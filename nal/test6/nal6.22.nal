@@ -1,0 +1,28 @@
+'********** recursion
+
+'0 is a number
+<0 --> num>. %1.00;0.90%
+
+'If n is a number, n+1 is also a number
+<<$1 --> num> ==> <(*,$1) --> num>>. %1.00;0.90%
+
+'3 is a number?
+<(*,(*,(*,0))) --> num>?
+
+''//outputMustContain('<0 --> (/,num,_)>. %1.00;0.81%')
+''//outputMustContain('<(*,(*,0)) --> (/,num,_)>. %1.00;0.66%')
+
+
+''outputMustContain('<(*,(*,0)) --> num>. %1.00;0.73%')
+
+'I guess 3 is a number
+''outputMustContain('<(*,(*,(*,0))) --> num>. %1.00;0.66%')
+
+
+2500
+
+
+
+'previous equivalent: outputMustContain('<(/,(*,0),_) --> (/,num,_)>. %1.00;0.73%')
+
+

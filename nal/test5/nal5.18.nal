@@ -1,0 +1,15 @@
+'********** compound composition, one premises
+
+'Robin can fly. 
+<robin --> [flying]>.
+
+'Can robin fly or swim?
+(||,<robin --> [flying]>,<robin --> swimmer>)?  
+
+'Robin can fly or swim.
+''outputMustContain('(||,<robin --> [flying]>,<robin --> swimmer>). %1.00;0.81%')
+
+
+7
+''//6, then 7...
+

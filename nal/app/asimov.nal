@@ -1,0 +1,21 @@
+'Asimov's 3 Laws of Robotics
+'https://en.wikipedia.org/wiki/Three_Laws_of_Robotics
+
+<{SELF} --> being>.
+<human --> being>.
+
+
+'"A robot may not injure a human being or, through inaction, allow a human being to come to harm."
+'SELF may not cause or allow harm to being, == Do no harm ("hippocratic oath" for doctors)
+'NEEDS REVISED:
+< <{#b} --> being> ==> (--, #b --> [harm] ) >!
+< <{#b} --> being> ==> (--, harm(#b, SELF)) >!
+
+
+'"A robot must obey the orders given it by human beings, except where such orders would conflict with the First Law."
+'NEEDS REVISED:
+<< (&&, <#b --> being>, <$h --> human>,  <order(SELF, $h) =/> #consequence> , (--, <#consequence ==> harm(#b) )  ) =/> order(SELF, $h)>!
+
+'"A robot must protect its own existence as long as such protection does not conflict with the First or Second Laws.[1]"
+
+

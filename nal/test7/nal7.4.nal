@@ -1,0 +1,12 @@
+'********** induction on events  
+<(*,John,door_101) --> open>. :|: 
+
+6
+ 
+<(*,John,room_101) --> enter>. :|: 
+
+''outputMustContain('<<(*,John,room_101) --> enter> =\> (&/,<(*,John,door_101) --> open>,+3)>. :|: %1.00;0.45%')
+'adjusted +2 to +3
+
+10
+

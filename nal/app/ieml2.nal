@@ -1,0 +1,87 @@
+'IEML
+'http://www.ieml.org/english/iemlword.html
+
+
+
+
+<{virtual,actual,sign,being,thing} --> element>.
+
+
+'http://www.ieml.org/english/polarity.html
+<{exist,is} --> a>.
+
+<{source,target} --> role>.
+
+'http://www.ieml.org/english/o_1.html
+<{virtual,actual} --> exist>.
+(--,<virtual <-> actual>).
+<{(*,energy,exist),(*,act,exist),(*,change,is),(*,concept,is)} --> source>.
+<{(*,energy,exist),(*,change,exist),(*,act,is),(*,concept,is)} --> target>.
+
+
+'http://www.ieml.org/english/polarevents.html
+<{energy, act, change, concept} --> event>.
+
+<(*,exist,exist) <-> energy>.
+<{reflect,act,perceive,reconstitute} --> energy>.
+
+<(*,exist,is) <-> act>.
+<{know, want, can, express, commit, do} --> act>.
+
+
+<(*,is,exist) <-> change>.
+<{meta_change, signal_change, meaning_change, personal_change, referent_change, material_change } --> change>.
+
+
+
+<(*,is,is) <-> concept>.
+<{thought,language,memory,society,affect,world,truth,life,space} --> concept>.
+
+
+
+
+'http://www.ieml.org/english/m_1.html
+<{sign,being,thing} --> is>.
+
+
+'http://www.ieml.org/english/cycles.html
+<(*,<$a --> event>,<$b --> event>) --> cycle>.
+<<(*,$a,$b) --> cycle> <-> <$a =/> $b>>.
+
+
+<life_stage --> (*,energy,energy)>.
+<behavior --> (*,energy,act)>.
+<governance --> (*,energy,change)>.
+<cause --> (*,energy,concept)>.
+
+<empowerment --> (*,act,energy)>.
+<performance --> (*,act,act)>.
+<production --> (*,act,change)>.
+<obstacle --> (*,act,concept)>.
+
+<impermanent --> (*,change,energy)>.
+<condition --> (*,change,act)>.
+<transformation --> (*,change,change)>.
+<trial --> (*,change,concept)>.
+
+<inner_meaning --> (*,concept,energy)>.
+<development --> (*,concept,act)>.
+<creation --> (*,concept,change)>.
+<nature --> (*,concept,concept)>.
+
+
+'Flow: Source,Target,Translator
+<(*,<$s --> source>,<$t --> target>,<$p --> translator>) --> flow>.
+<(*,$s,$t,$p) ==> <(*,$s,$t) --> $p>>.
+
+
+'-------------- EXAMPLE ------------
+
+<SELF --> memory>.
+<SELF --> thought>.
+<personal_change --> SELF>.
+'<<$x <-> thought> =/> reflect($x,#y)>!
+<^say <-> language>.
+'<<$x --> thought> =/> say($x)>!
+<#1 --> thought>?
+'say(actual,language,change)!

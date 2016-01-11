@@ -1,0 +1,28 @@
+''js("  javax.swing.JOptionPane.showMessageDialog(null, 'pay attention!') ")!
+
+
+
+js(" '<random --> [' + parseInt(Math.random()*0) + ']>. :|:' ")!
+''outputMustContain('<random --> [0]>. :|: %1.00;0.90%')
+
+
+''produces a task
+js("'<a --> b>.'")!
+''outputMustContain('<a --> b>.')
+
+
+''produces a term implication
+js("'<a --> term>'")!
+''outputMustContain('<<a --> term> --> (/,js,"'<a --> term>'",_)>. :|: %1.00;0.99%')
+
+
+
+
+
+
+jsop(abc, "function(x) { return '<it --> ' + x + '>.'; }")!
+abc(works)!
+''outputMustContain('<it --> works>.')
+
+
+50

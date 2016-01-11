@@ -1,0 +1,117 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>opennars</groupId>
+        <artifactId>opennars</artifactId>
+        <version>1.7-SNAPSHOT</version>
+    </parent>
+    <artifactId>nars_web</artifactId>
+    <packaging>jar</packaging>
+
+    <name>OpenNARS Web</name>
+    <url>https://github.com/opennars/opennars</url>
+
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <build>
+        <!--<resources>-->
+
+        <!--<resource>-->
+        <!--<directory>${basedir}/src/main/java/</directory>-->
+        <!--<includes>-->
+        <!--<include>**/*.xml</include>-->
+        <!--<include>**/public/*</include>-->
+        <!--<include>**/client/*.java</include>-->
+        <!--</includes>-->
+        <!--<filtering>false</filtering>-->
+        <!--</resource>-->
+        <!--</resources>-->
+    </build>
+
+    <dependencies>
+
+
+        <dependency>
+            <groupId>opennars</groupId>
+            <artifactId>nars_util</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>opennars</groupId>
+            <artifactId>nars_logic</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.undertow</groupId>
+            <artifactId>undertow-core</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jboss.logging</groupId>
+                    <artifactId>jboss-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.addthis</groupId>
+            <artifactId>meshy</artifactId>
+            <version>3.3.6</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-embedder</artifactId>
+            <version>3.3.9</version>
+        </dependency>
+
+
+        <!--<dependency>-->
+            <!--<groupId>org.eclipse.golo</groupId>-->
+            <!--<artifactId>golo</artifactId>-->
+            <!--<version>3.0.0-incubation</version>-->
+        <!--</dependency>-->
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-core</artifactId>
+            <version>2.16.1</version>
+        </dependency>
+
+
+    </dependencies>
+
+
+    <!-- GWT -->
+    <!--<dependency>-->
+    <!--<groupId>com.google.gwt</groupId>-->
+    <!--<artifactId>gwt-dev</artifactId>-->
+    <!--<version>2.7.0</version>-->
+    <!--</dependency>-->
+    <!--<dependency>-->
+    <!--<groupId>com.google.gwt</groupId>-->
+    <!--<artifactId>gwt-user</artifactId>-->
+    <!--<version>2.7.0</version>-->
+    <!--</dependency>-->
+
+    <!--<dependency>-->
+    <!--<groupId>com.sksamuel.gwt</groupId>-->
+    <!--<artifactId>gwt-websockets</artifactId>-->
+    <!--<version>1.0.4</version>-->
+    <!--</dependency>-->
+    <!--<dependency>-->
+    <!--<groupId>com.googlecode.gwtquery</groupId>-->
+    <!--<artifactId>gwtquery</artifactId>-->
+    <!--<version>1.4.3</version>-->
+    <!--<scope>provided</scope>-->
+    <!--</dependency>-->
+
+</project>
+

@@ -1,0 +1,188 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>opennars</groupId>
+        <artifactId>opennars</artifactId>
+        <version>1.7-SNAPSHOT</version>
+    </parent>
+
+
+    <artifactId>nars_lab</artifactId>
+    <packaging>jar</packaging>
+
+    <name>OpenNARS Lab</name>
+    <url>https://github.com/opennars/opennars</url>
+    <dependencies>
+        <dependency>
+            <groupId>opennars</groupId>
+            <artifactId>nars_util</artifactId>
+            <version>1.7-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>opennars</groupId>
+            <artifactId>nars_logic</artifactId>
+            <version>1.7-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>opennars</groupId>
+            <artifactId>nars_gui</artifactId>
+            <version>1.7-SNAPSHOT</version>
+        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>opennars</groupId>-->
+            <!--<artifactId>nars_web</artifactId>-->
+            <!--<version>1.7-SNAPSHOT</version>-->
+        <!--</dependency>-->
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.janino</groupId>
+            <artifactId>janino</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.boofcv</groupId>
+            <artifactId>visualize</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.boofcv</groupId>
+            <artifactId>WebcamCapture</artifactId>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.jogamp.gluegen</groupId>
+            <artifactId>gluegen-rt-main</artifactId>
+            <version>2.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jogamp.jogl</groupId>
+            <artifactId>jogl-all-main</artifactId>
+            <version>2.3.1</version>
+        </dependency>
+
+        <!--<dependency>-->
+            <!--<groupId>ai.h2o</groupId>-->
+            <!--<artifactId>h2o-core</artifactId>-->
+            <!--<version>3.0.1.4</version>-->
+            <!--<exclusions>-->
+                <!--<exclusion>-->
+                    <!--<groupId>ai.h2o</groupId>-->
+                    <!--<artifactId>google-analytics-java</artifactId>-->
+                <!--</exclusion>-->
+                <!--<exclusion>-->
+                    <!--<groupId>org.eclipse.jetty.aggregate</groupId>-->
+                    <!--<artifactId>jetty-servlet</artifactId>-->
+                <!--</exclusion>-->
+                <!--<exclusion>-->
+                    <!--<groupId>org.eclipse.jetty</groupId>-->
+                    <!--<artifactId>jetty-server</artifactId>-->
+                <!--</exclusion>-->
+                <!--<exclusion>-->
+                    <!--<groupId>com.google.guava</groupId>-->
+                    <!--<artifactId>guava</artifactId>-->
+                <!--</exclusion>-->
+                <!--<exclusion>-->
+                    <!--<groupId>log4j</groupId>-->
+                    <!--<artifactId>log4j</artifactId>-->
+                <!--</exclusion>-->
+                <!--<exclusion>-->
+                    <!--<groupId>commons-collections</groupId>-->
+                    <!--<artifactId>commons-collections</artifactId>-->
+                <!--</exclusion>-->
+            <!--</exclusions>-->
+        <!--</dependency>-->
+
+
+        <!--<dependency>-->
+            <!--<groupId>org.jogamp.jocl</groupId>-->
+            <!--<artifactId>jocl</artifactId>-->
+            <!--<version>2.3.1</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.jogamp.jocl</groupId>-->
+            <!--<artifactId>jocl-main</artifactId>-->
+            <!--<version>2.3.1</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>net.sf.sociaal</groupId>-->
+            <!--<artifactId>vecmath</artifactId>-->
+        <!--</dependency>-->
+
+       <!--<dependency>-->
+           <!--<groupId>org.encog</groupId>-->
+           <!--<artifactId>encog-core</artifactId>-->
+           <!--<exclusions>-->
+               <!--<exclusion>-->
+                   <!--<groupId>org.apache.commons</groupId>-->
+                   <!--<artifactId>commons-math3</artifactId>-->
+               <!--</exclusion>-->
+           <!--</exclusions>-->
+       <!--</dependency>-->
+
+        <dependency>
+            <groupId>net.sourceforge.tess4j</groupId>
+            <artifactId>tess4j</artifactId>
+            <version>2.0.2-SNAPSHOT</version>
+        </dependency>
+
+        <!--&lt;!&ndash; for VNC &ndash;&gt;-->
+        <!--<dependency>-->
+            <!--<groupId>urbanophile</groupId>-->
+            <!--<artifactId>java-getopt</artifactId>-->
+            <!--<version>1.0.9</version>-->
+
+        <!--</dependency>-->
+
+        <dependency>
+            <groupId>org.processing</groupId>
+            <artifactId>core</artifactId>
+            <version>3.0beta-SNAPSHOT</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.apache.bcel</groupId>
+            <artifactId>bcel</artifactId>
+        </dependency>
+
+
+    </dependencies>
+
+
+
+
+    <repositories>
+        <repository>
+            <id>snapshots-repo</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+  
+
+    <build>
+        <resources>
+
+            <resource>
+                <directory>${basedir}/src/main/java/</directory>
+                <includes>
+                    <include>**/*.cl</include>
+                    <include>**/keymaps/*</include>
+                </includes>
+                <filtering>false</filtering>
+            </resource>
+        </resources>
+    </build>
+</project>
+
