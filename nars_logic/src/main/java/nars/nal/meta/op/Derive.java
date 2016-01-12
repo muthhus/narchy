@@ -137,16 +137,20 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
 
 
             int tDelta = p.tDelta.getIfAbsent(Tense.ITERNAL);
-            Termed c;
+            Termed<Compound> c;
             if (tDelta > Tense.ITERNAL) {
                 //set time relation
                 Term tt = tNorm.term();
-                if (tt instanceof Compound)
+                if (tt instanceof Compound) {
                     c = ((Compound) tt).t(tDelta);
+
+                    if ( c == tt) //unchanged
+                        c = mem.taskConcept(tNorm); //accelerant: concept lookup
+                }
                 else
-                    c = tNorm;
+                    return;//c = tNorm;
             } else {
-                c = mem.taskConcept(tNorm); //accelerant
+                c = mem.taskConcept(tNorm); //accelerant: concept lookup
             }
 
             if (c != null) {
@@ -160,7 +164,7 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
 
         private final ConceptProcess premise;
 
-        public DerivedTask(Termed tc, ConceptProcess premise) {
+        public DerivedTask(Termed<Compound> tc, ConceptProcess premise) {
             super(tc);
             this.premise = premise;
         }
@@ -186,7 +190,7 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
     }
 
     /** part 2 */
-    private void derive(PremiseMatch m, Termed c, Truth truth, Budget budget) {
+    private void derive(PremiseMatch m, Termed<Compound> c, Truth truth, Budget budget) {
 
         ConceptProcess premise = m.premise;
 

@@ -62,8 +62,8 @@ public interface TermPrinter {
             case IMAGE_EXT:
                 imageAppend(c, p, pretty);
                 break;
-            case INHERIT: inheritAppend(c, p, pretty); break;
-            case SIMILAR: similarAppend(c, p, pretty); break;
+            //case INHERIT: inheritAppend(c, p, pretty); break;
+            //case SIMILAR: similarAppend(c, p, pretty); break;
             default:
                 if (op.isStatement() || c.size()==2) {
                     if (Op.isOperation(c)) {

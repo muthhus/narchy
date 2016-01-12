@@ -167,14 +167,14 @@ public abstract class AbstractTask extends Item<Task>
 
 
         if (t == null) throw new RuntimeException("null term");
-        Concept tNorm = memory.concept(t);
-        if (tNorm == null)
-            throw new RuntimeException("unconceptualizable:" + t);
 
-
-        if (!Task.validTaskTerm(tNorm.term())) {
-            throw new RuntimeException("invalid sentence term: " + tNorm);
+        //normalize term
+        Termed normalizedTerm = (Termed) memory.index.normalized(t);
+        if ((normalizedTerm == null) || (!Task.validTaskTerm(normalizedTerm.term()))) {
+            return null;
         }
+        setTerm(normalizedTerm);
+
 
         updateEvidence();
 
@@ -210,12 +210,7 @@ public abstract class AbstractTask extends Item<Task>
             memory.applyDefaultBudget((MutableTask)this);
         }
 
-        //obtain shared copy of term
-        Termed nomalizedTerm = (Termed) memory.index.normalized(t);
-        if (nomalizedTerm == null) {
-            return null;
-        }
-        setTerm(nomalizedTerm);
+
 
         //finally, assign a unique stamp if none specified (input)
         if (getEvidence().length== 0) {

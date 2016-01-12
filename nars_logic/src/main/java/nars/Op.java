@@ -225,7 +225,7 @@ public enum Op {
             w.append(ch);
 
         if (hasTime) {
-            if (t > 0) w.append('+');
+            if (t >= 0) w.append('+');
             w.append(Integer.toString(t)).append(' ');
         }
     }

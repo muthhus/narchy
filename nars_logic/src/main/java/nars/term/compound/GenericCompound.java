@@ -19,12 +19,19 @@ import static nars.nal.nal7.Tense.ITERNAL;
 
 public class GenericCompound<T extends Term> implements Compound<T> {
 
-    public final TermVector<T> terms;
     public final Op op;
+
+    /** subterm vector */
+    public final TermVector<T> terms;
+
+    /** subterm relation, resolves to unique concept */
     public final int relation;
 
-    protected final transient int hash;
-    private final int t;
+    /** temporal relation (dt), resolves to same concept */
+    public final int t;
+
+
+    private final transient int hash;
     private transient boolean normalized = false;
 
 

@@ -243,15 +243,15 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
     }
 
     public boolean timeMatches(Task t) {
-        return creationTimeMatches() && occurrenceTimeMatches(t) && relativeTimeMatches(t);
+        return creationTimeMatches() && occurrenceTimeMatches(t);
     }
 
-    private boolean relativeTimeMatches(Task t) {
-        if (term instanceof Compound) {
-            return ((Compound)t).t() == t.term().t();
-        }
-        return true;
-    }
+//    private boolean relativeTimeMatches(Task t) {
+//        if (term instanceof Compound) {
+//            return ((Compound)term).t() == t.term().t();
+//        }
+//        return true;
+//    }
 
     final boolean creationTimeMatches() {
         long now = nar.time();
