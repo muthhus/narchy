@@ -47,7 +47,7 @@ public class PremiseRuleTest extends TestCase {
 
         {
             PremiseRule x = p.termRaw("< A, A |- A, (Belief:Revision, Desire:Weak)>");
-            assertEquals("((A,A),(A,(<Revision-->Belief>,<Weak-->Desire>)))", x.toString());
+            assertEquals("((A,A),(A,((Revision-->Belief),(Weak-->Desire))))", x.toString());
             // assertEquals(12, x.getVolume());
         }
 

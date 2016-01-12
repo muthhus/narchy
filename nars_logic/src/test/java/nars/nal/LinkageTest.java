@@ -47,25 +47,11 @@ public class LinkageTest extends AbstractNALTester {
 
         Concept ret = tester.nar.concept(premise1);
         boolean passed = false;
-        if(ret!=null){// && ret.getTermLinks()!=null) {
-            for (Termed entry : ret.getTermLinks()) {
-                Term w = entry.term();
-                if (w.toString().equals(premise2)) {
-                    passed = true;
-                }
-            }
-        }
+        passed = isPassed2(premise2, ret, passed);
 
         Concept ret2 = tester.nar.concept(premise2);
         boolean passed2 = false;
-        if(ret2!=null){// && ret2.getTermLinks()!=null) {
-            for (Termed entry : ret2.getTermLinks()) {
-                Term w = entry.term();
-                if (w.toString().equals(premise1)) {
-                    passed2 = true;
-                }
-            }
-        }
+        passed2 = isPassed2(premise1, ret2, passed2);
 
         assertTrue(passed && passed2);
 //        if(passed && passed2) { //dummy to pass the test:
@@ -74,6 +60,18 @@ public class LinkageTest extends AbstractNALTester {
 //            throw new Exception("failed");
 //        }
 //        tester.mustBelieve(10,"<a --> b>",0.9f);
+    }
+
+    public boolean isPassed2(String premise1, Concept ret2, boolean passed2) {
+        if(ret2!=null){// && ret2.getTermLinks()!=null) {
+            for (Termed entry : ret2.getTermLinks()) {
+                Term w = entry.term();
+                if (w.toString().equals(premise1)) {
+                    passed2 = true;
+                }
+            }
+        }
+        return passed2;
     }
 
     public void ProperlyLinkedIndirectlyTest(String spremise1, String spremise2) throws Exception {
@@ -223,18 +221,18 @@ public class LinkageTest extends AbstractNALTester {
 
     @Test
     public void Linkage_NAL5_abduction() throws Exception {
-        ProperlyLinkedTest("((robin-->bird)==>(robin-->animal))","<robin-->animal>");
+        ProperlyLinkedTest("((robin-->bird)==>(robin-->animal))","(robin-->animal)");
     }
 
 
     @Test
     public void Linkage_NAL5_detachment() throws Exception {
-        ProperlyLinkedTest("((robin-->bird)==>(robin-->animal))", "<robin-->bird>");
+        ProperlyLinkedTest("((robin-->bird)==>(robin-->animal))", "(robin-->bird)");
     }
 
     @Test
     public void Linkage_NAL6_variable_elimination2() throws Exception {
-        ProperlyLinkedIndirectlyTest("<<$1-->bird>==><$1-->animal>>", "<tiger-->animal>");
+        ProperlyLinkedIndirectlyTest("<<$1-->bird>==><$1-->animal>>", "(tiger-->animal)");
     }
 
     //here the problem is: they should be interlinked by lock
