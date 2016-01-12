@@ -377,6 +377,8 @@
 //Reasoning about temporal statements. those are using the ==> relation because relation in time is a relation of the truth between statements.
 
 ////    X, (XI ==> B) |- occurrsForward( substituteIfUnifies( B, "$", XI, (&/,X,/1)), XI, "==>"), (Belief:Deduction, Desire:Induction, Order:ForAllSame, Event:Anticipate)
+    C, (A ==> B) |- substituteIfUnifies( B, "$", A, C), (Belief:Deduction, Desire:Induction, Order:ForAllSame, Event:Anticipate)
+    C, (A ==> B) |- substituteIfUnifies( A, "$", B, C), (Belief:Abduction, Desire:Deduction, Order:ForAllSame)
 //    X, (BI ==> Y) |- occurrsBackward( substituteIfUnifies( BI, "$", Y, X), BI, "==>"), (Belief:Abduction, Desire:Deduction, Order:ForAllSame)
 
 ////Temporal induction: ////////////////////////////////////////////////////////////////////////////////////
