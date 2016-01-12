@@ -20,7 +20,7 @@ public class TestTemporalRelations {
 
         assertEquals("(x ==>-5 y)", $("(x ==>-5 y)").toString());
 
-        assertEquals("((x:before) ==>+5 (x:after))", $("(x:before ==>+5 x:after)").toString());
+        assertEquals("((before-->x) ==>+5 (after-->x))", $("(x:before ==>+5 x:after)").toString());
     }
     @Test public void temporalEqualityAndCompare() {
         assertNotEquals( $("(x ==>+5 y)"), $("(x ==>+0 y)") );

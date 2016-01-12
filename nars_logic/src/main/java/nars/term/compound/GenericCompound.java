@@ -6,8 +6,8 @@ import nars.nal.nal7.Tense;
 import nars.term.Term;
 import nars.term.TermVector;
 import nars.term.Termed;
-import nars.term.compile.TermIndex;
 import nars.term.compile.TermPrinter;
+import nars.util.data.Util;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -48,9 +48,17 @@ public class GenericCompound<T extends Term> implements Compound<T> {
         this.normalized = (subterms.vars() == 0);
         this.op = op;
         this.relation = relation;
-        this.hash = TermIndex.hash(terms, op, t, relation+1);
+        this.hash = Util.hashCombine(terms.hashCode(), opRel(), t);
         this.t = t;
     }
+
+//    protected GenericCompound(GenericCompound copy, int newT) {
+//        this.terms = copy.terms;
+//        this.normalized = copy.normalized;
+//        this.op = copy.op;
+//        this.relation = copy.relation;
+//        this.hash = copy.
+//    }
 
     @Override
     public final Op op() {
@@ -232,7 +240,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     }
 
     public Compound t(int cycles) {
-        if (cycles == t()) return this;
+        if (cycles == t) return this;
         return new GenericCompound(op(), relation, cycles, subterms());
     }
 

@@ -16,7 +16,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static nars.Op.*;
-import static nars.util.data.Util.hashCombine;
 
 /**
  *
@@ -44,24 +43,13 @@ public interface TermIndex extends TermBuilder {
     /**
      * implications, equivalences, and interval
      */
-    int InvalidEquivalenceTerm =
-            or(IMPLICATION, EQUIV);
+    int InvalidEquivalenceTerm = or(IMPLICATION, EQUIV);
     /**
      * equivalences and intervals (not implications, they are allowed
      */
-    int InvalidImplicationPredicate =
-            or(EQUIV);
+    int InvalidImplicationPredicate = or(EQUIV);
 
-    /** universal compound hash function */
-    static <T extends Term> int hash(TermVector subterms, Op op, int t, int hashSalt) {
-        int h = hashCombine(
-                    hashCombine( subterms.hashCode(), op.ordinal() ),
-                    t
-                );
-        if (hashSalt!=0)
-            h = hashCombine(h, hashSalt);
-        return h;
-    }
+
 
 
     static Task spawn(Task parent, Compound content, char punctuation, Truth truth, long occ, Budget budget) {

@@ -208,9 +208,9 @@ public interface Term extends Termed, Comparable, Termlike {
                     .replace(" ", "0");
     }
 
-    @Override
-    default int opRel() {
-        return op().ordinal() | (-1 << 16);
+    /** upper 16 bits: ordinal, lower 16 bits: relation (default=-1) */
+    @Override default int opRel() {
+        return op().ordinal()<<16 | (-1 & 0xffff);
     }
 
     default boolean isCompound() {

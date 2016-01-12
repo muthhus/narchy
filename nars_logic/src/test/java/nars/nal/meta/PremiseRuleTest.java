@@ -117,7 +117,7 @@ public class PremiseRuleTest extends TestCase {
         y = ((PremiseRule)y).normalizeRule(i);
         printRecursive(y);
 
-        assertEquals("((<%1-->%2>,(--,%1)),(<%2-->%1>,(<Conversion-->Belief>)))", y.toString());
+        assertEquals("(((%1-->%2),(--,%1)),((%2-->%1),((Conversion-->Belief))))", y.toString());
         assertEquals(10, y.complexity());
         assertEquals(15, y.volume());
     }

@@ -169,15 +169,15 @@ public final class ConceptProcess implements Premise {
         return (int)Math.ceil(getTask().getPriority() * (max-min) + min);
     }
 
-    /** max(tasktime, belieftime) */
-    public long getOccurrenceTime() {
-        long occ= getTask().getOccurrenceTime();
-        Task b = getBelief();
-        if (b!=null) {
-            occ = Math.max(occ, b.getOccurrenceTime());
-        }
-        return occ;
-    }
+//    /** max(tasktime, belieftime) */
+//    public long getMaxOccurrenceTime() {
+//        long occ= getTask().getOccurrenceTime();
+//        Task b = getBelief();
+//        if (b!=null) {
+//            occ = Math.max(occ, b.getOccurrenceTime());
+//        }
+//        return occ;
+//    }
 
 
     //    /** supplies at most 1 premise containing the pair of next tasklink and termlink into a premise */

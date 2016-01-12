@@ -29,7 +29,6 @@ import nars.term.transform.CompoundTransform;
 import nars.term.transform.MapSubst;
 import nars.term.transform.VariableNormalization;
 import nars.term.variable.Variable;
-import org.junit.After;
 
 import java.util.HashMap;
 import java.util.List;
@@ -332,7 +331,7 @@ public class PremiseRule extends GenericCompound implements Level {
             //if (predicate.getSubject() instanceof SetExt) {
                 //decode precondition predicate arguments
             args = ((Compound)(predicate.term(0))).terms();
-            arg1 = args[0];
+            arg1 = (args.length > 0) ? args[0] : null;
             arg2 = (args.length > 1) ? args[1] : null;
             /*} else {
                 throw new RuntimeException("invalid arguments");*/
@@ -388,8 +387,12 @@ public class PremiseRule extends GenericCompound implements Level {
 //                    preNext = Temporality.either;
 //                    break;
 
-                case "event":
-                    preNext = Event.the;
+                case "after":
+                    preNext = Event.After.the;
+                    break;
+
+                case "before":
+                    preNext = Event.Before.the;
                     break;
 
 //                case "concurrent":

@@ -350,6 +350,10 @@ public enum Util {
         //return seed * 31 + hash;
     }
 
+    public static int hashCombine(int a, int b, int c) {
+        //TODO decide if this is efficient and hashes well
+        return hashCombine(hashCombine(a, b), c);
+    }
 
 
     public static int ELFHashNonZero(byte[] str, int seed) {

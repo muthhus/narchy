@@ -51,6 +51,9 @@ public interface Statement {
 
     /** skips the null and equality test */
     static boolean invalidStatement2(Term subject, Term predicate) {
+        subject = subject.anonymous();
+        predicate = predicate.anonymous();
+
         //TODO combine these mirrored invalidReflexive calls into one combined, unredundant operation
         if (invalidReflexive(subject, predicate))
             return true;

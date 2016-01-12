@@ -382,11 +382,17 @@
 ////Temporal induction: ////////////////////////////////////////////////////////////////////////////////////
 //When P and then S happened according to an observation, by induction (weak) it may be that alyways after P, usually S happens.
 
-    P, S, neq(P,S), event(after), notImplicationOrEquivalence(P), notImplicationOrEquivalence(S) |- (S ==> P), (Belief:Induction, Eternalize:Immediate),
-                                                                                                    (S <=> P), (Belief:Comparison)
-//                                                                                                    (P ==> S), (Belief:Abduction)
+    T, B, before(_), neq(T,B), notImplicationOrEquivalence(T), notImplicationOrEquivalence(B) |- (T ==> B), (Belief:Induction, Eternalize:Immediate),
+                                                                                                (T <=> B), (Belief:Comparison),
+                                                                                                (B ==> T), (Belief:Abduction)
 
-    P, S, event(after), notConjunction(P), notConjunction(S),  notImplicationOrEquivalence(P), notImplicationOrEquivalence(S) |- (P && S), (Belief:Intersection)
+    T, B, after(_), neq(T,B), notImplicationOrEquivalence(T), notImplicationOrEquivalence(B) |- (B ==> T), (Belief:Induction, Eternalize:Immediate),
+                                                                                               (B <=> T), (Belief:Comparison),
+                                                                                               (T ==> B), (Belief:Abduction)
+
+    T, B, before(_), neq(T,B), notConjunction(T), notConjunction(B),  notImplicationOrEquivalence(T), notImplicationOrEquivalence(B) |- (T && B), (Belief:Intersection)
+
+    T, B, after(_), neq(T,B), notConjunction(T), notConjunction(B),  notImplicationOrEquivalence(T), notImplicationOrEquivalence(B) |- (B && T), (Belief:Intersection)
 
 
 //    P, S, after(Task,Belief), measure_time(I), notImplicationOrEquivalence(P), notImplicationOrEquivalence(S) |- ((&/,S,I) =/> P), (Belief:Induction, Eternalize:Immediate),

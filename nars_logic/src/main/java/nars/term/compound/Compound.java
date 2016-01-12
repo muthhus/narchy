@@ -297,9 +297,9 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
         return subterms().hasEllipsis();
     }
 
-    @Override
-    default int opRel() {
-        return op().ordinal() | (relation() << 16);
+
+    @Override default int opRel() {
+        return op().ordinal()<<16 | (relation() & 0xffff);
     }
 
     default Term last() {

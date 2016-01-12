@@ -40,7 +40,7 @@ public class FindSubstTest {
 
                 //output
                 assertEquals(
-                        "<a-->b> <?1-->b> -?>",
+                        "(a-->b) (?1-->b) -?>",
                         a + " " + b + " -?>"  /*+ " remaining power"*/);
 
                 return true;

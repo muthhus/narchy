@@ -45,7 +45,7 @@ public class QuestTest {
         nar.answer(nar.task(term + '@'), a -> {
             //System.out.println("answer: " + a);
             //System.out.println(" " + a.getLog());
-            if (a.toString().contains("<a-->b>!"))
+            if (a.toString().contains("(a-->b)!"))
                 valid.set(true);
         });
 

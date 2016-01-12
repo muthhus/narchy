@@ -53,9 +53,9 @@ public class NAL7NewTest extends AbstractNALTester {
         t
         .input("x:before. :|:")
         .inputAt(10, "x:after. :|:")
-        .mustBelieve(cycles, "(x:before ==>+10 x:after)", 1.00f, inductionConf, 10)
-//        .mustBelieve(cycles, "(x:after ==>-10 x:before)", 1.00f, abductionConf, 10)
-//        .mustBelieve(cycles, "(x:before <=>+10 x:after)", 1.00f, comparisonConf, 10)
+        .mustBelieve(cycles, "(x:before ==>+10 x:after)", 1.00f, inductionConf, 0)
+        .mustBelieve(cycles, "(x:after ==>-10 x:before)", 1.00f, abductionConf, 10)
+//        .mustBelieve(cycles, "(x:before <=>+10 x:after)", 1.00f, comparisonConf, 0)
         .mustBelieve(cycles, "(x:after <=>-10 x:before)", 1.00f, comparisonConf, 10)
         .mustBelieve(cycles, "(x:before &&+10 x:after)", 1.00f, intersectionConf, 10)
         ;

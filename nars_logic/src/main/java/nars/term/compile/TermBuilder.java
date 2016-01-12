@@ -1,11 +1,11 @@
 package nars.term.compile;
 
+import com.google.common.collect.Lists;
 import com.gs.collections.api.set.MutableSet;
 import nars.Global;
 import nars.Op;
 import nars.nal.PremiseAware;
 import nars.nal.PremiseMatch;
-import nars.nal.nal7.Tense;
 import nars.nal.nal8.Operator;
 import nars.nal.op.ImmediateTermTransform;
 import nars.term.*;
@@ -18,6 +18,7 @@ import nars.term.transform.Subst;
 import nars.term.transform.VariableNormalization;
 import nars.term.transform.VariableTransform;
 import nars.term.variable.Variable;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -26,6 +27,7 @@ import java.util.TreeSet;
 
 import static java.util.Arrays.copyOfRange;
 import static nars.Op.*;
+import static nars.nal.nal7.Tense.ITERNAL;
 import static nars.term.Statement.pred;
 import static nars.term.Statement.subj;
 
@@ -205,7 +207,7 @@ public interface TermBuilder {
 
 
     default Term newTerm(Op op, int relation, TermContainer tt) {
-        return newTerm(op, relation, Tense.ITERNAL, tt);
+        return newTerm(op, relation, ITERNAL, tt);
     }
 
     default Term newTerm(Op op, int relation, int t, TermContainer tt) {
@@ -221,16 +223,23 @@ public interface TermBuilder {
                 if (u.length!=1)
                     throw new RuntimeException("invalid negation subterms: " + Arrays.toString(u));
                 return negation(u[0]);
+
+
             case INSTANCE:
+                if (u.length!=2 || t!= ITERNAL) throw new RuntimeException("invalid inst");
                 return inst(u[0], u[1]);
             case PROPERTY:
+                if (u.length!=2 || t!= ITERNAL) throw new RuntimeException("invalid prop");
                 return prop(u[0], u[1]);
             case INSTANCE_PROPERTY:
+                if (u.length!=2 || t!= ITERNAL) throw new RuntimeException("invalid instprop");
                 return instprop(u[0], u[1]);
+
             case CONJUNCTION:
-                return junction(CONJUNCTION, t, tt);
+                return junction(CONJUNCTION, t, u);
             case DISJUNCTION:
-                return junction(DISJUNCTION, t, tt);
+                return junction(DISJUNCTION, t, u);
+
             case IMAGE_INT:
             case IMAGE_EXT:
                 //if no relation was specified and it's an Image,
@@ -294,7 +303,6 @@ public interface TermBuilder {
         Term[] t = tt.terms();
         int currentSize = t.length;
 
-        boolean valid;
         if (op.minSize > 1 && currentSize == 1) {
             //special case: allow for ellipsis to occupy one item even if minArity>1
             if (t[0] instanceof Ellipsis)
@@ -357,8 +365,29 @@ public interface TermBuilder {
                 index, new TermVector(res));
     }
 
-    default Term junction(Op op, int t, Iterable<Term> u) {
+    default Term junction(Op op, int t, Term... u) {
+        if (t!=ITERNAL) {
+            if (u.length!=2) {
+                throw new RuntimeException("invalid temporal conjunction: " + op + " " + t + " "+ Arrays.toString(u));
+            }
+            if (op == DISJUNCTION) {
+                throw new RuntimeException("invalid temporal disjunction");
+            }
 
+            //Compound x = ((Compound) make(op, -1, TermSet.the(u)).term());
+            Term x = junction(op, Lists.newArrayList(u));
+            if (!x.isCompound()) return x;
+
+            Compound cx = (Compound)x;
+
+            boolean reversed = cx.term(0)==u[1];
+            return cx.t(reversed ? -t : t);
+        } else {
+            return junction(op, Lists.newArrayList(u));
+        }
+    }
+
+    default Term junction(Op op, Iterable<Term> u) {
 
         final boolean[] done = {true};
 
@@ -376,15 +405,8 @@ public interface TermBuilder {
             }
         });
 
-        if (!done[0]) {
-            return junction(op, t, s);
-        }
-
-        Term x = finish(op, -1, TermSet.the(s));
-        if (x instanceof Compound) {
-            x = ((Compound)x).t(t);
-        }
-        return x;
+        return !done[0] ? junction(op, s) :
+                finish(op, -1, TermSet.the(s));
     }
 
     default Term statement(Op op, int t, Term[] u) {
@@ -394,56 +416,68 @@ public interface TermBuilder {
                 return u[0];
 
             case 2:
-
-                Term subject = u[0];
-                Term predicate = u[1];
-
-                //DEBUG:
-                if (subject == null || predicate == null)
-                    throw new RuntimeException("invalid statement terms");
-
-                //special statement filters
-                switch (op) {
-                    case EQUIV:
-                        if (!validEquivalenceTerm(subject)) return null;
-                        if (!validEquivalenceTerm(predicate)) return null;
-                        break;
-
-                    case IMPLICATION:
-                        if (subject.isAny(TermIndex.InvalidEquivalenceTerm)) return null;
-                        if (predicate.isAny(TermIndex.InvalidImplicationPredicate)) return null;
-
-                        if (predicate.isAny(Op.ImplicationsBits)) {
-                            Term oldCondition = subj(predicate);
-                            if ((oldCondition.isAny(Op.ConjunctivesBits)) && oldCondition.containsTerm(subject))
-                                return null;
-
-                            return impl2Conj(op, subject, predicate, oldCondition);
-                        }
-                        break;
-                    default:
-                        break;
-                }
-
-                if (u[0].equals(u[1]))
-                    return u[0];
-
-                //already tested equality, so go to invalidStatement2:
-                if (!Statement.invalidStatement2(u[0], u[1])) {
-                    TermContainer cc = TermContainer.the(op, u);
-                    Compound x = ((Compound) make(op, -1, cc).term());
-                    if(t!=Tense.ITERNAL) {
-                        boolean reversed = cc.term(0)==u[1];
-                        x = x.t(reversed ? -t : t);
-                    }
-                    return x;
-                }
-
-                return null;
-            default:
-                return null;
-                //throw new RuntimeException("invalid statement arguments: " + Arrays.toString(t));
+                return statement2(op, t, u);
         }
+
+        return null;
+        //throw new RuntimeException("invalid statement arguments: " + Arrays.toString(t));
+    }
+
+    @Nullable
+    default Term statement2(Op op, int t, Term[] u) {
+        Term subject = u[0];
+        Term predicate = u[1];
+
+        //DEBUG:
+        if (subject == null || predicate == null)
+            throw new RuntimeException("invalid statement terms");
+
+        //special statement filters
+        switch (op) {
+
+            case INHERIT:
+            case SIMILAR:
+                if (t == 0) t = ITERNAL; //predictive inheritance disabled
+                else if (t!= ITERNAL) {
+                    throw new RuntimeException("temporal leak: " + op + " " + t + " " + Arrays.toString(u));
+                }
+                break;
+
+            case EQUIV:
+                if (!validEquivalenceTerm(subject)) return null;
+                if (!validEquivalenceTerm(predicate)) return null;
+                break;
+
+            case IMPLICATION:
+                if (subject.isAny(TermIndex.InvalidEquivalenceTerm)) return null;
+                if (predicate.isAny(TermIndex.InvalidImplicationPredicate)) return null;
+
+                if (predicate.isAny(Op.ImplicationsBits)) {
+                    Term oldCondition = subj(predicate);
+                    if ((oldCondition.isAny(Op.ConjunctivesBits)) && oldCondition.containsTerm(subject))
+                        return null;
+
+                    return impl2Conj(t, subject, predicate, oldCondition);
+                }
+                break;
+
+        }
+
+        if (u[0].equals(u[1]))
+            return u[0];
+
+        //already tested equality, so go to invalidStatement2:
+        if (!Statement.invalidStatement2(u[0], u[1])) {
+            TermContainer cc = TermContainer.the(op, u);
+            Compound x = ((Compound) make(op, -1, cc).term());
+            if(t!= ITERNAL) {
+                boolean reversed = cc.term(0)==u[1];
+                x = x.t(reversed ? -t : t);
+            }
+            return x;
+        }
+
+        return null;
     }
 
     default Term subtractSet(Op setType, Compound A, Compound B) {
@@ -452,21 +486,12 @@ public interface TermBuilder {
         return newTerm(setType, TermContainer.difference(A, B));
     }
 
-    default Term impl2Conj(Op op, Term subject, Term predicate, Term oldCondition) {
-        Op conjOp;
-        switch (op) {
-            case IMPLICATION:
-                conjOp = CONJUNCTION;
-                break;
-            default:
-                throw new RuntimeException("invalid case");
-        }
-
-        Term s = newTerm(conjOp, subject, oldCondition);
+    default Term impl2Conj(int t, Term subject, Term predicate, Term oldCondition) {
+        Term s = junction(CONJUNCTION, TermSet.the(subject, oldCondition));
         if (s == null)
             return null;
 
-        return newTerm(op, s, pred(predicate));
+        return junction(CONJUNCTION, t, s, pred(predicate));
     }
 
     default Term newIntersectINT(Term[] t) {

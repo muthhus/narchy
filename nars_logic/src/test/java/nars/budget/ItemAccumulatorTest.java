@@ -83,12 +83,12 @@ public class ItemAccumulatorTest {
 
         BLink<Task> oneLink = ii.getArrayBag().pop();
         Task one = oneLink.get();
-        assertEquals("$.30;.50;.95$ <d-->x>. :0: %1.0;.90%", one.toString());
+        assertEquals("$.30;.50;.95$ (d-->x). :0: %1.0;.90%", one.toString());
 
         List<Task> two = new ArrayList();
         two.add(ii.getArrayBag().pop().get());
         two.add(ii.getArrayBag().pop().get());
-        assertEquals("[$.20;.50;.95$ <c-->x>. :0: %1.0;.90%, $.10;.50;.95$ <b-->x>. :0: %1.0;.90%]", two.toString());
+        assertEquals("[$.20;.50;.95$ (c-->x). :0: %1.0;.90%, $.10;.50;.95$ (b-->x). :0: %1.0;.90%]", two.toString());
 
         assertEquals(1, ii.getArrayBag().size());
 
