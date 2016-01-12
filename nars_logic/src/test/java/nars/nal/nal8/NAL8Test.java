@@ -77,14 +77,35 @@ public class NAL8Test extends AbstractNALTester {
         tester.mustDesire(cycles, "goto(z)", 1.0f, 0.81f); // :|:
     }
 
-    @Test
-    public void goal_deduction_tensed() throws Narsese.NarseseException {
+    @Test public void goal_deduction_tensed_conseq() throws Narsese.NarseseException {
         TestNAR tester = test();
 
         tester.input("goto(x). :\\:");
         tester.inputAt(10, "(goto($1) ==>+5 at:(SELF,$1)).");
 
         tester.mustBelieve(cycles, "at:(SELF,x)", 1.0f, 0.81f, 0);
+    }
+
+    @Test
+    public void belief_deduction_by_condition() throws Narsese.NarseseException {
+        TestNAR tester = test();
+
+        tester.input("(open({t001}) ==>+5 <{t001} --> [opened]>). :|: ");
+        tester.inputAt(10, "open({t001}). :|:");
+
+        tester.mustBelieve(cycles, "<{t001} --> [opened]>", 1.0f, 0.81f, 15); // :|:
 
     }
+    @Test
+    public void condition_goal_deduction() throws Narsese.NarseseException {
+        TestNAR tester = test();
+
+        tester.input("reachable:(SELF,{t002})! ");
+        tester.inputAt(10, "(( on:($1,#2) &&+0 at:(SELF,#2) ) ==>+0 reachable:(SELF,$1)).");
+
+        tester.mustDesire(cycles, "( at:(SELF,#1) &&+0 on:({t002},#1))", 1.0f, 0.81f); // :|:
+
+    }
+
+
 }

@@ -241,7 +241,9 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
     public Compound t(int cycles) {
         if (cycles == t) return this;
-        return new GenericCompound(op(), relation, cycles, subterms());
+        GenericCompound g = new GenericCompound(op(), relation, cycles, subterms());
+        if (isNormalized()) g.setNormalized();
+        return g;
     }
 
     @Override

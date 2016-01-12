@@ -53,6 +53,7 @@ public abstract class AbstractMapIndex implements TermIndex {
         if (y == null) {
             putTerm(y = makeTerm(x));
         }
+
         return y;
     }
 

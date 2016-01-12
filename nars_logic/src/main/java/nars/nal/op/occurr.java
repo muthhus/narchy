@@ -5,8 +5,8 @@ import nars.nal.PremiseMatch;
 import nars.nal.meta.AtomicBooleanCondition;
 import nars.nal.nal7.Tense;
 import nars.process.ConceptProcess;
-import nars.task.Task;
 import nars.term.Term;
+import nars.term.compound.Compound;
 
 /**
  * occurrsRelative(target, variable, direction)
@@ -24,7 +24,7 @@ public class occurr extends AtomicBooleanCondition<PremiseMatch> {
         forward = var2.toString().equals("forward"); //TODO check else case
         str = getClass().getSimpleName() + ":(" +
                 (taskOrBelief ? "task" : "belief") + "," +
-                (forward ? "forward" : "reverse");
+                (forward ? "forward" : "reverse") + ")";
     }
 
     @Override
@@ -37,17 +37,19 @@ public class occurr extends AtomicBooleanCondition<PremiseMatch> {
 
         ConceptProcess p = m.premise;
 
-        Task eventTask = taskOrBelief ? p.getTask() : p.getBelief();
+        Term tt = taskOrBelief ? p.getTaskTerm() : p.getBeliefTerm().term();
 
-        if (eventTask != null) {
-            int t = eventTask.term().t();
+
+        if (tt != null && (tt instanceof Compound)) {
+            int t = ((Compound)tt).t();
             if (t != Tense.ITERNAL) {
                 if (!forward) t = -t;
+                //if (!forward) t = 0;
                 m.occDelta.set(t);
                 return true;
             }
         }
 
-        return false;
+        return true;
     }
 }

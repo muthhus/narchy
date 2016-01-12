@@ -206,12 +206,14 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
 
 
         //just not able to measure it, closed world assumption gone wild.
-        if (occ != Tense.ETERNAL && premise.isEternal() && !premise.nal(7)) {
-            throw new RuntimeException("eternal premise " + premise + " should not result in non-eternal occurence time: " + deriving + " via rule " + rule);
+        if (occ != Tense.ETERNAL) {
+            if (premise.isEternal() && !premise.nal(7)) {
+                throw new RuntimeException("eternal premise " + premise + " should not result in non-eternal occurence time: " + deriving + " via rule " + rule);
+            }
+            int occDelta = m.occDelta.getIfAbsent(0);
+            occ += occDelta;
         }
 
-        int occDelta = m.occDelta.getIfAbsent(0);
-        occ += occDelta;
 
         if ((Global.DEBUG_DETECT_DUPLICATE_DERIVATIONS || Global.DEBUG_LOG_DERIVING_RULE) && Global.DEBUG) {
             deriving.log(rule);

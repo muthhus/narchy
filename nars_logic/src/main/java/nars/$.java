@@ -446,6 +446,7 @@ public   enum $  {
         return terms.newTerm(op, relation, t, subterms);
     }
 
+
     public static int typeIndex(Op o) {
         switch (o) {
             case VAR_PATTERN:

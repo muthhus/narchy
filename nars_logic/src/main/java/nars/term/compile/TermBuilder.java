@@ -190,7 +190,11 @@ public interface TermBuilder {
     default Term newTerm(Compound csrc, TermContainer subs) {
         if (csrc.subterms().equals(subs))
             return csrc;
-        return newTerm(csrc.op(), csrc.relation(), csrc.t(), subs);
+        Term x = newTerm(csrc.op(), csrc.relation(), subs);
+        if (x instanceof Compound) {
+            x = ((Compound)x).t(csrc.t()); //HACK ?
+        }
+        return x;
     }
     default Term newTerm(Op op, TermContainer subs) {
         return newTerm(op, -1, subs);
@@ -487,7 +491,7 @@ public interface TermBuilder {
     }
 
     default Term impl2Conj(int t, Term subject, Term predicate, Term oldCondition) {
-        Term s = junction(CONJUNCTION, TermSet.the(subject, oldCondition));
+        Term s = junction(CONJUNCTION, t, subject, oldCondition);
         if (s == null)
             return null;
 
