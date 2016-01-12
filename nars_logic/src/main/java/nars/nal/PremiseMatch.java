@@ -36,6 +36,7 @@ public class PremiseMatch extends FindSubst {
     public ConceptProcess premise;
 
     //public final VarCachedVersionMap secondary;
+    public final Versioned<Integer> occDelta;
     public final Versioned<Integer> tDelta;
     public final Versioned<Truth> truth;
     public final Versioned<Character> punct;
@@ -56,6 +57,7 @@ public class PremiseMatch extends FindSubst {
         }
 
         //secondary = new VarCachedVersionMap(this);
+        occDelta = new Versioned(this);
         tDelta = new Versioned(this);
         truth = new Versioned(this);
         punct = new Versioned(this);

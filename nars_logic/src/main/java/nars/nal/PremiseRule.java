@@ -387,6 +387,10 @@ public class PremiseRule extends GenericCompound implements Level {
 //                    preNext = Temporality.either;
 //                    break;
 
+                case "occurr":
+                    preNext = new occurr(arg1,arg2);
+                    break;
+
                 case "after":
                     preNext = Event.After.the;
                     break;
