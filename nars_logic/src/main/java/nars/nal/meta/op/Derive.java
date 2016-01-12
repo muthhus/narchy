@@ -5,7 +5,6 @@ import nars.Global;
 import nars.Memory;
 import nars.bag.BLink;
 import nars.budget.Budget;
-import nars.concept.Concept;
 import nars.nal.PremiseMatch;
 import nars.nal.PremiseRule;
 import nars.nal.meta.AbstractLiteral;
@@ -138,14 +137,18 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
 
 
             int tDelta = p.tDelta.getIfAbsent(Tense.ITERNAL);
+            Termed c;
             if (tDelta > Tense.ITERNAL) {
                 //set time relation
                 Term tt = tNorm.term();
                 if (tt instanceof Compound)
-                    tNorm = ((Compound) tt).t(tDelta);
+                    c = ((Compound) tt).t(tDelta);
+                else
+                    c = tNorm;
+            } else {
+                c = mem.taskConcept(tNorm); //accelerant
             }
 
-            Concept c = mem.taskConcept(tNorm);
             if (c != null) {
                 derive(p, c, truth, budget);
             }
@@ -183,21 +186,16 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
     }
 
     /** part 2 */
-    private void derive(PremiseMatch m, Concept c, Truth truth, Budget budget) {
+    private void derive(PremiseMatch m, Termed c, Truth truth, Budget budget) {
 
         ConceptProcess premise = m.premise;
-
 
         Task task = premise.getTask();
         Task belief = premise.getBelief();
 
-
         char punct = m.punct.get();
 
-
-
         MutableTask deriving = new DerivedTask(c, premise);
-
 
         long now = premise.time();
         long occ = task.getOccurrenceTime();

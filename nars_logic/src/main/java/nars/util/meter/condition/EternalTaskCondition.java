@@ -89,7 +89,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
         this.confMax = Math.min(1.0f, confMax);
         this.confMin = Math.max(0.0f, confMin);
         this.punc = punc;
-        this.term = n.term(sentenceTerm).term();
+        this.term = Narsese.the().termRaw(sentenceTerm);
         //this.duration = n.memory.duration();
     }
 
@@ -107,24 +107,32 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
         float dist = 0;
         if (a.op()!=b.op()) {
             //50% for equal term
-            dist += 0.25f;
+            dist += 0.2f;
             if (dist >= ifLessThan) return dist;
         }
 
         if (a.size()!=b.size()) {
-            dist += 0.25f;
+            dist += 0.2f;
             if (dist >= ifLessThan) return dist;
         }
 
+        if (a instanceof Compound) {
+            if ( ((Compound)a).t() != ((Compound)b).t()) {
+                dist += 0.2f;
+                if (dist >= ifLessThan) return dist;
+            }
+        }
+
+
         if (a.structure()!=b.structure()) {
-            dist += 0.25f;
+            dist += 0.2f;
             if (dist >= ifLessThan) return dist;
         }
 
         //HACK use toString for now
         dist += Terms.levenshteinDistancePercent(
                 a.toString(false),
-                b.toString(false)) * 0.25f;
+                b.toString(false)) * 0.2f;
 
         return dist;
     }
@@ -235,10 +243,17 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
     }
 
     public boolean timeMatches(Task t) {
-        return creationTimeMatches(t) && occurrenceTimeMatches(t);
+        return creationTimeMatches() && occurrenceTimeMatches(t) && relativeTimeMatches(t);
     }
 
-    boolean creationTimeMatches(Task t) {
+    private boolean relativeTimeMatches(Task t) {
+        if (term instanceof Compound) {
+            return ((Compound)t).t() == t.term().t();
+        }
+        return true;
+    }
+
+    final boolean creationTimeMatches() {
         long now = nar.time();
         return !(((creationStart != -1) && (now < creationStart)) ||
                 ((creationEnd != -1) && (now > creationEnd)));

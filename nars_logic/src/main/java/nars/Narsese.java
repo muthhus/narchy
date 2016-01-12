@@ -506,7 +506,7 @@ public class Narsese extends BaseParser<Object> {
     public Rule TemporalRelation() {
         return seq(
 
-                STATEMENT_OPENER,
+                COMPOUND_TERM_OPENER,
                 s(),
                 Term(true,false),
                 s(),
@@ -515,7 +515,7 @@ public class Narsese extends BaseParser<Object> {
                 s(),
                 Term(true,false),
                 s(),
-                STATEMENT_CLOSER,
+                COMPOUND_TERM_CLOSER,
 
 
                 push(TemporalRelationBuilder((Term) pop() /* pred */,

@@ -4,6 +4,7 @@ import com.gs.collections.impl.list.mutable.primitive.FloatArrayList;
 import nars.Op;
 import nars.term.TermVector;
 import nars.term.Termed;
+import nars.term.compound.Compound;
 import nars.term.compound.GenericCompound;
 import nars.util.data.Util;
 
@@ -11,8 +12,7 @@ import java.io.IOException;
 import java.util.Objects;
 
 
-/** linear combination of a sequence
- * of terms representing basis vectors of a vector space  */
+/** linear combination of a vector of terms, each representing a basis vectors of the vector space they form */
 public class Space extends GenericCompound {
 
     /** matches each of the subterms in their order */
@@ -28,8 +28,8 @@ public class Space extends GenericCompound {
         this(subterms, new FloatArrayList(f));
     }
 
-    public Space anonymous() {
-        if (vector == null) return this;
+    @Override public Compound anonymous() {
+        if (vector == null) return super.anonymous();
         else return new Space(subterms());
     }
 

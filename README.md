@@ -1,4 +1,4 @@
-**Open-NARS** is the open-source version of [NARS](https://sites.google.com/site/narswang/home), a general-purpose AI system, designed in the framework of a reasoning system.  This project is an evolution of the [v1.5 system](http://code.google.com/p/open-nars/).  The [mailing list](https://groups.google.com/forum/?fromgroups#!forum/open-nars) discusses both its theory and implementation.
+**NARchy** derives from OpenNARS, the open-source version of [NARS](https://sites.google.com/site/narswang/home), a general-purpose AI system, designed in the framework of a reasoning system.
 
 ![OpenNARS Logo](https://raw.githubusercontent.com/opennars/opennars/graphplan1/doc/opennars_logo.png)
 

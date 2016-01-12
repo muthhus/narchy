@@ -267,22 +267,18 @@ public class Memory extends Param {
 
         //TODO ? put the unnormalized term for cached future normalizations?
 
-        if (tt.isCompound() && tt.hasAny(Op.SPACE)) {
-            if (tt instanceof Space) {
-                tt = ((Space) tt).anonymous();
-            }
+        if (tt.isCompound() ) {
+
+            tt = ((Compound)tt).anonymous();
 
             tt = index.transform((Compound)tt, new CompoundTransform<Compound,Term>() {
 
                 @Override public boolean test(Term term) {
-                    return term.hasAny(Op.SPACE);
+                    return true;
                 }
 
                 @Override public Term apply(Compound parent, Term subterm, int depth) {
-                    if (subterm instanceof Space) {
-                        return ((Space) subterm).anonymous();
-                    }
-                    return subterm;
+                    return subterm.anonymous();
                 }
             });
         }

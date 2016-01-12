@@ -23,6 +23,7 @@ package nars.term.compound;
 import nars.Global;
 import nars.Op;
 import nars.Symbols;
+import nars.nal.nal7.Tense;
 import nars.term.Term;
 import nars.term.TermContainer;
 import nars.term.compile.TermPrinter;
@@ -116,7 +117,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 
     @Override
     default void append(Appendable p, boolean pretty) throws IOException {
-        TermPrinter.appendCompound(this, p, pretty);
+        TermPrinter.compoundAppend(this, p, pretty);
     }
 
     default void appendArgs(Appendable p, boolean pretty, boolean appendedOperator) throws IOException {
@@ -318,6 +319,10 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 
     /** gets temporal relation value */
     int t();
+
+    default boolean hasT() {
+        return t()!= Tense.ITERNAL;
+    }
 
 
 

@@ -88,8 +88,10 @@ public interface TermBuilder {
             return t;
         }
 
-        Compound x = transform((Compound) t, normalizeFast((Compound) t));
-        Termed tx = the(x);
+        Compound tx = transform((Compound) t, normalizeFast((Compound) t));
+
+        //Termed tx = the(x); //term==concept only valid if tx==tx.anonymous()
+
         //if (x != t) {
             //if modified, set normalization flag HACK
             ((GenericCompound)tx.term()).setNormalized();
@@ -186,7 +188,7 @@ public interface TermBuilder {
     default Term newTerm(Compound csrc, TermContainer subs) {
         if (csrc.subterms().equals(subs))
             return csrc;
-        return newTerm(csrc.op(), csrc.relation(), subs);
+        return newTerm(csrc.op(), csrc.relation(), csrc.t(), subs);
     }
     default Term newTerm(Op op, TermContainer subs) {
         return newTerm(op, -1, subs);

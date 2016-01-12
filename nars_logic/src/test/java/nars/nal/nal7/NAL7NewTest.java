@@ -10,10 +10,6 @@ import org.junit.runners.Parameterized;
 
 import java.util.function.Supplier;
 
-import static nars.$.$;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-
 /**
  * Created by me on 1/9/16.
  */
@@ -31,34 +27,7 @@ public class NAL7NewTest extends AbstractNALTester {
         return AbstractNALTester.nars(7, true, true);
     }
 
-    @Test public void parseTemporalRelation() {
-        //TODO move to NarseseTest
-        assertEquals("<x ==>+5 y>", $("<x ==>+5 y>").toString());
-        assertEquals("<x &&+5 y>", $("<x &&+5 y>").toString());
 
-        assertEquals("<x ==>-5 y>", $("<x ==>-5 y>").toString());
-
-        assertEquals("<<before-->x> ==>+5 <after-->x>>", $("<x:before ==>+5 x:after>").toString());
-    }
-    @Test public void temporalEqualityAndCompare() {
-        assertNotEquals( $("<x ==>+5 y>"), $("<x ==>+0 y>") );
-        assertNotEquals( $("<x ==>+5 y>").hashCode(), $("<x ==>+0 y>").hashCode() );
-        assertNotEquals( $("<x ==> y>"), $("<x ==>+0 y>") );
-        assertNotEquals( $("<x ==> y>").hashCode(), $("<x ==>+0 y>").hashCode() );
-
-        assertEquals( $("<x ==>+0 y>"), $("<x ==>-0 y>") );
-
-        assertEquals(0,   $("<x ==>+0 y>").compareTo( $("<x ==>+0 y>") ) );
-        assertEquals(-1,  $("<x ==>+0 y>").compareTo( $("<x ==>+1 y>") ) );
-        assertEquals(+1,  $("<x ==>+1 y>").compareTo( $("<x ==>+0 y>") ) );
-    }
-
-
-    @Test public void testReversibilityOfCommutive() {
-        assertEquals("<a <=>+5 b>", $("<a <=>+5 b>").toString());
-        assertEquals("<a <=>-5 b>", $("<b <=>+5 a>").toString());
-
-    }
 
     @Test
     public void induction_on_events() throws Narsese.NarseseException {
@@ -79,16 +48,16 @@ public class NAL7NewTest extends AbstractNALTester {
         float intersectionConf = 0.45f;
 
         TestNAR t = test();
-        //t.nar.log();
+        t.nar.log();
 
         t
         .input("x:before. :|:")
         .inputAt(10, "x:after. :|:")
-        .mustBelieve(cycles, "<x:before ==>+10 x:after>", 1.00f, inductionConf, 10)
-        .mustBelieve(cycles, "<x:after ==>-10 x:before>", 1.00f, abductionConf, 0)
-        .mustBelieve(cycles, "<x:before <=>+10 x:after>", 1.00f, comparisonConf, 11)
-        .mustBelieve(cycles, "<x:after <=>-10 x:before>", 1.00f, comparisonConf, 11)
-        .mustBelieve(cycles, "<x:before &&+10 x:after>", 1.00f, intersectionConf, 11)
+        .mustBelieve(cycles, "(x:before ==>+10 x:after)", 1.00f, inductionConf, 10)
+        .mustBelieve(cycles, "(x:after ==>-10 x:before)", 1.00f, abductionConf, 0)
+        .mustBelieve(cycles, "(x:before <=>+10 x:after)", 1.00f, comparisonConf, 11)
+        .mustBelieve(cycles, "(x:after <=>-10 x:before)", 1.00f, comparisonConf, 11)
+        .mustBelieve(cycles, "(x:before &&+10 x:after)", 1.00f, intersectionConf, 11)
         ;
 
     }

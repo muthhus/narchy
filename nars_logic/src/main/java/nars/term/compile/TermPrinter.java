@@ -1,6 +1,9 @@
 package nars.term.compile;
 
 import nars.Op;
+import nars.Symbols;
+import nars.nal.nal8.Operator;
+import nars.term.Statement;
 import nars.term.Term;
 import nars.term.compound.Compound;
 
@@ -25,7 +28,7 @@ public interface TermPrinter {
         writer.append(COMPOUND_TERM_CLOSER);
     }
 
-    static void appendCompound(Compound c, Appendable p, boolean pretty) throws IOException {
+    static void compoundAppend(Compound c, Appendable p, boolean pretty) throws IOException {
 
         p.append(COMPOUND_TERM_OPENER);
 
@@ -44,4 +47,181 @@ public interface TermPrinter {
         p.append(COMPOUND_TERM_CLOSER);
     }
 
+    static void append(Compound c, Appendable p, boolean pretty) throws IOException {
+        final Op op = c.op();
+
+        switch (op) {
+            case SET_INT_OPENER:
+            case SET_EXT_OPENER:
+                setAppend(c, p, pretty);
+                break;
+            case PRODUCT:
+                productAppend(c, p, pretty);
+                break;
+            case IMAGE_INT:
+            case IMAGE_EXT:
+                imageAppend(c, p, pretty);
+                break;
+            case INHERIT: inheritAppend(c, p, pretty); break;
+            case SIMILAR: similarAppend(c, p, pretty); break;
+            default:
+                if (op.isStatement() || c.size()==2) {
+                    if (Op.isOperation(c)) {
+                        operationAppend((Compound) c.term(0), (Operator) c.term(1), p, pretty); //TODO Appender
+                    } else {
+                        statementAppend(c, p, pretty, op);
+                    }
+                } else {
+                    compoundAppend(c, p, pretty);
+                }
+                break;
+        }
+    }
+
+    static void inheritAppend(Compound c, Appendable p, boolean pretty) throws IOException {
+        Term a = Statement.subj(c);
+        Term b = Statement.pred(c);
+
+        p.append(Symbols.COMPOUND_TERM_OPENER);
+        b.append(p, pretty);
+        p.append(Symbols.INHERIT_SEPARATOR);
+        a.append(p, pretty);
+        p.append(Symbols.COMPOUND_TERM_CLOSER);
+    }
+    static void similarAppend(Compound c, Appendable p, boolean pretty) throws IOException {
+        Term a = Statement.subj(c);
+        Term b = Statement.pred(c);
+
+        p.append(Symbols.COMPOUND_TERM_OPENER);
+        a.append(p, pretty);
+        p.append(Symbols.SIMILAR_SEPARATOR);
+        b.append(p, pretty);
+        p.append(Symbols.COMPOUND_TERM_CLOSER);
+    }
+
+    static void statementAppend(Compound c, Appendable p, boolean pretty, Op op) throws IOException {
+        Term a = Statement.subj(c);
+        Term b = Statement.pred(c);
+
+        p.append(COMPOUND_TERM_OPENER);
+        a.append(p, pretty);
+
+        sep(p, pretty);
+
+        op.append(c, p);
+
+        sep(p, pretty);
+
+        b.append(p, pretty);
+
+        p.append(COMPOUND_TERM_CLOSER);
+    }
+
+    static void sep(Appendable w, boolean pretty) throws IOException {
+        if (pretty) w.append(' ');
+    }
+
+    static void productAppend(Compound product, Appendable p, boolean pretty) throws IOException {
+
+        int s = product.size();
+        p.append(COMPOUND_TERM_OPENER);
+        for (int i = 0; i < s; i++) {
+            product.term(i).append(p, pretty);
+            if (i < s - 1) {
+                p.append(pretty ? ", " : ",");
+            }
+        }
+        p.append(COMPOUND_TERM_CLOSER);
+    }
+
+    static void imageAppend(Compound image, Appendable p, boolean pretty) throws IOException {
+
+        int len = image.size();
+
+        p.append(COMPOUND_TERM_OPENER);
+        p.append(image.op().str);
+
+        int relationIndex = image.relation();
+        int i;
+        for (i = 0; i < len; i++) {
+            Term tt = image.term(i);
+
+            p.append(ARGUMENT_SEPARATOR);
+            if (pretty) p.append(' ');
+
+            if (i == relationIndex) {
+                p.append(Symbols.IMAGE_PLACE_HOLDER);
+                p.append(ARGUMENT_SEPARATOR);
+                if (pretty) p.append(' ');
+            }
+
+            tt.append(p, pretty);
+        }
+        if (i == relationIndex) {
+            p.append(ARGUMENT_SEPARATOR);
+            if (pretty) p.append(' ');
+            p.append(Symbols.IMAGE_PLACE_HOLDER);
+        }
+
+        p.append(COMPOUND_TERM_CLOSER);
+
+    }
+
+    static void setAppend(Compound set, Appendable p, boolean pretty) throws IOException {
+
+        int len = set.size();
+
+        //duplicated from above, dont want to store this as a field in the class
+        char opener, closer;
+        if (set.op(Op.SET_EXT)) {
+            opener = Op.SET_EXT_OPENER.ch;
+            closer = Symbols.SET_EXT_CLOSER;
+        } else {
+            opener = Op.SET_INT_OPENER.ch;
+            closer = Symbols.SET_INT_CLOSER;
+        }
+
+        p.append(opener);
+        for (int i = 0; i < len; i++) {
+            Term tt = set.term(i);
+            if (i != 0) p.append(Symbols.ARGUMENT_SEPARATOR);
+            tt.append(p, pretty);
+        }
+        p.append(closer);
+    }
+
+    static void operationAppend(Compound argsProduct, Operator operator, Appendable p, boolean pretty) throws IOException {
+
+        Term predTerm = operator.identifier(); //getOperatorTerm();
+
+        if ((predTerm.volume() != 1) || (predTerm.hasVar())) {
+            //if the predicate (operator) of this operation (inheritance) is not an atom, use Inheritance's append format
+            appendSeparator(p, pretty);
+            return;
+        }
+
+
+        Term[] xt = argsProduct.terms();
+
+        predTerm.append(p, pretty); //add the operator name without leading '^'
+        p.append(COMPOUND_TERM_OPENER);
+
+
+        int n = 0;
+        for (Term t : xt) {
+            if (n != 0) {
+                p.append(ARGUMENT_SEPARATOR);
+                if (pretty)
+                    p.append(' ');
+            }
+
+            t.append(p, pretty);
+
+
+            n++;
+        }
+
+        p.append(COMPOUND_TERM_CLOSER);
+
+    }
 }

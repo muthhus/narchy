@@ -100,13 +100,15 @@ public enum Symbols {
     static final int numByteSymbols = 15;
     private static final Op[] byteSymbols = new Op[numByteSymbols];
 
+    public static char INHERIT_SEPARATOR = ':';
+    public static char SIMILAR_SEPARATOR = '=';
 
     public static final char SET_INT_CLOSER = ']';
     public static final char SET_EXT_CLOSER = '}';
     public static final char COMPOUND_TERM_OPENER = '(';
     public static final char COMPOUND_TERM_CLOSER = ')';
-    public static final char STATEMENT_OPENER = '<';
-    public static final char STATEMENT_CLOSER = '>';
+    @Deprecated public static final char STATEMENT_OPENER = '<';
+    @Deprecated public static final char STATEMENT_CLOSER = '>';
 
 
 //    public static Op symbol(final byte b) {
@@ -131,6 +133,7 @@ public enum Symbols {
 
     private static final CharObjectHashMap<Op> _charToOperator
             = new CharObjectHashMap(Op.values().length * 2);
+
 
 
     static {
