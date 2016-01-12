@@ -27,7 +27,7 @@ public class Event extends AtomicBooleanCondition<PremiseMatch> {
         Premise premise = m.premise;
         if (premise.isEvent()) {
             //measured from belief to task, so it's relative to task
-            int tDelta = -((Temporal) premise.getTask()).tDelta((Temporal) premise.getBelief());
+            int tDelta = ((Temporal) premise.getTask()).tDelta((Temporal) premise.getBelief());
             m.tDelta.set(tDelta);
             return true;
         }

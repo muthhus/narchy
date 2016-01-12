@@ -45,21 +45,24 @@ public class NAL7NewTest extends AbstractNALTester {
         float inductionConf = 0.45f;
         float abductionConf = 0.45f;
         float comparisonConf = 0.45f;
-        float intersectionConf = 0.45f;
+        float intersectionConf = 0.81f;
 
         TestNAR t = test();
-        t.nar.log();
+        //t.nar.log();
 
         t
         .input("x:before. :|:")
         .inputAt(10, "x:after. :|:")
         .mustBelieve(cycles, "(x:before ==>+10 x:after)", 1.00f, inductionConf, 10)
-        .mustBelieve(cycles, "(x:after ==>-10 x:before)", 1.00f, abductionConf, 0)
-        .mustBelieve(cycles, "(x:before <=>+10 x:after)", 1.00f, comparisonConf, 11)
-        .mustBelieve(cycles, "(x:after <=>-10 x:before)", 1.00f, comparisonConf, 11)
-        .mustBelieve(cycles, "(x:before &&+10 x:after)", 1.00f, intersectionConf, 11)
+//        .mustBelieve(cycles, "(x:after ==>-10 x:before)", 1.00f, abductionConf, 10)
+//        .mustBelieve(cycles, "(x:before <=>+10 x:after)", 1.00f, comparisonConf, 10)
+        .mustBelieve(cycles, "(x:after <=>-10 x:before)", 1.00f, comparisonConf, 10)
+        .mustBelieve(cycles, "(x:before &&+10 x:after)", 1.00f, intersectionConf, 10)
         ;
 
+//        tester.mustBelieve(cycles, "<<(John, room) --> enter> =\\> (&/, <(John, door) --> open>, /6)>",
+//                1.00f, 0.45f,
+//                11);
     }
 
 }

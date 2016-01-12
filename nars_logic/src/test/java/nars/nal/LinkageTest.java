@@ -47,7 +47,7 @@ public class LinkageTest extends AbstractNALTester {
 
         Concept ret = tester.nar.concept(premise1);
         boolean passed = false;
-        if(ret!=null && ret.getTermLinks()!=null) {
+        if(ret!=null){// && ret.getTermLinks()!=null) {
             for (Termed entry : ret.getTermLinks()) {
                 Term w = entry.term();
                 if (w.toString().equals(premise2)) {
@@ -58,7 +58,7 @@ public class LinkageTest extends AbstractNALTester {
 
         Concept ret2 = tester.nar.concept(premise2);
         boolean passed2 = false;
-        if(ret2!=null && ret2.getTermLinks()!=null) {
+        if(ret2!=null){// && ret2.getTermLinks()!=null) {
             for (Termed entry : ret2.getTermLinks()) {
                 Term w = entry.term();
                 if (w.toString().equals(premise1)) {
@@ -223,13 +223,13 @@ public class LinkageTest extends AbstractNALTester {
 
     @Test
     public void Linkage_NAL5_abduction() throws Exception {
-        ProperlyLinkedTest("<<robin-->bird>==><robin-->animal>>","<robin-->animal>");
+        ProperlyLinkedTest("((robin-->bird)==>(robin-->animal))","<robin-->animal>");
     }
 
 
     @Test
     public void Linkage_NAL5_detachment() throws Exception {
-        ProperlyLinkedTest("<<robin-->bird>==><robin-->animal>>", "<robin-->bird>");
+        ProperlyLinkedTest("((robin-->bird)==>(robin-->animal))", "<robin-->bird>");
     }
 
     @Test

@@ -386,7 +386,7 @@
                                                                                                     (S <=> P), (Belief:Comparison)
 //                                                                                                    (P ==> S), (Belief:Abduction)
 
-    P, S, event(after), notConjunction(P), notConjunction(S),  notImplicationOrEquivalence(P), notImplicationOrEquivalence(S) |- (S && P), (Belief:Intersection)
+    P, S, event(after), notConjunction(P), notConjunction(S),  notImplicationOrEquivalence(P), notImplicationOrEquivalence(S) |- (P && S), (Belief:Intersection)
 
 
 //    P, S, after(Task,Belief), measure_time(I), notImplicationOrEquivalence(P), notImplicationOrEquivalence(S) |- ((&/,S,I) =/> P), (Belief:Induction, Eternalize:Immediate),

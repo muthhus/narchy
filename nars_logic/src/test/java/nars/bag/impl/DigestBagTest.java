@@ -47,7 +47,7 @@ public class DigestBagTest {
         assertEquals(2, d.list.size());
 
         /* ignored the low budget result */
-        assertTrue(d.list.getLast().get().toString().contains("<c-->a>"));
+        assertTrue(d.list.getLast().get().toString().contains("(c-->a)"));
 
     }
 

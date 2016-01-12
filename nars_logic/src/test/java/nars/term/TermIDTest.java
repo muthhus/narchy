@@ -22,7 +22,7 @@ public class TermIDTest {
     // '&&' 'a' ',' 'b' ')'
     @Test
     public void testInternalRepresentation28() {
-        testBytesRepresentation("(&&,a,b)", 5);
+        testBytesRepresentation("(a&&b)", 5);
     }
 
     // '--', 'a'
@@ -67,7 +67,7 @@ public class TermIDTest {
     //  '-->' 'a' ','  'b' ')' == 5
     @Test
     public void testInternalRepresentation27() {
-        testBytesRepresentation("<a-->b>", 5);
+        testBytesRepresentation("(a-->b)", 5);
     }
 
     @Test public void testInternalRepresentationImage1() {
