@@ -1,10 +1,5 @@
 package nars.task.filter;
 
-import nars.Premise;
-import nars.Symbols;
-import nars.concept.Concept;
-import nars.task.Task;
-
 /**
  * Prevent a duplicate belief from entering the system again
  */
@@ -25,25 +20,25 @@ public enum FilterDuplicateExistingBelief {
 //        return isUniqueBelief(nal, task) ? VALID : DUPLICATE;
 //    }
 
-    public static boolean isUniqueBelief(Premise nal, Task t) {
-
-        Concept c = nal.concept(t.term());
-
-        if (c == null) {
-            //concept doesnt even exist so this is not a duplciate of anything
-            return true;
-        }
-
-
-        switch (t.getPunctuation()) {
-            case Symbols.JUDGMENT:
-                return !c.getBeliefs().contains(t);
-            case Symbols.GOAL:
-                return !c.getGoals().contains(t);
-            default:
-                return false;
-        }
-
-    }
+//    public static boolean isUniqueBelief(Premise nal, Task t) {
+//
+//        Concept c = nal.concept(t.term());
+//
+//        if (c == null) {
+//            //concept doesnt even exist so this is not a duplciate of anything
+//            return true;
+//        }
+//
+//
+//        switch (t.getPunctuation()) {
+//            case Symbols.JUDGMENT:
+//                return !c.getBeliefs().contains(t);
+//            case Symbols.GOAL:
+//                return !c.getGoals().contains(t);
+//            default:
+//                return false;
+//        }
+//
+//    }
 
 }

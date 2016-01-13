@@ -107,17 +107,17 @@ public abstract class AbstractConcept implements Concept {
 //                append(' ').append(title).append(':').append(itemString).toString();
 //    }
 
-    /** called by memory, dont call self or otherwise */
-    public void delete() {
-        /*if (getMemory().inCycle())
-            throw new RuntimeException("concept " + this + " attempt to delete() during an active cycle; must be done between cycles");
-        */
-
-        if (getMeta() != null) {
-            getMeta().clear();
-            setMeta(null);
-        }
-        //TODO clear bags
-    }
+//    /** called by memory, dont call self or otherwise */
+//    public void delete() {
+//        /*if (getMemory().inCycle())
+//            throw new RuntimeException("concept " + this + " attempt to delete() during an active cycle; must be done between cycles");
+//        */
+//
+//        if (getMeta() != null) {
+//            getMeta().clear();
+//            setMeta(null);
+//        }
+//        //TODO clear bags
+//    }
 
 }

@@ -258,7 +258,7 @@ public class TermTest {
     @Test
     public void invalidTermIndep() {
 
-        String t = "<$1-->(~,{place4},$1)>";
+        String t = "($1-->({place4}~$1))";
         NAR n = new Terminal();
 
 
@@ -632,7 +632,7 @@ public class TermTest {
         assertTrue( inh("a", "b").op().isStatement() );
         Term aInhB = $("<a-->b>");
         assertTrue(aInhB instanceof GenericCompound);
-        assertEquals("<a-->b>",
+        assertEquals("(a-->b)",
                      aInhB.toString());
     }
 
@@ -643,10 +643,10 @@ public class TermTest {
 
 
         assertEquals(
-            "<A-->(/,%X,_)>", $("<A --> (/, %X, _)>").toString()
+            "(A-->(/,%X,_))", $("<A --> (/, %X, _)>").toString()
         );
         assertEquals(
-            "<A-->(/,_,%X)>", $("<A --> (/, _, %X)>").toString()
+            "(A-->(/,_,%X))", $("<A --> (/, _, %X)>").toString()
         );
 //        assertEquals(
 //                "(/,_,%X)", $("(/, _, %X)").toString()

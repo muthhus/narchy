@@ -3,10 +3,8 @@ package nars.concept.util;
 import nars.Memory;
 import nars.budget.BudgetMerge;
 import nars.task.Task;
-import nars.truth.Truth;
 import nars.util.event.ArraySharingList;
 
-import java.util.Arrays;
 import java.util.function.BiPredicate;
 
 /**
@@ -128,42 +126,42 @@ public class ArrayListTaskTable extends ArraySharingList<Task> implements TaskTa
     }
 
 
-    @Override
-    public final boolean contains(Task t) {
-        //        //equality:
-//        //  1. term (given because it is looking up in concept)
-//        //  2. truth
-//        //  3. occurrence time
-//        //  4. evidential set
-
-        if (isEmpty()) return false;
-
-        Truth taskTruth = t.getTruth();
-        long taskOccurrrence = t.getOccurrenceTime();
-        long[] taskEvidence = t.getEvidence();
-
-        Task[] aa = getCachedNullTerminatedArray();
-        for (Task x : aa) {
-
-            if (x == null) return false;
-
-            if (
-
-                //different truth value
-                (x.getTruth().equals(taskTruth)) &&
-
-                //differnt occurence time
-                (x.getOccurrenceTime() == taskOccurrrence) &&
-
-                //differnt evidence
-                (Arrays.equals(x.getEvidence(), taskEvidence))
-            )
-                return true;
-        }
-
-        return false;
-
-    }
+//    @Override
+//    public final boolean contains(Task t) {
+//        //        //equality:
+////        //  1. term (given because it is looking up in concept)
+////        //  2. truth
+////        //  3. occurrence time
+////        //  4. evidential set
+//
+//        if (isEmpty()) return false;
+//
+//        Truth taskTruth = t.getTruth();
+//        long taskOccurrrence = t.getOccurrenceTime();
+//        long[] taskEvidence = t.getEvidence();
+//
+//        Task[] aa = getCachedNullTerminatedArray();
+//        for (Task x : aa) {
+//
+//            if (x == null) return false;
+//
+//            if (
+//
+//                //different truth value
+//                (x.getTruth().equals(taskTruth)) &&
+//
+//                //differnt occurence time
+//                (x.getOccurrenceTime() == taskOccurrrence) &&
+//
+//                //differnt evidence
+//                (Arrays.equals(x.getEvidence(), taskEvidence))
+//            )
+//                return true;
+//        }
+//
+//        return false;
+//
+//    }
 
 }
 

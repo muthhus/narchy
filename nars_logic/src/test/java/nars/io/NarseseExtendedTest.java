@@ -82,7 +82,7 @@ public class NarseseExtendedTest {
 
 
         Compound u = term("<a:b --> c:d>");
-        assertEquals("<<b-->a>--><d-->c>>", u.toString());
+        assertEquals("((b-->a)-->(d-->c))", u.toString());
 
         Task ut = task("<a:b --> c:d>.");
         assertNotNull(ut);
@@ -118,27 +118,27 @@ public class NarseseExtendedTest {
 
     @Test
     public void testNamespaceTerms2() {
-        eqTerm("a:b", "<b-->a>");
-        eqTerm("a : b", "<b-->a>");
+        eqTerm("a:b", "(b-->a)");
+        eqTerm("a : b", "(b-->a)");
     }
 
     @Test public void testNamespaceTermsNonAtomicSubject() {
-        eqTerm("c:{a,b}", "<{a,b}-->c>");
+        eqTerm("c:{a,b}", "({a,b}-->c)");
     }
     @Test public void testNamespaceTermsNonAtomicPredicate() {
-        eqTerm("<a-->b>:c", "<c--><a-->b>>");
-        eqTerm("{a,b}:c", "<c-->{a,b}>");
-        eqTerm("(a,b):c", "<c-->(a,b)>");
+        eqTerm("<a-->b>:c", "(c-->(a-->b))");
+        eqTerm("{a,b}:c", "(c-->{a,b})");
+        eqTerm("(a,b):c", "(c-->(a,b))");
     }
 
     @Test public void testNamespaceTermsChain() {
 
-        eqTerm("d:{a,b}:c", "<<c-->{a,b}>-->d>");
+        eqTerm("d:{a,b}:c", "((c-->{a,b})-->d)");
 
 
-        eqTerm("c:{a,b}", "<{a,b}-->c>");
-        eqTerm("a:b:c",   "<<c-->b>-->a>");
-        eqTerm("a :b :c",   "<<c-->b>-->a>");
+        eqTerm("c:{a,b}", "({a,b}-->c)");
+        eqTerm("a:b:c",   "((c-->b)-->a)");
+        eqTerm("a :b :c",   "((c-->b)-->a)");
     }
 
     @Test
@@ -176,7 +176,7 @@ public class NarseseExtendedTest {
         assertEquals( "(--,x)", term("--x").toStringCompact() );
         assertEquals( "(--,x)", term("-- x").toStringCompact() );
 
-        assertEquals( "(--,(&&,x,y))", term("-- (x && y)").toStringCompact() );
+        assertEquals( "(--,(x&&y))", term("-- (x && y)").toStringCompact() );
 
 
         Compound nab = term("--(a & b)");

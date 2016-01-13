@@ -191,8 +191,6 @@ public class ArrayListBeliefTable extends ArrayListTaskTable implements BeliefTa
         int i = 0;
 
         for (Task b; null != (b = tasks[i++]); ) {
-            if (b == input)
-                return false;
 
             if (b.equals(input)) {
                 //these should be preventable earlier

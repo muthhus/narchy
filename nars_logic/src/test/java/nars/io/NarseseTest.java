@@ -144,7 +144,7 @@ public class NarseseTest {
 
     @Test
     public void testMultiCompound() throws Narsese.NarseseException {
-        String tt = "<<a<=>b>--><c==>d>>";
+        String tt = "((a<=>b)-->(c==>d))";
         Task t = task(tt + '?');
         assertNotNull(t);
         assertEquals(Op.INHERIT, t.op());
@@ -377,7 +377,7 @@ public class NarseseTest {
     @Test
     public void testEscape() throws Narsese.NarseseException {
         taskParses("<a --> \"a\">.");
-        assertTrue(task("<a --> \"a\">.").toString().contains("<a-->\"a\">."));
+        assertTrue(task("<a --> \"a\">.").toString().contains("(a-->\"a\")."));
     }
 
     @Test
@@ -445,19 +445,19 @@ public class NarseseTest {
     }
 
     @Test
-    public void testImageExtRel0() { testImageExtRel("<a-->(/,_,y,z)>", 0); }
+    public void testImageExtRel0() { testImageExtRel("(a-->(/,_,y,z))", 0); }
     @Test
-    public void testImageIntRel0() { testImageIntRel("<(\\,_,y,z)-->a>", 0); }
+    public void testImageIntRel0() { testImageIntRel("((\\,_,y,z)-->a)", 0); }
 
     @Test
-    public void testImageExtRel1() { testImageExtRel("<a-->(/,x,_,z)>", 1); }
+    public void testImageExtRel1() { testImageExtRel("(a-->(/,x,_,z))", 1); }
     @Test
-    public void testImageIntRel1() { testImageIntRel("<(\\,x,_,z)-->a>", 1); }
+    public void testImageIntRel1() { testImageIntRel("((\\,x,_,z)-->a)", 1); }
 
     @Test
-    public void testImageExtRel2() { testImageExtRel("<a-->(/,x,y,_)>", 2); }
+    public void testImageExtRel2() { testImageExtRel("(a-->(/,x,y,_))", 2); }
     @Test
-    public void testImageIntRel2() { testImageIntRel("<(\\,x,y,_)-->a>", 2); }
+    public void testImageIntRel2() { testImageIntRel("((\\,x,y,_)-->a)", 2); }
 
     private void testImageIntRel(String imageTerm, int relationIndexExpected) {
         Compound ti = term(imageTerm);

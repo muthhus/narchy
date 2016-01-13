@@ -91,10 +91,10 @@ public interface BeliefTable extends TaskTable {
             return false;
         }
 
-        @Override
-        public boolean contains(Task t) {
-            return false;
-        }
+//        @Override
+//        public boolean contains(Task t) {
+//            return false;
+//        }
 
 
         @Override
