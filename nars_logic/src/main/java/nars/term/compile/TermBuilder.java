@@ -6,6 +6,7 @@ import nars.Global;
 import nars.Op;
 import nars.nal.PremiseAware;
 import nars.nal.PremiseMatch;
+import nars.nal.nal7.Tense;
 import nars.nal.nal8.Operator;
 import nars.nal.op.ImmediateTermTransform;
 import nars.term.*;
@@ -64,11 +65,13 @@ public interface TermBuilder {
     }
 
 
-    Termed make(Op op, int relation, TermContainer subterms);
-
-    default Termed make(Op op, TermContainer subterms) {
-        return make(op, -1, subterms);
+    default Termed make(Op op, int relation, TermContainer subterms) {
+        return make(op, relation, subterms, Tense.ITERNAL);
     }
+
+    Termed make(Op op, int relation, TermContainer subterms, int dt);
+
+
 
     /** unifies a term with this; by default it passes through unchanged */
     default Termed the(Term t) {
@@ -174,7 +177,9 @@ public interface TermBuilder {
 
                     if (submods == -1) return -1;
                     if (submods > 0) {
+
                         x = newTerm(cx, TermContainer.the(cx.op(), yy));
+
                         if (x == null)
                             return -1;
                         modifications+= (cx!=x) ? 1 : 0;
@@ -190,24 +195,13 @@ public interface TermBuilder {
     default Term newTerm(Compound csrc, TermContainer subs) {
         if (csrc.subterms().equals(subs))
             return csrc;
-        Term x = newTerm(csrc.op(), csrc.relation(), subs);
-        if (x instanceof Compound) {
-            x = ((Compound)x).t(csrc.t()); //HACK ?
-        }
-        return x;
+        return newTerm(csrc.op(), csrc.relation(), csrc.t(), subs);
     }
+
     default Term newTerm(Op op, TermContainer subs) {
         return newTerm(op, -1, subs);
     }
 
-
-
-//    /** "clone"  */
-//    @Deprecated default Term newTerm(Compound csrc, Term... subs) {
-//        if (csrc.subterms().equals(subs))
-//            return csrc;
-//        return newTerm(csrc.op(), csrc.relation(), subs);
-//    }
 
 
     default Term newTerm(Op op, int relation, TermContainer tt) {
@@ -270,7 +264,7 @@ public interface TermBuilder {
 
         } else {
 
-            return finish(op, relation, tt);
+            return finish(op, t, relation, tt);
 
         }
 
@@ -300,19 +294,22 @@ public interface TermBuilder {
         }
     }
 
+    default Term finish(Op op, int relation, TermContainer tt) {
+        return finish(op, Tense.ITERNAL, relation, tt);
+    }
 
     /** step before calling Make, do not call manually from outside */
-    default Term finish(Op op, int relation, TermContainer tt) {
+    default Term finish(Op op, int t, int relation, TermContainer tt) {
 
-        Term[] t = tt.terms();
-        int currentSize = t.length;
+        Term[] u = tt.terms();
+        int currentSize = u.length;
 
         if (op.minSize > 1 && currentSize == 1) {
             //special case: allow for ellipsis to occupy one item even if minArity>1
-            if (t[0] instanceof Ellipsis)
+            if (u[0] instanceof Ellipsis)
                 currentSize++; //increase to make it seem valid and allow constrct below
             else
-              return t[0]; //reduction
+              return u[0]; //reduction
         }
 
         if (!op.validSize(currentSize)) {
@@ -320,7 +317,7 @@ public interface TermBuilder {
             return null;
         }
 
-        return make(op, relation, TermContainer.the(op, tt)).term();
+        return make(op, relation, TermContainer.the(op, tt), t).term();
 
     }
 
@@ -614,7 +611,9 @@ public interface TermBuilder {
             }
         }
 
-        Term result = newTerm(src, TermContainer.the(src.op(), sub));
+        TermContainer cc = TermContainer.the(src.op(), sub);
+        Term result = newTerm(src, cc);
+
 
         //apply any known immediate transform operators
         //TODO decide if this is evaluated incorrectly somehow in reverse
@@ -675,10 +674,5 @@ public interface TermBuilder {
         return true;
     }
 
-    default Compound theCompound(Term x) {
-        Term y = theTerm(x);
-        if (y instanceof Compound) return ((Compound)y);
-        return null;
-    }
 
 }

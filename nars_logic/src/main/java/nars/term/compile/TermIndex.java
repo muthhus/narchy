@@ -84,7 +84,9 @@ public interface TermIndex extends TermBuilder {
         TermVector t = (TermVector)s;
         Term[] x = t.terms();
         for (int i = 0; i < x.length; i++) {
-            x[i] = theTerm(x[i]); //since they are equal this will not need re-hashed
+            Term u = theTerm(x[i]); //since they are equal this will not need re-hashed
+            if (u.equals(x[i]))
+                x[i] = u; //HACK use unified, otherwise keep original
         }
         return s;
     }
@@ -109,7 +111,7 @@ public interface TermIndex extends TermBuilder {
 
 
     default Termed makeCompound(Compound t) {
-        return make(t.op(), t.relation(), t.subterms());
+        return make(t.op(), t.relation(), t.subterms(), t.t());
     }
 
 

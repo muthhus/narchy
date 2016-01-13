@@ -129,6 +129,10 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
             //before conceptualizating in mem.taskConcept
             Termed tNorm = mem.index.normalized(t);
 
+            //HACK why?
+            if (!tNorm.term().isCompound())
+                return;
+
             Truth truth = p.truth.get();
 
             Budget budget = p.getBudget(truth, tNorm);
@@ -140,18 +144,12 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
             Termed<Compound> c;
             if (tDelta > Tense.ITERNAL) {
                 //set time relation
-                Term tt = tNorm.term();
-                if (tt instanceof Compound) {
-                    c = ((Compound) tt).t(tDelta);
-
-                    if ( c == tt) //unchanged
-                        c = mem.taskConcept(tNorm); //accelerant: concept lookup
-                }
-                else
-                    return;//c = tNorm;
+                c = ((Compound)tNorm.term()).t(tDelta);
             } else {
-                c = mem.taskConcept(tNorm); //accelerant: concept lookup
+                //c = mem.taskConcept(tNorm); //accelerant: concept lookup
+                c = tNorm;
             }
+
 
             if (c != null) {
                 derive(p, c, truth, budget);
@@ -257,6 +255,7 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
         //HACK this should exclude the invalid rules which form any of these
 
         ConceptProcess premise = p.premise;
+
 
 
         //pre-normalize to avoid discovering invalidity after having consumed space and survived the input queue

@@ -50,6 +50,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
         this.relation = relation;
         this.hash = Util.hashCombine(terms.hashCode(), opRel(), t);
         this.t = t;
+
     }
 
 //    protected GenericCompound(GenericCompound copy, int newT) {

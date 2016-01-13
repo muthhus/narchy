@@ -6,6 +6,7 @@ import nars.budget.Budget;
 import nars.budget.Item;
 import nars.concept.Concept;
 import nars.nal.nal7.Tense;
+import nars.term.Term;
 import nars.term.Termed;
 import nars.term.compound.Compound;
 import nars.truth.DefaultTruth;
@@ -140,7 +141,7 @@ public abstract class AbstractTask extends Item<Task>
         if (getDeleted())
             return null;
 
-        Compound t = term();
+        Term t = term();
         if (!t.levelValid( memory.nal() ))
             return null;
 

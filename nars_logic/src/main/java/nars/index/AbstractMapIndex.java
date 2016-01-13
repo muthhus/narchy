@@ -2,11 +2,13 @@ package nars.index;
 
 import nars.$;
 import nars.Op;
+import nars.nal.nal7.Tense;
 import nars.term.Term;
 import nars.term.TermContainer;
 import nars.term.TermVector;
 import nars.term.Termed;
 import nars.term.compile.TermIndex;
+import nars.term.compound.Compound;
 import nars.term.compound.GenericCompound;
 
 import java.util.function.Consumer;
@@ -52,6 +54,8 @@ public abstract class AbstractMapIndex implements TermIndex {
         Termed y = getTermIfPresent(x);
         if (y == null) {
             putTerm(y = makeTerm(x));
+            if (!y.equals(x))
+                return x; //return original non-anonymized
         }
 
         return y;
@@ -70,8 +74,12 @@ public abstract class AbstractMapIndex implements TermIndex {
 //    public abstract int size();
 
     @Override
-    public Termed make(Op op, int relation, TermContainer t) {
-        return intern(op, relation, internSub(t));
+    public Termed make(Op op, int relation, TermContainer t, int dt) {
+        Termed x = intern(op, relation, internSub(t));
+        if (dt!= Tense.ITERNAL && x.term().isCompound()) {
+            x = ((Compound)x.term()).t(dt);
+        }
+        return x;
     }
 
     @Override public Termed makeAtomic(Term t) {

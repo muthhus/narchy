@@ -269,7 +269,7 @@ public class PremiseRule extends GenericCompound implements Level {
 
     public final PremiseRule normalizeRule(PatternIndex index) {
         return new PremiseRule(
-            index.theCompound(
+                (Compound)index.the(
                 $.terms.transform(
                     $.terms.transform(this, UppercaseAtomsToPatternVariables),
                 new PremiseRuleVariableNormalization()) ) );

@@ -103,9 +103,17 @@ public class NAL8Test extends AbstractNALTester {
         tester.input("reachable:(SELF,{t002})! ");
         tester.inputAt(10, "(( on:($1,#2) &&+0 at:(SELF,#2) ) ==>+0 reachable:(SELF,$1)).");
 
-        tester.mustDesire(cycles, "( at:(SELF,#1) &&+0 on:({t002},#1))", 1.0f, 0.81f); // :|:
 
+        tester.mustDesire(cycles, "( at:(SELF,#1) &&+0 on:({t002},#1))", 1.0f, 0.81f);
     }
+    @Test
+    public void condition_goal_deduction2() throws Narsese.NarseseException {
+        TestNAR tester = test();
 
+        tester.input("a:b! ");
+        tester.inputAt(10, "(( c:d &&+5 e:f ) ==>+0 a:b).");
+
+        tester.mustDesire(cycles, "( c:d &&+5 e:f)", 1.0f, 0.81f);
+    }
 
 }
