@@ -55,7 +55,7 @@ public class PostCondition implements Serializable, Level //since there can be m
         add(the("Info"));
         add(the("Event"));
         add(the("Punctuation"));
-        add(the("SequenceIntervals"));
+        /*@Deprecated*/ add(the("SequenceIntervals"));
         add(the("Eternalize"));
     }};
 
@@ -107,9 +107,6 @@ public class PostCondition implements Serializable, Level //since there can be m
             }
 
             Term which = i.term(0);
-
-
-            //negate = type.equals(negation);
 
 
             switch (type.toString()) {
@@ -165,11 +162,11 @@ public class PostCondition implements Serializable, Level //since there can be m
                     break;
 
                 case "SequenceIntervals":
-                    if (which.equals(PostCondition.fromBelief)) {
-                        rule.sequenceIntervalsFromBelief = true;
-                    } else if (which.equals(PostCondition.fromTask)) {
-                        rule.sequenceIntervalsFromTask = true;
-                    }
+//                    if (which.equals(PostCondition.fromBelief)) {
+//                        rule.sequenceIntervalsFromBelief = true;
+//                    } else if (which.equals(PostCondition.fromTask)) {
+//                        rule.sequenceIntervalsFromTask = true;
+//                    }
                     break;
 
                 default:

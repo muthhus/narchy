@@ -1,7 +1,6 @@
 package nars.nal.nal7;
 
 import nars.NAR;
-import nars.Narsese;
 import nars.nal.AbstractNALTester;
 import nars.util.meter.TestNAR;
 import org.junit.Test;
@@ -30,7 +29,7 @@ public class NAL7Test extends AbstractNALTester {
 
 
     @Test
-    public void induction_on_events() throws Narsese.NarseseException {
+    public void induction_on_events()  {
         /*
 
         //    P, S, after(Task,Belief), measure_time(I), notImplicationOrEquivalence(P), notImplicationOrEquivalence(S) |- ((&/,S,I) =/> P), (Belief:Induction, Eternalize:Immediate),
@@ -67,7 +66,7 @@ public class NAL7Test extends AbstractNALTester {
 
 
     @Test
-    public void temporal_explification() throws Narsese.NarseseException {
+    public void temporal_explification()  {
         TestNAR tester = test();
         tester.believe("(<($x, room) --> enter> ==>-5 <($x, door) --> open>)", 0.9f, 0.9f);
         tester.believe("(<($y, door) --> open> ==>-5 <($y, key) --> hold>)", 0.8f, 0.9f);
@@ -78,7 +77,7 @@ public class NAL7Test extends AbstractNALTester {
 
 
     @Test
-    public void temporal_analogy() throws Narsese.NarseseException {
+    public void temporal_analogy()  {
         TestNAR tester = test();
         tester.believe("(<($x, door) --> open> ==>+5 <($x, room) --> enter>)",
                 0.95f, 0.9f);
@@ -90,10 +89,10 @@ public class NAL7Test extends AbstractNALTester {
     }
 
 
-    @Test public void updating_and_revision() throws Narsese.NarseseException {
+    @Test public void updating_and_revision()  {
         testTemporalRevision(10, 0.50f, 0.95f, "<(John,key) --> hold>");
     }
-    @Test public void updating_and_revision2() throws Narsese.NarseseException {
+    @Test public void updating_and_revision2()  {
         testTemporalRevision(1, 0.50f, 0.95f, "<(John,key) --> hold>");
     }
 
@@ -152,8 +151,8 @@ public class NAL7Test extends AbstractNALTester {
     @Test public void testImplQueryTenseFuture() {
         test()
         .input("(y ==>+3 x). :\\:")
-        .input("(y ==>+3 ?x)? :/:")
-        .mustAnswer(15, "(y ==>+3 x)", 1.00f, 0.5f, Tense.Future);
+        .inputAt(20, "(y ==>+3 ?x)? :/:")
+        .mustAnswer(55, "(y ==>+3 x)", 1.00f, 0.5f, Tense.Future);
     }
 //    @Test public void testImplQuery2() {
 //        TestNAR t = test();
@@ -163,5 +162,23 @@ public class NAL7Test extends AbstractNALTester {
 //        .mustAnswer(15, "(y ==>+3 x)", 1.00f, 0.9f, Tense.Eternal);
 //    }
 
+    @Test public void intervalPreserve_and_shift_occurence_corner_case()  {
+        TestNAR tester = test();
+        tester.input("<s --> S>.");
+        tester.inputAt(10, "(<s --> S> &&+50 <z --> Z>). :|:");
+        tester.mustBelieve(cycles, "<z --> Z>.", 1.00f, 0.42f, 60);
+    }
+
+    @Test
+    public void intervalPreserve_and_shift_occurence()  {
+        //TODO this is an issue with junction reduction removing the interval
+        //to fix, junction termbuilder needs redesign and associated tests
+        //that cover this case in TermReductions.java
+        
+        TestNAR tester = test();
+        tester.input("S:s.");
+        tester.inputAt(10, "(S:s &&+50 (Y:y &&+3 Z:z)). :|:");
+        tester.mustBelieve(50, "(Y:y &&+3 Z:z).", 1.00f, 0.42f, 60);
+    }
 
 }

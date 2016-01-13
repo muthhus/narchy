@@ -77,8 +77,8 @@ public class PremiseRule extends GenericCompound implements Level {
     public boolean immediate_eternalize = false;
 
     public boolean anticipate = false;
-    public boolean sequenceIntervalsFromTask = false;
-    public boolean sequenceIntervalsFromBelief = false;
+    //public boolean sequenceIntervalsFromTask = false;
+    //public boolean sequenceIntervalsFromBelief = false;
 
     /** conditions which can be tested before term matching */
     public BooleanCondition[] prePreconditions;

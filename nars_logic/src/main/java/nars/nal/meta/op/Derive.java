@@ -18,6 +18,7 @@ import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.compound.Compound;
+import nars.term.match.EllipsisMatch;
 import nars.term.variable.Variable;
 import nars.truth.Truth;
 
@@ -93,6 +94,14 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
         Term derivedTerm = match.apply(term);
         if (derivedTerm == null)
             return null;
+        if ((derivedTerm instanceof EllipsisMatch)) {
+            throw new RuntimeException("invalid ellipsis match: " + derivedTerm);
+//            EllipsisMatch em = ((EllipsisMatch)derivedTerm);
+//            if (em.size()!=1) {
+//                throw new RuntimeException("invalid ellipsis match: " + em);
+//            }
+//            derivedTerm = em.term(0); //unwrap the item
+        }
 
 
         //HARD VOLUME LIMIT

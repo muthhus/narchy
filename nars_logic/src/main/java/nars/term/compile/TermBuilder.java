@@ -71,8 +71,6 @@ public interface TermBuilder {
 
     Termed make(Op op, int relation, TermContainer subterms, int dt);
 
-
-
     /** unifies a term with this; by default it passes through unchanged */
     default Termed the(Term t) {
         return t;
@@ -367,6 +365,9 @@ public interface TermBuilder {
     }
 
     default Term junction(Op op, int t, Term... u) {
+//        if (u.length == 1)
+//            return u[0];
+
         if (t!=ITERNAL) {
             if (u.length!=2) {
                 throw new RuntimeException("invalid temporal conjunction: " + op + " " + t + " "+ Arrays.toString(u));
@@ -375,8 +376,10 @@ public interface TermBuilder {
                 throw new RuntimeException("invalid temporal disjunction");
             }
 
-            //Compound x = ((Compound) make(op, -1, TermSet.the(u)).term());
-            Term x = junction(op, Lists.newArrayList(u));
+            if (u[0].equals(u[1])) return u[0];
+
+
+            Term x = make(op, -1, TermContainer.the(op, u)).term();
             if (!x.isCompound()) return x;
 
             Compound cx = (Compound)x;
@@ -384,11 +387,16 @@ public interface TermBuilder {
             boolean reversed = cx.term(0)==u[1];
             return cx.t(reversed ? -t : t);
         } else {
-            return junction(op, Lists.newArrayList(u));
+            return junction(op, ITERNAL, Lists.newArrayList(u));
         }
     }
 
-    default Term junction(Op op, Iterable<Term> u) {
+    /** flattening junction builder, don't use with temporal relation */
+    default Term junction(Op op, int t, Iterable<Term> u) {
+
+//        if (t!=ITERNAL) {
+//            return junction(op, t, Iterables.toArray(u, Term.class));
+//        }
 
         final boolean[] done = {true};
 
@@ -406,7 +414,15 @@ public interface TermBuilder {
             }
         });
 
-        return !done[0] ? junction(op, s) :
+//        if (s.size() == 1) {
+//            return s.iterator().next();
+//        }
+//        if (s.size() == 2 && t!=ITERNAL) {
+//            Iterator<Term> ii = s.iterator();
+//            return junction(op, t, ii.next(), ii.next());
+//        }
+
+        return !done[0] ? junction(op, t, s) :
                 finish(op, -1, TermSet.the(s));
     }
 

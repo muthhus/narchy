@@ -33,8 +33,11 @@ public final class SetTaskPerception extends TaskPerception {
 
     @Override
     public void accept(Task t) {
+        if (t.getDeleted()) {
+            throw new RuntimeException("deleted: " + t);
+        }
         Task existing = table.put(t, t);
-        if (existing!=null) {
+        if ((existing!=null) && (existing!=t) && (!existing.getDeleted())) {
             merge.merge(t.getBudget(), existing.getBudget(), 1f);
         }
     }

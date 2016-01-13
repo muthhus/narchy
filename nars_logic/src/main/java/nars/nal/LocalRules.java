@@ -181,36 +181,46 @@ public enum LocalRules {
 
         long then = question.getOccurrenceTime();
 
+        Task oldBest = question.getBestSolution();
+        if (oldBest!=null && oldBest.equals(sol)) {
+            return false;
+        }
+
         //use sol.getTruth() in case sol was changed since input to this method:
         //float newQ = solutionQuality(question, sol, sol.getTruth(), now);
-        float newQ = Tense.solutionQuality(question, sol, then, nal.memory.duration());
+        float newQ = Tense.solutionQuality(question, sol, now, nal.memory.duration());
 //        if (newQ == 0) {
 //            memory.emotion.happy(0, questionTask, nal);
 //            return null;
 //        }
 
-        Task oldBest = question.getBestSolution();
+
 
         //get the quality of the old solution if it were applied now (when conditions may differ)
-        float oldQ = (oldBest != null) ? Tense.solutionQuality(question, oldBest, then, nal.memory.duration()) : 0;
+        float oldQ = (oldBest != null) ? Tense.solutionQuality(question, oldBest, now, nal.memory.duration()) : -1;
 
-        if (oldQ >= newQ) {
-            //old solution was better
+//        if (oldQ > newQ) {
+//            //old solution was better
+//            return false;
+//        }
+
+        //TODO solutionEval calculates the same solutionQualities as here, avoid this unnecessary redundancy
+        Budget budget = solutionEval(question, sol, nal);
+        if (budget == null) {
             return false;
         }
+
 
         //else, new solution is btter
         memory.emotion.happy(newQ - oldQ, question);
 
-        question.setBestSolution(sol);
 
         memory.logic.SOLUTION_BEST.set(newQ);
 
 
-        //TODO solutionEval calculates the same solutionQuality as here, avoid this unnecessary redundancy
-        Budget budget = solutionEval(question, sol, nal);
-        if (budget == null)
-            return false;
+        sol.getBudget().set(budget);
+
+        question.setBestSolution(sol);
 
         /*memory.output(task);
 
@@ -240,7 +250,7 @@ public enum LocalRules {
 
 
         /** decrease question's budget for transfer to solutions */
-        question.getBudget().andPriority(budget.getPriority());
+        //question.getBudget().andPriority(budget.getPriority());
 
         //memory.eventDerived.emit(sol);
         //nal.nar().input(sol); //is this necessary? i cant find any reason for reinserting to input onw that it's part of the concept's belief/goal tables

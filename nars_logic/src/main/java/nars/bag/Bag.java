@@ -117,8 +117,8 @@ public abstract class Bag<V> extends AbstractCacheBag<V, BLink<V>> implements Co
         return setMergeFunction(null);
     }
 
-    protected final void merge(Budget target, Budget src, float scale) {
-        mergeFunction.merge(target, src, scale);
+    protected final void merge(Budget target, Budget incoming, float scale) {
+        mergeFunction.merge(target, incoming, scale);
     }
 
 //    /**
