@@ -281,7 +281,7 @@ public class EllipsisTest {
         //System.out.println(x);
 
         assertEquals(
-                "((<%1==>%2>,<(&&,%1,%3..+)==>%2>),(<(&&,%3..+)==>%2>,(<DecomposeNegativePositivePositive-->Belief>,<ForAllSame-->Order>,<FromBelief-->SequenceIntervals>)))",
+                "(((%1==>%2),((%1&&%3..+)==>%2)),(((&&,%3..+)==>%2),((DecomposeNegativePositivePositive-->Belief),(ForAllSame-->Order),(FromBelief-->SequenceIntervals))))",
                 x.toString()
         );
 

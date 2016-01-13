@@ -11,7 +11,6 @@ import nars.truth.TruthWave;
 import nars.truth.Truthed;
 
 import java.io.PrintStream;
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -173,18 +172,14 @@ public interface BeliefTable extends TaskTable {
 
     default Task top(Task query, long now) {
 
-        Task top = top();
-        if (top == null) return null;
+        switch (size()) {
+            case 0: return null;
+            case 1: return top();
+            default:
+                //TODO re-use the Ranker
+                return top(new SolutionQualityMatchingOrderRanker(query, now));
+        }
 
-//        if (!Tense.matchingOrder(query, top.getTerm())) {
-//            return null;
-//        }
-
-        if (size() == 1)
-            return top;
-
-        //TODO re-use the Ranker
-        return top(new SolutionQualityMatchingOrderRanker(query, now));
     }
 
     default float getConfidenceMax(float minFreq, float maxFreq) {
@@ -214,7 +209,7 @@ public interface BeliefTable extends TaskTable {
         public SolutionQualityMatchingOrderRanker(Task query, long now) {
             this.query = query;
             this.now = now;
-            hasQueryVar = query.hasQueryVar();
+            this.hasQueryVar = query.hasQueryVar();
         }
 
         @Override
@@ -286,26 +281,48 @@ public interface BeliefTable extends TaskTable {
     }
 
 
-    /** computes the truth/desire as an aggregate of projections of all
-     * beliefs to current time
-     */
-    default float getMeanProjectedExpectation(long time) {
-        int size = size();
-        if (size == 0) return 0;
+//    /** computes the truth/desire as an aggregate of projections of all
+//     * beliefs to current time
+//     */
+//    default float getMeanProjectedExpectation(long time) {
+//        int size = size();
+//        if (size == 0) return 0;
+//
+//        float[] d = {0};
+//        forEach(t -> d[0] += t.getTruth().projectionQuality(t, time, time, false) * t.getExpectation());
+//
+//        float dd = d[0];
+//
+//        if (dd == 0) return 0;
+//
+//        return dd / size;
+//
+//    }
+//
+//    default float Truth.projectionQuality(Task t, long targetTime, long currentTime, boolean problemHasQueryVar) {
+//        float freq = getFrequency();
+//        float conf = getConfidence();
+//
+//        long taskOcc = t.getOccurrenceTime();
+//
+//        if (!Tense.isEternal(taskOcc) && (targetTime != taskOcc)) {
+//            conf = TruthFunctions.eternalizedConfidence(conf);
+//            if (targetTime != Tense.ETERNAL) {
+//                float factor = TruthFunctions.temporalProjection(taskOcc, targetTime, currentTime);
+//                float projectedConfidence = factor * t.getConfidence();
+//                if (projectedConfidence > conf) {
+//                    conf = projectedConfidence;
+//                }
+//            }
+//        }
+//
+//        return problemHasQueryVar ? Truth.expectation(freq, conf) / t.term().complexity() : conf;
+//
+//    }
 
-        float[] d = {0};
-        forEach(t -> d[0] += t.projectionTruthQuality(time, time, false) * t.getExpectation());
-
-        float dd = d[0];
-
-        if (dd == 0) return 0;
-
-        return dd / size;
-
-    }
 
     @FunctionalInterface
-    interface Ranker extends Function<Task,Float>, Serializable {
+    interface Ranker extends Function<Task,Float> {
         /** returns a number producing a score or relevancy number for a given Task
          * @param bestToBeat current best score, which the ranking can use to decide to terminate early
          * @return a score value, or Float.MIN_VALUE to exclude that result

@@ -2,16 +2,11 @@ package nars.concept.util;
 
 import nars.Global;
 import nars.Memory;
-import nars.budget.Budget;
-import nars.budget.BudgetFunctions;
 import nars.concept.Concept;
 import nars.nal.LocalRules;
 import nars.nal.nal7.Tense;
-import nars.task.MutableTask;
 import nars.task.Task;
 import nars.truth.DefaultTruth;
-import nars.truth.Truth;
-import nars.truth.TruthFunctions;
 
 /**
  * Stores beliefs ranked in a sorted ArrayList, with strongest beliefs at lowest indexes (first iterated)
@@ -28,33 +23,6 @@ public class ArrayListBeliefTable extends ArrayListTaskTable implements BeliefTa
 
     public ArrayListBeliefTable(int cap) {
         super(cap);
-    }
-
-    /**
-     * creates a revision task (but does not input it)
-     * if failed, returns null
-     */
-    public static Task getRevision(Task newBelief, Task oldBelief, long now) {
-
-        if (newBelief.equals(oldBelief) || Tense.overlapping(newBelief, oldBelief))
-            return null;
-
-        Truth newBeliefTruth = newBelief.getTruth();
-
-        Truth oldBeliefTruth = oldBelief.projection(newBelief.getOccurrenceTime(), now);
-
-        Truth conclusion = TruthFunctions.revision(newBeliefTruth, oldBeliefTruth);
-
-        Budget budget = BudgetFunctions.revise(newBeliefTruth, oldBelief, conclusion, newBelief.getBudget());
-
-        //Task<T> revised = nal.input(
-        return new MutableTask(newBelief.get())
-                .punctuation(newBelief.getPunctuation())
-                .truth(conclusion)
-                .budget(budget)
-                .parent(newBelief, oldBelief)
-                .because("Revision")
-                .time(now, newBelief.getOccurrenceTime());
     }
 
 
@@ -167,7 +135,7 @@ public class ArrayListBeliefTable extends ArrayListTaskTable implements BeliefTa
         //TODO make sure input.isDeleted() can not happen
         if (!input.getDeleted() && LocalRules.revisible(input, top)) {
 
-            Task revised = getRevision(input, top, now);
+            Task revised = LocalRules.getRevision(input, top, now);
 
             if (revised != null && !input.equals(revised)) {
 

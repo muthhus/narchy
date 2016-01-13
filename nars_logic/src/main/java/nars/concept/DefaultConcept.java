@@ -46,6 +46,7 @@ public class DefaultConcept extends AtomConcept {
     static final BudgetMerge duplicateQuestionMerge = BudgetMerge.plusDQDominated;
     private final Termed[] termLinkTemplates;
 
+
 //    public DefaultConcept(Term term, Memory p) {
 //        this(term, new NullBag(), new NullBag(), p);
 //    }
@@ -195,12 +196,13 @@ public class DefaultConcept extends AtomConcept {
     @Override
     public boolean processBelief(Task belief, NAR nar) {
 
-        float successBefore = getSuccess();
+        long now = nar.time();
+        float successBefore = getSuccess(now);
 
         if (beliefs == null) beliefs = new ArrayListBeliefTable(nar.memory.conceptBeliefsMax.intValue());
 
         Task strongest = getBeliefs().add( belief,
-                new BeliefTable.SolutionQualityMatchingOrderRanker(belief, nar.memory.time()),
+                new BeliefTable.SolutionQualityMatchingOrderRanker(belief, now),
                 this, nar.memory);
 
         if (strongest == null || strongest.getDeleted()) {
@@ -214,7 +216,7 @@ public class DefaultConcept extends AtomConcept {
         if (hasQuestions()) {
             //TODO move this to a subclass of TaskTable which is customized for questions. then an arraylist impl of TaskTable can iterate by integer index and not this iterator/lambda
             getQuestions().forEach( question ->
-                LocalRules.trySolution(question, strongest, nar, null)
+                LocalRules.trySolution(question, strongest, nar, nar::input)
                 /*(s) -> {
                     //..
                 }*/
@@ -225,7 +227,7 @@ public class DefaultConcept extends AtomConcept {
 
 
         /** update happiness meter on solution  TODO revise */
-        float successAfter = getSuccess();
+        float successAfter = getSuccess(now);
         float delta = successAfter - successBefore;
         if (delta!=0) //more satisfaction of a goal due to belief, more happiness
             nar.memory.emotion.happy(delta);
@@ -245,28 +247,31 @@ public class DefaultConcept extends AtomConcept {
     @Override
     public boolean processGoal(Task goal, NAR nar) {
 
-        float successBefore = getSuccess();
-
         Memory memory = nar.memory;
+        long now = memory.time();
+
+        float successBefore = getSuccess(now);
+
 
         if (goals == null) goals = new ArrayListBeliefTable(nar.memory.conceptGoalsMax.intValue());
 
+
         Task strongest = getGoals().add( goal,
-                new BeliefTable.SolutionQualityMatchingOrderRanker(goal, memory.time()),
+                new BeliefTable.SolutionQualityMatchingOrderRanker(goal, now),
                 this, memory);
 
         if (strongest==null) {
             return false;
         }
         else {
-            float successAfter = getSuccess();
+            float successAfter = getSuccess(now);
             float delta = successAfter - successBefore;
             if (delta!=0) //less desire of a goal, more happiness
                memory.emotion.happy(delta);
 
             float expectation_diff = (1-successAfter) / successAfter;
             if(Math.abs(expectation_diff) >= Global.EXECUTION_SATISFACTION_TRESHOLD) {
-                DefaultTruth projected = strongest.projection(memory.time(), memory.time());
+                DefaultTruth projected = strongest.projection(now, now);
                 if (projected.getExpectation() > Global.EXECUTION_DESIRE_EXPECTATION_THRESHOLD) {
                     if (Op.isOperation(goal.term()) && (goal.getState() != Task.TaskState.Executed)) { //check here already
 
@@ -417,19 +422,19 @@ public class DefaultConcept extends AtomConcept {
 
         //boolean tableAffected = false;
 
-        if (!isConstant()) {
+
             //boolean newQuestion = table.isEmpty();
 
-            Task match = add(table, q, questionEquivalence, duplicateQuestionMerge, nar.memory);
-            if (match == q) {
-                //final int presize = getQuestions().size() + getQuests().size();
-                //onTableUpdated(q.getPunctuation(), presize);
-                //tableAffected = true;
-            }
-            else {
-                q = match; //try solution with the original question
-            }
+        Task match = add(table, q, questionEquivalence, duplicateQuestionMerge, nar.memory);
+        if (match == q) {
+            //final int presize = getQuestions().size() + getQuests().size();
+            //onTableUpdated(q.getPunctuation(), presize);
+            //tableAffected = true;
         }
+        else {
+            q = match; //try solution with the original question
+        }
+
 
         //TODO if the table was not affected, does the following still need to happen:
 
@@ -445,7 +450,7 @@ public class DefaultConcept extends AtomConcept {
                 return true;
             }
 
-            LocalRules.trySolution(q, sol, nar, null); /*(s) -> {
+            LocalRules.trySolution(q, sol, nar, nar::input); /*(s) -> {
                 //...
             });*/
         }

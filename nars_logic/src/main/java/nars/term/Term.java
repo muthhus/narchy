@@ -22,7 +22,6 @@ package nars.term;
 
 
 import nars.Op;
-import nars.nal.nal7.Order;
 import nars.term.compound.Compound;
 import nars.term.variable.Variable;
 import nars.term.visit.SubtermVisitor;
@@ -98,9 +97,6 @@ public interface Term extends Termed, Comparable, Termlike {
         return vars() > 0;
     }
 
-    default Order getTemporalOrder() {
-        return op().getTemporalOrder();
-    }
 
     //boolean hasVar(final Op type);
 

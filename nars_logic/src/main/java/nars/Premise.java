@@ -34,14 +34,14 @@ public interface Premise extends Level, Tasked {
     static Task match(Task question, Task solution, NAR nar, Consumer<Task> eachSolution) {
 
         if (question.isQuestion() || question.isGoal()) {
-            if (Tense.matchingOrder(question, solution)) {
+            //if (Tense.matchingOrder(question, solution)) {
                 Term[] u = {question.term(), solution.term()};
                 unify(Op.VAR_QUERY, u, nar.memory, (st) -> {
                     Task s = !st.equals(solution.term()) ?
                             MutableTask.clone(solution).term((Compound) st) : solution;
                     LocalRules.trySolution(question, s, nar, eachSolution);
                 });
-            }
+            //}
         }
 
         return solution;
@@ -592,12 +592,17 @@ public interface Premise extends Level, Tasked {
         return derived;
     }
 
-    default Term getTaskTerm() {
+    default Compound getTaskTerm() {
         return getTask().term();
     }
 
     Termed getBeliefTerm();
 
 
+    /** beliefTerm iff a Compound, null otherwise */
+    default Compound getBeliefCompound() {
+        Term x = getBeliefTerm().term();
+        return x.isCompound() ? (Compound) x : null;
+    }
 
 }

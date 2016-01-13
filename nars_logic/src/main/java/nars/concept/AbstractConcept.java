@@ -13,7 +13,6 @@ public abstract class AbstractConcept implements Concept {
     private final Term term;
 
     protected Map meta = null;
-    protected boolean constant = false;
 
     protected AbstractConcept(Term term) {
         this.term = term;
@@ -121,15 +120,4 @@ public abstract class AbstractConcept implements Concept {
         //TODO clear bags
     }
 
-
-    @Override
-    public final boolean isConstant() {
-        return constant;
-    }
-
-    @Override
-    public final boolean setConstant(boolean b) {
-        constant = b;
-        return constant;
-    }
 }

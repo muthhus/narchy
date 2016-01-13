@@ -3,7 +3,6 @@ package nars.op.mental;
 import com.google.common.util.concurrent.AtomicDouble;
 import nars.*;
 import nars.budget.Budget;
-import nars.nal.nal7.Tense;
 import nars.nal.nal8.Operator;
 import nars.task.Task;
 import nars.term.Term;
@@ -259,8 +258,8 @@ public class InternalExperience {
     };
 
     private static void internalizeImplication(Task task, Premise nal, Compound beliefImpl) {
-        Term taskTerm = task.term();
-        if (beliefImpl.getTemporalOrder() == Tense.ORDER_FORWARD) {
+        Compound taskTerm = task.term();
+        if (beliefImpl.hasT() && beliefImpl.t() > 0) {
             //1. check if its (&/,term,+i1,...,+in) =/> anticipateTerm form:
             boolean valid = true;
             Term impsub = beliefImpl.term(0);

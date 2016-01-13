@@ -9,6 +9,7 @@ import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.compound.Compound;
 import nars.term.variable.Variable;
+import nars.truth.Truth;
 import org.junit.Test;
 
 import java.util.List;
@@ -71,6 +72,27 @@ public class NarseseTest {
         assertEquals(0.95f, t.getDurability(), 0.001);
         assertEquals(0.93f, t.getFrequency(), 0.001);
         assertEquals(0.95f, t.getConfidence(), 0.001);
+    }
+
+    @Test public void testTruth() {
+        testTruth("%1;0.9%", 1f, 0.9f);
+        testTruth("%1.0;0.90%", 1f, 0.9f);
+        testTruth("%1.00;0.90%", 1f, 0.9f);
+        testTruth("%1;0.90%", 1f, 0.9f);
+        testTruth("%1;.9%", 1f, 0.9f);
+        testTruth("%0;0.90%", 0f, 0.9f);
+    }
+    @Test public void testTruthFreqOnly() {
+        testTruth("%0.0%", 0f, 0.9f);
+        testTruth("%1.0%", 1f, 0.9f);
+    }
+
+    public void testTruth(String t, float freq, float conf) {
+        String s = "a:b. " + t;
+
+        Truth truth = task(s).getTruth();
+        assertEquals(freq, truth.getFrequency(), 0.001);
+        assertEquals(conf, truth.getConfidence(), 0.001);
     }
 
     @Test

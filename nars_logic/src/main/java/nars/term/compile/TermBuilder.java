@@ -436,13 +436,6 @@ public interface TermBuilder {
         //special statement filters
         switch (op) {
 
-            case INHERIT:
-            case SIMILAR:
-                if (t == 0) t = ITERNAL; //predictive inheritance disabled
-                else if (t!= ITERNAL) {
-                    throw new RuntimeException("temporal leak: " + op + " " + t + " " + Arrays.toString(u));
-                }
-                break;
 
             case EQUIV:
                 if (!validEquivalenceTerm(subject)) return null;

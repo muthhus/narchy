@@ -21,8 +21,6 @@
 package nars.truth;
 
 import nars.Symbols;
-import nars.nal.nal7.Tense;
-import nars.task.Task;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.util.Texts;
@@ -188,26 +186,6 @@ public interface Truth extends MetaTruth<Float> {
         return setFrequency(1.0f - getFrequency());
     }
 
-    default float projectionQuality(Task s, long targetTime, long currentTime, boolean problemHasQueryVar) {
-        float freq = getFrequency();
-        float conf = getConfidence();
-
-        if (!Tense.isEternal(s.getOccurrenceTime()) && (targetTime != s.getOccurrenceTime())) {
-            conf = TruthFunctions.eternalizedConfidence(conf);
-            if (targetTime != Tense.ETERNAL) {
-                long occurrenceTime = s.getOccurrenceTime();
-                float factor = TruthFunctions.temporalProjection(occurrenceTime, targetTime, currentTime);
-                float projectedConfidence = factor * s.getConfidence();
-                if (projectedConfidence > conf) {
-                    conf = projectedConfidence;
-                }
-            }
-        }
-
-        return problemHasQueryVar ? Truth.expectation(freq, conf) / s.term().complexity() : conf;
-
-    }
-
     static int compare(Truth a, Truth b) {
         if (a == b) return 0;
 
@@ -221,6 +199,9 @@ public interface Truth extends MetaTruth<Float> {
 //
 //        return 0;
     }
+
+    Truth mulConf(float f);
+
 
 
     enum TruthComponent {

@@ -49,63 +49,27 @@ public interface Concept extends Termed, Supplier<Term> {
     Map<Object, Object> getMeta();
     void setMeta(Map<Object, Object> meta);
 
-
-//    boolean linkTerms(Budget budgetRef, boolean updateTLinks);
-//
-//    TermLink activateTermLink(TermLinkBuilder termLinkBuilder);
-//      boolean link(Task currentTask);
-
-
-    @Override
-    default Term get() { return term(); }
-
-
-//    default void discountBeliefConfidence() {
-//        if (hasBeliefs()) {
-//            discountTaskConfidences(getBeliefs());
-//        }
-//    }
-//
-//    default void discountGoalConfidence() {
-//        if (hasGoals()) {
-//            discountTaskConfidences(getGoals());
-//        }
-//    }
-//
-//    default void discountTaskConfidences(Iterable<Task> t) {
-//        t.forEach(Task::discountConfidence);
-//    }
-
+    @Override default Term get() { return term(); }
 
     default boolean hasGoals() {
-        BeliefTable s = getGoals();
-        return (s != null) && !s.isEmpty();
+        return !getGoals().isEmpty();
     }
 
     default boolean hasBeliefs() {
-        BeliefTable s = getBeliefs();
-        return (s != null) && !s.isEmpty();
+        return !getBeliefs().isEmpty();
     }
 
     default boolean hasQuestions() {
-        TaskTable s = getQuestions();
-        return (s != null) && !s.isEmpty();
+        return !getQuestions().isEmpty();
     }
 
     default boolean hasQuests() {
-        TaskTable s = getQuests();
-        return s != null && !s.isEmpty();
+        return !getQuests().isEmpty();
     }
 
-    boolean isConstant();
 
-    /** allows concept state to be locked */
-    boolean setConstant(boolean b);
-
-
-
-    default float getDesireExpectation() {
-        Truth d = getDesire();
+    default float getDesireExpectation(long now) {
+        Truth d = getDesire(now);
         if (d!=null) return d.getExpectation();
         return 0;
     }
@@ -145,16 +109,17 @@ public interface Concept extends Termed, Supplier<Term> {
     /**
      * Get the current overall desire value. TODO to be refined
      */
-    default Truth getDesire() {
-        return hasGoals() ? getGoals().top().getTruth() : null;
+    default Truth getDesire(long now) {
+        return hasGoals() ?
+            getGoals().top().projection(now, now) : null;
     }
 
     /** satisfaction/success metric:
      * if desire exists, returns 1.0 / (1 + Math.abs(belief - desire))
      *  otherwise zero */
-    default float getSuccess() {
+    default float getSuccess(long now) {
         Truth d;
-        return hasBeliefs() && hasGoals() && null != (d = getDesire()) ? 1.0f / (1.0f + Math.abs(getBeliefs().top().getTruth().getExpectation() - d.getExpectation())) : 0;
+        return hasBeliefs() && hasGoals() && null != (d = getDesire(now)) ? 1.0f / (1.0f + Math.abs(getBeliefs().top().getTruth().getExpectation() - d.getExpectation())) : 0;
     }
 
     BeliefTable getBeliefs();

@@ -18,9 +18,9 @@ public interface Temporal extends Tasked {
     void setOccurrenceTime(long t);
 
 
-    default boolean concurrent(Task s, int duration) {
-        return Tense.concurrent(s.getOccurrenceTime(), getOccurrenceTime(), duration);
-    }
+//    default boolean concurrent(Task s, int duration) {
+//        return Tense.concurrent(s.getOccurrenceTime(), getOccurrenceTime(), duration);
+//    }
 
     default int tDelta(Temporal other/*, int perceptualDuration*/) {
         long start = start();

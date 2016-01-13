@@ -11,7 +11,14 @@ public class DefaultTruth extends AbstractScalarTruth {
 
     //public final float epsilon;
 
+    /** unspecified confidence, will be invalid unless updated later */
+    public DefaultTruth(float f) {
+        setFrequency(f);
+        confidence = Float.NaN;
+    }
+
     public DefaultTruth(float f, float c) {
+
         set(f,c);
 
     }
@@ -36,8 +43,12 @@ public class DefaultTruth extends AbstractScalarTruth {
         this(truth.getFrequency(), truth.getConfidence());
     }
 
+    @Override
+    public Truth mulConf(float factor) {
+        return new DefaultTruth(getFrequency(), getConfidence() * factor);
+    }
 
-/*    public float getEpsilon() {
+    /*    public float getEpsilon() {
         return DEFAULT_TRUTH_EPSILON;
     }*/
 

@@ -3,7 +3,9 @@ package nars.nal.meta.pre;
 import nars.Premise;
 import nars.nal.PremiseMatch;
 import nars.nal.meta.AtomicBooleanCondition;
+import nars.nal.nal7.Tense;
 import nars.task.Temporal;
+import nars.term.compound.Compound;
 
 /**
  * After(%X,%Y) Means that
@@ -59,6 +61,65 @@ abstract public class Event extends AtomicBooleanCondition<PremiseMatch> {
         }
     }
 
+    /** applies dt to the derived term according to premise terms */
+    public abstract static class dt extends AtomicBooleanCondition<PremiseMatch> {
+
+
+        public static final dt avg = new dt() {
+            @Override protected boolean computeDT(Compound a, int at, Compound b, int bt, PremiseMatch m) {
+                int avg = (at + bt) / 2;
+                //float diff = Math.abs(at - bt)/avg;
+                m.tDelta.set(-avg);
+                return true;
+            }
+
+            @Override public String toString() {
+                return "dt(avg)";
+            }
+        };
+        public static final dt task = new dt() {
+            @Override protected boolean computeDT(Compound a, int at, Compound b, int bt, PremiseMatch m) {
+                m.tDelta.set(at);
+                return true;
+            }
+
+            @Override public String toString() {
+                return "dt(task)";
+            }
+        };
+
+
+        protected dt() {
+
+        }
+
+        @Override
+        abstract public String toString();
+
+        @Override
+        public boolean booleanValueOf(PremiseMatch m) {
+            Compound a = m.premise.getTaskTerm();
+            int at = a.t();
+
+            Compound b = m.premise.getBeliefCompound();
+            if (b == null) return false;
+            int bt = b.t();
+
+            if (at == Tense.ITERNAL) {
+                if (bt == Tense.ITERNAL)
+                    return true; //both atemporal, nothing needs done just allow
+                else
+                    return false;  //mismatch
+
+            } else if (bt == Tense.ITERNAL) {
+                return false; //mismatch
+            } else {
+                return computeDT(a, at, b, bt, m);
+            }
+        }
+
+        protected abstract boolean computeDT(Compound a, int at, Compound b, int bt, PremiseMatch m);
+    }
 //    /** task then/simultaneously belief */
 //    public static final class Before extends Event {
 //

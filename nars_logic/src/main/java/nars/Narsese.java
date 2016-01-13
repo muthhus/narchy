@@ -66,7 +66,7 @@ public class Narsese extends BaseParser<Object> {
         return parsers.get();
     }
 
-    public static Task makeTask(Memory memory, float[] b, Termed content, Character p, Truth t, Tense tense) {
+    public static Task makeTask(Memory memory, float[] b, Termed content, char p, Truth t, Tense tense) {
 
 //        if (p == null)
 //            throw new RuntimeException("character is null");
@@ -321,8 +321,7 @@ public class Narsese extends BaseParser<Object> {
 
                 TRUTH_VALUE_MARK,
 
-                //Frequency
-                ShortFloat(),
+                ShortFloat(), //Frequency
 
                 firstOf(
 
@@ -330,21 +329,19 @@ public class Narsese extends BaseParser<Object> {
 
                                 TruthTenseSeparator(VALUE_SEPARATOR, tense), // separating ;,|,/,\
 
-                                ShortFloat(),
+                                ShortFloat(), //Conf
 
-                                swap() && truth.set(new DefaultTruth((float) pop(), (float) pop())),
+                                optional(TRUTH_VALUE_MARK), //tailing '%' is optional
 
-                                optional(TRUTH_VALUE_MARK) //tailing '%' is optional
+                                swap() && truth.set(new DefaultTruth((float) pop(), (float) pop()))
                         ),
 
                         sequence(
+                                TRUTH_VALUE_MARK, //tailing '%'
 
-                                truth.set(new DefaultTruth((float) pop(), Float.NaN /* will be set automatically by Memory */)),
-
-                                optional(TruthTenseSeparator(TRUTH_VALUE_MARK, tense)) ////tailing %,|,/,\ is optional
+                                truth.set(new DefaultTruth((float) pop() ))
                         )
                 )
-
         );
     }
 
@@ -1103,7 +1100,14 @@ public class Narsese extends BaseParser<Object> {
         Termed content = m.index.normalized(contentRaw);
         if (content == null)
             throw new RuntimeException("Task term unnormalizable: " + contentRaw);
-        return makeTask(m, (float[]) x[0], content, (Character) x[2], (Truth) x[3], (Tense) x[4]);
+
+        char punct = (Character) x[2];
+
+        Truth t = (Truth) x[3];
+        if (t!=null && !Float.isFinite(t.getConfidence()))
+            t.setConfidence(m.getDefaultConfidence(punct));
+
+        return makeTask(m, (float[]) x[0], content, punct, t, (Tense) x[4]);
     }
 
     /**

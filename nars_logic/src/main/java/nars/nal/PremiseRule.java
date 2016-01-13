@@ -399,6 +399,18 @@ public class PremiseRule extends GenericCompound implements Level {
 
                     break;
 
+                case "dt":
+                    switch (arg1.toString()) {
+                        case "avg":
+                            preNext = Event.dt.avg; break;
+                        case "task":
+                            preNext = Event.dt.task; break;
+                        default:
+                            throw new RuntimeException("invalid dt() argument: " + arg1);
+                    }
+                    break;
+
+
 //                case "beforePos":
 //                    preNext = Event.Before.forward;
 //                    break;

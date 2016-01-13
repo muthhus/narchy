@@ -197,11 +197,11 @@
 //not necessarily the same as the order in the premises, given the hypothetical
 //nature of such a rule."
 
-    (P ==> M), (S ==> M), neq(S,P) |- (S ==> P), (Belief:Induction, Derive:AllowBackward)
+    (P ==> M), (S ==> M), neq(S,P), dt(avg) |- (S ==> P), (Belief:Induction, Derive:AllowBackward)
 
-    (M ==> P), (M ==> S), neq(S,P) |- (S ==> P), (Belief:Abduction, Derive:AllowBackward)
+    (M ==> P), (M ==> S), neq(S,P), dt(avg) |- (S ==> P), (Belief:Abduction, Derive:AllowBackward)
 
-    (P ==> M), (M ==> S), neq(S,P) |- (S ==> P), (Belief:Exemplification, Derive:AllowBackward)
+    (P ==> M), (M ==> S), neq(S,P), dt(avg) |- (S ==> P), (Belief:Exemplification, Derive:AllowBackward)
 
 //// implication to equivalence ////////////////////////////////////////////////////////////////////////////////////
 //If when S happens, P happens, and before P happens, S has happened, then they are truth-related equivalent
@@ -218,7 +218,7 @@
 
     (M ==> P), (S <=> M), neq(S,P) |- (S ==> P), (Belief:Analogy, Derive:AllowBackward)
 
-    (P ==> M), (S <=> M), neq(S,P) |- (P ==> S), (Belief:Analogy, Derive:AllowBackward)
+    (P ==> M), (S <=> M), neq(S,P), dt(task) |- (P ==> S), (Belief:Analogy, Derive:AllowBackward)
 
     (M <=> P), (S <=> M), neq(S,P) |- (S <=> P), (Belief:Resemblance, Order:ForAllSame, Derive:AllowBackward)
 

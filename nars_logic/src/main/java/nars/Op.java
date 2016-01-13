@@ -2,7 +2,6 @@ package nars;
 
 
 import com.gs.collections.api.tuple.primitive.IntIntPair;
-import nars.nal.nal7.Order;
 import nars.nal.nal7.Tense;
 import nars.term.Term;
 import nars.term.atom.Atom;
@@ -119,7 +118,6 @@ public enum Op {
     public final int minLevel;
 
     private final boolean commutative;
-    private final Order temporalOrder;
 
 
 //    Op(char c, int minLevel) {
@@ -168,21 +166,6 @@ public enum Op {
         this.minSize= size.getOne();
         this.maxSize = size.getTwo();
 
-        Order o = Order.None;
-        switch (string) { //has to be done by string..
-            case "=/>":
-            case "</>":
-            case "&/":
-                    o = Order.Forward; break;
-            case "=|>":
-            case "<|>":
-            case "&|":
-                    o = Order.Concurrent; break;
-            case "=\\>":
-                    o = Order.Backward; break;
-
-        }
-        this.temporalOrder = o;
 
     }
 
@@ -266,8 +249,11 @@ public enum Op {
         return commutative;
     }
 
-    public Order getTemporalOrder() {
-        return temporalOrder;
+    public final static int TemporalBits = or(CONJUNCTION, IMPLICATION, Op.EQUIV);
+
+    /** whether this op allows temporal relation (true) or ignores it  (false) */
+    public boolean isTemporal() {
+        return isA(TemporalBits);
     }
 
     public boolean validSize(int length) {

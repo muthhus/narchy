@@ -47,9 +47,14 @@ public class GenericCompound<T extends Term> implements Compound<T> {
         this.terms = subterms;
         this.normalized = (subterms.vars() == 0);
         this.op = op;
-        this.relation = relation;
-        this.hash = Util.hashCombine(terms.hashCode(), opRel(), t);
+
+        t = op().isTemporal() ? t : ITERNAL;
         this.t = t;
+
+        this.relation = relation;
+
+        this.hash = Util.hashCombine(terms.hashCode(), opRel(), t);
+
 
     }
 

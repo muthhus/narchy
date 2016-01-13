@@ -23,7 +23,6 @@ package nars.task;
 import nars.*;
 import nars.budget.Budgeted;
 import nars.concept.Concept;
-import nars.nal.nal7.Order;
 import nars.nal.nal7.Tense;
 import nars.term.Statement;
 import nars.term.Term;
@@ -176,10 +175,12 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     /** called when a Concept processes this Task */
     void onConcept(Concept c);
 
-    default <X extends Compound> MutableTask solution(X t, char newPunc, Truth newTruth, long newOcc, Task question, Memory memory) {
+    default <X extends Compound> MutableTask solution(X t, char newPunc, Truth solutionTruth, long newOcc, Task question, Memory memory) {
+
+
 
         MutableTask tt = new MutableTask(t, newPunc)
-            .truth(newTruth)
+            .truth(solutionTruth)
             .budget(getPriority(), getDurability(), getQuality())
             .time(memory.time(), newOcc);
 
@@ -327,8 +328,11 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         return appendTo(sb, memory, false);
     }
 
-    @Deprecated
-    default String toStringWithoutBudget(Memory memory) {
+    @Deprecated default String toStringWithoutBudget() {
+        return toStringWithoutBudget(null);
+    }
+
+    @Deprecated default String toStringWithoutBudget(Memory memory) {
         StringBuilder b = new StringBuilder();
         appendTo(b, memory, true, false,
                 false, //budget
@@ -520,9 +524,6 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
             throw new RuntimeException("parentTask must be null itself, or reference a non-null Task");
     }
 
-    default Order getTemporalOrder() {
-        return term().getTemporalOrder();
-    }
 
     void setTruth(Truth t);
 
@@ -611,14 +612,16 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
     default String getTense(long currentTime, int duration) {
 
-        if (Tense.isEternal(getOccurrenceTime())) {
+        long ot = getOccurrenceTime();
+
+        if (Tense.isEternal(ot)) {
             return "";
         }
 
-        switch (Tense.order(currentTime, getOccurrenceTime(), duration)) {
-            case Forward:
+        switch (Tense.order(currentTime, ot, duration)) {
+            case 1:
                 return Symbols.TENSE_FUTURE;
-            case Backward:
+            case -1:
                 return Symbols.TENSE_PAST;
             default:
                 return Symbols.TENSE_PRESENT;
@@ -682,7 +685,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
     //projects the truth to a certain time, covering all 4 cases as discussed in
     //https://groups.google.com/forum/#!searchin/open-nars/task$20eteneral/open-nars/8KnAbKzjp4E/rBc-6V5pem8J
-    default DefaultTruth projection(long targetTime, long currentTime) {
+    default DefaultTruth projection(long targetTime, long now) {
 
         Truth currentTruth = getTruth();
         long occurrenceTime = getOccurrenceTime();
@@ -699,21 +702,14 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
             //ok last option is that both are tensed, in this case we need to project to the target time
             //but since also eternalizing is valid, we use the stronger one.
             DefaultTruth eternalTruth = TruthFunctions.eternalize(currentTruth);
-            float factor = TruthFunctions.temporalProjection(targetTime, occurrenceTime, currentTime);
+
+            float factor = TruthFunctions.temporalProjection(now, targetTime, occurrenceTime);
+            //float factor = TruthFunctions.temporalProjection(targetTime, occurrenceTime, currentTime);
+
             float projectedConfidence = factor * currentTruth.getConfidence();
 
             return projectedConfidence > eternalTruth.getConfidence() ? new DefaultTruth(currentTruth.getFrequency(), projectedConfidence) : eternalTruth;
         }
-    }
-
-    /** calculates projection truth quality without creating new TruthValue instances */
-    default float projectionTruthQuality(long targetTime, long currentTime, boolean problemHasQueryVar) {
-        return projectionTruthQuality(getTruth(), targetTime, currentTime, problemHasQueryVar);
-    }
-
-    /** calculates projection truth quality without creating new TruthValue instances */
-    default float projectionTruthQuality(Truth t, long targetTime, long currentTime, boolean problemHasQueryVar) {
-        return t.projectionQuality(this, targetTime, currentTime, problemHasQueryVar);
     }
 
     final class ExpectationComparator implements Comparator<Task>, Serializable {

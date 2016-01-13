@@ -55,7 +55,7 @@ public class PremiseRuleTest extends TestCase {
             PremiseRule x = (PremiseRule)p.term("< <A --> B>, <B --> A> |- <A <-> B>, (Belief:Revision, Desire:Weak)>");
             x = normalize(x);
             assertEquals(19, x.volume());
-            assertEquals("((<%1-->%2>,<%2-->%1>),(<%1<->%2>,(<Revision-->Belief>,<Weak-->Desire>)))", x.toString());
+            assertEquals("(((%1-->%2),(%2-->%1)),((%1<->%2),((Revision-->Belief),(Weak-->Desire))))", x.toString());
 
         }
         {

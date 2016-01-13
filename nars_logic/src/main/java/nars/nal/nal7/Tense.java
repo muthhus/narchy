@@ -3,7 +3,7 @@ package nars.nal.nal7;
 import nars.Memory;
 import nars.task.Task;
 import nars.task.Temporal;
-import nars.term.Termed;
+import nars.term.compound.Compound;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 
@@ -22,10 +22,6 @@ public enum Tense  {
 
     public static final Tense Unknown = null;
 
-    @Deprecated public static final Order ORDER_NONE = Order.None;
-    @Deprecated public static final Order ORDER_FORWARD = Order.Forward;
-    @Deprecated public static final Order ORDER_CONCURRENT = Order.Concurrent;
-    @Deprecated public static final Order ORDER_BACKWARD = Order.Backward;
 
     /**
      * default for atemporal events
@@ -50,16 +46,8 @@ public enum Tense  {
         symbol = string;
     }
 
-    public static boolean matchingOrder(Termed a, Termed b) {
-        return matchingOrder(
-                a.term().getTemporalOrder(),
-                b.term().getTemporalOrder());
-    }
 
-    public static boolean matchingOrder(Order order1, Order order2) {
 
-        return (order1 == order2) || (order1 == ORDER_NONE) || (order2 == ORDER_NONE);
-    }
 
 //    public static boolean containsMentalOperator(final Task t) {
 //        return containsMentalOperator(t.getTerm(), true);
@@ -96,13 +84,24 @@ public enum Tense  {
      * @param solution The solution to be evaluated
      * @return The quality of the judgment as the solution
      */
-    public static float solutionQuality(Task problem, Task solution, long time) {
+    public static float solutionQuality(Task problem, Task solution, long time, int duration) {
+        float om = orderMatch(problem.term(), solution.term(), duration);
+        if (om == 0) return 0f;
+        return om * solutionQualityMatchingOrder(problem, solution, time);
+    }
 
-        if (!matchingOrder(problem, solution)) {
-            return 0;
-        }
+    /** degree to which the temporal relations of the two terms match */
+    public static float orderMatch(Compound a, Compound b, int duration) {
+        float fduration = (float)duration;
 
-        return solutionQualityMatchingOrder(problem, solution, time);
+        int at = a.t();
+        int bt = b.t();
+        if (at == bt) return 1f;
+
+        float ad = at /fduration;
+        float bd = bt /fduration;
+        return Math.min(0f, 1f - Math.abs(ad-bd)/((ad+bd)/2f));
+
     }
 
     public static float solutionQualityMatchingOrder(Task problem, Task solution, long time) {
@@ -114,7 +113,7 @@ public enum Tense  {
         long poc = problem.getOccurrenceTime();
 
         //TODO avoid creating new Truth instances
-        Truth truth = poc != solution.getOccurrenceTime() ?
+        Truth truth = (poc != solution.getOccurrenceTime()) ?
                 solution.projection(poc, time) :
                 solution.getTruth();
 
@@ -125,34 +124,34 @@ public enum Tense  {
                 or(originality, truth.getConfidence());
     }
 
-    /**
-        this method is used if the order is known to be matching, so it is not checked
-     */
-    public static float solutionQualityMatchingOrderOLD(Task problem, Task solution, long time, boolean hasQueryVar) {
+//    /**
+//        this method is used if the order is known to be matching, so it is not checked
+//     */
+//    public static float solutionQualityMatchingOrderOLD(Task problem, Task solution, long time, boolean hasQueryVar) {
+//
+//        /*if ((problem == null) || (solution == null)) {
+//            throw new RuntimeException("problem or solution is null");
+//        }*/
+//
+//        long poc = problem.getOccurrenceTime();
+//        Truth truth = poc != solution.getOccurrenceTime() ? solution.projection(poc, time) : solution.getTruth();
+//
+//        //if (problem.hasQueryVar()) {
+//        return hasQueryVar ? truth.getExpectation() / solution.term().complexity() : truth.getConfidence();
+//    }
 
-        /*if ((problem == null) || (solution == null)) {
-            throw new RuntimeException("problem or solution is null");
-        }*/
+//    public static float solutionQuality(boolean hasQueryVar, long occTime, Task solution, Truth projectedTruth, long time) {
+//        return solution.projectionTruthQuality(projectedTruth, occTime, time, hasQueryVar);
+//    }
 
-        long poc = problem.getOccurrenceTime();
-        Truth truth = poc != solution.getOccurrenceTime() ? solution.projection(poc, time) : solution.getTruth();
-
-        //if (problem.hasQueryVar()) {
-        return hasQueryVar ? truth.getExpectation() / solution.term().complexity() : truth.getConfidence();
-    }
-
-    public static float solutionQuality(boolean hasQueryVar, long occTime, Task solution, Truth projectedTruth, long time) {
-        return solution.projectionTruthQuality(projectedTruth, occTime, time, hasQueryVar);
-    }
-
-    public static Order order(float timeDiff, int durationCycles) {
+    public static int order(float timeDiff, int durationCycles) {
         float halfDuration = durationCycles / 2.0f;
         if (timeDiff >= halfDuration) {
-            return ORDER_FORWARD;
+            return +1;
         } else if (timeDiff <= -halfDuration) {
-            return ORDER_BACKWARD;
+            return -1;
         } else {
-            return ORDER_CONCURRENT;
+            return 0;
         }
     }
 
@@ -161,34 +160,34 @@ public enum Tense  {
      * event B before       then order=backward
      * occur at the same time, relative to duration: order = concurrent
      */
-    public static Order order(long a, long b, int durationCycles) {
+    public static int order(long a, long b, int durationCycles) {
         if ((a == ETERNAL) || (b == ETERNAL))
             throw new RuntimeException("order() does not compare ETERNAL times");
 
         return order(b - a, durationCycles);
     }
 
-    public static boolean concurrent(Temporal a, Temporal b, int durationCycles) {
-        return concurrent(a.getOccurrenceTime(), b.getOccurrenceTime(), durationCycles);
-    }
+//    public static boolean concurrent(Temporal a, Temporal b, int durationCycles) {
+//        return concurrent(a.getOccurrenceTime(), b.getOccurrenceTime(), durationCycles);
+//    }
 
-    /**
-     * whether two times are concurrent with respect ao a specific duration ("present moment") # of cycles
-     */
-    public static boolean concurrent(long a, long b, int perceptualDuration) {
-        //since Stamp.ETERNAL is Integer.MIN_VALUE,
-        //avoid any overflow errors by checking eternal first
-
-        if (a == ETERNAL) {
-            //if both are eternal, consider concurrent.  this is consistent with the original
-            //method of calculation which compared equivalent integer values only
-            return (b == ETERNAL);
-        } else if (b == ETERNAL) {
-            return false; //a==b was compared above
-        } else {
-            return order(a, b, perceptualDuration) == ORDER_CONCURRENT;
-        }
-    }
+//    /**
+//     * whether two times are concurrent with respect ao a specific duration ("present moment") # of cycles
+//     */
+//    public static boolean concurrent(long a, long b, int perceptualDuration) {
+//        //since Stamp.ETERNAL is Integer.MIN_VALUE,
+//        //avoid any overflow errors by checking eternal first
+//
+//        if (a == ETERNAL) {
+//            //if both are eternal, consider concurrent.  this is consistent with the original
+//            //method of calculation which compared equivalent integer values only
+//            return (b == ETERNAL);
+//        } else if (b == ETERNAL) {
+//            return false; //a==b was compared above
+//        } else {
+//            return order(a, b, perceptualDuration) == 0;
+//        }
+//    }
 
     public static boolean before(long a, long b, int perceptualDuration) {
         return after(b, a, perceptualDuration);
@@ -198,7 +197,7 @@ public enum Tense  {
     public static boolean after(long a, long b, int perceptualDuration) {
         if (a == ETERNAL || b == ETERNAL)
             return false;
-        return order(a, b, perceptualDuration) == ORDER_FORWARD;
+        return order(a, b, perceptualDuration) > 0;
     }
 
     public static boolean isEternal(long t)  {
