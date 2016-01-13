@@ -492,7 +492,7 @@ public interface TermBuilder {
         if (s == null)
             return null;
 
-        return junction(CONJUNCTION, t, s, pred(predicate));
+        return newTerm(IMPLICATION, t, new TermVector(s, pred(predicate)));
     }
 
     default Term newIntersectINT(Term[] t) {
