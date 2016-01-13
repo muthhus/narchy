@@ -203,7 +203,7 @@ public class ArrayListBeliefTable extends ArrayListTaskTable implements BeliefTa
 
             float existingRank = r.rank(b, rankInput);
 
-            boolean inputGreater = Float.isNaN(existingRank) || (rankInput > existingRank);
+            boolean inputGreater = !Float.isFinite(existingRank) || (rankInput > existingRank);
             if (inputGreater) {
                 break; //item will be inserted at this index
             }

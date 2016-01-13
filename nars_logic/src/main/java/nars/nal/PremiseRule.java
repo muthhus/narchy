@@ -402,9 +402,19 @@ public class PremiseRule extends GenericCompound implements Level {
                 case "dt":
                     switch (arg1.toString()) {
                         case "avg":
-                            preNext = Event.dt.avg; break;
+                            preNext = dt.avg; break;
                         case "task":
-                            preNext = Event.dt.task; break;
+                            preNext = dt.task; break;
+                        case "exact":
+                            preNext = dt.exact; break;
+                        case "sum":
+                            preNext = dt.sum; break;
+                        case "sumNeg":
+                            preNext = dt.sumNeg; break;
+                        case "bmint":
+                            preNext = dt.bmint; break;
+                        case "tminb":
+                            preNext = dt.tminb; break;
                         default:
                             throw new RuntimeException("invalid dt() argument: " + arg1);
                     }

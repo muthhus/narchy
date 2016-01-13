@@ -85,7 +85,7 @@ public class Space extends GenericCompound {
         FloatArrayList vv = this.vector;
         if (vv !=null) {
             float v = vv.get(i);
-            if (!Float.isNaN(v)) {
+            if (Float.isFinite(v)) {
                 p.append('*').append(Float.toString(v));
             }
         }

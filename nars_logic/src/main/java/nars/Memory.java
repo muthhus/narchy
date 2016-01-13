@@ -95,7 +95,7 @@ public class Memory extends Param {
      * used for reporting or informing outside. consists of additional notes
      * or data which could annotate a log or summary of system activity
      */
-    public final transient Topic<Serializable> eventSpeak = new DefaultTopic<>();
+    public final transient Topic<Object> eventSpeak = new DefaultTopic<>();
 
 
 

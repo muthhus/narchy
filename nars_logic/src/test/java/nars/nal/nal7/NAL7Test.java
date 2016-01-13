@@ -72,7 +72,7 @@ public class NAL7Test extends AbstractNALTester {
         tester.believe("(<($x, room) --> enter> ==>-5 <($x, door) --> open>)", 0.9f, 0.9f);
         tester.believe("(<($y, door) --> open> ==>-5 <($y, key) --> hold>)", 0.8f, 0.9f);
 
-        tester.mustBelieve(cycles, "(<($1,key) --> hold> ==>+5 <($1,room) --> enter>)", 1.00f, 0.37f);
+        tester.mustBelieve(cycles, "(<($1,key) --> hold> ==>+10 <($1,room) --> enter>)", 1.00f, 0.37f);
 
     }
 
@@ -103,6 +103,65 @@ public class NAL7Test extends AbstractNALTester {
         tester.inputAt(delay, belief + ". :|: %0%");
         tester.mustBelieve(delay+1, belief,  freq, conf, delay);
     }
+
+    @Test public void testSumNeg() {
+        //(P ==> M), (M ==> S), neq(S,P), dt(sumNeg) |- (S ==> P), (Belief:Exemplification, Derive:AllowBackward)
+        TestNAR tester = test();
+        tester.believe("(x ==>+2 y)");
+        tester.believe("(y ==>+3 z)");
+
+        tester.mustBelieve(2, "(z ==>-5 x)", 1.00f, 0.45f);
+
+    }
+
+    @Test public void testSum() {
+        test()
+        .believe("(x ==>+2 y)")
+        .believe("(y ==>+3 z)")
+        .mustBelieve(2, "(x ==>+5 z)", 1.00f, 0.81f);
+    }
+
+    @Test public void testBminT() {
+        //(P ==> M), (S ==> M), neq(S,P), dt(bmint) |- (S ==> P), (Belief:Induction, Derive:AllowBackward)
+        test()
+        .believe("(x ==>+2 y)")
+        .believe("(z ==>+3 y)")
+        .mustBelieve(5, "(z ==>+1 x)", 1.00f, 0.45f);
+    }
+    @Test public void testTminB() {
+        //(M ==> P), (M ==> S), neq(S,P), dt(tminb) |- (S ==> P), (Belief:Abduction, Derive:AllowBackward)
+
+        test()
+        .believe("(y ==>+3 x)")
+        .believe("(y ==>+2 z)")
+        .mustBelieve(5, "(z ==>+1 x)", 1.00f, 0.45f);
+    }
+
+    @Test public void testImplQuery() {
+        test()
+        .believe("(y ==>+3 x)")
+        .input("(y ==>+3 ?x)?")
+        .mustAnswer(15, "(y ==>+3 x)", 1.00f, 0.9f, Tense.Eternal);
+    }
+    @Test public void testImplQueryTense() {
+        test()
+        .input("(y ==>+3 x). :|:")
+        .input("(y ==>+3 ?x)? :|:")
+        .mustAnswer(15, "(y ==>+3 x)", 1.00f, 0.47f, Tense.Present);
+    }
+    @Test public void testImplQueryTenseFuture() {
+        test()
+        .input("(y ==>+3 x). :\\:")
+        .input("(y ==>+3 ?x)? :/:")
+        .mustAnswer(15, "(y ==>+3 x)", 1.00f, 0.5f, Tense.Future);
+    }
+//    @Test public void testImplQuery2() {
+//        TestNAR t = test();
+//        t.nar.log();
+//        t.believe("(y ==>+3 x)")
+//        .input("(y ==> x)?")
+//        .mustAnswer(15, "(y ==>+3 x)", 1.00f, 0.9f, Tense.Eternal);
+//    }
 
 
 }

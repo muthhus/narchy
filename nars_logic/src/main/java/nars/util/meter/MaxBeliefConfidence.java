@@ -44,7 +44,7 @@ public class MaxBeliefConfidence extends CycleReaction implements Signals {
                 best = conf;
             }
 
-            if (!Float.isNaN(conf))
+            if (!Float.isFinite(conf))
                 conf = -1;
         }
     }

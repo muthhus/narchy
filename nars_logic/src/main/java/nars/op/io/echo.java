@@ -22,6 +22,6 @@ public class echo extends ImmediateOperator {
 
     @Override
     public void execute(Execution e) {
-        e.nar.memory.eventSpeak.emit( Operator.opArgs(e.term()).terms() );
+        e.nar.memory.eventSpeak.emit( Operator.opArgs(e.term()) );
     }
 }

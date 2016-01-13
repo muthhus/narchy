@@ -2,7 +2,6 @@ package nars.util.meter;
 
 import nars.Global;
 import nars.NAR;
-import nars.Narsese;
 import nars.nal.nal7.Tense;
 import nars.task.Task;
 import nars.task.Tasked;
@@ -59,11 +58,11 @@ public class TestNAR  {
     static final boolean collectTrace = false;
 
     boolean finished = false;
-
+    final Topic<Task> answerReceiver;
 
     public TestNAR(NAR nar) {
 
-        Topic<Task> answerReceiver = new DefaultTopic();
+        answerReceiver = new DefaultTopic();
 
         this.outputEvents = new Topic[] {
             //nar.memory.eventDerived,
@@ -186,15 +185,15 @@ public class TestNAR  {
     }
 
     //TODO initialize this once in constructor
-    Topic<Tasked>[] outputEvents;
+    final Topic<Tasked>[] outputEvents;
 
-    public TestNAR mustOutput(long cycleStart, long cycleEnd, String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax, long occTimeAbsolute) throws Narsese.NarseseException {
+    public TestNAR mustOutput(long cycleStart, long cycleEnd, String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax, long occTimeAbsolute)  {
         mustEmit(outputEvents, cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax, occTimeAbsolute);
         return this;
     }
 
 
-    public TestNAR mustOutput(long withinCycles, String task) throws Narsese.NarseseException {
+    public TestNAR mustOutput(long withinCycles, String task)  {
         return mustEmit(outputEvents, withinCycles, task);
     }
 
@@ -218,15 +217,15 @@ public class TestNAR  {
 //        return mustEmit(c, cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax, ocRelative );
 //    }
 
-    public TestNAR mustEmit(Topic<Tasked>[] c, long cycleStart, long cycleEnd, String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax) throws Narsese.NarseseException {
+    public TestNAR mustEmit(Topic<Tasked>[] c, long cycleStart, long cycleEnd, String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax)  {
         return mustEmit(c, cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax, Tense.ETERNAL );
     }
 
-    public TestNAR mustEmit(Topic<Tasked>[] c, long cycleStart, long cycleEnd, String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax, Tense t) throws Narsese.NarseseException {
+    public TestNAR mustEmit(Topic<Tasked>[] c, long cycleStart, long cycleEnd, String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax, Tense t)  {
         return mustEmit(c, cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax, nar.time(t));
     }
 
-    public TestNAR mustEmit(Topic<Tasked>[] c, long cycleStart, long cycleEnd, String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax, long occTimeAbsolute) throws Narsese.NarseseException {
+    public TestNAR mustEmit(Topic<Tasked>[] c, long cycleStart, long cycleEnd, String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax, long occTimeAbsolute)  {
 
         float h = (freqMin!=-1) ? truthTolerance / 2.0f : 0;
 
@@ -285,7 +284,7 @@ public class TestNAR  {
 
     public final long time() { return nar.time(); }
 
-    public TestNAR mustEmit(Topic<Tasked>[] c, long withinCycles, String task) throws Narsese.NarseseException {
+    public TestNAR mustEmit(Topic<Tasked>[] c, long withinCycles, String task)  {
         Task t = nar.task(task);
         //TODO avoid reparsing term from string
 
@@ -302,15 +301,15 @@ public class TestNAR  {
         }
     }
 
-    public TestNAR mustOutput(long withinCycles, String term, char punc, float freq, float conf) throws Narsese.NarseseException {
+    public TestNAR mustOutput(long withinCycles, String term, char punc, float freq, float conf)  {
         long now = time();
         return mustOutput(now, now + withinCycles, term, punc, freq, freq, conf, conf, nar.time(Tense.Eternal));
     }
 
-    public TestNAR mustBelieve(long withinCycles, String term, float freqMin, float freqMax, float confMin, float confMax) throws Narsese.NarseseException {
+    public TestNAR mustBelieve(long withinCycles, String term, float freqMin, float freqMax, float confMin, float confMax)  {
         return mustBelieve(withinCycles, term, freqMin, freqMax, confMin, confMax, Tense.ETERNAL);
     }
-    public TestNAR mustBelieve(long withinCycles, String term, float freqMin, float freqMax, float confMin, float confMax, long tense) throws Narsese.NarseseException {
+    public TestNAR mustBelieve(long withinCycles, String term, float freqMin, float freqMax, float confMin, float confMax, long tense)  {
         long now = time();
         return mustOutput(now, now + withinCycles, term, '.', freqMin, freqMax, confMin, confMax, tense);
     }
@@ -322,19 +321,24 @@ public class TestNAR  {
 //        long now = time();
 //        return mustOutput(now + cycleStart, now + cycleStop, term, '.', freq, freq, confidence, confidence);
 //    }
-    public TestNAR mustBelieve(long withinCycles, String term, float freq, float confidence, Tense t) throws Narsese.NarseseException {
+    public TestNAR mustBelieve(long withinCycles, String term, float freq, float confidence, Tense t)  {
         long ttt = nar.time();
         return mustOutput(ttt, ttt + withinCycles, term, '.', freq, freq, confidence, confidence, nar.time(t));
     }
-    public TestNAR mustBelieve(long withinCycles, String term, float freq, float confidence, long occTimeAbsolute) throws Narsese.NarseseException {
+    public TestNAR mustAnswer(long withinCycles, String term, float freq, float confidence, Tense t)  {
+        long ttt = nar.time();
+        return mustEmit(new Topic[] { answerReceiver },
+                ttt, ttt + withinCycles, term, '.', freq, freq, confidence, confidence, nar.time(t));
+    }
+    public TestNAR mustBelieve(long withinCycles, String term, float freq, float confidence, long occTimeAbsolute)  {
         long t = nar.time();
         return mustOutput(t, t + withinCycles, term, '.', freq, freq, confidence, confidence,occTimeAbsolute);
     }
 
-    public TestNAR mustBelieve(long withinCycles, String term, float freq, float confidence) throws Narsese.NarseseException {
+    public TestNAR mustBelieve(long withinCycles, String term, float freq, float confidence)  {
         return mustBelieve(withinCycles, term, freq, confidence, Tense.Eternal);
     }
-    public TestNAR mustBelieve(long withinCycles, String term, float confidence) throws Narsese.NarseseException {
+    public TestNAR mustBelieve(long withinCycles, String term, float confidence)  {
         return mustBelieve(withinCycles, term, 1.0f, confidence);
     }
 
@@ -357,7 +361,7 @@ public class TestNAR  {
         return this;
     }
 
-    public TestNAR ask(String termString) throws Narsese.NarseseException {
+    public TestNAR ask(String termString)  {
         //Override believe to input beliefs that have occurrenceTime set on input
         // "lazy timing" appropriate for test cases that can have delays
         Task t = nar.ask(termString);
@@ -367,7 +371,7 @@ public class TestNAR  {
     }
 
 
-    public TestNAR believe(String... termString) throws Narsese.NarseseException {
+    public TestNAR believe(String... termString)  {
         for (String s : termString)
             nar.believe(s);
         return this;
@@ -376,7 +380,7 @@ public class TestNAR  {
 
 
 
-    public TestNAR believe(String termString, float freq, float conf) throws Narsese.NarseseException {
+    public TestNAR believe(String termString, float freq, float conf)  {
 
         nar.believe(termString, freq, conf);
         return this;

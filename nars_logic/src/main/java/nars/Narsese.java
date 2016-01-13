@@ -75,7 +75,7 @@ public class Narsese extends BaseParser<Object> {
 //            t = new DefaultTruth(p);
 //
         int blen = b != null ? b.length : 0;
-//        if ((blen > 0) && (Float.isNaN(b[0])))
+//        if ((blen > 0) && (Float.isFinite(b[0])))
 //            blen = 0;
 //
 

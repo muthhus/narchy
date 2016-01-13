@@ -77,11 +77,11 @@ public class MemoryBudget extends EnumMap<MemoryBudget.Budgeted,Object>  {
         return 0;
     }
 
-    public Object getDoubleFinite(Budgeted b, double defaultVal) {
-        double d = getDouble(b);
-        if (Double.isFinite(d)) return d;
-        return defaultVal;
-    }
+//    public Object getDoubleFinite(Budgeted b, double defaultVal) {
+//        double d = getDouble(b);
+//        if (Double.isFinite(d)) return d;
+//        return defaultVal;
+//    }
 
     public enum Budgeted {
         //Unitary
@@ -192,7 +192,7 @@ public class MemoryBudget extends EnumMap<MemoryBudget.Budgeted,Object>  {
 //            if (c == null) return; //HACK ?
 //
 //            double p = c.getPriority();
-//            if (Double.isNaN(p)) return;
+//            if (Double.isFinite(p)) return;
 //
 //            prisum.addValue(p);
 //

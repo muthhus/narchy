@@ -207,6 +207,9 @@ public class Default extends AbstractNAR {
         @Range(min=0,max=16,unit="TermLink")
         public final MutableInteger termlinksFiredPerFiredConcept = new MutableInteger(1);
 
+        @Range(min=0.0f,max=1.0,unit="Percent")
+        public final MutableFloat conceptActivation = new MutableFloat(1);
+
         @Range(min=0.01f,max=8,unit="Duration")
         public final MutableFloat conceptRemembering;
 
@@ -337,7 +340,7 @@ public class Default extends AbstractNAR {
         }
 
         public final void activate(Concept c, Budget b, float scale) {
-            active.put(c, b, scale);
+            active.put(c, b, scale * conceptActivation.floatValue());
         }
 
         /** fires a concept selected by the bag */

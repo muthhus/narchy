@@ -206,7 +206,7 @@ public abstract class AbstractTask extends Item<Task>
         //---- VALID TASK BEYOND THIS POINT
 
         /** NaN quality is a signal that a budget's values need initialized */
-        if (Float.isNaN(getQuality())) {
+        if (!Float.isFinite(getQuality())) {
             //HACK for now just assume that only MutableTask supports unbudgeted input
             memory.applyDefaultBudget((MutableTask)this);
         }

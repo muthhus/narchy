@@ -276,6 +276,9 @@ public enum LocalRules {
             task = nal.getCurrentTask();
             feedbackToLinks = true;
         }*/
+        if (question.getDeleted())
+            return null;
+
         boolean judgmentTask = question.isJudgment();
         float quality = Tense.solutionQuality(question, solution, nar.time(), nar.memory.duration());
         if (quality <= 0)

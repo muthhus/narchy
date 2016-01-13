@@ -38,8 +38,8 @@ public abstract class Budget extends BudgetedHandle {
         float nextDur = cp * tgt.getDurability() + np * src.getDurability();
         float nextQua = cp * tgt.getQuality() + np * src.getQuality();
 
-        assert !Float.isNaN(nextDur) : "NaN dur: " + src + ' ' + tgt.getDurability();
-        assert !Float.isNaN(nextQua) : "NaN quality";
+        assert Float.isFinite(nextDur) : "NaN dur: " + src + ' ' + tgt.getDurability();
+        assert Float.isFinite(nextQua) : "NaN quality";
 
         tgt.budget( nextPri,nextDur,nextQua);
     };
@@ -56,7 +56,7 @@ public abstract class Budget extends BudgetedHandle {
 
     //@Contract(pure = true)
     public static boolean getDeleted(float pri) {
-        return Float.isNaN(pri);
+        return !Float.isFinite(pri);
     }
 
     public static String toString(Budget b) {
@@ -264,7 +264,7 @@ public abstract class Budget extends BudgetedHandle {
     }
 
     public float getPriorityIfNaNThenZero() {
-        return !Float.isNaN(getPriority()) ? getPriority() : 0;
+        return Float.isFinite(getPriority()) ? getPriority() : 0;
     }
 
     /**

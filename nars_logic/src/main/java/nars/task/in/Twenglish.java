@@ -251,4 +251,33 @@ public class Twenglish {
         return Lists.transform(Twokenize.tokenize(msg),
                 Twenglish::spanToTerm);
     }
+
+    public static String learnSentence(NAR nar, int wordDelay, String message) {
+        List<Term> t = tokenize(message);
+
+        if (t.isEmpty()) return "silence";
+
+        String sentenceID = Integer.toString(message.hashCode());
+
+        nar.input("sentence(" + sentenceID + "). :|:");
+        //float f = 1f;
+        //float df = 0.5f / t.size();
+        for (Term w : t) {
+            //nar.input("sentence(" + sentenceID + "). :|:");// %" + f + ";0.95%");
+            //nar.frame(1);
+
+            ///nar.input("echo(" + w + "). :|: %1;0.9%");
+            nar.input("(sentence(" + sentenceID + ") ==> echo(" + w + ")). :|:");
+            nar.frame(wordDelay);
+            //nar.input("echo(" + w + "). :|: %0;0.9%");
+            //nar.frame(wordDelay);
+
+            //f-=df;
+        }
+        nar.input("(--, sentence(" + sentenceID + ")). :|:");
+
+        //nar.input("(--, sentence(" + sentenceID + ")). :|:");
+
+        return sentenceID;
+    }
 }

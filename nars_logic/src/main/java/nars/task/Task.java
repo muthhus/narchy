@@ -547,7 +547,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
                     1.0f //limit to only diminish
                 );
 
-        if (Float.isNaN(factor))
+        if (!Float.isFinite(factor))
             throw new RuntimeException("NaN");
 
         derived.forEach(t -> t.getBudget().mulPriority(factor));
