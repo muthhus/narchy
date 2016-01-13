@@ -22,6 +22,7 @@ package nars.truth;
 
 import nars.Global;
 import nars.nal.UtilityFunctions;
+import nars.nal.nal7.Tense;
 
 import static java.lang.Math.abs;
 
@@ -454,7 +455,7 @@ public final class TruthFunctions extends UtilityFunctions {
     public static ProjectedTruth eternalize(float freq, float conf) {
         return new ProjectedTruth(
                 freq,
-                eternalizedConfidence(conf)
+                eternalizedConfidence(conf), Tense.ETERNAL
         );
     }
     public static float eternalizedConfidence(float conf) {

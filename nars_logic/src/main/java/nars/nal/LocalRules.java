@@ -33,6 +33,7 @@ import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Term;
 import nars.term.compound.Compound;
+import nars.truth.ProjectedTruth;
 import nars.truth.Truth;
 import nars.truth.TruthFunctions;
 
@@ -113,11 +114,11 @@ public enum LocalRules {
      * @param question     The question to be processed
      * @return the projected Task, or the original Task
      */
-    public static void trySolution(Task question, Task solution, NAR nal, Consumer<Task> eachSolutions) {
+    public static void trySolution(Task question, Task sol, NAR nal, Consumer<Task> eachSolutions) {
 
-        if ((solution == null) || (solution.getDeleted())) {
-            throw new RuntimeException("proposedBelief " + solution + " deleted or null");
-        }
+//        if ((sol == null) || (sol.getDeleted())) {
+//            throw new RuntimeException("proposedBelief " + sol + " deleted or null");
+//        }
 
 //        float om = Tense.orderMatch(question, solution, nal.memory.duration());
 //
@@ -127,7 +128,6 @@ public enum LocalRules {
 //            return;
 //        }
 
-        Task sol = solution;
 
         Memory memory = nal.memory;
 
@@ -162,11 +162,11 @@ public enum LocalRules {
 
         if (solTerm.hasVarIndep() && !solTerm.equals(quesTerm)) {
 
-            Premise.unify(Op.VAR_INDEP, new Term[]{quesTerm, solTerm}, nal.memory, proc);
+            Premise.unify(Op.VAR_INDEP, quesTerm, solTerm, nal.memory, proc);
 
         } else {
             if (sol == null)
-                throw new RuntimeException("Unification invalid: " + solution + " unified and projected to " + sol);
+                throw new RuntimeException("Unification invalid: " + sol + " unified and projected to " + sol);
 
             proc.accept(sol.term());
         }
@@ -175,9 +175,9 @@ public enum LocalRules {
 
     public static boolean processSolution(Task question, NAR nal, Task sol, Memory memory, long now) {
 
-        if (!(question.isQuestion() || question.isQuest())) {
-            throw new RuntimeException(question + " not a question");
-        }
+//        if (!(question.isQuestion() || question.isQuest())) {
+//            throw new RuntimeException(question + " not a question");
+//        }
 
         long then = question.getOccurrenceTime();
 
@@ -209,6 +209,8 @@ public enum LocalRules {
 
         //TODO solutionEval calculates the same solutionQuality as here, avoid this unnecessary redundancy
         Budget budget = solutionEval(question, sol, nal);
+        if (budget == null)
+            return false;
 
         /*memory.output(task);
 
@@ -246,12 +248,12 @@ public enum LocalRules {
 
         Task finalSolution = sol;
         //defer this event until after frame ends so reasoning in this cycle may continue
-        if (question.isInput()) {
+        //if (question.isInput()) {
             nal.beforeNextFrame(() -> {
                 //nal.input(finalSolution);
                 memory.eventAnswer.emit(Tuples.twin(question, finalSolution));
             });
-        }
+        //}
 
         return true;
 
@@ -329,20 +331,21 @@ public enum LocalRules {
 
         Truth newBeliefTruth = newBelief.getTruth();
 
-        Truth oldBeliefTruth = oldBelief.projection(newBelief.getOccurrenceTime(), now);
+        long target = newBelief.getOccurrenceTime();
+
+        Truth oldBeliefTruth = oldBelief.projection(target, now);
 
         Truth conclusion = TruthFunctions.revision(newBeliefTruth, oldBeliefTruth);
-
-        Budget budget = BudgetFunctions.revise(newBeliefTruth, oldBelief, conclusion, newBelief.getBudget());
 
         //Task<T> revised = nal.input(
         return new MutableTask(newBelief.get())
                 .punctuation(newBelief.getPunctuation())
                 .truth(conclusion)
-                .budget(budget)
+                .budget(BudgetFunctions.revise(newBeliefTruth, oldBelief, conclusion, newBelief.getBudget()))
                 .parent(newBelief, oldBelief)
-                .because("Revision")
-                .time(now, newBelief.getOccurrenceTime());
+                .time(now,
+                        (conclusion instanceof ProjectedTruth) ? ((ProjectedTruth) conclusion).target : target)
+                .because("Revision");
     }
 
 

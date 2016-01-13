@@ -30,8 +30,8 @@ public final class ConceptProcess implements Premise {
     public final BLink<Concept> conceptLink;
     public final BLink<Termed> termLink;
 
-    private Task currentBelief = null;
-    private transient boolean cyclic;
+    private final Task currentBelief;
+    private final boolean cyclic;
 
     @Override
     public final Task getTask() {
@@ -52,46 +52,49 @@ public final class ConceptProcess implements Premise {
         this.termLink = termLink;
 
         //belief can be null:
-        if (belief!=null)
-            updateBelief(belief);
+        if (belief!=null)  {
+            currentBelief = belief;
+            cyclic = (belief != null) && Tense.overlapping(getTask(), belief);
+        } else {
+            currentBelief = null;
+            cyclic = false;
+        }
     }
 
 
     public static int fireAll(NAR nar, BLink<Concept> concept, BLink<Task> taskLink, BLink<Termed> termLink, Consumer<ConceptProcess> cp) {
 
-
-        int[] beliefAttempts = new int[1];
-
-        Task belief;
+        Task task = taskLink.get();
 
         Concept beliefConcept = nar.concept(termLink.get());
-        if (beliefConcept != null) {
-            Task task = taskLink.get();
 
+        Task belief;
+        if ((beliefConcept != null) && (beliefConcept.hasBeliefs())) {
             belief = beliefConcept.getBeliefs().top(task, nar.time());
-
-            if ((belief != null) && (!belief.getDeleted())) {
-                Premise.match(task, belief, nar, beliefResolved -> {
-                    beliefAttempts[0]++;
-                    cp.accept(new ConceptProcess(
-                            nar, concept,
-                            taskLink, termLink,
-                            beliefResolved));
-                });
-            }
-
+            if (belief.getDeleted())
+                throw new RuntimeException("deleted belief");
         } else {
             belief = null;
         }
 
-//        if (beliefAttempts[0] == 0) {
-            cp.accept(new ConceptProcess(nar, concept,
-                    taskLink, termLink, belief));
+        if (belief != null)  {
+            int[] beliefAttempts = new int[1];
+            Premise.match(task, belief, nar, beliefResolved -> {
+                beliefAttempts[0]++;
+                cp.accept(new ConceptProcess(
+                        nar, concept,
+                        taskLink, termLink,
+                        beliefResolved));
+            });
+            int a = beliefAttempts[0];
+            if (a > 0)
+                return a;
+        }
 
-//            return 1;
-//        } else {
-            return beliefAttempts[0]+1;
-//        }
+        cp.accept(new ConceptProcess(nar, concept,
+                taskLink, termLink, belief));
+        return 1;
+
 
     }
 
@@ -128,13 +131,6 @@ public final class ConceptProcess implements Premise {
 //
 //        return c;
 //    }
-
-    @Override public final void updateBelief(Task nextBelief) {
-        if (nextBelief!=currentBelief) {
-            currentBelief = nextBelief;
-            cyclic = (nextBelief != null) && Tense.overlapping(getTask(), nextBelief);
-        }
-    }
 
 
     @Override

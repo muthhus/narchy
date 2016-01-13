@@ -13,7 +13,7 @@ import nars.op.mental.Anticipate;
 import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.truth.DefaultTruth;
+import nars.truth.Truth;
 
 import java.util.function.BiPredicate;
 
@@ -271,7 +271,7 @@ public class DefaultConcept extends AtomConcept {
 
             float expectation_diff = (1-successAfter) / successAfter;
             if(Math.abs(expectation_diff) >= Global.EXECUTION_SATISFACTION_TRESHOLD) {
-                DefaultTruth projected = strongest.projection(now, now);
+                Truth projected = strongest.projection(now, now);
                 if (projected.getExpectation() > Global.EXECUTION_DESIRE_EXPECTATION_THRESHOLD) {
                     if (Op.isOperation(goal.term()) && (goal.getState() != Task.TaskState.Executed)) { //check here already
 

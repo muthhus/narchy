@@ -683,9 +683,10 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
 
 
+
     //projects the truth to a certain time, covering all 4 cases as discussed in
     //https://groups.google.com/forum/#!searchin/open-nars/task$20eteneral/open-nars/8KnAbKzjp4E/rBc-6V5pem8J
-    default DefaultTruth projection(long targetTime, long now) {
+    default Truth projection(long targetTime, long now) {
 
         Truth currentTruth = getTruth();
         long occurrenceTime = getOccurrenceTime();
@@ -693,7 +694,8 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         boolean eternal = targetTime == Tense.ETERNAL;
         boolean tenseEternal = Tense.isEternal(occurrenceTime);
         if (eternal ? tenseEternal : tenseEternal) {
-            return new DefaultTruth(currentTruth);                 //target and itself is eternal so return the truth of itself
+            return currentTruth;
+            //return new DefaultTruth(currentTruth);                 //target and itself is eternal so return the truth of itself
         }
         else if (eternal && !tenseEternal) { //target is eternal, but ours isnt, so we need to eternalize it
             return TruthFunctions.eternalize(currentTruth);
@@ -703,8 +705,8 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
             //but since also eternalizing is valid, we use the stronger one.
             DefaultTruth eternalTruth = TruthFunctions.eternalize(currentTruth);
 
-            float factor = TruthFunctions.temporalProjection(now, targetTime, occurrenceTime);
-            //float factor = TruthFunctions.temporalProjection(targetTime, occurrenceTime, currentTime);
+            //float factor = TruthFunctions.temporalProjection(now, targetTime, occurrenceTime);
+            float factor = TruthFunctions.temporalProjection(targetTime, occurrenceTime, now);
 
             float projectedConfidence = factor * currentTruth.getConfidence();
 

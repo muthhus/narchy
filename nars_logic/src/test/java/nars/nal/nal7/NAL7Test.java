@@ -53,10 +53,10 @@ public class NAL7Test extends AbstractNALTester {
         t
         .input("x:before. :|:")
         .inputAt(10, "x:after. :|:")
-        .mustBelieve(cycles, "(x:before ==>+10 x:after)", 1.00f, inductionConf, 0)
-        .mustBelieve(cycles, "(x:after ==>-10 x:before)", 1.00f, abductionConf, 0)
-        .mustBelieve(cycles, "(x:after <=>-10 x:before)", 1.00f, comparisonConf, 0)
-        .mustBelieve(cycles, "(x:after &&-10 x:before)", 1.00f, intersectionConf, 0)
+        .mustBelieve(11, "(x:before ==>+10 x:after)", 1.00f, inductionConf, 0)
+        .mustBelieve(11, "(x:after ==>-10 x:before)", 1.00f, abductionConf, 0)
+        .mustBelieve(11, "(x:after <=>-10 x:before)", 1.00f, comparisonConf, 0)
+        .mustBelieve(11, "(x:after &&-10 x:before)", 1.00f, intersectionConf, 0)
         ;
 
 //        tester.mustBelieve(cycles, "<<(John, room) --> enter> =\\> (&/, <(John, door) --> open>, /6)>",
@@ -90,16 +90,18 @@ public class NAL7Test extends AbstractNALTester {
     }
 
 
-    @Test
-    public void updating_and_revision() throws Narsese.NarseseException {
+    @Test public void updating_and_revision() throws Narsese.NarseseException {
+        testTemporalRevision(10, 0.50f, 0.95f, "<(John,key) --> hold>");
+    }
+    @Test public void updating_and_revision2() throws Narsese.NarseseException {
+        testTemporalRevision(1, 0.50f, 0.95f, "<(John,key) --> hold>");
+    }
+
+    void testTemporalRevision(int delay, float freq, float conf, String belief) {
         TestNAR tester = test();
-
-        tester.input("<(John,key) --> hold>. :|: %1.0;0.9%");
-        tester.inputAt(10, "<(John,key) --> hold>. :|: %0.0;0.9%");
-
-        tester.mustBelieve(cycles, "<(John,key) --> hold>", //TODO: Check truth value
-                0.5f, 0.95f,
-                10);
+        tester.input(belief + ". :|: %1%");
+        tester.inputAt(delay, belief + ". :|: %0%");
+        tester.mustBelieve(delay+1, belief,  freq, conf, delay);
     }
 
 

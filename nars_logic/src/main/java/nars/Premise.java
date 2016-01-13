@@ -31,20 +31,20 @@ public interface Premise extends Level, Tasked {
      * @param solution The belief
      * @return null if no match
      */
-    static Task match(Task question, Task solution, NAR nar, Consumer<Task> eachSolution) {
+    static void match(Task question, Task solution, NAR nar, Consumer<Task> eachSolution) {
 
-        if (question.isQuestion() || question.isGoal()) {
+
+        //if (question.isQuestion() || question.isGoal()) {
             //if (Tense.matchingOrder(question, solution)) {
-                Term[] u = {question.term(), solution.term()};
-                unify(Op.VAR_QUERY, u, nar.memory, (st) -> {
-                    Task s = !st.equals(solution.term()) ?
-                            MutableTask.clone(solution).term((Compound) st) : solution;
-                    LocalRules.trySolution(question, s, nar, eachSolution);
-                });
             //}
-        }
+        //}
 
-        return solution;
+        unify(Op.VAR_QUERY, question.term(), solution.term(), nar.memory, (st) -> {
+            Task s = !st.equals(solution.term()) ?
+                    MutableTask.clone(solution).term((Compound) st) : solution;
+            LocalRules.trySolution(question, s, nar, eachSolution);
+        });
+
     }
 
     /**
@@ -56,7 +56,7 @@ public interface Premise extends Level, Tasked {
      * <p>
      * only sets the values if it will return true, otherwise if it returns false the callee can expect its original values untouched
      */
-    static void unify(Op varType, Term[] t, Memory memory, Consumer<Term> solution) {
+    static void unify(Op varType, Term a, Term b, Memory memory, Consumer<Term> solution) {
 
         FindSubst f = new FindSubst(varType, memory.random) {
 
@@ -64,15 +64,13 @@ public interface Premise extends Level, Tasked {
 
                 //TODO combine these two blocks to use the same sub-method
 
-                Term a = t[0];
                 Term aa = a;
 
                 //FORWARD
-                if (a instanceof Compound) {
+                if (aa instanceof Compound) {
 
                     aa = getXY(a);
                     if (aa == null) aa = a;
-                    if (aa == null) return false;
 
                     Op aaop = aa.op();
                     if (a.op() == Op.VAR_QUERY && (aaop == Op.VAR_INDEP || aaop == Op.VAR_DEP))
@@ -80,27 +78,24 @@ public interface Premise extends Level, Tasked {
 
                 }
 
-                Term b = t[1];
                 Term bb = b;
 
                 //REVERSE
-                if (b instanceof Compound) {
+                if (bb instanceof Compound) {
                     bb = applySubstituteAndRenameVariables(
                             ((Compound) b),
                             (Map<Term, Term>)yx //inverse map
                     );
-
-                    if (bb == null) return false;
 
                     Op bbop = bb.op();
                     if (b.op() == Op.VAR_QUERY && (bbop == Op.VAR_INDEP || bbop == Op.VAR_DEP))
                         return false;
                 }
 
-                t[0] = aa;
-                t[1] = bb;
+                //t[0] = aa;
+                //t[1] = bb;
 
-                solution.accept(t[1]);
+                solution.accept(bb);
 
                 return true; //determines how many
             }
@@ -113,7 +108,7 @@ public interface Premise extends Level, Tasked {
 
         };
 
-        f.matchAll(t[0], t[1]);
+        f.matchAll(a, b);
     }
 
 
@@ -578,10 +573,6 @@ public interface Premise extends Level, Tasked {
 //    default void input(Stream<Task> t) {
 //        t.forEach(this::input);
 //    }
-
-    /** may be called during inference to update the premise
-     * with a better belief than what it had previously. */
-    void updateBelief(Task revised);
 
 
     default Task derive(Task derived) {

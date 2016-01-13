@@ -191,7 +191,7 @@
 //                (A ==> C)
 //If after S M happens, and after M P happens, so P happens after S
 
-    (M ==> P), (S ==> M), neq(S,P) |- (S ==> P), (Belief:Deduction, Order:ForAllSame, Derive:AllowBackward)
+    (M ==> P), (S ==> M), neq(S,P), dt(avg) |- (S ==> P), (Belief:Deduction, Order:ForAllSame, Derive:AllowBackward)
 
 //"Please note that the temporal order in the conclusion of a weak rule is
 //not necessarily the same as the order in the premises, given the hypothetical
@@ -206,30 +206,30 @@
 //// implication to equivalence ////////////////////////////////////////////////////////////////////////////////////
 //If when S happens, P happens, and before P happens, S has happened, then they are truth-related equivalent
 
-    (S ==> P), (P ==> S), neq(S,P) |- (S <=> P), (Belief:Intersection, Derive:AllowBackward)
+    (S ==> P), (P ==> S), neq(S,P), dt(avg) |- (S <=> P), (Belief:Intersection, Derive:AllowBackward)
 
 //// equivalence-based syllogism ////////////////////////////////////////////////////////////////////////////////////
 //Same as for inheritance again
 
-    (P ==> M), (S ==> M), neq(S,P) |- (S <=> P), (Belief:Comparison, Derive:AllowBackward)
+    (P ==> M), (S ==> M), neq(S,P), dt(avg) |- (S <=> P), (Belief:Comparison, Derive:AllowBackward)
 
-    (M ==> P), (M ==> S), neq(S,P) |- (S <=> P), (Belief:Comparison, Derive:AllowBackward)
+    (M ==> P), (M ==> S), neq(S,P), dt(avg) |- (S <=> P), (Belief:Comparison, Derive:AllowBackward)
 
 
-    (M ==> P), (S <=> M), neq(S,P) |- (S ==> P), (Belief:Analogy, Derive:AllowBackward)
+    (M ==> P), (S <=> M), neq(S,P), dt(task) |- (S ==> P), (Belief:Analogy, Derive:AllowBackward)
 
     (P ==> M), (S <=> M), neq(S,P), dt(task) |- (P ==> S), (Belief:Analogy, Derive:AllowBackward)
 
-    (M <=> P), (S <=> M), neq(S,P) |- (S <=> P), (Belief:Resemblance, Order:ForAllSame, Derive:AllowBackward)
+    (M <=> P), (S <=> M), neq(S,P), dt(avg) |- (S <=> P), (Belief:Resemblance, Order:ForAllSame, Derive:AllowBackward)
 
 //// implication-based composition ////////////////////////////////////////////////////////////////////////////////////
 //Same as for inheritance again
 
-    (P ==> M), (S ==> M), neq(S,P) |- ((P || S) ==> M), (Belief:Intersection),
-                                      ((P && S) ==> M), (Belief:Union)
+    (P ==> M), (S ==> M), neq(S,P), dt(task) |- ((P || S) ==> M), (Belief:Intersection),
+                                                ((P && S) ==> M), (Belief:Union)
 
-    (M ==> P), (M ==> S), neq(S,P) |- (M ==> (P && S)), (Belief:Intersection),
-                                      (M ==> (P || S)), (Belief:Union)
+    (M ==> P), (M ==> S), neq(S,P), dt(task) |- (M ==> (P && S)), (Belief:Intersection),
+                                                (M ==> (P || S)), (Belief:Union)
 
 //    (D =/> R), (D =\> K), neq(R,K) |- (K =/> R), (Belief:Abduction),
 //                                      (R =\> K), (Belief:Induction),
@@ -238,10 +238,10 @@
 //// implication-based decomposition ////////////////////////////////////////////////////////////////////////////////////
 //Same as for inheritance again
 
-    (S ==> M), ((||,S,A..+) ==> M) |- ((||,A..+) ==> M), (Belief:DecomposePositiveNegativeNegative, Order:ForAllSame)
-    (S ==> M), ((&&,S,A..+) ==> M) |- ((&&,A..+) ==> M), (Belief:DecomposeNegativePositivePositive, Order:ForAllSame, SequenceIntervals:FromBelief)
-    (M ==> S), (M ==> (&&,S,A..+)) |- (M ==> (&&,A..+)), (Belief:DecomposePositiveNegativeNegative, Order:ForAllSame, SequenceIntervals:FromBelief)
-    (M ==> S), (M ==> (||,S,A..+)) |- (M ==> (||,A..+)), (Belief:DecomposeNegativePositivePositive, Order:ForAllSame)
+    (S ==> M), ((||,S,A..+) ==> M), dt(task) |- ((||,A..+) ==> M), (Belief:DecomposePositiveNegativeNegative, Order:ForAllSame)
+    (S ==> M), ((&&,S,A..+) ==> M), dt(task) |- ((&&,A..+) ==> M), (Belief:DecomposeNegativePositivePositive, Order:ForAllSame, SequenceIntervals:FromBelief)
+    (M ==> S), (M ==> (&&,S,A..+)), dt(task) |- (M ==> (&&,A..+)), (Belief:DecomposePositiveNegativeNegative, Order:ForAllSame, SequenceIntervals:FromBelief)
+    (M ==> S), (M ==> (||,S,A..+)), dt(task) |- (M ==> (||,A..+)), (Belief:DecomposeNegativePositivePositive, Order:ForAllSame)
 
 //// conditional syllogism ////////////////////////////////////////////////////////////////////////////////////
 //If after M, P usually happens, and M happens, it means P is expected to happen
