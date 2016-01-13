@@ -50,7 +50,7 @@ public class PremiseRule extends GenericCompound implements Level {
         differ.class,
         union.class,
         substitute.class,
-        substituteIfUnifies.class
+        substituteIfUnifies.class,
 //        occurrsForward.class,
 //        occurrsBackward.class
     };
@@ -392,12 +392,19 @@ public class PremiseRule extends GenericCompound implements Level {
                     break;
 
                 case "after":
-                    preNext = Event.After.the;
+                    if (arg1.toString().equals("reverse"))
+                        preNext = Event.After.reverse;
+                    else
+                        preNext = Event.After.forward;
+
                     break;
 
-                case "before":
-                    preNext = Event.Before.the;
-                    break;
+//                case "beforePos":
+//                    preNext = Event.Before.forward;
+//                    break;
+//                case "beforeNeg":
+//                    preNext = Event.Before.reverse;
+//                    break;
 
 //                case "concurrent":
 //                    preNext = Concurrent.the;

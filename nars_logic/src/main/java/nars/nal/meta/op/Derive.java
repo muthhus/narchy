@@ -142,9 +142,17 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
 
             int tDelta = p.tDelta.getIfAbsent(Tense.ITERNAL);
             Termed<Compound> c;
-            if (tDelta > Tense.ITERNAL) {
+            if (tDelta != Tense.ITERNAL) {
+
+                Compound ct = (Compound) tNorm.term();
+
+                //check reversal against pattern
+//                if (ct.op().isCommutative() && (!p.getXY(((Compound)term).term(0)).equals(ct.term(0)))) {
+//                    tDelta = -tDelta;
+//                }
+
                 //set time relation
-                c = ((Compound)tNorm.term()).t(tDelta);
+                c = ct.t(tDelta);
             } else {
                 //c = mem.taskConcept(tNorm); //accelerant: concept lookup
                 c = tNorm;

@@ -10,7 +10,7 @@ import static org.junit.Assert.assertNotEquals;
 /**
  * Created by me on 1/12/16.
  */
-public class TestTemporalRelations {
+public class TemporalRelationsTest {
 
     @Test
     public void parseTemporalRelation() {
@@ -39,6 +39,11 @@ public class TestTemporalRelations {
     @Test public void testReversibilityOfCommutive() {
         assertEquals("(a <=>+5 b)", $("(a <=>+5 b)").toString());
         assertEquals("(a <=>-5 b)", $("(b <=>+5 a)").toString());
+        assertEquals("(a <=>-5 b)", $("(a <=>-5 b)").toString());
+
+        assertEquals("(a &&+5 b)", $("(a &&+5 b)").toString());
+        assertEquals("(a &&-5 b)", $("(b &&+5 a)").toString());
+
 
     }
 

@@ -38,7 +38,7 @@ import static nars.Op.*;
        (which can be constructed in a static context)
     --??
  */
-public   enum $  {
+public enum $  {
     ;
 
     public static final TermBuilder terms = new TermBuilder() {
@@ -464,16 +464,16 @@ public   enum $  {
     /** construct set_ext of key,value pairs from a Map */
     public static Compound seteMap(Map<Term,Term> map) {
         return $.sete(
-            map.entrySet().stream().map(
-                e -> $.p(e.getKey(),e.getValue()))
-            .collect( toList())
+                (Collection<? extends Term>) map.entrySet().stream().map(
+                    e -> $.p(e.getKey(),e.getValue()))
+                .collect( toList())
         );
     }
     public static <X> Compound seteMap(Map<Term,? extends X> map, Function<X, Term> toTerm) {
         return $.sete(
-            map.entrySet().stream().map(
-                e -> $.p(e.getKey(), toTerm.apply(e.getValue())))
-            .collect( toList())
+                (Collection<? extends Term>) map.entrySet().stream().map(
+                    e -> $.p(e.getKey(), toTerm.apply(e.getValue())))
+                .collect( toList())
         );
     }
 }

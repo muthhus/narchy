@@ -36,45 +36,52 @@ abstract public class Event extends AtomicBooleanCondition<PremiseMatch> {
     /** belief then task */
     public final static class After extends Event {
 
-        public static final After the = new After();
+        public static final After forward = new After(true);
+        public static final After reverse = new After(false);
+        private final boolean positive;
 
-        protected After() {
+        protected After(boolean positive) {
             super();
-        }
-        @Override
-        protected boolean booleanValueOfEvent(PremiseMatch m, int tDelta) {
-            if (tDelta < 0) {
-                m.tDelta.set(tDelta);
-                return true;
-            }
-            return false;
-        }
-
-        @Override public String toString() {
-            return "after";
-        }
-    }
-
-    /** task then/simultaneously belief */
-    public static final class Before extends Event {
-
-        public static final Before the = new Before();
-
-        protected Before() {
-            super();
+            this.positive = positive;
         }
 
         @Override
         protected boolean booleanValueOfEvent(PremiseMatch m, int tDelta) {
             if (tDelta >= 0) {
-                m.tDelta.set(tDelta);
+                m.tDelta.set(positive ? tDelta : -tDelta);
                 return true;
             }
             return false;
         }
 
         @Override public String toString() {
-            return "before";
+            return "after(" + (positive ? "forward" : "reverse") + ")";
         }
     }
+
+//    /** task then/simultaneously belief */
+//    public static final class Before extends Event {
+//
+//        public static final Before forward = new Before(true);
+//        public static final Before reverse = new Before(false);
+//        private final boolean positive;
+//
+//        protected Before(boolean pos) {
+//            super();
+//            this.positive = pos;
+//        }
+//
+//        @Override
+//        protected boolean booleanValueOfEvent(PremiseMatch m, int tDelta) {
+//            if (tDelta >= 0) {
+//                m.tDelta.set(positive ? -tDelta : tDelta);
+//                return true;
+//            }
+//            return false;
+//        }
+//
+//        @Override public String toString() {
+//            return "before";
+//        }
+//    }
 }

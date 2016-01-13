@@ -16,7 +16,7 @@ import java.util.function.Supplier;
 @RunWith(Parameterized.class)
 public class NAL7NewTest extends AbstractNALTester {
 
-    final int cycles = 104;
+    final int cycles = 25;
 
     public NAL7NewTest(Supplier<NAR> b) {
         super(b);
@@ -54,10 +54,9 @@ public class NAL7NewTest extends AbstractNALTester {
         .input("x:before. :|:")
         .inputAt(10, "x:after. :|:")
         .mustBelieve(cycles, "(x:before ==>+10 x:after)", 1.00f, inductionConf, 0)
-        .mustBelieve(cycles, "(x:after ==>-10 x:before)", 1.00f, abductionConf, 10)
-//        .mustBelieve(cycles, "(x:before <=>+10 x:after)", 1.00f, comparisonConf, 0)
-        .mustBelieve(cycles, "(x:after <=>-10 x:before)", 1.00f, comparisonConf, 10)
-        .mustBelieve(cycles, "(x:before &&+10 x:after)", 1.00f, intersectionConf, 10)
+        .mustBelieve(cycles, "(x:after ==>-10 x:before)", 1.00f, abductionConf, 0)
+        .mustBelieve(cycles, "(x:after <=>-10 x:before)", 1.00f, comparisonConf, 0)
+        .mustBelieve(cycles, "(x:after &&-10 x:before)", 1.00f, intersectionConf, 0)
         ;
 
 //        tester.mustBelieve(cycles, "<<(John, room) --> enter> =\\> (&/, <(John, door) --> open>, /6)>",
