@@ -15,7 +15,7 @@ import java.util.function.Supplier;
 @RunWith(Parameterized.class)
 public class NAL7Test extends AbstractNALTester {
 
-    final int cycles = 25;
+    final int cycles = 10;
 
     public NAL7Test(Supplier<NAR> b) {
         super(b);
@@ -163,8 +163,8 @@ public class NAL7Test extends AbstractNALTester {
     @Test public void intervalPreserve_and_shift_occurence_corner_case()  {
         TestNAR tester = test();
         tester.input("<s --> S>.");
-        tester.inputAt(10, "(<s --> S> &&+50 <z --> Z>). :|:");
-        tester.mustBelieve(cycles, "<z --> Z>.", 1.00f, 0.42f, 60);
+        tester.inputAt(3, "(<s --> S> &&+3 <z --> Z>). :|:");
+        tester.mustBelieve(cycles, "<z --> Z>.", 1.00f, 0.42f, 6);
     }
 
     @Test
@@ -179,4 +179,53 @@ public class NAL7Test extends AbstractNALTester {
         tester.mustBelieve(50, "(Y:y &&+3 Z:z).", 1.00f, 0.42f, 60);
     }
 
+
+    @Test
+    public void temporal_deduction()  {
+        TestNAR tester = test();
+        tester.believe("((($x, room) --> enter) ==>-3 (($x, door) --> open))", 0.9f, 0.9f);
+        tester.believe("((($y, door) --> open) ==>-4 (($y, key) --> hold))", 0.8f, 0.9f);
+
+        tester.mustBelieve(cycles, "((($1,room) --> enter) ==>-7 (($1,key) --> hold))", 0.72f, 0.58f);
+    }
+
+    @Test
+    public void temporal_induction_comparison()  {
+        TestNAR tester = test();
+        tester.believe("((( $x, door) --> open) ==>+5 (( $x, room) --> enter))", 0.9f, 0.9f);
+        tester.believe("((( $y, door) --> open) ==>-4 (( $y, key) --> hold))", 0.8f, 0.9f);
+
+        tester.mustBelieve(cycles, "((($1,key) --> hold) ==>+9 (($1,room) --> enter))", 0.9f, 0.39f);
+        tester.mustBelieve(cycles, "((($1,room) --> enter) ==>-9 (($1,key) --> hold))", 0.8f, 0.42f);
+        tester.mustBelieve(cycles, "((($1,key) --> hold) <=>+9 (($1,room) --> enter))", 0.73f, 0.44f);
+
+    }
+
+    @Test
+    public void inference_on_tense()  {
+        TestNAR tester = test();
+
+        tester.input("((($x, key) --> hold) ==>+7 (($x, room) --> enter)).");
+        tester.input("<(John, key) --> hold>. :|:");
+
+        tester.mustBelieve(cycles, "<(John,room) --> enter>", 1.00f, 0.81f, 7);
+    }
+    @Test
+    public void inference_on_tense_reverse()  {
+        TestNAR tester = test();
+
+        tester.input("((($x, key) --> hold) ==>+7 (($x, room) --> enter)).");
+        tester.input("<(John, room) --> enter>. :|:");
+
+        tester.mustBelieve(cycles, "<(John,key) --> hold>", 1.00f, 0.45f, -7);
+    }
+    @Test
+    public void inference_on_tense_reverse_novar()  {
+        TestNAR tester = test();
+
+        tester.input("(((John, key) --> hold) ==>+7 ((John, room) --> enter)).");
+        tester.input("<(John, room) --> enter>. :|:");
+
+        tester.mustBelieve(cycles, "<(John,key) --> hold>", 1.00f, 0.45f, -7);
+    }
 }

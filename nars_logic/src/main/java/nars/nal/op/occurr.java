@@ -45,8 +45,7 @@ public class occurr extends AtomicBooleanCondition<PremiseMatch> {
         if (tt != null && (tt instanceof Compound)) {
             int t = ((Compound)tt).t();
             if (t != Tense.ITERNAL) {
-                //if (!forward) t = -t;
-                if (!forward) t = 0;
+                if (!forward) t = -t;
                 m.occDelta.set(t);
                 return true;
             }

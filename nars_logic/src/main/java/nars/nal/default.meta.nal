@@ -213,7 +213,7 @@
 
     (P ==> M), (S ==> M), neq(S,P), dt(avg) |- (S <=> P), (Belief:Comparison, Derive:AllowBackward)
 
-    (M ==> P), (M ==> S), neq(S,P), dt(avg) |- (S <=> P), (Belief:Comparison, Derive:AllowBackward)
+    (M ==> P), (M ==> S), neq(S,P), dt(tminb) |- (S <=> P), (Belief:Comparison, Derive:AllowBackward)
 
 
     (M ==> P), (S <=> M), neq(S,P), dt(task) |- (S ==> P), (Belief:Analogy, Derive:AllowBackward)
@@ -341,13 +341,7 @@
 //this shoudlnt be necesssary if the previous works (with zero or more):
     (U --> L), ((&&,(#X --> L),(#X --> R)) ==> Z) |- ((U --> R) ==> Z), (Belief:Deduction)
 
-//// independent variable elimination ////////////////////////////////////////////////////////////////////////////////////
 
-    B, (A ==> C) |-  substituteIfUnifies( C, "$",A,B), (Belief:Deduction, Order:ForAllSame, Event:Anticipate)
-    B, (C ==> A) |-  substituteIfUnifies( C, "$",A,B), (Belief:Abduction, Order:ForAllSame)
-
-    B, (A <=> C) |- substituteIfUnifies( C, "$",A,B), (Belief:Deduction, Order:ForAllSame)
-    B, (C <=> A) |- substituteIfUnifies( C, "$",A,B), (Belief:Deduction, Order:ForAllSame)
 
 //// second level variable handling rules ////////////////////////////////////////////////////////////////////////////////////
 //second level variable elimination (termlink level2 growth needed in order for these rules to work)
@@ -373,12 +367,20 @@
     (Y --> L), ((Y --> S) ==> R) |- ((&&,(#X --> L),(#X --> S)) ==> R), (Belief:Induction)
     (Y --> L), ((&&,(Y --> S),A..+) ==> R) |- substitute(((&&,(#X --> L),(#X --> S),A..+) ==> R),Y,#X), (Belief:Intersection)
 
+//// independent variable elimination ////////////////////////////////////////////////////////////////////////////////////
+
+    B, (A ==> C) |- substituteIfUnifies( C, "$",A,B), (Belief:Deduction, Order:ForAllSame, Event:Anticipate)
+    B, (C ==> A), occurr(belief,reverse) |- substituteIfUnifies( C, "$",A,B), (Belief:Abduction, Order:ForAllSame)
+
+    B, (A <=> C) |- substituteIfUnifies( C, "$",A,B), (Belief:Deduction, Order:ForAllSame)
+    B, (C <=> A) |- substituteIfUnifies( C, "$",A,B), (Belief:Deduction, Order:ForAllSame)
+
 ////NAL7 specific inference ////////////////////////////////////////////////////////////////////////////////////
 //Reasoning about temporal statements. those are using the ==> relation because relation in time is a relation of the truth between statements.
 
 ////    X, (XI ==> B) |- occurrsForward( substituteIfUnifies( B, "$", XI, (&/,X,/1)), XI, "==>"), (Belief:Deduction, Desire:Induction, Order:ForAllSame, Event:Anticipate)
     C, (A ==> B), occurr(belief,forward) |- substituteIfUnifies( B, "$", A, C), (Belief:Deduction, Desire:Induction, Order:ForAllSame, Event:Anticipate)
-    C, (A ==> B), occurr(belief,reverse) |- substituteIfUnifies( A, "$", B, C), (Belief:Abduction, Desire:Deduction, Order:ForAllSame)
+    C, (A ==> B) |- substituteIfUnifies( A, "$", B, C), (Belief:Abduction, Desire:Deduction, Order:ForAllSame)
 
 //    X, (BI ==> Y) |- occurrsBackward( substituteIfUnifies( BI, "$", Y, X), BI, "==>"), (Belief:Abduction, Desire:Deduction, Order:ForAllSame)
 

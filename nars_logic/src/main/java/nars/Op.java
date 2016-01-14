@@ -192,6 +192,17 @@ public enum Op {
     public static final Op SET_INT = Op.SET_INT_OPENER;
 
 
+    public final String toString(Compound c)  {
+        int t = c.t();
+        boolean hasTime = t != Tense.ITERNAL;
+
+        if (!hasTime) {
+            return str;
+        } else {
+            return str + ( (t >= 0) ? "+" : "") + (Integer.toString(t));
+        }
+    }
+
     /**
      * writes this operator to a Writer in (human-readable) expanded UTF16 mode
      */

@@ -134,11 +134,11 @@ public class SubButton extends HBox {
                 Compound st = (Compound)t;
                 sb.getChildren().setAll(
                     make(nar, st.term(0)),
-                    make(t.op().str),
+                    make(t.op().toString(st)),
                     make(nar, st.term(1))
                 );
             } else {
-                sb.getChildren().add(make(t.op().str));
+                sb.getChildren().add(make(t.op().toString((Compound)t)));
 
                 for (Term x : ((Compound) t).terms()) {
 
