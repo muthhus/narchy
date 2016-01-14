@@ -33,85 +33,51 @@ public class NAL7OldTest extends AbstractNALTester {
 
 
 
+
 //    @Test
-//    public void inference_on_tense() throws Narsese.NarseseException {
+//    public void inference_on_tense_3() throws Narsese.NarseseException {
 //        TestNAR tester = test();
 //
-//        tester.input("<(&/,<($x, key) --> hold>,/50) =/> <($x, room) --> enter>>.");
-//        tester.input("<(John, key) --> hold>. :|:");
 //
-//        tester.mustBelieve(cycles, "<(John,room) --> enter>", 1.00f, 0.81f, 55); //":\:"
+//        tester.believe("<<(John,key) --> hold> =/> <(John,room) --> enter>>", 1.0f, 0.9f);
+//        tester.input("<(John,key) --> hold>. :|:");
+//
+//        tester.mustBelieve(cycles, "<(John,room) --> enter>",
+//                1.00f, 0.81f,
+//                5); //":/:"
+//
 //
 //    }
-
-
-//    @Test
-//    public void inference_on_tense_nonvar() throws Narsese.NarseseException {
-//        TestNAR tester = test();
-//
-//        tester.input("<(&/,<(John, key) --> hold>,/50) =/> <(John, room) --> enter>>.");
-//        tester.input("<(John, key) --> hold>. :|:");
-//
-//        tester.mustBelieve(cycles, "<(John,room) --> enter>", 1.00f, 0.81f, 55); //":\:"
-//
-//    }
-
 //
 //    @Test
-//    public void inference_on_tense_2() throws Narsese.NarseseException {
+//    public void inference_on_tense_4() throws Narsese.NarseseException {
 //        TestNAR tester = test();
 //
-//        tester.input("<(&/,<($x, key) --> hold>,/60) =/> <($x, room) --> enter>>.");
+//
+//        tester.believe("<<(John,key) --> hold> =/> <(John,room) --> enter>>", 1.0f, 0.9f);
 //        tester.input("<(John,room) --> enter>. :|:");
 //
-//        tester.mustBelieve(cycles, "<(John, key) --> hold>", 1.00f, 0.45f, -65); //":\:"
+//        tester.mustBelieve(cycles, "<(John,key) --> hold>",
+//                1.00f, 0.45f,
+//                -5); //:\\:
 //
 //    }
-
-    @Test
-    public void inference_on_tense_3() throws Narsese.NarseseException {
-        TestNAR tester = test();
-
-
-        tester.believe("<<(John,key) --> hold> =/> <(John,room) --> enter>>", 1.0f, 0.9f);
-        tester.input("<(John,key) --> hold>. :|:");
-
-        tester.mustBelieve(cycles, "<(John,room) --> enter>",
-                1.00f, 0.81f,
-                5); //":/:"
-
-
-    }
-
-    @Test
-    public void inference_on_tense_4() throws Narsese.NarseseException {
-        TestNAR tester = test();
-
-
-        tester.believe("<<(John,key) --> hold> =/> <(John,room) --> enter>>", 1.0f, 0.9f);
-        tester.input("<(John,room) --> enter>. :|:");
-
-        tester.mustBelieve(cycles, "<(John,key) --> hold>",
-                1.00f, 0.45f,
-                -5); //:\\:
-
-    }
-
-    @Test
-    public void induction_on_events() throws Narsese.NarseseException {
-        TestNAR tester = test();
-
-
-        tester.nar.log();
-
-        tester.input("<(John,door) --> open>. :|:");
-        tester.inputAt(11, "<(John,room) --> enter>. :|:");
-
-        tester.mustBelieve(cycles, "<<(John, room) --> enter> =\\> (&/, <(John, door) --> open>, /6)>",
-                1.00f, 0.45f,
-                11);
-
-    }
+//
+//    @Test
+//    public void induction_on_events() throws Narsese.NarseseException {
+//        TestNAR tester = test();
+//
+//
+//        tester.nar.log();
+//
+//        tester.input("<(John,door) --> open>. :|:");
+//        tester.inputAt(11, "<(John,room) --> enter>. :|:");
+//
+//        tester.mustBelieve(cycles, "<<(John, room) --> enter> =\\> (&/, <(John, door) --> open>, /6)>",
+//                1.00f, 0.45f,
+//                11);
+//
+//    }
 
     @Test
     public void induction_on_events2() throws Narsese.NarseseException {
@@ -336,4 +302,41 @@ public class NAL7OldTest extends AbstractNALTester {
 //        tester.mustBelieve(cycles, "<<( $x, door) --> open> =/> <( $x, corridor_100) --> leave>>", 0.95f, 0.81f);
 //
 //    }
+
+
+//    @Test
+//    public void inference_on_tense() throws Narsese.NarseseException {
+//        TestNAR tester = test();
+//
+//        tester.input("<(&/,<($x, key) --> hold>,/50) =/> <($x, room) --> enter>>.");
+//        tester.input("<(John, key) --> hold>. :|:");
+//
+//        tester.mustBelieve(cycles, "<(John,room) --> enter>", 1.00f, 0.81f, 55); //":\:"
+//
+//    }
+
+
+//    @Test
+//    public void inference_on_tense_nonvar() throws Narsese.NarseseException {
+//        TestNAR tester = test();
+//
+//        tester.input("<(&/,<(John, key) --> hold>,/50) =/> <(John, room) --> enter>>.");
+//        tester.input("<(John, key) --> hold>. :|:");
+//
+//        tester.mustBelieve(cycles, "<(John,room) --> enter>", 1.00f, 0.81f, 55); //":\:"
+//
+//    }
+
+//
+//    @Test
+//    public void inference_on_tense_2() throws Narsese.NarseseException {
+//        TestNAR tester = test();
+//
+//        tester.input("<(&/,<($x, key) --> hold>,/60) =/> <($x, room) --> enter>>.");
+//        tester.input("<(John,room) --> enter>. :|:");
+//
+//        tester.mustBelieve(cycles, "<(John, key) --> hold>", 1.00f, 0.45f, -65); //":\:"
+//
+//    }
+
 }

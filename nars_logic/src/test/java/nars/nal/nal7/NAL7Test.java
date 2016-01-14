@@ -50,10 +50,10 @@ public class NAL7Test extends AbstractNALTester {
         t
         .input("x:before. :|:")
         .inputAt(10, "x:after. :|:")
-        .mustBelieve(11, "(x:before ==>+10 x:after)", 1.00f, inductionConf, 0)
-        .mustBelieve(11, "(x:after ==>-10 x:before)", 1.00f, abductionConf, 0)
-        .mustBelieve(11, "(x:after <=>-10 x:before)", 1.00f, comparisonConf, 0)
-        .mustBelieve(11, "(x:after &&-10 x:before)", 1.00f, intersectionConf, 0)
+        .mustBelieve(11, "(x:before ==>+10 x:after)", 1.00f, abductionConf, 10)
+        .mustBelieve(11, "(x:after ==>-10 x:before)", 1.00f, inductionConf, 10)
+        .mustBelieve(11, "(x:after <=>-10 x:before)", 1.00f, comparisonConf, 10)
+        .mustBelieve(11, "(x:after &&-10 x:before)", 1.00f, intersectionConf, 10)
         ;
 
 //        tester.mustBelieve(cycles, "<<(John, room) --> enter> =\\> (&/, <(John, door) --> open>, /6)>",
@@ -228,4 +228,38 @@ public class NAL7Test extends AbstractNALTester {
 
         tester.mustBelieve(cycles, "<(John,key) --> hold>", 1.00f, 0.45f, -7);
     }
+
+    @Test
+    public void inference_on_tense_3()  {
+        TestNAR tester = test();
+        
+        tester.believe("(((John,key) --> hold) ==>+3 ((John,room) --> enter))", 1.0f, 0.9f);
+        tester.input("<(John,key) --> hold>. :|:");
+
+        tester.mustBelieve(cycles, "<(John,room) --> enter>",
+                1.00f, 0.81f, 3);
+
+    }
+
+    @Test
+    public void inference_on_tense_4()  {
+        TestNAR tester = test();
+        tester.believe("(((John,key) --> hold) ==>+3 ((John,room) --> enter))", 1.0f, 0.9f);
+        tester.input("<(John,room) --> enter>. :|:");
+
+        tester.mustBelieve(cycles, "<(John,key) --> hold>",
+                1.00f, 0.45f, -3);
+    }
+
+    @Test
+    public void induction_on_events_0()  {
+        TestNAR tester = test();
+
+        tester.input("<(John,door) --> open>. :|:");
+        tester.inputAt(4, "<(John,room) --> enter>. :|:");
+
+        tester.mustBelieve(cycles, "(<(John, room) --> enter> ==>-4 <(John, door) --> open>)",
+                1.00f, 0.45f, 4);
+    }
+
 }

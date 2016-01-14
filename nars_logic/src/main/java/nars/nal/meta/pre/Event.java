@@ -49,6 +49,9 @@ abstract public class Event extends AtomicBooleanCondition<PremiseMatch> {
         protected boolean booleanValueOfEvent(PremiseMatch m, int tDelta) {
             if (tDelta >= 0) {
                 m.tDelta.set(positive ? tDelta : -tDelta);
+                if (!positive) {
+                    m.occDelta.set(tDelta);
+                }
                 return true;
             }
             return false;
