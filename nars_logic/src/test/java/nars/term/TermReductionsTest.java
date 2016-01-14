@@ -3,6 +3,7 @@ package nars.term;
 import nars.$;
 import nars.Op;
 import nars.term.compound.Compound;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static nars.$.*;
@@ -258,6 +259,33 @@ public class TermReductionsTest {
                 $("(&&,(&&,a,b),(&&,c,d))").toString());
         assertEquals("(&&,b,c,d)",
                 $("(&&,b,(&&,c,d))").toString());
+    }
+
+    @Test
+    public void testTemporalConjunctionReduction1() {
+        assertEquals("(a &&+0 b)", $("(a &&+0 b)").toString());
+    }
+    @Test
+    public void testTemporalConjunctionReduction2() {
+        assertEquals("(a &&+0 (b &&+1 c))", $("(a &&+0 (b &&+1 c))").toString());
+    }
+    @Test
+    public void testTemporalConjunctionReduction3() {
+        assertEquals("(a &&+0 b)", $("( (a &&+0 b) && (a &&+0 b) )").toString());
+    }
+    @Test
+    public void testTemporalConjunctionReduction5() {
+        assertEquals("((a &&+0 b)&&(a &&+1 b))", $("( (a &&+0 b) && (a &&+1 b) )").toString());
+    }
+    @Test
+    public void testTemporalConjunctionReduction4() {
+        assertEquals("(a &&+0 b)", $("( a &&+0 (b && b) )").toString());
+    }
+    @Ignore
+    @Test
+    public void testTemporalConjunctionReduction6() {
+        //+0 is the only case in which temporal && can have arity>2
+        assertEquals("(&&+0, a, b, c)", $("( a &&+0 (b &&+0 c) )").toString());
     }
 
     @Test

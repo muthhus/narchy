@@ -79,9 +79,9 @@ public interface TermBuilder {
     default Termed the(Termed t) {
         return the(t.term());
     }
-    default Term theTerm(Termed t) {
-        return the(t).term();
-    }
+//    default Term theTerm(Termed t) {
+//        return the(t).term();
+//    }
     default Term theTerm(Term t) {
         return the(t).term();
     }
@@ -387,12 +387,12 @@ public interface TermBuilder {
             boolean reversed = cx.term(0)==u[1];
             return cx.t(reversed ? -t : t);
         } else {
-            return junction(op, ITERNAL, Lists.newArrayList(u));
+            return junction(op, Lists.newArrayList(u));
         }
     }
 
     /** flattening junction builder, don't use with temporal relation */
-    default Term junction(Op op, int t, Iterable<Term> u) {
+    default Term junction(Op op, Iterable<Term> u) {
 
 //        if (t!=ITERNAL) {
 //            return junction(op, t, Iterables.toArray(u, Term.class));
@@ -403,7 +403,7 @@ public interface TermBuilder {
         //TODO use a more efficient flattening that doesnt involve recursion and multiple array creations
         TreeSet<Term> s = new TreeSet();
         u.forEach(x -> {
-            if (x.op(op)) {
+            if (x.op(op) && (((Compound)x).t()==ITERNAL) ) {
                 for (Term y : ((TermContainer) x).terms()) {
                     if (s.add(y))
                         if (y.op(op))
@@ -422,7 +422,7 @@ public interface TermBuilder {
 //            return junction(op, t, ii.next(), ii.next());
 //        }
 
-        return !done[0] ? junction(op, t, s) :
+        return !done[0] ? junction(op, s) :
                 finish(op, -1, TermSet.the(s));
     }
 

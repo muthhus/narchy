@@ -103,7 +103,7 @@ public class AbstractPrototainer implements Prototainer  {
         // use by constructor and setter...
         String s = InjectionUtils.getKeyName(sourceFromContainer);
         
-        //SetterDependency sd = autowireBySetter(s);
+        SetterDependency sd = autowireBySetter(s);
         ConstructorDependency cd = autowireByConstructor(s);
         
         cd.setContainerKey(sourceFromContainer);
