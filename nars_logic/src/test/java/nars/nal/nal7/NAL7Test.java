@@ -299,72 +299,56 @@ public class NAL7Test extends AbstractNALTester {
         tester.inputAt(2, "<John --> (/,enter,_,room)>. :|:");
 
         //note: this result is reversed (pred equiv direction AND the occurrence time) from the original NAL7 test but its semantics are equivalent
-        tester.mustBelieve(cycles*4,
+        tester.mustBelieve(cycles,
                 "(<$1 --> (/, enter, _, room)> <=>-2 <$1 --> (/, open, _, door)>)",
                 1.00f, 0.45f,
                 2
         );
 
     }
+    @Test
+    public void induction_on_events_with_variable_introduction2()  {
+        TestNAR tester = test();
 
-//    @Test
-//    public void induction_on_events_with_variable_introduction_d1000()  {
-//        TestNAR tester = test();
-//        int delay = 1000;
-//        tester.nar.frame(delay);
-//
-//        tester.input("<John --> (/,open,_,door)>. :|:");
-//        tester.inputAt(delay + 10, "<John --> (/,enter,_,room)>. :|:");
-//
-//        tester.mustBelieve(cycles,
-//                //"<(&/,<$1 --> (/,open,_,door)>) </> <$1 --> (/,enter,_,room)>>",
-//                " <(&/, <$1 --> (/, open, _, door)>, /5) </> <$1 --> (/, enter, _, room)>>",
+
+        tester.input("<John --> (/,open,_,door)>. :|:");
+        tester.inputAt(2, "<John --> (/,enter,_,room)>. :|:");
+
+        //note: this result is reversed (pred equiv direction AND the occurrence time) from the original NAL7 test but its semantics are equivalent
+        tester.mustBelieve(cycles,
+                "(<$1 --> (/, enter, _, room)> ==>-2 <$1 --> (/, open, _, door)>)",
+                1.00f, 0.45f,
+                2
+        );
+
+        //REVERSE:
+//        tester.mustBelieve(cycles*4,
+//                "(<$1 --> (/, open, _, door)> ==>+2 <$1 --> (/, enter, _, room)>)",
 //                1.00f, 0.45f,
-//                delay
+//                0
 //        );
-//
-//    }
-//
-//    @Test
-//    public void induction_on_events_with_variable_introduction2()  {
-//        TestNAR tester = test();
-//
-//        tester.input("<John --> (/,open,_,door)>. :|:");
-//        tester.inputAt(10, "<John --> (/,enter,_,room)>. :|:");
-//
-//        tester.mustBelieve(cycles,
-//                "<(&/, <$1 --> (/, open, _, door)>, /5) =/> <$1 --> (/, enter, _, room)>>",
-//                1.00f, 0.45f,
-//                0);
-//
-//    }
-//
-//    @Test
-//    public void induction_on_events_with_variable_introduction3()  {
-//        TestNAR tester = test();
-//
-//        tester.input("<John --> (/,open,_,door)>. :|:");
-//        tester.inputAt(10, "<John --> (/,enter,_,room)>. :|:");
-//
-//        tester.mustBelieve(cycles, "<<$1 --> (/, enter, _, room)> =\\> (&/, <$1 --> (/, open, _, door)>, /5)>",
-//                1.00f, 0.45f,
-//                0);
-//
-//    }
-//
-//    @Test
-//    public void induction_on_events_composition()  {
-//        TestNAR tester = test();
-//
-//
-//        tester.input("<(John,key) --> hold>. :|:");
-//        tester.inputAt(10, "<<(John,door) --> open> =/> <(John,room) --> enter>>. :|:");
-//
-//        tester.mustBelieve(cycles, "<(&&,<(John,key) --> hold>,<(John,door) --> open>) =/> <(John,room) --> enter>>",
-//                1.00f, 0.45f,
-//                10);
-//
-//    }
+
+    }
+
+
+    @Test
+    public void induction_on_events_composition()  {
+        TestNAR tester = test();
+
+
+        //the 5's here are used in different ways but must match exactly for this result.
+        //if '+4' is used in the input implication then it creates a variance
+        //that demonstrates the need for interpolation, binning, or thresholding of time values
+
+        tester.input("<(John,key) --> hold>. :|:");
+        tester.inputAt(5, "(<(John,door) --> open> ==>+5 <(John,room) --> enter>). :|:");
+
+        tester.mustBelieve(cycles, "((&&,hold:(John,key),open:(John,door)) ==>+5 enter:(John,room))",
+                1.00f, 0.45f,
+                5);
+
+
+    }
 //
 //
 //
