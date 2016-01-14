@@ -5,8 +5,6 @@ import nars.$;
 import nars.nal.nal8.Operator;
 import nars.task.Task;
 import nars.term.Term;
-import nars.term.atom.Atom;
-import nars.term.compile.TermIndex;
 import nars.term.compound.Compound;
 
 /** an operation that executes immediately, and without logical consequences;
@@ -23,21 +21,21 @@ public abstract class ImmediateOperator extends NullOperator  {
 //        return new Operation(op, termizedProduct(args));
 //    }
 
-    /** apply Atom.quoteI */
-    static Compound termizedProduct(Object... args) {
-        if (args.length == 0) return TermIndex.Empty;
-        return $.p(termized(args));
-    }
-
-    static Term[] termized(Object... args) {
-        Term[] x = new Term[args.length];
-        for (int i = 0; i < args.length; i++) {
-            Term xx = x[i];
-            Term y = !(args[i] instanceof Term) ? Atom.quote(args[i].toString()) : xx;
-            x[i] = y;
-        }
-        return x;
-    }
+//    /** apply Atom.quoteI */
+//    static Compound termizedProduct(Object... args) {
+//        if (args.length == 0) return TermIndex.Empty;
+//        return $.p(termized(args));
+//    }
+//
+//    static Term[] termized(Object... args) {
+//        Term[] x = new Term[args.length];
+//        for (int i = 0; i < args.length; i++) {
+//            Term xx = x[i];
+//            Term y = !(args[i] instanceof Term) ? Atom.quote(args[i].toString()) : xx;
+//            x[i] = y;
+//        }
+//        return x;
+//    }
 
 //    /** create a new task that wraps this operation */
 //    public Task<Operation> newTask(Operation o) {
@@ -47,19 +45,19 @@ public abstract class ImmediateOperator extends NullOperator  {
 //    }
 
 
-    public static Task command(Class<? extends ImmediateOperator> opClass, Object... args) {
+    public static Task command(Class<? extends ImmediateOperator> opClass, Term... args) {
         return Task.command(
                 operation(opClass,
-                        termizedProduct(args))
+                        args)
         );
     }
 
 //    public static Compound operation(Class<? extends ImmediateOperator> opClass, Object... args) {
 //        return operation( opClass, termizedProduct(args));
 //    }
-    public static Compound operation(Class<? extends ImmediateOperator> opClass, Compound args) {
+    public static Compound operation(Class<? extends ImmediateOperator> opClass, Term... args) {
         return $.oper(
-                (Atom)$.$(opClass.getSimpleName()),
+                $.operator(opClass.getSimpleName()),
                 args);
     }
 

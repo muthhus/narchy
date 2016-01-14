@@ -5,6 +5,7 @@ import nars.Global;
 import nars.Memory;
 import nars.index.MapIndex2;
 import nars.nar.Default;
+import nars.op.mental.Innerperience;
 import nars.term.compile.TermIndex;
 import nars.time.FrameClock;
 
@@ -19,12 +20,17 @@ public enum NARideDefault {
         Global.DEBUG = false;
 
         FrameClock clock = new FrameClock();
-        NARide.show(new Default(
+
+        Default n = new Default(
                 new Memory(
-                    clock,
-                    //TermIndex.memoryGuava(clock, 100)),
-                    memoryWeak(1024*128)),
-                1024, 1, 2, 3).loop(), (i) -> {
+                        clock,
+                        //TermIndex.memoryGuava(clock, 100)),
+                        memoryWeak(1024 * 128)),
+                1024, 1, 2, 3);
+        new Innerperience(n);
+
+        NARide.show(n.loop(), (i) -> {
+
             /*try {
                 i.nar.input(new File("/tmp/h.nal"));
             } catch (Throwable e) {

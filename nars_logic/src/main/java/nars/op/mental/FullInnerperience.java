@@ -7,9 +7,9 @@ import nars.NAR;
  * <p>
  * called from Concept
  */
-public class FullInternalExperience extends InternalExperience {
+public class FullInnerperience extends Innerperience {
 
-    public FullInternalExperience(NAR n) {
+    public FullInnerperience(NAR n) {
         super(n);
     }
 

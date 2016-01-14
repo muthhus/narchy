@@ -26,8 +26,6 @@ public class NAL7Test extends AbstractNALTester {
         return AbstractNALTester.nars(7, true, true);
     }
 
-
-
     @Test
     public void induction_on_events()  {
         /*

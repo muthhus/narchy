@@ -128,11 +128,11 @@ public enum $  {
         return oper(opTerm, $.p(arg));
     }
 
-    public static Compound oper(Atom opTerm, Compound args) {
-        return oper(new Operator(opTerm), args);
-    }
+//    static Compound oper(Atom opTerm, Compound args) {
+//        return oper(new Operator(opTerm), args);
+//    }
 
-    public static Compound oper(Operator opTerm, Compound arg) {
+    static Compound oper(Operator opTerm, Compound arg) {
         return (Compound) the(
                 INHERIT,
                 arg == null ? TermIndex.Empty : arg,

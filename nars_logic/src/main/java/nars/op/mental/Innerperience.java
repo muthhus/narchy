@@ -4,6 +4,7 @@ import com.google.common.util.concurrent.AtomicDouble;
 import nars.*;
 import nars.budget.Budget;
 import nars.nal.nal8.Operator;
+import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Term;
 import nars.term.compound.Compound;
@@ -13,13 +14,12 @@ import java.util.Arrays;
 import java.util.Random;
 
 /**
+ * Internal Experience (NAL9)
+ * To remember activity as internal action operations
+ *
  * https://www.youtube.com/watch?v=ia4wMU-vfrw
- * <p>
- * To rememberAction an internal action as an operation
- * <p>
- * called from Concept
  */
-public class InternalExperience {
+public class Innerperience {
 
 
     public static float MINIMUM_BUDGET_SUMMARY_TO_CREATE = 0.5f; //0.92
@@ -38,14 +38,9 @@ public class InternalExperience {
     //internal experience has less priority?
     public static float INTERNAL_EXPERIENCE_PRIORITY_MUL = 0.1f; //0.1
 
-    //dont use internal experience for want and believe if this setting is true
-    public static final boolean enableWantBelieve = true; //wut, semantic issue ^^
-
-    //
-    public static boolean OLD_BELIEVE_WANT_EVALUATE_WONDER_STRATEGY = false; //https://groups.google.com/forum/#!topic/open-nars/DVE5FJd7FaM
-
     @Deprecated
     public static boolean enabled = true;
+    private final NAR nar;
 
 
     /** minimum expectation necessary to create a concept
@@ -53,13 +48,6 @@ public class InternalExperience {
      * */
     public AtomicDouble conceptCreationExpectation = new AtomicDouble(0.66);
 
-    public static boolean isAllowNewStrategy() {
-        return !OLD_BELIEVE_WANT_EVALUATE_WONDER_STRATEGY;
-    }
-
-    public static void setAllowNewStrategy(boolean val) {
-        OLD_BELIEVE_WANT_EVALUATE_WONDER_STRATEGY = !val;
-    }
 
 //    public boolean isEnableWantBelieve() {
 //        return enableWantBelieve;
@@ -84,14 +72,23 @@ public class InternalExperience {
         MINIMUM_BUDGET_SUMMARY_TO_CREATE_WONDER_EVALUATE = (float) val;
     }
 
-    //public static boolean enabled=true;
-
 
     public static final Operator believe = Operator.the("believe");
     public static final Operator want = Operator.the("want");
     public static final Operator wonder = Operator.the("wonder");
     public static final Operator evaluate = Operator.the("evaluate");
     public static final Operator anticipate = Operator.the("anticipate");
+
+    static final Operator[] nonInnateBeliefOperators = {
+            Operator.the("remind"),
+            Operator.the("doubt"),
+            Operator.the("consider"),
+            evaluate,
+            Operator.the("hestitate"),
+            wonder,
+            believe,
+            want
+    };
 
 
     /**
@@ -102,56 +99,39 @@ public class InternalExperience {
     }
 
 
-    public InternalExperience(NAR n) {
+    public Innerperience(NAR n) {
+
+        this.nar = n;
 
         n.memory.eventTaskProcess.on(tp -> {
-
-            Task task = tp.getTask();
-
-            //old strategy always, new strategy only for QUESTION and QUEST:
-            ///final char punc = task.getPunctuation();
-
-            if (OLD_BELIEVE_WANT_EVALUATE_WONDER_STRATEGY ||
-                    (!OLD_BELIEVE_WANT_EVALUATE_WONDER_STRATEGY && task.isQuestOrQuestion())) {
-                experienceFromTaskInternal(task, n.memory.self());
-            }
-            //we also need Mr task process to be able to have the task process, this is a hack..
-
+            experienceFromTaskInternal(tp.getTask());
         });
+
         n.memory.eventConceptProcess.on(p -> {
             Task belief = p.getBelief();
             if (belief == null) return;
-
             Task task = p.getTask();
+
             Random r = p.memory().random;
 
             if (r.nextFloat() < INTERNAL_EXPERIENCE_RARE_PROBABILITY) {
-                nonInnate(belief, task, p, randomNonInnate(r) );
+                nonInnate(task, belief, p, randomNonInnate(r) );
             }
 
-            Term beliefTerm = belief.term();
-
-            if (beliefTerm.op()==Op.IMPLICATION && r.nextFloat() <= INTERNAL_EXPERIENCE_PROBABILITY) {
-                internalizeImplication(task, p, (Compound)beliefTerm);
+            if (belief.term().op().isImplication() && r.nextFloat() <= INTERNAL_EXPERIENCE_PROBABILITY) {
+                internalizeImplication(task, belief, p);
             }
         });
     }
 
-    public static Compound toTerm(Task s, Term self, float conceptCreationExpectation) {
-        return toTerm(s, self, conceptCreationExpectation, enableWantBelieve);
-    }
 
-    public static Compound toTerm(Task s, Term self, float conceptCreationExpectation, boolean enableWantBelieve) {
+    public static Compound toTerm(Task s, Term self, float conceptCreationExpectation) {
         Operator opTerm;
         switch (s.getPunctuation()) {
             case Symbols.JUDGMENT:
-                if (!enableWantBelieve)
-                    return null;
                 opTerm = believe;
                 break;
             case Symbols.GOAL:
-                if (!enableWantBelieve)
-                    return null;
                 opTerm = want;
                 break;
             case Symbols.QUESTION:
@@ -201,7 +181,9 @@ public class InternalExperience {
 //        return null;
 //    }
 
-    protected Task experienceFromTaskInternal(Task task, Term self) {
+    protected void experienceFromTaskInternal(final Task task) {
+
+        final Term self = nar.memory.self();
 
         // if(OLD_BELIEVE_WANT_EVALUATE_WONDER_STRATEGY ||
         //         (!OLD_BELIEVE_WANT_EVALUATE_WONDER_STRATEGY && (task.sentence.punctuation==Symbols.QUESTION || task.sentence.punctuation==Symbols.QUEST))) {
@@ -209,60 +191,50 @@ public class InternalExperience {
         Budget b = task.getBudget();
         if (task.isQuestOrQuestion()) {
             if (b.summaryLessThan(MINIMUM_BUDGET_SUMMARY_TO_CREATE_WONDER_EVALUATE)) {
-                return null;
+                return;
             }
         } else if (b.summaryLessThan(MINIMUM_BUDGET_SUMMARY_TO_CREATE)) {
-            return null;
+            return;
         }
 
         Term content = task.term();
         // to prevent infinite recursions
         if (Op.isOperation(content)/* ||  Memory.randomNumber.nextFloat()>Global.INTERNAL_EXPERIENCE_PROBABILITY*/) {
-            return null;
+            return;
         }
 
         Compound ret = toTerm(task, self, conceptCreationExpectation.floatValue());
         if (ret == null) {
-            return null;
+            return;
         }
 
-        throw new RuntimeException("unimpl TODO");
 
-//
+
 //        float pri = Global.DEFAULT_JUDGMENT_PRIORITY * INTERNAL_EXPERIENCE_PRIORITY_MUL;
 //        float dur = Global.DEFAULT_JUDGMENT_DURABILITY * INTERNAL_EXPERIENCE_DURABILITY_MUL;
 //        if (!OLD_BELIEVE_WANT_EVALUATE_WONDER_STRATEGY) {
 //            pri *= INTERNAL_EXPERIENCE_PRIORITY_MUL;
 //            dur *= INTERNAL_EXPERIENCE_DURABILITY_MUL;
 //        }
-//
-//        Task<Compound<?>> t;
-//        nal.nar().input(t = MutableTask.make(ret).judgment()
-//                        .parent(task).occurr(nal.time())
-//                        .truth(1.0f, Global.DEFAULT_JUDGMENT_CONFIDENCE)
-//                        .budget(pri, dur)
-//                        .because("Remembered Action (Internal Experience)"));
-//        return t;
+
+        long now = nar.time();
+        nar.input(new MutableTask(ret).judgment()
+                        .parent(task).time(now, now)
+                        //.truth(1.0f, Global.DEFAULT_JUDGMENT_CONFIDENCE)
+                        //.budget(pri, dur)
+                        .because("Innerperience"));
     }
 
 
-    static final Operator[] nonInnateBeliefOperators = {
-            Operator.the("remind"),
-            Operator.the("doubt"),
-            Operator.the("consider"),
-            Operator.the("evaluate"),
-            Operator.the("hestitate"),
-            Operator.the("wonder"),
-            Operator.the("belief"),
-            Operator.the("want")
-    };
 
-    private static void internalizeImplication(Task task, Premise nal, Compound beliefImpl) {
+    private static void internalizeImplication(Task task, Task belief, Premise nal) {
         Compound taskTerm = task.term();
-        if (beliefImpl.hasT() && beliefImpl.t() > 0) {
+        Compound beliefTerm = belief.term();
+
+        if (beliefTerm.hasT() && beliefTerm.t() > 0) {
             //1. check if its (&/,term,+i1,...,+in) =/> anticipateTerm form:
             boolean valid = true;
-            Term impsub = beliefImpl.term(0);
+            Term impsub = beliefTerm.term(0);
             if (impsub.op() == Op.CONJUNCTION) {
                 Compound conj = (Compound) impsub;
                 if (!conj.term(0).equals(taskTerm)) {
@@ -281,42 +253,38 @@ public class InternalExperience {
                 //long interval = (impsub instanceof Interval ? ((Interval)impsub).duration() : 0);
                 int interval = 0;
 
-                beliefReasonDerive(task,
-                        $.oper(anticipate, $.p(beliefImpl.term(1))),
+                beliefReasonDerive(task, belief,
+                        $.oper(anticipate, beliefTerm.term(1)),
                         nal, interval);
             }
         }
     }
 
-    private static void nonInnate(Task belief, Task task, Premise nal, Operator op) {
+    private static void nonInnate(Task task, Task belief, Premise nal, Operator op) {
         //the operators which dont have a innate belief
         //also get a chance to reveal its effects to the system this way
 
-            beliefReasonDerive(task,
-                    $.oper(op, $.p(belief.term())),
+            beliefReasonDerive(task, belief,
+                    $.oper(op, belief.term()),
                     nal, 0);
     }
 
-    protected static void beliefReasonDerive(Task parent, Compound new_term, Premise p, long delay) {
+    protected static void beliefReasonDerive(Task parent, Task belief, Compound new_term, Premise p, long delay) {
 
         //TODO should this be a mew stamp or attached to parent.. originally it was a fresh new stamp from memory
 
         long now = p.time();
 
-        throw new RuntimeException("unimpl TODO");
-
-//        p.nar().input(MutableTask.make(new_term).goal().truth(1, Global.DEFAULT_JUDGMENT_CONFIDENCE)
-//                        .budget(Global.DEFAULT_GOAL_PRIORITY * INTERNAL_EXPERIENCE_PRIORITY_MUL,
-//                                Global.DEFAULT_GOAL_DURABILITY * INTERNAL_EXPERIENCE_DURABILITY_MUL)
-//                        .parent(parent)
-//                        .time(now, now + delay));
-
+        p.nar().input(new MutableTask(new_term).goal()
+                        /*.truth(1, Global.DEFAULT_JUDGMENT_CONFIDENCE)
+                        .budget(Global.DEFAULT_GOAL_PRIORITY * INTERNAL_EXPERIENCE_PRIORITY_MUL,
+                                Global.DEFAULT_GOAL_DURABILITY * INTERNAL_EXPERIENCE_DURABILITY_MUL)*/
+                        .parent(parent, belief)
+                        .time(now, now + delay)
+                        .because("Inner Belief")
+        );
     }
 
-
-    /*public enum InternalExperienceMode {
-        None, Minimal, Full
-    }*/
 
 //
 //    //TODO

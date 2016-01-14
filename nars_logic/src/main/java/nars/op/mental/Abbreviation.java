@@ -3,7 +3,6 @@ package nars.op.mental;
 import com.google.common.util.concurrent.AtomicDouble;
 import nars.*;
 import nars.concept.Concept;
-import nars.nal.nal8.Operator;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Term;
@@ -19,8 +18,8 @@ import java.util.function.Consumer;
  */
 public class Abbreviation implements Consumer<Task> {
 
-    private static final float abbreviationProbability = InternalExperience.INTERNAL_EXPERIENCE_PROBABILITY;
-    public static final Operator abbreviate = Operator.the("abbreviate");
+    private static final float abbreviationProbability = Innerperience.INTERNAL_EXPERIENCE_PROBABILITY;
+
 
     final float abbreviationConfidence = 0.99f;
 
@@ -47,8 +46,6 @@ public class Abbreviation implements Consumer<Task> {
         return Atom.the(Symbols.TERM_PREFIX + Integer.toHexString(currentTermSerial.incrementAndGet()));
     }
 
-
-
     public boolean canAbbreviate(Task task) {
         Term t = task.term();
 
@@ -58,15 +55,14 @@ public class Abbreviation implements Consumer<Task> {
             if (Operation.isA(s.getSubject(), abbreviate)) return false;
             if (Operation.isA(s.getPredicate(), abbreviate)) return false;
         }*/
-        return  (t.complexity() > abbreviationComplexityMin.get()) &&
+        return (t.complexity() > abbreviationComplexityMin.get()) &&
                 (task.getQuality() > abbreviationQualityMin.get());
     }
 
 
-
-
     /**
      * To create a judgment with a given statement
+     *
      * @return Immediate results as Tasks
      */
     @Override
@@ -105,7 +101,6 @@ public class Abbreviation implements Consumer<Task> {
             }
         }
     }
-
 
 
 }
