@@ -18,7 +18,7 @@ import java.util.function.Consumer;
  */
 public class Abbreviation implements Consumer<Task> {
 
-    private static final float abbreviationProbability = Innerperience.INTERNAL_EXPERIENCE_PROBABILITY;
+    private static final float abbreviationProbability = Inperience.INTERNAL_EXPERIENCE_PROBABILITY;
 
 
     final float abbreviationConfidence = 0.99f;

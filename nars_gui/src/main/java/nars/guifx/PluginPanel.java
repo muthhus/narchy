@@ -1,11 +1,12 @@
 package nars.guifx;
 
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ToggleButton;
+import javafx.scene.control.OverrunStyle;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.text.TextAlignment;
+import javafx.scene.layout.HBox;
 import nars.Global;
 import nars.NAR;
 import nars.guifx.demo.NARide;
@@ -21,16 +22,18 @@ import static javafx.application.Platform.runLater;
  * Manages the activated set of plugins in a NAR, and a menu for adding additional ones
  * and presets of them.
  */
-public class PluginPanel extends VBox {
+public class PluginPanel extends HBox {
+
+    final Map<String, Node> nodes = new ConcurrentHashMap<>();
 
     private final NAR nar;
     private final NARide ide;
 
-    double itemSpacing = 8.0;
+    //static final double itemSpacnig = 4.0;
 
     public PluginPanel(NARide ide) {
-
-        setSpacing(itemSpacing);
+        //super(Orientation.HORIZONTAL, itemSpacnig, itemSpacnig);
+        //setSpacing(itemSpacing);
 
         this.ide = ide;
         nar = ide.nar;
@@ -45,18 +48,18 @@ public class PluginPanel extends VBox {
 
     public void update() {
 
-        List<Node> toAdd = Global.newArrayList();
-        nar.memory.getSingletons().forEach((k, v) -> toAdd.add(node(k, v)));
+        Map<String, Object> ss = nar.memory.getSingletons();
+
+        List<Node> toAdd = Global.newArrayList(ss.size());
+        ss.forEach((k, v) -> toAdd.add(node(k, v)));
 
         //TODO use faster comparison method
 
-
-        runLater(() -> {
-            if (!getChildren().equals(toAdd)) {
+        if (!getChildren().equals(toAdd))
+            runLater(() -> {
                 getChildren().setAll(toAdd);
                 layout();
-            }
-        });
+            });
 
 
 //        menu.add(new JLabel(" + "));
@@ -93,21 +96,26 @@ public class PluginPanel extends VBox {
 //
     }
 
-    Map<String, Node> nodes = new ConcurrentHashMap<>();
 
     private Node node(String k, Object v) {
         return nodes.computeIfAbsent(k, (K) -> {
 
+            Node s = icon(K, v);
 
-            ToggleButton p = new ToggleButton();
+
+            Button p = new Button();
             p.getStyleClass().add("plugin_button");
-            p.setGraphic(icon(K, v));
-            p.setMaxWidth(Double.MAX_VALUE);
-            p.setMaxHeight(Double.MAX_VALUE);
+            p.setGraphic(s);
+            //p.setMaxWidth(Double.MAX_VALUE);
+            //p.setMaxHeight(Double.MAX_VALUE);
             //p.maxHeight(100);
             //p.prefHeight(100);
-            p.minHeight(128);
-            p.minWidth(128);
+
+
+            p.maxWidth(64);
+            p.maxHeight(64);
+            p.minHeight(64);
+            p.minWidth(64);
             return p;
         });
     }
@@ -128,18 +136,17 @@ public class PluginPanel extends VBox {
             BorderPane bp = new BorderPane();
 
             Label label = new Label(k);
-            Label content = new Label(v.toString());
 
-            content.setWrapText(true);
-            content.setTextAlignment(TextAlignment.LEFT);
+            label.setWrapText(true);
+            label.setTextOverrun(OverrunStyle.ELLIPSIS);
 
             label.getStyleClass().add("h1");
 
-            content.setCache(true);
             label.setCache(true);
 
-            bp.setTop(label);
-            bp.setBottom(content);
+            bp.setCenter(label);
+
+            label.setTooltip(new Tooltip(v.toString()));
 
             return bp;
         }

@@ -140,9 +140,8 @@
     -fx-padding: 3px;
     -fx-background-color: rgb(45,45,45) !important;
     -fx-control-inner-background:  transparent !important;
-    -fx-border-width: 0px 0px 0px 6px;
-    -fx-border-color: gray;
-    -fx-border-insets: 4px 4px 4px 0px;
+    -fx-border-insets: 4px 4px 4px 4px;
+    -fx-border-color: transparent;
 }
 .plugin_button:hover {
     -fx-border-color: lightgray;
@@ -151,12 +150,12 @@
 }
 .plugin_button:armed {
     -fx-background-color: rgb(65,65,65) !important;
-    -fx-border-color: yellow !important;
+    -fx-border-color: orange !important;
 }
-.plugin_button:selected {
+/*.plugin_button:selected {
     -fx-background-color: rgb(55,55,55) !important;
     -fx-border-color: orange;
-}
+}*/
 
 
 .windget {

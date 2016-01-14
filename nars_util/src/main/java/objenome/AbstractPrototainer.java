@@ -10,11 +10,10 @@ import com.gs.collections.impl.set.mutable.UnifiedSet;
 import objenome.solution.dependency.*;
 import objenome.util.InjectionUtils;
 
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 /**
  *
@@ -36,9 +35,9 @@ public class AbstractPrototainer implements Prototainer  {
         this(
                 concurrent ? new ConcurrentHashMap() : new UnifiedMap(0),
                 concurrent ? new ConcurrentHashMap() : new UnifiedMap(0),
-                concurrent ? Collections.synchronizedSet(new HashSet()) : new UnifiedSet(0),
-                concurrent ? Collections.synchronizedSet(new HashSet()) : new UnifiedSet(0),
-                concurrent ? Collections.synchronizedSet(new HashSet()) : new UnifiedSet(0)
+                concurrent ? new ConcurrentSkipListSet<>() : new UnifiedSet(0),
+                concurrent ? new ConcurrentSkipListSet<>() : new UnifiedSet(0),
+                concurrent ? new ConcurrentSkipListSet<>() : new UnifiedSet(0)
         );
     }
 
@@ -104,7 +103,7 @@ public class AbstractPrototainer implements Prototainer  {
         // use by constructor and setter...
         String s = InjectionUtils.getKeyName(sourceFromContainer);
         
-        SetterDependency sd = autowireBySetter(s);        
+        //SetterDependency sd = autowireBySetter(s);
         ConstructorDependency cd = autowireByConstructor(s);
         
         cd.setContainerKey(sourceFromContainer);

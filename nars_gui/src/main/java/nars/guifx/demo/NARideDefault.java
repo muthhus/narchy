@@ -5,7 +5,7 @@ import nars.Global;
 import nars.Memory;
 import nars.index.MapIndex2;
 import nars.nar.Default;
-import nars.op.mental.Innerperience;
+import nars.op.mental.Inperience;
 import nars.term.compile.TermIndex;
 import nars.time.FrameClock;
 
@@ -27,7 +27,7 @@ public enum NARideDefault {
                         //TermIndex.memoryGuava(clock, 100)),
                         memoryWeak(1024 * 128)),
                 1024, 1, 2, 3);
-        new Innerperience(n);
+        new Inperience(n);
 
         NARide.show(n.loop(), (i) -> {
 

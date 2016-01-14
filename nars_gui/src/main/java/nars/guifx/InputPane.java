@@ -28,7 +28,8 @@ public class InputPane extends TabPane {
 
         nar = n;
 
-        setSide(Side.BOTTOM);
+
+        setSide(Side.TOP);
         setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
 
         getTabs().add(new TabXLazy("Narsese", () -> new NarseseInput(n)));

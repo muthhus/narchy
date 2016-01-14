@@ -10,6 +10,7 @@ import objenome.util.bean.BeanProxyBuilder;
 
 import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -33,8 +34,8 @@ public class Container extends AbstractPrototainer implements AbstractContainer 
     
     public Container(boolean concurrent) {
         super(concurrent);
-        singletonsCache = concurrent ? new ConcurrentHashMap() : new UnifiedMap(0);
-        threadLocalsCache = concurrent ? new ConcurrentHashMap() : new UnifiedMap(0);
+        singletonsCache = concurrent ? new ConcurrentHashMap() : new LinkedHashMap(0);
+        threadLocalsCache = concurrent ? new ConcurrentHashMap() : new LinkedHashMap(0);
     }
 
     public Container(AbstractPrototainer parent) {
@@ -82,7 +83,7 @@ public class Container extends AbstractPrototainer implements AbstractContainer 
             //noinspection IfStatementWithTooManyBranches
             if (scope == Scope.SINGLETON) {
 
-                boolean needsToCreate = false;
+                boolean needsToCreate;
 
                 synchronized (singletonsCache) {
 

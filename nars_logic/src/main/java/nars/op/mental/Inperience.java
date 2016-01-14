@@ -19,7 +19,7 @@ import java.util.Random;
  *
  * https://www.youtube.com/watch?v=ia4wMU-vfrw
  */
-public class Innerperience {
+public class Inperience {
 
 
     public static float MINIMUM_BUDGET_SUMMARY_TO_CREATE = 0.5f; //0.92
@@ -99,7 +99,11 @@ public class Innerperience {
     }
 
 
-    public Innerperience(NAR n) {
+    public static boolean random(Random r, float prob, int volume) {
+        return r.nextFloat()*volume <= prob;
+    }
+
+    public Inperience(NAR n) {
 
         this.nar = n;
 
@@ -114,11 +118,13 @@ public class Innerperience {
 
             Random r = p.memory().random;
 
-            if (r.nextFloat() < INTERNAL_EXPERIENCE_RARE_PROBABILITY) {
+            int vol = Math.max(task.term().volume(), belief.term().volume());
+            if (random(r, INTERNAL_EXPERIENCE_RARE_PROBABILITY, vol)) {
                 nonInnate(task, belief, p, randomNonInnate(r) );
             }
 
-            if (belief.term().op().isImplication() && r.nextFloat() <= INTERNAL_EXPERIENCE_PROBABILITY) {
+            if (belief.term().op().isImplication() &&
+                    random(r, INTERNAL_EXPERIENCE_PROBABILITY, vol) ) {
                 internalizeImplication(task, belief, p);
             }
         });

@@ -102,7 +102,7 @@ public abstract class AbstractNAR extends NAR {
         memory.the(new Anticipate(this));
 
 
-        new FullInnerperience(this);
+        new FullInperience(this);
         new Abbreviation(this);
         //onExec(Counting.class);
 

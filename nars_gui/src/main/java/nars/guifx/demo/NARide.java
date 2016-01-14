@@ -2,17 +2,20 @@ package nars.guifx.demo;
 
 
 import javafx.event.EventHandler;
+import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.SceneAntialiasing;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.*;
+import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TabPane;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.stage.Stage;
 import nars.$;
 import nars.Global;
 import nars.NAR;
@@ -41,7 +44,7 @@ import nars.video.WebcamFX;
 import org.jewelsea.willow.browser.WebBrowser;
 
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -61,14 +64,13 @@ public class NARide extends BorderPane {
     public final TabPane content = new TabPane();
 
     public final NARMenu controlPane;
-    private final ScrollPane spp;
     public final PluginPanel pp;
 
     public final Map<Class, Function<Object,Node>> nodeBuilders = Global.newHashMap();
     public final LoopPane loopPane;
     //private final CornerMenu cornerMenu;
 
-    private final Map<Term, Supplier<? extends Node>> tools = new HashMap();
+    private final Map<Term, Supplier<? extends Node>> tools = new LinkedHashMap();
 
 
     @SuppressWarnings("HardcodedFileSeparator")
@@ -86,6 +88,7 @@ public class NARide extends BorderPane {
 
             Scene scene = new Scene(ni, 1000, 800,
                     false, SceneAntialiasing.DISABLED);
+
 
             //ni.addView(new TaskSheet(nar));
             ni.addView(new IOPane(nar));
@@ -351,6 +354,7 @@ public class NARide extends BorderPane {
         loopPane = new LoopPane(l);
         nar = l.nar;
 
+        content.setSide(Side.BOTTOM);
 
         controlPane = new NARMenu(nar);
 
@@ -375,7 +379,9 @@ public class NARide extends BorderPane {
                 new DefaultCyclePane((Default.AbstractCycle) c) //cast is hack
         );
 
-        spp = scrolled(pp = new PluginPanel(this));
+        pp = new PluginPanel(this);
+        //spp = scrolled();
+        addIcon(() -> controlPane); //first
 
 
 
@@ -443,28 +449,29 @@ public class NARide extends BorderPane {
         //taskBar.setRotateGraphic(true);
 
         //f.setCenter(taskBar);
-        f.setCenter(spp);
-
-        f.setTop(controlPane);
 
 
-        content.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+
+
         //  content.getTabs().add(new Tab("I/O", new TerminalPane(nar)));
 
 
         setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         content.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        f.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        //f.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
         content.setVisible(true);
 
-        SplitPane p = new SplitPane();
-        p.getItems().setAll(f, content);
-        p.setDividerPositions(0.5f);
+//        SplitPane p = new SplitPane();
+//        p.getItems().setAll(f, content);
+//        p.setDividerPositions(0.5f);
 
-        setCenter(p);
+        setCenter(content);
+        setBottom(scrolled(pp,true,false));
+
 
         runLater(() -> {
+
             TabPaneDetacher tabDetacher = new TabPaneDetacher();
             tabDetacher.makeTabsDetachable(content);
             /*tabDetacher.stylesheets(
@@ -481,32 +488,7 @@ public class NARide extends BorderPane {
         return this;
     }
 
-    public Stage show() {
 
-        return NARfx.newWindow(nar.toString(), this);
-
-    }
-
-
-    public void contentUpdate(boolean show) {
-
-        runLater(() -> {
-            if (!show) {
-                content.setVisible(false);
-            } else {
-                content.setVisible(true);
-            }
-
-            layout();
-            //g.autosize();
-
-            //p.setDividerPosition(0, 0.25);
-
-//                if (!isMaximized())
-//                    sizeToScene();
-        });
-
-    }
 
     /** number ms delay per cycle, -1 to pause */
     public void setSpeed(int nMS) {
@@ -521,11 +503,10 @@ public class NARide extends BorderPane {
     private static class DefaultCyclePane extends BorderPane {
 
         private final NAR nar;
-        private final Default.AbstractCycle cycle;
         //final NSlider activation;
 
         public DefaultCyclePane(Default.AbstractCycle l) {
-            cycle = l;
+
             nar = l.nar;
 
             Label status = new Label();
@@ -549,7 +530,7 @@ public class NARide extends BorderPane {
             });
             setTop(status);
 
-            setCenter(new POJOPane(l));
+            setCenter(scrolled(new POJOPane(l)));
         }
 //            this.activation = new NSlider(150, 50, 1.0) {
 //
