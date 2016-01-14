@@ -387,12 +387,13 @@
 ////Temporal induction: ////////////////////////////////////////////////////////////////////////////////////
 //When P and then S happened according to an observation, by induction (weak) it may be that alyways after P, usually S happens.
 
-    A, B, after(reverse), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (B ==> A), (Belief:Induction, Eternalize:Immediate),
-                                                                                                      (A <=> B), (Belief:Comparison)
+    A, B, after(reverseEnd), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (B ==> A), (Belief:Induction, Eternalize:Immediate)
+
+    A, B, after(reverseEnd), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A <=> B), (Belief:Comparison)
 
     A, B, after(forward), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A ==> B), (Belief:Abduction)
 
-    A, B, after(reverse), neq(A,B), notConjunction(A), notConjunction(B),  notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A && B), (Belief:Intersection)
+    A, B, after(reverseEnd), neq(A,B), notConjunction(A), notConjunction(B),  notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A && B), (Belief:Intersection)
 
 //    A, B, after(_), neq(A,B), notConjunction(A), notConjunction(B),  notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (B && A), (Belief:Intersection)
 

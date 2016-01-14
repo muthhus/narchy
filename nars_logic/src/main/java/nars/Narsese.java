@@ -219,7 +219,7 @@ public class Narsese extends BaseParser<Object> {
     public Rule LineCommentEchoed() {
         return sequence(
             zeroOrMore(noneOf("\n")),
-            push(ImmediateOperator.command(echo.class, Atom.the(match())))
+            push(ImmediateOperator.command(echo.class, Atom.quote(match())))
         );
     }
 

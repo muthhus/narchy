@@ -36,21 +36,27 @@ abstract public class Event extends AtomicBooleanCondition<PremiseMatch> {
     /** belief then task */
     public final static class After extends Event {
 
-        public static final After forward = new After(true);
-        public static final After reverse = new After(false);
-        private final boolean positive;
+        public static final After forward = new After(true, false);
+        public static final After reverseStart = new After(false, false);
+        public static final After reverseEnd = new After(false, true);
 
-        protected After(boolean positive) {
+        private final boolean positive;
+        private final boolean shift;
+
+        protected After(boolean positive, boolean shift) {
             super();
             this.positive = positive;
+            this.shift = shift;
         }
 
         @Override
         protected boolean booleanValueOfEvent(PremiseMatch m, int tDelta) {
             if (tDelta >= 0) {
-                m.tDelta.set(positive ? tDelta : -tDelta);
-                if (!positive) {
-                    m.occDelta.set(tDelta);
+                boolean p = this.positive;
+                m.tDelta.set(p ? tDelta : -tDelta);
+                boolean s = this.shift;
+                if (s) {
+                    m.occDelta.set(p ? -tDelta : tDelta);
                 }
                 return true;
             }

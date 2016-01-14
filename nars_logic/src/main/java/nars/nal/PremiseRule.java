@@ -392,11 +392,19 @@ public class PremiseRule extends GenericCompound implements Level {
                     break;
 
                 case "after":
-                    if (arg1.toString().equals("reverse"))
-                        preNext = Event.After.reverse;
-                    else
-                        preNext = Event.After.forward;
-
+                    switch (arg1.toString()) {
+                        case "forward":
+                            preNext = Event.After.forward;
+                            break;
+                        case "reverseStart":
+                            preNext = Event.After.reverseStart;
+                            break;
+                        case "reverseEnd":
+                            preNext = Event.After.reverseEnd;
+                            break;
+                        default:
+                            throw new RuntimeException("invalid after() argument: " + arg1);
+                    }
                     break;
 
                 case "dt":

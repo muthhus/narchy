@@ -15,7 +15,7 @@ import java.util.function.Supplier;
 @RunWith(Parameterized.class)
 public class NAL7Test extends AbstractNALTester {
 
-    final int cycles = 10;
+    final int cycles = 30;
 
     public NAL7Test(Supplier<NAR> b) {
         super(b);
@@ -258,8 +258,156 @@ public class NAL7Test extends AbstractNALTester {
         tester.input("<(John,door) --> open>. :|:");
         tester.inputAt(4, "<(John,room) --> enter>. :|:");
 
-        tester.mustBelieve(cycles, "(<(John, room) --> enter> ==>-4 <(John, door) --> open>)",
+        tester.mustBelieve(cycles, "(((John, room) --> enter) ==>-4 ((John, door) --> open))",
                 1.00f, 0.45f, 4);
     }
+
+
+
+
+    @Test
+    public void induction_on_events2()  {
+        TestNAR tester = test();
+
+        tester.input("<(John,door) --> open>. :|:");
+        tester.inputAt(4, "<(John,room) --> enter>. :|:");
+
+        tester.mustBelieve(cycles, "(((John, door) --> open) ==>+4 ((John, room) --> enter))",
+                1.00f, 0.45f, 4);
+
+    }
+
+    @Test
+    public void induction_on_events3()  {
+        TestNAR tester = test();
+
+        tester.input("<(John,door) --> open>. :|:");
+        tester.inputAt(4, "<(John,room) --> enter>. :|:");
+
+        tester.mustBelieve(cycles, "(<(John, door) --> open> <=>+4 <(John, room) --> enter>)",
+                1.00f, 0.45f,
+                4);
+
+    }
+
+    @Test
+    public void induction_on_events_with_variable_introduction()  {
+        TestNAR tester = test();
+
+
+        tester.input("<John --> (/,open,_,door)>. :|:");
+        tester.inputAt(2, "<John --> (/,enter,_,room)>. :|:");
+
+        //note: this result is reversed (pred equiv direction AND the occurrence time) from the original NAL7 test but its semantics are equivalent
+        tester.mustBelieve(cycles*4,
+                "(<$1 --> (/, enter, _, room)> <=>-2 <$1 --> (/, open, _, door)>)",
+                1.00f, 0.45f,
+                2
+        );
+
+    }
+
+//    @Test
+//    public void induction_on_events_with_variable_introduction_d1000()  {
+//        TestNAR tester = test();
+//        int delay = 1000;
+//        tester.nar.frame(delay);
+//
+//        tester.input("<John --> (/,open,_,door)>. :|:");
+//        tester.inputAt(delay + 10, "<John --> (/,enter,_,room)>. :|:");
+//
+//        tester.mustBelieve(cycles,
+//                //"<(&/,<$1 --> (/,open,_,door)>) </> <$1 --> (/,enter,_,room)>>",
+//                " <(&/, <$1 --> (/, open, _, door)>, /5) </> <$1 --> (/, enter, _, room)>>",
+//                1.00f, 0.45f,
+//                delay
+//        );
+//
+//    }
+//
+//    @Test
+//    public void induction_on_events_with_variable_introduction2()  {
+//        TestNAR tester = test();
+//
+//        tester.input("<John --> (/,open,_,door)>. :|:");
+//        tester.inputAt(10, "<John --> (/,enter,_,room)>. :|:");
+//
+//        tester.mustBelieve(cycles,
+//                "<(&/, <$1 --> (/, open, _, door)>, /5) =/> <$1 --> (/, enter, _, room)>>",
+//                1.00f, 0.45f,
+//                0);
+//
+//    }
+//
+//    @Test
+//    public void induction_on_events_with_variable_introduction3()  {
+//        TestNAR tester = test();
+//
+//        tester.input("<John --> (/,open,_,door)>. :|:");
+//        tester.inputAt(10, "<John --> (/,enter,_,room)>. :|:");
+//
+//        tester.mustBelieve(cycles, "<<$1 --> (/, enter, _, room)> =\\> (&/, <$1 --> (/, open, _, door)>, /5)>",
+//                1.00f, 0.45f,
+//                0);
+//
+//    }
+//
+//    @Test
+//    public void induction_on_events_composition()  {
+//        TestNAR tester = test();
+//
+//
+//        tester.input("<(John,key) --> hold>. :|:");
+//        tester.inputAt(10, "<<(John,door) --> open> =/> <(John,room) --> enter>>. :|:");
+//
+//        tester.mustBelieve(cycles, "<(&&,<(John,key) --> hold>,<(John,door) --> open>) =/> <(John,room) --> enter>>",
+//                1.00f, 0.45f,
+//                10);
+//
+//    }
+//
+//
+//
+//    //NAL7 tests which were accidentally in NAL8 category:
+//
+//    @Test
+//    public void variable_introduction_on_events()  {
+//        TestNAR tester = test();
+//
+//        tester.input("<{t003} --> (/,at,SELF,_)>. :|:");
+//        tester.inputAt(10, "<{t003} --> (/,on,{t002},_)>. :|:");
+//
+//        tester.mustBelieve(cycles, "(&&,<#1 --> (/,at,SELF,_)>,<#1 --> (/,on,{t002},_)>)",
+//                1.0f, 0.81f,
+//                10);
+//
+//    }
+//
+//    //TODO: investigate
+//    @Test
+//    public void variable_elimination_on_temporal_statements()  {
+//        TestNAR tester = test();
+//
+//
+//        Task T1 = tester.nar.inputTask("(&|,<({t002},#1) --> on>,<(SELF,#1) --> at>). :|:");
+//        tester.inputAt(10, "<(&|,<($1,#2) --> on>,<(SELF,#2) --> at>) =|> <(SELF,$1) --> reachable>>.");
+//
+//        tester.mustBelieve(cycles, "<(SELF,{t002}) --> reachable>",
+//                1.0f, 0.81f, T1.getOccurrenceTime()); //  TODO: find a way to check whether the occurence time is equal to the one of the first input
+//
+//    }
+//
+//    @Test
+//    public void temporalOrder()  {
+//        TestNAR tester = test();
+//        tester.input("<<m --> M> =/> <p --> P>>.");
+//        tester.inputAt(10, "<<s --> S> <|> <m --> M>>. %0.9;0.9%");
+//        tester.mustBelieve(cycles, "<<s --> S> =/> <p --> P>>", 0.90f, 0.73f);
+//
+//
+//        //(M =/> P), (S <|> M), not_equal(S,P) |- (S =/> P), (Truth:Analogy, Derive:AllowBackward)
+//    }
+//
+
 
 }
