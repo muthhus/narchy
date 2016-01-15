@@ -349,48 +349,46 @@ public class NAL7Test extends AbstractNALTester {
 
 
     }
-//
-//
-//
-//    //NAL7 tests which were accidentally in NAL8 category:
-//
-//    @Test
-//    public void variable_introduction_on_events()  {
-//        TestNAR tester = test();
-//
-//        tester.input("<{t003} --> (/,at,SELF,_)>. :|:");
-//        tester.inputAt(10, "<{t003} --> (/,on,{t002},_)>. :|:");
-//
-//        tester.mustBelieve(cycles, "(&&,<#1 --> (/,at,SELF,_)>,<#1 --> (/,on,{t002},_)>)",
-//                1.0f, 0.81f,
-//                10);
-//
-//    }
+
+    @Test
+    public void variable_introduction_on_events()  {
+        TestNAR tester = test();
+
+        tester.input("<{t003} --> (/,at,SELF,_)>. :|:");
+        tester.inputAt(10, "<{t003} --> (/,on,{t002},_)>. :|:");
+
+        tester.mustBelieve(cycles, "(&&,<#1 --> (/,at,SELF,_)>,<#1 --> (/,on,{t002},_)>)",
+                1.0f, 0.81f,
+                10);
+
+    }
 //
 //    //TODO: investigate
-//    @Test
-//    public void variable_elimination_on_temporal_statements()  {
-//        TestNAR tester = test();
+    @Test
+    public void variable_elimination_on_temporal_statements()  {
+        TestNAR tester = test();
+
+
+        tester.input("(<({t002},#1) --> on> &&+0 <(SELF,#1) --> at>). :|:");
+        tester.inputAt(10, "((<($1,#2) --> on> &&+0 <(SELF,#2) --> at>) ==>+0 <(SELF,$1) --> reachable>).");
+
+        tester.mustBelieve(cycles, "<(SELF,$1) --> reachable>",
+                1.0f, 0.81f, 0);
+        tester.mustBelieve(cycles, "<(SELF,{t002}) --> reachable>",
+                1.0f, 0.81f, 0);
+
+    }
 //
-//
-//        Task T1 = tester.nar.inputTask("(&|,<({t002},#1) --> on>,<(SELF,#1) --> at>). :|:");
-//        tester.inputAt(10, "<(&|,<($1,#2) --> on>,<(SELF,#2) --> at>) =|> <(SELF,$1) --> reachable>>.");
-//
-//        tester.mustBelieve(cycles, "<(SELF,{t002}) --> reachable>",
-//                1.0f, 0.81f, T1.getOccurrenceTime()); //  TODO: find a way to check whether the occurence time is equal to the one of the first input
-//
-//    }
-//
-//    @Test
-//    public void temporalOrder()  {
-//        TestNAR tester = test();
-//        tester.input("<<m --> M> =/> <p --> P>>.");
-//        tester.inputAt(10, "<<s --> S> <|> <m --> M>>. %0.9;0.9%");
-//        tester.mustBelieve(cycles, "<<s --> S> =/> <p --> P>>", 0.90f, 0.73f);
-//
-//
-//        //(M =/> P), (S <|> M), not_equal(S,P) |- (S =/> P), (Truth:Analogy, Derive:AllowBackward)
-//    }
+    @Test
+    public void temporalOrder()  {
+        TestNAR tester = test();
+        tester.input("(<m --> M> ==>+5 <p --> P>).");
+        tester.inputAt(10, "(<s --> S> <=>+0 <m --> M>). %0.9;0.9%");
+        tester.mustBelieve(cycles, "(<s --> S> ==>+5 <p --> P>)", 0.90f, 0.73f);
+
+
+        //(M =/> P), (S <|> M), not_equal(S,P) |- (S =/> P), (Truth:Analogy, Derive:AllowBackward)
+    }
 //
 
 
