@@ -71,11 +71,11 @@ public class AtomConcept extends AbstractConcept  {
     static final String shouldntProcess = "should not have attempted to process task here";
 
     @Override
-    public boolean processBelief(Task task, NAR nar) {
+    public Task processBelief(Task task, NAR nar) {
         throw new RuntimeException(shouldntProcess);
     }
     @Override
-    public boolean processGoal(Task task, NAR nar) {
+    public Task processGoal(Task task, NAR nar) {
         throw new RuntimeException(shouldntProcess);
     }
     @Override
@@ -120,10 +120,15 @@ public class AtomConcept extends AbstractConcept  {
 
             if (templateConcept != null) {
 
-                /** activate the peer task tlink */
+                /** activate local's termlink to template */
+                termLinks.put(templateConcept, taskBudget, subScale);
+
+                /** activate (reverse) template's termlink to local */
+                templateConcept.getTermLinks().put(this, taskBudget, subScale);
+
+                /** recursively activate the template's task tlink */
                 templateConcept.link(t, subScale, minScale, nar);
 
-                linkTemplate(templateConcept, taskBudget, subScale);
             }
         }
 
@@ -132,19 +137,13 @@ public class AtomConcept extends AbstractConcept  {
         return true;
     }
 
-
-    protected void linkTemplate(Concept target, Budget budget, float subScale) {
-        termLinks.put(target, budget, subScale);
-        target.getTermLinks().put(this, budget, subScale);
-
-    }
-
-//    /** atom concept, being irreducible, will have no templates to recurse into */
-//    @Override public void linkTemplates(Budget budget, float scale, NAR nar) {
+//    protected final void linkTemplate(Concept target, Budget budget, float subScale) {
+//        termLinks.put(target, budget, subScale);
+//        target.getTermLinks().put(this, budget, subScale);
 //    }
 
     @Override
-    public boolean process(Task task, NAR nar) {
-        return false;
+    public Task process(Task task, NAR nar) {
+        return null;
     }
 }

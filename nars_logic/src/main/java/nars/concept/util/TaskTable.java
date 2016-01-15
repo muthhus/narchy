@@ -1,7 +1,5 @@
 package nars.concept.util;
 
-import nars.Memory;
-import nars.budget.BudgetMerge;
 import nars.task.Task;
 import org.apache.commons.math3.analysis.interpolation.BivariateGridInterpolator;
 import org.apache.commons.math3.analysis.interpolation.UnivariateInterpolator;
@@ -28,15 +26,6 @@ public interface TaskTable extends Iterable<Task> {
 
     boolean isEmpty();
 
-    /**
-     * attempt to insert a task.
-     *
-     * @return: the input task itself, it it was added to the table
-     * an existing equivalent task if this was a duplicate
-     */
-
-
-    Task add(Task t, BiPredicate<Task,Task>  equality, BudgetMerge duplicateMerge, Memory m);
 
     /**
      * @return null if no duplicate was discovered, or the first Task that matched if one was
@@ -71,7 +60,6 @@ public interface TaskTable extends Iterable<Task> {
         }
     }
 
-    boolean add(Task t);
 
     //boolean contains(Task t);
 

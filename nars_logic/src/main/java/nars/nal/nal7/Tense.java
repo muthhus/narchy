@@ -1,5 +1,6 @@
 package nars.nal.nal7;
 
+import nars.Global;
 import nars.Memory;
 import nars.task.Task;
 import nars.task.Temporal;
@@ -262,6 +263,11 @@ public enum Tense  {
      */
     public static boolean overlapping(long[] a, long[] b) {
 
+        if (Global.DEBUG) {
+            if (a.length == 0 || b.length == 0) {
+                throw new RuntimeException("missing evidence");
+            }
+        }
         /** TODO there may be additional ways to exit early from this loop */
 
         for (long x : a) {

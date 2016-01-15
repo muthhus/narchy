@@ -462,8 +462,7 @@ public class Default extends AbstractNAR {
         public void process(ConceptProcess p) {
             Collection<Task> buffer = derivedTasksBuffer;
 
-            Deriver deriver = this.der;
-            deriver.run(p, matcher, buffer::add);
+            this.der.run(p, matcher, buffer::add);
 
             if (Global.DEBUG_DETECT_DUPLICATE_DERIVATIONS) {
                 HashBag<Task> b = detectDuplicates(buffer);
@@ -472,7 +471,7 @@ public class Default extends AbstractNAR {
             }
 
             if (!buffer.isEmpty()) {
-                Task.normalize( buffer,
+                Task.inputNormalized( buffer,
                         //p.getMeanPriority()
                         p.getTask().getPriority()
 

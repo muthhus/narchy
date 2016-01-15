@@ -12,8 +12,10 @@ import java.util.function.BiPredicate;
  * we use an ArrayList and not an ArrayDeque (which is seemingly ideal for the
  * FIFO behavior) because we can iterate entries by numeric index avoiding
  * allocation of an Iterator.
+ *
+ * TODO use a more common collection class than ArraySharingList and deprecate it
  */
-public class ArrayListTaskTable extends ArraySharingList<Task> implements TaskTable {
+public class ArrayListTaskTable extends ArraySharingList<Task> implements QuestionTaskTable {
 
     protected int capacity = 0;
 

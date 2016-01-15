@@ -47,11 +47,11 @@ public abstract class AbstractTask extends Item<Task>
     /**
      * Task from which the Task is derived, or null if input
      */
-    private transient Reference<Task> parentTask; //should this be transient? we may want a Special kind of Reference that includes at least the parent's Term
+    protected transient Reference<Task> parentTask; //should this be transient? we may want a Special kind of Reference that includes at least the parent's Term
     /**
      * Belief from which the Task is derived, or null if derived from a theorem
      */
-    private transient Reference<Task> parentBelief;
+    protected transient Reference<Task> parentBelief;
 
     private transient int hash;
 
@@ -214,7 +214,7 @@ public abstract class AbstractTask extends Item<Task>
 
 
         //finally, assign a unique stamp if none specified (input)
-        if (getEvidence().length== 0) {
+        if (getEvidence() == null) {
             setEvidence(memory.newStampSerial());
 
             //this actually means it arrived from unknown origin.
@@ -409,6 +409,8 @@ public abstract class AbstractTask extends Item<Task>
             setEvidence( Stamp.toSetArray( Stamp.zip(getParentTask(), getParentBelief() )));
         } else if ( isSingle() ) {
             setEvidence( getParentTask().getEvidence() );
+        } else {
+            setEvidence(null);
         }
 
     }
@@ -601,16 +603,9 @@ public abstract class AbstractTask extends Item<Task>
 //        this.hash = 0;
     }*/
 
-    public final void setParentTask(Task parentTask) {
-        this.parentTask = reference(parentTask);
-    }
     public final void setParents(Reference<Task> parentTask, Reference<Task> parentBelief) {
         this.parentTask = parentTask;
         this.parentBelief = parentBelief;
-    }
-
-    public final void setParentBelief(Task parentBelief) {
-        this.parentBelief = reference(parentBelief);
     }
 
     /**

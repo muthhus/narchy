@@ -18,6 +18,7 @@ public abstract class SortedIndex<T> implements Collection<T>, Serializable {
         throw new RuntimeException("Use insert method which can return a displaced object");
     }
 
+    /** similar semantics as Map.put ; the displaced task will be returned, which may be the input if it could not be inserted */
     public abstract T insert(T i);
 
     /** current index of existing item */

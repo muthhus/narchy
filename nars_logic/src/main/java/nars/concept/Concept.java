@@ -145,9 +145,9 @@ public interface Concept extends Termed, Supplier<Term> {
 
 
 
-    boolean processBelief(Task task, NAR nar);
+    Task processBelief(Task task, NAR nar);
 
-    boolean processGoal(Task task, NAR nar);
+    Task processGoal(Task task, NAR nar);
 
     boolean processQuestion(Task task, NAR nar);
 
@@ -300,7 +300,7 @@ public interface Concept extends Termed, Supplier<Term> {
      * process a task in this concept
      * @return true if process affected the concept (ie. was inserted into a belief table)
      */
-    boolean process(Task task, NAR nar);
+    Task process(Task task, NAR nar);
 
     /** attempt insert a tasklink into this concept's tasklink bag
      *  return true if successfully inserted

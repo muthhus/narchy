@@ -90,18 +90,20 @@ public class Derivelet {
 
         Concept concept = conceptLink.get();
 
-        concept.getTaskLinks().sample(tasklinks, each, tasks).commit();
-        if (tasks.isEmpty()) return 0;
+        Set<BLink<Task>> tasksBuffer = this.tasks;
+        concept.getTaskLinks().sample(tasklinks, each, tasksBuffer).commit();
+        if (tasksBuffer.isEmpty()) return 0;
 
-        concept.getTermLinks().sample(termlinks, each, terms).commit();
-        if (terms.isEmpty()) return 0;
+        Set<BLink<Termed>> termsBuffer = this.terms;
+        concept.getTermLinks().sample(termlinks, each, termsBuffer).commit();
+        if (termsBuffer.isEmpty()) return 0;
 
         //convert to array for fast for-within-for iterations
-        tasksArray = this.tasks.toArray(tasksArray);
-        this.tasks.clear();
+        BLink[] tasksArray = this.tasksArray = tasksBuffer.toArray(this.tasksArray);
+        tasksBuffer.clear();
 
-        termsArray = this.terms.toArray(termsArray);
-        this.terms.clear();
+        BLink[] termsArray = this.termsArray = termsBuffer.toArray(this.termsArray);
+        termsBuffer.clear();
 
         return firePremises(conceptLink,
                 tasksArray, termsArray,

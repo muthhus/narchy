@@ -4,6 +4,7 @@
  */
 package nars.process;
 
+import com.gs.collections.impl.factory.Sets;
 import nars.Global;
 import nars.NAR;
 import nars.Premise;
@@ -13,6 +14,7 @@ import nars.nal.nal7.Tense;
 import nars.task.Task;
 import nars.term.Termed;
 
+import java.util.Set;
 import java.util.function.Consumer;
 
 /** Firing a concept (reasoning event). Derives new Tasks via reasoning rules
@@ -70,31 +72,32 @@ public final class ConceptProcess implements Premise {
 
         Task belief;
         if ((beliefConcept != null) && (beliefConcept.hasBeliefs())) {
-            belief = beliefConcept.getBeliefs().top(nar.time());
-            if (belief == null || belief.getDeleted())
-                beliefConcept.getBeliefs().top(nar.time());
-                //throw new RuntimeException("deleted belief");
+            long now = nar.time();
+            belief = beliefConcept.getBeliefs().top(now);
+            if (belief == null || belief.getDeleted()) {
+                beliefConcept.print();
+                beliefConcept.getBeliefs().top(now);
+                throw new RuntimeException("deleted belief: " + belief + " " + beliefConcept.hasBeliefs());
+            }
         } else {
             belief = null;
         }
 
+
+        Set<Task> beliefs;
+
         if (belief != null)  {
-            int[] beliefAttempts = new int[1];
-            Premise.match(task, belief, nar, beliefResolved -> {
-                beliefAttempts[0]++;
-                cp.accept(new ConceptProcess(
-                        nar, concept,
-                        taskLink, termLink,
-                        beliefResolved));
-            });
-            int a = beliefAttempts[0];
-            if (a > 0)
-                return a;
+            beliefs = Global.newHashSet(1);
+            Premise.match(task, belief, nar, beliefs::add);
+        } else {
+            beliefs = Sets.mutable.of(belief);
         }
 
-        cp.accept(new ConceptProcess(nar, concept,
-                taskLink, termLink, belief));
-        return 1;
+        beliefs.forEach(matchedBelief -> {
+            cp.accept(new ConceptProcess(nar, concept,
+                    taskLink, termLink, matchedBelief));
+        });
+        return beliefs.size();
 
 
     }

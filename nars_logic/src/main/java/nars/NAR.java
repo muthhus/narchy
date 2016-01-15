@@ -415,7 +415,9 @@ public abstract class NAR implements Serializable, Level {
      */
     public int execute(Task goal) {
         Term term = goal.term();
-        goal.setExecuted();
+
+        if (!goal.isEternal())
+            goal.setExecuted();
 
         if (Op.isOperation(term)) {
 
@@ -428,7 +430,7 @@ public abstract class NAR implements Serializable, Level {
 
                 //enqueue after this frame, before next
                 //beforeNextFrame(
-                        new Execution(this, goal, tt).run();
+                new Execution(this, goal, tt).run();
                 //);
                 return 1;
             }
@@ -857,8 +859,6 @@ public abstract class NAR implements Serializable, Level {
     }
 
 
-
-
     public NAR trace() {
 
         trace(System.out);
@@ -872,37 +872,30 @@ public abstract class NAR implements Serializable, Level {
 
     /**
      * execute a Task as a TaskProcess (synchronous)
+     *
+     * TODO make private
      */
-    public Concept process(Task task) {
+    public final Concept process(Task task) {
 
-        if (!task.term().isNormalized()) {
-            throw new RuntimeException("Not normalized: " + task);
-        }
+        Termed term = task.get();
 
-        Concept c = conceptualize(task.term(), task.getBudget(), 1f);
+        Concept c = conceptualize(term, task.getBudget(), 1f);
         if (c == null) {
             throw new RuntimeException("Inconceivable: " + task);
-            //memory.remove(task, "Inconceivable");
-            //return null;
         }
 
         memory.emotion.busy(task);
 
-        if (c.process(task, this)) {
-            if (!task.getDeleted()) {
+        task = c.process(task, this);
+        if (task!=null) {
 
-                c.link(task, 1f, this);
+            //propagate activation
+            c.link(task, 1f, this);
 
-                memory.eventTaskProcess.emit(task);
-
-            }
-
-            return c;
-        } else {
-            memory.remove(task, "Unprocessed");
-            return null;
+            memory.eventTaskProcess.emit(task);
         }
 
+        return c;
     }
 
     /**
@@ -934,7 +927,9 @@ public abstract class NAR implements Serializable, Level {
         return this == obj;
     }
 
-    /** gets a measure of the current priority of the concept */
+    /**
+     * gets a measure of the current priority of the concept
+     */
     abstract public float conceptPriority(Termed termed, float priIfNonExistent);
 
     public static class AlreadyRunningException extends RuntimeException {

@@ -329,19 +329,15 @@ public enum LocalRules {
 //    }
 
     /**
-     * WARNING: this assumes terms are already
+     * WARNING: this assumes the task's terms are already
      * known to be equal.
      */
-    public static boolean revisible(Task newBelief, Task oldBelief) {
-
-        //TODO maybe add DEBUG test: newBelief and oldBelief term must be equal
-
-        if (newBelief.isRevisible() && (!newBelief.equals(oldBelief))) {
-            //if (Tense.matchingOrder(newBelief.getTemporalOrder(), oldBelief.getTemporalOrder()))
-                return true;
-        }
-
-        return false;
+    private static boolean isRevisible(Task newBelief, Task oldBelief) {
+        Term t = newBelief.term();
+        return
+            !(t.op().isConjunctive() && t.hasAny(Op.VAR_DEP))    // t.hasVarDep());
+            && !newBelief.equals(oldBelief)
+            && !Tense.overlapping(newBelief, oldBelief);
     }
 
     /**
@@ -350,13 +346,14 @@ public enum LocalRules {
      */
     public static Task getRevision(Task newBelief, Task oldBelief, long now) {
 
-        if (newBelief.equals(oldBelief) || Tense.overlapping(newBelief, oldBelief))
+        if (!isRevisible(newBelief, oldBelief)) {
             return null;
+        }
+        //if (Tense.matchingOrder(newBelief.getTemporalOrder(), oldBelief.getTemporalOrder()))
 
         Truth newBeliefTruth = newBelief.getTruth();
 
-
-        long target = newBelief.getOccurrenceTime();
+        long occ = newBelief.getOccurrenceTime();
 
 //        //interpolate the occurrence time by their relative confidences
 //        long newo = newBelief.getOccurrenceTime();
@@ -373,13 +370,12 @@ public enum LocalRules {
 //            target = newo;
 //        }
 
-
-        Truth oldBeliefTruth = oldBelief.projection(target, now);
+        Truth oldBeliefTruth = oldBelief.projection(occ, now);
 
         Truth conclusion = TruthFunctions.revision(newBeliefTruth, oldBeliefTruth);
         if (conclusion instanceof ProjectedTruth) {
             //allow eternalized truth to override with eternalized occurrence
-            target = ((ProjectedTruth) conclusion).target;
+            occ = ((ProjectedTruth) conclusion).target;
         }
 
         return new MutableTask(newBelief.get())
@@ -387,7 +383,7 @@ public enum LocalRules {
                 .truth(conclusion)
                 .budget(BudgetFunctions.revise(newBeliefTruth, oldBelief, conclusion, newBelief.getBudget()))
                 .parent(newBelief, oldBelief)
-                .time(now, target)
+                .time(now, occ)
                 .because("Revision");
     }
 

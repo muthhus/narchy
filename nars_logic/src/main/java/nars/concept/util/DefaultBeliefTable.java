@@ -1,67 +1,104 @@
 package nars.concept.util;
 
+import com.google.common.collect.Iterators;
 import nars.Global;
 import nars.Memory;
-import nars.concept.Concept;
 import nars.nal.LocalRules;
 import nars.task.Task;
-import nars.truth.DefaultTruth;
+import nars.truth.TruthFunctions;
+import nars.util.ArraySortedIndex;
+import nars.util.data.sorted.SortedIndex;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Stores beliefs ranked in a sorted ArrayList, with strongest beliefs at lowest indexes (first iterated)
  */
-public class ArrayListBeliefTable extends ArrayListTaskTable implements BeliefTable {
+public class DefaultBeliefTable implements BeliefTable {
+
+    final SortedIndex<Task> eternal;
+    final SortedIndex<Task> temporal;
+    private long now; //cached value, updated before temporal operations begin
 
 
-//    /** warning this will create a 0-capacity table,
-//     * rejecting all attempts at inputs.  either use the
-//     * other constructor or change capacity after construction. */
-//    public ArrayListBeliefTable() {
-//        this(0);
-//    }
+    public DefaultBeliefTable(int cap, int dur) {
+        super();
 
-    public ArrayListBeliefTable(int cap) {
-        super(cap);
+        if (cap == 1) cap = 2;
+        eternal = new ArraySortedIndex<Task>(cap/2) {
+            @Override public float score(Task b) {
+                return -b.getConfidence();
+            }
+        };
+        temporal = new ArraySortedIndex<Task>(cap/2) {
+            @Override public float score(Task b) {
+                return b.getConfidence()/(1+Math.abs(b.getOccurrenceTime() - now)/dur);
+            }
+        };
     }
 
+    @Override
+    public Iterator<Task> iterator() {
+        return Iterators.concat(eternal.iterator(), temporal.iterator());
+    }
 
-//    @Override
+    @Override
+    public void forEach(Consumer<? super Task> action) {
+        eternal.forEach(action);
+        temporal.forEach(action);
+    }
+
+    @Override
+    public void setCapacity(int newCapacity) {
+        if (newCapacity == 1) newCapacity = 2; //prevent 0 by accident
+        eternal.setCapacity(newCapacity/2);
+        temporal.setCapacity(newCapacity/2);
+    }
+
+    @Override
+    public int size() {
+        return eternal.size() + temporal.size();
+    }
+
+    @Override public boolean isEmpty() {
+        return size()==0;
+    }
+
+    @Override
+    public int getCapacity() {
+        return eternal.capacity() + temporal.capacity();
+    }
+
+    //    @Override
 //    public Task top(boolean hasQueryVar, long now, long occTime, Truth truth) {
 //        throw new RuntimeException("not supposed to be called");
 //    }
 
 
     @Override
-    public Task top() {
-        if (isEmpty()) return null;
-        return getCachedNullTerminatedArray()[0];
+    public void clear() {
+        eternal.clear();
+        temporal.clear();
     }
 
     @Override
     public Task topEternal() {
-        Task[] tasks = getCachedNullTerminatedArray();
-        if (tasks==null) return null;
-
-        for (Task x : tasks) {
-            if (x == null) break;
-            if (x.isEternal()) return x;
-        }
-        return null;
+        return eternal.getFirst();
     }
 
     @Override
     public Task topTemporal(long when) {
-        Task[] tasks = getCachedNullTerminatedArray();
-        if (tasks == null) return null;
-
         Task best = null;
         float bestRank = -1;
-        for (Task x : tasks) {
-            if (x == null) break;
-            float r = x.getConfidence() * x.projectionRank(when);
+        List<Task> l = temporal.getList();
+        for (int i = 0; i < l.size(); i++) {
+            Task x = l.get(i);
+            float r = x.getConfidence() * TruthFunctions.temporalProjectionRank(1, x.getOccurrenceTime(), when);
             if ((r > bestRank) ||
-            //tie-breaker: closer to the target time
-            ( (r==bestRank) && (Math.abs(when - best.getOccurrenceTime()) < Math.abs(when - x.getOccurrenceTime())) )) {
+                    //tie-breaker: closer to the target time
+                    ((r == bestRank) && (Math.abs(when - best.getOccurrenceTime()) < Math.abs(when - x.getOccurrenceTime())))) {
                 best = x;
                 bestRank = r;
             }
@@ -70,38 +107,38 @@ public class ArrayListBeliefTable extends ArrayListTaskTable implements BeliefTa
     }
 
 
-    @Deprecated @Override
-    public final Task top(Ranker r) {
-
-        Task[] tasks = getCachedNullTerminatedArray();
-        //if (tasks == null) return null;
-
-
-        float s = Float.NEGATIVE_INFINITY;
-        Task b = null;
-
-        for (int i = tasks.length - 1; i >= 0; i--) {
-            Task t = tasks[i];
-            if (t != null) {
-                float x = r.rank(t, s);
-                if (x + DefaultTruth.DEFAULT_TRUTH_EPSILON > s) {
-                    s = x;
-                    b = t;
-                }
-            }
-        }
-
-//        Task t;
-//        for (int i = 0; null != (t = tasks[i++]); ) {
-//            float x = r.rank(t, s);
-//            if (x > s) {
-//                s = x;
-//                b = t;
+//    @Deprecated @Override
+//    public final Task top(Ranker r) {
+//
+//        Task[] tasks = getCachedNullTerminatedArray();
+//        //if (tasks == null) return null;
+//
+//
+//        float s = Float.NEGATIVE_INFINITY;
+//        Task b = null;
+//
+//        for (int i = tasks.length - 1; i >= 0; i--) {
+//            Task t = tasks[i];
+//            if (t != null) {
+//                float x = r.rank(t, s);
+//                if (x + DefaultTruth.DEFAULT_TRUTH_EPSILON > s) {
+//                    s = x;
+//                    b = t;
+//                }
 //            }
 //        }
-
-        return b;
-    }
+//
+////        Task t;
+////        for (int i = 0; null != (t = tasks[i++]); ) {
+////            float x = r.rank(t, s);
+////            if (x > s) {
+////                s = x;
+////                b = t;
+////            }
+////        }
+//
+//        return b;
+//    }
 
 
     /**
@@ -113,138 +150,134 @@ public class ArrayListBeliefTable extends ArrayListTaskTable implements BeliefTa
      * the input will either be added or not depending
      * on its relation to the table's contents.
      *
-     * @param input
-     * @param ranking
-     * @param c
-     * @return
+     * if the new task is rejected, it will be deleted. callee must check
+     * for this condition
      */
     @Override
-    public Task add(Task input, BeliefTable.Ranker ranking, Concept c, Memory memory) {
+    public Task add(Task input, Memory memory, Consumer<Task> onBeliefChanged) {
 
-        /**
-         * involves 3 potentially unique tasks:
-         * input, strongest, revised (created here and returned)
-         */
+        long now = this.now = memory.time();
 
-        //empty (special case)
-        if (isEmpty()) {
-            add(input);
-            onChanged(c, memory);
-            return input;
+        boolean tableChanged;
+        Task preTop;
+
+        boolean eternal = input.isEternal();
+
+        preTop = eternal ? topEternal() : top(now);
+        tableChanged = insert(input, memory);
+
+        Task result;
+        if (!tableChanged) {
+            result = preTop;
+        } else {
+            if (preTop!=null)
+                result = addRevise(input, preTop, memory, now);
+            else
+                result = input;
+
+            onBeliefChanged.accept(result);
         }
 
-
-        boolean tableChanged = false;
-
-        long now = memory.time();
-        Task top = top(now); //get the top belief before adding
-
-        boolean added = tryAdd(input, ranking, memory);
-
-        if (added) {
-            tableChanged = true;
-        } else if (input.getDeleted()) {
-            return top;
-        }
-
-        //TODO make sure input.isDeleted() can not happen
-        if (!input.getDeleted() && LocalRules.revisible(input, top)) {
-
-            Task revised = LocalRules.getRevision(input, top, now);
-
-            if (revised != null && !input.equals(revised)) {
-
-                boolean addedRevision = tryAdd(revised, ranking, memory);
-                if (addedRevision) {
-                    tableChanged = true;
-                    memory.eventRevision.emit(revised);
-                    top = top(now);
-                    //nal.memory().logic.BELIEF_REVISION.hit();
-                } else {
-                    //onBeliefRemoved(revised, "Task Denied Belief Table Entry", memory);
-                }
-            }
-        }
-
-        if (tableChanged) {
-            onChanged(c, memory);
-        }
-
-//        if (!added) {
-//            //onBeliefRemoved(input, "Task Denied Belief Table Entry (2)", memory);
-//        }
-
-        return top;
+        return result;
     }
 
-    static void onChanged(Concept c, Memory memory) {
-        memory.eventConceptChanged.emit(c);
+    Task addRevise(Task input, Task preTop, Memory memory, long now) {
+        //        //TODO make sure input.isDeleted() can not happen
+
+
+        Task revised = LocalRules.getRevision(input, preTop, now);
+
+        if (revised != null && !revised.equals(input) && insert(revised, memory)) {
+            memory.eventRevision.emit(revised);
+        }
+
+
+        return input.isEternal() ? topEternal() : top(now);
     }
 
+    private boolean insert(Task t, Memory memory) {
+        return insert(t, t.isEternal() ? this.eternal : this.temporal, memory);
+    }
 
-    @Override
-    public final boolean tryAdd(Task input, Ranker r, Memory memory) {
-
+    boolean insert(Task input, SortedIndex<Task> table, Memory memory) {
         if (Global.DEBUG) {
-            if (input.getDeleted())
-                throw new RuntimeException("deleted task being added");
-            checkForDeleted();
+            checkForDeleted(input, table);
         }
 
-        float rankInput = r.rank(input);    // for the new isBelief
+        Task displaced = table.insert(input);
+        if (displaced!=null)
+            onBeliefRemoved(displaced, "Unbelievable/Undesirable", memory);
 
-        int siz = data.size();
-        boolean atCapacity = (capacity == siz);
-        Task[] tasks = getCachedNullTerminatedArray();
-
-        int i = 0;
-
-        for (Task b; null != (b = tasks[i++]); ) {
-
-            if (b.equals(input)) {
-                //these should be preventable earlier
-                if (b!=input) {
-                    onBeliefRemoved(input, "Duplicate", memory);
-                    if (Global.DEBUG) {
-                        checkForDeleted();
-                    }
-                }
-                return false;
-            }
-
-            float existingRank = r.rank(b, rankInput);
-
-            boolean inputGreater = !Float.isFinite(existingRank) || (rankInput > existingRank);
-            if (inputGreater) {
-                break; //item will be inserted at this index
-            }
-        }
-
-        i--; //-1 is correct since after the above for loop it will be 1 ahead
-
-
-        if (atCapacity) {
-            if (i == siz) {
-                //reached the end of the list and there is no room to add at the end
-                //here we cant remove it yet because it is needed for revision
-                return false;
-            } else {
-                Task removed = remove(siz - 1);
-                onBeliefRemoved(removed, "Forgotten", memory);
-            }
-        }
-
-        add(i, input);
-        return true;
+        return input == displaced ? false : true;
     }
+
+
+
+//    @Override
+//    public final boolean tryAdd(Task input, Ranker r, Memory memory) {
+//
+//        if (Global.DEBUG) {
+//            if (input.getDeleted())
+//                throw new RuntimeException("deleted task being added");
+//            checkForDeleted();
+//        }
+//
+//        float rankInput = r.rank(input);    // for the new isBelief
+//
+//        int siz = data.size();
+//        boolean atCapacity = (capacity == siz);
+//        Task[] tasks = getCachedNullTerminatedArray();
+//
+//        int i = 0;
+//
+//        for (Task b; null != (b = tasks[i++]); ) {
+//
+//            if (b.equals(input)) {
+//                //these should be preventable earlier
+//                if (b!=input) {
+//                    onBeliefRemoved(input, "Duplicate", memory);
+//                    if (Global.DEBUG) {
+//                        checkForDeleted();
+//                    }
+//                }
+//                return false;
+//            }
+//
+//            float existingRank = r.rank(b, rankInput);
+//
+//            boolean inputGreater = !Float.isFinite(existingRank) || (rankInput > existingRank);
+//            if (inputGreater) {
+//                break; //item will be inserted at this index
+//            }
+//        }
+//
+//        i--; //-1 is correct since after the above for loop it will be 1 ahead
+//
+//
+//        if (atCapacity) {
+//            if (i == siz) {
+//                //reached the end of the list and there is no room to add at the end
+//                //here we cant remove it yet because it is needed for revision
+//                return false;
+//            } else {
+//                Task removed = remove(siz - 1);
+//                onBeliefRemoved(removed, "Forgotten", memory);
+//            }
+//        }
+//
+//        add(i, input);
+//        return true;
+//    }
 
     private static void onBeliefRemoved(Task t, String reason, Memory memory) {
         memory.remove(t, reason);
     }
 
-    private void checkForDeleted() {
+    static void checkForDeleted(Task input, SortedIndex<Task> table) {
+        if (input.getDeleted())
+            throw new RuntimeException("deleted task being added");
 
-        data.forEach((Task dt) -> {
+        table.forEach((Task dt) -> {
 //            if (dt == null)
 //                throw new RuntimeException("wtf");
             if (dt.getDeleted()) {
@@ -258,6 +291,7 @@ public class ArrayListBeliefTable extends ArrayListTaskTable implements BeliefTa
             }
         });
     }
+
 
 
 //TODO provide a projected belief

@@ -238,11 +238,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         return term().hasVarQuery();
     }
 
-    default boolean isRevisible() {
-        Term t = term();
-        return !((t.op().isConjunctive() && t.hasVarDep()) ||
-                t.op(Op.SPACE));
-    }
+
 
     default StringBuilder appendTo(StringBuilder sb) {
         return appendTo(sb, null);
@@ -302,11 +298,6 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 //
 //        //return projection(when, now).getConfidence();
 //    }
-
-    default float projectionRank(long when) {
-        //TODO use appropriate conf:time ratio
-        return TruthFunctions.temporalProjectionRank(1, getOccurrenceTime(), when);
-    }
 
 
     enum TaskState {
@@ -571,7 +562,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     static void normalize(Iterable<Task> derived, float premisePriority) {
         derived.forEach(t -> t.getBudget().mulPriority(premisePriority));
     }
-    static void normalize(Iterable<Task> derived, float premisePriority, Consumer<Task> target) {
+    static void inputNormalized(Iterable<Task> derived, float premisePriority, Consumer<Task> target) {
         derived.forEach(t -> {
             t.getBudget().mulPriority(premisePriority);
             target.accept(t);

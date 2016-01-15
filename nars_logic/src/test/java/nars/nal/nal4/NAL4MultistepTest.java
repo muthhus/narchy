@@ -64,7 +64,7 @@ public class NAL4MultistepTest extends AbstractNALTester {
 
     }
 
-    @Test
+    @Ignore @Test
     public void nal4_everyday_reasoning_easier() throws Narsese.NarseseException {
         int time = 2550;
 

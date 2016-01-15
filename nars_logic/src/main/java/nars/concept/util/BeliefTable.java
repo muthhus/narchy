@@ -2,8 +2,6 @@ package nars.concept.util;
 
 import com.google.common.collect.Iterators;
 import nars.Memory;
-import nars.budget.BudgetMerge;
-import nars.concept.Concept;
 import nars.nal.nal7.Tense;
 import nars.task.Task;
 import nars.truth.Truth;
@@ -16,19 +14,18 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Random;
-import java.util.function.BiPredicate;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
  * A model storing, ranking, and projecting beliefs or goals (tasks with TruthValue).
  * It should iterate in top-down order (highest ranking first)
  */
-@SuppressWarnings("OverlyComplexAnonymousInnerClass")
 public interface BeliefTable extends TaskTable {
 
     /** main method */
 
-    Task add(Task input, BeliefTable.Ranker ranking, Concept c, Memory m);
+    Task add(Task input, Memory memory, Consumer<Task> onBeliefChanged);
 
     /* when does projecting to now not play a role? I guess there is no case,
     //wo we use just one ranker anymore, the normal solution ranker which takes
@@ -72,20 +69,6 @@ public interface BeliefTable extends TaskTable {
         public boolean isEmpty() {
             return true;
         }
-        @Override
-        public Task add(Task t, BiPredicate<Task,Task> equality, BudgetMerge duplicateMerge, Memory m) {
-            return null;
-        }
-
-        @Override
-        public Task add(Task input, Ranker ranking, Concept c, Memory m) {
-            return null;
-        }
-
-        @Override
-        public boolean tryAdd(Task input, Ranker r, Memory memory) {
-            return false;
-        }
 
         @Override
         public Task topEternal() {
@@ -98,32 +81,12 @@ public interface BeliefTable extends TaskTable {
         }
 
         @Override
-        public Task top() {
+        public Task add(Task input, Memory memory, Consumer<Task> onBeliefChanged) {
             return null;
-        }
-
-        @Override
-        public boolean add(Task t) {
-            return false;
         }
 
 
     };
-
-
-    /** innernal only: add a task to the table */
-    boolean add(Task t);
-
-
-    /** try to insert an input. returns true if it was
-     * not rejected for any reason (duplicate, etc..)
-     *
-     * additionally the input task may be set deleted
-     * so this should be checked after calling.
-     */
-    boolean tryAdd(Task input, BeliefTable.Ranker r, Memory memory);
-
-
 
 
 //    /**
@@ -270,12 +233,19 @@ public interface BeliefTable extends TaskTable {
 
     /** get the most relevant belief/goal with respect to a specific time. */
     default Task top(long t) {
-        if (t == Tense.ETERNAL) return topEternal();
-        else return topTemporal(t);
+        Task ete = topEternal();
+        if (t == Tense.ETERNAL)
+            return ete;
+
+        Task tmp = topTemporal(t);
+
+        if (tmp == null && ete == null) return null;
+        if (tmp == null) return ete;
+        if (ete == null) return tmp;
+        return (ete.getConfidence() >= tmp.getConfidence()) ?
+                    ete : tmp;
     }
 
-    /** get the top-ranking belief/goal */
-    Task top();
 
     /** the truth v alue of the topmost element, or null if there is none */
     default Truth topTruth(long now) {

@@ -115,7 +115,7 @@ public class BeliefTableTest extends TestCase {
     @Test
     public void testTruthOscillation() {
 
-        NAR n = newNAR(4);
+        NAR n = newNAR(8);
         n.memory.duration.set(1);
 
         int offCycles = 2;
@@ -144,11 +144,12 @@ public class BeliefTableTest extends TestCase {
         b.believe(1.0f, 0.9f, Tense.Present).run(offCycles)
                 .believe(0.0f, 0.9f, Tense.Present);
 
-        /*for (int i = 0; i < 16; i++) {
+        for (int i = 0; i < 16; i++) {
             b.printEnergy();
             b.print();
             n.frame(1);
-        }*/
+            //TODO test that they are sorted ?
+        }
 
 
 
@@ -258,9 +259,9 @@ public class BeliefTableTest extends TestCase {
             long now = b.nar.time();
 
             Task tt = b.concept().getBeliefs().top(now);
-            float p = tt.getExpectation() * tt.projectionRank(now);
+            //float p = tt.getExpectation() * tt.projectionRank(now);
 
-            System.out.println(now + " " + p + " " +  tt);
+            System.out.println(now + " " + " " +  tt);
 
             //b.print();
         }

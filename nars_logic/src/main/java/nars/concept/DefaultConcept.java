@@ -3,33 +3,21 @@ package nars.concept;
 import nars.*;
 import nars.bag.Bag;
 import nars.budget.BudgetMerge;
-import nars.concept.util.ArrayListBeliefTable;
 import nars.concept.util.ArrayListTaskTable;
 import nars.concept.util.BeliefTable;
-import nars.concept.util.TaskTable;
+import nars.concept.util.DefaultBeliefTable;
+import nars.concept.util.QuestionTaskTable;
 import nars.nal.LocalRules;
-import nars.op.mental.Anticipate;
 import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.truth.Truth;
 
 import java.util.function.BiPredicate;
 
 
 public class DefaultConcept extends AtomConcept {
 
-    protected TaskTable questions = null;
-    protected TaskTable quests = null;
-    protected BeliefTable beliefs = null;
-    protected BeliefTable goals = null;
-
-    //TODO move this to a GoalBeliefTable so lazy allocation manages this:
-    //final int max_last_execution_evidence_len = Global.MAXIMUM_EVIDENTAL_BASE_LENGTH * 8;
-    //final LongHashSet lastevidence = new LongHashSet(max_last_execution_evidence_len);
-
-
-    public static final BiPredicate<Task,Task> questionEquivalence = new BiPredicate<Task,Task> () {
+    public static final BiPredicate<Task, Task> questionEquivalence = new BiPredicate<Task, Task>() {
 
         @Override
         public boolean test(Task a, Task b) {
@@ -40,10 +28,16 @@ public class DefaultConcept extends AtomConcept {
 //        @Override public int compare(Task task, Task t1) {  return 0;        }
 //        @Override public int hashCodeOf(Task task) { return task.hashCode(); }
     };
-
-    /** how incoming budget is merged into its existing duplicate quest/question */
+    /**
+     * how incoming budget is merged into its existing duplicate quest/question
+     */
     static final BudgetMerge duplicateQuestionMerge = BudgetMerge.plusDQDominated;
     private final Termed[] termLinkTemplates;
+
+    protected QuestionTaskTable questions = null;
+    protected QuestionTaskTable quests = null;
+    protected BeliefTable beliefs = null;
+    protected BeliefTable goals = null;
 
 
 //    public DefaultConcept(Term term, Memory p) {
@@ -52,35 +46,35 @@ public class DefaultConcept extends AtomConcept {
 
     /**
      * Constructor, called in Memory.getConcept only
+     *
      * @param term      A term corresponding to the concept
      * @param taskLinks
      * @param termLinks
      */
-    public DefaultConcept(Term term, Bag<Task> taskLinks, Bag<Termed> termLinks, Memory p) {
+    public DefaultConcept(Term term, Bag<Task> taskLinks, Bag<Termed> termLinks, Memory m) {
         super(term, termLinks, taskLinks);
 
-        //TODO lazy instantiate?
-        beliefs = new ArrayListBeliefTable(p.conceptBeliefsMax.intValue());
-        goals = new ArrayListBeliefTable(p.conceptGoalsMax.intValue());
+        //lazily instantiated
+        //beliefs = null; //new DefaultBeliefTable(m.conceptBeliefsMax.intValue(), m.duration());
+        //goals = null; //new DefaultBeliefTable(m.conceptGoalsMax.intValue(), m.duration());
 
-        int maxQuestions = p.conceptQuestionsMax.intValue();
+        int maxQuestions = m.conceptQuestionsMax.intValue();
         questions = new ArrayListTaskTable(maxQuestions);
         quests = new ArrayListTaskTable(maxQuestions);
 
-        this.termLinkTemplates = TermLinkBuilder.build(term, p);
-
+        this.termLinkTemplates = TermLinkBuilder.build(term, m);
     }
 
     /**
      * Pending Quests to be answered by new desire values
      */
     @Override
-    public final TaskTable getQuests() {
+    public final QuestionTaskTable getQuests() {
         return quests;
     }
 
     @Override
-    public final TaskTable getQuestions() {
+    public final QuestionTaskTable getQuestions() {
         return questions;
     }
 
@@ -101,8 +95,6 @@ public class DefaultConcept extends AtomConcept {
     public final BeliefTable getGoals() {
         return goals == null ? BeliefTable.EMPTY : goals;
     }
-
-
 
 
 //    /** updates the concept-has-questions index if the concept transitions from having no questions to having, or from having to not having */
@@ -164,23 +156,19 @@ public class DefaultConcept extends AtomConcept {
 //
 
 
-
-    /** attempt to insert a task.
+    /**
+     * attempt to insert a task.
      *
-     * @param c the concept in which this occurrs
+     * @param c   the concept in which this occurrs
      * @param nal
-     * @return:
-     *      the input value that was inserted, if it was added to the table
-     *      a previous stored task if this was a duplicate (table unchanged)
-     *      a new belief created from older ones which serves as a revision of what was input, if it was added to the table
-     *      null if it was discarded
-     *
+     * @return: the input value that was inserted, if it was added to the table
+     * a previous stored task if this was a duplicate (table unchanged)
+     * a new belief created from older ones which serves as a revision of what was input, if it was added to the table
+     * null if it was discarded
      */
 
 
-
-
-    Task add(TaskTable table, Task input, BiPredicate<Task,Task>  eq, BudgetMerge duplicateMerge, Memory memory) {
+    Task add(QuestionTaskTable table, Task input, BiPredicate<Task, Task> eq, BudgetMerge duplicateMerge, Memory memory) {
         return table.add(input, eq, duplicateMerge, memory);
     }
 
@@ -193,46 +181,35 @@ public class DefaultConcept extends AtomConcept {
      * @return Whether to continue the processing of the task
      */
     @Override
-    public boolean processBelief(Task belief, NAR nar) {
-
+    public Task processBelief(Task belief, NAR nar) {
 
         long now = nar.time();
         float successBefore = getSuccess(now);
 
-        if (beliefs == null) beliefs = new ArrayListBeliefTable(nar.memory.conceptBeliefsMax.intValue());
+        if (beliefs == null) beliefs = new DefaultBeliefTable(nar.memory.conceptBeliefsMax.intValue(), nar.memory.duration());
 
-        Task strongest = getBeliefs().add( belief,
-                new BeliefTable.SolutionQualityMatchingOrderRanker(belief, now),
-                this, nar.memory);
+        return getBeliefs().add(belief, nar.memory, (best) -> {
 
-        if (strongest == null || strongest.getDeleted()) {
-            return false;
-        }
+            if (hasQuestions()) {
+                //TODO move this to a subclass of TaskTable which is customized for questions. then an arraylist impl of TaskTable can iterate by integer index and not this iterator/lambda
+                getQuestions().forEach(question ->
+                        LocalRules.trySolution(question, best, nar, nar::input)
+                );
+            }
 
-        if(belief.isInput() && !belief.isEternal()) {
-            this.put(Anticipate.class, true);
-        }
+            /** update happiness meter on solution  TODO revise */
+            float successAfter = getSuccess(now);
+            float delta = successAfter - successBefore;
+            if (delta != 0) //more satisfaction of a goal due to belief, more happiness
+                nar.memory.emotion.happy(delta);
 
-        if (hasQuestions()) {
-            //TODO move this to a subclass of TaskTable which is customized for questions. then an arraylist impl of TaskTable can iterate by integer index and not this iterator/lambda
-            getQuestions().forEach( question ->
-                LocalRules.trySolution(question, strongest, nar, nar::input)
-                /*(s) -> {
-                    //..
-                }*/
-                //)
-            );
-        }
-        //}
+            nar.memory.eventConceptChanged.emit(DefaultConcept.this);
 
+        });
 
-        /** update happiness meter on solution  TODO revise */
-        float successAfter = getSuccess(now);
-        float delta = successAfter - successBefore;
-        if (delta!=0) //more satisfaction of a goal due to belief, more happiness
-            nar.memory.emotion.happy(delta);
-
-        return true;
+//        if (belief.isInput() && !belief.isEternal()) {
+//            this.put(Anticipate.class, true);
+//        }
     }
 
 
@@ -245,37 +222,31 @@ public class DefaultConcept extends AtomConcept {
      * @return Whether to continue the processing of the task
      */
     @Override
-    public boolean processGoal(Task goal, NAR nar) {
-
-        Task input = goal;
+    public Task processGoal(Task inputGoal, NAR nar) {
 
         Memory memory = nar.memory;
+
         long now = memory.time();
 
         float successBefore = getSuccess(now);
 
 
-        if (goals == null) goals = new ArrayListBeliefTable(nar.memory.conceptGoalsMax.intValue());
+        if (goals == null) goals = new DefaultBeliefTable(
+                nar.memory.conceptGoalsMax.intValue(), nar.memory.duration());
 
+        return getGoals().add(inputGoal, memory, (goal) -> {
 
-        goal = getGoals().add( goal,
-                new BeliefTable.SolutionQualityMatchingOrderRanker(goal, now),
-                this, memory);
-
-        if (goal==null) {
-            return false;
-        }
-        else {
             float successAfter = getSuccess(now);
             float delta = successBefore - successAfter;
 
             // less desire of a goal, more happiness
             memory.emotion.happy(goal.getExpectation() * -delta);
 
-            if (delta >= Global.EXECUTION_SATISFACTION_TRESHOLD) {
-                Truth projected = goal.projection(now, now);
-                if (projected.getExpectation() > Global.EXECUTION_DESIRE_EXPECTATION_THRESHOLD) {
-                    if (Op.isOperation(goal.term()) && (goal.getState() != Task.TaskState.Executed)) { //check here already
+            if (Op.isOperation(goal.term()) && (goal.getState() != Task.TaskState.Executed)) {
+                if (delta >= Global.EXECUTION_SATISFACTION_TRESHOLD) {
+                    //Truth projected = goal.projection(now, now);
+                    if (goal.getExpectation() > Global.EXECUTION_DESIRE_EXPECTATION_THRESHOLD) {
+
 
 //                        LongHashSet ev = this.lastevidence;
 //
@@ -283,7 +254,7 @@ public class DefaultConcept extends AtomConcept {
 //                        //then there is no need to execute
 //                        //which means only execute if there is new evidence which suggests doing so1
 //                        if (ev.addAll(input.getEvidence())) {
-                            nar.execute(goal);
+                        nar.execute(goal);
 
 //                            //TODO more efficient size limiting
 //                            //lastevidence.toSortedList()
@@ -294,14 +265,11 @@ public class DefaultConcept extends AtomConcept {
                     }
                 }
             }
+        });
 
 
-            return true;
-
-        }
-
-            //long then = goal.getOccurrenceTime();
-            //int dur = nal.duration();
+        //long then = goal.getOccurrenceTime();
+        //int dur = nal.duration();
 
 //        //this task is not up to date (now is ahead of then) we have to project it first
 //        if(TemporalRules.after(then, now, dur)) {
@@ -393,7 +361,7 @@ public class DefaultConcept extends AtomConcept {
     /**
      * To answer a quest or q by existing beliefs
      *
-     * @param q The task to be processed
+     * @param q    The task to be processed
      * @param task
      * @param nar
      * @return true if the quest/question table changed
@@ -401,13 +369,13 @@ public class DefaultConcept extends AtomConcept {
     @Override
     public boolean processQuestion(Task q, NAR nar) {
 
-        final TaskTable table;
+        final QuestionTaskTable table;
         if (q.isQuestion()) {
-            if (questions == null) questions = new ArrayListBeliefTable(nar.memory.conceptQuestionsMax.intValue());
+            if (questions == null) questions = new ArrayListTaskTable(nar.memory.conceptQuestionsMax.intValue());
             table = getQuestions();
 
-        } else  { // else if (q.isQuest())
-            if (quests == null) quests = new ArrayListBeliefTable(nar.memory.conceptQuestionsMax.intValue());
+        } else { // else if (q.isQuest())
+            if (quests == null) quests = new ArrayListTaskTable(nar.memory.conceptQuestionsMax.intValue());
             table = getQuests();
         }
 
@@ -425,15 +393,14 @@ public class DefaultConcept extends AtomConcept {
         //boolean tableAffected = false;
 
 
-            //boolean newQuestion = table.isEmpty();
+        //boolean newQuestion = table.isEmpty();
 
         Task match = add(table, q, questionEquivalence, duplicateQuestionMerge, nar.memory);
         if (match == q) {
             //final int presize = getQuestions().size() + getQuests().size();
             //onTableUpdated(q.getPunctuation(), presize);
             //tableAffected = true;
-        }
-        else {
+        } else {
             q = match; //try solution with the original question
         }
 
@@ -445,7 +412,7 @@ public class DefaultConcept extends AtomConcept {
                 getGoals().top(now) :
                 getBeliefs().top(now);
 
-        if (sol!=null) {
+        if (sol != null) {
 
             if (sol.getDeleted()) {
                 //throw new RuntimeException("can not try solution on deleted task: " + sol);
@@ -513,8 +480,6 @@ public class DefaultConcept extends AtomConcept {
 //    }
 
 
-
-
     //
 //    public Collection<Sentence> getSentences(char punc) {
 //        switch(punc) {
@@ -563,7 +528,6 @@ public class DefaultConcept extends AtomConcept {
 //
 //        return true;
 //    }
-
 
 
 //    /**
@@ -682,7 +646,8 @@ public class DefaultConcept extends AtomConcept {
 //        return true;
 //    }
 
-    @Override public Termed[] getTermLinkTemplates() {
+    @Override
+    public Termed[] getTermLinkTemplates() {
         return termLinkTemplates;
     }
 
@@ -695,29 +660,34 @@ public class DefaultConcept extends AtomConcept {
      *
      * @return whether it was processed
      */
-    public boolean process(final Task task, NAR nar) {
+    public final Task process(final Task task, NAR nar) {
 
         task.onConcept(this);
 
-        //LogicMeter logicMeter = nar.memory.logic;
-
         switch (task.getPunctuation()) {
             case Symbols.JUDGMENT:
-                return processBelief(task, nar );
+                return processBelief(task, nar);
+
             case Symbols.GOAL:
                 return processGoal(task, nar);
+
             case Symbols.QUESTION:
-                return processQuestion(task, nar );
+                if (processQuestion(task, nar))
+                    return task;
+                break;
+
             case Symbols.QUEST:
-                return processQuest(task,nar );
+                if (processQuest(task, nar))
+                    return task;
+
+                break;
+
             default:
                 throw new RuntimeException("Invalid sentence type: " + task);
         }
 
-        //logicMeter.process(task).hit();
+        return null;
     }
-
-
 
 
 }

@@ -13,6 +13,8 @@ import nars.truth.Truth;
 
 import javax.annotation.Nullable;
 
+import static nars.Global.reference;
+
 /**
  * Mutable task with additional fluent api utility methods
  */
@@ -157,24 +159,30 @@ public class MutableTask extends AbstractTask {
     }
 
 
-    public MutableTask parent(Task parentTask, Task parentBelief) {
+    public final MutableTask parent(Task parentTask, Task parentBelief) {
         if (parentTask == null)
             throw new RuntimeException("parent task being set to null");
 
-        setParentTask(parentTask);
-        setParentBelief(parentBelief);
+        Task previousParent = getParentTask();
+        Task previousBelief = getParentBelief();
+
+        this.parentTask = reference(parentTask);
+        this.parentBelief = reference(parentBelief);
+
+        if (parentTask!=previousParent || parentBelief!=previousBelief)
+            updateEvidence();
+
         return this;
     }
 
 
-    public MutableTask occurr(long occurrenceTime) {
+    public final MutableTask occurr(long occurrenceTime) {
         setOccurrenceTime(occurrenceTime);
         return this;
     }
 
-    public MutableTask parent(Task task) {
-        parent(task, null);
-        return this;
+    public final MutableTask parent(Task task) {
+        return parent(task, null);
     }
 
     /**
