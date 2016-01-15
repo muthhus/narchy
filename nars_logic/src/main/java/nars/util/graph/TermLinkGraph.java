@@ -116,7 +116,7 @@ public class TermLinkGraph extends DirectedPseudograph<Term, String> {
         Bag<Termed> tl = c.getTermLinks();
         if (tl == null) return;
 
-        for (Termed tt : tl.values()) {
+        for (Termed tt : tl) {
             Term target = tt.term();
             if (!containsVertex(target)) {
                 addVertex(target);

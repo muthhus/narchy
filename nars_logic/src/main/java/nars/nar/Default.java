@@ -121,38 +121,38 @@ public class Default extends AbstractNAR {
         return new CurveBag<Concept>(initialCapacity, rng).mergePlus();
     }
 
-    public Bag<Concept> newConceptBagAggregateLinks(int initialCapacity) {
-        return new CurveBag<Concept>(initialCapacity, rng) {
-
-            @Override public BLink<Concept> put(Object v) {
-                BLink<Concept> b = get(v);
-                Concept c = (Concept) v;
-                if (b==null)
-                    b = new BLink(c, 0,1,1);
-
-                c.getTaskLinks().commit();
-                c.getTermLinks().commit();
-
-                float p =
-                        //Math.max(
-                        //c.getTaskLinks().getSummarySum()/taskLinkBagSize
-                        //(
-                        //c.getTaskLinks().getSummaryMean()
-                        //+c.getTermLinks().getSummaryMean()) * 0.5f
-                        c.getTaskLinks().getPriorityMax()
-
-                        // c.getTermLinks().getPriorityMax()
-
-                        //)
-                        ;
-
-                b.budget(p, 1f, 1f);
-
-                return put(c, b);
-            }
-
-        }.mergeNull();
-    }
+//    public Bag<Concept> newConceptBagAggregateLinks(int initialCapacity) {
+//        return new CurveBag<Concept>(initialCapacity, rng) {
+//
+//            @Override public BLink<Concept> put(Object v) {
+//                BLink<Concept> b = get(v);
+//                Concept c = (Concept) v;
+//                if (b==null)
+//                    b = new BLink(c, 0,1,1);
+//
+//                c.getTaskLinks().commit();
+//                c.getTermLinks().commit();
+//
+//                float p =
+//                        //Math.max(
+//                        //c.getTaskLinks().getSummarySum()/taskLinkBagSize
+//                        //(
+//                        //c.getTaskLinks().getSummaryMean()
+//                        //+c.getTermLinks().getSummaryMean()) * 0.5f
+//                        c.getTaskLinks().getPriorityMax()
+//
+//                        // c.getTermLinks().getPriorityMax()
+//
+//                        //)
+//                        ;
+//
+//                b.budget(p, 1f, 1f);
+//
+//                return put(c, b);
+//            }
+//
+//        }.mergeNull();
+//    }
 
 
     @Override public float conceptPriority(Termed termed, float priIfNonExistent) {
@@ -178,7 +178,7 @@ public class Default extends AbstractNAR {
     }
 
 
-    public static final Predicate<BLink> simpleForgetDecay = (b) -> {
+    public static final Predicate<BLink<?>> simpleForgetDecay = (b) -> {
         float p = b.getPriority() * 0.95f;
         if (p > b.getQuality()*0.1f)
             b.setPriority(p);
@@ -245,7 +245,9 @@ public class Default extends AbstractNAR {
 
         final List<BLink<Concept>> firing = Global.newArrayList(1);
 
-        private final AlannForget linkForget, conceptForget;
+        private final AlannForget<Task> taskLinkForget;
+        private final AlannForget<Termed> termLinkForget;
+        private final AlannForget<Concept> conceptForget;
 
         //cached
         private transient int termlnksToFire, tasklinksToFire;
@@ -278,7 +280,8 @@ public class Default extends AbstractNAR {
                 m.eventReset.on((mem) -> onReset())
             );
 
-            linkForget = new AlannForget(nar, m.linkForgetDurations, perfection);
+            taskLinkForget = new AlannForget(nar, m.linkForgetDurations, perfection);
+            termLinkForget = new AlannForget(nar, m.linkForgetDurations, perfection);
             conceptForget = new AlannForget(nar, m.conceptForgetDurations, perfection);
         }
 
@@ -353,13 +356,14 @@ public class Default extends AbstractNAR {
                 tasklinksToFire,
                 termlnksToFire,
                 //simpleForgetDecay
-                linkForget
+                termLinkForget,
+                taskLinkForget
             );
 
             //activate(c);
         }
 
-        final static class AlannForget implements Consumer<BLink>, Predicate<BLink> {
+        final static class AlannForget<X> implements Consumer<BLink<X>>, Predicate<BLink<X>> {
 
             private final MutableFloat forgetTime;
             private final MutableFloat perfection;

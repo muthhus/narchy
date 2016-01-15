@@ -1,8 +1,5 @@
 package nars.util;
 
-import nars.budget.BudgetMerge;
-
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -12,7 +9,7 @@ import java.util.function.Supplier;
 /**
  * adapter to a Map for coordinating changes in a Map with another Collection
  */
-public abstract class CollectorMap<K, V extends Supplier<K>> implements Serializable {
+public abstract class CollectorMap<K, V extends Supplier<K>>  {
 
     public final Map<K, V> map;
 
@@ -24,8 +21,6 @@ public abstract class CollectorMap<K, V extends Supplier<K>> implements Serializ
     public String toString() {
         return map.toString();
     }
-
-    public abstract BudgetMerge getMerge();
 
     /**
      * implementation for adding the value to another collecton (called internally)

@@ -27,7 +27,7 @@ import java.util.function.Predicate;
  * <p>
  * TODO make a CurveSampling interface with at least 2 implementations: Random and LinearScanning. it will use this instead of the 'boolean random' constructor argument
  */
-public class CurveBag<V> extends Bag<V> {
+public class CurveBag<V> implements Bag<V> {
 
     final ArrayBag<V> arrayBag;
 
@@ -68,11 +68,19 @@ public class CurveBag<V> extends Bag<V> {
     }
 
 
-    @Override
-    public CurveBag<V> setMergeFunction(BudgetMerge mergeFunction) {
-        arrayBag.setMergeFunction(mergeFunction);
-        return this;
+    /**
+     * set the merging function to 'plus'
+     */
+    @Deprecated public Bag<V> mergePlus() {
+        return arrayBag.setMergeFunction(BudgetMerge.plusDQDominated);
     }
+
+
+//    @Override
+//    public CurveBag<V> setMergeFunction(BudgetMerge mergeFunction) {
+//        arrayBag.setMergeFunction(mergeFunction);
+//        return this;
+//    }
 
     @Override
     public BLink<V> pop() {
@@ -111,14 +119,14 @@ public class CurveBag<V> extends Bag<V> {
 
 
     @Override
-    public final void topWhile(Predicate<BLink> each) {
+    public final void topWhile(Predicate each) {
         arrayBag.topWhile(each);
     }
 
     /** optimized batch fill, using consecutive array elements, also ensuring uniqueness
      * returns the instance for fluentcy
      * */
-    @Override public CurveBag<V> sample(int n, Predicate<BLink> each, Collection<BLink<V>> target) {
+    @Override public CurveBag<V> sample(int n, Predicate<BLink<V>> each, Collection<BLink<V>> target) {
 
         int ss = size();
         final int begin, end;
@@ -354,10 +362,10 @@ public class CurveBag<V> extends Bag<V> {
 //        return next; //# of items actually filled in the array
 //    }
 
-    @Override public final void top(Consumer<BLink> each) {
+    @Override public final void top(Consumer each) {
         arrayBag.top(each);
     }
-    @Override public void topN(int limit, Consumer<BLink> each) {
+    @Override public void topN(int limit, Consumer each) {
         arrayBag.topN(limit, each);
     }
 
@@ -376,9 +384,6 @@ public class CurveBag<V> extends Bag<V> {
         arrayBag.validate();
     }
 
-    public SortedIndex<BLink<V>> getItems() {
-        return arrayBag.items;
-    }
 
     public BLink<V> get(int i) {
         return arrayBag.getItem(i);

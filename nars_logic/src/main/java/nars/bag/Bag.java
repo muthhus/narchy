@@ -1,8 +1,7 @@
 package nars.bag;
 
-import nars.bag.impl.AbstractCacheBag;
+import nars.bag.impl.Table;
 import nars.budget.Budget;
-import nars.budget.BudgetMerge;
 import nars.util.data.Util;
 
 import java.io.PrintStream;
@@ -19,23 +18,23 @@ import java.util.function.Supplier;
  * TODO remove unnecessary methods, documetn
  * TODO implement java.util.Map interface
  */
-public abstract class Bag<V> extends AbstractCacheBag<V, BLink<V>> implements Consumer<V>, Supplier<BLink<V>>, Iterable<V> {
+public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<V>>, Iterable<V> {
 
 
-    protected BudgetMerge mergeFunction = null;
+
 
 
     /**
      * returns the bag to an empty state
      */
     @Override
-    public abstract void clear();
+    void clear();
 
     /**
      * gets the next value without removing changing it or removing it from any index.  however
      * the bag is cycled so that subsequent elements are different.
      */
-    public abstract BLink<V> sample();
+    BLink<V> sample();
 
 
     /**
@@ -45,24 +44,24 @@ public abstract class Bag<V> extends AbstractCacheBag<V, BLink<V>> implements Co
      * @return
      */
     @Override
-    public abstract BLink<V> remove(V key);
+    BLink<V> remove(V key);
 
 
     /**
      * put with an empty budget
      */
-    public abstract BLink<V> put(Object newItem);
+    BLink<V> put(Object newItem);
 
-    public final BLink<V> put(Object i, Budget b) {
+    default BLink<V> put(Object i, Budget b) {
         return put(i, b, 1f);
     }
 
     @Override
-    public BLink<V> put(V v, BLink<V> b) {
+    default BLink<V> put(V v, BLink<V> b) {
         return put(v, b, 1f);
     }
 
-    public abstract BLink<V> put(Object i, Budget b, float scale);
+    BLink<V> put(Object i, Budget b, float scale);
 
 
 
@@ -75,11 +74,11 @@ public abstract class Bag<V> extends AbstractCacheBag<V, BLink<V>> implements Co
 //        top(c -> (each.test(c) && (toFire[0]--) > 0));
 
 
-    public void sample(int n, Collection<BLink<V>> target) {
+    default void sample(int n, Collection<BLink<V>> target) {
         sample(n, null, target);
     }
 
-    public abstract Bag<V> sample(int n, Predicate<BLink> each, Collection<BLink<V>> target);
+    Bag<V> sample(int n, Predicate<BLink<V>> each, Collection<BLink<V>> target);
 //    /**
 //     * fills a collection with at-most N items, if an item passes the predicate.
 //     * returns how many items added
@@ -96,30 +95,6 @@ public abstract class Bag<V> extends AbstractCacheBag<V, BLink<V>> implements Co
 //    }
 
 
-    public Bag<V> setMergeFunction(BudgetMerge mergeFunction) {
-        this.mergeFunction = mergeFunction;
-        return this;
-    }
-
-
-    /**
-     * set the merging function to 'plus'
-     */
-    public Bag<V> mergePlus() {
-        return setMergeFunction(BudgetMerge.plusDQDominated);
-    }
-
-    /**
-     * sets a null merge function, which can be used to detect
-     * merging which should not happen (it will throw null pointer exception)
-     */
-    public Bag<V> mergeNull() {
-        return setMergeFunction(null);
-    }
-
-    protected final void merge(Budget target, Budget incoming, float scale) {
-        mergeFunction.merge(target, incoming, scale);
-    }
 
 //    /**
 //     * Get an Item by key
@@ -132,7 +107,7 @@ public abstract class Bag<V> extends AbstractCacheBag<V, BLink<V>> implements Co
 
 //    public abstract Set<K> keySet();
 
-    public abstract int capacity();
+    int capacity();
 
     /**
      * Choose an Item according to distribution policy and take it out of the Bag
@@ -140,27 +115,24 @@ public abstract class Bag<V> extends AbstractCacheBag<V, BLink<V>> implements Co
      *
      * @return The selected Item, or null if this bag is empty
      */
-    public abstract BLink<V> pop();
+    BLink<V> pop();
 
     /**
      * The number of items in the bag
      *
      * @return The number of items
      */
-    @Override
-    public abstract int size();
+    @Override int size();
 
-    public Iterable<V> values() {
-        return this;
-    }
 
-    public float getPriorityMean() {
+
+    default float getPriorityMean() {
         int s = size();
         if (s == 0) return 0;
         return getPrioritySum() / s;
     }
 
-    public float getSummaryMean() {
+    default float getSummaryMean() {
         int s = size();
         if (s == 0) return 0;
         return getSummarySum() / s;
@@ -176,7 +148,7 @@ public abstract class Bag<V> extends AbstractCacheBag<V, BLink<V>> implements Co
      * forEach may be used to avoid allocation of iterator instances
      */
     @Override
-    public abstract Iterator<V> iterator();
+    Iterator<V> iterator();
 
     /**
      * Check if an item is in the bag.  both its key and its value must match the parameter
@@ -184,7 +156,7 @@ public abstract class Bag<V> extends AbstractCacheBag<V, BLink<V>> implements Co
      * @param it An item
      * @return Whether the Item is in the Bag
      */
-    public boolean contains(V it) {
+    default boolean contains(V it) {
         return get(it) != null;
     }
 
@@ -207,13 +179,13 @@ public abstract class Bag<V> extends AbstractCacheBag<V, BLink<V>> implements Co
     /**
      * commits the next set of changes and updates any sorting
      */
-    public abstract void commit();
+    void commit();
 
     /**
      * implements the Consumer<V> interface; invokes a put()
      */
     @Override
-    public final void accept(V v) {
+    default void accept(V v) {
         put(v);
     }
 
@@ -221,19 +193,17 @@ public abstract class Bag<V> extends AbstractCacheBag<V, BLink<V>> implements Co
      * implements the Supplier<V> interface; invokes a remove()
      */
     @Override
-    public final BLink<V> get() {
+    default BLink<V> get() {
         return pop();
     }
 
-    public final boolean isEmpty() {
-        return size() == 0;
-    }
 
-    public void printAll() {
+
+    default void printAll() {
         printAll(System.out);
     }
 
-    public void printAll(PrintStream p) {
+    default void printAll(PrintStream p) {
         top(b -> p.println(b.toBudgetString() + ' ' + b.get()));
     }
 
@@ -243,32 +213,17 @@ public abstract class Bag<V> extends AbstractCacheBag<V, BLink<V>> implements Co
      */
     //by default this will use iterator().forEach() but this can be used to make sure each implementation offers its best
     //@Override abstract public void forEach(final Consumer<? super V> action);
-    public float getPrioritySum() {
+    default float getPrioritySum() {
         float[] total = {0};
         top(v -> total[0] += v.getPriority());
         return total[0];
     }
 
-    public float getSummarySum() {
+    default float getSummarySum() {
         float[] total = {0};
         top(v -> total[0] += v.summary());
         return total[0];
     }
-
-    public void top(Consumer<BLink> each) {
-        topWhile(e -> {
-            each.accept(e);
-            return true;
-        });
-    }
-
-    /**
-     * if predicate evaluates false, it terminates the iteration
-     */
-    public abstract void topWhile(Predicate<BLink> each);
-
-    //TODO provide default impl
-    public abstract void topN(int limit, Consumer<BLink> each);
 
 
 //    final public int forgetNext(float forgetCycles, final V[] batch, final long now) {
@@ -283,15 +238,12 @@ public abstract class Bag<V> extends AbstractCacheBag<V, BLink<V>> implements Co
 //    }
 
 
-    @Override
-    public String toString() {
-        return getClass().getSimpleName();// + "(" + size() + "/" + getCapacity() +")";
-    }
+
 
     /**
      * slow, probably want to override in subclasses
      */
-    public float getPriorityMin() {
+    default float getPriorityMin() {
         float[] min = {Float.POSITIVE_INFINITY};
         top(b -> {
             float p = b.getPriority();
@@ -303,7 +255,7 @@ public abstract class Bag<V> extends AbstractCacheBag<V, BLink<V>> implements Co
     /**
      * slow, probably want to override in subclasses
      */
-    public float getPriorityMax() {
+    default float getPriorityMax() {
         float[] max = {Float.NEGATIVE_INFINITY};
         top(b -> {
             float p = b.getPriority();
@@ -316,7 +268,7 @@ public abstract class Bag<V> extends AbstractCacheBag<V, BLink<V>> implements Co
     /**
      * default implementation; more optimal implementations will avoid instancing an iterator
      */
-    public void forEach(int max, Consumer<? super V> action) {
+    default void forEach(int max, Consumer<? super V> action) {
 
         Iterator<V> ii = iterator();
         int n = 0;
@@ -327,7 +279,7 @@ public abstract class Bag<V> extends AbstractCacheBag<V, BLink<V>> implements Co
     }
 
 
-    public abstract void setCapacity(int c);
+    void setCapacity(int c);
 
 
 //    /**
@@ -410,11 +362,11 @@ public abstract class Bag<V> extends AbstractCacheBag<V, BLink<V>> implements Co
 //        }
 //    }
 
-    public double[] getPriorityHistogram(int bins) {
+    default double[] getPriorityHistogram(int bins) {
         return getPriorityHistogram(new double[bins]);
     }
 
-    public double[] getPriorityHistogram(double[] x) {
+    default double[] getPriorityHistogram(double[] x) {
         int bins = x.length;
         top(budget -> {
             float p = budget.getPriority();

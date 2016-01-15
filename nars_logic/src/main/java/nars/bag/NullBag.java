@@ -10,7 +10,7 @@ import java.util.function.Predicate;
 /**
  * Bag which holds nothing
  */
-public final class NullBag<V> extends Bag<V> {
+public final class NullBag<V> implements Bag<V> {
 
     @Override
     public void clear() {
@@ -43,7 +43,7 @@ public final class NullBag<V> extends Bag<V> {
     }
 
     @Override
-    public NullBag<V> sample(int n, Predicate<BLink> each, Collection<BLink<V>> target) {
+    public NullBag<V> sample(int n, Predicate<BLink<V>> each, Collection<BLink<V>> target) {
         throw new RuntimeException("unimpl");
     }
 
@@ -73,17 +73,17 @@ public final class NullBag<V> extends Bag<V> {
     }
 
     @Override
-    public void top(Consumer<BLink> each) {
+    public void top(Consumer<BLink<V>> each) {
 
     }
 
     @Override
-    public void topWhile(Predicate<BLink> each) {
+    public void topWhile(Predicate<BLink<V>> each) {
 
     }
 
     @Override
-    public void topN(int limit, Consumer<BLink> each) {
+    public void topN(int limit, Consumer<BLink<V>> each) {
 
     }
 

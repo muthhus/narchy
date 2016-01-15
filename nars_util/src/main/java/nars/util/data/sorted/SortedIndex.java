@@ -2,7 +2,6 @@ package nars.util.data.sorted;
 
 
 import java.io.PrintStream;
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -11,7 +10,7 @@ import java.util.List;
  * Stores items with highest priority at index = 0,
  * lowest = size()-1
  */
-public abstract class SortedIndex<T> implements Collection<T>, Serializable {
+public abstract class SortedIndex<T> implements Collection<T> {
 
     @Override
     public boolean add(T t) {

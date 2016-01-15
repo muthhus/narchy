@@ -1,11 +1,9 @@
 package nars.bag;
 
 import nars.budget.Budget;
-import nars.data.BudgetedStruct;
 import nars.budget.UnitBudget;
+import nars.data.BudgetedStruct;
 import nars.nal.nal7.Tense;
-
-import java.util.function.Supplier;
 
 import static nars.util.data.Util.clamp;
 
@@ -16,7 +14,7 @@ import static nars.util.data.Util.clamp;
  * Acts as a "budget vector" containing an accumulating delta
  * that can be commit()'d on the next udpate
  */
-public final class BLink<X> extends Budget implements Supplier<X> {
+public final class BLink<X> extends Budget implements Link<X> {
 
     private final float[] b = new float[6];
     public final X id;
@@ -74,8 +72,12 @@ public final class BLink<X> extends Budget implements Supplier<X> {
         clearDelta();
     }
 
+    @Override public final float getScore() {
+        return getPriority();
+    }
+
     @Override
-    public float getPriority() {
+    public final float getPriority() {
         return b[0];
     }
 

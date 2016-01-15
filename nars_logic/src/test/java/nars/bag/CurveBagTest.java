@@ -40,7 +40,11 @@ public class CurveBagTest  {
     }
 
     public void testBasicInsertionRemoval(Bag<String> c) {
-        c.mergePlus();
+        //HACK
+        if (c instanceof CurveBag)
+            ((CurveBag)c).mergePlus();
+        else
+            ((ArrayBag)c).mergePlus();
 
         assertEquals(1, c.capacity());
         assertEquals(0, c.size());

@@ -5,7 +5,6 @@ import nars.NAR;
 import nars.bag.BLink;
 import nars.concept.Concept;
 import nars.nal.PremiseMatch;
-import nars.nar.Default;
 import nars.process.ConceptProcess;
 import nars.task.Task;
 import nars.term.Termed;
@@ -86,16 +85,18 @@ public class Derivelet {
             NAR nar,
             Consumer<ConceptProcess> proc,
             BLink<Concept> conceptLink,
-            int tasklinks, int termlinks, Predicate<BLink> each) {
+            int tasklinks, int termlinks,
+            Predicate<BLink<Termed>> eachTermLink,
+            Predicate<BLink<Task>> eachTaskLink) {
 
         Concept concept = conceptLink.get();
 
         Set<BLink<Task>> tasksBuffer = this.tasks;
-        concept.getTaskLinks().sample(tasklinks, each, tasksBuffer).commit();
+        concept.getTaskLinks().sample(tasklinks, eachTaskLink, tasksBuffer).commit();
         if (tasksBuffer.isEmpty()) return 0;
 
         Set<BLink<Termed>> termsBuffer = this.terms;
-        concept.getTermLinks().sample(termlinks, each, termsBuffer).commit();
+        concept.getTermLinks().sample(termlinks, eachTermLink, termsBuffer).commit();
         if (termsBuffer.isEmpty()) return 0;
 
         //convert to array for fast for-within-for iterations
@@ -177,7 +178,8 @@ public class Derivelet {
         int fired = firePremiseSquare(context.nar,
                 perPremise, this.concept,
                 tasklinks, termlinks,
-                Default.simpleForgetDecay
+                null, //Default.simpleForgetDecay,
+                null //Default.simpleForgetDecay
         );
 
         return fired > 0;
