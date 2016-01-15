@@ -186,9 +186,13 @@ public class DefaultConcept extends AtomConcept {
         long now = nar.time();
         float successBefore = getSuccess(now);
 
-        if (beliefs == null) beliefs = new DefaultBeliefTable(nar.memory.conceptBeliefsMax.intValue(), nar.memory.duration());
+        Memory memory = nar.memory;
 
-        return getBeliefs().add(belief, nar.memory, (best) -> {
+        BeliefTable beliefs = this.beliefs;
+        if (beliefs == null)
+            beliefs = this.beliefs = new DefaultBeliefTable(memory.conceptBeliefsMax.intValue(), memory);
+
+        return beliefs.add(belief, memory, (best) -> {
 
             if (hasQuestions()) {
                 //TODO move this to a subclass of TaskTable which is customized for questions. then an arraylist impl of TaskTable can iterate by integer index and not this iterator/lambda
@@ -201,9 +205,9 @@ public class DefaultConcept extends AtomConcept {
             float successAfter = getSuccess(now);
             float delta = successAfter - successBefore;
             if (delta != 0) //more satisfaction of a goal due to belief, more happiness
-                nar.memory.emotion.happy(delta);
+                memory.emotion.happy(delta);
 
-            nar.memory.eventConceptChanged.emit(DefaultConcept.this);
+            memory.eventConceptChanged.emit(DefaultConcept.this);
 
         });
 
@@ -232,7 +236,7 @@ public class DefaultConcept extends AtomConcept {
 
 
         if (goals == null) goals = new DefaultBeliefTable(
-                nar.memory.conceptGoalsMax.intValue(), nar.memory.duration());
+                nar.memory.conceptGoalsMax.intValue(), memory);
 
         return getGoals().add(inputGoal, memory, (goal) -> {
 

@@ -6,8 +6,8 @@ import nars.Global;
 import nars.Memory;
 import nars.bag.impl.ArrayTable;
 import nars.nal.LocalRules;
+import nars.nal.nal7.Tense;
 import nars.task.Task;
-import nars.truth.TruthFunctions;
 import nars.util.ArraySortedIndex;
 
 import java.util.HashMap;
@@ -26,19 +26,47 @@ public class DefaultBeliefTable implements BeliefTable {
     final ArrayTable<Task,Task> temporal;
 
     private long now; //cached value, updated before temporal operations begin
+    private long minT, maxT, tRange;
 
-    public DefaultBeliefTable(int cap, int dur) {
+    public DefaultBeliefTable(int cap, Memory memory) {
         super();
 
         this.map = new HashMap(cap/2);
+        this.now = memory.time();
+        this.minT = this.maxT = Tense.TIMELESS;
+        this.tRange = 1;
 
         if (cap == 1) cap = 2;
         eternal = new SetTable<Task>(cap/2, map,
             b -> b.getConfidence()
         );
         temporal = new SetTable<Task>(cap/2, map,
-            b -> b.getConfidence()/(1+Math.abs(b.getOccurrenceTime() - now)/dur)
+            b -> rankTemporal(b, now)
         );
+    }
+
+    void updateTime(long now, boolean updateRange) {
+        this.now = now;
+        if (updateRange) {
+            if (temporal.isEmpty()) {
+                tRange = 1;
+                minT = maxT = Tense.TIMELESS;
+            }
+            minT = Long.MAX_VALUE;
+            maxT = Long.MIN_VALUE;
+            for (Task x : temporal) {
+                long o = x.getOccurrenceTime();
+                if (o > maxT) maxT = o;
+                if (o < minT) minT = o;
+            }
+            tRange = Math.max(1, maxT - minT);
+
+        }
+    }
+
+
+    public float rankTemporal(Task b, long when) {
+        return b.getConfidence()/(1+Math.abs(b.getOccurrenceTime() - when)/tRange);
     }
 
     @Override
@@ -97,10 +125,11 @@ public class DefaultBeliefTable implements BeliefTable {
         List<? extends Task> l = temporal.items.getList();
         for (int i = 0; i < l.size(); i++) {
             Task x = l.get(i);
-            float r = x.getConfidence() * TruthFunctions.temporalProjectionRank(1, x.getOccurrenceTime(), when);
+            float r = rankTemporal(x, when);
             if ((r > bestRank) ||
                     //tie-breaker: closer to the target time
-                    ((r == bestRank) && (Math.abs(when - best.getOccurrenceTime()) < Math.abs(when - x.getOccurrenceTime())))) {
+                    ((r == bestRank) &&
+                        (Math.abs(when - best.getOccurrenceTime()) < Math.abs(when - x.getOccurrenceTime())))) {
                 best = x;
                 bestRank = r;
             }
@@ -177,6 +206,7 @@ public class DefaultBeliefTable implements BeliefTable {
                     input;
 
             onBeliefChanged.accept(result);
+            updateTime(now, !eternal);
         }
 
         return result;
@@ -227,6 +257,57 @@ public class DefaultBeliefTable implements BeliefTable {
 
     private ArrayTable<Task, Task> getTableFor(Task t) {
         return t.isEternal() ? this.eternal : this.temporal;
+    }
+
+
+
+
+    private static void onBeliefRemoved(Task t, String reason, Memory memory) {
+        memory.remove(t, reason);
+    }
+
+    static void checkForDeleted(Task input, ArrayTable<Task,Task> table) {
+        if (input.getDeleted())
+            throw new RuntimeException("deleted task being added");
+
+        table.forEach((Task dt) -> {
+//            if (dt == null)
+//                throw new RuntimeException("wtf");
+            if (dt.getDeleted()) {
+                throw new RuntimeException(
+                        //System.err.println(
+                        "deleted tasks should not be present in belief tables: " + dt);
+                //System.err.println(dt.getExplanation());
+                //remove(i);
+                //i--;
+//
+            }
+        });
+    }
+
+    final static class SetTable<T> extends ArrayTable<T,T> {
+        public SetTable(int cap, Map<T,T> index, FloatFunction<T> score) {
+            super(new LambdaSortedIndex(cap, score), index);
+        }
+
+        @Override
+        public T key(T t) {
+            return t;
+        }
+
+    }
+
+    final static class LambdaSortedIndex<T> extends ArraySortedIndex<T> {
+        private final FloatFunction<T> score;
+
+        public LambdaSortedIndex(int cap, FloatFunction<T> score) {
+            super(cap);
+            this.score = score;
+        }
+
+        @Override public float score(T b) {
+            return score.floatValueOf(b);
+        }
     }
 
 
@@ -285,45 +366,6 @@ public class DefaultBeliefTable implements BeliefTable {
 //        add(i, input);
 //        return true;
 //    }
-
-    private static void onBeliefRemoved(Task t, String reason, Memory memory) {
-        memory.remove(t, reason);
-    }
-
-    static void checkForDeleted(Task input, ArrayTable<Task,Task> table) {
-        if (input.getDeleted())
-            throw new RuntimeException("deleted task being added");
-
-        table.forEach((Task dt) -> {
-//            if (dt == null)
-//                throw new RuntimeException("wtf");
-            if (dt.getDeleted()) {
-                throw new RuntimeException(
-                        //System.err.println(
-                        "deleted tasks should not be present in belief tables: " + dt);
-                //System.err.println(dt.getExplanation());
-                //remove(i);
-                //i--;
-//
-            }
-        });
-    }
-
-    final static class SetTable<T> extends ArrayTable<T,T> {
-        public SetTable(int cap, Map<T,T> index, FloatFunction<T> score) {
-            super(new ArraySortedIndex<T>(cap) {
-                @Override public float score(T b) {
-                    return score.floatValueOf(b);
-                }
-            }, index);
-        }
-
-        @Override
-        public T key(T t) {
-            return t;
-        }
-    }
-
 
 //TODO provide a projected belief
 //
