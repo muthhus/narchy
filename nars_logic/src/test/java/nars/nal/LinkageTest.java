@@ -2,6 +2,7 @@ package nars.nal;
 
 import com.google.common.collect.Lists;
 import nars.NAR;
+import nars.bag.BLink;
 import nars.concept.Concept;
 import nars.nar.AbstractNAR;
 import nars.nar.Default;
@@ -64,8 +65,8 @@ public class LinkageTest extends AbstractNALTester {
 
     public boolean isPassed2(String premise1, Concept ret2, boolean passed2) {
         if(ret2!=null){// && ret2.getTermLinks()!=null) {
-            for (Termed entry : ret2.getTermLinks()) {
-                Term w = entry.term();
+            for (BLink<Termed> entry : ret2.getTermLinks()) {
+                Term w = entry.get().term();
                 if (w.toString().equals(premise1)) {
                     passed2 = true;
                 }
@@ -141,17 +142,17 @@ public class LinkageTest extends AbstractNALTester {
     public boolean linksIndirectly(NAR nar, Term premise2, Concept ret) {
         boolean passed = false;
         if(ret!=null && ret.getTermLinks()!=null) {
-            for (Termed entry : ret.getTermLinks()) {
-                if(entry.term().equals(premise2.term())) {
+            for (BLink<Termed> entry : ret.getTermLinks()) {
+                if(entry.get().term().equals(premise2.term())) {
                     passed = true;
                     break;
                 }
 
-                Term w = entry.term();
+                Term w = entry.get().term();
                 Concept Wc = nar.concept(w);
                 if(Wc != null) {
-                    for (Termed entry2 : Wc.getTermLinks()) {
-                        if(entry2.term().equals(premise2.term())) {
+                    for (BLink<Termed> entry2 : Wc.getTermLinks()) {
+                        if(entry2.get().term().equals(premise2.term())) {
                             passed = true;
                             break;
                         }
@@ -185,24 +186,25 @@ public class LinkageTest extends AbstractNALTester {
         Concept ret = tester.nar.concept(premise1);
         boolean passed = false;
         if(ret!=null && ret.getTermLinks()!=null) {
-            for (Termed entry : ret.getTermLinks()) {
-                if(entry.term().toString().equals(premise2)) {
+            for (BLink<Termed> entry : ret.getTermLinks()) {
+                Term et1 = entry.get().term();
+                if(et1.toString().equals(premise2)) {
                     passed = true;
                     break;
                 }
-                Term w = entry.term();
-                Concept Wc = tester.nar.concept(w);
+                Concept Wc = tester.nar.concept(et1);
                 if(Wc != null) {
-                    for (Termed entry2 : Wc.getTermLinks()) {
-                        if(entry2.term().toString().equals(premise2)) {
+                    for (BLink<Termed> entry2 : Wc.getTermLinks()) {
+                        Term et2 = entry2.get().term();
+                        if(et2.toString().equals(premise2)) {
                             passed = true;
                             break;
                         }
-                        Term w2 = entry2.term();
-                        Concept Wc2 = tester.nar.concept(w2);
+                        Concept Wc2 = tester.nar.concept(et2);
                         if(Wc2 != null) {
-                            for (Termed entry3 : Wc2.getTermLinks()) {
-                                if(entry3.term().toString().equals(premise2)) {
+                            for (BLink<Termed> entry3 : Wc2.getTermLinks()) {
+                                Term et3 = entry3.get().term();
+                                if(et3.toString().equals(premise2)) {
                                     passed = true;
                                     break;
                                 }

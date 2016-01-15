@@ -164,7 +164,7 @@ public class Default extends AbstractNAR {
 
     @Override
     public Concept conceptualize(Termed termed, Budget activation, float scale) {
-        Concept c = memory.concept(termed);
+        Concept c = concept(termed);
         if (c!=null) {
             core.activate(c, activation, scale);
         }
@@ -173,7 +173,7 @@ public class Default extends AbstractNAR {
 
     @Override
     public NAR forEachConcept(Consumer<Concept> recip) {
-        core.active.forEach(recip);
+        core.active.forEachKey(recip);
         return this;
     }
 

@@ -81,9 +81,9 @@ public class CurveBagTest  {
         a.put("x", new UnitBudget(0.1f, 0.5f, 0.5f));
         a.put("y", new UnitBudget(0.2f, 0.5f, 0.5f));
 
-        Iterator<String> ii = a.iterator();
-        assertEquals("y", ii.next());
-        assertEquals("x", ii.next());
+        Iterator<BLink<String>> ii = a.iterator();
+        assertEquals("y", ii.next().get());
+        assertEquals("x", ii.next().get());
 
         a.commit();
 

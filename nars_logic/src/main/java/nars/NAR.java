@@ -831,7 +831,7 @@ public abstract class NAR implements Serializable, Level {
             if (includeConceptGoals && c.hasBeliefs()) c.getGoals().top(maxPerConcept, recip);
             if (includeConceptQuests && c.hasQuests()) c.getQuests().top(maxPerConcept, recip);
             if (includeTaskLinks && null != c.getTaskLinks())
-                c.getTaskLinks().forEach(maxPerConcept, recip::accept);
+                c.getTaskLinks().forEach(maxPerConcept, t->recip.accept(t.get()));
         });
 
         return this;
@@ -877,7 +877,7 @@ public abstract class NAR implements Serializable, Level {
      */
     public final Concept process(Task task) {
 
-        Termed term = task.get();
+        Termed term = task.concept();
 
         Concept c = conceptualize(term, task.getBudget(), 1f);
         if (c == null) {

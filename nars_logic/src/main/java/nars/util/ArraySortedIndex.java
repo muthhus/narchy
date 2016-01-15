@@ -1,7 +1,6 @@
 package nars.util;
 
 import nars.Global;
-import nars.budget.Budgeted;
 import nars.util.data.sorted.SortedIndex;
 
 import java.util.Collection;
@@ -12,7 +11,7 @@ import java.util.function.Consumer;
 //import org.apache.commons.collections.iterators.ReverseListIterator;
 
 
-public class ArraySortedIndex<E extends Budgeted> extends SortedIndex<E> {
+abstract public class ArraySortedIndex<E> extends SortedIndex<E> {
 
     protected int capacity;
 
@@ -68,11 +67,11 @@ public class ArraySortedIndex<E extends Budgeted> extends SortedIndex<E> {
      /*return (1+b.getPriority())*
      (b.getDurability()*b.getQuality());
      */
-    @Override public float score(E b) {
-
-        return b.getPriority();
-
-    }
+//    @Override public float score(E b) {
+//
+//        return b.getPriority();
+//
+//    }
 
     @Override
     public boolean isSorted() {

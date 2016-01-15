@@ -1,6 +1,7 @@
 package nars.util.graph;
 
 import nars.NAR;
+import nars.bag.BLink;
 import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.term.Term;
@@ -116,8 +117,8 @@ public class TermLinkGraph extends DirectedPseudograph<Term, String> {
         Bag<Termed> tl = c.getTermLinks();
         if (tl == null) return;
 
-        for (Termed tt : tl) {
-            Term target = tt.term();
+        for (BLink<Termed> tt : tl) {
+            Term target = tt.get().term();
             if (!containsVertex(target)) {
                 addVertex(target);
             }

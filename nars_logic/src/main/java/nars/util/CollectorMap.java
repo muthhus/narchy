@@ -4,18 +4,19 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
-import java.util.function.Supplier;
 
 /**
  * adapter to a Map for coordinating changes in a Map with another Collection
  */
-public abstract class CollectorMap<K, V extends Supplier<K>>  {
+public abstract class CollectorMap<K, V>  {
 
     public final Map<K, V> map;
 
     protected CollectorMap(Map<K, V> map) {
         this.map = map;
     }
+
+    abstract public K key(V v);
 
     @Override
     public String toString() {
@@ -57,8 +58,8 @@ public abstract class CollectorMap<K, V extends Supplier<K>>  {
         if (removed != null && removed2 != null) {
             throw new RuntimeException("Only one item should have been removed on this insert; both removed: " + removed + ", " + removed2);
         }
-        if ((removed2 != null) && (!removed2.get().equals(key))) {
-            removeKey(removed2.get());
+        if ((removed2 != null) && (!key(removed2).equals(key))) {
+            removeKey(key(removed2));
             removed = removed2;
         }
 

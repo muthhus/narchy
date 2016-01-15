@@ -118,7 +118,7 @@ public class TermLinkGraph2 extends DirectedPseudograph<Termed, Termed> {
         if (tl == null) return;
 
         tl.forEach(t -> {
-            Term target = t.term();
+            Termed target = t.get();
             if (!containsVertex(target)) {
                 addVertex(target);
             }

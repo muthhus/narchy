@@ -1,9 +1,9 @@
 package nars.bag.impl;
 
-import nars.bag.Link;
 import nars.util.CollectorMap;
 import nars.util.data.sorted.SortedIndex;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -12,7 +12,7 @@ import java.util.function.Predicate;
 /**
  * Created by me on 1/15/16.
  */
-public abstract class ArrayTable<V, L extends Link<V>> implements Table<V,L> {
+abstract public class ArrayTable<V, L> implements Table<V,L> {
     /**
      * mapping from key to item
      */
@@ -20,18 +20,22 @@ public abstract class ArrayTable<V, L extends Link<V>> implements Table<V,L> {
     /**
      * array of lists of items, for items on different level
      */
-    public final SortedIndex<? extends L> items;
+    public final SortedIndex<L> items;
 
     public ArrayTable(SortedIndex<L> items, Map<V, L> map) {
         this.items = items;
         this.index = new ArrayMapping(map, items);
     }
 
-    public abstract L put(Object v);
+
+    public final void forEachKey(Consumer<? extends V> each) {
+        forEach(this::key);
+    }
+
 
     @Override
     public L put(V v, L l) {
-        throw new RuntimeException("unimpl");
+        return index.put(v, l);
     }
 
     public boolean isSorted() {
@@ -114,8 +118,11 @@ public abstract class ArrayTable<V, L extends Link<V>> implements Table<V,L> {
 //            throw new RuntimeException("removal fault");
 //        }
 
-        return remove(ii.get());
+        return remove(key(ii));
     }
+
+    /** gets the key associated with a value */
+    abstract public V key(L l);
 
     public L get(Object key) {
         return index.get(key);
@@ -125,7 +132,7 @@ public abstract class ArrayTable<V, L extends Link<V>> implements Table<V,L> {
         return items.capacity();
     }
 
-    public final void forEach(Consumer<? super V> action) {
+    public final void forEach(Consumer<? super L> action) {
 
         //items.forEach(b -> action.accept(b.get()));
 
@@ -135,20 +142,25 @@ public abstract class ArrayTable<V, L extends Link<V>> implements Table<V,L> {
         int n = l.size();
         for (int i = 0; i < n; i++) {
         //for (int i = l.size()-1; i >= 0; i--){
-            action.accept(l.get(i).get());
+            action.accept(l.get(i));
         }
 
+    }
+
+    @Override
+    public Iterator<L> iterator() {
+        return items.iterator();
     }
 
     /**
      * default implementation; more optimal implementations will avoid instancing an iterator
      */
-    public void forEach(int max, Consumer<? super V> action) {
+    public void forEach(int max, Consumer<? super L> action) {
         List<? extends L> l = items.getList();
         int n = Math.min(l.size(), max);
         //TODO let the list implementation decide this because it can use the array directly in ArraySortedIndex
         for (int i = 0; i < n; i++) {
-            action.accept(l.get(i).get());
+            action.accept(l.get(i));
         }
     }
 
@@ -172,9 +184,6 @@ public abstract class ArrayTable<V, L extends Link<V>> implements Table<V,L> {
             action.accept(l.get(i));
     }
 
-    public abstract float getPriorityMax();
-
-    public abstract float getPriorityMin();
 
     protected final class ArrayMapping extends CollectorMap<V, L> {
 
@@ -185,6 +194,10 @@ public abstract class ArrayTable<V, L extends Link<V>> implements Table<V,L> {
             this.items = items;
         }
 
+        @Override
+        public final V key(L l) {
+            return ArrayTable.this.key(l);
+        }
 
         @Override
         protected L removeItem(L removed) {
@@ -200,7 +213,7 @@ public abstract class ArrayTable<V, L extends Link<V>> implements Table<V,L> {
         protected L addItem(L i) {
             L overflow = items.insert(i);
             if (overflow!=null) {
-                removeKey(overflow.get());
+                removeKey(key(overflow));
             }
             return overflow;
         }

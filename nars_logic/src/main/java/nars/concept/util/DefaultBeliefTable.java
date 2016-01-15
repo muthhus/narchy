@@ -1,16 +1,20 @@
 package nars.concept.util;
 
 import com.google.common.collect.Iterators;
+import com.gs.collections.api.block.function.primitive.FloatFunction;
 import nars.Global;
 import nars.Memory;
+import nars.bag.impl.ArrayTable;
 import nars.nal.LocalRules;
 import nars.task.Task;
 import nars.truth.TruthFunctions;
 import nars.util.ArraySortedIndex;
-import nars.util.data.sorted.SortedIndex;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -18,30 +22,29 @@ import java.util.function.Consumer;
  */
 public class DefaultBeliefTable implements BeliefTable {
 
-    final SortedIndex<Task> eternal;
-    final SortedIndex<Task> temporal;
-    private long now; //cached value, updated before temporal operations begin
+    final Map<Task,Task> map;
+    final ArrayTable<Task,Task> eternal;
+    final ArrayTable<Task,Task> temporal;
 
+    private long now; //cached value, updated before temporal operations begin
 
     public DefaultBeliefTable(int cap, int dur) {
         super();
 
+        this.map = new HashMap(cap/2);
+
         if (cap == 1) cap = 2;
-        eternal = new ArraySortedIndex<Task>(cap/2) {
-            @Override public float score(Task b) {
-                return -b.getConfidence();
-            }
-        };
-        temporal = new ArraySortedIndex<Task>(cap/2) {
-            @Override public float score(Task b) {
-                return b.getConfidence()/(1+Math.abs(b.getOccurrenceTime() - now)/dur);
-            }
-        };
+        eternal = new SetTable<Task>(cap/2, map,
+            b -> -b.getConfidence()
+        );
+        temporal = new SetTable<Task>(cap/2, map,
+            b -> b.getConfidence()/(1+Math.abs(b.getOccurrenceTime() - now)/dur)
+        );
     }
 
     @Override
     public Iterator<Task> iterator() {
-        return Iterators.concat(eternal.iterator(), temporal.iterator());
+        return Iterators.concat(eternal.items.iterator(), temporal.items.iterator());
     }
 
     @Override
@@ -85,14 +88,14 @@ public class DefaultBeliefTable implements BeliefTable {
 
     @Override
     public Task topEternal() {
-        return eternal.getFirst();
+        return eternal.highest();
     }
 
     @Override
     public Task topTemporal(long when) {
         Task best = null;
         float bestRank = -1;
-        List<Task> l = temporal.getList();
+        List<? extends Task> l = temporal.items.getList();
         for (int i = 0; i < l.size(); i++) {
             Task x = l.get(i);
             float r = x.getConfidence() * TruthFunctions.temporalProjectionRank(1, x.getOccurrenceTime(), when);
@@ -170,10 +173,9 @@ public class DefaultBeliefTable implements BeliefTable {
         if (!tableChanged) {
             result = preTop;
         } else {
-            if (preTop!=null)
-                result = addRevise(input, preTop, memory, now);
-            else
-                result = input;
+            result = (preTop != null) ?
+                    addRevise(input, preTop, memory, now) :
+                    input;
 
             onBeliefChanged.accept(result);
         }
@@ -182,35 +184,51 @@ public class DefaultBeliefTable implements BeliefTable {
     }
 
     Task addRevise(Task input, Task preTop, Memory memory, long now) {
-        //        //TODO make sure input.isDeleted() can not happen
-
+        //TODO make sure input.isDeleted() can not happen
 
         Task revised = LocalRules.getRevision(input, preTop, now);
 
-        if (revised != null && !revised.equals(input) && insert(revised, memory)) {
+        if (revised != null && !revised.equals(input)) {
+            //return the revised task even if it wasn't inserted allowing it to be used as a transient
+            boolean inserted = insertAttempt(revised, memory);
             memory.eventRevision.emit(revised);
+            return revised;
         }
-
 
         return input.isEternal() ? topEternal() : top(now);
     }
 
     private boolean insert(Task t, Memory memory) {
-        return insert(t, t.isEternal() ? this.eternal : this.temporal, memory);
-    }
+        ArrayTable<Task, Task> table = getTableFor(t);
 
-    boolean insert(Task input, SortedIndex<Task> table, Memory memory) {
         if (Global.DEBUG) {
-            checkForDeleted(input, table);
+            checkForDeleted(t, table);
         }
 
-        Task displaced = table.insert(input);
+        Task displaced = table.put(t,t);
         if (displaced!=null)
             onBeliefRemoved(displaced, "Unbelievable/Undesirable", memory);
 
-        return input == displaced ? false : true;
+        return t == displaced ? false : true;
     }
 
+    /** try to insert but dont delete the input task if it wasn't inserted (but delete a displaced if it was)
+     *  returns true if it was inserted, false if not
+     * */
+    private boolean insertAttempt(Task t, Memory memory) {
+        ArrayTable<Task, Task> table = getTableFor(t);
+        Task displaced = table.put(t,t);
+        boolean inserted = displaced != t;
+        if (displaced!=null && inserted)
+            onBeliefRemoved(displaced, "Unbelievable/Undesirable (Revision Displaced)", memory);
+
+        return inserted;
+    }
+
+    @NotNull
+    private ArrayTable<Task, Task> getTableFor(Task t) {
+        return t.isEternal() ? this.eternal : this.temporal;
+    }
 
 
 //    @Override
@@ -273,7 +291,7 @@ public class DefaultBeliefTable implements BeliefTable {
         memory.remove(t, reason);
     }
 
-    static void checkForDeleted(Task input, SortedIndex<Task> table) {
+    static void checkForDeleted(Task input, ArrayTable<Task,Task> table) {
         if (input.getDeleted())
             throw new RuntimeException("deleted task being added");
 
@@ -292,6 +310,20 @@ public class DefaultBeliefTable implements BeliefTable {
         });
     }
 
+    final static class SetTable<T> extends ArrayTable<T,T> {
+        public SetTable(int cap, Map<T,T> index, FloatFunction<T> score) {
+            super(new ArraySortedIndex<T>(cap) {
+                @Override public float score(T b) {
+                    return score.floatValueOf(b);
+                }
+            }, index);
+        }
+
+        @Override
+        public T key(T t) {
+            return t;
+        }
+    }
 
 
 //TODO provide a projected belief

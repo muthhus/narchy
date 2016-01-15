@@ -70,7 +70,7 @@ public class DefaultAlann extends AbstractAlann  {
 
     @Override
     public Concept conceptualize(Termed termed, Budget activation, float scale) {
-        return memory.concept(termed); //TODO handle activation
+        return concept(termed); //TODO handle activation
     }
 
     @Override
@@ -98,7 +98,7 @@ public class DefaultAlann extends AbstractAlann  {
 
     final Supplier<Concept> fromInput = () -> {
         if (commander.isEmpty()) return null;
-        Task t = commander.commandIterator.next();
+        Task t = commander.commandIterator.next().get();
         return concept(t.term());
     };
 

@@ -286,7 +286,7 @@ public abstract class AbstractTask extends Item<Task>
     }
 
 
-    @Override public final Termed get() {
+    @Override public final Termed concept() {
         return term;
     }
 

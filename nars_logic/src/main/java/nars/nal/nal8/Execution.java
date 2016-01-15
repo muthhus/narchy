@@ -126,7 +126,7 @@ public class Execution implements Runnable {
     }
 
     public Concept taskConcept() {
-        return nar.concept(task.get());
+        return nar.concept(task.concept());
     }
 
 }

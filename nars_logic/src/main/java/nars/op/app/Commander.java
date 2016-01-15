@@ -2,6 +2,7 @@ package nars.op.app;
 
 import com.google.common.collect.Iterators;
 import nars.NAR;
+import nars.bag.BLink;
 import nars.budget.TaskAccumulator;
 import nars.concept.Concept;
 import nars.nal.nal7.Tense;
@@ -28,7 +29,7 @@ import java.util.function.Supplier;
 public class Commander implements Consumer<NAR>, Supplier<Concept> {
 
     public final TaskAccumulator commands;
-    public final Iterator<Task> commandIterator;
+    public final Iterator<BLink<Task>> commandIterator;
     public final LinkedHashSet<Concept> concepts = new LinkedHashSet();
     final Iterator<Concept> conceptsIterator = Iterators.cycle(concepts);
 
@@ -104,10 +105,10 @@ public class Commander implements Consumer<NAR>, Supplier<Concept> {
         long now = nar.time();
         if (now%cycleDivisor!= 0) return;
 
-        Iterator<Task> commandIterator = this.commandIterator;
+        Iterator<BLink<Task>> commandIterator = this.commandIterator;
         for (int i = 0; i < inputsPerFrame; i++) {
             if (commandIterator.hasNext()) {
-                Task next = commandIterator.next();
+                Task next = commandIterator.next().get();
                 if (valid(now, next)) {
                     Concept c = nar.process(next);
                     if (c!=null) {

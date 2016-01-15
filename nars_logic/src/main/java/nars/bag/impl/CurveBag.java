@@ -5,7 +5,6 @@ import nars.bag.BLink;
 import nars.bag.Bag;
 import nars.budget.Budget;
 import nars.budget.BudgetMerge;
-import nars.util.ArraySortedIndex;
 import nars.util.data.sorted.SortedIndex;
 
 import java.util.Collection;
@@ -48,7 +47,7 @@ public class CurveBag<V> implements Bag<V> {
 
 
     public CurveBag(BagCurve curve, int capacity, Random rng) {
-        this(new ArraySortedIndex(capacity/4, capacity), curve, rng);
+        this(ArrayBag.newDefaultIndex(capacity), curve, rng);
 
                                 /*if (capacity < 128)*/
         //items = new ArraySortedItemList<>(capacity);
@@ -61,10 +60,9 @@ public class CurveBag<V> implements Bag<V> {
 
     public CurveBag(SortedIndex<BLink<V>> items, BagCurve curve, Random rng) {
         super();
-
         this.arrayBag = new ArrayBag(items);
         this.curve = curve;
-        random = rng;
+        this.random = rng;
     }
 
 
@@ -72,7 +70,8 @@ public class CurveBag<V> implements Bag<V> {
      * set the merging function to 'plus'
      */
     @Deprecated public Bag<V> mergePlus() {
-        return arrayBag.setMergeFunction(BudgetMerge.plusDQDominated);
+        arrayBag.setMergeFunction(BudgetMerge.plusDQDominated);
+        return this;
     }
 
 
@@ -201,12 +200,16 @@ public class CurveBag<V> implements Bag<V> {
     }
 
     @Override
-    public Iterator<V> iterator() {
+    public Iterator<BLink<V>> iterator() {
         return arrayBag.iterator();
     }
 
+    @Override
+    public void forEachKey(Consumer<? extends V> each) {
+        arrayBag.forEachKey(each);
+    }
 
-//    public static long fastRound(final double d) {
+    //    public static long fastRound(final double d) {
 //        if (d > 0) {
 //            return (long) (d + 0.5d);
 //        } else {

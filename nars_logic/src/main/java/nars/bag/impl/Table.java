@@ -4,7 +4,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /** nearly a Map */
-public interface Table<K,V>  {
+public interface Table<K,V> extends Iterable<V> {
 
     void clear();
 
@@ -28,6 +28,9 @@ public interface Table<K,V>  {
     default void delete() {
 
     }
+
+    /** iterates in sorted order */
+    void forEachKey(Consumer<? extends K> each);
 
     default void top(Consumer<V> each) {
         topWhile(e -> {

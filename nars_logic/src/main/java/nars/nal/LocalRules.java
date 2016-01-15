@@ -378,7 +378,7 @@ public enum LocalRules {
             occ = ((ProjectedTruth) conclusion).target;
         }
 
-        return new MutableTask(newBelief.get())
+        return new MutableTask(newBelief.concept())
                 .punctuation(newBelief.getPunctuation())
                 .truth(conclusion)
                 .budget(BudgetFunctions.revise(newBeliefTruth, oldBelief, conclusion, newBelief.getBudget()))

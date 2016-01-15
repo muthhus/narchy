@@ -36,6 +36,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import static nars.Global.dereference;
 
@@ -47,8 +48,7 @@ import static nars.Global.dereference;
  * <p>
  * TODO decide if the Sentence fields need to be Reference<> also
  */
-public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Tasked {
-
+public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Tasked, Supplier<Task> {
 
     static void getExplanation(Task task, int indent, StringBuilder sb) {
         //TODO StringBuilder
@@ -256,7 +256,9 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         return appendTo(new StringBuilder(), memory, showStamp);
     }
 
-    default Termed get() {
+    @Override default public Task get() { return this ;}
+
+    default Termed concept() {
         return term();
     }
 

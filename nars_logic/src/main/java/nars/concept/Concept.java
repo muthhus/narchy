@@ -38,8 +38,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import static com.google.common.collect.Iterators.concat;
-
 public interface Concept extends Termed, Supplier<Term> {
 
     Bag<Task> getTaskLinks();
@@ -167,22 +165,22 @@ public interface Concept extends Termed, Supplier<Term> {
 //        return getGoals().top(eternal, nonEternal);
 //    }
 
-
-    default Iterator<? extends Termed> getTermedAdjacents(boolean termLinks, boolean taskLinks) {
-        if (termLinks && taskLinks) {
-            return concat(
-                    getTermLinks().iterator(), getTaskLinks().iterator()
-            );
-        }
-        if (termLinks) {
-            return getTermLinks().iterator();
-        }
-        if (taskLinks) {
-            return getTaskLinks().iterator();
-        }
-
-        return null;
-    }
+//
+//    default Iterator<? extends Termed> getTermedAdjacents(boolean termLinks, boolean taskLinks) {
+//        if (termLinks && taskLinks) {
+//            return concat(
+//                    getTermLinks().iterator(), getTaskLinks().iterator()
+//            );
+//        }
+//        if (termLinks) {
+//            return getTermLinks().iterator();
+//        }
+//        if (taskLinks) {
+//            return getTaskLinks().iterator();
+//        }
+//
+//        return null;
+//    }
 
     default void print() {
         print(System.out);

@@ -1,12 +1,12 @@
 package nars.bag.impl;
 
-import com.google.common.collect.Iterators;
 import com.google.common.collect.Sets;
 import nars.bag.BLink;
 import nars.bag.Bag;
 import nars.budget.*;
 import nars.util.ArraySortedIndex;
 import nars.util.data.sorted.SortedIndex;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -22,6 +22,10 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
 
     protected BudgetMerge mergeFunction = null;
 
+    public ArrayBag(int cap) {
+        this(newDefaultIndex(cap));
+    }
+
     public ArrayBag(SortedIndex<BLink<V>> items) {
         this(items,
             //Global.newHashMap(items.capacity()/2)
@@ -36,13 +40,24 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
 
     }
 
-    public ArrayBag(int capacity) {
-        this(new ArraySortedIndex<>(capacity));
+    @NotNull
+    public static <X extends Budgeted> ArraySortedIndex<X> newDefaultIndex(final int capacity) {
+        return new ArraySortedIndex<X>(capacity/4, capacity) {
+            @Override public float score(X v) {
+                return v.getPriority();
+            }
+        };
     }
+
 
     Bag<V> setMergeFunction(BudgetMerge mergeFunction) {
         this.mergeFunction = mergeFunction;
         return this;
+    }
+
+    @Override
+    public V key(BLink<V> l) {
+        return l.get();
     }
 
     @Override public BLink<V> put(Object v) {
@@ -66,13 +81,13 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
         return setMergeFunction(BudgetMerge.plusDQDominated);
     }
 
-    /**
-     * sets a null merge function, which can be used to detect
-     * merging which should not happen (it will throw null pointer exception)
-     */
-    Bag<V> mergeNull() {
-        return setMergeFunction(null);
-    }
+//    /**
+//     * sets a null merge function, which can be used to detect
+//     * merging which should not happen (it will throw null pointer exception)
+//     */
+//    Bag<V> mergeNull() {
+//        return setMergeFunction(null);
+//    }
 
     protected final void merge(Budget target, Budget incoming, float scale) {
         mergeFunction.merge(target, incoming, scale);
@@ -120,7 +135,7 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
     }
 
     @Override
-    public ArrayBag<V> sample(int n, Predicate<BLink<V>> each, Collection<BLink<V>> target) {
+    public Bag<V> sample(int n, Predicate<BLink<V>> each, Collection<BLink<V>> target) {
         throw new RuntimeException("unimpl");
     }
 
@@ -309,14 +324,14 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
 
 
     @Override
-    public final Iterator<V> iterator() {
-        return Iterators.transform(items.iterator(), t-> t.get() );
+    public final Iterator<BLink<V>> iterator() {
+        return items.iterator();
     }
 
     @Override
     public float getPriorityMax() {
         if (isEmpty()) return 0;
-        return items.getFirst(). getPriority();
+        return items.getFirst().getPriority();
     }
 
     @Override
@@ -325,18 +340,18 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
         return items.getLast().getPriority();
     }
 
-    public final void popAll(Consumer<? super V> receiver) {
+    public final void popAll(Consumer<BLink<V>> receiver) {
         forEach(receiver);
         clear();
     }
 
-    public void pop(Consumer<? super V> receiver, int n) {
+    public void pop(Consumer<BLink<V>> receiver, int n) {
         if (n == size()) {
             //special case where size <= inputPerCycle, the entire bag can be flushed in one operation
             popAll(receiver);
         } else {
             for (int i = 0; i < n; i++) {
-                receiver.accept(pop().get());
+                receiver.accept(pop());
             }
         }
     }

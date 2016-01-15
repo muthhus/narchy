@@ -18,7 +18,7 @@ import java.util.function.Supplier;
  * TODO remove unnecessary methods, documetn
  * TODO implement java.util.Map interface
  */
-public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<V>>, Iterable<V> {
+public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<V>>, Iterable<BLink<V>> {
 
 
 
@@ -148,7 +148,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
      * forEach may be used to avoid allocation of iterator instances
      */
     @Override
-    Iterator<V> iterator();
+    Iterator<BLink<V>> iterator();
 
     /**
      * Check if an item is in the bag.  both its key and its value must match the parameter
@@ -268,9 +268,9 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
     /**
      * default implementation; more optimal implementations will avoid instancing an iterator
      */
-    default void forEach(int max, Consumer<? super V> action) {
+    default void forEach(int max, Consumer<? super BLink<V>> action) {
 
-        Iterator<V> ii = iterator();
+        Iterator<BLink<V>> ii = iterator();
         int n = 0;
         while (ii.hasNext() && (n++ < max)) {
             action.accept(ii.next());

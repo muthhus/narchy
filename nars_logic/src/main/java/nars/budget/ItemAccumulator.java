@@ -20,7 +20,13 @@ public class ItemAccumulator<V extends Budgeted > {
     private final MyArrayBag arrayBag;
 
     public ItemAccumulator(int capacity) {
-        arrayBag = new MyArrayBag(new ArraySortedIndex(capacity));
+        arrayBag = new MyArrayBag(new ArraySortedIndex<BLink<V>>(capacity) {
+
+            @Override
+            public float score(BLink<V> v) {
+                return v.getPriority();
+            }
+        });
         arrayBag.mergePlus();
     }
 

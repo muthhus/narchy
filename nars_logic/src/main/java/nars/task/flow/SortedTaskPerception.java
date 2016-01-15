@@ -45,7 +45,7 @@ public class SortedTaskPerception extends TaskPerception {
 
     @Override
     public void forEach(Consumer<? super Task> each) {
-        buffer.getArrayBag().forEach(each);
+        buffer.getArrayBag().forEach(e -> each.accept(e.get()));
     }
 
     @Override
@@ -60,7 +60,8 @@ public class SortedTaskPerception extends TaskPerception {
                 inputsPerCyc = available;
             }
 
-            buffer.getArrayBag().pop(receiver,
+            buffer.getArrayBag().pop(
+                t -> receiver.accept(t.get()),
                 Math.min(available, inputsPerCyc)
             );
         }

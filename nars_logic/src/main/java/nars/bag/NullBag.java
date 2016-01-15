@@ -18,6 +18,11 @@ public final class NullBag<V> implements Bag<V> {
     }
 
     @Override
+    public void forEachKey(Consumer<? extends V> each) {
+
+    }
+
+    @Override
     public BLink<V> get(Object key) {
         return null;
     }
@@ -63,7 +68,7 @@ public final class NullBag<V> implements Bag<V> {
     }
 
     @Override
-    public Iterator<V> iterator() {
+    public Iterator<BLink<V>> iterator() {
         return null;
     }
 

@@ -2,7 +2,7 @@ package nars.task;
 
 
 @FunctionalInterface
-public interface Tasked {
+public interface Tasked  {
 
     Task getTask();
 
