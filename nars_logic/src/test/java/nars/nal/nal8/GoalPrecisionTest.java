@@ -1,0 +1,114 @@
+package nars.nal.nal8;
+
+import nars.NAR;
+import nars.nal.nal8.operator.SyncOperator;
+import nars.nar.Default;
+import nars.term.Term;
+import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Created by me on 1/15/16.
+ */
+public class GoalPrecisionTest {
+
+    /**
+     * op -> (requested,
+     * firstInvoked_ideally~=requested,
+     * firstInvokeBudget
+     * subsequentInvokeBudgetSums
+     * subsequentInvokeNum
+     * <p>
+     * <p>
+     * )
+     */
+    final Map<String, float[]> plan = new HashMap();
+
+    protected void schedule(int when, String action) {
+        plan.put(action, new float[]{when, -1, 0, 0, 0});
+    }
+
+    protected void print() {
+        plan.forEach((k, v) -> {
+            System.out.println(k + " " + Arrays.toString(v));
+        });
+    }
+
+    protected void run(NAR n, int end) {
+
+        n.onExecTask("x", new SyncOperator() {
+            @Override
+            public void execute(Execution a) {
+
+                Term[] aa = Operator.opArgsArray(a.term());
+                float pri = a.task.getPriority() * a.task.getExpectation();
+
+                float[] d = plan.get(aa[0].toString());
+                if (d == null) {
+                    throw new RuntimeException("unknown action: " + a);
+                }
+
+
+
+                if (d[1] == -1) {
+                    //first time
+                    d[1] = (int) n.time();
+                    d[2] = pri;
+                    System.out.println("OK " + a.task);
+                } else {
+                    d[3] += pri;
+                    d[4]++;
+                    a.taskConcept().print();
+                    System.out.println(a.task.getExplanation());
+                }
+
+                //a.task.mulPriority(0);
+
+                a.noticeExecuted();
+            }
+        });
+
+        //n.onExecTask("x", a -> {
+
+        //});
+
+        //input:
+        plan.forEach((k, v) -> {
+            n.inputAt((int) v[0], "x(" + k + ")! :|:");
+        });
+
+        n.frame(end);
+
+        print();
+
+    }
+
+
+    @Test
+    public void testExecuteGoalsOnTimeWithoutRepeats() {
+
+        schedule(1, "a");
+        schedule(10, "b");
+        schedule(15, "c");
+
+        run(new Default(), 100);
+
+    }
+
+    @Test
+    public void testExecuteGoalsResultingFromDerivation() {
+
+        Default n = new Default(100, 2, 1, 3);
+        //n.inputAt(1, "(x(b) ==>-10 x(a)).");
+        n.inputAt(1, "(x(a) ==>+3 x(b)).");
+
+        schedule(1, "a");
+        schedule(9999, "b");
+
+        run(n, 15);
+
+    }
+}

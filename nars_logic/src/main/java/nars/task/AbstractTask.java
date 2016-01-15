@@ -240,6 +240,9 @@ public abstract class AbstractTask extends Item<Task>
 
     @Override
     public void setExecuted() {
+        if (state==TaskState.Executed)
+            throw new RuntimeException("can not execute already executed");
+
         state = TaskState.Executed;
     }
 

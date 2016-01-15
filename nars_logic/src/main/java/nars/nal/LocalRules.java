@@ -355,22 +355,39 @@ public enum LocalRules {
 
         Truth newBeliefTruth = newBelief.getTruth();
 
+
         long target = newBelief.getOccurrenceTime();
+
+//        //interpolate the occurrence time by their relative confidences
+//        long newo = newBelief.getOccurrenceTime();
+//        long oldo = oldBelief.getOccurrenceTime();
+//        long target;
+//        if (newo!=oldo) {
+//            long dnew = Math.abs(now - newo);
+//            long dold = Math.abs(now - oldo);
+//            long dden = dnew + dold;
+//            target = dden != 0 ? (long) (Util.lerp(newo, oldo,
+//                    (float) (dnew / (dnew + dold))
+//            )) : newo;
+//        } else {
+//            target = newo;
+//        }
+
 
         Truth oldBeliefTruth = oldBelief.projection(target, now);
 
         Truth conclusion = TruthFunctions.revision(newBeliefTruth, oldBeliefTruth);
+        if (conclusion instanceof ProjectedTruth) {
+            //allow eternalized truth to override with eternalized occurrence
+            target = ((ProjectedTruth) conclusion).target;
+        }
 
-        //Task<T> revised = nal.input(
         return new MutableTask(newBelief.get())
                 .punctuation(newBelief.getPunctuation())
                 .truth(conclusion)
                 .budget(BudgetFunctions.revise(newBeliefTruth, oldBelief, conclusion, newBelief.getBudget()))
                 .parent(newBelief, oldBelief)
-                .time(now,
-                        (conclusion instanceof ProjectedTruth) ?
-                                ((ProjectedTruth) conclusion).target :
-                                target)
+                .time(now, target)
                 .because("Revision");
     }
 

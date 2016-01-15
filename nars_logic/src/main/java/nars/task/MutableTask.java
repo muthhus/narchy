@@ -193,6 +193,9 @@ public class MutableTask extends AbstractTask {
 
     /** flag used for anticipatable derivation */
     public MutableTask anticipate(boolean a) {
+        if (state==TaskState.Executed)
+            throw new RuntimeException("can not anticipate already executed task");
+
         if (a) state = (TaskState.Anticipated);
         return this;
     }

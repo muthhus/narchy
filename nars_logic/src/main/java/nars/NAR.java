@@ -415,6 +415,7 @@ public abstract class NAR implements Serializable, Level {
      */
     public int execute(Task goal) {
         Term term = goal.term();
+        goal.setExecuted();
 
         if (Op.isOperation(term)) {
 
@@ -422,14 +423,13 @@ public abstract class NAR implements Serializable, Level {
                     Operator.operatorName((Compound) term)
             );
 
-            goal.setExecuted();
 
             if (tt != null && !tt.isEmpty()) {
 
                 //enqueue after this frame, before next
-                beforeNextFrame(
-                        new Execution(this, goal, tt)
-                );
+                //beforeNextFrame(
+                        new Execution(this, goal, tt).run();
+                //);
                 return 1;
             }
 

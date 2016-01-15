@@ -259,22 +259,28 @@ public class Twenglish {
 
         String sentenceID = Integer.toString(message.hashCode());
 
-        nar.input("sentence(" + sentenceID + "). :|:");
+        nar.input("say(sentence, " + sentenceID + "). :|:");
         //float f = 1f;
         //float df = 0.5f / t.size();
         for (Term w : t) {
             //nar.input("sentence(" + sentenceID + "). :|:");// %" + f + ";0.95%");
             //nar.frame(1);
 
-            ///nar.input("echo(" + w + "). :|: %1;0.9%");
-            nar.input("(sentence(" + sentenceID + ") ==> say(" + w + ")). :|:");
+            //nar.input("(sentence(" + sentenceID + ") ==> say(" + w + ")). :|:");
+
+            nar.input("say(" + w + ")! %1|0.9%");
             nar.frame(wordDelay);
-            //nar.input("echo(" + w + "). :|: %0;0.9%");
-            //nar.frame(wordDelay);
+
+
+            //nar.input("say(" + w + "). %1|0.9%"); //silence
+            //nar.frame(wordDelay/2);
+
 
             //f-=df;
         }
-        nar.input("(--, sentence(" + sentenceID + ")). :|:");
+        nar.input("say(sentence, " + sentenceID + "). :|: %0%");
+
+        //nar.input("(--, sentence(" + sentenceID + ")). :|:");
 
         //nar.input("(--, sentence(" + sentenceID + ")). :|:");
 

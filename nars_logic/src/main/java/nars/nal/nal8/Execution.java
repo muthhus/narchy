@@ -5,6 +5,7 @@ import nars.Memory;
 import nars.NAR;
 import nars.budget.Budget;
 import nars.budget.UnitBudget;
+import nars.concept.Concept;
 import nars.task.Task;
 import nars.term.Term;
 import nars.term.compound.Compound;
@@ -96,6 +97,10 @@ public class Execution implements Runnable {
 
     }
 
+    protected void noticeExecuted() {
+        noticeExecuted(task);
+    }
+
     /**
      * internal notice of the execution
      * @param operation
@@ -118,6 +123,10 @@ public class Execution implements Runnable {
         );
 
         memory.logic.TASK_EXECUTED.hit();
+    }
+
+    public Concept taskConcept() {
+        return nar.concept(task.get());
     }
 
 }

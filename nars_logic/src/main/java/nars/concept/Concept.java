@@ -32,7 +32,6 @@ import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.compound.Compound;
-import nars.truth.Truth;
 
 import java.io.PrintStream;
 import java.util.Iterator;
@@ -65,13 +64,6 @@ public interface Concept extends Termed, Supplier<Term> {
 
     default boolean hasQuests() {
         return !getQuests().isEmpty();
-    }
-
-
-    default float getDesireExpectation(long now) {
-        Truth d = getDesire(now);
-        if (d!=null) return d.getExpectation();
-        return 0;
     }
 
 
@@ -109,17 +101,31 @@ public interface Concept extends Termed, Supplier<Term> {
     /**
      * Get the current overall desire value. TODO to be refined
      */
-    default Truth getDesire(long now) {
+    default float getDesire(long now) {
         return hasGoals() ?
-            getGoals().top(now).getTruth() : null;
+            getGoals().getMeanProjectedExpectation(now) : 0;
+//        return hasGoals() ?
+//            getGoals().top(now).getTruth().getExpectation() : 0;
+    }
+    /**
+     * Get the current overall belief value. TODO to be refined
+     */
+    default float getBelief(long now) {
+        return hasBeliefs() ?
+                getBeliefs().getMeanProjectedExpectation(now) : 0;
+//        return hasBeliefs() ?
+//                getBeliefs().top(now).getTruth().getExpectation() : 0;
     }
 
     /** satisfaction/success metric:
      * if desire exists, returns 1.0 / (1 + Math.abs(belief - desire))
      *  otherwise zero */
     default float getSuccess(long now) {
-        Truth d;
-        return hasBeliefs() && hasGoals() && null != (d = getDesire(now)) ? 1.0f / (1.0f + Math.abs(getBeliefs().top(now).getTruth().getExpectation() - d.getExpectation())) : 0;
+        return hasBeliefs() && hasGoals()
+                ?
+                1.0f / (1.0f +
+                        Math.abs(getBelief(now) - getDesire(now))) :
+                0;
     }
 
     BeliefTable getBeliefs();

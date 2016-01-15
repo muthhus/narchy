@@ -7,6 +7,7 @@ import nars.concept.Concept;
 import nars.nal.nal7.Tense;
 import nars.task.Task;
 import nars.truth.Truth;
+import nars.truth.TruthFunctions;
 import nars.truth.TruthWave;
 import nars.truth.Truthed;
 
@@ -293,44 +294,44 @@ public interface BeliefTable extends TaskTable {
     }
 
 
-//    /** computes the truth/desire as an aggregate of projections of all
-//     * beliefs to current time
-//     */
-//    default float getMeanProjectedExpectation(long time) {
-//        int size = size();
-//        if (size == 0) return 0;
-//
-//        float[] d = {0};
-//        forEach(t -> d[0] += t.getTruth().projectionQuality(t, time, time, false) * t.getExpectation());
-//
-//        float dd = d[0];
-//
-//        if (dd == 0) return 0;
-//
-//        return dd / size;
-//
-//    }
-//
-//    default float Truth.projectionQuality(Task t, long targetTime, long currentTime, boolean problemHasQueryVar) {
+    /** computes the truth/desire as an aggregate of projections of all
+     * beliefs to current time
+     */
+    default float getMeanProjectedExpectation(long time) {
+        int size = size();
+        if (size == 0) return 0;
+
+        float[] d = {0};
+        forEach(t -> d[0] += projectionQuality(t.getFrequency(), t.getConfidence(), t, time, time, false) * t.getExpectation());
+
+        float dd = d[0];
+
+        if (dd == 0) return 0;
+
+        return dd / size;
+
+    }
+
+    static float projectionQuality(float freq, float conf, Task t, long targetTime, long currentTime, boolean problemHasQueryVar) {
 //        float freq = getFrequency();
 //        float conf = getConfidence();
-//
-//        long taskOcc = t.getOccurrenceTime();
-//
-//        if (!Tense.isEternal(taskOcc) && (targetTime != taskOcc)) {
-//            conf = TruthFunctions.eternalizedConfidence(conf);
-//            if (targetTime != Tense.ETERNAL) {
-//                float factor = TruthFunctions.temporalProjection(taskOcc, targetTime, currentTime);
-//                float projectedConfidence = factor * t.getConfidence();
-//                if (projectedConfidence > conf) {
-//                    conf = projectedConfidence;
-//                }
-//            }
-//        }
-//
-//        return problemHasQueryVar ? Truth.expectation(freq, conf) / t.term().complexity() : conf;
-//
-//    }
+
+        long taskOcc = t.getOccurrenceTime();
+
+        if (!Tense.isEternal(taskOcc) && (targetTime != taskOcc)) {
+            conf = TruthFunctions.eternalizedConfidence(conf);
+            if (targetTime != Tense.ETERNAL) {
+                float factor = TruthFunctions.temporalProjection(taskOcc, targetTime, currentTime);
+                float projectedConfidence = factor * t.getConfidence();
+                if (projectedConfidence > conf) {
+                    conf = projectedConfidence;
+                }
+            }
+        }
+
+        return problemHasQueryVar ? Truth.expectation(freq, conf) / t.term().complexity() : conf;
+
+    }
 
 
     @FunctionalInterface

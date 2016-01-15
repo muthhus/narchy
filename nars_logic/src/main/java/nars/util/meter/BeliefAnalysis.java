@@ -30,6 +30,10 @@ public class BeliefAnalysis extends EnergyAnalysis {
 		nar.believe(term, present, freq, conf);
 		return this;
 	}
+	public BeliefAnalysis believe(float pri, float freq, float conf, long when) {
+		nar.believe(pri, term, when, freq, conf);
+		return this;
+	}
 
 	public Concept concept() {
 		return nar.concept(term);

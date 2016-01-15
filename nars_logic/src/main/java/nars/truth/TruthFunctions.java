@@ -463,10 +463,13 @@ public final class TruthFunctions extends UtilityFunctions {
     }
     
     public static float temporalProjection(long sourceTime, long targetTime, long currentTime) {
-        return abs(sourceTime - targetTime) /
-                (float) (abs(sourceTime - currentTime) + abs(targetTime - currentTime));
+        long den = (abs(sourceTime - currentTime) + abs(targetTime - currentTime));
+        if (den == 0) return 1f;
+        return abs(sourceTime - targetTime) / (float)den;
     }
-
+    public static float temporalProjectionRank(int dur, long sourceTime, long targetTime) {
+        return 1f / (dur + Math.abs(sourceTime-targetTime));
+    }
     /**
      * A function to convert confidence to weight
      * @param c confidence, in [0, 1)

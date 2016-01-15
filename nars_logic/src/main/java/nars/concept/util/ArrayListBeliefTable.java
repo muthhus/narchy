@@ -43,6 +43,7 @@ public class ArrayListBeliefTable extends ArrayListTaskTable implements BeliefTa
         if (tasks==null) return null;
 
         for (Task x : tasks) {
+            if (x == null) break;
             if (x.isEternal()) return x;
         }
         return null;
@@ -54,13 +55,15 @@ public class ArrayListBeliefTable extends ArrayListTaskTable implements BeliefTa
         if (tasks == null) return null;
 
         Task best = null;
-        float bestConf = -1;
+        float bestRank = -1;
         for (Task x : tasks) {
             if (x == null) break;
-            float c = x.projectionConfidence(when, when);
-            if (c > bestConf) {
+            float r = x.getConfidence() * x.projectionRank(when);
+            if ((r > bestRank) ||
+            //tie-breaker: closer to the target time
+            ( (r==bestRank) && (Math.abs(when - best.getOccurrenceTime()) < Math.abs(when - x.getOccurrenceTime())) )) {
                 best = x;
-                bestConf = c;
+                bestRank = r;
             }
         }
         return best;

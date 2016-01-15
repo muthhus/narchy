@@ -293,9 +293,19 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         return t.getConfidence();
     }
 
-    default float projectionConfidence(long when, long now) {
-        //TODO avoid creating Truth Values by calculating the confidence directly. then use this in projection's original usage as well
-        return projection(when, now).getConfidence();
+//    default float projectionConfidence(long when, long now) {
+//        //TODO avoid creating Truth Values by calculating the confidence directly. then use this in projection's original usage as well
+//
+//        float factor = TruthFunctions.temporalProjection(getOccurrenceTime(), when, now);
+//
+//        return factor * getConfidence();
+//
+//        //return projection(when, now).getConfidence();
+//    }
+
+    default float projectionRank(long when) {
+        //TODO use appropriate conf:time ratio
+        return TruthFunctions.temporalProjectionRank(1, getOccurrenceTime(), when);
     }
 
 
@@ -710,8 +720,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
             //but since also eternalizing is valid, we use the stronger one.
             DefaultTruth eternalTruth = TruthFunctions.eternalize(currentTruth);
 
-            //float factor = TruthFunctions.temporalProjection(now, targetTime, occurrenceTime);
-            float factor = TruthFunctions.temporalProjection(targetTime, occurrenceTime, now);
+            float factor = TruthFunctions.temporalProjection(occurrenceTime, targetTime, now);
 
             float projectedConfidence = factor * currentTruth.getConfidence();
 

@@ -92,6 +92,8 @@ public interface TermBuilder {
         }
 
         Compound tx = transform((Compound) t, normalizeFast((Compound) t));
+        if (tx == null)
+            return null;
 
         //Termed tx = the(x); //term==concept only valid if tx==tx.anonymous()
 
@@ -372,6 +374,7 @@ public interface TermBuilder {
             if (u.length!=2) {
                 //throw new RuntimeException
                 System.err.println("invalid temporal conjunction: " + op + " " + t + " "+ Arrays.toString(u));
+                return null;
             }
             if (op == DISJUNCTION) {
                 throw new RuntimeException("invalid temporal disjunction");

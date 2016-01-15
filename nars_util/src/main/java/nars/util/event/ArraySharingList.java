@@ -100,7 +100,8 @@ public class ArraySharingList<C> implements Iterable<C> {
     }
 
     public final boolean isEmpty() {
-        return getCachedNullTerminatedArray()==null;
+        C[] cc = getCachedNullTerminatedArray();
+        return cc == null || cc[0] == null;
     }
 
     public final void clear() {

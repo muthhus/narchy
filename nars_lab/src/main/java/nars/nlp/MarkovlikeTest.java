@@ -2,6 +2,7 @@ package nars.nlp;
 
 import nars.$;
 import nars.NAR;
+import nars.guifx.demo.NARide;
 import nars.nar.Default;
 import nars.task.in.Twenglish;
 import nars.term.Term;
@@ -16,7 +17,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class MarkovlikeTest {
 
-    public static String getSentence() {
+    public static String getSentence2() {
         switch ((int)(Math.random() * 5)) {
             case 0: return "how you?";
             case 1: return "what is?"; //what is #x
@@ -26,14 +27,24 @@ public class MarkovlikeTest {
         }
         return null;
     }
+    public static String getSentence() {
+        switch ((int)(Math.random() * 1)) {
+            case 0: return "aa bb cc dd ee.";
+            //case 1: return "c d e f g h i j k l m";
+        }
+        return null;
+    }
 
     public static void main(String[] args) {
     //public void testLanguage() {
 
-        Default d = new Default(1000,2,1,3);
+        Default d = new Default(1000,4,1,3);
 
+        d.core.conceptActivation.setValue(0.1f);
 
-        d.memory.conceptForgetDurations.setValue(2);
+        d.memory.duration.set(5);
+        d.memory.conceptForgetDurations.setValue(1);
+
         //d.log();
 
         final AtomicReference<Term> prev = new AtomicReference($.the(""));
@@ -43,25 +54,29 @@ public class MarkovlikeTest {
                 //$.logger.debug(e.task.getExplanation());
                 Term nn = e[0];
                 Term mm = prev.get();
-                if (nn.equals(mm)) {
-                    //return Atom.the("_stutter");
-                    return null;
-                }
+//                if (nn.equals(mm)) {
+//                    //return Atom.the("_stutter");
+//                    return null;
+//                }
 
                 $.logger.info(Arrays.toString(e));
 
-                r = $.p(mm, nn);
+                //r = $.p(mm, nn);
+                //r = $.impl(mm, nn);
+                r = e[0];
+
                 prev.set(nn);
+
             }
             return r;
         });
 
         //d.input("$1.0$ ((echo(#a) ==> echo(#b)) <-> echo(#a,#b)). %1.0;0.99%");
 
-        int repeats = 256;
-        int wordDelay = 20;
-        int sentenceDelay = 75;
-        int speakTime = 1500;
+        int repeats = 8;
+        int wordDelay = 40;
+        int sentenceDelay = 255;
+        int speakTime = wordDelay * 16;
         int silenceTime = 500;
 
         for (int i = 0; i < repeats; i++) {
@@ -87,8 +102,7 @@ public class MarkovlikeTest {
         }
 
 
-//        NARide.show(d.loop(), e-> {
-//        });
+        NARide.show(d.loop(), e-> {});
 
     }
 
@@ -99,13 +113,12 @@ public class MarkovlikeTest {
 
 
 
-        n.input("$1.0$ sentence(" + sentenceID + ")! :|: %1%");
+        n.input("say(sentence, " + sentenceID + ")! :|:");
         //d.input("$1.0$ echo(#x)! :|: %0.55%");
 
         n.frame(speakTime);
 
-        n.input("$1.0$ sentence(" + sentenceID + ")! :|: %0%"); //stop signal
-        n.input("$1.0$ echo(?x)! :|: %0%");
+
 
 
 

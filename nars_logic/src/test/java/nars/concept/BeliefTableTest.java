@@ -6,6 +6,7 @@ import nars.NAR;
 import nars.nal.nal7.Tense;
 import nars.nar.AbstractNAR;
 import nars.nar.Default;
+import nars.task.Task;
 import nars.util.meter.BeliefAnalysis;
 import nars.util.meter.MemoryBudget;
 import org.junit.Test;
@@ -224,6 +225,49 @@ public class BeliefTableTest extends TestCase {
 
     }
 
+
+    @Test
+    public void testProjectionConfidenceDecay() {
+
+        Global.DEBUG = true;
+
+        int maxBeliefs = 12;
+        NAR n = newNAR(maxBeliefs);
+
+        n.memory.duration.set(5);
+
+        BeliefAnalysis b = new BeliefAnalysis(n, "<a-->b>");
+
+        assertEquals(0.0, (Double) b.energy().get(MemoryBudget.Budgeted.ActiveConceptPrioritySum), 0.001);
+
+
+        b.believe(0.5f, 1.0f, 0.85f, 5);
+        b.believe(0.5f, 0.0f, 0.85f, 10);
+        b.believe(0.5f, 1.0f, 0.85f, 15);
+
+        int period = 1;
+        int loops = 20;
+
+        for (int i = 0; i < loops; i++) {
+
+
+            b.run(period);
+            //b.printEnergy();
+
+
+            long now = b.nar.time();
+
+            Task tt = b.concept().getBeliefs().top(now);
+            float p = tt.getExpectation() * tt.projectionRank(now);
+
+            System.out.println(now + " " + p + " " +  tt);
+
+            //b.print();
+        }
+
+        b.print();
+
+    }
 
 //    @Ignore
 //    @Test

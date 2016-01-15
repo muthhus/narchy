@@ -1,6 +1,5 @@
 package nars.concept;
 
-import com.gs.collections.impl.set.mutable.primitive.LongHashSet;
 import nars.*;
 import nars.bag.Bag;
 import nars.budget.BudgetMerge;
@@ -26,8 +25,8 @@ public class DefaultConcept extends AtomConcept {
     protected BeliefTable goals = null;
 
     //TODO move this to a GoalBeliefTable so lazy allocation manages this:
-    final int max_last_execution_evidence_len = Global.MAXIMUM_EVIDENTAL_BASE_LENGTH * 8;
-    final LongHashSet lastevidence = new LongHashSet(max_last_execution_evidence_len);
+    //final int max_last_execution_evidence_len = Global.MAXIMUM_EVIDENTAL_BASE_LENGTH * 8;
+    //final LongHashSet lastevidence = new LongHashSet(max_last_execution_evidence_len);
 
 
     public static final BiPredicate<Task,Task> questionEquivalence = new BiPredicate<Task,Task> () {
@@ -248,6 +247,8 @@ public class DefaultConcept extends AtomConcept {
     @Override
     public boolean processGoal(Task goal, NAR nar) {
 
+        Task input = goal;
+
         Memory memory = nar.memory;
         long now = memory.time();
 
@@ -266,30 +267,30 @@ public class DefaultConcept extends AtomConcept {
         }
         else {
             float successAfter = getSuccess(now);
-            float delta = successAfter - successBefore;
-            if (delta!=0) //less desire of a goal, more happiness
-               memory.emotion.happy(delta);
+            float delta = successBefore - successAfter;
 
-            float expectation_diff = (1-successAfter) / successAfter;
-            if(Math.abs(expectation_diff) >= Global.EXECUTION_SATISFACTION_TRESHOLD) {
+            // less desire of a goal, more happiness
+            memory.emotion.happy(goal.getExpectation() * -delta);
+
+            if (delta >= Global.EXECUTION_SATISFACTION_TRESHOLD) {
                 Truth projected = goal.projection(now, now);
                 if (projected.getExpectation() > Global.EXECUTION_DESIRE_EXPECTATION_THRESHOLD) {
                     if (Op.isOperation(goal.term()) && (goal.getState() != Task.TaskState.Executed)) { //check here already
 
-                        LongHashSet ev = this.lastevidence;
-
-                        //if all evidence of the new one is also part of the old one
-                        //then there is no need to execute
-                        //which means only execute if there is new evidence which suggests doing so1
-                        if (ev.addAll(goal.getEvidence())) {
+//                        LongHashSet ev = this.lastevidence;
+//
+//                        //if all evidence of the new one is also part of the old one
+//                        //then there is no need to execute
+//                        //which means only execute if there is new evidence which suggests doing so1
+//                        if (ev.addAll(input.getEvidence())) {
                             nar.execute(goal);
 
-                            //TODO more efficient size limiting
-                            //lastevidence.toSortedList()
-                            while(ev.size() > max_last_execution_evidence_len) {
-                                ev.remove( ev.min() );
-                            }
-                        }
+//                            //TODO more efficient size limiting
+//                            //lastevidence.toSortedList()
+//                            while(ev.size() > max_last_execution_evidence_len) {
+//                                ev.remove( ev.min() );
+//                            }
+//                        }
                     }
                 }
             }
