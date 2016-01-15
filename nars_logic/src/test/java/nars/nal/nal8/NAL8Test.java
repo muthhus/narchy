@@ -13,7 +13,7 @@ import java.util.function.Supplier;
 @RunWith(Parameterized.class)
 public class NAL8Test extends AbstractNALTester {
 
-    final int cycles = 250;
+    final int cycles = 50;
 
     public NAL8Test(Supplier<NAR> b) { super(b); }
 
@@ -86,6 +86,14 @@ public class NAL8Test extends AbstractNALTester {
         tester.inputAt(10, "(goto($1) ==>+5 at:(SELF,$1)).");
 
         tester.mustBelieve(cycles, "at:(SELF,x)", 1.0f, 0.81f, i);
+    }
+    @Test public void goal_deduction_tensed_conseq_noVar() throws Narsese.NarseseException {
+        TestNAR tester = test();
+
+        tester.input("goto(x). :\\:");
+        tester.inputAt(10, "(goto(x) ==>+5 at:(SELF,x)).");
+
+        tester.mustBelieve(cycles, "at:(SELF,x)", 1.0f, 0.81f, 0);
     }
 
     @Test

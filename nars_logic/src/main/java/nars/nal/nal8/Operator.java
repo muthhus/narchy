@@ -7,13 +7,7 @@ import nars.task.Task;
 import nars.term.Term;
 import nars.term.atom.AbstractStringAtom;
 import nars.term.atom.Atom;
-import nars.term.compile.TermPrinter;
 import nars.term.compound.Compound;
-import nars.term.variable.Variable;
-
-import java.io.IOException;
-
-import static nars.Symbols.*;
 
 /**
  * the 1-arity '^' compound which wraps a term to
@@ -61,8 +55,8 @@ public final class Operator<T extends Term> extends AbstractStringAtom { //imple
     public static Term result(Compound operation, Term y) {
         Compound x = (Compound) operation.term(0);
         Term t = x.last();
-        if (!(t instanceof Variable))
-            return null;
+        /*if (!(t instanceof Variable))
+            return null;*/
 
         return $.inh(
                 y, //SetExt.make(y),

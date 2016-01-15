@@ -21,10 +21,7 @@
 package nars.nal;
 
 import com.gs.collections.impl.tuple.Tuples;
-import nars.Memory;
-import nars.NAR;
-import nars.Op;
-import nars.Premise;
+import nars.*;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.budget.UnitBudget;
@@ -37,6 +34,7 @@ import nars.truth.ProjectedTruth;
 import nars.truth.Truth;
 import nars.truth.TruthFunctions;
 
+import java.util.Set;
 import java.util.function.Consumer;
 
 
@@ -107,6 +105,8 @@ public enum LocalRules {
 //    }
 
 
+
+
     /**
      * Check if a Sentence provide a better answer to a Question or Goal
      *
@@ -136,6 +136,8 @@ public enum LocalRules {
         /** temporary for comparing the result before unification and after */
         //float newQ0 = TemporalRules.solutionQuality(question, belief, projectedTruth, now);
 
+        final Set<Task> answered = Global.newHashSet(0);
+
         Consumer<Term> proc = (st) -> {
 
             long questionOcc = question.getOccurrenceTime();
@@ -153,6 +155,9 @@ public enum LocalRules {
             //TODO move this to a callee's consumer?
             if (processSolution(question, nal, ss, memory, now)) {
                 eachSolutions.accept(ss);
+
+                if (Global.DEBUG_NON_INPUT_ANSWERED_QUESTIONS || question.isInput())
+                    answered.add(question);
             }
 
         };
@@ -171,6 +176,13 @@ public enum LocalRules {
             proc.accept(sol.term());
         }
 
+        nal.beforeNextFrame(() -> {
+            //defer these events until after frame ends so reasoning in this cycle may continue
+            answered.forEach(q -> {
+                //TODO use an Answer class which is Runnable, combining that with the Twin info
+                memory.eventAnswer.emit(Tuples.twin(q, q.getBestSolution()));
+            });
+        });
     }
 
     public static boolean processSolution(Task question, NAR nal, Task sol, Memory memory, long now) {
@@ -179,12 +191,13 @@ public enum LocalRules {
 //            throw new RuntimeException(question + " not a question");
 //        }
 
-        long then = question.getOccurrenceTime();
+        //long then = question.getOccurrenceTime();
 
         Task oldBest = question.getBestSolution();
         if (oldBest!=null && oldBest.equals(sol)) {
             return false;
         }
+        question.setBestSolution(sol);
 
         //use sol.getTruth() in case sol was changed since input to this method:
         //float newQ = solutionQuality(question, sol, sol.getTruth(), now);
@@ -199,10 +212,11 @@ public enum LocalRules {
         //get the quality of the old solution if it were applied now (when conditions may differ)
         float oldQ = (oldBest != null) ? Tense.solutionQuality(question, oldBest, now, nal.memory.duration()) : -1;
 
-//        if (oldQ > newQ) {
-//            //old solution was better
-//            return false;
-//        }
+        if (oldQ >= newQ) {
+            //old solution was better
+            return false;
+        }
+
 
         //TODO solutionEval calculates the same solutionQualities as here, avoid this unnecessary redundancy
         Budget budget = solutionEval(question, sol, nal);
@@ -220,7 +234,6 @@ public enum LocalRules {
 
         sol.getBudget().set(budget);
 
-        question.setBestSolution(sol);
 
         /*memory.output(task);
 
@@ -256,14 +269,6 @@ public enum LocalRules {
         //nal.nar().input(sol); //is this necessary? i cant find any reason for reinserting to input onw that it's part of the concept's belief/goal tables
         //}
 
-        Task finalSolution = sol;
-        //defer this event until after frame ends so reasoning in this cycle may continue
-        //if (question.isInput()) {
-            nal.beforeNextFrame(() -> {
-                //nal.input(finalSolution);
-                memory.eventAnswer.emit(Tuples.twin(question, finalSolution));
-            });
-        //}
 
         return true;
 

@@ -105,7 +105,8 @@ public abstract class TermFunction<O> extends SyncOperator {
                     new MutableTask(inh).
                         judgment().
                         truth(getResultFrequency(), getResultConfidence()).
-                        tense(getResultTense(), nar.memory), opTask, feedbackPriorityMultiplier, feedbackDurabilityMultiplier)
+                        tense(getResultTense(), nar.memory), opTask,
+                        feedbackPriorityMultiplier, feedbackDurabilityMultiplier)
             );
 
             /*float equal = equals(lastTerm, y);
@@ -279,6 +280,7 @@ public abstract class TermFunction<O> extends SyncOperator {
 
         if (t != null) {
             e.feedback( result(e.nar, opTask, t/*, x, lastTerm*/) );
+            return;
         }
 
         throw new RuntimeException(this + " return value invalid: " + y);

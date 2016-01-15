@@ -156,7 +156,7 @@ public enum Global {
 
     public static float MAX_TERMUTATIONS_PER_MATCH = 8;
     public static float MIN_TERMUTATIONS_PER_MATCH = 1;
-
+    public static final boolean DEBUG_NON_INPUT_ANSWERED_QUESTIONS = false;
 
 
 //    public static float TEMPORAL_INDUCTION_CHAIN_SAMPLE_DEPTH(float taskPriority) {

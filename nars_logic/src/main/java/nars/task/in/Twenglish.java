@@ -267,7 +267,7 @@ public class Twenglish {
             //nar.frame(1);
 
             ///nar.input("echo(" + w + "). :|: %1;0.9%");
-            nar.input("(sentence(" + sentenceID + ") ==> echo(" + w + ")). :|:");
+            nar.input("(sentence(" + sentenceID + ") ==> say(" + w + ")). :|:");
             nar.frame(wordDelay);
             //nar.input("echo(" + w + "). :|: %0;0.9%");
             //nar.frame(wordDelay);

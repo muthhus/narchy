@@ -142,15 +142,11 @@ public class ArrayListBeliefTable extends ArrayListTaskTable implements BeliefTa
                 boolean addedRevision = tryAdd(revised, ranking, memory);
                 if (addedRevision) {
                     tableChanged = true;
-                }
-
-                memory.eventRevision.emit(revised);
-                //nal.memory().logic.BELIEF_REVISION.hit();
-
-                if (!addedRevision) {
-                    //onBeliefRemoved(revised, "Task Denied Belief Table Entry", memory);
-                } else {
                     top = revised;
+                    memory.eventRevision.emit(revised);
+                    //nal.memory().logic.BELIEF_REVISION.hit();
+                } else {
+                    //onBeliefRemoved(revised, "Task Denied Belief Table Entry", memory);
                 }
             }
         }
