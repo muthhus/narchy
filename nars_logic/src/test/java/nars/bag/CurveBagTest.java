@@ -96,8 +96,8 @@ public class CurveBagTest  {
         assertEquals("[x=$0.3000;0.5000;0.5000$, y=$0.2000;0.5000;0.5000$]", a.items.toString());
 
         ii = a.iterator();
-        assertEquals("x", ii.next());
-        assertEquals("y", ii.next());
+        assertEquals("x", ii.next().get());
+        assertEquals("y", ii.next().get());
 
     }
 

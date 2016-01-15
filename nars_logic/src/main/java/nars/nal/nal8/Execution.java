@@ -83,7 +83,7 @@ public class Execution implements Runnable {
 
             //final Operation t = op.getTerm();
 
-            for (Task f : feedback) {
+            feedback.forEach(f -> {
                 //if (t == null) continue;
 
                 f.log("Feedback");
@@ -92,7 +92,7 @@ public class Execution implements Runnable {
                 //f.log("Feedback: " + t /*"Feedback"*/);
 
                 nar.input(f);
-            }
+            });
         }
 
     }

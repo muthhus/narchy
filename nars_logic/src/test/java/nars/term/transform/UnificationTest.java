@@ -4,6 +4,7 @@ import com.gs.collections.impl.factory.Sets;
 import nars.Global;
 import nars.NAR;
 import nars.Op;
+import nars.concept.Concept;
 import nars.nar.Default;
 import nars.term.Term;
 import nars.term.compound.Compound;
@@ -673,11 +674,13 @@ public class UnificationTest  {
     @Test
     public void testIndVarConnectivity() {
 
-        String c = "<<$x --> bird> ==> <$x --> animal>>.";
+        String c = "(<$x --> bird> ==> <$x --> animal>).";
 
         NAR n = new Default().nal(6);
         n.input(c);
         n.frame(1);
+
+        n.forEachConcept(Concept::print);
 
         TermLinkGraph g = new TermLinkGraph(n);
         assertTrue("termlinks form a fully connected graph:\n" + g, g.isConnected());

@@ -1,80 +1,65 @@
 package nars.concept.util;
 
+import nars.Global;
 import nars.Memory;
 import nars.budget.BudgetMerge;
 import nars.task.Task;
-import nars.util.event.ArraySharingList;
 
+import java.util.Iterator;
+import java.util.List;
 import java.util.function.BiPredicate;
+import java.util.function.Consumer;
 
 /**
  * implements a Task table suitable for Questions and Quests using an ArrayList.
- * we use an ArrayList and not an ArrayDeque (which is seemingly ideal for the
- * FIFO behavior) because we can iterate entries by numeric index avoiding
- * allocation of an Iterator.
+ * uses a List and assumes that it is an ArrayList that can be
+ * accessed by index.
  *
- * TODO use a more common collection class than ArraySharingList and deprecate it
  */
-public class ArrayListTaskTable extends ArraySharingList<Task> implements QuestionTaskTable {
+public class ArrayListTaskTable implements QuestionTaskTable {
 
     protected int capacity = 0;
 
-
-    /**
-     * warning this will create a 0-capacity table,
-     * rejecting all attempts at inputs.  either use the
-     * other constructor or change capacity after construction.
-     */
-    public ArrayListTaskTable() {
-        this(0);
-    }
+    private final List<Task> list;
 
     public ArrayListTaskTable(int capacity) {
-        super(Task[]::new);
+        super();
+        this.list = Global.newArrayList(capacity);
         setCapacity(capacity);
     }
-
-//    @Override
-//    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-//        setCapacity(in.readInt());
-//        int n = in.readInt();
-//        for (int i = 0; i < n; i++) {
-//            this.add((Task)in.readObject());
-//        }
-//    }
-//
-//
-//    @Override
-//    public void writeExternal(ObjectOutput out) throws IOException {
-//        out.writeInt(capacity);
-//        int s = size();
-//        out.writeInt(s);
-//
-//        if (s == 0) return;
-//
-//        Task[] a = getCachedNullTerminatedArray();
-//        for (int i = 0; i < s; i++) {
-//            out.writeObject(a[i]);
-//        }
-//    }
 
     @Override
     public int getCapacity() {
         return capacity;
     }
 
-//    @Override
-//    public boolean equals(Object obj) {
-//        if (!(obj instanceof TaskTable)) return false;
-//        TaskTable t = (TaskTable) obj;
-//        return getCapacity() == t.getCapacity() &&
-//                Iterators.elementsEqual(iterator(), t.iterator());
-//    }
+    //TODO not tested yet
+    @Override public void setCapacity(int newCapacity) {
+        if (this.capacity==newCapacity) return;
+
+        capacity = newCapacity;
+
+        int s = list.size();
+
+        int toRemove = s - capacity;
+        while (toRemove-- > 0)
+            list.remove( --s ); //last element
+
+    }
 
     @Override
-    public void setCapacity(int newCapacity) {
-        capacity = newCapacity;
-        data.ensureCapacity(newCapacity);
+    public int size() {
+        return list.size();
+    }
+
+    @Override
+    public void clear() {
+        list.clear();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return list.isEmpty();
     }
 
 
@@ -85,9 +70,9 @@ public class ArrayListTaskTable extends ArraySharingList<Task> implements Questi
     public Task getFirstEquivalent(Task t, BiPredicate<Task,Task> e) {
         if (isEmpty()) return null;
 
-        Task[] aa = getCachedNullTerminatedArray();
-        Task a;
-        for (int i = 0; null != (a = aa[i++]); ) {
+        List<Task> ll = this.list;
+        for (int i = 0; i < ll.size(); i++) {
+            Task a = ll.get(i);
             if (e.test(a, t))
                 return a;
         }
@@ -113,22 +98,31 @@ public class ArrayListTaskTable extends ArraySharingList<Task> implements Questi
         int siz = size();
         if (siz + 1 > capacity) {
             // FIFO, remove oldest question (last)
-            /*Task removed = */remove(siz - 1);
+            /*Task removed = */list.remove(siz - 1);
 
             //m.remove(removed, "TaskTable FIFO Out");
 
             //m.emit(Events.ConceptQuestionRemove.class, c, removed /*, t*/);
         }
 
-        add(0, t);
+        list.add(0, t);
 
         //m.emit(Events.ConceptQuestionAdd.class, c, t);
 
         return t;
     }
 
+    @Override
+    public Iterator<Task> iterator() {
+        return list.iterator();
+    }
 
-//    @Override
+    @Override
+    public void forEach(Consumer<? super Task> action) {
+        list.forEach(action);
+    }
+
+    //    @Override
 //    public final boolean contains(Task t) {
 //        //        //equality:
 ////        //  1. term (given because it is looking up in concept)

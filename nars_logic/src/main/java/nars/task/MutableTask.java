@@ -10,9 +10,12 @@ import nars.term.Termed;
 import nars.term.compound.Compound;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
+import java.lang.ref.Reference;
 
+import static nars.Global.dereference;
 import static nars.Global.reference;
 
 /**
@@ -164,14 +167,24 @@ public class MutableTask extends AbstractTask {
         if (parentTask == null)
             throw new RuntimeException("parent task being set to null");
 
-        Task previousParent = getParentTask();
-        Task previousBelief = getParentBelief();
 
-        this.parentTask = reference(parentTask);
-        this.parentBelief = reference(parentBelief);
 
-        if (parentTask!=previousParent || parentBelief!=previousBelief)
-            updateEvidence();
+        //TODO avoid creating the ref's if not necessary?
+        return parent(reference(parentTask), reference(parentBelief));
+    }
+
+    @NotNull
+    public MutableTask parent(Reference<Task> rt, Reference<Task> rb) {
+
+        Task pt = dereference(rt);
+        Task pb = dereference(rb);
+
+        if (pt!=null && pt.isCommand()) rt = null;
+        if (pb!=null && pb.isCommand()) rb = null;
+
+        this.parentTask = rt;
+        this.parentBelief = rb;
+        updateEvidence();
 
         return this;
     }

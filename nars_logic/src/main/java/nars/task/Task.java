@@ -175,22 +175,14 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     /** called when a Concept processes this Task */
     void onConcept(Concept c);
 
-    default <X extends Compound> MutableTask solution(X t, char newPunc, Truth solutionTruth, long newOcc, Task question, Memory memory) {
-
-
-
-        MutableTask tt = new MutableTask(t, newPunc)
+    default Task solution(Compound t, char newPunc, Truth solutionTruth, long newOcc, Task question, Memory memory) {
+        return new MutableTask(t, newPunc)
             .truth(solutionTruth)
             .budget(getPriority(), getDurability(), getQuality())
-            .time(memory.time(), newOcc);
-
-        tt.setParents(getParentTaskRef(), getParentBeliefRef());
-
-
-        tt.setEvidence(getEvidence());
-        //tt.log(getLog());
-        tt.log(new Solution(question));
-        return tt;
+            .time(memory.time(), newOcc)
+            .parent(getParentTaskRef(), getParentBeliefRef())
+            .setEvidence(getEvidence())
+            .log(new Solution(question));
     }
 
     char getPunctuation();
@@ -486,11 +478,11 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
 
 
-    /** append a log entry */
-    void log(Object entry);
+    /** append a log entry; returns this task */
+    Task log(Object entry);
 
-    /** append log entries */
-    void log(List entries);
+    /** append log entries; returns this task */
+    Task log(List entries);
 
     /** get the recorded log entries */
     List getLog();

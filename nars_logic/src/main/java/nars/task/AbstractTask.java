@@ -2,7 +2,6 @@ package nars.task;
 
 import nars.Global;
 import nars.Memory;
-import nars.budget.Budget;
 import nars.budget.Item;
 import nars.concept.Concept;
 import nars.nal.nal7.Tense;
@@ -13,7 +12,6 @@ import nars.truth.DefaultTruth;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import nars.util.data.Util;
-import nars.util.data.array.LongArrays;
 
 import java.lang.ref.Reference;
 import java.util.Arrays;
@@ -39,7 +37,7 @@ public abstract class AbstractTask extends Item<Task>
 
     private Truth truth;
 
-    private long[] evidentialSet = LongArrays.EMPTY_ARRAY;
+    private long[] evidentialSet = null;
 
     private long creationTime = Tense.TIMELESS;
     private long occurrenceTime = Tense.ETERNAL;
@@ -64,14 +62,14 @@ public abstract class AbstractTask extends Item<Task>
     private List log = null;
 
 
-    public AbstractTask(Compound term, char punctuation, Truth truth, Budget bv, Task parentTask, Task parentBelief, Task solution) {
-        this(term, punctuation, truth,
-                bv.getPriority(),
-                bv.getDurability(),
-                bv.getQuality(),
-                parentTask, parentBelief,
-                solution);
-    }
+//    public AbstractTask(Compound term, char punctuation, Truth truth, Budget bv, Task parentTask, Task parentBelief, Task solution) {
+//        this(term, punctuation, truth,
+//                bv.getPriority(),
+//                bv.getDurability(),
+//                bv.getQuality(),
+//                parentTask, parentBelief,
+//                solution);
+//    }
 
     public AbstractTask(Compound term, char punc, Truth truth, float p, float d, float q) {
         this(term, punc, truth, p, d, q, (Task) null, null, null);
@@ -91,6 +89,7 @@ public abstract class AbstractTask extends Item<Task>
         this(task, task.getPunctuation(), task.getTruth(),
                 task.getPriority(), task.getDurability(), task.getQuality(),
                 task.getParentTaskRef(), task.getParentBeliefRef(), task.getBestSolutionRef());
+        setEvidence(task.getEvidence());
     }
 
     @Override
@@ -127,7 +126,8 @@ public abstract class AbstractTask extends Item<Task>
         this.term = term;
         this.parentTask = parentTask;
         this.parentBelief = parentBelief;
-        bestSolution = solution;
+        this.bestSolution = solution;
+        updateEvidence();
     }
 
     @Override
@@ -177,8 +177,6 @@ public abstract class AbstractTask extends Item<Task>
         setTerm(normalizedTerm);
 
 
-        updateEvidence();
-
         if (truth == null && isJudgmentOrGoal()) {
             //apply the default truth value for specified punctuation
             truth = new DefaultTruth(punc, memory);
@@ -215,18 +213,24 @@ public abstract class AbstractTask extends Item<Task>
 
         //finally, assign a unique stamp if none specified (input)
         if (getEvidence() == null) {
-            setEvidence(memory.newStampSerial());
+            if (!isInput()) {
+                throw new RuntimeException("non-Input task without evidence: " + this);
+            } else {
 
-            //this actually means it arrived from unknown origin.
-            //we'll clarify what null evidence means later.
-            //if data arrives via a hardware device, can a virtual
-            //task be used as the parent when it generates it?
-            //doesnt everything originate from something else?
-            if (log == null)
-                log("Input");
+                setEvidence(memory.newStampSerial());
+
+                //this actually means it arrived from unknown origin.
+                //we'll clarify what null evidence means later.
+                //if data arrives via a hardware device, can a virtual
+                //task be used as the parent when it generates it?
+                //doesnt everything originate from something else?
+                if (log == null)
+                    log("Input");
+            }
         }
 
-        hash = rehash();
+
+        //hash = rehash();
 
         onNormalized(memory);
 
@@ -313,8 +317,7 @@ public abstract class AbstractTask extends Item<Task>
         return isJudgmentOrGoal() && (getState() == TaskState.Anticipated || isInput());
     }
 
-    @Override
-    public Task setEvidence(long... evidentialSet) {
+    protected Task setEvidence(long... evidentialSet) {
         if (this.evidentialSet!=evidentialSet) {
             this.evidentialSet = evidentialSet;
             invalidate();
@@ -324,24 +327,26 @@ public abstract class AbstractTask extends Item<Task>
 
     @Override
     public final boolean isDouble() {
-        return getParentBelief() != null && getParentTask() != null;
+        return getParentBelief() != null;
     }
+
     @Override
     public final boolean isSingle() {
-        return getParentBelief()==null && getParentTask()!=null ;
+        return getParentBelief()==null;
     }
 
 
 
     @Override
-    public void log(List historyToCopy) {
+    public Task log(List historyToCopy) {
         if (!Global.DEBUG_TASK_LOG)
-            return;
+            return this;
 
         if (historyToCopy != null) {
             if (log == null) log = Global.newArrayList(historyToCopy.size());
             log.addAll(historyToCopy);
         }
+        return this;
     }
 
     @Override
@@ -351,7 +356,12 @@ public abstract class AbstractTask extends Item<Task>
 
     @Override
     public final long[] getEvidence() {
-        return evidentialSet;
+        long[] e = this.evidentialSet;
+        if (e == null) {
+            updateEvidence();
+            e = this.evidentialSet;
+        }
+        return e;
     }
 
     @Override
@@ -405,16 +415,16 @@ public abstract class AbstractTask extends Item<Task>
         //supplying no evidence will be assigned a new serial
         //but this should only happen for input tasks (with no parent)
 
-        if (isDouble()) {
-            setEvidence( Stamp.toSetArray( Stamp.zip(getParentTask(), getParentBelief() )));
-        } else if ( isSingle() ) {
-            setEvidence( getParentTask().getEvidence() );
+        if (getParentTask()!=null) {
+            if (isDouble())
+                setEvidence( Stamp.toSetArray( Stamp.zip(getParentTask(), getParentBelief() )));
+            else if ( isSingle() )
+                setEvidence(getParentTask().getEvidence());
         } else {
             setEvidence(null);
         }
 
     }
-
 
     public final void invalidate() {
         hash = 0;
@@ -423,7 +433,7 @@ public abstract class AbstractTask extends Item<Task>
     @Override
     public void setOccurrenceTime(long o) {
         if (o != occurrenceTime) {
-            occurrenceTime = o;
+            this.occurrenceTime = o;
             invalidate();
         }
     }
@@ -574,15 +584,16 @@ public abstract class AbstractTask extends Item<Task>
      * of the Task and the reason for it.
      */
     @Override
-    public final void log(Object entry) {
+    public final Task log(Object entry) {
         if (!Global.DEBUG_TASK_LOG)
-            return;
+            return this;
 
         //TODO parameter for max history length, although task history should not grow after they are crystallized with a concept
         if (log == null)
             log = Global.newArrayList(1);
 
         log.add(entry);
+        return this;
     }
 
     @Override
@@ -603,10 +614,7 @@ public abstract class AbstractTask extends Item<Task>
 //        this.hash = 0;
     }*/
 
-    public final void setParents(Reference<Task> parentTask, Reference<Task> parentBelief) {
-        this.parentTask = parentTask;
-        this.parentBelief = parentBelief;
-    }
+
 
     /**
      * Get the parent belief of a task

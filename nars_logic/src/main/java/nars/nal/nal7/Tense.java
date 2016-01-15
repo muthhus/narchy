@@ -8,10 +8,6 @@ import nars.term.compound.Compound;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import static nars.nal.UtilityFunctions.or;
 
 public enum Tense  {
@@ -285,10 +281,11 @@ public enum Tense  {
 
     public static boolean overlapping(Stamp a, Stamp b) {
 
+        long[] ae = a.getEvidence();
         if (b == null) return false;
         if (a == b) return true;
 
-        return overlapping(a.getEvidence(), b.getEvidence());
+        return overlapping(ae, b.getEvidence());
     }
 
     @Override
@@ -296,19 +293,19 @@ public enum Tense  {
         return symbol;
     }
     
-    protected static final Map<String, Tense> stringToTense;
-    
-    static {
-        Map<String, Tense> stt = new HashMap(Tense.values().length*2);
-        for (Tense t : Tense.values()) {
-            stt.put(t.toString(), t);
-        }
-        stringToTense = Collections.unmodifiableMap( stt );
-    }
-
-    public static Tense tense(String s) {
-        return stringToTense.get(s);
-    }
+//    protected static final Map<String, Tense> stringToTense;
+//
+//    static {
+//        Map<String, Tense> stt = new HashMap(Tense.values().length*2);
+//        for (Tense t : Tense.values()) {
+//            stt.put(t.toString(), t);
+//        }
+//        stringToTense = Collections.unmodifiableMap( stt );
+//    }
+//
+//    public static Tense tense(String s) {
+//        return stringToTense.get(s);
+//    }
 
 }
 

@@ -15,7 +15,7 @@ import java.util.function.Supplier;
 @RunWith(Parameterized.class)
 public class NAL7Test extends AbstractNALTester {
 
-    final int cycles = 30;
+    final int cycles = 60;
 
     public NAL7Test(Supplier<NAR> b) {
         super(b);
@@ -301,7 +301,7 @@ public class NAL7Test extends AbstractNALTester {
         //note: this result is reversed (pred equiv direction AND the occurrence time) from the original NAL7 test but its semantics are equivalent
         tester.mustBelieve(cycles,
                 "(<$1 --> (/, enter, _, room)> <=>-2 <$1 --> (/, open, _, door)>)",
-                1.00f, 0.45f,
+                1.00f, 0.81f, //0.45f,
                 2
         );
 
@@ -317,7 +317,8 @@ public class NAL7Test extends AbstractNALTester {
         //note: this result is reversed (pred equiv direction AND the occurrence time) from the original NAL7 test but its semantics are equivalent
         tester.mustBelieve(cycles,
                 "(<$1 --> (/, enter, _, room)> ==>-2 <$1 --> (/, open, _, door)>)",
-                1.00f, 0.45f,
+                1.00f,
+                0.81f, //0.45f,
                 2
         );
 

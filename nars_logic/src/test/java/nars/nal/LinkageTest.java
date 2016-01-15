@@ -8,10 +8,8 @@ import nars.nar.AbstractNAR;
 import nars.nar.Default;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.util.graph.TermLinkGraph;
 import nars.util.meter.TestNAR;
 import org.jetbrains.annotations.NotNull;
-import org.jgrapht.alg.StrongConnectivityInspector;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -105,25 +103,25 @@ public class LinkageTest extends AbstractNALTester {
 
 
         //System.err.println(premise1 + " not linked with " + premise2);
-        TermLinkGraph g = new TermLinkGraph(nar);
-        assertTrue(g.edgeSet().size() > 0);
-        assertTrue(g.vertexSet().size() > 0);
-
-        //g.print(System.out);
-        //System.out.println(g.isConnected() + " " + g.vertexSet().size() + " " + g.edgeSet().size());
-        //if (!g.isConnected()) {
-        if (!g.isStronglyConnected()) {
-            StrongConnectivityInspector ci =
-                    //new ConnectivityInspector(g);
-                    new StrongConnectivityInspector(g);
-            System.out.println("pemise: " + premise1 + " and " + premise2 + " termlink strongly connected subgraphs");
-            ci
-                //.connectedSets()
-                .stronglyConnectedSubgraphs()
-                .forEach( s -> System.out.println("\t" + s));
-
-        }
-        assertTrue(g.isConnected());
+//        TermLinkGraph g = new TermLinkGraph(nar);
+//        assertTrue(g.vertexSet().size() > 0);
+//        assertTrue(g.edgeSet().size() > 0);
+//
+//        //g.print(System.out);
+//        //System.out.println(g.isConnected() + " " + g.vertexSet().size() + " " + g.edgeSet().size());
+//        //if (!g.isConnected()) {
+//        if (!g.isStronglyConnected()) {
+//            StrongConnectivityInspector ci =
+//                    //new ConnectivityInspector(g);
+//                    new StrongConnectivityInspector(g);
+//            System.out.println("pemise: " + premise1 + " and " + premise2 + " termlink strongly connected subgraphs");
+//            ci
+//                //.connectedSets()
+//                .stronglyConnectedSubgraphs()
+//                .forEach( s -> System.out.println("\t" + s));
+//
+//        }
+//        assertTrue(g.isConnected());
 
         assertTrue(passed);
         assertTrue(passed2);

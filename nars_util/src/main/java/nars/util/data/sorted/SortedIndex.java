@@ -50,9 +50,9 @@ public abstract class SortedIndex<T> implements Collection<T> {
     public abstract float score(T v);
 
 
-    public final float scoreAt(int i) {
+    public final float scoreAt(int i, int size) {
         if (i == -1) return Float.POSITIVE_INFINITY;
-        if (i == size()) return Float.NEGATIVE_INFINITY;
+        if (i == size) return Float.NEGATIVE_INFINITY;
         return score(get(i));
     }
 }

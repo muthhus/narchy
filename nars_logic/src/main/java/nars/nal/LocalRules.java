@@ -144,18 +144,14 @@ public enum LocalRules {
 
             Truth solutionTruth = sol.projection(questionOcc, now);
 
-            Task ss;
-            if (solutionTruth.equals(sol.getTruth())) {
-                ss = sol; //no change
-            } else {
-                ss = sol.solution((Compound) st,
+            Task ss = sol.solution((Compound) st,
                         sol.getPunctuation(),
                         solutionTruth,
                         questionOcc,
                         question,
                         memory
                 );
-            }
+
 
             //TODO move this to a callee's consumer?
             if (processSolution(question, nal, ss, memory, now)) {
@@ -218,10 +214,10 @@ public enum LocalRules {
         //get the quality of the old solution if it were applied now (when conditions may differ)
         float oldQ = (oldBest != null) ? Tense.solutionQuality(question, oldBest, now, nal.memory.duration()) : -1;
 
-        if (oldQ >= newQ) {
-            //old solution was better
-            return false;
-        }
+//        if (oldQ >= newQ) {
+//            //old solution was better
+//            return false;
+//        }
 
 
         //TODO solutionEval calculates the same solutionQualities as here, avoid this unnecessary redundancy

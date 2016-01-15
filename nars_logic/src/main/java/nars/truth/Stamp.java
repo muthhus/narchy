@@ -95,8 +95,6 @@ public interface Stamp {
     Stamp setCreationTime(long t);
 
     default float getOriginality() {
-        if (getEvidence() == null)
-            throw new RuntimeException(this + " has null evidence");
         return 1.0f / (getEvidence().length + 1);
     }
 
@@ -107,7 +105,7 @@ public interface Stamp {
      */
     long[] getEvidence();
 
-    Stamp setEvidence(long... evidentialSet);
+    //Stamp setEvidence(long... evidentialSet);
 
     static long[] zip(Task parentTask, Task parentBelief) {
 

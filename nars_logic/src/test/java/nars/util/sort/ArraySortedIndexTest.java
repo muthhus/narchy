@@ -25,7 +25,7 @@ public class ArraySortedIndexTest {
     @Test public void test3() { test(100, 200); }
 
     void test(int insertions, int capacity) {
-        ArraySortedIndex<NullItem> x = ArrayBag.newDefaultIndex(capacity);
+        ArraySortedIndex<NullItem> x = new ArrayBag.BudgetedArraySortedIndex<>(capacity);
         for (int i = 0; i < insertions; i++) {
             //ensureSorted(x, i);
             x.insert(new NullItem());

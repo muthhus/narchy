@@ -1,7 +1,6 @@
 package nars.util.graph;
 
 import nars.NAR;
-import nars.bag.BLink;
 import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.term.Term;
@@ -17,7 +16,7 @@ import java.util.Set;
  * Generates a graph of a set of Concept's TermLinks. Each TermLink is an edge,
  * and the set of unique Concepts and Terms linked are the vertices.
  */
-public class TermLinkGraph extends DirectedPseudograph<Term, String> {
+public class TermLinkGraph extends DirectedPseudograph<Termed, String> {
 
     public TermLinkGraph() {
         super(String.class);
@@ -42,13 +41,13 @@ public class TermLinkGraph extends DirectedPseudograph<Term, String> {
 
     public void print(PrintStream out) {
 
-        Set<Term> vs = vertexSet();
+        Set<Termed> vs = vertexSet();
 
         out.println(getClass().getSimpleName() + " numTerms=" + vs.size() + ", numTermLinks=" + edgeSet().size() );
         out.print("\t");
         out.println(this);
 
-        for (Term t : vs) {
+        for (Termed t : vs) {
             out.print(t + ":  ");
             outgoingEdgesOf(t).forEach(e ->
                 out.print("  " + e)
@@ -67,29 +66,27 @@ public class TermLinkGraph extends DirectedPseudograph<Term, String> {
 
         /** add the termlink templates instead of termlinks */
         @Override protected void addTermLinks(Concept c) {
-            Term sourceTerm = c.get();
 
-            for (Termed t : c.getTermLinkTemplates()) {
-                Term targetTerm = t.term();
+
+            for (Termed targetTerm : c.getTermLinkTemplates()) {
                 if (!containsVertex(targetTerm)) {
                     addVertex(targetTerm);
                 }
 
-                addEdge(sourceTerm, targetTerm,
-                        edge(sourceTerm, targetTerm) );
+                addEdge(c, targetTerm,
+                        edge(c, targetTerm) );
             }
         }
     }
 
-    public TermLinkGraph add(Concept c, boolean includeTermLinks/*, boolean includeTaskLinks, boolean includeOtherReferencedConcepts*/) {
-        Term source = c.get();
+    public TermLinkGraph add(Concept source, boolean includeTermLinks/*, boolean includeTaskLinks, boolean includeOtherReferencedConcepts*/) {
 
         if (!containsVertex(source)) {
             addVertex(source);
         }
 
         if (includeTermLinks) {
-            addTermLinks(c);
+            addTermLinks(source);
         }
 
                 /*
@@ -112,24 +109,23 @@ public class TermLinkGraph extends DirectedPseudograph<Term, String> {
         if (c == null)
             throw new RuntimeException("null concept");
 
-        Term cterm = c.get();
+        //Term cterm = c.get();
 
         Bag<Termed> tl = c.getTermLinks();
         if (tl == null) return;
 
-        for (BLink<Termed> tt : tl) {
-            Term target = tt.get().term();
+        c.getTermLinks().forEachKey(target -> {
             if (!containsVertex(target)) {
                 addVertex(target);
             }
 
-            addEdge(cterm, target, edge(cterm,target));
-        }
+            addEdge(c, target, edge(c,target));
+        });
     }
 
-    static String edge(Term source, Term target) {
-        return '(' + source.toStringCompact()
-                + ',' + target.toStringCompact() + ')';
+    static String edge(Termed source, Termed target) {
+        return '(' + source.toString()
+                + ',' + target.toString() + ')';
     }
 
     public TermLinkGraph add(NAR n, boolean includeTermLinks/*, boolean includeTaskLinks, boolean includeOtherReferencedConcepts*/) {

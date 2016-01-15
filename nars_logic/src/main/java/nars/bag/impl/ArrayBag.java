@@ -6,7 +6,6 @@ import nars.bag.Bag;
 import nars.budget.*;
 import nars.util.ArraySortedIndex;
 import nars.util.data.sorted.SortedIndex;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -23,7 +22,7 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
     protected BudgetMerge mergeFunction = null;
 
     public ArrayBag(int cap) {
-        this(newDefaultIndex(cap));
+        this(new BudgetedArraySortedIndex<>(cap));
     }
 
     public ArrayBag(SortedIndex<BLink<V>> items) {
@@ -37,16 +36,7 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
         super(items, map);
 
         items.clear();
-
-    }
-
-    @NotNull
-    public static <X extends Budgeted> ArraySortedIndex<X> newDefaultIndex(final int capacity) {
-        return new ArraySortedIndex<X>(capacity/4, capacity) {
-            @Override public float score(X v) {
-                return v.getPriority();
-            }
-        };
+        setCapacity(items.capacity());
     }
 
 
@@ -56,7 +46,7 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
     }
 
     @Override
-    public V key(BLink<V> l) {
+    public final V key(BLink<V> l) {
         return l.get();
     }
 
@@ -284,7 +274,8 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
         if (!v.hasDelta()) {
             return;
         }
-        if (size() == 1) {
+        int size = size();
+        if (size == 1) {
             v.commit();
             return;
         }
@@ -302,8 +293,9 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
         v.commit();
 
         float newScore = ii.score(v);
-        if ((newScore < ii.scoreAt(currentIndex+1)) || //score of item below
-                (newScore > ii.scoreAt(currentIndex-1)) //score of item above
+
+        if ((newScore < ii.scoreAt(currentIndex+1, size)) || //score of item below
+                (newScore > ii.scoreAt(currentIndex-1, size)) //score of item above
             ) {
             ii.remove(currentIndex);
             ii.insert(v); //reinsert
@@ -357,4 +349,13 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
     }
 
 
+    public final static class BudgetedArraySortedIndex<X extends Budgeted> extends ArraySortedIndex<X> {
+        public BudgetedArraySortedIndex(int capacity) {
+            super(capacity / 4, capacity);
+        }
+
+        @Override public float score(X v) {
+            return v.getPriority();
+        }
+    }
 }

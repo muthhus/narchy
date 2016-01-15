@@ -47,7 +47,7 @@ public class CurveBag<V> implements Bag<V> {
 
 
     public CurveBag(BagCurve curve, int capacity, Random rng) {
-        this(ArrayBag.newDefaultIndex(capacity), curve, rng);
+        this(new ArrayBag.BudgetedArraySortedIndex<>(capacity), curve, rng);
 
                                 /*if (capacity < 128)*/
         //items = new ArraySortedItemList<>(capacity);

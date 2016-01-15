@@ -97,7 +97,7 @@ public abstract class AbstractNAR extends NAR {
             onExec(o);
     }
 
-    protected void initNAL9() {
+    @Deprecated protected void initNAL9() {
 
         memory.the(new Anticipate(this));
 
@@ -125,8 +125,8 @@ public abstract class AbstractNAR extends NAR {
 
         m.duration.set(5);
 
-        m.conceptBeliefsMax.set(12);
-        m.conceptGoalsMax.set(7);
+        m.conceptBeliefsMax.set(18);
+        m.conceptGoalsMax.set(14);
         m.conceptQuestionsMax.set(5);
 
         m.conceptForgetDurations.setValue(2.0);

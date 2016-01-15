@@ -9,7 +9,6 @@ import nars.nal.LocalRules;
 import nars.task.Task;
 import nars.truth.TruthFunctions;
 import nars.util.ArraySortedIndex;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -35,7 +34,7 @@ public class DefaultBeliefTable implements BeliefTable {
 
         if (cap == 1) cap = 2;
         eternal = new SetTable<Task>(cap/2, map,
-            b -> -b.getConfidence()
+            b -> b.getConfidence()
         );
         temporal = new SetTable<Task>(cap/2, map,
             b -> b.getConfidence()/(1+Math.abs(b.getOccurrenceTime() - now)/dur)
@@ -191,6 +190,7 @@ public class DefaultBeliefTable implements BeliefTable {
         if (revised != null && !revised.equals(input)) {
             //return the revised task even if it wasn't inserted allowing it to be used as a transient
             boolean inserted = insertAttempt(revised, memory);
+            //if (inserted) {
             memory.eventRevision.emit(revised);
             return revised;
         }
@@ -225,7 +225,6 @@ public class DefaultBeliefTable implements BeliefTable {
         return inserted;
     }
 
-    @NotNull
     private ArrayTable<Task, Task> getTableFor(Task t) {
         return t.isEternal() ? this.eternal : this.temporal;
     }
