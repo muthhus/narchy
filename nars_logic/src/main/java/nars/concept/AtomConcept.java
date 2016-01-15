@@ -120,15 +120,16 @@ public class AtomConcept extends AbstractConcept  {
 
             if (templateConcept != null) {
 
-                /** activate local's termlink to template */
-                termLinks.put(templateConcept, taskBudget, subScale);
-
-                /** activate (reverse) template's termlink to local */
-                templateConcept.getTermLinks().put(this, taskBudget, subScale);
+//                /** activate local's termlink to template */
+//                termLinks.put(templateConcept, taskBudget, subScale);
+//
+//                /** activate (reverse) template's termlink to local */
+//                templateConcept.getTermLinks().put(this, taskBudget, subScale);
 
                 /** recursively activate the template's task tlink */
                 templateConcept.link(t, subScale, minScale, nar);
 
+                linkTemplate(templateConcept, taskBudget, subScale);
             }
         }
 
@@ -137,10 +138,10 @@ public class AtomConcept extends AbstractConcept  {
         return true;
     }
 
-//    protected final void linkTemplate(Concept target, Budget budget, float subScale) {
-//        termLinks.put(target, budget, subScale);
-//        target.getTermLinks().put(this, budget, subScale);
-//    }
+    protected final void linkTemplate(Concept target, Budget budget, float subScale) {
+        termLinks.put(target, budget, subScale);
+        target.getTermLinks().put(this, budget, subScale);
+    }
 
     @Override
     public Task process(Task task, NAR nar) {

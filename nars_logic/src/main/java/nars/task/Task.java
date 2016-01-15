@@ -57,11 +57,11 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
             sb.append("  ");
 
 
-        task.appendTo(sb);
+        task.appendTo(sb, null, true);
 
-        /*List l = task.getLog();
+        List l = task.getLog();
         if (l!=null)
-            sb.append(" log=").append(l);*/
+            sb.append(" log=").append(l);
 
         if (task.getBestSolution() != null) {
             if (!task.term().equals(task.getBestSolution().term())) {

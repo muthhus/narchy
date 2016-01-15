@@ -17,7 +17,7 @@ import static org.junit.Assert.assertFalse;
 
 public class StampTest {
 
-    public static long[] a(long... x) {
+    static long[] a(long... x) {
         return x;
     }
 

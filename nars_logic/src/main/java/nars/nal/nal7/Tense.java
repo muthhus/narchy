@@ -285,9 +285,8 @@ public enum Tense  {
 
     public static boolean overlapping(Stamp a, Stamp b) {
 
-
-        if (a == b) return true;
         if (b == null) return false;
+        if (a == b) return true;
 
         return overlapping(a.getEvidence(), b.getEvidence());
     }

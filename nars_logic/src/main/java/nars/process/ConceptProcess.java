@@ -4,7 +4,6 @@
  */
 package nars.process;
 
-import com.gs.collections.impl.factory.Sets;
 import nars.Global;
 import nars.NAR;
 import nars.Premise;
@@ -83,21 +82,24 @@ public final class ConceptProcess implements Premise {
             belief = null;
         }
 
-
-        Set<Task> beliefs;
-
-        if (belief != null)  {
-            beliefs = Global.newHashSet(1);
+        if (belief != null) {
+            Set<Task> beliefs = Global.newHashSet(0);
             Premise.match(task, belief, nar, beliefs::add);
-        } else {
-            beliefs = Sets.mutable.of(belief);
+            if (!beliefs.isEmpty()) {
+                beliefs.forEach(matchedBelief -> {
+                    cp.accept(new ConceptProcess(nar, concept,
+                            taskLink, termLink, matchedBelief));
+                });
+                return beliefs.size();
+            }
         }
 
-        beliefs.forEach(matchedBelief -> {
-            cp.accept(new ConceptProcess(nar, concept,
-                    taskLink, termLink, matchedBelief));
-        });
-        return beliefs.size();
+        cp.accept(new ConceptProcess(nar, concept,
+                taskLink, termLink, belief));
+        return 1;
+
+
+
 
 
     }

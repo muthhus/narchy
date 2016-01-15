@@ -30,7 +30,8 @@ public class DigestBagTest {
         assertEquals(4, d.list.size());
 
         /* ignored the 0.1 conf result */
-        assertEquals(0.25f, d.list.getLast().get().getConfidence(), 0.001);
+        //revision adds results above, knocking out lower values like 0.25
+        assertEquals(0.5f, d.list.getLast().get().getConfidence(), 0.001);
 
     }
 
