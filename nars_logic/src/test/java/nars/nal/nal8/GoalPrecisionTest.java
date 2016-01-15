@@ -1,5 +1,6 @@
 package nars.nal.nal8;
 
+import nars.Global;
 import nars.NAR;
 import nars.nal.nal8.operator.SyncOperator;
 import nars.nar.Default;
@@ -39,6 +40,8 @@ public class GoalPrecisionTest {
 
     protected void run(NAR n, int end) {
 
+        Global.DEBUG = true;
+
         n.onExecTask("x", new SyncOperator() {
             @Override
             public void execute(Execution a) {
@@ -61,6 +64,10 @@ public class GoalPrecisionTest {
                 } else {
                     d[3] += pri;
                     d[4]++;
+
+                    System.out.println();
+                    System.out.println(a.task);
+                    System.out.println(a.task.getLog());
                     a.taskConcept().print();
                     System.out.println(a.task.getExplanation());
                 }
