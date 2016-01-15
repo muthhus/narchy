@@ -38,14 +38,15 @@ public class occurr extends AtomicBooleanCondition<PremiseMatch> {
         ConceptProcess p = m.premise;
 
         Term tt = taskOrBelief ? p.getTaskTerm() :
-                //p.getBeliefTerm().term();
-                p.getBelief()!=null ? p.getBelief().term() : null;
+                p.getBeliefTerm().term();
+                //p.getBelief()!=null ? p.getBelief().term() : null;
 
 
         if (tt != null && (tt instanceof Compound)) {
             int t = ((Compound)tt).t();
             if (t != Tense.ITERNAL) {
                 if (!forward) t = -t;
+
                 m.occDelta.set(t);
                 return true;
             }

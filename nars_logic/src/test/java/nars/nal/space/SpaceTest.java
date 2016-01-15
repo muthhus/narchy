@@ -46,8 +46,8 @@ public class SpaceTest {
     }
 
     @Test public void testBlank() {
-        Space xyBlank = new Space(xy);
-        assertEquals("(+,x,y)", xyBlank.toString());
+        assertEquals("(x+y)", new Space(xy).toString());
+        assertEquals("(+,x,y,z)", new Space(xyz).toString());
     }
 
 

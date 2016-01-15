@@ -80,10 +80,12 @@ public class NAL8Test extends AbstractNALTester {
     @Test public void goal_deduction_tensed_conseq() throws Narsese.NarseseException {
         TestNAR tester = test();
 
+        int i = 0;
+
         tester.input("goto(x). :\\:");
         tester.inputAt(10, "(goto($1) ==>+5 at:(SELF,$1)).");
 
-        tester.mustBelieve(cycles, "at:(SELF,x)", 1.0f, 0.81f, 0);
+        tester.mustBelieve(cycles, "at:(SELF,x)", 1.0f, 0.81f, i);
     }
 
     @Test
