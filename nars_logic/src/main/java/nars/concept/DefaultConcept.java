@@ -196,6 +196,7 @@ public class DefaultConcept extends AtomConcept {
     @Override
     public boolean processBelief(Task belief, NAR nar) {
 
+
         long now = nar.time();
         float successBefore = getSuccess(now);
 
@@ -256,11 +257,11 @@ public class DefaultConcept extends AtomConcept {
         if (goals == null) goals = new ArrayListBeliefTable(nar.memory.conceptGoalsMax.intValue());
 
 
-        Task strongest = getGoals().add( goal,
+        goal = getGoals().add( goal,
                 new BeliefTable.SolutionQualityMatchingOrderRanker(goal, now),
                 this, memory);
 
-        if (strongest==null) {
+        if (goal==null) {
             return false;
         }
         else {
@@ -271,7 +272,7 @@ public class DefaultConcept extends AtomConcept {
 
             float expectation_diff = (1-successAfter) / successAfter;
             if(Math.abs(expectation_diff) >= Global.EXECUTION_SATISFACTION_TRESHOLD) {
-                Truth projected = strongest.projection(now, now);
+                Truth projected = goal.projection(now, now);
                 if (projected.getExpectation() > Global.EXECUTION_DESIRE_EXPECTATION_THRESHOLD) {
                     if (Op.isOperation(goal.term()) && (goal.getState() != Task.TaskState.Executed)) { //check here already
 
@@ -281,7 +282,7 @@ public class DefaultConcept extends AtomConcept {
                         //then there is no need to execute
                         //which means only execute if there is new evidence which suggests doing so1
                         if (ev.addAll(goal.getEvidence())) {
-                            nar.execute(strongest);
+                            nar.execute(goal);
 
                             //TODO more efficient size limiting
                             //lastevidence.toSortedList()
@@ -438,10 +439,10 @@ public class DefaultConcept extends AtomConcept {
 
         //TODO if the table was not affected, does the following still need to happen:
 
-        long now = nar.time();
+        long now = q.getOccurrenceTime();
         Task sol = q.isQuest() ?
-                getGoals().top(q, now) :
-                getBeliefs().top(q, now);
+                getGoals().top(now) :
+                getBeliefs().top(now);
 
         if (sol!=null) {
 

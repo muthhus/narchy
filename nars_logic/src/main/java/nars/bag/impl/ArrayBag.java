@@ -437,7 +437,7 @@ public class ArrayBag<V> extends Bag<V> {
         }
     }
 
-    @Override public void top(Consumer<BLink> action) {
+    @Override public final void top(Consumer<BLink> action) {
         items.getList().forEach(action);
     }
     @Override public void topN(int limit, Consumer<BLink> action) {

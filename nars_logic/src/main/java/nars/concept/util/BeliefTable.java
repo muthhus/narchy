@@ -87,20 +87,26 @@ public interface BeliefTable extends TaskTable {
         }
 
         @Override
+        public Task topEternal() {
+            return null;
+        }
+
+        @Override
+        public Task topTemporal(long when) {
+            return null;
+        }
+
+        @Override
+        public Task top() {
+            return null;
+        }
+
+        @Override
         public boolean add(Task t) {
             return false;
         }
 
-//        @Override
-//        public boolean contains(Task t) {
-//            return false;
-//        }
 
-
-        @Override
-        public Task top(boolean eternal, boolean temporal) {
-            return null;
-        }
     };
 
 
@@ -170,17 +176,17 @@ public interface BeliefTable extends TaskTable {
         return t / beliefs.size();
     }
 
-    default Task top(Task query, long now) {
-
-        switch (size()) {
-            case 0: return null;
-            case 1: return top();
-            default:
-                //TODO re-use the Ranker
-                return top(new SolutionQualityMatchingOrderRanker(query, now));
-        }
-
-    }
+//    default Task top(Task query, long now) {
+//
+//        switch (size()) {
+//            case 0: return null;
+//            case 1: return top();
+//            default:
+//                //TODO re-use the Ranker
+//                return top(new SolutionQualityMatchingOrderRanker(query, now));
+//        }
+//
+//    }
 
     default float getConfidenceMax(float minFreq, float maxFreq) {
         float max = Float.NEGATIVE_INFINITY;
@@ -256,18 +262,24 @@ public interface BeliefTable extends TaskTable {
 
 
 
-    /** get the top-ranking belief/goal, selecting either eternal or temporal beliefs, or both  */
-    Task top(boolean eternal, boolean temporal);
+    /** get the top-ranking eternal belief/goal */
+    Task topEternal();
 
-    /** get the top-ranking belief/goal */
-    default Task top() {
-        return top(true, true);
+    Task topTemporal(long when);
+
+    /** get the most relevant belief/goal with respect to a specific time. */
+    default Task top(long t) {
+        if (t == Tense.ETERNAL) return topEternal();
+        else return topTemporal(t);
     }
 
+    /** get the top-ranking belief/goal */
+    Task top();
+
     /** the truth v alue of the topmost element, or null if there is none */
-    default Truth topTruth() {
+    default Truth topTruth(long now) {
         if (isEmpty()) return null;
-        return top().getTruth();
+        return top(now).getTruth();
     }
 
     default void print(PrintStream out) {
@@ -339,6 +351,7 @@ public interface BeliefTable extends TaskTable {
         }
 
     }
+
 
 
 

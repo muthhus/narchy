@@ -108,6 +108,8 @@ public class CurveBag<V> extends Bag<V> {
         return null; // empty bag
     }
 
+
+
     @Override
     public final void topWhile(Predicate<BLink> each) {
         arrayBag.topWhile(each);
@@ -352,7 +354,7 @@ public class CurveBag<V> extends Bag<V> {
 //        return next; //# of items actually filled in the array
 //    }
 
-    @Override public void top(Consumer<BLink> each) {
+    @Override public final void top(Consumer<BLink> each) {
         arrayBag.top(each);
     }
     @Override public void topN(int limit, Consumer<BLink> each) {

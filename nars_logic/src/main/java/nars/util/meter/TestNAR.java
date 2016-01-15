@@ -142,6 +142,8 @@ public class TestNAR  {
     }
 
 
+
+
     final class EarlyExit extends CycleReaction {
 
         final int checkResolution; //every # cycles to check for completion
@@ -368,6 +370,9 @@ public class TestNAR  {
 
         //explainable(t);
         return this;
+    }
+    public void askAt(int i, String term) {
+        nar.inputAt(i, term + "?");
     }
 
 

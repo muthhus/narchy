@@ -255,7 +255,6 @@ public abstract class Bag<V> extends AbstractCacheBag<V, BLink<V>> implements Co
         return total[0];
     }
 
-    @Deprecated
     public void top(Consumer<BLink> each) {
         topWhile(e -> {
             each.accept(e);

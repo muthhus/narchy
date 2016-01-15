@@ -277,8 +277,9 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
 
         //pre-normalize to avoid discovering invalidity after having consumed space and survived the input queue
         derived = derived.normalize(premise.memory());
+        if (derived == null) return null;
 
-        if ((null!=derived) && (null!= premise.derive(derived))) {
+        if ((null!= premise.derive(derived))) {
             p.receiver.accept(derived);
             return derived;
         }

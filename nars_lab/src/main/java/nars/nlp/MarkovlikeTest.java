@@ -2,7 +2,6 @@ package nars.nlp;
 
 import nars.$;
 import nars.NAR;
-import nars.guifx.demo.NARide;
 import nars.nar.Default;
 import nars.task.in.Twenglish;
 import nars.term.Term;
@@ -19,11 +18,11 @@ public class MarkovlikeTest {
 
     public static String getSentence() {
         switch ((int)(Math.random() * 5)) {
-            case 0: return "hi how are you?";
-            case 1: return "im fine thanks. and you?";
-            case 2: return "hello!";
-            case 3: return "im talking to you.";
-            case 4: return "now whats new?";
+            case 0: return "how you?";
+            case 1: return "what is?"; //what is #x
+            case 2: return "thanks im ok.";
+            case 3: return "what new?";
+            case 4: return "hello you!";
         }
         return null;
     }
@@ -41,10 +40,17 @@ public class MarkovlikeTest {
         final On l = d.onExecTerm("say", e -> {
             Term r;
             synchronized (prev) {
-                $.logger.info(Arrays.toString(e));
                 //$.logger.debug(e.task.getExplanation());
                 Term nn = e[0];
-                r = $.p(prev.get(), nn);
+                Term mm = prev.get();
+                if (nn.equals(mm)) {
+                    //return Atom.the("_stutter");
+                    return null;
+                }
+
+                $.logger.info(Arrays.toString(e));
+
+                r = $.p(mm, nn);
                 prev.set(nn);
             }
             return r;
@@ -52,11 +58,11 @@ public class MarkovlikeTest {
 
         //d.input("$1.0$ ((echo(#a) ==> echo(#b)) <-> echo(#a,#b)). %1.0;0.99%");
 
-        int repeats = 8;
-        int wordDelay = 50;
-        int sentenceDelay = 50;
-        int speakTime = 2500;
-        int silenceTime = 200;
+        int repeats = 256;
+        int wordDelay = 20;
+        int sentenceDelay = 75;
+        int speakTime = 1500;
+        int silenceTime = 500;
 
         for (int i = 0; i < repeats; i++) {
 
@@ -81,8 +87,8 @@ public class MarkovlikeTest {
         }
 
 
-        NARide.show(d.loop(), e-> {
-        });
+//        NARide.show(d.loop(), e-> {
+//        });
 
     }
 

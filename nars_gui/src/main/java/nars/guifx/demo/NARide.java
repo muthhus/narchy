@@ -122,7 +122,7 @@ public class NARide extends BorderPane {
                         };
 
                 @Override public Node make(Concept cc) {
-                    ConceptSummaryPane csp = new ConceptSummaryPane(cc);
+                    ConceptSummaryPane csp = new ConceptSummaryPane(cc, nar.time());
                     setOnMouseClicked( clickHandler );
                     return csp;
                 }

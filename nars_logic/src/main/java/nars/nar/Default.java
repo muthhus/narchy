@@ -289,7 +289,7 @@ public class Default extends AbstractNAR {
         }
 
         private void forgetConcepts() {
-            active.topWhile(conceptForget); //TODO use downsampling % of concepts not TOP
+            active.top(conceptForget); //TODO use downsampling % of concepts not TOP
         }
 
         private void updateActivated() {
@@ -359,7 +359,7 @@ public class Default extends AbstractNAR {
             //activate(c);
         }
 
-        final static class AlannForget implements Predicate<BLink>, Consumer<Memory> {
+        final static class AlannForget implements Consumer<BLink>, Predicate<BLink> {
 
             private final MutableFloat forgetTime;
             private final MutableFloat perfection;
@@ -372,19 +372,19 @@ public class Default extends AbstractNAR {
             public AlannForget(NAR nar, MutableFloat forgetTime, MutableFloat perfection) {
                 this.forgetTime = forgetTime;
                 this.perfection = perfection;
-                nar.onEachCycle(this);
+                nar.onEachCycle(this::accept);
                 accept(nar.memory);
             }
 
             @Override
-            public boolean test(BLink budget) {
+            public void accept(BLink budget) {
                 // priority * e^(-lambda*t)
                 //     lambda is (1 - durabilty) / forgetPeriod
                 //     dt is the delta
                 final long currentTime = now;
 
                 long dt = budget.setLastForgetTime(currentTime);
-                if (dt == 0) return true; //too soon to update
+                if (dt == 0) return ; //too soon to update
 
                 float currentPriority = budget.getPriorityIfNaNThenZero();
 
@@ -400,15 +400,20 @@ public class Default extends AbstractNAR {
 
                 budget.setPriority(nextPriority);
 
-                return true;
             }
 
-            @Override
+
             public void accept(Memory memory) {
                 //same for duration of the cycle
                 forgetTimeCached = forgetTime.floatValue() * memory.duration();
                 perfectionCached = perfection.floatValue();
                 now = memory.time();
+            }
+
+            @Override
+            public boolean test(BLink bLink) {
+                accept(bLink);
+                return true;
             }
         }
 

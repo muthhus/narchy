@@ -26,7 +26,7 @@ public class ConceptSummaryPane extends Text {
             conf, //all the way down to gray
             0.1 + 0.9f * conf));
 
-    public ConceptSummaryPane(Concept c) {
+    public ConceptSummaryPane(Concept c, long now) {
         super(c.get().toStringCompact());
 
 
@@ -44,14 +44,14 @@ public class ConceptSummaryPane extends Text {
                     //icon.size(iconWidth, iconWidth);
                 }
 
-                update(true,false);
+                update(true,false,now);
             }
         });
 
 
     }
 
-    public void update(boolean priority, boolean icon) {
+    public void update(boolean priority, boolean icon, long now) {
 
         if (this.icon == null)
             icon = false;
@@ -72,7 +72,7 @@ public class ConceptSummaryPane extends Text {
 
             Color color;
             if (concept.hasBeliefs()) {
-                Truth tv = concept.getBeliefs().topTruth();
+                Truth tv = concept.getBeliefs().topTruth(now);
                 color = truthColors.get(tv.getFrequency(), tv.getConfidence());
             }
             else {

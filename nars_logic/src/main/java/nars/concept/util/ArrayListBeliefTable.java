@@ -4,7 +4,6 @@ import nars.Global;
 import nars.Memory;
 import nars.concept.Concept;
 import nars.nal.LocalRules;
-import nars.nal.nal7.Tense;
 import nars.task.Task;
 import nars.truth.DefaultTruth;
 
@@ -33,31 +32,42 @@ public class ArrayListBeliefTable extends ArrayListTaskTable implements BeliefTa
 
 
     @Override
-    public Task top(boolean eternal, boolean temporal) {
+    public Task top() {
+        if (isEmpty()) return null;
+        return getCachedNullTerminatedArray()[0];
+    }
 
+    @Override
+    public Task topEternal() {
         Task[] tasks = getCachedNullTerminatedArray();
+        if (tasks==null) return null;
 
-        if (tasks == null)
-            return null;
-
-        if (eternal && temporal) {
-            return tasks[0];
+        for (Task x : tasks) {
+            if (x.isEternal()) return x;
         }
-        if (eternal ^ temporal) {
-            ///final int n = size();
-
-            Task t;
-            for (int i = 0; null != (t = tasks[i++]); ) {
-                boolean tEtern = Tense.isEternal(t.getOccurrenceTime());
-                if (eternal && tEtern || temporal && !tEtern) return t;
-            }
-        }
-
         return null;
     }
 
-
     @Override
+    public Task topTemporal(long when) {
+        Task[] tasks = getCachedNullTerminatedArray();
+        if (tasks == null) return null;
+
+        Task best = null;
+        float bestConf = -1;
+        for (Task x : tasks) {
+            if (x == null) break;
+            float c = x.projectionConfidence(when, when);
+            if (c > bestConf) {
+                best = x;
+                bestConf = c;
+            }
+        }
+        return best;
+    }
+
+
+    @Deprecated @Override
     public final Task top(Ranker r) {
 
         Task[] tasks = getCachedNullTerminatedArray();
@@ -123,14 +133,16 @@ public class ArrayListBeliefTable extends ArrayListTaskTable implements BeliefTa
 
         boolean tableChanged = false;
 
+        long now = memory.time();
+        Task top = top(now); //get the top belief before adding
+
         boolean added = tryAdd(input, ranking, memory);
+
         if (added) {
             tableChanged = true;
+        } else if (input.getDeleted()) {
+            return top;
         }
-
-        long now = memory.time();
-        Task top = top(input, now);
-
 
         //TODO make sure input.isDeleted() can not happen
         if (!input.getDeleted() && LocalRules.revisible(input, top)) {
@@ -142,8 +154,8 @@ public class ArrayListBeliefTable extends ArrayListTaskTable implements BeliefTa
                 boolean addedRevision = tryAdd(revised, ranking, memory);
                 if (addedRevision) {
                     tableChanged = true;
-                    top = revised;
                     memory.eventRevision.emit(revised);
+                    top = top(now);
                     //nal.memory().logic.BELIEF_REVISION.hit();
                 } else {
                     //onBeliefRemoved(revised, "Task Denied Belief Table Entry", memory);
@@ -151,15 +163,13 @@ public class ArrayListBeliefTable extends ArrayListTaskTable implements BeliefTa
             }
         }
 
-        //nal.updateBelief(top);
-
         if (tableChanged) {
             onChanged(c, memory);
         }
 
-        if (!added) {
-            //onBeliefRemoved(input, "Task Denied Belief Table Entry (2)", memory);
-        }
+//        if (!added) {
+//            //onBeliefRemoved(input, "Task Denied Belief Table Entry (2)", memory);
+//        }
 
         return top;
     }
@@ -190,9 +200,11 @@ public class ArrayListBeliefTable extends ArrayListTaskTable implements BeliefTa
 
             if (b.equals(input)) {
                 //these should be preventable earlier
-                onBeliefRemoved(input, "Duplicate", memory);
-                if (Global.DEBUG) {
-                    checkForDeleted();
+                if (b!=input) {
+                    onBeliefRemoved(input, "Duplicate", memory);
+                    if (Global.DEBUG) {
+                        checkForDeleted();
+                    }
                 }
                 return false;
             }
@@ -232,7 +244,7 @@ public class ArrayListBeliefTable extends ArrayListTaskTable implements BeliefTa
         data.forEach((Task dt) -> {
 //            if (dt == null)
 //                throw new RuntimeException("wtf");
-            if (dt == null || dt.getDeleted()) {
+            if (dt.getDeleted()) {
                 throw new RuntimeException(
                         //System.err.println(
                         "deleted tasks should not be present in belief tables: " + dt);

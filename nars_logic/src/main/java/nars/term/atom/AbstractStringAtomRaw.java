@@ -18,7 +18,7 @@ public abstract class AbstractStringAtomRaw extends Atomic  {
     @Override
     public abstract Op op();
 
-    @Override public String toString() {
+    @Override public final String toString() {
         return id;
     }
 

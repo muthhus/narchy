@@ -293,6 +293,11 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         return t.getConfidence();
     }
 
+    default float projectionConfidence(long when, long now) {
+        //TODO avoid creating Truth Values by calculating the confidence directly. then use this in projection's original usage as well
+        return projection(when, now).getConfidence();
+    }
+
 
     enum TaskState {
         Anticipated,

@@ -21,12 +21,18 @@ public abstract class ActiveConceptsLog extends LogPane {
 
     final AtomicBoolean pendingShown = new AtomicBoolean(false);
 
+    long now;
+
     public ActiveConceptsLog(NAR n) {
 
+        now = n.time();
+
         n.onEachFrame(nn-> {
+            now = n.time();
             if (displayed!=null)
                 displayed.forEach(this::update);
         });
+
         n.memory.eventConceptChanged.on((Concept c) -> {
             //TODO more efficient:
             display.remove(c);
@@ -71,13 +77,13 @@ public abstract class ActiveConceptsLog extends LogPane {
     Node node(Concept cc) {
         Node cp = cache.computeIfAbsent(cc, this::make);
         if (cp instanceof ConceptSummaryPane)
-            ((ConceptSummaryPane)cp).update(true,true);
+            ((ConceptSummaryPane)cp).update(true,true, now);
         return cp;
     }
 
     protected void update(Node node) {
         if (node instanceof ConceptSummaryPane) {
-            ((ConceptSummaryPane)node).update(true, false);
+            ((ConceptSummaryPane)node).update(true, false, now);
         }
     }
 }

@@ -555,6 +555,7 @@ public abstract class AbstractTask extends Item<Task>
      */
     @Override
     public final void setBestSolution(Task judg) {
+
         bestSolution = reference(judg);
         //InternalExperience.experienceFromBelief(memory, this, judg);
     }

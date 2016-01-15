@@ -44,7 +44,7 @@ public class TemporalInductionTest {
         //n.forEachConcept(Concept::print);
 
         Concept c = n.concept("a:b");
-        assertEquals("(b-->a). 5+0 %.50;.95%", c.getBeliefs().top().toStringWithoutBudget());
+        assertEquals("(b-->a). 5+0 %.50;.95%", c.getBeliefs().top(n.time()).toStringWithoutBudget());
     }
 
     @Test public void testTemporalRevisionOfTemporalRelation() {

@@ -111,7 +111,7 @@ public interface Concept extends Termed, Supplier<Term> {
      */
     default Truth getDesire(long now) {
         return hasGoals() ?
-            getGoals().top().projection(now, now) : null;
+            getGoals().top(now).getTruth() : null;
     }
 
     /** satisfaction/success metric:
@@ -119,7 +119,7 @@ public interface Concept extends Termed, Supplier<Term> {
      *  otherwise zero */
     default float getSuccess(long now) {
         Truth d;
-        return hasBeliefs() && hasGoals() && null != (d = getDesire(now)) ? 1.0f / (1.0f + Math.abs(getBeliefs().top().getTruth().getExpectation() - d.getExpectation())) : 0;
+        return hasBeliefs() && hasGoals() && null != (d = getDesire(now)) ? 1.0f / (1.0f + Math.abs(getBeliefs().top(now).getTruth().getExpectation() - d.getExpectation())) : 0;
     }
 
     BeliefTable getBeliefs();

@@ -370,7 +370,8 @@ public interface TermBuilder {
 
         if (t!=ITERNAL) {
             if (u.length!=2) {
-                throw new RuntimeException("invalid temporal conjunction: " + op + " " + t + " "+ Arrays.toString(u));
+                //throw new RuntimeException
+                System.err.println("invalid temporal conjunction: " + op + " " + t + " "+ Arrays.toString(u));
             }
             if (op == DISJUNCTION) {
                 throw new RuntimeException("invalid temporal disjunction");

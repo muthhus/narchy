@@ -133,7 +133,8 @@ public class FasterList<X> extends FastList<X> {
     @Override
     public final void forEach(Consumer c) {
         for (Object j : array()) {
-            if (j == null) break; //end of list
+            if (j == null)
+                break; //end of list
             c.accept(j);
         }
     }

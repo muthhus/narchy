@@ -144,17 +144,21 @@ public enum LocalRules {
 
             Truth solutionTruth = sol.projection(questionOcc, now);
 
-            MutableTask ss = sol.solution((Compound) st,
-                    sol.getPunctuation(),
-                    solutionTruth,
-                    questionOcc,
-                    question,
-                    memory
-            );
+            Task ss;
+            if (solutionTruth.equals(sol.getTruth())) {
+                ss = sol; //no change
+            } else {
+                ss = sol.solution((Compound) st,
+                        sol.getPunctuation(),
+                        solutionTruth,
+                        questionOcc,
+                        question,
+                        memory
+                );
+            }
 
             //TODO move this to a callee's consumer?
             if (processSolution(question, nal, ss, memory, now)) {
-                eachSolutions.accept(ss);
 
                 if (Global.DEBUG_NON_INPUT_ANSWERED_QUESTIONS || question.isInput())
                     answered.add(question);
@@ -176,9 +180,11 @@ public enum LocalRules {
             proc.accept(sol.term());
         }
 
-        nal.beforeNextFrame(() -> {
+        answered.forEach(q -> {
+            eachSolutions.accept(q.getBestSolution());
+
             //defer these events until after frame ends so reasoning in this cycle may continue
-            answered.forEach(q -> {
+            nal.beforeNextFrame(() -> {
                 //TODO use an Answer class which is Runnable, combining that with the Twin info
                 memory.eventAnswer.emit(Tuples.twin(q, q.getBestSolution()));
             });
@@ -362,7 +368,9 @@ public enum LocalRules {
                 .budget(BudgetFunctions.revise(newBeliefTruth, oldBelief, conclusion, newBelief.getBudget()))
                 .parent(newBelief, oldBelief)
                 .time(now,
-                        (conclusion instanceof ProjectedTruth) ? ((ProjectedTruth) conclusion).target : target)
+                        (conclusion instanceof ProjectedTruth) ?
+                                ((ProjectedTruth) conclusion).target :
+                                target)
                 .because("Revision");
     }
 

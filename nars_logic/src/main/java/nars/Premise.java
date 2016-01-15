@@ -576,6 +576,18 @@ public interface Premise extends Level, Tasked {
 
 
     default Task derive(Task derived) {
+
+
+        if (Global.DEBUG) {
+            if (getTask().equals(derived))
+                return null;
+                //throw new RuntimeException("derivation same as task");
+            if (getBelief() != null && getBelief().equals(derived))
+                return null;
+                //throw new RuntimeException("derivation same as belief");
+        }
+
+
         derived = removeInvalid(derived);
         if (derived != null) {
             memory().eventDerived.emit(derived);
