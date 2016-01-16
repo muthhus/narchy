@@ -23,11 +23,6 @@ public final class CommonVariable extends Variable  {
     }
 
     @Override
-    public boolean hasEllipsis() {
-        return false;
-    }
-
-    @Override
     public final int varIndep() {
         return type == Op.VAR_INDEP ? 1 : 0;
     }

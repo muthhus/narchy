@@ -25,7 +25,7 @@ public class TermSet<X extends Term> extends TermVector<X> {
 //        return new TermSet(presorted);
 //    }
 
-    private TermSet(X... x) {
+    private TermSet(X[] x) {
         super(x);
     }
 

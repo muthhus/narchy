@@ -265,7 +265,7 @@ public class TestNAR  {
 
     /** padding to add to specified time limitations to allow correct answers;
      *  default=0 having no effect  */
-    public int getTemporalTolerance() {
+    public static int getTemporalTolerance() {
         return temporalTolerance;
     }
 

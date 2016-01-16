@@ -406,7 +406,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
     public static double cost(Iterable<EternalTaskCondition> conditions) {
         long lastSuccess = Tense.TIMELESS;
         for (EternalTaskCondition e : conditions) {
-            long est = e.getSuccessTime();
+            long est = e.successTime;
             if (est != Tense.TIMELESS) {
                 if (lastSuccess < est) {
                     lastSuccess = est;
@@ -438,7 +438,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
 
     @Override
     public void toString(PrintStream out) {
-        out.println(isTrue() ? " OK" : "ERR" + '\t' + toString());
+        out.println(succeeded ? " OK" : "ERR" + '\t' + toString());
 
         BiConsumer<String,Task> printer = (label,s) -> {
             out.print('\t' + label + ' ');
@@ -455,8 +455,8 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
 
     @Override
     public void toLogger(Logger logger) {
-        String msg = isTrue() ? " OK" : "ERR" + '\t' + toString();
-        if (isTrue())
+        String msg = succeeded ? " OK" : "ERR" + '\t' + toString();
+        if (succeeded)
             logger.info(msg);
         else
             logger.warn(msg);

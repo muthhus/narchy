@@ -269,26 +269,16 @@ public class Memory extends Param {
 
         if (tt.isCompound() ) {
 
-            tt = ((Compound)tt).anonymous();
+            tt = tt.anonymous();
 
-            tt = index.transform((Compound)tt, new CompoundTransform<Compound,Term>() {
-
-                @Override public boolean test(Term term) {
-                    return true;
-                }
-
-                @Override public Term apply(Compound parent, Term subterm, int depth) {
-                    return subterm.anonymous();
-                }
-            });
+            tt = index.transform((Compound)tt, CompoundAnonymizer);
         }
 
         Function<Term, Termed> build = this::newDefaultConcept;
         Termed exists = index.apply(tt, build);
 
         if (exists instanceof Concept) {
-            Concept c = ((Concept)exists);
-            return c;
+            return ((Concept)exists);
         }
 
         if (exists==null)
@@ -596,6 +586,16 @@ public class Memory extends Param {
 
     }
 
+    final static CompoundTransform CompoundAnonymizer = new CompoundTransform<Compound,Term>() {
+
+        @Override public boolean test(Term term) {
+            return true;
+        }
+
+        @Override public Term apply(Compound parent, Term subterm, int depth) {
+            return subterm.anonymous();
+        }
+    };
 
 
     //    public byte[] toBytes() throws IOException, InterruptedException {

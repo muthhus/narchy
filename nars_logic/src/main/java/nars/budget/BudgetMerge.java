@@ -38,8 +38,7 @@ public interface BudgetMerge {
         float currentNextPrioritySum = (currentPriority + nextPri);
 
         /* current proportion */
-        final float cp;
-        cp = currentNextPrioritySum != 0 ? currentPriority / currentNextPrioritySum : 0.5f;
+        final float cp = currentNextPrioritySum != 0 ? currentPriority / currentNextPrioritySum : 0.5f;
 
         /* next proportion = 1 - cp */
         float np = 1.0f - cp;

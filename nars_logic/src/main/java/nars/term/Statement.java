@@ -61,16 +61,14 @@ public interface Statement {
 
 
         if ((Statement.is(subject)) && (Statement.is(predicate))) {
-            Termed s1 = subject;
-            Termed s2 = predicate;
 
-            Term t11 = Statement.subj(s1);
-            Term t22 = Statement.pred(s2);
+            Term t11 = Statement.subj(subject);
+            Term t22 = Statement.pred(predicate);
             if (!t11.equals(t22))
                 return false;
 
-            Term t12 = Statement.pred(s1);
-            Term t21 = Statement.subj(s2);
+            Term t12 = Statement.pred(subject);
+            Term t21 = Statement.subj(predicate);
             if (t12.equals(t21))
                 return true;
         }

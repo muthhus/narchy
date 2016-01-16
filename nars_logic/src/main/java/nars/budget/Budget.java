@@ -29,8 +29,7 @@ public abstract class Budget extends BudgetedHandle {
         float currentNextPrioritySum = currentPriority + nextPri;
 
         /* current proportion */
-        float cp;
-        cp = currentNextPrioritySum != 0 ? currentPriority / currentNextPrioritySum : 0.5f;
+        float cp = currentNextPrioritySum != 0 ? currentPriority / currentNextPrioritySum : 0.5f;
 
         /* next proportion = 1 - cp */
         float np = 1.0f - cp;
@@ -97,23 +96,28 @@ public abstract class Budget extends BudgetedHandle {
 
     
     
+    @Override
     public Budget getBudget() {
         return this;
     }
 
     
+    @Override
     public abstract float getPriority();
 
     
+    @Override
     public abstract void setPriority(float p);
 
     /**
      * returns the period in time: currentTime - lastForgetTime and sets the lastForgetTime to currentTime
      */
 
+    @Override
     public abstract long setLastForgetTime(long currentTime);
 
     
+    @Override
     public abstract long getLastForgetTime();
 
     public void mulPriority(float factor) {
@@ -121,11 +125,13 @@ public abstract class Budget extends BudgetedHandle {
     }
 
     
+    @Override
     public abstract float getDurability();
 
     public abstract void setDurability(float d);
 
     
+    @Override
     public abstract float getQuality();
 
     public abstract void setQuality(float q);
@@ -169,6 +175,7 @@ public abstract class Budget extends BudgetedHandle {
         return aveGeo(getPriority(), getDurability(), getQuality());
     }
 
+    @Override
     public abstract Budget clone();
 
     public boolean summaryLessThan(float s) {

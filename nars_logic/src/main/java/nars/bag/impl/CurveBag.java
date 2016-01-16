@@ -447,9 +447,8 @@ public class CurveBag<V> implements Bag<V> {
         BagCurve curve = this.curve;
         float y = curve.valueOf(x);
 
-        int index = index(y, s);
         //System.out.println("\t range:" +  min + ".." + max + " -> f(" + x + ")=" + y + "-> " + index);
-        return index;
+        return index(y, s);
     }
 
 

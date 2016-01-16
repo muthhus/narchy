@@ -8,7 +8,9 @@ import nars.bag.impl.ArrayTable;
 import nars.nal.LocalRules;
 import nars.nal.nal7.Tense;
 import nars.task.Task;
+import nars.truth.Truthed;
 import nars.util.ArraySortedIndex;
+import nars.util.data.Util;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -38,7 +40,7 @@ public class DefaultBeliefTable implements BeliefTable {
 
         if (cap == 1) cap = 2;
         eternal = new SetTable<Task>(cap/2, map,
-            b -> b.getConfidence()
+                Truthed::getConfidence
         );
         temporal = new SetTable<Task>(cap/2, map,
             b -> rankTemporal(b, now)
@@ -66,7 +68,7 @@ public class DefaultBeliefTable implements BeliefTable {
 
 
     public float rankTemporal(Task b, long when) {
-        return b.getConfidence()/(1+Math.abs(b.getOccurrenceTime() - when)/tRange);
+        return b.getConfidence()/((1f+Math.abs(b.getOccurrenceTime() - when))/tRange);
     }
 
     @Override
@@ -128,7 +130,7 @@ public class DefaultBeliefTable implements BeliefTable {
             float r = rankTemporal(x, when);
             if ((r > bestRank) ||
                     //tie-breaker: closer to the target time
-                    ((r == bestRank) &&
+                    ((Util.equal(r, bestRank, Global.BUDGET_PROPAGATION_EPSILON)) &&
                         (Math.abs(when - best.getOccurrenceTime()) < Math.abs(when - x.getOccurrenceTime())))) {
                 best = x;
                 bestRank = r;
@@ -189,13 +191,10 @@ public class DefaultBeliefTable implements BeliefTable {
 
         long now = this.now = memory.time();
 
-        boolean tableChanged;
-        Task preTop;
-
         boolean eternal = input.isEternal();
 
-        preTop = eternal ? topEternal() : top(now);
-        tableChanged = insert(input, memory);
+        Task preTop = eternal ? topEternal() : top(now);
+        boolean tableChanged = insert(input, memory);
 
         Task result;
         if (!tableChanged) {

@@ -1,6 +1,5 @@
 package nars.task;
 
-import nars.Memory;
 import nars.nal.nal7.Tense;
 
 /**
@@ -31,12 +30,12 @@ public interface Temporal extends Tasked {
     long start();
     long end();
 
-    default long getLifespan(Memory memory) {
-        long createdAt = getCreationTime();
-
-        return createdAt >= Tense.TIMELESS ? memory.time() - createdAt : -1;
-
-    }
+//    default long getLifespan(Memory memory) {
+//        long createdAt = getCreationTime();
+//
+//        return createdAt >= Tense.TIMELESS ? memory.time() - createdAt : -1;
+//
+//    }
 
     default boolean isTimeless() {
         return getOccurrenceTime() == Tense.TIMELESS;

@@ -75,7 +75,7 @@ public class NARLoop implements Runnable {
 
 
     public final boolean setPeriodMS(int period) {
-        int prevPeriod = getPeriodMS();
+        int prevPeriod = periodMS;
 
         if (prevPeriod == period) return false;
 

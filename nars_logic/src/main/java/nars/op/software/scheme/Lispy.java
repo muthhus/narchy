@@ -110,52 +110,56 @@ public enum Lispy {
                 .add("car", mh(Fun.class, l -> list(l).get(0)))
                 .add("cdr", mh(Fun.class, l -> list(l).subList(1, list(l).size())))
                 .add("append", mh(Fun2.class, (l, m) -> concat(list(l).stream(), list(m).stream()).collect(toList())))
-                .add("list", mh(FunAll.class, args -> asList(args)).asVarargsCollector(Object[].class))
+                .add("list", mh(FunAll.class, Arrays::asList).asVarargsCollector(Object[].class))
                 .add("list?", mh(Fun.class, l -> l instanceof List))
                 .add("null?", mhRef(List.class, "isEmpty"))
                 .add("symbol?", mh(Fun.class, a -> a instanceof String));
     }
 
     static Object eval(Object x, Env env) {
-        if (x instanceof String) {             // variable reference
-            return env.find(string(x)).dict.get(x);
-        }
-        if (!(x instanceof List)) {            // constant
-            return x;
-        }
-        List<?> l = (List<?>) x;
-        String var;
-        Object exp, cmd = l.get(0);
-        if (cmd instanceof String) {
-            switch (string(l.get(0))) {
-                case "quote":                        // (quote exp)
-                    return l.get(1);
-                case "if":                           // (if test conseq alt)
-                    return eval(((Boolean) eval(l.get(1), env)) ? l.get(2) : l.get(3), env);
-                case "set!":                         // (set! var exp)
-                    var = string(l.get(1));
-                    env.find(var).add(var, eval(l.get(2), env));
-                    return null;
-                case "define":                       // (define var exp)
-                    var = string(l.get(1));
-                    env.add(var, eval(l.get(2), env));
-                    return null;
-                case "lambda":                       // (lambda (vars) exp)
-                    List<?> vars = list(l.get(1));
-                    exp = l.get(2);
-                    return mh(FunAll.class, args -> eval(exp, new Env(env).addAll(vars, asList(args)))).asCollector(Object[].class, vars.size());
-                case "begin":                        // (begin exp*)
-                    return l.stream().skip(1).reduce(null, (val, e) -> eval(e, env), (__1, __2) -> null);
-                default:
+        while (true) {
+            if (x instanceof String) {             // variable reference
+                return env.find(string(x)).dict.get(x);
             }
-        }
-        List<?> exprs = l.stream().map(expr -> eval(expr, env)).collect(toList());
-        MethodHandle proc = (MethodHandle) exprs.get(0);
-        try {
-            return proc.invokeWithArguments(exprs.subList(1, exprs.size()));
-        } catch (Throwable e) {
-            if (e instanceof Error) throw (Error) e;
-            throw new Error(e);
+            if (!(x instanceof List)) {            // constant
+                return x;
+            }
+            List<?> l = (List<?>) x;
+            Object cmd = l.get(0);
+            if (cmd instanceof String) {
+                Object exp;
+                String var;
+                switch (string(l.get(0))) {
+                    case "quote":                        // (quote exp)
+                        return l.get(1);
+                    case "if":                           // (if test conseq alt)
+                        x = ((Boolean) eval(l.get(1), env)) ? l.get(2) : l.get(3);
+                        continue;
+                    case "set!":                         // (set! var exp)
+                        var = string(l.get(1));
+                        env.find(var).add(var, eval(l.get(2), env));
+                        return null;
+                    case "define":                       // (define var exp)
+                        var = string(l.get(1));
+                        env.add(var, eval(l.get(2), env));
+                        return null;
+                    case "lambda":                       // (lambda (vars) exp)
+                        List<?> vars = list(l.get(1));
+                        exp = l.get(2);
+                        return mh(FunAll.class, args -> eval(exp, new Env(env).addAll(vars, asList(args)))).asCollector(Object[].class, vars.size());
+                    case "begin":                        // (begin exp*)
+                        return l.stream().skip(1).reduce(null, (val, e) -> eval(e, env), (__1, __2) -> null);
+                    default:
+                }
+            }
+            List<?> exprs = l.stream().map(expr -> eval(expr, env)).collect(toList());
+            MethodHandle proc = (MethodHandle) exprs.get(0);
+            try {
+                return proc.invokeWithArguments(exprs.subList(1, exprs.size()));
+            } catch (Throwable e) {
+                if (e instanceof Error) throw (Error) e;
+                throw new Error(e);
+            }
         }
     }
 

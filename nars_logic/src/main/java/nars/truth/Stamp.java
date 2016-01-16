@@ -79,11 +79,11 @@ public interface Stamp {
 
         //3. de-duplicate
         long[] deduplicated = new long[uniques];
-        uniques = 0;
+        int uniques2 = 0;
         long lastValue2 = -1;
         for (long v : sorted) {
             if (lastValue2 != v)
-                deduplicated[uniques++] = v;
+                deduplicated[uniques2++] = v;
             lastValue2 = v;
         }
         return deduplicated;

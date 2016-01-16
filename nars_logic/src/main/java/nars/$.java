@@ -175,7 +175,7 @@ public enum $  {
     }
 
     public static Compound<Atom> p(String... t) {
-        return $.p($.the(t));
+        return $.p((Atom[]) $.the(t));
     }
 
     public static Variable v(Op type, String s) {

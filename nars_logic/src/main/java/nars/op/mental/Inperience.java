@@ -107,9 +107,7 @@ public class Inperience {
 
         this.nar = n;
 
-        n.memory.eventTaskProcess.on(tp -> {
-            experienceFromTaskInternal(tp.getTask());
-        });
+        n.memory.eventTaskProcess.on(tp -> experienceFromTaskInternal(tp.getTask()));
 
         n.memory.eventConceptProcess.on(p -> {
             Task belief = p.getBelief();

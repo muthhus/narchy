@@ -73,9 +73,7 @@ public class GuavaIndex implements TermIndex {
 
     @Override
     public void forEach(Consumer<? super Termed> c) {
-        data.asMap().forEach((k,v) -> {
-            c.accept(k);
-        });
+        data.asMap().forEach((k,v) -> c.accept(k));
     }
 
     /** gets an existing item or applies the builder to produce something to return */

@@ -518,7 +518,7 @@ public class Narsese extends BaseParser<Object> {
         );
     }
 
-    public Term TemporalRelationBuilder(Term pred, int cycles, Op o, Term subj) {
+    public static Term TemporalRelationBuilder(Term pred, int cycles, Op o, Term subj) {
         return $.the(o, -1, cycles, new TermVector(subj, pred));
     }
 

@@ -38,7 +38,6 @@ public class Choose2 extends Termutator {
         this.x = x;
         this.yFree = yFree;
         this.xEllipsis = xEllipsis;
-        int ysize = yFree.size();
         //yy = yFree.toArray(new Term[ysize]);
         yy = new ShuffledSubterms(f.random, new TermVector(yFree));
         comb = new Combinations(yy.size(), 2);

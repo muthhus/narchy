@@ -582,9 +582,8 @@ public interface TermBuilder {
         //reduction between one or both of the intersection type
 
         if (o1 == intersection) {
-            Term[] suffix;
 
-            suffix = o2 == intersection ? ((TermContainer) term2).terms() : new Term[]{term2};
+            Term[] suffix = o2 == intersection ? ((TermContainer) term2).terms() : new Term[]{term2};
 
             return finish(intersection, -1,
                     TermSet.the(Terms.concat(

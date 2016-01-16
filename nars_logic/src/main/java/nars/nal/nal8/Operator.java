@@ -54,7 +54,6 @@ public final class Operator<T extends Term> extends AbstractStringAtom { //imple
      */
     public static Term result(Compound operation, Term y) {
         Compound x = (Compound) operation.term(0);
-        Term t = x.last();
         /*if (!(t instanceof Variable))
             return null;*/
 

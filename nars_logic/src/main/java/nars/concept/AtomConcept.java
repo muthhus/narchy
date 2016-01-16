@@ -102,7 +102,7 @@ public class AtomConcept extends AbstractConcept  {
         //activate tasklink locally
         Budget taskBudget = t.getBudget();
 
-        getTaskLinks().put(t, taskBudget, scale);
+        taskLinks.put(t, taskBudget, scale);
 
         Termed[] templates = getTermLinkTemplates();
         if (templates == null) return false;

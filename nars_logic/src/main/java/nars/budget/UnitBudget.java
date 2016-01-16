@@ -264,11 +264,11 @@ public class UnitBudget extends Budget {
 
     @Override
     public void mulPriority(float factor) {
-        setPriority(getPriority() * factor);
+        setPriority(priority * factor);
     }
 
     public void mulDurability(float factor) {
-        setDurability(getDurability() * factor);
+        setDurability(durability * factor);
     }
 
 

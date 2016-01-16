@@ -30,7 +30,7 @@ public abstract class ConceptSet<T extends Term> extends MutableConceptMap<T> {
     }
     @Override
     public boolean exclude(Concept c) {
-        return values.remove(c.get())!=null;
+        return values.remove(c)!=null;
     }
 //    public boolean exclude(Term t) {
 //        return values.remove(t)!=null;

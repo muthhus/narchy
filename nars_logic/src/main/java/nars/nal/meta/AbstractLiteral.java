@@ -13,11 +13,6 @@ public abstract class AbstractLiteral extends Atomic {
     }
 
     @Override
-    public int volume() {
-        return 1;
-    }
-
-    @Override
     public int vars() {
         return 0;
     }

@@ -268,7 +268,7 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
     }
 
 
-    public Task derive(PremiseMatch p, Task derived) {
+    public static Task derive(PremiseMatch p, Task derived) {
 
         //HACK this should exclude the invalid rules which form any of these
 

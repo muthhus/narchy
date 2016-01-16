@@ -11,7 +11,7 @@ abstract public class ThenFork<C> extends GenericCompound<ProcTerm<C>> implement
 
     //private final MethodHandle method;
 
-    public ThenFork(ProcTerm<C>... actions) {
+    public ThenFork(ProcTerm<C>[] actions) {
         super(Op.CONJUNCTION, new TermVector(actions));
 
 

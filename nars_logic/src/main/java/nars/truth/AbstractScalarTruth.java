@@ -44,6 +44,6 @@ public abstract class AbstractScalarTruth extends AbstractTruth<Float> implement
 
     @Override
     public boolean equalsFrequency(Truth t) {
-        return (Util.equal(getFrequency(), t.getFrequency(), DefaultTruth.DEFAULT_TRUTH_EPSILON));
+        return (Util.equal(frequency, t.getFrequency(), DefaultTruth.DEFAULT_TRUTH_EPSILON));
     }
 }

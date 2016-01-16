@@ -245,10 +245,11 @@ public class GenericCompound<T extends Term> implements Compound<T> {
         return normalized;
     }
 
+    @Override
     public Compound t(int cycles) {
         if (cycles == t) return this;
         GenericCompound g = new GenericCompound(op(), relation, cycles, subterms());
-        if (isNormalized()) g.setNormalized();
+        if (normalized) g.setNormalized();
         return g;
     }
 

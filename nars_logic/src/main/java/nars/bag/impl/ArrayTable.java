@@ -28,6 +28,7 @@ abstract public class ArrayTable<V, L> implements Table<V,L> {
     }
 
 
+    @Override
     public final void forEachKey(Consumer<? extends V> each) {
         forEach(this::key);
     }
@@ -42,6 +43,7 @@ abstract public class ArrayTable<V, L> implements Table<V,L> {
         return items.isSorted();
     }
 
+    @Override
     public final void clear() {
         items.clear();
         index.clear();
@@ -52,6 +54,7 @@ abstract public class ArrayTable<V, L> implements Table<V,L> {
      *
      * @return The number of items
      */
+    @Override
     public final int size() {
         /*if (Global.DEBUG)
             validate();*/
@@ -72,6 +75,7 @@ abstract public class ArrayTable<V, L> implements Table<V,L> {
         return index.containsKey(it);
     }
 
+    @Override
     public L remove(V key) {
         return index.remove(key);
     }
@@ -124,6 +128,7 @@ abstract public class ArrayTable<V, L> implements Table<V,L> {
     /** gets the key associated with a value */
     abstract public V key(L l);
 
+    @Override
     public L get(Object key) {
         return index.get(key);
     }
@@ -132,6 +137,7 @@ abstract public class ArrayTable<V, L> implements Table<V,L> {
         return items.capacity();
     }
 
+    @Override
     public final void forEach(Consumer<? super L> action) {
 
         //items.forEach(b -> action.accept(b.get()));
@@ -164,6 +170,7 @@ abstract public class ArrayTable<V, L> implements Table<V,L> {
         }
     }
 
+    @Override
     public void topWhile(Predicate<L> action) {
         List<? extends L> l = items.getList();
         int n = l.size();
@@ -173,10 +180,12 @@ abstract public class ArrayTable<V, L> implements Table<V,L> {
         }
     }
 
+    @Override
     public final void top(Consumer<L> action) {
         items.getList().forEach(action);
     }
 
+    @Override
     public void topN(int limit, Consumer action) {
         List l = items.getList();
         int n = Math.min(l.size(), limit);
