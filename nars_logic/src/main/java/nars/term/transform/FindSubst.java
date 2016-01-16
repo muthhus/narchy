@@ -800,9 +800,10 @@ public abstract class FindSubst extends Versioning implements Subst {
     /**
      * true if the match assignment is allowed by constraints
      */
-    public boolean assignable(Term x, Term y) {
-        if (constraints == null) return true;
-        MatchConstraint c = constraints.get(x);
+    public final boolean assignable(Term x, Term y) {
+        ImmutableMap<Term, MatchConstraint> cc = this.constraints;
+        if (cc == null) return true;
+        MatchConstraint c = cc.get(x);
         if (c == null) return true;
         return !c.invalid(x, y, this);
     }

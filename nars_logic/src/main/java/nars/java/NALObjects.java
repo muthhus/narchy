@@ -184,7 +184,7 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
 
             /** pretend as if it were a goal of its own volition, although it was invoked externally
              *  Master of puppets, I'm pulling your strings */
-            nar.input( $.goal( $.oper(op, invocationArgs),
+            nar.input( $.goal( $.exec(op, invocationArgs),
                     invocationGoalFreq, invocationGoalConf).
                     present(nar.memory).
                     because(ir)
@@ -239,7 +239,7 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
         if (c.getName().contains("_$$_")) ////javassist wrapper class
             c = c.getSuperclass();
 
-        return Operator.the(
+        return $.op(
             c.getSimpleName() + '_' + overridden.getName()
         );
     }

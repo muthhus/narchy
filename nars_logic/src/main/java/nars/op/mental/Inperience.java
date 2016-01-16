@@ -76,18 +76,18 @@ public class Inperience {
     }
 
 
-    public static final Operator believe = Operator.the("believe");
-    public static final Operator want = Operator.the("want");
-    public static final Operator wonder = Operator.the("wonder");
-    public static final Operator evaluate = Operator.the("evaluate");
-    public static final Operator anticipate = Operator.the("anticipate");
+    public static final Operator believe = $.op("believe");
+    public static final Operator want = $.op("want");
+    public static final Operator wonder = $.op("wonder");
+    public static final Operator evaluate = $.op("evaluate");
+    public static final Operator anticipate = $.op("anticipate");
 
     static final Operator[] nonInnateBeliefOperators = {
-            Operator.the("remind"),
-            Operator.the("doubt"),
-            Operator.the("consider"),
+            $.op("remind"),
+            $.op("doubt"),
+            $.op("consider"),
             evaluate,
-            Operator.the("hestitate"),
+            $.op("hestitate"),
             wonder,
             believe,
             want
@@ -161,7 +161,7 @@ public class Inperience {
         }
         arg[k] = self;
 
-        Compound operation = $.oper(opTerm, arg);
+        Compound operation = $.exec(opTerm, arg);
         if (operation == null) {
             throw new RuntimeException("Unable to create Inheritance: " + opTerm + ", " + Arrays.toString(arg));
         }
@@ -229,7 +229,7 @@ public class Inperience {
                         .parent(task).time(now, now)
                         //.truth(1.0f, Global.DEFAULT_JUDGMENT_CONFIDENCE)
                         //.budget(pri, dur)
-                        .because("Innerperience"));
+                        .because("Inperience"));
     }
 
 
@@ -261,7 +261,7 @@ public class Inperience {
                 int interval = 0;
 
                 beliefReasonDerive(task, belief,
-                        $.oper(anticipate, beliefTerm.term(1)),
+                        $.exec(anticipate, beliefTerm.term(1)),
                         nal, interval);
             }
         }
@@ -272,7 +272,7 @@ public class Inperience {
         //also get a chance to reveal its effects to the system this way
 
             beliefReasonDerive(task, belief,
-                    $.oper(op, belief.term()),
+                    $.exec(op, belief.term()),
                     nal, 0);
     }
 

@@ -123,23 +123,26 @@ public enum $  {
         return the(SIMILAR, subj, pred);
     }
 
+    /** execution (NARS "operation") */
     @NotNull
-    public static Compound oper(String operator, String... args) {
-        return oper(Operator.the(operator), $.p(args));
+    public static Compound exec(String operator, String... args) {
+        return exec(op(operator), $.p(args));
     }
 
 
+    /** execution (NARS "operation") */
     @NotNull
-    public static Compound oper(Operator opTerm, Term... arg) {
-        return oper(opTerm, $.p(arg));
+    public static Compound exec(Operator opTerm, Term... arg) {
+        return exec(opTerm, $.p(arg));
     }
 
 //    static Compound oper(Atom opTerm, Compound args) {
 //        return oper(new Operator(opTerm), args);
 //    }
 
+    /** execution (NARS "operation") */
     @NotNull
-    static Compound oper(Operator opTerm, @Nullable Compound arg) {
+    static Compound exec(Operator opTerm, @Nullable Compound arg) {
         return (Compound) the(
                 INHERIT,
                 arg == null ? TermIndex.Empty : arg,
@@ -530,5 +533,10 @@ public enum $  {
                     e -> $.p(e.getKey(), toTerm.apply(e.getValue())))
                 .collect( toList())
         );
+    }
+
+
+    @NotNull public static Operator op(String name) {
+        return new Operator(Atom.the(name));
     }
 }

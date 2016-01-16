@@ -16,7 +16,7 @@ public abstract class ImmediateOperator extends NullOperator  {
     public final Operator op;
 
     protected ImmediateOperator() {
-        op = Operator.the(getOperatorTerm());
+        op = new Operator(getOperatorTerm());
     }
 
 //    public Operation newOperation(Object...args) {
@@ -58,7 +58,7 @@ public abstract class ImmediateOperator extends NullOperator  {
 //        return operation( opClass, termizedProduct(args));
 //    }
     public static Compound operation(@NotNull Class<? extends ImmediateOperator> opClass, Term... args) {
-        return $.oper(
+        return $.exec(
                 $.operator(opClass.getSimpleName()),
                 args);
     }

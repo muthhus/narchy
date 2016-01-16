@@ -70,6 +70,7 @@
         </resources>
 
         <plugins>
+
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-maven-plugin</artifactId>
@@ -119,7 +120,7 @@
                     <disableXmlReport>true</disableXmlReport>
                     <trimStackTrace>true</trimStackTrace>
                     <useFile>false</useFile>
-                    <redirectTestOutputToFile>false</redirectTestOutputToFile>
+                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
                     <testFailureIgnore>true</testFailureIgnore>
                 </configuration>
             </plugin>

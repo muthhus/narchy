@@ -1,5 +1,6 @@
 package nars.nal.meta;
 
+import com.gs.collections.api.map.ImmutableMap;
 import nars.$;
 import nars.Global;
 import nars.Op;
@@ -15,6 +16,7 @@ import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.compound.Compound;
+import nars.term.constraint.MatchConstraint;
 import nars.term.transform.FindSubst;
 import nars.truth.Truth;
 import nars.util.version.Versioned;
@@ -100,9 +102,9 @@ public class PremiseMatch extends FindSubst {
 
 
 
-    public final void match(@NotNull MatchTerm pattern /* callback */) {
+    public final void match(@NotNull MatchTerm pattern /* callback */, ImmutableMap<Term, MatchConstraint> c) {
         this.pattern.set(pattern); //to notify of matches
-        this.constraints = constraints;
+        this.constraints = c;
         matchAll(pattern.x, term.get() /* current term */);
         this.constraints = null;
     }

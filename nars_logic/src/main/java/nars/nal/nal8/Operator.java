@@ -6,7 +6,6 @@ import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Term;
 import nars.term.atom.AbstractStringAtom;
-import nars.term.atom.Atom;
 import nars.term.compound.Compound;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -143,16 +142,6 @@ public final class Operator<T extends Term> extends AbstractStringAtom { //imple
     @Override
     public int vars() {
         return 0;
-    }
-
-
-    @NotNull
-    public static Operator the(String name) {
-        return the(Atom.the(name));
-    }
-    @NotNull
-    public static Operator the(@NotNull Term x) {
-        return new Operator(x);
     }
 
 

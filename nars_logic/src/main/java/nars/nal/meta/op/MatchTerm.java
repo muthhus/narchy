@@ -85,7 +85,7 @@ public final class MatchTerm extends AtomicBooleanCondition<PremiseMatch> implem
 
     @Override
     @Deprecated public final boolean booleanValueOf(@NotNull PremiseMatch p) {
-        p.match(this);
+        p.match(this, constraints);
         return true;
     }
 

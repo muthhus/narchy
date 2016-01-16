@@ -429,7 +429,7 @@ public class OWLInput  {
             nar.believe($.inh(atom(subject), atom(object)));
         }
         else {
-            nar.believe($.oper((Operator) atom(predicate),
+            nar.believe($.exec((Operator) atom(predicate),
                     $.p(atom(subject), atom(object))));
         }
 

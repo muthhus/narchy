@@ -75,7 +75,7 @@ public class OperatorTest {
 //    }
 
     @Test public void testOperationIsInheritance() {
-        Compound o = $.oper(Operator.the("x"), $.p("x"));
+        Compound o = $.exec($.op("x"), $.p("x"));
         assertEquals(Op.INHERIT, o.op());
     }
 

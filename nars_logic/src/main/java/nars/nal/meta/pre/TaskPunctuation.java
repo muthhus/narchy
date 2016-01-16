@@ -32,7 +32,7 @@ public class TaskPunctuation extends AtomicBooleanCondition<PremiseMatch> {
 //
 //    };
 
-    public static final Term TaskQuestionTerm = $.oper("task", "\"?\"");
+    public static final Term TaskQuestionTerm = $.exec("task", "\"?\"");
 
     public static final TaskPunctuation TaskGoal = new TaskPunctuation('!');
 
