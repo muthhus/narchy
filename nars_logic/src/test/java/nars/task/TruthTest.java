@@ -17,11 +17,11 @@ public class TruthTest {
         Truth aCopy = new DefaultTruth(1.0f, 0.9f);
         assertEquals(a, aCopy);
 
-        Truth aEqualWithinThresh = new DefaultTruth(1.0f- Global.DEFAULT_TRUTH_EPSILON / 2.0f, 0.9f);
+        Truth aEqualWithinThresh = new DefaultTruth(1.0f- Global.TRUTH_EPSILON / 2.0f, 0.9f);
         assertEquals(a, aEqualWithinThresh);
         assertEquals(a.hashCode(), aEqualWithinThresh.hashCode());
 
-        Truth aNotWithinThresh = new DefaultTruth(1.0f - Global.DEFAULT_TRUTH_EPSILON * 1.0f, 0.9f);
+        Truth aNotWithinThresh = new DefaultTruth(1.0f - Global.TRUTH_EPSILON * 1.0f, 0.9f);
         assertNotEquals(a, aNotWithinThresh);
         assertNotEquals(a.hashCode(), aNotWithinThresh.hashCode());
 
@@ -31,11 +31,11 @@ public class TruthTest {
     public void testConfEquality() {
         Truth a = new DefaultTruth(1.0f, 0.5f);
 
-        Truth aEqualWithinThresh = new DefaultTruth(1.0f, 0.5f- Global.DEFAULT_TRUTH_EPSILON / 2.0f);
+        Truth aEqualWithinThresh = new DefaultTruth(1.0f, 0.5f- Global.TRUTH_EPSILON / 2.0f);
         assertEquals(a, aEqualWithinThresh);
         assertEquals(a.hashCode(), aEqualWithinThresh.hashCode());
 
-        Truth aNotWithinThresh = new DefaultTruth(1.0f, 0.5f - Global.DEFAULT_TRUTH_EPSILON * 1.0f);
+        Truth aNotWithinThresh = new DefaultTruth(1.0f, 0.5f - Global.TRUTH_EPSILON * 1.0f);
         assertNotEquals(a, aNotWithinThresh);
         assertNotEquals(a.hashCode(), aNotWithinThresh.hashCode());
     }

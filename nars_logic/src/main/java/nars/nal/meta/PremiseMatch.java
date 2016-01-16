@@ -56,7 +56,7 @@ public class PremiseMatch extends FindSubst {
 
     final Map<Operator, ImmediateTermTransform> transforms =
             Global.newHashMap();
-    private float minConfidence = Global.DEFAULT_TRUTH_EPSILON;
+    private float minConfidence = Global.TRUTH_EPSILON;
 
     public PremiseMatch(Random r) {
         super(Op.VAR_PATTERN, r );

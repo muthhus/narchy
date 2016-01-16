@@ -130,7 +130,7 @@ public abstract class AbstractNAR extends NAR {
 
         m.conceptBeliefsMax.set(18);
         m.conceptGoalsMax.set(14);
-        m.conceptQuestionsMax.set(5);
+        m.conceptQuestionsMax.set(3);
 
         m.conceptForgetDurations.setValue(2.0);
         m.linkForgetDurations.setValue(3.0);
@@ -143,9 +143,9 @@ public abstract class AbstractNAR extends NAR {
         m.termLinkThreshold.setValue(Global.BUDGET_PROPAGATION_EPSILON);
         m.taskLinkThreshold.setValue(Global.BUDGET_PROPAGATION_EPSILON);
 
-        m.executionExpectationThreshold.setValue(0.5);
+        m.executionExpectationThreshold.setValue(0.5 + Global.TRUTH_EPSILON);
 
-        m.shortTermMemoryHistory.set(5);
+        m.shortTermMemoryHistory.set(2);
     }
 
 

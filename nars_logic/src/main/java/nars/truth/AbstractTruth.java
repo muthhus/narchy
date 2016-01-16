@@ -42,7 +42,7 @@ public abstract class AbstractTruth<T> implements MetaTruth<T> {
     }
 
     public final boolean equalsConfidence(@NotNull Truth t) {
-        float e = Global.DEFAULT_TRUTH_EPSILON;//getEpsilon();
+        float e = Global.TRUTH_EPSILON;//getEpsilon();
         return Util.equal(confidence, t.getConfidence(), e);
     }
 

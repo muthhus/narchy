@@ -14,7 +14,7 @@ import static nars.util.Texts.n2;
  */
 public class UniformVector  {
 
-    float epsilon = Global.DEFAULT_TRUTH_EPSILON;
+    float epsilon = Global.TRUTH_EPSILON;
     @Nullable
     public double[] lastData = null;
     public final double[] data;

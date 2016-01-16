@@ -51,7 +51,7 @@ public enum Global {
 
     //TODO use 'I' for SELf, it is 3 characters shorter
     public static final Atom DEFAULT_SELF = Atom.the("I");
-    public static final float DEFAULT_TRUTH_EPSILON = 0.01f;
+    public static final float TRUTH_EPSILON = 0.01f;
 
     public static float EXECUTION_SATISFACTION_TRESHOLD = 0.0f; //decision threshold is enough for now
 

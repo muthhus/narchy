@@ -108,7 +108,7 @@ public class Default extends AbstractNAR {
     @NotNull
     protected AbstractCycle initCore(int activeConcepts, int conceptsFirePerCycle, int termLinksPerConcept, int taskLinksPerConcept) {
 
-        AbstractCycle c = new DefaultCycle(this, newDeriver(), newConceptBag(activeConcepts));
+        DefaultCycle c = new DefaultCycle(this, newDeriver(), newConceptBag(activeConcepts));
 
         //TODO move these to a PremiseGenerator which supplies
         // batches of Premises
@@ -118,6 +118,8 @@ public class Default extends AbstractNAR {
         c.conceptsFiredPerCycle.set(conceptsFirePerCycle);
 
         c.capacity.set(activeConcepts);
+
+        c.deriveConfMin.setValue(4f * Global.TRUTH_EPSILON);
 
         return c;
     }
@@ -450,8 +452,9 @@ public class Default extends AbstractNAR {
      */
     public static class DefaultCycle extends AbstractCycle {
 
+        /** derived tasks with truth confidence lower than this value are discarded. */
         @Range(min=0, max=1f)
-        public final MutableFloat deriveConfMin = new MutableFloat(Global.DEFAULT_TRUTH_EPSILON);
+        public final MutableFloat deriveConfMin = new MutableFloat(Global.TRUTH_EPSILON);
 
         /**
          * re-used, not to be used outside of this

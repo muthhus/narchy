@@ -118,7 +118,7 @@ public interface Truth extends MetaTruth<Float> {
         return (freqHash << 16) | confHash;
     }
 
-    int hashDiscreteness = (int)(1.0f / Global.DEFAULT_TRUTH_EPSILON);
+    int hashDiscreteness = (int)(1.0f / Global.TRUTH_EPSILON);
 
     @NotNull
     @Override
