@@ -54,8 +54,8 @@
             <version>3.0</version>
         </dependency>
         <dependency>
-                <groupId>opennars</groupId>
-                <version>${parent.version}</version>
+            <groupId>opennars</groupId>
+            <version>${project.parent.version}</version>
             <artifactId>nars_data</artifactId>
         </dependency>
 

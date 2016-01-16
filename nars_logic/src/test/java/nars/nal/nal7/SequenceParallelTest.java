@@ -372,4 +372,4 @@
 //        assertEquals("[x, /3]", Arrays.toString(a.toArrayWithIntervals((i,x) -> i==0)));
 //        assertEquals("[y]", Arrays.toString(a.toArrayWithIntervals((i,x) -> i==1)));
 //    }
-//}
+// }

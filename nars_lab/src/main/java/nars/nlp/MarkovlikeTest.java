@@ -17,25 +17,31 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class MarkovlikeTest {
 
-    public static String getSentence2() {
-        switch ((int)(Math.random() * 5)) {
-            case 0: return "how you?";
-            case 1: return "what is?"; //what is #x
-            case 2: return "thanks im ok.";
-            case 3: return "what new?";
-            case 4: return "hello you!";
-        }
-        return null;
-    }
-    public static String getSentence() {
-        switch ((int)(Math.random() * 1)) {
-            case 0: return "aa bb cc dd ee.";
-            //case 1: return "c d e f g h i j k l m";
-        }
-        return null;
-    }
+	public static String getSentence2() {
+		switch ((int) (Math.random() * 5)) {
+			case 0 :
+				return "how you?";
+			case 1 :
+				return "what is?"; // what is #x
+			case 2 :
+				return "thanks im ok.";
+			case 3 :
+				return "what new?";
+			case 4 :
+				return "hello you!";
+		}
+		return null;
+	}
+	public static String getSentence() {
+		switch ((int) (Math.random() * 1)) {
+			case 0 :
+				return "aa bb cc dd ee.";
+				// case 1: return "c d e f g h i j k l m";
+		}
+		return null;
+	}
 
-    public static void main(String[] args) {
+	public static void main(String[] args) {
     //public void testLanguage() {
 
         Default d = new Default(1000,4,1,3);
@@ -105,23 +111,14 @@ public class MarkovlikeTest {
         NARide.show(d.loop(), e-> {});
 
     }
+	public static void speak(NAR n, String sentenceID, int speakTime) {
+		// d.frame(1000);
 
-    public static void speak(NAR n, String sentenceID, int speakTime) {
-        //d.frame(1000);
+		n.input("say(sentence, " + sentenceID + ")! :|:");
+		// d.input("$1.0$ echo(#x)! :|: %0.55%");
 
+		n.frame(speakTime);
 
-
-
-
-        n.input("say(sentence, " + sentenceID + ")! :|:");
-        //d.input("$1.0$ echo(#x)! :|: %0.55%");
-
-        n.frame(speakTime);
-
-
-
-
-
-    }
+	}
 
 }
