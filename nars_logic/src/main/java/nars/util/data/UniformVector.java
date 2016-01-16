@@ -1,7 +1,7 @@
 package nars.util.data;
 
+import nars.Global;
 import nars.NAR;
-import nars.truth.DefaultTruth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,7 +14,7 @@ import static nars.util.Texts.n2;
  */
 public class UniformVector  {
 
-    float epsilon = DefaultTruth.DEFAULT_TRUTH_EPSILON;
+    float epsilon = Global.DEFAULT_TRUTH_EPSILON;
     @Nullable
     public double[] lastData = null;
     public final double[] data;

@@ -2,7 +2,6 @@ package nars.nal.meta;
 
 import nars.Memory;
 import nars.Premise;
-import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -23,7 +22,7 @@ public interface TruthOperator {
 
         if (truth!=null) {
             //pre-filter insufficient confidence level
-            if (truth.getConfidence() < DefaultTruth.DEFAULT_TRUTH_EPSILON) {
+            if (truth.getConfidence() < m.getMinConfidence()) {
                 return false;
             }
 

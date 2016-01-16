@@ -8,9 +8,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class DefaultTruth extends AbstractScalarTruth {
 
-    public static final float DEFAULT_TRUTH_EPSILON = 0.01f;
 
-    //public final float epsilon;
 
     /** unspecified confidence, will be invalid unless updated later */
     public DefaultTruth(float f) {

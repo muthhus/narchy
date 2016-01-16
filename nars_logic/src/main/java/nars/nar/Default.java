@@ -299,7 +299,7 @@ public class Default extends AbstractNAR {
             conceptForget = new AlannForget(nar, m.conceptForgetDurations, perfection);
         }
 
-        private void onCycle(Memory memory) {
+        protected void onCycle(Memory memory) {
             forgetConcepts();
             fireConcepts(conceptsFiredPerCycle.intValue());
             updateActivated();
@@ -450,6 +450,9 @@ public class Default extends AbstractNAR {
      */
     public static class DefaultCycle extends AbstractCycle {
 
+        @Range(min=0, max=1f)
+        public final MutableFloat deriveConfMin = new MutableFloat(Global.DEFAULT_TRUTH_EPSILON);
+
         /**
          * re-used, not to be used outside of this
          */
@@ -465,6 +468,7 @@ public class Default extends AbstractNAR {
         final Collection<Task> derivedTasksBuffer;
 
 
+
         public DefaultCycle(@NotNull NAR nar, Deriver deriver, Bag<Concept> concepts) {
             super(nar, deriver, concepts);
 
@@ -476,7 +480,10 @@ public class Default extends AbstractNAR {
 
         }
 
-
+        @Override protected void onCycle(Memory memory) {
+            matcher.setMinConfidence(deriveConfMin.floatValue());
+            super.onCycle(memory);
+        }
 
         @Override
         public void process(@NotNull ConceptProcess p) {

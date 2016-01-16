@@ -12,7 +12,6 @@ import nars.term.Termed;
 import nars.term.compound.Compound;
 import nars.term.transform.FindSubst;
 import nars.term.transform.MapSubst;
-import nars.truth.DefaultTruth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -400,7 +399,7 @@ public interface Premise extends Level, Tasked {
             throw new RuntimeException("Derived task must have a parent task or belief: " + derived);
         }
 
-        if (derived.isJudgmentOrGoal() && derived.getConfidence() < DefaultTruth.DEFAULT_TRUTH_EPSILON) {
+        if (derived.isJudgmentOrGoal() && derived.getConfidence() < Global.DEFAULT_TRUTH_EPSILON) {
             return "Insufficient confidence";
         }
 

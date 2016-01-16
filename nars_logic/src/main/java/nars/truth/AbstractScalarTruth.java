@@ -1,5 +1,6 @@
 package nars.truth;
 
+import nars.Global;
 import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,7 +18,7 @@ public abstract class AbstractScalarTruth extends AbstractTruth<Float> implement
 
     @Override
     public void setConfidence(float b) {
-        float e = DefaultTruth.DEFAULT_TRUTH_EPSILON; //getEpsilon();
+        float e = Global.DEFAULT_TRUTH_EPSILON; //getEpsilon();
         confidence = Util.round(b, e);
     }
 
@@ -37,7 +38,7 @@ public abstract class AbstractScalarTruth extends AbstractTruth<Float> implement
     @NotNull
     @Override
     public Truth setFrequency(float f) {
-        float e = DefaultTruth.DEFAULT_TRUTH_EPSILON; //getEpsilon();
+        float e = Global.DEFAULT_TRUTH_EPSILON; //getEpsilon();
         frequency = Util.round(f, e);
         return this;
     }
@@ -46,6 +47,6 @@ public abstract class AbstractScalarTruth extends AbstractTruth<Float> implement
 
     @Override
     public boolean equalsFrequency(@NotNull Truth t) {
-        return (Util.equal(frequency, t.getFrequency(), DefaultTruth.DEFAULT_TRUTH_EPSILON));
+        return (Util.equal(frequency, t.getFrequency(), Global.DEFAULT_TRUTH_EPSILON));
     }
 }

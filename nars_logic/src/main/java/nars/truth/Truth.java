@@ -20,6 +20,7 @@
  */
 package nars.truth;
 
+import nars.Global;
 import nars.Symbols;
 import nars.term.Term;
 import nars.term.atom.Atom;
@@ -117,7 +118,7 @@ public interface Truth extends MetaTruth<Float> {
         return (freqHash << 16) | confHash;
     }
 
-    int hashDiscreteness = (int)(1.0f / DefaultTruth.DEFAULT_TRUTH_EPSILON);
+    int hashDiscreteness = (int)(1.0f / Global.DEFAULT_TRUTH_EPSILON);
 
     @NotNull
     @Override

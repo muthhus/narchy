@@ -56,6 +56,7 @@ public class PremiseMatch extends FindSubst {
 
     final Map<Operator, ImmediateTermTransform> transforms =
             Global.newHashMap();
+    private float minConfidence = Global.DEFAULT_TRUTH_EPSILON;
 
     public PremiseMatch(Random r) {
         super(Op.VAR_PATTERN, r );
@@ -232,7 +233,13 @@ public class PremiseMatch extends FindSubst {
 
     }
 
+    public void setMinConfidence(float minConfidence) {
+        this.minConfidence = minConfidence;
+    }
 
+    public float getMinConfidence() {
+        return minConfidence;
+    }
 }
 
 
