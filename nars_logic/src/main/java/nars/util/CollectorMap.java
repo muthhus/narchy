@@ -1,5 +1,8 @@
 package nars.util;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -31,9 +34,10 @@ public abstract class CollectorMap<K, V>  {
     /**
      * implementation for removing the value to another collecton (called internally)
      */
+    @Nullable
     protected abstract V removeItem(V e);
 
-    public final void forEach(BiConsumer<K, V> each) {
+    public final void forEach(@NotNull BiConsumer<K, V> each) {
         map.forEach(each);
     }
 
@@ -66,6 +70,7 @@ public abstract class CollectorMap<K, V>  {
         return removed;
     }
 
+    @Nullable
     public V remove(K key) {
 
         V e = removeKey(key);
@@ -110,10 +115,12 @@ public abstract class CollectorMap<K, V>  {
         return map.containsKey(name);
     }
 
+    @NotNull
     public Set<K> keySet() {
         return map.keySet();
     }
 
+    @NotNull
     public Collection<V> values() {
         return map.values();
     }

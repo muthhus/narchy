@@ -2,6 +2,7 @@ package nars.util.event;
 
 import nars.Memory;
 import nars.NAR;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 
@@ -10,11 +11,11 @@ public abstract class CycleReaction implements Consumer<Memory> {
 
     private final On cycleReg;
 
-    protected CycleReaction(NAR nar) {
+    protected CycleReaction(@NotNull NAR nar) {
         this(nar.memory);
     }
 
-    protected CycleReaction(Memory memory) {
+    protected CycleReaction(@NotNull Memory memory) {
         cycleReg = memory.eventCycleEnd.on(this);
 
     }

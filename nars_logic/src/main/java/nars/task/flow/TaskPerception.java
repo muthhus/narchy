@@ -2,6 +2,7 @@ package nars.task.flow;
 
 import nars.Memory;
 import nars.task.Task;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 
@@ -14,9 +15,10 @@ public abstract class TaskPerception implements Consumer<Task> {
      * where to send output
      */
     //private final Active active = new Active();
+    @NotNull
     private final Memory memory;
 
-    protected TaskPerception(Memory m) {
+    protected TaskPerception(@NotNull Memory m) {
 
         this.memory = m;
 
@@ -28,7 +30,7 @@ public abstract class TaskPerception implements Consumer<Task> {
 
     }
 
-    protected TaskPerception(Memory m, Consumer<Task> eachFrameSupplyTo) {
+    protected TaskPerception(@NotNull Memory m, Consumer<Task> eachFrameSupplyTo) {
         this(m);
         //active.add(
             m.eventFrameStart.on((M) -> nextFrame(eachFrameSupplyTo));
@@ -44,11 +46,11 @@ public abstract class TaskPerception implements Consumer<Task> {
         public int count;
         //TODO minBudget, maxBudget etc
 
-        public TaskBufferStats(Memory m) {
+        public TaskBufferStats(@NotNull Memory m) {
             reset(m);
         }
 
-        public void reset(Memory m) {
+        public void reset(@NotNull Memory m) {
             minCreationTime = Integer.MAX_VALUE;
             maxCreationTime = Integer.MIN_VALUE;
             count = 0;
@@ -56,13 +58,14 @@ public abstract class TaskPerception implements Consumer<Task> {
         }
 
         @Override
-        public void accept(Task t) {
+        public void accept(@NotNull Task t) {
             long c = t.getCreationTime();
             if (c < minCreationTime) minCreationTime = c;
             if (c > maxCreationTime) maxCreationTime = c;
             count++;
         }
 
+        @NotNull
         @Override
         public String toString() {
             return "TaskBufferStats{" +
@@ -74,6 +77,7 @@ public abstract class TaskPerception implements Consumer<Task> {
         }
     }
 
+    @NotNull
     public TaskBufferStats getStatistics() {
         //minCreationTime, maxCreationTime
         TaskBufferStats s = new TaskBufferStats(memory);

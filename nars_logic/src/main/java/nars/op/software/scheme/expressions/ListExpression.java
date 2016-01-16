@@ -2,6 +2,7 @@ package nars.op.software.scheme.expressions;
 
 
 import nars.op.software.scheme.cons.Cons;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 import java.util.stream.Collectors;
@@ -14,9 +15,10 @@ public class ListExpression implements Expression, Iterable<Expression> {
         private static final Nil NIL = new Nil();
 
         private Nil() {
-            super(Cons.empty());
+            super(Cons.<Expression>empty());
         }
 
+        @NotNull
         public static Nil nil() {
             return NIL;
         }
@@ -34,6 +36,7 @@ public class ListExpression implements Expression, Iterable<Expression> {
         return value.iterator();
     }
 
+    @NotNull
     public static ListExpression list(Cons<Expression> list) {
         if (list == Cons.<Expression>empty()) {
             return Nil.nil();
@@ -42,12 +45,13 @@ public class ListExpression implements Expression, Iterable<Expression> {
         return new ListExpression(list);
     }
 
+    @NotNull
     public static ListExpression list(Expression... exps) {
         return ListExpression.list(copyOf(exps));
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@NotNull Object o) {
         return getClass() == o.getClass() && value.equals(((ListExpression) o).value);
     }
 

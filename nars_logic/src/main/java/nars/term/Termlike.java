@@ -1,5 +1,7 @@
 package nars.term;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.function.Predicate;
 
 /**
@@ -38,7 +40,7 @@ public interface Termlike  {
         return ((possibleSubtermStructure | existingStructure) != existingStructure);
     }
 
-    default boolean impossibleSubterm(Term target) {
+    default boolean impossibleSubterm(@NotNull Term target) {
         return ((impossibleStructureMatch(structure(), target.structure()))) ||
                 (impossibleSubTermVolume(target.volume()));
     }
@@ -65,7 +67,7 @@ public interface Termlike  {
     }
 
 
-    default boolean impossibleSubTermOrEquality(Term target) {
+    default boolean impossibleSubTermOrEquality(@NotNull Term target) {
         return ((impossibleStructureMatch(target.structure())) ||
                 (impossibleSubTermOrEqualityVolume(target.volume())));
     }

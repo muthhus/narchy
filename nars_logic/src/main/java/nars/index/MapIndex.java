@@ -2,6 +2,7 @@ package nars.index;
 
 import nars.term.TermContainer;
 import nars.term.Termed;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 import java.util.function.Consumer;
@@ -70,7 +71,7 @@ public class MapIndex extends AbstractMapIndex {
 
 
     @Override
-    public final void forEach(Consumer<? super Termed> c) {
+    public final void forEach(@NotNull Consumer<? super Termed> c) {
         data.forEach((k, v) -> c.accept(v));
     }
 }

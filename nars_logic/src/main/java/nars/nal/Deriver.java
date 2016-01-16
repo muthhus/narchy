@@ -2,6 +2,8 @@ package nars.nal;
 
 import nars.process.ConceptProcess;
 import nars.task.Task;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
@@ -15,9 +17,12 @@ import java.util.function.Consumer;
 public abstract class Deriver  {
 
     //@Deprecated public static final TermIndex terms = TermIndex.memory(16384);
+    @Nullable
     private static Deriver defaultDeriver = null;
+    @Nullable
     private static PremiseRuleSet defaultRules = null;
 
+    @Nullable
     public static synchronized PremiseRuleSet getDefaultRules() {
         if (defaultRules == null) {
             try {
@@ -31,6 +36,7 @@ public abstract class Deriver  {
         return defaultRules;
     }
 
+    @Nullable
     public static synchronized Deriver getDefaultDeriver() {
         if (defaultDeriver == null) {
             defaultDeriver = new TrieDeriver( getDefaultRules());
@@ -42,6 +48,7 @@ public abstract class Deriver  {
     /**
      * default set of rules, statically available
      */
+    @Nullable
     public final PremiseRuleSet rules;
 
 
@@ -88,7 +95,7 @@ public abstract class Deriver  {
      *  this method does not provide a way to stop or interrupt
      *  the process once it begins.
      */
-    public final void run(ConceptProcess premise, PremiseMatch m, Consumer<Task> t) {
+    public final void run(@NotNull ConceptProcess premise, @NotNull PremiseMatch m, Consumer<Task> t) {
         premise.memory().eventConceptProcess.emit(premise);
 
         m.start(premise, t, this);

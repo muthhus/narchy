@@ -2,6 +2,7 @@ package nars.term.variable;
 
 import nars.$;
 import nars.Op;
+import org.jetbrains.annotations.NotNull;
 
 public final class CommonVariable extends Variable  {
 
@@ -37,7 +38,8 @@ public final class CommonVariable extends Variable  {
         return type == Op.VAR_QUERY ? 1 : 0;
     }
 
-    public static CommonVariable make(Variable v1, Variable v2) {
+    @NotNull
+    public static CommonVariable make(@NotNull Variable v1, @NotNull Variable v2) {
 
 
 //        if (v1 instanceof CommonVariable) {

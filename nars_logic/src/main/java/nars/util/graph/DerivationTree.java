@@ -2,6 +2,7 @@ package nars.util.graph;
 
 import nars.concept.Concept;
 import nars.task.Task;
+import org.jetbrains.annotations.NotNull;
 import org.jgrapht.graph.DirectedMultigraph;
 
 
@@ -17,16 +18,18 @@ public class DerivationTree extends DirectedMultigraph<Task, String> {
         super(String.class);
     }
 
-    public DerivationTree add(Iterable<Task> t, int maxLevels) {
+    @NotNull
+    public DerivationTree add(@NotNull Iterable<Task> t, int maxLevels) {
         for (Task x : t) add(x, maxLevels);
         return this;
     }
 
+    @NotNull
     public static String edge(String label, Task from, Task to) {
         return label + '[' + from + ',' + to + ']';
     }
 
-    public boolean add(Task t, int maxLevels) {
+    public boolean add(@NotNull Task t, int maxLevels) {
         if (maxLevels == 0) return false;
 
 
@@ -79,7 +82,8 @@ public class DerivationTree extends DirectedMultigraph<Task, String> {
     }
 
 
-    public DerivationTree add(Concept c, int maxLevels) {
+    @NotNull
+    public DerivationTree add(@NotNull Concept c, int maxLevels) {
         add(c.getBeliefs(), maxLevels);
         add(c.getGoals(), maxLevels);
         add(c.getQuestions(), maxLevels);

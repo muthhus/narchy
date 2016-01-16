@@ -5,6 +5,7 @@ import nars.NAR;
 import nars.concept.Concept;
 import nars.task.Task;
 import nars.term.compound.Compound;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -16,12 +17,14 @@ import java.util.concurrent.ConcurrentLinkedDeque;
  */
 public class STMTemporalLinkage {
 
+    @NotNull
     public final Deque<Task> stm;
     //private final Deriver deriver;
     //int stmSize;
     //public static STMTemporalLinkage I=null;
 
     private static final String id = STMTemporalLinkage.class.getSimpleName();
+    @NotNull
     private final NAR nar;
 
     @Override
@@ -29,7 +32,7 @@ public class STMTemporalLinkage {
         return id;
     }
 
-    public STMTemporalLinkage(NAR nar) {
+    public STMTemporalLinkage(@NotNull NAR nar) {
 
         //this.deriver = deriver;
         //this.stmSize = 1;
@@ -46,7 +49,7 @@ public class STMTemporalLinkage {
 
     }
 
-    public static boolean isInputOrTriggeredOperation(Task newEvent) {
+    public static boolean isInputOrTriggeredOperation(@NotNull Task newEvent) {
         if (newEvent.isInput()) return true;
         //if (Tense.containsMentalOperator(newEvent)) return true;
         return false;
@@ -57,7 +60,7 @@ public class STMTemporalLinkage {
 //    }
 
 
-    public boolean inductionOnSucceedingEvents(Task currentTask, boolean anticipation) {
+    public boolean inductionOnSucceedingEvents(@NotNull Task currentTask, boolean anticipation) {
 
 
         int stmSize = nar.memory.shortTermMemoryHistory.intValue();

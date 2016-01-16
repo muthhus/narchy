@@ -10,6 +10,7 @@ import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.compile.TermBuilder;
 import nars.term.compound.Compound;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.function.Function;
@@ -29,12 +30,12 @@ public class scheme extends TermFunction {
     public static class SchemeProduct extends ListExpression {
 
 
-        public SchemeProduct(Iterable p) {
-            super(Cons.copyOf(Iterables.transform(p, term -> {
+        public SchemeProduct(Iterable<Term> p) {
+            super((Cons<Expression>)Cons.copyOf( Iterables.transform(p, (Term term) -> {
 
                 if (term instanceof Iterable) {
                     //return ListExpression.list(SymbolExpression.symbol("quote"), new SchemeProduct((Product)term));
-                    return new SchemeProduct((Iterable) term);
+                     return new SchemeProduct((Iterable) term);
                 }
                 if (term instanceof Atom) {
 
@@ -51,13 +52,18 @@ public class scheme extends TermFunction {
                     return new SymbolExpression(s);
                 }
                 throw new RuntimeException("Invalid term for scheme: " + term);
-            })));
+
+
+            }
+
+            )));
         }
     }
 
     //TODO make narsToScheme method
 
     public static final Function<Expression, Term> schemeToNars = new Function<Expression, Term>() {
+        @NotNull
         @Override
         public Term apply(Expression schemeObj) {
             if (schemeObj instanceof ListExpression) {
@@ -75,14 +81,14 @@ public class scheme extends TermFunction {
 
         }
 
-        public Term apply(Iterable<Expression> e) {
+        public Term apply(@NotNull Iterable<Expression> e) {
             List<Term> elements = Lists.newArrayList(StreamSupport.stream(e.spliterator(), false).map(schemeToNars::apply).collect(Collectors.toList()));
             return $.p( elements );
         }
     };
 
     @Override
-    public Term function(Compound o, TermBuilder i) {
+    public Term function(@NotNull Compound o, TermBuilder i) {
         Term[] x = o.terms();
         Term code = x[0];
 

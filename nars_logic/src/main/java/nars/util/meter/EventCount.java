@@ -5,6 +5,8 @@ import nars.NAR;
 import nars.util.event.Active;
 import nars.util.event.Topic;
 import nars.util.meter.event.HitMeter;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
@@ -13,10 +15,12 @@ import java.util.Map;
 */
 public class EventCount {
 
+    @NotNull
     public final Map<Object, HitMeter> eventMeters;
+    @Nullable
     private Active sub;
 
-    public EventCount(NAR n) {
+    public EventCount(@NotNull NAR n) {
 
         Map<Object, HitMeter> eventMeters
                 = this.eventMeters = Global.newHashMap();

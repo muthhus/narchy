@@ -7,6 +7,7 @@ import nars.budget.TaskAccumulator;
 import nars.concept.Concept;
 import nars.nal.nal7.Tense;
 import nars.task.Task;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -29,6 +30,7 @@ import java.util.function.Supplier;
 public class Commander implements Consumer<NAR>, Supplier<Concept> {
 
     public final TaskAccumulator commands;
+    @NotNull
     public final Iterator<BLink<Task>> commandIterator;
     public final LinkedHashSet<Concept> concepts = new LinkedHashSet();
     final Iterator<Concept> conceptsIterator = Iterators.cycle(concepts);
@@ -40,6 +42,7 @@ public class Commander implements Consumer<NAR>, Supplier<Concept> {
     /** how far away from the occurence time of a temporal belief before it is deleted */
     private final int maxTemporalBeliefAge;
     private final int maxTemporalBeliefDurations = 16 /* should be tuned */;
+    @NotNull
     private final NAR nar;
 
     int inputsPerFrame = 2;
@@ -48,11 +51,11 @@ public class Commander implements Consumer<NAR>, Supplier<Concept> {
 //    float priorityPerCycle = 1,
 //            priorityRemaining = 0; //change left over from last cycle
 
-    public Commander(NAR nar, int capacity) {
+    public Commander(@NotNull NAR nar, int capacity) {
         this(nar, new TaskAccumulator(capacity));
     }
 
-    public Commander(NAR nar, TaskAccumulator buffer) {
+    public Commander(@NotNull NAR nar, TaskAccumulator buffer) {
 
         this.nar = nar;
 
@@ -85,7 +88,7 @@ public class Commander implements Consumer<NAR>, Supplier<Concept> {
 //    }
 
 
-    protected void input(Task t) {
+    protected void input(@NotNull Task t) {
         if (/*(t.isGoal() || t.isQuestOrQuestion()) && */ t.isInput()) {
             commands.getArrayBag().put(t);
         }
@@ -93,7 +96,7 @@ public class Commander implements Consumer<NAR>, Supplier<Concept> {
 
 
     @Override
-    public void accept(NAR nar) {
+    public void accept(@NotNull NAR nar) {
 
         //TODO iterate tasks until allotted priority has been reached,
         //  TaskProcess each
@@ -123,7 +126,7 @@ public class Commander implements Consumer<NAR>, Supplier<Concept> {
 
     }
 
-    public final boolean valid(long now, Task t) {
+    public final boolean valid(long now, @NotNull Task t) {
 
         if (t.getBudget().getDeleted())
             return false;

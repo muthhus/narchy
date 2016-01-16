@@ -25,6 +25,7 @@ import nars.util.data.MutableInteger;
 import nars.util.data.list.FasterList;
 import nars.util.event.Active;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -39,7 +40,9 @@ import static java.util.stream.Collectors.toList;
  */
 public class Default extends AbstractNAR {
 
+    @NotNull
     public final AbstractCycle core;
+    @NotNull
     public final TaskPerception input;
 
 
@@ -59,7 +62,7 @@ public class Default extends AbstractNAR {
         ), numConcepts, conceptsFirePerCycle, termlinkFirePerConcept, tasklinkFirePerConcept);
     }
 
-    public Default(Memory mem, int activeConcepts, int conceptsFirePerCycle, int termLinksPerConcept, int taskLinksPerConcept) {
+    public Default(@NotNull Memory mem, int activeConcepts, int conceptsFirePerCycle, int termLinksPerConcept, int taskLinksPerConcept) {
         super(mem);
 
         the("input", input = initInput());
@@ -87,6 +90,7 @@ public class Default extends AbstractNAR {
 //        return new FIFOTaskPerception(this, null, this::process);
 //    }
 
+    @NotNull
     public TaskPerception initInput() {
 
         return new SetTaskPerception(
@@ -101,6 +105,7 @@ public class Default extends AbstractNAR {
         //input.inputsMaxPerCycle.set(conceptsFirePerCycle);;
     }
 
+    @NotNull
     protected AbstractCycle initCore(int activeConcepts, int conceptsFirePerCycle, int termLinksPerConcept, int taskLinksPerConcept) {
 
         AbstractCycle c = new DefaultCycle(this, newDeriver(), newConceptBag(activeConcepts));
@@ -117,6 +122,7 @@ public class Default extends AbstractNAR {
         return c;
     }
 
+    @NotNull
     public Bag<Concept> newConceptBag(int initialCapacity) {
         return new CurveBag<Concept>(initialCapacity, rng).mergePlus();
     }
@@ -171,6 +177,7 @@ public class Default extends AbstractNAR {
         return c;
     }
 
+    @NotNull
     @Override
     public NAR forEachConcept(Consumer<Concept> recip) {
         core.active.forEachKey(recip);
@@ -191,6 +198,7 @@ public class Default extends AbstractNAR {
      */
     public abstract static class AbstractCycle implements Consumer<BLink<Concept>> {
 
+        @NotNull
         final Active handlers;
 
         public final Deriver  der;
@@ -198,6 +206,7 @@ public class Default extends AbstractNAR {
         /**
          * How many concepts to fire each cycle; measures degree of parallelism in each cycle
          */
+        @NotNull
         @Range(min=0,max=64,unit="Concept")
         public final MutableInteger conceptsFiredPerCycle;
 
@@ -229,6 +238,7 @@ public class Default extends AbstractNAR {
          */
         public final Bag<Concept> active;
 
+        @NotNull
         @Deprecated
         public final transient NAR nar;
 
@@ -240,13 +250,17 @@ public class Default extends AbstractNAR {
 
         final Derivelet deriver = new Derivelet();
 
+        @NotNull
         @Range(min=0, max=1f,unit="Perfection")
         public final MutableFloat perfection;
 
         final List<BLink<Concept>> firing = Global.newArrayList(1);
 
+        @NotNull
         private final AlannForget<Task> taskLinkForget;
+        @NotNull
         private final AlannForget<Termed> termLinkForget;
+        @NotNull
         private final AlannForget<Concept> conceptForget;
 
         //cached
@@ -259,7 +273,7 @@ public class Default extends AbstractNAR {
 
         /* ---------- Short-term workspace for a single cycle ------- */
 
-        protected AbstractCycle(NAR nar, Deriver deriver, Bag<Concept> concepts) {
+        protected AbstractCycle(@NotNull NAR nar, Deriver deriver, Bag<Concept> concepts) {
 
             this.nar = nar;
 
@@ -347,7 +361,7 @@ public class Default extends AbstractNAR {
         }
 
         /** fires a concept selected by the bag */
-        @Override public final void accept(BLink<Concept> cb) {
+        @Override public final void accept(@NotNull BLink<Concept> cb) {
 
             //c.getTermLinks().up(simpleForgetDecay);
             //c.getTaskLinks().update(simpleForgetDecay);
@@ -373,7 +387,7 @@ public class Default extends AbstractNAR {
             private transient float perfectionCached = Float.NaN;
             private transient long now = -1;
 
-            public AlannForget(NAR nar, MutableFloat forgetTime, MutableFloat perfection) {
+            public AlannForget(@NotNull NAR nar, MutableFloat forgetTime, MutableFloat perfection) {
                 this.forgetTime = forgetTime;
                 this.perfection = perfection;
                 nar.onEachCycle(this::accept);
@@ -381,7 +395,7 @@ public class Default extends AbstractNAR {
             }
 
             @Override
-            public void accept(BLink budget) {
+            public void accept(@NotNull BLink budget) {
                 // priority * e^(-lambda*t)
                 //     lambda is (1 - durabilty) / forgetPeriod
                 //     dt is the delta
@@ -407,7 +421,7 @@ public class Default extends AbstractNAR {
             }
 
 
-            public void accept(Memory memory) {
+            public void accept(@NotNull Memory memory) {
                 //same for duration of the cycle
                 forgetTimeCached = forgetTime.floatValue() * memory.duration();
                 perfectionCached = perfection.floatValue();
@@ -415,7 +429,7 @@ public class Default extends AbstractNAR {
             }
 
             @Override
-            public boolean test(BLink bLink) {
+            public boolean test(@NotNull BLink bLink) {
                 accept(bLink);
                 return true;
             }
@@ -439,6 +453,7 @@ public class Default extends AbstractNAR {
         /**
          * re-used, not to be used outside of this
          */
+        @NotNull
         private final PremiseMatch matcher;
 
         /**
@@ -446,10 +461,11 @@ public class Default extends AbstractNAR {
          * be normalized or some other filter or aggregation
          * applied collectively.
          */
+        @NotNull
         final Collection<Task> derivedTasksBuffer;
 
 
-        public DefaultCycle(NAR nar, Deriver deriver, Bag<Concept> concepts) {
+        public DefaultCycle(@NotNull NAR nar, Deriver deriver, Bag<Concept> concepts) {
             super(nar, deriver, concepts);
 
             matcher = new PremiseMatch(nar.memory.random);
@@ -463,7 +479,7 @@ public class Default extends AbstractNAR {
 
 
         @Override
-        public void process(ConceptProcess p) {
+        public void process(@NotNull ConceptProcess p) {
             Collection<Task> buffer = derivedTasksBuffer;
 
             this.der.run(p, matcher, buffer::add);
@@ -493,7 +509,8 @@ public class Default extends AbstractNAR {
 
         }
 
-        static HashBag<Task> detectDuplicates(Collection<Task> buffer) {
+        @NotNull
+        static HashBag<Task> detectDuplicates(@NotNull Collection<Task> buffer) {
             HashBag<Task> taskCount = new HashBag<>();
             taskCount.addAll(buffer);
             taskCount.forEachWithOccurrences((t, i) -> {

@@ -9,6 +9,7 @@ import nars.nal.meta.op.SubTermOp;
 import nars.nal.meta.op.SubTermStructure;
 import nars.term.Term;
 import nars.term.constraint.MatchConstraint;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
@@ -16,7 +17,9 @@ import java.util.List;
 /** represents the "program" that the matcher will execute */
 public class TermPattern {
 
+    @NotNull
     public final Term[] pre;
+    @NotNull
     public final Term[] code;
     public final Term term;
 
@@ -38,10 +41,10 @@ public class TermPattern {
         this.code = code.toArray(new BooleanCondition[code.size()]);
     }
 
-    private static void compileTaskBeliefPair(TaskBeliefPair pattern,
-                                      List<BooleanCondition<PremiseMatch>> pre,
-                                      List<BooleanCondition<PremiseMatch>> code,
-                                      ListMultimap<Term, MatchConstraint> constraints) {
+    private static void compileTaskBeliefPair(@NotNull TaskBeliefPair pattern,
+                                              @NotNull List<BooleanCondition<PremiseMatch>> pre,
+                                              @NotNull List<BooleanCondition<PremiseMatch>> code,
+                                              ListMultimap<Term, MatchConstraint> constraints) {
         Term x0 = pattern.term(0);
         boolean x0Pattern = x0.op(Op.VAR_PATTERN);
         Term x1 = pattern.term(1);
@@ -360,6 +363,7 @@ public class TermPattern {
 //        }
 //    };
 
+    @NotNull
     @Override
     public String toString() {
         return "TermPattern{" + Arrays.toString(code) + '}';

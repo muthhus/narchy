@@ -1,6 +1,8 @@
 package nars.op.software.scheme.cons;
 
 import com.google.common.collect.Iterators;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -20,16 +22,19 @@ public class Cons<T> implements Iterable<T> {
         this.cdr = cdr;
     }
 
+    @NotNull
     public static <T> Cons<T> cons(T car, Cons<T> cdr) {
         return new Cons<>(car, cdr);
     }
 
+    @NotNull
     @SafeVarargs
     public static <T> Cons<T> copyOf(T... items) {
         return copyOf(Arrays.asList(items));
     }
 
-    public static <T> Cons<T> copyOf(Iterable<T> items) {
+    @NotNull
+    public static <T> Cons<T> copyOf(@NotNull Iterable<? extends T> items) {
         Cons<T> result = empty();
         for (T t : items) {
             if (result == empty()) {
@@ -71,6 +76,7 @@ public class Cons<T> implements Iterable<T> {
 
 
 
+    @NotNull
     @SuppressWarnings("unchecked")
     public static <E> Cons<E> empty() {
         return (Cons<E>) EMPTY;
@@ -97,7 +103,7 @@ public class Cons<T> implements Iterable<T> {
         };
     }
 
-    @Override public void forEach(Consumer<? super T> action) {
+    @Override public void forEach(@NotNull Consumer<? super T> action) {
         for (T e : this) {
             action.accept(e);
         }
@@ -107,6 +113,7 @@ public class Cons<T> implements Iterable<T> {
         return Spliterators.spliteratorUnknownSize(iterator(), Spliterator.NONNULL);
     }
 
+    @NotNull
     public Stream<T> stream() {
         return StreamSupport.stream(spliterator(), false);
     }
@@ -149,7 +156,7 @@ public class Cons<T> implements Iterable<T> {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) {
             return true;
         }
@@ -190,11 +197,13 @@ public class Cons<T> implements Iterable<T> {
             return Spliterators.emptySpliterator();
         }
 
+        @NotNull
         @Override
         public Object car() {
             throw new UnsupportedOperationException();
         }
 
+        @NotNull
         @Override
         public Cons<Object> cdr() {
             throw new UnsupportedOperationException();

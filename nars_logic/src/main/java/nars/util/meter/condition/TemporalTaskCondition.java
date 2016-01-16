@@ -3,6 +3,7 @@ package nars.util.meter.condition;
 import nars.NAR;
 import nars.Narsese;
 import nars.task.Task;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by me on 10/14/15.
@@ -23,6 +24,7 @@ public class TemporalTaskCondition extends EternalTaskCondition {
         this.occEnd = occEnd;
     }
 
+    @NotNull
     @Override
     public String toString() {
         return super.toString() + " occurrs: (" + occStart + ',' + occEnd +
@@ -30,7 +32,7 @@ public class TemporalTaskCondition extends EternalTaskCondition {
     }
 
     @Override
-    protected boolean occurrenceTimeMatches(Task task) {
+    protected boolean occurrenceTimeMatches(@NotNull Task task) {
         if (task.isEternal()) return false;
 
         //final long cc = task.getCreationTime();

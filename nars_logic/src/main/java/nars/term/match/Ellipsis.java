@@ -5,6 +5,7 @@ import nars.term.TermContainer;
 import nars.term.compound.Compound;
 import nars.term.transform.VariableNormalization;
 import nars.term.variable.Variable;
+import org.jetbrains.annotations.NotNull;
 
 public abstract class Ellipsis extends VarPattern { //TODO use Immutable
 
@@ -30,7 +31,7 @@ public abstract class Ellipsis extends VarPattern { //TODO use Immutable
     //public final Variable target;
 
 
-    protected Ellipsis(Variable target, String suffix) {
+    protected Ellipsis(@NotNull Variable target, String suffix) {
         super(
             target.toString().substring(1) /* exclude variable type char */
                     + suffix
@@ -46,7 +47,7 @@ public abstract class Ellipsis extends VarPattern { //TODO use Immutable
         return 0;
     }
 
-    public static boolean hasEllipsis(TermContainer x) {
+    public static boolean hasEllipsis(@NotNull TermContainer x) {
         int xs = x.size();
         for (int i = 0; i < xs; i++)
             if (x.term(i) instanceof Ellipsis) return true;
@@ -99,7 +100,7 @@ public abstract class Ellipsis extends VarPattern { //TODO use Immutable
 //        return n;
 //    }
 
-    public static int numNonEllipsisSubterms(Compound x) {
+    public static int numNonEllipsisSubterms(@NotNull Compound x) {
         int xs = x.size();
         int n = xs;
         for (int i = 0; i < xs; i++) {

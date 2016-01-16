@@ -6,6 +6,8 @@ import nars.concept.Concept;
 import nars.util.event.FrameReaction;
 import nars.util.meter.event.DoubleMeter;
 import nars.util.meter.event.HitMeter;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
@@ -21,6 +23,7 @@ public class LogicMeter extends FrameReaction {
 
 
 
+    @NotNull
     public final Memory m;
 
     //public final HitMeter TASK_PROCESS = new HitMeter("task.immediate_process");
@@ -92,7 +95,7 @@ public class LogicMeter extends FrameReaction {
     //private double[] conceptHistogram;
 
 
-    public LogicMeter(Memory m) {
+    public LogicMeter(@NotNull Memory m) {
         super(m);
         this.m = m;
     }
@@ -109,6 +112,7 @@ public class LogicMeter extends FrameReaction {
         double prioritySum = 0;
         double prioritySumSq = 0;
         static final int histogramBins = 4;
+        @NotNull
         double[] histogram = new double[histogramBins];
         int count;
         private double mean;
@@ -130,7 +134,7 @@ public class LogicMeter extends FrameReaction {
         }
 
         @Override
-        public void accept(I c) {
+        public void accept(@NotNull I c) {
 
             double p = c.getPriority();
 
@@ -183,6 +187,7 @@ public class LogicMeter extends FrameReaction {
         }
 
         /** priority histogram */
+        @NotNull
         public double[] getHistogram() {
             return histogram;
         }
@@ -201,7 +206,7 @@ public class LogicMeter extends FrameReaction {
         }
 
         @Override
-        public void accept(Concept c) {
+        public void accept(@Nullable Concept c) {
             if (c == null) return;
 
 
@@ -226,7 +231,7 @@ public class LogicMeter extends FrameReaction {
 
 
 
-        public void commit(Memory m) {
+        public void commit(@NotNull Memory m) {
 
 
             CONCEPTS_ACTIVE.set(count);

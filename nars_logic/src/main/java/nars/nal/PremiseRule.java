@@ -29,6 +29,7 @@ import nars.term.transform.CompoundTransform;
 import nars.term.transform.MapSubst;
 import nars.term.transform.VariableNormalization;
 import nars.term.variable.Variable;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.List;
@@ -102,15 +103,17 @@ public class PremiseRule extends GenericCompound implements Level {
     protected String source;
     public MatchTaskBelief match;
 
+    @NotNull
     public final Compound getPremise() {
         return (Compound) term(0);
     }
 
+    @NotNull
     public final Compound getConclusion() {
         return (Compound) term(1);
     }
 
-    PremiseRule(Compound premisesResultProduct) {
+    PremiseRule(@NotNull Compound premisesResultProduct) {
         this((Compound)premisesResultProduct.term(0), (Compound)premisesResultProduct.term(1));
     }
 
@@ -161,7 +164,8 @@ public class PremiseRule extends GenericCompound implements Level {
 
 
     /** add the sequence of involved conditions to a list, for one given postcondition (ex: called for each this.postconditions)  */
-    public List<Term> getConditions(PostCondition post) {
+    @NotNull
+    public List<Term> getConditions(@NotNull PostCondition post) {
 
         int n = prePreconditions.length + postPreconditions.length;
 
@@ -233,7 +237,7 @@ public class PremiseRule extends GenericCompound implements Level {
     }
 
     /** deduplicate and generate match-optimized compounds for rules */
-    public void compile(TermIndex index) {
+    public void compile(@NotNull TermIndex index) {
         Term[] premisePattern = ((Compound) term(0)).terms();
         premisePattern[0] = index.theTerm(premisePattern[0]); //task pattern
         premisePattern[1] = index.theTerm(premisePattern[1]); //belief pattern
@@ -251,8 +255,9 @@ public class PremiseRule extends GenericCompound implements Level {
             return false;
         }
 
+        @NotNull
         @Override
-        public Term apply(Compound containingCompound, Term v, int depth) {
+        public Term apply(@NotNull Compound containingCompound, @NotNull Term v, int depth) {
 
             //do not alter postconditions
             if ((containingCompound.op() == Op.INHERIT)
@@ -267,7 +272,8 @@ public class PremiseRule extends GenericCompound implements Level {
     static final UppercaseAtomsToPatternVariables UppercaseAtomsToPatternVariables = new UppercaseAtomsToPatternVariables();
 
 
-    public final PremiseRule normalizeRule(PatternIndex index) {
+    @NotNull
+    public final PremiseRule normalizeRule(@NotNull PatternIndex index) {
         return new PremiseRule(
                 (Compound)index.the(
                 $.terms.transform(
@@ -277,7 +283,8 @@ public class PremiseRule extends GenericCompound implements Level {
 
 
 
-    public final PremiseRule setup(PatternIndex index) /* throws PremiseRuleException */ {
+    @NotNull
+    public final PremiseRule setup(@NotNull PatternIndex index) /* throws PremiseRuleException */ {
 
         compile(index);
 
@@ -578,7 +585,7 @@ public class PremiseRule extends GenericCompound implements Level {
      * for each calculable "question reverse" rule,
      * supply to the consumer
      */
-    public final void forEachQuestionReversal(BiConsumer<PremiseRule,String> w) {
+    public final void forEachQuestionReversal(@NotNull BiConsumer<PremiseRule,String> w) {
 
         //String s = w.toString();
         /*if(s.contains("task(\"?") || s.contains("task(\"@")) { //these are backward inference already
@@ -625,6 +632,7 @@ public class PremiseRule extends GenericCompound implements Level {
      * for each calculable "question reverse" rule,
      * supply to the consumer
      */
+    @NotNull
     public final PremiseRule forwardPermutation() {
 
         // T, B, [pre] |- C, [post] ||--
@@ -638,6 +646,7 @@ public class PremiseRule extends GenericCompound implements Level {
         return clone(B, T, C, false);
     }
 
+    @NotNull
     private PremiseRule clone(Term newT, Term newB, Term newR, boolean question) {
 
         Map<Term,Term> m = new HashMap(3);

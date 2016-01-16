@@ -22,6 +22,8 @@ import nars.term.compound.GenericCompound;
 import nars.term.match.VarPattern;
 import nars.term.variable.Variable;
 import nars.truth.Truth;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
@@ -43,6 +45,7 @@ public enum $  {
 
     public static final TermBuilder terms = new TermBuilder() {
 
+        @NotNull
         @Override
         public Termed make(Op op, int relation, TermContainer subterms, int dt) {
             return new GenericCompound(op, relation, (TermVector)subterms);
@@ -75,15 +78,18 @@ public enum $  {
                 //.normalized();
     }
 
+    @NotNull
     public static <O> AtomObject<O> ref(String term, O instance) {
         return new AtomObject(term, instance);
     }
 
+    @NotNull
     public static Atom the(String id) {
         return Atom.the(id);
     }
 
-    public static Atom[] the(String... id) {
+    @NotNull
+    public static Atom[] the(@NotNull String... id) {
         int l = id.length;
         Atom[] x = new Atom[l];
         for (int i = 0; i < l; i++)
@@ -100,6 +106,7 @@ public enum $  {
      * Op.INHERITANCE from 2 Terms: subj --> pred
      *  returns a Term if the two inputs are equal to each other
      */
+    @Nullable
     public static Term inh(Term subj, Term pred) {
 
 //        if ((predicate instanceof Operator) && if (subject instanceof Product))
@@ -110,20 +117,24 @@ public enum $  {
     }
 
 
+    @Nullable
     public static Term inh(String subj, String pred) {
         return inh((Term)$(subj), $(pred));
     }
 
 
+    @Nullable
     public static Term sim(Term subj, Term pred) {
         return the(SIMILAR, subj, pred);
     }
 
+    @NotNull
     public static Compound oper(String operator, String... args) {
         return oper(Operator.the(operator), $.p(args));
     }
 
 
+    @NotNull
     public static Compound oper(Operator opTerm, Term... arg) {
         return oper(opTerm, $.p(arg));
     }
@@ -132,7 +143,8 @@ public enum $  {
 //        return oper(new Operator(opTerm), args);
 //    }
 
-    static Compound oper(Operator opTerm, Compound arg) {
+    @NotNull
+    static Compound oper(Operator opTerm, @Nullable Compound arg) {
         return (Compound) the(
                 INHERIT,
                 arg == null ? TermIndex.Empty : arg,
@@ -141,19 +153,23 @@ public enum $  {
     }
 
 
+    @Nullable
     public static Term impl(Term a, Term b) {
         return the(IMPLICATION, a, b);
     }
 
+    @Nullable
     public static Term neg(Term x) {
         return the(NEGATE, x);
     }
 
-    public static <T extends Term> Compound<T> p(Collection<? super T> t) {
+    @NotNull
+    public static <T extends Term> Compound<T> p(@NotNull Collection<? super T> t) {
         return $.p(t.toArray((T[]) new Term[t.size()]));
     }
 
-    public static Compound p(Term... t) {
+    @NotNull
+    public static Compound p(@Nullable Term... t) {
         if (t == null)
             return TermIndex.Empty;
 
@@ -165,7 +181,8 @@ public enum $  {
     }
 
     /** creates from a sublist of a list */
-    static Compound p(List<Term> l, int from, int to) {
+    @NotNull
+    static Compound p(@NotNull List<Term> l, int from, int to) {
         Term[] x = new Term[to - from];
 
         for (int j = 0, i = from; i < to; i++)
@@ -174,39 +191,48 @@ public enum $  {
         return $.p(x);
     }
 
+    @NotNull
     public static Compound<Atom> p(String... t) {
         return $.p((Atom[]) $.the(t));
     }
 
-    public static Variable v(Op type, String s) {
+    @NotNull
+    public static Variable v(@NotNull Op type, String s) {
         return v(type.ch, s);
     }
 
 
+    @NotNull
     public static Variable varDep(int i) {
         return v(VAR_DEP, i);
     }
 
+    @NotNull
     public static Variable varDep(String s) {
         return v(VAR_DEP, s);
     }
 
+    @NotNull
     public static Variable varIndep(int i) {
         return v(VAR_INDEP, i);
     }
 
+    @NotNull
     public static Variable varIndep(String s) {
         return v(VAR_INDEP, s);
     }
 
+    @NotNull
     public static Variable varQuery(int i) {
         return v(VAR_QUERY, i);
     }
 
+    @NotNull
     public static Variable varQuery(String s) {
         return v(VAR_QUERY, s);
     }
 
+    @NotNull
     public static VarPattern varPattern(int i) {
         return (VarPattern) v(VAR_PATTERN, i);
     }
@@ -220,12 +246,15 @@ public enum $  {
      * @param pred The second component
      * @return A compound generated or null
      */
+    @Nullable
     public static Term inst(Term subj, Term pred) {
         return terms.inst(subj, pred);
     }
+    @Nullable
     public static Term instprop(Term subject, Term predicate) {
         return terms.instprop(subject, predicate);
     }
+    @Nullable
     public static Term prop(Term subject, Term predicate) {
         return terms.prop(subject, predicate);
     }
@@ -234,39 +263,47 @@ public enum $  {
 //        return Terms.term(op, args);
 //    }
 
-    public static MutableTask belief(Compound term, Truth copyFrom) {
+    @NotNull
+    public static MutableTask belief(Compound term, @NotNull Truth copyFrom) {
         return belief(term, copyFrom.getFrequency(), copyFrom.getConfidence());
     }
 
+    @NotNull
     public static MutableTask belief(Compound term, float freq, float conf) {
         return new MutableTask(term).belief().truth(freq, conf);
     }
 
+    @NotNull
     public static MutableTask goal(Compound term, float freq, float conf) {
         return new MutableTask(term).goal().truth(freq, conf);
     }
 
-    public static Compound sete(Collection<? extends Term> t) {
+    @NotNull
+    public static Compound sete(@NotNull Collection<? extends Term> t) {
         return (Compound) the(SET_EXT, t);
     }
 
-   private static Term[] array(Collection<? extends Term> t) {
+   private static Term[] array(@NotNull Collection<? extends Term> t) {
         return t.toArray(new Term[t.size()]);
     }
 
-    public static Compound seti(Collection<Term> t) {
+    @NotNull
+    public static Compound seti(@NotNull Collection<Term> t) {
         return $.seti(array(t));
     }
 
+    @NotNull
     public static Compound sete(Term... t) {
         return (Compound) the(SET_EXT, t);
     }
 
     /** shorthand for extensional set */
+    @NotNull
     public static Compound s(Term... t) {
         return sete(t);
     }
 
+    @NotNull
     public static Compound seti(Term... t) {
         return (Compound) the(SET_INT, t);
     }
@@ -279,10 +316,12 @@ public enum $  {
      * @param predicate The second component
      * @return A compound generated or null
      */
+    @Nullable
     public static Term property(Term subject, Term predicate) {
         return inh(subject, $.seti(predicate));
     }
 
+    @NotNull
     public static Variable v(char ch, String name) {
 
 //        if (name.length() < 3) {
@@ -308,7 +347,8 @@ public enum $  {
 
     }
 
-    public static Variable v(Op type, int counter) {
+    @NotNull
+    public static Variable v(@NotNull Op type, int counter) {
         if (counter < Variable.MAX_VARIABLE_CACHED_PER_TYPE) {
             Variable[] vct = Variable.varCache[typeIndex(type)];
             Variable existing = vct[counter];
@@ -318,10 +358,12 @@ public enum $  {
         return v(type.ch, String.valueOf(counter));
     }
 
+    @Nullable
     public static Term conj(Term... a) {
         return the(CONJUNCTION, a);
     }
 
+    @Nullable
     public static Term disj(Term... a) {
         return the(DISJUNCTION, a);
     }
@@ -359,9 +401,11 @@ public enum $  {
 //        //loggerContext.stop();
     }
 
+    @NotNull
     public static final Logger logRoot;
 
     /** NALogging non-axiomatic logging encoder. log events expressed in NAL terms */
+    @NotNull
     public static final PatternLayoutEncoder logEncoder;
 
     static {
@@ -393,61 +437,75 @@ public enum $  {
 //        rootLogger.error("Message 2");
     }
 
+    @Nullable
     public static Term equiv(Term subject, Term pred) {
         return the(EQUIV, subject, pred);
     }
 
+    @Nullable
     public static Term diffInt(Term a, Term b) {
         return the(DIFF_INT, a, b);
     }
 
+    @Nullable
     public static Term diffExt(Term a, Term b) {
         return the(DIFF_EXT, a, b);
     }
 
+    @Nullable
     public static Term imageExt(Term... x) {
         return the(IMAGE_EXT, x);
     }
+    @Nullable
     public static Term imageInt(Term... x) {
         return the(IMAGE_INT, x);
     }
+    @Nullable
     public static Term sect(Term... x) {
         return the(INTERSECT_EXT, x);
     }
+    @Nullable
     public static Term sectInt(Term... x) {
         return the(INTERSECT_INT, x);
     }
 
 
+    @NotNull
     public static Operator operator(String name) {
         return new Operator($.the(name));
     }
 
 
-    public static Term the(Op op, Term... subterms) {
+    @Nullable
+    public static Term the(@NotNull Op op, Term... subterms) {
         return the(op, -1, subterms);
     }
-    public static Term the(Op op, int relation, Term... subterms) {
+    @Nullable
+    public static Term the(@NotNull Op op, int relation, Term... subterms) {
         return the(op, relation, TermContainer.the(op, subterms));
     }
 
-    public static Term the(Op op, Collection<? extends Term> subterms) {
+    @Nullable
+    public static Term the(@NotNull Op op, @NotNull Collection<? extends Term> subterms) {
         return the(op, -1, subterms);
     }
-    public static Term the(Op op, int relation, Collection<? extends Term> subterms) {
+    @Nullable
+    public static Term the(@NotNull Op op, int relation, @NotNull Collection<? extends Term> subterms) {
         return the(op, relation, TermContainer.the(op, subterms));
     }
 
-    public static Term the(Op op, int relation, TermContainer subterms) {
+    @Nullable
+    public static Term the(@NotNull Op op, int relation, TermContainer subterms) {
         return the(op, relation, Tense.ITERNAL, subterms);
     }
 
-    public static Term the(Op op, int relation, int t, TermContainer subterms) {
+    @Nullable
+    public static Term the(@NotNull Op op, int relation, int t, TermContainer subterms) {
         return terms.newTerm(op, relation, t, subterms);
     }
 
 
-    public static int typeIndex(Op o) {
+    public static int typeIndex(@NotNull Op o) {
         switch (o) {
             case VAR_PATTERN:
                 return 0;
@@ -462,14 +520,16 @@ public enum $  {
     }
 
     /** construct set_ext of key,value pairs from a Map */
-    public static Compound seteMap(Map<Term,Term> map) {
+    @NotNull
+    public static Compound seteMap(@NotNull Map<Term,Term> map) {
         return $.sete(
                 (Collection<? extends Term>) map.entrySet().stream().map(
                     e -> $.p(e.getKey(),e.getValue()))
                 .collect( toList())
         );
     }
-    public static <X> Compound seteMap(Map<Term,? extends X> map, Function<X, Term> toTerm) {
+    @NotNull
+    public static <X> Compound seteMap(@NotNull Map<Term,? extends X> map, @NotNull Function<X, Term> toTerm) {
         return $.sete(
                 (Collection<? extends Term>) map.entrySet().stream().map(
                     e -> $.p(e.getKey(), toTerm.apply(e.getValue())))

@@ -2,6 +2,7 @@ package nars.op.software.scheme;
 
 
 import nars.op.software.scheme.expressions.Expression;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.util.stream.IntStream;
@@ -17,11 +18,11 @@ public enum Repl {
         repl(INPUT_STREAM, OUTPUT_STREAM);
     }
 
-    private static void repl(InputStream in, PrintStream out) {
+    private static void repl(@NotNull InputStream in, @NotNull PrintStream out) {
         repl(in, out, ENV);
     }
 
-    public static void repl(InputStream in, PrintStream out, SchemeClosure env) {
+    public static void repl(@NotNull InputStream in, @NotNull PrintStream out, SchemeClosure env) {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
 
         String input = "";
@@ -47,7 +48,7 @@ public enum Repl {
         }
     }
 
-    private static String readLine(BufferedReader bufferedReader) throws IOException {
+    private static String readLine(@NotNull BufferedReader bufferedReader) throws IOException {
         String line = "";
         do {
             String l = bufferedReader.readLine();
@@ -57,11 +58,11 @@ public enum Repl {
         return line;
     }
 
-    private static boolean completeExpression(String input) {
+    private static boolean completeExpression(@NotNull String input) {
         return Reader.countOpenParens(input) == 0;
     }
 
-    private static void prompt(PrintStream out, int openParenCount) {
+    private static void prompt(@NotNull PrintStream out, int openParenCount) {
         if (openParenCount == 0) {
             out.print(" > ");
         } else {
@@ -69,12 +70,12 @@ public enum Repl {
         }
     }
 
-    private static void indent(PrintStream out, int openParenCount) {
+    private static void indent(@NotNull PrintStream out, int openParenCount) {
         out.print("... ");
         IntStream.range(0, openParenCount).forEach(i -> out.print("  "));
     }
 
-    private static String print(Expression expression) {
+    private static String print(@NotNull Expression expression) {
         String exp = expression.print();
         if (exp.isEmpty()) {
             return "";

@@ -3,11 +3,14 @@ package nars.nal.meta.pre;
 import nars.nal.PremiseMatch;
 import nars.nal.meta.AtomicBooleanCondition;
 import nars.term.Term;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Created by me on 8/15/15.
  */
 public abstract class PreCondition3 extends AtomicBooleanCondition<PremiseMatch> {
+    @Nullable
     public Term arg1=null, arg2=null, arg3=null;
 
 
@@ -19,7 +22,7 @@ public abstract class PreCondition3 extends AtomicBooleanCondition<PremiseMatch>
     }
 
     @Override
-    public boolean booleanValueOf(PremiseMatch m) {
+    public boolean booleanValueOf(@NotNull PremiseMatch m) {
         //these should not resolve to null
         Term a = m.apply(arg1);
         boolean r=false;
@@ -35,6 +38,7 @@ public abstract class PreCondition3 extends AtomicBooleanCondition<PremiseMatch>
 
     public abstract boolean test(PremiseMatch m, Term a, Term b, Term c);
 
+    @NotNull
     @Override
     public String toString() {
         return getClass().getSimpleName() + '[' + arg1 + ',' + arg2 + ',' + arg3 + ']';

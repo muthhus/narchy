@@ -1,6 +1,8 @@
 package nars.budget;
 
 import nars.data.BudgetedStruct;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Created by me on 12/12/15.
@@ -17,6 +19,7 @@ public class BagAggregateBudget extends Budget {
         this.budgets = budgets;
     }
 
+    @Nullable
     @Override
     public Budget zero() {
         return null;
@@ -47,6 +50,7 @@ public class BagAggregateBudget extends Budget {
         return this.time = currentTime;
     }
 
+    @NotNull
     @Override
     public String toString() {
         return getBudgetString();
@@ -124,6 +128,7 @@ public class BagAggregateBudget extends Budget {
         //ignore
     }
 
+    @NotNull
     @Override
     public Budget clone() {
         return this;

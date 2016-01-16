@@ -6,6 +6,7 @@ import nars.nal.nal8.Operator;
 import nars.term.Statement;
 import nars.term.Term;
 import nars.term.compound.Compound;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
@@ -15,12 +16,12 @@ import static nars.Symbols.*;
  * Created by me on 1/2/16.
  */
 public interface TermPrinter {
-    static void appendSeparator(Appendable p, boolean pretty) throws IOException {
+    static void appendSeparator(@NotNull Appendable p, boolean pretty) throws IOException {
         p.append(ARGUMENT_SEPARATOR);
         if (pretty) p.append(' ');
     }
 
-    static void writeCompound1(Op op, Term singleTerm, Appendable writer, boolean pretty) throws IOException {
+    static void writeCompound1(@NotNull Op op, @NotNull Term singleTerm, @NotNull Appendable writer, boolean pretty) throws IOException {
         writer.append(COMPOUND_TERM_OPENER);
         writer.append(op.str);
         writer.append(ARGUMENT_SEPARATOR);
@@ -28,7 +29,7 @@ public interface TermPrinter {
         writer.append(COMPOUND_TERM_CLOSER);
     }
 
-    static void compoundAppend(Compound c, Appendable p, boolean pretty) throws IOException {
+    static void compoundAppend(@NotNull Compound c, @NotNull Appendable p, boolean pretty) throws IOException {
 
         p.append(COMPOUND_TERM_OPENER);
 
@@ -43,11 +44,11 @@ public interface TermPrinter {
 
     }
 
-    static void appendCloser(Appendable p) throws IOException {
+    static void appendCloser(@NotNull Appendable p) throws IOException {
         p.append(COMPOUND_TERM_CLOSER);
     }
 
-    static void append(Compound c, Appendable p, boolean pretty) throws IOException {
+    static void append(@NotNull Compound c, @NotNull Appendable p, boolean pretty) throws IOException {
         final Op op = c.op();
 
         switch (op) {
@@ -78,7 +79,7 @@ public interface TermPrinter {
         }
     }
 
-    static void inheritAppend(Compound c, Appendable p, boolean pretty) throws IOException {
+    static void inheritAppend(@NotNull Compound c, @NotNull Appendable p, boolean pretty) throws IOException {
         Term a = Statement.subj(c);
         Term b = Statement.pred(c);
 
@@ -88,7 +89,7 @@ public interface TermPrinter {
         a.append(p, pretty);
         p.append(Symbols.COMPOUND_TERM_CLOSER);
     }
-    static void similarAppend(Compound c, Appendable p, boolean pretty) throws IOException {
+    static void similarAppend(@NotNull Compound c, @NotNull Appendable p, boolean pretty) throws IOException {
         Term a = Statement.subj(c);
         Term b = Statement.pred(c);
 
@@ -99,7 +100,7 @@ public interface TermPrinter {
         p.append(Symbols.COMPOUND_TERM_CLOSER);
     }
 
-    static void statementAppend(Compound c, Appendable p, boolean pretty, Op op) throws IOException {
+    static void statementAppend(@NotNull Compound c, @NotNull Appendable p, boolean pretty, @NotNull Op op) throws IOException {
         Term a = Statement.subj(c);
         Term b = Statement.pred(c);
 
@@ -117,11 +118,11 @@ public interface TermPrinter {
         p.append(COMPOUND_TERM_CLOSER);
     }
 
-    static void sep(Appendable w, boolean pretty) throws IOException {
+    static void sep(@NotNull Appendable w, boolean pretty) throws IOException {
         if (pretty) w.append(' ');
     }
 
-    static void productAppend(Compound product, Appendable p, boolean pretty) throws IOException {
+    static void productAppend(@NotNull Compound product, @NotNull Appendable p, boolean pretty) throws IOException {
 
         int s = product.size();
         p.append(COMPOUND_TERM_OPENER);
@@ -134,7 +135,7 @@ public interface TermPrinter {
         p.append(COMPOUND_TERM_CLOSER);
     }
 
-    static void imageAppend(Compound image, Appendable p, boolean pretty) throws IOException {
+    static void imageAppend(@NotNull Compound image, @NotNull Appendable p, boolean pretty) throws IOException {
 
         int len = image.size();
 
@@ -167,7 +168,7 @@ public interface TermPrinter {
 
     }
 
-    static void setAppend(Compound set, Appendable p, boolean pretty) throws IOException {
+    static void setAppend(@NotNull Compound set, @NotNull Appendable p, boolean pretty) throws IOException {
 
         int len = set.size();
 
@@ -190,7 +191,7 @@ public interface TermPrinter {
         p.append(closer);
     }
 
-    static void operationAppend(Compound argsProduct, Operator operator, Appendable p, boolean pretty) throws IOException {
+    static void operationAppend(@NotNull Compound argsProduct, @NotNull Operator operator, @NotNull Appendable p, boolean pretty) throws IOException {
 
         Term predTerm = operator.identifier(); //getOperatorTerm();
 

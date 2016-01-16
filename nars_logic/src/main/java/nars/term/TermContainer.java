@@ -5,7 +5,8 @@ import com.gs.collections.api.set.MutableSet;
 import com.gs.collections.impl.factory.Sets;
 import nars.Global;
 import nars.Op;
-import nars.term.compound.Compound;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
@@ -35,7 +36,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
         return Sets.mutable.of(terms());
     }
 
-    static MutableSet<Term> intersect(TermContainer a, TermContainer b) {
+    static MutableSet<Term> intersect(@NotNull TermContainer a, @NotNull TermContainer b) {
         return Sets.intersect(a.toSet(),b.toSet());
     }
 
@@ -56,7 +57,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
 
 
     /** returns null if empty set; not sorted */
-    @Deprecated static TermSet difference(TermContainer a, TermContainer b) {
+    @Deprecated static TermSet difference(@NotNull TermContainer a, @NotNull TermContainer b) {
 
         TreeSet<Term> terms = new TreeSet();
 
@@ -95,7 +96,8 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
     T[] terms();
 
 
-    default Term[] terms(IntObjectPredicate<T> filter) {
+    @NotNull
+    default Term[] terms(@NotNull IntObjectPredicate<T> filter) {
         List<T> l = Global.newArrayList(size());
         int s = size();
         for (int i = 0; i < s; i++) {
@@ -121,7 +123,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
 //    }
 
 
-    static String toString(TermContainer t) {
+    static String toString(@NotNull TermContainer t) {
         StringBuilder sb = new StringBuilder("{[(");
         int s = t.size();
         for (int i = 0; i < s; i++) {
@@ -135,6 +137,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
     }
 
     /** extract a sublist of terms as an array */
+    @NotNull
     default Term[] terms(int start, int end) {
         Term[] t = new Term[end-start];
         int j = 0;
@@ -144,7 +147,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
     }
 
     /** follows normal indexOf() semantics; -1 if not found */
-    default int indexOf(Term t) {
+    default int indexOf(@Nullable Term t) {
         if (t == null)
             throw new RuntimeException("not found");
             //return -1;
@@ -202,7 +205,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
 //
 //    }
 
-    default boolean equivalent(List<Term> sub) {
+    default boolean equivalent(@NotNull List<Term> sub) {
         int s = size();
         if (s!=sub.size()) return false;
         for (int i = 0; i < size(); i++) {
@@ -226,7 +229,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
     /** returns true if evaluates true for all terms
      * @param p*/
     @Override
-    default boolean and(Predicate<? super Term> p) {
+    default boolean and(@NotNull Predicate<? super Term> p) {
         for (Term t : terms()) {
             if (!p.test(t)) {
                 return false;
@@ -236,7 +239,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
     }
 
 
-    static boolean requiresTermSet(Op op, int num) {
+    static boolean requiresTermSet(@NotNull Op op, int num) {
         return op.isCommutative() && (num > 1);
     }
 
@@ -244,16 +247,19 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
     /** produces the correct TermContainer for the given Op,
      * according to the existing type
      */
-    static TermContainer the(Op op, TermContainer tt) {
+    @NotNull
+    static TermContainer the(@NotNull Op op, @NotNull TermContainer tt) {
         return (!requiresTermSet(op, tt.size()) || tt.isSorted()) ? tt :
             TermSet.the(tt.terms());
     }
-    static TermContainer the(Op op, Collection<? extends Term> tt) {
+    @NotNull
+    static TermContainer the(@NotNull Op op, @NotNull Collection<? extends Term> tt) {
         return requiresTermSet(op, tt.size()) ?
                 TermSet.the(tt) : new TermVector(tt);
     }
 
-    static TermContainer the(Op op, Term... tt) {
+    @NotNull
+    static TermContainer the(@NotNull Op op, @NotNull Term... tt) {
         return requiresTermSet(op, tt.length) ? TermSet.the(tt) :
                 new TermVector(tt);
     }

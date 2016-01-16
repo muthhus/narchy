@@ -8,6 +8,8 @@ import nars.truth.Truth;
 import nars.truth.TruthFunctions;
 import nars.truth.TruthWave;
 import nars.truth.Truthed;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.Arrays;
@@ -25,6 +27,7 @@ public interface BeliefTable extends TaskTable {
 
     /** main method */
 
+    @Nullable
     Task add(Task input, Memory memory, Consumer<Task> onBeliefChanged);
 
     /* when does projecting to now not play a role? I guess there is no case,
@@ -37,6 +40,7 @@ public interface BeliefTable extends TaskTable {
         return or(confidence, originality);
     };*/
 
+    @Nullable
     BeliefTable EMPTY = new BeliefTable() {
 
         @Override
@@ -75,11 +79,13 @@ public interface BeliefTable extends TaskTable {
             return null;
         }
 
+        @Nullable
         @Override
         public Task topTemporal(long when) {
             return null;
         }
 
+        @Nullable
         @Override
         public Task add(Task input, Memory memory, Consumer<Task> onBeliefChanged) {
             return null;
@@ -102,7 +108,8 @@ public interface BeliefTable extends TaskTable {
     /**
      * get a random belief, weighted by their sentences confidences
      */
-    default Task getBeliefRandomByConfidence(boolean eternal, Random rng) {
+    @Nullable
+    default Task getBeliefRandomByConfidence(boolean eternal, @NotNull Random rng) {
 
         if (isEmpty()) return null;
 
@@ -124,14 +131,14 @@ public interface BeliefTable extends TaskTable {
         return getConfidenceSum(this);
     }
 
-    static float getConfidenceSum(Iterable<? extends Truthed> beliefs) {
+    static float getConfidenceSum(@NotNull Iterable<? extends Truthed> beliefs) {
         float t = 0;
         for (Truthed s : beliefs)
             t += s.getTruth().getConfidence();
         return t;
     }
 
-    static float getMeanFrequency(Collection<? extends Truthed> beliefs) {
+    static float getMeanFrequency(@NotNull Collection<? extends Truthed> beliefs) {
         if (beliefs.isEmpty()) return 0.5f;
 
         float t = 0;
@@ -172,18 +179,19 @@ public interface BeliefTable extends TaskTable {
 
     final class SolutionQualityMatchingOrderRanker implements Ranker {
 
+        @NotNull
         private final Task query;
         private final long now;
         private final boolean hasQueryVar; //cache hasQueryVar
 
-        public SolutionQualityMatchingOrderRanker(Task query, long now) {
+        public SolutionQualityMatchingOrderRanker(@NotNull Task query, long now) {
             this.query = query;
             this.now = now;
             this.hasQueryVar = query.hasQueryVar();
         }
 
         @Override
-        public float rank(Task t, float bestToBeat) {
+        public float rank(@NotNull Task t, float bestToBeat) {
             Task q = query;
 
             if (t.equals(q)) return Float.NaN; //dont compare to self
@@ -227,11 +235,14 @@ public interface BeliefTable extends TaskTable {
 
 
     /** get the top-ranking eternal belief/goal */
+    @Nullable
     Task topEternal();
 
+    @Nullable
     Task topTemporal(long when);
 
     /** get the most relevant belief/goal with respect to a specific time. */
+    @Nullable
     default Task top(long t) {
         Task ete = topEternal();
         if (t == Tense.ETERNAL)
@@ -248,17 +259,19 @@ public interface BeliefTable extends TaskTable {
 
 
     /** the truth v alue of the topmost element, or null if there is none */
+    @Nullable
     default Truth topTruth(long now) {
         if (isEmpty()) return null;
         return top(now).getTruth();
     }
 
-    default void print(PrintStream out) {
+    default void print(@NotNull PrintStream out) {
         for (Task t : this) {
             out.println(t + " " + Arrays.toString(t.getEvidence()) + ' ' + t.getLog());
         }
     }
 
+    @NotNull
     default TruthWave getWave() {
         return new TruthWave(this);
     }
@@ -282,7 +295,7 @@ public interface BeliefTable extends TaskTable {
 
     }
 
-    static float projectionQuality(float freq, float conf, Task t, long targetTime, long currentTime, boolean problemHasQueryVar) {
+    static float projectionQuality(float freq, float conf, @NotNull Task t, long targetTime, long currentTime, boolean problemHasQueryVar) {
 //        float freq = getFrequency();
 //        float conf = getConfidence();
 
@@ -329,7 +342,8 @@ public interface BeliefTable extends TaskTable {
     /** allowed to return null. must evaluate all items in case the final one is the
      *  only item that does not have disqualifying rank (MIN_VALUE)
      * */
-    default Task top(Ranker r) {
+    @Nullable
+    default Task top(@NotNull Ranker r) {
 
         float s = Float.MIN_VALUE;
         Task b = null;

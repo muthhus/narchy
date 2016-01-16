@@ -1,6 +1,7 @@
 package nars.op.software.scheme.expressions;
 
 import nars.op.software.scheme.cons.Cons;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
 
@@ -18,6 +19,7 @@ public class SymbolicProcedureExpression extends ProcedureExpression {
         this.exps = exps;
     }
 
+    @NotNull
     @Override
     public String toString() {
         return names + "=" + exps;

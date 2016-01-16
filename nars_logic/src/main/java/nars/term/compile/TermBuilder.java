@@ -19,6 +19,7 @@ import nars.term.transform.Subst;
 import nars.term.transform.VariableNormalization;
 import nars.term.transform.VariableTransform;
 import nars.term.variable.Variable;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
@@ -41,11 +42,12 @@ public interface TermBuilder {
 
     /** allows using the single variable normalization,
      * which is safe if the term doesnt contain pattern variables */
-    static VariableTransform normalizeFast(Compound target) {
+    @NotNull
+    static VariableTransform normalizeFast(@NotNull Compound target) {
         return target.vars() == 1 ? VariableNormalization.singleVariableNormalization : new VariableNormalization();
     }
 
-    static boolean validEquivalenceTerm(Term t) {
+    static boolean validEquivalenceTerm(@NotNull Term t) {
         return !t.isAny(TermIndex.InvalidEquivalenceTerm);
 //        if ( instanceof Implication) || (subject instanceof Equivalence)
 //                || (predicate instanceof Implication) || (predicate instanceof Equivalence) ||
@@ -54,7 +56,7 @@ public interface TermBuilder {
 //        }
     }
 
-    static boolean hasImdex(Term[] r) {
+    static boolean hasImdex(@NotNull Term[] r) {
         for (Term x : r) {
             //        if (t instanceof Compound) return false;
 //        byte[] n = t.bytes();
@@ -76,7 +78,7 @@ public interface TermBuilder {
         return t;
     }
 
-    default Termed the(Termed t) {
+    default Termed the(@NotNull Termed t) {
         return the(t.term());
     }
 //    default Term theTerm(Termed t) {
@@ -86,7 +88,8 @@ public interface TermBuilder {
         return the(t).term();
     }
 
-    default Termed normalized(Term t) {
+    @Nullable
+    default Termed normalized(@NotNull Term t) {
         if (t.isNormalized()) {
             return t;
         }
@@ -109,25 +112,31 @@ public interface TermBuilder {
 //    }
 
 
-    default Term newTerm(Op op, Collection<Term> t) {
+    @Nullable
+    default Term newTerm(@NotNull Op op, @NotNull Collection<Term> t) {
         return newTerm(op, -1, t);
     }
-    default Term newTerm(Op op, int relation, Collection<Term> t) {
+    @Nullable
+    default Term newTerm(@NotNull Op op, int relation, @NotNull Collection<Term> t) {
         return newTerm(op, relation, TermContainer.the(op, t));
     }
-    default Term newTerm(Op op, Term singleton) {
+    @Nullable
+    default Term newTerm(@NotNull Op op, Term singleton) {
         return newTerm(op, -1, new TermVector(singleton));
     }
-    default Term newTerm(Op op, Term... x) {
+    @Nullable
+    default Term newTerm(@NotNull Op op, Term... x) {
         return newTerm(op, -1, TermContainer.the(op, x));
     }
 
 
-    default <X extends Compound> X transform(Compound src, CompoundTransform t) {
+    @Nullable
+    default <X extends Compound> X transform(@NotNull Compound src, @NotNull CompoundTransform t) {
         return transform(src, t, true);
     }
 
-    default <X extends Compound> X transform(Compound src, CompoundTransform t, boolean requireEqualityForNewInstance) {
+    @Nullable
+    default <X extends Compound> X transform(@NotNull Compound src, @NotNull CompoundTransform t, boolean requireEqualityForNewInstance) {
         if (!t.testSuperTerm(src)) {
             return (X) src; //nothing changed
         }
@@ -146,7 +155,7 @@ public interface TermBuilder {
 
 
     /** returns how many subterms were modified, or -1 if failure (ex: results in invalid term) */
-    default <T extends Term> int transform(Compound src, CompoundTransform<Compound<T>, T> trans, Term[] target, int level) {
+    default <T extends Term> int transform(@NotNull Compound src, @NotNull CompoundTransform<Compound<T>, T> trans, Term[] target, int level) {
         int n = src.size();
 
         int modifications = 0;
@@ -192,23 +201,27 @@ public interface TermBuilder {
         return modifications;
     }
 
-    default Term newTerm(Compound csrc, TermContainer subs) {
+    @Nullable
+    default Term newTerm(@NotNull Compound csrc, TermContainer subs) {
         if (csrc.subterms().equals(subs))
             return csrc;
         return newTerm(csrc.op(), csrc.relation(), csrc.t(), subs);
     }
 
-    default Term newTerm(Op op, TermContainer subs) {
+    @Nullable
+    default Term newTerm(@NotNull Op op, TermContainer subs) {
         return newTerm(op, -1, subs);
     }
 
 
 
-    default Term newTerm(Op op, int relation, TermContainer tt) {
+    @Nullable
+    default Term newTerm(@NotNull Op op, int relation, TermContainer tt) {
         return newTerm(op, relation, ITERNAL, tt);
     }
 
-    default Term newTerm(Op op, int relation, int t, TermContainer tt) {
+    @Nullable
+    default Term newTerm(@NotNull Op op, int relation, int t, @Nullable TermContainer tt) {
 
         if (tt == null)
             return null;
@@ -270,7 +283,8 @@ public interface TermBuilder {
 
     }
 
-    default Term newDiff(Op op, TermContainer tt) {
+    @Nullable
+    default Term newDiff(@NotNull Op op, @NotNull TermContainer tt) {
 
         //corresponding set type for reduction:
         Op set = op == DIFF_EXT ? SET_EXT : SET_INT;
@@ -294,12 +308,14 @@ public interface TermBuilder {
         }
     }
 
-    default Term finish(Op op, int relation, TermContainer tt) {
+    @Nullable
+    default Term finish(@NotNull Op op, int relation, @NotNull TermContainer tt) {
         return finish(op, Tense.ITERNAL, relation, tt);
     }
 
     /** step before calling Make, do not call manually from outside */
-    default Term finish(Op op, int t, int relation, TermContainer tt) {
+    @Nullable
+    default Term finish(@NotNull Op op, int t, int relation, @NotNull TermContainer tt) {
 
         Term[] u = tt.terms();
         int currentSize = u.length;
@@ -323,17 +339,20 @@ public interface TermBuilder {
 
 
 
+    @Nullable
     default Term inst(Term subj, Term pred) {
         return newTerm(Op.INHERIT, newTerm(Op.SET_EXT, subj), pred);
     }
+    @Nullable
     default Term prop(Term subj, Term pred) {
         return newTerm(Op.INHERIT, subj, newTerm(Op.SET_INT, pred));
     }
+    @Nullable
     default Term instprop(Term subj, Term pred) {
         return newTerm(Op.INHERIT, newTerm(Op.SET_EXT, subj), newTerm(Op.SET_INT, pred));
     }
 
-    default Term negation(Term t) {
+    default Term negation(@NotNull Term t) {
         if (t.op(Op.NEGATE)) {
             // (--,(--,P)) = P
             return ((TermContainer) t).term(0);
@@ -341,7 +360,8 @@ public interface TermBuilder {
         return make(Op.NEGATE, -1, new TermVector(t)).term();
     }
 
-    default Term image(Op o, Term[] res) {
+    @Nullable
+    default Term image(@NotNull Op o, @NotNull Term[] res) {
 
         int index = 0, j = 0;
         for (Term x : res) {
@@ -366,7 +386,8 @@ public interface TermBuilder {
                 index, new TermVector(res));
     }
 
-    default Term junction(Op op, int t, Term... u) {
+    @Nullable
+    default Term junction(@NotNull Op op, int t, @NotNull Term... u) {
 //        if (u.length == 1)
 //            return u[0];
 
@@ -396,7 +417,8 @@ public interface TermBuilder {
     }
 
     /** flattening junction builder, don't use with temporal relation */
-    default Term junction(Op op, Iterable<Term> u) {
+    @Nullable
+    default Term junction(@NotNull Op op, @NotNull Iterable<Term> u) {
 
 //        if (t!=ITERNAL) {
 //            return junction(op, t, Iterables.toArray(u, Term.class));
@@ -430,7 +452,8 @@ public interface TermBuilder {
                 finish(op, -1, TermSet.the(s));
     }
 
-    default Term statement(Op op, int t, Term[] u) {
+    @Nullable
+    default Term statement(@NotNull Op op, int t, @NotNull Term[] u) {
 
         switch (u.length) {
             case 1:
@@ -445,7 +468,7 @@ public interface TermBuilder {
     }
 
     @Nullable
-    default Term statement2(Op op, int t, Term[] u) {
+    default Term statement2(@NotNull Op op, int t, Term[] u) {
         Term subject = u[0];
         Term predicate = u[1];
 
@@ -494,13 +517,15 @@ public interface TermBuilder {
         return null;
     }
 
-    default Term subtractSet(Op setType, Compound A, Compound B) {
+    @Nullable
+    default Term subtractSet(@NotNull Op setType, @NotNull Compound A, @NotNull Compound B) {
         if (A.equals(B))
             return null; //empty set
         return newTerm(setType, TermContainer.difference(A, B));
     }
 
-    default Term impl2Conj(int t, Term subject, Term predicate, Term oldCondition) {
+    @Nullable
+    default Term impl2Conj(int t, Term subject, @NotNull Term predicate, Term oldCondition) {
         Term s = junction(CONJUNCTION, t, subject, oldCondition);
         if (s == null)
             return null;
@@ -508,21 +533,24 @@ public interface TermBuilder {
         return newTerm(IMPLICATION, t, new TermVector(s, pred(predicate)));
     }
 
-    default Term newIntersectINT(Term[] t) {
+    @Nullable
+    default Term newIntersectINT(@NotNull Term[] t) {
         return newIntersection(t,
                 Op.INTERSECT_INT,
                 Op.SET_INT,
                 Op.SET_EXT);
     }
 
-    default Term newIntersectEXT(Term[] t) {
+    @Nullable
+    default Term newIntersectEXT(@NotNull Term[] t) {
         return newIntersection(t,
                 Op.INTERSECT_EXT,
                 Op.SET_EXT,
                 Op.SET_INT);
     }
 
-    default Term newIntersection(Term[] t, Op intersection, Op setUnion, Op setIntersection) {
+    @Nullable
+    default Term newIntersection(@NotNull Term[] t, @NotNull Op intersection, @NotNull Op setUnion, @NotNull Op setIntersection) {
         switch (t.length) {
             case 0:
                 return t[0];
@@ -550,7 +578,8 @@ public interface TermBuilder {
         //return newCompound(intersection, t, -1, true);
     }
 
-    @Deprecated default Term newIntersection2(Term term1, Term term2, Op intersection, Op setUnion, Op setIntersection) {
+    @Nullable
+    @Deprecated default Term newIntersection2(@NotNull Term term1, @Nullable Term term2, @NotNull Op intersection, @NotNull Op setUnion, @NotNull Op setIntersection) {
 
         if(term2 == null) {
             throw new NullPointerException();
@@ -597,7 +626,8 @@ public interface TermBuilder {
 
     }
 
-    default Term intersect(Op resultOp, Compound a, Compound b) {
+    @Nullable
+    default Term intersect(@NotNull Op resultOp, @NotNull Compound a, @NotNull Compound b) {
         MutableSet<Term> i = TermContainer.intersect(a, b);
         if (i.isEmpty()) return null;
         return newTerm(resultOp, i);
@@ -605,7 +635,8 @@ public interface TermBuilder {
 
 
     /** returns the resolved term according to the substitution    */
-    default Term transform(Compound src, Subst f, boolean fullMatch) {
+    @Nullable
+    default Term transform(@NotNull Compound src, @NotNull Subst f, boolean fullMatch) {
 
 //        Term y = f.getXY(src);
 //        if (y!=null)
@@ -641,6 +672,7 @@ public interface TermBuilder {
 
 
 
+    @Nullable
     default Term applyImmediateTransform(Subst f, Term result, ImmediateTermTransform tf) {
 
         //Compound args = (Compound) Operator.opArgs((Compound) result).apply(f);
@@ -652,7 +684,8 @@ public interface TermBuilder {
     }
 
 
-    default Term apply(Subst f, Term src) {
+    @Nullable
+    default Term apply(@NotNull Subst f, Term src) {
         if (src instanceof Compound) {
             return transform((Compound)src, f, false);
         } else if (src instanceof Variable) {
@@ -668,7 +701,7 @@ public interface TermBuilder {
 
     /** resolve the this term according to subst by appending to sub.
      * return false if this term fails the substitution */
-    default boolean apply(Term src, Subst f, Collection<Term> sub) {
+    default boolean apply(Term src, @NotNull Subst f, @NotNull Collection<Term> sub) {
         Term u = apply(f, src);
         if (u == null) {
             u = src;

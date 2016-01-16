@@ -2,6 +2,8 @@ package nars.bag.impl;
 
 import nars.util.CollectorMap;
 import nars.util.data.sorted.SortedIndex;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.List;
@@ -16,6 +18,7 @@ abstract public class ArrayTable<V, L> implements Table<V,L> {
     /**
      * mapping from key to item
      */
+    @NotNull
     public final ArrayMapping index;
     /**
      * array of lists of items, for items on different level
@@ -75,6 +78,7 @@ abstract public class ArrayTable<V, L> implements Table<V,L> {
         return index.containsKey(it);
     }
 
+    @Nullable
     @Override
     public L remove(V key) {
         return index.remove(key);
@@ -112,6 +116,7 @@ abstract public class ArrayTable<V, L> implements Table<V,L> {
      *
      * @return The first Item
      */
+    @Nullable
     final L removeItem(int index) {
 
         L ii = getItem(index);
@@ -138,7 +143,7 @@ abstract public class ArrayTable<V, L> implements Table<V,L> {
     }
 
     @Override
-    public final void forEach(Consumer<? super L> action) {
+    public final void forEach(@NotNull Consumer<? super L> action) {
 
         //items.forEach(b -> action.accept(b.get()));
 
@@ -153,6 +158,7 @@ abstract public class ArrayTable<V, L> implements Table<V,L> {
 
     }
 
+    @NotNull
     @Override
     public Iterator<L> iterator() {
         return items.iterator();
@@ -161,7 +167,7 @@ abstract public class ArrayTable<V, L> implements Table<V,L> {
     /**
      * default implementation; more optimal implementations will avoid instancing an iterator
      */
-    public void forEach(int max, Consumer<? super L> action) {
+    public void forEach(int max, @NotNull Consumer<? super L> action) {
         List<? extends L> l = items.getList();
         int n = Math.min(l.size(), max);
         //TODO let the list implementation decide this because it can use the array directly in ArraySortedIndex
@@ -171,7 +177,7 @@ abstract public class ArrayTable<V, L> implements Table<V,L> {
     }
 
     @Override
-    public void topWhile(Predicate<L> action) {
+    public void topWhile(@NotNull Predicate<L> action) {
         List<? extends L> l = items.getList();
         int n = l.size();
         for (int i = 0; i < n; i++) {
@@ -181,12 +187,12 @@ abstract public class ArrayTable<V, L> implements Table<V,L> {
     }
 
     @Override
-    public final void top(Consumer<L> action) {
+    public final void top(@NotNull Consumer<L> action) {
         items.getList().forEach(action);
     }
 
     @Override
-    public void topN(int limit, Consumer action) {
+    public void topN(int limit, @NotNull Consumer action) {
         List l = items.getList();
         int n = Math.min(l.size(), limit);
         for (int i = 0; i < n; i++)

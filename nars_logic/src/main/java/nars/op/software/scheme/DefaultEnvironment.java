@@ -5,6 +5,7 @@ import nars.op.software.scheme.cons.Cons;
 import nars.op.software.scheme.expressions.Expression;
 import nars.op.software.scheme.expressions.NumberExpression;
 import nars.op.software.scheme.expressions.SymbolExpression;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -104,7 +105,7 @@ public enum DefaultEnvironment {
                     procedure(args -> load(loadFile(args.car().print()), Repl.ENV)))
             .build();
 
-    public static Expression load(String s, SchemeClosure env) {
+    public static Expression load(@NotNull String s, SchemeClosure env) {
         return StreamSupport.stream(read(s).spliterator(), false)
                 .map(e -> evaluate(e, env))
                 .reduce(Expression.none(), (e1, e2) -> e2);
@@ -124,7 +125,7 @@ public enum DefaultEnvironment {
         }
     }
 
-    private static String loadFile(String print) {
+    private static String loadFile(@NotNull String print) {
         try {
             return Files.lines(Paths.get(print))
                     .collect(Collectors.joining("\n"));
@@ -133,7 +134,8 @@ public enum DefaultEnvironment {
         }
     }
 
-    private static Cons<Expression> toList(Cons<Expression> args) {
+    @NotNull
+    private static Cons<Expression> toList(@NotNull Cons<Expression> args) {
         if (args.cadr() == nil()) {
             return cons(args.car(), empty());
         }
@@ -141,25 +143,26 @@ public enum DefaultEnvironment {
         return cons(args.car(), args.cadr().list().value);
     }
 
-    private static boolean satisfiesTransitivePredicate(Cons<Expression> args, BiPredicate<Long, Long> predicate) {
+    private static boolean satisfiesTransitivePredicate(@NotNull Cons<Expression> args, @NotNull BiPredicate<Long, Long> predicate) {
         Iterator<Expression> iterator = args.iterator();
         return args.stream()
                 .skip(1)
                 .allMatch(e -> predicate.test(iterator.next().number().value, e.number().value));
     }
 
-    private static boolean satisfiesTransitivePredicateGeneric(Cons<Expression> args, BiPredicate<Expression, Expression> predicate) {
+    private static boolean satisfiesTransitivePredicateGeneric(@NotNull Cons<Expression> args, @NotNull BiPredicate<Expression, Expression> predicate) {
         Iterator<Expression> iterator = args.iterator();
         return args.stream()
                 .skip(1)
                 .allMatch(e -> predicate.test(iterator.next(), e));
     }
 
+    @NotNull
     public static SchemeClosure newInstance() {
         return new SchemeClosure(new HashMap<>(PRIMITIVES));
     }
 
-    private static NumberExpression longFunction(Cons<Expression> args, BinaryOperator<Long> accumulator) {
+    private static NumberExpression longFunction(@NotNull Cons<Expression> args, BinaryOperator<Long> accumulator) {
         return args.stream()
                 .map(a -> a.number().value)
                 .reduce(accumulator)

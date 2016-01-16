@@ -32,6 +32,8 @@ import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.compound.Compound;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.Iterator;
@@ -43,6 +45,7 @@ public interface Concept extends Termed, Supplier<Term> {
     Bag<Task> getTaskLinks();
     Bag<Termed> getTermLinks();
 
+    @Nullable
     Map<Object, Object> getMeta();
     void setMeta(Map<Object, Object> meta);
 
@@ -65,6 +68,7 @@ public interface Concept extends Termed, Supplier<Term> {
     }
 
 
+    @NotNull
     default String toInstanceString() {
         String id = Integer.toString(System.identityHashCode(this), 16);
         return this + "::" + id;
@@ -74,7 +78,8 @@ public interface Concept extends Termed, Supplier<Term> {
     /** like Map.put for storing data in meta map
      *  @param value if null will perform a removal
      * */
-    default Object put(Object key, Object value) {
+    @Nullable
+    default Object put(Object key, @Nullable Object value) {
 
         Map<Object, Object> currMeta = getMeta();
 
@@ -91,6 +96,7 @@ public interface Concept extends Termed, Supplier<Term> {
     }
 
     /** like Map.gett for getting data stored in meta map */
+    @Nullable
     default <C> C get(Object key) {
         Map<Object, Object> m;
         return null == (m = getMeta()) ? null : (C) m.get(key);
@@ -126,10 +132,14 @@ public interface Concept extends Termed, Supplier<Term> {
                 0;
     }
 
+    @Nullable
     BeliefTable getBeliefs();
+    @Nullable
     BeliefTable getGoals();
 
+    @Nullable
     TaskTable getQuestions();
+    @Nullable
     TaskTable getQuests();
 
 
@@ -143,8 +153,10 @@ public interface Concept extends Termed, Supplier<Term> {
 
 
 
+    @Nullable
     Task processBelief(Task task, NAR nar);
 
+    @Nullable
     Task processGoal(Task task, NAR nar);
 
     boolean processQuestion(Task task, NAR nar);
@@ -186,12 +198,12 @@ public interface Concept extends Termed, Supplier<Term> {
         print(System.out);
     }
 
-    default void print(PrintStream out) {
+    default void print(@NotNull PrintStream out) {
         print(out, true, true, true, true);
     }
 
     /** prints a summary of all termlink, tasklink, etc.. */
-    default void print(PrintStream out, boolean showbeliefs, boolean showgoals, boolean showtermlinks, boolean showtasklinks) {
+    default void print(@NotNull PrintStream out, boolean showbeliefs, boolean showgoals, boolean showtermlinks, boolean showtasklinks) {
 
         out.println("concept: " + toInstanceString());
 
@@ -266,17 +278,19 @@ public interface Concept extends Termed, Supplier<Term> {
 
 
 
+    @Nullable
     Termed[] getTermLinkTemplates();
 
     Ordering<Task> taskCreationTime = new Ordering<Task>() {
         @Override
-        public int compare(Task left, Task right) {
+        public int compare(@NotNull Task left, @NotNull Task right) {
             return Longs.compare(
                     left.getCreationTime(),
                     right.getCreationTime());
         }
     };
 
+    @NotNull
     default Iterator<Task> iterateTasks(boolean onbeliefs, boolean ongoals, boolean onquestions, boolean onquests) {
 
         TaskTable beliefs = onbeliefs ? getBeliefs() : null;
@@ -298,6 +312,7 @@ public interface Concept extends Termed, Supplier<Term> {
      * process a task in this concept
      * @return true if process affected the concept (ie. was inserted into a belief table)
      */
+    @Nullable
     Task process(Task task, NAR nar);
 
     /** attempt insert a tasklink into this concept's tasklink bag
@@ -310,7 +325,7 @@ public interface Concept extends Termed, Supplier<Term> {
 
 
 
-    default boolean link(Task task, float initialScale, NAR nar) {
+    default boolean link(@NotNull Task task, float initialScale, @NotNull NAR nar) {
         float minScale =
             nar.memory.taskLinkThreshold.floatValue() / task.getBudget().summary();
 
@@ -324,7 +339,7 @@ public interface Concept extends Termed, Supplier<Term> {
      * @param otherTask task with a term equal to another concept's
      * @return number of links created (0, 1, or 2)
      */
-    default void crossLink(Task thisTask, Task otherTask, float initialScale, NAR nar) {
+    default void crossLink(@NotNull Task thisTask, @NotNull Task otherTask, float initialScale, @NotNull NAR nar) {
         Compound otherTerm = otherTask.term();
         if (otherTerm.equals(term()))
             return; //self

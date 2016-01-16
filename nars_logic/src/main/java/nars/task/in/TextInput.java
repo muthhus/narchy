@@ -24,6 +24,7 @@ import nars.NAR;
 import nars.Narsese;
 import nars.task.Task;
 import nars.task.flow.TaskQueue;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 
@@ -32,11 +33,11 @@ import java.util.Collection;
  */
 public class TextInput extends TaskQueue {
 
-	public TextInput(NAR n, String input) {
+	public TextInput(@NotNull NAR n, String input) {
 		process(n, input);
 	}
 
-	protected int process(NAR nar, String input) {
+	protected int process(@NotNull NAR nar, String input) {
         //..
 
         return Narsese.the().tasks(input,

@@ -3,6 +3,7 @@ package nars.op.meta;
 import nars.nal.nal8.operator.TermFunction;
 import nars.term.compile.TermBuilder;
 import nars.term.compound.Compound;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by me on 3/6/15.
@@ -10,7 +11,7 @@ import nars.term.compound.Compound;
 public class complexity extends TermFunction<Integer> {
 
     @Override
-    public Integer function(Compound x, TermBuilder i) {
+    public Integer function(@NotNull Compound x, TermBuilder i) {
         return x.term(0).complexity();
     }
 }

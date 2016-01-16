@@ -3,6 +3,8 @@ package nars.bag;
 import nars.bag.impl.Table;
 import nars.budget.Budget;
 import nars.util.data.Util;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.Collection;
@@ -34,6 +36,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
      * gets the next value without removing changing it or removing it from any index.  however
      * the bag is cycled so that subsequent elements are different.
      */
+    @Nullable
     BLink<V> sample();
 
 
@@ -43,6 +46,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
      * @param key
      * @return
      */
+    @Nullable
     @Override
     BLink<V> remove(V key);
 
@@ -50,17 +54,21 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
     /**
      * put with an empty budget
      */
+    @Nullable
     BLink<V> put(Object newItem);
 
+    @Nullable
     default BLink<V> put(Object i, Budget b) {
         return put(i, b, 1f);
     }
 
+    @Nullable
     @Override
     default BLink<V> put(V v, BLink<V> b) {
         return put(v, b, 1f);
     }
 
+    @Nullable
     BLink<V> put(Object i, Budget b, float scale);
 
 
@@ -78,6 +86,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
         sample(n, null, target);
     }
 
+    @NotNull
     Bag<V> sample(int n, Predicate<BLink<V>> each, Collection<BLink<V>> target);
 //    /**
 //     * fills a collection with at-most N items, if an item passes the predicate.
@@ -115,6 +124,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
      *
      * @return The selected Item, or null if this bag is empty
      */
+    @Nullable
     BLink<V> pop();
 
     /**
@@ -147,6 +157,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
      * iterates all items in (approximately) descending priority
      * forEach may be used to avoid allocation of iterator instances
      */
+    @Nullable
     @Override
     Iterator<BLink<V>> iterator();
 
@@ -192,6 +203,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
     /**
      * implements the Supplier<V> interface; invokes a remove()
      */
+    @Nullable
     @Override
     default BLink<V> get() {
         return pop();
@@ -203,7 +215,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
         printAll(System.out);
     }
 
-    default void printAll(PrintStream p) {
+    default void printAll(@NotNull PrintStream p) {
         top(b -> p.println(b.toBudgetString() + ' ' + b.get()));
     }
 
@@ -268,7 +280,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
     /**
      * default implementation; more optimal implementations will avoid instancing an iterator
      */
-    default void forEach(int max, Consumer<? super BLink<V>> action) {
+    default void forEach(int max, @NotNull Consumer<? super BLink<V>> action) {
 
         Iterator<BLink<V>> ii = iterator();
         int n = 0;
@@ -362,11 +374,13 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
 //        }
 //    }
 
+    @NotNull
     default double[] getPriorityHistogram(int bins) {
         return getPriorityHistogram(new double[bins]);
     }
 
-    default double[] getPriorityHistogram(double[] x) {
+    @NotNull
+    default double[] getPriorityHistogram(@NotNull double[] x) {
         int bins = x.length;
         top(budget -> {
             float p = budget.getPriority();

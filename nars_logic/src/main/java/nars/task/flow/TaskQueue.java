@@ -2,6 +2,8 @@ package nars.task.flow;
 
 import nars.NAR;
 import nars.task.Task;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayDeque;
 import java.util.Collection;
@@ -21,10 +23,10 @@ public class TaskQueue extends ArrayDeque<Task> implements Input , Consumer<Task
         super(initialCapacity);
     }
 
-    public TaskQueue(Collection<Task> x) {
+    public TaskQueue(@NotNull Collection<Task> x) {
         super(x);
     }
-    public TaskQueue(Task[] x) {
+    public TaskQueue(@NotNull Task[] x) {
         super(x.length);
         Collections.addAll(this, x);
     }
@@ -43,12 +45,13 @@ public class TaskQueue extends ArrayDeque<Task> implements Input , Consumer<Task
     }*/
 
     @Override
-    public void accept(Task task) {
+    public void accept(@Nullable Task task) {
         if (task==null) return;
 
         add(task);
     }
 
+    @Nullable
     @Override
     public Task get() {
         if (!isEmpty()) {
@@ -57,12 +60,12 @@ public class TaskQueue extends ArrayDeque<Task> implements Input , Consumer<Task
         return null;
     }
 
-    public void addIfNotNull(Task task) {
+    public void addIfNotNull(@Nullable Task task) {
         if (task!=null)
             add(task);
     }
 
-    public void input(NAR nar) {
+    public void input(@NotNull NAR nar) {
         nar.input((Input)this);
     }
 

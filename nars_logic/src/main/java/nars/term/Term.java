@@ -25,6 +25,7 @@ import nars.Op;
 import nars.term.compound.Compound;
 import nars.term.variable.Variable;
 import nars.term.visit.SubtermVisitor;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
@@ -33,6 +34,7 @@ public interface Term extends Termed, Comparable, Termlike {
 
 
 
+    @NotNull
     @Override default Term term() {
         return this;
     }
@@ -104,7 +106,7 @@ public interface Term extends Termed, Comparable, Termlike {
     /** tests if contains a term in the structural hash
      *  WARNING currently this does not detect presence of pattern variables
      * */
-    default boolean hasAny(Op op) {
+    default boolean hasAny(@NotNull Op op) {
 //        if (op == Op.VAR_PATTERN)
 //            return Variable.hasPatternVariable(this);
         return hasAny(op.bit());
@@ -125,7 +127,7 @@ public interface Term extends Termed, Comparable, Termlike {
         return (s & structuralVector) == s;
     }
     /** for multiple Op comparsions, use Op.or to produce an int and call isAny(int vector) */
-    default boolean isAny(Op op) {
+    default boolean isAny(@NotNull Op op) {
         return isAny(op.bit());
     }
 
@@ -173,6 +175,7 @@ public interface Term extends Termed, Comparable, Termlike {
 ////        }
 //    }
 
+    @NotNull
     StringBuilder toStringBuilder(boolean pretty);
 
 //    default public StringBuilder toStringBuilder(boolean pretty) {
@@ -198,6 +201,7 @@ public interface Term extends Termed, Comparable, Termlike {
         return (structure() | mask) == mask;
     }
 
+    @NotNull
     default String structureString() {
         return String.format("%16s",
                 Integer.toBinaryString(structure()))

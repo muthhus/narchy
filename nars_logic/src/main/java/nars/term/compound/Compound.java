@@ -31,6 +31,8 @@ import nars.term.transform.FindSubst;
 import nars.term.visit.SubtermVisitor;
 import nars.util.data.sexpression.IPair;
 import nars.util.data.sexpression.Pair;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.Set;
@@ -42,7 +44,7 @@ import java.util.Set;
 public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> {
 
 
-    static void argSep(Appendable p, boolean pretty) throws IOException {
+    static void argSep(@NotNull Appendable p, boolean pretty) throws IOException {
         if (pretty)
             p.append(Symbols.ARGUMENT_SEPARATOR_PRETTY);
         else
@@ -52,6 +54,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
     /** gets the set of unique recursively contained terms of a specific type
      * TODO generalize to a provided lambda predicate selector
      * */
+    @NotNull
     default Set<Term> uniqueSubtermSet(Op type) {
         Set<Term> t = Global.newHashSet(size());
         recurseTerms((t1, superterm) -> {
@@ -63,12 +66,12 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 
 
     @Override
-    default void recurseTerms(SubtermVisitor v) {
+    default void recurseTerms(@NotNull SubtermVisitor v) {
         recurseTerms(v, this);
     }
 
     @Override
-    default void recurseTerms(SubtermVisitor v, Compound parent) {
+    default void recurseTerms(@NotNull SubtermVisitor v, Compound parent) {
         v.accept(this, parent);
         subterms().forEach(a -> a.recurseTerms(v, this));
     }
@@ -116,11 +119,11 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 
 
     @Override
-    default void append(Appendable p, boolean pretty) throws IOException {
+    default void append(@NotNull Appendable p, boolean pretty) throws IOException {
         TermPrinter.compoundAppend(this, p, pretty);
     }
 
-    default void appendArgs(Appendable p, boolean pretty, boolean appendedOperator) throws IOException {
+    default void appendArgs(@NotNull Appendable p, boolean pretty, boolean appendedOperator) throws IOException {
         int nterms = size();
 
         boolean bb = nterms > 1 && appendedOperator;
@@ -137,6 +140,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
     }
 
 
+    @NotNull
     @Override
     default StringBuilder toStringBuilder(boolean pretty) {
         StringBuilder sb = new StringBuilder();
@@ -153,7 +157,8 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
      * extracts a subterm provided by the address tuple
      * returns null if specified subterm does not exist
      */
-    default <X extends Term> X subterm(int... address) {
+    @NotNull
+    default <X extends Term> X subterm(@NotNull int... address) {
         Term ptr = this;
         for (int i : address) {
             if (ptr instanceof TermContainer) {
@@ -219,14 +224,17 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 //    }
 
 
+    @NotNull
     TermContainer<T> subterms();
 
 
+    @NotNull
     @Override
     default String toStringCompact() {
         return toString(false);
     }
 
+    @NotNull
     @Override
     default String toString(boolean pretty) {
         return toStringBuilder(pretty).toString();
@@ -241,6 +249,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
     /**
      * cdr or 'rest' function for s-expression interface when arity > 1
      */
+    @Nullable
     @Override
     default Object _cdr() {
         int len = size();
@@ -257,11 +266,13 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
         return p;
     }
 
+    @NotNull
     @Override
     default Object setFirst(Object first) {
         throw new RuntimeException(this + " not modifiable");
     }
 
+    @NotNull
     @Override
     default Object setRest(Object rest) {
         throw new RuntimeException(this + " not modifiable");
@@ -278,7 +289,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
      * implementations may assume that y's .op() already matches this, and that
      * equality has already determined to be false.
      * */
-    default boolean match(Compound y, FindSubst subst) {
+    default boolean match(@NotNull Compound y, @NotNull FindSubst subst) {
 
         //TODO in compiled Compound's for patterns, include
         //# of PATTERN_VAR so that at this point, if
@@ -315,6 +326,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
     boolean isNormalized();
 
     /** sets temporal relation value (TEMPORARY). returns new value */
+    @NotNull
     @Deprecated Compound t(int cycles);
 
     /** gets temporal relation value */

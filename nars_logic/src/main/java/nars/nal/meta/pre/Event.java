@@ -4,6 +4,7 @@ import nars.Premise;
 import nars.nal.PremiseMatch;
 import nars.nal.meta.AtomicBooleanCondition;
 import nars.task.Temporal;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * After(%X,%Y) Means that
@@ -17,11 +18,12 @@ abstract public class Event extends AtomicBooleanCondition<PremiseMatch> {
     protected Event() {
     }
 
+    @NotNull
     @Override
     abstract public String toString();
 
     @Override
-    public boolean booleanValueOf(PremiseMatch m) {
+    public boolean booleanValueOf(@NotNull PremiseMatch m) {
         Premise premise = m.premise;
         if (premise.isEvent()) {
             int tDelta = ((Temporal) premise.getBelief()).tDelta((Temporal) premise.getTask());
@@ -50,7 +52,7 @@ abstract public class Event extends AtomicBooleanCondition<PremiseMatch> {
         }
 
         @Override
-        protected boolean booleanValueOfEvent(PremiseMatch m, int tDelta) {
+        protected boolean booleanValueOfEvent(@NotNull PremiseMatch m, int tDelta) {
             if (tDelta >= 0) {
                 boolean p = this.positive;
                 m.tDelta.set(p ? tDelta : -tDelta);
@@ -63,6 +65,7 @@ abstract public class Event extends AtomicBooleanCondition<PremiseMatch> {
             return false;
         }
 
+        @NotNull
         @Override public String toString() {
             return "after(" + (positive ? "forward" : "reverse") + ")";
         }

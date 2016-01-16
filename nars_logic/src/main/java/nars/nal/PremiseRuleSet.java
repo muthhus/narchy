@@ -5,6 +5,8 @@ import nars.Global;
 import nars.Narsese;
 import nars.term.compound.Compound;
 import nars.util.data.list.FasterList;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +40,7 @@ public class PremiseRuleSet {
         this(Paths.get(Deriver.class.getResource("default.meta.nal").toURI()));
     }
 
-    public PremiseRuleSet(Path path) throws IOException {
+    public PremiseRuleSet(@NotNull Path path) throws IOException {
         this(Files.readAllLines(path));
     }
     public final PatternIndex patterns = new PatternIndex();
@@ -47,7 +49,7 @@ public class PremiseRuleSet {
     private static final Logger logger = LoggerFactory.getLogger(PremiseRuleSet.class);
 
 
-    public PremiseRuleSet(boolean normalize, PremiseRule... rules) {
+    public PremiseRuleSet(boolean normalize, @NotNull PremiseRule... rules) {
         for (PremiseRule p : rules) {
             if (normalize)
                 p = p.normalizeRule(patterns);
@@ -55,7 +57,7 @@ public class PremiseRuleSet {
         }
     }
 
-    public PremiseRuleSet(Collection<String> ruleStrings) {
+    public PremiseRuleSet(@NotNull Collection<String> ruleStrings) {
         int[] errors = {0};
 
         parse(load(ruleStrings), patterns).forEach(s -> premiseRules.add(s));
@@ -68,7 +70,8 @@ public class PremiseRuleSet {
     }
 
 
-    static List<String> load(Iterable<String> lines) {
+    @NotNull
+    static List<String> load(@NotNull Iterable<String> lines) {
 
         List<String> unparsed_rules = Global.newArrayList(1024);
 
@@ -140,6 +143,7 @@ public class PremiseRuleSet {
     private static final String[] equFull = {"<=>"/*, "</>", "<|>"*/};
     private static final String[] implFull = {"==>"/*, "=/>" , "=|>", "=\\>"*/};
     private static final String[] conjFull = {"&&"/*, "&|", "&/"*/};
+    @Nullable
     private static final String[] unchanged = {null};
 
     /**
@@ -149,8 +153,8 @@ public class PremiseRuleSet {
      * @param rules
      * @param ruleString
      */
-    static void permuteTenses(Collection<String> rules /* results collection */,
-                              String ruleString) {
+    static void permuteTenses(@NotNull Collection<String> rules /* results collection */,
+                              @NotNull String ruleString) {
 
         //Original version which permutes in different tenses
 
@@ -200,7 +204,8 @@ public class PremiseRuleSet {
     }
 
 
-    static Set<PremiseRule> parse(Collection<String> rawRules, PatternIndex index) {
+    @NotNull
+    static Set<PremiseRule> parse(@NotNull Collection<String> rawRules, @NotNull PatternIndex index) {
 
 
         Set<String> expanded = new HashSet(rawRules.size() * 4); //Global.newHashSet(1); //new ConcurrentSkipListSet<>();
@@ -253,13 +258,14 @@ public class PremiseRuleSet {
         return ur;
     }
 
-    private static void addQuestions(Collection<PremiseRule> target, PremiseRule r, String src, PatternIndex patterns) {
+    private static void addQuestions(@NotNull Collection<PremiseRule> target, @NotNull PremiseRule r, String src, @NotNull PatternIndex patterns) {
 
         r.forEachQuestionReversal((q,reason) -> add(target, q, src + "//" + reason, patterns));
 
      }
 
-    static PremiseRule add(Collection<PremiseRule> target, PremiseRule q, String src, PatternIndex index) {
+    @Nullable
+    static PremiseRule add(@NotNull Collection<PremiseRule> target, @Nullable PremiseRule q, String src, @NotNull PatternIndex index) {
         if (q == null)
             throw new RuntimeException("null: " + q + ' ' + src);
 
@@ -270,6 +276,7 @@ public class PremiseRuleSet {
     }
     private static final Pattern spacePattern = Pattern.compile(" ", Pattern.LITERAL);
 
+    @NotNull
     public List<PremiseRule> getPremiseRules() {
         return premiseRules;
         //return Collections.unmodifiableList(premiseRules);

@@ -6,6 +6,8 @@ import nars.Symbols;
 import nars.nal.meta.TruthOperator;
 import nars.term.Term;
 import nars.term.atom.Atom;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
@@ -19,195 +21,227 @@ import java.util.Map;
 public enum BeliefFunction implements TruthOperator {
 
     Revision() {
-        @Override public Truth apply(final Truth T, final Truth B, Memory m) {
+        @NotNull
+        @Override public Truth apply(@NotNull final Truth T, @NotNull final Truth B, Memory m) {
             //if (B == null) return null;
             return TruthFunctions.revision(T, B);
         }
     },
     StructuralIntersection() {
-        @Override public Truth apply(final Truth T, final Truth B, Memory m) {
+        @Nullable
+        @Override public Truth apply(final Truth T, @Nullable final Truth B, @NotNull Memory m) {
             if (B == null) return null;
             return TruthFunctions.intersection(B, newDefaultTruth(m));
         }
     },
     StructuralDeduction() {
-        @Override public Truth apply(final Truth T, final Truth B, Memory m) {
+        @NotNull
+        @Override public Truth apply(@NotNull final Truth T, final Truth B, @NotNull Memory m) {
             //if (B == null) return null;
             return TruthFunctions.deduction1(T, defaultConfidence(m));
         }
     },
     StructuralAbduction() {
-        @Override public Truth apply(final Truth T, final Truth B, Memory m) {
+        @Nullable
+        @Override public Truth apply(final Truth T, @Nullable final Truth B, @NotNull Memory m) {
             if (B == null) return null;
             return TruthFunctions.abduction(B, newDefaultTruth(m));
         }
     },
     Deduction(true) {
-        @Override public Truth apply(final Truth T, final Truth B, Memory m) {
+        @Nullable
+        @Override public Truth apply(@NotNull final Truth T, @Nullable final Truth B, Memory m) {
             if (B == null) return null;
             return TruthFunctions.deduction(T, B);
         }
     },
     Induction() {
-        @Override public Truth apply(final Truth T, final Truth B, Memory m) {
+        @Nullable
+        @Override public Truth apply(@NotNull final Truth T, @Nullable final Truth B, Memory m) {
             if (B == null) return null;
             return TruthFunctions.induction(T, B);
         }
     },
     Abduction() {
-        @Override public Truth apply(final Truth T, final Truth B, Memory m) {
+        @Nullable
+        @Override public Truth apply(@NotNull final Truth T, @Nullable final Truth B, Memory m) {
             if (B == null) return null;
             return TruthFunctions.abduction(T, B);
         }
     },
     Comparison() {
-        @Override public Truth apply(final Truth T, final Truth B, Memory m) {
+        @Nullable
+        @Override public Truth apply(@NotNull final Truth T, @Nullable final Truth B, Memory m) {
             if (B == null) return null;
             return TruthFunctions.comparison(T, B);
         }
     },
     Conversion() {
-        @Override public Truth apply(final Truth T, final Truth B, Memory m) {
+        @Nullable
+        @Override public Truth apply(final Truth T, @Nullable final Truth B, Memory m) {
             if (B == null) return null;
             return TruthFunctions.conversion(B);
         }
     },
     Negation() {
-        @Override public Truth apply(final Truth T, /* nullable */ final Truth B, Memory m) {
+        @NotNull
+        @Override public Truth apply(@NotNull final Truth T, /* nullable */ final Truth B, Memory m) {
             return TruthFunctions.negation(T);
         }
     },
     Contraposition() {
-        @Override public Truth apply(final Truth T, /* nullable */ final Truth B, Memory m) {
+        @NotNull
+        @Override public Truth apply(@NotNull final Truth T, /* nullable */ final Truth B, Memory m) {
             return TruthFunctions.contraposition(T);
         }
     },
     Resemblance(true) {
-        @Override public Truth apply(final Truth T, final Truth B, Memory m) {
+        @Nullable
+        @Override public Truth apply(@NotNull final Truth T, @Nullable final Truth B, Memory m) {
             if (B == null) return null;
             return TruthFunctions.resemblance(T,B);
         }
     },
     Union() {
-        @Override public Truth apply(final Truth T, final Truth B, Memory m) {
+        @Nullable
+        @Override public Truth apply(@NotNull final Truth T, @Nullable final Truth B, Memory m) {
             if (B == null) return null;
             return TruthFunctions.union(T,B);
         }
     },
     Intersection(true) {
-        @Override public Truth apply(final Truth T, final Truth B, Memory m) {
+        @Nullable
+        @Override public Truth apply(@NotNull final Truth T, @Nullable final Truth B, Memory m) {
             if (B == null) return null;
             return TruthFunctions.intersection(T,B);
         }
     },
     Difference(true) {
-        @Override public Truth apply(final Truth T, final Truth B, Memory m) {
+        @Nullable
+        @Override public Truth apply(@NotNull final Truth T, @Nullable final Truth B, Memory m) {
             if (B == null) return null;
             return TruthFunctions.difference(T,B);
         }
     },
     Analogy(true) {
-        @Override public Truth apply(final Truth T, final Truth B, Memory m) {
+        @Nullable
+        @Override public Truth apply(@NotNull final Truth T, @Nullable final Truth B, Memory m) {
             if (B == null) return null;
             return TruthFunctions.analogy(T,B);
         }
     },
     ReduceConjunction() {
-        @Override public Truth apply(final Truth T, final Truth B, Memory m) {
+        @Nullable
+        @Override public Truth apply(@NotNull final Truth T, @Nullable final Truth B, Memory m) {
             if (B == null) return null;
             return TruthFunctions.reduceConjunction(T,B);
         }
     },
     ReduceDisjunction() {
-        @Override public Truth apply(final Truth T, final Truth B, Memory m) {
+        @Nullable
+        @Override public Truth apply(@NotNull final Truth T, @Nullable final Truth B, Memory m) {
             if (B == null) return null;
             return TruthFunctions.reduceDisjunction(T, B);
         }
     },
     ReduceConjunctionNeg() {
-        @Override public Truth apply(final Truth T, final Truth B, Memory m) {
+        @Nullable
+        @Override public Truth apply(@NotNull final Truth T, @Nullable final Truth B, Memory m) {
             if (B == null) return null;
             return TruthFunctions.reduceConjunctionNeg(T, B);
         }
     },
     AnonymousAnalogy() {
-        @Override public Truth apply(final Truth T, final Truth B, Memory m) {
+        @Nullable
+        @Override public Truth apply(@NotNull final Truth T, @Nullable final Truth B, Memory m) {
             if (B==null) return null;
             return TruthFunctions.anonymousAnalogy(T,B);
         }
     },
     Exemplification() {
-        @Override public Truth apply(final Truth T, final Truth B, Memory m) {
+        @Nullable
+        @Override public Truth apply(@NotNull final Truth T, @Nullable final Truth B, Memory m) {
             if (B==null) return null;
             return TruthFunctions.exemplification(T,B);
         }
     },
     DecomposeNegativeNegativeNegative() {
-        @Override public Truth apply(final Truth T, final Truth B, Memory m) {
+        @Nullable
+        @Override public Truth apply(@NotNull final Truth T, @Nullable final Truth B, Memory m) {
             if (B==null) return null;
             return TruthFunctions.decomposeNegativeNegativeNegative(T,B);
         }
     },
     DecomposePositiveNegativePositive() {
-        @Override public Truth apply(final Truth T, final Truth B, Memory m) {
+        @Nullable
+        @Override public Truth apply(@NotNull final Truth T, @Nullable final Truth B, Memory m) {
             if (B==null) return null;
             return TruthFunctions.decomposePositiveNegativePositive(T,B);
         }
     },
     DecomposeNegativePositivePositive() {
-        @Override public Truth apply(final Truth T, final Truth B, Memory m) {
+        @Nullable
+        @Override public Truth apply(@NotNull final Truth T, @Nullable final Truth B, Memory m) {
             if (B==null) return null;
             return TruthFunctions.decomposeNegativePositivePositive(T,B);
         }
     },
     DecomposePositivePositivePositive() {
-        @Override public Truth apply(final Truth T, final Truth B, Memory m) {
+        @Nullable
+        @Override public Truth apply(@NotNull final Truth T, @Nullable final Truth B, Memory m) {
             if (B==null) return null;
             return TruthFunctions.decomposeNegativePositivePositive(TruthFunctions.negation(T), B);
         }
     },
     DecomposePositiveNegativeNegative() {
-        @Override public Truth apply(final Truth T, final Truth B, Memory m) {
+        @Nullable
+        @Override public Truth apply(@NotNull final Truth T, @Nullable final Truth B, Memory m) {
             if (B == null) return null;
             return TruthFunctions.decomposePositiveNegativeNegative(T,B);
         }
     },
     Identity() {
-        @Override public Truth apply(final Truth T, /* nullable*/ final Truth B, Memory m) {
+        @NotNull
+        @Override public Truth apply(@NotNull final Truth T, /* nullable*/ final Truth B, Memory m) {
             return new DefaultTruth(T.getFrequency(), T.getConfidence());
         }
     },
     BeliefIdentity() {
-        @Override public Truth apply(final Truth T, /* nullable*/ final Truth B, Memory m) {
+        @Nullable
+        @Override public Truth apply(final Truth T, /* nullable*/ @Nullable final Truth B, Memory m) {
             if (B == null) return null;
             return new DefaultTruth(B.getFrequency(), B.getConfidence());
         }
     },
     BeliefStructuralDeduction() {
-        @Override public Truth apply(final Truth T, /* nullable*/ final Truth B, Memory m) {
+        @Nullable
+        @Override public Truth apply(final Truth T, /* nullable*/ @Nullable final Truth B, @NotNull Memory m) {
             if (B == null) return null;
             return TruthFunctions.deduction1(B, defaultConfidence(m));
         }
     },
     BeliefStructuralDifference() {
-        @Override public Truth apply(final Truth T, /* nullable*/ final Truth B, Memory m) {
+        @Nullable
+        @Override public Truth apply(final Truth T, /* nullable*/ @Nullable final Truth B, @NotNull Memory m) {
             if (B == null) return null;
             Truth res =  TruthFunctions.deduction1(B, defaultConfidence(m));
             return new DefaultTruth(1.0f-res.getFrequency(), res.getConfidence());
         }
     },
     BeliefNegation() {
-        @Override public Truth apply(final Truth T, /* nullable*/ final Truth B, Memory m) {
+        @Nullable
+        @Override public Truth apply(final Truth T, /* nullable*/ @Nullable final Truth B, Memory m) {
             if (B == null) return null;
             return TruthFunctions.negation(B);
         }
     };
 
-    public static Truth newDefaultTruth(Memory m) {
+    @Nullable
+    public static Truth newDefaultTruth(@NotNull Memory m) {
         return m.newDefaultTruth(Symbols.JUDGMENT);
     }
 
-    public static float defaultConfidence(Memory m) {
+    public static float defaultConfidence(@NotNull Memory m) {
         return m.getDefaultConfidence(Symbols.JUDGMENT);
     }
 

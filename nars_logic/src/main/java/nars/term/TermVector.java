@@ -8,6 +8,7 @@ import nars.term.match.Ellipsis;
 import nars.term.visit.SubtermVisitor;
 import nars.util.data.Util;
 import org.apache.commons.lang3.ArrayUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.lang.reflect.Array;
@@ -56,16 +57,16 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
 //        this(null);
 //    }
 
-    public TermVector(Collection<T> t, Class c) {
+    public TermVector(@NotNull Collection<T> t, Class c) {
         this((T[]) t.toArray((T[]) Array.newInstance(c, t.size())));
     }
 
-    public TermVector(Collection<T> t) {
+    public TermVector(@NotNull Collection<T> t) {
         this((T[]) t.toArray(new Term[t.size()]));
     }
 
     /** first n items */
-    public TermVector(Collection<T> t, int n) {
+    public TermVector(@NotNull Collection<T> t, int n) {
         this((T[]) t.toArray(new Term[n]));
     }
 
@@ -75,7 +76,7 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
         init();
     }
 
-    public TermVector(T[] source, Function<T,Termed<T>> mapping) {
+    public TermVector(@NotNull T[] source, @NotNull Function<T,Termed<T>> mapping) {
         int len = source.length;
         Term[] t = this.term = (T[]) new Term[len];
         for (int i = 0; i < len; i++)
@@ -90,7 +91,8 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
 
 
 
-    @Override public final Term[] terms(IntObjectPredicate<T> filter) {
+    @NotNull
+    @Override public final Term[] terms(@NotNull IntObjectPredicate<T> filter) {
         return Terms.filter(term, filter);
     }
 
@@ -143,6 +145,7 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
 //    }
 
 
+    @NotNull
     @Override
     public String toString() {
         return '(' + Joiner.on(',').join(term) + ')';
@@ -197,14 +200,14 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
 
 
     @Override
-    public final void forEach(Consumer<? super T> action, int start, int stop) {
+    public final void forEach(@NotNull Consumer<? super T> action, int start, int stop) {
         T[] tt = term;
         for (int i = start; i < stop; i++)
             action.accept(tt[i]);
     }
 
     @Override
-    public final void forEach(Consumer<? super T> action) {
+    public final void forEach(@NotNull Consumer<? super T> action) {
         T[] tt = term;
         for (T t : tt)
             action.accept(t);
@@ -217,7 +220,7 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
      * @return Whether the target is in the current term
      */
     @Override
-    public final boolean containsTerm(Term t) {
+    public final boolean containsTerm(@NotNull Term t) {
         return !impossibleSubterm(t) && Terms.contains(term, t);
     }
 
@@ -271,7 +274,7 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
     }
 
     @Override
-    public final void addAllTo(Collection<Term> set) {
+    public final void addAllTo(@NotNull Collection<Term> set) {
         Collections.addAll(set, term);
     }
 
@@ -301,7 +304,7 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
                 equalTerms(c);
     }
 
-    private boolean equalTerms(TermContainer c) {
+    private boolean equalTerms(@NotNull TermContainer c) {
         int s = size();
         if (s!=c.size())
             return false;
@@ -317,7 +320,7 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
 
 
     @Override
-    public final int compareTo(Object o) {
+    public final int compareTo(@NotNull Object o) {
         if (this == o) return 0;
 
         int diff;
@@ -333,7 +336,7 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
         return compareContent(c);
     }
 
-    public int compareContent(TermVector c) {
+    public int compareContent(@NotNull TermVector c) {
 
         int s = size(), diff;
         if ((diff = Integer.compare(s, c.size())) != 0)
@@ -358,11 +361,12 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
         return 0;
     }
 
-    public final void visit(SubtermVisitor v, Compound parent) {
+    public final void visit(@NotNull SubtermVisitor v, Compound parent) {
         for (Term t : term)
             v.accept(t, parent);
     }
 
+    @NotNull
     public TermVector reverse() {
         Term[] r = terms().clone();
         ArrayUtils.reverse(r);
@@ -373,9 +377,10 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
     /** thrown if a compound term contains itself as an immediate subterm */
     public static final class RecursiveTermContentException extends RuntimeException {
 
+        @NotNull
         public final Term term;
 
-        public RecursiveTermContentException(Term t) {
+        public RecursiveTermContentException(@NotNull Term t) {
             super(t.toString());
             this.term = t;
         }

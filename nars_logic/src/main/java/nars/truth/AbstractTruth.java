@@ -1,6 +1,7 @@
 package nars.truth;
 
 import nars.util.data.Util;
+import org.jetbrains.annotations.NotNull;
 
 
 public abstract class AbstractTruth<T> implements MetaTruth<T> {
@@ -39,7 +40,7 @@ public abstract class AbstractTruth<T> implements MetaTruth<T> {
         return false;
     }
 
-    public final boolean equalsConfidence(Truth t) {
+    public final boolean equalsConfidence(@NotNull Truth t) {
         float e = DefaultTruth.DEFAULT_TRUTH_EPSILON;//getEpsilon();
         return Util.equal(confidence, t.getConfidence(), e);
     }
@@ -53,6 +54,7 @@ public abstract class AbstractTruth<T> implements MetaTruth<T> {
      *
      * @return The String
      */
+    @NotNull
     @Override
     public String toString() {
         //return DELIMITER + frequency.toString() + SEPARATOR + confidence.toString() + DELIMITER;

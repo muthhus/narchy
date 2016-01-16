@@ -19,6 +19,8 @@ import nars.term.variable.CommonVariable;
 import nars.term.variable.Variable;
 import nars.util.version.Versioned;
 import nars.util.version.Versioning;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Random;
@@ -39,27 +41,32 @@ public abstract class FindSubst extends Versioning implements Subst {
     /**
      * variables whose contents are disallowed to equal each other
      */
+    @Nullable
     public ImmutableMap<Term, MatchConstraint> constraints = null;
 
     //public abstract Term resolve(Term t, Substitution s);
 
+    @NotNull
     public final VarCachedVersionMap xy;
+    @NotNull
     public final VarCachedVersionMap yx;
 
     /**
      * current "y"-term being matched against
      */
+    @NotNull
     public final Versioned<Term> term;
 
     /**
      * parent, if in subterms
      */
+    @NotNull
     public final Versioned<Compound> parent;
 
 
     public final List<Termutator> termutes = Global.newArrayList();
 
-    public static Ellipsis getFirstEllipsis(Compound X) {
+    public static Ellipsis getFirstEllipsis(@NotNull Compound X) {
         int xsize = X.size();
         for (int i = 0; i < xsize; i++) {
             Term xi = X.term(i);
@@ -73,12 +80,13 @@ public abstract class FindSubst extends Versioning implements Subst {
     /**
      * @param x a compound which contains one or more ellipsis terms
      */
-    public static int countNumNonEllipsis(Compound x) {
+    public static int countNumNonEllipsis(@NotNull Compound x) {
         //TODO depending on the expression, determine the sufficient # of terms Y must contain
         return Ellipsis.numNonEllipsisSubterms(x);
     }
 
 
+    @NotNull
     @Override
     public String toString() {
         return "subst:{" +
@@ -93,11 +101,11 @@ public abstract class FindSubst extends Versioning implements Subst {
     }
 
 
-    protected FindSubst(Op type, NAR nar) {
+    protected FindSubst(Op type, @NotNull NAR nar) {
         this(type, nar.memory);
     }
 
-    protected FindSubst(Op type, Memory memory) {
+    protected FindSubst(Op type, @NotNull Memory memory) {
         this(type, memory.random);
     }
 
@@ -132,11 +140,13 @@ public abstract class FindSubst extends Versioning implements Subst {
     }
 
 
+    @Nullable
     @Override
     public Term getXY(Object t) {
         return xy.getXY(t);
     }
 
+    @Nullable
     public Term getYX(Term t) {
         return yx.getXY(t);
     }
@@ -146,14 +156,14 @@ public abstract class FindSubst extends Versioning implements Subst {
         term.set(parent.get().term(index));
     }
 
-    public final void matchAll(Term x, Term y) {
+    public final void matchAll(@NotNull Term x, @NotNull Term y) {
         matchAll(x, y, true);
     }
 
     /**
      * setting finish=false allows matching in pieces before finishing
      */
-    public void matchAll(Term x, Term y, boolean finish) {
+    public void matchAll(@NotNull Term x, @NotNull Term y, boolean finish) {
         if (match(x, y) && finish) {
             if (!termutes.isEmpty())
                 matchTermutes();
@@ -175,7 +185,7 @@ public abstract class FindSubst extends Versioning implements Subst {
         termutes.clear();
     }
 
-    private void print(String prefix, Term a, Term b) {
+    private void print(String prefix, @Nullable Term a, Term b) {
         System.out.print(prefix);
         if (a != null)
             System.out.println(" " + a + " ||| " + b);
@@ -188,7 +198,7 @@ public abstract class FindSubst extends Versioning implements Subst {
     /**
      * recurses into the next sublevel of the term
      */
-    public final boolean match(Term x, Term y) {
+    public final boolean match(@NotNull Term x, @NotNull Term y) {
 
         if (x.equals(y)) {
             return true;
@@ -220,7 +230,7 @@ public abstract class FindSubst extends Versioning implements Subst {
         return false;
     }
 
-    private boolean matchYvar(Term x, Term y) {
+    private boolean matchYvar(@NotNull Term x, Term y) {
         Term ySubst = getYX(y);
 
         if (ySubst != null) {
@@ -234,7 +244,7 @@ public abstract class FindSubst extends Versioning implements Subst {
         }
     }
 
-    public boolean matchXvar(Variable x, Term y) {
+    public boolean matchXvar(@NotNull Variable x, @NotNull Term y) {
         Term xSubst = getXY(x);
 
         return (xSubst != null) ?
@@ -250,7 +260,7 @@ public abstract class FindSubst extends Versioning implements Subst {
 //    }
 
 
-    private boolean nextVarX(Variable xVar, Term y) {
+    private boolean nextVarX(@NotNull Variable xVar, @NotNull Term y) {
         Op xOp = xVar.op();
 
         if (xOp == type) {
@@ -271,7 +281,7 @@ public abstract class FindSubst extends Versioning implements Subst {
         return xy.isEmpty();
     }
 
-    public final boolean matchCompoundWithEllipsis(Compound X, Compound Y) {
+    public final boolean matchCompoundWithEllipsis(@NotNull Compound X, @NotNull Compound Y) {
 
         int xsize = X.size();
 
@@ -387,7 +397,7 @@ public abstract class FindSubst extends Versioning implements Subst {
 //        return false;
 //    }
 
-    protected boolean addTermutator(Termutator t) {
+    protected boolean addTermutator(@NotNull Termutator t) {
 
         //resolve termutator interferences that the addition may cause
         Termlike a = t.resultKey;
@@ -420,7 +430,7 @@ public abstract class FindSubst extends Versioning implements Subst {
         return true;
     }
 
-    public final boolean matchPermute(TermContainer x, Compound y) {
+    public final boolean matchPermute(@NotNull TermContainer x, @NotNull Compound y) {
         if
                 (((type != Op.VAR_PATTERN && (0 == (x.structure() & type.bit()))) ||
                 ((type == Op.VAR_PATTERN) && !Variable.hasPatternVariable(x))))
@@ -460,7 +470,7 @@ public abstract class FindSubst extends Versioning implements Subst {
      * @param X the pattern term
      * @param Y the compound being matched into X
      */
-    public final boolean matchEllipsedCommutative(Compound X, Ellipsis Xellipsis, Compound Y) {
+    public final boolean matchEllipsedCommutative(@NotNull Compound X, Ellipsis Xellipsis, @NotNull Compound Y) {
 
         //ALL OF THIS CAN BE PRECOMPUTED
         Set<Term> xSpecific = Global.newHashSet(0); //Global.newHashSet(0);
@@ -525,7 +535,7 @@ public abstract class FindSubst extends Versioning implements Subst {
     /**
      * toMatch matched into some or all of Y's terms
      */
-    private boolean matchCommutiveRemaining(Term xEllipsis, Set<Term> x, MutableSet<Term> yFree) {
+    private boolean matchCommutiveRemaining(Term xEllipsis, @NotNull Set<Term> x, @NotNull MutableSet<Term> yFree) {
         int xs = x.size();
 
         switch (xs) {
@@ -597,7 +607,7 @@ public abstract class FindSubst extends Versioning implements Subst {
      * WARNING this implementation only works if there is one ellipse in the subterms
      * this is not tested for either
      */
-    public final boolean matchEllipsedLinear(Compound X, Ellipsis Xellipsis, Compound Y) {
+    public final boolean matchEllipsedLinear(@NotNull Compound X, @NotNull Ellipsis Xellipsis, @NotNull Compound Y) {
 
         int i = 0, j = 0;
         int xsize = X.size();
@@ -666,7 +676,7 @@ public abstract class FindSubst extends Versioning implements Subst {
     /**
      * elimination
      */
-    private boolean putVarX(Variable x, Term y) {
+    private boolean putVarX(Variable x, @NotNull Term y) {
         if (putXY(x, y)) {
             if (x instanceof CommonVariable) {
                 putYX(x, y);
@@ -677,7 +687,7 @@ public abstract class FindSubst extends Versioning implements Subst {
     }
 
 
-    private boolean putCommon(Variable x, Variable y) {
+    private boolean putCommon(@NotNull Variable x, @NotNull Variable y) {
         Variable commonVar = CommonVariable.make(x, y);
         if (putXY(x, commonVar)) {
             putYX(y, commonVar);
@@ -690,7 +700,7 @@ public abstract class FindSubst extends Versioning implements Subst {
     /**
      * a branch for comparing a particular permutation, called from the main next()
      */
-    public boolean matchLinear(TermContainer X, TermContainer Y) {
+    public boolean matchLinear(@NotNull TermContainer X, @NotNull TermContainer Y) {
         int s = X.size();
         switch (s) {
             case 0:
@@ -705,7 +715,7 @@ public abstract class FindSubst extends Versioning implements Subst {
     }
 
 
-    public boolean matchLinearForward(TermContainer X, TermContainer Y) {
+    public boolean matchLinearForward(@NotNull TermContainer X, @NotNull TermContainer Y) {
         final int s = X.size();
         for (int i = 0; i < s; i++) {
             if (!matchSub(X, Y, i)) return false;
@@ -713,11 +723,11 @@ public abstract class FindSubst extends Versioning implements Subst {
         return true;
     }
 
-    public boolean matchSub(TermContainer X, TermContainer Y, int i) {
+    public boolean matchSub(@NotNull TermContainer X, @NotNull TermContainer Y, int i) {
         return match(X.term(i), Y.term(i));
     }
 
-    public boolean matchLinearReverse(TermContainer X, TermContainer Y) {
+    public boolean matchLinearReverse(@NotNull TermContainer X, @NotNull TermContainer Y) {
         for (int i = X.size() - 1; i >= 0; i--) {
             if (!matchSub(X, Y, i)) return false;
         }
@@ -764,7 +774,7 @@ public abstract class FindSubst extends Versioning implements Subst {
     /**
      * returns true if the assignment was allowed, false otherwise
      */
-    public final boolean putXY(Term x /* usually a Variable */, Term y) {
+    public final boolean putXY(Term x /* usually a Variable */, @NotNull Term y) {
 
 //        if (x.equals(y))
 //            throw new RuntimeException("x==y");
@@ -801,6 +811,7 @@ public abstract class FindSubst extends Versioning implements Subst {
         yx.put(x, y);
     }
 
+    @Nullable
     public Term apply(Term t) {
         throw new RuntimeException("unimpl");
     }
@@ -809,7 +820,7 @@ public abstract class FindSubst extends Versioning implements Subst {
     /**
      * default compound matching; op will already have been compared. no ellipsis will be involved
      */
-    public final boolean matchCompound(Compound x, Compound y) {
+    public final boolean matchCompound(@NotNull Compound x, @NotNull Compound y) {
         int xs = x.size();
         if ((xs == y.size()) && (x.relation() == y.relation())) {
             return ((xs > 1) && (x.isCommutative())) ?

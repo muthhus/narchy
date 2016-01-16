@@ -14,6 +14,8 @@ import nars.term.atom.Atom;
 import nars.term.compound.Compound;
 import nars.term.variable.Variable;
 import nars.util.Texts;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jgrapht.ext.*;
 import org.jgrapht.graph.DirectedMaskSubgraph;
 import org.jgrapht.graph.DirectedPseudograph;
@@ -43,6 +45,7 @@ import java.util.*;
  */
 public class DerivationGraph extends DirectedPseudograph<DerivationGraph.Keyed,Object> {
 
+    @NotNull
     public static String tenseRelative(long then, long now) {
         long dt = then - now;
         return dt < 0 ? "[" + dt + ']' : "[+" + dt + ']';
@@ -89,6 +92,7 @@ public class DerivationGraph extends DirectedPseudograph<DerivationGraph.Keyed,O
 
     }
 
+    @NotNull
     public final Map<PremiseKey, DerivationPattern> premiseResult;
 //    Map<Object,Double> edgeWeights = Global.newHashMap();
 
@@ -100,7 +104,7 @@ public class DerivationGraph extends DirectedPseudograph<DerivationGraph.Keyed,O
     static final Terminal np = new Terminal();
     static final Map<String, String> parsedTerm = new HashMap(1024);
 
-    public DerivationPattern add(ConceptProcess n, Task... derived) {
+    public DerivationPattern add(@NotNull ConceptProcess n, Task... derived) {
         return add(n.getConcept(), n.taskLink.get(),
                 n.termLink.get().term(),
                 n.getBelief(), n.time(), derived);
@@ -112,7 +116,7 @@ public class DerivationGraph extends DirectedPseudograph<DerivationGraph.Keyed,O
 //        return p;
 //    }
 
-    public DerivationPattern add(Concept c, Task tasklink, Term termlink, Task belief, long now, Task... result) {
+    public DerivationPattern add(Concept c, @NotNull Task tasklink, @Nullable Term termlink, @Nullable Task belief, long now, @NotNull Task... result) {
 
         ObjectIntHashMap<Term> unique = new ObjectIntHashMap();
 
@@ -228,7 +232,7 @@ public class DerivationGraph extends DirectedPseudograph<DerivationGraph.Keyed,O
         }
 
         @Override
-        public int compareTo(Keyed o) {
+        public int compareTo(@NotNull Keyed o) {
             return name().compareTo(o.name());
         }
 
@@ -237,16 +241,20 @@ public class DerivationGraph extends DirectedPseudograph<DerivationGraph.Keyed,O
     public static class PremiseKey extends Keyed  {
 
         //private final String conceptKey;
+        @NotNull
         private final String taskLinkKey;
+        @NotNull
         private final String termLinkKey;
+        @NotNull
         public final String key;
+        @NotNull
         private final String beliefKey;
         private final int beliefVolume;
         private final int taskVolume;
         private final int termVolume;
 
 
-        public PremiseKey(Task tasklink, Term termlink, Task belief, ObjectIntHashMap<Term> unique, long now, boolean truth, boolean budget) {
+        public PremiseKey(@NotNull Task tasklink, @Nullable Term termlink, @Nullable Task belief, ObjectIntHashMap<Term> unique, long now, boolean truth, boolean budget) {
             //this.conceptKey = genericString(concept.getTerm(), unique);
             taskLinkKey = genericString(tasklink, unique, now, truth, budget, false);
             termLinkKey = termlink == null ? "_" : genericString(termlink, unique);
@@ -261,6 +269,7 @@ public class DerivationGraph extends DirectedPseudograph<DerivationGraph.Keyed,O
                     beliefKey).trim();
         }
 
+        @NotNull
         @Override
         public String name() { return key; }
 
@@ -292,12 +301,14 @@ public class DerivationGraph extends DirectedPseudograph<DerivationGraph.Keyed,O
 
     public static class TaskResult extends Keyed {
 
+        @NotNull
         public final String key;
 
-        public TaskResult(Task t, ObjectIntHashMap<Term> unique, long now, boolean includeDerivedTruth, boolean includeDerivedBudget) {
+        public TaskResult(@NotNull Task t, ObjectIntHashMap<Term> unique, long now, boolean includeDerivedTruth, boolean includeDerivedBudget) {
             key = genericString(t, unique, now, includeDerivedTruth, includeDerivedBudget, false);
         }
 
+        @NotNull
         @Override
         public String name() {
             return key;
@@ -310,7 +321,7 @@ public class DerivationGraph extends DirectedPseudograph<DerivationGraph.Keyed,O
 
         public final String key;
 
-        public TermPattern(Term t, ObjectIntHashMap<Term> unique) {
+        public TermPattern(@NotNull Term t, ObjectIntHashMap<Term> unique) {
             key = genericString(t, unique);
         }
 
@@ -325,7 +336,7 @@ public class DerivationGraph extends DirectedPseudograph<DerivationGraph.Keyed,O
 
         public final String key;
 
-        public TaskPattern(Task s, ObjectIntHashMap<Term> unique, long now, boolean includeDerivedTruth) {
+        public TaskPattern(@NotNull Task s, ObjectIntHashMap<Term> unique, long now, boolean includeDerivedTruth) {
             key = genericString(s, unique, now, includeDerivedTruth);
         }
 
@@ -336,7 +347,8 @@ public class DerivationGraph extends DirectedPseudograph<DerivationGraph.Keyed,O
 
     }
 
-    public PremiseKey newPremise(Task tasklink, Term termlink, Task belief, ObjectIntHashMap<Term> unique, long now) {
+    @NotNull
+    public PremiseKey newPremise(@NotNull Task tasklink, Term termlink, Task belief, ObjectIntHashMap<Term> unique, long now) {
         return new PremiseKey(tasklink, termlink, belief, unique, now, includeDerivedTruth, includeDerivedBudget);
     }
 
@@ -382,6 +394,7 @@ public class DerivationGraph extends DirectedPseudograph<DerivationGraph.Keyed,O
 //        };
 //    }
 
+    @NotNull
     static Iterable<Task> getTasks(Premise n, int taskStart, int taskEnd) {
         if (taskStart == taskEnd)
             return Collections.emptyList();
@@ -391,7 +404,7 @@ public class DerivationGraph extends DirectedPseudograph<DerivationGraph.Keyed,O
 
 
 
-    public static String genericString(Task t, ObjectIntHashMap<Term> unique, long now, boolean includeDerivedTruth, boolean includeDerivedBudget, boolean includeDerivedParents) {
+    public static String genericString(@NotNull Task t, ObjectIntHashMap<Term> unique, long now, boolean includeDerivedTruth, boolean includeDerivedBudget, boolean includeDerivedParents) {
         StringBuilder tempTaskString = new StringBuilder(128);
 
         String s = genericString(t, unique, now, includeDerivedTruth);
@@ -436,19 +449,21 @@ public class DerivationGraph extends DirectedPseudograph<DerivationGraph.Keyed,O
 
 
 
-    TaskPattern addSentencePattern(Task sentence, ObjectIntHashMap<Term> unique, long now) {
+    @NotNull
+    TaskPattern addSentencePattern(@NotNull Task sentence, ObjectIntHashMap<Term> unique, long now) {
         TaskPattern s = new TaskPattern(sentence, unique, now, includeDerivedTruth);
         addVertex(s);
         return s;
     }
-    TermPattern addTermPattern(Term term, ObjectIntHashMap<Term> unique) {
+    @NotNull
+    TermPattern addTermPattern(@NotNull Term term, ObjectIntHashMap<Term> unique) {
         TermPattern s = new TermPattern(term, unique);
         addVertex(s);
         return s;
     }
 
 
-    public static String genericLiteral(Term c, ObjectIntHashMap<Term> unique) {
+    public static String genericLiteral(@NotNull Term c, @NotNull ObjectIntHashMap<Term> unique) {
         c.recurseTerms((t, superterm) -> {
             if ((t instanceof Atom) && (!(t instanceof Variable))) {
                 unique.getIfAbsentPut(t, unique.size());
@@ -473,11 +488,11 @@ public class DerivationGraph extends DirectedPseudograph<DerivationGraph.Keyed,O
 
     }
 
-    public static String genericString(Task s, long now, boolean includeTruth) {
+    public static String genericString(@NotNull Task s, long now, boolean includeTruth) {
         return genericString(s, new ObjectIntHashMap<>(), now, includeTruth);
     }
 
-    public static String genericString(Task s, ObjectIntHashMap<Term> unique, long now, boolean includeTruth) {
+    public static String genericString(@NotNull Task s, ObjectIntHashMap<Term> unique, long now, boolean includeTruth) {
         String t = genericString(s.term(), unique);
 
         t += s.getPunctuation();
@@ -497,7 +512,7 @@ public class DerivationGraph extends DirectedPseudograph<DerivationGraph.Keyed,O
         return t;
     }
 
-    public static String genericString(Term t, ObjectIntHashMap<Term> _unique) {
+    public static String genericString(@NotNull Term t, @Nullable ObjectIntHashMap<Term> _unique) {
         ObjectIntHashMap<Term> unique = _unique == null ? new ObjectIntHashMap() : _unique;
 
         if (t.getClass() == Atom.class) {
@@ -520,7 +535,7 @@ public class DerivationGraph extends DirectedPseudograph<DerivationGraph.Keyed,O
         return premiseResult.toString();
     }
 
-    public void print(Writer out) {
+    public void print(@NotNull Writer out) {
 
 //        for (PremiseKey premise : premiseResult.keySet()) {
 //            resultGroups = premiseResult.get(premise);
@@ -555,12 +570,13 @@ public class DerivationGraph extends DirectedPseudograph<DerivationGraph.Keyed,O
 
         GmlExporter gme = new GmlExporter(new IntegerNameProvider(), new StringNameProvider() {
             @Override
-            public String getVertexName(Object vertex) {
+            public String getVertexName(@NotNull Object vertex) {
                 return super.getVertexName(vertex);
             }
         }, new IntegerEdgeNameProvider(), new StringEdgeNameProvider() {
+            @NotNull
             @Override
-            public String getEdgeName(Object edge) {
+            public String getEdgeName(@NotNull Object edge) {
                 return super.getEdgeName(edge) + "\"\n\tweight \"" + getEdgeWeight(edge) ;
             }
         });
@@ -575,10 +591,11 @@ public class DerivationGraph extends DirectedPseudograph<DerivationGraph.Keyed,O
         }
     }
 
+    @NotNull
     private DirectedMaskSubgraph weightAtleast(double v) {
         MaskFunctor e = new MaskFunctor() {
             @Override
-            public boolean isEdgeMasked(Object edge) {
+            public boolean isEdgeMasked(@NotNull Object edge) {
                 return getEdgeWeight(edge) < v;
             }
 

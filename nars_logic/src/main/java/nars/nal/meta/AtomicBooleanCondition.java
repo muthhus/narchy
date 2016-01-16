@@ -1,6 +1,7 @@
 package nars.nal.meta;
 
 import nars.term.Term;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -22,11 +23,12 @@ public abstract class AtomicBooleanCondition<C> extends AbstractLiteral implemen
 
     /** add this or subconditions to expand in a rule */
     @Override
-    public void addConditions(List<Term> l) {
+    public void addConditions(@NotNull List<Term> l) {
         //default: just add this
         l.add(this);
     }
 
+    @NotNull
     public String toJavaConditionString() {
         return ("(/* TODO: " +
                 this +

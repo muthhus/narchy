@@ -3,6 +3,7 @@ package nars.nal.meta;
 import nars.Op;
 import nars.term.TermVector;
 import nars.term.compound.GenericCompound;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by me on 12/31/15.
@@ -42,7 +43,7 @@ abstract public class ThenFork<C> extends GenericCompound<ProcTerm<C>> implement
     }
 
     @Override
-    public void appendJavaProcedure(StringBuilder s) {
+    public void appendJavaProcedure(@NotNull StringBuilder s) {
         //s.append("/* " + this + "*/");
         for (ProcTerm<C> p : terms()) {
             s.append("\t\t");

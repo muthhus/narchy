@@ -1,6 +1,7 @@
 package nars.time;
 
 import nars.Memory;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Clock whose time change is managed by an external process
@@ -38,6 +39,7 @@ public class SimulatedClock implements Clock {
         return t0 - t;
     }
 
+    @NotNull
     @Override
     public String toString() {
         return Long.toString(t);

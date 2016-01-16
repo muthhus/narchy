@@ -5,6 +5,7 @@ import nars.bag.BLink;
 import nars.task.Task;
 import nars.util.ArraySortedIndex;
 import nars.util.data.sorted.SortedIndex;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 
@@ -14,11 +15,12 @@ import java.util.function.Consumer;
  */
 public class DigestBag implements Consumer<Task> {
 
-	public final SortedIndex<BLink<Task>> list;
+	@NotNull
+    public final SortedIndex<BLink<Task>> list;
 
     public DigestBag(int capacity) {
         list = new ArraySortedIndex<BLink<Task>>(capacity) {
-            @Override public float score(BLink<Task> v) {
+            @Override public float score(@NotNull BLink<Task> v) {
 
                 //return v.getPriority() * v.get().getConfidenceIfTruthOr(1f);
                 return v.getPriority();
@@ -26,7 +28,7 @@ public class DigestBag implements Consumer<Task> {
         };
     }
 
-    @Override public void accept(Task t) {
+    @Override public void accept(@NotNull Task t) {
         list.insert(new BLink(t, t.getBudget()));
     }
 
@@ -34,7 +36,7 @@ public class DigestBag implements Consumer<Task> {
 
         public DigestBag buffer;
 
-        public OutputBuffer(NAR n, int capacity) {
+        public OutputBuffer(@NotNull NAR n, int capacity) {
             this.buffer = new DigestBag(capacity);
 
             n.memory.eventTaskProcess.on(buffer);

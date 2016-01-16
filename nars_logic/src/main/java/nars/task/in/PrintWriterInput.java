@@ -1,6 +1,7 @@
 package nars.task.in;
 
 import nars.NAR;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,6 +18,7 @@ public class PrintWriterInput extends ReaderInput {
 	/**
 	 * Printing to out will be piped into TextInput
 	 */
+	@NotNull
 	public final PipedWriter out;
 	boolean outClosed = false;
 

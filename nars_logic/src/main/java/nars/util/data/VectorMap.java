@@ -1,6 +1,7 @@
 package nars.util.data;
 
 import nars.NAR;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * 
@@ -8,7 +9,9 @@ import nars.NAR;
  */
 public abstract class VectorMap {
 
+	@NotNull
 	public final UniformVector input;
+	@NotNull
 	public final UniformVector output;
 
 	protected VectorMap(NAR n, String prefix, int numInputs,

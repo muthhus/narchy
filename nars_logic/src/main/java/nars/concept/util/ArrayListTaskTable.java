@@ -4,6 +4,8 @@ import nars.Global;
 import nars.Memory;
 import nars.budget.BudgetMerge;
 import nars.task.Task;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.List;
@@ -20,6 +22,7 @@ public class ArrayListTaskTable implements QuestionTaskTable {
 
     protected int capacity = 0;
 
+    @NotNull
     private final List<Task> list;
 
     public ArrayListTaskTable(int capacity) {
@@ -66,8 +69,9 @@ public class ArrayListTaskTable implements QuestionTaskTable {
     /**
      * iterator-less implementation
      */
+    @Nullable
     @Override
-    public Task getFirstEquivalent(Task t, BiPredicate<Task,Task> e) {
+    public Task getFirstEquivalent(Task t, @NotNull BiPredicate<Task,Task> e) {
         if (isEmpty()) return null;
 
         List<Task> ll = this.list;
@@ -80,8 +84,9 @@ public class ArrayListTaskTable implements QuestionTaskTable {
     }
 
 
+    @Nullable
     @Override
-    public Task add(Task t, BiPredicate<Task,Task> equality, BudgetMerge duplicateMerge, Memory m) {
+    public Task add(@NotNull Task t, @NotNull BiPredicate<Task,Task> equality, @NotNull BudgetMerge duplicateMerge, @NotNull Memory m) {
 
         Task existing = getFirstEquivalent(t, equality);
         if (existing != null) {
@@ -112,13 +117,14 @@ public class ArrayListTaskTable implements QuestionTaskTable {
         return t;
     }
 
+    @NotNull
     @Override
     public Iterator<Task> iterator() {
         return list.iterator();
     }
 
     @Override
-    public void forEach(Consumer<? super Task> action) {
+    public void forEach(@NotNull Consumer<? super Task> action) {
         list.forEach(action);
     }
 

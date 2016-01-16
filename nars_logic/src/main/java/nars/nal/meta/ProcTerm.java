@@ -1,6 +1,7 @@
 package nars.nal.meta;
 
 import nars.term.Term;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 
@@ -9,7 +10,7 @@ import java.util.function.Consumer;
  */
 public interface ProcTerm<C> extends Term, Consumer<C> {
 
-    default void appendJavaProcedure(StringBuilder s) {
+    default void appendJavaProcedure(@NotNull StringBuilder s) {
         s.append("/* TODO: " + this + " */\n");
     }
 

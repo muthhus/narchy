@@ -4,6 +4,7 @@ import nars.index.MapIndex;
 import nars.term.TermVector;
 import nars.term.Termed;
 import nars.term.compound.Compound;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 
@@ -17,6 +18,7 @@ public class PatternIndex extends MapIndex {
     }
 
 
+    @NotNull
     @Override
     public Termed makeCompound(Compound x) {
 

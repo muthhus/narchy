@@ -4,6 +4,7 @@ import nars.nal.nal8.Execution;
 import nars.nal.nal8.operator.SyncOperator;
 import nars.term.Term;
 import nars.util.graph.TermLinkGraph;
+import org.jetbrains.annotations.NotNull;
 import org.jgrapht.alg.ConnectivityInspector;
 
 import java.util.Set;
@@ -14,7 +15,7 @@ import java.util.Set;
 public class connectivity extends SyncOperator {
 
     @Override
-    public void execute(Execution e) {
+    public void execute(@NotNull Execution e) {
 
         TermLinkGraph g = new TermLinkGraph(e.nar);
 

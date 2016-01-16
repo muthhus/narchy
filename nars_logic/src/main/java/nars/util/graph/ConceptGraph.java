@@ -3,6 +3,8 @@ package nars.util.graph;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.util.data.ConceptMap;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jgrapht.EdgeFactory;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.AsUndirectedGraph;
@@ -13,13 +15,14 @@ import org.jgrapht.graph.DefaultDirectedGraph;
  */
 public abstract class ConceptGraph<E> extends ConceptMap implements EdgeFactory<Concept,E> {
 
+    @NotNull
     public final Graph<Concept,E> graph;
 
-    protected ConceptGraph(NAR nar) {
+    protected ConceptGraph(@NotNull NAR nar) {
         this(nar, true);
     }
 
-    protected ConceptGraph(NAR nar, boolean directed) {
+    protected ConceptGraph(@NotNull NAR nar, boolean directed) {
         super(nar);
         graph = directed ? new DefaultDirectedGraph<>(this) : new AsUndirectedGraph(new DefaultDirectedGraph<>(this));
 
@@ -41,11 +44,13 @@ public abstract class ConceptGraph<E> extends ConceptMap implements EdgeFactory<
 
 
     /** must override this to use graph.addEdge(source,target) method */
+    @Nullable
     @Override
     public E createEdge(Concept source, Concept target) {
         return null;
     }
 
+    @Nullable
     public E addEdge(Concept source, Concept target) {
         graph.addVertex(source);
         graph.addVertex(target);

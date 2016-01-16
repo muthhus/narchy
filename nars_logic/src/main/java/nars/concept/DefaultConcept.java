@@ -11,6 +11,8 @@ import nars.nal.LocalRules;
 import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiPredicate;
 
@@ -20,7 +22,7 @@ public class DefaultConcept extends AtomConcept {
     public static final BiPredicate<Task, Task> questionEquivalence = new BiPredicate<Task, Task>() {
 
         @Override
-        public boolean test(Task a, Task b) {
+        public boolean test(@NotNull Task a, Task b) {
             return (a.equals(b));
         }
 
@@ -32,11 +34,16 @@ public class DefaultConcept extends AtomConcept {
      * how incoming budget is merged into its existing duplicate quest/question
      */
     static final BudgetMerge duplicateQuestionMerge = BudgetMerge.plusDQDominated;
+    @Nullable
     private final Termed[] termLinkTemplates;
 
+    @Nullable
     protected QuestionTaskTable questions = null;
+    @Nullable
     protected QuestionTaskTable quests = null;
+    @Nullable
     protected BeliefTable beliefs = null;
+    @Nullable
     protected BeliefTable goals = null;
 
 
@@ -51,7 +58,7 @@ public class DefaultConcept extends AtomConcept {
      * @param taskLinks
      * @param termLinks
      */
-    public DefaultConcept(Term term, Bag<Task> taskLinks, Bag<Termed> termLinks, Memory m) {
+    public DefaultConcept(Term term, Bag<Task> taskLinks, Bag<Termed> termLinks, @NotNull Memory m) {
         super(term, termLinks, taskLinks);
 
         //lazily instantiated
@@ -68,11 +75,13 @@ public class DefaultConcept extends AtomConcept {
     /**
      * Pending Quests to be answered by new desire values
      */
+    @Nullable
     @Override
     public final QuestionTaskTable getQuests() {
         return quests;
     }
 
+    @Nullable
     @Override
     public final QuestionTaskTable getQuestions() {
         return questions;
@@ -83,6 +92,7 @@ public class DefaultConcept extends AtomConcept {
      * Judgments directly made about the term Use ArrayList because of access
      * and insertion in the middle
      */
+    @Nullable
     @Override
     public final BeliefTable getBeliefs() {
         return beliefs == null ? BeliefTable.EMPTY : beliefs;
@@ -91,6 +101,7 @@ public class DefaultConcept extends AtomConcept {
     /**
      * Desire values on the term, similar to the above one
      */
+    @Nullable
     @Override
     public final BeliefTable getGoals() {
         return goals == null ? BeliefTable.EMPTY : goals;
@@ -168,7 +179,8 @@ public class DefaultConcept extends AtomConcept {
      */
 
 
-    Task add(QuestionTaskTable table, Task input, BiPredicate<Task, Task> eq, BudgetMerge duplicateMerge, Memory memory) {
+    @Nullable
+    Task add(@NotNull QuestionTaskTable table, Task input, BiPredicate<Task, Task> eq, BudgetMerge duplicateMerge, Memory memory) {
         return table.add(input, eq, duplicateMerge, memory);
     }
 
@@ -180,8 +192,9 @@ public class DefaultConcept extends AtomConcept {
      * @param nar
      * @return Whether to continue the processing of the task
      */
+    @Nullable
     @Override
-    public Task processBelief(Task belief, NAR nar) {
+    public Task processBelief(Task belief, @NotNull NAR nar) {
 
         long now = nar.time();
         float successBefore = getSuccess(now);
@@ -225,8 +238,9 @@ public class DefaultConcept extends AtomConcept {
      * @param task
      * @return Whether to continue the processing of the task
      */
+    @Nullable
     @Override
-    public Task processGoal(Task inputGoal, NAR nar) {
+    public Task processGoal(Task inputGoal, @NotNull NAR nar) {
 
         Memory memory = nar.memory;
 
@@ -371,7 +385,7 @@ public class DefaultConcept extends AtomConcept {
      * @return true if the quest/question table changed
      */
     @Override
-    public boolean processQuestion(Task q, NAR nar) {
+    public boolean processQuestion(@NotNull Task q, @NotNull NAR nar) {
 
         final QuestionTaskTable table;
         if (q.isQuestion()) {
@@ -664,7 +678,7 @@ public class DefaultConcept extends AtomConcept {
      *
      * @return whether it was processed
      */
-    public final Task process(final Task task, NAR nar) {
+    public final Task process(@NotNull final Task task, @NotNull NAR nar) {
 
         task.onConcept(this);
 

@@ -5,14 +5,16 @@ import nars.Premise;
 import nars.nal.PremiseMatch;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
-
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 
 public interface TruthOperator {
+    @Nullable
     Truth apply(Truth task, Truth belief, Memory m);
     boolean allowOverlap();
 
-    default boolean  apply(PremiseMatch m) {
+    default boolean  apply(@NotNull PremiseMatch m) {
         Premise premise = m.premise;
         Truth truth = apply(
                 premise.getTask().getTruth(),

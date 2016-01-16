@@ -23,6 +23,7 @@ package nars.truth;
 import nars.Global;
 import nars.nal.UtilityFunctions;
 import nars.nal.nal7.Tense;
+import org.jetbrains.annotations.NotNull;
 
 import static java.lang.Math.abs;
 
@@ -37,7 +38,8 @@ public final class TruthFunctions extends UtilityFunctions {
      * @param t Truth value of the premise
      * @return Truth value of the conclusion
      */
-    public static Truth conversion(Truth t) {
+    @NotNull
+    public static Truth conversion(@NotNull Truth t) {
         float f1 = t.getFrequency();
         float c1 = t.getConfidence();
         float w = and(f1, c1);
@@ -50,7 +52,8 @@ public final class TruthFunctions extends UtilityFunctions {
      * {A} |- (--A)
      * @return Truth value of the conclusion
      */
-    public static Truth negation(Truth v1) {
+    @NotNull
+    public static Truth negation(@NotNull Truth v1) {
         float f = 1.0f - v1.getFrequency();
         float c = v1.getConfidence();
         return new DefaultTruth(f, c);
@@ -74,7 +77,8 @@ public final class TruthFunctions extends UtilityFunctions {
      * @param v1 Truth value of the premise
      * @return Truth value of the conclusion
      */
-    public static Truth contraposition(Truth v1) {
+    @NotNull
+    public static Truth contraposition(@NotNull Truth v1) {
         float f1 = v1.getFrequency();
         float c1 = v1.getConfidence();
         float w = and(1 - f1, c1);
@@ -89,11 +93,13 @@ public final class TruthFunctions extends UtilityFunctions {
      * @param b Truth value of the second premise
      * @return Truth value of the conclusion
      */
-    public static Truth revision(Truth a, Truth b) {
+    @NotNull
+    public static Truth revision(@NotNull Truth a, @NotNull Truth b) {
         return revision(a, b, new DefaultTruth(0, 0));
     }
 
-    static Truth revision(Truth a, Truth b, Truth result) {
+    @NotNull
+    static Truth revision(@NotNull Truth a, @NotNull Truth b, @NotNull Truth result) {
         float f1 = a.getFrequency();
         float f2 = b.getFrequency();
         float w1 = c2w(a.getConfidence());
@@ -113,7 +119,8 @@ public final class TruthFunctions extends UtilityFunctions {
      * @param reliance Confidence of the second (analytical) premise
      * @return AnalyticTruth value of the conclusion, because it is structural
      */
-    public static Truth deduction(Truth a, float reliance) {
+    @NotNull
+    public static Truth deduction(@NotNull Truth a, float reliance) {
         float f = a.getFrequency();
         float c = and(f, a.getConfidence(), reliance);
         return new DefaultTruth(f, c);
@@ -125,16 +132,19 @@ public final class TruthFunctions extends UtilityFunctions {
      * @param b Truth value of the second premise
      * @return (non-Analytic) Truth value of the conclusion - normal truth because this is based on 2 premises
      */
-    public static Truth deduction(Truth a, Truth b) {
+    @NotNull
+    public static Truth deduction(@NotNull Truth a, @NotNull Truth b) {
         return deduction(a, b.getFrequency(), b.getConfidence());
     }
 
     /** assumes belief freq=1f */
-    public static Truth deduction1(Truth a, float bC) {
+    @NotNull
+    public static Truth deduction1(@NotNull Truth a, float bC) {
         return deduction(a, 1f, bC);
     }
 
-    public static Truth deduction(Truth a, float bF, float bC) {
+    @NotNull
+    public static Truth deduction(@NotNull Truth a, float bF, float bC) {
         float f = and(a.getFrequency(), bF);
         float c = and(f, a.getConfidence(), bC);
         return new DefaultTruth(f, c);
@@ -146,7 +156,8 @@ public final class TruthFunctions extends UtilityFunctions {
      * @param b Truth value of the second premise
      * @return Truth value of the conclusion
      */
-    public static Truth analogy(Truth a, Truth b) {
+    @NotNull
+    public static Truth analogy(@NotNull Truth a, @NotNull Truth b) {
         float f1 = a.getFrequency();
         float f2 = b.getFrequency();
         float c1 = a.getConfidence();
@@ -162,7 +173,8 @@ public final class TruthFunctions extends UtilityFunctions {
      * @param b Truth value of the second premise
      * @return Truth value of the conclusion
      */
-    public static Truth resemblance(Truth a, Truth b) {
+    @NotNull
+    public static Truth resemblance(@NotNull Truth a, @NotNull Truth b) {
         float f1 = a.getFrequency();
         float f2 = b.getFrequency();
         float c1 = a.getConfidence();
@@ -178,7 +190,8 @@ public final class TruthFunctions extends UtilityFunctions {
      * @param b Truth value of the second premise
      * @return Truth value of the conclusion, or null if either truth is analytic already
      */
-    public static Truth abduction(Truth a, Truth b) {
+    @NotNull
+    public static Truth abduction(@NotNull Truth a, @NotNull Truth b) {
         float f1 = a.getFrequency();
         float f2 = b.getFrequency();
         float c1 = a.getConfidence();
@@ -194,7 +207,8 @@ public final class TruthFunctions extends UtilityFunctions {
      * @param reliance Confidence of the second (analytical) premise
      * @return Truth value of the conclusion
      */
-    public static Truth abduction(Truth t, float reliance) {
+    @NotNull
+    public static Truth abduction(@NotNull Truth t, float reliance) {
         float f1 = t.getFrequency();
         float c1 = t.getConfidence();
         float w = and(c1, reliance);
@@ -208,7 +222,8 @@ public final class TruthFunctions extends UtilityFunctions {
      * @param v2 Truth value of the second premise
      * @return Truth value of the conclusion
      */
-    public static Truth induction(Truth v1, Truth v2) {
+    @NotNull
+    public static Truth induction(@NotNull Truth v1, @NotNull Truth v2) {
         return abduction(v2, v1);
     }
 
@@ -218,7 +233,8 @@ public final class TruthFunctions extends UtilityFunctions {
      * @param b Truth value of the second premise
      * @return Truth value of the conclusion
      */
-    public static Truth exemplification(Truth a, Truth b) {
+    @NotNull
+    public static Truth exemplification(@NotNull Truth a, @NotNull Truth b) {
         float f1 = a.getFrequency();
         float f2 = b.getFrequency();
         float c1 = a.getConfidence();
@@ -234,7 +250,8 @@ public final class TruthFunctions extends UtilityFunctions {
      * @param b Truth value of the second premise
      * @return Truth value of the conclusion
      */
-    public static Truth comparison(Truth a, Truth b) {
+    @NotNull
+    public static Truth comparison(@NotNull Truth a, @NotNull Truth b) {
         float f1 = a.getFrequency();
         float f2 = b.getFrequency();
         float c1 = a.getConfidence();
@@ -253,7 +270,8 @@ public final class TruthFunctions extends UtilityFunctions {
      * @param b Truth value of the second premise
      * @return Truth value of the conclusion
      */
-    public static Truth desireStrong(Truth a, Truth b) {
+    @NotNull
+    public static Truth desireStrong(@NotNull Truth a, @NotNull Truth b) {
         float f1 = a.getFrequency();
         float f2 = b.getFrequency();
         float c1 = a.getConfidence();
@@ -269,7 +287,8 @@ public final class TruthFunctions extends UtilityFunctions {
      * @param v2 Truth value of the second premise
      * @return Truth value of the conclusion
      */
-    public static Truth desireWeak(Truth v1, Truth v2) {
+    @NotNull
+    public static Truth desireWeak(@NotNull Truth v1, @NotNull Truth v2) {
         float f1 = v1.getFrequency();
         float f2 = v2.getFrequency();
         float c1 = v1.getConfidence();
@@ -285,7 +304,8 @@ public final class TruthFunctions extends UtilityFunctions {
      * @param v2 Truth value of the second premise
      * @return Truth value of the conclusion
      */
-    public static Truth desireDed(Truth v1, Truth v2) {
+    @NotNull
+    public static Truth desireDed(@NotNull Truth v1, @NotNull Truth v2) {
         float f1 = v1.getFrequency();
         float f2 = v2.getFrequency();
         float c1 = v1.getConfidence();
@@ -301,7 +321,8 @@ public final class TruthFunctions extends UtilityFunctions {
      * @param v2 Truth value of the second premise
      * @return Truth value of the conclusion
      */
-    public static Truth desireInd(Truth v1, Truth v2) {
+    @NotNull
+    public static Truth desireInd(@NotNull Truth v1, @NotNull Truth v2) {
         float f1 = v1.getFrequency();
         float f2 = v2.getFrequency();
         float c1 = v1.getConfidence();
@@ -318,7 +339,8 @@ public final class TruthFunctions extends UtilityFunctions {
      * @param v2 Truth value of the second premise
      * @return Truth value of the conclusion
      */
-    public static Truth union(Truth v1, Truth v2) {
+    @NotNull
+    public static Truth union(@NotNull Truth v1, @NotNull Truth v2) {
         float f1 = v1.getFrequency();
         float f2 = v2.getFrequency();
         float c1 = v1.getConfidence();
@@ -334,7 +356,8 @@ public final class TruthFunctions extends UtilityFunctions {
      * @param v2 Truth value of the second premise
      * @return Truth value of the conclusion
      */
-    public static Truth intersection(Truth v1, Truth v2) {
+    @NotNull
+    public static Truth intersection(@NotNull Truth v1, @NotNull Truth v2) {
         float f1 = v1.getFrequency();
         float f2 = v2.getFrequency();
         float c1 = v1.getConfidence();
@@ -350,7 +373,8 @@ public final class TruthFunctions extends UtilityFunctions {
      * @param b Truth value of the second premise
      * @return Truth value of the conclusion
      */
-    public static Truth reduceDisjunction(Truth a, Truth b) {
+    @NotNull
+    public static Truth reduceDisjunction(@NotNull Truth a, @NotNull Truth b) {
         return deduction(intersection(a, negation(b)), 1.0f);
     }
 
@@ -358,7 +382,8 @@ public final class TruthFunctions extends UtilityFunctions {
      * {(--, (&&, A, B)), B} |- (--, A)
      * @return Truth value of the conclusion
      */
-    public static Truth reduceConjunction(Truth v1, Truth v2) {
+    @NotNull
+    public static Truth reduceConjunction(@NotNull Truth v1, @NotNull Truth v2) {
         Truth v0 = intersection(negation(v1), v2);
         return negation(deduction(v0, 1.0f));
 
@@ -378,7 +403,8 @@ public final class TruthFunctions extends UtilityFunctions {
      * @param b Truth value of the second premise
      * @return Truth value of the conclusion
      */
-    public static Truth reduceConjunctionNeg(Truth a, Truth b) {
+    @NotNull
+    public static Truth reduceConjunctionNeg(@NotNull Truth a, @NotNull Truth b) {
         return reduceConjunction(a, negation(b));
     }
 
@@ -388,14 +414,16 @@ public final class TruthFunctions extends UtilityFunctions {
      * @param b Truth value of the second premise
      * @return Truth value of the conclusion
      */
-    public static Truth anonymousAnalogy(Truth a, Truth b) {
+    @NotNull
+    public static Truth anonymousAnalogy(@NotNull Truth a, @NotNull Truth b) {
         float f1 = a.getFrequency();
         float c1 = a.getConfidence();
         Truth v0 = new DefaultTruth(f1, w2c(c1));
         return analogy(b, v0);
     }
 
-    public static Truth decomposePositiveNegativeNegative(Truth a, Truth b) {
+    @NotNull
+    public static Truth decomposePositiveNegativeNegative(@NotNull Truth a, @NotNull Truth b) {
         float f1 = a.getFrequency();
         float c1 = a.getConfidence();
         float f2 = b.getFrequency();
@@ -405,7 +433,8 @@ public final class TruthFunctions extends UtilityFunctions {
         return new DefaultTruth(1-fn, and(fn,c1,c2));
     }
 
-    public static Truth decomposeNegativePositivePositive(Truth a, Truth b) {
+    @NotNull
+    public static Truth decomposeNegativePositivePositive(@NotNull Truth a, @NotNull Truth b) {
         float f1 = a.getFrequency();
         float c1 = a.getConfidence();
         float f2 = b.getFrequency();
@@ -415,7 +444,8 @@ public final class TruthFunctions extends UtilityFunctions {
         return new DefaultTruth(f, and(f,c1,c2));
     }
 
-    public static Truth decomposePositiveNegativePositive(Truth a, Truth b) {
+    @NotNull
+    public static Truth decomposePositiveNegativePositive(@NotNull Truth a, @NotNull Truth b) {
         float f1 = a.getFrequency();
         float c1 = a.getConfidence();
         float f2 = b.getFrequency();
@@ -425,7 +455,8 @@ public final class TruthFunctions extends UtilityFunctions {
         return new DefaultTruth(f, and(f,c1,c2));
     }
 
-    public static Truth decomposeNegativeNegativeNegative(Truth a, Truth b) {
+    @NotNull
+    public static Truth decomposeNegativeNegativeNegative(@NotNull Truth a, @NotNull Truth b) {
         float f1 = a.getFrequency();
         float c1 = a.getConfidence();
         float f2 = b.getFrequency();
@@ -435,7 +466,8 @@ public final class TruthFunctions extends UtilityFunctions {
         return new DefaultTruth(1-fn, and(fn,c1,c2));
     }
 
-    public static Truth difference(Truth a, Truth b) {
+    @NotNull
+    public static Truth difference(@NotNull Truth a, @NotNull Truth b) {
         float f1 = a.getFrequency();
         float c1 = a.getConfidence();
         float f2 = b.getFrequency();
@@ -444,7 +476,8 @@ public final class TruthFunctions extends UtilityFunctions {
         return new DefaultTruth(and(f1,(1-f2)), and(c1,c2));
     }
 
-    public static ProjectedTruth eternalize(Truth t) {
+    @NotNull
+    public static ProjectedTruth eternalize(@NotNull Truth t) {
         return eternalize(t.getFrequency(), t.getConfidence());
     }
 
@@ -452,6 +485,7 @@ public final class TruthFunctions extends UtilityFunctions {
      * From one moment to eternal
      * @return Truth value of the conclusion
      */
+    @NotNull
     public static ProjectedTruth eternalize(float freq, float conf) {
         return new ProjectedTruth(
                 freq,

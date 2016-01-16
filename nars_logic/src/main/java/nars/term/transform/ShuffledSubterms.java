@@ -3,6 +3,7 @@ package nars.term.transform;
 import nars.term.Term;
 import nars.term.TermContainer;
 import nars.util.math.ShuffledPermutations;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -104,7 +105,7 @@ public final class ShuffledSubterms extends ShuffledPermutations implements Term
     }
 
     @Override
-    public int compareTo(Object o) {
+    public int compareTo(@NotNull Object o) {
         return compound.compareTo(o);
     }
 
@@ -114,6 +115,7 @@ public final class ShuffledSubterms extends ShuffledPermutations implements Term
     }
 
 
+    @NotNull
     @Override
     public Term[] terms() {
         int s = size();
@@ -125,7 +127,7 @@ public final class ShuffledSubterms extends ShuffledPermutations implements Term
 
 
     @Override
-    public void addAllTo(Collection<Term> set) {
+    public void addAllTo(@NotNull Collection<Term> set) {
         forEach(set::add);
     }
 

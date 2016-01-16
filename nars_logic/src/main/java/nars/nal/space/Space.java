@@ -7,6 +7,8 @@ import nars.term.Termed;
 import nars.term.compound.Compound;
 import nars.term.compound.GenericCompound;
 import nars.util.data.Util;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -16,15 +18,16 @@ import java.util.Objects;
 public class Space extends GenericCompound {
 
     /** matches each of the subterms in their order */
+    @Nullable
     final FloatArrayList vector;
     final int hash2;
 
-    public Space(TermVector subterms) {
+    public Space(@NotNull TermVector subterms) {
         //this(subterms, FloatArrayList.newWithNValues((int)subterms.size(), (float)Float.NaN) /* blank */);
         this(subterms, (FloatArrayList) null);
     }
 
-    public Space(TermVector subterms, float... f) {
+    public Space(@NotNull TermVector subterms, float... f) {
         this(subterms, new FloatArrayList(f));
     }
 
@@ -34,7 +37,7 @@ public class Space extends GenericCompound {
     }
 
 
-    public Space(TermVector subterms, FloatArrayList vector) {
+    public Space(@NotNull TermVector subterms, @Nullable FloatArrayList vector) {
         super(Op.SPACE, -1, subterms);
         this.vector = vector;
         if (vector!=null) {
@@ -60,7 +63,7 @@ public class Space extends GenericCompound {
     }
 
     @Override
-    public int compareTo(Object that) {
+    public int compareTo(@NotNull Object that) {
         int c = super.compareTo(that);
         if (c == 0) {
             FloatArrayList a = vector;
@@ -79,7 +82,7 @@ public class Space extends GenericCompound {
     }
 
     @Override
-    public void appendArg(Appendable p, boolean pretty, int i) throws IOException {
+    public void appendArg(@NotNull Appendable p, boolean pretty, int i) throws IOException {
         term(i).append(p, pretty);
 
         FloatArrayList vv = this.vector;

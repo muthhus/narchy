@@ -23,6 +23,8 @@ package nars.budget;
 import nars.nal.nal7.Tense;
 import nars.truth.Truth;
 import nars.util.data.Util;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import static nars.nal.UtilityFunctions.and;
 import static nars.nal.UtilityFunctions.or;
@@ -70,7 +72,7 @@ public class UnitBudget extends Budget {
     protected long lastForgetTime = Tense.TIMELESS;
 
 
-    public UnitBudget(float p, float d, Truth qualityFromTruth) {
+    public UnitBudget(float p, float d, @Nullable Truth qualityFromTruth) {
         this(p, d, qualityFromTruth !=
                 null ? BudgetFunctions.truthToQuality(qualityFromTruth) : 1.0f);
     }
@@ -105,7 +107,7 @@ public class UnitBudget extends Budget {
      *
      * @param v Budget value to be cloned
      */
-    public UnitBudget(Budget v, boolean copyLastForgetTime) {
+    public UnitBudget(@Nullable Budget v, boolean copyLastForgetTime) {
         this();
         if (v != null) {
             budget(v);
@@ -122,6 +124,7 @@ public class UnitBudget extends Budget {
      * Cloning method
      * TODO give this a less amgiuous name to avoid conflict with subclasses that have clone methods
      */
+    @NotNull
     @Override
     public final Budget clone() {
         return new UnitBudget(this, true);
@@ -236,6 +239,7 @@ public class UnitBudget extends Budget {
      *
      * @return String representation of the value
      */
+    @NotNull
     @Override
     public String toString() {
         return getBudgetString();

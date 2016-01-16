@@ -2,6 +2,8 @@ package nars.time;
 
 import nars.Memory;
 import nars.util.event.On;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
@@ -10,11 +12,13 @@ public class CycleClock implements Clock, Consumer<Memory> {
 
 
     long t;
+    @Nullable
     private Memory memory;
+    @Nullable
     private On handler = null;
 
     @Override
-    public void clear(Memory m) {
+    public void clear(@Nullable Memory m) {
 
         if (this.memory!=null && this.memory!=m) {
             handler.off();
@@ -47,6 +51,7 @@ public class CycleClock implements Clock, Consumer<Memory> {
 
 
 
+    @NotNull
     @Override
     public String toString() {
         return Long.toString(t);

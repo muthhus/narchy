@@ -3,6 +3,8 @@ package nars.concept.util;
 import nars.task.Task;
 import org.apache.commons.math3.analysis.interpolation.BivariateGridInterpolator;
 import org.apache.commons.math3.analysis.interpolation.UnivariateInterpolator;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
@@ -30,7 +32,8 @@ public interface TaskTable extends Iterable<Task> {
     /**
      * @return null if no duplicate was discovered, or the first Task that matched if one was
      */
-    default Task getFirstEquivalent(Task t, BiPredicate<Task,Task>  e) {
+    @Nullable
+    default Task getFirstEquivalent(Task t, @NotNull BiPredicate<Task,Task>  e) {
         for (Task a : this) {
             if (e.test(a, t))
                 return a;
@@ -39,19 +42,22 @@ public interface TaskTable extends Iterable<Task> {
     }
 
 
+    @Nullable
     default BivariateGridInterpolator getWaveFrequencyConfidenceTime() {
         return null;
     }
 
+    @Nullable
     default UnivariateInterpolator getWaveFrequencyConfidence() {
         return null;
     }
 
+    @Nullable
     default UnivariateInterpolator getWaveConfidenceTime() {
         return null;
     }
 
-    default void top(int maxPerConcept, Consumer<Task> recip) {
+    default void top(int maxPerConcept, @NotNull Consumer<Task> recip) {
         int s = size();
         if (s < maxPerConcept) maxPerConcept = s;
         for (Task t : this) {

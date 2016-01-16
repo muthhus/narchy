@@ -6,6 +6,8 @@ import nars.bag.Bag;
 import nars.budget.Budget;
 import nars.budget.BudgetMerge;
 import nars.util.data.sorted.SortedIndex;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -28,6 +30,7 @@ import java.util.function.Predicate;
  */
 public class CurveBag<V> implements Bag<V> {
 
+    @NotNull
     final ArrayBag<V> arrayBag;
 
     public static final BagCurve power2BagCurve = new Power2BagCurve();
@@ -58,7 +61,7 @@ public class CurveBag<V> implements Bag<V> {
 
     }
 
-    public CurveBag(SortedIndex<BLink<V>> items, BagCurve curve, Random rng) {
+    public CurveBag(@NotNull SortedIndex<BLink<V>> items, BagCurve curve, Random rng) {
         super();
         this.arrayBag = new ArrayBag(items);
         this.curve = curve;
@@ -69,6 +72,7 @@ public class CurveBag<V> implements Bag<V> {
     /**
      * set the merging function to 'plus'
      */
+    @NotNull
     @Deprecated public Bag<V> mergePlus() {
         arrayBag.setMergeFunction(BudgetMerge.plusDQDominated);
         return this;
@@ -81,6 +85,7 @@ public class CurveBag<V> implements Bag<V> {
 //        return this;
 //    }
 
+    @Nullable
     @Override
     public BLink<V> pop() {
         return peekNext(true);
@@ -91,6 +96,7 @@ public class CurveBag<V> implements Bag<V> {
         arrayBag.commit();
     }
 
+    @Nullable
     public BLink<V> peekNext(boolean remove) {
 
         ArrayBag<V> b = this.arrayBag;
@@ -118,14 +124,15 @@ public class CurveBag<V> implements Bag<V> {
 
 
     @Override
-    public final void topWhile(Predicate each) {
+    public final void topWhile(@NotNull Predicate each) {
         arrayBag.topWhile(each);
     }
 
     /** optimized batch fill, using consecutive array elements, also ensuring uniqueness
      * returns the instance for fluentcy
      * */
-    @Override public CurveBag<V> sample(int n, Predicate<BLink<V>> each, Collection<BLink<V>> target) {
+    @NotNull
+    @Override public CurveBag<V> sample(int n, @Nullable Predicate<BLink<V>> each, @NotNull Collection<BLink<V>> target) {
 
         int ss = size();
         final int begin, end;
@@ -160,6 +167,7 @@ public class CurveBag<V> implements Bag<V> {
         return arrayBag.get(key);
     }
 
+    @Nullable
     @Override
     public final BLink<V> sample() {
         return peekNext(false);
@@ -171,12 +179,14 @@ public class CurveBag<V> implements Bag<V> {
     }
 
 
+    @Nullable
     @Override
     public BLink<V> put(Object v, Budget vBagBudget, float scale) {
         return arrayBag.put(v, vBagBudget, scale);
     }
 
 
+    @Nullable
     @Override public BLink<V> put(Object v) {
         BLink<V> existing = get(v);
         return (existing != null) ?
@@ -184,6 +194,7 @@ public class CurveBag<V> implements Bag<V> {
                 put((V) v, getDefaultBudget((V) v));
     }
 
+    @NotNull
     protected BLink<V> getDefaultBudget(V v) {
         return new BLink(v, 0,0,0);
     }
@@ -199,6 +210,7 @@ public class CurveBag<V> implements Bag<V> {
         return arrayBag.size();
     }
 
+    @NotNull
     @Override
     public Iterator<BLink<V>> iterator() {
         return arrayBag.iterator();
@@ -365,10 +377,10 @@ public class CurveBag<V> implements Bag<V> {
 //        return next; //# of items actually filled in the array
 //    }
 
-    @Override public final void top(Consumer each) {
+    @Override public final void top(@NotNull Consumer each) {
         arrayBag.top(each);
     }
-    @Override public void topN(int limit, Consumer each) {
+    @Override public void topN(int limit, @NotNull Consumer each) {
         arrayBag.topN(limit, each);
     }
 
@@ -466,6 +478,7 @@ public class CurveBag<V> implements Bag<V> {
             return 1.0f - (nx * nx * nx);
         }
 
+        @NotNull
         @Override
         public String toString() {
             return "CubicBagCurve";
@@ -480,6 +493,7 @@ public class CurveBag<V> implements Bag<V> {
             return (nnx * nnx);
         }
 
+        @NotNull
         @Override
         public String toString() {
             return "Power4BagCurve";
@@ -495,6 +509,7 @@ public class CurveBag<V> implements Bag<V> {
             return (nnx * nnx * nnx);
         }
 
+        @NotNull
         @Override
         public String toString() {
             return "Power6BagCurve";
@@ -526,6 +541,7 @@ public class CurveBag<V> implements Bag<V> {
             return (x * x);
         }
 
+        @NotNull
         @Override
         public String toString() {
             return "QuadraticBagCurve";

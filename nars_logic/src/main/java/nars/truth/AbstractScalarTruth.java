@@ -1,6 +1,7 @@
 package nars.truth;
 
 import nars.util.data.Util;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by me on 7/4/15.
@@ -33,6 +34,7 @@ public abstract class AbstractScalarTruth extends AbstractTruth<Float> implement
     }
 
 
+    @NotNull
     @Override
     public Truth setFrequency(float f) {
         float e = DefaultTruth.DEFAULT_TRUTH_EPSILON; //getEpsilon();
@@ -43,7 +45,7 @@ public abstract class AbstractScalarTruth extends AbstractTruth<Float> implement
 
 
     @Override
-    public boolean equalsFrequency(Truth t) {
+    public boolean equalsFrequency(@NotNull Truth t) {
         return (Util.equal(frequency, t.getFrequency(), DefaultTruth.DEFAULT_TRUTH_EPSILON));
     }
 }

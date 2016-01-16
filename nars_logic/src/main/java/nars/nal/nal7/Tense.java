@@ -7,6 +7,8 @@ import nars.task.Temporal;
 import nars.term.compound.Compound;
 import nars.truth.Stamp;
 import nars.truth.Truth;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import static nars.nal.UtilityFunctions.or;
 
@@ -17,6 +19,7 @@ public enum Tense  {
     Present(":|:"),
     Future(":/:");
 
+    @Nullable
     public static final Tense Unknown = null;
 
 
@@ -81,14 +84,14 @@ public enum Tense  {
      * @param solution The solution to be evaluated
      * @return The quality of the judgment as the solution
      */
-    public static float solutionQuality(Task problem, Task solution, long time, int duration) {
+    public static float solutionQuality(@NotNull Task problem, @NotNull Task solution, long time, int duration) {
         float om = orderMatch(problem.term(), solution.term(), duration);
         if (om == 0) return 0f;
         return om * solutionQualityMatchingOrder(problem, solution, time);
     }
 
     /** degree to which the temporal relations of the two terms match */
-    public static float orderMatch(Compound a, Compound b, int duration) {
+    public static float orderMatch(@NotNull Compound a, @NotNull Compound b, int duration) {
         float fduration = (float)duration;
 
         int at = a.t();
@@ -101,11 +104,11 @@ public enum Tense  {
 
     }
 
-    public static float solutionQualityMatchingOrder(Task problem, Task solution, long time) {
+    public static float solutionQualityMatchingOrder(@NotNull Task problem, @NotNull Task solution, long time) {
         return solutionQualityMatchingOrder(problem, solution, time, problem.hasQueryVar() );
     }
 
-    public static float solutionQualityMatchingOrder(final Task problem, final Task solution, final long time, final boolean hasQueryVar) {
+    public static float solutionQualityMatchingOrder(@NotNull final Task problem, @NotNull final Task solution, final long time, final boolean hasQueryVar) {
 
         long poc = problem.getOccurrenceTime();
 
@@ -201,15 +204,15 @@ public enum Tense  {
         return t <= TIMELESS; /* includes ETERNAL */
     }
 
-    public static long getOccurrenceTime(Tense tense, Memory m) {
+    public static long getOccurrenceTime(@NotNull Tense tense, @NotNull Memory m) {
         return getOccurrenceTime(m.time(), tense, m.duration());
     }
 
-    public static long getOccurrenceTime(long creationTime, Tense tense, Memory m) {
+    public static long getOccurrenceTime(long creationTime, @NotNull Tense tense, @NotNull Memory m) {
         return getOccurrenceTime(creationTime, tense, m.duration());
     }
 
-    public static long getOccurrenceTime(long creationTime, Tense tense, int duration) {
+    public static long getOccurrenceTime(long creationTime, @NotNull Tense tense, int duration) {
 
         if (creationTime == TIMELESS) {
             //in this case, occurenceTime must be considered relative to whatever creationTime will be set when perceived
@@ -232,7 +235,7 @@ public enum Tense  {
     }
 
     /** inner between: time difference of later.start() - earlier.end() */
-    public static int between(Temporal task, Temporal belief) {
+    public static int between(@NotNull Temporal task, @NotNull Temporal belief) {
         long tStart = task.start();
         long bStart = belief.start();
 
@@ -246,7 +249,7 @@ public enum Tense  {
     }
 
     /** true if there is a non-zero overlap interval of the tasks */
-    public static boolean overlaps(Task a, Task b) {
+    public static boolean overlaps(@NotNull Task a, @NotNull Task b) {
         return overlaps(a.start(), a.end(), b.start(), b.end());
     }
 
@@ -257,7 +260,7 @@ public enum Tense  {
     /**
      * true if there are any common elements; assumes the arrays are sorted and contain no duplicates
      */
-    public static boolean overlapping(long[] a, long[] b) {
+    public static boolean overlapping(@NotNull long[] a, @NotNull long[] b) {
 
         if (Global.DEBUG) {
             if (a.length == 0 || b.length == 0) {
@@ -279,7 +282,7 @@ public enum Tense  {
         return false;
     }
 
-    public static boolean overlapping(Stamp a, Stamp b) {
+    public static boolean overlapping(@NotNull Stamp a, @Nullable Stamp b) {
 
         long[] ae = a.getEvidence();
         if (b == null) return false;

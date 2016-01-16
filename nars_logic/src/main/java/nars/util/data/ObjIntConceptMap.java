@@ -4,6 +4,7 @@ import com.gs.collections.impl.map.mutable.primitive.ObjectIntHashMap;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.term.Term;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 
@@ -14,23 +15,24 @@ public abstract class ObjIntConceptMap<T extends Term> extends MutableConceptMap
     public final ObjectIntHashMap<T> values = new ObjectIntHashMap();
 
 
-    protected ObjIntConceptMap(NAR nar) {
+    protected ObjIntConceptMap(@NotNull NAR nar) {
         super(nar);
     }
 
+    @NotNull
     @Override
     public Iterator<T> iterator() {
         return values.keySet().iterator();
     }
 
     @Override
-    public boolean include(Concept c) {
+    public boolean include(@NotNull Concept c) {
         T t = (T) c.get();
         return values.getIfAbsentPut(t, 0) == 0;
     }
 
     @Override
-    public boolean exclude(Concept c) {
+    public boolean exclude(@NotNull Concept c) {
         return exclude(c.get());
     }
 

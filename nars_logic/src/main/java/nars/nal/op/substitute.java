@@ -9,6 +9,8 @@ import nars.term.compile.TermBuilder;
 import nars.term.compound.Compound;
 import nars.term.transform.MapSubst;
 import nars.term.transform.Subst;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 
 public class substitute extends ImmediateTermTransform implements PremiseAware {
@@ -17,13 +19,15 @@ public class substitute extends ImmediateTermTransform implements PremiseAware {
     public static final Atom QUERY_VAR = Atom.the("?", true);
     public static final Atom DEP_VAR = Atom.the("#", true);
 
+    @NotNull
     @Override
     public Term function(Compound x, TermBuilder i) {
         throw new RuntimeException("n/a");
     }
 
+    @Nullable
     @Override
-    public Term function(Compound p, PremiseMatch r) {
+    public Term function(@NotNull Compound p, @NotNull PremiseMatch r) {
         final Term[] xx = p.terms();
 
         //term to possibly transform
@@ -38,14 +42,16 @@ public class substitute extends ImmediateTermTransform implements PremiseAware {
         return subst(r, term, x, y);
     }
 
-    public static Term resolve(PremiseMatch r, Term x) {
+    @Nullable
+    public static Term resolve(@NotNull PremiseMatch r, Term x) {
         Term x2 = r.yx.get(x);
         if (x2 == null)
             x2 = x;
         return x2;
     }
 
-    public static Term subst(PremiseMatch r, Term term, Term x, Term y) {
+    @Nullable
+    public static Term subst(@NotNull PremiseMatch r, Term term, @NotNull Term x, Term y) {
         if (x.equals(y))
             return term;
 
@@ -58,11 +64,13 @@ public class substitute extends ImmediateTermTransform implements PremiseAware {
         return subst(r, m, term);
     }
 
-    public static Term subst(PremiseMatch r, Subst m, Term term) {
+    @Nullable
+    public static Term subst(@NotNull PremiseMatch r, @NotNull Subst m, Term term) {
         return subst(r.premise.memory().index, m, term);
     }
 
-    public static Term subst(TermBuilder i, Subst m, Term term) {
+    @Nullable
+    public static Term subst(@NotNull TermBuilder i, @NotNull Subst m, Term term) {
         return i.apply(m, term);
     }
 
@@ -96,7 +104,7 @@ public class substitute extends ImmediateTermTransform implements PremiseAware {
 //    }
 
 
-    public static Op getOp(Term type) {
+    public static Op getOp(@NotNull Term type) {
         Op o;
 
         //TODO cache the type

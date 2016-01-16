@@ -3,6 +3,7 @@ package nars.truth;
 import nars.nal.nal7.Tense;
 import nars.task.Task;
 import nars.util.Texts;
+import org.jetbrains.annotations.NotNull;
 
 /** chart-like representation of a belief state at each time cycle in a range of time */
 public class TruthWave {
@@ -20,7 +21,7 @@ public class TruthWave {
     float expectEternal0, expectEternal1;
     int numEternal, numTemporal;
 
-    public TruthWave(Iterable<Task> beliefs) {
+    public TruthWave(@NotNull Iterable<Task> beliefs) {
 
         long min = Long.MAX_VALUE;
         long max = Long.MIN_VALUE;
@@ -78,6 +79,7 @@ public class TruthWave {
      * for compact display.
      * if the value=1.0, then 'aa' is the result
      */
+    @NotNull
     public static String n2u(float x) {
         if ((x < 0) || (x > 1)) throw new RuntimeException("values >=0 and <=1");
         int hundreds = (int) Texts.hundredths(x);

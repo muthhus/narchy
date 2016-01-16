@@ -4,6 +4,8 @@ import nars.Global;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.util.data.ConceptMap;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.EdgeFactory;
 
@@ -23,6 +25,7 @@ public abstract class ConceptGraph2<E> extends ConceptMap implements DirectedGra
         return 0;
     }
 
+    @Nullable
     @Override
     public Set<E> incomingEdgesOf(Concept vertex) {
         return null;
@@ -33,6 +36,7 @@ public abstract class ConceptGraph2<E> extends ConceptMap implements DirectedGra
         return 0;
     }
 
+    @Nullable
     @Override
     public Set<E> outgoingEdgesOf(Concept vertex) {
         return null;
@@ -52,7 +56,7 @@ public abstract class ConceptGraph2<E> extends ConceptMap implements DirectedGra
 
 
 
-        public void addEdge(Concept target, E e, EdgeSet set) {
+        public void addEdge(Concept target, E e, @NotNull EdgeSet set) {
             switch (set) {
                 case Incoming:
                     ensureIncoming();
@@ -65,7 +69,8 @@ public abstract class ConceptGraph2<E> extends ConceptMap implements DirectedGra
             }
         }
 
-        public E removeEdge(Concept target, EdgeSet set) {
+        @Nullable
+        public E removeEdge(Concept target, @NotNull EdgeSet set) {
             switch (set) {
                 case Incoming:
                     if (incoming!=null)
@@ -80,7 +85,7 @@ public abstract class ConceptGraph2<E> extends ConceptMap implements DirectedGra
         }
     }
 
-    protected ConceptGraph2(NAR nar) {
+    protected ConceptGraph2(@NotNull NAR nar) {
         super(nar);
     }
 
@@ -94,32 +99,37 @@ public abstract class ConceptGraph2<E> extends ConceptMap implements DirectedGra
     }
 
     @Override
-    protected boolean onConceptActive(Concept c) {
+    protected boolean onConceptActive(@NotNull Concept c) {
         c.put(this, new Vertex());
         return true;
     }
 
 
+    @NotNull
     @Override
     public abstract E createEdge(Concept source, Concept target);
 
+    @Nullable
     @Override
     public Set<E> getAllEdges(Concept sourceVertex, Concept targetVertex) {
         return null;
     }
 
+    @Nullable
     @Override
     public E getEdge(Concept sourceVertex, Concept targetVertex) {
         return null;
     }
 
+    @Nullable
     @Override
     public EdgeFactory<Concept, E> getEdgeFactory() {
         return null;
     }
 
+    @NotNull
     @Override
-    public E addEdge(Concept source, Concept target) {
+    public E addEdge(@NotNull Concept source, @NotNull Concept target) {
         E e = createEdge(source, target);
         Vertex sv = source.get(this);
         Vertex tv = target.get(this);
@@ -153,11 +163,13 @@ public abstract class ConceptGraph2<E> extends ConceptMap implements DirectedGra
         return false;
     }
 
+    @Nullable
     @Override
     public Set<E> edgeSet() {
         return null;
     }
 
+    @Nullable
     @Override
     public Set<E> edgesOf(Concept vertex) {
         return null;
@@ -168,6 +180,7 @@ public abstract class ConceptGraph2<E> extends ConceptMap implements DirectedGra
         return false;
     }
 
+    @Nullable
     @Override
     public Set<E> removeAllEdges(Concept sourceVertex, Concept targetVertex) {
         return null;
@@ -178,8 +191,9 @@ public abstract class ConceptGraph2<E> extends ConceptMap implements DirectedGra
         return false;
     }
 
+    @Nullable
     @Override
-    public E removeEdge(Concept source, Concept target) {
+    public E removeEdge(@NotNull Concept source, @NotNull Concept target) {
         Vertex<E> sv = source.get(this);
         Vertex<E> tv = target.get(this);
         E x1 = sv.removeEdge(target, Vertex.EdgeSet.Outgoing);
@@ -199,16 +213,19 @@ public abstract class ConceptGraph2<E> extends ConceptMap implements DirectedGra
         return false;
     }
 
+    @Nullable
     @Override
     public Set<Concept> vertexSet() {
         return null;
     }
 
+    @Nullable
     @Override
     public Concept getEdgeSource(E e) {
         return null;
     }
 
+    @Nullable
     @Override
     public Concept getEdgeTarget(E e) {
         return null;

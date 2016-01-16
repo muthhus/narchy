@@ -4,6 +4,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.compound.Compound;
 import nars.term.visit.SubtermVisitor;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.function.Predicate;
@@ -20,7 +21,7 @@ public abstract class Atomic implements Term {
                 ((u instanceof Termed) && equalsTerm((Termed)u));
     }
 
-    private final boolean equalsTerm(Termed t) {
+    private final boolean equalsTerm(@NotNull Termed t) {
         return (op()==t.op()) && toString().equals(t.toString());
     }
 
@@ -34,7 +35,7 @@ public abstract class Atomic implements Term {
     /**
      * @param that The Term to be compared with the current Term
      */
-    @Override public final int compareTo(Object that) {
+    @Override public final int compareTo(@NotNull Object that) {
         if (that==this) return 0;
 
         Termed t = (Termed)that;
@@ -51,15 +52,15 @@ public abstract class Atomic implements Term {
 
 
     @Override
-    public final void recurseTerms(SubtermVisitor v, Compound parent) {
+    public final void recurseTerms(@NotNull SubtermVisitor v, Compound parent) {
         v.accept(this, parent);
     }
 
-    @Override public final boolean and(Predicate<? super Term> v) {
+    @Override public final boolean and(@NotNull Predicate<? super Term> v) {
         return v.test(this);
     }
 
-    @Override public final boolean or(Predicate<? super Term> v) {
+    @Override public final boolean or(@NotNull Predicate<? super Term> v) {
         return and(v); //re-use and, even though it's so similar
     }
 
@@ -69,11 +70,12 @@ public abstract class Atomic implements Term {
     }
 
     @Override
-    public final void append(Appendable w, boolean pretty) throws IOException {
+    public final void append(@NotNull Appendable w, boolean pretty) throws IOException {
         w.append(toString());
     }
 
     /** preferably use toCharSequence if needing a CharSequence; it avoids a duplication */
+    @NotNull
     @Override
     public final StringBuilder toStringBuilder(boolean pretty) {
         return new StringBuilder(toString());

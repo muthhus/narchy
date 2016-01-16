@@ -14,6 +14,8 @@ import nars.task.Task;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.compound.Compound;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -47,6 +49,7 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
 
 
 
+    @NotNull
     public static Set<String> methodExclusions = new HashSet<String>() {{
         add("hashCode");
         add("notify");
@@ -78,7 +81,8 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
         nar = n;
     }
 
-    public static <N extends NAR> N wrap(N n) throws Exception {
+    @NotNull
+    public static <N extends NAR> N wrap(@NotNull N n) throws Exception {
         NALObjects nalObjects = new NALObjects(n);
         return nalObjects.wrap("this", n);
     }
@@ -143,6 +147,7 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
             this.value = value;
         }
 
+        @NotNull
         @Override
         public String toString() {
             return "Puppet";
@@ -150,7 +155,8 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
     }
 
     //TODO run in separate execution context to avoid synchronized
-    public synchronized Object invoked(Object object, Method method, Object[] args, Object result) {
+    @Nullable
+    public synchronized Object invoked(Object object, @NotNull Method method, Object[] args, @Nullable Object result) {
 
         if (methodExclusions.contains(method.getName()))
             return result;
@@ -204,7 +210,7 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
         return result;
     }
 
-    private Compound getMethodInvocationTerms(Method method, Object instance, Object[] args) {
+    private Compound getMethodInvocationTerms(@NotNull Method method, Object instance, Object[] args) {
 
         //TODO handle static methods
 
@@ -224,7 +230,8 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
         return Stream.of(args).map(this::term).toArray(Term[]::new);
     }
 
-    public static Operator getMethodOperator(Method overridden) {
+    @NotNull
+    public static Operator getMethodOperator(@NotNull Method overridden) {
         //dereference class to origin, not using a wrapped class
         Class c = overridden.getDeclaringClass();
 
@@ -254,7 +261,8 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
 //    }
 //
 
-    public <T> T wrap(String id, Class<? extends T> instance) throws Exception {
+    @NotNull
+    public <T> T wrap(String id, @NotNull Class<? extends T> instance) throws Exception {
         //TODO avoid creating 't' because it will not be used. create the proxy class directly from the class
         T t = instance.newInstance();
         return wrap(id, t);
@@ -265,13 +273,15 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
      *  will be created and its fields will be those
      *  which are manipulated, not the original prototype.
      * */
-    public <T> T wrap(String id, T instance) throws Exception {
+    @NotNull
+    public <T> T wrap(String id, @NotNull T instance) throws Exception {
 
         return wrap(id, (Class<? extends T>)instance.getClass(), instance);
 
     }
 
-    public synchronized Object invokeVolition(Task currentTask, Method method, Object instance, Object[] args) {
+    @Nullable
+    public synchronized Object invokeVolition(Task currentTask, @NotNull Method method, Object instance, Object[] args) {
 
         Object result = null;
 
@@ -304,7 +314,8 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
 //        }
 //    }
 
-    @Override public final Object invoke(Object obj, Method wrapped, Method wrapper, Object[] args) throws Throwable {
+    @Nullable
+    @Override public final Object invoke(Object obj, @NotNull Method wrapped, @NotNull Method wrapper, Object[] args) throws Throwable {
         Object result = wrapper.invoke(obj, args);
         return invoked( obj, wrapped, args, result);
     }
@@ -314,7 +325,8 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
 //    }
 
     /** the id will be the atom term label for the created instance */
-    public <T> T wrap(String id, Class<? extends T> classs, /* nullable */ T instance) throws Exception {
+    @NotNull
+    public <T> T wrap(String id, Class<? extends T> classs, /* nullable */ @NotNull T instance) throws Exception {
 
 
         ProxyFactory factory = proxyCache.getIfAbsentPut(classs, ProxyFactory::new);
@@ -355,7 +367,7 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
         return wrappedInstance;
     }
 
-    public static boolean isMethodVisible(Method m) {
+    public static boolean isMethodVisible(@NotNull Method m) {
         String n = m.getName();
         if (n.contains("_d"))
             return false; //javassist wrapper method

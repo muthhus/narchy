@@ -26,6 +26,8 @@ import nars.task.Task;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.truth.DefaultTruth;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 
@@ -43,7 +45,7 @@ public abstract class feel extends SyncOperator implements Mental {
      * @param memory The memory in which the operation is executed
      * @return Immediate results as Tasks
      */
-    protected static ArrayList<Task> feeling(float value, Memory memory, Term feeling) {
+    protected static ArrayList<Task> feeling(float value, @NotNull Memory memory, Term feeling) {
 
         Term content = instprop(memory.self(), feeling);
 
@@ -55,6 +57,7 @@ public abstract class feel extends SyncOperator implements Mental {
         );
     }
 
+    @Nullable
     public static Term instprop(Term subject, Term predicate) {
         return $.terms.instprop(subject, predicate);
     }

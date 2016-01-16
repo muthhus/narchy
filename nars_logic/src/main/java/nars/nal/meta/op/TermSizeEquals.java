@@ -1,6 +1,7 @@
 package nars.nal.meta.op;
 
 import nars.term.Term;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by me on 12/17/15.
@@ -13,10 +14,11 @@ public final class TermSizeEquals extends MatchOp {
     }
 
     @Override
-    public boolean match(Term t) {
+    public boolean match(@NotNull Term t) {
         return t.size() == size;
     }
 
+    @NotNull
     @Override
     public String toString() {
         return "size=" + size;

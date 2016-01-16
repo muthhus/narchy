@@ -5,6 +5,8 @@ import nars.nal.nal8.Operator;
 import nars.nal.op.ImmediateTermTransform;
 import nars.term.Term;
 import nars.term.compound.Compound;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -13,12 +15,14 @@ public interface Subst  {
 
     boolean isEmpty();
 
+    @Nullable
     Term getXY(Object t);
 
     void clear();
 
     /** match a range of subterms of Y.  */
-    static List<Term> collect(Compound y, int from, int to) {
+    @NotNull
+    static List<Term> collect(@NotNull Compound y, int from, int to) {
         int s = to-from;
 
         List<Term> l = Global.newArrayList(s);
@@ -31,6 +35,7 @@ public interface Subst  {
     }
 
 
+    @Nullable
     default ImmediateTermTransform getTransform(Operator t) {
         return null;
     }

@@ -5,6 +5,8 @@ import nars.term.Term;
 import nars.term.TermContainer;
 import nars.term.Termed;
 import nars.term.compound.Compound;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.function.Consumer;
@@ -24,7 +26,8 @@ public class MapIndex2 extends AbstractMapIndex {
         this.data = data;
     }
 
-    static Object vector(Term t) {
+    @NotNull
+    static Object vector(@NotNull Term t) {
         if (t.isCompound()) return ((Compound)t).subterms();
         return t;
     }
@@ -49,19 +52,22 @@ public class MapIndex2 extends AbstractMapIndex {
     }
 
 
+    @NotNull
     @Override
-    public Termed getTermIfPresent(Termed t) {
+    public Termed getTermIfPresent(@NotNull Termed t) {
         return (Termed) getItemIfPresent(
                 vector(t.term()), t.opRel());
     }
 
 
+    @Nullable
     public Object getItemIfPresent(Object vv, int index) {
         IntObjectHashMap group = data.get(vv);
         if (group == null) return null;
         return group.get(index);
     }
 
+    @Nullable
     @Override
     protected TermContainer getSubtermsIfPresent(TermContainer subterms) {
         return (TermContainer) getItemIfPresent(
@@ -69,7 +75,7 @@ public class MapIndex2 extends AbstractMapIndex {
     }
 
     @Override
-    public void putTerm(Termed t) {
+    public void putTerm(@NotNull Termed t) {
         Object replaced = putItem(vector(t.term()), t.opRel(), t);
         if (replaced == null)
             count++;

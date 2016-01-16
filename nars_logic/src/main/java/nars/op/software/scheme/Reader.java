@@ -6,6 +6,7 @@ import nars.op.software.scheme.cons.Cons;
 import nars.op.software.scheme.exception.UnmatchedDoubleQuotes;
 import nars.op.software.scheme.exception.UnmatchedParenthesisExpection;
 import nars.op.software.scheme.expressions.*;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -19,7 +20,7 @@ import static nars.op.software.scheme.cons.Cons.empty;
 public enum Reader {
     ;
 
-    private static int eatWhiteSpace(String input, int index) {
+    private static int eatWhiteSpace(@NotNull String input, int index) {
         while (index < input.length() && Character.isWhitespace(input.charAt(index))) {
             index++;
         }
@@ -29,7 +30,8 @@ public enum Reader {
 
     private static final Set<Character> DELIMITERS = ImmutableSet.of('(', ')', '\'', ';');
 
-    public static List<String> tokenize(String input) {
+    @NotNull
+    public static List<String> tokenize(@NotNull String input) {
         List<String> res = new ArrayList<>();
         for (int i = eatWhiteSpace(input, 0); i < input.length(); i = eatWhiteSpace(input, i)) {
             char c = input.charAt(i);
@@ -60,7 +62,7 @@ public enum Reader {
         return res;
     }
 
-    public static List<Expression> read(String input) {
+    public static List<Expression> read(@NotNull String input) {
         if (input.trim().isEmpty()) {
             return ImmutableList.of(Expression.none());
         }
@@ -74,7 +76,7 @@ public enum Reader {
         return builder.build();
     }
 
-    public static int countOpenParens(String input) {
+    public static int countOpenParens(@NotNull String input) {
         return tokenize(input).stream()
                 .filter(t -> "(".equals(t) || ")".equals(t))
                 .map(t -> "(".equals(t) ? 1 : -1)
@@ -86,7 +88,8 @@ public enum Reader {
                 });
     }
 
-    private static Cons<Expression> parseSequence(Iterator<String> i) {
+    @NotNull
+    private static Cons<Expression> parseSequence(@NotNull Iterator<String> i) {
         Cons<Expression> result = empty();
         while (i.hasNext()) {
             String token = i.next();
@@ -106,7 +109,8 @@ public enum Reader {
         return result;
     }
 
-    private static <T> Cons<T> add(Cons<T> list, T t) {
+    @NotNull
+    private static <T> Cons<T> add(@NotNull Cons<T> list, T t) {
         if (list.isEmpty()) {
             return cons(t, empty());
         }
@@ -115,7 +119,8 @@ public enum Reader {
         return list;
     }
 
-    private static Expression symbolOrNumber(String token) {
+    @NotNull
+    private static Expression symbolOrNumber(@NotNull String token) {
         //noinspection IfStatementWithTooManyBranches
         if (token.length() > 0 && token.charAt(0) == '\"') {
             return StringExpression.string(token.substring(1, token.length() - 1));

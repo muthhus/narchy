@@ -4,6 +4,8 @@ import nars.bag.BLink;
 import nars.bag.impl.ArrayBag;
 import nars.util.ArraySortedIndex;
 import nars.util.data.sorted.SortedIndex;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 
@@ -17,13 +19,14 @@ import java.io.PrintStream;
 public class ItemAccumulator<V extends Budgeted > {
 
 
+    @NotNull
     private final MyArrayBag arrayBag;
 
     public ItemAccumulator(int capacity) {
         arrayBag = new MyArrayBag(new ArraySortedIndex<BLink<V>>(capacity) {
 
             @Override
-            public float score(BLink<V> v) {
+            public float score(@NotNull BLink<V> v) {
                 return v.getPriority();
             }
         });
@@ -35,12 +38,13 @@ public class ItemAccumulator<V extends Budgeted > {
         arrayBag.items.print(out);
     }
 
+    @NotNull
     public ArrayBag<V> getArrayBag() {
         return arrayBag;
     }
 
     class MyArrayBag extends ArrayBag<V> {
-        public MyArrayBag(SortedIndex<BLink<V>> items) {
+        public MyArrayBag(@NotNull SortedIndex<BLink<V>> items) {
             super(items);
         }
 
@@ -49,13 +53,14 @@ public class ItemAccumulator<V extends Budgeted > {
             return items.getFirst();
         }
 
+        @Nullable
         @Override
         public BLink<V> pop() {
             return removeHighest();
         }
 
         @Override
-        public void update(BLink<V> v) {
+        public void update(@NotNull BLink<V> v) {
             super.update(v);
             v.get().getBudget().set(v); //TODO replace instance's budget on insert so this copy isnt necessary
         }

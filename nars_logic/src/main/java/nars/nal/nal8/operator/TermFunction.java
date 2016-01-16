@@ -15,6 +15,8 @@ import nars.term.compound.Compound;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import nars.util.Texts;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -40,7 +42,7 @@ public abstract class TermFunction<O> extends SyncOperator {
         super(name);
     }
 
-    public static int integer(Term x, int defaultValue)  {
+    public static int integer(@NotNull Term x, int defaultValue)  {
         try {
             return integer(x);
         }
@@ -49,7 +51,7 @@ public abstract class TermFunction<O> extends SyncOperator {
         }
     }
 
-    public static int integer(Term x) throws NumberFormatException {
+    public static int integer(@NotNull Term x) throws NumberFormatException {
         return Texts.i(Atom.unquote(x));
     }
 
@@ -69,10 +71,12 @@ public abstract class TermFunction<O> extends SyncOperator {
      * @param x
      * @param i
      */
+    @Nullable
     public abstract O function(Compound x, TermBuilder i);
 
 
-    protected List<Task> result(NAR nar, Task opTask, Term y/*, Term[] x0, Term lastTerm*/) {
+    @Nullable
+    protected List<Task> result(@NotNull NAR nar, @NotNull Task opTask, Term y/*, Term[] x0, Term lastTerm*/) {
 
         Compound operation = opTask.term();
 
@@ -133,6 +137,7 @@ public abstract class TermFunction<O> extends SyncOperator {
     }
 
     /** default tense applied to result tasks */
+    @NotNull
     public Tense getResultTense() {
         return Tense.Present;
     }
@@ -199,7 +204,7 @@ public abstract class TermFunction<O> extends SyncOperator {
 
 
     @Override
-    public void execute(Execution e) {
+    public void execute(@NotNull Execution e) {
 
         Task opTask = e.task;
         Compound operation = opTask.term();
@@ -296,7 +301,7 @@ public abstract class TermFunction<O> extends SyncOperator {
     /** (can be overridden in subclasses) the extent to which it is truth 
      * that the 2 given terms are equal.  in other words, a distance metric
      */
-    public float equals(Term a, Term b) {
+    public float equals(@NotNull Term a, Term b) {
         //default: Term equality
         return a.equals(b) ? 1.0f : 0.0f;
     }

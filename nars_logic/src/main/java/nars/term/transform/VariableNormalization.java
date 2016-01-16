@@ -4,6 +4,7 @@ import nars.$;
 import nars.Global;
 import nars.term.compound.Compound;
 import nars.term.variable.Variable;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 import java.util.function.Function;
@@ -58,7 +59,7 @@ public class VariableNormalization extends VariableTransform implements Function
     public static final VariableTransform singleVariableNormalization = new VariableTransform() {
 
         @Override
-        public Variable apply(Compound containing, Variable current, int depth) {
+        public Variable apply(Compound containing, @NotNull Variable current, int depth) {
             //      (containing, current, depth) ->
             return $.v(current.op(), 1);
         }
@@ -70,7 +71,7 @@ public class VariableNormalization extends VariableTransform implements Function
 
 
     @Override
-    public final Variable apply(Variable v) {
+    public final Variable apply(@NotNull Variable v) {
         Variable rvv = newVariable(v, rename.size()+1);
         if (!renamed) {
             //test for any rename to know if modification occurred
@@ -85,7 +86,7 @@ public class VariableNormalization extends VariableTransform implements Function
     }
 
     /** if already normalized, alreadyNormalized will be non-null with the value */
-    protected Variable newVariable(Variable v, int serial) {
+    protected Variable newVariable(@NotNull Variable v, int serial) {
         return v.normalize(serial);
     }
 

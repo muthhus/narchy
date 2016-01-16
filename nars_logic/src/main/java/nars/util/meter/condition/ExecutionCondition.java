@@ -3,6 +3,7 @@ package nars.util.meter.condition;
 import nars.NAR;
 import nars.nal.nal7.Tense;
 import nars.term.atom.Atom;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * measures the occurrence of an execution within certain
@@ -16,7 +17,7 @@ public class ExecutionCondition implements NARCondition {
     private boolean success = false;
     private long successTime = Tense.TIMELESS;
 
-    public ExecutionCondition(NAR n, long start, long end, Atom opTerm, float minExpect, float maxExpect) {
+    public ExecutionCondition(@NotNull NAR n, long start, long end, Atom opTerm, float minExpect, float maxExpect) {
 
         this.start = start;
         this.end = end;
@@ -50,6 +51,7 @@ public class ExecutionCondition implements NARCondition {
         return success;
     }
 
+    @NotNull
     @Override
     public String toString() {
         return getClass().getSimpleName() + '[' + opTerm + ", time in " +

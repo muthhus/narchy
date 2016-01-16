@@ -2,6 +2,7 @@ package nars.nal.meta.op;
 
 import nars.term.Term;
 import nars.term.compound.Compound;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Imdex == image index
@@ -14,10 +15,11 @@ public final class ImageIndexEquals extends MatchOp {
     }
 
     @Override
-    public boolean match(Term t) {
+    public boolean match(@NotNull Term t) {
         return ((Compound) t).relation() == index;
     }
 
+    @NotNull
     @Override
     public String toString() {
         return "imdex:" + index;

@@ -5,6 +5,7 @@ import nars.Global;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.term.Term;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
@@ -12,7 +13,7 @@ public abstract class MutableConceptMap<T extends Term> extends ConceptMap imple
 
     public final Set<T> inclusions = Global.newHashSet(16);
 
-    protected MutableConceptMap(NAR n) {
+    protected MutableConceptMap(@NotNull NAR n) {
         super(n);
     }
 
@@ -33,7 +34,7 @@ public abstract class MutableConceptMap<T extends Term> extends ConceptMap imple
     }
 
     @Override
-    protected boolean onConceptForget(Concept c) {
+    protected boolean onConceptForget(@NotNull Concept c) {
         if (inclusions.contains(c.term())) return false;
         return exclude(c);
     }

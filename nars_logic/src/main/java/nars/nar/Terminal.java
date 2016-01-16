@@ -10,6 +10,8 @@ import nars.term.Termed;
 import nars.term.compile.TermIndex;
 import nars.time.Clock;
 import nars.time.FrameClock;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -25,7 +27,7 @@ public class Terminal extends AbstractNAR {
     final Predicate<Task> taskFilter =
             Task::isCommand;
 
-    public Terminal(TermIndex termIndex, Clock c) {
+    public Terminal(TermIndex termIndex, @NotNull Clock c) {
         super(new Memory(
                 c,
                 termIndex
@@ -47,10 +49,11 @@ public class Terminal extends AbstractNAR {
         this (i, new FrameClock());
     }
 
-    public Terminal(Clock c) {
+    public Terminal(@NotNull Clock c) {
         this(TermIndex.memory(1024), c);
     }
 
+    @Nullable
     @Override
     public Concept conceptualize(Termed termed, Budget activation, float scale) {
         return memory.concept(termed); //ignore activation
@@ -76,11 +79,13 @@ public class Terminal extends AbstractNAR {
 //    }
 
 
+    @Nullable
     @Override
     public NAR forEachConcept(Consumer<Concept> recip) {
         return null;
     }
 
+    @NotNull
     public FIFOTaskPerception initInput() {
         return new FIFOTaskPerception(this,
                 taskFilter,

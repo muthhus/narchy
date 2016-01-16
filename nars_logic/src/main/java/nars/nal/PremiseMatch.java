@@ -18,6 +18,8 @@ import nars.term.compound.Compound;
 import nars.term.transform.FindSubst;
 import nars.truth.Truth;
 import nars.util.version.Versioned;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.Random;
@@ -36,12 +38,18 @@ public class PremiseMatch extends FindSubst {
     public ConceptProcess premise;
 
     //public final VarCachedVersionMap secondary;
+    @NotNull
     public final Versioned<Integer> occDelta;
+    @NotNull
     public final Versioned<Integer> tDelta;
+    @NotNull
     public final Versioned<Truth> truth;
+    @NotNull
     public final Versioned<Character> punct;
+    @NotNull
     public final Versioned<MatchTerm> pattern;
 
+    @NotNull
     private TaskBeliefPair termPattern = new TaskBeliefPair();
     public boolean cyclic;
     int termutesPerMatch, termutes;
@@ -72,11 +80,11 @@ public class PremiseMatch extends FindSubst {
      * @param nal Reference to the memory
      * @return The budget of the conclusion
      */
-    public static Budget compoundForward(Truth truth, Termed content, ConceptProcess nal) {
+    public static Budget compoundForward(@NotNull Truth truth, @NotNull Termed content, @NotNull ConceptProcess nal) {
         return BudgetFunctions.compoundForward(new UnitBudget(), truth, content, nal);
     }
 
-    private void addTransform(Class<? extends ImmediateTermTransform> c) {
+    private void addTransform(@NotNull Class<? extends ImmediateTermTransform> c) {
         Operator o = $.operator(c.getSimpleName());
         try {
             transforms.put(o, c.newInstance());
@@ -91,7 +99,7 @@ public class PremiseMatch extends FindSubst {
 
 
 
-    public final void match(MatchTerm pattern /* callback */) {
+    public final void match(@NotNull MatchTerm pattern /* callback */) {
         this.pattern.set(pattern); //to notify of matches
         this.constraints = constraints;
         matchAll(pattern.x, term.get() /* current term */);
@@ -99,7 +107,7 @@ public class PremiseMatch extends FindSubst {
     }
 
     @Override
-    public void matchAll(Term x, Term y, boolean finish) {
+    public void matchAll(@NotNull Term x, @NotNull Term y, boolean finish) {
         this.termutes = termutesPerMatch;
         super.matchAll(x, y, finish);
     }
@@ -114,6 +122,7 @@ public class PremiseMatch extends FindSubst {
 
 
 
+    @NotNull
     @Override
     public String toString() {
         return "RuleMatch:{" +
@@ -131,7 +140,7 @@ public class PremiseMatch extends FindSubst {
     /**
      * set the next premise
      */
-    public final void start(ConceptProcess p, Consumer<Task> receiver, Deriver d) {
+    public final void start(@NotNull ConceptProcess p, Consumer<Task> receiver, @NotNull Deriver d) {
 
         premise = p;
         this.receiver = receiver;
@@ -173,7 +182,7 @@ public class PremiseMatch extends FindSubst {
 
     /** calculates Budget used in a derived task,
      *  returns null if invalid / insufficient */
-    public final Budget getBudget(Truth truth, Termed c) {
+    public final Budget getBudget(@Nullable Truth truth, @NotNull Termed c) {
 
         ConceptProcess p = this.premise;
 
@@ -202,6 +211,7 @@ public class PremiseMatch extends FindSubst {
         return budget;
     }
 
+    @Nullable
     @Override public final Term apply(Term t) {
         //TODO make a half resolve that only does xy?
 

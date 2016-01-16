@@ -1,5 +1,7 @@
 package nars.op.software.scheme.expressions;
 
+import org.jetbrains.annotations.NotNull;
+
 public class BooleanExpression implements Expression {
     public final boolean value;
 
@@ -7,12 +9,13 @@ public class BooleanExpression implements Expression {
         this.value = value;
     }
 
+    @NotNull
     public static BooleanExpression bool(boolean value) {
         return new BooleanExpression(value);
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@NotNull Object o) {
         return getClass() == o.getClass() && value == ((BooleanExpression) o).value;
     }
 
@@ -26,6 +29,7 @@ public class BooleanExpression implements Expression {
         return String.format("bool(%s)", value);
     }
 
+    @NotNull
     @Override
     public String print() {
         return value ? "#t" : "#f";

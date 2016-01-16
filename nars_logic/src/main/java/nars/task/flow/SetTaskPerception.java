@@ -4,6 +4,7 @@ import nars.Memory;
 import nars.budget.BudgetMerge;
 import nars.task.Task;
 import nars.util.data.map.UnifriedMap;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 
@@ -21,18 +22,18 @@ public final class SetTaskPerception extends TaskPerception {
     final BudgetMerge merge;
 
 
-    public SetTaskPerception(Memory m, Consumer<Task> receiver, BudgetMerge merge) {
+    public SetTaskPerception(@NotNull Memory m, Consumer<Task> receiver, BudgetMerge merge) {
         super(m, receiver);
         this.merge = merge;
     }
 
     @Override
-    public void forEach(Consumer<? super Task> each) {
+    public void forEach(@NotNull Consumer<? super Task> each) {
         table.forEach(each);
     }
 
     @Override
-    public void accept(Task t) {
+    public void accept(@NotNull Task t) {
         if (t.getDeleted()) {
             throw new RuntimeException("deleted: " + t);
         }
@@ -43,7 +44,7 @@ public final class SetTaskPerception extends TaskPerception {
     }
 
     @Override
-    public void nextFrame(Consumer<Task> receiver) {
+    public void nextFrame(@NotNull Consumer<Task> receiver) {
         //table.forEach((k, v)->receiver.accept(v));
         table.forEachValue(receiver::accept);
         table.clear();

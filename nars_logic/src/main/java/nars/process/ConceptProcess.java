@@ -12,6 +12,8 @@ import nars.concept.Concept;
 import nars.nal.nal7.Tense;
 import nars.task.Task;
 import nars.term.Termed;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 import java.util.function.Consumer;
@@ -31,6 +33,7 @@ public final class ConceptProcess implements Premise {
     public final BLink<Concept> conceptLink;
     public final BLink<Termed> termLink;
 
+    @Nullable
     private final Task currentBelief;
     private final boolean cyclic;
 
@@ -45,7 +48,7 @@ public final class ConceptProcess implements Premise {
         return conceptLink.get();
     }
 
-    public ConceptProcess(NAR nar, BLink<Concept> conceptLink, BLink<Task> taskLink, BLink<Termed> termLink, Task belief) {
+    public ConceptProcess(NAR nar, BLink<Concept> conceptLink, BLink<Task> taskLink, BLink<Termed> termLink, @Nullable Task belief) {
         this.nar = nar;
 
         this.taskLink = taskLink;
@@ -63,7 +66,7 @@ public final class ConceptProcess implements Premise {
     }
 
 
-    public static int fireAll(NAR nar, BLink<Concept> concept, BLink<Task> taskLink, BLink<Termed> termLink, Consumer<ConceptProcess> cp) {
+    public static int fireAll(@NotNull NAR nar, BLink<Concept> concept, @NotNull BLink<Task> taskLink, @NotNull BLink<Termed> termLink, @NotNull Consumer<ConceptProcess> cp) {
 
         Task task = taskLink.get();
 
@@ -139,6 +142,7 @@ public final class ConceptProcess implements Premise {
 //    }
 
 
+    @Nullable
     @Override
     public final Task getBelief() {
         return currentBelief;

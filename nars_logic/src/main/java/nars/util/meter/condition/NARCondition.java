@@ -1,5 +1,6 @@
 package nars.util.meter.condition;
 
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 import java.io.PrintStream;
@@ -17,14 +18,14 @@ public interface NARCondition extends Serializable {
 
     boolean isTrue();
 
-    default void toString(PrintStream out) {
+    default void toString(@NotNull PrintStream out) {
         out.print(toString());
     }
 
     /** max possible cycle time in which this condition could possibly be satisfied. */
     long getFinalCycle();
 
-    default void toLogger(Logger logger) {
+    default void toLogger(@NotNull Logger logger) {
         String s = toString();
         if (isTrue())
             logger.info(s);

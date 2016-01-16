@@ -25,6 +25,7 @@ import nars.$;
 import nars.Op;
 import nars.term.Termlike;
 import nars.term.atom.AbstractStringAtom;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A variable term, which does not correspond to a concept
@@ -35,7 +36,7 @@ public abstract class Variable extends AbstractStringAtom {
         super(n);
     }
 
-    protected Variable(byte[] n) {
+    protected Variable(@NotNull byte[] n) {
         super(n);
     }
 
@@ -43,7 +44,7 @@ public abstract class Variable extends AbstractStringAtom {
         super(n, specificOp);
     }
 
-    public static Variable v(Op varType, String baseName) {
+    public static Variable v(@NotNull Op varType, String baseName) {
         return v(varType.ch, baseName);
     }
 
@@ -89,7 +90,7 @@ public abstract class Variable extends AbstractStringAtom {
      * true if it has or is a pattern variable
      * necessary because VAR_PATTERN are hidden from substructure
      */
-    public static boolean hasPatternVariable(Termlike t) {
+    public static boolean hasPatternVariable(@NotNull Termlike t) {
         return t.or(x -> x.op() == Op.VAR_PATTERN);
     }
 
@@ -120,6 +121,7 @@ public abstract class Variable extends AbstractStringAtom {
             return $.v(Op.VAR_DEP, serial);
         }
 
+        @NotNull
         @Override
         public Op op() {
             return Op.VAR_DEP;
@@ -158,6 +160,7 @@ public abstract class Variable extends AbstractStringAtom {
             return $.v(Op.VAR_INDEP, serial);
         }
 
+        @NotNull
         @Override
         public Op op() {
             return Op.VAR_INDEP;
@@ -197,6 +200,7 @@ public abstract class Variable extends AbstractStringAtom {
             return $.v(Op.VAR_QUERY, serial);
         }
 
+        @NotNull
         @Override
         public Op op() {
             return Op.VAR_QUERY;

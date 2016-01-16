@@ -9,6 +9,7 @@ import nars.task.Task;
 import nars.term.Term;
 import nars.term.compound.Compound;
 import nars.truth.Truth;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -40,12 +41,14 @@ public class Inperience {
 
     @Deprecated
     public static boolean enabled = true;
+    @NotNull
     private final NAR nar;
 
 
     /** minimum expectation necessary to create a concept
      *  original value: 0.66
      * */
+    @NotNull
     public AtomicDouble conceptCreationExpectation = new AtomicDouble(0.66);
 
 
@@ -99,11 +102,11 @@ public class Inperience {
     }
 
 
-    public static boolean random(Random r, float prob, int volume) {
+    public static boolean random(@NotNull Random r, float prob, int volume) {
         return r.nextFloat()*volume <= prob;
     }
 
-    public Inperience(NAR n) {
+    public Inperience(@NotNull NAR n) {
 
         this.nar = n;
 
@@ -129,7 +132,7 @@ public class Inperience {
     }
 
 
-    public static Compound toTerm(Task s, Term self, float conceptCreationExpectation) {
+    public static Compound toTerm(@NotNull Task s, Term self, float conceptCreationExpectation) {
         Operator opTerm;
         switch (s.getPunctuation()) {
             case Symbols.JUDGMENT:
@@ -167,7 +170,7 @@ public class Inperience {
 
 
 
-    public static Operator randomNonInnate(Random r) {
+    public static Operator randomNonInnate(@NotNull Random r) {
         return nonInnateBeliefOperators[r.nextInt(nonInnateBeliefOperators.length)];
     }
 
@@ -185,7 +188,7 @@ public class Inperience {
 //        return null;
 //    }
 
-    protected void experienceFromTaskInternal(final Task task) {
+    protected void experienceFromTaskInternal(@NotNull final Task task) {
 
         final Term self = nar.memory.self();
 
@@ -231,7 +234,7 @@ public class Inperience {
 
 
 
-    private static void internalizeImplication(Task task, Task belief, Premise nal) {
+    private static void internalizeImplication(@NotNull Task task, @NotNull Task belief, @NotNull Premise nal) {
         Compound taskTerm = task.term();
         Compound beliefTerm = belief.term();
 
@@ -264,7 +267,7 @@ public class Inperience {
         }
     }
 
-    private static void nonInnate(Task task, Task belief, Premise nal, Operator op) {
+    private static void nonInnate(Task task, @NotNull Task belief, @NotNull Premise nal, Operator op) {
         //the operators which dont have a innate belief
         //also get a chance to reveal its effects to the system this way
 
@@ -273,7 +276,7 @@ public class Inperience {
                     nal, 0);
     }
 
-    protected static void beliefReasonDerive(Task parent, Task belief, Compound new_term, Premise p, long delay) {
+    protected static void beliefReasonDerive(Task parent, Task belief, Compound new_term, @NotNull Premise p, long delay) {
 
         //TODO should this be a mew stamp or attached to parent.. originally it was a fresh new stamp from memory
 

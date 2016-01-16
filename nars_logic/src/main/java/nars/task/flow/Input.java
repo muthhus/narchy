@@ -23,6 +23,8 @@ import nars.NAR;
 import nars.task.Task;
 import nars.util.data.buffer.Source;
 import nars.util.event.On;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
@@ -33,6 +35,7 @@ import java.util.function.Consumer;
  */
 public interface Input extends Source<Task> {
 
+    @Nullable
     @Override
     Task get();
 
@@ -52,7 +55,7 @@ public interface Input extends Source<Task> {
     //void input(NAR n, int numPerFrame);
 
 
-    default void input(NAR n, int numPerFrame) {
+    default void input(@NotNull NAR n, int numPerFrame) {
         if (numPerFrame == 0)
             throw new RuntimeException("0 rate");
         /*if (reg!=null)

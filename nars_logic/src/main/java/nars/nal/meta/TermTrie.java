@@ -3,6 +3,7 @@ package nars.nal.meta;
 import com.google.common.base.Joiner;
 import com.gs.collections.impl.map.mutable.primitive.ObjectIntHashMap;
 import nars.term.Term;
+import org.jetbrains.annotations.NotNull;
 import org.magnos.trie.Trie;
 import org.magnos.trie.TrieNode;
 import org.magnos.trie.TrieSequencer;
@@ -18,18 +19,19 @@ import static com.sun.org.apache.xerces.internal.impl.xs.opti.SchemaDOM.indent;
  * of unique) terms in a magnos trie */
 abstract public class TermTrie<K extends Term, V> {
 
+    @NotNull
     public final Trie<List<K>, V> trie;
 
     public void printSummary() {
         printSummary(System.out);
     }
 
-    public void printSummary(PrintStream out) {
+    public void printSummary(@NotNull PrintStream out) {
         printSummary(trie.root, out);
     }
 
 
-    public TermTrie(Iterable<V> R) {
+    public TermTrie(@NotNull Iterable<V> R) {
         super();
 
         ObjectIntHashMap<Term> conds = new ObjectIntHashMap<>();
@@ -37,7 +39,7 @@ abstract public class TermTrie<K extends Term, V> {
         trie = new Trie(new TrieSequencer<List<K>>() {
 
             @Override
-            public int matches(List<K> sequenceA, int indexA, List<K> sequenceB, int indexB, int count) {
+            public int matches(@NotNull List<K> sequenceA, int indexA, @NotNull List<K> sequenceB, int indexB, int count) {
                 for (int i = 0; i < count; i++) {
                     K a = sequenceA.get(i + indexA);
                     K b = sequenceB.get(i + indexB);
@@ -49,12 +51,12 @@ abstract public class TermTrie<K extends Term, V> {
             }
 
             @Override
-            public int lengthOf(List<K> sequence) {
+            public int lengthOf(@NotNull List<K> sequence) {
                 return sequence.size();
             }
 
             @Override
-            public int hashOf(List<K> sequence, int index) {
+            public int hashOf(@NotNull List<K> sequence, int index) {
                 //return sequence.get(index).hashCode();
 
                 Term pp = sequence.get(index);
@@ -68,7 +70,7 @@ abstract public class TermTrie<K extends Term, V> {
     /** called for each item on insert */
     abstract public void index(V v);
 
-    public static <A, B> void printSummary(TrieNode<List<A>,B> node, PrintStream out) {
+    public static <A, B> void printSummary(@NotNull TrieNode<List<A>,B> node, @NotNull PrintStream out) {
 
         node.forEach(n -> {
             List<A> seq = n.getSequence();

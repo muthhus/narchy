@@ -2,6 +2,8 @@ package nars.util.data;
 
 import nars.NAR;
 import nars.truth.DefaultTruth;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 
@@ -13,6 +15,7 @@ import static nars.util.Texts.n2;
 public class UniformVector  {
 
     float epsilon = DefaultTruth.DEFAULT_TRUTH_EPSILON;
+    @Nullable
     public double[] lastData = null;
     public final double[] data;
     private final String prefix;
@@ -65,6 +68,7 @@ public class UniformVector  {
         return Math.abs(a - b) >= epsilon;
     }
     
+    @NotNull
     public UniformVector setPriority(float p) {
         priority = p;
         return this;

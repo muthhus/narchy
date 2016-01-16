@@ -29,6 +29,8 @@ import nars.term.compound.Compound;
 import nars.time.Clock;
 import nars.util.event.*;
 import net.openhft.affinity.AffinityLock;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,6 +89,7 @@ public abstract class NAR implements Serializable, Level {
      * The memory of the reasoner
      * TODO dont expose as public
      */
+    @NotNull
     public final Memory memory;
     /**
      * The id/name of the reasoner
@@ -103,7 +106,7 @@ public abstract class NAR implements Serializable, Level {
     private final transient Deque<Runnable> nextTasks = new ConcurrentLinkedDeque();
 
 
-    public NAR(Memory m) {
+    public NAR(@NotNull Memory m) {
 
         memory = m;
 
@@ -146,6 +149,7 @@ public abstract class NAR implements Serializable, Level {
      * will remain attached but enabled plugins will have been deactivated and
      * reactivated, a signal for them to empty their state (if necessary).
      */
+    @NotNull
     public synchronized NAR reset() {
         runNextTasks();
 
@@ -158,7 +162,8 @@ public abstract class NAR implements Serializable, Level {
         return this;
     }
 
-    public FileInput input(File input) throws IOException {
+    @NotNull
+    public FileInput input(@NotNull File input) throws IOException {
         FileInput fi = new FileInput(this, input);
         input((Input) fi);
         return fi;
@@ -167,6 +172,7 @@ public abstract class NAR implements Serializable, Level {
     /**
      * inputs a task, only if the parsed text is valid; returns null if invalid
      */
+    @Nullable
     public Task inputTask(String taskText) {
         //try {
         Task t = task(taskText);
@@ -182,20 +188,24 @@ public abstract class NAR implements Serializable, Level {
     /**
      * parses and forms a Task from a string but doesnt input it
      */
+    @Nullable
     public Task task(String taskText) {
         return Narsese.the().task(taskText, memory);
     }
 
+    @NotNull
     public List<Task> tasks(String parse) {
         List<Task> result = Global.newArrayList(1);
         Narsese.the().tasks(parse, result, memory);
         return result;
     }
 
+    @NotNull
     public TaskQueue inputs(String parse) {
         return input(tasks(parse));
     }
 
+    @NotNull
     public TextInput input(String text) {
         TextInput i = new TextInput(this, text);
         /*if (i.size() == 0) {
@@ -206,6 +216,7 @@ public abstract class NAR implements Serializable, Level {
         return i;
     }
 
+    @NotNull
     public <T extends Termed> T term(String t) throws NarseseException {
 
         T x = (T) Narsese.the().term(t, index());
@@ -228,6 +239,7 @@ public abstract class NAR implements Serializable, Level {
     /**
      * gets a concept if it exists, or returns null if it does not
      */
+    @Nullable
     public Concept concept(String conceptTerm) throws NarseseException {
         return memory.concept(term(conceptTerm));
     }
@@ -235,6 +247,7 @@ public abstract class NAR implements Serializable, Level {
     /**
      * ask question
      */
+    @NotNull
     public Task ask(String termString) throws NarseseException {
         //TODO remove '?' if it is attached at end
         /*if (t instanceof Compound)
@@ -245,6 +258,7 @@ public abstract class NAR implements Serializable, Level {
     /**
      * ask question
      */
+    @NotNull
     public Task ask(Compound c) {
         //TODO remove '?' if it is attached at end
         return ask(c, QUESTION);
@@ -253,6 +267,7 @@ public abstract class NAR implements Serializable, Level {
     /**
      * ask quest
      */
+    @Nullable
     public Task askShould(String questString) throws NarseseException {
         Term c = term(questString);
         if (c instanceof Compound)
@@ -263,6 +278,7 @@ public abstract class NAR implements Serializable, Level {
     /**
      * ask quest
      */
+    @NotNull
     public Task askShould(Compound quest) {
         return ask(quest, QUEST);
     }
@@ -270,47 +286,56 @@ public abstract class NAR implements Serializable, Level {
     /**
      * desire goal
      */
-    public Task goal(Compound goalTerm, Tense tense, float freq, float conf) throws NarseseException {
+    @Nullable
+    public Task goal(Compound goalTerm, @NotNull Tense tense, float freq, float conf) throws NarseseException {
         return goal(
                 memory.getDefaultPriority(GOAL),
                 memory.getDefaultDurability(GOAL),
                 goalTerm, time(tense), freq, conf);
     }
 
-    public NAR believe(Termed term, Tense tense, float freq, float conf) throws NarseseException {
+    @NotNull
+    public NAR believe(Termed term, @NotNull Tense tense, float freq, float conf) throws NarseseException {
         believe(memory.getDefaultPriority(JUDGMENT), term, time(tense), freq, conf);
         return this;
     }
 
+    @Nullable
     public Task believe(float priority, Termed term, long when, float freq, float conf) throws NarseseException {
         return believe(priority, memory.getDefaultDurability(JUDGMENT), term, when, freq, conf);
     }
 
+    @NotNull
     public NAR believe(Termed term, float freq, float conf) throws NarseseException {
         return believe(term, Tense.Eternal, freq, conf);
     }
 
-    public NAR believe(String term, Tense tense, float freq, float conf) throws NarseseException {
+    @NotNull
+    public NAR believe(String term, @NotNull Tense tense, float freq, float conf) throws NarseseException {
         believe(memory.getDefaultPriority(JUDGMENT), term(term), time(tense), freq, conf);
         return this;
     }
 
-    public long time(Tense tense) {
+    public long time(@NotNull Tense tense) {
         return Tense.getOccurrenceTime(tense, memory);
     }
 
+    @NotNull
     public NAR believe(String termString, float freq, float conf) throws NarseseException {
         return believe((Termed) term(termString), freq, conf);
     }
 
+    @NotNull
     public NAR believe(String termString) throws NarseseException {
         return believe((Termed) term(termString));
     }
 
+    @NotNull
     public NAR believe(Termed term) throws NarseseException {
         return believe(term, 1.0f, memory.getDefaultConfidence(JUDGMENT));
     }
 
+    @Nullable
     public Task believe(float pri, float dur, Termed term, long occurrenceTime, float freq, float conf) throws NarseseException {
         return input(pri, dur, term, JUDGMENT, occurrenceTime, freq, conf);
     }
@@ -318,11 +343,13 @@ public abstract class NAR implements Serializable, Level {
     /**
      * TODO add parameter for Tense control. until then, default is Now
      */
+    @Nullable
     public Task goal(float pri, float dur, Termed goal, long occurrence, float freq, float conf) throws NarseseException {
         return input(pri, dur, goal, GOAL, occurrence, freq, conf);
     }
 
-    public Task input(float pri, float dur, Termed term, char punc, long occurrenceTime, float freq, float conf) {
+    @Nullable
+    public Task input(float pri, float dur, @Nullable Termed term, char punc, long occurrenceTime, float freq, float conf) {
 
         if (term == null) {
             return null;
@@ -338,6 +365,7 @@ public abstract class NAR implements Serializable, Level {
         return t;
     }
 
+    @NotNull
     public <T extends Compound> Task ask(T term, char questionOrQuest) throws NarseseException {
 
 
@@ -365,7 +393,8 @@ public abstract class NAR implements Serializable, Level {
     /**
      * returns a validated task if valid, null otherwise
      */
-    public Task validInput(Task t) {
+    @Nullable
+    public Task validInput(@NotNull Task t) {
         Memory m = memory;
 
 //        if (t == null) {
@@ -413,7 +442,7 @@ public abstract class NAR implements Serializable, Level {
      *
      * @return number of invoked handlers
      */
-    public int execute(Task goal) {
+    public int execute(@NotNull Task goal) {
         Term term = goal.term();
 
         if (!goal.isEternal())
@@ -457,13 +486,15 @@ public abstract class NAR implements Serializable, Level {
         return memory.index;
     }
 
-    public TaskQueue input(Collection<Task> t) {
+    @NotNull
+    public TaskQueue input(@NotNull Collection<Task> t) {
         TaskQueue tq = new TaskQueue(t);
         input((Input) tq);
         return tq;
     }
 
-    public TaskQueue input(Task[] t) {
+    @NotNull
+    public TaskQueue input(@NotNull Task[] t) {
         TaskQueue tq = new TaskQueue(t);
         input((Input) tq);
         return tq;
@@ -473,25 +504,25 @@ public abstract class NAR implements Serializable, Level {
         return onExec(Atom.the(operator), f);
     }
 
-    public On onExecTerm(String operator, Function<Term[], Object> f) {
+    public On onExecTerm(String operator, @NotNull Function<Term[], Object> f) {
         return onExecTerm(Atom.the(operator), f);
     }
 
     /**
      * creates a TermFunction operator from a supplied function, which can be a lambda
      */
-    public On onExecTerm(Term operator, Function<Term[], Object> func) {
+    public On onExecTerm(Term operator, @NotNull Function<Term[], Object> func) {
         return onExec(operator, new TermFunction(operator) {
 
             @Override
-            public Object function(Compound x, TermBuilder i) {
+            public Object function(@NotNull Compound x, TermBuilder i) {
                 return func.apply(x.terms());
             }
 
         });
     }
 
-    public On onExec(AbstractOperator r) {
+    public On onExec(@NotNull AbstractOperator r) {
         return onExec(r.getOperatorTerm(), r);
     }
 
@@ -516,11 +547,13 @@ public abstract class NAR implements Serializable, Level {
      * Adds an input channel for input from an external sense / sensor.
      * Will remain added until it closes or it is explicitly removed.
      */
-    public Input input(Input i) {
+    @NotNull
+    public Input input(@NotNull Input i) {
         i.input(this, 1);
         return i;
     }
 
+    @NotNull
     public EventEmitter event() {
         return memory.event;
     }
@@ -537,6 +570,7 @@ public abstract class NAR implements Serializable, Level {
     /**
      * steps 1 frame forward. cyclesPerFrame determines how many cycles this frame consists of
      */
+    @NotNull
     public NAR frame() {
         return frame(1);
     }
@@ -551,6 +585,7 @@ public abstract class NAR implements Serializable, Level {
      * is sufficiently high (ie. dont use this in a loop;
      * instead put the loop inside an AffinityLock)
      */
+    @NotNull
     public NAR frameBatch(int frames) {
 
         AffinityLock al = AffinityLock.acquireLock();
@@ -568,6 +603,7 @@ public abstract class NAR implements Serializable, Level {
      *
      * @return total time in seconds elapsed in realtime
      */
+    @NotNull
     public NAR frame(int frames) {
 
 
@@ -601,14 +637,16 @@ public abstract class NAR implements Serializable, Level {
         return this;
     }
 
-    public NAR trace(Appendable out, Predicate<String> includeKey) {
+    @NotNull
+    public NAR trace(@NotNull Appendable out, Predicate<String> includeKey) {
         return trace(out, includeKey, null);
     }
 
     /* Print all statically known events (discovered via reflection)
     *  for this reasoner to a stream
     * */
-    public NAR trace(Appendable out, Predicate<String> includeKey, Predicate includeValue) {
+    @NotNull
+    public NAR trace(@NotNull Appendable out, Predicate<String> includeKey, @Nullable Predicate includeValue) {
 
 
         String[] previous = {null};
@@ -627,23 +665,27 @@ public abstract class NAR implements Serializable, Level {
         return this;
     }
 
-    public NAR trace(Appendable out) {
+    @NotNull
+    public NAR trace(@NotNull Appendable out) {
         return trace(out, k -> true);
     }
 
+    @NotNull
     public NAR log() {
         return log(System.out);
     }
 
-    public NAR log(Appendable out) {
+    @NotNull
+    public NAR log(@NotNull Appendable out) {
         return log(out, null);
     }
 
-    public NAR log(Appendable out, Predicate includeValue) {
+    @NotNull
+    public NAR log(@NotNull Appendable out, Predicate includeValue) {
         return trace(out, NAR.logEvents::contains, includeValue);
     }
 
-    public void outputEvent(Appendable out, String previou, String k, Object v) throws IOException {
+    public void outputEvent(@NotNull Appendable out, String previou, @NotNull String k, Object v) throws IOException {
         //indent each cycle
         if (!"eventCycleStart".equals(k)) {
             out.append("  ");
@@ -676,10 +718,12 @@ public abstract class NAR implements Serializable, Level {
     /**
      * creates a new loop which begins paused
      */
+    @NotNull
     public NARLoop loop() {
         return loop(-1);
     }
 
+    @NotNull
     public NARLoop loop(float initialFPS) {
         float millisecPerFrame = 1000.0f / initialFPS;
         return loop((int) millisecPerFrame);
@@ -690,6 +734,7 @@ public abstract class NAR implements Serializable, Level {
      *
      * @param initialFramePeriodMS in milliseconds
      */
+    @NotNull
     NARLoop loop(int initialFramePeriodMS) {
 //        //TODO use DescriptiveStatistics to track history of frametimes to slow down (to decrease speed rate away from desired) or speed up (to reach desired framerate).  current method is too nervous, it should use a rolling average
 
@@ -699,6 +744,7 @@ public abstract class NAR implements Serializable, Level {
     /**
      * sets current maximum allowed NAL level (1..8)
      */
+    @NotNull
     public NAR nal(int level) {
         memory.nal(level);
         return this;
@@ -716,7 +762,7 @@ public abstract class NAR implements Serializable, Level {
      * adds a task to the queue of task which will be executed in batch
      * after the end of the current frame before the next frame.
      */
-    public void beforeNextFrame(Runnable t) {
+    public void beforeNextFrame(@NotNull Runnable t) {
         if (running.get()) {
             //in a frame, so schedule for after it
             nextTasks.addLast(t);
@@ -747,11 +793,11 @@ public abstract class NAR implements Serializable, Level {
      * queues a task to (hopefully) be executed at an unknown time in the future,
      * in its own thread in a thread pool
      */
-    public boolean execAsync(Runnable t) {
+    public boolean execAsync(@NotNull Runnable t) {
         return execAsync(t, null);
     }
 
-    public boolean execAsync(Runnable t, Consumer<RejectedExecutionException> onError) {
+    public boolean execAsync(@NotNull Runnable t, @Nullable Consumer<RejectedExecutionException> onError) {
         try {
             memory.eventSpeak.emit("execAsync " + t);
             memory.eventSpeak.emit("pool: " + NAR.asyncs.getActiveCount() + " running, " + NAR.asyncs.getTaskCount() + " pending");
@@ -766,6 +812,7 @@ public abstract class NAR implements Serializable, Level {
         }
     }
 
+    @NotNull
     @Override
     public String toString() {
         return getClass().getSimpleName() + '[' + memory.toString() + ']';
@@ -784,7 +831,8 @@ public abstract class NAR implements Serializable, Level {
         return running.get();
     }
 
-    public NAR answer(String question, Consumer<Task> recvSolution) {
+    @NotNull
+    public NAR answer(@NotNull String question, @NotNull Consumer<Task> recvSolution) {
         //question punctuation optional
         if (!(question.length() > 0 && question.charAt(question.length() - 1) == '?')) question = question + '?';
         Task qt = task(question);
@@ -794,7 +842,8 @@ public abstract class NAR implements Serializable, Level {
     /**
      * inputs the question and observes answer events for a solution
      */
-    public NAR answer(Task questionOrQuest, Consumer<Task> c) {
+    @NotNull
+    public NAR answer(Task questionOrQuest, @NotNull Consumer<Task> c) {
         new AnswerReaction(this, questionOrQuest) {
 
             @Override
@@ -806,11 +855,13 @@ public abstract class NAR implements Serializable, Level {
         return this;
     }
 
-    public NAR input(String... ss) {
+    @NotNull
+    public NAR input(@NotNull String... ss) {
         for (String s : ss) input(s);
         return this;
     }
 
+    @NotNull
     public NAR inputAt(long time, String... tt) {
         LongPredicate timeCondition = t -> t == time;
 
@@ -822,9 +873,10 @@ public abstract class NAR implements Serializable, Level {
         return this;
     }
 
+    @NotNull
     public NAR forEachConceptTask(boolean includeConceptBeliefs, boolean includeConceptQuestions, boolean includeConceptGoals, boolean includeConceptQuests,
                                   boolean includeTaskLinks, int maxPerConcept,
-                                  Consumer<Task> recip) {
+                                  @NotNull Consumer<Task> recip) {
         forEachConcept(c -> {
             if (includeConceptBeliefs && c.hasBeliefs()) c.getBeliefs().top(maxPerConcept, recip);
             if (includeConceptQuestions && c.hasQuestions()) c.getQuestions().top(maxPerConcept, recip);
@@ -837,28 +889,34 @@ public abstract class NAR implements Serializable, Level {
         return this;
     }
 
+    @Nullable
     public abstract NAR forEachConcept(Consumer<Concept> recip);
 
+    @Nullable
     public abstract Concept conceptualize(Termed termed, Budget activation, float scale);
 
-    public NAR stopIf(BooleanSupplier stopCondition) {
+    @NotNull
+    public NAR stopIf(@NotNull BooleanSupplier stopCondition) {
         onEachFrame(n -> {
             if (stopCondition.getAsBoolean()) stop();
         });
         return this;
     }
 
+    @NotNull
     public NAR onEachCycle(Consumer<Memory> receiver) {
         regs.add(memory.eventCycleEnd.on(receiver));
         return this;
     }
 
+    @NotNull
     public NAR onEachFrame(Consumer<NAR> receiver) {
         regs.add(memory.eventFrameStart.on(receiver));
         return this;
     }
 
 
+    @NotNull
     public NAR trace() {
 
         trace(System.out);
@@ -866,7 +924,7 @@ public abstract class NAR implements Serializable, Level {
         return this;
     }
 
-    public void input(Stream<Task> taskStream) {
+    public void input(@NotNull Stream<Task> taskStream) {
         input(new TaskStream(taskStream));
     }
 
@@ -875,7 +933,8 @@ public abstract class NAR implements Serializable, Level {
      *
      * TODO make private
      */
-    public final Concept process(Task task) {
+    @Nullable
+    public final Concept process(@NotNull Task task) {
 
         Termed term = task.concept();
 
@@ -903,11 +962,12 @@ public abstract class NAR implements Serializable, Level {
      * when possible, try to provide an existing Concept instance
      * to avoid a lookup
      */
+    @Nullable
     public Concept concept(Termed termed) {
         return memory.concept(termed);
     }
 
-    public On onQuestion(PatternAnswer p) {
+    public On onQuestion(@NotNull PatternAnswer p) {
         return memory.eventTaskProcess.on(question -> {
             if (question.getPunctuation() == '?') {
                 beforeNextFrame(() -> {

@@ -4,6 +4,7 @@ import nars.bag.BLink;
 import nars.bag.Bag;
 import nars.util.data.Util;
 import nars.util.data.random.XORShiftRandom;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Random;
 
@@ -23,7 +24,8 @@ public enum BagGenerators {
 //        return testRemovalPriorityDistribution(loops, insertsPerLoop, fractionToAdjust, fractionToRemove, f, true);
 //    }
 
-    public static int[] testRemovalPriorityDistribution(int loops, int insertsPerLoop, float fractionToRemove, Bag<CharSequence> f) {
+    @NotNull
+    public static int[] testRemovalPriorityDistribution(int loops, int insertsPerLoop, float fractionToRemove, @NotNull Bag<CharSequence> f) {
 
         int levels = 13;
         int[] count = new int[levels];
@@ -123,7 +125,7 @@ public enum BagGenerators {
 
     }
 
-    protected static int removal(int nRemoved, float p, int[] count) {
+    protected static int removal(int nRemoved, float p, @NotNull int[] count) {
 
         int l = count.length;
         int level = Util.bin(p, l);
@@ -133,7 +135,8 @@ public enum BagGenerators {
         return nRemoved;
     }
 
-    public static int[] testRetaining(int loops, int insertsPerLoop, Bag<CharSequence> f) {
+    @NotNull
+    public static int[] testRetaining(int loops, int insertsPerLoop, @NotNull Bag<CharSequence> f) {
 
         int levels = 9;
         int[] count = new int[levels];

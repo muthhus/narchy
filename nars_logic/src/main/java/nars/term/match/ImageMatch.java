@@ -3,6 +3,7 @@ package nars.term.match;
 import nars.Op;
 import nars.term.Term;
 import nars.term.compound.Compound;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * the indicated relation term is inserted
@@ -22,7 +23,8 @@ public enum ImageMatch /*extends ArrayEllipsisMatch<Term>*/ {
      * @param y the (concrete) image being matched against the pattern
      * @return
      */
-    public static EllipsisMatch put(Term[] t, Term relationTerm, Compound y) {
+    @NotNull
+    public static EllipsisMatch put(@NotNull Term[] t, Term relationTerm, @NotNull Compound y) {
 
         int l = t.length;
         Term[] t2 = new Term[l + 1];
@@ -40,7 +42,8 @@ public enum ImageMatch /*extends ArrayEllipsisMatch<Term>*/ {
         return new EllipsisMatch(t2);
     }
 
-    public static EllipsisMatch take(EllipsisMatch m, int imageIndex) {
+    @NotNull
+    public static EllipsisMatch take(@NotNull EllipsisMatch m, int imageIndex) {
 
         //this.imageIndex = imageIndex;
 

@@ -8,6 +8,7 @@ import nars.term.Term;
 import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.term.compound.Compound;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -26,7 +27,7 @@ public class PostCondition implements Serializable, Level //since there can be m
     public final Term beliefTruth;
     public final Term goalTruth;
 
-    public PostCondition(Term term, Term beliefTruth, Term goalTruth, char puncOverride) {
+    public PostCondition(@NotNull Term term, Term beliefTruth, Term goalTruth, char puncOverride) {
         this.term = term;
         //this.modifiers = modifiers;
         this.beliefTruth = beliefTruth;
@@ -35,6 +36,7 @@ public class PostCondition implements Serializable, Level //since there can be m
         minNAL = Terms.maxLevel(term);// term.op().minLevel;
     }
 
+    @NotNull
     public final Term term;
     //public final Term[] modifiers;
 
@@ -84,8 +86,8 @@ public class PostCondition implements Serializable, Level //since there can be m
      * @param modifiers
      * @throws RuntimeException
      */
-    public static PostCondition make(PremiseRule rule, Term term,
-                                     Term... modifiers) throws RuntimeException {
+    public static PostCondition make(@NotNull PremiseRule rule, @NotNull Term term,
+                                     @NotNull Term... modifiers) throws RuntimeException {
 
 
         //TruthOperator judgmentTruth = null,goalTruth = null;
@@ -199,7 +201,7 @@ public class PostCondition implements Serializable, Level //since there can be m
 
 
 
-    boolean valid(PremiseRule rule) {
+    boolean valid(@NotNull PremiseRule rule) {
         Term term = this.term;
 
         if (!modifiesPunctuation() && term instanceof Compound) {
@@ -224,6 +226,7 @@ public class PostCondition implements Serializable, Level //since there can be m
 
 
 
+    @NotNull
     @Override
     public String toString() {
         return "PostCondition{" +

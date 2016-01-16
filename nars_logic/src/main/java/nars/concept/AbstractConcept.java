@@ -2,6 +2,7 @@ package nars.concept;
 
 import nars.term.Term;
 import nars.term.Termed;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
@@ -12,6 +13,7 @@ public abstract class AbstractConcept implements Concept {
 
     private final Term term;
 
+    @Nullable
     protected Map meta = null;
 
     protected AbstractConcept(Term term) {
@@ -27,6 +29,7 @@ public abstract class AbstractConcept implements Concept {
     /**
      * metadata table where processes can store and retrieve concept-specific data by a key. lazily allocated
      */
+    @Nullable
     @Override
     public final Map<Object, Object> getMeta() {
         return meta;

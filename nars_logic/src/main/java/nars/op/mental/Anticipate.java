@@ -32,6 +32,7 @@ import nars.task.MutableTask;
 import nars.task.Task;
 import nars.task.Temporal;
 import nars.term.compound.Compound;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 import java.util.List;
@@ -49,6 +50,7 @@ public final class Anticipate {
 
     final Multimap<Compound,TaskTime> anticipations = LinkedHashMultimap.create();
 
+    @NotNull
     private final NAR nar;
 
     private static final boolean debug = false;
@@ -64,14 +66,14 @@ public final class Anticipate {
     final List<TaskTime> toRemove = Global.newArrayList();
 
 
-    public Anticipate(NAR nar) {
+    public Anticipate(@NotNull NAR nar) {
         this.nar = nar;
 
         nar.memory.eventCycleEnd.on(c -> updateAnticipations());
         nar.memory.eventInput.on(this::onInput);
     }
 
-    public void onInput(Task t) {
+    public void onInput(@NotNull Task t) {
         if (((Temporal)t).isAnticipated()) {
             anticipate(t);
             if (t.isInput())
@@ -79,7 +81,7 @@ public final class Anticipate {
         }
     }
 
-    public void anticipate(Task t) {
+    public void anticipate(@NotNull Task t) {
 
         if(t.getTruth().getExpectation() < DEFAULT_CONFIRMATION_EXPECTATION || t.getPunctuation() != Symbols.JUDGMENT) {
             return;
@@ -108,7 +110,7 @@ public final class Anticipate {
 
     }
 
-    protected void deriveDidntHappen(Compound prediction, TaskTime tt) {
+    protected void deriveDidntHappen(Compound prediction, @NotNull TaskTime tt) {
 
 //        if(testing) {
 //            String s = "did not happen: " + prediction.toString();
@@ -134,7 +136,7 @@ public final class Anticipate {
 
 
 
-    protected void mayHaveHappenedAsExpected(Task c) {
+    protected void mayHaveHappenedAsExpected(@NotNull Task c) {
 
         if(!c.isInput() || c.isEternal()) {
             return; //it's not a input task, the system is not allowed to convince itself about the state of affairs ^^
@@ -184,6 +186,7 @@ public final class Anticipate {
     public static final class TaskTime {
 
         /** all data is from task */
+        @NotNull
         public final Task task;
 
         /** cached locally, same value as in task */
@@ -194,7 +197,7 @@ public final class Anticipate {
         private final int hash;
         public float tolerance = 0;
 
-        public TaskTime(Task task, long creationTime) {
+        public TaskTime(@NotNull Task task, long creationTime) {
             this.task = task;
             this.creationTime = task.getCreationTime();
             occurrTime = task.getOccurrenceTime();

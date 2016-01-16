@@ -7,6 +7,7 @@ import nars.nal.meta.TaskBeliefPair;
 import nars.nal.meta.TermPattern;
 import nars.term.Term;
 import nars.term.constraint.MatchConstraint;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -17,11 +18,13 @@ import java.util.List;
 
     //public final TaskBeliefPair pattern;
 
+    @NotNull
     final TermPattern compiled;
 
+    @NotNull
     final String id;
 
-    public MatchTaskBelief(TaskBeliefPair pattern, ListMultimap<Term, MatchConstraint> constraints) {
+    public MatchTaskBelief(@NotNull TaskBeliefPair pattern, ListMultimap<Term, MatchConstraint> constraints) {
 
         //this.pattern = pattern;
         compiled = new TermPattern(pattern, constraints);
@@ -48,12 +51,12 @@ import java.util.List;
 
     }
 
-    public void addPreConditions(Collection<Term> l) {
+    public void addPreConditions(@NotNull Collection<Term> l) {
         Collections.addAll(l, compiled.pre);
     }
 
     @Override
-    public void addConditions(List<Term> l) {
+    public void addConditions(@NotNull List<Term> l) {
         Collections.addAll(l, compiled.code);
     }
 
@@ -62,6 +65,7 @@ import java.util.List;
         throw new RuntimeException("this should not be called");
     }
 
+    @NotNull
     @Override
     public final String toString() {
         return id;

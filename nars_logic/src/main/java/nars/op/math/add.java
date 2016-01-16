@@ -22,14 +22,16 @@ import nars.op.mental.Mental;
 import nars.term.Term;
 import nars.term.compile.TermBuilder;
 import nars.term.compound.Compound;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Count the number of elements in a set
  */
 public class add extends TermFunction<Integer> implements Mental {
 
+    @NotNull
     @Override
-    public Integer function(Compound o, TermBuilder i) {
+    public Integer function(@NotNull Compound o, TermBuilder i) {
 
         Term[] x = o.terms();
 
@@ -55,6 +57,7 @@ public class add extends TermFunction<Integer> implements Mental {
         return n1 + n2;
     }
 
+    @NotNull
     @Override
     public Tense getResultTense() {
         return Tense.Eternal;

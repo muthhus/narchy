@@ -1,5 +1,8 @@
 package nars.bag.impl;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -8,11 +11,14 @@ public interface Table<K,V> extends Iterable<V> {
 
     void clear();
 
+    @Nullable
     V get(Object key);
 
+    @Nullable
     Object remove(K key);
 
     /** same semantics as Map.put; output value is an existing value or null if none */
+    @Nullable
     V put(K k, V v);
 
 
@@ -32,7 +38,7 @@ public interface Table<K,V> extends Iterable<V> {
     /** iterates in sorted order */
     void forEachKey(Consumer<? extends K> each);
 
-    default void top(Consumer<V> each) {
+    default void top(@NotNull Consumer<V> each) {
         topWhile(e -> {
             each.accept(e);
             return true;

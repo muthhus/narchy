@@ -21,6 +21,8 @@ import nars.term.compound.Compound;
 import nars.term.match.EllipsisMatch;
 import nars.term.variable.Variable;
 import nars.truth.Truth;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import static nars.truth.TruthFunctions.eternalizedConfidence;
 
@@ -30,6 +32,7 @@ import static nars.truth.TruthFunctions.eternalizedConfidence;
  */
 public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
 
+    @NotNull
     private final String id;
 
     private final boolean anticipate;
@@ -39,10 +42,11 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
     /** result pattern */
     private final Term term;
 
+    @NotNull
     public final AndCondition<PremiseMatch> postMatch; //TODO use AND condition
 
 
-    public Derive(PremiseRule rule, Term term, BooleanCondition[] postMatch, boolean anticipate, boolean eternalize) {
+    public Derive(PremiseRule rule, Term term, @NotNull BooleanCondition[] postMatch, boolean anticipate, boolean eternalize) {
         this.rule = rule;
         this.postMatch = postMatch.length>0 ? new AndCondition(postMatch) : null;
         this.term = term;
@@ -69,6 +73,7 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
     }
 
 
+    @NotNull
     @Override
     public String toString() {
         return id;
@@ -78,7 +83,7 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
     /** main entry point for derivation result handler.
      * @return true to allow the matcher to continue matching,
      * false to stop it */
-    @Override public final void accept(PremiseMatch m) {
+    @Override public final void accept(@NotNull PremiseMatch m) {
 
         Term tt = solve(m);
 
@@ -89,7 +94,8 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
 
 
 
-    public Term solve(PremiseMatch match) {
+    @Nullable
+    public Term solve(@NotNull PremiseMatch match) {
 
         Term derivedTerm = match.apply(term);
         if (derivedTerm == null)
@@ -127,7 +133,7 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
 
 
     /** part 1 */
-    private void derive(PremiseMatch p, Term t) {
+    private void derive(@NotNull PremiseMatch p, @Nullable Term t) {
 
         if (t != null && !Variable.hasPatternVariable(t)) {
 
@@ -185,7 +191,7 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
         }
 
         @Override
-        public void onRevision(Truth conclusion) {
+        public void onRevision(@NotNull Truth conclusion) {
             ConceptProcess p = this.premise;
 
             BLink<Task> tLink = p.taskLink;
@@ -206,7 +212,7 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
     }
 
     /** part 2 */
-    private void derive(PremiseMatch m, Termed<Compound> c, Truth truth, Budget budget) {
+    private void derive(@NotNull PremiseMatch m, Termed<Compound> c, @Nullable Truth truth, Budget budget) {
 
         ConceptProcess premise = m.premise;
 
@@ -268,7 +274,7 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
     }
 
 
-    public static Task derive(PremiseMatch p, Task derived) {
+    public static Task derive(@NotNull PremiseMatch p, Task derived) {
 
         //HACK this should exclude the invalid rules which form any of these
 

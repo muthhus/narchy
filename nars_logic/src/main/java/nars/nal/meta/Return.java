@@ -2,6 +2,7 @@ package nars.nal.meta;
 
 import nars.nal.PremiseMatch;
 import nars.term.atom.Atom;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by me on 12/31/15.
@@ -16,7 +17,7 @@ public final class Return extends Atom implements ProcTerm<PremiseMatch> {
 
 
     @Override
-    public void appendJavaProcedure(StringBuilder s) {
+    public void appendJavaProcedure(@NotNull StringBuilder s) {
         s.append("return;");
     }
 

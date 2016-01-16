@@ -1,5 +1,7 @@
 package nars.op.software.scheme;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.Console;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -21,18 +23,21 @@ public enum Lispy {
     ;
 
     public interface Fun {
+        @NotNull
         Object apply(Object a);
     }
 
     public interface Fun2 {
+        @NotNull
         Object apply(Object a, Object b);
     }
 
     public interface FunAll {
+        @NotNull
         Object apply(Object[] args);
     }
 
-    static MethodHandle mhRef(Class<?> type, String name) {
+    static MethodHandle mhRef(@NotNull Class<?> type, String name) {
         try {
             return MethodHandles.publicLookup().unreflect(stream(type.getMethods()).filter(m -> m.getName().equals(name)).findFirst().get());
         } catch (IllegalAccessException e) {
@@ -40,28 +45,31 @@ public enum Lispy {
         }
     }
 
-    static <F> MethodHandle mh(Class<F> type, F fun) {
+    static <F> MethodHandle mh(@NotNull Class<F> type, F fun) {
         return mhRef(type, "apply").bindTo(fun);
     }
 
     @SuppressWarnings("unchecked")
-    static int compare(Object a, Object b) {
+    static int compare(@NotNull Object a, @NotNull Object b) {
         return ((Comparable<Object>) a).compareTo(b);  // I hope Java will never have reified type
     }
 
-    static List<?> list(Object o) {
+    @NotNull
+    static List<?> list(@NotNull Object o) {
         return (List<?>) o;
     }
 
-    static String string(Object o) {
+    @NotNull
+    static String string(@NotNull Object o) {
         return (String) o;
     }
 
-    static double dbl(Object o) {
+    static double dbl(@NotNull Object o) {
         return ((Number) o).doubleValue();
     }
 
-    static BigInteger bigint(Object o) {
+    @NotNull
+    static BigInteger bigint(@NotNull Object o) {
         return ((BigInteger) o);
     }
 
@@ -77,21 +85,25 @@ public enum Lispy {
             this.outer = outer;
         }
 
+        @NotNull
         Env find(String var) {
             return dict.containsKey(var) ? this : outer.find(var);
         }
 
+        @NotNull
         Env add(String var, Object value) {
             dict.put(var, value);
             return this;
         }
 
-        Env addAll(List<?> vars, List<?> values) {
+        @NotNull
+        Env addAll(@NotNull List<?> vars, @NotNull List<?> values) {
             range(0, vars.size()).forEach(i -> add(string(vars.get(i)), values.get(i)));
             return this;
         }
     }
 
+    @NotNull
     static Env globalEnv() {
         return new Env(null)
                 .add("+", mh(Fun2.class, (a, b) -> (isdbl(a) || isdbl(b)) ? dbl(a) + dbl(b) : bigint(a).add(bigint(b))))
@@ -116,7 +128,7 @@ public enum Lispy {
                 .add("symbol?", mh(Fun.class, a -> a instanceof String));
     }
 
-    static Object eval(Object x, Env env) {
+    static Object eval(Object x, @NotNull Env env) {
         while (true) {
             if (x instanceof String) {             // variable reference
                 return env.find(string(x)).dict.get(x);
@@ -163,15 +175,15 @@ public enum Lispy {
         }
     }
 
-    static Object parse(String s) {
+    static Object parse(@NotNull String s) {
         return readFrom(tokenize(s));
     }
 
-    static Queue<String> tokenize(String text) {
+    static Queue<String> tokenize(@NotNull String text) {
         return stream(text.replace("(", "( ").replace(")", " )").split(" ")).filter(s -> !s.isEmpty()).collect(toCollection(ArrayDeque::new));
     }
 
-    static Object readFrom(Queue<String> tokens) {
+    static Object readFrom(@NotNull Queue<String> tokens) {
         if (tokens.isEmpty()) throw new Error("unexpected EOF while reading");
         String token = tokens.poll();
         if ("(".equals(token)) {
@@ -188,7 +200,7 @@ public enum Lispy {
         return atom(token);
     }
 
-    static Object atom(String token) {
+    static Object atom(@NotNull String token) {
         try {
             return new BigInteger(token);
         } catch (NumberFormatException __) {

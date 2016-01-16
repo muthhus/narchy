@@ -2,6 +2,7 @@ package nars.truth;
 
 import nars.Symbols;
 import nars.util.Texts;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 
@@ -13,7 +14,8 @@ public interface MetaTruth<T> extends Cloneable, Serializable {
     void setValue(T v);
 
     //TODO add appendString(sb, decimals)
-    default StringBuilder appendString(StringBuilder sb) {
+    @NotNull
+    default StringBuilder appendString(@NotNull StringBuilder sb) {
         String vs = value().toString();
         int decimals = 2;
         sb.ensureCapacity(3 + (2 + decimals) + vs.length() );
@@ -39,6 +41,7 @@ public interface MetaTruth<T> extends Cloneable, Serializable {
 
 
 
+    @NotNull
     default CharSequence toCharSequence() {
         StringBuilder sb =  new StringBuilder();
         return appendString(sb);

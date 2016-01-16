@@ -3,6 +3,7 @@ package nars.term.match;
 import nars.$;
 import nars.Op;
 import nars.term.variable.Variable;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by me on 12/5/15.
@@ -24,6 +25,7 @@ public class VarPattern extends Variable {
         return 0;
     }
 
+    @NotNull
     @Override
     public final Op op() {
         return Op.VAR_PATTERN;

@@ -4,6 +4,8 @@ import nars.Narsese;
 import nars.Op;
 import nars.term.Term;
 import nars.util.data.Util;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /** default Atom implementation */
 public class Atom extends StringAtom {
@@ -18,15 +20,15 @@ public class Atom extends StringAtom {
 //    }
 
     /** TODO use a hash function equivalent to String's but without allocating a String */
-    @Deprecated public static int hash(byte[] id, int ordinal) {
+    @Deprecated public static int hash(@NotNull byte[] id, int ordinal) {
         return hash(new String(id).hashCode(), ordinal);
     }
 
-    public static int hash(String id, Op op) {
+    public static int hash(@NotNull String id, @NotNull Op op) {
         return hash(id.hashCode(), op);
     }
 
-    public static int hash(int id, Op op) {
+    public static int hash(int id, @NotNull Op op) {
         return hash(id, op.ordinal());
     }
 
@@ -40,7 +42,7 @@ public class Atom extends StringAtom {
         return Util.hashCombine(id, ordinal);
     }
 
-    public Atom(byte[] n) {
+    public Atom(@NotNull byte[] n) {
         super( new String(n) );
     }
 
@@ -70,12 +72,13 @@ public class Atom extends StringAtom {
 //    }
 
     /** Creates a quote-escaped term from a string. Useful for an atomic term that is meant to contain a message as its name */
+    @NotNull
     public static Atom quote(String t) {
         return Atom.the('"' + t + '"');
     }
 
     /** determines if the string is invalid as an unquoted term according to the characters present */
-    public static boolean quoteNecessary(CharSequence t) {
+    public static boolean quoteNecessary(@NotNull CharSequence t) {
         for (int i = 0; i < t.length(); i++) {
             char c = t.charAt(i);
 //            if (Character.isWhitespace(c)) return true;
@@ -91,7 +94,8 @@ public class Atom extends StringAtom {
 //        return atoms.computeIfAbsent(name, AtomInterner);
 //    }
 
-    public static Atom the(String name, boolean quoteIfNecessary) {
+    @NotNull
+    public static Atom the(@NotNull String name, boolean quoteIfNecessary) {
         if (quoteIfNecessary && quoteNecessary(name))
             return quote(name);
 
@@ -141,6 +145,7 @@ public class Atom extends StringAtom {
     }
 
     /** gets the atomic term given a name */
+    @NotNull
     public static Atom the(String name) {
         //return Atom.the(Utf8.toUtf8(name));
         return new Atom(name);
@@ -162,20 +167,24 @@ public class Atom extends StringAtom {
       //  }
     }
 
-    public static Atom the(byte[] id) {
+    @NotNull
+    public static Atom the(@NotNull byte[] id) {
         return new Atom(id);
     }
 
 
+    @NotNull
     public static Atom the(byte c) {
         return Atom.the(new byte[] { c });
     }
 
-    public static String unquote(Term s) {
+    @NotNull
+    public static String unquote(@NotNull Term s) {
         return toUnquoted(s.toString());
     }
 
-    public static String toUnquoted(String x) {
+    @NotNull
+    public static String toUnquoted(@NotNull String x) {
         int len = x.length();
         if (len > 0 && x.charAt(0) == '\"' && x.charAt(len - 1) == '\"') {
             return x.substring(1, len - 1);
@@ -192,6 +201,7 @@ public class Atom extends StringAtom {
     }
     */
 
+    @Nullable
     public static Term the(Object o) {
 
         if (o instanceof Term) return ((Term)o);
@@ -209,6 +219,7 @@ public class Atom extends StringAtom {
         return AtomBit;
     }
 
+    @NotNull
     public final String toStringUnquoted() {
         return toUnquoted(toString());
     }

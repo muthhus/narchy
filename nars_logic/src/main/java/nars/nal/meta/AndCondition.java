@@ -4,6 +4,7 @@ import nars.Op;
 import nars.term.Term;
 import nars.term.TermVector;
 import nars.term.compound.GenericCompound;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.List;
@@ -16,7 +17,7 @@ public final class AndCondition<C> extends GenericCompound<BooleanCondition<C>> 
     public AndCondition(BooleanCondition<C>[] p) {
         super(Op.CONJUNCTION, new TermVector(p));
     }
-    public AndCondition(Collection<BooleanCondition<C>> p) {
+    public AndCondition(@NotNull Collection<BooleanCondition<C>> p) {
         super(Op.CONJUNCTION, new TermVector(p, BooleanCondition.class));
     }
 
@@ -37,7 +38,7 @@ public final class AndCondition<C> extends GenericCompound<BooleanCondition<C>> 
     }
 
     @Override
-    public void addConditions(List<Term> l) {
+    public void addConditions(@NotNull List<Term> l) {
         l.add(this);
     }
 }

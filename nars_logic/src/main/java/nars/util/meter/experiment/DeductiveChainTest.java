@@ -7,30 +7,39 @@ import nars.nar.Default;
 import nars.term.atom.Atom;
 import nars.term.compound.Compound;
 import nars.util.meter.TestNAR;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Created by me on 8/25/15.
  */
 public class DeductiveChainTest extends TestNAR {
 
+    @NotNull
     public final Compound q;
+    @NotNull
     public final Compound[] beliefs;
 
     @FunctionalInterface
     public interface IndexedStatementBuilder {
+        @NotNull
         Compound apply(int x, int y);
     }
 
+    @Nullable
     public static final IndexedStatementBuilder inh = (int x, int y) ->
             (Compound)$.inh(a(x), a(y));
+    @Nullable
     public static final IndexedStatementBuilder sim = (int x, int y) ->
             (Compound)$.sim(a(x), a(y));
+    @Nullable
     public static final IndexedStatementBuilder impl = (int x, int y) ->
             (Compound)$.impl(a(x), a(y));
+    @Nullable
     public static final IndexedStatementBuilder equiv = (int x, int y) ->
             (Compound)$.equiv(a(x), a(y));
 
-    public DeductiveChainTest(NAR n, int length, int timeLimit, IndexedStatementBuilder b) {
+    public DeductiveChainTest(@NotNull NAR n, int length, int timeLimit, @NotNull IndexedStatementBuilder b) {
         super(n);
 
         beliefs = new Compound[length];
@@ -50,6 +59,7 @@ public class DeductiveChainTest extends TestNAR {
     }
 
 
+    @NotNull
     public static Atom a(int i) {
         return Atom.the((byte)('a' + i));
     }
@@ -64,7 +74,7 @@ public class DeductiveChainTest extends TestNAR {
         }
     }
 
-    static void test(NAR n, int chainLen, int cycles, IndexedStatementBuilder statementType) {
+    static void test(@NotNull NAR n, int chainLen, int cycles, @NotNull IndexedStatementBuilder statementType) {
 
 
         DeductiveChainTest test = new DeductiveChainTest(n, chainLen, cycles, statementType) {
@@ -132,6 +142,7 @@ public class DeductiveChainTest extends TestNAR {
 
     }
 
+    @NotNull
     private static String timestamp(long start) {
         return (System.currentTimeMillis() - start) + " ms";
     }

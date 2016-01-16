@@ -9,6 +9,8 @@ import nars.term.TermContainer;
 import nars.term.Termed;
 import nars.term.compile.TermIndex;
 import nars.time.Clock;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
@@ -21,7 +23,9 @@ import java.util.function.Function;
  * */
 public class GuavaIndex implements TermIndex {
 
+    @NotNull
     final Cache<Term,Termed> data;
+    @NotNull
     final SoftValueHashMap subterms;
 
 
@@ -53,7 +57,7 @@ public class GuavaIndex implements TermIndex {
 
     }
 
-    public GuavaIndex(CacheBuilder cb) {
+    public GuavaIndex(@NotNull CacheBuilder cb) {
         this.data = cb.build();
         this.subterms = new SoftValueHashMap();
 //        subterms = CacheBuilder.newBuilder()
@@ -72,13 +76,13 @@ public class GuavaIndex implements TermIndex {
     }
 
     @Override
-    public void forEach(Consumer<? super Termed> c) {
+    public void forEach(@NotNull Consumer<? super Termed> c) {
         data.asMap().forEach((k,v) -> c.accept(k));
     }
 
     /** gets an existing item or applies the builder to produce something to return */
     @Override
-    public <K extends Term> Termed<K> apply(K key, Function<K, Termed> builder)  {
+    public <K extends Term> Termed<K> apply(@NotNull K key, @NotNull Function<K, Termed> builder)  {
         try {
             return data.get(key, () -> builder.apply(key));
         } catch (ExecutionException e) {
@@ -88,8 +92,9 @@ public class GuavaIndex implements TermIndex {
 
 
 
+    @Nullable
     @Override
-    public Termed getTermIfPresent(Termed t) {
+    public Termed getTermIfPresent(@NotNull Termed t) {
         return data.getIfPresent(t.term());
     }
 
@@ -109,7 +114,7 @@ public class GuavaIndex implements TermIndex {
 //    }
 
     @Override
-    public void putTerm(Termed termed) {
+    public void putTerm(@NotNull Termed termed) {
         data.put(termed.term(), termed);
     }
 
@@ -118,11 +123,13 @@ public class GuavaIndex implements TermIndex {
         return (int)data.size();
     }
 
+    @NotNull
     @Override
     public Termed make(Op op, int relation, TermContainer subterms, int dt) {
         return AbstractMapIndex.intern(op, relation, internSub(subterms));
     }
 
+    @NotNull
     @Override
     public TermContainer internSub(TermContainer s) {
 //        try {
@@ -136,7 +143,7 @@ public class GuavaIndex implements TermIndex {
 
 
     @Override
-    public Termed the(Term x) {
+    public Termed the(@NotNull Term x) {
 
         if (!AbstractMapIndex.isInternable(x)) {
             return x;

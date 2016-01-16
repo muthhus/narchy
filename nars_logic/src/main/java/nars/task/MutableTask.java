@@ -32,11 +32,12 @@ public class MutableTask extends AbstractTask {
         setOccurrenceTime(Tense.TIMELESS);
     }
 
-    public static MutableTask clone(Task t) {
+    @NotNull
+    public static MutableTask clone(@NotNull Task t) {
         return new MutableTask(t, true);
     }
 
-    MutableTask(Task taskToClone, boolean dummy) {
+    MutableTask(@NotNull Task taskToClone, boolean dummy) {
         super(taskToClone);
     }
 
@@ -51,7 +52,8 @@ public class MutableTask extends AbstractTask {
     }
 
 
-    public MutableTask truth(Truth tv) {
+    @NotNull
+    public MutableTask truth(@org.jetbrains.annotations.Nullable Truth tv) {
         if (tv == null)
             setTruth(null);
         else
@@ -61,12 +63,14 @@ public class MutableTask extends AbstractTask {
 
 
 
+    @NotNull
     @Override
     public final MutableTask budget(float p, float d, float q) {
         super.budget(p, d, q);
         return this;
     }
 
+    @NotNull
     @Override
     public final MutableTask budget(@Nullable Budget source) {
         super.budget(source);
@@ -76,17 +80,20 @@ public class MutableTask extends AbstractTask {
     /**
      * uses default budget generation and multiplies it by gain factors
      */
+    @NotNull
     public MutableTask budgetScaled(float priorityFactor, float durFactor) {
         mulPriority(priorityFactor);
         mulDurability(durFactor);
         return this;
     }
 
+    @NotNull
     public final MutableTask term(Termed<Compound> t) {
         setTerm(t);
         return this;
     }
 
+    @NotNull
     public final MutableTask truth(float freq, float conf) {
         //if (truth == null)
             setTruth(new DefaultTruth(freq, conf));
@@ -96,41 +103,49 @@ public class MutableTask extends AbstractTask {
     }
 
 
+    @NotNull
     public MutableTask belief() {
         return judgment();
     }
 
+    @NotNull
     public MutableTask judgment() {
         setPunctuation(Symbols.JUDGMENT);
         return this;
     }
 
+    @NotNull
     public MutableTask question() {
         setPunctuation(Symbols.QUESTION);
         return this;
     }
 
+    @NotNull
     public MutableTask quest() {
         setPunctuation(Symbols.QUEST);
         return this;
     }
 
+    @NotNull
     public MutableTask goal() {
         setPunctuation(Symbols.GOAL);
         return this;
     }
 
-    public MutableTask tense(Tense t, Memory memory) {
+    @NotNull
+    public MutableTask tense(@NotNull Tense t, @NotNull Memory memory) {
         occurr(Tense.getOccurrenceTime(memory.time(), t, memory));
         return this;
     }
 
-    public final MutableTask present(Memory memory) {
+    @NotNull
+    public final MutableTask present(@NotNull Memory memory) {
         //return tense(Tense.Present, memory);
         long now = memory.time();
         return time(now, now);
     }
 
+    @NotNull
     public MutableTask budget(float p, float d) {
         float q;
         Truth t = getTruth();
@@ -145,11 +160,13 @@ public class MutableTask extends AbstractTask {
         return this;
     }
 
+    @NotNull
     public MutableTask punctuation(char punctuation) {
         setPunctuation(punctuation);
         return this;
     }
 
+    @NotNull
     public MutableTask time(long creationTime, long occurrenceTime) {
         setCreationTime(creationTime);
         occurr(occurrenceTime);
@@ -157,13 +174,14 @@ public class MutableTask extends AbstractTask {
     }
 
 
+    @NotNull
     public MutableTask because(Object reason) {
         log(reason);
         return this;
     }
 
 
-    public final MutableTask parent(Task parentTask, Task parentBelief) {
+    public final MutableTask parent(@org.jetbrains.annotations.Nullable Task parentTask, Task parentBelief) {
         if (parentTask == null)
             throw new RuntimeException("parent task being set to null");
 
@@ -190,6 +208,7 @@ public class MutableTask extends AbstractTask {
     }
 
 
+    @NotNull
     public final MutableTask occurr(long occurrenceTime) {
         setOccurrenceTime(occurrenceTime);
         return this;
@@ -207,6 +226,7 @@ public class MutableTask extends AbstractTask {
 //        return this;
 //    }
 
+    @NotNull
     public MutableTask eternal() {
         setEternal();
         return this;
@@ -214,6 +234,7 @@ public class MutableTask extends AbstractTask {
 
 
     /** flag used for anticipatable derivation */
+    @NotNull
     public MutableTask anticipate(boolean a) {
         if (state==TaskState.Executed)
             throw new RuntimeException("can not anticipate already executed task");
@@ -222,7 +243,8 @@ public class MutableTask extends AbstractTask {
         return this;
     }
 
-    public MutableTask budgetCompoundForward(ConceptProcess premise) {
+    @NotNull
+    public MutableTask budgetCompoundForward(@NotNull ConceptProcess premise) {
         BudgetFunctions.compoundForward(
                 getBudget(), getTruth(),
                 term(), premise);

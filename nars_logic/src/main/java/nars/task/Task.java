@@ -29,6 +29,8 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.compound.Compound;
 import nars.truth.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
 import java.lang.ref.Reference;
@@ -50,7 +52,7 @@ import static nars.Global.dereference;
  */
 public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Tasked, Supplier<Task> {
 
-    static void getExplanation(Task task, int indent, StringBuilder sb) {
+    static void getExplanation(@NotNull Task task, int indent, @NotNull StringBuilder sb) {
         //TODO StringBuilder
 
         for (int i = 0; i < indent; i++)
@@ -125,19 +127,20 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         return true;
     }
 
-    static float prioritySum(Iterable<? extends Budgeted > dd) {
+    static float prioritySum(@NotNull Iterable<? extends Budgeted > dd) {
         float f = 0;
         for (Budgeted  x : dd)
             f += x.getPriority();
         return f;
     }
 
-    static boolean subjectOrPredicateIsIndependentVar(Compound t) {
+    static boolean subjectOrPredicateIsIndependentVar(@NotNull Compound t) {
         if (!t.hasVarIndep()) return false;
         return (t.term(0).op(Op.VAR_INDEP)) || (t.term(1).op(Op.VAR_INDEP));
     }
 
 
+    @NotNull
     default Task getTask() { return this; }
 
 
@@ -153,6 +156,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
      * @return The task from which the task is derived, or
      * null if it has been forgotten
      */
+    @Nullable
     default Task getParentTask() {
         return dereference(getParentTaskRef());
     }
@@ -175,7 +179,8 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     /** called when a Concept processes this Task */
     void onConcept(Concept c);
 
-    default Task solution(Compound t, char newPunc, Truth solutionTruth, long newOcc, Task question, Memory memory) {
+    @NotNull
+    default Task solution(Compound t, char newPunc, Truth solutionTruth, long newOcc, Task question, @NotNull Memory memory) {
         return new MutableTask(t, newPunc)
             .truth(solutionTruth)
             .budget(getPriority(), getDurability(), getQuality())
@@ -187,12 +192,14 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
     char getPunctuation();
 
+    @Nullable
     @Override
     long[] getEvidence();
 
     @Override
     long getCreationTime();
 
+    @NotNull
     @Override
     Task setCreationTime(long c);
 
@@ -232,22 +239,27 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
 
 
+    @Nullable
     default StringBuilder appendTo(StringBuilder sb) {
         return appendTo(sb, null);
     }
 
+    @NotNull
     default Task name() {
         return this;
     }
 
-    default CharSequence toString(NAR nar, boolean showStamp) {
+    @Nullable
+    default CharSequence toString(@NotNull NAR nar, boolean showStamp) {
         return toString(nar.memory, showStamp);
     }
 
+    @Nullable
     default CharSequence toString(Memory memory, boolean showStamp) {
         return appendTo(new StringBuilder(), memory, showStamp);
     }
 
+    @NotNull
     @Override default public Task get() { return this ;}
 
     default Termed concept() {
@@ -299,6 +311,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         Executed
     }
 
+    @Nullable
     TaskState getState();
 
     final class Solution extends AtomicReference<Task> {
@@ -306,6 +319,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
             super(referent);
         }
 
+        @NotNull
         @Override
         public String toString() {
             return "Solved: " + get();
@@ -319,19 +333,23 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
 
 
-    default StringBuilder toString(/**@Nullable*/ Memory memory) {
+    @Nullable
+    default StringBuilder toString(/**@Nullable*/Memory memory) {
         return appendTo(null, memory);
     }
 
-    default StringBuilder appendTo(StringBuilder sb, /**@Nullable*/ Memory memory) {
+    @Nullable
+    default StringBuilder appendTo(@Nullable StringBuilder sb, /**@Nullable*/Memory memory) {
         if (sb == null) sb = new StringBuilder();
         return appendTo(sb, memory, false);
     }
 
+    @NotNull
     @Deprecated default String toStringWithoutBudget() {
         return toStringWithoutBudget(null);
     }
 
+    @NotNull
     @Deprecated default String toStringWithoutBudget(Memory memory) {
         StringBuilder b = new StringBuilder();
         appendTo(b, memory, true, false,
@@ -341,6 +359,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         return b.toString();
     }
 
+    @Nullable
     @Deprecated
     default StringBuilder appendTo(StringBuilder buffer, /**@Nullable*/ Memory memory, boolean showStamp) {
         boolean notCommand = getPunctuation()!=Symbols.COMMAND;
@@ -350,7 +369,8 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         );
     }
 
-    default StringBuilder appendTo(StringBuilder buffer, /**@Nullable*/ Memory memory, boolean term, boolean showStamp, boolean showBudget, boolean showLog) {
+    @Nullable
+    default StringBuilder appendTo(@Nullable StringBuilder buffer, /**@Nullable*/@Nullable Memory memory, boolean term, boolean showStamp, boolean showBudget, boolean showLog) {
 
 
         String contentName;
@@ -426,6 +446,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         return buffer;
     }
 
+    @Nullable
     default Object getLogLast() {
         List<String> log = getLog();
         if (log ==null || log.isEmpty()) return null;
@@ -447,6 +468,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         return false;
     }
 
+    @Nullable
     default Task getRootTask() {
         if (getParentTask() == null) {
             return null;
@@ -461,12 +483,14 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     }
 
 
+    @NotNull
     default String getExplanation() {
         StringBuilder sb = new StringBuilder();
         return getExplanation(sb).toString();
     }
 
-    default StringBuilder getExplanation(StringBuilder temporary) {
+    @NotNull
+    default StringBuilder getExplanation(@NotNull StringBuilder temporary) {
         temporary.setLength(0);
         getExplanation(this, 0, temporary);
         return temporary;
@@ -479,12 +503,15 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
 
     /** append a log entry; returns this task */
+    @NotNull
     Task log(Object entry);
 
     /** append log entries; returns this task */
+    @NotNull
     Task log(List entries);
 
     /** get the recorded log entries */
+    @Nullable
     List getLog();
 
 
@@ -516,6 +543,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     /** if unnormalized, returns a normalized version of the task,
      *  null if not normalizable
      */
+    @Nullable
     Task normalize(Memory memory);
 
 
@@ -538,7 +566,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
      * @param premisePriority the total value that the derivation group should reach, effectively a final scalar factor determined by premise parent and possibly existing belief tasks
      * @return the input collection, unmodified (elements may be adjusted individually)
      */
-    static void normalizeCombined(Iterable<Task> derived, float premisePriority) {
+    static void normalizeCombined(@NotNull Iterable<Task> derived, float premisePriority) {
 
 
         float totalDerivedPriority = prioritySum(derived);
@@ -553,16 +581,17 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         derived.forEach(t -> t.getBudget().mulPriority(factor));
     }
 
-    static void normalize(Iterable<Task> derived, float premisePriority) {
+    static void normalize(@NotNull Iterable<Task> derived, float premisePriority) {
         derived.forEach(t -> t.getBudget().mulPriority(premisePriority));
     }
-    static void inputNormalized(Iterable<Task> derived, float premisePriority, Consumer<Task> target) {
+    static void inputNormalized(@NotNull Iterable<Task> derived, float premisePriority, @NotNull Consumer<Task> target) {
         derived.forEach(t -> {
             t.getBudget().mulPriority(premisePriority);
             target.accept(t);
         });
     }
 
+    @NotNull
     static Task command(Compound op) {
         //TODO use lightweight CommandTask impl without all the logic metadata
         return new MutableTask(op, Symbols.COMMAND);
@@ -573,7 +602,8 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     }
 
 
-    default StringBuilder appendOccurrenceTime(StringBuilder sb) {
+    @NotNull
+    default StringBuilder appendOccurrenceTime(@NotNull StringBuilder sb) {
         long oc = getOccurrenceTime();
         long ct = getCreationTime();
 
@@ -628,6 +658,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         }
     }
 
+    @NotNull
     default CharSequence stampAsStringBuilder() {
 
         long[] ev = getEvidence();
@@ -665,6 +696,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
 
     /** creates a new child task (has this task as its parent) */
+    @NotNull
     default MutableTask spawn(Compound content, char punc) {
         return new MutableTask(content, punc);
     }
@@ -715,14 +747,14 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
     final class ExpectationComparator implements Comparator<Task>, Serializable {
         static final Comparator the = new ExpectationComparator();
-        @Override public int compare(Task b, Task a) {
+        @Override public int compare(@NotNull Task b, @NotNull Task a) {
             return Float.compare(a.getExpectation(), b.getExpectation());
         }
     }
 
     final class ConfidenceComparator implements Comparator<Task>, Serializable {
         static final Comparator the = new ExpectationComparator();
-        @Override public int compare(Task b, Task a) {
+        @Override public int compare(@NotNull Task b, @NotNull Task a) {
             return Float.compare(a.getConfidence(), b.getConfidence());
         }
     }

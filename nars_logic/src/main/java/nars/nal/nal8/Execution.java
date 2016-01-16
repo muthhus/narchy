@@ -10,6 +10,8 @@ import nars.task.Task;
 import nars.term.Term;
 import nars.term.compound.Compound;
 import nars.util.event.Topic;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 
@@ -46,6 +48,7 @@ public class Execution implements Runnable {
     /**
      * unwrapped (without ^)
      */
+    @NotNull
     public final Term operator() {
         return Operator.operatorTerm(term());
     }
@@ -68,7 +71,7 @@ public class Execution implements Runnable {
     /**
      * called after execution completed
      */
-    public void feedback(Iterable<Task> feedback) {
+    public void feedback(@Nullable Iterable<Task> feedback) {
 
         //Display a message in the output stream to indicate the reportExecution of an operation
 
@@ -105,7 +108,7 @@ public class Execution implements Runnable {
      * internal notice of the execution
      * @param operation
      */
-    protected void noticeExecuted(Task operation) {
+    protected void noticeExecuted(@NotNull Task operation) {
 
         Budget b = !operation.getDeleted() ? operation.getBudget() : UnitBudget.zero;
 

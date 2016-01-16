@@ -2,6 +2,7 @@ package nars.nal.nal7;
 
 import nars.Op;
 import nars.term.atom.AbstractStringAtom;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Atom which is invisible to most if not all reasoner
@@ -35,6 +36,7 @@ public class ShadowAtom extends AbstractStringAtom {
 //    @Override
 //    public final int structure() { return 0;     }
 
+    @NotNull
     @Override
     public Op op() {
         return Op.NONE;

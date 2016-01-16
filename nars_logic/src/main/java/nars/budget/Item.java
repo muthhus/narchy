@@ -21,6 +21,7 @@
 package nars.budget;
 
 import nars.Memory;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * An item is an object that can be put into a Bag,
@@ -53,6 +54,7 @@ public abstract class Item<K> extends UnitBudget  {
      * Get the current key
      * @return Current key value
      */
+    @NotNull
     public abstract K name();
 
 
@@ -62,6 +64,7 @@ public abstract class Item<K> extends UnitBudget  {
      * Return a String representation of the Item
      * @return The String representation of the full content
      */
+    @NotNull
     @Override
     public String toString() {        
         //return budget + " " + key ;
@@ -82,7 +85,7 @@ public abstract class Item<K> extends UnitBudget  {
 //    }
 
 
-    public void appendWithBudget(StringBuilder sb) {
+    public void appendWithBudget(@NotNull StringBuilder sb) {
         StringBuilder briefBudget = super.toBudgetStringExternal();
         String n = name().toString();
         sb.ensureCapacity(briefBudget.length()+n.length()+1);
@@ -120,7 +123,7 @@ public abstract class Item<K> extends UnitBudget  {
 //
 //    }
 
-    public static float getPrioritySum(Iterable<? extends Item> c) {
+    public static float getPrioritySum(@NotNull Iterable<? extends Item> c) {
         float totalPriority = 0;
         for (Item i : c)
             totalPriority+=i.getPriority();
@@ -128,7 +131,7 @@ public abstract class Item<K> extends UnitBudget  {
     }
     
     /** randomly selects an item from a collection, weighted by priority */
-    public static <E extends Item> E selectRandomByPriority(Memory memory, Iterable<E> c) {
+    public static <E extends Item> E selectRandomByPriority(@NotNull Memory memory, @NotNull Iterable<E> c) {
         float totalPriority = getPrioritySum(c);
         
         if (totalPriority == 0) return null;

@@ -3,6 +3,7 @@ package nars.nal.meta.pre;
 import nars.nal.PremiseMatch;
 import nars.nal.meta.AtomicBooleanCondition;
 import nars.term.Term;
+import org.jetbrains.annotations.NotNull;
 
 /** tests the resolved terms specified by pattern variable terms */
 public abstract class PreCondition1 extends AtomicBooleanCondition<PremiseMatch> {
@@ -13,13 +14,14 @@ public abstract class PreCondition1 extends AtomicBooleanCondition<PremiseMatch>
     }
 
     @Override
-    public boolean booleanValueOf(PremiseMatch m) {
+    public boolean booleanValueOf(@NotNull PremiseMatch m) {
         Term a = m.apply(arg1);
         return a != null && test(m, a);
     }
 
     public abstract boolean test(PremiseMatch m, Term a);
 
+    @NotNull
     @Override
     public String toString() {
         return getClass().getSimpleName() + ':' + arg1;

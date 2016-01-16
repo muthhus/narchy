@@ -1,5 +1,7 @@
 package nars.util.version;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jgrapht.util.ArrayUnenforcedSet;
 
 import java.util.AbstractMap;
@@ -32,6 +34,7 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
         return map.containsKey(key);
     }
 
+    @NotNull
     @Override
     public Set<X> keySet() {
         return map.keySet();
@@ -42,6 +45,7 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
 //        map.forEach((BiConsumer<? super X, ? super Versioned<Y>>) action);
 //    }
 
+    @Nullable
     @Override
     public Y remove(Object key) {
         Versioned<Y> x = map.remove(key);
@@ -79,6 +83,7 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
 //    }
 
     /** avoid using this if possible because it involves transforming the entries from the internal map to the external form */
+    @NotNull
     @Override public Set<Entry<X, Y>> entrySet() {
         ArrayUnenforcedSet<Entry<X,Y>> e = new ArrayUnenforcedSet<>(size());
         map.forEach( (k, v) -> {
@@ -141,6 +146,7 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
         return map.computeIfAbsent(key, this::newEntry);
     }
 
+    @NotNull
     public Versioned<Y> newEntry(X k) {
         return cache(k) ? new Versioned(context) :
             new RemovingVersionedEntry(k);
@@ -188,7 +194,8 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
         return null;
     }
 
-    public Y get(X key, Supplier<Y> ifAbsentPut) {
+    @Nullable
+    public Y get(X key, @NotNull Supplier<Y> ifAbsentPut) {
         //TODO use compute... Map methods
         Y o = get(key);
         if (o == null) {

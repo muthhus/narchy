@@ -2,6 +2,7 @@ package nars.nal.meta.op;
 
 import nars.term.Term;
 import nars.term.transform.FindSubst;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by me on 12/1/15.
@@ -15,7 +16,7 @@ public abstract class MatchOp extends PatternOp {
     public abstract boolean match(Term f);
 
     @Override
-    public final boolean run(FindSubst ff) {
+    public final boolean run(@NotNull FindSubst ff) {
 //            if (ff.power < 0) {
 //                return false;
 //            }

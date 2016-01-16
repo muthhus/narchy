@@ -2,6 +2,7 @@ package nars.task;
 
 import nars.Memory;
 import nars.util.event.Active;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Task which is specifically for collecting statistics about
@@ -15,7 +16,7 @@ public abstract class MeterTask extends MutableTask {
     private final Active active = new Active();
 
     @Override
-    protected void onNormalized(Memory memory) {
+    protected void onNormalized(@NotNull Memory memory) {
         active.add(
                 memory.eventFrameStart.on((n) -> onFrame(memory))
         );

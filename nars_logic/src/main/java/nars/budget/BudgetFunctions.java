@@ -20,7 +20,6 @@
  */
 package nars.budget;
 
-import nars.Global;
 import nars.NAR;
 import nars.bag.BLink;
 import nars.nal.UtilityFunctions;
@@ -29,6 +28,7 @@ import nars.task.Task;
 import nars.term.Termed;
 import nars.term.Termlike;
 import nars.truth.Truth;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Budget functions for resources allocation
@@ -45,7 +45,7 @@ public final class BudgetFunctions extends UtilityFunctions {
 	 *            The truth value of a judgment
 	 * @return The quality of the judgment, according to truth value only
 	 */
-	public static float truthToQuality(Truth t) {
+	public static float truthToQuality(@NotNull Truth t) {
 		float exp = t.getExpectation();
 		return Math.max(exp, (1.0f - exp) * 0.75f);
 	}
@@ -61,8 +61,9 @@ public final class BudgetFunctions extends UtilityFunctions {
 	 *            The truth value of the conclusion of revision
 	 * @return The budget for the new task
 	 */
-	public static Budget revise(Truth tTruth, Task oldBelief, Truth conclusion,
-			Budget tb) {
+	@NotNull
+	public static Budget revise(@NotNull Truth tTruth, @NotNull Task oldBelief, @NotNull Truth conclusion,
+								@NotNull Budget tb) {
 
 		Truth bTruth = oldBelief.getTruth();
 		float difT = conclusion.getExpDifAbs(tTruth);
@@ -225,7 +226,8 @@ public final class BudgetFunctions extends UtilityFunctions {
 	 *            The truth value of the conclusion
 	 * @return The budget value of the conclusion
 	 */
-	public static Budget forward(Truth truth, ConceptProcess nal) {
+	@NotNull
+	public static Budget forward(@NotNull Truth truth, @NotNull ConceptProcess nal) {
 		return budgetInference(truthToQuality(truth), 1, nal);
 	}
 
@@ -238,7 +240,8 @@ public final class BudgetFunctions extends UtilityFunctions {
 	 *            Reference to the memory
 	 * @return The budget value of the conclusion
 	 */
-	public static Budget backward(Truth truth, ConceptProcess nal) {
+	@NotNull
+	public static Budget backward(@NotNull Truth truth, @NotNull ConceptProcess nal) {
 		return budgetInference(truthToQuality(truth), 1, nal);
 	}
 
@@ -251,14 +254,16 @@ public final class BudgetFunctions extends UtilityFunctions {
 	 *            Reference to the memory
 	 * @return The budget value of the conclusion
 	 */
-	public static Budget backwardWeak(Truth truth, ConceptProcess nal) {
+	@NotNull
+	public static Budget backwardWeak(@NotNull Truth truth, @NotNull ConceptProcess nal) {
 		return budgetInference(w2c(1) * truthToQuality(truth), 1, nal);
 	}
 
 	/* ----- Task derivation in CompositionalRules and StructuralRules ----- */
 
-	public static Budget compoundForward(Budget target, Truth truth,
-			Termed content, ConceptProcess nal) {
+	@NotNull
+	public static Budget compoundForward(@NotNull Budget target, @NotNull Truth truth,
+										 @NotNull Termed content, @NotNull ConceptProcess nal) {
 		int complexity = content.term().complexity();
 		return budgetInference(target, truthToQuality(truth), complexity, nal);
 	}
@@ -270,7 +275,8 @@ public final class BudgetFunctions extends UtilityFunctions {
 	 *            The content of the conclusion
 	 * @return The budget of the conclusion
 	 */
-	public static Budget compoundBackward(Termed content, ConceptProcess nal) {
+	@NotNull
+	public static Budget compoundBackward(@NotNull Termed content, @NotNull ConceptProcess nal) {
 		return budgetInference(1.0f, content.term().complexity(), nal);
 	}
 
@@ -283,12 +289,14 @@ public final class BudgetFunctions extends UtilityFunctions {
 	 *            Reference to the memory
 	 * @return The budget of the conclusion
 	 */
-	public static Budget compoundBackwardWeak(Termlike content,
-			ConceptProcess nal) {
+	@NotNull
+	public static Budget compoundBackwardWeak(@NotNull Termlike content,
+											  @NotNull ConceptProcess nal) {
 		return budgetInference(w2c(1), content.complexity(), nal);
 	}
 
-	static Budget budgetInference(float qual, int complexity, ConceptProcess nal) {
+	@NotNull
+	static Budget budgetInference(float qual, int complexity, @NotNull ConceptProcess nal) {
 		return budgetInference(new UnitBudget(), qual, complexity, nal);
 	}
 
@@ -303,8 +311,9 @@ public final class BudgetFunctions extends UtilityFunctions {
 	 *            Reference to the memory
 	 * @return Budget of the conclusion task
 	 */
-	static Budget budgetInference(Budget target, float qual, int complexity,
-			ConceptProcess nal) {
+	@NotNull
+	static Budget budgetInference(@NotNull Budget target, float qual, int complexity,
+								  @NotNull ConceptProcess nal) {
 		float complexityFactor = complexity > 1 ?
 
 		// sqrt factor (experimental)
@@ -319,7 +328,8 @@ public final class BudgetFunctions extends UtilityFunctions {
 		return budgetInference(target, qual, complexityFactor, nal);
 	}
 
-	static Budget budgetInference(Budget target, float qual, float complexityFactor, ConceptProcess nal) {
+	@NotNull
+	static Budget budgetInference(@NotNull Budget target, float qual, float complexityFactor, @NotNull ConceptProcess nal) {
 
         BLink<Task> taskLink = nal.taskLink;
 

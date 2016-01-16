@@ -1,10 +1,13 @@
 package nars.op.software.befunge;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Created by didrik on 30.12.2014.
  */
 public class Board {
 
+	@NotNull
 	private final char[][] board;
 
 	Board() {

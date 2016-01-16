@@ -1,6 +1,7 @@
 package nars.task;
 
 import nars.nal.nal7.Tense;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * interface for the temporal information about the
@@ -21,7 +22,7 @@ public interface Temporal extends Tasked {
 //        return Tense.concurrent(s.getOccurrenceTime(), getOccurrenceTime(), duration);
 //    }
 
-    default int tDelta(Temporal other/*, int perceptualDuration*/) {
+    default int tDelta(@NotNull Temporal other/*, int perceptualDuration*/) {
         long start = start();
         long other_end = other.end();
         return (int)(start - other_end); //TODO long/int
@@ -45,11 +46,11 @@ public interface Temporal extends Tasked {
         setOccurrenceTime(Tense.ETERNAL);
     }
 
-    default void setOccurrenceTime(Tense tense, int duration) {
+    default void setOccurrenceTime(@NotNull Tense tense, int duration) {
         setOccurrenceTime(getCreationTime(), tense, duration);
     }
 
-    default void setOccurrenceTime(long creation, Tense tense, int duration) {
+    default void setOccurrenceTime(long creation, @NotNull Tense tense, int duration) {
         setOccurrenceTime(
             Tense.getOccurrenceTime(
                     creation,

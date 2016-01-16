@@ -14,6 +14,8 @@ import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import nars.truth.Truthed;
 import nars.util.Texts;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.io.PrintStream;
@@ -29,6 +31,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
 
     protected final NAR nar;
     private final char punc;
+    @Nullable
     private final Term term;
     boolean succeeded = false;
     long successTime = Tense.TIMELESS;
@@ -93,6 +96,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
         //this.duration = n.memory.duration();
     }
 
+    @NotNull
     public static String rangeStringN2(float min, float max) {
         return "(" + Texts.n2(min) + ',' + Texts.n2(max) + ')';
     }
@@ -100,7 +104,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
     /** a heuristic for measuring the difference between terms
      *  in range of 0..100%, 0 meaning equal
      * */
-    public static float termDistance(Term a, Term b, float ifLessThan) {
+    public static float termDistance(@NotNull Term a, @NotNull Term b, float ifLessThan) {
         if (a.equals(b)) return 0;
         //TODO handle TermMetadata terms
 
@@ -137,6 +141,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
         return dist;
     }
 
+    @NotNull
     @Override
     public String toString() {
         return term.toString() + punc + " %" +
@@ -206,7 +211,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
 
 
 
-    public boolean matches(Task task) {
+    public boolean matches(@Nullable Task task) {
         if (task == null) {
             return false;
         }
@@ -227,7 +232,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
 
     }
 
-    private boolean truthMatches(Truthed task) {
+    private boolean truthMatches(@NotNull Truthed task) {
         if ((punc == '.') || (punc == '!')) {
             if (task.getTruth() == null) {
                 return false;
@@ -242,7 +247,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
         return true;
     }
 
-    public boolean timeMatches(Task t) {
+    public boolean timeMatches(@NotNull Task t) {
         return creationTimeMatches() && occurrenceTimeMatches(t);
     }
 
@@ -259,12 +264,12 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
                 ((creationEnd != -1) && (now > creationEnd)));
     }
 
-    protected boolean occurrenceTimeMatches(Task t) {
+    protected boolean occurrenceTimeMatches(@NotNull Task t) {
         return (t.isEternal());
     }
 
     @Override
-    public final boolean test(Task task) {
+    public final boolean test(@NotNull Task task) {
 
         if (matches(task)) {
             valid.add(task);
@@ -276,7 +281,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
         return false;
     }
 
-    public void recordSimilar(Task task) {
+    public void recordSimilar(@NotNull Task task) {
         final TreeMap<Float, Task> similar = this.similar;
 
         //TODO add the levenshtein distance of other task components
@@ -341,6 +346,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
 //        return x;
 //    }
 
+    @NotNull
     public Truth getTruthMean() {
         return new DefaultTruth(0.5f * (freqMax + freqMin), 0.5f * (confMax + confMin));
     }
@@ -368,12 +374,12 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
 
 
     @Override
-    public final void accept(Tasked tasked) {
+    public final void accept(@NotNull Tasked tasked) {
         Task task = tasked.getTask();
         accept(task);
     }
 
-    public final void accept(Task task) {
+    public final void accept(@NotNull Task task) {
 
         if (succeeded) return; //no need to test any further
 
@@ -403,7 +409,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
      *  this is the soonest time at which all output conditions were successful.
      *  if any conditions were not successful, the cost is infinity
      * */
-    public static double cost(Iterable<EternalTaskCondition> conditions) {
+    public static double cost(@NotNull Iterable<EternalTaskCondition> conditions) {
         long lastSuccess = Tense.TIMELESS;
         for (EternalTaskCondition e : conditions) {
             long est = e.successTime;
@@ -425,7 +431,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
      *  monotonically increasing from -1..+1 (-1 if there were errors,
      *  0..1.0 if all successful.  limit 0 = takes forever, limit 1.0 = instantaneous
      */
-    public static double score(List<EternalTaskCondition> requirements) {
+    public static double score(@NotNull List<EternalTaskCondition> requirements) {
         double cost = cost(requirements);
         return Double.isFinite(cost) ? 1.0 / (1.0 + cost) : -1;
 
@@ -437,7 +443,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
     }
 
     @Override
-    public void toString(PrintStream out) {
+    public void toString(@NotNull PrintStream out) {
         out.println(succeeded ? " OK" : "ERR" + '\t' + toString());
 
         BiConsumer<String,Task> printer = (label,s) -> {
@@ -454,7 +460,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
     }
 
     @Override
-    public void toLogger(Logger logger) {
+    public void toLogger(@NotNull Logger logger) {
         String msg = succeeded ? " OK" : "ERR" + '\t' + toString();
         if (succeeded)
             logger.info(msg);

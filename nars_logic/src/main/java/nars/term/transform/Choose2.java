@@ -5,6 +5,7 @@ import nars.term.TermVector;
 import nars.term.match.EllipsisMatch;
 import nars.util.data.array.IntArrays;
 import nars.util.math.Combinations;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
@@ -13,14 +14,19 @@ import java.util.Set;
  */
 public class Choose2 extends Termutator {
 
+    @NotNull
     final Combinations comb;
+    @NotNull
     private final Set<Term> yFree;
     private final Term[] x;
     private final Term xEllipsis;
+    @NotNull
     private final FindSubst f;
+    @NotNull
     private final ShuffledSubterms yy;
     boolean state;
 
+    @NotNull
     @Override
     public String toString() {
 
@@ -32,7 +38,7 @@ public class Choose2 extends Termutator {
 
     }
 
-    public Choose2(FindSubst f, Term xEllipsis, Term[] x, Set<Term> yFree) {
+    public Choose2(@NotNull FindSubst f, Term xEllipsis, Term[] x, @NotNull Set<Term> yFree) {
         super(xEllipsis);
         this.f = f;
         this.x = x;

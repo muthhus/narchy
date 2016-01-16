@@ -6,6 +6,7 @@ import nars.concept.Concept;
 import nars.term.Term;
 import nars.truth.DefaultTruth;
 import nars.util.event.CycleReaction;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -15,14 +16,16 @@ import java.util.List;
  */
 public class MaxBeliefConfidence extends CycleReaction implements Signals {
 
+    @NotNull
     public final Term term;
+    @NotNull
     private final NAR nar;
     private final float freq;
     public long bestAt = -1;
     float conf = -1;
     private float best;
 
-    public MaxBeliefConfidence(NAR nar, String term, float freq) {
+    public MaxBeliefConfidence(@NotNull NAR nar, String term, float freq) {
         super(nar);
         this.nar = nar;
         this.term = nar.term(term);
@@ -49,6 +52,7 @@ public class MaxBeliefConfidence extends CycleReaction implements Signals {
         }
     }
 
+    @NotNull
     @Override
     public String toString() {
         String s = term + " best=" + best + " @ " + bestAt;
@@ -58,11 +62,13 @@ public class MaxBeliefConfidence extends CycleReaction implements Signals {
         return s;
     }
 
+    @NotNull
     @Override
     public List<Signal> getSignals() {
         return Lists.newArrayList(new Signal(term + "_confMax"));
     }
 
+    @NotNull
     @Override
     public Object[] sample(Object key) {
         return new Object[]{conf};

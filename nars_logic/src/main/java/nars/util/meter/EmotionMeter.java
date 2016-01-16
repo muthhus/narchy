@@ -5,6 +5,7 @@ import nars.Memory;
 import nars.task.Task;
 import nars.util.event.FrameReaction;
 import nars.util.meter.event.DoubleMeter;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 
@@ -14,6 +15,7 @@ import java.io.Serializable;
 public class EmotionMeter extends FrameReaction implements Serializable {
 
     //public static final Compound BUSYness = $.seti(Atom.the("busy"));
+    @NotNull
     private final Memory memory;
 
 
@@ -37,7 +39,7 @@ public class EmotionMeter extends FrameReaction implements Serializable {
 
     //static final Compound satisfiedSetInt = $.seti($.the("satisfied"));
 
-    public EmotionMeter(Memory memory) {
+    public EmotionMeter(@NotNull Memory memory) {
         super(memory);
 
         this.memory = memory;
@@ -66,7 +68,7 @@ public class EmotionMeter extends FrameReaction implements Serializable {
         happy += delta;
     }
 
-    public void happy(float solution, Task task) {
+    public void happy(float solution, @NotNull Task task) {
         happy += ( task.getBudget().summary() * solution );
     }
 
@@ -150,7 +152,7 @@ public class EmotionMeter extends FrameReaction implements Serializable {
     }
 
 
-    public void busy(Task cause) {
+    public void busy(@NotNull Task cause) {
         busy += cause.getPriority();
     }
 

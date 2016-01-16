@@ -4,6 +4,7 @@ import nars.Memory;
 import nars.nar.AbstractNAR;
 import nars.op.app.Commander;
 import nars.util.data.random.XorShift128PlusRandom;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Random;
 
@@ -13,9 +14,10 @@ import java.util.Random;
 public abstract class AbstractAlann extends AbstractNAR {
 
 	final Random rng = new XorShift128PlusRandom(1);
+	@NotNull
 	final Commander commander;
 
-	protected AbstractAlann(Memory m, int commanderCapacity) {
+	protected AbstractAlann(@NotNull Memory m, int commanderCapacity) {
 		super(m);
 
 		commander = new Commander(this, commanderCapacity);

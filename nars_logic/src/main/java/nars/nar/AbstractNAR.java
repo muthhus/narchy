@@ -25,6 +25,8 @@ import nars.op.software.scheme.scheme;
 import nars.term.compile.TermIndex;
 import nars.time.Clock;
 import nars.util.data.random.XorShift128PlusRandom;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
 import java.util.function.Consumer;
@@ -47,13 +49,14 @@ public abstract class AbstractNAR extends NAR {
 
 
     //public final Random rng = new RandomAdaptor(new MersenneTwister(1));
+    @NotNull
     public final Random rng;
 
-    public AbstractNAR(Clock clock) {
+    public AbstractNAR(@NotNull Clock clock) {
         this(new Memory(clock, TermIndex.memory(1024) ));
     }
 
-    public AbstractNAR(Memory memory) {
+    public AbstractNAR(@NotNull Memory memory) {
         super(memory);
 
         rng = new XorShift128PlusRandom(1);
@@ -117,7 +120,7 @@ public abstract class AbstractNAR extends NAR {
 
 
 
-    public void initDefaults(Memory m) {
+    public void initDefaults(@NotNull Memory m) {
         //parameter defaults
 
         setTaskLinkBagSize(12);
@@ -283,6 +286,7 @@ public abstract class AbstractNAR extends NAR {
 //        };
 //    }
 
+    @NotNull
     public AbstractNAR nal(int maxNALlevel) {
         memory.nal(maxNALlevel);
         return this;
@@ -302,26 +306,31 @@ public abstract class AbstractNAR extends NAR {
 
 
 
+    @NotNull
     public AbstractNAR setTaskLinkBagSize(int taskLinkBagSize) {
         this.taskLinkBagSize = taskLinkBagSize;
         return this;
     }
 
+    @NotNull
     public AbstractNAR setTermLinkBagSize(int termLinkBagSize) {
         this.termLinkBagSize = termLinkBagSize;
         return this;
     }
 
+    @NotNull
     @Override
     public String toString() {
         return getClass().getSimpleName() + '[' + nal() + ']';
     }
 
+    @Nullable
     protected Deriver newDeriver() {
         return Deriver.getDefaultDeriver();
     }
 
     /** reports all active concepts or those which can be reached */
+    @Nullable
     public abstract NAR forEachConcept(Consumer<Concept> recip);
 
 

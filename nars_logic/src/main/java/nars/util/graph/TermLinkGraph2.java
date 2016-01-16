@@ -6,6 +6,8 @@ import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.term.Term;
 import nars.term.Termed;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jgrapht.alg.ConnectivityInspector;
 import org.jgrapht.graph.DirectedPseudograph;
 
@@ -25,23 +27,24 @@ public class TermLinkGraph2 extends DirectedPseudograph<Termed, Termed> {
     }
 
 
-    public TermLinkGraph2(NAR n) {
+    public TermLinkGraph2(@NotNull NAR n) {
         this();
         add(n, true);
     }
 
-    public TermLinkGraph2(Concept... c) {
+    public TermLinkGraph2(@NotNull Concept... c) {
         this();
         for (Concept x : c)
             add(x, true);
     }
 
+    @NotNull
     @Override
     public String toString() {
         return '[' + vertexSet().toString() + ", " + edgeSet() + ']';
     }
 
-    public void print(PrintStream out) {
+    public void print(@NotNull PrintStream out) {
 
         Set<Termed> vs = vertexSet();
 
@@ -62,12 +65,12 @@ public class TermLinkGraph2 extends DirectedPseudograph<Termed, Termed> {
 
     public static class TermLinkTemplateGraph extends TermLinkGraph2 {
 
-        public TermLinkTemplateGraph(NAR n) {
+        public TermLinkTemplateGraph(@NotNull NAR n) {
             super(n);
         }
 
         /** add the termlink templates instead of termlinks */
-        @Override protected void addTermLinks(Concept c) {
+        @Override protected void addTermLinks(@NotNull Concept c) {
             Term sourceTerm = c.get();
 
             for (Termed t : c.getTermLinkTemplates()) {
@@ -81,7 +84,8 @@ public class TermLinkGraph2 extends DirectedPseudograph<Termed, Termed> {
         }
     }
 
-    public TermLinkGraph2 add(Concept c, boolean includeTermLinks/*, boolean includeTaskLinks, boolean includeOtherReferencedConcepts*/) {
+    @NotNull
+    public TermLinkGraph2 add(@NotNull Concept c, boolean includeTermLinks/*, boolean includeTaskLinks, boolean includeOtherReferencedConcepts*/) {
         Term source = c.get();
 
         if (!containsVertex(source)) {
@@ -108,7 +112,7 @@ public class TermLinkGraph2 extends DirectedPseudograph<Termed, Termed> {
         return this;
     }
 
-    protected void addTermLinks(Concept c) {
+    protected void addTermLinks(@Nullable Concept c) {
         if (c == null)
             throw new RuntimeException("null concept");
 
@@ -128,7 +132,8 @@ public class TermLinkGraph2 extends DirectedPseudograph<Termed, Termed> {
     }
 
 
-    public TermLinkGraph2 add(NAR n, boolean includeTermLinks/*, boolean includeTaskLinks, boolean includeOtherReferencedConcepts*/) {
+    @NotNull
+    public TermLinkGraph2 add(@NotNull NAR n, boolean includeTermLinks/*, boolean includeTaskLinks, boolean includeOtherReferencedConcepts*/) {
 
         n.forEachConcept(c -> add(c, includeTermLinks));
 

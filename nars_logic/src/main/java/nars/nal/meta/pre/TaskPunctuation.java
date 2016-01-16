@@ -5,6 +5,7 @@ import nars.Symbols;
 import nars.nal.PremiseMatch;
 import nars.nal.meta.AtomicBooleanCondition;
 import nars.term.Term;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by me on 8/27/15.
@@ -50,7 +51,7 @@ public class TaskPunctuation extends AtomicBooleanCondition<PremiseMatch> {
     }
 
     @Override
-    public boolean booleanValueOf(PremiseMatch m) {
+    public boolean booleanValueOf(@NotNull PremiseMatch m) {
         char taskPunc = m.premise.getTask().getPunctuation();
         return test(taskPunc);
     }
@@ -59,6 +60,7 @@ public class TaskPunctuation extends AtomicBooleanCondition<PremiseMatch> {
         return taskPunc == punc;
     }
 
+    @NotNull
     @Override
     public String toJavaConditionString() {
         return "'" + punc + "' == p.getTask().getPunctuation()";

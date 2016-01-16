@@ -11,6 +11,8 @@ import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.compile.TermBuilder;
 import nars.term.compound.Compound;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
@@ -51,7 +53,7 @@ public class js extends TermFunction implements Mental {
             }
         }
 
-        @Override public Object function(Compound o, TermBuilder i) {
+        @Override public Object function(@NotNull Compound o, TermBuilder i) {
             Term[] args = Operator.opArgsArray(o);
             Bindings bindings = newBindings(null, args);
             bindings.put("_o", fnCompiled);
@@ -75,7 +77,7 @@ public class js extends TermFunction implements Mental {
     public class jsop extends NullOperator {
 
         @Override
-        public void execute(Execution e) {
+        public void execute(@NotNull Execution e) {
             Task op = e.task;
             Term[] x = Operator.opArgsArray(op.term());
             String funcName = Atom.unquote(x[0]);
@@ -174,6 +176,7 @@ public class js extends TermFunction implements Mental {
 //    }
 
 
+    @NotNull
     public Bindings newBindings(NAR nar, Term[] args) {
 
         Bindings bindings = new SimpleBindings();
@@ -187,7 +190,8 @@ public class js extends TermFunction implements Mental {
     }
 
 
-    @Override public Object function(Compound o, TermBuilder i) {
+    @Nullable
+    @Override public Object function(@NotNull Compound o, TermBuilder i) {
         Term[] args = Operator.opArgsArray(o);
         if (args.length < 1) {
             return null;

@@ -4,6 +4,7 @@ import nars.budget.Budget;
 import nars.budget.UnitBudget;
 import nars.data.BudgetedStruct;
 import nars.nal.nal7.Tense;
+import org.jetbrains.annotations.NotNull;
 
 import static nars.util.data.Util.clamp;
 
@@ -29,12 +30,12 @@ public final class BLink<X> extends Budget implements Link<X> {
         init(p, d, q);
     }
 
-    public BLink(X id, BudgetedStruct b) {
+    public BLink(X id, @NotNull BudgetedStruct b) {
         this(id);
         init(b, 1f);
     }
 
-    public BLink(X id, BudgetedStruct b, float scale) {
+    public BLink(X id, @NotNull BudgetedStruct b, float scale) {
         this(id);
         init(b, scale);
     }
@@ -44,7 +45,7 @@ public final class BLink<X> extends Budget implements Link<X> {
         return id;
     }
 
-    private void init(BudgetedStruct c, float scale) {
+    private void init(@NotNull BudgetedStruct c, float scale) {
         //this.lastForget = c.getLastForgetTime();
         this.lastForget = Tense.TIMELESS;
 
@@ -129,6 +130,7 @@ public final class BLink<X> extends Budget implements Link<X> {
     }
 
 
+    @NotNull
     @Override
     public UnitBudget clone() {
         return new UnitBudget(this);
@@ -147,6 +149,7 @@ public final class BLink<X> extends Budget implements Link<X> {
         return id.hashCode();
     }
 
+    @NotNull
     @Override
     public String toString() {
         return id + "=" + getBudgetString();

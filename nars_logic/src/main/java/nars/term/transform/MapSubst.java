@@ -2,6 +2,7 @@ package nars.term.transform;
 
 import com.gs.collections.impl.map.mutable.UnifiedMap;
 import nars.term.Term;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
@@ -46,6 +47,7 @@ public class MapSubst implements Subst {
     }
 
 
+    @NotNull
     @Override
     public String toString() {
         return "Substitution{" +

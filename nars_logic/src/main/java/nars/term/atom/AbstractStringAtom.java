@@ -1,20 +1,21 @@
 package nars.term.atom;
 
 import nars.Op;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by me on 12/4/15.
  */
 public abstract class AbstractStringAtom extends AbstractStringAtomRaw {
 
-	protected AbstractStringAtom(byte[] id) {
+	protected AbstractStringAtom(@NotNull byte[] id) {
 		this(id, null);
 	}
 	protected AbstractStringAtom(String id) {
 		this(id, null);
 	}
 
-	protected AbstractStringAtom(byte[] id, Op specificOp) {
+	protected AbstractStringAtom(@NotNull byte[] id, Op specificOp) {
 		this(new String(id), specificOp);
 	}
 

@@ -8,6 +8,7 @@ import nars.term.compound.Compound;
 import nars.term.compound.GenericCompound;
 import nars.term.match.EllipsisTransform;
 import nars.term.transform.FindSubst;
+import org.jetbrains.annotations.NotNull;
 
 public final class PatternCompound extends GenericCompound {
 
@@ -23,11 +24,11 @@ public final class PatternCompound extends GenericCompound {
     private final boolean ellipsisTransform;
 
 
-    public PatternCompound(Compound seed) {
+    public PatternCompound(@NotNull Compound seed) {
         this(seed, (TermVector) seed.subterms());
     }
 
-    public PatternCompound(Compound seed, TermVector subterms) {
+    public PatternCompound(@NotNull Compound seed, @NotNull TermVector subterms) {
         super(seed.op(), seed.relation(), subterms);
 
         sizeCached = seed.size();
@@ -43,7 +44,7 @@ public final class PatternCompound extends GenericCompound {
         this.effectivelyCommutative = isCommutative() && (size() > 1);
     }
 
-    public static boolean hasEllipsisTransform(TermContainer x) {
+    public static boolean hasEllipsisTransform(@NotNull TermContainer x) {
         int xs = x.size();
         for (int i = 0; i < xs; i++)
             if (x.term(i) instanceof EllipsisTransform) return true;
@@ -65,7 +66,7 @@ public final class PatternCompound extends GenericCompound {
         return structureCached;
     }
 
-    @Override public boolean match(Compound y, FindSubst subst) {
+    @Override public boolean match(@NotNull Compound y, @NotNull FindSubst subst) {
         return canMatch(y) && (!ellipsis ?
                 ((effectivelyCommutative) ?
                         subst.matchPermute(this, y) :
@@ -73,7 +74,7 @@ public final class PatternCompound extends GenericCompound {
                 subst.matchCompoundWithEllipsis(this, y));
     }
 
-    public final boolean canMatch(Compound y) {
+    public final boolean canMatch(@NotNull Compound y) {
 
         int yStructure = y.structure();
         if ((yStructure | structureCached) != yStructure)

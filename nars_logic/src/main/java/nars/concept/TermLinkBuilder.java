@@ -7,6 +7,8 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.compound.Compound;
 import nars.term.variable.Variable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 
@@ -24,7 +26,8 @@ public enum TermLinkBuilder {
 //    protected float forgetCycles;
 //    protected long now;
 
-    public static Termed[] build(Term host, Memory memory) {
+    @Nullable
+    public static Termed[] build(Term host, @NotNull Memory memory) {
 
         if (!(host instanceof Compound)) {
             return null;
@@ -47,7 +50,7 @@ public enum TermLinkBuilder {
      * @param t          The CompoundTerm for which to build links
      * @param components set of components being accumulated, to avoid duplicates
      */
-    static void prepareComponentLinks(Compound t, Set<Termed> components, Memory memory) {
+    static void prepareComponentLinks(@NotNull Compound t, @NotNull Set<Termed> components, @NotNull Memory memory) {
 
         ///** add self link for structural transform: */
         //components.add(t);
@@ -116,7 +119,7 @@ public enum TermLinkBuilder {
     /**
      * determines whether to grow a 1st-level termlink to a subterm
      */
-    protected static Term growComponent(Term t, int level, Memory memory) {
+    protected static Term growComponent(Term t, int level, @NotNull Memory memory) {
 
         Concept tti = memory.concept(t);
         if (tti == null)

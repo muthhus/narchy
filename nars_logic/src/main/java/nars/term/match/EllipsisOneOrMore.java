@@ -4,27 +4,30 @@ import nars.$;
 import nars.Op;
 import nars.term.transform.VariableNormalization;
 import nars.term.variable.Variable;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by me on 12/5/15.
  */
 public class EllipsisOneOrMore extends Ellipsis {
 
-    public EllipsisOneOrMore(Variable name) {
+    public EllipsisOneOrMore(@NotNull Variable name) {
         this(name, "..+");
     }
 
+    @NotNull
     @Override
     public Variable normalize(int serial) {
         return new EllipsisOneOrMore($.v(Op.VAR_PATTERN, serial));
     }
 
+    @NotNull
     @Override
-    public Variable clone(Variable newVar, VariableNormalization normalizer) {
+    public Variable clone(@NotNull Variable newVar, VariableNormalization normalizer) {
         return new EllipsisOneOrMore(newVar);
     }
 
-    public EllipsisOneOrMore(Variable name, String s) {
+    public EllipsisOneOrMore(@NotNull Variable name, String s) {
         super(name, s);
     }
 

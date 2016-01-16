@@ -1,5 +1,8 @@
 package nars.term.index;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 /**
  * Implements very fast dictionary storage and retrieval. Only depends upon the
  * core String class.
@@ -51,7 +54,7 @@ public class TrieMap {
 	 *            Your data. Any data class except another TrieMap. Null values
 	 *            erase entries.
 	 */
-	public void put(String key, Object val) {
+	public void put(@NotNull String key, Object val) {
         assert key != null;
         assert !(val instanceof TrieMap); // Only we get to store TrieMap nodes. TODO: Allow it.
         if(key.isEmpty()) {
@@ -94,7 +97,8 @@ public class TrieMap {
 	/**
 	 * Retrieve a value for a given key or null if not found.
 	 */
-	public Object get(String key) {
+	@Nullable
+    public Object get(@NotNull String key) {
         TrieMap other = this;
         while (true) {
             assert key != null;

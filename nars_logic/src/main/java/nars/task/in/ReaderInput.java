@@ -2,6 +2,8 @@ package nars.task.in;
 
 import nars.NAR;
 import nars.task.flow.TaskQueue;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,6 +19,7 @@ import java.util.stream.Collectors;
 public class ReaderInput extends TaskQueue {
 
     public final NAR nar;
+    @Nullable
     protected BufferedReader input;
 
     protected void setInput(BufferedReader input) {
@@ -27,12 +30,12 @@ public class ReaderInput extends TaskQueue {
         this.nar = nar;
     }
 
-    public ReaderInput(NAR nar, InputStream i) {
+    public ReaderInput(NAR nar, @NotNull InputStream i) {
 
         this(nar, new BufferedReader(new InputStreamReader(i)));
     }
 
-    public ReaderInput(NAR nar, URL u) throws IOException {
+    public ReaderInput(NAR nar, @NotNull URL u) throws IOException {
         this(nar, u.openStream());
     }
 

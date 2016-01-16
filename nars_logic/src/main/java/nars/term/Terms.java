@@ -6,6 +6,8 @@ import nars.Op;
 import nars.term.compound.Compound;
 import nars.util.Texts;
 import nars.util.data.sorted.SortedList;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -24,7 +26,7 @@ public enum Terms {
     public static final Term[] Empty = new Term[0];
     public static final IntFunction<Term[]> TermArrayBuilder = Term[]::new;
 
-    public static boolean equalSubTermsInRespectToImageAndProduct(Termed a, Termed b) {
+    public static boolean equalSubTermsInRespectToImageAndProduct(@Nullable Termed a, @Nullable Termed b) {
 
         if (a == null || b == null) {
             return false;
@@ -65,11 +67,11 @@ public enum Terms {
     }
 
 
-    public static boolean equalSubjectPredicateInRespectToImageAndProduct(Compound a, Compound b) {
+    public static boolean equalSubjectPredicateInRespectToImageAndProduct(@NotNull Compound a, @NotNull Compound b) {
         return equalSubjectPredicateInRespectToImageAndProduct(a, b, true);
     }
 
-    static boolean equalSubjectPredicateInRespectToImageAndProduct(Termed A, Termed B, boolean requireEqualImageRelation) {
+    static boolean equalSubjectPredicateInRespectToImageAndProduct(@NotNull Termed A, @NotNull Termed B, boolean requireEqualImageRelation) {
 
 
         if (A.equals(B)) {
@@ -141,7 +143,7 @@ public enum Terms {
 
     }
 
-    private static boolean containsAll(TermContainer sat, Term ta, TermContainer sbt, Term tb) {
+    private static boolean containsAll(@NotNull TermContainer sat, Term ta, @NotNull TermContainer sbt, Term tb) {
         //set for fast containment check
         Set<Term> componentsA = sat.toSet();
         componentsA.add(ta);
@@ -161,7 +163,7 @@ public enum Terms {
 
 
     /** brute-force equality test */
-    public static boolean contains(Term[] container, Term v) {
+    public static boolean contains(@NotNull Term[] container, @NotNull Term v) {
         for (Term e : container)
             if (v.equals(e))
                 return true;
@@ -169,7 +171,8 @@ public enum Terms {
     }
 
 
-    public static Term[] reverse(Term[] arg) {
+    @NotNull
+    public static Term[] reverse(@NotNull Term[] arg) {
         int l = arg.length;
         Term[] r = new Term[l];
         for (int i = 0; i < l; i++) {
@@ -178,7 +181,7 @@ public enum Terms {
         return r;
     }
 
-    public static Term[] toSortedSetArray(Term... arg) {
+    public static Term[] toSortedSetArray(@NotNull Term... arg) {
         switch (arg.length) {
 
             case 0:
@@ -211,7 +214,7 @@ public enum Terms {
         }
     }
 
-    public static void printRecursive(Term x, int level) {
+    public static void printRecursive(@NotNull Term x, int level) {
         //indent
         for (int i = 0; i < level; i++)
             System.out.print("  ");
@@ -232,11 +235,11 @@ public enum Terms {
     /**
      * for printing complex terms as a recursive tree
      */
-    public static void printRecursive(Term x, Consumer<String> c) {
+    public static void printRecursive(Term x, @NotNull Consumer<String> c) {
         printRecursive(x, 0, c);
     }
 
-    public static void printRecursive(Term x, int level, Consumer<String> c) {
+    public static void printRecursive(Term x, int level, @NotNull Consumer<String> c) {
         //indent
         StringBuilder line = new StringBuilder();
         for (int i = 0; i < level; i++)
@@ -267,7 +270,8 @@ public enum Terms {
     }
 
     /** makes a set from the array of terms */
-    public static Set<Term> toSet(Term[] t) {
+    @NotNull
+    public static Set<Term> toSet(@NotNull Term[] t) {
         if (t.length == 1)
             return Collections.singleton(t[0]);
         Set<Term> l = Global.newHashSet(t.length);
@@ -275,8 +279,9 @@ public enum Terms {
         return l;
     }
 
+    @NotNull
     @SafeVarargs
-    public static <T> Set<T> toSortedSet(T... t) {
+    public static <T> Set<T> toSortedSet(@NotNull T... t) {
 
         int l = t.length;
         if (l == 1)
@@ -287,7 +292,7 @@ public enum Terms {
         return s;
     }
 
-    public static int maxLevel(Term term) {
+    public static int maxLevel(@NotNull Term term) {
         int[] max = {0};
         term.recurseTerms((t, p) -> {
             int m = t.op().minLevel;
@@ -297,7 +302,8 @@ public enum Terms {
         return max[0];
     }
 
-    public static Term[] concat(Term[] a, Term... b) {
+    @Nullable
+    public static Term[] concat(@Nullable Term[] a, @NotNull Term... b) {
 
         if (a == null) {
             return null;
@@ -319,7 +325,8 @@ public enum Terms {
         return arr;
     }
 
-    public static <T extends Term> Term[] filter(T[] input, IntObjectPredicate<T> filter) {
+    @NotNull
+    public static <T extends Term> Term[] filter(@NotNull T[] input, @NotNull IntObjectPredicate<T> filter) {
 
         int s = input.length;
 
@@ -334,22 +341,26 @@ public enum Terms {
         return l.toArray(new Term[l.size()]);
     }
 
-    public static Term[] filter(Term[] input, IntPredicate filter) {
+    @NotNull
+    public static Term[] filter(@NotNull Term[] input, @NotNull IntPredicate filter) {
         return filter(input, (i, t) -> filter.test(i));
     }
 
-    public static Term[] filter(Term[] input, Predicate<Term> filter) {
+    @NotNull
+    public static Term[] filter(@NotNull Term[] input, @NotNull Predicate<Term> filter) {
         return filter(input, (i, t) -> filter.test(t));
     }
 
-    public static Term[] toArray(Collection<Term> l) {
+    @NotNull
+    public static Term[] toArray(@NotNull Collection<Term> l) {
         int s = l.size();
         if (s == 0)
             return Terms.Empty;
         return l.toArray(new Term[s]);
     }
 
-    public static Term[] cloneTermsReplacing(Term[] term, Term from, Term to) {
+    @NotNull
+    public static Term[] cloneTermsReplacing(@NotNull Term[] term, Term from, @NotNull Term to) {
         Term[] y = new Term[term.length];
         int i = 0;
         for (Term x : term) {
@@ -361,7 +372,7 @@ public enum Terms {
     }
 
     /** returns lev distance divided by max(a.length(), b.length() */
-    public static float levenshteinDistancePercent(CharSequence a, CharSequence b) {
+    public static float levenshteinDistancePercent(@NotNull CharSequence a, @NotNull CharSequence b) {
         float len = Math.max(a.length(), b.length());
         if (len == 0) return 0;
         return Texts.levenshteinDistance(a,b) / len;

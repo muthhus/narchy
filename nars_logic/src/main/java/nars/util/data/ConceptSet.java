@@ -3,6 +3,7 @@ package nars.util.data;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.term.Term;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -14,17 +15,18 @@ public abstract class ConceptSet<T extends Term> extends MutableConceptMap<T> {
     public final Map<T,Concept> values = new LinkedHashMap();
 
 
-    protected ConceptSet(NAR nar) {
+    protected ConceptSet(@NotNull NAR nar) {
         super(nar);
     }
 
+    @NotNull
     @Override
     public Iterator<T> iterator() {
         return values.keySet().iterator();
     }
 
     @Override
-    public boolean include(Concept c) {
+    public boolean include(@NotNull Concept c) {
         Concept removed = values.put((T) c.get(), c);
         return removed!=c; //different instance
     }

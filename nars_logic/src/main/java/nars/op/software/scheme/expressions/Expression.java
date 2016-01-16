@@ -2,6 +2,7 @@ package nars.op.software.scheme.expressions;
 
 
 import nars.op.software.scheme.exception.UnexpectedExpression;
+import org.jetbrains.annotations.NotNull;
 
 public interface Expression  {
 
@@ -18,11 +19,12 @@ public interface Expression  {
 
     String print();
 
+    @NotNull
     static Expression none() {
         return NONE;
     }
 
-    default <T extends Expression> T assertExpressionOfType(Class<T> type) {
+    default <T extends Expression> T assertExpressionOfType(@NotNull Class<T> type) {
         if (!instanceOf(type)) {
             throw new UnexpectedExpression(String.format("Expected expression of type '%s', got '%s'", type.getSimpleName(), this));
         }
@@ -30,7 +32,7 @@ public interface Expression  {
         return type.cast(this);
     }
 
-    default <T extends Expression> boolean instanceOf(Class<T> type) {
+    default <T extends Expression> boolean instanceOf(@NotNull Class<T> type) {
         return type.isAssignableFrom(getClass());
     }
 

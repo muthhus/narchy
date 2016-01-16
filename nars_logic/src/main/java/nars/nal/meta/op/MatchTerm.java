@@ -13,6 +13,8 @@ import nars.term.Term;
 import nars.term.compound.Compound;
 import nars.term.constraint.AndConstraint;
 import nars.term.constraint.MatchConstraint;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.Set;
@@ -28,15 +30,18 @@ import static nars.$.seteMap;
 public final class MatchTerm extends AtomicBooleanCondition<PremiseMatch> implements ProcTerm<PremiseMatch> {
 
     public final TaskBeliefPair x;
+    @Nullable
     public final ImmutableMap<Term, MatchConstraint> constraints;
 
+    @NotNull
     private final Compound id;
 
     /** derivation handlers; use the array form for fast iteration */
     private final Set<Derive> derive = Global.newHashSet(1);
+    @Nullable
     private PremiseMatchFork onMatch = null;
 
-    private MatchTerm(TaskBeliefPair x, ImmutableMap<Term, MatchConstraint> constraints) {
+    private MatchTerm(TaskBeliefPair x, @Nullable ImmutableMap<Term, MatchConstraint> constraints) {
         this.id = (constraints == null) ?
                 //no constraints
                 x :
@@ -47,7 +52,8 @@ public final class MatchTerm extends AtomicBooleanCondition<PremiseMatch> implem
         this.constraints = constraints;
     }
 
-    public static MatchTerm get(TaskBeliefPair x, ListMultimap<Term, MatchConstraint> c) {
+    @NotNull
+    public static MatchTerm get(TaskBeliefPair x, @Nullable ListMultimap<Term, MatchConstraint> c) {
 
         ImmutableMap<Term, MatchConstraint> constraints =
                 ((c == null) || c.isEmpty()) ?
@@ -57,7 +63,8 @@ public final class MatchTerm extends AtomicBooleanCondition<PremiseMatch> implem
         return new MatchTerm(x, constraints);
     }
 
-    public static Map<Term, MatchConstraint> initConstraints(ListMultimap<Term, MatchConstraint> c) {
+    @NotNull
+    public static Map<Term, MatchConstraint> initConstraints(@NotNull ListMultimap<Term, MatchConstraint> c) {
         Map<Term, MatchConstraint> con = Global.newHashMap();
         c.asMap().forEach((t, cc) -> {
             switch (cc.size()) {
@@ -81,7 +88,7 @@ public final class MatchTerm extends AtomicBooleanCondition<PremiseMatch> implem
     }
 
     @Override
-    @Deprecated public final boolean booleanValueOf(PremiseMatch p) {
+    @Deprecated public final boolean booleanValueOf(@NotNull PremiseMatch p) {
         p.match(this);
         return true;
     }
@@ -97,7 +104,7 @@ public final class MatchTerm extends AtomicBooleanCondition<PremiseMatch> implem
     }
 
     /** delegates a partial or complete match to each of the known derivation handlers */
-    public boolean onMatch(PremiseMatch m) {
+    public boolean onMatch(@NotNull PremiseMatch m) {
         if (Global.DEBUG && derive.isEmpty())
             throw new RuntimeException("invalid MatchTerm with no derivation handlers:" + this);
 

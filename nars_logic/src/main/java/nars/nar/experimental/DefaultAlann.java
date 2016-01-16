@@ -7,6 +7,8 @@ import nars.budget.Budget;
 import nars.concept.Concept;
 import nars.task.Task;
 import nars.term.Termed;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +24,9 @@ public class DefaultAlann extends AbstractAlann  {
     //private Iterator<Concept> indexIterator = null;
 
     private final int defaultTTL;
+    @NotNull
     List<Derivelet> derivers = Global.newArrayList();
+    @NotNull
     private final DeriveletContext context;
 
     private final Logger log = LoggerFactory.getLogger(DefaultAlann.class);
@@ -48,7 +52,7 @@ public class DefaultAlann extends AbstractAlann  {
 //        this(new LocalMemory(new FrameClock(), concepts), numDerivelets);
 //    }
 
-    public DefaultAlann(Memory m, int commanderCapacity, int numDerivelets) {
+    public DefaultAlann(@NotNull Memory m, int commanderCapacity, int numDerivelets) {
         super(m, commanderCapacity);
 
         //indexIterator = Iterators.cycle(m.getConcepts());
@@ -96,13 +100,14 @@ public class DefaultAlann extends AbstractAlann  {
     }
 
 
+    @Nullable
     final Supplier<Concept> fromInput = () -> {
         if (commander.isEmpty()) return null;
         Task t = commander.commandIterator.next().get();
         return concept(t.term());
     };
 
-    final void restart(final Derivelet d) {
+    final void restart(@NotNull final Derivelet d) {
 
         Concept next = fromInput.get();
 
@@ -112,8 +117,9 @@ public class DefaultAlann extends AbstractAlann  {
     }
 
 
+    @NotNull
     @Override
-    public NAR forEachConcept(Consumer<Concept> each) {
+    public NAR forEachConcept(@NotNull Consumer<Concept> each) {
         commander.concepts.forEach(each);
         return this;
     }
@@ -121,7 +127,7 @@ public class DefaultAlann extends AbstractAlann  {
 
 
     private final class MyDeriveletContext extends DeriveletContext {
-        public MyDeriveletContext(NAR nar) {
+        public MyDeriveletContext(@NotNull NAR nar) {
             super(nar, nar.memory.random, DefaultAlann.this.commander);
         }
 

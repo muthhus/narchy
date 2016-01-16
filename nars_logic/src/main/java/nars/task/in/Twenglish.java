@@ -26,6 +26,8 @@ import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.util.io.Twokenize;
 import nars.util.io.Twokenize.Span;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -99,7 +101,8 @@ public class Twenglish {
     }
 
 
-    protected Collection<Task> parseSentence(String source, NAR n, List<Span> s) {
+    @NotNull
+    protected Collection<Task> parseSentence(String source, @NotNull NAR n, @NotNull List<Span> s) {
 
         LinkedList<Term> t = new LinkedList();
         Span last = null;
@@ -162,11 +165,13 @@ public class Twenglish {
     }
 
 
-    public static Term spanToTerm(Span c) {
+    @Nullable
+    public static Term spanToTerm(@NotNull Span c) {
         return spanToTerm(c, false);
     }
 
-    public static Term spanToTerm(Span c, boolean includeWordPOS) {
+    @Nullable
+    public static Term spanToTerm(@NotNull Span c, boolean includeWordPOS) {
         if ("word".equals(c.pattern)) {
             //TODO support >1 and probabalistic POS
             if (!includeWordPOS) {
@@ -187,6 +192,7 @@ public class Twenglish {
         //return Atom.the(c, true);
         return Atom.quote(c);
     }
+    @NotNull
     public static Term tagToTerm(String c) {
         c = c.toLowerCase();
         if ("word".equals(c)) return Atom.quote(" "); //space surrounded by quotes
@@ -195,7 +201,8 @@ public class Twenglish {
     
     
     /** returns a list of all tasks that it was able to parse for the input */
-    public List<Task> parse(String source, NAR n, String s) throws Narsese.NarseseException {
+    @NotNull
+    public List<Task> parse(String source, @NotNull NAR n, String s) throws Narsese.NarseseException {
 
         
         List<Task> results = Global.newArrayList();
@@ -252,7 +259,8 @@ public class Twenglish {
                 Twenglish::spanToTerm);
     }
 
-    public static String learnSentence(NAR nar, int wordDelay, String message) {
+    @NotNull
+    public static String learnSentence(@NotNull NAR nar, int wordDelay, @NotNull String message) {
         List<Term> t = tokenize(message);
 
         if (t.isEmpty()) return "silence";

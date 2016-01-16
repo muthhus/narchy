@@ -1,7 +1,8 @@
 package nars.op.software.scheme;
 
- import nars.op.software.scheme.cons.Cons;
+import nars.op.software.scheme.cons.Cons;
 import nars.op.software.scheme.expressions.*;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.function.Function;
@@ -14,11 +15,12 @@ import static nars.op.software.scheme.expressions.SymbolExpression.symbol;
 public enum Evaluator {
     ;
 
-    public static Expression evaluate(Expression exp, SchemeClosure env) {
+    public static Expression evaluate(@NotNull Expression exp, SchemeClosure env) {
         return analyze(exp).apply(env);
     }
 
-    public static Function<SchemeClosure, Expression> analyze(Expression exp) {
+    @NotNull
+    public static Function<SchemeClosure, Expression> analyze(@NotNull Expression exp) {
         if (isSelfEvaluating(exp)) {
             return e -> exp;
         }
@@ -40,7 +42,8 @@ public enum Evaluator {
         throw new IllegalArgumentException(String.format("Unable to evaluate expression '%s'", exp + " (" + exp.getClass() + ')'));
     }
 
-    private static Function<SchemeClosure, Expression> analyzeSpecialForm(ListExpression exp) {
+    @NotNull
+    private static Function<SchemeClosure, Expression> analyzeSpecialForm(@NotNull ListExpression exp) {
         Cons<Expression> exps = exp.value;
 
         //TODO use an enum of these operators already decoded to byte[] so that symbols dont need to re-generate a String version
@@ -67,18 +70,18 @@ public enum Evaluator {
 
     }
 
-    private static Function<SchemeClosure, Expression> analyzeQuote(Cons<Expression> exps) {
+    private static Function<SchemeClosure, Expression> analyzeQuote(@NotNull Cons<Expression> exps) {
         return env -> exps.cadr();
     }
 
-    private static Function<SchemeClosure, Expression> analyzeLambda(Cons<Expression> exps) {
+    private static Function<SchemeClosure, Expression> analyzeLambda(@NotNull Cons<Expression> exps) {
         Cons<SymbolExpression> paramNames = exps.cadr().list().value.stream()
                 .map(Expression::symbol)
                 .collect(Cons.collector());
         return analyzeProcedure(paramNames, exps);
     }
 
-    private static Function<SchemeClosure, Expression> analyzeSet(Cons<Expression> exps) {
+    private static Function<SchemeClosure, Expression> analyzeSet(@NotNull Cons<Expression> exps) {
         SymbolExpression symbol = exps.cadr().symbol();
         Function<SchemeClosure, Expression> valueProc = analyze(exps.cdr().cadr());
 
@@ -88,7 +91,7 @@ public enum Evaluator {
         };
     }
 
-    private static Function<SchemeClosure, Expression> analyzeFunctionDefinition(Cons<Expression> exps) {
+    private static Function<SchemeClosure, Expression> analyzeFunctionDefinition(@NotNull Cons<Expression> exps) {
         SymbolExpression name = exps.cadr().list().value.car().symbol();
         Cons<SymbolExpression> paramNames = exps.cadr().list().value.cdr().stream()
                 .map(Expression::symbol)
@@ -100,7 +103,7 @@ public enum Evaluator {
         };
     }
 
-    private static Function<SchemeClosure, Expression> analyzeVarDefinition(Cons<Expression> exps) {
+    private static Function<SchemeClosure, Expression> analyzeVarDefinition(@NotNull Cons<Expression> exps) {
         SymbolExpression symbol = exps.cadr().symbol();
         Function<SchemeClosure, Expression> valueProc = analyze(exps.cdr().cadr());
         return env -> {
@@ -109,11 +112,11 @@ public enum Evaluator {
         };
     }
 
-    private static boolean isVarDefinition(Cons<Expression> exps) {
+    private static boolean isVarDefinition(@NotNull Cons<Expression> exps) {
         return exps.cadr().isSymbol();
     }
 
-    private static Function<SchemeClosure, Expression> analyzeFunctionCall(ListExpression exp) {
+    private static Function<SchemeClosure, Expression> analyzeFunctionCall(@NotNull ListExpression exp) {
         List<Function<SchemeClosure, Expression>> map = exp.value.stream()
                 .map(Evaluator::analyze)
                 .collect(Collectors.toList());
@@ -126,7 +129,7 @@ public enum Evaluator {
         };
     }
 
-    private static Function<SchemeClosure, Expression> analyzeLet(Cons<Expression> exps) {
+    private static Function<SchemeClosure, Expression> analyzeLet(@NotNull Cons<Expression> exps) {
         List<Function<SchemeClosure, Expression>> letBindingValues = letBindingValues(exps);
         Function<SchemeClosure, Expression> letBody = analyzeProcedure(letBindingSymbols(exps), exps);
 
@@ -138,24 +141,24 @@ public enum Evaluator {
         };
     }
 
-    private static Cons<SymbolExpression> letBindingSymbols(Cons<Expression> exps) {
+    private static Cons<SymbolExpression> letBindingSymbols(@NotNull Cons<Expression> exps) {
         return exps.cadr().list().value.stream()
                 .map(e -> e.list().value.car().symbol())
                 .collect(Cons.collector());
     }
 
-    private static List<Function<SchemeClosure, Expression>> letBindingValues(Cons<Expression> exps) {
+    private static List<Function<SchemeClosure, Expression>> letBindingValues(@NotNull Cons<Expression> exps) {
         return exps.cadr().list().value.stream()
                 .map(e -> e.list().value.cadr())
                 .map(Evaluator::analyze)
                 .collect(Collectors.toList());
     }
 
-    private static Function<SchemeClosure, Expression> analyzeBegin(Cons<Expression> exps) {
+    private static Function<SchemeClosure, Expression> analyzeBegin(@NotNull Cons<Expression> exps) {
         return analyzeSequence(exps.cdr());
     }
 
-    private static Function<SchemeClosure, Expression> analyzeSequence(Cons<Expression> exps) {
+    private static Function<SchemeClosure, Expression> analyzeSequence(@NotNull Cons<Expression> exps) {
         List<Function<SchemeClosure, Expression>> seq = exps.stream()
                 .map(Evaluator::analyze)
                 .collect(Collectors.toList());
@@ -164,11 +167,11 @@ public enum Evaluator {
                 .collect(Collectors.reducing(Expression.none(), a -> a.apply(env), (a, b) -> b));
     }
 
-    private static Function<SchemeClosure, Expression> analyzeCond(Cons<Expression> exps) {
+    private static Function<SchemeClosure, Expression> analyzeCond(@NotNull Cons<Expression> exps) {
         return condToIf(exps.cdr());
     }
 
-    private static Function<SchemeClosure, Expression> condToIf(Cons<Expression> exps) {
+    private static Function<SchemeClosure, Expression> condToIf(@NotNull Cons<Expression> exps) {
         if (exps.isEmpty()) {
             return e -> BooleanExpression.bool(false);
         } else if (exps.size() == 1) {
@@ -193,25 +196,26 @@ public enum Evaluator {
         }
     }
 
-    private static Function<SchemeClosure, Expression> makeIf(Function<SchemeClosure, Expression> condition, Function<SchemeClosure, Expression> consequent, Optional<Function<SchemeClosure, Expression>> alternative) {
+    private static Function<SchemeClosure, Expression> makeIf(@NotNull Function<SchemeClosure, Expression> condition, @NotNull Function<SchemeClosure, Expression> consequent, @NotNull Optional<Function<SchemeClosure, Expression>> alternative) {
         return env -> isTruthy(condition.apply(env)) ? consequent.apply(env) : alternative.map(a -> a.apply(env)).orElse(Expression.none());
     }
 
-    private static Function<SchemeClosure, Expression> analyzeIf(Cons<Expression> exps) {
+    private static Function<SchemeClosure, Expression> analyzeIf(@NotNull Cons<Expression> exps) {
         Function<SchemeClosure, Expression> condition = analyze(exps.cadr());
         Function<SchemeClosure, Expression> consequent = analyze(exps.cdr().cadr());
         Optional<Function<SchemeClosure, Expression>> alternative = exps.size() > 3 ? Optional.of(analyze(exps.cdr().cdr().cadr())) : Optional.empty();
         return makeIf(condition, consequent, alternative);
     }
 
-    private static Function<SchemeClosure, Expression> analyzeProcedure(Cons<SymbolExpression> names, Cons<Expression> exps) {
+    private static Function<SchemeClosure, Expression> analyzeProcedure(@NotNull Cons<SymbolExpression> names, @NotNull Cons<Expression> exps) {
         Function<SchemeClosure, Expression> body = analyzeSequence(exps.cdr().cdr());
         return env ->
                 ProcedureExpression.procedure(names, exps, args ->
                         body.apply(env.extend(makeMap(names, args, new LinkedHashMap<>()))));
     }
 
-    private static Map<SymbolExpression, Expression> makeMap(Cons<SymbolExpression> names, Cons<Expression> args, Map<SymbolExpression, Expression> map) {
+    @NotNull
+    private static Map<SymbolExpression, Expression> makeMap(@NotNull Cons<SymbolExpression> names, @NotNull Cons<Expression> args, @NotNull Map<SymbolExpression, Expression> map) {
         while (true) {
             if (names.isEmpty()) {
                 return map;
@@ -226,20 +230,20 @@ public enum Evaluator {
         }
     }
 
-    private static boolean isSpecialForm(Expression exp) {
+    private static boolean isSpecialForm(@NotNull Expression exp) {
         return exp.isList() && exp.list().value.car().isSymbol()
                 && SPECIAL_FORMS.contains(exp.list().value.car().symbol());
     }
 
-    private static boolean isFunctionCall(Expression exp) {
+    private static boolean isFunctionCall(@NotNull Expression exp) {
         return exp.isList() && !exp.list().value.isEmpty();
     }
 
-    private static boolean isSelfEvaluating(Expression exp) {
+    private static boolean isSelfEvaluating(@NotNull Expression exp) {
         return exp.isNumber() || exp.isBoolean() || exp.isString() || exp == Expression.none() || (exp.isList() && exp.list().value.isEmpty());
     }
 
-    private static boolean isTruthy(Expression exp) {
+    private static boolean isTruthy(@NotNull Expression exp) {
         return !BooleanExpression.bool(false).equals(exp);
     }
 

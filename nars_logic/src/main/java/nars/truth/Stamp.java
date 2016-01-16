@@ -22,6 +22,8 @@ package nars.truth;
 
 import nars.Global;
 import nars.task.Task;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 
@@ -30,7 +32,8 @@ public interface Stamp {
     /***
      * zips two evidentialBase arrays into a new one
      */
-    static long[] zip(long[] a, long[] b) {
+    @NotNull
+    static long[] zip(@NotNull long[] a, @NotNull long[] b) {
 
         int baseLength = Math.min(a.length + b.length, Global.MAXIMUM_EVIDENTAL_BASE_LENGTH);
 
@@ -51,7 +54,8 @@ public interface Stamp {
         return c;
     }
 
-    static long[] toSetArray(long[] x) {
+    @NotNull
+    static long[] toSetArray(@NotNull long[] x) {
         int l = x.length;
 
         if (l < 2)
@@ -92,6 +96,7 @@ public interface Stamp {
 
     long getCreationTime();
 
+    @NotNull
     Stamp setCreationTime(long t);
 
     default float getOriginality() {
@@ -103,11 +108,13 @@ public interface Stamp {
      * this can always be calculated deterministically from the evidentialBAse
      * since it is the deduplicated and sorted form of it.
      */
+    @Nullable
     long[] getEvidence();
 
     //Stamp setEvidence(long... evidentialSet);
 
-    static long[] zip(Task parentTask, Task parentBelief) {
+    @NotNull
+    static long[] zip(@NotNull Task parentTask, @NotNull Task parentBelief) {
 
         long[] as = parentTask.getEvidence();
         long[] bs = parentBelief.getEvidence();

@@ -3,14 +3,16 @@ package nars.term.constraint;
 import com.google.common.base.Joiner;
 import nars.term.Term;
 import nars.term.transform.FindSubst;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 
 public class AndConstraint implements MatchConstraint {
 
+    @NotNull
     final MatchConstraint[] subConst;
 
-    public AndConstraint(Collection<MatchConstraint> m) {
+    public AndConstraint(@NotNull Collection<MatchConstraint> m) {
         if (m.size() < 2)
             throw new RuntimeException("invalid size");
 
@@ -26,6 +28,7 @@ public class AndConstraint implements MatchConstraint {
         return false;
     }
 
+    @NotNull
     @Override
     public String toString() {
         return "(&&," + Joiner.on(",").join(subConst) + ')';

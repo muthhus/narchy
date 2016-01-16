@@ -13,6 +13,8 @@ import nars.term.compound.Compound;
 import nars.term.transform.FindSubst;
 import nars.term.transform.MapSubst;
 import nars.truth.DefaultTruth;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.function.Consumer;
@@ -31,7 +33,7 @@ public interface Premise extends Level, Tasked {
      * @param solution The belief
      * @return null if no match
      */
-    static void match(Task question, Task solution, NAR nar, Consumer<Task> eachSolution) {
+    static void match(@NotNull Task question, @NotNull Task solution, @NotNull NAR nar, @NotNull Consumer<Task> eachSolution) {
 
 
         //if (question.isQuestion() || question.isGoal()) {
@@ -56,7 +58,7 @@ public interface Premise extends Level, Tasked {
      * <p>
      * only sets the values if it will return true, otherwise if it returns false the callee can expect its original values untouched
      */
-    static void unify(Op varType, Term a, Term b, Memory memory, Consumer<Term> solution) {
+    static void unify(Op varType, @NotNull Term a, @NotNull Term b, @NotNull Memory memory, @NotNull Consumer<Term> solution) {
 
         FindSubst f = new FindSubst(varType, memory.random) {
 
@@ -101,7 +103,8 @@ public interface Premise extends Level, Tasked {
                 return true; //determines how many
             }
 
-            Term applySubstituteAndRenameVariables(Compound t, Map<Term,Term> subs) {
+            @Nullable
+            Term applySubstituteAndRenameVariables(Compound t, @Nullable Map<Term,Term> subs) {
                 return (subs == null) || (subs.isEmpty()) ?
                         t /* no change necessary */ :
                         memory.index.apply(new MapSubst(subs), t);
@@ -132,6 +135,7 @@ public interface Premise extends Level, Tasked {
 
     //TaskLink getTaskLink();
 
+    @Nullable
     Task getBelief();
 
 
@@ -166,6 +170,7 @@ public interface Premise extends Level, Tasked {
     }
 
 
+    @NotNull
     default Memory memory() {
         return nar().memory;
     }
@@ -370,7 +375,8 @@ public interface Premise extends Level, Tasked {
      * then they need to be added to memory with inputTask(t)
      * <p>
      */
-    default Task removeInvalid(Task task) {
+    @NotNull
+    default Task removeInvalid(@NotNull Task task) {
 
         Memory memory = nar().memory;
 
@@ -384,7 +390,7 @@ public interface Premise extends Level, Tasked {
     }
 
     /** returns a string indicating a reason why it is invalid, or null if it actually is valid */
-    static String validate(Task derived) {
+    static String validate(@NotNull Task derived) {
 
         if (derived.term() == null) {
             throw new RuntimeException("task has null term");
@@ -494,6 +500,7 @@ public interface Premise extends Level, Tasked {
 
 
 
+    @Nullable
     default Concept concept(Term x) {
         return nar().concept(x);
     }
@@ -576,6 +583,7 @@ public interface Premise extends Level, Tasked {
 //    }
 
 
+    @Nullable
     default Task derive(Task derived) {
 
 
@@ -604,6 +612,7 @@ public interface Premise extends Level, Tasked {
 
 
     /** beliefTerm iff a Compound, null otherwise */
+    @Nullable
     default Compound getBeliefCompound() {
         Term x = getBeliefTerm().term();
         return x.isCompound() ? (Compound) x : null;

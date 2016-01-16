@@ -3,6 +3,7 @@ package nars.budget;
 import nars.Symbols;
 import nars.data.BudgetedStruct;
 import nars.util.Texts;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 
@@ -58,12 +59,13 @@ public abstract class Budget extends BudgetedHandle {
         return !Float.isFinite(pri);
     }
 
-    public static String toString(Budget b) {
+    public static String toString(@NotNull Budget b) {
 
         return toStringBuilder(new StringBuilder(), Texts.n4(b.getPriority()), Texts.n4(b.getDurability()), Texts.n4(b.getQuality())).toString();
     }
 
-    public static StringBuilder toStringBuilder(StringBuilder sb, CharSequence priorityString, CharSequence durabilityString, CharSequence qualityString) {
+    @org.jetbrains.annotations.Nullable
+    public static StringBuilder toStringBuilder(@org.jetbrains.annotations.Nullable StringBuilder sb, @NotNull CharSequence priorityString, @NotNull CharSequence durabilityString, @NotNull CharSequence qualityString) {
         int c = 1 + priorityString.length() + 1 + durabilityString.length() + 1 + qualityString.length() + 1;
         if (sb == null)
             sb = new StringBuilder(c);
@@ -82,6 +84,7 @@ public abstract class Budget extends BudgetedHandle {
     /**
      * set all quantities to zero
      */
+    @org.jetbrains.annotations.Nullable
     public Budget zero() {
         return budget(0, 0, 0);
     }
@@ -96,6 +99,7 @@ public abstract class Budget extends BudgetedHandle {
 
     
     
+    @NotNull
     @Override
     public Budget getBudget() {
         return this;
@@ -136,7 +140,7 @@ public abstract class Budget extends BudgetedHandle {
 
     public abstract void setQuality(float q);
 
-    public boolean equalsByPrecision(Budget t, float epsilon) {
+    public boolean equalsByPrecision(@NotNull Budget t, float epsilon) {
         return equal(getPriority(), t.getPriority(), epsilon) &&
                 equal(getDurability(), t.getDurability(), epsilon) &&
                 equal(getQuality(), t.getQuality(), epsilon);
@@ -155,7 +159,7 @@ public abstract class Budget extends BudgetedHandle {
     /**
      * merges another budget into this one, averaging each component
      */
-    public void mergeAverage(Budget that) {
+    public void mergeAverage(@NotNull Budget that) {
         if (this == that) return;
 
         budget(
@@ -175,6 +179,7 @@ public abstract class Budget extends BudgetedHandle {
         return aveGeo(getPriority(), getDurability(), getQuality());
     }
 
+    @NotNull
     @Override
     public abstract Budget clone();
 
@@ -245,6 +250,7 @@ public abstract class Budget extends BudgetedHandle {
     /**
      * copies a budget into this; if source is null, it deletes the budget
      */
+    @NotNull
     public BudgetedStruct budget(@Nullable Budget source) {
         if (source == null) {
             zero();
@@ -259,6 +265,7 @@ public abstract class Budget extends BudgetedHandle {
     /**
      * returns this budget, after being modified
      */
+    @NotNull
     public Budget budget(float p, float d, float q) {
         setPriority(p);
         setDurability(d);
@@ -266,7 +273,8 @@ public abstract class Budget extends BudgetedHandle {
         return this;
     }
 
-    public BudgetedStruct budget(BudgetedHandle source) {
+    @NotNull
+    public BudgetedStruct budget(@NotNull BudgetedHandle source) {
         return budget(source.getBudget());
     }
 
@@ -279,10 +287,12 @@ public abstract class Budget extends BudgetedHandle {
      *
      * @return String representation of the value with 2-digit accuracy
      */
+    @org.jetbrains.annotations.Nullable
     public StringBuilder toBudgetStringExternal() {
         return toBudgetStringExternal(null);
     }
 
+    @org.jetbrains.annotations.Nullable
     public StringBuilder toBudgetStringExternal(StringBuilder sb) {
         //return MARK + priority.toStringBrief() + SEPARATOR + durability.toStringBrief() + SEPARATOR + quality.toStringBrief() + MARK;
 
@@ -293,15 +303,17 @@ public abstract class Budget extends BudgetedHandle {
         return toStringBuilder(sb, priorityString, durabilityString, qualityString);
     }
 
+    @NotNull
     public String toBudgetString() {
         return toBudgetStringExternal().toString();
     }
 
+    @NotNull
     public String getBudgetString() {
         return toString(this);
     }
 
-    public void set(Budget b) {
+    public void set(@NotNull Budget b) {
         budget(b.getPriority(), b.getDurability(), b.getQuality());
     }
 

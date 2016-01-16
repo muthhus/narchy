@@ -14,6 +14,8 @@ import nars.util.meter.condition.ExecutionCondition;
 import nars.util.meter.condition.NARCondition;
 import nars.util.meter.condition.TemporalTaskCondition;
 import nars.util.meter.event.HitMeter;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +31,7 @@ import java.util.*;
 public class TestNAR  {
 
     public final Map<Object, HitMeter> eventMeters;
+    @NotNull
     public final NAR nar;
     boolean showFail = true;
     boolean showSuccess = false;
@@ -41,8 +44,10 @@ public class TestNAR  {
     /** "must" requirement conditions specification */
     public final Collection<NARCondition> requires = new ArrayList();
     //public final List<ExplainableTask> explanations = new ArrayList();
+    @Nullable
     private Exception error;
     private static final transient boolean exitOnAllSuccess = true;
+    @NotNull
     public List<Task> inputs = new ArrayList();
     private static final int temporalTolerance = 0;
     protected static final float truthTolerance = Global.TESTS_TRUTH_ERROR_TOLERANCE;
@@ -58,9 +63,10 @@ public class TestNAR  {
     static final boolean collectTrace = false;
 
     boolean finished = false;
+    @NotNull
     final Topic<Task> answerReceiver;
 
-    public TestNAR(NAR nar) {
+    public TestNAR(@NotNull NAR nar) {
 
         answerReceiver = new DefaultTopic();
 
@@ -105,6 +111,7 @@ public class TestNAR  {
 
 
 
+    @NotNull
     public TestNAR debug() {
         Global.DEBUG = true;
         //nar.stdout();
@@ -119,24 +126,27 @@ public class TestNAR  {
 //    }
 
     /** returns a new TestNAR continuing with the current nar */
+    @NotNull
     public TestNAR next() {
         finished = false;
         return new TestNAR(nar);
     }
 
+    @NotNull
     public TestNAR input(String s) {
         finished = false;
         nar.input(s);
         return this;
     }
 
+    @NotNull
     public TestNAR inputAt(long time, String s) {
         finished = false;
         nar.inputAt(time, s);
         return this;
     }
 
-    public void believe(String t, Tense tense, float f, float c) {
+    public void believe(String t, @NotNull Tense tense, float f, float c) {
         finished = false;
         nar.believe(t, tense, f, c);
     }
@@ -187,14 +197,17 @@ public class TestNAR  {
     }
 
     //TODO initialize this once in constructor
+    @NotNull
     final Topic<Tasked>[] outputEvents;
 
+    @NotNull
     public TestNAR mustOutput(long cycleStart, long cycleEnd, String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax, long occTimeAbsolute)  {
         mustEmit(outputEvents, cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax, occTimeAbsolute);
         return this;
     }
 
 
+    @NotNull
     public TestNAR mustOutput(long withinCycles, String task)  {
         return mustEmit(outputEvents, withinCycles, task);
     }
@@ -219,15 +232,18 @@ public class TestNAR  {
 //        return mustEmit(c, cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax, ocRelative );
 //    }
 
-    public TestNAR mustEmit(Topic<Tasked>[] c, long cycleStart, long cycleEnd, String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax)  {
+    @NotNull
+    public TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long cycleStart, long cycleEnd, String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax)  {
         return mustEmit(c, cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax, Tense.ETERNAL );
     }
 
-    public TestNAR mustEmit(Topic<Tasked>[] c, long cycleStart, long cycleEnd, String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax, Tense t)  {
+    @NotNull
+    public TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long cycleStart, long cycleEnd, String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax, @NotNull Tense t)  {
         return mustEmit(c, cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax, nar.time(t));
     }
 
-    public TestNAR mustEmit(Topic<Tasked>[] c, long cycleStart, long cycleEnd, String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax, long occTimeAbsolute)  {
+    @NotNull
+    public TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long cycleStart, long cycleEnd, String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax, long occTimeAbsolute)  {
 
         float h = (freqMin!=-1) ? truthTolerance / 2.0f : 0;
 
@@ -273,6 +289,7 @@ public class TestNAR  {
 //        this.temporalTolerance = temporalTolerance;
 //    }
 
+    @Nullable
     public Exception getError() {
         return error;
     }
@@ -286,7 +303,8 @@ public class TestNAR  {
 
     public final long time() { return nar.time(); }
 
-    public TestNAR mustEmit(Topic<Tasked>[] c, long withinCycles, String task)  {
+    @NotNull
+    public TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long withinCycles, String task)  {
         Task t = nar.task(task);
         //TODO avoid reparsing term from string
 
@@ -303,14 +321,17 @@ public class TestNAR  {
         }
     }
 
+    @NotNull
     public TestNAR mustOutput(long withinCycles, String term, char punc, float freq, float conf)  {
         long now = time();
         return mustOutput(now, now + withinCycles, term, punc, freq, freq, conf, conf, nar.time(Tense.Eternal));
     }
 
+    @NotNull
     public TestNAR mustBelieve(long withinCycles, String term, float freqMin, float freqMax, float confMin, float confMax)  {
         return mustBelieve(withinCycles, term, freqMin, freqMax, confMin, confMax, Tense.ETERNAL);
     }
+    @NotNull
     public TestNAR mustBelieve(long withinCycles, String term, float freqMin, float freqMax, float confMin, float confMax, long tense)  {
         long now = time();
         return mustOutput(now, now + withinCycles, term, '.', freqMin, freqMax, confMin, confMax, tense);
@@ -323,46 +344,56 @@ public class TestNAR  {
 //        long now = time();
 //        return mustOutput(now + cycleStart, now + cycleStop, term, '.', freq, freq, confidence, confidence);
 //    }
-    public TestNAR mustBelieve(long withinCycles, String term, float freq, float confidence, Tense t)  {
+    @NotNull
+    public TestNAR mustBelieve(long withinCycles, String term, float freq, float confidence, @NotNull Tense t)  {
         long ttt = nar.time();
         return mustOutput(ttt, ttt + withinCycles, term, '.', freq, freq, confidence, confidence, nar.time(t));
     }
-    public TestNAR mustAnswer(long withinCycles, String term, float freq, float confidence, Tense t)  {
+    @NotNull
+    public TestNAR mustAnswer(long withinCycles, String term, float freq, float confidence, @NotNull Tense t)  {
         long ttt = nar.time();
         return mustEmit(new Topic[] { answerReceiver },
                 ttt, ttt + withinCycles, term, '.', freq, freq, confidence, confidence, nar.time(t));
     }
+    @NotNull
     public TestNAR mustBelieve(long withinCycles, String term, float freq, float confidence, long occTimeAbsolute)  {
         long t = nar.time();
         return mustOutput(t, t + withinCycles, term, '.', freq, freq, confidence, confidence,occTimeAbsolute);
     }
 
+    @NotNull
     public TestNAR mustBelieve(long withinCycles, String term, float freq, float confidence)  {
         return mustBelieve(withinCycles, term, freq, confidence, Tense.Eternal);
     }
+    @NotNull
     public TestNAR mustBelieve(long withinCycles, String term, float confidence)  {
         return mustBelieve(withinCycles, term, 1.0f, confidence);
     }
 
+    @NotNull
     public TestNAR mustDesire(long withinCycles, String goalTerm, float freq, float conf) {
         return mustOutput(withinCycles, goalTerm, '!', freq, conf);
     }
 
+    @NotNull
     public TestNAR mustDesire(long withinCycles, String goalTerm, float freq, float conf, long occ) {
         long t = nar.time();
         return mustOutput(t, t + withinCycles, goalTerm, '!', freq, freq, conf, conf, occ);
     }
 
 
+    @NotNull
     public TestNAR mustExecute(long start, long end, String term) {
         return mustExecute(start, end, term, 0, 1.0f);
     }
 
+    @NotNull
     public TestNAR mustExecute(long start, long end, String term, float minExpect, float maxExpect) {
         requires.add(new ExecutionCondition(nar, start, end, Atom.the(term), minExpect, maxExpect));
         return this;
     }
 
+    @NotNull
     public TestNAR ask(String termString)  {
         //Override believe to input beliefs that have occurrenceTime set on input
         // "lazy timing" appropriate for test cases that can have delays
@@ -376,7 +407,8 @@ public class TestNAR  {
     }
 
 
-    public TestNAR believe(String... termString)  {
+    @NotNull
+    public TestNAR believe(@NotNull String... termString)  {
         for (String s : termString)
             nar.believe(s);
         return this;
@@ -385,6 +417,7 @@ public class TestNAR  {
 
 
 
+    @NotNull
     public TestNAR believe(String termString, float freq, float conf)  {
 
         nar.believe(termString, freq, conf);
@@ -396,13 +429,16 @@ public class TestNAR  {
     public static class Report implements Serializable {
 
         public final long time;
+        @NotNull
         public final HitMeter[] eventMeters;
+        @Nullable
         protected Serializable error = null;
         protected Task[] inputs;
+        @NotNull
         protected List<NARCondition> cond = Global.newArrayList(1);
         final transient int stackElements = 4;
 
-        public Report(TestNAR n) {
+        public Report(@NotNull TestNAR n) {
             time = n.time();
 
             inputs = n.inputs.toArray(new Task[n.inputs.size()]);
@@ -410,7 +446,7 @@ public class TestNAR  {
             eventMeters = var.toArray(new HitMeter[var.size()]);
         }
 
-        public void setError(Exception e) {
+        public void setError(@Nullable Exception e) {
             if (e!=null) {
                 error = new Object[]{e.toString(), Arrays.copyOf(e.getStackTrace(), stackElements)};
             }
@@ -427,7 +463,7 @@ public class TestNAR  {
             return true;
         }
 
-        public void toString(PrintStream out) {
+        public void toString(@NotNull PrintStream out) {
 
             if (error!=null) {
                 out.print(error);
@@ -465,10 +501,12 @@ public class TestNAR  {
 
     }
 
+    @NotNull
     public TestNAR test() {
         return run(true);
     }
 
+    @NotNull
     public TestNAR run(boolean testAndPrintReport /* for use with JUnit */) {
         long finalCycle = 0;
         for (NARCondition oc : requires) {
@@ -503,6 +541,7 @@ public class TestNAR  {
         return this;
     }
 
+    @NotNull
     public Report getReport() {
         Report report = new Report(this);
 
@@ -514,7 +553,7 @@ public class TestNAR  {
         return report;
     }
 
-    protected void report(Report report, boolean success) {
+    protected void report(@NotNull Report report, boolean success) {
 
         //String s = //JSONOutput.stringFromFieldsPretty(report);
             //report.toString();
@@ -539,10 +578,12 @@ public class TestNAR  {
 
     }
 
+    @NotNull
     public TestNAR run(long extraCycles) {
         return runUntil(time() + extraCycles);
     }
 
+    @NotNull
     public TestNAR runUntil(long finalCycle) {
 
         error = null;

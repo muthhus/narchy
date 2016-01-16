@@ -10,6 +10,8 @@ import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.compile.TermBuilder;
 import nars.term.compound.Compound;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Produces canonical "Reflective-Narsese" representation of a parameter term
@@ -24,7 +26,7 @@ public class reflect extends TermFunction {
 
     
     @Override
-    public Term function(Compound x, TermBuilder i) {
+    public Term function(@NotNull Compound x, TermBuilder i) {
 
         Term content = x.term(0);
 
@@ -35,16 +37,20 @@ public class reflect extends TermFunction {
     /**
      * <(*,subject,object) --> predicate>
      */
+    @Nullable
     public static Term sop(Term subject, Term object, Term predicate) {
         return $.inh($.p(getMetaTerm(subject), getMetaTerm(object)), predicate);
     }
-    public static Term sop(Compound s, String operatorName) {
+    @Nullable
+    public static Term sop(@NotNull Compound s, String operatorName) {
         return $.inh($.p(getMetaTerm(s.term(0)), getMetaTerm(s.term(1))), Atom.quote(operatorName));
     }
-    public static Term sop(Compound s, Term predicate) {
+    @Nullable
+    public static Term sop(@NotNull Compound s, Term predicate) {
         return $.inh($.p(getMetaTerm(s.term(0)), getMetaTerm(s.term(1))), predicate);
     }
-    public static Term sop(String operatorName, Compound c) {
+    @Nullable
+    public static Term sop(String operatorName, @NotNull Compound c) {
         Term[] m = new Term[c.size()];
         for (int i = 0; i < c.size(); i++)
             m[i] = getMetaTerm(c.term(i));
@@ -52,6 +58,7 @@ public class reflect extends TermFunction {
         return $.inh($.p(m), Atom.quote(operatorName));
     }
     
+    @Nullable
     public static Term getMetaTerm(Term node) {
         if (!(node instanceof Compound)) {
             return node;

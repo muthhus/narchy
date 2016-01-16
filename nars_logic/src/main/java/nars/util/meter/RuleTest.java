@@ -5,13 +5,15 @@ import nars.Narsese;
 import nars.nal.PremiseRule;
 import nars.nar.Default;
 import nars.task.Task;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * test an invididual premise
  */
 public class RuleTest extends TestNAR {
 
-	public static RuleTest from(PremiseRule r) {
+	@NotNull
+	public static RuleTest from(@NotNull PremiseRule r) {
 		// TODO eventually make this handle all of r's postconditions and
 		// modifiers, etc
 		String task = r.task().toString();
@@ -44,14 +46,14 @@ public class RuleTest extends TestNAR {
 
 	static final Narsese p = Narsese.the();
 
-	public RuleTest(NAR nar, String task, String belief, String result,
-			float minFreq, float maxFreq, float minConf, float maxConf) {
+	public RuleTest(@NotNull NAR nar, String task, String belief, String result,
+					float minFreq, float maxFreq, float minConf, float maxConf) {
 		this(nar, nar.task(task), nar.task(belief), result, minFreq, maxFreq,
 				minConf, maxConf);
 
 	}
-	public RuleTest(NAR nar, Task task, Task belief, String result,
-			float minFreq, float maxFreq, float minConf, float maxConf) {
+	public RuleTest(@NotNull NAR nar, Task task, Task belief, String result,
+					float minFreq, float maxFreq, float minConf, float maxConf) {
 		super(nar);
 
 		nar.input(task);

@@ -1,6 +1,7 @@
 package nars.term.atom;
 
 import nars.Op;
+import org.jetbrains.annotations.NotNull;
 
 
 /** atom backed by a native java String */
@@ -10,6 +11,7 @@ public class StringAtom extends AbstractStringAtomRaw {
         super(id);
     }
 
+    @NotNull
     @Override
     public Op op() {
         return Op.ATOM;

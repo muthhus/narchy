@@ -26,6 +26,8 @@ import nars.nal.nal8.decide.Decider;
 import nars.task.Task;
 import nars.term.Term;
 import nars.term.atom.Atom;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
@@ -35,17 +37,19 @@ import java.util.function.Consumer;
 public abstract class AbstractOperator implements Consumer<Execution> {
 
 
+    @Nullable
     public final Term operatorTerm;
 
 
 
 
+    @NotNull
     @Override
     public String toString() {
         return '^' + operatorTerm.toString();
     }
 
-    public AbstractOperator(Term term) {
+    public AbstractOperator(@Nullable Term term) {
         if (term == null) {
             term = Atom.the(getClass().getSimpleName());
         }
@@ -71,13 +75,14 @@ public abstract class AbstractOperator implements Consumer<Execution> {
 
 
 
+    @NotNull
     public Decider decider() {
         return DecideAboveDecisionThreshold.the;
     }
 
 
     @Override
-    public void accept(Execution execution) {
+    public void accept(@NotNull Execution execution) {
         Task o = execution.task;
         if (o.isCommand() || decider().test(o)) {
             _execute(execution);
@@ -98,7 +103,7 @@ public abstract class AbstractOperator implements Consumer<Execution> {
      * @param op     The operate to be executed
      * @return true if successful, false if an error occurred
      */
-    public final void _execute(Execution execution) {
+    public final void _execute(@NotNull Execution execution) {
         if (async()) {
             //asynch
             execution.nar.execAsync(() -> execute(execution));
@@ -132,6 +137,7 @@ public abstract class AbstractOperator implements Consumer<Execution> {
      */
     public boolean async() { return false; }
 
+    @Nullable
     public final Term getOperatorTerm() {
         return operatorTerm;
     }

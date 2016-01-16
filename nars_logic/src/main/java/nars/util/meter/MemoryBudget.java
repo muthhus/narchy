@@ -6,6 +6,7 @@ import nars.NAR;
 import nars.term.Term;
 import nars.util.Texts;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.EnumMap;
 import java.util.Iterator;
@@ -112,7 +113,8 @@ public class MemoryBudget extends EnumMap<MemoryBudget.Budgeted,Object>  {
         update(n);
     }
 
-    public static Signals onConcept(NARMetrics nm, Term termConcept) {
+    @NotNull
+    public static Signals onConcept(@NotNull NARMetrics nm, @NotNull Term termConcept) {
         Memory m = nm.nar.memory;
         String prefix = termConcept.toString();
         Signals s = new Signals() {
@@ -130,6 +132,7 @@ public class MemoryBudget extends EnumMap<MemoryBudget.Budgeted,Object>  {
 
             final Object[] empty = { 0, 0, 0 };
 
+            @NotNull
             @Override
             public Object[] sample(Object key) {
                 //Concept c = m.concept(termConcept);
@@ -145,24 +148,29 @@ public class MemoryBudget extends EnumMap<MemoryBudget.Budgeted,Object>  {
 
 
 
-    public static Signals on(String prefix, NARMetrics m) {
+    @NotNull
+    public static Signals on(String prefix, @NotNull NARMetrics m) {
         Signals s = on(prefix, b -> b.update(m.nar));
         m.metrics.add(s);
         return s;
     }
 
-    public static Signals on(String prefix, Consumer<MemoryBudget> c) {
+    @NotNull
+    public static Signals on(String prefix, @NotNull Consumer<MemoryBudget> c) {
 
         return new Signals() {
 
+            @NotNull
             MemoryBudget b = new MemoryBudget();
 
+            @NotNull
             @Override
             public List<Signal> getSignals() {
                 return Lists.newArrayList(
                         new Signal(prefix + "_ActiveConceptPrioritySum")
                 );
             }
+            @NotNull
             @Override
             public Object[] sample(Object key) {
                 c.accept(b);
@@ -211,6 +219,7 @@ public class MemoryBudget extends EnumMap<MemoryBudget.Budgeted,Object>  {
         //put(Budgeted.ActiveTermLinkPriorityStdDev, termLinkStdDev.getResult());
     }
 
+    @NotNull
     @Override
     public String toString() {
         Iterator<Entry<Budgeted,Object>> i = entrySet().iterator();

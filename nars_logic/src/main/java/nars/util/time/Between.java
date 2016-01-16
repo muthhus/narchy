@@ -1,5 +1,7 @@
 package nars.util.time;
 
+import org.jetbrains.annotations.NotNull;
+
 /** defines an interval between two comparable values */
 public class Between<K extends Comparable<? super K>> {
 	
@@ -27,23 +29,23 @@ public class Between<K extends Comparable<? super K>> {
 //		this.low = low;
 //	}
 
-    final boolean contains(K p){
+    final boolean contains(@NotNull K p){
 		return low.compareTo(p) <= 0 && high.compareTo(p) > 0;
 	}
 	
 	/**
 	 * Returns true if this Interval wholly contains i.
 	 */
-    final boolean contains(Between<K> i){
+    final boolean contains(@NotNull Between<K> i){
 		return contains(i.low) && contains(i.high);
 	}
 	
-	final boolean overlaps(K low, K high){
+	final boolean overlaps(@NotNull K low, @NotNull K high){
 		return  this.low.compareTo(high) <= 0 &&
 				this.high.compareTo(low) > 0;
 	}
 	
-	final boolean overlaps(Between<K> i){
+	final boolean overlaps(@NotNull Between<K> i){
 		return overlaps(i.low,i.high);
 	}
 	

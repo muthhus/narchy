@@ -3,12 +3,14 @@ package nars.util.data;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.util.event.Active;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by me on 4/16/15.
  */
 public abstract class ConceptMap {
 
+	@NotNull
 	public final NAR nar;
 
 	Active regs;
@@ -22,7 +24,7 @@ public abstract class ConceptMap {
 	public void reset() {
 	}
 
-	protected ConceptMap(NAR nar) {
+	protected ConceptMap(@NotNull NAR nar) {
 
         regs = new Active(
         nar.memory.eventReset.on(n -> {

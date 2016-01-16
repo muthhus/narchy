@@ -1,5 +1,8 @@
 package nars.util.time;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Collection;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -9,7 +12,9 @@ public interface IntervalTreeNode<K extends Comparable<? super K>,V> {
 
 	boolean isLeaf();
 	
+	@Nullable
 	IntervalTreeNode<K,V> getLeft();
+	@Nullable
 	IntervalTreeNode<K,V> getRight();
 	
 	boolean contains(K point);
@@ -26,6 +31,7 @@ public interface IntervalTreeNode<K extends Comparable<? super K>,V> {
 	
 	Between<K> getRange();
 	
+	@NotNull
 	IntervalTreeNode<K, V> put(Between<K> key, V value);
 
 	void getOverlap(Between<K> range, Consumer<V> accumulator);
@@ -39,22 +45,29 @@ public interface IntervalTreeNode<K extends Comparable<? super K>,V> {
 	 */
 	void searchContainedBy(Between<K> range, Collection<V> accumulator);
 	
+	@Nullable
 	IntervalTreeNode<K, V> removeOverlapping(Between<K> range);
+	@Nullable
 	IntervalTreeNode<K, V> removeContaining(Between<K> range);
+	@Nullable
 	IntervalTreeNode<K, V> removeContainedBy(Between<K> range);
 	
 	void values(Collection<V> accumulator);
 	void entrySet(Set<Entry<Between<K>, V>> accumulator);
 	void keySet(Set<Between<K>> accumulator);
 	
+	@Nullable
 	IntervalTreeNode<K, V> remove(V value);
+	@Nullable
 	IntervalTreeNode<K, V> removeAll(Collection<V> values);
 
 	int size();
 	int maxHeight();
 	void averageHeight(Collection<Integer> heights, int currentHeight);
 
+	@Nullable
 	V getEqual(Between<K> range);
 
+	@Nullable
 	V getContain(Between<K> range);
 }

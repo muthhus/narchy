@@ -6,6 +6,8 @@ import nars.bag.Bag;
 import nars.budget.*;
 import nars.util.ArraySortedIndex;
 import nars.util.data.sorted.SortedIndex;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -19,20 +21,21 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
 
     //public static final Procedure2<Budget, Budget> DEFAULT_MERGE_METHOD = UnitBudget.average;
 
+    @Nullable
     protected BudgetMerge mergeFunction = null;
 
     public ArrayBag(int cap) {
         this(new BudgetedArraySortedIndex<>(cap));
     }
 
-    public ArrayBag(SortedIndex<BLink<V>> items) {
+    public ArrayBag(@NotNull SortedIndex<BLink<V>> items) {
         this(items,
             //Global.newHashMap(items.capacity()/2)
             new HashMap(items.capacity()/2)
         );
     }
 
-    public ArrayBag(SortedIndex<BLink<V>> items, Map<V, BLink<V>> map) {
+    public ArrayBag(@NotNull SortedIndex<BLink<V>> items, Map<V, BLink<V>> map) {
         super(items, map);
 
         items.clear();
@@ -40,16 +43,18 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
     }
 
 
+    @NotNull
     Bag<V> setMergeFunction(BudgetMerge mergeFunction) {
         this.mergeFunction = mergeFunction;
         return this;
     }
 
     @Override
-    public final V key(BLink<V> l) {
+    public final V key(@NotNull BLink<V> l) {
         return l.get();
     }
 
+    @Nullable
     @Override public BLink<V> put(Object v) {
         //TODO combine with CurveBag.put(v)
         BLink<V> existing = get(v);
@@ -67,6 +72,7 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
     /**
      * set the merging function to 'plus'
      */
+    @NotNull
     public Bag<V> mergePlus() {
         return setMergeFunction(BudgetMerge.plusDQDominated);
     }
@@ -90,7 +96,8 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
     }
 
 
-    public BLink<V> put(BudgetedHandle k) {
+    @Nullable
+    public BLink<V> put(@NotNull BudgetedHandle k) {
         return put(k, k.getBudget());
     }
 
@@ -119,11 +126,13 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
 //        );
 //    }
 
+    @Nullable
     @Override
     public BLink<V> sample() {
         throw new RuntimeException("unimpl");
     }
 
+    @NotNull
     @Override
     public Bag<V> sample(int n, Predicate<BLink<V>> each, Collection<BLink<V>> target) {
         throw new RuntimeException("unimpl");
@@ -194,6 +203,7 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
      *
      * @return The selected Item, or null if this bag is empty
      */
+    @Nullable
     @Override
     public BLink<V> pop() {
         throw new RuntimeException("unimpl");
@@ -270,7 +280,7 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
         top(this::update);
     }
 
-    public void update(BLink<V> v) {
+    public void update(@NotNull BLink<V> v) {
         if (!v.hasDelta()) {
             return;
         }
@@ -309,6 +319,7 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
         return removeItem(0);
     }
 
+    @NotNull
     @Override
     public String toString() {
         return super.toString() + '{' + items.getClass().getSimpleName() + '}';
@@ -332,12 +343,12 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
         return items.getLast().getPriority();
     }
 
-    public final void popAll(Consumer<BLink<V>> receiver) {
+    public final void popAll(@NotNull Consumer<BLink<V>> receiver) {
         forEach(receiver);
         clear();
     }
 
-    public void pop(Consumer<BLink<V>> receiver, int n) {
+    public void pop(@NotNull Consumer<BLink<V>> receiver, int n) {
         if (n == size()) {
             //special case where size <= inputPerCycle, the entire bag can be flushed in one operation
             popAll(receiver);
@@ -354,7 +365,7 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
             super(capacity / 4, capacity);
         }
 
-        @Override public float score(X v) {
+        @Override public float score(@NotNull X v) {
             return v.getPriority();
         }
     }

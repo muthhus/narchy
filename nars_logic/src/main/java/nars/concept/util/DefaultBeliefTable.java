@@ -11,6 +11,8 @@ import nars.task.Task;
 import nars.truth.Truthed;
 import nars.util.ArraySortedIndex;
 import nars.util.data.Util;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -23,14 +25,17 @@ import java.util.function.Consumer;
  */
 public class DefaultBeliefTable implements BeliefTable {
 
+    @NotNull
     final Map<Task,Task> map;
+    @NotNull
     final ArrayTable<Task,Task> eternal;
+    @NotNull
     final ArrayTable<Task,Task> temporal;
 
     private long now; //cached value, updated before temporal operations begin
     private long minT, maxT, tRange;
 
-    public DefaultBeliefTable(int cap, Memory memory) {
+    public DefaultBeliefTable(int cap, @NotNull Memory memory) {
         super();
 
         this.map = new HashMap(cap/2);
@@ -67,17 +72,18 @@ public class DefaultBeliefTable implements BeliefTable {
     }
 
 
-    public float rankTemporal(Task b, long when) {
+    public float rankTemporal(@NotNull Task b, long when) {
         return b.getConfidence()/((1f+Math.abs(b.getOccurrenceTime() - when))/tRange);
     }
 
+    @NotNull
     @Override
     public Iterator<Task> iterator() {
         return Iterators.concat(eternal.items.iterator(), temporal.items.iterator());
     }
 
     @Override
-    public void forEach(Consumer<? super Task> action) {
+    public void forEach(@NotNull Consumer<? super Task> action) {
         eternal.forEach(action);
         temporal.forEach(action);
     }
@@ -115,11 +121,13 @@ public class DefaultBeliefTable implements BeliefTable {
         temporal.clear();
     }
 
+    @Nullable
     @Override
     public Task topEternal() {
         return eternal.highest();
     }
 
+    @Nullable
     @Override
     public Task topTemporal(long when) {
         Task best = null;
@@ -186,8 +194,9 @@ public class DefaultBeliefTable implements BeliefTable {
      * if the new task is rejected, it will be deleted. callee must check
      * for this condition
      */
+    @Nullable
     @Override
-    public Task add(Task input, Memory memory, Consumer<Task> onBeliefChanged) {
+    public Task add(@NotNull Task input, @NotNull Memory memory, @NotNull Consumer<Task> onBeliefChanged) {
 
         long now = this.now = memory.time();
 
@@ -211,7 +220,8 @@ public class DefaultBeliefTable implements BeliefTable {
         return result;
     }
 
-    Task addRevise(Task input, Task preTop, Memory memory, long now) {
+    @Nullable
+    Task addRevise(@NotNull Task input, @NotNull Task preTop, @NotNull Memory memory, long now) {
         //TODO make sure input.isDeleted() can not happen
 
         Task revised = LocalRules.getRevision(input, preTop, now);
@@ -227,7 +237,7 @@ public class DefaultBeliefTable implements BeliefTable {
         return input.isEternal() ? topEternal() : top(now);
     }
 
-    private boolean insert(Task t, Memory memory) {
+    private boolean insert(@NotNull Task t, @NotNull Memory memory) {
         ArrayTable<Task, Task> table = getTableFor(t);
 
         if (Global.DEBUG) {
@@ -244,7 +254,7 @@ public class DefaultBeliefTable implements BeliefTable {
     /** try to insert but dont delete the input task if it wasn't inserted (but delete a displaced if it was)
      *  returns true if it was inserted, false if not
      * */
-    private boolean insertAttempt(Task t, Memory memory) {
+    private boolean insertAttempt(@NotNull Task t, @NotNull Memory memory) {
         ArrayTable<Task, Task> table = getTableFor(t);
         Task displaced = table.put(t,t);
         boolean inserted = displaced != t;
@@ -254,18 +264,19 @@ public class DefaultBeliefTable implements BeliefTable {
         return inserted;
     }
 
-    private ArrayTable<Task, Task> getTableFor(Task t) {
+    @NotNull
+    private ArrayTable<Task, Task> getTableFor(@NotNull Task t) {
         return t.isEternal() ? this.eternal : this.temporal;
     }
 
 
 
 
-    private static void onBeliefRemoved(Task t, String reason, Memory memory) {
+    private static void onBeliefRemoved(@NotNull Task t, String reason, @NotNull Memory memory) {
         memory.remove(t, reason);
     }
 
-    static void checkForDeleted(Task input, ArrayTable<Task,Task> table) {
+    static void checkForDeleted(@NotNull Task input, @NotNull ArrayTable<Task,Task> table) {
         if (input.getDeleted())
             throw new RuntimeException("deleted task being added");
 

@@ -7,6 +7,7 @@ import nars.nal.nal7.Tense;
 import nars.process.ConceptProcess;
 import nars.term.Term;
 import nars.term.compound.Compound;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * occurrsRelative(target, variable, direction)
@@ -17,9 +18,10 @@ import nars.term.compound.Compound;
 public class occurr extends AtomicBooleanCondition<PremiseMatch> {
 
     final boolean taskOrBelief, forward;
+    @NotNull
     final String str;
 
-    public occurr(Term var1, Term var2) {
+    public occurr(@NotNull Term var1, @NotNull Term var2) {
         taskOrBelief = var1.toString().equals("task"); //TODO check else case
         forward = var2.toString().equals("forward"); //TODO check else case
         str = getClass().getSimpleName() + ":(" +
@@ -27,13 +29,14 @@ public class occurr extends AtomicBooleanCondition<PremiseMatch> {
                 (forward ? "forward" : "reverse") + ")";
     }
 
+    @NotNull
     @Override
     public String toString() {
         return str;
     }
 
     @Override
-    public boolean booleanValueOf(PremiseMatch m) {
+    public boolean booleanValueOf(@NotNull PremiseMatch m) {
 
         ConceptProcess p = m.premise;
 

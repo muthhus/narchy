@@ -5,6 +5,8 @@ import nars.task.Task;
 import nars.term.Term;
 import nars.term.transform.Subst;
 import nars.util.data.random.XorShift128PlusRandom;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Random;
@@ -14,17 +16,20 @@ import java.util.function.Function;
 public abstract class PatternAnswer implements Function<Task, List<Task>> {
 
     final Random rng = new XorShift128PlusRandom(1);
+    @Nullable
     public final Term pattern;
 
     protected PatternAnswer(String pattern) {
         this.pattern = Narsese.the().termRaw(pattern);
     }
 
+    @NotNull
     @Override
     public String toString() {
         return getClass().getSimpleName() + '[' + pattern.toString() + ']';
     }
 
+    @Nullable
     @Override
     public List<Task> apply(Task questionTask) {
 // TODO reimplement
@@ -37,12 +42,14 @@ public abstract class PatternAnswer implements Function<Task, List<Task>> {
         return null;
     }
 
-    private List<Task> process(Task question, List<Task> answers) {
+    @NotNull
+    private List<Task> process(Task question, @NotNull List<Task> answers) {
         answers.forEach(a -> {
 //            a.setParentTask(question);
         });
         return answers;
     }
 
+    @Nullable
     public abstract List<Task> run(Task operationTask, Subst map1);
 }

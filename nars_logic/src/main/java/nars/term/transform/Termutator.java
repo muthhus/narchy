@@ -1,6 +1,7 @@
 package nars.term.transform;
 
 import nars.term.Termlike;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by me on 12/22/15.
@@ -27,7 +28,7 @@ public abstract class Termutator /* implements BooleanIterator */ {
 
 
     @Override
-    public final boolean equals(Object obj) {
+    public final boolean equals(@NotNull Object obj) {
         if (this == obj) return true;
         return resultKey.equals(((Termutator)obj).resultKey);
     }

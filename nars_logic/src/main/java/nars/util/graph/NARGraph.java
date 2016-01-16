@@ -3,6 +3,8 @@ package nars.util.graph;
 import nars.Global;
 import nars.NAR;
 import nars.concept.Concept;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jgrapht.EdgeFactory;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultEdge;
@@ -19,7 +21,8 @@ import java.util.stream.Collectors;
  */
 public class NARGraph<V,E> extends DirectedMultigraph<V,E> {
 
-    public <X> Set<X> vertices(Class<? extends X> type) {
+    @NotNull
+    public <X> Set<X> vertices(@NotNull Class<? extends X> type) {
         Set<X> s = Global.newHashSet(vertexSet().size());
         s.addAll(vertexSet().stream().filter(type::isInstance).map(o -> (X) o).collect(Collectors.toList()));
         return s;
@@ -64,6 +67,7 @@ public class NARGraph<V,E> extends DirectedMultigraph<V,E> {
      */
     public interface Grapher {
 
+        @NotNull
         Grapher on(NARGraph g, Object o);
 
         /**
@@ -228,7 +232,8 @@ public class NARGraph<V,E> extends DirectedMultigraph<V,E> {
     }
 
 
-    public NARGraph add(NAR n, Filter filter, Grapher graphize) {
+    @NotNull
+    public NARGraph add(@NotNull NAR n, @NotNull Filter filter, @NotNull Grapher graphize) {
         graphize.onTime(this, n.time());
 
         //TODO support AbstractBag
@@ -250,11 +255,11 @@ public class NARGraph<V,E> extends DirectedMultigraph<V,E> {
     }
 
     @Override
-    public boolean addEdge(V sourceVertex, V targetVertex, E e) {
+    public boolean addEdge(V sourceVertex, V targetVertex, @NotNull E e) {
         return addEdge(sourceVertex, targetVertex, e, false);
     }
 
-    public boolean addEdge(V sourceVertex, V targetVertex, E e, boolean allowMultiple) {
+    public boolean addEdge(V sourceVertex, V targetVertex, @NotNull E e, boolean allowMultiple) {
         if (!allowMultiple) {
             Set<E> existing = getAllEdges(sourceVertex, targetVertex);
             if (existing != null) {
@@ -293,6 +298,7 @@ public class NARGraph<V,E> extends DirectedMultigraph<V,E> {
     //        toGML(new FileWriter(outputFile, false));
     //    }
 
+    @NotNull
     @Override
     public Graph clone() {
         return (Graph) super.clone();
@@ -321,6 +327,7 @@ public class NARGraph<V,E> extends DirectedMultigraph<V,E> {
             return ((TimeNode) obj).time == time;
         }
 
+        @NotNull
         @Override
         public String toString() {
             return "t" + time;
@@ -350,13 +357,14 @@ public class NARGraph<V,E> extends DirectedMultigraph<V,E> {
         at(x, t, (E) new UniqueEdge(edgeLabel));
     }
 
-    @Deprecated public void at(V x, long t, E edge) {
+    @Deprecated public void at(V x, long t, @NotNull E edge) {
         TimeNode timeNode = new TimeNode(t);
         addVertex((V) timeNode);
         addEdge((V) timeNode, x, edge);
     }
 
     private static class MyEdgeFactory implements EdgeFactory {
+        @Nullable
         @Override
         public Object createEdge(Object sourceVertex, Object targetVertex) {
             return null;

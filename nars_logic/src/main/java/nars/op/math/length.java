@@ -23,6 +23,7 @@ import nars.op.mental.Mental;
 import nars.term.Term;
 import nars.term.compile.TermBuilder;
 import nars.term.compound.Compound;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Count the number of elements in a set
@@ -43,7 +44,7 @@ public class length extends TermFunction<Integer> implements Mental {
     //TODO 'volume' of any term
 
     @Override
-    public Integer function(Compound o, TermBuilder i) {
+    public Integer function(@NotNull Compound o, TermBuilder i) {
         Term[] x = Operator.opArgsArray(o);
         Term content = x[0];
         /*if (!(content instanceof SetExt) && !(content instanceof SetInt)) {

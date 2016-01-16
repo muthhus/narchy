@@ -21,6 +21,7 @@ import nars.$;
 import nars.Memory;
 import nars.nal.nal8.Execution;
 import nars.term.Term;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Feeling happy value
@@ -34,7 +35,7 @@ public class feelHappy extends feel {
      * @return Immediate results as Tasks
      */
     @Override
-    public void execute(Execution e) {
+    public void execute(@NotNull Execution e) {
         Memory m = e.nar.memory;
         e.feedback(
             feeling(m.emotion.happy(), m, happiness)

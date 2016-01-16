@@ -4,6 +4,8 @@ package nars.op.software.scheme;
 import nars.op.software.scheme.exception.VariableNotDefinedException;
 import nars.op.software.scheme.expressions.Expression;
 import nars.op.software.scheme.expressions.SymbolExpression;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.List;
@@ -29,12 +31,13 @@ public class SchemeClosure {
         this(new HashMap<>(DefaultEnvironment.PRIMITIVES));
     }
 
+    @NotNull
     public SchemeClosure extend(Map<SymbolExpression, Expression> bindings) {
         return new SchemeClosure(bindings, this);
     }
 
 
-    public Expression get(SymbolExpression symbol) {
+    public Expression get(@NotNull SymbolExpression symbol) {
         SchemeClosure other = this;
         while (true) {
             Expression exists = other.bindings.get(symbol);
@@ -49,7 +52,7 @@ public class SchemeClosure {
         }
     }
 
-    public void set(SymbolExpression symbol, Expression value) {
+    public void set(@NotNull SymbolExpression symbol, Expression value) {
         if (bindings.containsKey(symbol)) {
             bindings.put(symbol, value);
         } else if (enclosingEnvironment != null) {
@@ -64,7 +67,7 @@ public class SchemeClosure {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
@@ -85,22 +88,23 @@ public class SchemeClosure {
         return result;
     }
 
+    @NotNull
     @Override
     public String toString() {
         return getClass().getSimpleName() + '@' + Integer.toUnsignedString( hashCode(), Character.MAX_RADIX);
     }
 
-    public Stream<Expression> evalStream(String input) {
+    public Stream<Expression> evalStream(@NotNull String input) {
         List<Expression> read = Reader.read(input);
         return eval(read);
 
     }
 
-    public Stream<Expression> eval(List<Expression> exprs) {
+    public Stream<Expression> eval(@NotNull List<Expression> exprs) {
         return exprs.stream().map(e -> Evaluator.evaluate(e, this));
     }
 
-    public List<Expression> eval(String input) {
+    public List<Expression> eval(@NotNull String input) {
         return evalStream(input).collect(Collectors.toList());
     }
 

@@ -2,6 +2,7 @@ package nars.term.constraint;
 
 import nars.term.Term;
 import nars.term.transform.FindSubst;
+import org.jetbrains.annotations.NotNull;
 
 
 public final class NotEqualsConstraint implements MatchConstraint {
@@ -13,7 +14,7 @@ public final class NotEqualsConstraint implements MatchConstraint {
     }
 
     @Override
-    public boolean invalid(Term x, Term y, FindSubst f) {
+    public boolean invalid(Term x, @NotNull Term y, @NotNull FindSubst f) {
         Term canNotEqual = f.getXY(b);
         if (canNotEqual != null) {
             return y.equals(canNotEqual);
@@ -21,6 +22,7 @@ public final class NotEqualsConstraint implements MatchConstraint {
         return false;
     }
 
+    @NotNull
     @Override
     public String toString() {
         return "notEqual:" + b;

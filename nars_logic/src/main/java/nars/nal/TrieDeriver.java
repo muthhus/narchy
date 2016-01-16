@@ -8,6 +8,8 @@ import nars.nal.meta.*;
 import nars.nal.meta.op.Derive;
 import nars.nal.meta.op.MatchTerm;
 import nars.term.Term;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.magnos.trie.TrieNode;
 
 import java.io.IOException;
@@ -22,7 +24,9 @@ import java.util.stream.Collectors;
  */
 public class TrieDeriver extends Deriver {
 
+    @NotNull
     public final ProcTerm<PremiseMatch>[] roots;
+    @Nullable
     public final TermTrie<Term, PremiseRule> trie;
 
     /** derivation term graph, gathered for analysis */
@@ -32,13 +36,13 @@ public class TrieDeriver extends Deriver {
         this(new PremiseRuleSet(Lists.newArrayList(rule)));
     }
 
-    public TrieDeriver(PremiseRuleSet ruleset) {
+    public TrieDeriver(@NotNull PremiseRuleSet ruleset) {
         super(ruleset);
 
         this.trie = new TermTrie<Term, PremiseRule>(ruleset.getPremiseRules()) {
 
             @Override
-            public void index(PremiseRule s) {
+            public void index(@Nullable PremiseRule s) {
 
                 if (s == null || s.postconditions == null)
                     return;
@@ -79,9 +83,11 @@ public class TrieDeriver extends Deriver {
     }
 
     /** HACK warning: use of this singular matchParent tracker is not thread-safe. assumes branches will be processed in a linear, depth first order */
+    @Nullable
     final transient AtomicReference<MatchTerm> matchParent = new AtomicReference<MatchTerm>(null);
 
-    private List<Term> getBranches(TrieNode<List<Term>, PremiseRule> node) {
+    @NotNull
+    private List<Term> getBranches(@NotNull TrieNode<List<Term>, PremiseRule> node) {
 
         List<Term> bb = Global.newArrayList(node.getChildCount());
 
@@ -102,7 +108,7 @@ public class TrieDeriver extends Deriver {
     }
 
 
-    private Collection<BooleanCondition<PremiseMatch>> compileConditions(Collection<Term> t, AtomicReference<MatchTerm> matchParent) {
+    private Collection<BooleanCondition<PremiseMatch>> compileConditions(@NotNull Collection<Term> t, @NotNull AtomicReference<MatchTerm> matchParent) {
 
         return t.stream().filter(x -> {
             if (x instanceof BooleanCondition) {
@@ -135,15 +141,17 @@ public class TrieDeriver extends Deriver {
 
 
 
-    private static Collection<ProcTerm<PremiseMatch>> compileActions(List<Term> t) {
+    @NotNull
+    private static Collection<ProcTerm<PremiseMatch>> compileActions(@NotNull List<Term> t) {
         //t.forEach(x -> System.out.println(x.getClass() + " " + x));
         return (Collection)t;
     }
 
 
+    @NotNull
     public static ProcTerm<PremiseMatch> branch(
-            Collection<BooleanCondition<PremiseMatch>> condition,
-            ThenFork<PremiseMatch> conseq) {
+            @NotNull Collection<BooleanCondition<PremiseMatch>> condition,
+            @Nullable ThenFork<PremiseMatch> conseq) {
 
         if ((conseq != null) && (conseq.size() > 0)) {
             return new PremiseBranch(condition, conseq);
@@ -152,7 +160,7 @@ public class TrieDeriver extends Deriver {
         }
     }
 
-    protected void compile(ProcTerm<PremiseMatch> p) throws IOException, CannotCompileException, NotFoundException {
+    protected void compile(@NotNull ProcTerm<PremiseMatch> p) throws IOException, CannotCompileException, NotFoundException {
         StringBuilder s = new StringBuilder();
 
         final String header = "public final static String wtf=" +

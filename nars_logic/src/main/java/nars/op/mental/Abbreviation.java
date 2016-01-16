@@ -8,6 +8,7 @@ import nars.task.Task;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.compound.Compound;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -27,13 +28,14 @@ public class Abbreviation implements Consumer<Task> {
     //when a concept is important and exceeds a syntactic complexity, let NARS name it:
     public final AtomicInteger abbreviationComplexityMin = new AtomicInteger(24);
     public final AtomicDouble abbreviationQualityMin = new AtomicDouble(0.7f);
+    @NotNull
     private final NAR nar;
 
     //TODO different parameters for priorities and budgets of both the abbreviation process and the resulting abbreviation judgment
     //public AtomicDouble priorityFactor = new AtomicDouble(1.0);
 
 
-    public Abbreviation(NAR n) {
+    public Abbreviation(@NotNull NAR n) {
 
         n.memory.eventInput.on(this);
         nar = n;
@@ -46,7 +48,7 @@ public class Abbreviation implements Consumer<Task> {
         return Atom.the(Symbols.TERM_PREFIX + Integer.toHexString(currentTermSerial.incrementAndGet()));
     }
 
-    public boolean canAbbreviate(Task task) {
+    public boolean canAbbreviate(@NotNull Task task) {
         Term t = task.term();
 
         if (Op.isOperation(t)) return false;
@@ -66,7 +68,7 @@ public class Abbreviation implements Consumer<Task> {
      * @return Immediate results as Tasks
      */
     @Override
-    public void accept(Task task) {
+    public void accept(@NotNull Task task) {
 
 
         //is it complex and also important? then give it a name:

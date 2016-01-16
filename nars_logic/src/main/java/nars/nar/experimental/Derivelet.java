@@ -9,6 +9,8 @@ import nars.process.ConceptProcess;
 import nars.task.Task;
 import nars.term.Termed;
 import nars.term.Terms;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 import java.util.function.Consumer;
@@ -52,10 +54,12 @@ public class Derivelet {
      */
     private final Set<BLink<Task>> tasks = Global.newHashSet(1);
 
+    @NotNull
     private BLink[] termsArray = new BLink[0];
+    @NotNull
     private BLink[] tasksArray = new BLink[0];
 
-    public static int firePremises(BLink<Concept> conceptLink, BLink<Task>[] tasks, BLink<Termed>[] terms, Consumer<ConceptProcess> proc, NAR nar) {
+    public static int firePremises(BLink<Concept> conceptLink, @NotNull BLink<Task>[] tasks, @NotNull BLink<Termed>[] terms, @NotNull Consumer<ConceptProcess> proc, @NotNull NAR nar) {
 
         int total = 0;
 
@@ -82,9 +86,9 @@ public class Derivelet {
      * (recycles buffers, non-thread safe, one thread use this at a time)
      */
     public int firePremiseSquare(
-            NAR nar,
-            Consumer<ConceptProcess> proc,
-            BLink<Concept> conceptLink,
+            @NotNull NAR nar,
+            @NotNull Consumer<ConceptProcess> proc,
+            @NotNull BLink<Concept> conceptLink,
             int tasklinks, int termlinks,
             Predicate<BLink<Termed>> eachTermLink,
             Predicate<BLink<Task>> eachTaskLink) {
@@ -113,6 +117,7 @@ public class Derivelet {
     }
 
 
+    @NotNull
     private NAR nar() {
         return context.nar;
     }
@@ -121,6 +126,7 @@ public class Derivelet {
      * determines a next concept to move adjacent to
      * the concept it is currently at
      */
+    @Nullable
     public Concept nextConcept() {
 
         final BLink<Concept> concept = this.concept;
@@ -185,6 +191,7 @@ public class Derivelet {
         return fired > 0;
     }
 
+    @Nullable
     final Consumer<Task> perDerivation = (derived) -> {
         final NAR n = nar();
 
@@ -197,13 +204,14 @@ public class Derivelet {
             DeriveletContext.deriver.run(p, matcher, perDerivation);
 
 
-    public final void start(final Concept concept, int ttl, final DeriveletContext context) {
+    public final void start(final Concept concept, int ttl, @NotNull final DeriveletContext context) {
         this.context = context;
         this.concept = new BLink(concept, 0, 0, 0); //TODO
         this.ttl = ttl;
         this.matcher = new PremiseMatch(context.rng);
     }
 
+    @NotNull
     @Override
     public String toString() {
         return getClass().getSimpleName() + '@' + concept;

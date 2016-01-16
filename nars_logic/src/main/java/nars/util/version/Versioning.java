@@ -2,6 +2,7 @@ package nars.util.version;
 
 import nars.util.data.DequePool;
 import nars.util.data.list.FasterList;
+import org.jetbrains.annotations.NotNull;
 
 /** versioning context that holds versioned instances */
 public class Versioning extends FasterList<Versioned> {
@@ -12,6 +13,7 @@ public class Versioning extends FasterList<Versioned> {
     private int nextID = 1;
 
 
+    @NotNull
     @Override
     public String toString() {
         return now + ":" + super.toString();
@@ -93,7 +95,7 @@ public class Versioning extends FasterList<Versioned> {
     }
 
     /** should only call this when v will never be used again because its buffers are recycled here */
-    public <X> void onDeleted(Versioned v) {
+    public <X> void onDeleted(@NotNull Versioned v) {
         FasterList vStack = v.value;
 
         //TODO maybe flush these periodically for GC
@@ -109,6 +111,7 @@ public class Versioning extends FasterList<Versioned> {
             super(Versioning.initiALPOOL_CAPACITY);
         }
 
+        @NotNull
         @Override public FasterList create() {
             return new FasterList(8);
         }
@@ -119,6 +122,7 @@ public class Versioning extends FasterList<Versioned> {
             super(Versioning.initiALPOOL_CAPACITY);
         }
 
+        @NotNull
         @Override public int[] create() {
             return new int[stackLimit];
         }

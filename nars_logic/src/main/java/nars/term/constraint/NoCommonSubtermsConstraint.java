@@ -4,6 +4,8 @@ import nars.Global;
 import nars.term.Term;
 import nars.term.compound.Compound;
 import nars.term.transform.FindSubst;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 
@@ -17,7 +19,7 @@ public final class NoCommonSubtermsConstraint implements MatchConstraint {
     }
 
     @Override
-    public boolean invalid(Term x, Term y, FindSubst f) {
+    public boolean invalid(Term x, Term y, @NotNull FindSubst f) {
         Term B = f.getXY(b);
         if (B != null) {
             Set<Term> tmpSet = Global.newHashSet(0);
@@ -26,6 +28,7 @@ public final class NoCommonSubtermsConstraint implements MatchConstraint {
         return false;
     }
 
+    @NotNull
     @Override
     public String toString() {
         return "noCommonSubterms(" + b + ')';
@@ -36,7 +39,7 @@ public final class NoCommonSubtermsConstraint implements MatchConstraint {
         return !addUnmatchedSubterms(b, null, s); //we stop early this way (efficiency)
     }
 
-    static boolean addUnmatchedSubterms(Term x, Set<Term> AX, Set<Term> BX) {
+    static boolean addUnmatchedSubterms(Term x, @Nullable Set<Term> AX, @Nullable Set<Term> BX) {
         if (BX != null && BX.contains(x)) { //by this we can stop early
             return false;
         }

@@ -3,6 +3,7 @@ package nars.nal.nal8.decide;
 import nars.Memory;
 import nars.task.Task;
 import nars.truth.Truth;
+import org.jetbrains.annotations.NotNull;
 
 
 public abstract class DecideAboveDecisionThreshold extends DecideAllGoals {
@@ -20,7 +21,7 @@ public abstract class DecideAboveDecisionThreshold extends DecideAllGoals {
         }
 
         @Override
-        protected float desire(Task task) {
+        protected float desire(@NotNull Task task) {
             Truth t = task.getTruth();
             if (t == null)
                 throw new RuntimeException("null truth");
@@ -47,7 +48,7 @@ public abstract class DecideAboveDecisionThreshold extends DecideAllGoals {
 //    }
 
     @Override
-    public boolean test(Task task) {
+    public boolean test(@NotNull Task task) {
         if (super.test(task)) {
             return desire(task) > memory.executionExpectationThreshold.floatValue();
         }

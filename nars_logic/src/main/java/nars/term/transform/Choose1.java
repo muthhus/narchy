@@ -2,6 +2,7 @@ package nars.term.transform;
 
 import nars.term.Term;
 import nars.term.match.EllipsisMatch;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
@@ -11,14 +12,17 @@ import java.util.Set;
  */
 public class Choose1 extends Termutator {
 
+    @NotNull
     private final Set<Term> yFree;
     private final Term x;
     private final Term xEllipsis;
     private final FindSubst f;
     private int shuffle;
+    @NotNull
     private final Term[] yy;
     private int count;
 
+    @NotNull
     @Override
     public String toString() {
 
@@ -29,7 +33,7 @@ public class Choose1 extends Termutator {
                 '}';
     }
 
-    public Choose1(FindSubst f, Term xEllipsis, Term x, Set<Term> yFree) {
+    public Choose1(FindSubst f, Term xEllipsis, Term x, @NotNull Set<Term> yFree) {
         super(xEllipsis);
 
         int ysize = yFree.size();

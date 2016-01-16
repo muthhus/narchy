@@ -10,6 +10,8 @@ import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.compile.TermBuilder;
 import nars.term.compound.Compound;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -25,6 +27,7 @@ public class MethodOperator extends TermFunction {
 
     static final TypeParser parser = TypeParser.newBuilder().build();
 
+    @NotNull
     private final Method method;
     private final Parameter[] params;
 
@@ -34,9 +37,10 @@ public class MethodOperator extends TermFunction {
     boolean feedback = true;
 
     public static final Atom ERROR = Atom.the("ERR");
+    @Nullable
     private volatile Task currentTask = null;
 
-    public MethodOperator(AtomicBoolean enable, Method m, NALObjects context) {
+    public MethodOperator(AtomicBoolean enable, @NotNull Method m, NALObjects context) {
         super(getParentMethodName(m));
 
         this.context = context;
@@ -45,7 +49,7 @@ public class MethodOperator extends TermFunction {
         this.enable = enable;
     }
 
-    private static Term getParentMethodName(Method m) {
+    private static Term getParentMethodName(@NotNull Method m) {
         Class<?> sc = m.getDeclaringClass();
 
         String superClass = sc.getSimpleName();
@@ -54,7 +58,7 @@ public class MethodOperator extends TermFunction {
     }
 
     @Override
-    public void execute(Execution e) {
+    public void execute(@NotNull Execution e) {
         currentTask = e.task; //HACK
 
         super.execute(e);
@@ -63,8 +67,9 @@ public class MethodOperator extends TermFunction {
     }
 
 
+    @Nullable
     @Override
-    public Object function(Compound o, TermBuilder ti) {
+    public Object function(@NotNull Compound o, TermBuilder ti) {
         Term[] x;
         try {
             x = ((Compound) o.terms()[0]).terms(); //HACK

@@ -7,6 +7,7 @@ import nars.nal.nal8.operator.TermFunction;
 import nars.term.Term;
 import nars.term.compile.TermBuilder;
 import nars.term.compound.Compound;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,13 +24,14 @@ import java.util.List;
 public abstract class Flat extends TermFunction {
 
     @Override
-    public Term function(Compound op, TermBuilder i) {
+    public Term function(@NotNull Compound op, TermBuilder i) {
         List<Term> l = new ArrayList();
         collect(Operator.opArgsArray(op), l);
         return result(l);
     }
 
-    public static List<Term> collect(Term[] x, List<Term> l) {
+    @NotNull
+    public static List<Term> collect(@NotNull Term[] x, @NotNull List<Term> l) {
         for (Term a : x) {
             if (a.op(Op.PRODUCT) || a.op().isSet() || a.isAny(Op.ConjunctivesBits)) {
                 ((Compound)a).addAllTo(l);
@@ -40,13 +42,15 @@ public abstract class Flat extends TermFunction {
         return l;
     }
 
+    @NotNull
     public abstract Term result(List<Term> terms);
 
     public static class flatProduct extends Flat {
 
 
+        @NotNull
         @Override
-        public Term result(List<Term> terms) {
+        public Term result(@NotNull List<Term> terms) {
             return $.p(terms);
         }
 

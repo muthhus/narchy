@@ -21,6 +21,7 @@
 package nars.nal;
 
 import nars.Global;
+import org.jetbrains.annotations.NotNull;
 
 import static java.lang.Math.pow;
 import static java.lang.Math.sqrt;
@@ -38,7 +39,7 @@ public class UtilityFunctions   {
      * @param arr The inputs, each in [0, 1]
      * @return The output that is no larger than each input
      */
-    public static float and(float... arr) {
+    public static float and(@NotNull float... arr) {
         float product = 1;
         for (float f : arr) {
             product *= f;
@@ -61,7 +62,7 @@ public class UtilityFunctions   {
      * @param arr The inputs, each in [0, 1]
      * @return The output that is no smaller than each input
      */
-    public static float or(float... arr) {
+    public static float or(@NotNull float... arr) {
         float product = 1;
         for (float f : arr) {
             product *= (1 - f);
@@ -78,7 +79,7 @@ public class UtilityFunctions   {
      * @param arr The inputs, each in [0, 1]
      * @return The arithmetic average the inputs
      */
-    public static float aveAri(float... arr) {
+    public static float aveAri(@NotNull float... arr) {
         float sum = 0;
         for (float f : arr) {
             sum += f;
@@ -91,7 +92,7 @@ public class UtilityFunctions   {
      * @param arr The inputs, each in [0, 1]
      * @return The geometric average the inputs
      */
-    public static float aveGeo(float... arr) {
+    public static float aveGeo(@NotNull float... arr) {
         float product = 1;
         for (float f : arr) {
             if (f == 0) return 0;

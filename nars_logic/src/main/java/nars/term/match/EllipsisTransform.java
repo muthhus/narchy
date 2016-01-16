@@ -7,6 +7,7 @@ import nars.term.Term;
 import nars.term.compound.Compound;
 import nars.term.transform.VariableNormalization;
 import nars.term.variable.Variable;
+import org.jetbrains.annotations.NotNull;
 
 /** ellipsis that transforms one of its elements, which it is required to match within */
 public class EllipsisTransform extends EllipsisOneOrMore {
@@ -14,7 +15,7 @@ public class EllipsisTransform extends EllipsisOneOrMore {
     public final Term from;
     public final Term to;
 
-    public EllipsisTransform(Variable name, Term from, Term to) {
+    public EllipsisTransform(@NotNull Variable name, Term from, Term to) {
         super(name, ".." + from + '=' + to + "..+");
 
 //        if (from instanceof VarPattern)
@@ -28,14 +29,16 @@ public class EllipsisTransform extends EllipsisOneOrMore {
           this.to = to;
     }
 
+    @NotNull
     @Override
     public Variable normalize(int serial) {
         //handled in a special way elsewhere
         return this;
     }
 
+    @NotNull
     @Override
-    public Variable clone(Variable v, VariableNormalization normalizer) {
+    public Variable clone(@NotNull Variable v, VariableNormalization normalizer) {
         //normalizes any variable parameter terms of an EllipsisTransform
         PremiseRule.PremiseRuleVariableNormalization vnn = (PremiseRule.PremiseRuleVariableNormalization) normalizer;
         return new EllipsisTransform(v,
@@ -43,7 +46,8 @@ public class EllipsisTransform extends EllipsisOneOrMore {
                 to instanceof Variable ? vnn.applyAfter((Variable)to) : to);
     }
 
-    public EllipsisMatch collect(Compound y, int a, int b, PremiseMatch subst) {
+    @NotNull
+    public EllipsisMatch collect(@NotNull Compound y, int a, int b, @NotNull PremiseMatch subst) {
         if (from.equals(Op.Imdex) && (y.op().isImage())) {
 
             int rel = y.relation();

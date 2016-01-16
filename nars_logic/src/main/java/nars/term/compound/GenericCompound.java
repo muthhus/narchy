@@ -8,6 +8,7 @@ import nars.term.TermVector;
 import nars.term.Termed;
 import nars.term.compile.TermPrinter;
 import nars.util.data.Util;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -22,6 +23,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     public final Op op;
 
     /** subterm vector */
+    @NotNull
     public final TermVector<T> terms;
 
     /** subterm relation, resolves to unique concept */
@@ -35,15 +37,15 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     private transient boolean normalized = false;
 
 
-    public GenericCompound(Op op, TermVector subterms) {
+    public GenericCompound(Op op, @NotNull TermVector subterms) {
         this(op, -1, subterms);
     }
 
-    public GenericCompound(Op op, int relation, TermVector subterms) {
+    public GenericCompound(Op op, int relation, @NotNull TermVector subterms) {
         this(op, relation, Tense.ITERNAL, subterms);
     }
 
-    public GenericCompound(Op op, int relation, int t, TermVector subterms) {
+    public GenericCompound(Op op, int relation, int t, @NotNull TermVector subterms) {
         this.terms = subterms;
         this.normalized = (subterms.vars() == 0);
         this.op = op;
@@ -78,7 +80,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     }
 
     @Override
-    public final void append(Appendable p, boolean pretty) throws IOException {
+    public final void append(@NotNull Appendable p, boolean pretty) throws IOException {
         TermPrinter.append(this, p, pretty);
     }
 
@@ -112,21 +114,22 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
 
     @Override
-    public final void addAllTo(Collection<Term> set) {
+    public final void addAllTo(@NotNull Collection<Term> set) {
         terms.addAllTo(set);
     }
 
+    @NotNull
     @Override
     public final TermVector<T> subterms() {
         return terms;
     }
 
     @Override
-    public boolean equals(Object that) {
+    public boolean equals(@NotNull Object that) {
         return this == that || hashCode() == that.hashCode() && equalsFurther((Termed) that);
     }
 
-    private boolean equalsFurther(Termed thatTerm) {
+    private boolean equalsFurther(@NotNull Termed thatTerm) {
 
         boolean r=false;
         Term u = thatTerm.term();
@@ -182,12 +185,12 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
 
     @Override
-    public final void forEach(Consumer<? super T> action, int start, int stop) {
+    public final void forEach(@NotNull Consumer<? super T> action, int start, int stop) {
         terms.forEach(action, start, stop);
     }
 
     @Override
-    public final void forEach(Consumer<? super T> c) {
+    public final void forEach(@NotNull Consumer<? super T> c) {
         terms.forEach(c);
     }
 
@@ -196,7 +199,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     }
 
     @Override
-    public final Term[] terms(IntObjectPredicate<T> filter) {
+    public final Term[] terms(@NotNull IntObjectPredicate<T> filter) {
         return terms.terms(filter);
     }
 
@@ -216,7 +219,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     }
 
     @Override
-    public final boolean containsTerm(Term target) {
+    public final boolean containsTerm(@NotNull Term target) {
         return terms.containsTerm(target);
     }
 
@@ -245,6 +248,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
         return normalized;
     }
 
+    @NotNull
     @Override
     public Compound t(int cycles) {
         if (cycles == t) return this;

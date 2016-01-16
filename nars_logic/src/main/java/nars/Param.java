@@ -9,6 +9,7 @@ import nars.truth.Truth;
 import nars.util.data.MutableInteger;
 import objenome.Container;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -33,6 +34,7 @@ public abstract class Param extends Container implements Level {
      *
      * previously called "bag threshold" and had default value = 0.1
      */
+    @NotNull
     @Range(min=0, max=1f)
     public MutableFloat perfection = new MutableFloat(0.1);
 
@@ -141,7 +143,7 @@ public abstract class Param extends Container implements Level {
         }
     }
 
-    public void applyDefaultBudget(MutableTask t) {
+    public void applyDefaultBudget(@NotNull MutableTask t) {
 
         char punc = t.getPunctuation();
         t.setPriority(getDefaultPriority(punc));

@@ -10,6 +10,7 @@ import nars.NAR;
 import nars.Narsese;
 import nars.task.Task;
 import nars.task.flow.TaskQueue;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,11 +49,12 @@ public class LibraryInput extends TextInput {
     }
 
 
-    protected LibraryInput(NAR n, String path) throws IOException {
+    protected LibraryInput(@NotNull NAR n, @NotNull String path) throws IOException {
         super(n, FileInput.load(path));
     }
     
-    public static LibraryInput get(NAR n, String id) throws Exception {
+    @NotNull
+    public static LibraryInput get(@NotNull NAR n, @NotNull String id) throws Exception {
         if (!id.endsWith(".nal"))
             id = id + ".nal";
 
@@ -68,7 +70,8 @@ public class LibraryInput extends TextInput {
         cwd = currentRelativePath.toAbsolutePath().toString();
     }
 
-    public static String getExamplePath(String path) {
+    @NotNull
+    public static String getExamplePath(@NotNull String path) {
         if (path.length() > 0 && path.charAt(0) == '/') return path; //dont modify, it's already absolute
         return cwd.endsWith("nars_logic") || cwd.endsWith("nars_lab") ? "../nal/" + path : "nal/" + path;
     }
@@ -77,12 +80,14 @@ public class LibraryInput extends TextInput {
 //        return OutputCondition.getConditions(n, input, similarResultsToSave);
 //    }
 
+    @NotNull
     public static Map<String,String> getUnitTests() {
         return getUnitTests("test", "Examples/DecisionMaking", "Examples/ClassicalConditioning");
     }
 
 
-    public static Map<String,String> getUnitTests(String... directories) {
+    @NotNull
+    public static Map<String,String> getUnitTests(@NotNull String... directories) {
         Map<String,String> l = new TreeMap();
 
         for (String dir : directories ) {
@@ -112,7 +117,7 @@ public class LibraryInput extends TextInput {
     }
 
     @Override
-    protected int process(NAR nar, String input) {
+    protected int process(@NotNull NAR nar, String input) {
         int n = super.process(nar, input);
         this.input = input;
         return n;
@@ -123,6 +128,7 @@ public class LibraryInput extends TextInput {
         return input;
     }
 
+    @NotNull
     protected static Map<String, String> examples = new HashMap(); //path -> script data
 
     static final Function<? super String, CharSequence> lineFilter = _line -> {
@@ -134,7 +140,7 @@ public class LibraryInput extends TextInput {
         return line;
     };
 
-    public static String getExample(String path) {
+    public static String getExample(@NotNull String path) {
         try {
             String existing = examples.get(path);
             if (existing!=null)
@@ -149,6 +155,7 @@ public class LibraryInput extends TextInput {
         }
     }
 
+    @NotNull
     public static Collection<String> getPaths(String... directories) {
         Map<String, String> et = LibraryInput.getUnitTests(directories);
         Collection<String> t = et.values();
@@ -172,6 +179,7 @@ public class LibraryInput extends TextInput {
 //        return params;
 //    }
 
+    @NotNull
     public static List<Object[]> rawTasks(String script) {
 
         List<Object[]> rr = Global.newArrayList();
@@ -181,7 +189,8 @@ public class LibraryInput extends TextInput {
         return rr;
     }
 
-    public static List<Task> getExample(List<Object[]> raw, Memory m) {
+    @NotNull
+    public static List<Task> getExample(@NotNull List<Object[]> raw, @NotNull Memory m) {
 
         List<Task> y = Global.newArrayList(raw.size());
         for (Object o : raw) {
@@ -194,7 +203,8 @@ public class LibraryInput extends TextInput {
         return y;
     }
 
-    public static TaskQueue getExampleInput(List raw, Memory m) {
+    @NotNull
+    public static TaskQueue getExampleInput(@NotNull List raw, @NotNull Memory m) {
         return new TaskQueue(getExample(raw, m));
     }
 }

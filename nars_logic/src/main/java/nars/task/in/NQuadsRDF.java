@@ -7,6 +7,8 @@ import nars.task.Task;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.compound.Compound;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.semanticweb.yars.nx.Node;
 import org.semanticweb.yars.nx.parser.NxParser;
 
@@ -46,13 +48,13 @@ public abstract class NQuadsRDF {
 //            "(<[^\\s]+>|_:(?:[A-Za-z][A-Za-z0-9\\-_]*))\\s+(<[^\\s]+>)\\s+(<[^\\s]+>|_:(?:[A-Za-z][A-Za-z0-9\\-_]*)|\\\"(?:(?:\\\"|[^\"])*)\\\"(?:@(?:[a-z]+[\\-A-Za-z0-9]*)|\\^\\^<(?:[^>]+)>)?)\\s+(<[^\\s]+>).*"
 //    );
 
-    public static void input(NAR nar, String input) throws Exception {
+    public static void input(@NotNull NAR nar, String input) throws Exception {
         NxParser p  = new NxParser();
         p.parse(Collections.singleton(input));
         input(nar, p);
     }
 
-    public static void input(NAR nar, InputStream input) throws Exception {
+    public static void input(@NotNull NAR nar, @NotNull InputStream input) throws Exception {
         //try {
             NxParser p = new NxParser();
             p.parse(input);
@@ -66,11 +68,11 @@ public abstract class NQuadsRDF {
 //        }
     }
 
-    public static void input(NAR nar, Iterable<Node[]> nxp) {
+    public static void input(@NotNull NAR nar, @NotNull Iterable<Node[]> nxp) {
         input(nar, StreamSupport.stream(nxp.spliterator(), false));
     }
 
-    public static void input(NAR nar, Stream<Node[]> nxp) {
+    public static void input(@NotNull NAR nar, @NotNull Stream<Node[]> nxp) {
 
         nar.input(
             nxp.map( (Node[] nx) -> {
@@ -166,7 +168,7 @@ public abstract class NQuadsRDF {
 //    }
 
     //TODO interpret Node subclasses in special ways, possibly returning Compounds not only Atom's
-    public static Atom resource(Node n) {
+    public static Atom resource(@NotNull Node n) {
         String s = n.getLabel();
         //if (s.startsWith("<") && s.endsWith(">")) {
             //s = s.substring(1, s.length() - 1);
@@ -205,7 +207,7 @@ public abstract class NQuadsRDF {
 //    }
 
 
-    public static Term atom(String uri) {
+    public static Term atom(@NotNull String uri) {
         int lastSlash = uri.lastIndexOf('/');
         if (lastSlash!=-1)
             uri = uri.substring(lastSlash + 1);
@@ -246,6 +248,7 @@ public abstract class NQuadsRDF {
     static final Atom differentFrom = Atom.the("differentFrom");
     static final Atom dataTypeProperty = Atom.the("DatatypeProperty");
 
+    @Nullable
     static Term subjObjInst(Term subject, char subjType, char objType, boolean reverse) {
         String a = reverse ? "subj" : "obj";
         String b = reverse ? "obj" : "subj";
@@ -259,9 +262,9 @@ public abstract class NQuadsRDF {
      * relation is to be saved. Takes care of updating relation_types as well.
      *
      */
-    public static Task input(NAR nar,
-                             Atom subject,
-                             Atom predicate, Term object) {
+    public static Task input(@NotNull NAR nar,
+                             @Nullable Atom subject,
+                             @NotNull Atom predicate, @NotNull Term object) {
 
         //http://www.w3.org/TR/owl-ref/
 
@@ -371,7 +374,8 @@ public abstract class NQuadsRDF {
      * @param qname the QName for the tag.
      * @return the formatted QName for the tag.
      */
-    private String formatTag(QName qname) {
+    @NotNull
+    private String formatTag(@NotNull QName qname) {
         String prefix = qname.getPrefix();
         String suffix = qname.getLocalPart();
 
@@ -388,7 +392,7 @@ public abstract class NQuadsRDF {
      * @param name the input camel cased name.
      * @return the "english" name.
      */
-    private String getEnglishName(String name) {
+    private String getEnglishName(@NotNull String name) {
         StringBuilder englishNameBuilder = new StringBuilder();
         char[] namechars = name.toCharArray();
         for (int i = 0; i < namechars.length; i++) {

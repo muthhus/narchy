@@ -6,6 +6,8 @@ import nars.concept.util.BeliefTable;
 import nars.nal.nal7.Tense;
 import nars.term.compound.Compound;
 import nars.truth.TruthWave;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /** utility class for analyzing the belief/goal state of a concept */
 public class BeliefAnalysis extends EnergyAnalysis {
@@ -17,19 +19,22 @@ public class BeliefAnalysis extends EnergyAnalysis {
 		this.term = term;
 	}
 
-	public BeliefAnalysis(NAR n, String term) {
+	public BeliefAnalysis(@NotNull NAR n, String term) {
 		this(n, (Compound) n.term(term));
 	}
 
+	@NotNull
 	public BeliefAnalysis believe(float freq, float conf) {
 		nar.believe(term, freq, conf);
 		return this;
 	}
 
-	public BeliefAnalysis believe(float freq, float conf, Tense present) {
+	@NotNull
+	public BeliefAnalysis believe(float freq, float conf, @NotNull Tense present) {
 		nar.believe(term, present, freq, conf);
 		return this;
 	}
+	@NotNull
 	public BeliefAnalysis believe(float pri, float freq, float conf, long when) {
 		nar.believe(pri, term, when, freq, conf);
 		return this;
@@ -39,6 +44,7 @@ public class BeliefAnalysis extends EnergyAnalysis {
 		return nar.concept(term);
 	}
 
+	@Nullable
 	public BeliefTable beliefs() {
 		Concept c = concept();
 		if (c == null)
@@ -46,10 +52,12 @@ public class BeliefAnalysis extends EnergyAnalysis {
 		return c.getBeliefs();
 	}
 
+	@NotNull
 	public TruthWave wave() {
 		return beliefs().getWave();
 	}
 
+	@NotNull
 	public BeliefAnalysis run(int frames) {
 		nar.frame(frames);
 		return this;

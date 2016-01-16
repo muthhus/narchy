@@ -21,7 +21,8 @@
 package nars.term;
 
 import nars.term.compound.Compound;
-
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 
 /**
@@ -39,7 +40,7 @@ public interface Statement {
      * @param predicate The second component
      * @return Whether The Statement is invalid
      */
-    static boolean invalidStatement(Term subject, Term predicate) {
+    static boolean invalidStatement(@Nullable Term subject, @Nullable Term predicate) {
         if (subject == null || predicate == null)
             return true;
 
@@ -50,7 +51,7 @@ public interface Statement {
     }
 
     /** skips the null and equality test */
-    static boolean invalidStatement2(Term subject, Term predicate) {
+    static boolean invalidStatement2(@NotNull Term subject, @NotNull Term predicate) {
 
         //TODO combine these mirrored invalidReflexive calls into one combined, unredundant operation
         if (invalidReflexive(subject, predicate))
@@ -76,14 +77,14 @@ public interface Statement {
     }
 
 
-    static boolean is(Termed t) {
+    static boolean is(@NotNull Termed t) {
         return t.op().isStatement();
     }
 
-    static Term subj(Termed t) {
+    static Term subj(@NotNull Termed t) {
         return ((TermContainer)t.term()).term(0);
     }
-    static Term pred(Termed t) {
+    static Term pred(@NotNull Termed t) {
         return ((TermContainer)t.term()).term(1);
     }
 

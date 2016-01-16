@@ -2,6 +2,8 @@ package nars.util;
 
 import nars.Global;
 import nars.util.data.sorted.SortedIndex;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -19,7 +21,7 @@ abstract public class ArraySortedIndex<E> extends SortedIndex<E> {
 
 
     @Override
-    public final void forEach(Consumer<? super E> consumer) {
+    public final void forEach(@NotNull Consumer<? super E> consumer) {
         list.forEach(consumer);
     }
 
@@ -140,6 +142,7 @@ abstract public class ArraySortedIndex<E> extends SortedIndex<E> {
         return list.get(i);
     }
 
+    @Nullable
     @Override
     public E insert(E incoming) {
 
@@ -258,6 +261,7 @@ abstract public class ArraySortedIndex<E> extends SortedIndex<E> {
         return list.toString();
     }
 
+    @NotNull
     @Override
     public final Iterator<E> descendingIterator() {
         //return new ReverseListIterator(list);
@@ -293,10 +297,12 @@ abstract public class ArraySortedIndex<E> extends SortedIndex<E> {
         list.clear();
     }
 
+    @NotNull
     @Override public Object[] toArray() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @NotNull
     @Override
     public <T> T[] toArray(T[] a) {
         throw new UnsupportedOperationException("Not supported yet.");

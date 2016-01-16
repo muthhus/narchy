@@ -1,5 +1,7 @@
 package nars.op.software.scheme.expressions;
 
+import org.jetbrains.annotations.NotNull;
+
 public class NumberExpression implements Expression {
     public final long value;
 
@@ -7,12 +9,13 @@ public class NumberExpression implements Expression {
         this.value = value;
     }
 
+    @NotNull
     public static NumberExpression number(long n) {
         return new NumberExpression(n);
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@NotNull Object o) {
         return getClass() == o.getClass() && value == ((NumberExpression) o).value;
     }
 
@@ -25,6 +28,7 @@ public class NumberExpression implements Expression {
         return String.format("number(%s)", value);
     }
 
+    @NotNull
     @Override
     public String print() {
         return Long.toString(value);

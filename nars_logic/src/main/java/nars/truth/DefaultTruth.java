@@ -1,6 +1,7 @@
 package nars.truth;
 
 import nars.Memory;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by me on 5/19/15.
@@ -27,7 +28,7 @@ public class DefaultTruth extends AbstractScalarTruth {
 //        super(v);
 //    }
 
-    public DefaultTruth(char punctuation, Memory m) {
+    public DefaultTruth(char punctuation, @NotNull Memory m) {
         set(1.0f, m.getDefaultConfidence(punctuation));
     }
 
@@ -35,14 +36,15 @@ public class DefaultTruth extends AbstractScalarTruth {
     public DefaultTruth() {
     }
 
-    public DefaultTruth(AbstractScalarTruth toClone) {
+    public DefaultTruth(@NotNull AbstractScalarTruth toClone) {
         this(toClone.getFrequency(), toClone.getConfidence());
     }
 
-    public DefaultTruth(Truth truth) {
+    public DefaultTruth(@NotNull Truth truth) {
         this(truth.getFrequency(), truth.getConfidence());
     }
 
+    @NotNull
     @Override
     public Truth mulConf(float factor) {
         return new DefaultTruth(getFrequency(), getConfidence() * factor);

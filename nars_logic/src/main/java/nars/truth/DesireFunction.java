@@ -6,53 +6,63 @@ import nars.Symbols;
 import nars.nal.meta.TruthOperator;
 import nars.term.Term;
 import nars.term.atom.Atom;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
 public enum DesireFunction implements TruthOperator {
 
     Negation() {
-        @Override public Truth apply(final Truth T, final Truth B, Memory m) {
+        @NotNull
+        @Override public Truth apply(@NotNull final Truth T, final Truth B, Memory m) {
             return TruthFunctions.negation(T); }
     },
 
     Strong() {
-        @Override public Truth apply(final Truth T, final Truth B, Memory m) {
+        @Nullable
+        @Override public Truth apply(@NotNull final Truth T, @Nullable final Truth B, Memory m) {
             if (B == null) return null;
             return TruthFunctions.desireStrong(T,B);
         }
     },
     Weak() {
-        @Override public Truth apply(final Truth T, final Truth B, Memory m) {
+        @Nullable
+        @Override public Truth apply(@NotNull final Truth T, @Nullable final Truth B, Memory m) {
             if (B == null) return null;
             return TruthFunctions.desireWeak(T, B);
         }
     },
     Induction() {
-        @Override public Truth apply(final Truth T, final Truth B, Memory m) {
+        @Nullable
+        @Override public Truth apply(@NotNull final Truth T, @Nullable final Truth B, Memory m) {
             if (B == null) return null;
             return TruthFunctions.desireInd(T,B);
         }
     },
     Deduction() {
-        @Override public Truth apply(final Truth T, final Truth B, Memory m) {
+        @Nullable
+        @Override public Truth apply(@NotNull final Truth T, @Nullable final Truth B, Memory m) {
             if (B==null) return null;
             return TruthFunctions.desireDed(T,B);
         }
     },
     Identity() {
-        @Override public Truth apply(final Truth T, /* N/A: */ final Truth B, Memory m) {
+        @NotNull
+        @Override public Truth apply(@NotNull final Truth T, /* N/A: */ final Truth B, Memory m) {
             return new DefaultTruth(T.getFrequency(), T.getConfidence());
         }
     },
     StructuralStrong() {
-        @Override public Truth apply(final Truth T, final Truth B, Memory m) {
+        @NotNull
+        @Override public Truth apply(@NotNull final Truth T, final Truth B, @NotNull Memory m) {
             return TruthFunctions.desireStrong(T, newDefaultTruth(m));
         }
     };
 
 
-    private static Truth newDefaultTruth(Memory m) {
+    @Nullable
+    private static Truth newDefaultTruth(@NotNull Memory m) {
         return m.newDefaultTruth(Symbols.JUDGMENT /* goal? */);
     }
 

@@ -2,6 +2,7 @@ package nars.nal.meta.pre;
 
 import nars.nal.PremiseMatch;
 import nars.term.Term;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by me on 8/15/15.
@@ -13,7 +14,7 @@ public class InputPremises extends PreCondition2 {
     }
 
     @Override
-    public final boolean test(PremiseMatch m, Term a, Term b) {
+    public final boolean test(@NotNull PremiseMatch m, Term a, Term b) {
         return m.premise.getTask().isInput() && m.premise.getBelief() != null && m.premise.getBelief().isInput();
     }
 

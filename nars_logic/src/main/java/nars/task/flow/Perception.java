@@ -2,6 +2,8 @@ package nars.task.flow;
 
 import nars.task.Task;
 import nars.util.data.buffer.Source;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -14,13 +16,16 @@ public interface Perception extends Consumer<Source<Task>>,Supplier<Task> {
     void accept(Source<Task> input);
 
 
+    @NotNull
     @Override
     Task get();
 
+    @NotNull
     default Task pop() {
         return get();
     }
 
+    @Nullable
     default Task pop(float minPriority) {
         Task t;
         while ((t = get())!=null) {

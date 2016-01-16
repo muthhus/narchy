@@ -1,6 +1,8 @@
 package nars.bag;
 
 import nars.budget.Budget;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -22,6 +24,7 @@ public final class NullBag<V> implements Bag<V> {
 
     }
 
+    @Nullable
     @Override
     public BLink<V> get(Object key) {
         return null;
@@ -32,21 +35,25 @@ public final class NullBag<V> implements Bag<V> {
         return null;
     }
 
+    @Nullable
     @Override
     public BLink<V> remove(V key) {
         return null;
     }
 
+    @Nullable
     @Override
     public BLink<V> put(Object newItem) {
         return null;
     }
 
+    @Nullable
     @Override
     public BLink<V> put(Object i, Budget b, float scale) {
         return null;
     }
 
+    @NotNull
     @Override
     public NullBag<V> sample(int n, Predicate<BLink<V>> each, Collection<BLink<V>> target) {
         throw new RuntimeException("unimpl");

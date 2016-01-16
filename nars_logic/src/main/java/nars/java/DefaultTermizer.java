@@ -8,6 +8,8 @@ import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.compound.Compound;
 import nars.term.variable.Variable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -61,6 +63,7 @@ public class DefaultTermizer implements Termizer {
     }
 
     /** dereference a term to an object (but do not un-termize) */
+    @Nullable
     @Override public Object object(Term t) {
 
         if (t == NULL) return null;
@@ -73,7 +76,8 @@ public class DefaultTermizer implements Termizer {
     }
 
 
-    Term obj2term(Object o) {
+    @Nullable
+    Term obj2term(@Nullable Object o) {
 
         if (o == null)
             return NULL;
@@ -204,7 +208,7 @@ public class DefaultTermizer implements Termizer {
 
     }
 
-    private boolean reportClassInPackage(Class oc) {
+    private boolean reportClassInPackage(@NotNull Class oc) {
         if (classInPackageExclusions.contains(oc)) return false;
 
         if (Term.class.isAssignableFrom(oc)) return false;
@@ -215,7 +219,8 @@ public class DefaultTermizer implements Termizer {
 
 
     /** (#arg1, #arg2, ...), #returnVar */
-    private Term[] getMethodArgVariables(Method m) {
+    @NotNull
+    private Term[] getMethodArgVariables(@NotNull Method m) {
 
         //TODO handle static methods which will not receive first variable instance
 
@@ -233,6 +238,7 @@ public class DefaultTermizer implements Termizer {
         };
     }
 
+    @NotNull
     private Term[] getArgVariables(String prefix, int numParams) {
         Term[] x = new Term[numParams];
         for (int i = 0; i < numParams; i++) {
@@ -241,15 +247,15 @@ public class DefaultTermizer implements Termizer {
         return x;
     }
 
-    public static Term termClass(Class c) {
+    public static Term termClass(@NotNull Class c) {
         return Atom.the(c.getSimpleName());
     }
 
-    public static Term termClassInPackage(Class c) {
+    public static Term termClassInPackage(@NotNull Class c) {
         return $.p(termPackage(c.getPackage()), termClass(c));
     }
 
-    public static Term termPackage(Package p) {
+    public static Term termPackage(@NotNull Package p) {
         //TODO cache?
         String[] path = p.getName().split("\\.");
         return $.p(path);
@@ -257,7 +263,7 @@ public class DefaultTermizer implements Termizer {
         //return Atom.the(p.getName());
     }
 
-    public static Term termInstanceInClassInPackage(Object o) {
+    public static Term termInstanceInClassInPackage(@NotNull Object o) {
         //return o.getClass().getName() + '@' + Integer.toHexString(o.hashCode());
         //return o.getClass() + "_" + System.identityHashCode(o)
         return $.p(
@@ -267,12 +273,14 @@ public class DefaultTermizer implements Termizer {
                 );
     }
 
+    @Nullable
     protected Term termClassInPackage(Term classs, @Deprecated Term packagge) {
         //TODO ??
         return null;
     }
 
-    public Term term(Object o) {
+    @Nullable
+    public Term term(@Nullable Object o) {
         if (o == null) return NULL;
 
         //        String cname = o.getClass().toString().substring(6) /* "class " */;
@@ -312,7 +320,8 @@ public class DefaultTermizer implements Termizer {
         //return oterm;
     }
 
-    public Term obj2termCached(Object o, Runnable[] post) {
+    @Nullable
+    public Term obj2termCached(@Nullable Object o, Runnable[] post) {
 
         if (o == null) return NULL;
         if (o instanceof Term)
@@ -353,7 +362,8 @@ public class DefaultTermizer implements Termizer {
 
     }
 
-    public static <T extends Term> Map<Atom,T> mapStaticClassFields(Class c, Function<Field, T> each) {
+    @NotNull
+    public static <T extends Term> Map<Atom,T> mapStaticClassFields(@NotNull Class c, @NotNull Function<Field, T> each) {
         Field[] ff = c.getFields();
         Map<Atom,T> t = Global.newHashMap(ff.length);
         for (Field f : ff) {

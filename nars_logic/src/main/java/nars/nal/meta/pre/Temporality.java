@@ -3,6 +3,7 @@ package nars.nal.meta.pre;
 import nars.nal.PremiseMatch;
 import nars.nal.meta.AtomicBooleanCondition;
 import nars.nal.meta.BooleanCondition;
+import org.jetbrains.annotations.NotNull;
 
 public abstract class Temporality extends AtomicBooleanCondition<PremiseMatch> {
 
@@ -14,7 +15,7 @@ public abstract class Temporality extends AtomicBooleanCondition<PremiseMatch> {
         }
 
         @Override
-        public boolean booleanValueOf(PremiseMatch m) {
+        public boolean booleanValueOf(@NotNull PremiseMatch m) {
             return m.premise.isEvent();
         }
 

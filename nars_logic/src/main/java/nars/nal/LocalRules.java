@@ -33,6 +33,7 @@ import nars.term.compound.Compound;
 import nars.truth.ProjectedTruth;
 import nars.truth.Truth;
 import nars.truth.TruthFunctions;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 import java.util.function.Consumer;
@@ -114,7 +115,7 @@ public enum LocalRules {
      * @param question     The question to be processed
      * @return the projected Task, or the original Task
      */
-    public static void trySolution(Task question, Task sol, NAR nal, Consumer<Task> eachSolutions) {
+    public static void trySolution(@NotNull Task question, @NotNull Task sol, @NotNull NAR nal, @NotNull Consumer<Task> eachSolutions) {
 
 //        if ((sol == null) || (sol.getDeleted())) {
 //            throw new RuntimeException("proposedBelief " + sol + " deleted or null");
@@ -187,7 +188,7 @@ public enum LocalRules {
         });
     }
 
-    public static boolean processSolution(Task question, NAR nal, Task sol, Memory memory, long now) {
+    public static boolean processSolution(@NotNull Task question, @NotNull NAR nal, @NotNull Task sol, @NotNull Memory memory, long now) {
 
 //        if (!(question.isQuestion() || question.isQuest())) {
 //            throw new RuntimeException(question + " not a question");
@@ -287,7 +288,7 @@ public enum LocalRules {
      * @return The budget for the new task which is the belief activated, if
      * necessary
      */
-    public static Budget solutionEval(Task question, Task solution, NAR nar) {
+    public static Budget solutionEval(@NotNull Task question, @NotNull Task solution, @NotNull NAR nar) {
         //boolean feedbackToLinks = false;
         /*if (task == null) {
             task = nal.getCurrentTask();
@@ -328,7 +329,7 @@ public enum LocalRules {
      * WARNING: this assumes the task's terms are already
      * known to be equal.
      */
-    private static boolean isRevisible(Task newBelief, Task oldBelief) {
+    private static boolean isRevisible(@NotNull Task newBelief, Task oldBelief) {
         Term t = newBelief.term();
         return
             !(t.op().isConjunctive() && t.hasAny(Op.VAR_DEP))    // t.hasVarDep());
@@ -340,7 +341,7 @@ public enum LocalRules {
      * creates a revision task (but does not input it)
      * if failed, returns null
      */
-    public static Task getRevision(Task newBelief, Task oldBelief, long now) {
+    public static Task getRevision(@NotNull Task newBelief, @NotNull Task oldBelief, long now) {
 
         if (!isRevisible(newBelief, oldBelief)) {
             return null;

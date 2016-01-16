@@ -4,6 +4,7 @@ import nars.Op;
 import nars.term.Term;
 import nars.term.TermVector;
 import nars.term.compound.GenericCompound;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * just holds two terms, not really necessary
@@ -16,13 +17,13 @@ public final class TaskBeliefPair extends GenericCompound {
         super(Op.PRODUCT, new TermVector(Op.Imdex, Op.Imdex) /* placeholders */);
     }
 
-    public TaskBeliefPair(Term a, Term b) {
+    public TaskBeliefPair(@NotNull Term a, @NotNull Term b) {
         this();
         set(a, b);
     }
 
 
-    public void set(Term a, Term b) {
+    public void set(@NotNull Term a, @NotNull Term b) {
         Term[] t = terms();
         t[0] = a;
         t[1] = b;

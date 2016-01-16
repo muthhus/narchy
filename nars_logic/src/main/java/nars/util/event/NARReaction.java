@@ -2,6 +2,7 @@ package nars.util.event;
 
 import nars.Memory;
 import nars.NAR;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Class whch manages the registration and unregistration of event handlers
@@ -12,22 +13,22 @@ public abstract class NARReaction extends AbstractReaction<Class,Object[]> {
 
 
 
-    protected NARReaction(NAR n, Class... events) {
+    protected NARReaction(@NotNull NAR n, Class... events) {
         this(n.memory.event, true, events);
     }
 
-    protected NARReaction(Memory m, boolean active, Class... events) {
+    protected NARReaction(@NotNull Memory m, boolean active, Class... events) {
         this(m.event, active, events);
     }
 
-    protected NARReaction(Memory m, Class... events) {
+    protected NARReaction(@NotNull Memory m, Class... events) {
         this(m.event, true, events);
     }
     protected NARReaction(EventEmitter n, Class... events) {
         this(n, true, events);
     }
 
-    protected NARReaction(NAR n, boolean active, Class... events) {
+    protected NARReaction(@NotNull NAR n, boolean active, Class... events) {
         this(n.memory.event, active, events);
     }
 

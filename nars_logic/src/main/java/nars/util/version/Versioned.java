@@ -2,6 +2,8 @@ package nars.util.version;
 
 import nars.util.data.list.FasterIntArrayList;
 import nars.util.data.list.FasterList;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Maintains a versioned snapshot history (stack) of a changing value
@@ -9,6 +11,7 @@ import nars.util.data.list.FasterList;
 public class Versioned<X> extends FasterIntArrayList /*Comparable<Versioned>*/ {
 
     public final FasterList<X> value;
+    @NotNull
     private final Versioning context;
 
     /**
@@ -16,11 +19,11 @@ public class Versioned<X> extends FasterIntArrayList /*Comparable<Versioned>*/ {
      */
     private final int id;
 
-    public Versioned(Versioning context) {
+    public Versioned(@NotNull Versioning context) {
         this(context, context.newIntStack(), context.newValueStack());
     }
 
-    public Versioned(Versioning context, int[] buffer, FasterList<X> value) {
+    public Versioned(@NotNull Versioning context, int[] buffer, FasterList<X> value) {
         super(buffer);
         this.context = context;
         this.value = value;
@@ -94,6 +97,7 @@ public class Versioned<X> extends FasterIntArrayList /*Comparable<Versioned>*/ {
      * set but does not commit;
      * a commit should precede this call otherwise it will have the version of a previous commit
      */
+    @NotNull
     public Versioning thenSet(X nextValue) {
         Versioning ctx = context;
         set(ctx.continueChange(this), nextValue);
@@ -105,6 +109,7 @@ public class Versioned<X> extends FasterIntArrayList /*Comparable<Versioned>*/ {
      * make sure to call commit on the returned context after
      * all concurrent set() are finished
      */
+    @NotNull
     final Versioning set(int now, X nextValue) {
 
         add(now);
@@ -151,6 +156,7 @@ public class Versioned<X> extends FasterIntArrayList /*Comparable<Versioned>*/ {
 //        set(y);
 //    }
 
+    @Nullable
     public X getIfAbsent(X valueIfMissing) {
         if (isEmpty()) return valueIfMissing;
         X x = get();

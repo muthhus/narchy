@@ -12,6 +12,8 @@ import nars.truth.DefaultTruth;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import nars.util.data.Util;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.Reference;
 import java.util.Arrays;
@@ -31,12 +33,14 @@ public abstract class AbstractTask extends Item<Task>
     /** content term of this task */
     private Termed<Compound> term;
 
+    @Nullable
     protected TaskState state = null;
 
     private char punctuation;
 
     private Truth truth;
 
+    @Nullable
     private long[] evidentialSet = null;
 
     private long creationTime = Tense.TIMELESS;
@@ -57,8 +61,10 @@ public abstract class AbstractTask extends Item<Task>
      * TODO move to SolutionTask subclass
      * For Question and Goal: best solution found so far
      */
+    @Nullable
     private transient Reference<Task> bestSolution;
 
+    @Nullable
     private List log = null;
 
 
@@ -85,13 +91,14 @@ public abstract class AbstractTask extends Item<Task>
     }
 
     /** copy/clone constructor */
-    public AbstractTask(Task task) {
+    public AbstractTask(@NotNull Task task) {
         this(task, task.getPunctuation(), task.getTruth(),
                 task.getPriority(), task.getDurability(), task.getQuality(),
                 task.getParentTaskRef(), task.getParentBeliefRef(), task.getBestSolutionRef());
         setEvidence(task.getEvidence());
     }
 
+    @NotNull
     @Override
     public Task getTask() {
         return this;
@@ -131,7 +138,7 @@ public abstract class AbstractTask extends Item<Task>
     }
 
     @Override
-    public final Task normalize(Memory memory) {
+    public final Task normalize(@NotNull Memory memory) {
 
 //        if (hash != 0) {
 //            /* already validated */
@@ -237,6 +244,7 @@ public abstract class AbstractTask extends Item<Task>
         return this;
     }
 
+    @Nullable
     @Override
     public TaskState getState() {
         return state;
@@ -317,6 +325,7 @@ public abstract class AbstractTask extends Item<Task>
         return isJudgmentOrGoal() && (getState() == TaskState.Anticipated || isInput());
     }
 
+    @NotNull
     protected Task setEvidence(long... evidentialSet) {
         if (this.evidentialSet!=evidentialSet) {
             this.evidentialSet = evidentialSet;
@@ -337,8 +346,9 @@ public abstract class AbstractTask extends Item<Task>
 
 
 
+    @NotNull
     @Override
-    public Task log(List historyToCopy) {
+    public Task log(@Nullable List historyToCopy) {
         if (!Global.DEBUG_TASK_LOG)
             return this;
 
@@ -354,6 +364,7 @@ public abstract class AbstractTask extends Item<Task>
         return punctuation;
     }
 
+    @Nullable
     @Override
     public final long[] getEvidence() {
         long[] e = this.evidentialSet;
@@ -397,6 +408,7 @@ public abstract class AbstractTask extends Item<Task>
         return Util.compare(getEvidence(), o.getEvidence());
     }
 
+    @NotNull
     @Override
     public final Task setCreationTime(long creationTime) {
         if ((this.creationTime <= Tense.TIMELESS) && (occurrenceTime > Tense.TIMELESS)) {
@@ -461,7 +473,7 @@ public abstract class AbstractTask extends Item<Task>
      * @return Whether the two sentences have the same content
      */
     @Override
-    public final boolean equals(Object that) {
+    public final boolean equals(@NotNull Object that) {
         if (this == that) return true;
         //if (that instanceof Task) {
 
@@ -474,7 +486,7 @@ public abstract class AbstractTask extends Item<Task>
     }
 
     @Override
-    public final boolean equivalentTo(Task that, boolean punctuation, boolean term, boolean truth, boolean stamp, boolean creationTime) {
+    public final boolean equivalentTo(@NotNull Task that, boolean punctuation, boolean term, boolean truth, boolean stamp, boolean creationTime) {
 
         if (this == that) return true;
 
@@ -516,7 +528,7 @@ public abstract class AbstractTask extends Item<Task>
      * @param s The Stamp to be compared
      * @return Whether the two have contain the same evidential base
      */
-    public final boolean equalStamp(Task s, boolean evidentialSet, boolean creationTime, boolean occurrenceTime) {
+    public final boolean equalStamp(@NotNull Task s, boolean evidentialSet, boolean creationTime, boolean occurrenceTime) {
         if (this == s) return true;
 
         /*if (hash && (!occurrenceTime || !evidentialSet))
@@ -547,6 +559,7 @@ public abstract class AbstractTask extends Item<Task>
         return parentBelief;
     }
 
+    @Nullable
     @Override
     public Reference<Task> getBestSolutionRef() {
         return bestSolution;
@@ -557,6 +570,7 @@ public abstract class AbstractTask extends Item<Task>
      *
      * @return The stored Sentence or null
      */
+    @Nullable
     @Override
     public Task getBestSolution() {
         return dereference(bestSolution);
@@ -583,6 +597,7 @@ public abstract class AbstractTask extends Item<Task>
      * ex: an entry might be a String describing a change in the story/history
      * of the Task and the reason for it.
      */
+    @NotNull
     @Override
     public final Task log(Object entry) {
         if (!Global.DEBUG_TASK_LOG)
@@ -596,6 +611,7 @@ public abstract class AbstractTask extends Item<Task>
         return this;
     }
 
+    @Nullable
     @Override
     public final List getLog() {
         return log;
@@ -621,6 +637,7 @@ public abstract class AbstractTask extends Item<Task>
      *
      * @return The belief from which the task is derived
      */
+    @Nullable
     @Override
     public final Task getParentBelief() {
         return dereference(parentBelief);
@@ -628,11 +645,13 @@ public abstract class AbstractTask extends Item<Task>
 
 
 
+    @NotNull
     @Override
     public final Task name() {
         return this;
     }
 
+    @NotNull
     @Override
     @Deprecated
     public String toString() {

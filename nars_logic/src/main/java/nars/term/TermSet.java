@@ -1,20 +1,25 @@
 package nars.term;
 
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Collection;
 import java.util.TreeSet;
 
 public class TermSet<X extends Term> extends TermVector<X> {
 
+    @NotNull
     public static TermSet the(Term... x) {
         return new TermSet(Terms.toSortedSetArray(x));
     }
 
+    @NotNull
     public static TermSet the(Collection<? extends Term> x) {
         return new TermSet(toSortedSetArray(x));
     }
 
-    public static TermSet union(TermContainer a, TermContainer b) {
+    @NotNull
+    public static TermSet union(@NotNull TermContainer a, @NotNull TermContainer b) {
         TreeSet<Term> t = new TreeSet<Term>();
         a.addAllTo(t);
         b.addAllTo(t);

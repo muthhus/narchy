@@ -8,6 +8,8 @@ import nars.term.Term;
 import nars.term.atom.AbstractStringAtom;
 import nars.term.atom.Atom;
 import nars.term.compound.Compound;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * the 1-arity '^' compound which wraps a term to
@@ -26,24 +28,27 @@ public final class Operator<T extends Term> extends AbstractStringAtom { //imple
 
     //final static byte[] opPrefix = new byte[] { (byte)'^' };
 
+    @NotNull
     private final T term;
 
-    public Operator(T the) {
+    public Operator(@NotNull T the) {
         super(Op.OPERATOR.ch + the.toString());
         term = the;
     }
 
-    public static Compound opArgs(Compound operation) {
+    @NotNull
+    public static Compound opArgs(@NotNull Compound operation) {
         return (Compound) operation.term(0);
     }
 
-    public static Term operatorName(Compound operation) {
+    public static Term operatorName(@NotNull Compound operation) {
         Operator tn = operatorTerm(operation);
         if (tn != null) return tn.identifier();
         return null;
     }
 
-    public static Operator operatorTerm(Compound operation) {
+    @NotNull
+    public static Operator operatorTerm(@NotNull Compound operation) {
         return ((Operator) operation.term(1));
     }
 
@@ -52,7 +57,8 @@ public final class Operator<T extends Term> extends AbstractStringAtom { //imple
      * the final term in the product (x) needs to be a variable,
      * which will be replaced with the result term (y)
      */
-    public static Term result(Compound operation, Term y) {
+    @Nullable
+    public static Term result(@NotNull Compound operation, Term y) {
         Compound x = (Compound) operation.term(0);
         /*if (!(t instanceof Variable))
             return null;*/
@@ -71,7 +77,8 @@ public final class Operator<T extends Term> extends AbstractStringAtom { //imple
      * @param index    The index of the place-holder (variable)
      * @return A compound generated or a term it reduced to
      */
-    private static Term makeImageExt(Compound product, Term relation, short index) {
+    @Nullable
+    private static Term makeImageExt(@NotNull Compound product, @NotNull Term relation, short index) {
         int pl = product.size();
         if (relation.op(Op.PRODUCT)) {
             Compound p2 = (Compound) relation;
@@ -97,16 +104,17 @@ public final class Operator<T extends Term> extends AbstractStringAtom { //imple
     /**
      * applies certain data to a feedback task relating to its causing operation's task
      */
-    public static Task feedback(MutableTask feedback, Task goal, float priMult, float durMult) {
+    public static Task feedback(@NotNull MutableTask feedback, @NotNull Task goal, float priMult, float durMult) {
         return feedback.budget(goal.getBudget()).
                 budgetScaled(priMult, durMult).
                 parent(goal);
     }
 
-    public static Term[] opArgsArray(Compound term) {
+    public static Term[] opArgsArray(@NotNull Compound term) {
         return opArgs(term).terms();
     }
 
+    @NotNull
     @Override
     public Op op() {
         return Op.OPERATOR;
@@ -138,14 +146,17 @@ public final class Operator<T extends Term> extends AbstractStringAtom { //imple
     }
 
 
+    @NotNull
     public static Operator the(String name) {
         return the(Atom.the(name));
     }
-    public static Operator the(Term x) {
+    @NotNull
+    public static Operator the(@NotNull Term x) {
         return new Operator(x);
     }
 
 
+    @NotNull
     public Term identifier() {
         return term;
     }

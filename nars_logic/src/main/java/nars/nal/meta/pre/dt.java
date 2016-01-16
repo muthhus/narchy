@@ -4,13 +4,14 @@ import nars.nal.PremiseMatch;
 import nars.nal.meta.AtomicBooleanCondition;
 import nars.nal.nal7.Tense;
 import nars.term.compound.Compound;
+import org.jetbrains.annotations.NotNull;
 
 /** applies dt to the derived term according to premise terms */
 public abstract class dt extends AtomicBooleanCondition<PremiseMatch> {
 
 
     public static final dt avg = new dt() {
-        @Override protected boolean computeDT(Compound t, int tt, Compound b, int bt, PremiseMatch m) {
+        @Override protected boolean computeDT(Compound t, int tt, Compound b, int bt, @NotNull PremiseMatch m) {
             int avg = (tt + bt) / 2;
             //float diff = Math.abs(at - bt)/avg;
             m.tDelta.set(-avg);
@@ -22,7 +23,7 @@ public abstract class dt extends AtomicBooleanCondition<PremiseMatch> {
         }
     };
     public static final dt sum = new dt() {
-        @Override protected boolean computeDT(Compound t, int tt, Compound b, int bt, PremiseMatch m) {
+        @Override protected boolean computeDT(Compound t, int tt, Compound b, int bt, @NotNull PremiseMatch m) {
             int sum = (tt + bt);
             m.tDelta.set(sum);
             return true;
@@ -34,7 +35,7 @@ public abstract class dt extends AtomicBooleanCondition<PremiseMatch> {
     };
 
     public static final dt sumNeg = new dt() {
-        @Override protected boolean computeDT(Compound t, int tt, Compound b, int bt, PremiseMatch m) {
+        @Override protected boolean computeDT(Compound t, int tt, Compound b, int bt, @NotNull PremiseMatch m) {
             int sum = (tt + bt);
             m.tDelta.set(-sum);
             return true;
@@ -45,7 +46,7 @@ public abstract class dt extends AtomicBooleanCondition<PremiseMatch> {
         }
     };
     public static final dt task = new dt() {
-        @Override protected boolean computeDT(Compound t, int tt, Compound b, int bt, PremiseMatch m) {
+        @Override protected boolean computeDT(Compound t, int tt, Compound b, int bt, @NotNull PremiseMatch m) {
             m.tDelta.set(tt);
             return true;
         }
@@ -55,7 +56,7 @@ public abstract class dt extends AtomicBooleanCondition<PremiseMatch> {
         }
     };
     public static final dt exact = new dt() {
-        @Override protected boolean computeDT(Compound t, int tt, Compound b, int bt, PremiseMatch m) {
+        @Override protected boolean computeDT(Compound t, int tt, Compound b, int bt, @NotNull PremiseMatch m) {
             if (tt == bt) {
                 m.tDelta.set(tt);
                 return true;
@@ -68,7 +69,7 @@ public abstract class dt extends AtomicBooleanCondition<PremiseMatch> {
         }
     };
     public static final dt opposite = new dt() {
-        @Override protected boolean computeDT(Compound t, int tt, Compound b, int bt, PremiseMatch m) {
+        @Override protected boolean computeDT(Compound t, int tt, Compound b, int bt, @NotNull PremiseMatch m) {
             if (tt == -bt) {
                 m.tDelta.set(tt);
                 return true;
@@ -83,7 +84,7 @@ public abstract class dt extends AtomicBooleanCondition<PremiseMatch> {
 
     /** belief minus task */
     public static final dt bmint = new dt() {
-        @Override protected boolean computeDT(Compound t, int tt, Compound b, int bt, PremiseMatch m) {
+        @Override protected boolean computeDT(Compound t, int tt, Compound b, int bt, @NotNull PremiseMatch m) {
             m.tDelta.set(bt- tt);
             return true;
         }
@@ -94,7 +95,7 @@ public abstract class dt extends AtomicBooleanCondition<PremiseMatch> {
     };
     /** task minus belief */
     public static final dt tminb = new dt() {
-        @Override protected boolean computeDT(Compound t, int tt, Compound b, int bt, PremiseMatch m) {
+        @Override protected boolean computeDT(Compound t, int tt, Compound b, int bt, @NotNull PremiseMatch m) {
             m.tDelta.set(tt - bt);
             return true;
         }
@@ -110,11 +111,12 @@ public abstract class dt extends AtomicBooleanCondition<PremiseMatch> {
 
     }
 
+    @NotNull
     @Override
     abstract public String toString();
 
     @Override
-    public boolean booleanValueOf(PremiseMatch m) {
+    public boolean booleanValueOf(@NotNull PremiseMatch m) {
         Compound a = m.premise.getTaskTerm();
         int at = a.t();
 

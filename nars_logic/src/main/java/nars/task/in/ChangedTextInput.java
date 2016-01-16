@@ -1,6 +1,7 @@
 package nars.task.in;
 
 import nars.NAR;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * TextInput subclass that only inputs when the next input value changes from
@@ -9,6 +10,7 @@ import nars.NAR;
 public class ChangedTextInput {
 
 	private final NAR nar;
+	@Nullable
 	private String last = null;
 	private boolean allowRepeats = false;
 

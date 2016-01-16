@@ -1,15 +1,19 @@
 package nars.term.transform;
 
 import nars.term.TermContainer;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by me on 12/22/15.
  */
 public class CommutivePermutations extends Termutator {
+    @NotNull
     final ShuffledSubterms perm;
     private final TermContainer y;
+    @NotNull
     private final FindSubst f;
 
+    @NotNull
     @Override
     public String toString() {
 
@@ -19,7 +23,7 @@ public class CommutivePermutations extends Termutator {
                     '}';
     }
 
-    public CommutivePermutations(FindSubst f, TermContainer x, TermContainer Y) {
+    public CommutivePermutations(@NotNull FindSubst f, TermContainer x, TermContainer Y) {
         super(x);
         this.perm = new ShuffledSubterms(f.random, x);
         this.y = Y;

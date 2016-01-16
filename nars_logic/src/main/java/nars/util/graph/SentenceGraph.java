@@ -3,6 +3,7 @@ package nars.util.graph;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.util.data.ConceptSet;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,7 @@ import java.util.Objects;
  */
 public abstract class SentenceGraph extends ConceptGraph<SentenceGraph.ConceptRelation> {
 
+    @NotNull
     public final ConceptSet edgeConcepts;
 
     public static class ConceptRelation {
@@ -51,11 +53,12 @@ public abstract class SentenceGraph extends ConceptGraph<SentenceGraph.ConceptRe
 
 
 
-    protected SentenceGraph(NAR nar, boolean directed) {
+    protected SentenceGraph(@NotNull NAR nar, boolean directed) {
         super(nar);
         edgeConcepts = new ConceptSet(nar) {
 
             /** buffer the concepts until the end of the cycle to help ensure that subterms will also be conceptualized, otherwise edges will fail tot be created */
+            @NotNull
             List<Concept> toAdd = new ArrayList();
 
             @Override
@@ -79,7 +82,7 @@ public abstract class SentenceGraph extends ConceptGraph<SentenceGraph.ConceptRe
             }
 
             @Override
-            protected boolean onConceptForget(Concept c) {
+            protected boolean onConceptForget(@NotNull Concept c) {
                 if (super.onConceptForget(c)) {
                     ConceptRelation[] cr = getRelations(c);
                     for (ConceptRelation r : cr) {
@@ -103,6 +106,7 @@ public abstract class SentenceGraph extends ConceptGraph<SentenceGraph.ConceptRe
      * create the set of relation edges which represent the relationship
      * concept.
      */
+    @NotNull
     abstract ConceptRelation[] getRelations(Concept c);
 
     @Override

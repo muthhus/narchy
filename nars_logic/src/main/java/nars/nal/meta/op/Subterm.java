@@ -1,6 +1,7 @@
 package nars.nal.meta.op;
 
 import nars.term.transform.FindSubst;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * selects the ith sibling subterm of the current parent
@@ -13,11 +14,12 @@ public final class Subterm extends PatternOp {
     }
 
     @Override
-    public boolean run(FindSubst f) {
+    public boolean run(@NotNull FindSubst f) {
         f.goSubterm(index);
         return true;
     }
 
+    @NotNull
     @Override
     public String toString() {
         return "t" + index; //s for subterm and sibling

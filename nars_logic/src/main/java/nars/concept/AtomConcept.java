@@ -8,6 +8,8 @@ import nars.concept.util.TaskTable;
 import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Created by me on 9/2/15.
@@ -48,21 +50,25 @@ public class AtomConcept extends AbstractConcept  {
     }
 
 
+    @Nullable
     @Override
     public BeliefTable getBeliefs() {
         return BeliefTable.EMPTY;
     }
 
+    @Nullable
     @Override
     public BeliefTable getGoals() {
         return BeliefTable.EMPTY;
     }
 
+    @Nullable
     @Override
     public TaskTable getQuestions() {
         return BeliefTable.EMPTY;
     }
 
+    @Nullable
     @Override
     public TaskTable getQuests() {
         return BeliefTable.EMPTY;
@@ -70,10 +76,12 @@ public class AtomConcept extends AbstractConcept  {
 
     static final String shouldntProcess = "should not have attempted to process task here";
 
+    @Nullable
     @Override
     public Task processBelief(Task task, NAR nar) {
         throw new RuntimeException(shouldntProcess);
     }
+    @Nullable
     @Override
     public Task processGoal(Task task, NAR nar) {
         throw new RuntimeException(shouldntProcess);
@@ -89,6 +97,7 @@ public class AtomConcept extends AbstractConcept  {
 
 
     /** atoms have no termlink templates, they are irreducible */
+    @Nullable
     @Override public Termed[] getTermLinkTemplates() {
         return null;
     }
@@ -97,7 +106,7 @@ public class AtomConcept extends AbstractConcept  {
      * when a task is processed, a tasklink
      * can be created at the concept of its term
      */
-    @Override public final boolean link(Task t, float scale, float minScale, NAR nar) {
+    @Override public final boolean link(@NotNull Task t, float scale, float minScale, @NotNull NAR nar) {
 
         //activate tasklink locally
         Budget taskBudget = t.getBudget();
@@ -130,7 +139,7 @@ public class AtomConcept extends AbstractConcept  {
         return true;
     }
 
-    protected final void linkTemplate(Task t, Concept target, Budget b, float minScale, float subScale, NAR nar) {
+    protected final void linkTemplate(Task t, @NotNull Concept target, Budget b, float minScale, float subScale, NAR nar) {
 
         /** recursively activate the template's task tlink */
         target.link(t, subScale, minScale, nar);
@@ -143,6 +152,7 @@ public class AtomConcept extends AbstractConcept  {
     }
 
 
+    @Nullable
     @Override
     public Task process(Task task, NAR nar) {
         return null;

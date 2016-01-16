@@ -6,11 +6,13 @@ import nars.nal.nal8.Operator;
 import nars.task.Task;
 import nars.term.Term;
 import nars.term.compound.Compound;
+import org.jetbrains.annotations.NotNull;
 
 /** an operation that executes immediately, and without logical consequences;
  *  used for system control functions  */
 public abstract class ImmediateOperator extends NullOperator  {
 
+    @NotNull
     public final Operator op;
 
     protected ImmediateOperator() {
@@ -45,7 +47,7 @@ public abstract class ImmediateOperator extends NullOperator  {
 //    }
 
 
-    public static Task command(Class<? extends ImmediateOperator> opClass, Term... args) {
+    public static Task command(@NotNull Class<? extends ImmediateOperator> opClass, Term... args) {
         return Task.command(
                 operation(opClass,
                         args)
@@ -55,7 +57,7 @@ public abstract class ImmediateOperator extends NullOperator  {
 //    public static Compound operation(Class<? extends ImmediateOperator> opClass, Object... args) {
 //        return operation( opClass, termizedProduct(args));
 //    }
-    public static Compound operation(Class<? extends ImmediateOperator> opClass, Term... args) {
+    public static Compound operation(@NotNull Class<? extends ImmediateOperator> opClass, Term... args) {
         return $.oper(
                 $.operator(opClass.getSimpleName()),
                 args);

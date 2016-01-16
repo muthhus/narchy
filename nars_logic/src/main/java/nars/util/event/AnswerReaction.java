@@ -9,6 +9,8 @@ import nars.NAR;
 import nars.Narsese;
 import nars.concept.Concept;
 import nars.task.Task;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
@@ -18,23 +20,26 @@ import java.util.function.Consumer;
  */
 public abstract class AnswerReaction implements Consumer<Twin<Task>> {
     
+    @Nullable
     private final Task question;
+    @NotNull
     private final NAR nar;
+    @Nullable
     private volatile On reg;
 
 
     /** reacts to all questions */
-    protected AnswerReaction(NAR n) {
+    protected AnswerReaction(@NotNull NAR n) {
         this(n, (Task)null);
     }
 
 
-    protected AnswerReaction(NAR n, String questionTask) throws Narsese.NarseseException {
+    protected AnswerReaction(@NotNull NAR n, String questionTask) throws Narsese.NarseseException {
         this(n, n.task(questionTask));
     }
 
     /** reacts to a specific question or quest */
-    protected AnswerReaction(NAR n, Task question) {
+    protected AnswerReaction(@NotNull NAR n, @Nullable Task question) {
 
         nar = n;
         this.question = question;
@@ -72,7 +77,7 @@ public abstract class AnswerReaction implements Consumer<Twin<Task>> {
     }
 
     @Override
-    public void accept(Twin<Task> taskTwin) {
+    public void accept(@NotNull Twin<Task> taskTwin) {
         Task questionTask = taskTwin.getOne();
         Task belief = taskTwin.getTwo();
 

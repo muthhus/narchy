@@ -6,6 +6,7 @@ import nars.nal.nal7.Tense;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.compound.Compound;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
@@ -89,6 +90,7 @@ public enum Op {
     /**
      * symbol representation of this getOperator
      */
+    @NotNull
     public final String str;
 
     /**
@@ -128,29 +130,29 @@ public enum Op {
         this(c, minLevel, type, Args.None);
     }
 
-    Op(String s, boolean commutative, int minLevel) {
+    Op(@NotNull String s, boolean commutative, int minLevel) {
         this(s, minLevel, OpType.Other, Args.None);
     }
-    Op(String s, boolean commutative, int minLevel, IntIntPair size) {
+    Op(@NotNull String s, boolean commutative, int minLevel, @NotNull IntIntPair size) {
         this(s, commutative, minLevel, OpType.Other, size);
     }
 
-    Op(char c, int minLevel, OpType type, IntIntPair size) {
+    Op(char c, int minLevel, OpType type, @NotNull IntIntPair size) {
         this(Character.toString(c), minLevel, type, size);
     }
 
-    Op(String string, int minLevel, IntIntPair size) {
+    Op(@NotNull String string, int minLevel, @NotNull IntIntPair size) {
         this(string, minLevel, OpType.Other, size);
     }
 
-    Op(String string, int minLevel, OpType type) {
+    Op(@NotNull String string, int minLevel, OpType type) {
         this(string, false /* non-commutive */, minLevel, type, Args.None);
     }
-    Op(String string, int minLevel, OpType type, IntIntPair size) {
+    Op(@NotNull String string, int minLevel, OpType type, @NotNull IntIntPair size) {
         this(string, false /* non-commutive */, minLevel, type, size);
     }
 
-    Op(String string, boolean commutative, int minLevel, OpType type, IntIntPair size) {
+    Op(@NotNull String string, boolean commutative, int minLevel, OpType type, @NotNull IntIntPair size) {
 
         this.str = string;
 
@@ -180,6 +182,7 @@ public enum Op {
     }
 
 
+    @NotNull
     @Override
     public String toString() {
         return str;
@@ -192,7 +195,8 @@ public enum Op {
     public static final Op SET_INT = Op.SET_INT_OPENER;
 
 
-    public final String toString(Compound c)  {
+    @NotNull
+    public final String toString(@NotNull Compound c)  {
         int t = c.t();
         boolean hasTime = t != Tense.ITERNAL;
 
@@ -206,7 +210,7 @@ public enum Op {
     /**
      * writes this operator to a Writer in (human-readable) expanded UTF16 mode
      */
-    public final void append(Compound c, Appendable w) throws IOException {
+    public final void append(@NotNull Compound c, @NotNull Appendable w) throws IOException {
         int t = c.t();
         boolean hasTime = t != Tense.ITERNAL;
 
@@ -224,14 +228,14 @@ public enum Op {
         }
     }
 
-    public static int or(int... i) {
+    public static int or(@NotNull int... i) {
         int bits = 0;
         for (int x : i) {
             bits |= x;
         }
         return bits;
     }
-    public static int or(Op... o) {
+    public static int or(@NotNull Op... o) {
         int bits = 0;
         for (Op n : o)
             bits |= n.bit();
@@ -242,7 +246,7 @@ public enum Op {
         return (1 << ordinal());
     }
 
-    public static int or(int bits, Op o) {
+    public static int or(int bits, @NotNull Op o) {
         return bits | o.bit();
     }
 

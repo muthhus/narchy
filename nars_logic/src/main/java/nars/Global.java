@@ -25,6 +25,8 @@ import com.gs.collections.impl.set.mutable.UnifiedSet;
 import nars.term.atom.Atom;
 import nars.util.data.list.FasterList;
 import nars.util.data.map.UnifriedMap;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
@@ -167,10 +169,12 @@ public enum Global {
 //
 
 
+    @NotNull
     public static <K,V> Map<K, V> newHashMap() {
         return newHashMap(0);
     }
 
+    @NotNull
     public static <K, V> Map<K,V> newHashMap(int capacity) {
         //return new UnifiedMap(capacity);
         return new UnifriedMap(capacity);
@@ -182,21 +186,25 @@ public enum Global {
     }
 
     /** copy */
+    @NotNull
     public static <X,Y> Map<X, Y> newHashMap(Map<X, Y> xy) {
         return new UnifriedMap(xy);
     }
 
+    @NotNull
     public static <X> List<X> newArrayList() {
         return new FasterList<>(); //GS
         //return new ArrayList();
     }
 
+    @NotNull
     public static <X> List<X> newArrayList(int capacity) {
 
         return new FasterList(capacity);
         //return new ArrayList(capacity);
     }
 
+    @NotNull
     public static <X> Set<X> newHashSet(int capacity) {
         return new UnifiedSet(capacity);
         //return new SimpleHashSet(capacity);
@@ -204,18 +212,21 @@ public enum Global {
         //return new LinkedHashSet(capacity);
     }
 
-    public static <X> Set<X> newHashSet(Collection<X> values) {
+    @NotNull
+    public static <X> Set<X> newHashSet(@NotNull Collection<X> values) {
         Set<X> s = newHashSet(values.size());
         s.addAll(values);
         return s;
     }
 
 
-    public static <C> Reference<C> reference(C s) {
+    @Nullable
+    public static <C> Reference<C> reference(@Nullable C s) {
         if (s == null) return null;
         return new SoftReference(s);
     }
-    public static <C> C dereference(Reference<C> s) {
+    @Nullable
+    public static <C> C dereference(@Nullable Reference<C> s) {
         if (s == null) return null;
         return s.get();
     }

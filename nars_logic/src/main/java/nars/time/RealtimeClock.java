@@ -1,6 +1,7 @@
 package nars.time;
 
 import nars.Memory;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 
@@ -52,6 +53,7 @@ public abstract class RealtimeClock implements Clock {
             this.frameTime = frameTime;
         }
 
+        @NotNull
         public String toString() {
             return "Lag frameTime=" +
                     frameTime + ", duration=" + dur + " cycles)";
@@ -77,6 +79,7 @@ public abstract class RealtimeClock implements Clock {
 
     protected abstract float unitsToSeconds(long l);
 
+    @NotNull
     @Override
     public String toString() {
         return secondsSinceStart() + "s";

@@ -46,6 +46,8 @@ import nars.util.event.EventEmitter;
 import nars.util.event.Topic;
 import nars.util.meter.EmotionMeter;
 import nars.util.meter.LogicMeter;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,6 +73,7 @@ public class Memory extends Param {
 
     public final Random random;
 
+    @NotNull
     @Deprecated
     public final transient EventEmitter<Class, Object[]> event;
 
@@ -116,9 +119,12 @@ public class Memory extends Param {
 
 
     //TODO move these to separate components, not part of Memory:
+    @NotNull
     public final transient EmotionMeter emotion;
+    @NotNull
     public final transient LogicMeter logic;
 
+    @NotNull
     public final Clock clock;
 
     /** holds known Term's and Concept's */
@@ -134,14 +140,14 @@ public class Memory extends Param {
     long currentStampSerial = 1;
 
 
-    public Memory(Clock clock, TermIndex index) {
+    public Memory(@NotNull Clock clock, TermIndex index) {
         this(clock, new XorShift128PlusRandom(1), index);
     }
 
     /**
      * Create a new memory
      */
-    public Memory(Clock clock, Random rng, TermIndex index) {
+    public Memory(@NotNull Clock clock, Random rng, TermIndex index) {
 
         random = rng;
 
@@ -231,6 +237,7 @@ public class Memory extends Param {
         return !(term instanceof Variable);
     }
 
+    @NotNull
     Concept newDefaultConcept(Term t) {
 
         int termLinkBagSize = 32;
@@ -253,6 +260,7 @@ public class Memory extends Param {
                 new SpaceConcept((Space)t, taskLinks, termLinks, this));
     }
 
+    @Nullable
     public Concept concept(Termed t) {
         if (t instanceof Concept) return ((Concept)t);
 
@@ -327,7 +335,7 @@ public class Memory extends Param {
     /**
      * called anytime a task has been removed, deleted, discarded, ignored, etc.
      */
-    public final void remove(Task task, Object removalReason) {
+    public final void remove(@NotNull Task task, @Nullable Object removalReason) {
 
         boolean willBeReceived = !eventTaskRemoved.isEmpty();
 
@@ -566,6 +574,7 @@ public class Memory extends Param {
 //                + item.toString();
 //    }
 
+    @NotNull
     @Override
     public String toString() {
         return getClass().getSimpleName() + ':' + nal() + "[@" + time() + ",C=" + size() + ']';
@@ -592,7 +601,7 @@ public class Memory extends Param {
             return true;
         }
 
-        @Override public Term apply(Compound parent, Term subterm, int depth) {
+        @Override public Term apply(Compound parent, @NotNull Term subterm, int depth) {
             return subterm.anonymous();
         }
     };

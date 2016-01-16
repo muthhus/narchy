@@ -2,6 +2,7 @@ package nars;
 
 import nars.util.data.Util;
 import net.openhft.affinity.AffinityLock;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -14,8 +15,10 @@ public class NARLoop implements Runnable {
 
     static final Logger logger = getLogger(NARLoop.class);
 
+    @NotNull
     public final NAR nar;
 
+    @NotNull
     private final Thread thread;
 
     /**
@@ -33,6 +36,7 @@ public class NARLoop implements Runnable {
     //TODO make this into a SimpleIntegerProperty also
 
 
+    @NotNull
     @Override
     public String toString() {
         return nar + ":loop@" + getFrequency() + "Hz";
@@ -48,7 +52,7 @@ public class NARLoop implements Runnable {
     }
 
 
-    public NARLoop(NAR n, int initialPeriod) {
+    public NARLoop(@NotNull NAR n, int initialPeriod) {
         this(n, initialPeriod, false);
     }
 
@@ -58,7 +62,7 @@ public class NARLoop implements Runnable {
      * @param initialPeriod
      * @param reserveCPUCore whether to acquire a thread affinity lock on a CPU core, which will improve performance if a dedicated core can be assigned
      */
-    public NARLoop(NAR n, int initialPeriod, boolean reserveCPUCore) {
+    public NARLoop(@NotNull NAR n, int initialPeriod, boolean reserveCPUCore) {
 
 
         nar = n;
@@ -159,7 +163,7 @@ public class NARLoop implements Runnable {
         logger.info("stopped");
     }
 
-    public void frame(NAR nar) {
+    public void frame(@NotNull NAR nar) {
         int periodMS = this.periodMS;
 
         if (periodMS < 0) {

@@ -10,6 +10,8 @@ import nars.term.Termed;
 import nars.term.compile.TermIndex;
 import nars.term.compound.Compound;
 import nars.term.compound.GenericCompound;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
@@ -26,23 +28,27 @@ public abstract class AbstractMapIndex implements TermIndex {
     }
 
     /** get the instance that will be internalized */
+    @NotNull
     public static Termed intern(Op op, int relation, TermContainer t) {
         //return (TermMetadata.hasMetadata(t) || op.isA(TermMetadata.metadataBits)) ?
                 //newMetadataCompound(op, relation, t) :
         return newInternCompound(op, t, relation);
     }
 
-    public static Term newMetadataCompound(Op op, int relation, TermContainer t) {
+    @Nullable
+    public static Term newMetadataCompound(@NotNull Op op, int relation, TermContainer t) {
         //create unique
         return $.the(op, relation, t);
     }
 
+    @NotNull
     protected static Termed newInternCompound(Op op, TermContainer subterms, int relation) {
         return new GenericCompound(
             op, relation, (TermVector) subterms
         );
     }
 
+    @Nullable
     @Override
     public Termed the(Term x) {
 
@@ -73,6 +79,7 @@ public abstract class AbstractMapIndex implements TermIndex {
 //    @Override
 //    public abstract int size();
 
+    @NotNull
     @Override
     public Termed make(Op op, int relation, TermContainer t, int dt) {
         Termed x = intern(op, relation, internSub(t));
@@ -86,6 +93,7 @@ public abstract class AbstractMapIndex implements TermIndex {
         return t;
     }
 
+    @Nullable
     @Override public TermContainer internSub(TermContainer s) {
         TermContainer existing = getSubtermsIfPresent(s);
         if (existing == null) {
@@ -97,6 +105,7 @@ public abstract class AbstractMapIndex implements TermIndex {
 
 
     abstract protected void putSubterms(TermContainer subterms);
+    @Nullable
     abstract protected TermContainer getSubtermsIfPresent(TermContainer subterms);
 
 

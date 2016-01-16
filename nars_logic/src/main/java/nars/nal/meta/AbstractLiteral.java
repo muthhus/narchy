@@ -2,6 +2,7 @@ package nars.nal.meta;
 
 import nars.Op;
 import nars.term.atom.Atomic;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by me on 1/1/16.
@@ -32,6 +33,7 @@ public abstract class AbstractLiteral extends Atomic {
         return 0;
     }
 
+    @NotNull
     @Override
     public Op op() {
         return Op.ATOM;

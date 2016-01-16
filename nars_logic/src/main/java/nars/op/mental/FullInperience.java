@@ -1,6 +1,7 @@
 package nars.op.mental;
 
 import nars.NAR;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * To rememberAction an internal action as an operation
@@ -9,7 +10,7 @@ import nars.NAR;
  */
 public class FullInperience extends Inperience {
 
-    public FullInperience(NAR n) {
+    public FullInperience(@NotNull NAR n) {
         super(n);
     }
 

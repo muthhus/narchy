@@ -2,16 +2,19 @@ package nars.util.meter;
 
 import nars.NAR;
 import nars.util.event.FrameReaction;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class NARMetrics extends FrameReaction {
 
+    @NotNull
     public final TemporalMetrics<Object> metrics;
+    @NotNull
     public final NAR nar;
 
-    public NARMetrics(NAR n, int historySize) {
+    public NARMetrics(@NotNull NAR n, int historySize) {
         super(n);
 
         nar = n;
@@ -57,11 +60,13 @@ public class NARMetrics extends FrameReaction {
         return m;
     }
 
+    @NotNull
     public TemporalMetrics<Object> getMetrics() {
         return metrics;
     }
 
-    public SignalData[] getCharts(String... names) {
+    @NotNull
+    public SignalData[] getCharts(@NotNull String... names) {
         List<SignalData> l = new ArrayList(names.length);
         for (String n : names) {
             SignalData t = metrics.newSignalData(n);

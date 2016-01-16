@@ -2,6 +2,7 @@ package nars.task.flow;
 
 import nars.NAR;
 import nars.task.Task;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -44,26 +45,26 @@ public class FIFOTaskPerception extends TaskPerception {
      */
     protected final Predicate<Task> filter;
 
-    public FIFOTaskPerception(NAR nar, Predicate<Task> filter, Consumer<Task> receiver) {
+    public FIFOTaskPerception(@NotNull NAR nar, Predicate<Task> filter, Consumer<Task> receiver) {
         super(nar.memory, receiver);
         this.filter = filter;
     }
 
-    public FIFOTaskPerception(NAR nar, Predicate<Task> filter) {
+    public FIFOTaskPerception(@NotNull NAR nar, Predicate<Task> filter) {
         super(nar.memory);
         this.filter = filter;
     }
-    public FIFOTaskPerception(NAR nar) {
+    public FIFOTaskPerception(@NotNull NAR nar) {
         this(nar, null);
     }
 
     @Override
-    public void forEach(Consumer<? super Task> each) {
+    public void forEach(@NotNull Consumer<? super Task> each) {
         buffer.forEach(each);
     }
 
     @Override
-    public void accept(Task t) {
+    public void accept(@NotNull Task t) {
         Predicate<Task> f = this.filter;
         if (f == null || f.test(t)) {
 
@@ -95,7 +96,7 @@ public class FIFOTaskPerception extends TaskPerception {
 
     /** sends the next batch of tasks to the receiver */
     @Override
-    public void nextFrame(Consumer<Task> receiver) {
+    public void nextFrame(@NotNull Consumer<Task> receiver) {
 
 
         int s = buffer.size();

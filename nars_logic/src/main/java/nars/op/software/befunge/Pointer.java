@@ -1,5 +1,7 @@
 package nars.op.software.befunge;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -14,7 +16,9 @@ public class Pointer {
     private final Board board;
 
     //TODO use EnumMap
+    @NotNull
     private final Map<Character, Runnable> map;
+    @NotNull
     private final BefungeStack stack;
 
     public Pointer(Board board){

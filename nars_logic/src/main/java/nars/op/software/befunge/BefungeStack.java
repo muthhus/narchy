@@ -1,6 +1,8 @@
 package nars.op.software.befunge;
 
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Stack;
 
 /**
@@ -18,10 +20,12 @@ public class BefungeStack {
         stack.push(l);
     }
 
+    @NotNull
     Long pop(){
         return stack.isEmpty() ? 0L : stack.pop();
     }
 
+    @NotNull
     Long peek(){
         return stack.isEmpty() ? 0L : stack.peek();
     }

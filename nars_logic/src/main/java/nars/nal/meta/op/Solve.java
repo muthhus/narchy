@@ -10,6 +10,7 @@ import nars.nal.meta.PostCondition;
 import nars.nal.meta.TruthOperator;
 import nars.truth.BeliefFunction;
 import nars.truth.DesireFunction;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Evaluates the truth of a premise
@@ -26,8 +27,9 @@ abstract public class Solve extends AtomicBooleanCondition<PremiseMatch> {
         this.derive = derive;
     }
 
-    public static Solve the(PostCondition p, PremiseRule rule, boolean anticipate, boolean eternalize,
-                            BooleanCondition[] postPreconditions) {
+    @NotNull
+    public static Solve the(@NotNull PostCondition p, PremiseRule rule, boolean anticipate, boolean eternalize,
+                            @NotNull BooleanCondition[] postPreconditions) {
 
         char puncOverride = p.puncOverride;
 
@@ -57,7 +59,7 @@ abstract public class Solve extends AtomicBooleanCondition<PremiseMatch> {
         if (puncOverride == 0) {
             //Inherit from task
             return new Solve(i, der) {
-                @Override public boolean booleanValueOf(PremiseMatch m) {
+                @Override public boolean booleanValueOf(@NotNull PremiseMatch m) {
                     return measure(m,
                             m.premise.getTask().getPunctuation(),
                             belief, desire);
@@ -66,7 +68,7 @@ abstract public class Solve extends AtomicBooleanCondition<PremiseMatch> {
         } else {
             //Override
             return new Solve(i, der) {
-                @Override public boolean booleanValueOf(PremiseMatch m) {
+                @Override public boolean booleanValueOf(@NotNull PremiseMatch m) {
                     return measure(m, puncOverride, belief, desire);
                 }
             };
@@ -141,7 +143,7 @@ abstract public class Solve extends AtomicBooleanCondition<PremiseMatch> {
 //        return measureTruthOverride(m, punct, belief, desire);
 //    }
 
-    static boolean measure(PremiseMatch m, char punct, TruthOperator belief, TruthOperator desire) {
+    static boolean measure(@NotNull PremiseMatch m, char punct, TruthOperator belief, TruthOperator desire) {
         boolean r;
         switch (punct) {
             case Symbols.JUDGMENT:

@@ -9,6 +9,8 @@ import nars.term.*;
 import nars.term.compound.Compound;
 import nars.term.compound.GenericCompound;
 import nars.truth.Truth;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.HashMap;
@@ -35,6 +37,7 @@ public interface TermIndex extends TermBuilder {
 
     //Termed get(Object t);
 
+    @Nullable
     Termed getTermIfPresent(Termed t);
 
     /** # of contained terms */
@@ -52,10 +55,12 @@ public interface TermIndex extends TermBuilder {
 
 
 
-    static Task spawn(Task parent, Compound content, char punctuation, Truth truth, long occ, Budget budget) {
+    @NotNull
+    static Task spawn(Task parent, Compound content, char punctuation, Truth truth, long occ, @NotNull Budget budget) {
         return spawn(parent, content, punctuation, truth, occ, budget.getPriority(), budget.getDurability(), budget.getQuality());
     }
 
+    @NotNull
     static Task spawn(Task parent, Compound content, char punctuation, Truth truth, long occ, float p, float d, float q) {
         return new MutableTask(content, punctuation)
                 .truth(truth)
@@ -66,7 +71,8 @@ public interface TermIndex extends TermBuilder {
 
 
     /** gets an existing item or applies the builder to produce something to return */
-    default <K extends Term> Termed<K> apply(K key, Function<K,Termed> builder) {
+    @Nullable
+    default <K extends Term> Termed<K> apply(K key, @NotNull Function<K,Termed> builder) {
         Termed existing = getTermIfPresent(key);
         if (existing == null) {
             putTerm(existing = builder.apply(key));
@@ -74,6 +80,7 @@ public interface TermIndex extends TermBuilder {
         return existing;
     }
 
+    @Nullable
     TermContainer internSub(TermContainer s);
 
 
@@ -110,7 +117,7 @@ public interface TermIndex extends TermBuilder {
 //    }
 
 
-    default Termed makeCompound(Compound t) {
+    default Termed makeCompound(@NotNull Compound t) {
         return make(t.op(), t.relation(), t.subterms(), t.t());
     }
 
@@ -198,6 +205,7 @@ public interface TermIndex extends TermBuilder {
 //    }
 
     /** default memory-based (Guava) cache */
+    @NotNull
     static TermIndex memory(int capacity) {
 //        CacheBuilder builder = CacheBuilder.newBuilder()
 //            .maximumSize(capacity);
@@ -220,7 +228,7 @@ public interface TermIndex extends TermBuilder {
 ////        );
 //    }
 
-    default void print(PrintStream out) {
+    default void print(@NotNull PrintStream out) {
         forEach(out::println);
     }
 
