@@ -1,8 +1,8 @@
 package nars.term.match;
 
 import nars.Op;
-import nars.nal.PremiseMatch;
-import nars.nal.PremiseRule;
+import nars.nal.meta.PremiseMatch;
+import nars.nal.meta.PremiseRule;
 import nars.term.Term;
 import nars.term.compound.Compound;
 import nars.term.transform.VariableNormalization;

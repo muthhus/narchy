@@ -22,8 +22,8 @@ package nars.budget;
 
 import nars.NAR;
 import nars.bag.BLink;
+import nars.concept.ConceptProcess;
 import nars.nal.UtilityFunctions;
-import nars.process.ConceptProcess;
 import nars.task.Task;
 import nars.term.Termed;
 import nars.term.Termlike;

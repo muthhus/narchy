@@ -1,6 +1,5 @@
 package nars.nal.meta;
 
-import nars.nal.PremiseMatch;
 import nars.term.atom.Atom;
 import org.jetbrains.annotations.NotNull;
 

@@ -3,7 +3,7 @@ package nars.op.data;
 import nars.nal.nal8.Operator;
 import nars.nal.nal8.operator.TermFunction;
 import nars.term.Term;
-import nars.term.compile.TermBuilder;
+import nars.term.TermBuilder;
 import nars.term.compound.Compound;
 import nars.util.Texts;
 import org.jetbrains.annotations.NotNull;

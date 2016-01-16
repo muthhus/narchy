@@ -2,11 +2,11 @@ package nars.term.compound;
 
 import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
 import nars.Op;
-import nars.nal.nal7.Tense;
+import nars.nal.Tense;
 import nars.term.Term;
+import nars.term.TermPrinter;
 import nars.term.TermVector;
 import nars.term.Termed;
-import nars.term.compile.TermPrinter;
 import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,7 +15,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.function.Consumer;
 
-import static nars.nal.nal7.Tense.ITERNAL;
+import static nars.nal.Tense.ITERNAL;
 
 
 public class GenericCompound<T extends Term> implements Compound<T> {
@@ -89,7 +89,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     }
 
     @Override
-    public int compareTo(Object o) {
+    public int compareTo(@NotNull Object o) {
         int r=0;
         if (this != o) {
             Termed t = (Termed) o;

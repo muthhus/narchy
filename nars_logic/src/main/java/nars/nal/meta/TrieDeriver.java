@@ -1,10 +1,10 @@
-package nars.nal;
+package nars.nal.meta;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import javassist.*;
 import nars.Global;
-import nars.nal.meta.*;
+import nars.nal.Deriver;
 import nars.nal.meta.op.Derive;
 import nars.nal.meta.op.MatchTerm;
 import nars.term.Term;

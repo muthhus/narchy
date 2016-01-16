@@ -28,12 +28,12 @@ public abstract class AtomicBooleanCondition<C> extends AbstractLiteral implemen
         l.add(this);
     }
 
-    @NotNull
-    public String toJavaConditionString() {
-        return ("(/* TODO: " +
-                this +
-                " */ false)\t");
-    }
+//    @NotNull
+//    public String toJavaConditionString() {
+//        return ("(/* TODO: " +
+//                this +
+//                " */ false)\t");
+//    }
 
 
 }

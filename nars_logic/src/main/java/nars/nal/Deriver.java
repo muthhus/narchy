@@ -1,6 +1,9 @@
 package nars.nal;
 
-import nars.process.ConceptProcess;
+import nars.concept.ConceptProcess;
+import nars.nal.meta.PremiseMatch;
+import nars.nal.meta.PremiseRuleSet;
+import nars.nal.meta.TrieDeriver;
 import nars.task.Task;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -87,7 +90,7 @@ public abstract class Deriver  {
 //    }
 
     /** run an initialized rule matcher */
-    protected abstract void run(PremiseMatch matcher);
+    public abstract void run(PremiseMatch matcher);
 
 
     /** initialize a rule matcher with a Premise to supply

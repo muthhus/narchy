@@ -3,7 +3,7 @@ package nars.util.meter;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.concept.util.BeliefTable;
-import nars.nal.nal7.Tense;
+import nars.nal.Tense;
 import nars.term.compound.Compound;
 import nars.truth.TruthWave;
 import org.jetbrains.annotations.NotNull;
@@ -40,6 +40,7 @@ public class BeliefAnalysis extends EnergyAnalysis {
 		return this;
 	}
 
+	@Nullable
 	public Concept concept() {
 		return nar.concept(term);
 	}

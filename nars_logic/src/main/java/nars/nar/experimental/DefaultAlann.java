@@ -131,6 +131,7 @@ public class DefaultAlann extends AbstractAlann  {
             super(nar, nar.memory.random, DefaultAlann.this.commander);
         }
 
+        @Nullable
         @Override
         public Concept concept(Termed term) {
             return nar.concept(term);

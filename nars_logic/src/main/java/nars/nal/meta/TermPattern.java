@@ -3,7 +3,6 @@ package nars.nal.meta;
 import com.google.common.collect.ListMultimap;
 import nars.Global;
 import nars.Op;
-import nars.nal.PremiseMatch;
 import nars.nal.meta.op.MatchTerm;
 import nars.nal.meta.op.SubTermOp;
 import nars.nal.meta.op.SubTermStructure;

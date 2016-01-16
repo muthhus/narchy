@@ -20,7 +20,7 @@
  */
 package nars.budget;
 
-import nars.nal.nal7.Tense;
+import nars.nal.Tense;
 import nars.truth.Truth;
 import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;

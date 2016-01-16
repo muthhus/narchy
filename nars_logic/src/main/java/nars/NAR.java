@@ -7,7 +7,7 @@ import nars.Narsese.NarseseException;
 import nars.budget.Budget;
 import nars.concept.Concept;
 import nars.nal.Level;
-import nars.nal.nal7.Tense;
+import nars.nal.Tense;
 import nars.nal.nal8.AbstractOperator;
 import nars.nal.nal8.Execution;
 import nars.nal.nal8.Operator;
@@ -21,10 +21,10 @@ import nars.task.flow.TaskStream;
 import nars.task.in.FileInput;
 import nars.task.in.TextInput;
 import nars.term.Term;
+import nars.term.TermBuilder;
+import nars.term.TermIndex;
 import nars.term.Termed;
 import nars.term.atom.Atom;
-import nars.term.compile.TermBuilder;
-import nars.term.compile.TermIndex;
 import nars.term.compound.Compound;
 import nars.time.Clock;
 import nars.util.event.*;
@@ -47,7 +47,7 @@ import java.util.function.*;
 import java.util.stream.Stream;
 
 import static nars.Symbols.*;
-import static nars.nal.nal7.Tense.ETERNAL;
+import static nars.nal.Tense.ETERNAL;
 
 
 /**

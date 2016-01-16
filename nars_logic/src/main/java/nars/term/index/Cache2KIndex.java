@@ -1,10 +1,10 @@
-package nars.index;
+package nars.term.index;
 
 
 import nars.term.Term;
 import nars.term.TermContainer;
+import nars.term.TermIndex;
 import nars.term.Termed;
-import nars.term.compile.TermIndex;
 import org.cache2k.Cache;
 
 /** TermIndex implemented with Cache2K with

@@ -1,8 +1,8 @@
 package nars.nal.meta.pre;
 
-import nars.nal.PremiseMatch;
 import nars.nal.meta.AtomicBooleanCondition;
 import nars.nal.meta.BooleanCondition;
+import nars.nal.meta.PremiseMatch;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class Temporality extends AtomicBooleanCondition<PremiseMatch> {

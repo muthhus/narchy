@@ -1,13 +1,9 @@
-package nars.index;
+package nars.term.index;
 
 import nars.$;
 import nars.Op;
-import nars.nal.nal7.Tense;
-import nars.term.Term;
-import nars.term.TermContainer;
-import nars.term.TermVector;
-import nars.term.Termed;
-import nars.term.compile.TermIndex;
+import nars.nal.Tense;
+import nars.term.*;
 import nars.term.compound.Compound;
 import nars.term.compound.GenericCompound;
 import org.jetbrains.annotations.NotNull;

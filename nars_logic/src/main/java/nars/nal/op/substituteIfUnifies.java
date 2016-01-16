@@ -1,7 +1,7 @@
 package nars.nal.op;
 
 import nars.Op;
-import nars.nal.PremiseMatch;
+import nars.nal.meta.PremiseMatch;
 import nars.term.Term;
 import nars.term.compound.Compound;
 import nars.term.transform.FindSubst;

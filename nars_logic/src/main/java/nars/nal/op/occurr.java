@@ -1,10 +1,10 @@
 package nars.nal.op;
 
 
-import nars.nal.PremiseMatch;
+import nars.concept.ConceptProcess;
+import nars.nal.Tense;
 import nars.nal.meta.AtomicBooleanCondition;
-import nars.nal.nal7.Tense;
-import nars.process.ConceptProcess;
+import nars.nal.meta.PremiseMatch;
 import nars.term.Term;
 import nars.term.compound.Compound;
 import org.jetbrains.annotations.NotNull;

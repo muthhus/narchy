@@ -11,7 +11,7 @@ import nars.nar.Default;
 import nars.task.Task;
 import nars.task.in.TextInput;
 import nars.task.in.Twenglish;
-import nars.term.compile.TermIndex;
+import nars.term.TermIndex;
 import nars.time.RealtimeMSClock;
 import nars.util.data.Util;
 import nars.util.data.sorted.SortedIndex;

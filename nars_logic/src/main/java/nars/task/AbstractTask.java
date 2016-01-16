@@ -4,7 +4,7 @@ import nars.Global;
 import nars.Memory;
 import nars.budget.Item;
 import nars.concept.Concept;
-import nars.nal.nal7.Tense;
+import nars.nal.Tense;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.compound.Compound;

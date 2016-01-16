@@ -1,8 +1,8 @@
 package nars.nal.op;
 
 import nars.term.Term;
+import nars.term.TermBuilder;
 import nars.term.TermContainer;
-import nars.term.compile.TermBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

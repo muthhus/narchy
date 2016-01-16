@@ -2,14 +2,13 @@
  * Here comes the text of your license
  * Each line should be prefixed with  *
  */
-package nars.process;
+package nars.concept;
 
 import nars.Global;
 import nars.NAR;
 import nars.Premise;
 import nars.bag.BLink;
-import nars.concept.Concept;
-import nars.nal.nal7.Tense;
+import nars.nal.Tense;
 import nars.task.Task;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;

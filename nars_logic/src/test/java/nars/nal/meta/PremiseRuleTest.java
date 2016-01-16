@@ -2,9 +2,6 @@ package nars.nal.meta;
 
 import junit.framework.TestCase;
 import nars.Narsese;
-import nars.nal.PatternIndex;
-import nars.nal.PremiseRule;
-import nars.nal.PremiseRuleSet;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.term.compound.Compound;

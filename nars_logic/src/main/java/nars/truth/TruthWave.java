@@ -1,6 +1,6 @@
 package nars.truth;
 
-import nars.nal.nal7.Tense;
+import nars.nal.Tense;
 import nars.task.Task;
 import nars.util.Texts;
 import org.jetbrains.annotations.NotNull;

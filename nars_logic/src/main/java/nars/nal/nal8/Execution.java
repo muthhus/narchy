@@ -128,6 +128,7 @@ public class Execution implements Runnable {
         memory.logic.TASK_EXECUTED.hit();
     }
 
+    @Nullable
     public Concept taskConcept() {
         return nar.concept(task.concept());
     }

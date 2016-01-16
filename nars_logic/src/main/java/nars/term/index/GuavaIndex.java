@@ -1,4 +1,4 @@
-package nars.index;
+package nars.term.index;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -6,8 +6,8 @@ import javassist.scopedpool.SoftValueHashMap;
 import nars.Op;
 import nars.term.Term;
 import nars.term.TermContainer;
+import nars.term.TermIndex;
 import nars.term.Termed;
-import nars.term.compile.TermIndex;
 import nars.time.Clock;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

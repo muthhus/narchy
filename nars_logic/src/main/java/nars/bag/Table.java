@@ -1,4 +1,4 @@
-package nars.bag.impl;
+package nars.bag;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

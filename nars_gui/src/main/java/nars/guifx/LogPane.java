@@ -15,7 +15,7 @@ import nars.Premise;
 import nars.concept.Concept;
 import nars.guifx.treemap.Item;
 import nars.guifx.treemap.TreemapChart;
-import nars.nal.nal7.Tense;
+import nars.nal.Tense;
 
 import java.util.Collection;
 import java.util.HashSet;

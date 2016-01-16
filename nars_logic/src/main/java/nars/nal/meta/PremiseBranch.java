@@ -1,7 +1,6 @@
 package nars.nal.meta;
 
 import nars.Op;
-import nars.nal.PremiseMatch;
 import nars.term.TermVector;
 import nars.term.compound.GenericCompound;
 import org.jetbrains.annotations.NotNull;

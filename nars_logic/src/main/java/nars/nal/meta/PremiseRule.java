@@ -1,4 +1,4 @@
-package nars.nal;
+package nars.nal.meta;
 
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.MultimapBuilder;
@@ -6,18 +6,15 @@ import com.google.common.collect.Sets;
 import nars.$;
 import nars.Global;
 import nars.Op;
-import nars.nal.meta.AtomicBooleanCondition;
-import nars.nal.meta.BooleanCondition;
-import nars.nal.meta.PostCondition;
-import nars.nal.meta.TaskBeliefPair;
+import nars.nal.Level;
 import nars.nal.meta.op.Solve;
 import nars.nal.meta.pre.*;
 import nars.nal.op.*;
 import nars.term.Term;
+import nars.term.TermIndex;
 import nars.term.TermVector;
 import nars.term.Terms;
 import nars.term.atom.Atom;
-import nars.term.compile.TermIndex;
 import nars.term.compound.Compound;
 import nars.term.compound.GenericCompound;
 import nars.term.constraint.MatchConstraint;
@@ -59,11 +56,6 @@ public class PremiseRule extends GenericCompound implements Level {
     /** blank marker trie node indicating the derivation and terminating the branch */
     public static final BooleanCondition END = new AtomicBooleanCondition<PremiseMatch>() {
 
-
-        @Override
-        public String toJavaConditionString() {
-            return "true";
-        }
 
         @Override
         public boolean booleanValueOf(PremiseMatch versioneds) {
@@ -712,7 +704,7 @@ public class PremiseRule extends GenericCompound implements Level {
             return $.v(VAR_PATTERN, i);
         }
 
-        @Override protected Variable newVariable(Variable v, int serial) {
+        @Override protected Variable newVariable(@NotNull Variable v, int serial) {
 
 
             if (v instanceof Ellipsis) {
@@ -728,7 +720,7 @@ public class PremiseRule extends GenericCompound implements Level {
         }
 
         @Override
-        public final boolean testSuperTerm(Compound t) {
+        public final boolean testSuperTerm(@NotNull Compound t) {
             //descend all, because VAR_PATTERN is not yet always considered a variable
             return true;
         }

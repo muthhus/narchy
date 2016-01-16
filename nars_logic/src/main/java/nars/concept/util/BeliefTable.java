@@ -2,7 +2,7 @@ package nars.concept.util;
 
 import com.google.common.collect.Iterators;
 import nars.Memory;
-import nars.nal.nal7.Tense;
+import nars.nal.Tense;
 import nars.task.Task;
 import nars.truth.Truth;
 import nars.truth.TruthFunctions;

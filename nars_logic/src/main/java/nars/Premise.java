@@ -3,7 +3,7 @@ package nars;
 import nars.concept.Concept;
 import nars.nal.Level;
 import nars.nal.LocalRules;
-import nars.nal.nal7.Tense;
+import nars.nal.Tense;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.task.Tasked;

@@ -2,7 +2,6 @@ package nars.nal.meta;
 
 import nars.Memory;
 import nars.Premise;
-import nars.nal.PremiseMatch;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;

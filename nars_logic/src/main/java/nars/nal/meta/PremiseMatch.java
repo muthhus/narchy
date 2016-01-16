@@ -1,4 +1,4 @@
-package nars.nal;
+package nars.nal.meta;
 
 import nars.$;
 import nars.Global;
@@ -6,11 +6,11 @@ import nars.Op;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.budget.UnitBudget;
-import nars.nal.meta.TaskBeliefPair;
+import nars.concept.ConceptProcess;
+import nars.nal.Deriver;
 import nars.nal.meta.op.MatchTerm;
 import nars.nal.nal8.Operator;
 import nars.nal.op.ImmediateTermTransform;
-import nars.process.ConceptProcess;
 import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;

@@ -47,6 +47,7 @@ public abstract class DeriveletContext implements Consumer<NAR> {
     }
 
 
+    @Nullable
     public abstract Concept concept(Termed term);
 
 //    public float getForgetCycles() {

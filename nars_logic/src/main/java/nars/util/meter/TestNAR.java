@@ -2,7 +2,7 @@ package nars.util.meter;
 
 import nars.Global;
 import nars.NAR;
-import nars.nal.nal7.Tense;
+import nars.nal.Tense;
 import nars.task.Task;
 import nars.task.Tasked;
 import nars.term.atom.Atom;
@@ -30,6 +30,7 @@ import java.util.*;
 */
 public class TestNAR  {
 
+    @NotNull
     public final Map<Object, HitMeter> eventMeters;
     @NotNull
     public final NAR nar;

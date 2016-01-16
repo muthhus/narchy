@@ -25,7 +25,6 @@ import nars.*;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.budget.UnitBudget;
-import nars.nal.nal7.Tense;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Term;

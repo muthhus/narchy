@@ -1,13 +1,12 @@
-package nars.term.compile;
+package nars.term;
 
 import nars.Op;
 import nars.budget.Budget;
-import nars.index.MapIndex;
 import nars.task.MutableTask;
 import nars.task.Task;
-import nars.term.*;
 import nars.term.compound.Compound;
 import nars.term.compound.GenericCompound;
+import nars.term.index.MapIndex;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

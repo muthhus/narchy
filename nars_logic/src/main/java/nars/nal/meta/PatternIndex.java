@@ -1,9 +1,9 @@
-package nars.nal;
+package nars.nal.meta;
 
-import nars.index.MapIndex;
 import nars.term.TermVector;
 import nars.term.Termed;
 import nars.term.compound.Compound;
+import nars.term.index.MapIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -20,7 +20,7 @@ public class PatternIndex extends MapIndex {
 
     @NotNull
     @Override
-    public Termed makeCompound(Compound x) {
+    public Termed makeCompound(@NotNull Compound x) {
 
         /*if (!(x instanceof AbstractCompoundPattern)) {
             if (x instanceof Compound) {

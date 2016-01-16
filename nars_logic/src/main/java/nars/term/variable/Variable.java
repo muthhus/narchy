@@ -107,6 +107,7 @@ public abstract class Variable extends AbstractStringAtom {
     }
 
     /** produce a normalized version of this identified by the serial integer */
+    @NotNull
     public abstract Variable normalize(int serial);
 
 

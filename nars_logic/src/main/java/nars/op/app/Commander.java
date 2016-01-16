@@ -5,7 +5,7 @@ import nars.NAR;
 import nars.bag.BLink;
 import nars.budget.TaskAccumulator;
 import nars.concept.Concept;
-import nars.nal.nal7.Tense;
+import nars.nal.Tense;
 import nars.task.Task;
 import org.jetbrains.annotations.NotNull;
 

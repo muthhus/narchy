@@ -1,7 +1,7 @@
 package nars.nal.meta.pre;
 
-import nars.nal.PremiseMatch;
 import nars.nal.meta.AtomicBooleanCondition;
+import nars.nal.meta.PremiseMatch;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -15,7 +15,7 @@ public abstract class PreCondition3 extends AtomicBooleanCondition<PremiseMatch>
 
 
     /** no arguments should be null */
-    protected PreCondition3(Term var1, Term var2, Term var3) {
+    protected PreCondition3(@Nullable Term var1, @Nullable Term var2, @Nullable Term var3) {
         arg1 = var1;
         arg2 = var2;
         arg3 = var3;

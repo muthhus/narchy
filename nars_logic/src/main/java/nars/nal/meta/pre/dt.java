@@ -1,8 +1,8 @@
 package nars.nal.meta.pre;
 
-import nars.nal.PremiseMatch;
+import nars.nal.Tense;
 import nars.nal.meta.AtomicBooleanCondition;
-import nars.nal.nal7.Tense;
+import nars.nal.meta.PremiseMatch;
 import nars.term.compound.Compound;
 import org.jetbrains.annotations.NotNull;
 

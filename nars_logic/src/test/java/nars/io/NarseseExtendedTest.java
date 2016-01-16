@@ -3,7 +3,7 @@ package nars.io;
 import nars.Narsese;
 import nars.Op;
 import nars.Symbols;
-import nars.nal.nal7.Tense;
+import nars.nal.Tense;
 import nars.nar.Terminal;
 import nars.task.Task;
 import nars.term.Term;
@@ -12,7 +12,7 @@ import org.junit.Test;
 
 import static nars.io.NarseseTest.task;
 import static nars.io.NarseseTest.term;
-import static nars.nal.nal7.Tense.*;
+import static nars.nal.Tense.*;
 import static org.junit.Assert.*;
 
 /**

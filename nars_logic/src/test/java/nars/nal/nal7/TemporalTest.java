@@ -1,6 +1,7 @@
 package nars.nal.nal7;
 
 import nars.NAR;
+import nars.nal.Tense;
 import nars.nar.Default;
 import nars.task.Task;
 import org.junit.Assert;

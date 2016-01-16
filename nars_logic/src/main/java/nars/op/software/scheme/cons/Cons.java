@@ -190,7 +190,7 @@ public class Cons<T> implements Iterable<T> {
             return Iterators.emptyIterator();
         }
 
-        @Override public void forEach(Consumer action) {
+        @Override public void forEach(@NotNull Consumer action) {
         }
 
         @Override public Spliterator<Object> spliterator() {

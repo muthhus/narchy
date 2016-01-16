@@ -1,4 +1,4 @@
-package nars.index;
+package nars.term.index;
 
 import com.gs.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import nars.term.Term;

@@ -4,7 +4,7 @@ package nars.util.meter.condition;
 import nars.Global;
 import nars.NAR;
 import nars.Narsese;
-import nars.nal.nal7.Tense;
+import nars.nal.Tense;
 import nars.task.Task;
 import nars.task.Tasked;
 import nars.term.Term;

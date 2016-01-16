@@ -7,8 +7,8 @@ import nars.nal.nal8.operator.TermFunction;
 import nars.op.software.scheme.cons.Cons;
 import nars.op.software.scheme.expressions.*;
 import nars.term.Term;
+import nars.term.TermBuilder;
 import nars.term.atom.Atom;
-import nars.term.compile.TermBuilder;
 import nars.term.compound.Compound;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,7 +30,7 @@ public class scheme extends TermFunction {
     public static class SchemeProduct extends ListExpression {
 
 
-        public SchemeProduct(Iterable<Term> p) {
+        public SchemeProduct(@NotNull Iterable<Term> p) {
             super((Cons<Expression>)Cons.copyOf( Iterables.transform(p, (Term term) -> {
 
                 if (term instanceof Iterable) {

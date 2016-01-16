@@ -3,7 +3,7 @@ package nars.bag;
 import nars.budget.Budget;
 import nars.budget.UnitBudget;
 import nars.data.BudgetedStruct;
-import nars.nal.nal7.Tense;
+import nars.nal.Tense;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.util.data.Util.clamp;

@@ -23,7 +23,7 @@ package nars.task;
 import nars.*;
 import nars.budget.Budgeted;
 import nars.concept.Concept;
-import nars.nal.nal7.Tense;
+import nars.nal.Tense;
 import nars.term.Statement;
 import nars.term.Term;
 import nars.term.Termed;
@@ -164,6 +164,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     Reference<Task> getParentTaskRef();
 
 
+    @Nullable
     Task getParentBelief();
 
     Reference<Task> getParentBeliefRef();
@@ -327,8 +328,10 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     }
 
 
+    @Nullable
     Task getBestSolution();
 
+    @Nullable
     Reference<Task> getBestSolutionRef();
 
 

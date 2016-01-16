@@ -1,15 +1,14 @@
-package nars.nal;
+package nars.nal.meta;
 
 import nars.Global;
-import nars.nal.meta.BooleanCondition;
-import nars.nal.meta.PostCondition;
+import nars.nal.Deriver;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 
-public class SimpleDeriver extends Deriver  {
+public class SimpleDeriver extends Deriver {
 
     @NotNull
     private final List<List<Term>> unrolled;
@@ -28,7 +27,7 @@ public class SimpleDeriver extends Deriver  {
     }
 
     @Override
-    protected void run(@NotNull PremiseMatch m) {
+    public void run(@NotNull PremiseMatch m) {
 
         int now = m.now();
 

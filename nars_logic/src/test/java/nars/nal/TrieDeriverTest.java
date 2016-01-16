@@ -1,6 +1,7 @@
 package nars.nal;
 
 import nars.NAR;
+import nars.nal.meta.TrieDeriver;
 import nars.nar.Default;
 import org.junit.Test;
 

@@ -1,7 +1,7 @@
 package nars.task.in;
 
 import nars.NAR;
-import nars.nal.nal7.Tense;
+import nars.nal.Tense;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Term;

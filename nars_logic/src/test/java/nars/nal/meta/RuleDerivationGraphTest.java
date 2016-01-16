@@ -2,8 +2,6 @@ package nars.nal.meta;
 
 import com.google.common.collect.Sets;
 import nars.nal.Deriver;
-import nars.nal.PremiseRule;
-import nars.nal.TrieDeriver;
 import nars.term.Term;
 import org.apache.commons.math3.stat.Frequency;
 import org.junit.Test;

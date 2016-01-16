@@ -15,6 +15,7 @@ public class VarPattern extends Variable {
         super(Op.VAR_PATTERN.ch + name);
     }
 
+    @NotNull
     @Override
     public Variable normalize(int serial) {
         return $.v(Op.VAR_PATTERN, serial);

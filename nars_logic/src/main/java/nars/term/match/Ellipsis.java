@@ -24,6 +24,7 @@ public abstract class Ellipsis extends VarPattern { //TODO use Immutable
 //        }
 //    };
 
+    @NotNull
     public abstract Variable clone(Variable newVar, VariableNormalization normalizer);
 
 

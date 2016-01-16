@@ -1,4 +1,4 @@
-package nars.nal;
+package nars.nal.meta;
 
 import nars.term.Term;
 import nars.term.compound.Compound;

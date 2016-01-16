@@ -3,7 +3,6 @@ package nars.nal.meta;
 import nars.Op;
 import nars.Symbols;
 import nars.nal.Level;
-import nars.nal.PremiseRule;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.term.atom.Atom;

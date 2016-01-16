@@ -2,8 +2,8 @@ package nars.nal.meta.pre;
 
 import nars.$;
 import nars.Symbols;
-import nars.nal.PremiseMatch;
 import nars.nal.meta.AtomicBooleanCondition;
+import nars.nal.meta.PremiseMatch;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
@@ -60,9 +60,9 @@ public class TaskPunctuation extends AtomicBooleanCondition<PremiseMatch> {
         return taskPunc == punc;
     }
 
-    @NotNull
-    @Override
-    public String toJavaConditionString() {
-        return "'" + punc + "' == p.getTask().getPunctuation()";
-    }
+//    @NotNull
+//    @Override
+//    public String toJavaConditionString() {
+//        return "'" + punc + "' == p.getTask().getPunctuation()";
+//    }
 }

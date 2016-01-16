@@ -1,8 +1,8 @@
 package nars.nal.meta.pre;
 
 import com.google.common.collect.ListMultimap;
-import nars.nal.PremiseMatch;
 import nars.nal.meta.AtomicBooleanCondition;
+import nars.nal.meta.PremiseMatch;
 import nars.nal.meta.TaskBeliefPair;
 import nars.nal.meta.TermPattern;
 import nars.term.Term;

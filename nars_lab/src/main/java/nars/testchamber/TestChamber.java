@@ -5,7 +5,7 @@ import nars.NAR;
 import nars.guifx.IOPane;
 import nars.guifx.demo.NARide;
 import nars.nar.Default;
-import nars.term.compile.TermIndex;
+import nars.term.TermIndex;
 import nars.testchamber.Cell.Logic;
 import nars.testchamber.Cell.Material;
 import nars.testchamber.map.Maze;

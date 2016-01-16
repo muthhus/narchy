@@ -2,14 +2,13 @@ package nars.term;
 
 import javassist.scopedpool.SoftValueHashMap;
 import nars.NAR;
-import nars.index.GuavaIndex;
-import nars.index.MapIndex;
-import nars.index.MapIndex2;
 import nars.nar.Default;
 import nars.nar.Terminal;
 import nars.task.Task;
-import nars.term.compile.TermIndex;
 import nars.term.compound.Compound;
+import nars.term.index.GuavaIndex;
+import nars.term.index.MapIndex;
+import nars.term.index.MapIndex2;
 import nars.time.FrameClock;
 import nars.util.data.map.UnifriedMap;
 import org.junit.Ignore;

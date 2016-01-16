@@ -1,7 +1,5 @@
-package nars.nal;
+package nars.nal.meta;
 
-import nars.nal.meta.ProcTerm;
-import nars.nal.meta.ThenFork;
 import org.jetbrains.annotations.NotNull;
 
 /**

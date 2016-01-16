@@ -1,8 +1,8 @@
 package nars.nal.meta.pre;
 
 import nars.Premise;
-import nars.nal.PremiseMatch;
 import nars.nal.meta.AtomicBooleanCondition;
+import nars.nal.meta.PremiseMatch;
 import nars.task.Temporal;
 import org.jetbrains.annotations.NotNull;
 

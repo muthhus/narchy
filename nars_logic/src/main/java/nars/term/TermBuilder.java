@@ -1,15 +1,14 @@
-package nars.term.compile;
+package nars.term;
 
 import com.google.common.collect.Lists;
 import com.gs.collections.api.set.MutableSet;
 import nars.Global;
 import nars.Op;
-import nars.nal.PremiseAware;
-import nars.nal.PremiseMatch;
-import nars.nal.nal7.Tense;
+import nars.nal.Tense;
+import nars.nal.meta.PremiseAware;
+import nars.nal.meta.PremiseMatch;
 import nars.nal.nal8.Operator;
 import nars.nal.op.ImmediateTermTransform;
-import nars.term.*;
 import nars.term.compound.Compound;
 import nars.term.compound.GenericCompound;
 import nars.term.match.Ellipsis;
@@ -29,7 +28,7 @@ import java.util.TreeSet;
 
 import static java.util.Arrays.copyOfRange;
 import static nars.Op.*;
-import static nars.nal.nal7.Tense.ITERNAL;
+import static nars.nal.Tense.ITERNAL;
 import static nars.term.Statement.pred;
 import static nars.term.Statement.subj;
 
@@ -67,17 +66,21 @@ public interface TermBuilder {
     }
 
 
+    @NotNull
     default Termed make(Op op, int relation, TermContainer subterms) {
         return make(op, relation, subterms, Tense.ITERNAL);
     }
 
+    @NotNull
     Termed make(Op op, int relation, TermContainer subterms, int dt);
 
     /** unifies a term with this; by default it passes through unchanged */
+    @Nullable
     default Termed the(Term t) {
         return t;
     }
 
+    @Nullable
     default Termed the(@NotNull Termed t) {
         return the(t.term());
     }

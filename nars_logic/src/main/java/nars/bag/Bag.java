@@ -1,6 +1,5 @@
 package nars.bag;
 
-import nars.bag.impl.Table;
 import nars.budget.Budget;
 import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;

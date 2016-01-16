@@ -6,7 +6,7 @@ import nars.Global;
 import nars.Memory;
 import nars.bag.impl.ArrayTable;
 import nars.nal.LocalRules;
-import nars.nal.nal7.Tense;
+import nars.nal.Tense;
 import nars.task.Task;
 import nars.truth.Truthed;
 import nars.util.ArraySortedIndex;

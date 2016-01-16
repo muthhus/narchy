@@ -3,9 +3,9 @@ package nars.guifx.demo;
 import javassist.scopedpool.SoftValueHashMap;
 import nars.Global;
 import nars.Memory;
-import nars.index.MapIndex2;
 import nars.nar.Default;
-import nars.term.compile.TermIndex;
+import nars.term.TermIndex;
+import nars.term.index.MapIndex2;
 import nars.time.FrameClock;
 
 /**

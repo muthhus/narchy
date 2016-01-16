@@ -4,7 +4,7 @@ import nars.$;
 import nars.Global;
 import nars.NAR;
 import nars.Narsese;
-import nars.nal.nal7.Tense;
+import nars.nal.Tense;
 import nars.nar.Default;
 import nars.term.Term;
 import nars.util.event.On;

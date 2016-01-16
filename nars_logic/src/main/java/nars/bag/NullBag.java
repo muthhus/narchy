@@ -85,7 +85,7 @@ public final class NullBag<V> implements Bag<V> {
     }
 
     @Override
-    public void top(Consumer<BLink<V>> each) {
+    public void top(@NotNull Consumer<BLink<V>> each) {
 
     }
 

@@ -1,4 +1,4 @@
-package nars.nal.nal7;
+package nars.nal;
 
 import nars.Global;
 import nars.Memory;

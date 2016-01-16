@@ -1,11 +1,11 @@
 package nars.nal.op;
 
 import nars.Op;
-import nars.nal.PremiseAware;
-import nars.nal.PremiseMatch;
+import nars.nal.meta.PremiseAware;
+import nars.nal.meta.PremiseMatch;
 import nars.term.Term;
+import nars.term.TermBuilder;
 import nars.term.atom.Atom;
-import nars.term.compile.TermBuilder;
 import nars.term.compound.Compound;
 import nars.term.transform.MapSubst;
 import nars.term.transform.Subst;

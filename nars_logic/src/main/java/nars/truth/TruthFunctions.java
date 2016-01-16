@@ -21,8 +21,8 @@
 package nars.truth;
 
 import nars.Global;
+import nars.nal.Tense;
 import nars.nal.UtilityFunctions;
-import nars.nal.nal7.Tense;
 import org.jetbrains.annotations.NotNull;
 
 import static java.lang.Math.abs;

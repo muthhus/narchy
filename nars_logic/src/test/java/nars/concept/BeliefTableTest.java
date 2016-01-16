@@ -3,7 +3,7 @@ package nars.concept;
 import junit.framework.TestCase;
 import nars.Global;
 import nars.NAR;
-import nars.nal.nal7.Tense;
+import nars.nal.Tense;
 import nars.nar.AbstractNAR;
 import nars.nar.Default;
 import nars.task.Task;

@@ -1,6 +1,4 @@
-package nars.main;
-
-import nars.NAR;
+package nars;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;

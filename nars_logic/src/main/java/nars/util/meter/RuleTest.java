@@ -2,7 +2,7 @@ package nars.util.meter;
 
 import nars.NAR;
 import nars.Narsese;
-import nars.nal.PremiseRule;
+import nars.nal.meta.PremiseRule;
 import nars.nar.Default;
 import nars.task.Task;
 import org.jetbrains.annotations.NotNull;

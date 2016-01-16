@@ -2,7 +2,7 @@ package nars.guifx.demo;
 
 import nars.Memory;
 import nars.nar.Default;
-import nars.term.compile.TermIndex;
+import nars.term.TermIndex;
 import nars.time.RealtimeMSClock;
 
 

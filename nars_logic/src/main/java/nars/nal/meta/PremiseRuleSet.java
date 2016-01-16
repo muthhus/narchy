@@ -1,8 +1,9 @@
-package nars.nal;
+package nars.nal.meta;
 
 import nars.$;
 import nars.Global;
 import nars.Narsese;
+import nars.nal.Deriver;
 import nars.term.compound.Compound;
 import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;

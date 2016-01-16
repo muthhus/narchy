@@ -52,7 +52,7 @@ public class Space extends GenericCompound {
     }
 
     @Override
-    public boolean equals(Object that) {
+    public boolean equals(@NotNull Object that) {
         return (that instanceof Space) && super.equals(that) &&
             Objects.equals(vector,  ((Space)((Termed)that).term()).vector);
     }
