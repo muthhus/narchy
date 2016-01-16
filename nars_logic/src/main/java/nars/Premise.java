@@ -87,6 +87,7 @@ public interface Premise extends Level, Tasked {
                             (Map<Term, Term>)yx //inverse map
                     );
 
+
                     Op bbop = bb.op();
                     if (b.op() == Op.VAR_QUERY && (bbop == Op.VAR_INDEP || bbop == Op.VAR_DEP))
                         return false;
@@ -102,7 +103,7 @@ public interface Premise extends Level, Tasked {
 
             Term applySubstituteAndRenameVariables(Compound t, Map<Term,Term> subs) {
                 return (subs == null) || (subs.isEmpty()) ?
-                        t /* no chane necessary */ :
+                        t /* no change necessary */ :
                         memory.index.apply(new MapSubst(subs), t);
             }
 

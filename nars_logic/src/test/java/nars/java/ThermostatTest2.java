@@ -16,7 +16,7 @@ public enum ThermostatTest2 {
     ;
 
     /** number of steps in total range */
-    static int range = 4;
+    static int range = 18;
 
     /** # steps it can move per invocation (+/-) */
 
@@ -41,7 +41,17 @@ public enum ThermostatTest2 {
         public int go(/*int speed,*/ boolean upOrDown) {
             int speed = 1;
 
-            if (log) System.out.println("\tgo @ " + current + " (" + speed + ',' + upOrDown + ") TO " + target + " (" + (Math.abs(target-current)) + " dist)\n");
+            //if (log) System.out.println("\tgo @ " + current + " (" + speed + ',' + upOrDown + ") TO " + target + " (" + (Math.abs(target-current)) + " dist)\n");
+
+            for (int i = 0; i < range; i++) {
+                char c;
+                if (i == target) c = 'x';
+                else if (i == current) c = '|';
+                else c = '-';
+                System.out.print(c);
+            }
+            System.out.println("  " + current + " (" + speed + ',' + upOrDown + ") TO " + target + " (" + (Math.abs(target-current)) + " dist)" );
+
 
             current += speed * (upOrDown ? +1 : -1);
 
@@ -74,13 +84,13 @@ public enum ThermostatTest2 {
     //@Test public void testThermostat1() throws Exception {
     public static void main(String[] arg) throws Exception {
 
-        Global.DEBUG = false;
-        Global.EXIT_ON_EXCEPTION = true;
+        Global.DEBUG = Global.EXIT_ON_EXCEPTION = false;
 
         int dur = 5;
 
-        Default n = new Default(1024, 4, 2, 3);
+        Default n = new Default(1024, 1, 2, 3);
         n.memory.duration.set(dur);
+
         //n.getInput().inputPerCycle.set(2);
 
 
@@ -200,11 +210,25 @@ public enum ThermostatTest2 {
 
 //                n.input(notValid + "! %0%");
 
-        for (int i = 0; i < 5; i++) {
+        int runs = 25;
+        int runLength = 5000;
+        float initialGamma = 1f/500;
+
+        for (int i = 0; i < runs; i++) {
 
             reset(tc, range);
-            tc.go(true); n.frame(dur*2); ///*tc.valid();*/ n.frame(dur*4);
-            tc.go(false); n.frame(dur*2); ///*tc.valid();*/ n.frame(dur*4);
+
+            float gamma = initialGamma / i;
+            for (int j = 0; j < runLength; j++){
+                if (n.memory.random.nextFloat() < gamma) {
+                    tc.go( n.memory.random.nextBoolean() );
+                }
+
+                n.frame();
+            }
+
+            //tc.go(true); n.frame(dur*2); ///*tc.valid();*/ n.frame(dur*4);
+            //tc.go(false); n.frame(dur*2); ///*tc.valid();*/ n.frame(dur*4);
 
             //tc.log = false;
 
@@ -227,7 +251,7 @@ public enum ThermostatTest2 {
 
 
             //n.input("<(--,true) --> (/, ^Thermostat_valid, t, _)>! %0%");
-            n.frame(1000*dur);
+            //n.frame(1000*dur);
             //System.out.println(tc.valid() + " " + tc.current + " ... " + tc.target  );
 
 

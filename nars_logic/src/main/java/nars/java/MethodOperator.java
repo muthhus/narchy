@@ -65,7 +65,12 @@ public class MethodOperator extends TermFunction {
 
     @Override
     public Object function(Compound o, TermBuilder ti) {
-        Term[] x = o.terms();
+        Term[] x;
+        try {
+            x = ((Compound) o.terms()[0]).terms(); //HACK
+        } catch (Exception e) {
+            return null;
+        }
 
         //System.out.println("method: " + method + " w/ " + x);
 
