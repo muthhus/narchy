@@ -45,17 +45,20 @@ public class GenericCompound<T extends Term> implements Compound<T> {
         this(op, relation, Tense.ITERNAL, subterms);
     }
 
-    public GenericCompound(Op op, int relation, int t, @NotNull TermVector subterms) {
+    public GenericCompound(Op op, int relation, int dt, @NotNull TermVector subterms) {
         this.terms = subterms;
         this.normalized = (subterms.vars() == 0);
         this.op = op;
 
-        t = op().isTemporal() ? t : ITERNAL;
-        this.t = t;
+        if (!op.isTemporal() && dt!=ITERNAL)
+            throw new RuntimeException("invalid temporal relation for " + op);
+
+        //t = op.isTemporal() ? t : ITERNAL;
+        this.t = dt;
 
         this.relation = relation;
 
-        this.hash = Util.hashCombine(terms.hashCode(), opRel(), t);
+        this.hash = Util.hashCombine(terms.hashCode(), opRel(), dt);
 
 
     }

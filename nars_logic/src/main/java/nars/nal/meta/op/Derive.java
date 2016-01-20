@@ -160,6 +160,8 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
 //                if (ct.op().isCommutative() && (!p.getXY(((Compound)term).term(0)).equals(ct.term(0)))) {
 //                    tDelta = -tDelta;
 //                }
+                if (!ct.op().isTemporal())
+                    return;
 
                 //set time relation
                 c = ct.t(tDelta);

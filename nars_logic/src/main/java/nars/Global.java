@@ -125,11 +125,11 @@ public enum Global {
     public static final int MAXIMUM_EVIDENTAL_BASE_LENGTH = 10;
 
 
-    /**
-     * The rate of confidence decrease in mental operations Doubt and Hesitate
-     * set to zero to disable this feature.
-     */
-    public static float DISCOUNT_RATE = 0.5f;
+//    /**
+//     * The rate of confidence decrease in mental operations Doubt and Hesitate
+//     * set to zero to disable this feature.
+//     */
+//    public static float DISCOUNT_RATE = 0.5f;
 
 
 
@@ -157,7 +157,7 @@ public enum Global {
     /** extra debugging checks */
     public static boolean DEBUG_PARANOID = false;
 
-    public static float MAX_TERMUTATIONS_PER_MATCH = 8;
+    public static float MAX_TERMUTATIONS_PER_MATCH = 4;
     public static float MIN_TERMUTATIONS_PER_MATCH = 1;
     public static final boolean DEBUG_NON_INPUT_ANSWERED_QUESTIONS = false;
 

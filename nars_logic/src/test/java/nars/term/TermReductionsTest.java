@@ -281,12 +281,19 @@ public class TermReductionsTest {
     public void testTemporalConjunctionReduction4() {
         assertEquals("(a &&+0 b)", $("( a &&+0 (b && b) )").toString());
     }
-    @Ignore
     @Test
-    public void testTemporalConjunctionReduction6() {
+    public void testTemporalNTermConjunctionParallel() {
         //+0 is the only case in which temporal && can have arity>2
-        assertEquals("(&&+0, a, b, c)", $("( a &&+0 (b &&+0 c) )").toString());
+        //TODO fix spacing:
+        assertEquals("( &&+0 ,a,b,c)", $("( a &&+0 (b &&+0 c) )").toString());
     }
+
+    @Ignore @Test
+    public void testTemporalNTermEquivalenceParallel() {
+        //+0 is the only case in which temporal && can have arity>2
+        assertEquals("(<=>+0, a, b, c)", $("( a <=>+0 (b <=>+0 c) )").toString());
+    }
+
 
     @Test
     public void testMultireduction() {

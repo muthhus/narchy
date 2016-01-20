@@ -394,14 +394,24 @@ public interface TermBuilder {
 //        if (u.length == 1)
 //            return u[0];
 
+
         if (t!=ITERNAL) {
+            if (op == DISJUNCTION) {
+                throw new RuntimeException("invalid temporal disjunction");
+            }
+
+            if (t == 0) {
+                //special case: 0
+                Term x = junction(op, 0, TermSet.the(u));
+                if (x.op(op))
+                    return ((Compound)x).t(0);
+                return x;
+            }
+
             if (u.length!=2) {
                 //throw new RuntimeException
                 System.err.println("invalid temporal conjunction: " + op + " " + t + " "+ Arrays.toString(u));
                 return null;
-            }
-            if (op == DISJUNCTION) {
-                throw new RuntimeException("invalid temporal disjunction");
             }
 
             if (u[0].equals(u[1])) return u[0];
@@ -415,13 +425,13 @@ public interface TermBuilder {
             boolean reversed = cx.term(0)==u[1];
             return cx.t(reversed ? -t : t);
         } else {
-            return junction(op, Lists.newArrayList(u));
+            return junction(op, t, Lists.newArrayList(u));
         }
     }
 
     /** flattening junction builder, don't use with temporal relation */
     @Nullable
-    default Term junction(@NotNull Op op, @NotNull Iterable<Term> u) {
+    default Term junction(@NotNull Op op, int dt, @NotNull Iterable<Term> u) {
 
 //        if (t!=ITERNAL) {
 //            return junction(op, t, Iterables.toArray(u, Term.class));
@@ -432,7 +442,7 @@ public interface TermBuilder {
         //TODO use a more efficient flattening that doesnt involve recursion and multiple array creations
         TreeSet<Term> s = new TreeSet();
         u.forEach(x -> {
-            if (x.op(op) && (((Compound)x).t()==ITERNAL) ) {
+            if (x.op(op) && (((Compound)x).t()==dt) ) {
                 for (Term y : ((TermContainer) x).terms()) {
                     if (s.add(y))
                         if (y.op(op))
@@ -451,8 +461,8 @@ public interface TermBuilder {
 //            return junction(op, t, ii.next(), ii.next());
 //        }
 
-        return !done[0] ? junction(op, s) :
-                finish(op, -1, TermSet.the(s));
+        return !done[0] ? junction(op, dt, s) :
+                finish(op, dt, -1, TermSet.the(s));
     }
 
     @Nullable
