@@ -332,14 +332,14 @@
 
 //conditional abduction by dependent variable
 
-    ((X --> R) ==> Z), ((&&,(#Y --> B),(#Y --> R),A..*) ==> Z) |- (X --> B), (Belief:Abduction)
-    ((X --> R) ==> Z), ((&&,(#Y --> B),(#Y --> R)) ==> Z) |- (X --> B), (Belief:Abduction)
+    ((X --> R) ==> Z), ((&&,(#Y --> B),(#Y --> R),A..*) ==> Z), dt(exact) |- (X --> B), (Belief:Abduction)
+    ((X --> R) ==> Z), ((&&,(#Y --> B),(#Y --> R)) ==> Z), dt(exact) |- (X --> B), (Belief:Abduction)
 
 // conditional deduction "An inverse inference has been implemented as a form of deduction" https://code.google.com/p/open-nars/issues/detail?id=40&can=1
 
     (U --> L), ((&&,A..*,(#X --> L),(#X --> R)) ==> Z) |- substitute(((&&,A..*,(U --> R)) ==> Z),#X,U), (Belief:Deduction)
 //this shoudlnt be necesssary if the previous works (with zero or more):
-    (U --> L), ((&&,(#X --> L),(#X --> R)) ==> Z) |- ((U --> R) ==> Z), (Belief:Deduction)
+    (U --> L), ((&&,(#X --> L),(#X --> R)) ==> Z), dt(belief) |- ((U --> R) ==> Z), (Belief:Deduction)
 
 
 
@@ -349,22 +349,22 @@
     (B --> K), (&&,(#X --> L),(($Y --> K) ==> A)) |- substitute((&&, (#X --> L), A), $Y,B), (Belief:Deduction)
     (B --> K), (&&,(#X --> L),(($Y --> K) ==> (&&,A..+))) |- substitute((&&,(#X --> L),A..+),$Y,B), (Belief:Deduction)
 
-    (B --> K), (($X --> L) ==> (&&,(#Y --> K),A..+)) |- substitute((($X --> L) ==> (&&,A..+)),#Y,B), (Belief:AnonymousAnalogy)
-    (B --> K), (($X --> L) ==> (&&,(#Y --> K),A)) |- substitute((($X --> L) ==> A),#Y,B), (Belief:AnonymousAnalogy)
+    (B --> K), (($X --> L) ==> (&&,(#Y --> K),A..+)), dt(belief) |- substitute((($X --> L) ==> (&&,A..+)),#Y,B), (Belief:AnonymousAnalogy)
+    (B --> K), (($X --> L) ==> (&&,(#Y --> K),A)), dt(belief) |- substitute((($X --> L) ==> A),#Y,B), (Belief:AnonymousAnalogy)
 
 
 
 //precondition combiner inference rule (variable_unification6):
 
-    ((&&,C,A..+) ==> Z), ((&&,C,B..+) ==> Z) |- ((&&,A..+) ==> (&&,B..+)), (Belief:Induction),
-                                                ((&&,B..+) ==> (&&,A..+)), (Belief:Induction)
-    (Z ==> (&&,C,A..+)), (Z ==> (&&,C,B..+)) |- ((&&,A..+) ==> (&&,B..+)), (Belief:Abduction),
-                                                ((&&,B..+) ==> (&&,A..+)), (Belief:Abduction)
+    ((&&,C,A..+) ==> Z), ((&&,C,B..+) ==> Z), dt(exact) |- ((&&,A..+) ==> (&&,B..+)), (Belief:Induction),
+                                                           ((&&,B..+) ==> (&&,A..+)), (Belief:Induction)
+    (Z ==> (&&,C,A..+)), (Z ==> (&&,C,B..+)), dt(exact) |- ((&&,A..+) ==> (&&,B..+)), (Belief:Abduction),
+                                                           ((&&,B..+) ==> (&&,A..+)), (Belief:Abduction)
 
 
 //second level variable introduction
 
-    (Y --> L), ((Y --> S) ==> R) |- ((&&,(#X --> L),(#X --> S)) ==> R), (Belief:Induction)
+    (Y --> L), ((Y --> S) ==> R), dt(belief) |- ((&&,(#X --> L),(#X --> S)) ==> R), (Belief:Induction)
     (Y --> L), ((&&,(Y --> S),A..+) ==> R) |- substitute(((&&,(#X --> L),(#X --> S),A..+) ==> R),Y,#X), (Belief:Intersection)
 
 //// independent variable elimination ////////////////////////////////////////////////////////////////////////////////////

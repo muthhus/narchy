@@ -412,6 +412,8 @@ public class PremiseRule extends GenericCompound implements Level {
                             preNext = dt.avg; break;
                         case "task":
                             preNext = dt.task; break;
+                        case "belief":
+                            preNext = dt.belief; break;
                         case "exact":
                             preNext = dt.exact; break;
                         case "sum":

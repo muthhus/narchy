@@ -337,14 +337,6 @@ public class NAL5Test extends AbstractNALTester {
         tester.mustBelieve(cycles,"<<R --> b> ==> <R --> [w]>>",1.00f,0.42f);
         tester.mustBelieve(cycles,"<<R --> [w]> ==> <R --> b>>",0.90f,0.45f);
     }
-    @Test
-    public void conditional_abduction3_semigeneric4(){
-        TestNAR tester = test();
-        tester.believe("<(&&,<s --> [f]>,<s --> [w]>) ==> <s --> [l]>>",0.9f,0.9f);
-        tester.believe("<(&&,<s --> [f]>,<s --> b>) ==> <s --> [l]>>");
-        tester.mustBelieve(cycles*2,"<<s --> b> ==> <s --> [w]>>",1.00f,0.42f);
-        tester.mustBelieve(cycles*2,"<<s --> [w]> ==> <s --> b>>",0.90f,0.45f);
-    }
 
     @Test
     public void conditional_abduction3(){
@@ -356,13 +348,15 @@ public class NAL5Test extends AbstractNALTester {
 
     }
 
+
+
     @Test
     public void conditional_abduction3_generic(){
         TestNAR tester = test();
         tester.believe("<(&&,<r --> [f]>,<r --> [w]>) ==> <r --> [l]>>",0.9f,0.9f);
         tester.believe("<(&&,<r --> [f]>,<r --> b>) ==> <r --> [l]>>");
-        tester.mustBelieve(cycles*8,"<<r --> b> ==> <r --> [w]>>",1.00f,0.42f);
-        tester.mustBelieve(cycles*8,"<<r --> [w]> ==> <r --> b>>",0.90f,0.45f);
+        tester.mustBelieve(cycles*2,"<<r --> b> ==> <r --> [w]>>",1.00f,0.42f);
+        tester.mustBelieve(cycles*2,"<<r --> [w]> ==> <r --> b>>",0.90f,0.45f);
     }
 
     @Test

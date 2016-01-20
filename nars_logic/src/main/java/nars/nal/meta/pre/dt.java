@@ -55,6 +55,16 @@ public abstract class dt extends AtomicBooleanCondition<PremiseMatch> {
             return "dt(task)";
         }
     };
+    public static final dt belief = new dt() {
+        @Override protected boolean computeDT(Compound t, int tt, Compound b, int bt, @NotNull PremiseMatch m) {
+            m.tDelta.set(bt);
+            return true;
+        }
+
+        @Override public String toString() {
+            return "dt(belief)";
+        }
+    };
     public static final dt exact = new dt() {
         @Override protected boolean computeDT(Compound t, int tt, Compound b, int bt, @NotNull PremiseMatch m) {
             if (tt == bt) {

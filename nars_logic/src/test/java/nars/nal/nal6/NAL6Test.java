@@ -13,7 +13,7 @@ import java.util.function.Supplier;
 public class NAL6Test extends AbstractNALTester {
 
 
-    final int cycles =750;
+    final int cycles =250;
 
     public NAL6Test(Supplier<NAR> b) {
         super(b);
