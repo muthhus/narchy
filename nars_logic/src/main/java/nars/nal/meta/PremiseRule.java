@@ -424,6 +424,10 @@ public class PremiseRule extends GenericCompound implements Level {
                             preNext = dt.bmint; break;
                         case "tminb":
                             preNext = dt.tminb; break;
+
+                        case "occ":
+                            preNext = dt.occ; break;
+
                         default:
                             throw new RuntimeException("invalid dt() argument: " + arg1);
                     }

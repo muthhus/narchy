@@ -1,8 +1,10 @@
 package nars.nal.meta.pre;
 
 import nars.concept.ConceptProcess;
+import nars.nal.Tense;
 import nars.nal.meta.AtomicBooleanCondition;
 import nars.nal.meta.PremiseMatch;
+import nars.task.Task;
 import nars.term.compound.Compound;
 import org.jetbrains.annotations.NotNull;
 
@@ -125,6 +127,44 @@ public abstract class dt extends AtomicBooleanCondition<PremiseMatch> {
             return "dt(exact)";
         }
     };
+
+    /** translates difference in task occurrence to temporal relation */
+    public static final dt occ = new dt() {
+        @Override
+        public boolean booleanValueOf(@NotNull PremiseMatch m) {
+            long at = m.premise.getTask().getOccurrenceTime();
+            boolean ate = at == Tense.ETERNAL;
+
+            Task bb = m.premise.getBelief();
+            if (bb == null) {
+                return ate; //proceed only if task is eternal
+            }
+
+            long bt = bb.getOccurrenceTime();
+            boolean bte = bt == Tense.ETERNAL;
+            if (ate) {
+                if (bte) return true;
+                else
+                    return false; //mixed
+            } else {
+                if (bte) return false; //mixed
+            }
+            m.tDelta.set((int)(at - bt));
+            return true;
+        }
+
+        @Override
+        protected boolean computeDT(Compound t, int tt, Compound b, int bt, PremiseMatch m) {
+            throw new RuntimeException("N/A");
+        }
+
+        @Override
+        public String toString() {
+            return "dt(occ)";
+        }
+    };
+
+
 //    public static final dt opposite = new dt() {
 //        @Override protected boolean computeDT(Compound t, int tt, Compound b, int bt, @NotNull PremiseMatch m) {
 //            if (tt == -bt) {
