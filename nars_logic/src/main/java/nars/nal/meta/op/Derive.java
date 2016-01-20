@@ -156,10 +156,6 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
 
                 Compound ct = (Compound) tNorm.term();
 
-                //check reversal against pattern
-//                if (ct.op().isCommutative() && (!p.getXY(((Compound)term).term(0)).equals(ct.term(0)))) {
-//                    tDelta = -tDelta;
-//                }
                 if (!ct.op().isTemporal())
                     return;
 

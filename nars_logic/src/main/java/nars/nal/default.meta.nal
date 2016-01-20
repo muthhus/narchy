@@ -270,22 +270,22 @@
 //// propositional decomposition ////////////////////////////////////////////////////////////////////////////////////
 //If S is the case, and (&&,S,A..+) is not the case, it can't be that (&&,A..+) is the case
 
-    S, (&&,S,A..+) |- (&&,A..+), (Belief:DecomposePositiveNegativeNegative, Order:ForAllSame, SequenceIntervals:FromBelief)
+    S, (&&,S,A..+), dt(belief) |- (&&,A..+), (Belief:DecomposePositiveNegativeNegative, Order:ForAllSame, SequenceIntervals:FromBelief)
     S, (||,S,A..+) |- (||,A..+), (Belief:DecomposeNegativePositivePositive)
 
 //Additional for negation: https://groups.google.com/forum/#!topic/open-nars/g-7r0jjq2Vc
 
-    S, (&&,(--,S),A..+) |- (&&,A..+), (Belief:DecomposeNegativeNegativeNegative, Order:ForAllSame, SequenceIntervals:FromBelief)
+    S, (&&,(--,S),A..+), dt(belief) |- (&&,A..+), (Belief:DecomposeNegativeNegativeNegative, Order:ForAllSame, SequenceIntervals:FromBelief)
     S, (||,(--,S),A..+) |- (||,A..+), (Belief:DecomposePositivePositivePositive)
 
 //// multi-conditional syllogism ////////////////////////////////////////////////////////////////////////////////////
 //Inference about the pre/postconditions
 
-    Y, ((&&,X,A..+) ==> B) |- substituteIfUnifies(((&&,A..+) ==> B),"$",X,Y), (Belief:Deduction, Order:ForAllSame, SequenceIntervals:FromBelief)
+    Y, ((&&,X,A..+) ==> B), dt(belief) |- substituteIfUnifies(((&&,A..+) ==> B),"$",X,Y), (Belief:Deduction, Order:ForAllSame, SequenceIntervals:FromBelief)
 
-    ((&&,M,A..+) ==> C), ((&&,A..+) ==> C) |- M, (Belief:Abduction, Order:ForAllSame)
+    ((&&,M,A..+) ==> C), ((&&,A..+) ==> C), dt(exact) |- M, (Belief:Abduction, Order:ForAllSame)
 //single case of previous which doesnt require conjunction in single-term case
-    ((&&,M,A) ==> C), (A ==> C) |- M, (Belief:Abduction, Order:ForAllSame)
+    ((&&,M,A) ==> C), (A ==> C), dt(exact) |- M, (Belief:Abduction, Order:ForAllSame)
 
 //Can be derived by NAL7 rules so this won't be necessary there (Order:ForAllSame left out here)
 
