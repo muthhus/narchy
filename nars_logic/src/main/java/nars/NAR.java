@@ -443,17 +443,16 @@ public abstract class NAR implements Serializable, Level {
      * @return number of invoked handlers
      */
     public int execute(@NotNull Task goal) {
-        Term term = goal.term();
+        Term operation = goal.term();
 
-        if (!goal.isEternal())
-            goal.setExecuted();
+        if (Op.isOperation(operation)) {
 
-        if (Op.isOperation(term)) {
+            if (!goal.isEternal())
+                goal.setExecuted();
 
             Topic<Execution> tt = memory.exe.get(
-                    Operator.operatorName((Compound) term)
+                Operator.operatorTerm((Compound) operation)
             );
-
 
             if (tt != null && !tt.isEmpty()) {
 
@@ -531,6 +530,10 @@ public abstract class NAR implements Serializable, Level {
     }
 
     public On onExec(Term op, Consumer<Execution> each) {
+        if (!op.op(Op.OPERATOR)) {
+            op = Operator.the(op);
+        }
+
         Topic<Execution> t = memory.exe.computeIfAbsent(op, (Term o) -> new DefaultTopic<Execution>());
         return t.on(each);
     }

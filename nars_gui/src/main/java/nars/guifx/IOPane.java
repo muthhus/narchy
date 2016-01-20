@@ -9,14 +9,11 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.web.WebView;
 import nars.NAR;
-import nars.Op;
 import nars.guifx.demo.TaskButton;
 import nars.guifx.util.NSlider;
-import nars.nal.nal8.Operator;
 import nars.task.Task;
 import nars.term.Term;
 import nars.term.atom.Atom;
-import nars.term.compound.Compound;
 import nars.util.event.On;
 import org.jetbrains.annotations.NotNull;
 
@@ -130,21 +127,21 @@ public class IOPane extends BorderPane /*implements FXIconPaneBuilder*/ {
     }
 
     public Node newTaskNode(Task t) {
-        Term tt = t.term();
-        if (Op.isOperation(tt)) {
-            Compound ct = (Compound) tt;
-            Term[] a = Operator.opArgsArray(ct);
-            switch (Operator.operatorName(ct).toString()) {
-                case "html":
-                    WebView w = new WebView();
-                    //w.resize(400,200);
-                    w.getEngine().loadContent(
-                        ((Atom)a[0]).toStringUnquoted()
-                    );
-                    return w;
-
-            }
-        }
+//        Term tt = t.term();
+//        if (Op.isOperation(tt)) {
+//            Compound ct = (Compound) tt;
+//            Term[] a = Operator.opArgsArray(ct);
+//            switch (Operator.operatorName(ct).toString()) {
+//                case "html":
+//                    WebView w = new WebView();
+//                    //w.resize(400,200);
+//                    w.getEngine().loadContent(
+//                        ((Atom)a[0]).toStringUnquoted()
+//                    );
+//                    return w;
+//
+//            }
+//        }
         return new TaskButton(nar, t.getTask());
         //return SubButton.make(nar, t);
     }

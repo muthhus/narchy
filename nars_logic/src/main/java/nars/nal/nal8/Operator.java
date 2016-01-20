@@ -24,15 +24,8 @@ import org.jetbrains.annotations.Nullable;
  */
 public final class Operator<T extends Term> extends AbstractStringAtom { //implements Term {
 
-
-    //final static byte[] opPrefix = new byte[] { (byte)'^' };
-
-    @NotNull
-    private final T term;
-
     public Operator(@NotNull T the) {
         super(Op.OPERATOR.ch + the.toString());
-        term = the;
     }
 
     @NotNull
@@ -40,11 +33,7 @@ public final class Operator<T extends Term> extends AbstractStringAtom { //imple
         return (Compound) operation.term(0);
     }
 
-    public static Term operatorName(@NotNull Compound operation) {
-        Operator tn = operatorTerm(operation);
-        if (tn != null) return tn.identifier();
-        return null;
-    }
+
 
     @NotNull
     public static Operator operatorTerm(@NotNull Compound operation) {
@@ -59,11 +48,8 @@ public final class Operator<T extends Term> extends AbstractStringAtom { //imple
     @Nullable
     public static Term result(@NotNull Compound operation, Term y) {
         Compound x = (Compound) operation.term(0);
-        /*if (!(t instanceof Variable))
-            return null;*/
-
         return $.inh(
-                y, //SetExt.make(y),
+                y,
                 makeImageExt(x, operation.term(1), (short) (x.size() - 1) /* position of the variable */)
         );
     }
@@ -144,10 +130,7 @@ public final class Operator<T extends Term> extends AbstractStringAtom { //imple
         return 0;
     }
 
-
-    @NotNull
-    public Term identifier() {
-        return term;
+    public static Term the(Term op) {
+        return new Operator(op);
     }
-
 }

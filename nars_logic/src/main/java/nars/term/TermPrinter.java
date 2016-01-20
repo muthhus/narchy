@@ -191,20 +191,20 @@ public interface TermPrinter {
 
     static void operationAppend(@NotNull Compound argsProduct, @NotNull Operator operator, @NotNull Appendable p, boolean pretty) throws IOException {
 
-        Term predTerm = operator.identifier(); //getOperatorTerm();
-
-        if ((predTerm.volume() != 1) || (predTerm.hasVar())) {
-            //if the predicate (operator) of this operation (inheritance) is not an atom, use Inheritance's append format
-            appendSeparator(p, pretty);
-            return;
-        }
+        //Term predTerm = operator.identifier(); //getOperatorTerm();
+//        if ((predTerm.volume() != 1) || (predTerm.hasVar())) {
+//            //if the predicate (operator) of this operation (inheritance) is not an atom, use Inheritance's append format
+//            appendSeparator(p, pretty);
+//            return;
+//        }
 
 
         Term[] xt = argsProduct.terms();
 
-        predTerm.append(p, pretty); //add the operator name without leading '^'
-        p.append(COMPOUND_TERM_OPENER);
+        //append the operator name without leading '^'
+        p.append(operator.toString().substring(1));  //predTerm.append(p, pretty);
 
+        p.append(COMPOUND_TERM_OPENER);
 
         int n = 0;
         for (Term t : xt) {

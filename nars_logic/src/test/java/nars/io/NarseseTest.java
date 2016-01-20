@@ -257,7 +257,7 @@ public class NarseseTest {
         Term[] aa = Operator.opArgsArray(t);
         assertEquals(2, aa.length);
         assertEquals("^believe", t.term(1).toString());
-        assertEquals("believe", Operator.operatorName(t).toString());
+        assertEquals("^believe", Operator.operatorTerm(t).toString());
         assertEquals("a", aa[0].toString());
         assertEquals("b", aa[1].toString());
     }
@@ -534,8 +534,8 @@ public class NarseseTest {
     }
 
     protected void ensureIsEcho(Compound op) {
-        assertEquals(Atom.the(echo.class.getSimpleName()),
-                Operator.operatorName(op));
+        assertEquals("^" + Atom.the(echo.class.getSimpleName()),
+                Operator.operatorTerm(op).toString());
     }
 
 
@@ -566,8 +566,8 @@ public class NarseseTest {
     public void testOperatorTerm() {
         Operator o = term("^op");
         assertNotNull(o);
-        assertEquals("op", o.identifier().toString());
-        assertEquals(Atom.class, o.identifier().getClass());
+        assertEquals("^op", o.toString());
+        assertEquals(Operator.class, o.getClass());
     }
 
     @Test
