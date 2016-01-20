@@ -241,13 +241,14 @@ public class PremiseRuleSet {
 
                 PremiseRule r = add(ur, preNorm, src, index);
 
-                if (r.allowBackward)
+                if (r.allowBackward) {
                     addQuestions(ur, r, src, index);
 
-                PremiseRule f = r.forwardPermutation();
-                if (r.allowBackward)
-                    addQuestions(ur, f, src, index);
-                add(ur, f, src, index);
+                    PremiseRule f = r.forwardPermutation();
+                    //if (r.allowBackward)
+                        addQuestions(ur, f, src, index);
+                    add(ur, f, src, index);
+                }
 
 
             } catch (Exception ex) {

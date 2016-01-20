@@ -38,9 +38,11 @@ public final class PremiseBranch extends GenericCompound implements ProcTerm<Pre
     }
 
     @Override public void accept(PremiseMatch m) {
+        int r = m.now();
         if (cond.booleanValueOf(m)) {
             conseq.accept(m);
         }
+        m.revert(r);
     }
 
 

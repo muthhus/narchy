@@ -61,8 +61,9 @@ public class Versioned<X> extends FasterIntArrayList /*Comparable<Versioned>*/ {
 
 
     public int lastUpdatedAt() {
-        if (isEmpty()) return -1;
-        return getLast();
+        int s = size();
+        if (s == 0) return -1;
+        return get(s-1);
     }
 
     /*@Override
@@ -74,8 +75,9 @@ public class Versioned<X> extends FasterIntArrayList /*Comparable<Versioned>*/ {
      * gets the latest value
      */
     public final X get() {
-        if (size == 0) return null;
-        return value.getLast();
+        int s = size();
+        if (s == 0) return null;
+        return value.get(s-1);
     }
 
 //    /**
@@ -98,10 +100,8 @@ public class Versioned<X> extends FasterIntArrayList /*Comparable<Versioned>*/ {
      * a commit should precede this call otherwise it will have the version of a previous commit
      */
     @NotNull
-    public Versioning thenSet(X nextValue) {
-        Versioning ctx = context;
-        set(ctx.continueChange(this), nextValue);
-        return ctx;
+    public void thenSet(X nextValue) {
+        set(context.continueChange(this), nextValue);
     }
 
     /**
@@ -110,12 +110,9 @@ public class Versioned<X> extends FasterIntArrayList /*Comparable<Versioned>*/ {
      * all concurrent set() are finished
      */
     @NotNull
-    final Versioning set(int now, X nextValue) {
-
+    final void set(int now, X nextValue) {
         add(now);
         value.add(nextValue);
-
-        return context;
     }
 
 
@@ -138,15 +135,12 @@ public class Versioned<X> extends FasterIntArrayList /*Comparable<Versioned>*/ {
         int s = size();
         for (int i = 0; i < s; i++) {
             //sb.append('(');
-            sb.append(get(i));
-            sb.append(':');
-            sb.append(value.get(i));
+            sb.append(get(i)).append(':').append(value.get(i));
             //sb.append(')');
             if (i < s - 1)
                 sb.append(", ");
         }
-        sb.append(')');
-        return sb.toString();
+        return sb.append(')').toString();
 
     }
 
@@ -158,7 +152,6 @@ public class Versioned<X> extends FasterIntArrayList /*Comparable<Versioned>*/ {
 
     @Nullable
     public X getIfAbsent(X valueIfMissing) {
-        if (isEmpty()) return valueIfMissing;
         X x = get();
         if (x == null) return valueIfMissing;
         return x;
@@ -170,10 +163,8 @@ public class Versioned<X> extends FasterIntArrayList /*Comparable<Versioned>*/ {
 //    }
 
     @Deprecated public int getIfAbsent(int valueIfMissing) {
-        if (isEmpty()) return valueIfMissing;
         Integer i  = (Integer) get();
-        if (i == null) return valueIfMissing;
-        return i;
+        return i == null ? valueIfMissing : i;
     }
 
 //    public char getIfAbsent(char valueIfMissing) {

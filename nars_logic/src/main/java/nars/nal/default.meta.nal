@@ -264,8 +264,11 @@
 
 //// conjunction decompose
 
-    (&&,B,A..+), B |- B, (Belief:StructuralDeduction, Desire:StructuralStrong, Order:ForAllSame)
+    (&&,X,A..+), Y |- X, (Belief:StructuralDeduction, Desire:StructuralStrong, Order:ForAllSame)
+
 //    (&/,B,A..+), B, task("!") |- (&/,A..+), (Desire:Strong, SequenceIntervals:FromTask)
+     (&&,A,B), X, task("!"), occurr(task,reverse) |- A, (Desire:StructuralStrong)
+     (&&,A,B), X, task("!") |- B, (Desire:StructuralStrong)
 
 //// propositional decomposition ////////////////////////////////////////////////////////////////////////////////////
 //If S is the case, and (&&,S,A..+) is not the case, it can't be that (&&,A..+) is the case
@@ -290,11 +293,11 @@
 //Can be derived by NAL7 rules so this won't be necessary there (Order:ForAllSame left out here)
 
 //the first rule does not have Order:ForAllSame because it would be invalid, see: https://groups.google.com/forum/#!topic/open-nars/r5UJo64Qhrk
-    ((&&,A..+) ==> C), M, notImplicationOrEquivalence(M) |- ((&&,M,A..+) ==> C), (Belief:Induction)
+    ((&&,A..+) ==> C), M, notImplicationOrEquivalence(M), dt(task) |- ((&&,M,A..+) ==> C), (Belief:Induction)
 
-    ((&&,M,A..+) ==> C), (B ==> M) |- ((&&,B,A..+) ==> C), (Belief:Deduction, Order:ForAllSame, SequenceIntervals:FromTask)
-    ((&&,M,A..+) ==> C), ((&&,B,A..+) ==> C) |- (B ==> M), (Belief:Induction, Order:ForAllSame)
-    ((&&,B,A..+) ==> C), (B ==> M) |- ((&&,M,A..+) ==> C), (Belief:Abduction, Order:ForAllSame, SequenceIntervals:FromTask)
+    ((&&,M,A..+) ==> C), (B ==> M), dt(sum) |- ((&&,B,A..+) ==> C), (Belief:Deduction, Order:ForAllSame, SequenceIntervals:FromTask)
+    ((&&,M,A..+) ==> C), ((&&,B,A..+) ==> C), dt(bmint) |- (B ==> M), (Belief:Induction, Order:ForAllSame)
+    ((&&,B,A..+) ==> C), (B ==> M), dt(tminb) |- ((&&,M,A..+) ==> C), (Belief:Abduction, Order:ForAllSame, SequenceIntervals:FromTask)
 
 //// variable introduction ////////////////////////////////////////////////////////////////////////////////////
 //Introduce variables by common subject or predicate
@@ -313,16 +316,16 @@
 
 //// 2nd variable introduction ////////////////////////////////////////////////////////////////////////////////////
 
-    (A ==> (M --> P)), (M --> S), not_equal(A, (M --> S)) |- ((&&,A,($X --> S)) ==> ($X --> P)), (Belief:Induction),
+    (A ==> (M --> P)), (M --> S), not_equal(A, (M --> S)), dt(task) |- ((&&,A,($X --> S)) ==> ($X --> P)), (Belief:Induction),
                                                              (&&,(A ==> (#Y --> P)), (#Y --> S)), (Belief:Intersection)
 
-    (&&,(M --> P), A..+), (M --> S), neq(S,P) |- (($Y --> S) ==> (&&,($Y --> P), A..+)), (Belief:Induction),
+    (&&,(M --> P), A..+), (M --> S), neq(S,P), dt(task) |- (($Y --> S) ==> (&&,($Y --> P), A..+)), (Belief:Induction),
                                                  (&&,(#Y --> S), (#Y --> P), A..+), (Belief:Intersection)
 
-    (A ==> (P --> M)), (S --> M), neq(S,P), not_equal(A, (S --> M)) |- ((&&,A,(P --> $X)) ==> (S --> $X)), (Belief:Abduction),
+    (A ==> (P --> M)), (S --> M), neq(S,P), not_equal(A, (S --> M)), dt(task) |- ((&&,A,(P --> $X)) ==> (S --> $X)), (Belief:Abduction),
                                                                        (&&,(A ==> (P --> #Y)), (S --> #Y)), (Belief:Intersection)
 
-    (&&,(P --> M), A..+), (S --> M), neq(S,P) |- ((S --> $Y) ==> (&&,(P --> $Y), A..+)), (Belief:Abduction),
+    (&&,(P --> M), A..+), (S --> M), neq(S,P), dt(task) |- ((S --> $Y) ==> (&&,(P --> $Y), A..+)), (Belief:Abduction),
                                                  (&&, (S --> #Y), (P --> #Y), A..+), (Belief:Intersection)
 
 //// dependent variable elimination ////////////////////////////////////////////////////////////////////////////////////
@@ -332,12 +335,12 @@
 
 //conditional abduction by dependent variable
 
-    ((X --> R) ==> Z), ((&&,(#Y --> B),(#Y --> R),A..*) ==> Z), dt(exact) |- (X --> B), (Belief:Abduction)
-    ((X --> R) ==> Z), ((&&,(#Y --> B),(#Y --> R)) ==> Z), dt(exact) |- (X --> B), (Belief:Abduction)
+    ((X --> R) ==> Z), ((&&,(#Y --> B),(#Y --> R),A..*) ==> Z) |- (X --> B), (Belief:Abduction)
+    ((X --> R) ==> Z), ((&&,(#Y --> B),(#Y --> R)) ==> Z) |- (X --> B), (Belief:Abduction)
 
 // conditional deduction "An inverse inference has been implemented as a form of deduction" https://code.google.com/p/open-nars/issues/detail?id=40&can=1
 
-    (U --> L), ((&&,A..*,(#X --> L),(#X --> R)) ==> Z) |- substitute(((&&,A..*,(U --> R)) ==> Z),#X,U), (Belief:Deduction)
+    (U --> L), ((&&,A..*,(#X --> L),(#X --> R)) ==> Z), dt(belief) |- substitute(((&&,A..*,(U --> R)) ==> Z),#X,U), (Belief:Deduction)
 //this shoudlnt be necesssary if the previous works (with zero or more):
     (U --> L), ((&&,(#X --> L),(#X --> R)) ==> Z), dt(belief) |- ((U --> R) ==> Z), (Belief:Deduction)
 
@@ -346,6 +349,7 @@
 //// second level variable handling rules ////////////////////////////////////////////////////////////////////////////////////
 //second level variable elimination (termlink level2 growth needed in order for these rules to work)
 
+//TODO these will need some kind of dt extraction path, like beliefsImplicationSubterm..
     (B --> K), (&&,(#X --> L),(($Y --> K) ==> A)) |- substitute((&&, (#X --> L), A), $Y,B), (Belief:Deduction)
     (B --> K), (&&,(#X --> L),(($Y --> K) ==> (&&,A..+))) |- substitute((&&,(#X --> L),A..+),$Y,B), (Belief:Deduction)
 
@@ -356,9 +360,9 @@
 
 //precondition combiner inference rule (variable_unification6):
 
-    ((&&,C,A..+) ==> Z), ((&&,C,B..+) ==> Z), dt(exact) |- ((&&,A..+) ==> (&&,B..+)), (Belief:Induction),
+    ((&&,C,A..+) ==> Z), ((&&,C,B..+) ==> Z), dt(avg) |- ((&&,A..+) ==> (&&,B..+)), (Belief:Induction),
                                                            ((&&,B..+) ==> (&&,A..+)), (Belief:Induction)
-    (Z ==> (&&,C,A..+)), (Z ==> (&&,C,B..+)), dt(exact) |- ((&&,A..+) ==> (&&,B..+)), (Belief:Abduction),
+    (Z ==> (&&,C,A..+)), (Z ==> (&&,C,B..+)), dt(avg) |- ((&&,A..+) ==> (&&,B..+)), (Belief:Abduction),
                                                            ((&&,B..+) ==> (&&,A..+)), (Belief:Abduction)
 
 
