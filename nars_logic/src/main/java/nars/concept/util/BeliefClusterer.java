@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package nars.guifx.demo;
+package nars.concept.util;
 
 import org.apache.commons.math3.exception.ConvergenceException;
 import org.apache.commons.math3.exception.MathIllegalArgumentException;
@@ -623,3 +623,53 @@ abstract public class BeliefClusterer<T>  {
     }
 
 }
+
+//            BeliefClusterer<Task> bc = new BeliefClusterer<Task>(tt.size()/3) {
+//
+//                protected float occ(long occ) {
+//                    return ((occ - minT) / (maxT-minT));
+//                }
+//
+//                @Override
+//                protected double distance(Task a, double[] b) {
+//                    float docc = (float)Math.abs(occ(a.getOccurrenceTime()) - b[0]);
+//                    float dfreq = (float)Math.abs(a.getFrequency() - b[1]);
+//
+//                    //return docc + dfreq; //TODO euclidean?
+//                    return Math.sqrt( docc*docc + dfreq*dfreq );
+//                }
+//
+//                @Override
+//                public ArrayRealVector p(Task task) {
+//                    return new ArrayRealVector(
+//                        new double[] { occ(task.getOccurrenceTime()), task.getFrequency() },
+//                        false
+//                    );
+//                }
+//
+//                @Override
+//                protected int getDimensions() {
+//                    return 2;
+//                }
+//            };
+//
+//
+//            final Comparator<? super Task> r = new Comparator<Task>() {
+//                @Override
+//                public int compare(Task o1, Task o2) {
+//                    return Float.compare(
+//                            o2.getConfidence()* o2.getOriginality(),
+//                            o1.getConfidence()* o1.getOriginality()
+//                    );
+//                }
+//            };
+//
+//            List<BeliefClusterer<Task>.Cluster> gt = bc.cluster(tt);
+//            for (BeliefClusterer<Task>.Cluster cl : gt) {
+//                Task w = cl.getWeakest(r);
+//                //System.out.println("removed " + w + " remains: " + cl.getPoints());
+//                if (w!=null) {
+//                    //concept.getBeliefs().remove(w);
+//                }
+//            }
+//            //System.out.println(gt);

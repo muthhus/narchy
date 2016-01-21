@@ -31,9 +31,6 @@ public abstract class TermFunction<O> extends SyncOperator {
     protected TermFunction() {
     }
 
-    protected TermFunction(Term name) {
-        super(name);
-    }
 
     protected TermFunction(String name) {
         super(name);

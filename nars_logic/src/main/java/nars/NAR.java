@@ -503,18 +503,16 @@ public abstract class NAR implements Level,Consumer<Task> {
     }
 
     public On onExecTask(String operator, Consumer<Execution> f) {
-        return onExec(Atom.the(operator), f);
+        return onExec(operator, f);
     }
 
-    public On onExecTerm(String operator, @NotNull Function<Term[], Object> f) {
-        return onExecTerm(Atom.the(operator), f);
-    }
+
 
     /**
      * creates a TermFunction operator from a supplied function, which can be a lambda
      */
-    public On onExecTerm(Term operator, @NotNull Function<Term[], Object> func) {
-        return onExec(operator, new TermFunction(operator) {
+    public On onExecTerm(String operator, @NotNull Function<Term[], Object> func) {
+        return onExec(new TermFunction(operator) {
 
             @Override
             public Object function(@NotNull Compound x, TermBuilder i) {
@@ -529,15 +527,12 @@ public abstract class NAR implements Level,Consumer<Task> {
     }
 
     public On onExec(String op, Consumer<Execution> each) {
-        return onExec(Atom.the(op), each);
+        return onExec($.operator(op), each);
     }
 
-    public On onExec(Term op, Consumer<Execution> each) {
-        if (!op.op(Op.OPERATOR)) {
-            op = Operator.the(op);
-        }
-
-        Topic<Execution> t = memory.exe.computeIfAbsent(op, (Term o) -> new DefaultTopic<Execution>());
+    public On onExec(Operator op, Consumer<Execution> each) {
+        Topic<Execution> t = memory.exe.computeIfAbsent(
+                op, (Term o) -> new DefaultTopic<Execution>());
         return t.on(each);
     }
 

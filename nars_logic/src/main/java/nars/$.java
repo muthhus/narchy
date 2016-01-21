@@ -126,7 +126,7 @@ public enum $  {
     /** execution (NARS "operation") */
     @NotNull
     public static Compound exec(String operator, String... args) {
-        return exec(op(operator), $.p(args));
+        return exec(operator(operator), $.p(args));
     }
 
 
@@ -470,7 +470,7 @@ public enum $  {
 
     @NotNull
     public static Operator operator(String name) {
-        return new Operator($.the(name));
+        return new Operator(name);
     }
 
 
@@ -536,7 +536,4 @@ public enum $  {
     }
 
 
-    @NotNull public static Operator op(String name) {
-        return new Operator(Atom.the(name));
-    }
 }

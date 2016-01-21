@@ -75,7 +75,7 @@ public class OperatorTest {
 //    }
 
     @Test public void testOperationIsInheritance() {
-        Compound o = $.exec($.op("x"), $.p("x"));
+        Compound o = $.exec($.operator("x"), $.p("x"));
         assertEquals(Op.INHERIT, o.op());
     }
 
@@ -132,23 +132,23 @@ public class OperatorTest {
 
     }
 
-    @Test public void testCompoundOperator() {
-
-        AtomicBoolean executed = new AtomicBoolean(false);
-
-        NAR n = new Default();
-
-        n.onExec((Term)n.term("<a --> b>"), (exec) -> {
-            executed.set(true);
-        });
-
-        n.input("<a --> b>(a,b,c)!");
-
-        n.frame(1);
-
-        assertTrue(executed.get());
-
-    }
+//    @Ignore @Test public void testCompoundOperator() {
+//
+//        AtomicBoolean executed = new AtomicBoolean(false);
+//
+//        NAR n = new Default();
+//
+//        n.onExec((Term)n.term("<a --> b>"), (exec) -> {
+//            executed.set(true);
+//        });
+//
+//        n.input("<a --> b>(a,b,c)!");
+//
+//        n.frame(1);
+//
+//        assertTrue(executed.get());
+//
+//    }
 
     @Test public void testPatternOperation() {
         AtomicInteger count = new AtomicInteger();

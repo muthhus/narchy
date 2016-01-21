@@ -21,11 +21,10 @@
 
 package nars.nal.nal8;
 
+import nars.$;
 import nars.nal.nal8.decide.DecideAboveDecisionThreshold;
 import nars.nal.nal8.decide.Decider;
 import nars.task.Task;
-import nars.term.Term;
-import nars.term.atom.Atom;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -37,42 +36,35 @@ import java.util.function.Consumer;
 public abstract class AbstractOperator implements Consumer<Execution> {
 
 
-    @Nullable
-    public final Term operatorTerm;
-
-
-
+    @NotNull
+    public final Operator operatorTerm;
 
     @NotNull
     @Override
     public String toString() {
-        return '^' + operatorTerm.toString();
+        return operatorTerm.toString();
     }
 
-    public AbstractOperator(@Nullable Term term) {
-        if (term == null) {
-            term = Atom.the(getClass().getSimpleName());
-        }
-        operatorTerm = term;
-    }
-
-    public AbstractOperator(String operatorName) {
-        this(Atom.the(operatorName));
-    }
-
-    public AbstractOperator(Atom operatorTerm) {
-        this.operatorTerm = operatorTerm;
-    }
+//    public AbstractOperator(@Nullable Term term) {
+//        if (term == null) {
+//            term = Operator.the(getClass().getSimpleName());
+//        }
+//        operatorTerm = term;
+//    }
 
 
     /**
      * use the class name as the operator name
      */
     public AbstractOperator() {
-        String className = getClass().getSimpleName();
-        operatorTerm = Atom.the(className);
+        this(null);
     }
-
+    public AbstractOperator(@Nullable String operatorName) {
+        if (operatorName == null) {
+            operatorName = getClass().getSimpleName();
+        }
+        this.operatorTerm = $.operator(operatorName);
+    }
 
 
     @NotNull
@@ -138,7 +130,7 @@ public abstract class AbstractOperator implements Consumer<Execution> {
     public boolean async() { return false; }
 
     @Nullable
-    public final Term getOperatorTerm() {
+    public final Operator getOperatorTerm() {
         return operatorTerm;
     }
 

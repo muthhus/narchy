@@ -27,6 +27,9 @@ public final class Operator<T extends Term> extends AbstractStringAtom { //imple
     public Operator(@NotNull T the) {
         super(Op.OPERATOR.ch + the.toString());
     }
+    public Operator(@NotNull String the) {
+        super(Op.OPERATOR.ch + the);
+    }
 
     @NotNull
     public static Compound opArgs(@NotNull Compound operation) {
@@ -132,6 +135,9 @@ public final class Operator<T extends Term> extends AbstractStringAtom { //imple
     }
 
     public static Term the(Term op) {
+        return new Operator(op);
+    }
+    public static Term the(String op) {
         return new Operator(op);
     }
 }

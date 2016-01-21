@@ -10,10 +10,12 @@ import nars.Global;
 import nars.NAR;
 import nars.nal.Tense;
 import nars.nal.nal8.Operator;
+import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.compound.Compound;
+import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -61,6 +63,7 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
         add("getHandler");
         add("setHandler");
         add("toString");
+        add("equals");
     }};
 
     private final AtomicBoolean goalInvoke = new AtomicBoolean(true);
@@ -124,7 +127,7 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
 
     }
 
-    final AtomicBoolean lock = new AtomicBoolean(false);
+    //final AtomicBoolean lock = new AtomicBoolean(false);
 
     /** non-null if the method is being invoked by NARS,
      * in which case it will reference the task that invoked
@@ -156,31 +159,32 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
         }
     }
 
-    //TODO run in separate execution context to avoid synchronized
-    @Nullable
-    public Object invoked(Object object, @NotNull Method method, Object[] args, @Nullable Object result) {
 
+    MutableTask invokingGoal(Object object, @NotNull Method method, Object[] args) {
         if (methodExclusions.contains(method.getName()))
-            return result;
-
-
-        if (!lock.compareAndSet(false,true)) {
-            return result;
-        }
-
+            return null;
 
         Operator op = getOperator(method);
-
-
         Compound invocationArgs = getMethodInvocationTerms(method, object, args);
 
+        return $.goal( $.exec(op, (Compound)invocationArgs),
+                invocationGoalFreq, invocationGoalConf).
+                present(nar.memory).because("Invoked" /* via VM */);
+    }
 
+    //TODO run in separate execution context to avoid synchronized
+    @Nullable
+    public Object invoked(@Nullable Object result, MutableTask invokingGoal) {
 
-        Term effect;
-        effect = result != null ? term(result) : VOID;
+//        if (!lock.compareAndSet(false,true)) {
+//            return result;
+//        }
+
+        Term effect = term(result);
 
         //TODO re-use static copy for 'VOID' instances
         InvocationResult ir = new InvocationResult(effect);
+        invokingGoal.because(ir);
 
         Task volitionTask = volition.get();
 
@@ -188,11 +192,7 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
 
             /** pretend as if it were a goal of its own volition, although it was invoked externally
              *  Master of puppets, I'm pulling your strings */
-            nar.input( $.goal( $.exec(op, (Compound)invocationArgs),
-                    invocationGoalFreq, invocationGoalConf).
-                    present(nar.memory).
-                    because(ir)
-            );
+            nar.input( invokingGoal );
 
 //            nar.input(
 //                new FluentTask(Operation.result(op, invocationArgs, effect)).
@@ -209,10 +209,12 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
         }
 
 
-        lock.set(false);
+//        lock.set(false);
 
         return result;
     }
+
+    static final Variable returnValue = $.varDep("returnValue");
 
     private Compound getMethodInvocationTerms(@NotNull Method method, Object instance, Object[] args) {
 
@@ -224,7 +226,7 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
         x[0] = term(instance);
         x[1] = $.p(terms(args));
         if (!isVoid) {
-            x[2] = $.varDep("returnValue");
+            x[2] = returnValue;
         }
         return $.p(x);
     }
@@ -252,9 +254,7 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
         if (c.getName().contains("_$$_")) ////javassist wrapper class
             c = c.getSuperclass();
 
-        return $.op(
-            c.getSimpleName() + '_' + overridden.getName()
-        );
+        return $.operator(c.getSimpleName() + '_' + overridden.getName());
     }
 
 //    //TODO use a generic Consumer<Task> for recipient/recipients of these
@@ -329,8 +329,19 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
 
     @Nullable
     @Override public final Object invoke(Object obj, @NotNull Method wrapped, @NotNull Method wrapper, Object[] args) throws Throwable {
+        MutableTask invokingGoal = invokingGoal(obj, wrapped, args);
+
+        if (invokingGoal!=null)
+            MethodOperator.setCurrentTask(invokingGoal);
+
         Object result = wrapper.invoke(obj, args);
-        return invoked( obj, wrapped, args, result);
+
+        if (invokingGoal!=null) {
+            MethodOperator.setCurrentTask(null);
+            invoked(result, invokingGoal);
+        }
+
+        return result;
     }
 
 //    public <T> T build(String id, Class<? extends T> classs) throws Exception {

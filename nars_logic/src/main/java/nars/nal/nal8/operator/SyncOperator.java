@@ -1,7 +1,6 @@
 package nars.nal.nal8.operator;
 
 import nars.nal.nal8.AbstractOperator;
-import nars.term.Term;
 
 /**
  * Operator which executes synchronously (in current reasoner thread). Should be
@@ -10,9 +9,6 @@ import nars.term.Term;
  */
 public abstract class SyncOperator extends AbstractOperator {
 
-	protected SyncOperator(Term term) {
-		super(term);
-	}
 
 	protected SyncOperator(String name) {
 		super(name);
@@ -20,7 +16,7 @@ public abstract class SyncOperator extends AbstractOperator {
 
 	/** uses the implementation class's simpleName as the term */
 	protected SyncOperator() {
-		super((Term) null);
+		this(null);
 	}
 
 }

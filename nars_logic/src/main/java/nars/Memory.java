@@ -29,6 +29,7 @@ import nars.concept.Concept;
 import nars.concept.ConceptProcess;
 import nars.concept.DefaultConcept;
 import nars.nal.nal8.Execution;
+import nars.nal.nal8.Operator;
 import nars.nal.space.Space;
 import nars.nal.space.SpaceConcept;
 import nars.task.Task;
@@ -116,7 +117,7 @@ public class Memory extends Param {
     /** executables (incl. operators).
      * keys in this map should be OPERATOR (^something)
      * */
-    public final transient Map<Term, Topic<Execution>> exe = new HashMap();
+    public final transient Map<Operator, Topic<Execution>> exe = new HashMap();
 
 
 

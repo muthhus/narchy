@@ -3,6 +3,7 @@ package nars.java;
 import nars.concept.Concept;
 import nars.nar.Default;
 import nars.task.Task;
+import nars.truth.Truth;
 import nars.util.data.UnitVal;
 import nars.util.data.Util;
 
@@ -16,9 +17,10 @@ public class Thermostat3 {
     static final float speed = 0.05f;
     final float tolerance = 0.1f;
     private final UnitVal h;
+    long cyclePause = 0;
 
     Default n;
-    float targetX, targetY;
+    float targetX;
 
 
     void move() {
@@ -34,19 +36,14 @@ public class Thermostat3 {
     public static class UnitValTaskInc extends UnitVal {
 
         @Override
-        public void inc(boolean positive) {
+        public Truth inc(boolean positive) {
             Task cTask = MethodOperator.getCurrentTask();
             float exp;
-            if (cTask == null) {
-                //exp = 0.1f;
-                exp = 0;
-            } else {
-                exp = cTask.getExpectation();// * cTask.getPriority();
-            }
 
+            //System.out.println(cTask.getExplanation());
+            exp = cTask.getExpectation();// * cTask.getPriority();
 
-
-            _inc(positive, speed * exp);
+            return _inc(positive, speed * exp);
         }
     }
 
@@ -54,10 +51,10 @@ public class Thermostat3 {
 
         //Global.DEBUG = true;
 
-        n = new Default(1000, 15, 1, 3);
+        n = new Default(1000, 10, 1, 3);
         //n.log();
         //n.memory.executionExpectationThreshold.setValue(0.8f);
-        n.core.confidenceDerivationMin.setValue(0.05f);
+        n.core.confidenceDerivationMin.setValue(0.02f);
 
 
         NALObjects objs = new NALObjects(n) {
@@ -75,7 +72,7 @@ public class Thermostat3 {
 
         this.h = objs.wrap("h", UnitValTaskInc.class /* new UnitVal(0.5f, speed)*/);
 
-        h.setInc(speed);
+        //h.setInc(speed);
 
 //        d.onExec("h", t-> {
 //            float exp = t.task.getExpectation();
@@ -125,8 +122,8 @@ public class Thermostat3 {
             }
 
 
-            if (n.time() % 1 == 0) {
-                int cols = 40;
+            if (n.time() % 5 == 0) {
+                int cols = 60;
                 int target = Math.round(targetX * cols);
                 int current = Math.round(h.isTrue().getFrequency() * cols);
 
@@ -169,6 +166,8 @@ public class Thermostat3 {
                         c.getBeliefs().print(System.out);
                 });
             }
+
+            Util.pause(cyclePause);
         }
 
 
@@ -179,18 +178,20 @@ public class Thermostat3 {
     }
 
     public void train() {
-        //d.input("v(1)! :|: %0.75%");
-        //d.input("v(0)! :|: %0.75%");
 
-        if (Math.random() < 0.25f)
-            h.inc(true);
-        if (Math.random() < 0.25f)
-            h.inc(false);
-
-        ////(-1-->(/,^UnitVal_compare,h,(0.61368304,0.1),_)).
-        n.input("({0}-->(/,^UnitVal_compare,h,?p,_))! :|:");
+        n.input("UnitValTaskInc_inc(h,((--,true)))!  %1.0;0.55%");
+        n.input("UnitValTaskInc_inc(h,(true))! %1.0;0.55%");
+        n.input("({0}-->(/,^UnitVal_compare,h,?p,_))!");
         //n.input("({-1}-->(/,^UnitVal_compare,h,#p,_))! :|: %0%");
         //n.input("({1}-->(/,^UnitVal_compare,h,#p,_))! :|: %0%");
+
+
+
+
+//        if (Math.random() < 0.15f) {
+            //h.inc(Math.random() < 0.5);
+//        }
+        ////(-1-->(/,^UnitVal_compare,h,(0.61368304,0.1),_)).
         //n.input("(-1-->(/,^UnitVal_compare,h,#p,_))! %0%");
         //n.input("(1-->(/,^UnitVal_compare,h,#p,_))! %0%");
 

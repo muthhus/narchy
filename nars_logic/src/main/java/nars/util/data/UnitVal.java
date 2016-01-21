@@ -33,12 +33,13 @@ public class UnitVal {
         this.dv = dv;
     }
 
-    public void inc(boolean positive) {
-        _inc(positive, dv);
+    public Truth inc(boolean positive) {
+        return _inc(positive, dv);
     }
 
-    protected void _inc(boolean positive, float dv) {
+    protected Truth _inc(boolean positive, float dv) {
         v = Util.clamp(v + (positive ? 1 : -1) * dv);
+        return new DefaultTruth(v, 0.5f);
     }
 
     public void setOne() {

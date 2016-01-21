@@ -38,7 +38,7 @@ public class Execution implements Runnable {
 
     /** should only be called by NAR */
     @Override public final void run() {
-        if (task.getDeleted()) return;
+        //if (task.getDeleted()) return;
 
         listeners.emit(this);
     }
@@ -51,7 +51,7 @@ public class Execution implements Runnable {
      * unwrapped (without ^)
      */
     @NotNull
-    public final Term operator() {
+    public final Operator operator() {
         return Operator.operatorTerm(term());
     }
     public final Term[] argArray() {

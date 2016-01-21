@@ -1,7 +1,6 @@
 package nars.java;
 
 import com.github.drapostolos.typeparser.TypeParser;
-import nars.$;
 import nars.Op;
 import nars.nal.nal8.Execution;
 import nars.nal.nal8.operator.TermFunction;
@@ -56,12 +55,12 @@ public class MethodOperator extends TermFunction {
         return currentTask.get();
     }
 
-    private static Term getParentMethodName(@NotNull Method m) {
+    private static String getParentMethodName(@NotNull Method m) {
         Class<?> sc = m.getDeclaringClass();
 
         String superClass = sc.getSimpleName();
         String methodName = m.getName();
-        return $.the(superClass + '_' + methodName);
+        return (superClass + '_' + methodName);
     }
 
     @Override
@@ -179,6 +178,10 @@ public class MethodOperator extends TermFunction {
         }
 
         return null;
+    }
+
+    static void setCurrentTask(Task m) {
+        currentTask.set(m);
     }
 
 }

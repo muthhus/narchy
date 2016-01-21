@@ -540,7 +540,7 @@ public class Narsese extends BaseParser<Object> {
 
     public Rule Operator() {
         return sequence(OPERATOR.ch, Term(false, false),
-                push(new Operator((Term) pop())));
+                push($.operator(pop().toString())));
     }
 
     //final static String invalidAtomCharacters = " ,.!?" + INTERVAL_PREFIX_OLD + "<>-=*|&()<>[]{}%#$@\'\"\t\n";
@@ -975,7 +975,7 @@ public class Narsese extends BaseParser<Object> {
 
 
         return (op == OPERATOR) ?
-                $.exec(new Operator(vectorterms.get(0)),
+                $.exec($.operator(vectorterms.get(0).toString()),
                         $.p(vectorterms, 1, vectorterms.size())
                 ) :
                 $.the(op, -1, vectorterms);

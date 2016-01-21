@@ -1,11 +1,11 @@
 package nars.util.meter;
 
+import nars.$;
 import nars.Global;
 import nars.NAR;
 import nars.nal.Tense;
 import nars.task.Task;
 import nars.task.Tasked;
-import nars.term.atom.Atom;
 import nars.util.event.CycleReaction;
 import nars.util.event.DefaultTopic;
 import nars.util.event.Topic;
@@ -390,7 +390,7 @@ public class TestNAR  {
 
     @NotNull
     public TestNAR mustExecute(long start, long end, String term, float minExpect, float maxExpect) {
-        requires.add(new ExecutionCondition(nar, start, end, Atom.the(term), minExpect, maxExpect));
+        requires.add(new ExecutionCondition(nar, start, end, $.operator(term), minExpect, maxExpect));
         return this;
     }
 

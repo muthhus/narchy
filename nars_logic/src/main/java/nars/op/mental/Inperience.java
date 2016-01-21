@@ -76,22 +76,24 @@ public class Inperience {
     }
 
 
-    public static final Operator believe = $.op("believe");
-    public static final Operator want = $.op("want");
-    public static final Operator wonder = $.op("wonder");
-    public static final Operator evaluate = $.op("evaluate");
-    public static final Operator anticipate = $.op("anticipate");
+    public static final Operator believe = $.operator("believe");
+    public static final Operator want = $.operator("want");
+    public static final Operator wonder = $.operator("wonder");
+    public static final Operator evaluate = $.operator("evaluate");
+    public static final Operator anticipate = $.operator("anticipate");
 
     static final Operator[] nonInnateBeliefOperators = {
-            $.op("remind"),
-            $.op("doubt"),
-            $.op("consider"),
+            $.operator("remind"),
+            $.operator("doubt"),
+            $.operator("consider"),
             evaluate,
-            $.op("hestitate"),
+            $.operator("hestitate"),
             wonder,
             believe,
             want
     };
+
+
 
 
     /**
