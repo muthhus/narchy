@@ -8,8 +8,8 @@ import nars.nal.nal8.operator.TermFunction;
 import nars.task.Task;
 import nars.term.Term;
 import nars.term.TermBuilder;
-import nars.term.atom.Atom;
 import nars.term.compound.Compound;
+import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,7 +36,8 @@ public class MethodOperator extends TermFunction {
     private final NALObjects context;
     boolean feedback = true;
 
-    public static final Atom ERROR = Atom.the("ERR");
+    //public static final Atom ERROR = Atom.the("ERR");
+
     @Nullable
     private volatile Task currentTask = null;
 
@@ -135,10 +136,17 @@ public class MethodOperator extends TermFunction {
 
 
             Object ll = currentTask.getLogLast();
-            Object result = ll instanceof NALObjects.InvocationResult ? ((NALObjects.InvocationResult) ll).value : context.invokeVolition(currentTask, method, instance, args);
+            Object result = ll instanceof NALObjects.InvocationResult ?
+                    ((NALObjects.InvocationResult) ll).value :
+                    context.invokeVolition(currentTask, method, instance, args);
 
-            if (feedback)
-                return context.term(result);
+
+            if (feedback) {
+                if (result instanceof Truth)
+                    return result; //raw truth value
+                else
+                    return context.term(result); //termize it
+            }
 
         } catch (IllegalArgumentException e) {
 

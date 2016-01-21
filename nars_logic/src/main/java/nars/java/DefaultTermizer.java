@@ -4,6 +4,7 @@ import com.gs.collections.api.bimap.MutableBiMap;
 import com.gs.collections.impl.bimap.mutable.HashBiMap;
 import nars.$;
 import nars.Global;
+import nars.nal.nal8.Operator;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.compound.Compound;
@@ -17,6 +18,8 @@ import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static nars.java.NALObjects.getMethodOperator;
 
 /**
  * Created by me on 8/19/15.
@@ -177,7 +180,7 @@ public class DefaultTermizer implements Termizer {
             //translate the method to an operation term
             Method m = (Method)o;
             return $.exec(
-                NALObjects.getMethodOperator(m),
+                getOperator(m),
                 getMethodArgVariables(m)
             );
         }
@@ -206,6 +209,10 @@ public class DefaultTermizer implements Termizer {
 //        }
 
 
+    }
+
+    public Operator getOperator(Method m) {
+        return getMethodOperator(m);
     }
 
     private boolean reportClassInPackage(@NotNull Class oc) {

@@ -19,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -156,16 +157,18 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
 
     //TODO run in separate execution context to avoid synchronized
     @Nullable
-    public synchronized Object invoked(Object object, @NotNull Method method, Object[] args, @Nullable Object result) {
+    public Object invoked(Object object, @NotNull Method method, Object[] args, @Nullable Object result) {
 
         if (methodExclusions.contains(method.getName()))
             return result;
+
 
         if (!lock.compareAndSet(false,true)) {
             return result;
         }
 
-        Operator op = getMethodOperator(method);
+
+        Operator op = getOperator(method);
 
 
         Compound invocationArgs = getMethodInvocationTerms(method, object, args);
@@ -230,8 +233,17 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
         return Stream.of(args).map(this::term).toArray(Term[]::new);
     }
 
+
+    /** cache */
+    final Map<Method,Operator> methodOperators = new HashMap();
+
+    @Override
+    public Operator getOperator(Method m) {
+        return methodOperators.computeIfAbsent(m, NALObjects::getMethodOperator);
+    }
+
     @NotNull
-    public static Operator getMethodOperator(@NotNull Method overridden) {
+    static Operator getMethodOperator(@NotNull Method overridden) {
         //dereference class to origin, not using a wrapped class
         Class c = overridden.getDeclaringClass();
 
@@ -355,7 +367,14 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
         for (Method m :  instance.getClass().getMethods()) {
             if (isMethodVisible(m) && Modifier.isPublic(m.getModifiers())) {
                 methodOps.computeIfAbsent(m, M -> {
-                    MethodOperator mo = new MethodOperator(goalInvoke, M, this);
+                    MethodOperator mo;
+//                    if (M.getReturnType().isAssignableFrom(Truth.class)) {
+//                        mo = new MethodOperator(goalInvoke, M, this) {
+//
+//                        };
+//                    } else {
+                        mo = new MethodOperator(goalInvoke, M, this);
+                    //}
                     nar.onExec(mo);
                     return mo;
                 });

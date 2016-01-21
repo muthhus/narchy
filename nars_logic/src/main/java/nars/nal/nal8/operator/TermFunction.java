@@ -232,33 +232,30 @@ public abstract class TermFunction<O> extends SyncOperator {
             return;
         }
 
-        if (y instanceof Boolean) {
-            boolean by = (Boolean)y;
-            y = new DefaultTruth(by ? 1 : 0, 0.99f);
-        }
         if (y instanceof Truth) {
-            //this will get the original input operation term, not after it has been inlined.
 
-            e.nar.input(
-                new MutableTask(operation).judgment()
-                        .truth((Truth) y).eternal()
-            );
+            e.feedback((Truth)y);
 
             return;
         }
 
 
-        if (y instanceof Number) {
-            y = (Atom.the((Number)y));
-        }
-
         if (y instanceof Task) {
-            e.feedback( Lists.newArrayList((Task)y) );
+            e.feedback( (Task)y );
             return;
         }
         if (y instanceof Term) {
             e.feedback( result(e.nar, opTask, (Term) y/*, x, lastTerm*/) );
             return;
+        }
+
+        if (y instanceof Boolean) {
+            boolean by = (Boolean)y;
+            y = new DefaultTruth(by ? 1 : 0, 0.99f);
+        }
+
+        if (y instanceof Number) {
+            y = (Atom.the((Number)y));
         }
 
 

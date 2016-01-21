@@ -54,10 +54,11 @@ public class MutableTask extends AbstractTask {
 
     @NotNull
     public MutableTask truth(@org.jetbrains.annotations.Nullable Truth tv) {
-        if (tv == null)
-            setTruth(null);
-        else
-            setTruth(new DefaultTruth(tv));
+//        if (tv == null)
+//            setTruth(null);
+//        else
+//            setTruth(new DefaultTruth(tv));
+        setTruth(tv);
         return this;
     }
 
