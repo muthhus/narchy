@@ -939,9 +939,7 @@ public abstract class NAR implements Serializable, Level {
     @Nullable
     public final Concept process(@NotNull Task task) {
 
-        Termed term = task.concept();
-
-        Concept c = conceptualize(term, task.getBudget(), 1f);
+        Concept c = conceptualize(task.concept(), task.getBudget(), 1f);
         if (c == null) {
             throw new RuntimeException("Inconceivable: " + task);
         }
@@ -949,7 +947,7 @@ public abstract class NAR implements Serializable, Level {
         memory.emotion.busy(task);
 
         task = c.process(task, this);
-        if (task!=null) {
+        if (!task.getDeleted()) {
 
             //propagate activation
             c.link(task, 1f, this);

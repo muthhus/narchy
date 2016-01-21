@@ -179,8 +179,8 @@ public class DefaultConcept extends AtomConcept {
      */
 
 
-    @Nullable
-    Task add(@NotNull QuestionTaskTable table, Task input, BiPredicate<Task, Task> eq, BudgetMerge duplicateMerge, Memory memory) {
+    @NotNull
+    Task add(@NotNull QuestionTaskTable table, @NotNull Task input, BiPredicate<Task, Task> eq, BudgetMerge duplicateMerge, Memory memory) {
         return table.add(input, eq, duplicateMerge, memory);
     }
 
@@ -380,21 +380,20 @@ public class DefaultConcept extends AtomConcept {
      * To answer a quest or q by existing beliefs
      *
      * @param q    The task to be processed
-     * @param task
      * @param nar
-     * @return true if the quest/question table changed
+     * @return the relevant task
      */
     @Override
-    public boolean processQuestion(@NotNull Task q, @NotNull NAR nar) {
+    public Task processQuestion(@NotNull Task q, @NotNull NAR nar) {
 
-        final QuestionTaskTable table;
+        final QuestionTaskTable questionTable;
         if (q.isQuestion()) {
             if (questions == null) questions = new ArrayListTaskTable(nar.memory.conceptQuestionsMax.intValue());
-            table = getQuestions();
+            questionTable = getQuestions();
 
         } else { // else if (q.isQuest())
             if (quests == null) quests = new ArrayListTaskTable(nar.memory.conceptQuestionsMax.intValue());
-            table = getQuests();
+            questionTable = getQuests();
         }
 
 //        //if (Global.DEBUG) {
@@ -409,32 +408,23 @@ public class DefaultConcept extends AtomConcept {
         //getMemory().execute(q);
 
         //boolean tableAffected = false;
-
-
         //boolean newQuestion = table.isEmpty();
 
-        Task match = add(table, q, questionEquivalence, duplicateQuestionMerge, nar.memory);
-        if (match == q) {
-            //final int presize = getQuestions().size() + getQuests().size();
-            //onTableUpdated(q.getPunctuation(), presize);
-            //tableAffected = true;
-        } else {
-            q = match; //try solution with the original question
-        }
+        q = add(questionTable, q, questionEquivalence, duplicateQuestionMerge, nar.memory);
 
 
         //TODO if the table was not affected, does the following still need to happen:
 
-        long now = q.getOccurrenceTime();
-        Task sol = q.isQuest() ?
-                getGoals().top(now) :
-                getBeliefs().top(now);
+        BeliefTable answerTable = q.isQuest() ?
+                getGoals() : getBeliefs();
+
+        Task sol = answerTable.top(q.getOccurrenceTime());
 
         if (sol != null) {
 
             if (sol.getDeleted()) {
-                //throw new RuntimeException("can not try solution on deleted task: " + sol);
-                return true;
+                throw new RuntimeException("can not try solution on deleted task: " + sol);
+//                return true;
             }
 
             LocalRules.trySolution(q, sol, nar, nar::input); /*(s) -> {
@@ -442,7 +432,7 @@ public class DefaultConcept extends AtomConcept {
             });*/
         }
 
-        return true;
+        return q;
     }
 
 
@@ -676,9 +666,14 @@ public class DefaultConcept extends AtomConcept {
      * <p>
      * called in Memory.immediateProcess only
      *
-     * @return whether it was processed
+     * @return the relevant, non-null, non-deleted Task, which will either be:
+     *      --the input
+     *      --an existing one which absorbed the input and will re-fire
+     *      --a revised/projected task which may or may not remain in the belief table
+     *
+     *
      */
-    public final Task process(@NotNull final Task task, @NotNull NAR nar) {
+    @NotNull public final Task process(@NotNull final Task task, @NotNull NAR nar) {
 
         task.onConcept(this);
 
@@ -690,21 +685,15 @@ public class DefaultConcept extends AtomConcept {
                 return processGoal(task, nar);
 
             case Symbols.QUESTION:
-                if (processQuestion(task, nar))
-                    return task;
-                break;
+                return processQuestion(task, nar);
 
             case Symbols.QUEST:
-                if (processQuest(task, nar))
-                    return task;
-
-                break;
+                return processQuest(task, nar);
 
             default:
                 throw new RuntimeException("Invalid sentence type: " + task);
         }
 
-        return null;
     }
 
 

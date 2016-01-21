@@ -159,9 +159,9 @@ public interface Concept extends Termed, Supplier<Term> {
     @Nullable
     Task processGoal(Task task, NAR nar);
 
-    boolean processQuestion(Task task, NAR nar);
+    Task processQuestion(Task task, NAR nar);
 
-    boolean processQuest(Task task, NAR nar);
+    Task processQuest(Task task, NAR nar);
 
 
 
@@ -312,13 +312,13 @@ public interface Concept extends Termed, Supplier<Term> {
      * process a task in this concept
      * @return true if process affected the concept (ie. was inserted into a belief table)
      */
-    @Nullable
-    Task process(Task task, NAR nar);
+    @NotNull
+    Task process(@NotNull Task task, @NotNull NAR nar);
 
     /** attempt insert a tasklink into this concept's tasklink bag
      *  return true if successfully inserted
      * */
-    boolean link(Task task, float scale, float minScale, NAR nar);
+    boolean link(@NotNull Task task, float scale, float minScale, @NotNull NAR nar);
 
     //void linkTemplates(Budget budget, float scale, NAR nar);
 

@@ -9,6 +9,7 @@ import nars.nal.meta.PremiseMatch;
 import nars.task.Task;
 import nars.term.Termed;
 import nars.term.Terms;
+import nars.term.compound.Compound;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -59,25 +60,23 @@ public class Derivelet {
     @NotNull
     private BLink[] tasksArray = new BLink[0];
 
-    public static int firePremises(BLink<Concept> conceptLink, @NotNull BLink<Task>[] tasks, @NotNull BLink<Termed>[] terms, @NotNull Consumer<ConceptProcess> proc, @NotNull NAR nar) {
-
-        int total = 0;
+    public static void firePremises(@NotNull BLink<Concept> conceptLink, @NotNull BLink<Task>[] tasks, @NotNull BLink<Termed>[] terms, @NotNull Consumer<ConceptProcess> proc, @NotNull NAR nar) {
 
         for (BLink<Task> taskLink : tasks) {
+
             if (taskLink == null) break;
+
+            Compound taskLinkTerm = taskLink.get().term();
 
             for (BLink<Termed> termLink : terms) {
                 if (termLink == null) break;
 
-                if (Terms.equalSubTermsInRespectToImageAndProduct(taskLink.get().term(), termLink.get().term()))
-                    continue;
-
-                total+= ConceptProcess.fireAll(
-                    nar, conceptLink, taskLink, termLink, proc);
+                if (!Terms.equalSubTermsInRespectToImageAndProduct(taskLinkTerm, termLink.get().term()))
+                    ConceptProcess.fireAll(
+                        nar, conceptLink, taskLink, termLink, proc);
             }
         }
 
-        return total;
     }
 
 
@@ -85,7 +84,7 @@ public class Derivelet {
      * iteratively supplies a matrix of premises from the next N tasklinks and M termlinks
      * (recycles buffers, non-thread safe, one thread use this at a time)
      */
-    public int firePremiseSquare(
+    public void firePremiseSquare(
             @NotNull NAR nar,
             @NotNull Consumer<ConceptProcess> proc,
             @NotNull BLink<Concept> conceptLink,
@@ -97,11 +96,11 @@ public class Derivelet {
 
         Set<BLink<Task>> tasksBuffer = this.tasks;
         concept.getTaskLinks().sample(tasklinks, eachTaskLink, tasksBuffer).commit();
-        if (tasksBuffer.isEmpty()) return 0;
+        if (tasksBuffer.isEmpty()) return;
 
         Set<BLink<Termed>> termsBuffer = this.terms;
         concept.getTermLinks().sample(termlinks, eachTermLink, termsBuffer).commit();
-        if (termsBuffer.isEmpty()) return 0;
+        if (termsBuffer.isEmpty()) return;
 
         //convert to array for fast for-within-for iterations
         BLink[] tasksArray = this.tasksArray = tasksBuffer.toArray(this.tasksArray);
@@ -110,7 +109,7 @@ public class Derivelet {
         BLink[] termsArray = this.termsArray = termsBuffer.toArray(this.termsArray);
         termsBuffer.clear();
 
-        return firePremises(conceptLink,
+        firePremises(conceptLink,
                 tasksArray, termsArray,
                 proc, nar);
 
@@ -164,31 +163,30 @@ public class Derivelet {
     /**
      * run next iteration; true if still alive by end, false if died and needs recycled
      */
-    public final boolean cycle(final long now) {
+    public final void cycle(final long now) {
 
         if (this.ttl-- == 0) {
             //died
-            return false;
+            return ;
         }
 
         //TODO dont instantiate BagBudget
         if ((this.concept = new BLink(nextConcept(), 0, 0, 0)) == null) {
             //dead-end
-            return false;
+            return;
         }
 
 
         int tasklinks = 1;
         int termlinks = 2;
 
-        int fired = firePremiseSquare(context.nar,
+        firePremiseSquare(context.nar,
                 perPremise, this.concept,
                 tasklinks, termlinks,
                 null, //Default.simpleForgetDecay,
                 null //Default.simpleForgetDecay
         );
 
-        return fired > 0;
     }
 
     @Nullable

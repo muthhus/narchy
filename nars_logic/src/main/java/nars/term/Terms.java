@@ -26,7 +26,7 @@ public enum Terms {
     public static final Term[] Empty = new Term[0];
     public static final IntFunction<Term[]> TermArrayBuilder = Term[]::new;
 
-    public static boolean equalSubTermsInRespectToImageAndProduct(@Nullable Termed a, @Nullable Termed b) {
+    public static boolean equalSubTermsInRespectToImageAndProduct(@Nullable Term a, @Nullable Term b) {
 
         if (a == null || b == null) {
             return false;
@@ -71,7 +71,7 @@ public enum Terms {
         return equalSubjectPredicateInRespectToImageAndProduct(a, b, true);
     }
 
-    static boolean equalSubjectPredicateInRespectToImageAndProduct(@NotNull Termed A, @NotNull Termed B, boolean requireEqualImageRelation) {
+    static boolean equalSubjectPredicateInRespectToImageAndProduct(@NotNull Term A, @NotNull Term B, boolean requireEqualImageRelation) {
 
 
         if (A.equals(B)) {

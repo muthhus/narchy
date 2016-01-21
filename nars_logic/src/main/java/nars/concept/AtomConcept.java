@@ -87,14 +87,19 @@ public class AtomConcept extends AbstractConcept  {
         throw new RuntimeException(shouldntProcess);
     }
     @Override
-    public boolean processQuestion(Task task, NAR nar) {
+    public Task processQuestion(Task task, NAR nar) {
         throw new RuntimeException(shouldntProcess);
     }
+
     @Override
-    public final boolean processQuest(Task task, NAR nar) {
+    public final Task processQuest(Task task, NAR nar) {
         return processQuestion(task, nar );
     }
 
+    @Override
+    public Task process(Task task, NAR nar) {
+        throw new RuntimeException(shouldntProcess);
+    }
 
     /** atoms have no termlink templates, they are irreducible */
     @Nullable
@@ -152,9 +157,6 @@ public class AtomConcept extends AbstractConcept  {
     }
 
 
-    @Nullable
-    @Override
-    public Task process(Task task, NAR nar) {
-        return null;
-    }
+
+
 }

@@ -60,6 +60,7 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
         add("stream");
         add("getHandler");
         add("setHandler");
+        add("toString");
     }};
 
     private final AtomicBoolean goalInvoke = new AtomicBoolean(true);
@@ -187,7 +188,7 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
 
             /** pretend as if it were a goal of its own volition, although it was invoked externally
              *  Master of puppets, I'm pulling your strings */
-            nar.input( $.goal( $.exec(op, invocationArgs),
+            nar.input( $.goal( $.exec(op, (Compound)invocationArgs),
                     invocationGoalFreq, invocationGoalConf).
                     present(nar.memory).
                     because(ir)

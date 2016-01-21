@@ -39,7 +39,9 @@ public class MethodOperator extends TermFunction {
     //public static final Atom ERROR = Atom.the("ERR");
 
     @Nullable
-    private volatile Task currentTask = null;
+    private static final ThreadLocal<Task> currentTask = new ThreadLocal();
+
+    private static final boolean strict = false;
 
     public MethodOperator(AtomicBoolean enable, @NotNull Method m, NALObjects context) {
         super(getParentMethodName(m));
@@ -48,6 +50,10 @@ public class MethodOperator extends TermFunction {
         method = m;
         params = method.getParameters();
         this.enable = enable;
+    }
+
+    public static Task getCurrentTask() {
+        return currentTask.get();
     }
 
     private static Term getParentMethodName(@NotNull Method m) {
@@ -60,28 +66,24 @@ public class MethodOperator extends TermFunction {
 
     @Override
     public void execute(@NotNull Execution e) {
-        currentTask = e.task; //HACK
+        ThreadLocal<Task> localTask = MethodOperator.currentTask;
+
+        localTask.set(e.task); //HACK
 
         super.execute(e);
 
-        currentTask = null;
+        localTask.set(null);
     }
 
 
     @Nullable
     @Override
     public Object function(@NotNull Compound o, TermBuilder ti) {
-        Term[] x;
-        try {
-            x = ((Compound) o.terms()[0]).terms(); //HACK
-        } catch (Exception e) {
-            return null;
-        }
-
-        //System.out.println("method: " + method + " w/ " + x);
 
         if (!enable.get())
             return null;
+
+        Term[] x = o.terms();
 
         int pc = method.getParameterCount();
         int requires, paramOffset;
@@ -94,10 +96,16 @@ public class MethodOperator extends TermFunction {
             paramOffset = 1;
         }
 
-        if (x.length < requires)
-            throw new RuntimeException("invalid argument count: needs " + requires + " but has " + Arrays.toString(x));
+        if (x.length < requires) {
+            if (strict) {
+                String msg = "invalid argument count: needs " + requires + " but has " + Arrays.toString(x);
+                throw new RuntimeException(msg);
+            }
+            return null;
+        }
 
         Object instance = paramOffset == 0 ? null : context.object(x[0]);
+        NALObjects ctx = this.context;
 
         Object[] args;
         if (pc == 0) {
@@ -119,9 +127,10 @@ public class MethodOperator extends TermFunction {
                 return null;
             }
 
+            Parameter[] par = this.params;
             for (int i = 0; i < pc; i++) {
-                Object a = context.object(pxv.term(i));
-                Class<?> pt = params[i].getType();
+                Object a = ctx.object(pxv.term(i));
+                Class<?> pt = par[i].getType();
                 if (!pt.isAssignableFrom(a.getClass())) {
                     a = parser.parseType(a.toString(), pt);
                 }
@@ -135,17 +144,19 @@ public class MethodOperator extends TermFunction {
             //Object result = Invoker.invoke(instance, method.getName(), args); /** from Boon library */
 
 
-            Object ll = currentTask.getLogLast();
+            Task curTask = currentTask.get();
+
+            Object ll = curTask.getLogLast();
             Object result = ll instanceof NALObjects.InvocationResult ?
                     ((NALObjects.InvocationResult) ll).value :
-                    context.invokeVolition(currentTask, method, instance, args);
+                    context.invokeVolition(curTask, method, instance, args);
 
 
             if (feedback) {
                 if (result instanceof Truth)
                     return result; //raw truth value
                 else
-                    return context.term(result); //termize it
+                    return ctx.term(result); //termize it
             }
 
         } catch (IllegalArgumentException e) {
@@ -158,7 +169,8 @@ public class MethodOperator extends TermFunction {
 //
 //            //return ERROR atom as feedback
 //            return ERROR;
-            e.printStackTrace();
+            //e.printStackTrace();
+            throw new RuntimeException(e);
 
         } catch (Exception e) {
             //System.err.println(method + " <- " + instance + " (" + instance.getClass() + " =?= " + method.getDeclaringClass() + "\n\t<<< " + Arrays.toString(args));

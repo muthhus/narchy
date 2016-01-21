@@ -142,12 +142,12 @@ public abstract class FindSubst extends Versioning implements Subst {
 
     @Nullable
     @Override
-    public Term getXY(Object t) {
+    public Term getXY(@NotNull Object t) {
         return xy.getXY(t);
     }
 
     @Nullable
-    public Term getYX(Term t) {
+    public Term getYX(@NotNull Term t) {
         return yx.getXY(t);
     }
 
@@ -230,26 +230,35 @@ public abstract class FindSubst extends Versioning implements Subst {
         return false;
     }
 
-    private boolean matchYvar(@NotNull Term x, Term y) {
+    private boolean matchYvar(@NotNull Term x, @NotNull Term y) {
         Term ySubst = getYX(y);
 
         if (ySubst != null) {
             return match(x, ySubst); //loop
         } else {
-            putYX(/*(Variable)*/ y, x);
-            if (y instanceof CommonVariable) {
-                return putXY(/*(Variable)*/ y, x);
+            if (putYX(/*(Variable)*/ y, x)) {
+                if (y instanceof CommonVariable) {
+                    return putXY(/*(Variable)*/ y, x);
+                }
+                return true;
             }
-            return true;
         }
+        return false;
     }
 
     public boolean matchXvar(@NotNull Variable x, @NotNull Term y) {
         Term xSubst = getXY(x);
 
-        return (xSubst != null) ?
-                match(xSubst, y) :
-                nextVarX(x, y);
+        //try {
+            return (xSubst != null) ?
+                    match(xSubst, y) :
+                    nextVarX(x, y);
+        /*}
+        catch (StackOverflowError e) {
+            e.printStackTrace();
+            return false;
+        }*/
+
     }
 
 //    private static void printComparison(int power, Compound cx, Compound cy) {
@@ -679,7 +688,7 @@ public abstract class FindSubst extends Versioning implements Subst {
     private boolean putVarX(Variable x, @NotNull Term y) {
         if (putXY(x, y)) {
             if (x instanceof CommonVariable) {
-                putYX(x, y);
+                return putYX(x, y);
             }
             return true;
         }
@@ -689,12 +698,7 @@ public abstract class FindSubst extends Versioning implements Subst {
 
     private boolean putCommon(@NotNull Variable x, @NotNull Variable y) {
         Variable commonVar = CommonVariable.make(x, y);
-        if (putXY(x, commonVar)) {
-            putYX(y, commonVar);
-            //?? what if it fails, should we restore/undo 'x'?
-            return true;
-        }
-        return false;
+        return putXY(x, commonVar) && putYX(y, commonVar);
     }
 
     /**
@@ -769,6 +773,27 @@ public abstract class FindSubst extends Versioning implements Subst {
         }
 
     }
+    public final boolean putYX(Term y /* usually a Variable */, Term x) {
+        //yx.put(x, y);
+
+        VarCachedVersionMap yx = this.yx;
+
+        Versioned<Term> v = yx.map.get(x);
+
+        /*if (!assignable(x, y))
+            return false;*/
+
+        if (v == null) {
+            v = yx.getOrCreateIfAbsent(x);
+        } else {
+            Term vv = (v != null) ? v.get() : null;
+            if (vv != null) {
+                return y.equals(vv);
+            }
+        }
+        v.set(y);
+        return true;
+    }
 
 
     /**
@@ -808,9 +833,6 @@ public abstract class FindSubst extends Versioning implements Subst {
         return !c.invalid(x, y, this);
     }
 
-    public final void putYX(Term y /* usually a Variable */, Term x) {
-        yx.put(x, y);
-    }
 
     @Nullable
     public Term apply(Term t) {

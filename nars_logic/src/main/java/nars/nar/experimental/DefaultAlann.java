@@ -91,9 +91,10 @@ public class DefaultAlann extends AbstractAlann  {
 
         final List<Derivelet> derivers = this.derivers;
         derivers.forEach(d -> {
-            if (!d.cycle(now)) {
-                restart(d); //recycle this derivelet
-            }
+            //TODO
+//            if (!d.cycle(now)) {
+//                restart(d); //recycle this derivelet
+//            }
         });
 
 

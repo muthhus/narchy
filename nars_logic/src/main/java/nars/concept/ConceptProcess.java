@@ -14,7 +14,6 @@ import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Set;
 import java.util.function.Consumer;
 
 /** Firing a concept (reasoning event). Derives new Tasks via reasoning rules
@@ -76,34 +75,26 @@ public final class ConceptProcess implements Premise {
             long now = nar.time();
             belief = beliefConcept.getBeliefs().top(now);
             if (belief == null || belief.getDeleted()) {
-                beliefConcept.print();
-                beliefConcept.getBeliefs().top(now);
+//                beliefConcept.print();
+//                beliefConcept.getBeliefs().top(now);
                 throw new RuntimeException("deleted belief: " + belief + " " + beliefConcept.hasBeliefs());
             }
         } else {
             belief = null;
         }
 
+        Consumer<Task> runBelief = (b) -> {
+            cp.accept(new ConceptProcess(nar, concept,
+                    taskLink, termLink, b));
+        };
+
         if (belief != null) {
-            Set<Task> beliefs = Global.newHashSet(0);
-            Premise.match(task, belief, nar, beliefs::add);
-            if (!beliefs.isEmpty()) {
-                beliefs.forEach(matchedBelief -> {
-                    cp.accept(new ConceptProcess(nar, concept,
-                            taskLink, termLink, matchedBelief));
-                });
-                return beliefs.size();
-            }
+            //try unified solutions
+            Premise.matchUnifiedSolutions(task, belief, nar, runBelief);
         }
 
-        cp.accept(new ConceptProcess(nar, concept,
-                taskLink, termLink, belief));
+        runBelief.accept(belief);
         return 1;
-
-
-
-
-
     }
 
 //    /**

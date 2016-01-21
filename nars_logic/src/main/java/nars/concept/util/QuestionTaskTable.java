@@ -3,7 +3,7 @@ package nars.concept.util;
 import nars.Memory;
 import nars.budget.BudgetMerge;
 import nars.task.Task;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.BiPredicate;
 
@@ -19,6 +19,6 @@ public interface QuestionTaskTable extends TaskTable {
      * an existing equivalent task if this was a duplicate
      */
 
-    @Nullable
+    @NotNull
     Task add(Task t, BiPredicate<Task, Task> equality, BudgetMerge duplicateMerge, Memory m);
 }

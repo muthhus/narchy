@@ -142,7 +142,7 @@ public enum $  {
 
     /** execution (NARS "operation") */
     @NotNull
-    static Compound exec(Operator opTerm, @Nullable Compound arg) {
+    public static Compound exec(Operator opTerm, @Nullable Compound arg) {
         return (Compound) the(
                 INHERIT,
                 arg == null ? TermIndex.Empty : arg,

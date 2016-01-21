@@ -27,11 +27,17 @@ public class UnitVal {
         return new DefaultTruth(v, 0.9f);
     }
 
-    public boolean equals(float target, float tolerance) {
-        return Math.abs(v - target) <= tolerance;
+
+
+    public void setInc(float dv) {
+        this.dv = dv;
     }
 
     public void inc(boolean positive) {
+        _inc(positive, dv);
+    }
+
+    protected void _inc(boolean positive, float dv) {
         v = Util.clamp(v + (positive ? 1 : -1) * dv);
     }
 
@@ -45,5 +51,19 @@ public class UnitVal {
 
     public void random() {
         v = (float)Math.random();
+    }
+
+    public boolean equals(float target, float tolerance) {
+        return _equals(target, tolerance);
+    }
+
+    private boolean _equals(float target, float tolerance) {
+        return Math.abs(v - target) <= tolerance;
+    }
+
+    public int compare(float w, float tolerance) {
+        if (_equals(w, tolerance)) return 0;
+        if (v < w) return -1;
+        return 1;
     }
 }

@@ -30,9 +30,9 @@ public interface Premise extends Level, Tasked {
      *
      * @param question The task
      * @param solution The belief
-     * @return null if no match
+     * @return number of matches tried
      */
-    static void match(@NotNull Task question, @NotNull Task solution, @NotNull NAR nar, @NotNull Consumer<Task> eachSolution) {
+    static void matchUnifiedSolutions(@NotNull Task question, @NotNull Task solution, @NotNull NAR nar, @NotNull Consumer<Task> eachSolution) {
 
 
         //if (question.isQuestion() || question.isGoal()) {
@@ -40,12 +40,16 @@ public interface Premise extends Level, Tasked {
             //}
         //}
 
+        //int[] count = new int[1];
         unify(Op.VAR_QUERY, question.term(), solution.term(), nar.memory, (st) -> {
             Task s = !st.equals(solution.term()) ?
-                    MutableTask.clone(solution).term((Compound) st) : solution;
+                    MutableTask.clone(solution, (Compound) st) : solution;
+
             LocalRules.trySolution(question, s, nar, eachSolution);
+            //count[0]++;
         });
 
+        //return count[0];
     }
 
     /**
@@ -57,61 +61,8 @@ public interface Premise extends Level, Tasked {
      * <p>
      * only sets the values if it will return true, otherwise if it returns false the callee can expect its original values untouched
      */
-    static void unify(Op varType, @NotNull Term a, @NotNull Term b, @NotNull Memory memory, @NotNull Consumer<Term> solution) {
-
-        FindSubst f = new FindSubst(varType, memory.random) {
-
-            @Override public boolean onMatch() {
-
-                //TODO combine these two blocks to use the same sub-method
-
-                Term aa = a;
-
-                //FORWARD
-                if (aa instanceof Compound) {
-
-                    aa = getXY(a);
-                    if (aa == null) aa = a;
-
-                    Op aaop = aa.op();
-                    if (a.op() == Op.VAR_QUERY && (aaop == Op.VAR_INDEP || aaop == Op.VAR_DEP))
-                        return false;
-
-                }
-
-                Term bb = b;
-
-                //REVERSE
-                if (bb instanceof Compound) {
-                    bb = applySubstituteAndRenameVariables(
-                            ((Compound) b),
-                            (Map<Term, Term>)yx //inverse map
-                    );
-
-
-                    Op bbop = bb.op();
-                    if (b.op() == Op.VAR_QUERY && (bbop == Op.VAR_INDEP || bbop == Op.VAR_DEP))
-                        return false;
-                }
-
-                //t[0] = aa;
-                //t[1] = bb;
-
-                solution.accept(bb);
-
-                return true; //determines how many
-            }
-
-            @Nullable
-            Term applySubstituteAndRenameVariables(Compound t, @Nullable Map<Term,Term> subs) {
-                return (subs == null) || (subs.isEmpty()) ?
-                        t /* no change necessary */ :
-                        memory.index.apply(new MapSubst(subs), t);
-            }
-
-        };
-
-        f.matchAll(a, b);
+    static void unify(@NotNull Op varType, @NotNull Term a, @NotNull Term b, @NotNull Memory memory, @NotNull Consumer<Term> solution) {
+        new UnifySubst(varType, memory, a, b, solution);
     }
 
 
@@ -617,4 +568,71 @@ public interface Premise extends Level, Tasked {
         return x.isCompound() ? (Compound) x : null;
     }
 
+    static final class UnifySubst extends FindSubst {
+
+        private final Memory memory;
+        private final Term a;
+        private final Term b;
+        private final Consumer<Term> solution;
+
+        public UnifySubst(Op varType, Memory memory, Term a, Term b, Consumer<Term> solution) {
+            super(varType, memory.random);
+            this.memory = memory;
+            this.a = a;
+            this.b = b;
+            this.solution = solution;
+            matchAll(a, b);
+        }
+
+        @Override public boolean onMatch() {
+
+            //TODO combine these two blocks to use the same sub-method
+
+            Term aa = a;
+
+            //FORWARD
+            if (aa instanceof Compound) {
+
+                aa = getXY(a);
+                if (aa == null) aa = a;
+
+                Op aaop = aa.op();
+                if (a.op() == Op.VAR_QUERY && (aaop == Op.VAR_INDEP || aaop == Op.VAR_DEP))
+                    return false;
+
+            }
+
+            Term bb = b;
+
+            //REVERSE
+            if (bb instanceof Compound) {
+                bb = applySubstituteAndRenameVariables(
+                        ((Compound) b),
+                        (Map<Term, Term>)yx //inverse map
+                );
+
+                if (bb==null)
+                    return false; //WHY?
+
+                Op bbop = bb.op();
+                if (b.op() == Op.VAR_QUERY && (bbop == Op.VAR_INDEP || bbop == Op.VAR_DEP))
+                    return false;
+            }
+
+            //t[0] = aa;
+            //t[1] = bb;
+
+            solution.accept(bb);
+
+            return true; //determines how many
+        }
+
+        @Nullable
+        Term applySubstituteAndRenameVariables(Compound t, @Nullable Map<Term,Term> subs) {
+            return (subs == null) || (subs.isEmpty()) ?
+                    t /* no change necessary */ :
+                    memory.index.apply(new MapSubst(subs), t);
+        }
+
+    }
 }

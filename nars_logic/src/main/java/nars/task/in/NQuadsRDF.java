@@ -354,7 +354,7 @@ public abstract class NQuadsRDF {
         if (belief instanceof Compound) {
             //System.out.println(subject + " " + predicate + " " + object + " :: " + belief);
 
-            return new MutableTask().term((Compound)belief).
+            return new MutableTask((Compound)belief).
                     belief().truth(1.0f,0.95f)
                     .time(nar.time(),
                     Tense.ETERNAL //TODO Tense parameter

@@ -1,6 +1,5 @@
 package nars.nal.nal8.operator;
 
-import com.google.common.collect.Lists;
 import nars.NAR;
 import nars.Symbols;
 import nars.nal.Tense;
@@ -17,8 +16,6 @@ import nars.truth.Truth;
 import nars.util.Texts;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 
 /** 
@@ -76,7 +73,7 @@ public abstract class TermFunction<O> extends SyncOperator {
 
 
     @Nullable
-    protected List<Task> result(@NotNull NAR nar, @NotNull Task opTask, Term y/*, Term[] x0, Term lastTerm*/) {
+    protected Task result(@NotNull NAR nar, @NotNull Task opTask, Term y/*, Term[] x0, Term lastTerm*/) {
 
         Compound operation = opTask.term();
 
@@ -104,14 +101,14 @@ public abstract class TermFunction<O> extends SyncOperator {
 
         //Implication.make(operation, actual_part, TemporalRules.ORDER_FORWARD);
 
-        return Lists.newArrayList(
+        return
                 Operator.feedback(
                     new MutableTask(inh).
                         judgment().
                         truth(getResultFrequency(), getResultConfidence()).
                         tense(getResultTense(), nar.memory), opTask,
                         feedbackPriorityMultiplier, feedbackDurabilityMultiplier)
-            );
+            ;
 
             /*float equal = equals(lastTerm, y);
             ArrayList<Task> rt = Lists.newArrayList(
