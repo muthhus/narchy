@@ -67,7 +67,10 @@ abstract public class Event extends AtomicBooleanCondition<PremiseMatch> {
 
         @NotNull
         @Override public String toString() {
-            return "after(" + (positive ? "forward" : "reverse") + ")";
+            return "after(" +
+                        (positive ? "positive" : "negative") + "," +
+                        (shift ? "shift":"same") +
+                    ")";
         }
     }
 

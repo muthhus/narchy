@@ -22,14 +22,6 @@ public class NAL8Test extends AbstractNALTester {
     }
 
 
-
-
-
-
-
-
-
-
     @Test
     public void subsent_1()  {
         TestNAR tester = test();
@@ -40,23 +32,12 @@ public class NAL8Test extends AbstractNALTester {
         tester.input("[opened]:{t001}. :|:");
         tester.inputAt(10, "(hold:({t002}) &&+5 (at:({t001}) &&+5 (open({t001}) &&+5 [opened]:{t001}))).");
 
-        tester.mustBelieve(cycles*10, "(hold:({t002}) &&+5 (at:({t001}) &&+5 open({t001})))",
+        tester.mustBelieve(cycles, "(hold:({t002}) &&+5 (at:({t001}) &&+5 open({t001})))",
                 1.0f, 0.45f,
                 -5);
     }
 
 
-    @Test
-    public void temporal_deduction_2()  {
-        TestNAR tester = test();
-
-        tester.input("<(&/, hold:(SELF,{t002}), at:(SELF,{t001}), open({t001})) =/> [opened]:{t001}>.");
-        tester.inputAt(10, "hold:(SELF,{t002}). :|: ");
-
-        //mustBelieve?
-        tester.mustBelieve(cycles, "<(&/, at:(SELF,{t001}), open({t001})) =/> [opened]:{t001}>", 1.0f, 0.81f, 10);
-
-    }
 
 
 
@@ -68,8 +49,8 @@ public class NAL8Test extends AbstractNALTester {
     public void conditional_abduction_test()  { //maybe to nal7 lets see how we will split these in the future
         TestNAR tester = test();
 
-        tester.input("<(SELF,{t003}) --> at>. :|:");
-        tester.inputAt(10, "(goto($1) ==>+5 <(SELF,$1) --> at>).");
+        tester.input("at:(SELF,{t003}). :|:");
+        tester.inputAt(10, "(goto($1) ==>+5 at:(SELF,$1)).");
 
         tester.mustBelieve(cycles, "goto({t003})", 1.0f, 0.45f, -5);
 
@@ -80,9 +61,9 @@ public class NAL8Test extends AbstractNALTester {
         TestNAR tester = test();
 
         tester.input("goto({t003}). :|:");
-        tester.inputAt(10, "(goto($1) ==>+5 <(SELF,$1) --> at>).");
+        tester.inputAt(10, "(goto($1) ==>+5 at:(SELF,$1)).");
 
-        tester.mustBelieve(cycles, "<(SELF, {t003}) --> at>", 1.0f, 0.81f, 5);
+        tester.mustBelieve(cycles, "at:(SELF,{t003})", 1.0f, 0.81f, 5);
 
     }
 
@@ -91,13 +72,21 @@ public class NAL8Test extends AbstractNALTester {
         TestNAR tester = test();
 
         tester.input("goto({t003}). :|: ");
-        tester.inputAt(10, "(goto($1) ==>+5 <(SELF,$1) --> at>). ");
+        tester.inputAt(10, "(goto($1) ==>+5 at:(SELF,$1)). ");
 
-        tester.mustBelieve(cycles, "<(SELF, {t003}) --> at>", 1.0f, 0.81f,5);
+        tester.mustBelieve(cycles, "at:(SELF,{t003})", 1.0f, 0.81f,5);
 
     }
 
 
 
+    @Test public void goal_deduction_tensed_conseq()  {
+        TestNAR tester = test();
+
+        tester.input("goto(x). :\\:");
+        tester.inputAt(10, "(goto($1) ==>+5 at:(SELF,$1)).");
+
+        tester.mustBelieve(cycles, "at:(SELF,x)", 1.0f, 0.81f, 0);
+    }
 
 }

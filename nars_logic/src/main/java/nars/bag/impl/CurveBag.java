@@ -217,7 +217,7 @@ public class CurveBag<V> implements Bag<V> {
     }
 
     @Override
-    public void forEachKey(Consumer<? extends V> each) {
+    public void forEachKey(Consumer<? super V> each) {
         arrayBag.forEachKey(each);
     }
 

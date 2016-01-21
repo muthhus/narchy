@@ -33,8 +33,8 @@ abstract public class ArrayTable<V, L> implements Table<V,L> {
 
 
     @Override
-    public final void forEachKey(Consumer<? extends V> each) {
-        forEach(this::key);
+    public final void forEachKey(Consumer<? super V> each) {
+        forEach(t -> each.accept(key(t)));
     }
 
 

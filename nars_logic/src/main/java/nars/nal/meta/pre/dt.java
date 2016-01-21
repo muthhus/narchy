@@ -135,21 +135,20 @@ public abstract class dt extends AtomicBooleanCondition<PremiseMatch> {
             long at = m.premise.getTask().getOccurrenceTime();
             boolean ate = at == Tense.ETERNAL;
 
-            Task bb = m.premise.getBelief();
-            if (bb == null) {
-                return ate; //proceed only if task is eternal
+            if (!ate) {
+                Task bb = m.premise.getBelief();
+                if (bb != null) {
+                    //return ate; //proceed only if task is eternal
+                    long bt = bb.getOccurrenceTime();
+                    boolean bte = bt == Tense.ETERNAL;
+                    if (!bte) {
+                        int d = (int) (at - bt);
+                        m.tDelta.set(d);
+                        m.occDelta.set(-d);
+                    }
+                }
             }
 
-            long bt = bb.getOccurrenceTime();
-            boolean bte = bt == Tense.ETERNAL;
-            if (ate) {
-                if (bte) return true;
-                else
-                    return false; //mixed
-            } else {
-                if (bte) return false; //mixed
-            }
-            m.tDelta.set((int)(at - bt));
             return true;
         }
 

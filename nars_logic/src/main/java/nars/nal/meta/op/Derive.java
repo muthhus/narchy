@@ -82,8 +82,11 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
 
         Term tt = solve(m);
 
-        if ((tt != null) && ((postMatch==null) || (postMatch.booleanValueOf(m))))
-            derive(m, tt);
+        if (tt != null) {
+            AndCondition<PremiseMatch> pm = postMatch;
+            if (pm == null || (pm.booleanValueOf(m)))
+                derive(m, tt);
+        }
 
     }
 
@@ -160,11 +163,10 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
                     //set time relation
                     c = ct.t(tDelta);
                 } else {
-                    //convert to occDelta
+                    //convert to occDelta:
                     //p.occDelta.set(p.occDelta.getIfAbsent(0) + tDelta);
                     c = tNorm;
                 }
-
 
             } else {
                 //c = mem.taskConcept(tNorm); //accelerant: concept lookup

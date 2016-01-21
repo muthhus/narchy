@@ -5,6 +5,8 @@ import nars.concept.Concept;
 import nars.nar.Default;
 import org.junit.Test;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -85,4 +87,34 @@ public class TemporalInductionTest {
         //assertEquals("(b-->a). 5+0 %.50;.95%", c.getBeliefs().top().toStringWithoutBudget());
     }
 
+    @Test public void testInductionStability() {
+        //two entirely disjoint events, and all inductable beliefs from them, should produce a finite system that doesn't explode
+        Default d = new Default(256,1,2,3);
+        d.input("a:b. :|:");
+        d.frame(5);
+        d.input("c:d. :|:");
+
+        d.frame(24);
+
+        //everything should be inducted by now:
+        int numConcepts = d.core.active.size();
+        int numBeliefs = getBeliefCount(d);
+
+        System.out.println(numConcepts + " " + numBeliefs);
+
+        d.frame(300);
+
+        //# unique concepts unchanged:
+        assertEquals(numConcepts, d.core.active.size());
+        assertEquals(numBeliefs, getBeliefCount(d));
+
+    }
+
+    private static int getBeliefCount(NAR n) {
+        AtomicInteger a = new AtomicInteger(0);
+        n.forEachConceptTask(true,false,false,false,false,1000,t->{
+           a.addAndGet(1);
+        });
+        return a.intValue();
+    }
 }

@@ -36,7 +36,7 @@ public interface Table<K,V> extends Iterable<V> {
     }
 
     /** iterates in sorted order */
-    void forEachKey(Consumer<? extends K> each);
+    void forEachKey(Consumer<? super K> each);
 
     default void top(@NotNull Consumer<V> each) {
         topWhile(e -> {
