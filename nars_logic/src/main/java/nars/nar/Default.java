@@ -41,7 +41,7 @@ import static java.util.stream.Collectors.toList;
 public class Default extends AbstractNAR {
 
     @NotNull
-    public final AbstractCycle core;
+    public final DefaultCycle core;
     @NotNull
     public final TaskPerception input;
 
@@ -106,7 +106,7 @@ public class Default extends AbstractNAR {
     }
 
     @NotNull
-    protected AbstractCycle initCore(int activeConcepts, int conceptsFirePerCycle, int termLinksPerConcept, int taskLinksPerConcept) {
+    protected DefaultCycle initCore(int activeConcepts, int conceptsFirePerCycle, int termLinksPerConcept, int taskLinksPerConcept) {
 
         DefaultCycle c = new DefaultCycle(this, newDeriver(), newConceptBag(activeConcepts));
 
@@ -119,7 +119,7 @@ public class Default extends AbstractNAR {
 
         c.capacity.set(activeConcepts);
 
-        c.deriveConfMin.setValue(4f * Global.TRUTH_EPSILON);
+        c.confidenceDerivationMin.setValue(4f * Global.TRUTH_EPSILON);
 
         return c;
     }
@@ -454,7 +454,7 @@ public class Default extends AbstractNAR {
 
         /** derived tasks with truth confidence lower than this value are discarded. */
         @Range(min=0, max=1f)
-        public final MutableFloat deriveConfMin = new MutableFloat(Global.TRUTH_EPSILON);
+        public final MutableFloat confidenceDerivationMin = new MutableFloat(Global.TRUTH_EPSILON);
 
         /**
          * re-used, not to be used outside of this
@@ -484,7 +484,7 @@ public class Default extends AbstractNAR {
         }
 
         @Override protected void onCycle(Memory memory) {
-            matcher.setMinConfidence(deriveConfMin.floatValue());
+            matcher.setMinConfidence(confidenceDerivationMin.floatValue());
             super.onCycle(memory);
         }
 

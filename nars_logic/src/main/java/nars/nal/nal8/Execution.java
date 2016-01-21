@@ -78,9 +78,6 @@ public class Execution implements Runnable {
         //Display a message in the output stream to indicate the reportExecution of an operation
 
 
-        if (!task.isCommand()) {
-            noticeExecuted(task);
-        }
 
         //feedback tasks as input
         //should we allow immediate tasks to create feedback?
@@ -98,6 +95,11 @@ public class Execution implements Runnable {
 
                 nar.input(f);
             });
+        } else {
+            //default: noticed executed
+            if (!task.isCommand()) {
+                noticeExecuted(task);
+            }
         }
 
     }
@@ -127,7 +129,6 @@ public class Execution implements Runnable {
                         because("Executed")
         );
 
-        memory.logic.TASK_EXECUTED.hit();
     }
 
     @Nullable

@@ -43,10 +43,13 @@ public class TemporalInductionTest {
         n.input("a:b. %0.0|0.9%");
         n.frame(1);
 
-        //n.forEachConcept(Concept::print);
+        n.forEachConcept(Concept::print);
 
         Concept c = n.concept("a:b");
-        assertEquals("(b-->a). 5+0 %.50;.95%", c.getBeliefs().top(n.time()).toStringWithoutBudget());
+        //assertEquals("(b-->a). 5+0 %.50;.95%", c.getBeliefs().top(n.time()).toStringWithoutBudget());
+
+        //when originality is considered:
+        assertEquals("(b-->a). 5+0 %0.0;.90%", c.getBeliefs().top(n.time()).toStringWithoutBudget());
     }
 
     @Test public void testTemporalRevisionOfTemporalRelation() {

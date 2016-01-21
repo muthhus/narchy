@@ -213,7 +213,7 @@ public enum ThermostatTest2 {
 //                n.input(notValid + "! %0%");
 
         int runs = 50;
-        int runLength = 2000;
+        int runLength = 4000;
         float gamma = 1f/2f;
         float inputRate = 1/20f;
         float gammaScale = 0.95f; //decrease gamma probability per run

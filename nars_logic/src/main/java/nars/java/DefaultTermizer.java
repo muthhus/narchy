@@ -95,7 +95,7 @@ public class DefaultTermizer implements Termizer {
             return ((Boolean) o) ? TRUE : FALSE;
 
         if (o instanceof Number)
-            return Atom.the((Number) o);
+            return number((Number)o);
 
         if (o instanceof Class) {
             Class oc = (Class) o;
@@ -209,6 +209,10 @@ public class DefaultTermizer implements Termizer {
 //        }
 
 
+    }
+
+    protected Term number(Number o) {
+        return Atom.the((Number) o);
     }
 
     public Operator getOperator(Method m) {
@@ -340,28 +344,35 @@ public class DefaultTermizer implements Termizer {
         if (oe == null) {
 
             Term oterm = obj2term(o);
-
-            Term clas = classes.computeIfAbsent(o.getClass(), this::obj2term);
-
-            Term finalClas = clas;
-            post[0] = () ->  onInstanceOfClass(o, oterm, finalClas);
-
-            //instances.put(oterm, o); //reverse
-
             oe = oterm;
-            try {
-                iii.put(o, oterm);
+
+            if (cacheableInstance(o)) {
+                Term clas = classes.computeIfAbsent(o.getClass(), this::obj2term);
+
+                Term finalClas = clas;
+                post[0] = () -> onInstanceOfClass(o, oterm, finalClas);
+
+                //instances.put(oterm, o); //reverse
+
+                oe = oterm;
+                try {
+                    iii.put(o, oterm);
+                } catch (Exception e) { /* hack */ }
             }
-            catch (Exception e) { /* hack */ }
 
         }
 
         return oe;
     }
 
+    private boolean cacheableInstance(Object o) {
+        if (o instanceof Float)
+            return false;
+        return true;
+    }
+
 
     protected void onInstanceChange(Term oterm, Term prevOterm) {
-
 
     }
 

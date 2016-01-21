@@ -7,7 +7,7 @@ import nars.truth.Truth;
  * Mutable holder and manipulator of a float value restricted to range 0...+1.0
  */
 public class UnitVal {
-    private float v;
+    protected float v;
     private float dv;
 
     public UnitVal() {
@@ -24,7 +24,7 @@ public class UnitVal {
     }
 
     public Truth isTrue() {
-        return new DefaultTruth(v, 0.9f);
+        return new DefaultTruth(v, 0.25f);
     }
 
 

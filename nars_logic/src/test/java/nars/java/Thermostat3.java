@@ -1,5 +1,6 @@
 package nars.java;
 
+import nars.concept.Concept;
 import nars.nar.Default;
 import nars.task.Task;
 import nars.util.data.UnitVal;
@@ -12,9 +13,8 @@ import java.io.PrintStream;
  */
 public class Thermostat3 {
 
-    final float speed = 0.05f;
+    static final float speed = 0.05f;
     final float tolerance = 0.1f;
-    final float driftRate = 0.1f;
     private final UnitVal h;
 
     Default n;
@@ -22,40 +22,14 @@ public class Thermostat3 {
 
 
     void move() {
-        targetX = Util.clamp( targetX + (float)(Math.random()-0.5f)*2*driftRate );
-        //targetY = (float)Math.random();
-        //h.random();
+        //targetX = Util.clamp( targetX + (float)(Math.random()-0.5f)*2*driftRate );
+
+        targetX = Util.clamp(
+                (float)(Math.sin( n.time() / 1000.0f )+1f)*0.5f
+        );
     }
 
-//    String pos(String var, float value) {
-//        if (Math.abs(value) < tolerance) {
-//            return "<" + var + " --> zero>. :|:";
-//        }
-//        String dir = value > 0 ? "plus" : "neg";
-//
-//        return "<" + var + " --> " + dir + ">. :|: %1;" + Math.abs(value) + "%";
-//    }
 
-//    String feedback(boolean h, boolean v) {
-//        String s = "";
-//        if (h) {
-//            cx = Util.clamp(cx);
-//            float dx = targetX - cx;
-//            String t = pos("dx", dx);
-//            s += t;
-//            d.input(t);
-//        }
-//
-//        if (v) {
-//            cy = Util.clamp(cy);
-//            float dy = targetY - cy;
-//            String t = pos("dy", dy);
-//            s += t;
-//            d.input(t);
-//        }
-//
-//        return s;
-//    }
 
     public static class UnitValTaskInc extends UnitVal {
 
@@ -65,12 +39,14 @@ public class Thermostat3 {
             float exp;
             if (cTask == null) {
                 //exp = 0.1f;
-                return;
+                exp = 0;
             } else {
-                exp = cTask.getExpectation() * cTask.getPriority();
+                exp = cTask.getExpectation();// * cTask.getPriority();
             }
 
-            _inc(positive, exp);
+
+
+            _inc(positive, speed * exp);
         }
     }
 
@@ -80,10 +56,23 @@ public class Thermostat3 {
 
         n = new Default(1000, 15, 1, 3);
         //n.log();
-        n.memory.executionExpectationThreshold.setValue(0.6f);
+        //n.memory.executionExpectationThreshold.setValue(0.8f);
+        n.core.confidenceDerivationMin.setValue(0.05f);
 
 
-        NALObjects objs = new NALObjects(n);
+        NALObjects objs = new NALObjects(n) {
+
+//            @Override
+//            protected Term number(Number o) {
+//                //HACK:
+//                if (o instanceof Integer) {
+//                    return super.number(o);
+//                } else {
+//                    return Atom.the(0);//Atom.the("float"); //$.varDep((o.hashCode());
+//                }
+//            }
+        };
+
         this.h = objs.wrap("h", UnitValTaskInc.class /* new UnitVal(0.5f, speed)*/);
 
         h.setInc(speed);
@@ -136,7 +125,7 @@ public class Thermostat3 {
             }
 
 
-            if (n.time() % 10 == 0) {
+            if (n.time() % 1 == 0) {
                 int cols = 40;
                 int target = Math.round(targetX * cols);
                 int current = Math.round(h.isTrue().getFrequency() * cols);
@@ -166,11 +155,19 @@ public class Thermostat3 {
             }
 
 
-            if (Math.random() < 0.01) {
+            if (Math.random() < 0.1) {
                 train();
             }
             if (Math.random() < 0.02) {
                 move();
+            }
+
+            if (n.time() % 1000 == 0) {
+                n.core.active.forEach(20, b-> {
+                    Concept c = b.get();
+                    if (c.hasBeliefs())
+                        c.getBeliefs().print(System.out);
+                });
             }
         }
 
@@ -185,13 +182,17 @@ public class Thermostat3 {
         //d.input("v(1)! :|: %0.75%");
         //d.input("v(0)! :|: %0.75%");
 
-        h.inc(true);
-        h.inc(false);
+        if (Math.random() < 0.25f)
+            h.inc(true);
+        if (Math.random() < 0.25f)
+            h.inc(false);
 
         ////(-1-->(/,^UnitVal_compare,h,(0.61368304,0.1),_)).
-        n.input("(0-->(/,^UnitVal_compare,h,#p,_))! %1%");
-        n.input("(-1-->(/,^UnitVal_compare,h,#p,_))! %0%");
-        n.input("(1-->(/,^UnitVal_compare,h,#p,_))! %0%");
+        n.input("({0}-->(/,^UnitVal_compare,h,?p,_))! :|:");
+        //n.input("({-1}-->(/,^UnitVal_compare,h,#p,_))! :|: %0%");
+        //n.input("({1}-->(/,^UnitVal_compare,h,#p,_))! :|: %0%");
+        //n.input("(-1-->(/,^UnitVal_compare,h,#p,_))! %0%");
+        //n.input("(1-->(/,^UnitVal_compare,h,#p,_))! %0%");
 
 
         //d.input("h(1)! :|: %0.65%");

@@ -48,7 +48,8 @@ public final class Operator<T extends Term> extends AbstractStringAtom { //imple
     @Nullable
     public static Term result(@NotNull Compound operation, Term y) {
         Compound x = (Compound) operation.term(0);
-        return $.inh(
+        //return $.inh(
+        return $.inst(
                 y,
                 makeImageExt(x, operation.term(1), (short) (x.size() - 1) /* position of the variable */)
         );

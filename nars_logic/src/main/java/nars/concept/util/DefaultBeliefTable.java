@@ -8,13 +8,11 @@ import nars.bag.impl.ArrayTable;
 import nars.nal.LocalRules;
 import nars.nal.Tense;
 import nars.task.Task;
-import nars.truth.Truthed;
 import nars.util.ArraySortedIndex;
 import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -40,13 +38,13 @@ public class DefaultBeliefTable implements BeliefTable {
 
         if (cap == 1) cap = 2;
 
-        this.map = new HashMap(cap);
+        this.map = Global.newHashMap(cap/4); //new HashMap(cap/4);
         this.now = memory.time();
         this.minT = this.maxT = Tense.TIMELESS;
         this.tRange = 1;
 
         eternal = new SetTable<Task>(cap/2, map,
-            Truthed::getConfidence //TODO consider originality?
+            this::rankEternal
         );
         temporal = new SetTable<Task>(cap/2, map,
             this::rankTemporal
@@ -78,7 +76,11 @@ public class DefaultBeliefTable implements BeliefTable {
     }
 
     public float rankTemporal(@NotNull Task b, long when) {
-        return b.getConfidence()/((1f+Math.abs(b.getOccurrenceTime() - when))/tRange);
+        return b.getConfidence()/((1f+Math.abs(b.getOccurrenceTime() - when))/(tRange))*b.getOriginality();
+    }
+
+    public float rankEternal(@NotNull Task b) {
+        return b.getConfidence()*b.getOriginality();
     }
 
     @NotNull
