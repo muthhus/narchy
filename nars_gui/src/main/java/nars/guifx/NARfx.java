@@ -6,7 +6,6 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -274,12 +273,14 @@ public enum NARfx  {
 
     public static void newWindow(NAR nar, Concept c) {
         //TODO //ConceptPane wn = new ConceptPane(nar, c);
-        Pane wn = new ConceptPane(nar, c);
+        ConceptPane wn = new ConceptPane(nar, c);
 
         Stage st;
         Stage removed = window.put(c, st = newWindow(c.toString(), wn));
         st.setAlwaysOnTop(true); //? does this work
         st.show();
+
+        wn.changed(null,null,null);
 
         if (removed!=null)
             removed.close();

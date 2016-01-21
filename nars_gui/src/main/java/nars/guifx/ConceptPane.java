@@ -6,15 +6,20 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
+import nars.Global;
 import nars.NAR;
 import nars.bag.Bag;
 import nars.concept.Concept;
+import nars.concept.util.DefaultBeliefTable;
+import nars.guifx.demo.BeliefClusterer;
 import nars.guifx.demo.SubButton;
 import nars.guifx.graph2.TermEdge;
 import nars.guifx.graph2.TermNode;
@@ -29,6 +34,7 @@ import nars.nar.Default;
 import nars.task.Task;
 import nars.term.Termed;
 import nars.util.event.FrameReaction;
+import org.apache.commons.math3.linear.ArrayRealVector;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -42,8 +48,9 @@ import static javafx.application.Platform.runLater;
  */
 public class ConceptPane extends BorderPane implements ChangeListener {
 
-    private final Concept concept;
-//    private final Scatter3D tasks;
+    private final NAR nar;
+    private final BeliefTablePane tasks;
+    //    private final Scatter3D tasks;
 //    private final BagView<Task> taskLinkView;
 //    private final BagView<Term> termLinkView;
     private FrameReaction reaction;
@@ -131,7 +138,7 @@ public class ConceptPane extends BorderPane implements ChangeListener {
 
         public void frame() {
 
-            if (!isVisible()) return;
+            //if (!isVisible()) return;
 
             dead.addAll(linkShape.keySet());
 
@@ -146,6 +153,7 @@ public class ConceptPane extends BorderPane implements ChangeListener {
             Iterable<X>[] collects = get();
             if (collects != null) {
                 for (Iterable<X> ii : collects) {
+                    if (ii == null) continue;
                     ii.forEach(tl -> {
 
                         dead.remove(tl);
@@ -244,34 +252,32 @@ public class ConceptPane extends BorderPane implements ChangeListener {
     }
 
     public ConceptPane(NAR nar, Concept c) {
+        super();
 
-        concept = c;
+        //concept = c;
+        this.nar = nar;
 
 
         setTop(new Label(c.toInstanceString()));
 
-        Iterable<Task>[] taskCollects = new Iterable[] {
-                c.getBeliefs(),
-                c.getGoals(),
-                c.getQuestions(),
-                c.getQuests()
-        };
 
 
 //        //Label termlinks = new Label("Termlinks diagram");
 //        //Label tasklinks = new Label("Tasklnks diagram");
 //        tasks = new Scatter3D<Task>() {
 //
-//
-//
 //            @Override
 //            Iterable<Task>[] get() {
-//                return taskCollects;
+//                return new Iterable[] { c.getBeliefs(),
+//                        c.getGoals(),
+//                        c.getQuestions(),
+//                        c.getQuests() };
 //            }
 //
 //            @Override
 //            protected void update(Task tl, double[] position, double[] size, Consumer<Color> color) {
 //
+//                System.out.println("update: " + tl);
 //                if (tl.isQuestOrQuestion()) {
 //                    position[0] = -1;
 //                    position[1] = tl.getBestSolution() != null ? tl.getBestSolution().getConfidence() : 0;
@@ -316,14 +322,17 @@ public class ConceptPane extends BorderPane implements ChangeListener {
 //        BorderPane links = new BorderPane();
 //        setCenter(new SplitPane(new BorderPane(links), tasks.content));
 
+        tasks = new BeliefTablePane(c);
+        tasks.maxWidth(Double.MAX_VALUE);
+        tasks.maxHeight(Double.MAX_VALUE);
+        setCenter(tasks);
 
-        setCenter(new ConceptNeighborhoodGraph(nar, concept));
+        //setCenter(new ConceptNeighborhoodGraph(nar, concept));
 
         /*Label controls = new Label("Control Panel");
         setBottom(controls);*/
 
         visibleProperty().addListener(this);
-        changed(null, null, null);
     }
 
     public static class ConceptNeighborhoodGraph extends BorderPane {
@@ -384,16 +393,19 @@ public class ConceptPane extends BorderPane implements ChangeListener {
         //tasks.frame();
         /*taskLinkView.frame();
         termLinkView.frame();*/
+
+        tasks.frame();
+
     }
 
     @Override
     public void changed(ObservableValue observable, Object oldValue, Object newValue) {
         if (isVisible()) {
-            /*reaction = new FrameReaction(nar) {
+            reaction = new FrameReaction(nar) {
                 @Override public void onFrame() {
                     frame();
                 }
-            };*/
+            };
         }
         else {
             if (reaction!=null) {
@@ -429,4 +441,117 @@ public class ConceptPane extends BorderPane implements ChangeListener {
 
     }
 
+    public static class BeliefTablePane extends BorderPane {
+        final Canvas eternal, temporal;
+        private final Concept concept;
+
+        public BeliefTablePane(Concept c) {
+            super();
+            this.concept = c;
+            eternal = new Canvas(300, 300);
+            eternal.maxWidth(300);
+            eternal.maxHeight(300);
+            temporal = new Canvas(800, 400);
+            temporal.maxWidth(500);
+            temporal.maxHeight(300);
+
+            setCenter(temporal);
+            setLeft(eternal);
+        }
+
+        public void frame() {
+            //redraw
+            GraphicsContext ge = eternal.getGraphicsContext2D();
+            float gew = (float) ge.getCanvas().getWidth();
+            float geh = (float) ge.getCanvas().getHeight();
+            ge.clearRect(0,0, gew, geh);
+
+            GraphicsContext te = temporal.getGraphicsContext2D();
+            float tew = (float) te.getCanvas().getWidth();
+            float teh = (float) te.getCanvas().getHeight();
+            te.clearRect(0,0, tew, teh);
+
+            float b = 10;
+
+            List<Task> tt = Global.newArrayList();
+            if (!(concept.getBeliefs() instanceof DefaultBeliefTable)) return;
+
+            float minT = ((DefaultBeliefTable) concept.getBeliefs()).getMinT();
+            float maxT = ((DefaultBeliefTable) concept.getBeliefs()).getMaxT();
+
+            for (Task t : concept.getBeliefs()) {
+                if (t.isEternal() && t.getTruth()!=null) {
+                    float f = t.getFrequency();
+                    float c = t.getConfidence();
+                    float w = 20;
+                    float h = 20;
+                    float x = b + (gew-2*b-w) * f;
+                    float y = b + (geh-2*b-h) * (1-c);
+                    ge.setFill(new Color( f,  c, 0.25f, 1f));
+                    ge.fillRect(x-w/2,y-h/2,w,h);
+                } else if (!t.isEternal() && t.getTruth()!=null) {
+                    float f = t.getFrequency();
+                    float cc = t.getConfidence();
+                    float o = t.getOccurrenceTime();
+                    float w = 15;
+                    float h = 15;
+                    float x = b + ((o - minT) / (maxT-minT)) * (tew-2*b-w);
+                    float y = b + (teh-2*b-h) * (1-f);
+                    te.setFill(new Color( f,  cc, 0.25f, 1f*t.getOriginality()));
+                    te.fillRect(x-w/2,y-h/2,w,h);
+                    tt.add(t);
+                }
+            }
+
+            BeliefClusterer<Task> bc = new BeliefClusterer<Task>(tt.size()/3) {
+
+                protected float occ(long occ) {
+                    return ((occ - minT) / (maxT-minT));
+                }
+
+                @Override
+                protected double distance(Task a, double[] b) {
+                    float docc = (float)Math.abs(occ(a.getOccurrenceTime()) - b[0]);
+                    float dfreq = (float)Math.abs(a.getFrequency() - b[1]);
+
+                    //return docc + dfreq; //TODO euclidean?
+                    return Math.sqrt( docc*docc + dfreq*dfreq );
+                }
+
+                @Override
+                public ArrayRealVector p(Task task) {
+                    return new ArrayRealVector(
+                        new double[] { occ(task.getOccurrenceTime()), task.getFrequency() },
+                        false
+                    );
+                }
+
+                @Override
+                protected int getDimensions() {
+                    return 2;
+                }
+            };
+
+
+            final Comparator<? super Task> r = new Comparator<Task>() {
+                @Override
+                public int compare(Task o1, Task o2) {
+                    return Float.compare(
+                            o2.getConfidence()* o2.getOriginality(),
+                            o1.getConfidence()* o1.getOriginality()
+                    );
+                }
+            };
+
+            List<BeliefClusterer<Task>.Cluster> gt = bc.cluster(tt);
+            for (BeliefClusterer<Task>.Cluster cl : gt) {
+                Task w = cl.getWeakest(r);
+                //System.out.println("removed " + w + " remains: " + cl.getPoints());
+                if (w!=null) {
+                    //concept.getBeliefs().remove(w);
+                }
+            }
+            //System.out.println(gt);
+        }
+    }
 }

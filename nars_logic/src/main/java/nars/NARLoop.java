@@ -125,9 +125,6 @@ public class NARLoop implements Runnable {
     @Override
     public final void run() {
 
-
-
-
         AffinityLock al;
         if (cpuCoreReserve) {
             al = AffinityLock.acquireLock();

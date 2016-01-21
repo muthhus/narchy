@@ -79,6 +79,11 @@ public interface BeliefTable extends TaskTable {
             return input;
         }
 
+        @Override
+        public boolean remove(Task w) {
+            return false;
+        }
+
 
         @Override
         public Task topEternal() {
@@ -176,6 +181,8 @@ public interface BeliefTable extends TaskTable {
         if (max == -1) return Float.NaN;
         return max;
     }
+
+    boolean remove(Task w);
 
 
     final class SolutionQualityMatchingOrderRanker implements Ranker {

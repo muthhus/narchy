@@ -51,6 +51,27 @@ public class DefaultBeliefTable implements BeliefTable {
         );
     }
 
+    public long getMinT() {
+        return minT;
+    }
+
+    public long getMaxT() {
+        return maxT;
+    }
+
+    @Override
+    public boolean remove(Task w) {
+        if (w.isEternal()) {
+            return eternal.remove(w)!=null;
+        } else {
+            if (temporal.remove(w)!=null) {
+                updateTime(now, true);
+                return true;
+            }
+            return false;
+        }
+    }
+
     void updateTime(long now, boolean updateRange) {
         this.now = now;
         if (updateRange) {
@@ -218,7 +239,7 @@ public class DefaultBeliefTable implements BeliefTable {
                     addRevise(input, preTop, memory, now) :
                     input;
 
-            updateTime(now, result.isEternal());
+            updateTime(now, !result.isEternal());
         }
 
         return result;
