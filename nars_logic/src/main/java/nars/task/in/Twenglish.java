@@ -267,7 +267,7 @@ public class Twenglish {
 
         String sentenceID = Integer.toString(message.hashCode());
 
-        nar.input("say(sentence, " + sentenceID + "). :|:");
+        nar.input("say(sentence, " + sentenceID + ")! :|:");
         //float f = 1f;
         //float df = 0.5f / t.size();
         for (Term w : t) {
@@ -275,9 +275,9 @@ public class Twenglish {
             //nar.frame(1);
 
             //nar.input("(sentence(" + sentenceID + ") ==> say(" + w + ")). :|:");
-
-            nar.input("say(" + w + ")! %1|0.9%");
             nar.frame(wordDelay);
+
+            nar.input("say(" + w + ")! :|: %1.0;0.9%");
 
 
             //nar.input("say(" + w + "). %1|0.9%"); //silence

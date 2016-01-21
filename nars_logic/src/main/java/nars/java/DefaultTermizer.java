@@ -366,8 +366,8 @@ public class DefaultTermizer implements Termizer {
     }
 
     private boolean cacheableInstance(Object o) {
-        if (o instanceof Float)
-            return false;
+//        if (o instanceof Float)
+//            return false;
         return true;
     }
 

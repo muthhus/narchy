@@ -114,7 +114,7 @@ public class MarkovlikeTest {
 	public static void speak(NAR n, String sentenceID, int speakTime) {
 		// d.frame(1000);
 
-		n.input("say(sentence, " + sentenceID + ")! :|:");
+		n.input("say(sentence, " + sentenceID + "). :|:");
 		// d.input("$1.0$ echo(#x)! :|: %0.55%");
 
 		n.frame(speakTime);

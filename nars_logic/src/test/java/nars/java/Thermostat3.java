@@ -179,11 +179,11 @@ public class Thermostat3 {
 
     public void train() {
 
-        n.input("UnitValTaskInc_inc(h,((--,true)))!  %1.0;0.55%");
-        n.input("UnitValTaskInc_inc(h,(true))! %1.0;0.55%");
-        n.input("({0}-->(/,^UnitVal_compare,h,?p,_))!");
-        //n.input("({-1}-->(/,^UnitVal_compare,h,#p,_))! :|: %0%");
-        //n.input("({1}-->(/,^UnitVal_compare,h,#p,_))! :|: %0%");
+        n.input("UnitValTaskInc_inc(h,((--,true)),#x)!  %1.0;0.55%");
+        n.input("UnitValTaskInc_inc(h,(true),#x)! %1.0;0.55%");
+        n.input("(0-->(/,^UnitVal_compare,h,(#p),_))!");
+        n.input("(-1-->(/,^UnitVal_compare,h,(#p),_))! %0%");
+        n.input("(1-->(/,^UnitVal_compare,h,(#p),_))! %0%");
 
 
 
