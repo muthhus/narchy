@@ -4,6 +4,7 @@ import nars.Memory;
 import nars.budget.BudgetMerge;
 import nars.task.Task;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiPredicate;
 
@@ -18,7 +19,20 @@ public interface QuestionTaskTable extends TaskTable {
      * @return: the input task itself, it it was added to the table
      * an existing equivalent task if this was a duplicate
      */
-
     @NotNull
     Task add(Task t, BiPredicate<Task, Task> equality, BudgetMerge duplicateMerge, Memory m);
+
+
+    /**
+     * @return null if no duplicate was discovered, or the first Task that matched if one was
+     */
+    @Nullable
+    Task getFirstEquivalent(Task t, @NotNull BiPredicate<Task,Task>  e);
+//    {
+//        for (Task a : this) {
+//            if (e.test(a, t))
+//                return a;
+//        }
+//        return null;
+//    }
 }

@@ -34,6 +34,7 @@ public class DefaultConcept extends AtomConcept {
      * how incoming budget is merged into its existing duplicate quest/question
      */
     static final BudgetMerge duplicateQuestionMerge = BudgetMerge.plusDQDominated;
+
     @Nullable
     private final Termed[] termLinkTemplates;
 
@@ -164,25 +165,7 @@ public class DefaultConcept extends AtomConcept {
 //            linkTerms(aggregateBudget, true);
 //        }
 //    }
-//
 
-
-    /**
-     * attempt to insert a task.
-     *
-     * @param c   the concept in which this occurrs
-     * @param nal
-     * @return: the input value that was inserted, if it was added to the table
-     * a previous stored task if this was a duplicate (table unchanged)
-     * a new belief created from older ones which serves as a revision of what was input, if it was added to the table
-     * null if it was discarded
-     */
-
-
-    @NotNull
-    Task add(@NotNull QuestionTaskTable table, @NotNull Task input, BiPredicate<Task, Task> eq, BudgetMerge duplicateMerge, Memory memory) {
-        return table.add(input, eq, duplicateMerge, memory);
-    }
 
 
     /**
@@ -192,9 +175,9 @@ public class DefaultConcept extends AtomConcept {
      * @param nar
      * @return Whether to continue the processing of the task
      */
-    @Nullable
+    @NotNull
     @Override
-    public Task processBelief(Task belief, @NotNull NAR nar) {
+    public Task processBelief(@NotNull Task belief, @NotNull NAR nar) {
 
         long now = nar.time();
         float successBefore = getSuccess(now);
@@ -205,14 +188,13 @@ public class DefaultConcept extends AtomConcept {
         if (beliefs == null)
             beliefs = this.beliefs = new DefaultBeliefTable(memory.conceptBeliefsMax.intValue(), memory);
 
-        return beliefs.add(belief, memory, (best) -> {
+        Task best = beliefs.add(belief, memory);
 
-            if (hasQuestions()) {
-                //TODO move this to a subclass of TaskTable which is customized for questions. then an arraylist impl of TaskTable can iterate by integer index and not this iterator/lambda
-                getQuestions().forEach(question ->
-                    LocalRules.trySolution(question, best, nar, nar::input)
-                );
-            }
+        if (hasQuestions()) {
+            //TODO move this to a subclass of TaskTable which is customized for questions. then an arraylist impl of TaskTable can iterate by integer index and not this iterator/lambda
+            getQuestions().forEach(question ->
+                    LocalRules.trySolution(question, best, nar, nar)
+            );
 
             /** update happiness meter on solution  TODO revise */
             float successAfter = getSuccess(now);
@@ -220,9 +202,9 @@ public class DefaultConcept extends AtomConcept {
             if (delta != 0) //more satisfaction of a goal due to belief, more happiness
                 memory.emotion.happy(delta);
 
-            memory.eventConceptChanged.emit(DefaultConcept.this);
+        }
 
-        });
+        return best;
 
 //        if (belief.isInput() && !belief.isEternal()) {
 //            this.put(Anticipate.class, true);
@@ -238,9 +220,9 @@ public class DefaultConcept extends AtomConcept {
      * @param task
      * @return Whether to continue the processing of the task
      */
-    @Nullable
+    @NotNull
     @Override
-    public Task processGoal(Task inputGoal, @NotNull NAR nar) {
+    public Task processGoal(@NotNull Task inputGoal, @NotNull NAR nar) {
 
         Memory memory = nar.memory;
 
@@ -252,18 +234,18 @@ public class DefaultConcept extends AtomConcept {
         if (goals == null) goals = new DefaultBeliefTable(
                 nar.memory.conceptGoalsMax.intValue(), memory);
 
-        return getGoals().add(inputGoal, memory, (goal) -> {
+        Task goal = getGoals().add(inputGoal, memory);
 
-            float successAfter = getSuccess(now);
-            float delta = successBefore - successAfter;
+        float successAfter = getSuccess(now);
+        float delta = successBefore - successAfter;
 
-            // less desire of a goal, more happiness
-            memory.emotion.happy(goal.getExpectation() * -delta);
+        // less desire of a goal, more happiness
+        memory.emotion.happy(goal.getExpectation() * -delta);
 
-            if (Op.isOperation(goal.term()) && (goal.getState() != Task.TaskState.Executed)) {
-                if (delta >= Global.EXECUTION_SATISFACTION_TRESHOLD) {
-                    //Truth projected = goal.projection(now, now);
-                    if (goal.getExpectation() > Global.EXECUTION_DESIRE_EXPECTATION_THRESHOLD) {
+        if (Op.isOperation(goal.term()) && (goal.getState() != Task.TaskState.Executed)) {
+            if (delta >= Global.EXECUTION_SATISFACTION_TRESHOLD) {
+                //Truth projected = goal.projection(now, now);
+                if (goal.getExpectation() > Global.EXECUTION_DESIRE_EXPECTATION_THRESHOLD) {
 
 
 //                        LongHashSet ev = this.lastevidence;
@@ -272,7 +254,7 @@ public class DefaultConcept extends AtomConcept {
 //                        //then there is no need to execute
 //                        //which means only execute if there is new evidence which suggests doing so1
 //                        if (ev.addAll(input.getEvidence())) {
-                        nar.execute(goal);
+                    nar.execute(goal);
 
 //                            //TODO more efficient size limiting
 //                            //lastevidence.toSortedList()
@@ -280,14 +262,15 @@ public class DefaultConcept extends AtomConcept {
 //                                ev.remove( ev.min() );
 //                            }
 //                        }
-                    }
                 }
             }
-        });
+        }
+        return goal;
+    }
 
 
-        //long then = goal.getOccurrenceTime();
-        //int dur = nal.duration();
+    //long then = goal.getOccurrenceTime();
+    //int dur = nal.duration();
 
 //        //this task is not up to date (now is ahead of then) we have to project it first
 //        if(TemporalRules.after(then, now, dur)) {
@@ -333,7 +316,7 @@ public class DefaultConcept extends AtomConcept {
 //            }
 
 
-    }
+
 
 
 //    public static void questionFromGoal(final Task task, final Premise p) {
@@ -379,7 +362,7 @@ public class DefaultConcept extends AtomConcept {
     /**
      * To answer a quest or q by existing beliefs
      *
-     * @param q    The task to be processed
+     * @param q   The task to be processed
      * @param nar
      * @return the relevant task
      */
@@ -410,7 +393,7 @@ public class DefaultConcept extends AtomConcept {
         //boolean tableAffected = false;
         //boolean newQuestion = table.isEmpty();
 
-        q = add(questionTable, q, questionEquivalence, duplicateQuestionMerge, nar.memory);
+        q = questionTable.add(q, questionEquivalence, duplicateQuestionMerge, nar.memory);
 
 
         //TODO if the table was not affected, does the following still need to happen:
@@ -423,13 +406,11 @@ public class DefaultConcept extends AtomConcept {
         if (sol != null) {
 
             if (sol.getDeleted()) {
-                throw new RuntimeException("can not try solution on deleted task: " + sol);
+                throw new RuntimeException("should not have received deleted task: " + sol);
 //                return true;
             }
 
-            LocalRules.trySolution(q, sol, nar, nar::input); /*(s) -> {
-                //...
-            });*/
+            LocalRules.trySolution(q, sol, nar, nar);
         }
 
         return q;
@@ -667,13 +648,12 @@ public class DefaultConcept extends AtomConcept {
      * called in Memory.immediateProcess only
      *
      * @return the relevant, non-null, non-deleted Task, which will either be:
-     *      --the input
-     *      --an existing one which absorbed the input and will re-fire
-     *      --a revised/projected task which may or may not remain in the belief table
-     *
-     *
+     * --the input
+     * --an existing one which absorbed the input and will re-fire
+     * --a revised/projected task which may or may not remain in the belief table
      */
-    @NotNull public final Task process(@NotNull final Task task, @NotNull NAR nar) {
+    @NotNull
+    public final Task process(@NotNull final Task task, @NotNull NAR nar) {
 
         task.onConcept(this);
 

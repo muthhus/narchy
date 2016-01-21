@@ -38,17 +38,18 @@ public class DefaultBeliefTable implements BeliefTable {
     public DefaultBeliefTable(int cap, @NotNull Memory memory) {
         super();
 
-        this.map = new HashMap(cap/2);
+        if (cap == 1) cap = 2;
+
+        this.map = new HashMap(cap);
         this.now = memory.time();
         this.minT = this.maxT = Tense.TIMELESS;
         this.tRange = 1;
 
-        if (cap == 1) cap = 2;
         eternal = new SetTable<Task>(cap/2, map,
-                Truthed::getConfidence
+            Truthed::getConfidence //TODO consider originality?
         );
         temporal = new SetTable<Task>(cap/2, map,
-            b -> rankTemporal(b, now)
+            this::rankTemporal
         );
     }
 
@@ -71,6 +72,10 @@ public class DefaultBeliefTable implements BeliefTable {
         }
     }
 
+
+    public float rankTemporal(@NotNull Task b) {
+        return rankTemporal(b, now);
+    }
 
     public float rankTemporal(@NotNull Task b, long when) {
         return b.getConfidence()/((1f+Math.abs(b.getOccurrenceTime() - when))/tRange);
@@ -194,33 +199,30 @@ public class DefaultBeliefTable implements BeliefTable {
      * if the new task is rejected, it will be deleted. callee must check
      * for this condition
      */
-    @Nullable
+    @NotNull
     @Override
-    public Task add(@NotNull Task input, @NotNull Memory memory, @NotNull Consumer<Task> onBeliefChanged) {
+    public Task add(@NotNull Task input, @NotNull Memory memory) {
 
         long now = this.now = memory.time();
 
-        boolean eternal = input.isEternal();
-
-        Task preTop = eternal ? topEternal() : top(now);
-        boolean tableChanged = insert(input, memory);
+        Task preTop = input.isEternal() ? topEternal() : top(now);
 
         Task result;
-        if (!tableChanged) {
+
+        if (!insert(input, memory)) {
             result = preTop;
         } else {
             result = (preTop != null) ?
                     addRevise(input, preTop, memory, now) :
                     input;
 
-            onBeliefChanged.accept(result);
-            updateTime(now, !eternal);
+            updateTime(now, result.isEternal());
         }
 
         return result;
     }
 
-    @Nullable
+    @NotNull
     Task addRevise(@NotNull Task input, @NotNull Task preTop, @NotNull Memory memory, long now) {
         //TODO make sure input.isDeleted() can not happen
 

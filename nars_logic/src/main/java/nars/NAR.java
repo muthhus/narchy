@@ -36,7 +36,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.Executors;
@@ -60,7 +59,7 @@ import static nars.nal.Tense.ETERNAL;
  * * step mode - controlled by an outside system, such as during debugging or testing
  * * thread mode - runs in a pausable closed-loop at a specific maximum framerate.
  */
-public abstract class NAR implements Serializable, Level {
+public abstract class NAR implements Level,Consumer<Task> {
 
 
     /**
@@ -434,6 +433,10 @@ public abstract class NAR implements Serializable, Level {
         memory.eventInput.emit(t);
 
         return true;
+    }
+
+    @Override public final void accept(Task task) {
+        input(task);
     }
 
     /**

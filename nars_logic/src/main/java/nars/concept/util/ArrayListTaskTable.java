@@ -84,7 +84,7 @@ public class ArrayListTaskTable implements QuestionTaskTable {
     }
 
 
-    @Nullable
+    @NotNull
     @Override
     public Task add(@NotNull Task t, @NotNull BiPredicate<Task,Task> equality, @NotNull BudgetMerge duplicateMerge, @NotNull Memory m) {
 

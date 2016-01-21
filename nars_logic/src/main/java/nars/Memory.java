@@ -111,7 +111,7 @@ public class Memory extends Param {
     public final transient Topic<Task> eventDerived = new DefaultTopic<>();
 
     public final transient Topic<Twin<Task>> eventAnswer = new DefaultTopic<>();
-    public final transient Topic<Concept> eventConceptChanged = new DefaultTopic();
+
 
     /** executables (incl. operators).
      * keys in this map should be OPERATOR (^something)

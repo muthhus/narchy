@@ -6,7 +6,6 @@ import org.apache.commons.math3.analysis.interpolation.UnivariateInterpolator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
 /**
@@ -29,17 +28,7 @@ public interface TaskTable extends Iterable<Task> {
     boolean isEmpty();
 
 
-    /**
-     * @return null if no duplicate was discovered, or the first Task that matched if one was
-     */
-    @Nullable
-    default Task getFirstEquivalent(Task t, @NotNull BiPredicate<Task,Task>  e) {
-        for (Task a : this) {
-            if (e.test(a, t))
-                return a;
-        }
-        return null;
-    }
+
 
 
     @Nullable

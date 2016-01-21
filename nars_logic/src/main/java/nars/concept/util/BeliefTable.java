@@ -16,7 +16,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Random;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -27,8 +26,8 @@ public interface BeliefTable extends TaskTable {
 
     /** main method */
 
-    @Nullable
-    Task add(Task input, Memory memory, Consumer<Task> onBeliefChanged);
+    @NotNull
+    Task add(@NotNull Task input, Memory memory);
 
     /* when does projecting to now not play a role? I guess there is no case,
     //wo we use just one ranker anymore, the normal solution ranker which takes
@@ -74,6 +73,13 @@ public interface BeliefTable extends TaskTable {
             return true;
         }
 
+        @NotNull
+        @Override
+        public Task add(@NotNull Task input, Memory memory) {
+            return input;
+        }
+
+
         @Override
         public Task topEternal() {
             return null;
@@ -85,11 +91,6 @@ public interface BeliefTable extends TaskTable {
             return null;
         }
 
-        @Nullable
-        @Override
-        public Task add(Task input, Memory memory, Consumer<Task> onBeliefChanged) {
-            return null;
-        }
 
 
     };
@@ -250,11 +251,14 @@ public interface BeliefTable extends TaskTable {
 
         Task tmp = topTemporal(t);
 
-        if (tmp == null && ete == null) return null;
-        if (tmp == null) return ete;
-        if (ete == null) return tmp;
-        return (ete.getConfidence() >= tmp.getConfidence()) ?
+        if (tmp == null) {
+            return ete;
+        } else if (ete == null) {
+            return tmp;
+        } else {
+            return (ete.getConfidence() >= tmp.getConfidence()) ?
                     ete : tmp;
+        }
     }
 
 
