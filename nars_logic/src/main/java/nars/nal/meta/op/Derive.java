@@ -197,10 +197,13 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
             BLink<Task> tLink = p.taskLink;
             BLink<Termed> bLink = p.termLink;
 
-            //TODO check for Question
-            float oneMinusDifT = 1f - conclusion.getExpDifAbs(tLink.get().getTruth());
-            tLink.andPriority(oneMinusDifT);
-            tLink.andDurability(oneMinusDifT);
+            //TODO check this Question case is right
+            Truth tLinkTruth = tLink.get().getTruth();
+            if (tLinkTruth!=null) {
+                float oneMinusDifT = 1f - conclusion.getExpDifAbs(tLinkTruth);
+                tLink.andPriority(oneMinusDifT);
+                tLink.andDurability(oneMinusDifT);
+            }
 
             Task belief = p.getBelief();
             if (belief!=null) {

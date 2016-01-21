@@ -185,6 +185,7 @@ public enum ThermostatTest2 {
         String notValid = "<(--,true) --> (/, ^Model_valid, T, (), _)>";*/
 
         String isValid = "<0 --> (/, ^Model_go, T, ?x, _)>";
+        String isValid2 = "<0 --> (/, ^Model_go, T, #x, _)>";
 //        String notValid = "<(--,true) --> (/, ^Model_valid, T, (), _)>";
 //
 //        String up = "Model_go(T, (1, true), #x)";
@@ -202,6 +203,7 @@ public enum ThermostatTest2 {
 //                n.input(down + "@ :|:");
 
         n.input(isValid + '?');
+        n.input(isValid + '!');
 //        n.should(isValidThen.apply($(up)));
 //        n.should(isValidThen.apply($(down)));
 //        n.should(notValidThen.apply($(up)));
@@ -210,22 +212,32 @@ public enum ThermostatTest2 {
 
 //                n.input(notValid + "! %0%");
 
-        int runs = 25;
-        int runLength = 5000;
-        float initialGamma = 1f/500;
+        int runs = 50;
+        int runLength = 2000;
+        float gamma = 1f/2f;
+        float inputRate = 1/20f;
+        float gammaScale = 0.95f; //decrease gamma probability per run
 
         for (int i = 0; i < runs; i++) {
 
             reset(tc, range);
 
-            float gamma = initialGamma / i;
             for (int j = 0; j < runLength; j++){
-                if (n.memory.random.nextFloat() < gamma) {
-                    tc.go( n.memory.random.nextBoolean() );
+
+                if (n.memory.random.nextFloat() < inputRate) {
+                    if (n.memory.random.nextFloat() < gamma) {
+                        tc.go( n.memory.random.nextBoolean() );
+                    } else {
+                        //n.input("Model_go((T,(true),#1))! :|: %0.51%");
+                        //n.input("Model_go((T,((--,true)),#1))! :|: %0.51%");
+                        n.input(isValid2 + "! :|:");
+                    }
                 }
 
                 n.frame();
             }
+
+            gamma *= gammaScale;
 
             //tc.go(true); n.frame(dur*2); ///*tc.valid();*/ n.frame(dur*4);
             //tc.go(false); n.frame(dur*2); ///*tc.valid();*/ n.frame(dur*4);
