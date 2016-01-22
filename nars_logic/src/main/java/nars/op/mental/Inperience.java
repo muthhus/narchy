@@ -136,7 +136,7 @@ public class Inperience {
 
     public static Compound toTerm(@NotNull Task s, Term self, float conceptCreationExpectation) {
         Operator opTerm;
-        switch (s.getPunctuation()) {
+        switch (s.punc()) {
             case Symbols.JUDGMENT:
                 opTerm = believe;
                 break;
@@ -153,7 +153,7 @@ public class Inperience {
                 return null;
         }
 
-        Truth tr = s.getTruth();
+        Truth tr = s.truth();
         Term[] arg = new Term[1 + (tr == null ? 1 : 2)];
         arg[0] = s.term();
         int k = 1;

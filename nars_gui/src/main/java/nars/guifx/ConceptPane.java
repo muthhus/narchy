@@ -18,6 +18,7 @@ import nars.Global;
 import nars.NAR;
 import nars.bag.Bag;
 import nars.concept.Concept;
+import nars.concept.util.BeliefTable;
 import nars.concept.util.DefaultBeliefTable;
 import nars.guifx.demo.SubButton;
 import nars.guifx.graph2.TermEdge;
@@ -387,12 +388,12 @@ public class ConceptPane extends BorderPane implements ChangeListener {
 
 
 
-    protected void frame() {
+    protected void frame(long now) {
         //tasks.frame();
         /*taskLinkView.frame();
         termLinkView.frame();*/
 
-        tasks.frame();
+        tasks.frame(now);
 
     }
 
@@ -401,7 +402,7 @@ public class ConceptPane extends BorderPane implements ChangeListener {
         if (isVisible()) {
             reaction = new FrameReaction(nar) {
                 @Override public void onFrame() {
-                    frame();
+                    frame(nar.time());
                 }
             };
         }
@@ -457,7 +458,7 @@ public class ConceptPane extends BorderPane implements ChangeListener {
             setLeft(eternal);
         }
 
-        public void frame() {
+        public void frame(long now) {
             //redraw
             GraphicsContext ge = eternal.getGraphicsContext2D();
             float gew = (float) ge.getCanvas().getWidth();
@@ -477,30 +478,44 @@ public class ConceptPane extends BorderPane implements ChangeListener {
             float minT = ((DefaultBeliefTable) concept.getBeliefs()).getMinT();
             float maxT = ((DefaultBeliefTable) concept.getBeliefs()).getMaxT();
 
+            //Present axis line
+            float nowLineWidth = 5;
+            float nx = xTime(tew, b, minT, maxT, now, nowLineWidth);
+            te.setFill(Color.WHITE);
+            te.fillRect(nx-nowLineWidth/2f, 0, nowLineWidth, teh);
+
+
             for (Task t : concept.getBeliefs()) {
-                if (t.isEternal() && t.getTruth()!=null) {
+                if (t.isEternal() && t.truth()!=null) {
                     float f = t.getFrequency();
                     float c = t.getConfidence();
                     float w = 20;
                     float h = 20;
-                    float x = b + (gew-2*b-w) * f;
-                    float y = b + (geh-2*b-h) * (1-c);
-                    ge.setFill(new Color( f,  c, 0.25f, 1f));
+                    float x = b + (gew-2*b-w) * c;
+                    float y = b + (geh-2*b-h) * (1-f);
+                    float rank = BeliefTable.rankEternal(t);
+                    ge.setFill(new Color( f,  c, 1f, rank));
                     ge.fillRect(x-w/2,y-h/2,w,h);
-                } else if (!t.isEternal() && t.getTruth()!=null) {
+                } else if (!t.isEternal() && t.truth()!=null) {
                     float f = t.getFrequency();
                     float cc = t.getConfidence();
                     float o = t.getOccurrenceTime();
                     float w = 15;
                     float h = 15;
-                    float x = b + ((o - minT) / (maxT-minT)) * (tew-2*b-w);
+                    float x = xTime(tew, b, minT, maxT, o, w);
                     float y = b + (teh-2*b-h) * (1-f);
-                    te.setFill(new Color( f,  cc, 0.25f, 1f*t.getOriginality()));
+                    float rank = BeliefTable.rankTemporal(t, now, now);
+                    te.setFill(new Color( f,  cc, 1f, rank));
                     te.fillRect(x-w/2,y-h/2,w,h);
                     tt.add(t);
                 }
+
             }
 
+        }
+
+        private float xTime(float tew, float b, float minT, float maxT, float o, float w) {
+            return b + ((o - minT) / (maxT-minT)) * (tew-2*b-w);
         }
     }
 }

@@ -658,7 +658,7 @@ public class DefaultConcept extends AtomConcept {
 
         task.onConcept(this);
 
-        switch (task.getPunctuation()) {
+        switch (task.punc()) {
             case Symbols.JUDGMENT:
                 return processBelief(task, nar);
 

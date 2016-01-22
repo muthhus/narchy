@@ -140,27 +140,18 @@ public enum LocalRules {
 
         Consumer<Term> proc = (st) -> {
 
-            long questionOcc = question.getOccurrenceTime();
+            Task ss = sol.solution((Compound)st, question, memory );
 
-            Truth solutionTruth = sol.projection(questionOcc, now);
-
-            Task ss = sol.solution((Compound) st,
-                        sol.getPunctuation(),
-                        solutionTruth,
-                        questionOcc,
-                        question,
-                        memory
-                );
-
-
-            //TODO move this to a callee's consumer?
             if (processSolution(question, nal, ss, memory, now)) {
+
+                //System.out.println(question + " " + ss + " " + ss.getExplanation());
 
                 if (Global.DEBUG_NON_INPUT_ANSWERED_QUESTIONS || question.isInput())
                     answered.add(question);
             }
 
         };
+
 
         Compound quesTerm = question.term();
         Compound solTerm = sol.term();
@@ -307,7 +298,7 @@ public enum LocalRules {
         } else {
             float taskPriority = question.getPriority();
 
-            budget = new UnitBudget(UtilityFunctions.or(taskPriority, quality), question.getDurability(), BudgetFunctions.truthToQuality(solution.getTruth()));
+            budget = new UnitBudget(UtilityFunctions.or(taskPriority, quality), question.getDurability(), BudgetFunctions.truthToQuality(solution.truth()));
             question.getBudget().setPriority(Math.min(1 - quality, taskPriority));
         }
         /*
@@ -347,7 +338,7 @@ public enum LocalRules {
         }
         //if (Tense.matchingOrder(newBelief.getTemporalOrder(), oldBelief.getTemporalOrder()))
 
-        Truth newBeliefTruth = newBelief.getTruth();
+        Truth newBeliefTruth = newBelief.truth();
 
         long occ = newBelief.getOccurrenceTime();
 
@@ -375,7 +366,7 @@ public enum LocalRules {
         }
 
         return new MutableTask(newBelief.concept())
-                .punctuation(newBelief.getPunctuation())
+                .punctuation(newBelief.punc())
                 .truth(conclusion)
                 .budget(BudgetFunctions.revise(newBeliefTruth, oldBelief, conclusion, newBelief.getBudget()))
                 .parent(newBelief, oldBelief)

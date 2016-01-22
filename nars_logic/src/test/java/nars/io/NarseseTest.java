@@ -67,7 +67,7 @@ public class NarseseTest {
         Task t = task("$0.99;0.95$ <a --> b>! %0.93;0.95%");
 
         assertNotNull(t);
-        assertEquals('!', t.getPunctuation());
+        assertEquals('!', t.punc());
         assertEquals(0.99f, t.getPriority(), 0.001);
         assertEquals(0.95f, t.getDurability(), 0.001);
         assertEquals(0.93f, t.getFrequency(), 0.001);
@@ -90,7 +90,7 @@ public class NarseseTest {
     public void testTruth(String t, float freq, float conf) {
         String s = "a:b. " + t;
 
-        Truth truth = task(s).getTruth();
+        Truth truth = task(s).truth();
         assertEquals(freq, truth.getFrequency(), 0.001);
         assertEquals(conf, truth.getConfidence(), 0.001);
     }
@@ -103,10 +103,10 @@ public class NarseseTest {
         Compound i = t.term();
         assertEquals("a", i.term(0).toString());
         assertEquals("b", i.term(1).toString());
-        assertEquals('.', t.getPunctuation());
+        assertEquals('.', t.punc());
         //assertEquals(Global.DEFAULT_JUDGMENT_PRIORITY, t.getPriority(), 0.001);
         //assertEquals(Global.DEFAULT_JUDGMENT_DURABILITY, t.getDurability(), 0.001);
-        assertEquals(1.0f, t.getTruth().getFrequency(), 0.001);
+        assertEquals(1.0f, t.truth().getFrequency(), 0.001);
         //assertEquals(Global.DEFAULT_JUDGMENT_CONFIDENCE, t.getTruth().getConfidence(), 0.001);
     }
 
@@ -135,7 +135,7 @@ public class NarseseTest {
         assertNotNull(t);
         assertEquals(Op.EQUIV, t.op());
 
-        assertEquals('.', t.getPunctuation());
+        assertEquals('.', t.punc());
         //assertEquals(Global.DEFAULT_JUDGMENT_PRIORITY, t.getPriority(), 0.001);
         //assertEquals(Global.DEFAULT_JUDGMENT_DURABILITY, t.getDurability(), 0.001);
         assertEquals(0.0f, t.getFrequency(), 0.001);
@@ -149,8 +149,8 @@ public class NarseseTest {
         assertNotNull(t);
         assertEquals(Op.INHERIT, t.op());
         assertEquals(tt, t.term().toString());
-        assertEquals('?', t.getPunctuation());
-        assertNull(t.getTruth());
+        assertEquals('?', t.punc());
+        assertNull(t.truth());
         assertEquals(7, t.term().complexity());
     }
 
@@ -183,8 +183,8 @@ public class NarseseTest {
         assertNotNull(t);
         assertEquals(Op.PRODUCT, t.op());
         assertEquals(tt, t.term().toString());
-        assertEquals('@', t.getPunctuation());
-        assertNull(t.getTruth());
+        assertEquals('@', t.punc());
+        assertNull(t.truth());
 
     }
 

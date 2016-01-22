@@ -123,7 +123,7 @@ public interface BeliefTable extends TaskTable {
 
 
         for (Task x : this) {
-            r -= x.getTruth().getConfidence();
+            r -= x.truth().getConfidence();
             if (r < 0)
                 return x;
         }
@@ -139,7 +139,7 @@ public interface BeliefTable extends TaskTable {
     static float getConfidenceSum(@NotNull Iterable<? extends Truthed> beliefs) {
         float t = 0;
         for (Truthed s : beliefs)
-            t += s.getTruth().getConfidence();
+            t += s.truth().getConfidence();
         return t;
     }
 
@@ -148,7 +148,7 @@ public interface BeliefTable extends TaskTable {
 
         float t = 0;
         for (Truthed s : beliefs)
-            t += s.getTruth().getFrequency();
+            t += s.truth().getFrequency();
         return t / beliefs.size();
     }
 
@@ -168,10 +168,10 @@ public interface BeliefTable extends TaskTable {
         float max = Float.NEGATIVE_INFINITY;
 
         for (Task t : this) {
-            float f = t.getTruth().getFrequency();
+            float f = t.truth().getFrequency();
 
             if ((f >= minFreq) && (f <= maxFreq)) {
-                float c = t.getTruth().getConfidence();
+                float c = t.truth().getConfidence();
                 if (c > max)
                     max = c;
             }
@@ -187,7 +187,8 @@ public interface BeliefTable extends TaskTable {
 
 
     public static float rankTemporal(@NotNull Task b, long when, long tRange) {
-        return b.getConfidence()/((1f+Math.abs(b.getOccurrenceTime() - when))/(tRange))*b.getOriginality();
+        return rankEternal(b)*
+                (1f/(1f+ (Math.abs(b.getOccurrenceTime() - when)/((float)tRange))) );
     }
 
     public static float rankEternal(@NotNull Task b) {
@@ -215,7 +216,7 @@ public interface BeliefTable extends TaskTable {
         } else if (ete == null) {
             return tmp;
         } else {
-            return ( ete.getConfidence() >= tmp.getConfidence()) ?
+            return ( ete.getConfidence() > tmp.getConfidence()) ?
                     ete : tmp;
         }
     }
@@ -225,7 +226,7 @@ public interface BeliefTable extends TaskTable {
     @Nullable
     default Truth topTruth(long now) {
         if (isEmpty()) return null;
-        return top(now).getTruth();
+        return top(now).truth();
     }
 
     default void print(@NotNull PrintStream out) {

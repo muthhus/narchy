@@ -159,9 +159,9 @@ public class NAL1Test extends AbstractNALTester {
            .answer(question, a -> { //.en("What is a type of swimmer?")
 
                 //test for a few task conditions, everything except for evidence
-                if (a.getPunctuation() == expectedTask.getPunctuation())
+                if (a.punc() == expectedTask.punc())
                     if (a.term().equals(expectedTask.term())) {
-                        if (Objects.equals(a.getTruth(), expectedTask.getTruth()))
+                        if (Objects.equals(a.truth(), expectedTask.truth()))
                             solved.set(true);
                 }
 

@@ -83,7 +83,7 @@ public enum Tense  {
         //TODO avoid creating new Truth instances
         Truth truth = (poc != solution.getOccurrenceTime()) ?
                 solution.projection(poc, time) :
-                solution.getTruth();
+                solution.truth();
 
         //if (problem.hasQueryVar()) {
         float originality = solution.getOriginality();

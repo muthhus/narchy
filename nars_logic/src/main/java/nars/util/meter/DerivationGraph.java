@@ -495,12 +495,12 @@ public class DerivationGraph extends DirectedPseudograph<DerivationGraph.Keyed,O
     public static String genericString(@NotNull Task s, ObjectIntHashMap<Term> unique, long now, boolean includeTruth) {
         String t = genericString(s.term(), unique);
 
-        t += s.getPunctuation();
+        t += s.punc();
 
 
         if (includeTruth) {
             t += " %";
-            t += s.getTruth() != null ? Texts.n2(s.getFrequency()) + ";" + Texts.n2(s.getConfidence()) : "?;?";
+            t += s.truth() != null ? Texts.n2(s.getFrequency()) + ";" + Texts.n2(s.getConfidence()) : "?;?";
             t += "%";
         }
 

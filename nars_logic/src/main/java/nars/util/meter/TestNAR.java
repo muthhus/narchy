@@ -311,14 +311,14 @@ public class TestNAR  {
 
         long now = time();
         String termString = t.term().toString();
-        if (t.getTruth()!=null) {
+        if (t.truth()!=null) {
             float freq = t.getFrequency();
             float conf = t.getConfidence();
             long occurrence = t.getOccurrenceTime();
-            return mustEmit(c, now, now + withinCycles, termString, t.getPunctuation(), freq, freq, conf, conf, occurrence);
+            return mustEmit(c, now, now + withinCycles, termString, t.punc(), freq, freq, conf, conf, occurrence);
         }
         else {
-            return mustEmit(c, now, now + withinCycles, termString, t.getPunctuation(), -1, -1, -1, -1);
+            return mustEmit(c, now, now + withinCycles, termString, t.punc(), -1, -1, -1, -1);
         }
     }
 

@@ -52,7 +52,7 @@ public class TaskPunctuation extends AtomicBooleanCondition<PremiseMatch> {
 
     @Override
     public boolean booleanValueOf(@NotNull PremiseMatch m) {
-        char taskPunc = m.premise.getTask().getPunctuation();
+        char taskPunc = m.premise.getTask().punc();
         return test(taskPunc);
     }
 

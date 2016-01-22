@@ -56,7 +56,7 @@ abstract public class Solve extends AtomicBooleanCondition<PremiseMatch> {
             return new Solve(i, der) {
                 @Override public boolean booleanValueOf(@NotNull PremiseMatch m) {
                     return measure(m,
-                            m.premise.getTask().getPunctuation(),
+                            m.premise.getTask().punc(),
                             belief, desire);
                 }
             };

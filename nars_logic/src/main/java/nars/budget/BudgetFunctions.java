@@ -65,7 +65,7 @@ public final class BudgetFunctions extends UtilityFunctions {
 	public static Budget revise(@NotNull Truth tTruth, @NotNull Task oldBelief, @NotNull Truth conclusion,
 								@NotNull Budget tb) {
 
-		Truth bTruth = oldBelief.getTruth();
+		Truth bTruth = oldBelief.truth();
 		float difT = conclusion.getExpDifAbs(tTruth);
 
 		tb.andPriority(1.0f - difT);

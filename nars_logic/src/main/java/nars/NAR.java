@@ -963,7 +963,7 @@ public abstract class NAR implements Level,Consumer<Task> {
 
     public On onQuestion(@NotNull PatternAnswer p) {
         return memory.eventTaskProcess.on(question -> {
-            if (question.getPunctuation() == '?') {
+            if (question.punc() == '?') {
                 beforeNextFrame(() -> {
                     List<Task> l = p.apply(question);
                     if (l != null) {

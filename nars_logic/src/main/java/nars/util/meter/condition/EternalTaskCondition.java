@@ -219,7 +219,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
 
         if (!task.term().equals(term)) return false;
 
-        if (task.getPunctuation() != punc)
+        if (task.punc() != punc)
             return false;
 
         if (!truthMatches(task))
@@ -235,7 +235,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
 
     private boolean truthMatches(@NotNull Truthed task) {
         if ((punc == Symbols.JUDGMENT) || (punc == Symbols.GOAL)) {
-            if (task.getTruth() == null) {
+            if (task.truth() == null) {
                 return false;
             }
             float fr = task.getFrequency();

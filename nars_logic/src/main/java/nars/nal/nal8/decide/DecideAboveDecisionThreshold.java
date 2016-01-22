@@ -22,7 +22,7 @@ public abstract class DecideAboveDecisionThreshold extends DecideAllGoals {
 
         @Override
         protected float desire(@NotNull Task task) {
-            Truth t = task.getTruth();
+            Truth t = task.truth();
             if (t == null)
                 throw new RuntimeException("null truth");
 

@@ -152,7 +152,7 @@ public class MutableTask extends AbstractTask {
     @NotNull
     public MutableTask budget(float p, float d) {
         float q;
-        Truth t = getTruth();
+        Truth t = truth();
         if (!isQuestOrQuestion()) {
             if (t == null)
                 throw new RuntimeException("Truth needs to be defined prior to budget to calculate truthToQuality");
@@ -250,7 +250,7 @@ public class MutableTask extends AbstractTask {
     @NotNull
     public MutableTask budgetCompoundForward(@NotNull ConceptProcess premise) {
         BudgetFunctions.compoundForward(
-                getBudget(), getTruth(),
+                getBudget(), truth(),
                 term(), premise);
         return this;
     }

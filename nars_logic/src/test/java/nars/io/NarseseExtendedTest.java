@@ -166,7 +166,7 @@ public class NarseseExtendedTest {
             Term tt = t.term();
             assertEquals(Op.NEGATE, tt.op());
             assertTrue("negated".equals(((Compound) tt).term(0).toString()));
-            assertTrue(t.getPunctuation() == Symbols.GOAL);
+            assertTrue(t.punc() == Symbols.GOAL);
         }
     }
 

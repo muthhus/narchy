@@ -30,8 +30,8 @@ public class TruthWave {
         for (Task t : beliefs) {
             long o = t.getOccurrenceTime();
             if (o == Tense.ETERNAL) {
-                expectEternal1 += t.getTruth().getExpectationPositive();
-                expectEternal0 += t.getTruth().getExpectationNegative();
+                expectEternal1 += t.truth().getExpectationPositive();
+                expectEternal0 += t.truth().getExpectationNegative();
                 numEternal++;
             }
             else {
@@ -59,8 +59,8 @@ public class TruthWave {
                 long o = t.getOccurrenceTime();
                 if (o != Tense.ETERNAL) {
                     int i = (int)(o - min);
-                    expect[1][i] += t.getTruth().getExpectationPositive();
-                    expect[0][i] += t.getTruth().getExpectationNegative();
+                    expect[1][i] += t.truth().getExpectationPositive();
+                    expect[0][i] += t.truth().getExpectationNegative();
                 }
             }
 

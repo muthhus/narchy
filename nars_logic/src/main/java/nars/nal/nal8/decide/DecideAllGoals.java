@@ -13,7 +13,7 @@ public class DecideAllGoals implements Decider {
 
     @Override
     public boolean test(@NotNull Task task) {
-        return (task.getPunctuation() == Symbols.GOAL);
+        return (task.punc() == Symbols.GOAL);
     }
 
 }

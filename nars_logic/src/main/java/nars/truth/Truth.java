@@ -234,7 +234,7 @@ public interface Truth extends MetaTruth<Float> {
     static DescriptiveStatistics statistics(@NotNull Iterable<? extends Truthed> t, @NotNull TruthComponent component) {
         DescriptiveStatistics d = new DescriptiveStatistics();
         for (Truthed x : t) {
-            Truth v = x.getTruth();
+            Truth v = x.truth();
             if (v!=null)
                 d.addValue(v.getComponent(component));
         }

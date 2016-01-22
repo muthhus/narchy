@@ -120,7 +120,7 @@ public class Execution implements Runnable {
 
         nar.input($.belief(operation.term(),
 
-                operation.getTruth()).
+                operation.truth()).
                 //1f, Global.OPERATOR_EXECUTION_CONFIDENCE).
 
                         budget(b).

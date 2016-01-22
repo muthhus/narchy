@@ -92,7 +92,7 @@ public abstract class AbstractTask extends Item<Task>
 
     /** copy/clone constructor */
     public AbstractTask(@NotNull Task task) {
-        this(task, task.getPunctuation(), task.getTruth(),
+        this(task, task.punc(), task.truth(),
                 task.getPriority(), task.getDurability(), task.getQuality(),
                 task.getParentTaskRef(), task.getParentBeliefRef(), task.getBestSolutionRef());
         setEvidence(task.getEvidence());
@@ -153,7 +153,7 @@ public abstract class AbstractTask extends Item<Task>
             return null;
 
 
-        char punc = getPunctuation();
+        char punc = punc();
         if (punc == 0)
             throw new RuntimeException("Punctuation must be specified before generating a default budget");
 
@@ -276,8 +276,8 @@ public abstract class AbstractTask extends Item<Task>
         int h = Objects.hash(
                 Arrays.hashCode(getEvidence()),
                 term(),
-                getPunctuation(),
-                getTruth(),
+                punc(),
+                truth(),
                 getOccurrenceTime()
         );
 
@@ -308,7 +308,7 @@ public abstract class AbstractTask extends Item<Task>
     }
 
     @Override
-    public Truth getTruth() {
+    public Truth truth() {
         return truth;
     }
 
@@ -360,7 +360,7 @@ public abstract class AbstractTask extends Item<Task>
     }
 
     @Override
-    public final char getPunctuation() {
+    public final char punc() {
         return punctuation;
     }
 
@@ -394,11 +394,11 @@ public abstract class AbstractTask extends Item<Task>
         int tt = term().compareTo(o.term());
         if (tt != 0) return tt;
 
-        int tc = Character.compare(punctuation, o.getPunctuation());
+        int tc = Character.compare(punctuation, o.punc());
         if (tc != 0) return tc;
 
         if (truth!=null) {
-            int tu = Truth.compare(o.getTruth(), truth);
+            int tu = Truth.compare(o.truth(), truth);
             if (tu!=0) return tu;
         }
 
@@ -490,7 +490,7 @@ public abstract class AbstractTask extends Item<Task>
 
         if (this == that) return true;
 
-        char thisPunc = getPunctuation();
+        char thisPunc = punc();
 
         if (stamp) {
             //uniqueness includes every aspect of stamp except creation time
@@ -500,11 +500,11 @@ public abstract class AbstractTask extends Item<Task>
         }
 
         if (truth) {
-            Truth thisTruth = getTruth();
+            Truth thisTruth = truth();
             if (thisTruth == null) {
                 //equal punctuation will ensure thatTruth is also null
             } else {
-                if (!thisTruth.equals(that.getTruth())) return false;
+                if (!thisTruth.equals(that.truth())) return false;
             }
         }
 
@@ -514,7 +514,7 @@ public abstract class AbstractTask extends Item<Task>
         }
 
         if (punctuation) {
-            if (thisPunc != that.getPunctuation()) return false;
+            if (thisPunc != that.punc()) return false;
         }
 
         return true;

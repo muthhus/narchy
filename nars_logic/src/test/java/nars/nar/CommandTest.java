@@ -38,7 +38,7 @@ public class CommandTest {
         });
         Task t = n.task("c(x);");
         assertNotNull(t);
-        assertEquals(Symbols.COMMAND, t.getPunctuation());
+        assertEquals(Symbols.COMMAND, t.punc());
         assertTrue(t.isCommand());
         assertEquals("c(x); :0:", t.toString());
 

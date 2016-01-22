@@ -181,17 +181,30 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     void onConcept(Concept c);
 
     @NotNull
-    default Task solution(Compound t, char newPunc, Truth solutionTruth, long newOcc, Task question, @NotNull Memory memory) {
-        return new MutableTask(t, newPunc)
-            .truth(solutionTruth)
-            .budget(getPriority(), getDurability(), getQuality())
-            .time(memory.time(), newOcc)
-            .parent(getParentTaskRef(), getParentBeliefRef())
-            .setEvidence(getEvidence())
-            .log(new Solution(question));
+    default Task solution(Compound newTerm, @NotNull Task question, @NotNull Memory memory) {
+        long questionOcc = question.getOccurrenceTime();
+
+        long now = memory.time();
+
+        Truth projectedTruth = projection(questionOcc, now);
+
+        Task solution;
+        if ((truth() !=projectedTruth) || (!newTerm.equals(term()))) {
+            solution = new MutableTask(newTerm, punc())
+                    .truth(projectedTruth)
+                    .budget(getPriority(), getDurability(), getQuality())
+                    .time(now, questionOcc)
+                    .parent(getParentTaskRef(), getParentBeliefRef())
+                    .setEvidence(getEvidence());
+        } else {
+            solution = this;
+        }
+
+        solution.log(new Solution(question));
+        return solution;
     }
 
-    char getPunctuation();
+    char punc();
 
     @Nullable
     @Override
@@ -210,7 +223,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
      * @return Whether the object is a Question
      */
     default boolean isQuestion() {
-        return (getPunctuation() == Symbols.QUESTION);
+        return (punc() == Symbols.QUESTION);
     }
 
     /**
@@ -219,19 +232,19 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
      * @return Whether the object is a Judgment
      */
     default boolean isJudgment() {
-        return (getPunctuation() == Symbols.JUDGMENT);
+        return (punc() == Symbols.JUDGMENT);
     }
 
     default boolean isGoal() {
-        return (getPunctuation() == Symbols.GOAL);
+        return (punc() == Symbols.GOAL);
     }
 
     default boolean isQuest() {
-        return (getPunctuation() == Symbols.QUEST);
+        return (punc() == Symbols.QUEST);
     }
 
     default boolean isCommand()  {
-        return (getPunctuation() == Symbols.COMMAND);
+        return (punc() == Symbols.COMMAND);
     }
 
     default boolean hasQueryVar() {
@@ -271,7 +284,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     Compound term();
 
     @Override
-    Truth getTruth();
+    Truth truth();
 
     default boolean isQuestOrQuestion() {
         return isQuestion() || isQuest();
@@ -291,7 +304,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     void setExecuted();
 
     default float getConfidenceIfTruthOr(float v) {
-        Truth t = getTruth();
+        Truth t = truth();
         if (t == null) return v;
         return t.getConfidence();
     }
@@ -365,7 +378,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     @Nullable
     @Deprecated
     default StringBuilder appendTo(StringBuilder buffer, /**@Nullable*/ Memory memory, boolean showStamp) {
-        boolean notCommand = getPunctuation()!=Symbols.COMMAND;
+        boolean notCommand = punc()!=Symbols.COMMAND;
         return appendTo(buffer, memory, true, showStamp && notCommand,
                 notCommand, //budget
                 showStamp //log
@@ -395,7 +408,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
         int stringLength = contentName.length() + tenseString.length() + 1 + 1;
 
-        if (getTruth() != null)
+        if (truth() != null)
             stringLength += 11;
 
         if (showStamp)
@@ -429,14 +442,14 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
             getBudget().toBudgetStringExternal(buffer).append(' ');
         }
 
-        buffer.append(contentName).append(getPunctuation());
+        buffer.append(contentName).append(punc());
 
         if (tenseString.length() > 0)
             buffer.append(' ').append(tenseString);
 
-        if (getTruth()!= null) {
+        if (truth()!= null) {
             buffer.append(' ');
-            getTruth().appendString(buffer, 2);
+            truth().appendString(buffer, 2);
         }
 
         if (showStamp)
@@ -500,7 +513,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     }
 
     default Truth getDesire() {
-        return getTruth();
+        return truth();
     }
 
 
@@ -723,7 +736,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     //https://groups.google.com/forum/#!searchin/open-nars/task$20eteneral/open-nars/8KnAbKzjp4E/rBc-6V5pem8J
     default Truth projection(long targetTime, long now) {
 
-        Truth currentTruth = getTruth();
+        Truth currentTruth = truth();
         long occurrenceTime = getOccurrenceTime();
 
         boolean eternal = targetTime == Tense.ETERNAL;
@@ -744,7 +757,8 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
             float projectedConfidence = factor * currentTruth.getConfidence();
 
-            return projectedConfidence > eternalTruth.getConfidence() ? new DefaultTruth(currentTruth.getFrequency(), projectedConfidence) : eternalTruth;
+            return projectedConfidence < eternalTruth.getConfidence() ? eternalTruth :
+              new DefaultTruth(currentTruth.getFrequency(), projectedConfidence);
         }
     }
 

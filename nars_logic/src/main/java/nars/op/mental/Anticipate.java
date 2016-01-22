@@ -83,7 +83,7 @@ public final class Anticipate {
 
     public void anticipate(@NotNull Task t) {
 
-        if(t.getTruth().getExpectation() < DEFAULT_CONFIRMATION_EXPECTATION || t.getPunctuation() != Symbols.JUDGMENT) {
+        if(t.truth().getExpectation() < DEFAULT_CONFIRMATION_EXPECTATION || t.punc() != Symbols.JUDGMENT) {
             return;
         }
 
@@ -147,7 +147,7 @@ public final class Anticipate {
         final List<TaskTime> toRemove = this.toRemove;
 
         anticipations.get(c.term()).stream().filter(tt -> tt.inTime(cOccurr) && !c.equals(tt.task) &&
-                tt.task.getTruth().getExpectation() > DEFAULT_CONFIRMATION_EXPECTATION).forEach(tt -> {
+                tt.task.truth().getExpectation() > DEFAULT_CONFIRMATION_EXPECTATION).forEach(tt -> {
             toRemove.add(tt);
             happeneds++;
         });

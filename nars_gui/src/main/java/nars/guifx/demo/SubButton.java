@@ -169,13 +169,13 @@ public class SubButton extends HBox {
             sb.add(makeParagraph(t.toString()));
         } else {
             sb.add(make(nar, t.term()));
-            sb.add(make(String.valueOf(t.getPunctuation())));
+            sb.add(make(String.valueOf(t.punc())));
             //sb.add(make(space()));
         }
 
         float minScale = 0.25f;
         if (!t.isQuestOrQuestion()) {
-            sb.scale(minScale + 2f * 0.75f * t.getTruth().getConfidence());
+            sb.scale(minScale + 2f * 0.75f * t.truth().getConfidence());
         }
 
         sb.shade(t.getPriority());

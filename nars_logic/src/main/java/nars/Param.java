@@ -145,7 +145,7 @@ public abstract class Param extends Container implements Level {
 
     public void applyDefaultBudget(@NotNull MutableTask t) {
 
-        char punc = t.getPunctuation();
+        char punc = t.punc();
         t.setPriority(getDefaultPriority(punc));
         t.setDurability(getDefaultDurability(punc));
 
@@ -153,7 +153,7 @@ public abstract class Param extends Container implements Level {
 
             /** if q was not specified, and truth is, then we can calculate q from truthToQuality */
             if (!Float.isFinite(t.getQuality())) {
-                t.setQuality(BudgetFunctions.truthToQuality(t.getTruth()));
+                t.setQuality(BudgetFunctions.truthToQuality(t.truth()));
             }
         } else if (t.isQuestion()) {
             t.setQuality(DEFAULT_QUESTION_QUALITY);

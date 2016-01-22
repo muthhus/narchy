@@ -6,25 +6,47 @@ import nars.guifx.NARfx;
 import nars.nar.Default;
 import nars.util.Texts;
 
+
+
 /**
  * Created by me on 1/21/16.
  */
 public class ConceptPaneTest {
 
-    static float waveFreq = 0.715f;
-    static float conf = 0.75f;
+    public static final int beliefCapacity = 96;
+    static float waveFreq = 0.22715f;
+    static float conf = 0.9f;
+    static float predictionProbability = 0.0f; //how often to ask for a prediction
+    static float pastProbability = 0.1f; //how often to ask for a prediction
+    static final float fps = 30f;
 
     public static void main(String[] args) {
         NAR nar = new Default();
         //nar.input("y:x.");
         //nar.input("y:x. %0%");
-        nar.memory.conceptBeliefsMax.set(96);
+        nar.memory.conceptBeliefsMax.set(beliefCapacity);
         nar.run(2);
         nar.onEachFrame(n-> {
-            CharSequence y = Texts.n2(0.5f * ((float) Math.sin(nar.time() * waveFreq) + 1f));
-            nar.input("y:x. :|: %" + y + ";" + conf + "%");
 
-            //nar.input("y:x? :/:");
+            //random eternals
+            {
+                //float ef = nar.memory.random.nextFloat();
+                //float ec = nar.memory.random.nextFloat() * 0.5f;
+                float ef = 0.5f * ((float) Math.sin(nar.time() * waveFreq) + 1f);
+                float ec = 0.1f;
+                nar.input("y:x. %" + Texts.n2(ef) + ";" + Texts.n2(ec) + "%");
+            }
+
+            //random temporals
+            {
+                CharSequence y = Texts.n2(0.5f * ((float) Math.sin(nar.time() * waveFreq) + 1f));
+                nar.input("y:x. :|: %" + y + ";" + conf + "%");
+
+                if (nar.memory.random.nextFloat() < predictionProbability)
+                    nar.input("y:x? :/:");
+                if (nar.memory.random.nextFloat() < pastProbability)
+                    nar.input("y:x? :\\:");
+            }
         });
 
 
@@ -34,7 +56,8 @@ public class ConceptPaneTest {
         NARfx.run((a,s)->{
             NARfx.newWindow(nar, c);
 
-            nar.loop(10f);
+
+            nar.loop(fps);
         });
     }
 }

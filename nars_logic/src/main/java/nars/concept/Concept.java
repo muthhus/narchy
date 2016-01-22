@@ -85,7 +85,7 @@ public interface Concept extends Termed, Comparable<Termed> {
 //        return hasGoals() ?
 //            getGoals().getMeanProjectedExpectation(now) : 0;
         return hasGoals() ?
-            getGoals().top(now).getTruth().getExpectation() : 0;
+            getGoals().top(now).truth().getExpectation() : 0;
     }
     /**
      * Get the current overall belief value. TODO to be refined
@@ -94,7 +94,7 @@ public interface Concept extends Termed, Comparable<Termed> {
 //        return hasBeliefs() ?
 //                getBeliefs().getMeanProjectedExpectation(now) : 0;
         return hasBeliefs() ?
-                getBeliefs().top(now).getTruth().getExpectation() : 0;
+                getBeliefs().top(now).truth().getExpectation() : 0;
     }
 
     /** satisfaction/success metric:
