@@ -34,14 +34,14 @@ public class TestbedSetting {
    * modifies drawing.
    *
    */
-  public static enum SettingType {
+  public enum SettingType {
     DRAWING, ENGINE
   }
   
   /**
    * The type of value this setting pertains to
    */
-  public static enum ConstraintType {
+  public enum ConstraintType {
     BOOLEAN, RANGE
   }
   

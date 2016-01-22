@@ -13,7 +13,7 @@ import org.jbox2d.dynamics.Fixture;
  */
 public class ClosestHitRayCastCallback implements RayCastCallback {
 	/** Where the ray cast is coming from */
-	private Vec2 origin;
+	private final Vec2 origin;
 	
 	/** Used to keep track of the closest hit */
 	private float closestDist;
@@ -22,7 +22,8 @@ public class ClosestHitRayCastCallback implements RayCastCallback {
 	private DynamicEntity closest;
 	
 	/** Details about hit */
-	private Vec2 normalOnClosest, pointOnClosest;
+	private final Vec2 normalOnClosest;
+	private final Vec2 pointOnClosest;
 	
 	/**
 	 * Create a new ClosestCallback
@@ -42,8 +43,9 @@ public class ClosestHitRayCastCallback implements RayCastCallback {
 		pointOnClosest = new Vec2(0.0f, 0.0f);
 	}
 	
+	@Override
 	public float reportFixture(Fixture fixture, Vec2 point, Vec2 normal,
-								  float fraction) {
+							   float fraction) {
 		// check if this hit is any closer than the closest one
 		float dist = fixture.getBody().getPosition().sub(origin).lengthSquared();
 		if(dist <= closestDist*closestDist){

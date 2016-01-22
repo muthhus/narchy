@@ -17,7 +17,7 @@
  * @author TranquilMarmot
  */
 public class DynamicEntity extends Entity {
-	private static String LOGTAG = "DynamicEntity";
+	private static final String LOGTAG = "DynamicEntity";
 	/** Body that's in the Physics world */
 	public Body body;
 	
@@ -38,7 +38,7 @@ public class DynamicEntity extends Entity {
 		super(renderer, layer);
 		
 		this.bodyDef = bodyDef;
-		fixtureDefs = new ArrayList<FixtureDef>();
+		fixtureDefs = new ArrayList<>();
 		fixtureDefs.add(fixtureDef);
 	}
 	
@@ -131,7 +131,7 @@ public class DynamicEntity extends Entity {
 	
 	@Override
 	public String toString(){
-		return this.getClass().getSimpleName() + " " + location;
+		return this.getClass().getSimpleName() + ' ' + location;
 	}
 
 	/*

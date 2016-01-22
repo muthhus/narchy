@@ -9,6 +9,8 @@ import nars.rover.Sim;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Term;
+import nars.truth.DefaultTruth;
+import nars.truth.Truth;
 import nars.util.event.FrameReaction;
 import org.jbox2d.callbacks.DebugDraw;
 import org.jbox2d.common.Vec2;
@@ -33,7 +35,7 @@ public abstract class AbstractPolygonBot extends Robotic {
     final Deque<Vec2> positions = new ArrayDeque();
     final List<Sense> senses = new ArrayList();
     public float linearThrustPerCycle = 8f;
-    public float angularSpeedPerCycle = 0.44f * 0.25f;
+    public float angularSpeedPerCycle = 0.15f;
     int mission = 0;
     //public float curiosity = 0.1f;
     int motionPeriod = 3;
@@ -41,20 +43,28 @@ public abstract class AbstractPolygonBot extends Robotic {
     public Vec2 point2 = new Vec2();
     public Vec2 d = new Vec2();
     boolean feel_motion = true; //todo add option in gui
-    protected void thrustRelative(float f) {
+
+    public Truth thrustRelative(float f) {
+        float velBefore = torso.getLinearVelocity().length();
         if (f == 0) {
             torso.setLinearVelocity(new Vec2());
         } else {
             thrust(0, f * linearThrustPerCycle);
         }
+        float velAfter = torso.getLinearVelocity().length();
+        return new DefaultTruth(velAfter - velBefore, 0.9f);
     }
 
-    protected void rotateRelative(float f) {
+    public Truth rotateRelative(float f) {
+        float vBefore = torso.getAngularVelocity();
         rotate(f * angularSpeedPerCycle);
+        float vAfter = torso.getAngularVelocity();
+        return new DefaultTruth(vAfter - vBefore, 0.9f);
     }
 
     protected void curious(float freq, float conf) {
-        nar.input("motor(random)! %" + freq + "|" + conf + "%");
+        //nar.input("motor(random)! %" + freq + '|' + conf + '%');
+        nar.input("MotorControls_random(motor,())! :|: %1.0;0.9%");
     }
 
     protected void addAxioms() {
@@ -102,9 +112,14 @@ public abstract class AbstractPolygonBot extends Robotic {
 
         addAxioms();
 
-        nar.input("<goal --> [health]>! %1.0;0.90%");
+        nar.input("<goal --> [health]>! %1.0;0.95%");
+        nar.input("<goal --> [health]>! :|: %1.0;0.95%");
 
-        nar.believe("<goal --> [health]>", Tense.Present, 0.50f, 0.99f); //reset
+        nar.believe("<goal --> [health]>", Tense.Present, 0.5f, 0.9f); //reset
+
+
+        nar.input("<food ==> health>?");
+        nar.input("<goal <-> motor>?");
 
         try {
             if (mission == 0) {
@@ -113,7 +128,7 @@ public abstract class AbstractPolygonBot extends Robotic {
 
                 //nar.goal("<goal --> food>", 1.00f, 0.90f);
                 nar.input("<goal --> [food]>! :|:");
-                nar.input("<goal --> [food]>. :|: %0.50;0.90%"); //reset
+                nar.input("<goal --> [food]>. :|: %0.5;0.90%"); //reset
 
 
                 //nar.input("goal(food)! %1.00;0.99%");
@@ -146,10 +161,12 @@ public abstract class AbstractPolygonBot extends Robotic {
     public void eat(Body eaten) {
         Material m = (Material)eaten.getUserData();
         if (m instanceof Sim.FoodMaterial) {
-            nar.input("<goal --> [food]>. :|: %0.90;0.90%");
-            nar.input("<goal --> [health]>. :|: %0.90;0.90%");
+            nar.logger.warn("food");
+            nar.input("<goal --> [food]>. :|: %1.00;0.75%");
+            nar.input("<goal --> [health]>. :|: %1.00;0.75%");
         }
         else if (m instanceof Sim.PoisonMaterial) {
+            nar.logger.warn("poison");
             nar.input("<goal --> [food]>. :|: %0.00;0.90%");
             nar.input("<goal --> [health]>. :|: %0.00;0.90%");
         }
@@ -171,7 +188,8 @@ public abstract class AbstractPolygonBot extends Robotic {
 
     @Override
     public void step(int time) {
-        if (sim.cnt % sim.missionPeriod == 0) {
+        long now = sim.clock.time();
+        if (now % sim.missionPeriod == 0) {
             inputMission();
         }
 
@@ -183,16 +201,18 @@ public abstract class AbstractPolygonBot extends Robotic {
         do_sth_importance+=decrease_of_importance_step; //increase
         nar.addInput("(^motor,random)!");
         }*/
-        if (feel_motion && sim.cnt % motionPeriod == 0) {
+        if (feel_motion && now % motionPeriod == 0) {
             feelMotion();
         }
         /*if (Math.random() < curiosity) {
             randomAction();
         }*/
 
+        if (feel_motion && now % sim.missionPeriod == 0) {
+            System.out.println(nar.memory.emotion.happy() + " happy, " + nar.memory.emotion.busy() + " busy, " + nar.memory.index.size() + " concepts");
+        }
+
         nar.frame();
-
-
     }
 
     public void thrust(float angle, float force) {
@@ -356,7 +376,7 @@ public abstract class AbstractPolygonBot extends Robotic {
 
         @Override
         public String toString() {
-            return getClass().getSimpleName() + "[" + concept + "]";
+            return getClass().getSimpleName() + '[' + concept + ']';
         }
 
         public void setFeedback(boolean feedback) {
@@ -452,12 +472,11 @@ public abstract class AbstractPolygonBot extends Robotic {
             if (!isPos)
                 net = -net;
 
-            float posFeedback = 0, negFeedback = 0;
             if (net > threshold) {
                 final float feedback = onFrame(net, isPos);
                 if (Float.isFinite(feedback)) {
                     if (isPos) {
-                        posFeedback = feedback;
+                        float posFeedback = feedback;
                         nar.input(this.positive.getFeedback(posFeedback));
                         nar.input(this.negative.getFeedback(0));
 
@@ -472,7 +491,7 @@ public abstract class AbstractPolygonBot extends Robotic {
 //                        nar.inputDirect(iit);
 
                     } else {
-                        negFeedback = feedback;
+                        float negFeedback = feedback;
                         nar.input(this.negative.getFeedback(negFeedback));
                         nar.input(this.positive.getFeedback(0));
 
@@ -498,6 +517,7 @@ public abstract class AbstractPolygonBot extends Robotic {
 
     }
 
+    @FunctionalInterface
     public interface Sense {
 
         void step(boolean input, boolean draw);

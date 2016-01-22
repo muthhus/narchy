@@ -34,16 +34,16 @@ package nars.rover.physics;
  */
 public interface TestbedPanel {
 
-  public void grabFocus();
+  void grabFocus();
 
   /**
    * Renders the world
    * @return if the renderer is ready for drawing
    */
-  public boolean render();
+  boolean render();
 
   /**
    * Paints the rendered world to the screen
    */
-  public void paintScreen();
+  void paintScreen();
 }

@@ -218,7 +218,8 @@ public class TestbedState {
     }
   }
 
-  public static interface TestChangedListener {
-    public void testChanged(PhysicsModel test, int index);
+  @FunctionalInterface
+  public interface TestChangedListener {
+    void testChanged(PhysicsModel test, int index);
   }
 }

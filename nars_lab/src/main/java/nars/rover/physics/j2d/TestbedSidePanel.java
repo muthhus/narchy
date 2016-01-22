@@ -23,7 +23,6 @@
  ******************************************************************************/
 package nars.rover.physics.j2d;
 
-import nars.rover.PhysicsModel;
 import nars.rover.physics.PhysicsController;
 import nars.rover.physics.TestbedSetting;
 import nars.rover.physics.TestbedSetting.SettingType;
@@ -56,10 +55,10 @@ public class TestbedSidePanel extends JPanel implements ChangeListener, ActionLi
 
   public JComboBox tests;
 
-  private JButton pauseButton = new JButton("Pause");
-  private JButton stepButton = new JButton("Step");
-  private JButton resetButton = new JButton("Reset");
-  private JButton quitButton = new JButton("Quit");
+  private final JButton pauseButton = new JButton("Pause");
+  private final JButton stepButton = new JButton("Step");
+  private final JButton resetButton = new JButton("Reset");
+  private final JButton quitButton = new JButton("Quit");
 
   public JButton saveButton = new JButton("Save");
   public JButton loadButton = new JButton("Load");
@@ -70,13 +69,7 @@ public class TestbedSidePanel extends JPanel implements ChangeListener, ActionLi
     initComponents();
     addListeners();
 
-    model.addTestChangeListener(new TestbedState.TestChangedListener() {
-      @Override
-      public void testChanged(PhysicsModel argTest, int argIndex) {
-        tests.setSelectedIndex(argIndex);
-
-      }
-    });
+    model.addTestChangeListener((argTest, argIndex) -> tests.setSelectedIndex(argIndex));
   }
 
   public void initComponents() {
@@ -179,57 +172,33 @@ public class TestbedSidePanel extends JPanel implements ChangeListener, ActionLi
   }
 
   public void addListeners() {
-    pauseButton.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        if (model.getSettings().pause) {
-          model.getSettings().pause = false;
-          pauseButton.setText("Pause");
-        } else {
-          model.getSettings().pause = true;
-          pauseButton.setText("Resume");
-        }
-        model.getPanel().grabFocus();
+    pauseButton.addActionListener(e -> {
+      if (model.getSettings().pause) {
+        model.getSettings().pause = false;
+        pauseButton.setText("Pause");
+      } else {
+        model.getSettings().pause = true;
+        pauseButton.setText("Resume");
       }
+      model.getPanel().grabFocus();
     });
 
-    stepButton.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        model.getSettings().singleStep = true;
-        if (!model.getSettings().pause) {
-          model.getSettings().pause = true;
-          pauseButton.setText("Resume");
-        }
-        model.getPanel().grabFocus();
+    stepButton.addActionListener(e -> {
+      model.getSettings().singleStep = true;
+      if (!model.getSettings().pause) {
+        model.getSettings().pause = true;
+        pauseButton.setText("Resume");
       }
+      model.getPanel().grabFocus();
     });
 
-    resetButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        controller.reset();
-      }
-    });
+    resetButton.addActionListener(e -> controller.reset());
 
-    quitButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        System.exit(0);
-      }
-    });
+    quitButton.addActionListener(e -> System.exit(0));
 
-    saveButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        controller.save();
-      }
-    });
+    saveButton.addActionListener(e -> controller.save());
 
-    loadButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        controller.load();
-      }
-    });
+    loadButton.addActionListener(e -> controller.load());
   }
 
   private void addSettings(JPanel argPanel, TestbedSettings argSettings, SettingType argIgnore) {
@@ -260,6 +229,7 @@ public class TestbedSidePanel extends JPanel implements ChangeListener, ActionLi
     }
   }
 
+  @Override
   public void stateChanged(ChangeEvent e) {
     JComponent component = (JComponent) e.getSource();
     TestbedSetting setting = (TestbedSetting) component.getClientProperty(SETTING_TAG);
@@ -279,6 +249,7 @@ public class TestbedSidePanel extends JPanel implements ChangeListener, ActionLi
     model.getPanel().grabFocus();
   }
 
+  @Override
   public void actionPerformed(ActionEvent e) {
     controller.playTest(tests.getSelectedIndex());
   }

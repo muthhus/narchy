@@ -1,107 +1,44 @@
 package nars.rover.run;
 
 import nars.Global;
+import nars.Memory;
 import nars.NAR;
-import nars.Video;
+import nars.NARLoop;
+import nars.guifx.demo.NARide;
 import nars.nar.Default;
 import nars.rover.RoverWorld;
 import nars.rover.Sim;
-import nars.rover.robot.CarefulRover;
 import nars.rover.robot.Rover;
 import nars.rover.robot.Spider;
 import nars.rover.robot.Turret;
 import nars.rover.world.FoodSpawnWorld1;
+import nars.term.index.MapIndex2;
 import nars.time.SimulatedClock;
-import nars.util.event.CycleReaction;
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+
+import java.util.HashMap;
 
 /**
  * Created by me on 6/20/15.
  */
 public class SomeRovers {
 
-    private static SimulatedClock clock = new SimulatedClock();
+    private static final SimulatedClock clock = new SimulatedClock();
 
 
-    static {
-        Video.themeInvert();
-    }
-
-    public static NAR newDefault(int threads) {
-
-        int cycPerFrame = 5;
-
-        //Alann d = new ParallelAlann(64, threads);
-        //DefaultAlann d = new DefaultAlann(32);
-        //d.tlinkToConceptExchangeRatio = 1f;
-
-        Default d = new Default();
-
-        //d.param.conceptActivationFactor.set(0.25f);
-        //d.param.inputsMaxPerCycle.set(4);
-
-        //Default d = new Equalized(1024, 16, 10);
-        //d.setTermLinkBagSize(16);
-        //d.setTaskLinkBagSize(16);
-
+//    static {
+//        Video.themeInvert();
+//    }
 //
-//            @Override
-//            public Concept newConcept(final Term t, final Budget b, final Memory m) {
-//
-//                Bag<Sentence, TaskLink> taskLinks =
-//                        new CurveBag(rng, /*sentenceNodes,*/ getConceptTaskLinks());
-//                        //new ChainBag(rng,  getConceptTaskLinks());
-//
-//                Bag<TermLinkKey, TermLink> termLinks =
-//                        new CurveBag(rng, /*termlinkKeyNodes,*/ getConceptTermLinks());
-//                        //new ChainBag(rng, /*termlinkKeyNodes,*/ getConceptTermLinks());
-//
-//                return newConcept(t, b, taskLinks, termLinks, m);
-//            }
-//
-//        };
-        //d.setInternalExperience(null);
-        //d.param.setClock(clock);
-        //d.setClock(clock);
 
-        //d.param.conceptTaskTermProcessPerCycle.set(4);
-
-
-        //d.param.setCyclesPerFrame(cycPerFrame);
-        d.setCyclesPerFrame(cycPerFrame);
-        //d.param.duration.set(cycPerFrame);
-        //d.param.conceptBeliefsMax.set(16);
-        //d.param.conceptGoalsMax.set(8);
-
-        //TextOutput.out(nar).setShowInput(true).setShowOutput(false);
-
-
-        //N/A for solid
-        //nar.param.inputsMaxPerCycle.set(32);
-        //nar.param.conceptsFiredPerCycle.set(4);
-
-        //d.param.conceptCreationExpectation.set(0);
-
-        //d.termLinkForgetDurations.set(4);
-
-
-
-        return d;
-    }
 
     public static void main(String[] args) {
 
-        Global.DEBUG = Global.EXIT_ON_EXCEPTION = false;
+        Global.DEBUG = Global.EXIT_ON_EXCEPTION = true;
 
-
-        float fps = 60;
-        boolean cpanels = true;
-
-        RoverWorld world;
 
         //world = new ReactorWorld(this, 32, 48, 48*2);
 
-        world = new FoodSpawnWorld1(128, 48, 48, 0.5f);
+        RoverWorld world = new FoodSpawnWorld1(128, 48, 48, 0.5f);
 
         //world = new GridSpaceWorld(GridSpaceWorld.newMazePlanet());
 
@@ -110,75 +47,149 @@ public class SomeRovers {
 
 
         game.add(new Turret("turret"));
+
         game.add(new Spider("spider",
                 3, 3, 0.618f, 30, 30));
 
 
         {
-            NAR nar = newDefault(3);
+            NAR nar = new Default(
+                    new Memory(clock, new MapIndex2(new HashMap())),
+                    2000, 200, 2, 2);
+
+            nar.memory.duration.set(10);
+
+            NARLoop tmp = nar.loop();
+            new Thread(()-> {
+                NARide.show(tmp, x -> {
+                    tmp.stop();
+                });
+            }).start();
+
+            nar.setCyclesPerFrame(2);
+
 
             game.add(new Rover("r1", nar));
 
+
+
         }
-        {
-            NAR nar = new Default(  );
+//        {
+//            NAR nar = new Default();
+//
+//            //nar.param.outputVolume.set(0);
+//
+//            game.add(new CarefulRover("r2", nar));
+//        }
 
-            //nar.param.outputVolume.set(0);
-
-            game.add(new CarefulRover("r2", nar));
-
-            /*if (cpanels) {
-                SwingUtilities.invokeLater(() -> {
-                    new NARSwing(nar, false);
-                });
-            }*/
-        }
-
+        float fps = 60;
         game.run(fps);
 
     }
 
-    private static class InputActivationController extends CycleReaction {
-
-        private final NAR nar;
-
-        final int windowSize;
-
-        final DescriptiveStatistics busyness;
-
-        public InputActivationController(NAR nar) {
-            super(nar);
-            this.nar = nar;
-            this.windowSize = nar.memory.duration();
-            this.busyness = new DescriptiveStatistics(windowSize);
-        }
-
-        @Override
-        public void onCycle() {
-
-            final float bInst = nar.memory.emotion.busy();
-            busyness.addValue(bInst);
-
-//            float bAvg = (float)busyness.getMean();
-
-//            float busyMax = 3f;
-
-//            double a = nar.memory.inputActivationFactor.get();
-//            if (bAvg > busyMax) {
-//                a -= 0.01f;
-//            }
-//            else  {
-//                a += 0.01f;
-//            }
+//    private static class InputActivationController extends CycleReaction {
 //
-//            final float min = 0.01f;
-//            if (a < min) a = min;
-//            if (a > 1f) a = 1f;
+//        private final NAR nar;
 //
-//            //System.out.println("act: " + a + " (" + bInst + "," + bAvg);
+//        final int windowSize;
 //
-//            nar.param.inputActivationFactor.set(a);
-//            nar.param.conceptActivationFactor.set( 0.5f * (1f + a) /** half as attenuated */ );
-        }
-    }
+//        final DescriptiveStatistics busyness;
+//
+//        public InputActivationController(NAR nar) {
+//            super(nar);
+//            this.nar = nar;
+//            this.windowSize = nar.memory.duration();
+//            this.busyness = new DescriptiveStatistics(windowSize);
+//        }
+//
+//        @Override
+//        public void onCycle() {
+//
+//            final float bInst = nar.memory.emotion.busy();
+//            busyness.addValue(bInst);
+//
+////            float bAvg = (float)busyness.getMean();
+//
+////            float busyMax = 3f;
+//
+////            double a = nar.memory.inputActivationFactor.get();
+////            if (bAvg > busyMax) {
+////                a -= 0.01f;
+////            }
+////            else  {
+////                a += 0.01f;
+////            }
+////
+////            final float min = 0.01f;
+////            if (a < min) a = min;
+////            if (a > 1f) a = 1f;
+////
+////            //System.out.println("act: " + a + " (" + bInst + "," + bAvg);
+////
+////            nar.param.inputActivationFactor.set(a);
+////            nar.param.conceptActivationFactor.set( 0.5f * (1f + a) /** half as attenuated */ );
+//        }
+//    }
+
+//    public static NAR newDefault(int threads) {
+////
+////        int cycPerFrame = 5;
+////
+////        //Alann d = new ParallelAlann(64, threads);
+////        //DefaultAlann d = new DefaultAlann(32);
+////        //d.tlinkToConceptExchangeRatio = 1f;
+////
+////        Default d = new Default();
+////
+////        //d.param.conceptActivationFactor.set(0.25f);
+////        //d.param.inputsMaxPerCycle.set(4);
+////
+////        //Default d = new Equalized(1024, 16, 10);
+////        //d.setTermLinkBagSize(16);
+////        //d.setTaskLinkBagSize(16);
+////
+//////
+//////            @Override
+//////            public Concept newConcept(final Term t, final Budget b, final Memory m) {
+//////
+//////                Bag<Sentence, TaskLink> taskLinks =
+//////                        new CurveBag(rng, /*sentenceNodes,*/ getConceptTaskLinks());
+//////                        //new ChainBag(rng,  getConceptTaskLinks());
+//////
+//////                Bag<TermLinkKey, TermLink> termLinks =
+//////                        new CurveBag(rng, /*termlinkKeyNodes,*/ getConceptTermLinks());
+//////                        //new ChainBag(rng, /*termlinkKeyNodes,*/ getConceptTermLinks());
+//////
+//////                return newConcept(t, b, taskLinks, termLinks, m);
+//////            }
+//////
+//////        };
+////        //d.setInternalExperience(null);
+////        //d.param.setClock(clock);
+////        //d.setClock(clock);
+////
+////        //d.param.conceptTaskTermProcessPerCycle.set(4);
+////
+////
+////        //d.param.setCyclesPerFrame(cycPerFrame);
+////        d.setCyclesPerFrame(cycPerFrame);
+////        //d.param.duration.set(cycPerFrame);
+////        //d.param.conceptBeliefsMax.set(16);
+////        //d.param.conceptGoalsMax.set(8);
+////
+////        //TextOutput.out(nar).setShowInput(true).setShowOutput(false);
+////
+////
+////        //N/A for solid
+////        //nar.param.inputsMaxPerCycle.set(32);
+////        //nar.param.conceptsFiredPerCycle.set(4);
+////
+////        //d.param.conceptCreationExpectation.set(0);
+////
+////        //d.termLinkForgetDurations.set(4);
+////
+////
+////
+////        return d;
+////    }
 }

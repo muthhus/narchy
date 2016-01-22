@@ -26,7 +26,6 @@
 package nars.rover.physics;
 
 import nars.rover.PhysicsModel;
-import org.jbox2d.common.IViewportTransform;
 import org.jbox2d.common.Vec2;
 
 import java.awt.event.KeyEvent;
@@ -45,12 +44,12 @@ public class PhysicsController {
 
     private static final Logger log = Logger.getLogger(PhysicsController.class.toString());
 
-    public static enum UpdateBehavior {
+    public enum UpdateBehavior {
 
         UPDATE_CALLED, UPDATE_IGNORED
     }
 
-    public static enum MouseBehavior {
+    public enum MouseBehavior {
 
         NORMAL, FORCE_Y_FLIP
     }
@@ -64,7 +63,7 @@ public class PhysicsController {
     private long frameCount;
     private float targetFrameRate;
     private float frameRate = 0;
-    private boolean animating = false;
+    private final boolean animating = false;
     private Thread animator;
 
     public final TestbedState model;
@@ -94,12 +93,9 @@ public class PhysicsController {
 
     private void addListeners() {
         // time for our controlling
-        model.addTestChangeListener(new TestbedState.TestChangedListener() {
-            @Override
-            public void testChanged(PhysicsModel test, int index) {
-                model.getPanel().grabFocus();
-                nextTest = test;
-            }
+        model.addTestChangeListener((test, index) -> {
+            model.getPanel().grabFocus();
+            nextTest = test;
         });
     }
 
@@ -197,7 +193,7 @@ public class PhysicsController {
                 return;
             
         }
-        IViewportTransform transform = currTest.getCamera().getTransform();
+        //IViewportTransform transform = currTest.getCamera().getTransform();
         // process our input
         while (!inputQueue.isEmpty()) {
             QueueItem i = null;

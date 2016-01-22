@@ -3,6 +3,7 @@ package nars.rover.robot;
 import nars.Global;
 import nars.NAR;
 import nars.rover.obj.VisionRay;
+import nars.term.Term;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
@@ -26,8 +27,8 @@ public class CarefulRover extends AbstractPolygonBot {
 
 
     final ArrayList<String> randomActions = new ArrayList<>();
-    private float visionDistanceFactor = 1f;
-    Map<String,VisionRay> pixels = Global.newHashMap();
+    private final float visionDistanceFactor = 1f;
+    Map<Term,VisionRay> pixels = Global.newHashMap();
 
     public void randomAction() {
         int x = (int) (Math.random() * randomActions.size());
@@ -71,7 +72,7 @@ public class CarefulRover extends AbstractPolygonBot {
         for (int i = 0; i < numPixels; i++) {
             VisionRay v = new VisionRay(this, torso,
                         /*eats ?*/ center /*: new Vec2(0,0)*/,
-                    a, da, 3, 10, 8) {
+                    a, da, 3, 10) {
 
                 @Override
                 protected float getDistance() {
@@ -123,7 +124,7 @@ public class CarefulRover extends AbstractPolygonBot {
 //        });
 
         System.out.println(pixels);
-        for (String a : pixels.keySet()) {
+        for (Term a : pixels.keySet()) {
             randomActions.add("vision(" + a + ")! :!: %1%");
             randomActions.add("vision(" + a + ")! :|: %0%");
         }

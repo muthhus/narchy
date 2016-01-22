@@ -4,7 +4,6 @@ import org.jbox2d.callbacks.QueryCallback;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
-import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.World;
 
 /**
@@ -28,19 +27,16 @@ public class Explosion {
         final float m_blastRadiusSq = blastRadius*blastRadius;
 
         //find all bodies with fixtures in blast radius AABB
-        QueryCallback queryCallback = new QueryCallback() {
-            @Override
-            public boolean reportFixture(Fixture fixture) {
-                Body body = fixture.getBody();
-                Vec2 bodyCom = body.getWorldCenter();
+        QueryCallback queryCallback = fixture -> {
+            Body body = fixture.getBody();
+            Vec2 bodyCom = body.getWorldCenter();
 
-                //ignore bodies outside the blast range
-                if ((bodyCom.sub(center)).lengthSquared() < m_blastRadiusSq) {
-                    applyBlastImpulse(body, center, bodyCom, blastPower);
-                    return true;
-                }
-                return false;
+            //ignore bodies outside the blast range
+            if ((bodyCom.sub(center)).lengthSquared() < m_blastRadiusSq) {
+                applyBlastImpulse(body, center, bodyCom, blastPower);
+                return true;
             }
+            return false;
         };
 
         world.queryAABB(queryCallback, new AABB(

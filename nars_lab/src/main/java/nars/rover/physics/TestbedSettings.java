@@ -63,7 +63,7 @@ public class TestbedSettings {
   public boolean pause = false;
   public boolean singleStep = false;
 
-  private List<TestbedSetting> settings;
+  private final List<TestbedSetting> settings;
   private final Map<String, TestbedSetting> settingsMap;
 
   public TestbedSettings() {

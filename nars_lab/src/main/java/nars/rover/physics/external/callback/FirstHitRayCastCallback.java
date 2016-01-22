@@ -15,6 +15,7 @@ public class FirstHitRayCastCallback implements RayCastCallback {
 	/** Pointer to first hit */
 	private DynamicEntity hit;
 
+	@Override
 	public float reportFixture(Fixture fixture, Vec2 point, Vec2 normal,
 							   float fraction) {
 		hit = (DynamicEntity)fixture.getUserData(); //PhysicsHelper.getDynamicEntity(fixture);

@@ -23,14 +23,14 @@ import java.util.List;
 public class Sim extends PhysicsModel {
 
 
-    private final SimulatedClock clock;
+    public final SimulatedClock clock;
     /* how often to input mission, in frames */
-    public int missionPeriod = 8;
+    public int missionPeriod = 24;
 
     boolean wraparound = false;
 
     public final List<Robotic> robots = Global.newArrayList();
-    final static int angleResolution = 13;
+    final static int angleResolution = 9;
 
 
     PhysicsRun phy = new PhysicsRun(10, this);
@@ -156,7 +156,7 @@ public class Sim extends PhysicsModel {
         return normalized;
     }
 
-    public int cnt = 0;
+
 
     static String[] angleTerms = new String[angleResolution];
 
@@ -164,7 +164,6 @@ public class Sim extends PhysicsModel {
         float h = (float) normalizeAngle(a);
         h /= MathUtils.PI*2.0f;
         int i = (int) (h * angleResolution / 1f);
-        String t;
         final int ha = angleResolution;
 
 //        if (i == 0) {
@@ -195,7 +194,7 @@ public class Sim extends PhysicsModel {
 //                angleTerms[i+ha] = s;
             }
 
-            t = angleTerms[i];
+        String t = angleTerms[i];
         //}
 
         return t;
@@ -316,7 +315,7 @@ public class Sim extends PhysicsModel {
 
     @Override
     public void step(float timeStep, TestbedSettings settings, TestbedPanel panel) {
-        cnt++;
+
 
         super.step(timeStep, settings, panel);
 

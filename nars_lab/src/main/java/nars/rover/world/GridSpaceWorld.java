@@ -9,7 +9,10 @@ import nars.rover.RoverWorld;
 import nars.rover.physics.gl.JoglAbstractDraw;
 import nars.rover.physics.j2d.SwingDraw;
 import nars.rover.physics.j2d.SwingDraw.LayerDraw;
-import nars.testchamber.*;
+import nars.testchamber.Cell;
+import nars.testchamber.Grid2DSpace;
+import nars.testchamber.Hauto;
+import nars.testchamber.SimplexNoise;
 import nars.testchamber.map.Maze;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.jbox2d.dynamics.Body;
@@ -29,18 +32,15 @@ public class GridSpaceWorld extends RoverWorld implements LayerDraw {
         int water_threshold = 30;
         Hauto cells = new Hauto(w, h, null);
         
-        cells.forEach(0, 0, w, h, new CellFunction() {
-            @Override
-            public void update(Cell c) {
+        cells.forEach(0, 0, w, h, c -> {
 ///c.setHeight((int)(Math.random() * 12 + 1));
-                float smoothness = 20f;
-                c.material = Cell.Material.GrassFloor;
-                double n = SimplexNoise.noise(c.state.x / smoothness, c.state.y / smoothness);
-                if ((n * 64) > water_threshold) {
-                    c.material = Cell.Material.Water;
-                }
-                c.setHeight((int) (Math.random() * 24 + 1));
+            float smoothness = 20f;
+            c.material = Cell.Material.GrassFloor;
+            double n = SimplexNoise.noise(c.state.x / smoothness, c.state.y / smoothness);
+            if ((n * 64) > water_threshold) {
+                c.material = Cell.Material.Water;
             }
+            c.setHeight((int) (Math.random() * 24 + 1));
         });
         
         Maze.buildMaze(cells, 3, 3, 23, 23);
@@ -64,26 +64,24 @@ public class GridSpaceWorld extends RoverWorld implements LayerDraw {
 
         ((JoglAbstractDraw)p.draw()).addLayer(this);
 
-        cells(new CellVisitor() {
-            @Override public void cell(Cell c, float px, float py) {
-                switch (c.material) {
-                    case StoneWall:
-                        Body w = addWall(px, py, cw/2f, ch/2f, 0f);
-                        w.setUserData(new SwingDraw.DrawProperty() {
+        cells((c, px, py) -> {
+            switch (c.material) {
+                case StoneWall:
+                    Body w1 = addWall(px, py, cw/2f, ch/2f, 0f);
+                    w1.setUserData(new SwingDraw.DrawProperty() {
 
-                            @Override
-                            public void before(Body b, SwingDraw d) {
-                                d.setFillColor(null);
-                                d.setStroke(null);
-                            }
+                        @Override
+                        public void before(Body b, SwingDraw d) {
+                            d.setFillColor(null);
+                            d.setStroke(null);
+                        }
 
-                            @Override public String toString() {
-                                return "wall";
-                            }
+                        @Override public String toString() {
+                            return "wall";
+                        }
 
-                        });
-                        break;
-                }
+                    });
+                    break;
             }
         }, false);
 
@@ -106,17 +104,17 @@ public class GridSpaceWorld extends RoverWorld implements LayerDraw {
         
     }
     
+    @FunctionalInterface
     public interface CellVisitor {
-        public void cell(Cell c, float px, float py);
+        void cell(Cell c, float px, float py);
     }
     
     public void cells(CellVisitor v, boolean onlyVisible) {
-        float px, py;
         for (int x = 0; x < w; x++) {
             for (int y = 0; y < h; y++) {
-                px = x * cw - worldWidth/2f;
-                py = -(y * ch) + worldHeight/2f;
-                
+                float px = x * cw - worldWidth / 2f;
+                float py = -(y * ch) + worldHeight / 2f;
+
                 Cell c = grid.cells.at(x, y);
                 v.cell(c, px, py);
             }
@@ -143,7 +141,7 @@ public class GridSpaceWorld extends RoverWorld implements LayerDraw {
                     draw.drawSolidRect(px, py, cw, ch,0.1f,0.5f + c.height*0.005f, 0.1f);
                     break;
                 case Water:
-                    float db = (float)rng.nextFloat()*0.04f;
+                    float db = rng.nextFloat() *0.04f;
                     
                     
                     float b = 0.5f + h*0.01f - db;

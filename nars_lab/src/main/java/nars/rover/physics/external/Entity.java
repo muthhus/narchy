@@ -27,7 +27,7 @@ public class Entity {
 	protected float angle;
 	
 	/** What layer the entity gets rendered on */
-	private int layer;
+	private final int layer;
 	
 	/** Hash value for entity */
 	private Integer hash;

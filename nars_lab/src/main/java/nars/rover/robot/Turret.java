@@ -40,7 +40,7 @@ public class Turret extends Robotic {
                             ii.remove();
 
 
-                        d.drawSolidCircle(bd.getCenter(), bd.explosionTTL/8 +  rng.nextFloat() * 4, new Vec2(),
+                        d.drawSolidCircle(bd.getCenter(), bd.explosionTTL/8f +  rng.nextFloat() * 4f, new Vec2(),
                                 new Color3f(1 - rng.nextFloat()/3f,
                                             0.8f - rng.nextFloat()/3f,
                                             0f));
@@ -80,7 +80,7 @@ public class Turret extends Robotic {
 
     final int maxBullets = 16;
     final Deque<Body> bullets = new ArrayDeque(maxBullets);
-    final Deque<Body> removedBullets = new ArrayDeque(maxBullets);
+    final Queue<Body> removedBullets = new ArrayDeque(maxBullets);
     final Collection<BulletData> explosions = new ConcurrentLinkedQueue();
 
     public void fireBullet(/*float ttl*/) {
@@ -92,8 +92,6 @@ public class Turret extends Robotic {
 //            ((BulletData)b.getUserData()).diesAt
 //
 //        }
-
-        final float speed = 100f;
 
 
         if (bullets.size() >= maxBullets) {
@@ -107,6 +105,7 @@ public class Turret extends Robotic {
 
         float angle = torso.getAngle();
         Vec2 rayDir = new Vec2( (float)Math.cos(angle), (float)Math.sin(angle) );
+        final float speed = 100f;
         rayDir.mulLocal(speed);
 
 

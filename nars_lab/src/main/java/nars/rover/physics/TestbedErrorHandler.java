@@ -23,6 +23,7 @@
  ******************************************************************************/
 package nars.rover.physics;
 
+@FunctionalInterface
 public interface TestbedErrorHandler {
   void serializationError(Exception e, String message);
 }

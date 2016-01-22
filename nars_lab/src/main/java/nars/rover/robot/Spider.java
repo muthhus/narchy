@@ -1,6 +1,7 @@
 package nars.rover.robot;
 
 import nars.rover.Sim;
+import nars.rover.util.Bodies;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyType;
@@ -63,7 +64,7 @@ public class Spider extends Robotic {
             float ax = (float) (x + Math.cos(angle) * dr);
             float ay = (float) (y + Math.sin(angle) * dr);
             final Body b = arm[i] = sim.create(new Vec2(ax, ay),
-                    sim.rectangle(new Vec2(al, aw), new Vec2(), angle), BodyType.DYNAMIC); //, angle, 1.0f, m);
+                    Bodies.rectangle(new Vec2(al, aw), new Vec2(), angle), BodyType.DYNAMIC); //, angle, 1.0f, m);
 
             float rx = (float) (x + Math.cos(angle) * (dr - al / 2.0f));
             float ry = (float) (y + Math.sin(angle) * (dr - al / 2.0f));
@@ -151,7 +152,7 @@ public class Spider extends Robotic {
     @Override
     public void init(Sim p) {
         this.sim = p;
-        Body base = sim.create(new Vec2(ix, iy), sim.circle(torsoRadius), BodyType.DYNAMIC); //ix, iy, 1.0f, m);
+        Body base = sim.create(new Vec2(ix, iy), Bodies.circle(torsoRadius), BodyType.DYNAMIC); //ix, iy, 1.0f, m);
 
         float da = (float) ((Math.PI * 2.0) / arms);
         float a = 0;

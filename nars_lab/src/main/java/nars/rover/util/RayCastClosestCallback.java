@@ -20,6 +20,7 @@ public class RayCastClosestCallback implements RayCastCallback {
         m_hit = false;
     }
 
+    @Override
     public float reportFixture(Fixture fixture, Vec2 point, Vec2 normal, float fraction) {
         Body body = fixture.getBody();
         //Object userData = body.getUserData();

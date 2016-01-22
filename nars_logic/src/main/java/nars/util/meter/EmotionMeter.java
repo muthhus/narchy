@@ -15,9 +15,6 @@ import java.io.Serializable;
 public class EmotionMeter extends FrameReaction implements Serializable {
 
     //public static final Compound BUSYness = $.seti(Atom.the("busy"));
-    @NotNull
-    private final Memory memory;
-
 
     /**
      * busy = total priority accumulated in this cycle
@@ -41,8 +38,6 @@ public class EmotionMeter extends FrameReaction implements Serializable {
 
     public EmotionMeter(@NotNull Memory memory) {
         super(memory);
-
-        this.memory = memory;
 
         onFrame(); //first update
     }

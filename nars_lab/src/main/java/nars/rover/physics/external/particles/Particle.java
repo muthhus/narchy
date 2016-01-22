@@ -12,9 +12,10 @@ import org.jbox2d.dynamics.FixtureDef;
  */
 public class Particle extends BoxEntity {
 	/** How long the particle stays alive */
-	private float timeToLive, timeAlive;
+	private final float timeToLive;
+	private float timeAlive;
 	/** The emitter this particle came from */
-	private ParticleEmitter owner;
+	private final ParticleEmitter owner;
 	
 	public Particle(
 			float timeToLive, ParticleEmitter owner,
@@ -40,6 +41,6 @@ public class Particle extends BoxEntity {
 	
 
 	
-	public ParticleEmitter getEmitter(){ return this.owner; };
-	
+	public ParticleEmitter getEmitter(){ return this.owner; }
+
 }

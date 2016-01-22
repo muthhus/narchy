@@ -7,7 +7,7 @@ import nars.rover.physics.PhysicsController;
  *
  */
 public class JoglDraw extends JoglAbstractDraw {
-    private JoglAbstractPanel panel;
+    private final JoglAbstractPanel panel;
 
     public JoglDraw(JoglAbstractPanel panel) {
         this.panel = panel;

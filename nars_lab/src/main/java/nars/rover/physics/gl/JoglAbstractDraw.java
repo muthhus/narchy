@@ -42,6 +42,7 @@ import org.jbox2d.dynamics.joints.Joint;
 import org.jbox2d.pooling.arrays.Vec2Array;
 
 import java.awt.*;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public abstract class JoglAbstractDraw extends DebugDraw {
@@ -49,7 +50,7 @@ public abstract class JoglAbstractDraw extends DebugDraw {
     private JoglAbstractPanel panel;
     private final TextRenderer text;
     private static final int NUM_CIRCLE_POINTS = 13;
-    public final java.util.List<SwingDraw.LayerDraw> layers = new CopyOnWriteArrayList();
+    public final List<SwingDraw.LayerDraw> layers = new CopyOnWriteArrayList();
 
     Transform xf = new Transform();
 
@@ -140,13 +141,13 @@ public abstract class JoglAbstractDraw extends DebugDraw {
 
 
 
+    @FunctionalInterface
     public interface DrawProperty {
-        public void before(Body b, JoglAbstractDraw d, float time);
+        void before(Body b, JoglAbstractDraw d, float time);
     }
 
 
     void drawBody(Body b, float time) {
-        boolean wireframe = false;
 
         Object o = b.getUserData();
         if (o instanceof DrawProperty) {
@@ -161,14 +162,15 @@ public abstract class JoglAbstractDraw extends DebugDraw {
 
         xf.set(b.getTransform());
 
+        boolean wireframe = false;
         for (Fixture f = b.getFixtureList(); f != null; f = f.getNext()) {
-            if (b.isActive() == false) {
+            if (!b.isActive()) {
                 drawShape(f, xf, fillColor, wireframe);
             } else if (b.getType() == BodyType.STATIC) {
                 drawShape(f, xf, fillColor, wireframe);
             } else if (b.getType() == BodyType.KINEMATIC) {
                 drawShape(f, xf, fillColor, wireframe);
-            } else if (b.isAwake() == false) {
+            } else if (!b.isAwake()) {
                 drawShape(f, xf, fillColor, wireframe);
             } else {
                 drawShape(f, xf, fillColor, wireframe);
@@ -185,7 +187,7 @@ public abstract class JoglAbstractDraw extends DebugDraw {
     private void drawShape(Fixture fixture, Transform xf, Color3f color, boolean wireframe) {
 
         switch (fixture.getType()) {
-            case CIRCLE: {
+            case CIRCLE:
                 CircleShape circle = (CircleShape) fixture.getShape();
 
                 // Vec2 center = Mul(xf, circle.m_p);
@@ -215,8 +217,7 @@ public abstract class JoglAbstractDraw extends DebugDraw {
                 } else {
                     drawSolidCircle(center, radius, axis, color);
                 }
-            }
-            break;
+                break;
 
             case POLYGON: {
                 PolygonShape poly = (PolygonShape) fixture.getShape();
@@ -236,14 +237,13 @@ public abstract class JoglAbstractDraw extends DebugDraw {
                 }
             }
             break;
-            case EDGE: {
+            case EDGE:
                 EdgeShape edge = (EdgeShape) fixture.getShape();
                 Transform.mulToOutUnsafe(xf, edge.m_vertex1, v1);
                 Transform.mulToOutUnsafe(xf, edge.m_vertex2, v2);
                 drawSegment(v1, v2, color);
-            }
-            break;
-            case CHAIN: {
+                break;
+            case CHAIN:
                 ChainShape chain = (ChainShape) fixture.getShape();
                 int count = chain.m_count;
                 Vec2[] vertices = chain.m_vertices;
@@ -255,8 +255,7 @@ public abstract class JoglAbstractDraw extends DebugDraw {
                     drawCircle(v1, 0.05f, color);
                     v1.set(v2);
                 }
-            }
-            break;
+                break;
             default:
                 break;
         }
@@ -352,11 +351,11 @@ public abstract class JoglAbstractDraw extends DebugDraw {
         //if (g.getDeviceConfiguration().getBounds().intersects(ipx-iw/2, ipy-ih/2, iw, ih)) {
         //}
 
-        Vec2[] vert = new Vec2[4];
         //float ulx = ipx-iw/2, uly = ipy-ih/2;
         float ulx = px, uly = py;
         w/=2;
         h/=2;
+        Vec2[] vert = new Vec2[4];
         vert[0] = new Vec2(ulx - w, uly - h);
         vert[1] = new Vec2(ulx + w, uly - h);
         vert[2] = new Vec2(ulx + w, uly + h);
@@ -399,11 +398,11 @@ public abstract class JoglAbstractDraw extends DebugDraw {
         float c = MathUtils.cos(theta);
         float s = MathUtils.sin(theta);
         float x = radius;
-        float y = 0;
         float cx = center.x;
         float cy = center.y;
         gl.glBegin(GL2.GL_LINE_LOOP);
         gl.glColor4f(color.x, color.y, color.z, 1);
+        float y = 0;
         for (int i = 0; i < NUM_CIRCLE_POINTS; i++) {
             gl.glVertex3f(x + cx, y + cy, 0);
             // apply the rotation matrix
@@ -424,11 +423,11 @@ public abstract class JoglAbstractDraw extends DebugDraw {
         float c = MathUtils.cos(theta);
         float s = MathUtils.sin(theta);
         float x = radius;
-        float y = 0;
         float cx = center.x;
         float cy = center.y;
         gl.glBegin(GL2.GL_LINE_LOOP);
         gl.glColor4f(color.x, color.y, color.z, 1);
+        float y = 0;
         for (int i = 0; i < NUM_CIRCLE_POINTS; i++) {
             gl.glVertex3f(x + cx, y + cy, 0);
             // apply the rotation matrix
@@ -453,11 +452,11 @@ public abstract class JoglAbstractDraw extends DebugDraw {
         float c = MathUtils.cos(theta);
         float s = MathUtils.sin(theta);
         float x = radius;
-        float y = 0;
         float cx = center.x;
         float cy = center.y;
         gl.glBegin(GL2.GL_TRIANGLE_FAN);
         gl.glColor4f(color.x, color.y, color.z, .4f);
+        float y = 0;
         for (int i = 0; i < NUM_CIRCLE_POINTS; i++) {
             gl.glVertex3f(x + cx, y + cy, 0);
             // apply the rotation matrix
@@ -587,11 +586,11 @@ public abstract class JoglAbstractDraw extends DebugDraw {
         GL2 gl = panel.getGL().getGL2();
         getWorldToScreenToOut(xf.p, temp);
         temp2.setZero();
-        float k_axisScale = 0.4f;
 
         gl.glBegin(GL2.GL_LINES);
         gl.glColor3f(1, 0, 0);
 
+        float k_axisScale = 0.4f;
         temp2.x = xf.p.x + k_axisScale * xf.q.c;
         temp2.y = xf.p.y + k_axisScale * xf.q.s;
         getWorldToScreenToOut(temp2, temp2);

@@ -18,43 +18,45 @@ public class Jetpack {
 
 
 	/** Player this jetpack belongs to */
-	private DynamicEntity player;
+	private final DynamicEntity player;
 	
 	/** Amount of force jetpack outputs */
-	private float upwardForce = 20.0f;
+	private final float upwardForce = 20.0f;
 	
 	/** Max speed the player can go on the Y axis */
-	private float maxVelocityY = 15.0f;
+	private final float maxVelocityY = 15.0f;
 	
 	/** Whether or not the player is using the jetpack */
 	private boolean jetpackOn;
 	
 	/** Particle emitter for jetpack */
-	private ParticleEmitter jetpackEmitter;
+	private final ParticleEmitter jetpackEmitter;
 	
 	/** How much fuel is left in this jetpack. Should always be between 0 and 100. */
 	private float fuel = 100.0f;
 	
 	/** How fast the jetpack depletes/refuels */
-	private float depleteRate = 50.0f, rechargeRate = 20.0f;
+	private final float depleteRate = 50.0f;
+	private final float rechargeRate = 20.0f;
 	
 	/** The jetpack charges faster after the player lands on the ground */
 	private boolean fastRecharging;
 	
 	/** How fast the jetpack fast recharges */
-	private float fastRechargeRate = 75.0f;
+	private final float fastRechargeRate = 75.0f;
 	
 	/** How much fuel is left before the jetpack starts hovering */
-	private float hoverStartPercent = 30.0f;
+	private final float hoverStartPercent = 30.0f;
 	
 	/** How fast the jetpack depletes/recharges when hovering */
-	private float hoverDepleteRate = 10.0f, hoverRechargeRate = 30.0f;
+	private final float hoverDepleteRate = 10.0f;
+	private final float hoverRechargeRate = 30.0f;
 	
 	/** Whether or not the player is hovering (< hoverStartPercent fuel) */
 	private boolean isHovering;
 	
 	/** Force the jetpack outputs if it's hovering */
-	private float hoverForce = 10.0f;
+	private final float hoverForce = 10.0f;
 			
 	/** @param player Player owning this jetpack */
 	public Jetpack(DynamicEntity player){
@@ -79,10 +81,7 @@ public class Jetpack {
 		// apply force and drain fuel if the jetpack is on
 		if(jetpackOn && fuel > 0.0f){
 			applyForce(timeStep);
-			if(isHovering)
-				fuel -= timeStep * hoverDepleteRate;
-			else
-				fuel -= timeStep * depleteRate;
+			fuel -= isHovering ? timeStep * hoverDepleteRate : timeStep * depleteRate;
 			fastRecharging = false;
 			if(fuel <= 0.0f)
 				this.disable();
@@ -139,10 +138,7 @@ public class Jetpack {
 	private void applyForce(float timeStep){
 		Vec2 linVec = player.body.getLinearVelocity();
 		if(linVec.y <= maxVelocityY){
-			if(isHovering)
-				linVec.y += timeStep * hoverForce;
-			else
-				linVec.y += timeStep * upwardForce;
+			linVec.y += isHovering ? timeStep * hoverForce : timeStep * upwardForce;
 			player.body.setLinearVelocity(linVec);
 			jetpackEmitter.activate();
 		}

@@ -37,16 +37,14 @@ public class AWTPanelHelper {
         help.add("Press '[' or ']' to change tests, and 'r' to restart.");
         model.setImplSpecificHelp(help);
 
-        panel.addMouseWheelListener(new MouseWheelListener() {
-            public void mouseWheelMoved(MouseWheelEvent e) {
-                int notches = e.getWheelRotation();
-                PhysicsModel currTest = model.getCurrTest();
-                if (currTest == null) {
-                    return;
-                }
-                ZoomType zoom = notches < 0 ? ZoomType.ZOOM_IN : ZoomType.ZOOM_OUT;
-                currTest.getCamera().zoomToPoint(mouse, zoom);
+        panel.addMouseWheelListener(e -> {
+            int notches = e.getWheelRotation();
+            PhysicsModel currTest = model.getCurrTest();
+            if (currTest == null) {
+                return;
             }
+            ZoomType zoom = notches < 0 ? ZoomType.ZOOM_IN : ZoomType.ZOOM_OUT;
+            currTest.getCamera().zoomToPoint(mouse, zoom);
         });
 
         panel.addMouseListener(new MouseAdapter() {

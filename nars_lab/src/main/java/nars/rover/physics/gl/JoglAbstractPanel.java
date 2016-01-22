@@ -56,7 +56,7 @@ public abstract class JoglAbstractPanel extends GLCanvas implements TestbedPanel
     private Timer timer;
     //LightEngine light = new LightEngine();
 
-    private TestbedState model;
+    private final TestbedState model;
 
     // model can be null
     // if it is null world and debugDraw can be null, because they are retrived from model
@@ -147,21 +147,11 @@ public abstract class JoglAbstractPanel extends GLCanvas implements TestbedPanel
     }
 
     private World getWorld() {
-        if( model != null ) {
-            return model.getCurrTest().getWorld();
-        }
-        else {
-            return world;
-        }
+        return model != null ? model.getCurrTest().getWorld() : world;
     }
 
     private DebugDraw getDebugDraw() {
-        if( model != null ) {
-            return model.getDebugDraw();
-        }
-        else {
-            return debugDraw;
-        }
+        return model != null ? model.getDebugDraw() : debugDraw;
     }
 
     @Override
@@ -175,7 +165,7 @@ public abstract class JoglAbstractPanel extends GLCanvas implements TestbedPanel
         gl2.glEnable(GL.GL_LINE_SMOOTH);
         gl2.glEnable(GL.GL_LINE_WIDTH);
         gl2.glEnable(GL2.GL_BLEND);
-        gl2.glBlendFunc(gl2.GL_SRC_ALPHA, gl2.GL_ONE_MINUS_SRC_ALPHA);
+        gl2.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
 
 
         //getGL().getGL2().glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
@@ -213,7 +203,7 @@ public abstract class JoglAbstractPanel extends GLCanvas implements TestbedPanel
         gl2.glViewport(0, 0, getWidth(), getHeight());
 
         if( controller != null ) {
-            controller.updateExtents(arg3 / 2, arg4 / 2);
+            controller.updateExtents(arg3 / 2f, arg4 / 2f);
         }
     }
 }

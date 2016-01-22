@@ -80,8 +80,8 @@ public abstract class PhysicsModel extends Bodies implements ContactListener, Ru
     private boolean bombSpawning = false;
 
     protected boolean mouseTracing;
-    private Vec2 mouseTracerPosition = new Vec2();
-    private Vec2 mouseTracerVelocity = new Vec2();
+    private final Vec2 mouseTracerPosition = new Vec2();
+    private final Vec2 mouseTracerVelocity = new Vec2();
 
     private final Vec2 mouseWorld = new Vec2();
     private int pointCount;
@@ -94,7 +94,7 @@ public abstract class PhysicsModel extends Bodies implements ContactListener, Ru
     protected int m_textLine;
     private final LinkedList<String> textList = new LinkedList<>();
 
-    private PhysicsCamera camera;
+    private final PhysicsCamera camera;
 
     private final Transform identity = new Transform();
     private TestbedSettings settings;
@@ -137,20 +137,23 @@ public abstract class PhysicsModel extends Bodies implements ContactListener, Ru
         camera = new PhysicsCamera(getDefaultCameraPos(), getDefaultCameraScale(), ZOOM_SCALE_DIFF);
     }
 
+    @Override
     public final void beginContact(final Contact contact) {
-
-        final Object ua = contact.getFixtureA().getBody().getUserData();
-        final Object ub = contact.getFixtureB().getBody().getUserData();
-
-        if (ua instanceof Collidable)
-            ((Collidable)ua).onCollision(contact);
-        if (ub instanceof Collidable)
-            ((Collidable)ub).onCollision(contact);
+        handleCollision(contact, contact.getFixtureA());
+        handleCollision(contact, contact.getFixtureB());
     }
 
+    private static void handleCollision(Contact contact, Fixture fa) {
+        final Object ua = fa.getBody().getUserData();
+        if (ua instanceof Collidable)
+            ((Collidable)ua).onCollision(contact);
+    }
+
+    @Override
     public void endContact(Contact contact) {
     }
 
+    @Override
     public void postSolve(Contact contact, ContactImpulse impulse) {
     }
 
@@ -351,7 +354,7 @@ public abstract class PhysicsModel extends Bodies implements ContactListener, Ru
         return time;
     }
 
-    synchronized public void step(float timeStep, TestbedSettings settings, TestbedPanel panel) {
+    public void step(float timeStep, TestbedSettings settings, TestbedPanel panel) {
     //float hz = settings.getSetting(TestbedSettings.Hz).value;
 
         
@@ -697,12 +700,12 @@ public abstract class PhysicsModel extends Bodies implements ContactListener, Ru
     private final Vec2 vel = new Vec2();
 
     private void completeBombSpawn(Vec2 p) {
-        if (bombSpawning == false) {
+        if (!bombSpawning) {
             return;
         }
 
-        float multiplier = 30f;
         vel.set(bombSpawnPoint).subLocal(p);
+        float multiplier = 30f;
         vel.mulLocal(multiplier);
         launchBomb(bombSpawnPoint, vel);
         bombSpawning = false;
@@ -712,6 +715,7 @@ public abstract class PhysicsModel extends Bodies implements ContactListener, Ru
     private final PointState[] state2 = new PointState[Settings.maxManifoldPoints];
     private final WorldManifold worldManifold = new WorldManifold();
 
+    @Override
     public void preSolve(Contact contact, Manifold oldManifold) {
         Manifold manifold = contact.getManifold();
 
@@ -751,6 +755,7 @@ class TestQueryCallback implements QueryCallback {
         fixture = null;
     }
 
+    @Override
     public boolean reportFixture(Fixture argFixture) {
         Body body = argFixture.getBody();
         if (body.getType() == BodyType.DYNAMIC) {

@@ -76,9 +76,10 @@ public class TestPanelJ2D extends JPanel implements TestbedPanel {
     private void updateSize(int width, int height) {
         panelWidth = width;
         panelHeight = height;
-        controller.updateExtents(width / 2, height / 2);
+        controller.updateExtents(width / 2f, height / 2f);
     }
 
+    @Override
     public boolean render() {
         if (dbImage == null) {
             //System.out.println("dbImage is null, creating a new one");
@@ -103,6 +104,7 @@ public class TestPanelJ2D extends JPanel implements TestbedPanel {
         return true;
     }
 
+    @Override
     public void paintScreen() {
         try {
             Graphics g = this.getGraphics();

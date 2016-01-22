@@ -30,7 +30,6 @@ import com.jogamp.opengl.GLProfile;
 import nars.rover.physics.PhysicsController;
 import nars.rover.physics.PhysicsController.MouseBehavior;
 import nars.rover.physics.PhysicsController.UpdateBehavior;
-import nars.rover.physics.TestbedErrorHandler;
 import nars.rover.physics.TestbedState;
 import nars.rover.physics.gl.JoglAbstractDraw;
 import nars.rover.physics.gl.JoglAbstractPanel;
@@ -65,13 +64,8 @@ public class PhysicsRun {
         // }
         model = new TestbedState();
         controller = new PhysicsController(model, UpdateBehavior.UPDATE_CALLED, MouseBehavior.NORMAL,
-            new TestbedErrorHandler() {
-                @Override
-                public void serializationError(Exception e, String message) {
-                    JOptionPane.showMessageDialog(null, message, "Serialization Error",
-                            JOptionPane.ERROR_MESSAGE);
-                }
-            });
+                (e, message) -> JOptionPane.showMessageDialog(null, message, "Serialization Error",
+                        JOptionPane.ERROR_MESSAGE));
 
         //PhysPanel panel = new PhysPanel(model, controller);
         GLCapabilities config = new GLCapabilities(GLProfile.getDefault());

@@ -12,7 +12,7 @@ import org.jbox2d.dynamics.contacts.Contact;
 
 public abstract class Bodies implements BodyDefCallback, FixtureDefCallback {
 
-	public World world;
+	protected World world;
 	public float standard_friction;
 	public float standard_density;
 	public float standard_restitution = 0;
@@ -21,10 +21,10 @@ public abstract class Bodies implements BodyDefCallback, FixtureDefCallback {
 
 	public interface CollisionManager {
 
-		public abstract void preSolve(Contact contact, Manifold point_manifold, boolean is_fix_a);
-		public abstract void beginContact(Contact contact, boolean is_fix_a);
-		public abstract void endContact(Contact contact, boolean is_fix_a);
-		public abstract void postSolve(Contact contact, ContactImpulse impulse, boolean is_fix_a);
+		void preSolve(Contact contact, Manifold point_manifold, boolean is_fix_a);
+		void beginContact(Contact contact, boolean is_fix_a);
+		void endContact(Contact contact, boolean is_fix_a);
+		void postSolve(Contact contact, ContactImpulse impulse, boolean is_fix_a);
 
 	}
 
@@ -80,9 +80,8 @@ public abstract class Bodies implements BodyDefCallback, FixtureDefCallback {
 	public Body create(Vec2 position, Shape[] shapes, BodyType bodytype, BodyDefCallback body_instruction, FixtureDefCallback fixture_instruction, CollisionManager colm){
 		Body groundbody = world.createBody(setupBody(position, bodytype, body_instruction));
 
-		FixtureDef temp;
 		for(Shape s : shapes){
-			temp = createFix(s, fixture_instruction);
+			FixtureDef temp = createFix(s, fixture_instruction);
 			if(colm != null)temp.userData = new FixtureData(colm);
 			groundbody.createFixture(temp);
 		}

@@ -72,15 +72,16 @@ public class SwingDraw extends DebugDraw {
         circle = new Ellipse2D.Float(-1, -1, 2, 2);
     }
 
-    public static interface PhyDrawable {
-        public void draw(SwingDraw d);
+    @FunctionalInterface
+    public interface PhyDrawable {
+        void draw(SwingDraw d);
     }
     
 
 
     public interface LayerDraw {
-        public void drawGround(JoglAbstractDraw draw, World w);
-        public void drawSky(JoglAbstractDraw draw, World w);
+        void drawGround(JoglAbstractDraw draw, World w);
+        void drawSky(JoglAbstractDraw draw, World w);
     }
     
     public void addLayer(LayerDraw l) {
@@ -167,8 +168,9 @@ public class SwingDraw extends DebugDraw {
         //flush();
 
     }
+    @FunctionalInterface
     public interface DrawProperty {
-        public void before(Body b, SwingDraw d);
+        void before(Body b, SwingDraw d);
     }
     
     Color defaultFillColor =  new Color(0.75f, 0.75f, 0.75f);
@@ -194,8 +196,7 @@ public class SwingDraw extends DebugDraw {
     
 
     void drawBody(Body b) {
-        boolean wireframe = false;
-        
+
         Object o = b.getUserData();
         if (o instanceof DrawProperty) {
             DrawProperty d = (DrawProperty)o;
@@ -213,9 +214,10 @@ public class SwingDraw extends DebugDraw {
         
         
         xf.set(b.getTransform());
-        
+
+        boolean wireframe = false;
         for (Fixture f = b.getFixtureList(); f != null; f = f.getNext()) {
-            if (b.isActive() == false) {
+            if (!b.isActive()) {
                 color.set(0.5f, 0.5f, 0.3f);
                 drawShape(f, xf, color, wireframe);
             } else if (b.getType() == BodyType.STATIC) {
@@ -224,7 +226,7 @@ public class SwingDraw extends DebugDraw {
             } else if (b.getType() == BodyType.KINEMATIC) {
                 color.set(0.5f, 0.5f, 0.9f);
                 drawShape(f, xf, color, wireframe);
-            } else if (b.isAwake() == false) {
+            } else if (!b.isAwake()) {
                 color.set(0.5f, 0.5f, 0.5f);
                 drawShape(f, xf, color, wireframe);
             } else {
@@ -294,14 +296,13 @@ public class SwingDraw extends DebugDraw {
                 }
             }
             break;
-            case EDGE: {
+            case EDGE:
                 EdgeShape edge = (EdgeShape) fixture.getShape();
                 Transform.mulToOutUnsafe(xf, edge.m_vertex1, v1);
                 Transform.mulToOutUnsafe(xf, edge.m_vertex2, v2);
                 drawSegment(v1, v2, color);
-            }
-            break;
-            case CHAIN: {
+                break;
+            case CHAIN:
                 ChainShape chain = (ChainShape) fixture.getShape();
                 int count = chain.m_count;
                 Vec2[] vertices = chain.m_vertices;
@@ -313,8 +314,7 @@ public class SwingDraw extends DebugDraw {
                     drawCircle(v1, 0.05f, color);
                     v1.set(v2);
                 }
-            }
-            break;
+                break;
             default:
                 break;
         }
@@ -341,15 +341,14 @@ public class SwingDraw extends DebugDraw {
                 drawSegment(p1, p2, color);
                 break;
 
-            case PULLEY: {
+            case PULLEY:
                 PulleyJoint pulley = (PulleyJoint) joint;
                 Vec2 s1 = pulley.getGroundAnchorA();
                 Vec2 s2 = pulley.getGroundAnchorB();
                 drawSegment(s1, p1, color);
                 drawSegment(s2, p2, color);
                 drawSegment(s1, s2, color);
-            }
-            break;
+                break;
             case CONSTANT_VOLUME:
             case MOUSE:
                 // don't draw this
@@ -373,7 +372,7 @@ public class SwingDraw extends DebugDraw {
     @Override
     public void drawPoint(Vec2 argPoint, float argRadiusOnScreen, Color3f argColor) {
         getWorldToScreenToOut(argPoint, sp1);
-        Graphics2D g = getGraphics();
+        Graphics2D g = graphics;
 
         Color c = new Color(argColor.x, argColor.y, argColor.z);
         g.setColor(c);
@@ -390,7 +389,7 @@ public class SwingDraw extends DebugDraw {
         getWorldToScreenToOut(p2, sp2);
 
         Color c = new Color(color.x, color.y, color.z);
-        Graphics2D g = getGraphics();
+        Graphics2D g = graphics;
         g.setColor(c);
 
         g.setStroke(stroke);
@@ -403,7 +402,7 @@ public class SwingDraw extends DebugDraw {
 
         
         Color c = new Color(color.x, color.y, color.z, alpha);
-        Graphics2D g = getGraphics();        
+        Graphics2D g = graphics;
         g.setColor(c);
         g.setStroke(stroke);
         g.drawLine((int) sp1.x, (int) sp1.y, (int) sp2.x, (int) sp2.y);
@@ -443,7 +442,7 @@ public class SwingDraw extends DebugDraw {
 
     @Override
     public void drawCircle(Vec2 center, float radius, Color3f color) {
-        Graphics2D g = getGraphics();
+        Graphics2D g = graphics;
         Color s = new Color(color.x, color.y, color.z, 1f);
         saveState(g);
         transformGraphics(g, center);
@@ -455,7 +454,7 @@ public class SwingDraw extends DebugDraw {
     }
 
     public void drawCircle(Vec2 center, float radius, Vec2 axis, Color3f color) {
-        Graphics2D g = getGraphics();
+        Graphics2D g = graphics;
         saveState(g);
         transformGraphics(g, center);
         g.setStroke(stroke);
@@ -472,7 +471,7 @@ public class SwingDraw extends DebugDraw {
 
     @Override
     public void drawSolidCircle(Vec2 center, float radius, Vec2 axis, Color3f color) {
-        Graphics2D g = getGraphics();
+        Graphics2D g = graphics;
         saveState(g);
         transformGraphics(g, center);
         g.setStroke(stroke);
@@ -551,7 +550,7 @@ public class SwingDraw extends DebugDraw {
     private final static IntArray yIntsPool = new IntArray();
 
     public void drawSolidRect(float px, float py, float w, float h, float r, float G, float b) {
-        Graphics2D g = getGraphics();
+        Graphics2D g = graphics;
         //saveState(g);
                 
         getWorldToScreenToOut(px, py, temp);
@@ -579,7 +578,7 @@ public class SwingDraw extends DebugDraw {
     public void drawSolidPolygon(Vec2[] vertices, int vertexCount, Color3f color) {
         Color s = strokeColor;
         Color f = fillColor;
-        Graphics2D g = getGraphics();
+        Graphics2D g = graphics;
         //saveState(g);
         int[] xInts = xIntsPool.get(vertexCount);
         int[] yInts = yIntsPool.get(vertexCount);
@@ -599,7 +598,7 @@ public class SwingDraw extends DebugDraw {
     @Override
     public void drawPolygon(Vec2[] vertices, int vertexCount, Color3f color) {
         Color s = strokeColor; //new Color(color.x, color.y, color.z, 1f);
-        Graphics2D g = getGraphics();
+        Graphics2D g = graphics;
         
         //saveState(g);
         int[] xInts = xIntsPool.get(vertexCount);
@@ -617,7 +616,7 @@ public class SwingDraw extends DebugDraw {
 
     @Override
     public void drawString(float x, float y, String s, Color3f color) {
-        Graphics2D g = getGraphics();
+        Graphics2D g = graphics;
         if (g == null) {
             return;
         }
@@ -634,14 +633,14 @@ public class SwingDraw extends DebugDraw {
 
     @Override
     public void drawTransform(Transform xf) {
-        Graphics2D g = getGraphics();
+        Graphics2D g = graphics;
         getWorldToScreenToOut(xf.p, temp);
         temp2.setZero();
-        float k_axisScale = 0.4f;
 
         Color c = new Color(1, 0, 0);
         g.setColor(c);
 
+        float k_axisScale = 0.4f;
         temp2.x = xf.p.x + k_axisScale * xf.q.c;
         temp2.y = xf.p.y + k_axisScale * xf.q.s;
         getWorldToScreenToOut(temp2, temp2);

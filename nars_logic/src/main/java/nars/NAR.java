@@ -76,7 +76,7 @@ public abstract class NAR implements Level,Consumer<Task> {
                     "               IRC:  http://webchat.freenode.net/?channels=nars \n";
 
 
-    static final Logger logger = LoggerFactory.getLogger(NAR.class);
+    public static final Logger logger = LoggerFactory.getLogger(NAR.class);
     static final ThreadPoolExecutor asyncs =
             (ThreadPoolExecutor) Executors.newCachedThreadPool();
     static final Set<String> logEvents = Sets.newHashSet(
