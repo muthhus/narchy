@@ -44,8 +44,8 @@ public class UnificationTest  {
         nar.believe(s2);
         nar.frame(2);
 
-        Term t1 = nar.concept(s1).get();
-        Term t2 = nar.concept(s2).get();
+        Term t1 = nar.concept(s1).term();
+        Term t2 = nar.concept(s2).term();
 
         Set<Term> t1u = ((Compound) t1).uniqueSubtermSet(type);
         Set<Term> t2u = ((Compound) t2).uniqueSubtermSet(type);

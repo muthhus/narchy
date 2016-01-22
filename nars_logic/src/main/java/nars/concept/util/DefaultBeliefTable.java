@@ -149,7 +149,7 @@ public class DefaultBeliefTable implements BeliefTable {
     @Nullable
     @Override
     public Task topEternal() {
-        return eternal.highest();
+        return eternal.top();
     }
 
     @Nullable

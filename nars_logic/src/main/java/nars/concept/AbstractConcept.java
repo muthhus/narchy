@@ -1,7 +1,9 @@
 package nars.concept;
 
+import nars.Global;
 import nars.term.Term;
 import nars.term.Termed;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
@@ -35,26 +37,35 @@ public abstract class AbstractConcept implements Concept {
         return meta;
     }
 
-    @Override
-    @Deprecated public void setMeta(Map<Object, Object> meta) {
+
+    private void setMeta(Map<Object, Object> meta) {
         this.meta = meta;
     }
 
 
 
+    /** like Map.put for storing data in meta map
+     *  @param value if null will perform a removal
+     * */
+    @Nullable
+    public final Object put(@NotNull Object key, @Nullable Object value) {
 
+        Map<Object, Object> currMeta = getMeta();
 
-        /**
-         * The term is the unique ID of the concept
-         */
-    @Override
-    public final Term get() {
-        return term;
+        if (value != null) {
+
+            if (currMeta == null) setMeta(currMeta = Global.newHashMap());
+
+            return currMeta.put(key, value);
+        }
+        else {
+            return currMeta != null ? currMeta.remove(key) : null;
+        }
+
     }
 
-
     @Override
-    public boolean equals(Object obj) {
+    public final boolean equals(Object obj) {
         return (this == obj) || ((obj instanceof Termed)
                 && ((Termed) obj).term().equals(term));
     }
@@ -64,6 +75,10 @@ public abstract class AbstractConcept implements Concept {
         return term.hashCode();
     }
 
+    @Override
+    public final int compareTo(Termed o) {
+        return term.compareTo(o.term());
+    }
 
     /**
      * Return a string representation of the concept, called in ConceptBag only

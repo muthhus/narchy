@@ -9,6 +9,7 @@ import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jgrapht.alg.ConnectivityInspector;
+import org.jgrapht.alg.StrongConnectivityInspector;
 import org.jgrapht.graph.DirectedPseudograph;
 
 import java.io.PrintStream;
@@ -22,7 +23,7 @@ public class TermLinkGraph2 extends DirectedPseudograph<Termed, Termed> {
 
     public TermLinkGraph2() {
         super((a, b) -> {
-            return $.p((Term)a,(Term)b);
+            return $.p(a.term(),b.term());
         });
     }
 
@@ -71,7 +72,7 @@ public class TermLinkGraph2 extends DirectedPseudograph<Termed, Termed> {
 
         /** add the termlink templates instead of termlinks */
         @Override protected void addTermLinks(@NotNull Concept c) {
-            Term sourceTerm = c.get();
+            Term sourceTerm = c.term();
 
             for (Termed t : c.getTermLinkTemplates()) {
                 Term targetTerm = t.term();
@@ -86,7 +87,7 @@ public class TermLinkGraph2 extends DirectedPseudograph<Termed, Termed> {
 
     @NotNull
     public TermLinkGraph2 add(@NotNull Concept c, boolean includeTermLinks/*, boolean includeTaskLinks, boolean includeOtherReferencedConcepts*/) {
-        Term source = c.get();
+        Term source = c.term();
 
         if (!containsVertex(source)) {
             addVertex(source);
@@ -116,7 +117,7 @@ public class TermLinkGraph2 extends DirectedPseudograph<Termed, Termed> {
         if (c == null)
             throw new RuntimeException("null concept");
 
-        Term cterm = c.get();
+        Term cterm = c.term();
 
         Bag<Termed> tl = c.getTermLinks();
         if (tl == null) return;
@@ -143,6 +144,11 @@ public class TermLinkGraph2 extends DirectedPseudograph<Termed, Termed> {
     public boolean isConnected() {
         ConnectivityInspector<Termed,Termed> ci = new ConnectivityInspector(this);
         return ci.isGraphConnected();
+    }
+
+    public boolean isStronglyConnected() {
+        StrongConnectivityInspector<Termed,Termed> ci = new StrongConnectivityInspector(this);
+        return ci.isStronglyConnected();
     }
 
 //    public void add(Memory memory) {

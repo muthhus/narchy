@@ -8,7 +8,7 @@ import nars.nar.AbstractNAR;
 import nars.nar.Default;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.util.graph.TermLinkGraph;
+import nars.util.graph.TermLinkGraph2;
 import nars.util.meter.TestNAR;
 import org.jetbrains.annotations.NotNull;
 import org.jgrapht.alg.StrongConnectivityInspector;
@@ -105,7 +105,7 @@ public class LinkageTest extends AbstractNALTester {
 
 
         //System.err.println(premise1 + " not linked with " + premise2);
-        TermLinkGraph g = new TermLinkGraph(nar);
+        TermLinkGraph2 g = new TermLinkGraph2(nar);
         assertTrue(g.vertexSet().size() > 0);
         assertTrue(g.edgeSet().size() > 0);
 

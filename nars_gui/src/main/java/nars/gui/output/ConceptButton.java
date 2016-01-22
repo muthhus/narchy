@@ -28,7 +28,7 @@ public class ConceptButton extends JButton implements ActionListener {
     }
 
     public ConceptButton(NAR n, Concept c) {
-        this(n, c.get());
+        this(n, c.term());
         concept = c;
     }
 

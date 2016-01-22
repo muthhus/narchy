@@ -3,7 +3,7 @@ package nars.op.meta;
 import nars.nal.nal8.Execution;
 import nars.nal.nal8.operator.SyncOperator;
 import nars.term.Term;
-import nars.util.graph.TermLinkGraph;
+import nars.util.graph.TermLinkGraph2;
 import org.jetbrains.annotations.NotNull;
 import org.jgrapht.alg.ConnectivityInspector;
 
@@ -17,7 +17,7 @@ public class connectivity extends SyncOperator {
     @Override
     public void execute(@NotNull Execution e) {
 
-        TermLinkGraph g = new TermLinkGraph(e.nar);
+        TermLinkGraph2 g = new TermLinkGraph2(e.nar);
 
 
         ConnectivityInspector<Term,String> ci = new ConnectivityInspector(g);

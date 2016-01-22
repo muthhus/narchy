@@ -92,7 +92,7 @@ public class Narsese extends BaseParser<Object> {
                         .truth(t)
                         .time(
                                 memory.time(), //creation time
-                                Tense.getOccurrenceTime(
+                                Tense.getRelativeOccurrence(
                                         tense,
                                         memory
                                 ));

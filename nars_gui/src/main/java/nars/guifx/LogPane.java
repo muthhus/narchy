@@ -231,7 +231,7 @@ public class LogPane extends BorderPane  {
     static class ConceptActivationIcon extends Button {
 
         public ConceptActivationIcon(Concept c) {
-           super(c.get().toStringCompact());
+           super(c.term().toStringCompact());
             setCache(true);
         }
     }

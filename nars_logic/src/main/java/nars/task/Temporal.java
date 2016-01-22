@@ -52,7 +52,7 @@ public interface Temporal extends Tasked {
 
     default void setOccurrenceTime(long creation, @NotNull Tense tense, int duration) {
         setOccurrenceTime(
-            Tense.getOccurrenceTime(
+            Tense.getRelativeOccurrence(
                     creation,
                     tense,
                     duration));

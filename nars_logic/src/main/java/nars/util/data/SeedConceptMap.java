@@ -20,8 +20,7 @@ public abstract class SeedConceptMap extends ConceptMap {
 
     @Override
     public boolean contains(@NotNull Concept c) {
-        Term s = c.get();
-        return terms.contains(s);
+        return terms.contains(c.term());
     }
 
     public boolean contains(Term t) { return terms.contains(t); }

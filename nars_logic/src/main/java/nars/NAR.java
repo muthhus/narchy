@@ -316,7 +316,7 @@ public abstract class NAR implements Level,Consumer<Task> {
     }
 
     public long time(@NotNull Tense tense) {
-        return Tense.getOccurrenceTime(tense, memory);
+        return Tense.getRelativeOccurrence(tense, memory);
     }
 
     @NotNull

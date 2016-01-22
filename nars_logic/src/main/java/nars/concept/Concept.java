@@ -23,13 +23,11 @@ package nars.concept;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Ordering;
 import com.google.common.primitives.Longs;
-import nars.Global;
 import nars.NAR;
 import nars.bag.Bag;
 import nars.concept.util.BeliefTable;
 import nars.concept.util.TaskTable;
 import nars.task.Task;
-import nars.term.Term;
 import nars.term.Termed;
 import nars.term.compound.Compound;
 import org.jetbrains.annotations.NotNull;
@@ -38,18 +36,14 @@ import org.jetbrains.annotations.Nullable;
 import java.io.PrintStream;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.function.Supplier;
 
-public interface Concept extends Termed, Supplier<Term> {
+public interface Concept extends Termed, Comparable<Termed> {
 
     Bag<Task> getTaskLinks();
     Bag<Termed> getTermLinks();
 
     @Nullable
     Map<Object, Object> getMeta();
-    void setMeta(Map<Object, Object> meta);
-
-    @Override default Term get() { return term(); }
 
     default boolean hasGoals() {
         return !getGoals().isEmpty();
@@ -74,30 +68,12 @@ public interface Concept extends Termed, Supplier<Term> {
         return this + "::" + id;
     }
 
+    Object put(@NotNull Object key, @Nullable Object value);
 
-    /** like Map.put for storing data in meta map
-     *  @param value if null will perform a removal
-     * */
-    @Nullable
-    default Object put(Object key, @Nullable Object value) {
-
-        Map<Object, Object> currMeta = getMeta();
-
-        if (value != null) {
-
-            if (currMeta == null) setMeta(currMeta = Global.newHashMap());
-
-            return currMeta.put(key, value);
-        }
-        else {
-            return currMeta != null ? currMeta.remove(key) : null;
-        }
-
-    }
 
     /** like Map.gett for getting data stored in meta map */
     @Nullable
-    default <C> C get(Object key) {
+    default <C> C get(@NotNull Object key) {
         Map<Object, Object> m;
         return null == (m = getMeta()) ? null : (C) m.get(key);
     }
@@ -106,19 +82,19 @@ public interface Concept extends Termed, Supplier<Term> {
      * Get the current overall desire value. TODO to be refined
      */
     default float getDesire(long now) {
-        return hasGoals() ?
-            getGoals().getMeanProjectedExpectation(now) : 0;
 //        return hasGoals() ?
-//            getGoals().top(now).getTruth().getExpectation() : 0;
+//            getGoals().getMeanProjectedExpectation(now) : 0;
+        return hasGoals() ?
+            getGoals().top(now).getTruth().getExpectation() : 0;
     }
     /**
      * Get the current overall belief value. TODO to be refined
      */
     default float getBelief(long now) {
-        return hasBeliefs() ?
-                getBeliefs().getMeanProjectedExpectation(now) : 0;
 //        return hasBeliefs() ?
-//                getBeliefs().top(now).getTruth().getExpectation() : 0;
+//                getBeliefs().getMeanProjectedExpectation(now) : 0;
+        return hasBeliefs() ?
+                getBeliefs().top(now).getTruth().getExpectation() : 0;
     }
 
     /** satisfaction/success metric:

@@ -3,7 +3,6 @@ package nars.nal;
 import nars.Global;
 import nars.Memory;
 import nars.task.Task;
-import nars.task.Temporal;
 import nars.term.compound.Compound;
 import nars.truth.Stamp;
 import nars.truth.Truth;
@@ -12,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 import static nars.nal.UtilityFunctions.or;
 
+/** tense modes, and various Temporal utility functions and constants */
 public enum Tense  {
 
     Eternal(":-:"),
@@ -19,16 +19,14 @@ public enum Tense  {
     Present(":|:"),
     Future(":/:");
 
-    @Nullable
-    public static final Tense Unknown = null;
-
-
     /**
      * default for atemporal events
      * means "always" in Judgment/Question, but "current" in Goal/Quest
      */
     public static final long ETERNAL = Long.MIN_VALUE;
 
+
+    /** integer version of long ETERNAL */
     @Deprecated public static final int ITERNAL = Integer.MIN_VALUE;
 
 
@@ -46,37 +44,6 @@ public enum Tense  {
         symbol = string;
     }
 
-
-
-
-//    public static boolean containsMentalOperator(final Task t) {
-//        return containsMentalOperator(t.getTerm(), true);
-//        /*
-//        if(!(t.term instanceof Operation))
-//            return false;
-//
-//        Operation o= (Operation)t.term;
-//        return (o.getOperator() instanceof Mental);
-//        */
-//    }
-//
-//    public static boolean containsMentalOperator(Term t, boolean recurse) {
-//        if (t instanceof Operation) {
-//            //Operation o = (Operation) t;
-//            //if (o.getOperatorTerm() instanceof Mental) return true;
-//        }
-//        if ((recurse) && (t instanceof Compound)) {
-//            Compound ct = (Compound)t;
-//            int l = ct.size();
-//            for (int i = 0; i < l; i++) {
-//                Term s = ct.term(i);
-//                if (containsMentalOperator(s, true)) return true;
-//            }
-//        }
-//
-//        return false;
-//    }
-
     /**
      * Evaluate the quality of the judgment as a solution to a problem
      *
@@ -92,11 +59,12 @@ public enum Tense  {
 
     /** degree to which the temporal relations of the two terms match */
     public static float orderMatch(@NotNull Compound a, @NotNull Compound b, int duration) {
-        float fduration = (float)duration;
 
         int at = a.t();
         int bt = b.t();
         if (at == bt) return 1f;
+
+        float fduration = (float)duration;
 
         float ad = at /fduration;
         float bd = bt /fduration;
@@ -144,7 +112,7 @@ public enum Tense  {
 //        return solution.projectionTruthQuality(projectedTruth, occTime, time, hasQueryVar);
 //    }
 
-    public static int order(float timeDiff, int durationCycles) {
+    static int order(float timeDiff, int durationCycles) {
         float halfDuration = durationCycles / 2.0f;
         if (timeDiff >= halfDuration) {
             return +1;
@@ -166,6 +134,118 @@ public enum Tense  {
 
         return order(b - a, durationCycles);
     }
+
+    public static boolean isEternal(long t)  {
+        return t <= TIMELESS; /* includes ETERNAL */
+    }
+
+    public static long getRelativeOccurrence(@NotNull Tense tense, @NotNull Memory m) {
+        return getRelativeOccurrence(m.time(), tense, m.duration());
+    }
+
+    public static long getRelativeOccurrence(long creationTime, @NotNull Tense tense, @NotNull Memory m) {
+        return getRelativeOccurrence(creationTime, tense, m.duration());
+    }
+
+    public static long getRelativeOccurrence(long creationTime, @NotNull Tense tense, int duration) {
+        switch (tense) {
+            case Present:
+                return creationTime;
+            case Past:
+                return creationTime - duration;
+            case Future:
+                return creationTime + duration;
+            default:
+                return ETERNAL;
+        }
+    }
+
+
+    /**
+     * true if there are any common elements; assumes the arrays are sorted and contain no duplicates
+     * @param a evidence stamp in sorted order
+     * @param b evidence stamp in sorted order
+     */
+    public static boolean overlapping(@NotNull long[] a, @NotNull long[] b) {
+
+        if (Global.DEBUG) {
+            if (a.length == 0 || b.length == 0) {
+                throw new RuntimeException("missing evidence");
+            }
+        }
+
+        /** TODO there may be additional ways to exit early from this loop */
+
+        for (long x : a) {
+            for (long y : b) {
+                if (x == y) {
+                    return true; //commonality detected
+                } else if (y > x) {
+                    //any values after y in b will not be equal to x
+                    break;
+                }
+            }
+        }
+        return false;
+    }
+
+    public static boolean overlapping(@NotNull Stamp a, @Nullable Stamp b) {
+
+        if (b == null) return false;
+        if (a == b) return true;
+
+        return overlapping(a.getEvidence(), b.getEvidence());
+    }
+
+    @Override
+    public String toString() {
+        return symbol;
+    }
+    
+
+
+}
+
+//    protected static final Map<String, Tense> stringToTense;
+//
+//    static {
+//        Map<String, Tense> stt = new HashMap(Tense.values().length*2);
+//        for (Tense t : Tense.values()) {
+//            stt.put(t.toString(), t);
+//        }
+//        stringToTense = Collections.unmodifiableMap( stt );
+//    }
+//
+//    public static Tense tense(String s) {
+//        return stringToTense.get(s);
+//    }
+//    public static boolean containsMentalOperator(final Task t) {
+//        return containsMentalOperator(t.getTerm(), true);
+//        /*
+//        if(!(t.term instanceof Operation))
+//            return false;
+//
+//        Operation o= (Operation)t.term;
+//        return (o.getOperator() instanceof Mental);
+//        */
+//    }
+//
+//    public static boolean containsMentalOperator(Term t, boolean recurse) {
+//        if (t instanceof Operation) {
+//            //Operation o = (Operation) t;
+//            //if (o.getOperatorTerm() instanceof Mental) return true;
+//        }
+//        if ((recurse) && (t instanceof Compound)) {
+//            Compound ct = (Compound)t;
+//            int l = ct.size();
+//            for (int i = 0; i < l; i++) {
+//                Term s = ct.term(i);
+//                if (containsMentalOperator(s, true)) return true;
+//            }
+//        }
+//
+//        return false;
+//    }
 
 //    public static boolean concurrent(Temporal a, Temporal b, int durationCycles) {
 //        return concurrent(a.getOccurrenceTime(), b.getOccurrenceTime(), durationCycles);
@@ -189,128 +269,39 @@ public enum Tense  {
 //        }
 //    }
 
-    public static boolean before(long a, long b, int perceptualDuration) {
-        return after(b, a, perceptualDuration);
-    }
-
-    /** true if B is after A */
-    public static boolean after(long a, long b, int perceptualDuration) {
-        if (a == ETERNAL || b == ETERNAL)
-            return false;
-        return order(a, b, perceptualDuration) > 0;
-    }
-
-    public static boolean isEternal(long t)  {
-        return t <= TIMELESS; /* includes ETERNAL */
-    }
-
-    public static long getOccurrenceTime(@NotNull Tense tense, @NotNull Memory m) {
-        return getOccurrenceTime(m.time(), tense, m.duration());
-    }
-
-    public static long getOccurrenceTime(long creationTime, @NotNull Tense tense, @NotNull Memory m) {
-        return getOccurrenceTime(creationTime, tense, m.duration());
-    }
-
-    public static long getOccurrenceTime(long creationTime, @NotNull Tense tense, int duration) {
-
-        if (creationTime == TIMELESS) {
-            //in this case, occurenceTime must be considered relative to whatever creationTime will be set when perceived
-            //so we base it at zero to make this possible
-            creationTime = 0;
-        }
-
-        switch (tense) {
-            case Present:
-                return creationTime;
-            case Past:
-                return creationTime - duration;
-            case Future:
-                return creationTime + duration;
-            default:
-            //case Unknown:
-            //case Eternal:
-                return ETERNAL;
-        }
-    }
-
-    /** inner between: time difference of later.start() - earlier.end() */
-    public static int between(@NotNull Temporal task, @NotNull Temporal belief) {
-        long tStart = task.start();
-        long bStart = belief.start();
-
-        Temporal earlier = tStart <= bStart ? task : belief;
-        Temporal later = earlier == task ? belief : task;
-
-        long a = earlier.end();
-        long b = later.start();
-
-        return (int)(b-a);
-    }
-
-    /** true if there is a non-zero overlap interval of the tasks */
-    public static boolean overlaps(@NotNull Task a, @NotNull Task b) {
-        return overlaps(a.start(), a.end(), b.start(), b.end());
-    }
-
-    public static boolean overlaps(long xStart, long xEnd, long yStart, long yEnd) {
-        return Math.max(xStart,yStart) <= Math.min(xEnd,yEnd);
-    }
-
-    /**
-     * true if there are any common elements; assumes the arrays are sorted and contain no duplicates
-     */
-    public static boolean overlapping(@NotNull long[] a, @NotNull long[] b) {
-
-        if (Global.DEBUG) {
-            if (a.length == 0 || b.length == 0) {
-                throw new RuntimeException("missing evidence");
-            }
-        }
-        /** TODO there may be additional ways to exit early from this loop */
-
-        for (long x : a) {
-            for (long y : b) {
-                if (x == y) {
-                    return true;
-                } else if (y > x) {
-                    //any values after y in b will not be equal to x
-                    break;
-                }
-            }
-        }
-        return false;
-    }
-
-    public static boolean overlapping(@NotNull Stamp a, @Nullable Stamp b) {
-
-        long[] ae = a.getEvidence();
-        if (b == null) return false;
-        if (a == b) return true;
-
-        return overlapping(ae, b.getEvidence());
-    }
-
-    @Override
-    public String toString() {
-        return symbol;
-    }
-    
-//    protected static final Map<String, Tense> stringToTense;
-//
-//    static {
-//        Map<String, Tense> stt = new HashMap(Tense.values().length*2);
-//        for (Tense t : Tense.values()) {
-//            stt.put(t.toString(), t);
-//        }
-//        stringToTense = Collections.unmodifiableMap( stt );
+//    public static boolean before(long a, long b, int perceptualDuration) {
+//        return after(b, a, perceptualDuration);
 //    }
 //
-//    public static Tense tense(String s) {
-//        return stringToTense.get(s);
+//    /** true if B is after A */
+//    public static boolean after(long a, long b, int perceptualDuration) {
+//        if (a == ETERNAL || b == ETERNAL)
+//            return false;
+//        return order(a, b, perceptualDuration) > 0;
+//    }
+//    /** inner between: time difference of later.start() - earlier.end() */
+//    public static int between(@NotNull Temporal task, @NotNull Temporal belief) {
+//        long tStart = task.start();
+//        long bStart = belief.start();
+//
+//        Temporal earlier = tStart <= bStart ? task : belief;
+//        Temporal later = earlier == task ? belief : task;
+//
+//        long a = earlier.end();
+//        long b = later.start();
+//
+//        return (int)(b-a);
+//    }
+//
+//    /** true if there is a non-zero overlap interval of the tasks */
+//    public static boolean overlaps(@NotNull Task a, @NotNull Task b) {
+//        return overlaps(a.start(), a.end(), b.start(), b.end());
+//    }
+//
+//    public static boolean overlaps(long xStart, long xEnd, long yStart, long yEnd) {
+//        return Math.max(xStart,yStart) <= Math.min(xEnd,yEnd);
 //    }
 
-}
 
 //TODO make an enum for these Orders
 

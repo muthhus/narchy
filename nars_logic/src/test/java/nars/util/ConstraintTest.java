@@ -6,6 +6,7 @@ import nars.Op;
 import nars.concept.Concept;
 import nars.nar.Default;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.term.compound.Compound;
 import org.jacop.constraints.XeqY;
 import org.jacop.constraints.netflow.NetworkBuilder;
@@ -44,8 +45,8 @@ public class ConstraintTest {
 
             @Override
             public void addConstraintsFor(Concept c) {
-                Term t = c.get();
-                if (t.op() == Op.IMPLICATION) {
+                Term t = c.term();
+                if (t.op(Op.IMPLICATION)) {
                     Compound i = (Compound)t;
                     Term effect = i.term(1);
                     if (!concepts.contains(effect))
@@ -109,17 +110,17 @@ public class ConstraintTest {
     /** boolean satisfiability among a set of terms */
     public abstract static class SATNetwork {
         private final NAR nar;
-        protected final Set<Compound> concepts;
+        protected final Set<Termed> concepts;
         protected Store store;
         final Map<Term,IntVar> termVars = Global.newHashMap();
 
         public SATNetwork(NAR n, String... terms) {
             this(n, Arrays.stream(terms)
-                    .map(t -> (Compound)n.term(t))
+                    .map(t -> (n.concept(t)))
                     .collect(Collectors.toSet()));
         }
 
-        public SATNetwork(NAR n, Set<Compound> concepts) {
+        public SATNetwork(NAR n, Set<Termed> concepts) {
             nar = n;
             this.concepts = concepts;
         }
@@ -128,10 +129,11 @@ public class ConstraintTest {
          *  creating constraints (in 'store') and variables */
         public abstract void addConstraintsFor(Concept c);
 
-        void related(Compound t) {
+        void related(Termed t) {
+            Term tt = t.term();
             nar.forEachConcept( c-> {
                 //if (c.get().containsTermRecursively(t)) {
-                if (c.get().containsTerm(t)) {
+                if (c.term().containsTerm(tt)) {
                     addConstraintsFor(c);
                 }
             });

@@ -84,17 +84,17 @@ abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements Tabl
         return (size() >= capacity());
     }
 
-    protected final L removeLowest() {
+    protected final L removeBottom() {
         if (isEmpty()) return null;
         return removeItem(size() - 1);
     }
 
-    public final L highest() {
+    public final L top() {
         if (isEmpty()) return null;
         return getItem(0);
     }
 
-    public final L lowest() {
+    public final L bottom() {
         if (isEmpty()) return null;
         return getItem(size() - 1);
     }

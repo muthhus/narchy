@@ -16,7 +16,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Random;
-import java.util.function.Function;
 
 /**
  * A model storing, ranking, and projecting beliefs or goals (tasks with TruthValue).
@@ -39,7 +38,7 @@ public interface BeliefTable extends TaskTable {
         return or(confidence, originality);
     };*/
 
-    @Nullable
+
     BeliefTable EMPTY = new BeliefTable() {
 
         @Override
@@ -185,60 +184,6 @@ public interface BeliefTable extends TaskTable {
     boolean remove(Task w);
 
 
-    final class SolutionQualityMatchingOrderRanker implements Ranker {
-
-        @NotNull
-        private final Task query;
-        private final long now;
-        private final boolean hasQueryVar; //cache hasQueryVar
-
-        public SolutionQualityMatchingOrderRanker(@NotNull Task query, long now) {
-            this.query = query;
-            this.now = now;
-            this.hasQueryVar = query.hasQueryVar();
-        }
-
-        @Override
-        public float rank(@NotNull Task t, float bestToBeat) {
-            Task q = query;
-
-            if (t.equals(q)) return Float.NaN; //dont compare to self
-
-            //TODO use bestToBeat to avoid extra work
-            //return or(t.getOriginality(),Tense.solutionQualityMatchingOrder(q, t, now, hasQueryVar));
-            return Tense.solutionQualityMatchingOrder(q, t, now, hasQueryVar);
-        }
-    }
-
-
-//    /**
-//     * Select a belief value or desire value for a given query
-//     *
-//     * @param query The query to be processed
-//     * @param list  The list of beliefs or goals to be used
-//     * @return The best candidate selected
-//     */
-//    public static Task getTask(final Sentence query, long now, final List<Task>... lists) {
-//        float currentBest = 0;
-//        float beliefQuality;
-//        Task candidate = null;
-//
-//        for (List<Task> list : lists) {
-//            if (list.isEmpty()) continue;
-//
-//            int lsv = list.size();
-//            for (int i = 0; i < lsv; i++) {
-//                Task judg = list.get(i);
-//                beliefQuality = solutionQuality(query, judg.sentence, now);
-//                if (beliefQuality > currentBest) {
-//                    currentBest = beliefQuality;
-//                    candidate = judg;
-//                }
-//            }
-//        }
-//
-//        return candidate;
-//    }
 
 
     public static float rankTemporal(@NotNull Task b, long when, long tRange) {
@@ -335,47 +280,100 @@ public interface BeliefTable extends TaskTable {
     }
 
 
-    @FunctionalInterface
-    interface Ranker extends Function<Task,Float> {
-        /** returns a number producing a score or relevancy number for a given Task
-         * @param bestToBeat current best score, which the ranking can use to decide to terminate early
-         * @return a score value, or Float.MIN_VALUE to exclude that result
-         * */
-        float rank(Task t, float bestToBeat);
+//    @FunctionalInterface
+//    interface Ranker extends Function<Task,Float> {
+//        /** returns a number producing a score or relevancy number for a given Task
+//         * @param bestToBeat current best score, which the ranking can use to decide to terminate early
+//         * @return a score value, or Float.MIN_VALUE to exclude that result
+//         * */
+//        float rank(Task t, float bestToBeat);
+//
+//
+//        default float rank(Task t) {
+//            return rank(t, Float.MIN_VALUE);
+//        }
+//
+//        @Override default Float apply(Task t) {
+//            return rank(t);
+//        }
+//
+//    }
+
+//    /** allowed to return null. must evaluate all items in case the final one is the
+//     *  only item that does not have disqualifying rank (MIN_VALUE)
+//     * */
+//    @Nullable
+//    default Task top(@NotNull Ranker r) {
+//
+//        float s = Float.MIN_VALUE;
+//        Task b = null;
+//
+//        for (Task t : this) {
+//            float x = r.rank(t, s);
+//            if (x > s) {
+//                s = x;
+//                b = t;
+//            }
+//        }
+//
+//        return b;
+//    }
 
 
-        default float rank(Task t) {
-            return rank(t, Float.MIN_VALUE);
-        }
+//    final class SolutionQualityMatchingOrderRanker implements Ranker {
+//
+//        @NotNull
+//        private final Task query;
+//        private final long now;
+//        private final boolean hasQueryVar; //cache hasQueryVar
+//
+//        public SolutionQualityMatchingOrderRanker(@NotNull Task query, long now) {
+//            this.query = query;
+//            this.now = now;
+//            this.hasQueryVar = query.hasQueryVar();
+//        }
+//
+//        @Override
+//        public float rank(@NotNull Task t, float bestToBeat) {
+//            Task q = query;
+//
+//            if (t.equals(q)) return Float.NaN; //dont compare to self
+//
+//            //TODO use bestToBeat to avoid extra work
+//            //return or(t.getOriginality(),Tense.solutionQualityMatchingOrder(q, t, now, hasQueryVar));
+//            return Tense.solutionQualityMatchingOrder(q, t, now, hasQueryVar);
+//        }
+//    }
 
-        @Override default Float apply(Task t) {
-            return rank(t);
-        }
 
-    }
-
-
-
-
-    /** allowed to return null. must evaluate all items in case the final one is the
-     *  only item that does not have disqualifying rank (MIN_VALUE)
-     * */
-    @Nullable
-    default Task top(@NotNull Ranker r) {
-
-        float s = Float.MIN_VALUE;
-        Task b = null;
-
-        for (Task t : this) {
-            float x = r.rank(t, s);
-            if (x > s) {
-                s = x;
-                b = t;
-            }
-        }
-
-        return b;
-    }
+//    /**
+//     * Select a belief value or desire value for a given query
+//     *
+//     * @param query The query to be processed
+//     * @param list  The list of beliefs or goals to be used
+//     * @return The best candidate selected
+//     */
+//    public static Task getTask(final Sentence query, long now, final List<Task>... lists) {
+//        float currentBest = 0;
+//        float beliefQuality;
+//        Task candidate = null;
+//
+//        for (List<Task> list : lists) {
+//            if (list.isEmpty()) continue;
+//
+//            int lsv = list.size();
+//            for (int i = 0; i < lsv; i++) {
+//                Task judg = list.get(i);
+//                beliefQuality = solutionQuality(query, judg.sentence, now);
+//                if (beliefQuality > currentBest) {
+//                    currentBest = beliefQuality;
+//                    candidate = judg;
+//                }
+//            }
+//        }
+//
+//        return candidate;
+//    }
 
 //
 //    /** TODO experimental and untested */
