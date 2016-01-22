@@ -165,7 +165,7 @@ public class NAL1Test extends AbstractNALTester {
                             solved.set(true);
                 }
 
-            }).frame(cycles);
+            }).run(cycles);
 
         assertTrue(solved.get());
     }

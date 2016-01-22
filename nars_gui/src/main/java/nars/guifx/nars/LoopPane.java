@@ -69,7 +69,7 @@ public class LoopPane extends VBox {
         stepButton.setOnAction(e -> {
 
             if (!n.running()) {
-                n.frame();
+                n.step();
                 say("stepped to time " + n.time());
             } else {
                 say("already running");

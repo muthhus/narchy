@@ -4,6 +4,7 @@ package nars.util.meter.condition;
 import nars.Global;
 import nars.NAR;
 import nars.Narsese;
+import nars.Symbols;
 import nars.nal.Tense;
 import nars.task.Task;
 import nars.task.Tasked;
@@ -233,7 +234,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
     }
 
     private boolean truthMatches(@NotNull Truthed task) {
-        if ((punc == '.') || (punc == '!')) {
+        if ((punc == Symbols.JUDGMENT) || (punc == Symbols.GOAL)) {
             if (task.getTruth() == null) {
                 return false;
             }

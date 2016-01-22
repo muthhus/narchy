@@ -16,7 +16,7 @@ public abstract class RealtimeClock implements Clock {
 
     @Override
     public void clear(Memory m) {
-        preFrame();
+        tick();
         t = t0 = getRealTime();
 
         start = t;
@@ -24,7 +24,7 @@ public abstract class RealtimeClock implements Clock {
 
 
     @Override
-    public final void preFrame() {
+    public final void tick() {
         long now = getRealTime();
 
         t0 = t;

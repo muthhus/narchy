@@ -136,7 +136,7 @@ public class NALObjectsTest  {
             }
         });
 
-        n.frame(6);
+        n.run(6);
 
 
         assertEquals(0, wrapped.count); //unaffected
@@ -220,7 +220,7 @@ public class NALObjectsTest  {
         assertNotNull( tc.the() );
 
 
-        n.frame(4);
+        n.run(4);
 
 
         assertNotEquals(tc.getClass(), TestClass.class);
@@ -298,7 +298,7 @@ public class NALObjectsTest  {
         nc.add("item");
         //nc.add("x");
 
-        n.frame(2);
+        n.run(2);
 
         nc.toArray();
 
@@ -323,7 +323,7 @@ public class NALObjectsTest  {
         nc.size();
         nc.clear();
 
-        n.frame(50);
+        n.run(50);
 
     }
 
@@ -343,7 +343,7 @@ public class NALObjectsTest  {
         System.out.println( tc.getClassMethods() );
 
 
-        n.frame(16);
+        n.run(16);
 
 
 

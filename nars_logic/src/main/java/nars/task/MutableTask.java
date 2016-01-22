@@ -142,9 +142,11 @@ public class MutableTask extends AbstractTask {
 
     @NotNull
     public final MutableTask present(@NotNull Memory memory) {
-        //return tense(Tense.Present, memory);
-        long now = memory.time();
-        return time(now, now);
+        return present(memory.time());
+    }
+
+    @NotNull public final MutableTask present(long when) {
+        return time(when, when);
     }
 
     @NotNull

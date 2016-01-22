@@ -59,7 +59,7 @@ public class SomeRovers {
             nar.core.confidenceDerivationMin.setValue(0.05f);
             nar.core.conceptActivation.setValue(0.035f);
             nar.memory.duration.set(3);
-            nar.setCyclesPerFrame(1);
+            nar.memory.cyclesPerFrame.set(1);
 
 
 //            NARLoop tmp = nar.loop();

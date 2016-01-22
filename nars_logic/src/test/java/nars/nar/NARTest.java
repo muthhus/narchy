@@ -49,7 +49,7 @@ public class NARTest {
 
         //TextOutput.out(nar);
 
-        nar.input("<a-->b>.", "<b-->c>.").frame(25);
+        nar.input("<a-->b>.", "<b-->c>.").run(25);
 
         nar.input("<a-->b>.", "<b-->c>.");
         nar.stop();
@@ -83,7 +83,7 @@ public class NARTest {
                 .input("<a --> b>.", "<b --> c>.")
                 .stopIf( () -> false )
                 .onEachCycle( n -> cycCount.incrementAndGet() )
-                .trace(sw).frame(frames);
+                .trace(sw).run(frames);
 
         new Default()
                 .input("<a --> b>.", "<b --> c>.")
@@ -122,7 +122,7 @@ public class NARTest {
         new Default(100, 1, 1, 3).nal(2)
                 //.trace()
                 .input("<a <-> b>. %1.0;0.5%",
-                       "<b --> a>. %1.0;0.5%").frame(cyclesBeforeQuestion);
+                       "<b --> a>. %1.0;0.5%").run(cyclesBeforeQuestion);
 
         NAR nar = new Default(100, 1, 1, 3).nal(2)
                 //.trace()
@@ -133,7 +133,7 @@ public class NARTest {
 
         nar.log();
 
-        nar.frame(cyclesAfterQuestion);
+        nar.run(cyclesAfterQuestion);
 
         assertTrue(b.get());
 
@@ -144,7 +144,7 @@ public class NARTest {
         NAR n = new Terminal();
 
         n.beforeNextFrame(b::incrementAndGet);
-        n.frame(4);
+        n.run(4);
         assertEquals(1, b.get());
 
     }

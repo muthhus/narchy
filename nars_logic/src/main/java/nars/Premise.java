@@ -127,7 +127,7 @@ public interface Premise extends Level, Tasked {
 
 
     default Term self() {
-        return memory().self();
+        return nar().self;
     }
 
 

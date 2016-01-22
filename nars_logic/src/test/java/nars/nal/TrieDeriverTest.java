@@ -28,7 +28,7 @@ public class TrieDeriverTest {
 
         assertEquals(1, ((TrieDeriver) (((Default) x).core.der)).roots.length);
 
-        x.log().frame(4);
+        x.log().run(4);
     }
 
     @Test

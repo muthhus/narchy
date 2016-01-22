@@ -113,7 +113,7 @@ public class Thermostat3 {
 
 
             try {
-                n.frame();
+                n.step();
             } catch (Throwable e) {
                 //e.printStackTrace();
                 //System.exit(1);

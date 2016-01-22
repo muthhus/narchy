@@ -192,7 +192,7 @@ public class Inperience {
 
     protected void experienceFromTaskInternal(@NotNull final Task task) {
 
-        final Term self = nar.memory.self();
+        final Term self = nar.self;
 
         // if(OLD_BELIEVE_WANT_EVALUATE_WONDER_STRATEGY ||
         //         (!OLD_BELIEVE_WANT_EVALUATE_WONDER_STRATEGY && (task.sentence.punctuation==Symbols.QUESTION || task.sentence.punctuation==Symbols.QUEST))) {

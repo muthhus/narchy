@@ -8,7 +8,7 @@ import nars.nar.AbstractNAR;
 import nars.nar.Default;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.util.graph.TermLinkGraph2;
+import nars.util.graph.TermLinkGraph;
 import nars.util.meter.TestNAR;
 import org.jetbrains.annotations.NotNull;
 import org.jgrapht.alg.StrongConnectivityInspector;
@@ -95,7 +95,7 @@ public class LinkageTest extends AbstractNALTester {
 
         nar.input(getTask(punc, premise1));
         nar.input(getTask(punc, premise2));
-        nar.frame(1);
+        nar.run(1);
 
         //List<String> fails = new ArrayList();
 
@@ -105,7 +105,7 @@ public class LinkageTest extends AbstractNALTester {
 
 
         //System.err.println(premise1 + " not linked with " + premise2);
-        TermLinkGraph2 g = new TermLinkGraph2(nar);
+        TermLinkGraph g = new TermLinkGraph(nar);
         assertTrue(g.vertexSet().size() > 0);
         assertTrue(g.edgeSet().size() > 0);
 
@@ -169,7 +169,7 @@ public class LinkageTest extends AbstractNALTester {
         TestNAR tester = test();
         tester.believe(premise1); //.en("If robin is a type of bird then robin can fly.");
         tester.believe(premise2); //.en("Robin is a type of bird.");
-        tester.nar.frame(1);
+        tester.nar.run(1);
 
         boolean passed = links(premise1, premise2, tester);
         boolean passed2 = links(premise2, premise1, tester);
@@ -333,7 +333,7 @@ public class LinkageTest extends AbstractNALTester {
     public void testConceptFormed(String s) throws Exception {
         TestNAR tester = test();
         tester.believe(s,1.0f,0.9f);
-        tester.nar.frame(1);
+        tester.nar.run(1);
         Concept ret = tester.nar.concept(s);
 
         assertNotNull("Failed to create a concept for "+s, ret);
@@ -375,7 +375,7 @@ public class LinkageTest extends AbstractNALTester {
         AbstractNAR tester = new Default(100,1,1,1);
         String nonsense = "<(&&,<#1 --> M>,<#2 --> M>) ==> <#1 --> nonsense>>";
         tester.believe(nonsense); //.en("If robin is a type of bird then robin can fly.");
-        tester.frame(1);
+        tester.run(1);
         Concept c = tester.concept(nonsense);
         assertNotNull(c);
     }

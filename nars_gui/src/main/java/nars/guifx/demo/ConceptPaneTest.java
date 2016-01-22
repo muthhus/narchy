@@ -19,7 +19,7 @@ public class ConceptPaneTest {
         //nar.input("y:x.");
         //nar.input("y:x. %0%");
         nar.memory.conceptBeliefsMax.set(96);
-        nar.frame(2);
+        nar.run(2);
         nar.onEachFrame(n-> {
             CharSequence y = Texts.n2(0.5f * ((float) Math.sin(nar.time() * waveFreq) + 1f));
             nar.input("y:x. :|: %" + y + ";" + conf + "%");

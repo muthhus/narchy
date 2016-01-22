@@ -234,7 +234,7 @@ public enum ThermostatTest2 {
                     }
                 }
 
-                n.frame();
+                n.step();
             }
 
             gamma *= gammaScale;

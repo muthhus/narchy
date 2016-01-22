@@ -35,7 +35,7 @@ public enum NARGraph1Test {
 
         n.input("<a --> b>.");
         n.input("<b --> c>.");
-        n.frame(5);
+        n.run(5);
 
 
         DefaultGrapher g = new DefaultGrapher(

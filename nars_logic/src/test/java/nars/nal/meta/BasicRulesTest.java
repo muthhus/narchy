@@ -29,7 +29,7 @@ public class BasicRulesTest {
         //TextOutput.out(n);
 
 
-        n.frame(150);
+        n.run(150);
     }
 
     @Test public void testSubstitution() {
@@ -39,7 +39,7 @@ public class BasicRulesTest {
         //OUT: <C1 --> C2>. %1.00;0.81% {70: 1;2}
 
         //TextOutput.out(n);
-        n.frame(50);
+        n.run(50);
 
         //<<$1 --> drunk> ==> <$1--> dead>>. <S --> drunk>.     |-  <S --> dead>.
 
@@ -53,7 +53,7 @@ public class BasicRulesTest {
         //OUT: <S --> dead>. %1.00;0.81% {58: 1;2}
 
         //TextOutput.out(n);
-        n.frame(150);
+        n.run(150);
 
 
 

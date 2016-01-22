@@ -18,7 +18,7 @@
 package nars.op.mental;
 
 import nars.$;
-import nars.Memory;
+import nars.NAR;
 import nars.nal.nal8.Execution;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
@@ -36,9 +36,11 @@ public class feelHappy extends feel {
      */
     @Override
     public void execute(@NotNull Execution e) {
-        Memory m = e.nar.memory;
+        NAR n = e.nar;
         e.feedback(
-            feeling(m.emotion.happy(), m, happiness)
+                feeling(n.memory.emotion.happy(),
+                        n,
+                        happiness)
         );
     }
 }

@@ -28,7 +28,7 @@ public class AttentionTest {
             n.believe("<x" + i + " <-> x" + (i + 1) + '>');
         
         //n.runWhileInputting(100);
-        n.frame(16);
+        n.run(16);
         
         int c = n.core.active.size();
         assertTrue(c > 16);

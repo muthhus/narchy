@@ -352,9 +352,14 @@ public class TestNAR  {
     }
     @NotNull
     public TestNAR mustAnswer(long withinCycles, String term, float freq, float confidence, @NotNull Tense t)  {
+        return mustAnswer(withinCycles, term, freq, confidence, nar.time(t));
+    }
+
+    @NotNull
+    public TestNAR mustAnswer(long withinCycles, String term, float freq, float confidence, long when)  {
         long ttt = nar.time();
         return mustEmit(new Topic[] { answerReceiver },
-                ttt, ttt + withinCycles, term, '.', freq, freq, confidence, confidence, nar.time(t));
+                ttt, ttt + withinCycles, term, '.', freq, freq, confidence, confidence, when);
     }
     @NotNull
     public TestNAR mustBelieve(long withinCycles, String term, float freq, float confidence, long occTimeAbsolute)  {
@@ -596,7 +601,7 @@ public class TestNAR  {
         //try {
         int frames = (int) (finalCycle - time());
         while (frames-- > 0 && !finished)
-            nar.frame();
+            nar.step();
 
         /*}
         catch (Exception e) {

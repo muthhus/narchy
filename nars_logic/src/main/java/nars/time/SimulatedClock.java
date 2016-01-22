@@ -28,7 +28,7 @@ public class SimulatedClock implements Clock {
     public void add(long dt) { set(t + dt); }
 
     @Override
-    public void preFrame() {
+    public void tick() {
         t0 = t;
         t = tNext;
     }

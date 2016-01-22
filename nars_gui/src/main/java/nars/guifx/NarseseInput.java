@@ -23,7 +23,7 @@ public class NarseseInput extends CodeInput {
         }
 
         try {
-            nar.frame();
+            nar.step();
         } catch (NAR.AlreadyRunningException e) {
             //no problem it is already running and will get the queued event
         }

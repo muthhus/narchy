@@ -56,7 +56,7 @@ public class TemporalRelationsTest {
         //d.index().print(System.out);
         //d.concept("(x==>y)").print();
 
-        d.frame();
+        d.step();
 
         assertEquals(3, d.index().size() );
 
@@ -64,7 +64,7 @@ public class TemporalRelationsTest {
         assertEquals(3, d.concept("(x==>y)").getBeliefs().size() );
 
         d.input("(x ==>+1 y). :|:"); //present
-        d.frame();
+        d.step();
 
         assertEquals( 5, d.concept("(x==>y)").getBeliefs().size() );
 

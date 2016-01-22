@@ -275,7 +275,7 @@ public class Twenglish {
             //nar.frame(1);
 
             //nar.input("(sentence(" + sentenceID + ") ==> say(" + w + ")). :|:");
-            nar.frame(wordDelay);
+            nar.run(wordDelay);
 
             nar.input("say(" + w + ")! :|: %1.0;0.9%");
 

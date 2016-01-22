@@ -43,20 +43,18 @@ import nars.term.variable.Variable;
 import nars.time.Clock;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.event.DefaultTopic;
-import nars.util.event.EventEmitter;
 import nars.util.event.Topic;
 import nars.util.meter.EmotionMeter;
 import nars.util.meter.LogicMeter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.function.Function;
+
 
 /**
  * Memory consists of the run-time state of a NAR, including: * term and concept
@@ -74,10 +72,6 @@ public class Memory extends Param {
 
     public final Random random;
 
-    @NotNull
-    @Deprecated
-    public final transient EventEmitter<Class, Object[]> event;
-
     public final transient Topic<Task> eventTaskRemoved = new DefaultTopic<>();
     public final transient Topic<ConceptProcess> eventConceptProcess = new DefaultTopic<>();
     public final transient Topic<Task> eventRevision = new DefaultTopic<>();
@@ -92,8 +86,6 @@ public class Memory extends Param {
     public final transient Topic<Memory> eventCycleEnd = new DefaultTopic<>(); //eventCycleStart; //new DefaultObserved();
 
     public final transient Topic<Task> eventTaskProcess = new DefaultTopic<>();
-
-    public static final Logger logger = LoggerFactory.getLogger(Memory.class);
 
     /**
      * used for reporting or informing outside. consists of additional notes
@@ -164,9 +156,6 @@ public class Memory extends Param {
 
         self = Global.DEFAULT_SELF; //default value
 
-        event = new EventEmitter.DefaultEventEmitter();
-
-
         //temporary
         logic = new LogicMeter(this);
         emotion = new EmotionMeter(this);
@@ -202,13 +191,7 @@ public class Memory extends Param {
 //    }
 
 
-    public final Atom self() {
-        return self;
-    }
 
-    public void setSelf(Atom t) {
-        self = t;
-    }
 
 
 //    public void delete() {
@@ -500,24 +483,6 @@ public class Memory extends Param {
 //    public final void put(final Concept c) {
 //        concepts.put(c);
 //    }
-
-    public final void cycle(int num) {
-
-        //final Clock clock = this.clock;
-        Topic<Memory> eachCycle = eventCycleEnd;
-
-        //synchronized (clock) {
-
-            for (; num > 0; num--) {
-
-
-                eachCycle.emit(this);
-
-            }
-
-        //}
-
-    }
 
 
 //    /** called when a Concept's lifecycle has changed */

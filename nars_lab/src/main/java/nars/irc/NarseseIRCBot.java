@@ -91,7 +91,7 @@ public class NarseseIRCBot extends IRCBot {
     public void loop(File corpus, int lineDelay) {
         new Thread(() -> {
             try {
-                nar.frame();
+                nar.step();
             }
             catch (Exception e) {
                 e.printStackTrace();

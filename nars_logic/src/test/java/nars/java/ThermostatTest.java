@@ -48,7 +48,7 @@ public enum ThermostatTest  {
         while (!t.valid()) {
             if (t.above()) t.down();
             if (t.below()) t.up();
-            n.frame(10);
+            n.run(10);
         }
 
     }
@@ -100,7 +100,7 @@ public enum ThermostatTest  {
         for (int i = 0; i < 2; i++) {
             demonstrate(n, tc, range);
             //n.memory.getControl().iterator().forEachRemaining(c -> System.out.println(c));
-            n.frame(1000);
+            n.run(1000);
         }
 
         n.forEachConcept(System.out::println);
@@ -124,7 +124,7 @@ public enum ThermostatTest  {
 
 
             //n.input("<(--,true) --> (/, ^Thermostat_valid, t, _)>! %0%");
-            n.frame(1000);
+            n.run(1000);
             System.out.println(tc.valid());
         }
 

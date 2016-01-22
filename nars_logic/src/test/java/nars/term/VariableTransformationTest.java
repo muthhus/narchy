@@ -67,7 +67,7 @@ public class VariableTransformationTest {
         System.out.println(t2);
 
         //TextOutput.out(n);
-        n.frame(10);
+        n.run(10);
 
     }
 }

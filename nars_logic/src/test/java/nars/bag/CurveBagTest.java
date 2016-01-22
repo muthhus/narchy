@@ -146,7 +146,7 @@ public class CurveBagTest  {
         n.input("$1$ a:b.");
         n.input("$1$ b:c.");
         n.input("$1$ c:d.");
-        n.frame(4);
+        n.run(4);
         Bag<Concept> bag = n.core.active;
 
         bag.top(System.out::println);

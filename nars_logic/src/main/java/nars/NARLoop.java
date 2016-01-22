@@ -171,7 +171,7 @@ public class NARLoop implements Runnable {
             long start = System.currentTimeMillis();
 
             if (!nar.running.get()) {
-                nar.frame(cyclesPerFrame);
+                nar.run(cyclesPerFrame);
                 throttle(periodMS, System.currentTimeMillis() - start);
             } else {
                 //logger.warn("nar began running before this frame attempted to start");

@@ -87,7 +87,7 @@ public class GoalPrecisionTest {
             n.inputAt((int) v[0], "x(" + k + ")! :|:");
         });
 
-        n.frame(end);
+        n.run(end);
 
         print();
 

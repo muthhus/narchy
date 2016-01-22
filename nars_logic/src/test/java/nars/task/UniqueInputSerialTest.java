@@ -34,17 +34,17 @@ public class UniqueInputSerialTest {
 
         Task x = n.inputTask("<a --> b>.");
         assertArrayEquals(new long[]{1}, x.getEvidence());
-        n.frame();
+        n.step();
 
         Task y = n.inputTask("<b --> c>.");
         assertArrayEquals(new long[]{2}, y.getEvidence());
-        n.frame();
+        n.step();
 
         n.reset();
 
         TaskQueue z = n.inputs("<e --> f>.  <g --> h>. "); //test when they are input on the same parse
 
-        n.frame(10);
+        n.run(10);
 
         Task q = n.inputTask("<c --> d>.");
         assertArrayEquals(new long[]{5}, q.getEvidence());
@@ -66,7 +66,7 @@ public class UniqueInputSerialTest {
             //System.out.println(t);
         });
 
-        d.frame(64);
+        d.run(64);
 
 
     }

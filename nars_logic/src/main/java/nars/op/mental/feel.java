@@ -18,15 +18,13 @@ package nars.op.mental;
 
 import com.google.common.collect.Lists;
 import nars.$;
-import nars.Memory;
+import nars.NAR;
 import nars.Symbols;
 import nars.nal.nal8.operator.SyncOperator;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Term;
-import nars.term.atom.Atom;
 import nars.truth.DefaultTruth;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -36,24 +34,21 @@ import java.util.ArrayList;
  */
 public abstract class feel extends SyncOperator implements Mental {
 
-    private final Term feelingTerm = Atom.the("feel");
-
     /**
      * To get the current value of an internal sensor
      *
      * @param value The value to be checked, in [0, 1]
-     * @param memory The memory in which the operation is executed
      * @return Immediate results as Tasks
      */
-    protected static ArrayList<Task> feeling(float value, @NotNull Memory memory, Term feeling) {
+    protected static ArrayList<Task> feeling(float value, NAR nar, Term feeling) {
 
-        Term content = instprop(memory.self(), feeling);
+        Term content = instprop(nar.self, feeling);
 
         return Lists.newArrayList(
             new MutableTask(content, Symbols.JUDGMENT)
                 .judgment()
                 .truth(new DefaultTruth(value, 0.999f))
-                .present(memory)
+                .present(nar.time())
         );
     }
 

@@ -60,7 +60,7 @@ public class BeliefAnalysis extends EnergyAnalysis {
 
 	@NotNull
 	public BeliefAnalysis run(int frames) {
-		nar.frame(frames);
+		nar.run(frames);
 		return this;
 	}
 

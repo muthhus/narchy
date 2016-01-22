@@ -136,7 +136,7 @@ public class TestAggregator extends RunListener {
         //TextOutput.out(nar).setOutputPriorityMin(0.5f);
 
         for (int i = 0; i < 100; i++) {
-            nar.frame(100);
+            nar.run(100);
             System.out.println(new MemoryBudget(nar));
         }
 

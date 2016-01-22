@@ -104,7 +104,7 @@ public class BeliefTableTest extends TestCase {
 
         assertEquals("revised", 3, b.size());
 
-        n.frame(delay2);
+        n.run(delay2);
 
         assertEquals("no additional revisions", 3, b.size());
 
@@ -147,7 +147,7 @@ public class BeliefTableTest extends TestCase {
         for (int i = 0; i < 16; i++) {
             b.printEnergy();
             b.print();
-            n.frame(1);
+            n.run(1);
             //TODO test that they are sorted ?
         }
 

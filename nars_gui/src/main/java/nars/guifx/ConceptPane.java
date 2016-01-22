@@ -424,7 +424,7 @@ public class ConceptPane extends BorderPane implements ChangeListener {
         n.input("<a --> b>! %0.35%");
         n.input("<a --> b>. %0.75%");
 
-        n.frame(516);
+        n.run(516);
 
         NARfx.run((a,s) -> {
             NARfx.newWindow(n, n.concept("<a-->b>"));

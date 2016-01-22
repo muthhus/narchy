@@ -27,7 +27,10 @@ import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.term.compound.Compound;
 import nars.time.Clock;
-import nars.util.event.*;
+import nars.util.event.AnswerReaction;
+import nars.util.event.DefaultTopic;
+import nars.util.event.On;
+import nars.util.event.Topic;
 import net.openhft.affinity.AffinityLock;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -42,7 +45,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.*;
+import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static nars.Symbols.*;
@@ -104,22 +110,19 @@ public abstract class NAR implements Level,Consumer<Task> {
     //Executors.newFixedThreadPool(1);
     private final transient Deque<Runnable> nextTasks = new ConcurrentLinkedDeque();
 
-
     public NAR(@NotNull Memory m) {
+        this(m, Global.DEFAULT_SELF);
+    }
+
+    public NAR(@NotNull Memory m, Atom self) {
 
         memory = m;
 
         m.the(NAR.class, this);
 
-        if (running())
-            throw new RuntimeException("NAR must be stopped to change memory");
-
-
-        self = Global.DEFAULT_SELF; //TODO make this parametreizable
-
+        this.self = self;
 
         /** register some components in the dependency context, Container (which Memory subclasses from) */
-        //m.the("memory", m);
         m.the("clock", m.clock);
 
 
@@ -135,7 +138,7 @@ public abstract class NAR implements Level,Consumer<Task> {
                     throw new RuntimeException(ex);
                 }
             } else {
-                Memory.logger.error(e.toString());
+                logger.error(e.toString());
             }
         });
 
@@ -150,7 +153,6 @@ public abstract class NAR implements Level,Consumer<Task> {
      */
     @NotNull
     public synchronized NAR reset() {
-        runNextTasks();
 
         nextTasks.clear();
 
@@ -445,7 +447,7 @@ public abstract class NAR implements Level,Consumer<Task> {
      *
      * @return number of invoked handlers
      */
-    public int execute(@NotNull Task goal) {
+    public final int execute(@NotNull Task goal) {
         Term operation = goal.term();
 
         if (Op.isOperation(operation)) {
@@ -477,14 +479,14 @@ public abstract class NAR implements Level,Consumer<Task> {
     /**
      * register a singleton
      */
-    public <X> X the(Object key, X value) {
+    public final <X> X the(Object key, X value) {
         return memory.the(key, value);
     }
 
     /**
      * returns the global concept index
      */
-    public TermIndex index() {
+    public final TermIndex index() {
         return memory.index;
     }
 
@@ -496,7 +498,7 @@ public abstract class NAR implements Level,Consumer<Task> {
     }
 
     @NotNull
-    public TaskQueue input(@NotNull Task[] t) {
+    public TaskQueue input(@NotNull Task... t) {
         TaskQueue tq = new TaskQueue(t);
         input((Input) tq);
         return tq;
@@ -511,7 +513,7 @@ public abstract class NAR implements Level,Consumer<Task> {
     /**
      * creates a TermFunction operator from a supplied function, which can be a lambda
      */
-    public On onExecTerm(String operator, @NotNull Function<Term[], Object> func) {
+    public On onExecTerm(@NotNull String operator, @NotNull Function<Term[], Object> func) {
         return onExec(new TermFunction(operator) {
 
             @Override
@@ -526,22 +528,14 @@ public abstract class NAR implements Level,Consumer<Task> {
         return onExec(r.getOperatorTerm(), r);
     }
 
-    public On onExec(@NotNull String op, Consumer<Execution> each) {
+    public On onExec(@NotNull String op, @NotNull Consumer<Execution> each) {
         return onExec($.operator(op), each);
     }
 
-    public On onExec(Operator op, Consumer<Execution> each) {
+    public On onExec(@NotNull Operator op, @NotNull Consumer<Execution> each) {
         Topic<Execution> t = memory.exe.computeIfAbsent(
                 op, (Term o) -> new DefaultTopic<Execution>());
         return t.on(each);
-    }
-
-    public int getCyclesPerFrame() {
-        return memory.cyclesPerFrame.intValue();
-    }
-
-    public void setCyclesPerFrame(int cyclesPerFrame) {
-        memory.cyclesPerFrame.set(cyclesPerFrame);
     }
 
     /**
@@ -552,11 +546,6 @@ public abstract class NAR implements Level,Consumer<Task> {
     public Input input(@NotNull Input i) {
         i.input(this, 1);
         return i;
-    }
-
-    @NotNull
-    public EventEmitter event() {
-        return memory.event;
     }
 
     /**
@@ -572,8 +561,8 @@ public abstract class NAR implements Level,Consumer<Task> {
      * steps 1 frame forward. cyclesPerFrame determines how many cycles this frame consists of
      */
     @NotNull
-    public NAR frame() {
-        return frame(1);
+    public NAR step() {
+        return run(1);
     }
 
     /**
@@ -587,11 +576,11 @@ public abstract class NAR implements Level,Consumer<Task> {
      * instead put the loop inside an AffinityLock)
      */
     @NotNull
-    public NAR frameBatch(int frames) {
+    public NAR runBatch(int frames) {
 
         AffinityLock al = AffinityLock.acquireLock();
         try {
-            frame(frames);
+            run(frames);
         } finally {
             al.release();
         }
@@ -605,37 +594,41 @@ public abstract class NAR implements Level,Consumer<Task> {
      * @return total time in seconds elapsed in realtime
      */
     @NotNull
-    public NAR frame(int frames) {
+    public final NAR run(int frames) {
 
-
-        if (!running.compareAndSet(false, true)) {
+        AtomicBoolean r = this.running;
+        if (!r.compareAndSet(false, true))
             throw new NAR.AlreadyRunningException();
-        }
 
+        _frame(frames);
+
+        r.compareAndSet(true, false);
+
+        return this;
+    }
+
+    private final void _frame(int frames) {
         Memory memory = this.memory;
 
         Topic<NAR> frameStart = memory.eventFrameStart;
 
+        Topic<Memory> cycleStart = memory.eventCycleEnd;
+
         Clock clock = memory.clock;
 
-        int cpf = getCyclesPerFrame();
-        for (int f = 0; f < frames; f++) {
-
+        int cpf = memory.cyclesPerFrame.intValue();
+        for ( ; frames > 0; frames--) {
+            clock.tick();
             frameStart.emit(this);
-
-            clock.preFrame();
-
-            memory.cycle(cpf);
-
+            cycles(memory, cycleStart, cpf);
             runNextTasks();
         }
+    }
 
-        running.compareAndSet(true, false);
-
-
-        //TODO rewrite ResourceMeter to use event handler
-
-        return this;
+    private static void cycles(Memory memory, Topic<Memory> cycleStart, int cyclesPerFrame) {
+        for (; cyclesPerFrame > 0; cyclesPerFrame--) {
+            cycleStart.emit(memory);
+        }
     }
 
     @NotNull
@@ -776,17 +769,18 @@ public abstract class NAR implements Level,Consumer<Task> {
     /**
      * runs all the tasks in the 'Next' queue
      */
-    protected void runNextTasks() {
-        int originalSize = nextTasks.size();
-        if (originalSize == 0) return;
-        nextTasks.forEach(Runnable::run);
-        nextTasks.clear();
+    private void runNextTasks() {
+        Deque<Runnable> n = this.nextTasks;
+        if (!n.isEmpty()) {
+            n.forEach(Runnable::run);
+            n.clear();
+        }
     }
 
     /**
      * signals an error through one or more event notification systems
      */
-    protected void error(Throwable ex) {
+    protected void error(@NotNull Throwable ex) {
         memory.eventError.emit(ex);
     }
 
@@ -864,11 +858,12 @@ public abstract class NAR implements Level,Consumer<Task> {
 
     @NotNull
     public NAR inputAt(long time, String... tt) {
-        LongPredicate timeCondition = t -> t == time;
+        //LongPredicate timeCondition = t -> t == time;
 
-        onEachCycle(m -> {
-            if (timeCondition.test(m.time())) {
-                input(tt);
+        onEachFrame(m -> {
+            //if (timeCondition.test(m.time())) {
+            if (m.time() == time) {
+                m.input(tt);
             }
         });
         return this;

@@ -52,7 +52,7 @@ public class NARBenchmark {
 
 		n.believe(a);
 		n.believe(b);
-		n.frame(10000);
+		n.run(10000);
 	}
 
 	@Benchmark
@@ -65,6 +65,6 @@ public class NARBenchmark {
 
 		n.believe(a);
 		n.believe(b);
-		n.frame(10000);
+		n.run(10000);
 	}
 }

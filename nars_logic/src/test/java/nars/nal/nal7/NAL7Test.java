@@ -51,10 +51,10 @@ public class NAL7Test extends AbstractNALTester {
         t
         .input("x:before. :|:")
         .inputAt(10, "x:after. :|:")
-        .mustBelieve(11, "(x:before ==>+10 x:after)", 1.00f, abductionConf, 10)
-        .mustBelieve(11, "(x:after ==>-10 x:before)", 1.00f, inductionConf, 10)
-        .mustBelieve(11, "(x:after <=>-10 x:before)", 1.00f, comparisonConf, 10)
-        .mustBelieve(11, "(x:after &&-10 x:before)", 1.00f, intersectionConf, 10)
+        .mustBelieve(12, "(x:before ==>+10 x:after)", 1.00f, abductionConf, 10)
+        .mustBelieve(12, "(x:after ==>-10 x:before)", 1.00f, inductionConf, 10)
+        .mustBelieve(12, "(x:after <=>-10 x:before)", 1.00f, comparisonConf, 10)
+        .mustBelieve(12, "(x:after &&-10 x:before)", 1.00f, intersectionConf, 10)
         ;
 
 //        tester.mustBelieve(cycles, "<<(John, room) --> enter> =\\> (&/, <(John, door) --> open>, /6)>",
@@ -89,10 +89,10 @@ public class NAL7Test extends AbstractNALTester {
 
 
     @Test public void updating_and_revision()  {
-        testTemporalRevision(10, 0.50f, 0.95f, "<(John,key) --> hold>");
+        testTemporalRevision(10, 0.25f, 0.92f, "<(John,key) --> hold>");
     }
     @Test public void updating_and_revision2()  {
-        testTemporalRevision(1, 0.50f, 0.95f, "<(John,key) --> hold>");
+        testTemporalRevision(1, 0.09f, 0.91f, "<(John,key) --> hold>");
     }
 
     void testTemporalRevision(int delay, float freq, float conf, String belief) {
@@ -151,7 +151,7 @@ public class NAL7Test extends AbstractNALTester {
         test()
         .input("(y ==>+3 x). :\\:")
         .inputAt(20, "(y ==>+3 ?x)? :/:")
-        .mustAnswer(55, "(y ==>+3 x)", 1.00f, 0.5f, Tense.Future);
+        .mustAnswer(55, "(y ==>+3 x)", 1.00f, 0.47f, 25);
     }
 //    @Test public void testImplQuery2() {
 //        TestNAR t = test();
@@ -359,7 +359,7 @@ public class NAL7Test extends AbstractNALTester {
         tester.input("<{t003} --> (/,at,SELF,_)>. :|:");
         tester.inputAt(10, "<{t003} --> (/,on,{t002},_)>. :|:");
 
-        tester.mustBelieve(cycles, "(&&,<#1 --> (/,at,SELF,_)>,<#1 --> (/,on,{t002},_)>)",
+        tester.mustBelieve(cycles, "(<#1 --> (/,at,SELF,_)> &&+10 <#1 --> (/,on,{t002},_)>)",
                 1.0f, 0.81f,
                 10);
 

@@ -95,7 +95,7 @@ public class MarkovlikeTest {
                     //"a b c."
                     //"a b c d e f g."
             );
-            d.frame(sentenceDelay);
+            d.run(sentenceDelay);
 
             $.logger.warn("speak");
 
@@ -103,7 +103,7 @@ public class MarkovlikeTest {
 
             $.logger.warn("off");
 
-            d.frame(silenceTime); //verify it is quiet
+            d.run(silenceTime); //verify it is quiet
 
         }
 
@@ -117,7 +117,7 @@ public class MarkovlikeTest {
 		n.input("say(sentence, " + sentenceID + "). :|:");
 		// d.input("$1.0$ echo(#x)! :|: %0.55%");
 
-		n.frame(speakTime);
+		n.run(speakTime);
 
 	}
 

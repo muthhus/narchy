@@ -21,7 +21,7 @@ public class FrameClock implements Clock {
 
 
     @Override
-    public final void preFrame() {
+    public final void tick() {
         t++;
     }
 
@@ -29,8 +29,6 @@ public class FrameClock implements Clock {
     public long elapsed() {
         return 1;
     }
-
-
 
     @NotNull
     @Override

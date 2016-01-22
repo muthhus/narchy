@@ -44,7 +44,7 @@ public class CommandTest {
 
         n.input(t);
 
-        n.frame(1);
+        n.run(1);
 
         assertTrue(invoked.get());
 

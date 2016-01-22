@@ -66,7 +66,7 @@ public class SpaceTest {
         Concept c2 = n.concept(xy11);
         assertTrue(c == c2);
 
-        n.frame();
+        n.step();
 
         c.print();
     }
@@ -83,7 +83,7 @@ public class SpaceTest {
 
         Concept c = n.concept(xyClass);
 
-        n.frame();
+        n.step();
 
         c.print();
     }
@@ -101,7 +101,7 @@ public class SpaceTest {
 
         Concept c = n.concept($.sim(a, xyClass));
 
-        n.frame();
+        n.step();
 
         c.print();
     }

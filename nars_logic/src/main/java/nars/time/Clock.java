@@ -15,7 +15,7 @@ public interface Clock extends Serializable {
 	/** returns the current time, as measured in units determined by this clock */
 	long time();
 
-	void preFrame();
+	void tick();
 
 	long elapsed();
 }

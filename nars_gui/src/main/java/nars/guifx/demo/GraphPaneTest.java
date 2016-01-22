@@ -16,7 +16,7 @@ import nars.nar.Default;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.compound.Compound;
-import nars.util.graph.TermLinkGraph2;
+import nars.util.graph.TermLinkGraph;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.EdgeFactory;
 import org.jgrapht.VertexFactory;
@@ -114,8 +114,8 @@ public enum GraphPaneTest {
         n.input("a:b.");
         n.input("b:c.");
         n.input("c:(d,a)!");
-        n.frame(4);
-        return new TermLinkGraph2(n);
+        n.run(4);
+        return new TermLinkGraph(n);
     }
 
     public static void main(String[] args) {

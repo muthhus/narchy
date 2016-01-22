@@ -28,14 +28,14 @@ public class VectorMapTest {
         
         //n.log();
 
-        n.frame(16);
+        n.run(16);
 
         d[1] = 1.0f;
         d[2] = 0.5f;
         
         v.update();
 
-        n.frame(16);
+        n.run(16);
 
 
         //TODO assert that NAR has > 1 concepts
@@ -64,7 +64,7 @@ public class VectorMapTest {
         
         v.update();
 
-        n.frame(16);
+        n.run(16);
 
         new CycleReaction(n) {
 
@@ -85,7 +85,7 @@ public class VectorMapTest {
 
         n.log();
 
-        n.frame(256);
+        n.run(256);
 
 
 

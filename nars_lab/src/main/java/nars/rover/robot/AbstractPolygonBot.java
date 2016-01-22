@@ -212,7 +212,7 @@ public abstract class AbstractPolygonBot extends Robotic {
             System.out.println(nar.memory.emotion.happy() + " happy, " + nar.memory.emotion.busy() + " busy, " + nar.memory.index.size() + " concepts");
         }
 
-        nar.frame();
+        nar.step();
     }
 
     public void thrust(float angle, float force) {

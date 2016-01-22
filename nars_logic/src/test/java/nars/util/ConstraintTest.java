@@ -92,7 +92,7 @@ public class ConstraintTest {
         n.input("<x-->y>?");
 
         n.trace();
-        n.frame(5);
+        n.run(5);
 
         sat.solve();
         sat.store.print();
@@ -101,7 +101,7 @@ public class ConstraintTest {
         n.input("<a <-> d>. %0%");
         n.input("<<x --> y> ==> (b,c)>. %0.75%");
         n.input("<<a <-> d> ==> <x --> y>>. %0%");
-        n.frame(100);
+        n.run(100);
 
         sat.solve();
         sat.store.print();

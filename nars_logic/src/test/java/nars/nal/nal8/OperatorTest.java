@@ -101,7 +101,7 @@ public class OperatorTest {
 
         n.input("exe(a,b,c)!");
 
-        n.frame(1);
+        n.run(1);
 
         assertTrue(executed.get());
 
@@ -120,7 +120,7 @@ public class OperatorTest {
         //n.trace();
         n.input("exe(a,b,c)!");
 
-        n.frame(1);
+        n.run(1);
 
         assertTrue(executed.get());
 

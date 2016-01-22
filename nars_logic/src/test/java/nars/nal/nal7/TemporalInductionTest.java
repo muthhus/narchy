@@ -25,10 +25,10 @@ public class TemporalInductionTest {
         //TextOutput.out(n);
 
         n.input(task);
-        n.frame(10);
+        n.run(10);
         n.input(task2);
 
-        n.frame(10);
+        n.run(10);
 
     }
 
@@ -39,9 +39,9 @@ public class TemporalInductionTest {
         //TextOutput.out(n);
 
         n.input("a:b. %1.0|0.9%");
-        n.frame(5);
+        n.run(5);
         n.input("a:b. %0.0|0.9%");
-        n.frame(1);
+        n.run(1);
 
         n.forEachConcept(Concept::print);
 
@@ -60,7 +60,7 @@ public class TemporalInductionTest {
 
         n.input("(a ==>+0 b). %1.0;0.7%");
         n.input("(a ==>+5 b). %1.0;0.6%");
-        n.frame(1);
+        n.run(1);
 
         n.forEachConcept(Concept::print);
 
@@ -76,13 +76,13 @@ public class TemporalInductionTest {
         n.input("a:b. :|:");
         //n.frame();
         n.input("a:b? :/:");
-        n.frame(5);
+        n.run(5);
         n.input("a:b? :/:");
-        n.frame(30);
+        n.run(30);
         n.input("a:b? :/:");
-        n.frame(250);
+        n.run(250);
         n.input("a:b? :/:");
-        n.frame(1);
+        n.run(1);
 
         //n.forEachConcept(Concept::print);
 
@@ -94,10 +94,10 @@ public class TemporalInductionTest {
         //two entirely disjoint events, and all inductable beliefs from them, should produce a finite system that doesn't explode
         Default d = new Default(256,1,2,3);
         d.input("a:b. :|:");
-        d.frame(5);
+        d.run(5);
         d.input("c:d. :|:");
 
-        d.frame(24);
+        d.run(24);
 
         //everything should be inducted by now:
         int numConcepts = d.core.active.size();
@@ -105,7 +105,7 @@ public class TemporalInductionTest {
 
         System.out.println(numConcepts + " " + numBeliefs);
 
-        d.frame(300);
+        d.run(300);
 
         //# unique concepts unchanged:
         assertEquals(numConcepts, d.core.active.size());

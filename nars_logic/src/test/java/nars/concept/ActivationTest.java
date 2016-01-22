@@ -20,7 +20,7 @@ public class ActivationTest {
 
         n.input("$0.1$ <a --> b>.");
         n.input("$0.1$ <b --> a>.");
-        n.frame(15);
+        n.run(15);
 
 
         n.forEachConcept(System.out::println);

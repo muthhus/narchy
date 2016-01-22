@@ -42,7 +42,7 @@ public class UnificationTest  {
         NAR nar = test.nar;
         nar.believe(s1);
         nar.believe(s2);
-        nar.frame(2);
+        nar.run(2);
 
         Term t1 = nar.concept(s1).term();
         Term t2 = nar.concept(s2).term();
@@ -677,7 +677,7 @@ public class UnificationTest  {
 
         NAR n = new Default().nal(6);
         n.input(c);
-        n.frame(1);
+        n.run(1);
 
         n.forEachConcept(Concept::print);
 

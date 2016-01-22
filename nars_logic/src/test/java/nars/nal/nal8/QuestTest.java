@@ -38,7 +38,7 @@ public class QuestTest {
         //nar.log();
 
         nar.goal(nar.term(term), Tense.Eternal, 1.0f, 0.9f);
-        nar.frame();
+        nar.step();
 
         AtomicBoolean valid = new AtomicBoolean(false);
 
@@ -49,7 +49,7 @@ public class QuestTest {
                 valid.set(true);
         });
 
-        nar.frame(1);
+        nar.run(1);
 
         assertTrue(valid.get());
     }
