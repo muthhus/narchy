@@ -37,7 +37,7 @@ public final class PremiseBranch extends GenericCompound implements ProcTerm<Pre
         this.conseq = (ProcTerm<PremiseMatch>) term(1);
     }
 
-    @Override public void accept(PremiseMatch m) {
+    @Override public void accept(@NotNull PremiseMatch m) {
         int r = m.now();
         if (cond.booleanValueOf(m)) {
             conseq.accept(m);

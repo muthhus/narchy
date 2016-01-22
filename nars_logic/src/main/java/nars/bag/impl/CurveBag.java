@@ -394,10 +394,7 @@ public class CurveBag<V> implements Bag<V> {
         return arrayBag.isSorted();
     }
 
-    /** (utility method specific to curvebag) */
-    public void validate() {
-        arrayBag.validate();
-    }
+
 
 
     public BLink<V> get(int i) {
@@ -411,7 +408,6 @@ public class CurveBag<V> implements Bag<V> {
      *
      * @return
      */
-
     @FunctionalInterface
     public interface BagCurve extends FloatToFloatFunction {
     }

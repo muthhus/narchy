@@ -42,7 +42,7 @@ public enum $  {
 
         @NotNull
         @Override
-        public Termed make(Op op, int relation, TermContainer subterms, int dt) {
+        public Termed make(@NotNull Op op, int relation, TermContainer subterms, int dt) {
             return new GenericCompound(op, relation, (TermVector)subterms);
         }
     };
@@ -125,7 +125,7 @@ public enum $  {
 
     /** execution (NARS "operation") */
     @NotNull
-    public static Compound exec(String operator, String... args) {
+    public static Compound exec(@NotNull String operator, String... args) {
         return exec(operator(operator), $.p(args));
     }
 
@@ -262,17 +262,17 @@ public enum $  {
 //    }
 
     @NotNull
-    public static MutableTask belief(Compound term, @NotNull Truth copyFrom) {
+    public static MutableTask belief(@NotNull Compound term, @NotNull Truth copyFrom) {
         return belief(term, copyFrom.getFrequency(), copyFrom.getConfidence());
     }
 
     @NotNull
-    public static MutableTask belief(Compound term, float freq, float conf) {
+    public static MutableTask belief(@NotNull Compound term, float freq, float conf) {
         return new MutableTask(term).belief().truth(freq, conf);
     }
 
     @NotNull
-    public static MutableTask goal(Compound term, float freq, float conf) {
+    public static MutableTask goal(@NotNull Compound term, float freq, float conf) {
         return new MutableTask(term).goal().truth(freq, conf);
     }
 
@@ -469,7 +469,7 @@ public enum $  {
 
 
     @NotNull
-    public static Operator operator(String name) {
+    public static Operator operator(@NotNull String name) {
         return new Operator(name);
     }
 

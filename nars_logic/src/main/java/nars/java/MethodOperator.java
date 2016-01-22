@@ -55,6 +55,7 @@ public class MethodOperator extends TermFunction {
         return currentTask.get();
     }
 
+    @NotNull
     private static String getParentMethodName(@NotNull Method m) {
         Class<?> sc = m.getDeclaringClass();
 

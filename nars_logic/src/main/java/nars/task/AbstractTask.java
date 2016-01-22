@@ -77,11 +77,11 @@ public abstract class AbstractTask extends Item<Task>
 //                solution);
 //    }
 
-    public AbstractTask(Compound term, char punc, Truth truth, float p, float d, float q) {
+    public AbstractTask(@NotNull Compound term, char punc, Truth truth, float p, float d, float q) {
         this(term, punc, truth, p, d, q, (Task) null, null, null);
     }
 
-    public AbstractTask(Compound term, char punc, Truth truth, float p, float d, float q, Task parentTask, Task parentBelief, Task solution) {
+    public AbstractTask(@NotNull Compound term, char punc, Truth truth, float p, float d, float q, Task parentTask, Task parentBelief, Task solution) {
         this(term, punc, truth,
                 p, d, q,
                 Global.reference(parentTask),
@@ -118,7 +118,7 @@ public abstract class AbstractTask extends Item<Task>
     }
 
 
-    protected final void setTerm(Termed<Compound> t) {
+    protected final void setTerm(@NotNull Termed<Compound> t) {
         if (term!=t) {
             term = t;
             invalidate();
@@ -126,7 +126,7 @@ public abstract class AbstractTask extends Item<Task>
     }
 
 
-    public AbstractTask(Termed<Compound> term, char punctuation, Truth truth, float p, float d, float q, Reference<Task> parentTask, Reference<Task> parentBelief, Reference<Task> solution) {
+    public AbstractTask(@NotNull Termed<Compound> term, char punctuation, Truth truth, float p, float d, float q, Reference<Task> parentTask, Reference<Task> parentBelief, Reference<Task> solution) {
         super(p, d, q);
         this.truth = truth;
         this.punctuation = punctuation;
@@ -322,7 +322,7 @@ public abstract class AbstractTask extends Item<Task>
 
     @Override
     public final boolean isAnticipated() {
-        return isJudgmentOrGoal() && (getState() == TaskState.Anticipated || isInput());
+        return isJudgmentOrGoal() && !isEternal() && (getState() == TaskState.Anticipated || isInput());
     }
 
     @NotNull

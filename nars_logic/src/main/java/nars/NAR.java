@@ -258,7 +258,7 @@ public abstract class NAR implements Level,Consumer<Task> {
      * ask question
      */
     @NotNull
-    public Task ask(Compound c) {
+    public Task ask(@NotNull Compound c) {
         //TODO remove '?' if it is attached at end
         return ask(c, QUESTION);
     }
@@ -278,7 +278,7 @@ public abstract class NAR implements Level,Consumer<Task> {
      * ask quest
      */
     @NotNull
-    public Task askShould(Compound quest) {
+    public Task askShould(@NotNull Compound quest) {
         return ask(quest, QUEST);
     }
 
@@ -365,7 +365,7 @@ public abstract class NAR implements Level,Consumer<Task> {
     }
 
     @NotNull
-    public <T extends Compound> Task ask(T term, char questionOrQuest) throws NarseseException {
+    public <T extends Compound> Task ask(@NotNull T term, char questionOrQuest) throws NarseseException {
 
 
         //TODO use input method like believe uses which avoids creation of redundant Budget instance
@@ -502,7 +502,7 @@ public abstract class NAR implements Level,Consumer<Task> {
         return tq;
     }
 
-    public On onExecTask(String operator, Consumer<Execution> f) {
+    public On onExecTask(@NotNull String operator, Consumer<Execution> f) {
         return onExec(operator, f);
     }
 
@@ -526,7 +526,7 @@ public abstract class NAR implements Level,Consumer<Task> {
         return onExec(r.getOperatorTerm(), r);
     }
 
-    public On onExec(String op, Consumer<Execution> each) {
+    public On onExec(@NotNull String op, Consumer<Execution> each) {
         return onExec($.operator(op), each);
     }
 

@@ -134,10 +134,12 @@ public final class Operator<T extends Term> extends AbstractStringAtom { //imple
         return 0;
     }
 
-    public static Term the(Term op) {
+    @NotNull
+    public static Term the(@NotNull Term op) {
         return new Operator(op);
     }
-    public static Term the(String op) {
+    @NotNull
+    public static Term the(@NotNull String op) {
         return new Operator(op);
     }
 }

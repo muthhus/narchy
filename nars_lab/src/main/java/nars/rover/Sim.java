@@ -25,12 +25,12 @@ public class Sim extends PhysicsModel {
 
     public final SimulatedClock clock;
     /* how often to input mission, in frames */
-    public int missionPeriod = 24;
+    public int missionPeriod = 16;
 
     boolean wraparound = false;
 
     public final List<Robotic> robots = Global.newArrayList();
-    final static int angleResolution = 9;
+    final static int angleResolution = 13;
 
 
     PhysicsRun phy = new PhysicsRun(10, this);

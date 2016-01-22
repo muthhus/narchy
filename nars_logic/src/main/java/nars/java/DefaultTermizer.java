@@ -215,7 +215,7 @@ public class DefaultTermizer implements Termizer {
         return Atom.the((Number) o);
     }
 
-    public Operator getOperator(Method m) {
+    public Operator getOperator(@NotNull Method m) {
         return getMethodOperator(m);
     }
 

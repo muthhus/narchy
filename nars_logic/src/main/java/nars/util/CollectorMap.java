@@ -103,7 +103,7 @@ public abstract class CollectorMap<K, V>  {
         return map.containsValue(it);
     }
 
-    public final void clear() {
+    public void clear() {
         map.clear();
     }
 

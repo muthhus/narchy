@@ -35,7 +35,7 @@ public abstract class AbstractPolygonBot extends Robotic {
     final Deque<Vec2> positions = new ArrayDeque();
     final List<Sense> senses = new ArrayList();
     public float linearThrustPerCycle = 8f;
-    public float angularSpeedPerCycle = 0.15f;
+    public float angularSpeedPerCycle = 0.35f;
     int mission = 0;
     //public float curiosity = 0.1f;
     int motionPeriod = 3;

@@ -710,6 +710,7 @@ public class PremiseRule extends GenericCompound implements Level {
             return $.v(VAR_PATTERN, i);
         }
 
+        @NotNull
         @Override protected Variable newVariable(@NotNull Variable v, int serial) {
 
 

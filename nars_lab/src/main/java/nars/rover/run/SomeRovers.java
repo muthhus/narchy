@@ -1,10 +1,8 @@
 package nars.rover.run;
 
+import javassist.scopedpool.SoftValueHashMap;
 import nars.Global;
 import nars.Memory;
-import nars.NAR;
-import nars.NARLoop;
-import nars.guifx.demo.NARide;
 import nars.nar.Default;
 import nars.rover.RoverWorld;
 import nars.rover.Sim;
@@ -14,8 +12,6 @@ import nars.rover.robot.Turret;
 import nars.rover.world.FoodSpawnWorld1;
 import nars.term.index.MapIndex2;
 import nars.time.SimulatedClock;
-
-import java.util.HashMap;
 
 /**
  * Created by me on 6/20/15.
@@ -53,20 +49,26 @@ public class SomeRovers {
 
 
         {
-            NAR nar = new Default(
-                    new Memory(clock, new MapIndex2(new HashMap())),
-                    2000, 200, 2, 2);
+            Default nar = new Default(
+                    new Memory(clock, new MapIndex2(
+                        new SoftValueHashMap())),
+                        1600, 25, 2, 3);
 
-            nar.memory.duration.set(10);
+            nar.initNAL9();
+            nar.memory.perfection.setValue(0.1f);
+            nar.core.confidenceDerivationMin.setValue(0.05f);
+            nar.core.conceptActivation.setValue(0.035f);
+            nar.memory.duration.set(3);
+            nar.setCyclesPerFrame(1);
 
-            NARLoop tmp = nar.loop();
-            new Thread(()-> {
-                NARide.show(tmp, x -> {
-                    tmp.stop();
-                });
-            }).start();
 
-            nar.setCyclesPerFrame(2);
+//            NARLoop tmp = nar.loop();
+//            new Thread(()-> {
+//                NARide.show(tmp, x -> {
+//                    tmp.stop();
+//                });
+//            }).start();
+
 
 
             game.add(new Rover("r1", nar));
@@ -82,7 +84,7 @@ public class SomeRovers {
 //            game.add(new CarefulRover("r2", nar));
 //        }
 
-        float fps = 60;
+        float fps = 25;
         game.run(fps);
 
     }

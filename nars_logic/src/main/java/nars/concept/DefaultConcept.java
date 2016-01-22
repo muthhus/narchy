@@ -366,6 +366,7 @@ public class DefaultConcept extends AtomConcept {
      * @param nar
      * @return the relevant task
      */
+    @NotNull
     @Override
     public Task processQuestion(@NotNull Task q, @NotNull NAR nar) {
 

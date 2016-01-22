@@ -773,7 +773,7 @@ public abstract class FindSubst extends Versioning implements Subst {
         }
 
     }
-    public final boolean putYX(Term y /* usually a Variable */, Term x) {
+    public final boolean putYX(@NotNull Term y /* usually a Variable */, Term x) {
         //yx.put(x, y);
 
         VarCachedVersionMap yx = this.yx;

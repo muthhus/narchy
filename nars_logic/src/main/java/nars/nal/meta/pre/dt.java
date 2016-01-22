@@ -7,6 +7,7 @@ import nars.nal.meta.PremiseMatch;
 import nars.task.Task;
 import nars.term.compound.Compound;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import static nars.nal.Tense.ITERNAL;
 
@@ -129,6 +130,7 @@ public abstract class dt extends AtomicBooleanCondition<PremiseMatch> {
     };
 
     /** translates difference in task occurrence to temporal relation */
+    @Nullable
     public static final dt occ = new dt() {
         @Override
         public boolean booleanValueOf(@NotNull PremiseMatch m) {

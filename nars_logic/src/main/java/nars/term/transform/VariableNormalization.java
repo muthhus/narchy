@@ -70,6 +70,7 @@ public class VariableNormalization extends VariableTransform implements Function
     boolean renamed = false;
 
 
+    @NotNull
     @Override
     public final Variable apply(@NotNull Variable v) {
         Variable rvv = newVariable(v, rename.size()+1);
@@ -86,6 +87,7 @@ public class VariableNormalization extends VariableTransform implements Function
     }
 
     /** if already normalized, alreadyNormalized will be non-null with the value */
+    @NotNull
     protected Variable newVariable(@NotNull Variable v, int serial) {
         return v.normalize(serial);
     }

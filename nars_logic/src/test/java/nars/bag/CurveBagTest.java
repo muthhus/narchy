@@ -111,8 +111,8 @@ public class CurveBagTest  {
 
         a.commit();
 
-        System.out.println(a.items);
-        System.out.println(a.index);
+        //System.out.println(a.items);
+        //System.out.println(ArrayTable.this);
 
         assertEquals(2, a.size());
         assertTrue(a.contains("x") && a.contains("y"));

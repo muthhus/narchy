@@ -95,22 +95,16 @@ public final class TruthFunctions extends UtilityFunctions {
      */
     @NotNull
     public static Truth revision(@NotNull Truth a, @NotNull Truth b) {
-        return revision(a, b, new DefaultTruth(0, 0));
-    }
-
-    @NotNull
-    static Truth revision(@NotNull Truth a, @NotNull Truth b, @NotNull Truth result) {
         float f1 = a.getFrequency();
         float f2 = b.getFrequency();
         float w1 = c2w(a.getConfidence());
         float w2 = c2w(b.getConfidence());
         float w = w1 + w2;
-        return result.set(
+        return new DefaultTruth(
                 (w1 * f1 + w2 * f2) / w,
                 w2c(w)
         );
     }
-
 
 
     /**

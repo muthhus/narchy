@@ -100,13 +100,12 @@ public abstract class AbstractNAR extends NAR {
             onExec(o);
     }
 
-    @Deprecated protected void initNAL9() {
+    @Deprecated public void initNAL9() {
 
         memory.the(new Anticipate(this));
+        memory.the(new Inperience(this));
+        memory.the(new Abbreviation(this));
 
-
-        new FullInperience(this);
-        new Abbreviation(this);
         //onExec(Counting.class);
 
 //                /*if (internalExperience == Minimal) {

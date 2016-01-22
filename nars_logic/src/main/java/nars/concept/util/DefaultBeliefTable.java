@@ -44,7 +44,7 @@ public class DefaultBeliefTable implements BeliefTable {
         this.tRange = 1;
 
         eternal = new SetTable<Task>(cap/2, map,
-            this::rankEternal
+            BeliefTable::rankEternal
         );
         temporal = new SetTable<Task>(cap/2, map,
             this::rankTemporal
@@ -60,7 +60,7 @@ public class DefaultBeliefTable implements BeliefTable {
     }
 
     @Override
-    public boolean remove(Task w) {
+    public boolean remove(@NotNull Task w) {
         if (w.isEternal()) {
             return eternal.remove(w)!=null;
         } else {
@@ -95,14 +95,10 @@ public class DefaultBeliefTable implements BeliefTable {
     public float rankTemporal(@NotNull Task b) {
         return rankTemporal(b, now);
     }
-
     public float rankTemporal(@NotNull Task b, long when) {
-        return b.getConfidence()/((1f+Math.abs(b.getOccurrenceTime() - when))/(tRange))*b.getOriginality();
+        return BeliefTable.rankTemporal(b, when, tRange);
     }
 
-    public float rankEternal(@NotNull Task b) {
-        return b.getConfidence()*b.getOriginality();
-    }
 
     @NotNull
     @Override
@@ -125,11 +121,11 @@ public class DefaultBeliefTable implements BeliefTable {
 
     @Override
     public int size() {
-        return eternal.size() + temporal.size();
+        return map.size(); //eternal.size() + temporal.size();
     }
 
     @Override public boolean isEmpty() {
-        return size()==0;
+        return map.isEmpty(); // size()==0;
     }
 
     @Override
@@ -145,8 +141,9 @@ public class DefaultBeliefTable implements BeliefTable {
 
     @Override
     public void clear() {
-        eternal.clear();
-        temporal.clear();
+        eternal.items.clear();
+        temporal.items.clear();
+        map.clear();
     }
 
     @Nullable
@@ -263,15 +260,16 @@ public class DefaultBeliefTable implements BeliefTable {
     }
 
     private boolean insert(@NotNull Task t, @NotNull Memory memory) {
-        ArrayTable<Task, Task> table = getTableFor(t);
+        ArrayTable<Task, Task> table = tableFor(t);
 
-        if (Global.DEBUG) {
-            checkForDeleted(t, table);
-        }
+//        if (Global.DEBUG) {
+//            checkForDeleted(t, table);
+//        }
 
         Task displaced = table.put(t,t);
-        if (displaced!=null)
+        if (displaced!=null) {
             onBeliefRemoved(displaced, "Unbelievable/Undesirable", memory);
+        }
 
         return t == displaced ? false : true;
     }
@@ -280,7 +278,7 @@ public class DefaultBeliefTable implements BeliefTable {
      *  returns true if it was inserted, false if not
      * */
     private boolean insertAttempt(@NotNull Task t, @NotNull Memory memory) {
-        ArrayTable<Task, Task> table = getTableFor(t);
+        ArrayTable<Task, Task> table = tableFor(t);
         Task displaced = table.put(t,t);
         boolean inserted = displaced != t;
         if (displaced!=null && inserted)
@@ -290,7 +288,7 @@ public class DefaultBeliefTable implements BeliefTable {
     }
 
     @NotNull
-    private ArrayTable<Task, Task> getTableFor(@NotNull Task t) {
+    private ArrayTable<Task, Task> tableFor(@NotNull Task t) {
         return t.isEternal() ? this.eternal : this.temporal;
     }
 
@@ -301,24 +299,24 @@ public class DefaultBeliefTable implements BeliefTable {
         memory.remove(t, reason);
     }
 
-    static void checkForDeleted(@NotNull Task input, @NotNull ArrayTable<Task,Task> table) {
-        if (input.getDeleted())
-            throw new RuntimeException("deleted task being added");
-
-        table.forEach((Task dt) -> {
-//            if (dt == null)
-//                throw new RuntimeException("wtf");
-            if (dt.getDeleted()) {
-                throw new RuntimeException(
-                        //System.err.println(
-                        "deleted tasks should not be present in belief tables: " + dt);
-                //System.err.println(dt.getExplanation());
-                //remove(i);
-                //i--;
+//    static void checkForDeleted(@NotNull Task input, @NotNull ArrayTable<Task,Task> table) {
+//        if (input.getDeleted())
+//            throw new RuntimeException("deleted task being added");
 //
-            }
-        });
-    }
+//        table.forEach((Task dt) -> {
+////            if (dt == null)
+////                throw new RuntimeException("wtf");
+//            if (dt.getDeleted()) {
+//                throw new RuntimeException(
+//                        //System.err.println(
+//                        "deleted tasks should not be present in belief tables: " + dt);
+//                //System.err.println(dt.getExplanation());
+//                //remove(i);
+//                //i--;
+////
+//            }
+//        });
+//    }
 
     final static class SetTable<T> extends ArrayTable<T,T> {
         public SetTable(int cap, Map<T,T> index, FloatFunction<T> score) {

@@ -53,7 +53,7 @@ public final class Anticipate {
     @NotNull
     private final NAR nar;
 
-    private static final boolean debug = false;
+//    private static final boolean debug = false;
     //private long nextUpdateTime = -1;
 
     /** called each cycle to update calculations of anticipations */
@@ -69,8 +69,8 @@ public final class Anticipate {
     public Anticipate(@NotNull NAR nar) {
         this.nar = nar;
 
-        nar.memory.eventCycleEnd.on(c -> updateAnticipations());
-        nar.memory.eventInput.on(this::onInput);
+        nar.memory.eventFrameStart.on(c -> updateAnticipations());
+        nar.memory.eventTaskProcess.on(this::onInput);
     }
 
     public void onInput(@NotNull Task t) {
@@ -97,8 +97,8 @@ public final class Anticipate {
         if (now > t.getOccurrenceTime()) //its about the past..
             return;
 
-        if (debug)
-            System.err.println("Anticipating " + tt + " in " + (t.getOccurrenceTime() - now));
+//        if (debug)
+//            System.err.println("Anticipating " + tt + " in " + (t.getOccurrenceTime() - now));
 
         TaskTime taskTime = new TaskTime(t, t.getCreationTime());
 //        if(testing) {
@@ -123,8 +123,8 @@ public final class Anticipate {
         //it did not happen, so the time of when it did not
         //happen is exactly the time it was expected
 
-        if (debug)
-            System.err.println("Anticipation Negated " + tt.task);
+//        if (debug)
+//            System.err.println("Anticipation Negated " + tt.task);
 
         nar.input(new MutableTask(prediction)
                 .belief()
@@ -142,9 +142,9 @@ public final class Anticipate {
             return; //it's not a input task, the system is not allowed to convince itself about the state of affairs ^^
         }
 
-        toRemove.clear();
-
         long cOccurr = c.getOccurrenceTime();
+
+        final List<TaskTime> toRemove = this.toRemove;
 
         anticipations.get(c.term()).stream().filter(tt -> tt.inTime(cOccurr) && !c.equals(tt.task) &&
                 tt.task.getTruth().getExpectation() > DEFAULT_CONFIRMATION_EXPECTATION).forEach(tt -> {
@@ -153,13 +153,15 @@ public final class Anticipate {
         });
 
         toRemove.forEach(tt -> anticipations.remove(c.term(),tt));
+        toRemove.clear();
+
     }
 
     protected void updateAnticipations() {
 
-        long now = nar.memory.time();
-
         if (anticipations.isEmpty()) return;
+
+        long now = nar.memory.time();
 
         Iterator<Map.Entry<Compound, TaskTime>> it = anticipations.entries().iterator();
 
@@ -176,8 +178,8 @@ public final class Anticipate {
             }
         }
 
-        if (debug)
-            System.err.println(now + ": Anticipations: pending=" + anticipations.size() + " happened=" + happeneds + " , didnts=" + didnts);
+//        if (debug)
+//            System.err.println(now + ": Anticipations: pending=" + anticipations.size() + " happened=" + happeneds + " , didnts=" + didnts);
     }
 
     /** Prediction point vector / centroid of a group of Tasks
@@ -199,11 +201,11 @@ public final class Anticipate {
 
         public TaskTime(@NotNull Task task, long creationTime) {
             this.task = task;
-            this.creationTime = task.getCreationTime();
-            occurrTime = task.getOccurrenceTime();
-            hash = (int)(31 * creationTime + occurrTime);
+            long cre = this.creationTime = task.getCreationTime();
+            long occ = this.occurrTime = task.getOccurrenceTime();
+            hash = (int)(31 * creationTime + occ);
             //expiredate in relation how long we predicted forward
-            long prediction_time = occurrTime - this.creationTime;
+            long prediction_time = occ - cre;
             tolerance = prediction_time/TOLERANCE_DIV;
         }
 

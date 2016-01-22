@@ -27,6 +27,7 @@ import org.apache.commons.math3.ml.distance.EuclideanDistance;
 import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.stat.descriptive.moment.Variance;
 import org.apache.commons.math3.util.MathUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -190,6 +191,7 @@ abstract public class BeliefClusterer<T>  {
             this.pos = new ArrayRealVector(dim);
         }
 
+        @NotNull
         @Override
         public String toString() {
             return "<" +
@@ -211,6 +213,7 @@ abstract public class BeliefClusterer<T>  {
             this.points.add(point);
         }
 
+        @NotNull
         public List<T> getPoints() {
             return this.points;
         }
@@ -228,6 +231,7 @@ abstract public class BeliefClusterer<T>  {
     }
 
     /** gets the vector point for t */
+    @NotNull
     abstract public ArrayRealVector p(T t);
 
     /**
@@ -248,7 +252,8 @@ abstract public class BeliefClusterer<T>  {
      * @throws ConvergenceException if an empty cluster is encountered and the
      * {@link #emptyStrategy} is set to {@code ERROR}
      */
-    public List<Cluster> cluster(final Collection<T> points)
+    @NotNull
+    public List<Cluster> cluster(@NotNull final Collection<T> points)
         throws MathIllegalArgumentException, ConvergenceException {
 
         // sanity checks
@@ -316,8 +321,8 @@ abstract public class BeliefClusterer<T>  {
      * @param assignments points assignments to clusters
      * @return the number of points assigned to different clusters as the iteration before
      */
-    private int assignPointsToClusters(final List<Cluster> clusters,
-                                       final Collection<T> points,
+    private int assignPointsToClusters(@NotNull final List<Cluster> clusters,
+                                       @NotNull final Collection<T> points,
                                        final int[] assignments) {
         int assignedDifferently = 0;
         int pointIndex = 0;
@@ -341,7 +346,8 @@ abstract public class BeliefClusterer<T>  {
      * @param points the points to choose the initial centers from
      * @return the initial centers
      */
-    private List<Cluster> chooseInitialCenters(final Collection<T> points) {
+    @NotNull
+    private List<Cluster> chooseInitialCenters(@NotNull final Collection<T> points) {
 
         // Convert to list for indexed access. Make it unmodifiable, since removal of items
         // would screw up the logic of this method.
@@ -467,7 +473,8 @@ abstract public class BeliefClusterer<T>  {
      * @return a random point from the selected cluster
      * @throws ConvergenceException if clusters are all empty
      */
-    private ArrayRealVector getPointFromLargestVarianceCluster(final Collection<Cluster> clusters)
+    @NotNull
+    private ArrayRealVector getPointFromLargestVarianceCluster(@NotNull final Collection<Cluster> clusters)
             throws ConvergenceException {
 
         double maxVariance = Double.NEGATIVE_INFINITY;
@@ -510,7 +517,8 @@ abstract public class BeliefClusterer<T>  {
      * @return a random point from the selected cluster
      * @throws ConvergenceException if clusters are all empty
      */
-    private ArrayRealVector getPointFromLargestNumberCluster(final Collection<? extends Cluster> clusters)
+    @NotNull
+    private ArrayRealVector getPointFromLargestNumberCluster(@NotNull final Collection<? extends Cluster> clusters)
             throws ConvergenceException {
 
         int maxNumber = 0;
@@ -546,7 +554,8 @@ abstract public class BeliefClusterer<T>  {
      * @return point farthest to its cluster center
      * @throws ConvergenceException if clusters are all empty
      */
-    private ArrayRealVector getFarthestPoint(final Collection<Cluster> clusters) throws ConvergenceException {
+    @NotNull
+    private ArrayRealVector getFarthestPoint(@NotNull final Collection<Cluster> clusters) throws ConvergenceException {
 
         double maxDistance = Double.NEGATIVE_INFINITY;
         Cluster selectedCluster = null;
@@ -583,7 +592,7 @@ abstract public class BeliefClusterer<T>  {
      * @param point the point to find the nearest {@link Cluster} for
      * @return the index of the nearest {@link Cluster} to the given point
      */
-    private int getNearestCluster(final Collection<Cluster> clusters, final T point) {
+    private int getNearestCluster(@NotNull final Collection<Cluster> clusters, final T point) {
         double minDistance = Double.MAX_VALUE;
         int clusterIndex = 0;
         int minCluster = 0;
@@ -605,7 +614,8 @@ abstract public class BeliefClusterer<T>  {
      * @param dimension the point dimension
      * @return the computed centroid for the set of points
      */
-    private ArrayRealVector centroidOf(final Collection<T> points, final int dimension) {
+    @NotNull
+    private ArrayRealVector centroidOf(@NotNull final Collection<T> points, final int dimension) {
         final double[] centroid = new double[dimension];
 
         for (final T p : points) {

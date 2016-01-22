@@ -44,10 +44,10 @@ public class VisionRay implements AbstractPolygonBot.Sense, SwingDraw.LayerDraw 
     public Color3f normalColor = new Color3f(0.9f, 0.9f, 0.4f);
     final Color3f rayColor = new Color3f(); //current ray color
     public final Atom angleTerm;
-    private final float distMomentum = 0f;
+
     private float hitDist;
     private Body hit;
-    private final float confMomentum = 0;
+
     private float conf;
     private BLink<Concept> angleConcept;
 

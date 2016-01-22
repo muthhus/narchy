@@ -9,7 +9,6 @@ import nars.nal.nal8.AbstractOperator;
  */
 public abstract class SyncOperator extends AbstractOperator {
 
-
 	protected SyncOperator(String name) {
 		super(name);
 	}

@@ -20,6 +20,7 @@ import static nars.nal.Tense.ITERNAL;
 
 public class GenericCompound<T extends Term> implements Compound<T> {
 
+    @NotNull
     public final Op op;
 
     /** subterm vector */
@@ -37,15 +38,15 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     private transient boolean normalized = false;
 
 
-    public GenericCompound(Op op, @NotNull TermVector subterms) {
+    public GenericCompound(@NotNull Op op, @NotNull TermVector subterms) {
         this(op, -1, subterms);
     }
 
-    public GenericCompound(Op op, int relation, @NotNull TermVector subterms) {
+    public GenericCompound(@NotNull Op op, int relation, @NotNull TermVector subterms) {
         this(op, relation, Tense.ITERNAL, subterms);
     }
 
-    public GenericCompound(Op op, int relation, int dt, @NotNull TermVector subterms) {
+    public GenericCompound(@NotNull Op op, int relation, int dt, @NotNull TermVector subterms) {
         this.terms = subterms;
         this.normalized = (subterms.vars() == 0);
         this.op = op;
@@ -71,6 +72,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 //        this.hash = copy.
 //    }
 
+    @NotNull
     @Override
     public final Op op() {
         return op;

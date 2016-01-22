@@ -15,33 +15,28 @@ import java.util.function.Predicate;
 /**
  * Created by me on 1/15/16.
  */
-abstract public class ArrayTable<V, L> implements Table<V,L> {
-    /**
-     * mapping from key to item
-     */
-    @NotNull
-    public final ArrayMapping index;
+abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements Table<V,L> {
     /**
      * array of lists of items, for items on different level
      */
     public final SortedIndex<L> items;
 
     public ArrayTable(SortedIndex<L> items, Map<V, L> map) {
+        super(map);
         this.items = items;
-        this.index = new ArrayMapping(map, items);
     }
 
 
     @Override
-    public final void forEachKey(Consumer<? super V> each) {
+    public final void forEachKey(@NotNull Consumer<? super V> each) {
         forEach(t -> each.accept(key(t)));
     }
 
 
-    @Override
-    public L put(V v, L l) {
-        return index.put(v, l);
-    }
+//    @Override
+//    public L put(V v, L l) {
+//        return this.put(v, l);
+//    }
 
     public boolean isSorted() {
         return items.isSorted();
@@ -49,21 +44,21 @@ abstract public class ArrayTable<V, L> implements Table<V,L> {
 
     @Override
     public final void clear() {
+        super.clear();
         items.clear();
-        index.clear();
     }
 
-    /**
-     * The number of items in the bag
-     *
-     * @return The number of items
-     */
-    @Override
-    public final int size() {
-        /*if (Global.DEBUG)
-            validate();*/
-        return items.size();
-    }
+//    /**
+//     * The number of items in the bag
+//     *
+//     * @return The number of items
+//     */
+//    @Override
+//    public final int size() {
+//        /*if (Global.DEBUG)
+//            validate();*/
+//        return items.size();
+//    }
 
     public final void setCapacity(int capacity) {
         items.setCapacity(capacity);
@@ -76,14 +71,10 @@ abstract public class ArrayTable<V, L> implements Table<V,L> {
      * @return Whether the Item is in the Bag
      */
     public boolean contains(V it) {
-        return index.containsKey(it);
+        return this.containsKey(it);
     }
 
-    @Nullable
-    @Override
-    public L remove(V key) {
-        return index.remove(key);
-    }
+
 
     /**
      * TODO make this work for the original condition: (size() >= capacity)
@@ -134,10 +125,10 @@ abstract public class ArrayTable<V, L> implements Table<V,L> {
     /** gets the key associated with a value */
     abstract public V key(L l);
 
-    @Override
-    public L get(Object key) {
-        return index.get(key);
-    }
+//    @Override
+//    public L get(Object key) {
+//        return index.get(key);
+//    }
 
     public final int capacity() {
         return items.capacity();
@@ -201,37 +192,34 @@ abstract public class ArrayTable<V, L> implements Table<V,L> {
     }
 
 
-    protected final class ArrayMapping extends CollectorMap<V, L> {
+    @Override
+    protected L removeItem(L removed) {
 
-        final SortedIndex<L> items;
-
-        public ArrayMapping(Map<V, L> map, SortedIndex<L> items) {
-            super(map);
-            this.items = items;
+        if (items.remove(removed)) {
+            return removed;
         }
 
-        @Override
-        public final V key(L l) {
-            return ArrayTable.this.key(l);
-        }
-
-        @Override
-        protected L removeItem(L removed) {
-
-            if (items.remove(removed)) {
-                return removed;
-            }
-
-            return null;
-        }
-
-        @Override
-        protected L addItem(L i) {
-            L overflow = items.insert(i);
-            if (overflow!=null) {
-                removeKey(key(overflow));
-            }
-            return overflow;
-        }
+        return null;
     }
+
+    @Override
+    protected L addItem(L i) {
+        L overflow = items.insert(i);
+        if (overflow!=null) {
+            removeKey(key(overflow));
+        }
+        return overflow;
+    }
+
+//    protected final class ArrayMapping extends CollectorMap<V, L> {
+//
+//        final SortedIndex<L> items;
+//
+//        public ArrayMapping(Map<V, L> map, SortedIndex<L> items) {
+//            super(map);
+//            this.items = items;
+//        }
+//
+//
+//    }
 }

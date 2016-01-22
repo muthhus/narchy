@@ -5,9 +5,11 @@
 package nars.rover.robot;
 
 import nars.NAR;
+import nars.java.MethodOperator;
 import nars.java.NALObjects;
 import nars.rover.Sim;
 import nars.rover.obj.VisionRay;
+import nars.task.Task;
 import nars.task.in.ChangedTextInput;
 import nars.truth.Truth;
 import org.jbox2d.collision.shapes.PolygonShape;
@@ -33,14 +35,13 @@ public class Rover extends AbstractPolygonBot {
     private final ChangedTextInput mouthInput;
 
     //float tasteDistanceThreshold = 1.0f;
-    final static int retinaPixels = 23;
+    final static int retinaPixels = 13;
     final NALObjects objs;
-    int retinaRaysPerPixel = 2; //rays per vision sensor
+    int retinaRaysPerPixel = 4; //rays per vision sensor
     float aStep = (float) (Math.PI * 2f) / retinaPixels;
     float L = 25f; //vision distance
     Vec2 mouthPoint = new Vec2(2.7f, 0); //0.5f);
     @Deprecated
-    int distanceResolution = 4;
     double mouthArc = Math.PI / 6f; //in radians
     float biteDistanceThreshold = 0.05f;
     float linearDamping = 0.8f;
@@ -253,15 +254,15 @@ public class Rover extends AbstractPolygonBot {
         }
 
         public Truth forward(boolean forward) {
-            //Task c = MethodOperator.getCurrentTask(); c.getExpectation()
-            float thrust = 1;
+            Task c = MethodOperator.getCurrentTask();
+            float thrust = c!=null ? c.getExpectation() : 1;
             if (!forward) thrust = -thrust;
             return rover.thrustRelative(thrust);
         }
 
         public Truth rotate(boolean left) {
-            //Task c = MethodOperator.getCurrentTask(); c.getExpectation()
-            float thrust = 1;
+            Task c = MethodOperator.getCurrentTask();
+            float thrust = c!=null ? c.getExpectation() : 1;
             if (left) thrust = -thrust;
             return rover.rotateRelative(thrust);
         }

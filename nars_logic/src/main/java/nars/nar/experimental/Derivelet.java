@@ -190,7 +190,7 @@ public class Derivelet {
     }
 
     @Nullable
-    final Consumer<Task> perDerivation = (derived) -> {
+    final Consumer<Task> perDerivation = ( derived) -> {
         final NAR n = nar();
 
         derived = n.validInput(derived);

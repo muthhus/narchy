@@ -241,6 +241,13 @@ public interface BeliefTable extends TaskTable {
 //    }
 
 
+    public static float rankTemporal(@NotNull Task b, long when, long tRange) {
+        return b.getConfidence()/((1f+Math.abs(b.getOccurrenceTime() - when))/(tRange))*b.getOriginality();
+    }
+
+    public static float rankEternal(@NotNull Task b) {
+        return b.getConfidence()*b.getOriginality();
+    }
 
     /** get the top-ranking eternal belief/goal */
     @Nullable
@@ -263,7 +270,7 @@ public interface BeliefTable extends TaskTable {
         } else if (ete == null) {
             return tmp;
         } else {
-            return (ete.getConfidence() >= tmp.getConfidence()) ?
+            return ( ete.getConfidence() >= tmp.getConfidence()) ?
                     ete : tmp;
         }
     }

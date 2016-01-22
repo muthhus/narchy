@@ -67,7 +67,7 @@ public class ItemAccumulator<V extends Budgeted > {
 
         @Override
         public final boolean contains(V t) {
-            return index.containsKey(t);
+            return containsKey(t);
         }
     }
 

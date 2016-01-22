@@ -570,12 +570,15 @@ public interface Premise extends Level, Tasked {
 
     static final class UnifySubst extends FindSubst {
 
+        @NotNull
         private final Memory memory;
+        @NotNull
         private final Term a;
+        @NotNull
         private final Term b;
         private final Consumer<Term> solution;
 
-        public UnifySubst(Op varType, Memory memory, Term a, Term b, Consumer<Term> solution) {
+        public UnifySubst(Op varType, @NotNull Memory memory, @NotNull Term a, @NotNull Term b, Consumer<Term> solution) {
             super(varType, memory.random);
             this.memory = memory;
             this.a = a;

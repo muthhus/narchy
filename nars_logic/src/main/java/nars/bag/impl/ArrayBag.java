@@ -1,6 +1,5 @@
 package nars.bag.impl;
 
-import com.google.common.collect.Sets;
 import nars.bag.BLink;
 import nars.bag.Bag;
 import nars.budget.*;
@@ -9,7 +8,10 @@ import nars.util.data.sorted.SortedIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -138,46 +140,46 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
         throw new RuntimeException("unimpl");
     }
 
-    public void validate() {
-        int in = index.size();
-        int is = items.size();
-        if (Math.abs(is - in) > 0) {
-//                System.err.println("INDEX");
-//                for (Object o : index.values()) {
-//                    System.err.println(o);
-//                }
-//                System.err.println("ITEMS:");
-//                for (Object o : items) {
-//                    System.err.println(o);
-//                }
-
-            Set<V> difference = Sets.symmetricDifference(
-                    new HashSet(index.values()),
-                    new HashSet(items)
-            );
-
-            System.err.println("DIFFERENCE");
-            for (Object o : difference) {
-                System.err.println("  " + o);
-            }
-
-            throw new RuntimeException("curvebag fault: " + in + " index, " + is + " items");
-        }
-
-//            //test for a discrepency of +1/-1 difference between name and items
-//            if ((is - in > 2) || (is - in < -2)) {
-//                System.err.println(this.getClass() + " inconsistent index: items=" + is + " names=" + in);
-//                /*System.out.println(nameTable);
-//                System.out.println(items);
-//                if (is > in) {
-//                    List<E> e = new ArrayList(items);
-//                    for (E f : nameTable.values())
-//                        e.remove(f);
-//                    System.out.println("difference: " + e);
-//                }*/
-//                throw new RuntimeException(this.getClass() + " inconsistent index: items=" + is + " names=" + in);
+//    public void validate() {
+//        int in = ArrayTable.this.size();
+//        int is = items.size();
+//        if (Math.abs(is - in) > 0) {
+////                System.err.println("INDEX");
+////                for (Object o : index.values()) {
+////                    System.err.println(o);
+////                }
+////                System.err.println("ITEMS:");
+////                for (Object o : items) {
+////                    System.err.println(o);
+////                }
+//
+//            Set<V> difference = Sets.symmetricDifference(
+//                    new HashSet(((CollectorMap<V, L>) ArrayTable.this).values()),
+//                    new HashSet(items)
+//            );
+//
+//            System.err.println("DIFFERENCE");
+//            for (Object o : difference) {
+//                System.err.println("  " + o);
 //            }
-    }
+//
+//            throw new RuntimeException("curvebag fault: " + in + " index, " + is + " items");
+//        }
+//
+////            //test for a discrepency of +1/-1 difference between name and items
+////            if ((is - in > 2) || (is - in < -2)) {
+////                System.err.println(this.getClass() + " inconsistent index: items=" + is + " names=" + in);
+////                /*System.out.println(nameTable);
+////                System.out.println(items);
+////                if (is > in) {
+////                    List<E> e = new ArrayList(items);
+////                    for (E f : nameTable.values())
+////                        e.remove(f);
+////                    System.out.println("difference: " + e);
+////                }*/
+////                throw new RuntimeException(this.getClass() + " inconsistent index: items=" + is + " names=" + in);
+////            }
+//    }
 
     //    /**
 //     * Get an Item by key
@@ -220,9 +222,7 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
     @Override
     public final BLink<V> put(Object i, Budget b, float scale) {
 
-        ArrayMapping index = this.index;
-
-        BLink<V> existing = index.get(i);
+        BLink<V> existing = get(i);
 
         if (existing != null) {
 
@@ -244,13 +244,13 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
                 newBudget.commit();
             }
 
-            BLink<V> displaced = index.put((V) i, newBudget);
+            BLink<V> displaced = put((V) i, newBudget);
             if (displaced!=null) {
                 if (displaced == newBudget)
                     return null; //wasnt inserted
                 else {
                     //remove what was been removed from the items list
-                    index.removeKey(displaced.get());
+                    removeKey(displaced.get());
                 }
             }
 

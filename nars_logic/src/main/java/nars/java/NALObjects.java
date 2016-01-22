@@ -160,6 +160,7 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
     }
 
 
+    @Nullable
     MutableTask invokingGoal(Object object, @NotNull Method method, Object[] args) {
         if (methodExclusions.contains(method.getName()))
             return null;
@@ -174,7 +175,7 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
 
     //TODO run in separate execution context to avoid synchronized
     @Nullable
-    public Object invoked(@Nullable Object result, MutableTask invokingGoal) {
+    public Object invoked(@Nullable Object result, @NotNull MutableTask invokingGoal) {
 
 //        if (!lock.compareAndSet(false,true)) {
 //            return result;

@@ -33,21 +33,21 @@ public class MutableTask extends AbstractTask {
     }
 
     @NotNull
-    public static MutableTask clone(@NotNull Task t, Compound newTerm) {
+    public static MutableTask clone(@NotNull Task t, @NotNull Compound newTerm) {
         return new MutableTask(t, newTerm);
     }
 
-    MutableTask(@NotNull Task taskToClone, Compound newTerm) {
+    MutableTask(@NotNull Task taskToClone, @NotNull Compound newTerm) {
         super(taskToClone);
         term(newTerm);
     }
 
-    public MutableTask(Termed<Compound> term) {
+    public MutableTask(@NotNull Termed<Compound> term) {
         this();
         term(term);
     }
 
-    public MutableTask(Termed<Compound> content, char punc) {
+    public MutableTask(@NotNull Termed<Compound> content, char punc) {
         this(content);
         punctuation(punc);
     }
@@ -90,7 +90,7 @@ public class MutableTask extends AbstractTask {
     }
 
     @NotNull
-    protected final MutableTask term(Termed<Compound> t) {
+    protected final MutableTask term(@NotNull Termed<Compound> t) {
         setTerm(t);
         return this;
     }

@@ -96,6 +96,7 @@ public class AtomConcept extends AbstractConcept  {
         return processQuestion(task, nar );
     }
 
+    @NotNull
     @Override
     public Task process(Task task, NAR nar) {
         throw new RuntimeException(shouldntProcess);
@@ -144,7 +145,7 @@ public class AtomConcept extends AbstractConcept  {
         return true;
     }
 
-    protected final void linkTemplate(Task t, @NotNull Concept target, Budget b, float minScale, float subScale, NAR nar) {
+    protected final void linkTemplate(@NotNull Task t, @NotNull Concept target, Budget b, float minScale, float subScale, @NotNull NAR nar) {
 
         /** recursively activate the template's task tlink */
         target.link(t, subScale, minScale, nar);

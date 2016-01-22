@@ -27,17 +27,17 @@ public class Inperience {
     public static float MINIMUM_BUDGET_SUMMARY_TO_CREATE_WONDER_EVALUATE = 0.92f;
 
     //internal experience has less durability?
-    public static final float INTERNAL_EXPERIENCE_PROBABILITY = 0.01f;
+    public static final float INTERNAL_EXPERIENCE_PROBABILITY = 0.005f;
 
     //less probable form
     public static final float INTERNAL_EXPERIENCE_RARE_PROBABILITY =
             INTERNAL_EXPERIENCE_PROBABILITY / 4.0f;
 
 
-    //internal experience has less durability?
-    public static float INTERNAL_EXPERIENCE_DURABILITY_MUL = 0.1f; //0.1
-    //internal experience has less priority?
-    public static float INTERNAL_EXPERIENCE_PRIORITY_MUL = 0.1f; //0.1
+//    //internal experience has less durability?
+//    public static float INTERNAL_EXPERIENCE_DURABILITY_MUL = 0.1f; //0.1
+//    //internal experience has less priority?
+//    public static float INTERNAL_EXPERIENCE_PRIORITY_MUL = 0.1f; //0.1
 
     @Deprecated
     public static boolean enabled = true;
@@ -100,7 +100,7 @@ public class Inperience {
      * whether it is full internal experience, or minimal (false)
      */
     public boolean isFull() {
-        return false;
+        return true;
     }
 
 

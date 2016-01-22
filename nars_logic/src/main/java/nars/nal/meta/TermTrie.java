@@ -12,7 +12,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.List;
 
-import static com.sun.org.apache.xerces.internal.impl.xs.opti.SchemaDOM.indent;
 
 
 /** indexes sequences of (a perfectly-hashable fixed number
@@ -89,7 +88,11 @@ abstract public class TermTrie<K extends Term, V> {
         });
 
     }
-
+    public static void indent(int amount) {
+        for (int i = 0; i < amount; i++) {
+            System.out.print(' ');
+        }
+    }
 
     public String getSummary() {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

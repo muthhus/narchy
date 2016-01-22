@@ -55,12 +55,12 @@ public interface TermIndex extends TermBuilder {
 
 
     @NotNull
-    static Task spawn(Task parent, Compound content, char punctuation, Truth truth, long occ, @NotNull Budget budget) {
+    static Task spawn(Task parent, @NotNull Compound content, char punctuation, Truth truth, long occ, @NotNull Budget budget) {
         return spawn(parent, content, punctuation, truth, occ, budget.getPriority(), budget.getDurability(), budget.getQuality());
     }
 
     @NotNull
-    static Task spawn(Task parent, Compound content, char punctuation, Truth truth, long occ, float p, float d, float q) {
+    static Task spawn(Task parent, @NotNull Compound content, char punctuation, Truth truth, long occ, float p, float d, float q) {
         return new MutableTask(content, punctuation)
                 .truth(truth)
                 .budget(p, d, q)
@@ -102,6 +102,7 @@ public interface TermIndex extends TermBuilder {
         return t; /* as-is */
     }
 
+    @NotNull
     default Termed makeTerm(Term t) {
         return t instanceof Compound ?
                 makeCompound((Compound) t)
@@ -116,6 +117,7 @@ public interface TermIndex extends TermBuilder {
 //    }
 
 
+    @NotNull
     default Termed makeCompound(@NotNull Compound t) {
         return make(t.op(), t.relation(), t.subterms(), t.t());
     }
