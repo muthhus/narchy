@@ -14,22 +14,20 @@ import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.function.BiPredicate;
-
 
 public class DefaultConcept extends AtomConcept {
 
-    public static final BiPredicate<Task, Task> questionEquivalence = new BiPredicate<Task, Task>() {
-
-        @Override
-        public boolean test(@NotNull Task a, Task b) {
-            return (a.equals(b));
-        }
-
-//        //N/
-//        @Override public int compare(Task task, Task t1) {  return 0;        }
-//        @Override public int hashCodeOf(Task task) { return task.hashCode(); }
-    };
+//    public static final BiPredicate<Task, Task> questionEquivalence = new BiPredicate<Task, Task>() {
+//
+//        @Override
+//        public boolean test(@NotNull Task a, Task b) {
+//            return (a.equals(b));
+//        }
+//
+////        //N/
+////        @Override public int compare(Task task, Task t1) {  return 0;        }
+////        @Override public int hashCodeOf(Task task) { return task.hashCode(); }
+//    };
     /**
      * how incoming budget is merged into its existing duplicate quest/question
      */
@@ -394,7 +392,7 @@ public class DefaultConcept extends AtomConcept {
         //boolean tableAffected = false;
         //boolean newQuestion = table.isEmpty();
 
-        q = questionTable.add(q, questionEquivalence, duplicateQuestionMerge, nar.memory);
+        q = questionTable.add(q, duplicateQuestionMerge, nar.memory);
 
 
         //TODO if the table was not affected, does the following still need to happen:
@@ -407,7 +405,7 @@ public class DefaultConcept extends AtomConcept {
         if (sol != null) {
 
             if (sol.getDeleted()) {
-                throw new RuntimeException("should not have received deleted task: " + sol);
+                throw new RuntimeException("should not have received deleted task:\n" + sol.getLog() + " " + sol.getExplanation() + " " + q + " " + q.getBestSolution());
 //                return true;
             }
 

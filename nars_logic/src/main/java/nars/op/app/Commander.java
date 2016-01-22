@@ -14,6 +14,7 @@ import java.util.LinkedHashSet;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+
 /**
  * Captures input goals and questions into a buffer
  * (ie. input by user) and re-processes them in a
@@ -113,7 +114,8 @@ public class Commander implements Consumer<NAR>, Supplier<Concept> {
             if (commandIterator.hasNext()) {
                 Task next = commandIterator.next().get();
                 if (valid(now, next)) {
-                    Concept c = nar.process(next);
+                    /*Concept c = */nar.input(next);
+                    Concept c = nar.concept( next.concept() );
                     if (c!=null) {
                         concepts.add(c);
                         //TODO add recursive components?

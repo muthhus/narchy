@@ -74,7 +74,7 @@ public class Default extends AbstractNAR {
         ));
 
         if (core!=null) {
-            beforeNextFrame(this::initHigherNAL);
+            runLater(this::initHigherNAL);
         }
 
 

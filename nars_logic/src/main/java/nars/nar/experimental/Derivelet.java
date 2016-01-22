@@ -193,9 +193,9 @@ public class Derivelet {
     final Consumer<Task> perDerivation = ( derived) -> {
         final NAR n = nar();
 
-        derived = n.validInput(derived);
-        if (derived != null)
-            n.process(derived);
+        /*derived = n.validInput(derived);
+        if (derived != null)*/
+            n.input(derived);
     };
 
     final Consumer<ConceptProcess> perPremise = p ->

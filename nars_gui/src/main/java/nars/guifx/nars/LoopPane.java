@@ -68,7 +68,7 @@ public class LoopPane extends VBox {
         stepButton.setTooltip(new Tooltip("Step"));
         stepButton.setOnAction(e -> {
 
-            if (!n.running()) {
+            if (!n.running.get()) {
                 n.step();
                 say("stepped to time " + n.time());
             } else {

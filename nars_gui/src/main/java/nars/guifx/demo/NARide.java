@@ -198,7 +198,7 @@ public class NARide extends BorderPane {
 //                return () -> ni;
 //            });
             nar.onExec("gc", (c) -> {
-                nar.beforeNextFrame(() -> {
+                nar.runLater(() -> {
                     long before = Runtime.getRuntime().freeMemory();
                     System.gc();
                     long after = Runtime.getRuntime().freeMemory();

@@ -43,6 +43,15 @@ public abstract class CollectorMap<K, V>  {
 
 
 
+    public V putIfAbsent(K key, V value) {
+        V existing = putKeyIfAbsent(key, value);
+        if (existing != null) {
+            return existing;
+        }
+        addItem(value);
+        return null;
+    }
+
     public V put(K key, V value) {
 
 
@@ -131,6 +140,9 @@ public abstract class CollectorMap<K, V>  {
      */
     public final V putKey(K key, V value) {
         return map.put(key, value);
+    }
+    public final V putKeyIfAbsent(K key, V value) {
+        return map.putIfAbsent(key, value);
     }
 
 

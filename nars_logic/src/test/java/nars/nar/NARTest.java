@@ -143,7 +143,7 @@ public class NARTest {
         AtomicInteger b = new AtomicInteger(0);
         NAR n = new Terminal();
 
-        n.beforeNextFrame(b::incrementAndGet);
+        n.runLater(b::incrementAndGet);
         n.run(4);
         assertEquals(1, b.get());
 

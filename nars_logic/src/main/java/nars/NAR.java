@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -108,13 +108,13 @@ public abstract class NAR implements Level,Consumer<Task> {
     //TODO use this to store all handler registrations, and decide if transient or not
     public final transient List<Object> regs = new ArrayList();
     //Executors.newFixedThreadPool(1);
-    private final transient Deque<Runnable> nextTasks = new ConcurrentLinkedDeque();
+    private final transient Collection<Runnable> nextTasks = new CopyOnWriteArrayList(); //ConcurrentLinkedDeque();
 
     public NAR(@NotNull Memory m) {
         this(m, Global.DEFAULT_SELF);
     }
 
-    public NAR(@NotNull Memory m, Atom self) {
+    public NAR(@NotNull Memory m, @NotNull Atom self) {
 
         memory = m;
 
@@ -174,13 +174,13 @@ public abstract class NAR implements Level,Consumer<Task> {
      * inputs a task, only if the parsed text is valid; returns null if invalid
      */
     @Nullable
-    public Task inputTask(String taskText) {
+    public Task inputTask(@NotNull String taskText) {
         //try {
         Task t = task(taskText);
-        t.setCreationTime(time());
-        if (input(t))
-            return t;
-        return null;
+
+        input(t);
+
+        return t;
         /*} catch (Exception e) {
             return null;
         }*/
@@ -190,24 +190,24 @@ public abstract class NAR implements Level,Consumer<Task> {
      * parses and forms a Task from a string but doesnt input it
      */
     @Nullable
-    public Task task(String taskText) {
+    public Task task(@NotNull String taskText) {
         return Narsese.the().task(taskText, memory);
     }
 
     @NotNull
-    public List<Task> tasks(String parse) {
+    public List<Task> tasks(@NotNull String parse) {
         List<Task> result = Global.newArrayList(1);
         Narsese.the().tasks(parse, result, memory);
         return result;
     }
 
     @NotNull
-    public TaskQueue inputs(String parse) {
+    public TaskQueue inputs(@NotNull String parse) {
         return input(tasks(parse));
     }
 
     @NotNull
-    public TextInput input(String text) {
+    public TextInput input(@NotNull String text) {
         TextInput i = new TextInput(this, text);
         if (i.size() == 0) {
             //TODO replace with real parser error
@@ -218,7 +218,7 @@ public abstract class NAR implements Level,Consumer<Task> {
     }
 
     @NotNull
-    public <T extends Termed> T term(String t) throws NarseseException {
+    public <T extends Termed> T term(@NotNull String t) throws NarseseException {
 
         T x = (T) Narsese.the().term(t, index());
 
@@ -241,7 +241,7 @@ public abstract class NAR implements Level,Consumer<Task> {
      * gets a concept if it exists, or returns null if it does not
      */
     @Nullable
-    public Concept concept(String conceptTerm) throws NarseseException {
+    public Concept concept(@NotNull String conceptTerm) throws NarseseException {
         return memory.concept(term(conceptTerm));
     }
 
@@ -249,7 +249,7 @@ public abstract class NAR implements Level,Consumer<Task> {
      * ask question
      */
     @NotNull
-    public Task ask(String termString) throws NarseseException {
+    public Task ask(@NotNull String termString) throws NarseseException {
         //TODO remove '?' if it is attached at end
         /*if (t instanceof Compound)
             return ((T)t).normalizeDestructively();*/
@@ -269,7 +269,7 @@ public abstract class NAR implements Level,Consumer<Task> {
      * ask quest
      */
     @Nullable
-    public Task askShould(String questString) throws NarseseException {
+    public Task askShould(@NotNull String questString) throws NarseseException {
         Term c = term(questString);
         if (c instanceof Compound)
             return askShould((Compound) c);
@@ -288,7 +288,7 @@ public abstract class NAR implements Level,Consumer<Task> {
      * desire goal
      */
     @Nullable
-    public Task goal(Compound goalTerm, @NotNull Tense tense, float freq, float conf) throws NarseseException {
+    public Task goal(@NotNull Compound goalTerm, @NotNull Tense tense, float freq, float conf) throws NarseseException {
         return goal(
                 memory.getDefaultPriority(GOAL),
                 memory.getDefaultDurability(GOAL),
@@ -296,23 +296,23 @@ public abstract class NAR implements Level,Consumer<Task> {
     }
 
     @NotNull
-    public NAR believe(Termed term, @NotNull Tense tense, float freq, float conf) throws NarseseException {
+    public NAR believe(@NotNull Termed term, @NotNull Tense tense, float freq, float conf) throws NarseseException {
         believe(memory.getDefaultPriority(JUDGMENT), term, time(tense), freq, conf);
         return this;
     }
 
     @Nullable
-    public Task believe(float priority, Termed term, long when, float freq, float conf) throws NarseseException {
+    public Task believe(float priority, @NotNull Termed term, long when, float freq, float conf) throws NarseseException {
         return believe(priority, memory.getDefaultDurability(JUDGMENT), term, when, freq, conf);
     }
 
     @NotNull
-    public NAR believe(Termed term, float freq, float conf) throws NarseseException {
+    public NAR believe(@NotNull Termed term, float freq, float conf) throws NarseseException {
         return believe(term, Tense.Eternal, freq, conf);
     }
 
     @NotNull
-    public NAR believe(String term, @NotNull Tense tense, float freq, float conf) throws NarseseException {
+    public NAR believe(@NotNull String term, @NotNull Tense tense, float freq, float conf) throws NarseseException {
         believe(memory.getDefaultPriority(JUDGMENT), term(term), time(tense), freq, conf);
         return this;
     }
@@ -322,22 +322,22 @@ public abstract class NAR implements Level,Consumer<Task> {
     }
 
     @NotNull
-    public NAR believe(String termString, float freq, float conf) throws NarseseException {
+    public NAR believe(@NotNull String termString, float freq, float conf) throws NarseseException {
         return believe((Termed) term(termString), freq, conf);
     }
 
     @NotNull
-    public NAR believe(String termString) throws NarseseException {
+    public NAR believe(@NotNull String termString) throws NarseseException {
         return believe((Termed) term(termString));
     }
 
     @NotNull
-    public NAR believe(Termed term) throws NarseseException {
+    public NAR believe(@NotNull Termed term) throws NarseseException {
         return believe(term, 1.0f, memory.getDefaultConfidence(JUDGMENT));
     }
 
     @Nullable
-    public Task believe(float pri, float dur, Termed term, long occurrenceTime, float freq, float conf) throws NarseseException {
+    public Task believe(float pri, float dur, @NotNull Termed term, long occurrenceTime, float freq, float conf) throws NarseseException {
         return input(pri, dur, term, JUDGMENT, occurrenceTime, freq, conf);
     }
 
@@ -345,12 +345,12 @@ public abstract class NAR implements Level,Consumer<Task> {
      * TODO add parameter for Tense control. until then, default is Now
      */
     @Nullable
-    public Task goal(float pri, float dur, Termed goal, long occurrence, float freq, float conf) throws NarseseException {
+    public Task goal(float pri, float dur, @NotNull Termed goal, long occurrence, float freq, float conf) throws NarseseException {
         return input(pri, dur, goal, GOAL, occurrence, freq, conf);
     }
 
     @Nullable
-    public Task input(float pri, float dur, @Nullable Termed term, char punc, long occurrenceTime, float freq, float conf) {
+    public Task input(float pri, float dur, @NotNull Termed term, char punc, long occurrenceTime, float freq, float conf) {
 
         if (term == null) {
             return null;
@@ -408,7 +408,7 @@ public abstract class NAR implements Level,Consumer<Task> {
             if (n == 0) {
                 m.remove(t, "Unknown Command");
             }
-            return null;
+            return t;
         }
 
         Task tNorm = t.normalize(m);
@@ -421,6 +421,23 @@ public abstract class NAR implements Level,Consumer<Task> {
 
     }
 
+    public static final class InvalidTaskException extends RuntimeException {
+
+        public final Task task;
+
+        public InvalidTaskException(Task t) {
+            super();
+            this.task = t;
+        }
+
+        @Override
+        public String getMessage() {
+            return "Invalid Task: " + task;
+        }
+
+    }
+
+
     /**
      * exposes the memory to an input, derived, or immediate task.
      * the memory then delegates it to its controller
@@ -428,13 +445,16 @@ public abstract class NAR implements Level,Consumer<Task> {
      * return true if the task was processed
      * if the task was a command, it will return false even if executed
      */
-    public boolean input(Task t) {
+    public final void input(Task t) {
+        if (t == null)
+            throw new InvalidTaskException(null);
+
         if (null == (t = validInput(t)))
-            return false;
+            throw new InvalidTaskException(t);
 
-        memory.eventInput.emit(t);
+        if (!t.isCommand())
+            memory.eventInput.emit(t);
 
-        return true;
     }
 
     @Override public final void accept(Task task) {
@@ -756,10 +776,10 @@ public abstract class NAR implements Level,Consumer<Task> {
      * adds a task to the queue of task which will be executed in batch
      * after the end of the current frame before the next frame.
      */
-    public void beforeNextFrame(@NotNull Runnable t) {
+    public void runLater(@NotNull Runnable t) {
         if (running.get()) {
             //in a frame, so schedule for after it
-            nextTasks.addLast(t);
+            nextTasks.add(t);
         } else {
             //not in a frame, can execute immediately
             t.run();
@@ -770,7 +790,7 @@ public abstract class NAR implements Level,Consumer<Task> {
      * runs all the tasks in the 'Next' queue
      */
     private void runNextTasks() {
-        Deque<Runnable> n = this.nextTasks;
+        Collection<Runnable> n = this.nextTasks;
         if (!n.isEmpty()) {
             n.forEach(Runnable::run);
             n.clear();
@@ -788,11 +808,11 @@ public abstract class NAR implements Level,Consumer<Task> {
      * queues a task to (hopefully) be executed at an unknown time in the future,
      * in its own thread in a thread pool
      */
-    public boolean execAsync(@NotNull Runnable t) {
-        return execAsync(t, null);
+    public boolean runAsync(@NotNull Runnable t) {
+        return runAsync(t, null);
     }
 
-    public boolean execAsync(@NotNull Runnable t, @Nullable Consumer<RejectedExecutionException> onError) {
+    public boolean runAsync(@NotNull Runnable t, @Nullable Consumer<RejectedExecutionException> onError) {
         try {
             memory.eventSpeak.emit("execAsync " + t);
             memory.eventSpeak.emit("pool: " + NAR.asyncs.getActiveCount() + " running, " + NAR.asyncs.getTaskCount() + " pending");
@@ -818,13 +838,11 @@ public abstract class NAR implements Level,Consumer<Task> {
      *
      * @return The current time
      */
-    public long time() {
+    public final long time() {
         return memory.time();
     }
 
-    public boolean running() {
-        return running.get();
-    }
+
 
     @NotNull
     public NAR answer(@NotNull String question, @NotNull Consumer<Task> recvSolution) {
@@ -838,7 +856,7 @@ public abstract class NAR implements Level,Consumer<Task> {
      * inputs the question and observes answer events for a solution
      */
     @NotNull
-    public NAR answer(Task questionOrQuest, @NotNull Consumer<Task> c) {
+    public NAR answer(@NotNull Task questionOrQuest, @NotNull Consumer<Task> c) {
         new AnswerReaction(this, questionOrQuest) {
 
             @Override
@@ -857,7 +875,7 @@ public abstract class NAR implements Level,Consumer<Task> {
     }
 
     @NotNull
-    public NAR inputAt(long time, String... tt) {
+    public NAR inputAt(long time, @NotNull String... tt) {
         //LongPredicate timeCondition = t -> t == time;
 
         onEachFrame(m -> {
@@ -886,10 +904,10 @@ public abstract class NAR implements Level,Consumer<Task> {
     }
 
     @Nullable
-    public abstract NAR forEachConcept(Consumer<Concept> recip);
+    public abstract NAR forEachConcept(@NotNull Consumer<Concept> recip);
 
     @Nullable
-    public abstract Concept conceptualize(Termed termed, Budget activation, float scale);
+    public abstract Concept conceptualize(@NotNull Termed termed, Budget activation, float scale);
 
     @NotNull
     public NAR stopIf(@NotNull BooleanSupplier stopCondition) {
@@ -930,23 +948,28 @@ public abstract class NAR implements Level,Consumer<Task> {
      * TODO make private
      */
     @Nullable
-    public final Concept process(@NotNull Task task) {
+    protected final Concept process(@NotNull Task input) {
 
-        Concept c = conceptualize(task.concept(), task.getBudget(), 1f);
+        Concept c = conceptualize(input.concept(), input.getBudget(), 1f);
         if (c == null) {
-            throw new RuntimeException("Inconceivable: " + task);
+            throw new RuntimeException("Inconceivable: " + input);
         }
 
-        memory.emotion.busy(task);
+        memory.emotion.busy(input);
 
-        task = c.process(task, this);
-        if (!task.getDeleted()) {
+        Task matched = c.process(input, this);
+        //if (!task.getDeleted()) {
 
-            //propagate activation
-            c.link(task, 1f, this);
+        c.link(matched, 1f, this);
 
-            memory.eventTaskProcess.emit(task);
-        }
+//        if (input!=matched) {
+//            //if (Global.DEBUG..
+//            input.log(Tuples.pair("Resolved", matched));
+//            logger.info(input.getExplanation());
+//        }
+
+        memory.eventTaskProcess.emit(matched);
+        //}
 
         return c;
     }
@@ -964,7 +987,7 @@ public abstract class NAR implements Level,Consumer<Task> {
     public On onQuestion(@NotNull PatternAnswer p) {
         return memory.eventTaskProcess.on(question -> {
             if (question.punc() == '?') {
-                beforeNextFrame(() -> {
+                runLater(() -> {
                     List<Task> l = p.apply(question);
                     if (l != null) {
                         l.forEach(answer -> memory.eventAnswer.emit(Tuples.twin(question, answer)));

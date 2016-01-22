@@ -9,7 +9,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
 /**
@@ -71,13 +70,14 @@ public class ArrayListTaskTable implements QuestionTaskTable {
      */
     @Nullable
     @Override
-    public Task getFirstEquivalent(Task t, @NotNull BiPredicate<Task,Task> e) {
+    public Task getFirstEquivalent(Task t) {
         if (isEmpty()) return null;
 
         List<Task> ll = this.list;
-        for (int i = 0; i < ll.size(); i++) {
+        int s = ll.size();
+        for (int i = 0; i < s; i++) {
             Task a = ll.get(i);
-            if (e.test(a, t))
+            if (a.equals(t))
                 return a;
         }
         return null;
@@ -86,9 +86,10 @@ public class ArrayListTaskTable implements QuestionTaskTable {
 
     @NotNull
     @Override
-    public Task add(@NotNull Task t, @NotNull BiPredicate<Task,Task> equality, @NotNull BudgetMerge duplicateMerge, @NotNull Memory m) {
+    public Task add(@NotNull Task t, @NotNull BudgetMerge duplicateMerge, @NotNull Memory m) {
 
-        Task existing = getFirstEquivalent(t, equality);
+
+        Task existing = getFirstEquivalent(t);
         if (existing != null) {
 
             if (existing != t) {
@@ -103,9 +104,9 @@ public class ArrayListTaskTable implements QuestionTaskTable {
         int siz = size();
         if (siz + 1 > capacity) {
             // FIFO, remove oldest question (last)
-            /*Task removed = */list.remove(siz - 1);
+            Task removed = list.remove(siz - 1);
 
-            //m.remove(removed, "TaskTable FIFO Out");
+            m.remove(removed, "TaskTable FIFO Out");
 
             //m.emit(Events.ConceptQuestionRemove.class, c, removed /*, t*/);
         }

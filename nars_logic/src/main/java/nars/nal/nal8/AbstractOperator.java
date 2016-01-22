@@ -98,7 +98,7 @@ public abstract class AbstractOperator implements Consumer<Execution> {
     public final void _execute(@NotNull Execution execution) {
         if (async()) {
             //asynch
-            execution.nar.execAsync(() -> execute(execution));
+            execution.nar.runAsync(() -> execute(execution));
         } else {
             //synchronous
             execute(execution);

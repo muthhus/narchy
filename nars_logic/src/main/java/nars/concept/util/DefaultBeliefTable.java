@@ -225,11 +225,11 @@ public class DefaultBeliefTable implements BeliefTable {
 
         long now = this.now = memory.time();
 
-        Task preTop = input.isEternal() ? topEternal() : top(now);
+        Task preTop = top(now); //input.isEternal() ? topEternal() : top(now);
 
-        Task result;
 
-        if (!insert(input, memory)) {
+        Task result = insert(input, memory);
+        if (result==null) {
             result = preTop;
         } else {
             result = (preTop != null) ?
@@ -259,19 +259,23 @@ public class DefaultBeliefTable implements BeliefTable {
         return input.isEternal() ? topEternal() : top(now);
     }
 
-    private boolean insert(@NotNull Task t, @NotNull Memory memory) {
+    private Task insert(@NotNull Task t, @NotNull Memory memory) {
         ArrayTable<Task, Task> table = tableFor(t);
 
 //        if (Global.DEBUG) {
 //            checkForDeleted(t, table);
 //        }
 
+        Task existing = map.get(t);
+        if (existing!=null)
+            return existing;
+
         Task displaced = table.put(t,t);
         if (displaced!=null) {
-            onBeliefRemoved(displaced, "Unbelievable/Undesirable", memory);
+            onBeliefRemoved(displaced, "Duplicate/Unbelievable/Undesirable", memory);
         }
 
-        return t == displaced ? false : true;
+        return t == displaced ? null: t;
     }
 
     /** try to insert but dont delete the input task if it wasn't inserted (but delete a displaced if it was)

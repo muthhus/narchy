@@ -30,14 +30,21 @@ public class NALLevelTest {
 
         String productSentence = "<(a,b) --> c>.\n<c <-> a>?\n";
 
-        n1.input(productSentence);
-        n1.run(5);
+        try {
+            n1.input(productSentence);
+            n1.run(5);
+            assertTrue(false); //should not reach here
+        } catch (NAR.InvalidTaskException e) {
+            //this is normal
+        }
+
+        assertEquals(0, n1.time());
 
 
         n8.input(productSentence);
         n8.run(5);
 
-        assertEquals(5, n1.time());
+
         assertEquals("NAL1 will NOT process sentence containing a Product", 0, n1Count.numTaskProcesses());
         assertTrue("NAL8 will process sentence containing a Product", n8Count.numTaskProcesses() >= 1);
 

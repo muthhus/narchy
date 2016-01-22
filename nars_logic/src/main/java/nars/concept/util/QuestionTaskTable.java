@@ -6,8 +6,6 @@ import nars.task.Task;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.function.BiPredicate;
-
 /** task table used for storing Questions and Quests.
  *  simpler than Belief/Goal tables
  * */
@@ -20,14 +18,14 @@ public interface QuestionTaskTable extends TaskTable {
      * an existing equivalent task if this was a duplicate
      */
     @NotNull
-    Task add(Task t, BiPredicate<Task, Task> equality, BudgetMerge duplicateMerge, Memory m);
+    Task add(Task t, BudgetMerge duplicateMerge, Memory m);
 
 
     /**
      * @return null if no duplicate was discovered, or the first Task that matched if one was
      */
     @Nullable
-    Task getFirstEquivalent(Task t, @NotNull BiPredicate<Task,Task>  e);
+    Task getFirstEquivalent(Task t);
 //    {
 //        for (Task a : this) {
 //            if (e.test(a, t))

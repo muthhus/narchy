@@ -171,7 +171,7 @@ public enum LocalRules {
             eachSolutions.accept(q.getBestSolution());
 
             //defer these events until after frame ends so reasoning in this cycle may continue
-            nal.beforeNextFrame(() -> {
+            nal.runLater(() -> {
                 //TODO use an Answer class which is Runnable, combining that with the Twin info
                 memory.eventAnswer.emit(Tuples.twin(q, q.getBestSolution()));
             });

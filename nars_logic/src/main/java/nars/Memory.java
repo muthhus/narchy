@@ -323,22 +323,20 @@ public class Memory extends Param {
      */
     public final void remove(@NotNull Task task, @Nullable Object removalReason) {
 
-        boolean willBeReceived = !eventTaskRemoved.isEmpty();
 
-        if (willBeReceived && removalReason!=null)
+        if (removalReason!=null)
             task.log(removalReason);
 
         if (!task.getDeleted()) {
 
             task.getBudget().delete();
 
-            if (willBeReceived) {
 
-                /*if (Global.DEBUG_DERIVATION_STACKTRACES && Global.DEBUG_TASK_LOG)
-                    task.log(Premise.getStack());*/
+            /*if (Global.DEBUG_DERIVATION_STACKTRACES && Global.DEBUG_TASK_LOG)
+                task.log(Premise.getStack());*/
 
-                eventTaskRemoved.emit(task);
-            }
+            eventTaskRemoved.emit(task);
+
             /* else: a more destructive cleanup of the discarded task? */
         }
 

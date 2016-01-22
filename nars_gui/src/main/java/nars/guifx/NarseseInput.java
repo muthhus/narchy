@@ -17,7 +17,7 @@ public class NarseseInput extends CodeInput {
     public boolean onInput(String s) {
 
         if (!s.isEmpty()) {
-            nar.beforeNextFrame(() -> {
+            nar.runLater(() -> {
                 nar.input(s);
             });
         }
