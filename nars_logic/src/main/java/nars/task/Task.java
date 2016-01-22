@@ -21,6 +21,7 @@
 package nars.task;
 
 import nars.*;
+import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.concept.Concept;
 import nars.nal.Tense;
@@ -41,6 +42,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import static nars.Global.dereference;
+import static nars.nal.LocalRules.solutionEval;
 
 /**
  * A task to be processed, consists of a Sentence and a BudgetValue.
@@ -65,12 +67,12 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 //        if (l!=null)
 //            sb.append(" log=").append(l);
 
-        if (task.getBestSolution() != null) {
-            if (!task.term().equals(task.getBestSolution().term())) {
-                sb.append(" solution=");
-                task.getBestSolution().appendTo(sb);
-            }
-        }
+//        if (task.getBestSolution() != null) {
+//            if (!task.term().equals(task.getBestSolution().term())) {
+//                sb.append(" solution=");
+//                task.getBestSolution().appendTo(sb);
+//            }
+//        }
 
         Task pt = task.getParentTask();
         Task pb = task.getParentBelief();
@@ -181,19 +183,27 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     void onConcept(Concept c);
 
     @NotNull
-    default Task solution(Compound newTerm, @NotNull Task question, @NotNull Memory memory) {
+    default Task projectedSolution(@NotNull Compound newTerm, @NotNull Task question, @NotNull Memory memory) {
         long questionOcc = question.getOccurrenceTime();
 
         long now = memory.time();
 
+        Budget budget = solutionEval(question, this, memory);
+        if (budget == null)
+            return null;
+
         Truth projectedTruth = projection(questionOcc, now);
 
+        long occCurrent = getOccurrenceTime();
+
+        long solutionOcc = projectedTruth instanceof ProjectedTruth ? ((ProjectedTruth)projectedTruth).target : occCurrent;
+
         Task solution;
-        if ((truth() !=projectedTruth) || (!newTerm.equals(term()))) {
+        if ((truth() !=projectedTruth) || (!newTerm.equals(term())) || (solutionOcc!= occCurrent)) {
             solution = new MutableTask(newTerm, punc())
                     .truth(projectedTruth)
                     .budget(getPriority(), getDurability(), getQuality())
-                    .time(now, questionOcc)
+                    .time(now, solutionOcc)
                     .parent(getParentTaskRef(), getParentBeliefRef())
                     .setEvidence(getEvidence());
         } else {
@@ -340,12 +350,6 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         }
     }
 
-
-    @Nullable
-    Task getBestSolution();
-
-    @Nullable
-    Reference<Task> getBestSolutionRef();
 
 
 
@@ -570,8 +574,6 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
 
     void setTruth(Truth t);
-
-    void setBestSolution(Task belief);
 
 
 

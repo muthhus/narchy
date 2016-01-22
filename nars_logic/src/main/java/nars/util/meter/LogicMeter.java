@@ -76,7 +76,7 @@ public class LogicMeter extends FrameReaction {
 
 
     //public final DoubleMeter DERIVATION_LATENCY = new DoubleMeter("rule.derivation.latency");
-    public final DoubleMeter SOLUTION_BEST = new DoubleMeter("task.solution.best");
+    //public final DoubleMeter SOLUTION_BEST = new DoubleMeter("task.solution.best");
 
 
     /*

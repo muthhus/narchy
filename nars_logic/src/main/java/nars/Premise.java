@@ -45,7 +45,7 @@ public interface Premise extends Level, Tasked {
             Task s = !st.equals(solution.term()) ?
                     MutableTask.clone(solution, (Compound) st) : solution;
 
-            LocalRules.trySolution(question, s, nar, eachSolution);
+            LocalRules.forEachSolution(question, s, nar, eachSolution);
             //count[0]++;
         });
 

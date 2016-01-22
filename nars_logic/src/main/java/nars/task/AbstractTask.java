@@ -57,15 +57,10 @@ public abstract class AbstractTask extends Item<Task>
 
     private transient int hash;
 
-    /**
-     * TODO move to SolutionTask subclass
-     * For Question and Goal: best solution found so far
-     */
-    @Nullable
-    private transient Reference<Task> bestSolution;
+
 
     @Nullable
-    private List log = null;
+    private Reference<List> log = null;
 
 
 //    public AbstractTask(Compound term, char punctuation, Truth truth, Budget bv, Task parentTask, Task parentBelief, Task solution) {
@@ -78,15 +73,14 @@ public abstract class AbstractTask extends Item<Task>
 //    }
 
     public AbstractTask(@NotNull Compound term, char punc, Truth truth, float p, float d, float q) {
-        this(term, punc, truth, p, d, q, (Task) null, null, null);
+        this(term, punc, truth, p, d, q, (Task) null, null);
     }
 
-    public AbstractTask(@NotNull Compound term, char punc, Truth truth, float p, float d, float q, Task parentTask, Task parentBelief, Task solution) {
+    public AbstractTask(@NotNull Compound term, char punc, Truth truth, float p, float d, float q, Task parentTask, Task parentBelief) {
         this(term, punc, truth,
                 p, d, q,
                 Global.reference(parentTask),
-                reference(parentBelief),
-                reference(solution)
+                reference(parentBelief)
         );
     }
 
@@ -94,7 +88,7 @@ public abstract class AbstractTask extends Item<Task>
     public AbstractTask(@NotNull Task task) {
         this(task, task.punc(), task.truth(),
                 task.getPriority(), task.getDurability(), task.getQuality(),
-                task.getParentTaskRef(), task.getParentBeliefRef(), task.getBestSolutionRef());
+                task.getParentTaskRef(), task.getParentBeliefRef());
         setEvidence(task.getEvidence());
     }
 
@@ -126,14 +120,13 @@ public abstract class AbstractTask extends Item<Task>
     }
 
 
-    public AbstractTask(@NotNull Termed<Compound> term, char punctuation, Truth truth, float p, float d, float q, Reference<Task> parentTask, Reference<Task> parentBelief, Reference<Task> solution) {
+    public AbstractTask(@NotNull Termed<Compound> term, char punctuation, Truth truth, float p, float d, float q, Reference<Task> parentTask, Reference<Task> parentBelief) {
         super(p, d, q);
         this.truth = truth;
         this.punctuation = punctuation;
         this.term = term;
         this.parentTask = parentTask;
         this.parentBelief = parentBelief;
-        this.bestSolution = solution;
         updateEvidence();
     }
 
@@ -346,18 +339,7 @@ public abstract class AbstractTask extends Item<Task>
 
 
 
-    @NotNull
-    @Override
-    public Task log(@Nullable List historyToCopy) {
-        if (!Global.DEBUG_TASK_LOG)
-            return this;
 
-        if (historyToCopy != null) {
-            if (log == null) log = Global.newArrayList(historyToCopy.size());
-            log.addAll(historyToCopy);
-        }
-        return this;
-    }
 
     @Override
     public final char punc() {
@@ -559,37 +541,20 @@ public abstract class AbstractTask extends Item<Task>
         return parentBelief;
     }
 
-    @Nullable
+
+
+
+    @NotNull
     @Override
-    public Reference<Task> getBestSolutionRef() {
-        return bestSolution;
+    public Task log(@Nullable List historyToCopy) {
+        if (!Global.DEBUG_TASK_LOG)
+            return this;
+
+        if ((historyToCopy != null) && (!historyToCopy.isEmpty())) {
+            getOrCreateLog().addAll(historyToCopy);
+        }
+        return this;
     }
-
-    /**
-     * Get the best-so-far solution for a Question or Goal
-     *
-     * @return The stored Sentence or null
-     */
-    @Nullable
-    @Override
-    public Task getBestSolution() {
-        return dereference(bestSolution);
-    }
-
-    /**
-     * Set the best-so-far solution for a Question or Goal, and report answer
-     * for input question
-     *
-     * @param judg The solution to be remembered
-     */
-    @Override
-    public final void setBestSolution(Task judg) {
-
-        bestSolution = reference(judg);
-        //InternalExperience.experienceFromBelief(memory, this, judg);
-    }
-
-
 
     /**
      * append an entry to this task's log history
@@ -603,18 +568,24 @@ public abstract class AbstractTask extends Item<Task>
         if (!Global.DEBUG_TASK_LOG)
             return this;
 
-        //TODO parameter for max history length, although task history should not grow after they are crystallized with a concept
-        if (log == null)
-            log = Global.newArrayList(1);
-
-        log.add(entry);
+        getOrCreateLog().add(entry);
         return this;
     }
 
     @Nullable
     @Override
     public final List getLog() {
-        return log;
+        return dereference(log);
+    }
+
+
+    @NotNull
+    final List getOrCreateLog() {
+        List exist = getLog();
+        if (exist == null) {
+            this.log = reference(exist = Global.newArrayList(1));
+        }
+        return exist;
     }
 
 

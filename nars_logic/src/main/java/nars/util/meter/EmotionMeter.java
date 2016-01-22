@@ -63,9 +63,9 @@ public class EmotionMeter extends FrameReaction implements Serializable {
         happy += delta;
     }
 
-    public void happy(float solution, @NotNull Task task) {
-        happy += ( task.getBudget().summary() * solution );
-    }
+//    public void happy(float solution, @NotNull Task task) {
+//        happy += ( task.getBudget().summary() * solution );
+//    }
 
     protected void commitHappy() {
 

@@ -19,6 +19,8 @@ public class ConceptPaneTest {
     static float predictionProbability = 0.0f; //how often to ask for a prediction
     static float pastProbability = 0.1f; //how often to ask for a prediction
     static final float fps = 30f;
+    static boolean enableEternals = true;
+    static boolean enableTemporals = true;
 
     public static void main(String[] args) {
         NAR nar = new Default();
@@ -29,16 +31,16 @@ public class ConceptPaneTest {
         nar.onEachFrame(n-> {
 
             //random eternals
-            {
+            if (enableEternals) {
                 //float ef = nar.memory.random.nextFloat();
                 //float ec = nar.memory.random.nextFloat() * 0.5f;
                 float ef = 0.5f * ((float) Math.sin(nar.time() * waveFreq) + 1f);
-                float ec = 0.1f;
+                float ec = (float)Math.random(); //0.1f;
                 nar.input("y:x. %" + Texts.n2(ef) + ";" + Texts.n2(ec) + "%");
             }
 
             //random temporals
-            {
+            if (enableTemporals) {
                 CharSequence y = Texts.n2(0.5f * ((float) Math.sin(nar.time() * waveFreq) + 1f));
                 nar.input("y:x. :|: %" + y + ";" + conf + "%");
 

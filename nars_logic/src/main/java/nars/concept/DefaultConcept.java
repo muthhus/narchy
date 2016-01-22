@@ -191,7 +191,7 @@ public class DefaultConcept extends AtomConcept {
         if (hasQuestions()) {
             //TODO move this to a subclass of TaskTable which is customized for questions. then an arraylist impl of TaskTable can iterate by integer index and not this iterator/lambda
             getQuestions().forEach(question ->
-                    LocalRules.trySolution(question, best, nar, nar)
+                    LocalRules.forEachSolution(question, best, nar, nar)
             );
 
             /** update happiness meter on solution  TODO revise */
@@ -405,11 +405,11 @@ public class DefaultConcept extends AtomConcept {
         if (sol != null) {
 
             if (sol.getDeleted()) {
-                throw new RuntimeException("should not have received deleted task:\n" + sol.getLog() + " " + sol.getExplanation() + " " + q + " " + q.getBestSolution());
+                throw new RuntimeException("should not have received deleted task:\n" + sol.getLog() + " " + sol.getExplanation() + " " + q );
 //                return true;
             }
 
-            LocalRules.trySolution(q, sol, nar, nar);
+            LocalRules.forEachSolution(q, sol, nar, nar);
         }
 
         return q;

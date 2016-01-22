@@ -34,7 +34,6 @@ import nars.truth.Truth;
 import nars.truth.TruthFunctions;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Set;
 import java.util.function.Consumer;
 
 
@@ -114,7 +113,7 @@ public enum LocalRules {
      * @param question     The question to be processed
      * @return the projected Task, or the original Task
      */
-    public static void trySolution(@NotNull Task question, @NotNull Task sol, @NotNull NAR nal, @NotNull Consumer<Task> eachSolutions) {
+    public static void forEachSolution(@NotNull Task question, @NotNull Task sol, @NotNull NAR nal, @NotNull Consumer<Task> eachSolutions) {
 
 //        if ((sol == null) || (sol.getDeleted())) {
 //            throw new RuntimeException("proposedBelief " + sol + " deleted or null");
@@ -131,23 +130,22 @@ public enum LocalRules {
 
         Memory memory = nal.memory;
 
-        long now = memory.time();
-
         /** temporary for comparing the result before unification and after */
         //float newQ0 = TemporalRules.solutionQuality(question, belief, projectedTruth, now);
 
-        final Set<Task> answered = Global.newHashSet(0);
 
         Consumer<Term> proc = (st) -> {
 
-            Task ss = sol.solution((Compound)st, question, memory );
+            Task validSolution = sol.projectedSolution((Compound)st, question, memory );
 
-            if (processSolution(question, nal, ss, memory, now)) {
-
+            if (validSolution!=null) {
+                eachSolutions.accept(validSolution);
                 //System.out.println(question + " " + ss + " " + ss.getExplanation());
 
-                if (Global.DEBUG_NON_INPUT_ANSWERED_QUESTIONS || question.isInput())
-                    answered.add(question);
+                //TODO use an Answer class which is Runnable, combining that with the Twin info
+                if (Global.DEBUG_NON_INPUT_ANSWERED_QUESTIONS || question.isInput()) {
+                    memory.eventAnswer.emit(Tuples.twin(question, validSolution));
+                }
             }
 
         };
@@ -164,108 +162,107 @@ public enum LocalRules {
             if (sol == null)
                 throw new RuntimeException("Unification invalid: " + sol + " unified and projected to " + sol);
 
-            proc.accept(sol.term());
+            proc.accept(solTerm);
         }
 
-        answered.forEach(q -> {
-            eachSolutions.accept(q.getBestSolution());
 
-            //defer these events until after frame ends so reasoning in this cycle may continue
-            nal.runLater(() -> {
-                //TODO use an Answer class which is Runnable, combining that with the Twin info
-                memory.eventAnswer.emit(Tuples.twin(q, q.getBestSolution()));
-            });
-        });
     }
 
-    public static boolean processSolution(@NotNull Task question, @NotNull NAR nal, @NotNull Task sol, @NotNull Memory memory, long now) {
-
-//        if (!(question.isQuestion() || question.isQuest())) {
-//            throw new RuntimeException(question + " not a question");
-//        }
-
-        //long then = question.getOccurrenceTime();
-
-        Task oldBest = question.getBestSolution();
-        if (oldBest!=null && oldBest.equals(sol)) {
-            return false;
-        }
-        question.setBestSolution(sol);
-
-        //use sol.getTruth() in case sol was changed since input to this method:
-        //float newQ = solutionQuality(question, sol, sol.getTruth(), now);
-        float newQ = Tense.solutionQuality(question, sol, now, nal.memory.duration());
-//        if (newQ == 0) {
-//            memory.emotion.happy(0, questionTask, nal);
+//    /** refines a solution for a question.
+//     *  returns true if the solution is valid for the question */
+//    public static Task solve(@NotNull Task question, @NotNull NAR nal,
+//                             @NotNull Task existingSol, @NotNull Compound content, @NotNull Memory memory, long now) {
+//
+//
+////        if (!(question.isQuestion() || question.isQuest())) {
+////            throw new RuntimeException(question + " not a question");
+////        }
+//
+//        //long then = question.getOccurrenceTime();
+//
+//        Task sol = existingSol.projectedSolution(content, question, memory );
+//        return sol;
+//
+//        if (budget == null) {
 //            return null;
 //        }
-
-
-
-        //get the quality of the old solution if it were applied now (when conditions may differ)
-        float oldQ = (oldBest != null) ? Tense.solutionQuality(question, oldBest, now, nal.memory.duration()) : -1;
-
-//        if (oldQ >= newQ) {
-//            //old solution was better
-//            return false;
+//        if (budget.getDeleted()) {
+//            throw new RuntimeException("deleted solution budget");
 //        }
-
-
-        //TODO solutionEval calculates the same solutionQualities as here, avoid this unnecessary redundancy
-        Budget budget = solutionEval(question, sol, nal);
-        if (budget == null) {
-            return false;
-        }
-
-
-        //else, new solution is btter
-        memory.emotion.happy(newQ - oldQ, question);
-
-
-        memory.logic.SOLUTION_BEST.set(newQ);
-
-
-        sol.getBudget().set(budget);
-
-
-        /*memory.output(task);
-
-        //only questions and quests get here because else output is spammed
-        if(task.sentence.isQuestion() || task.sentence.isQuest()) {
-            memory.emit(Solved.class, task, belief);
-        } else {
-            memory.emit(Output.class, task, belief);
-        }*/
-
-        //nal.addSolution(nal.getCurrentTask(), budget, belief, task);
-
-        //.reason(currentTask.getHistory())
-
-
-        //if (belief != inputBelief) { //!belief.equals(inputBelief)) {
-        //it was either unified and/or projected:
-            /*belief = nal.addNewTask(nal.newTask(belief.getTerm(), belief.getPunctuation())
-                            .truth(belief.getTruth())
-                            .budget(budget)
-                            .parent(belief) //.parent(questionTask, questionTask.getParentBelief())
-                            .occurr(belief.getOccurrenceTime())
-
-                            .solution(belief),
-                    "Adjusted Solution",
-                    true, false, false);*/
-
-
-        /** decrease question's budget for transfer to solutions */
-        //question.getBudget().andPriority(budget.getPriority());
-
-        //memory.eventDerived.emit(sol);
-        //nal.nar().input(sol); //is this necessary? i cant find any reason for reinserting to input onw that it's part of the concept's belief/goal tables
-        //}
-
-
-        return true;
-
-    }
+//        sol.getBudget().set(budget);
+//        return sol;
+//
+//
+//
+//
+//        //use sol.getTruth() in case sol was changed since input to this method:
+//        //float newQ = solutionQuality(question, sol, sol.getTruth(), now);
+//        //float newQ = Tense.solutionQuality(question, sol, now, nal.memory.duration());
+////        if (newQ == 0) {
+////            memory.emotion.happy(0, questionTask, nal);
+////            return null;
+////        }
+//
+//
+//
+//        //get the quality of the old solution if it were applied now (when conditions may differ)
+//        //float oldQ = (existingSol != null) ? Tense.solutionQuality(question, existingSol, now, nal.memory.duration()) : -1;
+//
+////        if (oldQ >= newQ) {
+////            //old solution was better
+////            return false;
+////        }
+//
+//
+//        //TODO solutionEval calculates the same solutionQualities as here, avoid this unnecessary redundancy
+//
+//
+//
+//        //else, new solution is btter
+////        memory.emotion.happy(newQ - oldQ, question);
+//
+//
+//        //memory.logic.SOLUTION_BEST.set(newQ);
+//
+//
+//
+//
+//        /*memory.output(task);
+//
+//        //only questions and quests get here because else output is spammed
+//        if(task.sentence.isQuestion() || task.sentence.isQuest()) {
+//            memory.emit(Solved.class, task, belief);
+//        } else {
+//            memory.emit(Output.class, task, belief);
+//        }*/
+//
+//        //nal.addSolution(nal.getCurrentTask(), budget, belief, task);
+//
+//        //.reason(currentTask.getHistory())
+//
+//
+//        //if (belief != inputBelief) { //!belief.equals(inputBelief)) {
+//        //it was either unified and/or projected:
+//            /*belief = nal.addNewTask(nal.newTask(belief.getTerm(), belief.getPunctuation())
+//                            .truth(belief.getTruth())
+//                            .budget(budget)
+//                            .parent(belief) //.parent(questionTask, questionTask.getParentBelief())
+//                            .occurr(belief.getOccurrenceTime())
+//
+//                            .solution(belief),
+//                    "Adjusted Solution",
+//                    true, false, false);*/
+//
+//
+//        /** decrease question's budget for transfer to solutions */
+//        //question.getBudget().andPriority(budget.getPriority());
+//
+//        //memory.eventDerived.emit(sol);
+//        //nal.nar().input(sol); //is this necessary? i cant find any reason for reinserting to input onw that it's part of the concept's belief/goal tables
+//        //}
+//
+//
+//    }
 
     /**
      * Evaluate the quality of a belief as a solution to a problem, then reward
@@ -278,17 +275,17 @@ public enum LocalRules {
      * @return The budget for the new task which is the belief activated, if
      * necessary
      */
-    public static Budget solutionEval(@NotNull Task question, @NotNull Task solution, @NotNull NAR nar) {
+    public static Budget solutionEval(@NotNull Task question, @NotNull Task solution, @NotNull Memory m) {
         //boolean feedbackToLinks = false;
         /*if (task == null) {
             task = nal.getCurrentTask();
             feedbackToLinks = true;
         }*/
         if (question.getDeleted())
-            return null;
+            throw new RuntimeException("question deleted: " + question);
 
         boolean judgmentTask = question.isJudgment();
-        float quality = Tense.solutionQuality(question, solution, nar.time(), nar.memory.duration());
+        float quality = Tense.solutionQuality(question, solution, m.time(), m.duration());
         if (quality <= 0)
             return null;
 
