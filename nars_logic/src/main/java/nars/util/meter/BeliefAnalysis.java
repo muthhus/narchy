@@ -19,7 +19,7 @@ public class BeliefAnalysis extends EnergyAnalysis {
 		this.term = term;
 	}
 
-	public BeliefAnalysis(@NotNull NAR n, String term) {
+	public BeliefAnalysis(@NotNull NAR n, @NotNull String term) {
 		this(n, (Compound) n.term(term));
 	}
 

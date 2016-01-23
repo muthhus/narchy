@@ -33,11 +33,11 @@ public class RuleTest extends TestNAR {
 
 	}
 
-	public RuleTest(String task, String belief, String result) {
+	public RuleTest(@NotNull String task, @NotNull String belief, String result) {
 		this(task, belief, result, 0, 1, 0, 1);
 	}
-	public RuleTest(String task, String belief, String result, float minFreq,
-			float maxFreq, float minConf, float maxConf) {
+	public RuleTest(@NotNull String task, @NotNull String belief, String result, float minFreq,
+					float maxFreq, float minConf, float maxConf) {
 		this(
 				// new SingleStepNAR(),
 				new Default(), task, belief, result, minFreq, maxFreq, minConf,
@@ -46,7 +46,7 @@ public class RuleTest extends TestNAR {
 
 	static final Narsese p = Narsese.the();
 
-	public RuleTest(@NotNull NAR nar, String task, String belief, String result,
+	public RuleTest(@NotNull NAR nar, @NotNull String task, @NotNull String belief, String result,
 					float minFreq, float maxFreq, float minConf, float maxConf) {
 		this(nar, nar.task(task), nar.task(belief), result, minFreq, maxFreq,
 				minConf, maxConf);

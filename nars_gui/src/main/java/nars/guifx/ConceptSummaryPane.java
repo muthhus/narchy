@@ -72,7 +72,7 @@ public class ConceptSummaryPane extends Text {
 
             Color color;
             if (concept.hasBeliefs()) {
-                Truth tv = concept.getBeliefs().topTruth(now);
+                Truth tv = concept.getBeliefs().top(now).truth();
                 color = truthColors.get(tv.getFrequency(), tv.getConfidence());
             }
             else {

@@ -257,7 +257,7 @@ public class ConceptPane extends BorderPane implements ChangeListener {
         this.nar = nar;
 
 
-        setTop(new Label(c.toInstanceString()));
+        setTop(new Label(c.toString()));
 
 
 

@@ -153,7 +153,7 @@ public class NAL1Test extends AbstractNALTester {
 
         Task expectedTask = nar.task(expectedSolution + ". %1.00;0.80%");
 
-        //nar.stdout();
+        nar.log();
 
         nar.believe(belief, 1.0f, 0.8f)
            .answer(question, a -> { //.en("What is a type of swimmer?")

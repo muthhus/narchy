@@ -278,7 +278,7 @@ public class Inperience {
                     nal, 0);
     }
 
-    protected static void beliefReasonDerive(Task parent, Task belief, Compound new_term, @NotNull Premise p, long delay) {
+    protected static void beliefReasonDerive(Task parent, Task belief, @NotNull Compound new_term, @NotNull Premise p, long delay) {
 
         //TODO should this be a mew stamp or attached to parent.. originally it was a fresh new stamp from memory
 

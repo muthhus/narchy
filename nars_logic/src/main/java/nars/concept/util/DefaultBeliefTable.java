@@ -9,7 +9,6 @@ import nars.nal.LocalRules;
 import nars.nal.Tense;
 import nars.task.Task;
 import nars.util.ArraySortedIndex;
-import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -148,23 +147,21 @@ public class DefaultBeliefTable implements BeliefTable {
 
     @Nullable
     @Override
-    public Task topEternal() {
+    public final Task topEternal() {
         return eternal.top();
     }
 
     @Nullable
     @Override
-    public Task topTemporal(long when) {
+    public final Task topTemporal(long when) {
         Task best = null;
         float bestRank = -1;
         List<? extends Task> l = temporal.items.getList();
-        for (int i = 0; i < l.size(); i++) {
+        int ls = l.size();
+        for (int i = 0; i < ls; i++) {
             Task x = l.get(i);
             float r = rankTemporal(x, when);
-            if ((r > bestRank) ||
-                    //tie-breaker: closer to the target time
-                    ((Util.equal(r, bestRank, Global.BUDGET_PROPAGATION_EPSILON)) &&
-                        (Math.abs(when - best.getOccurrenceTime()) < Math.abs(when - x.getOccurrenceTime())))) {
+            if (r > bestRank) {
                 best = x;
                 bestRank = r;
             }

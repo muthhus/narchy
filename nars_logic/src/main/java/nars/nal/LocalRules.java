@@ -30,6 +30,7 @@ import nars.task.Task;
 import nars.term.Term;
 import nars.term.compound.Compound;
 import nars.truth.ProjectedTruth;
+import nars.truth.Stamp;
 import nars.truth.Truth;
 import nars.truth.TruthFunctions;
 import org.jetbrains.annotations.NotNull;
@@ -321,7 +322,7 @@ public enum LocalRules {
         return
             !(t.op().isConjunctive() && t.hasAny(Op.VAR_DEP))    // t.hasVarDep());
             && !newBelief.equals(oldBelief)
-            && !Tense.overlapping(newBelief, oldBelief);
+            && !Stamp.overlapping(newBelief, oldBelief);
     }
 
     /**

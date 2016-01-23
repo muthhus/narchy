@@ -179,7 +179,7 @@ public class DerivationGraph extends DirectedPseudograph<DerivationGraph.Keyed,O
 
 
     /** this normalizes any commutative terms which are out of order, and caches them in a list to avoid reparsing */
-    public static String parseTerm(String i) {
+    public static String parseTerm(@NotNull String i) {
         String s = parsedTerm.get(i);
         if (s == null) {
             s = np.term(i).term().toStringCompact();

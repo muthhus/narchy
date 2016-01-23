@@ -110,7 +110,7 @@ public final class Anticipate {
 
     }
 
-    protected void deriveDidntHappen(Compound prediction, @NotNull TaskTime tt) {
+    protected void deriveDidntHappen(@NotNull Compound prediction, @NotNull TaskTime tt) {
 
 //        if(testing) {
 //            String s = "did not happen: " + prediction.toString();

@@ -39,6 +39,7 @@ public interface BeliefTable extends TaskTable {
     };*/
 
 
+    @Nullable
     BeliefTable EMPTY = new BeliefTable() {
 
         @Override
@@ -195,14 +196,15 @@ public interface BeliefTable extends TaskTable {
         return b.getConfidence()*b.getOriginality();
     }
 
-    /** get the top-ranking eternal belief/goal */
-    @Nullable
-    Task topEternal();
+    /** get the top-ranking eternal belief/goal; null if no eternal beliefs known */
+    @Nullable Task topEternal();
 
-    @Nullable
-    Task topTemporal(long when);
+    /** finds the most relevant temporal belief for the given time; ; null if no temporal beliefs known */
+    @Nullable Task topTemporal(long when);
 
-    /** get the most relevant belief/goal with respect to a specific time. */
+    /** get the most relevant belief/goal with respect to a specific time.
+     *
+     * */
     @Nullable
     default Task top(long t) {
         Task ete = topEternal();
@@ -222,12 +224,6 @@ public interface BeliefTable extends TaskTable {
     }
 
 
-    /** the truth v alue of the topmost element, or null if there is none */
-    @Nullable
-    default Truth topTruth(long now) {
-        if (isEmpty()) return null;
-        return top(now).truth();
-    }
 
     default void print(@NotNull PrintStream out) {
         for (Task t : this) {

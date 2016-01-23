@@ -34,7 +34,7 @@ public abstract class AnswerReaction implements Consumer<Twin<Task>> {
     }
 
 
-    protected AnswerReaction(@NotNull NAR n, String questionTask) throws Narsese.NarseseException {
+    protected AnswerReaction(@NotNull NAR n, @NotNull String questionTask) throws Narsese.NarseseException {
         this(n, n.task(questionTask));
     }
 

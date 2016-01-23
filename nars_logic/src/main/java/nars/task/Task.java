@@ -610,7 +610,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     }
 
     @NotNull
-    static Task command(Compound op) {
+    static Task command(@NotNull Compound op) {
         //TODO use lightweight CommandTask impl without all the logic metadata
         return new MutableTask(op, Symbols.COMMAND);
     }
@@ -715,7 +715,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
     /** creates a new child task (has this task as its parent) */
     @NotNull
-    default MutableTask spawn(Compound content, char punc) {
+    default MutableTask spawn(@NotNull Compound content, char punc) {
         return new MutableTask(content, punc);
     }
 

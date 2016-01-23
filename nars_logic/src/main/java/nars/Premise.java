@@ -2,9 +2,7 @@ package nars;
 
 import nars.concept.Concept;
 import nars.nal.Level;
-import nars.nal.LocalRules;
 import nars.nal.Tense;
-import nars.task.MutableTask;
 import nars.task.Task;
 import nars.task.Tasked;
 import nars.term.Term;
@@ -22,35 +20,6 @@ import java.util.function.Consumer;
  * Defines the conditions used in an instance of a derivation
  */
 public interface Premise extends Level, Tasked {
-
-    /**
-     * The task and belief have the same content
-     * <p>
-     * called in RuleTables.reason
-     *
-     * @param question The task
-     * @param solution The belief
-     * @return number of matches tried
-     */
-    static void matchUnifiedSolutions(@NotNull Task question, @NotNull Task solution, @NotNull NAR nar, @NotNull Consumer<Task> eachSolution) {
-
-
-        //if (question.isQuestion() || question.isGoal()) {
-            //if (Tense.matchingOrder(question, solution)) {
-            //}
-        //}
-
-        //int[] count = new int[1];
-        unify(Op.VAR_QUERY, question.term(), solution.term(), nar.memory, (st) -> {
-            Task s = !st.equals(solution.term()) ?
-                    MutableTask.clone(solution, (Compound) st) : solution;
-
-            LocalRules.forEachSolution(question, s, nar, eachSolution);
-            //count[0]++;
-        });
-
-        //return count[0];
-    }
 
     /**
      * To unify two terms
@@ -126,6 +95,7 @@ public interface Premise extends Level, Tasked {
     }
 
 
+    @NotNull
     default Term self() {
         return nar().self;
     }

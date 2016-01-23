@@ -1,6 +1,7 @@
 package nars.task.in;
 
 import nars.NAR;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -18,7 +19,7 @@ public class ChangedTextInput {
 		nar = n;
 	}
 
-	public boolean set(String s) {
+	public boolean set(@NotNull String s) {
 		if (!enable())
 			return false;
 		if (allowRepeats() || (last == null) || (!last.equals(s))) {

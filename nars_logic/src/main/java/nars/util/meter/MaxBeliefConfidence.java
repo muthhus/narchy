@@ -25,7 +25,7 @@ public class MaxBeliefConfidence extends CycleReaction implements Signals {
     float conf = -1;
     private float best;
 
-    public MaxBeliefConfidence(@NotNull NAR nar, String term, float freq) {
+    public MaxBeliefConfidence(@NotNull NAR nar, @NotNull String term, float freq) {
         super(nar);
         this.nar = nar;
         this.term = nar.term(term);

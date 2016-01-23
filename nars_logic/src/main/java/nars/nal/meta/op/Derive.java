@@ -185,7 +185,7 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
 
         private final ConceptProcess premise;
 
-        public DerivedTask(Termed<Compound> tc, ConceptProcess premise) {
+        public DerivedTask(@NotNull Termed<Compound> tc, ConceptProcess premise) {
             super(tc);
             this.premise = premise;
         }
@@ -215,7 +215,7 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
     }
 
     /** part 2 */
-    private void derive(@NotNull PremiseMatch m, Termed<Compound> c, @Nullable Truth truth, Budget budget) {
+    private void derive(@NotNull PremiseMatch m, @NotNull Termed<Compound> c, @Nullable Truth truth, Budget budget) {
 
         ConceptProcess premise = m.premise;
 

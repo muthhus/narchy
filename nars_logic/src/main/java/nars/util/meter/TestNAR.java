@@ -134,7 +134,7 @@ public class TestNAR  {
     }
 
     @NotNull
-    public TestNAR input(String s) {
+    public TestNAR input(@NotNull String s) {
         finished = false;
         nar.input(s);
         return this;
@@ -147,7 +147,7 @@ public class TestNAR  {
         return this;
     }
 
-    public void believe(String t, @NotNull Tense tense, float f, float c) {
+    public void believe(@NotNull String t, @NotNull Tense tense, float f, float c) {
         finished = false;
         nar.believe(t, tense, f, c);
     }
@@ -209,7 +209,7 @@ public class TestNAR  {
 
 
     @NotNull
-    public TestNAR mustOutput(long withinCycles, String task)  {
+    public TestNAR mustOutput(long withinCycles, @NotNull String task)  {
         return mustEmit(outputEvents, withinCycles, task);
     }
 
@@ -305,7 +305,7 @@ public class TestNAR  {
     public final long time() { return nar.time(); }
 
     @NotNull
-    public TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long withinCycles, String task)  {
+    public TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long withinCycles, @NotNull String task)  {
         Task t = nar.task(task);
         //TODO avoid reparsing term from string
 
@@ -389,18 +389,18 @@ public class TestNAR  {
 
 
     @NotNull
-    public TestNAR mustExecute(long start, long end, String term) {
+    public TestNAR mustExecute(long start, long end, @NotNull String term) {
         return mustExecute(start, end, term, 0, 1.0f);
     }
 
     @NotNull
-    public TestNAR mustExecute(long start, long end, String term, float minExpect, float maxExpect) {
+    public TestNAR mustExecute(long start, long end, @NotNull String term, float minExpect, float maxExpect) {
         requires.add(new ExecutionCondition(nar, start, end, $.operator(term), minExpect, maxExpect));
         return this;
     }
 
     @NotNull
-    public TestNAR ask(String termString)  {
+    public TestNAR ask(@NotNull String termString)  {
         //Override believe to input beliefs that have occurrenceTime set on input
         // "lazy timing" appropriate for test cases that can have delays
         Task t = nar.ask(termString);
@@ -424,7 +424,7 @@ public class TestNAR  {
 
 
     @NotNull
-    public TestNAR believe(String termString, float freq, float conf)  {
+    public TestNAR believe(@NotNull String termString, float freq, float conf)  {
 
         nar.believe(termString, freq, conf);
         return this;

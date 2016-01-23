@@ -93,6 +93,42 @@ public interface Stamp {
         return deduplicated;
     }
 
+    static boolean overlapping(@NotNull Stamp a, @Nullable Stamp b) {
+
+        if (b == null) return false;
+        if (a == b) return true;
+
+        return overlapping(a.getEvidence(), b.getEvidence());
+    }
+
+    /**
+     * true if there are any common elements; assumes the arrays are sorted and contain no duplicates
+     * @param a evidence stamp in sorted order
+     * @param b evidence stamp in sorted order
+     */
+    static boolean overlapping(@NotNull long[] a, @NotNull long[] b) {
+
+        if (Global.DEBUG) {
+            if (a.length == 0 || b.length == 0) {
+                throw new RuntimeException("missing evidence");
+            }
+        }
+
+        /** TODO there may be additional ways to exit early from this loop */
+
+        for (long x : a) {
+            for (long y : b) {
+                if (x == y) {
+                    return true; //commonality detected
+                } else if (y > x) {
+                    //any values after y in b will not be equal to x
+                    break;
+                }
+            }
+        }
+        return false;
+    }
+
 
     long getCreationTime();
 

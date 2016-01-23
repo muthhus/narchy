@@ -43,6 +43,7 @@ public abstract class CollectorMap<K, V>  {
 
 
 
+    @Nullable
     public V putIfAbsent(K key, V value) {
         V existing = putKeyIfAbsent(key, value);
         if (existing != null) {

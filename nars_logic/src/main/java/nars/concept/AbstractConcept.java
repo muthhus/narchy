@@ -76,7 +76,7 @@ public abstract class AbstractConcept implements Concept {
     }
 
     @Override
-    public final int compareTo(Termed o) {
+    public final int compareTo(@NotNull Termed o) {
         return term.compareTo(o.term());
     }
 

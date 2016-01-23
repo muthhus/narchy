@@ -25,7 +25,7 @@ public abstract class AbstractMapIndex implements TermIndex {
 
     /** get the instance that will be internalized */
     @NotNull
-    public static Termed intern(Op op, int relation, TermContainer t) {
+    public static Termed intern(@NotNull Op op, int relation, TermContainer t) {
         //return (TermMetadata.hasMetadata(t) || op.isA(TermMetadata.metadataBits)) ?
                 //newMetadataCompound(op, relation, t) :
         return newInternCompound(op, t, relation);
@@ -38,7 +38,7 @@ public abstract class AbstractMapIndex implements TermIndex {
     }
 
     @NotNull
-    protected static Termed newInternCompound(Op op, TermContainer subterms, int relation) {
+    protected static Termed newInternCompound(@NotNull Op op, TermContainer subterms, int relation) {
         return new GenericCompound(
             op, relation, (TermVector) subterms
         );
@@ -77,7 +77,7 @@ public abstract class AbstractMapIndex implements TermIndex {
 
     @NotNull
     @Override
-    public Termed make(Op op, int relation, TermContainer t, int dt) {
+    public Termed make(@NotNull Op op, int relation, TermContainer t, int dt) {
         Termed x = intern(op, relation, internSub(t));
         if (dt!= Tense.ITERNAL && x.term().isCompound()) {
             x = ((Compound)x.term()).t(dt);

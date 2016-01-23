@@ -86,11 +86,13 @@ public class AtomConcept extends AbstractConcept  {
     public Task processGoal(Task task, NAR nar) {
         throw new RuntimeException(shouldntProcess);
     }
+    @NotNull
     @Override
     public Task processQuestion(Task task, NAR nar) {
         throw new RuntimeException(shouldntProcess);
     }
 
+    @NotNull
     @Override
     public final Task processQuest(Task task, NAR nar) {
         return processQuestion(task, nar );

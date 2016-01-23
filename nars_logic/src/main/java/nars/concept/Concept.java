@@ -62,12 +62,7 @@ public interface Concept extends Termed, Comparable<Termed> {
     }
 
 
-    @NotNull
-    default String toInstanceString() {
-        String id = Integer.toString(System.identityHashCode(this), 16);
-        return this + "::" + id;
-    }
-
+    @Nullable
     Object put(@NotNull Object key, @Nullable Object value);
 
 
@@ -181,7 +176,7 @@ public interface Concept extends Termed, Comparable<Termed> {
     /** prints a summary of all termlink, tasklink, etc.. */
     default void print(@NotNull PrintStream out, boolean showbeliefs, boolean showgoals, boolean showtermlinks, boolean showtasklinks) {
 
-        out.println("concept: " + toInstanceString());
+        out.println("concept: " + toString());
 
         String indent = "  \t";
         if (showbeliefs) {

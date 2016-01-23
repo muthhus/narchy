@@ -100,6 +100,7 @@ public abstract class NAR implements Level,Consumer<Task> {
      * The id/name of the reasoner
      * TODO
      */
+    @NotNull
     public final Atom self;
     /**
      * Flag for running continuously
@@ -430,6 +431,7 @@ public abstract class NAR implements Level,Consumer<Task> {
             this.task = t;
         }
 
+        @NotNull
         @Override
         public String getMessage() {
             return "Invalid Task: " + task;
@@ -445,7 +447,7 @@ public abstract class NAR implements Level,Consumer<Task> {
      * return true if the task was processed
      * if the task was a command, it will return false even if executed
      */
-    public final void input(Task t) {
+    public final void input(@Nullable Task t) {
         if (t == null)
             throw new InvalidTaskException(null);
 
@@ -524,7 +526,7 @@ public abstract class NAR implements Level,Consumer<Task> {
         return tq;
     }
 
-    public On onExecTask(@NotNull String operator, Consumer<Execution> f) {
+    public On onExecTask(@NotNull String operator, @NotNull Consumer<Execution> f) {
         return onExec(operator, f);
     }
 
@@ -645,7 +647,7 @@ public abstract class NAR implements Level,Consumer<Task> {
         }
     }
 
-    private static void cycles(Memory memory, Topic<Memory> cycleStart, int cyclesPerFrame) {
+    private static void cycles(Memory memory, @NotNull Topic<Memory> cycleStart, int cyclesPerFrame) {
         for (; cyclesPerFrame > 0; cyclesPerFrame--) {
             cycleStart.emit(memory);
         }

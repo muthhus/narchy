@@ -25,6 +25,7 @@ import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Term;
 import nars.truth.DefaultTruth;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -40,7 +41,7 @@ public abstract class feel extends SyncOperator implements Mental {
      * @param value The value to be checked, in [0, 1]
      * @return Immediate results as Tasks
      */
-    protected static ArrayList<Task> feeling(float value, NAR nar, Term feeling) {
+    protected static ArrayList<Task> feeling(float value, @NotNull NAR nar, Term feeling) {
 
         Term content = instprop(nar.self, feeling);
 

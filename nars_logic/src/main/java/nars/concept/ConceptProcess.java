@@ -6,11 +6,13 @@ package nars.concept;
 
 import nars.Global;
 import nars.NAR;
+import nars.Op;
 import nars.Premise;
 import nars.bag.BLink;
-import nars.nal.Tense;
 import nars.task.Task;
+import nars.term.Term;
 import nars.term.Termed;
+import nars.truth.Stamp;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,7 +34,7 @@ public final class ConceptProcess implements Premise {
     public final BLink<Termed> termLink;
 
     @Nullable
-    private final Task currentBelief;
+    private final Task belief;
     private final boolean cyclic;
 
     @Override
@@ -53,48 +55,41 @@ public final class ConceptProcess implements Premise {
         this.conceptLink = conceptLink;
         this.termLink = termLink;
 
-        //belief can be null:
-        if (belief!=null)  {
-            currentBelief = belief;
-            cyclic = (belief != null) && Tense.overlapping(getTask(), belief);
-        } else {
-            currentBelief = null;
-            cyclic = false;
-        }
+        this.belief = belief;
+        this.cyclic = (belief != null) && Stamp.overlapping(getTask(), belief);
     }
 
 
     public static int fireAll(@NotNull NAR nar, BLink<Concept> concept, @NotNull BLink<Task> taskLink, @NotNull BLink<Termed> termLink, @NotNull Consumer<ConceptProcess> cp) {
 
         Task task = taskLink.get();
+        Term tel = termLink.get().term();
+        if (tel!=null) /*&& (task.term().hasVarQuery()))*/ {
+             Premise.unify(Op.VAR_QUERY, task.term(), tel, nar.memory, (u) -> {
+                 if (!tel.equals(u)) {
+                     fireAll(nar, concept, taskLink, termLink, u, cp);
+                 }
+             });
+        }
 
-        Concept beliefConcept = nar.concept(termLink.get());
+        fireAll(nar, concept, taskLink, termLink, tel, cp);
 
-        Task belief;
+        return 1; //HACK
+    }
+
+    public static void fireAll(@NotNull NAR nar, BLink<Concept> concept, @NotNull BLink<Task> taskLink, @NotNull BLink<Termed> termLink, Term beliefTerm, @NotNull Consumer<ConceptProcess> cp) {
+        Concept beliefConcept = nar.concept(beliefTerm);
+
+        Task belief = null;
         if ((beliefConcept != null) && (beliefConcept.hasBeliefs())) {
-            long now = nar.time();
-            belief = beliefConcept.getBeliefs().top(now);
+            belief = beliefConcept.getBeliefs().top(nar.time());
             if (belief == null || belief.getDeleted()) {
-//                beliefConcept.print();
-//                beliefConcept.getBeliefs().top(now);
                 throw new RuntimeException("deleted belief: " + belief + " " + beliefConcept.hasBeliefs());
             }
-        } else {
-            belief = null;
         }
 
-        Consumer<Task> runBelief = (b) -> {
-            cp.accept(new ConceptProcess(nar, concept,
-                    taskLink, termLink, b));
-        };
-
-        if (belief != null) {
-            //try unified solutions
-            Premise.matchUnifiedSolutions(task, belief, nar, runBelief);
-        }
-
-        runBelief.accept(belief);
-        return 1;
+        cp.accept(new ConceptProcess(nar, concept,
+                taskLink, termLink, belief));
     }
 
 //    /**
@@ -135,7 +130,7 @@ public final class ConceptProcess implements Premise {
     @Nullable
     @Override
     public final Task getBelief() {
-        return currentBelief;
+        return belief;
     }
 
     @Override
