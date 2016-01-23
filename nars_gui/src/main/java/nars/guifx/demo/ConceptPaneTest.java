@@ -14,12 +14,12 @@ import nars.util.Texts;
 public class ConceptPaneTest {
 
     public static final int beliefCapacity = 96;
-    static float waveFreq = 0.22715f;
+    static float waveFreq = 0.12715f;
     static float conf = 0.9f;
-    static float predictionProbability = 0.0f; //how often to ask for a prediction
-    static float pastProbability = 0.1f; //how often to ask for a prediction
+    static float predictionProbability = 0.5f; //how often to ask for a prediction
+    static float pastProbability = 0.5f; //how often to ask for a prediction
     static final float fps = 30f;
-    static boolean enableEternals = true;
+    static boolean enableEternals = false;
     static boolean enableTemporals = true;
 
     public static void main(String[] args) {
@@ -35,7 +35,7 @@ public class ConceptPaneTest {
                 //float ef = nar.memory.random.nextFloat();
                 //float ec = nar.memory.random.nextFloat() * 0.5f;
                 float ef = 0.5f * ((float) Math.sin(nar.time() * waveFreq) + 1f);
-                float ec = (float)Math.random(); //0.1f;
+                float ec = 0.05f * (float)Math.random(); //0.1f;
                 nar.input("y:x. %" + Texts.n2(ef) + ";" + Texts.n2(ec) + "%");
             }
 

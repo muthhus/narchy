@@ -270,6 +270,64 @@ public class BeliefTableTest extends TestCase {
 
     }
 
+    @Test
+    public void testEternalBeliefRanking() {
+
+        Global.DEBUG = true;
+
+        int maxBeliefs = 10;
+        NAR n = newNAR(maxBeliefs);
+
+
+        BeliefAnalysis b = new BeliefAnalysis(n, "<a-->b>");
+
+        b.believe(1.0f, 0.5f); n.step();
+        b.print();
+        assertEquals(0.5, b.concept().getBeliefs().topEternal().getConfidence(), 0.001);
+        assertEquals(0.5, b.concept().getBeliefs().top(n.time()).getConfidence(), 0.001);
+        assertEquals(1, b.concept().getBeliefs().size());
+
+        b.believe(1.0f, 0.5f); n.step();
+        b.print();
+        assertEquals(0.67, b.concept().getBeliefs().topEternal().getConfidence(), 0.001);
+        assertEquals(3, b.concept().getBeliefs().size());
+
+        b.believe(1.0f, 0.5f); n.step();
+        b.print();
+        assertEquals(0.75, b.concept().getBeliefs().topEternal().getConfidence(), 0.001);
+        assertEquals(0.75, b.concept().getBeliefs().top(n.time()).getConfidence(), 0.001);
+        assertEquals(5, b.concept().getBeliefs().size());
+
+        b.believe(1.0f, 0.5f); n.step();
+        b.print();
+        assertEquals(0.80, b.concept().getBeliefs().topEternal().getConfidence(), 0.001);
+        assertEquals(5, b.concept().getBeliefs().size());
+
+//        int period = 1;
+//        int loops = 20;
+//
+//        for (int i = 0; i < loops; i++) {
+//
+//
+//            b.run(period);
+//            //b.printEnergy();
+//
+//
+//            long now = b.nar.time();
+//
+//            Task tt = b.concept().getBeliefs().top(now);
+//            //float p = tt.getExpectation() * tt.projectionRank(now);
+//
+//            System.out.println(now + " " + " " +  tt);
+//
+//            //b.print();
+//        }
+
+        b.print();
+
+    }
+
+
 //    @Ignore
 //    @Test
 //    public void testTruthOscillationLongTerm() {

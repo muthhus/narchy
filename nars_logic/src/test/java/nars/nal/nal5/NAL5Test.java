@@ -343,8 +343,11 @@ public class NAL5Test extends AbstractNALTester {
         TestNAR tester = test();
         tester.believe("<(&&,<robin --> [flying]>,<robin --> [withWings]>) ==> <robin --> [living]>>",0.9f,0.9f); //.en("If robin can fly and it has wings, then robin is living.");
         tester.believe("<(&&,<robin --> [flying]>,<robin --> bird>) ==> <robin --> [living]>>"); //.en("If robin can fly and robin is a bird then robin is living.");
-        tester.mustBelieve(cycles*2,"<<robin --> bird> ==> <robin --> [withWings]>>",1.00f,0.42f); //.en("I guess if robin is a bird, then robin has wings.");
-        tester.mustBelieve(cycles*2,"<<robin --> [withWings]> ==> <robin --> bird>>",0.90f,0.45f); //.en("I guess if robin has wings, then robin is a bird.");
+        tester.mustBelieve(cycles*2,"<<robin --> bird> ==> <robin --> [withWings]>>",
+                0.90f,0.45f);
+                //1.00f,0.42f); //.en("I guess if robin is a bird, then robin has wings.");
+        tester.mustBelieve(cycles*2,"<<robin --> [withWings]> ==> <robin --> bird>>",
+                0.90f,0.45f); //.en("I guess if robin has wings, then robin is a bird.");
 
     }
 

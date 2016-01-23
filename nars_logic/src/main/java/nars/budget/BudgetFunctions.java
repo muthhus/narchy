@@ -342,7 +342,7 @@ public final class BudgetFunctions extends UtilityFunctions {
         final float quality = qual * complexityFactor;
 
         BLink<Termed> termLink = nal.termLink;
-        if (termLink!=null) {
+        if ((termLink!=null) && (!termLink.getDeleted())) {
             priority = or(priority, termLink.getPriority());
             durability = and(durability, termLink.getDurability()); //originaly was 'AND'
 

@@ -447,7 +447,7 @@ public class ConceptPane extends BorderPane implements ChangeListener {
         public BeliefTablePane(Concept c) {
             super();
             this.concept = c;
-            eternal = new Canvas(300, 300);
+            eternal = new Canvas(300, 400);
             eternal.maxWidth(300);
             eternal.maxHeight(300);
             temporal = new Canvas(800, 400);

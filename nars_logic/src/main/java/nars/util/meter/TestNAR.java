@@ -76,7 +76,7 @@ public class TestNAR  {
             //nar.memory.eventInput,
             nar.memory.eventTaskProcess,
             nar.memory.eventTaskRemoved,
-            nar.memory.eventRevision,
+            //nar.memory.eventRevision,
             answerReceiver
         };
 

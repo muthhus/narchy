@@ -17,6 +17,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Random;
 
+import static nars.nal.UtilityFunctions.or;
+
 /**
  * A model storing, ranking, and projecting beliefs or goals (tasks with TruthValue).
  * It should iterate in top-down order (highest ranking first)
@@ -188,12 +190,12 @@ public interface BeliefTable extends TaskTable {
 
 
     public static float rankTemporal(@NotNull Task b, long when, long tRange) {
-        return rankEternal(b)*
-                (1f/(1f+ (Math.abs(b.getOccurrenceTime() - when)/((float)tRange))) );
+        return or(rankEternal(b), b.getOriginality())
+                *(1f/(1f+ (Math.abs(b.getOccurrenceTime() - when)/((float)tRange))) );
     }
 
     public static float rankEternal(@NotNull Task b) {
-        return b.getConfidence()*b.getOriginality();
+        return b.getConfidence();
     }
 
     /** get the top-ranking eternal belief/goal; null if no eternal beliefs known */
@@ -274,6 +276,12 @@ public interface BeliefTable extends TaskTable {
 
         return problemHasQueryVar ? Truth.expectation(freq, conf) / t.term().complexity() : conf;
 
+    }
+
+    static Task stronger(Task a, Task b) {
+        if (a.getConfidence() > b.getConfidence())
+            return a;
+        return b;
     }
 
 
