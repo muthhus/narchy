@@ -98,7 +98,7 @@ public interface Stamp {
         if (b == null) return false;
         if (a == b) return true;
 
-        return overlapping(a.getEvidence(), b.getEvidence());
+        return overlapping(a.evidence(), b.evidence());
     }
 
     /**
@@ -130,13 +130,13 @@ public interface Stamp {
     }
 
 
-    long getCreationTime();
+    long creation();
 
     @NotNull
     Stamp setCreationTime(long t);
 
     default float getOriginality() {
-        return 1.0f / (getEvidence().length + 1);
+        return 1.0f / (evidence().length + 1);
     }
 
     /**
@@ -145,17 +145,17 @@ public interface Stamp {
      * since it is the deduplicated and sorted form of it.
      */
     @Nullable
-    long[] getEvidence();
+    long[] evidence();
 
     //Stamp setEvidence(long... evidentialSet);
 
     @NotNull
     static long[] zip(@NotNull Task parentTask, @NotNull Task parentBelief) {
 
-        long[] as = parentTask.getEvidence();
-        long[] bs = parentBelief.getEvidence();
+        long[] as = parentTask.evidence();
+        long[] bs = parentBelief.evidence();
 
-        return parentTask.getCreationTime() > parentBelief.getCreationTime() ?
+        return parentTask.creation() > parentBelief.creation() ?
                 Stamp.zip(bs, as) :
                 Stamp.zip(as, bs);
     }

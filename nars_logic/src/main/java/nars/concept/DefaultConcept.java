@@ -165,7 +165,6 @@ public class DefaultConcept extends AtomConcept {
 //    }
 
 
-
     /**
      * To accept a new judgment as belief, and check for revisions and solutions
      *
@@ -190,9 +189,12 @@ public class DefaultConcept extends AtomConcept {
 
         if (hasQuestions()) {
             //TODO move this to a subclass of TaskTable which is customized for questions. then an arraylist impl of TaskTable can iterate by integer index and not this iterator/lambda
-            getQuestions().forEach(question ->
-                    LocalRules.forEachSolution(question, best, nar, nar)
-            );
+            getQuestions().forEach(question -> {
+                if (question.getDeleted())
+                    throw new RuntimeException("deleted question: " + question);
+
+                LocalRules.forEachSolution(question, best, nar, nar);
+            });
 
             /** update happiness meter on solution  TODO revise */
             float successAfter = getSuccess(now);
@@ -314,9 +316,6 @@ public class DefaultConcept extends AtomConcept {
 //            }
 
 
-
-
-
 //    public static void questionFromGoal(final Task task, final Premise p) {
 //        if (Global.QUESTION_GENERATION_ON_DECISION_MAKING || Global.HOW_QUESTION_GENERATION_ON_DECISION_MAKING) {
 //            //ok, how can we achieve it? add a question of whether it is fullfilled
@@ -378,13 +377,17 @@ public class DefaultConcept extends AtomConcept {
             questionTable = getQuests();
         }
 
-//        //if (Global.DEBUG) {
+        if (Global.DEBUG) {
 //            if (q.getTruth() != null) {
 //                System.err.println(q + " has non-null truth");
 //                System.err.println(q.getExplanation());
 //                throw new RuntimeException(q + " has non-null truth");
 //            }
-        //}
+            questionTable.forEach(qq -> {
+                if (qq.getDeleted())
+                    throw new RuntimeException("question is deleted: " + qq);
+            });
+        }
 
         /** execute the question, for any attached operators that will handle it */
         //getMemory().execute(q);
@@ -400,12 +403,12 @@ public class DefaultConcept extends AtomConcept {
         BeliefTable answerTable = q.isQuest() ?
                 getGoals() : getBeliefs();
 
-        Task sol = answerTable.top(q.getOccurrenceTime());
+        Task sol = answerTable.top(q.occurrence());
 
         if (sol != null) {
 
             if (sol.getDeleted()) {
-                throw new RuntimeException("should not have received deleted task:\n" + sol.log() + " " + sol.getExplanation() + " " + q );
+                throw new RuntimeException("should not have received deleted task:\n" + sol.log() + " " + sol.getExplanation() + " " + q);
 //                return true;
             }
 

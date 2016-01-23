@@ -2,7 +2,6 @@ package nars.nal;
 
 import nars.Memory;
 import nars.task.Task;
-import nars.term.compound.Compound;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 
@@ -41,33 +40,20 @@ public enum Tense  {
         symbol = string;
     }
 
-    /**
-     * Evaluate the quality of the judgment as a solution to a problem
-     *
-     * @param problem A goal or question
-     * @param solution The solution to be evaluated
-     * @return The quality of the judgment as the solution
-     */
-    public static float solutionQuality(@NotNull Task problem, @NotNull Task solution, long time, int duration) {
-        float om = orderMatch(problem.term(), solution.term(), duration);
-        if (om == 0) return 0f;
-        return om * solutionQualityMatchingOrder(problem, solution, time);
-    }
-
-    /** degree to which the temporal relations of the two terms match */
-    public static float orderMatch(@NotNull Compound a, @NotNull Compound b, int duration) {
-
-        int at = a.t();
-        int bt = b.t();
-        if (at == bt) return 1f;
-
-        float fduration = (float)duration;
-
-        float ad = at /fduration;
-        float bd = bt /fduration;
-        return Math.min(0f, 1f - Math.abs(ad-bd)/((ad+bd)/2f));
-
-    }
+    //    /** degree to which the temporal relations of the two terms match */
+//    public static float orderMatch(@NotNull Compound a, @NotNull Compound b, int duration) {
+//
+//        int at = a.t();
+//        int bt = b.t();
+//        if (at == bt) return 1f;
+//
+//        float fduration = (float)duration;
+//
+//        float ad = at /fduration;
+//        float bd = bt /fduration;
+//        return Math.min(0f, 1f - Math.abs(ad-bd)/((ad+bd)/2f));
+//
+//    }
 
     public static float solutionQualityMatchingOrder(@NotNull Task problem, @NotNull Task solution, long time) {
         return solutionQualityMatchingOrder(problem, solution, time, problem.hasQueryVar() );
@@ -75,12 +61,10 @@ public enum Tense  {
 
     public static float solutionQualityMatchingOrder(@NotNull final Task problem, @NotNull final Task solution, final long time, final boolean hasQueryVar) {
 
-        long poc = problem.getOccurrenceTime();
+        long poc = problem.occurrence();
 
         //TODO avoid creating new Truth instances
-        Truth truth = (poc != solution.getOccurrenceTime()) ?
-                solution.projection(poc, time) :
-                solution.truth();
+        Truth truth = solution.projection(poc, time);
 
         //if (problem.hasQueryVar()) {
         float originality = solution.getOriginality();

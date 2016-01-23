@@ -25,8 +25,8 @@ public class TemporalTest {
     @Test public void parsedCorrectOccurrenceTime() {
         NAR n = new Default(); //for cycle/frame clock, not realtime like Terminal
         Task t = n.inputTask("<a --> b>. :\\:");
-        Assert.assertEquals(0, t.getCreationTime());
-        Assert.assertEquals(-(n.memory.duration()), t.getOccurrenceTime());
+        Assert.assertEquals(0, t.creation());
+        Assert.assertEquals(-(n.memory.duration()), t.occurrence());
     }
 
 

@@ -33,11 +33,11 @@ public class UniqueInputSerialTest {
         Global.DEBUG = true;
 
         Task x = n.inputTask("<a --> b>.");
-        assertArrayEquals(new long[]{1}, x.getEvidence());
+        assertArrayEquals(new long[]{1}, x.evidence());
         n.step();
 
         Task y = n.inputTask("<b --> c>.");
-        assertArrayEquals(new long[]{2}, y.getEvidence());
+        assertArrayEquals(new long[]{2}, y.evidence());
         n.step();
 
         n.reset();
@@ -47,7 +47,7 @@ public class UniqueInputSerialTest {
         n.run(10);
 
         Task q = n.inputTask("<c --> d>.");
-        assertArrayEquals(new long[]{5}, q.getEvidence());
+        assertArrayEquals(new long[]{5}, q.evidence());
 
     }
 
@@ -61,7 +61,7 @@ public class UniqueInputSerialTest {
         long[] ev = {1, 2};
         d.memory.eventDerived.on(t -> {
             assertArrayEquals("all derived terms should be double premise: " + t,
-                    ev, t.getEvidence());
+                    ev, t.evidence());
 
             //System.out.println(t);
         });

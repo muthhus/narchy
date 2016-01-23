@@ -191,7 +191,7 @@ public interface BeliefTable extends TaskTable {
 
     public static float rankTemporal(@NotNull Task b, long when, long tRange) {
         return or(rankEternal(b), b.getOriginality())
-                *(1f/(1f+ (Math.abs(b.getOccurrenceTime() - when)/((float)tRange))) );
+                *(1f/(1f+ (Math.abs(b.occurrence() - when)/((float)tRange))) );
     }
 
     public static float rankEternal(@NotNull Task b) {
@@ -246,7 +246,7 @@ public interface BeliefTable extends TaskTable {
 
     default void print(@NotNull PrintStream out) {
         for (Task t : this) {
-            out.println(t + " " + Arrays.toString(t.getEvidence()) + ' ' + t.log());
+            out.println(t + " " + Arrays.toString(t.evidence()) + ' ' + t.log());
         }
     }
 
@@ -278,7 +278,7 @@ public interface BeliefTable extends TaskTable {
 //        float freq = getFrequency();
 //        float conf = getConfidence();
 
-        long taskOcc = t.getOccurrenceTime();
+        long taskOcc = t.occurrence();
 
         if (!Tense.isEternal(taskOcc) && (targetTime != taskOcc)) {
             conf = TruthFunctions.eternalizedConfidence(conf);

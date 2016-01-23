@@ -52,11 +52,11 @@ public class SomeRovers {
             Default nar = new Default(
                     new Memory(clock, new MapIndex2(
                         new SoftValueHashMap())),
-                        1600, 25, 2, 3);
+                        1600, 50, 1, 3);
 
-            nar.initNAL9();
-            nar.memory.perfection.setValue(0.1f);
-            nar.core.confidenceDerivationMin.setValue(0.05f);
+            //nar.initNAL9();
+            nar.memory.perfection.setValue(0.2f);
+            nar.core.confidenceDerivationMin.setValue(0.03f);
             nar.core.conceptActivation.setValue(0.035f);
             nar.memory.duration.set(3);
             nar.memory.cyclesPerFrame.set(1);

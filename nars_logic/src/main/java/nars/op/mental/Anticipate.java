@@ -94,13 +94,13 @@ public final class Anticipate {
 
         long now = nar.time();
 
-        if (now > t.getOccurrenceTime()) //its about the past..
+        if (now > t.occurrence()) //its about the past..
             return;
 
 //        if (debug)
 //            System.err.println("Anticipating " + tt + " in " + (t.getOccurrenceTime() - now));
 
-        TaskTime taskTime = new TaskTime(t, t.getCreationTime());
+        TaskTime taskTime = new TaskTime(t, t.creation());
 //        if(testing) {
 //            String s = "anticipating: "+taskTime.task.getTerm().toString();
 //            System.out.println(s);
@@ -142,7 +142,7 @@ public final class Anticipate {
             return; //it's not a input task, the system is not allowed to convince itself about the state of affairs ^^
         }
 
-        long cOccurr = c.getOccurrenceTime();
+        long cOccurr = c.occurrence();
 
         final List<TaskTime> toRemove = this.toRemove;
 
@@ -201,8 +201,8 @@ public final class Anticipate {
 
         public TaskTime(@NotNull Task task, long creationTime) {
             this.task = task;
-            long cre = this.creationTime = task.getCreationTime();
-            long occ = this.occurrTime = task.getOccurrenceTime();
+            long cre = this.creationTime = task.creation();
+            long occ = this.occurrTime = task.occurrence();
             hash = (int)(31 * creationTime + occ);
             //expiredate in relation how long we predicted forward
             long prediction_time = occ - cre;

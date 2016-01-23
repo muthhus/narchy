@@ -673,7 +673,7 @@ public interface TermBuilder {
 
         //apply any known immediate transform operators
         //TODO decide if this is evaluated incorrectly somehow in reverse
-        if (Op.isOperation(result)) {
+        if (result!=null && Op.isOperation(result)) {
             ImmediateTermTransform tf = f.getTransform(Operator.operatorTerm((Compound)result));
             if (tf!=null) {
                 return applyImmediateTransform(f, result, tf);

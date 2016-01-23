@@ -506,7 +506,7 @@ public class DerivationGraph extends DirectedPseudograph<DerivationGraph.Keyed,O
 
 
         if (!s.isEternal()) {
-            t += ' ' + tenseRelative(s.getOccurrenceTime(), now);
+            t += ' ' + tenseRelative(s.occurrence(), now);
         }
 
         return t;

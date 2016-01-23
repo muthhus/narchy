@@ -81,7 +81,7 @@ public class DefaultBeliefTable implements BeliefTable {
             minT = Long.MAX_VALUE;
             maxT = Long.MIN_VALUE;
             for (Task x : temporal) {
-                long o = x.getOccurrenceTime();
+                long o = x.occurrence();
                 if (o > maxT) maxT = o;
                 if (o < minT) minT = o;
             }
@@ -245,8 +245,12 @@ public class DefaultBeliefTable implements BeliefTable {
         Task revised = LocalRules.getRevision(input, preTop, now);
 
         if ((revised != null) && !revised.equals(input)) {
+
             //return the revised task even if it wasn't inserted allowing it to be used as a transient
+
             boolean inserted = insertAttempt(revised, memory);
+
+
             //if (inserted) {
             //memory.eventRevision.emit(revised);
             //return revised;

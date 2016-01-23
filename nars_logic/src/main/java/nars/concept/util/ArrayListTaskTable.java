@@ -88,6 +88,8 @@ public class ArrayListTaskTable implements QuestionTaskTable {
     @Override
     public Task add(@NotNull Task t, @NotNull BudgetMerge duplicateMerge, @NotNull Memory m) {
 
+        if (t.getDeleted())
+            throw new RuntimeException("adding deleted task");
 
         Task existing = getFirstEquivalent(t);
         if (existing != null) {

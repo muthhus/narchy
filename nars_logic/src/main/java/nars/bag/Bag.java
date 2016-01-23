@@ -54,10 +54,10 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
      * put with an empty budget
      */
     @Nullable
-    BLink<V> put(Object newItem);
+    BLink<V> put(V newItem);
 
     @Nullable
-    default BLink<V> put(Object i, Budget b) {
+    default BLink<V> put(V i, Budget b) {
         return put(i, b, 1f);
     }
 
@@ -68,7 +68,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
     }
 
     @Nullable
-    BLink<V> put(Object i, Budget b, float scale);
+    BLink<V> put(V i, Budget b, float scale);
 
 
 

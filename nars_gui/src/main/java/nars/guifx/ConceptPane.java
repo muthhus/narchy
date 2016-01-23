@@ -499,7 +499,7 @@ public class ConceptPane extends BorderPane implements ChangeListener {
                 } else if (!t.isEternal() && t.truth()!=null) {
                     float f = t.getFrequency();
                     float cc = t.getConfidence();
-                    float o = t.getOccurrenceTime();
+                    float o = t.occurrence();
                     float w = 15;
                     float h = 15;
                     float x = xTime(tew, b, minT, maxT, o, w);

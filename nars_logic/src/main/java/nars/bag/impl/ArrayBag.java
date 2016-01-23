@@ -2,7 +2,10 @@ package nars.bag.impl;
 
 import nars.bag.BLink;
 import nars.bag.Bag;
-import nars.budget.*;
+import nars.budget.Budget;
+import nars.budget.BudgetMerge;
+import nars.budget.Budgeted;
+import nars.budget.UnitBudget;
 import nars.util.ArraySortedIndex;
 import nars.util.data.sorted.SortedIndex;
 import org.jetbrains.annotations.NotNull;
@@ -10,7 +13,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -57,7 +59,7 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
     }
 
     @Nullable
-    @Override public BLink<V> put(Object v) {
+    @Override public BLink<V> put(V v) {
         //TODO combine with CurveBag.put(v)
         BLink<V> existing = get(v);
         if (existing!=null) {
@@ -91,16 +93,10 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
         mergeFunction.merge(target, incoming, scale);
     }
 
-    private Budget getDefaultBudget(Object v) {
+    private Budget getDefaultBudget(V v) {
         if (v instanceof Budgeted)
             return ((Budgeted)v).getBudget();
         return UnitBudget.zero;
-    }
-
-
-    @Nullable
-    public BLink<V> put(@NotNull BudgetedHandle k) {
-        return put(k, k.getBudget());
     }
 
 
@@ -220,7 +216,7 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
      * @return The updated budget
      */
     @Override
-    public final BLink<V> put(Object i, Budget b, float scale) {
+    public final BLink<V> put(V i, Budget b, float scale) {
 
         BLink<V> existing = get(i);
 
@@ -235,23 +231,24 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
 
         } else {
 
-            BLink newBudget;
+            BLink<V> newBudget;
             if (!(b instanceof BLink)) {
-                newBudget = new BLink(i, b, scale);
+                newBudget = new BLink<V>(i, b, scale);
             } else {
                 //use provided
                 newBudget = (BLink)b;
                 newBudget.commit();
             }
 
-            BLink<V> displaced = put((V) i, newBudget);
+            BLink<V> displaced = put( i, newBudget);
             if (displaced!=null) {
-                if (displaced == newBudget)
+                if (displaced == newBudget) {
                     return null; //wasnt inserted
-                else {
+                }
+                /*else {
                     //remove what was been removed from the items list
                     removeKey(displaced.get());
-                }
+                }*/
             }
 
             return newBudget;
@@ -296,7 +293,7 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
         if (currentIndex == -1) {
             //an update for an item which has been removed already. must be re-inserted
             v.commit();
-            put(v);
+            put(v.get(), v);
             return;
         }
 
@@ -325,11 +322,6 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
         return super.toString() + '{' + items.getClass().getSimpleName() + '}';
     }
 
-
-    @Override
-    public final Iterator<BLink<V>> iterator() {
-        return items.iterator();
-    }
 
     @Override
     public float getPriorityMax() {

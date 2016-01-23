@@ -431,8 +431,8 @@ public interface Premise extends Level, Tasked {
         /* TODO This part is used commonly, extract into its own precondition */
         Task b = getBelief();
         if (b == null) return false;
-        return (!Tense.isEternal(getTask().getOccurrenceTime()) &&
-                (!Tense.isEternal(b.getOccurrenceTime())));
+        return (!Tense.isEternal(getTask().occurrence()) &&
+                (!Tense.isEternal(b.occurrence())));
     }
 
     /** true if both task and belief (if not null) are eternal */

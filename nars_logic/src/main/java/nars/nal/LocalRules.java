@@ -284,9 +284,13 @@ public enum LocalRules {
         }*/
         if (question.getDeleted())
             throw new RuntimeException("question deleted: " + question);
+        if (solution.getDeleted())
+            throw new RuntimeException("solution deleted: " + solution);
 
         boolean judgmentTask = question.isJudgment();
-        float quality = Tense.solutionQuality(question, solution, m.time(), m.duration());
+        //float om = orderMatch(problem.term(), solution.term(), duration);
+        //if (om == 0) return 0f;
+        float quality = Tense.solutionQualityMatchingOrder(question, solution, m.time());
         if (quality <= 0)
             return null;
 
@@ -338,7 +342,7 @@ public enum LocalRules {
 
         Truth newBeliefTruth = newBelief.truth();
 
-        long occ = newBelief.getOccurrenceTime();
+        long occ = newBelief.occurrence();
 
 //        //interpolate the occurrence time by their relative confidences
 //        long newo = newBelief.getOccurrenceTime();

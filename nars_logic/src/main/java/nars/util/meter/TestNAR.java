@@ -314,7 +314,7 @@ public class TestNAR  {
         if (t.truth()!=null) {
             float freq = t.getFrequency();
             float conf = t.getConfidence();
-            long occurrence = t.getOccurrenceTime();
+            long occurrence = t.occurrence();
             return mustEmit(c, now, now + withinCycles, termString, t.punc(), freq, freq, conf, conf, occurrence);
         }
         else {

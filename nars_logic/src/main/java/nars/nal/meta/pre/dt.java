@@ -134,14 +134,14 @@ public abstract class dt extends AtomicBooleanCondition<PremiseMatch> {
     public static final dt occ = new dt() {
         @Override
         public boolean booleanValueOf(@NotNull PremiseMatch m) {
-            long at = m.premise.getTask().getOccurrenceTime();
+            long at = m.premise.getTask().occurrence();
             boolean ate = at == Tense.ETERNAL;
 
             if (!ate) {
                 Task bb = m.premise.getBelief();
                 if (bb != null) {
                     //return ate; //proceed only if task is eternal
-                    long bt = bb.getOccurrenceTime();
+                    long bt = bb.occurrence();
                     boolean bte = bt == Tense.ETERNAL;
                     if (!bte) {
                         int d = (int) (at - bt);

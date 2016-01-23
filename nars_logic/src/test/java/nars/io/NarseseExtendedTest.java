@@ -29,12 +29,12 @@ public class NarseseExtendedTest {
         tensed(t, false, w);
     }
     void tensed(Task t, boolean eternal, Tense w) {
-        assertEquals(eternal, isEternal(t.getOccurrenceTime()));
+        assertEquals(eternal, isEternal(t.occurrence()));
         if (!eternal) {
             switch (w) {
-                case Past: assertTrue(t.getOccurrenceTime() < 0); break;
-                case Future: assertTrue(t.getOccurrenceTime() > 0); break;
-                case Present: assertEquals(0, t.getOccurrenceTime()); break;
+                case Past: assertTrue(t.occurrence() < 0); break;
+                case Future: assertTrue(t.occurrence() > 0); break;
+                case Present: assertEquals(0, t.occurrence()); break;
             }
         }
     }

@@ -212,7 +212,7 @@ public interface Truth extends MetaTruth<Float> {
     }
 
     @NotNull
-    Truth mulConf(float f);
+    Truth cloneMultipliedConfidence(float f);
 
 
 

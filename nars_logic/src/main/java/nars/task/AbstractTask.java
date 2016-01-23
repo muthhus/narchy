@@ -89,7 +89,7 @@ public abstract class AbstractTask extends Item<Task>
         this(task, task.punc(), task.truth(),
                 task.getPriority(), task.getDurability(), task.getQuality(),
                 task.getParentTaskRef(), task.getParentBeliefRef());
-        setEvidence(task.getEvidence());
+        setEvidence(task.evidence());
     }
 
     @NotNull
@@ -187,9 +187,9 @@ public abstract class AbstractTask extends Item<Task>
         // set it to the memory's current time here,
         // and adjust occurenceTime if it's not eternal
 
-        if (getCreationTime() <= Tense.TIMELESS) {
+        if (creation() <= Tense.TIMELESS) {
             long now = memory.time();
-            long oc = getOccurrenceTime();
+            long oc = occurrence();
             if (oc != Tense.ETERNAL)
                 oc += now;
 
@@ -212,7 +212,7 @@ public abstract class AbstractTask extends Item<Task>
 
 
         //finally, assign a unique stamp if none specified (input)
-        if (getEvidence() == null) {
+        if (evidence() == null) {
             if (!isInput()) {
                 throw new RuntimeException("non-Input task without evidence: " + this);
             } else {
@@ -267,11 +267,11 @@ public abstract class AbstractTask extends Item<Task>
     private int rehash() {
 
         int h = Objects.hash(
-                Arrays.hashCode(getEvidence()),
+                Arrays.hashCode(evidence()),
                 term(),
                 punc(),
                 truth(),
-                getOccurrenceTime()
+                occurrence()
         );
 
         if (h == 0) return 1; //reserve 0 for non-hashed
@@ -348,7 +348,7 @@ public abstract class AbstractTask extends Item<Task>
 
     @Nullable
     @Override
-    public final long[] getEvidence() {
+    public final long[] evidence() {
         long[] e = this.evidentialSet;
         if (e == null) {
             updateEvidence();
@@ -358,12 +358,12 @@ public abstract class AbstractTask extends Item<Task>
     }
 
     @Override
-    public final long getCreationTime() {
+    public final long creation() {
         return creationTime;
     }
 
     @Override
-    public final long getOccurrenceTime() {
+    public final long occurrence() {
         return occurrenceTime;
     }
 
@@ -384,10 +384,10 @@ public abstract class AbstractTask extends Item<Task>
             if (tu!=0) return tu;
         }
 
-        int to = Long.compare( getOccurrenceTime(), o.getOccurrenceTime() );
+        int to = Long.compare( occurrence(), o.occurrence() );
         if (to!=0) return to;
 
-        return Util.compare(getEvidence(), o.getEvidence());
+        return Util.compare(evidence(), o.evidence());
     }
 
     @NotNull
@@ -413,7 +413,7 @@ public abstract class AbstractTask extends Item<Task>
             if (isDouble())
                 setEvidence( Stamp.toSetArray( Stamp.zip(getParentTask(), getParentBelief() )));
             else if ( isSingle() )
-                setEvidence(getParentTask().getEvidence());
+                setEvidence(getParentTask().evidence());
         } else {
             setEvidence(null);
         }
@@ -519,11 +519,11 @@ public abstract class AbstractTask extends Item<Task>
         if (hash)
             if (hashCode() != s.hashCode()) return false;*/
         if (creationTime)
-            if (getCreationTime() != s.getCreationTime()) return false;
+            if (creation() != s.creation()) return false;
         if (occurrenceTime)
-            if (getOccurrenceTime() != s.getOccurrenceTime()) return false;
+            if (occurrence() != s.occurrence()) return false;
         if (evidentialSet) {
-            return Arrays.equals(getEvidence(), s.getEvidence());
+            return Arrays.equals(evidence(), s.evidence());
         }
 
 

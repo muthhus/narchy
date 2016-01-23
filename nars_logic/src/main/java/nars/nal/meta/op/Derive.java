@@ -227,7 +227,7 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
         MutableTask deriving = new DerivedTask(c, premise);
 
         long now = premise.time();
-        long occ = premise.getTask().getOccurrenceTime();
+        long occ = premise.getTask().occurrence();
 
 
         //just not able to measure it, closed world assumption gone wild.

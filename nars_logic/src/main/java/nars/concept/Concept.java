@@ -256,8 +256,8 @@ public interface Concept extends Termed, Comparable<Termed> {
         @Override
         public int compare(@NotNull Task left, @NotNull Task right) {
             return Longs.compare(
-                    left.getCreationTime(),
-                    right.getCreationTime());
+                    left.creation(),
+                    right.creation());
         }
     };
 

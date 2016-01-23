@@ -172,11 +172,11 @@ public enum Op {
     }
 
     public static boolean isOperation(Term t) {
-        if (!(t instanceof Compound)) return false;
+        if (!(t.isCompound())) return false;
         Compound c = (Compound)t;
-        return c.op().isA(OperationBits) &&
-               c.op(Op.INHERIT) &&
+        return !c.impossibleStructureMatch(OperationBits) &&
                c.size() == 2 &&
+               c.op(Op.INHERIT) &&
                c.term(1).op(Op.OPERATOR) &&
                c.term(0).op(Op.PRODUCT);
     }
@@ -217,6 +217,7 @@ public enum Op {
         if (hasTime)
             w.append(' ');
 
+        char ch = this.ch;
         if (ch == 0)
             w.append(str);
         else
@@ -257,18 +258,18 @@ public enum Op {
     public static final int ANY = 0;
 
     public final boolean isVar() {
-        return type == Op.OpType.Variable;
+        return type == OpType.Variable;
     }
 
     public boolean isCommutative() {
         return commutative;
     }
 
-    public final static int TemporalBits = or(CONJUNCTION, IMPLICATION, Op.EQUIV);
+    public final static int TemporalBits = or(CONJUNCTION, IMPLICATION, EQUIV);
 
     /** whether this op allows temporal relation (true) or ignores it  (false) */
     public boolean isTemporal() {
-        return isA(TemporalBits);
+        return in(TemporalBits);
     }
 
     public boolean validSize(int length) {
@@ -277,32 +278,33 @@ public enum Op {
     }
 
     public boolean isImage() {
-        return isA(ImageBits);
+        return in(ImageBits);
     }
 
     public boolean isConjunctive() {
-        return isA(ConjunctivesBits);
+        return in(ConjunctivesBits);
     }
 
 
     public boolean isStatement() {
-        return isA(StatementBits);
+        return in(StatementBits);
     }
 
-    public boolean isA(int vector) {
-        return isA(bit(), vector);
+    /** true if matches any of the on bits of the vector */
+    public boolean in(int vector) {
+        return in(bit(), vector);
     }
 
-    static boolean isA(int needle, int haystack) {
+    static boolean in(int needle, int haystack) {
         return (needle & haystack) == needle;
     }
 
     public boolean isSet() {
-        return isA(Op.SetsBits);
+        return in(SetsBits);
     }
 
     public boolean isImplication() {
-        return isA(ImplicationsBits);
+        return in(ImplicationsBits);
     }
 
 

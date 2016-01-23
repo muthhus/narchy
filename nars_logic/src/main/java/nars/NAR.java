@@ -406,7 +406,7 @@ public abstract class NAR implements Level,Consumer<Task> {
         @NotNull
         @Override
         public String getMessage() {
-            return "Invalid Task: " + task;
+            return "Invalid Task: " + task.getExplanation();
         }
 
     }
@@ -435,12 +435,17 @@ public abstract class NAR implements Level,Consumer<Task> {
                     u = i;
                 }
             } else {
-                //accept input if it can be normalized
-                u = i.normalize(m);
-                if (u == null) {
-                    m.remove(i, "Unnormalizable");
+                if (i.getDeleted()) {
+                    m.remove(i, "Pre-Deleted");
+                    u = null;
                 } else {
-                    m.eventInput.emit(u);
+                    //accept input if it can be normalized
+                    u = i.normalize(m);
+                    if (u == null) {
+                        m.remove(i, "Unnormalizable");
+                    } else {
+                        m.eventInput.emit(u);
+                    }
                 }
             }
         /*} else {

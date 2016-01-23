@@ -9,6 +9,22 @@ import org.jetbrains.annotations.NotNull;
 public class DefaultTruth extends AbstractScalarTruth {
 
 
+    public final static Truth ZERO = new DefaultTruth(0.5f, 0) {
+        {
+            confidence = 0;
+        }
+
+        @Override
+        public void setConfidence(float b) {
+
+        }
+
+        @NotNull
+        @Override
+        public Truth setFrequency(float f) {
+            return this;
+        }
+    };
 
     /** unspecified confidence, will be invalid unless updated later */
     public DefaultTruth(float f) {
@@ -44,7 +60,7 @@ public class DefaultTruth extends AbstractScalarTruth {
 
     @NotNull
     @Override
-    public Truth mulConf(float factor) {
+    public Truth cloneMultipliedConfidence(float factor) {
         return new DefaultTruth(getFrequency(), getConfidence() * factor);
     }
 

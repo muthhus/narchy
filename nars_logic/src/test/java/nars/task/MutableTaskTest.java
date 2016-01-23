@@ -17,13 +17,13 @@ public class MutableTaskTest {
 
         String s = "<a --> b>";
 
-        assertTrue(Tense.isEternal(new MutableTask(n.term(s)).eternal().getOccurrenceTime()));
+        assertTrue(Tense.isEternal(new MutableTask(n.term(s)).eternal().occurrence()));
 
         assertTrue("default is timeless", new MutableTask(n.term(s)).isTimeless());
 
-        assertTrue("tense=eternal is eternal", Tense.isEternal(new MutableTask(n.term(s)).eternal().getOccurrenceTime()));
+        assertTrue("tense=eternal is eternal", Tense.isEternal(new MutableTask(n.term(s)).eternal().occurrence()));
 
-        assertTrue("present is non-eternal", !Tense.isEternal(new MutableTask(n.term(s)).present(n.memory).getOccurrenceTime()));
+        assertTrue("present is non-eternal", !Tense.isEternal(new MutableTask(n.term(s)).present(n.memory).occurrence()));
 
     }
 
@@ -34,9 +34,9 @@ public class MutableTaskTest {
         String s = "<a --> b>";
 
         //the final occurr() or tense() is the value applied
-        assertTrue(!Tense.isEternal(new MutableTask(n.term(s)).eternal().occurr(100).getOccurrenceTime()));
-        assertTrue(!Tense.isEternal(new MutableTask(n.term(s)).eternal().present(n.memory).getOccurrenceTime()));
-        assertTrue(Tense.isEternal(new MutableTask(n.term(s)).occurr(100).eternal().getOccurrenceTime()));
+        assertTrue(!Tense.isEternal(new MutableTask(n.term(s)).eternal().occurr(100).occurrence()));
+        assertTrue(!Tense.isEternal(new MutableTask(n.term(s)).eternal().present(n.memory).occurrence()));
+        assertTrue(Tense.isEternal(new MutableTask(n.term(s)).occurr(100).eternal().occurrence()));
     }
 
 

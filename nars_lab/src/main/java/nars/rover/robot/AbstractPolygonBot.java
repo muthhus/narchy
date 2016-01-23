@@ -112,23 +112,24 @@ public abstract class AbstractPolygonBot extends Robotic {
 
         addAxioms();
 
-        nar.input("<goal --> [health]>! %1.0;0.95%");
-        nar.input("<goal --> [health]>! :|: %1.0;0.95%");
+        nar.input("goal:{health}! %1.0;0.95%");
+        nar.input("goal:{health}! :|: %1.0;0.95%");
 
-        nar.believe("<goal --> [health]>", Tense.Present, 0.5f, 0.9f); //reset
+        nar.believe("goal:{health}", Tense.Present, 0.5f, 0.9f); //reset
 
 
-        nar.input("<food ==> health>?");
-        nar.input("<goal <-> motor>?");
+        nar.input("$0.9$ <food <-> health>?");
+        nar.input("$0.9$ <goal <-> motor>?");
+        nar.input("$0.9$ <poison <-> health>?");
 
         try {
             if (mission == 0) {
                 //seek food
                 //curiosity = 0.05f;
 
-                //nar.goal("<goal --> food>", 1.00f, 0.90f);
-                nar.input("<goal --> [food]>! :|:");
-                nar.input("<goal --> [food]>. :|: %0.5;0.90%"); //reset
+                //nar.goal("goal:{food}", 1.00f, 0.90f);
+                nar.input("goal:{food}! :|:");
+                nar.input("goal:{food}. :|: %0.5;0.90%"); //reset
 
 
                 //nar.input("goal(food)! %1.00;0.99%");
@@ -141,7 +142,7 @@ public abstract class AbstractPolygonBot extends Robotic {
                 //rest
                 //curiosity = 0;
                 nar.input("moved(0)! %1.00;0.9%");
-                nar.input("<goal --> [food]>! %0.00;0.9%");
+                nar.input("goal:{food}! %0.00;0.9%");
             }
         }
         catch (Exception e) {
@@ -162,13 +163,15 @@ public abstract class AbstractPolygonBot extends Robotic {
         Material m = (Material)eaten.getUserData();
         if (m instanceof Sim.FoodMaterial) {
             nar.logger.warn("food");
-            nar.input("<goal --> [food]>. :|: %1.00;0.75%");
-            nar.input("<goal --> [health]>. :|: %1.00;0.75%");
+            nar.input("eat:food. :|:");
+            nar.input("goal:{food}. :|: %1.00;0.75%");
+            nar.input("goal:{health}. :|: %1.00;0.75%");
         }
         else if (m instanceof Sim.PoisonMaterial) {
             nar.logger.warn("poison");
-            nar.input("<goal --> [food]>. :|: %0.00;0.90%");
-            nar.input("<goal --> [health]>. :|: %0.00;0.90%");
+            nar.input("eat:poison. :|:");
+            nar.input("goal:{food}. :|: %0.00;0.90%");
+            nar.input("goal:{health}. :|: %0.00;0.90%");
         }
         else {
             return;

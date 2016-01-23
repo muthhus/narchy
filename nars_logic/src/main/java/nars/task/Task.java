@@ -43,6 +43,7 @@ import java.util.function.Supplier;
 
 import static nars.Global.dereference;
 import static nars.nal.LocalRules.solutionEval;
+import static nars.nal.Tense.ITERNAL;
 
 /**
  * A task to be processed, consists of a Sentence and a BudgetValue.
@@ -184,46 +185,83 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
     @NotNull
     default Task projectedSolution(@NotNull Compound newTerm, @NotNull Task question, @NotNull Memory memory) {
-        long questionOcc = question.getOccurrenceTime();
 
         long now = memory.time();
+
+        float termRelevance = termRelevance(newTerm, question.term());
+        if (termRelevance == 0)
+            return null;
 
         Budget solutionBudget = solutionEval(question, this, memory);
         if (solutionBudget == null)
             return null;
 
-        Truth projectedTruth = projection(questionOcc, now);
+        Truth solTruth = projection(question.occurrence(), now, termRelevance);
+        solutionBudget.mulPriority(termRelevance);
 
-        long occCurrent = getOccurrenceTime();
+        long occCurrent = occurrence();
 
         //if truth instanceof ProjectedTruth, use its attached occ time (possibly eternal or temporal), otherwise assume it is this task's occurence time
-        long solutionOcc = projectedTruth instanceof ProjectedTruth ?
-                ((ProjectedTruth)projectedTruth).target : occCurrent;
+        long solutionOcc = solTruth instanceof ProjectedTruth ?
+                ((ProjectedTruth)solTruth).target : occCurrent;
 
         Task solution;
-        if ((!truth().equals(projectedTruth)) || (!newTerm.equals(term())) || (solutionOcc!= occCurrent)) {
+        if ((!truth().equals(solTruth)) || (!newTerm.equals(term())) || (solutionOcc!= occCurrent)) {
             solution = new MutableTask(newTerm, punc())
-                    .truth(projectedTruth)
-                    .budget(solutionBudget)
+                    .truth(solTruth)
                     .time(now, solutionOcc)
                     .parent(getParentTaskRef(), getParentBeliefRef())
-                    .setEvidence(getEvidence());
+                    .setEvidence(evidence());
         } else {
             solution = this;
         }
 
-        solution.log(new Solution(question));
+        solution.getBudget().set(solutionBudget);
+
+        ////TODO avoid adding repeat & equal Solution instances
+        //solution.log(new Solution(question));
+
         return solution;
+    }
+
+    /** heuristic which evaluates the semantic similarity of two terms
+     * returning 1f if there is a complete match, 0f if there is
+     * a totally separate meaning for each, and in-between if
+     * some intermediate aspect is different (ex: temporal relation dt)
+     */
+    static float termRelevance(Compound a, Compound b) {
+        Op aop = a.op();
+        if (aop !=b.op()) return 0f;
+        if (aop.isTemporal()) {
+            int at = a.t();
+            int bt = b.t();
+            if (at != bt) {
+                if ((at == ITERNAL) || (bt == ITERNAL)) {
+                    //either is atemporal but not both
+                    return 0.5f;
+                }
+                boolean ap = at >= 0;
+                boolean bp = bt >= 0;
+                if (ap ^ bp) {
+                    //opposite direction
+                    return 0;
+                } else {
+                    //same direction
+                    return 1f - (Math.abs(at - bt) / (1f+Math.abs(at + bt)));
+                }
+            }
+        }
+        return 1f;
     }
 
     char punc();
 
     @Nullable
     @Override
-    long[] getEvidence();
+    long[] evidence();
 
     @Override
-    long getCreationTime();
+    long creation();
 
     @NotNull
     @Override
@@ -618,14 +656,14 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     }
 
     default boolean isEternal() {
-        return getOccurrenceTime()== Tense.ETERNAL;
+        return occurrence()== Tense.ETERNAL;
     }
 
 
     @NotNull
     default StringBuilder appendOccurrenceTime(@NotNull StringBuilder sb) {
-        long oc = getOccurrenceTime();
-        long ct = getCreationTime();
+        long oc = occurrence();
+        long ct = creation();
 
         /*if (oc == Stamp.TIMELESS)
             throw new RuntimeException("invalid occurrence time");*/
@@ -662,7 +700,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
     default String getTense(long currentTime, int duration) {
 
-        long ot = getOccurrenceTime();
+        long ot = occurrence();
 
         if (Tense.isEternal(ot)) {
             return "";
@@ -681,19 +719,19 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     @NotNull
     default CharSequence stampAsStringBuilder() {
 
-        long[] ev = getEvidence();
+        long[] ev = evidence();
         int len = ev != null ? ev.length : 0;
         int estimatedInitialSize = 8 + (len * 3);
 
         StringBuilder buffer = new StringBuilder(estimatedInitialSize);
         buffer.append(Symbols.STAMP_OPENER);
 
-        if (getCreationTime() == Tense.TIMELESS) {
+        if (creation() == Tense.TIMELESS) {
             buffer.append('?');
-        } else if (!Tense.isEternal(getOccurrenceTime())) {
+        } else if (!Tense.isEternal(occurrence())) {
             appendOccurrenceTime(buffer);
         } else {
-            buffer.append(getCreationTime());
+            buffer.append(creation());
         }
         buffer.append(Symbols.STAMP_STARTER).append(' ');
         for (int i = 0; i < len; i++) {
@@ -721,11 +759,11 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         return new MutableTask(content, punc);
     }
 
-    default long getOccurrenceTime() {
+    default long occurrence() {
         return Tense.ETERNAL;
     }
 
-    default long start() { return getOccurrenceTime(); }
+    default long start() { return occurrence(); }
     default long end() {
         return start() + duration();
     }
@@ -734,14 +772,19 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     }
 
 
-
+    default Truth projection(long targetTime, long now, float scale) {
+        Truth t = projection(targetTime, now);
+        if (scale==1f) return t;
+        if (scale==0f) return DefaultTruth.ZERO;
+        return t.cloneMultipliedConfidence(scale);
+    }
 
     //projects the truth to a certain time, covering all 4 cases as discussed in
     //https://groups.google.com/forum/#!searchin/open-nars/task$20eteneral/open-nars/8KnAbKzjp4E/rBc-6V5pem8J
     default Truth projection(long targetTime, long now) {
 
         Truth currentTruth = truth();
-        long occurrenceTime = getOccurrenceTime();
+        long occurrenceTime = occurrence();
 
         boolean toEternal = targetTime == Tense.ETERNAL;
         boolean tenseEternal = Tense.isEternal(occurrenceTime);

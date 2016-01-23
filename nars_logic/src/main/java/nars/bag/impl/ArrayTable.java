@@ -67,14 +67,19 @@ abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements Tabl
     /**
      * Check if an item is in the bag
      *
-     * @param it An item
+     * @param k An item
      * @return Whether the Item is in the Bag
      */
-    public boolean contains(V it) {
-        return this.containsKey(it);
+    public boolean contains(V k) {
+        return this.containsKey(k);
     }
 
 
+
+    @Override
+    public int size() {
+        return items.size(); //eternal.size() + temporal.size();
+    }
 
     /**
      * TODO make this work for the original condition: (size() >= capacity)
@@ -119,7 +124,9 @@ abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements Tabl
 //            throw new RuntimeException("removal fault");
 //        }
 
-        return remove(key(ii));
+        removeItem(ii);
+        removeKeyForValue(ii);
+        return ii;
     }
 
     /** gets the key associated with a value */
@@ -152,7 +159,7 @@ abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements Tabl
 
     @NotNull
     @Override
-    public Iterator<L> iterator() {
+    public final Iterator<L> iterator() {
         return items.iterator();
     }
 
@@ -184,7 +191,7 @@ abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements Tabl
     }
 
     @Override
-    public void topN(int limit, @NotNull Consumer action) {
+    public final void topN(int limit, @NotNull Consumer action) {
         List l = items.getList();
         int n = Math.min(l.size(), limit);
         for (int i = 0; i < n; i++)
@@ -193,20 +200,19 @@ abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements Tabl
 
 
     @Override
-    protected L removeItem(L removed) {
+    protected final L removeItem(L removed) {
 
-        if (items.remove(removed)) {
-            return removed;
-        }
+        return items.remove(removed) ? removed : null;
 
-        return null;
     }
 
     @Override
-    protected L addItem(L i) {
+    protected final L addItem(L i) {
         L overflow = items.insert(i);
         if (overflow!=null) {
-            removeKey(key(overflow));
+            L v = removeKeyForValue(overflow);
+            if (v!=overflow)
+                throw new RuntimeException("bag inconsistency: " + overflow + " mismatched with " + v);
         }
         return overflow;
     }

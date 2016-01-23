@@ -163,7 +163,7 @@ public class CurveBag<V> implements Bag<V> {
     }
 
     @Override
-    public BLink<V> get(Object key) {
+    public BLink<V> get(V key) {
         return arrayBag.get(key);
     }
 
@@ -181,17 +181,17 @@ public class CurveBag<V> implements Bag<V> {
 
     @Nullable
     @Override
-    public BLink<V> put(Object v, Budget vBagBudget, float scale) {
+    public BLink<V> put(V v, Budget vBagBudget, float scale) {
         return arrayBag.put(v, vBagBudget, scale);
     }
 
 
     @Nullable
-    @Override public BLink<V> put(Object v) {
+    @Override public BLink<V> put(V v) {
         BLink<V> existing = get(v);
         return (existing != null) ?
                 existing :
-                put((V) v, getDefaultBudget((V) v));
+                put(v, getDefaultBudget(v));
     }
 
     @NotNull

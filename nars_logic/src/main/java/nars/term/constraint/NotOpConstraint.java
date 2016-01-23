@@ -22,7 +22,7 @@ public final class NotOpConstraint implements MatchConstraint {
 
     @Override
     public boolean invalid(Term assignee, @NotNull Term value, FindSubst f) {
-        return value.op().isA(op);
+        return value.op().in(op);
     }
     @NotNull
     @Override

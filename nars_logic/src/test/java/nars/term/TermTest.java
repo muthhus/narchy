@@ -310,6 +310,9 @@ public class TermTest {
 
         NAR n = new Terminal();
 
+        assertFalse(Op.isOperation(n.term("(a,b)")));
+        assertFalse(Op.isOperation(n.term("^wonder")));
+
         try {
             Term x = n.term("wonder(a,b)");
             assertEquals(Op.INHERIT, x.op());

@@ -60,7 +60,7 @@ public abstract class TaskPerception implements Consumer<Task> {
 
         @Override
         public void accept(@NotNull Task t) {
-            long c = t.getCreationTime();
+            long c = t.creation();
             if (c < minCreationTime) minCreationTime = c;
             if (c > maxCreationTime) maxCreationTime = c;
             count++;

@@ -97,7 +97,7 @@ public class TemporalInductionTest {
         d.run(5);
         d.input("c:d. :|:");
 
-        d.run(24);
+        d.run(200);
 
         //everything should be inducted by now:
         int numConcepts = d.core.active.size();
@@ -105,7 +105,7 @@ public class TemporalInductionTest {
 
         System.out.println(numConcepts + " " + numBeliefs);
 
-        d.run(300);
+        d.run(200);
 
         //# unique concepts unchanged:
         assertEquals(numConcepts, d.core.active.size());

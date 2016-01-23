@@ -133,8 +133,8 @@ public class Commander implements Consumer<NAR>, Supplier<Concept> {
         if (t.getBudget().getDeleted())
             return false;
 
-        if (!Tense.isEternal(t.getOccurrenceTime())) {
-            long age = Math.abs( now - t.getOccurrenceTime() );
+        if (!Tense.isEternal(t.occurrence())) {
+            long age = Math.abs( now - t.occurrence() );
             if (age > maxTemporalBeliefAge)
                 return false;
         }

@@ -8,12 +8,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
 
+
 /**
  * adapter to a Map for coordinating changes in a Map with another Collection
  */
 public abstract class CollectorMap<K, V>  {
 
-    public final Map<K, V> map;
+    private final Map<K, V> map;
 
     protected CollectorMap(Map<K, V> map) {
         this.map = map;
@@ -42,16 +43,15 @@ public abstract class CollectorMap<K, V>  {
     }
 
 
-
-    @Nullable
-    public V putIfAbsent(K key, V value) {
-        V existing = putKeyIfAbsent(key, value);
-        if (existing != null) {
-            return existing;
-        }
-        addItem(value);
-        return null;
-    }
+//    @Nullable
+//    public V putIfAbsent(K key, V value) {
+//        V existing = putKeyIfAbsent(key, value);
+//        if (existing != null) {
+//            return existing;
+//        }
+//        addItem(value);
+//        return null;
+//    }
 
     public V put(K key, V value) {
 
@@ -60,10 +60,16 @@ public abstract class CollectorMap<K, V>  {
         V removed = putKey(key, value);
         if (removed != null) {
 
-            V remd = removeItem(removed);
+            if (removed == value) {
+                //rejected input
+                return value;
+            }
+            else {
+                //displaced other
+                V remd = removeItem(removed);
+                if (remd == null)
+                    throw new RuntimeException("unable to remove item corresponding to key " + key);
 
-            if (remd == null) {
-                throw new RuntimeException("unable to remove item corresponding to key " + key);
             }
         }
 
@@ -72,9 +78,12 @@ public abstract class CollectorMap<K, V>  {
         if (removed != null && removed2 != null) {
             throw new RuntimeException("Only one item should have been removed on this insert; both removed: " + removed + ", " + removed2);
         }
-        if ((removed2 != null) && (!key(removed2).equals(key))) {
-            removeKey(key(removed2));
-            removed = removed2;
+        if (removed2 != null) {
+            K key2 = key(removed2);
+
+                removeKey(key2);
+                removed = removed2;
+
         }
 
         return removed;
@@ -104,20 +113,23 @@ public abstract class CollectorMap<K, V>  {
         return map.remove(key);
     }
 
+    public final V removeKeyForValue(V value) {
+        return removeKey(key(value));
+    }
 
-    public final int size() {
+    public int size() {
         return map.size();
     }
 
-    public final boolean containsValue(V it) {
-        return map.containsValue(it);
-    }
+//    public final boolean containsValue(V it) {
+//        return map.containsValue(it);
+//    }
 
     public void clear() {
         map.clear();
     }
 
-    public final V get(Object key) {
+    public final V get(K key) {
         return map.get(key);
     }
 
@@ -139,12 +151,12 @@ public abstract class CollectorMap<K, V>  {
     /**
      * put key in index, do not add value
      */
-    public final V putKey(K key, V value) {
+    protected final V putKey(K key, V value) {
         return map.put(key, value);
     }
-    public final V putKeyIfAbsent(K key, V value) {
-        return map.putIfAbsent(key, value);
-    }
+//    public final V putKeyIfAbsent(K key, V value) {
+//        return map.putIfAbsent(key, value);
+//    }
 
 
 }

@@ -77,7 +77,7 @@ public class ConceptComet extends HyperassociativeMap2D {
         }
 
 
-        long xCreation = x.getCreationTime();
+        long xCreation = x.creation();
         if (xCreation <= Tense.TIMELESS) {
             xCreation = (long) now;
         }

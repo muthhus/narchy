@@ -28,7 +28,7 @@ public class TruthWave {
 
         //get min and max occurence time
         for (Task t : beliefs) {
-            long o = t.getOccurrenceTime();
+            long o = t.occurrence();
             if (o == Tense.ETERNAL) {
                 expectEternal1 += t.truth().getExpectationPositive();
                 expectEternal0 += t.truth().getExpectationNegative();
@@ -56,7 +56,7 @@ public class TruthWave {
 
         if (numTemporal > 0) {
             for (Task t : beliefs) {
-                long o = t.getOccurrenceTime();
+                long o = t.occurrence();
                 if (o != Tense.ETERNAL) {
                     int i = (int)(o - min);
                     expect[1][i] += t.truth().getExpectationPositive();

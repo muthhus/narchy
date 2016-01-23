@@ -12,8 +12,8 @@ public interface Temporal extends Tasked {
 
     boolean isAnticipated();
 
-    long getCreationTime();
-    long getOccurrenceTime();
+    long creation();
+    long occurrence();
 
     void setOccurrenceTime(long t);
 
@@ -39,16 +39,16 @@ public interface Temporal extends Tasked {
 //    }
 
     default boolean isTimeless() {
-        return getOccurrenceTime() == Tense.TIMELESS;
+        return occurrence() == Tense.TIMELESS;
     }
 
     default void setEternal() {
         setOccurrenceTime(Tense.ETERNAL);
     }
 
-    default void setOccurrenceTime(@NotNull Tense tense, int duration) {
-        setOccurrenceTime(getCreationTime(), tense, duration);
-    }
+//    default void setOccurrenceTime(@NotNull Tense tense, int duration) {
+//        setOccurrenceTime(creation(), tense, duration);
+//    }
 
     default void setOccurrenceTime(long creation, @NotNull Tense tense, int duration) {
         setOccurrenceTime(

@@ -350,7 +350,7 @@ public final class BudgetFunctions extends UtilityFunctions {
             final float targetActivation = nar.conceptPriority(termLink.get(), 0);
             float sourceActivation = 1.0f;
             if(taskLink!=null) {
-                sourceActivation = nar.conceptPriority(taskLink.get().term(), 0);
+                sourceActivation = nar.conceptPriority(taskLink.get().concept(), 0);
             }
             if (targetActivation >= 0) {
                 //https://groups.google.com/forum/#!topic/open-nars/KnUA43B6iYs
