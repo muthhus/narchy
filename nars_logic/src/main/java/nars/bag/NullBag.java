@@ -24,6 +24,11 @@ public final class NullBag<V> implements Bag<V> {
 
     }
 
+    @Override
+    public Bag<V> filter(Predicate<BLink<? extends V>> forEachIfFalseThenRemove) {
+        return null;
+    }
+
     @Nullable
     @Override
     public BLink<V> get(Object key) {

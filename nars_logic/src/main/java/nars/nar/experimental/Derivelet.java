@@ -91,19 +91,19 @@ public class Derivelet {
             @NotNull Consumer<ConceptProcess> proc,
             @NotNull BLink<? extends Concept> conceptLink,
             int tasklinks, int termlinks,
-            Predicate<BLink<? extends Termed>> eachTermLink,
-            Predicate<BLink<? extends Task>> eachTaskLink) {
+            @NotNull Consumer<BLink<? extends Termed>> eachTermLink,
+            @NotNull Predicate<BLink<? extends Task>> eachTaskLink) {
 
         Concept concept = conceptLink.get();
 
         Set<BLink<Task>> tasksBuffer = this.tasks;
-        concept.getTaskLinks().sample(tasklinks, eachTaskLink, tasksBuffer).commit();
-        //concept.getTaskLinks().forEach(bc -> eachTaskLink.test(bc));
-        //concept.getTaskLinks().commit();
+        //concept.getTaskLinks().sample(tasklinks, eachTaskLink, tasksBuffer).commit();
+        concept.getTaskLinks().filter(eachTaskLink).sample(tasklinks, tasksBuffer);
         if (tasksBuffer.isEmpty()) return;
 
         Set<BLink<Termed>> termsBuffer = this.terms;
-        concept.getTermLinks().sample(termlinks, eachTermLink, termsBuffer).commit();
+        //concept.getTermLinks().sample(termlinks, eachTermLink, termsBuffer).commit();
+        concept.getTermLinks().forEachThen(eachTermLink).sample(termlinks, termsBuffer);
         if (termsBuffer.isEmpty()) return;
 
         //convert to array for fast for-within-for iterations

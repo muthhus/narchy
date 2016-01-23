@@ -398,4 +398,12 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
     }
 
 
+    Bag<V> filter(Predicate<BLink<? extends V>> forEachIfFalseThenRemove);
+
+
+    default Bag<V> forEachThen(Consumer<BLink<? extends V>> each) {
+        forEach(each);
+        return this;
+    }
+
 }

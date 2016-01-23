@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+
 /**
  * Created by me on 1/15/16.
  */
@@ -140,6 +141,7 @@ abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements Tabl
     public final int capacity() {
         return items.capacity();
     }
+
 
     @Override
     public final void forEach(@NotNull Consumer<? super L> action) {

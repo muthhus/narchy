@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -136,6 +137,22 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
         throw new RuntimeException("unimpl");
     }
 
+    @Override
+    public Bag<V> filter(Predicate<BLink<? extends V>> forEachIfFalseThenRemove) {
+        List<BLink<V>> l = items.getList();
+        int n = l.size();
+        if (n > 0) {
+            for (int i = 0; i < n; i++) {
+                if (!forEachIfFalseThenRemove.test(l.get(i))) {
+                    removeKeyForValue(  l.remove(i) );
+                    i--;
+                    n--;
+                }
+            }
+            commit();
+        }
+        return this;
+    }
 
     //    public void validate() {
 //        int in = ArrayTable.this.size();
@@ -269,6 +286,8 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
         //now that room is available:
 
     }
+
+
 
     @Override
     public final void commit() {

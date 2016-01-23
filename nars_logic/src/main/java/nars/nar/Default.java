@@ -304,7 +304,17 @@ public class Default extends AbstractNAR {
                 m.eventReset.on((mem) -> onReset())
             );
 
-            taskLinkForget = new AlannForget(nar, taskLinkRemembering, perfection);
+            taskLinkForget = new AlannForget<Task>(nar, taskLinkRemembering, perfection) {
+
+                @Override
+                public boolean test(BLink<? extends Task> b) {
+                    if (b.get().isDeleted())
+                        return false;
+                    accept(b);
+                    return true;
+                }
+            };
+
             termLinkForget = new AlannForget(nar, termLinkRemembering, perfection);
             conceptForget = new AlannForget(nar, conceptRemembering, perfection);
         }
@@ -382,7 +392,7 @@ public class Default extends AbstractNAR {
             //activate(c);
         }
 
-        final static class AlannForget<X> implements Consumer<BLink<? extends X>>, Predicate<BLink<? extends X>> {
+        static class AlannForget<X> implements Consumer<BLink<? extends X>>, Predicate<BLink<? extends X>> {
 
             private final MutableFloat forgetTime;
             private final MutableFloat perfection;

@@ -128,6 +128,8 @@ public class CurveBag<V> implements Bag<V> {
         arrayBag.topWhile(each);
     }
 
+
+
     /** optimized batch fill, using consecutive array elements, also ensuring uniqueness
      * returns the instance for fluentcy
      * */
@@ -201,24 +203,33 @@ public class CurveBag<V> implements Bag<V> {
     }
 
     @Override
-    public int capacity() {
+    public final int capacity() {
         return arrayBag.capacity();
     }
 
+    @Override
+    public final CurveBag<V> filter(Predicate<BLink<? extends V>> forEachIfFalseThenRemove) {
+        arrayBag.filter(forEachIfFalseThenRemove);
+        return this;
+    }
+
+    @Override public void sample(int n, Collection<BLink<V>> target) {
+        sample(n, null, target);
+    }
 
     @Override
-    public int size() {
+    public final int size() {
         return arrayBag.size();
     }
 
     @NotNull
     @Override
-    public Iterator<BLink<V>> iterator() {
+    public final Iterator<BLink<V>> iterator() {
         return arrayBag.iterator();
     }
 
     @Override
-    public void forEachKey(@NotNull Consumer<? super V> each) {
+    public final void forEachKey(@NotNull Consumer<? super V> each) {
         arrayBag.forEachKey(each);
     }
 
