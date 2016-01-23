@@ -194,8 +194,8 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
         public void onRevision(@NotNull Truth conclusion) {
             ConceptProcess p = this.premise;
 
-            BLink<Task> tLink = p.taskLink;
-            BLink<Termed> bLink = p.termLink;
+            BLink<? extends Task> tLink = p.taskLink;
+            BLink<? extends Termed> bLink = p.termLink;
 
             //TODO check this Question case is right
             Truth tLinkTruth = tLink.get().truth();

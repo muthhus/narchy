@@ -132,7 +132,8 @@ public class CurveBag<V> implements Bag<V> {
      * returns the instance for fluentcy
      * */
     @NotNull
-    @Override public CurveBag<V> sample(int n, @Nullable Predicate<BLink<V>> each, @NotNull Collection<BLink<V>> target) {
+    @Override
+    public CurveBag<V> sample(int n, Predicate<? super BLink<V>> each, Collection<? super BLink<V>> target) {
 
         int ss = size();
         final int begin, end;

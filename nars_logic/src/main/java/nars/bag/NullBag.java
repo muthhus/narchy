@@ -53,10 +53,11 @@ public final class NullBag<V> implements Bag<V> {
         return null;
     }
 
+
     @NotNull
     @Override
-    public NullBag<V> sample(int n, Predicate<BLink<V>> each, Collection<BLink<V>> target) {
-        throw new RuntimeException("unimpl");
+    public Bag<V> sample(int n, Predicate<? super BLink<V>> each, Collection<? super BLink<V>> target) {
+        return null;
     }
 
     @Override

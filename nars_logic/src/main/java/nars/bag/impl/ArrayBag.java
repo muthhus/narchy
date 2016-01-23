@@ -132,11 +132,12 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
 
     @NotNull
     @Override
-    public Bag<V> sample(int n, Predicate<BLink<V>> each, Collection<BLink<V>> target) {
+    public Bag<V> sample(int n, Predicate<? super BLink<V>> each, Collection<? super BLink<V>> target) {
         throw new RuntimeException("unimpl");
     }
 
-//    public void validate() {
+
+    //    public void validate() {
 //        int in = ArrayTable.this.size();
 //        int is = items.size();
 //        if (Math.abs(is - in) > 0) {

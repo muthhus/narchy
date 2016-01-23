@@ -86,7 +86,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
     }
 
     @NotNull
-    Bag<V> sample(int n, Predicate<BLink<V>> each, Collection<BLink<V>> target);
+    Bag<V> sample(int n, Predicate<? super BLink<V>> each, Collection<? super BLink<V>> target);
 //    /**
 //     * fills a collection with at-most N items, if an item passes the predicate.
 //     * returns how many items added

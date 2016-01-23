@@ -29,9 +29,9 @@ public final class ConceptProcess implements Premise {
 
 
     public final NAR nar;
-    public final BLink<Task> taskLink;
-    public final BLink<Concept> conceptLink;
-    public final BLink<Termed> termLink;
+    public final BLink<? extends Task> taskLink;
+    public final BLink<? extends Concept> conceptLink;
+    public final BLink<? extends Termed> termLink;
 
     @Nullable
     private final Task belief;
@@ -48,7 +48,9 @@ public final class ConceptProcess implements Premise {
         return conceptLink.get();
     }
 
-    public ConceptProcess(NAR nar, BLink<Concept> conceptLink, BLink<Task> taskLink, BLink<Termed> termLink, @Nullable Task belief) {
+    public ConceptProcess(NAR nar, BLink<? extends Concept> conceptLink,
+                          BLink<? extends Task> taskLink,
+                          BLink<? extends Termed> termLink, @Nullable Task belief) {
         this.nar = nar;
 
         this.taskLink = taskLink;
@@ -60,7 +62,7 @@ public final class ConceptProcess implements Premise {
     }
 
 
-    public static int fireAll(@NotNull NAR nar, BLink<Concept> concept, @NotNull BLink<Task> taskLink, @NotNull BLink<Termed> termLink, @NotNull Consumer<ConceptProcess> cp) {
+    public static int fireAll(@NotNull NAR nar, BLink<? extends Concept> concept, @NotNull BLink<? extends Task> taskLink, @NotNull BLink<? extends Termed> termLink, @NotNull Consumer<ConceptProcess> cp) {
 
         Task task = taskLink.get();
         Term tel = termLink.get().term();
@@ -77,7 +79,7 @@ public final class ConceptProcess implements Premise {
         return 1; //HACK
     }
 
-    public static void fireAll(@NotNull NAR nar, BLink<Concept> concept, @NotNull BLink<Task> taskLink, @NotNull BLink<Termed> termLink, Term beliefTerm, @NotNull Consumer<ConceptProcess> cp) {
+    public static void fireAll(@NotNull NAR nar, BLink<? extends Concept> concept, @NotNull BLink<? extends Task> taskLink, @NotNull BLink<? extends Termed> termLink, Term beliefTerm, @NotNull Consumer<ConceptProcess> cp) {
         Concept beliefConcept = nar.concept(beliefTerm);
 
         Task belief = null;

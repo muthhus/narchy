@@ -201,7 +201,7 @@ public class Default extends AbstractNAR {
      * The original deterministic memory cycle implementation that is currently used as a standard
      * for development and testing.
      */
-    public abstract static class AbstractCycle implements Consumer<BLink<Concept>> {
+    public abstract static class AbstractCycle implements Consumer<BLink<? extends Concept>> {
 
         @NotNull
         final Active handlers;
@@ -367,7 +367,7 @@ public class Default extends AbstractNAR {
         }
 
         /** fires a concept selected by the bag */
-        @Override public final void accept(@NotNull BLink<Concept> cb) {
+        @Override public final void accept(@NotNull BLink<? extends Concept> cb) {
 
             //c.getTermLinks().up(simpleForgetDecay);
             //c.getTaskLinks().update(simpleForgetDecay);
@@ -382,7 +382,7 @@ public class Default extends AbstractNAR {
             //activate(c);
         }
 
-        final static class AlannForget<X> implements Consumer<BLink<X>>, Predicate<BLink<X>> {
+        final static class AlannForget<X> implements Consumer<BLink<? extends X>>, Predicate<BLink<? extends X>> {
 
             private final MutableFloat forgetTime;
             private final MutableFloat perfection;
@@ -400,7 +400,7 @@ public class Default extends AbstractNAR {
             }
 
             @Override
-            public void accept(@NotNull BLink budget) {
+            public void accept(@NotNull BLink<? extends X> budget) {
                 // priority * e^(-lambda*t)
                 //     lambda is (1 - durabilty) / forgetPeriod
                 //     dt is the delta
@@ -434,8 +434,8 @@ public class Default extends AbstractNAR {
             }
 
             @Override
-            public boolean test(@NotNull BLink bLink) {
-                accept(bLink);
+            public boolean test(BLink<? extends X> b) {
+                accept(b);
                 return true;
             }
         }

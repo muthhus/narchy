@@ -331,7 +331,7 @@ public final class BudgetFunctions extends UtilityFunctions {
 	@NotNull
 	static Budget budgetInference(@NotNull Budget target, float qual, float complexityFactor, @NotNull ConceptProcess nal) {
 
-        BLink<Task> taskLink = nal.taskLink;
+        BLink<? extends Task> taskLink = nal.taskLink;
 
         Budget t =
             (taskLink !=null) ? taskLink :  nal.getTask().budget();
@@ -341,7 +341,7 @@ public final class BudgetFunctions extends UtilityFunctions {
         float durability = t.dur() * complexityFactor;
         final float quality = qual * complexityFactor;
 
-        BLink<Termed> termLink = nal.termLink;
+        BLink<? extends Termed> termLink = nal.termLink;
         if ((termLink!=null) && (!termLink.isDeleted())) {
             priority = or(priority, termLink.pri());
             durability = and(durability, termLink.dur()); //originaly was 'AND'

@@ -62,15 +62,15 @@ public class Derivelet {
     @NotNull
     private BLink[] tasksArray = new BLink[0];
 
-    public static void firePremises(@NotNull BLink<Concept> conceptLink, @NotNull BLink<Task>[] tasks, @NotNull BLink<Termed>[] terms, @NotNull Consumer<ConceptProcess> proc, @NotNull NAR nar) {
+    public static void firePremises(@NotNull BLink<? extends Concept> conceptLink, @NotNull BLink<? extends Task>[] tasks, @NotNull BLink<? extends Termed>[] terms, @NotNull Consumer<ConceptProcess> proc, @NotNull NAR nar) {
 
-        for (BLink<Task> taskLink : tasks) {
+        for (BLink<? extends Task> taskLink : tasks) {
 
             if (taskLink == null) break;
 
             Compound taskLinkTerm = taskLink.get().term();
 
-            for (BLink<Termed> termLink : terms) {
+            for (BLink<? extends Termed> termLink : terms) {
                 if (termLink == null) break;
 
                 if (!Terms.equalSubTermsInRespectToImageAndProduct(taskLinkTerm, termLink.get().term()))
@@ -89,10 +89,10 @@ public class Derivelet {
     public void firePremiseSquare(
             @NotNull NAR nar,
             @NotNull Consumer<ConceptProcess> proc,
-            @NotNull BLink<Concept> conceptLink,
+            @NotNull BLink<? extends Concept> conceptLink,
             int tasklinks, int termlinks,
-            Predicate<BLink<Termed>> eachTermLink,
-            Predicate<BLink<Task>> eachTaskLink) {
+            Predicate<BLink<? extends Termed>> eachTermLink,
+            Predicate<BLink<? extends Task>> eachTaskLink) {
 
         Concept concept = conceptLink.get();
 
