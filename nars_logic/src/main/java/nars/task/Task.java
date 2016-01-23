@@ -188,21 +188,23 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
         long now = memory.time();
 
-        Budget budget = solutionEval(question, this, memory);
-        if (budget == null)
+        Budget solutionBudget = solutionEval(question, this, memory);
+        if (solutionBudget == null)
             return null;
 
         Truth projectedTruth = projection(questionOcc, now);
 
         long occCurrent = getOccurrenceTime();
 
-        long solutionOcc = projectedTruth instanceof ProjectedTruth ? ((ProjectedTruth)projectedTruth).target : occCurrent;
+        //if truth instanceof ProjectedTruth, use its attached occ time (possibly eternal or temporal), otherwise assume it is this task's occurence time
+        long solutionOcc = projectedTruth instanceof ProjectedTruth ?
+                ((ProjectedTruth)projectedTruth).target : occCurrent;
 
         Task solution;
-        if ((truth() !=projectedTruth) || (!newTerm.equals(term())) || (solutionOcc!= occCurrent)) {
+        if ((!truth().equals(projectedTruth)) || (!newTerm.equals(term())) || (solutionOcc!= occCurrent)) {
             solution = new MutableTask(newTerm, punc())
                     .truth(projectedTruth)
-                    .budget(getPriority(), getDurability(), getQuality())
+                    .budget(solutionBudget)
                     .time(now, solutionOcc)
                     .parent(getParentTaskRef(), getParentBeliefRef())
                     .setEvidence(getEvidence());
@@ -468,7 +470,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
     @Nullable
     default Object getLogLast() {
-        List<String> log = getLog();
+        List<String> log = log();
         if (log ==null || log.isEmpty()) return null;
         return log.get(log.size()-1);
     }
@@ -532,7 +534,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
     /** get the recorded log entries */
     @Nullable
-    List getLog();
+    List log();
 
 
     //TODO make a Source.{ INPUT, SINGLE, DOUBLE } enum
@@ -741,16 +743,14 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         Truth currentTruth = truth();
         long occurrenceTime = getOccurrenceTime();
 
-        boolean eternal = targetTime == Tense.ETERNAL;
+        boolean toEternal = targetTime == Tense.ETERNAL;
         boolean tenseEternal = Tense.isEternal(occurrenceTime);
-        if (eternal ? tenseEternal : tenseEternal) {
-            return currentTruth;
+        if (toEternal && tenseEternal) {
+
+            return tenseEternal ? currentTruth : TruthFunctions.eternalize(currentTruth);
             //return new DefaultTruth(currentTruth);                 //target and itself is eternal so return the truth of itself
-        }
-        else if (eternal && !tenseEternal) { //target is eternal, but ours isnt, so we need to eternalize it
-            return TruthFunctions.eternalize(currentTruth);
-        }
-        else {
+
+        } else {
             //ok last option is that both are tensed, in this case we need to project to the target time
             //but since also eternalizing is valid, we use the stronger one.
             DefaultTruth eternalTruth = TruthFunctions.eternalize(currentTruth);
@@ -760,7 +760,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
             float projectedConfidence = factor * currentTruth.getConfidence();
 
             return projectedConfidence < eternalTruth.getConfidence() ? eternalTruth :
-              new DefaultTruth(currentTruth.getFrequency(), projectedConfidence);
+              new ProjectedTruth(currentTruth.getFrequency(), projectedConfidence, targetTime);
         }
     }
 

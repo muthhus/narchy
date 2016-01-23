@@ -211,7 +211,7 @@ public class DefaultTermizer implements Termizer {
 
     }
 
-    protected Term number(Number o) {
+    protected static Term number(Number o) {
         return Atom.the((Number) o);
     }
 
@@ -354,7 +354,6 @@ public class DefaultTermizer implements Termizer {
 
                 //instances.put(oterm, o); //reverse
 
-                oe = oterm;
                 try {
                     iii.put(o, oterm);
                 } catch (Exception e) { /* hack */ }

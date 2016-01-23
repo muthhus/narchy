@@ -88,12 +88,10 @@ public class Execution implements Runnable {
             feedback.forEach(f -> {
                 //if (t == null) continue;
 
-                f.log("Feedback");
-
                 //TODO avoid using a string like this
                 //f.log("Feedback: " + t /*"Feedback"*/);
 
-                nar.input(f);
+                nar.input(f.log("Feedback"));
             });
         } else {
             //default: noticed executed

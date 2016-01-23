@@ -15,12 +15,13 @@ public abstract class TaskPerception implements Consumer<Task> {
      * where to send output
      */
     //private final Active active = new Active();
-    @NotNull
-    private final Memory memory;
+
+    //@NotNull
+    //private final Memory memory;
 
     protected TaskPerception(@NotNull Memory m) {
 
-        this.memory = m;
+        //this.memory = m;
 
         //active.add(
             m.eventInput.on(this);
@@ -37,7 +38,7 @@ public abstract class TaskPerception implements Consumer<Task> {
         //);
     }
 
-    public abstract void forEach(Consumer<? super Task> each);
+    //public abstract void forEach(Consumer<? super Task> each);
 
     public static class TaskBufferStats implements Consumer<Task> {
         public long time;
@@ -77,19 +78,19 @@ public abstract class TaskPerception implements Consumer<Task> {
         }
     }
 
-    @NotNull
-    public TaskBufferStats getStatistics() {
-        //minCreationTime, maxCreationTime
-        TaskBufferStats s = new TaskBufferStats(memory);
-        forEach(s);
-        return s;
-    }
+//    @NotNull
+//    public TaskBufferStats getStatistics() {
+//        //minCreationTime, maxCreationTime
+//        TaskBufferStats s = new TaskBufferStats(memory);
+//        forEach(s);
+//        return s;
+//    }
 
     @Override
     public abstract void accept(Task t);
 
     /** here the buffer should apply any updates and send some/all inputs to the Memory */
-    public abstract void nextFrame(Consumer<Task> receiver);
+    protected abstract void nextFrame(Consumer<Task> receiver);
 
     public abstract void clear();
 }

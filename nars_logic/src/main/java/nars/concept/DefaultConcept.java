@@ -405,7 +405,7 @@ public class DefaultConcept extends AtomConcept {
         if (sol != null) {
 
             if (sol.getDeleted()) {
-                throw new RuntimeException("should not have received deleted task:\n" + sol.getLog() + " " + sol.getExplanation() + " " + q );
+                throw new RuntimeException("should not have received deleted task:\n" + sol.log() + " " + sol.getExplanation() + " " + q );
 //                return true;
             }
 

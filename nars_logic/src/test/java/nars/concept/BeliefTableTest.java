@@ -228,7 +228,7 @@ public class BeliefTableTest extends TestCase {
 
 
     @Test
-    public void testProjectionConfidenceDecay() {
+    public void testTemporalProjectionInterpolation() {
 
         Global.DEBUG = true;
 
@@ -259,11 +259,9 @@ public class BeliefTableTest extends TestCase {
             long now = b.nar.time();
 
             Task tt = b.concept().getBeliefs().top(now);
-            //float p = tt.getExpectation() * tt.projectionRank(now);
 
-            System.out.println(now + " " + " " +  tt);
+            System.out.println(now + " " +  tt);
 
-            //b.print();
         }
 
         b.print();

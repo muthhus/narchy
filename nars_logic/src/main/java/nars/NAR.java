@@ -87,8 +87,9 @@ public abstract class NAR implements Level,Consumer<Task> {
             (ThreadPoolExecutor) Executors.newCachedThreadPool();
     static final Set<String> logEvents = Sets.newHashSet(
             "eventTaskProcess", "eventAnswer",
-            "eventExecute", "eventRevision", /* eventDerive */ "eventError",
+            "eventExecute", //"eventRevision", /* eventDerive */ "eventError",
             "eventSpeak"
+
     );
     /**
      * The memory of the reasoner
@@ -106,9 +107,10 @@ public abstract class NAR implements Level,Consumer<Task> {
      * Flag for running continuously
      */
     public final AtomicBoolean running = new AtomicBoolean();
+
     //TODO use this to store all handler registrations, and decide if transient or not
     public final transient List<Object> regs = new ArrayList();
-    //Executors.newFixedThreadPool(1);
+
     private final transient Collection<Runnable> nextTasks = new CopyOnWriteArrayList(); //ConcurrentLinkedDeque();
 
     public NAR(@NotNull Memory m) {
@@ -392,36 +394,6 @@ public abstract class NAR implements Level,Consumer<Task> {
 
     }
 
-    /**
-     * returns a validated task if valid, null otherwise
-     */
-    @Nullable
-    public Task validInput(@NotNull Task t) {
-        Memory m = memory;
-
-//        if (t == null) {
-//            throw new RuntimeException("null input");
-//        }
-
-        if (t.isCommand()) {
-            //direct execution pathway for commands
-            int n = execute(t);
-            if (n == 0) {
-                m.remove(t, "Unknown Command");
-            }
-            return t;
-        }
-
-        Task tNorm = t.normalize(m);
-        if (tNorm == null) {
-            m.remove(t, "Garbage");
-            return null;
-        }
-
-        return tNorm;
-
-    }
-
     public static final class InvalidTaskException extends RuntimeException {
 
         public final Task task;
@@ -447,16 +419,36 @@ public abstract class NAR implements Level,Consumer<Task> {
      * return true if the task was processed
      * if the task was a command, it will return false even if executed
      */
-    public final void input(@Nullable Task t) {
-        if (t == null)
-            throw new InvalidTaskException(null);
+    public final void input(@NotNull Task i) {
 
-        if (null == (t = validInput(t)))
-            throw new InvalidTaskException(t);
+        Memory m = memory;
 
-        if (!t.isCommand())
-            memory.eventInput.emit(t);
+        Task u;
+        //if (i != null) {
+            if (i.isCommand()) {
+                //direct execution
+                int n = execute(i);
+                if (n == 0) {
+                    m.remove(i, "Unmatched Command");
+                    u = null;
+                } else {
+                    u = i;
+                }
+            } else {
+                //accept input if it can be normalized
+                u = i.normalize(m);
+                if (u == null) {
+                    m.remove(i, "Unnormalizable");
+                } else {
+                    m.eventInput.emit(u);
+                }
+            }
+        /*} else {
+            u = null;
+        }*/
 
+        if (null == u)
+            throw new InvalidTaskException(i);
     }
 
     @Override public final void accept(Task task) {

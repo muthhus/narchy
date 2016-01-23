@@ -230,7 +230,7 @@ public class DefaultBeliefTable implements BeliefTable {
             result = preTop;
         } else {
             result = (preTop != null) ?
-                    addRevise(input, preTop, now) :
+                    addRevise(input, preTop, memory, now) :
                     input;
 
             updateTime(now, !result.isEternal());
@@ -240,13 +240,13 @@ public class DefaultBeliefTable implements BeliefTable {
     }
 
     @NotNull
-    Task addRevise(@NotNull Task input, @NotNull Task preTop, long now) {
+    Task addRevise(@NotNull Task input, @NotNull Task preTop, @NotNull Memory memory, long now) {
 
         Task revised = LocalRules.getRevision(input, preTop, now);
 
-        if (revised != null) { // && !revised.equals(input)) {
+        if ((revised != null) && !revised.equals(input)) {
             //return the revised task even if it wasn't inserted allowing it to be used as a transient
-            //boolean inserted = insertAttempt(revised, memory);
+            boolean inserted = insertAttempt(revised, memory);
             //if (inserted) {
             //memory.eventRevision.emit(revised);
             //return revised;

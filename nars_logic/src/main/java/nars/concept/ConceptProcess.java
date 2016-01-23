@@ -86,6 +86,7 @@ public final class ConceptProcess implements Premise {
             if (belief == null || belief.getDeleted()) {
                 throw new RuntimeException("deleted belief: " + belief + " " + beliefConcept.hasBeliefs());
             }
+
         }
 
         cp.accept(new ConceptProcess(nar, concept,

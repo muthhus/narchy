@@ -19,6 +19,7 @@ import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
@@ -30,28 +31,18 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
 
+
 /**
  * Dynamic proxy for any POJO that intercepts specific
  * methods and generates reasoner events which can be
  * stored, input to one or more reasoners, etc..
  * <p>
- *
+ * <p>
  * TODO option to include stack traces in conjunction with invocation
- *
  */
 public class NALObjects extends DefaultTermizer implements Termizer, MethodHandler {
 
-    private final NAR nar;
-    final MutableMap<Class, ProxyFactory> proxyCache = new UnifiedMap().asSynchronized();
-
-    //    final Map<Object, Term> instances = new com.google.common.collect.MapMaker()
-//            .concurrencyLevel(4).weakKeys().makeMap();
-    //final HashBiMap<Object,Term> instances = new HashBiMap();
-
-    final Map<Method,MethodOperator> methodOps = Global.newHashMap();
-
-
-
+    static final Variable returnValue = $.varDep("returnValue");
     @NotNull
     public static Set<String> methodExclusions = new HashSet<String>() {{
         add("hashCode");
@@ -66,17 +57,35 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
         add("equals");
     }};
 
-    private final AtomicBoolean goalInvoke = new AtomicBoolean(true);
+    //    final Map<Object, Term> instances = new com.google.common.collect.MapMaker()
+//            .concurrencyLevel(4).weakKeys().makeMap();
+    //final HashBiMap<Object,Term> instances = new HashBiMap();
+    final MutableMap<Class, ProxyFactory> proxyCache = new UnifiedMap().asSynchronized();
+    final Map<Method, MethodOperator> methodOps = Global.newHashMap();
+    /**
+     * non-null if the method is being invoked by NARS,
+     * in which case it will reference the task that invoked
+     * feedback will be handled by the responsible MethodOperator's execution
+     */
+    final AtomicReference<Task> volition = new AtomicReference();
+    /**
+     * cache
+     */
+    final Map<Method, Operator> methodOperators = new HashMap();
+    private final NAR nar;
 
-    /** for externally-puppeted method invocation goals */
-    private float invocationGoalFreq = 1.0f;
-    private float invocationGoalConf = 0.9f;
-
-//    /** for method invocation result beliefs  */
+    //    /** for method invocation result beliefs  */
 //    private float invocationResultFreq = 1f;
 //    private float invocationResultConf = 0.9f;
-
-    /** for meta-data beliefs about (classes, objects, packages, etc..) */
+    private final AtomicBoolean goalInvoke = new AtomicBoolean(true);
+    /**
+     * for externally-puppeted method invocation goals
+     */
+    private float invocationGoalFreq = 1.0f;
+    private float invocationGoalConf = 0.9f;
+    /**
+     * for meta-data beliefs about (classes, objects, packages, etc..)
+     */
     private float metadataBeliefFreq = 1.0f;
     private float metadataBeliefConf = 0.99f;
     private float metadataPriority = 0.1f;
@@ -92,47 +101,29 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
         return nalObjects.wrap("this", n);
     }
 
-    @Override
-    protected Term termClassInPackage(Term classs, Term packagge) {
-        Term t = $.inst(classs, packagge);
-        nar.believe(metadataPriority, t,
-                Tense.ETERNAL,
-                metadataBeliefFreq, metadataBeliefConf);
-        return t;
-    }
+    @NotNull
+    static Operator getMethodOperator(@NotNull Method overridden) {
+        //dereference class to origin, not using a wrapped class
+        Class c = overridden.getDeclaringClass();
 
+        //HACK
+        if (c.getName().contains("_$$_")) ////javassist wrapper class
+            c = c.getSuperclass();
 
-    @Override
-    protected void onInstanceOfClass(Object o, Term oterm, Term clas) {
-        /** only point to type if non-numeric? */
-        //if (!Primitives.isWrapperType(instance.getClass()))
-
-        //nar.believe(Instance.make(oterm, clas));
-    }
-
-    protected void onInstanceOfClass(Term identifier, Term clas) {
-        nar.believe(metadataPriority, $.inst(identifier, clas),
-            Tense.ETERNAL,
-            metadataBeliefFreq, metadataBeliefConf);
-    }
-
-    @Override
-    protected void onInstanceChange(Term oterm, Term prevOterm) {
-
-        Term s = $.sim(oterm, prevOterm);
-        if (s instanceof Compound)
-            nar.believe(metadataPriority, ((Compound)s),
-                Tense.ETERNAL,
-                metadataBeliefFreq, metadataBeliefConf);
-
+        return $.operator(c.getSimpleName() + '_' + overridden.getName());
     }
 
     //final AtomicBoolean lock = new AtomicBoolean(false);
 
-    /** non-null if the method is being invoked by NARS,
-     * in which case it will reference the task that invoked
-     * feedback will be handled by the responsible MethodOperator's execution */
-    final AtomicReference<Task> volition = new AtomicReference();
+    public static boolean isMethodVisible(@NotNull Method m) {
+        String n = m.getName();
+        return !methodExclusions.contains(n) &&
+
+                //javassist wrapper method HACK todo use something more specific this could trigger a false positive
+                !n.contains("_d")
+
+                && (m.getDeclaringClass() != Object.class);
+    }
 
 
 //    /** when a proxy wrapped instance method is called, this can
@@ -145,37 +136,56 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
 //        return invoked( object, overridden, args, result);
 //    }
 
-    public static class InvocationResult {
-        public final Term value;
+    @Override
+    protected Term termClassInPackage(Term classs, Term packagge) {
+        Term t = $.inst(classs, packagge);
+        nar.believe(metadataPriority, t,
+                Tense.ETERNAL,
+                metadataBeliefFreq, metadataBeliefConf);
+        return t;
+    }
 
-        public InvocationResult(Term value) {
-            this.value = value;
-        }
+    @Override
+    protected void onInstanceOfClass(Object o, Term oterm, Term clas) {
+        /** only point to type if non-numeric? */
+        //if (!Primitives.isWrapperType(instance.getClass()))
 
-        @NotNull
-        @Override
-        public String toString() {
-            return "Puppet";
-        }
+        //nar.believe(Instance.make(oterm, clas));
+    }
+
+    protected void onInstanceOfClass(Term identifier, Term clas) {
+        nar.believe(metadataPriority, $.inst(identifier, clas),
+                Tense.ETERNAL,
+                metadataBeliefFreq, metadataBeliefConf);
+    }
+
+    @Override
+    protected void onInstanceChange(Term oterm, Term prevOterm) {
+
+        Term s = $.sim(oterm, prevOterm);
+        if (s instanceof Compound)
+            nar.believe(metadataPriority, ((Compound) s),
+                    Tense.ETERNAL,
+                    metadataBeliefFreq, metadataBeliefConf);
+
     }
 
 
-    @Nullable
-    MutableTask invokingGoal(Object object, @NotNull Method method, Object[] args) {
+    @Nullable MutableTask invokingGoal(@NotNull Object instance, @NotNull Method method, @NotNull Object[] args) {
         if (methodExclusions.contains(method.getName()))
             return null;
 
         Operator op = getOperator(method);
-        Compound invocationArgs = getMethodInvocationTerms(method, object, args);
+        Compound invocationArgs = getMethodInvocationTerms(method, instance, args);
 
-        return $.goal( $.exec(op, (Compound)invocationArgs),
+        return $.goal($.exec(op, (Compound) invocationArgs),
                 invocationGoalFreq, invocationGoalConf).
                 present(nar.memory).because("Invoked" /* via VM */);
     }
 
     //TODO run in separate execution context to avoid synchronized
     @Nullable
-    public Object invoked(@Nullable Object result, @NotNull MutableTask invokingGoal) {
+    public void invoked(@Nullable Object result, @NotNull Task invokingGoal) {
 
 //        if (!lock.compareAndSet(false,true)) {
 //            return result;
@@ -183,9 +193,11 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
 
         Term effect = term(result);
 
-        //TODO re-use static copy for 'VOID' instances
-        InvocationResult ir = new InvocationResult(effect);
-        invokingGoal.because(ir);
+        //TODO re-use static copy for 'VOID' and null-returning instances
+        if (invokingGoal != null) {
+            InvocationResult ir = new InvocationResult(effect);
+            ((MutableTask)invokingGoal).because(ir);
+        }
 
         Task volitionTask = volition.get();
 
@@ -193,7 +205,7 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
 
             /** pretend as if it were a goal of its own volition, although it was invoked externally
              *  Master of puppets, I'm pulling your strings */
-            nar.input( invokingGoal );
+            nar.input(invokingGoal);
 
 //            nar.input(
 //                new FluentTask(Operation.result(op, invocationArgs, effect)).
@@ -203,19 +215,14 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
 //                        budget(g.getBudget()).
 //                        because("External Invocation")
 //                    );
-        }
-        else {
+        } else {
             //feedback will be returned via operation execution
             //System.out.println("VOLITION " + volitionTask);
         }
 
 
 //        lock.set(false);
-
-        return result;
     }
-
-    static final Variable returnValue = $.varDep("returnValue");
 
     private Compound getMethodInvocationTerms(@NotNull Method method, Object instance, Object[] args) {
 
@@ -237,25 +244,9 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
         return Stream.of(args).map(this::term).toArray(Term[]::new);
     }
 
-
-    /** cache */
-    final Map<Method,Operator> methodOperators = new HashMap();
-
     @Override
     public Operator getOperator(Method m) {
         return methodOperators.computeIfAbsent(m, NALObjects::getMethodOperator);
-    }
-
-    @NotNull
-    static Operator getMethodOperator(@NotNull Method overridden) {
-        //dereference class to origin, not using a wrapped class
-        Class c = overridden.getDeclaringClass();
-
-        //HACK
-        if (c.getName().contains("_$$_")) ////javassist wrapper class
-            c = c.getSuperclass();
-
-        return $.operator(c.getSimpleName() + '_' + overridden.getName());
     }
 
 //    //TODO use a generic Consumer<Task> for recipient/recipients of these
@@ -276,36 +267,37 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
 //
 
     @NotNull
-    public <T> T wrap(String id, @NotNull Class<? extends T> instance) throws Exception {
-        //TODO avoid creating 't' because it will not be used. create the proxy class directly from the class
-        T t = instance.newInstance();
-        return wrap(id, t);
+    public <T> T wrap(String id, @NotNull Class<? extends T> instance) {
+        //TODO create the proxy class directly from the class or instance
+        try {
+            return wrap(id, instance.newInstance());
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    /** the id will be the atom term label for an instance.
-     *  the instance should not be used because a new instance
-     *  will be created and its fields will be those
-     *  which are manipulated, not the original prototype.
-     * */
-    @NotNull
-    public <T> T wrap(String id, @NotNull T instance) throws Exception {
 
-        return wrap(id, (Class<? extends T>)instance.getClass(), instance);
+    /**
+     * the id will be the atom term label for an instance.
+     * the instance should not be used because a new instance
+     * will be created and its fields will be those
+     * which are manipulated, not the original prototype.
+     */
+    @NotNull
+    private <T> T wrap(String id, @NotNull T instance) throws Exception {
+
+        return wrap(id, (Class<? extends T>) instance.getClass(), instance);
 
     }
 
     @Nullable
-    public synchronized Object invokeVolition(Task currentTask, @NotNull Method method, Object instance, Object[] args) {
+    public Object invokeVolition(Task currentTask, @NotNull Method method, Object instance, Object[] args) throws InvocationTargetException, IllegalAccessException {
 
         Object result = null;
 
         volition.set(currentTask);
 
-        try {
-            result = method.invoke(instance, args);
-        } catch (Exception e) {
-            result = e;
-        }
+        result = method.invoke(instance, args);
 
         volition.set(null);
 
@@ -329,18 +321,32 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
 //    }
 
     @Nullable
-    @Override public final Object invoke(Object obj, @NotNull Method wrapped, @NotNull Method wrapper, Object[] args) throws Throwable {
-        MutableTask invokingGoal = invokingGoal(obj, wrapped, args);
+    @Override
+    public final Object invoke(Object obj, @NotNull Method wrapped, @NotNull Method wrapper, Object[] args) throws Throwable {
 
-        if (invokingGoal!=null)
-            MethodOperator.setCurrentTask(invokingGoal);
+        Task invokingGoal = MethodOperator.getCurrentTask();
 
-        Object result = wrapper.invoke(obj, args);
-
-        if (invokingGoal!=null) {
-            MethodOperator.setCurrentTask(null);
-            invoked(result, invokingGoal);
+        Object result;
+        if (invokingGoal==null) {
+            invokingGoal = invokingGoal(obj, wrapped, args);
+            if (invokingGoal == null) {
+                //just execute it
+                return wrapper.invoke(obj, args);
+            } else {
+                MethodOperator.setCurrentTask(invokingGoal);
+            }
         }
+
+        //else {
+
+
+            result = wrapper.invoke(obj, args);
+
+            invoked(result, invokingGoal);
+
+            MethodOperator.setCurrentTask(null);
+
+        //}
 
         return result;
     }
@@ -349,9 +355,11 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
 //        return build(id, classs, null);
 //    }
 
-    /** the id will be the atom term label for the created instance */
+    /**
+     * the id will be the atom term label for the created instance
+     */
     @NotNull
-    public <T> T wrap(String id, Class<? extends T> classs, /* nullable */ @NotNull T instance) throws Exception {
+    <T> T wrap(String id, Class<? extends T> classs, /* nullable */ @NotNull T instance) throws Exception {
 
 
         ProxyFactory factory = proxyCache.getIfAbsentPut(classs, ProxyFactory::new);
@@ -377,17 +385,10 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
 
         //add operators for public methods
 
-        for (Method m :  instance.getClass().getMethods()) {
+        for (Method m : instance.getClass().getMethods()) {
             if (isMethodVisible(m) && Modifier.isPublic(m.getModifiers())) {
                 methodOps.computeIfAbsent(m, M -> {
-                    MethodOperator mo;
-//                    if (M.getReturnType().isAssignableFrom(Truth.class)) {
-//                        mo = new MethodOperator(goalInvoke, M, this) {
-//
-//                        };
-//                    } else {
-                        mo = new MethodOperator(goalInvoke, M, this);
-                    //}
+                    MethodOperator mo = new MethodOperator(goalInvoke, M, this);
                     nar.onExec(mo);
                     return mo;
                 });
@@ -399,19 +400,22 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
         return wrappedInstance;
     }
 
-    public static boolean isMethodVisible(@NotNull Method m) {
-        String n = m.getName();
-        if (n.contains("_d"))
-            return false; //javassist wrapper method
-
-        if (m.getDeclaringClass() == Object.class)
-            return false;
-
-        return !methodExclusions.contains(n);
-    }
-
     public void setGoalInvoke(boolean b) {
         goalInvoke.set(b);
+    }
+
+    public static class InvocationResult {
+        public final Term value;
+
+        public InvocationResult(Term value) {
+            this.value = value;
+        }
+
+        @NotNull
+        @Override
+        public String toString() {
+            return "Puppet";
+        }
     }
 
 

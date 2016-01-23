@@ -45,10 +45,10 @@ public class SortedTaskPerception extends TaskPerception {
 
     }
 
-    @Override
-    public void forEach(@NotNull Consumer<? super Task> each) {
-        buffer.getArrayBag().forEach(e -> each.accept(e.get()));
-    }
+//    @Override
+//    public void forEach(@NotNull Consumer<? super Task> each) {
+//        buffer.getArrayBag().forEach(e -> each.accept(e.get()));
+//    }
 
     @Override
     public final void nextFrame(@NotNull Consumer<Task> receiver) {

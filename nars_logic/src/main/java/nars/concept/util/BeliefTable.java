@@ -204,6 +204,23 @@ public interface BeliefTable extends TaskTable {
     /** finds the most relevant temporal belief for the given time; ; null if no temporal beliefs known */
     @Nullable Task topTemporal(long when);
 
+//    default Truth best(long when) {
+//        return best(when, when);
+//    }
+//
+//    /** projects, if necessary, the top belief result, and returns the estimated Truth for the target time */
+//    default Truth best(long when, long now) {
+//        Task top = top(when);
+//        Truth topTruth;
+//        if (when != Tense.ETERNAL) {
+//            topTruth = projectAggregate...
+//        } else {
+//            topTruth = top.truth();
+//        }
+//
+//        return topTruth;
+//    }
+
     /** get the most relevant belief/goal with respect to a specific time.
      *
      * */
@@ -229,7 +246,7 @@ public interface BeliefTable extends TaskTable {
 
     default void print(@NotNull PrintStream out) {
         for (Task t : this) {
-            out.println(t + " " + Arrays.toString(t.getEvidence()) + ' ' + t.getLog());
+            out.println(t + " " + Arrays.toString(t.getEvidence()) + ' ' + t.log());
         }
     }
 
@@ -283,6 +300,8 @@ public interface BeliefTable extends TaskTable {
             return a;
         return b;
     }
+
+
 
 
 //    @FunctionalInterface

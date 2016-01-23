@@ -13,9 +13,9 @@ import nars.util.Texts;
  */
 public class ConceptPaneTest {
 
-    public static final int beliefCapacity = 96;
+    public static final int beliefCapacity = 32;
     static float waveFreq = 0.12715f;
-    static float conf = 0.9f;
+    static float conf = 0.5f;
     static float predictionProbability = 0.5f; //how often to ask for a prediction
     static float pastProbability = 0.5f; //how often to ask for a prediction
     static final float fps = 30f;
@@ -28,6 +28,7 @@ public class ConceptPaneTest {
         //nar.input("y:x. %0%");
         nar.memory.conceptBeliefsMax.set(beliefCapacity);
         nar.run(2);
+        nar.memory.duration.set(10);
         nar.onEachFrame(n-> {
 
             //random eternals
@@ -35,19 +36,22 @@ public class ConceptPaneTest {
                 //float ef = nar.memory.random.nextFloat();
                 //float ec = nar.memory.random.nextFloat() * 0.5f;
                 float ef = 0.5f * ((float) Math.sin(nar.time() * waveFreq) + 1f);
-                float ec = 0.05f * (float)Math.random(); //0.1f;
+                float ec = 0.5f * (float)Math.random(); //0.1f;
                 nar.input("y:x. %" + Texts.n2(ef) + ";" + Texts.n2(ec) + "%");
             }
 
             //random temporals
             if (enableTemporals) {
-                CharSequence y = Texts.n2(0.5f * ((float) Math.sin(nar.time() * waveFreq) + 1f));
-                nar.input("y:x. :|: %" + y + ";" + conf + "%");
 
                 if (nar.memory.random.nextFloat() < predictionProbability)
                     nar.input("y:x? :/:");
-                if (nar.memory.random.nextFloat() < pastProbability)
+                else if (nar.memory.random.nextFloat() < pastProbability)
                     nar.input("y:x? :\\:");
+                else {
+                    CharSequence y = Texts.n2(0.5f * ((float) Math.sin(nar.time() * waveFreq) + 1f));
+                    nar.input("y:x. :|: %" + y + ";" + conf + "%");
+                }
+
             }
         });
 

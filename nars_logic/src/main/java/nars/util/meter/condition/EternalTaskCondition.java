@@ -482,7 +482,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
             similar.values().forEach(s -> {
                 logger.info("\t{}", s);
                 logger.debug("\t\t{}", s.getParentTask() + " , " + s.getParentBelief());
-                logger.debug("\t\t{}", s.getLog());
+                logger.debug("\t\t{}", s.log());
                 //logger.debug(s.getExplanation().replace("\n", "\n\t\t"));
             });
         }

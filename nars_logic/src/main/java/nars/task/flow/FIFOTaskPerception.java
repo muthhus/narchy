@@ -58,10 +58,10 @@ public class FIFOTaskPerception extends TaskPerception {
         this(nar, null);
     }
 
-    @Override
-    public void forEach(@NotNull Consumer<? super Task> each) {
-        buffer.forEach(each);
-    }
+//    @Override
+//    public void forEach(@NotNull Consumer<? super Task> each) {
+//        buffer.forEach(each);
+//    }
 
     @Override
     public void accept(@NotNull Task t) {

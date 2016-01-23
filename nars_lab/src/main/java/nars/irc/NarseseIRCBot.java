@@ -36,7 +36,7 @@ public class NarseseIRCBot extends IRCBot {
 
             String ss = ((Task)t).toStringWithoutBudget(nar.memory);
 
-            if (tt.getLog()!=null && tt.getLogLast().toString().startsWith("Answer"))
+            if (tt.log()!=null && tt.getLogLast().toString().startsWith("Answer"))
                 ss += " " + tt.getLogLast();
 
             return ss;

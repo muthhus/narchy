@@ -574,14 +574,14 @@ public abstract class AbstractTask extends Item<Task>
 
     @Nullable
     @Override
-    public final List getLog() {
+    public final List log() {
         return dereference(log);
     }
 
 
     @NotNull
     final List getOrCreateLog() {
-        List exist = getLog();
+        List exist = log();
         if (exist == null) {
             this.log = reference(exist = Global.newArrayList(1));
         }

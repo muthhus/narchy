@@ -27,10 +27,11 @@ public final class SetTaskPerception extends TaskPerception {
         this.merge = merge;
     }
 
-    @Override
-    public void forEach(@NotNull Consumer<? super Task> each) {
-        table.forEach(each);
-    }
+// this isnt safe
+//    @Override
+//    public void forEach(@NotNull Consumer<? super Task> each) {
+//        table.forEach(each);
+//    }
 
     @Override
     public void accept(@NotNull Task t) {
@@ -44,10 +45,16 @@ public final class SetTaskPerception extends TaskPerception {
     }
 
     @Override
-    public void nextFrame(@NotNull Consumer<Task> receiver) {
-        //table.forEach((k, v)->receiver.accept(v));
-        table.forEachValue(receiver::accept);
+    protected final void nextFrame(@NotNull Consumer<Task> receiver) {
+
+
+        //create an array copy in case the table is modified as a result of executing a task
+        Task[] aa = table.toArray(new Task[table.size()]);
         table.clear();
+        for (Task x: aa) {
+            receiver.accept(x);
+        }
+
     }
 
     @Override
