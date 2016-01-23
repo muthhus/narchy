@@ -269,12 +269,9 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
 
     }
 
-
-
-
     @Override
     public final void commit() {
-        top(this::update);
+        forEach(this::update);
     }
 
     public void update(@NotNull BLink<V> v) {

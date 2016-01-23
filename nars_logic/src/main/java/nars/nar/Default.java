@@ -310,18 +310,12 @@ public class Default extends AbstractNAR {
         }
 
         protected void onCycle(Memory memory) {
-            forgetConcepts();
+
             fireConcepts(conceptsFiredPerCycle.intValue());
-            updateActivated();
-        }
 
-        private void forgetConcepts() {
-            active.top(conceptForget); //TODO use downsampling % of concepts not TOP
-        }
+            Bag<Concept> active = this.active;
 
-        private void updateActivated() {
-            active.commit();
-
+            active.forEach(conceptForget); //TODO use downsampling % of concepts not TOP
             //active.printAll();
 
             LinkedHashSet<Concept> a = this.activated;
@@ -329,6 +323,8 @@ public class Default extends AbstractNAR {
                 a.forEach(active::put);
                 a.clear();
             }
+
+            active.commit();
         }
 
         /** processes derivation result */
@@ -379,7 +375,6 @@ public class Default extends AbstractNAR {
             deriver.firePremiseSquare(nar, this::process, cb,
                 tasklinksToFire,
                 termlnksToFire,
-                //simpleForgetDecay
                 termLinkForget,
                 taskLinkForget
             );

@@ -84,20 +84,12 @@ public final class NullBag<V> implements Bag<V> {
 
     }
 
-    @Override
-    public void top(@NotNull Consumer<BLink<V>> each) {
-
-    }
 
     @Override
     public void topWhile(Predicate<BLink<V>> each) {
 
     }
 
-    @Override
-    public void topN(int limit, Consumer<BLink<V>> each) {
-
-    }
 
     @Override
     public void setCapacity(int c) {

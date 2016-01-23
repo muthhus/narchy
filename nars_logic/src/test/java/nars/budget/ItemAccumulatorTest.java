@@ -79,7 +79,7 @@ public class ItemAccumulatorTest {
         assertTrue(ii.getArrayBag().isSorted());
 
         //System.out.println(ii);
-        ii.getArrayBag().top(x -> System.out.println(x));
+        ii.getArrayBag().forEach(x -> System.out.println(x));
 
         BLink<Task> oneLink = ii.getArrayBag().pop();
         Task one = oneLink.get();

@@ -1,6 +1,5 @@
 package nars.bag;
 
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
@@ -38,20 +37,18 @@ public interface Table<K,V> extends Iterable<V> {
     /** iterates in sorted order */
     void forEachKey(Consumer<? super K> each);
 
-    default void top(@NotNull Consumer<V> each) {
-        topWhile(e -> {
-            each.accept(e);
-            return true;
-        });
-    }
+//    default void top(@NotNull Consumer<V> each) {
+//        topWhile(e -> {
+//            each.accept(e);
+//            return true;
+//        });
+//    }
 
     /**
      * if predicate evaluates false, it terminates the iteration
      */
     void topWhile(Predicate<V> each);
 
-    //TODO provide default impl
-    void topN(int limit, Consumer<V> each);
 
 
 }

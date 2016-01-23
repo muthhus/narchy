@@ -144,16 +144,17 @@ abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements Tabl
     @Override
     public final void forEach(@NotNull Consumer<? super L> action) {
 
-        //items.forEach(b -> action.accept(b.get()));
+        items.getList().forEach(action);
 
-        final List<? extends L> l = items.getList();
-
-        //start at end
-        int n = l.size();
-        for (int i = 0; i < n; i++) {
-        //for (int i = l.size()-1; i >= 0; i--){
-            action.accept(l.get(i));
-        }
+//        //items.forEach(b -> action.accept(b.get()));
+//
+//        final List<? extends L> l = items.getList();
+//
+//        int n = l.size();
+//        for (int i = 0; i < n; i++) {
+//        //for (int i = l.size()-1; i >= 0; i--){
+//            action.accept(l.get(i));
+//        }
 
     }
 
@@ -185,18 +186,15 @@ abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements Tabl
         }
     }
 
-    @Override
-    public final void top(@NotNull Consumer<L> action) {
-        items.getList().forEach(action);
-    }
 
-    @Override
-    public final void topN(int limit, @NotNull Consumer action) {
-        List l = items.getList();
-        int n = Math.min(l.size(), limit);
-        for (int i = 0; i < n; i++)
-            action.accept(l.get(i));
-    }
+
+//    @Override
+//    public final void topN(int limit, @NotNull Consumer action) {
+//        List l = items.getList();
+//        int n = Math.min(l.size(), limit);
+//        for (int i = 0; i < n; i++)
+//            action.accept(l.get(i));
+//    }
 
 
     @Override

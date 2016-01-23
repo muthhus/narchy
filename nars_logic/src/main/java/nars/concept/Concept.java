@@ -213,7 +213,7 @@ public interface Concept extends Termed, Comparable<Termed> {
         if (showtermlinks) {
 
             out.println("\n TermLinks:");
-            getTermLinks().top(b-> {
+            getTermLinks().forEach(b-> {
                 out.print(indent);
                 out.print(b.get() + " " + b.toBudgetString());
                 out.print(" ");
@@ -222,7 +222,7 @@ public interface Concept extends Termed, Comparable<Termed> {
 
         if (showtasklinks) {
             out.println("\n TaskLinks:");
-            getTaskLinks().top(b-> {
+            getTaskLinks().forEach(b-> {
                 out.print(indent);
                 out.print(b.get() + " " + b.toBudgetString());
                 out.print(" ");

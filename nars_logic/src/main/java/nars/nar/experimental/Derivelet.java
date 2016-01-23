@@ -98,6 +98,8 @@ public class Derivelet {
 
         Set<BLink<Task>> tasksBuffer = this.tasks;
         concept.getTaskLinks().sample(tasklinks, eachTaskLink, tasksBuffer).commit();
+        //concept.getTaskLinks().forEach(bc -> eachTaskLink.test(bc));
+        //concept.getTaskLinks().commit();
         if (tasksBuffer.isEmpty()) return;
 
         Set<BLink<Termed>> termsBuffer = this.terms;

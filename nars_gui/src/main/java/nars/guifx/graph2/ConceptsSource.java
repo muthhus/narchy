@@ -119,8 +119,8 @@ public class ConceptsSource extends GraphSource {
 //            //missing.remove(tn.term);
         };
 
-        ((Concept)cc).getTermLinks().topN(maxNodeLinks, linkUpdater);
-        ((Concept)cc).getTaskLinks().topN(maxNodeLinks, linkUpdater);
+        ((Concept)cc).getTermLinks().forEach(maxNodeLinks, linkUpdater);
+        ((Concept)cc).getTaskLinks().forEach(maxNodeLinks, linkUpdater);
 
         //sn.removeEdges(missing);
 

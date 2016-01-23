@@ -377,13 +377,6 @@ public class CurveBag<V> implements Bag<V> {
 //        return next; //# of items actually filled in the array
 //    }
 
-    @Override public final void top(@NotNull Consumer each) {
-        arrayBag.top(each);
-    }
-    @Override public void topN(int limit, @NotNull Consumer each) {
-        arrayBag.topN(limit, each);
-    }
-
     @Override
     public void setCapacity(int c) {
         arrayBag.setCapacity(c);

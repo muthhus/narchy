@@ -215,7 +215,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
     }
 
     default void printAll(@NotNull PrintStream p) {
-        top(b -> p.println(b.toBudgetString() + ' ' + b.get()));
+        forEach(b -> p.println(b.toBudgetString() + ' ' + b.get()));
     }
 
     /**
@@ -226,13 +226,13 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
     //@Override abstract public void forEach(final Consumer<? super V> action);
     default float getPrioritySum() {
         float[] total = {0};
-        top(v -> total[0] += v.pri());
+        forEach(v -> total[0] += v.pri());
         return total[0];
     }
 
     default float getSummarySum() {
         float[] total = {0};
-        top(v -> total[0] += v.summary());
+        forEach(v -> total[0] += v.summary());
         return total[0];
     }
 
@@ -256,7 +256,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
      */
     default float getPriorityMin() {
         float[] min = {Float.POSITIVE_INFINITY};
-        top(b -> {
+        forEach(b -> {
             float p = b.pri();
             if (p < min[0]) min[0] = p;
         });
@@ -268,7 +268,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
      */
     default float getPriorityMax() {
         float[] max = {Float.NEGATIVE_INFINITY};
-        top(b -> {
+        forEach(b -> {
             float p = b.pri();
             if (p > max[0]) max[0] = p;
         });
@@ -381,7 +381,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
     @NotNull
     default double[] getPriorityHistogram(@NotNull double[] x) {
         int bins = x.length;
-        top(budget -> {
+        forEach(budget -> {
             float p = budget.pri();
             int b = Util.bin(p, bins - 1);
             x[b]++;
