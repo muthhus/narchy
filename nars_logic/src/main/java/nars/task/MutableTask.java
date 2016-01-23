@@ -23,9 +23,9 @@ import static nars.Global.reference;
  */
 public class MutableTask extends AbstractTask {
 
-    public MutableTask() {
+    public MutableTask(Termed<Compound> term) {
         /** budget triple - to be valid, at least the first 2 of these must be non-NaN (unless it is a question)  */
-        super(null, (char) 0, null,
+        super(term.term(), (char) 0, null,
             /* budget: */ 0, Float.NaN, Float.NaN);
 
         setEternal();
@@ -42,10 +42,6 @@ public class MutableTask extends AbstractTask {
         term(newTerm);
     }
 
-    public MutableTask(@NotNull Termed<Compound> term) {
-        this();
-        term(term);
-    }
 
     public MutableTask(@NotNull Termed<Compound> content, char punc) {
         this(content);
@@ -185,9 +181,9 @@ public class MutableTask extends AbstractTask {
     }
 
 
-    public final MutableTask parent(@org.jetbrains.annotations.Nullable Task parentTask, Task parentBelief) {
-        if (parentTask == null)
-            throw new RuntimeException("parent task being set to null");
+    public final MutableTask parent(@NotNull Task parentTask, @Nullable Task parentBelief) {
+        /*if (parentTask == null)
+            throw new RuntimeException("parent task being set to null");*/
 
 
 

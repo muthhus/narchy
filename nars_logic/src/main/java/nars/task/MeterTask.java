@@ -1,6 +1,8 @@
 package nars.task;
 
 import nars.Memory;
+import nars.term.Termed;
+import nars.term.compound.Compound;
 import nars.util.event.Active;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,6 +16,10 @@ import org.jetbrains.annotations.NotNull;
 public abstract class MeterTask extends MutableTask {
 
     private final Active active = new Active();
+
+    public MeterTask(Termed<Compound> c) {
+        super(c);
+    }
 
     @Override
     protected void onNormalized(@NotNull Memory memory) {

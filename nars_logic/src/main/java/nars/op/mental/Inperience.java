@@ -269,16 +269,16 @@ public class Inperience {
         }
     }
 
-    private static void nonInnate(Task task, @NotNull Task belief, @NotNull Premise nal, Operator op) {
+    static void nonInnate(Task task, @NotNull Task belief, @NotNull Premise nal, Operator op) {
         //the operators which dont have a innate belief
         //also get a chance to reveal its effects to the system this way
 
-            beliefReasonDerive(task, belief,
-                    $.exec(op, belief.term()),
-                    nal, 0);
+        Compound c = $.exec(op, belief.term());
+        if (c!=null)
+            beliefReasonDerive(task, belief, c, nal, 0);
     }
 
-    protected static void beliefReasonDerive(Task parent, Task belief, @NotNull Compound new_term, @NotNull Premise p, long delay) {
+    static void beliefReasonDerive(Task parent, Task belief, @NotNull Compound new_term, @NotNull Premise p, long delay) {
 
         //TODO should this be a mew stamp or attached to parent.. originally it was a fresh new stamp from memory
 

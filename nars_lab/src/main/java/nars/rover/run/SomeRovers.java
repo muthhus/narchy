@@ -9,7 +9,7 @@ import nars.rover.Sim;
 import nars.rover.robot.Rover;
 import nars.rover.robot.Spider;
 import nars.rover.robot.Turret;
-import nars.rover.world.GridSpaceWorld;
+import nars.rover.world.FoodSpawnWorld1;
 import nars.term.index.MapIndex2;
 import nars.time.SimulatedClock;
 
@@ -34,9 +34,9 @@ public class SomeRovers {
 
         //world = new ReactorWorld(this, 32, 48, 48*2);
 
-        //RoverWorld world = new FoodSpawnWorld1(128, 48, 48, 0.5f);
+        RoverWorld world = new FoodSpawnWorld1(128, 48, 48, 0.5f);
 
-        RoverWorld world = new GridSpaceWorld(GridSpaceWorld.newMazePlanet());
+        //RoverWorld world = new GridSpaceWorld(GridSpaceWorld.newMazePlanet());
 
 
         final Sim game = new Sim(clock, world);
@@ -49,19 +49,23 @@ public class SomeRovers {
 
 
         {
+            int conceptsFirePerCycle = 50;
             Default nar = new Default(
                     new Memory(clock, new MapIndex2(
                         new SoftValueHashMap())),
-                        1600, 50, 1, 3);
+                        1600, conceptsFirePerCycle, 1, 2);
 
-            nar.memory.DEFAULT_GOAL_PRIORITY = 0.9f;
-            nar.memory.DEFAULT_GOAL_DURABILITY = 0.9f;
-            nar.memory.DEFAULT_GOAL_DURABILITY = 0.9f;
-            //nar.initNAL9();
+            nar.memory.DEFAULT_GOAL_PRIORITY = 0.7f;
+            nar.memory.DEFAULT_GOAL_DURABILITY = 0.7f;
+            nar.memory.DEFAULT_QUESTION_PRIORITY = 0.7f;
+            nar.memory.DEFAULT_QUESTION_DURABILITY = 0.7f;
+
+            nar.initNAL9();
+
             nar.memory.perfection.setValue(0.2f);
-            nar.core.confidenceDerivationMin.setValue(0.03f);
-            nar.core.conceptActivation.setValue(0.035f);
-            nar.memory.duration.set(3);
+            nar.core.confidenceDerivationMin.setValue(0.06f);
+            nar.core.conceptActivation.setValue(1f/conceptsFirePerCycle /* approxmimate */);
+            nar.memory.duration.set(2);
             nar.memory.cyclesPerFrame.set(1);
 
 

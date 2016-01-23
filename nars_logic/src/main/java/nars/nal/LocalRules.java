@@ -116,9 +116,9 @@ public enum LocalRules {
      */
     public static void forEachSolution(@NotNull Task question, @NotNull Task sol, @NotNull NAR nal, @NotNull Consumer<Task> eachSolutions) {
 
-//        if ((sol == null) || (sol.getDeleted())) {
-//            throw new RuntimeException("proposedBelief " + sol + " deleted or null");
-//        }
+        if (sol.getDeleted()) {
+            throw new RuntimeException("proposedBelief " + sol + " deleted or null");
+        }
 
 //        float om = Tense.orderMatch(question, solution, nal.memory.duration());
 //

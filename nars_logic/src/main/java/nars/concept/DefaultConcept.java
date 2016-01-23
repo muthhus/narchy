@@ -190,9 +190,6 @@ public class DefaultConcept extends AtomConcept {
         if (hasQuestions()) {
             //TODO move this to a subclass of TaskTable which is customized for questions. then an arraylist impl of TaskTable can iterate by integer index and not this iterator/lambda
             getQuestions().forEach(question -> {
-                if (question.getDeleted())
-                    throw new RuntimeException("deleted question: " + question);
-
                 LocalRules.forEachSolution(question, best, nar, nar);
             });
 
@@ -383,10 +380,10 @@ public class DefaultConcept extends AtomConcept {
 //                System.err.println(q.getExplanation());
 //                throw new RuntimeException(q + " has non-null truth");
 //            }
-            questionTable.forEach(qq -> {
-                if (qq.getDeleted())
-                    throw new RuntimeException("question is deleted: " + qq);
-            });
+//            questionTable.forEach(qq -> {
+//                if (qq.getDeleted())
+//                    throw new RuntimeException("question is deleted: " + qq);
+//            });
         }
 
         /** execute the question, for any attached operators that will handle it */
@@ -404,14 +401,7 @@ public class DefaultConcept extends AtomConcept {
                 getGoals() : getBeliefs();
 
         Task sol = answerTable.top(q.occurrence());
-
         if (sol != null) {
-
-            if (sol.getDeleted()) {
-                throw new RuntimeException("should not have received deleted task:\n" + sol.log() + " " + sol.getExplanation() + " " + q);
-//                return true;
-            }
-
             LocalRules.forEachSolution(q, sol, nar, nar);
         }
 

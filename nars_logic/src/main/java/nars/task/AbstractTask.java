@@ -113,6 +113,9 @@ public abstract class AbstractTask extends Item<Task>
 
 
     protected final void setTerm(@NotNull Termed<Compound> t) {
+        if (t == null)
+            throw new RuntimeException("null term");
+
         if (term!=t) {
             term = t;
             invalidate();

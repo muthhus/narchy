@@ -171,9 +171,9 @@ public abstract class Param extends Container implements Level {
     /** Default durability of input judgment */
     float DEFAULT_JUDGMENT_DURABILITY = 0.5f; //was 0.8 in 1.5.5; 0.5 after
     /** Default priority of input question */
-    float DEFAULT_QUESTION_PRIORITY = 0.5f;
+    public float DEFAULT_QUESTION_PRIORITY = 0.5f;
     /** Default durability of input question */
-    float DEFAULT_QUESTION_DURABILITY = 0.5f;
+    public float DEFAULT_QUESTION_DURABILITY = 0.5f;
 
 
     /** Default confidence of input goal. */
@@ -222,10 +222,12 @@ public abstract class Param extends Container implements Level {
     }
     float getDefaultQuality(char punctuation) {
         switch (punctuation) {
+            case Symbols.QUEST:
+                return DEFAULT_QUEST_QUALITY;
             case Symbols.QUESTION:
-                return DEFAULT_QUESTION_DURABILITY;
-            case Symbols.GOAL:
-                return DEFAULT_GOAL_DURABILITY;
+                return DEFAULT_QUESTION_QUALITY;
+            /*case Symbols.GOAL:
+                return DEFAULT_GOAL_QUALITY;*/
         }
         throw new RuntimeException("Use truthToQuality for: " + punctuation);
     }
