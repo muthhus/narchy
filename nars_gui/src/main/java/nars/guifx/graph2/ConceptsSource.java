@@ -76,21 +76,13 @@ public class ConceptsSource extends GraphSource {
         //rolling average
         ee.pri = lerp(
                 ((BLink)link).getPriority(), ee.pri,
-                      0.05f);
+                      0.1f);
     }
 
-
-
-
-    public float getConceptPriority(Termed cc) {
-        BLink<Concept> ccc = ((Default) nar).core.active.get(cc);
-        if (ccc == null) return 0;
-        return ccc.getPriorityIfNaNThenZero();
-    }
 
     @Override
     public void updateNode(SpaceGrapher g, Termed s, TermNode sn) {
-        sn.priNorm = getConceptPriority(s);
+        sn.priNorm = nar.conceptPriority(s, 0f);
         super.updateNode(g, s, sn);
     }
 

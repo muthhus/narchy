@@ -79,7 +79,7 @@ public class VisionRay implements AbstractPolygonBot.Sense, SwingDraw.LayerDraw 
 
 
         if (angleConcept == null)
-            angleConcept = ((Default)abstractPolygonBot.nar).core.active.get(angleTerm);
+            angleConcept = ((Default)abstractPolygonBot.nar).core.active.get(abstractPolygonBot.nar.concept(angleTerm));
 
         if (angleConcept != null) {
             conceptPriority = 0.5f + 0.5f * angleConcept.getPriority();

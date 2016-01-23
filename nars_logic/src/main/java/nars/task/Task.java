@@ -206,17 +206,18 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
                 ((ProjectedTruth)solTruth).target : occCurrent;
 
         Task solution;
-        if ((!truth().equals(solTruth)) || (!newTerm.equals(term())) || (solutionOcc!= occCurrent)) {
+        //if ((!truth().equals(solTruth)) || (!newTerm.equals(term())) || (solutionOcc!= occCurrent)) {
             solution = new MutableTask(newTerm, punc())
                     .truth(solTruth)
                     .time(now, solutionOcc)
                     .parent(getParentTaskRef(), getParentBeliefRef())
+                    .budget(solutionBudget)
                     .setEvidence(evidence());
-        } else {
-            solution = this;
-        }
 
-        solution.getBudget().set(solutionBudget);
+        //} else {
+        //    solution = this;
+        //}
+
 
         ////TODO avoid adding repeat & equal Solution instances
         //solution.log(new Solution(question));

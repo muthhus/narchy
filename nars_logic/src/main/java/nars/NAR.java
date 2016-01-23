@@ -949,6 +949,9 @@ public abstract class NAR implements Level,Consumer<Task> {
     @Nullable
     protected final Concept process(@NotNull Task input) {
 
+        if (input.getDeleted())
+            throw new RuntimeException(input + " deleted");
+
         Concept c = conceptualize(input.concept(), input.getBudget(), 1f);
         if (c == null) {
             throw new RuntimeException("Inconceivable: " + input);

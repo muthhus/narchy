@@ -137,6 +137,10 @@ public enum LocalRules {
 
         Consumer<Term> proc = (st) -> {
 
+            //seems its possible for the solution to become deleted in-between executions of this lambda
+            if (sol.getDeleted())
+                return;
+
             Task validSolution = sol.projectedSolution((Compound)st, question, memory );
 
             if (validSolution!=null) {

@@ -84,7 +84,7 @@ public class SomeRovers {
 //            game.add(new CarefulRover("r2", nar));
 //        }
 
-        float fps = 25;
+        float fps = 75;
         game.run(fps);
 
     }
