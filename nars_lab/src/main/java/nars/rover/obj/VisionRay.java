@@ -82,9 +82,9 @@ public class VisionRay implements AbstractPolygonBot.Sense, SwingDraw.LayerDraw 
             angleConcept = ((Default)abstractPolygonBot.nar).core.active.get(abstractPolygonBot.nar.concept(angleTerm));
 
         if (angleConcept != null) {
-            conceptPriority = 0.5f + 0.5f * angleConcept.getPriority();
-            conceptDurability = 0.5f + 0.5f * angleConcept.getDurability();
-            conceptQuality = 0.5f + 0.5f * angleConcept.getQuality();
+            conceptPriority = 0.5f + 0.5f * angleConcept.pri();
+            conceptDurability = 0.5f + 0.5f * angleConcept.dur();
+            conceptQuality = 0.5f + 0.5f * angleConcept.qua();
 
             //sight.setProbability(Math.max(minVisionInputProbability, Math.min(1.0f, maxVisionInputProbability * conceptPriority)));
             //sight.setProbability(minVisionInputProbability);

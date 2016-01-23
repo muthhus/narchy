@@ -27,7 +27,7 @@ public class ItemAccumulator<V extends Budgeted > {
 
             @Override
             public float score(@NotNull BLink<V> v) {
-                return v.getPriority();
+                return v.pri();
             }
         });
         arrayBag.mergePlus();
@@ -62,7 +62,7 @@ public class ItemAccumulator<V extends Budgeted > {
         @Override
         public void update(@NotNull BLink<V> v) {
             super.update(v);
-            v.get().getBudget().set(v); //TODO replace instance's budget on insert so this copy isnt necessary
+            v.get().budget().set(v); //TODO replace instance's budget on insert so this copy isnt necessary
         }
 
         @Override

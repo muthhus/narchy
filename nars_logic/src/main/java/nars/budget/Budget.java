@@ -20,7 +20,7 @@ public abstract class Budget extends BudgetedHandle {
 
 
     public static final BudgetMerge plus = (tgt, src, srcScale) -> {
-        float dp = src.getPriority() * srcScale;
+        float dp = src.pri() * srcScale;
 
         float currentPriority = tgt.getPriorityIfNaNThenZero();
 
@@ -35,10 +35,10 @@ public abstract class Budget extends BudgetedHandle {
         /* next proportion = 1 - cp */
         float np = 1.0f - cp;
 
-        float nextDur = cp * tgt.getDurability() + np * src.getDurability();
-        float nextQua = cp * tgt.getQuality() + np * src.getQuality();
+        float nextDur = cp * tgt.dur() + np * src.dur();
+        float nextQua = cp * tgt.qua() + np * src.qua();
 
-        assert Float.isFinite(nextDur) : "NaN dur: " + src + ' ' + tgt.getDurability();
+        assert Float.isFinite(nextDur) : "NaN dur: " + src + ' ' + tgt.dur();
         assert Float.isFinite(nextQua) : "NaN quality";
 
         tgt.budget( nextPri,nextDur,nextQua);
@@ -61,7 +61,7 @@ public abstract class Budget extends BudgetedHandle {
 
     public static String toString(@NotNull Budget b) {
 
-        return toStringBuilder(new StringBuilder(), Texts.n4(b.getPriority()), Texts.n4(b.getDurability()), Texts.n4(b.getQuality())).toString();
+        return toStringBuilder(new StringBuilder(), Texts.n4(b.pri()), Texts.n4(b.dur()), Texts.n4(b.qua())).toString();
     }
 
     @org.jetbrains.annotations.Nullable
@@ -101,13 +101,13 @@ public abstract class Budget extends BudgetedHandle {
     
     @NotNull
     @Override
-    public Budget getBudget() {
+    public Budget budget() {
         return this;
     }
 
     
     @Override
-    public abstract float getPriority();
+    public abstract float pri();
 
     
     @Override
@@ -122,28 +122,28 @@ public abstract class Budget extends BudgetedHandle {
 
     
     @Override
-    public abstract long getLastForgetTime();
+    public abstract long lastForgetTime();
 
     public void mulPriority(float factor) {
-        setPriority(getPriority() * factor);
+        setPriority(pri() * factor);
     }
 
     
     @Override
-    public abstract float getDurability();
+    public abstract float dur();
 
     public abstract void setDurability(float d);
 
     
     @Override
-    public abstract float getQuality();
+    public abstract float qua();
 
     public abstract void setQuality(float q);
 
     public boolean equalsByPrecision(@NotNull Budget t, float epsilon) {
-        return equal(getPriority(), t.getPriority(), epsilon) &&
-                equal(getDurability(), t.getDurability(), epsilon) &&
-                equal(getQuality(), t.getQuality(), epsilon);
+        return equal(pri(), t.pri(), epsilon) &&
+                equal(dur(), t.dur(), epsilon) &&
+                equal(qua(), t.qua(), epsilon);
     }
 
     /**
@@ -153,7 +153,7 @@ public abstract class Budget extends BudgetedHandle {
      * @param v The increasing percent
      */
     public void orPriority(float v) {
-        setPriority(or(getPriority(), v));
+        setPriority(or(pri(), v));
     }
 
     /**
@@ -163,9 +163,9 @@ public abstract class Budget extends BudgetedHandle {
         if (this == that) return;
 
         budget(
-                mean(getPriority(), that.getPriority()),
-                mean(getDurability(), that.getDurability()),
-                mean(getQuality(), that.getQuality())
+                mean(pri(), that.pri()),
+                mean(dur(), that.dur()),
+                mean(qua(), that.qua())
         );
     }
 
@@ -176,7 +176,7 @@ public abstract class Budget extends BudgetedHandle {
      * @return The summary value
      */
     public float summary() {
-        return aveGeo(getPriority(), getDurability(), getQuality());
+        return aveGeo(pri(), dur(), qua());
     }
 
     @NotNull
@@ -191,7 +191,7 @@ public abstract class Budget extends BudgetedHandle {
      * uses optimized aveGeoNotLessThan to avoid a cube root operation
      */
     public boolean summaryNotLessThan(float min) {
-        return min == 0f || aveGeoNotLessThan(min, getPriority(), getDurability(), getQuality());
+        return min == 0f || aveGeoNotLessThan(min, pri(), dur(), qua());
     }
 
 
@@ -209,7 +209,7 @@ public abstract class Budget extends BudgetedHandle {
      * @param v The increasing percent
      */
     public void orDurability(float v) {
-        setDurability(or(getDurability(), v));
+        setDurability(or(dur(), v));
     }
 
     /**
@@ -218,14 +218,14 @@ public abstract class Budget extends BudgetedHandle {
      * @param v The decreasing percent
      */
     public void andDurability(float v) {
-        setDurability(and(getDurability(), v));
+        setDurability(and(dur(), v));
     }
 
     /**
      * AND's (multiplies) priority with another value
      */
     public void andPriority(float v) {
-        setPriority(and(getPriority(), v));
+        setPriority(and(pri(), v));
     }
 
     /**
@@ -238,7 +238,7 @@ public abstract class Budget extends BudgetedHandle {
      */
     public boolean summaryGreaterOrEqual(float budgetThreshold) {
 
-        if (getDeleted()) return false;
+        if (isDeleted()) return false;
 
         /* since budget can only be positive.. */
         if (budgetThreshold <= 0) return true;
@@ -255,8 +255,8 @@ public abstract class Budget extends BudgetedHandle {
         if (source == null) {
             zero();
         } else {
-            budget(source.getPriority(), source.getDurability(), source.getQuality());
-            setLastForgetTime(source.getLastForgetTime());
+            budget(source.pri(), source.dur(), source.qua());
+            setLastForgetTime(source.lastForgetTime());
         }
 
         return this;
@@ -275,11 +275,11 @@ public abstract class Budget extends BudgetedHandle {
 
     @NotNull
     public BudgetedStruct budget(@NotNull BudgetedHandle source) {
-        return budget(source.getBudget());
+        return budget(source.budget());
     }
 
     public float getPriorityIfNaNThenZero() {
-        return Float.isFinite(getPriority()) ? getPriority() : 0;
+        return Float.isFinite(pri()) ? pri() : 0;
     }
 
     /**
@@ -296,9 +296,9 @@ public abstract class Budget extends BudgetedHandle {
     public StringBuilder toBudgetStringExternal(StringBuilder sb) {
         //return MARK + priority.toStringBrief() + SEPARATOR + durability.toStringBrief() + SEPARATOR + quality.toStringBrief() + MARK;
 
-        CharSequence priorityString = Texts.n2(getPriority());
-        CharSequence durabilityString = Texts.n2(getDurability());
-        CharSequence qualityString = Texts.n2(getQuality());
+        CharSequence priorityString = Texts.n2(pri());
+        CharSequence durabilityString = Texts.n2(dur());
+        CharSequence qualityString = Texts.n2(qua());
 
         return toStringBuilder(sb, priorityString, durabilityString, qualityString);
     }
@@ -314,7 +314,7 @@ public abstract class Budget extends BudgetedHandle {
     }
 
     public void set(@NotNull Budget b) {
-        budget(b.getPriority(), b.getDurability(), b.getQuality());
+        budget(b.pri(), b.dur(), b.qua());
     }
 
 }

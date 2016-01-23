@@ -7,28 +7,28 @@ public abstract class BudgetedHandle implements Budgeted {
 
 
     @Override
-    public boolean getDeleted() {
-        return Budget.getDeleted(getPriority());
+    public boolean isDeleted() {
+        return Budget.getDeleted(pri());
     }
 
     @Override
-    public float getPriority() {
-        return getBudget().getPriority();
+    public float pri() {
+        return budget().pri();
     }
 
     @Override
-    public float getDurability() {
-        return getBudget().getDurability();
+    public float dur() {
+        return budget().dur();
     }
 
     @Override
-    public float getQuality() {
-        return getBudget().getQuality();
+    public float qua() {
+        return budget().qua();
     }
 
     @Override
-    public long getLastForgetTime() {
-        return getBudget().getLastForgetTime();
+    public long lastForgetTime() {
+        return budget().lastForgetTime();
     }
 
     public abstract void setPriority(float p);

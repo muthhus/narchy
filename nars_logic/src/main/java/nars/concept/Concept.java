@@ -298,10 +298,9 @@ public interface Concept extends Termed, Comparable<Termed> {
 
     default boolean link(@NotNull Task task, float initialScale, @NotNull NAR nar) {
         float minScale =
-            nar.memory.taskLinkThreshold.floatValue() / task.getBudget().summary();
+            nar.memory.taskLinkThreshold.floatValue() / task.budget().pri();
 
-        if (!Float.isFinite(minScale)) return false;
-        return link(task, initialScale, minScale, nar);
+        return Float.isFinite(minScale) && link(task, initialScale, minScale, nar);
     }
 
     /**
@@ -317,7 +316,7 @@ public interface Concept extends Termed, Comparable<Termed> {
 
         link(otherTask, initialScale, nar);
 
-        Concept other = nar.conceptualize(otherTask, thisTask.getBudget(), initialScale);
+        Concept other = nar.conceptualize(otherTask, thisTask.budget(), initialScale);
         if (other == null)
             return;
 

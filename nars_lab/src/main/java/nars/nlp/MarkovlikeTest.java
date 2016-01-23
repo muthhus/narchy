@@ -46,7 +46,7 @@ public class MarkovlikeTest {
 
         Default d = new Default(1000,4,1,3);
 
-        d.core.conceptActivation.setValue(0.1f);
+        d.core.activationRate.setValue(0.1f);
 
         d.memory.duration.set(5);
         d.memory.conceptForgetDurations.setValue(1);

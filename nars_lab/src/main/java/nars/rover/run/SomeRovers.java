@@ -3,6 +3,8 @@ package nars.rover.run;
 import javassist.scopedpool.SoftValueHashMap;
 import nars.Global;
 import nars.Memory;
+import nars.NARLoop;
+import nars.guifx.demo.NARide;
 import nars.nar.Default;
 import nars.rover.RoverWorld;
 import nars.rover.Sim;
@@ -53,28 +55,31 @@ public class SomeRovers {
             Default nar = new Default(
                     new Memory(clock, new MapIndex2(
                         new SoftValueHashMap())),
-                        1600, conceptsFirePerCycle, 1, 2);
+                        1600, conceptsFirePerCycle, 2, 3);
 
-            nar.memory.DEFAULT_GOAL_PRIORITY = 0.7f;
+            nar.memory.DEFAULT_GOAL_PRIORITY = 0.8f;
             nar.memory.DEFAULT_GOAL_DURABILITY = 0.7f;
-            nar.memory.DEFAULT_QUESTION_PRIORITY = 0.7f;
+            nar.memory.DEFAULT_QUESTION_PRIORITY = 0.8f;
             nar.memory.DEFAULT_QUESTION_DURABILITY = 0.7f;
 
             nar.initNAL9();
 
-            nar.memory.perfection.setValue(0.2f);
+            nar.memory.perfection.setValue(0.1f);
             nar.core.confidenceDerivationMin.setValue(0.06f);
-            nar.core.conceptActivation.setValue(1f/conceptsFirePerCycle /* approxmimate */);
+            nar.core.activationRate.setValue(1f/conceptsFirePerCycle /* approxmimate */);
             nar.memory.duration.set(2);
             nar.memory.cyclesPerFrame.set(1);
 
 
-//            NARLoop tmp = nar.loop();
-//            new Thread(()-> {
-//                NARide.show(tmp, x -> {
-//                    tmp.stop();
-//                });
-//            }).start();
+            boolean gui = true;
+            if (gui) {
+                NARLoop tmp = nar.loop();
+                new Thread(() -> {
+                    NARide.show(tmp, x -> {
+                        tmp.stop();
+                    });
+                }).start();
+            }
 
 
 

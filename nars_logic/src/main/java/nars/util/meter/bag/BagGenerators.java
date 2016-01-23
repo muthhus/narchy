@@ -49,7 +49,7 @@ public enum BagGenerators {
 
                 BLink<CharSequence> overflow = f.put(k);
                 if (overflow!=null) {
-                    float p = overflow.getPriority();
+                    float p = overflow.pri();
                     nRemoved[0] = removal(nRemoved[0], p, count);
                 }
 
@@ -90,7 +90,7 @@ public enum BagGenerators {
 
                 int sizeAfter = f.size();
 
-                float p = f.get(t).getPriority();
+                float p = f.get(t).pri();
 
                 //String expected = (min + " > "+ p + " > " + max);
                 /*if (requireOrder) {

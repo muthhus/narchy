@@ -270,7 +270,7 @@ public class NarseseIRCBot extends IRCBot {
 
         nar = new Default(new Memory(new RealtimeMSClock(),
                 //TermIndex.memoryWeak(numConcepts * 2)
-                TermIndex.memory(1000)), 1024, 1, 3, 4);
+                TermIndex.memory(1000)), 1024, 1, 4, 3);
 
         output = new DigestBag.OutputBuffer(nar, 128);
 

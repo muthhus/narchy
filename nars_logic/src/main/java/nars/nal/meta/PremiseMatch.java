@@ -198,7 +198,7 @@ public class PremiseMatch extends FindSubst {
 //        }
 
         float derThresh = p.memory().derivationDurabilityThreshold.floatValue();
-        if (budget.getDurability() < derThresh)
+        if (budget.dur() < derThresh)
             return null;
 
 

@@ -153,7 +153,7 @@ public enum ThermostatTest2 {
 
                 //if (t.isJudgmentOrGoal()) return true;
 
-                return t.getBudget().summary() > 0.05;
+                return t.budget().summary() > 0.05;
                 //return t.getQuality() > 0.05;
                 //return true;
 

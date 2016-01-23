@@ -327,9 +327,9 @@ public class Memory extends Param {
         if (removalReason!=null)
             task.log(removalReason);
 
-        if (!task.getDeleted()) {
+        if (!task.isDeleted()) {
 
-            task.getBudget().delete();
+            task.budget().delete();
 
 
             /*if (Global.DEBUG_DERIVATION_STACKTRACES && Global.DEBUG_TASK_LOG)

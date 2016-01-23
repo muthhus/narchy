@@ -126,7 +126,7 @@ public abstract class Item<K> extends UnitBudget  {
     public static float getPrioritySum(@NotNull Iterable<? extends Item> c) {
         float totalPriority = 0;
         for (Item i : c)
-            totalPriority+=i.getPriority();
+            totalPriority+=i.pri();
         return totalPriority;
     }
     
@@ -141,7 +141,7 @@ public abstract class Item<K> extends UnitBudget  {
         E s = null;
         for (E i : c) {
             s = i;
-            r -= s.getPriority();
+            r -= s.pri();
             if (r < 0)
                 return s;
         }

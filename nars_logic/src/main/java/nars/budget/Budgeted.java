@@ -9,6 +9,6 @@ import org.jetbrains.annotations.NotNull;
 public interface Budgeted extends BudgetedStruct {
 
 	@NotNull
-	Budget getBudget();
+	Budget budget();
 
 }

@@ -88,9 +88,7 @@ public enum NARGraph1Test {
 
     public static void main(String[] args)  {
 
-
         Default n = new Default(1024,1,1,2);
-        n.memory.linkForgetDurations.setValue(4);
 
         NARide.show(n.loop(), ide -> {
 

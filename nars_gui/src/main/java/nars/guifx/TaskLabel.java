@@ -67,7 +67,7 @@ public class TaskLabel extends AutoLabel<Task> {
 
     @Override
     protected float getPriority(Task obj) {
-        return obj.getBudget().getPriorityIfNaNThenZero();
+        return obj.budget().getPriorityIfNaNThenZero();
     }
 
     public void enablePopupClickHandler(NAR nar) {

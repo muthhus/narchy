@@ -1,7 +1,6 @@
 package nars.rover.robot;
 
 import nars.NAR;
-import nars.budget.UnitBudget;
 import nars.concept.Concept;
 import nars.nal.Tense;
 import nars.rover.Material;
@@ -118,9 +117,9 @@ public abstract class AbstractPolygonBot extends Robotic {
         nar.believe("goal:{health}", Tense.Present, 0.5f, 0.9f); //reset
 
 
-        nar.input("$0.9$ <food <-> health>?");
-        nar.input("$0.9$ <goal <-> motor>?");
-        nar.input("$0.9$ <poison <-> health>?");
+        nar.input("<food <-> health>?");
+        nar.input("<goal <-> motor>?");
+        nar.input("<poison <-> health>?");
 
         try {
             if (mission == 0) {
@@ -382,9 +381,9 @@ public abstract class AbstractPolygonBot extends Robotic {
             return getClass().getSimpleName() + '[' + concept + ']';
         }
 
-        public void setFeedback(boolean feedback) {
-            this.feedbackEnabled = feedback;
-        }
+//        public void setFeedback(boolean feedback) {
+//            this.feedbackEnabled = feedback;
+//        }
 
         public float getDesireIfConceptMissing() { return 0; }
 
@@ -414,7 +413,7 @@ public abstract class AbstractPolygonBot extends Robotic {
 
         public Task getFeedback(float feedback) {
             //since it's expectation, using 0.99 conf is like preserving the necessary truth as was desired, if feedback = desire
-            return new MutableTask(term).present(nar.memory).belief().truth(feedback, 0.99f);
+            return new MutableTask(term).present(nar.memory).belief().truth(feedback, 0.9f);
         }
 
         public Concept getConcept() {
@@ -423,10 +422,6 @@ public abstract class AbstractPolygonBot extends Robotic {
                 concept = nar.concept(term);
             }
 
-            //try remembering it
-            if (concept == null) {
-                concept = nar.conceptualize(term, new UnitBudget(0.5f,0.5f,0.5f), 1f);
-            }
 
             return concept;
         }

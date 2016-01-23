@@ -128,20 +128,22 @@ public class CurveBagTest  {
         a.put("x", new UnitBudget(0.1f, 0.5f, 0.5f), 0.5f);
         a.commit();
 
-        assertEquals(0.15, a.get("x").getPriority(), 0.001f);
+        assertEquals(0.15, a.get("x").pri(), 0.001f);
 
         a.put("y", new UnitBudget(0.1f, 0.5f, 0.5f));
         a.put("y", new UnitBudget(0.1f, 0.5f, 0.5f), 0.5f);
         a.put("y", new UnitBudget(0.1f, 0.5f, 0.5f), 0.25f);
         a.commit();
 
-        assertEquals(0.175, a.get("y").getPriority(), 0.001f);
+        assertEquals(0.175, a.get("y").pri(), 0.001f);
 
     }
 
     @Test public void testDistribution() {
         Default n = new Default(48, 4, 2, 4);
-        n.memory.linkForgetDurations.setValue(100);
+        n.memory.conceptForgetDurations.setValue(100);
+        n.memory.termLinkForgetDurations.setValue(100);
+        n.memory.taskLinkForgetDurations.setValue(100);
         n.memory.perfection.setValue(1f);
         n.input("$1$ a:b.");
         n.input("$1$ b:c.");
@@ -193,7 +195,7 @@ public class CurveBagTest  {
     private EmpiricalDistribution getPriorityDistribution(Bag b, int n) {
         DoubleArrayList f = new DoubleArrayList(n);
         for (int i = 0; i < n; i++)
-            f.add( b.sample().getPriority() );
+            f.add( b.sample().pri() );
         EmpiricalDistribution e =new EmpiricalDistribution(10 /* bins */);
         e.load(f.toArray());
         return e;

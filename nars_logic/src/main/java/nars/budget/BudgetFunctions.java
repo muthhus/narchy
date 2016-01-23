@@ -86,8 +86,8 @@ public final class BudgetFunctions extends UtilityFunctions {
 			}*/
 		}
 
-		float priority = or(dif, tb.getPriority());
-		float durability = aveAri(dif, tb.getDurability());
+		float priority = or(dif, tb.pri());
+		float durability = aveAri(dif, tb.dur());
 		float quality = truthToQuality(conclusion);
 
 		/*
@@ -334,17 +334,17 @@ public final class BudgetFunctions extends UtilityFunctions {
         BLink<Task> taskLink = nal.taskLink;
 
         Budget t =
-            (taskLink !=null) ? taskLink :  nal.getTask().getBudget();
+            (taskLink !=null) ? taskLink :  nal.getTask().budget();
 
 
-        float priority = t.getPriority();
-        float durability = t.getDurability() * complexityFactor;
+        float priority = t.pri();
+        float durability = t.dur() * complexityFactor;
         final float quality = qual * complexityFactor;
 
         BLink<Termed> termLink = nal.termLink;
-        if ((termLink!=null) && (!termLink.getDeleted())) {
-            priority = or(priority, termLink.getPriority());
-            durability = and(durability, termLink.getDurability()); //originaly was 'AND'
+        if ((termLink!=null) && (!termLink.isDeleted())) {
+            priority = or(priority, termLink.pri());
+            durability = and(durability, termLink.dur()); //originaly was 'AND'
 
             NAR nar = nal.nar;
             final float targetActivation = nar.conceptPriority(termLink.get(), 0);

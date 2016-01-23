@@ -136,7 +136,7 @@ public class LogicMeter extends FrameReaction {
         @Override
         public void accept(@NotNull I c) {
 
-            double p = c.getPriority();
+            double p = c.pri();
 
             //TODO totalGoals...
             //TODO totalQuests...

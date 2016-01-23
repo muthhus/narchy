@@ -29,7 +29,7 @@ public interface Perception extends Consumer<Source<Task>>,Supplier<Task> {
     default Task pop(float minPriority) {
         Task t;
         while ((t = get())!=null) {
-            if (t.getPriority() >= minPriority)
+            if (t.pri() >= minPriority)
                 return t;
         }
         return null;

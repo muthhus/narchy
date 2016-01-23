@@ -608,7 +608,7 @@ public class NARide extends BorderPane {
                 Iterable<X> si = source.get();
 
                 for (X i : si) {
-                    Budget b = i.getBudget();
+                    Budget b = i.budget();
 
                     int c = i.hashCode();
                     Color f = NARfx.hashColor(c, b.summary(), Plot2D.ca);

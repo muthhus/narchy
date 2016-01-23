@@ -27,7 +27,7 @@ public enum NARideRealtimeDefault {
                 )*/
             //)
         );
-        Default nar = new Default(mem, 1024, 1, 1, 3);
+        Default nar = new Default(mem, 1024, 1, 3, 1);
         //nar.nal(9);
         nar.setTaskLinkBagSize(32);
         nar.setTermLinkBagSize(128);

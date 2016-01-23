@@ -410,7 +410,7 @@ public class DerivationGraph extends DirectedPseudograph<DerivationGraph.Keyed,O
         String s = genericString(t, unique, now, includeDerivedTruth);
 
         if (includeDerivedBudget)
-            tempTaskString.append(t.getBudget().toBudgetString());
+            tempTaskString.append(t.budget().toBudgetString());
 
         tempTaskString.append(s);
 

@@ -30,7 +30,7 @@ public class ItemAccumulatorTest {
         assertEquals(0, ii.getArrayBag().size());
 
         Task t = n.task("$0.1$ <a --> b>. %1.00;0.90%");
-        assertEquals(0.1f, t.getPriority(), 0.001);
+        assertEquals(0.1f, t.pri(), 0.001);
 
         ii.getArrayBag().put(t);
         assertEquals(1, ii.getArrayBag().size());
@@ -43,7 +43,7 @@ public class ItemAccumulatorTest {
         ii.getArrayBag().forEach(c -> System.out.println(c));
 
         //mergePlus:
-        assertEquals(0.1f+0.1f, ii.getArrayBag().sample().getPriority(), 0.001f);
+        assertEquals(0.1f+0.1f, ii.getArrayBag().sample().pri(), 0.001f);
 
     }
 
@@ -120,7 +120,7 @@ public class ItemAccumulatorTest {
         MutableDouble prev = new MutableDouble(Double.POSITIVE_INFINITY);
 
         ii.getArrayBag().forEach( (Budgeted t) -> {
-            float p = t.getBudget().getPriority();
+            float p = t.budget().pri();
             assertTrue(p <= prev.floatValue()); //decreasing
             prev.set(p);
         });

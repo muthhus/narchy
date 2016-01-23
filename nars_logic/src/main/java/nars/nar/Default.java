@@ -59,10 +59,10 @@ public class Default extends AbstractNAR {
                 //TermIndex.memoryWeak(numConcepts * 2)
                 TermIndex.memory(numConcepts * 2)
 
-        ), numConcepts, conceptsFirePerCycle, termlinkFirePerConcept, tasklinkFirePerConcept);
+        ), numConcepts, conceptsFirePerCycle, tasklinkFirePerConcept, termlinkFirePerConcept);
     }
 
-    public Default(@NotNull Memory mem, int activeConcepts, int conceptsFirePerCycle, int termLinksPerConcept, int taskLinksPerConcept) {
+    public Default(@NotNull Memory mem, int activeConcepts, int conceptsFirePerCycle, int taskLinksPerConcept, int termLinksPerConcept) {
         super(mem);
 
         the("input", input = initInput());
@@ -168,7 +168,7 @@ public class Default extends AbstractNAR {
         if (cc != null) {
             BLink<Concept> c = core.active.get(cc);
             if (c != null)
-                return c.getPriority();
+                return c.pri();
         }
         return priIfNonExistent;
     }
@@ -191,8 +191,8 @@ public class Default extends AbstractNAR {
 
 
     public static final Predicate<BLink<?>> simpleForgetDecay = (b) -> {
-        float p = b.getPriority() * 0.95f;
-        if (p > b.getQuality()*0.1f)
+        float p = b.pri() * 0.95f;
+        if (p > b.qua()*0.1f)
             b.setPriority(p);
         return true;
     };
@@ -222,13 +222,16 @@ public class Default extends AbstractNAR {
         public final MutableInteger termlinksFiredPerFiredConcept = new MutableInteger(1);
 
         @Range(min=0.0f,max=1.0,unit="Percent")
-        public final MutableFloat conceptActivation = new MutableFloat(1);
+        public final MutableFloat activationRate;
 
         @Range(min=0.01f,max=8,unit="Duration")
         public final MutableFloat conceptRemembering;
 
         @Range(min=0.01f,max=8,unit="Duration")
-        public final MutableFloat linkRemembering;
+        public final MutableFloat termLinkRemembering;
+
+        @Range(min=0.01f,max=8,unit="Duration")
+        public final MutableFloat taskLinkRemembering;
 
         //public final MutableFloat activationFactor = new MutableFloat(1.0f);
 
@@ -287,8 +290,10 @@ public class Default extends AbstractNAR {
 
             Memory m = nar.memory;
 
+            this.activationRate = m.activationRate;
             this.conceptRemembering = m.conceptForgetDurations;
-            this.linkRemembering = m.linkForgetDurations;
+            this.termLinkRemembering = m.termLinkForgetDurations;
+            this.taskLinkRemembering = m.taskLinkForgetDurations;
             this.perfection = m.perfection;
 
             conceptsFiredPerCycle = new MutableInteger(1);
@@ -299,9 +304,9 @@ public class Default extends AbstractNAR {
                 m.eventReset.on((mem) -> onReset())
             );
 
-            taskLinkForget = new AlannForget(nar, m.linkForgetDurations, perfection);
-            termLinkForget = new AlannForget(nar, m.linkForgetDurations, perfection);
-            conceptForget = new AlannForget(nar, m.conceptForgetDurations, perfection);
+            taskLinkForget = new AlannForget(nar, taskLinkRemembering, perfection);
+            termLinkForget = new AlannForget(nar, termLinkRemembering, perfection);
+            conceptForget = new AlannForget(nar, conceptRemembering, perfection);
         }
 
         protected void onCycle(Memory memory) {
@@ -361,8 +366,8 @@ public class Default extends AbstractNAR {
 
         }
 
-        public final void activate(Concept c, Budget b, float scale) {
-            active.put(c, b, scale * conceptActivation.floatValue());
+        final void activate(Concept c, Budget b, float scale) {
+            active.put(c, b, scale * activationRate.floatValue());
         }
 
         /** fires a concept selected by the bag */
@@ -414,9 +419,9 @@ public class Default extends AbstractNAR {
                 float relativeThreshold = perfectionCached;
 
                 float expDecayed = currentPriority * (float) Math.exp(
-                        -((1.0f - budget.getDurability()) / forgetTimeCached) * dt
+                        -((1.0f - budget.dur()) / forgetTimeCached) * dt
                 );
-                float threshold = budget.getQuality() * relativeThreshold;
+                float threshold = budget.qua() * relativeThreshold;
 
                 float nextPriority = expDecayed;
                 if (nextPriority < threshold) nextPriority = threshold;
@@ -506,7 +511,7 @@ public class Default extends AbstractNAR {
             if (!buffer.isEmpty()) {
                 Task.inputNormalized( buffer,
                         //p.getMeanPriority()
-                        p.getTask().getPriority()
+                        p.getTask().pri()
 
                         //p.getTask().getPriority() * 1f/buffer.size()
                         //p.getTask().getPriority()/buffer.size()

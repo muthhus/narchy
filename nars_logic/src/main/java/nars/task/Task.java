@@ -133,7 +133,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     static float prioritySum(@NotNull Iterable<? extends Budgeted > dd) {
         float f = 0;
         for (Budgeted  x : dd)
-            f += x.getPriority();
+            f += x.pri();
         return f;
     }
 
@@ -484,7 +484,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
 
         if (showBudget) {
-            getBudget().toBudgetStringExternal(buffer).append(' ');
+            budget().toBudgetStringExternal(buffer).append(' ');
         }
 
         buffer.append(contentName).append(punc());
@@ -637,15 +637,15 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         if (!Float.isFinite(factor))
             throw new RuntimeException("NaN");
 
-        derived.forEach(t -> t.getBudget().mulPriority(factor));
+        derived.forEach(t -> t.budget().mulPriority(factor));
     }
 
     static void normalize(@NotNull Iterable<Task> derived, float premisePriority) {
-        derived.forEach(t -> t.getBudget().mulPriority(premisePriority));
+        derived.forEach(t -> t.budget().mulPriority(premisePriority));
     }
     static void inputNormalized(@NotNull Iterable<Task> derived, float premisePriority, @NotNull Consumer<Task> target) {
         derived.forEach(t -> {
-            t.getBudget().mulPriority(premisePriority);
+            t.budget().mulPriority(premisePriority);
             target.accept(t);
         });
     }

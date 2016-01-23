@@ -181,7 +181,7 @@ public class TreePane extends BorderPane {
     }
 
     private boolean visible(Task k) {
-        return k.getPriority() >= minPriority.get();
+        return k.pri() >= minPriority.get();
     }
 
     final Function<Task, AutoLabel> newLabel;

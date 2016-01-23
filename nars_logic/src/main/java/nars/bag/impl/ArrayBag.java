@@ -63,7 +63,7 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
         //TODO combine with CurveBag.put(v)
         BLink<V> existing = get(v);
         if (existing!=null) {
-            merge(existing.getBudget(),
+            merge(existing.budget(),
                     getDefaultBudget(v), 1f);
             return existing;
         } else {
@@ -95,7 +95,7 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
 
     private Budget getDefaultBudget(V v) {
         if (v instanceof Budgeted)
-            return ((Budgeted)v).getBudget();
+            return ((Budgeted)v).budget();
         return UnitBudget.zero;
     }
 
@@ -326,13 +326,13 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
     @Override
     public float getPriorityMax() {
         if (isEmpty()) return 0;
-        return items.getFirst().getPriority();
+        return items.getFirst().pri();
     }
 
     @Override
     public float getPriorityMin() {
         if (isEmpty()) return 0;
-        return items.getLast().getPriority();
+        return items.getLast().pri();
     }
 
     public final void popAll(@NotNull Consumer<BLink<V>> receiver) {
@@ -358,7 +358,7 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
         }
 
         @Override public float score(@NotNull X v) {
-            return v.getPriority();
+            return v.pri();
         }
     }
 }

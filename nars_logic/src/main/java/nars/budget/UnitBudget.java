@@ -139,7 +139,7 @@ public class UnitBudget extends Budget {
      * @return The current priority
      */
     @Override
-    public final float getPriority() {
+    public final float pri() {
         return priority;
     }
 
@@ -168,7 +168,7 @@ public class UnitBudget extends Budget {
      * @return The current durability
      */
     @Override
-    public final float getDurability() {
+    public final float dur() {
         return durability;
     }
 
@@ -191,7 +191,7 @@ public class UnitBudget extends Budget {
      * @return The current quality
      */
     @Override
-    public final float getQuality() {
+    public final float qua() {
         return quality;
     }
 
@@ -258,7 +258,7 @@ public class UnitBudget extends Budget {
     }
 
     @Override
-    public long getLastForgetTime() {
+    public long lastForgetTime() {
         return lastForgetTime;
     }
 

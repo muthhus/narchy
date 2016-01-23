@@ -117,7 +117,7 @@ public class AtomConcept extends AbstractConcept  {
     @Override public final boolean link(@NotNull Task t, float scale, float minScale, @NotNull NAR nar) {
 
         //activate tasklink locally
-        Budget taskBudget = t.getBudget();
+        Budget taskBudget = t.budget();
 
         taskLinks.put(t, taskBudget, scale);
 
@@ -134,11 +134,8 @@ public class AtomConcept extends AbstractConcept  {
         for (Termed linkTemplate : templates) {
 
             Concept templateConcept = nar.conceptualize(linkTemplate, taskBudget, subScale);
-            if (templateConcept == null) {
-                continue;
-            }
-
-            linkTemplate(t, templateConcept, taskBudget, minScale, subScale, nar);
+            if (templateConcept != null)
+                linkTemplate(t, templateConcept, taskBudget, minScale, subScale, nar);
 
         }
 
@@ -149,14 +146,15 @@ public class AtomConcept extends AbstractConcept  {
 
     protected final void linkTemplate(@NotNull Task t, @NotNull Concept target, Budget b, float minScale, float subScale, @NotNull NAR nar) {
 
-        /** recursively activate the template's task tlink */
-        target.link(t, subScale, minScale, nar);
 
         /** activate local's termlink to template */
         termLinks.put(target, b, subScale);
 
         /** activate (reverse) template's termlink to local */
         target.getTermLinks().put(this, b, subScale);
+
+        /** recursively activate the template's task tlink */
+        target.link(t, subScale, minScale, nar);
     }
 
 

@@ -87,7 +87,7 @@ public abstract class AbstractTask extends Item<Task>
     /** copy/clone constructor */
     public AbstractTask(@NotNull Task task) {
         this(task, task.punc(), task.truth(),
-                task.getPriority(), task.getDurability(), task.getQuality(),
+                task.pri(), task.dur(), task.qua(),
                 task.getParentTaskRef(), task.getParentBeliefRef());
         setEvidence(task.evidence());
     }
@@ -141,7 +141,7 @@ public abstract class AbstractTask extends Item<Task>
 //            return this;
 //        }
 
-        if (getDeleted())
+        if (isDeleted())
             return null;
 
         Term t = term();
@@ -207,7 +207,7 @@ public abstract class AbstractTask extends Item<Task>
         //---- VALID TASK BEYOND THIS POINT
 
         /** NaN quality is a signal that a budget's values need initialized */
-        if (!Float.isFinite(getQuality())) {
+        if (!Float.isFinite(qua())) {
             //HACK for now just assume that only MutableTask supports unbudgeted input
             memory.applyDefaultBudget((MutableTask)this);
         }

@@ -45,7 +45,7 @@ public class ConceptsSource extends GraphSource {
     private String keywordFilter = null;
     private final Predicate<BLink<Concept>> eachConcept = cc -> {
 
-        float p = cc.getPriority();
+        float p = cc.pri();
         if ((p < _minPri) || (p > _maxPri))
             return true;
 
@@ -75,7 +75,7 @@ public class ConceptsSource extends GraphSource {
     public void updateEdge(TermEdge ee, Object link) {
         //rolling average
         ee.pri = lerp(
-                ((BLink)link).getPriority(), ee.pri,
+                ((BLink)link).pri(), ee.pri,
                       0.1f);
     }
 

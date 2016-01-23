@@ -61,7 +61,7 @@ public abstract class AbstractNAR extends NAR {
 
         rng = new XorShift128PlusRandom(1);
 
-        initDefaults(memory);
+        initDefaults();
 
 
     }
@@ -119,9 +119,9 @@ public abstract class AbstractNAR extends NAR {
 
 
 
-    public void initDefaults(@NotNull Memory m) {
-        //parameter defaults
+    protected void initDefaults() {
 
+        final Memory m = this.memory;
         setTaskLinkBagSize(12);
         setTermLinkBagSize(16);
 
@@ -132,7 +132,8 @@ public abstract class AbstractNAR extends NAR {
         m.conceptQuestionsMax.set(3);
 
         m.conceptForgetDurations.setValue(2.0);
-        m.linkForgetDurations.setValue(3.0);
+        m.termLinkForgetDurations.setValue(5.0);
+        m.taskLinkForgetDurations.setValue(3.0);
 
         m.derivationDurabilityThreshold.setValue(Global.BUDGET_DERIVATION_DURABILITY_THRESHOLD);
 

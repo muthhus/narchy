@@ -45,7 +45,7 @@ public class TestChamber {
                 )*/
 
         );
-        Default nar = new Default(mem, 4096, 100, 1, 3);
+        Default nar = new Default(mem, 4096, 100, 3, 1);
 
         //nar.nal(9);
         nar.setTaskLinkBagSize(32);

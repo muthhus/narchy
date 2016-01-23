@@ -11,7 +11,7 @@ public interface BudgetMerge {
 
 
     BudgetMerge plusDQDominated = (tgt, src, srcScale) -> {
-        float nextPriority = src.getPriority() * srcScale;
+        float nextPriority = src.pri() * srcScale;
 
         float currentPriority = tgt.getPriorityIfNaNThenZero();
 
@@ -21,14 +21,14 @@ public interface BudgetMerge {
         boolean currentWins = currentPriority > nextPriority;
 
         tgt.budget( sumPriority,
-                (currentWins ? tgt.getDurability() : src.getDurability()),
-                (currentWins ? tgt.getQuality() : src.getQuality()));
+                (currentWins ? tgt.dur() : src.dur()),
+                (currentWins ? tgt.qua() : src.qua()));
     };
     /** add priority, interpolate durability and quality according to the relative change in priority
      *  WARNING untested
      * */
     BudgetMerge plusDQInterp = (tgt, src, srcScale) -> {
-        float dp = src.getPriority() * srcScale;
+        float dp = src.pri() * srcScale;
 
         float currentPriority = tgt.getPriorityIfNaNThenZero();
 
@@ -44,11 +44,11 @@ public interface BudgetMerge {
         float np = 1.0f - cp;
 
 
-        float nextDur = (cp * tgt.getDurability()) + (np * src.getDurability());
-        float nextQua = (cp * tgt.getQuality()) + (np * src.getQuality());
+        float nextDur = (cp * tgt.dur()) + (np * src.dur());
+        float nextQua = (cp * tgt.qua()) + (np * src.qua());
 
         if (!Float.isFinite(nextDur))
-            throw new RuntimeException("NaN dur: " + src + ' ' + tgt.getDurability());
+            throw new RuntimeException("NaN dur: " + src + ' ' + tgt.dur());
         if (!Float.isFinite(nextQua))
             throw new RuntimeException("NaN quality");
 

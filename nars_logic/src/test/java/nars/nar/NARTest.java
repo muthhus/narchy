@@ -62,7 +62,7 @@ public class NARTest {
 
         //a new nar with the same memory is allowed to
         //take control of it after the first stops
-        AbstractNAR nar2 = new Default(nar.memory, 1000, 1, 1, 3);
+        AbstractNAR nar2 = new Default(nar.memory, 1000, 1, 3, 1);
 
         assertTrue(nar2.memory.time() > 1);
 

@@ -108,7 +108,7 @@ public class CurveBag<V> implements Bag<V> {
             BLink<V> i = remove ?
                     b.removeItem(index) : b.getItem(index);
 
-            if (!i.getBudget().getDeleted()) {
+            if (!i.budget().isDeleted()) {
                 return i;
             }
 

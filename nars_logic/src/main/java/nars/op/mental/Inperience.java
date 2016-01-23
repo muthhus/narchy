@@ -10,8 +10,8 @@ import nars.term.Term;
 import nars.term.compound.Compound;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -39,8 +39,6 @@ public class Inperience {
 //    //internal experience has less priority?
 //    public static float INTERNAL_EXPERIENCE_PRIORITY_MUL = 0.1f; //0.1
 
-    @Deprecated
-    public static boolean enabled = true;
     @NotNull
     private final NAR nar;
 
@@ -49,7 +47,7 @@ public class Inperience {
      *  original value: 0.66
      * */
     @NotNull
-    public AtomicDouble conceptCreationExpectation = new AtomicDouble(0.66);
+    public final AtomicDouble conceptCreationExpectation = new AtomicDouble(0.66);
 
 
 //    public boolean isEnableWantBelieve() {
@@ -94,16 +92,6 @@ public class Inperience {
     };
 
 
-
-
-    /**
-     * whether it is full internal experience, or minimal (false)
-     */
-    public boolean isFull() {
-        return true;
-    }
-
-
     public static boolean random(@NotNull Random r, float prob, int volume) {
         return r.nextFloat()*volume <= prob;
     }
@@ -126,7 +114,7 @@ public class Inperience {
                 nonInnate(task, belief, p, randomNonInnate(r) );
             }
 
-            if (belief.term().op().isImplication() &&
+            if (belief.op().isImplication() &&
                     random(r, INTERNAL_EXPERIENCE_PROBABILITY, vol) ) {
                 internalizeImplication(task, belief, p);
             }
@@ -134,7 +122,8 @@ public class Inperience {
     }
 
 
-    public static Compound toTerm(@NotNull Task s, Term self, float conceptCreationExpectation) {
+    @Nullable
+    public static Compound reify(@NotNull Task s, Term self, float conceptCreationExpectation) {
         Operator opTerm;
         switch (s.punc()) {
             case Symbols.JUDGMENT:
@@ -164,9 +153,9 @@ public class Inperience {
         arg[k] = self;
 
         Compound operation = $.exec(opTerm, arg);
-        if (operation == null) {
-            throw new RuntimeException("Unable to create Inheritance: " + opTerm + ", " + Arrays.toString(arg));
-        }
+//        if (operation == null) {
+//            throw new RuntimeException("Unable to create Inheritance: " + opTerm + ", " + Arrays.toString(arg));
+//        }
         return operation;
     }
 
@@ -197,7 +186,7 @@ public class Inperience {
         // if(OLD_BELIEVE_WANT_EVALUATE_WONDER_STRATEGY ||
         //         (!OLD_BELIEVE_WANT_EVALUATE_WONDER_STRATEGY && (task.sentence.punctuation==Symbols.QUESTION || task.sentence.punctuation==Symbols.QUEST))) {
         //char punc = task.getPunctuation();
-        Budget b = task.getBudget();
+        Budget b = task.budget();
         if (task.isQuestOrQuestion()) {
             if (b.summaryLessThan(MINIMUM_BUDGET_SUMMARY_TO_CREATE_WONDER_EVALUATE)) {
                 return;
@@ -212,7 +201,7 @@ public class Inperience {
             return;
         }
 
-        Compound ret = toTerm(task, self, conceptCreationExpectation.floatValue());
+        Compound ret = reify(task, self, conceptCreationExpectation.floatValue());
         if (ret == null) {
             return;
         }
@@ -259,12 +248,15 @@ public class Inperience {
 
 
             if (valid) {
-                //long interval = (impsub instanceof Interval ? ((Interval)impsub).duration() : 0);
-                int interval = 0;
+                Compound c = $.exec(anticipate, beliefTerm.term(1));
+                if (c!=null) {
+                    //long interval = (impsub instanceof Interval ? ((Interval)impsub).duration() : 0);
+                    //int interval = 0;
 
-                beliefReasonDerive(task, belief,
-                        $.exec(anticipate, beliefTerm.term(1)),
-                        nal, interval);
+                    beliefReasonDerive(task, belief,
+                            c,
+                            nal, 0);
+                }
             }
         }
     }

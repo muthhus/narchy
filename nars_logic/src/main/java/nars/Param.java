@@ -81,10 +81,15 @@ public abstract class Param extends Container implements Level {
     //@Deprecated public final MutableFloat termLinkForgetDurations = new MutableFloat();
     
     /** TaskLink decay rate in TaskLinkBag, in [1, 99]. originally: TASK_LINK_FORGETTING_CYCLE */
-    public final MutableFloat linkForgetDurations = new MutableFloat();
+    public final MutableFloat termLinkForgetDurations = new MutableFloat();
+
+    public final MutableFloat taskLinkForgetDurations = new MutableFloat();
 
     public final MutableFloat conceptForgetDurations = new MutableFloat();
-    
+
+    /** base activation factor */
+    public final MutableFloat activationRate = new MutableFloat(1f);
+
 
      /*
      BUDGET THRESHOLDS
@@ -152,7 +157,7 @@ public abstract class Param extends Container implements Level {
         if (t.isJudgmentOrGoal()) {
 
             /** if q was not specified, and truth is, then we can calculate q from truthToQuality */
-            if (!Float.isFinite(t.getQuality())) {
+            if (!Float.isFinite(t.qua())) {
                 t.setQuality(BudgetFunctions.truthToQuality(t.truth()));
             }
         } else if (t.isQuestion()) {

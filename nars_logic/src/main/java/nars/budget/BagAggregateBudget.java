@@ -31,7 +31,7 @@ public class BagAggregateBudget extends Budget {
     }
 
     @Override
-    public float getPriority() {
+    public float pri() {
         return pri;
     }
 
@@ -62,9 +62,9 @@ public class BagAggregateBudget extends Budget {
     private void refreshMax() {
         float totalPri = 0, totalDur = 0, totalQua = 0;
         for (BudgetedStruct b : budgets) {
-            totalPri = Math.max(b.getPriority(), totalPri);
-            totalDur = Math.max(b.getDurability(), totalDur);
-            totalQua = Math.max(b.getQuality(), totalQua);
+            totalPri = Math.max(b.pri(), totalPri);
+            totalDur = Math.max(b.dur(), totalDur);
+            totalQua = Math.max(b.qua(), totalQua);
         }
 
         //System.out.println(getLastForgetTime() + " " + this);
@@ -78,9 +78,9 @@ public class BagAggregateBudget extends Budget {
         float totalPri = 0, totalDur = 0, totalQua = 0;
         int n = 0;
         for (BudgetedStruct b : budgets) {
-            totalPri += b.getPriority();
-            totalDur += b.getDurability();
-            totalQua += b.getQuality();
+            totalPri += b.pri();
+            totalDur += b.dur();
+            totalQua += b.qua();
             n++;
         }
 
@@ -99,7 +99,7 @@ public class BagAggregateBudget extends Budget {
     }
 
     @Override
-    public long getLastForgetTime() {
+    public long lastForgetTime() {
         return time;
     }
 
@@ -109,7 +109,7 @@ public class BagAggregateBudget extends Budget {
     }
 
     @Override
-    public float getDurability() {
+    public float dur() {
         return dur;
     }
 
@@ -119,7 +119,7 @@ public class BagAggregateBudget extends Budget {
     }
 
     @Override
-    public float getQuality() {
+    public float qua() {
         return qua;
     }
 

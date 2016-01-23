@@ -112,7 +112,7 @@ public class Execution implements Runnable {
      */
     protected void noticeExecuted(@NotNull Task operation) {
 
-        Budget b = !operation.getDeleted() ? operation.getBudget() : UnitBudget.zero;
+        Budget b = !operation.isDeleted() ? operation.budget() : UnitBudget.zero;
 
         Memory memory = nar.memory;
 

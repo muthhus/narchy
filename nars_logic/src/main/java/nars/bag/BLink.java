@@ -50,7 +50,7 @@ public final class BLink<X> extends Budget implements Link<X> {
         this.lastForget = Tense.TIMELESS;
 
 
-        init(c.getPriority() * scale, c.getDurability(), c.getQuality());
+        init(c.pri() * scale, c.dur(), c.qua());
     }
 
     public void init(float p, float d, float q) {
@@ -74,11 +74,11 @@ public final class BLink<X> extends Budget implements Link<X> {
     }
 
     @Override public final float getScore() {
-        return getPriority();
+        return pri();
     }
 
     @Override
-    public final float getPriority() {
+    public final float pri() {
         return b[0];
     }
 
@@ -89,7 +89,7 @@ public final class BLink<X> extends Budget implements Link<X> {
     }
 
     @Override
-    public float getDurability() {
+    public float dur() {
         return b[1];
     }
 
@@ -100,7 +100,7 @@ public final class BLink<X> extends Budget implements Link<X> {
     }
 
     @Override
-    public float getQuality() {
+    public float qua() {
         return b[2];
     }
 
@@ -125,7 +125,7 @@ public final class BLink<X> extends Budget implements Link<X> {
     }
 
     @Override
-    public long getLastForgetTime() {
+    public long lastForgetTime() {
         return lastForget;
     }
 

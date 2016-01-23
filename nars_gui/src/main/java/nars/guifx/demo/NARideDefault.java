@@ -25,7 +25,7 @@ public enum NARideDefault {
                         clock,
                         //TermIndex.memoryGuava(clock, 100)),
                         memoryWeak(1024 * 128)),
-                1024, 1, 2, 3);
+                1024, 1, 3, 2);
         //new Inperience(n);
 
         NARide.show(n.loop(), (i) -> {

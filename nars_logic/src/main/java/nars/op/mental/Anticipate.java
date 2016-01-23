@@ -217,7 +217,7 @@ public final class Anticipate {
             return occur > occurrTime - TOLERANCE_DIV && occur < occurrTime + TOLERANCE_DIV;
         }
 
-        public float getPriority() { return task.getPriority(); }
+        public float getPriority() { return task.pri(); }
 
         @Override
         public int hashCode() {
@@ -232,7 +232,7 @@ public final class Anticipate {
         }
 
         public Budget getBudget() {
-            return task.getBudget();
+            return task.budget();
         }
     }
 }

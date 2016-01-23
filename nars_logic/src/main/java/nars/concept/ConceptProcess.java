@@ -83,7 +83,7 @@ public final class ConceptProcess implements Premise {
         Task belief = null;
         if ((beliefConcept != null) && (beliefConcept.hasBeliefs())) {
             belief = beliefConcept.getBeliefs().top(nar.time());
-            if (belief == null || belief.getDeleted()) {
+            if (belief == null || belief.isDeleted()) {
                 throw new RuntimeException("deleted belief: " + belief + " " + beliefConcept.hasBeliefs());
             }
 
@@ -158,7 +158,7 @@ public final class ConceptProcess implements Premise {
 
     public int getMaxMatches() {
         final float min = Global.MIN_TERMUTATIONS_PER_MATCH, max = Global.MAX_TERMUTATIONS_PER_MATCH;
-        return (int)Math.ceil(getTask().getPriority() * (max-min) + min);
+        return (int)Math.ceil(getTask().pri() * (max-min) + min);
     }
 
 //    /** max(tasktime, belieftime) */

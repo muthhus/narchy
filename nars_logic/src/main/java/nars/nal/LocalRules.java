@@ -116,9 +116,9 @@ public enum LocalRules {
      */
     public static void forEachSolution(@NotNull Task question, @NotNull Task sol, @NotNull NAR nal, @NotNull Consumer<Task> eachSolutions) {
 
-        if (sol.getDeleted()) {
-            throw new RuntimeException("proposedBelief " + sol + " deleted or null");
-        }
+        if (sol.isDeleted())
+            return;
+
 
 //        float om = Tense.orderMatch(question, solution, nal.memory.duration());
 //
@@ -138,7 +138,7 @@ public enum LocalRules {
         Consumer<Term> proc = (st) -> {
 
             //seems its possible for the solution to become deleted in-between executions of this lambda
-            if (sol.getDeleted())
+            if (sol.isDeleted())
                 return;
 
             Task validSolution = sol.projectedSolution((Compound)st, question, memory );
@@ -286,9 +286,9 @@ public enum LocalRules {
             task = nal.getCurrentTask();
             feedbackToLinks = true;
         }*/
-        if (question.getDeleted())
+        if (question.isDeleted())
             throw new RuntimeException("question deleted: " + question);
-        if (solution.getDeleted())
+        if (solution.isDeleted())
             throw new RuntimeException("solution deleted: " + solution);
 
         boolean judgmentTask = question.isJudgment();
@@ -300,12 +300,12 @@ public enum LocalRules {
 
         Budget budget = null;
         if (judgmentTask) {
-            question.getBudget().orPriority(quality);
+            question.budget().orPriority(quality);
         } else {
-            float taskPriority = question.getPriority();
+            float taskPriority = question.pri();
 
-            budget = new UnitBudget(UtilityFunctions.or(taskPriority, quality), question.getDurability(), BudgetFunctions.truthToQuality(solution.truth()));
-            question.getBudget().setPriority(Math.min(1 - quality, taskPriority));
+            budget = new UnitBudget(UtilityFunctions.or(taskPriority, quality), question.dur(), BudgetFunctions.truthToQuality(solution.truth()));
+            question.budget().setPriority(Math.min(1 - quality, taskPriority));
         }
         /*
         if (feedbackToLinks) {
@@ -374,7 +374,7 @@ public enum LocalRules {
         return new MutableTask(newBelief.concept())
                 .punctuation(newBelief.punc())
                 .truth(conclusion)
-                .budget(BudgetFunctions.revise(newBeliefTruth, oldBelief, conclusion, newBelief.getBudget()))
+                .budget(BudgetFunctions.revise(newBeliefTruth, oldBelief, conclusion, newBelief.budget()))
                 .parent(newBelief, oldBelief)
                 .time(now, occ)
                 .because("Revision");

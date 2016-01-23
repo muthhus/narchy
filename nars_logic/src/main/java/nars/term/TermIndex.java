@@ -56,7 +56,7 @@ public interface TermIndex extends TermBuilder {
 
     @NotNull
     static Task spawn(Task parent, @NotNull Compound content, char punctuation, Truth truth, long occ, @NotNull Budget budget) {
-        return spawn(parent, content, punctuation, truth, occ, budget.getPriority(), budget.getDurability(), budget.getQuality());
+        return spawn(parent, content, punctuation, truth, occ, budget.pri(), budget.dur(), budget.qua());
     }
 
     @NotNull

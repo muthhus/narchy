@@ -94,7 +94,7 @@ public final class Operator<T extends Term> extends AbstractStringAtom { //imple
      * applies certain data to a feedback task relating to its causing operation's task
      */
     public static Task feedback(@NotNull MutableTask feedback, @NotNull Task goal, float priMult, float durMult) {
-        return feedback.budget(goal.getBudget()).
+        return feedback.budget(goal.budget()).
                 budgetScaled(priMult, durMult).
                 parent(goal);
     }

@@ -83,7 +83,7 @@ public class TaskButton extends Label {
     }
 
     public void update() {
-        float pri = task.getPriority();
+        float pri = task.pri();
         float priToFontSize = pri * 30f;
 //            getStyleClass().clear();
 //            getStylesheets().clear();
@@ -107,7 +107,7 @@ public class TaskButton extends Label {
 
     @NotNull
     private Color getColor() {
-        float pri = task.getPriority();
+        float pri = task.pri();
         return hsb(
                 (task.op().ordinal() / 64f) * 360.0,
                 0.4, 0.7, 0.75f + pri * 0.25f

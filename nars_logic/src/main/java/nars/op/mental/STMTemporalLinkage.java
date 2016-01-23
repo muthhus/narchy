@@ -41,7 +41,7 @@ public class STMTemporalLinkage {
 
 
         nar.memory.eventTaskProcess.on(n -> {
-            if (!n.getTask().getDeleted())
+            if (!n.getTask().isDeleted())
                 inductionOnSucceedingEvents(n, false);
         });
         nar.memory.eventReset.on(n -> stm.clear());
@@ -103,7 +103,7 @@ public class STMTemporalLinkage {
                 numToRemoveFromBeginning--;
             }
             else {
-                if (!previousTask.getDeleted()) {
+                if (!previousTask.isDeleted()) {
                     concept.crossLink(currentTask, previousTask, 1f, nar);
                 }
             }

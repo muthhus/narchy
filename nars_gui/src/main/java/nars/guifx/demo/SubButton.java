@@ -163,7 +163,7 @@ public class SubButton extends HBox {
     }
 
     public static SubButton make(NAR nar, Task t) {
-        SubButton sb = new SubButton(paddingDefault, t.term(), t.getPriority());
+        SubButton sb = new SubButton(paddingDefault, t.term(), t.pri());
 
         if (t.term().volume() > 16) {
             sb.add(makeParagraph(t.toString()));
@@ -178,7 +178,7 @@ public class SubButton extends HBox {
             sb.scale(minScale + 2f * 0.75f * t.truth().getConfidence());
         }
 
-        sb.shade(t.getPriority());
+        sb.shade(t.pri());
 
         return sb;
     }

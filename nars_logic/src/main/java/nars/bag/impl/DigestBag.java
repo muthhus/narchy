@@ -23,13 +23,13 @@ public class DigestBag implements Consumer<Task> {
             @Override public float score(@NotNull BLink<Task> v) {
 
                 //return v.getPriority() * v.get().getConfidenceIfTruthOr(1f);
-                return v.getPriority();
+                return v.pri();
             }
         };
     }
 
     @Override public void accept(@NotNull Task t) {
-        list.insert(new BLink(t, t.getBudget()));
+        list.insert(new BLink(t, t.budget()));
     }
 
     public static class OutputBuffer {
