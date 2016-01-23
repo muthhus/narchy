@@ -33,6 +33,8 @@ import java.util.function.Consumer;
  */
 public class PremiseMatch extends FindSubst {
 
+    private final Deriver deriver;
+
     /** Global Context */
     public Consumer<Task> receiver;
 
@@ -60,13 +62,14 @@ public class PremiseMatch extends FindSubst {
             Global.newHashMap();
     private float minConfidence = Global.TRUTH_EPSILON;
 
-    public PremiseMatch(Random r) {
+    public PremiseMatch(Random r, Deriver deriver) {
         super(Op.VAR_PATTERN, r );
 
         for (Class<? extends ImmediateTermTransform> c : PremiseRule.Operators) {
             addTransform(c);
         }
 
+        this.deriver = deriver;
         //secondary = new VarCachedVersionMap(this);
         occDelta = new Versioned(this);
         tDelta = new Versioned(this);
@@ -143,7 +146,7 @@ public class PremiseMatch extends FindSubst {
     /**
      * set the next premise
      */
-    public final void start(@NotNull ConceptProcess p, Consumer<Task> receiver, @NotNull Deriver d) {
+    public final void start(@NotNull ConceptProcess p, Consumer<Task> receiver) {
 
         premise = p;
         this.receiver = receiver;
@@ -168,7 +171,9 @@ public class PremiseMatch extends FindSubst {
 
         //setPower(branchPower.get()); //HACK is this where it should be assigned?
 
-        d.run(this);
+        p.nar.memory.eventConceptProcess.emit(p);
+
+        deriver.run(this);
 
         clear();
 

@@ -17,6 +17,8 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+
+
 /**
  * particle that travels through the graph,
  * responsible for deciding what to derive
@@ -199,14 +201,14 @@ public class Derivelet {
     };
 
     final Consumer<ConceptProcess> perPremise = p ->
-            DeriveletContext.deriver.run(p, matcher, perDerivation);
+            matcher.start(p, perDerivation);
 
 
     public final void start(final Concept concept, int ttl, @NotNull final DeriveletContext context) {
         this.context = context;
         this.concept = new BLink(concept, 0, 0, 0); //TODO
         this.ttl = ttl;
-        this.matcher = new PremiseMatch(context.rng);
+        this.matcher = new PremiseMatch(context.rng, DeriveletContext.deriver);
     }
 
     @NotNull

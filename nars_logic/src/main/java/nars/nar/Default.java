@@ -476,19 +476,22 @@ public class Default extends AbstractNAR {
          * applied collectively.
          */
         @NotNull
-        final Collection<Task> derivedTasksBuffer;
+        private final Collection<Task> derivedTasksBuffer;
+
+        private final Consumer<Task> onDerived;
 
 
 
         public DefaultCycle(@NotNull NAR nar, Deriver deriver, Bag<Concept> concepts) {
             super(nar, deriver, concepts);
 
-            matcher = new PremiseMatch(nar.memory.random);
+            matcher = new PremiseMatch(nar.memory.random, deriver);
             /* if detecting duplicates, use a list. otherwise use a set to deduplicate anyway */
             derivedTasksBuffer =
                     Global.DEBUG_DETECT_DUPLICATE_DERIVATIONS ?
                             new FasterList() : Global.newHashSet(1);
 
+            onDerived = derivedTasksBuffer::add;
         }
 
         @Override protected void onCycle(Memory memory) {
@@ -496,11 +499,13 @@ public class Default extends AbstractNAR {
             super.onCycle(memory);
         }
 
+
         @Override
         public void process(@NotNull ConceptProcess p) {
-            Collection<Task> buffer = derivedTasksBuffer;
 
-            this.der.run(p, matcher, buffer::add);
+            matcher.start(p, onDerived);
+
+            Collection<Task> buffer = derivedTasksBuffer;
 
             if (Global.DEBUG_DETECT_DUPLICATE_DERIVATIONS) {
                 HashBag<Task> b = detectDuplicates(buffer);

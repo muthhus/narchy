@@ -44,7 +44,7 @@ public class RuleTest extends TestNAR {
 				maxConf);
 	}
 
-	static final Narsese p = Narsese.the();
+	private static final Narsese p = Narsese.the();
 
 	public RuleTest(@NotNull NAR nar, @NotNull String task, @NotNull String belief, String result,
 					float minFreq, float maxFreq, float minConf, float maxConf) {

@@ -1,14 +1,9 @@
 package nars.nal;
 
-import nars.concept.ConceptProcess;
 import nars.nal.meta.PremiseMatch;
 import nars.nal.meta.PremiseRuleSet;
 import nars.nal.meta.TrieDeriver;
-import nars.task.Task;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.function.Consumer;
 
 /**
  *
@@ -93,16 +88,6 @@ public abstract class Deriver  {
     public abstract void run(PremiseMatch matcher);
 
 
-    /** initialize a rule matcher with a Premise to supply
-     *  a consumer with zero or more derived tasks.
-     *  this method does not provide a way to stop or interrupt
-     *  the process once it begins.
-     */
-    public final void run(@NotNull ConceptProcess premise, @NotNull PremiseMatch m, Consumer<Task> t) {
-        premise.memory().eventConceptProcess.emit(premise);
-
-        m.start(premise, t, this);
-    }
 
 
 //    public void load(Memory memory) {
