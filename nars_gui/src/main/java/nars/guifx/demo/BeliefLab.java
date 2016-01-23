@@ -11,15 +11,15 @@ import nars.util.Texts;
 /**
  * Created by me on 1/21/16.
  */
-public class ConceptPaneTest {
+public class BeliefLab {
 
-    public static final int beliefCapacity = 32;
-    static float waveFreq = 0.12715f;
-    static float conf = 0.5f;
-    static float predictionProbability = 0.5f; //how often to ask for a prediction
-    static float pastProbability = 0.5f; //how often to ask for a prediction
+    public static final int beliefCapacity = 127;
+    static float waveFreq = 0.052715f;
+    static float conf = 0.75f;
+    static float predictionProbability = 0.01f; //how often to ask for a prediction
+    static float pastProbability = 0.01f; //how often to ask for a prediction
     static final float fps = 30f;
-    static boolean enableEternals = false;
+    static boolean enableEternals = true;
     static boolean enableTemporals = true;
 
     public static void main(String[] args) {

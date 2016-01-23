@@ -9,7 +9,6 @@ import nars.term.TermIndex;
 import nars.testchamber.Cell.Logic;
 import nars.testchamber.Cell.Material;
 import nars.testchamber.map.Maze;
-import nars.testchamber.object.Key;
 import nars.testchamber.operator.Activate;
 import nars.testchamber.operator.Deactivate;
 import nars.testchamber.operator.Goto;
@@ -257,9 +256,9 @@ public class TestChamber {
                             inventorybag.cx = (int) space.current.x;
                             inventorybag.cy = (int) space.current.y;
                         }
-                        if (!(inventorybag instanceof Key)) {
-                            keyn = -1;
-                        }
+//                        if (!(inventorybag instanceof Key)) {
+//                            keyn = -1;
+//                        }
                         if (path.size() <= 1) {
                             active = true;
                             executed_going = false;

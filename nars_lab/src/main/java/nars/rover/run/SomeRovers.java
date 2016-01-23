@@ -9,7 +9,7 @@ import nars.rover.Sim;
 import nars.rover.robot.Rover;
 import nars.rover.robot.Spider;
 import nars.rover.robot.Turret;
-import nars.rover.world.FoodSpawnWorld1;
+import nars.rover.world.GridSpaceWorld;
 import nars.term.index.MapIndex2;
 import nars.time.SimulatedClock;
 
@@ -34,9 +34,9 @@ public class SomeRovers {
 
         //world = new ReactorWorld(this, 32, 48, 48*2);
 
-        RoverWorld world = new FoodSpawnWorld1(128, 48, 48, 0.5f);
+        //RoverWorld world = new FoodSpawnWorld1(128, 48, 48, 0.5f);
 
-        //world = new GridSpaceWorld(GridSpaceWorld.newMazePlanet());
+        RoverWorld world = new GridSpaceWorld(GridSpaceWorld.newMazePlanet());
 
 
         final Sim game = new Sim(clock, world);
@@ -54,6 +54,9 @@ public class SomeRovers {
                         new SoftValueHashMap())),
                         1600, 50, 1, 3);
 
+            nar.memory.DEFAULT_GOAL_PRIORITY = 0.9f;
+            nar.memory.DEFAULT_GOAL_DURABILITY = 0.9f;
+            nar.memory.DEFAULT_GOAL_DURABILITY = 0.9f;
             //nar.initNAL9();
             nar.memory.perfection.setValue(0.2f);
             nar.core.confidenceDerivationMin.setValue(0.03f);

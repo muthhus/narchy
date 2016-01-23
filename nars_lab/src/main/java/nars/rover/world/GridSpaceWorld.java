@@ -10,7 +10,6 @@ import nars.rover.physics.gl.JoglAbstractDraw;
 import nars.rover.physics.j2d.SwingDraw;
 import nars.rover.physics.j2d.SwingDraw.LayerDraw;
 import nars.testchamber.Cell;
-import nars.testchamber.Grid2DSpace;
 import nars.testchamber.Hauto;
 import nars.testchamber.SimplexNoise;
 import nars.testchamber.map.Maze;
@@ -25,6 +24,15 @@ import java.util.Random;
  * @author me
  */
 public class GridSpaceWorld extends RoverWorld implements LayerDraw {
+
+    public static class Grid2DSpace {
+
+        public final Hauto cells;
+
+        public Grid2DSpace(Hauto cells) {
+            this.cells = cells;
+        }
+    }
 
     public static Grid2DSpace newMazePlanet() {
         int w = 40;
@@ -45,7 +53,7 @@ public class GridSpaceWorld extends RoverWorld implements LayerDraw {
         
         Maze.buildMaze(cells, 3, 3, 23, 23);
         
-        return new Grid2DSpace(cells, null);                
+        return new Grid2DSpace(cells);
     }
     
     private final Grid2DSpace grid;

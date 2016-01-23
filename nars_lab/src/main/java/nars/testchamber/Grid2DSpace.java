@@ -4,7 +4,6 @@ import automenta.vivisect.swing.NWindow;
 import nars.NAR;
 import nars.testchamber.Cell.Logic;
 import nars.testchamber.Cell.Material;
-import nars.testchamber.gui.EditorPanel;
 import processing.core.PApplet;
 import processing.core.PVector;
 
@@ -16,7 +15,7 @@ import java.util.*;
 import java.util.List;
 
 
-public class Grid2DSpace extends PApplet {
+class Grid2DSpace extends PApplet {
 
     public static boolean world_used=false;
 
@@ -99,11 +98,11 @@ public class Grid2DSpace extends PApplet {
         menu.add(syntaxEnable);
          */
         
-        EditorPanel editor = new EditorPanel(this);
-        NWindow editorWindow = new NWindow("Edit", editor);
-        editorWindow.setSize(200, 400);
-        editorWindow.setVisible(true);
-        
+//        EditorPanel editor = new EditorPanel(this);
+//        NWindow editorWindow = new NWindow("Edit", editor);
+//        editorWindow.setSize(200, 400);
+//        editorWindow.setVisible(true);
+//
         
         
         content.add(menu, BorderLayout.NORTH);

@@ -4,10 +4,9 @@ import nars.NAR;
 import nars.testchamber.Cell.Logic;
 import nars.testchamber.Cell.Machine;
 import nars.testchamber.Cell.Material;
-import nars.testchamber.object.Key;
-import nars.testchamber.object.Pizza;
 
 import static nars.testchamber.Cell.Logic.*;
+import static nars.testchamber.Cell.Material.Pizza;
 
 public class Hauto {
     private final NAR nar;
@@ -52,12 +51,12 @@ public class Hauto {
                             }
                         }
                     }
-                    if(!nope) {
-                        TestChamber.space.add(new Pizza(i, j, "{pizza"+ entityID + '}'));
-                        if(TestChamber.staticInformation)
-                        nar.input("<{pizza" + entityID + "} --> pizza>.");
-                        entityID++;
-                    }
+//                    if(!nope) {
+//                        TestChamber.space.add(new Pizza(i, j, "{pizza"+ entityID + '}'));
+//                        if(TestChamber.staticInformation)
+//                        nar.input("<{pizza" + entityID + "} --> pizza>.");
+//                        entityID++;
+//                    }
                 }
                 nar.input('<' + r.name + " --> [on]>. :|:");
             }
@@ -239,32 +238,34 @@ public class Hauto {
             return;
         }
         
-        if(doorname != null && !doorname.isEmpty() && selected.material==Material.Door) {
-            space.add(new Key(x, y, doorname.replace("door", "key")));
-            if(TestChamber.staticInformation)
-            nar.input('<' + doorname.replace("door", "key") + " --> key>.");
-            if(TestChamber.curiousity) {
-                space.nar.input("<goto(" + doorname.replace("door", "key") + ") =/> <Self --> [curious]>>.");
-                space.nar.input("<pick("+ doorname.replace("door", "key") + ") =/> <Self --> [curious]>>.");
-            }
-            doorname="";
-            return;
-        }
-        if(selected.material==Material.Pizza) {
-            doorname="{pizza"+ entityID + '}';
-        }
-        if(doorname != null && !doorname.isEmpty() && selected.material==Material.Pizza) {
-            space.add(new Pizza(x, y, doorname));
-            if(TestChamber.staticInformation)
-            nar.input('<' + doorname + " --> pizza>.");
-            if(TestChamber.curiousity) {
-                space.nar.input("<goto(" + doorname + ") =/> <Self --> [curious]>>.");
-            }
-            entityID++;
-            doorname="";
-            return;
-        }
-        if(!(selected.material==Material.Door) && !(selected.material==Material.Pizza))
+//        if(doorname != null && !doorname.isEmpty() && selected.material==Material.Door) {
+//            space.add(new Key(x, y, doorname.replace("door", "key")));
+//            if(TestChamber.staticInformation)
+//            nar.input('<' + doorname.replace("door", "key") + " --> key>.");
+//            if(TestChamber.curiousity) {
+//                space.nar.input("<goto(" + doorname.replace("door", "key") + ") =/> <Self --> [curious]>>.");
+//                space.nar.input("<pick("+ doorname.replace("door", "key") + ") =/> <Self --> [curious]>>.");
+//            }
+//            doorname="";
+//            return;
+//        }
+//        if(selected.material== Pizza) {
+//            doorname="{pizza"+ entityID + '}';
+//        }
+
+//        if(doorname != null && !doorname.isEmpty() && selected.material== Pizza) {
+//            space.add(new Pizza(x, y, doorname));
+//            if(TestChamber.staticInformation)
+//            nar.input('<' + doorname + " --> pizza>.");
+//            if(TestChamber.curiousity) {
+//                space.nar.input("<goto(" + doorname + ") =/> <Self --> [curious]>>.");
+//            }
+//            entityID++;
+//            doorname="";
+//            return;
+//        }
+
+        if(!(selected.material==Material.Door) && !(selected.material== Pizza))
             doorname="";
         
         readCells[x][y].charge = selected.charge;
@@ -276,7 +277,7 @@ public class Hauto {
         readCells[x][y].machine = selected.machine;
         writeCells[x][y].machine = selected.machine;
         
-        if(selected.material==Material.Pizza || selected.material==Material.Door || selected.logic==Logic.OFFSWITCH || selected.logic==Logic.SWITCH || selected.machine==Machine.Light || selected.machine==Machine.Turret) //or other entity...
+        if(selected.material== Pizza || selected.material==Material.Door || selected.logic==Logic.OFFSWITCH || selected.logic==Logic.SWITCH || selected.machine==Machine.Light || selected.machine==Machine.Turret) //or other entity...
         {
             String name="";
             if(selected.material==Material.Door) {
@@ -430,7 +431,7 @@ public class Hauto {
 
         if("Pizza".equals(label)) {
             selected.logic = Logic.NotALogicBlock;
-            selected.material = Material.Pizza;
+            selected.material = Pizza;
             selected.is_solid=false;
         }
         if("Door".equals(label)) {

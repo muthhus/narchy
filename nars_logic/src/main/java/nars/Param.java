@@ -179,9 +179,9 @@ public abstract class Param extends Container implements Level {
     /** Default confidence of input goal. */
     float DEFAULT_GOAL_CONFIDENCE = 0.9f;
     /** Default priority of input judgment */
-    float DEFAULT_GOAL_PRIORITY = 0.5f;
+    public float DEFAULT_GOAL_PRIORITY = 0.5f;
     /** Default durability of input judgment */
-    float DEFAULT_GOAL_DURABILITY = 0.5f;
+    public float DEFAULT_GOAL_DURABILITY = 0.5f;
     /** Default priority of input question */
     float DEFAULT_QUEST_PRIORITY = 0.5f;
     /** Default durability of input question */

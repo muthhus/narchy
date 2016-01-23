@@ -5,7 +5,6 @@ import nars.testchamber.Action.Forward;
 import nars.testchamber.Cell.Logic;
 import nars.testchamber.Cell.Material;
 import nars.testchamber.map.Maze;
-import nars.testchamber.object.Key;
 import nars.testchamber.operator.Activate;
 import nars.testchamber.operator.Deactivate;
 import nars.testchamber.operator.Goto;
@@ -116,9 +115,9 @@ public class TestChamber2 extends TestChamber {
                             inventorybag.cx=(int)current.x;
                             inventorybag.cy=(int)current.y;
                         }
-                        if(!(inventorybag instanceof Key)) {
-                            keyn=-1;
-                        }
+//                        if(!(inventorybag instanceof Key)) {
+//                            keyn=-1;
+//                        }
                         if (path.size() <= 1) {
                             //nar.step(1);
                             //System.out.println("at destination; didnt need to find path");
