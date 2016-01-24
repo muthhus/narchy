@@ -151,14 +151,14 @@ public class UnitBudget extends Budget {
      */
     @Override
     public final void setPriority(float p) {
-        if (Budget.getDeleted(p)) {
-            throw new RuntimeException("NaN priority");
-        }
+        if (Budget.isDeleted(p))
+            throw new InvalidPriorityException();
+
         priority = Util.clamp(p);
     }
 
     @Override
-    public void deleteBudget() {
+    public final void delete() {
         this.priority = Float.NaN;
     }
 
@@ -276,5 +276,17 @@ public class UnitBudget extends Budget {
     }
 
 
+
+
+    final static class InvalidPriorityException extends RuntimeException {
+        public InvalidPriorityException() {
+            super();
+        }
+
+        @Override
+        public String getMessage() {
+            return "NaN priority";
+        }
+    }
 
 }

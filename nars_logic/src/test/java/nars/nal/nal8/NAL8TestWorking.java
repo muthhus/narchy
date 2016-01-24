@@ -12,7 +12,7 @@ import java.util.function.Supplier;
 @RunWith(Parameterized.class)
 public class NAL8TestWorking extends AbstractNALTester {
 
-    final int cycles = 250; //150 worked for most of the initial NAL8 tests converted
+    final int cycles = 150; //150 worked for most of the initial NAL8 tests converted
 
     public NAL8TestWorking(Supplier<NAR> b) { super(b); }
 
@@ -20,10 +20,6 @@ public class NAL8TestWorking extends AbstractNALTester {
     public static Iterable configurations() {
         return AbstractNALTester.nars(8, false);
     }
-
-
-
-
 
     @Test
     public void goal_deductionWithVariableElmination()  {
@@ -271,9 +267,9 @@ public class NAL8TestWorking extends AbstractNALTester {
         TestNAR tester = test();
 
         tester.input("goto({t001}). :\\: ");
-        tester.inputAt(10, "(goto($1)==>+5<(SELF,$1) --> at>). ");
+        tester.inputAt(7, "(goto($1)==>+2<(SELF,$1) --> at>). ");
 
-        tester.mustBelieve(cycles, "<(SELF,{t001}) --> at>", 1.0f, 0.81f, 0);
+        tester.mustBelieve(cycles, "<(SELF,{t001}) --> at>", 1.0f, 0.81f, -3);
 
     }
 

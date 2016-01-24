@@ -3,11 +3,11 @@ package nars.truth;
 /** subclass used as an indicator that it was the result of projection */
 public final class ProjectedTruth extends DefaultTruth {
 
-	public final long target;
+	public final long when;
 
-	public ProjectedTruth(float f, float c, long target) {
+	public ProjectedTruth(float f, float c, long when) {
 		super(f, c);
-		this.target = target;
+		this.when = when;
 	}
 
 	// public ProjectedTruth(Truth cloned, long occurrenceTime) {

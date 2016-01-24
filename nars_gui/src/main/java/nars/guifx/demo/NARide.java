@@ -614,7 +614,7 @@ public class NARide extends BorderPane {
                     Color f = NARfx.hashColor(c, b.summary(), Plot2D.ca);
                     g.setFill(f);
 
-                    float p = b.getPriorityIfNaNThenZero();
+                    float p = b.priIfFiniteElseZero();
                     double x = w * Math.abs(c % Util.PRIME2) / Util.PRIME2;
                     double y = h * p;
                     g.fillRect(x - iw / 2, y - ih / 2, iw, ih);

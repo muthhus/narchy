@@ -80,7 +80,7 @@ public class TaskSummaryIcon extends SummaryIcon implements Runnable {
         //TODO only clear if size changed, because it can just paint on top
         //g.clearRect(0, 0, W, H);
 
-        float p = task.budget().getPriorityIfNaNThenZero();
+        float p = task.budget().priIfFiniteElseZero();
 
         if (Math.abs(lastPriority - p) > VISIBLE_BUDGET_CHANGE) {
 

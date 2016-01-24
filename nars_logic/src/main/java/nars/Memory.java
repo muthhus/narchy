@@ -266,6 +266,9 @@ public class Memory extends Param {
             tt = tt.anonymous();
 
             tt = index.transform((Compound)tt, CompoundAnonymizer);
+
+            if (tt == null)
+                return null;
         }
 
         Function<Term, Termed> build = this::newDefaultConcept;

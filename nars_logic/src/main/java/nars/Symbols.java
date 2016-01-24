@@ -87,10 +87,6 @@ public enum Symbols {
     public static final String ARGUMENT_SEPARATOR_PRETTY = ", ";
     public static final char IMAGE_PLACE_HOLDER = '_';
     
-    /* prefix of special Term name */
-    public static final char INTERVAL_PREFIX = '/'; //TODO switch to: ????
-    public static final char TERM_PREFIX = 'T';
-    public static final char QUOTE = '\"';
 
 
 

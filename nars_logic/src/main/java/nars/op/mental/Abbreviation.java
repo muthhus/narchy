@@ -2,8 +2,6 @@ package nars.op.mental;
 
 import nars.$;
 import nars.NAR;
-import nars.Op;
-import nars.Symbols;
 import nars.concept.Concept;
 import nars.task.MutableTask;
 import nars.task.Task;
@@ -23,35 +21,46 @@ import java.util.function.Consumer;
  */
 public class Abbreviation implements Consumer<Task> {
 
-    private static final float abbreviationProbability = Inperience.INTERNAL_EXPERIENCE_PROBABILITY;
 
-
-    final float abbreviationConfidence = 0.95f;
-
-    //these two are AND-coupled:
+    private static final AtomicInteger currentTermSerial = new AtomicInteger(1);
     //when a concept is important and exceeds a syntactic complexity, let NARS name it:
     public final MutableInt abbreviationVolMin = new MutableInt(15);
     public final MutableInt abbreviationVolMax = new MutableInt(30);
-    public final MutableFloat abbreviationQualityMin = new MutableFloat(0.75f);
-    @NotNull
-    private final NAR nar;
+    public final MutableFloat abbreviationQualityMin = new MutableFloat(0.8f);
 
     //TODO different parameters for priorities and budgets of both the abbreviation process and the resulting abbreviation judgment
     //public AtomicDouble priorityFactor = new AtomicDouble(1.0);
+    /**
+     * generated abbreviation belief's confidence
+     */
+    public final MutableFloat abbreviationConfidence = new MutableFloat(0.95f);
+    public final MutableFloat abbreviationProbability = new MutableFloat(Inperience.INTERNAL_EXPERIENCE_RARE_PROBABILITY);
+    @NotNull
+    private final NAR nar;
+    private final String termPrefix;
 
 
-    public Abbreviation(@NotNull NAR n) {
+    public Abbreviation(@NotNull NAR n, String termPrefix) {
 
-        n.memory.eventInput.on(this);
-        nar = n;
+        this.nar = n;
+        this.termPrefix = termPrefix;
+
+        n.memory.eventTaskProcess.on(this);
 
     }
 
-    private static final AtomicInteger currentTermSerial = new AtomicInteger(1);
+    static final Compound newAbbreviation(Concept abbreviated, Term id) {
+        return (Compound) $.sim(abbreviated.term(), id);
 
-    public static Term newSerialTerm() {
+        /*
+        //old 1.6 pattern:
+        Operation compound = Operation.make(
+            Product.make(termArray(termAbbreviating)), abbreviate);*/
+    }
+
+    public Term newSerialTerm() {
         //TODO base64
-        return Atom.the(Symbols.TERM_PREFIX + Integer.toHexString(currentTermSerial.incrementAndGet()));
+        return Atom.the(termPrefix + Integer.toString(currentTermSerial.incrementAndGet(), 36));
     }
 
     final boolean canAbbreviate(@NotNull Task task) {
@@ -64,12 +73,11 @@ public class Abbreviation implements Consumer<Task> {
         }*/
         int v = t.volume();
         return
-                (!Op.isOperation(t)) &&
+                //(!Op.isOperation(t)) &&
                 (v >= abbreviationVolMin.floatValue()) &&
-                (v <= abbreviationVolMax.floatValue()) &&
-                (task.qua() > abbreviationQualityMin.intValue());
+                        (v <= abbreviationVolMax.floatValue()) &&
+                        (task.qua() > abbreviationQualityMin.intValue());
     }
-
 
     /**
      * To create a judgment with a given statement
@@ -79,40 +87,29 @@ public class Abbreviation implements Consumer<Task> {
     @Override
     public void accept(@NotNull Task task) {
 
-
         //is it complex and also important? then give it a name:
         if (canAbbreviate(task)) {
-            if ((nar.memory.random.nextFloat() <= abbreviationProbability)) {
+            if ((nar.memory.random.nextFloat() <= abbreviationProbability.floatValue())) {
 
+                Concept abbreviated = task.concept(nar);
+                if (abbreviated != null && abbreviated.get(Abbreviation.class) == null) {
 
-                Compound termAbbreviating = task.term();
+                    Term id = newSerialTerm();
 
-            /*Operation compound = Operation.make(
-                    Product.make(termArray(termAbbreviating)), abbreviate);*/
+                    Concept abbreviation = nar.concept(newAbbreviation(abbreviated, id));
+                    if (abbreviation != null) {
 
-                Concept concept = nar.concept(termAbbreviating);
+                        abbreviation.put(Abbreviation.class, abbreviation); //abbreviated by itself
+                        abbreviated.put(Abbreviation.class, id); //abbreviated by the serial
 
-                if (concept != null && concept.get(Abbreviation.class) == null) {
+                        nar.logger.info("Abbreviation " + abbreviation);
 
-                    Term atomic = newSerialTerm();
+                        nar.input(
+                                new MutableTask(abbreviation)
+                                        .judgment().truth(1, abbreviationConfidence.floatValue())
+                                        .present(nar.memory)
+                        );
 
-                    concept.put(Abbreviation.class, atomic); //abbreviated by the serial
-
-                    Compound c = (Compound) $.sim(termAbbreviating, atomic);
-                    if (c != null) {
-
-                        Concept cc = nar.concept(c);
-                        if (cc!=null) {
-                            cc.put(Abbreviation.class, cc); //abbreviated by itself
-
-                            nar.logger.info("Abbreviation " + cc);
-
-                            nar.input(
-                                new MutableTask(c)
-                                    .judgment().truth(1, abbreviationConfidence)
-                                    .present(nar.memory)
-                            );
-                        }
                     }
                 }
             }

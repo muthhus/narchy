@@ -203,14 +203,14 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
         //if truth instanceof ProjectedTruth, use its attached occ time (possibly eternal or temporal), otherwise assume it is this task's occurence time
         long solutionOcc = solTruth instanceof ProjectedTruth ?
-                ((ProjectedTruth)solTruth).target : occCurrent;
+                ((ProjectedTruth)solTruth).when : occCurrent;
 
         Task solution;
         //if ((!truth().equals(solTruth)) || (!newTerm.equals(term())) || (solutionOcc!= occCurrent)) {
             solution = new MutableTask(newTerm, punc())
                     .truth(solTruth)
                     .time(now, solutionOcc)
-                    .parent(getParentTaskRef(), getParentBeliefRef())
+                    .parent(this)
                     .budget(solutionBudget)
                     .setEvidence(evidence());
 
@@ -327,8 +327,12 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     @NotNull
     @Override default public Task get() { return this ;}
 
-    default Termed concept() {
+    default Termed<Compound> concept() {
         return term();
+    }
+
+    default Concept concept(NAR n) {
+        return n.concept(concept());
     }
 
     @Override

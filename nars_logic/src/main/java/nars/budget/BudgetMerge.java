@@ -6,6 +6,31 @@ package nars.budget;
 @FunctionalInterface
 public interface BudgetMerge {
 
+    BudgetMerge plus = (tgt, src, srcScale) -> {
+        float dp = src.pri() * srcScale;
+
+        float currentPriority = tgt.priIfFiniteElseZero();
+
+        float nextPri = currentPriority + dp;
+        if (nextPri > 1) nextPri = 1f;
+
+        float currentNextPrioritySum = currentPriority + nextPri;
+
+        /* current proportion */
+        float cp = currentNextPrioritySum != 0 ? currentPriority / currentNextPrioritySum : 0.5f;
+
+        /* next proportion = 1 - cp */
+        float np = 1.0f - cp;
+
+        float nextDur = cp * tgt.dur() + np * src.dur();
+        float nextQua = cp * tgt.qua() + np * src.qua();
+
+        assert Float.isFinite(nextDur) : "NaN dur: " + src + ' ' + tgt.dur();
+        assert Float.isFinite(nextQua) : "NaN quality";
+
+        tgt.budget( nextPri,nextDur,nextQua);
+    };
+
     /** merge 'incoming' budget (scaled by incomingScale) into 'existing' */
     void merge(Budget existing, Budget incoming, float incomingScale);
 
@@ -13,7 +38,7 @@ public interface BudgetMerge {
     BudgetMerge plusDQDominated = (tgt, src, srcScale) -> {
         float nextPriority = src.pri() * srcScale;
 
-        float currentPriority = tgt.getPriorityIfNaNThenZero();
+        float currentPriority = tgt.priIfFiniteElseZero();
 
         float sumPriority = currentPriority + nextPriority;
         if (sumPriority > 1) sumPriority = 1f;
@@ -30,7 +55,7 @@ public interface BudgetMerge {
     BudgetMerge plusDQInterp = (tgt, src, srcScale) -> {
         float dp = src.pri() * srcScale;
 
-        float currentPriority = tgt.getPriorityIfNaNThenZero();
+        float currentPriority = tgt.priIfFiniteElseZero();
 
         float nextPri = currentPriority + dp;
         if (nextPri > 1) nextPri = 1f;

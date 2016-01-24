@@ -368,7 +368,7 @@ public enum LocalRules {
         Truth conclusion = TruthFunctions.revision(newBeliefTruth, oldBeliefTruth);
         if (conclusion instanceof ProjectedTruth) {
             //allow eternalized truth to override with eternalized occurrence
-            occ = ((ProjectedTruth) conclusion).target;
+            occ = ((ProjectedTruth) conclusion).when;
         }
 
         return new MutableTask(newBelief.concept())

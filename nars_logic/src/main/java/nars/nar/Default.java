@@ -9,6 +9,7 @@ import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
 import nars.budget.Budget;
 import nars.budget.BudgetMerge;
+import nars.budget.Forget;
 import nars.concept.Concept;
 import nars.concept.ConceptProcess;
 import nars.data.Range;
@@ -265,11 +266,11 @@ public class Default extends AbstractNAR {
         final List<BLink<Concept>> firing = Global.newArrayList(1);
 
         @NotNull
-        private final AlannForget<Task> taskLinkForget;
+        private final Forget.ForgetAndDetectItemDeletion<Task> taskLinkForget;
         @NotNull
-        private final AlannForget<Termed> termLinkForget;
+        private final Forget.AbstractForget<Termed> termLinkForget;
         @NotNull
-        private final AlannForget<Concept> conceptForget;
+        private final Forget.AbstractForget<Concept> conceptForget;
 
         //cached
         private transient int termlnksToFire, tasklinksToFire;
@@ -304,19 +305,11 @@ public class Default extends AbstractNAR {
                 m.eventReset.on((mem) -> onReset())
             );
 
-            taskLinkForget = new AlannForget<Task>(nar, taskLinkRemembering, perfection) {
+            conceptForget = new Forget.LinearForget(nar, conceptRemembering, perfection);
+            termLinkForget = new Forget.LinearForget(nar, termLinkRemembering, perfection);
+            taskLinkForget = new Forget.LinearForget(nar, taskLinkRemembering, perfection)
+                    .withDeletedItemFiltering();
 
-                @Override
-                public boolean test(BLink<? extends Task> b) {
-                    if (b.get().isDeleted())
-                        return false;
-                    accept(b);
-                    return true;
-                }
-            };
-
-            termLinkForget = new AlannForget(nar, termLinkRemembering, perfection);
-            conceptForget = new AlannForget(nar, conceptRemembering, perfection);
         }
 
         protected void onCycle(Memory memory) {
@@ -390,64 +383,6 @@ public class Default extends AbstractNAR {
             );
 
             //activate(c);
-        }
-
-        static class AlannForget<X> implements Consumer<BLink<? extends X>>, Predicate<BLink<? extends X>> {
-
-            private final MutableFloat forgetTime;
-            private final MutableFloat perfection;
-
-            //cached
-            private transient float forgetTimeCached = Float.NaN;
-            private transient float perfectionCached = Float.NaN;
-            private transient long now = -1;
-
-            public AlannForget(@NotNull NAR nar, MutableFloat forgetTime, MutableFloat perfection) {
-                this.forgetTime = forgetTime;
-                this.perfection = perfection;
-                nar.onEachCycle(this::accept);
-                accept(nar.memory);
-            }
-
-            @Override
-            public void accept(@NotNull BLink<? extends X> budget) {
-                // priority * e^(-lambda*t)
-                //     lambda is (1 - durabilty) / forgetPeriod
-                //     dt is the delta
-                final long currentTime = now;
-
-                long dt = budget.setLastForgetTime(currentTime);
-                if (dt == 0) return ; //too soon to update
-
-                float currentPriority = budget.getPriorityIfNaNThenZero();
-
-                float relativeThreshold = perfectionCached;
-
-                float expDecayed = currentPriority * (float) Math.exp(
-                        -((1.0f - budget.dur()) / forgetTimeCached) * dt
-                );
-                float threshold = budget.qua() * relativeThreshold;
-
-                float nextPriority = expDecayed;
-                if (nextPriority < threshold) nextPriority = threshold;
-
-                budget.setPriority(nextPriority);
-
-            }
-
-
-            public void accept(@NotNull Memory memory) {
-                //same for duration of the cycle
-                forgetTimeCached = forgetTime.floatValue() * memory.duration();
-                perfectionCached = perfection.floatValue();
-                now = memory.time();
-            }
-
-            @Override
-            public boolean test(BLink<? extends X> b) {
-                accept(b);
-                return true;
-            }
         }
 
         //try to implement some other way, this is here because of serializability

@@ -264,8 +264,11 @@ public final class BudgetFunctions extends UtilityFunctions {
 	@NotNull
 	public static Budget compoundForward(@NotNull Budget target, @NotNull Truth truth,
 										 @NotNull Termed content, @NotNull ConceptProcess nal) {
-		int complexity = content.term().complexity();
-		return budgetInference(target, truthToQuality(truth), complexity, nal);
+		return budgetInference(
+				target,
+				truthToQuality(truth),
+				content.term().complexity(),
+				nal);
 	}
 
 	/**
@@ -347,12 +350,12 @@ public final class BudgetFunctions extends UtilityFunctions {
             durability = and(durability, termLink.dur()); //originaly was 'AND'
 
             NAR nar = nal.nar;
-            final float targetActivation = nar.conceptPriority(termLink.get(), 0);
-            float sourceActivation = 1.0f;
-            if(taskLink!=null) {
-                sourceActivation = nar.conceptPriority(taskLink.get().concept(), 0);
-            }
-            if (targetActivation >= 0) {
+            final float targetActivation = nar.conceptPriority(termLink.get(), -1);
+
+			if (targetActivation >= 0) {
+
+				float sourceActivation = taskLink != null ? nar.conceptPriority(taskLink.get().concept(), 0) : 1f;
+
                 //https://groups.google.com/forum/#!topic/open-nars/KnUA43B6iYs
                 termLink.orPriority(or(quality, and(sourceActivation,targetActivation)));
                 //was

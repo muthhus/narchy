@@ -19,31 +19,6 @@ import static nars.util.data.Util.mean;
 public abstract class Budget extends BudgetedHandle {
 
 
-    public static final BudgetMerge plus = (tgt, src, srcScale) -> {
-        float dp = src.pri() * srcScale;
-
-        float currentPriority = tgt.getPriorityIfNaNThenZero();
-
-        float nextPri = currentPriority + dp;
-        if (nextPri > 1) nextPri = 1f;
-
-        float currentNextPrioritySum = currentPriority + nextPri;
-
-        /* current proportion */
-        float cp = currentNextPrioritySum != 0 ? currentPriority / currentNextPrioritySum : 0.5f;
-
-        /* next proportion = 1 - cp */
-        float np = 1.0f - cp;
-
-        float nextDur = cp * tgt.dur() + np * src.dur();
-        float nextQua = cp * tgt.qua() + np * src.qua();
-
-        assert Float.isFinite(nextDur) : "NaN dur: " + src + ' ' + tgt.dur();
-        assert Float.isFinite(nextQua) : "NaN quality";
-
-        tgt.budget( nextPri,nextDur,nextQua);
-    };
-
     //@Contract(pure = true)
     public static boolean aveGeoNotLessThan(float min, float a, float b, float c) {
         float minCubed = min * min * min; //cube both sides
@@ -55,7 +30,7 @@ public abstract class Budget extends BudgetedHandle {
     }
 
     //@Contract(pure = true)
-    public static boolean getDeleted(float pri) {
+    public static boolean isDeleted(float pri) {
         return !Float.isFinite(pri);
     }
 
@@ -89,19 +64,13 @@ public abstract class Budget extends BudgetedHandle {
         return budget(0, 0, 0);
     }
 
-    public void delete() {
-        deleteBudget();
-    }
+    /** the result of this should be that pri() is not finite (ex: NaN) */
+    abstract public void delete();
 
-    public void deleteBudget() {
-        setPriority(Float.NaN);
-    }
 
-    
-    
     @NotNull
     @Override
-    public Budget budget() {
+    public final Budget budget() {
         return this;
     }
 
@@ -228,24 +197,24 @@ public abstract class Budget extends BudgetedHandle {
         setPriority(and(pri(), v));
     }
 
-    /**
-     * Whether the budget should get any processing at all
-     * <p>
-     * to be revised to depend on how busy the system is
-     * tests whether summary >= threhsold
-     *
-     * @return The decision on whether to process the Item
-     */
-    public boolean summaryGreaterOrEqual(float budgetThreshold) {
-
-        if (isDeleted()) return false;
-
-        /* since budget can only be positive.. */
-        if (budgetThreshold <= 0) return true;
-
-
-        return summaryNotLessThan(budgetThreshold);
-    }
+//    /**
+//     * Whether the budget should get any processing at all
+//     * <p>
+//     * to be revised to depend on how busy the system is
+//     * tests whether summary >= threhsold
+//     *
+//     * @return The decision on whether to process the Item
+//     */
+//    public boolean summaryGreaterOrEqual(float budgetThreshold) {
+//
+//        if (isDeleted()) return false;
+//
+//        /* since budget can only be positive.. */
+//        if (budgetThreshold <= 0) return true;
+//
+//
+//        return summaryNotLessThan(budgetThreshold);
+//    }
 
     /**
      * copies a budget into this; if source is null, it deletes the budget
@@ -278,7 +247,7 @@ public abstract class Budget extends BudgetedHandle {
         return budget(source.budget());
     }
 
-    public float getPriorityIfNaNThenZero() {
+    public float priIfFiniteElseZero() {
         return Float.isFinite(pri()) ? pri() : 0;
     }
 

@@ -21,14 +21,19 @@ public class BeliefLab {
     static final float fps = 30f;
     static boolean enableEternals = true;
     static boolean enableTemporals = true;
+    static int duration = 10;
+    static int stmInduction = 0;
+
 
     public static void main(String[] args) {
         NAR nar = new Default();
         //nar.input("y:x.");
         //nar.input("y:x. %0%");
+        nar.memory.shortTermMemoryHistory.set(stmInduction);
         nar.memory.conceptBeliefsMax.set(beliefCapacity);
         nar.run(2);
-        nar.memory.duration.set(10);
+
+        nar.memory.duration.set(duration);
         nar.onEachFrame(n-> {
 
             //random eternals

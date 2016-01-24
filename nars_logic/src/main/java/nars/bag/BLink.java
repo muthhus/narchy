@@ -49,7 +49,6 @@ public final class BLink<X> extends Budget implements Link<X> {
         //this.lastForget = c.getLastForgetTime();
         this.lastForget = Tense.TIMELESS;
 
-
         init(c.pri() * scale, c.dur(), c.qua());
     }
 
@@ -58,6 +57,12 @@ public final class BLink<X> extends Budget implements Link<X> {
         b[0] = clamp(p);
         b[1] = clamp(d);
         b[2] = clamp(q);
+    }
+
+    @Override
+    public void delete() {
+        clearDelta();
+        b[0] = Float.NaN;
     }
 
     private void clearDelta() {

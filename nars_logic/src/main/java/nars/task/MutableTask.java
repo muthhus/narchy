@@ -185,23 +185,24 @@ public class MutableTask extends AbstractTask {
         /*if (parentTask == null)
             throw new RuntimeException("parent task being set to null");*/
 
+        this.parentTask = ((parentTask != null) && !parentTask.isCommand()) ? reference(parentTask) : null;
 
+        this.parentBelief = ((parentBelief != null) && !parentBelief.isCommand()) ? reference(parentBelief) : null;
 
-        //TODO avoid creating the ref's if not necessary?
-        return parent(reference(parentTask), reference(parentBelief));
+        updateEvidence();
+
+        return this;
     }
 
     @NotNull
     public MutableTask parent(Reference<Task> rt, Reference<Task> rb) {
 
         Task pt = dereference(rt);
+        this.parentTask = ((pt != null) && !pt.isCommand()) ? rt : null ;
+
         Task pb = dereference(rb);
+        this.parentBelief = ((pb != null) && !pb.isCommand()) ? rb : null;
 
-        if (pt!=null && pt.isCommand()) rt = null;
-        if (pb!=null && pb.isCommand()) rb = null;
-
-        this.parentTask = rt;
-        this.parentBelief = rb;
         updateEvidence();
 
         return this;
