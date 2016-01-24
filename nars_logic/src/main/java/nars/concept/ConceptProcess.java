@@ -58,7 +58,7 @@ public final class ConceptProcess implements Premise {
         this.termLink = termLink;
 
         this.belief = belief;
-        this.cyclic = (belief != null) && Stamp.overlapping(getTask(), belief);
+        this.cyclic = Stamp.overlapping(getTask(), belief);
     }
 
 

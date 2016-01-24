@@ -1,11 +1,9 @@
 package nars.concept.util;
 
 import com.google.common.collect.Iterators;
-import nars.Memory;
+import nars.NAR;
 import nars.nal.Tense;
 import nars.task.Task;
-import nars.truth.Truth;
-import nars.truth.TruthFunctions;
 import nars.truth.TruthWave;
 import nars.truth.Truthed;
 import org.jetbrains.annotations.NotNull;
@@ -28,7 +26,7 @@ public interface BeliefTable extends TaskTable {
     /** main method */
 
     @NotNull
-    Task add(@NotNull Task input, Memory memory);
+    Task add(@NotNull Task input, NAR nar);
 
     /* when does projecting to now not play a role? I guess there is no case,
     //wo we use just one ranker anymore, the normal solution ranker which takes
@@ -77,13 +75,14 @@ public interface BeliefTable extends TaskTable {
 
         @NotNull
         @Override
-        public Task add(@NotNull Task input, Memory memory) {
+        public Task add(@NotNull Task input, NAR nar) {
             return input;
         }
 
+
         @Override
-        public boolean remove(Task w) {
-            return false;
+        public float rankEternal(@NotNull Task b) {
+            return 0;
         }
 
 
@@ -184,18 +183,15 @@ public interface BeliefTable extends TaskTable {
         return max;
     }
 
-    boolean remove(Task w);
-
-
-
-
-    public static float rankTemporal(@NotNull Task b, long when, long tRange) {
-        return or(rankEternal(b), b.getOriginality())
-                *(1f/(1f+ (Math.abs(b.occurrence() - when)/((float)tRange))) );
+    static public float rankTemporal(@NotNull Task b, long when, float duration) {
+        return rankEternal(b, when, duration)
+                /(1f+ (Math.abs(b.occurrence() - when)/duration));
     }
 
-    public static float rankEternal(@NotNull Task b) {
-        return b.conf();
+    public float rankEternal(@NotNull Task b);
+
+    static public float rankEternal(@NotNull Task b, long now, float duration) {
+        return or(b.conf(), b.getOriginality()) / (1f + (Math.abs(now - b.creation()/duration)));
     }
 
     /** get the top-ranking eternal belief/goal; null if no eternal beliefs known */
@@ -256,49 +252,47 @@ public interface BeliefTable extends TaskTable {
     }
 
 
-    /** computes the truth/desire as an aggregate of projections of all
-     * beliefs to current time
-     */
-    default float getMeanProjectedExpectation(long time) {
-        int size = size();
-        if (size == 0) return 0;
+//    /** computes the truth/desire as an aggregate of projections of all
+//     * beliefs to current time
+//     */
+//    default float getMeanProjectedExpectation(long time) {
+//        int size = size();
+//        if (size == 0) return 0;
+//
+//        float[] d = {0};
+//        forEach(t -> d[0] += projectionQuality(t.freq(), t.conf(), t, time, time, false) * t.getExpectation());
+//
+//        float dd = d[0];
+//
+//        if (dd == 0) return 0;
+//
+//        return dd / size;
+//
+//    }
 
-        float[] d = {0};
-        forEach(t -> d[0] += projectionQuality(t.freq(), t.conf(), t, time, time, false) * t.getExpectation());
-
-        float dd = d[0];
-
-        if (dd == 0) return 0;
-
-        return dd / size;
-
-    }
-
-    static float projectionQuality(float freq, float conf, @NotNull Task t, long targetTime, long currentTime, boolean problemHasQueryVar) {
-//        float freq = getFrequency();
-//        float conf = getConfidence();
-
-        long taskOcc = t.occurrence();
-
-        if (!Tense.isEternal(taskOcc) && (targetTime != taskOcc)) {
-            conf = TruthFunctions.eternalizedConfidence(conf);
-            if (targetTime != Tense.ETERNAL) {
-                float factor = TruthFunctions.temporalProjection(taskOcc, targetTime, currentTime);
-                float projectedConfidence = factor * t.conf();
-                if (projectedConfidence > conf) {
-                    conf = projectedConfidence;
-                }
-            }
-        }
-
-        return problemHasQueryVar ? Truth.expectation(freq, conf) / t.term().complexity() : conf;
-
-    }
+//    static float projectionQuality(float freq, float conf, @NotNull Task t, long targetTime, long currentTime, boolean problemHasQueryVar) {
+////        float freq = getFrequency();
+////        float conf = getConfidence();
+//
+//        long taskOcc = t.occurrence();
+//
+//        if (!Tense.isEternal(taskOcc) && (targetTime != taskOcc)) {
+//            conf = TruthFunctions.eternalizedConfidence(conf);
+//            if (targetTime != Tense.ETERNAL) {
+//                float factor = TruthFunctions.temporalProjection(taskOcc, targetTime, currentTime);
+//                float projectedConfidence = factor * t.conf();
+//                if (projectedConfidence > conf) {
+//                    conf = projectedConfidence;
+//                }
+//            }
+//        }
+//
+//        return problemHasQueryVar ? Truth.expectation(freq, conf) / t.term().complexity() : conf;
+//
+//    }
 
     static Task stronger(Task a, Task b) {
-        if (a.conf() > b.conf())
-            return a;
-        return b;
+        return a.conf() > b.conf() ? a : b;
     }
 
 

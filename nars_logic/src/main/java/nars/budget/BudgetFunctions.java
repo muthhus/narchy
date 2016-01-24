@@ -77,13 +77,14 @@ public final class BudgetFunctions extends UtilityFunctions {
 				- Math.max(tTruth.conf(), bTruth.conf());
 
 		if (dif < 0) {
-			/*String msg = ("Revision fault: previous belief " + oldBelief
-					+ " more confident than revised: " + conclusion);
-			if (Global.DEBUG) {
-				throw new RuntimeException(msg);
-			} else {
-				System.err.println(msg);
-			}*/
+//			String msg = ("Revision fault: previous belief " + oldBelief
+//					+ " more confident than revised: " + conclusion);
+//			if (Global.DEBUG) {
+//				throw new RuntimeException(msg);
+//			} else {
+//				System.err.println(msg);
+//			}
+			dif = 0;
 		}
 
 		float priority = or(dif, tb.pri());

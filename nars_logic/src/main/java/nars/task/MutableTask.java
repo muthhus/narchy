@@ -1,5 +1,6 @@
 package nars.task;
 
+import nars.Global;
 import nars.Memory;
 import nars.Symbols;
 import nars.budget.Budget;
@@ -14,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.lang.ref.Reference;
+import java.util.Objects;
 
 import static nars.Global.dereference;
 import static nars.Global.reference;
@@ -185,6 +187,8 @@ public class MutableTask extends AbstractTask {
         /*if (parentTask == null)
             throw new RuntimeException("parent task being set to null");*/
 
+        ensureParentNonLoop(parentTask, parentBelief);
+
         this.parentTask = ((parentTask != null) && !parentTask.isCommand()) ? reference(parentTask) : null;
 
         this.parentBelief = ((parentBelief != null) && !parentBelief.isCommand()) ? reference(parentBelief) : null;
@@ -192,6 +196,15 @@ public class MutableTask extends AbstractTask {
         updateEvidence();
 
         return this;
+    }
+
+    private void ensureParentNonLoop(@NotNull Task parentTask, @Nullable Task parentBelief) {
+        if (Global.DEBUG) {
+            if (parentTask!=null && Objects.equals(this,parentTask))
+                throw new RuntimeException("parentTask loop");
+            if (parentBelief!=null && Objects.equals(this,parentBelief))
+                throw new RuntimeException("parentBelief loop");
+        }
     }
 
     @NotNull
@@ -202,6 +215,8 @@ public class MutableTask extends AbstractTask {
 
         Task pb = dereference(rb);
         this.parentBelief = ((pb != null) && !pb.isCommand()) ? rb : null;
+
+        ensureParentNonLoop(pt, pb);
 
         updateEvidence();
 

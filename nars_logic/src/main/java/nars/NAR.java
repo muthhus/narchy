@@ -949,8 +949,12 @@ public abstract class NAR implements Level,Consumer<Task> {
     @Nullable
     protected final Concept process(@NotNull Task input) {
 
-        if (input.isDeleted())
-            throw new RuntimeException(input + " deleted");
+        if (input.isDeleted()) {
+            //throw new RuntimeException(
+            System.err.println(
+                    input + " "  + input.log() + " deleted:\n" + input.getExplanation());
+            return null;
+        }
 
 
         float activation = memory.activationRate.floatValue();

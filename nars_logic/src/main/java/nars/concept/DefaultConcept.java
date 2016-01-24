@@ -185,7 +185,7 @@ public class DefaultConcept extends AtomConcept {
         if (beliefs == null)
             beliefs = this.beliefs = new DefaultBeliefTable(memory.conceptBeliefsMax.intValue(), memory);
 
-        Task best = beliefs.add(belief, memory);
+        Task best = beliefs.add(belief, nar);
 
         if (hasQuestions()) {
             //TODO move this to a subclass of TaskTable which is customized for questions. then an arraylist impl of TaskTable can iterate by integer index and not this iterator/lambda
@@ -231,7 +231,7 @@ public class DefaultConcept extends AtomConcept {
         if (goals == null) goals = new DefaultBeliefTable(
                 nar.memory.conceptGoalsMax.intValue(), memory);
 
-        Task goal = getGoals().add(inputGoal, memory);
+        Task goal = getGoals().add(inputGoal, nar);
 
         float successAfter = getSuccess(now);
         float delta = successBefore - successAfter;

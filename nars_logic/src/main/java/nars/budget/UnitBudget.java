@@ -159,6 +159,8 @@ public class UnitBudget extends Budget {
 
     @Override
     public final void delete() {
+        if (isDeleted())
+            throw new RuntimeException("already deleted");
         this.priority = Float.NaN;
     }
 

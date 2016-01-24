@@ -18,7 +18,6 @@ import nars.Global;
 import nars.NAR;
 import nars.bag.Bag;
 import nars.concept.Concept;
-import nars.concept.util.BeliefTable;
 import nars.concept.util.DefaultBeliefTable;
 import nars.guifx.demo.SubButton;
 import nars.guifx.graph2.TermEdge;
@@ -493,7 +492,7 @@ public class ConceptPane extends BorderPane implements ChangeListener {
                     float h = 20;
                     float x = b + (gew-2*b-w) * c;
                     float y = b + (geh-2*b-h) * (1-f);
-                    float rank = BeliefTable.rankEternal(t);
+                    float rank = c; //concept.getBeliefs().rankEternal(t);
                     ge.setFill(new Color( f,  c, 1f, rank));
                     ge.fillRect(x-w/2,y-h/2,w,h);
                 } else if (!t.isEternal() && t.truth()!=null) {
@@ -504,7 +503,7 @@ public class ConceptPane extends BorderPane implements ChangeListener {
                     float h = 15;
                     float x = xTime(tew, b, minT, maxT, o, w);
                     float y = b + (teh-2*b-h) * (1-f);
-                    float rank = BeliefTable.rankTemporal(t, now, now);
+                    float rank = cc; //BeliefTable.rankTemporal(t, now, now);
                     te.setFill(new Color( f,  cc, 1f, rank));
                     te.fillRect(x-w/2,y-h/2,w,h);
                     tt.add(t);

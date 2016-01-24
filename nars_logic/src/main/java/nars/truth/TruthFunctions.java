@@ -23,6 +23,7 @@ package nars.truth;
 import nars.Global;
 import nars.nal.Tense;
 import nars.nal.UtilityFunctions;
+import nars.task.Task;
 import org.jetbrains.annotations.NotNull;
 
 import static java.lang.Math.abs;
@@ -105,7 +106,39 @@ public final class TruthFunctions extends UtilityFunctions {
                 w2c(w)
         );
     }
+    @NotNull
+    public static Truth revision(@NotNull Task ta, @NotNull Task tb, long now) {
+        Truth a = ta.truth();
+        Truth b = tb.truth();
 
+        if (a.equals(b)) return a;
+
+        float f1 = a.freq();
+        float f2 = b.freq();
+
+        float w1 = c2w(a.conf());
+        float w2 = c2w(b.conf());
+
+        //temporal proximity metric (similar to projection)
+        long at = ta.occurrence();
+        long bt = tb.occurrence();
+        if (at != bt) {
+            long adt = Math.abs(at-now);
+            long bdt = Math.abs(bt-now);
+            if (adt!=bdt) {
+                float p = adt/((float)(adt+bdt));
+                w2 *= p;
+                w1 *= (1f-p);
+            }
+        }
+
+        float w = w1 + w2;
+
+        return new DefaultTruth(
+            (w1 * f1 + w2 * f2) / w,
+            w2c(w) * TruthFunctions.temporalProjection(at, bt, now)
+        );
+    }
 
     /**
      * {M, <M ==> P>} |- P

@@ -20,8 +20,10 @@
  */
 package nars.nal;
 
-import com.gs.collections.impl.tuple.Tuples;
-import nars.*;
+import nars.Memory;
+import nars.NAR;
+import nars.Op;
+import nars.Premise;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.budget.UnitBudget;
@@ -114,9 +116,6 @@ public enum LocalRules {
      */
     public static void forEachSolution(@NotNull Task question, @NotNull Task sol, @NotNull NAR nal, @NotNull Consumer<Task> eachSolutions) {
 
-        if (sol.isDeleted())
-            return;
-
 
 //        float om = Tense.orderMatch(question, solution, nal.memory.duration());
 //
@@ -135,20 +134,14 @@ public enum LocalRules {
 
         Consumer<Term> proc = (st) -> {
 
-            //seems its possible for the solution to become deleted in-between executions of this lambda
-            if (sol.isDeleted())
-                return;
 
-            Task validSolution = sol.projectedSolution((Compound)st, question, memory );
+            Task validSolution = sol.solved((Compound)st, question, memory );
 
             if (validSolution!=null) {
                 eachSolutions.accept(validSolution);
                 //System.out.println(question + " " + ss + " " + ss.getExplanation());
 
-                //TODO use an Answer class which is Runnable, combining that with the Twin info
-                if (Global.DEBUG_NON_INPUT_ANSWERED_QUESTIONS || question.isInput()) {
-                    memory.eventAnswer.emit(Tuples.twin(question, validSolution));
-                }
+
             }
 
         };
@@ -284,10 +277,7 @@ public enum LocalRules {
             task = nal.getCurrentTask();
             feedbackToLinks = true;
         }*/
-        if (question.isDeleted())
-            throw new RuntimeException("question deleted: " + question);
-        if (solution.isDeleted())
-            throw new RuntimeException("solution deleted: " + solution);
+
 
         boolean judgmentTask = question.isJudgment();
         //float om = orderMatch(problem.term(), solution.term(), duration);
