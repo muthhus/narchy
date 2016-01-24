@@ -27,17 +27,17 @@ public enum Forget { ;
     }
 
     /** for BLinked budgeted items: if that item becomes deleted, then the enclosing BLink is removed during a Bag.filter operation that applies this Predicate */
-    public static final class ForgetAndDetectItemDeletion<X extends Budgeted> implements BudgetForgetFilter<X> {
+    public static final class ForgetAndDetectDeletion<X extends Budgeted> implements BudgetForgetFilter<X> {
 
         final BudgetForget<X> forget;
 
-        public ForgetAndDetectItemDeletion(BudgetForget<X> forget) {
+        public ForgetAndDetectDeletion(BudgetForget<X> forget) {
             this.forget = forget;
         }
 
         @Override
         public boolean test(BLink<? extends X> b) {
-            if (b.get().isDeleted())
+            if (b.get().isDeleted() || b.isDeleted())
                 return false;
             forget.accept(b);
             return true;
@@ -72,8 +72,8 @@ public enum Forget { ;
             now = memory.time();
         }
 
-        public <B extends Budgeted> ForgetAndDetectItemDeletion<B> withDeletedItemFiltering() {
-            return new ForgetAndDetectItemDeletion<B>((BudgetForget<B>) this);
+        public <B extends Budgeted> ForgetAndDetectDeletion<B> withDeletedItemFiltering() {
+            return new ForgetAndDetectDeletion<B>((BudgetForget<B>) this);
         }
 
     }

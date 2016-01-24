@@ -78,12 +78,9 @@ public abstract class CollectorMap<K, V>  {
         if (removed != null && removed2 != null) {
             throw new RuntimeException("Only one item should have been removed on this insert; both removed: " + removed + ", " + removed2);
         }
-        if (removed2 != null) {
-            K key2 = key(removed2);
-
-                removeKey(key2);
-                removed = removed2;
-
+        if (removed2 != null) { //&& (!key(removed2).equals(key))) {
+            removeKey(key(removed2));
+            removed = removed2;
         }
 
         return removed;
@@ -95,11 +92,11 @@ public abstract class CollectorMap<K, V>  {
         V e = removeKey(key);
         if (e != null) {
             V removed = removeItem(e);
-            if (removed == null) {
-                /*if (Global.DEBUG)
-                    throw new RuntimeException(key + " removed from index but not from items list");*/
-                return null;
-            }
+//            if (removed == null) {
+//                /*if (Global.DEBUG)
+//                    throw new RuntimeException(key + " removed from index but not from items list");*/
+//                //return null;
+//            }
             if (removed != e)
                 throw new RuntimeException(key + " removed " + e + " but item removed was " + removed);
             return removed;

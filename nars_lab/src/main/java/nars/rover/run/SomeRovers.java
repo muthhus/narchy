@@ -31,7 +31,7 @@ public class SomeRovers {
 
     public static void main(String[] args) {
 
-        Global.DEBUG = Global.EXIT_ON_EXCEPTION = false;
+        Global.DEBUG = Global.EXIT_ON_EXCEPTION = true;
 
 
         //world = new ReactorWorld(this, 32, 48, 48*2);
@@ -51,11 +51,11 @@ public class SomeRovers {
 
 
         {
-            int conceptsFirePerCycle = 20;
+            int conceptsFirePerCycle = 40;
             Default nar = new Default(
                     new Memory(clock, new MapIndex2(
                         new SoftValueHashMap())),
-                        1600, conceptsFirePerCycle, 2, 4);
+                        1600, conceptsFirePerCycle, 1, 3);
 
             nar.memory.DEFAULT_GOAL_PRIORITY = 0.8f;
             nar.memory.DEFAULT_GOAL_DURABILITY = 0.7f;
@@ -64,9 +64,9 @@ public class SomeRovers {
 
             //nar.initNAL9();
 
-            nar.memory.perfection.setValue(0.1f);
-            nar.core.confidenceDerivationMin.setValue(0.04f);
-            nar.core.activationRate.setValue(1f/conceptsFirePerCycle /* approxmimate */);
+            nar.memory.perfection.setValue(0.15f);
+            nar.core.confidenceDerivationMin.setValue(0.02f);
+            nar.core.activationRate.setValue(3f/conceptsFirePerCycle /* approxmimate */);
             nar.memory.duration.set(2);
             nar.memory.cyclesPerFrame.set(1);
 

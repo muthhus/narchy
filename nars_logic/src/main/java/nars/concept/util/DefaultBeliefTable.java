@@ -372,28 +372,28 @@ public class DefaultBeliefTable implements BeliefTable {
      *  returns true if it was inserted, false if not
      * */
     private Task tryInsert(@NotNull Task incoming, @NotNull Memory memory) {
-        if (incoming.isDeleted())
-            throw new RuntimeException("wtf");
+
 
         ArrayTable<Task, Task> table = tableFor(incoming);
 
-        Task existing = map.get(incoming);
-        if (existing!=null)  {
-            if (existing!=incoming) {
-                existingMergeFunction.merge(existing.budget(), incoming.budget(), 1f);
-                ((MutableTask) existing).state(incoming.state()); //clear any state
-                onBeliefRemoved(incoming, "Duplicate", memory);
-            }
-            return existing;
-        }
+//        Task existing = map.get(incoming);
+//        if (existing!=null)  {
+//            if (existing!=incoming) {
+//                existingMergeFunction.merge(existing.budget(), incoming.budget(), 1f);
+//                ((MutableTask) existing).state(incoming.state()); //clear any state
+//                onBeliefRemoved(incoming, "Duplicate", memory);
+//            }
+//            return existing;
+//        }
 
         Task displaced = table.put(incoming,incoming);
         boolean inserted = displaced == null || displaced!=incoming;//!displaced.equals(t);
-        if (displaced!=null && inserted)
-            onBeliefRemoved(displaced,
-                    "Displaced",
-                    //"Displaced by " + incoming,
-                    memory);
+//        if (displaced!=null && inserted) {
+//            onBeliefRemoved(displaced,
+//                    "Displaced",
+//                    //"Displaced by " + incoming,
+//                    memory);
+//        }
 
         return incoming;
     }

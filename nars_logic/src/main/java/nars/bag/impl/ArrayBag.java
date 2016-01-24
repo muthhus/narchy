@@ -143,9 +143,11 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
         int n = l.size();
         if (n > 0) {
             for (int i = 0; i < n; i++) {
-                if (!forEachIfFalseThenRemove.test(l.get(i))) {
-                    BLink<V> removed = removeKeyForValue(l.remove(i));
-                    removed.delete();
+                BLink<V> h = l.get(i);
+                if (!forEachIfFalseThenRemove.test(h)) {
+                    removeKeyForValue(h); //only remove key, we remove the item here
+                    h.delete();
+                    l.remove(i);
                     i--;
                     n--;
                 }

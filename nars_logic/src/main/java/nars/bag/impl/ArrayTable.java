@@ -209,11 +209,11 @@ abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements Tabl
     @Override
     protected final L addItem(L i) {
         L overflow = items.insert(i);
-        if (overflow!=null) {
-            L v = removeKeyForValue(overflow);
-            if (v!=overflow)
-                throw new RuntimeException("bag inconsistency: " + overflow + " mismatched with " + v);
-        }
+//        if (overflow!=null) {
+//            L v = removeKeyForValue(overflow);
+//            if (v!=overflow)
+//                throw new RuntimeException("bag inconsistency: " + overflow + " mismatched with " + v);
+//        }
         return overflow;
     }
 

@@ -266,7 +266,7 @@ public class Default extends AbstractNAR {
         final List<BLink<Concept>> firing = Global.newArrayList(1);
 
         @NotNull
-        private final Forget.ForgetAndDetectItemDeletion<Task> taskLinkForget;
+        private final Forget.ForgetAndDetectDeletion<Task> taskLinkForget;
         @NotNull
         private final Forget.AbstractForget<Termed> termLinkForget;
         @NotNull
