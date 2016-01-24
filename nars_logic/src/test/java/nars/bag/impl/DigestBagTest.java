@@ -32,7 +32,7 @@ public class DigestBagTest {
 
         /* ignored the 0.1 conf result */
         //revision adds results above, knocking out lower values like 0.25
-        assertTrue(0.25f < d.list.getLast().get().getConfidence());
+        assertTrue(0.25f < d.list.getLast().get().conf());
 
 
     }

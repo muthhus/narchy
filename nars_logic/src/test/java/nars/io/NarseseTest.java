@@ -70,8 +70,8 @@ public class NarseseTest {
         assertEquals('!', t.punc());
         assertEquals(0.99f, t.pri(), 0.001);
         assertEquals(0.95f, t.dur(), 0.001);
-        assertEquals(0.93f, t.getFrequency(), 0.001);
-        assertEquals(0.95f, t.getConfidence(), 0.001);
+        assertEquals(0.93f, t.freq(), 0.001);
+        assertEquals(0.95f, t.conf(), 0.001);
     }
 
     @Test public void testTruth() {
@@ -91,8 +91,8 @@ public class NarseseTest {
         String s = "a:b. " + t;
 
         Truth truth = task(s).truth();
-        assertEquals(freq, truth.getFrequency(), 0.001);
-        assertEquals(conf, truth.getConfidence(), 0.001);
+        assertEquals(freq, truth.freq(), 0.001);
+        assertEquals(conf, truth.conf(), 0.001);
     }
 
     @Test
@@ -106,7 +106,7 @@ public class NarseseTest {
         assertEquals('.', t.punc());
         //assertEquals(Global.DEFAULT_JUDGMENT_PRIORITY, t.getPriority(), 0.001);
         //assertEquals(Global.DEFAULT_JUDGMENT_DURABILITY, t.getDurability(), 0.001);
-        assertEquals(1.0f, t.truth().getFrequency(), 0.001);
+        assertEquals(1.0f, t.truth().freq(), 0.001);
         //assertEquals(Global.DEFAULT_JUDGMENT_CONFIDENCE, t.getTruth().getConfidence(), 0.001);
     }
 
@@ -138,8 +138,8 @@ public class NarseseTest {
         assertEquals('.', t.punc());
         //assertEquals(Global.DEFAULT_JUDGMENT_PRIORITY, t.getPriority(), 0.001);
         //assertEquals(Global.DEFAULT_JUDGMENT_DURABILITY, t.getDurability(), 0.001);
-        assertEquals(0.0f, t.getFrequency(), 0.001);
-        assertEquals(0.93f, t.getConfidence(), 0.001);
+        assertEquals(0.0f, t.freq(), 0.001);
+        assertEquals(0.93f, t.conf(), 0.001);
     }
 
     @Test

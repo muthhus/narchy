@@ -45,7 +45,7 @@ public interface Truth extends MetaTruth<Float> {
      *
      * @return The frequency value
      */
-    float getFrequency();
+    float freq();
 
     @NotNull
     Truth setFrequency(float f);
@@ -63,13 +63,13 @@ public interface Truth extends MetaTruth<Float> {
 
     /** expectation, the expectation of freq=1 */
     default float getExpectationPositive() {
-        return expectation(getFrequency(), getConfidence());
+        return expectation(freq(), conf());
     }
 
 
     /** expectation inverse, the expectation of freq=0  */
     default float getExpectationNegative() {
-        return expectation(1.0f - getFrequency(), getConfidence());
+        return expectation(1.0f - freq(), conf());
     }
 
     static float expectation(float frequency, float confidence) {
@@ -93,7 +93,7 @@ public interface Truth extends MetaTruth<Float> {
      * @return True if the frequence is less than 1/2
      */
     default boolean isNegative() {
-        return getFrequency() < 0.5f;
+        return freq() < 0.5f;
     }
 
 
@@ -112,8 +112,8 @@ public interface Truth extends MetaTruth<Float> {
     static int hash(@NotNull Truth t) {
 
         //assuming epsilon is large enough such that: 0 <= h < 2^15:
-        int freqHash = Util.hash(t.getFrequency(), hashDiscreteness);
-        int confHash = Util.hash(t.getConfidence(), hashDiscreteness);
+        int freqHash = Util.hash(t.freq(), hashDiscreteness);
+        int confHash = Util.hash(t.conf(), hashDiscreteness);
 
         return (freqHash << 16) | confHash;
     }
@@ -144,9 +144,9 @@ public interface Truth extends MetaTruth<Float> {
         sb.ensureCapacity(3 + 2 * (2 + decimals) );
         return sb
             .append(Symbols.TRUTH_VALUE_MARK)
-            .append(Texts.n(getFrequency(), decimals))
+            .append(Texts.n(freq(), decimals))
             .append(Symbols.VALUE_SEPARATOR)
-            .append(Texts.n(getConfidence(), decimals))
+            .append(Texts.n(conf(), decimals))
             .append(Symbols.TRUTH_VALUE_MARK);
     }
 
@@ -194,7 +194,7 @@ public interface Truth extends MetaTruth<Float> {
     @NotNull
     default Truth negate() {
         //final float f = 1 - getFrequency();
-        return setFrequency(1.0f - getFrequency());
+        return setFrequency(1.0f - freq());
     }
 
     static int compare(@NotNull Truth a, @NotNull Truth b) {
@@ -222,8 +222,8 @@ public interface Truth extends MetaTruth<Float> {
     
     default float getComponent(@NotNull TruthComponent c) {
         switch (c) {
-            case Frequency: return getFrequency();
-            case Confidence: return getConfidence();
+            case Frequency: return freq();
+            case Confidence: return conf();
             case Expectation: return getExpectation();                
         }
         return Float.NaN;
@@ -245,7 +245,7 @@ public interface Truth extends MetaTruth<Float> {
 
     /** use getFrequency() when possible because this may box the result as a non-primitive */
     @Override
-    default Float value() { return getFrequency(); }
+    default Float value() { return freq(); }
 
 
     /** use setFrequency(v) when possible because this may box the result as a non-primitive */

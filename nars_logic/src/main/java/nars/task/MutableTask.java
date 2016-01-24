@@ -251,4 +251,9 @@ public class MutableTask extends AbstractTask {
                 term(), premise);
         return this;
     }
+
+    public MutableTask state(TaskState s) {
+        this.state = s;
+        return this;
+    }
 }

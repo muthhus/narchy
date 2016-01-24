@@ -14,7 +14,7 @@ public abstract class AbstractTruth<T> implements MetaTruth<T> {
 
 
     @Override
-    public final float getConfidence() {
+    public final float conf() {
         return confidence;
     }
 
@@ -43,7 +43,7 @@ public abstract class AbstractTruth<T> implements MetaTruth<T> {
 
     public final boolean equalsConfidence(@NotNull Truth t) {
         float e = Global.TRUTH_EPSILON;//getEpsilon();
-        return Util.equal(confidence, t.getConfidence(), e);
+        return Util.equal(confidence, t.conf(), e);
     }
 
     public abstract boolean equalsFrequency(Truth t);

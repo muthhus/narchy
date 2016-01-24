@@ -281,24 +281,24 @@ public class BeliefTableTest extends TestCase {
 
         b.believe(1.0f, 0.5f); n.step();
         b.print();
-        assertEquals(0.5, b.concept().getBeliefs().topEternal().getConfidence(), 0.001);
-        assertEquals(0.5, b.concept().getBeliefs().top(n.time()).getConfidence(), 0.001);
+        assertEquals(0.5, b.concept().getBeliefs().topEternal().conf(), 0.001);
+        assertEquals(0.5, b.concept().getBeliefs().top(n.time()).conf(), 0.001);
         assertEquals(1, b.concept().getBeliefs().size());
 
         b.believe(1.0f, 0.5f); n.step();
         b.print();
-        assertEquals(0.67, b.concept().getBeliefs().topEternal().getConfidence(), 0.001);
+        assertEquals(0.67, b.concept().getBeliefs().topEternal().conf(), 0.001);
         assertEquals(3, b.concept().getBeliefs().size());
 
         b.believe(1.0f, 0.5f); n.step();
         b.print();
-        assertEquals(0.75, b.concept().getBeliefs().topEternal().getConfidence(), 0.001);
-        assertEquals(0.75, b.concept().getBeliefs().top(n.time()).getConfidence(), 0.001);
+        assertEquals(0.75, b.concept().getBeliefs().topEternal().conf(), 0.001);
+        assertEquals(0.75, b.concept().getBeliefs().top(n.time()).conf(), 0.001);
         assertEquals(5, b.concept().getBeliefs().size());
 
         b.believe(1.0f, 0.5f); n.step();
         b.print();
-        assertEquals(0.80, b.concept().getBeliefs().topEternal().getConfidence(), 0.001);
+        assertEquals(0.80, b.concept().getBeliefs().topEternal().conf(), 0.001);
         assertEquals(5, b.concept().getBeliefs().size());
 
 //        int period = 1;

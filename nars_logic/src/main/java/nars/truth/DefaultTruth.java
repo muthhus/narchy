@@ -51,17 +51,17 @@ public class DefaultTruth extends AbstractScalarTruth {
     }
 
     public DefaultTruth(@NotNull AbstractScalarTruth toClone) {
-        this(toClone.getFrequency(), toClone.getConfidence());
+        this(toClone.freq(), toClone.conf());
     }
 
     public DefaultTruth(@NotNull Truth truth) {
-        this(truth.getFrequency(), truth.getConfidence());
+        this(truth.freq(), truth.conf());
     }
 
     @NotNull
     @Override
     public Truth cloneMultipliedConfidence(float factor) {
-        return new DefaultTruth(getFrequency(), getConfidence() * factor);
+        return new DefaultTruth(freq(), conf() * factor);
     }
 
     /*    public float getEpsilon() {

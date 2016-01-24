@@ -263,7 +263,7 @@ public enum $  {
 
     @NotNull
     public static MutableTask belief(@NotNull Compound term, @NotNull Truth copyFrom) {
-        return belief(term, copyFrom.getFrequency(), copyFrom.getConfidence());
+        return belief(term, copyFrom.freq(), copyFrom.conf());
     }
 
     @NotNull

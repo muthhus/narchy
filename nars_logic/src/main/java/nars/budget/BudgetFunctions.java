@@ -62,7 +62,7 @@ public final class BudgetFunctions extends UtilityFunctions {
 	 * @return The budget for the new task
 	 */
 	@NotNull
-	public static Budget revise(@NotNull Truth tTruth, @NotNull Task oldBelief, @NotNull Truth conclusion,
+	public static void revise(@NotNull Budget target, @NotNull Truth tTruth, @NotNull Task oldBelief, @NotNull Truth conclusion,
 								@NotNull Budget tb) {
 
 		Truth bTruth = oldBelief.truth();
@@ -73,8 +73,8 @@ public final class BudgetFunctions extends UtilityFunctions {
 
 		oldBelief.onRevision(conclusion);
 
-		float dif = conclusion.getConfidence()
-				- Math.max(tTruth.getConfidence(), bTruth.getConfidence());
+		float dif = conclusion.conf()
+				- Math.max(tTruth.conf(), bTruth.conf());
 
 		if (dif < 0) {
 			/*String msg = ("Revision fault: previous belief " + oldBelief
@@ -104,7 +104,7 @@ public final class BudgetFunctions extends UtilityFunctions {
 		 * quality = 0; }
 		 */
 
-		return new UnitBudget(priority, durability, quality);
+		target.budget(priority, durability, quality);
 	}
 
 	// /**

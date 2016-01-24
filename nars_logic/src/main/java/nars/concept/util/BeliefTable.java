@@ -126,7 +126,7 @@ public interface BeliefTable extends TaskTable {
 
 
         for (Task x : this) {
-            r -= x.truth().getConfidence();
+            r -= x.truth().conf();
             if (r < 0)
                 return x;
         }
@@ -142,7 +142,7 @@ public interface BeliefTable extends TaskTable {
     static float getConfidenceSum(@NotNull Iterable<? extends Truthed> beliefs) {
         float t = 0;
         for (Truthed s : beliefs)
-            t += s.truth().getConfidence();
+            t += s.truth().conf();
         return t;
     }
 
@@ -151,7 +151,7 @@ public interface BeliefTable extends TaskTable {
 
         float t = 0;
         for (Truthed s : beliefs)
-            t += s.truth().getFrequency();
+            t += s.truth().freq();
         return t / beliefs.size();
     }
 
@@ -171,10 +171,10 @@ public interface BeliefTable extends TaskTable {
         float max = Float.NEGATIVE_INFINITY;
 
         for (Task t : this) {
-            float f = t.truth().getFrequency();
+            float f = t.truth().freq();
 
             if ((f >= minFreq) && (f <= maxFreq)) {
-                float c = t.truth().getConfidence();
+                float c = t.truth().conf();
                 if (c > max)
                     max = c;
             }
@@ -195,7 +195,7 @@ public interface BeliefTable extends TaskTable {
     }
 
     public static float rankEternal(@NotNull Task b) {
-        return b.getConfidence();
+        return b.conf();
     }
 
     /** get the top-ranking eternal belief/goal; null if no eternal beliefs known */
@@ -237,7 +237,7 @@ public interface BeliefTable extends TaskTable {
         } else if (ete == null) {
             return tmp;
         } else {
-            return ( ete.getConfidence() > tmp.getConfidence()) ?
+            return ( ete.conf() > tmp.conf()) ?
                     ete : tmp;
         }
     }
@@ -264,7 +264,7 @@ public interface BeliefTable extends TaskTable {
         if (size == 0) return 0;
 
         float[] d = {0};
-        forEach(t -> d[0] += projectionQuality(t.getFrequency(), t.getConfidence(), t, time, time, false) * t.getExpectation());
+        forEach(t -> d[0] += projectionQuality(t.freq(), t.conf(), t, time, time, false) * t.getExpectation());
 
         float dd = d[0];
 
@@ -284,7 +284,7 @@ public interface BeliefTable extends TaskTable {
             conf = TruthFunctions.eternalizedConfidence(conf);
             if (targetTime != Tense.ETERNAL) {
                 float factor = TruthFunctions.temporalProjection(taskOcc, targetTime, currentTime);
-                float projectedConfidence = factor * t.getConfidence();
+                float projectedConfidence = factor * t.conf();
                 if (projectedConfidence > conf) {
                     conf = projectedConfidence;
                 }
@@ -296,7 +296,7 @@ public interface BeliefTable extends TaskTable {
     }
 
     static Task stronger(Task a, Task b) {
-        if (a.getConfidence() > b.getConfidence())
+        if (a.conf() > b.conf())
             return a;
         return b;
     }

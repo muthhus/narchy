@@ -22,7 +22,7 @@ public interface TruthOperator {
 
         if (truth!=null) {
             //pre-filter insufficient confidence level
-            if (truth.getConfidence() < m.getMinConfidence()) {
+            if (truth.conf() < m.getMinConfidence()) {
                 return false;
             }
 

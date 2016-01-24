@@ -25,14 +25,12 @@ import nars.*;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.budget.UnitBudget;
-import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.term.compound.Compound;
-import nars.truth.ProjectedTruth;
 import nars.truth.Stamp;
-import nars.truth.Truth;
-import nars.truth.TruthFunctions;
+import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
@@ -325,59 +323,23 @@ public enum LocalRules {
      * WARNING: this assumes the task's terms are already
      * known to be equal.
      */
-    private static boolean isRevisible(@NotNull Task newBelief, Task oldBelief) {
+    public static boolean isRevisible(@NotNull Task newBelief, Task oldBelief) {
         Term t = newBelief.term();
         return
-            !(t.op().isConjunctive() && t.hasAny(Op.VAR_DEP))    // t.hasVarDep());
-            && !newBelief.equals(oldBelief)
-            && !Stamp.overlapping(newBelief, oldBelief);
+            !newBelief.equals(oldBelief) &&
+            !(t.op().isConjunctive() && t.hasAny(Op.VAR_DEP)) &&   // t.hasVarDep());
+            !Stamp.overlapping(newBelief, oldBelief);
     }
 
-    /**
-     * creates a revision task (but does not input it)
-     * if failed, returns null
-     */
-    public static Task getRevision(@NotNull Task newBelief, @NotNull Task oldBelief, long now) {
 
-        if (!isRevisible(newBelief, oldBelief)) {
-            return null;
-        }
-        //if (Tense.matchingOrder(newBelief.getTemporalOrder(), oldBelief.getTemporalOrder()))
+    /** assumes the compounds are the same except for possible numeric metadata differences */
+    public static Termed<Compound> intermpolate(Termed<Compound> a, Termed<Compound> b, float aConf, float bConf) {
+        if (a.equals(b)) return a;
 
-        Truth newBeliefTruth = newBelief.truth();
+        int at = a.term().t();
+        int bt = b.term().t();
 
-        long occ = newBelief.occurrence();
-
-//        //interpolate the occurrence time by their relative confidences
-//        long newo = newBelief.getOccurrenceTime();
-//        long oldo = oldBelief.getOccurrenceTime();
-//        long target;
-//        if (newo!=oldo) {
-//            long dnew = Math.abs(now - newo);
-//            long dold = Math.abs(now - oldo);
-//            long dden = dnew + dold;
-//            target = dden != 0 ? (long) (Util.lerp(newo, oldo,
-//                    (float) (dnew / (dnew + dold))
-//            )) : newo;
-//        } else {
-//            target = newo;
-//        }
-
-        Truth oldBeliefTruth = oldBelief.projection(occ, now);
-
-        Truth conclusion = TruthFunctions.revision(newBeliefTruth, oldBeliefTruth);
-        if (conclusion instanceof ProjectedTruth) {
-            //allow eternalized truth to override with eternalized occurrence
-            occ = ((ProjectedTruth) conclusion).when;
-        }
-
-        return new MutableTask(newBelief.concept())
-                .punctuation(newBelief.punc())
-                .truth(conclusion)
-                .budget(BudgetFunctions.revise(newBeliefTruth, oldBelief, conclusion, newBelief.budget()))
-                .parent(newBelief, oldBelief)
-                .time(now, occ)
-                .because("Revision");
+        return a.term().t( Math.round(Util.lerp(at, bt, aConf/(aConf+bConf))) );
     }
 
 

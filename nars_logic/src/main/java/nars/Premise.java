@@ -320,7 +320,7 @@ public interface Premise extends Level, Tasked {
             throw new RuntimeException("Derived task must have a parent task or belief: " + derived);
         }
 
-        if (derived.isJudgmentOrGoal() && derived.getConfidence() < Global.TRUTH_EPSILON) {
+        if (derived.isJudgmentOrGoal() && derived.conf() < Global.TRUTH_EPSILON) {
             return "Insufficient confidence";
         }
 

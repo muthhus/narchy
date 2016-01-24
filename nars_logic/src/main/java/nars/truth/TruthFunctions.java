@@ -40,8 +40,8 @@ public final class TruthFunctions extends UtilityFunctions {
      */
     @NotNull
     public static Truth conversion(@NotNull Truth t) {
-        float f1 = t.getFrequency();
-        float c1 = t.getConfidence();
+        float f1 = t.freq();
+        float c1 = t.conf();
         float w = and(f1, c1);
         float c = w2c(w);
         return new DefaultTruth(1, c);
@@ -54,8 +54,8 @@ public final class TruthFunctions extends UtilityFunctions {
      */
     @NotNull
     public static Truth negation(@NotNull Truth v1) {
-        float f = 1.0f - v1.getFrequency();
-        float c = v1.getConfidence();
+        float f = 1.0f - v1.freq();
+        float c = v1.conf();
         return new DefaultTruth(f, c);
 
         /*
@@ -79,8 +79,8 @@ public final class TruthFunctions extends UtilityFunctions {
      */
     @NotNull
     public static Truth contraposition(@NotNull Truth v1) {
-        float f1 = v1.getFrequency();
-        float c1 = v1.getConfidence();
+        float f1 = v1.freq();
+        float c1 = v1.conf();
         float w = and(1 - f1, c1);
         float c = w2c(w);
         return new DefaultTruth(0, c);
@@ -95,10 +95,10 @@ public final class TruthFunctions extends UtilityFunctions {
      */
     @NotNull
     public static Truth revision(@NotNull Truth a, @NotNull Truth b) {
-        float f1 = a.getFrequency();
-        float f2 = b.getFrequency();
-        float w1 = c2w(a.getConfidence());
-        float w2 = c2w(b.getConfidence());
+        float f1 = a.freq();
+        float f2 = b.freq();
+        float w1 = c2w(a.conf());
+        float w2 = c2w(b.conf());
         float w = w1 + w2;
         return new DefaultTruth(
                 (w1 * f1 + w2 * f2) / w,
@@ -115,8 +115,8 @@ public final class TruthFunctions extends UtilityFunctions {
      */
     @NotNull
     public static Truth deduction(@NotNull Truth a, float reliance) {
-        float f = a.getFrequency();
-        float c = and(f, a.getConfidence(), reliance);
+        float f = a.freq();
+        float c = and(f, a.conf(), reliance);
         return new DefaultTruth(f, c);
     }
         /* ----- double argument functions, called in SyllogisticRules ----- */
@@ -128,7 +128,7 @@ public final class TruthFunctions extends UtilityFunctions {
      */
     @NotNull
     public static Truth deduction(@NotNull Truth a, @NotNull Truth b) {
-        return deduction(a, b.getFrequency(), b.getConfidence());
+        return deduction(a, b.freq(), b.conf());
     }
 
     /** assumes belief freq=1f */
@@ -139,8 +139,8 @@ public final class TruthFunctions extends UtilityFunctions {
 
     @NotNull
     public static Truth deduction(@NotNull Truth a, float bF, float bC) {
-        float f = and(a.getFrequency(), bF);
-        float c = and(f, a.getConfidence(), bC);
+        float f = and(a.freq(), bF);
+        float c = and(f, a.conf(), bC);
         return new DefaultTruth(f, c);
     }
 
@@ -152,10 +152,10 @@ public final class TruthFunctions extends UtilityFunctions {
      */
     @NotNull
     public static Truth analogy(@NotNull Truth a, @NotNull Truth b) {
-        float f1 = a.getFrequency();
-        float f2 = b.getFrequency();
-        float c1 = a.getConfidence();
-        float c2 = b.getConfidence();
+        float f1 = a.freq();
+        float f2 = b.freq();
+        float c1 = a.conf();
+        float c2 = b.conf();
         float f = and(f1, f2);
         float c = and(c1, c2, f2);
         return new DefaultTruth(f, c);
@@ -169,10 +169,10 @@ public final class TruthFunctions extends UtilityFunctions {
      */
     @NotNull
     public static Truth resemblance(@NotNull Truth a, @NotNull Truth b) {
-        float f1 = a.getFrequency();
-        float f2 = b.getFrequency();
-        float c1 = a.getConfidence();
-        float c2 = b.getConfidence();
+        float f1 = a.freq();
+        float f2 = b.freq();
+        float c1 = a.conf();
+        float c2 = b.conf();
         float f = and(f1, f2);
         float c = and(c1, c2, or(f1, f2));
         return new DefaultTruth(f, c);
@@ -186,10 +186,10 @@ public final class TruthFunctions extends UtilityFunctions {
      */
     @NotNull
     public static Truth abduction(@NotNull Truth a, @NotNull Truth b) {
-        float f1 = a.getFrequency();
-        float f2 = b.getFrequency();
-        float c1 = a.getConfidence();
-        float c2 = b.getConfidence();
+        float f1 = a.freq();
+        float f2 = b.freq();
+        float c1 = a.conf();
+        float c2 = b.conf();
         float w = and(f2, c1, c2);
         float c = w2c(w);
         return new DefaultTruth(f1, c);
@@ -203,8 +203,8 @@ public final class TruthFunctions extends UtilityFunctions {
      */
     @NotNull
     public static Truth abduction(@NotNull Truth t, float reliance) {
-        float f1 = t.getFrequency();
-        float c1 = t.getConfidence();
+        float f1 = t.freq();
+        float c1 = t.conf();
         float w = and(c1, reliance);
         float c = w2c(w);
         return new DefaultTruth(f1, c);
@@ -229,10 +229,10 @@ public final class TruthFunctions extends UtilityFunctions {
      */
     @NotNull
     public static Truth exemplification(@NotNull Truth a, @NotNull Truth b) {
-        float f1 = a.getFrequency();
-        float f2 = b.getFrequency();
-        float c1 = a.getConfidence();
-        float c2 = b.getConfidence();
+        float f1 = a.freq();
+        float f2 = b.freq();
+        float c1 = a.conf();
+        float c2 = b.conf();
         float w = and(f1, f2, c1, c2);
         float c = w2c(w);
         return new DefaultTruth(1, c);
@@ -246,10 +246,10 @@ public final class TruthFunctions extends UtilityFunctions {
      */
     @NotNull
     public static Truth comparison(@NotNull Truth a, @NotNull Truth b) {
-        float f1 = a.getFrequency();
-        float f2 = b.getFrequency();
-        float c1 = a.getConfidence();
-        float c2 = b.getConfidence();
+        float f1 = a.freq();
+        float f2 = b.freq();
+        float c1 = a.conf();
+        float c2 = b.conf();
         float f0 = or(f1, f2);
         float f = (f0 == 0) ? 0 : (and(f1, f2) / f0);
         float w = and(f0, c1, c2);
@@ -266,10 +266,10 @@ public final class TruthFunctions extends UtilityFunctions {
      */
     @NotNull
     public static Truth desireStrong(@NotNull Truth a, @NotNull Truth b) {
-        float f1 = a.getFrequency();
-        float f2 = b.getFrequency();
-        float c1 = a.getConfidence();
-        float c2 = b.getConfidence();
+        float f1 = a.freq();
+        float f2 = b.freq();
+        float c1 = a.conf();
+        float c2 = b.conf();
         float f = and(f1, f2);
         float c = and(c1, c2, f2);
         return new DefaultTruth(f, c);
@@ -283,10 +283,10 @@ public final class TruthFunctions extends UtilityFunctions {
      */
     @NotNull
     public static Truth desireWeak(@NotNull Truth v1, @NotNull Truth v2) {
-        float f1 = v1.getFrequency();
-        float f2 = v2.getFrequency();
-        float c1 = v1.getConfidence();
-        float c2 = v2.getConfidence();
+        float f1 = v1.freq();
+        float f2 = v2.freq();
+        float c1 = v1.conf();
+        float c2 = v2.conf();
         float f = and(f1, f2);
         float c = and(c1, c2, f2, w2c(1.0f));
         return new DefaultTruth(f, c);
@@ -300,10 +300,10 @@ public final class TruthFunctions extends UtilityFunctions {
      */
     @NotNull
     public static Truth desireDed(@NotNull Truth v1, @NotNull Truth v2) {
-        float f1 = v1.getFrequency();
-        float f2 = v2.getFrequency();
-        float c1 = v1.getConfidence();
-        float c2 = v2.getConfidence();
+        float f1 = v1.freq();
+        float f2 = v2.freq();
+        float c1 = v1.conf();
+        float c2 = v2.conf();
         float f = and(f1, f2);
         float c = and(c1, c2);
         return new DefaultTruth(f, c);
@@ -317,10 +317,10 @@ public final class TruthFunctions extends UtilityFunctions {
      */
     @NotNull
     public static Truth desireInd(@NotNull Truth v1, @NotNull Truth v2) {
-        float f1 = v1.getFrequency();
-        float f2 = v2.getFrequency();
-        float c1 = v1.getConfidence();
-        float c2 = v2.getConfidence();
+        float f1 = v1.freq();
+        float f2 = v2.freq();
+        float c1 = v1.conf();
+        float c2 = v2.conf();
         float w = and(f2, c1, c2);
         float c = w2c(w);
         return new DefaultTruth(f1, c);
@@ -335,10 +335,10 @@ public final class TruthFunctions extends UtilityFunctions {
      */
     @NotNull
     public static Truth union(@NotNull Truth v1, @NotNull Truth v2) {
-        float f1 = v1.getFrequency();
-        float f2 = v2.getFrequency();
-        float c1 = v1.getConfidence();
-        float c2 = v2.getConfidence();
+        float f1 = v1.freq();
+        float f2 = v2.freq();
+        float c1 = v1.conf();
+        float c2 = v2.conf();
         float f = or(f1, f2);
         float c = and(c1, c2);
         return new DefaultTruth(f, c);
@@ -352,10 +352,10 @@ public final class TruthFunctions extends UtilityFunctions {
      */
     @NotNull
     public static Truth intersection(@NotNull Truth v1, @NotNull Truth v2) {
-        float f1 = v1.getFrequency();
-        float f2 = v2.getFrequency();
-        float c1 = v1.getConfidence();
-        float c2 = v2.getConfidence();
+        float f1 = v1.freq();
+        float f2 = v2.freq();
+        float c1 = v1.conf();
+        float c2 = v2.conf();
         float f = and(f1, f2);
         float c = and(c1, c2);
         return new DefaultTruth(f, c);
@@ -410,18 +410,18 @@ public final class TruthFunctions extends UtilityFunctions {
      */
     @NotNull
     public static Truth anonymousAnalogy(@NotNull Truth a, @NotNull Truth b) {
-        float f1 = a.getFrequency();
-        float c1 = a.getConfidence();
+        float f1 = a.freq();
+        float c1 = a.conf();
         Truth v0 = new DefaultTruth(f1, w2c(c1));
         return analogy(b, v0);
     }
 
     @NotNull
     public static Truth decomposePositiveNegativeNegative(@NotNull Truth a, @NotNull Truth b) {
-        float f1 = a.getFrequency();
-        float c1 = a.getConfidence();
-        float f2 = b.getFrequency();
-        float c2 = b.getConfidence();
+        float f1 = a.freq();
+        float c1 = a.conf();
+        float f2 = b.freq();
+        float c2 = b.conf();
 
         float fn = and(f1,1-f2);
         return new DefaultTruth(1-fn, and(fn,c1,c2));
@@ -429,10 +429,10 @@ public final class TruthFunctions extends UtilityFunctions {
 
     @NotNull
     public static Truth decomposeNegativePositivePositive(@NotNull Truth a, @NotNull Truth b) {
-        float f1 = a.getFrequency();
-        float c1 = a.getConfidence();
-        float f2 = b.getFrequency();
-        float c2 = b.getConfidence();
+        float f1 = a.freq();
+        float c1 = a.conf();
+        float f2 = b.freq();
+        float c2 = b.conf();
 
         float f = and((1-f1),f2);
         return new DefaultTruth(f, and(f,c1,c2));
@@ -440,10 +440,10 @@ public final class TruthFunctions extends UtilityFunctions {
 
     @NotNull
     public static Truth decomposePositiveNegativePositive(@NotNull Truth a, @NotNull Truth b) {
-        float f1 = a.getFrequency();
-        float c1 = a.getConfidence();
-        float f2 = b.getFrequency();
-        float c2 = b.getConfidence();
+        float f1 = a.freq();
+        float c1 = a.conf();
+        float f2 = b.freq();
+        float c2 = b.conf();
 
         float f = and(f1,(1-f2));
         return new DefaultTruth(f, and(f,c1,c2));
@@ -451,10 +451,10 @@ public final class TruthFunctions extends UtilityFunctions {
 
     @NotNull
     public static Truth decomposeNegativeNegativeNegative(@NotNull Truth a, @NotNull Truth b) {
-        float f1 = a.getFrequency();
-        float c1 = a.getConfidence();
-        float f2 = b.getFrequency();
-        float c2 = b.getConfidence();
+        float f1 = a.freq();
+        float c1 = a.conf();
+        float f2 = b.freq();
+        float c2 = b.conf();
 
         float fn = and((1-f1),(1-f2));
         return new DefaultTruth(1-fn, and(fn,c1,c2));
@@ -462,17 +462,17 @@ public final class TruthFunctions extends UtilityFunctions {
 
     @NotNull
     public static Truth difference(@NotNull Truth a, @NotNull Truth b) {
-        float f1 = a.getFrequency();
-        float c1 = a.getConfidence();
-        float f2 = b.getFrequency();
-        float c2 = b.getConfidence();
+        float f1 = a.freq();
+        float c1 = a.conf();
+        float f2 = b.freq();
+        float c2 = b.conf();
 
         return new DefaultTruth(and(f1,(1-f2)), and(c1,c2));
     }
 
     @NotNull
     public static ProjectedTruth eternalize(@NotNull Truth t) {
-        return eternalize(t.getFrequency(), t.getConfidence());
+        return eternalize(t.freq(), t.conf());
     }
 
     /**

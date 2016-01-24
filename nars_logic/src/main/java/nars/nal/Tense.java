@@ -55,25 +55,19 @@ public enum Tense  {
 //
 //    }
 
-    public static float solutionQualityMatchingOrder(@NotNull Task problem, @NotNull Task solution, long time) {
-        return solutionQualityMatchingOrder(problem, solution, time, problem.hasQueryVar() );
-    }
-
-    public static float solutionQualityMatchingOrder(@NotNull final Task problem, @NotNull final Task solution, final long time, final boolean hasQueryVar) {
-
-        long poc = problem.occurrence();
+    public static float solutionQualityMatchingOrder(@NotNull Task problem, @NotNull Task solution, long now) {
 
         //TODO avoid creating new Truth instances
-        Truth truth = solution.projection(poc, time);
+        Truth truth = solution.projection(problem.occurrence(), now);
 
         //if (problem.hasQueryVar()) {
         float originality = solution.getOriginality();
-        return hasQueryVar ?
+        return problem.hasQueryVar() ?
                 or(originality, truth.getExpectation() / solution.term().complexity()) :
-                or(originality, truth.getConfidence());
+                or(originality, truth.conf());
     }
 
-//    /**
+    //    /**
 //        this method is used if the order is known to be matching, so it is not checked
 //     */
 //    public static float solutionQualityMatchingOrderOLD(Task problem, Task solution, long time, boolean hasQueryVar) {

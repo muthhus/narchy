@@ -23,7 +23,7 @@ public interface MetaTruth<T> extends Cloneable, Serializable {
                 .append(Symbols.TRUTH_VALUE_MARK)
                 .append(vs)
                 .append(Symbols.VALUE_SEPARATOR)
-                .append(Texts.n(getConfidence(), decimals))
+                .append(Texts.n(conf(), decimals))
                 .append(Symbols.TRUTH_VALUE_MARK);
     }
 
@@ -32,7 +32,7 @@ public interface MetaTruth<T> extends Cloneable, Serializable {
      *
      * @return The confidence value
      */
-    float getConfidence();
+    float conf();
 
 
 

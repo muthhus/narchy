@@ -1,5 +1,8 @@
 package nars.budget;
 
+import nars.util.data.Util;
+
+
 /**
  * Budget merge function, with input scale factor
  */
@@ -49,6 +52,7 @@ public interface BudgetMerge {
                 (currentWins ? tgt.dur() : src.dur()),
                 (currentWins ? tgt.qua() : src.qua()));
     };
+
     /** add priority, interpolate durability and quality according to the relative change in priority
      *  WARNING untested
      * */
@@ -78,6 +82,16 @@ public interface BudgetMerge {
             throw new RuntimeException("NaN quality");
 
         tgt.budget( nextPri, nextDur, nextQua );
+    };
+
+    /** add priority, interpolate durability and quality according to the relative change in priority
+     *  WARNING untested
+     * */
+    BudgetMerge max = (tgt, src, srcScaleIgnored) -> {
+        tgt.budget(
+                Util.max(src.priIfFiniteElseZero(), tgt.priIfFiniteElseZero()),
+                Util.max(src.dur(), tgt.dur()),
+                Util.max(src.qua(), tgt.qua()));
     };
 
 //    /** the max priority, durability, and quality of two tasks */

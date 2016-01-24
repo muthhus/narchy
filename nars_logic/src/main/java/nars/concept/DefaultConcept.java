@@ -239,7 +239,7 @@ public class DefaultConcept extends AtomConcept {
         // less desire of a goal, more happiness
         memory.emotion.happy(goal.getExpectation() * -delta);
 
-        if (Op.isOperation(goal.term()) && (goal.getState() != Task.TaskState.Executed)) {
+        if (Op.isOperation(goal.term()) && (goal.state() != Task.TaskState.Executed)) {
             if (delta >= Global.EXECUTION_SATISFACTION_TRESHOLD) {
                 //Truth projected = goal.projection(now, now);
                 if (goal.getExpectation() > Global.EXECUTION_DESIRE_EXPECTATION_THRESHOLD) {

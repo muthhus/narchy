@@ -203,14 +203,14 @@ public enum BeliefFunction implements TruthOperator {
     Identity() {
         @NotNull
         @Override public Truth apply(@NotNull final Truth T, /* nullable*/ final Truth B, Memory m) {
-            return new DefaultTruth(T.getFrequency(), T.getConfidence());
+            return new DefaultTruth(T.freq(), T.conf());
         }
     },
     BeliefIdentity() {
         @Nullable
         @Override public Truth apply(final Truth T, /* nullable*/ @Nullable final Truth B, Memory m) {
             if (B == null) return null;
-            return new DefaultTruth(B.getFrequency(), B.getConfidence());
+            return new DefaultTruth(B.freq(), B.conf());
         }
     },
     BeliefStructuralDeduction() {
@@ -225,7 +225,7 @@ public enum BeliefFunction implements TruthOperator {
         @Override public Truth apply(final Truth T, /* nullable*/ @Nullable final Truth B, @NotNull Memory m) {
             if (B == null) return null;
             Truth res =  TruthFunctions.deduction1(B, defaultConfidence(m));
-            return new DefaultTruth(1.0f-res.getFrequency(), res.getConfidence());
+            return new DefaultTruth(1.0f-res.freq(), res.conf());
         }
     },
     BeliefNegation() {

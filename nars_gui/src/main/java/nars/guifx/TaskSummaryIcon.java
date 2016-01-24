@@ -60,10 +60,10 @@ public class TaskSummaryIcon extends SummaryIcon implements Runnable {
         }
         else {
             if (task.isJudgment()) {
-                g.setFill(getBeliefColor(task.getFrequency(), task.getConfidence()) );
+                g.setFill(getBeliefColor(task.freq(), task.conf()) );
             }
             else if (task.isGoal()) {
-                g.setFill(getGoalColor(task.getFrequency(), task.getConfidence()));
+                g.setFill(getGoalColor(task.freq(), task.conf()));
             }
             g.fillRect(W/3, 0, W/3, H);
         }

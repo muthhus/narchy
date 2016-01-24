@@ -248,7 +248,8 @@ public abstract class Budget extends BudgetedHandle {
     }
 
     public float priIfFiniteElseZero() {
-        return Float.isFinite(pri()) ? pri() : 0;
+        float p = pri();
+        return Float.isFinite(p) ? p : 0;
     }
 
     /**

@@ -238,8 +238,8 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
             if (task.truth() == null) {
                 return false;
             }
-            float fr = task.getFrequency();
-            float co = task.getConfidence();
+            float fr = task.freq();
+            float co = task.conf();
 
             if ((co > confMax) || (co < confMin) || (fr > freqMax) || (fr < freqMin)) {
                 return false;
@@ -295,7 +295,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
         if (difference >= worstDiff)
             return;
 
-        float f = task.getFrequency();
+        float f = task.freq();
         float freqDiff = Math.min(
                 Math.abs(f - freqMin),
                 Math.abs(f - freqMax));
@@ -303,7 +303,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
         if (difference >= worstDiff)
             return;
 
-        float c = task.getConfidence();
+        float c = task.conf();
         float confDiff = Math.min(
                 Math.abs(c - confMin),
                 Math.abs(c - confMax));

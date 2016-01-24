@@ -242,7 +242,7 @@ public abstract class AbstractTask extends Item<Task>
 
     @Nullable
     @Override
-    public TaskState getState() {
+    public TaskState state() {
         return state;
     }
 
@@ -318,7 +318,7 @@ public abstract class AbstractTask extends Item<Task>
 
     @Override
     public final boolean isAnticipated() {
-        return isJudgmentOrGoal() && !isEternal() && (getState() == TaskState.Anticipated || isInput());
+        return isJudgmentOrGoal() && !isEternal() && (state() == TaskState.Anticipated || isInput());
     }
 
     @NotNull

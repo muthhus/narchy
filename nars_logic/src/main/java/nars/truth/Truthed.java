@@ -9,14 +9,14 @@ public interface Truthed {
         if (t == null) return Float.NaN;
         return t.getExpectation();
     }
-    default float getConfidence() {
+    default float conf() {
         Truth t = truth();
         if (t == null) return Float.NaN;
-        return t.getConfidence();
+        return t.conf();
     }
-    default float getFrequency() {
+    default float freq() {
         Truth t = truth();
         if (t == null) return Float.NaN;
-        return t.getFrequency();
+        return t.freq();
     }
 }

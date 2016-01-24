@@ -188,7 +188,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
         long now = memory.time();
 
-        float termRelevance = termRelevance(newTerm, question.term());
+        float termRelevance = Task.termRelevance(newTerm, question.term());
         if (termRelevance == 0)
             return null;
 
@@ -212,7 +212,9 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
                     .time(now, solutionOcc)
                     .parent(this)
                     .budget(solutionBudget)
-                    .setEvidence(evidence());
+                    .state(state())
+                    .setEvidence(evidence())
+                    ;
 
         //} else {
         //    solution = this;
@@ -361,7 +363,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     default float getConfidenceIfTruthOr(float v) {
         Truth t = truth();
         if (t == null) return v;
-        return t.getConfidence();
+        return t.conf();
     }
 
 //    default float projectionConfidence(long when, long now) {
@@ -381,7 +383,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     }
 
     @Nullable
-    TaskState getState();
+    TaskState state();
 
     final class Solution extends AtomicReference<Task> {
         Solution(Task referent) {
@@ -789,10 +791,9 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     default Truth projection(long targetTime, long now) {
 
         Truth currentTruth = truth();
-        long occurrenceTime = occurrence();
 
-        boolean toEternal = targetTime == Tense.ETERNAL;
-        boolean tenseEternal = Tense.isEternal(occurrenceTime);
+        boolean toEternal = (targetTime == Tense.ETERNAL);
+        boolean tenseEternal = isEternal();
         if (toEternal && tenseEternal) {
 
             return tenseEternal ? currentTruth : TruthFunctions.eternalize(currentTruth);
@@ -803,12 +804,13 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
             //but since also eternalizing is valid, we use the stronger one.
             DefaultTruth eternalTruth = TruthFunctions.eternalize(currentTruth);
 
-            float factor = TruthFunctions.temporalProjection(occurrenceTime, targetTime, now);
+            float factor = TruthFunctions.temporalProjection(occurrence(), targetTime, now);
 
-            float projectedConfidence = factor * currentTruth.getConfidence();
+            float projectedConfidence = factor * currentTruth.conf();
 
-            return projectedConfidence < eternalTruth.getConfidence() ? eternalTruth :
-              new ProjectedTruth(currentTruth.getFrequency(), projectedConfidence, targetTime);
+            return projectedConfidence < eternalTruth.conf() ?
+                    eternalTruth :
+              new ProjectedTruth(currentTruth.freq(), projectedConfidence, targetTime);
         }
     }
 
@@ -822,7 +824,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     final class ConfidenceComparator implements Comparator<Task>, Serializable {
         static final Comparator the = new ExpectationComparator();
         @Override public int compare(@NotNull Task b, @NotNull Task a) {
-            return Float.compare(a.getConfidence(), b.getConfidence());
+            return Float.compare(a.conf(), b.conf());
         }
     }
 }

@@ -264,8 +264,8 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
                     new DerivedTask(c, premise) //derived.term())
                             .punctuation(punct)
                             .truth(
-                                truth.getFrequency(),
-                                eternalizedConfidence(truth.getConfidence())
+                                truth.freq(),
+                                eternalizedConfidence(truth.conf())
                             )
                             .budgetCompoundForward(premise)
                             .time(now, Tense.ETERNAL)

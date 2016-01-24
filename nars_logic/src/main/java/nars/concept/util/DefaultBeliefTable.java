@@ -5,9 +5,17 @@ import com.gs.collections.api.block.function.primitive.FloatFunction;
 import nars.Global;
 import nars.Memory;
 import nars.bag.impl.ArrayTable;
+import nars.budget.Budget;
+import nars.budget.BudgetFunctions;
+import nars.budget.BudgetMerge;
 import nars.nal.LocalRules;
 import nars.nal.Tense;
+import nars.task.MutableTask;
 import nars.task.Task;
+import nars.term.Termed;
+import nars.term.compound.Compound;
+import nars.truth.Truth;
+import nars.truth.TruthFunctions;
 import nars.util.ArraySortedIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,10 +25,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+
 /**
  * Stores beliefs ranked in a sorted ArrayList, with strongest beliefs at lowest indexes (first iterated)
  */
 public class DefaultBeliefTable implements BeliefTable {
+
+    final static BudgetMerge existingMergeFunction = BudgetMerge.max;
 
     @NotNull
     final Map<Task,Task> map;
@@ -222,58 +233,28 @@ public class DefaultBeliefTable implements BeliefTable {
 
         long now = this.now = memory.time();
 
-        Task preTop = top(now); //input.isEternal() ? topEternal() : top(now);
-
-
-        Task result = insert(input, memory);
-        if (result==null) {
-            result = preTop;
-        } else {
-            result = (preTop != null) ?
-                    addRevise(input, preTop, memory, now) :
-                    input;
-
-            updateTime(now, !result.isEternal());
-        }
-
-        return result;
-    }
-
-    @NotNull
-    Task addRevise(@NotNull Task input, @NotNull Task preTop, @NotNull Memory memory, long now) {
-
-        Task revised = LocalRules.getRevision(input, preTop, now);
+        Task revised = getRevision(input, now);
 
         if ((revised != null) && !revised.equals(input)) {
-
-            //return the revised task even if it wasn't inserted allowing it to be used as a transient
-
-            boolean inserted = insertAttempt(revised, memory);
-
-
-            //if (inserted) {
-            //memory.eventRevision.emit(revised);
-            //return revised;
-
-//            if (BeliefTable.stronger(revised, input)!=revised)
-//                throw new RuntimeException("broken revision");
-
             input = revised;
         }
 
-        return BeliefTable.stronger(preTop, input); //input.isEternal() ? topEternal() : top(now);
+        //return the revised task even if it wasn't inserted allowing it to be used as a transient
+        boolean inserted = insertAttempt(revised, memory);
+        updateTime(now, !input.isEternal());
+
+        return input;
     }
+
 
     private Task insert(@NotNull Task t, @NotNull Memory memory) {
         ArrayTable<Task, Task> table = tableFor(t);
 
-//        if (Global.DEBUG) {
-//            checkForDeleted(t, table);
-//        }
-
         Task existing = map.get(t);
-        if (existing!=null)
+        if (existing!=null) {
+            existingMergeFunction.merge(existing.budget(), t.budget(), 1f);
             return existing;
+        }
 
         Task displaced = table.put(t,t);
         if (displaced!=null) {
@@ -283,13 +264,87 @@ public class DefaultBeliefTable implements BeliefTable {
         return t == displaced ? null: t;
     }
 
+    /**
+     * creates a revision task (but does not input it)
+     * if failed, returns null
+     */
+    public Task getRevision(@NotNull Task newBelief, long now) {
+
+        List<Task> beliefs = tableFor(newBelief).items.getList();
+        int bsize = beliefs.size();
+        if (bsize == 0)
+            return newBelief; //nothing to revise with
+
+        Compound newBeliefTerm = newBelief.term();
+        float newBeliefFreq = newBelief.freq();
+        long occ = newBelief.occurrence();
+
+        //best found
+        Task oldBelief = null;
+        float termRelevance = Float.NaN;
+        float minDist = Float.MAX_VALUE;
+
+        float tRange = this.tRange;
+
+        for (int i = 0; i < bsize; i++) {
+            Task x = beliefs.get(i);
+            if (!LocalRules.isRevisible(newBelief, x)) continue;
+
+            float tRel = Task.termRelevance(newBeliefTerm, x.term());
+            if (tRel <= 0) continue;
+
+            float dFreq = 1f + Math.abs(newBeliefFreq - x.freq());
+            float dt = 1f + Math.abs(occ - x.occurrence())/tRange;
+            float dist = dFreq * dt / (tRel * x.conf());
+            if (dist < minDist) {
+                minDist = dist;
+                termRelevance = tRel;
+                oldBelief = x;
+            }
+        }
+
+        if (oldBelief == null) return newBelief; //nothing matches
+
+
+        Truth newBeliefTruth = newBelief.truth();
+        Truth oldBeliefTruth = oldBelief.projection(occ, now);
+
+        Truth conclusion = TruthFunctions.revision(
+                newBeliefTruth,
+                oldBeliefTruth);
+        conclusion.setConfidence( conclusion.conf() * termRelevance );
+
+
+        Termed<Compound> term = LocalRules.intermpolate(newBelief.concept(), oldBelief.concept(), newBeliefTruth.conf(), oldBeliefTruth.conf());
+
+        MutableTask t = new MutableTask(term, newBelief.punc())
+                .truth(conclusion)
+                .parent(newBelief, oldBelief)
+                .time(now, occ)
+                .state(newBelief.state())
+                .because("Revision");
+
+        Budget bb = t.budget();
+        BudgetFunctions.revise(bb, newBeliefTruth, oldBelief, conclusion, newBelief.budget());
+        bb.mulPriority(termRelevance);
+
+        return t;
+    }
+
     /** try to insert but dont delete the input task if it wasn't inserted (but delete a displaced if it was)
      *  returns true if it was inserted, false if not
      * */
     private boolean insertAttempt(@NotNull Task t, @NotNull Memory memory) {
         ArrayTable<Task, Task> table = tableFor(t);
+
+        Task existing = map.get(t);
+        if (existing!=null) {
+            existingMergeFunction.merge(existing.budget(), t.budget(), 1f);
+            return true;
+        }
+
         Task displaced = table.put(t,t);
-        boolean inserted = displaced != t;
+        boolean inserted = displaced == null || !displaced.equals(t);
         if (displaced!=null && inserted)
             onBeliefRemoved(displaced, "Unbelievable/Undesirable (Revision Displaced)", memory);
 

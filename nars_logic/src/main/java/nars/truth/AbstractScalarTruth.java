@@ -30,7 +30,7 @@ public abstract class AbstractScalarTruth extends AbstractTruth<Float> implement
 
 
     @Override
-    public float getFrequency() {
+    public float freq() {
         return frequency;
     }
 
@@ -47,6 +47,6 @@ public abstract class AbstractScalarTruth extends AbstractTruth<Float> implement
 
     @Override
     public boolean equalsFrequency(@NotNull Truth t) {
-        return (Util.equal(frequency, t.getFrequency(), Global.TRUTH_EPSILON));
+        return (Util.equal(frequency, t.freq(), Global.TRUTH_EPSILON));
     }
 }

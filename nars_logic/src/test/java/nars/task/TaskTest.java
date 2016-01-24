@@ -55,10 +55,10 @@ public class TaskTest {
         Task y = null;
         for (Task x : l) {
             if (y!=null) {
-                assertTrue( x.getFrequency() <= y.getFrequency() );
-                float c = y.getConfidence();
-                if (x.getConfidence() != 0.9f) //wrap around only time when it will decrease
-                    assertTrue( x.getConfidence() <= c);
+                assertTrue( x.freq() <= y.freq() );
+                float c = y.conf();
+                if (x.conf() != 0.9f) //wrap around only time when it will decrease
+                    assertTrue( x.conf() <= c);
             }
             y = x;
         }

@@ -500,7 +500,7 @@ public class DerivationGraph extends DirectedPseudograph<DerivationGraph.Keyed,O
 
         if (includeTruth) {
             t += " %";
-            t += s.truth() != null ? Texts.n2(s.getFrequency()) + ";" + Texts.n2(s.getConfidence()) : "?;?";
+            t += s.truth() != null ? Texts.n2(s.freq()) + ";" + Texts.n2(s.conf()) : "?;?";
             t += "%";
         }
 

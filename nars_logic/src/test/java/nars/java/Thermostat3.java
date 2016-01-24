@@ -125,7 +125,7 @@ public class Thermostat3 {
             if (n.time() % 5 == 0) {
                 int cols = 60;
                 int target = Math.round(targetX * cols);
-                int current = Math.round(h.isTrue().getFrequency() * cols);
+                int current = Math.round(h.isTrue().freq() * cols);
 
                 PrintStream out = System.out;
                 for (int i = 0; i <= cols; i++) {

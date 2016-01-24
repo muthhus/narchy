@@ -1107,7 +1107,7 @@ public class Narsese extends BaseParser<Object> {
         char punct = (Character) x[2];
 
         Truth t = (Truth) x[3];
-        if (t!=null && !Float.isFinite(t.getConfidence()))
+        if (t!=null && !Float.isFinite(t.conf()))
             t.setConfidence(m.getDefaultConfidence(punct));
 
         return makeTask(m, (float[]) x[0], content, punct, t, (Tense) x[4]);

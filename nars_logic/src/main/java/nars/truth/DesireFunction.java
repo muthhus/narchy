@@ -50,7 +50,7 @@ public enum DesireFunction implements TruthOperator {
     Identity() {
         @NotNull
         @Override public Truth apply(@NotNull final Truth T, /* N/A: */ final Truth B, Memory m) {
-            return new DefaultTruth(T.getFrequency(), T.getConfidence());
+            return new DefaultTruth(T.freq(), T.conf());
         }
     },
     StructuralStrong() {

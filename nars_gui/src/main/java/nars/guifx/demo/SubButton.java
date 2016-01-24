@@ -175,7 +175,7 @@ public class SubButton extends HBox {
 
         float minScale = 0.25f;
         if (!t.isQuestOrQuestion()) {
-            sb.scale(minScale + 2f * 0.75f * t.truth().getConfidence());
+            sb.scale(minScale + 2f * 0.75f * t.truth().conf());
         }
 
         sb.shade(t.pri());

@@ -487,8 +487,8 @@ public class ConceptPane extends BorderPane implements ChangeListener {
 
             for (Task t : concept.getBeliefs()) {
                 if (t.isEternal() && t.truth()!=null) {
-                    float f = t.getFrequency();
-                    float c = t.getConfidence();
+                    float f = t.freq();
+                    float c = t.conf();
                     float w = 20;
                     float h = 20;
                     float x = b + (gew-2*b-w) * c;
@@ -497,8 +497,8 @@ public class ConceptPane extends BorderPane implements ChangeListener {
                     ge.setFill(new Color( f,  c, 1f, rank));
                     ge.fillRect(x-w/2,y-h/2,w,h);
                 } else if (!t.isEternal() && t.truth()!=null) {
-                    float f = t.getFrequency();
-                    float cc = t.getConfidence();
+                    float f = t.freq();
+                    float cc = t.conf();
                     float o = t.occurrence();
                     float w = 15;
                     float h = 15;

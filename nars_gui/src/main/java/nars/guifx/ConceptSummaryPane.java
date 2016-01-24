@@ -73,7 +73,7 @@ public class ConceptSummaryPane extends Text {
             Color color;
             if (concept.hasBeliefs()) {
                 Truth tv = concept.getBeliefs().top(now).truth();
-                color = truthColors.get(tv.getFrequency(), tv.getConfidence());
+                color = truthColors.get(tv.freq(), tv.conf());
             }
             else {
                 color = Color.GRAY;
@@ -147,9 +147,9 @@ public class ConceptSummaryPane extends Text {
         double w = 12;
 
 
-        float freq = t.getFrequency();
+        float freq = t.freq();
         double y = (1.0f - freq) * Wm;
-        float cnf = t.getConfidence();
+        float cnf = t.conf();
         double x = cnf * hm;
 
         Color color = ca.get(freq, cnf);
