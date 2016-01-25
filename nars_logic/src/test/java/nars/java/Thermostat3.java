@@ -37,7 +37,7 @@ public class Thermostat3 {
 
         @Override
         public Truth inc(boolean positive) {
-            Task cTask = MethodOperator.getCurrentTask();
+            Task cTask = MethodOperator.invokingTask();
             float exp;
 
             //System.out.println(cTask.getExplanation());
@@ -70,7 +70,7 @@ public class Thermostat3 {
 //            }
         };
 
-        this.h = objs.wrap("h", UnitValTaskInc.class /* new UnitVal(0.5f, speed)*/);
+        this.h = objs.the("h", UnitValTaskInc.class /* new UnitVal(0.5f, speed)*/);
 
         //h.setInc(speed);
 

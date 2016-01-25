@@ -99,7 +99,7 @@ public enum ThermostatTest2 {
         NALObjects nobj = new NALObjects(n);
 
         String id = "T";
-        Model tc = nobj.wrap(id, Model.class);
+        Model tc = nobj.the(id, Model.class);
 
         //nobj.setGoalInvoke(false);
 

@@ -14,7 +14,6 @@ import nars.task.in.ChangedTextInput;
 import nars.truth.Truth;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Color3f;
-import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
@@ -28,8 +27,9 @@ import static nars.rover.Sim.f;
  */
 public class Rover extends AbstractPolygonBot {
 
+    private final ChangedTextInput spin;
     private final ChangedTextInput feltAngularVelocity;
-    private final ChangedTextInput feltOrientation;
+
     private final ChangedTextInput feltSpeed;
     private final ChangedTextInput feltSpeedAvg;
     private final ChangedTextInput mouthInput;
@@ -62,9 +62,9 @@ public class Rover extends AbstractPolygonBot {
 
         objs = new NALObjects(nar);
 
+        spin = new ChangedTextInput(nar);
         mouthInput = new ChangedTextInput(nar);
         feltAngularVelocity = new ChangedTextInput(nar);
-        feltOrientation = new ChangedTextInput(nar);
         feltSpeed = new ChangedTextInput(nar);
         feltSpeedAvg = new ChangedTextInput(nar);
 //
@@ -161,8 +161,8 @@ public class Rover extends AbstractPolygonBot {
 
     protected void addMotorController() throws Exception {
 
-        motors = objs.wrap("motor", MotorControls.class);
-        motors.rover = this;
+        motors = objs.the("motor", MotorControls.class, this);
+
 
     }
 
@@ -173,24 +173,25 @@ public class Rover extends AbstractPolygonBot {
         //radians per frame to angVelocity discretized value
         float xa = torso.getAngularVelocity();
         float angleScale = 1.50f;
-        float angVelocity = (float) (Math.log(Math.abs(xa * angleScale) + 1f)) / 2f;
+        String angDir = xa > 0 ? "r" : "l";
+        float angSpeed = (float) (Math.log(Math.abs(xa * angleScale) + 1f)) / 2f;
         float maxAngleVelocityFelt = 0.8f;
-        if (angVelocity > maxAngleVelocityFelt) {
-            angVelocity = maxAngleVelocityFelt;
+        if (angSpeed > maxAngleVelocityFelt) {
+            angSpeed = maxAngleVelocityFelt;
         }
-        if (angVelocity < 0.1) {
-            feltAngularVelocity.set("rotated(" + f(0) + "). :|: %0.95;0.90%");
-            //feltAngularVelocity.set("feltAngularMotion. :|: %0.00;0.90%");
-        } else {
-            String direction;
-            if (xa < 0) {
-                direction = sim.angleTerm(-MathUtils.PI);
-            } else /*if (xa > 0)*/ {
-                direction = sim.angleTerm(+MathUtils.PI);
-            }
-            feltAngularVelocity.set("rotated(" + f(angVelocity) + "," + direction + "). :|:");
-            // //feltAngularVelocity.set("<" + direction + " --> feltAngularMotion>. :|: %" + da + ";0.90%");
-        }
+//        if (angVelocity < 0.1) {
+//            feltAngularVelocity.set("rotated(" + f(0) + "). :|: %0.95;0.90%");
+//            //feltAngularVelocity.set("feltAngularMotion. :|: %0.00;0.90%");
+//        } else {
+//            String direction;
+//            if (xa < 0) {
+//                direction = sim.angleTerm(-MathUtils.PI);
+//            } else /*if (xa > 0)*/ {
+//                direction = sim.angleTerm(+MathUtils.PI);
+//            }
+//            feltAngularVelocity.set("rotated(" + f(angVelocity) + "," + direction + "). :|:");
+//            // //feltAngularVelocity.set("<" + direction + " --> feltAngularMotion>. :|: %" + da + ";0.90%");
+//        }
 
 
         float linVelocity = torso.getLinearVelocity().length();
@@ -198,31 +199,30 @@ public class Rover extends AbstractPolygonBot {
 
 
         Vec2 currentPosition = torso.getWorldCenter();
-        if (!positions.isEmpty()) {
-            Vec2 movement = currentPosition.sub(positions.poll());
-            double theta = Math.atan2(movement.y, movement.x);
+        //if (!positions.isEmpty()) {
+            //Vec2 movement = currentPosition.sub(positions.poll());
+            //double theta = Math.atan2(movement.y, movement.x);
             //motionAngle.observe((float)theta);
-        }
+        //}
         positions.addLast(currentPosition.clone());
 
 
-        feltOrientation.set("facing(" + sim.angleTerm(torso.getAngle()) + "). :|:");
+        String torsoAngle = sim.angleTerm(torso.getAngle());
 
         if (linVelocity == 0)
-            feltSpeed.set("moved(0). :|:");
+            feltSpeed.set("motion:(z,0). :|:");
         else
-            feltSpeed.set("moved(" + (linVelocity < 0 ? "n" : "p") +  "," + f(linVelocity) + "). :|:");
+            feltSpeed.set("motion:(" + (linVelocity < 0 ? "n" : "p") +  "," + f(linVelocity) + "). :|:");
 
-
-        String motion = "<(" + f(linVelocity) + ',' + sim.angleTerm(torso.getAngle()) + ',' + f(angVelocity) + ") --> motion>. :|:";
 
 
         //facingAngle.observe( angVelocity ); // );
         //nar.inputDirect(nar.task("<facing-->[" +  + "]>. :|:"));
-        nar.input(nar.task("<A-->[w" + Sim.angleTerm(torso.getAngle()) + "]>. :|:"));
+        spin.set("spin:(" + torsoAngle + "," + angDir + f(angSpeed) + "). :|:");
 
         //System.out.println("  " + motion);
-        feltSpeed.set(motion);
+        feltSpeed.set("motion:(" + f(linVelocity) + ',' + torsoAngle + ',' + f(angSpeed) + "). :|:");
+
         //feltSpeed.set("feltSpeed. :|: %" + sp + ";0.90%");
         //int positionWindow1 = 16;
 
@@ -242,10 +242,10 @@ public class Rover extends AbstractPolygonBot {
 
     public static class MotorControls {
 
-        public Rover rover = null;
+        public final Rover rover;
 
-        public MotorControls() {
-
+        public MotorControls(Rover rover) {
+            this.rover = rover;
         }
 
         public void stop() {
@@ -254,14 +254,14 @@ public class Rover extends AbstractPolygonBot {
         }
 
         public Truth forward(boolean forward) {
-            Task c = MethodOperator.getCurrentTask();
+            Task c = MethodOperator.invokingTask();
             float thrust = c!=null ? c.getExpectation() : 1;
             if (!forward) thrust = -thrust;
             return rover.thrustRelative(thrust);
         }
 
         public Truth rotate(boolean left) {
-            Task c = MethodOperator.getCurrentTask();
+            Task c = MethodOperator.invokingTask();
             float thrust = c!=null ? c.getExpectation() : 1;
             if (left) thrust = -thrust;
             return rover.rotateRelative(thrust);

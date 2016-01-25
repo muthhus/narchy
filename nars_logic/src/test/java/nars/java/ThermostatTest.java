@@ -72,7 +72,7 @@ public enum ThermostatTest  {
         //NAR n = new NAR(new Default().setInternalExperience(null));
 
         NALObjects nobj = new NALObjects(n);
-        Thermostat tc = nobj.wrap("t", Thermostat.class);
+        Thermostat tc = nobj.the("t", Thermostat.class);
 
         nobj.setGoalInvoke(false);
 

@@ -95,11 +95,11 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
         nar = n;
     }
 
-    @NotNull
-    public static <N extends NAR> N wrap(@NotNull N n) throws Exception {
-        NALObjects nalObjects = new NALObjects(n);
-        return nalObjects.wrap("this", n);
-    }
+//    @NotNull
+//    public static <N extends NAR> N the(@NotNull N n) throws Exception {
+//        NALObjects nalObjects = new NALObjects(n);
+//        return nalObjects.the("this", n);
+//    }
 
     @NotNull
     static Operator getMethodOperator(@NotNull Method overridden) {
@@ -266,29 +266,47 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
 //    }
 //
 
-    @NotNull
-    public <T> T wrap(String id, @NotNull Class<? extends T> instance) {
-        //TODO create the proxy class directly from the class or instance
+    @NotNull public <T> T theOrNull(String id, @NotNull Class<? extends T> instance, Object... args)  {
         try {
-            return wrap(id, instance.newInstance());
-        } catch (Throwable e) {
-            throw new RuntimeException(e);
+            return the(id, instance, args);
+        } catch (Exception e) {
+            return null;
         }
     }
 
+    /** creates a new instance to be managed by this */
+    @NotNull public <T> T the(String id, @NotNull Class<? extends T> instance, Object... args) throws Exception {
 
-    /**
-     * the id will be the atom term label for an instance.
-     * the instance should not be used because a new instance
-     * will be created and its fields will be those
-     * which are manipulated, not the original prototype.
-     */
-    @NotNull
-    private <T> T wrap(String id, @NotNull T instance) throws Exception {
+        ProxyFactory factory = proxyCache.getIfAbsentPut(instance, ProxyFactory::new);
+        factory.setSuperclass(instance);
 
-        return wrap(id, (Class<? extends T>) instance.getClass(), instance);
+        Class clazz = factory.createClass();
 
+
+        //TODO create the proxy class directly from the class or instance
+
+        Atom identifier = Atom.the(id);
+
+        T wrappedInstance = the(identifier, (T)clazz.getConstructors()[0].newInstance(args));
+
+        //add operators for public methods
+        for (Method m : instance.getMethods()) {
+            if (isMethodVisible(m) && Modifier.isPublic(m.getModifiers())) {
+                methodOps.computeIfAbsent(m, M -> {
+                    MethodOperator mo = new MethodOperator(goalInvoke, M, this);
+                    nar.onExec(mo);
+                    return mo;
+                });
+            }
+        }
+
+        onInstanceOfClass(identifier, term(instance));
+
+        return wrappedInstance;
     }
+
+
+
 
     @Nullable
     public Object invokeVolition(Task currentTask, @NotNull Method method, Object instance, Object[] args) throws InvocationTargetException, IllegalAccessException {
@@ -324,7 +342,7 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
     @Override
     public final Object invoke(Object obj, @NotNull Method wrapped, @NotNull Method wrapper, Object[] args) throws Throwable {
 
-        Task invokingGoal = MethodOperator.getCurrentTask();
+        Task invokingGoal = MethodOperator.invokingTask();
 
         Object result;
         if (invokingGoal==null) {
@@ -359,19 +377,8 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
      * the id will be the atom term label for the created instance
      */
     @NotNull
-    <T> T wrap(String id, Class<? extends T> classs, /* nullable */ @NotNull T instance) throws Exception {
+    <T> T the(Atom identifier, @NotNull T wrappedInstance) throws Exception {
 
-
-        ProxyFactory factory = proxyCache.getIfAbsentPut(classs, ProxyFactory::new);
-        factory.setSuperclass(classs);
-
-        Class clazz = factory.createClass();
-
-        T wrappedInstance = (T) clazz.newInstance();
-
-
-        Atom identifier = Atom.the(id);
-        //instances.put(identifier, wrappedInstance);
 
         map(identifier, wrappedInstance);
 
@@ -383,19 +390,6 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
         ((ProxyObject) wrappedInstance).setHandler(this);
 
 
-        //add operators for public methods
-
-        for (Method m : instance.getClass().getMethods()) {
-            if (isMethodVisible(m) && Modifier.isPublic(m.getModifiers())) {
-                methodOps.computeIfAbsent(m, M -> {
-                    MethodOperator mo = new MethodOperator(goalInvoke, M, this);
-                    nar.onExec(mo);
-                    return mo;
-                });
-            }
-        }
-
-        onInstanceOfClass(identifier, term(classs));
 
         return wrappedInstance;
     }
@@ -403,6 +397,7 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
     public void setGoalInvoke(boolean b) {
         goalInvoke.set(b);
     }
+
 
     public static class InvocationResult {
         public final Term value;

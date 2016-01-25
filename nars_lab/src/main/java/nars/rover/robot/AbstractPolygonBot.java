@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 
+import static nars.util.Texts.n2;
+
 /**
  * Created by me on 8/3/15.
  */
@@ -62,8 +64,7 @@ public abstract class AbstractPolygonBot extends Robotic {
     }
 
     protected void curious(float freq, float conf) {
-        //nar.input("motor(random)! %" + freq + '|' + conf + '%');
-        nar.input("MotorControls_random(motor,())! :|: %1.0;0.9%");
+        nar.input("MotorControls_random(motor,())! :|: %" + n2(freq) + ";" + n2(conf) + "%");
     }
 
     protected void addAxioms() {

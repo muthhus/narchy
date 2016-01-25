@@ -97,7 +97,7 @@ public class NALObjectsTest  {
 
         NALObjects no = new NALObjects(n);
 
-        TestClass wrapper = no.wrap(instance, TestClass.class);
+        TestClass wrapper = no.theOrNull(instance, TestClass.class);
 
         assertEquals(4, n.memory.exe.size() - startSize);
 
@@ -213,7 +213,7 @@ public class NALObjectsTest  {
 
         EventCount count = new EventCount(n);
 
-        TestClass tc = new NALObjects(n).wrap("myJavaObject", TestClass.class);
+        TestClass tc = new NALObjects(n).the("myJavaObject", TestClass.class);
 
         tc.noParamMethodReturningVoid();
         assertEquals(6.0, tc.multiply(2, 3), 0.001);
@@ -291,7 +291,7 @@ public class NALObjectsTest  {
         NAR n = new Default();
 
         NALObjects no = new NALObjects(n);
-        ArrayList nc = no.wrap("ourList", ArrayList.class);
+        ArrayList nc = no.the("ourList", ArrayList.class);
 
 
         //n.stdout();
@@ -337,7 +337,7 @@ public class NALObjectsTest  {
 
         //EventCount count = new EventCount(n);
 
-        TestClass tc = new NALObjects(n).wrap("obj", TestClass.class);
+        TestClass tc = new NALObjects(n).the("obj", TestClass.class);
 
 
         System.out.println( tc.getClassMethods() );

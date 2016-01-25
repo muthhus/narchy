@@ -53,7 +53,7 @@ public class MethodOperator extends TermFunction {
         this.enable = enable;
     }
 
-    public static Task getCurrentTask() {
+    public static Task invokingTask() {
         return currentTask.get();
     }
 
