@@ -18,7 +18,6 @@ import static nars.$.$;
 import static nars.$.p;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static sun.management.snmp.jvminstr.JvmThreadInstanceEntryImpl.ThreadStateMap.Byte0.blocked;
 
 /**
  * Created by me on 12/22/15.
@@ -90,17 +89,17 @@ public class TermutatorTest {
 
     @Test public void testComm2() {
         assertTermutatorProducesUniqueResults(
-                new CommutivePermutations($("{%A,%B}"),
+                new CommutivePermutations(f, $("{%A,%B}"),
                         $("{x,y}")), 2);
     }
     @Test public void testComm3() {
         assertTermutatorProducesUniqueResults(
-                new CommutivePermutations($("{%A,%B,%C}"),
+                new CommutivePermutations(f, $("{%A,%B,%C}"),
                         $("{x,y,z}")), 6);
     }
     @Test public void testComm4() {
         assertTermutatorProducesUniqueResults(
-                new CommutivePermutations($("{%A,%B,%C,%D}"),
+                new CommutivePermutations(f, $("{%A,%B,%C,%D}"),
                         $("{w,x,y,z}")), 24);
     }
 
@@ -112,8 +111,6 @@ public class TermutatorTest {
         final int[] actual = {0};
         //int blocked = 0;
         final int[] duplicates = {0};
-        int i = 0;
-
 
         t.run(f, new Termutator[] { t, new Termutator("evaluate") {
 
@@ -139,7 +136,6 @@ public class TermutatorTest {
 
         assertEquals(num, s.size());
         assertEquals(num, actual[0]);
-        assertEquals(0, blocked);
         assertEquals(0, duplicates[0]);
 
         return res;

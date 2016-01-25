@@ -55,7 +55,7 @@ public class Choose1 extends Termutator {
     @Override
     public void run(FindSubst f, Termutator[] chain, int current) {
         int l = yy.length-1;
-        int shuffle = f.random.nextInt(l - 1); //randomize starting offset
+        int shuffle = f.random.nextInt(l); //randomize starting offset
 
         int start = f.now();
 

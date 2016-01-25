@@ -477,7 +477,7 @@ public abstract class FindSubst extends Versioning implements Subst {
             return matchLinear(x, y);
         }
 
-        return addTermutator(new CommutivePermutations(x, y));
+        return addTermutator(new CommutivePermutations(this, x, y));
     }
 
 
