@@ -31,6 +31,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
+
 /**
  * Twitter English - english with additional tags for twitter-like content 
  */
@@ -267,7 +268,9 @@ public class Twenglish {
 
         String sentenceID = Integer.toString(message.hashCode());
 
-        nar.input("say(sentence, " + sentenceID + ")! :|:");
+        nar.input("speak:" + sentenceID + "! :|:");
+        //nar.input("say(sentence, " + sentenceID + ")! :|:");
+
         //float f = 1f;
         //float df = 0.5f / t.size();
         for (Term w : t) {
@@ -275,10 +278,14 @@ public class Twenglish {
             //nar.frame(1);
 
             //nar.input("(sentence(" + sentenceID + ") ==> say(" + w + ")). :|:");
-            nar.run(wordDelay);
 
-            nar.input("say(" + w + ")! :|: %1.0;0.9%");
+            nar.input("say(" + w + ")! :|:");
 
+            nar.run(wordDelay/2);
+
+            nar.input("(--, say(" + w + "))! :|:");
+
+            nar.run(wordDelay/2);
 
             //nar.input("say(" + w + "). %1|0.9%"); //silence
             //nar.frame(wordDelay/2);
@@ -286,7 +293,8 @@ public class Twenglish {
 
             //f-=df;
         }
-        nar.input("say(sentence, " + sentenceID + "). :|: %0%");
+        //nar.input("say(sentence, " + sentenceID + "). :|: %0%");
+        nar.input("(--, speak:" + sentenceID + ")! :|:");
 
         //nar.input("(--, sentence(" + sentenceID + ")). :|:");
 

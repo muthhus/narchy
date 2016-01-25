@@ -166,8 +166,12 @@ public interface Truth extends MetaTruth<Float> {
 
     
     @NotNull
-    default Term toWordTerm(float trueExpectationThreshold) {
+    default Term toWordTerm(float trueExpectationThreshold, boolean negated) {
         float e = getExpectation();
+
+        if (negated)
+            e = 1 - e;
+
         if (e > trueExpectationThreshold) {
             return Truth_TRUE;
         }

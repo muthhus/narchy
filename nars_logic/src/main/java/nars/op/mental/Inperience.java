@@ -144,11 +144,15 @@ public class Inperience {
 
         Truth tr = s.truth();
         Term[] arg = new Term[1 + (tr == null ? 1 : 2)];
-        arg[0] = s.term();
+        Compound tt = s.term();
+
+        boolean negated = tt.op(Op.NEGATE);
+        arg[0] = !negated ? tt : $.neg(tt) /* unwrap negation */;
+
         int k = 1;
 
         if (tr != null) {
-            arg[k++] = tr.toWordTerm(conceptCreationExpectation);
+            arg[k++] = tr.toWordTerm(conceptCreationExpectation, negated);
         }
         arg[k] = self;
 

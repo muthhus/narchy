@@ -14,8 +14,8 @@ import java.io.PrintStream;
  */
 public class Thermostat3 {
 
-    static final float speed = 0.1f;
-    final float tolerance = 0.1f;
+    static final float speed = 0.02f;
+    final float tolerance = 0.15f;
     private final UnitVal h;
     long cyclePause = 0;
 
@@ -51,10 +51,10 @@ public class Thermostat3 {
 
         //Global.DEBUG = true;
 
-        n = new Default(1000, 10, 2, 3);
+        n = new Default(1000, 15, 2, 3);
         //n.log();
-        //n.memory.executionExpectationThreshold.setValue(0.8f);
-        n.core.confidenceDerivationMin.setValue(0.04f);
+        n.memory.executionExpectationThreshold.setValue(0.65f);
+        n.core.confidenceDerivationMin.setValue(0.02f);
 
 
         NALObjects objs = new NALObjects(n) {
@@ -181,9 +181,9 @@ public class Thermostat3 {
 
         n.input("UnitValTaskInc_inc(h,((--,true)),#x)! :|:  %1.0;0.55%");
         n.input("UnitValTaskInc_inc(h,(true),#x)! :|: %1.0;0.55%");
-        n.input("(0-->(/,^UnitVal_compare,h,(#p),_))!");
-        n.input("(-1-->(/,^UnitVal_compare,h,(#p),_))! %0%");
-        n.input("(1-->(/,^UnitVal_compare,h,(#p),_))! %0%");
+        n.input("(0-->(/,^UnitVal_compare,h,(#p),_))! :|:");
+        n.input("(--, (-1-->(/,^UnitVal_compare,h,(#p),_)))! :|:");
+        n.input("(--, (1-->(/,^UnitVal_compare,h,(#p),_)))! :|:");
 
 
 

@@ -20,22 +20,22 @@ public class MarkovlikeTest {
 	public static String getSentence2() {
 		switch ((int) (Math.random() * 5)) {
 			case 0 :
-				return "how you?";
+				return "how you? nice! what you doing? i know it.";
 			case 1 :
-				return "what is?"; // what is #x
+				return "what is? ok! it is what new."; // what is #x
 			case 2 :
-				return "thanks im ok.";
+				return "you want to know how i?  thanks i ok.";
 			case 3 :
-				return "what new?";
+				return "what new? now that we talk i want to know how you!";
 			case 4 :
-				return "hello you!";
+				return "ok you! nice to talk. what you doing now?";
 		}
 		return null;
 	}
 	public static String getSentence() {
 		switch ((int) (Math.random() * 1)) {
 			case 0 :
-				return "aa bb cc dd ee.";
+				return "aa bb cc dd ee";
 				// case 1: return "c d e f g h i j k l m";
 		}
 		return null;
@@ -44,12 +44,15 @@ public class MarkovlikeTest {
 	public static void main(String[] args) {
     //public void testLanguage() {
 
-        Default d = new Default(1000,4,1,3);
+        Default d = new Default(1000,1,2,3);
 
+        d.initNAL9();
+
+        d.memory.executionExpectationThreshold.setValue(0.75f);
         d.core.activationRate.setValue(0.1f);
 
         d.memory.duration.set(5);
-        d.memory.conceptForgetDurations.setValue(1);
+        //d.memory.conceptForgetDurations.setValue(1);
 
         //d.log();
 
@@ -80,17 +83,17 @@ public class MarkovlikeTest {
         //d.input("$1.0$ ((echo(#a) ==> echo(#b)) <-> echo(#a,#b)). %1.0;0.99%");
 
         int repeats = 8;
-        int wordDelay = 40;
-        int sentenceDelay = 255;
+        int wordDelay = 150;
+        int sentenceDelay = 300;
         int speakTime = wordDelay * 16;
-        int silenceTime = 500;
+        int silenceTime = 1000;
 
         for (int i = 0; i < repeats; i++) {
 
             $.logger.warn("train");
 
             String sentenceID = Twenglish.learnSentence(d, wordDelay,
-                    getSentence()
+                    getSentence2()
                     //"this is a sentence for learning language."
                     //"a b c."
                     //"a b c d e f g."
@@ -114,11 +117,13 @@ public class MarkovlikeTest {
 	public static void speak(NAR n, String sentenceID, int speakTime) {
 		// d.frame(1000);
 
-		n.input("say(sentence, " + sentenceID + "). :|:");
-		// d.input("$1.0$ echo(#x)! :|: %0.55%");
+		n.input("speak:" + sentenceID + "! :|:");
+
 
 		n.run(speakTime);
 
+        //silence
+        //n.input("(--, say(?x))! :|:");
 	}
 
 }
