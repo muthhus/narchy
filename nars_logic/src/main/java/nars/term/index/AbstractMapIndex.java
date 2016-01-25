@@ -3,9 +3,13 @@ package nars.term.index;
 import nars.$;
 import nars.Op;
 import nars.nal.Tense;
-import nars.term.*;
-import nars.term.compound.Compound;
+import nars.term.Compound;
+import nars.term.Term;
+import nars.term.TermIndex;
+import nars.term.Termed;
 import nars.term.compound.GenericCompound;
+import nars.term.container.TermContainer;
+import nars.term.container.TermVector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

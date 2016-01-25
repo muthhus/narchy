@@ -84,10 +84,10 @@ public class DerivationTree extends DirectedMultigraph<Task, String> {
 
     @NotNull
     public DerivationTree add(@NotNull Concept c, int maxLevels) {
-        add(c.getBeliefs(), maxLevels);
-        add(c.getGoals(), maxLevels);
-        add(c.getQuestions(), maxLevels);
-        add(c.getQuests(), maxLevels);
+        add(c.beliefs(), maxLevels);
+        add(c.goals(), maxLevels);
+        add(c.questions(), maxLevels);
+        add(c.quests(), maxLevels);
         return this;
     }
 

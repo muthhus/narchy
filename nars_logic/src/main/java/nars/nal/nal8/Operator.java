@@ -4,9 +4,9 @@ import nars.$;
 import nars.Op;
 import nars.task.MutableTask;
 import nars.task.Task;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.AbstractStringAtom;
-import nars.term.compound.Compound;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

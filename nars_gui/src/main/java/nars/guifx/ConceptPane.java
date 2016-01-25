@@ -472,10 +472,10 @@ public class ConceptPane extends BorderPane implements ChangeListener {
             float b = 10;
 
             List<Task> tt = Global.newArrayList();
-            if (!(concept.getBeliefs() instanceof DefaultBeliefTable)) return;
+            if (!(concept.beliefs() instanceof DefaultBeliefTable)) return;
 
-            float minT = ((DefaultBeliefTable) concept.getBeliefs()).getMinT();
-            float maxT = ((DefaultBeliefTable) concept.getBeliefs()).getMaxT();
+            float minT = ((DefaultBeliefTable) concept.beliefs()).getMinT();
+            float maxT = ((DefaultBeliefTable) concept.beliefs()).getMaxT();
 
             //Present axis line
             float nowLineWidth = 5;
@@ -484,7 +484,7 @@ public class ConceptPane extends BorderPane implements ChangeListener {
             te.fillRect(nx-nowLineWidth/2f, 0, nowLineWidth, teh);
 
 
-            for (Task t : concept.getBeliefs()) {
+            for (Task t : concept.beliefs()) {
                 if (t.isEternal() && t.truth()!=null) {
                     float f = t.freq();
                     float c = t.conf();

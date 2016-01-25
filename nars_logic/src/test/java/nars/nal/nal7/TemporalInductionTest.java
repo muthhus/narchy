@@ -49,7 +49,7 @@ public class TemporalInductionTest {
         //assertEquals("(b-->a). 5+0 %.50;.95%", c.getBeliefs().top(n.time()).toStringWithoutBudget());
 
         //when originality is considered:
-        assertEquals("(b-->a). 5+0 %0.0;.90%", c.getBeliefs().top(n.time()).toStringWithoutBudget());
+        assertEquals("(b-->a). 5+0 %0.0;.90%", c.beliefs().top(n.time()).toStringWithoutBudget());
     }
 
     @Test public void testTemporalRevisionOfTemporalRelation() {

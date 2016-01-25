@@ -4,7 +4,7 @@ import nars.NAR;
 import nars.concept.Concept;
 import nars.concept.util.BeliefTable;
 import nars.nal.Tense;
-import nars.term.compound.Compound;
+import nars.term.Compound;
 import nars.truth.TruthWave;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -50,7 +50,7 @@ public class BeliefAnalysis extends EnergyAnalysis {
 		Concept c = concept();
 		if (c == null)
 			return BeliefTable.EMPTY;
-		return c.getBeliefs();
+		return c.beliefs();
 	}
 
 	@NotNull

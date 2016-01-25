@@ -2,7 +2,7 @@ package nars.nal.meta.op;
 
 import nars.nal.meta.AtomicBooleanCondition;
 import nars.nal.meta.PremiseMatch;
-import nars.term.transform.FindSubst;
+import nars.term.transform.subst.FindSubst;
 
 /**
  * Created by me on 12/1/15.

@@ -20,8 +20,8 @@ import nars.concept.Concept;
 import nars.guifx.graph2.TermNode;
 import nars.guifx.graph2.impl.CanvasEdgeRenderer;
 import nars.task.Task;
+import nars.term.Compound;
 import nars.term.Term;
-import nars.term.compound.Compound;
 
 /**
  * Created by me on 12/13/15.

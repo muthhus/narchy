@@ -5,7 +5,7 @@ import nars.nal.Tense;
 import nars.nal.meta.AtomicBooleanCondition;
 import nars.nal.meta.PremiseMatch;
 import nars.task.Task;
-import nars.term.compound.Compound;
+import nars.term.Compound;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

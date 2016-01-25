@@ -2,9 +2,10 @@ package nars.nal.meta;
 
 import junit.framework.TestCase;
 import nars.Narsese;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
-import nars.term.compound.Compound;
+import nars.term.index.PatternIndex;
 import org.junit.Test;
 
 /**

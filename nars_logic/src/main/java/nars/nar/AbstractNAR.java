@@ -9,7 +9,7 @@ import nars.nal.meta.PremiseRule;
 import nars.nal.nal8.AbstractOperator;
 import nars.nal.nal8.operator.NullOperator;
 import nars.nal.nal8.operator.TermFunction;
-import nars.op.data.Flat;
+import nars.op.data.flat;
 import nars.op.data.similaritree;
 import nars.op.io.echo;
 import nars.op.io.reset;
@@ -204,7 +204,7 @@ public abstract class AbstractNAR extends NAR {
             new complexity(),
 
             //Term manipulation
-            new Flat.flatProduct(),
+            new flat.flatProduct(),
             new similaritree(),
 
             //TODO move Javascript to a UnsafeOperators set, because of remote execution issues

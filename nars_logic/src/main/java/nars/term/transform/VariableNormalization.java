@@ -2,7 +2,7 @@ package nars.term.transform;
 
 import nars.$;
 import nars.Global;
-import nars.term.compound.Compound;
+import nars.term.Compound;
 import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 

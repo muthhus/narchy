@@ -1,7 +1,7 @@
 package nars.term.transform;
 
+import nars.term.Compound;
 import nars.term.Term;
-import nars.term.compound.Compound;
 import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 

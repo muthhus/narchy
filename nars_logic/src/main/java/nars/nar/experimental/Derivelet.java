@@ -7,9 +7,9 @@ import nars.concept.Concept;
 import nars.concept.ConceptProcess;
 import nars.nal.meta.PremiseMatch;
 import nars.task.Task;
+import nars.term.Compound;
 import nars.term.Termed;
 import nars.term.Terms;
-import nars.term.compound.Compound;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

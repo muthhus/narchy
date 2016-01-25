@@ -5,9 +5,9 @@ import nars.NAR;
 import nars.Op;
 import nars.concept.Concept;
 import nars.nar.Default;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.compound.Compound;
 import org.jacop.constraints.XeqY;
 import org.jacop.constraints.netflow.NetworkBuilder;
 import org.jacop.constraints.netflow.NetworkFlow;
@@ -73,7 +73,7 @@ public class ConstraintTest {
                 if (cause == null || !cause.hasBeliefs())
                     return null;
 
-                float e = cause.getBeliefs().top(n.time()).truth().getExpectation();
+                float e = cause.beliefs().top(n.time()).truth().expectation();
                 if ((e < 0.75) && (e > 0.25)) {
                     return null; //too indeterminate
                 }

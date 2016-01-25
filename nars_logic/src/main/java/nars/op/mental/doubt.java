@@ -23,7 +23,7 @@ import nars.nal.nal8.operator.SyncOperator;
 /**
  * Operator that activates a concept
  */
-public class doubt extends SyncOperator implements Mental {
+public class doubt extends SyncOperator {
 
     /**
      * To activate a concept as if a question has been asked about it

@@ -6,17 +6,14 @@ public interface Truthed {
 
     default float expectation() {
         Truth t = truth();
-        if (t == null) return Float.NaN;
-        return t.getExpectation();
+        return t == null ? Float.NaN : t.expectation();
     }
     default float conf() {
         Truth t = truth();
-        if (t == null) return Float.NaN;
-        return t.conf();
+        return t == null ? Float.NaN : t.conf();
     }
     default float freq() {
         Truth t = truth();
-        if (t == null) return Float.NaN;
-        return t.freq();
+        return t == null ? Float.NaN : t.freq();
     }
 }

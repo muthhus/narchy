@@ -211,10 +211,10 @@ public class LogicMeter extends FrameReaction {
 
 
             if (c.hasQuestions())
-                totalQuestions += c.getQuestions().size();
+                totalQuestions += c.questions().size();
 
             if (c.hasBeliefs())
-                totalBeliefs += c.getBeliefs().size();
+                totalBeliefs += c.beliefs().size();
 
 
 //            float termLinksMass = c.getTermLinks().mass();

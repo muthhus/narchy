@@ -1,8 +1,8 @@
 package nars.nal.meta;
 
 import nars.Op;
-import nars.term.TermVector;
 import nars.term.compound.GenericCompound;
+import nars.term.container.TermVector;
 import org.jetbrains.annotations.NotNull;
 
 /**

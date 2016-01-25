@@ -5,11 +5,11 @@ import nars.nal.Level;
 import nars.nal.Tense;
 import nars.task.Task;
 import nars.task.Tasked;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.compound.Compound;
-import nars.term.transform.FindSubst;
-import nars.term.transform.MapSubst;
+import nars.term.transform.subst.FindSubst;
+import nars.term.transform.subst.MapSubst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

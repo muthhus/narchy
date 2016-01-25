@@ -3,7 +3,7 @@ package nars.term;
 import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
 import nars.Global;
 import nars.Op;
-import nars.term.compound.Compound;
+import nars.term.container.TermContainer;
 import nars.util.Texts;
 import nars.util.data.sorted.SortedList;
 import org.jetbrains.annotations.NotNull;

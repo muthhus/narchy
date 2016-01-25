@@ -26,7 +26,7 @@ public abstract class DecideAboveDecisionThreshold extends DecideAllGoals {
             if (t == null)
                 throw new RuntimeException("null truth");
 
-            return t.getExpectation();
+            return t.expectation();
         }
     }
 

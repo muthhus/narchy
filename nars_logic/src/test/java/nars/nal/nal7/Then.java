@@ -1,8 +1,8 @@
 package nars.nal.nal7;
 
 import nars.Op;
-import nars.term.TermVector;
 import nars.term.compound.GenericCompound;
+import nars.term.container.TermVector;
 
 /**
  * "then" (adv) after that; next; afterward. in that case; therefore. a

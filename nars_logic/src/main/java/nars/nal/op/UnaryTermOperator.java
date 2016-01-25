@@ -1,8 +1,8 @@
 package nars.nal.op;
 
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.TermBuilder;
-import nars.term.compound.Compound;
 import org.jetbrains.annotations.NotNull;
 
 /**

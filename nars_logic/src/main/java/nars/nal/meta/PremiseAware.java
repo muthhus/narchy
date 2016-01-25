@@ -1,7 +1,7 @@
 package nars.nal.meta;
 
+import nars.term.Compound;
 import nars.term.Term;
-import nars.term.compound.Compound;
 import org.jetbrains.annotations.Nullable;
 
 public interface PremiseAware {

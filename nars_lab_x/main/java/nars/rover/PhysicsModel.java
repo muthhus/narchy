@@ -25,7 +25,6 @@
  */
 package nars.rover;
 
-import nars.rover.physics.*;
 import nars.rover.robot.Collidable;
 import nars.rover.util.Bodies;
 import org.jbox2d.collision.AABB;

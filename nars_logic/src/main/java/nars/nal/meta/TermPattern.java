@@ -3,11 +3,11 @@ package nars.nal.meta;
 import com.google.common.collect.ListMultimap;
 import nars.Global;
 import nars.Op;
+import nars.nal.meta.constraint.MatchConstraint;
 import nars.nal.meta.op.MatchTerm;
 import nars.nal.meta.op.SubTermOp;
 import nars.nal.meta.op.SubTermStructure;
 import nars.term.Term;
-import nars.term.constraint.MatchConstraint;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;

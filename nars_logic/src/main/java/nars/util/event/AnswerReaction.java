@@ -63,7 +63,7 @@ public abstract class AnswerReaction implements Consumer<Twin<Task>> {
         Concept c = nar.concept(question.get());
         if (c == null) return false;
 
-        Task top = c.getBeliefs().top(nar.time());
+        Task top = c.beliefs().top(nar.time());
         if (top!=null) {
             onSolution(top);
             /*

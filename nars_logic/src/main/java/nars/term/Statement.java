@@ -20,7 +20,7 @@
  */
 package nars.term;
 
-import nars.term.compound.Compound;
+import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

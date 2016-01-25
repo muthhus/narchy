@@ -61,12 +61,12 @@ public class TemporalRelationsTest {
         assertEquals(3, d.index().size() );
 
         //2 + 1 revision (for now)
-        assertEquals(3, d.concept("(x==>y)").getBeliefs().size() );
+        assertEquals(3, d.concept("(x==>y)").beliefs().size() );
 
         d.input("(x ==>+1 y). :|:"); //present
         d.step();
 
-        assertEquals( 5, d.concept("(x==>y)").getBeliefs().size() );
+        assertEquals( 5, d.concept("(x==>y)").beliefs().size() );
 
         assertEquals(3, d.index().size() ); //remains 3
 

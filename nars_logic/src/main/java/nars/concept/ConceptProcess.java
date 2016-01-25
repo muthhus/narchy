@@ -84,7 +84,7 @@ public final class ConceptProcess implements Premise {
 
         Task belief = null;
         if ((beliefConcept != null) && (beliefConcept.hasBeliefs())) {
-            belief = beliefConcept.getBeliefs().top(nar.time());
+            belief = beliefConcept.beliefs().top(nar.time());
             if (belief == null || belief.isDeleted()) {
                 throw new RuntimeException("deleted belief: " + belief + " " + beliefConcept.hasBeliefs());
             }

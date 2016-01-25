@@ -5,7 +5,6 @@ import nars.NAR;
 import nars.nar.Default;
 import nars.nar.Terminal;
 import nars.task.Task;
-import nars.term.compound.Compound;
 import nars.term.index.GuavaIndex;
 import nars.term.index.MapIndex;
 import nars.term.index.MapIndex2;

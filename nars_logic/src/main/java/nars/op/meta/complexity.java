@@ -1,8 +1,8 @@
 package nars.op.meta;
 
 import nars.nal.nal8.operator.TermFunction;
+import nars.term.Compound;
 import nars.term.TermBuilder;
-import nars.term.compound.Compound;
 import org.jetbrains.annotations.NotNull;
 
 /**

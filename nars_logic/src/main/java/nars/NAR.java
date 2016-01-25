@@ -20,12 +20,8 @@ import nars.task.flow.TaskQueue;
 import nars.task.flow.TaskStream;
 import nars.task.in.FileInput;
 import nars.task.in.TextInput;
-import nars.term.Term;
-import nars.term.TermBuilder;
-import nars.term.TermIndex;
-import nars.term.Termed;
+import nars.term.*;
 import nars.term.atom.Atom;
-import nars.term.compound.Compound;
 import nars.time.Clock;
 import nars.util.event.AnswerReaction;
 import nars.util.event.DefaultTopic;
@@ -891,10 +887,10 @@ public abstract class NAR implements Level,Consumer<Task> {
                                   boolean includeTaskLinks, int maxPerConcept,
                                   @NotNull Consumer<Task> recip) {
         forEachConcept(c -> {
-            if (includeConceptBeliefs && c.hasBeliefs()) c.getBeliefs().top(maxPerConcept, recip);
-            if (includeConceptQuestions && c.hasQuestions()) c.getQuestions().top(maxPerConcept, recip);
-            if (includeConceptGoals && c.hasBeliefs()) c.getGoals().top(maxPerConcept, recip);
-            if (includeConceptQuests && c.hasQuests()) c.getQuests().top(maxPerConcept, recip);
+            if (includeConceptBeliefs && c.hasBeliefs()) c.beliefs().top(maxPerConcept, recip);
+            if (includeConceptQuestions && c.hasQuestions()) c.questions().top(maxPerConcept, recip);
+            if (includeConceptGoals && c.hasBeliefs()) c.goals().top(maxPerConcept, recip);
+            if (includeConceptQuests && c.hasQuests()) c.quests().top(maxPerConcept, recip);
             if (includeTaskLinks && null != c.getTaskLinks())
                 c.getTaskLinks().forEach(maxPerConcept, t->recip.accept(t.get()));
         });

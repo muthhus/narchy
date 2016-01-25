@@ -1,9 +1,9 @@
 package nars.term.atom;
 
+import nars.term.Compound;
+import nars.term.SubtermVisitor;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.compound.Compound;
-import nars.term.visit.SubtermVisitor;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;

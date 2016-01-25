@@ -21,7 +21,6 @@ import nars.concept.Concept;
 import nars.nar.Default;
 import nars.nar.Terminal;
 import nars.task.Task;
-import nars.term.compound.Compound;
 import nars.term.compound.GenericCompound;
 import org.junit.Test;
 

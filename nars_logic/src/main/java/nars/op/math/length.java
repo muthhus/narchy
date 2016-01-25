@@ -19,10 +19,9 @@ package nars.op.math;
 
 import nars.nal.nal8.Operator;
 import nars.nal.nal8.operator.TermFunction;
-import nars.op.mental.Mental;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.TermBuilder;
-import nars.term.compound.Compound;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -39,7 +38,7 @@ import org.jetbrains.annotations.NotNull;
 
  * 
  */
-public class length extends TermFunction<Integer> implements Mental {
+public class length extends TermFunction<Integer> {
 
     //TODO 'volume' of any term
 

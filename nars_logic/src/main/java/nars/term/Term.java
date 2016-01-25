@@ -22,9 +22,7 @@ package nars.term;
 
 
 import nars.Op;
-import nars.term.compound.Compound;
 import nars.term.variable.Variable;
-import nars.term.visit.SubtermVisitor;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;

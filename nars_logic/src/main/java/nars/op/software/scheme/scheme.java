@@ -6,10 +6,10 @@ import nars.$;
 import nars.nal.nal8.operator.TermFunction;
 import nars.op.software.scheme.cons.Cons;
 import nars.op.software.scheme.expressions.*;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.TermBuilder;
 import nars.term.atom.Atom;
-import nars.term.compound.Compound;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;

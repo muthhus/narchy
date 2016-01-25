@@ -72,7 +72,7 @@ public class ConceptSummaryPane extends Text {
 
             Color color;
             if (concept.hasBeliefs()) {
-                Truth tv = concept.getBeliefs().top(now).truth();
+                Truth tv = concept.beliefs().top(now).truth();
                 color = truthColors.get(tv.freq(), tv.conf());
             }
             else {
@@ -132,8 +132,8 @@ public class ConceptSummaryPane extends Text {
             g.setLineWidth(m);
             g.strokeRect(m/2, m/2, W-m, H-m);
 
-            concept.getBeliefs().forEach(t-> plot(m, Wm, Hm, g, t, false));
-            concept.getGoals().forEach(t-> plot(m, Wm, Hm, g, t, true));
+            concept.beliefs().forEach(t-> plot(m, Wm, Hm, g, t, false));
+            concept.goals().forEach(t-> plot(m, Wm, Hm, g, t, true));
 
         }
 

@@ -3,10 +3,11 @@ package nars.term.compound;
 import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
 import nars.Op;
 import nars.nal.Tense;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.TermPrinter;
-import nars.term.TermVector;
 import nars.term.Termed;
+import nars.term.container.TermVector;
 import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
 

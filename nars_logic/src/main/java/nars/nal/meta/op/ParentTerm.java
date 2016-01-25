@@ -1,7 +1,7 @@
 package nars.nal.meta.op;
 
-import nars.term.compound.Compound;
-import nars.term.transform.FindSubst;
+import nars.term.Compound;
+import nars.term.transform.subst.FindSubst;
 import org.jetbrains.annotations.NotNull;
 
 /**

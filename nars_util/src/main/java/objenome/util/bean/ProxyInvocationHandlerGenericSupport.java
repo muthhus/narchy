@@ -10,7 +10,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
-import static objenome.util.bean.ProxyInvocationHandlerPropertyChangeSupport.isAnnotated;
 import static objenome.util.bean.anno.GenericBeanMethod.Type.*;
 
 public class ProxyInvocationHandlerGenericSupport implements InvocationHandler {

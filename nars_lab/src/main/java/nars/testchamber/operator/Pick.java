@@ -23,8 +23,8 @@ package nars.testchamber.operator;
 import nars.nal.nal8.Execution;
 import nars.nal.nal8.Operator;
 import nars.nal.nal8.operator.SyncOperator;
+import nars.term.Compound;
 import nars.term.Term;
-import nars.term.compound.Compound;
 import nars.testchamber.TestChamber;
 
 /**

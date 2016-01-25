@@ -5,10 +5,10 @@ import com.gs.collections.api.map.ImmutableMap;
 import nars.$;
 import nars.Global;
 import nars.nal.meta.*;
+import nars.nal.meta.constraint.AndConstraint;
+import nars.nal.meta.constraint.MatchConstraint;
+import nars.term.Compound;
 import nars.term.Term;
-import nars.term.compound.Compound;
-import nars.term.constraint.AndConstraint;
-import nars.term.constraint.MatchConstraint;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -52,7 +52,7 @@ public interface Truth extends MetaTruth<Float> {
      *
      * @return The expectation value
      */
-    default float getExpectation() {
+    default float expectation() {
         return getExpectationPositive();
     }
 
@@ -79,7 +79,7 @@ public interface Truth extends MetaTruth<Float> {
      * @return The absolute difference
      */
     default float getExpDifAbs(@NotNull Truth t) {
-        return Math.abs(getExpectation() - t.getExpectation());
+        return Math.abs(expectation() - t.expectation());
     }
 
     /**
@@ -167,10 +167,7 @@ public interface Truth extends MetaTruth<Float> {
     
     @NotNull
     default Term toWordTerm(float trueExpectationThreshold, boolean negated) {
-        float e = getExpectation();
-
-        if (negated)
-            e = 1 - e;
+        float e = !negated ? getExpectationPositive() : getExpectationNegative();
 
         if (e > trueExpectationThreshold) {
             return Truth_TRUE;
@@ -219,7 +216,7 @@ public interface Truth extends MetaTruth<Float> {
         switch (c) {
             case Frequency: return freq();
             case Confidence: return conf();
-            case Expectation: return getExpectation();                
+            case Expectation: return expectation();
         }
         return Float.NaN;
     }

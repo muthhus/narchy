@@ -60,7 +60,7 @@ public enum Tense  {
         //if (problem.hasQueryVar()) {
         float originality = solution.getOriginality();
         return problem.hasQueryVar() ?
-                or(originality, projectedTruth.getExpectation() / solution.term().complexity()) :
+                or(originality, projectedTruth.expectation() / solution.term().complexity()) :
                 or(originality, projectedTruth.conf());
     }
 

@@ -3,9 +3,9 @@ package nars;
 
 import com.gs.collections.api.tuple.primitive.IntIntPair;
 import nars.nal.Tense;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;
-import nars.term.compound.Compound;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;

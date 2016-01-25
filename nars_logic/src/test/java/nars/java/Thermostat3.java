@@ -163,7 +163,7 @@ public class Thermostat3 {
                 n.core.active.forEach(20, b-> {
                     Concept c = b.get();
                     if (c.hasBeliefs())
-                        c.getBeliefs().print(System.out);
+                        c.beliefs().print(System.out);
                 });
             }
 

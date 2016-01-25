@@ -3,12 +3,12 @@ package nars.nal.op;
 import nars.Op;
 import nars.nal.meta.PremiseAware;
 import nars.nal.meta.PremiseMatch;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.TermBuilder;
 import nars.term.atom.Atom;
-import nars.term.compound.Compound;
-import nars.term.transform.MapSubst;
-import nars.term.transform.Subst;
+import nars.term.transform.subst.MapSubst;
+import nars.term.transform.subst.Subst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

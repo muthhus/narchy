@@ -5,8 +5,8 @@ import nars.nal.meta.AtomicBooleanCondition;
 import nars.nal.meta.PremiseMatch;
 import nars.nal.meta.TaskBeliefPair;
 import nars.nal.meta.TermPattern;
+import nars.nal.meta.constraint.MatchConstraint;
 import nars.term.Term;
-import nars.term.constraint.MatchConstraint;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;

@@ -1,7 +1,7 @@
 package nars.nal.meta.op;
 
 import nars.term.Term;
-import nars.term.transform.FindSubst;
+import nars.term.transform.subst.FindSubst;
 import org.jetbrains.annotations.NotNull;
 
 /**

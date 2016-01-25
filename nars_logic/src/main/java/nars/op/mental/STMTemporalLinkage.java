@@ -4,7 +4,7 @@ import nars.Global;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.task.Task;
-import nars.term.compound.Compound;
+import nars.term.Compound;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayDeque;

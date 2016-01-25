@@ -3,7 +3,7 @@ package nars.nal.nal8;
 import nars.Narsese;
 import nars.task.Task;
 import nars.term.Term;
-import nars.term.transform.Subst;
+import nars.term.transform.subst.Subst;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

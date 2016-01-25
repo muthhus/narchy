@@ -4,8 +4,8 @@ import nars.$;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.nar.Default;
-import nars.term.TermVector;
 import nars.term.atom.Atom;
+import nars.term.container.TermVector;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

@@ -2,10 +2,10 @@ package nars.nal.space;
 
 import com.gs.collections.impl.list.mutable.primitive.FloatArrayList;
 import nars.Op;
-import nars.term.TermVector;
+import nars.term.Compound;
 import nars.term.Termed;
-import nars.term.compound.Compound;
 import nars.term.compound.GenericCompound;
+import nars.term.container.TermVector;
 import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

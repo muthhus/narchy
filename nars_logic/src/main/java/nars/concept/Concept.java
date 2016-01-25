@@ -28,8 +28,8 @@ import nars.bag.Bag;
 import nars.concept.util.BeliefTable;
 import nars.concept.util.TaskTable;
 import nars.task.Task;
+import nars.term.Compound;
 import nars.term.Termed;
-import nars.term.compound.Compound;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -46,19 +46,19 @@ public interface Concept extends Termed, Comparable<Termed> {
     Map<Object, Object> getMeta();
 
     default boolean hasGoals() {
-        return !getGoals().isEmpty();
+        return !goals().isEmpty();
     }
 
     default boolean hasBeliefs() {
-        return !getBeliefs().isEmpty();
+        return !beliefs().isEmpty();
     }
 
     default boolean hasQuestions() {
-        return !getQuestions().isEmpty();
+        return !questions().isEmpty();
     }
 
     default boolean hasQuests() {
-        return !getQuests().isEmpty();
+        return !quests().isEmpty();
     }
 
 
@@ -73,44 +73,29 @@ public interface Concept extends Termed, Comparable<Termed> {
         return null == (m = getMeta()) ? null : (C) m.get(key);
     }
 
-    /**
-     * Get the current overall desire value. TODO to be refined
-     */
-    default float getDesire(long now) {
-//        return hasGoals() ?
-//            getGoals().getMeanProjectedExpectation(now) : 0;
-        return hasGoals() ?
-            getGoals().top(now).truth().getExpectation() : 0;
-    }
-    /**
-     * Get the current overall belief value. TODO to be refined
-     */
-    default float getBelief(long now) {
-//        return hasBeliefs() ?
-//                getBeliefs().getMeanProjectedExpectation(now) : 0;
-        return hasBeliefs() ?
-                getBeliefs().top(now).truth().getExpectation() : 0;
-    }
-
     /** belief vs desire metric:
      *      positive = satisfied
      *      negative = desired */
     default float getSuccess(long now) {
-        return hasBeliefs() && hasGoals()
+        //        return hasBeliefs() ?
+//                getBeliefs().getMeanProjectedExpectation(now) : 0;
+        //        return hasGoals() ?
+//            getGoals().getMeanProjectedExpectation(now) : 0;
+        return (hasBeliefs() && hasGoals())
                 ?
-                getBelief(now) - getDesire(now) :
-                0;
+                (beliefs().top(now).expectation() -
+                        goals().top(now).expectation()) : 0;
     }
 
     @Nullable
-    BeliefTable getBeliefs();
+    BeliefTable beliefs();
     @Nullable
-    BeliefTable getGoals();
+    BeliefTable goals();
 
     @Nullable
-    TaskTable getQuestions();
+    TaskTable questions();
     @Nullable
-    TaskTable getQuests();
+    TaskTable quests();
 
 
 
@@ -180,31 +165,31 @@ public interface Concept extends Termed, Comparable<Termed> {
         String indent = "  \t";
         if (showbeliefs) {
             out.print(" Beliefs:");
-            if (getBeliefs().isEmpty()) out.println(" none");
+            if (beliefs().isEmpty()) out.println(" none");
             else {out.println();
-            getBeliefs().forEach(s -> {
+            beliefs().forEach(s -> {
                 out.print(indent); out.println(s);
             });}
             out.print(" Questions:");
-            if (getQuestions().isEmpty()) out.println(" none");
+            if (questions().isEmpty()) out.println(" none");
             else {out.println();
-            getQuestions().forEach(s -> {
+            questions().forEach(s -> {
                 out.print(indent); out.println(s);
             });}
         }
 
         if (showgoals) {
             out.print(" Goals:");
-            if (getGoals().isEmpty()) out.println(" none");
+            if (goals().isEmpty()) out.println(" none");
             else {out.println();
-            getGoals().forEach(s -> {
+            goals().forEach(s -> {
                 out.print(indent);
                 out.println(s);
             });}
             out.print(" Quests:");
-            if (getQuestions().isEmpty()) out.println(" none");
+            if (questions().isEmpty()) out.println(" none");
             else {out.println();
-                getQuests().forEach(s -> {
+                quests().forEach(s -> {
                     out.print(indent); out.println(s);
                 });}
         }
@@ -263,10 +248,10 @@ public interface Concept extends Termed, Comparable<Termed> {
     @NotNull
     default Iterator<Task> iterateTasks(boolean onbeliefs, boolean ongoals, boolean onquestions, boolean onquests) {
 
-        TaskTable beliefs = onbeliefs ? getBeliefs() : null;
-        TaskTable goals =   ongoals ? getGoals() : null ;
-        TaskTable questions = onquestions ?  getQuestions() : null;
-        TaskTable quests = onquests ? getQuests() : null;
+        TaskTable beliefs = onbeliefs ? beliefs() : null;
+        TaskTable goals =   ongoals ? goals() : null ;
+        TaskTable questions = onquestions ?  questions() : null;
+        TaskTable quests = onquests ? quests() : null;
 
         Iterator<Task> b1 = beliefs != null ? beliefs.iterator() : Iterators.emptyIterator();
         Iterator<Task> b2 = goals != null ? goals.iterator() : Iterators.emptyIterator();

@@ -1,7 +1,7 @@
 package nars.term.index;
 
-import nars.term.TermContainer;
 import nars.term.Termed;
+import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;

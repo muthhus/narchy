@@ -3,10 +3,10 @@ package nars.nal.meta;
 import nars.Op;
 import nars.Symbols;
 import nars.nal.Level;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.term.atom.Atom;
-import nars.term.compound.Compound;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;

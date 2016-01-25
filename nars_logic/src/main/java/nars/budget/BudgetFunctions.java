@@ -47,18 +47,15 @@ public final class BudgetFunctions extends UtilityFunctions {
 	 * @return The quality of the judgment, according to truth value only
 	 */
 	public static float truthToQuality(@NotNull Truth t) {
-		float exp = t.getExpectation();
+		float exp = t.expectation();
 		return Math.max(exp, (1.0f - exp) * 0.75f);
 	}
 
 	/**
 	 * Evaluate the quality of a revision, then de-prioritize the premises
 	 * 
-	 * @param tTruth
 	 *            The truth value of the judgment in the task of the premise
-	 * @param oldBelief
 	 *            The truth value of the previously existing belief
-	 * @param conclusion
 	 *            The truth value of the conclusion of revision
 	 * @return The budget for the new task
 	 */

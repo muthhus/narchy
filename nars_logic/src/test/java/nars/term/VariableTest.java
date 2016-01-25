@@ -3,7 +3,6 @@ package nars.term;
 import nars.$;
 import nars.Narsese;
 import nars.nar.Terminal;
-import nars.term.compound.Compound;
 import nars.term.variable.Variable;
 import org.junit.Test;
 

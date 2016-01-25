@@ -1,13 +1,13 @@
 package nars.nal.meta;
 
 import nars.Op;
+import nars.nal.meta.match.EllipsisTransform;
+import nars.term.Compound;
 import nars.term.Term;
-import nars.term.TermContainer;
-import nars.term.TermVector;
-import nars.term.compound.Compound;
 import nars.term.compound.GenericCompound;
-import nars.term.match.EllipsisTransform;
-import nars.term.transform.FindSubst;
+import nars.term.container.TermContainer;
+import nars.term.container.TermVector;
+import nars.term.transform.subst.FindSubst;
 import org.jetbrains.annotations.NotNull;
 
 public final class PatternCompound extends GenericCompound {

@@ -33,7 +33,7 @@ package nars.perf.nars.nar.perf;
 
 import nars.NAR;
 import nars.nar.Default;
-import nars.term.compound.Compound;
+import nars.term.Compound;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Mode;

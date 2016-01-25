@@ -3,6 +3,8 @@ package nars.term.transform;
 import nars.$;
 import nars.Op;
 import nars.term.Term;
+import nars.term.transform.subst.FindSubst;
+import nars.term.transform.subst.Subst;
 import nars.util.data.random.XORShiftRandom;
 import org.junit.Test;
 

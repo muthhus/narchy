@@ -2,9 +2,9 @@ package nars.nal.op;
 
 import nars.Op;
 import nars.nal.meta.PremiseMatch;
+import nars.term.Compound;
 import nars.term.Term;
-import nars.term.compound.Compound;
-import nars.term.transform.FindSubst;
+import nars.term.transform.subst.FindSubst;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

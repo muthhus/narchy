@@ -2,10 +2,10 @@ package nars.java;
 
 import nars.$;
 import nars.nal.nal8.operator.TermFunction;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.TermBuilder;
 import nars.term.atom.Atom;
-import nars.term.compound.Compound;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

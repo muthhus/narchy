@@ -5,8 +5,8 @@ import nars.concept.ConceptProcess;
 import nars.nal.Tense;
 import nars.nal.meta.AtomicBooleanCondition;
 import nars.nal.meta.PremiseMatch;
+import nars.term.Compound;
 import nars.term.Term;
-import nars.term.compound.Compound;
 import org.jetbrains.annotations.NotNull;
 
 /**

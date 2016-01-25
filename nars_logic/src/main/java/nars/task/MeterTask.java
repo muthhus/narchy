@@ -1,8 +1,8 @@
 package nars.task;
 
 import nars.Memory;
+import nars.term.Compound;
 import nars.term.Termed;
-import nars.term.compound.Compound;
 import nars.util.event.Active;
 import org.jetbrains.annotations.NotNull;
 

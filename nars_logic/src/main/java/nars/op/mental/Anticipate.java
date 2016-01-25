@@ -31,7 +31,7 @@ import nars.budget.Budget;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.task.Temporal;
-import nars.term.compound.Compound;
+import nars.term.Compound;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
@@ -83,7 +83,7 @@ public final class Anticipate {
 
     public void anticipate(@NotNull Task t) {
 
-        if(t.truth().getExpectation() < DEFAULT_CONFIRMATION_EXPECTATION || t.punc() != Symbols.JUDGMENT) {
+        if(t.truth().expectation() < DEFAULT_CONFIRMATION_EXPECTATION || t.punc() != Symbols.JUDGMENT) {
             return;
         }
 
@@ -147,7 +147,7 @@ public final class Anticipate {
         final List<TaskTime> toRemove = this.toRemove;
 
         anticipations.get(c.term()).stream().filter(tt -> tt.inTime(cOccurr) && !c.equals(tt.task) &&
-                tt.task.truth().getExpectation() > DEFAULT_CONFIRMATION_EXPECTATION).forEach(tt -> {
+                tt.task.truth().expectation() > DEFAULT_CONFIRMATION_EXPECTATION).forEach(tt -> {
             toRemove.add(tt);
             happeneds++;
         });

@@ -33,7 +33,7 @@ import java.util.ArrayList;
 /**
  * Feeling common operations
  */
-public abstract class feel extends SyncOperator implements Mental {
+public abstract class feel extends SyncOperator {
 
     /**
      * To get the current value of an internal sensor

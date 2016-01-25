@@ -76,13 +76,13 @@ public class DefaultConcept extends AtomConcept {
      */
     @Nullable
     @Override
-    public final QuestionTaskTable getQuests() {
+    public final QuestionTaskTable quests() {
         return quests;
     }
 
     @Nullable
     @Override
-    public final QuestionTaskTable getQuestions() {
+    public final QuestionTaskTable questions() {
         return questions;
     }
 
@@ -93,7 +93,7 @@ public class DefaultConcept extends AtomConcept {
      */
     @Nullable
     @Override
-    public final BeliefTable getBeliefs() {
+    public final BeliefTable beliefs() {
         return beliefs == null ? BeliefTable.EMPTY : beliefs;
     }
 
@@ -102,7 +102,7 @@ public class DefaultConcept extends AtomConcept {
      */
     @Nullable
     @Override
-    public final BeliefTable getGoals() {
+    public final BeliefTable goals() {
         return goals == null ? BeliefTable.EMPTY : goals;
     }
 
@@ -243,7 +243,7 @@ public class DefaultConcept extends AtomConcept {
         if (goals == null) goals = new DefaultBeliefTable(
                 nar.memory.conceptGoalsMax.intValue(), memory);
 
-        Task goal = getGoals().add(inputGoal, nar);
+        Task goal = goals().add(inputGoal, nar);
 
 
 
@@ -379,11 +379,11 @@ public class DefaultConcept extends AtomConcept {
         final QuestionTaskTable questionTable;
         if (q.isQuestion()) {
             if (questions == null) questions = new ArrayListTaskTable(nar.memory.conceptQuestionsMax.intValue());
-            questionTable = getQuestions();
+            questionTable = questions();
 
         } else { // else if (q.isQuest())
             if (quests == null) quests = new ArrayListTaskTable(nar.memory.conceptQuestionsMax.intValue());
-            questionTable = getQuests();
+            questionTable = quests();
         }
 
         if (Global.DEBUG) {
@@ -410,7 +410,7 @@ public class DefaultConcept extends AtomConcept {
         //TODO if the table was not affected, does the following still need to happen:
 
         BeliefTable answerTable = q.isQuest() ?
-                getGoals() : getBeliefs();
+                goals() : beliefs();
 
         Task sol = answerTable.top(q.occurrence());
         if (sol != null) {

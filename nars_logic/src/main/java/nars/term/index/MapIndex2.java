@@ -1,10 +1,10 @@
 package nars.term.index;
 
 import com.gs.collections.impl.map.mutable.primitive.IntObjectHashMap;
+import nars.term.Compound;
 import nars.term.Term;
-import nars.term.TermContainer;
 import nars.term.Termed;
-import nars.term.compound.Compound;
+import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

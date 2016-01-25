@@ -52,25 +52,25 @@ public class AtomConcept extends AbstractConcept  {
 
     @Nullable
     @Override
-    public BeliefTable getBeliefs() {
+    public BeliefTable beliefs() {
         return BeliefTable.EMPTY;
     }
 
     @Nullable
     @Override
-    public BeliefTable getGoals() {
+    public BeliefTable goals() {
         return BeliefTable.EMPTY;
     }
 
     @Nullable
     @Override
-    public TaskTable getQuestions() {
+    public TaskTable questions() {
         return BeliefTable.EMPTY;
     }
 
     @Nullable
     @Override
-    public TaskTable getQuests() {
+    public TaskTable quests() {
         return BeliefTable.EMPTY;
     }
 

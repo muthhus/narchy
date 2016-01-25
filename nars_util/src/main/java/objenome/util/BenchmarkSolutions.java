@@ -21,8 +21,6 @@
  */
 package objenome.util;
 
-import objenome.problem.STGPBoolean.BooleanCases;
-
 import java.util.function.Function;
 
 /**

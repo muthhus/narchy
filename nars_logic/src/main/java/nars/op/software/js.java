@@ -5,12 +5,11 @@ import nars.nal.nal8.Execution;
 import nars.nal.nal8.Operator;
 import nars.nal.nal8.operator.NullOperator;
 import nars.nal.nal8.operator.TermFunction;
-import nars.op.mental.Mental;
 import nars.task.Task;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.TermBuilder;
 import nars.term.atom.Atom;
-import nars.term.compound.Compound;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,7 +22,7 @@ import java.util.HashMap;
 /**
  * Executes a Javascript expression
  */
-public class js extends TermFunction implements Mental {
+public class js extends TermFunction {
 
     private static final ThreadLocal<ScriptEngine> js = new ThreadLocal<ScriptEngine>() {
         @Override

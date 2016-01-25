@@ -4,8 +4,8 @@ package nars.nal.nal8.operator;
 import nars.$;
 import nars.nal.nal8.Operator;
 import nars.task.Task;
+import nars.term.Compound;
 import nars.term.Term;
-import nars.term.compound.Compound;
 import org.jetbrains.annotations.NotNull;
 
 /** an operation that executes immediately, and without logical consequences;

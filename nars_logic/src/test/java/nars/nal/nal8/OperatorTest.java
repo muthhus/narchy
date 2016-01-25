@@ -8,9 +8,9 @@ import nars.budget.Budget;
 import nars.nar.Default;
 import nars.nar.Terminal;
 import nars.task.Task;
+import nars.term.Compound;
 import nars.term.Term;
-import nars.term.compound.Compound;
-import nars.term.transform.Subst;
+import nars.term.transform.subst.Subst;
 import nars.util.meter.TestNAR;
 import org.junit.Test;
 
@@ -241,8 +241,8 @@ public class OperatorTest {
         t.mustBelieve(8, "add(1, 2, 3)", 1.0f, 0.99f);
         t.test();
 
-        assertEquals(1, n.concept("add(1, 1, 2)").getBeliefs().size());
-        assertEquals(1, n.concept("add(1, 1, #x)").getQuestions().size());
+        assertEquals(1, n.concept("add(1, 1, 2)").beliefs().size());
+        assertEquals(1, n.concept("add(1, 1, #x)").questions().size());
         n.concept("add(1, 1, 2)").print(System.out);
     }
 

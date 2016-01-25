@@ -2,7 +2,7 @@ package nars.term;
 
 import nars.$;
 import nars.Op;
-import nars.term.compound.Compound;
+import nars.term.container.TermContainer;
 import org.junit.Ignore;
 import org.junit.Test;
 
