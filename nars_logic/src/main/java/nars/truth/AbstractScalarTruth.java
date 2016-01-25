@@ -1,9 +1,5 @@
 package nars.truth;
 
-import nars.Global;
-import nars.util.data.Util;
-import org.jetbrains.annotations.NotNull;
-
 /**
  * Created by me on 7/4/15.
  */
@@ -13,40 +9,20 @@ public abstract class AbstractScalarTruth extends AbstractTruth<Float> implement
     /**
      * The frequency factor of the truth value
      */
-    private float frequency;
+    public final float freq;
+
+    public AbstractScalarTruth(float freq, float conf) {
+        super(conf);
+        this.freq = freq;
+    }
+
+    public abstract int hashCode();
 
 
     @Override
-    public void setConfidence(float b) {
-        float e = Global.TRUTH_EPSILON; //getEpsilon();
-        confidence = Util.round(b, e);
+    public final float freq() {
+        return freq;
     }
 
 
-    @Override
-    public final int hashCode() {
-        return Truth.hash(this);
-    }
-
-
-    @Override
-    public float freq() {
-        return frequency;
-    }
-
-
-    @NotNull
-    @Override
-    public Truth setFrequency(float f) {
-        float e = Global.TRUTH_EPSILON; //getEpsilon();
-        frequency = Util.round(f, e);
-        return this;
-    }
-
-
-
-    @Override
-    public boolean equalsFrequency(@NotNull Truth t) {
-        return (Util.equal(frequency, t.freq(), Global.TRUTH_EPSILON));
-    }
 }

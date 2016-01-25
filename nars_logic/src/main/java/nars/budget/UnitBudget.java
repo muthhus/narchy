@@ -269,7 +269,7 @@ public class UnitBudget extends Budget {
 
 
     @Override
-    public void mulPriority(float factor) {
+    public void priMult(float factor) {
         setPriority(priority * factor);
     }
 

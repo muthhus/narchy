@@ -104,7 +104,7 @@ public class BagAggregateBudget extends Budget {
     }
 
     @Override
-    public void mulPriority(float factor) {
+    public void priMult(float factor) {
 
     }
 

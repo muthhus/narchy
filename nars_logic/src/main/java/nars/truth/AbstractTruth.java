@@ -10,19 +10,18 @@ public abstract class AbstractTruth<T> implements MetaTruth<T> {
     /**
      * The confidence factor of the truth value
      */
-    protected float confidence;
+    public final float conf;
 
+    public AbstractTruth(float conf) {
+        this.conf = conf;
+    }
 
     @Override
     public final float conf() {
-        return confidence;
+        return conf;
     }
 
 
-//    @Override
-//    public float getConfidenceMax() {
-//        return Global.MAX_CONFIDENCE;
-//    }
 
     /**
      * Compare two truth values
@@ -33,20 +32,19 @@ public abstract class AbstractTruth<T> implements MetaTruth<T> {
 
     @Override
     public boolean equals(Object that) {
-        if (that == this) return true;
-        if (that instanceof Truth) {
-            Truth t = ((Truth) that);
-            return equalsConfidence(t) && equalsFrequency(t);
-        }
-        return false;
+        return (that == this) ||
+               ((that instanceof Truth) && equalsTruth((Truth)that));
     }
 
-    public final boolean equalsConfidence(@NotNull Truth t) {
-        float e = Global.TRUTH_EPSILON;//getEpsilon();
-        return Util.equal(confidence, t.conf(), e);
+    protected final boolean equalsTruth(Truth t) {
+        return equalsConfidence(t) && equalsFrequency(t);
     }
 
-    public abstract boolean equalsFrequency(Truth t);
+    protected final boolean equalsConfidence(@NotNull Truth t) {
+        return Util.equal(conf, t.conf(), Global.TRUTH_EPSILON);
+    }
+
+    protected abstract boolean equalsFrequency(Truth t);
 
 
 

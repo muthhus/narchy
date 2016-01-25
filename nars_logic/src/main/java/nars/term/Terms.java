@@ -16,6 +16,7 @@ import java.util.function.IntPredicate;
 import java.util.function.Predicate;
 
 import static nars.Op.*;
+import static nars.nal.Tense.ITERNAL;
 
 /**
  * Static utility class for static methods related to Terms
@@ -376,5 +377,42 @@ public enum Terms {
         float len = Math.max(a.length(), b.length());
         if (len == 0) return 0;
         return Texts.levenshteinDistance(a,b) / len;
+    }
+
+    /** heuristic which evaluates the semantic similarity of two terms
+     * returning 1f if there is a complete match, 0f if there is
+     * a totally separate meaning for each, and in-between if
+     * some intermediate aspect is different (ex: temporal relation dt)
+     */
+    public static float termRelevance(Compound a, Compound b) {
+        Op aop = a.op();
+        if (aop !=b.op()) return 0f;
+        if (aop.isTemporal()) {
+            int at = a.t();
+            int bt = b.t();
+            if (at != bt) {
+                if ((at == ITERNAL) || (bt == ITERNAL)) {
+                    //either is atemporal but not both
+                    return 0.5f;
+                }
+                boolean symmetric = aop.isCommutative();
+
+                if (symmetric) {
+                    int ata = Math.abs(at);
+                    int bta = Math.abs(bt);
+                    return 1f - (ata / ((float)(ata + bta)));
+                } else {
+                    boolean ap = at >= 0;
+                    boolean bp = bt >= 0;
+                    if (ap ^ bp) {
+                        return 0; //opposite direction
+                    } else {
+                        //same direction
+                        return 1f - (Math.abs(at - bt) / (1f + Math.abs(at + bt)));
+                    }
+                }
+            }
+        }
+        return 1f;
     }
 }

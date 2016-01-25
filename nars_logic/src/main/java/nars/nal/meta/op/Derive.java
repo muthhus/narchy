@@ -19,7 +19,7 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.truth.TruthFunctions.eternalizedConfidence;
+import static nars.truth.TruthFunctions.eternalize;
 
 /**
  * Handles matched derivation results
@@ -265,7 +265,7 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
                             .punctuation(punct)
                             .truth(
                                 truth.freq(),
-                                eternalizedConfidence(truth.conf())
+                                eternalize(truth.conf())
                             )
                             .budgetCompoundForward(premise)
                             .time(now, Tense.ETERNAL)

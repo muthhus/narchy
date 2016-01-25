@@ -505,21 +505,13 @@ public final class TruthFunctions extends UtilityFunctions {
 
     @NotNull
     public static ProjectedTruth eternalize(@NotNull Truth t) {
-        return eternalize(t.freq(), t.conf());
-    }
-
-    /**
-     * From one moment to eternal
-     * @return Truth value of the conclusion
-     */
-    @NotNull
-    public static ProjectedTruth eternalize(float freq, float conf) {
         return new ProjectedTruth(
-                freq,
-                eternalizedConfidence(conf), Tense.ETERNAL
+                t.freq(),
+                eternalize(t.conf()), Tense.ETERNAL
         );
     }
-    public static float eternalizedConfidence(float conf) {
+
+    public static float eternalize(float conf) {
         return w2c(conf);
     }
     

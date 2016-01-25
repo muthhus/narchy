@@ -82,7 +82,7 @@ public class MutableTask extends AbstractTask {
      */
     @NotNull
     public MutableTask budgetScaled(float priorityFactor, float durFactor) {
-        mulPriority(priorityFactor);
+        priMult(priorityFactor);
         mulDurability(durFactor);
         return this;
     }

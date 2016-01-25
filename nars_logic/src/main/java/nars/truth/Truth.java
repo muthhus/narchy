@@ -20,7 +20,6 @@
  */
 package nars.truth;
 
-import nars.Global;
 import nars.Symbols;
 import nars.term.Term;
 import nars.term.atom.Atom;
@@ -46,10 +45,6 @@ public interface Truth extends MetaTruth<Float> {
      * @return The frequency value
      */
     float freq();
-
-    @NotNull
-    Truth setFrequency(float f);
-
 
 
     /**
@@ -109,7 +104,7 @@ public interface Truth extends MetaTruth<Float> {
      * as well as non-naturally ordered / non-lexicographic
      * but deterministic compareTo() ordering.
      */
-    static int hash(@NotNull Truth t) {
+    static int hash(@NotNull Truth t, int hashDiscreteness) {
 
         //assuming epsilon is large enough such that: 0 <= h < 2^15:
         int freqHash = Util.hash(t.freq(), hashDiscreteness);
@@ -118,7 +113,6 @@ public interface Truth extends MetaTruth<Float> {
         return (freqHash << 16) | confHash;
     }
 
-    int hashDiscreteness = (int)(1.0f / Global.TRUTH_EPSILON);
 
     @NotNull
     @Override
@@ -183,19 +177,14 @@ public interface Truth extends MetaTruth<Float> {
         return Truth_UNSURE;
     }
 
-    @NotNull
-    default Truth set(float frequency, float confidence) {
-        setFrequency(frequency);
-        setConfidence(confidence);
-        return this;
-    }
 
-    /** negation that modifies the truth instance itself */
-    @NotNull
-    default Truth negate() {
-        //final float f = 1 - getFrequency();
-        return setFrequency(1.0f - freq());
-    }
+
+//    /** negation that modifies the truth instance itself */
+//    @NotNull
+//    default Truth negate() {
+//        //final float f = 1 - getFrequency();
+//        return setFrequency(1.0f - freq());
+//    }
 
     static int compare(@NotNull Truth a, @NotNull Truth b) {
         if (a == b) return 0;
@@ -211,8 +200,10 @@ public interface Truth extends MetaTruth<Float> {
 //        return 0;
     }
 
-    @NotNull
-    Truth cloneMultipliedConfidence(float f);
+
+    /** clones a copy with confidence multiplied */
+    @NotNull Truth withConfMult(float f);
+    @NotNull Truth withConf(float f);
 
 
 
@@ -248,8 +239,5 @@ public interface Truth extends MetaTruth<Float> {
     default Float value() { return freq(); }
 
 
-    /** use setFrequency(v) when possible because this may box the result as a non-primitive */
-    @Override
-    default void setValue(Float v) { setFrequency(v); }
 
 }

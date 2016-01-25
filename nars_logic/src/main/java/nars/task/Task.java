@@ -29,8 +29,12 @@ import nars.nal.Tense;
 import nars.term.Statement;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.Terms;
 import nars.term.compound.Compound;
-import nars.truth.*;
+import nars.truth.ProjectedTruth;
+import nars.truth.Stamp;
+import nars.truth.Truth;
+import nars.truth.Truthed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -43,8 +47,9 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import static nars.Global.dereference;
-import static nars.nal.LocalRules.solutionEval;
-import static nars.nal.Tense.ITERNAL;
+import static nars.nal.LocalRules.solutionBudget;
+import static nars.truth.TruthFunctions.eternalize;
+import static nars.truth.TruthFunctions.temporalProjection;
 
 /**
  * A task to be processed, consists of a Sentence and a BudgetValue.
@@ -185,33 +190,33 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     void onConcept(Concept c);
 
     @NotNull
-    default Task solved(@NotNull Compound newTerm, @NotNull Task question, @NotNull Memory memory) {
-        if (term().equals(newTerm)) return this;
-        else
-            return solvedProjected(newTerm, question, memory);
+    default Task answer(@NotNull Compound newTerm, @NotNull Task question, @NotNull Memory memory) {
+        return term().equals(newTerm) && occurrence() == question.occurrence() ? this : answerProjected(newTerm, question, memory);
     }
 
     @NotNull
-    default Task solvedProjected(@NotNull Compound newTerm, @NotNull Task question, @NotNull Memory memory) {
+    default Task answerProjected(@NotNull Compound newTerm, @NotNull Task question, @NotNull Memory memory) {
 
         long now = memory.time();
 
-        float termRelevance = Task.termRelevance(newTerm, question.term());
+        float termRelevance = Terms.termRelevance(newTerm, question.term());
         if (termRelevance == 0)
             return null;
 
-        Budget solutionBudget = solutionEval(question, this, memory);
+        //TODO avoid creating new Truth instances
+        Truth solTruth = projection(question.occurrence(), now, false);
+        if (solTruth == null)
+            return null;
+
+        solTruth = solTruth.withConfMult(termRelevance);
+
+        Budget solutionBudget = solutionBudget(question, this, solTruth, memory);
         if (solutionBudget == null)
             return null;
 
-        Truth solTruth = projection(question.occurrence(), now, termRelevance);
-        solutionBudget.mulPriority(termRelevance);
-
-        long occCurrent = occurrence();
-
         //if truth instanceof ProjectedTruth, use its attached occ time (possibly eternal or temporal), otherwise assume it is this task's occurence time
         long solutionOcc = solTruth instanceof ProjectedTruth ?
-                ((ProjectedTruth)solTruth).when : occCurrent;
+                ((ProjectedTruth)solTruth).when : occurrence();
 
         Task solution;
         //if ((!truth().equals(solTruth)) || (!newTerm.equals(term())) || (solutionOcc!= occCurrent)) {
@@ -240,36 +245,6 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         //solution.log(new Solution(question));
 
         return solution;
-    }
-
-    /** heuristic which evaluates the semantic similarity of two terms
-     * returning 1f if there is a complete match, 0f if there is
-     * a totally separate meaning for each, and in-between if
-     * some intermediate aspect is different (ex: temporal relation dt)
-     */
-    static float termRelevance(Compound a, Compound b) {
-        Op aop = a.op();
-        if (aop !=b.op()) return 0f;
-        if (aop.isTemporal()) {
-            int at = a.t();
-            int bt = b.t();
-            if (at != bt) {
-                if ((at == ITERNAL) || (bt == ITERNAL)) {
-                    //either is atemporal but not both
-                    return 0.5f;
-                }
-                boolean ap = at >= 0;
-                boolean bp = bt >= 0;
-                if (ap ^ bp) {
-                    //opposite direction
-                    return 0;
-                } else {
-                    //same direction
-                    return 1f - (Math.abs(at - bt) / (1f+Math.abs(at + bt)));
-                }
-            }
-        }
-        return 1f;
     }
 
     char punc();
@@ -370,8 +345,6 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     default void onRevision(Truth truthConclusion) {
 
     }
-
-    void mulPriority(float factor);
 
     void setExecuted();
 
@@ -659,15 +632,15 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         if (!Float.isFinite(factor))
             throw new RuntimeException("NaN");
 
-        derived.forEach(t -> t.budget().mulPriority(factor));
+        derived.forEach(t -> t.budget().priMult(factor));
     }
 
     static void normalize(@NotNull Iterable<Task> derived, float premisePriority) {
-        derived.forEach(t -> t.budget().mulPriority(premisePriority));
+        derived.forEach(t -> t.budget().priMult(premisePriority));
     }
     static void inputNormalized(@NotNull Iterable<Task> derived, float premisePriority, @NotNull Consumer<Task> target) {
         derived.forEach(t -> {
-            t.budget().mulPriority(premisePriority);
+            t.budget().priMult(premisePriority);
             target.accept(t);
         });
     }
@@ -795,38 +768,46 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     }
 
 
-    default Truth projection(long targetTime, long now, float scale) {
-        Truth t = projection(targetTime, now);
-        if (scale==1f) return t;
-        if (scale==0f) return DefaultTruth.ZERO;
-        return t.cloneMultipliedConfidence(scale);
+
+    default Truth projection(long targetTime, long now) {
+        return projection(targetTime, now, true);
     }
 
     //projects the truth to a certain time, covering all 4 cases as discussed in
     //https://groups.google.com/forum/#!searchin/open-nars/task$20eteneral/open-nars/8KnAbKzjp4E/rBc-6V5pem8J
-    default Truth projection(long targetTime, long now) {
+    default Truth projection(long targetTime, long now, boolean eternalizeIfWeaklyTemporal) {
 
         Truth currentTruth = truth();
 
-        boolean toEternal = (targetTime == Tense.ETERNAL);
-        boolean tenseEternal = isEternal();
-        if (toEternal && tenseEternal) {
+        if ((targetTime == Tense.ETERNAL)) {
 
-            return tenseEternal ? currentTruth : TruthFunctions.eternalize(currentTruth);
-            //return new DefaultTruth(currentTruth);                 //target and itself is eternal so return the truth of itself
+            return isEternal() ? currentTruth :
+                    eternalize(currentTruth);
 
         } else {
-            //ok last option is that both are tensed, in this case we need to project to the target time
-            //but since also eternalizing is valid, we use the stronger one.
-            DefaultTruth eternalTruth = TruthFunctions.eternalize(currentTruth);
 
-            float factor = TruthFunctions.temporalProjection(occurrence(), targetTime, now);
+            long occ = occurrence();
+            if (occ == targetTime)
+                return currentTruth;
 
-            float projectedConfidence = factor * currentTruth.conf();
+            float conf = currentTruth.conf();
 
-            return projectedConfidence < eternalTruth.conf() ?
-                    eternalTruth :
-              new ProjectedTruth(currentTruth.freq(), projectedConfidence, targetTime);
+            float nextConf;
+            long nextOcc = targetTime;
+
+            float projConf = nextConf =
+                    conf * temporalProjection(occ, now, targetTime);
+
+            if (eternalizeIfWeaklyTemporal) {
+                float eternConf = eternalize(conf);
+
+                if (projConf < eternConf) {
+                    nextConf = eternConf;
+                    nextOcc = Tense.ETERNAL;
+                }
+            }
+
+            return new ProjectedTruth(currentTruth.freq(), nextConf, nextOcc);
         }
     }
 

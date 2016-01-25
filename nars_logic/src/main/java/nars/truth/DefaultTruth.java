@@ -1,53 +1,34 @@
 package nars.truth;
 
+import nars.Global;
 import nars.Memory;
+import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * Created by me on 5/19/15.
- */
+import static nars.util.data.Util.round;
+
+
 public class DefaultTruth extends AbstractScalarTruth {
 
 
-    public final static Truth ZERO = new DefaultTruth(0.5f, 0) {
-        {
-            confidence = 0;
-        }
-
-        @Override
-        public void setConfidence(float b) {
-
-        }
-
-        @NotNull
-        @Override
-        public Truth setFrequency(float f) {
-            return this;
-        }
-    };
+    private final int hash;
 
     /** unspecified confidence, will be invalid unless updated later */
     public DefaultTruth(float f) {
-        setFrequency(f);
-        confidence = Float.NaN;
+        super(f, Float.NaN);
+        this.hash = 0;
     }
 
     public DefaultTruth(float f, float c) {
-
-        set(f,c);
-
+        super(
+            round(f, Global.TRUTH_EPSILON),
+            round(c, Global.TRUTH_EPSILON)
+        );
+        this.hash = Truth.hash(this, hashDiscreteness);
     }
-
-//    public DefaultTruth(Truth v) {
-//        super(v);
-//    }
 
     public DefaultTruth(char punctuation, @NotNull Memory m) {
-        set(1.0f, m.getDefaultConfidence(punctuation));
-    }
-
-    /** 0, 0 default */
-    public DefaultTruth() {
+        this(1.0f, m.getDefaultConfidence(punctuation));
     }
 
     public DefaultTruth(@NotNull AbstractScalarTruth toClone) {
@@ -60,9 +41,36 @@ public class DefaultTruth extends AbstractScalarTruth {
 
     @NotNull
     @Override
-    public Truth cloneMultipliedConfidence(float factor) {
-        return new DefaultTruth(freq(), conf() * factor);
+    public final Truth withConfMult(float factor) {
+        return factor == 1 ? this : new DefaultTruth(freq, conf() * factor);
     }
+
+    @Override public final Truth withConf(float newConf) {
+        newConf = round(newConf, Global.TRUTH_EPSILON);
+        return (conf != newConf) ? new DefaultTruth(freq, newConf) : this;
+    }
+
+    @Override
+    public boolean equals(Object that) {
+        if (that instanceof DefaultTruth) {
+            return ((DefaultTruth)that).hash == hash; //shortcut, since perfect hash for this instance
+        } else if (that instanceof Truth) {
+            return equalsTruth((Truth)that);
+        }
+        return false;
+    }
+
+    @Override
+    public final int hashCode() {
+        return hash;
+    }
+
+    @Override
+    protected boolean equalsFrequency(@NotNull Truth t) {
+        return (Util.equal(freq, t.freq(), Global.TRUTH_EPSILON));
+    }
+
+    private static final int hashDiscreteness = (int)(1.0f / Global.TRUTH_EPSILON);
 
     /*    public float getEpsilon() {
         return DEFAULT_TRUTH_EPSILON;

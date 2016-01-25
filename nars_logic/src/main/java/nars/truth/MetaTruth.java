@@ -11,7 +11,7 @@ public interface MetaTruth<T> extends Cloneable, Serializable {
 
     T value();
 
-    void setValue(T v);
+    //void setValue(T v); //move to MutableMetaTruth interface
 
     //TODO add appendString(sb, decimals)
     @NotNull
@@ -36,8 +36,8 @@ public interface MetaTruth<T> extends Cloneable, Serializable {
 
 
 
-    /** TODO move this to a MutableTruth interface to separate a read-only impl */
-    void setConfidence(float c);
+//    /** TODO move this to a MutableTruth interface to separate a read-only impl */
+//    void setConfidence(float c);
 
 
 

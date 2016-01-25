@@ -14,6 +14,7 @@ import nars.nal.Tense;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Termed;
+import nars.term.Terms;
 import nars.term.compound.Compound;
 import nars.truth.Truth;
 import nars.truth.TruthFunctions;
@@ -307,7 +308,7 @@ public class DefaultBeliefTable implements BeliefTable {
             Task x = beliefs.get(i);
             if (!LocalRules.isRevisible(newBelief, x)) continue;
 
-            float tRel = Task.termRelevance(newBeliefTerm, x.term());
+            float tRel = Terms.termRelevance(newBeliefTerm, x.term());
             if (tRel <= 0) continue;
 
 
@@ -327,8 +328,9 @@ public class DefaultBeliefTable implements BeliefTable {
                         x, now);
             }
 
-            float ffreqMatch = 1f/(1f + Math.abs(newBeliefFreq - x.freq()));
-            c.setConfidence(c.conf() * tRel * ffreqMatch);
+            //float ffreqMatch = 1f/(1f + Math.abs(newBeliefFreq - x.freq()));
+            float ffreqMatch = 1;
+            c = c.withConfMult(tRel * ffreqMatch);
 
             float cc = c.conf();
             if (cc > best) {

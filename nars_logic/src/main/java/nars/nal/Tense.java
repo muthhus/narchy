@@ -55,16 +55,13 @@ public enum Tense  {
 //
 //    }
 
-    public static float solutionQualityMatchingOrder(@NotNull Task problem, @NotNull Task solution, long now) {
-
-        //TODO avoid creating new Truth instances
-        Truth truth = solution.projection(problem.occurrence(), now);
+    public static float solutionQuality(@NotNull Task problem, @NotNull Task solution, Truth projectedTruth, long now) {
 
         //if (problem.hasQueryVar()) {
         float originality = solution.getOriginality();
         return problem.hasQueryVar() ?
-                or(originality, truth.getExpectation() / solution.term().complexity()) :
-                or(originality, truth.conf());
+                or(originality, projectedTruth.getExpectation() / solution.term().complexity()) :
+                or(originality, projectedTruth.conf());
     }
 
     //    /**

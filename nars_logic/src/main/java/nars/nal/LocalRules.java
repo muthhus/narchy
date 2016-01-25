@@ -32,6 +32,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.compound.Compound;
 import nars.truth.Stamp;
+import nars.truth.Truth;
 import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
 
@@ -117,6 +118,12 @@ public enum LocalRules {
     public static void forEachSolution(@NotNull Task question, @NotNull Task sol, @NotNull NAR nal, @NotNull Consumer<Task> eachSolutions) {
 
 
+        if (Stamp.overlapping(question, sol)) {
+            //System.out.println(question.getExplanation());
+            //System.out.println(sol.getExplanation());
+            return;
+        }
+
 //        float om = Tense.orderMatch(question, solution, nal.memory.duration());
 //
 //        if (!Tense.matchingOrder(question, solution)) {
@@ -131,16 +138,18 @@ public enum LocalRules {
         /** temporary for comparing the result before unification and after */
         //float newQ0 = TemporalRules.solutionQuality(question, belief, projectedTruth, now);
 
+        //System.out.println(nal.time() + " solve: " + question);
 
         Consumer<Term> proc = (st) -> {
 
 
-            Task validSolution = sol.solved((Compound)st, question, memory );
+            Task validSolution = sol.answer((Compound)st, question, memory );
 
             if (validSolution!=null) {
+                //System.out.println("\twith: " + validSolution);
+
                 eachSolutions.accept(validSolution);
                 //System.out.println(question + " " + ss + " " + ss.getExplanation());
-
 
             }
 
@@ -155,9 +164,6 @@ public enum LocalRules {
             Premise.unify(Op.VAR_INDEP, quesTerm, solTerm, nal.memory, proc);
 
         } else {
-            if (sol == null)
-                throw new RuntimeException("Unification invalid: " + sol + " unified and projected to " + sol);
-
             proc.accept(solTerm);
         }
 
@@ -271,7 +277,7 @@ public enum LocalRules {
      * @return The budget for the new task which is the belief activated, if
      * necessary
      */
-    public static Budget solutionEval(@NotNull Task question, @NotNull Task solution, @NotNull Memory m) {
+    public static Budget solutionBudget(@NotNull Task question, @NotNull Task solution, @NotNull Truth projectedTruth, @NotNull Memory m) {
         //boolean feedbackToLinks = false;
         /*if (task == null) {
             task = nal.getCurrentTask();
@@ -282,7 +288,7 @@ public enum LocalRules {
         boolean judgmentTask = question.isJudgment();
         //float om = orderMatch(problem.term(), solution.term(), duration);
         //if (om == 0) return 0f;
-        float quality = Tense.solutionQualityMatchingOrder(question, solution, m.time());
+        float quality = Tense.solutionQuality(question, solution, projectedTruth, m.time());
         if (quality <= 0)
             return null;
 
