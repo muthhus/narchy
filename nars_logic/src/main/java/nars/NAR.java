@@ -844,18 +844,18 @@ public abstract class NAR implements Level,Consumer<Task> {
 
 
     @NotNull
-    public NAR answer(@NotNull String question, @NotNull Consumer<Task> recvSolution) {
+    public NAR onAnswer(@NotNull String question, @NotNull Consumer<Task> recvSolution) {
         //question punctuation optional
         if (!(question.length() > 0 && question.charAt(question.length() - 1) == '?')) question = question + '?';
         Task qt = task(question);
-        return answer(qt, recvSolution);
+        return onAnswer(qt, recvSolution);
     }
 
     /**
      * inputs the question and observes answer events for a solution
      */
     @NotNull
-    public NAR answer(@NotNull Task questionOrQuest, @NotNull Consumer<Task> c) {
+    public NAR onAnswer(@NotNull Task questionOrQuest, @NotNull Consumer<Task> c) {
         new AnswerReaction(this, questionOrQuest) {
 
             @Override

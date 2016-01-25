@@ -1,5 +1,6 @@
 package nars.rover.robot;
 
+import nars.$;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.rover.Material;
@@ -18,6 +19,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static nars.util.Texts.n2;
 
@@ -25,6 +27,10 @@ import static nars.util.Texts.n2;
  * Created by me on 8/3/15.
  */
 public abstract class AbstractPolygonBot extends Robotic {
+
+    private Consumer<Task> goalSolutionAnswered = (x)->{
+        $.logger.warn("Plan: {0}", x);
+    };
 
     public AbstractPolygonBot(String id, NAR nar) {
         super(id);
@@ -34,14 +40,14 @@ public abstract class AbstractPolygonBot extends Robotic {
     public final NAR nar;
     final Deque<Vec2> positions = new ArrayDeque();
     final List<Sense> senses = new ArrayList();
-    public float linearThrustPerCycle = 8f;
+    public float linearThrustPerCycle = 4f;
     public float angularSpeedPerCycle = 0.35f;
     int mission = 0;
     //public float curiosity = 0.1f;
-    int motionPeriod = 3;
-    public Vec2 point1 = new Vec2();
-    public Vec2 point2 = new Vec2();
-    public Vec2 d = new Vec2();
+    int motionPeriod = 1;
+    public Vec2 point1 = new Vec2(); //HACK
+    public final Vec2 point2 = new Vec2();
+    public final Vec2 d = new Vec2();
     boolean feel_motion = true; //todo add option in gui
 
     public Truth thrustRelative(float f) {
@@ -105,12 +111,13 @@ public abstract class AbstractPolygonBot extends Robotic {
 //        nar.input("<0 <-> xxxxxxxxx>. %0.00;0.90%");
 
         //nar.input("goal:{health}! %1.0;0.95%");
-        nar.input("goal:{health}! :|: %1.0;0.95%");
+        //nar.input("goal:{health}! :|:");
 
         //nar.believe("goal:{health}", Tense.Present, 0.5f, 0.9f); //reset
 
 
-        nar.input("<?x ==> goal:{$y}>? :|:");
+
+        //nar.input("<?x ==> goal:{$y}>? :|:");
 
         try {
             if (mission == 0) {
@@ -119,15 +126,15 @@ public abstract class AbstractPolygonBot extends Robotic {
 
                 //nar.goal("goal:{food}", 1.00f, 0.90f);
                 //nar.input("goal:{food}!");
-                nar.input("goal:{food}! :|:");
-                nar.input("goal:{food}. :|: %0.5;0.90%"); //reset
+                nar.input("eat:{food}! :|:");
+                nar.input("eat:{poison}! :|: %0%");
 
-                nar.input("motion:(0, #x)! :|: %0%"); //move
+                nar.input("motion:#anything! :|:"); //move
 
             } else if (mission == 1) {
                 //rest
+                nar.input("eat:{#anything}! :|: %0%");
                 nar.input("motion:(0, #x)! :|:"); //stop
-                nar.input("goal:{food}! :|: %0.00;0.9%");
             }
         }
         catch (Exception e) {
@@ -148,15 +155,15 @@ public abstract class AbstractPolygonBot extends Robotic {
         Material m = (Material)eaten.getUserData();
         if (m instanceof Sim.FoodMaterial) {
             nar.logger.warn("food");
-            nar.input("eat:food. :|:");
-            nar.input("goal:{food}. :|: %1.00;0.75%");
-            nar.input("goal:{health}. :|: %1.00;0.75%");
+            nar.input("eat:{food}. :|:");
+            //nar.input("goal:{food}. :|: %1.00;0.75%");
+            //nar.input("goal:{health}. :|: %1.00;0.75%");
         }
         else if (m instanceof Sim.PoisonMaterial) {
             nar.logger.warn("poison");
-            nar.input("eat:poison. :|:");
-            nar.input("goal:{food}. :|: %0.00;0.90%");
-            nar.input("goal:{health}. :|: %0.00;0.90%");
+            nar.input("eat:{poison}. :|:");
+            //nar.input("goal:{food}. :|: %0.00;0.90%");
+            //nar.input("goal:{health}. :|: %0.00;0.90%");
         }
         else {
             return;

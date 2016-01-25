@@ -156,7 +156,7 @@ public class NAL1Test extends AbstractNALTester {
         nar.log();
 
         nar.believe(belief, 1.0f, 0.8f)
-           .answer(question, a -> { //.en("What is a type of swimmer?")
+           .onAnswer(question, a -> { //.en("What is a type of swimmer?")
 
                 //test for a few task conditions, everything except for evidence
                 if (a.punc() == expectedTask.punc())

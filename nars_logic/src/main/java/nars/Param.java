@@ -172,9 +172,9 @@ public abstract class Param extends Container implements Level {
     float DEFAULT_JUDGMENT_CONFIDENCE = 0.9f;
 
     /** Default priority of input judgment */
-    float DEFAULT_JUDGMENT_PRIORITY = 0.5f;
+    public float DEFAULT_JUDGMENT_PRIORITY = 0.5f;
     /** Default durability of input judgment */
-    float DEFAULT_JUDGMENT_DURABILITY = 0.5f; //was 0.8 in 1.5.5; 0.5 after
+    public float DEFAULT_JUDGMENT_DURABILITY = 0.5f; //was 0.8 in 1.5.5; 0.5 after
     /** Default priority of input question */
     public float DEFAULT_QUESTION_PRIORITY = 0.5f;
     /** Default durability of input question */

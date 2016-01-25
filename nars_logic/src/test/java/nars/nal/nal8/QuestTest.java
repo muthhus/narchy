@@ -42,7 +42,7 @@ public class QuestTest {
 
         AtomicBoolean valid = new AtomicBoolean(false);
 
-        nar.answer(nar.task(term + '@'), a -> {
+        nar.onAnswer(nar.task(term + '@'), a -> {
             //System.out.println("answer: " + a);
             //System.out.println(" " + a.getLog());
             if (a.toString().contains("(a-->b)!"))

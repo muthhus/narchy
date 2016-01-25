@@ -10,6 +10,7 @@ import nars.rover.physics.j2d.SwingDraw;
 import nars.rover.robot.AbstractPolygonBot;
 import nars.rover.util.RayCastClosestCallback;
 import nars.task.MutableTask;
+import nars.task.in.ChangedTextInput;
 import nars.term.Termed;
 import nars.term.atom.Atom;
 import org.jbox2d.common.Color3f;
@@ -29,9 +30,9 @@ public class VisionRay implements AbstractPolygonBot.Sense, SwingDraw.LayerDraw 
     final Vec2 point; //where the retina receives vision at
     final float angle;
     protected float distance;
-    //final ChangedTextInput sight =
+    final ChangedTextInput sight;
             //new SometimesChangedTextInput(nar, minVisionInputProbability);
-            //new ChangedTextInput(abstractPolygonBot.nar);
+
     //private final String seenAngleTerm;
 
     RayCastClosestCallback ccallback = new RayCastClosestCallback();
@@ -54,6 +55,7 @@ public class VisionRay implements AbstractPolygonBot.Sense, SwingDraw.LayerDraw 
 
     public VisionRay(AbstractPolygonBot abstractPolygonBot, Body body, Vec2 point, float angle, float arc, int resolution, float length) {
         this.abstractPolygonBot = abstractPolygonBot;
+        this.sight = new ChangedTextInput(abstractPolygonBot.nar);
         this.body = body;
         this.point = point;
         this.angle = angle;
@@ -221,13 +223,13 @@ public class VisionRay implements AbstractPolygonBot.Sense, SwingDraw.LayerDraw 
 
 
         if ((hit == null) || (hitDist > 1.0f)) {
-            inputVisionFreq(hitDist, "confusion");
+            //inputVisionFreq(hitDist, "nothing");
             return;
         } else if (conf < 0.01f) {
             inputVisionFreq(hitDist, "unknown");
             return;
         } else {
-            String material = hit.getUserData() != null ? hit.getUserData().toString() : "sth";
+            String material = hit.getUserData() != null ? hit.getUserData().toString() : "something";
             inputVisionFreq(hitDist, material);
 
         }
@@ -249,11 +251,10 @@ public class VisionRay implements AbstractPolygonBot.Sense, SwingDraw.LayerDraw 
         //String x = "<see_" + angleTerm + " --> [" + material + "]>. %" + freq + "|" + conf + "%";
 
         Termed tt =
-                $.inh(
-                        $.p(angleTerm, Atom.the(material)),
-                        $.the("see")
-                );
-
+            $.inh(
+                $.p(angleTerm, Atom.the(material), Atom.the(Sim.f4(dist))),
+                $.the("see")
+            );
 
         abstractPolygonBot.nar.input(
                 new MutableTask(tt).belief().present(abstractPolygonBot.nar.memory).

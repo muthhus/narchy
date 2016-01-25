@@ -20,7 +20,7 @@ import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.Fixture;
 
-import static nars.rover.Sim.f;
+import static nars.rover.Sim.f4;
 
 /**
  * Triangular mobile vehicle
@@ -35,9 +35,9 @@ public class Rover extends AbstractPolygonBot {
     private final ChangedTextInput mouthInput;
 
     //float tasteDistanceThreshold = 1.0f;
-    final static int retinaPixels = 13;
+    final static int retinaPixels = 8;
     final NALObjects objs;
-    int retinaRaysPerPixel = 4; //rays per vision sensor
+    int retinaRaysPerPixel = 12; //rays per vision sensor
     float aStep = (float) (Math.PI * 2f) / retinaPixels;
     float L = 25f; //vision distance
     Vec2 mouthPoint = new Vec2(2.7f, 0); //0.5f);
@@ -185,7 +185,7 @@ public class Rover extends AbstractPolygonBot {
 //        }
 
 
-        float linVelocity = torso.getLinearVelocity().length();
+        float linSpeed = torso.getLinearVelocity().length();
         //linearVelocity.observe(linVelocity);
 
 
@@ -200,19 +200,19 @@ public class Rover extends AbstractPolygonBot {
 
         String torsoAngle = sim.angleTerm(torso.getAngle());
 
-        if (linVelocity == 0)
-            feltSpeed.set("motion:(z,0). :|:");
+        if (linSpeed == 0)
+            feltSpeed.set("(--, motion:#anything). :|:");
         else
-            feltSpeed.set("motion:(" + (linVelocity < 0 ? "n" : "p") +  "," + f(linVelocity) + "). :|:");
+            feltSpeed.set("motion:(" + f4(linSpeed) + ',' + torsoAngle + ',' + f4(angSpeed) + "). :|:");
 
 
 
         //facingAngle.observe( angVelocity ); // );
         //nar.inputDirect(nar.task("<facing-->[" +  + "]>. :|:"));
-        spin.set("spin:(" + torsoAngle + "," + angDir + f(angSpeed) + "). :|:");
+        spin.set("spin:(" + torsoAngle + "," + angDir + f4(angSpeed) + "). :|:");
 
         //System.out.println("  " + motion);
-        feltSpeed.set("motion:(" + f(linVelocity) + ',' + torsoAngle + ',' + f(angSpeed) + "). :|:");
+
 
         //feltSpeed.set("feltSpeed. :|: %" + sp + ";0.90%");
         //int positionWindow1 = 16;

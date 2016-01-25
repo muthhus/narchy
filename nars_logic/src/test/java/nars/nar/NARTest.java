@@ -128,7 +128,7 @@ public class NARTest {
                 //.trace()
                 .input("<a <-> b>. %1.0;0.5%",
                         "<b --> a>. %1.0;0.5%")
-                .answer(question, t -> b.set(true) )
+                .onAnswer(question, t -> b.set(true) )
                 .stopIf(b::get);
 
         nar.log();
