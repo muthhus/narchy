@@ -6,6 +6,7 @@ import com.gs.collections.impl.factory.Sets;
 import nars.Global;
 import nars.Op;
 import nars.term.Term;
+import nars.term.TermBuilder;
 import nars.term.Termlike;
 import nars.term.Terms;
 import org.jetbrains.annotations.NotNull;
@@ -60,7 +61,10 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
 
 
     /** returns null if empty set; not sorted */
-    @Deprecated static TermSet difference(@NotNull TermContainer a, @NotNull TermContainer b) {
+    @Deprecated static Term difference(TermBuilder i, Op op, @NotNull TermContainer a, @NotNull TermContainer b) {
+
+        if (a.equals(b))
+            return Terms.empty(op);
 
         TreeSet<Term> terms = new TreeSet();
 
@@ -70,8 +74,8 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
                 terms.add(x);
         }
 
-        if (terms.isEmpty()) return null;
-        return TermSet.the(terms);
+        if (terms.isEmpty()) return Terms.empty(op);
+        return i.newTerm(op, TermSet.the(terms));
 
 //        if (a.size() == 1 && b.size() == 1) {
 //            //special case

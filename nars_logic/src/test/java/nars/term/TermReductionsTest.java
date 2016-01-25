@@ -40,7 +40,7 @@ public class TermReductionsTest {
         //UNION if (term1.op(Op.SET_INT) && term2.op(Op.SET_INT)) {
         assertEquals("{P,Q,R,S}", sect(sete(p, q), sete(r, s)).toString());
         assertEquals("{P,Q,R,S}", $("(&,{P,Q},{R,S})").toString());
-        assertEquals(null, sect(seti(p, q), seti(r, s)));
+        assertEquals(Terms.EmptySetInt, sect(seti(p, q), seti(r, s)));
 
     }
 
@@ -65,7 +65,7 @@ public class TermReductionsTest {
 
     }
     @Test public void testIntersectIntReductionToZero() {
-        assertEquals(null, $("(|,{P,Q},{R,S})"));
+        assertEquals(Terms.EmptySetExt, $("(|,{P,Q},{R,S})"));
     }
 
     @Test public void testIntersectIntReduction_to_one() {
@@ -146,12 +146,10 @@ public class TermReductionsTest {
     }
 
     @Test public void testDiffIntEqual() {
-        Term d = diffInt(p, p);
-        assertNull(d);
+        assertEquals(Terms.EmptySetInt, diffInt(p, p));
     }
     @Test public void testDiffExtEqual() {
-        Term d = diffExt(p, p);
-        assertNull(d);
+        assertEquals(Terms.EmptySetExt, diffExt(p, p));
     }
     @Test public void testDifferenceSorted() {
 //        assertArrayEquals(
@@ -161,7 +159,7 @@ public class TermReductionsTest {
         //check consistency with differenceSorted
         assertArrayEquals(
             new Term[] { r, s },
-            TermContainer.difference(sete(r, p, q, s), sete(p, q)).terms()
+            ((Compound)TermContainer.difference($.terms, Op.SET_EXT, sete(r, p, q, s), sete(p, q))).terms()
         );
     }
     @Test public void testDifferenceSortedEmpty() {
@@ -171,8 +169,8 @@ public class TermReductionsTest {
 //        );
         //check consistency with differenceSorted
         assertEquals(
-                null,
-                TermContainer.difference(sete(p, q), sete(p, q))
+            Terms.EmptySetExt,
+            TermContainer.difference($.terms, Op.SET_EXT, sete(p, q), sete(p, q))
         );
     }
 
@@ -184,15 +182,17 @@ public class TermReductionsTest {
 
 
         assertEquals(
-                ((Compound)$("{Mars,Venus}")).subterms(),
+                $("{Mars,Venus}"),
                 TermContainer.difference(
+                        $.terms, Op.SET_EXT,
                         $("{Mars,Pluto,Venus}"),
                         $("{Pluto,Saturn}")
                 )
         );
         assertEquals(
-                ((Compound)$("{Saturn}")).subterms(),
+                $("{Saturn}"),
                 TermContainer.difference(
+                        $.terms, Op.SET_EXT,
                         $("{Pluto,Saturn}"),
                         $("{Mars,Pluto,Venus}")
                 )

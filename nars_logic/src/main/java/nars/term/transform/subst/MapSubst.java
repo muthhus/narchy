@@ -30,8 +30,6 @@ public class MapSubst implements Subst {
         xy.clear();
     }
 
-
-
     @Override
     public boolean isEmpty() {
         return xy.isEmpty();

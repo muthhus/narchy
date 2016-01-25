@@ -13,6 +13,8 @@ import java.util.List;
 
 public interface Subst  {
 
+    /** can be used to determine if this subst will have any possible effect on any transforms to any possible term,
+     * used as a quick test to prevent transform initializations */
     boolean isEmpty();
 
     @Nullable

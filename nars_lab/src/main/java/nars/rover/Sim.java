@@ -170,7 +170,7 @@ public class Sim extends PhysicsModel {
 //            s += ")";
 
 
-            angleTerms[i] = "a:" + intToBitSet.the(i).toString();
+            angleTerms[i] = intToBitSet.the(i).toString();
 
 //
 //                String s;
@@ -192,7 +192,7 @@ public class Sim extends PhysicsModel {
     /**
      * maps a value (which must be in range 0..1.0) to a term name
      */
-    public static String f4(double p) {
+    public static String f5(double p) {
         if (p < 0) {
             throw new RuntimeException("Invalid value for: " + p);
         }

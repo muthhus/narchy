@@ -14,8 +14,9 @@ public class differ extends BinaryTermOperator/*implements BinaryOperator<Term>*
     @Override
     public Term apply(@NotNull Term a, Term b, @NotNull TermBuilder i) {
         //TODO construct TermSet directly
-        return i.newTerm(a.op(), TermContainer.difference(
-                (Compound) a, (Compound) b
-        ));
+        return TermContainer.difference(
+            i, a.op(),
+            (Compound) a, (Compound) b
+        );
     }
 }

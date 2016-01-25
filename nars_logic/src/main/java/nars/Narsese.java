@@ -498,7 +498,7 @@ public class Narsese extends BaseParser<Object> {
 
     Rule EmptyCompound(char c, Op op) {
         return sequence(
-            s(), c, push(op == PRODUCT ? Terms.EmptyProduct : op == SET_EXT ? Terms.EmptySetExt : op == SET_INT ? Terms.EmptySetInt : null)
+            s(), c, push(Terms.empty(op))
         );
     }
 

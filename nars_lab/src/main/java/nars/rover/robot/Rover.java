@@ -20,19 +20,16 @@ import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.Fixture;
 
-import static nars.rover.Sim.f4;
+import static nars.rover.Sim.f5;
 
 /**
  * Triangular mobile vehicle
  */
 public class Rover extends AbstractPolygonBot {
 
-    private final ChangedTextInput spin;
-    private final ChangedTextInput feltAngularVelocity;
 
-    private final ChangedTextInput feltSpeed;
-    private final ChangedTextInput feltSpeedAvg;
-    private final ChangedTextInput mouthInput;
+    private final ChangedTextInput feltMotion;
+
 
     //float tasteDistanceThreshold = 1.0f;
     final static int retinaPixels = 8;
@@ -62,11 +59,8 @@ public class Rover extends AbstractPolygonBot {
 
         objs = new NALObjects(nar);
 
-        spin = new ChangedTextInput(nar);
-        mouthInput = new ChangedTextInput(nar);
-        feltAngularVelocity = new ChangedTextInput(nar);
-        feltSpeed = new ChangedTextInput(nar);
-        feltSpeedAvg = new ChangedTextInput(nar);
+
+        feltMotion = new ChangedTextInput(nar);
 //
 //
 //        linearVelocity = new SimpleAutoRangeTruthFrequency(nar, nar.term("<motion-->[linear]>"), new AutoRangeTruthFrequency(0.0f));
@@ -200,17 +194,11 @@ public class Rover extends AbstractPolygonBot {
 
         String torsoAngle = sim.angleTerm(torso.getAngle());
 
-        if (linSpeed == 0)
-            feltSpeed.set("(--, motion:#anything). :|:");
-        else
-            feltSpeed.set("motion:(" + f4(linSpeed) + ',' + torsoAngle + ',' + f4(angSpeed) + "). :|:");
 
-
+        feltMotion.set("(&&,(speed," + f5(linSpeed) + "),(angle," + torsoAngle + "),(rotation,(" + angDir + "," + f5(angSpeed) + "))). :|:");
 
         //facingAngle.observe( angVelocity ); // );
         //nar.inputDirect(nar.task("<facing-->[" +  + "]>. :|:"));
-        spin.set("spin:(" + torsoAngle + "," + angDir + f4(angSpeed) + "). :|:");
-
         //System.out.println("  " + motion);
 
 

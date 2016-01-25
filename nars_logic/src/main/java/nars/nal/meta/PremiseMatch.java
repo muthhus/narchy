@@ -211,6 +211,9 @@ public class PremiseMatch extends FindSubst {
     @Override public final Term apply(Term t) {
         //TODO make a half resolve that only does xy?
 
+        if (isEmpty())
+            return t;
+
 //        Term ret = getXY(t);
 //        if (ret != null) {
 //            ret = getYX(ret);

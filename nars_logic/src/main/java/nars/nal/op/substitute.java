@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 
+/** TODO is this better named "substituteAny" */
 public class substitute extends ImmediateTermTransform implements PremiseAware {
 
     public static final Atom INDEP_VAR = Atom.the("$", true);
@@ -66,15 +67,10 @@ public class substitute extends ImmediateTermTransform implements PremiseAware {
 
     @Nullable
     public static Term subst(@NotNull PremiseMatch r, @NotNull Subst m, Term term) {
-        return subst(r.premise.memory().index, m, term);
+        return r.premise.memory().index.apply(m, term);
     }
 
-    @Nullable
-    public static Term subst(@NotNull TermBuilder i, @NotNull Subst m, Term term) {
-        return i.apply(m, term);
-    }
-
-//    protected boolean substitute(Compound p, MapSubst m, Term a, Term b) {
+    //    protected boolean substitute(Compound p, MapSubst m, Term a, Term b) {
 //        final Term type = p.term(1);
 //        Op o = getOp(type);
 //

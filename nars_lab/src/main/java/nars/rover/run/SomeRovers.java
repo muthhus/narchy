@@ -24,7 +24,7 @@ public class SomeRovers {
 
     public static void main(String[] args) {
 
-        Global.DEBUG = Global.EXIT_ON_EXCEPTION = true;
+        Global.DEBUG = Global.EXIT_ON_EXCEPTION = false;
 
 
         //world = new ReactorWorld(this, 32, 48, 48*2);
@@ -42,7 +42,7 @@ public class SomeRovers {
         game.add(new Spider("spider",
                 3, 3, 0.618f, 30, 30));
                 {
-            int conceptsFirePerCycle = 10;
+            int conceptsFirePerCycle = 5;
             Default nar = new Default(
                     new Memory(clock, new MapIndex2(
                         new SoftValueHashMap())),
@@ -61,7 +61,7 @@ public class SomeRovers {
             nar.core.confidenceDerivationMin.setValue(0.005f);
             nar.core.activationRate.setValue(1f/conceptsFirePerCycle /* approxmimate */);
             nar.memory.duration.set(5);
-            nar.memory.cyclesPerFrame.set(5);
+            nar.memory.cyclesPerFrame.set(10);
 
 
             boolean gui = true;
@@ -89,7 +89,7 @@ public class SomeRovers {
 //            game.add(new CarefulRover("r2", nar));
 //        }
 
-        float fps = 75;
+        float fps = 50;
         game.run(fps);
 
     }

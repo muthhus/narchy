@@ -1,20 +1,18 @@
 package nars.nal.op;
 
-import nars.Op;
 import nars.nal.meta.PremiseMatch;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.transform.subst.FindSubst;
-import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
 
-/** substituteIfUnifies(term, variableType, varFrom, varTo) */
+/** substituteIfUnifies(term, variableType, varFrom, varTo)
+ * TODO is this better named "substituteAll"
+ * */
 public final class substituteIfUnifies extends substitute {
-
-
 
     @Nullable
     @Override public Term function(@NotNull Compound p, @NotNull PremiseMatch r) {
@@ -24,29 +22,43 @@ public final class substituteIfUnifies extends substitute {
         final Term x = xx[2];
         final Term y = xx[3];
 
-        FindSubst umap = unifies(op, x, y);
-        if (umap!=null) {
-            //umap.putXY(term, y);
-            return subst(r, umap, term);
-        }
+        FindSubst umap = unifies(op, x, y, r.premise.memory().random);
 
-        return term;
+        return ((umap != null) && (!umap.isEmpty())) ?
+                subst(r, umap, term) :
+                term;
     }
 
-    static FindSubst unifies(@NotNull Term op, @NotNull Term x, @NotNull Term y) {
-        Op o = getOp(op);
-        Random rng = new XorShift128PlusRandom(1);
-        FindSubst sub = new FindSubst(o, rng) {
-            @Override public boolean onMatch() {
-                //should not get called by .match only
-                return false;
-            }
-        };
+    static FindSubst unifies(@NotNull Term op, @NotNull Term x, @NotNull Term y, Random rng) {
 
-        if (sub.match(x, y)) {
+        OneMatchFindSubst sub = new OneMatchFindSubst(op, rng);
+        boolean matched = sub.tryMatch(x, y);
+
+        if (matched) {
             return sub;
         }
-
         return null;
+
+
+    }
+
+    private final static class OneMatchFindSubst extends FindSubst {
+
+        private boolean matched = false;
+
+        public OneMatchFindSubst(Term op, Random rng) {
+            super(substitute.getOp(op), rng);
+        }
+
+        /** terminates after the first match */
+        @Override public boolean onMatch() {
+            matched = true;
+            return false;
+        }
+
+        public boolean tryMatch(Term x, Term y) {
+            matchAll(x, y, true);
+            return matched;
+        }
     }
 }

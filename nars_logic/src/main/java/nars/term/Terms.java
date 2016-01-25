@@ -422,4 +422,14 @@ public enum Terms {
         }
         return 1f;
     }
+
+    public static Term empty(Op op) {
+        switch (op) {
+            case SET_EXT_OPENER: return EmptySetExt;
+            case SET_INT_OPENER: return EmptySetInt;
+            case PRODUCT: return EmptyProduct;
+            default:
+                return null;
+        }
+    }
 }

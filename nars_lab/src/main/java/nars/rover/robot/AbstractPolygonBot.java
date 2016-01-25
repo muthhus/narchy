@@ -126,15 +126,15 @@ public abstract class AbstractPolygonBot extends Robotic {
 
                 //nar.goal("goal:{food}", 1.00f, 0.90f);
                 //nar.input("goal:{food}!");
-                nar.input("eat:{food}! :|:");
-                nar.input("eat:{poison}! :|: %0%");
+                nar.input("(eat,{food})! :|:");
+                nar.input("(eat,{poison})! :|: %0%");
 
-                nar.input("motion:#anything! :|:"); //move
+                //nar.input("motion:#anything! :|:"); //move
 
             } else if (mission == 1) {
                 //rest
-                nar.input("eat:{#anything}! :|: %0%");
-                nar.input("motion:(0, #x)! :|:"); //stop
+                nar.input("(eat,{#anything})! :|: %0%");
+                //nar.input("motion:(0, #x)! :|:"); //stop
             }
         }
         catch (Exception e) {
@@ -155,13 +155,13 @@ public abstract class AbstractPolygonBot extends Robotic {
         Material m = (Material)eaten.getUserData();
         if (m instanceof Sim.FoodMaterial) {
             nar.logger.warn("food");
-            nar.input("eat:{food}. :|:");
+            nar.input("(eat,{food}). :|:");
             //nar.input("goal:{food}. :|: %1.00;0.75%");
             //nar.input("goal:{health}. :|: %1.00;0.75%");
         }
         else if (m instanceof Sim.PoisonMaterial) {
             nar.logger.warn("poison");
-            nar.input("eat:{poison}. :|:");
+            nar.input("(eat,{poison}). :|:");
             //nar.input("goal:{food}. :|: %0.00;0.90%");
             //nar.input("goal:{health}. :|: %0.00;0.90%");
         }
@@ -207,7 +207,12 @@ public abstract class AbstractPolygonBot extends Robotic {
             System.out.println(nar.memory.emotion.happy() + " happy, " + nar.memory.emotion.busy() + " busy, " + nar.memory.index.size() + " concepts");
         }
 
-        nar.step();
+        try {
+            nar.step();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public void thrust(float angle, float force) {

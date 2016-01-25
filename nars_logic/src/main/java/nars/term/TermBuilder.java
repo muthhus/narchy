@@ -306,7 +306,8 @@ public interface TermBuilder {
                     return subtractSet(set, (Compound)et0, (Compound)et1);
 
                 if (et0.equals(et1))
-                    return null;
+                    return Terms.empty(set);
+
                 return finish(op, -1, TermContainer.the(op, tt));
             default:
                 return null;
@@ -534,9 +535,7 @@ public interface TermBuilder {
 
     @Nullable
     default Term subtractSet(@NotNull Op setType, @NotNull Compound A, @NotNull Compound B) {
-        if (A.equals(B))
-            return null; //empty set
-        return newTerm(setType, TermContainer.difference(A, B));
+        return TermContainer.difference(this, setType, A, B);
     }
 
     @Nullable
@@ -611,7 +610,8 @@ public interface TermBuilder {
 
         if ((o1 == setIntersection) && (o2 == setIntersection)) {
             //the set type which is intersected
-            return intersect(setIntersection, (Compound) term1, (Compound) term2);
+            MutableSet<Term> i = TermContainer.intersect((Compound) term1, (Compound) term2);
+            return newTerm(setIntersection, i);
         }
 
         if (o2 == intersection && o1!=intersection) {
@@ -641,19 +641,16 @@ public interface TermBuilder {
 
     }
 
-    @Nullable
-    default Term intersect(@NotNull Op resultOp, @NotNull Compound a, @NotNull Compound b) {
-        MutableSet<Term> i = TermContainer.intersect(a, b);
-        if (i.isEmpty()) return null;
-        return newTerm(resultOp, i);
-    }
-
 
     /** returns the resolved term according to the substitution    */
     @Nullable
     default Term transform(@NotNull Compound src, @NotNull Subst f, boolean fullMatch) {
 
-//        Term y = f.getXY(src);
+        if (f.isEmpty()) {
+            return fullMatch ? null : src;
+        }
+//
+// Term y = f.getXY(src);
 //        if (y!=null)
 //            return y;
 
@@ -678,9 +675,12 @@ public interface TermBuilder {
         if (result!=null && Op.isOperation(result)) {
             ImmediateTermTransform tf = f.getTransform(Operator.operatorTerm((Compound)result));
             if (tf!=null) {
-                return applyImmediateTransform(f, result, tf);
+                result = applyImmediateTransform(f, result, tf);
             }
         }
+
+        if (result == null && !fullMatch)
+            result = src;
 
         return result;
     }
@@ -701,6 +701,12 @@ public interface TermBuilder {
 
     @Nullable
     default Term apply(@NotNull Subst f, Term src) {
+
+        if (f.isEmpty()) {
+            //return fullMatch ? null : src;
+            return src;
+        }
+
         if (src instanceof Compound) {
             return transform((Compound)src, f, false);
         } else if (src instanceof Variable) {

@@ -178,27 +178,26 @@ public abstract class FindSubst extends Versioning implements Subst {
         }
     }
 
-    private void matchTermutes() {
-        //repeat until # of termutes stabilizes
+    /** repeat until # of termutes stabilizes */
+    final private void matchTermutes() {
+
         int termutesPre;
-        //System.out.println("termutes start");
+        List<Termutator> tt = this.termutes;
         do {
-            //System.out.println("  termutes: " + termutes);
-            termutesPre = termutes.size();
-            matchTermutations(0, termutesPre);
-        } while (termutes.size() != termutesPre);
+            matchTermutations(0, termutesPre = tt.size());
+        } while (tt.size() != termutesPre);
 
-        termutes.clear();
+        tt.clear();
     }
 
-    private void print(String prefix, @Nullable Term a, Term b) {
-        System.out.print(prefix);
-        if (a != null)
-            System.out.println(" " + a + " ||| " + b);
-        else
-            System.out.println();
-        System.out.println("     " + this);
-    }
+//    private void print(String prefix, @Nullable Term a, Term b) {
+//        System.out.print(prefix);
+//        if (a != null)
+//            System.out.println(" " + a + " ||| " + b);
+//        else
+//            System.out.println();
+//        System.out.println("     " + this);
+//    }
 
 
     /**
@@ -281,8 +280,7 @@ public abstract class FindSubst extends Versioning implements Subst {
         if (xOp == type) {
             return putVarX(xVar, y);
         } else {
-            Op yOp = y.op();
-            if (yOp == xOp) {
+            if (y.op() == xOp) {
                 return putCommon(xVar, (Variable) y);
             }
         }
@@ -291,8 +289,7 @@ public abstract class FindSubst extends Versioning implements Subst {
     }
 
     @Override
-    public boolean isEmpty() {
-        //throw new RuntimeException("unimpl");
+    public final boolean isEmpty() {
         return xy.isEmpty();
     }
 

@@ -237,13 +237,13 @@ public class VisionRay implements AbstractPolygonBot.Sense, SwingDraw.LayerDraw 
 
     }
 
-    @Deprecated
-    private String inputVisionDiscrete(float dist, String material) {
-        float freq = 1f;
-        String sdist = Sim.f(dist);
-        //String ss = "<(*," + angleTerm + "," + dist + ") --> " + material + ">. :|: %" + Texts.n1(freq) + ";" + Texts.n1(conf) + "%";
-        return "see:(" + material + ',' + angleTerm + ',' + sdist + "). :|: %" + freq + ';' + conf + '%';
-    }
+//    @Deprecated
+//    private String inputVisionDiscrete(float dist, String material) {
+//        float freq = 1f;
+//        String sdist = Sim.f(dist);
+//        //String ss = "<(*," + angleTerm + "," + dist + ") --> " + material + ">. :|: %" + Texts.n1(freq) + ";" + Texts.n1(conf) + "%";
+//        return "see:(" + material + ',' + angleTerm + ',' + sdist + "). :|: %" + freq + ';' + conf + '%';
+//    }
 
     private void inputVisionFreq(float dist, String material) {
         float freq = 0.5f + 0.5f * (1f / (1f + dist) );
@@ -251,10 +251,7 @@ public class VisionRay implements AbstractPolygonBot.Sense, SwingDraw.LayerDraw 
         //String x = "<see_" + angleTerm + " --> [" + material + "]>. %" + freq + "|" + conf + "%";
 
         Termed tt =
-            $.inh(
-                $.p(angleTerm, Atom.the(material), Atom.the(Sim.f4(dist))),
-                $.the("see")
-            );
+            $.p(Atom.the(material), angleTerm, Atom.the(Sim.f5(dist)));
 
         abstractPolygonBot.nar.input(
                 new MutableTask(tt).belief().present(abstractPolygonBot.nar.memory).
