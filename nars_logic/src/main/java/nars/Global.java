@@ -101,7 +101,7 @@ public enum Global {
     /** Evidential Horizon, the amount of future evidence to be considered (during revision).
      * Must be >=1.0, usually 1 .. 2
      */
-    public static float HORIZON = 2;
+    public static float HORIZON = 1f;
 
 
 
