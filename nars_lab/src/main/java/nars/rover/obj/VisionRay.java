@@ -1,6 +1,7 @@
 package nars.rover.obj;
 
 import nars.$;
+import nars.Global;
 import nars.bag.BLink;
 import nars.concept.Concept;
 import nars.nar.Default;
@@ -18,7 +19,7 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.World;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -66,14 +67,17 @@ public class VisionRay implements AbstractPolygonBot.Sense, SwingDraw.LayerDraw 
         this.distance = length;
     }
 
+    List<Runnable> preDraw = Global.newArrayList();
 
-    Collection<Runnable> toDraw =
+    List<Runnable> toDraw =
             //new ConcurrentLinkedDeque<>();
             new CopyOnWriteArrayList();
 
 
     public void step(boolean feel, boolean drawing) {
-        toDraw.clear();
+
+
+        preDraw.clear();
 
         float conceptPriority;
         float conceptDurability;
@@ -107,6 +111,7 @@ public class VisionRay implements AbstractPolygonBot.Sense, SwingDraw.LayerDraw 
         float angOffset = 0; //(float)Math.random() * (-arc/4f);
 
         final AbstractPolygonBot ap = this.abstractPolygonBot;
+        JoglAbstractDraw dd = ((JoglAbstractDraw) ap.getDraw());
 
         for (int r = 0; r < resolution; r++) {
             float da = (-arc / 2f) + dArc * r + angOffset;
@@ -175,12 +180,11 @@ public class VisionRay implements AbstractPolygonBot.Sense, SwingDraw.LayerDraw 
                 rayColor.x = Math.max(rayColor.x, 0f);
                 rayColor.y = Math.max(rayColor.y, 0f);
                 rayColor.z = Math.max(rayColor.z, 0f);
-                final Vec2 finalEndPoint = endPoint.clone();
-                Color3f rc = new Color3f(rayColor.x, rayColor.y, rayColor.z);
-                final float thick = 2f;
 
-                JoglAbstractDraw dd = ((JoglAbstractDraw) ap.getDraw());
-                toDraw.add(() -> dd.drawSegment(ap.point1, finalEndPoint, rc.x, rc.y, rc.z, alpha, 1f * thick));
+                Vec2 finalEndPoint = endPoint.clone();
+                Color3f rc = new Color3f(rayColor.x, rayColor.y, rayColor.z);
+
+                preDraw.add(() -> drawIt(ap, alpha, finalEndPoint, rc, 2f /* thickness */, dd));
 
             }
         }
@@ -198,7 +202,14 @@ public class VisionRay implements AbstractPolygonBot.Sense, SwingDraw.LayerDraw 
             perceiveDist(hit, 0.5f, 1.0f);
         }
 
+        toDraw.clear();
+        toDraw.addAll(preDraw);
+
         updatePerception();
+    }
+
+    private static void drawIt(AbstractPolygonBot ap, float alpha, Vec2 finalEndPoint, Color3f rc, float thick, JoglAbstractDraw dd) {
+        dd.drawSegment(ap.point1, finalEndPoint, rc.x, rc.y, rc.z, alpha, 1f * thick);
     }
 
     protected float getDistance() {
@@ -263,8 +274,9 @@ public class VisionRay implements AbstractPolygonBot.Sense, SwingDraw.LayerDraw 
 
     @Override
     public void drawGround(JoglAbstractDraw d, World w) {
-        for (Runnable r : toDraw) {
-            r.run();
+        List<Runnable> x = this.toDraw;
+        for (int i = 0, xSize = x.size(); i < xSize; i++) {
+            x.get(i).run();
         }
     }
 
@@ -273,7 +285,7 @@ public class VisionRay implements AbstractPolygonBot.Sense, SwingDraw.LayerDraw 
 
     }
 
-    public void setDistance(float d) {
-        this.distance = d;
-    }
+//    public void setDistance(float d) {
+//        this.distance = d;
+//    }
 }

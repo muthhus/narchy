@@ -211,6 +211,7 @@ public abstract class AbstractPolygonBot extends Robotic {
             nar.step();
         } catch (RuntimeException e) {
             e.printStackTrace();
+            nar.stop();
         }
 
     }

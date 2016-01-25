@@ -200,7 +200,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
             return null;
 
         //TODO avoid creating new Truth instances
-        Truth solTruth = projection(question.occurrence(), now, false);
+        Truth solTruth = projection(question.occurrence(), now, true);
         if (solTruth == null)
             return null;
 
@@ -765,9 +765,9 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
 
 
-    default Truth projection(long targetTime, long now) {
-        return projection(targetTime, now, true);
-    }
+//    default Truth projection(long targetTime, long now) {
+//        return projection(targetTime, now, true);
+//    }
 
     //projects the truth to a certain time, covering all 4 cases as discussed in
     //https://groups.google.com/forum/#!searchin/open-nars/task$20eteneral/open-nars/8KnAbKzjp4E/rBc-6V5pem8J

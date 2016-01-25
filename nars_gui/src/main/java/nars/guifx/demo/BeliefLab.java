@@ -19,8 +19,8 @@ public class BeliefLab {
     static float predictionProbability = 0.3f; //how often to ask for a prediction
     static float pastProbability = 0.3f; //how often to ask for a prediction
     static final float fps = 30f;
-    static boolean enableEternals = true;
-    static boolean enableTemporals = false;
+    static boolean enableEternals = false;
+    static boolean enableTemporals = true;
     static int duration = 3;
     static int stmInduction = 0;
 
