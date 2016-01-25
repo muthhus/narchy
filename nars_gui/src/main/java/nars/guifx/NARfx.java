@@ -248,6 +248,7 @@ public enum NARfx  {
         s.setScene(scene);
 
         n.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        s.show();
 
         return s;
     }
@@ -278,7 +279,6 @@ public enum NARfx  {
         Stage st;
         Stage removed = window.put(c, st = newWindow(c.toString(), wn));
         st.setAlwaysOnTop(true); //? does this work
-        st.show();
 
         wn.changed(null,null,null);
 
@@ -294,7 +294,6 @@ public enum NARfx  {
                 c.toString(), wn));
 
         st.setAlwaysOnTop(true); //? does this work
-        st.show();
 
         if (removed!=null)
             removed.close();
