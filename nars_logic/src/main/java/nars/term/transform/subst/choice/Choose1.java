@@ -17,11 +17,8 @@ public class Choose1 extends Termutator {
     private final Set<Term> yFree;
     private final Term x;
     private final Term xEllipsis;
-    private final FindSubst f;
-    private int shuffle;
     @NotNull
     private final Term[] yy;
-    private int count;
 
     @NotNull
     @Override
@@ -34,7 +31,7 @@ public class Choose1 extends Termutator {
                 '}';
     }
 
-    public Choose1(FindSubst f, Term xEllipsis, Term x, @NotNull Set<Term> yFree) {
+    public Choose1(Term xEllipsis, Term x, @NotNull Set<Term> yFree) {
         super(xEllipsis);
 
         int ysize = yFree.size();
@@ -42,9 +39,7 @@ public class Choose1 extends Termutator {
             throw new RuntimeException(yFree + " offers no choice");
         }
 
-        this.f = f;
         this.x = x;
-
 
         this.yFree = yFree;
         this.xEllipsis = xEllipsis;
@@ -58,33 +53,31 @@ public class Choose1 extends Termutator {
     }
 
     @Override
-    public void reset() {
-        int l = yy.length;
-        this.count = l - 1;
-        this.shuffle = f.random.nextInt(l - 1); //randomize starting offset
-    }
+    public void run(FindSubst f, Termutator[] chain, int current) {
+        int l = yy.length-1;
+        int shuffle = f.random.nextInt(l - 1); //randomize starting offset
 
-    @Override
-    public boolean hasNext() {
-        return count >= 0;
-    }
+        int start = f.now();
 
-    @Override
-    public boolean next() {
-        final int ysize = yy.length;
+        for ( ; l >=0; l--) {
 
-        Term y = yy[(shuffle + count) % ysize];
-        count--;
+            if (valid(f, next(shuffle, l))) {
+                next(f, chain, current);
+            }
 
-        if (y.equals(x))
-            return true; //throw new RuntimeException("fault");
-
-        boolean matched = f.match(x, y);
-
-        if (matched) {
-            return f.putXY(xEllipsis, new EllipsisMatch(yFree, y));
+            f.revert(start);
         }
 
-        return false;
     }
+
+
+    private boolean valid(FindSubst f, Term y) {
+        return f.match(x, y) && f.putXY(xEllipsis, new EllipsisMatch(yFree, y));
+    }
+
+    private Term next(int shuffle, int permute) {
+        Term[] yy = this.yy;
+        return yy[(shuffle + permute) % yy.length];
+    }
+
 }

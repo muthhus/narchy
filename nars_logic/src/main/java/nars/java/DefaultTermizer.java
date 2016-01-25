@@ -27,8 +27,8 @@ import static nars.java.NALObjects.getMethodOperator;
 public class DefaultTermizer implements Termizer {
 
 
-    public static final Atom PACKAGE = Atom.the("package");
-    public static final Atom PRIMITIVE = Atom.the("primitive");
+    public static final Atom PACKAGE = $.the("package");
+    public static final Atom PRIMITIVE = $.the("primitive");
     public static final Variable INSTANCE_VAR = $.varDep("instance");
 
     final Map<Package, Term> packages = new HashMap();
@@ -259,7 +259,25 @@ public class DefaultTermizer implements Termizer {
     }
 
     public static Term termClass(@NotNull Class c) {
-        return Atom.the(c.getSimpleName());
+        //return Atom.the(Utf8.toUtf8(name));
+
+        return $.the(c.getSimpleName());
+
+//        int olen = name.length();
+//        switch (olen) {
+//            case 0:
+//                throw new RuntimeException("empty atom name: " + name);
+//
+////            //re-use short term names
+////            case 1:
+////            case 2:
+////                return theCached(name);
+//
+//            default:
+//                if (olen > Short.MAX_VALUE/2)
+//                    throw new RuntimeException("atom name too long");
+
+        //  }
     }
 
     public static Term termClassInPackage(@NotNull Class c) {

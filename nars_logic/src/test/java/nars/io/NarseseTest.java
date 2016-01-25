@@ -534,7 +534,24 @@ public class NarseseTest {
     }
 
     protected void ensureIsEcho(Compound op) {
-        assertEquals("^" + Atom.the(echo.class.getSimpleName()),
+        //return Atom.the(Utf8.toUtf8(name));
+
+        //        int olen = name.length();
+//        switch (olen) {
+//            case 0:
+//                throw new RuntimeException("empty atom name: " + name);
+//
+////            //re-use short term names
+////            case 1:
+////            case 2:
+////                return theCached(name);
+//
+//            default:
+//                if (olen > Short.MAX_VALUE/2)
+//                    throw new RuntimeException("atom name too long");
+
+        //  }
+        assertEquals("^" + $.the(echo.class.getSimpleName()),
                 Operator.operatorTerm(op).toString());
     }
 

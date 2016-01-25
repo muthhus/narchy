@@ -82,7 +82,7 @@ public enum $  {
 
     @NotNull
     public static Atom the(String id) {
-        return Atom.the(id);
+        return new Atom(id);
     }
 
     @NotNull
@@ -90,7 +90,7 @@ public enum $  {
         int l = id.length;
         Atom[] x = new Atom[l];
         for (int i = 0; i < l; i++)
-            x[i] = Atom.the(id[i]);
+            x[i] = the(id[i]);
         return x;
     }
 
@@ -536,6 +536,12 @@ public enum $  {
                     e -> $.p(e.getKey(), toTerm.apply(e.getValue())))
                 .collect( toList())
         );
+    }
+
+
+    /** create a literal atom from a class (it's name) */
+    public static Atom the(Class c) {
+        return $.the(c.getName());
     }
 
 

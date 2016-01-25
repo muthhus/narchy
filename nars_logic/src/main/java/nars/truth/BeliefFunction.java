@@ -1,11 +1,11 @@
 package nars.truth;
 
+import nars.$;
 import nars.Global;
 import nars.Memory;
 import nars.Symbols;
 import nars.nal.meta.TruthOperator;
 import nars.term.Term;
-import nars.term.atom.Atom;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -263,7 +263,7 @@ public enum BeliefFunction implements TruthOperator {
 
     static {
         for (BeliefFunction tm : BeliefFunction.values())
-            atomToTruthModifier.put(Atom.the(tm.toString()), tm);
+            atomToTruthModifier.put($.the(tm.toString()), tm);
     }
 
     public static BeliefFunction get(Term a) {

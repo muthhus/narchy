@@ -20,9 +20,9 @@
  */
 package nars.truth;
 
+import nars.$;
 import nars.Symbols;
 import nars.term.Term;
-import nars.term.atom.Atom;
 import nars.util.Texts;
 import nars.util.data.Util;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
@@ -34,9 +34,9 @@ public interface Truth extends MetaTruth<Float> {
 
 
 
-    Term Truth_TRUE = Atom.the("TRUE");
-    Term Truth_FALSE = Atom.the("FALSE");
-    Term Truth_UNSURE = Atom.the("UNSURE");
+    Term Truth_TRUE = $.the("TRUE");
+    Term Truth_FALSE = $.the("FALSE");
+    Term Truth_UNSURE = $.the("UNSURE");
 
 
     /**

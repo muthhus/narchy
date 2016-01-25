@@ -36,11 +36,11 @@ import java.util.*;
  * Twitter English - english with additional tags for twitter-like content 
  */
 public class Twenglish {
-    public static final Atom GOAL = Atom.the("goal");
-    public static final Atom QUESTION = Atom.the("question");
-    public static final Atom QUEST = Atom.the("quest");
-    public static final Atom JUDGMENT = Atom.the("judgment");
-    public static final Atom FRAGMENT = Atom.the("words");
+    public static final Atom GOAL = $.the("goal");
+    public static final Atom QUESTION = $.the("question");
+    public static final Atom QUEST = $.the("quest");
+    public static final Atom JUDGMENT = $.the("judgment");
+    public static final Atom FRAGMENT = $.the("words");
 
     //public final ArrayList<String> vocabulary = new ArrayList<>();
     

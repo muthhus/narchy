@@ -83,8 +83,7 @@ public enum Op {
 
 
     /** Image index ("imdex") symbol */
-    public static final Atom Imdex = Atom.the("_");
-
+    public static final Atom Imdex = $.the("_");
 
 
     /**

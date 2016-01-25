@@ -216,7 +216,25 @@ public abstract class NQuadsRDF {
             case "owl#Thing": uri = "thing"; break;
         }
 
-        return Atom.the(uri);
+        //return Atom.the(Utf8.toUtf8(name));
+
+        return the(uri);
+
+//        int olen = name.length();
+//        switch (olen) {
+//            case 0:
+//                throw new RuntimeException("empty atom name: " + name);
+//
+////            //re-use short term names
+////            case 1:
+////            case 2:
+////                return theCached(name);
+//
+//            default:
+//                if (olen > Short.MAX_VALUE/2)
+//                    throw new RuntimeException("atom name too long");
+
+        //  }
     }
 
 //
@@ -233,20 +251,20 @@ public abstract class NQuadsRDF {
 //        return Instance.make(clas, owlClass);
 //    }
 
-    public static final Atom owlClass = Atom.the("Class");
-    static final Atom parentOf = Atom.the("parentOf");
-    static final Atom type = Atom.the("type");
-    static final Atom subClassOf = Atom.the("subClassOf");
-    static final Atom subPropertyOf = Atom.the("subPropertyOf");
-    static final Atom equivalentClass = Atom.the("equivalentClass");
-    static final Atom equivalentProperty = Atom.the("equivalentProperty");
-    static final Atom inverseOf = Atom.the("inverseOf");
-    static final Atom disjointWith = Atom.the("disjointWith");
-    static final Atom domain = Atom.the("domain");
-    static final Atom range = Atom.the("range");
-    static final Atom sameAs = Atom.the("sameAs");
-    static final Atom differentFrom = Atom.the("differentFrom");
-    static final Atom dataTypeProperty = Atom.the("DatatypeProperty");
+    public static final Atom owlClass = the("Class");
+    static final Atom parentOf = the("parentOf");
+    static final Atom type = the("type");
+    static final Atom subClassOf = the("subClassOf");
+    static final Atom subPropertyOf = the("subPropertyOf");
+    static final Atom equivalentClass = the("equivalentClass");
+    static final Atom equivalentProperty = the("equivalentProperty");
+    static final Atom inverseOf = the("inverseOf");
+    static final Atom disjointWith = the("disjointWith");
+    static final Atom domain = the("domain");
+    static final Atom range = the("range");
+    static final Atom sameAs = the("sameAs");
+    static final Atom differentFrom = the("differentFrom");
+    static final Atom dataTypeProperty = the("DatatypeProperty");
 
     @Nullable
     static Term subjObjInst(Term subject, char subjType, char objType, boolean reverse) {

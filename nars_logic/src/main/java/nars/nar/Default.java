@@ -1,6 +1,7 @@
 package nars.nar;
 
 import com.gs.collections.impl.bag.mutable.HashBag;
+import nars.$;
 import nars.Global;
 import nars.Memory;
 import nars.NAR;
@@ -21,6 +22,8 @@ import nars.task.flow.SetTaskPerception;
 import nars.task.flow.TaskPerception;
 import nars.term.TermIndex;
 import nars.term.Termed;
+import nars.term.transform.subst.FindSubst;
+import nars.term.transform.subst.choice.Termutator;
 import nars.time.FrameClock;
 import nars.util.data.MutableInteger;
 import nars.util.data.list.FasterList;
@@ -301,8 +304,8 @@ public class Default extends AbstractNAR {
             active = concepts;
 
             this.handlers = new Active(
-                m.eventCycleEnd.on(this::onCycle),
-                m.eventReset.on((mem) -> onReset())
+                m.eventCycleEnd.on(this::cycle),
+                m.eventReset.on(this::reset)
             );
 
             conceptForget = new Forget.ExpForget(nar, conceptRemembering, perfection);
@@ -312,9 +315,30 @@ public class Default extends AbstractNAR {
 
         }
 
-        protected void onCycle(Memory memory) {
+        final Termutator fireConcepts = new Termutator($.the("FireConcepts")){
+
+            @Override
+            public void run(FindSubst f, Termutator[] chain, int current) {
+
+                //TODO
+            }
+
+            @Override
+            public int getEstimatedPermutations() {
+                return conceptsFiredPerCycle.intValue();
+            }
+
+        };
+
+        protected void cycle(Memory memory) {
 
             fireConcepts(conceptsFiredPerCycle.intValue());
+
+            commit();
+        }
+
+        /** apply pending activity at the end of a cycle */
+        private final void commit() {
 
             Bag<Concept> active = this.active;
 
@@ -328,6 +352,7 @@ public class Default extends AbstractNAR {
             }
 
             active.commit();
+
         }
 
         /** processes derivation result */
@@ -341,7 +366,7 @@ public class Default extends AbstractNAR {
         }
 
 
-        private void onReset() {
+        private void reset(Memory m) {
             active.clear();
             activated.clear();
         }
@@ -434,9 +459,9 @@ public class Default extends AbstractNAR {
             onDerived = derivedTasksBuffer::add;
         }
 
-        @Override protected void onCycle(Memory memory) {
+        @Override protected void cycle(Memory memory) {
             matcher.setMinConfidence(confidenceDerivationMin.floatValue());
-            super.onCycle(memory);
+            super.cycle(memory);
         }
 
 

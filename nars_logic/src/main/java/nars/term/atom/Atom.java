@@ -1,5 +1,6 @@
 package nars.term.atom;
 
+import nars.$;
 import nars.Narsese;
 import nars.Op;
 import nars.term.Term;
@@ -74,7 +75,25 @@ public class Atom extends StringAtom {
     /** Creates a quote-escaped term from a string. Useful for an atomic term that is meant to contain a message as its name */
     @NotNull
     public static Atom quote(String t) {
-        return Atom.the('"' + t + '"');
+        //return Atom.the(Utf8.toUtf8(name));
+
+        return $.the('"' + t + '"');
+
+//        int olen = name.length();
+//        switch (olen) {
+//            case 0:
+//                throw new RuntimeException("empty atom name: " + name);
+//
+////            //re-use short term names
+////            case 1:
+////            case 2:
+////                return theCached(name);
+//
+//            default:
+//                if (olen > Short.MAX_VALUE/2)
+//                    throw new RuntimeException("atom name too long");
+
+        //  }
     }
 
     /** determines if the string is invalid as an unquoted term according to the characters present */
@@ -99,7 +118,25 @@ public class Atom extends StringAtom {
         if (quoteIfNecessary && quoteNecessary(name))
             return quote(name);
 
-        return the(name);
+        //return Atom.the(Utf8.toUtf8(name));
+
+        return $.the(name);
+
+//        int olen = name.length();
+//        switch (olen) {
+//            case 0:
+//                throw new RuntimeException("empty atom name: " + name);
+//
+////            //re-use short term names
+////            case 1:
+////            case 2:
+////                return theCached(name);
+//
+//            default:
+//                if (olen > Short.MAX_VALUE/2)
+//                    throw new RuntimeException("atom name too long");
+
+        //  }
     }
 
     public static Term the(Term x) {
@@ -112,7 +149,7 @@ public class Atom extends StringAtom {
         if (o instanceof Short) return the(o.intValue());
         if (o instanceof Integer) return the(o.intValue());
 
-        if (o instanceof Long) return the(Long.toString((long)o));
+        if (o instanceof Long) return $.the(Long.toString((long)o));
 
         if ((o instanceof Float) || (o instanceof Double)) return the(o.floatValue());
 
@@ -130,25 +167,12 @@ public class Atom extends StringAtom {
         if ((i >= 0) && (i <= 9)) {
             Atom a = digits[i];
             if (a == null)
-                a = digits[i] = the(Integer.toString(i, radix));
+                a = digits[i] = $.the(Integer.toString(i, radix));
             return a;
         }
-        return the(Integer.toString(i, radix));
-    }
-
-    public static Atom the(float v) {
-        if (Util.equal( (float)Math.floor(v), v, Float.MIN_VALUE*2 )) {
-            //close enough to be an int, so it doesnt need to be quoted
-            return the((int)v);
-        }
-        return the(Float.toString(v));
-    }
-
-    /** gets the atomic term given a name */
-    @NotNull
-    public static Atom the(String name) {
         //return Atom.the(Utf8.toUtf8(name));
-        return new Atom(name);
+
+        return $.the(Integer.toString(i, radix));
 
 //        int olen = name.length();
 //        switch (olen) {
@@ -164,7 +188,33 @@ public class Atom extends StringAtom {
 //                if (olen > Short.MAX_VALUE/2)
 //                    throw new RuntimeException("atom name too long");
 
-      //  }
+        //  }
+    }
+
+    public static Atom the(float v) {
+        if (Util.equal( (float)Math.floor(v), v, Float.MIN_VALUE*2 )) {
+            //close enough to be an int, so it doesnt need to be quoted
+            return the((int)v);
+        }
+        //return Atom.the(Utf8.toUtf8(name));
+
+        return $.the(Float.toString(v));
+
+//        int olen = name.length();
+//        switch (olen) {
+//            case 0:
+//                throw new RuntimeException("empty atom name: " + name);
+//
+////            //re-use short term names
+////            case 1:
+////            case 2:
+////                return theCached(name);
+//
+//            default:
+//                if (olen > Short.MAX_VALUE/2)
+//                    throw new RuntimeException("atom name too long");
+
+        //  }
     }
 
     @NotNull
@@ -206,7 +256,7 @@ public class Atom extends StringAtom {
 
         if (o instanceof Term) return ((Term)o);
         if (o instanceof String)
-            return the((String)o);
+            return $.the((String)o);
         if (o instanceof Number)
             return the((Number)o);
         return null;

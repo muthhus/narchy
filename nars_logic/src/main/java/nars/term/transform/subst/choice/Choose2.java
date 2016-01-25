@@ -26,7 +26,6 @@ public class Choose2 extends Termutator {
     private final FindSubst f;
     @NotNull
     private final ShuffledSubterms yy;
-    boolean state;
 
     @NotNull
     @Override
@@ -57,41 +56,41 @@ public class Choose2 extends Termutator {
     }
 
     @Override
-    public void reset() {
+    public void run(FindSubst versioneds, Termutator[] chain, int current) {
+
         comb.reset();
-        state = true;
-    }
 
-    @Override
-    public boolean hasNext() {
-        return comb.hasNext() || !state;
-    }
+        boolean state = true;
 
-    @Override
-    public boolean next() {
+        int start = f.now();
 
-        int[] c = state ? comb.next() : comb.prev();
-        state = !state;
+        while (!(comb.hasNext() || !state)) {
 
-        Term y1 = yy.term(c[0]);
-        int c1 = c[1];
-        IntArrays.reverse(c); //swap to try the reverse next iteration
+            int[] c = state ? comb.next() : comb.prev();
+            state = !state;
 
-        FindSubst f = this.f;
-        Term[] x = this.x;
+            Term y1 = yy.term(c[0]);
+            int c1 = c[1];
+            IntArrays.reverse(c); //swap to try the reverse next iteration
 
-        if (f.match(x[0], y1)) {
+            FindSubst f = this.f;
+            Term[] x = this.x;
 
+            if (f.match(x[0], y1)) {
 
-            Term y2 = yy.term(c1);
+                Term y2 = yy.term(c1);
 
-            if (f.match(x[1], y2)) {
-                return f.putXY(xEllipsis,
-                            new EllipsisMatch(yFree, y1, y2));
+                if (f.match(x[1], y2) && f.putXY(xEllipsis,
+                            new EllipsisMatch(yFree, y1, y2))) {
+
+                    next(f, chain, current);
+                }
             }
+
+            f.revert(start);
+
         }
 
-
-        return false;
     }
+
 }

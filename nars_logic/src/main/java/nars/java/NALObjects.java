@@ -285,7 +285,24 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
 
         //TODO create the proxy class directly from the class or instance
 
-        Atom identifier = Atom.the(id);
+        //return Atom.the(Utf8.toUtf8(name));
+
+        //        int olen = name.length();
+//        switch (olen) {
+//            case 0:
+//                throw new RuntimeException("empty atom name: " + name);
+//
+////            //re-use short term names
+////            case 1:
+////            case 2:
+////                return theCached(name);
+//
+//            default:
+//                if (olen > Short.MAX_VALUE/2)
+//                    throw new RuntimeException("atom name too long");
+
+        //  }
+        Atom identifier = $.the(id);
 
         T wrappedInstance = the(identifier, (T)clazz.getConstructors()[0].newInstance(args));
 

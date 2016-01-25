@@ -10,10 +10,9 @@ import org.jetbrains.annotations.NotNull;
  */
 public class CommutivePermutations extends Termutator {
     @NotNull
-    final ShuffledSubterms perm;
+    ShuffledSubterms perm;
     private final TermContainer y;
-    @NotNull
-    private final FindSubst f;
+    private final TermContainer x;
 
     @NotNull
     @Override
@@ -25,11 +24,10 @@ public class CommutivePermutations extends Termutator {
                     '}';
     }
 
-    public CommutivePermutations(@NotNull FindSubst f, TermContainer x, TermContainer Y) {
+    public CommutivePermutations(@NotNull TermContainer x, @NotNull TermContainer Y) {
         super(x);
-        this.perm = new ShuffledSubterms(f.random, x);
+        this.x = x;
         this.y = Y;
-        this.f = f;
     }
 
     @Override
@@ -38,18 +36,25 @@ public class CommutivePermutations extends Termutator {
     }
 
     @Override
-    public boolean next() {
-        perm.next();
-        return f.matchLinear(perm, y);
+    public void run(FindSubst f, Termutator[] chain, int current) {
+        ShuffledSubterms p = this.perm;
+        if (p == null) {
+            p = this.perm = new ShuffledSubterms(f.random, x);
+        }
+
+        p.reset();
+
+        int start = f.now();
+
+        while (p.hasNext()) {
+            p.next();
+            if (f.matchLinear(p, y))
+                next(f, chain, current);
+
+            f.revert(start);
+        }
+
     }
 
-    @Override
-    public void reset() {
-        perm.reset();
-    }
 
-    @Override
-    public boolean hasNext() {
-        return perm.hasNext();
-    }
 }

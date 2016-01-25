@@ -17,7 +17,41 @@ public class TermVectorTest {
     public void testSubtermsEquality() {
 
         Compound a = (Compound) $.inh("a", "b");
-        Compound b = (Compound) $.impl(Atom.the("a"), Atom.the("b"));
+        //return Atom.the(Utf8.toUtf8(name));
+
+        //        int olen = name.length();
+//        switch (olen) {
+//            case 0:
+//                throw new RuntimeException("empty atom name: " + name);
+//
+////            //re-use short term names
+////            case 1:
+////            case 2:
+////                return theCached(name);
+//
+//            default:
+//                if (olen > Short.MAX_VALUE/2)
+//                    throw new RuntimeException("atom name too long");
+
+        //  }
+        //return Atom.the(Utf8.toUtf8(name));
+
+        //        int olen = name.length();
+//        switch (olen) {
+//            case 0:
+//                throw new RuntimeException("empty atom name: " + name);
+//
+////            //re-use short term names
+////            case 1:
+////            case 2:
+////                return theCached(name);
+//
+//            default:
+//                if (olen > Short.MAX_VALUE/2)
+//                    throw new RuntimeException("atom name too long");
+
+        //  }
+        Compound b = (Compound) $.impl($.the("a"), $.the("b"));
 
         assertEquals(a.subterms(), b.subterms());
         assertEquals(a.subterms().hashCode(), b.subterms().hashCode());

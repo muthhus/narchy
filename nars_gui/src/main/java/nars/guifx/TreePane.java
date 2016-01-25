@@ -6,12 +6,12 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
+import nars.$;
 import nars.NAR;
 import nars.guifx.util.NSlider;
 import nars.nal.nal8.operator.ImmediateOperator;
 import nars.op.io.echo;
 import nars.task.Task;
-import nars.term.atom.Atom;
 import nars.util.event.FrameReaction;
 
 import java.util.*;
@@ -25,7 +25,7 @@ import static javafx.application.Platform.runLater;
  */
 public class TreePane extends BorderPane {
 
-    public static final Task root = ImmediateOperator.command(echo.class, Atom.the(TreePane.class.getSimpleName()));
+    public static final Task root = ImmediateOperator.command(echo.class, $.the(TreePane.class.getSimpleName()));
     private final TaskTreeItem rootNode;
     private final TreeView<Task> tree;
     private final FrameReaction onFrame;

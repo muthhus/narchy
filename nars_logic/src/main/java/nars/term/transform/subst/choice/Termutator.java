@@ -1,28 +1,32 @@
 package nars.term.transform.subst.choice;
 
+import nars.$;
 import nars.term.Termlike;
+import nars.term.transform.subst.FindSubst;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * AIKR choicepoint used in deciding possible mutations to apply in deriving new compounds
  */
-public abstract class Termutator /* implements BooleanIterator */ {
+public abstract class Termutator  {
 
-    public final Termlike resultKey;
+    public final Termlike key;
 
-    protected Termutator(Termlike resultKey) {
-        this.resultKey = resultKey;
+    public Termutator(String key) {
+        this($.the(key));
     }
 
-    ///** string representing the conditions necessary for match. used for comparison when resultKey are equal to know if there is conflict */
-    //abstract String getConditionsKey();
+    public Termutator(Termlike key) {
+        this.key = key;
+    }
 
-    /**
-     * applies test, returns the determined validity
-     */
-    public abstract boolean next();
+    /** match all termutations recursing to the next after each successful one */
+    public abstract void run(FindSubst f, Termutator[] chain, int current);
 
-    public abstract void reset();
+    /** call this to invoke the next termutator in the chain */
+    protected static void next(FindSubst f, Termutator[] chain, int current) {
+        chain[current+1].run(f, chain, current+1);
+    }
 
     public abstract int getEstimatedPermutations();
 
@@ -30,14 +34,12 @@ public abstract class Termutator /* implements BooleanIterator */ {
     @Override
     public final boolean equals(@NotNull Object obj) {
         if (this == obj) return true;
-        return resultKey.equals(((Termutator)obj).resultKey);
+        return key.equals(((Termutator)obj).key);
     }
 
     @Override
     public final int hashCode() {
-        return resultKey.hashCode();
+        return key.hashCode();
     }
-
-    public abstract boolean hasNext();
 
 }

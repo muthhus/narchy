@@ -492,8 +492,8 @@ public class ConceptPane extends BorderPane implements ChangeListener {
                     float h = 20;
                     float x = b + (gew-2*b-w) * c;
                     float y = b + (geh-2*b-h) * (1-f);
-                    float rank = c; //concept.getBeliefs().rankEternal(t);
-                    ge.setFill(new Color( f,  c, 1f, rank));
+                    float alpha = 0.5f + 0.5f * c; //concept.getBeliefs().rankEternal(t);
+                    ge.setFill(new Color( f,  c, 1f, alpha));
                     ge.fillRect(x-w/2,y-h/2,w,h);
                 } else if (!t.isEternal() && t.truth()!=null) {
                     float f = t.freq();
@@ -503,8 +503,8 @@ public class ConceptPane extends BorderPane implements ChangeListener {
                     float h = 15;
                     float x = xTime(tew, b, minT, maxT, o, w);
                     float y = b + (teh-2*b-h) * (1-f);
-                    float rank = cc; //BeliefTable.rankTemporal(t, now, now);
-                    te.setFill(new Color( f,  cc, 1f, rank));
+                    float alpha = 0.5f + 0.5f * cc; //BeliefTable.rankTemporal(t, now, now);
+                    te.setFill(new Color( f,  cc, 1f, alpha));
                     te.fillRect(x-w/2,y-h/2,w,h);
                     tt.add(t);
                 }

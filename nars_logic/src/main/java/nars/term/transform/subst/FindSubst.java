@@ -166,29 +166,53 @@ public abstract class FindSubst extends Versioning implements Subst {
         matchAll(x, y, true);
     }
 
+    /** appended to the end of termuator execution chains to invoke
+     *  any accumulated termutations occurring during the match
+     *  or onMatch() if it was stable
+     * **/
+    private final Termutator termunator = new Termutator(".") {
+
+        /** should be be synchronized if threadsafe necessary*/
+        @Override
+        public void run(FindSubst f, Termutator[] ignored, int negativeOne) {
+
+            if (termutes.isEmpty()) {
+                onMatch();
+            } else {
+                Termutator.next(FindSubst.this, next(), -1);
+            }
+
+        }
+
+        @NotNull
+        private Termutator[] next() {
+            List<Termutator> t = FindSubst.this.termutes;
+            int n = t.size();
+
+            t.add(termunator);
+            Termutator[] tt = FindSubst.this.termutes.toArray(new Termutator[n]);
+            t.clear();
+            return tt;
+        }
+
+        @Override
+        public int getEstimatedPermutations() {
+            return 0;
+        }
+    };
+
     /**
      * setting finish=false allows matching in pieces before finishing
      */
     public void matchAll(@NotNull Term x, @NotNull Term y, boolean finish) {
+
         if (match(x, y) && finish) {
-            if (!termutes.isEmpty())
-                matchTermutes();
-            else
-                onMatch(); //no termutations, it matched, we're done
+
+            termunator.run(this, null, -1);
+
         }
     }
 
-    /** repeat until # of termutes stabilizes */
-    final private void matchTermutes() {
-
-        int termutesPre;
-        List<Termutator> tt = this.termutes;
-        do {
-            matchTermutations(0, termutesPre = tt.size());
-        } while (tt.size() != termutesPre);
-
-        tt.clear();
-    }
 
 //    private void print(String prefix, @Nullable Term a, Term b) {
 //        System.out.print(prefix);
@@ -409,26 +433,28 @@ public abstract class FindSubst extends Versioning implements Subst {
 //        return false;
 //    }
 
-    protected boolean addTermutator(@NotNull Termutator t) {
+    protected boolean addTermutator(@NotNull Termutator x) {
 
         //resolve termutator interferences that the addition may cause
-        Termlike a = t.resultKey;
-        for (int i = 0; i < termutes.size(); i++) {
-            Termutator s = termutes.get(i);
-            Termlike b = s.resultKey;
+        Termlike a = x.key;
+        List<Termutator> t = this.termutes;
+        int s = t.size();
+        for (int i = 0; i < s; i++) {
+            Termutator y = t.get(i);
+            Termlike b = y.key;
             if (a.equals(b)) {
                 //TODO maybe bifurcate a termutator tree with an OR branch?
 
                 //if exact same conditions, dont add duplicate
                 if (a.getClass() == b.getClass() &&
-                        s.toString().equals(t.toString()))
+                        y.toString().equals(t.toString()))
                     return true;
                 else
                     continue;
             }
             if (a.containsTerm((Term) b)) {
                 //insert b before a since it is more specific
-                termutes.add(i, t);
+                t.add(i, x);
                 return true;
             } /*else if (b.containsTerm((Term) a)) {
                 //a contained by b; append to end (after a)
@@ -437,8 +463,7 @@ public abstract class FindSubst extends Versioning implements Subst {
 
         }
 
-        //unique, add
-        termutes.add(t);
+        t.add(x);
         return true;
     }
 
@@ -452,7 +477,7 @@ public abstract class FindSubst extends Versioning implements Subst {
             return matchLinear(x, y);
         }
 
-        return addTermutator(new CommutivePermutations(this, x, y));
+        return addTermutator(new CommutivePermutations(x, y));
     }
 
 
@@ -554,7 +579,7 @@ public abstract class FindSubst extends Versioning implements Subst {
             case 0:
                 return putXY(xEllipsis, new EllipsisMatch(yFree));
             case 1:
-                return addTermutator(new Choose1(this,
+                return addTermutator(new Choose1(
                         xEllipsis, x.iterator().next(), yFree));
             case 2:
                 return addTermutator(new Choose2(this,
@@ -742,40 +767,19 @@ public abstract class FindSubst extends Versioning implements Subst {
     }
 
 
-    private void matchTermutations(int i, int max) {
+//    public void termute(int i, Termutator[] chain) {
+//
+//        int max = chain.length;
+//        if (i == max) {
+//            onMatch();
+//            return;
+//        }
+//
+//        Termutator t = chain[i];
+//        t.reset(this, i, chain);
+//
+//    }
 
-        if (i == max) {
-            if (this.termutes.size() == max)
-                onMatch();
-            else {
-                //throw new RuntimeException("termutes modified");
-                //have to restart
-            }
-            return;
-        }
-
-        Termutator t = termutes.get(i);
-        t.reset();
-
-        int revert = now();
-
-        while (t.hasNext()) {
-
-
-            //System.out.println("@" + now() + " " + i + ": " + t + " ");
-            //System.out.println("->  " + xy);
-
-            if (t.next()) {
-                //System.out.println("@" + now() + " -->  " + xy);
-                matchTermutations(i + 1, max);
-            }
-
-            revert(revert);
-            //System.out.println("@" + revert + " <-  " + xy);
-
-        }
-
-    }
     public final boolean putYX(@NotNull Term y /* usually a Variable */, Term x) {
         //yx.put(x, y);
 

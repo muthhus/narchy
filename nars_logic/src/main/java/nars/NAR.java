@@ -956,7 +956,8 @@ public abstract class NAR implements Level,Consumer<Task> {
         float activation = memory.activationRate.floatValue();
         Concept c = conceptualize(input.concept(), input.budget(), activation);
         if (c == null) {
-            throw new RuntimeException("Inconceivable: " + input);
+            //throw new RuntimeException("Inconceivable: " + input);
+            return null;
         }
 
         memory.emotion.busy(input);
@@ -990,7 +991,7 @@ public abstract class NAR implements Level,Consumer<Task> {
 
     public On onQuestion(@NotNull PatternAnswer p) {
         return memory.eventTaskProcess.on(question -> {
-            if (question.punc() == '?') {
+            if (question.punc() == Symbols.QUESTION) {
                 runLater(() -> {
                     List<Task> l = p.apply(question);
                     if (l != null) {

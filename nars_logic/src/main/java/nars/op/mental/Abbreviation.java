@@ -7,7 +7,6 @@ import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.atom.Atom;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.jetbrains.annotations.NotNull;
@@ -60,7 +59,25 @@ public class Abbreviation implements Consumer<Task> {
 
     public Term newSerialTerm() {
         //TODO base64
-        return Atom.the(termPrefix + Integer.toString(currentTermSerial.incrementAndGet(), 36));
+        //return Atom.the(Utf8.toUtf8(name));
+
+        return $.the(termPrefix + Integer.toString(currentTermSerial.incrementAndGet(), 36));
+
+//        int olen = name.length();
+//        switch (olen) {
+//            case 0:
+//                throw new RuntimeException("empty atom name: " + name);
+//
+////            //re-use short term names
+////            case 1:
+////            case 2:
+////                return theCached(name);
+//
+//            default:
+//                if (olen > Short.MAX_VALUE/2)
+//                    throw new RuntimeException("atom name too long");
+
+        //  }
     }
 
     final boolean canAbbreviate(@NotNull Task task) {

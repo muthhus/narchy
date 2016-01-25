@@ -22,6 +22,7 @@ import org.jbox2d.dynamics.World;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+
 /**
  * Created by me on 8/11/15.
  */
@@ -240,7 +241,8 @@ public class VisionRay implements AbstractPolygonBot.Sense, SwingDraw.LayerDraw 
             inputVisionFreq(hitDist, "unknown");
             return;
         } else {
-            String material = hit.getUserData() != null ? hit.getUserData().toString() : "something";
+            Object d = hit.getUserData();
+            String material = d != null ? d.toString() : "something";
             inputVisionFreq(hitDist, material);
 
         }
@@ -257,16 +259,50 @@ public class VisionRay implements AbstractPolygonBot.Sense, SwingDraw.LayerDraw 
 //    }
 
     private void inputVisionFreq(float dist, String material) {
-        float freq = 0.5f + 0.5f * (1f / (1f + dist) );
+        //float freq = 0.5f + 0.5f * (1f / (1f + dist) );
         //String ss = "<(*," + angleTerm + "," + dist + ") --> " + material + ">. :|: %" + Texts.n1(freq) + ";" + Texts.n1(conf) + "%";
         //String x = "<see_" + angleTerm + " --> [" + material + "]>. %" + freq + "|" + conf + "%";
 
+        //return Atom.the(Utf8.toUtf8(name));
+
+        //        int olen = name.length();
+//        switch (olen) {
+//            case 0:
+//                throw new RuntimeException("empty atom name: " + name);
+//
+////            //re-use short term names
+////            case 1:
+////            case 2:
+////                return theCached(name);
+//
+//            default:
+//                if (olen > Short.MAX_VALUE/2)
+//                    throw new RuntimeException("atom name too long");
+
+        //  }
+        //return Atom.the(Utf8.toUtf8(name));
+
+        //        int olen = name.length();
+//        switch (olen) {
+//            case 0:
+//                throw new RuntimeException("empty atom name: " + name);
+//
+////            //re-use short term names
+////            case 1:
+////            case 2:
+////                return theCached(name);
+//
+//            default:
+//                if (olen > Short.MAX_VALUE/2)
+//                    throw new RuntimeException("atom name too long");
+
+        //  }
         Termed tt =
-            $.p(Atom.the(material), angleTerm, Atom.the(Sim.f5(dist)));
+            $.p($.the(material), angleTerm, $.the(Sim.f5(dist)));
 
         abstractPolygonBot.nar.input(
                 new MutableTask(tt).belief().present(abstractPolygonBot.nar.memory).
-                        truth(freq, conf));
+                        truth(1f, conf));
     }
 
     public void onTouch(Body hit, float di) {
@@ -274,10 +310,7 @@ public class VisionRay implements AbstractPolygonBot.Sense, SwingDraw.LayerDraw 
 
     @Override
     public void drawGround(JoglAbstractDraw d, World w) {
-        List<Runnable> x = this.toDraw;
-        for (int i = 0, xSize = x.size(); i < xSize; i++) {
-            x.get(i).run();
-        }
+        toDraw.forEach(Runnable::run);
     }
 
     @Override

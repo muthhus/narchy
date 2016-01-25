@@ -75,7 +75,25 @@ public class scheme extends TermFunction {
             //TODO handle other types, like Object[] etc
             else {
                 //return Term.get("\"" + schemeObj.print() + "\"" );
-                return Atom.the(schemeObj.print());
+                //return Atom.the(Utf8.toUtf8(name));
+
+                return $.the(schemeObj.print());
+
+//        int olen = name.length();
+//        switch (olen) {
+//            case 0:
+//                throw new RuntimeException("empty atom name: " + name);
+//
+////            //re-use short term names
+////            case 1:
+////            case 2:
+////                return theCached(name);
+//
+//            default:
+//                if (olen > Short.MAX_VALUE/2)
+//                    throw new RuntimeException("atom name too long");
+
+                //  }
             }
             //throw new RuntimeException("Invalid expression for term: " + schemeObj);
 
