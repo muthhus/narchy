@@ -19,7 +19,9 @@ package nars.op.math;
 /**
  * Count the number of elements in a set
  */
-public class add extends IntIntTo {
+public class add extends IntIntTo<Integer> {
 
-
+    @Override protected Integer function(int a, int b) {
+        return a+b;
+    }
 }

@@ -1,6 +1,7 @@
 package nars.term;
 
 import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
+import nars.$;
 import nars.Global;
 import nars.Op;
 import nars.term.container.TermContainer;
@@ -24,7 +25,13 @@ import static nars.nal.Tense.ITERNAL;
  */
 public enum Terms {
     ;
+
     public static final Term[] Empty = new Term[0];
+    public static final Compound EmptyProduct = $.p(Empty);
+    public static final Compound EmptySetExt = $.sete(Empty);
+    public static final Compound EmptySetInt = $.seti(Empty);
+
+
     public static final IntFunction<Term[]> TermArrayBuilder = Term[]::new;
 
     public static boolean equalSubTermsInRespectToImageAndProduct(@Nullable Term a, @Nullable Term b) {

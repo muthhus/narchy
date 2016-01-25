@@ -450,20 +450,25 @@ public class Narsese extends BaseParser<Object> {
                                 //Negation.make(popTerm(null, true)))),
                                 $.neg(Atom.the(pop())))),
 
-                        seq(
-                                Op.SET_EXT_OPENER.str,
-                                MultiArgTerm(Op.SET_EXT_OPENER, SET_EXT_CLOSER)
+                        seq(Op.SET_EXT_OPENER.str,
+
+                                firstOf(
+                                    EmptyCompound(SET_EXT_CLOSER, Op.SET_EXT),
+                                    MultiArgTerm(Op.SET_EXT_OPENER, SET_EXT_CLOSER)
+                                )
                         ),
 
-                        seq(
-                                Op.SET_INT_OPENER.str,
-                                MultiArgTerm(Op.SET_INT_OPENER, SET_INT_CLOSER)
+                        seq(Op.SET_INT_OPENER.str,
+                                firstOf(
+                                    EmptyCompound(SET_INT_CLOSER, Op.SET_INT),
+                                    MultiArgTerm(Op.SET_INT_OPENER, SET_INT_CLOSER)
+                                )
                         ),
 
                         seq(COMPOUND_TERM_OPENER,
                                 firstOf(
-                                        //empty product
-                                        seq(s(), COMPOUND_TERM_CLOSER, push(TermIndex.Empty)),
+
+                                        EmptyCompound(COMPOUND_TERM_CLOSER, Op.PRODUCT),
 
                                         MultiArgTerm(null, COMPOUND_TERM_CLOSER, true, false, false, false),
 
@@ -491,11 +496,11 @@ public class Narsese extends BaseParser<Object> {
     }
 
 
-//    Rule EmptyProduct() {
-//        return sequence(
-//            COMPOUND_TERM_OPENER, s(), COMPOUND_TERM_CLOSER, push(Compounds.Empty)
-//        );
-//    }
+    Rule EmptyCompound(char c, Op op) {
+        return sequence(
+            s(), c, push(op == PRODUCT ? Terms.EmptyProduct : op == SET_EXT ? Terms.EmptySetExt : op == SET_INT ? Terms.EmptySetInt : null)
+        );
+    }
 
 
     public Rule TemporalRelation() {

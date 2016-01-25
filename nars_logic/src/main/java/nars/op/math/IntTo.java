@@ -8,7 +8,7 @@ import nars.term.TermBuilder;
 import org.jetbrains.annotations.NotNull;
 
 
-public abstract class IntIntTo<Y> extends TermFunction<Y> {
+public abstract class IntTo<Y> extends TermFunction<Y> {
 
     @NotNull
     @Override
@@ -16,8 +16,8 @@ public abstract class IntIntTo<Y> extends TermFunction<Y> {
 
         Term[] x = o.terms();
 
-        if (x.length < 2) {
-            throw new RuntimeException("Requires 2 arguments");
+        if (x.length < 1) {
+            throw new RuntimeException("Requires 1 arguments");
         }
 
         int n1;
@@ -28,17 +28,10 @@ public abstract class IntIntTo<Y> extends TermFunction<Y> {
             throw new RuntimeException("1st parameter not an integer: " + x[0]);
         }
 
-        int n2;
-        try {
-            n2 = integer(x[1]);
-        } catch (NumberFormatException e) {
-            throw new RuntimeException("2nd parameter not an integer: " + x[1]);
-        }
-
-        return function(n1, n2);
+        return function(n1);
     }
 
-    protected abstract Y function(int a, int b);
+    protected abstract Y function(int a);
 
     @NotNull
     @Override

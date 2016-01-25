@@ -538,11 +538,29 @@ public class NarseseTest {
                 Operator.operatorTerm(op).toString());
     }
 
+    @Test public void testEmptySetExt() {
+        Compound e = term("{}");
+        assertNotNull(e);
+        assertTrue(e.op(Op.SET_EXT));
+        assertEquals(0, e.size());
+        assertEquals(term("{}"),   term("{ }"));
+        assertEquals(term("{}"), term(" {   }"));
+    }
+    @Test public void testEmptySetInt() {
+        Compound e = term("[]");
+        assertNotNull(e);
+        assertTrue(e.op(Op.SET_INT));
+        assertEquals(0, e.size());
+        assertEquals(term("[]"),   term("[ ]"));
+        assertEquals(term("[]"), term(" [   ]"));
+    }
 
     @Test public void testEmptyProduct() {
         Compound e = term("()");
         assertNotNull(e);
         assertEquals(0, e.size());
+        assertEquals(term("()"),   term("( )"));
+        assertEquals(term("()"), term(" (   )"));
 
         Term o = term("<#x --> (/, ^Model_valid, T, (), _)>?");
         assertNotNull(o);

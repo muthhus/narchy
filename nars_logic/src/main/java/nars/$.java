@@ -15,6 +15,7 @@ import nars.term.*;
 import nars.term.atom.Atom;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
+import nars.term.container.TermSet;
 import nars.term.container.TermVector;
 import nars.term.variable.Variable;
 import nars.truth.Truth;
@@ -279,8 +280,9 @@ public enum $  {
 
     @NotNull
     public static Compound sete(@NotNull Collection<? extends Term> t) {
-        return (Compound) the(SET_EXT, t);
+        return (Compound) terms.finish(SET_EXT, -1, TermSet.the(t));
     }
+
 
    private static Term[] array(@NotNull Collection<? extends Term> t) {
         return t.toArray(new Term[t.size()]);

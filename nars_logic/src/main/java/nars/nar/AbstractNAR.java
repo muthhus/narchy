@@ -10,6 +10,7 @@ import nars.nal.nal8.AbstractOperator;
 import nars.nal.nal8.operator.NullOperator;
 import nars.nal.nal8.operator.TermFunction;
 import nars.op.data.flat;
+import nars.op.data.intToBitSet;
 import nars.op.data.similaritree;
 import nars.op.io.echo;
 import nars.op.io.reset;
@@ -199,6 +200,9 @@ public abstract class AbstractNAR extends NAR {
             // math operations
             new length(),
             new add(),
+
+            new intToBitSet(),
+
             //new MathExpression(),
 
             new complexity(),
