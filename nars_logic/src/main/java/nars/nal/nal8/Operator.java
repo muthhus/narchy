@@ -6,9 +6,13 @@ import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Terms;
 import nars.term.atom.AbstractStringAtom;
+import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import static nars.Op.PRODUCT;
 
 /**
  * the 1-arity '^' compound which wraps a term to
@@ -43,6 +47,8 @@ public final class Operator<T extends Term> extends AbstractStringAtom { //imple
         return ((Operator) operation.term(1));
     }
 
+    static final Variable defaultResultVariable = $.varDep("defaultResultVariable");
+
     /**
      * creates a result term in the conventional format.
      * the final term in the product (x) needs to be a variable,
@@ -51,6 +57,14 @@ public final class Operator<T extends Term> extends AbstractStringAtom { //imple
     @Nullable
     public static Term result(@NotNull Compound operation, Term y) {
         Compound x = (Compound) operation.term(0);
+        if (!x.op(PRODUCT))
+            throw new RuntimeException("invalid operation");
+
+        //add var dep as last term if missing
+        if (!x.last().op().isVar()) {
+            x = $.p( Terms.concat(x.terms(), defaultResultVariable));
+        }
+
         return $.inh(
         //return $.inst(
                 y,
@@ -69,7 +83,7 @@ public final class Operator<T extends Term> extends AbstractStringAtom { //imple
     @Nullable
     private static Term makeImageExt(@NotNull Compound product, @NotNull Term relation, short index) {
         int pl = product.size();
-        if (relation.op(Op.PRODUCT)) {
+        if (relation.op(PRODUCT)) {
             Compound p2 = (Compound) relation;
             if ((pl == 2) && (p2.size() == 2)) {
                 if ((index == 0) && product.term(1).equals(p2.term(1))) { // (/,_,(*,a,b),b) is reduced to a
