@@ -22,13 +22,6 @@ public class SomeRovers {
 
     private static final SimulatedClock clock = new SimulatedClock();
 
-
-//    static {
-//        Video.themeInvert();
-//    }
-//
-
-
     public static void main(String[] args) {
 
         Global.DEBUG = Global.EXIT_ON_EXCEPTION = true;
@@ -71,7 +64,7 @@ public class SomeRovers {
             nar.memory.cyclesPerFrame.set(1);
 
 
-            boolean gui = false;
+            boolean gui = true;
             if (gui) {
                 NARLoop tmp = nar.loop();
                 new Thread(() -> {

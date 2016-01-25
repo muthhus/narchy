@@ -4,7 +4,7 @@ package nars.truth;
 public interface Truthed {
     Truth truth();
 
-    default float getExpectation() {
+    default float expectation() {
         Truth t = truth();
         if (t == null) return Float.NaN;
         return t.getExpectation();

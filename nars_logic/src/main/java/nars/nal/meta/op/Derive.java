@@ -191,11 +191,12 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
         }
 
         @Override
-        public void onRevision(@NotNull Truth conclusion) {
+        public boolean onRevision(@NotNull Task t) {
+            Truth conclusion = t.truth();
+
             ConceptProcess p = this.premise;
 
             BLink<? extends Task> tLink = p.taskLink;
-            BLink<? extends Termed> bLink = p.termLink;
 
             //TODO check this Question case is right
             Truth tLinkTruth = tLink.get().truth();
@@ -207,10 +208,14 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
 
             Task belief = p.getBelief();
             if (belief!=null) {
+                BLink<? extends Termed> bLink = p.termLink;
                 float oneMinusDifB = 1f - conclusion.getExpDifAbs(belief.truth());
                 bLink.andPriority(oneMinusDifB);
                 bLink.andDurability(oneMinusDifB);
             }
+
+            return true;
+
         }
     }
 
@@ -267,9 +272,16 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
                                 truth.freq(),
                                 eternalize(truth.conf())
                             )
-                            .budgetCompoundForward(premise)
+
                             .time(now, Tense.ETERNAL)
-                            .parent(task, belief)
+
+                            .budget(budget)
+                            .budgetCompoundForward(premise)
+
+                            .parent(derived)  //this is lighter weight and potentially easier on GC
+                            //.parent(task, belief)
+
+                            .log("Immediaternalized") //Immediate Eternalization
             );
 
         }

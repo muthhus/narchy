@@ -342,8 +342,8 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     }
 
     /** allows for budget feedback that occurrs on revision */
-    default void onRevision(Truth truthConclusion) {
-
+    default boolean onRevision(Task conclusion) {
+        return true;
     }
 
     void setExecuted();
@@ -814,7 +814,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     final class ExpectationComparator implements Comparator<Task>, Serializable {
         static final Comparator the = new ExpectationComparator();
         @Override public int compare(@NotNull Task b, @NotNull Task a) {
-            return Float.compare(a.getExpectation(), b.getExpectation());
+            return Float.compare(a.expectation(), b.expectation());
         }
     }
 

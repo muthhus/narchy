@@ -31,7 +31,7 @@ public class ExecutionCondition implements NARCondition {
             if (!success) {
                 long now = n.time();
                 if ((now >= start) && (now <= end)) {
-                    float expect = t.task.getExpectation();
+                    float expect = t.task.expectation();
                     if ((expect >= minExpect) && (expect <= maxExpect)) {
                         success = true;
                         successTime = now;

@@ -2,7 +2,6 @@ package nars.rover.robot;
 
 import nars.NAR;
 import nars.concept.Concept;
-import nars.nal.Tense;
 import nars.rover.Material;
 import nars.rover.Sim;
 import nars.task.MutableTask;
@@ -63,20 +62,19 @@ public abstract class AbstractPolygonBot extends Robotic {
         return new DefaultTruth(vAfter - vBefore, 0.9f);
     }
 
-    protected void curious(float freq, float conf) {
+    protected void train(long t) {
+        float freq = 0.95f, conf = 0.9f;
         nar.input("MotorControls_random(motor,())! :|: %" + n2(freq) + ";" + n2(conf) + "%");
+        System.out.println("@" + t + " Curiosity Trained");
     }
 
-    protected void addAxioms() {
+    public void inputMission() {
 
         //alpha curiosity parameter
-        if (nar.time() < 50) {
-            curious(0.9f, 0.7f);
+        long t = nar.time();
+        if (t < 500) {
+            train(t);
         }
-        else {
-            curious(0.75f, 0.05f);
-        }
-
 
 
         //nar.input("<{left,right,forward,reverse} --> direction>.");
@@ -106,21 +104,13 @@ public abstract class AbstractPolygonBot extends Robotic {
 //        nar.input("<xxxxxxxx <-> xxxxxxxxxx>. %0.60;0.60%");
 //        nar.input("<0 <-> xxxxxxxxx>. %0.00;0.90%");
 
-    }
-
-    public void inputMission() {
-
-        addAxioms();
-
-        nar.input("goal:{health}! %1.0;0.95%");
+        //nar.input("goal:{health}! %1.0;0.95%");
         nar.input("goal:{health}! :|: %1.0;0.95%");
 
-        nar.believe("goal:{health}", Tense.Present, 0.5f, 0.9f); //reset
+        //nar.believe("goal:{health}", Tense.Present, 0.5f, 0.9f); //reset
 
 
-        nar.input("<food <-> health>?");
-        nar.input("<goal <-> motor>?");
-        nar.input("<poison <-> health>?");
+        nar.input("<?x ==> goal:{$y}>? :|:");
 
         try {
             if (mission == 0) {
@@ -128,21 +118,16 @@ public abstract class AbstractPolygonBot extends Robotic {
                 //curiosity = 0.05f;
 
                 //nar.goal("goal:{food}", 1.00f, 0.90f);
+                //nar.input("goal:{food}!");
                 nar.input("goal:{food}! :|:");
                 nar.input("goal:{food}. :|: %0.5;0.90%"); //reset
 
+                nar.input("motion:(0, #x)! :|: %0%"); //move
 
-                //nar.input("goal(food)! %1.00;0.99%");
-                //nar.input("goal(stop)! %0.00;0.99%");
-                //nar.addInput("Wall! %0.00;0.50%");
-                //nar.input("goal(see)! %1.00;0.70%");
-                //nar.input("goal(moved)! %1.00;0.70%");
-                //nar.input("goal(rotated)! %1.00;0.70%");
             } else if (mission == 1) {
                 //rest
-                //curiosity = 0;
-                nar.input("moved(0)! %1.00;0.9%");
-                nar.input("goal:{food}! %0.00;0.9%");
+                nar.input("motion:(0, #x)! :|:"); //stop
+                nar.input("goal:{food}! :|: %0.00;0.9%");
             }
         }
         catch (Exception e) {

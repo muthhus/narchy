@@ -73,15 +73,6 @@ public class Rover extends AbstractPolygonBot {
 //        motionAngle = new SimpleAutoRangeTruthFrequency(nar, nar.term("<motion-->[angle]>"), new BipolarAutoRangeTruthFrequency());
 //        facingAngle = new SimpleAutoRangeTruthFrequency(nar, nar.term("<motion-->[facing]>"), new BipolarAutoRangeTruthFrequency());
 
-
-        addAxioms();
-
-        //String p = "$0.99;0.75;0.90$ ";
-
-        //randomActions.add("motor($direction)!");
-        //TODO : randomActions.add("motor($direction,$direction)!");
-
-
     }
 
     @Override
@@ -255,14 +246,14 @@ public class Rover extends AbstractPolygonBot {
 
         public Truth forward(boolean forward) {
             Task c = MethodOperator.invokingTask();
-            float thrust = c!=null ? c.getExpectation() : 1;
+            float thrust = c!=null ? c.expectation() : 1;
             if (!forward) thrust = -thrust;
             return rover.thrustRelative(thrust);
         }
 
         public Truth rotate(boolean left) {
             Task c = MethodOperator.invokingTask();
-            float thrust = c!=null ? c.getExpectation() : 1;
+            float thrust = c!=null ? c.expectation() : 1;
             if (left) thrust = -thrust;
             return rover.rotateRelative(thrust);
         }

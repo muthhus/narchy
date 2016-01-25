@@ -92,14 +92,13 @@ public interface Concept extends Termed, Comparable<Termed> {
                 getBeliefs().top(now).truth().getExpectation() : 0;
     }
 
-    /** satisfaction/success metric:
-     * if desire exists, returns 1.0 / (1 + Math.abs(belief - desire))
-     *  otherwise zero */
+    /** belief vs desire metric:
+     *      positive = satisfied
+     *      negative = desired */
     default float getSuccess(long now) {
         return hasBeliefs() && hasGoals()
                 ?
-                1.0f / (1.0f +
-                        Math.abs(getBelief(now) - getDesire(now))) :
+                getBelief(now) - getDesire(now) :
                 0;
     }
 

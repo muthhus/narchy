@@ -177,7 +177,9 @@ public class DefaultConcept extends AtomConcept {
     public Task processBelief(@NotNull Task belief, @NotNull NAR nar) {
 
         long now = nar.time();
-        float successBefore = getSuccess(now);
+
+        boolean hasGoals = hasGoals();
+        float successBefore = hasGoals ? getSuccess(now) : 0;
 
         Memory memory = nar.memory;
 
@@ -187,18 +189,15 @@ public class DefaultConcept extends AtomConcept {
 
         Task best = beliefs.add(belief, nar);
 
-        if (hasQuestions()) {
-            //TODO move this to a subclass of TaskTable which is customized for questions. then an arraylist impl of TaskTable can iterate by integer index and not this iterator/lambda
-            getQuestions().forEach(question -> {
-                LocalRules.forEachSolution(question, best, nar, nar);
-            });
+//        if (hasQuestions()) {
+//            //TODO move this to a subclass of TaskTable which is customized for questions. then an arraylist impl of TaskTable can iterate by integer index and not this iterator/lambda
+//            getQuestions().forEach(question -> {
+//                LocalRules.forEachSolution(question, best, nar, nar);
+//            });
+//        }
 
-            /** update happiness meter on solution  TODO revise */
-            float successAfter = getSuccess(now);
-            float delta = successAfter - successBefore;
-            if (delta != 0) //more satisfaction of a goal due to belief, more happiness
-                memory.emotion.happy(delta);
-
+        if (hasGoals) {
+            updateSuccess(null, successBefore, memory);
         }
 
         return best;
@@ -206,6 +205,19 @@ public class DefaultConcept extends AtomConcept {
 //        if (belief.isInput() && !belief.isEternal()) {
 //            this.put(Anticipate.class, true);
 //        }
+    }
+
+    private float updateSuccess(Task inputGoal, float successBefore, Memory memory) {
+        /** update happiness meter on solution  TODO revise */
+        float successAfter = getSuccess(memory.time());
+
+        if (inputGoal != null)
+            successAfter = Math.max(inputGoal.expectation(), successAfter);
+
+        float delta = successAfter - successBefore;
+        if (delta != 0) //more satisfaction of a goal due to belief, more happiness
+            memory.emotion.happyPlus(delta);
+        return delta;
     }
 
 
@@ -233,16 +245,16 @@ public class DefaultConcept extends AtomConcept {
 
         Task goal = getGoals().add(inputGoal, nar);
 
-        float successAfter = getSuccess(now);
-        float delta = successBefore - successAfter;
 
-        // less desire of a goal, more happiness
-        memory.emotion.happy(goal.getExpectation() * -delta);
 
-        if (Op.isOperation(goal.term()) && (goal.state() != Task.TaskState.Executed)) {
-            if (delta >= Global.EXECUTION_SATISFACTION_TRESHOLD) {
+        if (goal.expectation() > Global.EXECUTION_DESIRE_EXPECTATION_THRESHOLD) {
+
+            float delta = updateSuccess(goal, successBefore, memory);
+
+            if (Op.isOperation(goal.term()) && (goal.state() != Task.TaskState.Executed)) {
+
+                if (delta >= Global.EXECUTION_SATISFACTION_TRESHOLD) {
                 //Truth projected = goal.projection(now, now);
-                if (goal.getExpectation() > Global.EXECUTION_DESIRE_EXPECTATION_THRESHOLD) {
 
 
 //                        LongHashSet ev = this.lastevidence;

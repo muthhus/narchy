@@ -6,9 +6,7 @@ import nars.Global;
 import nars.Memory;
 import nars.NAR;
 import nars.bag.impl.ArrayTable;
-import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
-import nars.budget.BudgetMerge;
 import nars.nal.LocalRules;
 import nars.nal.Tense;
 import nars.task.MutableTask;
@@ -28,13 +26,12 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 
-
 /**
  * Stores beliefs ranked in a sorted ArrayList, with strongest beliefs at lowest indexes (first iterated)
  */
 public class DefaultBeliefTable implements BeliefTable {
 
-    final static BudgetMerge existingMergeFunction = BudgetMerge.max;
+    //final static BudgetMerge existingMergeFunction = BudgetMerge.max;
 
     @NotNull
     final Map<Task,Task> map;
@@ -241,7 +238,7 @@ public class DefaultBeliefTable implements BeliefTable {
 
         long now = this.now = nar.time();
 
-        Task revised = getRevision(input, now);
+        Task revised = getRevision(input, nar);
         if ((revised!=null) && (!revised.equals(input))) {
             //if (BeliefTable.stronger(revised, input)==revised) {
                 nar.input(revised);
@@ -288,7 +285,8 @@ public class DefaultBeliefTable implements BeliefTable {
      * creates a revision task (but does not input it)
      * if failed, returns null
      */
-    public Task getRevision(@NotNull Task newBelief, long now) {
+    public Task getRevision(@NotNull Task newBelief, @NotNull NAR nar) {
+        long now = nar.time();
 
         List<Task> beliefs = tableFor(newBelief).items.getList();
         int bsize = beliefs.size();
@@ -296,8 +294,8 @@ public class DefaultBeliefTable implements BeliefTable {
             return null; //nothing to revise with
 
         Compound newBeliefTerm = newBelief.term();
-        float newBeliefFreq = newBelief.freq();
         long newBeliefOcc = newBelief.occurrence();
+        float newBeliefConf = newBelief.conf();
 
         //best found
         Task oldBelief = null;
@@ -308,8 +306,8 @@ public class DefaultBeliefTable implements BeliefTable {
             Task x = beliefs.get(i);
             if (!LocalRules.isRevisible(newBelief, x)) continue;
 
-            float tRel = Terms.termRelevance(newBeliefTerm, x.term());
-            if (tRel <= 0) continue;
+            float matchFactor = Terms.termRelevance(newBeliefTerm, x.term());
+            if (matchFactor <= 0) continue;
 
 
 //
@@ -328,9 +326,11 @@ public class DefaultBeliefTable implements BeliefTable {
                         x, now);
             }
 
+            if (c.conf() * matchFactor < Math.max(newBeliefConf, x.conf()))
+                continue;
+
             //float ffreqMatch = 1f/(1f + Math.abs(newBeliefFreq - x.freq()));
-            float ffreqMatch = 1;
-            c = c.withConfMult(tRel * ffreqMatch);
+            c = c.withConfMult(matchFactor);
 
             float cc = c.conf();
             if (cc > best) {
@@ -361,13 +361,12 @@ public class DefaultBeliefTable implements BeliefTable {
                 .state(newBelief.state())
                 .because("Revision");
 
-        Budget bb = t.budget();
-        BudgetFunctions.revise(bb, newBelief.truth(), oldBelief, conclusion, newBelief.budget());
+        BudgetFunctions.budgetRevision(t, newBelief, oldBelief);
 
-        if (bb.isDeleted())
-            throw new RuntimeException("deleted revision");
+        if (!BudgetFunctions.valid(t.budget(), nar.memory))
+            return null;
 
-        return t;
+        return oldBelief.onRevision(t) ? t : null;
     }
 
     /** try to insert but dont delete the input task if it wasn't inserted (but delete a displaced if it was)

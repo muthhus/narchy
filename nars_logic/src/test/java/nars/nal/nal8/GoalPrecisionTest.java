@@ -47,7 +47,7 @@ public class GoalPrecisionTest {
             public void execute(Execution a) {
 
                 Term[] aa = Operator.opArgsArray(a.term());
-                float pri = a.task.pri() * a.task.getExpectation();
+                float pri = a.task.pri() * a.task.expectation();
 
                 float[] d = plan.get(aa[0].toString());
                 if (d == null) {

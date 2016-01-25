@@ -20,6 +20,7 @@
  */
 package nars.budget;
 
+import nars.Memory;
 import nars.NAR;
 import nars.bag.BLink;
 import nars.concept.ConceptProcess;
@@ -62,34 +63,35 @@ public final class BudgetFunctions extends UtilityFunctions {
 	 * @return The budget for the new task
 	 */
 	@NotNull
-	public static void revise(@NotNull Budget target, @NotNull Truth tTruth, @NotNull Task oldBelief, @NotNull Truth conclusion,
-								@NotNull Budget tb) {
+	public static void budgetRevision(@NotNull Task conclusion, @NotNull Task newBelief, @NotNull Task oldBelief) {
 
+		Truth nTruth = newBelief.truth();
+		Budget nBudget = newBelief.budget();
+
+		Truth concTruth = conclusion.truth();
 		Truth bTruth = oldBelief.truth();
-		float difT = conclusion.getExpDifAbs(tTruth);
+		float difT = concTruth.getExpDifAbs(nTruth);
 
-		tb.andPriority(1.0f - difT);
-		tb.andDurability(1.0f - difT);
+		nBudget.andPriority(1.0f - difT);
+		nBudget.andDurability(1.0f - difT);
 
-		oldBelief.onRevision(conclusion);
-
-		float dif = conclusion.conf()
-				- Math.max(tTruth.conf(), bTruth.conf());
+		float dif = concTruth.conf()
+				- Math.max(nTruth.conf(), bTruth.conf());
 
 		if (dif < 0) {
-//			String msg = ("Revision fault: previous belief " + oldBelief
-//					+ " more confident than revised: " + conclusion);
+			String msg = ("Revision fault: previous belief " + oldBelief
+					+ " more confident than revised: " + conclusion);
 //			if (Global.DEBUG) {
-//				throw new RuntimeException(msg);
+				throw new RuntimeException(msg);
 //			} else {
 //				System.err.println(msg);
 //			}
-			dif = 0;
+//			dif = 0;
 		}
 
-		float priority = or(dif, tb.pri());
-		float durability = aveAri(dif, tb.dur());
-		float quality = truthToQuality(conclusion);
+		float priority = or(dif, nBudget.pri());
+		float durability = aveAri(dif, nBudget.dur());
+		float quality = truthToQuality(concTruth);
 
 		/*
 		 * if (priority < 0) { memory.nar.output(ERR.class, new
@@ -105,7 +107,8 @@ public final class BudgetFunctions extends UtilityFunctions {
 		 * quality = 0; }
 		 */
 
-		target.budget(priority, durability, quality);
+		conclusion.budget().budget(priority, durability, quality);
+
 	}
 
 	// /**
@@ -391,4 +394,22 @@ public final class BudgetFunctions extends UtilityFunctions {
 	public static float aveAri(float a, float b) {
 		return (a + b) / 2.0f;
 	}
+
+	/**
+     * Forward logic with CompoundTerm conclusion
+     *
+     * @param truth The truth value of the conclusion
+     * @param content The content of the conclusion
+     * @param nal Reference to the memory
+     * @return The budget of the conclusion
+     */
+    public static Budget compoundForward(@NotNull Truth truth, @NotNull Termed content, @NotNull ConceptProcess nal) {
+        return compoundForward(new UnitBudget(), truth, content, nal);
+    }
+
+	/** tests a budget's validity for a task to be processed by a memory */
+	public static boolean valid(Budget budget, Memory m) {
+        return !budget.isDeleted() &&
+				budget.dur() < m.derivationDurabilityThreshold.floatValue();
+    }
 }

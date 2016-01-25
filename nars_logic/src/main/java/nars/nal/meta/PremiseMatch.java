@@ -3,10 +3,10 @@ package nars.nal.meta;
 import com.gs.collections.api.map.ImmutableMap;
 import nars.$;
 import nars.Global;
+import nars.Memory;
 import nars.Op;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
-import nars.budget.UnitBudget;
 import nars.concept.ConceptProcess;
 import nars.nal.Deriver;
 import nars.nal.meta.op.MatchTerm;
@@ -76,18 +76,6 @@ public class PremiseMatch extends FindSubst {
         truth = new Versioned(this);
         punct = new Versioned(this);
         pattern = new Versioned(this);
-    }
-
-    /**
-     * Forward logic with CompoundTerm conclusion
-     *
-     * @param truth The truth value of the conclusion
-     * @param content The content of the conclusion
-     * @param nal Reference to the memory
-     * @return The budget of the conclusion
-     */
-    public static Budget compoundForward(@NotNull Truth truth, @NotNull Termed content, @NotNull ConceptProcess nal) {
-        return BudgetFunctions.compoundForward(new UnitBudget(), truth, content, nal);
     }
 
     private void addTransform(@NotNull Class<? extends ImmediateTermTransform> c) {
@@ -195,15 +183,15 @@ public class PremiseMatch extends FindSubst {
         ConceptProcess p = this.premise;
 
         Budget budget = truth != null ?
-                compoundForward(truth, c, p) :
+                BudgetFunctions.compoundForward(truth, c, p) :
                 BudgetFunctions.compoundBackward(c, p);
 
 //        if (Budget.isDeleted(budget.getPriority())) {
 //            throw new RuntimeException("why is " + budget + " deleted");
 //        }
 
-        float derThresh = p.memory().derivationDurabilityThreshold.floatValue();
-        if (budget.dur() < derThresh)
+        Memory m = p.memory();
+        if (BudgetFunctions.valid(budget, m))
             return null;
 
 

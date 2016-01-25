@@ -23,21 +23,17 @@ import java.util.List;
 public class Sim extends PhysicsModel {
 
 
+    final static int angleBits = 3;
+    final static int angleResolution = 1 << angleBits;
+
+    private static final double TWO_PI = 2 * Math.PI;
+    static String[] angleTerms = new String[angleResolution];
     public final SimulatedClock clock;
-    /* how often to input mission, in frames */
-    public int missionPeriod = 128;
-
-    boolean wraparound = false;
-
     public final List<Robotic> robots = Global.newArrayList();
-    final static int angleResolution = 7;
-
-
+    /* how often to input mission, in frames */
+    public int missionPeriod = 16;
+    public RoverWorld world;
     PhysicsRun phy = new PhysicsRun(10, this);
-    private long delayMS;
-    private float fps;
-    private boolean running = false;
-
 
 
 //        //new NARPrologMirror(nar,0.75f, true).temporal(true, true);
@@ -106,43 +102,22 @@ public class Sim extends PhysicsModel {
 //
 //
 //        };
+    private long delayMS;
+    private float fps;
+    private boolean running = false;
 
 
-    public void setFPS(float f) {
-        this.fps = f;
-        delayMS = (long) (1000f / fps);
+    public Sim(SimulatedClock clock, RoverWorld world) {
+        this.clock = clock;
+
+        this.world = world;
+
+        init(phy.model);
+
+        cycle();
+
+        this.world.init(this);
     }
-
-    public void run(float fps) {
-        setFPS(fps);
-
-        running = true;
-        while (running) {
-            cycle();
-            try {
-                Thread.sleep(delayMS);
-            } catch (InterruptedException e) {
-            }
-        }
-
-    }
-
-    public void stop() {
-        running = false;
-    }
-
-
-    public void add(Robotic r) {
-        r.init(this);
-        robots.add(r);
-    }
-
-    public void remove(Body r) {
-        getWorld().destroyBody(r);
-    }
-
-
-    private static final double TWO_PI = 2 * Math.PI;
 
     public static double normalizeAngle(final double theta) {
         double normalized = theta % TWO_PI;
@@ -156,15 +131,13 @@ public class Sim extends PhysicsModel {
         return normalized;
     }
 
-
-
-    static String[] angleTerms = new String[angleResolution];
-
     public static String angleTerm(final float a) {
         float h = (float) normalizeAngle(a);
-        h /= MathUtils.PI*2.0f;
+        h /= MathUtils.PI * 2.0f;
         int i = (int) (h * angleResolution / 1f);
-        final int ha = angleResolution;
+        if (i == angleResolution) i = 0; //wraparound and eliminate i=angleResolution case
+
+        //final int ha = angleResolution;
 
 //        if (i == 0) {
 //            t = "forward";
@@ -177,10 +150,26 @@ public class Sim extends PhysicsModel {
 //        } else {
 
 
-            if (angleTerms[i] == null) {
-                //angleTerms[i] = "(angle," + i + ")";
+        if (angleTerms[i] == null) {
+            //angleTerms[i] = "(angle," + i + ")";
 
-                angleTerms[i] = "a" + i;
+            String bs = Integer.toBinaryString(i);
+            while (bs.length() < angleBits) {
+                bs = "0" + bs;
+            }
+            char[] bits = bs.toCharArray();
+            String s = "(";
+            for (int i1 = 0; i1 < bits.length; i1++) {
+                char x = bits[i1];
+
+                s += x;
+                if (i1!=bits.length-1)
+                    s += ",";
+            }
+            s += ")";
+
+
+            angleTerms[i] = s;
 
 //
 //                String s;
@@ -192,12 +181,11 @@ public class Sim extends PhysicsModel {
 //                }
 //
 //                angleTerms[i+ha] = s;
-            }
+        }
 
-        String t = angleTerms[i];
         //}
 
-        return t;
+        return angleTerms[i];
     }
 
     /**
@@ -243,6 +231,38 @@ public class Sim extends PhysicsModel {
         return String.valueOf(i);
     }
 
+    public void setFPS(float f) {
+        this.fps = f;
+        delayMS = (long) (1000f / fps);
+    }
+
+    public void run(float fps) {
+        setFPS(fps);
+
+        running = true;
+        while (running) {
+            cycle();
+            try {
+                Thread.sleep(delayMS);
+            } catch (InterruptedException e) {
+            }
+        }
+
+    }
+
+    public void stop() {
+        running = false;
+    }
+
+    public void add(Robotic r) {
+        r.init(this);
+        robots.add(r);
+    }
+
+    public void remove(Body r) {
+        getWorld().destroyBody(r);
+    }
+
     @Override
     public BodyDef bodyDefCallback(BodyDef body) {
         return body;
@@ -252,66 +272,6 @@ public class Sim extends PhysicsModel {
     public FixtureDef fixDefCallback(FixtureDef fixture) {
         return fixture;
     }
-
-
-    public interface Edible {
-
-    }
-
-    public static class FoodMaterial extends Material implements Edible {
-
-        static final Color3f foodFill = new Color3f(0.15f, 0.6f, 0.15f);
-
-        @Override
-        public void before(Body b, JoglAbstractDraw d, float time) {
-
-            d.setFillColor(foodFill);
-        }
-
-        @Override
-        public String toString() {
-            return "food";
-        }
-    }
-    public static class WallMaterial extends Material {
-        static final Color3f wallFill = new Color3f(0.5f, 0.5f, 0.5f);
-        @Override
-        public void before(Body b, JoglAbstractDraw d, float time) {
-            d.setFillColor(wallFill);
-        }
-
-        @Override
-        public String toString() {
-            return "wall";
-        }
-    }
-    public static class PoisonMaterial extends Material implements Edible {
-
-        static final Color3f poisonFill = new Color3f(0.45f, 0.15f, 0.15f);
-
-        @Override
-        public void before(Body b, JoglAbstractDraw d, float time) {
-            d.setFillColor(poisonFill);
-        }
-        @Override
-        public String toString() {
-            return "poison";
-        }
-    }
-
-    public Sim(SimulatedClock clock, RoverWorld world) {
-        this.clock = clock;
-
-        this.world = world;
-
-        init(phy.model);
-
-        cycle();
-
-        this.world.init(this);
-    }
-
-
 
     @Override
     public void step(float timeStep, TestbedSettings settings, TestbedPanel panel) {
@@ -325,6 +285,24 @@ public class Sim extends PhysicsModel {
 
         clock.add(1);
 
+    }
+
+    @Override
+    public void initTest(boolean deserialized) {
+
+
+        getWorld().setGravity(new Vec2());
+        getWorld().setAllowSleep(false);
+
+    }
+
+    protected final void cycle() {
+        phy.cycle(fps);
+    }
+
+    @Override
+    public String getTestName() {
+        return "NARS Rover";
     }
 
 //    public class RoverPanel extends JPanel {
@@ -365,27 +343,53 @@ public class Sim extends PhysicsModel {
 //    }
 //
 
-    public RoverWorld world;
-
-    @Override
-    public void initTest(boolean deserialized) {
-
-
-        getWorld().setGravity(new Vec2());
-        getWorld().setAllowSleep(false);
+    public interface Edible {
 
     }
 
-    protected final void cycle() {
-        phy.cycle(fps);
+    public static class FoodMaterial extends Material implements Edible {
+
+        static final Color3f foodFill = new Color3f(0.15f, 0.6f, 0.15f);
+
+        @Override
+        public void before(Body b, JoglAbstractDraw d, float time) {
+
+            d.setFillColor(foodFill);
+        }
+
+        @Override
+        public String toString() {
+            return "food";
+        }
     }
 
+    public static class WallMaterial extends Material {
+        static final Color3f wallFill = new Color3f(0.5f, 0.5f, 0.5f);
 
+        @Override
+        public void before(Body b, JoglAbstractDraw d, float time) {
+            d.setFillColor(wallFill);
+        }
 
+        @Override
+        public String toString() {
+            return "wall";
+        }
+    }
 
+    public static class PoisonMaterial extends Material implements Edible {
 
-    @Override     public String getTestName() {
-        return "NARS Rover";
+        static final Color3f poisonFill = new Color3f(0.45f, 0.15f, 0.15f);
+
+        @Override
+        public void before(Body b, JoglAbstractDraw d, float time) {
+            d.setFillColor(poisonFill);
+        }
+
+        @Override
+        public String toString() {
+            return "poison";
+        }
     }
 
 }

@@ -305,9 +305,9 @@ public class Default extends AbstractNAR {
                 m.eventReset.on((mem) -> onReset())
             );
 
-            conceptForget = new Forget.LinearForget(nar, conceptRemembering, perfection);
-            termLinkForget = new Forget.LinearForget(nar, termLinkRemembering, perfection);
-            taskLinkForget = new Forget.LinearForget(nar, taskLinkRemembering, perfection)
+            conceptForget = new Forget.ExpForget(nar, conceptRemembering, perfection);
+            termLinkForget = new Forget.ExpForget(nar, termLinkRemembering, perfection);
+            taskLinkForget = new Forget.ExpForget(nar, taskLinkRemembering, perfection)
                     .withDeletedItemFiltering();
 
         }

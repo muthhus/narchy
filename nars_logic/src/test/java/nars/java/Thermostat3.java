@@ -41,7 +41,7 @@ public class Thermostat3 {
             float exp;
 
             //System.out.println(cTask.getExplanation());
-            exp = cTask.getExpectation();// * cTask.getPriority();
+            exp = cTask.expectation();// * cTask.getPriority();
 
             return _inc(positive, speed * exp);
         }
