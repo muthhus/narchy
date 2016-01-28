@@ -99,7 +99,7 @@ public class ArrayListTaskTable implements QuestionTaskTable {
                 m.remove(t, "PreExisting TaskTable Duplicate");
             }
 
-            return existing;
+            return null;
         }
 
         //Memory m = c.getMemory();

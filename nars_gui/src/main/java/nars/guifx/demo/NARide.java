@@ -499,6 +499,18 @@ public class NARide extends BorderPane {
         }
     }
 
+    /** creates a NARIde window with the NAR's loop (created) */
+    public static void loop(NAR nar, boolean start) {
+
+        NARLoop tmp = nar.loop();
+        new Thread(() -> {
+            NARide.show(tmp, x -> {
+                if (!start)
+                    tmp.stop();
+            });
+        }).start();
+    }
+
 
     private static class DefaultCyclePane extends BorderPane {
 

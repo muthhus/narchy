@@ -970,6 +970,8 @@ public abstract class NAR implements Level,Consumer<Task> {
         memory.emotion.busy(input);
 
         Task matched = c.process(input, this);
+        if (matched == null) return null;
+
         //if (!task.getDeleted()) {
 
         c.link(matched, activation, this);

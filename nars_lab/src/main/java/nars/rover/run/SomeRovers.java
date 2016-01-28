@@ -3,7 +3,6 @@ package nars.rover.run;
 import javassist.scopedpool.SoftValueHashMap;
 import nars.Global;
 import nars.Memory;
-import nars.NARLoop;
 import nars.guifx.demo.NARide;
 import nars.nar.Default;
 import nars.rover.RoverWorld;
@@ -66,12 +65,7 @@ public class SomeRovers {
 
             boolean gui = true;
             if (gui) {
-                NARLoop tmp = nar.loop();
-                new Thread(() -> {
-                    NARide.show(tmp, x -> {
-                        tmp.stop();
-                    });
-                }).start();
+                NARide.loop(nar, false);
             }
 
 

@@ -189,15 +189,17 @@ public class DefaultConcept extends AtomConcept {
 
         Task best = beliefs.add(belief, nar);
 
-//        if (hasQuestions()) {
-//            //TODO move this to a subclass of TaskTable which is customized for questions. then an arraylist impl of TaskTable can iterate by integer index and not this iterator/lambda
-//            getQuestions().forEach(question -> {
-//                LocalRules.forEachSolution(question, best, nar, nar);
-//            });
-//        }
+        if (best!=null) {
+//            if (hasQuestions()) {
+//                //TODO move this to a subclass of TaskTable which is customized for questions. then an arraylist impl of TaskTable can iterate by integer index and not this iterator/lambda
+//                questions().forEach(question -> {
+//                    LocalRules.forEachSolution(question, best, nar, nar);
+//                });
+//            }
 
-        if (hasGoals) {
-            updateSuccess(null, successBefore, memory);
+            if (hasGoals) {
+                updateSuccess(null, successBefore, memory);
+            }
         }
 
         return best;
@@ -247,7 +249,7 @@ public class DefaultConcept extends AtomConcept {
 
 
 
-        if (goal.expectation() > Global.EXECUTION_DESIRE_EXPECTATION_THRESHOLD) {
+        if (goal!=null && goal.expectation() > Global.EXECUTION_DESIRE_EXPECTATION_THRESHOLD) {
 
             float delta = updateSuccess(goal, successBefore, memory);
 
@@ -408,12 +410,14 @@ public class DefaultConcept extends AtomConcept {
 
         //TODO if the table was not affected, does the following still need to happen:
 
-        BeliefTable answerTable = q.isQuest() ?
-                goals() : beliefs();
+        if (q!=null) {
+            BeliefTable answerTable = q.isQuest() ?
+                    goals() : beliefs();
 
-        Task sol = answerTable.top(q.occurrence(), nar.time());
-        if (sol != null) {
-            LocalRules.forEachSolution(q, sol, nar, nar);
+            Task sol = answerTable.top(q.occurrence(), nar.time());
+            if (sol != null) {
+                LocalRules.forEachSolution(q, sol, nar, nar);
+            }
         }
 
         return q;

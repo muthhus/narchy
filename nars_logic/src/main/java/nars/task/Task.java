@@ -20,7 +20,6 @@
  */
 package nars.task;
 
-import com.gs.collections.impl.tuple.Tuples;
 import nars.*;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
@@ -223,7 +222,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
                     .budget(solutionBudget)
                     .state(state())
                     //.setEvidence(evidence())
-                    .log("Projected")
+                    .log("Projected Solution")
                     //.log("Projected from " + this)
                     ;
 
@@ -232,10 +231,6 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         //}
 
 
-        //TODO use an Answer class which is Runnable, combining that with the Twin info
-        if (Global.DEBUG_NON_INPUT_ANSWERED_QUESTIONS || question.isInput()) {
-            memory.eventAnswer.emit(Tuples.twin(question, solution));
-        }
 
         ////TODO avoid adding repeat & equal Solution instances
         //solution.log(new Solution(question));
