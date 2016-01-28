@@ -99,7 +99,7 @@ public class IOPane extends BorderPane /*implements FXIconPaneBuilder*/ {
         @Override
         public void appear() {
             super.appear();
-            On commands = nar.onExec("html", (e) -> {
+            On commands = nar.onExecution("html", (e) -> {
 
                 Term[] a = e.argArray();
                 String content = ((Atom)a[0]).toStringUnquoted();

@@ -1,5 +1,6 @@
 package nars.guifx.demo;
 
+import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.text.TextFlow;
@@ -12,6 +13,7 @@ import nars.task.flow.SetTaskPerception;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static javafx.application.Platform.runLater;
@@ -19,26 +21,27 @@ import static javafx.application.Platform.runLater;
 /**
  * Created by me on 12/12/15.
  */
-public class NARtop implements Supplier<Pane> {
+public class NARtop<N extends Node> implements Supplier<Pane> {
 
     final SetTaskPerception active;
-    //final FlowPane buttons = new FlowPane();
-    final Map<Task,SubButton> taskButtons = new HashMap();
+    final Map<Task,N> taskNodes = new HashMap();
     private final NAR nar;
     private final Pane base;
+    private final Function<Task, N> newNode;
 
-    public NARtop(NAR d, Pane base) {
+    public NARtop(NAR n, Pane base, Function<Task,N> builder) {
         super();
 
-        this.nar = d;
+        this.nar = n;
         this.base = base;
+        this.newNode = builder;
 
         //setLeft(new TreePane(d));
 
-        active = new SetTaskPerception(d.memory, f -> {
+        active = new SetTaskPerception(n.memory, f -> {
             update();
         }, BudgetMerge.plusDQDominated);
-        d.memory.eventTaskProcess.on(t -> {
+        n.memory.eventTaskProcess.on(t -> {
             if (t.isInput()) {
                 runLater( () -> {
                     addInput(t);
@@ -64,10 +67,8 @@ public class NARtop implements Supplier<Pane> {
      * adds a task to be managed/displayed by this widget
      */
     protected void addInput(Task t) {
-        
-        taskButtons.computeIfAbsent(t, k -> {
-            //TaskButton b = new TaskButton(nar,k);
-            SubButton b = SubButton.make(nar, k);
+        taskNodes.computeIfAbsent(t, k -> {
+            N b = newNode.apply(k);
             base.getChildren().add(b);
             return b;
         });
@@ -78,11 +79,17 @@ public class NARtop implements Supplier<Pane> {
         Default n = new Default(1000, 1, 1, 3);
 
         NARide.show(n.loop(), (i) -> {
+            Function<Task, Node>
+                subbuttonBuilder = t -> SubButton.make(n, t),
+                taskbuttonBuilder = t -> new TaskButton(n, t);
+
             NARfx.newWindow("x",
-                    new NARtop(n, new TextFlow()).get()
+                new NARtop(n,
+                    new TextFlow(), subbuttonBuilder).get()
             );
             NARfx.newWindow("y",
-                    new NARtop(n, new TilePane()).get()
+                    new NARtop(n, new TilePane(),
+                            taskbuttonBuilder).get()
             );
 
             n.input("$0.70$ <groceries --> [bought]>!");

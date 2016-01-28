@@ -2,7 +2,6 @@ package nars.nal.nal8;
 
 import nars.Global;
 import nars.NAR;
-import nars.nal.nal8.operator.SyncOperator;
 import nars.nar.Default;
 import nars.term.Term;
 import org.junit.Test;
@@ -41,42 +40,73 @@ public class GoalPrecisionTest {
     protected void run(NAR n, int end) {
 
         Global.DEBUG = true;
+        n.onExecution(Operator.the("x"), (Execution a) -> {
+            Term[] aa = a.argArray();
+            float pri = a.task.pri() * a.task.expectation();
 
-        n.onExecTask("x", new SyncOperator() {
-            @Override
-            public void execute(Execution a) {
-
-                Term[] aa = Operator.opArgsArray(a.term());
-                float pri = a.task.pri() * a.task.expectation();
-
-                float[] d = plan.get(aa[0].toString());
-                if (d == null) {
-                    throw new RuntimeException("unknown action: " + a);
-                }
-
-
-
-                if (d[1] == -1) {
-                    //first time
-                    d[1] = (int) n.time();
-                    d[2] = pri;
-                    System.out.println("OK " + a.task);
-                } else {
-                    d[3] += pri;
-                    d[4]++;
-
-                    System.out.println();
-                    System.out.println(a.task);
-                    System.out.println(a.task.log());
-                    a.taskConcept().print();
-                    System.out.println(a.task.getExplanation());
-                }
-
-                //a.task.mulPriority(0);
-
-                a.noticeExecuted();
+            float[] d = plan.get(aa[0].toString());
+            if (d == null) {
+                throw new RuntimeException("unknown action: " + a);
             }
+
+
+            if (d[1] == -1) {
+                //first time
+                d[1] = (int) n.time();
+                d[2] = pri;
+                System.out.println("OK " + a.task);
+            } else {
+                d[3] += pri;
+                d[4]++;
+
+                System.out.println();
+                System.out.println(a.task);
+                System.out.println(a.task.log());
+                a.taskConcept().print();
+                System.out.println(a.task.getExplanation());
+            }
+
+            //a.task.mulPriority(0);
+
+            a.noticeExecuted();
+
         });
+
+//        n.onExec("x", (Term[] aa) {
+//            @Override
+//            public void execute(Execution a) {
+//
+//                Term[] aa = Operator.opArgsArray(a.term());
+//                float pri = a.task.pri() * a.task.expectation();
+//
+//                float[] d = plan.get(aa[0].toString());
+//                if (d == null) {
+//                    throw new RuntimeException("unknown action: " + a);
+//                }
+//
+//
+//
+//                if (d[1] == -1) {
+//                    //first time
+//                    d[1] = (int) n.time();
+//                    d[2] = pri;
+//                    System.out.println("OK " + a.task);
+//                } else {
+//                    d[3] += pri;
+//                    d[4]++;
+//
+//                    System.out.println();
+//                    System.out.println(a.task);
+//                    System.out.println(a.task.log());
+//                    a.taskConcept().print();
+//                    System.out.println(a.task.getExplanation());
+//                }
+//
+//                //a.task.mulPriority(0);
+//
+//                a.noticeExecuted();
+//            }
+//        });
 
         //n.onExecTask("x", a -> {
 

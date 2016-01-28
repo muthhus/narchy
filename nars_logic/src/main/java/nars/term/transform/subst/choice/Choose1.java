@@ -9,7 +9,6 @@ import java.util.Set;
 
 /**
  * choose 1 at a time from a set of N, which means iterating up to N
- * will remove the chosen item(s) from Y if successful before returning
  */
 public class Choose1 extends Termutator {
 

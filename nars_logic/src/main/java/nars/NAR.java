@@ -519,9 +519,9 @@ public abstract class NAR implements Level,Consumer<Task> {
         return tq;
     }
 
-    public On onExecTask(@NotNull String operator, @NotNull Consumer<Execution> f) {
-        return onExec(operator, f);
-    }
+//    public On onExecTask(@NotNull String operator, @NotNull Consumer<Execution> f) {
+//        return onExec(operator, f);
+//    }
 
 
 
@@ -540,17 +540,24 @@ public abstract class NAR implements Level,Consumer<Task> {
     }
 
     public On onExec(@NotNull AbstractOperator r) {
-        return onExec(r.getOperatorTerm(), r);
+        return onExecution(r.getOperatorTerm(), r);
     }
 
-    public On onExec(@NotNull String op, @NotNull Consumer<Execution> each) {
-        return onExec($.operator(op), each);
+
+    public On onExec(@NotNull String op, @NotNull Consumer<Term[]> each) {
+        return onExecution($.operator(op), e -> {
+            each.accept(e.argArray());
+        });
     }
 
-    public On onExec(@NotNull Operator op, @NotNull Consumer<Execution> each) {
-        Topic<Execution> t = memory.exe.computeIfAbsent(
-                op, (Term o) -> new DefaultTopic<Execution>());
-        return t.on(each);
+    public On onExecution(@NotNull String op, @NotNull Consumer<Execution> each) {
+        return onExecution($.operator(op), each);
+    }
+
+    public On onExecution(@NotNull Operator op, @NotNull Consumer<Execution> each) {
+        return memory.exe.computeIfAbsent(op,
+                    o -> new DefaultTopic<Execution>())
+                        .on(each);
     }
 
     /**

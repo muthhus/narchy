@@ -26,7 +26,7 @@ public class ExecutionCondition implements NARCondition {
         this.minExpect = minExpect;
         this.maxExpect = maxExpect;
 
-        n.onExec(opTerm, t -> {
+        n.onExecution(opTerm, t -> {
 
             if (!success) {
                 long now = n.time();
