@@ -40,7 +40,7 @@ public class DefaultBeliefTable implements BeliefTable {
     @NotNull
     final ArrayTable<Task,Task> temporal;
 
-    private long now; //cached value, updated before temporal operations begin
+    private long lastInsert; //cached value, updated before temporal operations begin
     private long minT, maxT;
     float duration;
 
@@ -50,7 +50,7 @@ public class DefaultBeliefTable implements BeliefTable {
         if (cap == 1) cap = 2;
 
         this.map = Global.newHashMap(cap/4); //new HashMap(cap/4);
-        this.now = memory.time();
+        this.lastInsert = memory.time();
         this.minT = this.maxT = Tense.TIMELESS;
         this.duration = memory.duration.floatValue();
 
@@ -63,7 +63,7 @@ public class DefaultBeliefTable implements BeliefTable {
     }
 
     public float rankEternal(@NotNull Task b) {
-        return BeliefTable.rankEternal(b, now, duration);
+        return BeliefTable.rankEternal(b, lastInsert, duration);
     }
 
 
@@ -89,7 +89,7 @@ public class DefaultBeliefTable implements BeliefTable {
 //    }
 
     void updateTime(long now, boolean updateRange) {
-        this.now = now;
+        this.lastInsert = now;
         if (updateRange) {
             if (temporal.isEmpty()) {
                 minT = maxT = Tense.TIMELESS;
@@ -108,7 +108,7 @@ public class DefaultBeliefTable implements BeliefTable {
 
 
     public float rankTemporal(@NotNull Task b) {
-        return rankTemporal(b, now);
+        return rankTemporal(b, lastInsert);
     }
     public float rankTemporal(@NotNull Task b, long when) {
         return BeliefTable.rankTemporal(b, when, duration);
@@ -169,7 +169,7 @@ public class DefaultBeliefTable implements BeliefTable {
 
     @Nullable
     @Override
-    public final Task topTemporal(long when) {
+    public final Task topTemporal(long when, long now) {
         Task best = null;
         float bestRank = -1;
         List<? extends Task> l = temporal.items.getList();
@@ -182,6 +182,11 @@ public class DefaultBeliefTable implements BeliefTable {
                 bestRank = r;
             }
         }
+
+        if (best!=null) {//if (project) {
+            best = best.projectTask(when, now);
+        }
+
         return best;
     }
 
@@ -236,7 +241,7 @@ public class DefaultBeliefTable implements BeliefTable {
     @Override
     public Task add(@NotNull Task input, @NotNull NAR nar) {
 
-        long now = this.now = nar.time();
+        long now = this.lastInsert = nar.time();
 
         Task revised = getRevision(input, nar);
         if ((revised!=null) && (!revised.equals(input))) {
@@ -388,13 +393,14 @@ public class DefaultBeliefTable implements BeliefTable {
 //        }
 
         Task displaced = table.put(incoming,incoming);
+
         boolean inserted = displaced == null || displaced!=incoming;//!displaced.equals(t);
-//        if (displaced!=null && inserted) {
-//            onBeliefRemoved(displaced,
-//                    "Displaced",
-//                    //"Displaced by " + incoming,
-//                    memory);
-//        }
+        if (displaced!=null && inserted) {
+            onBeliefRemoved(displaced,
+                    "Displaced",
+                    //"Displaced by " + incoming,
+                    memory);
+        }
 
         return incoming;
     }

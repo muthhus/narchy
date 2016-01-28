@@ -406,13 +406,12 @@ public class DefaultConcept extends AtomConcept {
 
         q = questionTable.add(q, duplicateQuestionMerge, nar.memory);
 
-
         //TODO if the table was not affected, does the following still need to happen:
 
         BeliefTable answerTable = q.isQuest() ?
                 goals() : beliefs();
 
-        Task sol = answerTable.top(q.occurrence());
+        Task sol = answerTable.top(q.occurrence(), nar.time());
         if (sol != null) {
             LocalRules.forEachSolution(q, sol, nar, nar);
         }

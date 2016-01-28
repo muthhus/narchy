@@ -200,7 +200,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
             return null;
 
         //TODO avoid creating new Truth instances
-        Truth solTruth = projection(question.occurrence(), now, true);
+        Truth solTruth = projectTruth(question.occurrence(), now, true);
         if (solTruth == null)
             return null;
 
@@ -349,6 +349,16 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         if (t == null) return v;
         return t.conf();
     }
+
+    default Task projectTask(long when, long now) {
+        Truth adjustedTruth = projectTruth(when, now, true);
+        if (adjustedTruth.equals(truth())) return this;
+
+        return MutableTask.clone(this, adjustedTruth);
+        //}
+
+    }
+
 
 //    default float projectionConfidence(long when, long now) {
 //        //TODO avoid creating Truth Values by calculating the confidence directly. then use this in projection's original usage as well
@@ -771,7 +781,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
     //projects the truth to a certain time, covering all 4 cases as discussed in
     //https://groups.google.com/forum/#!searchin/open-nars/task$20eteneral/open-nars/8KnAbKzjp4E/rBc-6V5pem8J
-    default Truth projection(long targetTime, long now, boolean eternalizeIfWeaklyTemporal) {
+    default Truth projectTruth(long targetTime, long now, boolean eternalizeIfWeaklyTemporal) {
 
         Truth currentTruth = truth();
 

@@ -48,20 +48,20 @@ public class SomeRovers {
                         new SoftValueHashMap())),
                         1200, conceptsFirePerCycle, 2, 3);
 
-            nar.memory.DEFAULT_JUDGMENT_PRIORITY = 0.35f;
-            nar.memory.DEFAULT_JUDGMENT_DURABILITY = 0.35f;
-            nar.memory.DEFAULT_GOAL_PRIORITY = 0.7f;
-            nar.memory.DEFAULT_GOAL_DURABILITY = 0.7f;
-            nar.memory.DEFAULT_QUESTION_PRIORITY = 0.6f;
-            nar.memory.DEFAULT_QUESTION_DURABILITY = 0.6f;
+//            nar.memory.DEFAULT_JUDGMENT_PRIORITY = 0.35f;
+//            nar.memory.DEFAULT_JUDGMENT_DURABILITY = 0.35f;
+//            nar.memory.DEFAULT_GOAL_PRIORITY = 0.7f;
+//            nar.memory.DEFAULT_GOAL_DURABILITY = 0.7f;
+//            nar.memory.DEFAULT_QUESTION_PRIORITY = 0.6f;
+//            nar.memory.DEFAULT_QUESTION_DURABILITY = 0.6f;
 
-            //nar.initNAL9();
+            nar.initNAL9();
 
             //nar.memory.perfection.setValue(0.15f);
             nar.core.confidenceDerivationMin.setValue(0.005f);
             nar.core.activationRate.setValue(1f/conceptsFirePerCycle /* approxmimate */);
             nar.memory.duration.set(5);
-            //nar.memory.cyclesPerFrame.set(10);
+            nar.memory.cyclesPerFrame.set(4);
 
 
             boolean gui = true;

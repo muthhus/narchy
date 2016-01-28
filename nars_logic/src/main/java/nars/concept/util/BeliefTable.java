@@ -93,7 +93,7 @@ public interface BeliefTable extends TaskTable {
 
         @Nullable
         @Override
-        public Task topTemporal(long when) {
+        public Task topTemporal(long when, long now) {
             return null;
         }
 
@@ -198,7 +198,7 @@ public interface BeliefTable extends TaskTable {
     @Nullable Task topEternal();
 
     /** finds the most relevant temporal belief for the given time; ; null if no temporal beliefs known */
-    @Nullable Task topTemporal(long when);
+    @Nullable Task topTemporal(long when, long now);
 
 //    default Truth best(long when) {
 //        return best(when, when);
@@ -217,16 +217,26 @@ public interface BeliefTable extends TaskTable {
 //        return topTruth;
 //    }
 
+    default Task top(long now) {
+        return top(now, now);
+    }
+
     /** get the most relevant belief/goal with respect to a specific time.
      *
      * */
     @Nullable
-    default Task top(long t) {
-        Task ete = topEternal();
-        if (t == Tense.ETERNAL)
-            return ete;
+    default Task top(long t, long now) {
 
-        Task tmp = topTemporal(t);
+        Task ete = topEternal();
+        if (t == Tense.ETERNAL) {
+            if (ete != null)
+                return ete;
+            else {
+                //eternalize the topTemporal
+            }
+        }
+
+        Task tmp = topTemporal(t, now);
 
         if (tmp == null) {
             return ete;

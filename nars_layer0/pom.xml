@@ -36,7 +36,7 @@
         <dependency>
             <groupId>org.jacop</groupId>
             <artifactId>jacop</artifactId>
-            <version>4.3.0</version>
+            <version>4.4.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>log4j</groupId>
@@ -51,7 +51,7 @@
         <dependency>
             <groupId>net.openhft</groupId>
             <artifactId>affinity</artifactId>
-            <version>3.0</version>
+            <version>3.0.1</version>
         </dependency>
         <dependency>
             <groupId>opennars</groupId>

@@ -46,7 +46,7 @@ public enum Terms {
         }
 
         Op o = a.op();
-        boolean equalOps = o == b.op();
+        boolean equalOps = (o == b.op());
 
         if (equalOps) {
             switch (o) {
@@ -66,10 +66,11 @@ public enum Terms {
             return false;
 
         //match all subterms
+        Term[] at = A.terms();
+        Term[] bt = B.terms();
         for (int i = 0; i < aLen; i++) {
-            if (!equalSubTermsInRespectToImageAndProduct(A.term(i), B.term(i)))
+            if (!equalSubTermsInRespectToImageAndProduct(at[i], bt[i]))
                 return false;
-
         }
         return true;
     }

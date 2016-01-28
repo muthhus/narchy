@@ -170,4 +170,11 @@ public enum Forget { ;
 
     }
 
+    //TODO implement as a Forgetter:
+    public static final Predicate<BLink<?>> simpleForgetDecay = (b) -> {
+        float p = b.pri() * 0.95f;
+        if (p > b.qua()*0.1f)
+            b.setPriority(p);
+        return true;
+    };
 }

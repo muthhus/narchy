@@ -13,11 +13,11 @@ import nars.util.Texts;
  */
 public class BeliefLab {
 
-    public static final int beliefCapacity = 192;
-    static float waveFreq = 0.152715f;
-    static float conf = 0.8f;
-    static float predictionProbability = 0.3f; //how often to ask for a prediction
-    static float pastProbability = 0.3f; //how often to ask for a prediction
+    public static final int beliefCapacity = 64;
+    static float waveFreq = 0.052715f;
+    static float conf = 0.9f;
+    static float predictionProbability = 0.2f; //how often to ask for a prediction
+    static float pastProbability = 0.0f; //how often to ask for a prediction
     static final float fps = 30f;
     static boolean enableEternals = false;
     static boolean enableTemporals = true;

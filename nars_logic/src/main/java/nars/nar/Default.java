@@ -35,7 +35,6 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 import static java.util.stream.Collectors.toList;
 
@@ -193,12 +192,7 @@ public class Default extends AbstractNAR {
     }
 
 
-    public static final Predicate<BLink<?>> simpleForgetDecay = (b) -> {
-        float p = b.pri() * 0.95f;
-        if (p > b.qua()*0.1f)
-            b.setPriority(p);
-        return true;
-    };
+
 
     /**
      * The original deterministic memory cycle implementation that is currently used as a standard
@@ -314,6 +308,7 @@ public class Default extends AbstractNAR {
 
         }
 
+        //TODO:
         final Termutator fireConcepts = new Termutator($.the("FireConcepts")){
 
             @Override

@@ -258,7 +258,7 @@ public class BeliefTableTest extends TestCase {
 
             long now = b.nar.time();
 
-            Task tt = b.concept().beliefs().top(now);
+            Task tt = b.concept().beliefs().top(now, now);
 
             System.out.println(now + " " +  tt);
 
@@ -287,8 +287,8 @@ public class BeliefTableTest extends TestCase {
 
         b.believe(1.0f, 0.5f); n.step();
         b.print();
-        assertEquals(0.67, b.concept().beliefs().topEternal().conf(), 0.001);
-        assertEquals(3, b.concept().beliefs().size());
+        assertEquals(0.5, b.concept().beliefs().topEternal().conf(), 0.001);
+        assertEquals(2, b.concept().beliefs().size());
 
         b.believe(1.0f, 0.5f); n.step();
         b.print();

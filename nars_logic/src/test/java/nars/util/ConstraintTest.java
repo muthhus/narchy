@@ -73,7 +73,8 @@ public class ConstraintTest {
                 if (cause == null || !cause.hasBeliefs())
                     return null;
 
-                float e = cause.beliefs().top(n.time()).truth().expectation();
+                long now = n.time();
+                float e = cause.beliefs().top(now, now).truth().expectation();
                 if ((e < 0.75) && (e > 0.25)) {
                     return null; //too indeterminate
                 }
