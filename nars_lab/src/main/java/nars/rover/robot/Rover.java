@@ -28,7 +28,7 @@ import static nars.rover.Sim.f5;
 public class Rover extends AbstractPolygonBot {
 
 
-    private final ChangedTextInput feltMotion;
+    private final ChangedTextInput feltMotion, feltAngle;
 
 
     //float tasteDistanceThreshold = 1.0f;
@@ -61,6 +61,7 @@ public class Rover extends AbstractPolygonBot {
 
 
         feltMotion = new ChangedTextInput(nar);
+        feltAngle = new ChangedTextInput(nar);
 //
 //
 //        linearVelocity = new SimpleAutoRangeTruthFrequency(nar, nar.term("<motion-->[linear]>"), new AutoRangeTruthFrequency(0.0f));
@@ -195,7 +196,11 @@ public class Rover extends AbstractPolygonBot {
         String torsoAngle = sim.angleTerm(torso.getAngle());
 
 
-        feltMotion.set("(&&,(speed," + f5(linSpeed) + "),(angle," + torsoAngle + "),(rotation,(" + angDir + "," + f5(angSpeed) + "))). :|:");
+        //feltMotion.set("(&&+0, speed:{" + f5(linSpeed) + "},angle:{" + torsoAngle + "},rotation:{" + angDir + "," + f5(angSpeed) + "}). :|:");
+        feltMotion.set("speed:{" + f5(linSpeed) + "}. :|:");
+        feltAngle.set("angle:{" + torsoAngle + "}. :|:");
+        //feltMotion.set("rotation:{\" + angDir + \",\" + f5(angSpeed) + \"}. :|:");
+
 
         //facingAngle.observe( angVelocity ); // );
         //nar.inputDirect(nar.task("<facing-->[" +  + "]>. :|:"));

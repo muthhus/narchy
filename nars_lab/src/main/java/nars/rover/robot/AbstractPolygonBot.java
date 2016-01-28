@@ -69,18 +69,18 @@ public abstract class AbstractPolygonBot extends Robotic {
     }
 
     protected void train(long t) {
-        float freq = 0.95f, conf = 0.9f;
+        float freq = 0.5f + 0.5f * (1/(1f + t/1000f)), conf = 0.9f;
         nar.input("MotorControls_random(motor,())! :|: %" + n2(freq) + ";" + n2(conf) + "%");
-        System.out.println("@" + t + " Curiosity Trained");
+        System.out.println("@" + t + " Curiosity Trained @ freq=" + freq);
     }
 
     public void inputMission() {
 
         //alpha curiosity parameter
         long t = nar.time();
-        if (t < 500) {
-            train(t);
-        }
+
+        train(t);
+
 
 
         //nar.input("<{left,right,forward,reverse} --> direction>.");
@@ -126,14 +126,14 @@ public abstract class AbstractPolygonBot extends Robotic {
 
                 //nar.goal("goal:{food}", 1.00f, 0.90f);
                 //nar.input("goal:{food}!");
-                nar.input("(eat,{food})! :|:");
-                nar.input("(eat,{poison})! :|: %0%");
+                nar.input("eat:{food}! :|:");
+                nar.input("eat:{poison}! :|: %0%");
 
                 //nar.input("motion:#anything! :|:"); //move
 
             } else if (mission == 1) {
                 //rest
-                nar.input("(eat,{#anything})! :|: %0%");
+                nar.input("eat:{#anything}! :|: %0%");
                 //nar.input("motion:(0, #x)! :|:"); //stop
             }
         }
@@ -155,13 +155,13 @@ public abstract class AbstractPolygonBot extends Robotic {
         Material m = (Material)eaten.getUserData();
         if (m instanceof Sim.FoodMaterial) {
             nar.logger.warn("food");
-            nar.input("(eat,{food}). :|:");
+            nar.input("eat:{food}. :|:");
             //nar.input("goal:{food}. :|: %1.00;0.75%");
             //nar.input("goal:{health}. :|: %1.00;0.75%");
         }
         else if (m instanceof Sim.PoisonMaterial) {
             nar.logger.warn("poison");
-            nar.input("(eat,{poison}). :|:");
+            nar.input("eat:{poison}. :|:");
             //nar.input("goal:{food}. :|: %0.00;0.90%");
             //nar.input("goal:{health}. :|: %0.00;0.90%");
         }

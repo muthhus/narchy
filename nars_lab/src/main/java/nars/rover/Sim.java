@@ -1,7 +1,6 @@
 package nars.rover;
 
 import nars.Global;
-import nars.op.data.intToBitSet;
 import nars.rover.physics.TestbedPanel;
 import nars.rover.physics.TestbedSettings;
 import nars.rover.physics.gl.JoglAbstractDraw;
@@ -152,25 +151,9 @@ public class Sim extends PhysicsModel {
 
 
         if (angleTerms[i] == null) {
-            //angleTerms[i] = "(angle," + i + ")";
+            angleTerms[i] = "ang" + i;
 
-//            String bs = Integer.toBinaryString(i);
-//            while (bs.length() < angleBits) {
-//                bs = "0" + bs;
-//            }
-//            char[] bits = bs.toCharArray();
-//            String s = "(";
-//            for (int i1 = 0; i1 < bits.length; i1++) {
-//                char x = bits[i1];
-//
-//                s += x;
-//                if (i1!=bits.length-1)
-//                    s += ",";
-//            }
-//            s += ")";
-
-
-            angleTerms[i] = intToBitSet.the(i).toString();
+            //angleTerms[i] = intToBitSet.the(i).toString();
 
 //
 //                String s;

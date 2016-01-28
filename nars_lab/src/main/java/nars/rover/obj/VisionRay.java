@@ -298,7 +298,7 @@ public class VisionRay implements AbstractPolygonBot.Sense, SwingDraw.LayerDraw 
 
         //  }
         Termed tt =
-            $.p($.the(material), angleTerm, $.the(Sim.f5(dist)));
+            $.inst($.p(angleTerm, $.the(Sim.f5(dist))), $.the(material));
 
         abstractPolygonBot.nar.input(
                 new MutableTask(tt).belief().present(abstractPolygonBot.nar.memory).
