@@ -24,6 +24,7 @@ package nars;
 import com.gs.collections.api.tuple.Twin;
 import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
+import nars.budget.BudgetMerge;
 import nars.concept.AtomConcept;
 import nars.concept.Concept;
 import nars.concept.ConceptProcess;
@@ -230,10 +231,10 @@ public class Memory extends Param {
         int taskLinkBagSize = 32;
 
         Bag<Task> taskLinks =
-                new CurveBag<Task>(taskLinkBagSize, random).mergePlus();
+                new CurveBag<Task>(taskLinkBagSize, random).merge(BudgetMerge.avg);
 
         Bag<Termed> termLinks =
-                new CurveBag<Termed>(termLinkBagSize, random).mergePlus();
+                new CurveBag<Termed>(termLinkBagSize, random).merge(BudgetMerge.plusDQBlend);
 
         return (t instanceof Atom) ?
 

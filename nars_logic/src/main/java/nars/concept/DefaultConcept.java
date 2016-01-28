@@ -31,7 +31,7 @@ public class DefaultConcept extends AtomConcept {
     /**
      * how incoming budget is merged into its existing duplicate quest/question
      */
-    static final BudgetMerge duplicateQuestionMerge = BudgetMerge.plusDQDominated;
+    static final BudgetMerge duplicateQuestionMerge = BudgetMerge.plusDQDominant;
 
     @Nullable
     private final Termed[] termLinkTemplates;

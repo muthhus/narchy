@@ -1,7 +1,7 @@
 package nars.budget;
 
+import nars.Global;
 import nars.util.data.Util;
-
 
 /**
  * Budget merge function, with input scale factor
@@ -9,7 +9,7 @@ import nars.util.data.Util;
 @FunctionalInterface
 public interface BudgetMerge {
 
-    BudgetMerge plus = (tgt, src, srcScale) -> {
+    BudgetMerge plusDQBlend = (tgt, src, srcScale) -> {
         float dp = src.pri() * srcScale;
 
         float currentPriority = tgt.priIfFiniteElseZero();
@@ -38,7 +38,7 @@ public interface BudgetMerge {
     void merge(Budget existing, Budget incoming, float incomingScale);
 
 
-    BudgetMerge plusDQDominated = (tgt, src, srcScale) -> {
+    BudgetMerge plusDQDominant = (tgt, src, srcScale) -> {
         float nextPriority = src.pri() * srcScale;
 
         float currentPriority = tgt.priIfFiniteElseZero();
@@ -53,36 +53,36 @@ public interface BudgetMerge {
                 (currentWins ? tgt.qua() : src.qua()));
     };
 
-    /** add priority, interpolate durability and quality according to the relative change in priority
-     *  WARNING untested
-     * */
-    BudgetMerge plusDQInterp = (tgt, src, srcScale) -> {
-        float dp = src.pri() * srcScale;
-
-        float currentPriority = tgt.priIfFiniteElseZero();
-
-        float nextPri = currentPriority + dp;
-        if (nextPri > 1) nextPri = 1f;
-
-        float currentNextPrioritySum = (currentPriority + nextPri);
-
-        /* current proportion */
-        final float cp = currentNextPrioritySum != 0 ? currentPriority / currentNextPrioritySum : 0.5f;
-
-        /* next proportion = 1 - cp */
-        float np = 1.0f - cp;
-
-
-        float nextDur = (cp * tgt.dur()) + (np * src.dur());
-        float nextQua = (cp * tgt.qua()) + (np * src.qua());
-
-        if (!Float.isFinite(nextDur))
-            throw new RuntimeException("NaN dur: " + src + ' ' + tgt.dur());
-        if (!Float.isFinite(nextQua))
-            throw new RuntimeException("NaN quality");
-
-        tgt.budget( nextPri, nextDur, nextQua );
-    };
+//    /** add priority, interpolate durability and quality according to the relative change in priority
+//     *  WARNING untested
+//     * */
+//    BudgetMerge plusDQInterp = (tgt, src, srcScale) -> {
+//        float dp = src.pri() * srcScale;
+//
+//        float currentPriority = tgt.priIfFiniteElseZero();
+//
+//        float nextPri = currentPriority + dp;
+//        if (nextPri > 1) nextPri = 1f;
+//
+//        float currentNextPrioritySum = (currentPriority + nextPri);
+//
+//        /* current proportion */
+//        final float cp = currentNextPrioritySum != 0 ? currentPriority / currentNextPrioritySum : 0.5f;
+//
+//        /* next proportion = 1 - cp */
+//        float np = 1.0f - cp;
+//
+//
+//        float nextDur = (cp * tgt.dur()) + (np * src.dur());
+//        float nextQua = (cp * tgt.qua()) + (np * src.qua());
+//
+//        if (!Float.isFinite(nextDur))
+//            throw new RuntimeException("NaN dur: " + src + ' ' + tgt.dur());
+//        if (!Float.isFinite(nextQua))
+//            throw new RuntimeException("NaN quality");
+//
+//        tgt.budget( nextPri, nextDur, nextQua );
+//    };
 
     /** add priority, interpolate durability and quality according to the relative change in priority
      *  WARNING untested
@@ -103,31 +103,34 @@ public interface BudgetMerge {
 //        );
 //    }
 
+    /** LERP average */
+    BudgetMerge avg = (tgt, src, srcScaleIgnored) -> {
+
+        float currentPriority = tgt.pri();
+
+        float otherPriority = src.pri();
+
+        float prisum = (currentPriority + otherPriority);
+
+        /* current proportion */
+        float cp = (Util.equal(prisum, 0, Global.BUDGET_PROPAGATION_EPSILON)) ?
+                0.5f : /* both are zero so they have equal infleunce */
+                (currentPriority / prisum);
+
+        /* next proportion */
+        float np = 1.0f - cp;
+
+        tgt.budget(
+                cp * currentPriority + np * otherPriority,
+                cp * tgt.dur() + np * src.dur(),
+                cp * tgt.qua() + np * src.qua()
+        );
+    };
 //    /**
 //     * merges another budget into this one, averaging each component
 //     */
 //    default void mergeAverageLERP(Budget that) {
-//        if (this == that) return;
-//
-//        float currentPriority = getPriority();
-//
-//        float otherPriority = that.getPriority();
-//
-//        float prisum = (currentPriority + otherPriority);
-//
-//        /* current proportion */
-//        float cp = (Util.equal(prisum, 0, BUDGET_EPSILON)) ?
-//                0.5f : /* both are zero so they have equal infleunce */
-//                (currentPriority / prisum);
-//
-//        /* next proportion */
-//        float np = 1.0f - cp;
-//
-//        budget(
-//                cp * getPriority() + np * that.getPriority(),
-//                cp * getDurability() + np * that.getDurability(),
-//                cp * getQuality() + np * that.getQuality()
-//        );
+
 //    }
 
 //    /* ----------------------- Concept ----------------------- */

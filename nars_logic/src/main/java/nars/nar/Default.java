@@ -90,15 +90,12 @@ public class Default extends AbstractNAR {
 
     }
 
-//    public TaskPerception _initInput() {
-//        return new FIFOTaskPerception(this, null, this::process);
-//    }
 
     @NotNull
     public TaskPerception initInput() {
 
         return new SetTaskPerception(
-                memory, this::process, BudgetMerge.plusDQDominated);
+                memory, this::process, BudgetMerge.plusDQDominant);
 
         /* {
             @Override
@@ -130,7 +127,9 @@ public class Default extends AbstractNAR {
 
     @NotNull
     public Bag<Concept> newConceptBag(int initialCapacity) {
-        return new CurveBag<Concept>(initialCapacity, rng).mergePlus();
+        return new CurveBag<Concept>(initialCapacity, rng)
+                //.mergePlus();
+                .merge(BudgetMerge.plusDQDominant);
     }
 
 //    public Bag<Concept> newConceptBagAggregateLinks(int initialCapacity) {

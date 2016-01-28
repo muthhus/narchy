@@ -55,13 +55,13 @@ public class SomeRovers {
             nar.memory.DEFAULT_QUESTION_PRIORITY = 0.6f;
             nar.memory.DEFAULT_QUESTION_DURABILITY = 0.6f;
 
-            nar.initNAL9();
+            //nar.initNAL9();
 
             //nar.memory.perfection.setValue(0.15f);
             nar.core.confidenceDerivationMin.setValue(0.005f);
             nar.core.activationRate.setValue(1f/conceptsFirePerCycle /* approxmimate */);
             nar.memory.duration.set(5);
-            nar.memory.cyclesPerFrame.set(10);
+            //nar.memory.cyclesPerFrame.set(10);
 
 
             boolean gui = true;

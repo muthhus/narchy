@@ -40,7 +40,7 @@ public class NARtop<N extends Node> implements Supplier<Pane> {
 
         active = new SetTaskPerception(n.memory, f -> {
             update();
-        }, BudgetMerge.plusDQDominated);
+        }, BudgetMerge.plusDQDominant);
         n.memory.eventTaskProcess.on(t -> {
             if (t.isInput()) {
                 runLater( () -> {

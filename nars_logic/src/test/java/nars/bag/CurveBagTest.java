@@ -4,6 +4,7 @@ import com.gs.collections.impl.list.mutable.primitive.DoubleArrayList;
 import nars.Global;
 import nars.bag.impl.ArrayBag;
 import nars.bag.impl.CurveBag;
+import nars.budget.BudgetMerge;
 import nars.budget.UnitBudget;
 import nars.concept.Concept;
 import nars.nar.Default;
@@ -42,9 +43,9 @@ public class CurveBagTest  {
     public void testBasicInsertionRemoval(Bag<String> c) {
         //HACK
         if (c instanceof CurveBag)
-            ((CurveBag)c).mergePlus();
+            ((CurveBag)c).merge(BudgetMerge.plusDQDominant);
         else
-            ((ArrayBag)c).mergePlus();
+            ((ArrayBag)c).merge(BudgetMerge.plusDQDominant);
 
         assertEquals(1, c.capacity());
         assertEquals(0, c.size());
@@ -61,7 +62,7 @@ public class CurveBagTest  {
 
     @Test public void testBudgetMerge() {
         ArrayBag<String> a = new ArrayBag(4);
-        a.mergePlus();
+        a.merge(BudgetMerge.plusDQDominant);
 
         a.put("x", new UnitBudget(0.1f, 0.5f, 0.5f));
         a.put("x", new UnitBudget(0.1f, 0.5f, 0.5f));
@@ -76,7 +77,7 @@ public class CurveBagTest  {
 
     @Test public void testSort() {
         ArrayBag<String> a = new ArrayBag(4);
-        a.mergePlus();
+        a.merge(BudgetMerge.plusDQDominant);
 
         a.put("x", new UnitBudget(0.1f, 0.5f, 0.5f));
         a.put("y", new UnitBudget(0.2f, 0.5f, 0.5f));
@@ -103,7 +104,7 @@ public class CurveBagTest  {
 
     @Test public void testCapacity() {
         ArrayBag<String> a = new ArrayBag(2);
-        a.mergePlus();
+        a.merge(BudgetMerge.plusDQDominant);
 
         a.put("x", new UnitBudget(0.1f, 0.5f, 0.5f));
         a.put("y", new UnitBudget(0.2f, 0.5f, 0.5f));
@@ -122,7 +123,7 @@ public class CurveBagTest  {
 
     @Test public void testScalePut() {
         ArrayBag<String> a = new ArrayBag(2);
-        a.mergePlus();
+        a.merge(BudgetMerge.plusDQDominant);
 
         a.put("x", new UnitBudget(0.1f, 0.5f, 0.5f));
         a.put("x", new UnitBudget(0.1f, 0.5f, 0.5f), 0.5f);

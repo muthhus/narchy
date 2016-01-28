@@ -69,21 +69,10 @@ public class CurveBag<V> implements Bag<V> {
     }
 
 
-    /**
-     * set the merging function to 'plus'
-     */
-    @NotNull
-    @Deprecated public Bag<V> mergePlus() {
-        arrayBag.setMergeFunction(BudgetMerge.plusDQDominated);
+    public CurveBag<V> merge(BudgetMerge mergeFunction) {
+        arrayBag.merge(mergeFunction);
         return this;
     }
-
-
-//    @Override
-//    public CurveBag<V> setMergeFunction(BudgetMerge mergeFunction) {
-//        arrayBag.setMergeFunction(mergeFunction);
-//        return this;
-//    }
 
     @Nullable
     @Override

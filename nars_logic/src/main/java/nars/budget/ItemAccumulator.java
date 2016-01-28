@@ -30,7 +30,7 @@ public class ItemAccumulator<V extends Budgeted > {
                 return v.pri();
             }
         });
-        arrayBag.mergePlus();
+        arrayBag.merge(BudgetMerge.plusDQDominant);
     }
 
 

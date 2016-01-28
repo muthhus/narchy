@@ -25,7 +25,7 @@ public class ItemAccumulatorTest {
                 2 //capacity = 2 but this test will only grow to size 1 if successful
         );
 
-        ii.getArrayBag().mergePlus();
+        ii.getArrayBag().merge(BudgetMerge.plusDQDominant);
 
         assertEquals(0, ii.getArrayBag().size());
 

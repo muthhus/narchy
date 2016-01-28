@@ -49,7 +49,7 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
 
 
     @NotNull
-    Bag<V> setMergeFunction(BudgetMerge mergeFunction) {
+    public Bag<V> merge(BudgetMerge mergeFunction) {
         this.mergeFunction = mergeFunction;
         return this;
     }
@@ -72,23 +72,6 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
                     put((V) v, getDefaultBudget(v));
         }
     }
-
-
-    /**
-     * set the merging function to 'plus'
-     */
-    @NotNull
-    public Bag<V> mergePlus() {
-        return setMergeFunction(BudgetMerge.plusDQDominated);
-    }
-
-//    /**
-//     * sets a null merge function, which can be used to detect
-//     * merging which should not happen (it will throw null pointer exception)
-//     */
-//    Bag<V> mergeNull() {
-//        return setMergeFunction(null);
-//    }
 
     protected final void merge(Budget target, Budget incoming, float scale) {
         mergeFunction.merge(target, incoming, scale);

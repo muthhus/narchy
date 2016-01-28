@@ -72,9 +72,9 @@ public abstract class AbstractNAR extends NAR {
             initNAL7();
             if(nal() >=8) {
                 initNAL8();
-                if (nal() >= 9) {
-                    initNAL9();
-                }
+//                if (nal() >= 9) {
+//                    initNAL9();
+//                }
             }
         }
     }
