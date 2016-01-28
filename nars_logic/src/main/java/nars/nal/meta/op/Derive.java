@@ -1,6 +1,7 @@
 package nars.nal.meta.op;
 
 import com.google.common.base.Joiner;
+import nars.$;
 import nars.Global;
 import nars.Memory;
 import nars.bag.BLink;
@@ -37,27 +38,24 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
     /** result pattern */
     private final Term term;
 
-    @NotNull
-    public final AndCondition<PremiseMatch> postMatch; //TODO use AND condition
-
+    @NotNull private final BooleanCondition<PremiseMatch> postMatch; //TODO use AND condition
 
     public Derive(PremiseRule rule, Term term, @NotNull BooleanCondition[] postMatch, boolean anticipate, boolean eternalize) {
         this.rule = rule;
-        this.postMatch = postMatch.length>0 ? new AndCondition(postMatch) : null;
+        this.postMatch = (postMatch.length > 0) ? new AndCondition(postMatch) : BooleanCondition.TRUE;
         this.term = term;
         this.anticipate = anticipate;
         this.eternalize = eternalize;
 
         String i = "Derive:(" + term;
-        if (eternalize || anticipate) {
-            if (eternalize && anticipate) {
-                i += ", {eternalize,anticipate}";
-            } else if (eternalize && !anticipate) {
-                i += ", {eternalize}";
-            } else if (anticipate && !eternalize) {
-                i += ", {anticipate}";
-            }
+        if (eternalize && anticipate) {
+            i += ", {eternalize,anticipate}";
+        } else if (eternalize) {
+            i += ", {eternalize}";
+        } else if (anticipate) {
+            i += ", {anticipate}";
         }
+
 
         if (postMatch.length > 0) {
             i += ", {" + Joiner.on(',').join(postMatch) + '}';
@@ -80,24 +78,11 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
      * false to stop it */
     @Override public final void accept(@NotNull PremiseMatch m) {
 
-        Term tt = solve(m);
+        Term derivedTerm = m.apply(term);
 
-        if (tt != null) {
-            AndCondition<PremiseMatch> pm = postMatch;
-            if (pm == null || (pm.booleanValueOf(m)))
-                derive(m, tt);
-        }
-
-    }
-
-
-
-    @Nullable
-    public Term solve(@NotNull PremiseMatch match) {
-
-        Term derivedTerm = match.apply(term);
         if (derivedTerm == null)
-            return null;
+            return;
+
         if ((derivedTerm instanceof EllipsisMatch)) {
             throw new RuntimeException("invalid ellipsis match: " + derivedTerm);
 //            EllipsisMatch em = ((EllipsisMatch)derivedTerm);
@@ -107,33 +92,43 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
 //            derivedTerm = em.term(0); //unwrap the item
         }
 
+        if (ensureValidVolume(derivedTerm) && postMatch.booleanValueOf(m))
+            derive(m, derivedTerm);
 
-        //HARD VOLUME LIMIT
-        if (derivedTerm.volume() > Global.COMPOUND_VOLUME_MAX) {
-            //$.logger.error("Term volume overflow");
-            /*c.forEach(x -> {
-                Terms.printRecursive(x, (String line) ->$.logger.error(line) );
-            });*/
 
-            if (Global.DEBUG) {
-                String message = "Term volume overflow: " + derivedTerm;
-                System.err.println(message);
-                System.exit(1);
-                //throw new RuntimeException(message);
-            } else {
-                return null;
-            }
-        }
-
-        return derivedTerm;
     }
 
+    private static boolean ensureValidVolume(Term derivedTerm) {
+
+        //HARD VOLUME LIMIT
+        boolean tooLarge = derivedTerm.volume() > Global.COMPOUND_VOLUME_MAX;
+        if (tooLarge) {
+
+            if (Global.DEBUG) {
+                //$.logger.error("Term volume overflow");
+                /*c.forEach(x -> {
+                    Terms.printRecursive(x, (String line) ->$.logger.error(line) );
+                });*/
+
+                String message = "Term volume overflow: " + derivedTerm;
+                $.logger.error(message);
+                System.exit(1);
+                //throw new RuntimeException(message);
+            }
+
+            return false;
+
+        }
+
+        return true;
+
+    }
 
 
     /** part 1 */
     private void derive(@NotNull PremiseMatch p, @Nullable Term t) {
 
-        if (t != null && !Variable.hasPatternVariable(t)) {
+        if ((t != null) && !Variable.hasPatternVariable(t)) {
 
             Memory mem = p.premise.memory();
 
@@ -143,7 +138,7 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
             Termed tNorm = mem.index.normalized(t);
 
             //HACK why?
-            if (tNorm == null || !tNorm.term().isCompound())
+            if ((tNorm == null) || !tNorm.term().isCompound())
                 return;
 
             Truth truth = p.truth.get();
@@ -159,14 +154,11 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
 
                 Compound ct = (Compound) tNorm.term();
 
-                if (ct.op().isTemporal()) {
-                    //set time relation
-                    c = ct.t(tDelta);
-                } else {
-                    //convert to occDelta:
-                    //p.occDelta.set(p.occDelta.getIfAbsent(0) + tDelta);
-                    c = tNorm;
-                }
+                //set time relation
+                //convert to occDelta:
+                //p.occDelta.set(p.occDelta.getIfAbsent(0) + tDelta);
+
+                c = ct.op().isTemporal() ? ct.t(tDelta) : tNorm;
 
             } else {
                 //c = mem.taskConcept(tNorm); //accelerant: concept lookup
@@ -174,9 +166,7 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
             }
 
 
-            if (c != null) {
-                derive(p, c, truth, budget);
-            }
+            derive(p, c, truth, budget);
         }
 
     }
@@ -232,16 +222,16 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
         MutableTask deriving = new DerivedTask(c, premise);
 
         long now = premise.time();
-        long occ = premise.getTask().occurrence();
+        long occ = task.occurrence();
 
 
         //just not able to measure it, closed world assumption gone wild.
-        if (occ != Tense.ETERNAL) {
+        boolean derivedTemporal = occ != Tense.ETERNAL;
+        if (derivedTemporal) {
             if (premise.isEternal() && !premise.nal(7)) {
                 throw new RuntimeException("eternal premise " + premise + " should not result in non-eternal occurence time: " + deriving + " via rule " + rule);
             }
-            int occDelta = m.occDelta.getIfAbsent(0);
-            occ += occDelta;
+            occ += m.occDelta.getIfAbsent(0);
         }
 
 
@@ -255,7 +245,7 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
                 .budget(budget)
                 .time(now, occ)
                 .parent(task, belief /* null if single */)
-                .anticipate(occ != Tense.ETERNAL && anticipate);
+                .anticipate(derivedTemporal && anticipate);
 
         if ((derived = derive(m, derived)) == null)
             return;
@@ -263,25 +253,24 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
         //--------- TASK WAS DERIVED if it reaches here
 
 
-        if (truth != null && eternalize && !derived.isEternal()) {
+        if (derivedTemporal && (truth != null) && eternalize) {
 
-            derive(m,
-                    new DerivedTask(c, premise) //derived.term())
-                            .punctuation(punct)
-                            .truth(
-                                truth.freq(),
-                                eternalize(truth.conf())
-                            )
+            derive(m, new DerivedTask(c, premise) //derived.term())
+                    .punctuation(punct)
+                    .truth(
+                        truth.freq(),
+                        eternalize(truth.conf())
+                    )
 
-                            .time(now, Tense.ETERNAL)
+                    .time(now, Tense.ETERNAL)
 
-                            .budget(budget)
-                            .budgetCompoundForward(premise)
+                    .budget(budget)
+                    .budgetCompoundForward(premise)
 
-                            .parent(derived)  //this is lighter weight and potentially easier on GC
-                            //.parent(task, belief)
+                    .parent(derived)  //this is lighter weight and potentially easier on GC
+                    //.parent(task, belief)
 
-                            .log("Immediaternalized") //Immediate Eternalization
+                    .log("Immediaternalized") //Immediate Eternalization
             );
 
         }
@@ -289,7 +278,7 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
     }
 
 
-    public static Task derive(@NotNull PremiseMatch p, Task derived) {
+    private static Task derive(@NotNull PremiseMatch p, Task derived) {
 
         //HACK this should exclude the invalid rules which form any of these
 
@@ -311,29 +300,3 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
 
 
 }
-
-//        public void partial(RuleMatch match) {
-//            Term dt = solve(match);
-//            if (dt == null) return ;
-//
-//            //maybe this needs applied somewhre diferent
-//            if (!post(match))
-//                return ;
-//
-//            VarCachedVersionMap secondary = match.secondary;
-//
-//            if (!secondary.isEmpty()) {
-//
-//                Term rederivedTerm = dt.apply(secondary, true);
-//
-//                //its possible that the substitution produces an invalid term, ex: an invalid statement
-//                dt = rederivedTerm;
-//                if (dt == null) return;
-//            }
-//
-//            dt = dt.normalized();
-//            if (dt == null) return;
-//
-//
-//            derive(match, dt);
-//        }

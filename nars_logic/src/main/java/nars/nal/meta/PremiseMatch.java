@@ -3,7 +3,6 @@ package nars.nal.meta;
 import com.gs.collections.api.map.ImmutableMap;
 import nars.$;
 import nars.Global;
-import nars.Memory;
 import nars.Op;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
@@ -190,9 +189,7 @@ public class PremiseMatch extends FindSubst {
 //            throw new RuntimeException("why is " + budget + " deleted");
 //        }
 
-        Memory m = p.memory();
-        if (BudgetFunctions.valid(budget, m))
-            return null;
+        return BudgetFunctions.valid(budget, p.memory()) ? budget : null;
 
 
 //        if (!!budget.summaryLessThan(p.memory().derivationThreshold.floatValue())) {
@@ -203,8 +200,6 @@ public class PremiseMatch extends FindSubst {
 ////            }
 //            return null;
 //        }
-
-        return budget;
     }
 
     @Nullable

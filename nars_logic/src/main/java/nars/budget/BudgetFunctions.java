@@ -407,6 +407,6 @@ public final class BudgetFunctions extends UtilityFunctions {
 	/** tests a budget's validity for a task to be processed by a memory */
 	public static boolean valid(Budget budget, Memory m) {
         return !budget.isDeleted() &&
-				budget.dur() < m.derivationDurabilityThreshold.floatValue();
+				budget.dur() >= m.derivationDurabilityThreshold.floatValue();
     }
 }
