@@ -2,17 +2,15 @@
   "name": "nars_web",
   "version": "0.0.0",
   "homepage": "https://github.com/automenta/opennars",
-  "authors": [
-    "SeH <automenta@gmail.com>"
-  ],
-  "description": "Client interface for nars_web",
+  "description": "HTML/JS OpenNARS Web Client",
   "directory": "lib/",
   "dependencies": {
-	"jquery":"",
-	"lodash":"",
-    "cytoscape":"",
-	"____jquery-ui":"",
-	"____jquery.terminal":""
+	"jquery":"latest",
+	"lodash":"latest",
+    "cytoscape":"latest",
+    "cytoscape-edgehandles": "latest",
+    "semantic": "latest",
+    "interact": "latest"
   },
   "keywords": [
     "nars",

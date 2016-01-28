@@ -1,0 +1,75 @@
+<html>
+<head>
+    <title>?</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+
+
+    <!--<link type="text/css" rel="stylesheet" href="index.css"/>-->
+    <link type="text/css" rel="stylesheet" href="spacegraph.dark.css"/>
+    <link type="text/css" rel="stylesheet" href="spacegraph.css"/>
+
+    <!--<link type="text/css" rel="stylesheet" href="edit.css"/>-->
+    <!--<link type="text/css" rel="stylesheet" href="view.wikipedia.css"/>-->
+
+
+    <link rel="stylesheet" href="lib/semantic/dist/semantic.min.css"/>
+
+    <!--<script src="object.js"></script>-->
+
+    <script src="spacegraph.demo.js"></script>
+
+    <!--<script src="view.js"></script>-->
+
+    <!--<script src="edit.js"></script>-->
+
+    <!--<script src="view.wikipedia.js"></script>-->
+
+    <!--<script src="view.map.js"></script>-->
+    <!--<script src="view.map2d.js"></script>-->
+    <!--<script src="view.map3d.js"></script>-->
+
+
+    <link rel="import" href="head.html">
+    <!--<link rel="import" href="head.leaflet.html">-->
+
+
+</head>
+
+<body>
+    <!--<div id="sidebar" class="ui inverted menu"></div>-->
+    <div id="view"></div>
+
+</body>
+
+<!--<script src="index.js" onload="ready()" ></script>-->
+
+<script>
+
+//$.ready( function() {
+    var s = spacegraph($('#view'), { } );
+    s.ready();
+    console.log(s);
+
+    s.addChannel(new Channel({
+            nodes: [{
+                width: 64,
+                height: 64,
+                widget: {
+                    html: '<div style="width: 100%; height: 100%;"><div contenteditable="true" class="editable">...</div><br/></div>',
+                    style: {},
+                    scale: 0.9,
+                    minPixels: 8,
+                    pixelScale: 200
+                }
+            }]
+        }));
+
+
+//});
+
+</script>
+</html>
