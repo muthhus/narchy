@@ -109,6 +109,7 @@ public class NARWebServer extends PathHandler {
         @Override
         protected void onFullTextMessage(WebSocketChannel socket, BufferedTextMessage message) throws IOException {
 
+            //System.out.println("onFullTextMessage: " + message);
             nar.input(message.getData());
 
 //            if (attemptJSONParseOfText) {
@@ -131,6 +132,10 @@ public class NARWebServer extends PathHandler {
 
 
         public void send(WebSocketChannel socket, Object object) {
+            //System.out.println("send: " + object);
+
+            WebSockets.sendText(object.toString(), socket, this);
+
 //            try {
 //
 //                ByteBuffer data = ByteBuffer.wrap(JSON.omDeep.writeValueAsBytes(object));

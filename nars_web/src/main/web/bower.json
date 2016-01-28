@@ -10,6 +10,7 @@
   "dependencies": {
 	"jquery":"",
 	"lodash":"",
+    "cytoscape":"",
 	"____jquery-ui":"",
 	"____jquery.terminal":""
   },

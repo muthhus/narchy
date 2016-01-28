@@ -48,12 +48,12 @@
         <dependency>
             <groupId>io.undertow</groupId>
             <artifactId>undertow-core</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.jboss.logging</groupId>
-                    <artifactId>jboss-logging</artifactId>
-                </exclusion>
-            </exclusions>
+            <!--<exclusions>-->
+                <!--<exclusion>-->
+                    <!--<groupId>org.jboss.logging</groupId>-->
+                    <!--<artifactId>jboss-logging</artifactId>-->
+                <!--</exclusion>-->
+            <!--</exclusions>-->
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -67,11 +67,11 @@
             <version>3.3.6</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-embedder</artifactId>
-            <version>3.3.9</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.apache.maven</groupId>-->
+            <!--<artifactId>maven-embedder</artifactId>-->
+            <!--<version>3.3.9</version>-->
+        <!--</dependency>-->
 
 
         <!--<dependency>-->
