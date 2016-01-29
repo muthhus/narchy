@@ -4,6 +4,7 @@ package nars.op.software.prolog.terms;
 
 //!depends
 
+import nars.op.software.prolog.Prolog;
 import nars.op.software.prolog.fluents.HashDict;
 import nars.op.software.prolog.io.IO;
 import nars.op.software.prolog.io.Parser;
@@ -24,9 +25,9 @@ public class Clause extends Fun {
   * Note the building of a dictionary of variables, allowing
   * listing of the clause with its original variable names.
   */
-  public Clause(String s){
+  public Clause(Prolog p, String s){
     super(":-");
-    Clause C=clauseFromString(s);
+    Clause C=clauseFromString(p, s);
     // IO.mes("CLAUSE:"+C.pprint()+"\nDICT:"+C.dict);
     this.args=C.args;
     this.dict=C.dict;
@@ -37,8 +38,8 @@ public class Clause extends Fun {
   * Extracts a clause from its String representation.
   */
   
-  public static Clause clauseFromString(String s) {
-    return Parser.clsFromString(s);
+  public static Clause clauseFromString(Prolog p, String s) {
+    return Parser.clsFromString(p, s);
   }
   
   /**
@@ -54,7 +55,7 @@ public class Clause extends Fun {
     return G;
   }
   
-  public static Clause goalFromString(String line) {
+  public static Clause goalFromString(Prolog p, String line) {
     if (IO.trace()) IO.trace("read string: <"+line+ '>');
     
     if(null==line)
@@ -62,7 +63,7 @@ public class Clause extends Fun {
     else if(0==line.length())
       return null;
     
-    Clause C=clauseFromString(line);
+    Clause C=clauseFromString(p, line);
     if(null==C) {
       if (IO.trace()) IO.error("warning (null Clause):"+line);
       return null;

@@ -1,7 +1,7 @@
 package nars.op.software.prolog.terms;
 
 
-import nars.op.software.prolog.Init;
+import nars.op.software.prolog.Prolog;
 import nars.op.software.prolog.io.IO;
 
 import java.util.Iterator;
@@ -32,7 +32,7 @@ public class Unfolder extends Source {
    * step in program p. Iterator e is set to range over matching
    * clauses in the database of program p.
    */
-  public Unfolder(Clause g,Prog p){
+  public Unfolder(Prolog prolog, Clause g,Prog p){
     super(p);
     this.goal=g;
     this.prog=p;
@@ -43,7 +43,7 @@ public class Unfolder extends Source {
       Term first=goal.getFirst();
       if(null!=first) {
         oldtop=prog.getTrail().size();
-        this.e= Init.default_db.toEnumerationFor(first.getKey());
+        this.e= prolog.db.toEnumerationFor(first.getKey());
         if(!e.hasNext())
           trace_nomatch(first);
       }

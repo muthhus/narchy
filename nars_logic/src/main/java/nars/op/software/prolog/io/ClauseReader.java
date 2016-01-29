@@ -1,5 +1,6 @@
 package nars.op.software.prolog.io;
 
+import nars.op.software.prolog.Prolog;
 import nars.op.software.prolog.terms.*;
 
 import java.io.IOException;
@@ -12,33 +13,35 @@ import java.io.Reader;
 public class ClauseReader extends CharReader {
   protected Parser parser;
   
-  public ClauseReader(Reader reader,Prog p){
+  public ClauseReader(Prolog prolog, Reader reader,Prog p) throws Exception {
     super(reader,p);
-    make_parser("from shared reader");
+    make_parser(prolog, "from shared reader");
   }
-  
-  public ClauseReader(String f,Prog p){
+
+
+
+  public ClauseReader(Prolog prolog, String f,Prog p) throws Exception {
     super(f,p);
-    make_parser(f);
+    make_parser(prolog, f);
   }
   
-  public ClauseReader(Prog p){
+  public ClauseReader(Prolog prolog, Prog p) throws Exception {
     super(p);
-    make_parser("standard input");
+    make_parser(prolog, "standard input");
   }
   
   /**
    * parses from a string representation of a term
    */
-  public ClauseReader(Term t,Prog p){
+  public ClauseReader(Prolog prolog, Term t,Prog p) throws Exception {
     super(t,p);
-    make_parser("string parser");
+    make_parser(prolog, "string parser");
   }
   
-  void make_parser(String f) {
+  void make_parser(Prolog prolog, String f) throws Exception {
     if(null!=reader)
       try {
-        this.parser=new Parser(reader);
+        this.parser=new Parser(prolog, reader);
       } catch(IOException e) {
         IO.error("unable to build parser for: "+f);
       }
@@ -54,7 +57,7 @@ public class ClauseReader extends CharReader {
       if(null==s||0==s.length())
         C=null;
       else
-        C=new Clause(s);
+        C=new Clause(parser.prolog,s);
     } else if(null!=parser) {
       if(parser.atEOF()) {
         C=null;

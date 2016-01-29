@@ -6,11 +6,13 @@ import nars.op.software.prolog.fluents.DataBase;
 import nars.op.software.prolog.io.IO;
 import nars.op.software.prolog.terms.*;
 
+import static nars.op.software.prolog.terms.Prog.firstSolution;
+
 /**
   Initializes Prolog. Sets up shared data areas.
   Ensures that lib.class, obtained from lib.pro->lib.java is loaded.
 */
-public class Init {
+public class Prolog {
   public static final int version=101;
   
   public static final String getInfo() {
@@ -21,43 +23,42 @@ public class Init {
   
   public static final String default_lib="lib.prolog";
   
-  public static DataBase default_db;
+  public DataBase db;
 
-  public static Builtins builtinDict;
+  public Builtins dict;
   
-  public static Clause getGoal(String line) {
-    Clause G=Clause.goalFromString(line);
+  public Clause goal(String line) {
+    Clause G=Clause.goalFromString(this, line);
     // IO.mes("getGoal: "+G+" DICT: "+G.dict); //OK
     return G;
   }
   
-  public static void run_query(String query) {
-    Clause Goal=getGoal(query);
-    timeGoal(Goal);
+  public void query(String query) {
+      timeGoal(goal(query));
   }
   
   /**
   * reads a query from input strea
   */
-  static Clause getGoal() {
-    return getGoal(IO.promptln("?- "));
+  Clause goal() {
+    return goal(IO.promptln("?- "));
   }
   
   /**
   * evalutes a query
   */
-  public static void evalGoal(Clause goal) {
+  public void eval(Clause goal) {
     Clause NamedGoal=goal.cnumbervars(false);
     Term Names=NamedGoal.head();
     if(!(Names instanceof Fun)) { // no vars in Goal
-      Term Result= Prog.firstSolution(goal.head(),goal.body());
+      Term Result= firstSolution(this, goal.head(),goal.body());
       if(!Const.aNo.equals(Result))
         Result=Const.aYes;
       IO.println(Result.toString());
       return;
     }
     
-    Prog E=new Prog(goal,null);
+    Prog E=new Prog(this, goal,null);
     
     for(int i=0;;i++) {
       Term R=Prog.ask_engine(E);
@@ -96,10 +97,10 @@ public class Init {
   *  evaluates and times a Goal querying program P
   */
   
-  public static void timeGoal(Clause goal) {
+  public void timeGoal(Clause goal) {
     long t1=System.currentTimeMillis();
     try {
-      evalGoal(goal);
+      eval(goal);
     } catch(Throwable e) {
       IO.error("Execution error in goal:\n  "+goal.pprint()+".\n",e);
     }
@@ -111,13 +112,13 @@ public class Init {
   *  (almost) standard Prolog-like toplevel in Java
   *  (will) print out variables and values
   */
-  public static void standardTop() {
+  public void standardTop() {
     standardTop("?- ");
   }
   
-  public static void standardTop(String prompt) {
+  public void standardTop(String prompt) {
     for(;;) {
-      Clause G=getGoal(IO.promptln(prompt));
+      Clause G= goal(IO.promptln(prompt));
       if(null==G) {
         continue;
       }
@@ -131,8 +132,8 @@ public class Init {
    first solution of the form "the(Answer)" or the constant
    "no" if no solution exists
   */
-  public static Term askProlog(Term answer,Term body) {
-    return Prog.firstSolution(answer,body);
+  public Term ask(Term answer, Term body) {
+    return firstSolution(this, answer,body);
   }
   
   /**
@@ -141,8 +142,8 @@ public class Init {
     Answer is an instance of Goal or the constant
     "no" if no solution exists
   */
-  public static Term askProlog(Term Goal) {
-    return askProlog(Goal,Goal);
+  public Term ask(Term goal) {
+    return ask(goal,goal);
   }
   
   /**
@@ -151,35 +152,57 @@ public class Init {
     of the variables or the first solution to the query or "no"
     if no such solution exists
   */
-  public static String askProlog(String query) {
-    Clause Goal=getGoal(query);
+  public String ask(String query) {
+    Clause Goal= goal(query);
     Term Body=Goal.body();
-    return askProlog(Body).pprint();
+    return ask(Body).pprint();
   }
   
-  public static boolean run(String[] args) {
+  public Prolog run(String[] args) {
     if(null!=args) {
       for(int i=0;i<args.length;i++) {
-        String result=askProlog(args[i]);
+        String result= ask(args[i]);
         IO.trace(result);
         if("no".equals(result.intern())) {
           IO.error("failing cmd line argument: "+args[i]);
-          return false;
+          return null;
         }
       }
     }
-    return true;
+    return this;
   }
-  
-  /**
-     Initialises key data areas. Runs a first query, which,
-     if suceeeds a true, otherwise false is returned
-  */
-  public static final boolean startProlog() {
-    // should be final for expiration mechanism (it should avoid overriding!)
-    IO.println(getInfo());
-    default_db=new DataBase();
-    return true;
+
+  public Const toConstBuiltin(Const c) {
+    //TODO switch
+    if(c.name().equals(Const.aNil.name()))
+      return Const.aNil;
+    if(c.name().equals(Const.aNo.name()))
+      return Const.aNo;
+    if(c.name().equals(Const.aYes.name()))
+      return Const.aYes;
+
+    ConstBuiltin B=(ConstBuiltin) dict.newBuiltin(c);
+    if(null==B) {
+      // IO.mes("not a builtin:"+this);
+      return c;
+    }
+    return B;
+  }
+
+//  /**
+//     Initialises key data areas. Runs a first query, which,
+//     if suceeeds a true, otherwise false is returned
+//  */
+//  public static final boolean startProlog() {
+//    // should be final for expiration mechanism (it should avoid overriding!)
+//    //IO.println(getInfo());
+//
+//
+//    return true;
+//  }
+
+  public Prolog() {
+    db =new DataBase();
   }
   
 }

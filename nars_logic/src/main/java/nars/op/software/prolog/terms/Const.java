@@ -70,7 +70,11 @@ public class Const extends Nonvar {
     is just a plain Prolog constant with no builtin code attached to it
   */
   
-  public String toUnquoted() {
+  public final String toUnquoted() {
     return name();
+  }
+
+  public final String key() {
+      return name()+ '/' + arity();
   }
 }

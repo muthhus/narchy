@@ -1,5 +1,8 @@
 package nars.op.software.prolog.terms;
 
+import nars.op.software.prolog.Prolog;
+import org.jetbrains.annotations.NotNull;
+
 /**
   Basic toplevel Prolog Engine. Loads and executes Prolog
   programs and can be extended to spawn threads executing on new Prolog Engine
@@ -7,19 +10,21 @@ package nars.op.software.prolog.terms;
   synced local and remote Linda transactions
 */
 public class Prog extends Source implements Runnable {
+  private final Prolog prolog;
   // CONSTRUCTORS
   
   /**
     Creates a Prog starting execution with argument "goal" 
   */
-  public Prog(Clause goal,Prog parent){
+  public Prog(Prolog prolog, Clause goal, Prog parent){
     super(parent);
+    this.prolog = prolog;
     this.parent=parent;
     goal=goal.ccopy();
     this.trail=new Trail();
     this.orStack=new ObjectStack();
     if(null!=goal)
-      orStack.push(new Unfolder(goal,this));
+      orStack.push(nextUnfolder(goal));
     
   }
   
@@ -68,7 +73,7 @@ public class Prog extends Source implements Runnable {
           orStack.push(I);
         else
           I.stop();
-        orStack.push(new Unfolder(nextgoal,this));
+        orStack.push(nextUnfolder(nextgoal));
       }
     }
     Term head;
@@ -79,7 +84,12 @@ public class Prog extends Source implements Runnable {
       head=answer.head();
     return head;
   }
-  
+
+  @NotNull
+  private Unfolder nextUnfolder(Clause nextgoal) {
+    return new Unfolder(prolog, nextgoal, this);
+  }
+
   public void stop() {
     if(null!=trail) {
       trail.unwind(0);
@@ -92,8 +102,8 @@ public class Prog extends Source implements Runnable {
     Computes a copy of the first solution X of Goal G.
   */
   
-  static public Term firstSolution(Term X,Term G) {
-    Prog p=new_engine(X,G);
+  public static Term firstSolution(Prolog prolog, Term X,Term G) {
+    Prog p= new Prog(prolog, new Clause(X, G), null);
     Term A=ask_engine(p);
     if(A!=null) {
       A=new Fun("the",A);
@@ -102,16 +112,7 @@ public class Prog extends Source implements Runnable {
       A=Const.aNo;
     return A;
   }
-  
-  /**
-   * creates a new logic engine
-   */
-  static public Prog new_engine(Term X,Term G) {
-    Clause C=new Clause(X,G);
-    Prog p=new Prog(C,null);
-    return p;
-  }
-  
+
   /** asks a logic engine to return a solution
    */
   

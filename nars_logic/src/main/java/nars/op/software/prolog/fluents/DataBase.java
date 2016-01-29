@@ -1,6 +1,6 @@
 package nars.op.software.prolog.fluents;
 
-import nars.op.software.prolog.Init;
+import nars.op.software.prolog.Prolog;
 import nars.op.software.prolog.io.IO;
 import nars.op.software.prolog.io.Parser;
 import nars.op.software.prolog.terms.*;
@@ -150,9 +150,9 @@ public class DataBase extends BlackBoard {
     overriding existing predicates
     to be extended to load from URLs transparently
   */
-  static public boolean fromFile(String f,boolean overwrite) {
+  static public boolean fromFile(Prolog p, String f,boolean overwrite) {
     if (IO.trace()) IO.trace("last consulted file was: "+lastFile);
-    boolean ok=fileToProg(f,overwrite);
+    boolean ok=fileToProg(p, f,overwrite);
     if(ok) {
       if (IO.trace()) IO.trace("last consulted file set to: "+f);
       lastFile=f;
@@ -165,28 +165,28 @@ public class DataBase extends BlackBoard {
   /**
     reconsults a file by overwritting similar predicates in memory
   */
-  static public boolean fromFile(String f) {
-    return fromFile(f,true);
+  static public boolean fromFile(Prolog p, String f) {
+    return fromFile(p, f,true);
   }
   
-  private static String lastFile=Init.default_lib;
+  private static String lastFile= Prolog.default_lib;
   
   /**
     reconsults the last reconsulted file
   */
-  static public boolean fromFile() {
+  static public boolean fromFile(Prolog p) {
     IO.println("begin('"+lastFile+"')");
-    boolean ok=fromFile(lastFile);
+    boolean ok=fromFile(p, lastFile);
     if(ok)
       IO.println("end('"+lastFile+"')");
     return ok;
   }
   
-  static private boolean fileToProg(String fname,boolean overwrite) {
+  static private boolean fileToProg(Prolog prolog, String fname,boolean overwrite) {
     Reader sname=IO.toFileReader(fname);
     if(null==sname)
       return false;
-    return streamToProg(fname,sname,overwrite);
+    return streamToProg(prolog, fname,sname,overwrite);
   }
   
   /**
@@ -194,16 +194,16 @@ public class DataBase extends BlackBoard {
     blackboard. Overwrites old predicates if asked to.
     Returns true if all went well.
   */
-  static public boolean streamToProg(Reader sname,boolean overwrite) {
-    return streamToProg(sname.toString(),sname,overwrite);
+  static public boolean streamToProg(Prolog prolog, Reader sname,boolean overwrite) {
+    return streamToProg(prolog, sname.toString(),sname,overwrite);
   }
   
-  static private boolean streamToProg(String fname,Reader sname,
+  static private boolean streamToProg(Prolog prolog, String fname,Reader sname,
       boolean overwrite) {
-    BlackBoard ktable=overwrite?(BlackBoard)Init.default_db.clone():null;
+    BlackBoard ktable=overwrite?(BlackBoard) prolog.db.clone():null;
     // Clause Err=new Clause(new Const("error"),new Var());
     try {
-      Parser p=new Parser(sname);
+      Parser p=new Parser(prolog, sname);
       apply_parser(p,fname,ktable);
     } catch(Exception e) { // already catched by readClause
       IO.error("unexpected error in streamToProg",e);
@@ -224,7 +224,7 @@ public class DataBase extends BlackBoard {
         Parser.showError(C);
       else {
         // IO.mes("ADDING= "+C.pprint());
-        processClause(C,ktable);
+        processClause(p.prolog, C,ktable);
         C.setFile(fname,begins_at,p.lineno());
       }
     }
@@ -233,27 +233,27 @@ public class DataBase extends BlackBoard {
   /**
     adds a Clause to the joint Linda and Predicate table
   */
-  static public void addClause(Clause C,HashDict ktable) {
+  public static void addClause(Prolog p, Clause C,HashDict ktable) {
     String k=C.getKey();
     // overwrites previous definitions
     if(null!=ktable&&null!=ktable.get(k)) {
       ktable.remove(k);
-      Init.default_db.remove(k);
+      p.db.remove(k);
     }
-    Init.default_db.out(k,C,false);
+    p.db.out(k,C,false);
   }
   
   /**
     adds a Clause to the joint Linda and Predicate table
     @see Clause
   */
-  static public void processClause(Clause C,HashDict ktable) {
+  public static void processClause(Prolog prolog, Clause C,HashDict ktable) {
     if(C.head().matches(new Const("init"))) {
       // IO.mes("init: "+C.getBody());
-      Prog.firstSolution(C.head(),C.body());
+      Prog.firstSolution(prolog, C.head(),C.body());
     } else {
       // IO.mes("ADDING= "+C.pprint());
-      addClause(C,ktable);
+      addClause(prolog, C,ktable);
     }
   }
 }

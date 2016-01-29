@@ -1,5 +1,7 @@
 package nars.op.software.prolog.terms;
 
+import nars.op.software.prolog.Prolog;
+
 /**
   Top element of the Prolog term hierarchy.
   Describes a simple or compound ter like:
@@ -63,8 +65,8 @@ public abstract class Term extends Object implements Cloneable {
     return false;
   }
   
-  public static Term fromString(String s) {
-    return Clause.clauseFromString(s).toTerm();
+  public static Term fromString(Prolog p, String s) {
+    return Clause.clauseFromString(p, s).toTerm();
   }
   
   /**

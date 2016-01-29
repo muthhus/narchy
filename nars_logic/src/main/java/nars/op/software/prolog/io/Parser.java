@@ -1,6 +1,6 @@
 package nars.op.software.prolog.io;
 
-import nars.op.software.prolog.builtins.Builtins;
+import nars.op.software.prolog.Prolog;
 import nars.op.software.prolog.fluents.HashDict;
 import nars.op.software.prolog.terms.*;
 
@@ -16,9 +16,11 @@ import java.util.Objects;
 */
 class Lexer extends StreamTokenizer {
   protected final Reader input;
-  
-  public Lexer(Reader I) {
+  private final Prolog prolog;
+
+  public Lexer(Prolog p, Reader I) {
     super(I);
+    this.prolog = p;
     this.input=I;
     parseNumbers();
     eolIsSignificant(true);
@@ -34,27 +36,27 @@ class Lexer extends StreamTokenizer {
     dict=new HashDict();
   }
   
-  /**
-     Path+File name based constructor
-     Used in prolog2java
-  */
-  
-  public Lexer(String path,String s) throws IOException{
-    this(IO.url_or_file(path+s)); // stream
-  }
+//  /**
+//     Path+File name based constructor
+//     Used in prolog2java
+//  */
+//
+//  public Lexer(String path,String s) throws IOException{
+//    this(IO.url_or_file(path+s)); // stream
+//  }
   
   /**
      String based constructor.
      Used in queries ended by \n + prolog2java.
   */
   
-  public Lexer(String s) throws Exception{
-    this(IO.string_to_stream(s));
+  public Lexer(Prolog p, String s) throws Exception{
+    this(p, IO.string_to_stream(s));
   }
   
-  public Lexer() throws IOException{
-    this(IO.input);
-  }
+//  public Lexer() throws IOException{
+//    this(IO.input);
+//  }
   
   private final static String anonymous= "_";
   
@@ -79,8 +81,8 @@ class Lexer extends StreamTokenizer {
     return !inClause;
   }
   
-  protected final static Term make_const(String s) {
-    return new constToken(s);
+  protected final Term make_const(String s) {
+    return new constToken(prolog, s);
   }
   
   private final static Term make_fun(String s) {
@@ -283,13 +285,14 @@ class realToken extends Fun {
 }
 
 class constToken extends Fun {
-  public constToken(Const c){
+  public constToken(Prolog prolog, Const c){
     super("constToken",c);
-    args[0]=Builtins.toConstBuiltin(c);
+
+    args[0]=prolog.toConstBuiltin(c);
   }
-  
-  public constToken(String s){
-    this(new Const(s));
+
+  public constToken(Prolog prolog, String s){
+    this(prolog, new Const(s));
   }
 }
 
@@ -375,22 +378,28 @@ class commaToken extends Token {
 */
 
 public class Parser extends Lexer {
+
+  public final Prolog prolog;
+
+//  public Parser(Reader I) throws IOException{
+//    super(I);
+//  }
   
-  public Parser(Reader I) throws IOException{
-    super(I);
+//  /*
+//    used in prolog2java
+//  */
+//  public Parser(String p,String s) throws IOException{
+//    super(p,s);
+//  }
+//
+  public Parser(Prolog p, String s) throws Exception{
+    super(p, s);
+    this.prolog = p;
   }
-  
-  /*
-    used in prolog2java
-  */
-  public Parser(String p,String s) throws IOException{
-    super(p,s);
+  public Parser(Prolog p, Reader s) throws Exception{
+    super(p, s);
+    this.prolog = p;
   }
-  
-  public Parser(String s) throws Exception{
-    super(s);
-  }
-  
   /**
     Main Parser interface: reads a clause together
     with variable name information
@@ -533,7 +542,7 @@ public class Parser extends Lexer {
     } else if(n instanceof funToken) {
       Fun f=(Fun)t;
       f.args=getArgs();
-      t=Builtins.toFunBuiltin(f);
+      t= prolog.dict.toFunBuiltin(f);
     } else
       throw new ParserException("var,int,real,constant,'[' or functor",
           "bad term",n);
@@ -607,14 +616,14 @@ public class Parser extends Lexer {
     return s;
   }
   
-  public static Clause clsFromString(String s) {
+  public static Clause clsFromString(Prolog prolog, String s) {
     if(null==s)
       return null;
     s=patchEOFString(s);
     Clause t=null;
     try {
       Parser p;
-      p=new Parser(s);
+      p=new Parser(prolog, s);
       t=p.readClause();
     } catch(Exception e) { // nothing expected to catch
       IO.error("unexpected parsing error",e);
