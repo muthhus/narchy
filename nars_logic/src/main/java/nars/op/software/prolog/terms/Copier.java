@@ -1,7 +1,7 @@
 package nars.op.software.prolog.terms;
 
-import prolog.fluents.HashDict;
-import prolog.io.IO;
+import nars.op.software.prolog.fluents.HashDict;
+import nars.op.software.prolog.io.IO;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -57,8 +57,8 @@ public class Copier extends SystemObject {
                 break;
             } else if (t instanceof Cons) {
                 Cons c = (Cons) t;
-                V.add(c.getArg(0));
-                t = c.getArg(1);
+                V.add(c.arg(0));
+                t = c.arg(1);
             } else if (t instanceof Const) {
                 V.add(t);
                 break;

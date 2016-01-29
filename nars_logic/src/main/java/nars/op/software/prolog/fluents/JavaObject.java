@@ -1,6 +1,6 @@
 package nars.op.software.prolog.fluents;
 
-import prolog.terms.SystemObject;
+import nars.op.software.prolog.terms.SystemObject;
 
 public class JavaObject extends SystemObject {
   public JavaObject(Object i){

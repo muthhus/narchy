@@ -20,7 +20,7 @@ public abstract class Term extends Object implements Cloneable {
   /** 
     returns or fakes an arity for all subtypes 
   */
-  abstract public int getArity();
+  abstract public int arity();
   
   /** Dereferences if necessary.
       If multi-threaded, this should be synchronized
@@ -235,12 +235,12 @@ public abstract class Term extends Object implements Cloneable {
     while(!(Cs instanceof Nil)) {
       if(!(Cs instanceof Cons))
         return null;
-      Nonvar head=(Nonvar)((Cons)Cs).getArg(0);
+      Nonvar head=(Nonvar)((Cons)Cs).arg(0);
       if(!(head instanceof Int))
         return null;
       char c=(char)((Int)head).val;
       s.append(c);
-      Cs=(Nonvar)((Cons)Cs).getArg(1);
+      Cs=(Nonvar)((Cons)Cs).arg(1);
     }
     
     return s.toString();

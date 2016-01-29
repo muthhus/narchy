@@ -1,6 +1,6 @@
 package nars.op.software.prolog.fluents;
 
-import prolog.io.IO;
+import nars.op.software.prolog.io.IO;
 
 import java.util.ArrayList;
 import java.util.Iterator;

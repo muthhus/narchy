@@ -1,9 +1,9 @@
 package nars.op.software.prolog.builtins;
 
-import prolog.Init;
-import prolog.fluents.*;
-import prolog.io.*;
-import prolog.terms.*;
+import nars.op.software.prolog.Init;
+import nars.op.software.prolog.fluents.*;
+import nars.op.software.prolog.io.*;
+import nars.op.software.prolog.terms.*;
 
 /**
  This class contains a dictionary of all builtins i.e.
@@ -112,7 +112,7 @@ public class Builtins extends HashDict {
     registers a symbol as name of a builtin
   */
   public void register(Const proto) {
-    String key=proto.name()+ '/' +proto.getArity();
+    String key=proto.name()+ '/' +proto.arity();
     // IO.mes("registering builtin: "+key);
     put(key,proto);
   }
@@ -122,7 +122,7 @@ public class Builtins extends HashDict {
   */
   public Const newBuiltin(Const S) {
     String className=S.name();
-    int arity=S.getArity();
+    int arity=S.arity();
     String key=className+ '/' +arity;
     Const b=(Const)get(key);
     return b;
@@ -145,10 +145,10 @@ public class Builtins extends HashDict {
   }
   
   public static Fun toFunBuiltin(Fun f) {
-    if(f.name().equals(":-")&&f.getArity()==2) {
+    if(f.name().equals(":-")&&f.arity()==2) {
       return new Clause(f.args[0],f.args[1]);
     }
-    if(f.name().equals(",")&&f.getArity()==2) {
+    if(f.name().equals(",")&&f.arity()==2) {
       return new Conj(f.args[0],f.args[1]);
     }
     FunBuiltin B=(FunBuiltin)Init.builtinDict.newBuiltin(f);
@@ -173,7 +173,7 @@ final class is_builtin extends FunBuiltin {
   }
   
   public int exec(Prog p) {
-    return getArg(0).isBuiltin()?1:0;
+    return arg(0).isBuiltin()?1:0;
   }
 }
 
@@ -200,7 +200,7 @@ final class system extends FunBuiltin {
   }
   
   public int exec(Prog p) {
-    String cmd=((Const)getArg(0)).name();
+    String cmd=((Const) arg(0)).name();
     return IO.system(cmd);
   }
 }
@@ -214,7 +214,7 @@ final class file_char_reader extends FunBuiltin {
   }
   
   public int exec(Prog p) {
-    Term I=getArg(0);
+    Term I= arg(0);
     Fluent f;
     if(I instanceof CharReader)
       f=new CharReader(((CharReader)I).reader,p);
@@ -235,12 +235,12 @@ final class file_clause_reader extends FunBuiltin {
   }
   
   public int exec(Prog p) {
-    Term I=getArg(0);
+    Term I= arg(0);
     Fluent f;
     if(I instanceof CharReader)
       f=new ClauseReader(((CharReader)I).reader,p);
     else {
-      String s=((Const)getArg(0)).name();
+      String s=((Const) arg(0)).name();
       f=new ClauseReader(s,p);
     }
     return putArg(1,f,p);
@@ -256,7 +256,7 @@ final class char_file_writer extends FunBuiltin {
   }
   
   public int exec(Prog p) {
-    String s=((Const)getArg(0)).name();
+    String s=((Const) arg(0)).name();
     Fluent f=new CharWriter(s,p);
     return putArg(1,f,p);
   }
@@ -271,7 +271,7 @@ final class clause_file_writer extends FunBuiltin {
   }
   
   public int exec(Prog p) {
-    String s=((Const)getArg(0)).name();
+    String s=((Const) arg(0)).name();
     Fluent f=new ClauseWriter(s,p);
     return putArg(1,f,p);
   }
@@ -311,7 +311,7 @@ final class get_stdout extends FunBuiltin {
   -2 for an integer like 13
   -3 for real like 3.14
   -4 for a wrapped JavaObject;
-  @see Term#getArity
+  @see Term#arity
 */
 final class get_arity extends FunBuiltin {
   get_arity(){
@@ -319,7 +319,7 @@ final class get_arity extends FunBuiltin {
   }
   
   public int exec(Prog p) {
-    Int N=new Int(getArg(0).getArity());
+    Int N=new Int(arg(0).arity());
     return putArg(1,N,p);
   }
 }
@@ -334,7 +334,7 @@ final class stack_dump extends FunBuiltin {
   }
   
   public int exec(Prog p) {
-    String s=getArg(0).toString();
+    String s= arg(0).toString();
     IO.error("User requested dump",(new Exception(s)));
     return 1;
   }
@@ -387,7 +387,7 @@ final class reconsult extends FunBuiltin {
   }
   
   public int exec(Prog p) {
-    String f=((Const)getArg(0)).name();
+    String f=((Const) arg(0)).name();
     return DataBase.fromFile(f)?1:0;
   }
 }
@@ -403,7 +403,7 @@ final class consult extends FunBuiltin {
   }
   
   public int exec(Prog p) {
-    String f=((Const)getArg(0)).name();
+    String f=((Const) arg(0)).name();
     if (IO.trace()) IO.trace("consulting: "+f);
     return DataBase.fromFile(f,false)?1:0;
   }
@@ -460,8 +460,8 @@ final class db_add extends FunBuiltin {
   }
   
   public int exec(Prog p) {
-    DataBase db=(DataBase) getArg(0).toObject();
-    Term X=getArg(1);
+    DataBase db=(DataBase) arg(0).toObject();
+    Term X= arg(1);
     // IO.mes("X==>"+X);
     String key=X.getKey();
     // IO.mes("key==>"+key);
@@ -483,8 +483,8 @@ final class db_remove extends FunBuiltin {
   }
   
   public int exec(Prog p) {
-    DataBase db=(DataBase) getArg(0).toObject();
-    Term X=getArg(1);
+    DataBase db=(DataBase) arg(0).toObject();
+    Term X= arg(1);
     Term R=db.cin(X.getKey(),X);
     return putArg(2,R,p);
   }
@@ -502,8 +502,8 @@ final class db_collect extends FunBuiltin {
   }
   
   public int exec(Prog p) {
-    DataBase db=(DataBase) getArg(0).toObject();
-    Term X=getArg(1);
+    DataBase db=(DataBase) arg(0).toObject();
+    Term X= arg(1);
     Term R=db.all(X.getKey(),X);
     return putArg(2,R,p);
   }
@@ -519,7 +519,7 @@ final class db_source extends FunBuiltin {
   }
   
   public int exec(Prog p) {
-    DataBase db=(DataBase) getArg(0).toObject();
+    DataBase db=(DataBase) arg(0).toObject();
     Source S=new JavaSource(db.toEnumeration(),p);
     return putArg(1,S,p);
   }
@@ -535,7 +535,7 @@ final class at_key extends FunBuiltin {
   }
   
   public int exec(Prog p) {
-    Term R=Init.default_db.all(getArg(0).getKey(),new Var());
+    Term R=Init.default_db.all(arg(0).getKey(),new Var());
     return putArg(1,R,p);
   }
 }
@@ -550,7 +550,7 @@ final class pred_to_string extends FunBuiltin {
   }
   
   public int exec(Prog p) {
-    String key=getArg(0).getKey();
+    String key= arg(0).getKey();
     String listing=Init.default_db.pred_to_string(key);
     if(null==listing)
       return 0;
@@ -582,8 +582,8 @@ final class arg extends FunBuiltin {
   
   public int exec(Prog p) {
     int i=getIntArg(0);
-    Fun F=(Fun)getArg(1);
-    Term A=(i==0)?new Const(F.name()):((i==-1)?new Int(F.getArity())
+    Fun F=(Fun) arg(1);
+    Term A=(i==0)?new Const(F.name()):((i==-1)?new Int(F.arity())
         :F.args[i-1]);
     return putArg(2,A,p);
   }
@@ -599,7 +599,7 @@ final class new_fun extends FunBuiltin {
   }
   
   public int exec(Prog p) {
-    String s=((Const)getArg(0)).name();
+    String s=((Const) arg(0)).name();
     int i=getIntArg(1);
     Term T;
     if(i==0)
@@ -622,7 +622,7 @@ final class name_to_chars extends FunBuiltin {
   }
   
   public int exec(Prog p) {
-    Term Cs= getArg(0).toChars();
+    Term Cs= arg(0).toChars();
     return putArg(1,Cs,p);
   }
 }
@@ -637,7 +637,7 @@ final class chars_to_name extends FunBuiltin {
   
   public int exec(Prog p) {
     int convert=getIntArg(0);
-    String s=charsToString((Nonvar)getArg(1));
+    String s=charsToString((Nonvar) arg(1));
     Nonvar T=new Const(s);
     if(convert>0) {
       try {
@@ -663,7 +663,7 @@ final class numbervars extends FunBuiltin {
   }
   
   public int exec(Prog p) {
-    Term T=getArg(0).numbervars();
+    Term T= arg(0).numbervars();
     return putArg(1,T,p);
   }
 }
@@ -679,9 +679,9 @@ final class compute extends FunBuiltin {
   
   public int exec(Prog p) {
     
-    Term o=getArg(0);
-    Term a=getArg(1);
-    Term b=getArg(2);
+    Term o= arg(0);
+    Term a= arg(1);
+    Term b= arg(2);
     if(!(o instanceof Const)||!(a instanceof Num)||!(b instanceof Num))
       IO.error("bad arithmetic operation ("+o+"): "+a+ ',' +b+"\nprog: "
           +p.toString());
@@ -762,7 +762,7 @@ final class source_list extends FunBuiltin {
   }
   
   public int exec(Prog p) {
-    Source S=(Source)getArg(0);
+    Source S=(Source) arg(0);
     Term Xs=S.toList();
     return putArg(1,Xs,p);
   }
@@ -778,7 +778,7 @@ final class list_source extends FunBuiltin {
   }
   
   public int exec(Prog p) {
-    Source E=new ListSource((Const)getArg(0),p);
+    Source E=new ListSource((Const) arg(0),p);
     return putArg(1,E,p);
   }
 }
@@ -793,7 +793,7 @@ final class term_source extends FunBuiltin {
   }
   
   public int exec(Prog p) {
-    TermSource E=new TermSource((Nonvar)getArg(0),p);
+    TermSource E=new TermSource((Nonvar) arg(0),p);
     return putArg(1,E,p);
   }
 }
@@ -809,9 +809,9 @@ final class integer_source extends FunBuiltin {
   }
   
   public int exec(Prog p) {
-    IntegerSource E=new IntegerSource(((Int)getArg(0)).longValue(),
-        ((Int)getArg(1)).longValue(),((Int)getArg(2)).longValue(),
-        ((Int)getArg(3)).longValue(),p);
+    IntegerSource E=new IntegerSource(((Int) arg(0)).longValue(),
+        ((Int) arg(1)).longValue(),((Int) arg(2)).longValue(),
+        ((Int) arg(3)).longValue(),p);
     return putArg(4,E,p);
   }
 }
@@ -825,7 +825,7 @@ final class source_loop extends FunBuiltin {
   }
   
   public int exec(Prog p) {
-    Source s=(Source)getArg(0);
+    Source s=(Source) arg(0);
     return putArg(1,new SourceLoop(s,p),p);
   }
 }
@@ -840,7 +840,7 @@ final class source_term extends FunBuiltin {
   }
   
   public int exec(Prog p) {
-    Source S=(Source)getArg(0);
+    Source S=(Source) arg(0);
     Term Xs=Builtins.toFunBuiltin(((Fun)S.toFun()));
     return putArg(1,Xs,p);
   }
@@ -861,7 +861,7 @@ final class answer_source extends FunBuiltin {
   }
   
   public int exec(Prog p) {
-    Clause goal=new Clause(getArg(0),getArg(1));
+    Clause goal=new Clause(arg(0), arg(1));
     Prog U=new Prog(goal,p);
     return putArg(2,U,p);
   }
@@ -876,7 +876,7 @@ final class unfolder_source extends FunBuiltin {
   }
   
   public int exec(Prog p) {
-    Clause goal=getArg(0).toClause();
+    Clause goal= arg(0).toClause();
     Prog newp=new Prog(goal,p);
     Unfolder S=new Unfolder(goal,newp);
     return putArg(1,S,p);
@@ -896,7 +896,7 @@ final class get extends FunBuiltin {
   
   public int exec(Prog p) {
     // IO.mes("<<"+getArg(0)+"\n"+p+p.getTrail().pprint());
-    Source S=(Source)getArg(0);
+    Source S=(Source) arg(0);
     Term A=Const.the(S.getElement());
     // if(null==A) A=Const.aNo;
     // else A=new Fun("the",A);
@@ -916,8 +916,8 @@ final class put extends FunBuiltin {
   }
   
   public int exec(Prog p) {
-    Sink S=(Sink)getArg(0);
-    Term X=getArg(1);
+    Sink S=(Sink) arg(0);
+    Term X= arg(1);
     if(0==S.putElement(X)) {
       IO.error("error in putElement: "+X);
     }
@@ -935,7 +935,7 @@ final class stop extends FunBuiltin {
   }
   
   public int exec(Prog p) {
-    Fluent S=(Fluent)getArg(0);
+    Fluent S=(Fluent) arg(0);
     S.stop();
     return 1;
   }
@@ -951,7 +951,7 @@ final class split_source extends FunBuiltin {
   }
   
   public int exec(Prog p) {
-    Source original=(Source)getArg(0);
+    Source original=(Source) arg(0);
     Const Xs=original.toList();
     return (putArg(1,new ListSource(Xs,p),p)>0&&putArg(2,new ListSource(Xs,p),p)>0)?1
         :0;
@@ -967,7 +967,7 @@ final class merge_sources extends FunBuiltin {
   }
   
   public int exec(Prog p) {
-    Const list=(Const)getArg(0);
+    Const list=(Const) arg(0);
     return putArg(1,new SourceMerger(list,p),p);
   }
 }
@@ -981,8 +981,8 @@ final class discharge extends FunBuiltin {
   }
   
   public int exec(Prog p) {
-    Source from=(Source)getArg(0);
-    Sink to=(Sink)getArg(1);
+    Source from=(Source) arg(0);
+    Sink to=(Sink) arg(1);
     for(;;) {
       Term X=from.getElement();
       if(null==X) {
@@ -1005,7 +1005,7 @@ final class collect extends FunBuiltin {
   }
   
   public int exec(Prog p) {
-    Sink s=(Sink)getArg(0);
+    Sink s=(Sink) arg(0);
     Term X=s.collect();
     if(null==X)
       X=Const.aNo;
@@ -1052,7 +1052,7 @@ final class string_char_reader extends FunBuiltin {
   }
   
   public int exec(Prog p) {
-    return putArg(1,new CharReader(getArg(0),p),p);
+    return putArg(1,new CharReader(arg(0),p),p);
   }
 }
 
@@ -1065,7 +1065,7 @@ final class string_clause_reader extends FunBuiltin {
   }
   
   public int exec(Prog p) {
-    return putArg(1,new ClauseReader(getArg(0),p),p);
+    return putArg(1,new ClauseReader(arg(0),p),p);
   }
 }
 
@@ -1085,8 +1085,8 @@ final class set_persistent extends FunBuiltin {
   }
   
   public int exec(Prog p) {
-    Fluent F=(Fluent)getArg(0);
-    Const R=(Const)getArg(1);
+    Fluent F=(Fluent) arg(0);
+    Const R=(Const) arg(1);
     boolean yesno=!R.equals(Const.aNo);
     F.setPersistent(yesno);
     return 1;
@@ -1102,7 +1102,7 @@ final class get_persistent extends FunBuiltin {
   }
   
   public int exec(Prog p) {
-    Fluent F=(Fluent)getArg(0);
+    Fluent F=(Fluent) arg(0);
     Term R=F.getPersistent()?Const.aYes:Const.aNo;
     return putArg(1,R,p);
   }

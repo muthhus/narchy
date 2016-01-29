@@ -16,6 +16,7 @@
                 <directory>${basedir}/src/main/java/</directory>
                 <includes>
                     <include>**/*.nal</include>
+                    <include>**/*.prolog</include>
                 </includes>
                 <filtering>false</filtering>
             </resource>

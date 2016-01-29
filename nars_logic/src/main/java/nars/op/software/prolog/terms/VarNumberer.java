@@ -1,6 +1,6 @@
 package nars.op.software.prolog.terms;
 
-import prolog.fluents.HashDict;
+import nars.op.software.prolog.fluents.HashDict;
 
 /**
   Used in implementing uniform replacement of

@@ -1,16 +1,19 @@
 package nars.op.software.prolog;
 
-import prolog.builtins.Builtins;
+
+import nars.op.software.prolog.builtins.Builtins;
 
 /**
    Minimal command line only Prolog main entry point
 */
-public class Main {
+public class PrologMain {
   public static int init() {
     if(!Init.startProlog())
       return 0;
     Init.builtinDict=new Builtins();
-    Init.askProlog("reconsult('"+Init.default_lib+"')");
+    Init.askProlog("reconsult('"+
+            PrologMain.class.getResource(Init.default_lib).toExternalForm()
+            +"')");
     return 1;
   }
   

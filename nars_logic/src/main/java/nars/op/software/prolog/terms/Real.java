@@ -23,7 +23,7 @@ public class Real extends Num {
 		 && val==((Real)that).val;
   }
 
-  public final int getArity() {
+  public final int arity() {
     return Term.REAL;
   }
 

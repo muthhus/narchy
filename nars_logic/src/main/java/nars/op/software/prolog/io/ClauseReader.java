@@ -1,6 +1,6 @@
 package nars.op.software.prolog.io;
 
-import prolog.terms.*;
+import nars.op.software.prolog.terms.*;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -61,7 +61,7 @@ public class ClauseReader extends CharReader {
         stop();
       } else
         C=parser.readClause();
-      if(C!=null&&C.getHead().equals(Const.anEof)) {
+      if(C!=null&&C.head().equals(Const.anEof)) {
         C=null;
         stop();
       }
@@ -76,8 +76,8 @@ public class ClauseReader extends CharReader {
     Clause SuperC=new Clause(Vs,C);
     SuperC.dict=C.dict;
     Clause NamedSuperC=SuperC.cnumbervars(false);
-    Term Ns=NamedSuperC.getHead();
-    Term NamedC=NamedSuperC.getBody();
+    Term Ns=NamedSuperC.head();
+    Term NamedC=NamedSuperC.body();
     return new Fun("clause",C,Vs,NamedC,Ns);
   }
   

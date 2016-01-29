@@ -1,9 +1,9 @@
 package nars.op.software.prolog.io;
 
-import prolog.terms.Const;
-import prolog.terms.Fun;
-import prolog.terms.Prog;
-import prolog.terms.Term;
+import nars.op.software.prolog.terms.Const;
+import nars.op.software.prolog.terms.Fun;
+import nars.op.software.prolog.terms.Prog;
+import nars.op.software.prolog.terms.Term;
 
 /**
   Writer
@@ -22,7 +22,7 @@ public class ClauseWriter extends CharWriter {
       return 0;
     String s=null;
     if((t instanceof Fun)&&"$string".equals(((Fun)t).name())) {
-      Const Xs=(Const)((Fun)t).getArg(0);
+      Const Xs=(Const)((Fun)t).arg(0);
       s=Term.charsToString(Xs);
     } else
       s=t.pprint();

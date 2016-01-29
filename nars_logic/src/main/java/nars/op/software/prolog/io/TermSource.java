@@ -1,6 +1,6 @@
 package nars.op.software.prolog.io;
 
-import prolog.terms.*;
+import nars.op.software.prolog.terms.*;
 
 /**
  * Maps a Term to an Source for iterating over its arguments
@@ -25,8 +25,8 @@ public class TermSource extends Source {
       val=null;
     } else if(0==pos)
       X=new Const(val.name());
-    else if(pos<= val.getArity())
-      X=((Fun)val).getArg(pos-1);
+    else if(pos<= val.arity())
+      X=((Fun)val).arg(pos-1);
     else {
       X=null;
       val=null;

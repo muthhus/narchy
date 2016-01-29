@@ -60,7 +60,7 @@ public class Const extends Nonvar {
     returns an arity normally defined as 0
     @see Term#CONST
   */
-  public int getArity() {
+  public int arity() {
     return Term.CONST;
   }
   

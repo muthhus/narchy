@@ -1,9 +1,10 @@
 package nars.op.software.prolog;
 
-import prolog.builtins.Builtins;
-import prolog.fluents.DataBase;
-import prolog.io.IO;
-import prolog.terms.*;
+
+import nars.op.software.prolog.builtins.Builtins;
+import nars.op.software.prolog.fluents.DataBase;
+import nars.op.software.prolog.io.IO;
+import nars.op.software.prolog.terms.*;
 
 /**
   Initializes Prolog. Sets up shared data areas.
@@ -18,10 +19,10 @@ public class Init {
     return s;
   }
   
-  public static final String default_lib="src/prolog/lib.pro";
+  public static final String default_lib="lib.prolog";
   
   public static DataBase default_db;
-  
+
   public static Builtins builtinDict;
   
   public static Clause getGoal(String line) {
@@ -45,18 +46,18 @@ public class Init {
   /**
   * evalutes a query
   */
-  public static void evalGoal(Clause Goal) {
-    Clause NamedGoal=Goal.cnumbervars(false);
-    Term Names=NamedGoal.getHead();
+  public static void evalGoal(Clause goal) {
+    Clause NamedGoal=goal.cnumbervars(false);
+    Term Names=NamedGoal.head();
     if(!(Names instanceof Fun)) { // no vars in Goal
-      Term Result=Prog.firstSolution(Goal.getHead(),Goal.getBody());
+      Term Result= Prog.firstSolution(goal.head(),goal.body());
       if(!Const.aNo.equals(Result))
         Result=Const.aYes;
       IO.println(Result.toString());
       return;
     }
     
-    Prog E=new Prog(Goal,null);
+    Prog E=new Prog(goal,null);
     
     for(int i=0;;i++) {
       Term R=Prog.ask_engine(E);
@@ -66,8 +67,8 @@ public class Init {
         break;
       }
       Fun NamedR=(Fun)R.numbervars();
-      for(int j=0;j<Names.getArity();j++) {
-        IO.println(((Fun)Names).getArg(j)+"="+NamedR.getArg(j));
+      for(int j = 0; j<Names.arity(); j++) {
+        IO.println(((Fun)Names).arg(j)+"="+NamedR.arg(j));
       }
       // IO.println(";");
       if(!moreAnswers(i)) {
@@ -95,12 +96,12 @@ public class Init {
   *  evaluates and times a Goal querying program P
   */
   
-  public static void timeGoal(Clause Goal) {
+  public static void timeGoal(Clause goal) {
     long t1=System.currentTimeMillis();
     try {
-      evalGoal(Goal);
+      evalGoal(goal);
     } catch(Throwable e) {
-      IO.error("Execution error in goal:\n  "+Goal.pprint()+".\n",e);
+      IO.error("Execution error in goal:\n  "+goal.pprint()+".\n",e);
     }
     long t2=System.currentTimeMillis();
     IO.println("Time: "+(t2-t1)/1000.0+" sec");
@@ -130,8 +131,8 @@ public class Init {
    first solution of the form "the(Answer)" or the constant
    "no" if no solution exists
   */
-  public static Term askProlog(Term Answer,Term Body) {
-    return Prog.firstSolution(Answer,Body);
+  public static Term askProlog(Term answer,Term body) {
+    return Prog.firstSolution(answer,body);
   }
   
   /**
@@ -152,7 +153,7 @@ public class Init {
   */
   public static String askProlog(String query) {
     Clause Goal=getGoal(query);
-    Term Body=Goal.getBody();
+    Term Body=Goal.body();
     return askProlog(Body).pprint();
   }
   

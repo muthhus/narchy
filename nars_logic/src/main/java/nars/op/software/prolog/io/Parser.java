@@ -1,8 +1,8 @@
 package nars.op.software.prolog.io;
 
-import prolog.builtins.Builtins;
-import prolog.fluents.HashDict;
-import prolog.terms.*;
+import nars.op.software.prolog.builtins.Builtins;
+import nars.op.software.prolog.fluents.HashDict;
+import nars.op.software.prolog.terms.*;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -439,8 +439,8 @@ public class Parser extends Lexer {
   }
   
   static public final boolean isError(Clause C) {
-    Term H=C.getHead();
-    return H instanceof Fun && "error".equals(((Fun) H).name()) && H.getArity() == 3
+    Term H=C.head();
+    return H instanceof Fun && "error".equals(((Fun) H).name()) && H.arity() == 3
             && !(((Fun) H).args[0].ref() instanceof Var);
   }
   

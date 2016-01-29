@@ -1,8 +1,8 @@
 package nars.op.software.prolog.fluents;
 
-import prolog.terms.Const;
-import prolog.terms.Copier;
-import prolog.terms.Prog;
+import nars.op.software.prolog.terms.Const;
+import nars.op.software.prolog.terms.Copier;
+import nars.op.software.prolog.terms.Prog;
 
 /**
   Builds an iterator from a list

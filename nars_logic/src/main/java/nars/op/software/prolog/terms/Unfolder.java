@@ -1,7 +1,8 @@
 package nars.op.software.prolog.terms;
 
-import prolog.Init;
-import prolog.io.IO;
+
+import nars.op.software.prolog.Init;
+import nars.op.software.prolog.io.IO;
 
 import java.util.Iterator;
 
@@ -42,7 +43,7 @@ public class Unfolder extends Source {
       Term first=goal.getFirst();
       if(null!=first) {
         oldtop=prog.getTrail().size();
-        this.e=Init.default_db.toEnumerationFor(first.getKey());
+        this.e= Init.default_db.toEnumerationFor(first.getKey());
         if(!e.hasNext())
           trace_nomatch(first);
       }
@@ -61,7 +62,7 @@ public class Unfolder extends Source {
    * Extracts an answer at the end of an AND-derivation
    */
   Clause getAnswer() {
-    if(null!=goal&&goal.getBody() instanceof true_)
+    if(null!=goal&&goal.body() instanceof true_)
       return goal.ccopy();
     else
       return null;
@@ -83,7 +84,7 @@ public class Unfolder extends Source {
       if(null==first)
         break; // cannot reduce further
       if(first instanceof Conj) { // advances to next (possibly) inline builtin
-        goal=new Clause(goal.getHead(),Clause.appendConj(first,goal.getRest()));
+        goal=new Clause(goal.head(),Clause.appendConj(first,goal.getRest()));
         first=goal.getFirst();
       }
       
@@ -96,7 +97,7 @@ public class Unfolder extends Source {
         
         case 1: // builtin suceeds
           // IO.mes("advancing: "+goal);
-          goal=new Clause(goal.getHead(),goal.getRest());
+          goal=new Clause(goal.head(),goal.getRest());
           continue; // advance
           
         case 0: // builtin fails

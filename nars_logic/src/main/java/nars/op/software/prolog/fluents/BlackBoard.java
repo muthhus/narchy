@@ -1,7 +1,7 @@
 package nars.op.software.prolog.fluents;
 
-import prolog.io.IO;
-import prolog.terms.Term;
+import nars.op.software.prolog.io.IO;
+import nars.op.software.prolog.terms.Term;
 
 import java.util.ArrayList;
 import java.util.Iterator;

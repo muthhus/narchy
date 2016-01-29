@@ -7,7 +7,7 @@ package nars.op.software.prolog.terms;
 public class Fun extends Const {
   public Term args[];
   
-  public final int getArity() {
+  public final int arity() {
     return args.length;
   }
   
@@ -40,12 +40,12 @@ public class Fun extends Const {
     }
   }
   
-  public final Term getArg(int i) {
+  public final Term arg(int i) {
     return args[i].ref();
   }
   
   public final int getIntArg(int i) {
-    return (int)((Int)getArg(i)).getValue();
+    return (int)((Int) arg(i)).getValue();
   }
   
   public final void setArg(int i,Term T) {
@@ -179,6 +179,6 @@ public class Fun extends Const {
   }
   
   boolean isClause() {
-    return getArity()==2&&name().equals(":-");
+    return arity()==2&&name().equals(":-");
   }
 }

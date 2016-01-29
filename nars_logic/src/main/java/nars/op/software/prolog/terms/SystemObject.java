@@ -28,7 +28,7 @@ public class SystemObject extends Nonvar {
     return name();
   }
   
-  public final int getArity() {
+  public final int arity() {
     return Term.JAVA;
   }
 }

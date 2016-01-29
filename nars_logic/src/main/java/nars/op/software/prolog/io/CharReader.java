@@ -1,6 +1,6 @@
 package nars.op.software.prolog.io;
 
-import prolog.terms.*;
+import nars.op.software.prolog.terms.*;
 
 import java.io.IOException;
 import java.io.Reader;

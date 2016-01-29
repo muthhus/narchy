@@ -76,7 +76,7 @@ public class Prog extends Source implements Runnable {
       head=null;
       stop();
     } else
-      head=answer.getHead();
+      head=answer.head();
     return head;
   }
   

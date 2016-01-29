@@ -1,9 +1,9 @@
 package nars.op.software.prolog.fluents;
 
-import prolog.Init;
-import prolog.io.IO;
-import prolog.io.Parser;
-import prolog.terms.*;
+import nars.op.software.prolog.Init;
+import nars.op.software.prolog.io.IO;
+import nars.op.software.prolog.io.Parser;
+import nars.op.software.prolog.terms.*;
 
 import java.io.Reader;
 import java.util.ArrayList;
@@ -248,9 +248,9 @@ public class DataBase extends BlackBoard {
     @see Clause
   */
   static public void processClause(Clause C,HashDict ktable) {
-    if(C.getHead().matches(new Const("init"))) {
+    if(C.head().matches(new Const("init"))) {
       // IO.mes("init: "+C.getBody());
-      Prog.firstSolution(C.getHead(),C.getBody());
+      Prog.firstSolution(C.head(),C.body());
     } else {
       // IO.mes("ADDING= "+C.pprint());
       addClause(C,ktable);

@@ -1,9 +1,9 @@
 package nars.op.software.prolog.io;
 
-import prolog.terms.Int;
-import prolog.terms.Prog;
-import prolog.terms.Sink;
-import prolog.terms.Term;
+import nars.op.software.prolog.terms.Int;
+import nars.op.software.prolog.terms.Prog;
+import nars.op.software.prolog.terms.Sink;
+import nars.op.software.prolog.terms.Term;
 
 import java.io.IOException;
 import java.io.Writer;

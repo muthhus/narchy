@@ -1,10 +1,12 @@
 package nars.op.software.prolog.terms;
 
-import prolog.fluents.HashDict;
-import prolog.io.IO;
-import prolog.io.Parser;
+
 
 //!depends
+
+import nars.op.software.prolog.fluents.HashDict;
+import nars.op.software.prolog.io.IO;
+import nars.op.software.prolog.io.Parser;
 
 /**
 * Datatype for a Prolog clause (H:-B) having a head H and a body b
@@ -45,7 +47,7 @@ public class Clause extends Fun {
   */
   
   public Clause toGoal() {
-    Clause G=new Clause(varsOf(),getHead());
+    Clause G=new Clause(varsOf(), head());
     G.dict=dict;
     G.checkIfGround();
     if (IO.trace()) IO.trace("conversion from clause to goal ignores body of: "+pprint());
@@ -74,7 +76,7 @@ public class Clause extends Fun {
   * Detects that a clause is ground (i.e. has no variables)
   */
   final void checkIfGround() {
-    ground=varsOf().getArity()==0;
+    ground=varsOf().arity()==0;
   }
   
   /**
@@ -115,8 +117,8 @@ public class Clause extends Fun {
   * Prints out a clause as Head:-Body
   */
   private static String Clause2String(Clause c) {
-    Term h=c.getHead();
-    Term t=c.getBody();
+    Term h=c.head();
+    Term t=c.body();
     if(t instanceof Conj)
       return h+":-"+((Conj)t).conjToString();
     return h+":-"+t;
@@ -183,8 +185,8 @@ public class Clause extends Fun {
     Note that Head:-true will convert to the term Head.
   */
   public final Term toTerm() {
-    if(getBody() instanceof true_)
-      return getHead();
+    if(body() instanceof true_)
+      return head();
     return this;
   }
   
@@ -206,14 +208,14 @@ public class Clause extends Fun {
   /**
     Extracts the head of a clause (a Term).
   */
-  public final Term getHead() {
+  public final Term head() {
     return args[0].ref();
   }
   
   /**
     Extracts the body of a clause
   */
-  public final Term getBody() {
+  public final Term body() {
     return args[1].ref();
   }
   
@@ -222,7 +224,7 @@ public class Clause extends Fun {
     i.e. from H:-B1,B2,...,Bn it will extract B1.
   */
   final Term getFirst() {
-    Term body=getBody();
+    Term body= body();
     if(body instanceof Conj)
       return ((Conj)body).args[0].ref();
     else if(body instanceof true_)
@@ -241,7 +243,7 @@ public class Clause extends Fun {
     @see Conj
   */
   final Term getRest() {
-    Term body=getBody();
+    Term body= body();
     if(body instanceof Conj)
       return ((Conj)body).args[1].ref();
     else
@@ -281,14 +283,14 @@ public class Clause extends Fun {
     Clause result=null;
     Term first=getFirst();
     
-    if(first!=null&&that.getHead().matches(first,trail)) {
+    if(first!=null&&that.head().matches(first,trail)) {
       
       that=that.ccopy();
       
-      that.getHead().unify(first,trail);
+      that.head().unify(first,trail);
       
-      Term cont=appendConj(that.getBody(),getRest());
-      result=new Clause(getHead(),cont);
+      Term cont=appendConj(that.body(),getRest());
+      result=new Clause(head(),cont);
     }
     return result;
   }
@@ -316,7 +318,7 @@ public class Clause extends Fun {
     head of the clause and its arity.
   */
   final public String getKey() {
-    return getHead().getKey();
+    return head().getKey();
   }
   
   final boolean isClause() {

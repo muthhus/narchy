@@ -21,7 +21,7 @@ public class Int extends Num {
     // once they get it right
   }
   
-  public final int getArity() {
+  public final int arity() {
     return Term.INT;
   }
   

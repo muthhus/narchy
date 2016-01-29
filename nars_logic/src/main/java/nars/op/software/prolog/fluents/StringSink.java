@@ -1,9 +1,9 @@
 package nars.op.software.prolog.fluents;
 
-import prolog.terms.Const;
-import prolog.terms.Prog;
-import prolog.terms.Sink;
-import prolog.terms.Term;
+import nars.op.software.prolog.terms.Const;
+import nars.op.software.prolog.terms.Prog;
+import nars.op.software.prolog.terms.Sink;
+import nars.op.software.prolog.terms.Term;
 
 /**
   Builds  Fluents from Java

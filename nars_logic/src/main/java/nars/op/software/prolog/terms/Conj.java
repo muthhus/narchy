@@ -28,11 +28,11 @@ public class Conj extends Cons {
   
   static public final Term getHead(Term T) {
     T=T.ref();
-    return (T instanceof Conj)?((Conj)T).getArg(0):T;
+    return (T instanceof Conj)?((Conj)T).arg(0):T;
   }
   
   static public final Term getTail(Term T) {
     T=T.ref();
-    return (T instanceof Conj)?((Conj)T).getArg(1):Const.aTrue;
+    return (T instanceof Conj)?((Conj)T).arg(1):Const.aTrue;
   }
 }

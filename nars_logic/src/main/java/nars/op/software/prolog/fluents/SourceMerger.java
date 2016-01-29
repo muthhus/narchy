@@ -1,6 +1,6 @@
 package nars.op.software.prolog.fluents;
 
-import prolog.terms.*;
+import nars.op.software.prolog.terms.*;
 
 /**
   Merges a List of Sources into a new Source which

@@ -13,7 +13,7 @@ public class Var extends Term {
     val=this;
   }
   
-  public int getArity() {
+  public int arity() {
     return Term.VAR;
   }
   
