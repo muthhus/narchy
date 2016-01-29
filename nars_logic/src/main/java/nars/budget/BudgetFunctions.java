@@ -72,22 +72,26 @@ public final class BudgetFunctions extends UtilityFunctions {
 		nBudget.andPriority(1.0f - difT);
 		nBudget.andDurability(1.0f - difT);
 
-		float dif = concTruth.conf()
-				- Math.max(nTruth.conf(), bTruth.conf());
+		float proportion = concTruth.conf()
+				/ (nTruth.conf() + bTruth.conf());
 
-		if (dif < 0) {
-			String msg = ("Revision fault: previous belief " + oldBelief
-					+ " more confident than revised: " + conclusion);
-//			if (Global.DEBUG) {
-				throw new RuntimeException(msg);
-//			} else {
-//				System.err.println(msg);
-//			}
-//			dif = 0;
-		}
+//		if (dif < 0) {
+//			String msg = ("Revision fault: previous belief " + oldBelief
+//					+ " more confident than revised: " + conclusion);
+////			if (Global.DEBUG) {
+//				throw new RuntimeException(msg);
+////			} else {
+////				System.err.println(msg);
+////			}
+////			dif = 0;
+//		}
 
-		float priority = or(dif, nBudget.pri());
-		float durability = aveAri(dif, nBudget.dur());
+		float priority =
+				proportion * (nBudget.pri() + oldBelief.pri());
+				//or(dif, nBudget.pri());
+		float durability =
+				//aveAri(dif, nBudget.dur());
+				proportion * (nBudget.dur() + oldBelief.dur());
 		float quality = truthToQuality(concTruth);
 
 		/*

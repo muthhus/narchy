@@ -191,7 +191,7 @@ public interface BeliefTable extends TaskTable {
     public float rankEternal(@NotNull Task b);
 
     static public float rankEternal(@NotNull Task b, long now, float duration) {
-        return or(b.conf(), b.getOriginality()) / (1f + (Math.abs(now - b.creation()/duration)));
+        return or(b.conf(), b.getOriginality());// - ((Math.abs(now - b.creation()/duration)));
     }
 
     /** get the top-ranking eternal belief/goal; null if no eternal beliefs known */

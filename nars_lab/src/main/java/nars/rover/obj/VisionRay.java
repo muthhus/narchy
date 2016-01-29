@@ -192,15 +192,15 @@ public class VisionRay implements AbstractPolygonBot.Sense, SwingDraw.LayerDraw 
         if (hit != null) {
             float meanDist = totalDist / resolution;
             float percentDiff = (float) Math.sqrt(Math.abs(meanDist - minDist));
-            float conf = 0.50f + 0.2f * (1.0f - percentDiff);
-            if (conf > 0.9f) {
-                conf = 0.9f;
+            float conf = 0.8f + 0.2f * (1.0f - percentDiff);
+            if (conf > 0.99f) {
+                conf = 0.99f;
             }
 
             //perceiveDist(hit, conf, meanDist);
             perceiveDist(hit, conf, meanDist);
         } else {
-            perceiveDist(hit, 0.5f, 1.0f);
+            perceiveDist(hit, 0.9f, 1.0f);
         }
 
         toDraw.clear();
@@ -298,7 +298,7 @@ public class VisionRay implements AbstractPolygonBot.Sense, SwingDraw.LayerDraw 
 
         //  }
         Termed tt =
-            $.inst($.p(angleTerm, $.the(Sim.f5(dist))), $.the(material));
+            $.inh($.p(angleTerm, $.the(Sim.f5(dist))), $.the(material));
 
         abstractPolygonBot.nar.input(
                 new MutableTask(tt).belief().present(abstractPolygonBot.nar.memory).

@@ -3,7 +3,6 @@ package nars.java;
 import nars.concept.Concept;
 import nars.nar.Default;
 import nars.task.Task;
-import nars.truth.Truth;
 import nars.util.data.UnitVal;
 import nars.util.data.Util;
 
@@ -14,8 +13,8 @@ import java.io.PrintStream;
  */
 public class Thermostat4 {
 
-    static final float speed = 0.02f;
-    final float tolerance = 0.15f;
+    static final float speed = 0.12f;
+    final static float tolerance = 0.15f;
     private final UnitValTaskInc h;
     long cyclePause = 0;
 
@@ -35,8 +34,7 @@ public class Thermostat4 {
 
     public static class UnitValTaskInc extends UnitVal {
 
-        @Override
-        public Truth inc(boolean positive) {
+        public boolean move(boolean positive) {
             Task cTask = MethodOperator.invokingTask();
             float exp;
 
@@ -44,14 +42,21 @@ public class Thermostat4 {
             exp = cTask.expectation();// * cTask.getPriority();
             //exp = 1f;
 
-            return _inc(positive, speed * exp);
+
+            float da = Math.abs( targetX - v);
+
+            _inc(positive, speed * exp);
+
+            float db = Math.abs( targetX - v);
+
+            return db < da;
         }
 
-        public int compare(float tolerance) {
-            if (_equals(targetX, tolerance)) return 0;
-            if (v < targetX) return -1;
-            return 1;
-        }
+//        public int compare(float tolerance) {
+//            if (_equals(targetX, tolerance)) return 0;
+//            if (v < targetX) return -1;
+//            return 1;
+//        }
     }
 
     public Thermostat4() throws Exception {
@@ -150,16 +155,16 @@ public class Thermostat4 {
                 }
 
                 //reduce the number of different terms being created:
-                targetX = Util.round(targetX, tolerance/2f);
+//                targetX = Util.round(targetX, tolerance/2f);
 
-                int c = h.compare(tolerance);
-                out.print("\t" + c);
-                int c1 = h.compare(0.25f);
-                out.print("\t" + c1);
-                int c2 = h.compare(0.5f);
-                out.print("\t" + c2);
-                int c3 = h.compare(0.75f);
-                out.print("\t" + c3);
+//                int c = h.compare(tolerance);
+//                out.print("\t" + c);
+//                int c1 = h.compare(0.25f);
+//                out.print("\t" + c1);
+//                int c2 = h.compare(0.5f);
+//                out.print("\t" + c2);
+//                int c3 = h.compare(0.75f);
+//                out.print("\t" + c3);
                 out.println();
 
 
@@ -193,11 +198,11 @@ public class Thermostat4 {
 
     public void train() {
 
-        n.input("UnitValTaskInc_inc(h,((--,true)),#x)! :|:  %1.0;0.55%");
-        n.input("UnitValTaskInc_inc(h,(true),#x)! :|: %1.0;0.55%");
-        n.input("(0-->(/,^UnitValTaskInc_compare,h,(#p),_))! :|:");
-        n.input("(--, (-1-->(/,^UnitValTaskInc_compare,h,(#p),_)))! :|:");
-        n.input("(--, (1-->(/,^UnitValTaskInc_compare,h,(#p),_)))! :|:");
+        n.input("UnitValTaskInc_move(h,((--,true)),#x)! :|:  %1.0;0.55%");
+        n.input("UnitValTaskInc_move(h,(true),#x)! :|: %1.0;0.55%");
+        n.input("(true -->(/,^UnitValTaskInc_move,h,(#p),_))! :|:");
+        n.input("((--,true) -->(/,^UnitValTaskInc_move,h,(#p),_))! :|:");
+        n.input("((--,true) -->(/,^UnitValTaskInc_move,h,(#p),_))! :|:");
 
 
 

@@ -126,8 +126,9 @@ public abstract class AbstractPolygonBot extends Robotic {
 
                 //nar.goal("goal:{food}", 1.00f, 0.90f);
                 //nar.input("goal:{food}!");
-                nar.input("eat:food!");
-                nar.input("(--, eat:poison)!");
+                nar.input("eat:food! :|: %1.00;0.95%");
+                nar.input("(--, eat:poison)! :|: %1.00;0.95%");
+                nar.input("(--, <food <-> poison>). %1.00;0.95%");
 
                 //nar.input("motion:#anything! :|:"); //move
 

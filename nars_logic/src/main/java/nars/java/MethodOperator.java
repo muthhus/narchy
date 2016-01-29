@@ -134,7 +134,11 @@ public class MethodOperator extends TermFunction {
 
             Parameter[] par = this.params;
             for (int i = 0; i < pc; i++) {
-                Object a = ctx.object(pxv.term(i));
+                Term tt = pxv.term(i);
+                if (tt.op().isVar())
+                    return null;
+
+                Object a = ctx.object(tt);
                 Class<?> pt = par[i].getType();
                 if (!pt.isAssignableFrom(a.getClass())) {
                     a = parser.parseType(a.toString(), pt);

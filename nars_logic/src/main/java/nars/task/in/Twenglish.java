@@ -268,7 +268,7 @@ public class Twenglish {
 
         String sentenceID = Integer.toString(message.hashCode());
 
-        nar.input("speak:" + sentenceID + "! :|:");
+        //nar.input("speak:" + sentenceID + ". :|:");
         //nar.input("say(sentence, " + sentenceID + ")! :|:");
 
         //float f = 1f;
@@ -283,7 +283,7 @@ public class Twenglish {
 
             nar.run(wordDelay/2);
 
-            nar.input("(--, say(" + w + "))! :|:");
+            //nar.input("(--, say(" + w + "))! :|:");
 
             nar.run(wordDelay/2);
 
@@ -294,7 +294,7 @@ public class Twenglish {
             //f-=df;
         }
         //nar.input("say(sentence, " + sentenceID + "). :|: %0%");
-        nar.input("(--, speak:" + sentenceID + ")! :|:");
+        //nar.input("(--, speak:" + sentenceID + "). :|:");
 
         //nar.input("(--, sentence(" + sentenceID + ")). :|:");
 

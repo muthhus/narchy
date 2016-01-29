@@ -48,10 +48,10 @@ public class MarkovlikeTest {
 
         d.initNAL9();
 
-        d.memory.executionExpectationThreshold.setValue(0.75f);
-        d.core.activationRate.setValue(0.1f);
+        d.memory.executionExpectationThreshold.setValue(0.6f);
+        //d.core.activationRate.setValue(0.5f);
+        d.memory.shortTermMemoryHistory.set(5);
 
-        d.memory.duration.set(5);
         //d.memory.conceptForgetDurations.setValue(1);
 
         //d.log();
@@ -83,10 +83,11 @@ public class MarkovlikeTest {
         //d.input("$1.0$ ((echo(#a) ==> echo(#b)) <-> echo(#a,#b)). %1.0;0.99%");
 
         int repeats = 8;
-        int wordDelay = 150;
-        int sentenceDelay = 300;
+        int wordDelay = 30;
+        int sentenceDelay = 500;
         int speakTime = wordDelay * 16;
         int silenceTime = 1000;
+        d.memory.duration.set(wordDelay/2);
 
         for (int i = 0; i < repeats; i++) {
 

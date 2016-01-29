@@ -241,15 +241,15 @@ public class PremiseRuleSet {
                 PremiseRule preNorm = new PremiseRule((Compound) Narsese.the().term(src, $.terms, false /* raw */));
 
                 PremiseRule r = add(ur, preNorm, src, index);
-
-                if (r.allowBackward) {
-                    addQuestions(ur, r, src, index);
-
-                    PremiseRule f = r.forwardPermutation();
-                    //if (r.allowBackward)
-                        addQuestions(ur, f, src, index);
-                    add(ur, f, src, index);
-                }
+//
+//                if (r.allowBackward) {
+//                    addQuestions(ur, r, src, index);
+//
+//                    PremiseRule f = r.forwardPermutation();
+//                    //if (r.allowBackward)
+//                        addQuestions(ur, f, src, index);
+//                    add(ur, f, src, index);
+//                }
 
 
             } catch (Exception ex) {

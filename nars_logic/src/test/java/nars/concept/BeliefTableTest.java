@@ -1,6 +1,5 @@
 package nars.concept;
 
-import junit.framework.TestCase;
 import nars.Global;
 import nars.NAR;
 import nars.nal.Tense;
@@ -11,10 +10,12 @@ import nars.util.meter.BeliefAnalysis;
 import nars.util.meter.MemoryBudget;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * Created by me on 7/5/15.
  */
-public class BeliefTableTest extends TestCase {
+public class BeliefTableTest  {
 
 
 //    @Test public void testRevisionBeliefs() {
@@ -292,14 +293,17 @@ public class BeliefTableTest extends TestCase {
 
         b.believe(1.0f, 0.5f); n.step();
         b.print();
-        assertEquals(0.75, b.concept().beliefs().topEternal().conf(), 0.001);
-        assertEquals(0.75, b.concept().beliefs().top(n.time()).conf(), 0.001);
-        assertEquals(5, b.concept().beliefs().size());
+        assertEquals(0.5, b.concept().beliefs().topEternal().conf(), 0.001);
+        assertEquals(0.67, b.concept().beliefs().top(n.time()).conf(), 0.001);
+        assertEquals(4, b.concept().beliefs().size());
 
         b.believe(1.0f, 0.5f); n.step();
         b.print();
-        assertEquals(0.80, b.concept().beliefs().topEternal().conf(), 0.001);
-        assertEquals(5, b.concept().beliefs().size());
+        assertEquals(0.5, b.concept().beliefs().topEternal().conf(), 0.001);
+        assertEquals(6, b.concept().beliefs().size());
+
+        n.step();
+        b.print();
 
 //        int period = 1;
 //        int loops = 20;

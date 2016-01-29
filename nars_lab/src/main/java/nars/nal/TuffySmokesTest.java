@@ -103,21 +103,21 @@ public class TuffySmokesTest {
 
         Global.DEBUG = true;
 
-        NAR n = new Default(1000, 4, 2, 3);
-        //n.memory.activationRate.setValue(0.1f);
+        NAR n = new Default(1000, 3, 2, 3);
+        n.memory.activationRate.setValue(0.1f);
         n.memory.conceptForgetDurations.setValue(5);
 
         //n.log();
 
         axioms(n);
-        n.run(1000);
+        n.run(100);
 
         input(n);
-        n.run(2000); question(n);
+        n.run(4000); question(n);
 
-        n.run(2000); question(n);
+        n.run(4000); question(n);
 
-        n.run(2000); question(n);
+        n.run(4000); question(n);
 
 
         //NARide.loop(n, true);

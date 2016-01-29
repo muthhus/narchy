@@ -113,7 +113,7 @@ public class DefaultBeliefTable implements BeliefTable {
         return rankTemporal(b, lastUpdate);
     }
     public float rankTemporal(@NotNull Task b, long when) {
-        return BeliefTable.rankTemporal(b, when, duration);
+        return BeliefTable.rankTemporal(b, when, duration*getCapacity());
     }
 
 
@@ -325,13 +325,14 @@ public class DefaultBeliefTable implements BeliefTable {
             return null; //nothing to revise with
 
         Compound newBeliefTerm = newBelief.term();
-        long newBeliefOcc = newBelief.occurrence();
-        float newBeliefConf = newBelief.conf();
+        //long newBeliefOcc = newBelief.occurrence();
+        //float newBeliefConf = newBelief.conf();
 
         //best found
         Task oldBelief = null;
         float best = 0;
         Truth conclusion = null;
+        long concTime = Tense.ETERNAL;
 
         for (int i = 0; i < bsize; i++) {
             Task x = beliefs.get(i);
@@ -349,16 +350,19 @@ public class DefaultBeliefTable implements BeliefTable {
 //            }
 
             Truth c;
+            long t;
             if (newBelief.isEternal()) {
                 c = TruthFunctions.revision(newBelief.truth(), x.truth());
+                t = Tense.ETERNAL;
             } else {
                 c = TruthFunctions.revision(
                         newBelief,
                         x, now);
+                t = now;
             }
 
-            if (c.conf() * matchFactor < Math.max(newBeliefConf, x.conf()))
-                continue;
+//            if (c.conf() * matchFactor < Math.max(newBeliefConf, x.conf()))
+//                continue;
 
             //float ffreqMatch = 1f/(1f + Math.abs(newBeliefFreq - x.freq()));
             c = c.withConfMult(matchFactor);
@@ -368,6 +372,7 @@ public class DefaultBeliefTable implements BeliefTable {
                 best = cc;
                 oldBelief = x;
                 conclusion = c;
+                concTime = t;
             }
         }
 
@@ -388,7 +393,7 @@ public class DefaultBeliefTable implements BeliefTable {
         MutableTask t = new MutableTask(term, newBelief.punc())
                 .truth(conclusion)
                 .parent(newBelief, oldBelief)
-                .time(now, newBeliefOcc)
+                .time(now, concTime)
                 .state(newBelief.state())
                 //.because("Insertion Revision");
                 .because("Insertion Revision (%+" +
