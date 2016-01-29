@@ -7,6 +7,7 @@ import nars.Memory;
 import nars.NAR;
 import nars.bag.impl.ArrayTable;
 import nars.budget.BudgetFunctions;
+import nars.budget.BudgetMerge;
 import nars.nal.LocalRules;
 import nars.nal.Tense;
 import nars.task.MutableTask;
@@ -242,9 +243,22 @@ public class DefaultBeliefTable implements BeliefTable {
     @Override
     public Task add(@NotNull Task input, @NotNull NAR nar) {
 
-        Task existing = contains(input, nar.memory);
+//        if (input.isDeleted()) {
+//            throw new RuntimeException("input budget deleted");
+//        }
+
+        Task existing = contains(input);
         if (existing!=null) {
-            return null;
+            if (existing!=input) {
+//                if (existing.isDeleted()) {
+//                    throw new RuntimeException("existing budget deleted");
+//                }
+
+                BudgetMerge.avg.merge(existing.budget(), input.budget(), 1f);
+                ((MutableTask) existing).state(input.state()); //reset execution / anticipated state
+                nar.memory.remove(input, "PreExisting Duplicate Belief/Goal");
+            }
+            return existing;
         }
 
         long now = this.lastUpdate = nar.time();
@@ -389,15 +403,15 @@ public class DefaultBeliefTable implements BeliefTable {
         return oldBelief.onRevision(t) ? t : null;
     }
 
-    private Task contains(Task incoming, Memory memory) {
+    private Task contains(Task incoming) {
 
         Task existing = map.get(incoming);
         if (existing!=null)  {
-            if (existing!=incoming) {
-                //existingMergeFunction.merge(existing.budget(), incoming.budget(), 1f);
-                //((MutableTask) existing).state(incoming.state()); //clear any state
-                onBeliefRemoved(incoming, "Duplicate", memory);
-            }
+//            if (existing!=incoming) {
+//                //existingMergeFunction.merge(existing.budget(), incoming.budget(), 1f);
+//                //((MutableTask) existing).state(incoming.state()); //clear any state
+//                onBeliefRemoved(incoming, "Duplicate", memory);
+//            }
             return existing;
         }
 

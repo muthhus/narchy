@@ -96,10 +96,10 @@ public class ArrayListTaskTable implements QuestionTaskTable {
 
             if (existing != t) {
                 duplicateMerge.merge(existing.budget(), t.budget(), 1f);
-                m.remove(t, "PreExisting TaskTable Duplicate");
+                m.remove(t, "PreExisting Duplicate Question");
             }
 
-            return null;
+            return existing;
         }
 
         //Memory m = c.getMemory();

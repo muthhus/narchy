@@ -187,9 +187,10 @@ public class DefaultConcept extends AtomConcept {
         if (beliefs == null)
             beliefs = this.beliefs = new DefaultBeliefTable(memory.conceptBeliefsMax.intValue(), memory);
 
-        Task best = beliefs.add(belief, nar);
+        belief = beliefs.add(belief, nar);
 
-        if (best!=null) {
+        //TODO only compute updates if belief was actually added, not merged with duplicate
+        {
 //            if (hasQuestions()) {
 //                //TODO move this to a subclass of TaskTable which is customized for questions. then an arraylist impl of TaskTable can iterate by integer index and not this iterator/lambda
 //                questions().forEach(question -> {
@@ -200,9 +201,10 @@ public class DefaultConcept extends AtomConcept {
             if (hasGoals) {
                 updateSuccess(null, successBefore, memory);
             }
+
         }
 
-        return best;
+        return belief;
 
 //        if (belief.isInput() && !belief.isEternal()) {
 //            this.put(Anticipate.class, true);
@@ -247,9 +249,7 @@ public class DefaultConcept extends AtomConcept {
 
         Task goal = goals().add(inputGoal, nar);
 
-
-
-        if (goal!=null && goal.expectation() > Global.EXECUTION_DESIRE_EXPECTATION_THRESHOLD) {
+        if (goal.expectation() > Global.EXECUTION_DESIRE_EXPECTATION_THRESHOLD) {
 
             float delta = updateSuccess(goal, successBefore, memory);
 
@@ -388,7 +388,7 @@ public class DefaultConcept extends AtomConcept {
             questionTable = quests();
         }
 
-        if (Global.DEBUG) {
+        //if (Global.DEBUG) {
 //            if (q.getTruth() != null) {
 //                System.err.println(q + " has non-null truth");
 //                System.err.println(q.getExplanation());
@@ -398,7 +398,7 @@ public class DefaultConcept extends AtomConcept {
 //                if (qq.getDeleted())
 //                    throw new RuntimeException("question is deleted: " + qq);
 //            });
-        }
+        //}
 
         /** execute the question, for any attached operators that will handle it */
         //getMemory().execute(q);

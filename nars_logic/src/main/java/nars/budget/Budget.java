@@ -11,7 +11,6 @@ import static java.lang.Math.pow;
 import static nars.nal.UtilityFunctions.and;
 import static nars.nal.UtilityFunctions.or;
 import static nars.util.data.Util.equal;
-import static nars.util.data.Util.mean;
 
 /**
  * Created by me on 12/11/15.
@@ -138,18 +137,6 @@ public abstract class Budget extends BudgetedHandle {
         setPriority(or(pri(), v));
     }
 
-    /**
-     * merges another budget into this one, averaging each component
-     */
-    public void mergeAverage(@NotNull Budget that) {
-        if (this == that) return;
-
-        budget(
-                mean(pri(), that.pri()),
-                mean(dur(), that.dur()),
-                mean(qua(), that.qua())
-        );
-    }
 
 
     /**

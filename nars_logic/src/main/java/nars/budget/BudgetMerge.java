@@ -103,7 +103,7 @@ public interface BudgetMerge {
 //        );
 //    }
 
-    /** LERP average */
+    /** LERP average proportional to priority change */
     BudgetMerge avg = (tgt, src, srcScaleIgnored) -> {
 
         float currentPriority = tgt.pri();
@@ -111,6 +111,7 @@ public interface BudgetMerge {
         float otherPriority = src.pri();
 
         float prisum = (currentPriority + otherPriority);
+
 
         /* current proportion */
         float cp = (Util.equal(prisum, 0, Global.BUDGET_PROPAGATION_EPSILON)) ?
@@ -186,4 +187,18 @@ public interface BudgetMerge {
 //
 //    }
 //
+
+//    /**
+//     * merges another budget into this one, averaging each component
+//     */
+//    public void mergeAverage(@NotNull Budget that) {
+//        if (this == that) return;
+//
+//        budget(
+//                mean(pri(), that.pri()),
+//                mean(dur(), that.dur()),
+//                mean(qua(), that.qua())
+//        );
+//    }
+
 }
