@@ -61,7 +61,7 @@ public class UnitVal {
         return _equals(target, tolerance);
     }
 
-    private boolean _equals(float target, float tolerance) {
+    protected boolean _equals(float target, float tolerance) {
         return Math.abs(v - target) <= tolerance;
     }
 

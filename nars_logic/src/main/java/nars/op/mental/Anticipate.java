@@ -24,6 +24,7 @@ package nars.op.mental;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
+import nars.$;
 import nars.Global;
 import nars.NAR;
 import nars.Symbols;
@@ -44,7 +45,6 @@ import java.util.Map;
  */
 public final class Anticipate {
 
-    public static final float TOLERANCE_DIV=5.0f;
     public float DEFAULT_CONFIRMATION_EXPECTATION = 0.51f;
 
 
@@ -94,13 +94,13 @@ public final class Anticipate {
 
         long now = nar.time();
 
-        if (now > t.occurrence()) //its about the past..
+        if (now > t.occurrence()) //its about the past
             return;
 
 //        if (debug)
 //            System.err.println("Anticipating " + tt + " in " + (t.getOccurrenceTime() - now));
 
-        TaskTime taskTime = new TaskTime(t, t.creation());
+        TaskTime taskTime = new TaskTime(t);
 //        if(testing) {
 //            String s = "anticipating: "+taskTime.task.getTerm().toString();
 //            System.out.println(s);
@@ -126,9 +126,9 @@ public final class Anticipate {
 //        if (debug)
 //            System.err.println("Anticipation Negated " + tt.task);
 
-        nar.input(new MutableTask(prediction)
+        nar.input(new MutableTask($.neg(prediction))
                 .belief()
-                .truth(0.0f, nar.memory.getDefaultConfidence(Symbols.JUDGMENT))
+                .truth(1.0f, nar.memory.getDefaultConfidence(Symbols.JUDGMENT))
                 .time(nar.time(), expectedOccurrenceTime)
                 .parent(tt.task, null)
                 .because("Absent Anticipated Event"));
@@ -146,8 +146,10 @@ public final class Anticipate {
 
         final List<TaskTime> toRemove = this.toRemove;
 
-        anticipations.get(c.term()).stream().filter(tt -> tt.inTime(cOccurr) && !c.equals(tt.task) &&
-                tt.task.truth().expectation() > DEFAULT_CONFIRMATION_EXPECTATION).forEach(tt -> {
+        int halfDur = nar.memory.duration()/2;
+
+        anticipations.get(c.term()).stream().filter(tt -> tt.inTime(cOccurr, halfDur) && !c.equals(tt.task) &&
+                tt.task.expectation() > DEFAULT_CONFIRMATION_EXPECTATION).forEach(tt -> {
             toRemove.add(tt);
             happeneds++;
         });
@@ -165,13 +167,14 @@ public final class Anticipate {
 
         Iterator<Map.Entry<Compound, TaskTime>> it = anticipations.entries().iterator();
 
+        int halfDur = nar.memory.duration()/2;
         while (it.hasNext()) {
 
             Map.Entry<Compound, TaskTime> t = it.next();
             Compound term = t.getKey();
             TaskTime tt = t.getValue();
 
-            if (tt.tooLate(now)) {
+            if (tt.tooLate(now, halfDur)) {
                 deriveDidntHappen(term, tt);
                 it.remove();
                 didnts++;
@@ -197,23 +200,23 @@ public final class Anticipate {
 
         /** cached locally, same value as in task */
         private final int hash;
-        public float tolerance = 0;
+        //public float tolerance = 0;
 
-        public TaskTime(@NotNull Task task, long creationTime) {
+        public TaskTime(@NotNull Task task) {
             this.task = task;
             long cre = this.creationTime = task.creation();
             long occ = this.occurrTime = task.occurrence();
-            hash = (int)(31 * creationTime + occ);
+            hash = (int)(31 * cre + occ);
             //expiredate in relation how long we predicted forward
             long prediction_time = occ - cre;
-            tolerance = prediction_time/TOLERANCE_DIV;
+            //tolerance = prediction_time/TOLERANCE_DIV;
         }
 
-        public boolean tooLate(long occur) {
+        public boolean tooLate(long occur, int TOLERANCE_DIV) {
             return occur > occurrTime + TOLERANCE_DIV;
         }
 
-        public boolean inTime(long occur) {
+        public boolean inTime(long occur, int TOLERANCE_DIV) {
             return occur > occurrTime - TOLERANCE_DIV && occur < occurrTime + TOLERANCE_DIV;
         }
 

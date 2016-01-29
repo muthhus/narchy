@@ -1,9 +1,11 @@
 package nars.nal;
 
-import com.gs.collections.api.tuple.Twin;
+import nars.Global;
 import nars.NAR;
-import nars.guifx.demo.NARide;
+import nars.concept.Concept;
 import nars.nar.Default;
+import nars.task.Task;
+
 /**
  * Created by me on 1/28/16.
  */
@@ -11,10 +13,25 @@ public class TuffySmokesTest {
 
     static void question(NAR n) {
         for (String name : new String[] { "Edward", "Anna", "Bob", "Frank", "Gary", "Helen" }) {
-            n.input("<" + name + " --> [Cancer]>?");
+            String t = "<" + name + " --> [Cancer]>";
+            //n.input(t + "?");
+            Concept c = n.concept(t);
+            if (c == null)  {
+                System.err.println(t + " unknown");
+            } else {
+                if (!c.hasBeliefs()) {
+                    System.err.println(t + " no beliefs");
+                } else {
+                    Task b = c.beliefs().top(n.time());
+                    System.err.println(t + " = " + b);
+                    //System.err.println(b.getExplanation());
+                    continue;
+                }
+            }
+            n.input(t + "?");
         }
 
-        n.input("<?x --> [Cancer]>?");
+        //n.input("<?x --> [Cancer]>?");
     }
 
     static void input(NAR n) {
@@ -24,13 +41,20 @@ public class TuffySmokesTest {
         n.input("<(Edward,Frank) --> Friends>. %1.00;0.99%");
         n.input("<(Gary,Helen) --> Friends>. %1.00;0.99%");
         n.input("(--,<(Gary,Frank) --> Friends>). %1.00;0.99%");
+
         n.input("<Anna --> [Smokes]>. %1.00;0.99%");
         n.input("<Edward --> [Smokes]>. %1.00;0.99%");
+        n.input("(--, <Gary --> [Smokes]>). %1.00;0.99%");
+        n.input("(--, <Frank --> [Smokes]>). %1.00;0.99%");
+        n.input("(--, <Helen --> [Smokes]>). %1.00;0.99%");
+        n.input("(--, <Bob --> [Smokes]>). %1.00;0.99%");
     }
 
     static void axioms(NAR n) {
 
         //only positive side of => corresponds to ==> in NAL, so we have to translate
+
+        n.input("<<($1,$2) --> Friends> ==> <($2,$1) --> Friends>>. %1.00;0.99%");
 
         //!Smokes(a1) || cancer(a1) rewritten:  Smokes(a1) => cancer(a1) or !cancer(a1) => !Smokes(a1)
         n.input("<<$1 --> [Smokes]> ==> <$1 --> [Cancer]>>. %1.00;0.50%");
@@ -40,41 +64,36 @@ public class TuffySmokesTest {
         //rewritten:
         //Friends(a1,a2) => (!Smokes(a1) || Smokes(a2))  1.
         n.input("<<($1,$2) --> Friends> ==> (||,<$2 --> [Smokes]>,(--,<$1 --> [Smokes]>))>. %1.00;0.40%");
-        n.input("<<($1,$2) --> Friends> ==> (||,<$1 --> [Smokes]>,(--,<$2 --> [Smokes]>))>. %1.00;0.40%");
 
         //and contraposition:
         //!(!Smokes(a1) || Smokes(a2)) => !Friends(a1,a2)
         //(Smokes(a1) && !Smokes(a2)) => !Friends(a1,a2) 2.
         n.input("<(&&,<$1 --> [Smokes]>,(--,<$2 --> [Smokes]>)) ==> (--,<($1,$2) --> Friends>)>. %1.00;0.40%");
-        n.input("<(&&,<$2 --> [Smokes]>,(--,<$1 --> [Smokes]>)) ==> (--,<($1,$2) --> Friends>)>. %1.00;0.40%");
 
         //!Friends(a1,a2) || !Smokes(a2) || Smokes(a1)
         n.input("<<($1,$2) --> Friends> ==> (||,<$2 --> [Smokes]>,(--,<$1 --> [Smokes]>))>. %1.00;0.40%");
-        n.input("<<($1,$2) --> Friends> ==> (||,<$1 --> [Smokes]>,(--,<$2 --> [Smokes]>))>. %1.00;0.40%");
 
         //!Friends(a1,a2) || !Smokes(a1) || Smokes(a2)
         //rewritten2:
         //Smokes(a1) => (Smokes(a2) || !Friends(a1,a2))
         n.input("<<$1 --> [Smokes]> ==> (||,<$2 --> [Smokes]>,(--,<($1,$2) --> Friends>))>. %1.00;0.40%");
-        n.input("<<$2 --> [Smokes]> ==> (||,<$1 --> [Smokes]>,(--,<($1,$2) --> Friends>))>. %1.00;0.40%");
 
         //and contraposition:
         //!(Smokes(a2) || !Friends(a1,a2)) => !Smokes(a1)
         //(!Smokes(a2) && Friends(a1,a2)) => !Smokes(a1)
         n.input("<(&&,(--,<$2 --> [Smokes]>),<($1,$2) --> Friends>) ==> (--,<$1 --> [Smokes]>)>. %1.00;0.40%");
-        n.input("<(&&,(--,<$1 --> [Smokes]>),<($1,$2) --> Friends>) ==> (--,<$2 --> [Smokes]>)>. %1.00;0.40%");
 
         //!Friends(a1,a2) || !Smokes(a1) || Smokes(a2)
         //rewritten2:
         //!Smokes(a2) => (!Friends(a1,a2) || !Smokes(a1))
         n.input("<(--,<$2 --> [Smokes]>) ==> (||,(--,<($1,$2) --> Friends>),(--,<$1 --> [Smokes]>))>. %1.00;0.40%");
-        n.input("<(--,<$1 --> [Smokes]>) ==> (||,(--,<($1,$2) --> Friends>),(--,<$2 --> [Smokes]>))>. %1.00;0.40%");
 
         //and contraposition:
         //!(!Friends(a1,a2) || !Smokes(a1)) => Smokes(a2)
         //(Friends(a1,a2) && Smokes(a1)) => Smokes(a2)
         n.input("<(&&,<($1,$2) --> Friends>,<$1 -->  [Smokes]>) ==> <$2 --> [Smokes]>>.");
-        n.input("<(&&,<($1,$2) --> Friends>,<$2 --> [Smokes]>) ==> <$1 --> [Smokes]>>.");
+
+        //n.input("<#x --> [Cancer]>?");
 
     }
 
@@ -82,22 +101,30 @@ public class TuffySmokesTest {
     //public void testReasonableAnswers() {
     public static void main(String[] args) {
 
-        NAR n = new Default();
+        Global.DEBUG = true;
+
+        NAR n = new Default(1000, 4, 2, 3);
         //n.memory.activationRate.setValue(0.1f);
+        n.memory.conceptForgetDurations.setValue(5);
+
+        //n.log();
 
         axioms(n);
-        //n.run(1000);
+        n.run(1000);
 
         input(n);
-        //n.run(1000);
+        n.run(2000); question(n);
 
-        question(n);
+        n.run(2000); question(n);
 
-        NARide.loop(n, true);
+        n.run(2000); question(n);
+
+
+        //NARide.loop(n, true);
 
         //n.log();
         //n.log(System.out, k -> { System.out.println(k); return k.equals("eventAnswer"); } );
-        n.log(System.out, k -> k instanceof Twin);
+        //n.log(System.out, k -> k instanceof Twin);
 
         //n.run(5500);
 

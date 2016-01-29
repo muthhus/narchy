@@ -5,6 +5,7 @@ import nars.Global;
 import nars.Memory;
 import nars.guifx.demo.NARide;
 import nars.nar.Default;
+import nars.op.mental.Anticipate;
 import nars.rover.RoverWorld;
 import nars.rover.Sim;
 import nars.rover.robot.Rover;
@@ -41,7 +42,7 @@ public class SomeRovers {
         game.add(new Spider("spider",
                 3, 3, 0.618f, 30, 30));
                 {
-            int conceptsFirePerCycle = 5;
+            int conceptsFirePerCycle = 8;
             Default nar = new Default(
                     new Memory(clock, new MapIndex2(
                         new SoftValueHashMap())),
@@ -54,14 +55,16 @@ public class SomeRovers {
 //            nar.memory.DEFAULT_QUESTION_PRIORITY = 0.6f;
 //            nar.memory.DEFAULT_QUESTION_DURABILITY = 0.6f;
 
-            nar.initNAL9();
+            //nar.initNAL9();
+            nar.memory.the(new Anticipate(nar));
+
 
             //nar.memory.perfection.setValue(0.15f);
-            nar.core.confidenceDerivationMin.setValue(0.01f);
-            nar.core.activationRate.setValue(1f/conceptsFirePerCycle /* approxmimate */);
-            nar.memory.duration.set(5);
-            nar.memory.cyclesPerFrame.set(8);
-            nar.memory.shortTermMemoryHistory.set(5);
+            nar.core.confidenceDerivationMin.setValue(0.03f);
+            nar.core.activationRate.setValue(0.3f/conceptsFirePerCycle /* approxmimate */);
+            nar.memory.duration.set(4);
+            nar.memory.cyclesPerFrame.set(2);
+            nar.memory.shortTermMemoryHistory.set(3);
 
 
             boolean gui = true;

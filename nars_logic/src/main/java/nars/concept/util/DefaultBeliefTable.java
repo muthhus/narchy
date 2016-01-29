@@ -277,7 +277,7 @@ public class DefaultBeliefTable implements BeliefTable {
         //}
 
         //return input;
-        return revised!=null ? revised : input;
+        return input; //revised!=null ? revised : input;
     }
 
 

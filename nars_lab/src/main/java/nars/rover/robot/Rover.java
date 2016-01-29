@@ -32,9 +32,9 @@ public class Rover extends AbstractPolygonBot {
 
 
     //float tasteDistanceThreshold = 1.0f;
-    final static int retinaPixels = 8;
+    final static int retinaPixels = 16;
     final NALObjects objs;
-    int retinaRaysPerPixel = 12; //rays per vision sensor
+    int retinaRaysPerPixel = 6; //rays per vision sensor
     float aStep = (float) (Math.PI * 2f) / retinaPixels;
     float L = 25f; //vision distance
     Vec2 mouthPoint = new Vec2(2.7f, 0); //0.5f);
