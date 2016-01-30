@@ -140,8 +140,8 @@ public class TestNAR  {
         return this;
     }
 
-    @NotNull
-    public TestNAR inputAt(long time, String s) {
+    /** warning may not work with time=0 */
+    @NotNull public TestNAR inputAt(long time, String s) {
         finished = false;
         nar.inputAt(time, s);
         return this;

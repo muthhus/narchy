@@ -266,10 +266,10 @@ public class NAL8TestWorking extends AbstractNALTester {
     public void goal_deduction_2()  {
         TestNAR tester = test();
 
-        tester.input("goto({t001}). :\\: ");
-        tester.inputAt(7, "(goto($1)==>+2<(SELF,$1) --> at>). ");
+        tester.input("goto({t001}). :\\: "); //-5
+        tester.inputAt(7, "(goto($1) ==>+2 at:(SELF,$1)). ");
 
-        tester.mustBelieve(cycles, "<(SELF,{t001}) --> at>", 1.0f, 0.81f, -3);
+        tester.mustBelieve(cycles, "at:(SELF,{t001})", 1.0f, 0.81f, -3);
 
     }
 

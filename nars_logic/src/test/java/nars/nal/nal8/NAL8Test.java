@@ -37,7 +37,43 @@ public class NAL8Test extends AbstractNALTester {
                 -5);
     }
 
+    @Test
+    public void subsent_1_simpler()  {
+        TestNAR tester = test();
 
+        //TODO decide correct parentheses ordering
+
+        //tester.nar.log();
+        tester.input("[opened]:t1. :|:");
+        tester.inputAt(10, "(hold:t2 &&+5 (at:t1 &&+5 (open(t1) &&+5 [opened]:t1))).");
+
+        tester.mustBelieve(cycles, "(hold:t2 &&+5 (at:t1 &&+5 open(t1)))",
+                1.0f, 0.45f,
+                -5);
+    }
+    @Test
+    public void subsent_simultaneous()  {
+        TestNAR tester = test();
+
+        //TODO decide correct parentheses ordering
+
+        //tester.nar.log();
+        tester.input("[opened]:t1. :|:");
+        tester.inputAt(10, "(hold:t2 &&+0 (at:t1 &&+0 (open(t1) &&+0 [opened]:t1))).");
+
+        //TODO Narsese parser for this:
+//        tester.mustBelieve(cycles, "( &&+0 ,(t1-->at),(t2-->hold),(t1-->[opened]),open(t1))",
+//                1.0f, 0.90f,
+//                0);
+
+        tester.mustBelieve(cycles, "(&&, hold:t2, at:t1, open(t1)).",
+                1.0f, 0.42f,
+                0);
+
+//        tester.mustBelieve(cycles, "(hold:t2 &&+0 (at:t1 &&+0 open(t1))).",
+//                1.0f, 0.45f,
+//                0);
+    }
 
 
 

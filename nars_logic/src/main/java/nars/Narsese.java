@@ -502,6 +502,8 @@ public class Narsese extends BaseParser<Object> {
         );
     }
 
+//    public Rule ConjunctionParallel() {
+//    }
 
     public Rule TemporalRelation() {
         return seq(

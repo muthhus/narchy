@@ -145,13 +145,13 @@ public class NAL7Test extends AbstractNALTester {
         test()
         .input("(y ==>+3 x). :|:")
         .input("(y ==>+3 ?x)? :|:")
-        .mustAnswer(15, "(y ==>+3 x)", 1.00f, 0.47f, Tense.Present);
+        .mustAnswer(15, "(y ==>+3 x)", 1.00f, 0.90f, Tense.Present);
     }
     @Test public void testImplQueryTenseFuture() {
         test()
         .input("(y ==>+3 x). :\\:")
         .inputAt(20, "(y ==>+3 ?x)? :/:")
-        .mustAnswer(55, "(y ==>+3 x)", 1.00f, 0.47f, 25);
+        .mustAnswer(55, "(y ==>+3 x)", 1.00f, 0.79f, 25);
     }
 //    @Test public void testImplQuery2() {
 //        TestNAR t = test();
@@ -245,11 +245,11 @@ public class NAL7Test extends AbstractNALTester {
     @Test
     public void inference_on_tense_4()  {
         TestNAR tester = test();
-        tester.believe("(((John,key) --> hold) ==>+3 ((John,room) --> enter))", 1.0f, 0.9f);
+        tester.believe("(((John,key) --> hold) ==>+3 ((John,room) --> enter))");
         tester.input("<(John,room) --> enter>. :|:");
 
         tester.mustBelieve(cycles, "<(John,key) --> hold>",
-                1.00f, 0.45f, -3);
+                1.00f, 0.81f, -3);
     }
 
     @Test
@@ -349,31 +349,32 @@ public class NAL7Test extends AbstractNALTester {
                 5);
     }
 
-    @Test
-    public void induction_on_events_composition()  {
+    @Test public void induction_on_events_composition1()  {
+        compositionTest(1, 5);
+    }
+    @Test public void induction_on_events_composition2()  {
+        compositionTest(1, 7);
+    }
+    @Test public void induction_on_events_composition3()  {
+        compositionTest(4, 3);
+    }
+
+    private void compositionTest(int t, int dt) {
         TestNAR tester = test();
-
-
-        //the 5's here are used in different ways but must match exactly for this result.
-        //if '+4' is used in the input implication then it creates a variance
-        //that demonstrates the need for interpolation, binning, or thresholding of time values
-
-        tester.input("<(John,key) --> hold>. :|:");
-        tester.input("(open:(John,door) ==>+5 enter:(John,room)). :|:");
+        tester.inputAt(t, "<(John,key) --> hold>. :|:");
+        tester.inputAt(t, "(open:(John,door) ==>+" + dt + " enter:(John,room)). :|:");
 
         tester.mustBelieve(cycles, "(hold:(John,key) &&+0 open:(John,door))",
                 1.00f, 0.73f,
-                0);
+                t);
 
         tester.mustBelieve(cycles, "enter:(John,room)",
                 1.00f, 0.81f,
-                5);
+                t+dt);
 
-        tester.mustBelieve(cycles, "((hold:(John,key) && open:(John,door)) ==>+5 enter:(John,room))",
+        tester.mustBelieve(cycles, "((hold:(John,key) && open:(John,door)) ==>+" + dt + " enter:(John,room))",
                 1.00f, 0.34f,
-                0);
-
-
+                t);
     }
 
     @Test
@@ -395,12 +396,12 @@ public class NAL7Test extends AbstractNALTester {
         TestNAR tester = test();
 
 
-        tester.input("(<({t002},#1) --> on> &&+0 <(SELF,#1) --> at>). :|:");
-        tester.inputAt(10, "((<($1,#2) --> on> &&+0 <(SELF,#2) --> at>) ==>+0 <(SELF,$1) --> reachable>).");
+        tester.input("(on:({t002},#1) &&+0 at:(SELF,#1)). :|:");
+        tester.inputAt(10, "((on:($1,#2) &&+0 at:(SELF,#2)) ==>+0 reachable:(SELF,$1)).");
 
-        tester.mustBelieve(cycles, "<(SELF,$1) --> reachable>",
+        tester.mustBelieve(cycles, "reachable:(SELF,$1)",
                 1.0f, 0.81f, 0);
-        tester.mustBelieve(cycles, "<(SELF,{t002}) --> reachable>",
+        tester.mustBelieve(cycles, "reachable:(SELF,{t002})",
                 1.0f, 0.81f, 0);
 
     }
