@@ -346,6 +346,11 @@
     (U --> L), ((&&,(#X --> L),(#X --> R)) ==> Z), dt(belief) |- ((U --> R) ==> Z), (Belief:Deduction)
 
 
+//    B, (A ==> C) |-  substituteIfUnifies( C, "$",A,B), (Belief:Deduction, Order:ForAllSame, Event:Anticipate)
+//    B, (C ==> A) |-  substituteIfUnifies( C, "$",A,B), (Belief:Abduction, Order:ForAllSame)
+
+    B, (A <=> C) |- substituteIfUnifies( C, "$",A,B), (Belief:Deduction, Order:ForAllSame)
+    B, (C <=> A) |- substituteIfUnifies( C, "$",A,B), (Belief:Deduction, Order:ForAllSame)
 
 //// second level variable handling rules ////////////////////////////////////////////////////////////////////////////////////
 //second level variable elimination (termlink level2 growth needed in order for these rules to work)

@@ -16,7 +16,7 @@ import java.util.function.Supplier;
 @RunWith(Parameterized.class)
 public class NAL7Test extends AbstractNALTester {
 
-    final int cycles = 60;
+    final int cycles = 460;
 
     public NAL7Test(Supplier<NAR> b) {
         super(b);
@@ -359,18 +359,26 @@ public class NAL7Test extends AbstractNALTester {
 
     private void compositionTest(int t, int dt) {
         TestNAR tester = test();
-        tester.inputAt(t, "<(John,key) --> hold>. :|:");
+
+        tester.inputAt(t, "hold:(John,key). :|:");
         tester.inputAt(t, "(open:(John,door) ==>+" + dt + " enter:(John,room)). :|:");
 
-        tester.mustBelieve(cycles, "(hold:(John,key) &&+0 open:(John,door))",
+        String component = "(hold:(John,key) &&+0 open:(John,door))";
+
+        tester.mustBelieve(cycles, component,
                 1.00f, 0.73f,
                 t);
+//
+//        tester.mustBelieve(cycles, "open:(John,door)",
+//                1.00f, 0.81f,
+//                t);
+//
+//        tester.mustBelieve(cycles, "enter:(John,room)",
+//                1.00f, 0.81f,
+//                t+dt);
 
-        tester.mustBelieve(cycles, "enter:(John,room)",
-                1.00f, 0.81f,
-                t+dt);
 
-        tester.mustBelieve(cycles, "((hold:(John,key) && open:(John,door)) ==>+" + dt + " enter:(John,room))",
+        tester.mustBelieve(cycles, "(" + component + " ==>+" + dt + " enter:(John,room))",
                 1.00f, 0.34f,
                 t);
     }
