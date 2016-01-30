@@ -6,11 +6,11 @@
   "directory": "lib/",
   "dependencies": {
 	"jquery":"latest",
+    "jquery-ui":"latest",
 	"lodash":"latest",
     "cytoscape":"latest",
     "cytoscape-edgehandles": "latest",
-    "semantic": "latest",
-    "interact": "latest"
+    "semantic": "latest"
   },
   "keywords": [
     "nars",

@@ -11,10 +11,10 @@ function NodeFrame(spacegraph) {
     };
 
     var frameVisible = false;
-    var frameTimeToFade = 2000; //ms
+    var frameTimeToFade = 1000; //ms
     var frameHiding = -1;
     var frameNodePixelScale = 300;
-    var frameNodeScale = 1.25;
+    var frameNodeScale = 1.15;
     var frameEleNode = null;
     var frameEleResizing = false;
 
@@ -132,8 +132,8 @@ function NodeFrame(spacegraph) {
             }
         });
 
-        //var se = $('#nodeframe #resizeSE');
-        interact('#nodeframe #resizeSE').draggable({
+        var se = $('#nodeframe #resizeSE');
+        se.draggable({
                         revert: true,
                         helper: "clone",
                         appendTo: '#nodeframe #resizeSE',
@@ -141,6 +141,8 @@ function NodeFrame(spacegraph) {
 
                         //http://api.jqueryui.com/draggable/#event-drag
                         start: function (event, ui) {
+
+
                             var node = frameEleNode;
 
                             if (!node)

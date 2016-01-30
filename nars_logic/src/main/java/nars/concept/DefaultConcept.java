@@ -249,6 +249,7 @@ public class DefaultConcept extends AtomConcept {
 
         Task goal = goals().add(inputGoal, nar);
 
+
         if (goal.expectation() > Global.EXECUTION_DESIRE_EXPECTATION_THRESHOLD) {
 
             float delta = updateSuccess(goal, successBefore, memory);

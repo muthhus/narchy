@@ -12,6 +12,8 @@ import nars.rover.obj.VisionRay;
 import nars.task.Task;
 import nars.task.in.ChangedTextInput;
 import nars.truth.Truth;
+import nars.util.Texts;
+import nars.util.data.Util;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.Vec2;
@@ -19,8 +21,6 @@ import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.Fixture;
-
-import static nars.rover.Sim.f5;
 
 /**
  * Triangular mobile vehicle
@@ -32,9 +32,9 @@ public class Rover extends AbstractPolygonBot {
 
 
     //float tasteDistanceThreshold = 1.0f;
-    final static int retinaPixels = 16;
+    final static int retinaPixels = 8;
     final NALObjects objs;
-    int retinaRaysPerPixel = 6; //rays per vision sensor
+    int retinaRaysPerPixel = 2; //rays per vision sensor
     float aStep = (float) (Math.PI * 2f) / retinaPixels;
     float L = 25f; //vision distance
     Vec2 mouthPoint = new Vec2(2.7f, 0); //0.5f);
@@ -197,8 +197,12 @@ public class Rover extends AbstractPolygonBot {
 
 
         //feltMotion.set("(&&+0, speed:{" + f5(linSpeed) + "},angle:{" + torsoAngle + "},rotation:{" + angDir + "," + f5(angSpeed) + "}). :|:");
-        feltMotion.set("speed:{" + f5(linSpeed) + "}. :|:");
-        feltAngle.set("angle:{" + torsoAngle + "}. :|:");
+
+        float speedFreq = linSpeed < 0.1 ? 0 : Util.clamp(0.5f + (float)(linSpeed/linearThrustPerCycle/1.25f));
+        //System.out.println(linSpeed +  " " + speedFreq);
+        feltMotion.set("speed:linear. %" + Texts.n2(speedFreq) + "|0.95%");
+
+        feltAngle.set("angle:" + torsoAngle + ". :|:");
         //feltMotion.set("rotation:{\" + angDir + \",\" + f5(angSpeed) + \"}. :|:");
 
 
@@ -237,29 +241,43 @@ public class Rover extends AbstractPolygonBot {
             rover.rotateRelative(0);
         }
 
-        public Truth forward(boolean forward) {
+        private Truth forward(boolean forward) {
             Task c = MethodOperator.invokingTask();
             float thrust = c!=null ? c.expectation() : 1;
             if (!forward) thrust = -thrust;
             return rover.thrustRelative(thrust);
         }
 
-        public Truth rotate(boolean left) {
+        private Truth rotate(boolean left) {
             Task c = MethodOperator.invokingTask();
             float thrust = c!=null ? c.expectation() : 1;
             if (left) thrust = -thrust;
             return rover.rotateRelative(thrust);
         }
 
-        public void random() {
+        public Truth left() { return rotate(true); }
+        public Truth right() { return rotate(false); }
+        public Truth forward() { return forward(true); }
+        public Truth backward() { return forward(false); }
+
+        public Task random() {
+            Task c = MethodOperator.invokingTask();
+
+            //TODO dont parse these proxy tasks, its slow
             switch ((int)(5 * Math.random())) {
-                case 0: forward(true);  break;
-                case 1: forward(false);  break;
-                case 2: rotate(true);  break;
-                case 3: rotate(false);  break;
-                case 4: stop();  break;
+                case 0:
+                    return rover.nar.task("MotorControls(forward,motor,())! :|: " + c.truth());
+                case 1:
+                    return rover.nar.task("MotorControls(backward,motor,())! :|: " + c.truth());
+                case 2:
+                    return rover.nar.task("MotorControls(left,motor,())! :|: " + c.truth());
+                case 3:
+                    return rover.nar.task("MotorControls(right,motor,())! :|: " + c.truth());
+                case 4:
+                    return rover.nar.task("MotorControls(stop,motor,())! :|: " + c.truth());
             }
 
+            return null;
         }
     }
 

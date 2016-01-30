@@ -94,7 +94,7 @@ public class Default extends AbstractNAR {
     public TaskPerception initInput() {
 
         return new SetTaskPerception(
-                memory, this::process, BudgetMerge.plusDQDominant);
+                memory, this::process, BudgetMerge.plusDQBlend);
 
         /* {
             @Override
@@ -128,7 +128,7 @@ public class Default extends AbstractNAR {
     public Bag<Concept> newConceptBag(int initialCapacity) {
         return new CurveBag<Concept>(initialCapacity, rng)
                 //.mergePlus();
-                .merge(BudgetMerge.plusDQDominant);
+                .merge(BudgetMerge.plusDQBlend);
     }
 
 //    public Bag<Concept> newConceptBagAggregateLinks(int initialCapacity) {

@@ -3,8 +3,6 @@ package nars.java;
 import com.github.drapostolos.typeparser.TypeParser;
 import nars.Global;
 import nars.Op;
-import nars.nal.nal8.Execution;
-import nars.nal.nal8.operator.TermFunction;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
@@ -23,8 +21,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Created by me on 8/19/15.
  */
-public class MethodOperator extends TermFunction {
-
+public class MethodOperator  {
 
     static final TypeParser parser = TypeParser.newBuilder().build();
 
@@ -40,12 +37,19 @@ public class MethodOperator extends TermFunction {
     //public static final Atom ERROR = Atom.the("ERR");
 
     @Nullable
-    private static final ThreadLocal<Task> currentTask = new ThreadLocal();
+    public static final ThreadLocal<Task> currentTask = new ThreadLocal();
 
     private static final boolean strict = false;
 
     public MethodOperator(AtomicBoolean enable, @NotNull Method m, NALObjects context) {
-        super(getParentMethodName(m));
+        //super(getParentMethodName(m));
+        /*
+            Class<?> sc = m.getDeclaringClass();
+
+            String superClass = sc.getSimpleName();
+            String methodName = m.getName();
+            return (superClass + '_' + methodName);
+         */
 
         this.context = context;
         method = m;
@@ -57,29 +61,19 @@ public class MethodOperator extends TermFunction {
         return currentTask.get();
     }
 
-    @NotNull
-    private static String getParentMethodName(@NotNull Method m) {
-        Class<?> sc = m.getDeclaringClass();
+//    @NotNull
+//    private static String getParentMethodName(@NotNull Method m) {
+//        Class<?> sc = m.getDeclaringClass();
+//
+//        String superClass = sc.getSimpleName();
+//        String methodName = m.getName();
+//        return (superClass + '_' + methodName);
+//    }
 
-        String superClass = sc.getSimpleName();
-        String methodName = m.getName();
-        return (superClass + '_' + methodName);
-    }
 
-    @Override
-    public void execute(@NotNull Execution e) {
-        ThreadLocal<Task> localTask = MethodOperator.currentTask;
-
-        localTask.set(e.task); //HACK
-
-        super.execute(e);
-
-        localTask.set(null);
-    }
 
 
     @Nullable
-    @Override
     public Object function(@NotNull Compound o, TermBuilder ti) {
 
         if (!enable.get())
@@ -90,12 +84,12 @@ public class MethodOperator extends TermFunction {
         int pc = method.getParameterCount();
         int requires, paramOffset;
         if (Modifier.isStatic(method.getModifiers())) {
-            requires = 1;
-            paramOffset = 0;
-        }
-        else {
             requires = 1 + 1;
             paramOffset = 1;
+        }
+        else {
+            requires = 1 + 1 + 1;
+            paramOffset = 2;
         }
 
         if (x.length < requires) {
@@ -105,7 +99,7 @@ public class MethodOperator extends TermFunction {
                 return null;
         }
 
-        Object instance = paramOffset == 0 ? null : context.object(x[0]);
+        Object instance = paramOffset == 0 ? null : context.object(x[paramOffset-1]);
         NALObjects ctx = this.context;
 
         Object[] args;
@@ -162,8 +156,8 @@ public class MethodOperator extends TermFunction {
 
 
             if (feedback) {
-                if (result instanceof Truth)
-                    return result; //raw truth value
+                if ((result instanceof Truth) || (result instanceof Task))
+                    return result; //raw truth value or task
                 else
                     return ctx.term(result); //termize it
             } else {

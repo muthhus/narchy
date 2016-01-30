@@ -646,7 +646,8 @@ public class PremiseRule extends GenericCompound implements Level {
         Term B = getBeliefTermPattern();
         Term C = getConclusionTermPattern();
 
-        //      B, T, [pre], task_is_question() |- T, [post]
+        ////      B, T, [pre], task_is_question() |- T, [post]
+        //      B, T, [pre], task_is_question() |- C, [post]
 
         return clone(B, T, C, false);
     }

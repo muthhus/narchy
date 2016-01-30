@@ -21,8 +21,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -61,6 +59,8 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
 //            .concurrencyLevel(4).weakKeys().makeMap();
     //final HashBiMap<Object,Term> instances = new HashBiMap();
     final MutableMap<Class, ProxyFactory> proxyCache = new UnifiedMap().asSynchronized();
+
+    final Map<Class, ClassOperator> classOps = Global.newHashMap();
     final Map<Method, MethodOperator> methodOps = Global.newHashMap();
     /**
      * non-null if the method is being invoked by NARS,
@@ -71,8 +71,8 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
     /**
      * cache
      */
-    final Map<Method, Operator> methodOperators = new HashMap();
-    private final NAR nar;
+    //final Map<Method, Operator> methodOperators = new HashMap();
+    public final NAR nar;
 
     //    /** for method invocation result beliefs  */
 //    private float invocationResultFreq = 1f;
@@ -191,15 +191,16 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
 //            return result;
 //        }
 
-        Term effect = term(result);
-
-        //TODO re-use static copy for 'VOID' and null-returning instances
-        if (invokingGoal != null) {
-            InvocationResult ir = new InvocationResult(effect);
-            ((MutableTask)invokingGoal).because(ir);
-        }
+        //Term effect = term(result);
 
         Task volitionTask = volition.get();
+
+        //TODO re-use static copy for 'VOID' and null-returning instances
+//        if (invokingGoal != null) {
+//            InvocationResult ir = new InvocationResult(volitionTask, effect);
+//            ((MutableTask)invokingGoal).because(ir);
+//        }
+
 
         if (volitionTask == null) {
 
@@ -244,10 +245,10 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
         return Stream.of(args).map(this::term).toArray(Term[]::new);
     }
 
-    @Override
-    public Operator getOperator(Method m) {
-        return methodOperators.computeIfAbsent(m, NALObjects::getMethodOperator);
-    }
+//    @Override
+//    public Operator getOperator(Method m) {
+//        return methodOperators.computeIfAbsent(m, NALObjects::getMethodOperator);
+//    }
 
 //    //TODO use a generic Consumer<Task> for recipient/recipients of these
 //    public final NAR nar;
@@ -306,16 +307,11 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
 
         T wrappedInstance = the(identifier, (T)clazz.getConstructors()[0].newInstance(args));
 
-        //add operators for public methods
-        for (Method m : instance.getMethods()) {
-            if (isMethodVisible(m) && Modifier.isPublic(m.getModifiers())) {
-                methodOps.computeIfAbsent(m, M -> {
-                    MethodOperator mo = new MethodOperator(goalInvoke, M, this);
-                    nar.onExec(mo);
-                    return mo;
-                });
-            }
-        }
+        ClassOperator co = classOps.computeIfAbsent(instance, i -> {
+            ClassOperator co2 = new ClassOperator(i, goalInvoke, NALObjects.this);
+            nar.onExec(co2);
+            return co2;
+        });
 
         onInstanceOfClass(identifier, term(instance));
 
@@ -358,6 +354,9 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
     @Nullable
     @Override
     public final Object invoke(Object obj, @NotNull Method wrapped, @NotNull Method wrapper, Object[] args) throws Throwable {
+
+        if (methodExclusions.contains(wrapped.getName()))
+            return wrapper.invoke(obj, args);
 
         Task invokingGoal = MethodOperator.invokingTask();
 
@@ -418,15 +417,17 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
 
     public static class InvocationResult {
         public final Term value;
+        private final Task volition;
 
-        public InvocationResult(Term value) {
+        public InvocationResult(Task volition, Term value) {
             this.value = value;
+            this.volition = volition;
         }
 
         @NotNull
         @Override
         public String toString() {
-            return "Puppet";
+            return volition + "->" + value; //"Puppet";
         }
     }
 

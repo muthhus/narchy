@@ -298,11 +298,14 @@ public class VisionRay implements AbstractPolygonBot.Sense, SwingDraw.LayerDraw 
 
         //  }
         Termed tt =
-            $.inh($.p(angleTerm, $.the(Sim.f5(dist))), $.the(material));
+            //$.inh($.p(angleTerm, $.the(Sim.f5(dist))), $.the(material));
+            $.prop(angleTerm, $.the(material));
+
+        float freq = 0.5f + 0.5f / (1+ dist );
 
         abstractPolygonBot.nar.input(
                 new MutableTask(tt).belief().present(abstractPolygonBot.nar.memory).
-                        truth(1f, conf));
+                        truth(freq, conf));
     }
 
     public void onTouch(Body hit, float di) {

@@ -26,12 +26,12 @@ public interface Premise extends Level, Tasked {
      *
      * @param varType The varType of variable that can be substituted
      * @param t       The first and second term as an array, which will have been modified upon returning true
-     * @return Whether the unification is possible.  't' will refer to the unified terms
      * <p>
      * only sets the values if it will return true, otherwise if it returns false the callee can expect its original values untouched
      */
-    static void unify(@NotNull Op varType, @NotNull Term a, @NotNull Term b, @NotNull Memory memory, @NotNull Consumer<Term> solution) {
-        new UnifySubst(varType, memory, a, b, solution);
+    static int unify(@NotNull Op varType, @NotNull Term a, @NotNull Term b, @NotNull Memory memory, @NotNull Consumer<Term> solution) {
+        UnifySubst u = new UnifySubst(varType, memory, a, b, solution);
+        return u.matches();
     }
 
 
@@ -547,6 +547,7 @@ public interface Premise extends Level, Tasked {
         @NotNull
         private final Term b;
         private final Consumer<Term> solution;
+        int matches = 0;
 
         public UnifySubst(Op varType, @NotNull Memory memory, @NotNull Term a, @NotNull Term b, Consumer<Term> solution) {
             super(varType, memory.random);
@@ -555,6 +556,10 @@ public interface Premise extends Level, Tasked {
             this.b = b;
             this.solution = solution;
             matchAll(a, b);
+        }
+
+        public int matches() {
+            return matches;
         }
 
         @Override public boolean onMatch() {
@@ -595,7 +600,9 @@ public interface Premise extends Level, Tasked {
             //t[0] = aa;
             //t[1] = bb;
 
+
             solution.accept(bb);
+            matches++;
 
             return true; //determines how many
         }

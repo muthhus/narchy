@@ -66,20 +66,32 @@ public final class ConceptProcess implements Premise {
 
         Task task = taskLink.get();
         Term tel = termLink.get().term();
-        if (tel!=null) /*&& (task.term().hasVarQuery()))*/ {
-             Premise.unify(Op.VAR_QUERY, task.term(), tel, nar.memory, (u) -> {
-                 if (!tel.equals(u)) {
-                     fireAll(nar, concept, taskLink, termLink, u, cp);
-                 }
-             });
+
+        int n = 0;
+        if ((tel!=null) && /*&& (task.term().hasVarQuery()))*/
+            (task.term().hasAny(Op.VAR_QUERY)) /*|| tel.hasAny(Op.VAR_QUERY))*/) {
+            n += Premise.unify(Op.VAR_QUERY, task.term(), tel, nar.memory, (u) -> {
+
+                Task belief = fireAll(nar, concept, taskLink, termLink, u, cp);
+
+                //Answers questions containing query variable that have been matched
+                if (belief != null && task.isQuestOrQuestion() && !belief.isQuestOrQuestion())
+                    nar.memory.onSolve(task, belief);
+            });
         }
 
-        fireAll(nar, concept, taskLink, termLink, tel, cp);
 
-        return 1; //HACK
+        if (n == 0) {
+            fireAll(nar, concept, taskLink, termLink, tel, cp);
+            n++;
+        }
+
+
+        return n; //HACK
     }
 
-    public static void fireAll(@NotNull NAR nar, BLink<? extends Concept> concept, @NotNull BLink<? extends Task> taskLink, @NotNull BLink<? extends Termed> termLink, Term beliefTerm, @NotNull Consumer<ConceptProcess> cp) {
+    /** returns the corresponding belief task */
+    public static Task fireAll(@NotNull NAR nar, BLink<? extends Concept> concept, @NotNull BLink<? extends Task> taskLink, @NotNull BLink<? extends Termed> termLink, Term beliefTerm, @NotNull Consumer<ConceptProcess> cp) {
         Concept beliefConcept = nar.concept(beliefTerm);
 
         Task belief = null;
@@ -102,6 +114,8 @@ public final class ConceptProcess implements Premise {
 
         cp.accept(new ConceptProcess(nar, concept,
                 taskLink, termLink, belief));
+
+        return belief;
     }
 
 //    /**

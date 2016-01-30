@@ -42,7 +42,7 @@ public class SomeRovers {
         game.add(new Spider("spider",
                 3, 3, 0.618f, 30, 30));
                 {
-            int conceptsFirePerCycle = 8;
+            int conceptsFirePerCycle = 3;
             Default nar = new Default(
                     new Memory(clock, new MapIndex2(
                         new SoftValueHashMap())),
@@ -60,11 +60,12 @@ public class SomeRovers {
 
 
             //nar.memory.perfection.setValue(0.15f);
-            nar.core.confidenceDerivationMin.setValue(0.03f);
-            nar.core.activationRate.setValue(0.3f/conceptsFirePerCycle /* approxmimate */);
-            nar.memory.duration.set(4);
-            nar.memory.cyclesPerFrame.set(2);
-            nar.memory.shortTermMemoryHistory.set(3);
+            nar.core.confidenceDerivationMin.setValue(0.01f);
+            nar.core.activationRate.setValue(0.6f/conceptsFirePerCycle /* approxmimate */);
+            nar.memory.duration.set(2);
+            nar.memory.cyclesPerFrame.set(16);
+            nar.memory.shortTermMemoryHistory.set(2);
+            //nar.memory.executionExpectationThreshold.setValue(0.95f);
 
 
             boolean gui = true;

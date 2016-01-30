@@ -56,23 +56,26 @@
 
     s.addChannel(new Channel({
             nodes: [{
-                width: 64,
-                height: 64,
+                width: 32,
+                height: 32,
+                style: {
+                    shape: 'hexagon'
+                },
                 widget: {
-                    html: '<div style="width: 100%; height: 100%;"><div contenteditable="true" class="editable">...</div><br/></div>',
-                    style: {},
+                    html: '<div style="width: 100%;"><div contenteditable="true" class="editable">...</div><br/></div>',
+                    style: { },
                     scale: 0.9,
                     minPixels: 8,
-                    pixelScale: 200
+                    pixelScale: 100
                 }
             }]
         }));
     s.addChannel(new Channel({
             nodes: [{
-                width: 64,
-                height: 64,
+                width: 128,
+                height: 128,
                 widget: {
-                    html: '<iframe width="560" height="315" src="https://www.youtube.com/embed/vDpGq4QWyUs" frameborder="0" allowfullscreen></iframe>',
+                    html: '<iframe width="100%" height="100%" src="/terminal.html"></iframe>',
                     style: {},
                     scale: 0.8,
                     minPixels: 8,

@@ -22,6 +22,7 @@ package nars;
 
 
 import com.gs.collections.api.tuple.Twin;
+import com.gs.collections.impl.tuple.Tuples;
 import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
 import nars.budget.BudgetMerge;
@@ -231,10 +232,12 @@ public class Memory extends Param {
         int taskLinkBagSize = 32;
 
         Bag<Task> taskLinks =
-                new CurveBag<Task>(taskLinkBagSize, random).merge(BudgetMerge.avg);
+                new CurveBag<Task>(taskLinkBagSize, random)
+                        .merge(BudgetMerge.plusDQBlend);
 
         Bag<Termed> termLinks =
-                new CurveBag<Termed>(termLinkBagSize, random).merge(BudgetMerge.plusDQBlend);
+                new CurveBag<Termed>(termLinkBagSize, random)
+                        .merge(BudgetMerge.plusDQBlend);
 
         return (t instanceof Atom) ?
 
@@ -575,6 +578,16 @@ public class Memory extends Param {
             return subterm.anonymous();
         }
     };
+
+    /** called when a solution is found */
+    public void onSolve(Task question, Task solution) {
+
+        //TODO use an Answer class which is Runnable, combining that with the Twin info
+        if (Global.DEBUG_NON_INPUT_ANSWERED_QUESTIONS || question.isInput()) {
+            eventAnswer.emit(Tuples.twin(question, solution));
+        }
+
+    }
 
 
     //    public byte[] toBytes() throws IOException, InterruptedException {

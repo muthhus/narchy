@@ -278,6 +278,11 @@ public enum $  {
         return new MutableTask(term).goal().truth(freq, conf);
     }
 
+//    @NotNull
+//    public static MutableTask task(@NotNull String s, Memory m) {
+//        return Narsese.the().task(s, m);
+//    }
+
     @NotNull
     public static Compound sete(@NotNull Collection<? extends Term> t) {
         return (Compound) terms.finish(SET_EXT, -1, TermSet.the(t));

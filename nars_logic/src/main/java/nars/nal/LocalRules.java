@@ -20,8 +20,10 @@
  */
 package nars.nal;
 
-import com.gs.collections.impl.tuple.Tuples;
-import nars.*;
+import nars.Memory;
+import nars.NAR;
+import nars.Op;
+import nars.Premise;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.budget.UnitBudget;
@@ -145,11 +147,7 @@ public enum LocalRules {
 
             if (validSolution!=null) {
 
-
-                //TODO use an Answer class which is Runnable, combining that with the Twin info
-                if (Global.DEBUG_NON_INPUT_ANSWERED_QUESTIONS || question.isInput()) {
-                    memory.eventAnswer.emit(Tuples.twin(question, validSolution));
-                }
+                memory.onSolve(question, validSolution);
 
                 //System.out.println("\twith: " + validSolution);
 

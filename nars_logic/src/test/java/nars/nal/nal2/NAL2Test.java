@@ -203,6 +203,8 @@ public class NAL2Test extends AbstractNALTester {
     @Test
     public void backwardInference() throws Narsese.NarseseException {
         TestNAR tester = test();
+
+        //<bird --> swimmer>. <{?x} --> swimmer>?
         tester.believe("<bird --> swimmer>");//Bird is a type of swimmer. ");
         tester.ask("<{?x} --> swimmer>");//What is a swimmer?");
         tester.mustOutput(cycles, "<{?1} --> bird>?");//What is a bird?");

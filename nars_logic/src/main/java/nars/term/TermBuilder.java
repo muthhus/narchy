@@ -649,10 +649,10 @@ public interface TermBuilder {
         if (f.isEmpty()) {
             return fullMatch ? null : src;
         }
-//
-// Term y = f.getXY(src);
-//        if (y!=null)
-//            return y;
+
+        Term y = f.getXY(src);
+        if (y!=null)
+            return y;
 
         int len = src.size();
 

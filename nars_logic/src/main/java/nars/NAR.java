@@ -463,6 +463,7 @@ public abstract class NAR implements Level,Consumer<Task> {
      * @return number of invoked handlers
      */
     public final int execute(@NotNull Task goal) {
+
         Term operation = goal.term();
 
         if (Op.isOperation(operation)) {

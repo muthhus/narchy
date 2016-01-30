@@ -26,31 +26,32 @@ public class AnticipationTest {
         TestNAR t = new TestNAR(d);
         t.input("(<a --> b> ==>+8 <b --> c>).");
         t.input("<a --> b>. :|:");
-        t.mustBelieve(55, "(<a --> b> ==>+8 <b --> c>)", 0f, 0.45f, 0); // :\:
-        t.mustBelieve(55, "(<a --> b> ==>+8 <b --> c>)", 0.92f, 0.91f, 0);  // :\:
+        //t.mustBelieve(55, "(--,(<a --> b> ==>+8 <b --> c>))", 1f, 0.45f, 0); // :\:
+        t.mustBelieve(55, "(--,(b-->c)).", 1f, 0.9f, 8);
+        //t.mustBelieve(55, "(<a --> b> ==>+8 <b --> c>)", 0.92f, 0.91f, 0);  // :\:
         t.test();
     }
 
-    @Test
-    public void testAnticipation2() {
-        /*
-        <(&/,<a --> b>,+3) =/> <b --> c>>.
-        <a --> b>. :|:
-        5
-        <b --> c>. :|:
-        20
-        ''outputMustContain('<(&/,<a --> b>,+3) =/> <b --> c>>. :|: %1.00;0.91%')
-        */
-        NAR d = new Default();
-        new Anticipate(d);
-
-        TestNAR t = new TestNAR(d);
-        t.input("(<a --> b> ==>+8 <b --> c>).");
-        t.input("<a --> b>. :|:");
-        t.inputAt(5, "<b --> c>. :|:");
-        t.mustBelieve(55, "(<a --> b> ==>+8 <b --> c>)", 1f, 0.90f, 0); // :\:
-        t.test();
-
-    }
+//    @Test
+//    public void testAnticipation2() {
+//        /*
+//        <(&/,<a --> b>,+3) =/> <b --> c>>.
+//        <a --> b>. :|:
+//        5
+//        <b --> c>. :|:
+//        20
+//        ''outputMustContain('<(&/,<a --> b>,+3) =/> <b --> c>>. :|: %1.00;0.91%')
+//        */
+//        NAR d = new Default();
+//        new Anticipate(d);
+//
+//        TestNAR t = new TestNAR(d);
+//        t.input("(<a --> b> ==>+8 <b --> c>).");
+//        t.input("<a --> b>. :|:");
+//        t.inputAt(5, "<b --> c>. :|:");
+//        t.mustBelieve(55, "(<a --> b> ==>+8 <b --> c>)", 1f, 0.90f, 5); // :\:
+//        t.test();
+//
+//    }
 
 }

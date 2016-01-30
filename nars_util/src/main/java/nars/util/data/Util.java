@@ -773,4 +773,23 @@ public enum Util {
         else
             throw new RuntimeException("out of bounds");
     }
+
+    /** clamps output to 0..+1.  y=0.5 at x=0 */
+    public static float sigmoid(float v) {
+        return 1f / (1f + (float)Math.exp(-v));
+    }
+
+    public static float sigmoidDiff(float a, float b) {
+        float sum = a + b;
+        float delta = a - b;
+        float deltaNorm = delta / sum;
+        return sigmoid(deltaNorm);
+    }
+
+    public static float sigmoidDiffAbs(float a, float b) {
+        float sum = a + b;
+        float delta = Math.abs(a - b);
+        float deltaNorm = delta / sum;
+        return sigmoid(deltaNorm);
+    }
 }

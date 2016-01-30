@@ -560,8 +560,9 @@ function spacegraph(targetWrapper, opt) {
     s.nodeProcessor = [];
 
     s.updateNode = function(n) {
-        for (var i = 0; i < this.nodeProcessor.length; i++)
-            s.nodeProcessor[i].apply(n);
+        var np = s.nodeProcessor;
+        for (var i = 0; i < np.length; i++)
+            vp[i].apply(n);
     };
 
     s.updateChannel = function(c) {

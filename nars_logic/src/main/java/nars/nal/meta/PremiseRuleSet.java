@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -242,14 +243,24 @@ public class PremiseRuleSet {
 
                 PremiseRule r = add(ur, preNorm, src, index);
 //
-//                if (r.allowBackward) {
-//                    addQuestions(ur, r, src, index);
-//
-//                    PremiseRule f = r.forwardPermutation();
-//                    //if (r.allowBackward)
-//                        addQuestions(ur, f, src, index);
-//                    add(ur, f, src, index);
-//                }
+                if (r.allowBackward) {
+
+                    //System.err.println("r: " + r);
+
+                    BiConsumer<PremiseRule, String> eachQuestion = (q, reason) ->
+                            //System.err.println("  q: " + q + " " + reason);
+                            add(ur, q, src + "//" + reason, index);
+
+                    r.forEachQuestionReversal(eachQuestion);
+
+                    PremiseRule f = r.forwardPermutation();
+                    //System.err.println("  f: " + f);
+
+                        //addQuestions(ur, f, src, index);
+                    f.forEachQuestionReversal(eachQuestion);
+
+                    add(ur, f, src, index);
+                }
 
 
             } catch (Exception ex) {
@@ -263,7 +274,8 @@ public class PremiseRuleSet {
 
     private static void addQuestions(@NotNull Collection<PremiseRule> target, @NotNull PremiseRule r, String src, @NotNull PatternIndex patterns) {
 
-        r.forEachQuestionReversal((q,reason) -> add(target, q, src + "//" + reason, patterns));
+        r.forEachQuestionReversal((q,reason) ->
+                add(target, q, src + "//" + reason, patterns));
 
      }
 

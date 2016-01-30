@@ -235,6 +235,11 @@ public abstract class TermFunction<O> extends SyncOperator {
 
 
         if (y instanceof Task) {
+            Task ty = (Task)y;
+            if (ty.pri() == 0) {
+                //set a resulting zero budget to the input task's
+                ty.budget().set(opTask.budget());
+            }
             e.feedback( (Task)y );
             return;
         }

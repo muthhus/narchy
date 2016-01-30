@@ -9,7 +9,6 @@ import nars.nal.meta.PremiseMatch;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Termed;
-import nars.term.Terms;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -73,9 +72,14 @@ public class Derivelet {
             for (BLink<? extends Termed> termLink : terms) {
                 if (termLink == null) break;
 
-                if (!Terms.equalSubTermsInRespectToImageAndProduct(taskLinkTerm, termLink.get().term()))
+//                if (!Terms.equalSubTermsInRespectToImageAndProduct(taskLinkTerm, termLink.get().term()))
                     ConceptProcess.fireAll(
                         nar, conceptLink, taskLink, termLink, proc);
+//                else
+//                    System.out.println(
+//                        "equalSubtermsInRespect: "+ conceptLink + " " +  taskLink + " " +  termLink
+//                    );
+
             }
         }
 

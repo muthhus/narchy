@@ -104,7 +104,7 @@ public class TuffySmokesTest {
         Global.DEBUG = true;
 
         NAR n = new Default(1000, 3, 2, 3);
-        n.memory.activationRate.setValue(0.1f);
+        n.memory.activationRate.setValue(0.5f);
         n.memory.conceptForgetDurations.setValue(5);
 
         //n.log();
