@@ -199,7 +199,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
             return null;
 
         //TODO avoid creating new Truth instances
-        Truth solTruth = projectTruth(question.occurrence(), now, true);
+        Truth solTruth = projectTruth(question.occurrence(), now, false);
         if (solTruth == null)
             return null;
 
@@ -346,11 +346,11 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     }
 
     default Task projectTask(long when, long now) {
-        Truth adjustedTruth = projectTruth(when, now, true);
-        if (adjustedTruth.equals(truth())) return this;
-
-        return MutableTask.clone(this, adjustedTruth);
-        //}
+        Truth adjustedTruth = projectTruth(when, now, false);
+        long occ = occurrence();
+        long projOcc = (adjustedTruth instanceof ProjectedTruth) ? ((ProjectedTruth)adjustedTruth).when : occ;
+        return /*occ == projOcc && */adjustedTruth.equals(truth()) ? this :
+                MutableTask.clone(this, adjustedTruth, now, projOcc);
 
     }
 

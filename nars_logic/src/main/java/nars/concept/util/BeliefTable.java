@@ -262,23 +262,32 @@ public interface BeliefTable extends TaskTable {
     }
 
 
-//    /** computes the truth/desire as an aggregate of projections of all
-//     * beliefs to current time
-//     */
-//    default float getMeanProjectedExpectation(long time) {
-//        int size = size();
-//        if (size == 0) return 0;
-//
-//        float[] d = {0};
-//        forEach(t -> d[0] += projectionQuality(t.freq(), t.conf(), t, time, time, false) * t.getExpectation());
-//
-//        float dd = d[0];
-//
-//        if (dd == 0) return 0;
-//
-//        return dd / size;
-//
-//    }
+    /** computes the truth/desire as an aggregate of projections of all
+     * beliefs to current time
+     */
+    default float getMeanProjectedExpectation(long time, int dur) {
+        int size = size();
+        if (size == 0) return 0;
+
+        float[] d = {0};
+        forEach(t -> d[0] +=
+                relevance(t, time, dur) //projectionQuality(t.freq(), t.conf(), t, time, time, false)
+                * t.expectation());
+
+        float dd = d[0];
+
+        if (dd == 0) return 0;
+
+        return dd / size;
+
+    }
+
+    static float relevance(Task t, long time, int dur) {
+        long o = t.occurrence();
+        if (o == Tense.ETERNAL) return 0.5f;
+        return 1f / (1f + Math.abs(o - time)/((float)dur));
+    }
+
 
 //    static float projectionQuality(float freq, float conf, @NotNull Task t, long targetTime, long currentTime, boolean problemHasQueryVar) {
 ////        float freq = getFrequency();
@@ -287,7 +296,7 @@ public interface BeliefTable extends TaskTable {
 //        long taskOcc = t.occurrence();
 //
 //        if (!Tense.isEternal(taskOcc) && (targetTime != taskOcc)) {
-//            conf = TruthFunctions.eternalizedConfidence(conf);
+//            conf = TruthFunctions.eternalize(conf);
 //            if (targetTime != Tense.ETERNAL) {
 //                float factor = TruthFunctions.temporalProjection(taskOcc, targetTime, currentTime);
 //                float projectedConfidence = factor * t.conf();

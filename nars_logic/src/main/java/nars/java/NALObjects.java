@@ -195,7 +195,7 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
 
         //TODO re-use static copy for 'VOID' and null-returning instances
         if (invokingGoal != null) {
-            InvocationResult ir = new InvocationResult(volitionTask, effect);
+            InvocationResult ir = new InvocationResult(effect);
             ((MutableTask)invokingGoal).because(ir);
         }
 
@@ -416,17 +416,15 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
 
     public static class InvocationResult {
         public final Term value;
-        private final Task volition;
 
-        public InvocationResult(Task volition, Term value) {
+        public InvocationResult(Term value) {
             this.value = value;
-            this.volition = volition;
         }
 
         @NotNull
         @Override
         public String toString() {
-            return volition + "->" + value; //"Puppet";
+            return value.toString(); //"Puppet";
         }
     }
 

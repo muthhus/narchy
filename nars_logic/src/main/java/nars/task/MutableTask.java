@@ -10,7 +10,6 @@ import nars.nal.Tense;
 import nars.term.Compound;
 import nars.term.Termed;
 import nars.truth.DefaultTruth;
-import nars.truth.ProjectedTruth;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 
@@ -46,20 +45,16 @@ public class MutableTask extends AbstractTask {
         term(newTerm);
     }
 
-    @NotNull public static MutableTask clone(@NotNull Task t, @NotNull Truth newTruth) {
-        return clone(t, newTruth, newTruth instanceof ProjectedTruth ?
-                (((ProjectedTruth)newTruth).when) : t.occurrence());
-    }
 
     @NotNull
-    public static MutableTask clone(@NotNull Task t, @NotNull Truth newTruth, long occ) {
-        return new MutableTask(t, newTruth, occ);
+    public static MutableTask clone(@NotNull Task t, @NotNull Truth newTruth, long now, long occ) {
+        return new MutableTask(t, newTruth, now, occ);
     }
 
-    MutableTask(@NotNull Task taskToClone, @NotNull Truth newTruth, long occ) {
+    MutableTask(@NotNull Task taskToClone, @NotNull Truth newTruth, long now, long occ) {
         super(taskToClone);
         truth(newTruth);
-        occurr(occ);
+        time(now, occ);
     }
 
     public MutableTask(@NotNull Termed<Compound> content, char punc) {

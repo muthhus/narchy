@@ -389,7 +389,6 @@
     C, (A ==> B), occurr(belief,zero) |- substituteIfUnifies( A, "$", B, C), (Belief:Deduction, Desire:Deduction, Order:ForAllSame)
     B, (A ==> B), occurr(belief,reverse) |- A, (Belief:Deduction, Desire:Deduction, Order:ForAllSame)
 
-
 //    X, (BI ==> Y) |- occurrsBackward( substituteIfUnifies( BI, "$", Y, X), BI, "==>"), (Belief:Abduction, Desire:Deduction, Order:ForAllSame)
 
 ////Temporal induction: ////////////////////////////////////////////////////////////////////////////////////
