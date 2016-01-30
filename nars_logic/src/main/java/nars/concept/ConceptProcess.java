@@ -22,13 +22,13 @@ import java.util.function.Consumer;
 
 import static nars.nal.Tense.*;
 
-/** Firing a concept (reasoning event). Derives new Tasks via reasoning rules
- *
- *  Concept
- *     Task
- *     TermLinks
- *
- * */
+/**
+ * Firing a concept (reasoning event). Derives new Tasks via reasoning rules
+ * <p>
+ * Concept
+ * Task
+ * TermLinks
+ */
 public final class ConceptProcess implements Premise {
 
 
@@ -40,17 +40,9 @@ public final class ConceptProcess implements Premise {
     @Nullable
     private final Task belief;
     private final boolean cyclic;
+    @Deprecated
+    public long occ;
 
-    @Override
-    public final Task task() {
-        return taskLink.get();
-    }
-
-
-
-    public Concept concept() {
-        return conceptLink.get();
-    }
 
     public ConceptProcess(NAR nar, BLink<? extends Concept> conceptLink,
                           BLink<? extends Task> taskLink,
@@ -65,15 +57,14 @@ public final class ConceptProcess implements Premise {
         this.cyclic = Stamp.overlapping(task(), belief);
     }
 
-
     public static int fireAll(@NotNull NAR nar, BLink<? extends Concept> concept, @NotNull BLink<? extends Task> taskLink, @NotNull BLink<? extends Termed> termLink, @NotNull Consumer<ConceptProcess> cp) {
 
         Task task = taskLink.get();
         Term tel = termLink.get().term();
 
         int n = 0;
-        if ((tel!=null) && /*&& (task.term().hasVarQuery()))*/
-            (task.term().hasAny(Op.VAR_QUERY)) /*|| tel.hasAny(Op.VAR_QUERY))*/) {
+        if ((tel != null) && /*&& (task.term().hasVarQuery()))*/
+                (task.term().hasAny(Op.VAR_QUERY)) /*|| tel.hasAny(Op.VAR_QUERY))*/) {
             n += Premise.unify(Op.VAR_QUERY, task.term(), tel, nar.memory, (u) -> {
 
                 Task belief = fireAll(nar, concept, taskLink, termLink, u, cp);
@@ -94,7 +85,9 @@ public final class ConceptProcess implements Premise {
         return n; //HACK
     }
 
-    /** returns the corresponding belief task */
+    /**
+     * returns the corresponding belief task
+     */
     public static Task fireAll(@NotNull NAR nar, BLink<? extends Concept> concept, @NotNull BLink<? extends Task> taskLink, @NotNull BLink<? extends Termed> termLink, Term beliefTerm, @NotNull Consumer<ConceptProcess> cp) {
         Concept beliefConcept = nar.concept(beliefTerm);
 
@@ -122,6 +115,11 @@ public final class ConceptProcess implements Premise {
         return belief;
     }
 
+    @Override
+    public final Task task() {
+        return taskLink.get();
+    }
+
 //    /**
 //     * @return the current termLink aka BeliefLink
 //     */
@@ -130,11 +128,8 @@ public final class ConceptProcess implements Premise {
 //        return termLink;
 //    }
 
-
-    public final Termed beliefTerm() {
-        Task x = belief();
-        return x== null ? termLink.get() :
-                x.term();
+    public Concept concept() {
+        return conceptLink.get();
     }
 
 
@@ -156,6 +151,11 @@ public final class ConceptProcess implements Premise {
 //        return c;
 //    }
 
+    public final Termed beliefTerm() {
+        Task x = belief();
+        return x == null ? termLink.get() :
+                x.term();
+    }
 
     @Nullable
     @Override
@@ -173,9 +173,9 @@ public final class ConceptProcess implements Premise {
         return new StringBuilder().append(
                 getClass().getSimpleName())
                 .append('[').append(conceptLink).append(',')
-                            .append(taskLink).append(',')
-                            .append(termLink).append(',')
-                            .append(belief())
+                .append(taskLink).append(',')
+                .append(termLink).append(',')
+                .append(belief())
                 .append(']')
                 .toString();
     }
@@ -187,11 +187,12 @@ public final class ConceptProcess implements Premise {
 
     public int getMaxMatches() {
         final float min = Global.MIN_TERMUTATIONS_PER_MATCH, max = Global.MAX_TERMUTATIONS_PER_MATCH;
-        return (int)Math.ceil(task().pri() * (max-min) + min);
+        return (int) Math.ceil(task().pri() * (max - min) + min);
     }
 
-
-    /** apply temporal characteristics to a newly derived term according to the premise's */
+    /**
+     * apply temporal characteristics to a newly derived term according to the premise's
+     */
     public final Compound temporalize(Compound derived, Term taskPattern, Term beliefPattern, Term conclusionPattern) {
 
         occ = occurrenceTarget(); //reset
@@ -199,18 +200,16 @@ public final class ConceptProcess implements Premise {
         Term cc = conclusionPattern;
         if (Op.isOperation(cc)) {
             //unwrap operation, work with its first argument
-            cc = Operator.opArgsArray((Compound)cc)[0];
+            cc = Operator.opArgsArray((Compound) cc)[0];
         }
 
         Compound tt = task().term();
-        Compound bb = belief()!=null ? belief().term() : null;
+        Compound bb = belief() != null ? belief().term() : null;
 
         int td = tt.t();
-        int bd = bb!=null ? bb.t() : ITERNAL;
+        int bd = bb != null ? bb.t() : ITERNAL;
 
         if (cc.op().isTemporal() && cc.isCompound()) {
-
-
 
 
             //System.out.println(tt + " "  + bb);
@@ -229,40 +228,53 @@ public final class ConceptProcess implements Premise {
              */
             int s = cc.size();
             if (s == 2) {
-                Compound ccc = (Compound)cc;
+                Compound ccc = (Compound) cc;
                 Term ca = ccc.term(0);
                 Term cb = ccc.term(1);
 
                 int t = ITERNAL;
                 if ((taskPattern.size() == 2) && (beliefPattern.size() == 2)) {
-                    Compound tpp = (Compound)taskPattern;
-                    Compound bpp = (Compound)beliefPattern;
+                    Compound tpp = (Compound) taskPattern;
+                    Compound bpp = (Compound) beliefPattern;
                     if (tpp.term(1).equals(bpp.term(0))) {
                         //chained inner
-                        t = td + bd;
+                        t = -(td + bd);
                     } else if (tpp.term(0).equals(bpp.term(1))) {
                         //chain outer
                         t = td + bd; //?? CHECK
+                    } else if (tpp.term(0).equals(bpp.term(0))) {
+                        //common left
+                        t = td - bd;
+                    } else if (tpp.term(1).equals(bpp.term(1))) {
+                        //common right
+                        t = bd - td;
                     }
-                } else if ((taskPattern.size() == 0) && (beliefPattern.size() == 0)) {
+                } else if ((taskPattern.size() == 0) && (beliefPattern.size() == 0) && belief()!=null) {
                     long aTask = taskPattern.subtermTime(ca, td);
                     long aBelief = beliefPattern.subtermTime(ca, bd);
                     long bTask = taskPattern.subtermTime(cb, td);
                     long bBelief = beliefPattern.subtermTime(cb, bd);
 
-                    if (aTask!=ETERNAL && aBelief == ETERNAL) {
-                        if (bBelief!=ETERNAL && bTask == ETERNAL) {
-                            //forward: task -> belief
-                            t = (int)(belief().occurrence() - task().occurrence());
-                            //occ += 0;
-                        }
+                    if (aTask != ETERNAL && aBelief == ETERNAL &&
+                            bBelief != ETERNAL && bTask == ETERNAL) {
+                        //forward: task -> belief
+                        t = (int) (belief().occurrence() - task().occurrence());
+                        //occ += 0;
+
+                    }
+                    else if (aTask == ETERNAL && aBelief != ETERNAL &&
+                            bBelief == ETERNAL && bTask != ETERNAL) {
+                        //reverse: belief -> task
+                        t = (int) (task().occurrence() - belief().occurrence());
+                        //occ += 0;
+
                     }
 
                 }
 
                 //System.out.println(derived + " " + a + ":"+ aTask + "|" + aBelief + ", " + b + ":" + bTask + "|" + bBelief);
 
-                if (t!=ITERNAL) {
+                if (t != ITERNAL) {
                     return derived.t(t);
                 }
 
@@ -270,29 +282,26 @@ public final class ConceptProcess implements Premise {
                 //..
             }
         } else {
-            if (cc.size() == 0) {
+            //if (cc.size() == 0) {
 
-                long ot = taskPattern.subtermTime(cc, td);
-                long ob = beliefPattern.subtermTime(cc, bd);
+            long ot = taskPattern.subtermTime(cc, td);
+            long ob = beliefPattern.subtermTime(cc, bd);
 
-                if (occ>TIMELESS) {
-                    if (ot != ETERNAL) {
-                        occ = occ + ot;
-                    } else if (ob != ETERNAL) {
-                        occ = occ + ob;
-                    } else {
-                        //neither, remain eternal
-                    }
+            if (occ > TIMELESS) {
+                if (ot != ETERNAL) {
+                    occ = occ + ot;
+                } else if (ob != ETERNAL) {
+                    occ = occ + ob;
+                } else {
+                    //neither, remain eternal
                 }
             }
+            //}
         }
 
         return derived;
         //return nar.memory.index.transformRoot(derived, temporalize);
     }
-
-
-    @Deprecated public long occ;
 
 
 //    /** max(tasktime, belieftime) */
@@ -328,7 +337,6 @@ public final class ConceptProcess implements Premise {
 ////            throw new RuntimeException("tasklink null"); //bag should not have returned this
 //
 //    }
-
 
 
 //    public abstract Stream<Task> derive(final Deriver p);
