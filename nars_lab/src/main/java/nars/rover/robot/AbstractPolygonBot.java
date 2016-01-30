@@ -45,11 +45,11 @@ public abstract class AbstractPolygonBot extends Robotic {
     public float angularSpeedPerCycle = 0.7f;
     int mission = 0;
     //public float curiosity = 0.1f;
-    int motionPeriod = 1;
     public Vec2 point1 = new Vec2(); //HACK
     public final Vec2 point2 = new Vec2();
     public final Vec2 d = new Vec2();
-    boolean feel_motion = true; //todo add option in gui
+    boolean feel_motion = true, feel_senses = true; //todo add option in gui
+    int motionPeriod = 2, sensePeriod = 2;
 
     public Truth thrustRelative(float f) {
         float velBefore = torso.getLinearVelocity().length();
@@ -70,7 +70,8 @@ public abstract class AbstractPolygonBot extends Robotic {
     }
 
     protected void train(long t) {
-        float freq = 0.5f + 0.5f * (1/(1f + t/5000f)), conf = 0.85f;
+        //float freq = 0.5f + 0.5f * (1/(1f + t/5000f)), conf = 0.85f;
+        float freq = 1f, conf = 0.9f;
         nar.input("MotorControls(random,motor,(),#x)! :|: %" + n2(freq) + ";" + n2(conf) + "%");
         System.out.println("@" + t + " Curiosity Trained @ freq=" + freq);
     }
@@ -119,7 +120,7 @@ public abstract class AbstractPolygonBot extends Robotic {
 
         try {
 
-            if (t < 250)
+            if (t < 500)
                 train(t);
             else if (mission == 0) {
                 //seek food
@@ -128,12 +129,15 @@ public abstract class AbstractPolygonBot extends Robotic {
                 //nar.goal("goal:{food}", 1.00f, 0.90f);
                 //nar.input("goal:{food}!");
                 nar.input("eat:food! :|: %1.00;0.95%");
+                nar.input("speed:linear! :|: %1.00;0.7%");
                 nar.input("(--, eat:poison)! :|: %1.00;0.95%");
-                nar.input("(--, <eat:food <-> eat:poison>). %1.00;0.95%");
-                nar.input("(?x ==> eat:#y)?");
+                //nar.input("(--, <eat:food <-> eat:poison>). %1.00;0.95%");
+                //nar.input("(?x ==> eat:#y)?");
 
                 //nar.input("MotorControls(?x,motor,?y,?z)! :|: %1.00;0.75%");
 
+                //((Default)nar).core.active.printAll();
+                //nar.concept("MotorControls(forward,motor,(),#1)").print();
 
                 //nar.input("motion:#anything! :|:"); //move
 
@@ -194,8 +198,10 @@ public abstract class AbstractPolygonBot extends Robotic {
             inputMission();
         }
 
-        for (Sense v : senses) {
-            v.step(true, true);
+        if (feel_senses && (now % sensePeriod == 0)) {
+            for (Sense v : senses) {
+                v.step(true, true);
+            }
         }
         /*if(cnt>=do_sth_importance) {
         cnt=0;

@@ -72,7 +72,7 @@ public class CarefulRover extends AbstractPolygonBot {
         for (int i = 0; i < numPixels; i++) {
             VisionRay v = new VisionRay(this, torso,
                         /*eats ?*/ center /*: new Vec2(0,0)*/,
-                    a, da, 3, 10) {
+                    a, da, 3, 10, 1f/numPixels) {
 
                 @Override
                 protected float getDistance() {

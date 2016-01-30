@@ -367,7 +367,7 @@ public class PhysicsController {
         } else {
             updateTime = System.nanoTime();
         }
-        TestbedPanel panel = model.getPanel();
+        //TestbedPanel panel = model.getPanel();
 
         if (currTest != null && updateBehavior == UpdateBehavior.UPDATE_CALLED) {
             updateTest(timeStep);

@@ -5,13 +5,15 @@
 package nars.rover.robot;
 
 import nars.NAR;
+import nars.Symbols;
 import nars.java.MethodOperator;
 import nars.java.NALObjects;
 import nars.rover.Sim;
 import nars.rover.obj.VisionRay;
+import nars.task.MutableTask;
 import nars.task.Task;
 import nars.task.in.ChangedTextInput;
-import nars.truth.Truth;
+import nars.term.Termed;
 import nars.util.Texts;
 import nars.util.data.Util;
 import org.jbox2d.collision.shapes.PolygonShape;
@@ -21,6 +23,7 @@ import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.Fixture;
+
 
 /**
  * Triangular mobile vehicle
@@ -32,9 +35,9 @@ public class Rover extends AbstractPolygonBot {
 
 
     //float tasteDistanceThreshold = 1.0f;
-    final static int retinaPixels = 8;
+    final static int retinaPixels = 16;
     final NALObjects objs;
-    int retinaRaysPerPixel = 2; //rays per vision sensor
+    int retinaRaysPerPixel = 4; //rays per vision sensor
     float aStep = (float) (Math.PI * 2f) / retinaPixels;
     float L = 25f; //vision distance
     Vec2 mouthPoint = new Vec2(2.7f, 0); //0.5f);
@@ -114,7 +117,7 @@ public class Rover extends AbstractPolygonBot {
 
             VisionRay v = new VisionRay(this, torso,
                     /*eats ?*/ mouthPoint /*: new Vec2(0,0)*/,
-                    angle, aStep, retinaRaysPerPixel, L) {
+                    angle, aStep, retinaRaysPerPixel, L, 1f/retinaPixels) {
 
 
                 @Override
@@ -231,53 +234,72 @@ public class Rover extends AbstractPolygonBot {
     public static class MotorControls {
 
         public final Rover rover;
+        private final Termed left, right, stop, forward, backward;
 
         public MotorControls(Rover rover) {
             this.rover = rover;
+
+            forward = rover.nar.term("MotorControls(forward,motor,(),#x)");
+            backward = rover.nar.term("MotorControls(backward,motor,(),#x)");
+            left = rover.nar.term("MotorControls(left,motor,(),#x)");
+            right = rover.nar.term("MotorControls(right,motor,(),#x)");
+            stop = rover.nar.term("MotorControls(stop,motor,(),#x)");
         }
 
-        public void stop() {
+        public boolean stop() {
             rover.thrustRelative(0);
             rover.rotateRelative(0);
+            return true;
         }
 
-        private Truth forward(boolean forward) {
-            Task c = MethodOperator.invokingTask();
-            float thrust = c!=null ? c.expectation() : 1;
+        private boolean forward(boolean forward) {
+            //Task c = MethodOperator.invokingTask();
+            //float thrust = c!=null ? c.expectation() : 1;
+            float thrust = 1f;
             if (!forward) thrust = -thrust;
-            return rover.thrustRelative(thrust);
+            rover.thrustRelative(thrust);
+            return true;
         }
 
-        private Truth rotate(boolean left) {
-            Task c = MethodOperator.invokingTask();
-            float thrust = c!=null ? c.expectation() : 1;
+        private boolean rotate(boolean left) {
+            //Task c = MethodOperator.invokingTask();
+            //float thrust = c!=null ? c.expectation() : 1;
+            float thrust = 1f;
             if (left) thrust = -thrust;
-            return rover.rotateRelative(thrust);
+            rover.rotateRelative(thrust);
+            return true;
         }
 
-        public Truth left() { return rotate(true); }
-        public Truth right() { return rotate(false); }
-        public Truth forward() { return forward(true); }
-        public Truth backward() { return forward(false); }
+        public boolean left() { return rotate(true); }
+        public boolean right() { return rotate(false); }
+        public boolean forward() { return forward(true); }
+        public boolean backward() { return forward(false); }
+
 
         public Task random() {
             Task c = MethodOperator.invokingTask();
 
+            Termed term;
+
             //TODO dont parse these proxy tasks, its slow
             switch ((int)(5 * Math.random())) {
                 case 0:
-                    return rover.nar.task("MotorControls(forward,motor,(),#x)! :|: " + c.truth());
+                    term = forward; break;
                 case 1:
-                    return rover.nar.task("MotorControls(backward,motor,(),#x)! :|: " + c.truth());
+                    term = backward; break;
                 case 2:
-                    return rover.nar.task("MotorControls(left,motor,(),#x)! :|: " + c.truth());
+                    term = left; break;
                 case 3:
-                    return rover.nar.task("MotorControls(right,motor,(),#x)! :|: " + c.truth());
+                    term = right; break;
                 case 4:
-                    return rover.nar.task("MotorControls(stop,motor,(),#x)! :|: " + c.truth());
+                    term = stop; break;
+                default:
+                    term = null;
             }
 
-            return null;
+            return new MutableTask(term, Symbols.GOAL)
+                    //.truth( c.truth() )
+                    .present(rover.nar.memory);
         }
     }
 

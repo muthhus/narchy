@@ -68,7 +68,7 @@ public class GoalPrecisionTest {
 
             //a.task.mulPriority(0);
 
-            a.noticeExecuted();
+            n.input(a.noticeExecuted());
 
         });
 

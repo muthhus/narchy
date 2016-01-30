@@ -31,7 +31,7 @@ public class Sim extends PhysicsModel {
     public final SimulatedClock clock;
     public final List<Robotic> robots = Global.newArrayList();
     /* how often to input mission, in frames */
-    public int missionPeriod = 16;
+    public int missionPeriod = 24;
     public RoverWorld world;
     PhysicsRun phy = new PhysicsRun(10, this);
 

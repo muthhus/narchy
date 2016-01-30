@@ -170,11 +170,11 @@ public class PhysicsRun {
         });        
     }*/
     
-    public void cycle() {          
-
-        controller.cycle(simulationRate);
-
-    }
+//    public void cycle() {
+//
+//        controller.cycle(simulationRate);
+//
+//    }
 
     public void cycle(float fps) {
 

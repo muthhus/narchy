@@ -10,28 +10,19 @@ import nars.util.data.Util;
 public interface BudgetMerge {
 
     BudgetMerge plusDQBlend = (tgt, src, srcScale) -> {
-        float dp = src.pri() * srcScale;
+        float incomingPri = src.pri() * srcScale;
 
-        float currentPriority = tgt.priIfFiniteElseZero();
+        float currentPri = tgt.priIfFiniteElseZero();
 
-        float nextPri = currentPriority + dp;
-        if (nextPri > 1) nextPri = 1f;
-
-        float currentNextPrioritySum = currentPriority + nextPri;
+        float sumPri = currentPri + incomingPri;
 
         /* current proportion */
-        float cp = currentNextPrioritySum != 0 ? currentPriority / currentNextPrioritySum : 0.5f;
+        float cp = currentPri / sumPri;
+        float ip = 1f - cp;
 
-        /* next proportion = 1 - cp */
-        float np = 1.0f - cp;
-
-        float nextDur = cp * tgt.dur() + np * src.dur();
-        float nextQua = cp * tgt.qua() + np * src.qua();
-
-        assert Float.isFinite(nextDur) : "NaN dur: " + src + ' ' + tgt.dur();
-        assert Float.isFinite(nextQua) : "NaN quality";
-
-        tgt.budget( nextPri,nextDur,nextQua);
+        tgt.budget( sumPri,
+                cp * tgt.dur() + ip * src.dur(),
+                cp * tgt.qua() + ip * src.qua());
     };
 
     /** merge 'incoming' budget (scaled by incomingScale) into 'existing' */

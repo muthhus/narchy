@@ -62,19 +62,20 @@ public final class Operator<T extends Term> extends AbstractStringAtom { //imple
 
         //add var dep as last term if missing
         if (!x.last().op().isVar()) {
-            x = $.p( Terms.concat(x.terms(), y)); //defaultResultVariable));
-        } else {
-            //TODO more efficient than subterm sequencing it:
-            x = $.p( Terms.concat(x.terms(0, x.size()-1), y));
+            x = $.p(Terms.concat(x.terms(), y)); //defaultResultVariable));
         }
+//        } else {
+//            //TODO more efficient than subterm sequencing it:
+//            x = $.p( Terms.concat(x.terms(0, x.size()-1), y));
+//        }
 
-//        return $.inh(
+        return $.inh(
 //        //return $.inst(
-//                y,
-//                makeImageExt(x, operation.term(1), (short) (x.size() - 1) /* position of the variable */)
-//        );
+                y,
+                makeImageExt(x, operation.term(1), (short) (x.size() - 1) /* position of the variable */)
+        );
 
-        return $.exec(Operator.operatorTerm(operation), x);
+        //return $.exec(Operator.operatorTerm(operation), x);
     }
 
     /**

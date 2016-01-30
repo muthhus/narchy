@@ -14,7 +14,9 @@ public class NarseseInput extends CodeInput {
     }
 
     @Override
-    public boolean onInput(String s) {
+    public boolean onInput(String _s) {
+
+        String s = _s.trim();
 
         if (!s.isEmpty()) {
             nar.runLater(() -> {

@@ -53,14 +53,16 @@ public class VisionRay implements AbstractPolygonBot.Sense, SwingDraw.LayerDraw 
 
     private float conf;
     private BLink<Concept> angleConcept;
+    float pri;
 
 
-    public VisionRay(AbstractPolygonBot abstractPolygonBot, Body body, Vec2 point, float angle, float arc, int resolution, float length) {
+    public VisionRay(AbstractPolygonBot abstractPolygonBot, Body body, Vec2 point, float angle, float arc, int resolution, float length, float pri) {
         this.abstractPolygonBot = abstractPolygonBot;
         this.sight = new ChangedTextInput(abstractPolygonBot.nar);
         this.body = body;
         this.point = point;
         this.angle = angle;
+        this.pri = pri;
         this.angleTerm = $.the(Sim.angleTerm(angle));
         //this.seenAngleTerm = //"see_" + sim.angleTerm(angle);
         this.arc = arc;
@@ -305,7 +307,7 @@ public class VisionRay implements AbstractPolygonBot.Sense, SwingDraw.LayerDraw 
 
         abstractPolygonBot.nar.input(
                 new MutableTask(tt).belief().present(abstractPolygonBot.nar.memory).
-                        truth(freq, conf));
+                        truth(freq, conf).budget(pri, 0.5f));
     }
 
     public void onTouch(Body hit, float di) {

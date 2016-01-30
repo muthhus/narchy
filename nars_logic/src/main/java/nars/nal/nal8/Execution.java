@@ -1,5 +1,6 @@
 package nars.nal.nal8;
 
+import com.google.common.collect.Lists;
 import nars.$;
 import nars.Memory;
 import nars.NAR;
@@ -15,8 +16,6 @@ import nars.util.event.Topic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
-
 /**
  * Execution context which Operator implementations
  * receive, supporting any variety of synchronous/
@@ -26,6 +25,7 @@ import java.util.Collections;
  */
 public class Execution implements Runnable {
 
+    private static final float DEFAULT_EXECUTION_CONFIDENCE = 0.99f;
     public final NAR nar;
     public final Task task;
     private final Topic<Execution> listeners;
@@ -67,7 +67,14 @@ public class Execution implements Runnable {
     //feedback(Object o)
 
     public void feedback(Task feedback) {
-        feedback(Collections.singletonList(feedback));
+        //feedback(Collections.singletonList(feedback));
+        feedbackAll(
+            feedback,
+            noticeExecuted()
+        );
+    }
+    void feedbackAll(Task... feedback) {
+        feedback(Lists.newArrayList(feedback));
     }
 
     /**
@@ -102,30 +109,30 @@ public class Execution implements Runnable {
 
     }
 
-    protected void noticeExecuted() {
-        noticeExecuted(task);
+    protected Task noticeExecuted() {
+        return noticeExecuted(task);
     }
 
     /**
      * internal notice of the execution
      * @param operation
      */
-    protected void noticeExecuted(@NotNull Task operation) {
+    protected Task noticeExecuted(@NotNull Task operation) {
 
         Budget b = !operation.isDeleted() ? operation.budget() : UnitBudget.zero;
 
         Memory memory = nar.memory;
 
-        nar.input($.belief(operation.term(),
+        return $.belief(operation.term(),
 
-                operation.truth()).
-                //1f, Global.OPERATOR_EXECUTION_CONFIDENCE).
+                operation.truth()). //equal to input, balanced
+                //1f, DEFAULT_EXECUTION_CONFIDENCE).
 
                         budget(b).
                         present(memory).
                 //parent(operation). //https://github.com/opennars/opennars/commit/23d34d5ddaf7c71348d0a70a88e2805ec659ed1c#diff-abb6b480847c96e2dbf488d303fb4962L235
                         because("Executed")
-        );
+        ;
 
     }
 
