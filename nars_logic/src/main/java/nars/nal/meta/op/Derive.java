@@ -20,7 +20,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static nars.nal.Tense.ETERNAL;
-import static nars.nal.Tense.ITERNAL;
 import static nars.truth.TruthFunctions.eternalize;
 
 /**
@@ -37,7 +36,7 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
     private final PremiseRule rule;
 
     /** result pattern */
-    private final Term term;
+    private final Term conclusionPattern;
 
     @NotNull private final BooleanCondition<PremiseMatch> postMatch; //TODO use AND condition
 
@@ -45,7 +44,7 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
     public Derive(PremiseRule rule, Term term, @NotNull BooleanCondition[] postMatch, boolean anticipate, boolean eternalize) {
         this.rule = rule;
         this.postMatch = (postMatch.length > 0) ? new AndCondition(postMatch) : BooleanCondition.TRUE;
-        this.term = term;
+        this.conclusionPattern = term;
         this.anticipate = anticipate;
         this.eternalize = eternalize;
 
@@ -80,7 +79,7 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
      * false to stop it */
     @Override public final void accept(@NotNull PremiseMatch m) {
 
-        Term derivedTerm = m.apply(term);
+        Term derivedTerm = m.apply(conclusionPattern);
 
         if (derivedTerm == null)
             return;
@@ -155,16 +154,21 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
         boolean p7 = premise.nal(7);
 
         long now = premise.time();
-        long occ = p7 ? premise.occurrenceTarget() : ETERNAL;
+        long occ;
 
         Compound ct = (Compound) tNorm.term();
 
         if (p7) {
-            ct = premise.temporalize(ct);
 
-            int os = premise.occShift;
-            if (os!=ITERNAL)
-                occ += os;
+            ct = premise.temporalize(ct,
+                    rule.getTaskTermPattern(),
+                    rule.getBeliefTermPattern(),
+                    conclusionPattern
+                    );
+
+            occ = premise.occ;
+        } else {
+            occ = ETERNAL;
         }
 
         derive(p, ct, truth, budget, now, occ);

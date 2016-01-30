@@ -9,19 +9,18 @@ import nars.NAR;
 import nars.Op;
 import nars.Premise;
 import nars.bag.BLink;
-import nars.nal.Tense;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.transform.CompoundTransform;
 import nars.truth.Stamp;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
-import static nars.nal.Tense.*;
+import static nars.nal.Tense.ETERNAL;
+import static nars.nal.Tense.ITERNAL;
 
 /** Firing a concept (reasoning event). Derives new Tasks via reasoning rules
  *
@@ -193,127 +192,153 @@ public final class ConceptProcess implements Premise {
 
 
     /** apply temporal characteristics to a newly derived term according to the premise's */
-    public final Compound temporalize(Compound derived) {
-        occShift = ITERNAL; //reset
-        return nar.memory.index.transformRoot(derived, temporalize);
-    }
+    public final Compound temporalize(Compound derived, Term taskPattern, Term beliefPattern, Term conclusionPattern) {
 
-    @Deprecated public int occShift;
+        occ = occurrenceTarget(); //reset
 
-    private final CompoundTransform temporalize = new CompoundTransform<Compound,Compound>() {
 
-        @Override
-        public boolean test(Term ct) {
-            //N/A probably
-            return ct.isCompound();
-            //return true; //ct.op().isTemporal();
-        }
-
-        @Override
-        public boolean testSuperTerm(Compound ct) {
-            //N/A probably
-            //return ct.op().isTemporal();
-            return true;
-        }
-
-        final static int maxLevel = 1;
-
-        @Override
-        public Compound apply(Compound der, Compound unused, int depth) {
-            //ignore details below a certain depth
-            if (depth >= maxLevel)
-                return der;
-
-            int tDelta = ITERNAL;
-
-            Task T = task();
-            Task B = belief();
-
-            Compound tt = T.term();
-            Compound bb = B!=null ? B.term() : null;
+        if (conclusionPattern.op().isTemporal() && conclusionPattern.isCompound()) {
+            Compound tt = task().term();
+            Compound bb = belief()!=null ? belief().term() : null;
 
             int td = tt.t();
             int bd = bb!=null ? bb.t() : ITERNAL;
 
-            if (der.op().isTemporal()) {
+            Compound cc = (Compound) conclusionPattern;
 
-                //(a ??? b)
-                Term a = der.term(0);
-                Term b = der.term(1);
+            //System.out.println(tt + " "  + bb);
 
+            /* CASES:
+                conclusion pattern size 1
+                    equal to task subterm
+                    equal to belief subterm
+                    unique term
+                conclusion pattern size 2 (a, b)
+                    a equal to task subterm
+                    b equal to task subterm
+                    a equal to belief subterm
+                    b equal to belief subterm
 
-                long ot= T.occurrence();
-                long aTask = T.subtermTime(a);
-                long ob = B!=null ? B.occurrence() : TIMELESS;
-                long aBelief = B!=null ? B.subtermTime(a) : ITERNAL;
-                long bTask = T.subtermTime(b);
-                long bBelief = B!=null ? B.subtermTime(b) : ITERNAL;
+             */
+            int s = cc.size();
+            if (s == 1) {
+                long taskOffset = taskPattern.subtermTime(derived, td);
+                long beliefOffset = beliefPattern.subtermTime(derived, bd);
+                //System.out.println(derived + " " + taskOffset + " " + beliefOffset);
+            } else if (s == 2) {
+                Term ca = cc.term(0);
+                Term cb = cc.term(1);
 
-                //offset all by their respective times
-                if (ot <= TIMELESS && ob <= TIMELESS) {
-                    ot = ob = 0;
-                } else {
-                    if (ot > TIMELESS && ob <= TIMELESS) {
-                        ob = ot;
-                    } else if (ot <= TIMELESS && ob > TIMELESS) {
-                        ot = ob;
+                int t = ITERNAL;
+                if ((taskPattern.size() == 2) && (beliefPattern.size() == 2)) {
+                    Compound tpp = (Compound)taskPattern;
+                    Compound bpp = (Compound)beliefPattern;
+                    if (tpp.term(1).equals(bpp.term(0))) {
+                        //chained inner
+                        t = td + bd;
+                    } else if (tpp.term(0).equals(bpp.term(1))) {
+                        //chain outer
+                        t = td + bd; //?? CHECK
                     }
-                    aTask += ot; bTask += ot;
-                    aBelief += ob; bBelief += ob;
-                }
+                } else if ((taskPattern.size() == 0) && (beliefPattern.size() == 0)) {
+                    long aTask = taskPattern.subtermTime(ca, td);
+                    long aBelief = beliefPattern.subtermTime(ca, bd);
+                    long bTask = taskPattern.subtermTime(cb, td);
+                    long bBelief = beliefPattern.subtermTime(cb, bd);
 
-
-                long la = ETERNAL, lb = ETERNAL;
-                if ((aTask > TIMELESS) && (aBelief <= TIMELESS))
-                    la = aTask;
-                else if ((aBelief > TIMELESS) && (aTask <= TIMELESS))
-                    la = aBelief;
-                else if ((aBelief <= TIMELESS) && (aTask <= TIMELESS))
-                    la = TIMELESS;
-                else
-                    la = (aTask + aBelief)/2;
-
-                if ((bTask > TIMELESS) && (bBelief <= TIMELESS))
-                    lb = bTask;
-                else if ((bBelief > TIMELESS) && (bTask <= TIMELESS))
-                    lb = bBelief;
-                else if ((bBelief <= TIMELESS) && (bTask <= TIMELESS))
-                    lb = TIMELESS;
-                else
-                    lb = (bTask + bBelief)/2;
-
-                //TODO handle case when both are known in each (avg?)
-
-                if ((la>TIMELESS) && (lb>TIMELESS)) {
-                    tDelta = (int) (lb - la);
-
-                    if (tDelta != Tense.ITERNAL) {
-                        der = der.t(tDelta);
+                    if (aTask!=ETERNAL && aBelief == ETERNAL) {
+                        if (bBelief!=ETERNAL && bTask == ETERNAL) {
+                            //forward: task -> belief
+                            t = (int)(belief().occurrence() - task().occurrence());
+                            //occ += 0;
+                        }
                     }
-                }
-            } else {
-                //if ((td!=ITERNAL) && (tt.term(1).equals(der))) {
-                    //occShift = -td;
-                //} else if ((bd!=ITERNAL) && (bb.term(1).equals(der))) {
-                if (bd!=ITERNAL)
-                    occShift = -bd;
-                //}
-            }
 
-//            else {
-//                //examine dt of T.term and B.term
-//
-//                if (la > TIMELESS) {
-//                    //subj has common start
-//                } else if (lb > TIMELESS) {
-//                    //pred has common end
+                }
+//                if ((aTask!=ETERNAL && aBelief!=ETERNAL)) {
+//                    //left term appears in both task and belief
+//                    if ((aTask!=0 && aBelief==0)) {
+//                        //chained inner
+//                        t = td + bd;
+//                    } else if (aTask == 0 && aBelief!=0) {
+//                        //chain outer
+//                        t = td - bd; //?? CHECK
+//                    }
+//                } else if ((bTask!=ETERNAL && bBelief!=ETERNAL)) {
+//                    //right term appears in both task and belief
+//                    if ((bTask!=0 && bBelief==0)) {
+//                        //chain outer
+//                        t = td - bd; //?? CHECK
+//                    } else if (bTask == 0 && bBelief!=0) {
+//                        // chained inner
+//                        t = td + bd;
+//                    }
+//                } else if (td!=ITERNAL && bd!=ITERNAL) {
+//                    //??
+//                    t = (td+bd)/2;
+//                } else if (bd == ITERNAL) {
+//                    t = td;
+//                } else { //if (td == ITERNAL) {
+//                    t = bd;
 //                }
-//            }
 
+//                long a = ETERNAL, b = ETERNAL;
+//                if (aTask == aBelief || aBelief == ETERNAL) {
+//                    a = aTask;
+//                    t = td;
+//                    b = a + t;
+//                } else if (aBelief!=ETERNAL && aTask == ETERNAL) {
+//                    a = aBelief;
+//                    t = bd;
+//                    b = a + t;
+//                } else if (aBelief==ETERNAL && aTask == ETERNAL) {
+//                    a = ETERNAL;
+//                    t = ITERNAL;
+//                } else {
+//                    a = ETERNAL;
+//                    System.out.println("A amibugous: " + a + " " + aTask + " " + aBelief);
+//                }
+//
+//
+//                if (a!=ETERNAL) {
+//                    if ((bTask == ETERNAL) && (bBelief == ETERNAL)){
+//                        //unique b term, calculate via dt
+//                        //b = a + t;
+//                    }
+//                } else {
+//                    if ((bTask == ETERNAL && bBelief == ETERNAL)) {
+//                        //no clue
+//                        b = ETERNAL;
+//                    } else if ((bTask==ETERNAL) && (bBelief != ETERNAL)) {
+//                        b = bBelief;
+//                        a = b - t;
+//                    } else if ((bTask!=ETERNAL) && (bBelief == ETERNAL)){
+//                        b = bTask;
+//                        a = b - t;
+//                    } else {
+//                        System.out.println("B amibugous: " + b + " " + bTask + " " + bBelief);
+//                    }
+//
+//
+//                }
 
-            return der;
+                //System.out.println(derived + " " + a + ":"+ aTask + "|" + aBelief + ", " + b + ":" + bTask + "|" + bBelief);
+
+                if (t!=ITERNAL) {
+                    return derived.t(t);
+                }
+
+            } else {
+                //..
+            }
         }
-    };
+
+        return derived;
+        //return nar.memory.index.transformRoot(derived, temporalize);
+    }
+
+
+    @Deprecated public long occ;
 
 
 //    /** max(tasktime, belieftime) */

@@ -43,7 +43,6 @@ import java.util.function.Supplier;
 
 import static nars.Global.dereference;
 import static nars.nal.LocalRules.solutionBudget;
-import static nars.nal.Tense.ITERNAL;
 import static nars.nal.Tense.TIMELESS;
 import static nars.truth.TruthFunctions.eternalize;
 import static nars.truth.TruthFunctions.temporalProjection;
@@ -356,48 +355,17 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
     }
 
-    /** get the absolute time of an event subterm, if present, TIMELESS otherwise */
-    default long subtermTimeAbs(Term x) {
-        long t = subtermTime(x);
-        if (t == TIMELESS) return TIMELESS;
-        return t + occurrence();
-    }
+//    /** get the absolute time of an event subterm, if present, TIMELESS otherwise */
+//    default long subtermTimeAbs(Term x) {
+//        long t = subtermTime(x);
+//        if (t == TIMELESS) return TIMELESS;
+//        return t + occurrence();
+//    }
 
-    /** relevant time of an event subterm (or self), if present, TIMELESS otherwise */
-    default long subtermTime(Term x) {
-        //TODO recurse and calculate correctly
-
-        Compound tt = term();
-
-        if (tt.equals(x))
-            return 0;
-
-        if (!tt.op().isTemporal())
-            return ITERNAL;
-
-        int dt = tt.t();
-        if (dt==ITERNAL) {
-            dt = 0;
-        }
-
-        if (dt == 0) {
-            if (tt.containsTerm(x))
-                return 0; //also handles &| multi-arg case
-        } else if (tt.size() == 2) {
-
-            Term subj = tt.term(0);
-            if (subj.equals(x)) return 0;
-
-            Term pred = tt.term(1);
-            if (pred.equals(x)) return dt;
-
-        } else {
-            throw new RuntimeException("invalid temporal type: " + tt);
-        }
-
-        return TIMELESS;
-    }
-
+//    /** relevant time of an event subterm (or self), if present, TIMELESS otherwise */
+//    default long subtermTime(Term x) {
+//        return term().subtermTime(x, x.t());
+//    }
 
 
 //    default float projectionConfidence(long when, long now) {

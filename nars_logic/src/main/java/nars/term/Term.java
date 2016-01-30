@@ -27,6 +27,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
+import static nars.nal.Tense.ETERNAL;
+import static nars.nal.Tense.ITERNAL;
+
 
 public interface Term extends Termed, Comparable, Termlike {
 
@@ -218,6 +221,39 @@ public interface Term extends Termed, Comparable, Termlike {
     @Override
     default boolean isNormalized() {
         return true;
+    }
+
+    default long subtermTime(Term x) {
+        return subtermTime(x, this instanceof Compound ? ((Compound)this).t() : ITERNAL);
+    }
+
+    default long subtermTime(Term x, int dt) {
+
+        if (this.equals(x))
+            return 0;
+
+        if (!this.op().isTemporal())
+            return ETERNAL;
+
+        Compound c = ((Compound) this);
+
+
+        if (dt == 0) {
+            if (this.containsTerm(x))
+                return 0; //also handles &| multi-arg case
+        } else if (this.size() == 2) {
+
+            Term subj = c.term(0);
+            if (subj.equals(x)) return 0;
+
+            Term pred = c.term(1);
+            if (pred.equals(x)) return dt;
+
+        } else {
+            throw new RuntimeException("invalid temporal type: " + this);
+        }
+
+        return ETERNAL;
     }
 
 //    default public boolean hasAll(final Op... op) {
