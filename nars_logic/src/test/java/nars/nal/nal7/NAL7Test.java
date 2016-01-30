@@ -151,7 +151,7 @@ public class NAL7Test extends AbstractNALTester {
         test()
         .input("(y ==>+3 x). :\\:")
         .inputAt(20, "(y ==>+3 ?x)? :/:")
-        .mustAnswer(55, "(y ==>+3 x)", 1.00f, 0.79f, 25);
+        .mustAnswer(55, "(y ==>+3 x)", 1.00f, 0.79f, 48);
     }
 //    @Test public void testImplQuery2() {
 //        TestNAR t = test();

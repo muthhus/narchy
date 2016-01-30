@@ -4,7 +4,6 @@ import com.gs.collections.api.bimap.MutableBiMap;
 import com.gs.collections.impl.bimap.mutable.HashBiMap;
 import nars.$;
 import nars.Global;
-import nars.nal.nal8.Operator;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;
@@ -179,10 +178,7 @@ public class DefaultTermizer implements Termizer {
         else if (o instanceof Method) {
             //translate the method to an operation term
             Method m = (Method)o;
-            return $.exec(
-                getOperator(m),
-                getMethodArgVariables(m)
-            );
+            return getOperation(m, getMethodArgVariables(m));
         }
 
         return termInstanceInClassInPackage(o);
@@ -215,8 +211,8 @@ public class DefaultTermizer implements Termizer {
         return Atom.the((Number) o);
     }
 
-    public Operator getOperator(@NotNull Method m) {
-        return getMethodOperator(m);
+    public Compound getOperation(@NotNull Method m, Term[] args) {
+        return getMethodOperator(m, args);
     }
 
     private boolean reportClassInPackage(@NotNull Class oc) {

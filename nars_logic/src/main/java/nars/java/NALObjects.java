@@ -9,7 +9,6 @@ import nars.$;
 import nars.Global;
 import nars.NAR;
 import nars.nal.Tense;
-import nars.nal.nal8.Operator;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
@@ -102,7 +101,7 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
 //    }
 
     @NotNull
-    static Operator getMethodOperator(@NotNull Method overridden) {
+    static Compound getMethodOperator(@NotNull Method overridden, Term[] args) {
         //dereference class to origin, not using a wrapped class
         Class c = overridden.getDeclaringClass();
 
@@ -110,7 +109,7 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
         if (c.getName().contains("_$$_")) ////javassist wrapper class
             c = c.getSuperclass();
 
-        return $.operator(c.getSimpleName() + '_' + overridden.getName());
+        return $.exec($.operator(c.getSimpleName()), args );
     }
 
     //final AtomicBoolean lock = new AtomicBoolean(false);
@@ -175,10 +174,9 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
         if (methodExclusions.contains(method.getName()))
             return null;
 
-        Operator op = getOperator(method);
-        Compound invocationArgs = getMethodInvocationTerms(method, instance, args);
+        Compound op = getOperation(method, getMethodInvocationTerms(method, instance, args));
 
-        return $.goal($.exec(op, (Compound) invocationArgs),
+        return $.goal(op,
                 invocationGoalFreq, invocationGoalConf).
                 present(nar.memory).because("Invoked" /* via VM */);
     }
@@ -191,15 +189,15 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
 //            return result;
 //        }
 
-        //Term effect = term(result);
+        Term effect = term(result);
 
         Task volitionTask = volition.get();
 
         //TODO re-use static copy for 'VOID' and null-returning instances
-//        if (invokingGoal != null) {
-//            InvocationResult ir = new InvocationResult(volitionTask, effect);
-//            ((MutableTask)invokingGoal).because(ir);
-//        }
+        if (invokingGoal != null) {
+            InvocationResult ir = new InvocationResult(volitionTask, effect);
+            ((MutableTask)invokingGoal).because(ir);
+        }
 
 
         if (volitionTask == null) {
@@ -225,19 +223,20 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
 //        lock.set(false);
     }
 
-    private Compound getMethodInvocationTerms(@NotNull Method method, Object instance, Object[] args) {
+    private Term[] getMethodInvocationTerms(@NotNull Method method, Object instance, Object[] args) {
 
         //TODO handle static methods
 
         boolean isVoid = method.getReturnType() == void.class;
 
-        Term[] x = new Term[isVoid ? 2 : 3];
-        x[0] = term(instance);
-        x[1] = $.p(terms(args));
+        Term[] x = new Term[isVoid ? 3 : 4];
+        x[0] = $.the(method.getName());
+        x[1] = term(instance);
+        x[2] = $.p(terms(args));
         if (!isVoid) {
-            x[2] = returnValue;
+            x[3] = returnValue;
         }
-        return $.p(x);
+        return x;
     }
 
     private Term[] terms(Object[] args) {

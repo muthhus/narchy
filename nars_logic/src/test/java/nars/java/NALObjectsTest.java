@@ -89,7 +89,7 @@ public class NALObjectsTest  {
         n.log(new PrintWriter(ns));
 
 
-        n.log();
+        //n.log();
 
         String instance = "obj";
 
@@ -99,7 +99,7 @@ public class NALObjectsTest  {
 
         TestClass wrapper = no.theOrNull(instance, TestClass.class);
 
-        assertEquals(4, n.memory.exe.size() - startSize);
+        assertEquals("one ClassOperator registered", 1, n.memory.exe.size() - startSize);
 
         assertNotEquals(TestClass.class, wrapper.getClass());
         assertEquals(TestClass.class, wrapper.getClass().getSuperclass());
@@ -110,7 +110,7 @@ public class NALObjectsTest  {
         }
         else {
             //INVOKE VOLITIONALLY
-            n.input("TestClass_multiply(" + instance + ",(2, 3),#x)! :|:");
+            n.input("TestClass(multiply, " + instance + ",(2, 3),#x)! :|:");
         }
 
         AtomicInteger puppets = new AtomicInteger(0);
@@ -175,10 +175,10 @@ public class NALObjectsTest  {
 
         System.out.println(bs);
 
-        String invocationGoal0 = "TestClass_multiply(obj,(2,3),#1)!";
+        String invocationGoal0 = "TestClass(multiply,obj,(2,3),#1)!";
         assertTrue(1 <= countMatches(bs, invocationGoal0));
 
-        String invocationGoal = "TestClass_multiply(obj,(2,3),#1)! :|: %1.0;.90%";
+        String invocationGoal = "TestClass(multiply,obj,(2,3),#1)! :|: %1.0;.90%";
         assertEquals(1, countMatches(bs, invocationGoal));
 
 
@@ -195,7 +195,7 @@ public class NALObjectsTest  {
         }
 
         //TaskProcess: $.50;.50;.95$
-        String feedback = "(6-->(/,^TestClass_multiply,obj,(2,3),_)).";
+        String feedback = "(6-->(/,^TestClass,multiply,obj,(2,3),_)).";
 
         System.out.println(bs);
 
