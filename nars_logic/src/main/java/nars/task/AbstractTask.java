@@ -94,7 +94,7 @@ public abstract class AbstractTask extends Item<Task>
 
     @NotNull
     @Override
-    public Task getTask() {
+    public Task task() {
         return this;
     }
 

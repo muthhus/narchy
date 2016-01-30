@@ -73,7 +73,7 @@ public class Commander implements Consumer<NAR>, Supplier<Concept> {
 
 
         nar.memory.eventInput.on((tp) -> {
-            Task t = tp.getTask();
+            Task t = tp.task();
             if (t.isInput() && !commands.getArrayBag().contains(t))
                 input(t);
         });

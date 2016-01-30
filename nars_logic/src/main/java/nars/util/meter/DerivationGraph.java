@@ -105,9 +105,9 @@ public class DerivationGraph extends DirectedPseudograph<DerivationGraph.Keyed,O
     static final Map<String, String> parsedTerm = new HashMap(1024);
 
     public DerivationPattern add(@NotNull ConceptProcess n, Task... derived) {
-        return add(n.getConcept(), n.taskLink.get(),
+        return add(n.concept(), n.taskLink.get(),
                 n.termLink.get().term(),
-                n.getBelief(), n.time(), derived);
+                n.belief(), n.time(), derived);
     }
 
 //    public DerivationPattern addExpected(ConceptProcess n, Task... expected) {
@@ -120,7 +120,7 @@ public class DerivationGraph extends DirectedPseudograph<DerivationGraph.Keyed,O
 
         ObjectIntHashMap<Term> unique = new ObjectIntHashMap();
 
-        PremiseKey premise = newPremise(tasklink.getTask(),
+        PremiseKey premise = newPremise(tasklink.task(),
                 termlink, belief, unique, now);
 
         addVertex(premise);

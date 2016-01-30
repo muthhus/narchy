@@ -15,8 +15,8 @@ public interface TruthOperator {
     default boolean  apply(@NotNull PremiseMatch m) {
         Premise premise = m.premise;
         Truth truth = apply(
-                premise.getTask().truth(),
-                premise.getBelief() == null ? null : premise.getBelief().truth(),
+                premise.task().truth(),
+                premise.belief() == null ? null : premise.belief().truth(),
                 premise.memory()
         );
 

@@ -40,11 +40,10 @@ public class PremiseMatch extends FindSubst {
     /** current Premise */
     public ConceptProcess premise;
 
-    //public final VarCachedVersionMap secondary;
-    @NotNull
-    public final Versioned<Integer> occDelta;
-    @NotNull
-    public final Versioned<Integer> tDelta;
+//    @NotNull
+//    public final Versioned<Integer> occDelta;
+//    @NotNull
+//    public final Versioned<Integer> tDelta;
     @NotNull
     public final Versioned<Truth> truth;
     @NotNull
@@ -69,9 +68,8 @@ public class PremiseMatch extends FindSubst {
         }
 
         this.deriver = deriver;
-        //secondary = new VarCachedVersionMap(this);
-        occDelta = new Versioned(this);
-        tDelta = new Versioned(this);
+        //occDelta = new Versioned(this);
+        //tDelta = new Versioned(this);
         truth = new Versioned(this);
         punct = new Versioned(this);
         pattern = new Versioned(this);
@@ -138,9 +136,9 @@ public class PremiseMatch extends FindSubst {
         premise = p;
         this.receiver = receiver;
 
-        Compound taskTerm = p.getTask().term();
+        Compound taskTerm = p.task().term();
 
-        Termed beliefTerm = p.getBeliefTerm();  //experimental, prefer to use the belief term's Term in case it has more relevant TermMetadata (intermvals)
+        Termed beliefTerm = p.beliefTerm();  //experimental, prefer to use the belief term's Term in case it has more relevant TermMetadata (intermvals)
 
         this.termutesPerMatch = p.getMaxMatches();
 

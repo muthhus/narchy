@@ -425,7 +425,7 @@
 
 //here now are the backward inference rules which should really only work on backward inference:
 
-    (A --> S), (B --> S), task("?") |- (A --> B), (Punctuation:Question),
+    (A --> S), (B --> S), neq(A,B), task("?") |- (A --> B), (Punctuation:Question),
                                        (B --> A), (Punctuation:Question)
 
 //and the backward inference driven forward inference:

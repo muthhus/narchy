@@ -100,12 +100,12 @@ public class Inperience {
 
         this.nar = n;
 
-        n.memory.eventTaskProcess.on(tp -> experienceFromTaskInternal(tp.getTask()));
+        n.memory.eventTaskProcess.on(tp -> experienceFromTaskInternal(tp.task()));
 
         n.memory.eventConceptProcess.on(p -> {
-            Task belief = p.getBelief();
+            Task belief = p.belief();
             if (belief == null) return;
-            Task task = p.getTask();
+            Task task = p.task();
 
             Random r = p.memory().random;
 

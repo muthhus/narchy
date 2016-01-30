@@ -141,6 +141,13 @@ public interface TermBuilder {
     }
 
     @Nullable
+    default <X extends Compound> X transformRoot(@NotNull Compound src, @NotNull CompoundTransform t) {
+        if (t.testSuperTerm(src))
+            return (X)t.apply(src, null, 0);
+        return (X)src;
+    }
+
+    @Nullable
     default <X extends Compound> X transform(@NotNull Compound src, @NotNull CompoundTransform t, boolean requireEqualityForNewInstance) {
         if (!t.testSuperTerm(src)) {
             return (X) src; //nothing changed

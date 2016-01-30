@@ -145,7 +145,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
 
     @NotNull
-    default Task getTask() { return this; }
+    default Task task() { return this; }
 
 
     /**
@@ -353,6 +353,25 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
                 MutableTask.clone(this, adjustedTruth, now, projOcc);
 
     }
+
+    /** get the time of an event subterm, if present */
+    default long subtermTime(Term a) {
+        //TODO recurse and calculate correctly
+
+        //int dt = this.term().t();
+        Compound tt = term();
+
+        long occ = occurrence();
+
+        if (tt.equals(a))
+            return occ;
+
+        if (tt.containsTerm(a))
+            return occ;
+
+        return Tense.TIMELESS;
+    }
+
 
 
 //    default float projectionConfidence(long when, long now) {

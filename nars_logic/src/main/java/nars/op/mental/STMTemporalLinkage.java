@@ -41,7 +41,7 @@ public class STMTemporalLinkage {
 
 
         nar.memory.eventTaskProcess.on(n -> {
-            if (!n.getTask().isDeleted())
+            if (!n.task().isDeleted())
                 inductionOnSucceedingEvents(n, false);
         });
         nar.memory.eventReset.on(n -> stm.clear());

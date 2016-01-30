@@ -342,7 +342,7 @@ public final class BudgetFunctions extends UtilityFunctions {
         BLink<? extends Task> taskLink = nal.taskLink;
 
         Budget t =
-            (taskLink !=null) ? taskLink :  nal.getTask().budget();
+            (taskLink !=null) ? taskLink :  nal.task().budget();
 
 
         float priority = t.pri();

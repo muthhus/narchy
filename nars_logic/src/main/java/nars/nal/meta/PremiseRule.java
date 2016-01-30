@@ -13,9 +13,11 @@ import nars.nal.meta.constraint.NotEqualsConstraint;
 import nars.nal.meta.constraint.NotOpConstraint;
 import nars.nal.meta.match.Ellipsis;
 import nars.nal.meta.op.Solve;
-import nars.nal.meta.pre.*;
+import nars.nal.meta.pre.MatchTaskBelief;
+import nars.nal.meta.pre.NotEqual;
+import nars.nal.meta.pre.TaskNegative;
+import nars.nal.meta.pre.TaskPunctuation;
 import nars.nal.op.ImmediateTermTransform;
-import nars.nal.op.occurr;
 import nars.nal.op.substitute;
 import nars.nal.op.substituteIfUnifies;
 import nars.op.data.differ;
@@ -309,9 +311,6 @@ public class PremiseRule extends GenericCompound implements Level {
         //and not a belief term pattern
         //(which will not reference any particular atoms)
 
-
-
-
         pattern = new PatternCompound((Compound)$.p(taskTermPattern, beliefTermPattern));
 
 
@@ -319,10 +318,6 @@ public class PremiseRule extends GenericCompound implements Level {
 
         //additional modifiers: either preConditionsList or beforeConcs, classify them here
         for (int i = 2; i < precon.length; i++) {
-//            if (!(precon[i] instanceof Inheritance)) {
-//                System.err.println("unknown precondition type: " + precon[i] + " in rule: " + this);
-//                continue;
-//            }
 
             Compound predicate = (Compound) precon[i];
             Term predicate_name = predicate.term(1);
@@ -394,95 +389,53 @@ public class PremiseRule extends GenericCompound implements Level {
 //                    break;
 
                 case "occurr":
-                    preNext = new occurr(arg1,arg2);
+//                    preNext = new occurr(arg1,arg2);
                     break;
 
                 case "after":
-                    switch (arg1.toString()) {
-                        case "forward":
-                            preNext = Event.After.forward;
-                            break;
-                        case "reverseStart":
-                            preNext = Event.After.reverseStart;
-                            break;
-                        case "reverseEnd":
-                            preNext = Event.After.reverseEnd;
-                            break;
-                        default:
-                            throw new RuntimeException("invalid after() argument: " + arg1);
-                    }
+//                    switch (arg1.toString()) {
+//                        case "forward":
+//                            preNext = Event.After.forward;
+//                            break;
+//                        case "reverseStart":
+//                            preNext = Event.After.reverseStart;
+//                            break;
+//                        case "reverseEnd":
+//                            preNext = Event.After.reverseEnd;
+//                            break;
+//                        default:
+//                            throw new RuntimeException("invalid after() argument: " + arg1);
+//                    }
                     break;
 
                 case "dt":
-                    switch (arg1.toString()) {
-                        case "avg":
-                            preNext = dt.avg; break;
-                        case "task":
-                            preNext = dt.task; break;
-                        case "belief":
-                            preNext = dt.belief; break;
-                        case "exact":
-                            preNext = dt.exact; break;
-                        case "sum":
-                            preNext = dt.sum; break;
-                        case "sumNeg":
-                            preNext = dt.sumNeg; break;
-                        case "bmint":
-                            preNext = dt.bmint; break;
-                        case "tminb":
-                            preNext = dt.tminb; break;
-
-                        case "occ":
-                            preNext = dt.occ; break;
-
-                        default:
-                            throw new RuntimeException("invalid dt() argument: " + arg1);
-                    }
+//                    switch (arg1.toString()) {
+//                        case "avg":
+//                            preNext = dt.avg; break;
+//                        case "task":
+//                            preNext = dt.task; break;
+//                        case "belief":
+//                            preNext = dt.belief; break;
+//                        case "exact":
+//                            preNext = dt.exact; break;
+//                        case "sum":
+//                            preNext = dt.sum; break;
+//                        case "sumNeg":
+//                            preNext = dt.sumNeg; break;
+//                        case "bmint":
+//                            preNext = dt.bmint; break;
+//                        case "tminb":
+//                            preNext = dt.tminb; break;
+//
+//                        case "occ":
+//                            preNext = dt.occ; break;
+//
+//                        default:
+//                            throw new RuntimeException("invalid dt() argument: " + arg1);
+//                    }
                     break;
 
 
-//                case "beforePos":
-//                    preNext = Event.Before.forward;
-//                    break;
-//                case "beforeNeg":
-//                    preNext = Event.Before.reverse;
-//                    break;
-
-//                case "concurrent":
-//                    preNext = Concurrent.the;
-//                    break;
-
-//
-//                case "measure_time":
-//                    if (args.length!=1)
-//                        throw new RuntimeException("measure_time requires 1 component");
-//
-//                    preNext = Temporality.both;
-//                    next = new MeasureTime(arg1);
-//                    break;
-
-
-
-                case "substitute":
-                case "substitute_if_unifies":
-                    throw new RuntimeException("depr");
-                    //afterConcs.add(new Substitute(arg1, (Variable)arg2));
-                    //break;
-
-                    //afterConcs.add(new SubstituteIfUnified(arg1, arg2, args[2]));
-                    //break;
-
-//                case "intersection":
-//                    afterConcs.add(new Intersect(arg1, arg2, args[2]));
-//                    break;
-//
-//                case "union":
-//                    afterConcs.add(new Unite(arg1, arg2, args[2]));
-//                    break;
-//
-//                case "difference":
-//                    afterConcs.add(new Differ(arg1, arg2, args[2]));
-//                    break;
 
                 case "task":
                     switch (arg1.toString()) {
@@ -503,13 +456,6 @@ public class PremiseRule extends GenericCompound implements Level {
                     }
                     break;
 
-
-                case "not_conjunction":
-                case "not_set":
-                case "not_implication_or_equivalence":
-                case "shift_occurrence_forward":
-                case "shift_occurrence_backward":
-                    throw new RuntimeException("depr");
 
                 default:
                     throw new RuntimeException("unhandled postcondition: " + predicateNameStr + " in " + this + "");

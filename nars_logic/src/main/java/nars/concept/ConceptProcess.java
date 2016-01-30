@@ -38,13 +38,13 @@ public final class ConceptProcess implements Premise {
     private final boolean cyclic;
 
     @Override
-    public final Task getTask() {
+    public final Task task() {
         return taskLink.get();
     }
 
 
 
-    public Concept getConcept() {
+    public Concept concept() {
         return conceptLink.get();
     }
 
@@ -58,7 +58,7 @@ public final class ConceptProcess implements Premise {
         this.termLink = termLink;
 
         this.belief = belief;
-        this.cyclic = Stamp.overlapping(getTask(), belief);
+        this.cyclic = Stamp.overlapping(task(), belief);
     }
 
 
@@ -127,8 +127,8 @@ public final class ConceptProcess implements Premise {
 //    }
 
 
-    public final Termed getBeliefTerm() {
-        Task x = getBelief();
+    public final Termed beliefTerm() {
+        Task x = belief();
         return x== null ? termLink.get() :
                 x.term();
     }
@@ -155,7 +155,7 @@ public final class ConceptProcess implements Premise {
 
     @Nullable
     @Override
-    public final Task getBelief() {
+    public final Task belief() {
         return belief;
     }
 
@@ -171,7 +171,7 @@ public final class ConceptProcess implements Premise {
                 .append('[').append(conceptLink).append(',')
                             .append(taskLink).append(',')
                             .append(termLink).append(',')
-                            .append(getBelief())
+                            .append(belief())
                 .append(']')
                 .toString();
     }
@@ -183,7 +183,7 @@ public final class ConceptProcess implements Premise {
 
     public int getMaxMatches() {
         final float min = Global.MIN_TERMUTATIONS_PER_MATCH, max = Global.MAX_TERMUTATIONS_PER_MATCH;
-        return (int)Math.ceil(getTask().pri() * (max-min) + min);
+        return (int)Math.ceil(task().pri() * (max-min) + min);
     }
 
 //    /** max(tasktime, belieftime) */

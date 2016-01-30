@@ -15,7 +15,7 @@ public class InputPremises extends PreCondition2 {
 
     @Override
     public final boolean test(@NotNull PremiseMatch m, Term a, Term b) {
-        return m.premise.getTask().isInput() && m.premise.getBelief() != null && m.premise.getBelief().isInput();
+        return m.premise.task().isInput() && m.premise.belief() != null && m.premise.belief().isInput();
     }
 
 }

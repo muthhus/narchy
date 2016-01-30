@@ -16,6 +16,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import static nars.nal.Tense.ETERNAL;
+
 /**
  * Defines the conditions used in an instance of a derivation
  */
@@ -48,17 +50,17 @@ public interface Premise extends Level, Tasked {
 //        return t.apply(subs);
 //    }
 
-    Concept getConcept();
+    Concept concept();
 
     //BagBudget<Termed> getTermLink();
 
     //TaskLink getTaskLink();
 
     @Nullable
-    Task getBelief();
+    Task belief();
 
 
-    Task getTask();
+    Task task();
 
 
     NAR nar();
@@ -429,18 +431,18 @@ public interface Premise extends Level, Tasked {
     /** true if both task and (non-null) belief are temporal events */
     default boolean isEvent() {
         /* TODO This part is used commonly, extract into its own precondition */
-        Task b = getBelief();
+        Task b = belief();
         if (b == null) return false;
-        return (!Tense.isEternal(getTask().occurrence()) &&
+        return (!Tense.isEternal(task().occurrence()) &&
                 (!Tense.isEternal(b.occurrence())));
     }
 
     /** true if both task and belief (if not null) are eternal */
     default boolean isEternal() {
-        Task b = getBelief();
+        Task b = belief();
         if ((b != null) && (!b.isEternal()))
             return false;
-        return getTask().isEternal();
+        return task().isEternal();
     }
 
 //    /** true if either task or belief is non-eternal */
@@ -508,10 +510,10 @@ public interface Premise extends Level, Tasked {
 
 
         if (Global.DEBUG) {
-            if (getTask().equals(derived))
+            if (task().equals(derived))
                 return null;
                 //throw new RuntimeException("derivation same as task");
-            if (getBelief() != null && getBelief().equals(derived))
+            if (belief() != null && belief().equals(derived))
                 return null;
                 //throw new RuntimeException("derivation same as belief");
         }
@@ -525,18 +527,36 @@ public interface Premise extends Level, Tasked {
     }
 
     default Compound getTaskTerm() {
-        return getTask().term();
+        return task().term();
     }
 
-    Termed getBeliefTerm();
+    Termed beliefTerm();
 
 
     /** beliefTerm iff a Compound, null otherwise */
     @Nullable
     default Compound getBeliefCompound() {
-        Term x = getBeliefTerm().term();
+        Term x = beliefTerm().term();
         return x.isCompound() ? (Compound) x : null;
     }
+
+    /** computes a base occurrence time from the premise task and belief */
+    default long occurrenceTarget() {
+        long t = task().occurrence();
+        Task b = belief();
+        if (b == null) return t;
+        else {
+            long bOcc = b.occurrence();
+
+            if (t == ETERNAL) {
+                if (bOcc!=ETERNAL) return bOcc;
+                else return ETERNAL;
+            } else { //if (bOcc == ETERNAL) {
+                return t;
+            }
+        }
+    }
+
 
     static final class UnifySubst extends FindSubst {
 

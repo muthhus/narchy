@@ -4,6 +4,7 @@ import com.google.common.base.Joiner;
 import nars.$;
 import nars.Global;
 import nars.Memory;
+import nars.Premise;
 import nars.bag.BLink;
 import nars.budget.Budget;
 import nars.concept.ConceptProcess;
@@ -15,11 +16,13 @@ import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.transform.CompoundTransform;
 import nars.term.variable.Variable;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static nars.nal.Tense.*;
 import static nars.truth.TruthFunctions.eternalize;
 
 /**
@@ -39,6 +42,7 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
     private final Term term;
 
     @NotNull private final BooleanCondition<PremiseMatch> postMatch; //TODO use AND condition
+
 
     public Derive(PremiseRule rule, Term term, @NotNull BooleanCondition[] postMatch, boolean anticipate, boolean eternalize) {
         this.rule = rule;
@@ -128,48 +132,109 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
     /** part 1 */
     private void derive(@NotNull PremiseMatch p, @Nullable Term t) {
 
-        if ((t != null) && !Variable.hasPatternVariable(t)) {
-
-            Memory mem = p.premise.memory();
-
-            //get the normalized term to determine the budget (via it's complexity)
-            //this way we can determine if the budget is insufficient
-            //before conceptualizating in mem.taskConcept
-            Termed tNorm = mem.index.normalized(t);
-
-            //HACK why?
-            if ((tNorm == null) || !tNorm.term().isCompound())
-                return;
-
-            Truth truth = p.truth.get();
-
-            Budget budget = p.getBudget(truth, tNorm);
-            if (budget == null)
-                return;
-
-
-            int tDelta = p.tDelta.getIfAbsent(Tense.ITERNAL);
-            Termed<Compound> c;
-            if (tDelta != Tense.ITERNAL) {
-
-                Compound ct = (Compound) tNorm.term();
-
-                //set time relation
-                //convert to occDelta:
-                //p.occDelta.set(p.occDelta.getIfAbsent(0) + tDelta);
-
-                c = ct.op().isTemporal() ? ct.t(tDelta) : tNorm;
-
-            } else {
-                //c = mem.taskConcept(tNorm); //accelerant: concept lookup
-                c = tNorm;
-            }
-
-
-            derive(p, c, truth, budget);
+        if ((t == null) || Variable.hasPatternVariable(t)) {
+            return;
         }
 
+        ConceptProcess premise = p.premise;
+        Memory mem = premise.memory();
+
+        //get the normalized term to determine the budget (via it's complexity)
+        //this way we can determine if the budget is insufficient
+        //before conceptualizating in mem.taskConcept
+        Termed tNorm = mem.index.normalized(t);
+
+        //HACK why?
+        if ((tNorm == null) || !tNorm.term().isCompound())
+            return;
+
+        Truth truth = p.truth.get();
+
+        Budget budget = p.getBudget(truth, tNorm);
+        if (budget == null)
+            return;
+
+        boolean p7 = premise.nal(7);
+
+        long now = premise.time();
+        long occ = p7 ? premise.occurrenceTarget() : ETERNAL;
+
+        Compound ct = (Compound) tNorm.term();
+
+        if (p7) {
+            this.premise = premise; //HACK
+            ct = premise.nar.memory.index.transformRoot(ct, temporalize);
+            this.premise = null; //HACK
+        }
+
+        derive(p, ct, truth, budget, now, occ);
+
     }
+
+    /** HACK */
+    transient private Premise premise;
+
+    private final CompoundTransform temporalize = new CompoundTransform<Compound,Compound>() {
+
+        @Override
+        public boolean test(Term ct) {
+            //N/A probably
+            return ct.isCompound();
+            //return true; //ct.op().isTemporal();
+        }
+
+        @Override
+        public boolean testSuperTerm(Compound ct) {
+            //N/A probably
+            return ct.op().isTemporal();
+        }
+
+        final static int maxLevel = 3;
+
+        @Override
+        public Compound apply(Compound parent, Compound unused, int depth) {
+            //ignore details below a certain depth
+            if (depth >= maxLevel)
+                return parent;
+
+            int tDelta = ITERNAL;
+
+            //(a ??? b)
+            Term a = parent.term(0);
+            Term b = parent.term(1);
+
+            Task pt = premise.task();
+            long aTask = pt.subtermTime(a);
+            Task pb = premise.belief();
+            long aBelief = pb!=null ? pb.subtermTime(a) : ITERNAL;
+            long bTask = pt.subtermTime(b);
+            long bBelief = pb!=null ? pb.subtermTime(b) : ITERNAL;
+
+            boolean aBoth = (aTask!=TIMELESS && aBelief!=TIMELESS);
+            boolean bBoth = (bTask!=TIMELESS && bBelief!=TIMELESS);
+
+            long la = ETERNAL, lb = ETERNAL;
+            if ((aTask > TIMELESS) && (aBelief <= TIMELESS))
+                la = aTask;
+            else if ((aBelief > TIMELESS) && (aTask <= TIMELESS))
+                la = aBelief;
+            if ((bTask > TIMELESS) && (bBelief <= TIMELESS))
+                lb = bTask;
+            else if ((bBelief > TIMELESS) && (bTask <= TIMELESS))
+                lb = bBelief;
+
+            //TODO handle case when both are known in each (avg?)
+
+            if ((la!=ETERNAL) && (lb!=ETERNAL))
+                tDelta = (int)(lb - la);
+
+            if (tDelta != Tense.ITERNAL) {
+                parent = parent.t(tDelta);
+            }
+
+            return parent;
+        }
+    };
 
     public final static class DerivedTask extends MutableTask {
 
@@ -196,7 +261,7 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
                 tLink.andDurability(oneMinusDifT);
             }
 
-            Task belief = p.getBelief();
+            Task belief = p.belief();
             if (belief!=null) {
                 BLink<? extends Termed> bLink = p.termLink;
                 float oneMinusDifB = 1f - conclusion.getExpDifAbs(belief.truth());
@@ -210,34 +275,23 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
     }
 
     /** part 2 */
-    private void derive(@NotNull PremiseMatch m, @NotNull Termed<Compound> c, @Nullable Truth truth, Budget budget) {
+    private void derive(@NotNull PremiseMatch m, @NotNull Termed<Compound> c, @Nullable Truth truth, Budget budget, long now, long occ) {
 
         ConceptProcess premise = m.premise;
 
-        Task task = premise.getTask();
-        Task belief = premise.getBelief();
+        Task task = premise.task();
+        Task belief = premise.belief();
 
         char punct = m.punct.get();
 
         MutableTask deriving = new DerivedTask(c, premise);
 
-        long now = premise.time();
-        long occ = task.occurrence();
-
-
-        //just not able to measure it, closed world assumption gone wild.
-        boolean derivedTemporal = occ != Tense.ETERNAL;
-        if (derivedTemporal) {
-            if (premise.isEternal() && !premise.nal(7)) {
-                throw new RuntimeException("eternal premise " + premise + " should not result in non-eternal occurence time: " + deriving + " via rule " + rule);
-            }
-            occ += m.occDelta.getIfAbsent(0);
-        }
-
 
         if ((Global.DEBUG_DETECT_DUPLICATE_DERIVATIONS || Global.DEBUG_LOG_DERIVING_RULE) && Global.DEBUG) {
             deriving.log(rule);
         }
+
+        boolean derivedTemporal = occ != ETERNAL;
 
         Task derived = deriving
                 .punctuation(punct)
@@ -262,7 +316,7 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
                         eternalize(truth.conf())
                     )
 
-                    .time(now, Tense.ETERNAL)
+                    .time(now, ETERNAL)
 
                     .budget(budget)
                     .budgetCompoundForward(premise)
