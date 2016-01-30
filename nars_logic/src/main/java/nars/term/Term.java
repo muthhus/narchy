@@ -232,7 +232,7 @@ public interface Term extends Termed, Comparable, Termlike {
         if (this.equals(x))
             return 0;
 
-        if (!this.op().isTemporal())
+        if (!this.op().isTemporal() || dt == ITERNAL)
             return ETERNAL;
 
         Compound c = ((Compound) this);

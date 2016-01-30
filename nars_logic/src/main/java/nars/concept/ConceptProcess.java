@@ -9,6 +9,7 @@ import nars.NAR;
 import nars.Op;
 import nars.Premise;
 import nars.bag.BLink;
+import nars.nal.nal8.Operator;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
@@ -19,8 +20,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
-import static nars.nal.Tense.ETERNAL;
-import static nars.nal.Tense.ITERNAL;
+import static nars.nal.Tense.*;
 
 /** Firing a concept (reasoning event). Derives new Tasks via reasoning rules
  *
@@ -196,15 +196,22 @@ public final class ConceptProcess implements Premise {
 
         occ = occurrenceTarget(); //reset
 
+        Term cc = conclusionPattern;
+        if (Op.isOperation(cc)) {
+            //unwrap operation, work with its first argument
+            cc = Operator.opArgsArray((Compound)cc)[0];
+        }
 
-        if (conclusionPattern.op().isTemporal() && conclusionPattern.isCompound()) {
-            Compound tt = task().term();
-            Compound bb = belief()!=null ? belief().term() : null;
+        Compound tt = task().term();
+        Compound bb = belief()!=null ? belief().term() : null;
 
-            int td = tt.t();
-            int bd = bb!=null ? bb.t() : ITERNAL;
+        int td = tt.t();
+        int bd = bb!=null ? bb.t() : ITERNAL;
 
-            Compound cc = (Compound) conclusionPattern;
+        if (cc.op().isTemporal() && cc.isCompound()) {
+
+
+
 
             //System.out.println(tt + " "  + bb);
 
@@ -221,13 +228,10 @@ public final class ConceptProcess implements Premise {
 
              */
             int s = cc.size();
-            if (s == 1) {
-                long taskOffset = taskPattern.subtermTime(derived, td);
-                long beliefOffset = beliefPattern.subtermTime(derived, bd);
-                //System.out.println(derived + " " + taskOffset + " " + beliefOffset);
-            } else if (s == 2) {
-                Term ca = cc.term(0);
-                Term cb = cc.term(1);
+            if (s == 2) {
+                Compound ccc = (Compound)cc;
+                Term ca = ccc.term(0);
+                Term cb = ccc.term(1);
 
                 int t = ITERNAL;
                 if ((taskPattern.size() == 2) && (beliefPattern.size() == 2)) {
@@ -255,72 +259,6 @@ public final class ConceptProcess implements Premise {
                     }
 
                 }
-//                if ((aTask!=ETERNAL && aBelief!=ETERNAL)) {
-//                    //left term appears in both task and belief
-//                    if ((aTask!=0 && aBelief==0)) {
-//                        //chained inner
-//                        t = td + bd;
-//                    } else if (aTask == 0 && aBelief!=0) {
-//                        //chain outer
-//                        t = td - bd; //?? CHECK
-//                    }
-//                } else if ((bTask!=ETERNAL && bBelief!=ETERNAL)) {
-//                    //right term appears in both task and belief
-//                    if ((bTask!=0 && bBelief==0)) {
-//                        //chain outer
-//                        t = td - bd; //?? CHECK
-//                    } else if (bTask == 0 && bBelief!=0) {
-//                        // chained inner
-//                        t = td + bd;
-//                    }
-//                } else if (td!=ITERNAL && bd!=ITERNAL) {
-//                    //??
-//                    t = (td+bd)/2;
-//                } else if (bd == ITERNAL) {
-//                    t = td;
-//                } else { //if (td == ITERNAL) {
-//                    t = bd;
-//                }
-
-//                long a = ETERNAL, b = ETERNAL;
-//                if (aTask == aBelief || aBelief == ETERNAL) {
-//                    a = aTask;
-//                    t = td;
-//                    b = a + t;
-//                } else if (aBelief!=ETERNAL && aTask == ETERNAL) {
-//                    a = aBelief;
-//                    t = bd;
-//                    b = a + t;
-//                } else if (aBelief==ETERNAL && aTask == ETERNAL) {
-//                    a = ETERNAL;
-//                    t = ITERNAL;
-//                } else {
-//                    a = ETERNAL;
-//                    System.out.println("A amibugous: " + a + " " + aTask + " " + aBelief);
-//                }
-//
-//
-//                if (a!=ETERNAL) {
-//                    if ((bTask == ETERNAL) && (bBelief == ETERNAL)){
-//                        //unique b term, calculate via dt
-//                        //b = a + t;
-//                    }
-//                } else {
-//                    if ((bTask == ETERNAL && bBelief == ETERNAL)) {
-//                        //no clue
-//                        b = ETERNAL;
-//                    } else if ((bTask==ETERNAL) && (bBelief != ETERNAL)) {
-//                        b = bBelief;
-//                        a = b - t;
-//                    } else if ((bTask!=ETERNAL) && (bBelief == ETERNAL)){
-//                        b = bTask;
-//                        a = b - t;
-//                    } else {
-//                        System.out.println("B amibugous: " + b + " " + bTask + " " + bBelief);
-//                    }
-//
-//
-//                }
 
                 //System.out.println(derived + " " + a + ":"+ aTask + "|" + aBelief + ", " + b + ":" + bTask + "|" + bBelief);
 
@@ -330,6 +268,22 @@ public final class ConceptProcess implements Premise {
 
             } else {
                 //..
+            }
+        } else {
+            if (cc.size() == 0) {
+
+                long ot = taskPattern.subtermTime(cc, td);
+                long ob = beliefPattern.subtermTime(cc, bd);
+
+                if (occ>TIMELESS) {
+                    if (ot != ETERNAL) {
+                        occ = occ + ot;
+                    } else if (ob != ETERNAL) {
+                        occ = occ + ob;
+                    } else {
+                        //neither, remain eternal
+                    }
+                }
             }
         }
 
