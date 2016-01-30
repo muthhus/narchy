@@ -4,11 +4,9 @@ import com.google.common.base.Joiner;
 import nars.$;
 import nars.Global;
 import nars.Memory;
-import nars.Premise;
 import nars.bag.BLink;
 import nars.budget.Budget;
 import nars.concept.ConceptProcess;
-import nars.nal.Tense;
 import nars.nal.meta.*;
 import nars.nal.meta.match.EllipsisMatch;
 import nars.task.MutableTask;
@@ -16,13 +14,13 @@ import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.transform.CompoundTransform;
 import nars.term.variable.Variable;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.nal.Tense.*;
+import static nars.nal.Tense.ETERNAL;
+import static nars.nal.Tense.ITERNAL;
 import static nars.truth.TruthFunctions.eternalize;
 
 /**
@@ -162,79 +160,17 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
         Compound ct = (Compound) tNorm.term();
 
         if (p7) {
-            this.premise = premise; //HACK
-            ct = premise.nar.memory.index.transformRoot(ct, temporalize);
-            this.premise = null; //HACK
+            ct = premise.temporalize(ct);
+
+            int os = premise.occShift;
+            if (os!=ITERNAL)
+                occ += os;
         }
 
         derive(p, ct, truth, budget, now, occ);
 
     }
 
-    /** HACK */
-    transient private Premise premise;
-
-    private final CompoundTransform temporalize = new CompoundTransform<Compound,Compound>() {
-
-        @Override
-        public boolean test(Term ct) {
-            //N/A probably
-            return ct.isCompound();
-            //return true; //ct.op().isTemporal();
-        }
-
-        @Override
-        public boolean testSuperTerm(Compound ct) {
-            //N/A probably
-            return ct.op().isTemporal();
-        }
-
-        final static int maxLevel = 3;
-
-        @Override
-        public Compound apply(Compound parent, Compound unused, int depth) {
-            //ignore details below a certain depth
-            if (depth >= maxLevel)
-                return parent;
-
-            int tDelta = ITERNAL;
-
-            //(a ??? b)
-            Term a = parent.term(0);
-            Term b = parent.term(1);
-
-            Task pt = premise.task();
-            long aTask = pt.subtermTime(a);
-            Task pb = premise.belief();
-            long aBelief = pb!=null ? pb.subtermTime(a) : ITERNAL;
-            long bTask = pt.subtermTime(b);
-            long bBelief = pb!=null ? pb.subtermTime(b) : ITERNAL;
-
-            boolean aBoth = (aTask!=TIMELESS && aBelief!=TIMELESS);
-            boolean bBoth = (bTask!=TIMELESS && bBelief!=TIMELESS);
-
-            long la = ETERNAL, lb = ETERNAL;
-            if ((aTask > TIMELESS) && (aBelief <= TIMELESS))
-                la = aTask;
-            else if ((aBelief > TIMELESS) && (aTask <= TIMELESS))
-                la = aBelief;
-            if ((bTask > TIMELESS) && (bBelief <= TIMELESS))
-                lb = bTask;
-            else if ((bBelief > TIMELESS) && (bTask <= TIMELESS))
-                lb = bBelief;
-
-            //TODO handle case when both are known in each (avg?)
-
-            if ((la!=ETERNAL) && (lb!=ETERNAL))
-                tDelta = (int)(lb - la);
-
-            if (tDelta != Tense.ITERNAL) {
-                parent = parent.t(tDelta);
-            }
-
-            return parent;
-        }
-    };
 
     public final static class DerivedTask extends MutableTask {
 

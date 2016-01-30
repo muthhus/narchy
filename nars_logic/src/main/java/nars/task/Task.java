@@ -43,6 +43,8 @@ import java.util.function.Supplier;
 
 import static nars.Global.dereference;
 import static nars.nal.LocalRules.solutionBudget;
+import static nars.nal.Tense.ITERNAL;
+import static nars.nal.Tense.TIMELESS;
 import static nars.truth.TruthFunctions.eternalize;
 import static nars.truth.TruthFunctions.temporalProjection;
 
@@ -354,22 +356,46 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
     }
 
-    /** get the time of an event subterm, if present */
-    default long subtermTime(Term a) {
+    /** get the absolute time of an event subterm, if present, TIMELESS otherwise */
+    default long subtermTimeAbs(Term x) {
+        long t = subtermTime(x);
+        if (t == TIMELESS) return TIMELESS;
+        return t + occurrence();
+    }
+
+    /** relevant time of an event subterm (or self), if present, TIMELESS otherwise */
+    default long subtermTime(Term x) {
         //TODO recurse and calculate correctly
 
-        //int dt = this.term().t();
         Compound tt = term();
 
-        long occ = occurrence();
+        if (tt.equals(x))
+            return 0;
 
-        if (tt.equals(a))
-            return occ;
+        if (!tt.op().isTemporal())
+            return ITERNAL;
 
-        if (tt.containsTerm(a))
-            return occ;
+        int dt = tt.t();
+        if (dt==ITERNAL) {
+            dt = 0;
+        }
 
-        return Tense.TIMELESS;
+        if (dt == 0) {
+            if (tt.containsTerm(x))
+                return 0; //also handles &| multi-arg case
+        } else if (tt.size() == 2) {
+
+            Term subj = tt.term(0);
+            if (subj.equals(x)) return 0;
+
+            Term pred = tt.term(1);
+            if (pred.equals(x)) return dt;
+
+        } else {
+            throw new RuntimeException("invalid temporal type: " + tt);
+        }
+
+        return TIMELESS;
     }
 
 
@@ -689,13 +715,13 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         //however, timeless creation time means it has not been perceived yet
 
         if (oc == Tense.ETERNAL) {
-            if (ct == Tense.TIMELESS) {
+            if (ct == TIMELESS) {
                 sb.append(":-:");
             } else {
                 sb.append(':').append(Long.toString(ct)).append(':');
             }
 
-        } else if (oc == Tense.TIMELESS) {
+        } else if (oc == TIMELESS) {
             sb.append("N/A");
 
         } else {
@@ -742,7 +768,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         StringBuilder buffer = new StringBuilder(estimatedInitialSize);
         buffer.append(Symbols.STAMP_OPENER);
 
-        if (creation() == Tense.TIMELESS) {
+        if (creation() == TIMELESS) {
             buffer.append('?');
         } else if (!Tense.isEternal(occurrence())) {
             appendOccurrenceTime(buffer);

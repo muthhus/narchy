@@ -142,8 +142,12 @@ public interface TermBuilder {
 
     @Nullable
     default <X extends Compound> X transformRoot(@NotNull Compound src, @NotNull CompoundTransform t) {
-        if (t.testSuperTerm(src))
-            return (X)t.apply(src, null, 0);
+        if (t.testSuperTerm(src)) {
+//            Compound xsrc = transform(src, t);
+//            if (xsrc!=null)
+//                src = xsrc;
+            return (X) t.apply(src, null, 0);
+        }
         return (X)src;
     }
 

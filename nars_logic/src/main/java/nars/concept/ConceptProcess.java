@@ -9,14 +9,19 @@ import nars.NAR;
 import nars.Op;
 import nars.Premise;
 import nars.bag.BLink;
+import nars.nal.Tense;
 import nars.task.Task;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.transform.CompoundTransform;
 import nars.truth.Stamp;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
+
+import static nars.nal.Tense.*;
 
 /** Firing a concept (reasoning event). Derives new Tasks via reasoning rules
  *
@@ -177,7 +182,7 @@ public final class ConceptProcess implements Premise {
     }
 
     @Override
-    public NAR nar() {
+    public final NAR nar() {
         return nar;
     }
 
@@ -185,6 +190,131 @@ public final class ConceptProcess implements Premise {
         final float min = Global.MIN_TERMUTATIONS_PER_MATCH, max = Global.MAX_TERMUTATIONS_PER_MATCH;
         return (int)Math.ceil(task().pri() * (max-min) + min);
     }
+
+
+    /** apply temporal characteristics to a newly derived term according to the premise's */
+    public final Compound temporalize(Compound derived) {
+        occShift = ITERNAL; //reset
+        return nar.memory.index.transformRoot(derived, temporalize);
+    }
+
+    @Deprecated public int occShift;
+
+    private final CompoundTransform temporalize = new CompoundTransform<Compound,Compound>() {
+
+        @Override
+        public boolean test(Term ct) {
+            //N/A probably
+            return ct.isCompound();
+            //return true; //ct.op().isTemporal();
+        }
+
+        @Override
+        public boolean testSuperTerm(Compound ct) {
+            //N/A probably
+            //return ct.op().isTemporal();
+            return true;
+        }
+
+        final static int maxLevel = 1;
+
+        @Override
+        public Compound apply(Compound der, Compound unused, int depth) {
+            //ignore details below a certain depth
+            if (depth >= maxLevel)
+                return der;
+
+            int tDelta = ITERNAL;
+
+            Task T = task();
+            Task B = belief();
+
+            Compound tt = T.term();
+            Compound bb = B!=null ? B.term() : null;
+
+            int td = tt.t();
+            int bd = bb!=null ? bb.t() : ITERNAL;
+
+            if (der.op().isTemporal()) {
+
+                //(a ??? b)
+                Term a = der.term(0);
+                Term b = der.term(1);
+
+
+                long ot= T.occurrence();
+                long aTask = T.subtermTime(a);
+                long ob = B!=null ? B.occurrence() : TIMELESS;
+                long aBelief = B!=null ? B.subtermTime(a) : ITERNAL;
+                long bTask = T.subtermTime(b);
+                long bBelief = B!=null ? B.subtermTime(b) : ITERNAL;
+
+                //offset all by their respective times
+                if (ot <= TIMELESS && ob <= TIMELESS) {
+                    ot = ob = 0;
+                } else {
+                    if (ot > TIMELESS && ob <= TIMELESS) {
+                        ob = ot;
+                    } else if (ot <= TIMELESS && ob > TIMELESS) {
+                        ot = ob;
+                    }
+                    aTask += ot; bTask += ot;
+                    aBelief += ob; bBelief += ob;
+                }
+
+
+                long la = ETERNAL, lb = ETERNAL;
+                if ((aTask > TIMELESS) && (aBelief <= TIMELESS))
+                    la = aTask;
+                else if ((aBelief > TIMELESS) && (aTask <= TIMELESS))
+                    la = aBelief;
+                else if ((aBelief <= TIMELESS) && (aTask <= TIMELESS))
+                    la = TIMELESS;
+                else
+                    la = (aTask + aBelief)/2;
+
+                if ((bTask > TIMELESS) && (bBelief <= TIMELESS))
+                    lb = bTask;
+                else if ((bBelief > TIMELESS) && (bTask <= TIMELESS))
+                    lb = bBelief;
+                else if ((bBelief <= TIMELESS) && (bTask <= TIMELESS))
+                    lb = TIMELESS;
+                else
+                    lb = (bTask + bBelief)/2;
+
+                //TODO handle case when both are known in each (avg?)
+
+                if ((la>TIMELESS) && (lb>TIMELESS)) {
+                    tDelta = (int) (lb - la);
+
+                    if (tDelta != Tense.ITERNAL) {
+                        der = der.t(tDelta);
+                    }
+                }
+            } else {
+                //if ((td!=ITERNAL) && (tt.term(1).equals(der))) {
+                    //occShift = -td;
+                //} else if ((bd!=ITERNAL) && (bb.term(1).equals(der))) {
+                if (bd!=ITERNAL)
+                    occShift = -bd;
+                //}
+            }
+
+//            else {
+//                //examine dt of T.term and B.term
+//
+//                if (la > TIMELESS) {
+//                    //subj has common start
+//                } else if (lb > TIMELESS) {
+//                    //pred has common end
+//                }
+//            }
+
+
+            return der;
+        }
+    };
+
 
 //    /** max(tasktime, belieftime) */
 //    public long getMaxOccurrenceTime() {
