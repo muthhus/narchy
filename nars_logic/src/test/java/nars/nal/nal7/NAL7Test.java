@@ -225,7 +225,7 @@ public class NAL7Test extends AbstractNALTester {
         tester.input("(((John, key) --> hold) ==>+7 ((John, room) --> enter)).");
         tester.input("<(John, room) --> enter>. :|:");
 
-        tester.mustBelieve(cycles, "<(John,key) --> hold>", 1.00f, 0.81f, -7);
+        tester.mustBelieve(cycles, "<(John,key) --> hold>", 1.00f, 0.45f, -7);
     }
 
     @Test
@@ -247,7 +247,7 @@ public class NAL7Test extends AbstractNALTester {
         tester.input("<(John,room) --> enter>. :|:");
 
         tester.mustBelieve(cycles, "<(John,key) --> hold>",
-                1.00f, 0.81f, -3);
+                1.00f, 0.45f, -3);
     }
 
     @Test
