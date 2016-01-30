@@ -198,11 +198,11 @@ public class Thermostat4 {
 
     public void train() {
 
-        n.input("UnitValTaskInc_move(h,((--,true)),#x)! :|:  %1.0;0.55%");
-        n.input("UnitValTaskInc_move(h,(true),#x)! :|: %1.0;0.55%");
-        n.input("(true -->(/,^UnitValTaskInc_move,h,(#p),_))! :|:");
-        n.input("((--,true) -->(/,^UnitValTaskInc_move,h,(#p),_))! :|:");
-        n.input("((--,true) -->(/,^UnitValTaskInc_move,h,(#p),_))! :|:");
+        n.input("UnitValTaskInc(move,h,((--,true)),#x)! :|:  %1.0;0.55%");
+        n.input("UnitValTaskInc(move,h,(true),#x)! :|: %1.0;0.55%");
+        n.input("(true -->(/,^UnitValTaskInc,move,h,(#p),_))! :|:");
+        n.input("((--,true) -->(/,^UnitValTaskInc,move,h,(#p),_))! :|:");
+        n.input("((--,true) -->(/,^UnitValTaskInc,move,h,(#p),_))! :|:");
 
 
 

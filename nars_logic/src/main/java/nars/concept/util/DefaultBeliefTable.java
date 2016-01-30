@@ -361,8 +361,8 @@ public class DefaultBeliefTable implements BeliefTable {
                         x, t);
             }
 
-//            if (c.conf() * matchFactor <= Math.max(newBelief.conf(), x.conf()))
-//                continue;
+            if (c.conf() * matchFactor <= Math.max(newBelief.conf(), x.conf()))
+                continue;
 
             //float ffreqMatch = 1f/(1f + Math.abs(newBeliefFreq - x.freq()));
             c = c.withConfMult(matchFactor);
