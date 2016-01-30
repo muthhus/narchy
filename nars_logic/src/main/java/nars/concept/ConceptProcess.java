@@ -237,8 +237,12 @@ public final class ConceptProcess implements Premise {
                     Compound tpp = (Compound) taskPattern;
                     Compound bpp = (Compound) beliefPattern;
                     if (tpp.term(1).equals(bpp.term(0))) {
+                        t = td + bd;
+
                         //chained inner
-                        t = -(td + bd);
+                        if (!cb.equals(bpp.term(1))) {
+                            t = -t; //invert direction
+                        }
                     } else if (tpp.term(0).equals(bpp.term(1))) {
                         //chain outer
                         t = td + bd; //?? CHECK
@@ -289,9 +293,9 @@ public final class ConceptProcess implements Premise {
 
             if (occ > TIMELESS) {
                 if (ot != ETERNAL) {
-                    occ = occ + ot;
+                    occ = ot; //occ + ot;
                 } else if (ob != ETERNAL) {
-                    occ = occ + ob;
+                    occ = ob; //occ + ob - bd;
                 } else {
                     //neither, remain eternal
                 }
