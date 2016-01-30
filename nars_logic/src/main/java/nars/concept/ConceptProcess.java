@@ -236,22 +236,33 @@ public final class ConceptProcess implements Premise {
                 if ((taskPattern.size() == 2) && (beliefPattern.size() == 2)) {
                     Compound tpp = (Compound) taskPattern;
                     Compound bpp = (Compound) beliefPattern;
-                    if (tpp.term(1).equals(bpp.term(0))) {
-                        t = td + bd;
+                    if (td!=ITERNAL && bd!=ITERNAL) {
+                        if (tpp.term(1).equals(bpp.term(0))) {
+                            t = td + bd;
 
-                        //chained inner
-                        if (!cb.equals(bpp.term(1))) {
-                            t = -t; //invert direction
+                            //chained inner
+                            if (!cb.equals(bpp.term(1))) {
+                                t = -t; //invert direction
+                            }
+                        } else if (tpp.term(0).equals(bpp.term(1))) {
+                            //chain outer
+                            t = td + bd; //?? CHECK
+                        } else if (tpp.term(0).equals(bpp.term(0))) {
+                            //common left
+                            t = td - bd;
+                        } else if (tpp.term(1).equals(bpp.term(1))) {
+                            //common right
+                            t = bd - td;
+                        } else {
+                            throw new RuntimeException("unhandled case");
                         }
-                    } else if (tpp.term(0).equals(bpp.term(1))) {
-                        //chain outer
-                        t = td + bd; //?? CHECK
-                    } else if (tpp.term(0).equals(bpp.term(0))) {
-                        //common left
-                        t = td - bd;
-                    } else if (tpp.term(1).equals(bpp.term(1))) {
-                        //common right
-                        t = bd - td;
+                    } else if (td == ITERNAL && bd == ITERNAL && belief!=null) {
+                        long to = task().occurrence();
+                        long bo = belief().occurrence();
+                        t = (int)(to - bo);
+                        occ -= t;
+                    } else {
+                        //throw new RuntimeException("unhandled case");
                     }
                 } else if ((taskPattern.size() == 0) && (beliefPattern.size() == 0) && belief()!=null) {
                     long aTask = taskPattern.subtermTime(ca, td);
@@ -272,6 +283,9 @@ public final class ConceptProcess implements Premise {
                         t = (int) (task().occurrence() - belief().occurrence());
                         //occ += 0;
 
+                    } else {
+                        throw new RuntimeException("unhandled case");
+
                     }
 
                 }
@@ -283,7 +297,7 @@ public final class ConceptProcess implements Premise {
                 }
 
             } else {
-                //..
+                //throw new RuntimeException("unhandled case");
             }
         } else {
             //if (cc.size() == 0) {
@@ -291,7 +305,7 @@ public final class ConceptProcess implements Premise {
             long ot = taskPattern.subtermTime(cc, td);
             long ob = beliefPattern.subtermTime(cc, bd);
 
-            if (occ > TIMELESS) {
+            if (occ > TIMELESS ) {
                 if (ot != ETERNAL) {
                     if (taskPattern.isCompound()) {
                         Compound ctp = (Compound)taskPattern;
@@ -301,13 +315,18 @@ public final class ConceptProcess implements Premise {
                     }
                     occ = occ + ot; //occ + ot;
                 } else if (ob != ETERNAL) {
-                    if (beliefPattern.isCompound()) {
-                        Compound cbp = (Compound)beliefPattern;
-                        if (cbp.term(0).equals(cc)) {
-                            ob-=bd;
+
+                    if (belief().occurrence()!=task().occurrence()) { //why?
+                        if (beliefPattern.isCompound()) {
+                            Compound cbp = (Compound) beliefPattern;
+                            if (!cbp.term(1).equals(cc)) {
+                                ob -= bd;
+                            }
                         }
                     }
+
                     occ = occ + ob;
+
                 } else {
                     //neither, remain eternal
                 }
