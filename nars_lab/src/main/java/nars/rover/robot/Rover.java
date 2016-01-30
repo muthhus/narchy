@@ -266,15 +266,15 @@ public class Rover extends AbstractPolygonBot {
             //TODO dont parse these proxy tasks, its slow
             switch ((int)(5 * Math.random())) {
                 case 0:
-                    return rover.nar.task("MotorControls(forward,motor,())! :|: " + c.truth());
+                    return rover.nar.task("MotorControls(forward,motor,(),#x)! :|: " + c.truth());
                 case 1:
-                    return rover.nar.task("MotorControls(backward,motor,())! :|: " + c.truth());
+                    return rover.nar.task("MotorControls(backward,motor,(),#x)! :|: " + c.truth());
                 case 2:
-                    return rover.nar.task("MotorControls(left,motor,())! :|: " + c.truth());
+                    return rover.nar.task("MotorControls(left,motor,(),#x)! :|: " + c.truth());
                 case 3:
-                    return rover.nar.task("MotorControls(right,motor,())! :|: " + c.truth());
+                    return rover.nar.task("MotorControls(right,motor,(),#x)! :|: " + c.truth());
                 case 4:
-                    return rover.nar.task("MotorControls(stop,motor,())! :|: " + c.truth());
+                    return rover.nar.task("MotorControls(stop,motor,(),#x)! :|: " + c.truth());
             }
 
             return null;

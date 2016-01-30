@@ -5,7 +5,6 @@ import nars.Global;
 import nars.Memory;
 import nars.guifx.demo.NARide;
 import nars.nar.Default;
-import nars.op.mental.Anticipate;
 import nars.rover.RoverWorld;
 import nars.rover.Sim;
 import nars.rover.robot.Rover;
@@ -56,15 +55,15 @@ public class SomeRovers {
 //            nar.memory.DEFAULT_QUESTION_DURABILITY = 0.6f;
 
             //nar.initNAL9();
-            nar.memory.the(new Anticipate(nar));
+            //nar.memory.the(new Anticipate(nar));
 
 
             //nar.memory.perfection.setValue(0.15f);
             nar.core.confidenceDerivationMin.setValue(0.01f);
             nar.core.activationRate.setValue(0.6f/conceptsFirePerCycle /* approxmimate */);
             nar.memory.duration.set(2);
-            nar.memory.cyclesPerFrame.set(16);
-            nar.memory.shortTermMemoryHistory.set(2);
+            nar.memory.cyclesPerFrame.set(4);
+            nar.memory.shortTermMemoryHistory.set(4);
             //nar.memory.executionExpectationThreshold.setValue(0.95f);
 
 

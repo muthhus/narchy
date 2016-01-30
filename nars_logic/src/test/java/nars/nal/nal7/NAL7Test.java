@@ -16,7 +16,7 @@ import java.util.function.Supplier;
 @RunWith(Parameterized.class)
 public class NAL7Test extends AbstractNALTester {
 
-    final int cycles = 60;
+    final int cycles = 200;
 
     public NAL7Test(Supplier<NAR> b) {
         super(b);
@@ -89,17 +89,17 @@ public class NAL7Test extends AbstractNALTester {
 
 
     @Test public void updating_and_revision()  {
-        testTemporalRevision(10, 0.25f, 0.92f, "<(John,key) --> hold>");
+        testTemporalRevision(10, 0.08f, 0.75f, "<(John,key) --> hold>");
     }
     @Test public void updating_and_revision2()  {
-        testTemporalRevision(1, 0.09f, 0.91f, "<(John,key) --> hold>");
+        testTemporalRevision(1, 0.33f, 0.30f, "<(John,key) --> hold>");
     }
 
     void testTemporalRevision(int delay, float freq, float conf, String belief) {
         TestNAR tester = test();
         tester.input(belief + ". :|: %1%");
         tester.inputAt(delay, belief + ". :|: %0%");
-        tester.mustBelieve(delay+1, belief,  freq, conf, delay);
+        tester.mustBelieve(delay+2, belief,  freq, conf, delay+1);
     }
 
     @Test public void testSumNeg() {
@@ -227,7 +227,7 @@ public class NAL7Test extends AbstractNALTester {
         tester.input("(((John, key) --> hold) ==>+7 ((John, room) --> enter)).");
         tester.input("<(John, room) --> enter>. :|:");
 
-        tester.mustBelieve(cycles, "<(John,key) --> hold>", 1.00f, 0.45f, -7);
+        tester.mustBelieve(cycles, "<(John,key) --> hold>", 1.00f, 0.81f, -7);
     }
 
     @Test
@@ -332,6 +332,22 @@ public class NAL7Test extends AbstractNALTester {
 
     }
 
+    @Test public void induction_on_events_composition_pre()  {
+        TestNAR tester = test();
+
+
+        tester.input("(open:(John,door) ==>+5 enter:(John,room)). :|:");
+
+
+        tester.mustBelieve(cycles, "open:(John,door)",
+                1.00f, 0.81f,
+                0);
+
+        //[((%1,(%2==>%3),occurr(belief,forward)),(substituteIfUnifies(%3,"$",%2,%1),((Deduction-->Belief),(Induction-->Desire),(ForAllSame-->Order),(Anticipate-->Event))))]".
+        tester.mustBelieve(cycles, "enter:(John,room)",
+                1.00f, 0.81f,
+                5);
+    }
 
     @Test
     public void induction_on_events_composition()  {
@@ -343,11 +359,19 @@ public class NAL7Test extends AbstractNALTester {
         //that demonstrates the need for interpolation, binning, or thresholding of time values
 
         tester.input("<(John,key) --> hold>. :|:");
-        tester.inputAt(5, "(<(John,door) --> open> ==>+5 <(John,room) --> enter>). :|:");
+        tester.input("(open:(John,door) ==>+5 enter:(John,room)). :|:");
 
-        tester.mustBelieve(cycles, "((&&,hold:(John,key),open:(John,door)) ==>+5 enter:(John,room))",
-                1.00f, 0.45f,
+        tester.mustBelieve(cycles, "(hold:(John,key) &&+0 open:(John,door))",
+                1.00f, 0.73f,
+                0);
+
+        tester.mustBelieve(cycles, "enter:(John,room)",
+                1.00f, 0.81f,
                 5);
+
+        tester.mustBelieve(cycles, "((hold:(John,key) && open:(John,door)) ==>+5 enter:(John,room))",
+                1.00f, 0.34f,
+                0);
 
 
     }

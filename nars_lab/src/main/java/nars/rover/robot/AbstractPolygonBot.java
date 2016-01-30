@@ -119,7 +119,7 @@ public abstract class AbstractPolygonBot extends Robotic {
 
         try {
 
-            if (t < 500)
+            if (t < 250)
                 train(t);
             else if (mission == 0) {
                 //seek food
@@ -130,8 +130,9 @@ public abstract class AbstractPolygonBot extends Robotic {
                 nar.input("eat:food! :|: %1.00;0.95%");
                 nar.input("(--, eat:poison)! :|: %1.00;0.95%");
                 nar.input("(--, <eat:food <-> eat:poison>). %1.00;0.95%");
+                nar.input("(?x ==> eat:#y)?");
 
-                nar.input("MotorControls(?x,motor,?y,#z)! :|:");
+                //nar.input("MotorControls(?x,motor,?y,?z)! :|: %1.00;0.75%");
 
 
                 //nar.input("motion:#anything! :|:"); //move

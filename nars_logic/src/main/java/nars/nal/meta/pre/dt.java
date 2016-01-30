@@ -23,7 +23,7 @@ public abstract class dt extends AtomicBooleanCondition<PremiseMatch> {
             if (tt != ITERNAL && bt != ITERNAL) {
                 int avg = (tt + bt) / 2;
                 //float diff = Math.abs(at - bt)/avg;
-                m.tDelta.set(-avg);
+                m.tDelta.set(avg);
             }
             return true;
         }

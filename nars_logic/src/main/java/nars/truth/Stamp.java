@@ -96,7 +96,7 @@ public interface Stamp {
     static boolean overlapping(@NotNull Stamp a, @Nullable Stamp b) {
 
         if (b == null) return false;
-        if (a == b) return true;
+        if (a.equals(b)) return true;
 
         return overlapping(a.evidence(), b.evidence());
     }

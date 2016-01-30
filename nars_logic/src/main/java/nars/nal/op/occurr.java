@@ -17,16 +17,26 @@ import org.jetbrains.annotations.NotNull;
  */
 public class occurr extends AtomicBooleanCondition<PremiseMatch> {
 
-    final boolean taskOrBelief, forward;
+    final boolean taskOrBelief;
     @NotNull
     final String str;
 
+    final int mult;
+
     public occurr(@NotNull Term var1, @NotNull Term var2) {
         taskOrBelief = var1.toString().equals("task"); //TODO check else case
-        forward = var2.toString().equals("forward"); //TODO check else case
+
+        switch (var2.toString()) {
+            case "forward": mult = 1; break;
+            case "reverse": mult = -1; break;
+            case "zero": mult = 0; break;
+            default:
+                throw new RuntimeException("invalid occurrence multiplier parameter");
+        }
+
         str = getClass().getSimpleName() + ":(" +
                 (taskOrBelief ? "task" : "belief") + "," +
-                (forward ? "forward" : "reverse") + ")";
+                mult + ")";
     }
 
     @NotNull
@@ -46,14 +56,18 @@ public class occurr extends AtomicBooleanCondition<PremiseMatch> {
 
 
         if (tt != null && (tt instanceof Compound)) {
-            int t = ((Compound)tt).t();
+            int t = ((Compound) tt).t();
             if (t != Tense.ITERNAL) {
-                if (!forward) t = -t;
-
-                m.occDelta.set(t);
-                return true;
+                int docc;
+                if (mult!=0) {
+                    docc = t * mult;
+                } else {
+                    docc = 0;
+                }
+                m.occDelta.set(docc);
             }
         }
+
 
         return true;
     }

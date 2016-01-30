@@ -249,14 +249,15 @@ public class DefaultConcept extends AtomConcept {
 
         Task goal = goals().add(inputGoal, nar);
 
-
         if (goal.expectation() > Global.EXECUTION_DESIRE_EXPECTATION_THRESHOLD) {
 
             float delta = updateSuccess(goal, successBefore, memory);
 
-            if (Op.isOperation(goal.term()) && (goal.state() != Task.TaskState.Executed)) {
+            if (Op.isOperation(goal.term()) ) {
+                    //&& (goal.state() != Task.TaskState.Executed)) {
 
-                if (delta >= Global.EXECUTION_SATISFACTION_TRESHOLD) {
+                /*if (delta >= Global.EXECUTION_SATISFACTION_TRESHOLD)*/ {
+
                 //Truth projected = goal.projection(now, now);
 
 

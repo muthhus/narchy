@@ -355,14 +355,14 @@ public class DefaultBeliefTable implements BeliefTable {
                 c = TruthFunctions.revision(newBelief.truth(), x.truth());
                 t = Tense.ETERNAL;
             } else {
-                t = Math.max(newBelief.occurrence(), x.occurrence());
+                t = now; //Math.max(newBelief.occurrence(), x.occurrence());
                 c = TruthFunctions.revision(
                         newBelief,
                         x, t);
             }
 
-            if (c.conf() * matchFactor <= Math.max(newBelief.conf(), x.conf()))
-                continue;
+//            if (c.conf() * matchFactor <= Math.max(newBelief.conf(), x.conf()))
+//                continue;
 
             //float ffreqMatch = 1f/(1f + Math.abs(newBeliefFreq - x.freq()));
             c = c.withConfMult(matchFactor);
