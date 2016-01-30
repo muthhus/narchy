@@ -191,45 +191,45 @@
 //                (A ==> C)
 //If after S M happens, and after M P happens, so P happens after S
 
-    (M ==> P), (S ==> M), neq(S,P), dt(sum) |- (S ==> P), (Belief:Deduction, Order:ForAllSame, Derive:AllowBackward)
+    (M ==> P), (S ==> M), neq(S,P) |- (S ==> P), (Belief:Deduction, Order:ForAllSame, Derive:AllowBackward)
 
 //"Please note that the temporal order in the conclusion of a weak rule is
 //not necessarily the same as the order in the premises, given the hypothetical
 //nature of such a rule."
 
-    (P ==> M), (S ==> M), neq(S,P), dt(bmint) |- (S ==> P), (Belief:Induction, Derive:AllowBackward)
+    (P ==> M), (S ==> M), neq(S,P) |- (S ==> P), (Belief:Induction, Derive:AllowBackward)
 
-    (M ==> P), (M ==> S), neq(S,P), dt(tminb) |- (S ==> P), (Belief:Abduction, Derive:AllowBackward)
+    (M ==> P), (M ==> S), neq(S,P) |- (S ==> P), (Belief:Abduction, Derive:AllowBackward)
 
     (P ==> M), (M ==> S), neq(S,P), dt(sumNeg) |- (S ==> P), (Belief:Exemplification, Derive:AllowBackward)
 
 //// implication to equivalence ////////////////////////////////////////////////////////////////////////////////////
 //If when S happens, P happens, and before P happens, S has happened, then they are truth-related equivalent
 
-    (S ==> P), (P ==> S), neq(S,P), dt(avg) |- (S <=> P), (Belief:Intersection, Derive:AllowBackward)
+    (S ==> P), (P ==> S), neq(S,P) |- (S <=> P), (Belief:Intersection, Derive:AllowBackward)
 
 //// equivalence-based syllogism ////////////////////////////////////////////////////////////////////////////////////
 //Same as for inheritance again
 
-    (P ==> M), (S ==> M), neq(S,P), dt(avg) |- (S <=> P), (Belief:Comparison, Derive:AllowBackward)
+    (P ==> M), (S ==> M), neq(S,P) |- (S <=> P), (Belief:Comparison, Derive:AllowBackward)
 
-    (M ==> P), (M ==> S), neq(S,P), dt(tminb) |- (S <=> P), (Belief:Comparison, Derive:AllowBackward)
+    (M ==> P), (M ==> S), neq(S,P) |- (S <=> P), (Belief:Comparison, Derive:AllowBackward)
 
 
-    (M ==> P), (S <=> M), neq(S,P), dt(task) |- (S ==> P), (Belief:Analogy, Derive:AllowBackward)
+    (M ==> P), (S <=> M), neq(S,P) |- (S ==> P), (Belief:Analogy, Derive:AllowBackward)
 
-    (P ==> M), (S <=> M), neq(S,P), dt(task) |- (P ==> S), (Belief:Analogy, Derive:AllowBackward)
+    (P ==> M), (S <=> M), neq(S,P) |- (P ==> S), (Belief:Analogy, Derive:AllowBackward)
 
-    (M <=> P), (S <=> M), neq(S,P), dt(avg) |- (S <=> P), (Belief:Resemblance, Order:ForAllSame, Derive:AllowBackward)
+    (M <=> P), (S <=> M), neq(S,P) |- (S <=> P), (Belief:Resemblance, Order:ForAllSame, Derive:AllowBackward)
 
 //// implication-based composition ////////////////////////////////////////////////////////////////////////////////////
 //Same as for inheritance again
 
-    (P ==> M), (S ==> M), neq(S,P), dt(avg) |- ((P || S) ==> M), (Belief:Intersection),
-                                               ((P && S) ==> M), (Belief:Union)
+    (P ==> M), (S ==> M), neq(S,P) |- ((P || S) ==> M), (Belief:Intersection),
+                                      ((P && S) ==> M), (Belief:Union)
 
-    (M ==> P), (M ==> S), neq(S,P), dt(avg) |- (M ==> (P && S)), (Belief:Intersection),
-                                               (M ==> (P || S)), (Belief:Union)
+    (M ==> P), (M ==> S), neq(S,P) |- (M ==> (P && S)), (Belief:Intersection),
+                                      (M ==> (P || S)), (Belief:Union)
 
 //    (D =/> R), (D =\> K), neq(R,K) |- (K =/> R), (Belief:Abduction),
 //                                      (R =\> K), (Belief:Induction),
@@ -238,10 +238,10 @@
 //// implication-based decomposition ////////////////////////////////////////////////////////////////////////////////////
 //Same as for inheritance again
 
-    (S ==> M), ((||,S,A..+) ==> M), dt(task) |- ((||,A..+) ==> M), (Belief:DecomposePositiveNegativeNegative, Order:ForAllSame)
-    (S ==> M), ((&&,S,A..+) ==> M), dt(task) |- ((&&,A..+) ==> M), (Belief:DecomposeNegativePositivePositive, Order:ForAllSame, SequenceIntervals:FromBelief)
-    (M ==> S), (M ==> (&&,S,A..+)), dt(task) |- (M ==> (&&,A..+)), (Belief:DecomposePositiveNegativeNegative, Order:ForAllSame, SequenceIntervals:FromBelief)
-    (M ==> S), (M ==> (||,S,A..+)), dt(task) |- (M ==> (||,A..+)), (Belief:DecomposeNegativePositivePositive, Order:ForAllSame)
+    (S ==> M), ((||,S,A..+) ==> M) |- ((||,A..+) ==> M), (Belief:DecomposePositiveNegativeNegative, Order:ForAllSame)
+    (S ==> M), ((&&,S,A..+) ==> M) |- ((&&,A..+) ==> M), (Belief:DecomposeNegativePositivePositive, Order:ForAllSame, SequenceIntervals:FromBelief)
+    (M ==> S), (M ==> (&&,S,A..+)) |- (M ==> (&&,A..+)), (Belief:DecomposePositiveNegativeNegative, Order:ForAllSame, SequenceIntervals:FromBelief)
+    (M ==> S), (M ==> (||,S,A..+)) |- (M ==> (||,A..+)), (Belief:DecomposeNegativePositivePositive, Order:ForAllSame)
 
 //// conditional syllogism ////////////////////////////////////////////////////////////////////////////////////
 //If after M, P usually happens, and M happens, it means P is expected to happen
@@ -267,7 +267,7 @@
     (&&,X,A..+), Y |- X, (Belief:StructuralDeduction, Desire:StructuralStrong, Order:ForAllSame)
 
 //    (&/,B,A..+), B, task("!") |- (&/,A..+), (Desire:Strong, SequenceIntervals:FromTask)
-     (&&,A,B), X, task("!"), occurr(task,reverse) |- A, (Desire:StructuralStrong)
+     (&&,A,B), X, task("!") |- A, (Desire:StructuralStrong)
      (&&,A,B), X, task("!") |- B, (Desire:StructuralStrong)
 
 //// propositional decomposition ////////////////////////////////////////////////////////////////////////////////////
@@ -278,26 +278,26 @@
 
 //Additional for negation: https://groups.google.com/forum/#!topic/open-nars/g-7r0jjq2Vc
 
-    S, (&&,(--,S),A..+), dt(belief) |- (&&,A..+), (Belief:DecomposeNegativeNegativeNegative, Order:ForAllSame, SequenceIntervals:FromBelief)
+    S, (&&,(--,S),A..+) |- (&&,A..+), (Belief:DecomposeNegativeNegativeNegative, Order:ForAllSame, SequenceIntervals:FromBelief)
     S, (||,(--,S),A..+) |- (||,A..+), (Belief:DecomposePositivePositivePositive)
 
 //// multi-conditional syllogism ////////////////////////////////////////////////////////////////////////////////////
 //Inference about the pre/postconditions
 
-    Y, ((&&,X,A..+) ==> B), dt(belief) |- substituteIfUnifies(((&&,A..+) ==> B),"$",X,Y), (Belief:Deduction, Order:ForAllSame, SequenceIntervals:FromBelief)
+    Y, ((&&,X,A..+) ==> B) |- substituteIfUnifies(((&&,A..+) ==> B),"$",X,Y), (Belief:Deduction, Order:ForAllSame, SequenceIntervals:FromBelief)
 
-    ((&&,M,A..+) ==> C), ((&&,A..+) ==> C), dt(exact) |- M, (Belief:Abduction, Order:ForAllSame)
+    ((&&,M,A..+) ==> C), ((&&,A..+) ==> C) |- M, (Belief:Abduction, Order:ForAllSame)
 //single case of previous which doesnt require conjunction in single-term case
-    ((&&,M,A) ==> C), (A ==> C), dt(exact) |- M, (Belief:Abduction, Order:ForAllSame)
+    ((&&,M,A) ==> C), (A ==> C) |- M, (Belief:Abduction, Order:ForAllSame)
 
 //Can be derived by NAL7 rules so this won't be necessary there (Order:ForAllSame left out here)
 
 //the first rule does not have Order:ForAllSame because it would be invalid, see: https://groups.google.com/forum/#!topic/open-nars/r5UJo64Qhrk
-    ((&&,A..+) ==> C), M, notImplicationOrEquivalence(M), dt(task) |- ((&&,M,A..+) ==> C), (Belief:Induction)
+    ((&&,A..+) ==> C), M, notImplicationOrEquivalence(M) |- ((&&,M,A..+) ==> C), (Belief:Induction)
 
-    ((&&,M,A..+) ==> C), (B ==> M), dt(sum) |- ((&&,B,A..+) ==> C), (Belief:Deduction, Order:ForAllSame, SequenceIntervals:FromTask)
-    ((&&,M,A..+) ==> C), ((&&,B,A..+) ==> C), dt(bmint) |- (B ==> M), (Belief:Induction, Order:ForAllSame)
-    ((&&,B,A..+) ==> C), (B ==> M), dt(tminb) |- ((&&,M,A..+) ==> C), (Belief:Abduction, Order:ForAllSame, SequenceIntervals:FromTask)
+    ((&&,M,A..+) ==> C), (B ==> M) |- ((&&,B,A..+) ==> C), (Belief:Deduction, Order:ForAllSame, SequenceIntervals:FromTask)
+    ((&&,M,A..+) ==> C), ((&&,B,A..+) ==> C) |- (B ==> M), (Belief:Induction, Order:ForAllSame)
+    ((&&,B,A..+) ==> C), (B ==> M) |- ((&&,M,A..+) ==> C), (Belief:Abduction, Order:ForAllSame, SequenceIntervals:FromTask)
 
 //// variable introduction ////////////////////////////////////////////////////////////////////////////////////
 //Introduce variables by common subject or predicate
@@ -309,7 +309,7 @@
 
 
 
-    (M --> S), (M --> P), neq(S,P), dt(occ) |- (($X --> S) ==> ($X --> P)), (Belief:Induction),
+    (M --> S), (M --> P), neq(S,P) |- (($X --> S) ==> ($X --> P)), (Belief:Induction),
                                       (($X --> P) ==> ($X --> S)), (Belief:Abduction),
                                       (($X --> S) <=> ($X --> P)), (Belief:Comparison),
                                       (&&,(#Y --> S),(#Y --> P)), (Belief:Intersection)
@@ -317,22 +317,22 @@
 
 //// 2nd variable introduction ////////////////////////////////////////////////////////////////////////////////////
 
-    (A ==> (M --> P)), (M --> S), not_equal(A, (M --> S)), dt(task) |- ((&&,A,($X --> S)) ==> ($X --> P)), (Belief:Induction),
+    (A ==> (M --> P)), (M --> S), not_equal(A, (M --> S)) |- ((&&,A,($X --> S)) ==> ($X --> P)), (Belief:Induction),
                                                              (&&,(A ==> (#Y --> P)), (#Y --> S)), (Belief:Intersection)
 
-    (&&,(M --> P), A..+), (M --> S), neq(S,P), dt(task) |- (($Y --> S) ==> (&&,($Y --> P), A..+)), (Belief:Induction),
+    (&&,(M --> P), A..+), (M --> S), neq(S,P) |- (($Y --> S) ==> (&&,($Y --> P), A..+)), (Belief:Induction),
                                                  (&&,(#Y --> S), (#Y --> P), A..+), (Belief:Intersection)
 
-    (A ==> (P --> M)), (S --> M), neq(S,P), not_equal(A, (S --> M)), dt(task) |- ((&&,A,(P --> $X)) ==> (S --> $X)), (Belief:Abduction),
+    (A ==> (P --> M)), (S --> M), neq(S,P), not_equal(A, (S --> M)) |- ((&&,A,(P --> $X)) ==> (S --> $X)), (Belief:Abduction),
                                                                        (&&,(A ==> (P --> #Y)), (S --> #Y)), (Belief:Intersection)
 
-    (&&,(P --> M), A..+), (S --> M), neq(S,P), dt(task) |- ((S --> $Y) ==> (&&,(P --> $Y), A..+)), (Belief:Abduction),
+    (&&,(P --> M), A..+), (S --> M), neq(S,P) |- ((S --> $Y) ==> (&&,(P --> $Y), A..+)), (Belief:Abduction),
                                                  (&&, (S --> #Y), (P --> #Y), A..+), (Belief:Intersection)
 
 //// dependent variable elimination ////////////////////////////////////////////////////////////////////////////////////
 //Decomposition with elimination of a variable
 
-    (&&, X, A..+), B, occurr(task,forward) |- substituteIfUnifies((&&,A..+),"#",X,B), (Belief:AnonymousAnalogy, Desire:Strong, Order:ForAllSame, SequenceIntervals:FromTask)
+    (&&, X, A..+), B |- substituteIfUnifies((&&,A..+),"#",X,B), (Belief:AnonymousAnalogy, Desire:Strong, Order:ForAllSame, SequenceIntervals:FromTask)
 
 //conditional abduction by dependent variable
 
@@ -341,9 +341,9 @@
 
 // conditional deduction "An inverse inference has been implemented as a form of deduction" https://code.google.com/p/open-nars/issues/detail?id=40&can=1
 
-    (U --> L), ((&&,A..*,(#X --> L),(#X --> R)) ==> Z), dt(belief) |- substitute(((&&,A..*,(U --> R)) ==> Z),#X,U), (Belief:Deduction)
+    (U --> L), ((&&,A..*,(#X --> L),(#X --> R)) ==> Z) |- substitute(((&&,A..*,(U --> R)) ==> Z),#X,U), (Belief:Deduction)
 //this shoudlnt be necesssary if the previous works (with zero or more):
-    (U --> L), ((&&,(#X --> L),(#X --> R)) ==> Z), dt(belief) |- ((U --> R) ==> Z), (Belief:Deduction)
+    (U --> L), ((&&,(#X --> L),(#X --> R)) ==> Z) |- ((U --> R) ==> Z), (Belief:Deduction)
 
 
 //    B, (A ==> C) |-  substituteIfUnifies( C, "$",A,B), (Belief:Deduction, Order:ForAllSame, Event:Anticipate)
@@ -359,22 +359,22 @@
     (B --> K), (&&,(#X --> L),(($Y --> K) ==> A)) |- substitute((&&, (#X --> L), A), $Y,B), (Belief:Deduction)
     (B --> K), (&&,(#X --> L),(($Y --> K) ==> (&&,A..+))) |- substitute((&&,(#X --> L),A..+),$Y,B), (Belief:Deduction)
 
-    (B --> K), (($X --> L) ==> (&&,(#Y --> K),A..+)), dt(belief) |- substitute((($X --> L) ==> (&&,A..+)),#Y,B), (Belief:AnonymousAnalogy)
-    (B --> K), (($X --> L) ==> (&&,(#Y --> K),A)), dt(belief) |- substitute((($X --> L) ==> A),#Y,B), (Belief:AnonymousAnalogy)
+    (B --> K), (($X --> L) ==> (&&,(#Y --> K),A..+)) |- substitute((($X --> L) ==> (&&,A..+)),#Y,B), (Belief:AnonymousAnalogy)
+    (B --> K), (($X --> L) ==> (&&,(#Y --> K),A)) |- substitute((($X --> L) ==> A),#Y,B), (Belief:AnonymousAnalogy)
 
 
 
 //precondition combiner inference rule (variable_unification6):
 
-    ((&&,C,A..+) ==> Z), ((&&,C,B..+) ==> Z), dt(avg) |- ((&&,A..+) ==> (&&,B..+)), (Belief:Induction),
+    ((&&,C,A..+) ==> Z), ((&&,C,B..+) ==> Z) |- ((&&,A..+) ==> (&&,B..+)), (Belief:Induction),
                                                            ((&&,B..+) ==> (&&,A..+)), (Belief:Induction)
-    (Z ==> (&&,C,A..+)), (Z ==> (&&,C,B..+)), dt(avg) |- ((&&,A..+) ==> (&&,B..+)), (Belief:Abduction),
+    (Z ==> (&&,C,A..+)), (Z ==> (&&,C,B..+)) |- ((&&,A..+) ==> (&&,B..+)), (Belief:Abduction),
                                                            ((&&,B..+) ==> (&&,A..+)), (Belief:Abduction)
 
 
 //second level variable introduction
 
-    (Y --> L), ((Y --> S) ==> R), dt(belief) |- ((&&,(#X --> L),(#X --> S)) ==> R), (Belief:Induction)
+    (Y --> L), ((Y --> S) ==> R) |- ((&&,(#X --> L),(#X --> S)) ==> R), (Belief:Induction)
     (Y --> L), ((&&,(Y --> S),A..+) ==> R) |- substitute(((&&,(#X --> L),(#X --> S),A..+) ==> R),Y,#X), (Belief:Intersection)
 
 //// independent variable elimination ////////////////////////////////////////////////////////////////////////////////////
@@ -383,27 +383,27 @@
 //    B, (C ==> A), occurr(belief,reverse) |- substituteIfUnifies( C, "$",A,B), (Belief:Abduction, Order:ForAllSame)
 
 //    C, (B <=> A), occurr(belief,reverse) |- substituteIfUnifies( A, "$",B,C), (Belief:Deduction, Order:ForAllSame)
-    C, (A <=> B), occurr(belief,forward) |- substituteIfUnifies( A, "$",B,C), (Belief:Deduction, Order:ForAllSame)
+    C, (A <=> B) |- substituteIfUnifies( A, "$",B,C), (Belief:Deduction, Order:ForAllSame)
 
 ////NAL7 specific inference ////////////////////////////////////////////////////////////////////////////////////
 //Reasoning about temporal statements. those are using the ==> relation because relation in time is a relation of the truth between statements.
 
 ////    X, (XI ==> B) |- occurrsForward( substituteIfUnifies( B, "$", XI, (&/,X,/1)), XI, "==>"), (Belief:Deduction, Desire:Induction, Order:ForAllSame, Event:Anticipate)
 //    X, (BI ==> Y) |- occurrsBackward( substituteIfUnifies( BI, "$", Y, X), BI, "==>"), (Belief:Abduction, Desire:Deduction, Order:ForAllSame)
-    C, (A ==> B), occurr(belief,forward) |- substituteIfUnifies( B, "$", A, C), (Belief:Deduction, Desire:Induction, Order:ForAllSame, Event:Anticipate)
-    C, (A ==> B), occurr(belief,reverse) |- substituteIfUnifies( A, "$", B, C), (Belief:Abduction, Desire:Deduction, Order:ForAllSame)
+    C, (A ==> B) |- substituteIfUnifies( B, "$", A, C), (Belief:Deduction, Desire:Induction, Order:ForAllSame, Event:Anticipate)
+    C, (A ==> B) |- substituteIfUnifies( A, "$", B, C), (Belief:Abduction, Desire:Deduction, Order:ForAllSame)
 
 
 ////Temporal induction: ////////////////////////////////////////////////////////////////////////////////////
 //When P and then S happened according to an observation, by induction (weak) it may be that alyways after P, usually S happens.
 
-    A, B, after(forward), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A ==> B), (Belief:Induction, Eternalize:Immediate)
+    A, B, events(both), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A ==> B), (Belief:Induction, Eternalize:Immediate)
 
-    A, B, after(reverseEnd), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A <=> B), (Belief:Comparison)
+    A, B, events(both), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A <=> B), (Belief:Comparison)
 
-    A, B, after(reverseEnd), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (B ==> A), (Belief:Abduction)
+    A, B, events(both), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (B ==> A), (Belief:Abduction)
 
-    A, B, after(reverseEnd), neq(A,B), notConjunction(A), notConjunction(B),  notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A && B), (Belief:Intersection)
+    A, B, events(both), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B), notConjunction(A), notConjunction(B) |- (A && B), (Belief:Intersection)
 
 //    A, B, after(_), neq(A,B), notConjunction(A), notConjunction(B),  notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (B && A), (Belief:Intersection)
 

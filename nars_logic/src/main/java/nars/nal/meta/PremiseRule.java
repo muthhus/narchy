@@ -13,10 +13,7 @@ import nars.nal.meta.constraint.NotEqualsConstraint;
 import nars.nal.meta.constraint.NotOpConstraint;
 import nars.nal.meta.match.Ellipsis;
 import nars.nal.meta.op.Solve;
-import nars.nal.meta.pre.MatchTaskBelief;
-import nars.nal.meta.pre.NotEqual;
-import nars.nal.meta.pre.TaskNegative;
-import nars.nal.meta.pre.TaskPunctuation;
+import nars.nal.meta.pre.*;
 import nars.nal.op.ImmediateTermTransform;
 import nars.nal.op.substitute;
 import nars.nal.op.substituteIfUnifies;
@@ -378,11 +375,9 @@ public class PremiseRule extends GenericCompound implements Level {
                     constraints.put(arg1, new NotOpConstraint(Op.ImplicationOrEquivalenceBits));
                     break;
 
-
-
-//                case "event":
-//                    preNext = Temporality.both;
-//                    break;
+                case "events":
+                    preNext = events.the;
+                    break;
 
 //                case "temporal":
 //                    preNext = Temporality.either;
