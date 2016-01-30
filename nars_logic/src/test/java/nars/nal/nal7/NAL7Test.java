@@ -165,19 +165,15 @@ public class NAL7Test extends AbstractNALTester {
         TestNAR tester = test();
         tester.input("<s --> S>.");
         tester.inputAt(3, "(<s --> S> &&+3 <z --> Z>). :|:");
-        tester.mustBelieve(cycles, "<z --> Z>.", 1.00f, 0.42f, 6);
+        tester.mustBelieve(cycles, "<z --> Z>.", 1.00f, 0.81f /* 0.42? */ , 6);
     }
 
     @Test
     public void intervalPreserve_and_shift_occurence()  {
-        //TODO this is an issue with junction reduction removing the interval
-        //to fix, junction termbuilder needs redesign and associated tests
-        //that cover this case in TermReductions.java
-        
         TestNAR tester = test();
         tester.input("S:s.");
         tester.inputAt(10, "(S:s &&+50 (Y:y &&+3 Z:z)). :|:");
-        tester.mustBelieve(50, "(Y:y &&+3 Z:z).", 1.00f, 0.42f, 60);
+        tester.mustBelieve(50, "(Y:y &&+3 Z:z).", 1.00f, 0.81f /* 0.42? */, 60);
     }
 
 
@@ -389,7 +385,7 @@ public class NAL7Test extends AbstractNALTester {
                 10);
 
     }
-//
+
 //    //TODO: investigate
     @Test
     public void variable_elimination_on_temporal_statements()  {

@@ -244,7 +244,7 @@ public interface Term extends Termed, Comparable, Termlike {
         } else if (this.size() == 2) {
 
             Term subj = c.term(0);
-            if (subj.equals(x)) return -dt;
+            if (subj.equals(x)) return 0;
 
             Term pred = c.term(1);
             if (pred.equals(x)) return dt;

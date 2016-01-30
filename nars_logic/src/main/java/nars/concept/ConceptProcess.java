@@ -293,9 +293,21 @@ public final class ConceptProcess implements Premise {
 
             if (occ > TIMELESS) {
                 if (ot != ETERNAL) {
-                    occ = ot; //occ + ot;
+                    if (taskPattern.isCompound()) {
+                        Compound ctp = (Compound)taskPattern;
+                        if (ctp.term(0).equals(cc)) {
+                            ot-=td;
+                        }
+                    }
+                    occ = occ + ot; //occ + ot;
                 } else if (ob != ETERNAL) {
-                    occ = ob; //occ + ob - bd;
+                    if (beliefPattern.isCompound()) {
+                        Compound cbp = (Compound)beliefPattern;
+                        if (cbp.term(0).equals(cc)) {
+                            ob-=bd;
+                        }
+                    }
+                    occ = occ + ob;
                 } else {
                     //neither, remain eternal
                 }
