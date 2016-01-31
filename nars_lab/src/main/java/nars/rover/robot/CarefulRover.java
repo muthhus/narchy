@@ -2,6 +2,7 @@ package nars.rover.robot;
 
 import nars.Global;
 import nars.NAR;
+import nars.rover.obj.NARVisionRay;
 import nars.rover.obj.VisionRay;
 import nars.term.Term;
 import org.jbox2d.collision.shapes.PolygonShape;
@@ -19,6 +20,7 @@ import java.util.Map;
  */
 public class CarefulRover extends AbstractPolygonBot {
 
+    private final NAR nar;
     float linearDamping = 0.9f;
     float angularDamping = 0.6f;
     float restitution = 0.9f; //bounciness
@@ -30,10 +32,10 @@ public class CarefulRover extends AbstractPolygonBot {
     private final float visionDistanceFactor = 1f;
     Map<Term,VisionRay> pixels = Global.newHashMap();
 
-    public void randomAction() {
-        int x = (int) (Math.random() * randomActions.size());
-        nar.input(randomActions.get(x));
-    }
+//    public void randomAction() {
+//        int x = (int) (Math.random() * randomActions.size());
+//        nar.input(randomActions.get(x));
+//    }
 
 //    public static String command(Operation operation, Memory memory) {
 //        Term[] args = operation.args();
@@ -61,7 +63,8 @@ public class CarefulRover extends AbstractPolygonBot {
 //    }
 
     public CarefulRover(String id, NAR nar) {
-        super(id, nar);
+        super(id);
+        this.nar = nar;
     }
 
     protected void initSensors(Body torso) {
@@ -70,7 +73,7 @@ public class CarefulRover extends AbstractPolygonBot {
         float da = (float) (Math.PI * 2 / numPixels);
         float a = 0;
         for (int i = 0; i < numPixels; i++) {
-            VisionRay v = new VisionRay(this, torso,
+            NARVisionRay v = new NARVisionRay(nar, this, torso,
                         /*eats ?*/ center /*: new Vec2(0,0)*/,
                     a, da, 3, 10, 1f/numPixels) {
 

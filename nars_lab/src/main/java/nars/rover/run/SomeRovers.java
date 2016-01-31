@@ -7,7 +7,7 @@ import nars.guifx.demo.NARide;
 import nars.nar.Default;
 import nars.rover.RoverWorld;
 import nars.rover.Sim;
-import nars.rover.robot.Rover;
+import nars.rover.robot.NARover;
 import nars.rover.robot.Spider;
 import nars.rover.robot.Turret;
 import nars.rover.world.FoodSpawnWorld1;
@@ -28,7 +28,7 @@ public class SomeRovers {
 
         //world = new ReactorWorld(this, 32, 48, 48*2);
 
-        RoverWorld world = new FoodSpawnWorld1(128, 48, 48, 0.5f);
+        RoverWorld world = new FoodSpawnWorld1(256, 48, 48, 0.75f);
 
         //RoverWorld world = new GridSpaceWorld(GridSpaceWorld.newMazePlanet());
 
@@ -40,12 +40,14 @@ public class SomeRovers {
 
         game.add(new Spider("spider",
                 3, 3, 0.618f, 30, 30));
-                {
+
+
+        {
             int conceptsFirePerCycle = 4;
             Default nar = new Default(
                     new Memory(clock, new MapIndex2(
-                        new SoftValueHashMap())),
-                        1200, conceptsFirePerCycle, 4, 3);
+                            new SoftValueHashMap())),
+                    1200, conceptsFirePerCycle, 4, 3);
 
 //            nar.memory.DEFAULT_JUDGMENT_PRIORITY = 0.35f;
 //            nar.memory.DEFAULT_JUDGMENT_DURABILITY = 0.35f;
@@ -60,10 +62,10 @@ public class SomeRovers {
 
             //nar.memory.perfection.setValue(0.15f);
             nar.core.confidenceDerivationMin.setValue(0.02f);
-            nar.core.activationRate.setValue(1f/conceptsFirePerCycle /* approxmimate */);
+            nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
             nar.memory.duration.set(4);
             nar.memory.conceptForgetDurations.setValue(2);
-            nar.memory.cyclesPerFrame.set(8);
+            nar.memory.cyclesPerFrame.set(3);
             nar.memory.shortTermMemoryHistory.set(3);
             //nar.memory.executionExpectationThreshold.setValue(0.95f);
 
@@ -74,12 +76,15 @@ public class SomeRovers {
             }
 
 
-
-            game.add(new Rover("r1", nar));
-
-
+            game.add(new NARover("r1", nar));
 
         }
+
+        {
+
+            game.add(new QRover("r2"));
+        }
+
 //        {
 //            NAR nar = new Default();
 //

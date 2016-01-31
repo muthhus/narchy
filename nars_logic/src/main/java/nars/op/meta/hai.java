@@ -48,7 +48,7 @@ public class hai {
 
         Q = new float[states][states][outputs];
         et = new float[states][states][outputs];
-        setQ(0.07f, 0.65f, 0.9f); //0.1 0.5 0.9
+        setQ(0.07f, 0.75f, 0.9f); //0.1 0.5 0.9
     }
 
 
@@ -103,7 +103,7 @@ public class hai {
         return lastAction;
     }
 
-    void setQ(float alpha, float gamma, float lambda) {
+    public void setQ(float alpha, float gamma, float lambda) {
         Alpha = alpha;
         Gamma = gamma;
         Lambda = lambda;
@@ -122,14 +122,14 @@ public class hai {
         //final float[][][] vis;
         final int numInputs;
         final int SomSize;
-        float gamma = 5.0f;
+        float gamma;
         float eta = 0.1f;
         float outmul = 1.0f;
         int winnerx = 0;
         int winnery = 0;
         float Leak = 0.1f;
         float InMul = 1.0f;
-        final boolean Leaky = false;
+        final boolean Leaky = true;
 
         Hsom(int SomSize, int numInputs) {
             links = new float[SomSize][SomSize][numInputs];
@@ -137,6 +137,7 @@ public class hai {
             inputs = new float[numInputs];
             coords1 = new float[SomSize][SomSize];
             coords2 = new float[SomSize][SomSize];
+            gamma = SomSize/2f;
             this.numInputs = numInputs;
             this.SomSize = SomSize;
             for (int i1 = 0; i1 < SomSize; i1++) {

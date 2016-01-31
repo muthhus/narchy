@@ -8,7 +8,9 @@ import nars.NAR;
 import nars.Symbols;
 import nars.java.MethodOperator;
 import nars.java.NALObjects;
+import nars.rover.Material;
 import nars.rover.Sim;
+import nars.rover.obj.NARVisionRay;
 import nars.rover.obj.VisionRay;
 import nars.task.MutableTask;
 import nars.task.Task;
@@ -16,37 +18,32 @@ import nars.task.in.ChangedTextInput;
 import nars.term.Termed;
 import nars.util.Texts;
 import nars.util.data.Util;
-import org.jbox2d.collision.shapes.PolygonShape;
-import org.jbox2d.common.Color3f;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
-import org.jbox2d.dynamics.BodyDef;
-import org.jbox2d.dynamics.BodyType;
-import org.jbox2d.dynamics.Fixture;
+
+import static nars.util.Texts.n2;
 
 
 /**
  * Triangular mobile vehicle
  */
-public class Rover extends AbstractPolygonBot {
+public class NARover extends AbstractPolygonBot {
 
 
     private final ChangedTextInput feltMotion, feltAngle;
 
-
+    public final NAR nar;
     //float tasteDistanceThreshold = 1.0f;
     final static int retinaPixels = 16;
     final NALObjects objs;
     int retinaRaysPerPixel = 4; //rays per vision sensor
-    float aStep = (float) (Math.PI * 2f) / retinaPixels;
+
     float L = 25f; //vision distance
-    Vec2 mouthPoint = new Vec2(2.7f, 0); //0.5f);
+    final static Vec2 mouthPoint = new Vec2(2.7f, 0); //0.5f);
     @Deprecated
-    double mouthArc = Math.PI / 6f; //in radians
-    float biteDistanceThreshold = 0.05f;
-    float linearDamping = 0.8f;
-    float angularDamping = 0.6f;
-    float restitution = 0.9f; //bounciness
+    final static double mouthArc = Math.PI / 6f; //in radians
+
+
 
 
 //    final SimpleAutoRangeTruthFrequency linearVelocity;
@@ -54,11 +51,13 @@ public class Rover extends AbstractPolygonBot {
 //    final SimpleAutoRangeTruthFrequency facingAngle;
 
     //public class DistanceInput extends ChangedTextInput
-    float friction = 0.5f;
+
     private MotorControls motors;
 
-    public Rover(String id, NAR nar) {
-        super(id, nar);
+    public NARover(String id, NAR nar) {
+        super(id);
+
+        this.nar = nar;
 
         objs = new NALObjects(nar);
 
@@ -71,6 +70,133 @@ public class Rover extends AbstractPolygonBot {
 //        motionAngle = new SimpleAutoRangeTruthFrequency(nar, nar.term("<motion-->[angle]>"), new BipolarAutoRangeTruthFrequency());
 //        facingAngle = new SimpleAutoRangeTruthFrequency(nar, nar.term("<motion-->[facing]>"), new BipolarAutoRangeTruthFrequency());
 
+    }
+
+    @Override
+    protected void onEat(Body eaten, Material m) {
+        if (m instanceof Sim.FoodMaterial) {
+            nar.logger.warn("food");
+            nar.input("eat:food. :|:");
+            //nar.input("goal:{food}. :|: %1.00;0.75%");
+            //nar.input("goal:{health}. :|: %1.00;0.75%");
+        }
+        else if (m instanceof Sim.PoisonMaterial) {
+            nar.logger.warn("poison");
+            nar.input("eat:poison. :|:");
+            //nar.input("goal:{food}. :|: %0.00;0.90%");
+            //nar.input("goal:{health}. :|: %0.00;0.90%");
+        }
+
+    }
+
+    @Override
+    public void step(int time) {
+        super.step(time);
+
+
+        try {
+            nar.step();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            nar.stop();
+        }
+
+    }
+
+    public void inputMission() {
+
+        //alpha curiosity parameter
+        long t = nar.time();
+
+
+        //nar.input("<{left,right,forward,reverse} --> direction>.");
+        //nar.input("<{wall,empty,food,poison} --> material>.");
+        //nar.input("<{0,x,xx,xxx,xxxx,xxxxx,xxxxxx,xxxxxxx,xxxxxxxx,xxxxxxxxx,xxxxxxxxxx} --> magnitude>.");
+        //nar.input("<{0,1,2,3,4,5,6,7,8,9} --> magnitude>.");
+
+        //nar.input("< ( ($n,#x) &| ($n,#y) ) =/> lessThan(#x,#y) >?");
+
+        /*
+        for (int i = 0; i < 2; i++) {
+            String x = "lessThan(" + XORShiftRandom.global.nextInt(10) + "," +
+                    XORShiftRandom.global.nextInt(10) + ")?";
+
+            nar.input(x);
+        }
+        */
+
+//        nar.input("<0 <-> x>. %0.60;0.60%");
+//        nar.input("<x <-> xx>. %0.60;0.60%");
+//        nar.input("<xx <-> xxx>. %0.60;0.60%");
+//        nar.input("<xxx <-> xxxx>. %0.60;0.60%");
+//        nar.input("<xxxx <-> xxxxx>. %0.60;0.60%");
+//        nar.input("<xxxxx <-> xxxxxx>. %0.60;0.60%");
+//        nar.input("<xxxxxx <-> xxxxxxx>. %0.60;0.60%");
+//        nar.input("<xxxxxxx <-> xxxxxxxxx>. %0.60;0.60%");
+//        nar.input("<xxxxxxxx <-> xxxxxxxxxx>. %0.60;0.60%");
+//        nar.input("<0 <-> xxxxxxxxx>. %0.00;0.90%");
+
+        //nar.input("goal:{health}! %1.0;0.95%");
+        //nar.input("goal:{health}! :|:");
+
+        //nar.believe("goal:{health}", Tense.Present, 0.5f, 0.9f); //reset
+
+
+
+        //nar.input("<?x ==> goal:{$y}>? :|:");
+
+        try {
+
+            if (t < 1500)
+                train(t);
+            else if (mission == 0) {
+                //seek food
+                //curiosity = 0.05f;
+
+                //nar.goal("goal:{food}", 1.00f, 0.90f);
+                //nar.input("goal:{food}!");
+
+                //clear appetite:
+                //nar.input("eat:food. :|: %0.00;0.75%");
+                //nar.input("eat:poison. :|: %0.00;0.75%");
+
+                nar.input("eat:food! %1.00|0.95%");
+                nar.input("speed:linear! %1.00|0.8%");
+                nar.input("eat:poison! %0.0|0.9%");
+                //nar.input("(--, <eat:food <-> eat:poison>). %1.00;0.95%");
+                nar.input("(?x ==> eat:#y)?");
+                nar.input("(?x && eat:#y)?");
+
+                nar.input("MotorControls(#x,motor,#y,#z)! :|: %1.0;0.75%"); //create demand for action
+                nar.input("MotorControls(?x,motor,?y,#z)! :|: %1.0;0.75%");
+                //nar.concept("MotorControls(?x,motor,?y,#z)").print();
+                //nar.concept("MotorControls(#x,motor,#y,#z)").print();
+
+
+                //((Default)nar).core.active.printAll();
+                //nar.concept("MotorControls(forward,motor,(),#1)").print();
+
+                //nar.input("motion:#anything! :|:"); //move
+
+            } else if (mission == 1) {
+                //rest
+                nar.input("eat:#anything! :|: %0%");
+                //nar.input("motion:(0, #x)! :|:"); //stop
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        //..
+    }
+
+
+    protected void train(long t) {
+        //float freq = 0.5f + 0.5f * (1/(1f + t/5000f)), conf = 0.85f;
+        float freq = 1f, conf = 0.9f;
+        nar.input("MotorControls(random,motor,(),#x)! %1.0;0.1%");
+        nar.input("MotorControls(random,motor,(),#x)! %" + n2(freq) + "|" + n2(conf) + "%");
+        System.out.println("@" + t + " Curiosity Trained @ freq=" + freq);
     }
 
     @Override
@@ -91,62 +217,27 @@ public class Rover extends AbstractPolygonBot {
 
     @Override
     protected Body newTorso() {
-        PolygonShape shape = new PolygonShape();
 
-        Vec2[] vertices = {new Vec2(3.0f, 0.0f), new Vec2(-1.0f, +2.0f), new Vec2(-1.0f, -2.0f)};
-        shape.set(vertices, vertices.length);
-        //shape.m_centroid.set(bodyDef.position);
-        BodyDef bd = new BodyDef();
-        bd.linearDamping = (linearDamping);
-        bd.angularDamping = (angularDamping);
-        bd.type = BodyType.DYNAMIC;
-        bd.position.set(0, 0);
-
-        Body torso = getWorld().createBody(bd);
-        Fixture f = torso.createFixture(shape, mass);
-        f.setRestitution(restitution);
-        f.setFriction(friction);
+        Body torso = newTriangleTorso(getWorld(), mass);
 
 
-        //for (int i = -pixels / 2; i <= pixels / 2; i++) {
         for (int i = 0; i < retinaPixels; i++) {
-            final float angle = /*MathUtils.PI / 2f*/ aStep * i;
-            final boolean eats = ((angle < mouthArc / 2f) || (angle > (Math.PI * 2f) - mouthArc / 2f));
+            float aStep = (float) (Math.PI * 2f) / retinaPixels;
+            final float angle = aStep * i;
 
-            //System.out.println(i + " " + angle + " " + eats);
-
-            VisionRay v = new VisionRay(this, torso,
+            VisionRay v = new NARVisionRay(nar, this, torso,
                     /*eats ?*/ mouthPoint /*: new Vec2(0,0)*/,
                     angle, aStep, retinaRaysPerPixel, L, 1f/retinaPixels) {
-
-
-                @Override
-                public void onTouch(Body touched, float di) {
-                    if (touched == null) return;
-
-                    if (touched.getUserData() instanceof Sim.Edible) {
-
-                        if (eats) {
-
-                            if (di <= biteDistanceThreshold)
-                                eat(touched);
-                            /*} else if (di <= tasteDistanceThreshold) {
-                                //taste(touched, di );
-                            }*/
-                        }
-                    }
-                }
             };
-            v.sparkColor = new Color3f(0.5f, 0.4f, 0.4f);
-            v.normalColor = new Color3f(0.4f, 0.4f, 0.4f);
+            v.setEats(((angle < mouthArc / 2f) || (angle > (Math.PI * 2f) - mouthArc / 2f)));
 
 
             draw.addLayer(v);
-
             senses.add(v);
         }
         return torso;
     }
+
 
     protected void addMotorController() throws Exception {
 
@@ -233,10 +324,10 @@ public class Rover extends AbstractPolygonBot {
 
     public static class MotorControls {
 
-        public final Rover rover;
+        public final NARover rover;
         private final Termed left, right, stop, forward, backward;
 
-        public MotorControls(Rover rover) {
+        public MotorControls(NARover rover) {
             this.rover = rover;
 
             forward = rover.nar.term("MotorControls(forward,motor,(),#x)");
@@ -302,6 +393,95 @@ public class Rover extends AbstractPolygonBot {
         }
     }
 
+
+
+    /** bipolar cycle desire, which resolves two polar opposite desires into one */
+    public abstract static class BiCycleDesire  {
+
+        private final CycleDesire positive;
+        private final CycleDesire negative;
+
+        public float positiveDesire, negativeDesire;
+        float threshold = 0f;
+        private final NAR nar;
+
+        public BiCycleDesire(String positiveTerm, String negativeTerm, ConceptDesire desireFunction, NAR n) {
+            this.nar = n;
+            this.positive = new CycleDesire(positiveTerm, desireFunction, n) {
+
+                @Override
+                float onFrame(final float desire) {
+                    positiveDesire = desire;
+                    return Float.NaN;
+                }
+            };
+            //this will be executed directly after positive, so we put the event handler in negative
+            this.negative = new CycleDesire(negativeTerm, desireFunction, n) {
+
+                @Override
+                float onFrame(float negativeDesire) {
+                    BiCycleDesire.this.negativeDesire = negativeDesire;
+
+                    frame(positiveDesire, negativeDesire);
+
+
+                    return Float.NaN;
+                }
+
+            };
+        }
+
+        protected void frame(final float positiveDesire, final float negativeDesire) {
+
+            float net = positiveDesire - negativeDesire;
+            boolean isPos = (net > 0);
+            if (!isPos)
+                net = -net;
+
+            if (net > threshold) {
+                final float feedback = onFrame(net, isPos);
+                if (Float.isFinite(feedback)) {
+                    if (isPos) {
+                        float posFeedback = feedback;
+                        nar.input(this.positive.getFeedback(posFeedback));
+                        nar.input(this.negative.getFeedback(0));
+
+//                        //counteract the interference
+//                        negFeedback = (negativeDesire - (positiveDesire - feedback));
+//                        if (negFeedback < 0) negFeedback = 0;
+//                        Task iit = this.negative.getFeedback(negFeedback)
+//                                .goal()
+//                                .truth(negFeedback, 0.75f) //adjust confidence too
+//                                .get();
+//
+//                        nar.inputDirect(iit);
+
+                    } else {
+                        float negFeedback = feedback;
+                        nar.input(this.negative.getFeedback(negFeedback));
+                        nar.input(this.positive.getFeedback(0));
+
+//                        //counteract the interference
+//                        posFeedback = (positiveDesire - (negativeDesire - feedback));
+//                        if (posFeedback < 0) posFeedback = 0;
+//                        Task iit = this.positive.getFeedback(posFeedback)
+//                                .goal()
+//                                .truth(posFeedback, 0.75f)
+//                                .get();
+//
+//                        nar.inputDirect(iit);
+
+
+                    }
+                }
+
+            }
+
+        }
+
+        abstract float onFrame(float desire, boolean positive);
+
+    }
 }
 
 //        new CycleDesire("motor(random)", strongestTask, nar) {

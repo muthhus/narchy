@@ -33,8 +33,6 @@ public class FoodSpawnWorld1 extends RoverWorld {
         super.init(p);
 
 
-        int numFood = 100;
-
         float foodSpawnR = w / 1.5f;
         for (int i = 0; i < numFood; i++) {
             float minSize = 0.8f;

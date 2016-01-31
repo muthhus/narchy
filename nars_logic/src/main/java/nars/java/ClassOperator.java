@@ -59,6 +59,7 @@ public class ClassOperator extends TermFunction {
     @Nullable
     @Override
     public final Object function(Compound x, TermBuilder i) {
+        if (x.size() == 0) return null;
         Term methodTerm = x.term(0);
         MethodOperator methFunc = methods.get(methodTerm);
         if (methFunc!=null) {
