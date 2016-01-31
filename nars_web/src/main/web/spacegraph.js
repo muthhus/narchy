@@ -339,13 +339,13 @@ function spacegraph(targetWrapper, opt) {
         boxSelectionEnabled: false,
         autolock: false,
         autoungrabify: false,
-        autounselectify: false,
+        autounselectify: true,
         // rendering options:
         headless: false,
         styleEnabled: true,
         hideEdgesOnViewport: false,
         hideLabelsOnViewport: false,
-        textureOnViewport: false, //true = higher performance, lower quality
+        textureOnViewport: true, //true = higher performance, lower quality
         motionBlur: false,
         wheelSensitivity: 1,
         //pixelRatio: 0.25, //downsample pixels
@@ -368,7 +368,7 @@ function spacegraph(targetWrapper, opt) {
 
 
     // EdgeHandler: the default values of each option are outlined below:
-    var ehDefaults = {
+    s.edgehandles({
         preview: true, // whether to show added edges preview before releasing selection
         handleSize: 3, // the size of the edge handle put on nodes
         handleColor: "rgba(255, 0, 0, 0.5)", // the colour of the handle and the line drawn from it
@@ -411,20 +411,40 @@ function spacegraph(targetWrapper, opt) {
          // fired when edgehandles interaction is stopped (either complete with added edges or incomplete)
          }
          */
-    };
+    });
 
-    s.edgehandles( ehDefaults );
 
+//    s.noderesize({
+//      handleColor: '#000000', // the colour of the handle and the line drawn from it
+//      hoverDelay: 150, // time spend over a target node before it is considered a target selection
+//      enabled: false, // whether to start the plugin in the enabled state
+//      minNodeWidth: 30,
+//      minNodeHeight: 30,
+//      triangleSize: 10,
+//      lines: 3,
+//      padding: 5,
+//
+//      start: function(sourceNode) {
+//        console.log('resize', sourceNode);
+//        // fired when noderesize interaction starts (drag on handle)
+//      },
+//      complete: function(sourceNode, targetNodes, addedEntities) {
+//        // fired when noderesize is done and entities are added
+//      },
+//      stop: function(sourceNode) {
+//        // fired when noderesize interaction is stopped (either complete with added edges or incomplete)
+//      }
+//    });
 
     s.channels = { };
     s.listeners = { };
     s.widgets = new Map(); //node -> widget DOM element
     s.currentLayout = {
         //name: 'cosefast'
-        //name: 'grid' //cose implementation is slow as fuck becaause it has all these log debug statements and string generation that serves no purpose but at least its pretty
+        name: 'grid' //cose implementation is slow as fuck becaause it has all these log debug statements and string generation that serves no purpose but at least its pretty
         //name: 'arbor'
 
-        name: 'breadthfirst',
+        //name: 'breadthfirst',
         //circle:true,
         //directed:true
     };
@@ -533,7 +553,7 @@ function spacegraph(targetWrapper, opt) {
 
         //console.log(html, pos.x, pos.y, minPixels, pixelScale);
 
-        var transformPrecision = 4;
+        var transformPrecision = 3;
 
         var matb, matc, px, py;
         wx = wx.toPrecision(transformPrecision);

@@ -44,4 +44,5 @@
     width: 400px;
     transform-origin: 0 0;
     display: none;
+    cursor: crosshair !important;
 }

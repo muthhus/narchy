@@ -10,7 +10,10 @@
 	"lodash":"latest",
     "cytoscape":"latest",
     "cytoscape-edgehandles": "latest",
-    "semantic": "latest"
+    "cytoscape-cose-bilkent":"latest",
+    "semantic": "latest",
+    "object-editor": "latest"
+
   },
   "keywords": [
     "nars",

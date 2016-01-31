@@ -10,11 +10,12 @@ function NodeFrame(spacegraph) {
         hovered: null
     };
 
-    var frameVisible = false;
-    var frameTimeToFade = 1000; //ms
-    var frameHiding = -1;
+    var frameTimeToFade = 500; //ms
     var frameNodePixelScale = 300;
     var frameNodeScale = 1.15;
+
+    var frameVisible = false;
+    var frameHiding = -1;
     var frameEleNode = null;
     var frameEleResizing = false;
 
@@ -90,9 +91,10 @@ function NodeFrame(spacegraph) {
                 }
             }
             else {
-                if ((frameHiding === -1) && (this.currentlyVisible)) {
+                if ((frameHiding === -1) && (this.currentlyVisible) && !frameEleResizing) {
                     frameHiding = setTimeout(function () {
                         //if still set for hiding, actually hide it
+                        if (frameEleResizing) return;
                         if (!frameVisible) {
                             frameEle.fadeOut(function () {
                                 f.hovered = null;
@@ -132,11 +134,14 @@ function NodeFrame(spacegraph) {
             }
         });
 
-        var se = $('#nodeframe #resizeSE');
+        var sese= '#nodeframe #resizeSE';
+        var se = $(sese);
         se.draggable({
-                        revert: true,
+                        //revert: true,
                         helper: "clone",
-                        appendTo: '#nodeframe #resizeSE',
+                        stack: sese,
+                        cursor: "se-resize",
+                        //appendTo: sese,
                         //appendTo: "body",
 
                         //http://api.jqueryui.com/draggable/#event-drag
@@ -160,39 +165,59 @@ function NodeFrame(spacegraph) {
                             this.originalPos = [parseFloat(pos.x), parseFloat(pos.y)];
                             this.originalSize = [node.width(), node.height(), node.renderedWidth(), node.renderedHeight()];
                             this.originalOffset = [ui.offset.left, ui.offset.top];
+
+                            se.next().hide(); //hide the clone, its displayed position is confusing
+
+                            event.stopPropagation();
+
                         },
                         drag: function (event, ui) {
+
+                            event.stopPropagation();
 
                             var node = frameEleNode;
                             if (node !== this.originalNode)
                                 return;
 
-                            var dx = parseFloat(ui.offset.left - this.originalOffset[0]);
-                            var dy = parseFloat(ui.offset.top - this.originalOffset[1]);
+                            var oos = this.originalOffset;
+                            var dx = parseFloat(ui.offset.left - oos[0]);
+                            var dy = parseFloat(ui.offset.top - oos[1]);
 
                             var p = this.originalPos;
                             var os = this.originalSize;
 
-                            var dw = dx * (os[0] / os[2]);
-                            var dh = dy * (os[1] / os[3]);
-                            var w = os[0] + dw;
-                            var h = os[1] + dh;
-                            var x = p[0] + dw / 2.0;
-                            var y = p[1] + dh / 2.0;
+                            var os0 = os[0];
+                            var os1 = os[1];
 
+                            var dw = dx * (os0 / os[2]);
+                            var dh = dy * (os1 / os[3]);
 
-                            node.cy().startBatch();
-                            node.position({x: x, y: y});
-                            node.css({
-                                'width': w,
-                                'height': h
+                            var ncy = node.cy();
+                            ncy.startBatch();
+
+                            node.position({
+                                x: p[0] + dw / 2.0,
+                                y: p[1] + dh / 2.0
                             });
-                            node.cy().endBatch();
+                            node.css({
+                                width: os0 + dw,
+                                height: os1 + dh
+                            });
+                            ncy.endBatch();
+
+                            setTimeout(nodeFrame.hoverUpdate, 0);
                         },
                         stop: function (event, ui) {
                             frameEle[0].style.width = undefined; //reset width
 
-                            frameEleResizing = false;
+                            event.stopPropagation();
+
+                            setTimeout(function() {
+                                nodeFrame.hoverUpdate();
+                                frameEleResizing = false;
+                                se.next().show(); //unhide the clone
+                            }, 0);
+
                         }
 
         });

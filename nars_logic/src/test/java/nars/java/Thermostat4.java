@@ -13,7 +13,7 @@ import java.io.PrintStream;
  */
 public class Thermostat4 {
 
-    static final float speed = 0.12f;
+    static final float speed = 0.05f;
     final static float tolerance = 0.15f;
     private final UnitValTaskInc h;
     long cyclePause = 0;
@@ -70,7 +70,7 @@ public class Thermostat4 {
         n.core.confidenceDerivationMin.setValue(0.01f);
         n.memory.shortTermMemoryHistory.set(3);
         n.memory.cyclesPerFrame.set(3);
-        n.initNAL9();
+        //n.initNAL9();
 
 
         NALObjects objs = new NALObjects(n) {
@@ -198,12 +198,13 @@ public class Thermostat4 {
 
     public void train() {
 
-        n.input("UnitValTaskInc(move,h,((--,true)),#x)! :|:  %1.0;0.55%");
-        n.input("UnitValTaskInc(move,h,(true),#x)! :|: %1.0;0.55%");
-        n.input("(true -->(/,^UnitValTaskInc,move,h,(#p),_))! :|:");
-        n.input("((--,true) -->(/,^UnitValTaskInc,move,h,(#p),_))! :|:");
-        n.input("((--,true) -->(/,^UnitValTaskInc,move,h,(#p),_))! :|:");
-
+        n.input("UnitValTaskInc(move,h,((--,true)),#x). :|:  %0.0;0.75%");
+        n.input("UnitValTaskInc(move,h,((--,true)),#x)! :|:  %1.0;0.75%");
+        n.input("UnitValTaskInc(move,h,(true),#x). :|:  %0.0;0.75%");
+        n.input("UnitValTaskInc(move,h,(true),#x)! :|: %1.0;0.75%");
+        n.input("(true -->(/,^UnitValTaskInc,move,h,(?p),_))! :|:");
+        n.input("((--,true) -->(/,^UnitValTaskInc,move,h,(?p),_))! :|:");
+        n.input("((--,true) -->(/,^UnitValTaskInc,move,h,(?p),_))! :|:");
 
 
 

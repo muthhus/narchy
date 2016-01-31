@@ -50,8 +50,11 @@
 <script>
 
     var s = spacegraph($('#view'), { } );
-    s.ready();
-    console.log(s);
+    //s.ready();
+
+    newSpacePopupMenu(s);
+
+
 
     s.addChannel(new Channel({
             nodes: [{
