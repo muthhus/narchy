@@ -25,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public class Execution implements Runnable {
 
-    private static final float DEFAULT_EXECUTION_CONFIDENCE = 0.99f;
+
     public final NAR nar;
     public final Task task;
     private final Topic<Execution> listeners;

@@ -32,8 +32,6 @@ import java.util.function.Consumer;
  */
 public class DefaultBeliefTable implements BeliefTable {
 
-    //final static BudgetMerge existingMergeFunction = BudgetMerge.max;
-
     @NotNull
     final Map<Task,Task> map;
     @NotNull
@@ -73,7 +71,7 @@ public class DefaultBeliefTable implements BeliefTable {
     /** computes the truth/desire as an aggregate of projections of all
      * beliefs to current time
      */
-    public final float expectation(Memory memory) {
+    public final float expectation(Memory memory, boolean positive) {
 
         long time = memory.time();
         int dur = memory.duration();
@@ -84,7 +82,8 @@ public class DefaultBeliefTable implements BeliefTable {
 
             float e =
                     BeliefTable.relevance(t, time, dur) //projectionQuality(t.freq(), t.conf(), t, time, time, false)
-                            * t.expectation();
+                    * t.expectation(positive);
+
             float best = d[0];
             if (e > best)
                 d[0] = e;
@@ -278,6 +277,7 @@ public class DefaultBeliefTable implements BeliefTable {
 //            throw new RuntimeException("input budget deleted");
 //        }
 
+        //Filter duplicates
         Task existing = contains(input);
         if (existing!=null) {
             if (existing!=input) {
@@ -292,13 +292,17 @@ public class DefaultBeliefTable implements BeliefTable {
             return existing;
         }
 
-        long now = this.lastUpdate = nar.time();
+        //long now = this.lastUpdate = nar.time();
 
 
         Task revised = getRevision(input, nar);
-        if ((revised!=null) && (!revised.equals(input))) {
+        if (revised!=null)  {
+            if (revised.equals(input)) // || BeliefTable.stronger(revised, input)==input) {
+                throw new RuntimeException("useless revision: " + revised);
+
+
             //if (BeliefTable.stronger(revised, input)==revised) {
-                nar.input(revised);
+            nar.input(revised);
             //}
         }
 
@@ -314,15 +318,19 @@ public class DefaultBeliefTable implements BeliefTable {
 
 
         //} else {
-            input = tryInsert(input, m);
-            updateTime(now, !input.isEternal());
+            if (tryInsert(input, m)) {
+                updateTime(nar.time(), !input.isEternal());
+                return input;
+            } else {
+                return null;
+            }
         //}
 
             //input = revised;
         //}
 
         //return input;
-        return input; //revised!=null ? revised : input;
+        //return input; //revised!=null ? revised : input;
     }
 
 
@@ -392,8 +400,8 @@ public class DefaultBeliefTable implements BeliefTable {
                         x, t);
             }
 
-//            if (c.conf() * matchFactor <= Math.max(newBelief.conf(), x.conf()))
-//                continue;
+            if (c.conf() * matchFactor <= Math.max(newBelief.conf(), x.conf()))
+                continue;
 
             //float ffreqMatch = 1f/(1f + Math.abs(newBeliefFreq - x.freq()));
             c = c.withConfMult(matchFactor);
@@ -407,8 +415,11 @@ public class DefaultBeliefTable implements BeliefTable {
             }
         }
 
-        if (oldBelief == null) return null; //nothing matches
+        if (oldBelief == null)
+            return null; //nothing matches
 
+        if (conclusion.equals(newBelief.truth()) && concTime == newBelief.occurrence())
+            return null; //equal
 
 //        Truth newBeliefTruth = newBelief.truth();
 //        Truth oldBeliefTruth = oldBelief.projection(newBeliefOcc, now);
@@ -457,7 +468,7 @@ public class DefaultBeliefTable implements BeliefTable {
     /** try to insert but dont delete the input task if it wasn't inserted (but delete a displaced if it was)
      *  returns true if it was inserted, false if not
      * */
-    private Task tryInsert(@NotNull Task incoming, @NotNull Memory memory) {
+    private boolean tryInsert(@NotNull Task incoming, @NotNull Memory memory) {
 
 
         ArrayTable<Task, Task> table = tableFor(incoming);
@@ -466,14 +477,17 @@ public class DefaultBeliefTable implements BeliefTable {
         Task displaced = table.put(incoming,incoming);
 
         boolean inserted = displaced == null || displaced!=incoming;//!displaced.equals(t);
-        if (displaced!=null && inserted) {
-//            onBeliefRemoved(displaced,
-//                    "Displaced",
-//                    //"Displaced by " + incoming,
-//                    memory);
+//        if (displaced!=null && inserted) {
+//
+//        }
+        if (displaced!=null) {
+            onBeliefRemoved(displaced,
+                    "Displaced",
+                    //"Displaced by " + incoming,
+                    memory);
         }
 
-        return incoming;
+        return inserted;
     }
 
     @NotNull

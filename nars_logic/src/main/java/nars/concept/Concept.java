@@ -267,8 +267,7 @@ public interface Concept extends Termed, Comparable<Termed> {
      * process a task in this concept
      * @return true if process affected the concept (ie. was inserted into a belief table)
      */
-    @NotNull
-    Task process(@NotNull Task task, @NotNull NAR nar);
+    @Nullable Task process(@NotNull Task task, @NotNull NAR nar);
 
     /** attempt insert a tasklink into this concept's tasklink bag
      *  return true if successfully inserted

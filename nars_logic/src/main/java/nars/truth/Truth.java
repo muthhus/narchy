@@ -53,17 +53,20 @@ public interface Truth extends MetaTruth<Float> {
      * @return The expectation value
      */
     default float expectation() {
-        return getExpectationPositive();
+        return expectationPositive();
+    }
+    default float expectation(boolean positive) {
+        return positive ? expectationPositive() : expectationNegative();
     }
 
     /** expectation, the expectation of freq=1 */
-    default float getExpectationPositive() {
+    default float expectationPositive() {
         return expectation(freq(), conf());
     }
 
 
     /** expectation inverse, the expectation of freq=0  */
-    default float getExpectationNegative() {
+    default float expectationNegative() {
         return expectation(1.0f - freq(), conf());
     }
 
@@ -167,7 +170,7 @@ public interface Truth extends MetaTruth<Float> {
     
     @NotNull
     default Term toWordTerm(float trueExpectationThreshold, boolean negated) {
-        float e = !negated ? getExpectationPositive() : getExpectationNegative();
+        float e = !negated ? expectationPositive() : expectationNegative();
 
         if (e > trueExpectationThreshold) {
             return Truth_TRUE;

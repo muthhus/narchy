@@ -209,7 +209,7 @@ public final class ConceptProcess implements Premise {
         int td = tt.t();
         int bd = bb != null ? bb.t() : ITERNAL;
 
-        if (cc.op().isTemporal() && cc.isCompound()) {
+        if (derived.op().isTemporal() && cc.isCompound()) {
 
 
             //System.out.println(tt + " "  + bb);

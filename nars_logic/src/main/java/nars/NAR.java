@@ -468,8 +468,8 @@ public abstract class NAR implements Level,Consumer<Task> {
 
         if (Op.isOperation(operation)) {
 
-            if (!goal.isEternal())
-                goal.setExecuted();
+            /*if (!goal.isEternal())
+                goal.setExecuted();*/
 
             Topic<Execution> tt = memory.exe.get(
                 Operator.operatorTerm((Compound) operation)
@@ -970,12 +970,12 @@ public abstract class NAR implements Level,Consumer<Task> {
 
         memory.emotion.busy(input);
 
-        Task matched = c.process(input, this);
-        if (matched == null) return null;
+        Task t = c.process(input, this);
+        if (t == null) return null;
 
         //if (!task.getDeleted()) {
 
-        c.link(matched, activation, this);
+        c.link(t, activation, this);
 
 //        if (input!=matched) {
 //            //if (Global.DEBUG..
@@ -983,7 +983,7 @@ public abstract class NAR implements Level,Consumer<Task> {
 //            logger.info(input.getExplanation());
 //        }
 
-        memory.eventTaskProcess.emit(matched);
+        memory.eventTaskProcess.emit(t);
         //}
 
         return c;

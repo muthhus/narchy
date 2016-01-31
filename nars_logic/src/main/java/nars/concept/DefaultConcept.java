@@ -251,22 +251,27 @@ public class DefaultConcept extends AtomConcept {
 
         Task goal = goals().add(inputGoal, nar);
 
-        if (Op.isOperation(goal.term()) ) {
+        if (Op.isOperation(term())) {
 
-            float e = goals().expectation(memory);
+            float goalExp = goals().expectation(memory, true);
+            float belExp = goals().expectation(memory, false);
 
-        //if (e > Global.EXECUTION_DESIRE_EXPECTATION_THRESHOLD)
-        if ((e - beliefs().expectation(memory)) > 0)
-        {
+            //if (e > Global.EXECUTION_DESIRE_EXPECTATION_THRESHOLD)
+            if (goalExp > belExp) {
 
-            //float delta = updateSuccess(goal, successBefore, memory);
+                //float delta = updateSuccess(goal, successBefore, memory);
 
 
-                    //&& (goal.state() != Task.TaskState.Executed)) {
+                if (goal == null) {
+                    long now = memory.time();
+                    goal = goals().top(now);
+                }
+                //&& (goal.state() != Task.TaskState.Executed)) {
 
-                /*if (delta >= Global.EXECUTION_SATISFACTION_TRESHOLD)*/ {
+                /*if (delta >= Global.EXECUTION_SATISFACTION_TRESHOLD)*/
+                {
 
-                //Truth projected = goal.projection(now, now);
+                    //Truth projected = goal.projection(now, now);
 
 
 //                        LongHashSet ev = this.lastevidence;
@@ -421,7 +426,7 @@ public class DefaultConcept extends AtomConcept {
 
         //TODO if the table was not affected, does the following still need to happen:
 
-        if (q!=null) {
+        if (q != null) {
             BeliefTable answerTable = q.isQuest() ?
                     goals() : beliefs();
 

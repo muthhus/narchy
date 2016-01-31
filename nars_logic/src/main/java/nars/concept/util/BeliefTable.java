@@ -81,7 +81,7 @@ public interface BeliefTable extends TaskTable {
         }
 
         @Override
-        public float expectation(Memory memory) {
+        public float expectation(Memory memory, boolean positive) {
             return 0;
         }
 
@@ -320,7 +320,7 @@ public interface BeliefTable extends TaskTable {
         return a.conf() > b.conf() ? a : b;
     }
 
-    float expectation(Memory memory);
+    float expectation(Memory memory, boolean positive);
 
 
 

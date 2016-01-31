@@ -8,6 +8,12 @@ public interface Truthed {
         Truth t = truth();
         return t == null ? Float.NaN : t.expectation();
     }
+
+    default float expectation(boolean positive) {
+        Truth t = truth();
+        return t == null ? Float.NaN : t.expectation(positive);
+    }
+
     default float conf() {
         Truth t = truth();
         return t == null ? Float.NaN : t.conf();
