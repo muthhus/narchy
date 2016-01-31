@@ -17,7 +17,8 @@ public class SimpleDeriver extends Deriver {
         super(rules);
 
         List<List<Term>> u = Global.newArrayList();
-        for (PremiseRule r : rules.getPremiseRules()) {
+        //return Collections.unmodifiableList(premiseRules);
+        for (PremiseRule r : rules.rules) {
             for (PostCondition p : r.postconditions)
                 u.add( r.getConditions(p) );
         }

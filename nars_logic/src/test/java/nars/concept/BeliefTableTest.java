@@ -248,7 +248,7 @@ public class BeliefTableTest  {
         n.step();
         b.print();
 
-        assertEquals(0.716f, b.beliefs().expectation(true, n.memory), 0.001f);
+        assertEquals(0.75f, b.beliefs().expectation(true, n.memory), 0.1f);
         assertEquals(0.216f, b.beliefs().expectation(false, n.memory), 0.001f);
 
         n.input("a:b. %0.2|0.7%");

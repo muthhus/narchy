@@ -2,7 +2,6 @@ package nars.concept;
 
 import nars.*;
 import nars.bag.Bag;
-import nars.budget.BudgetMerge;
 import nars.concept.util.ArrayListTaskTable;
 import nars.concept.util.BeliefTable;
 import nars.concept.util.DefaultBeliefTable;
@@ -31,7 +30,6 @@ public class DefaultConcept extends AtomConcept {
     /**
      * how incoming budget is merged into its existing duplicate quest/question
      */
-    static final BudgetMerge duplicateQuestionMerge = BudgetMerge.plusDQDominant;
 
     @Nullable
     private final Termed[] termLinkTemplates;
@@ -395,7 +393,6 @@ public class DefaultConcept extends AtomConcept {
         if (q.isQuestion()) {
             if (questions == null) questions = new ArrayListTaskTable(nar.memory.conceptQuestionsMax.intValue());
             questionTable = questions();
-
         } else { // else if (q.isQuest())
             if (quests == null) quests = new ArrayListTaskTable(nar.memory.conceptQuestionsMax.intValue());
             questionTable = quests();
@@ -419,7 +416,7 @@ public class DefaultConcept extends AtomConcept {
         //boolean tableAffected = false;
         //boolean newQuestion = table.isEmpty();
 
-        q = questionTable.add(q, duplicateQuestionMerge, nar.memory);
+        q = questionTable.add(q, nar.memory);
 
         //TODO if the table was not affected, does the following still need to happen:
 

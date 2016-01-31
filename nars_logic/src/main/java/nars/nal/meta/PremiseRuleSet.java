@@ -35,7 +35,7 @@ public class PremiseRuleSet {
     private static final Pattern equivOperatorPattern = Pattern.compile("<=>", Pattern.LITERAL);
     private static final Pattern implOperatorPattern = Pattern.compile("==>", Pattern.LITERAL);
     private static final Pattern conjOperatorPattern = Pattern.compile("&&", Pattern.LITERAL);
-    private final List<PremiseRule> premiseRules = new FasterList<>();
+    public final List<PremiseRule> rules = new FasterList<>();
 
 
     public PremiseRuleSet() throws IOException, URISyntaxException {
@@ -55,17 +55,17 @@ public class PremiseRuleSet {
         for (PremiseRule p : rules) {
             if (normalize)
                 p = p.normalizeRule(patterns);
-            premiseRules.add(p);
+            this.rules.add(p);
         }
     }
 
     public PremiseRuleSet(@NotNull Collection<String> ruleStrings) {
         int[] errors = {0};
 
-        parse(load(ruleStrings), patterns).forEach(s -> premiseRules.add(s));
+        parse(load(ruleStrings), patterns).forEach(s -> rules.add(s));
 
 
-        logger.info("indexed " + premiseRules.size() + " total rules, consisting of " + patterns.size() + " unique pattern components terms");
+        logger.info("indexed " + rules.size() + " total rules, consisting of " + patterns.size() + " unique pattern components terms");
         if (errors[0] > 0) {
             logger.warn("\trule errors: " + errors[0]);
         }
@@ -280,8 +280,8 @@ public class PremiseRuleSet {
 
     @Nullable
     static PremiseRule add(@NotNull Collection<PremiseRule> target, @Nullable PremiseRule q, String src, @NotNull PatternIndex index) {
-        if (q == null)
-            throw new RuntimeException("null: " + q + ' ' + src);
+//        if (q == null)
+//            throw new RuntimeException("null: " + q + ' ' + src);
 
         q = q.normalizeRule(index).setup(index);
         q.setSource(src);
@@ -289,12 +289,6 @@ public class PremiseRuleSet {
         return q;
     }
     private static final Pattern spacePattern = Pattern.compile(" ", Pattern.LITERAL);
-
-    @NotNull
-    public List<PremiseRule> getPremiseRules() {
-        return premiseRules;
-        //return Collections.unmodifiableList(premiseRules);
-    }
 
 
 }

@@ -122,8 +122,8 @@ public interface Term extends Termed, Comparable, Termlike {
 //    }
 //
 
-    @Override
-    default boolean isAny(int structuralVector) {
+    /** true if the operator's bit is included in the enabld bits of the provided vector */
+    @Override default boolean isAny(int structuralVector) {
         int s = op().bit();
         return (s & structuralVector) == s;
     }

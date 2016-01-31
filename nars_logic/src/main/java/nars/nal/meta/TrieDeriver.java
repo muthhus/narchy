@@ -39,7 +39,8 @@ public class TrieDeriver extends Deriver {
     public TrieDeriver(@NotNull PremiseRuleSet ruleset) {
         super(ruleset);
 
-        this.trie = new TermTrie<Term, PremiseRule>(ruleset.getPremiseRules()) {
+        //return Collections.unmodifiableList(premiseRules);
+        this.trie = new TermTrie<Term, PremiseRule>(ruleset.rules) {
 
             @Override
             public void index(@Nullable PremiseRule s) {

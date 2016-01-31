@@ -433,7 +433,7 @@ public class NarseseTest {
         String ff = Float.toString(f);
         Atom a = term(ff);
         assertNotNull(a);
-        assertEquals(ff, a.toString());
+        assertEquals('"' + ff + '"', a.toString());
     }
 
     @Test

@@ -31,7 +31,8 @@ public class RuleDerivationGraphTest {
     public void testRuleStatistics() {
         //SimpleDeriver d = new SimpleDeriver(Deriver.standard);
 
-        List<PremiseRule> R = getDefaultRules().getPremiseRules();
+        //return Collections.unmodifiableList(premiseRules);
+        List<PremiseRule> R = getDefaultRules().rules;
         int registeredRules = R.size();
 
 

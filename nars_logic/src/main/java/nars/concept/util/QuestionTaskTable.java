@@ -1,7 +1,6 @@
 package nars.concept.util;
 
 import nars.Memory;
-import nars.budget.BudgetMerge;
 import nars.task.Task;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -18,14 +17,14 @@ public interface QuestionTaskTable extends TaskTable {
      * an existing equivalent task if this was a duplicate
      */
     @NotNull
-    Task add(Task t, BudgetMerge duplicateMerge, Memory m);
+    Task add(Task t, Memory m);
 
 
     /**
      * @return null if no duplicate was discovered, or the first Task that matched if one was
      */
     @Nullable
-    Task getFirstEquivalent(Task t);
+    Task contains(Task t);
 //    {
 //        for (Task a : this) {
 //            if (e.test(a, t))

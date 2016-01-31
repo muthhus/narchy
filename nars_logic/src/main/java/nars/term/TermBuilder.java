@@ -2,6 +2,7 @@ package nars.term;
 
 import com.google.common.collect.Lists;
 import com.gs.collections.api.set.MutableSet;
+import nars.$;
 import nars.Global;
 import nars.Op;
 import nars.nal.Tense;
@@ -62,7 +63,7 @@ public interface TermBuilder {
             //        if (t instanceof Compound) return false;
 //        byte[] n = t.bytes();
 //        if (n.length != 1) return false;
-            if (x.equals(Op.Imdex)) return true;
+            if (x.equals(Imdex)) return true;
         }
         return false;
     }
@@ -100,15 +101,9 @@ public interface TermBuilder {
         }
 
         Compound tx = transform((Compound) t, normalizeFast((Compound) t));
-        if (tx == null)
-            return null;
-
-        //Termed tx = the(x); //term==concept only valid if tx==tx.anonymous()
-
-        //if (x != t) {
-            //if modified, set normalization flag HACK
+        if (tx != null)
             ((GenericCompound)tx.term()).setNormalized();
-        //}
+
         return tx;
     }
 
@@ -140,16 +135,16 @@ public interface TermBuilder {
         return transform(src, t, true);
     }
 
-    @Nullable
-    default <X extends Compound> X transformRoot(@NotNull Compound src, @NotNull CompoundTransform t) {
-        if (t.testSuperTerm(src)) {
-//            Compound xsrc = transform(src, t);
-//            if (xsrc!=null)
-//                src = xsrc;
-            return (X) t.apply(src, null, 0);
-        }
-        return (X)src;
-    }
+//    @Nullable
+//    default <X extends Compound> X transformRoot(@NotNull Compound src, @NotNull CompoundTransform t) {
+//        if (t.testSuperTerm(src)) {
+////            Compound xsrc = transform(src, t);
+////            if (xsrc!=null)
+////                src = xsrc;
+//            return (X) t.apply(src, null, 0);
+//        }
+//        return (X)src;
+//    }
 
     @Nullable
     default <X extends Compound> X transform(@NotNull Compound src, @NotNull CompoundTransform t, boolean requireEqualityForNewInstance) {
@@ -203,7 +198,16 @@ public interface TermBuilder {
                     if (submods == -1) return -1;
                     if (submods > 0) {
 
-                        x = newTerm(cx, TermContainer.the(cx.op(), yy));
+                        //method 1: using termindex
+//                        x = newTerm(cx.op(), cx.relation(), cx.t(),
+//                            TermContainer.the(cx.op(), yy)
+//                        );
+
+                        //method 2: on heap
+                        Op op = cx.op();
+                        x = $.the(op, cx.relation(), cx.t(),
+                            TermContainer.the(op, yy)
+                        );
 
                         if (x == null)
                             return -1;
@@ -239,8 +243,8 @@ public interface TermBuilder {
     @Nullable
     default Term newTerm(@NotNull Op op, int relation, int t, @Nullable TermContainer tt) {
 
-        if (tt == null)
-            return null;
+//        if (tt == null)
+//            return null;
 
         Term[] u = tt.terms();
 
@@ -277,14 +281,16 @@ public interface TermBuilder {
                 }
                 if ((relation == -1) || (relation > u.length))
                     return null;
-                //throw new RuntimeException("invalid index relation: " + relation + " for args " + Arrays.toString(t));
 
-                break;
+                break; //continued below
+
             case DIFF_EXT:
             case DIFF_INT:
                 return newDiff(op, tt);
-            case INTERSECT_EXT: return newIntersectEXT(u);
-            case INTERSECT_INT: return newIntersectINT(u);
+            case INTERSECT_EXT:
+                return newIntersectEXT(u);
+            case INTERSECT_INT:
+                return newIntersectINT(u);
         }
 
         if (op.isStatement()) {
@@ -293,7 +299,7 @@ public interface TermBuilder {
 
         } else {
 
-            return finish(op, t, relation, tt);
+            return finish(op, relation, t, tt);
 
         }
 
@@ -327,14 +333,14 @@ public interface TermBuilder {
 
     @Nullable
     default Term finish(@NotNull Op op, int relation, @NotNull TermContainer tt) {
-        return finish(op, Tense.ITERNAL, relation, tt);
+        return finish(op, relation, Tense.ITERNAL, tt);
     }
 
     /** step before calling Make, do not call manually from outside */
     @Nullable
-    default Term finish(@NotNull Op op, int t, int relation, @NotNull TermContainer tt) {
+    default Term finish(@NotNull Op op, int relation, int dt, @NotNull TermContainer args) {
 
-        Term[] u = tt.terms();
+        Term[] u = args.terms();
         int currentSize = u.length;
 
         if (op.minSize > 1 && currentSize == 1) {
@@ -347,34 +353,64 @@ public interface TermBuilder {
 
         if (!op.validSize(currentSize)) {
             //throw new RuntimeException(Arrays.toString(t) + " invalid size for " + op);
-            return null;
+            throw new InvalidTermConstruction(op, relation, dt, args.terms());
+            //return null;
         }
 
-        return make(op, relation, TermContainer.the(op, tt), t).term();
+        return make(op, relation, TermContainer.the(op, args), dt).term();
 
     }
 
+    public static final class InvalidTermConstruction extends RuntimeException {
+        private final Op op;
+        private final int rel;
+        private final int dt;
+        private final Term[] args;
+
+        public InvalidTermConstruction(Op op, int rel, int dt, Term[] args) {
+
+            this.op = op;
+            this.rel = rel;
+            this.dt = dt;
+            this.args = args;
+        }
+
+        @Override
+        public String getMessage() {
+            return toString();
+        }
+
+        @Override
+        public String toString() {
+            return "InvalidTermConstruction{" +
+                    "op=" + op +
+                    ", rel=" + rel +
+                    ", dt=" + dt +
+                    ", args=" + Arrays.toString(args) +
+                    '}';
+        }
+    }
 
 
     @Nullable
     default Term inst(Term subj, Term pred) {
-        return newTerm(Op.INHERIT, newTerm(Op.SET_EXT, subj), pred);
+        return newTerm(INHERIT, newTerm(SET_EXT, subj), pred);
     }
     @Nullable
     default Term prop(Term subj, Term pred) {
-        return newTerm(Op.INHERIT, subj, newTerm(Op.SET_INT, pred));
+        return newTerm(INHERIT, subj, newTerm(SET_INT, pred));
     }
     @Nullable
     default Term instprop(Term subj, Term pred) {
-        return newTerm(Op.INHERIT, newTerm(Op.SET_EXT, subj), newTerm(Op.SET_INT, pred));
+        return newTerm(INHERIT, newTerm(SET_EXT, subj), newTerm(SET_INT, pred));
     }
 
     default Term negation(@NotNull Term t) {
-        if (t.op(Op.NEGATE)) {
+        if (t.op(NEGATE)) {
             // (--,(--,P)) = P
             return ((TermContainer) t).term(0);
         }
-        return make(Op.NEGATE, -1, new TermVector(t)).term();
+        return make(NEGATE, -1, new TermVector(t)).term();
     }
 
     @Nullable
@@ -382,7 +418,7 @@ public interface TermBuilder {
 
         int index = 0, j = 0;
         for (Term x : res) {
-            if (x.equals(Op.Imdex)) {
+            if (x.equals(Imdex)) {
                 index = j;
             }
             j++;
@@ -423,9 +459,9 @@ public interface TermBuilder {
             }
 
             if (u.length!=2) {
-                //throw new RuntimeException
-                System.err.println("invalid temporal conjunction: " + op + " " + t + " "+ Arrays.toString(u));
-                return null;
+                throw new RuntimeException
+                ("invalid temporal conjunction: " + op + " " + t + " "+ Arrays.toString(u));
+                //return null;
             }
 
             if (u[0].equals(u[1])) return u[0];
@@ -476,22 +512,18 @@ public interface TermBuilder {
 //        }
 
         return !done[0] ? junction(op, dt, s) :
-                finish(op, dt, -1, TermSet.the(s));
+                finish(op, -1, dt, TermSet.the(s));
     }
 
     @Nullable
     default Term statement(@NotNull Op op, int t, @NotNull Term[] u) {
 
         switch (u.length) {
-            case 1:
-                return u[0];
-
-            case 2:
-                return statement2(op, t, u);
+            case 2: return statement2(op, t, u);
+            case 1: return u[0];
+            default:
+                throw new RuntimeException("invalid statement arguments: " + Arrays.toString(u));
         }
-
-        return null;
-        //throw new RuntimeException("invalid statement arguments: " + Arrays.toString(t));
     }
 
     @Nullable
@@ -500,8 +532,8 @@ public interface TermBuilder {
         Term predicate = u[1];
 
         //DEBUG:
-        if (subject == null || predicate == null)
-            throw new RuntimeException("invalid statement terms");
+        //if (subject == null || predicate == null)
+        //    throw new RuntimeException("invalid statement terms");
 
         //special statement filters
         switch (op) {
@@ -516,9 +548,9 @@ public interface TermBuilder {
                 if (subject.isAny(TermIndex.InvalidEquivalenceTerm)) return null;
                 if (predicate.isAny(TermIndex.InvalidImplicationPredicate)) return null;
 
-                if (predicate.isAny(Op.ImplicationsBits)) {
+                if (predicate.isAny(ImplicationsBits)) {
                     Term oldCondition = subj(predicate);
-                    if ((oldCondition.isAny(Op.ConjunctivesBits)) && oldCondition.containsTerm(subject))
+                    if ((oldCondition.isAny(ConjunctivesBits)) && oldCondition.containsTerm(subject))
                         return null;
 
                     return impl2Conj(t, subject, predicate, oldCondition);
@@ -561,17 +593,17 @@ public interface TermBuilder {
     @Nullable
     default Term newIntersectINT(@NotNull Term[] t) {
         return newIntersection(t,
-                Op.INTERSECT_INT,
-                Op.SET_INT,
-                Op.SET_EXT);
+                INTERSECT_INT,
+                SET_INT,
+                SET_EXT);
     }
 
     @Nullable
     default Term newIntersectEXT(@NotNull Term[] t) {
         return newIntersection(t,
-                Op.INTERSECT_EXT,
-                Op.SET_EXT,
-                Op.SET_INT);
+                INTERSECT_EXT,
+                SET_EXT,
+                SET_INT);
     }
 
     @Nullable
@@ -683,7 +715,7 @@ public interface TermBuilder {
 
         //apply any known immediate transform operators
         //TODO decide if this is evaluated incorrectly somehow in reverse
-        if (result!=null && Op.isOperation(result)) {
+        if (result!=null && isOperation(result)) {
             ImmediateTermTransform tf = f.getTransform(Operator.operatorTerm((Compound)result));
             if (tf!=null) {
                 result = applyImmediateTransform(f, result, tf);

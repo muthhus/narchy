@@ -70,7 +70,7 @@ public class ArrayListTaskTable implements QuestionTaskTable {
      */
     @Nullable
     @Override
-    public Task getFirstEquivalent(Task t) {
+    public Task contains(Task t) {
         if (isEmpty()) return null;
 
         List<Task> ll = this.list;
@@ -86,21 +86,11 @@ public class ArrayListTaskTable implements QuestionTaskTable {
 
     @NotNull
     @Override
-    public Task add(@NotNull Task t, @NotNull BudgetMerge duplicateMerge, @NotNull Memory m) {
+    public Task add(@NotNull Task t, @NotNull Memory m) {
 
-//        if (t.isDeleted())
-//            throw new RuntimeException("adding deleted task");
 
-        Task existing = getFirstEquivalent(t);
-        if (existing != null) {
-
-            if (existing != t) {
-                duplicateMerge.merge(existing.budget(), t.budget(), 1f);
-                m.remove(t, "PreExisting Duplicate Question");
-            }
-
-            return existing;
-        }
+        if (filterDuplicate(t, m))
+            return null;
 
         //Memory m = c.getMemory();
         int siz = size();
@@ -118,6 +108,20 @@ public class ArrayListTaskTable implements QuestionTaskTable {
         //m.emit(Events.ConceptQuestionAdd.class, c, t);
 
         return t;
+    }
+
+    private boolean filterDuplicate(@NotNull Task t, @NotNull Memory m) {
+        Task existing = contains(t);
+        if (existing != null) {
+
+            if (existing != t) {
+                BudgetMerge.plusDQBlend.merge(existing.budget(), t.budget(), 1f);
+                m.remove(t, "Duplicate Question");
+            }
+
+            return true;
+        }
+        return false;
     }
 
     @NotNull

@@ -19,7 +19,7 @@ import java.util.Set;
 public class GrammarTest {
 
 
-    long delay = 150;
+    long delay = 25;
 
 
     public GrammarTest() throws Exception {
@@ -27,43 +27,51 @@ public class GrammarTest {
         //Global.DEBUG = true;
 
 
-        Default n = new Default(1000, 1, 2, 3);
-        n.logSummaryGT(System.out, 0.2f);
+        Default n = new Default(1000, 3, 2, 3);
+        n.logSummaryGT(System.out, 0.15f);
 
 
         //n.memory.executionExpectationThreshold.setValue(0.55f);
         n.core.confidenceDerivationMin.setValue(0.01f);
 
-        n.memory.DEFAULT_JUDGMENT_PRIORITY = 0.5f;
-        n.memory.DEFAULT_GOAL_PRIORITY = 0.75f;
-        n.memory.activationRate.setValue(0.5f);
+        n.memory.DEFAULT_JUDGMENT_PRIORITY = 0.3f;
+        n.memory.DEFAULT_GOAL_PRIORITY = 0.5f;
+        n.memory.activationRate.setValue(0.1f);
 
-        n.memory.shortTermMemoryHistory.set(4);
+        n.memory.duration.set(8);
+        n.memory.shortTermMemoryHistory.set(3);
         n.memory.cyclesPerFrame.set(8);
         //n.initNAL9();
 
 
         Trainer grammar = new NALObjects(n).
-                the("grammar", Trainer.class, "ababababcdcdcdcdeeee");
+                the("grammar", Trainer.class, "ababcdcdeeee");
 
         //get the vocabulary
         Set<Character> vocab = grammar.chars();
 
-        n.input("(&&, ($x<->#y), Trainer(predict,grammar,$x,#y))! %1.0|0.99%"); //input and output are demanded to be the same
-        n.input("(Trainer(predict,grammar,#x,#y) ==> Trainer(predict,grammar,#y,$z))? :|:");
+        n.input("(($x<->#y) &&+0 Trainer(predict,grammar,($x),#y))! %1.0|0.99%"); //input and output are demanded to be the same
+        n.input("(Trainer(predict,grammar,(#x),#y) ==> Trainer(predict,grammar,(#y),$z))? :|:");
+
+        int period = 32;
 
         //start
         for (char c : vocab) {
-            n.run(64);
+            n.run(period/2);
             grammar.predict(c);
+            n.run(period/2);
+            grammar.prev();
         }
 
         int frames = 1064;
         for (int i = 0; i < frames; i++) {
 
-//            if (i%32==0) {
-//
-//            }
+
+            if (i% period == 0) {
+                n.input("Trainer(predict,grammar,(#x),#y)! :|:");
+                n.input("Trainer(predict,grammar,(#x),#y)? :/:");
+                n.input("Trainer(prev,grammar,(),#y)? :/:");
+            }
 
 
             try {
@@ -85,6 +93,7 @@ public class GrammarTest {
         }
 
         dump(n);
+        System.out.println("SCORE: " + grammar.score + " / " + grammar.i);
 
     }
 
@@ -155,15 +164,24 @@ public class GrammarTest {
         }
 
         public char predict(char next) {
-            char actual = tape.charAt( (i++) % tape.length() );
+            char actual = c(i++);
             log.append(actual).append(next); //pairs of chars
             System.out.println(next + " ?= " + actual + " " + score());
             score += (actual == next) ? 1 : 0;
             return actual;
         }
 
+        private char c(int p) {
+            return tape.charAt( p % tape.length() );
+        }
+
         private float score() {
             return (float)score / i;
+        }
+
+        public char prev() {
+            if (i == 0) return '?';
+            return c(i-1);
         }
 
     }
