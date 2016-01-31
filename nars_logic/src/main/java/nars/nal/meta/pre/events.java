@@ -4,9 +4,7 @@ import nars.nal.meta.AtomicBooleanCondition;
 import nars.nal.meta.PremiseMatch;
 
 /**
- * After(%X,%Y) Means that
- * %X is after %Y
- * TODO use less confusing terminology and order convention
+ * True if the premise task and belief are both non-eternal events
  */
 public class events extends AtomicBooleanCondition<PremiseMatch> {
 

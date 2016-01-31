@@ -1,16 +1,19 @@
 package nars.nal.meta.op;
 
 import nars.Op;
+import nars.nal.meta.AtomicBooleanCondition;
+import nars.nal.meta.PremiseMatch;
 import nars.term.Compound;
-import nars.term.transform.subst.FindSubst;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * requires a specific subterm type
  */
-public final class SubTermOp extends PatternOp {
+public final class SubTermOp extends AtomicBooleanCondition<PremiseMatch> {
+
     public final int subterm;
     public final Op op;
+
     @NotNull
     private final transient String id;
 
@@ -18,7 +21,7 @@ public final class SubTermOp extends PatternOp {
     public SubTermOp(int subterm, Op op) {
         this.subterm = subterm;
         this.op = op;
-        id = "(subterm:" + subterm + "):\"" + op + '"';
+        id = subterm + ":\"" + op + '"';
     }
 
     @NotNull
@@ -28,8 +31,8 @@ public final class SubTermOp extends PatternOp {
     }
 
     @Override
-    public boolean run(@NotNull FindSubst ff) {
+    public boolean booleanValueOf(PremiseMatch ff) {
         Compound parent = (Compound) ff.term.get();
-        return parent.term(subterm).op() == op;
+        return parent.term(subterm, op);
     }
 }

@@ -2,7 +2,6 @@ package nars.concept.util;
 
 import com.google.common.collect.Iterators;
 import com.gs.collections.api.block.function.primitive.FloatFunction;
-import nars.Global;
 import nars.Memory;
 import nars.NAR;
 import nars.bag.impl.ArrayTable;
@@ -18,10 +17,10 @@ import nars.term.Terms;
 import nars.truth.Truth;
 import nars.truth.TruthFunctions;
 import nars.util.ArraySortedIndex;
-import nars.util.Texts;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +50,10 @@ public class DefaultBeliefTable implements BeliefTable {
 
         if (cap == 1) cap = 2;
 
-        this.map = Global.newHashMap(cap/4); //new HashMap(cap/4);
+        this.map =
+                //Global.newHashMap(cap/4);
+                new HashMap(cap);
+
         this.lastUpdate = memory.time();
         this.minT = this.maxT = Tense.TIMELESS;
         this.duration = memory.duration.floatValue();
@@ -395,10 +397,10 @@ public class DefaultBeliefTable implements BeliefTable {
                 .parent(newBelief, oldBelief)
                 .time(now, concTime)
                 .state(newBelief.state())
-                //.because("Insertion Revision");
-                .because("Insertion Revision (%+" +
+                .because("Insertion Revision");
+                /*.because("Insertion Revision (%+" +
                                 Texts.n2(conclusion.freq() - newBelief.freq()) +
-                        ";+" + Texts.n2(conclusion.conf() - newBelief.conf()) + "%");
+                        ";+" + Texts.n2(conclusion.conf() - newBelief.conf()) + "%");*/
 
         BudgetFunctions.budgetRevision(t, newBelief, oldBelief);
 

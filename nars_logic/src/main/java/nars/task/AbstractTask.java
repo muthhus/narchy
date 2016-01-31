@@ -269,13 +269,27 @@ public abstract class AbstractTask extends Item<Task>
     /** includes: evidentialset, occurrencetime, truth, term, punctuation */
     private int rehash() {
 
-        int h = Objects.hash(
-                Arrays.hashCode(evidence()),
-                term(),
+        int h = Util.hashCombine( Util.hashCombine(
+                term().hashCode(),
                 punc(),
-                truth(),
-                occurrence()
+                Arrays.hashCode(evidence())
+            ),
+            Long.hashCode( occurrence())
         );
+
+        Truth t = truth();
+
+        h = (t != null) ?
+            Util.hashCombine(h, t.hashCode() ) :
+            h;
+
+//        int h = Objects.hash(
+//                Arrays.hashCode(evidence()),
+//                occurrence(),
+//                punc(),
+//                term(),
+//                truth()
+//        );
 
         if (h == 0) return 1; //reserve 0 for non-hashed
 

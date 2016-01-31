@@ -1,4 +1,4 @@
-package nars.nal.meta.op;
+package nars.nal.op;
 
 import com.google.common.base.Joiner;
 import nars.$;

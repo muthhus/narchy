@@ -429,7 +429,7 @@
 //here now are the backward inference rules which should really only work on backward inference:
 
     (A --> S), (B --> S), neq(A,B), task("?") |- (A --> B), (Punctuation:Question),
-                                       (B --> A), (Punctuation:Question)
+                                                 (B --> A), (Punctuation:Question)
 
 //and the backward inference driven forward inference:
 
@@ -440,6 +440,8 @@
 
     ([A] --> [B]), (A <-> B), task("?") |- ([A] --> [B]), (Belief:BeliefIdentity, Punctuation:Judgment)
     ({A} --> {B}), (A <-> B), task("?") |- ({A} --> {B}), (Belief:BeliefIdentity, Punctuation:Judgment)
+
+
 
 //NAL3:
 

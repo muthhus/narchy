@@ -12,9 +12,9 @@ import nars.nal.meta.constraint.NoCommonSubtermsConstraint;
 import nars.nal.meta.constraint.NotEqualsConstraint;
 import nars.nal.meta.constraint.NotOpConstraint;
 import nars.nal.meta.match.Ellipsis;
-import nars.nal.meta.op.Solve;
 import nars.nal.meta.pre.*;
 import nars.nal.op.ImmediateTermTransform;
+import nars.nal.op.Solve;
 import nars.nal.op.substitute;
 import nars.nal.op.substituteIfUnifies;
 import nars.op.data.differ;
@@ -593,6 +593,8 @@ public class PremiseRule extends GenericCompound implements Level {
         return clone(B, T, C, false);
     }
 
+    static final Term TaskQuestionTerm = $.exec("task", "\"?\"");
+
     @NotNull
     private PremiseRule clone(Term newT, Term newB, Term newR, boolean question) {
 
@@ -607,7 +609,7 @@ public class PremiseRule extends GenericCompound implements Level {
         Compound pc = (Compound) remapped.term(0);
         Term[] pp = pc.terms(); //premise component
         Compound newPremise = question ?
-                $.p(concat(pp, TaskPunctuation.TaskQuestionTerm) ) :
+                $.p(concat(pp, TaskQuestionTerm) ) :
                 pc;
 
         return new PremiseRule(newPremise, (Compound)remapped.term(1));

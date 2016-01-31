@@ -131,8 +131,10 @@ abstract public class ArraySortedIndex<E> extends SortedIndex<E> {
                 lowerBound = mid - 1;
             else if (mp > score) //midpoint is new upperBound so go to lowerBound half
                 upperBound = mid + 1;
-            else
-                return mid; // key found
+            else {
+                lowerBound = mid; // key found
+                break;
+            }
         }
         return lowerBound;
     }
@@ -261,12 +263,12 @@ abstract public class ArraySortedIndex<E> extends SortedIndex<E> {
         return list.toString();
     }
 
-    @NotNull
-    @Override
-    public final Iterator<E> descendingIterator() {
-        //return new ReverseListIterator(list);
-        throw new RuntimeException("unimpl yet");
-    }
+//    @NotNull
+//    @Override
+//    public final Iterator<E> descendingIterator() {
+//        //return new ReverseListIterator(list);
+//        throw new RuntimeException("unimpl yet");
+//    }
 
     @Override public final E remove(int i) {
         return list.remove(i);

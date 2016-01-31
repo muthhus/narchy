@@ -36,6 +36,11 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
     /** gets subterm at index i */
     T term(int i);
 
+    /** tests if subterm i is op o */
+    default boolean term(int i, Op o) {
+        return term(i).op(o);
+    }
+
     default MutableSet<Term> toSet() {
         return Sets.mutable.of(terms());
     }

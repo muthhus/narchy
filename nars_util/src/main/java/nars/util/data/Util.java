@@ -76,13 +76,13 @@ public enum Util {
         ));
     }
 
-    public static int hash(int a, int b) {
-        return PRIME2 * (PRIME2 + a) + b;
-    }
-
-    public static int hash(int a, int b, int c) {
-        return PRIME2 * (PRIME2 * (PRIME2 + a) + b) + c;
-    }
+//    public static int hash(int a, int b) {
+//        return PRIME2 * (PRIME2 + a) + b;
+//    }
+//
+//    public static int hash(int a, int b, int c) {
+//        return PRIME2 * (PRIME2 * (PRIME2 + a) + b) + c;
+//    }
 
 //    public final static int hash(int a, int b, int c, int d) {
 //        return PRIME2 * (PRIME2 * (PRIME2 * (PRIME2 + a) + b) + c) + d;
@@ -94,11 +94,11 @@ public enum Util {
 //    }
 
     public static int hash(Object a, Object b) {
-        return hash(a.hashCode(), b.hashCode());
+        return hashCombine(a.hashCode(), b.hashCode());
     }
 
     public static int hash(Object a, Object b, Object c) {
-        return hash(a.hashCode(), b.hashCode(), c.hashCode());
+        return hashCombine(a.hashCode(), b.hashCode(), c.hashCode());
     }
 
 //    public final static int hash(Object a, Object b, Object c, Object d) {

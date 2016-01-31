@@ -3,7 +3,6 @@ package nars.util.data.sorted;
 
 import java.io.PrintStream;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -31,7 +30,7 @@ public abstract class SortedIndex<T> implements Collection<T> {
     public final T getLast() {  return get(size()-1);    }
     public final T getFirst() { return get(0); }
 
-    public abstract Iterator<T> descendingIterator();
+    //public abstract Iterator<T> descendingIterator();
     public abstract void setCapacity(int capacity);
 
     public abstract List<T> getList();

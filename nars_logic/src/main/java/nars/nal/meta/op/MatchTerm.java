@@ -7,6 +7,7 @@ import nars.Global;
 import nars.nal.meta.*;
 import nars.nal.meta.constraint.AndConstraint;
 import nars.nal.meta.constraint.MatchConstraint;
+import nars.nal.op.Derive;
 import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;

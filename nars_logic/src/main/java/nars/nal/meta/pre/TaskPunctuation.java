@@ -1,16 +1,14 @@
 package nars.nal.meta.pre;
 
-import nars.$;
 import nars.Symbols;
 import nars.nal.meta.AtomicBooleanCondition;
 import nars.nal.meta.PremiseMatch;
-import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by me on 8/27/15.
  */
-public class TaskPunctuation extends AtomicBooleanCondition<PremiseMatch> {
+final public class TaskPunctuation extends AtomicBooleanCondition<PremiseMatch> {
 
     public final char punc;
     public final String id;
@@ -18,10 +16,19 @@ public class TaskPunctuation extends AtomicBooleanCondition<PremiseMatch> {
 
     public static final TaskPunctuation TaskJudgment = new TaskPunctuation('.');
 
-    public static final TaskPunctuation TaskQuestion = new TaskPunctuation('?') {
-        @Override protected boolean test(char taskPunc) {
+    public static final AtomicBooleanCondition<PremiseMatch> TaskQuestion = new AtomicBooleanCondition<PremiseMatch>() {
+
+        @Override
+        public boolean booleanValueOf(PremiseMatch o) {
+            char taskPunc = o.premise.task().punc();
             return taskPunc == Symbols.QUESTION || taskPunc == Symbols.QUEST;
         }
+
+        @Override
+        public String toString() {
+            return "task:\"?\"";
+        }
+
     };
 
 //    public static final TaskPunctuation TaskNotQuestion = new TaskPunctuation(
@@ -32,16 +39,16 @@ public class TaskPunctuation extends AtomicBooleanCondition<PremiseMatch> {
 //
 //    };
 
-    public static final Term TaskQuestionTerm = $.exec("task", "\"?\"");
+
 
     public static final TaskPunctuation TaskGoal = new TaskPunctuation('!');
 
     TaskPunctuation(char p) {
-        this(p, "Punc:\"" + p + '\"');
+        this(p, "task:\"" + p + '\"');
     }
 
     TaskPunctuation(char p, String id) {
-        punc = p;
+        this.punc = p;
         this.id = id;
     }
 
@@ -51,16 +58,11 @@ public class TaskPunctuation extends AtomicBooleanCondition<PremiseMatch> {
     }
 
     @Override
-    public boolean booleanValueOf(@NotNull PremiseMatch m) {
-        char taskPunc = m.premise.task().punc();
-        return test(taskPunc);
+    public final boolean booleanValueOf(@NotNull PremiseMatch m) {
+        return m.premise.task().punc() == punc;
     }
 
-    protected boolean test(char taskPunc) {
-        return taskPunc == punc;
-    }
-
-//    @NotNull
+    //    @NotNull
 //    @Override
 //    public String toJavaConditionString() {
 //        return "'" + punc + "' == p.getTask().getPunctuation()";

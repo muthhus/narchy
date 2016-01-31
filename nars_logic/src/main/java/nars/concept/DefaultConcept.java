@@ -176,10 +176,10 @@ public class DefaultConcept extends AtomConcept {
     @Override
     public Task processBelief(@NotNull Task belief, @NotNull NAR nar) {
 
-        long now = nar.time();
+        //long now = nar.time();
 
-        boolean hasGoals = hasGoals();
-        float successBefore = hasGoals ? getSuccess(now) : 0;
+        //boolean hasGoals = hasGoals();
+        //float successBefore = hasGoals ? getSuccess(now) : 0;
 
         Memory memory = nar.memory;
 
@@ -198,9 +198,9 @@ public class DefaultConcept extends AtomConcept {
 //                });
 //            }
 
-            if (hasGoals) {
-                updateSuccess(null, successBefore, memory);
-            }
+//            if (hasGoals) {
+//                updateSuccess(null, successBefore, memory);
+//            }
 
         }
 
@@ -239,9 +239,9 @@ public class DefaultConcept extends AtomConcept {
 
         Memory memory = nar.memory;
 
-        long now = memory.time();
+        //long now = memory.time();
 
-        float successBefore = getSuccess(now);
+        //float successBefore = getSuccess(now);
 
 
         if (goals == null) goals = new DefaultBeliefTable(
@@ -251,7 +251,7 @@ public class DefaultConcept extends AtomConcept {
 
         if (goal.expectation() > Global.EXECUTION_DESIRE_EXPECTATION_THRESHOLD) {
 
-            float delta = updateSuccess(goal, successBefore, memory);
+            //float delta = updateSuccess(goal, successBefore, memory);
 
             if (Op.isOperation(goal.term()) ) {
                     //&& (goal.state() != Task.TaskState.Executed)) {
