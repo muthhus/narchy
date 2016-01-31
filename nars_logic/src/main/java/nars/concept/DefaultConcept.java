@@ -1,6 +1,9 @@
 package nars.concept;
 
-import nars.*;
+import nars.Memory;
+import nars.NAR;
+import nars.Op;
+import nars.Symbols;
 import nars.bag.Bag;
 import nars.budget.BudgetMerge;
 import nars.concept.util.ArrayListTaskTable;
@@ -243,17 +246,22 @@ public class DefaultConcept extends AtomConcept {
 
         //float successBefore = getSuccess(now);
 
-
         if (goals == null) goals = new DefaultBeliefTable(
                 nar.memory.conceptGoalsMax.intValue(), memory);
 
         Task goal = goals().add(inputGoal, nar);
 
-        if (goal.expectation() > Global.EXECUTION_DESIRE_EXPECTATION_THRESHOLD) {
+        if (Op.isOperation(goal.term()) ) {
+
+            float e = goals().expectation(memory);
+
+        //if (e > Global.EXECUTION_DESIRE_EXPECTATION_THRESHOLD)
+        if ((e - beliefs().expectation(memory)) > 0)
+        {
 
             //float delta = updateSuccess(goal, successBefore, memory);
 
-            if (Op.isOperation(goal.term()) ) {
+
                     //&& (goal.state() != Task.TaskState.Executed)) {
 
                 /*if (delta >= Global.EXECUTION_SATISFACTION_TRESHOLD)*/ {
@@ -278,6 +286,7 @@ public class DefaultConcept extends AtomConcept {
                 }
             }
         }
+
         return goal;
     }
 

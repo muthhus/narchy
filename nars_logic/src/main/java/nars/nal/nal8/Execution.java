@@ -145,7 +145,7 @@ public class Execution implements Runnable {
                 //task.concept()
         ).judgment()
                 .truth(y).present(nar.memory)
-                /*.budget(task.budget())*/
+                .budget(task.budget())
         );
 
     }

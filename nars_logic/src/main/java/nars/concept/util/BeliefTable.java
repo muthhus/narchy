@@ -1,6 +1,7 @@
 package nars.concept.util;
 
 import com.google.common.collect.Iterators;
+import nars.Memory;
 import nars.NAR;
 import nars.nal.Tense;
 import nars.task.Task;
@@ -79,6 +80,10 @@ public interface BeliefTable extends TaskTable {
             return input;
         }
 
+        @Override
+        public float expectation(Memory memory) {
+            return 0;
+        }
 
         @Override
         public float rankEternal(@NotNull Task b) {
@@ -282,6 +287,7 @@ public interface BeliefTable extends TaskTable {
 
     }
 
+
     static float relevance(Task t, long time, int dur) {
         long o = t.occurrence();
         if (o == Tense.ETERNAL) return 0.5f;
@@ -314,6 +320,7 @@ public interface BeliefTable extends TaskTable {
         return a.conf() > b.conf() ? a : b;
     }
 
+    float expectation(Memory memory);
 
 
 

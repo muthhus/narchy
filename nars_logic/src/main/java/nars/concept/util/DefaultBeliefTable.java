@@ -70,6 +70,35 @@ public class DefaultBeliefTable implements BeliefTable {
         return BeliefTable.rankEternal(b, lastUpdate, duration);
     }
 
+    /** computes the truth/desire as an aggregate of projections of all
+     * beliefs to current time
+     */
+    public final float expectation(Memory memory) {
+
+        long time = memory.time();
+        int dur = memory.duration();
+
+        float[] d = {0};
+
+        Consumer<Task> rank = t -> {
+
+            float e =
+                    BeliefTable.relevance(t, time, dur) //projectionQuality(t.freq(), t.conf(), t, time, time, false)
+                            * t.expectation();
+            float best = d[0];
+            if (e > best)
+                d[0] = e;
+        };
+
+        if (!temporal.isEmpty())
+            temporal.forEach(rank);
+
+        if (!eternal.isEmpty())
+            rank.accept( eternal.top() );
+
+        return d[0];
+    }
+
 
     public long getMinT() {
         return minT;
