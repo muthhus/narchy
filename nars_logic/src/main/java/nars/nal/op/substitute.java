@@ -1,5 +1,6 @@
 package nars.nal.op;
 
+import nars.$;
 import nars.Op;
 import nars.nal.meta.PremiseAware;
 import nars.nal.meta.PremiseMatch;
@@ -16,9 +17,9 @@ import org.jetbrains.annotations.Nullable;
 /** TODO is this better named "substituteAny" */
 public class substitute extends ImmediateTermTransform implements PremiseAware {
 
-    public static final Atom INDEP_VAR = Atom.the("$", true);
-    public static final Atom QUERY_VAR = Atom.the("?", true);
-    public static final Atom DEP_VAR = Atom.the("#", true);
+    public static final Atom INDEP_VAR = $.the("$", true);
+    public static final Atom QUERY_VAR = $.the("?", true);
+    public static final Atom DEP_VAR = $.the("#", true);
 
     @NotNull
     @Override

@@ -9,7 +9,6 @@ import nars.nal.nal8.operator.TermFunction;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.TermBuilder;
-import nars.term.atom.Atom;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -43,7 +42,26 @@ public class reflect extends TermFunction {
     }
     @Nullable
     public static Term sop(@NotNull Compound s, String operatorName) {
-        return $.inh($.p(getMetaTerm(s.term(0)), getMetaTerm(s.term(1))), Atom.quote(operatorName));
+        //return Atom.the(Utf8.toUtf8(name));
+
+        //return $.the('"' + t + '"');
+
+//        int olen = name.length();
+//        switch (olen) {
+//            case 0:
+//                throw new RuntimeException("empty atom name: " + name);
+//
+////            //re-use short term names
+////            case 1:
+////            case 2:
+////                return theCached(name);
+//
+//            default:
+//                if (olen > Short.MAX_VALUE/2)
+//                    throw new RuntimeException("atom name too long");
+
+        //  }
+        return $.inh($.p(getMetaTerm(s.term(0)), getMetaTerm(s.term(1))), $.quote(operatorName));
     }
     @Nullable
     public static Term sop(@NotNull Compound s, Term predicate) {
@@ -55,7 +73,26 @@ public class reflect extends TermFunction {
         for (int i = 0; i < c.size(); i++)
             m[i] = getMetaTerm(c.term(i));
 
-        return $.inh($.p(m), Atom.quote(operatorName));
+        //return Atom.the(Utf8.toUtf8(name));
+
+        //return $.the('"' + t + '"');
+
+//        int olen = name.length();
+//        switch (olen) {
+//            case 0:
+//                throw new RuntimeException("empty atom name: " + name);
+//
+////            //re-use short term names
+////            case 1:
+////            case 2:
+////                return theCached(name);
+//
+//            default:
+//                if (olen > Short.MAX_VALUE/2)
+//                    throw new RuntimeException("atom name too long");
+
+        //  }
+        return $.inh($.p(m), $.quote(operatorName));
     }
     
     @Nullable

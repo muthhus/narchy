@@ -135,7 +135,7 @@ public class NALObjectsTest  {
             }
         });
 
-        n.run(12);
+        n.run(6);
 
 
         //assertEquals(0, wrapped.count); //unaffected

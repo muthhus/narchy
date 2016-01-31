@@ -7,6 +7,7 @@ import nars.NAR;
 import nars.budget.Budget;
 import nars.budget.UnitBudget;
 import nars.java.NALObjects;
+import nars.nal.Tense;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
@@ -26,6 +27,8 @@ import org.jetbrains.annotations.Nullable;
 public class Execution implements Runnable {
 
 
+    public final static float feedbackPriorityMultiplier = 1.0f;
+    public final static float feedbackDurabilityMultiplier = 1.0f;
     public final NAR nar;
     public final Task task;
     private final Topic<Execution> listeners;
@@ -34,6 +37,64 @@ public class Execution implements Runnable {
         this.nar = nar;
         this.task = task;
         this.listeners = listeners;
+    }
+
+    public static Task result(@NotNull NAR nar, @NotNull Task goal, Term y/*, Term[] x0, Term lastTerm*/, Tense tense) {
+
+        Compound operation = goal.term();
+
+        //Variable var=new Variable("$1");
+        //  Term actual_part = Similarity.make(var, y);
+        //  Variable vardep=new Variable("#1");
+        //Term actual_dep_part = Similarity.make(vardep, y);
+//        operation=(Operation) operation.setComponent(0,
+//                ((Compound)operation.getSubject()).setComponent(
+//                        numArgs, y));
+
+        //Examples:
+        //      <3 --> (/,^add,1,2,_,SELF)>.
+        //      <2 --> (/,^count,{a,b},_,SELF)>. :|: %1.00;0.99%
+        //transform to image for perception variable introduction rule (is more efficient representation
+
+
+        //final int numArgs = x0.length;
+
+        Term inh = Operator.result(operation, y);
+        if ((!(inh instanceof Compound))) {
+            //TODO wrap a non-Compound result as some kind of statement
+            return null;
+        }
+
+        //Implication.make(operation, actual_part, TemporalRules.ORDER_FORWARD);
+
+        return new MutableTask(inh).
+                        judgment().
+                        //truth(getResultFrequency(), getResultConfidence()).
+                        tense(tense, nar.memory).budget(goal.budget()).
+                        budgetScaled(feedbackPriorityMultiplier, feedbackDurabilityMultiplier)
+            ;
+
+            /*float equal = equals(lastTerm, y);
+            ArrayList<Task> rt = Lists.newArrayList(
+                    m.newTask(actual, Symbols.JUDGMENT_MARK,
+                            1.0f, confidence,
+                            Global.DEFAULT_JUDGMENT_PRIORITY,
+                            Global.DEFAULT_JUDGMENT_DURABILITY,
+                            operation.getTask()));
+
+            if (equal < 1.0f) {
+                rt.add(m.newTask(operation, Symbols.JUDGMENT_MARK,
+                            equal, confidence,
+                            Global.DEFAULT_JUDGMENT_PRIORITY,
+                            Global.DEFAULT_JUDGMENT_DURABILITY,
+                            operation.getTask()));
+            }
+            return rt;
+            */
+
+
+
+
     }
 
     /** should only be called by NAR */

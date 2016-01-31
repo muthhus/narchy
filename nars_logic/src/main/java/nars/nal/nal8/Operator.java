@@ -2,8 +2,6 @@ package nars.nal.nal8;
 
 import nars.$;
 import nars.Op;
-import nars.task.MutableTask;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
@@ -110,14 +108,7 @@ public final class Operator<T extends Term> extends AbstractStringAtom { //imple
         return $.the(Op.IMAGE_EXT, index + 1, argument);
     }
 
-    /**
-     * applies certain data to a feedback task relating to its causing operation's task
-     */
-    public static Task feedback(@NotNull MutableTask feedback, @NotNull Task goal, float priMult, float durMult) {
-        return feedback.budget(goal.budget()).
-                budgetScaled(priMult, durMult).
-                parent(goal);
-    }
+
 
     public static Term[] opArgsArray(@NotNull Compound term) {
         return opArgs(term).terms();

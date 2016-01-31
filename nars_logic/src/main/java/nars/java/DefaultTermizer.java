@@ -1,5 +1,6 @@
 package nars.java;
 
+import com.google.common.collect.ImmutableSet;
 import com.gs.collections.api.bimap.MutableBiMap;
 import com.gs.collections.impl.bimap.mutable.HashBiMap;
 import nars.$;
@@ -39,20 +40,21 @@ public class DefaultTermizer implements Termizer {
     /*final HashMap<Term, Object> instances = new HashMap();
     final HashMap<Object, Term> objects = new HashMap();*/
 
-    static final Set<Class> classInPackageExclusions = new HashSet() {{
-        add(Class.class);
-        add(Object.class);
+    static final Set<Class> classInPackageExclusions = ImmutableSet.of(
+        Class.class,
+        Object.class,
 
         //since autoboxing can be managed, the distinction between boxed and unboxed values should not be seen by reasoner
-        add(Float.class);
-        add(Double.class);
-        add(Boolean.class);
-        add(Long.class);
-        add(Integer.class);
-        add(Short.class);
-        add(Byte.class);
-        add(Class.class);
-    }};
+        Float.class,
+        Double.class,
+        Boolean.class,
+        Character.class,
+        Long.class,
+        Integer.class,
+        Short.class,
+        Byte.class,
+        Class.class
+    );
 
     public DefaultTermizer() {
         map(NULL, null);
@@ -88,50 +90,61 @@ public class DefaultTermizer implements Termizer {
         if (o instanceof Term) return (Term)o;
 
         if (o instanceof String)
-            return Atom.quote((String) o);
+            return $.quote((String) o);
 
         if (o instanceof Boolean)
             return ((Boolean) o) ? TRUE : FALSE;
+
+        if (o instanceof Character)
+            return $.the(String.valueOf((Character)o));
 
         if (o instanceof Number)
             return number((Number)o);
 
         if (o instanceof Class) {
             Class oc = (Class) o;
+            return classTerm(oc);
 
-            Package p = oc.getPackage();
-            if (p != null) {
+//            if (metadata) {
+//                Package p = oc.getPackage();
+//                if (p != null) {
+//
+//                    Term cterm = termClassInPackage(oc);
+//
+//                    if (reportClassInPackage(oc)) { //TODO use a method for other class exclusions
+//                        Term pkg = packages.get(p);
+//                        if (pkg == null) {
+//                            pkg = termPackage(p);
+//                            packages.put(p, pkg);
+//                            termClassInPackage(cterm, PACKAGE);
+//                        }
+//
+//                        //TODO add recursive superclass ancestry?
+//                    }
+//
+//                    return cterm;
+//                }
+//            }
 
-                Term cterm = termClassInPackage(oc);
 
-                if (reportClassInPackage(oc)) { //TODO use a method for other class exclusions
-                    Term pkg = packages.get(p);
-                    if (pkg == null) {
-                        pkg = termPackage(p);
-                        packages.put(p, pkg);
-                        termClassInPackage(cterm, PACKAGE);
-                    }
 
-                    //TODO add recursive superclass ancestry?
-                }
-
-                return cterm;
-            }
-            return PRIMITIVE;
+            //return PRIMITIVE;
         }
 
         if (o instanceof int[]) {
             List<Term> arg = Arrays.stream((int[]) o)
-                    .mapToObj(Atom::the).collect(Collectors.toList());
+                    .mapToObj((i) -> $.the(i)).collect(Collectors.toList());
             if (arg.isEmpty()) return EMPTY;
             return $.p( arg );
         }
+
         //noinspection IfStatementWithTooManyBranches
         if (o instanceof Object[]) {
             List<Term> arg = Arrays.stream((Object[]) o).map(this::term).collect(Collectors.toList());
             if (arg.isEmpty()) return EMPTY;
             return $.p( arg );
         }
+
         if (o instanceof List) {
             if (((List)o).isEmpty()) return EMPTY;
 
@@ -153,6 +166,7 @@ public class DefaultTermizer implements Termizer {
             return Atom.quote(o.toString().substring(17));
         }*/
         }
+
         if (o instanceof Set) {
             Collection<Term> arg = (Collection<Term>) ((Collection) o).stream().map(this::term).collect(Collectors.toList());
             if (arg.isEmpty()) return EMPTY;
@@ -175,13 +189,14 @@ public class DefaultTermizer implements Termizer {
             if (components.isEmpty()) return EMPTY;
             return $.sete(components);
         }
+
         else if (o instanceof Method) {
             //translate the method to an operation term
             Method m = (Method)o;
             return getOperation(m, getMethodArgVariables(m));
         }
 
-        return termInstanceInClassInPackage(o);
+        return instanceTerm(o);
 
 
 //        //ensure package is term'ed
@@ -208,9 +223,8 @@ public class DefaultTermizer implements Termizer {
     }
 
     protected static Term number(Number o) {
-        return Atom.the((Number) o);
+        return $.the((Number) o);
     }
-
     public Compound getOperation(@NotNull Method m, Term[] args) {
         return getMethodOperator(m, args);
     }
@@ -254,7 +268,7 @@ public class DefaultTermizer implements Termizer {
         return x;
     }
 
-    public static Term termClass(@NotNull Class c) {
+    public static Term classTerm(@NotNull Class c) {
         //return Atom.the(Utf8.toUtf8(name));
 
         return $.the(c.getSimpleName());
@@ -277,7 +291,7 @@ public class DefaultTermizer implements Termizer {
     }
 
     public static Term termClassInPackage(@NotNull Class c) {
-        return $.p(termPackage(c.getPackage()), termClass(c));
+        return $.p(termPackage(c.getPackage()), classTerm(c));
     }
 
     public static Term termPackage(@NotNull Package p) {
@@ -288,13 +302,22 @@ public class DefaultTermizer implements Termizer {
         //return Atom.the(p.getName());
     }
 
-    public static Term termInstanceInClassInPackage(@NotNull Object o) {
+    /** generic instance term representation */
+    public static Term instanceTerm(@NotNull Object o) {
         //return o.getClass().getName() + '@' + Integer.toHexString(o.hashCode());
         //return o.getClass() + "_" + System.identityHashCode(o)
+
+        //                Term clas = classes.computeIfAbsent(o.getClass(), this::obj2term);
+//
+//                Term finalClas = clas;
+//                post[0] = () -> onInstanceOfClass(o, oterm, finalClas);
+
+        //instances.put(oterm, o); //reverse
+
         return $.p(
                     termPackage(o.getClass().getPackage()),
                     termClassInPackage(o.getClass()),
-                    Atom.the(System.identityHashCode(o), 36)
+                    $.the(System.identityHashCode(o), 36)
                 );
     }
 
@@ -352,27 +375,18 @@ public class DefaultTermizer implements Termizer {
         if (o instanceof Term)
             return ((Term)o);
 
-        MutableBiMap<Object, Term> iii = instances.inverse();
-        Term oe = iii.get(o);
-        //computeifAbsent crashes because it can go recursive
-        if (oe == null) {
+        Term oe;
+        if (cacheableInstance(o)) {
 
-            Term oterm = obj2term(o);
-            oe = oterm;
+            MutableBiMap<Object, Term> iii = instances.inverse();
+            oe = iii.get(o); //computeifAbsent crashes because it can go recursive
+            if (oe == null) {
 
-            if (cacheableInstance(o)) {
-                Term clas = classes.computeIfAbsent(o.getClass(), this::obj2term);
 
-                Term finalClas = clas;
-                post[0] = () -> onInstanceOfClass(o, oterm, finalClas);
-
-                //instances.put(oterm, o); //reverse
-
-                try {
-                    iii.put(o, oterm);
-                } catch (Exception e) { /* hack */ }
+                oe = iii.computeIfAbsent(o, this::obj2term);
             }
-
+        } else {
+            oe = obj2term(o);
         }
 
         return oe;

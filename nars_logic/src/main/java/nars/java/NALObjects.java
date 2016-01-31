@@ -9,6 +9,7 @@ import nars.$;
 import nars.Global;
 import nars.NAR;
 import nars.nal.Tense;
+import nars.nal.nal8.Execution;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
@@ -189,31 +190,25 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
 //            return result;
 //        }
 
-        Term effect = term(result);
 
         Task volitionTask = volition.get();
 
-        //TODO re-use static copy for 'VOID' and null-returning instances
-        if (invokingGoal != null) {
-            InvocationResult ir = new InvocationResult(effect);
-            ((MutableTask)invokingGoal).because(ir);
-        }
+//        //TODO re-use static copy for 'VOID' and null-returning instances
+//        if (invokingGoal != null) {
+//            InvocationResult ir = new InvocationResult(effect);
+//            ((MutableTask)invokingGoal).because(ir);
+//        }
 
 
         if (volitionTask == null) {
 
             /** pretend as if it were a goal of its own volition, although it was invoked externally
              *  Master of puppets, I'm pulling your strings */
-            nar.input(invokingGoal);
+            nar.input(
+                invokingGoal.log(JavaInvoked.the),
+                Execution.result(nar, invokingGoal, term(result), Tense.Present).log("Java Return")
+            );
 
-//            nar.input(
-//                new FluentTask(Operation.result(op, invocationArgs, effect)).
-//                        belief().
-//                        truth(invocationResultFreq, invocationResultConf).
-//                        present(nar.memory).parent(g).
-//                        budget(g.getBudget()).
-//                        because("External Invocation")
-//                    );
         } else {
             //feedback will be returned via operation execution
             //System.out.println("VOLITION " + volitionTask);
@@ -414,17 +409,18 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
     }
 
 
-    public static class InvocationResult {
-        public final Term value;
+    /** shared log entry marker instance to prevent duplicate execution
+     * if a wrapper has already been
+     * invoked and the return value already determined */
+    public final static class JavaInvoked {
+        public final static JavaInvoked the = new JavaInvoked();
 
-        public InvocationResult(Term value) {
-            this.value = value;
-        }
+        protected JavaInvoked() {         }
 
         @NotNull
         @Override
         public String toString() {
-            return value.toString(); //"Puppet";
+            return "Java Invoked";
         }
     }
 

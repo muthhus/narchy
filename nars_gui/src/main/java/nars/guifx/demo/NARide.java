@@ -36,7 +36,6 @@ import nars.guifx.util.*;
 import nars.nar.Default;
 import nars.term.Term;
 import nars.term.TermIndex;
-import nars.term.atom.Atom;
 import nars.time.FrameClock;
 import nars.time.RealtimeMSClock;
 import nars.util.data.Util;
@@ -337,7 +336,7 @@ public class NARide extends BorderPane {
         mi.setOnAction((e) -> addView(builder.get()));
         /* depr */
         controlPane.tool.getItems().add(mi);
-        tools.put(Atom.the(name, true), builder);
+        tools.put($.the(name, true), builder);
     }
 
     public void addTool(Menu submenu) {

@@ -13,7 +13,7 @@ public class hai {
     final Random rng = new XorShift128PlusRandom(1);
 
     final Hsom som;
-    final float[][][] Q; //state, action
+    final float[][][] Q; // [state -> state] x action
     final float[][][] et;
 
     final int nActions, nStates;

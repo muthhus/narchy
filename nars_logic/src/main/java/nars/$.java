@@ -19,6 +19,7 @@ import nars.term.container.TermSet;
 import nars.term.container.TermVector;
 import nars.term.variable.Variable;
 import nars.truth.Truth;
+import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.LoggerFactory;
@@ -84,6 +85,10 @@ public enum $  {
     public static Atom the(String id) {
         return new Atom(id);
     }
+    @NotNull
+    public static Atom quote(String text) {
+        return $.the('"' + text + '"');
+    }
 
     @NotNull
     public static Atom[] the(@NotNull String... id) {
@@ -96,7 +101,7 @@ public enum $  {
 
 
     public static Atom the(int i) {
-        return Atom.the(i);
+        return the(i, 10);
     }
 
     /**
@@ -550,4 +555,100 @@ public enum $  {
     }
 
 
+    public static Atom the(Number o) {
+
+        if (o instanceof Byte) return the(o.intValue());
+        if (o instanceof Short) return the(o.intValue());
+        if (o instanceof Integer) return the(o.intValue());
+
+        if (o instanceof Long) return the(Long.toString((long)o));
+
+        if ((o instanceof Float) || (o instanceof Double)) return the(o.floatValue());
+
+        return the(o.toString(), true);
+    }
+
+    private static final Atom[] digits = new Atom[10];
+
+    /** gets the atomic term of an integer, with specific radix (up to 36) */
+    public static Atom the(int i, int radix) {
+        //fast lookup for single digits
+        if ((i >= 0) && (i <= 9)) {
+            Atom a = digits[i];
+            if (a == null)
+                a = digits[i] = the(Integer.toString(i, radix));
+            return a;
+        }
+        //return Atom.the(Utf8.toUtf8(name));
+
+        return the(Integer.toString(i, radix));
+
+//        int olen = name.length();
+//        switch (olen) {
+//            case 0:
+//                throw new RuntimeException("empty atom name: " + name);
+//
+////            //re-use short term names
+////            case 1:
+////            case 2:
+////                return theCached(name);
+//
+//            default:
+//                if (olen > Short.MAX_VALUE/2)
+//                    throw new RuntimeException("atom name too long");
+
+        //  }
+    }
+
+    public static Atom the(float v) {
+        if (Util.equal( (float)Math.floor(v), v, Float.MIN_VALUE*2 )) {
+            //close enough to be an int, so it doesnt need to be quoted
+            return the((int)v);
+        }
+        //return Atom.the(Utf8.toUtf8(name));
+
+        return quote(Float.toString(v));
+
+//        int olen = name.length();
+//        switch (olen) {
+//            case 0:
+//                throw new RuntimeException("empty atom name: " + name);
+//
+////            //re-use short term names
+////            case 1:
+////            case 2:
+////                return theCached(name);
+//
+//            default:
+//                if (olen > Short.MAX_VALUE/2)
+//                    throw new RuntimeException("atom name too long");
+
+        //  }
+    }
+
+    @NotNull
+    public static Atom the(@NotNull String name, boolean quoteIfNecessary) {
+        if (quoteIfNecessary && Atom.quoteNecessary(name))
+            return quote(name);
+
+        //return Atom.the(Utf8.toUtf8(name));
+
+        return the(name);
+
+//        int olen = name.length();
+//        switch (olen) {
+//            case 0:
+//                throw new RuntimeException("empty atom name: " + name);
+//
+////            //re-use short term names
+////            case 1:
+////            case 2:
+////                return theCached(name);
+//
+//            default:
+//                if (olen > Short.MAX_VALUE/2)
+//                    throw new RuntimeException("atom name too long");
+
+        //  }
+    }
 }

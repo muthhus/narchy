@@ -1,11 +1,11 @@
 package nars.nal.nal8.operator;
 
+import nars.$;
 import nars.NAR;
 import nars.Symbols;
 import nars.nal.Tense;
 import nars.nal.nal8.Execution;
 import nars.nal.nal8.Operator;
-import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
@@ -24,9 +24,6 @@ import org.jetbrains.annotations.Nullable;
  * with the result of the function substituted in the variable's place.
  */
 public abstract class TermFunction<O> extends SyncOperator {
-
-    private final float feedbackPriorityMultiplier = 1.0f;
-    private final float feedbackDurabilityMultiplier = 1.0f;
 
     protected TermFunction() {
     }
@@ -69,65 +66,8 @@ public abstract class TermFunction<O> extends SyncOperator {
     public abstract O function(Compound x, TermBuilder i);
 
 
-    @Nullable
-    protected Task result(@NotNull NAR nar, @NotNull Task opTask, Term y/*, Term[] x0, Term lastTerm*/) {
-
-        Compound operation = opTask.term();
-
-        //Variable var=new Variable("$1");
-        //  Term actual_part = Similarity.make(var, y);
-        //  Variable vardep=new Variable("#1");
-        //Term actual_dep_part = Similarity.make(vardep, y);
-//        operation=(Operation) operation.setComponent(0,
-//                ((Compound)operation.getSubject()).setComponent(
-//                        numArgs, y));
-
-        //Examples:
-        //      <3 --> (/,^add,1,2,_,SELF)>.
-        //      <2 --> (/,^count,{a,b},_,SELF)>. :|: %1.00;0.99%
-        //transform to image for perception variable introduction rule (is more efficient representation
-
-
-        //final int numArgs = x0.length;
-
-        Term inh = Operator.result(operation, y);
-        if ((!(inh instanceof Compound))) {
-            //TODO wrap a non-Compound result as some kind of statement
-            return null;
-        }
-
-        //Implication.make(operation, actual_part, TemporalRules.ORDER_FORWARD);
-
-        return
-                Operator.feedback(
-                    new MutableTask(inh).
-                        judgment().
-                        truth(getResultFrequency(), getResultConfidence()).
-                        tense(getResultTense(), nar.memory), opTask,
-                        feedbackPriorityMultiplier, feedbackDurabilityMultiplier)
-            ;
-
-            /*float equal = equals(lastTerm, y);
-            ArrayList<Task> rt = Lists.newArrayList(
-                    m.newTask(actual, Symbols.JUDGMENT_MARK,
-                            1.0f, confidence,
-                            Global.DEFAULT_JUDGMENT_PRIORITY,
-                            Global.DEFAULT_JUDGMENT_DURABILITY,
-                            operation.getTask()));
-
-            if (equal < 1.0f) {
-                rt.add(m.newTask(operation, Symbols.JUDGMENT_MARK,
-                            equal, confidence,
-                            Global.DEFAULT_JUDGMENT_PRIORITY,
-                            Global.DEFAULT_JUDGMENT_DURABILITY,
-                            operation.getTask()));
-            }
-            return rt;
-            */
-
-
-
-
+    protected Task result(@NotNull NAR nar, @NotNull Task goal, Term y/*, Term[] x0, Term lastTerm*/) {
+        return Execution.result(nar, goal, y, getResultTense());
     }
 
     /** default tense applied to result tasks */
@@ -136,16 +76,16 @@ public abstract class TermFunction<O> extends SyncOperator {
         return Tense.Present;
     }
 
-    /** default confidence applied to result tasks */
-    public float getResultFrequency() {
-        return 1.0f;
-    }
-
-
-    /** default confidence applied to result tasks */
-    public float getResultConfidence() {
-        return 0.99f;
-    }
+//    /** default confidence applied to result tasks */
+//    public float getResultFrequency() {
+//        return 1.0f;
+//    }
+//
+//
+//    /** default confidence applied to result tasks */
+//    public float getResultConfidence() {
+//        return 0.99f;
+//    }
 
 
 
@@ -256,7 +196,7 @@ public abstract class TermFunction<O> extends SyncOperator {
         }
 
         if (y instanceof Number) {
-            y = (Atom.the((Number)y));
+            y = ($.the((Number)y));
         }
 
 
@@ -279,7 +219,7 @@ public abstract class TermFunction<O> extends SyncOperator {
 
         //2. try to parse as term
 
-        Term t = Atom.the(ys, true);
+        Term t = $.the(ys, true);
 
         if (t != null) {
             e.feedback( result(e.nar, opTask, t/*, x, lastTerm*/) );

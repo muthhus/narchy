@@ -150,9 +150,11 @@ public class MethodOperator  {
             Task curTask = currentTask.get();
 
             Object ll = curTask.getLogLast();
-            Object result = ll instanceof NALObjects.InvocationResult ?
-                    ((NALObjects.InvocationResult) ll).value :
-                    context.invokeVolition(curTask, method, instance, args);
+
+            if (ll instanceof NALObjects.JavaInvoked)
+                return null; //already invoked
+
+            Object result = context.invokeVolition(curTask, method, instance, args);
 
 
             if (feedback) {

@@ -186,7 +186,7 @@ public abstract class NQuadsRDF {
 
             if (s.isEmpty()) return null;
 
-            return Atom.the(s, true);
+            return the(s, true);
         //}
         //else
           //  return null;

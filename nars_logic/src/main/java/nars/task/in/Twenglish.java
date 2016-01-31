@@ -191,13 +191,32 @@ public class Twenglish {
     
     public static Term lexToTerm(String c) {
         //return Atom.the(c, true);
-        return Atom.quote(c);
+        return $.quote(c);
+        //return Atom.the(Utf8.toUtf8(name));
+
+        //return $.the('"' + t + '"');
+
+//        int olen = name.length();
+//        switch (olen) {
+//            case 0:
+//                throw new RuntimeException("empty atom name: " + name);
+//
+////            //re-use short term names
+////            case 1:
+////            case 2:
+////                return theCached(name);
+//
+//            default:
+//                if (olen > Short.MAX_VALUE/2)
+//                    throw new RuntimeException("atom name too long");
+
+        //  }
     }
     @NotNull
     public static Term tagToTerm(String c) {
         c = c.toLowerCase();
-        if ("word".equals(c)) return Atom.quote(" "); //space surrounded by quotes
-        return Atom.the(c, true);
+        if ("word".equals(c)) return $.quote(" ");
+        return $.the(c, true);
     }
     
     
