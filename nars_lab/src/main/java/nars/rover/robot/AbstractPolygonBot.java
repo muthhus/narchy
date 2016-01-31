@@ -38,15 +38,15 @@ public abstract class AbstractPolygonBot extends Robotic {
     public final NAR nar;
     final Deque<Vec2> positions = new ArrayDeque();
     final List<Sense> senses = new ArrayList();
-    public float linearThrustPerCycle = 5*6f;
-    public float angularSpeedPerCycle = 5*0.7f;
+    public float linearThrustPerCycle = 2*6f;
+    public float angularSpeedPerCycle = 2*0.7f;
     int mission = 0;
     //public float curiosity = 0.1f;
     public Vec2 point1 = new Vec2(); //HACK
     public final Vec2 point2 = new Vec2();
     public final Vec2 d = new Vec2();
     boolean feel_motion = true, feel_senses = true; //todo add option in gui
-    int motionPeriod = 2, sensePeriod = 2;
+    int motionPeriod = 8, sensePeriod = 8;
 
     public void thrustRelative(float f) {
         //float velBefore = torso.getLinearVelocity().length();
@@ -70,7 +70,8 @@ public abstract class AbstractPolygonBot extends Robotic {
     protected void train(long t) {
         //float freq = 0.5f + 0.5f * (1/(1f + t/5000f)), conf = 0.85f;
         float freq = 1f, conf = 0.9f;
-        nar.input("MotorControls(random,motor,(),#x)! :|: %" + n2(freq) + ";" + n2(conf) + "%");
+        nar.input("MotorControls(random,motor,(),#x)! %1.0;0.1%");
+        nar.input("MotorControls(random,motor,(),#x)! %" + n2(freq) + "|" + n2(conf) + "%");
         System.out.println("@" + t + " Curiosity Trained @ freq=" + freq);
     }
 
@@ -131,14 +132,18 @@ public abstract class AbstractPolygonBot extends Robotic {
                 //nar.input("eat:food. :|: %0.00;0.75%");
                 //nar.input("eat:poison. :|: %0.00;0.75%");
 
-                nar.input("eat:food! :|: %1.00;0.95%");
-                nar.input("speed:linear! :|: %1.00;0.8%");
-                nar.input("(--, eat:poison)! :|: %1.00;0.95%");
+                nar.input("eat:food! %1.00|0.95%");
+                nar.input("speed:linear! %1.00|0.8%");
+                nar.input("eat:poison! %0.0|0.9%");
                 //nar.input("(--, <eat:food <-> eat:poison>). %1.00;0.95%");
-                //nar.input("(?x ==> eat:#y)?");
+                nar.input("(?x ==> eat:#y)?");
+                nar.input("(?x && eat:#y)?");
 
-                //nar.input("MotorControls(#x,motor,#y,#z). :|: %0.1;0.66%"); //create demand for action
-                //nar.input("MotorControls(?x,motor,?y,?z)! :|: %1.00;0.75%");
+                nar.input("MotorControls(#x,motor,#y,#z)! :|: %1.0;0.75%"); //create demand for action
+                nar.input("MotorControls(?x,motor,?y,#z)! :|: %1.0;0.75%");
+                //nar.concept("MotorControls(?x,motor,?y,#z)").print();
+                //nar.concept("MotorControls(#x,motor,#y,#z)").print();
+
 
                 //((Default)nar).core.active.printAll();
                 //nar.concept("MotorControls(forward,motor,(),#1)").print();

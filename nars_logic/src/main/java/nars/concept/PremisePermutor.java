@@ -52,14 +52,23 @@ public class PremisePermutor extends UnifySubst implements Function<Term, Task> 
 
 
     /**
+     * main entry point:
      * iteratively supplies a matrix of premises from the next N tasklinks and M termlinks
      * (recycles buffers, non-thread safe, one thread use this at a time)
      */
     public void firePremiseSquared(
             @NotNull BLink<? extends Concept> conceptLink,
             int tasklinks, int termlinks,
-            @NotNull Consumer<BLink<? extends Termed>> eachTermLink,
-            @NotNull Predicate<BLink<? extends Task>> eachTaskLink) {
+            @NotNull Consumer<BLink<? extends Termed>> eachTermLink /* forget/update func */,
+            @NotNull Predicate<BLink<? extends Task>> eachTaskLink /* forget/update func */
+    ) {
+
+        long now = nar.time();
+        if (lastMatch!= now) {
+            lastMatch = now;
+            beliefCache.clear();
+        }
+
 
         Concept concept = conceptLink.get();
 
@@ -94,11 +103,6 @@ public class PremisePermutor extends UnifySubst implements Function<Term, Task> 
 
     void match(BLink<? extends Concept> concept, BLink<? extends Task>[] taskLinks, @NotNull BLink<? extends Termed> termLink) {
 
-        long now = nar.time();
-        if (lastMatch!= now) {
-            lastMatch = now;
-            beliefCache.clear();
-        }
 
         this.concept = concept;
         this.termLink = termLink;
@@ -108,15 +112,15 @@ public class PremisePermutor extends UnifySubst implements Function<Term, Task> 
             if (taskLink == null) break; //null-terminated array, ends
 
             Compound taskLinkTerm = taskLink.get().term();
+            Term termLinkTerm  = termLink.get().term();
 
-            if (Terms.equalSubTermsInRespectToImageAndProduct(taskLinkTerm, termLink.get().term())) {
+            if (Terms.equalSubTermsInRespectToImageAndProduct(taskLinkTerm, termLinkTerm )) {
                 continue;
             }
 
             this.taskLink = taskLink;
 
-            matchAll(taskLinkTerm, termLink.get().term());
-            clear();
+            matchAll(taskLinkTerm, termLinkTerm );
         }
     }
 

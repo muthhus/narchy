@@ -35,12 +35,14 @@ public abstract class UnifySubst extends FindSubst implements Consumer<Term> {
     }
 
     public void matchAll(@NotNull Term x, @NotNull Term y, boolean finish) {
-        clear();
         this.a = x;
         this.b = y;
         this.matches = 0;
 
-        super.matchAll(x, y, finish);
+        if (x.hasAny(type) || y.hasAny(type)) { //no need to unify if there is actually no variable
+            clear();
+            super.matchAll(x, y, finish);
+        }
 
         if (acceptUnmatched && matches == 0) {
             accept(y);
