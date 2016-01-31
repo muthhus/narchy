@@ -254,7 +254,8 @@ public final class ConceptProcess implements Premise {
                             //common right
                             t = bd - td;
                         } else {
-                            throw new RuntimeException("unhandled case");
+                            //throw new RuntimeException("unhandled case");
+                            t = (bd + td)/2; //???
                         }
                     } else if (td == ITERNAL && bd == ITERNAL && belief!=null) {
                         long to = task().occurrence();

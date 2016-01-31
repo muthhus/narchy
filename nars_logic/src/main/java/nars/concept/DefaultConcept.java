@@ -254,7 +254,7 @@ public class DefaultConcept extends AtomConcept {
         if (Op.isOperation(term())) {
 
             float goalExp = goals().expectation(memory, true);
-            float belExp = goals().expectation(memory, false);
+            float belExp = beliefs().expectation(memory, true);
 
             //if (e > Global.EXECUTION_DESIRE_EXPECTATION_THRESHOLD)
             if (goalExp > belExp) {

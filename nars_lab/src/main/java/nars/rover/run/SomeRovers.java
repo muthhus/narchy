@@ -41,7 +41,7 @@ public class SomeRovers {
         game.add(new Spider("spider",
                 3, 3, 0.618f, 30, 30));
                 {
-            int conceptsFirePerCycle = 4;
+            int conceptsFirePerCycle = 8;
             Default nar = new Default(
                     new Memory(clock, new MapIndex2(
                         new SoftValueHashMap())),
