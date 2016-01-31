@@ -13,7 +13,7 @@ import java.io.PrintStream;
  */
 public class Thermostat4 {
 
-    static final float speed = 0.05f;
+    static final float speed = 0.25f;
     final static float tolerance = 0.15f;
     private final UnitValTaskInc h;
     long cyclePause = 0;
@@ -33,6 +33,27 @@ public class Thermostat4 {
 
 
     public static class UnitValTaskInc extends UnitVal {
+        final static int cols = 8;
+
+        public int[] see() {
+
+            int target = Math.round(targetX * cols);
+            int current = Math.round(v * cols);
+            int[] ss = new int[cols+1];
+
+            for (int i = 0; i <= cols; i++) {
+                char c;
+
+                if ((target == current) && (target == i)) c = '+';
+                else if (i == target) c = 'x';
+                else if (i == current) c = '|';
+                else c = 0; //'-';
+
+                ss[i] = c;
+            }
+
+            return ss;
+        }
 
         public boolean move(boolean positive) {
             Task cTask = MethodOperator.invokingTask();
@@ -63,13 +84,13 @@ public class Thermostat4 {
 
         //Global.DEBUG = true;
 
-        n = new Default(1000, 15, 2, 3);
+        n = new Default(1000, 16, 2, 3);
         //n.log();
         n.memory.activationRate.setValue(0.05f);
         n.memory.executionExpectationThreshold.setValue(0.55f);
         n.core.confidenceDerivationMin.setValue(0.01f);
         n.memory.shortTermMemoryHistory.set(3);
-        n.memory.cyclesPerFrame.set(3);
+        n.memory.cyclesPerFrame.set(4);
         //n.initNAL9();
 
 
@@ -139,20 +160,17 @@ public class Thermostat4 {
 
 
             if (n.time() % 5 == 0) {
-                int cols = 60;
-                int target = Math.round(targetX * cols);
-                int current = Math.round(h.isTrue().freq() * cols);
+
 
                 PrintStream out = System.out;
-                for (int i = 0; i <= cols; i++) {
-                    char c;
-                    if ((target == current) && (target == i)) c = '+';
-                    else if (i == target) c = 'x';
-                    else if (i == current) c = '|';
-                    else c = '-';
 
+                int[] cc  = h.see();
+                for (int i = 0; i < cc.length; i++) {
+                    char c = (char) cc[i];
+                    if (c == 0) c = '-';
                     out.print(c);
                 }
+
 
                 //reduce the number of different terms being created:
 //                targetX = Util.round(targetX, tolerance/2f);

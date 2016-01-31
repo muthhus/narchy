@@ -6,6 +6,7 @@ import nars.nal.Tense;
 import nars.nar.AbstractNAR;
 import nars.nar.Default;
 import nars.task.Task;
+import nars.truth.DefaultTruth;
 import nars.util.meter.BeliefAnalysis;
 import nars.util.meter.MemoryBudget;
 import org.junit.Test;
@@ -140,7 +141,7 @@ public class BeliefTableTest  {
         //b.printEnergy();
 
         b.print();
-        assertEquals(3, b.size());
+        assertEquals(2, b.size());
 
         b.believe(1.0f, 0.9f, Tense.Present).run(offCycles)
                 .believe(0.0f, 0.9f, Tense.Present);
@@ -227,6 +228,37 @@ public class BeliefTableTest  {
 
     }
 
+    @Test
+    public void testExpectation() {
+
+        assertEquals(0.859f, new DefaultTruth(0.9f,0.9f).expectationPositive(), 0.001f);
+        assertEquals(0.859f, new DefaultTruth(0.1f,0.9f).expectationNegative(), 0.001f);
+
+
+        NAR n = newNAR(12);
+
+        n.memory.duration.set(5);
+
+        BeliefAnalysis b = new BeliefAnalysis(n, "a:b");
+
+        n.input("a:b. %0.9|0.9%"); //highest positive
+        n.input("a:b. %0.8|0.8%");
+
+
+        n.step();
+        b.print();
+
+        assertEquals(0.716f, b.beliefs().expectation(true, n.memory), 0.001f);
+        assertEquals(0.216f, b.beliefs().expectation(false, n.memory), 0.001f);
+
+        n.input("a:b. %0.2|0.7%");
+        n.input("a:b. %0.1|0.8%"); //highest negative
+
+        n.step();
+        b.print();
+
+        assertEquals(0.683f, b.beliefs().expectation(false, n.memory), 0.001f);
+    }
 
     @Test
     public void testTemporalProjectionInterpolation() {

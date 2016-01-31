@@ -20,8 +20,8 @@ public abstract class PreCondition2 extends AtomicBooleanCondition<PremiseMatch>
     @Override
     public boolean booleanValueOf(@NotNull PremiseMatch m) {
         return test(m,
-                m.apply(arg1),
-                m.apply(arg2));
+                m.resolve(arg1),
+                m.resolve(arg2));
     }
 
     public abstract boolean test(PremiseMatch m, Term a, Term b);

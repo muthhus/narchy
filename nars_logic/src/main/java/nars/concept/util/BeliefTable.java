@@ -81,7 +81,7 @@ public interface BeliefTable extends TaskTable {
         }
 
         @Override
-        public float expectation(Memory memory, boolean positive) {
+        public float expectation(boolean positive, Memory memory) {
             return 0;
         }
 
@@ -290,7 +290,9 @@ public interface BeliefTable extends TaskTable {
 
     static float relevance(Task t, long time, int dur) {
         long o = t.occurrence();
-        if (o == Tense.ETERNAL) return 0.5f;
+
+        if (o == Tense.ETERNAL) return 0.5f; //weight eternal half as much as temporal; similar to a horizon heuristic
+
         return 1f / (1f + Math.abs(o - time)/((float)dur));
     }
 
@@ -320,7 +322,7 @@ public interface BeliefTable extends TaskTable {
         return a.conf() > b.conf() ? a : b;
     }
 
-    float expectation(Memory memory, boolean positive);
+    float expectation(boolean positive, Memory memory);
 
 
 

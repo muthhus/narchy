@@ -201,7 +201,7 @@ public class PremiseMatch extends FindSubst {
     }
 
     @Nullable
-    @Override public final Term apply(Term t) {
+    @Override public final Term resolve(Term t) {
         //TODO make a half resolve that only does xy?
 
         if (isEmpty())

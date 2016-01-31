@@ -8,13 +8,8 @@ import nars.task.Tasked;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.transform.subst.FindSubst;
-import nars.term.transform.subst.MapSubst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Map;
-import java.util.function.Consumer;
 
 import static nars.nal.Tense.ETERNAL;
 
@@ -23,18 +18,18 @@ import static nars.nal.Tense.ETERNAL;
  */
 public interface Premise extends Level, Tasked {
 
-    /**
-     * To unify two terms
-     *
-     * @param varType The varType of variable that can be substituted
-     * @param t       The first and second term as an array, which will have been modified upon returning true
-     * <p>
-     * only sets the values if it will return true, otherwise if it returns false the callee can expect its original values untouched
-     */
-    static int unify(@NotNull Op varType, @NotNull Term a, @NotNull Term b, @NotNull Memory memory, @NotNull Consumer<Term> solution) {
-        UnifySubst u = new UnifySubst(varType, memory, a, b, solution);
-        return u.matches();
-    }
+//    /**
+//     * To unify two terms
+//     *
+//     * @param varType The varType of variable that can be substituted
+//     * @param t       The first and second term as an array, which will have been modified upon returning true
+//     * <p>
+//     * only sets the values if it will return true, otherwise if it returns false the callee can expect its original values untouched
+//     */
+//    static int unify(@NotNull Op varType, @NotNull Term a, @NotNull Term b, @NotNull Memory memory, @NotNull Consumer<Term> solution) {
+//        UnifySubst u = new UnifySubst(varType, memory, a, b, solution);
+//        return u.matches();
+//    }
 
 
 //    /**
@@ -558,81 +553,4 @@ public interface Premise extends Level, Tasked {
     }
 
 
-    static final class UnifySubst extends FindSubst {
-
-        @NotNull
-        private final Memory memory;
-        @NotNull
-        private final Term a;
-        @NotNull
-        private final Term b;
-        private final Consumer<Term> solution;
-        int matches = 0;
-
-        public UnifySubst(Op varType, @NotNull Memory memory, @NotNull Term a, @NotNull Term b, Consumer<Term> solution) {
-            super(varType, memory.random);
-            this.memory = memory;
-            this.a = a;
-            this.b = b;
-            this.solution = solution;
-            matchAll(a, b);
-        }
-
-        public int matches() {
-            return matches;
-        }
-
-        @Override public boolean onMatch() {
-
-            //TODO combine these two blocks to use the same sub-method
-
-            Term aa = a;
-
-            //FORWARD
-            if (aa instanceof Compound) {
-
-                aa = getXY(a);
-                if (aa == null) aa = a;
-
-                Op aaop = aa.op();
-                if (a.op() == Op.VAR_QUERY && (aaop == Op.VAR_INDEP || aaop == Op.VAR_DEP))
-                    return false;
-
-            }
-
-            Term bb = b;
-
-            //REVERSE
-            if (bb instanceof Compound) {
-                bb = applySubstituteAndRenameVariables(
-                        ((Compound) b),
-                        (Map<Term, Term>)yx //inverse map
-                );
-
-                if (bb==null)
-                    return false; //WHY?
-
-                Op bbop = bb.op();
-                if (b.op() == Op.VAR_QUERY && (bbop == Op.VAR_INDEP || bbop == Op.VAR_DEP))
-                    return false;
-            }
-
-            //t[0] = aa;
-            //t[1] = bb;
-
-
-            solution.accept(bb);
-            matches++;
-
-            return true; //determines how many
-        }
-
-        @Nullable
-        Term applySubstituteAndRenameVariables(Compound t, @Nullable Map<Term,Term> subs) {
-            return (subs == null) || (subs.isEmpty()) ?
-                    t /* no change necessary */ :
-                    memory.index.apply(new MapSubst(subs), t);
-        }
-
-    }
 }

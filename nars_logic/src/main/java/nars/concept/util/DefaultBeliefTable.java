@@ -71,31 +71,40 @@ public class DefaultBeliefTable implements BeliefTable {
     /** computes the truth/desire as an aggregate of projections of all
      * beliefs to current time
      */
-    public final float expectation(Memory memory, boolean positive) {
+    public final float expectation(boolean positive, Memory memory) {
 
         long time = memory.time();
         int dur = memory.duration();
 
-        float[] d = {0};
+        float[] d = {0f /* neutral threshold */};
 
         Consumer<Task> rank = t -> {
 
-            float e =
-                    BeliefTable.relevance(t, time, dur) //projectionQuality(t.freq(), t.conf(), t, time, time, false)
-                    * t.expectation(positive);
-
             float best = d[0];
+
+            float f = t.freq();
+            if (!positive) f = 1f - f;
+
+            //scale conf by relevance, not the expectation itself
+            float e = Truth.expectation(f, t.conf() * BeliefTable.relevance(t, time, dur));
+
+            if (!positive) e = 1f - e; //invert to be consistent with maximum value ranking
+
             if (e > best)
                 d[0] = e;
         };
 
-        if (!temporal.isEmpty())
-            temporal.forEach(rank);
+        ArrayTable<Task, Task> t = this.temporal, u = this.eternal;
+        if (!t.isEmpty()) {
+            t.forEach(rank);
+        }
 
-        if (!eternal.isEmpty())
-            rank.accept( eternal.top() );
+        if (!u.isEmpty()) {
+            u.forEach(rank);
+        }
 
-        return d[0];
+        float dd = d[0];
+        return (positive) ? dd : (1f - dd);
     }
 
 

@@ -23,7 +23,6 @@ package nars.nal;
 import nars.Memory;
 import nars.NAR;
 import nars.Op;
-import nars.Premise;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.budget.UnitBudget;
@@ -162,13 +161,13 @@ public enum LocalRules {
         Compound quesTerm = question.term();
         Compound solTerm = sol.term();
 
-        if (solTerm.hasVarIndep() && !solTerm.equals(quesTerm)) {
+        //if (solTerm.hasVarIndep() && !solTerm.equals(quesTerm)) {
 
-            Premise.unify(Op.VAR_INDEP, quesTerm, solTerm, nal.memory, proc);
+            //Premise.unify(Op.VAR_INDEP, quesTerm, solTerm, nal.memory, proc);
 
-        } else {
+        //} else {
             proc.accept(solTerm);
-        }
+        //}
 
 
     }

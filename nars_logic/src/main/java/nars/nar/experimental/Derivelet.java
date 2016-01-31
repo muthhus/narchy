@@ -1,21 +1,16 @@
 package nars.nar.experimental;
 
-import nars.Global;
 import nars.NAR;
 import nars.bag.BLink;
 import nars.concept.Concept;
 import nars.concept.ConceptProcess;
 import nars.nal.meta.PremiseMatch;
 import nars.task.Task;
-import nars.term.Compound;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
-
 
 
 /**
@@ -46,82 +41,6 @@ public class Derivelet {
     public DeriveletContext context;
 
     PremiseMatch matcher;
-
-    /**
-     * temporary re-usable array for batch firing
-     */
-    private final Set<BLink<Termed>> terms = Global.newHashSet(1);
-    /**
-     * temporary re-usable array for batch firing
-     */
-    private final Set<BLink<Task>> tasks = Global.newHashSet(1);
-
-    @NotNull
-    private BLink[] termsArray = new BLink[0];
-    @NotNull
-    private BLink[] tasksArray = new BLink[0];
-
-    public static void firePremises(@NotNull BLink<? extends Concept> conceptLink, @NotNull BLink<? extends Task>[] tasks, @NotNull BLink<? extends Termed>[] terms, @NotNull Consumer<ConceptProcess> proc, @NotNull NAR nar) {
-
-        for (BLink<? extends Task> taskLink : tasks) {
-
-            if (taskLink == null) break;
-
-            Compound taskLinkTerm = taskLink.get().term();
-
-            for (BLink<? extends Termed> termLink : terms) {
-                if (termLink == null) break;
-
-//                if (!Terms.equalSubTermsInRespectToImageAndProduct(taskLinkTerm, termLink.get().term()))
-                    ConceptProcess.fireAll(
-                        nar, conceptLink, taskLink, termLink, proc);
-//                else
-//                    System.out.println(
-//                        "equalSubtermsInRespect: "+ conceptLink + " " +  taskLink + " " +  termLink
-//                    );
-
-            }
-        }
-
-    }
-
-
-    /**
-     * iteratively supplies a matrix of premises from the next N tasklinks and M termlinks
-     * (recycles buffers, non-thread safe, one thread use this at a time)
-     */
-    public void firePremiseSquare(
-            @NotNull NAR nar,
-            @NotNull Consumer<ConceptProcess> proc,
-            @NotNull BLink<? extends Concept> conceptLink,
-            int tasklinks, int termlinks,
-            @NotNull Consumer<BLink<? extends Termed>> eachTermLink,
-            @NotNull Predicate<BLink<? extends Task>> eachTaskLink) {
-
-        Concept concept = conceptLink.get();
-
-        Set<BLink<Task>> tasksBuffer = this.tasks;
-        //concept.getTaskLinks().sample(tasklinks, eachTaskLink, tasksBuffer).commit();
-        concept.getTaskLinks().filter(eachTaskLink).sample(tasklinks, tasksBuffer);
-        if (tasksBuffer.isEmpty()) return;
-
-        Set<BLink<Termed>> termsBuffer = this.terms;
-        //concept.getTermLinks().sample(termlinks, eachTermLink, termsBuffer).commit();
-        concept.getTermLinks().forEachThen(eachTermLink).sample(termlinks, termsBuffer);
-        if (termsBuffer.isEmpty()) return;
-
-        //convert to array for fast for-within-for iterations
-        BLink[] tasksArray = this.tasksArray = tasksBuffer.toArray(this.tasksArray);
-        tasksBuffer.clear();
-
-        BLink[] termsArray = this.termsArray = termsBuffer.toArray(this.termsArray);
-        termsBuffer.clear();
-
-        firePremises(conceptLink,
-                tasksArray, termsArray,
-                proc, nar);
-
-    }
 
 
     @NotNull
@@ -188,12 +107,12 @@ public class Derivelet {
         int tasklinks = 1;
         int termlinks = 2;
 
-        firePremiseSquare(context.nar,
-                perPremise, this.concept,
-                tasklinks, termlinks,
-                null, //Default.simpleForgetDecay,
-                null //Default.simpleForgetDecay
-        );
+//        firePremiseSquare(context.nar,
+//                this.concept,
+//                tasklinks, termlinks,
+//                null, //Default.simpleForgetDecay,
+//                null //Default.simpleForgetDecay
+//        );
 
     }
 

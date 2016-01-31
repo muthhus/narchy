@@ -6,7 +6,6 @@ package nars.rover.robot;
 
 import nars.NAR;
 import nars.Symbols;
-import nars.java.MethodOperator;
 import nars.java.NALObjects;
 import nars.rover.Sim;
 import nars.rover.obj.VisionRay;
@@ -277,11 +276,10 @@ public class Rover extends AbstractPolygonBot {
 
 
         public Task random() {
-            Task c = MethodOperator.invokingTask();
+            //Task c = MethodOperator.invokingTask();
 
             Termed term;
 
-            //TODO dont parse these proxy tasks, its slow
             switch ((int)(5 * Math.random())) {
                 case 0:
                     term = forward; break;
@@ -292,7 +290,8 @@ public class Rover extends AbstractPolygonBot {
                 case 3:
                     term = right; break;
                 case 4:
-                    term = stop; break;
+                    //term = stop; break;
+                    term = forward; break;
                 default:
                     term = null;
             }

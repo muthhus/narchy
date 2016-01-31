@@ -15,10 +15,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Stamp;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.function.Consumer;
 
 import static nars.nal.Tense.*;
 
@@ -57,63 +54,6 @@ public final class ConceptProcess implements Premise {
         this.cyclic = Stamp.overlapping(task(), belief);
     }
 
-    public static int fireAll(@NotNull NAR nar, BLink<? extends Concept> concept, @NotNull BLink<? extends Task> taskLink, @NotNull BLink<? extends Termed> termLink, @NotNull Consumer<ConceptProcess> cp) {
-
-        Task task = taskLink.get();
-        Term tel = termLink.get().term();
-
-        int n = 0;
-        if ((tel != null) && /*&& (task.term().hasVarQuery()))*/
-                (task.term().hasAny(Op.VAR_QUERY)) /*|| tel.hasAny(Op.VAR_QUERY))*/) {
-            n += Premise.unify(Op.VAR_QUERY, task.term(), tel, nar.memory, (u) -> {
-
-                Task belief = fireAll(nar, concept, taskLink, termLink, u, cp);
-
-                //Answers questions containing query variable that have been matched
-                if (belief != null && task.isQuestOrQuestion() && !belief.isQuestOrQuestion())
-                    nar.memory.onSolve(task, belief);
-            });
-        }
-
-
-        if (n == 0) {
-            fireAll(nar, concept, taskLink, termLink, tel, cp);
-            n++;
-        }
-
-
-        return n; //HACK
-    }
-
-    /**
-     * returns the corresponding belief task
-     */
-    public static Task fireAll(@NotNull NAR nar, BLink<? extends Concept> concept, @NotNull BLink<? extends Task> taskLink, @NotNull BLink<? extends Termed> termLink, Term beliefTerm, @NotNull Consumer<ConceptProcess> cp) {
-        Concept beliefConcept = nar.concept(beliefTerm);
-
-        Task belief = null;
-        if ((beliefConcept != null) && (beliefConcept.hasBeliefs())) {
-
-            //long taskTime = taskLink.get().occurrence();
-
-            long now = nar.time();
-
-
-            belief = beliefConcept.beliefs().top(
-                    now, //taskTime,
-                    now);
-
-            if (belief == null || belief.isDeleted()) {
-                throw new RuntimeException("deleted belief: " + belief + " " + beliefConcept.hasBeliefs());
-            }
-
-        }
-
-        cp.accept(new ConceptProcess(nar, concept,
-                taskLink, termLink, belief));
-
-        return belief;
-    }
 
     @Override
     public final Task task() {

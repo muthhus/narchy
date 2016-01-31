@@ -13,6 +13,7 @@ import nars.budget.BudgetMerge;
 import nars.budget.Forget;
 import nars.concept.Concept;
 import nars.concept.ConceptProcess;
+import nars.concept.PremisePermutor;
 import nars.data.Range;
 import nars.nal.Deriver;
 import nars.nal.meta.PremiseMatch;
@@ -271,6 +272,8 @@ public class Default extends AbstractNAR {
         //cached
         private transient int termlnksToFire, tasklinksToFire;
 
+        final PremisePermutor tqu;
+
 //        @Deprecated
 //        int tasklinks = 2; //TODO use MutableInteger for this
 //        @Deprecated
@@ -284,6 +287,8 @@ public class Default extends AbstractNAR {
 
             this.der = deriver;
 
+
+            this.tqu = new PremisePermutor(nar, this::process);
 
             Memory m = nar.memory;
 
@@ -391,17 +396,14 @@ public class Default extends AbstractNAR {
         /** fires a concept selected by the bag */
         @Override public final void accept(@NotNull BLink<? extends Concept> cb) {
 
-            //c.getTermLinks().up(simpleForgetDecay);
-            //c.getTaskLinks().update(simpleForgetDecay);
-
-            deriver.firePremiseSquare(nar, this::process, cb,
+            tqu.firePremiseSquared(
+                cb,
                 tasklinksToFire,
                 termlnksToFire,
                 termLinkForget,
                 taskLinkForget
             );
 
-            //activate(c);
         }
 
         //try to implement some other way, this is here because of serializability

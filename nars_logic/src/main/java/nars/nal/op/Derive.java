@@ -79,7 +79,7 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
      * false to stop it */
     @Override public final void accept(@NotNull PremiseMatch m) {
 
-        Term derivedTerm = m.apply(conclusionPattern);
+        Term derivedTerm = m.resolve(conclusionPattern);
 
         if (derivedTerm == null)
             return;

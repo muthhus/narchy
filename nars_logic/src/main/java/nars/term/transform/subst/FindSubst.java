@@ -158,9 +158,9 @@ public abstract class FindSubst extends Versioning implements Subst {
     }
 
 
-    public final void goSubterm(int index) {
-        term.set(parent.get().term(index));
-    }
+//    public final void goSubterm(int index) {
+//        term.set(parent.get().term(index));
+//    }
 
     public final void matchAll(@NotNull Term x, @NotNull Term y) {
         matchAll(x, y, true);
@@ -174,7 +174,7 @@ public abstract class FindSubst extends Versioning implements Subst {
 
         /** should be be synchronized if threadsafe necessary*/
         @Override
-        public void run(FindSubst f, Termutator[] ignored, int negativeOne) {
+        public void run(FindSubst f, Termutator[] ignored, int ignoredAlwaysNegativeOne) {
 
             if (termutes.isEmpty()) {
                 onMatch();
@@ -211,6 +211,7 @@ public abstract class FindSubst extends Versioning implements Subst {
             termunator.run(this, null, -1);
 
         }
+
     }
 
 
@@ -365,7 +366,7 @@ public abstract class FindSubst extends Versioning implements Subst {
                 EllipsisTransform et = (EllipsisTransform) e;
                 if (et.from.equals(Op.Imdex)) {
 
-                    Term n = apply(et.to);
+                    Term n = resolve(et.to);
                     if (n == null)
                         return false;
 
@@ -379,7 +380,7 @@ public abstract class FindSubst extends Versioning implements Subst {
                         return putXY(e, ImageMatch.put(raw.term, n, Y));
                     }
                 } else {
-                    Term n = apply(et.from);
+                    Term n = resolve(et.from);
                     if (n == null)
                         return false;
 
@@ -842,7 +843,7 @@ public abstract class FindSubst extends Versioning implements Subst {
 
 
     @Nullable
-    public Term apply(Term t) {
+    public Term resolve(Term t) {
         throw new RuntimeException("unimpl");
     }
 

@@ -1,9 +1,6 @@
 package nars.concept;
 
-import nars.Memory;
-import nars.NAR;
-import nars.Op;
-import nars.Symbols;
+import nars.*;
 import nars.bag.Bag;
 import nars.budget.BudgetMerge;
 import nars.concept.util.ArrayListTaskTable;
@@ -253,11 +250,11 @@ public class DefaultConcept extends AtomConcept {
 
         if (Op.isOperation(term())) {
 
-            float goalExp = goals().expectation(memory, true);
-            float belExp = beliefs().expectation(memory, true);
+            float goalExp = goals().expectation(true, memory); //strongest/most relevant current desire
 
-            //if (e > Global.EXECUTION_DESIRE_EXPECTATION_THRESHOLD)
-            if (goalExp > belExp) {
+            if ((goalExp > Global.EXECUTION_DESIRE_EXPECTATION_THRESHOLD)
+                //&&(goalExp > beliefs().expectation(true, memory))
+                    ) {
 
                 //float delta = updateSuccess(goal, successBefore, memory);
 
