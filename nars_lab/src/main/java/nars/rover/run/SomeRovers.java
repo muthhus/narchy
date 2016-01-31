@@ -42,6 +42,10 @@ public class SomeRovers {
                 3, 3, 0.618f, 30, 30));
 
 
+        boolean addNARRover = false;
+        boolean addQRover = true;
+
+        if (addNARRover)
         {
             int conceptsFirePerCycle = 4;
             Default nar = new Default(
@@ -80,7 +84,8 @@ public class SomeRovers {
 
         }
 
-        {
+
+        if (addQRover) {
 
             game.add(new QRover("r2"));
         }
