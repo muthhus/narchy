@@ -59,9 +59,10 @@ public class UniqueInputSerialTest {
         d.input("<a --> b>.", "<b --> c>.");
 
         long[] ev = {1, 2};
-        d.memory.eventDerived.on(t -> {
-            assertArrayEquals("all derived terms should be double premise: " + t,
-                    ev, t.evidence());
+        d.memory.eventTaskProcess.on(t -> {
+            if (t.isDouble())
+                assertArrayEquals("all double-premise derived terms have this evidence: "
+                        + t, ev, t.evidence());
 
             //System.out.println(t);
         });

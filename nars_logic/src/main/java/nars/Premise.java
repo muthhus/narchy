@@ -514,11 +514,7 @@ public interface Premise extends Level, Tasked {
         }
 
 
-        derived = removeInvalid(derived);
-        if (derived != null) {
-            memory().eventDerived.emit(derived);
-        }
-        return derived;
+        return removeInvalid(derived);
     }
 
     default Compound getTaskTerm() {

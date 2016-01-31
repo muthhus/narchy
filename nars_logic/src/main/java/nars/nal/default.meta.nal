@@ -167,20 +167,6 @@
     ((B ~ G) --> S), S |- (B --> S), (Belief:StructuralDeduction)
     (R --> (B - S)), R |- (R --> B), (Belief:StructuralDeduction)
 
-////// NAL4 - Transformations between products and images: ////////////////////////////////////////////////////////////////////////////////////
-//Relations and transforming them into different representations so that arguments and the relation itself can become the subject or predicate
-
-    ((A..B=_..+) --> M), B |- (B --> (/, M, A..B=_..+, _ )), (Belief:Identity, Desire:Identity)
-    ((A..+) --> M), M |- (M --> (/,_, A..+)), (Belief:Identity, Desire:Identity)
-
-    (M --> (A..B=_..+)), B |- ((\, M, A..B=_..+, _ ) --> B), (Belief:Identity, Desire:Identity)
-    (M --> (A..+)), M |- ((\,_, A..+) --> M), (Belief:Identity, Desire:Identity)
-
-    (B --> (/,M, A.._=B..+, _)), M |- ((A.._=B..+) --> M), (Belief:Identity, Desire:Identity)
-    (M --> (/, _, A..+ )), M |- ((A..+) --> M), (Belief:Identity, Desire:Identity)
-
-    ((\, M, A.._=B..+, _ ) --> B), M |- (M --> (A.._=B..+)), (Belief:Identity, Desire:Identity)
-    ((\, _, A..+ ) --> M), M |- (M --> (A..+)), (Belief:Identity, Desire:Identity)
 
 //// implication-based syllogism ////////////////////////////////////////////////////////////////////////////////////
 //       (A ==> B) ------- (B ==> C)
@@ -246,10 +232,10 @@
 //// conditional syllogism ////////////////////////////////////////////////////////////////////////////////////
 //If after M, P usually happens, and M happens, it means P is expected to happen
 
-//    M, (M ==> P) |- occurrsForward(P, M, "==>"), (Belief:Deduction, Desire:Induction, Order:ForAllSame)
-//    M, (P ==> M) |- occurrsBackward(P, P, "==>"), (Belief:Abduction, Desire:Deduction, Order:ForAllSame)
-//    M, (S <=> M) |- occurrsBackward(S, M, "<=>"), (Belief:Analogy, Desire:Strong, Order:ForAllSame)
-//    M, (M <=> S) |- occurrsForward(S, S, "==>"), (Belief:Analogy, Desire:Strong, Order:ForAllSame)
+    M, (M ==> P) |- P, (Belief:Deduction, Desire:Induction, Order:ForAllSame)
+    M, (P ==> M) |- P, (Belief:Abduction, Desire:Deduction, Order:ForAllSame)
+    M, (M <=> S) |- S, (Belief:Analogy, Desire:Strong, Order:ForAllSame)
+    M, (S <=> M) |- S, (Belief:Analogy, Desire:Strong, Order:ForAllSame)
 
 //// conditional composition: ////////////////////////////////////////////////////////////////////////////////////
 //They are let out for AGI purpose, don't let the system generate conjunctions or useless <=> and ==> statements
@@ -264,11 +250,13 @@
 
 //// conjunction decompose
 
-    (&&,X,A..+), Y |- X, (Belief:StructuralDeduction, Desire:StructuralStrong, Order:ForAllSame)
+//    (&&,X,A..+), X, task("!")  |- (&&,A..+), (Belief:StructuralDeduction, Desire:StructuralStrong, Order:ForAllSame)
+
+     (&&,X,A..+), X  |- (&&,A..+), (Belief:StructuralDeduction, Desire:StructuralStrong)
 
 //    (&/,B,A..+), B, task("!") |- (&/,A..+), (Desire:Strong, SequenceIntervals:FromTask)
-     (&&,A,B), X, task("!") |- A, (Desire:StructuralStrong)
-     (&&,A,B), X, task("!") |- B, (Desire:StructuralStrong)
+     (&&,A,B), X |- A, (Belief:StructuralDeduction, Desire:StructuralStrong)
+     (&&,A,B), X |- B, (Belief:StructuralDeduction, Desire:StructuralStrong)
 
 //// propositional decomposition ////////////////////////////////////////////////////////////////////////////////////
 //If S is the case, and (&&,S,A..+) is not the case, it can't be that (&&,A..+) is the case
@@ -441,6 +429,11 @@
     ([A] --> [B]), (A <-> B), task("?") |- ([A] --> [B]), (Belief:BeliefIdentity, Punctuation:Judgment)
     ({A} --> {B}), (A <-> B), task("?") |- ({A} --> {B}), (Belief:BeliefIdentity, Punctuation:Judgment)
 
+//experimental:
+//    ([A] <-> {B}), (A <-> B), task("?") |- ([A] <-> {B}), (Belief:BeliefIdentity, Punctuation:Judgment)
+//    ({A} <-> [B]), (A <-> B), task("?") |- ({A} <-> [B]), (Belief:BeliefIdentity, Punctuation:Judgment)
+//    ([A] --> {B}), (A <-> B), task("?") |- ([A] --> {B}), (Belief:BeliefIdentity, Punctuation:Judgment)
+//    ({A} --> [B]), (A <-> B), task("?") |- ({A} --> [B]), (Belief:BeliefIdentity, Punctuation:Judgment)
 
 
 //NAL3:
@@ -462,18 +455,49 @@
     (W --> (-,S,B)), (W --> B), task("?") |- (W --> (-,S,B)), (Belief:BeliefStructuralDifference, Punctuation:Judgment)
     ((~,S,B) --> W), (B --> W), task("?") |- ((~,S,B) --> W), (Belief:BeliefStructuralDifference, Punctuation:Judgment)
 
-//NAL4:
-
+////// NAL4 - Transformations between products and images: ////////////////////////////////////////////////////////////////////////////////////
+//Relations and transforming them into different representations so that arguments and the relation itself can become the subject or predicate
 ////composition on both sides of a statement:
 
     ((B,P) <-> Z) ,(B <-> A), task("?") |- ((B,P) <-> (A,P)), (Belief:BeliefStructuralDeduction, Punctuation:Judgment)
     ((P,B) <-> Z) ,(B <-> A), task("?") |- ((P,B) <-> (P,A)), (Belief:BeliefStructuralDeduction, Punctuation:Judgment)
 
-    ((P,B) --> Z) ,(B --> A), task("?") |- ((P,B) --> (P,A)), (Belief:BeliefStructuralDeduction, Punctuation:Judgment)
     ((B,P) --> Z) ,(B --> A), task("?") |- ((B,P) --> (A,P)), (Belief:BeliefStructuralDeduction, Punctuation:Judgment)
+    ((P,B) --> Z) ,(B --> A), task("?") |- ((P,B) --> (P,A)), (Belief:BeliefStructuralDeduction, Punctuation:Judgment)
 
-    ((/,N,_,B) --> Z), (S --> B), task("?") |- ((/,N,_,B) --> (/,N,_,S)), (Belief:BeliefStructuralDeduction, Punctuation:Judgment)
+    ((/,N,_,A) --> Z), (B --> A), task("?") |- ((/,N,_,A) --> (/,N,_,B)), (Belief:BeliefStructuralDeduction, Punctuation:Judgment)
     ((\,N,A,_) --> Z), (N --> R), task("?") |- ((\,N,A,_) --> (\,R,A,_)), (Belief:BeliefStructuralDeduction, Punctuation:Judgment)
+
+//experimental reversal
+//    ((P,B) --> Z) ,(A --> B), task("?") |- ((P,A) --> (P,B)), (Belief:BeliefStructuralDeduction, Punctuation:Judgment)
+//    ((B,P) --> Z) ,(A --> B), task("?") |- ((A,P) --> (B,P)), (Belief:BeliefStructuralDeduction, Punctuation:Judgment)
+//    ((P,B) <-> Z) ,(A <-> B), task("?") |- ((P,A) <-> (P,B)), (Belief:BeliefStructuralDeduction, Punctuation:Judgment)
+//    ((B,P) <-> Z) ,(A <-> B), task("?") |- ((A,P) <-> (B,P)), (Belief:BeliefStructuralDeduction, Punctuation:Judgment)
+
+//experimental 2-arity extension
+//    ((/,_,A) --> Z), (B --> A), task("?") |- ((/,_,A) --> (/,_,B)), (Belief:BeliefStructuralDeduction, Punctuation:Judgment)
+
+//experimental 4-arity extension TODO use image ellipsis untested
+//    ((/,M,N,_,B) --> Z), (S --> B), task("?") |- ((/,M,N,_,B) --> (/,M,N,_,S)), (Belief:BeliefStructuralDeduction, Punctuation:Judgment)
+//    ((/,N,_,B,M) --> Z), (S --> B), task("?") |- ((/,N,_,B,M) --> (/,N,_,S,M)), (Belief:BeliefStructuralDeduction, Punctuation:Judgment)
+//    ((\,M,N,A,_) --> Z), (N --> R), task("?") |- ((\,M,N,A,_) --> (\,M,R,A,_)), (Belief:BeliefStructuralDeduction, Punctuation:Judgment)
+//    ((\,N,A,_,M) --> Z), (N --> R), task("?") |- ((\,N,A,_,M) --> (\,R,A,_,M)), (Belief:BeliefStructuralDeduction, Punctuation:Judgment)
+
+
+
+    ((A..B=_..+) --> M), B |- (B --> (/, M, A..B=_..+, _ )), (Belief:Identity, Desire:Identity)
+    ((A..+) --> M), M |- (M --> (/,_, A..+)), (Belief:Identity, Desire:Identity)
+
+    (M --> (A..B=_..+)), B |- ((\, M, A..B=_..+, _ ) --> B), (Belief:Identity, Desire:Identity)
+    (M --> (A..+)), M |- ((\,_, A..+) --> M), (Belief:Identity, Desire:Identity)
+
+    (B --> (/,M, A.._=B..+, _)), M |- ((A.._=B..+) --> M), (Belief:Identity, Desire:Identity)
+    (M --> (/, _, A..+ )), M |- ((A..+) --> M), (Belief:Identity, Desire:Identity)
+
+    ((\, M, A.._=B..+, _ ) --> B), M |- (M --> (A.._=B..+)), (Belief:Identity, Desire:Identity)
+    ((\, _, A..+ ) --> M), M |- (M --> (A..+)), (Belief:Identity, Desire:Identity)
+
+
 
 //NAL5:
 

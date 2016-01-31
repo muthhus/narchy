@@ -45,7 +45,7 @@ public class DigestBag implements Consumer<Task> {
             n.memory.eventAnswer.on(tt -> {
                 if (tt.getOne().isInput()) {
                     Task t = tt.getTwo();
-                    t.log("Answers " + tt.getOne());
+                    //t.log("Answers " + tt.getOne());
                     buffer.accept(t);
                 }
             });

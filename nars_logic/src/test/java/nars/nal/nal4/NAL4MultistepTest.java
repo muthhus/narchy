@@ -25,24 +25,29 @@ public class NAL4MultistepTest extends AbstractNALTester {
     }
 
     //this test only works because the confidence matches, but the related task has insufficient budget
-    @Ignore @Test
+    @Test
     public void nal4_everyday_reasoning() throws Narsese.NarseseException {
         int time = 250;
 
         //Global.DEBUG = true;
 
         TestNAR tester = test();
+
+        //tester.nar.logSummaryGT(System.out, 0.5f);
+
+        //(({tom},{sky})-->likes).  <{tom} --> cat>. <({tom},{sky}) --> likes>. <(cat,[blue]) --> likes>?
+
         tester.believe("<{sky} --> [blue]>",1.0f,0.9f); //en("the sky is blue");
         tester.believe("<{tom} --> cat>",1.0f,0.9f); //en("tom is a cat");
         tester.believe("<({tom},{sky}) --> likes>",1.0f,0.9f); //en("tom likes the sky");
 
-        tester.askAt(time/2, "<(cat,[blue]) --> likes>"); //cats like blue?
+        tester.ask("<(cat,[blue]) --> likes>"); //cats like blue?
 
         tester.mustBelieve(time, "<(cat,[blue]) --> likes>", 1.0f, 0.42f); //en("A base is something that has a reaction with an acid.");
 
     }
 
-    @Test
+    @Ignore @Test
     public void nal4_everyday_reasoning_easiest() throws Narsese.NarseseException {
         int time = 150;
 
@@ -64,7 +69,7 @@ public class NAL4MultistepTest extends AbstractNALTester {
 
     }
 
-    @Ignore @Test
+    @Test @Ignore
     public void nal4_everyday_reasoning_easier() throws Narsese.NarseseException {
         int time = 2550;
 

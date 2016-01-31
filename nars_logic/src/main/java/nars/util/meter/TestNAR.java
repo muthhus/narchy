@@ -85,7 +85,7 @@ public class TestNAR  {
         //adapt 'answer' events (Twin<Task>) answer task component to the answerReceiver topic
         nar.memory.eventAnswer.on(tt -> {
             Task t = tt.getTwo();
-            t.log("Answers " + tt.getOne());
+            //t.log("Answers " + tt.getOne());
             answerReceiver.emit(t);
         });
 

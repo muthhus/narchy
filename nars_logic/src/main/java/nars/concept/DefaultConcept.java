@@ -188,13 +188,15 @@ public class DefaultConcept extends AtomConcept {
         belief = beliefs.add(belief, nar);
 
         //TODO only compute updates if belief was actually added, not merged with duplicate
+
         {
-//            if (hasQuestions()) {
-//                //TODO move this to a subclass of TaskTable which is customized for questions. then an arraylist impl of TaskTable can iterate by integer index and not this iterator/lambda
-//                questions().forEach(question -> {
-//                    LocalRules.forEachSolution(question, best, nar, nar);
-//                });
-//            }
+            if (belief!=null && hasQuestions()) {
+                //TODO move this to a subclass of TaskTable which is customized for questions. then an arraylist impl of TaskTable can iterate by integer index and not this iterator/lambda
+                final Task solution = belief;
+                questions().forEach(question -> {
+                    LocalRules.forEachSolution(question, solution, nar, nar);
+                });
+            }
 
 //            if (hasGoals) {
 //                updateSuccess(null, successBefore, memory);

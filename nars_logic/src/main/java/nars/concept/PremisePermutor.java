@@ -128,7 +128,9 @@ public class PremisePermutor extends UnifySubst implements Function<Term, Task> 
     /** uses the query-unified term to complete a premise */
     @Override public final void accept(Term beliefTerm) {
 
-        Task belief = beliefCache.computeIfAbsent(beliefTerm, this);
+        Task belief = beliefTerm.isCompound() ?
+                beliefCache.computeIfAbsent(beliefTerm, this) :
+                null; //atomic terms will have no beliefs anyway
 
         eachPremise.accept(new ConceptProcess(
                 nar, concept,
