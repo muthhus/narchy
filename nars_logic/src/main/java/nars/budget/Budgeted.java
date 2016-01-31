@@ -11,4 +11,7 @@ public interface Budgeted extends BudgetedStruct {
 	@NotNull
 	Budget budget();
 
+	default float summary() {
+		return budget().summary();
+	}
 }

@@ -154,9 +154,11 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
     }
 
     protected void onInstanceOfClass(Term identifier, Term clas) {
-        nar.believe(metadataPriority, $.inst(identifier, clas),
-                Tense.ETERNAL,
-                metadataBeliefFreq, metadataBeliefConf);
+//        if (metadata) {
+//            nar.believe(metadataPriority, $.inst(identifier, clas),
+//                    Tense.ETERNAL,
+//                    metadataBeliefFreq, metadataBeliefConf);
+//        }
     }
 
     @Override

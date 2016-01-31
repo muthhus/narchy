@@ -2,9 +2,11 @@ package nars;
 
 
 import com.google.common.collect.Sets;
+import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
 import nars.Narsese.NarseseException;
 import nars.budget.Budget;
+import nars.budget.Budgeted;
 import nars.concept.Concept;
 import nars.nal.Level;
 import nars.nal.Tense;
@@ -28,6 +30,7 @@ import nars.util.event.DefaultTopic;
 import nars.util.event.On;
 import nars.util.event.Topic;
 import net.openhft.affinity.AffinityLock;
+import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -47,8 +50,10 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import static java.lang.System.out;
 import static nars.Symbols.*;
 import static nars.nal.Tense.ETERNAL;
+import static org.fusesource.jansi.Ansi.ansi;
 
 
 /**
@@ -390,6 +395,21 @@ public abstract class NAR implements Level,Consumer<Task> {
 
     }
 
+    /** logs tasks and other budgeted items with a summary exceeding a threshold */
+    public void logSummaryGT(Appendable out, float summaryThreshold) {
+        log(out, v-> {
+            Budgeted b = null;
+            if (v instanceof Budgeted) {
+                b = ((Budgeted)v);
+            } else if (v instanceof Twin) {
+                if (((Twin)v).getOne() instanceof Budgeted) {
+                    b = (Budgeted)((Twin)v).getOne();
+                }
+            }
+            return b == null ? false : b.summary() > summaryThreshold;
+        });
+    }
+
     public static final class InvalidTaskException extends RuntimeException {
 
         public final Task task;
@@ -480,6 +500,9 @@ public abstract class NAR implements Level,Consumer<Task> {
                 //enqueue after this frame, before next
                 //beforeNextFrame(
                 new Execution(this, goal, tt).run();
+
+                goal.budget().zero(); //execution drains the task's budget
+
                 //);
                 return 1;
             }
@@ -669,14 +692,18 @@ public abstract class NAR implements Level,Consumer<Task> {
         String[] previous = {null};
 
         Topic.all(memory, (k, v) -> {
+
             if (includeValue != null && !includeValue.test(v))
                 return;
+
+            if (k.startsWith("event")) k = k.substring(5); //remove 'event' prefix
 
             try {
                 outputEvent(out, previous[0], k, v);
             } catch (IOException e) {
                 error(e);
             }
+            previous[0] = k;
         }, includeKey);
 
         return this;
@@ -689,7 +716,7 @@ public abstract class NAR implements Level,Consumer<Task> {
 
     @NotNull
     public NAR log() {
-        return log(System.out);
+        return log(out);
     }
 
     @NotNull
@@ -709,6 +736,7 @@ public abstract class NAR implements Level,Consumer<Task> {
         }
 
         String chan = k.toString();
+
         if (!chan.equals(previou)) {
             out
                     //.append(ANSI.COLOR_CONFIG)
@@ -722,10 +750,24 @@ public abstract class NAR implements Level,Consumer<Task> {
                 out.append(' ');
         }
 
-        if (v instanceof Object[])
+        if (v instanceof Object[]) {
             v = Arrays.toString((Object[]) v);
-        else if (v instanceof Task)
-            v = ((Task) v).toString(memory, true);
+        }
+        else if (v instanceof Task) {
+            Task tv = ((Task) v);
+            v = ansi()
+                .a(tv.qua() > 0.5f ?
+                    Ansi.Attribute.INTENSITY_BOLD :
+                    Ansi.Attribute.INTENSITY_FAINT)
+                .a(tv.pri() > 0.5f ? Ansi.Attribute.NEGATIVE_ON : Ansi.Attribute.NEGATIVE_OFF)
+                .a(tv.dur() > 0.5f ? Ansi.Attribute.UNDERLINE : Ansi.Attribute.UNDERLINE_OFF)
+                .fg(Budget.budgetSummaryColor(tv))
+                .a(
+                    tv.toString(memory, true)
+                )
+                .reset()
+                    .toString();
+        }
 
         out.append(v.toString());
 
@@ -936,7 +978,7 @@ public abstract class NAR implements Level,Consumer<Task> {
     @NotNull
     public NAR trace() {
 
-        trace(System.out);
+        trace(out);
 
         return this;
     }

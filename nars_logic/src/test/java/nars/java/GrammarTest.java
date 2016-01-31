@@ -19,7 +19,7 @@ import java.util.Set;
 public class GrammarTest {
 
 
-    long delay = 50;
+    long delay = 150;
 
 
     public GrammarTest() throws Exception {
@@ -28,27 +28,42 @@ public class GrammarTest {
 
 
         Default n = new Default(1000, 1, 2, 3);
-        n.log();
-        //n.memory.activationRate.setValue(0.05f);
-        n.memory.executionExpectationThreshold.setValue(0.55f);
+        n.logSummaryGT(System.out, 0.2f);
+
+
+        //n.memory.executionExpectationThreshold.setValue(0.55f);
         n.core.confidenceDerivationMin.setValue(0.01f);
-        n.memory.shortTermMemoryHistory.set(3);
-        n.memory.cyclesPerFrame.set(4);
+
+        n.memory.DEFAULT_JUDGMENT_PRIORITY = 0.5f;
+        n.memory.DEFAULT_GOAL_PRIORITY = 0.75f;
+        n.memory.activationRate.setValue(0.5f);
+
+        n.memory.shortTermMemoryHistory.set(4);
+        n.memory.cyclesPerFrame.set(8);
         //n.initNAL9();
 
 
-        GrammarTrainer grammar = new NALObjects(n).
-                the("g", GrammarTrainer.class, "ababababcdcdcdcdeeee");
+        Trainer grammar = new NALObjects(n).
+                the("grammar", Trainer.class, "ababababcdcdcdcdeeee");
 
         //get the vocabulary
-        System.out.println("VOCABULARY: " + grammar.chars());
+        Set<Character> vocab = grammar.chars();
 
-        n.input("GrammarTrainer(predict,g,#x,#x)! %1.0|0.99%"); //input and output are demanded to be the same
+        n.input("(&&, ($x<->#y), Trainer(predict,grammar,$x,#y))! %1.0|0.99%"); //input and output are demanded to be the same
+        n.input("(Trainer(predict,grammar,#x,#y) ==> Trainer(predict,grammar,#y,$z))? :|:");
 
         //start
-        //grammar.predict('a');
+        for (char c : vocab) {
+            n.run(64);
+            grammar.predict(c);
+        }
 
-        while (true) {
+        int frames = 1064;
+        for (int i = 0; i < frames; i++) {
+
+//            if (i%32==0) {
+//
+//            }
 
 
             try {
@@ -63,17 +78,22 @@ public class GrammarTest {
 
 
             if (n.time() % 3000 == 0) {
-                n.core.active.forEach(10, b -> {
-                    Concept c = b.get();
-                    if (c.hasBeliefs())
-                        c.beliefs().print(System.out);
-                });
+                dump(n);
             }
 
             Util.pause(delay);
         }
 
+        dump(n);
 
+    }
+
+    private void dump(Default n) {
+        n.core.active.forEach(10, b -> {
+            Concept c = b.get();
+            if (c.hasBeliefs())
+                c.beliefs().print(System.out);
+        });
     }
 
     public static void main(String[] args) throws Exception {
@@ -106,7 +126,8 @@ public class GrammarTest {
 //        //d.input("<dy --> zero>! :|:");
 //    }
 
-    public static class GrammarTrainer {
+    /** Grammar Trainer */
+    public static class Trainer {
 
         public final String tape;
 
@@ -117,7 +138,7 @@ public class GrammarTest {
         public StringBuilder log;
         private int score;
 
-        public GrammarTrainer(String tape) {
+        public Trainer(String tape) {
             this.tape = tape;
             i = 0;
             score = 0;

@@ -2,7 +2,9 @@ package nars.budget;
 
 import nars.Symbols;
 import nars.data.BudgetedStruct;
+import nars.task.Task;
 import nars.util.Texts;
+import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -285,6 +287,18 @@ public abstract class Budget extends BudgetedHandle {
 
     public void set(@NotNull Budget b) {
         budget(b.pri(), b.dur(), b.qua());
+    }
+
+    public static Ansi.Color budgetSummaryColor(Task tv) {
+        int s = (int)Math.floor(tv.summary()*5);
+        switch (s) {
+            case 1: return Ansi.Color.MAGENTA;
+            case 2: return Ansi.Color.GREEN;
+            case 3: return Ansi.Color.YELLOW;
+            case 4: return Ansi.Color.RED;
+
+            default: return Ansi.Color.DEFAULT;
+        }
     }
 
 }

@@ -28,6 +28,13 @@
             <artifactId>type-parser</artifactId>
             <version>0.5.0</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.fusesource.jansi</groupId>
+            <artifactId>jansi</artifactId>
+            <version>1.11</version>
+        </dependency>
+
         <dependency>
             <groupId>org.semanticweb.yars</groupId>
             <artifactId>nxparser-parsers</artifactId>
