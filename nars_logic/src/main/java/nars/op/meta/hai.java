@@ -5,226 +5,238 @@ import nars.util.data.random.XorShift128PlusRandom;
 import java.util.Random;
 
 
-/** q-learning + SOM agent, cognitive prosthetic. designed by patham9 */
-public class haisom  {
+/**
+ * q-learning + SOM agent, cognitive prosthetic. designed by patham9
+ */
+public class hai {
 
-    Random rng = new XorShift128PlusRandom(1);
+    final Random rng = new XorShift128PlusRandom(1);
 
-        class Hsom
-        {
-            Hsom(int SomSize, int numInputs)
-            {
-                links = new float[SomSize][SomSize][numInputs];
-                vis = new float[SomSize][SomSize][numInputs];
-                inputs = new float[numInputs];
-                coords1 = new float[SomSize][SomSize];
-                coords2 = new float[SomSize][SomSize];
-                this.numInputs = numInputs;
-                this.SomSize = SomSize;
-                for (int i1 = 0; i1 < SomSize; i1++)
-                {
-                    for (int i2 = 0; i2 < SomSize; i2++)
-                    {
-                        coords1[i1][i2] = (float) ((float)i1 * 1.0); //Kartenkoords
-                        coords2[i1][i2] = (float) ((float)i2 * 1.0);
-                    }
-                }
-                for (int x = 0; x < SomSize; x++)
-                {
-                    for (int y = 0; y < SomSize; y++)
-                    {
-                        for (int z = 0; z < numInputs; z++)
-                        {
-                            links[x][y][z] = (float) ((rng.nextFloat()/**2.0-1.0*/) * 0.1);
-                        }
-                    }
-                }
-            }
-            float[][][] links;
-            float[] inputs;
-            float[][] coords1;
-            float[][] coords2;
-            float[][][] vis;
-            int numInputs = 100;
-            int SomSize = 10;
-            float gamma = 5.0f;
-            float eta=0.1f;
-            float outmul = 1.0f;
-            int winnerx = 0; //winner coordinates
-            int winnery = 0;
+    final Hsom som;
+    final float[][][] Q; //state, action
+    final float[][][] et;
 
-            float Leak= (float) 0.1;
-            float InMul= (float) 1.0;
-            boolean Leaky=true;
-            void Input(float[] input)
-            {
-                int i1, i2, j;
-                float summe;
-                float minv = 100000.0f;
+    final int nActions, nStates;
+    int lastStateX = 0, lastStateY = 0, lastAction = 0;
 
-                for (j = 0; j < numInputs; j++)
-                {
-                    if (!Leaky)
-                    {
-                        this.inputs[j] = input[j]*InMul;
-                    }
-                    else
-                    {
-                        this.inputs[j] += -Leak * this.inputs[j] + input[j];
-                    }
-                }
-                for (i1 = 0; i1 < SomSize; i1++)
-                {
-                    for (i2 = 0; i2 < SomSize; i2++)
-                    {
-                        summe = 0.0f;
-                        for (j = 0; j < numInputs; j++)
-                        {
-                            float val=(links[i1][i2][j] - inputs[j]) * (links[i1][i2][j] - inputs[j]);
-                            vis[i1][i2][j]=val;
-                            summe += val;
-                        }
-                        if (summe <= minv) //get winner
-                        {
-                            minv = summe;
-                            winnerx = i1;
-                            winnery = i2;
-                        }
-                    }
-                }
-            }
-            void Output(float[] outarr)
-            {
-                int x = winnerx;
-                int y = winnery;
-                int i;
-                for (i = 0; i < numInputs; i++)
-                {
-                    outarr[i] = links[x][y][i] * outmul;
-                }
-            }
-            float hsit(int i1, int i2)
-            {   //neighboorhood-function
-                float diff1 = (coords1[i1][i2] - coords1[winnerx][winnery]) * (coords1[i1][i2] - coords1[winnerx][winnery]);
-                float diff2 = (coords2[i1][i2] - coords2[winnerx][winnery]) * (coords2[i1][i2] - coords2[winnerx][winnery]);
-                return 1.0f / ((float)Math.sqrt(2 * Math.PI * gamma * gamma)) * ((float)Math.exp((diff1 + diff2) / (-2 * gamma * gamma)));
-            }
-            void Adapt(float[] input)
-            {
-                int i1, i2, j;
-                Input(input);
-                if (eta != 0.0f)
-                {
-                    for (i1 = 0; i1 < SomSize; i1++)
-                    {
-                        for (i2 = 0; i2 < SomSize; i2++)
-                        {
-                            for (j = 0; j < numInputs; j++)
-                            {  //adaption
-                                links[i1][i2][j] = links[i1][i2][j] + eta * hsit(i1, i2) * (inputs[j] - links[i1][i2][j]);
-                            }
-                        }
-                    }
-                }
-            }
-            String GetWinnerCoordinatesWordFromAnalogInput(float[] input)
-            {
-                Adapt(input);
-                return "x" + String.valueOf(winnerx)+ "y" + String.valueOf(winnery);
-            }
-            void SetParams(float AdaptionStrenght, float AdaptioRadius)
-            {
-                eta = AdaptionStrenght;
-                gamma = AdaptioRadius;
-            }
-            void GetActivationForRendering(float[][] input, boolean forSpecialInput, int specialInputIndex)
-            {
-                if (input == null)
-                {
-                    input = new float[SomSize][SomSize];
-                }
-                for (int x = 0; x < SomSize; x++)
-                {
-                    for (int y = 0; y < SomSize; y++)
-                    {
-                        float curval = (float) 0.0;
-                        if (!forSpecialInput)
-                        {
-                            for (int i = 0; i < numInputs; i++)
-                            {
-                                curval += vis[x][y][i];
-                            }
-                        }
-                        else
-                        {
-                            curval = vis[x][y][specialInputIndex];
-                        }
-                        input[x][y] = curval;
-                    }
-                }
 
-                //minimum for better visualisation:
-                float mini = 99999999;
-                float maxi = -99999999;
-                for (int x = 0; x < SomSize; x++)
-                {
-                    for (int y = 0; y < SomSize; y++)
-                    {
-                        float t=input[x][y];
-                        if (t < mini)
-                        {
-                            mini = t;
-                        }
-                        if (t > maxi)
-                        {
-                            maxi = t;
-                        }
-                    }
+    /*
+    http://stackoverflow.com/questions/1854659/alpha-and-gamma-parameters-in-qlearning
+    Alpha is the learning rate. If the reward or transition function is stochastic (random), then alpha should change over time, approaching zero at infinity. This has to do with approximating the expected outcome of a inner product (T(transition)*R(reward)), when one of the two, or both, have random behavior.
+
+    Gamma is the value of future reward. It can affect learning quite a bit, and can be a dynamic or static value. If it is equal to one, the agent values future reward JUST AS MUCH as current reward. This means, in ten actions, if an agent does something good this is JUST AS VALUABLE as doing this action directly. So learning doesn't work at that well at high gamma values.
+    Conversely, a gamma of zero will cause the agent to only value immediate rewards, which only works with very detailed reward functions.
+
+    http://web.eecs.utk.edu/~asaites/project-pdfs/sarsalambda.pdf
+    Lambda is the rate of decay (in conjunction with gamma) of the eligibility trace. This is the amount
+    by which the eligibility of a state is reduced each time step that it is not being visited. A low lambda
+    causes a lower reward to propagate back to states farther from the goal. While this can prevent the
+    reinforcement of a path which is not optimal, it causes a state which is far from the goal to receive very
+    little reward. This slows down convergence, because the agent spends more time searching for a path if
+    it starts far from the goal. Conversely, a high lambda allows more of the path to be updated with higher
+    rewards. This suited our implementation, because our high initial epsilon was able to correct any state
+    values which might have been incorrectly reinforced and create a more defined path to the goal in fewer
+    episodes. Because of this, we chose a final lambda of 0.9.
+     */
+    float Alpha, Gamma, Lambda;
+
+    public hai(int inputs, int states, int outputs) {
+        nActions = outputs;
+        nStates = states;
+
+        som = new Hsom(outputs, inputs);
+
+        Q = new float[states][states][outputs];
+        et = new float[states][states][outputs];
+        setQ(0.07f, 0.65f, 0.9f); //0.1 0.5 0.9
+    }
+
+
+
+
+    static int quantify(float val, int quantsteps) {
+        float step = 1 / ((float) quantsteps);
+        float wander = 0.0f;
+        int ind = -1;
+        while (wander <= val) {
+            wander += step;
+            ind++;
+        }
+        return ind;
+    }
+
+    int learn(int StateX, int StateY, float reward) {
+        int maxk = 0;
+        float maxval = -999999;
+        for (int k = 0; k < nActions; k++) {
+            float qq = Q[StateX][StateY][k];
+            if (qq > maxval) {
+                maxk = k;
+                maxval = qq;
+            }
+        }
+        int Action;
+        Action = rng.nextFloat() < Alpha ? (int) (rng.nextFloat() * nActions) : maxk;
+        float DeltaQ = (reward + (Gamma * Q[StateX][StateY][Action])) - Q[lastStateX][lastStateY][lastAction];
+        et[lastStateX][lastStateY][lastAction]+=1f;
+
+        float alphaDelta = Alpha * DeltaQ;
+        float gammaLambda = Gamma * Lambda;
+
+        for (int i = 0; i < nStates; i++) {
+            for (int j = 0; j < nStates; j++) {
+                float[] etij = et[i][j];
+                float[] qij = Q[i][j];
+                for (int k = 0; k < nActions; k++) {
+
+                    float etijk = etij[k];
+
+                    qij[k] += alphaDelta * etijk;
+                    etij[k] *= gammaLambda;
                 }
-                float diff = maxi - mini;
-                for (int x = 0; x < SomSize; x++)
-                {
-                    for (int y = 0; y < SomSize; y++)
-                    {
-                        input[x][y] = (float) ((input[x][y] /*- mini*/) / Math.max(0.00000001, diff));
+            }
+        }
+
+        lastStateX = StateX;
+        lastStateY = StateY;
+        lastAction = Action;
+        return lastAction;
+    }
+
+    void setQ(float alpha, float gamma, float lambda) {
+        Alpha = alpha;
+        Gamma = gamma;
+        Lambda = lambda;
+    }
+
+    public int act(float[] input, float reward) {
+        som.learn(input);
+        return learn(som.winnerx, som.winnery, reward);
+    }
+
+    class Hsom {
+        final float[][][] links;
+        final float[] inputs;
+        final float[][] coords1;
+        final float[][] coords2;
+        //final float[][][] vis;
+        final int numInputs;
+        final int SomSize;
+        float gamma = 5.0f;
+        float eta = 0.1f;
+        float outmul = 1.0f;
+        int winnerx = 0;
+        int winnery = 0;
+        float Leak = 0.1f;
+        float InMul = 1.0f;
+        final boolean Leaky = false;
+
+        Hsom(int SomSize, int numInputs) {
+            links = new float[SomSize][SomSize][numInputs];
+            //vis = new float[SomSize][SomSize][numInputs];
+            inputs = new float[numInputs];
+            coords1 = new float[SomSize][SomSize];
+            coords2 = new float[SomSize][SomSize];
+            this.numInputs = numInputs;
+            this.SomSize = SomSize;
+            for (int i1 = 0; i1 < SomSize; i1++) {
+                for (int i2 = 0; i2 < SomSize; i2++) {
+                    coords1[i1][i2] = (float) ((float) i1 * 1.0); //Kartenkoords
+                    coords2[i1][i2] = (float) ((float) i2 * 1.0);
+                }
+            }
+            for (int x = 0; x < SomSize; x++) {
+                for (int y = 0; y < SomSize; y++) {
+                    for (int z = 0; z < numInputs; z++) {
+                        links[x][y][z] = (float) ((rng.nextFloat()/**2.0-1.0*/) * 0.1);
                     }
                 }
             }
         }
 
-//        void hsom_DrawSOM(Hsom somobj,int RenderSize,int x,int y,boolean bSpecial,int specialIndex)
-//        {
-//            fill(0);
-//            pushMatrix();
-//            translate(x,y);
-//            float[][]  input = new float[somobj.SomSize][somobj.SomSize];
-//            somobj.GetActivationForRendering(input,bSpecial,specialIndex);
-//            hamlib.Draw2DPlane(input,RenderSize);
-//            fill(255);
-//            rect(somobj.winnerx*RenderSize,somobj.winnery*RenderSize,RenderSize,RenderSize);
-//            popMatrix();
-//        }
+        void input(float[] input) {
+            int j;
 
-
-        class Hai
-        {
-            Hai(){}
-            float[][][] Q; //state, action
-            float[][][] et;
-            int nActions=0,nStates=0;
-            int Quantify(float val, int quantsteps)
-            {
-                float step=1/((float)quantsteps);
-                float wander=0.0f;
-                int ind=-1;
-                while(wander<=val)
-                {
-                    wander+=step;
-                    ind++;
+            for (j = 0; j < numInputs; j++) {
+                if (!Leaky) {
+                    this.inputs[j] = input[j] * InMul;
+                } else {
+                    this.inputs[j] += (-Leak * this.inputs[j]) + input[j];
                 }
-                return ind;
             }
-//            void Draw(int x,int y,int RenderSize)
+            float minv = Float.MAX_VALUE;
+            for (int i1 = 0; i1 < SomSize; i1++) {
+                for (int i2 = 0; i2 < SomSize; i2++) {
+                    float summe = 0.0f;
+                    float[] ll = links[i1][i2];
+                    for (j = 0; j < numInputs; j++) {
+                        float ij = inputs[j];
+                        float lljminij = ll[j] - ij;
+                        //vis[i1][i2][j] = val;
+                        summe += lljminij * lljminij;
+                    }
+                    if (summe <= minv) //get winner
+                    {
+                        minv = summe;
+                        winnerx = i1;
+                        winnery = i2;
+                    }
+                }
+            }
+        }
+
+        void get(float[] outarr) {
+            int x = winnerx;
+            int y = winnery;
+            for (int i = 0; i < numInputs; i++) {
+                outarr[i] = links[x][y][i] * outmul;
+            }
+        }
+
+        float hsit(int i1, int i2) {   //neighboorhood-function
+            float[][] cc = this.coords1;
+            int winnerx = this.winnerx;
+            int winnery = this.winnery;
+            float diff1 = (cc[i1][i2] - cc[winnerx][winnery]) * (cc[i1][i2] - cc[winnerx][winnery]);
+            float[][] dd = this.coords2;
+            float diff2 = (dd[i1][i2] - dd[winnerx][winnery]) * (dd[i1][i2] - dd[winnerx][winnery]);
+            float gammaSq = 2 * gamma * gamma;
+            return (1.0f / ((float) Math.sqrt(Math.PI * gammaSq))) * ((float) Math.exp((diff1 + diff2) / (-gammaSq)));
+        }
+
+        /**
+         * inputs and trains it
+         */
+        public void learn(float[] input) {
+            input(input);
+
+
+            float eta = this.eta;
+            if (eta != 0.0f) {
+                float[][][] l = this.links;
+                float[] ii = this.inputs;
+
+                for (int i1 = 0; i1 < SomSize; i1++) {
+                    for (int i2 = 0; i2 < SomSize; i2++) {
+                        float h = hsit(i1, i2);
+                        float[] ll = l[i1][i2];
+                        for (int j = 0; j < numInputs; j++) {  //adaption
+                            float lx = l[i1][i2][j];
+                            ll[j] = lx + (eta * h * (ii[j] - lx));
+                        }
+                    }
+                }
+            }
+        }
+
+        void set(float AdaptionStrenght, float AdaptioRadius) {
+            eta = AdaptionStrenght;
+            gamma = AdaptioRadius;
+        }
+
+
+
+        //            void Draw(int x,int y,int RenderSize)
 //            {
 //                hsom_DrawSOM(som,RenderSize,x,y+RenderSize*6,false,0);
 //                pushMatrix();
@@ -245,68 +257,67 @@ public class haisom  {
 //                }
 //                popMatrix();
 //            }
-            Hai(int nactions,int nstates)
-            {
-                nActions=nactions;
-                nStates=nstates;
-                Q=new float[nStates][nStates][nActions];
-                et=new float[nStates][nStates][nActions];
-            }
-            int lastStateX=0,lastStateY=0,lastAction=0;
-            float Alpha=0.1f,Gamma=0.8f,Lambda=0.1f; //0.1 0.5 0.9
-            int Update(int StateX,int StateY,float reward)
-            {
-                int maxk=0;
-                float maxval=-999999;
-                for(int k=0;k<nActions;k++)
-                {
-                    if(Q[StateX][StateY][k]>maxval)
-                    {
-                        maxk=k;
-                        maxval=Q[StateX][StateY][k];
-                    }
-                }
-                int Action=0;
-                if(rng.nextFloat()<Alpha)
-                {
-                    Action=(int)(rng.nextFloat() * nActions);
-                }
-                else
-                {
-                    Action=maxk;
-                }
-                float DeltaQ=reward+Gamma*Q[StateX][StateY][Action]-Q[lastStateX][lastStateY][lastAction];
-                et[lastStateX][lastStateY][lastAction]=et[lastStateX][lastStateY][lastAction]+1;
-                for(int i=0;i<nStates;i++)
-                {
-                    for(int j=0;j<nStates;j++)
-                    {
-                        for(int k=0;k<nActions;k++)
-                        {
-                            Q[i][j][k]=Q[i][j][k]+Alpha*DeltaQ*et[i][j][k];
-                            et[i][j][k]=Gamma*Lambda*et[i][j][k];
-                        }
-                    }
-                }
 
-                lastStateX=StateX;
-                lastStateY=StateY;
-                lastAction=Action;
-                return lastAction;
-            }
-            void SetParams(float[] Params)
-            {
-                Alpha=Params[0];
-                Gamma=Params[1];
-                Lambda=Params[2];
-            }
-            Hsom som;
-            int UpdateSOM(float[] viewField,float reward)
-            {
-                som.Adapt(viewField);
-                return Update(som.winnerx,som.winnery,reward);
-            }
-        }
+
+//        String GetWinnerCoordinatesWordFromAnalogInput(float[] input) {
+//            learn(input);
+//            return "x" + String.valueOf(winnerx) + "y" + String.valueOf(winnery);
+//        }
+
+
+
+//        void GetActivationForRendering(float[][] input, boolean forSpecialInput, int specialInputIndex) {
+//            if (input == null) {
+//                input = new float[SomSize][SomSize];
+//            }
+//            for (int x = 0; x < SomSize; x++) {
+//                for (int y = 0; y < SomSize; y++) {
+//                    float curval = (float) 0.0;
+//                    if (!forSpecialInput) {
+//                        for (int i = 0; i < numInputs; i++) {
+//                            curval += vis[x][y][i];
+//                        }
+//                    } else {
+//                        curval = vis[x][y][specialInputIndex];
+//                    }
+//                    input[x][y] = curval;
+//                }
+//            }
+//
+//            //minimum for better visualisation:
+//            float mini = 99999999;
+//            float maxi = -99999999;
+//            for (int x = 0; x < SomSize; x++) {
+//                for (int y = 0; y < SomSize; y++) {
+//                    float t = input[x][y];
+//                    if (t < mini) {
+//                        mini = t;
+//                    }
+//                    if (t > maxi) {
+//                        maxi = t;
+//                    }
+//                }
+//            }
+//            float diff = maxi - mini;
+//            for (int x = 0; x < SomSize; x++) {
+//                for (int y = 0; y < SomSize; y++) {
+//                    input[x][y] = (float) ((input[x][y] /*- mini*/) / Math.max(0.00000001, diff));
+//                }
+//            }
+//        }
+    }
+//        void hsom_DrawSOM(Hsom somobj,int RenderSize,int x,int y,boolean bSpecial,int specialIndex)
+//        {
+//            fill(0);
+//            pushMatrix();
+//            translate(x,y);
+//            float[][]  input = new float[somobj.SomSize][somobj.SomSize];
+//            somobj.GetActivationForRendering(input,bSpecial,specialIndex);
+//            hamlib.Draw2DPlane(input,RenderSize);
+//            fill(255);
+//            rect(somobj.winnerx*RenderSize,somobj.winnery*RenderSize,RenderSize,RenderSize);
+//            popMatrix();
+//        }
 
 //        public void keyPressed()
 //        {
@@ -367,8 +378,8 @@ public class haisom  {
 //                j.y=random(1)*height;
 //            }
 //        }
-        int Hsim_eyesize=3; //9
-        float[] viewField=new float[Hsim_eyesize*2];
+    //int Hsim_eyesize=3; //9
+    //float[] viewField=new float[Hsim_eyesize*2];
 
 //        void hsim_ObjectTask(Obj oi)
 //        {
@@ -1337,7 +1348,4 @@ public class haisom  {
 //
 //    }
 
-    public static void main(String[] args) {
-        new haisom();
-    }
 }

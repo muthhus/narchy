@@ -2,89 +2,34 @@ package nars.java;
 
 import nars.concept.Concept;
 import nars.nar.Default;
+import nars.op.meta.hai;
 import nars.task.Task;
 import nars.util.data.UnitVal;
 import nars.util.data.Util;
 
 import java.io.PrintStream;
 
+import static nars.java.Thermostat4.UnitValTaskInc.cols;
+
 /**
  * Created by me on 1/20/16.
  */
 public class Thermostat4 {
 
-    static final float speed = 0.25f;
-    final static float tolerance = 0.15f;
+    static final float speed = 0.001f;
+    //final static float tolerance = 0.1f;
+    static float targetX;
     private final UnitValTaskInc h;
     long cyclePause = 0;
-
     Default n;
-    static float targetX;
 
-
-    void chase() {
-        //targetX = Util.clamp( targetX + (float)(Math.random()-0.5f)*2*driftRate );
-
-        targetX = Util.clamp(
-                (float)(Math.sin( n.time() / 1000.0f )+1f)*0.5f
-        );
-    }
-
-
-
-    public static class UnitValTaskInc extends UnitVal {
-        final static int cols = 8;
-
-        public int[] see() {
-
-            int target = Math.round(targetX * cols);
-            int current = Math.round(v * cols);
-            int[] ss = new int[cols+1];
-
-            for (int i = 0; i <= cols; i++) {
-                char c;
-
-                if ((target == current) && (target == i)) c = '+';
-                else if (i == target) c = 'x';
-                else if (i == current) c = '|';
-                else c = 0; //'-';
-
-                ss[i] = c;
-            }
-
-            return ss;
-        }
-
-        public boolean move(boolean positive) {
-            Task cTask = MethodOperator.invokingTask();
-            float exp;
-
-            //System.out.println(cTask.getExplanation());
-            exp = cTask.expectation();// * cTask.getPriority();
-            //exp = 1f;
-
-
-            float da = Math.abs( targetX - v);
-
-            _inc(positive, speed * exp);
-
-            float db = Math.abs( targetX - v);
-
-            return db < da;
-        }
-
-//        public int compare(float tolerance) {
-//            if (_equals(targetX, tolerance)) return 0;
-//            if (v < targetX) return -1;
-//            return 1;
-//        }
-    }
 
     public Thermostat4() throws Exception {
 
         //Global.DEBUG = true;
 
-        n = new Default(1000, 16, 2, 3);
+
+        n = new Default(1000, 1, 2, 3);
         //n.log();
         n.memory.activationRate.setValue(0.05f);
         n.memory.executionExpectationThreshold.setValue(0.55f);
@@ -108,6 +53,26 @@ public class Thermostat4 {
         };
 
         this.h = objs.the("h", UnitValTaskInc.class /* new UnitVal(0.5f, speed)*/);
+
+        hai hai = new hai(cols, cols/2, 3);
+        n.onEachFrame(nn -> {
+            int[] x = h.see();
+            float[] ff = new float[x.length];
+            for (int i = 0; i < x.length; i++) {
+                int xx = x[i];
+                switch ((char)xx) {
+                    case '|': ff[i] = 1f; break;
+                    case 'x': ff[i] = -1f; break;
+                }
+            }
+            int a = hai.act(ff, -.5f + 2f/(1f+Math.abs(targetX - h.get()) ));
+            switch (a) {
+                case 0: h.move(true); break;
+                case 1: h.move(false); break;
+                case 2: /* nothing */ break;
+            }
+            //System.out.println(Arrays.toString(ff) + " => " + a);
+        });
 
         //h.setInc(speed);
 
@@ -148,7 +113,6 @@ public class Thermostat4 {
         while (true) {
 
 
-
             try {
                 n.step();
             } catch (Throwable e) {
@@ -164,7 +128,7 @@ public class Thermostat4 {
 
                 PrintStream out = System.out;
 
-                int[] cc  = h.see();
+                int[] cc = h.see();
                 for (int i = 0; i < cc.length; i++) {
                     char c = (char) cc[i];
                     if (c == 0) c = '-';
@@ -197,7 +161,7 @@ public class Thermostat4 {
             }
 
             if (n.time() % 3000 == 0) {
-                n.core.active.forEach(10, b-> {
+                n.core.active.forEach(10, b -> {
                     Concept c = b.get();
                     if (c.hasBeliefs())
                         c.beliefs().print(System.out);
@@ -214,20 +178,27 @@ public class Thermostat4 {
         new Thermostat4();
     }
 
+    void chase() {
+        //targetX = Util.clamp( targetX + (float)(Math.random()-0.5f)*2*driftRate );
+
+        targetX = Util.clamp(
+                (float) (Math.sin(n.time() / 1000.0f) + 1f) * 0.5f
+        );
+    }
+
     public void train() {
 
-        n.input("UnitValTaskInc(move,h,((--,true)),#x). :|:  %0.0;0.75%");
+        //n.input("UnitValTaskInc(move,h,((--,true)),#x). :|:  %0.0;0.75%");
         n.input("UnitValTaskInc(move,h,((--,true)),#x)! :|:  %1.0;0.75%");
-        n.input("UnitValTaskInc(move,h,(true),#x). :|:  %0.0;0.75%");
+        //n.input("UnitValTaskInc(move,h,(true),#x). :|:  %0.0;0.75%");
         n.input("UnitValTaskInc(move,h,(true),#x)! :|: %1.0;0.75%");
         n.input("(true -->(/,^UnitValTaskInc,move,h,(?p),_))! :|:");
         n.input("((--,true) -->(/,^UnitValTaskInc,move,h,(?p),_))! :|:");
         n.input("((--,true) -->(/,^UnitValTaskInc,move,h,(?p),_))! :|:");
 
 
-
 //        if (Math.random() < 0.15f) {
-            //h.inc(Math.random() < 0.5);
+        //h.inc(Math.random() < 0.5);
 //        }
         ////(-1-->(/,^UnitVal_compare,h,(0.61368304,0.1),_)).
         //n.input("(-1-->(/,^UnitVal_compare,h,#p,_))! %0%");
@@ -238,5 +209,53 @@ public class Thermostat4 {
         //d.input("h(0)! :|: %0.65%");
         //d.input("<dx --> zero>! :|:");
         //d.input("<dy --> zero>! :|:");
+    }
+
+    public static class UnitValTaskInc extends UnitVal {
+        final static int cols = 16;
+
+        public int[] see() {
+
+            int target = Math.round(targetX * cols);
+            int current = Math.round(v * cols);
+            int[] ss = new int[cols + 1];
+
+            for (int i = 0; i <= cols; i++) {
+                char c;
+
+                if ((target == current) && (target == i)) c = '+';
+                else if (i == target) c = 'x';
+                else if (i == current) c = '|';
+                else c = 0; //'-';
+
+                ss[i] = c;
+            }
+
+            return ss;
+        }
+
+        public boolean move(boolean positive) {
+            Task cTask = MethodOperator.invokingTask();
+            float exp;
+
+            //System.out.println(cTask.getExplanation());
+            exp = cTask.expectation();// * cTask.getPriority();
+            //exp = 1f;
+
+
+            float da = Math.abs(targetX - v);
+
+            _inc(positive, speed * exp);
+
+            float db = Math.abs(targetX - v);
+
+            return db < da;
+        }
+
+//        public int compare(float tolerance) {
+//            if (_equals(targetX, tolerance)) return 0;
+//            if (v < targetX) return -1;
+//            return 1;
+//        }
     }
 }
