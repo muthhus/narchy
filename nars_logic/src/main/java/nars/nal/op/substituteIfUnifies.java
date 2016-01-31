@@ -7,8 +7,6 @@ import nars.term.transform.subst.FindSubst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Random;
-
 /** substituteIfUnifies(term, variableType, varFrom, varTo)
  * TODO is this better named "substituteAll"
  * */
@@ -22,43 +20,33 @@ public final class substituteIfUnifies extends substitute {
         final Term x = xx[2];
         final Term y = xx[3];
 
-        FindSubst umap = unifies(op, x, y, r.premise.memory().random);
-
-        return ((umap != null) && (!umap.isEmpty())) ?
-                subst(r, umap, term) :
-                term;
-    }
-
-    static FindSubst unifies(@NotNull Term op, @NotNull Term x, @NotNull Term y, Random rng) {
-
-        OneMatchFindSubst sub = new OneMatchFindSubst(op, rng);
-        boolean matched = sub.tryMatch(x, y);
-
-        if (matched) {
-            return sub;
-        }
-        return null;
-
-
+        return new OneMatchFindSubst(op, r, term).tryMatch(x, y);
     }
 
     private final static class OneMatchFindSubst extends FindSubst {
 
-        private boolean matched = false;
+        private final Term xterm;
+        private final PremiseMatch r;
+        private Term result = null;
 
-        public OneMatchFindSubst(Term op, Random rng) {
-            super(substitute.getOp(op), rng);
+        public OneMatchFindSubst(Term op, PremiseMatch r, Term xterm) {
+            super(substitute.getOp(op), r.premise.memory().random);
+            this.xterm = xterm;
+            this.r = r;
         }
 
         /** terminates after the first match */
         @Override public boolean onMatch() {
-            matched = true;
+            //apply the match before the xy/yx mapping gets reverted after leaving the termutator
+            result = subst(r, this, xterm);
             return false;
         }
 
-        public boolean tryMatch(Term x, Term y) {
+        public Term tryMatch(Term x, Term y) {
             matchAll(x, y, true);
-            return matched;
+            return result;
         }
+
+
     }
 }

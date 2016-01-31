@@ -268,7 +268,7 @@ public abstract class FindSubst extends Versioning implements Subst {
         } else {
             if (putYX(/*(Variable)*/ y, x)) {
                 if (y instanceof CommonVariable) {
-                    return putXY(/*(Variable)*/ y, x);
+                    return putXY(x, /*(Variable)*/ y);
                 }
                 return true;
             }
@@ -717,7 +717,7 @@ public abstract class FindSubst extends Versioning implements Subst {
     private boolean putVarX(Variable x, @NotNull Term y) {
         if (putXY(x, y)) {
             if (x instanceof CommonVariable) {
-                return putYX(x, y);
+                return putYX(y, x);
             }
             return true;
         }

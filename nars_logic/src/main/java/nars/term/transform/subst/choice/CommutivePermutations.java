@@ -37,13 +37,9 @@ public class CommutivePermutations extends Termutator {
     @Override
     public void run(FindSubst f, Termutator[] chain, int current) {
         ShuffledSubterms p = this.perm;
-        if (p == null) {
-            p = this.perm;
-        }
-
         p.reset();
-
         int start = f.now();
+
 
         while (p.hasNext()) {
             p.next();
