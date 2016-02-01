@@ -44,4 +44,9 @@ public class TermSet<X extends Term> extends TermVector<X> {
     @Override public final boolean isSorted() {
         return true;
     }
+
+    @Override
+    public TermVector replacing(int subterm, Term replacement) {
+        throw new RuntimeException("n/a for set");
+    }
 }

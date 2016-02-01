@@ -384,4 +384,14 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
             this.term = t;
         }
     }
+
+    /** creates a copy if changed */
+    @Override public TermVector replacing(int subterm, Term replacement) {
+        if (term(subterm).equals(replacement))
+            return this;
+
+        Term[] t = terms().clone();
+        t[subterm] = replacement;
+        return new TermVector(t);
+    }
 }

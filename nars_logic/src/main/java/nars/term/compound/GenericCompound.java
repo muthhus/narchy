@@ -7,6 +7,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.TermPrinter;
 import nars.term.Termed;
+import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
@@ -193,6 +194,11 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     @Override
     public final void forEach(@NotNull Consumer<? super T> action, int start, int stop) {
         terms.forEach(action, start, stop);
+    }
+
+    @Override
+    public TermContainer replacing(int subterm, Term replacement) {
+        throw new RuntimeException("n/a for compound");
     }
 
     @Override

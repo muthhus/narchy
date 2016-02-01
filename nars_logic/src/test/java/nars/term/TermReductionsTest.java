@@ -7,6 +7,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import static nars.$.*;
+import static nars.Op.CONJUNCTION;
 import static org.junit.Assert.*;
 
 /**
@@ -138,6 +139,11 @@ public class TermReductionsTest {
     }
     @Test public void testConjunctionEqual() {
         assertEquals(p, $.conj(p, p));
+    }
+    @Test public void testConjunctionNormal() {
+        Term x = $.$("(&&, <#1 --> lock>, <#1 --> (/, open, #2, _)>, <#2 --> key>)");
+        assertEquals(3, x.size());
+        assertEquals(CONJUNCTION, x.op());
     }
 
     @Test public void testIntExtEqual() {

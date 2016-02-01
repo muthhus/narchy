@@ -6,7 +6,6 @@ package nars.rover.robot;
 
 import nars.NAR;
 import nars.Symbols;
-import nars.java.MethodOperator;
 import nars.java.NALObjects;
 import nars.rover.Material;
 import nars.rover.Sim;
@@ -344,18 +343,18 @@ public class NARover extends AbstractPolygonBot {
         }
 
         private boolean forward(boolean forward) {
-            Task c = MethodOperator.invokingTask();
-            float thrust = c!=null ? c.expectation() : 1;
-            //float thrust = 1f;
+            //Task c = MethodOperator.invokingTask();
+            //float thrust = c!=null ? c.expectation() : 1;
+            float thrust = 1f;
             if (!forward) thrust = -thrust;
             rover.thrustRelative(thrust);
             return true;
         }
 
         private boolean rotate(boolean left) {
-            Task c = MethodOperator.invokingTask();
-            float thrust = c!=null ? c.expectation() : 1;
-            //float thrust = 1f;
+            //Task c = MethodOperator.invokingTask();
+            //float thrust = c!=null ? c.expectation() : 1;
+            float thrust = 1f;
             if (left) thrust = -thrust;
             rover.rotateRelative(thrust);
             return true;

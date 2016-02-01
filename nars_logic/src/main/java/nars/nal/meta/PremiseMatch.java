@@ -56,7 +56,7 @@ public class PremiseMatch extends FindSubst {
     public boolean cyclic;
     int termutesPerMatch, termutes;
 
-    final Map<Operator, ImmediateTermTransform> transforms =
+    public final Map<Operator, ImmediateTermTransform> transforms =
             Global.newHashMap();
     private float minConfidence = Global.TRUTH_EPSILON;
 

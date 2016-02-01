@@ -288,4 +288,5 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
         return true;
     }
 
+    TermContainer replacing(int subterm, Term replacement);
 }

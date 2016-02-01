@@ -4,11 +4,13 @@ import com.google.common.base.Joiner;
 import nars.$;
 import nars.Global;
 import nars.Memory;
+import nars.Op;
 import nars.bag.BLink;
 import nars.budget.Budget;
 import nars.concept.ConceptProcess;
 import nars.nal.meta.*;
 import nars.nal.meta.match.EllipsisMatch;
+import nars.nal.nal8.Operator;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
@@ -160,13 +162,23 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
 
         if (p7) {
 
+            Term taskTermPattern = rule.getTaskTermPattern();
+            Term beliefTermPattern = rule.getBeliefTermPattern();
+            Term cp = this.conclusionPattern;
+
+            if (Op.isOperation(cp) && p.transforms.containsKey( Operator.operatorTerm((Compound) cp) ) ) {
+                //unwrap operation from conclusion pattern; the pattern we want is its first argument
+                cp = Operator.opArgsArray((Compound) cp)[0];
+            }
+
             ct = premise.temporalize(ct,
-                    rule.getTaskTermPattern(),
-                    rule.getBeliefTermPattern(),
-                    conclusionPattern
-                    );
+                    taskTermPattern,
+                    beliefTermPattern,
+                    cp
+            );
 
             occ = premise.occ;
+
         } else {
             occ = ETERNAL;
         }

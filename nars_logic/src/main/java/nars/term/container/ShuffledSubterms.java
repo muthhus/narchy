@@ -124,6 +124,11 @@ public final class ShuffledSubterms extends ShuffledPermutations implements Term
         return x;
     }
 
+    @Override
+    public TermContainer replacing(int subterm, Term replacement) {
+        throw new RuntimeException("n/a for shuffle"); //TODO maybe is valid
+    }
+
 
     @Override
     public void addAllTo(@NotNull Collection<Term> set) {
