@@ -1,10 +1,7 @@
 package nars.nal.op;
 
 import com.google.common.base.Joiner;
-import nars.$;
-import nars.Global;
-import nars.Memory;
-import nars.Op;
+import nars.*;
 import nars.bag.BLink;
 import nars.budget.Budget;
 import nars.concept.ConceptProcess;
@@ -42,11 +39,18 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
 
     @NotNull private final BooleanCondition<PremiseMatch> postMatch; //TODO use AND condition
 
+    /** whether this a single or double premise derivation; necessary in case premise
+     * does have a belief but it was not involved in determining Truth */
+    private final boolean beliefSingle, desireSingle;
 
-    public Derive(PremiseRule rule, Term term, @NotNull BooleanCondition[] postMatch, boolean anticipate, boolean eternalize) {
+
+    public Derive(PremiseRule rule, Term term, @NotNull BooleanCondition[] postMatch,
+                  boolean beliefSingle, boolean desireSingle, boolean anticipate, boolean eternalize) {
         this.rule = rule;
         this.postMatch = (postMatch.length > 0) ? new AndCondition(postMatch) : BooleanCondition.TRUE;
         this.conclusionPattern = term;
+        this.beliefSingle = beliefSingle;
+        this.desireSingle = desireSingle;
         this.anticipate = anticipate;
         this.eternalize = eternalize;
 
@@ -241,6 +245,13 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
         }
 
         boolean derivedTemporal = occ != ETERNAL;
+
+        //nullify belief for single-premise conclusions
+        if ((truth!=null) && (belief!=null)) {
+            if (((punct == Symbols.JUDGMENT) && beliefSingle) ||
+             ((punct == Symbols.GOAL) && desireSingle))
+                belief = null;
+        }
 
         Task derived = deriving
                 .punctuation(punct)

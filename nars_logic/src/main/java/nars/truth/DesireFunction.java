@@ -4,15 +4,19 @@ import nars.$;
 import nars.Global;
 import nars.Memory;
 import nars.Symbols;
+import nars.nal.meta.AllowOverlap;
+import nars.nal.meta.SinglePremise;
 import nars.nal.meta.TruthOperator;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Field;
 import java.util.Map;
 
 public enum DesireFunction implements TruthOperator {
 
+    @SinglePremise
     Negation() {
         @NotNull
         @Override public Truth apply(@NotNull final Truth T, final Truth B, Memory m) {
@@ -41,6 +45,8 @@ public enum DesireFunction implements TruthOperator {
             return TruthFunctions.desireInd(T,B);
         }
     },
+
+    @AllowOverlap
     Deduction() {
         @Nullable
         @Override public Truth apply(@NotNull final Truth T, @Nullable final Truth B, Memory m) {
@@ -48,6 +54,8 @@ public enum DesireFunction implements TruthOperator {
             return TruthFunctions.desireDed(T,B);
         }
     },
+
+    @SinglePremise
     Identity() {
         @NotNull
         @Override public Truth apply(@NotNull final Truth T, /* N/A: */ final Truth B, Memory m) {
@@ -55,6 +63,8 @@ public enum DesireFunction implements TruthOperator {
             return T;
         }
     },
+
+    @SinglePremise
     StructuralStrong() {
         @NotNull
         @Override public Truth apply(@NotNull final Truth T, final Truth B, @NotNull Memory m) {
@@ -65,7 +75,7 @@ public enum DesireFunction implements TruthOperator {
 
     @Nullable
     private static Truth newDefaultTruth(@NotNull Memory m) {
-        return m.newTruthDefault(Symbols.JUDGMENT /* goal? */);
+        return m.newTruthDefault(Symbols.GOAL /* goal? */);
     }
 
 
@@ -76,13 +86,35 @@ public enum DesireFunction implements TruthOperator {
             atomToTruthModifier.put($.the(tm.toString()), tm);
     }
 
-    @Override
-    public final boolean allowOverlap() {
-        return false;
-    }
 
     public static DesireFunction get(Term a) {
         return atomToTruthModifier.get(a);
+    }
+
+
+    private final boolean single;
+    private final boolean overlap;
+
+    DesireFunction() {
+
+        try {
+            Field enumField = getClass().getField(name());
+            this.single = enumField.isAnnotationPresent(SinglePremise.class);
+            this.overlap = enumField.isAnnotationPresent(AllowOverlap.class);
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    @Override
+    public boolean single() {
+        return single;
+    }
+
+    @Override
+    public boolean allowOverlap() {
+        return overlap;
     }
 
 }

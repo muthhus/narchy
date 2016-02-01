@@ -43,21 +43,16 @@ abstract public class Solve extends AtomicBooleanCondition<PremiseMatch> {
 
         i += ')';
 
-        //this.rule = rule;
-
-
         Derive der = new Derive(rule, p.term,
                 postPreconditions,
+                belief!=null ? belief.single() : false,
+                desire!=null ? desire.single() : false,
                 anticipate,
                 eternalize);
 
-        if (puncOverride == 0) {
-            //Inherit from task
-            return new SolvePuncFromTask(i, der, belief, desire);
-        } else {
-            //Override
-            return new SolvePuncOverride(i, der, puncOverride, belief, desire);
-        }
+        return puncOverride == 0 ?
+                new SolvePuncFromTask(i, der, belief, desire) :
+                new SolvePuncOverride(i, der, puncOverride, belief, desire);
 
 
 //

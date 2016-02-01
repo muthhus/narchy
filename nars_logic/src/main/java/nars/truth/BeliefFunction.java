@@ -4,11 +4,14 @@ import nars.$;
 import nars.Global;
 import nars.Memory;
 import nars.Symbols;
+import nars.nal.meta.AllowOverlap;
+import nars.nal.meta.SinglePremise;
 import nars.nal.meta.TruthOperator;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Field;
 import java.util.Map;
 
 /**
@@ -20,6 +23,7 @@ import java.util.Map;
  */
 public enum BeliefFunction implements TruthOperator {
 
+    @SinglePremise
     Revision() {
         @NotNull
         @Override public Truth apply(@NotNull final Truth T, @NotNull final Truth B, Memory m) {
@@ -27,6 +31,7 @@ public enum BeliefFunction implements TruthOperator {
             return TruthFunctions.revision(T, B);
         }
     },
+
     StructuralIntersection() {
         @Nullable
         @Override public Truth apply(final Truth T, @Nullable final Truth B, @NotNull Memory m) {
@@ -34,12 +39,15 @@ public enum BeliefFunction implements TruthOperator {
             return TruthFunctions.intersection(B, newDefaultTruth(m));
         }
     },
+
+    @SinglePremise
     StructuralDeduction() {
         @NotNull
         @Override public Truth apply(@NotNull final Truth T, final Truth B, @NotNull Memory m) {
             return TruthFunctions.deduction1(T, defaultConfidence(m));
         }
     },
+
     StructuralAbduction() {
         @Nullable
         @Override public Truth apply(final Truth T, @Nullable final Truth B, @NotNull Memory m) {
@@ -47,13 +55,16 @@ public enum BeliefFunction implements TruthOperator {
             return TruthFunctions.abduction(B, newDefaultTruth(m));
         }
     },
-    Deduction(true) {
+
+    @AllowOverlap
+    Deduction() {
         @Nullable
         @Override public Truth apply(@NotNull final Truth T, @Nullable final Truth B, Memory m) {
             if (B == null) return null;
             return TruthFunctions.deduction(T, B);
         }
     },
+
     Induction() {
         @Nullable
         @Override public Truth apply(@NotNull final Truth T, @Nullable final Truth B, Memory m) {
@@ -61,6 +72,7 @@ public enum BeliefFunction implements TruthOperator {
             return TruthFunctions.induction(T, B);
         }
     },
+
     Abduction() {
         @Nullable
         @Override public Truth apply(@NotNull final Truth T, @Nullable final Truth B, Memory m) {
@@ -68,6 +80,7 @@ public enum BeliefFunction implements TruthOperator {
             return TruthFunctions.abduction(T, B);
         }
     },
+
     Comparison() {
         @Nullable
         @Override public Truth apply(@NotNull final Truth T, @Nullable final Truth B, Memory m) {
@@ -75,6 +88,7 @@ public enum BeliefFunction implements TruthOperator {
             return TruthFunctions.comparison(T, B);
         }
     },
+
     Conversion() {
         @Nullable
         @Override public Truth apply(final Truth T, @Nullable final Truth B, Memory m) {
@@ -82,25 +96,32 @@ public enum BeliefFunction implements TruthOperator {
             return TruthFunctions.conversion(B);
         }
     },
+
+    @SinglePremise
     Negation() {
         @NotNull
         @Override public Truth apply(@NotNull final Truth T, /* nullable */ final Truth B, Memory m) {
             return TruthFunctions.negation(T);
         }
     },
+
+    @SinglePremise
     Contraposition() {
         @NotNull
         @Override public Truth apply(@NotNull final Truth T, /* nullable */ final Truth B, Memory m) {
             return TruthFunctions.contraposition(T);
         }
     },
-    Resemblance(true) {
+
+    @AllowOverlap
+    Resemblance() {
         @Nullable
         @Override public Truth apply(@NotNull final Truth T, @Nullable final Truth B, Memory m) {
             if (B == null) return null;
             return TruthFunctions.resemblance(T,B);
         }
     },
+
     Union() {
         @Nullable
         @Override public Truth apply(@NotNull final Truth T, @Nullable final Truth B, Memory m) {
@@ -108,21 +129,27 @@ public enum BeliefFunction implements TruthOperator {
             return TruthFunctions.union(T,B);
         }
     },
-    Intersection(true) {
+
+    @AllowOverlap
+    Intersection() {
         @Nullable
         @Override public Truth apply(@NotNull final Truth T, @Nullable final Truth B, Memory m) {
             if (B == null) return null;
             return TruthFunctions.intersection(T,B);
         }
     },
-    Difference(true) {
+
+    @AllowOverlap
+    Difference() {
         @Nullable
         @Override public Truth apply(@NotNull final Truth T, @Nullable final Truth B, Memory m) {
             if (B == null) return null;
             return TruthFunctions.difference(T,B);
         }
     },
-    Analogy(true) {
+
+    @AllowOverlap
+    Analogy() {
         @Nullable
         @Override public Truth apply(@NotNull final Truth T, @Nullable final Truth B, Memory m) {
             if (B == null) return null;
@@ -199,6 +226,8 @@ public enum BeliefFunction implements TruthOperator {
             return TruthFunctions.decomposePositiveNegativeNegative(T,B);
         }
     },
+
+    @SinglePremise
     Identity() {
         @NotNull
         @Override public Truth apply(@NotNull final Truth T, /* nullable*/ final Truth B, Memory m) {
@@ -206,6 +235,7 @@ public enum BeliefFunction implements TruthOperator {
             //return new DefaultTruth(T.freq(), T.conf());
         }
     },
+
     BeliefIdentity() {
         @Nullable
         @Override public Truth apply(final Truth T, /* nullable*/ @Nullable final Truth B, Memory m) {
@@ -214,6 +244,7 @@ public enum BeliefFunction implements TruthOperator {
             return B;
         }
     },
+
     BeliefStructuralDeduction() {
         @Nullable
         @Override public Truth apply(final Truth T, /* nullable*/ @Nullable final Truth B, @NotNull Memory m) {
@@ -237,6 +268,7 @@ public enum BeliefFunction implements TruthOperator {
         }
     };
 
+
     @Nullable
     public static Truth newDefaultTruth(@NotNull Memory m) {
         return m.newTruthDefault(Symbols.JUDGMENT);
@@ -246,8 +278,6 @@ public enum BeliefFunction implements TruthOperator {
         return m.getDefaultConfidence(Symbols.JUDGMENT);
     }
 
-
-    public final boolean allowOverlap;
 
 
 //    /**
@@ -271,17 +301,30 @@ public enum BeliefFunction implements TruthOperator {
         return atomToTruthModifier.get(a);
     }
 
+
+    private final boolean single;
+    private final boolean overlap;
+
     BeliefFunction() {
-        this(false);
-    }
 
-    BeliefFunction(boolean allowOverlap) {
-        this.allowOverlap = allowOverlap;
-    }
+        try {
+            Field enumField = getClass().getField(name());
+            this.single = enumField.isAnnotationPresent(SinglePremise.class);
+            this.overlap = enumField.isAnnotationPresent(AllowOverlap.class);
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        }
 
+
+    }
 
     @Override
-    public final boolean allowOverlap() {
-        return allowOverlap;
+    public boolean single() {
+        return single;
+    }
+
+    @Override
+    public boolean allowOverlap() {
+        return overlap;
     }
 }

@@ -458,6 +458,10 @@ public interface TermBuilder {
                 return x;
             }
 
+            if (u.length == 1) {
+                return u[0];
+            }
+
             if (u.length!=2) {
                 throw new RuntimeException
                 ("invalid temporal conjunction: " + op + " " + t + " "+ Arrays.toString(u));

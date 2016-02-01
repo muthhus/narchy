@@ -8,9 +8,9 @@ import org.jetbrains.annotations.Nullable;
 
 
 public interface TruthOperator {
+
     @Nullable
-    Truth apply(Truth task, Truth belief, Memory m);
-    boolean allowOverlap();
+    Truth apply(@NotNull Truth task, @Nullable Truth belief, @NotNull Memory m);
 
     default boolean  apply(@NotNull PremiseMatch m) {
         Premise premise = m.premise;
@@ -31,4 +31,7 @@ public interface TruthOperator {
         }
         return false;
     }
+
+    boolean allowOverlap();
+    boolean single();
 }
