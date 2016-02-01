@@ -3,7 +3,6 @@ package nars.util.version;
 import nars.util.data.list.FasterIntArrayList;
 import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Maintains a versioned snapshot history (stack) of a changing value
@@ -13,6 +12,8 @@ public class Versioned<X> extends FasterIntArrayList /*Comparable<Versioned>*/ {
     public final FasterList<X> value;
     @NotNull
     private final Versioning context;
+
+    X current = null;
 
     /**
      * id, unique within the context this has registered with
@@ -33,6 +34,7 @@ public class Versioned<X> extends FasterIntArrayList /*Comparable<Versioned>*/ {
     /** called when this versioned is removed/deleted from a context */
     void delete() {
         context.onDeleted(this);
+        current = null;
     }
 
     @Override
@@ -53,6 +55,7 @@ public class Versioned<X> extends FasterIntArrayList /*Comparable<Versioned>*/ {
             if (a[p--] > before) {
                 popTo(p);
                 value.popTo(p);
+                this.current = getUncached();
                 return true;
             }
         }
@@ -75,6 +78,10 @@ public class Versioned<X> extends FasterIntArrayList /*Comparable<Versioned>*/ {
      * gets the latest value
      */
     public final X get() {
+        return current;
+    }
+
+    private final X getUncached() {
         int s = size();
         if (s == 0) return null;
         return value.get(s-1);
@@ -92,7 +99,9 @@ public class Versioned<X> extends FasterIntArrayList /*Comparable<Versioned>*/ {
      * sets thens commits
      */
     public void set(X nextValue) {
-        set(context.newChange(this), nextValue);
+        if (this.current!=nextValue) {
+            set(context.newChange(this), this.current = nextValue);
+        }
     }
 
     /**
@@ -101,7 +110,9 @@ public class Versioned<X> extends FasterIntArrayList /*Comparable<Versioned>*/ {
      */
     @NotNull
     public void thenSet(X nextValue) {
-        set(context.continueChange(this), nextValue);
+        if (this.current!=nextValue) {
+            set(context.continueChange(this), this.current = nextValue);
+        }
     }
 
     /**
@@ -120,6 +131,7 @@ public class Versioned<X> extends FasterIntArrayList /*Comparable<Versioned>*/ {
     public void clear() {
         super.clear();
         value.clear();
+        this.current = null;
     }
 
     @Override
@@ -150,22 +162,22 @@ public class Versioned<X> extends FasterIntArrayList /*Comparable<Versioned>*/ {
 //        set(y);
 //    }
 
-    @Nullable
-    public X getIfAbsent(X valueIfMissing) {
-        X x = get();
-        if (x == null) return valueIfMissing;
-        return x;
-    }
-
-//    public long getIfAbsent(long valueIfMissing) {
-//        if (isEmpty()) return valueIfMissing;
-//        return ((Long) get());
+//    @Nullable
+//    public X getIfAbsent(X valueIfMissing) {
+//        X x = get();
+//        if (x == null) return valueIfMissing;
+//        return x;
 //    }
-
-    @Deprecated public int getIfAbsent(int valueIfMissing) {
-        Integer i  = (Integer) get();
-        return i == null ? valueIfMissing : i;
-    }
+//
+////    public long getIfAbsent(long valueIfMissing) {
+////        if (isEmpty()) return valueIfMissing;
+////        return ((Long) get());
+////    }
+//
+//    @Deprecated public int getIfAbsent(int valueIfMissing) {
+//        Integer i  = (Integer) get();
+//        return i == null ? valueIfMissing : i;
+//    }
 
 //    public char getIfAbsent(char valueIfMissing) {
 //        if (isEmpty()) return valueIfMissing;

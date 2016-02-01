@@ -333,6 +333,7 @@ public class NAL7Test extends AbstractNALTester {
     @Test public void induction_on_events_composition_pre()  {
         TestNAR tester = test();
 
+        tester.nar.log();
 
         tester.input("(open:(John,door) ==>+5 enter:(John,room)). :|:");
 
@@ -368,14 +369,14 @@ public class NAL7Test extends AbstractNALTester {
         tester.mustBelieve(cycles, component,
                 1.00f, 0.73f,
                 t);
-//
-//        tester.mustBelieve(cycles, "open:(John,door)",
-//                1.00f, 0.81f,
-//                t);
-//
-//        tester.mustBelieve(cycles, "enter:(John,room)",
-//                1.00f, 0.81f,
-//                t+dt);
+
+        tester.mustBelieve(cycles, "open:(John,door)",
+                1.00f, 0.81f,
+                t);
+
+        tester.mustBelieve(cycles, "enter:(John,room)",
+                1.00f, 0.81f,
+                t+dt);
 
 
         tester.mustBelieve(cycles, "(" + component + " ==>+" + dt + " enter:(John,room))",

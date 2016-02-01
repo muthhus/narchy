@@ -232,10 +232,23 @@
 //// conditional syllogism ////////////////////////////////////////////////////////////////////////////////////
 //If after M, P usually happens, and M happens, it means P is expected to happen
 
-    M, (M ==> P) |- P, (Belief:Deduction, Desire:Induction, Order:ForAllSame)
-    M, (P ==> M) |- P, (Belief:Abduction, Desire:Deduction, Order:ForAllSame)
+//    M, (M ==> P) |- P, (Belief:Deduction, Desire:Induction, Order:ForAllSame)
+//    M, (P ==> M) |- P, (Belief:Abduction, Desire:Deduction, Order:ForAllSame)
     M, (M <=> S) |- S, (Belief:Analogy, Desire:Strong, Order:ForAllSame)
     M, (S <=> M) |- S, (Belief:Analogy, Desire:Strong, Order:ForAllSame)
+
+    (A==>B),A |- A, (Belief:StructuralDeduction, Desire:Deduction, Order:ForAllSame)
+    (A==>B),B |- B, (Belief:StructuralDeduction, Desire:Induction, Order:ForAllSame)
+
+////NAL7 specific inference ////////////////////////////////////////////////////////////////////////////////////
+//Reasoning about temporal statements. those are using the ==> relation because relation in time is a relation of the truth between statements.
+
+////    X, (XI ==> B) |- occurrsForward( substituteIfUnifies( B, "$", XI, (&/,X,/1)), XI, "==>"), (Belief:Deduction, Desire:Induction, Order:ForAllSame, Event:Anticipate)
+//    X, (BI ==> Y) |- occurrsBackward( substituteIfUnifies( BI, "$", Y, X), BI, "==>"), (Belief:Abduction, Desire:Deduction, Order:ForAllSame)
+    C, (A ==> B) |- substituteIfUnifies( B, "$", A, C), (Belief:Deduction, Desire:Induction, Order:ForAllSame, Event:Anticipate)
+    C, (A ==> B) |- substituteIfUnifies( A, "$", B, C), (Belief:Abduction, Desire:Deduction, Order:ForAllSame)
+
+
 
 //// conditional composition: ////////////////////////////////////////////////////////////////////////////////////
 //They are let out for AGI purpose, don't let the system generate conjunctions or useless <=> and ==> statements
@@ -372,14 +385,6 @@
 
 //    C, (B <=> A), occurr(belief,reverse) |- substituteIfUnifies( A, "$",B,C), (Belief:Deduction, Order:ForAllSame)
     C, (A <=> B) |- substituteIfUnifies( A, "$",B,C), (Belief:Deduction, Order:ForAllSame)
-
-////NAL7 specific inference ////////////////////////////////////////////////////////////////////////////////////
-//Reasoning about temporal statements. those are using the ==> relation because relation in time is a relation of the truth between statements.
-
-////    X, (XI ==> B) |- occurrsForward( substituteIfUnifies( B, "$", XI, (&/,X,/1)), XI, "==>"), (Belief:Deduction, Desire:Induction, Order:ForAllSame, Event:Anticipate)
-//    X, (BI ==> Y) |- occurrsBackward( substituteIfUnifies( BI, "$", Y, X), BI, "==>"), (Belief:Abduction, Desire:Deduction, Order:ForAllSame)
-    C, (A ==> B) |- substituteIfUnifies( B, "$", A, C), (Belief:Deduction, Desire:Induction, Order:ForAllSame, Event:Anticipate)
-    C, (A ==> B) |- substituteIfUnifies( A, "$", B, C), (Belief:Abduction, Desire:Deduction, Order:ForAllSame)
 
 
 ////Temporal induction: ////////////////////////////////////////////////////////////////////////////////////

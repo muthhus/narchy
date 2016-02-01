@@ -60,6 +60,10 @@ public class PremiseMatch extends FindSubst {
             Global.newHashMap();
     private float minConfidence = Global.TRUTH_EPSILON;
 
+
+    /** cached value */
+    private transient char premisePunc;
+
     public PremiseMatch(Random r, Deriver deriver) {
         super(Op.VAR_PATTERN, r );
 
@@ -133,7 +137,9 @@ public class PremiseMatch extends FindSubst {
      */
     public final void start(@NotNull ConceptProcess p, Consumer<Task> receiver) {
 
-        premise = p;
+        this.premise = p;
+        this.premisePunc = premise.task().punc();
+
         this.receiver = receiver;
 
         Compound taskTerm = p.task().term();
@@ -230,6 +236,10 @@ public class PremiseMatch extends FindSubst {
 
     public float getMinConfidence() {
         return minConfidence;
+    }
+
+    public char punc() {
+        return premisePunc;
     }
 }
 

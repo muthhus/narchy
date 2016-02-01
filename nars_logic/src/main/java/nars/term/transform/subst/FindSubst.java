@@ -149,7 +149,7 @@ public abstract class FindSubst extends Versioning implements Subst {
 
     @Nullable
     @Override
-    public Term getXY(@NotNull Object t) {
+    public final Term getXY(@NotNull Object t) {
         return xy.getXY(t);
     }
 

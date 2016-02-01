@@ -40,9 +40,11 @@ public class FasterList<X> extends FastList<X> {
      * this directly manipulates the 'size' value that the list uses to add new items at. use with caution
      * if index==-1, then size will be zero, similar to calling clear(),
      * except the array items will not be null
+     *
+     * returns the next value
      * */
     public final void popTo(int index) {
-        size = index+1;
+        this.size = index+1;
     }
 
 

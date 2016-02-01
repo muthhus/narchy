@@ -24,6 +24,7 @@ import nars.Global;
 import nars.nal.Tense;
 import nars.nal.UtilityFunctions;
 import nars.task.Task;
+import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
 
 import static java.lang.Math.abs;
@@ -55,7 +56,13 @@ public final class TruthFunctions extends UtilityFunctions {
      */
     @NotNull
     public static Truth negation(@NotNull Truth v1) {
-        float f = 1.0f - v1.freq();
+        float fPos = v1.freq();
+
+        //if = 0.5, negating will produce same result
+        if (Util.equal(fPos, 0.5f, Global.TRUTH_EPSILON))
+            return v1;
+
+        float f = 1.0f - fPos;
         float c = v1.conf();
         return new DefaultTruth(f, c);
 

@@ -16,7 +16,8 @@ public enum DesireFunction implements TruthOperator {
     Negation() {
         @NotNull
         @Override public Truth apply(@NotNull final Truth T, final Truth B, Memory m) {
-            return TruthFunctions.negation(T); }
+            return TruthFunctions.negation(T);
+        }
     },
 
     Strong() {
@@ -50,7 +51,8 @@ public enum DesireFunction implements TruthOperator {
     Identity() {
         @NotNull
         @Override public Truth apply(@NotNull final Truth T, /* N/A: */ final Truth B, Memory m) {
-            return new DefaultTruth(T.freq(), T.conf());
+            //return new DefaultTruth(T.freq(), T.conf());
+            return T;
         }
     },
     StructuralStrong() {
@@ -63,7 +65,7 @@ public enum DesireFunction implements TruthOperator {
 
     @Nullable
     private static Truth newDefaultTruth(@NotNull Memory m) {
-        return m.newDefaultTruth(Symbols.JUDGMENT /* goal? */);
+        return m.newTruthDefault(Symbols.JUDGMENT /* goal? */);
     }
 
 

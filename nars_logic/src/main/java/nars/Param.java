@@ -244,7 +244,7 @@ public abstract class Param extends Container implements Level {
         return EXECUTION_SATISFACTION_TRESHOLD;
     }
 
-    public final Truth newDefaultTruth(char p) {
+    public final Truth newTruthDefault(char p) {
         switch (p) {
             case GOAL:
             case JUDGMENT: return new DefaultTruth(1.0f, getDefaultConfidence(p));

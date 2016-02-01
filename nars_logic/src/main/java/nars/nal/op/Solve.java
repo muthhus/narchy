@@ -53,20 +53,10 @@ abstract public class Solve extends AtomicBooleanCondition<PremiseMatch> {
 
         if (puncOverride == 0) {
             //Inherit from task
-            return new Solve(i, der) {
-                @Override public boolean booleanValueOf(@NotNull PremiseMatch m) {
-                    return measure(m,
-                            m.premise.task().punc(),
-                            belief, desire);
-                }
-            };
+            return new SolvePuncFromTask(i, der, belief, desire);
         } else {
             //Override
-            return new Solve(i, der) {
-                @Override public boolean booleanValueOf(@NotNull PremiseMatch m) {
-                    return measure(m, puncOverride, belief, desire);
-                }
-            };
+            return new SolvePuncOverride(i, der, puncOverride, belief, desire);
         }
 
 
@@ -163,5 +153,38 @@ abstract public class Solve extends AtomicBooleanCondition<PremiseMatch> {
     }
 
 
+    private static final class SolvePuncFromTask extends Solve {
+        private final BeliefFunction belief;
+        private final DesireFunction desire;
+
+        public SolvePuncFromTask(String i, Derive der, BeliefFunction belief, DesireFunction desire) {
+            super(i, der);
+            this.belief = belief;
+            this.desire = desire;
+        }
+
+        @Override public boolean booleanValueOf(@NotNull PremiseMatch m) {
+            return measure(m,
+                    m.punc(),
+                    belief, desire);
+        }
+    }
+
+    private static final class SolvePuncOverride extends Solve {
+        private final char puncOverride;
+        private final BeliefFunction belief;
+        private final DesireFunction desire;
+
+        public SolvePuncOverride(String i, Derive der, char puncOverride, BeliefFunction belief, DesireFunction desire) {
+            super(i, der);
+            this.puncOverride = puncOverride;
+            this.belief = belief;
+            this.desire = desire;
+        }
+
+        @Override public boolean booleanValueOf(@NotNull PremiseMatch m) {
+            return measure(m, puncOverride, belief, desire);
+        }
+    }
 }
 

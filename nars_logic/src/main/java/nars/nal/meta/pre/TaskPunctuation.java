@@ -20,7 +20,7 @@ final public class TaskPunctuation extends AtomicBooleanCondition<PremiseMatch> 
 
         @Override
         public boolean booleanValueOf(PremiseMatch o) {
-            char taskPunc = o.premise.task().punc();
+            char taskPunc = o.punc();
             return taskPunc == Symbols.QUESTION || taskPunc == Symbols.QUEST;
         }
 
@@ -59,7 +59,7 @@ final public class TaskPunctuation extends AtomicBooleanCondition<PremiseMatch> 
 
     @Override
     public final boolean booleanValueOf(@NotNull PremiseMatch m) {
-        return m.premise.task().punc() == punc;
+        return m.punc() == punc;
     }
 
     //    @NotNull

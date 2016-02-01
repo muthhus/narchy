@@ -37,7 +37,6 @@ public enum BeliefFunction implements TruthOperator {
     StructuralDeduction() {
         @NotNull
         @Override public Truth apply(@NotNull final Truth T, final Truth B, @NotNull Memory m) {
-            //if (B == null) return null;
             return TruthFunctions.deduction1(T, defaultConfidence(m));
         }
     },
@@ -203,14 +202,16 @@ public enum BeliefFunction implements TruthOperator {
     Identity() {
         @NotNull
         @Override public Truth apply(@NotNull final Truth T, /* nullable*/ final Truth B, Memory m) {
-            return new DefaultTruth(T.freq(), T.conf());
+            return T;
+            //return new DefaultTruth(T.freq(), T.conf());
         }
     },
     BeliefIdentity() {
         @Nullable
         @Override public Truth apply(final Truth T, /* nullable*/ @Nullable final Truth B, Memory m) {
-            if (B == null) return null;
-            return new DefaultTruth(B.freq(), B.conf());
+            //if (B == null) return null;
+            //return new DefaultTruth(B.freq(), B.conf());
+            return B;
         }
     },
     BeliefStructuralDeduction() {
@@ -238,7 +239,7 @@ public enum BeliefFunction implements TruthOperator {
 
     @Nullable
     public static Truth newDefaultTruth(@NotNull Memory m) {
-        return m.newDefaultTruth(Symbols.JUDGMENT);
+        return m.newTruthDefault(Symbols.JUDGMENT);
     }
 
     public static float defaultConfidence(@NotNull Memory m) {
