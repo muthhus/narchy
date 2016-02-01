@@ -1,6 +1,7 @@
 package nars.nal.nal7;
 
 import nars.nar.Default;
+import nars.term.Compound;
 import org.junit.Test;
 
 import static nars.$.$;
@@ -74,5 +75,29 @@ public class TemporalRelationsTest {
         d.index().print(System.out);
         d.concept("(x==>y)").print();
     }
+
+    @Test public void testSubtermTimeRecursive() {
+        Compound c = $("(hold:t2 &&+1 (at:t1 &&+3 ([opened]:t1 &&+5 open(t1))))");
+        assertEquals(0, c.subtermTime($("hold:t2")));
+        assertEquals(1, c.subtermTime($("at:t1")));
+        assertEquals(4, c.subtermTime($("[opened]:t1")));
+        assertEquals(9, c.subtermTime($("open(t1)")));
+    }
+    @Test public void testSubtermTimeRecursiveWithNegativeCommutive() {
+        Compound b = $("(a &&+5 b)");
+        assertEquals(0, b.subtermTime($("a")));
+        assertEquals(5, b.subtermTime($("b")));
+
+        Compound c = $("(a &&-5 b)");
+        assertEquals(5, c.subtermTime($("a")));
+        assertEquals(0, c.subtermTime($("b")));
+
+        Compound d = $("(b &&-5 a)");
+        assertEquals(0, d.subtermTime($("a")));
+        assertEquals(5, d.subtermTime($("b")));
+
+
+    }
+
 
 }

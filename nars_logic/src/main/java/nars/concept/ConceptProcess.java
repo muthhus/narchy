@@ -272,32 +272,40 @@ public final class ConceptProcess implements Premise {
 
             if (occ > TIMELESS ) {
 
-                long ot = taskPattern.subtermTime(cp, td);
-                long ob = beliefPattern.subtermTime(cp, bd);
+                if (task().isEternal() && !belief.isEternal()) {
+                    //find relative time of belief in the task, relative time of the conclusion, and subtract
+                    //the occ (=belief time's)
+                    long timeOfBeliefInTask = tt.subtermTime(bb);
+                    long timeOfDerivedInTask = tt.subtermTime(derived);
+                    occ += (timeOfDerivedInTask - timeOfBeliefInTask);
+                } else {
+                    long ot = taskPattern.subtermTime(cp, td);
+                    long ob = beliefPattern.subtermTime(cp, bd);
 
-                if (ot != ETERNAL) {
-                    if (taskPattern.isCompound()) {
-                        Compound ctp = (Compound)taskPattern;
-                        if (ctp.term(0).equals(cp)) {
-                            ot-=td;
-                        }
-                    }
-                    occ += ot; //occ + ot;
-                } else if (ob != ETERNAL) {
-
-                    if (belief().occurrence()!=task().occurrence()) { //why?
-                        if (beliefPattern.isCompound()) {
-                            Compound cbp = (Compound) beliefPattern;
-                            if (!cbp.term(1).equals(cp)) {
-                                ob -= bd;
+                    if (ot != ETERNAL) {
+                        if (taskPattern.isCompound()) {
+                            Compound ctp = (Compound) taskPattern;
+                            if (ctp.term(0).equals(cp)) {
+                                ot -= td;
                             }
                         }
+                        occ += ot; //occ + ot;
+                    } else if (ob != ETERNAL) {
+
+                        if (belief().occurrence() != task().occurrence()) { //why?
+                            if (beliefPattern.isCompound()) {
+                                Compound cbp = (Compound) beliefPattern;
+                                if (!cbp.term(1).equals(cp)) {
+                                    ob -= bd;
+                                }
+                            }
+                        }
+
+                        occ += ob;
+
+                    } else {
+                        //neither, remain eternal
                     }
-
-                    occ += ob;
-
-                } else {
-                    //neither, remain eternal
                 }
             }
             //}

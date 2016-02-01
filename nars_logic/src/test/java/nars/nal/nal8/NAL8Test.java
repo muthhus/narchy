@@ -28,13 +28,32 @@ public class NAL8Test extends AbstractNALTester {
 
         //TODO decide correct parentheses ordering
 
-        //tester.nar.log();
+        tester.nar.log();
         tester.input("[opened]:{t001}. :|:");
-        tester.inputAt(10, "(hold:({t002}) &&+5 (at:({t001}) &&+5 (open({t001}) &&+5 [opened]:{t001}))).");
+        tester.inputAt(10,
+                "(((hold:({t002}) &&+5 at:({t001})) &&+5 open({t001})) &&+5 [opened]:{t001}).");
+        //on input becomes:
+        //       (({t001}-->[opened]) &&-5 (open({t001}) &&-5 ((({t002})-->hold) &&+5 (({t001})-->at))))
+
+//        //the structurually inverted sequence
+//        tester.mustBelieve(cycles,
+//                "(hold:({t002}) &&+5 (at:({t001}) &&+5 (open({t001}) &&+5 [opened]:{t001})))",
+//                1.0f, 0.90f
+//                );
 
         tester.mustBelieve(cycles, "(hold:({t002}) &&+5 (at:({t001}) &&+5 open({t001})))",
                 1.0f, 0.45f,
                 -5);
+
+        //tester.inputAt(10, "(hold:({t002}) &&+5 (at:({t001}) &&+5 (open({t001}) &&+5 [opened]:{t001}))).");
+////        tester.mustBelieve(cycles, "(hold:({t002}) &&+5 (at:({t001}) &&+5 open({t001})))",
+////                1.0f, 0.45f,
+////                -5);
+
+//        tester.mustBelieve(cycles, "(hold:({t002}) &&+5 (at:({t001}) &&+5 open({t001})))",
+//                1.0f, 0.45f,
+//                -5);
+
     }
 
     @Test
@@ -43,13 +62,20 @@ public class NAL8Test extends AbstractNALTester {
 
         //TODO decide correct parentheses ordering
 
-        //tester.nar.log();
         tester.input("[opened]:t1. :|:");
         tester.inputAt(10, "(hold:t2 &&+5 (at:t1 &&+5 (open(t1) &&+5 [opened]:t1))).");
+        //opened at 0
+        //open() @ -5
+        //at @ -10
+        //hold @ -15
 
-        tester.mustBelieve(cycles, "(hold:t2 &&+5 (at:t1 &&+5 open(t1)))",
-                1.0f, 0.45f,
-                -5);
+        tester.mustBelieve(cycles, "hold:t2",
+                1.0f, 0.81f,
+                -15);
+
+//        tester.mustBelieve(cycles, "(hold:t2 &&+5 (at:t1 &&+5 open(t1)))",
+//                1.0f, 0.45f,
+//                -5);
     }
     @Test
     public void subsent_simultaneous()  {

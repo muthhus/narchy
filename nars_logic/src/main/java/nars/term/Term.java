@@ -227,6 +227,7 @@ public interface Term extends Termed, Comparable, Termlike {
         return subtermTime(x, this instanceof Compound ? ((Compound)this).t() : ITERNAL);
     }
 
+    /** matches the first occuring event's time relative to this temporal relation, with parameter for a hypothetical dt */
     default long subtermTime(Term x, int dt) {
 
         if (this.equals(x))
@@ -243,11 +244,29 @@ public interface Term extends Termed, Comparable, Termlike {
                 return 0; //also handles &| multi-arg case
         } else if (this.size() == 2) {
 
-            Term subj = c.term(0);
-            if (subj.equals(x)) return 0;
+            //use the normalized order of the terms so that the first is always @ 0
+            int firstIndex, lastIndex;
+            if (dt < 0) {
+                dt = -dt;
+                firstIndex = 1;
+                lastIndex = 0;
+            } else {
+                firstIndex = 0;
+                lastIndex = 1;
+            }
 
-            Term pred = c.term(1);
-            if (pred.equals(x)) return dt;
+            Term first = c.term(firstIndex);
+            if (first.equals(x)) return 0;
+
+            Term last = c.term(lastIndex);
+            if (last.equals(x)) return dt;
+
+            long withinSubj = first.subtermTime(x);
+            if (withinSubj!=ETERNAL)
+                return withinSubj;
+            long withinPred = last.subtermTime(x);
+            if (withinPred!=ETERNAL)
+                return dt + withinPred;
 
         } else {
             throw new RuntimeException("invalid temporal type: " + this);
