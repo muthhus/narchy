@@ -361,6 +361,8 @@ public class NAL7Test extends AbstractNALTester {
     private void compositionTest(int t, int dt) {
         TestNAR tester = test();
 
+        tester.nar.log();
+
         tester.inputAt(t, "hold:(John,key). :|:");
         tester.inputAt(t, "(open:(John,door) ==>+" + dt + " enter:(John,room)). :|:");
 

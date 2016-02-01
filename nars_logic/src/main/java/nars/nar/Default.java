@@ -475,19 +475,20 @@ public class Default extends AbstractNAR {
             }
 
             if (!buffer.isEmpty()) {
-                Task.inputNormalized( buffer,
-                        //p.getMeanPriority()
-                        p.task().pri()
-
-                        //p.getTask().getPriority() * 1f/buffer.size()
-                        //p.getTask().getPriority()/buffer.size()
-                        //p.taskLink.getPriority()
-                        //p.getTaskLink().getPriority()/buffer.size()
-
-                        //p.conceptLink.getPriority()
-                        //UtilityFunctions.or(p.conceptLink.getPriority(), p.taskLink.getPriority())
-
-                ,nar::input);
+//                Task.inputNormalized( buffer,
+//                        //p.getMeanPriority()
+//                        p.task().pri()
+//
+//                        //p.getTask().getPriority() * 1f/buffer.size()
+//                        //p.getTask().getPriority()/buffer.size()
+//                        //p.taskLink.getPriority()
+//                        //p.getTaskLink().getPriority()/buffer.size()
+//
+//                        //p.conceptLink.getPriority()
+//                        //UtilityFunctions.or(p.conceptLink.getPriority(), p.taskLink.getPriority())
+//
+//                ,nar::input);
+                nar.input(buffer);
                 buffer.clear();
             }
 

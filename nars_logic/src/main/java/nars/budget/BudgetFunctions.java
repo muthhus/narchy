@@ -322,16 +322,17 @@ public final class BudgetFunctions extends UtilityFunctions {
 	@NotNull
 	static Budget budgetInference(@NotNull Budget target, float qual, int complexity,
 								  @NotNull ConceptProcess nal) {
-		float complexityFactor = complexity > 1 ?
+		//float complexityFactor = complexity > 1 ?
 
 		// sqrt factor (experimental)
 		// (float) (1f / Math.sqrt(Math.max(1, complexity))) //experimental,
 		// reduces dur and qua by sqrt of complexity (more slowly)
 
 				// linear factor (original)
-				(1.0f / Math.max(1, complexity))
+				//(1.0f / Math.max(1, complexity))
 
-				: 1.0f;
+				//: 1.0f;
+		float complexityFactor = 1f / complexity;
 
 		return budgetInference(target, qual, complexityFactor, nal);
 	}
@@ -339,10 +340,10 @@ public final class BudgetFunctions extends UtilityFunctions {
 	@NotNull
 	static Budget budgetInference(@NotNull Budget target, float qual, float complexityFactor, @NotNull ConceptProcess nal) {
 
-        BLink<? extends Task> taskLink = nal.taskLink;
+        final BLink<? extends Task> taskLink = nal.taskLink;
 
-        Budget t =
-            (taskLink !=null) ? taskLink :  nal.task().budget();
+        final Budget t = taskLink;
+            //(taskLink !=null) ? taskLink :  nal.task().budget();
 
 
         float priority = t.pri();
@@ -351,7 +352,7 @@ public final class BudgetFunctions extends UtilityFunctions {
 
         BLink<? extends Termed> termLink = nal.termLink;
         if ((termLink!=null) && (!termLink.isDeleted())) {
-            priority = or(priority, termLink.pri());
+            priority = and(priority, termLink.pri()); //originally was OR, but this can explode because the result of OR can exceed the inputs
             durability = and(durability, termLink.dur()); //originaly was 'AND'
 
             NAR nar = nal.nar;
