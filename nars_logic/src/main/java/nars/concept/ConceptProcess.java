@@ -142,16 +142,12 @@ public final class ConceptProcess implements Premise {
         int td = tt.t();
         int bd = bb != null ? bb.t() : ITERNAL;
 
-        if (derived.toString().equals("(pick({t002})==>((SELF,{t002})-->hold))")) {
-            System.err.println("caugt");
-        }
 
         if (derived.op().isTemporal() && cp.isCompound()) {
 
             int t = ITERNAL;
             Compound ccc = (Compound) cp;
             Term ca = ccc.term(0);
-            Term cb = ccc.term(1);
 
             //System.out.println(tt + " "  + bb);
 
@@ -169,46 +165,76 @@ public final class ConceptProcess implements Premise {
              */
             int s = cp.size();
             if (s == 2) {
+                Term cb = ccc.term(1);
 
-                if ((taskPattern.size() == 2) && (beliefPattern.size() == 2)) {
+                //chained relations
+                if (td!=ITERNAL && bd!=ITERNAL && (taskPattern.size() == 2) && (beliefPattern.size() == 2)) {
                     Compound tpp = (Compound) taskPattern;
                     Compound bpp = (Compound) beliefPattern;
-                    if (td!=ITERNAL && bd!=ITERNAL) {
-                        if (tpp.term(1).equals(bpp.term(0))) {
-                            t = td + bd;
 
-                            //chained inner
-                            if (!cb.equals(bpp.term(1))) {
-                                t = -t; //invert direction
-                            }
-                        } else if (tpp.term(0).equals(bpp.term(1))) {
-                            //chain outer
-                            t = td + bd; //?? CHECK
-                        } else if (tpp.term(0).equals(bpp.term(0))) {
-                            //common left
-                            t = td - bd;
-                        } else if (tpp.term(1).equals(bpp.term(1))) {
-                            //common right
-                            t = bd - td;
-                        } else {
-                            //throw new RuntimeException("unhandled case");
-                            t = (bd + td) / 2; //???
+                    if (tpp.term(1).equals(bpp.term(0))) {
+                        t = td + bd;
+
+                        //chained inner
+                        if (!cb.equals(bpp.term(1))) {
+                            t = -t; //invert direction
                         }
-                    }
-                } else if (td == ITERNAL && bd == ITERNAL) {
-                    //both ITERNAL
-                    if(belief()==null) {
-                        occ = task().occurrence();
+                    } else if (tpp.term(0).equals(bpp.term(1))) {
+                        //chain outer
+                        t = td + bd; //?? CHECK
+                    } else if (tpp.term(0).equals(bpp.term(0))) {
+                        //common left
+                        t = td - bd;
+                    } else if (tpp.term(1).equals(bpp.term(1))) {
+                        //common right
+                        t = bd - td;
                     } else {
-                        long to = task().occurrence();
-                        long bo = belief().occurrence();
-                        if ((to != ETERNAL) && (bo != ETERNAL)) {
-                            t = (int) (to - bo);
-                            occ -= t;
-                        } else {
+                        //throw new RuntimeException("unhandled case");
+                        t = (bd + td) / 2; //???
+                    }
+
+                }
+
+                if (td == ITERNAL && bd == ITERNAL) {
+
+                    long aTask = taskPattern.subtermTime(ca, td);
+                    long aBelief = beliefPattern.subtermTime(ca, bd);
+                    long bTask = taskPattern.subtermTime(cb, td);
+                    long bBelief = beliefPattern.subtermTime(cb, bd);
+
+                    if (aTask != ETERNAL && aBelief == ETERNAL &&
+                            bBelief != ETERNAL && bTask == ETERNAL) {
+                        //forward: task -> belief
+                        t = (int) (belief().occurrence() - task().occurrence());
+                        //occ += t;
+                        //occ += 0;
+
+                    }
+                    else if (aTask == ETERNAL && aBelief != ETERNAL &&
+                            bBelief == ETERNAL && bTask != ETERNAL) {
+                        //reverse: belief -> task
+                        t = (int) (task().occurrence() - belief().occurrence());
+                        //occ += 0;
+
+                    } else {
+                        //throw new RuntimeException("unhandled case");
+
+
+                        //both ITERNAL
+                        if(belief()!=null) {
+
+                            long to = task().occurrence();
+                            long bo = belief().occurrence();
+                            if ((to != ETERNAL) && (bo != ETERNAL)) {
+                                t = (int) (to - bo);
+                                occ -= t;
+                            } /*else {
                             occ = to;
+                        }*/
                         }
                     }
+
+
                 } else if (td == ITERNAL && bd!=ITERNAL) {
                     //belief has dt
                     t = bd;
@@ -218,33 +244,20 @@ public final class ConceptProcess implements Premise {
                     t = td;
                     //TODO align
                 }   else {
-                    //throw new RuntimeException("unhandled case");
-                }
-            } else if ((taskPattern.size() == 0) && (beliefPattern.size() == 0) && belief()!=null) {
-                long aTask = taskPattern.subtermTime(ca, td);
-                long aBelief = beliefPattern.subtermTime(ca, bd);
-                long bTask = taskPattern.subtermTime(cb, td);
-                long bBelief = beliefPattern.subtermTime(cb, bd);
 
-                if (aTask != ETERNAL && aBelief == ETERNAL &&
-                        bBelief != ETERNAL && bTask == ETERNAL) {
-                    //forward: task -> belief
-                    t = (int) (belief().occurrence() - task().occurrence());
-                    //occ += 0;
+
 
                 }
-                else if (aTask == ETERNAL && aBelief != ETERNAL &&
-                        bBelief == ETERNAL && bTask != ETERNAL) {
-                    //reverse: belief -> task
-                    t = (int) (task().occurrence() - belief().occurrence());
-                    //occ += 0;
-
-                } else {
-                    throw new RuntimeException("unhandled case");
-
-                }
-
             }
+
+
+//            if (t!=ITERNAL) {
+//                long ot = taskPattern.subtermTime(cp, t);
+//                long ob = beliefPattern.subtermTime(cp, t);
+//
+//                System.out.println(ot + " " + ob);
+//
+//            }
 
             //System.out.println(derived + " " + a + ":"+ aTask + "|" + aBelief + ", " + b + ":" + bTask + "|" + bBelief);
 
@@ -255,10 +268,13 @@ public final class ConceptProcess implements Premise {
         } else {
             //if (cc.size() == 0) {
 
-            long ot = taskPattern.subtermTime(cp, td);
-            long ob = beliefPattern.subtermTime(cp, bd);
+
 
             if (occ > TIMELESS ) {
+
+                long ot = taskPattern.subtermTime(cp, td);
+                long ob = beliefPattern.subtermTime(cp, bd);
+
                 if (ot != ETERNAL) {
                     if (taskPattern.isCompound()) {
                         Compound ctp = (Compound)taskPattern;
@@ -266,7 +282,7 @@ public final class ConceptProcess implements Premise {
                             ot-=td;
                         }
                     }
-                    occ = occ + ot; //occ + ot;
+                    occ += ot; //occ + ot;
                 } else if (ob != ETERNAL) {
 
                     if (belief().occurrence()!=task().occurrence()) { //why?
@@ -278,7 +294,7 @@ public final class ConceptProcess implements Premise {
                         }
                     }
 
-                    occ = occ + ob;
+                    occ += ob;
 
                 } else {
                     //neither, remain eternal
@@ -286,6 +302,7 @@ public final class ConceptProcess implements Premise {
             }
             //}
         }
+
 
         return derived;
         //return nar.memory.index.transformRoot(derived, temporalize);
