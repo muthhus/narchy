@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.function.BiConsumer;
 
 
 public interface Subst  {
@@ -36,6 +37,7 @@ public interface Subst  {
         return l;
     }
 
+    void forEach(BiConsumer<? super Term, ? super Term> each);
 
     @Nullable
     default ImmediateTermTransform getTransform(Operator t) {

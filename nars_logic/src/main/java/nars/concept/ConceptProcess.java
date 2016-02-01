@@ -8,6 +8,8 @@ import nars.Global;
 import nars.NAR;
 import nars.Premise;
 import nars.bag.BLink;
+import nars.nal.meta.PremiseMatch;
+import nars.nal.op.Derive;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
@@ -132,7 +134,12 @@ public final class ConceptProcess implements Premise {
      * apply temporal characteristics to a newly derived term according to the premise's
      * @param cp Rule's (effective) Conclusion Term Pattern
      */
-    public final Compound temporalize(Compound derived, Term taskPattern, Term beliefPattern, Term cp) {
+    public final Compound temporalize(Compound derived, Term cp, PremiseMatch p, Derive d) {
+
+
+        Term tp = d.rule.getTaskTermPattern();
+        Term bp = d.rule.getBeliefTermPattern();
+
 
         occ = occurrenceTarget(); //reset
 
@@ -142,10 +149,10 @@ public final class ConceptProcess implements Premise {
         int td = tt.t();
         int bd = bb != null ? bb.t() : ITERNAL;
 
+        int t = ITERNAL;
 
         if (derived.op().isTemporal() && cp.isCompound()) {
 
-            int t = ITERNAL;
             Compound ccc = (Compound) cp;
             Term ca = ccc.term(0);
 
@@ -168,9 +175,9 @@ public final class ConceptProcess implements Premise {
                 Term cb = ccc.term(1);
 
                 //chained relations
-                if (td!=ITERNAL && bd!=ITERNAL && (taskPattern.size() == 2) && (beliefPattern.size() == 2)) {
-                    Compound tpp = (Compound) taskPattern;
-                    Compound bpp = (Compound) beliefPattern;
+                if (td!=ITERNAL && bd!=ITERNAL && (tp.size() == 2) && (bp.size() == 2)) {
+                    Compound tpp = (Compound) tp;
+                    Compound bpp = (Compound) bp;
 
                     if (tpp.term(1).equals(bpp.term(0))) {
                         t = td + bd;
@@ -197,10 +204,10 @@ public final class ConceptProcess implements Premise {
 
                 if (td == ITERNAL && bd == ITERNAL) {
 
-                    long aTask = taskPattern.subtermTime(ca, td);
-                    long aBelief = beliefPattern.subtermTime(ca, bd);
-                    long bTask = taskPattern.subtermTime(cb, td);
-                    long bBelief = beliefPattern.subtermTime(cb, bd);
+                    long aTask = tp.subtermTime(ca, td);
+                    long aBelief = bp.subtermTime(ca, bd);
+                    long bTask = tp.subtermTime(cb, td);
+                    long bBelief = bp.subtermTime(cb, bd);
 
                     if (aTask != ETERNAL && aBelief == ETERNAL &&
                             bBelief != ETERNAL && bTask == ETERNAL) {
@@ -228,9 +235,7 @@ public final class ConceptProcess implements Premise {
                             if ((to != ETERNAL) && (bo != ETERNAL)) {
                                 t = (int) (to - bo);
                                 occ -= t;
-                            } /*else {
-                            occ = to;
-                        }*/
+                            }
                         }
                     }
 
@@ -261,30 +266,56 @@ public final class ConceptProcess implements Premise {
 
             //System.out.println(derived + " " + a + ":"+ aTask + "|" + aBelief + ", " + b + ":" + bTask + "|" + bBelief);
 
-            if (t != ITERNAL) {
-                return derived.t(t);
-            }
 
-        } else {
-            //if (cc.size() == 0) {
+        }
 
 
 
-            if (occ > TIMELESS ) {
+        //apply occurrence shift
+        if (occ > TIMELESS ) {
 
-                if (task().isEternal() && !belief.isEternal()) {
+            Term T = p.resolve(tt);
+            Term B = bb!=null ? p.resolve(bb) : null;
+            Term C = derived;
+
+            if (belief()!=null) {
+                if (task().isEternal() && !belief().isEternal()) {
                     //find relative time of belief in the task, relative time of the conclusion, and subtract
                     //the occ (=belief time's)
-                    long timeOfBeliefInTask = tt.subtermTime(bb);
-                    long timeOfDerivedInTask = tt.subtermTime(derived);
-                    occ += (timeOfDerivedInTask - timeOfBeliefInTask);
+                    long timeOfBeliefInTask = T.subtermTime(B,td);
+                    long timeOfDerivedInTask = T.subtermTime(C,td);
+                    if (timeOfDerivedInTask!=ETERNAL && timeOfBeliefInTask!=ETERNAL)
+                        occ += (timeOfDerivedInTask - timeOfBeliefInTask);
+                    else if (timeOfDerivedInTask!=ETERNAL)
+                        occ += timeOfDerivedInTask;
+                } else if (!task().isEternal() && belief().isEternal()) {
+                    long timeOfTaskInBelief = B.subtermTime(T,bd);
+                    long timeOfDerivedInBelief = B.subtermTime(C,bd);
+                    if (timeOfTaskInBelief != ETERNAL && timeOfDerivedInBelief != ETERNAL)
+                        occ += (timeOfDerivedInBelief - timeOfTaskInBelief);
+                    else if (timeOfDerivedInBelief!=ETERNAL)
+                        occ += timeOfDerivedInBelief;
+                } else if (!task().isEternal() && !belief().isEternal()) {
+                    //long ot = T.subtermTime(C, td);
+                    //long ob = B.subtermTime(C, bd);
+                    //System.out.println("which");
+                    //if (t!=ITERNAL)
+                    //    occ -= t;
+                }
+            } else {
+
+                if (!task().isEternal()) {
+                    long timeOfDerivedInTask = T.subtermTime(C, td);
+                    if (timeOfDerivedInTask!=ETERNAL)
+                        occ += timeOfDerivedInTask;
                 } else {
-                    long ot = taskPattern.subtermTime(cp, td);
-                    long ob = beliefPattern.subtermTime(cp, bd);
+
+                    long ot = tp.subtermTime(cp, td);
+                    long ob = bp.subtermTime(cp, bd);
 
                     if (ot != ETERNAL) {
-                        if (taskPattern.isCompound()) {
-                            Compound ctp = (Compound) taskPattern;
+                        if (tp.isCompound()) {
+                            Compound ctp = (Compound) tp;
                             if (ctp.term(0).equals(cp)) {
                                 ot -= td;
                             }
@@ -293,8 +324,8 @@ public final class ConceptProcess implements Premise {
                     } else if (ob != ETERNAL) {
 
                         if (belief().occurrence() != task().occurrence()) { //why?
-                            if (beliefPattern.isCompound()) {
-                                Compound cbp = (Compound) beliefPattern;
+                            if (bp.isCompound()) {
+                                Compound cbp = (Compound) bp;
                                 if (!cbp.term(1).equals(cp)) {
                                     ob -= bd;
                                 }
@@ -305,11 +336,30 @@ public final class ConceptProcess implements Premise {
 
                     } else {
                         //neither, remain eternal
+                        throw new RuntimeException("unhandled case");
                     }
                 }
             }
-            //}
+
+
         }
+            //}
+        //}
+
+        if (t != ITERNAL) {
+            derived = derived.t(t);
+
+//            int nt = derived.t();
+//            if (occ > TIMELESS) {
+//                if (Math.signum(t) != Math.signum(nt)) {
+//                    //re-align the occurrence
+//                    occ -= t;
+//                } else {
+//                    occ -= nt;
+//                }
+//            }
+        }
+
 
 
         return derived;

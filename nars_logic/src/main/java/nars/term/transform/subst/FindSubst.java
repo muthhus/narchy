@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.BiConsumer;
 
 
 /* recurses a pair of compound term tree's subterms
@@ -841,6 +842,10 @@ public abstract class FindSubst extends Versioning implements Subst {
         return !c.invalid(x, y, this);
     }
 
+    @Override public void forEach(BiConsumer<? super Term, ? super Term> each) {
+        xy.forEach(each);
+        //TODO yx also?
+    }
 
     @Nullable
     public Term resolve(Term t) {
@@ -872,6 +877,18 @@ public abstract class FindSubst extends Versioning implements Subst {
 
         public VarCachedVersionMap(Versioning context, Map<Term, Versioned<Term>> map) {
             super(context, map);
+        }
+
+        @Override
+        public void forEach(BiConsumer<? super Term, ? super Term> each) {
+            Map<Term, Versioned<Term>> m = this.map;
+            if (!m.isEmpty()) {
+                m.forEach((k, vv) -> {
+                    Term v = vv.get();
+                    if (v != null)
+                        each.accept(k, v);
+                });
+            }
         }
 
         @Override

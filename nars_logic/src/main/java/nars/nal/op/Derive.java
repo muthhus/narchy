@@ -35,7 +35,7 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
 
     private final boolean anticipate;
     private final boolean eternalize;
-    private final PremiseRule rule;
+    public final PremiseRule rule;
 
     /** result pattern */
     private final Term conclusionPattern;
@@ -162,8 +162,7 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
 
         if (p7) {
 
-            Term taskTermPattern = rule.getTaskTermPattern();
-            Term beliefTermPattern = rule.getBeliefTermPattern();
+
             Term cp = this.conclusionPattern;
 
             if (Op.isOperation(cp) && p.transforms.containsKey( Operator.operatorTerm((Compound) cp) ) ) {
@@ -172,9 +171,7 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
             }
 
             ct = premise.temporalize(ct,
-                    taskTermPattern,
-                    beliefTermPattern,
-                    cp
+                    cp, p, this
             );
 
             occ = premise.occ;
