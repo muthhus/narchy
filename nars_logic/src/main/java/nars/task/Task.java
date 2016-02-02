@@ -42,8 +42,8 @@ import java.util.function.Supplier;
 import static nars.Global.dereference;
 import static nars.nal.LocalRules.solutionBudget;
 import static nars.nal.Tense.TIMELESS;
-import static nars.nal.UtilityFunctions.w2c;
-import static nars.truth.TruthFunctions.*;
+import static nars.truth.TruthFunctions.eternalize;
+import static nars.truth.TruthFunctions.temporalProjection;
 
 /**
  * A task to be processed, consists of a Sentence and a BudgetValue.
@@ -202,7 +202,8 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         if (solTruth == null)
             return null;
 
-        solTruth = solTruth.withConf( w2c(c2w(solTruth.conf())* termRelevance ) );
+        solTruth =  solTruth.withConfMult(termRelevance);
+                //solTruth.withConf( w2c(solTruth.conf())* termRelevance );
 
         Budget solutionBudget = solutionBudget(question, this, solTruth, memory);
         if (solutionBudget == null)
@@ -808,7 +809,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
             long nextOcc = targetTime;
 
             float projConf = nextConf =
-                    w2c(c2w(conf) * temporalProjection(occ, targetTime, now));
+                    conf * temporalProjection( targetTime, occ, now);
 
             if (eternalizeIfWeaklyTemporal) {
                 float eternConf = eternalize(conf);

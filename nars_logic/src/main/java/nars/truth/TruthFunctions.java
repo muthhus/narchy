@@ -21,14 +21,13 @@
 package nars.truth;
 
 import nars.Global;
+import nars.concept.util.BeliefTable;
 import nars.nal.Tense;
 import nars.nal.UtilityFunctions;
 import nars.task.Task;
 import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import static java.lang.Math.abs;
 
 /**
  * All truth-value (and desire-value) functions used in logic rules
@@ -107,7 +106,7 @@ public final class TruthFunctions extends UtilityFunctions {
         float w1 = c2w(a.conf());
         float w2 = c2w(b.conf());
         float w = (w1 + w2);
-        float newConf = w2c(w * match);
+        float newConf = w2c(w)* match;
         if (newConf < confThreshold + Global.TRUTH_EPSILON/2f)
             return null;
 
@@ -129,21 +128,25 @@ public final class TruthFunctions extends UtilityFunctions {
         long bt = tb.occurrence();
         float w1 = c2w(a.conf());
         float w2 = c2w(b.conf());
-        float w = (w1 + w2);
-        float newConf = w2c(w * TruthFunctions.temporalProjection(at, bt, now) * match);
+        final float w = (w1 + w2);
+        float newConf = w2c(w)
+                * temporalProjection(now, at, bt)
+                //* TruthFunctions.temporalProjection(at, bt, now)
+                * match;
         if (newConf < confThreshold + Global.TRUTH_EPSILON/2f) return null;
 
-        //temporal proximity balancing metric (similar to projection). does not affect 'w' the total used to compute confidence
-
-        if (at != bt) {
-            long adt = Math.abs(at-now);
-            long bdt = Math.abs(bt-now);
-            if (adt!=bdt) {
-                float p = adt/((float)(adt+bdt)); //LERP the proportion
-                w2 *= p;
-                w1 *= (1f-p);
-            }
-        }
+//        //temporal proximity balancing metric (similar to projection). does not affect 'w' the total used to compute confidence
+//        //NOT WORKING YET
+//        if (at != bt) {
+//            long adt = Math.abs(at-now);
+//            long bdt = Math.abs(bt-now);
+//            if (adt!=bdt) {
+//                //MATH IS WRONG HERE
+//                float p = ((float)(adt+bdt)); //LERP the proportion
+//                w2 *= Math.abs(adt)/p;
+//                w1 *= Math.abs(bdt)/p;
+//            }
+//        }
 
         float f1 = a.freq();
         float f2 = b.freq();
@@ -151,6 +154,10 @@ public final class TruthFunctions extends UtilityFunctions {
             (w1 * f1 + w2 * f2) / w,
             newConf
         );
+    }
+
+    public static float temporalProjection(long now, long at, long bt) {
+        return BeliefTable.relevance(Math.abs(now-at) + Math.abs(now-bt), Math.abs(at-bt));
     }
 
     /**
@@ -528,11 +535,11 @@ public final class TruthFunctions extends UtilityFunctions {
         return w2c(conf);
     }
     
-    public static float temporalProjection(long sourceTime, long targetTime, long currentTime) {
-        long den = (abs(sourceTime - currentTime) + abs(targetTime - currentTime));
-        if (den == 0) return 1f;
-        return abs(sourceTime - targetTime) / (float)den;
-    }
+//    public static float temporalProjection(long sourceTime, long targetTime, long currentTime) {
+//        long den = (abs(sourceTime - currentTime) + abs(targetTime - currentTime));
+//        if (den == 0) return 1f;
+//        return abs(sourceTime - targetTime) / (float)den;
+//    }
 
     /**
      * A function to convert confidence to weight

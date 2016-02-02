@@ -36,10 +36,21 @@ import org.jetbrains.annotations.Nullable;
 import java.io.PrintStream;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public interface Concept extends Termed, Comparable<Termed> {
 
+    Ordering<Task> taskCreationTime = new Ordering<Task>() {
+        @Override
+        public int compare(@NotNull Task left, @NotNull Task right) {
+            return Longs.compare(
+                    left.creation(),
+                    right.creation());
+        }
+    };
+
     Bag<Task> getTaskLinks();
+
     Bag<Termed> getTermLinks();
 
     @Nullable
@@ -61,21 +72,23 @@ public interface Concept extends Termed, Comparable<Termed> {
         return !quests().isEmpty();
     }
 
-
     @Nullable
     Object put(@NotNull Object key, @Nullable Object value);
 
-
-    /** like Map.gett for getting data stored in meta map */
+    /**
+     * like Map.gett for getting data stored in meta map
+     */
     @Nullable
     default <C> C get(@NotNull Object key) {
         Map<Object, Object> m;
         return null == (m = getMeta()) ? null : (C) m.get(key);
     }
 
-    /** belief vs desire metric:
-     *      positive = satisfied
-     *      negative = desired */
+    /**
+     * belief vs desire metric:
+     * positive = satisfied
+     * negative = desired
+     */
     default float getSuccess(long now) {
         //        return hasBeliefs() ?
 //                getBeliefs().getMeanProjectedExpectation(now) : 0;
@@ -89,14 +102,12 @@ public interface Concept extends Termed, Comparable<Termed> {
 
     @Nullable
     BeliefTable beliefs();
+
     @Nullable
     BeliefTable goals();
 
     @Nullable
     TaskTable questions();
-    @Nullable
-    TaskTable quests();
-
 
 
 //    /** debugging utility */
@@ -105,8 +116,8 @@ public interface Concept extends Termed, Comparable<Termed> {
 //            throw new RuntimeException("Deleted concept should not activate TermLinks");
 //    }
 
-
-
+    @Nullable
+    TaskTable quests();
 
     @Nullable
     Task processBelief(Task task, NAR nar);
@@ -115,11 +126,6 @@ public interface Concept extends Termed, Comparable<Termed> {
     Task processGoal(Task task, NAR nar);
 
     Task processQuestion(Task task, NAR nar);
-
-    Task processQuest(Task task, NAR nar);
-
-
-
 
 
 //    /** returns the best belief of the specified types */
@@ -149,71 +155,14 @@ public interface Concept extends Termed, Comparable<Termed> {
 //        return null;
 //    }
 
+    Task processQuest(Task task, NAR nar);
+
     default void print() {
         print(System.out);
     }
 
     default void print(@NotNull PrintStream out) {
         print(out, true, true, true, true);
-    }
-
-    /** prints a summary of all termlink, tasklink, etc.. */
-    default void print(@NotNull PrintStream out, boolean showbeliefs, boolean showgoals, boolean showtermlinks, boolean showtasklinks) {
-
-        out.println("concept: " + toString());
-
-        String indent = "  \t";
-        if (showbeliefs) {
-            out.print(" Beliefs:");
-            if (beliefs().isEmpty()) out.println(" none");
-            else {out.println();
-            beliefs().forEach(s -> {
-                out.print(indent); out.println(s);
-            });}
-            out.print(" Questions:");
-            if (questions().isEmpty()) out.println(" none");
-            else {out.println();
-            questions().forEach(s -> {
-                out.print(indent); out.println(s);
-            });}
-        }
-
-        if (showgoals) {
-            out.print(" Goals:");
-            if (goals().isEmpty()) out.println(" none");
-            else {out.println();
-            goals().forEach(s -> {
-                out.print(indent);
-                out.println(s);
-            });}
-            out.print(" Quests:");
-            if (questions().isEmpty()) out.println(" none");
-            else {out.println();
-                quests().forEach(s -> {
-                    out.print(indent); out.println(s);
-                });}
-        }
-
-        if (showtermlinks) {
-
-            out.println("\n TermLinks:");
-            getTermLinks().forEach(b-> {
-                out.print(indent);
-                out.print(b.get() + " " + b.toBudgetString());
-                out.print(" ");
-            });
-        }
-
-        if (showtasklinks) {
-            out.println("\n TaskLinks:");
-            getTaskLinks().forEach(b-> {
-                out.print(indent);
-                out.print(b.get() + " " + b.toBudgetString());
-                out.print(" ");
-            });
-        }
-
-        out.println();
     }
 
 
@@ -231,26 +180,85 @@ public interface Concept extends Termed, Comparable<Termed> {
 //        return filter(termToConcept, Concept.class); //should remove null's (unless they never get included anyway), TODO Check that)
 //    }
 
+    /**
+     * prints a summary of all termlink, tasklink, etc..
+     */
+    default void print(@NotNull PrintStream out, boolean showbeliefs, boolean showgoals, boolean showtermlinks, boolean showtasklinks) {
 
+        out.println("concept: " + toString());
+
+        String indent = "  \t";
+
+        Consumer<Task> printTask = s -> {
+            out.print(indent);
+            out.print(s);
+            out.print(" ");
+            out.print(s.getLogLast());
+            out.println();
+        };
+
+        if (showbeliefs) {
+            out.print(" Beliefs:");
+            if (beliefs().isEmpty()) out.println(" none");
+            else {
+                out.println();
+
+                beliefs().forEach(printTask);
+            }
+            out.print(" Questions:");
+            if (questions().isEmpty()) out.println(" none");
+            else {
+                out.println();
+                questions().forEach(printTask);
+            }
+        }
+
+        if (showgoals) {
+            out.print(" Goals:");
+            if (goals().isEmpty()) out.println(" none");
+            else {
+                out.println();
+                goals().forEach(printTask);
+            }
+            out.print(" Quests:");
+            if (questions().isEmpty()) out.println(" none");
+            else {
+                out.println();
+                quests().forEach(printTask);
+            }
+        }
+
+        if (showtermlinks) {
+
+            out.println("\n TermLinks:");
+            getTermLinks().forEach(b -> {
+                out.print(indent);
+                out.print(b.get() + " " + b.toBudgetString());
+                out.print(" ");
+            });
+        }
+
+        if (showtasklinks) {
+            out.println("\n TaskLinks:");
+            getTaskLinks().forEach(b -> {
+                out.print(indent);
+                out.print(b.get() + " " + b.toBudgetString());
+                out.print(" ");
+            });
+        }
+
+        out.println();
+    }
 
     @Nullable
     Termed[] getTermLinkTemplates();
-
-    Ordering<Task> taskCreationTime = new Ordering<Task>() {
-        @Override
-        public int compare(@NotNull Task left, @NotNull Task right) {
-            return Longs.compare(
-                    left.creation(),
-                    right.creation());
-        }
-    };
 
     @NotNull
     default Iterator<Task> iterateTasks(boolean onbeliefs, boolean ongoals, boolean onquestions, boolean onquests) {
 
         TaskTable beliefs = onbeliefs ? beliefs() : null;
-        TaskTable goals =   ongoals ? goals() : null ;
-        TaskTable questions = onquestions ?  questions() : null;
+        TaskTable goals = ongoals ? goals() : null;
+        TaskTable questions = onquestions ? questions() : null;
         TaskTable quests = onquests ? quests() : null;
 
         Iterator<Task> b1 = beliefs != null ? beliefs.iterator() : Iterators.emptyIterator();
@@ -262,33 +270,32 @@ public interface Concept extends Termed, Comparable<Termed> {
     }
 
 
-
     /**
      * process a task in this concept
+     *
      * @return true if process affected the concept (ie. was inserted into a belief table)
      */
-    @Nullable Task process(@NotNull Task task, @NotNull NAR nar);
+    @Nullable
+    Task process(@NotNull Task task, @NotNull NAR nar);
 
-    /** attempt insert a tasklink into this concept's tasklink bag
-     *  return true if successfully inserted
-     * */
+    /**
+     * attempt insert a tasklink into this concept's tasklink bag
+     * return true if successfully inserted
+     */
     boolean link(@NotNull Task task, float scale, float minScale, @NotNull NAR nar);
 
     //void linkTemplates(Budget budget, float scale, NAR nar);
 
 
-
-
     default boolean link(@NotNull Task task, float initialScale, @NotNull NAR nar) {
         float minScale =
-            nar.memory.taskLinkThreshold.floatValue() / task.budget().pri();
+                nar.memory.taskLinkThreshold.floatValue() / task.budget().pri();
 
         return Float.isFinite(minScale) && link(task, initialScale, minScale, nar);
     }
 
     /**
-     *
-     * @param thisTask task with a term equal to this concept's
+     * @param thisTask  task with a term equal to this concept's
      * @param otherTask task with a term equal to another concept's
      * @return number of links created (0, 1, or 2)
      */
@@ -305,7 +312,6 @@ public interface Concept extends Termed, Comparable<Termed> {
 
         other.link(thisTask, initialScale, nar);
     }
-
 
 
 //    public Task getTask(boolean hasQueryVar, long occTime, Truth truth, List<Task>... lists);

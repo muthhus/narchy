@@ -284,7 +284,7 @@ public enum NARfx  {
         Stage st;
         Stage removed = window.put(c, st = newWindow(c.toString(), wn));
         st.setAlwaysOnTop(true); //? does this work
-
+        wn.autosize();
 
         if (removed!=null)
             removed.close();

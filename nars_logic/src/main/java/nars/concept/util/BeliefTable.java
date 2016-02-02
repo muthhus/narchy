@@ -269,14 +269,19 @@ public interface BeliefTable extends TaskTable {
 //
 //    }
 
+    static float relevance(Task t, long time, float ageFactor) {
+        return relevance(t.occurrence(), time, ageFactor);
+    }
 
     /** temporal relevance */
-    static float relevance(Task t, long time, float ageFactor) {
-        long o = t.occurrence();
+    static float relevance(long from, long to, float ageFactor) {
+        if (from == Tense.ETERNAL) return 0.5f; //weight eternal half as much as temporal; similar to a horizon heuristic
 
-        if (o == Tense.ETERNAL) return 0.5f; //weight eternal half as much as temporal; similar to a horizon heuristic
+        return relevance(Math.abs(from - to), ageFactor);
+    }
 
-        return 1f / (1f + Math.abs(o - time)*ageFactor);
+    static float relevance(long delta /* positive only */, float ageFactor) {
+        return 1f / (1f + delta*ageFactor);
     }
 
 

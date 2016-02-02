@@ -53,7 +53,7 @@ public class DefaultBeliefTable implements BeliefTable {
                 //new HashMap(cap);
 
         this.minT = this.maxT = this.lastUpdate = memory.time();
-        this.ageFactor = 0;
+        this.ageFactor = memory.duration()*2;
 
         /** Ranking by originality is a metric used to conserve original information in balance with confidence */
         eternal = new SetTable<Task>(cap/2, map, new ArraySortedIndex<Task>(cap) {
@@ -104,7 +104,7 @@ public class DefaultBeliefTable implements BeliefTable {
             }
         }
 
-        ageFactor = (minT!=maxT)? 1f/(maxT-minT) : 0;
+        //ageFactor = (minT!=maxT)? 1f/(maxT-minT) : 0;
     }
 
 

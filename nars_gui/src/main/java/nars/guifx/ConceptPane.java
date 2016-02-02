@@ -518,10 +518,10 @@ public class ConceptPane extends BorderPane implements ChangeListener {
         final Canvas eternal, temporal;
 
         final static ColorMatrix beliefColors = new ColorMatrix(8,8,(f,c)->
-            new Color(0.6f, 0.25f, 1f, 0.25f + 0.6f * c)
+            new Color(0.6f+0.4f*c, 0.2f, 1f, 0.15f + 0.8f * c)
         );
         final static ColorMatrix goalColors = new ColorMatrix(8,8,(f,c)->
-            new Color(0.5f, 1f, 0f, 0.25f + 0.6f * c)
+            new Color(0.2f + 0.4f*c, 1f, 0f, 0.15f + 0.8f * c)
         );
 
         //horizontal block
