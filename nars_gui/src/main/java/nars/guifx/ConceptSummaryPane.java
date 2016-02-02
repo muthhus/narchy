@@ -126,8 +126,8 @@ public class ConceptSummaryPane extends Text {
 
             GraphicsContext g = getGraphicsContext2D();
 
-            Color c = NARfx.hashColor(concept.term().hashCode(),
-                    1.0f, Plot2D.ca);
+            /*Color c = NARfx.hashColor(concept.term().hashCode(),
+                    1.0f, Plot2D.ca);*/
             g.setStroke(Color.GRAY);
             g.setLineWidth(m);
             g.strokeRect(m/2, m/2, W-m, H-m);

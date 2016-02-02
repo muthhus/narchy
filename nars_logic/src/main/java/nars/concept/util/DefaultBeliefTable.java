@@ -1,7 +1,6 @@
 package nars.concept.util;
 
 import com.google.common.collect.Iterators;
-import com.gs.collections.api.block.function.primitive.FloatFunction;
 import nars.Global;
 import nars.Memory;
 import nars.NAR;
@@ -58,12 +57,17 @@ public class DefaultBeliefTable implements BeliefTable {
         this.duration = memory.duration.floatValue();
 
         /** Ranking by originality is a metric used to conserve original information in balance with confidence */
-        eternal = new SetTable<Task>(cap/2, map,
-            BeliefTable::rankEternalByOriginalty
-        );
-        temporal = new SetTable<Task>(cap/2, map,
-            this::rankTemporalByOriginality
-        );
+        eternal = new SetTable<Task>(cap/2, map, new ArraySortedIndex<Task>(cap) {
+            @Override public float score(Task v) {
+                return BeliefTable.rankEternalByOriginality(v);
+            }
+        });
+        temporal = new SetTable<Task>(cap/2, map, new ArraySortedIndex<Task>(cap) {
+            @Override public float score(Task v) {
+                return rankTemporalByOriginality(v);
+            }
+        });
+
     }
 
 
@@ -475,8 +479,8 @@ public class DefaultBeliefTable implements BeliefTable {
 //    }
 
     final static class SetTable<T> extends ArrayTable<T,T> {
-        public SetTable(int cap, Map<T,T> index, FloatFunction<T> score) {
-            super(new LambdaSortedIndex(cap, score), index);
+        public SetTable(int cap, Map<T,T> index, ArraySortedIndex<T> items) {
+            super(items, index);
         }
 
         @Override
@@ -486,18 +490,18 @@ public class DefaultBeliefTable implements BeliefTable {
 
     }
 
-    final static class LambdaSortedIndex<T> extends ArraySortedIndex<T> {
-        private final FloatFunction<T> score;
-
-        public LambdaSortedIndex(int cap, FloatFunction<T> score) {
-            super(cap);
-            this.score = score;
-        }
-
-        @Override public float score(T b) {
-            return score.floatValueOf(b);
-        }
-    }
+//    final static class LambdaSortedIndex<T> extends ArraySortedIndex<T> {
+//        private final FloatFunction<T> score;
+//
+//        public LambdaSortedIndex(int cap, FloatFunction<T> score) {
+//            super(cap);
+//            this.score = score;
+//        }
+//
+//        @Override public float score(T b) {
+//            return score.floatValueOf(b);
+//        }
+//    }
 
 
 //    @Override

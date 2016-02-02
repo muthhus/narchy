@@ -5,6 +5,7 @@ import javafx.scene.layout.HBox;
 import nars.NAR;
 import nars.guifx.NARfx;
 import nars.guifx.StatusPane;
+import nars.guifx.chart.PlotBox;
 import nars.guifx.util.NSlider;
 import nars.nar.Default;
 import nars.util.meter.MemoryBudget;

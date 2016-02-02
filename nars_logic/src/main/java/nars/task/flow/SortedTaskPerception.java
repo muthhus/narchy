@@ -1,7 +1,7 @@
 package nars.task.flow;
 
 import nars.NAR;
-import nars.budget.TaskAccumulator;
+import nars.budget.ItemAccumulator;
 import nars.task.Task;
 import nars.util.data.MutableInteger;
 import org.jetbrains.annotations.NotNull;
@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 public class SortedTaskPerception extends TaskPerception {
 
     @NotNull
-    final TaskAccumulator buffer;
+    final ItemAccumulator<Task> buffer;
 
     public final MutableInteger inputPerCycle = new MutableInteger();
 
@@ -29,13 +29,13 @@ public class SortedTaskPerception extends TaskPerception {
         this.inputPerCycle.set( inputPerCycle );
 
         //TODO use MutableInteger for capacity for all Bags
-        buffer = new TaskAccumulator(capacity);
+        buffer = new ItemAccumulator<Task>(capacity);
     }
 
     @Override
     public final void accept(@NotNull Task t) {
         if (!t.isDeleted()) {
-            Task overflow = buffer.getArrayBag().put(t).get();
+            Task overflow = buffer.bag().put(t).get();
             if (overflow!=null)
                 onOverflow(overflow);
         }
@@ -52,7 +52,7 @@ public class SortedTaskPerception extends TaskPerception {
 
     @Override
     public final void nextFrame(@NotNull Consumer<Task> receiver) {
-        TaskAccumulator buffer = this.buffer;
+        ItemAccumulator<Task> buffer = this.buffer;
         int available = size();
         if (available > 0) {
 
@@ -62,7 +62,7 @@ public class SortedTaskPerception extends TaskPerception {
                 inputsPerCyc = available;
             }
 
-            buffer.getArrayBag().pop(
+            buffer.bag().pop(
                 t -> receiver.accept(t.get()),
                 Math.min(available, inputsPerCyc)
             );
@@ -70,11 +70,11 @@ public class SortedTaskPerception extends TaskPerception {
     }
 
     public final int size() {
-        return buffer.getArrayBag().size();
+        return buffer.bag().size();
     }
 
     @Override
     public void clear() {
-        buffer.getArrayBag().clear();
+        buffer.bag().clear();
     }
 }

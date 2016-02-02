@@ -10,6 +10,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
@@ -18,6 +19,7 @@ import nars.bag.Bag;
 import nars.concept.Concept;
 import nars.concept.util.BeliefTable;
 import nars.concept.util.DefaultBeliefTable;
+import nars.guifx.chart.Plot2D;
 import nars.guifx.demo.SubButton;
 import nars.guifx.graph2.TermEdge;
 import nars.guifx.graph2.TermNode;
@@ -28,8 +30,10 @@ import nars.guifx.graph2.source.DefaultGrapher;
 import nars.guifx.graph3.SpaceNet;
 import nars.guifx.graph3.Xform;
 import nars.guifx.util.ColorArray;
+import nars.guifx.util.ColorMatrix;
 import nars.nar.Default;
 import nars.task.Task;
+import nars.term.Term;
 import nars.term.Termed;
 import nars.util.event.FrameReaction;
 
@@ -48,6 +52,7 @@ public class ConceptPane extends BorderPane implements ChangeListener {
 
     private final NAR nar;
     private final BeliefTablePane tasks;
+    private final Plot2D budgetGraph;
     //    private final Scatter3D tasks;
 //    private final BagView<Task> taskLinkView;
 //    private final BagView<Term> termLinkView;
@@ -320,10 +325,20 @@ public class ConceptPane extends BorderPane implements ChangeListener {
 //        BorderPane links = new BorderPane();
 //        setCenter(new SplitPane(new BorderPane(links), tasks.content));
 
-        tasks = new BeliefTablePane(c);
-        //tasks.maxWidth(Double.MAX_VALUE);
-        //tasks.maxHeight(Double.MAX_VALUE);
-        setCenter(tasks);
+
+        tasks = new BeliefTablePane(nar, c);
+
+        budgetGraph = new Plot2D(Plot2D.Line, 64, 64.0);
+        budgetGraph.add("Pri", () -> {
+           return nar.conceptPriority(c, 0);
+        }, 0, 1f);
+
+
+        setCenter(new VBox(
+            budgetGraph,
+            tasks
+        ));
+
 
         //setCenter(new ConceptNeighborhoodGraph(nar, concept));
 
@@ -335,6 +350,8 @@ public class ConceptPane extends BorderPane implements ChangeListener {
         runLater(()->{
             changed(null,null,null);
         });
+
+
     }
 
     public static class ConceptNeighborhoodGraph extends BorderPane {
@@ -398,6 +415,7 @@ public class ConceptPane extends BorderPane implements ChangeListener {
 
         tasks.frame(now);
 
+        budgetGraph.update();
     }
 
     @Override
@@ -421,14 +439,14 @@ public class ConceptPane extends BorderPane implements ChangeListener {
     /* test example */
     public static void main(String[] args) {
         NAR n = new Default();
-        n.input("<a-->b>. <b-->c>. <c-->a>.");
+        n.input("<a-->b>. <b-->c>. <c-->a>. :|:");
         n.input("<a --> b>!");
         n.input("<a --> b>?");
         n.input("<a --> b>. %0.10;0.95%");
         n.input("<a --> b>! %0.35%");
-        n.input("<a --> b>. %0.75%");
+        n.input("<a --> b>. :/: %0.75%");
 
-        n.run(516);
+        n.run(16);
 
         NARfx.run((a,s) -> {
             NARfx.newConceptWindow(n, n.concept("<a-->b>"));
@@ -445,26 +463,35 @@ public class ConceptPane extends BorderPane implements ChangeListener {
 
     public static class BeliefTablePane extends BorderPane {
         final Canvas eternal, temporal;
-        private final Concept concept;
+        private final Term concept;
 
+        final static ColorMatrix beliefColors = new ColorMatrix(8,8,(f,c)->
+            new Color(0.6f, 0.25f, 1f, 0.25f + 0.6f * c)
+        );
+        final static ColorMatrix goalColors = new ColorMatrix(8,8,(f,c)->
+            new Color(0.5f, 1f, 0f, 0.25f + 0.6f * c)
+        );
+
+        //horizontal block
         final static TaskRenderer beliefRenderer = new TaskRenderer() {
             @Override public void renderTask(GraphicsContext ge, float f, float c, float w, float h, float x, float y) {
-                float alpha = 0.4f + 0.5f * c; //BeliefTable.rankTemporal(t, now, now);
-                ge.setFill(new Color( f,  0.5f, c, alpha));
-                ge.fillRect(x-w/2,y-h/2,w,h);
+                ge.setFill(beliefColors.get(f, c));
+                ge.fillRect(x-w/2,y-h/4,w,h/2);
             }
         };
+        //vertical block
         final static TaskRenderer goalRenderer = new TaskRenderer() {
             @Override public void renderTask(GraphicsContext ge, float f, float c, float w, float h, float x, float y) {
-                float alpha = 0.4f + 0.5f * c; //BeliefTable.rankTemporal(t, now, now);
-                ge.setFill(new Color( c,  f, 0.5f, alpha));
-                ge.fillOval(x-w/2,y-h/2,w,h);
+                ge.setFill(goalColors.get(f, c));
+                ge.fillRect(x-w/4,y-h/2,w/2,h);
             }
         };
+        private final NAR nar;
 
-        public BeliefTablePane(Concept c) {
+        public BeliefTablePane(NAR n, Termed c) {
             super();
-            this.concept = c;
+            this.nar = n;
+            this.concept = c.term();
             eternal = new Canvas(75, 75);
             temporal = new Canvas(200, 75);
 
@@ -473,6 +500,8 @@ public class ConceptPane extends BorderPane implements ChangeListener {
         }
 
         public void frame(long now) {
+            Concept concept = nar.concept(this.concept);
+
             //redraw
             GraphicsContext ge = eternal.getGraphicsContext2D();
             float gew = (float) ge.getCanvas().getWidth();
@@ -541,16 +570,11 @@ public class ConceptPane extends BorderPane implements ChangeListener {
                     float c = t.conf();
                     float x = b + (gew - 2 * b - w) * c;
                     float y = b + (geh - 2 * b - h) * (1 - f);
-                    float alpha = 0.4f + 0.5f * c; //concept.getBeliefs().rankEternal(t);
                     r.renderTask(ge, f, c, w, h, x, y);
                 } else if (!t.isEternal() && t.truth() != null) {
                     float f = t.freq();
                     float cc = t.conf();
                     float o = t.occurrence();
-
-                    if ((o < minT) || (o > maxT))
-                        throw new RuntimeException("task " + t + " out of range");
-
                     float x = xTime(tew, b, minT, maxT, o, w);
                     float y = b + (teh - 2 * b - h) * (1 - f);
                     r.renderTask(te, f, cc, w, h, x, y);

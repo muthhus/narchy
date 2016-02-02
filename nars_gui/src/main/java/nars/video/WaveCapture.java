@@ -7,7 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import nars.guifx.NARfx;
-import nars.guifx.Plot2D;
+import nars.guifx.chart.Plot2D;
 import nars.util.event.DefaultTopic;
 import nars.util.event.On;
 import nars.util.event.Topic;
@@ -113,10 +113,10 @@ public class WaveCapture implements Runnable {
         //                };
 
 
-        rawWave = new Plot2D.Series("Audio") {
+        rawWave = new Plot2D.Series("Audio", 1) {
 
             @Override
-            public void update(int maxHistory) {
+            public void update() {
                 history.clear();
 
                 float[] samples = WaveCapture.this.samples;
@@ -148,10 +148,10 @@ public class WaveCapture implements Runnable {
             }
 
         };
-        wavelet1d = new Plot2D.Series("Wavelet") {
+        wavelet1d = new Plot2D.Series("Wavelet", 1) {
 
             @Override
-            public void update(int maxHistory) {
+            public void update() {
                 float[] ss = samples;
                 if (ss == null) return;
                 //samples[0] = null;

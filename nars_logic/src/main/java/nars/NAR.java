@@ -503,16 +503,12 @@ public abstract class NAR implements Level, Consumer<Task> {
             //beforeNextFrame( //<-- enqueue after this frame, before next
             new Execution(this, goal, tt).run();
 
-            if (!inputGoal.isEternal()) {
-                //execution drains temporal task's budget in proportion to durability
-                Budget inputGoalBudget = inputGoal.budget();
-                inputGoalBudget.priMult(1f - inputGoalBudget.dur());
-            }
+//            if (!inputGoal.isEternal()) {
+//                //execution drains temporal task's budget in proportion to durability
+//                Budget inputGoalBudget = inputGoal.budget();
+//                inputGoalBudget.priMult(1f - inputGoalBudget.dur());
+//            }
 
-        }
-
-        if (goal != inputGoal) {
-            memory.remove(goal, executed ? "Executed Projected Goal" : "Unexecuted Projected Goal");
         }
 
         return executed;

@@ -167,11 +167,11 @@ public class Default extends AbstractNAR {
 
 
     @Override public final float conceptPriority(Termed termed, float priIfNonExistent) {
-        Concept cc = memory.concept(termed);
+        Concept cc = concept(termed);
         if (cc != null) {
             BLink<Concept> c = core.active.get(cc);
             if (c != null)
-                return c.pri();
+                return c.priIfFiniteElse(priIfNonExistent);
         }
         return priIfNonExistent;
     }

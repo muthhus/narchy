@@ -25,6 +25,7 @@ import nars.budget.Budget;
 import nars.budget.BudgetedHandle;
 import nars.concept.Concept;
 import nars.guifx.*;
+import nars.guifx.chart.Plot2D;
 import nars.guifx.graph2.ConceptsSource;
 import nars.guifx.graph2.TermEdge;
 import nars.guifx.graph2.impl.HalfHalfLineCanvasEdgeRenderer;

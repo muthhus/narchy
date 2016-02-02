@@ -21,29 +21,29 @@ public class ItemAccumulatorTest {
 
     @Test
     public void testAccumulatorDeduplication() {
-        TaskAccumulator ii = new TaskAccumulator(
+        ItemAccumulator<Task> ii = new ItemAccumulator<Task>(
                 2 //capacity = 2 but this test will only grow to size 1 if successful
         );
 
-        ii.getArrayBag().merge(BudgetMerge.plusDQDominant);
+        ii.bag().merge(BudgetMerge.plusDQDominant);
 
-        assertEquals(0, ii.getArrayBag().size());
+        assertEquals(0, ii.bag().size());
 
         Task t = n.task("$0.1$ <a --> b>. %1.00;0.90%");
         assertEquals(0.1f, t.pri(), 0.001);
 
-        ii.getArrayBag().put(t);
-        assertEquals(1, ii.getArrayBag().size());
+        ii.bag().put(t);
+        assertEquals(1, ii.bag().size());
 
-        ii.getArrayBag().put(t);
-        assertEquals(1, ii.getArrayBag().size());
+        ii.bag().put(t);
+        assertEquals(1, ii.bag().size());
 
-        ii.getArrayBag().commit();
+        ii.bag().commit();
 
-        ii.getArrayBag().forEach(c -> System.out.println(c));
+        ii.bag().forEach(c -> System.out.println(c));
 
         //mergePlus:
-        assertEquals(0.1f+0.1f, ii.getArrayBag().sample().pri(), 0.001f);
+        assertEquals(0.1f+0.1f, ii.bag().sample().pri(), 0.001f);
 
     }
 
@@ -54,7 +54,7 @@ public class ItemAccumulatorTest {
 
         int capacity = 4;
 
-        TaskAccumulator ii = new TaskAccumulator(
+        ItemAccumulator<Task> ii = new ItemAccumulator<Task>(
                 capacity
         );
 
@@ -62,35 +62,35 @@ public class ItemAccumulatorTest {
         String s = ". %1.00;0.90%";
         Task n1 = n.task("$0.05$ <z-->x>" + s);
 
-        ii.getArrayBag().put(n1);
-        ii.getArrayBag().put(n.task("$0.09$ <a-->x>" + s ));
-        ii.getArrayBag().put(n.task("$0.1$ <b-->x>" + s ));
-        ii.getArrayBag().put(n.task("$0.2$ <c-->x>" + s ));
-        ii.getArrayBag().put(n.task("$0.3$ <d-->x>" + s ));
-        ii.getArrayBag().commit();
-        assertEquals(4, ii.getArrayBag().size());
+        ii.bag().put(n1);
+        ii.bag().put(n.task("$0.09$ <a-->x>" + s ));
+        ii.bag().put(n.task("$0.1$ <b-->x>" + s ));
+        ii.bag().put(n.task("$0.2$ <c-->x>" + s ));
+        ii.bag().put(n.task("$0.3$ <d-->x>" + s ));
+        ii.bag().commit();
+        assertEquals(4, ii.bag().size());
 
         //z should be ignored
         //List<Task> buffer = Global.newArrayList();
 
 
-        assertEquals(capacity, ii.getArrayBag().size());
+        assertEquals(capacity, ii.bag().size());
 
-        assertTrue(ii.getArrayBag().isSorted());
+        assertTrue(ii.bag().isSorted());
 
         //System.out.println(ii);
-        ii.getArrayBag().forEach(x -> System.out.println(x));
+        ii.bag().forEach(x -> System.out.println(x));
 
-        BLink<Task> oneLink = ii.getArrayBag().pop();
+        BLink<Task> oneLink = ii.bag().pop();
         Task one = oneLink.get();
         assertEquals("$.30;.50;.95$ (d-->x). :0: %1.0;.90%", one.toString());
 
         List<Task> two = new ArrayList();
-        two.add(ii.getArrayBag().pop().get());
-        two.add(ii.getArrayBag().pop().get());
+        two.add(ii.bag().pop().get());
+        two.add(ii.bag().pop().get());
         assertEquals("[$.20;.50;.95$ (c-->x). :0: %1.0;.90%, $.10;.50;.95$ (b-->x). :0: %1.0;.90%]", two.toString());
 
-        assertEquals(1, ii.getArrayBag().size());
+        assertEquals(1, ii.bag().size());
 
 //        ii.update(capacity, buffer);
 //        System.out.println(buffer);
@@ -108,25 +108,25 @@ public class ItemAccumulatorTest {
 
         int capacity = 8;
 
-        TaskAccumulator ii = new TaskAccumulator(capacity);
-        assertTrue(ii.getArrayBag().isSorted());
+        ItemAccumulator<Task> ii = new ItemAccumulator<Task>(capacity);
+        assertTrue(ii.bag().isSorted());
 
         for (int i = 0; i < capacity - 1; i++) {
-            ii.getArrayBag().put($.$("a:" + i, '?').budget( (float)Math.random() * 0.95f, 0.5f, 0.5f));
+            ii.bag().put($.$("a:" + i, '?').budget( (float)Math.random() * 0.95f, 0.5f, 0.5f));
         }
 
-        ii.getArrayBag().commit();
+        ii.bag().commit();
 
         MutableDouble prev = new MutableDouble(Double.POSITIVE_INFINITY);
 
-        ii.getArrayBag().forEach( (Budgeted t) -> {
+        ii.bag().forEach( (Budgeted t) -> {
             float p = t.budget().pri();
             assertTrue(p <= prev.floatValue()); //decreasing
             prev.set(p);
         });
 
         //this will use an Iterator to determine sorting
-        assertTrue(ii.getArrayBag().isSorted());
+        assertTrue(ii.bag().isSorted());
     }
 
     @Test public void testRankDurQuaForEqualPri() {   }
@@ -137,14 +137,14 @@ public class ItemAccumulatorTest {
 
         int capacity = 8;
 
-        TaskAccumulator ii = new TaskAccumulator(capacity);
+        ItemAccumulator<Task> ii = new ItemAccumulator<Task>(capacity);
 
         for (int i = 0; i < capacity-1; i++) {
             float dur = i * 0.05f;
-            ii.getArrayBag().put($.$("a:" + i, '?').budget(0.5f, dur, 0.5f));
+            ii.bag().put($.$("a:" + i, '?').budget(0.5f, dur, 0.5f));
         }
 
-        assertTrue(ii.getArrayBag().isSorted());
+        assertTrue(ii.bag().isSorted());
 
         ii.print(System.out);
 

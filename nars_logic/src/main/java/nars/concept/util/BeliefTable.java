@@ -178,11 +178,11 @@ public interface BeliefTable extends TaskTable {
 
 
     static public float rankTemporalByOriginality(@NotNull Task b, long when, float duration) {
-        return rankEternalByOriginalty(b)
+        return rankEternalByOriginality(b)
                 /(1f+ (Math.abs(b.occurrence() - when)/duration));
     }
 
-    static public float rankEternalByOriginalty(@NotNull Task b) {
+    static public float rankEternalByOriginality(@NotNull Task b) {
         return or(b.conf(), b.originality());
     }
 

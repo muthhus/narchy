@@ -1,7 +1,8 @@
 package nars.guifx;
 
 import nars.NAR;
-import nars.guifx.demo.PlotBox;
+import nars.guifx.chart.Plot2D;
+import nars.guifx.chart.PlotBox;
 import nars.util.event.FrameReaction;
 import nars.util.meter.MemoryBudget;
 

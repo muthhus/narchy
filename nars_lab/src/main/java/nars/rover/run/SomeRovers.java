@@ -4,7 +4,6 @@ import javassist.scopedpool.SoftValueHashMap;
 import nars.Global;
 import nars.Memory;
 import nars.guifx.NARfx;
-import nars.guifx.demo.NARide;
 import nars.nar.Default;
 import nars.op.mental.Anticipate;
 import nars.rover.RoverWorld;
@@ -49,7 +48,7 @@ public class SomeRovers {
 
         if (addNARRover)
         {
-            int conceptsFirePerCycle = 2;
+            int conceptsFirePerCycle = 3;
             Default nar = new Default(
                     new Memory(clock, new MapIndex2(
                             new SoftValueHashMap())),
@@ -71,14 +70,14 @@ public class SomeRovers {
             //nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
             nar.memory.duration.set(8);
             nar.memory.conceptForgetDurations.setValue(3);
-            nar.memory.cyclesPerFrame.set(16);
+            nar.memory.cyclesPerFrame.set(8);
             nar.memory.shortTermMemoryHistory.set(3);
             //nar.memory.executionExpectationThreshold.setValue(0.95f);
 
 
             boolean gui = true;
             if (gui) {
-                NARide.loop(nar, false);
+                //NARide.loop(nar, false);
 
                 NARfx.run( () -> {
 //                    NARide.newIDE(nar.loop(), (i) -> {

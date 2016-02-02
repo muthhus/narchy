@@ -1,8 +1,7 @@
-package nars.guifx.demo;
+package nars.guifx.chart;
 
 import javafx.scene.Node;
 import javafx.scene.layout.VBox;
-import nars.guifx.Plot2D;
 
 /**
  * Created by me on 10/11/15.

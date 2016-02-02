@@ -67,6 +67,10 @@ public class Execution implements Runnable {
             return null;
         }
 
+        if (goal.isDeleted()) {
+            throw new RuntimeException("goal deleted");
+        }
+
         return (MutableTask) new MutableTask(inh)
                 .judgment()  //with default truth value
                 .tense(tense, nar.memory)

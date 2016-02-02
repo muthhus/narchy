@@ -1,6 +1,5 @@
 package nars.budget;
 
-import nars.Global;
 import nars.util.data.Util;
 
 /**
@@ -9,20 +8,31 @@ import nars.util.data.Util;
 @FunctionalInterface
 public interface BudgetMerge {
 
-    BudgetMerge plusDQBlend = (tgt, src, srcScale) -> {
+    static void dqBlend(Budget tgt, Budget src, float srcScale, boolean addOrAvgPri) {
         float incomingPri = src.pri() * srcScale;
 
         float currentPri = tgt.priIfFiniteElseZero();
 
         float sumPri = currentPri + incomingPri;
 
-        /* current proportion */
-        float cp = currentPri / sumPri;
-        float ip = 1f - cp;
+        float cp = currentPri / sumPri; // current proportion
+        float ip = 1f - cp; // inverse proportion
 
-        tgt.budget( sumPri,
-                cp * tgt.dur() + ip * src.dur(),
-                cp * tgt.qua() + ip * src.qua());
+        tgt.budget(addOrAvgPri ?
+                        sumPri :
+                        ((cp * currentPri) + (ip * incomingPri)),
+                (cp * tgt.dur()) + (ip * src.dur()),
+                (cp * tgt.qua()) + (ip * src.qua()));
+    }
+
+    /** sum priority, LERP other components in proportion to the priorities */
+    BudgetMerge plusDQBlend = (tgt, src, srcScale) -> {
+        dqBlend(tgt, src, srcScale, true);
+    };
+
+    /** avg priority, LERP other components in proportion to the priorities */
+    BudgetMerge avgDQBlend = (tgt, src, srcScale) -> {
+        dqBlend(tgt, src, srcScale, false);
     };
 
     /** merge 'incoming' budget (scaled by incomingScale) into 'existing' */
@@ -94,30 +104,7 @@ public interface BudgetMerge {
 //        );
 //    }
 
-    /** LERP average proportional to priority change */
-    BudgetMerge avg = (tgt, src, srcScaleIgnored) -> {
 
-        float currentPriority = tgt.pri();
-
-        float otherPriority = src.pri();
-
-        float prisum = (currentPriority + otherPriority);
-
-
-        /* current proportion */
-        float cp = (Util.equal(prisum, 0, Global.BUDGET_PROPAGATION_EPSILON)) ?
-                0.5f : /* both are zero so they have equal infleunce */
-                (currentPriority / prisum);
-
-        /* next proportion */
-        float np = 1.0f - cp;
-
-        tgt.budget(
-                cp * currentPriority + np * otherPriority,
-                cp * tgt.dur() + np * src.dur(),
-                cp * tgt.qua() + np * src.qua()
-        );
-    };
 //    /**
 //     * merges another budget into this one, averaging each component
 //     */

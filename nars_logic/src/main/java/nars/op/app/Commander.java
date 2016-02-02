@@ -3,7 +3,7 @@ package nars.op.app;
 import com.google.common.collect.Iterators;
 import nars.NAR;
 import nars.bag.BLink;
-import nars.budget.TaskAccumulator;
+import nars.budget.ItemAccumulator;
 import nars.concept.Concept;
 import nars.nal.Tense;
 import nars.task.Task;
@@ -30,7 +30,7 @@ import java.util.function.Supplier;
  */
 public class Commander implements Consumer<NAR>, Supplier<Concept> {
 
-    public final TaskAccumulator commands;
+    public final ItemAccumulator<Task> commands;
     @NotNull
     public final Iterator<BLink<Task>> commandIterator;
     public final LinkedHashSet<Concept> concepts = new LinkedHashSet();
@@ -53,10 +53,10 @@ public class Commander implements Consumer<NAR>, Supplier<Concept> {
 //            priorityRemaining = 0; //change left over from last cycle
 
     public Commander(@NotNull NAR nar, int capacity) {
-        this(nar, new TaskAccumulator(capacity));
+        this(nar, new ItemAccumulator<Task>(capacity));
     }
 
-    public Commander(@NotNull NAR nar, TaskAccumulator buffer) {
+    public Commander(@NotNull NAR nar, ItemAccumulator<Task> buffer) {
 
         this.nar = nar;
 
@@ -66,7 +66,7 @@ public class Commander implements Consumer<NAR>, Supplier<Concept> {
                 //: null;
 
         commands = buffer;
-        commandIterator = Iterators.cycle(commands.getArrayBag());
+        commandIterator = Iterators.cycle(commands.bag());
 
 
         maxTemporalBeliefAge = nar.memory.duration() * maxTemporalBeliefDurations;
@@ -74,7 +74,7 @@ public class Commander implements Consumer<NAR>, Supplier<Concept> {
 
         nar.memory.eventInput.on((tp) -> {
             Task t = tp.task();
-            if (t.isInput() && !commands.getArrayBag().contains(t))
+            if (t.isInput() && !commands.bag().contains(t))
                 input(t);
         });
     }
@@ -91,7 +91,7 @@ public class Commander implements Consumer<NAR>, Supplier<Concept> {
 
     protected void input(@NotNull Task t) {
         if (/*(t.isGoal() || t.isQuestOrQuestion()) && */ t.isInput()) {
-            commands.getArrayBag().put(t);
+            commands.bag().put(t);
         }
     }
 
@@ -102,7 +102,7 @@ public class Commander implements Consumer<NAR>, Supplier<Concept> {
         //TODO iterate tasks until allotted priority has been reached,
         //  TaskProcess each
 
-        int cs = commands.getArrayBag().size();
+        int cs = commands.bag().size();
         if (cs == 0) return;
 
 
@@ -148,11 +148,11 @@ public class Commander implements Consumer<NAR>, Supplier<Concept> {
     }
 
     public boolean isEmpty() {
-        return this.commands.getArrayBag().isEmpty();
+        return this.commands.bag().isEmpty();
     }
 
     public int size() {
-        return this.commands.getArrayBag().size();
+        return this.commands.bag().size();
     }
 
     //TODO getBufferPrioritySum

@@ -1,12 +1,14 @@
-package nars.guifx;
+package nars.guifx.chart;
 
 import com.gs.collections.api.block.function.primitive.DoubleToDoubleFunction;
+import com.gs.collections.api.block.procedure.primitive.FloatProcedure;
 import com.gs.collections.impl.list.mutable.primitive.FloatArrayList;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.paint.Color;
 import nars.Global;
+import nars.guifx.NARfx;
 import nars.guifx.util.ColorMatrix;
 import nars.guifx.util.NControl;
 import org.apache.commons.math3.util.FastMath;
@@ -26,21 +28,50 @@ public class Plot2D extends NControl/*Canvas */ implements Runnable {
 
     public static final ColorMatrix ca = new ColorMatrix(17, 1, (x, y) -> Color.hsb(x * 360.0, 0.6f, y * 0.5 + 0.5));
 
-    public abstract static class Series {
+    public static abstract class Series {
         public final FloatArrayList history = new FloatArrayList(); //TODO make Float
         final String name;
         final Color color; //main color
+
+        /** history size */
+        private final int capacity;
+        private final FloatProcedure rangeFinder;
 
         protected transient double minValue;
         protected transient double maxValue;
 
         @SuppressWarnings("ConstructorNotProtectedInAbstractClass")
-        public Series(String name) {
+        public Series(String name, int capacity) {
             this.name = name;
-            color = NARfx.hashColor(name, ca);
+            this.color = NARfx.hashColor(name, ca);
+            this.capacity = capacity;
+            this.rangeFinder = v -> {
+                if (v < minValue) minValue = v;
+                if (v > maxValue) maxValue = v;
+                //mean += v;
+            };
         }
 
-        public abstract void update(int maxHistory);
+
+        public abstract void update();
+
+        protected void push(float d) {
+            if (Float.isFinite(d))
+                history.add(d);
+        }
+
+        protected void autorange() {
+            minValue = Float.POSITIVE_INFINITY;
+            maxValue = Float.NEGATIVE_INFINITY;
+            history.forEach(rangeFinder);
+        }
+
+        protected void limit() {
+            FloatArrayList h = this.history;
+            int over = h.size() - this.capacity;
+            for (int i = 0; i < over; i++)
+                h.removeAtIndex(0);
+        }
 
     }
 
@@ -75,34 +106,31 @@ public class Plot2D extends NControl/*Canvas */ implements Runnable {
         return this;
     }
 
-    public Plot2D add(String name, DoubleSupplier valueFunc) {
-        add(new Series(name) {
-
-            @Override
-            public void update(int maxHistory) {
-                while (history.size() > maxHistory)
-                    history.removeAtIndex(0);
-
-
-                double d = valueFunc.getAsDouble();
-                if (Double.isFinite(d))
-                    history.add((float) d);
-
-                minValue = Float.POSITIVE_INFINITY;
-                maxValue = Float.NEGATIVE_INFINITY;
-
-                history.forEach(v -> {
-                    if (Double.isFinite(v)) {
-                        if (v < minValue) minValue = v;
-                        if (v > maxValue) maxValue = v;
-                    }
-                    //mean += v;
-                });
+    public Plot2D add(String name, DoubleSupplier valueFunc, float min, float max) {
+        Series s;
+        add(s = new Series(name, maxHistory) {
+            @Override public void update() {
+                limit();
+                push((float)valueFunc.getAsDouble());
             }
+        });
+        s.minValue = min;
+        s.maxValue = max;
+        return this;
+    }
 
+    public Plot2D add(String name, DoubleSupplier valueFunc) {
+        add(new Series(name, maxHistory) {
+            @Override public void update() {
+                limit();
+                push((float)valueFunc.getAsDouble());
+                autorange();
+            }
         });
         return this;
     }
+
+
 
     @Override
     public void run() {
@@ -227,8 +255,7 @@ public class Plot2D extends NControl/*Canvas */ implements Runnable {
     };
 
     protected void updateSeries() {
-        int mh = maxHistory;
-        series.forEach(s -> s.update(mh));
+        series.forEach(s -> s.update());
 
         minValue = Float.POSITIVE_INFINITY;
         maxValue = Float.NEGATIVE_INFINITY;
