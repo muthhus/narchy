@@ -26,6 +26,7 @@ import nars.nal.UtilityFunctions;
 import nars.task.Task;
 import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import static java.lang.Math.abs;
 
@@ -101,34 +102,39 @@ public final class TruthFunctions extends UtilityFunctions {
      * @param b Truth value of the second premise
      * @return Truth value of the conclusion
      */
-    @NotNull
-    public static Truth revision(@NotNull Truth a, @NotNull Truth b) {
-        float f1 = a.freq();
-        float f2 = b.freq();
+    @Nullable
+    public static Truth revision(@NotNull Truth a, @NotNull Truth b, float match, float confThreshold) {
         float w1 = c2w(a.conf());
         float w2 = c2w(b.conf());
-        float w = w1 + w2;
+        float w = (w1 + w2);
+        float newConf = w2c(w * match);
+        if (newConf < confThreshold + Global.TRUTH_EPSILON/2f)
+            return null;
+
+        float f1 = a.freq();
+        float f2 = b.freq();
+
         return new DefaultTruth(
                 (w1 * f1 + w2 * f2) / w,
-                w2c(w)
+                newConf
         );
     }
-    @NotNull
-    public static Truth revision(@NotNull Task ta, @NotNull Task tb, long now) {
+
+    @Nullable
+    public static Truth revision(@NotNull Task ta, @NotNull Task tb, long now, float match, float confThreshold) {
         Truth a = ta.truth();
         Truth b = tb.truth();
 
-        if (a.equals(b)) return a;
-
-        float f1 = a.freq();
-        float f2 = b.freq();
-
-        float w1 = c2w(a.conf());
-        float w2 = c2w(b.conf());
-
-        //temporal proximity metric (similar to projection)
         long at = ta.occurrence();
         long bt = tb.occurrence();
+        float w1 = c2w(a.conf());
+        float w2 = c2w(b.conf());
+        float w = (w1 + w2);
+        float newConf = w2c(w * TruthFunctions.temporalProjection(at, bt, now) * match);
+        if (newConf < confThreshold + Global.TRUTH_EPSILON/2f) return null;
+
+        //temporal proximity balancing metric (similar to projection). does not affect 'w' the total used to compute confidence
+
         if (at != bt) {
             long adt = Math.abs(at-now);
             long bdt = Math.abs(bt-now);
@@ -139,11 +145,11 @@ public final class TruthFunctions extends UtilityFunctions {
             }
         }
 
-        float w = w1 + w2;
-
+        float f1 = a.freq();
+        float f2 = b.freq();
         return new DefaultTruth(
             (w1 * f1 + w2 * f2) / w,
-            w2c(w) * TruthFunctions.temporalProjection(at, bt, now)
+            newConf
         );
     }
 

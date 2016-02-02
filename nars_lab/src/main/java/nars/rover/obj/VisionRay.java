@@ -44,8 +44,12 @@ abstract public class VisionRay extends RayCastClosestCallback implements Abstra
     private Vec2 root = new Vec2();
     private Vec2 target = new Vec2();
 
+    //final Sensor sensor;
+
     public VisionRay(Vec2 point, float angle, float arc, AbstractPolygonBot bot, float length, int resolution) {
         this.bot = bot;
+
+        //this.sensor = new Sensor();
 
         this.point = point;
         this.angle = angle;

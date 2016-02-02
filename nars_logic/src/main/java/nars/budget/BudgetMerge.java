@@ -8,7 +8,7 @@ import nars.util.data.Util;
 @FunctionalInterface
 public interface BudgetMerge {
 
-    static void dqBlend(Budget tgt, Budget src, float srcScale, boolean addOrAvgPri) {
+    static void dqBlendByPri(Budget tgt, Budget src, float srcScale, boolean addOrAvgPri) {
         float incomingPri = src.pri() * srcScale;
 
         float currentPri = tgt.priIfFiniteElseZero();
@@ -16,23 +16,45 @@ public interface BudgetMerge {
         float sumPri = currentPri + incomingPri;
 
         float cp = currentPri / sumPri; // current proportion
+
+        dqBlend(tgt, src, addOrAvgPri ?
+                sumPri :
+                ((cp * currentPri) + ((1f-cp) * incomingPri)), cp);
+    }
+    static void dqBlendBySummary(Budget tgt, Budget src, float srcScale, boolean addOrAvgPri) {
+        float incomingPri = src.pri() * srcScale;
+        float incomingSummary = src.summary() * srcScale;
+
+        float currentPri = tgt.priIfFiniteElseZero();
+        float currentSummary = tgt.summary();
+
+        float sumSummary = currentSummary + incomingSummary;
+
+        float cp = currentSummary / sumSummary; // current proportion
+
+        dqBlend(tgt, src, addOrAvgPri ?
+                currentPri + incomingPri :
+                ((cp * currentPri) + ((1f-cp) * incomingPri)), cp);
+    }
+
+    static void dqBlend(Budget tgt, Budget src, float nextPri, float cp) {
         float ip = 1f - cp; // inverse proportion
 
-        tgt.budget(addOrAvgPri ?
-                        sumPri :
-                        ((cp * currentPri) + (ip * incomingPri)),
+        tgt.budget(nextPri,
                 (cp * tgt.dur()) + (ip * src.dur()),
                 (cp * tgt.qua()) + (ip * src.qua()));
     }
 
     /** sum priority, LERP other components in proportion to the priorities */
     BudgetMerge plusDQBlend = (tgt, src, srcScale) -> {
-        dqBlend(tgt, src, srcScale, true);
+        //dqBlendByPri(tgt, src, srcScale, true);
+        dqBlendBySummary(tgt, src, srcScale, true);
     };
 
     /** avg priority, LERP other components in proportion to the priorities */
     BudgetMerge avgDQBlend = (tgt, src, srcScale) -> {
-        dqBlend(tgt, src, srcScale, false);
+        //dqBlend(tgt, src, srcScale, false);
+        dqBlendBySummary(tgt, src, srcScale, false);
     };
 
     /** merge 'incoming' budget (scaled by incomingScale) into 'existing' */

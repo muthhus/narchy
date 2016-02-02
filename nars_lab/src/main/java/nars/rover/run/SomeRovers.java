@@ -7,6 +7,7 @@ import nars.Global;
 import nars.Memory;
 import nars.guifx.NARfx;
 import nars.nar.Default;
+import nars.op.mental.Anticipate;
 import nars.rover.RoverWorld;
 import nars.rover.Sim;
 import nars.rover.robot.NARover;
@@ -25,7 +26,7 @@ public class SomeRovers {
 
     public static void main(String[] args) {
 
-        Global.DEBUG = Global.EXIT_ON_EXCEPTION = false;
+        Global.DEBUG = Global.EXIT_ON_EXCEPTION = true;
 
 
         //world = new ReactorWorld(this, 32, 48, 48*2);
@@ -49,7 +50,7 @@ public class SomeRovers {
 
         if (addNARRover)
         {
-            int conceptsFirePerCycle = 3;
+            int conceptsFirePerCycle = 2;
             Default nar = new Default(
                     new Memory(clock, new MapIndex2(
                             new SoftValueHashMap())),
@@ -63,7 +64,7 @@ public class SomeRovers {
 //            nar.memory.DEFAULT_QUESTION_DURABILITY = 0.6f;
 
             //nar.initNAL9();
-            //nar.memory.the(new Anticipate(nar));
+            nar.memory.the(new Anticipate(nar));
 
 
             //nar.memory.perfection.setValue(0.15f);
@@ -72,9 +73,9 @@ public class SomeRovers {
             //nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
             nar.core.activationRate.setValue(0.5f);
 
-            nar.memory.duration.set(3);
+            nar.memory.duration.set(2);
             nar.memory.conceptForgetDurations.setValue(2);
-            nar.memory.cyclesPerFrame.set(8);
+            nar.memory.cyclesPerFrame.set(3);
             nar.memory.shortTermMemoryHistory.set(3);
             //nar.memory.executionExpectationThreshold.setValue(0.95f);
 
@@ -127,7 +128,7 @@ public class SomeRovers {
 //            game.add(new CarefulRover("r2", nar));
 //        }
 
-        float fps = 50;
+        float fps = 30;
         game.run(fps);
 
     }

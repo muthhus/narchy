@@ -148,7 +148,7 @@ public class Plot2D extends NControl/*Canvas */  {
     @Override
     public void run() {
 
-        if (!ready.compareAndSet(false, true))
+        if (ready.get() != false)
             return;
 
         List<Series> series = this.series;
@@ -170,6 +170,7 @@ public class Plot2D extends NControl/*Canvas */  {
             pv.draw(series, g, minValue, maxValue);
         }
 
+        ready.set(true);
 
     }
 

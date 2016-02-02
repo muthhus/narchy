@@ -177,11 +177,6 @@ public interface BeliefTable extends TaskTable {
     }
 
 
-    static public float rankTemporalByOriginality(@NotNull Task b, long when, float duration) {
-        return rankEternalByOriginality(b)
-                /(1f+ (Math.abs(b.occurrence() - when)/duration));
-    }
-
     static public float rankEternalByOriginality(@NotNull Task b) {
         return or(b.conf(), b.originality());
     }
@@ -275,12 +270,13 @@ public interface BeliefTable extends TaskTable {
 //    }
 
 
-    static float relevance(Task t, long time, float dur) {
+    /** temporal relevance */
+    static float relevance(Task t, long time, float ageFactor) {
         long o = t.occurrence();
 
         if (o == Tense.ETERNAL) return 0.5f; //weight eternal half as much as temporal; similar to a horizon heuristic
 
-        return 1f / (1f + Math.abs(o - time)/dur);
+        return 1f / (1f + Math.abs(o - time)*ageFactor);
     }
 
 
@@ -314,12 +310,12 @@ public interface BeliefTable extends TaskTable {
      *
      * @param t
      * @param time
-     * @param dur effectively a ratio for trading off confidence against time
+     * @param ageFactor effectively a ratio for trading off confidence against time
      * @return
      */
-    static float rankTemporalByConfidence(Task t, long time, float dur) {
+    static float rankTemporalByConfidence(Task t, long time, float ageFactor) {
         return
-            t.conf() * BeliefTable.relevance(t, time, dur)
+            t.conf() * BeliefTable.relevance(t, time, ageFactor)
         ;
     }
 

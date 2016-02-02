@@ -33,9 +33,7 @@ import nars.truth.Truthed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.Serializable;
 import java.lang.ref.Reference;
-import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -44,8 +42,8 @@ import java.util.function.Supplier;
 import static nars.Global.dereference;
 import static nars.nal.LocalRules.solutionBudget;
 import static nars.nal.Tense.TIMELESS;
-import static nars.truth.TruthFunctions.eternalize;
-import static nars.truth.TruthFunctions.temporalProjection;
+import static nars.nal.UtilityFunctions.w2c;
+import static nars.truth.TruthFunctions.*;
 
 /**
  * A task to be processed, consists of a Sentence and a BudgetValue.
@@ -204,7 +202,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         if (solTruth == null)
             return null;
 
-        solTruth = solTruth.withConfMult(termRelevance);
+        solTruth = solTruth.withConf( w2c(c2w(solTruth.conf())* termRelevance ) );
 
         Budget solutionBudget = solutionBudget(question, this, solTruth, memory);
         if (solutionBudget == null)
@@ -810,7 +808,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
             long nextOcc = targetTime;
 
             float projConf = nextConf =
-                    conf * temporalProjection(occ, targetTime, now);
+                    w2c(c2w(conf) * temporalProjection(occ, targetTime, now));
 
             if (eternalizeIfWeaklyTemporal) {
                 float eternConf = eternalize(conf);
@@ -825,17 +823,17 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         }
     }
 
-    final class ExpectationComparator implements Comparator<Task>, Serializable {
-        static final Comparator the = new ExpectationComparator();
-        @Override public int compare(@NotNull Task b, @NotNull Task a) {
-            return Float.compare(a.expectation(), b.expectation());
-        }
-    }
-
-    final class ConfidenceComparator implements Comparator<Task>, Serializable {
-        static final Comparator the = new ExpectationComparator();
-        @Override public int compare(@NotNull Task b, @NotNull Task a) {
-            return Float.compare(a.conf(), b.conf());
-        }
-    }
+//    final class ExpectationComparator implements Comparator<Task>, Serializable {
+//        static final Comparator the = new ExpectationComparator();
+//        @Override public int compare(@NotNull Task b, @NotNull Task a) {
+//            return Float.compare(a.expectation(), b.expectation());
+//        }
+//    }
+//
+//    final class ConfidenceComparator implements Comparator<Task>, Serializable {
+//        static final Comparator the = new ExpectationComparator();
+//        @Override public int compare(@NotNull Task b, @NotNull Task a) {
+//            return Float.compare(a.conf(), b.conf());
+//        }
+//    }
 }
