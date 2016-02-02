@@ -53,10 +53,13 @@ public class ConceptPane extends BorderPane implements ChangeListener {
     private final NAR nar;
     private final BeliefTablePane tasks;
     private final Plot2D budgetGraph;
+    private final Term term;
     //    private final Scatter3D tasks;
 //    private final BagView<Task> taskLinkView;
 //    private final BagView<Term> termLinkView;
     private FrameReaction reaction;
+
+    private transient Concept currentConcept; //caches current value, updated on each frame
 
     public abstract static class Scatter3D<X> extends SpaceNet {
 
@@ -254,14 +257,14 @@ public class ConceptPane extends BorderPane implements ChangeListener {
         }
     }
 
-    public ConceptPane(NAR nar, Concept c) {
+    public ConceptPane(NAR nar, Termed conceptTerm) {
         super();
 
-        //concept = c;
+        this.term = conceptTerm.term();
         this.nar = nar;
 
 
-        setTop(new Label(c.toString()));
+        setTop(new Label(conceptTerm.toString()));
 
 
 
@@ -326,11 +329,12 @@ public class ConceptPane extends BorderPane implements ChangeListener {
 //        setCenter(new SplitPane(new BorderPane(links), tasks.content));
 
 
-        tasks = new BeliefTablePane(nar, c);
+        tasks = new BeliefTablePane(nar);
 
         budgetGraph = new Plot2D(Plot2D.Line, 64, 64.0);
         budgetGraph.add("Pri", () -> {
-           return nar.conceptPriority(c, 0);
+            Concept cc = currentConcept;
+            return cc != null ? nar.conceptPriority(cc, 0) : 0;
         }, 0, 1f);
 
 
@@ -413,7 +417,8 @@ public class ConceptPane extends BorderPane implements ChangeListener {
         /*taskLinkView.frame();
         termLinkView.frame();*/
 
-        tasks.frame(now);
+        Concept c = currentConcept = nar.concept(this.term);
+        tasks.frame(c, now);
 
         budgetGraph.update();
     }
@@ -463,7 +468,6 @@ public class ConceptPane extends BorderPane implements ChangeListener {
 
     public static class BeliefTablePane extends BorderPane {
         final Canvas eternal, temporal;
-        private final Term concept;
 
         final static ColorMatrix beliefColors = new ColorMatrix(8,8,(f,c)->
             new Color(0.6f, 0.25f, 1f, 0.25f + 0.6f * c)
@@ -486,12 +490,10 @@ public class ConceptPane extends BorderPane implements ChangeListener {
                 ge.fillRect(x-w/4,y-h/2,w/2,h);
             }
         };
-        private final NAR nar;
 
-        public BeliefTablePane(NAR n, Termed c) {
+        public BeliefTablePane(NAR n) {
             super();
-            this.nar = n;
-            this.concept = c.term();
+
             eternal = new Canvas(75, 75);
             temporal = new Canvas(200, 75);
 
@@ -499,8 +501,7 @@ public class ConceptPane extends BorderPane implements ChangeListener {
             setLeft(eternal);
         }
 
-        public void frame(long now) {
-            Concept concept = nar.concept(this.concept);
+        public void frame(Concept concept, long now) {
 
             //redraw
             GraphicsContext ge = eternal.getGraphicsContext2D();
@@ -508,11 +509,12 @@ public class ConceptPane extends BorderPane implements ChangeListener {
             float geh = (float) ge.getCanvas().getHeight();
             ge.clearRect(0, 0, gew, geh);
 
-
             GraphicsContext te = temporal.getGraphicsContext2D();
             float tew = (float) te.getCanvas().getWidth();
             float teh = (float) te.getCanvas().getHeight();
             te.clearRect(0, 0, tew, teh);
+
+            if (concept == null) return;
 
             //compute bounds from combined min/max of beliefs and goals so they align correctly
             long minT = Long.MAX_VALUE;
@@ -557,28 +559,32 @@ public class ConceptPane extends BorderPane implements ChangeListener {
             float b = 4; //border
 
             //Present axis line
-            float nowLineWidth = 3;
-            float nx = xTime(tew, b, minT, maxT, now, nowLineWidth);
-            te.setFill(Color.WHITE);
-            te.fillRect(nx - nowLineWidth / 2f, 0, nowLineWidth, teh);
+            if ((now <= maxT) && (now >= minT)) {
+                float nowLineWidth = 3;
+                float nx = xTime(tew, b, minT, maxT, now, nowLineWidth);
+                te.setFill(Color.WHITE);
+                te.fillRect(nx - nowLineWidth / 2f, 0, nowLineWidth, teh);
+            }
 
             float w = 10;
             float h = 10;
             for (Task t : table) {
-                if (t.isEternal() && t.truth() != null) {
-                    float f = t.freq();
-                    float c = t.conf();
-                    float x = b + (gew - 2 * b - w) * c;
-                    float y = b + (geh - 2 * b - h) * (1 - f);
-                    r.renderTask(ge, f, c, w, h, x, y);
-                } else if (!t.isEternal() && t.truth() != null) {
-                    float f = t.freq();
-                    float cc = t.conf();
+                float f = t.freq();
+                float cc = t.conf();
+                float eh, x;
+                GraphicsContext g;
+                if (t.isEternal()) {
+                    eh = geh;
+                    x = b + (gew - b - w) * cc;
+                    g = ge;
+                } else  {
+                    eh = teh;
                     float o = t.occurrence();
-                    float x = xTime(tew, b, minT, maxT, o, w);
-                    float y = b + (teh - 2 * b - h) * (1 - f);
-                    r.renderTask(te, f, cc, w, h, x, y);
+                    x = xTime(tew, b, minT, maxT, o, w);
+                    g = te;
                 }
+                float y = b + (eh - b - h) * (1 - f);
+                r.renderTask(g, f, cc, w, h, x, y);
 
             }
         }
@@ -590,7 +596,7 @@ public class ConceptPane extends BorderPane implements ChangeListener {
 
         private float xTime(float tew, float b, float minT, float maxT, float o, float w) {
             float p = minT == maxT ? 0.5f : (o - minT) / (maxT - minT);
-            return b + p * (tew-2*b-w);
+            return b + p * (tew-b-w);
         }
     }
 }

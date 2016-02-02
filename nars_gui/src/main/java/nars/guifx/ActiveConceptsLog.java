@@ -27,7 +27,7 @@ public abstract class ActiveConceptsLog extends LogPane {
 
         now = n.time();
 
-        n.onEachFrame(nn-> {
+        n.onFrame(nn-> {
             now = n.time();
             if (displayed!=null)
                 displayed.forEach(this::update);

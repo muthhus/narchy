@@ -40,7 +40,7 @@ public class BeliefLab {
 
         Concept c = nar.concept("y:x");
 
-        nar.onEachFrame(n-> {
+        nar.onFrame(n-> {
 
             //random eternals
             if (enableEternals) {

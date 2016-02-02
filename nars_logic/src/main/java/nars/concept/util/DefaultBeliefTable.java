@@ -259,7 +259,8 @@ public class DefaultBeliefTable implements BeliefTable {
         Task existing = contains(input);
         if (existing!=null) {
             if (existing!=input) {
-                BudgetMerge.plusDQBlend.merge(existing.budget(), input.budget(), 1f);
+                //Average allows duplicate tasks to not explode like plus would
+                BudgetMerge.avgDQBlend.merge(existing.budget(), input.budget(), 1f);
                 ((MutableTask) existing).state(input.state()); //reset execution / anticipated state
                 nar.memory.remove(input, "Duplicate Belief/Goal");
             }

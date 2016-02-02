@@ -67,8 +67,11 @@ public class SomeRovers {
 
             //nar.memory.perfection.setValue(0.15f);
             nar.core.confidenceDerivationMin.setValue(0.02f);
+
             //nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
-            nar.memory.duration.set(8);
+            nar.core.activationRate.setValue(0.2f);
+
+            nar.memory.duration.set(6);
             nar.memory.conceptForgetDurations.setValue(3);
             nar.memory.cyclesPerFrame.set(8);
             nar.memory.shortTermMemoryHistory.set(3);

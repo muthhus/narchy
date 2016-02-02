@@ -39,7 +39,7 @@ public class PluginPanel extends HBox {
         nar = ide.nar;
 
 
-        nar.onEachFrame((n) -> update());
+        nar.onFrame((n) -> update());
         update();
 
 

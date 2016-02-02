@@ -16,8 +16,8 @@ import nars.task.MutableTask;
 import nars.task.Task;
 import nars.task.in.ChangedTextInput;
 import nars.term.Termed;
-import nars.util.Texts;
 import nars.util.data.Util;
+import nars.util.signal.Sensor;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 
@@ -30,7 +30,7 @@ import static nars.util.Texts.n2;
 public class NARover extends AbstractPolygonBot {
 
 
-    private final ChangedTextInput feltMotion, feltAngle;
+    private final ChangedTextInput feltAngle;
 
     public final NAR nar;
     //float tasteDistanceThreshold = 1.0f;
@@ -45,6 +45,7 @@ public class NARover extends AbstractPolygonBot {
 
 
 
+    final Sensor linearSpeed;
 
 //    final SimpleAutoRangeTruthFrequency linearVelocity;
 //    final SimpleAutoRangeTruthFrequency motionAngle;
@@ -62,7 +63,12 @@ public class NARover extends AbstractPolygonBot {
         objs = new NALObjects(nar);
 
 
-        feltMotion = new ChangedTextInput(nar);
+        linearSpeed = new Sensor(nar, nar.term("speed:linear"), () -> {
+            return torso.getLinearVelocity().length()/linearThrustPerCycle/1.25f;
+        }, (speed) -> {
+            return speed < 0.1 ? 0 : Util.clamp(0.5f + speed);
+        });
+
         feltAngle = new ChangedTextInput(nar);
 //
 //
@@ -250,17 +256,10 @@ public class NARover extends AbstractPolygonBot {
 
     //public static final ConceptDesire strongestTask = (c ->  c.getGoals().topEternal().getExpectation() );
 
+
     @Override
     protected void feelMotion() {
-        //radians per frame to angVelocity discretized value
-        float xa = torso.getAngularVelocity();
-        float angleScale = 1.50f;
-        String angDir = xa > 0 ? "r" : "l";
-        float angSpeed = (float) (Math.log(Math.abs(xa * angleScale) + 1f)) / 2f;
-        float maxAngleVelocityFelt = 0.8f;
-        if (angSpeed > maxAngleVelocityFelt) {
-            angSpeed = maxAngleVelocityFelt;
-        }
+
 //        if (angVelocity < 0.1) {
 //            feltAngularVelocity.set("rotated(" + f(0) + "). :|: %0.95;0.90%");
 //            //feltAngularVelocity.set("feltAngularMotion. :|: %0.00;0.90%");
@@ -276,17 +275,16 @@ public class NARover extends AbstractPolygonBot {
 //        }
 
 
-        float linSpeed = torso.getLinearVelocity().length();
         //linearVelocity.observe(linVelocity);
 
 
-        Vec2 currentPosition = torso.getWorldCenter();
+        //Vec2 currentPosition = torso.getWorldCenter();
         //if (!positions.isEmpty()) {
             //Vec2 movement = currentPosition.sub(positions.poll());
             //double theta = Math.atan2(movement.y, movement.x);
             //motionAngle.observe((float)theta);
         //}
-        positions.addLast(currentPosition.clone());
+        //positions.addLast(currentPosition.clone());
 
 
         String torsoAngle = sim.angleTerm(torso.getAngle());
@@ -294,9 +292,19 @@ public class NARover extends AbstractPolygonBot {
 
         //feltMotion.set("(&&+0, speed:{" + f5(linSpeed) + "},angle:{" + torsoAngle + "},rotation:{" + angDir + "," + f5(angSpeed) + "}). :|:");
 
-        float speedFreq = linSpeed < 0.1 ? 0 : Util.clamp(0.5f + (float)(linSpeed/linearThrustPerCycle/1.25f));
-        //System.out.println(linSpeed +  " " + speedFreq);
-        feltMotion.set("speed:linear. %" + Texts.n2(speedFreq) + "|0.95%");
+
+
+//        //radians per frame to angVelocity discretized value
+//        float xa = torso.getAngularVelocity();
+//        float angleScale = 1.50f;
+//        String angDir = xa > 0 ? "r" : "l";
+//        float angSpeed = (float) (Math.log(Math.abs(xa * angleScale) + 1f)) / 2f;
+//        float maxAngleVelocityFelt = 0.8f;
+//        if (angSpeed > maxAngleVelocityFelt) {
+//            angSpeed = maxAngleVelocityFelt;
+//        }
+//        feltMotion.set("speed:right. %" + Texts.n2(angSpeedRight) + "|0.8%");
+//        feltMotion.set("speed:left. %" + Texts.n2(angSpeedLeft) + "|0.8%");
 
         feltAngle.set("angle:" + torsoAngle + ". :|:");
         //feltMotion.set("rotation:{\" + angDir + \",\" + f5(angSpeed) + \"}. :|:");

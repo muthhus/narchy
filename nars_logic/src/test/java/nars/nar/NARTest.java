@@ -82,13 +82,13 @@ public class NARTest {
         new Default()
                 .input("<a --> b>.", "<b --> c>.")
                 .stopIf( () -> false )
-                .onEachCycle( n -> cycCount.incrementAndGet() )
+                .onCycle(n -> cycCount.incrementAndGet() )
                 .trace(sw).run(frames);
 
         new Default()
                 .input("<a --> b>.", "<b --> c>.")
                 .stopIf(() -> false)
-                .onEachCycle(n -> cycCount.incrementAndGet())
+                .onCycle(n -> cycCount.incrementAndGet())
                 .trace(sw)
                 .forEachConceptTask(true, true, true, true, false, 1, System.out::println );
 

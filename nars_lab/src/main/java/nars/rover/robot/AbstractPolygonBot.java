@@ -13,9 +13,7 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.*;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Deque;
 import java.util.List;
 
 /**
@@ -37,7 +35,7 @@ public abstract class AbstractPolygonBot extends Robotic {
     static float restitution = 0.9f; //bounciness
     static float friction = 0.5f;
 
-    final Deque<Vec2> positions = new ArrayDeque();
+    //final Deque<Vec2> positions = new ArrayDeque();
     protected final List<Sense> senses = new ArrayList();
     public float linearThrustPerCycle = 2*5f;
     public float angularSpeedPerCycle = 2*0.7f;

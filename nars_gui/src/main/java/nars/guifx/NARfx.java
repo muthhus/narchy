@@ -20,6 +20,7 @@ import nars.NAR;
 import nars.concept.Concept;
 import nars.guifx.util.ColorMatrix;
 import nars.task.Task;
+import nars.term.Termed;
 
 import java.util.List;
 import java.util.Map;
@@ -408,10 +409,10 @@ public enum NARfx  {
         );
     }
 
-    private static void newConceptWindow(NAR nar, List<Concept> cc) {
-        Pane v = new TilePane(Orientation.VERTICAL);
+    private static void newConceptWindow(NAR nar, List<Termed> cc) {
+        Pane v = new TilePane(Orientation.VERTICAL, 4,4);
 
-        for (Concept c : cc) {
+        for (Termed c : cc) {
             ConceptPane wn = new ConceptPane(nar, c);
             v.getChildren().add(wn);
         }

@@ -528,7 +528,7 @@ public class NARide extends BorderPane {
 
             Label status = new Label();
             StringBuilder sb = new StringBuilder();
-            nar.onEachFrame(c -> {
+            nar.onFrame(c -> {
 
                 int activeConcepts = l.active.size();
                 TermIndex index = nar.memory.index;

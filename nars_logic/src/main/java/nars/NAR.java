@@ -941,7 +941,7 @@ public abstract class NAR implements Level, Consumer<Task> {
     public NAR inputAt(long time, @NotNull String... tt) {
         //LongPredicate timeCondition = t -> t == time;
 
-        onEachFrame(m -> {
+        onFrame(m -> {
             //if (timeCondition.test(m.time())) {
             if (m.time() == time) {
                 m.input(tt);
@@ -974,29 +974,28 @@ public abstract class NAR implements Level, Consumer<Task> {
 
     @NotNull
     public NAR stopIf(@NotNull BooleanSupplier stopCondition) {
-        onEachFrame(n -> {
+        onFrame(n -> {
             if (stopCondition.getAsBoolean()) stop();
         });
         return this;
     }
 
-    @NotNull
-    public NAR onEachCycle(Consumer<Memory> receiver) {
+    /** reasoning cycles occurr zero or more times per frame */
+    @NotNull public NAR onCycle(Consumer<Memory> receiver) {
         regs.add(memory.eventCycleEnd.on(receiver));
         return this;
     }
 
-    @NotNull
-    public NAR onEachFrame(Consumer<NAR> receiver) {
+    /** a frame batches a burst of multiple cycles, for coordinating with external systems in which multiple cycles
+     * must be run per control frame. */
+    @NotNull public NAR onFrame(Consumer<NAR> receiver) {
         regs.add(memory.eventFrameStart.on(receiver));
         return this;
     }
 
     @NotNull
     public NAR trace() {
-
         trace(out);
-
         return this;
     }
 

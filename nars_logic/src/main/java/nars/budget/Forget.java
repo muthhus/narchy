@@ -59,7 +59,7 @@ public enum Forget { ;
         public AbstractForget(@NotNull NAR nar, @NotNull MutableFloat forgetDurations, @NotNull MutableFloat perfection) {
             this.forgetDurations = forgetDurations;
             this.perfection = perfection;
-            nar.onEachCycle(this::accept);
+            nar.onCycle(this::accept);
         }
 
         @Override

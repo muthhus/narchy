@@ -178,7 +178,7 @@ public class TestChamber {
         space.automataPeriod = automataPeriod / gridUpdatePeriod;
         space.agentPeriod = agentPeriod / gridUpdatePeriod;
         TestChamber into = this;
-        nar.onEachFrame(n -> {
+        nar.onFrame(n -> {
             if (nar.time() % gridUpdatePeriod == 0) {
                 space.update(into);
 
