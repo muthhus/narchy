@@ -197,7 +197,7 @@ public class NAL8Test extends AbstractNALTester {
     public void belief_deduction_by_condition()  {
         TestNAR tester = test();
 
-        tester.input("(open({t001}) ==>+5 <{t001} --> [opened]>). :|: ");
+        tester.input("(open({t001}) ==>+5 <{t001} --> [opened]>).");
         tester.inputAt(10, "open({t001}). :|:");
 
         tester.mustBelieve(cycles, "<{t001} --> [opened]>", 1.0f, 0.81f, 15);

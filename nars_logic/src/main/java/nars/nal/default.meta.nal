@@ -187,7 +187,7 @@
 
     (M ==> P), (M ==> S), neq(S,P) |- (S ==> P), (Belief:Abduction, Derive:AllowBackward)
 
-    (P ==> M), (M ==> S), neq(S,P), dt(sumNeg) |- (S ==> P), (Belief:Exemplification, Derive:AllowBackward)
+    (P ==> M), (M ==> S), neq(S,P) |- (S ==> P), (Belief:Exemplification, Derive:AllowBackward)
 
 //// implication to equivalence ////////////////////////////////////////////////////////////////////////////////////
 //If when S happens, P happens, and before P happens, S has happened, then they are truth-related equivalent
@@ -232,21 +232,24 @@
 //// conditional syllogism ////////////////////////////////////////////////////////////////////////////////////
 //If after M, P usually happens, and M happens, it means P is expected to happen
 
-//    M, (M ==> P) |- P, (Belief:Deduction, Desire:Induction, Order:ForAllSame)
-//    M, (P ==> M) |- P, (Belief:Abduction, Desire:Deduction, Order:ForAllSame)
-    M, (M <=> S) |- S, (Belief:Analogy, Desire:Strong, Order:ForAllSame)
-    M, (S <=> M) |- S, (Belief:Analogy, Desire:Strong, Order:ForAllSame)
+    B, (A ==> C) |- substituteIfUnifies(C,"$",A,B), (Belief:Deduction, Desire:Induction, Order:ForAllSame, Event:Anticipate)
+    B, (C ==> A) |- substituteIfUnifies(C,"$",A,B), (Belief:Abduction, Desire:Deduction, Order:ForAllSame)
 
-    (A==>B),A |- A, (Belief:StructuralDeduction, Desire:Deduction, Order:ForAllSame)
-    (A==>B),B |- B, (Belief:StructuralDeduction, Desire:Induction, Order:ForAllSame)
+    B, (A <=> C) |- substituteIfUnifies(C,"$",A,B), (Belief:Deduction, Desire:Induction, Order:ForAllSame)
+
+//    B, (A ==> C) |-  substituteIfUnifies( C, "$",A,B), (Belief:Deduction, Order:ForAllSame, Event:Anticipate)
+//    B, (C ==> A) |-  substituteIfUnifies( C, "$",A,B), (Belief:Abduction, Order:ForAllSame)
+
+    (A ==> B), B |- A, (Belief:StructuralDeduction, Desire:Deduction, Order:ForAllSame, Event:Anticipate)
+    (A ==> B), A |- B, (Belief:StructuralDeduction, Desire:Induction, Order:ForAllSame)
 
 ////NAL7 specific inference ////////////////////////////////////////////////////////////////////////////////////
 //Reasoning about temporal statements. those are using the ==> relation because relation in time is a relation of the truth between statements.
 
 ////    X, (XI ==> B) |- occurrsForward( substituteIfUnifies( B, "$", XI, (&/,X,/1)), XI, "==>"), (Belief:Deduction, Desire:Induction, Order:ForAllSame, Event:Anticipate)
 //    X, (BI ==> Y) |- occurrsBackward( substituteIfUnifies( BI, "$", Y, X), BI, "==>"), (Belief:Abduction, Desire:Deduction, Order:ForAllSame)
-    C, (A ==> B) |- substituteIfUnifies( B, "$", A, C), (Belief:Deduction, Desire:Induction, Order:ForAllSame, Event:Anticipate)
-    C, (A ==> B) |- substituteIfUnifies( A, "$", B, C), (Belief:Abduction, Desire:Deduction, Order:ForAllSame)
+//    C, (A ==> B) |- substituteIfUnifies( B, "$", A, C), (Belief:Deduction, Desire:Induction, Order:ForAllSame, Event:Anticipate),
+//                    substituteIfUnifies( A, "$", B, C), (Belief:Abduction, Desire:Deduction, Order:ForAllSame)
 
 
 
@@ -268,8 +271,8 @@
      (&&,X,A..+), X  |- (&&,A..+), (Belief:StructuralDeduction, Desire:StructuralStrong)
 
 //    (&/,B,A..+), B, task("!") |- (&/,A..+), (Desire:Strong, SequenceIntervals:FromTask)
-     (&&,A,B), X |- A, (Belief:StructuralDeduction, Desire:StructuralStrong)
-     (&&,A,B), X |- B, (Belief:StructuralDeduction, Desire:StructuralStrong)
+     (&&,A,B), A |- A, (Belief:StructuralDeduction, Desire:StructuralStrong),
+                    B, (Belief:StructuralDeduction, Desire:StructuralStrong)
 
 //// propositional decomposition ////////////////////////////////////////////////////////////////////////////////////
 //If S is the case, and (&&,S,A..+) is not the case, it can't be that (&&,A..+) is the case
@@ -347,16 +350,10 @@
     (U --> L), ((&&,(#X --> L),(#X --> R)) ==> Z) |- ((U --> R) ==> Z), (Belief:Deduction)
 
 
-//    B, (A ==> C) |-  substituteIfUnifies( C, "$",A,B), (Belief:Deduction, Order:ForAllSame, Event:Anticipate)
-//    B, (C ==> A) |-  substituteIfUnifies( C, "$",A,B), (Belief:Abduction, Order:ForAllSame)
-
-    B, (A <=> C) |- substituteIfUnifies( C, "$",A,B), (Belief:Deduction, Order:ForAllSame)
-    B, (C <=> A) |- substituteIfUnifies( C, "$",A,B), (Belief:Deduction, Order:ForAllSame)
 
 //// second level variable handling rules ////////////////////////////////////////////////////////////////////////////////////
 //second level variable elimination (termlink level2 growth needed in order for these rules to work)
 
-//TODO these will need some kind of dt extraction path, like beliefsImplicationSubterm..
     (B --> K), (&&,(#X --> L),(($Y --> K) ==> A)) |- substitute((&&, (#X --> L), A), $Y,B), (Belief:Deduction)
     (B --> K), (&&,(#X --> L),(($Y --> K) ==> (&&,A..+))) |- substitute((&&,(#X --> L),A..+),$Y,B), (Belief:Deduction)
 
@@ -378,25 +375,19 @@
     (Y --> L), ((Y --> S) ==> R) |- ((&&,(#X --> L),(#X --> S)) ==> R), (Belief:Induction)
     (Y --> L), ((&&,(Y --> S),A..+) ==> R) |- substitute(((&&,(#X --> L),(#X --> S),A..+) ==> R),Y,#X), (Belief:Intersection)
 
-//// independent variable elimination ////////////////////////////////////////////////////////////////////////////////////
 
-//    B, (A ==> C) |- substituteIfUnifies( C, "$",A,B), (Belief:Deduction, Order:ForAllSame, Event:Anticipate)
-//    B, (C ==> A), occurr(belief,reverse) |- substituteIfUnifies( C, "$",A,B), (Belief:Abduction, Order:ForAllSame)
-
-//    C, (B <=> A), occurr(belief,reverse) |- substituteIfUnifies( A, "$",B,C), (Belief:Deduction, Order:ForAllSame)
-    C, (A <=> B) |- substituteIfUnifies( A, "$",B,C), (Belief:Deduction, Order:ForAllSame)
 
 
 ////Temporal induction: ////////////////////////////////////////////////////////////////////////////////////
 //When P and then S happened according to an observation, by induction (weak) it may be that alyways after P, usually S happens.
 
-    A, B, events(both), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A ==> B), (Belief:Induction, Eternalize:Immediate)
+    A, B, events(after), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A ==> B), (Belief:Induction, Eternalize:Immediate)
 
-    A, B, events(both), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A <=> B), (Belief:Comparison)
+    A, B, events(after), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A <=> B), (Belief:Comparison)
 
-    A, B, events(both), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (B ==> A), (Belief:Abduction)
+    A, B, events(after), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (B ==> A), (Belief:Abduction)
 
-    A, B, events(both), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B), notConjunction(A), notConjunction(B) |- (A && B), (Belief:Intersection)
+    A, B, events(after), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B), notConjunction(A), notConjunction(B) |- (A && B), (Belief:Intersection)
 
 //    A, B, after(_), neq(A,B), notConjunction(A), notConjunction(B),  notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (B && A), (Belief:Intersection)
 

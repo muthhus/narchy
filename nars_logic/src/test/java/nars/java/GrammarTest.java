@@ -28,15 +28,15 @@ public class GrammarTest {
 
 
         Default n = new Default(1000, 3, 2, 3);
-        n.logSummaryGT(System.out, 0.15f);
+        n.logSummaryGT(System.out, 0);// 0.15f);
 
 
         //n.memory.executionExpectationThreshold.setValue(0.55f);
         n.core.confidenceDerivationMin.setValue(0.01f);
 
-        n.memory.DEFAULT_JUDGMENT_PRIORITY = 0.3f;
+        n.memory.DEFAULT_JUDGMENT_PRIORITY = 0.5f;
         n.memory.DEFAULT_GOAL_PRIORITY = 0.5f;
-        n.memory.activationRate.setValue(0.1f);
+        //n.memory.activationRate.setValue(0.1f);
 
         n.memory.duration.set(8);
         n.memory.shortTermMemoryHistory.set(3);

@@ -16,7 +16,7 @@ import java.util.function.Supplier;
 @RunWith(Parameterized.class)
 public class NAL7Test extends AbstractNALTester {
 
-    final int cycles = 460;
+    final int cycles = 160;
 
     public NAL7Test(Supplier<NAR> b) {
         super(b);
@@ -46,15 +46,15 @@ public class NAL7Test extends AbstractNALTester {
         float intersectionConf = 0.81f;
 
         TestNAR t = test();
-        //t.nar.log();
+        t.nar.log();
 
         t
         .input("x:before. :|:")
         .inputAt(10, "x:after. :|:")
-        .mustBelieve(12, "(x:before ==>+10 x:after)", 1.00f, abductionConf, 10)
-        .mustBelieve(12, "(x:after ==>-10 x:before)", 1.00f, inductionConf, 10)
-        .mustBelieve(12, "(x:after <=>-10 x:before)", 1.00f, comparisonConf, 10)
-        .mustBelieve(12, "(x:after &&-10 x:before)", 1.00f, intersectionConf, 10)
+        .mustBelieve(cycles, "(x:before ==>+10 x:after)", 1.00f, abductionConf, 10)
+        .mustBelieve(cycles, "(x:after ==>-10 x:before)", 1.00f, inductionConf, 10)
+        .mustBelieve(cycles, "(x:after <=>-10 x:before)", 1.00f, comparisonConf, 10)
+        .mustBelieve(cycles, "(x:after &&-10 x:before)", 1.00f, intersectionConf, 10)
         ;
 
 //        tester.mustBelieve(cycles, "<<(John, room) --> enter> =\\> (&/, <(John, door) --> open>, /6)>",
@@ -175,7 +175,8 @@ public class NAL7Test extends AbstractNALTester {
         TestNAR tester = test();
         tester.input("S:s.");
         tester.inputAt(10, "(S:s &&+50 (Y:y &&+3 Z:z)). :|:");
-        tester.mustBelieve(50, "(Y:y &&+3 Z:z).", 1.00f, 0.81f /* 0.42? */, 60);
+        tester.mustBelieve(cycles, "S:s.", 1.00f, 0.81f /* 0.42? */, 10);
+        tester.mustBelieve(cycles, "(Y:y &&+3 Z:z).", 1.00f, 0.81f /* 0.42? */, 60);
     }
 
 
@@ -280,13 +281,35 @@ public class NAL7Test extends AbstractNALTester {
     public void induction_on_events3()  {
         TestNAR tester = test();
 
-        tester.input("<(John,door) --> open>. :|:");
-        tester.inputAt(4, "<(John,room) --> enter>. :|:");
+        tester.input("open:(John,door). :|:");
+        tester.inputAt(4, "enter:(John,room). :|:");
 
-        tester.mustBelieve(cycles, "(<(John, door) --> open> <=>+4 <(John, room) --> enter>)",
+        tester.mustBelieve(cycles, "(open:(John, door) <=>+4 enter:(John, room))",
                 1.00f, 0.45f,
                 4);
 
+    }
+
+    @Test public void induction_on_events3_simple()  {
+        TestNAR tester = test();
+
+        tester.input("<door --> open>. :|:");
+        tester.inputAt(4, "<room --> enter>. :|:");
+
+        tester.mustBelieve(cycles, "(<door --> open> <=>+4 <room --> enter>)",
+                1.00f, 0.45f,
+                4);
+    }
+    @Test public void induction_on_events3_simple_reversed()  {
+        //TO TEST COMMUTIVITY
+        TestNAR tester = test();
+
+        tester.input("<room --> enter>. :|:");
+        tester.inputAt(4, "<door --> open>. :|:");
+
+        tester.mustBelieve(cycles, "(<door --> open> <=>-4 <room --> enter>)",
+                1.00f, 0.45f,
+                4);
     }
 
     @Test
@@ -342,7 +365,6 @@ public class NAL7Test extends AbstractNALTester {
                 1.00f, 0.81f,
                 0);
 
-        //[((%1,(%2==>%3),occurr(belief,forward)),(substituteIfUnifies(%3,"$",%2,%1),((Deduction-->Belief),(Induction-->Desire),(ForAllSame-->Order),(Anticipate-->Event))))]".
         tester.mustBelieve(cycles, "enter:(John,room)",
                 1.00f, 0.81f,
                 5);

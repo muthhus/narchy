@@ -6,20 +6,27 @@ import nars.nal.meta.PremiseMatch;
 /**
  * True if the premise task and belief are both non-eternal events
  */
-public class events extends AtomicBooleanCondition<PremiseMatch> {
+abstract public class events extends AtomicBooleanCondition<PremiseMatch> {
 
-    public static final events the = new events();
+    /** task is before or simultaneous with belief which follows (T ... B) */
+    public static final events after = new events() {
 
-    protected events() {
-    }
+        @Override
+        public String toString() {
+            return "after";
+        }
+
+        @Override
+        boolean allow(long taskOcc, long beliefOcc) {
+            return (beliefOcc - taskOcc) >= 0;
+        }
+    };
+
 
     @Override
-    public String toString() {
-        return "events";
+    public final boolean booleanValueOf(PremiseMatch m) {
+        return m.premise.isEvent() && allow(m.premise.task().occurrence(), m.premise.belief().occurrence());
     }
 
-    @Override
-    public boolean booleanValueOf(PremiseMatch m) {
-        return m.premise.isEvent();
-    }
- }
+    abstract boolean allow(long taskOcc, long beliefOcc);
+}

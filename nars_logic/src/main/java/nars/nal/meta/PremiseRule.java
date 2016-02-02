@@ -376,7 +376,13 @@ public class PremiseRule extends GenericCompound implements Level {
                     break;
 
                 case "events":
-                    preNext = events.the;
+                    switch (arg1.toString()) {
+                        case "after":
+                            preNext = events.after;
+                            break;
+                        default:
+                            throw new RuntimeException("invalid events parameters");
+                    }
                     break;
 
 //                case "temporal":
@@ -387,7 +393,7 @@ public class PremiseRule extends GenericCompound implements Level {
 //                    preNext = new occurr(arg1,arg2);
                     break;
 
-                case "after":
+//                case "after":
 //                    switch (arg1.toString()) {
 //                        case "forward":
 //                            preNext = Event.After.forward;
@@ -401,7 +407,7 @@ public class PremiseRule extends GenericCompound implements Level {
 //                        default:
 //                            throw new RuntimeException("invalid after() argument: " + arg1);
 //                    }
-                    break;
+//                    break;
 
                 case "dt":
 //                    switch (arg1.toString()) {

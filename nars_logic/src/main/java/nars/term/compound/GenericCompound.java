@@ -260,9 +260,8 @@ public class GenericCompound<T extends Term> implements Compound<T> {
         return normalized;
     }
 
-    @NotNull
-    @Override
-    public Compound t(int cycles) {
+    /** WARNING: this does not perform commutive handling correctly. use the index newTerm method for now */
+    @NotNull @Override public Compound t(int cycles) {
         if (cycles == t) return this;
         GenericCompound g = new GenericCompound(op(), relation, cycles, subterms());
         if (normalized) g.setNormalized();

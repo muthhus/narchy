@@ -144,10 +144,10 @@ public final class ConceptProcess implements Premise {
         occ = occurrenceTarget(); //reset
 
         Compound tt = task().term();
-        Compound bb = belief() != null ? belief().term() : null;
+        Term bb = beliefTerm().term(); // belief() != null ? belief().term() : null;
 
         int td = tt.t();
-        int bd = bb != null ? bb.t() : ITERNAL;
+        int bd = bb instanceof Compound ? ((Compound)bb).t() : ITERNAL;
 
         int t = ITERNAL;
 
@@ -212,17 +212,18 @@ public final class ConceptProcess implements Premise {
                     if (aTask != ETERNAL && aBelief == ETERNAL &&
                             bBelief != ETERNAL && bTask == ETERNAL) {
                         //forward: task -> belief
+                        //t = (int) (task().occurrence() - belief().occurrence());
                         t = (int) (belief().occurrence() - task().occurrence());
-                        //occ += t;
-                        //occ += 0;
+                        occ += t;
 
                     }
                     else if (aTask == ETERNAL && aBelief != ETERNAL &&
                             bBelief == ETERNAL && bTask != ETERNAL) {
                         //reverse: belief -> task
                         t = (int) (task().occurrence() - belief().occurrence());
-                        //occ += 0;
-
+                        //t = (int) (belief().occurrence() - task().occurrence());
+                        //t = (int) (task().occurrence() - belief().occurrence());
+                        occ -= t;
                     } else {
                         //throw new RuntimeException("unhandled case");
 
@@ -249,9 +250,9 @@ public final class ConceptProcess implements Premise {
                     t = td;
                     //TODO align
                 }   else {
-
-
-
+                    //throw new RuntimeException("unhandled case");
+                    //???
+                    //t = (td+bd)/2;
                 }
             }
 
@@ -279,6 +280,8 @@ public final class ConceptProcess implements Premise {
             Term C = derived;
 
             if (belief()!=null) {
+                //TODO cleanup simplify this is messy and confusing
+
                 if (task().isEternal() && !belief().isEternal()) {
                     //find relative time of belief in the task, relative time of the conclusion, and subtract
                     //the occ (=belief time's)
@@ -291,14 +294,20 @@ public final class ConceptProcess implements Premise {
                 } else if (!task().isEternal() && belief().isEternal()) {
                     long timeOfTaskInBelief = B.subtermTime(T,bd);
                     long timeOfDerivedInBelief = B.subtermTime(C,bd);
+
                     if (timeOfTaskInBelief != ETERNAL && timeOfDerivedInBelief != ETERNAL)
                         occ += (timeOfDerivedInBelief - timeOfTaskInBelief);
                     else if (timeOfDerivedInBelief!=ETERNAL)
                         occ += timeOfDerivedInBelief;
+                    else {
+                        long timeOfDerivedInTask = T.subtermTime(C,td);
+                        occ += timeOfDerivedInTask;
+                    }
                 } else if (!task().isEternal() && !belief().isEternal()) {
+                    //throw new RuntimeException("ambiguous task or belief");
+
                     //long ot = T.subtermTime(C, td);
                     //long ob = B.subtermTime(C, bd);
-                    //System.out.println("which");
                     //if (t!=ITERNAL)
                     //    occ -= t;
                 }
@@ -347,6 +356,16 @@ public final class ConceptProcess implements Premise {
         //}
 
         if (t != ITERNAL) {
+            /*derived = (Compound) p.premise.nar.memory.index.newTerm(derived.op(), derived.relation(),
+                    t, derived.subterms());*/
+
+            /* reverse subterms if commutive and the terms are opposite the corresponding pattern */
+            if (derived.op().isCommutative()) {
+                if (!p.resolve(((Compound)cp).term(0)).equals(derived.term(0))) {
+                    t = -t;
+                }
+            }
+
             derived = derived.t(t);
 
 //            int nt = derived.t();
