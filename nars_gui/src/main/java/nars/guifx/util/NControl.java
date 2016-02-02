@@ -7,17 +7,22 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.StackPane;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static javafx.application.Platform.runLater;
+
 /**
  * Created by me on 10/11/15.
  */
-public abstract class NControl extends StackPane {
+public abstract class NControl extends StackPane implements Runnable {
 
     public final ChangeListener<Number> redrawOnDoubleChange = (observable, oldValue, newValue) -> {
         //TODO debounce these with a AtomicBoolean or something
-        redraw();
+        run();
     };
 
-    protected final Canvas canvas;
+    public final Canvas canvas;
+    protected final AtomicBoolean ready = new AtomicBoolean(true);
 
     @SuppressWarnings("ConstructorNotProtectedInAbstractClass")
     public NControl(double w, double h) {
@@ -32,17 +37,18 @@ public abstract class NControl extends StackPane {
         if (w <= 0 && h <= 0) {
 
             canvas.boundsInParentProperty().addListener((b) -> {
-
-                setWidth(bp.get().getHeight());
-                setHeight(bp.get().getHeight());
-                redraw();
+                Bounds bpg = bp.get();
+                double hh = bpg.getHeight();
+                setWidth(hh);
+                setHeight(hh);
+                run();
             });
 
         } else if (h <= 0) {
             canvas.maxHeight(Double.MAX_VALUE);
             canvas.boundsInParentProperty().addListener((b) -> {
                 setHeight(bp.get().getHeight());
-                redraw();
+                run();
             });
         } else {
             setHeight(h);
@@ -50,10 +56,12 @@ public abstract class NControl extends StackPane {
         if (w <= 0) {
             //maxWidth(Double.MAX_VALUE);
             boundsInParentProperty().addListener((b) -> {
-                canvas.setWidth(bp.get().getWidth());
-                setPrefWidth(bp.get().getWidth());
-                setWidth(bp.get().getWidth());
-                redraw();
+                Bounds bpg = bp.get();
+                double ww = bpg.getWidth();
+                canvas.setWidth(ww);
+                setPrefWidth(ww);
+                setWidth(ww);
+                run();
             });
             //((DoubleProperty)widthProperty()).bind( canvas.widthProperty() );
             //setWidth(bp.get().getWidth());
@@ -75,5 +83,11 @@ public abstract class NControl extends StackPane {
         return canvas.getGraphicsContext2D();
     }
 
-    protected abstract void redraw();
+
+    public void draw() {
+        if (ready.compareAndSet(true, false)) {
+            runLater(this);
+        }
+    }
+
 }

@@ -612,7 +612,7 @@ public class NARide extends BorderPane {
         }
 
         @Override
-        protected void redraw() {
+        public void run() {
 
             GraphicsContext g = canvas.getGraphicsContext2D();
             double w = canvas.getWidth(), h = canvas.getHeight();

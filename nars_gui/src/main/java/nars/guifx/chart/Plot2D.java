@@ -17,12 +17,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.DoubleSupplier;
 
-import static javafx.application.Platform.runLater;
-
 /**
  * Created by me on 8/10/15.
  */
-public class Plot2D extends NControl/*Canvas */ implements Runnable {
+public class Plot2D extends NControl/*Canvas */  {
 
     //public static final ColorArray BlueRed = new ColorArray(128, Color.BLUE, Color.RED);
 
@@ -45,6 +43,9 @@ public class Plot2D extends NControl/*Canvas */ implements Runnable {
             this.name = name;
             this.color = NARfx.hashColor(name, ca);
             this.capacity = capacity;
+
+            history.ensureCapacity(capacity);
+
             this.rangeFinder = v -> {
                 if (v < minValue) minValue = v;
                 if (v > maxValue) maxValue = v;
@@ -52,8 +53,17 @@ public class Plot2D extends NControl/*Canvas */ implements Runnable {
             };
         }
 
+        @Override
+        public String toString() {
+            return name + "[" + history.size() + "/" + capacity + "]";
+        }
 
         public abstract void update();
+
+        protected void push(double d) {
+            if (Double.isFinite(d))
+                history.add((float)d);
+        }
 
         protected void push(float d) {
             if (Float.isFinite(d))
@@ -68,7 +78,7 @@ public class Plot2D extends NControl/*Canvas */ implements Runnable {
 
         protected void limit() {
             FloatArrayList h = this.history;
-            int over = h.size() - this.capacity;
+            int over = h.size() - (this.capacity-1);
             for (int i = 0; i < over; i++)
                 h.removeAtIndex(0);
         }
@@ -95,10 +105,9 @@ public class Plot2D extends NControl/*Canvas */ implements Runnable {
 
         maxHistory = history;
 
-        plotVis.addListener((n) -> update());
-
-
         plotVis.set(p);
+
+        plotVis.addListener((n) -> update());
     }
 
     public Plot2D add(Series s) {
@@ -111,7 +120,13 @@ public class Plot2D extends NControl/*Canvas */ implements Runnable {
         add(s = new Series(name, maxHistory) {
             @Override public void update() {
                 limit();
-                push((float)valueFunc.getAsDouble());
+                double v = valueFunc.getAsDouble();
+                if (!Double.isFinite(v)) {
+                    throw new RuntimeException("invalid value");
+                }
+                if (v < min) v = min;
+                if (v > max) v = max;
+                push(v);
             }
         });
         s.minValue = min;
@@ -130,15 +145,18 @@ public class Plot2D extends NControl/*Canvas */ implements Runnable {
         return this;
     }
 
-
-
     @Override
     public void run() {
+
+        if (!ready.compareAndSet(false, true))
+            return;
 
         List<Series> series = this.series;
 
         //HACK (not initialized yet but run() called
-        if (series == null || series.isEmpty()) return;
+        if (series == null || series.isEmpty()) {
+            return;
+        }
 
         GraphicsContext g = graphics();
 
@@ -147,11 +165,11 @@ public class Plot2D extends NControl/*Canvas */ implements Runnable {
 
         g.clearRect(0, 0, W, H);
 
-
         PlotVis pv = plotVis.get();
         if (pv != null) {
             pv.draw(series, g, minValue, maxValue);
         }
+
 
     }
 
@@ -216,15 +234,17 @@ public class Plot2D extends NControl/*Canvas */ implements Runnable {
             g.fillText(String.valueOf(minValue), 0, H - m - 2);
             g.setGlobalBlendMode(BlendMode.SRC_OVER /* default */);
 
+            DoubleToDoubleFunction ypos = (v) -> {
+                double py = (v - minValue) / (maxValue - minValue);
+                if (py < 0) py = 0;
+                else if (py > 1.0) py = 1.0;
+                return m + (1.0 - py) * h;
+            };
+
             series.forEach(s -> {
 
 
-                DoubleToDoubleFunction ypos = (v) -> {
-                    double py = (v - minValue) / (maxValue - minValue);
-                    if (py < 0) py = 0;
-                    else if (py > 1.0) py = 1.0;
-                    return m + (1.0 - py) * h;
-                };
+
 
                 double mid = ypos.valueOf(0.5 * (s.minValue + s.maxValue));
 
@@ -255,7 +275,7 @@ public class Plot2D extends NControl/*Canvas */ implements Runnable {
     };
 
     protected void updateSeries() {
-        series.forEach(s -> s.update());
+        series.forEach(Series::update);
 
         minValue = Float.POSITIVE_INFINITY;
         maxValue = Float.NEGATIVE_INFINITY;
@@ -270,14 +290,5 @@ public class Plot2D extends NControl/*Canvas */ implements Runnable {
         draw();
     }
 
-    public void draw() {
-        runLater(this);
-    }
-
-
-    @Override
-    protected void redraw() {
-        run();
-    }
 }
 

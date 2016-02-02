@@ -145,7 +145,7 @@ public class NSlider extends NControl {
         for (int i = 0; i < v.length; i++) {
             value(i, v[i]);
         }
-        redraw();
+        run();
         return this;
     }
 
@@ -339,7 +339,7 @@ public class NSlider extends NControl {
     };
 
     @Override
-    protected void redraw() {
+    public void run() {
         //HACK - called before initialized
         if (vis == null) return;
 

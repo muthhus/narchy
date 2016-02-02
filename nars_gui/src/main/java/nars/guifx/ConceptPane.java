@@ -7,15 +7,19 @@ import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Label;
+import javafx.scene.control.Button;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
 import nars.NAR;
 import nars.bag.Bag;
+import nars.budget.UnitBudget;
 import nars.concept.Concept;
 import nars.concept.util.BeliefTable;
 import nars.concept.util.DefaultBeliefTable;
@@ -31,7 +35,9 @@ import nars.guifx.graph3.SpaceNet;
 import nars.guifx.graph3.Xform;
 import nars.guifx.util.ColorArray;
 import nars.guifx.util.ColorMatrix;
+import nars.guifx.util.SimpleMenuItem;
 import nars.nar.Default;
+import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
@@ -257,14 +263,55 @@ public class ConceptPane extends BorderPane implements ChangeListener {
         }
     }
 
-    public ConceptPane(NAR nar, Termed conceptTerm) {
+    public ConceptPane(NAR nar, Termed cconceptTerm) {
         super();
 
-        this.term = conceptTerm.term();
+
+
+        Term conceptTerm = cconceptTerm.term();
+        this.term = conceptTerm;
         this.nar = nar;
 
 
-        setTop(new Label(conceptTerm.toString()));
+        tasks = new BeliefTablePane();
+
+        budgetGraph = new Plot2D(Plot2D.BarWave, 128, 64);
+        budgetGraph.add("Pri", () -> {
+            Concept cc = currentConcept;
+            //if (cc == null)
+              //  throw new RuntimeException("missing concept");
+            return cc != null ? nar.conceptPriority(cc, 0) : 0;
+        }, 0, 1f);
+
+
+        Button activateButton = new Button("+");
+        activateButton.setOnMouseClicked(e->{
+            nar.runLater(()->{
+                nar.conceptualize(conceptTerm, new UnitBudget(1f, 0.75f, 0.75f), 1f);
+            });
+        });
+        Button goalButton = new Button("!");
+        activateButton.setOnMouseClicked(e->{
+            nar.runLater(()->{
+                nar.input(new MutableTask(conceptTerm, '!').present(nar.memory).log("GUI"));
+            });
+        });
+
+        Menu conceptMenu = new Menu(conceptTerm.toString());
+        conceptMenu.getItems().add(new SimpleMenuItem("Dump",()->{
+            nar.runLater(()-> {
+
+                System.out.println(conceptTerm + ": " + nar.conceptPriority(conceptTerm, Float.NaN));
+                nar.concept(conceptTerm).print();
+
+                //getChildren().clear();
+                budgetGraph.requestLayout();
+                //getChildren().addAll( tasks, budgetGraph );
+            });
+        }));
+
+        setTop(new FlowPane(new MenuBar(conceptMenu), activateButton, goalButton));
+
 
 
 
@@ -329,29 +376,25 @@ public class ConceptPane extends BorderPane implements ChangeListener {
 //        setCenter(new SplitPane(new BorderPane(links), tasks.content));
 
 
-        tasks = new BeliefTablePane(nar);
-
-        budgetGraph = new Plot2D(Plot2D.Line, 64, 64.0);
-        budgetGraph.add("Pri", () -> {
-            Concept cc = currentConcept;
-            return cc != null ? nar.conceptPriority(cc, 0) : 0;
-        }, 0, 1f);
 
 
-        setCenter(new VBox(
-            budgetGraph,
-            tasks
-        ));
 
 
-        //setCenter(new ConceptNeighborhoodGraph(nar, concept));
+        runLater(()->{
+
+            setCenter(new VBox(
+                    budgetGraph,
+                    tasks
+            ));
+            layout();
+
+
+            //setCenter(new ConceptNeighborhoodGraph(nar, concept));
 
         /*Label controls = new Label("Control Panel");
         setBottom(controls);*/
 
-        visibleProperty().addListener(this);
-
-        runLater(()->{
+            visibleProperty().addListener(this);
             changed(null,null,null);
         });
 
@@ -418,19 +461,24 @@ public class ConceptPane extends BorderPane implements ChangeListener {
         termLinkView.frame();*/
 
         Concept c = currentConcept = nar.concept(this.term);
-        tasks.frame(c, now);
 
         budgetGraph.update();
+
+        tasks.frame(c, now);
+
     }
 
     @Override
-    public void changed(ObservableValue observable, Object oldValue, Object newValue) {
+    public synchronized void changed(ObservableValue observable, Object oldValue, Object newValue) {
         if (isVisible()) {
-            reaction = new FrameReaction(nar) {
-                @Override public void onFrame() {
-                    frame(nar.time());
-                }
-            };
+            if (reaction==null) {
+                reaction = new FrameReaction(nar) {
+                    @Override
+                    public void onFrame() {
+                        frame(nar.time());
+                    }
+                };
+            }
         }
         else {
             if (reaction!=null) {
@@ -466,7 +514,7 @@ public class ConceptPane extends BorderPane implements ChangeListener {
 
     }
 
-    public static class BeliefTablePane extends BorderPane {
+    public static class BeliefTablePane extends HBox {
         final Canvas eternal, temporal;
 
         final static ColorMatrix beliefColors = new ColorMatrix(8,8,(f,c)->
@@ -491,14 +539,16 @@ public class ConceptPane extends BorderPane implements ChangeListener {
             }
         };
 
-        public BeliefTablePane(NAR n) {
+        public BeliefTablePane() {
             super();
 
-            eternal = new Canvas(75, 75);
-            temporal = new Canvas(200, 75);
+            getChildren().addAll(
+                eternal = new Canvas(75, 75),
+                temporal = new Canvas(200, 75)
+            );
 
-            setCenter(temporal);
-            setLeft(eternal);
+            //setCenter(temporal);
+            //setLeft(eternal);
         }
 
         public void frame(Concept concept, long now) {

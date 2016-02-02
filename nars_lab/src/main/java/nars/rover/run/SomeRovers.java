@@ -1,11 +1,12 @@
 package nars.rover.run;
 
+import javafx.geometry.Orientation;
+import javafx.scene.layout.TilePane;
 import javassist.scopedpool.SoftValueHashMap;
 import nars.Global;
 import nars.Memory;
 import nars.guifx.NARfx;
 import nars.nar.Default;
-import nars.op.mental.Anticipate;
 import nars.rover.RoverWorld;
 import nars.rover.Sim;
 import nars.rover.robot.NARover;
@@ -62,17 +63,17 @@ public class SomeRovers {
 //            nar.memory.DEFAULT_QUESTION_DURABILITY = 0.6f;
 
             //nar.initNAL9();
-            nar.memory.the(new Anticipate(nar));
+            //nar.memory.the(new Anticipate(nar));
 
 
             //nar.memory.perfection.setValue(0.15f);
-            nar.core.confidenceDerivationMin.setValue(0.02f);
+            nar.core.confidenceDerivationMin.setValue(0.01f);
 
             //nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
-            nar.core.activationRate.setValue(0.2f);
+            nar.core.activationRate.setValue(0.5f);
 
-            nar.memory.duration.set(6);
-            nar.memory.conceptForgetDurations.setValue(3);
+            nar.memory.duration.set(3);
+            nar.memory.conceptForgetDurations.setValue(2);
             nar.memory.cyclesPerFrame.set(8);
             nar.memory.shortTermMemoryHistory.set(3);
             //nar.memory.executionExpectationThreshold.setValue(0.95f);
@@ -88,15 +89,21 @@ public class SomeRovers {
 //                    }, new Stage());
 
                     NARfx.newConceptWindow(nar,
+                            new TilePane(Orientation.VERTICAL),
                             "MotorControls(#x,motor,(),#z)",
                             "MotorControls(left,motor,(),#z)",
                             "MotorControls(right,motor,(),#z)",
                             "MotorControls(forward,motor,(),#z)",
                             "MotorControls(backward,motor,(),#z)",
-                            "MotorControls(stop,motor,(),#z)",
+                            "MotorControls(stop,motor,(),#z)"
+                    );
+                    NARfx.newConceptWindow(nar,
+                            new TilePane(Orientation.VERTICAL),
                             "eat:food",
                             "eat:poison",
-                            "speed:linear"
+                            "speed:linear",
+                            "speed:left",
+                            "speed:right"
                     );
                 });
             }

@@ -2,14 +2,12 @@ package nars.guifx;
 
 import com.gs.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import javafx.application.Application;
-import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
-import javafx.scene.layout.TilePane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Modality;
@@ -254,7 +252,7 @@ public enum NARfx  {
         s.setTitle(title);
         s.setScene(scene);
 
-        n.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        //n.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         s.show();
 
         return s;
@@ -403,19 +401,20 @@ public enum NARfx  {
 
     }
 
-    public static void newConceptWindow(NAR nar, String... concepts) {
-        newConceptWindow(nar, Stream.of(concepts).map(
+    public static void newConceptWindow(NAR nar, Pane container, String... concepts) {
+        newConceptWindow(nar, container, Stream.of(concepts).map(
             s -> nar.concept(s)).collect(Collectors.toList())
         );
     }
 
-    private static void newConceptWindow(NAR nar, List<Termed> cc) {
-        Pane v = new TilePane(Orientation.VERTICAL, 4,4);
+    private static void newConceptWindow(NAR nar, Pane v, List<Termed> cc) {
 
         for (Termed c : cc) {
             ConceptPane wn = new ConceptPane(nar, c);
             v.getChildren().add(wn);
         }
+
+        v.layout();
 
         Stage st;
         Stage removed = window.put(cc, st = newWindow("Concepts", scrolled(v)));

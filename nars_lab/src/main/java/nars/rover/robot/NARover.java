@@ -4,6 +4,8 @@
  */
 package nars.rover.robot;
 
+import com.gs.collections.api.block.function.primitive.FloatFunction;
+import com.gs.collections.api.block.function.primitive.FloatToFloatFunction;
 import nars.NAR;
 import nars.Symbols;
 import nars.java.MethodOperator;
@@ -14,7 +16,7 @@ import nars.rover.obj.NARVisionRay;
 import nars.rover.obj.VisionRay;
 import nars.task.MutableTask;
 import nars.task.Task;
-import nars.task.in.ChangedTextInput;
+import nars.term.Term;
 import nars.term.Termed;
 import nars.util.data.Util;
 import nars.util.signal.Sensor;
@@ -30,7 +32,6 @@ import static nars.util.Texts.n2;
 public class NARover extends AbstractPolygonBot {
 
 
-    private final ChangedTextInput feltAngle;
 
     public final NAR nar;
     //float tasteDistanceThreshold = 1.0f;
@@ -45,7 +46,7 @@ public class NARover extends AbstractPolygonBot {
 
 
 
-    final Sensor linearSpeed;
+    final Sensor linearSpeed, leftSpeed, rightSpeed;
 
 //    final SimpleAutoRangeTruthFrequency linearVelocity;
 //    final SimpleAutoRangeTruthFrequency motionAngle;
@@ -62,15 +63,31 @@ public class NARover extends AbstractPolygonBot {
 
         objs = new NALObjects(nar);
 
+        int maxUpdateTime = 32;
 
-        linearSpeed = new Sensor(nar, nar.term("speed:linear"), () -> {
-            return torso.getLinearVelocity().length()/linearThrustPerCycle/1.25f;
-        }, (speed) -> {
+
+        FloatToFloatFunction speedThresholdToFreq = (speed) -> {
             return speed < 0.1 ? 0 : Util.clamp(0.5f + speed);
-        });
+        };
 
-        feltAngle = new ChangedTextInput(nar);
-//
+        linearSpeed = new Sensor(nar, nar.term("speed:linear"), (t) -> {
+            return torso.getLinearVelocity().length()/linearThrustPerCycle/1.25f;
+        }, speedThresholdToFreq).maxTimeBetweenUpdates(maxUpdateTime);
+
+        Term speedLeft = nar.term("speed:left");
+        Term speedRight = nar.term("speed:right");
+        FloatFunction<Term> angleSpeed = (t) -> {
+            float a = torso.getAngularVelocity();
+            if (a < 0 && t == speedLeft) return -a;
+            else if (a > 0 && t == speedRight) return a;
+            return 0;
+        };
+        leftSpeed = new Sensor(nar, speedLeft, angleSpeed, speedThresholdToFreq).maxTimeBetweenUpdates(maxUpdateTime);
+        rightSpeed = new Sensor(nar, speedRight, angleSpeed, speedThresholdToFreq).maxTimeBetweenUpdates(maxUpdateTime);
+
+        //TODO torso angle
+
+
 //
 //        linearVelocity = new SimpleAutoRangeTruthFrequency(nar, nar.term("<motion-->[linear]>"), new AutoRangeTruthFrequency(0.0f));
 //        motionAngle = new SimpleAutoRangeTruthFrequency(nar, nar.term("<motion-->[angle]>"), new BipolarAutoRangeTruthFrequency());
@@ -306,7 +323,7 @@ public class NARover extends AbstractPolygonBot {
 //        feltMotion.set("speed:right. %" + Texts.n2(angSpeedRight) + "|0.8%");
 //        feltMotion.set("speed:left. %" + Texts.n2(angSpeedLeft) + "|0.8%");
 
-        feltAngle.set("angle:" + torsoAngle + ". :|:");
+
         //feltMotion.set("rotation:{\" + angDir + \",\" + f5(angSpeed) + \"}. :|:");
 
 
