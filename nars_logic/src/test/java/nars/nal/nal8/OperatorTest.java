@@ -99,7 +99,7 @@ public class OperatorTest {
             return null;
         });
 
-        n.input("exe(a,b,c)!");
+        n.input("exe(a,b,c,#x)!");
 
         n.run(1);
 

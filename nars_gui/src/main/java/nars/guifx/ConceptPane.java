@@ -448,13 +448,15 @@ public class ConceptPane extends BorderPane implements ChangeListener {
         private final Concept concept;
 
         final static TaskRenderer beliefRenderer = new TaskRenderer() {
-            @Override public void renderTask(GraphicsContext ge, float f, float c, float w, float h, float x, float y, float alpha) {
+            @Override public void renderTask(GraphicsContext ge, float f, float c, float w, float h, float x, float y) {
+                float alpha = 0.4f + 0.5f * c; //BeliefTable.rankTemporal(t, now, now);
                 ge.setFill(new Color( f,  0.5f, c, alpha));
                 ge.fillRect(x-w/2,y-h/2,w,h);
             }
         };
         final static TaskRenderer goalRenderer = new TaskRenderer() {
-            @Override public void renderTask(GraphicsContext ge, float f, float c, float w, float h, float x, float y, float alpha) {
+            @Override public void renderTask(GraphicsContext ge, float f, float c, float w, float h, float x, float y) {
+                float alpha = 0.4f + 0.5f * c; //BeliefTable.rankTemporal(t, now, now);
                 ge.setFill(new Color( c,  f, 0.5f, alpha));
                 ge.fillOval(x-w/2,y-h/2,w,h);
             }
@@ -531,16 +533,16 @@ public class ConceptPane extends BorderPane implements ChangeListener {
             te.setFill(Color.WHITE);
             te.fillRect(nx - nowLineWidth / 2f, 0, nowLineWidth, teh);
 
-            float w = 15;
-            float h = 15;
+            float w = 10;
+            float h = 10;
             for (Task t : table) {
                 if (t.isEternal() && t.truth() != null) {
                     float f = t.freq();
                     float c = t.conf();
                     float x = b + (gew - 2 * b - w) * c;
                     float y = b + (geh - 2 * b - h) * (1 - f);
-                    float alpha = 0.25f + 0.5f * c; //concept.getBeliefs().rankEternal(t);
-                    r.renderTask(ge, f, c, w, h, x, y, alpha);
+                    float alpha = 0.4f + 0.5f * c; //concept.getBeliefs().rankEternal(t);
+                    r.renderTask(ge, f, c, w, h, x, y);
                 } else if (!t.isEternal() && t.truth() != null) {
                     float f = t.freq();
                     float cc = t.conf();
@@ -551,15 +553,14 @@ public class ConceptPane extends BorderPane implements ChangeListener {
 
                     float x = xTime(tew, b, minT, maxT, o, w);
                     float y = b + (teh - 2 * b - h) * (1 - f);
-                    float alpha = 0.25f + 0.5f * cc; //BeliefTable.rankTemporal(t, now, now);
-                    r.renderTask(te, f, cc, w, h, x, y, alpha);
+                    r.renderTask(te, f, cc, w, h, x, y);
                 }
 
             }
         }
 
         @FunctionalInterface interface TaskRenderer {
-            void renderTask(GraphicsContext ge, float f, float c, float w, float h, float x, float y, float alpha);
+            void renderTask(GraphicsContext ge, float f, float c, float w, float h, float x, float y);
         }
 
 

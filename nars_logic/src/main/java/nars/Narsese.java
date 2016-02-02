@@ -83,7 +83,7 @@ public class Narsese extends BaseParser<Object> {
         }
 
         if (t == null) {
-            t = memory.newTruthDefault(p);
+            t = memory.getTruthDefault(p);
         }
 
         MutableTask ttt =

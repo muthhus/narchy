@@ -248,8 +248,8 @@ public class BeliefTableTest  {
         n.step();
         b.print();
 
-        assertEquals(0.75f, b.beliefs().expectation(true, n.memory), 0.1f);
-        assertEquals(0.2f, b.beliefs().expectation(false, n.memory), 0.01f);
+        assertEquals(0.859f, b.beliefs().top(n).expectation(true), 0.1f);
+        //assertEquals(0.2f, b.beliefs().top(n).expectation(false), 0.01f);
 
         n.input("a:b. %0.2|0.7%");
         n.input("a:b. %0.1|0.8%"); //highest negative
@@ -257,7 +257,7 @@ public class BeliefTableTest  {
         n.step();
         b.print();
 
-        assertEquals(0.24f, b.beliefs().expectation(false, n.memory), 0.01f);
+        //assertEquals(0.24f, b.beliefs().top(n).expectation(false), 0.01f);
     }
 
     @Test

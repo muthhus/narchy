@@ -250,7 +250,9 @@ public class DefaultConcept extends AtomConcept {
 
         if (Op.isOperation(term())) {
 
-            float goalExp = goals().expectation(true, memory); //strongest/most relevant current desire
+            long now = memory.time();
+            Task projectedGoal = goals().top(now);
+            float goalExp = projectedGoal.expectation(); //strongest/most relevant current desire
 
             if ((goalExp > Global.EXECUTION_DESIRE_EXPECTATION_THRESHOLD)
                 //&&(goalExp > beliefs().expectation(true, memory))
@@ -258,11 +260,6 @@ public class DefaultConcept extends AtomConcept {
 
                 //float delta = updateSuccess(goal, successBefore, memory);
 
-
-                if (goal == null) {
-                    long now = memory.time();
-                    goal = goals().top(now);
-                }
                 //&& (goal.state() != Task.TaskState.Executed)) {
 
                 /*if (delta >= Global.EXECUTION_SATISFACTION_TRESHOLD)*/
@@ -277,7 +274,7 @@ public class DefaultConcept extends AtomConcept {
 //                        //then there is no need to execute
 //                        //which means only execute if there is new evidence which suggests doing so1
 //                        if (ev.addAll(input.getEvidence())) {
-                    nar.execute(goal);
+                    nar.execute(projectedGoal);
 
 //                            //TODO more efficient size limiting
 //                            //lastevidence.toSortedList()

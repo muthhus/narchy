@@ -1,7 +1,6 @@
 package nars.concept.util;
 
 import com.google.common.collect.Iterators;
-import nars.Memory;
 import nars.NAR;
 import nars.nal.Tense;
 import nars.task.Task;
@@ -79,17 +78,6 @@ public interface BeliefTable extends TaskTable {
         public Task add(@NotNull Task input, NAR nar) {
             return input;
         }
-
-        @Override
-        public float expectation(boolean positive, Memory memory) {
-            return 0;
-        }
-
-        @Override
-        public float rankEternal(@NotNull Task b) {
-            return 0;
-        }
-
 
         @Override
         public Task topEternal() {
@@ -188,15 +176,14 @@ public interface BeliefTable extends TaskTable {
         return max;
     }
 
-    static public float rankTemporal(@NotNull Task b, long when, float duration) {
-        return rankEternal(b, when, duration)
+
+    static public float rankTemporalByOriginality(@NotNull Task b, long when, float duration) {
+        return rankEternalByOriginalty(b)
                 /(1f+ (Math.abs(b.occurrence() - when)/duration));
     }
 
-    public float rankEternal(@NotNull Task b);
-
-    static public float rankEternal(@NotNull Task b, long now, float duration) {
-        return or(b.conf(), b.getOriginality());// - ((Math.abs(now - b.creation()/duration)));
+    static public float rankEternalByOriginalty(@NotNull Task b) {
+        return or(b.conf(), b.originality());
     }
 
     /** get the top-ranking eternal belief/goal; null if no eternal beliefs known */
@@ -267,33 +254,33 @@ public interface BeliefTable extends TaskTable {
     }
 
 
-    /** computes the truth/desire as an aggregate of projections of all
-     * beliefs to current time
-     */
-    default float getMeanProjectedExpectation(long time, int dur) {
-        int size = size();
-        if (size == 0) return 0;
+//    /** computes the truth/desire as an aggregate of projections of all
+//     * beliefs to current time
+//     */
+//    default float getMeanProjectedExpectation(long time, int dur) {
+//        int size = size();
+//        if (size == 0) return 0;
+//
+//        float[] d = {0};
+//        forEach(t -> d[0] +=
+//                relevance(t, time, dur) //projectionQuality(t.freq(), t.conf(), t, time, time, false)
+//                * t.expectation());
+//
+//        float dd = d[0];
+//
+//        if (dd == 0) return 0;
+//
+//        return dd / size;
+//
+//    }
 
-        float[] d = {0};
-        forEach(t -> d[0] +=
-                relevance(t, time, dur) //projectionQuality(t.freq(), t.conf(), t, time, time, false)
-                * t.expectation());
 
-        float dd = d[0];
-
-        if (dd == 0) return 0;
-
-        return dd / size;
-
-    }
-
-
-    static float relevance(Task t, long time, int dur) {
+    static float relevance(Task t, long time, float dur) {
         long o = t.occurrence();
 
         if (o == Tense.ETERNAL) return 0.5f; //weight eternal half as much as temporal; similar to a horizon heuristic
 
-        return 1f / (1f + Math.abs(o - time)/((float)dur));
+        return 1f / (1f + Math.abs(o - time)/dur);
     }
 
 
@@ -322,8 +309,23 @@ public interface BeliefTable extends TaskTable {
         return a.conf() > b.conf() ? a : b;
     }
 
-    float expectation(boolean positive, Memory memory);
 
+    /**
+     *
+     * @param t
+     * @param time
+     * @param dur effectively a ratio for trading off confidence against time
+     * @return
+     */
+    static float rankTemporalByConfidence(Task t, long time, float dur) {
+        return
+            t.conf() * BeliefTable.relevance(t, time, dur)
+        ;
+    }
+
+    default Task top(NAR n) {
+        return top(n.memory.time());
+    }
 
 
 //    @FunctionalInterface

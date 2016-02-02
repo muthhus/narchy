@@ -271,7 +271,7 @@ public enum BeliefFunction implements TruthOperator {
 
     @Nullable
     public static Truth newDefaultTruth(@NotNull Memory m) {
-        return m.newTruthDefault(Symbols.JUDGMENT);
+        return m.getTruthDefault(Symbols.JUDGMENT);
     }
 
     public static float defaultConfidence(@NotNull Memory m) {

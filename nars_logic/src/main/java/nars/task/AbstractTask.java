@@ -332,7 +332,7 @@ public abstract class AbstractTask extends Item<Task>
 
     @Override
     public final boolean isAnticipated() {
-        return isJudgmentOrGoal() && !isEternal() && (state() == TaskState.Anticipated || isInput());
+        return isJudgment() && !isEternal() && (state() == TaskState.Anticipated || isInput());
     }
 
     @NotNull

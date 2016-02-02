@@ -4,7 +4,9 @@ import javassist.scopedpool.SoftValueHashMap;
 import nars.Global;
 import nars.Memory;
 import nars.guifx.NARfx;
+import nars.guifx.demo.NARide;
 import nars.nar.Default;
+import nars.op.mental.Anticipate;
 import nars.rover.RoverWorld;
 import nars.rover.Sim;
 import nars.rover.robot.NARover;
@@ -47,7 +49,7 @@ public class SomeRovers {
 
         if (addNARRover)
         {
-            int conceptsFirePerCycle = 16;
+            int conceptsFirePerCycle = 2;
             Default nar = new Default(
                     new Memory(clock, new MapIndex2(
                             new SoftValueHashMap())),
@@ -61,24 +63,28 @@ public class SomeRovers {
 //            nar.memory.DEFAULT_QUESTION_DURABILITY = 0.6f;
 
             //nar.initNAL9();
-            //nar.memory.the(new Anticipate(nar));
+            nar.memory.the(new Anticipate(nar));
 
 
             //nar.memory.perfection.setValue(0.15f);
-            nar.core.confidenceDerivationMin.setValue(0.01f);
-            //nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
+            nar.core.confidenceDerivationMin.setValue(0.02f);
+            nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
             nar.memory.duration.set(4);
             nar.memory.conceptForgetDurations.setValue(2);
-            nar.memory.cyclesPerFrame.set(1);
+            nar.memory.cyclesPerFrame.set(16);
             nar.memory.shortTermMemoryHistory.set(3);
             //nar.memory.executionExpectationThreshold.setValue(0.95f);
 
 
             boolean gui = true;
             if (gui) {
-                //NARide.loop(nar, false);
+                NARide.loop(nar, false);
 
                 NARfx.run( () -> {
+//                    NARide.newIDE(nar.loop(), (i) -> {
+//
+//                    }, new Stage());
+
                     NARfx.newConceptWindow(nar,
                             "MotorControls(#x,motor,#y,#z)",
                             "MotorControls(left,motor,(),#z)",

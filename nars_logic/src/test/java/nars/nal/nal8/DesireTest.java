@@ -51,11 +51,12 @@ public class DesireTest {
     }
 
     private float print(NAR n, String concept, long now) {
-        float exp = n.concept(concept).goals().expectation(false, n.memory);
         Task tt = n.concept(concept).goals().top(now);
-        System.out.println(now + ": " + exp + "\t" + tt);
+        System.out.println(now + ": " + "\t" + tt);
             /*if (tt!=null)
                 System.out.println(tt.getExplanation());*/
-        return exp;
+        if (tt!=null)
+            return tt.expectation();
+        return -1f;
     }
 }

@@ -4,7 +4,6 @@ import nars.$;
 import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Terms;
 import nars.term.atom.AbstractStringAtom;
 import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
@@ -45,7 +44,7 @@ public final class Operator<T extends Term> extends AbstractStringAtom { //imple
         return ((Operator) operation.term(1));
     }
 
-    static final Variable defaultResultVariable = $.varDep("defaultResultVariable");
+    public static final Variable defaultResultVariable = $.varDep("defaultResultVariable");
 
     /**
      * creates a result term in the conventional format.
@@ -53,28 +52,37 @@ public final class Operator<T extends Term> extends AbstractStringAtom { //imple
      * which will be replaced with the result term (y)
      */
     @Nullable
-    public static Term result(@NotNull Compound operation, Term y) {
+    public static Term result(@NotNull Compound operation, @Nullable Term y) {
         Compound x = (Compound) operation.term(0);
         if (!x.op(PRODUCT))
             throw new RuntimeException("invalid operation");
 
         //add var dep as last term if missing
-        if (!x.last().op().isVar()) {
-            x = $.p(Terms.concat(x.terms(), y)); //defaultResultVariable));
+        Term xLast = x.last();
+        if (!xLast.op(Op.VAR_DEP)) {
+            throw new RuntimeException("feedback requires variable in last position");
+            //x = $.p(Terms.concat(x.terms(), y)); //defaultResultVariable));
+
+            //        } else {
+            //            //TODO more efficient than subterm sequencing it:
+            //            x = $.p( Terms.concat(x.terms(0, x.size()-1), y));
+            //        }
         }
-//        } else {
-//            //TODO more efficient than subterm sequencing it:
-//            x = $.p( Terms.concat(x.terms(0, x.size()-1), y));
-//        }
+
+        //if (y != null)
+        //    x = (Compound) x.replacing(x.size()-1, y);
+
+        if (y == null)
+            y = xLast;
 
         return $.inh(
-//        //return $.inst(
                 y,
                 makeImageExt(x, operation.term(1), (short) (x.size() - 1) /* position of the variable */)
         );
 
         //return $.exec(Operator.operatorTerm(operation), x);
     }
+
 
     /**
      * Try to make an Image from a Product and a relation. Called by the logic rules.

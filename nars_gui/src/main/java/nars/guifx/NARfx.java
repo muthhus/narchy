@@ -2,6 +2,7 @@ package nars.guifx;
 
 import com.gs.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import javafx.application.Application;
+import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -408,7 +409,7 @@ public enum NARfx  {
     }
 
     private static void newConceptWindow(NAR nar, List<Concept> cc) {
-        Pane v = new TilePane();
+        Pane v = new TilePane(Orientation.VERTICAL);
 
         for (Concept c : cc) {
             ConceptPane wn = new ConceptPane(nar, c);
@@ -416,7 +417,7 @@ public enum NARfx  {
         }
 
         Stage st;
-        Stage removed = window.put(cc, st = newWindow("Concepts", v));
+        Stage removed = window.put(cc, st = newWindow("Concepts", scrolled(v)));
 
         if (removed!=null)
             removed.close();

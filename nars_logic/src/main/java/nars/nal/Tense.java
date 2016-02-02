@@ -5,6 +5,7 @@ import nars.task.Task;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 
+import static nars.concept.util.BeliefTable.rankEternalByOriginalty;
 import static nars.nal.UtilityFunctions.or;
 
 /** tense modes, and various Temporal utility functions and constants */
@@ -56,12 +57,9 @@ public enum Tense  {
 //    }
 
     public static float solutionQuality(@NotNull Task problem, @NotNull Task solution, Truth projectedTruth, long now) {
-
-        //if (problem.hasQueryVar()) {
-        float originality = solution.getOriginality();
-        return problem.hasQueryVar() ?
-                or(originality, projectedTruth.expectation() / solution.term().complexity()) :
-                or(originality, projectedTruth.conf());
+        return !problem.hasQueryVar() ?
+                    rankEternalByOriginalty(solution) :
+                    or(solution.originality(), projectedTruth.expectation() / solution.term().complexity());
     }
 
     //    /**

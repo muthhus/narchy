@@ -6,7 +6,6 @@ import nars.Memory;
 import nars.NAR;
 import nars.budget.Budget;
 import nars.budget.UnitBudget;
-import nars.java.NALObjects;
 import nars.nal.Tense;
 import nars.task.MutableTask;
 import nars.task.Task;
@@ -202,7 +201,7 @@ public class Execution implements Runnable {
 
         //this will get the original input operation term, not after it has been inlined.
         feedback( new MutableTask(
-                Operator.result(task.term(), NALObjects.TRUE)
+                Operator.result(task.term(), null)
                 //task.concept()
         ).judgment()
                 .truth(y).present(nar.memory)

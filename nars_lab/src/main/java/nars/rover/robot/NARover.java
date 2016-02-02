@@ -6,6 +6,7 @@ package nars.rover.robot;
 
 import nars.NAR;
 import nars.Symbols;
+import nars.java.MethodOperator;
 import nars.java.NALObjects;
 import nars.rover.Material;
 import nars.rover.Sim;
@@ -336,38 +337,35 @@ public class NARover extends AbstractPolygonBot {
             stop = rover.nar.term("MotorControls(stop,motor,(),#x)");
         }
 
-        public boolean stop() {
+        public void stop() {
             rover.thrustRelative(0);
             rover.rotateRelative(0);
-            return true;
         }
 
-        private boolean forward(boolean forward) {
+        private void forward(boolean forward) {
             //Task c = MethodOperator.invokingTask();
             //float thrust = c!=null ? c.expectation() : 1;
             float thrust = 2f;
             if (!forward) thrust = -thrust;
             rover.thrustRelative(thrust);
-            return true;
         }
 
-        private boolean rotate(boolean left) {
+        private void rotate(boolean left) {
             //Task c = MethodOperator.invokingTask();
             //float thrust = c!=null ? c.expectation() : 1;
             float thrust = 2f;
             if (left) thrust = -thrust;
             rover.rotateRelative(thrust);
-            return true;
         }
 
-        public boolean left() { return rotate(true); }
-        public boolean right() { return rotate(false); }
-        public boolean forward() { return forward(true); }
-        public boolean backward() { return forward(false); }
+        public void left() {  rotate(true); }
+        public void right() {  rotate(false); }
+        public void forward() {  forward(true); }
+        public void backward() {  forward(false); }
 
 
         public Task random() {
-            //Task c = MethodOperator.invokingTask();
+            Task c = MethodOperator.invokingTask();
 
             Termed term;
 
@@ -387,7 +385,8 @@ public class NARover extends AbstractPolygonBot {
             }
 
             return new MutableTask(term, Symbols.GOAL)
-                    //.truth( c.truth() )
+                    .budget(c.budget())
+                    .truth( c.truth() )
                     .present(rover.nar.memory);
         }
     }

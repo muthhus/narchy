@@ -57,56 +57,53 @@ public class DefaultBeliefTable implements BeliefTable {
         this.minT = this.maxT = Tense.TIMELESS;
         this.duration = memory.duration.floatValue();
 
+        /** Ranking by originality is a metric used to conserve original information in balance with confidence */
         eternal = new SetTable<Task>(cap/2, map,
-            this::rankEternal
+            BeliefTable::rankEternalByOriginalty
         );
         temporal = new SetTable<Task>(cap/2, map,
-            this::rankTemporal
+            this::rankTemporalByOriginality
         );
     }
 
-    public float rankEternal(@NotNull Task b) {
-        return BeliefTable.rankEternal(b, lastUpdate, duration);
-    }
 
-    /** computes the truth/desire as an aggregate of projections of all
-     * beliefs to current time
-     */
-    public final float expectation(boolean positive, Memory memory) {
 
-        long time = memory.time();
-        int dur = memory.duration();
-
-        float[] d = {0f /* neutral threshold */};
-
-        Consumer<Task> rank = t -> {
-
-            float best = d[0];
-
-            float f = t.freq();
-            if (!positive) f = 1f - f;
-
-            //scale conf by relevance, not the expectation itself
-            float e = Truth.expectation(f, t.conf() * BeliefTable.relevance(t, time, dur));
-
-            if (!positive) e = 1f - e; //invert to be consistent with maximum value ranking
-
-            if (e > best)
-                d[0] = e;
-        };
-
-        ArrayTable<Task, Task> t = this.temporal, u = this.eternal;
-        if (!t.isEmpty()) {
-            t.forEach(rank);
-        }
-
-        if (!u.isEmpty()) {
-            u.forEach(rank);
-        }
-
-        float dd = d[0];
-        return (positive) ? dd : (1f - dd);
-    }
+//    /** computes the truth/desire as an aggregate of projections of all
+//     * beliefs to current time
+//     */
+//    public final float expectation(boolean positive, Memory memory) {
+//
+//        long time = memory.time();
+//        int dur = memory.duration();
+//
+//        float[] d = { positive ?  0f : 1f };
+//
+//        Consumer<Task> rank = t -> {
+//
+//            float best = d[0];
+//
+//            //scale conf by relevance, not the expectation itself
+//            float e =
+//                    Truth.expectation(t.freq(), t.conf()) *
+//                    BeliefTable.rankTemporalByConfidence( t, time, dur );
+//
+//
+//            if ((positive && (e > best)) || (!positive && (e < best)))
+//                d[0] = e;
+//        };
+//
+//        ArrayTable<Task, Task> t = this.temporal, u = this.eternal;
+//        if (!t.isEmpty()) {
+//            t.forEach(rank);
+//        }
+//
+//        if (!u.isEmpty()) {
+//            u.forEach(rank);
+//        }
+//
+//        float dd = d[0];
+//        return dd;
+//    }
 
 
     public long getMinT() {
@@ -151,11 +148,11 @@ public class DefaultBeliefTable implements BeliefTable {
     }
 
 
-    public float rankTemporal(@NotNull Task b) {
-        return rankTemporal(b, lastUpdate);
+    public float rankTemporalByOriginality(@NotNull Task b) {
+        return rankTemporalByOriginality(b, lastUpdate);
     }
-    public float rankTemporal(@NotNull Task b, long when) {
-        return BeliefTable.rankTemporal(b, when, duration*getCapacity());
+    public float rankTemporalByOriginality(@NotNull Task b, long when) {
+        return BeliefTable.rankTemporalByOriginality(b, when, duration*getCapacity());
     }
 
 
@@ -220,7 +217,7 @@ public class DefaultBeliefTable implements BeliefTable {
         int ls = l.size();
         for (int i = 0; i < ls; i++) {
             Task x = l.get(i);
-            float r = rankTemporal(x, when);
+            float r = BeliefTable.rankTemporalByConfidence(x, when, duration);
             if (r > bestRank) {
                 best = x;
                 bestRank = r;

@@ -10,12 +10,12 @@ import nars.Global;
 import nars.NAR;
 import nars.nal.Tense;
 import nars.nal.nal8.Execution;
+import nars.nal.nal8.Operator;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;
-import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,7 +40,7 @@ import java.util.stream.Stream;
  */
 public class NALObjects extends DefaultTermizer implements Termizer, MethodHandler {
 
-    static final Variable returnValue = $.varDep("returnValue");
+
     @NotNull
     public static Set<String> methodExclusions = new HashSet<String>() {{
         add("hashCode");
@@ -224,15 +224,13 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
 
         //TODO handle static methods
 
-        boolean isVoid = method.getReturnType() == void.class;
+        //boolean isVoid = method.getReturnType() == void.class;
 
-        Term[] x = new Term[isVoid ? 3 : 4];
+        Term[] x = new Term[4];
         x[0] = $.the(method.getName());
         x[1] = term(instance);
         x[2] = $.p(terms(args));
-        if (!isVoid) {
-            x[3] = returnValue;
-        }
+        x[3] = Operator.defaultResultVariable;
         return x;
     }
 

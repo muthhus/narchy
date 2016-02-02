@@ -16,6 +16,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 import nars.$;
 import nars.Global;
 import nars.NAR;
@@ -79,151 +80,7 @@ public class NARide extends BorderPane {
 
         NARfx.run((a,b) -> {
 
-            Thread.currentThread().setName("NARide");
-
-
-            NAR nar = loop.nar;
-            NARide ni = new NARide(loop);
-
-            Scene scene = new Scene(ni, 1000, 800,
-                    false, SceneAntialiasing.DISABLED);
-
-
-            //ni.addView(new TaskSheet(nar));
-            ni.addView(new IOPane(nar));
-
-                /*ni.addView(new UDPPane(new UDPNetwork(
-                        10001+(int)(Math.random()*5000) //HACK
-                ).connect(nar)));*/
-
-                /*ni.addIcon(() -> {
-                    return new InputPane(nar);
-                });*/
-            ni.addIcon(() -> new ConceptSonificationPanel(nar));
-            //ni.addView(additional components);
-
-            ni.addTool("I/O", () -> new IOPane(nar));
-            ni.addTool("Active Concepts (Buttons)", () -> new ActiveConceptsLog(nar) {
-
-                @Override public Node make(Concept cc) {
-                    return SubButton.make(nar, cc);
-                }
-            });
-            ni.addTool("Active Concepts (Log)", () -> new ActiveConceptsLog(nar) {
-
-                final EventHandler<? super MouseEvent> clickHandler =
-                        e -> {
-                            System.out.println(e);
-                            ConceptSummaryPane src = (ConceptSummaryPane) e.getSource();
-
-                            Concept cc = src.concept;
-                            NARfx.newConceptWindow(nar,cc);
-                        };
-
-                @Override public Node make(Concept cc) {
-                    ConceptSummaryPane csp = new ConceptSummaryPane(cc, nar.time());
-                    setOnMouseClicked( clickHandler );
-                    return csp;
-                }
-            });
-            ni.addTool("Task Tree", () -> new TreePane(nar));
-            ni.addTool("Concept Network", () -> new DefaultGrapher(
-                new ConceptsSource(nar),
-
-                //new DefaultNodeVis(),
-                new HexButtonVis(nar),
-
-
-                (A,B) -> {
-                    TermEdge te = new TermEdge(A,B) {
-                        @Override public double getWeight() {
-                            return pri;
-                        }
-                    };
-                    return te;
-                    //return $.pro(A.getTerm(), B.getTerm());
-                },
-
-                //new HalfHalfRightTriangleCanvasEdgeRenderer()
-                new HalfHalfLineCanvasEdgeRenderer()
-
-            ));
-            ni.addTool("Fractal Workspace", () -> new NARspace(nar));
-
-
-            ni.addTool("Webcam", () -> {
-                return new WebcamFX();
-            });
-
-
-            ni.addTool("Terminal (bash)", LocalTerminal::new);
-            ni.addTool("Status", () -> new StatusPane(nar, 320));
-            ni.addTool("VNC/RDP Remote", () -> (VncClientApp.newView()));
-            ni.addTool("Web Browser", WebBrowser::new);
-
-            ni.addTool("HTTP Server", Pane::new);
-
-            ni.addTool(new Menu("Interface..."));
-            ni.addTool(new Menu("Cognition..."));
-            ni.addTool(new Menu("Sensor..."));
-
-            ni.controlPane.main.getItems().addAll(
-                new SimpleMenuItem("Full-Screen", () -> {
-                    b.setFullScreenExitHint("F11 to release full-screen");
-                    b.setFullScreenExitKeyCombination(KeyCombination.keyCombination("F11"));
-
-                    b.setFullScreen(true);
-                })
-            );
-
-            //Button summaryPane = new Button(":D");
-
-//            Scene scene = new SizeAwareWindow((d) -> {
-//                double w = d[0];
-//                double h = d[1];
-//                if ((w < 200) && (h < 200)) {
-//                    /*
-//                    new LinePlot(
-//                        "Concepts",
-//                        () -> (nar.memory.getConcepts().size()),
-//                        300
-//                     */
-//                    return () -> summaryPane;
-//                }/* else if (w < 200) {
-//                    return Column;
-//                } else if (h < 200) {
-//                    return Row;
-//                }*/
-//                return () -> ni;
-//            });
-            nar.onExec("gc", (c) -> {
-                nar.runLater(() -> {
-                    long before = Runtime.getRuntime().freeMemory();
-                    System.gc();
-                    long after = Runtime.getRuntime().freeMemory();
-                    $.logger.info("GarbageCollect:\"" + (after - before)/1024 + "k collected, " + after/1024 + "k available\".");
-                });
-            });
-
-            nar.onExec("memstat", (c) -> {
-                String report = "";
-                report += "Busy: " + nar.memory.emotion.busy() + "<br/>";
-                report += "Index Size (Terms): " + nar.memory.index.size() + "<br/>";
-                report += "Active Concept Bag Histogram: " +
-                        Arrays.toString(((Default)nar).core.active.getPriorityHistogram(10)) + "<br/>";
-                nar.input("html(\"" + report + "\");");
-            });
-
-
-            scene.getStylesheets().setAll(NARfx.css);
-            b.setScene(scene);
-            b.show();
-            scene.getWindow().centerOnScreen();
-
-            if (ide != null)
-                ide.accept(ni);
-
-            b.setOnCloseRequest((e) -> System.exit(0));
+            newIDE(loop, ide, b);
         });
 //        SizeAwareWindow wn = NARide.newWindow(nar, ni = new NARide(nar));
 //
@@ -243,6 +100,154 @@ public class NARide extends BorderPane {
 //            removed.close();
 //
 //        return ni;
+    }
+
+    public static void newIDE(NARLoop loop, Consumer<NARide> ide, Stage b) {
+        Thread.currentThread().setName("NARide");
+
+
+        NAR nar = loop.nar;
+        NARide ni = new NARide(loop);
+
+        Scene scene = new Scene(ni, 1000, 800,
+                false, SceneAntialiasing.DISABLED);
+
+
+        //ni.addView(new TaskSheet(nar));
+        ni.addView(new IOPane(nar));
+
+                /*ni.addView(new UDPPane(new UDPNetwork(
+                        10001+(int)(Math.random()*5000) //HACK
+                ).connect(nar)));*/
+
+                /*ni.addIcon(() -> {
+                    return new InputPane(nar);
+                });*/
+        ni.addIcon(() -> new ConceptSonificationPanel(nar));
+        //ni.addView(additional components);
+
+        ni.addTool("I/O", () -> new IOPane(nar));
+        ni.addTool("Active Concepts (Buttons)", () -> new ActiveConceptsLog(nar) {
+
+            @Override public Node make(Concept cc) {
+                return SubButton.make(nar, cc);
+            }
+        });
+        ni.addTool("Active Concepts (Log)", () -> new ActiveConceptsLog(nar) {
+
+            final EventHandler<? super MouseEvent> clickHandler =
+                    e -> {
+                        System.out.println(e);
+                        ConceptSummaryPane src = (ConceptSummaryPane) e.getSource();
+
+                        Concept cc = src.concept;
+                        NARfx.newConceptWindow(nar,cc);
+                    };
+
+            @Override public Node make(Concept cc) {
+                ConceptSummaryPane csp = new ConceptSummaryPane(cc, nar.time());
+                setOnMouseClicked( clickHandler );
+                return csp;
+            }
+        });
+        ni.addTool("Task Tree", () -> new TreePane(nar));
+        ni.addTool("Concept Network", () -> new DefaultGrapher(
+            new ConceptsSource(nar),
+
+            //new DefaultNodeVis(),
+            new HexButtonVis(nar),
+
+
+            (A,B) -> {
+                TermEdge te = new TermEdge(A,B) {
+                    @Override public double getWeight() {
+                        return pri;
+                    }
+                };
+                return te;
+                //return $.pro(A.getTerm(), B.getTerm());
+            },
+
+            //new HalfHalfRightTriangleCanvasEdgeRenderer()
+            new HalfHalfLineCanvasEdgeRenderer()
+
+        ));
+        ni.addTool("Fractal Workspace", () -> new NARspace(nar));
+
+
+        ni.addTool("Webcam", () -> {
+            return new WebcamFX();
+        });
+
+
+        ni.addTool("Terminal (bash)", LocalTerminal::new);
+        ni.addTool("Status", () -> new StatusPane(nar, 320));
+        ni.addTool("VNC/RDP Remote", () -> (VncClientApp.newView()));
+        ni.addTool("Web Browser", WebBrowser::new);
+
+        ni.addTool("HTTP Server", Pane::new);
+
+        ni.addTool(new Menu("Interface..."));
+        ni.addTool(new Menu("Cognition..."));
+        ni.addTool(new Menu("Sensor..."));
+
+        ni.controlPane.main.getItems().addAll(
+            new SimpleMenuItem("Full-Screen", () -> {
+                b.setFullScreenExitHint("F11 to release full-screen");
+                b.setFullScreenExitKeyCombination(KeyCombination.keyCombination("F11"));
+
+                b.setFullScreen(true);
+            })
+        );
+
+        //Button summaryPane = new Button(":D");
+
+//            Scene scene = new SizeAwareWindow((d) -> {
+//                double w = d[0];
+//                double h = d[1];
+//                if ((w < 200) && (h < 200)) {
+//                    /*
+//                    new LinePlot(
+//                        "Concepts",
+//                        () -> (nar.memory.getConcepts().size()),
+//                        300
+//                     */
+//                    return () -> summaryPane;
+//                }/* else if (w < 200) {
+//                    return Column;
+//                } else if (h < 200) {
+//                    return Row;
+//                }*/
+//                return () -> ni;
+//            });
+        nar.onExec("gc", (c) -> {
+            nar.runLater(() -> {
+                long before = Runtime.getRuntime().freeMemory();
+                System.gc();
+                long after = Runtime.getRuntime().freeMemory();
+                $.logger.info("GarbageCollect:\"" + (after - before)/1024 + "k collected, " + after/1024 + "k available\".");
+            });
+        });
+
+        nar.onExec("memstat", (c) -> {
+            String report = "";
+            report += "Busy: " + nar.memory.emotion.busy() + "<br/>";
+            report += "Index Size (Terms): " + nar.memory.index.size() + "<br/>";
+            report += "Active Concept Bag Histogram: " +
+                    Arrays.toString(((Default)nar).core.active.getPriorityHistogram(10)) + "<br/>";
+            nar.input("html(\"" + report + "\");");
+        });
+
+
+        scene.getStylesheets().setAll(NARfx.css);
+        b.setScene(scene);
+        b.show();
+        scene.getWindow().centerOnScreen();
+
+        if (ide != null)
+            ide.accept(ni);
+
+        b.setOnCloseRequest((e) -> System.exit(0));
     }
 
 

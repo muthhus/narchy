@@ -28,11 +28,11 @@ import nars.$;
 import nars.Global;
 import nars.NAR;
 import nars.Symbols;
-import nars.budget.Budget;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.task.Temporal;
 import nars.term.Compound;
+import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
@@ -47,8 +47,10 @@ public final class Anticipate {
 
     public float DEFAULT_CONFIRMATION_EXPECTATION = 0.51f;
 
+    /** max differnce in frequency value to be considered a match */
+    final static float FREQ_TOLERANCE = 0.25f;
 
-    final Multimap<Compound,TaskTime> anticipations = LinkedHashMultimap.create();
+    final Multimap<Compound,Task> anticipations = LinkedHashMultimap.create();
 
     @NotNull
     private final NAR nar;
@@ -63,7 +65,7 @@ public final class Anticipate {
 //    public static String teststring = "";
 
 
-    final List<TaskTime> toRemove = Global.newArrayList();
+    final List<Task> toRemove = Global.newArrayList();
 
 
     public Anticipate(@NotNull NAR nar) {
@@ -83,7 +85,7 @@ public final class Anticipate {
 
     public void anticipate(@NotNull Task t) {
 
-        if(t.truth().expectation() < DEFAULT_CONFIRMATION_EXPECTATION || t.punc() != Symbols.JUDGMENT) {
+        if (t.expectation() < DEFAULT_CONFIRMATION_EXPECTATION) {
             return;
         }
 
@@ -100,17 +102,17 @@ public final class Anticipate {
 //        if (debug)
 //            System.err.println("Anticipating " + tt + " in " + (t.getOccurrenceTime() - now));
 
-        TaskTime taskTime = new TaskTime(t);
-//        if(testing) {
+        //        if(testing) {
 //            String s = "anticipating: "+taskTime.task.getTerm().toString();
 //            System.out.println(s);
 //            teststring += s + "\n";
 //        }
-        anticipations.put(tt, taskTime);
+
+        anticipations.put(tt, t);
 
     }
 
-    protected void deriveDidntHappen(@NotNull Compound prediction, @NotNull TaskTime tt) {
+    protected void deriveDidntHappen(@NotNull Compound prediction, @NotNull Task tt) {
 
 //        if(testing) {
 //            String s = "did not happen: " + prediction.toString();
@@ -118,7 +120,7 @@ public final class Anticipate {
 //            teststring += s + "\n";
 //        }
 
-        long expectedOccurrenceTime = tt.occurrTime;
+        long expectedOccurrenceTime = tt.occurrence();
 
         //it did not happen, so the time of when it did not
         //happen is exactly the time it was expected
@@ -128,9 +130,9 @@ public final class Anticipate {
 
         nar.input(new MutableTask($.neg(prediction))
                 .belief()
-                .truth(1.0f, nar.memory.getDefaultConfidence(Symbols.JUDGMENT))
+                .truth(nar.memory.getTruthDefault(Symbols.JUDGMENT))
                 .time(nar.time(), expectedOccurrenceTime)
-                .parent(tt.task, null)
+                //.parent(tt, null)
                 .because("Absent Anticipated Event"));
     }
 
@@ -142,19 +144,22 @@ public final class Anticipate {
             return; //it's not a input task, the system is not allowed to convince itself about the state of affairs ^^
         }
 
+        float freq = c.freq();
         long cOccurr = c.occurrence();
 
-        final List<TaskTime> toRemove = this.toRemove;
+        final List<Task> toRemove = this.toRemove;
 
-        int halfDur = nar.memory.duration()/2;
+        int tolerance = nar.memory.duration();
 
-        anticipations.get(c.term()).stream().filter(tt -> tt.inTime(cOccurr, halfDur) && !c.equals(tt.task) &&
-                tt.task.expectation() > DEFAULT_CONFIRMATION_EXPECTATION).forEach(tt -> {
+        Multimap<Compound, Task> a = this.anticipations;
+        Compound ct = c.term();
+
+        a.get(ct).stream().filter(tt -> inTime(freq, tt, cOccurr, tolerance)).forEach(tt -> {
             toRemove.add(tt);
             happeneds++;
         });
 
-        toRemove.forEach(tt -> anticipations.remove(c.term(),tt));
+        toRemove.forEach(tt -> a.remove(ct,tt));
         toRemove.clear();
 
     }
@@ -165,16 +170,16 @@ public final class Anticipate {
 
         long now = nar.memory.time();
 
-        Iterator<Map.Entry<Compound, TaskTime>> it = anticipations.entries().iterator();
+        Iterator<Map.Entry<Compound, Task>> it = anticipations.entries().iterator();
 
         int halfDur = nar.memory.duration()/2;
         while (it.hasNext()) {
 
-            Map.Entry<Compound, TaskTime> t = it.next();
+            Map.Entry<Compound, Task> t = it.next();
             Compound term = t.getKey();
-            TaskTime tt = t.getValue();
+            Task tt = t.getValue();
 
-            if (tt.tooLate(now, halfDur)) {
+            if (tooLate(tt, now, halfDur)) {
                 deriveDidntHappen(term, tt);
                 it.remove();
                 didnts++;
@@ -185,57 +190,61 @@ public final class Anticipate {
 //            System.err.println(now + ": Anticipations: pending=" + anticipations.size() + " happened=" + happeneds + " , didnts=" + didnts);
     }
 
-    /** Prediction point vector / centroid of a group of Tasks
-     *      time a prediction is made (creationTime), and
-     *      tme it is expected (ocurrenceTime) */
-    public static final class TaskTime {
 
-        /** all data is from task */
-        @NotNull
-        public final Task task;
-
-        /** cached locally, same value as in task */
-        public final long occurrTime;
-        public final long creationTime;
-
-        /** cached locally, same value as in task */
-        private final int hash;
-        //public float tolerance = 0;
-
-        public TaskTime(@NotNull Task task) {
-            this.task = task;
-            long cre = this.creationTime = task.creation();
-            long occ = this.occurrTime = task.occurrence();
-            hash = (int)(31 * cre + occ);
-            //expiredate in relation how long we predicted forward
-            long prediction_time = occ - cre;
-            //tolerance = prediction_time/TOLERANCE_DIV;
-        }
-
-        public boolean tooLate(long occur, int TOLERANCE_DIV) {
-            return occur > occurrTime + TOLERANCE_DIV;
-        }
-
-        public boolean inTime(long occur, int TOLERANCE_DIV) {
-            return occur > occurrTime - TOLERANCE_DIV && occur < occurrTime + TOLERANCE_DIV;
-        }
-
-        public float getPriority() { return task.pri(); }
-
-        @Override
-        public int hashCode() {
-            return hash;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj == this) return true;
-            TaskTime t = (TaskTime)obj;
-            return creationTime == t.creationTime  &&  occurrTime == t.occurrTime;
-        }
-
-        public Budget getBudget() {
-            return task.budget();
-        }
+    public static boolean tooLate(Task t, long occur, int TOLERANCE_DIV) {
+        return occur > t.occurrence() + TOLERANCE_DIV;
     }
+
+    public static boolean inTime(float incomingFreq, Task existing, long incomingOccurr, int TOLERANCE_DIV) {
+        long occurrTime= existing.occurrence();
+        return
+                Util.equal(incomingFreq, existing.freq(), FREQ_TOLERANCE) &&
+                //within time tolerance
+                (incomingOccurr > occurrTime - TOLERANCE_DIV && incomingOccurr < occurrTime + TOLERANCE_DIV);
+    }
+
+//    /** Prediction point vector / centroid of a group of Tasks
+//     *      time a prediction is made (creationTime), and
+//     *      tme it is expected (ocurrenceTime) */
+//    public static final class TaskTime {
+//
+//        /** all data is from task */
+//        @NotNull
+//        public final Task task;
+//
+//        /** cached locally, same value as in task */
+//        public final long occurrTime;
+//        public final long creationTime;
+//
+//        /** cached locally, same value as in task */
+//        private final int hash;
+//        //public float tolerance = 0;
+//
+//        public TaskTime(@NotNull Task task) {
+//            this.task = task;
+//            long cre = this.creationTime = task.creation();
+//            long occ = this.occurrTime = task.occurrence();
+//            hash = (int)(31 * cre + occ);
+//            //expiredate in relation how long we predicted forward
+//            //long prediction_time = occ - cre;
+//            //tolerance = prediction_time/TOLERANCE_DIV;
+//        }
+//
+//
+//        public float getPriority() { return task.pri(); }
+//
+//        @Override
+//        public int hashCode() {
+//            return hash;
+//        }
+//
+//        @Override
+//        public boolean equals(Object obj) {
+//            if (obj == this) return true;
+//            TaskTime t = (TaskTime)obj;
+//            return creationTime == t.creationTime  &&  occurrTime == t.occurrTime;
+//        }
+//
+//
+//    }
 }

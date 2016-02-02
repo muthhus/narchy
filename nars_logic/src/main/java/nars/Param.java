@@ -22,6 +22,8 @@ import static nars.Symbols.JUDGMENT;
 public abstract class Param extends Container implements Level {
 
 
+    private Truth defaultGoalTruth = null, defaultJudgmentTruth = null;
+
     public final MutableInteger cyclesPerFrame = new MutableInteger(1);
 
     /**
@@ -138,10 +140,10 @@ public abstract class Param extends Container implements Level {
 
         switch (punctuation) {
             case JUDGMENT:
-                return DEFAULT_JUDGMENT_CONFIDENCE;
+                return defaultJudgmentTruth.conf();
 
             case GOAL:
-                return DEFAULT_GOAL_CONFIDENCE;
+                return defaultGoalTruth.conf();
 
             default:
                 throw new RuntimeException("Invalid punctuation " + punctuation + " for a TruthValue");
@@ -168,8 +170,7 @@ public abstract class Param extends Container implements Level {
 
     }
 
-    /** Default confidence of input judgment. */
-    float DEFAULT_JUDGMENT_CONFIDENCE = 0.9f;
+
 
     /** Default priority of input judgment */
     public float DEFAULT_JUDGMENT_PRIORITY = 0.5f;
@@ -181,8 +182,7 @@ public abstract class Param extends Container implements Level {
     public float DEFAULT_QUESTION_DURABILITY = 0.5f;
 
 
-    /** Default confidence of input goal. */
-    float DEFAULT_GOAL_CONFIDENCE = 0.9f;
+
     /** Default priority of input judgment */
     public float DEFAULT_GOAL_PRIORITY = 0.5f;
     /** Default durability of input judgment */
@@ -244,12 +244,17 @@ public abstract class Param extends Container implements Level {
         return EXECUTION_SATISFACTION_TRESHOLD;
     }
 
-    public final Truth newTruthDefault(char p) {
+
+
+    public final Truth getTruthDefault(char p) {
         switch (p) {
             case GOAL:
-            case JUDGMENT: return new DefaultTruth(1.0f, getDefaultConfidence(p));
+                return defaultGoalTruth;
+            case JUDGMENT:
+                return defaultJudgmentTruth;
             default:
                 return null;
+                //throw new RuntimeException("invalid punctuation");
         }
     }
 
@@ -331,4 +336,17 @@ public abstract class Param extends Container implements Level {
 //        json = b.create();
 //    }
 
+    Param() {
+        setDefaultJudgmentConfidence(0.9f);
+        setDefaultGoalConfidence(0.9f);
+
+    }
+
+    public void setDefaultGoalConfidence(float v) {
+        defaultGoalTruth = new DefaultTruth(1.0f, v);
+    }
+
+    public void setDefaultJudgmentConfidence(float v) {
+        defaultJudgmentTruth = new DefaultTruth(1.0f, v);
+    }
 }

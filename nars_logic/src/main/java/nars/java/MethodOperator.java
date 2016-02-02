@@ -158,8 +158,8 @@ public class MethodOperator  {
 
 
             if (feedback) {
-                if ((result instanceof Truth) || (result instanceof Task))
-                    return result; //raw truth value or task
+                if (result == null || (result instanceof Truth) || (result instanceof Task))
+                    return result; //raw values: null, truth value, or task
                 else
                     return ctx.term(result); //termize it
             } else {

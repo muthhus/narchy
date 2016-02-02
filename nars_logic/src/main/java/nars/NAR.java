@@ -501,7 +501,8 @@ public abstract class NAR implements Level,Consumer<Task> {
                 //beforeNextFrame(
                 new Execution(this, goal, tt).run();
 
-                goal.budget().zero(); //execution drains the task's budget
+                if (!goal.isEternal())
+                    goal.budget().zero(); //execution drains temporal task's budget
 
                 //);
                 return 1;
@@ -997,8 +998,10 @@ public abstract class NAR implements Level,Consumer<Task> {
 
         if (input.isDeleted()) {
             //throw new RuntimeException(
-            System.err.println(
-                    input + " "  + input.log() + " deleted:\n" + input.getExplanation());
+            if (Global.DEBUG) {
+                System.err.println(
+                        input + " " + input.log() + " deleted:\n" + input.getExplanation());
+            }
             return null;
         }
 

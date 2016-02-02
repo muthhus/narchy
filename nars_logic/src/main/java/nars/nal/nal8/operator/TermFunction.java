@@ -164,7 +164,9 @@ public abstract class TermFunction<O> extends SyncOperator {
 
         Object y = function(Operator.opArgs(operation), e.nar.index());
 
-        if (y == null) {
+
+        if (y == null || (y instanceof Term)) {
+            e.feedback( result(e.nar, opTask, (Term) y/*, x, lastTerm*/) );
             return;
         }
 
@@ -175,7 +177,6 @@ public abstract class TermFunction<O> extends SyncOperator {
             return;
         }
 
-
         if (y instanceof Task) {
             Task ty = (Task)y;
             if (ty.pri() == 0) {
@@ -183,10 +184,6 @@ public abstract class TermFunction<O> extends SyncOperator {
                 ty.budget().set(opTask.budget());
             }
             e.feedback( (Task)y );
-            return;
-        }
-        if (y instanceof Term) {
-            e.feedback( result(e.nar, opTask, (Term) y/*, x, lastTerm*/) );
             return;
         }
 

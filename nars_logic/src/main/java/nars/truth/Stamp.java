@@ -135,7 +135,7 @@ public interface Stamp {
     @NotNull
     Stamp setCreationTime(long t);
 
-    default float getOriginality() {
+    default float originality() {
         return 1.0f / (evidence().length + 1);
     }
 
