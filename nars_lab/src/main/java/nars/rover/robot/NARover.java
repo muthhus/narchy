@@ -345,7 +345,7 @@ public class NARover extends AbstractPolygonBot {
         private boolean forward(boolean forward) {
             //Task c = MethodOperator.invokingTask();
             //float thrust = c!=null ? c.expectation() : 1;
-            float thrust = 1f;
+            float thrust = 2f;
             if (!forward) thrust = -thrust;
             rover.thrustRelative(thrust);
             return true;
@@ -354,7 +354,7 @@ public class NARover extends AbstractPolygonBot {
         private boolean rotate(boolean left) {
             //Task c = MethodOperator.invokingTask();
             //float thrust = c!=null ? c.expectation() : 1;
-            float thrust = 1f;
+            float thrust = 2f;
             if (left) thrust = -thrust;
             rover.rotateRelative(thrust);
             return true;

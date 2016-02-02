@@ -225,8 +225,8 @@
 //Same as for inheritance again
 
     (S ==> M), ((||,S,A..+) ==> M) |- ((||,A..+) ==> M), (Belief:DecomposePositiveNegativeNegative, Order:ForAllSame)
-    (S ==> M), ((&&,S,A..+) ==> M) |- ((&&,A..+) ==> M), (Belief:DecomposeNegativePositivePositive, Order:ForAllSame, SequenceIntervals:FromBelief)
-    (M ==> S), (M ==> (&&,S,A..+)) |- (M ==> (&&,A..+)), (Belief:DecomposePositiveNegativeNegative, Order:ForAllSame, SequenceIntervals:FromBelief)
+    (S ==> M), ((&&,S,A..+) ==> M) |- ((&&,A..+) ==> M), (Belief:DecomposeNegativePositivePositive, Order:ForAllSame)
+    (M ==> S), (M ==> (&&,S,A..+)) |- (M ==> (&&,A..+)), (Belief:DecomposePositiveNegativeNegative, Order:ForAllSame)
     (M ==> S), (M ==> (||,S,A..+)) |- (M ==> (||,A..+)), (Belief:DecomposeNegativePositivePositive, Order:ForAllSame)
 
 //// conditional syllogism ////////////////////////////////////////////////////////////////////////////////////
@@ -265,30 +265,33 @@
 //   P, S, no_common_subterm(S,P) |- (P || S), (Belief:Union)
 
 //// conjunction decompose
+     (&&,X,A..+), X  |- (&&,A..+), (Belief:StructuralDeduction, Desire:StructuralStrong),
+                        X, (Belief:StructuralDeduction, Desire:StructuralStrong)
 
-//    (&&,X,A..+), X, task("!")  |- (&&,A..+), (Belief:StructuralDeduction, Desire:StructuralStrong, Order:ForAllSame)
+//// dependent variable elimination - decomposition with elimination of a variable
+//TODO add a precondition that only allows this if B is not a subterm of the conjunction, which is the case above and produces different truth
+     (&&,X,A..+), B  |- substituteIfUnifies((&&,A..+),"#",X,B), (Belief:AnonymousAnalogy, Desire:Strong, Order:ForAllSame)
 
-     (&&,X,A..+), X  |- (&&,A..+), (Belief:StructuralDeduction, Desire:StructuralStrong)
 
-//    (&/,B,A..+), B, task("!") |- (&/,A..+), (Desire:Strong, SequenceIntervals:FromTask)
-     (&&,A,B), A |- A, (Belief:StructuralDeduction, Desire:StructuralStrong),
-                    B, (Belief:StructuralDeduction, Desire:StructuralStrong)
+//    (&/,B,A..+), B, task("!") |- (&/,A..+), (Desire:Strong)
+//     (&&,A,B), A |- A, (Belief:StructuralDeduction, Desire:StructuralStrong),
+//                    B, (Belief:StructuralDeduction, Desire:StructuralStrong)
 
 //// propositional decomposition ////////////////////////////////////////////////////////////////////////////////////
 //If S is the case, and (&&,S,A..+) is not the case, it can't be that (&&,A..+) is the case
 
-    S, (&&,S,A..+) |- (&&,A..+), (Belief:DecomposePositiveNegativeNegative, Order:ForAllSame, SequenceIntervals:FromBelief)
+    S, (&&,S,A..+) |- (&&,A..+), (Belief:DecomposePositiveNegativeNegative, Order:ForAllSame)
     S, (||,S,A..+) |- (||,A..+), (Belief:DecomposeNegativePositivePositive)
 
 //Additional for negation: https://groups.google.com/forum/#!topic/open-nars/g-7r0jjq2Vc
 
-    S, (&&,(--,S),A..+) |- (&&,A..+), (Belief:DecomposeNegativeNegativeNegative, Order:ForAllSame, SequenceIntervals:FromBelief)
+    S, (&&,(--,S),A..+) |- (&&,A..+), (Belief:DecomposeNegativeNegativeNegative, Order:ForAllSame)
     S, (||,(--,S),A..+) |- (||,A..+), (Belief:DecomposePositivePositivePositive)
 
 //// multi-conditional syllogism ////////////////////////////////////////////////////////////////////////////////////
 //Inference about the pre/postconditions
 
-    Y, ((&&,X,A..+) ==> B) |- substituteIfUnifies(((&&,A..+) ==> B),"$",X,Y), (Belief:Deduction, Order:ForAllSame, SequenceIntervals:FromBelief)
+    Y, ((&&,X,A..+) ==> B) |- substituteIfUnifies(((&&,A..+) ==> B),"$",X,Y), (Belief:Deduction, Order:ForAllSame)
 
     ((&&,M,A..+) ==> C), ((&&,A..+) ==> C) |- M, (Belief:Abduction, Order:ForAllSame)
 //single case of previous which doesnt require conjunction in single-term case
@@ -299,9 +302,9 @@
 //the first rule does not have Order:ForAllSame because it would be invalid, see: https://groups.google.com/forum/#!topic/open-nars/r5UJo64Qhrk
     ((&&,A..+) ==> C), M, notImplicationOrEquivalence(M) |- ((&&,M,A..+) ==> C), (Belief:Induction)
 
-    ((&&,M,A..+) ==> C), (B ==> M) |- ((&&,B,A..+) ==> C), (Belief:Deduction, Order:ForAllSame, SequenceIntervals:FromTask)
+    ((&&,M,A..+) ==> C), (B ==> M) |- ((&&,B,A..+) ==> C), (Belief:Deduction, Order:ForAllSame)
     ((&&,M,A..+) ==> C), ((&&,B,A..+) ==> C) |- (B ==> M), (Belief:Induction, Order:ForAllSame)
-    ((&&,B,A..+) ==> C), (B ==> M) |- ((&&,M,A..+) ==> C), (Belief:Abduction, Order:ForAllSame, SequenceIntervals:FromTask)
+    ((&&,B,A..+) ==> C), (B ==> M) |- ((&&,M,A..+) ==> C), (Belief:Abduction, Order:ForAllSame)
 
 //// variable introduction ////////////////////////////////////////////////////////////////////////////////////
 //Introduce variables by common subject or predicate
@@ -333,10 +336,6 @@
     (&&,(P --> M), A..+), (S --> M), neq(S,P) |- ((S --> $Y) ==> (&&,(P --> $Y), A..+)), (Belief:Abduction),
                                                  (&&, (S --> #Y), (P --> #Y), A..+), (Belief:Intersection)
 
-//// dependent variable elimination ////////////////////////////////////////////////////////////////////////////////////
-//Decomposition with elimination of a variable
-
-    (&&, X, A..+), B |- substituteIfUnifies((&&,A..+),"#",X,B), (Belief:AnonymousAnalogy, Desire:Strong, Order:ForAllSame, SequenceIntervals:FromTask)
 
 //conditional abduction by dependent variable
 

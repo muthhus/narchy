@@ -352,7 +352,7 @@ public final class BudgetFunctions extends UtilityFunctions {
 
         BLink<? extends Termed> termLink = nal.termLink;
         if ((termLink!=null) && (!termLink.isDeleted())) {
-            priority = and(priority, termLink.pri()); //originally was OR, but this can explode because the result of OR can exceed the inputs
+            priority = or(priority, termLink.pri()); //originally was OR, but this can explode because the result of OR can exceed the inputs
             durability = and(durability, termLink.dur()); //originaly was 'AND'
 
             NAR nar = nal.nar;

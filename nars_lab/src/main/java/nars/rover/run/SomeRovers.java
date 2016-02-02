@@ -47,7 +47,7 @@ public class SomeRovers {
 
         if (addNARRover)
         {
-            int conceptsFirePerCycle = 4;
+            int conceptsFirePerCycle = 16;
             Default nar = new Default(
                     new Memory(clock, new MapIndex2(
                             new SoftValueHashMap())),

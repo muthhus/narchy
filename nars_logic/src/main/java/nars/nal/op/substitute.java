@@ -71,7 +71,8 @@ public class substitute extends ImmediateTermTransform implements PremiseAware {
         //copy the new mappings to the match
         m.forEach( (k,v) -> {
             if (!r.putXY(k, v)) {
-                throw new RuntimeException("what does this mean");
+                //throw new RuntimeException("what does this mean");
+                r.xy.put(k, v); //HACK
             }
         });
 //        if (!m.yx.isEmpty()) {

@@ -38,7 +38,7 @@ abstract public class VisionRay extends RayCastClosestCallback implements Abstra
     List<Runnable> toDraw =
             //new ConcurrentLinkedDeque<>();
             new CopyOnWriteArrayList();
-    float biteDistanceThreshold = 0.1f;
+    float biteDistanceThreshold = 0.05f;
     private boolean eats;
     protected Body hitNext;
     private Vec2 root = new Vec2();

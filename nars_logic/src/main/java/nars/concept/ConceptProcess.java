@@ -241,7 +241,6 @@ public final class ConceptProcess implements Premise {
                             //t = (int) (task().occurrence() - belief().occurrence());
                             if (reversed) occ+=t; else occ -= t;
                         } else {
-\
 
                             //both ITERNAL
 
@@ -261,7 +260,8 @@ public final class ConceptProcess implements Premise {
                 } else if (td != ITERNAL && bd==ITERNAL) {
                     //task has dt
                     t = td;
-                    //TODO align
+                    //occ += t; //TODO check this alignment
+
                 }   else {
                     //throw new RuntimeException("unhandled case");
                     //???
@@ -314,7 +314,11 @@ public final class ConceptProcess implements Premise {
                         occ += timeOfDerivedInBelief;
                     else {
                         long timeOfDerivedInTask = T.subtermTime(C,td);
-                        occ += timeOfDerivedInTask;
+                        if (timeOfDerivedInTask!=ETERNAL) {
+                            occ += timeOfDerivedInTask;
+                        } else {
+                            //??
+                        }
                     }
                 } else if (!task().isEternal() && !belief().isEternal()) {
                     //throw new RuntimeException("ambiguous task or belief");
