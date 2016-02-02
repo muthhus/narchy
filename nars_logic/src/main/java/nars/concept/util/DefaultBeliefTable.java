@@ -139,7 +139,8 @@ public class DefaultBeliefTable implements BeliefTable {
         if (temporal.isEmpty()) {
             minT = maxT = Tense.TIMELESS;
         } else {
-            minT = maxT = Long.MAX_VALUE;
+            minT = Long.MAX_VALUE;
+            maxT = Long.MIN_VALUE;
             List<Task> list = temporal.items.getList();
             for (int i = 0, listSize = list.size(); i < listSize; i++) {
                 long o = list.get(i).occurrence();

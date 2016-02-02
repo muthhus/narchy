@@ -160,7 +160,7 @@ public class NARover extends AbstractPolygonBot {
                 //nar.input("eat:poison. :|: %0.00;0.75%");
 
                 nar.input("eat:food! %1.00|0.95%");
-                nar.input("speed:linear! %1.00|0.8%");
+                nar.input("speed:linear! %1.00;0.8%");
                 nar.input("eat:poison! %0.0|0.9%");
                 //nar.input("(--, <eat:food <-> eat:poison>). %1.00;0.95%");
                 nar.input("(?x ==> eat:#y)?");

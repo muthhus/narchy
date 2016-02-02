@@ -33,7 +33,7 @@ public class TaskPane extends BorderPane {
         conceptButton.setOnMouseClicked(e -> {
             Concept concept = nar.concept(c);
             if (concept!=null) {
-                NARfx.newWindow(nar, concept);
+                NARfx.newConceptWindow(nar, concept);
 //                ConceptPane cp = new ConceptPane(nar, concept);
 //                cp.setPrefSize(getWidth(), 300);
 //                setCenter(cp);

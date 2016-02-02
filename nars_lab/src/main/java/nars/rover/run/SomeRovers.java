@@ -3,7 +3,7 @@ package nars.rover.run;
 import javassist.scopedpool.SoftValueHashMap;
 import nars.Global;
 import nars.Memory;
-import nars.guifx.demo.NARide;
+import nars.guifx.NARfx;
 import nars.nar.Default;
 import nars.rover.RoverWorld;
 import nars.rover.Sim;
@@ -43,7 +43,7 @@ public class SomeRovers {
 
 
         boolean addNARRover = true;
-        boolean addQRover = true;
+        boolean addQRover = false;
 
         if (addNARRover)
         {
@@ -69,14 +69,28 @@ public class SomeRovers {
             //nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
             nar.memory.duration.set(4);
             nar.memory.conceptForgetDurations.setValue(2);
-            nar.memory.cyclesPerFrame.set(3);
+            nar.memory.cyclesPerFrame.set(1);
             nar.memory.shortTermMemoryHistory.set(3);
             //nar.memory.executionExpectationThreshold.setValue(0.95f);
 
 
-            boolean gui = false;
+            boolean gui = true;
             if (gui) {
-                NARide.loop(nar, false);
+                //NARide.loop(nar, false);
+
+                NARfx.run( () -> {
+                    NARfx.newConceptWindow(nar,
+                            "MotorControls(#x,motor,#y,#z)",
+                            "MotorControls(left,motor,(),#z)",
+                            "MotorControls(right,motor,(),#z)",
+                            "MotorControls(forward,motor,(),#z)",
+                            "MotorControls(backward,motor,(),#z)",
+                            "MotorControls(stop,motor,(),#z)",
+                            "eat:food",
+                            "eat:poison",
+                            "speed:linear"
+                    );
+                });
             }
 
 

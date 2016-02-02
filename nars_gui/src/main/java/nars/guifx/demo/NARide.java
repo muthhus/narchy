@@ -77,7 +77,7 @@ public class NARide extends BorderPane {
 
         //SizeAwareWindow wn = NARide.newWindow(nar, ni = new NARide(nar));
 
-        NARfx.run((a, b) -> {
+        NARfx.run((a,b) -> {
 
             Thread.currentThread().setName("NARide");
 
@@ -117,7 +117,7 @@ public class NARide extends BorderPane {
                             ConceptSummaryPane src = (ConceptSummaryPane) e.getSource();
 
                             Concept cc = src.concept;
-                            NARfx.newWindow(nar,cc);
+                            NARfx.newConceptWindow(nar,cc);
                         };
 
                 @Override public Node make(Concept cc) {

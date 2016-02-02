@@ -6,7 +6,9 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.TilePane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Modality;
@@ -18,7 +20,10 @@ import nars.concept.Concept;
 import nars.guifx.util.ColorMatrix;
 import nars.task.Task;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 /**
@@ -272,7 +277,7 @@ public enum NARfx  {
 //        NARide.show(nar.loop(), (Consumer)null);
 //    }
 
-    public static void newWindow(NAR nar, Concept c) {
+    public static void newConceptWindow(NAR nar, Concept c) {
         //TODO //ConceptPane wn = new ConceptPane(nar, c);
         ConceptPane wn = new ConceptPane(nar, c);
 
@@ -280,7 +285,6 @@ public enum NARfx  {
         Stage removed = window.put(c, st = newWindow(c.toString(), wn));
         st.setAlwaysOnTop(true); //? does this work
 
-        wn.changed(null,null,null);
 
         if (removed!=null)
             removed.close();
@@ -353,6 +357,14 @@ public enum NARfx  {
 //    }
 
 
+    /** run in FX context in separate thread */
+    public static void run(Runnable r) {
+        new Thread( () -> {
+            run((a, b) -> {
+                r.run();
+            });
+        }).start();
+    }
 
     /* https://macdevign.wordpress.com/2014/03/27/running-javafx-application-instance-in-the-main-method-of-a-class/ */
     public static void run(AppLaunch appLaunch, String... sArArgs) {
@@ -386,6 +398,28 @@ public enum NARfx  {
         Scene dialogScene = new Scene(n, 500, 500);
         dialog.setScene(dialogScene);
         dialog.show();
+
+    }
+
+    public static void newConceptWindow(NAR nar, String... concepts) {
+        newConceptWindow(nar, Stream.of(concepts).map(
+            s -> nar.concept(s)).collect(Collectors.toList())
+        );
+    }
+
+    private static void newConceptWindow(NAR nar, List<Concept> cc) {
+        Pane v = new TilePane();
+
+        for (Concept c : cc) {
+            ConceptPane wn = new ConceptPane(nar, c);
+            v.getChildren().add(wn);
+        }
+
+        Stage st;
+        Stage removed = window.put(cc, st = newWindow("Concepts", v));
+
+        if (removed!=null)
+            removed.close();
 
     }
 

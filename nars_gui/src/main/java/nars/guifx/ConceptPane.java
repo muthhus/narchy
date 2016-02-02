@@ -1,7 +1,6 @@
 package nars.guifx;
 
 import com.gs.collections.impl.set.mutable.UnifiedSet;
-import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.Group;
@@ -14,10 +13,10 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
-import nars.Global;
 import nars.NAR;
 import nars.bag.Bag;
 import nars.concept.Concept;
+import nars.concept.util.BeliefTable;
 import nars.concept.util.DefaultBeliefTable;
 import nars.guifx.demo.SubButton;
 import nars.guifx.graph2.TermEdge;
@@ -40,6 +39,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static javafx.application.Platform.runLater;
+
 
 /**
  * Created by me on 8/10/15.
@@ -234,7 +234,7 @@ public class ConceptPane extends BorderPane implements ChangeListener {
             }
 
             if (!getChildren().equals(pending) && queued.compareAndSet(false, true)) {
-                Platform.runLater(this);
+                runLater(this);
             }
         }
 
@@ -321,8 +321,8 @@ public class ConceptPane extends BorderPane implements ChangeListener {
 //        setCenter(new SplitPane(new BorderPane(links), tasks.content));
 
         tasks = new BeliefTablePane(c);
-        tasks.maxWidth(Double.MAX_VALUE);
-        tasks.maxHeight(Double.MAX_VALUE);
+        //tasks.maxWidth(Double.MAX_VALUE);
+        //tasks.maxHeight(Double.MAX_VALUE);
         setCenter(tasks);
 
         //setCenter(new ConceptNeighborhoodGraph(nar, concept));
@@ -331,6 +331,10 @@ public class ConceptPane extends BorderPane implements ChangeListener {
         setBottom(controls);*/
 
         visibleProperty().addListener(this);
+
+        runLater(()->{
+            changed(null,null,null);
+        });
     }
 
     public static class ConceptNeighborhoodGraph extends BorderPane {
@@ -427,7 +431,7 @@ public class ConceptPane extends BorderPane implements ChangeListener {
         n.run(516);
 
         NARfx.run((a,s) -> {
-            NARfx.newWindow(n, n.concept("<a-->b>"));
+            NARfx.newConceptWindow(n, n.concept("<a-->b>"));
 //            s.setScene(new ConsolePanel(n, n.concept("<a-->b>")),
 //                    800,600);
 
@@ -443,15 +447,24 @@ public class ConceptPane extends BorderPane implements ChangeListener {
         final Canvas eternal, temporal;
         private final Concept concept;
 
+        final static TaskRenderer beliefRenderer = new TaskRenderer() {
+            @Override public void renderTask(GraphicsContext ge, float f, float c, float w, float h, float x, float y, float alpha) {
+                ge.setFill(new Color( f,  0.5f, c, alpha));
+                ge.fillRect(x-w/2,y-h/2,w,h);
+            }
+        };
+        final static TaskRenderer goalRenderer = new TaskRenderer() {
+            @Override public void renderTask(GraphicsContext ge, float f, float c, float w, float h, float x, float y, float alpha) {
+                ge.setFill(new Color( c,  f, 0.5f, alpha));
+                ge.fillOval(x-w/2,y-h/2,w,h);
+            }
+        };
+
         public BeliefTablePane(Concept c) {
             super();
             this.concept = c;
-            eternal = new Canvas(300, 400);
-            eternal.maxWidth(300);
-            eternal.maxHeight(300);
-            temporal = new Canvas(800, 400);
-            temporal.maxWidth(500);
-            temporal.maxHeight(300);
+            eternal = new Canvas(75, 75);
+            temporal = new Canvas(200, 75);
 
             setCenter(temporal);
             setLeft(eternal);
@@ -462,59 +475,97 @@ public class ConceptPane extends BorderPane implements ChangeListener {
             GraphicsContext ge = eternal.getGraphicsContext2D();
             float gew = (float) ge.getCanvas().getWidth();
             float geh = (float) ge.getCanvas().getHeight();
-            ge.clearRect(0,0, gew, geh);
+            ge.clearRect(0, 0, gew, geh);
+
 
             GraphicsContext te = temporal.getGraphicsContext2D();
             float tew = (float) te.getCanvas().getWidth();
             float teh = (float) te.getCanvas().getHeight();
-            te.clearRect(0,0, tew, teh);
+            te.clearRect(0, 0, tew, teh);
 
-            float b = 10;
+            //compute bounds from combined min/max of beliefs and goals so they align correctly
+            long minT = Long.MAX_VALUE;
+            long maxT = Long.MIN_VALUE;
+            {
 
-            List<Task> tt = Global.newArrayList();
-            if (!(concept.beliefs() instanceof DefaultBeliefTable)) return;
+                if (concept.hasBeliefs()) {
+                    minT = ((DefaultBeliefTable) concept.beliefs()).getMinT();
+                    maxT = ((DefaultBeliefTable) concept.beliefs()).getMaxT();
+                }
+                if (concept.hasGoals()) {
+                    minT = Math.min(minT, ((DefaultBeliefTable) concept.goals()).getMinT());
+                    maxT = Math.max(maxT, ((DefaultBeliefTable) concept.goals()).getMaxT());
+                }
+            }
 
-            float minT = ((DefaultBeliefTable) concept.beliefs()).getMinT();
-            float maxT = ((DefaultBeliefTable) concept.beliefs()).getMaxT();
+
+            try {
+                if (concept.hasBeliefs())
+                    renderTable(minT, maxT, now, ge, gew, geh, te, tew, teh, concept.beliefs(), beliefRenderer);
+                if (concept.hasGoals())
+                    renderTable(minT, maxT, now, ge, gew, geh, te, tew, teh, concept.goals(), goalRenderer);
+            }
+            catch (Throwable t) {
+                //HACK
+                t.printStackTrace();
+            }
+
+
+            //borders
+            {
+                ge.setStroke(Color.WHITE);
+                te.setStroke(Color.WHITE);
+                ge.strokeRect(0, 0, gew, geh);
+                te.strokeRect(0, 0, tew, teh);
+                ge.setStroke(null);
+                te.setStroke(null);
+            }
+        }
+
+        private void renderTable(long minT, long maxT, long now, GraphicsContext ge, float gew, float geh, GraphicsContext te, float tew, float teh, BeliefTable table, TaskRenderer r) {
+            float b = 4; //border
 
             //Present axis line
-            float nowLineWidth = 5;
+            float nowLineWidth = 3;
             float nx = xTime(tew, b, minT, maxT, now, nowLineWidth);
             te.setFill(Color.WHITE);
-            te.fillRect(nx-nowLineWidth/2f, 0, nowLineWidth, teh);
+            te.fillRect(nx - nowLineWidth / 2f, 0, nowLineWidth, teh);
 
-
-            for (Task t : concept.beliefs()) {
-                if (t.isEternal() && t.truth()!=null) {
+            float w = 15;
+            float h = 15;
+            for (Task t : table) {
+                if (t.isEternal() && t.truth() != null) {
                     float f = t.freq();
                     float c = t.conf();
-                    float w = 20;
-                    float h = 20;
-                    float x = b + (gew-2*b-w) * c;
-                    float y = b + (geh-2*b-h) * (1-f);
-                    float alpha = 0.5f + 0.5f * c; //concept.getBeliefs().rankEternal(t);
-                    ge.setFill(new Color( f,  c, 1f, alpha));
-                    ge.fillRect(x-w/2,y-h/2,w,h);
-                } else if (!t.isEternal() && t.truth()!=null) {
+                    float x = b + (gew - 2 * b - w) * c;
+                    float y = b + (geh - 2 * b - h) * (1 - f);
+                    float alpha = 0.25f + 0.5f * c; //concept.getBeliefs().rankEternal(t);
+                    r.renderTask(ge, f, c, w, h, x, y, alpha);
+                } else if (!t.isEternal() && t.truth() != null) {
                     float f = t.freq();
                     float cc = t.conf();
                     float o = t.occurrence();
-                    float w = 15;
-                    float h = 15;
+
+                    if ((o < minT) || (o > maxT))
+                        throw new RuntimeException("task " + t + " out of range");
+
                     float x = xTime(tew, b, minT, maxT, o, w);
-                    float y = b + (teh-2*b-h) * (1-f);
-                    float alpha = 0.5f + 0.5f * cc; //BeliefTable.rankTemporal(t, now, now);
-                    te.setFill(new Color( f,  cc, 1f, alpha));
-                    te.fillRect(x-w/2,y-h/2,w,h);
-                    tt.add(t);
+                    float y = b + (teh - 2 * b - h) * (1 - f);
+                    float alpha = 0.25f + 0.5f * cc; //BeliefTable.rankTemporal(t, now, now);
+                    r.renderTask(te, f, cc, w, h, x, y, alpha);
                 }
 
             }
-
         }
 
+        @FunctionalInterface interface TaskRenderer {
+            void renderTask(GraphicsContext ge, float f, float c, float w, float h, float x, float y, float alpha);
+        }
+
+
         private float xTime(float tew, float b, float minT, float maxT, float o, float w) {
-            return b + ((o - minT) / (maxT-minT)) * (tew-2*b-w);
+            float p = minT == maxT ? 0.5f : (o - minT) / (maxT - minT);
+            return b + p * (tew-2*b-w);
         }
     }
 }
