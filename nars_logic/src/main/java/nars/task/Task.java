@@ -810,7 +810,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
             long nextOcc = targetTime;
 
             float projConf = nextConf =
-                    conf * temporalProjection(occ, now, targetTime);
+                    conf * temporalProjection(occ, targetTime, now);
 
             if (eternalizeIfWeaklyTemporal) {
                 float eternConf = eternalize(conf);

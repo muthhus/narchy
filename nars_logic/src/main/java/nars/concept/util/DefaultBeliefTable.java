@@ -345,6 +345,8 @@ public class DefaultBeliefTable implements BeliefTable {
                         x, t);
             }
 
+            //TODO avoid allocating Truth's here
+
             if (c.conf() * matchFactor <= Math.max(newBelief.conf(), x.conf()))
                 continue;
 

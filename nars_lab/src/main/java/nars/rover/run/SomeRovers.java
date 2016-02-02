@@ -68,9 +68,9 @@ public class SomeRovers {
 
             //nar.memory.perfection.setValue(0.15f);
             nar.core.confidenceDerivationMin.setValue(0.02f);
-            nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
-            nar.memory.duration.set(4);
-            nar.memory.conceptForgetDurations.setValue(2);
+            //nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
+            nar.memory.duration.set(8);
+            nar.memory.conceptForgetDurations.setValue(3);
             nar.memory.cyclesPerFrame.set(16);
             nar.memory.shortTermMemoryHistory.set(3);
             //nar.memory.executionExpectationThreshold.setValue(0.95f);
@@ -86,7 +86,7 @@ public class SomeRovers {
 //                    }, new Stage());
 
                     NARfx.newConceptWindow(nar,
-                            "MotorControls(#x,motor,#y,#z)",
+                            "MotorControls(#x,motor,(),#z)",
                             "MotorControls(left,motor,(),#z)",
                             "MotorControls(right,motor,(),#z)",
                             "MotorControls(forward,motor,(),#z)",

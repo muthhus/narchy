@@ -34,9 +34,9 @@ public class NARover extends AbstractPolygonBot {
 
     public final NAR nar;
     //float tasteDistanceThreshold = 1.0f;
-    final static int retinaPixels = 16;
+    final static int retinaPixels = 9;
     final NALObjects objs;
-    int retinaRaysPerPixel = 4; //rays per vision sensor
+    int retinaRaysPerPixel = 3; //rays per vision sensor
 
     float L = 25f; //vision distance
     final static Vec2 mouthPoint = new Vec2(2.7f, 0); //0.5f);
@@ -76,7 +76,7 @@ public class NARover extends AbstractPolygonBot {
     protected void onEat(Body eaten, Material m) {
         if (m instanceof Sim.FoodMaterial) {
             nar.logger.warn("food");
-            nar.input("eat:food. :|:");
+            nar.input("eat:food. :|: %0.8;0.8%");
             //nar.input("goal:{food}. :|: %1.00;0.75%");
             //nar.input("goal:{health}. :|: %1.00;0.75%");
         }
@@ -161,14 +161,16 @@ public class NARover extends AbstractPolygonBot {
                 //nar.input("eat:poison. :|: %0.00;0.75%");
 
                 nar.input("eat:food! %1.00|0.95%");
-                nar.input("speed:linear! %1.00;0.8%");
+                nar.input("eat:food. :|: %0.0%"); //not eating right now
+
+                nar.input("speed:linear! %1.00;0.7%");
                 nar.input("eat:poison! %0.0|0.9%");
                 //nar.input("(--, <eat:food <-> eat:poison>). %1.00;0.95%");
                 nar.input("(?x ==> eat:#y)?");
-                nar.input("(?x && eat:#y)?");
+                //nar.input("(?x && eat:#y)?");
 
-                nar.input("MotorControls(#x,motor,#y,#z)! :|: %1.0;0.75%"); //create demand for action
-                nar.input("MotorControls(?x,motor,?y,#z)! :|: %1.0;0.75%");
+                nar.input("MotorControls(#x,motor,(),#z)! :|: %1.0;0.25%"); //create demand for action
+                nar.input("MotorControls(?x,motor,(),#z)! :|: %1.0;0.25%");
                 //nar.concept("MotorControls(?x,motor,?y,#z)").print();
                 //nar.concept("MotorControls(#x,motor,#y,#z)").print();
 

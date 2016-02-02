@@ -581,7 +581,8 @@ public class Memory extends Param {
 
         //TODO use an Answer class which is Runnable, combining that with the Twin info
         if (Global.DEBUG_NON_INPUT_ANSWERED_QUESTIONS || question.isInput()) {
-            eventAnswer.emit(Tuples.twin(question, solution));
+            if (!eventAnswer.isEmpty())
+                eventAnswer.emit(Tuples.twin(question, solution));
         }
 
     }

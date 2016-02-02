@@ -133,7 +133,7 @@ public final class TruthFunctions extends UtilityFunctions {
             long adt = Math.abs(at-now);
             long bdt = Math.abs(bt-now);
             if (adt!=bdt) {
-                float p = adt/((float)(adt+bdt));
+                float p = adt/((float)(adt+bdt)); //LERP the proportion
                 w2 *= p;
                 w1 *= (1f-p);
             }

@@ -89,17 +89,19 @@ public class NAL7Test extends AbstractNALTester {
 
 
     @Test public void updating_and_revision()  {
-        testTemporalRevision(10, 0.08f, 0.75f, "<(John,key) --> hold>");
+        testTemporalRevision(10, 0.50f, 0.64f, "<(John,key) --> hold>");
     }
     @Test public void updating_and_revision2()  {
-        testTemporalRevision(1, 0.33f, 0.30f, "<(John,key) --> hold>");
+        testTemporalRevision(1, 0f, 0.47f, "<(John,key) --> hold>");
     }
 
     void testTemporalRevision(int delay, float freq, float conf, String belief) {
         TestNAR tester = test();
-        tester.input(belief + ". :|: %1%");
-        tester.inputAt(delay, belief + ". :|: %0%");
-        tester.mustBelieve(delay+2, belief,  freq, conf, delay+1);
+        tester.nar.log();
+        tester.input(belief + ". :|: %1.00;0.65%");
+        tester.inputAt(delay, belief + ". :|: %0.9;0.70%");
+        tester.inputAt(delay+1, belief + "? :|:");
+        tester.mustBelieve(delay+15, belief,  freq, conf, delay);
     }
 
     @Test public void testSumNeg() {
