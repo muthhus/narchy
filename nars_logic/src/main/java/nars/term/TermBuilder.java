@@ -720,7 +720,7 @@ public interface TermBuilder {
         //apply any known immediate transform operators
         //TODO decide if this is evaluated incorrectly somehow in reverse
         if (result!=null && isOperation(result)) {
-            ImmediateTermTransform tf = f.getTransform(Operator.operatorTerm((Compound)result));
+            ImmediateTermTransform tf = f.getTransform(Operator.operator((Compound)result));
             if (tf!=null) {
                 result = applyImmediateTransform(f, result, tf);
             }

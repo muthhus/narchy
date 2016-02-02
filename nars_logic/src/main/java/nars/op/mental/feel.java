@@ -16,7 +16,6 @@
  */
 package nars.op.mental;
 
-import com.google.common.collect.Lists;
 import nars.$;
 import nars.NAR;
 import nars.Symbols;
@@ -26,9 +25,6 @@ import nars.task.Task;
 import nars.term.Term;
 import nars.truth.DefaultTruth;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
 
 /**
  * Feeling common operations
@@ -41,20 +37,16 @@ public abstract class feel extends SyncOperator {
      * @param value The value to be checked, in [0, 1]
      * @return Immediate results as Tasks
      */
-    protected static ArrayList<Task> feeling(float value, @NotNull NAR nar, Term feeling) {
+    protected static Task feeling(float value, @NotNull NAR nar, Term feeling) {
 
-        Term content = instprop(nar.self, feeling);
+        Term content = $.instprop(nar.self, feeling);
 
-        return Lists.newArrayList(
+        return
             new MutableTask(content, Symbols.JUDGMENT)
                 .judgment()
-                .truth(new DefaultTruth(value, 0.999f))
+                .truth(new DefaultTruth(value, 0.99f))
                 .present(nar.time())
-        );
+        ;
     }
 
-    @Nullable
-    public static Term instprop(Term subject, Term predicate) {
-        return $.terms.instprop(subject, predicate);
-    }
 }

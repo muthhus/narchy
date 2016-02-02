@@ -1,9 +1,9 @@
 package nars.nal.nal8;
 
-import com.google.common.collect.Lists;
 import nars.$;
 import nars.Memory;
 import nars.NAR;
+import nars.Op;
 import nars.budget.Budget;
 import nars.budget.UnitBudget;
 import nars.nal.Tense;
@@ -11,10 +11,12 @@ import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.truth.Truth;
+import nars.term.variable.Variable;
 import nars.util.event.Topic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import static nars.Op.PRODUCT;
 
 /**
  * Execution context which Operator implementations
@@ -28,6 +30,7 @@ public class Execution implements Runnable {
 
     public final static float feedbackPriorityMultiplier = 1.0f;
     public final static float feedbackDurabilityMultiplier = 1.0f;
+    public static final Variable defaultResultVariable = $.varDep("defaultResultVariable");
     public final NAR nar;
     public final Task task;
     private final Topic<Execution> listeners;
@@ -38,7 +41,7 @@ public class Execution implements Runnable {
         this.listeners = listeners;
     }
 
-    public static Task result(@NotNull NAR nar, @NotNull Task goal, Term y/*, Term[] x0, Term lastTerm*/, Tense tense) {
+    public static MutableTask result(@NotNull NAR nar, @NotNull Task goal, Term y/*, Term[] x0, Term lastTerm*/, Tense tense) {
 
         Compound operation = goal.term();
 
@@ -58,21 +61,22 @@ public class Execution implements Runnable {
 
         //final int numArgs = x0.length;
 
-        Term inh = Operator.result(operation, y);
+        Term inh = result(operation, y);
         if ((!(inh instanceof Compound))) {
             //TODO wrap a non-Compound result as some kind of statement
             return null;
         }
 
+        return (MutableTask) new MutableTask(inh)
+                .judgment()  //with default truth value
+                .tense(tense, nar.memory)
+                .budget(goal.budget())
+                .budgetScaled(feedbackPriorityMultiplier, feedbackDurabilityMultiplier)
+                .log("Execution Result")
+                ;
+
+
         //Implication.make(operation, actual_part, TemporalRules.ORDER_FORWARD);
-
-        return new MutableTask(inh).
-                        judgment().
-                        //truth(getResultFrequency(), getResultConfidence()).
-                        tense(tense, nar.memory).budget(goal.budget()).
-                        budgetScaled(feedbackPriorityMultiplier, feedbackDurabilityMultiplier)
-            ;
-
             /*float equal = equals(lastTerm, y);
             ArrayList<Task> rt = Lists.newArrayList(
                     m.newTask(actual, Symbols.JUDGMENT_MARK,
@@ -92,14 +96,47 @@ public class Execution implements Runnable {
             */
 
 
-
-
     }
 
-    /** should only be called by NAR */
-    @Override public final void run() {
-        //if (task.getDeleted()) return;
+    /**
+     * creates a result term in the conventional format.
+     * the final term in the product (x) needs to be a variable,
+     * which will be replaced with the result term (y)
+     */
+    @Nullable
+    static Term result(@NotNull Compound operation, @Nullable Term y) {
 
+        Compound x = (Compound) operation.term(0);
+        if (!x.op(PRODUCT))
+            throw new RuntimeException("invalid operation");
+
+        //add var dep as last term if missing
+        Term xLast = x.last();
+        if (!xLast.op(Op.VAR_DEP))
+            throw new RuntimeException("feedback requires variable in last position");
+        //x = $.p(Terms.concat(x.terms(), y)); //defaultResultVariable));
+
+        //        } else {
+        //            //TODO more efficient than subterm sequencing it:
+        //            x = $.p( Terms.concat(x.terms(0, x.size()-1), y));
+        //        }
+
+
+        //default case: use the trailing dependent variable for the result term
+        if (y == null)
+            y = xLast;
+
+        return $.inhImageExt(operation, y, x);
+
+        //return $.exec(Operator.operatorTerm(operation), x);
+    }
+
+    /**
+     * should only be called by NAR
+     */
+    @Override
+    public final void run() {
+        //if (task.getDeleted()) return; //in case it was delayed and got deleted in the meantime
         listeners.emit(this);
     }
 
@@ -112,8 +149,9 @@ public class Execution implements Runnable {
      */
     @NotNull
     public final Operator operator() {
-        return Operator.operatorTerm(term());
+        return Operator.operator(term());
     }
+
     public final Term[] argArray() {
         return Operator.opArgsArray(term());
     }
@@ -126,58 +164,20 @@ public class Execution implements Runnable {
     //feedback(Task[] t)
     //feedback(Object o)
 
-    public void feedback(Task feedback) {
-        //feedback(Collections.singletonList(feedback));
-        feedbackAll(
-            feedback,
-            noticeExecuted()
+    public final void feedback(Task feedback) {
+        NAR n = this.nar;
+        n.input(
+            noticeExecuted(n, task),
+            feedback
         );
-    }
-    void feedbackAll(Task... feedback) {
-        feedback(Lists.newArrayList(feedback));
-    }
-
-    /**
-     * called after execution completed
-     */
-    public void feedback(@Nullable Iterable<Task> feedback) {
-
-        //Display a message in the output stream to indicate the reportExecution of an operation
-
-
-
-        //feedback tasks as input
-        //should we allow immediate tasks to create feedback?
-        if (feedback != null) {
-
-            //final Operation t = op.getTerm();
-
-            feedback.forEach(f -> {
-                //if (t == null) continue;
-
-                //TODO avoid using a string like this
-                //f.log("Feedback: " + t /*"Feedback"*/);
-
-                nar.input(f.log("Feedback"));
-            });
-        } else {
-            //default: noticed executed
-            if (!task.isCommand()) {
-                noticeExecuted(task);
-            }
-        }
-
-    }
-
-    protected Task noticeExecuted() {
-        return noticeExecuted(task);
     }
 
     /**
      * internal notice of the execution
+     *
      * @param operation
      */
-    protected Task noticeExecuted(@NotNull Task operation) {
+    public static Task noticeExecuted(NAR nar, @NotNull Task operation) {
 
         Budget b = !operation.isDeleted() ? operation.budget() : UnitBudget.zero;
 
@@ -192,21 +192,9 @@ public class Execution implements Runnable {
                         present(memory).
                 //parent(operation). //https://github.com/opennars/opennars/commit/23d34d5ddaf7c71348d0a70a88e2805ec659ed1c#diff-abb6b480847c96e2dbf488d303fb4962L235
                         because("Executed")
-        ;
+                ;
 
     }
 
-    public void feedback(Truth y) {
 
-
-        //this will get the original input operation term, not after it has been inlined.
-        feedback( new MutableTask(
-                Operator.result(task.term(), null)
-                //task.concept()
-        ).judgment()
-                .truth(y).present(nar.memory)
-                .budget(task.budget())
-        );
-
-    }
 }

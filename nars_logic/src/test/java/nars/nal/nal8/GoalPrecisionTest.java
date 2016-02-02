@@ -1,5 +1,6 @@
 package nars.nal.nal8;
 
+import nars.$;
 import nars.Global;
 import nars.NAR;
 import nars.nar.Default;
@@ -40,7 +41,7 @@ public class GoalPrecisionTest {
     protected void run(NAR n, int end) {
 
         Global.DEBUG = true;
-        n.onExecution(Operator.the("x"), (Execution a) -> {
+        n.onExecution($.operator("x"), (Execution a) -> {
             Term[] aa = a.argArray();
             float pri = a.task.pri() * a.task.expectation();
 
@@ -68,7 +69,6 @@ public class GoalPrecisionTest {
 
             //a.task.mulPriority(0);
 
-            n.input(a.noticeExecuted());
 
         });
 

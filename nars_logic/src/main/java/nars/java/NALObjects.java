@@ -10,7 +10,6 @@ import nars.Global;
 import nars.NAR;
 import nars.nal.Tense;
 import nars.nal.nal8.Execution;
-import nars.nal.nal8.Operator;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
@@ -27,7 +26,6 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
-
 
 
 /**
@@ -61,7 +59,8 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
     final MutableMap<Class, ProxyFactory> proxyCache = new UnifiedMap().asSynchronized();
 
     final Map<Class, ClassOperator> classOps = Global.newHashMap();
-    final Map<Method, MethodOperator> methodOps = Global.newHashMap();
+    //final Map<Method, MethodOperator> methodOps = Global.newHashMap();
+
     /**
      * non-null if the method is being invoked by NARS,
      * in which case it will reference the task that invoked
@@ -188,19 +187,7 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
     @Nullable
     public void invoked(@Nullable Object result, @NotNull Task invokingGoal) {
 
-//        if (!lock.compareAndSet(false,true)) {
-//            return result;
-//        }
-
-
         Task volitionTask = volition.get();
-
-//        //TODO re-use static copy for 'VOID' and null-returning instances
-//        if (invokingGoal != null) {
-//            InvocationResult ir = new InvocationResult(effect);
-//            ((MutableTask)invokingGoal).because(ir);
-//        }
-
 
         if (volitionTask == null) {
 
@@ -208,16 +195,14 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
              *  Master of puppets, I'm pulling your strings */
             nar.input(
                 invokingGoal.log(JavaInvoked.the),
-                Execution.result(nar, invokingGoal, term(result), Tense.Present).log("Java Return")
+                Execution.noticeExecuted(nar, invokingGoal),
+                Execution.result(nar, invokingGoal, term(result), Tense.Present).log("Java Execution Result")
             );
 
         } else {
             //feedback will be returned via operation execution
-            //System.out.println("VOLITION " + volitionTask);
         }
 
-
-//        lock.set(false);
     }
 
     private Term[] getMethodInvocationTerms(@NotNull Method method, Object instance, Object[] args) {
@@ -230,7 +215,7 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
         x[0] = $.the(method.getName());
         x[1] = term(instance);
         x[2] = $.p(terms(args));
-        x[3] = Operator.defaultResultVariable;
+        x[3] = Execution.defaultResultVariable;
         return x;
     }
 
@@ -318,11 +303,9 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
     @Nullable
     public Object invokeVolition(Task currentTask, @NotNull Method method, Object instance, Object[] args) throws InvocationTargetException, IllegalAccessException {
 
-        Object result = null;
-
         volition.set(currentTask);
 
-        result = method.invoke(instance, args);
+        Object result = method.invoke(instance, args);
 
         volition.set(null);
 
@@ -365,16 +348,11 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
             }
         }
 
-        //else {
+        result = wrapper.invoke(obj, args);
 
+        invoked(result, invokingGoal);
 
-            result = wrapper.invoke(obj, args);
-
-            invoked(result, invokingGoal);
-
-            MethodOperator.setCurrentTask(null);
-
-        //}
+        MethodOperator.setCurrentTask(null);
 
         return result;
     }

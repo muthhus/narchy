@@ -651,4 +651,43 @@ public enum $  {
 
         //  }
     }
+
+    public static Term inhImageExt(@NotNull Compound operation, @Nullable Term y, Compound x) {
+        return inh(
+                y,
+                imageExt(x, operation.term(1), x.size() - 1 /* position of the variable */)
+        );
+    }
+
+    /**
+     * Try to make an Image from a Product and a relation. Called by the logic rules.
+     *
+     * @param product  The product
+     * @param relation The relation (the operator)
+     * @param index    The index of the place-holder (variable)
+     * @return A compound generated or a term it reduced to
+     */
+    @Nullable
+    public static Term imageExt(@NotNull Compound product, @NotNull Term relation, int index) {
+        int pl = product.size();
+//        if (relation.op(PRODUCT)) {
+//            Compound p2 = (Compound) relation;
+//            if ((pl == 2) && (p2.size() == 2)) {
+//                if ((index == 0) && product.term(1).equals(p2.term(1))) { // (/,_,(*,a,b),b) is reduced to a
+//                    return p2.term(0);
+//                }
+//                if ((index == 1) && product.term(0).equals(p2.term(0))) { // (/,(*,a,b),a,_) is reduced to b
+//                    return p2.term(1);
+//                }
+//            }
+//        }
+        /*Term[] argument =
+            Terms.concat(new Term[] { relation }, product.cloneTerms()
+        );*/
+        Term[] argument = new Term[pl];
+        argument[0] = relation;
+        System.arraycopy(product.terms(), 0, argument, 1, pl - 1);
+
+        return the(IMAGE_EXT, index + 1, argument);
+    }
 }

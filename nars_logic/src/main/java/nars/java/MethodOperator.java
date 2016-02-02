@@ -71,13 +71,18 @@ public class MethodOperator  {
 //    }
 
 
-
-
     @Nullable
     public Object function(@NotNull Compound o, TermBuilder ti) {
 
         if (!enable.get())
             return null;
+
+        Task curTask = currentTask.get();
+        Object ll = curTask.getLogLast();
+
+        //Check if this was previously executed by the Java invocation pathway
+        if (ll instanceof NALObjects.JavaInvoked)
+            return ll; //signals already invoked
 
         Term[] x = o.terms();
 
@@ -147,12 +152,8 @@ public class MethodOperator  {
             //Object result = Invoker.invoke(instance, method.getName(), args); /** from Boon library */
 
 
-            Task curTask = currentTask.get();
 
-            Object ll = curTask.getLogLast();
 
-            if (ll instanceof NALObjects.JavaInvoked)
-                return null; //already invoked
 
             Object result = context.invokeVolition(curTask, method, instance, args);
 

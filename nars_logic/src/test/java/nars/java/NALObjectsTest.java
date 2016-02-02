@@ -24,7 +24,8 @@ import static org.junit.Assert.*;
 
 public class NALObjectsTest  {
 
-    public static class TestClass {
+    /** test class */
+    public static class T {
 
         public int count = 0;
         public int val = -1;
@@ -42,14 +43,14 @@ public class NALObjectsTest  {
             //return Math.random();
         }
 
-        public float multiply(float a, float b) {
+        public float mul(float a, float b) {
             count++;
             return a * b;
         }
 
         @Override
         public String toString() {
-            return "TestClass[" + count + ']';
+            return "T[" + count + ']';
         }
 
         public List<Method> getClassMethods() {
@@ -91,26 +92,26 @@ public class NALObjectsTest  {
 
         //n.log();
 
-        String instance = "obj";
+        String instance = "o";
 
         int startSize = n.memory.exe.size();
 
         NALObjects no = new NALObjects(n);
 
-        TestClass wrapper = no.theOrNull(instance, TestClass.class);
+        T wrapper = no.theOrNull(instance, T.class);
 
         assertEquals("one ClassOperator registered", 1, n.memory.exe.size() - startSize);
 
-        assertNotEquals(TestClass.class, wrapper.getClass());
-        assertEquals(TestClass.class, wrapper.getClass().getSuperclass());
+        assertNotEquals(T.class, wrapper.getClass());
+        assertEquals(T.class, wrapper.getClass().getSuperclass());
 
         if (external) {
             //INVOKE EXTERNALLY
-            wrapper.multiply(2, 3);
+            wrapper.mul(2, 3);
         }
         else {
             //INVOKE VOLITIONALLY
-            n.input("TestClass(multiply, " + instance + ",(2, 3),#x)! :|:");
+            n.input("T(mul, " + instance + ",(2, 3),#x)! :|:");
         }
 
         AtomicInteger puppets = new AtomicInteger(0);
@@ -123,7 +124,7 @@ public class NALObjectsTest  {
 
             String l = log.toString();
             //boolean hasPuppet = l.contains("Puppet");
-            boolean isMultiply = t.toString().contains("multiply");
+            boolean isMultiply = t.toString().contains("mul");
 //            if (!external && hasPuppet && t.isGoal() && isMultiply)
 //                assertFalse(t + " internal mode registered a Puppet invocation", true);
             boolean hasInput = l.contains("Input");
@@ -135,52 +136,26 @@ public class NALObjectsTest  {
             }
         });
 
-        n.run(6);
-
+        n.run(12);
 
         //assertEquals(0, wrapped.count); //unaffected
         assertEquals(1, wrapper.count); //wrapper fields affected
 
-        //WHAT TO EXPECT
-        /*
-
-        CLASS IS IN WHICH PACKAGE
-          eventTaskProcess: $0.50;0.80;0.95$
-                 <{((nars, java), TestClass)} --> package>. %1.00;0.90% Input
-
-        OBJECT INSTANCE OF WHICH CLASS
-          eventTaskProcess: $0.50;0.80;0.95$
-                <{obj} --> ((nars, java), TestClass)>. %1.00;0.90% Input
-
-        METHOD INVOKED (either by reasoner explicitly, or by external source)
-          eventTaskProcess: $0.60;0.90;0.95$
-                TestClass_multiply(obj, (2, 3), #1)! :\: %1.00;0.90% Input
-
-        METHOD RETURNED VALUE
-          eventTaskProcess: $0.50;0.80;0.95$
-                <{6} --> (/, ^TestClass_multiply, obj, (2, 3), _)>. :\: %1.00;0.90% Input
-
-        TODO: method metadata, including parameter typing information
-        */
-
-
-        //System.out.println(ns.getBuffer().toString());
-        //System.out.println();
-        //System.out.println(ms.getBuffer().toString());
-
         //TODO use TestNAR and test for right tense
-
 
         String bs = ns.getBuffer().toString();
 
         System.out.println(bs);
 
-        String invocationGoal0 = "TestClass(multiply,obj,(2,3),#1)!";
-        assertTrue(1 <= countMatches(bs, invocationGoal0));
 
-        String invocationGoal = "TestClass(multiply,obj,(2,3),#1)! :|: %1.0;.90%";
+        String invocationGoal = "T(mul,o,(2,3),#1)! :|: %1.0;.90%";
         assertEquals(1, countMatches(bs, invocationGoal));
 
+        String exeuctionNotice = "T(mul,o,(2,3),#1). :|: %1.0;.90%";
+        assertEquals(1, countMatches(bs, exeuctionNotice));
+
+        String feedbackResult = "(6-->(/,^T,mul,o,(2,3),_)). :|: %1.0;.90%";
+        assertEquals(1, countMatches(bs, feedbackResult));
 
 
         if (!external) assertEquals( 1, inputs.get() );
@@ -195,7 +170,7 @@ public class NALObjectsTest  {
         }
 
         //TaskProcess: $.50;.50;.95$
-        String feedback = "(6-->(/,^TestClass,multiply,obj,(2,3),_)).";
+        String feedback = "(6-->(/,^T,mul,o,(2,3),_)).";
 
         System.out.println(bs);
 
@@ -213,17 +188,17 @@ public class NALObjectsTest  {
 
         EventCount count = new EventCount(n);
 
-        TestClass tc = new NALObjects(n).the("myJavaObject", TestClass.class);
+        T tc = new NALObjects(n).the("myJavaObject", T.class);
 
         tc.noParamMethodReturningVoid();
-        assertEquals(6.0, tc.multiply(2, 3), 0.001);
+        assertEquals(6.0, tc.mul(2, 3), 0.001);
         assertNotNull( tc.the() );
 
 
         n.run(4);
 
 
-        assertNotEquals(tc.getClass(), TestClass.class);
+        assertNotEquals(tc.getClass(), T.class);
         assertTrue(1 <= count.numInputs());
 
 
@@ -337,7 +312,7 @@ public class NALObjectsTest  {
 
         //EventCount count = new EventCount(n);
 
-        TestClass tc = new NALObjects(n).the("obj", TestClass.class);
+        T tc = new NALObjects(n).the("obj", T.class);
 
 
         System.out.println( tc.getClassMethods() );

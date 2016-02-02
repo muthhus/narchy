@@ -66,7 +66,7 @@ import static org.fusesource.jansi.Ansi.ansi;
  * * step mode - controlled by an outside system, such as during debugging or testing
  * * thread mode - runs in a pausable closed-loop at a specific maximum framerate.
  */
-public abstract class NAR implements Level,Consumer<Task> {
+public abstract class NAR implements Level, Consumer<Task> {
 
 
     /**
@@ -148,6 +148,12 @@ public abstract class NAR implements Level,Consumer<Task> {
 
         m.start();
 
+    }
+
+    private static void cycles(Memory memory, @NotNull Topic<Memory> cycleStart, int cyclesPerFrame) {
+        for (; cyclesPerFrame > 0; cyclesPerFrame--) {
+            cycleStart.emit(memory);
+        }
     }
 
     /**
@@ -395,38 +401,22 @@ public abstract class NAR implements Level,Consumer<Task> {
 
     }
 
-    /** logs tasks and other budgeted items with a summary exceeding a threshold */
+    /**
+     * logs tasks and other budgeted items with a summary exceeding a threshold
+     */
     public void logSummaryGT(Appendable out, float summaryThreshold) {
-        log(out, v-> {
+        log(out, v -> {
             Budgeted b = null;
             if (v instanceof Budgeted) {
-                b = ((Budgeted)v);
+                b = ((Budgeted) v);
             } else if (v instanceof Twin) {
-                if (((Twin)v).getOne() instanceof Budgeted) {
-                    b = (Budgeted)((Twin)v).getOne();
+                if (((Twin) v).getOne() instanceof Budgeted) {
+                    b = (Budgeted) ((Twin) v).getOne();
                 }
             }
             return b == null ? false : b.summary() > summaryThreshold;
         });
     }
-
-    public static final class InvalidTaskException extends RuntimeException {
-
-        public final Task task;
-
-        public InvalidTaskException(Task t) {
-            super();
-            this.task = t;
-        }
-
-        @NotNull
-        @Override
-        public String getMessage() {
-            return "Invalid Task: " + task.getExplanation();
-        }
-
-    }
-
 
     /**
      * exposes the memory to an input, derived, or immediate task.
@@ -440,39 +430,36 @@ public abstract class NAR implements Level,Consumer<Task> {
         Memory m = memory;
 
         Task u;
-        //if (i != null) {
-            if (i.isCommand()) {
-                //direct execution
-                int n = execute(i);
-                if (n == 0) {
-                    m.remove(i, "Unmatched Command");
-                    u = null;
-                } else {
-                    u = i;
-                }
+        if (i.isCommand()) {
+            //direct execution
+            if (!execute(i, null)) {
+                m.remove(i, "Unmatched Command");
+                u = null;
             } else {
-                if (i.isDeleted()) {
-                    m.remove(i, "Pre-Deleted");
-                    u = null;
+                u = i;
+            }
+        } else {
+            if (i.isDeleted()) {
+                m.remove(i, "Pre-Deleted");
+                u = null;
+            } else {
+                //accept input if it can be normalized
+                u = i.normalize(m);
+                if (u == null) {
+                    m.remove(i, "Unnormalizable");
                 } else {
-                    //accept input if it can be normalized
-                    u = i.normalize(m);
-                    if (u == null) {
-                        m.remove(i, "Unnormalizable");
-                    } else {
-                        m.eventInput.emit(u);
-                    }
+                    //ACCEPT TASK FOR INPUT
+                    m.eventInput.emit(u);
                 }
             }
-        /*} else {
-            u = null;
-        }*/
+        }
 
         if (null == u)
             throw new InvalidTaskException(i);
     }
 
-    @Override public final void accept(Task task) {
+    @Override
+    public final void accept(Task task) {
         input(task);
     }
 
@@ -482,38 +469,82 @@ public abstract class NAR implements Level,Consumer<Task> {
      *
      * @return number of invoked handlers
      */
-    public final int execute(@NotNull Task goal) {
+    public final boolean execute(@NotNull Task inputGoal, @Nullable Concept goalConcept) {
 
-        Term operation = goal.term();
+        Term goalTerm = inputGoal.term();
+        if (!Op.isOperation(goalTerm)) {
+            return false;
+        }
 
-        if (Op.isOperation(operation)) {
+        Task goal = inputGoal;
 
-            /*if (!goal.isEternal())
-                goal.setExecuted();*/
+        if (goalConcept != null) {
+            //Normal Goal
+            long now = memory.time();
+            Task projectedGoal = goalConcept.goals().top(now);
+            float goalExp = projectedGoal.expectation();
 
-            Topic<Execution> tt = memory.exe.get(
-                Operator.operatorTerm((Compound) operation)
-            );
+            if (goalExp < Global.EXECUTION_DESIRE_EXPECTATION_THRESHOLD) {
+                return false;
+            }
 
-            if (tt != null && !tt.isEmpty()) {
+            goal = projectedGoal;
+        } else {
+            //a Command to directly execute, unmodified
+        }
 
-                //enqueue after this frame, before next
-                //beforeNextFrame(
-                new Execution(this, goal, tt).run();
 
-                if (!goal.isEternal())
-                    goal.budget().zero(); //execution drains temporal task's budget
+        Topic<Execution> tt = memory.exe.get(
+                Operator.operator((Compound) goalTerm)
+        );
 
-                //);
-                return 1;
+        boolean executed = (tt != null && !tt.isEmpty());
+        if (executed) {
+            //beforeNextFrame( //<-- enqueue after this frame, before next
+            new Execution(this, goal, tt).run();
+
+            if (!inputGoal.isEternal()) {
+                //execution drains temporal task's budget in proportion to durability
+                Budget inputGoalBudget = inputGoal.budget();
+                inputGoalBudget.priMult(1f - inputGoalBudget.dur());
             }
 
         }
+
+        if (goal != inputGoal) {
+            memory.remove(goal, executed ? "Executed Projected Goal" : "Unexecuted Projected Goal");
+        }
+
+        return executed;
+
         /*else {
             System.err.println("Unexecutable: " + goal);
         }*/
 
-        return 0;
+
+        //float delta = updateSuccess(goal, successBefore, memory);
+
+        //&& (goal.state() != Task.TaskState.Executed)) {
+
+            /*if (delta >= Global.EXECUTION_SATISFACTION_TRESHOLD)*/
+
+        //Truth projected = goal.projection(now, now);
+
+
+//                        LongHashSet ev = this.lastevidence;
+//
+//                        //if all evidence of the new one is also part of the old one
+//                        //then there is no need to execute
+//                        //which means only execute if there is new evidence which suggests doing so1
+//                        if (ev.addAll(input.getEvidence())) {
+
+//                            //TODO more efficient size limiting
+//                            //lastevidence.toSortedList()
+//                            while(ev.size() > max_last_execution_evidence_len) {
+//                                ev.remove( ev.min() );
+//                            }
+//                        }
+
     }
 
     /**
@@ -549,7 +580,6 @@ public abstract class NAR implements Level,Consumer<Task> {
 //    }
 
 
-
     /**
      * creates a TermFunction operator from a supplied function, which can be a lambda
      */
@@ -581,8 +611,8 @@ public abstract class NAR implements Level,Consumer<Task> {
 
     public On onExecution(@NotNull Operator op, @NotNull Consumer<Execution> each) {
         return memory.exe.computeIfAbsent(op,
-                    o -> new DefaultTopic<Execution>())
-                        .on(each);
+                o -> new DefaultTopic<Execution>())
+                .on(each);
     }
 
     /**
@@ -664,17 +694,11 @@ public abstract class NAR implements Level,Consumer<Task> {
         Clock clock = memory.clock;
 
         int cpf = memory.cyclesPerFrame.intValue();
-        for ( ; frames > 0; frames--) {
+        for (; frames > 0; frames--) {
             clock.tick();
             frameStart.emit(this);
             cycles(memory, cycleStart, cpf);
             runNextTasks();
-        }
-    }
-
-    private static void cycles(Memory memory, @NotNull Topic<Memory> cycleStart, int cyclesPerFrame) {
-        for (; cyclesPerFrame > 0; cyclesPerFrame--) {
-            cycleStart.emit(memory);
         }
     }
 
@@ -753,20 +777,19 @@ public abstract class NAR implements Level,Consumer<Task> {
 
         if (v instanceof Object[]) {
             v = Arrays.toString((Object[]) v);
-        }
-        else if (v instanceof Task) {
+        } else if (v instanceof Task) {
             Task tv = ((Task) v);
             v = ansi()
-                .a(tv.qua() > 0.5f ?
-                    Ansi.Attribute.INTENSITY_BOLD :
-                    Ansi.Attribute.INTENSITY_FAINT)
-                .a(tv.pri() > 0.5f ? Ansi.Attribute.NEGATIVE_ON : Ansi.Attribute.NEGATIVE_OFF)
-                .a(tv.dur() > 0.5f ? Ansi.Attribute.UNDERLINE : Ansi.Attribute.UNDERLINE_OFF)
-                .fg(Budget.budgetSummaryColor(tv))
-                .a(
-                    tv.toString(memory, true)
-                )
-                .reset()
+                    .a(tv.qua() > 0.5f ?
+                            Ansi.Attribute.INTENSITY_BOLD :
+                            Ansi.Attribute.INTENSITY_FAINT)
+                    .a(tv.pri() > 0.5f ? Ansi.Attribute.NEGATIVE_ON : Ansi.Attribute.NEGATIVE_OFF)
+                    .a(tv.dur() > 0.5f ? Ansi.Attribute.UNDERLINE : Ansi.Attribute.UNDERLINE_OFF)
+                    .fg(Budget.budgetSummaryColor(tv))
+                    .a(
+                            tv.toString(memory, true)
+                    )
+                    .reset()
                     .toString();
         }
 
@@ -888,8 +911,6 @@ public abstract class NAR implements Level,Consumer<Task> {
         return memory.time();
     }
 
-
-
     @NotNull
     public NAR onAnswer(@NotNull String question, @NotNull Consumer<Task> recvSolution) {
         //question punctuation optional
@@ -943,7 +964,7 @@ public abstract class NAR implements Level,Consumer<Task> {
             if (includeConceptGoals && c.hasBeliefs()) c.goals().top(maxPerConcept, recip);
             if (includeConceptQuests && c.hasQuests()) c.quests().top(maxPerConcept, recip);
             if (includeTaskLinks && null != c.getTaskLinks())
-                c.getTaskLinks().forEach(maxPerConcept, t->recip.accept(t.get()));
+                c.getTaskLinks().forEach(maxPerConcept, t -> recip.accept(t.get()));
         });
 
         return this;
@@ -975,7 +996,6 @@ public abstract class NAR implements Level,Consumer<Task> {
         return this;
     }
 
-
     @NotNull
     public NAR trace() {
 
@@ -990,7 +1010,7 @@ public abstract class NAR implements Level,Consumer<Task> {
 
     /**
      * execute a Task as a TaskProcess (synchronous)
-     *
+     * <p>
      * TODO make private
      */
     @Nullable
@@ -1005,31 +1025,30 @@ public abstract class NAR implements Level,Consumer<Task> {
             return null;
         }
 
+        final Memory memory = this.memory;
 
         float activation = memory.activationRate.floatValue();
         Concept c = conceptualize(input.concept(), input.budget(), activation);
         if (c == null) {
             //throw new RuntimeException("Inconceivable: " + input);
+            memory.remove(input, "Inconceivable");
             return null;
         }
 
         memory.emotion.busy(input);
 
         Task t = c.process(input, this);
-        if (t == null) return null;
-
-        //if (!task.getDeleted()) {
+        if (t == null) {
+            //dont delete 'input' because it may be a duplicate which was already in the table and remains there
+            return null;
+        }
 
         c.link(t, activation, this);
 
-//        if (input!=matched) {
-//            //if (Global.DEBUG..
-//            input.log(Tuples.pair("Resolved", matched));
-//            logger.info(input.getExplanation());
-//        }
-
         memory.eventTaskProcess.emit(t);
-        //}
+
+        if (t.isGoal())
+            execute(t, c);
 
         return c;
     }
@@ -1068,6 +1087,23 @@ public abstract class NAR implements Level,Consumer<Task> {
      * gets a measure of the current priority of the concept
      */
     abstract public float conceptPriority(Termed termed, float priIfNonExistent);
+
+    public static final class InvalidTaskException extends RuntimeException {
+
+        public final Task task;
+
+        public InvalidTaskException(Task t) {
+            super();
+            this.task = t;
+        }
+
+        @NotNull
+        @Override
+        public String getMessage() {
+            return "Invalid Task: " + task.getExplanation();
+        }
+
+    }
 
     public static class AlreadyRunningException extends RuntimeException {
         public AlreadyRunningException() {

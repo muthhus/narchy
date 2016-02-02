@@ -1,11 +1,11 @@
 package nars.nal.nal8.operator;
 
 import nars.$;
-import nars.NAR;
 import nars.Symbols;
 import nars.nal.Tense;
 import nars.nal.nal8.Execution;
 import nars.nal.nal8.Operator;
+import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
@@ -66,8 +66,8 @@ public abstract class TermFunction<O> extends SyncOperator {
     public abstract O function(Compound x, TermBuilder i);
 
 
-    protected Task result(@NotNull NAR nar, @NotNull Task goal, Term y/*, Term[] x0, Term lastTerm*/) {
-        return Execution.result(nar, goal, y, getResultTense());
+    protected MutableTask result(Execution e, Term y/*, Term[] x0, Term lastTerm*/) {
+        return Execution.result(e.nar, e.task, y, getResultTense());
     }
 
     /** default tense applied to result tasks */
@@ -139,41 +139,25 @@ public abstract class TermFunction<O> extends SyncOperator {
 
     @Override
     public void execute(@NotNull Execution e) {
+        feedback(e,
+            function(Operator.opArgs(e.task.term()), e.nar.index())
+        );
+    }
 
-
-        Task opTask = e.task;
-        Compound operation = opTask.term();
-
-        //Term opTerm = Compounds.operatorTerm(operation);
-        //Term[] x = Compounds.args(operation).terms();
-
-        //Memory memory = nar.memory;
-
-//        int numInputs = x.length;
-//        if (x[numInputs - 1].equals(memory.self()))
-//            numInputs--;
-//
-//        Term lastTerm = null;
-//        if (x[numInputs - 1] instanceof Variable) {
-//            lastTerm = x[numInputs-1];
-//            numInputs--;
-//        }
-
-        //Term[] x0 = operation.getArgumentTerms(false, memory);
-
-
-        Object y = function(Operator.opArgs(operation), e.nar.index());
-
+    protected void feedback(Execution e, Object y) {
 
         if (y == null || (y instanceof Term)) {
-            e.feedback( result(e.nar, opTask, (Term) y/*, x, lastTerm*/) );
+            e.feedback( result(e, (Term) y) );
             return;
         }
 
+        if (y instanceof Boolean) {
+            boolean by = (Boolean)y;
+            y = new DefaultTruth(by ? 1 : 0, 0.99f);
+        }
+
         if (y instanceof Truth) {
-
-            e.feedback((Truth)y);
-
+            e.feedback( result(e, null).truth((Truth)y) );
             return;
         }
 
@@ -181,15 +165,10 @@ public abstract class TermFunction<O> extends SyncOperator {
             Task ty = (Task)y;
             if (ty.pri() == 0) {
                 //set a resulting zero budget to the input task's
-                ty.budget().set(opTask.budget());
+                ty.budget().set(e.task.budget());
             }
             e.feedback( (Task)y );
             return;
-        }
-
-        if (y instanceof Boolean) {
-            boolean by = (Boolean)y;
-            y = new DefaultTruth(by ? 1 : 0, 0.99f);
         }
 
         if (y instanceof Number) {
@@ -219,7 +198,7 @@ public abstract class TermFunction<O> extends SyncOperator {
         Term t = $.the(ys, true);
 
         if (t != null) {
-            e.feedback( result(e.nar, opTask, t/*, x, lastTerm*/) );
+            e.feedback( result(e, t/*, x, lastTerm*/) );
             return;
         }
 

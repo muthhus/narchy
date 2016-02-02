@@ -169,7 +169,7 @@ public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
 
             Term cp = this.conclusionPattern;
 
-            if (Op.isOperation(cp) && p.transforms.containsKey( Operator.operatorTerm((Compound) cp) ) ) {
+            if (Op.isOperation(cp) && p.transforms.containsKey( Operator.operator((Compound) cp) ) ) {
                 //unwrap operation from conclusion pattern; the pattern we want is its first argument
                 cp = Operator.opArgsArray((Compound) cp)[0];
             }

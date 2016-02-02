@@ -257,7 +257,7 @@ public class NarseseTest {
         Term[] aa = Operator.opArgsArray(t);
         assertEquals(2, aa.length);
         assertEquals("^believe", t.term(1).toString());
-        assertEquals("^believe", Operator.operatorTerm(t).toString());
+        assertEquals("^believe", Operator.operator(t).toString());
         assertEquals("a", aa[0].toString());
         assertEquals("b", aa[1].toString());
     }
@@ -552,7 +552,7 @@ public class NarseseTest {
 
         //  }
         assertEquals("^" + $.the(echo.class.getSimpleName()),
-                Operator.operatorTerm(op).toString());
+                Operator.operator(op).toString());
     }
 
     @Test public void testEmptySetExt() {

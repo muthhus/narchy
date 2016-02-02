@@ -1,6 +1,8 @@
 package nars.concept;
 
-import nars.*;
+import nars.Memory;
+import nars.NAR;
+import nars.Symbols;
 import nars.bag.Bag;
 import nars.concept.util.ArrayListTaskTable;
 import nars.concept.util.BeliefTable;
@@ -235,58 +237,17 @@ public class DefaultConcept extends AtomConcept {
      */
     @NotNull
     @Override
-    public Task processGoal(@NotNull Task inputGoal, @NotNull NAR nar) {
+    public final Task processGoal(@NotNull Task inputGoal, @NotNull NAR nar) {
 
         Memory memory = nar.memory;
 
-        //long now = memory.time();
-
-        //float successBefore = getSuccess(now);
-
-        if (goals == null) goals = new DefaultBeliefTable(
-                nar.memory.conceptGoalsMax.intValue(), memory);
-
-        Task goal = goals().add(inputGoal, nar);
-
-        if (Op.isOperation(term())) {
-
-            long now = memory.time();
-            Task projectedGoal = goals().top(now);
-            float goalExp = projectedGoal.expectation(); //strongest/most relevant current desire
-
-            if ((goalExp > Global.EXECUTION_DESIRE_EXPECTATION_THRESHOLD)
-                //&&(goalExp > beliefs().expectation(true, memory))
-                    ) {
-
-                //float delta = updateSuccess(goal, successBefore, memory);
-
-                //&& (goal.state() != Task.TaskState.Executed)) {
-
-                /*if (delta >= Global.EXECUTION_SATISFACTION_TRESHOLD)*/
-                {
-
-                    //Truth projected = goal.projection(now, now);
-
-
-//                        LongHashSet ev = this.lastevidence;
-//
-//                        //if all evidence of the new one is also part of the old one
-//                        //then there is no need to execute
-//                        //which means only execute if there is new evidence which suggests doing so1
-//                        if (ev.addAll(input.getEvidence())) {
-                    nar.execute(projectedGoal);
-
-//                            //TODO more efficient size limiting
-//                            //lastevidence.toSortedList()
-//                            while(ev.size() > max_last_execution_evidence_len) {
-//                                ev.remove( ev.min() );
-//                            }
-//                        }
-                }
-            }
+        BeliefTable g = goals();
+        if (goals == null) {
+            g = this.goals = new DefaultBeliefTable(
+                memory.conceptGoalsMax.intValue(), memory);
         }
 
-        return goal;
+        return g.add(inputGoal, nar);
     }
 
 

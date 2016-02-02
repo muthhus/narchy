@@ -1,15 +1,10 @@
 package nars.nal.nal8;
 
-import nars.$;
 import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.AbstractStringAtom;
-import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import static nars.Op.PRODUCT;
 
 /**
  * the 1-arity '^' compound which wraps a term to
@@ -26,100 +21,26 @@ import static nars.Op.PRODUCT;
 public final class Operator<T extends Term> extends AbstractStringAtom { //implements Term {
 
     public Operator(@NotNull T the) {
-        super(Op.OPERATOR.ch + the.toString());
-    }
-    public Operator(@NotNull String the) {
-        super(Op.OPERATOR.ch + the);
+        this(the.toString());
     }
 
-    @NotNull
-    public static Compound opArgs(@NotNull Compound operation) {
+    public Operator(@NotNull String the) {
+        super(the.charAt(0)!=Op.OPERATOR.ch ? Op.OPERATOR.ch + the : the); //prepends ^ if necessary
+    }
+
+    /** returns the Product arguments compound of an operation. does not check if the input is actually an operation */
+    @NotNull public static Compound opArgs(@NotNull Compound operation) {
         return (Compound) operation.term(0);
     }
 
-
-
-    @NotNull
-    public static Operator operatorTerm(@NotNull Compound operation) {
-        return ((Operator) operation.term(1));
-    }
-
-    public static final Variable defaultResultVariable = $.varDep("defaultResultVariable");
-
-    /**
-     * creates a result term in the conventional format.
-     * the final term in the product (x) needs to be a variable,
-     * which will be replaced with the result term (y)
-     */
-    @Nullable
-    public static Term result(@NotNull Compound operation, @Nullable Term y) {
-        Compound x = (Compound) operation.term(0);
-        if (!x.op(PRODUCT))
-            throw new RuntimeException("invalid operation");
-
-        //add var dep as last term if missing
-        Term xLast = x.last();
-        if (!xLast.op(Op.VAR_DEP)) {
-            throw new RuntimeException("feedback requires variable in last position");
-            //x = $.p(Terms.concat(x.terms(), y)); //defaultResultVariable));
-
-            //        } else {
-            //            //TODO more efficient than subterm sequencing it:
-            //            x = $.p( Terms.concat(x.terms(0, x.size()-1), y));
-            //        }
-        }
-
-        //if (y != null)
-        //    x = (Compound) x.replacing(x.size()-1, y);
-
-        if (y == null)
-            y = xLast;
-
-        return $.inh(
-                y,
-                makeImageExt(x, operation.term(1), (short) (x.size() - 1) /* position of the variable */)
-        );
-
-        //return $.exec(Operator.operatorTerm(operation), x);
-    }
-
-
-    /**
-     * Try to make an Image from a Product and a relation. Called by the logic rules.
-     *
-     * @param product  The product
-     * @param relation The relation (the operator)
-     * @param index    The index of the place-holder (variable)
-     * @return A compound generated or a term it reduced to
-     */
-    @Nullable
-    private static Term makeImageExt(@NotNull Compound product, @NotNull Term relation, short index) {
-        int pl = product.size();
-        if (relation.op(PRODUCT)) {
-            Compound p2 = (Compound) relation;
-            if ((pl == 2) && (p2.size() == 2)) {
-                if ((index == 0) && product.term(1).equals(p2.term(1))) { // (/,_,(*,a,b),b) is reduced to a
-                    return p2.term(0);
-                }
-                if ((index == 1) && product.term(0).equals(p2.term(0))) { // (/,(*,a,b),a,_) is reduced to b
-                    return p2.term(1);
-                }
-            }
-        }
-        /*Term[] argument =
-            Terms.concat(new Term[] { relation }, product.cloneTerms()
-        );*/
-        Term[] argument = new Term[pl];
-        argument[0] = relation;
-        System.arraycopy(product.terms(), 0, argument, 1, pl - 1);
-
-        return $.the(Op.IMAGE_EXT, index + 1, argument);
-    }
-
-
-
-    public static Term[] opArgsArray(@NotNull Compound term) {
+    /** returns the terms array of the arguments of an operation. does not check if the input is actually an operation */
+    @NotNull public static Term[] opArgsArray(@NotNull Compound term) {
         return opArgs(term).terms();
+    }
+
+    /** returns the Operator predicate of an operation. does not check if the input is actually an operation */
+    @NotNull public static Operator operator(@NotNull Compound operation) {
+        return ((Operator) operation.term(1));
     }
 
     @NotNull
@@ -153,12 +74,4 @@ public final class Operator<T extends Term> extends AbstractStringAtom { //imple
         return 0;
     }
 
-    @NotNull
-    public static Operator the(@NotNull Term op) {
-        return new Operator(op);
-    }
-    @NotNull
-    public static Operator the(@NotNull String op) {
-        return new Operator(op);
-    }
 }
