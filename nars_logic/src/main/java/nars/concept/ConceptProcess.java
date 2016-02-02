@@ -209,34 +209,47 @@ public final class ConceptProcess implements Premise {
                     long bTask = tp.subtermTime(cb, td);
                     long bBelief = bp.subtermTime(cb, bd);
 
-                    if (aTask != ETERNAL && aBelief == ETERNAL &&
-                            bBelief != ETERNAL && bTask == ETERNAL) {
-                        //forward: task -> belief
-                        //t = (int) (task().occurrence() - belief().occurrence());
-                        t = (int) (belief().occurrence() - task().occurrence());
-                        occ += t;
+                    if(belief()!=null) {
 
-                    }
-                    else if (aTask == ETERNAL && aBelief != ETERNAL &&
-                            bBelief == ETERNAL && bTask != ETERNAL) {
-                        //reverse: belief -> task
-                        t = (int) (task().occurrence() - belief().occurrence());
-                        //t = (int) (belief().occurrence() - task().occurrence());
-                        //t = (int) (task().occurrence() - belief().occurrence());
-                        occ -= t;
-                    } else {
-                        //throw new RuntimeException("unhandled case");
+                        long to = task().occurrence();
+                        long bo = belief().occurrence();
 
+                        int docc = (int) (bo - to);
 
-                        //both ITERNAL
-                        if(belief()!=null) {
-
-                            long to = task().occurrence();
-                            long bo = belief().occurrence();
-                            if ((to != ETERNAL) && (bo != ETERNAL)) {
-                                t = (int) (to - bo);
-                                occ -= t;
+                        boolean reversed = false;
+                        /* reverse subterms if commutive and the terms are opposite the corresponding pattern */
+                        if (derived.op().isCommutative()) {
+                            if (!p.resolve(((Compound) cp).term(0)).equals(derived.term(0))) {
+                                docc = -docc;
+                                reversed = true;
                             }
+                        }
+
+
+                        if (aTask != ETERNAL && aBelief == ETERNAL &&
+                                bBelief != ETERNAL && bTask == ETERNAL) {
+                            //forward: task -> belief
+                            //t = (int) (task().occurrence() - belief().occurrence());
+                            t = docc;
+                            if (reversed) occ-=t; else occ += t;
+
+                        } else if (aTask == ETERNAL && aBelief != ETERNAL &&
+                                bBelief == ETERNAL && bTask != ETERNAL) {
+                            //reverse: belief -> task
+                            t = -docc;
+                            //t = (int) (belief().occurrence() - task().occurrence());
+                            //t = (int) (task().occurrence() - belief().occurrence());
+                            if (reversed) occ+=t; else occ -= t;
+                        } else {
+\
+
+                            //both ITERNAL
+
+                            if ((to != ETERNAL) && (bo != ETERNAL)) {
+                                t = docc;
+                                if (reversed) occ-=t; else occ += t;
+                            }
+
                         }
                     }
 
@@ -358,13 +371,6 @@ public final class ConceptProcess implements Premise {
         if (t != ITERNAL) {
             /*derived = (Compound) p.premise.nar.memory.index.newTerm(derived.op(), derived.relation(),
                     t, derived.subterms());*/
-
-            /* reverse subterms if commutive and the terms are opposite the corresponding pattern */
-            if (derived.op().isCommutative()) {
-                if (!p.resolve(((Compound)cp).term(0)).equals(derived.term(0))) {
-                    t = -t;
-                }
-            }
 
             derived = derived.t(t);
 

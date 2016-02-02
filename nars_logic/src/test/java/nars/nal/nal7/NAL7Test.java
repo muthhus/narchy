@@ -192,8 +192,11 @@ public class NAL7Test extends AbstractNALTester {
     @Test
     public void temporal_induction_comparison()  {
         TestNAR tester = test();
+
+        // hold ==>+4 open ==>+5 enter
         tester.believe("((( $x, door) --> open) ==>+5 (( $x, room) --> enter))", 0.9f, 0.9f);
         tester.believe("((( $y, door) --> open) ==>-4 (( $y, key) --> hold))", 0.8f, 0.9f);
+
 
         tester.mustBelieve(cycles, "((($1,key) --> hold) ==>+9 (($1,room) --> enter))", 0.9f, 0.39f);
         tester.mustBelieve(cycles, "((($1,room) --> enter) ==>-9 (($1,key) --> hold))", 0.8f, 0.42f);
@@ -383,7 +386,7 @@ public class NAL7Test extends AbstractNALTester {
     private void compositionTest(int t, int dt) {
         TestNAR tester = test();
 
-        tester.nar.log();
+        //tester.nar.log();
 
         tester.inputAt(t, "hold:(John,key). :|:");
         tester.inputAt(t, "(open:(John,door) ==>+" + dt + " enter:(John,room)). :|:");
