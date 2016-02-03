@@ -284,7 +284,7 @@ public interface BeliefTable extends TaskTable {
     }
 
     /** ageFactor < 1 (ex: 1/dur) */
-    static float relevance(long delta /* positive only */, float ageFactor) {
+    static float relevance(long delta /* positive only */, float ageFactor /* <1, divides usually */) {
         return 1f / (1f + delta*ageFactor);
     }
 

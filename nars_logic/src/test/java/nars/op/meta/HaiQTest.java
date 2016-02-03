@@ -81,7 +81,7 @@ public class HaiQTest {
             float v;
             if ((cx!=null) && (cx.hasBeliefs())) {
                 Task t = cx.beliefs().topTemporal(now, now);
-                System.out.println(t);
+                //System.out.println(t);
                 v = t.expectation();
             } else {
                 v = ifNonExists;
@@ -102,7 +102,7 @@ public class HaiQTest {
 
         void act(int x) {
             //desire action of the given action concept
-            logger.info("act: " + x);
+            //logger.info("act: " + x);
         }
 
 
@@ -118,16 +118,17 @@ public class HaiQTest {
         n.input("hai(set, q, ({x:0,x:1}, {reward:xy}, {y:0, y:1}), #z);");
 
         n.input("x:0. :\\: %0.25%");
+        n.input("(x:0 ==>+5 (--,x:1)). :|: %0.99%");
         n.run(1);
-        n.input("x:0. :/:");
+        n.input("x:0. :/: %0.5%");
         n.run(1);
-        n.input("x:1. :|:");
+        n.input("x:1. :|: %0.5%");
         n.run(1);
         n.input("reward:xy. :/: %0.75%");
-        n.input("(x:0 ==>+20 (--,x:1)). %0.9%");
         n.run(10);
-        n.input("x:1. :|: %0%");
-        n.run(10);
+        //n.input("x:1. :|: %0%");
+        n.run(50);
 
+        //n.concept("(1-->x)").print();
     }
 }

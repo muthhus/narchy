@@ -202,8 +202,10 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         if (solTruth == null)
             return null;
 
-        solTruth =  solTruth.withConfMult(termRelevance);
+        solTruth = solTruth.withConfMult(termRelevance);
                 //solTruth.withConf( w2c(solTruth.conf())* termRelevance );
+
+        if (solTruth.conf() < conf()) return this;
 
         Budget solutionBudget = solutionBudget(question, this, solTruth, memory);
         if (solutionBudget == null)
@@ -349,7 +351,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         Truth adjustedTruth = projectTruth(when, now, false);
         long occ = occurrence();
         long projOcc = (adjustedTruth instanceof ProjectedTruth) ? ((ProjectedTruth)adjustedTruth).when : occ;
-        return /*occ == projOcc && */adjustedTruth.equals(truth()) ? this :
+        return /*occ == projOcc &&*/ adjustedTruth.equals(truth()) ? this :
                 MutableTask.clone(this, adjustedTruth, now, projOcc);
 
     }

@@ -44,7 +44,7 @@ public class SomeRovers {
                 3, 3, 0.618f, 30, 30));
 
 
-        boolean addNARRover = false;
+        boolean addNARRover = true;
         boolean addQRover = true;
 
         if (addNARRover)
