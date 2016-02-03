@@ -298,6 +298,7 @@ public class NAL7Test extends AbstractNALTester {
     @Test public void induction_on_events3_simple()  {
         TestNAR tester = test();
 
+        tester.nar.log();
         tester.input("<door --> open>. :|:");
         tester.inputAt(4, "<room --> enter>. :|:");
 
@@ -308,7 +309,6 @@ public class NAL7Test extends AbstractNALTester {
     @Test public void induction_on_events3_simple_reversed()  {
         //TO TEST COMMUTIVITY
         TestNAR tester = test();
-
         tester.input("<room --> enter>. :|:");
         tester.inputAt(4, "<door --> open>. :|:");
 

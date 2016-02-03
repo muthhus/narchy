@@ -29,6 +29,8 @@ import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static java.lang.StrictMath.abs;
+
 /**
  * All truth-value (and desire-value) functions used in logic rules
  */
@@ -132,13 +134,13 @@ public final class TruthFunctions extends UtilityFunctions {
         long bdt = Math.abs(bt-now);
         float closeness = (adt!=bdt) ? (bdt/(float)(adt+bdt)) : 0.5f;
 
-        float w1 = c2w(a.conf()) * closeness;
-        float w2 = c2w(b.conf()) * (1-closeness);
+        float w1 = c2w(a.conf() * closeness);
+        float w2 = c2w(b.conf() * (1-closeness));
 
         final float w = (w1 + w2);
         float newConf = w2c(w)
                 * temporalProjection(now, at, bt)
-                //* TruthFunctions.temporalProjection(at, bt, now)
+                //* TruthFunctions.temporalProjectionOld(at, bt, now)
                 * match;
         if (newConf < confThreshold + Global.TRUTH_EPSILON/2f) return null;
 
@@ -154,6 +156,12 @@ public final class TruthFunctions extends UtilityFunctions {
     public static float temporalProjection(long now, long at, long bt) {
         return BeliefTable.relevance(Math.abs(now-at) + Math.abs(now-bt), Math.abs(at-bt));
     }
+      public static float temporalProjectionOld(long sourceTime, long targetTime, long currentTime) {
+        long den = (abs(sourceTime - currentTime) + abs(targetTime - currentTime));
+        if (den == 0) return 1f;
+        return abs(sourceTime - targetTime) / (float)den;
+    }
+
 
     /**
      * {M, <M ==> P>} |- P

@@ -53,7 +53,7 @@ public class DefaultBeliefTable implements BeliefTable {
                 //new HashMap(cap);
 
         this.minT = this.maxT = this.lastUpdate = memory.time();
-        this.ageFactor = memory.duration()*2;
+        this.ageFactor = 1f/(memory.duration()*2);
 
         /** Ranking by originality is a metric used to conserve original information in balance with confidence */
         eternal = new SetTable<Task>(cap/2, map, new ArraySortedIndex<Task>(cap) {
@@ -295,10 +295,11 @@ public class DefaultBeliefTable implements BeliefTable {
 //                continue;
 //            }
 
-            int totalEvidence = newBelief.evidence().length + x.evidence().length;
+            int totalEvidence = 0; //newBelief.evidence().length + x.evidence().length;
             float minValidConf = Math.max(newBelief.conf(), x.conf());
+            if (minValidConf < bestConf) continue;
             float minValidRank = BeliefTable.rankEternalByOriginality(minValidConf, totalEvidence);
-            if ((minValidRank < bestRank) || (minValidConf < bestConf)) continue;
+            if (minValidRank < bestRank) continue;
 
             Truth c;
             long t;

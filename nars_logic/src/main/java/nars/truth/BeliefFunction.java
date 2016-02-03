@@ -28,7 +28,7 @@ public enum BeliefFunction implements TruthOperator {
         @NotNull
         @Override public Truth apply(@NotNull final Truth T, @NotNull final Truth B, Memory m) {
             //if (B == null) return null;
-            return TruthFunctions.revision(T, B, 1f, 0f);
+            return TruthFunctions.revision(T, B, 1f, -1f);
         }
     },
 

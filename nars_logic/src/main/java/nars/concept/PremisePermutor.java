@@ -144,7 +144,7 @@ public class PremisePermutor extends UnifySubst implements Function<Term, Task> 
     }
 
 
-    /** resolves the mots relevant task for a given term/concept */
+    /** resolves the most relevant task for a given term/concept */
     @Override public final Task apply(Term beliefTerm) {
 
         Concept beliefConcept = nar.concept(beliefTerm);
