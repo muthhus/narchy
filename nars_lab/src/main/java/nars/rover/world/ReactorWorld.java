@@ -5,6 +5,7 @@
 package nars.rover.world;
 
 import nars.rover.Material;
+import nars.rover.PhysicsModel;
 import nars.rover.RoverWorld;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.MathUtils;
@@ -19,14 +20,21 @@ import org.jbox2d.dynamics.BodyType;
 public class ReactorWorld extends RoverWorld {
     private final float w;
     private final float h;
+    private final int numFood;
 
     public ReactorWorld(int numFood, float w, float h) {
         super();
         this.w = w;
         this.h = h;
+        this.numFood = numFood;
 
+    }
+
+    @Override
+    public void init(PhysicsModel p) {
+        super.init(p);
         p.getWorld().setAllowSleep(false);
-        p.getWorld().setGravity(new Vec2(0, 9));
+        p.getWorld().setGravity(new Vec2(0, -9));
 
         float foodSpawnR = w / 1.5f;
         for (int i = 0; i < numFood; i++) {
@@ -41,9 +49,9 @@ public class ReactorWorld extends RoverWorld {
         addWall(w, 0, wt, h, 0);
         addWall(0, -h, w, wt, 0);
 
-        fireFuktonium(16);
+        //fireFuktonium(4);
 
-        for (int i = 0; i < 16; i++) {
+        for (int i = 0; i < 4; i++) {
             fireExecutiveCasket();
         }
     }
@@ -54,10 +62,10 @@ public class ReactorWorld extends RoverWorld {
     }
 
     protected void fireFuktonium() {
-        fireDebris(1.0f, 0.2f);
+        fireDebris(1f, 1f);
     }
     protected void fireExecutiveCasket() {
-        fireDebris(8f, 3f);
+        fireDebris(1f, 1.5f);
     }
     /**
      * fuel rod components mixed with plutonium ash mutated into a supernatural buckyball atomic compound

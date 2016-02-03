@@ -24,4 +24,4 @@
 //    public String toString() {
 //        return "t" + index; //s for subterm and sibling
 //    }
-//}
+// }

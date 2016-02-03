@@ -276,15 +276,18 @@ public class ConceptPane extends VBox implements ChangeListener {
         @Override
         public void run() {
             //synchronized (pending) {
-            queued.set(false);
+            if (!queued.get())
+                return;
 
             getChildren().setAll(pending.stream().map(this::getNode).collect(toList()));
-            //}
 
             getChildren().forEach(n -> {
                 if (n instanceof Runnable)
                     ((Runnable) n).run();
             });
+
+            queued.set(false);
+
         }
     }
 

@@ -5,10 +5,10 @@ import nars.op.software.prolog.terms.Copier;
 import nars.op.software.prolog.terms.Prog;
 
 /**
-  Builds an iterator from a list
-*/
+ * Builds an iterator from a list
+ */
 public class ListSource extends JavaSource {
-  public ListSource(Const Xs,Prog p){
-    super(Copier.ConsToVector(Xs),p);
-  }
+	public ListSource(Const Xs, Prog p) {
+		super(Copier.ConsToVector(Xs), p);
+	}
 }

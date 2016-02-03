@@ -1,8 +1,8 @@
 package nars.bag;
 
 import nars.budget.Budget;
+import nars.budget.Budgeted;
 import nars.budget.UnitBudget;
-import nars.data.BudgetedStruct;
 import nars.nal.Tense;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,12 +30,12 @@ public final class BLink<X> extends Budget implements Link<X> {
         init(p, d, q);
     }
 
-    public BLink(X id, @NotNull BudgetedStruct b) {
+    public BLink(X id, @NotNull Budgeted b) {
         this(id);
         init(b, 1f);
     }
 
-    public BLink(X id, @NotNull BudgetedStruct b, float scale) {
+    public BLink(X id, @NotNull Budgeted b, float scale) {
         this(id);
         init(b, scale);
     }
@@ -45,7 +45,7 @@ public final class BLink<X> extends Budget implements Link<X> {
         return id;
     }
 
-    private void init(@NotNull BudgetedStruct c, float scale) {
+    private void init(@NotNull Budgeted c, float scale) {
         //this.lastForget = c.getLastForgetTime();
         this.lastForget = Tense.TIMELESS;
 
@@ -83,7 +83,7 @@ public final class BLink<X> extends Budget implements Link<X> {
     }
 
     @Override
-    public final float pri() {
+    public final float getPriority() {
         return b[0];
     }
 
@@ -94,7 +94,7 @@ public final class BLink<X> extends Budget implements Link<X> {
     }
 
     @Override
-    public float dur() {
+    public float getDurability() {
         return b[1];
     }
 
@@ -105,7 +105,7 @@ public final class BLink<X> extends Budget implements Link<X> {
     }
 
     @Override
-    public float qua() {
+    public float getQuality() {
         return b[2];
     }
 
@@ -130,7 +130,7 @@ public final class BLink<X> extends Budget implements Link<X> {
     }
 
     @Override
-    public long lastForgetTime() {
+    public long getLastForgetTime() {
         return lastForget;
     }
 

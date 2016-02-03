@@ -4,6 +4,22 @@ package nars;
 import com.google.common.collect.Sets;
 import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 import nars.Narsese.NarseseException;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
@@ -36,21 +52,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.Executors;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.BooleanSupplier;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
 
-import static java.lang.System.out;
 import static nars.Symbols.*;
 import static nars.nal.Tense.ETERNAL;
 import static org.fusesource.jansi.Ansi.ansi;
@@ -110,7 +112,7 @@ public abstract class NAR implements Level, Consumer<Task> {
     public final AtomicBoolean running = new AtomicBoolean();
 
     //TODO use this to store all handler registrations, and decide if transient or not
-    public final transient List<Object> regs = new ArrayList();
+    public final transient List<Object> regs = Global.newArrayList();
 
     private final transient Collection<Runnable> nextTasks = new CopyOnWriteArrayList(); //ConcurrentLinkedDeque();
 
@@ -737,7 +739,7 @@ public abstract class NAR implements Level, Consumer<Task> {
 
     @NotNull
     public NAR log() {
-        return log(out);
+        return log(System.out);
     }
 
     @NotNull
@@ -995,7 +997,7 @@ public abstract class NAR implements Level, Consumer<Task> {
 
     @NotNull
     public NAR trace() {
-        trace(out);
+        trace(System.out);
         return this;
     }
 
@@ -1082,6 +1084,13 @@ public abstract class NAR implements Level, Consumer<Task> {
      * gets a measure of the current priority of the concept
      */
     abstract public float conceptPriority(Termed termed, float priIfNonExistent);
+
+    public Term[] terms(String... terms) {
+        Term[] t = new Term[terms.length];
+        Stream.of(terms).map(x -> term(x)).toArray(Term[]::new);
+        return t;
+
+    }
 
     public static final class InvalidTaskException extends RuntimeException {
 

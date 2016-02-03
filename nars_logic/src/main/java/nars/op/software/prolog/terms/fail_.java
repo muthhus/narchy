@@ -1,13 +1,14 @@
 package nars.op.software.prolog.terms;
 
-
 /**
-  Always fails
-*/
+ * Always fails
+ */
 class fail_ extends ConstBuiltin {
-  fail_() {super("fail");}
+	fail_() {
+		super("fail");
+	}
 
-  public int exec(Prog p) {
-    return 0;
-  }
+	public int exec(Prog p) {
+		return 0;
+	}
 }

@@ -24,4 +24,4 @@
 //    public String toString() {
 //        return /*"Struct = " + */ Integer.toString(bits, 2);
 //    }
-//}
+// }

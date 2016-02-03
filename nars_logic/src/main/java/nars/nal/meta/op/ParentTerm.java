@@ -27,4 +27,4 @@
 //    public String toString() {
 //        return "parent(" + parent + ')'; //s for subterm and sibling
 //    }
-//}
+// }

@@ -59,8 +59,10 @@ public class TaskButton<X> extends Label implements Runnable {
             s = labelize(((Task)ref).toStringWithoutBudget(null));
         } else if (ref instanceof Termed) {
             s = labelize( ((Termed)ref).term().toString() );
-        } else {
+        } else if (ref!=null) {
             s = ref.toString();
+        } else {
+            s = "null";
         }
         setText(s);
 

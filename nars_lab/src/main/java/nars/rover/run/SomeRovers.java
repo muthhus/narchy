@@ -1,24 +1,42 @@
 package nars.rover.run;
 
+import com.gs.collections.impl.factory.Lists;
 import javafx.scene.layout.VBox;
 import javassist.scopedpool.SoftValueHashMap;
 import nars.Global;
 import nars.Memory;
+import nars.NAR;
 import nars.guifx.NARfx;
 import nars.nar.Default;
 import nars.rover.RoverWorld;
 import nars.rover.Sim;
 import nars.rover.robot.NARover;
-import nars.rover.robot.Spider;
-import nars.rover.robot.Turret;
 import nars.rover.world.FoodSpawnWorld1;
+import nars.term.Termed;
 import nars.term.index.MapIndex2;
 import nars.time.SimulatedClock;
+import nars.util.signal.hai;
+
+import java.util.Collections;
+import java.util.List;
+
 
 /**
  * Created by me on 6/20/15.
  */
 public class SomeRovers {
+
+    public static final String motorLeft = "MotorControls(left,motor,(),#z)";
+    public static final String motorRight = "MotorControls(right,motor,(),#z)";
+    public static final String motorForward = "MotorControls(forward,motor,(),#z)";
+    ////"MotorControls(backward,motor,(),#z)",
+    public static final String motorStop = "MotorControls(stop,motor,(),#z)";
+
+    public static final String eatFood = "eat:food";
+    public static final String eatPoison = "eat:poison";
+    public static final String speedLeft = "speed:left";
+    public static final String speedRight = "speed:right";
+    public static final String speedForward = "speed:forward";
 
     private static final SimulatedClock clock = new SimulatedClock();
 
@@ -27,9 +45,9 @@ public class SomeRovers {
         Global.DEBUG = Global.EXIT_ON_EXCEPTION = true;
 
 
-        //world = new ReactorWorld(this, 32, 48, 48*2);
+        //RoverWorld world = new ReactorWorld(32, 48, 32);
 
-        RoverWorld world = new FoodSpawnWorld1(256, 48, 48, 0.75f);
+        RoverWorld world = new FoodSpawnWorld1(256, 48, 48, 0.5f);
 
         //RoverWorld world = new GridSpaceWorld(GridSpaceWorld.newMazePlanet());
 
@@ -37,89 +55,21 @@ public class SomeRovers {
         final Sim game = new Sim(clock, world);
 
 
-        game.add(new Turret("turret"));
-
-        game.add(new Spider("spider",
-                3, 3, 0.618f, 30, 30));
+//        game.add(new Turret("turret"));
+//
+//        game.add(new Spider("spider",
+//                3, 3, 0.618f, 30, 30));
 
 
         boolean addNARRover = true;
-        boolean addQRover = true;
+        boolean addQRover = false;
 
-        if (addNARRover)
-        {
-            int conceptsFirePerCycle = 2;
-            Default nar = new Default(
-                    new Memory(clock, new MapIndex2(
-                            new SoftValueHashMap())),
-                    1200, conceptsFirePerCycle, 2, 4);
-
-//            nar.memory.DEFAULT_JUDGMENT_PRIORITY = 0.35f;
-//            nar.memory.DEFAULT_JUDGMENT_DURABILITY = 0.35f;
-//            nar.memory.DEFAULT_GOAL_PRIORITY = 0.7f;
-//            nar.memory.DEFAULT_GOAL_DURABILITY = 0.7f;
-//            nar.memory.DEFAULT_QUESTION_PRIORITY = 0.6f;
-//            nar.memory.DEFAULT_QUESTION_DURABILITY = 0.6f;
-
-            //nar.initNAL9();
-            //nar.memory.the(new Anticipate(nar));
-
-
-            //nar.memory.perfection.setValue(0.15f);
-            nar.core.confidenceDerivationMin.setValue(0.01f);
-
-            //nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
-            nar.core.activationRate.setValue(0.5f);
-
-            nar.memory.duration.set(5);
-            nar.memory.conceptForgetDurations.setValue(3);
-            nar.memory.termLinkForgetDurations.setValue(10);
-            nar.memory.taskLinkForgetDurations.setValue(20);
-            nar.memory.cyclesPerFrame.set(64);
-            nar.memory.shortTermMemoryHistory.set(4);
-            //nar.memory.executionExpectationThreshold.setValue(0.95f);
-
-
-            boolean gui = true;
-            if (gui) {
-                //NARide.loop(nar, false);
-
-                NARfx.run( () -> {
-//                    NARide.newIDE(nar.loop(), (i) -> {
-//
-//                    }, new Stage());
-
-                    NARfx.newConceptWindow(nar,
-                            //new TilePane(Orientation.VERTICAL),
-                            new VBox(),
-                            "MotorControls(#x,motor,(),#z)",
-                            "MotorControls(left,motor,(),#z)",
-                            "MotorControls(right,motor,(),#z)",
-                            "MotorControls(forward,motor,(),#z)",
-                            //"MotorControls(backward,motor,(),#z)",
-                            "MotorControls(stop,motor,(),#z)"
-                    );
-                    NARfx.newConceptWindow(nar,
-                            //new TilePane(Orientation.VERTICAL),
-                            new VBox(),
-                            "eat:food",
-                            "eat:poison",
-                            "speed:left",
-                            "speed:right",
-                            "speed:forward"
-                            //"speed:backward"
-                    );
-                });
-            }
-
-
-            game.add(new NARover("r1", nar));
-
+        if (addNARRover) {
+            game.add(q(new NARover("r1", newNAR())));
         }
 
 
         if (addQRover) {
-
             game.add(new QRover("r2"));
         }
 
@@ -134,6 +84,94 @@ public class SomeRovers {
         float fps = 30;
         game.run(fps);
 
+    }
+
+    public static Default newNAR() {
+        int conceptsFirePerCycle = 2;
+        Default nar = new Default(
+                new Memory(clock, new MapIndex2(
+                        new SoftValueHashMap())),
+                1200, conceptsFirePerCycle, 2, 4);
+
+//            nar.memory.DEFAULT_JUDGMENT_PRIORITY = 0.35f;
+//            nar.memory.DEFAULT_JUDGMENT_DURABILITY = 0.35f;
+//            nar.memory.DEFAULT_GOAL_PRIORITY = 0.7f;
+//            nar.memory.DEFAULT_GOAL_DURABILITY = 0.7f;
+//            nar.memory.DEFAULT_QUESTION_PRIORITY = 0.6f;
+//            nar.memory.DEFAULT_QUESTION_DURABILITY = 0.6f;
+
+        //nar.initNAL9();
+        //nar.memory.the(new Anticipate(nar));
+
+
+        //nar.memory.perfection.setValue(0.15f);
+        nar.core.confidenceDerivationMin.setValue(0.01f);
+
+        //nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
+        nar.core.activationRate.setValue(0.5f);
+
+        nar.memory.duration.set(5);
+        nar.memory.conceptForgetDurations.setValue(3);
+        nar.memory.termLinkForgetDurations.setValue(10);
+        nar.memory.taskLinkForgetDurations.setValue(20);
+        nar.memory.cyclesPerFrame.set(64);
+        nar.memory.shortTermMemoryHistory.set(4);
+        //nar.memory.executionExpectationThreshold.setValue(0.95f);
+
+
+        boolean gui = true;
+        if (gui) {
+            //NARide.loop(nar, false);
+
+            NARfx.run( () -> {
+//                    NARide.newIDE(nar.loop(), (i) -> {
+//
+//                    }, new Stage());
+
+                NARfx.newConceptWindow(nar,
+                        //new TilePane(Orientation.VERTICAL),
+                        new VBox(),
+                        "MotorControls(#x,motor,(),#z)",
+                        motorLeft,
+                        motorRight,
+                        motorForward,
+
+                        motorStop
+                );
+
+                NARfx.newConceptWindow(nar,
+                        //new TilePane(Orientation.VERTICAL),
+                        new VBox(),
+                        eatFood,
+                        eatPoison,
+                        speedLeft,
+                        speedRight,
+                        speedForward
+                        //"speed:backward"
+                );
+            });
+        }
+
+        return nar;
+    }
+
+    /** attaches a prosthetic q-controller to a NAR */
+    public static NARover q(NARover r) {
+        NAR n = r.nar;
+        hai q = new hai(n);
+
+        List<Termed> sensors = Global.newArrayList();
+        Collections.addAll(sensors, n.terms(eatFood, eatPoison, speedLeft, speedRight, speedForward));
+
+        q.set(
+            sensors,
+            Lists.mutable.of(n.term("eat:food")),
+            Lists.mutable.of(n.term(motorForward), n.term(motorLeft), n.term(motorRight), n.term(motorStop))
+        );
+
+
+
+        return r;
     }
 
 //    private static class InputActivationController extends CycleReaction {
@@ -180,65 +218,4 @@ public class SomeRovers {
 //        }
 //    }
 
-//    public static NAR newDefault(int threads) {
-////
-////        int cycPerFrame = 5;
-////
-////        //Alann d = new ParallelAlann(64, threads);
-////        //DefaultAlann d = new DefaultAlann(32);
-////        //d.tlinkToConceptExchangeRatio = 1f;
-////
-////        Default d = new Default();
-////
-////        //d.param.conceptActivationFactor.set(0.25f);
-////        //d.param.inputsMaxPerCycle.set(4);
-////
-////        //Default d = new Equalized(1024, 16, 10);
-////        //d.setTermLinkBagSize(16);
-////        //d.setTaskLinkBagSize(16);
-////
-//////
-//////            @Override
-//////            public Concept newConcept(final Term t, final Budget b, final Memory m) {
-//////
-//////                Bag<Sentence, TaskLink> taskLinks =
-//////                        new CurveBag(rng, /*sentenceNodes,*/ getConceptTaskLinks());
-//////                        //new ChainBag(rng,  getConceptTaskLinks());
-//////
-//////                Bag<TermLinkKey, TermLink> termLinks =
-//////                        new CurveBag(rng, /*termlinkKeyNodes,*/ getConceptTermLinks());
-//////                        //new ChainBag(rng, /*termlinkKeyNodes,*/ getConceptTermLinks());
-//////
-//////                return newConcept(t, b, taskLinks, termLinks, m);
-//////            }
-//////
-//////        };
-////        //d.setInternalExperience(null);
-////        //d.param.setClock(clock);
-////        //d.setClock(clock);
-////
-////        //d.param.conceptTaskTermProcessPerCycle.set(4);
-////
-////
-////        //d.param.setCyclesPerFrame(cycPerFrame);
-////        d.setCyclesPerFrame(cycPerFrame);
-////        //d.param.duration.set(cycPerFrame);
-////        //d.param.conceptBeliefsMax.set(16);
-////        //d.param.conceptGoalsMax.set(8);
-////
-////        //TextOutput.out(nar).setShowInput(true).setShowOutput(false);
-////
-////
-////        //N/A for solid
-////        //nar.param.inputsMaxPerCycle.set(32);
-////        //nar.param.conceptsFiredPerCycle.set(4);
-////
-////        //d.param.conceptCreationExpectation.set(0);
-////
-////        //d.termLinkForgetDurations.set(4);
-////
-////
-////
-////        return d;
-////    }
 }

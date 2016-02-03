@@ -34,6 +34,15 @@ public abstract class Budget extends BudgetedHandle {
     public static boolean isDeleted(float pri) {
         return !Float.isFinite(pri);
     }
+    
+    public final boolean isDeleted() {
+        return getDeleted();
+    }
+
+    @Override
+    public final boolean getDeleted() {
+        return isDeleted(pri());
+    }   
 
     public static String toString(@NotNull Budget b) {
 
@@ -77,10 +86,6 @@ public abstract class Budget extends BudgetedHandle {
 
     
     @Override
-    public abstract float pri();
-
-    
-    @Override
     public abstract void setPriority(float p);
 
     /**
@@ -90,9 +95,7 @@ public abstract class Budget extends BudgetedHandle {
     @Override
     public abstract long setLastForgetTime(long currentTime);
 
-    
-    @Override
-    public abstract long lastForgetTime();
+   
 
     public Budget mult(float priFactor, float durFactor, float quaFactor) {
         if (priFactor!=1) priMult(priFactor);
@@ -111,15 +114,10 @@ public abstract class Budget extends BudgetedHandle {
         setQuality(qua() * factor);
     }
 
-    
-    @Override
-    public abstract float dur();
 
     public abstract void setDurability(float d);
 
-    
-    @Override
-    public abstract float qua();
+
 
     public abstract void setQuality(float q);
 
@@ -227,7 +225,7 @@ public abstract class Budget extends BudgetedHandle {
             zero();
         } else {
             budget(source.pri(), source.dur(), source.qua());
-            setLastForgetTime(source.lastForgetTime());
+            setLastForgetTime(source.getLastForgetTime());
         }
 
         return this;

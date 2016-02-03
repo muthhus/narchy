@@ -1,6 +1,5 @@
 package nars.budget;
 
-import nars.data.BudgetedStruct;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -9,15 +8,17 @@ import org.jetbrains.annotations.Nullable;
  */
 public class BagAggregateBudget extends Budget {
 
-    private final Iterable<? extends BudgetedStruct> budgets;
+    private final Iterable<? extends Budgeted> budgets;
     private long time;
     private float pri = 0;
     private float dur = 0;
     private float qua = 0;
 
-    public BagAggregateBudget(Iterable<? extends BudgetedStruct> budgets) {
+    public BagAggregateBudget(Iterable<? extends Budgeted> budgets) {
         this.budgets = budgets;
     }
+
+    
 
     @Nullable
     @Override
@@ -30,8 +31,11 @@ public class BagAggregateBudget extends Budget {
 
     }
 
+    
+    
+
     @Override
-    public float pri() {
+    public float getPriority() {
         return pri;
     }
 
@@ -59,9 +63,16 @@ public class BagAggregateBudget extends Budget {
         refreshMax();
     }
 
+    @Override
+    public long getLastForgetTime() {
+        throw new UnsupportedOperationException("unsupported");
+    }
+    
+    
+
     private void refreshMax() {
         float totalPri = 0, totalDur = 0, totalQua = 0;
-        for (BudgetedStruct b : budgets) {
+        for (Budgeted b : budgets) {
             totalPri = Math.max(b.pri(), totalPri);
             totalDur = Math.max(b.dur(), totalDur);
             totalQua = Math.max(b.qua(), totalQua);
@@ -77,7 +88,7 @@ public class BagAggregateBudget extends Budget {
     private void refreshAvg() {
         float totalPri = 0, totalDur = 0, totalQua = 0;
         int n = 0;
-        for (BudgetedStruct b : budgets) {
+        for (Budgeted b : budgets) {
             totalPri += b.pri();
             totalDur += b.dur();
             totalQua += b.qua();
@@ -98,10 +109,6 @@ public class BagAggregateBudget extends Budget {
 
     }
 
-    @Override
-    public long lastForgetTime() {
-        return time;
-    }
 
     @Override
     public void priMult(float factor) {
@@ -109,7 +116,7 @@ public class BagAggregateBudget extends Budget {
     }
 
     @Override
-    public float dur() {
+    public float getDurability() {
         return dur;
     }
 
@@ -119,7 +126,7 @@ public class BagAggregateBudget extends Budget {
     }
 
     @Override
-    public float qua() {
+    public float getQuality() {
         return qua;
     }
 
