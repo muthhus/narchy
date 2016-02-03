@@ -32,6 +32,7 @@ import nars.guifx.graph2.impl.HalfHalfLineCanvasEdgeRenderer;
 import nars.guifx.graph2.impl.HexButtonVis;
 import nars.guifx.graph2.source.DefaultGrapher;
 import nars.guifx.nars.LoopPane;
+import nars.guifx.nars.SubButton;
 import nars.guifx.remote.VncClientApp;
 import nars.guifx.terminal.LocalTerminal;
 import nars.guifx.util.*;

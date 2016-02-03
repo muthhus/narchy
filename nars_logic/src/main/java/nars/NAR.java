@@ -959,8 +959,8 @@ public abstract class NAR implements Level, Consumer<Task> {
             if (includeConceptQuestions && c.hasQuestions()) c.questions().top(maxPerConcept, recip);
             if (includeConceptGoals && c.hasBeliefs()) c.goals().top(maxPerConcept, recip);
             if (includeConceptQuests && c.hasQuests()) c.quests().top(maxPerConcept, recip);
-            if (includeTaskLinks && null != c.getTaskLinks())
-                c.getTaskLinks().forEach(maxPerConcept, t -> recip.accept(t.get()));
+            if (includeTaskLinks && null != c.tasklinks())
+                c.tasklinks().forEach(maxPerConcept, t -> recip.accept(t.get()));
         });
 
         return this;

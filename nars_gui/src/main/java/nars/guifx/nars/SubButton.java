@@ -1,4 +1,4 @@
-package nars.guifx.demo;
+package nars.guifx.nars;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -113,7 +113,7 @@ public class SubButton extends HBox {
         SubButton s = make(nar, c.term());
         s.setValue(c);
 
-        Bag<Task> tl = c.getTaskLinks();
+        Bag<Task> tl = c.tasklinks();
         if (!tl.isEmpty()) {
             s.shade(tl.getPriorityMax());
         }

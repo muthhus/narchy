@@ -49,9 +49,9 @@ public interface Concept extends Termed, Comparable<Termed> {
         }
     };
 
-    Bag<Task> getTaskLinks();
+    Bag<Task> tasklinks();
 
-    Bag<Termed> getTermLinks();
+    Bag<Termed> termlinks();
 
     @Nullable
     Map<Object, Object> getMeta();
@@ -231,7 +231,7 @@ public interface Concept extends Termed, Comparable<Termed> {
         if (showtermlinks) {
 
             out.println("\n TermLinks:");
-            getTermLinks().forEach(b -> {
+            termlinks().forEach(b -> {
                 out.print(indent);
                 out.print(b.get() + " " + b.toBudgetString());
                 out.print(" ");
@@ -240,7 +240,7 @@ public interface Concept extends Termed, Comparable<Termed> {
 
         if (showtasklinks) {
             out.println("\n TaskLinks:");
-            getTaskLinks().forEach(b -> {
+            tasklinks().forEach(b -> {
                 out.print(indent);
                 out.print(b.get() + " " + b.toBudgetString());
                 out.print(" ");

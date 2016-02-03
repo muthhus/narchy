@@ -74,8 +74,8 @@ public class Derivelet {
 
 
             final BLink tl = ((x > (stayProb + (rem / 2))) ?
-                    c.getTermLinks() :
-                    c.getTaskLinks())
+                    c.termlinks() :
+                    c.tasklinks())
                     .sample();
 
             if (tl != null) {

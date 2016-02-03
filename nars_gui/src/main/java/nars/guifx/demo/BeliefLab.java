@@ -18,13 +18,13 @@ public class BeliefLab {
 //    }
     public static final int beliefCapacity = 80;
     static float waveFreq = 0.08715f;
-    static float conf = 0.7f;
-    static float predictionProbability = 0.2f; //how often to ask for a prediction
-    static float pastProbability = 0.2f; //how often to ask for a prediction
+    static float conf = 0.6f;
+    static float predictionProbability = 0.1f; //how often to ask for a prediction
+    static float pastProbability = 0.1f; //how often to ask for a prediction
     static final float fps = 20f;
     static boolean enableEternals = false;
     static boolean enableTemporals = true;
-    static int duration = 4;
+    static int duration = 2;
     static int stmInduction = 0;
 
 

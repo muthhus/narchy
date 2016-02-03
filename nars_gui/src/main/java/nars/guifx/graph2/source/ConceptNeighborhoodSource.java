@@ -43,8 +43,8 @@ public class ConceptNeighborhoodSource extends ConceptsSource {
 
             Concept c = (Concept) r;
 
-            c.getTaskLinks().forEach(termLinkNeighbors, onLink);
-            c.getTermLinks().forEach(termLinkNeighbors, onLink);
+            c.tasklinks().forEach(termLinkNeighbors, onLink);
+            c.termlinks().forEach(termLinkNeighbors, onLink);
             //concepts::add);
         });
 

@@ -411,6 +411,8 @@ public enum NARfx  {
 
         for (Termed c : cc) {
             ConceptPane wn = new ConceptPane(nar, c);
+            wn.setMaxWidth(250);
+            wn.setPrefWidth(250);
             v.getChildren().add(wn);
         }
 

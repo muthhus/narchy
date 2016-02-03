@@ -37,7 +37,7 @@ public class AtomConcept extends AbstractConcept  {
      * Task links for indirect processing
      */
     @Override
-    public final Bag<Task> getTaskLinks() {
+    public final Bag<Task> tasklinks() {
         return taskLinks;
     }
 
@@ -45,7 +45,7 @@ public class AtomConcept extends AbstractConcept  {
      * Term links between the term and its components and compounds; beliefs
      */
     @Override
-    public final Bag<Termed> getTermLinks() {
+    public final Bag<Termed> termlinks() {
         return termLinks;
     }
 
@@ -151,7 +151,7 @@ public class AtomConcept extends AbstractConcept  {
         termLinks.put(target, b, subScale);
 
         /** activate (reverse) template's termlink to local */
-        target.getTermLinks().put(this, b, subScale);
+        target.termlinks().put(this, b, subScale);
 
         /** recursively activate the template's task tlink */
         target.link(t, subScale, minScale, nar);

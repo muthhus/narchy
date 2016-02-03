@@ -10,7 +10,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
-import nars.guifx.demo.SubButton;
+import nars.guifx.nars.SubButton;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;

@@ -119,7 +119,7 @@ public class TermLinkGraph extends DirectedPseudograph<Termed, Termed> {
 
         Term cterm = c.term();
 
-        Bag<Termed> tl = c.getTermLinks();
+        Bag<Termed> tl = c.termlinks();
         if (tl == null) return;
 
         tl.forEach(t -> {

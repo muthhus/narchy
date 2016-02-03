@@ -13,6 +13,7 @@ import javafx.scene.text.TextFlow;
 import nars.NAR;
 import nars.Premise;
 import nars.concept.Concept;
+import nars.guifx.nars.TaskLabel;
 import nars.guifx.treemap.Item;
 import nars.guifx.treemap.TreemapChart;
 import nars.nal.Tense;

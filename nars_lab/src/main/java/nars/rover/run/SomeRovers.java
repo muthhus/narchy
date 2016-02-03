@@ -1,7 +1,6 @@
 package nars.rover.run;
 
-import javafx.geometry.Orientation;
-import javafx.scene.layout.TilePane;
+import javafx.scene.layout.VBox;
 import javassist.scopedpool.SoftValueHashMap;
 import nars.Global;
 import nars.Memory;
@@ -49,11 +48,11 @@ public class SomeRovers {
 
         if (addNARRover)
         {
-            int conceptsFirePerCycle = 6;
+            int conceptsFirePerCycle = 3;
             Default nar = new Default(
                     new Memory(clock, new MapIndex2(
                             new SoftValueHashMap())),
-                    1200, conceptsFirePerCycle, 4, 4);
+                    1200, conceptsFirePerCycle, 2, 4);
 
 //            nar.memory.DEFAULT_JUDGMENT_PRIORITY = 0.35f;
 //            nar.memory.DEFAULT_JUDGMENT_DURABILITY = 0.35f;
@@ -70,12 +69,12 @@ public class SomeRovers {
             nar.core.confidenceDerivationMin.setValue(0.01f);
 
             //nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
-            nar.core.activationRate.setValue(0.1f);
+            nar.core.activationRate.setValue(0.5f);
 
-            nar.memory.duration.set(3);
-            nar.memory.conceptForgetDurations.setValue(4);
-            nar.memory.cyclesPerFrame.set(8);
-            nar.memory.shortTermMemoryHistory.set(3);
+            nar.memory.duration.set(2);
+            nar.memory.conceptForgetDurations.setValue(2);
+            nar.memory.cyclesPerFrame.set(32);
+            nar.memory.shortTermMemoryHistory.set(4);
             //nar.memory.executionExpectationThreshold.setValue(0.95f);
 
 
@@ -89,7 +88,8 @@ public class SomeRovers {
 //                    }, new Stage());
 
                     NARfx.newConceptWindow(nar,
-                            new TilePane(Orientation.VERTICAL),
+                            //new TilePane(Orientation.VERTICAL),
+                            new VBox(),
                             "MotorControls(#x,motor,(),#z)",
                             "MotorControls(left,motor,(),#z)",
                             "MotorControls(right,motor,(),#z)",
@@ -98,10 +98,10 @@ public class SomeRovers {
                             "MotorControls(stop,motor,(),#z)"
                     );
                     NARfx.newConceptWindow(nar,
-                            new TilePane(Orientation.VERTICAL),
+                            //new TilePane(Orientation.VERTICAL),
+                            new VBox(),
                             "eat:food",
                             "eat:poison",
-                            "speed:linear",
                             "speed:left",
                             "speed:right",
                             "speed:forward",

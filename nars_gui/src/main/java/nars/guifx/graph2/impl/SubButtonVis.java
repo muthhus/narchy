@@ -2,9 +2,9 @@ package nars.guifx.graph2.impl;
 
 import javafx.scene.Node;
 import nars.concept.Concept;
-import nars.guifx.demo.SubButton;
 import nars.guifx.graph2.TermNode;
 import nars.guifx.graph2.scene.DefaultNodeVis;
+import nars.guifx.nars.SubButton;
 import nars.nar.Default;
 import nars.term.Termed;
 

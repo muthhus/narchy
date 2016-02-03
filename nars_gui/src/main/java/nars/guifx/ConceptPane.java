@@ -17,14 +17,15 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
+import nars.Global;
 import nars.NAR;
+import nars.bag.BLink;
 import nars.bag.Bag;
 import nars.budget.UnitBudget;
 import nars.concept.Concept;
 import nars.concept.util.BeliefTable;
 import nars.concept.util.DefaultBeliefTable;
 import nars.guifx.chart.Plot2D;
-import nars.guifx.demo.SubButton;
 import nars.guifx.graph2.TermEdge;
 import nars.guifx.graph2.TermNode;
 import nars.guifx.graph2.impl.BlurCanvasEdgeRenderer;
@@ -33,6 +34,9 @@ import nars.guifx.graph2.source.ConceptNeighborhoodSource;
 import nars.guifx.graph2.source.DefaultGrapher;
 import nars.guifx.graph3.SpaceNet;
 import nars.guifx.graph3.Xform;
+import nars.guifx.nars.NARActionButton;
+import nars.guifx.nars.SubButton;
+import nars.guifx.nars.TaskButton;
 import nars.guifx.util.ColorArray;
 import nars.guifx.util.ColorMatrix;
 import nars.guifx.util.SimpleMenuItem;
@@ -47,19 +51,24 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
+import static java.util.stream.Collectors.toList;
 import static javafx.application.Platform.runLater;
 
 
 /**
  * Created by me on 8/10/15.
  */
-public class ConceptPane extends BorderPane implements ChangeListener {
+public class ConceptPane extends VBox implements ChangeListener {
 
     private final NAR nar;
-    private final BeliefTablePane tasks;
+    private final BeliefTablePane beliefChart;
     private final Plot2D budgetGraph;
     private final Term term;
+    private final BagView<Termed> termlinkView;
+    private final BagView<Task> tasklinkView;
+
     //    private final Scatter3D tasks;
 //    private final BagView<Task> taskLinkView;
 //    private final BagView<Term> termLinkView;
@@ -219,21 +228,22 @@ public class ConceptPane extends BorderPane implements ChangeListener {
 
     }
 
-    public static class BagView<X> extends FlowPane implements Runnable {
+    public static class BagView<X> extends VBox /* FlowPane */ implements Runnable {
 
-        final Map<X,Node> componentCache = new WeakHashMap<>();
-        private final Bag<X> bag;
-        private final Function<X, Node> builder;
-        final List<Node> pending = new ArrayList();
+        final Map<BLink<X>,Node> componentCache = new WeakHashMap<>();
+        private final Supplier<Bag<X>> bag;
+        private final Function<BLink<X>, Node> builder;
+        final List<BLink<X>> pending = Global.newArrayList();
         final AtomicBoolean queued = new AtomicBoolean();
 
-        public BagView(Bag<X> bag, Function<X,Node> builder) {
+
+        public BagView(Supplier<Bag<X>> bag, Function<BLink<X>,Node> builder) {
             this.bag = bag;
             this.builder = builder;
-            frame();
+            update();
         }
 
-        Node getNode(X n) {
+        Node getNode(BLink<X> n) {
             Node existing = componentCache.get(n);
             if (existing == null) {
                 componentCache.put(n, existing = builder.apply(n));
@@ -241,25 +251,38 @@ public class ConceptPane extends BorderPane implements ChangeListener {
             return existing;
         }
 
-        public void frame() {
-            synchronized (pending) {
-                pending.clear();
-                bag.forEach(b -> pending.add(getNode(b.get())));
+        public void update() {
+
+            Bag<X> bLinks = bag.get();
+            if (bLinks == null) {
+                return;
             }
 
-            if (!getChildren().equals(pending) && queued.compareAndSet(false, true)) {
-                runLater(this);
+            if (!queued.compareAndSet(false, true)) {
+                pending.clear();
+                bLinks.forEach(pending::add);
+
+                if (!getChildren().equals(pending)) {
+                    runLater(this);
+                } else {
+                    queued.set(false);
+                }
             }
+
         }
 
         @Override
         public void run() {
-            synchronized (pending) {
-                getChildren().setAll(pending);
-                queued.set(false);
-            }
+            //synchronized (pending) {
+            queued.set(false);
 
-            getChildren().stream().filter(n -> n instanceof Runnable).forEach(n -> ((Runnable) n).run());
+            getChildren().setAll(pending.stream().map(this::getNode).collect(toList()));
+            //}
+
+            getChildren().forEach(n -> {
+                if (n instanceof Runnable)
+                    ((Runnable) n).run();
+            });
         }
     }
 
@@ -273,9 +296,12 @@ public class ConceptPane extends BorderPane implements ChangeListener {
         this.nar = nar;
 
 
-        tasks = new BeliefTablePane();
+        beliefChart = new BeliefTablePane();
 
-        budgetGraph = new Plot2D(Plot2D.BarWave, 128, 64);
+        int budgetGraphWidth = 0;
+        int budgetGraphHeight = 32;
+
+        budgetGraph = new Plot2D(Plot2D.BarWave, 128, budgetGraphWidth, budgetGraphHeight);
         budgetGraph.add("Pri", () -> {
             Concept cc = currentConcept;
             //if (cc == null)
@@ -284,17 +310,11 @@ public class ConceptPane extends BorderPane implements ChangeListener {
         }, 0, 1f);
 
 
-        Button activateButton = new Button("+");
-        activateButton.setOnMouseClicked(e->{
-            nar.runLater(()->{
-                nar.conceptualize(conceptTerm, new UnitBudget(1f, 0.75f, 0.75f), 1f);
-            });
+        Button activateButton = new NARActionButton(nar, "+", (n) -> {
+                n.conceptualize(conceptTerm, new UnitBudget(1f, 0.75f, 0.75f), 1f);
         });
-        Button goalButton = new Button("!");
-        activateButton.setOnMouseClicked(e->{
-            nar.runLater(()->{
-                nar.input(new MutableTask(conceptTerm, '!').present(nar.memory).log("GUI"));
-            });
+        Button goalButton = new NARActionButton(nar, "!", (n) -> {
+            n.input(new MutableTask(conceptTerm, '!').present(n.memory).log("GUI"));
         });
 
         Menu conceptMenu = new Menu(conceptTerm.toString());
@@ -304,95 +324,51 @@ public class ConceptPane extends BorderPane implements ChangeListener {
                 System.out.println(conceptTerm + ": " + nar.conceptPriority(conceptTerm, Float.NaN));
                 nar.concept(conceptTerm).print();
 
-                //getChildren().clear();
-                budgetGraph.requestLayout();
-                //getChildren().addAll( tasks, budgetGraph );
             });
         }));
 
-        setTop(new FlowPane(new MenuBar(conceptMenu), activateButton, goalButton));
 
 
 
 
-//        //Label termlinks = new Label("Termlinks diagram");
-//        //Label tasklinks = new Label("Tasklnks diagram");
-//        tasks = new Scatter3D<Task>() {
-//
-//            @Override
-//            Iterable<Task>[] get() {
-//                return new Iterable[] { c.getBeliefs(),
-//                        c.getGoals(),
-//                        c.getQuestions(),
-//                        c.getQuests() };
-//            }
-//
-//            @Override
-//            protected void update(Task tl, double[] position, double[] size, Consumer<Color> color) {
-//
-//                System.out.println("update: " + tl);
-//                if (tl.isQuestOrQuestion()) {
-//                    position[0] = -1;
-//                    position[1] = tl.getBestSolution() != null ? tl.getBestSolution().getConfidence() : 0;
-//                }
-//                else {
-//                    Truth t = tl.getTruth();
-//                    position[0] = t.getFrequency();
-//                    position[1] = t.getConfidence();
-//                }
-//                float pri = tl.getPriority();
-//                position[2] = pri;
-//
-//                size[0] = size[1] = size[2] = 0.5f + pri;
-//                color.accept(ca.get(pri));
-//            }
-//        };
-//
-//        //TilePane links = new TilePane(links.content);
-//
-////        Label beliefs = new Label("Beliefs diagram");
-////        Label goals = new Label("Goals diagram");
-////        Label questions = new Label("Questions diagram");
-//
-////        SplitPane links = new SplitPane(
-////                scrolled(termLinkView = new BagView<>(c.getTermLinks(),
-////                                (t) -> new ItemButton(t, Object::toString,
-////                                        (i) -> {
-////
-////                                        }
-////
-////                                )
-////                        )
-////                ),
-////                scrolled(taskLinkView = new BagView<>(c.getTaskLinks(),
-////                        (t) -> new TaskLabel(t.getTask(), null)
-////
-////                ))
-////        );
-////        links.setOrientation(Orientation.VERTICAL);
+
+
+//        Label beliefs = new Label("Beliefs diagram");
+//        Label goals = new Label("Goals diagram");
+//        Label questions = new Label("Questions diagram");
+
+
+
 //        //links.setMaxSize(Double.MAX_VALUE,Double.MAX_VALUE);
 
 //        BorderPane links = new BorderPane();
 //        setCenter(new SplitPane(new BorderPane(links), tasks.content));
 
+        termlinkView = new BagView<Termed>(
+            ()->currentConcept!=null ? currentConcept.termlinks() : null,
+            //(t) -> SubButton.make(nar, t.term())
+            (t) -> new TaskButton(nar, t)
+        );
+        tasklinkView = new BagView<Task>(
+            ()->currentConcept!=null ? currentConcept.tasklinks() : null,
+            (t) -> new TaskButton(nar, t)
+        );
+
+        getChildren().setAll(
+            new FlowPane(new MenuBar(conceptMenu), activateButton, goalButton),
+
+                //new VBox(
+                        beliefChart,
+                        budgetGraph,
+                        new HBox(termlinkView, tasklinkView));
 
 
-
-
+        //setCenter(new ConceptNeighborhoodGraph(nar, concept));
 
         runLater(()->{
 
-            setCenter(new VBox(
-                    budgetGraph,
-                    tasks
-            ));
-            layout();
 
 
-            //setCenter(new ConceptNeighborhoodGraph(nar, concept));
-
-        /*Label controls = new Label("Control Panel");
-        setBottom(controls);*/
 
             visibleProperty().addListener(this);
             changed(null,null,null);
@@ -464,12 +440,16 @@ public class ConceptPane extends BorderPane implements ChangeListener {
 
         budgetGraph.update();
 
-        tasks.frame(c, now);
+        beliefChart.frame(c, now);
+
+        termlinkView.update();
+        tasklinkView.update();
 
     }
 
     @Override
     public synchronized void changed(ObservableValue observable, Object oldValue, Object newValue) {
+
         if (isVisible()) {
             if (reaction==null) {
                 reaction = new FrameReaction(nar) {
@@ -649,4 +629,43 @@ public class ConceptPane extends BorderPane implements ChangeListener {
             return b + p * (tew-b-w);
         }
     }
+
+
+
+//        //Label termlinks = new Label("Termlinks diagram");
+//        //Label tasklinks = new Label("Tasklnks diagram");
+//        tasks = new Scatter3D<Task>() {
+//
+//            @Override
+//            Iterable<Task>[] get() {
+//                return new Iterable[] { c.getBeliefs(),
+//                        c.getGoals(),
+//                        c.getQuestions(),
+//                        c.getQuests() };
+//            }
+//
+//            @Override
+//            protected void update(Task tl, double[] position, double[] size, Consumer<Color> color) {
+//
+//                System.out.println("update: " + tl);
+//                if (tl.isQuestOrQuestion()) {
+//                    position[0] = -1;
+//                    position[1] = tl.getBestSolution() != null ? tl.getBestSolution().getConfidence() : 0;
+//                }
+//                else {
+//                    Truth t = tl.getTruth();
+//                    position[0] = t.getFrequency();
+//                    position[1] = t.getConfidence();
+//                }
+//                float pri = tl.getPriority();
+//                position[2] = pri;
+//
+//                size[0] = size[1] = size[2] = 0.5f + pri;
+//                color.accept(ca.get(pri));
+//            }
+//        };
+//
+
+
+
 }

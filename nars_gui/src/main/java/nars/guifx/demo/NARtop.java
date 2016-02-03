@@ -7,6 +7,8 @@ import javafx.scene.text.TextFlow;
 import nars.NAR;
 import nars.budget.BudgetMerge;
 import nars.guifx.NARfx;
+import nars.guifx.nars.SubButton;
+import nars.guifx.nars.TaskButton;
 import nars.nar.Default;
 import nars.task.Task;
 import nars.task.flow.SetTaskPerception;

@@ -198,11 +198,18 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
             return null;
 
         //TODO avoid creating new Truth instances
-        Truth solTruth = projectTruth(question.occurrence(), now, false);
+        Truth solTruth = projectTruth(question.occurrence(), now, true);
         if (solTruth == null)
             return null;
 
+        //if truth instanceof ProjectedTruth, use its attached occ time (possibly eternal or temporal), otherwise assume it is this task's occurence time
+        long solutionOcc = solTruth instanceof ProjectedTruth ?
+                ((ProjectedTruth)solTruth).when : occurrence();
+
+        if (solTruth.conf() < conf()) return this;
+
         solTruth = solTruth.withConfMult(termRelevance);
+                //* BeliefTable.relevance(this, solutionOcc, memory.duration()));
                 //solTruth.withConf( w2c(solTruth.conf())* termRelevance );
 
         if (solTruth.conf() < conf()) return this;
@@ -211,9 +218,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         if (solutionBudget == null)
             return null;
 
-        //if truth instanceof ProjectedTruth, use its attached occ time (possibly eternal or temporal), otherwise assume it is this task's occurence time
-        long solutionOcc = solTruth instanceof ProjectedTruth ?
-                ((ProjectedTruth)solTruth).when : occurrence();
+
 
         Task solution;
         //if ((!truth().equals(solTruth)) || (!newTerm.equals(term())) || (solutionOcc!= occCurrent)) {

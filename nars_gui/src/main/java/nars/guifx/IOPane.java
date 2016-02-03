@@ -9,7 +9,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.web.WebView;
 import nars.NAR;
-import nars.guifx.demo.TaskButton;
+import nars.guifx.nars.TaskButton;
 import nars.guifx.util.NSlider;
 import nars.task.Task;
 import nars.term.Term;

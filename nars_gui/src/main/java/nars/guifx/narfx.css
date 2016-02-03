@@ -673,3 +673,6 @@
     -fx-text-fill: white;
 }
 
+.taskbutton:hover {
+    -fx-text-fill: white !important;
+}

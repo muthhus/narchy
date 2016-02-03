@@ -74,12 +74,12 @@ public class PremisePermutor extends UnifySubst implements Function<Term, Task> 
 
         Set<BLink<Task>> tasksBuffer = this.tasks;
         //concept.getTaskLinks().sample(tasklinks, eachTaskLink, tasksBuffer).commit();
-        concept.getTaskLinks().filter(eachTaskLink).sample(tasklinks, tasksBuffer);
+        concept.tasklinks().filter(eachTaskLink).sample(tasklinks, tasksBuffer);
         if (tasksBuffer.isEmpty()) return;
 
         Set<BLink<Termed>> termsBuffer = this.terms;
         //concept.getTermLinks().sample(termlinks, eachTermLink, termsBuffer).commit();
-        concept.getTermLinks().forEachThen(eachTermLink).sample(termlinks, termsBuffer);
+        concept.termlinks().forEachThen(eachTermLink).sample(termlinks, termsBuffer);
         if (termsBuffer.isEmpty()) return;
 
         //convert to array for fast for-within-for iterations
