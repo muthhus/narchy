@@ -51,6 +51,22 @@
 ////// Truth-value functions: see TruthFunctions.java
 
 //// Immediate Inference ////////////////////////////////////////////////////////////////////////////////////
+
+  --A,   A, task("?") |- --A, (Belief:BeliefNegation, Punctuation:Judgment)
+    A, --A, task("?") |-   A, (Belief:BeliefNegation, Punctuation:Judgment)
+
+//A belief b <f,c> is equal to --b <1-f,c>, which is the negation rule:
+
+    (A --> B), A, task(negative) |- --(A --> B), (Belief:Negation, Desire:Negation, Derive:AllowBackward)
+    (A --> B), A, task(negative) |- --(A --> B), (Belief:Negation, Desire:Negation, Derive:AllowBackward)
+  --(A --> B), A                 |-   (A --> B), (Belief:Negation, Desire:Negation, Derive:AllowBackward)
+  --(A --> B), B                 |-   (A --> B), (Belief:Negation, Desire:Negation, Derive:AllowBackward)
+
+
+    (A <-> B), A, task(negative) |- --(A <-> B), (Belief:Negation, Desire:Negation, Derive:AllowBackward)
+  --(A <-> B), A                 |-   (A <-> B), (Belief:Negation, Desire:Negation, Derive:AllowBackward)
+
+
 //If S can stand for P, P can to a certain low degree also represent the class S
 //If after S usually P happens, then it might be a good guess that usually before P happens, S happens.
 
@@ -62,17 +78,7 @@
     ( --S ==> P),   P |- ( --P ==> S), (Belief:Contraposition, Derive:AllowBackward)
     ( --S ==> P), --S |- ( --P ==> S), (Belief:Contraposition, Derive:AllowBackward)
 
-//A belief b <f,c> is equal to --b <1-f,c>, which is the negation rule:
 
-    (A --> B), A, task(negative) |- --(A --> B), (Belief:Negation, Desire:Negation, Derive:AllowBackward)
-    (A --> B), B, task(negative) |- --(A --> B), (Belief:Negation, Desire:Negation, Derive:AllowBackward)
-  --(A --> B), A, task(negative) |-   (A --> B), (Belief:Negation, Desire:Negation, Derive:AllowBackward)
-  --(A --> B), B, task(negative) |-   (A --> B), (Belief:Negation, Desire:Negation, Derive:AllowBackward)
-
-    (A <-> B), A, task(negative) |- --(A <-> B), (Belief:Negation, Desire:Negation, Derive:AllowBackward)
-    (A <-> B), B, task(negative) |- --(A <-> B), (Belief:Negation, Desire:Negation, Derive:AllowBackward)
-  --(A <-> B), A, task(negative) |-   (A <-> B), (Belief:Negation, Desire:Negation, Derive:AllowBackward)
-  --(A <-> B), B, task(negative) |-   (A <-> B), (Belief:Negation, Desire:Negation, Derive:AllowBackward)
 
 //// inheritance-based syllogism ////////////////////////////////////////////////////////////////////////////////////
 //       (A --> B) ------- (B --> C)
@@ -363,15 +369,15 @@
 
 //precondition combiner inference rule (variable_unification6):
 
-    ((&&,C,A..+) ==> Z), ((&&,C,B..+) ==> Z) |- ((&&,A..+) ==> (&&,B..+)), (Belief:Induction),
-                                                           ((&&,B..+) ==> (&&,A..+)), (Belief:Induction)
+    ((&&,C,A..+) ==> Z), ((&&,C,B..+) ==> Z) |- ((&&,A..+) ==> (&&,B..+)), (Belief:Induction, Desire:Induction),
+                                                ((&&,B..+) ==> (&&,A..+)), (Belief:Induction, Desire:Induction)
     (Z ==> (&&,C,A..+)), (Z ==> (&&,C,B..+)) |- ((&&,A..+) ==> (&&,B..+)), (Belief:Abduction),
-                                                           ((&&,B..+) ==> (&&,A..+)), (Belief:Abduction)
+                                                ((&&,B..+) ==> (&&,A..+)), (Belief:Abduction)
 
 
 //second level variable introduction
 
-    (Y --> L), ((Y --> S) ==> R) |- ((&&,(#X --> L),(#X --> S)) ==> R), (Belief:Induction)
+    (Y --> L), ((Y --> S) ==> R) |- ((&&,(#X --> L),(#X --> S)) ==> R), (Belief:Induction, Desire:Induction)
     (Y --> L), ((&&,(Y --> S),A..+) ==> R) |- substitute(((&&,(#X --> L),(#X --> S),A..+) ==> R),Y,#X), (Belief:Intersection)
 
 
@@ -494,10 +500,7 @@
 
 
 
-//NAL5:
 
-  --A,   A, task("?") |- --A, (Belief:BeliefNegation, Punctuation:Judgment)
-    A, --A, task("?") |-   A, (Belief:BeliefNegation, Punctuation:Judgment)
 
 //compound composition one premise
 
