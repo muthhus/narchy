@@ -1,5 +1,6 @@
 package nars.guifx.nars;
 
+import javafx.scene.CacheHint;
 import javafx.scene.Cursor;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -78,6 +79,8 @@ public class TaskButton<X> extends Label implements Runnable {
         setCursor(Cursor.CROSSHAIR);
         setWrapText(true);
 
+        setCacheHint(CacheHint.SCALE);
+        setCache(true);
 
         if (ref instanceof Task) {
             setOnMouseClicked(c -> {

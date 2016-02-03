@@ -48,7 +48,7 @@ public class SomeRovers {
 
         if (addNARRover)
         {
-            int conceptsFirePerCycle = 3;
+            int conceptsFirePerCycle = 2;
             Default nar = new Default(
                     new Memory(clock, new MapIndex2(
                             new SoftValueHashMap())),
@@ -71,9 +71,11 @@ public class SomeRovers {
             //nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
             nar.core.activationRate.setValue(0.5f);
 
-            nar.memory.duration.set(2);
-            nar.memory.conceptForgetDurations.setValue(2);
-            nar.memory.cyclesPerFrame.set(32);
+            nar.memory.duration.set(5);
+            nar.memory.conceptForgetDurations.setValue(3);
+            nar.memory.termLinkForgetDurations.setValue(10);
+            nar.memory.taskLinkForgetDurations.setValue(20);
+            nar.memory.cyclesPerFrame.set(64);
             nar.memory.shortTermMemoryHistory.set(4);
             //nar.memory.executionExpectationThreshold.setValue(0.95f);
 
@@ -94,7 +96,7 @@ public class SomeRovers {
                             "MotorControls(left,motor,(),#z)",
                             "MotorControls(right,motor,(),#z)",
                             "MotorControls(forward,motor,(),#z)",
-                            "MotorControls(backward,motor,(),#z)",
+                            //"MotorControls(backward,motor,(),#z)",
                             "MotorControls(stop,motor,(),#z)"
                     );
                     NARfx.newConceptWindow(nar,
@@ -104,8 +106,8 @@ public class SomeRovers {
                             "eat:poison",
                             "speed:left",
                             "speed:right",
-                            "speed:forward",
-                            "speed:backward"
+                            "speed:forward"
+                            //"speed:backward"
                     );
                 });
             }

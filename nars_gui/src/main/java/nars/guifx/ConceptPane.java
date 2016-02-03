@@ -10,10 +10,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
@@ -235,11 +232,16 @@ public class ConceptPane extends VBox implements ChangeListener {
         private final Function<BLink<X>, Node> builder;
         final List<BLink<X>> pending = Global.newArrayList();
         final AtomicBoolean queued = new AtomicBoolean();
+        private final int limit;
 
 
-        public BagView(Supplier<Bag<X>> bag, Function<BLink<X>,Node> builder) {
+        public BagView(Supplier<Bag<X>> bag, Function<BLink<X>,Node> builder, int limit) {
             this.bag = bag;
             this.builder = builder;
+            this.limit = limit;
+
+            setCache(true);
+
             update();
         }
 
@@ -260,7 +262,7 @@ public class ConceptPane extends VBox implements ChangeListener {
 
             if (!queued.compareAndSet(false, true)) {
                 pending.clear();
-                bLinks.forEach(pending::add);
+                bLinks.forEach(limit, pending::add);
 
                 if (!getChildren().equals(pending)) {
                     runLater(this);
@@ -344,15 +346,28 @@ public class ConceptPane extends VBox implements ChangeListener {
 //        BorderPane links = new BorderPane();
 //        setCenter(new SplitPane(new BorderPane(links), tasks.content));
 
+        int maxDisplayedBagItems = 16;
+        
         termlinkView = new BagView<Termed>(
             ()->currentConcept!=null ? currentConcept.termlinks() : null,
             //(t) -> SubButton.make(nar, t.term())
-            (t) -> new TaskButton(nar, t)
+            (t) -> new TaskButton(nar, t),
+                maxDisplayedBagItems
         );
         tasklinkView = new BagView<Task>(
             ()->currentConcept!=null ? currentConcept.tasklinks() : null,
-            (t) -> new TaskButton(nar, t)
+            (t) -> new TaskButton(nar, t),
+                maxDisplayedBagItems
         );
+
+        GridPane bags = new GridPane();
+        ColumnConstraints column1 = new ColumnConstraints();
+        column1.setPercentWidth(50);
+        ColumnConstraints column2 = new ColumnConstraints();
+        column2.setPercentWidth(50);
+        bags.getColumnConstraints().addAll(column1, column2); // each get 50% of width
+        bags.addRow(0,termlinkView, tasklinkView);
+        bags.maxWidth(Double.MAX_VALUE);
 
         getChildren().setAll(
             new FlowPane(new MenuBar(conceptMenu), activateButton, goalButton),
@@ -360,7 +375,7 @@ public class ConceptPane extends VBox implements ChangeListener {
                 //new VBox(
                         beliefChart,
                         budgetGraph,
-                        new HBox(termlinkView, tasklinkView));
+                        bags);
 
 
         //setCenter(new ConceptNeighborhoodGraph(nar, concept));

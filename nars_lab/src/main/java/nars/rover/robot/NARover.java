@@ -37,7 +37,7 @@ public class NARover extends AbstractPolygonBot {
     //float tasteDistanceThreshold = 1.0f;
     final static int retinaPixels = 9;
     final Naljects objs;
-    private final Sensor linearSpeedBack;
+    //private final Sensor linearSpeedBack;
     int retinaRaysPerPixel = 2; //rays per vision sensor
 
     float L = 25f; //vision distance
@@ -47,7 +47,8 @@ public class NARover extends AbstractPolygonBot {
 
 
 
-    final Sensor linearSpeedFwd, leftSpeed, rightSpeed;
+    float hungry, sick;
+    final Sensor linearSpeedFwd, leftSpeed, rightSpeed, hungrySensor, sickSensor;
 
 //    final SimpleAutoRangeTruthFrequency linearVelocity;
 //    final SimpleAutoRangeTruthFrequency motionAngle;
@@ -66,26 +67,28 @@ public class NARover extends AbstractPolygonBot {
 
         int maxUpdateTime = 32;
 
+        hungry = 1f;
+        sick = 0f;
 
         FloatToFloatFunction speedThresholdToFreq = (speed) -> {
             return speed < 0.1 ? 0 : Util.clamp(0.5f + speed);
         };
 
         Term speedForward = nar.term("speed:forward");
-        Term speedBackward = nar.term("speed:backward");
+        //Term speedBackward = nar.term("speed:backward");
         Vec2 forwardVec = new Vec2(1,0f);
         Vec2 tmp = new Vec2();
         FloatFunction<Term> linearSpeed = (t) -> {
             torso.getLinearVelocityFromLocalPointToOut(forwardVec, tmp);
-            float v = tmp.length()/ linearThrustPerCycle / 1.25f;
+            float v = tmp.length()/ linearThrustPerCycle * (1f - sick) / 1.25f;
             if (v >= 0 && t == speedForward) return v;
-            else if (v <= 0 && t == speedBackward) return -v;
+            //else if (v <= 0 && t == speedBackward) return -v;
             return 0;
         };
         this.linearSpeedFwd = new Sensor(nar, speedForward,
                 linearSpeed, speedThresholdToFreq).maxTimeBetweenUpdates(maxUpdateTime);
-        this.linearSpeedBack = new Sensor(nar, speedBackward,
-                linearSpeed, speedThresholdToFreq).maxTimeBetweenUpdates(maxUpdateTime);
+        /*this.linearSpeedBack = new Sensor(nar, speedBackward,
+                linearSpeed, speedThresholdToFreq).maxTimeBetweenUpdates(maxUpdateTime);*/
 
         Term speedLeft = nar.term("speed:left");
         Term speedRight = nar.term("speed:right");
@@ -101,10 +104,18 @@ public class NARover extends AbstractPolygonBot {
         //TODO torso angle
 
 
+        hungrySensor = new Sensor(nar, nar.term("eat:food"), (t) -> {
+            return 1f-hungry;
+        }, speedThresholdToFreq);
+        sickSensor = new Sensor(nar, nar.term("eat:poison"), (t) -> {
+            return sick;
+        }, speedThresholdToFreq);
+
 //
 //        linearVelocity = new SimpleAutoRangeTruthFrequency(nar, nar.term("<motion-->[linear]>"), new AutoRangeTruthFrequency(0.0f));
 //        motionAngle = new SimpleAutoRangeTruthFrequency(nar, nar.term("<motion-->[angle]>"), new BipolarAutoRangeTruthFrequency());
 //        facingAngle = new SimpleAutoRangeTruthFrequency(nar, nar.term("<motion-->[facing]>"), new BipolarAutoRangeTruthFrequency());
+
 
     }
 
@@ -112,13 +123,17 @@ public class NARover extends AbstractPolygonBot {
     protected void onEat(Body eaten, Material m) {
         if (m instanceof Sim.FoodMaterial) {
             nar.logger.warn("food");
-            nar.input("eat:food. :|: %1.0;0.9%");
+            //nar.input("eat:food. :|: %1.0;0.9%");
+            hungry = Util.clamp(hungry - 0.85f);
+
             //nar.input("goal:{food}. :|: %1.00;0.75%");
             //nar.input("goal:{health}. :|: %1.00;0.75%");
         }
         else if (m instanceof Sim.PoisonMaterial) {
             nar.logger.warn("poison");
-            nar.input("eat:poison. :|:");
+            //nar.input("eat:poison. :|:");
+            sick = Util.clamp(sick + 0.5f);
+
             //nar.input("goal:{food}. :|: %0.00;0.90%");
             //nar.input("goal:{health}. :|: %0.00;0.90%");
         }
@@ -137,6 +152,8 @@ public class NARover extends AbstractPolygonBot {
             nar.stop();
         }
 
+        sick *= 0.95f;
+        hungry = Util.clamp(hungry + 0.1f);
     }
 
     public void inputMission() {
@@ -197,16 +214,15 @@ public class NARover extends AbstractPolygonBot {
                 //nar.input("eat:poison. :|: %0.00;0.75%");
 
                 nar.input("eat:food! %1.00|0.95%");
-                nar.input("eat:food. :|: %0.0%"); //not eating right now
 
-                nar.input("speed:linear! %1.00;0.7%");
+                nar.input("speed:forward! %1.00;0.7%");
                 nar.input("eat:poison! %0.0|0.9%");
                 //nar.input("(--, <eat:food <-> eat:poison>). %1.00;0.95%");
                 //nar.input("(?x ==> eat:#y)?");
                 //nar.input("(?x && eat:#y)?");
 
                 nar.input("MotorControls(#x,motor,(),#z)! :|: %1.0;0.25%"); //create demand for action
-                nar.input("MotorControls(?x,motor,(),#z)! :|: %1.0;0.25%");
+                //nar.input("MotorControls(?x,motor,(),#z)! :|: %1.0;0.25%");
                 //nar.concept("MotorControls(?x,motor,?y,#z)").print();
                 //nar.concept("MotorControls(#x,motor,#y,#z)").print();
 
@@ -232,7 +248,7 @@ public class NARover extends AbstractPolygonBot {
     protected void train(long t) {
         //float freq = 0.5f + 0.5f * (1/(1f + t/5000f)), conf = 0.85f;
         float freq = 1f, conf = 0.9f;
-        nar.input("MotorControls(random,motor,(),#x)! %1.0;0.1%");
+        //nar.input("MotorControls(random,motor,(),#x)! %1.0;0.1%");
         nar.input("MotorControls(random,motor,(),#x)! %" + n2(freq) + "|" + n2(conf) + "%");
         System.out.println("@" + t + " Curiosity Trained @ freq=" + freq);
     }
@@ -365,13 +381,13 @@ public class NARover extends AbstractPolygonBot {
     public static class MotorControls {
 
         public final NARover rover;
-        private final Termed left, right, stop, forward, backward;
+        private final Termed left, right, stop, forward;
 
         public MotorControls(NARover rover) {
             this.rover = rover;
 
             forward = rover.nar.term("MotorControls(forward,motor,(),#x)");
-            backward = rover.nar.term("MotorControls(backward,motor,(),#x)");
+            //backward = rover.nar.term("MotorControls(backward,motor,(),#x)");
             left = rover.nar.term("MotorControls(left,motor,(),#x)");
             right = rover.nar.term("MotorControls(right,motor,(),#x)");
             stop = rover.nar.term("MotorControls(stop,motor,(),#x)");
@@ -390,18 +406,18 @@ public class NARover extends AbstractPolygonBot {
             rover.thrustRelative(thrust);
         }
 
-        private void rotate(boolean left) {
+        private void rotate(boolean right) {
             //Task c = MethodOperator.invokingTask();
             //float thrust = c!=null ? c.expectation() : 1;
             float thrust = 2f;
-            if (left) thrust = -thrust;
+            if (right) thrust = -thrust;
             rover.rotateRelative(thrust);
         }
 
-        public void left() {  rotate(true); }
-        public void right() {  rotate(false); }
+        public void left() {  rotate(false); }
+        public void right() {  rotate(true); }
         public void forward() {  forward(true); }
-        public void backward() {  forward(false); }
+        //public void backward() {  forward(false); }
 
 
         public Task random() {
@@ -409,16 +425,16 @@ public class NARover extends AbstractPolygonBot {
 
             Termed term;
 
-            switch ((int)(5 * Math.random())) {
+            switch ((int)(4 * Math.random())) {
                 case 0:
                     term = forward; break;
+//                case 1:
+//                    term = backward; break;
                 case 1:
-                    term = backward; break;
-                case 2:
                     term = left; break;
-                case 3:
+                case 2:
                     term = right; break;
-                case 4:
+                case 3:
                     term = stop; break;
                 default:
                     term = null;
@@ -427,7 +443,8 @@ public class NARover extends AbstractPolygonBot {
             return new MutableTask(term, Symbols.GOAL)
                     .budget(c.budget())
                     .truth( c.truth() )
-                    .present(rover.nar.memory);
+                    .present(rover.nar.memory)
+                    .log("Curiosity");
         }
     }
 

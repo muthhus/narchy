@@ -47,14 +47,14 @@ public interface BudgetMerge {
 
     /** sum priority, LERP other components in proportion to the priorities */
     BudgetMerge plusDQBlend = (tgt, src, srcScale) -> {
-        //dqBlendByPri(tgt, src, srcScale, true);
-        dqBlendBySummary(tgt, src, srcScale, true);
+        dqBlendByPri(tgt, src, srcScale, true);
+        //dqBlendBySummary(tgt, src, srcScale, true);
     };
 
     /** avg priority, LERP other components in proportion to the priorities */
     BudgetMerge avgDQBlend = (tgt, src, srcScale) -> {
-        //dqBlend(tgt, src, srcScale, false);
-        dqBlendBySummary(tgt, src, srcScale, false);
+        dqBlendByPri(tgt, src, srcScale, false);
+        //dqBlendBySummary(tgt, src, srcScale, false);
     };
 
     /** merge 'incoming' budget (scaled by incomingScale) into 'existing' */
