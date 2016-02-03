@@ -126,8 +126,15 @@ public final class TruthFunctions extends UtilityFunctions {
 
         long at = ta.occurrence();
         long bt = tb.occurrence();
-        float w1 = c2w(a.conf());
-        float w2 = c2w(b.conf());
+
+        //temporal proximity balancing metric (similar to projection)
+        long adt = Math.abs(at-now);
+        long bdt = Math.abs(bt-now);
+        float closeness = (adt!=bdt) ? (bdt/(float)(adt+bdt)) : 0.5f;
+
+        float w1 = c2w(a.conf()) * closeness;
+        float w2 = c2w(b.conf()) * (1-closeness);
+
         final float w = (w1 + w2);
         float newConf = w2c(w)
                 * temporalProjection(now, at, bt)
@@ -135,18 +142,6 @@ public final class TruthFunctions extends UtilityFunctions {
                 * match;
         if (newConf < confThreshold + Global.TRUTH_EPSILON/2f) return null;
 
-//        //temporal proximity balancing metric (similar to projection). does not affect 'w' the total used to compute confidence
-//        //NOT WORKING YET
-//        if (at != bt) {
-//            long adt = Math.abs(at-now);
-//            long bdt = Math.abs(bt-now);
-//            if (adt!=bdt) {
-//                //MATH IS WRONG HERE
-//                float p = ((float)(adt+bdt)); //LERP the proportion
-//                w2 *= Math.abs(adt)/p;
-//                w1 *= Math.abs(bdt)/p;
-//            }
-//        }
 
         float f1 = a.freq();
         float f2 = b.freq();

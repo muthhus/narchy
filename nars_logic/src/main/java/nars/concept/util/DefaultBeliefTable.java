@@ -277,7 +277,7 @@ public class DefaultBeliefTable implements BeliefTable {
 
         //best found
         Task oldBelief = null;
-        float best = 0;
+        float bestRank = 0, bestConf = 0;
         Truth conclusion = null;
         long concTime = Tense.ETERNAL;
 
@@ -288,7 +288,6 @@ public class DefaultBeliefTable implements BeliefTable {
             float matchFactor = Terms.termRelevance(newBeliefTerm, x.term());
             if (matchFactor <= 0) continue;
 
-
 //
 //            float factor = tRel * freqMatch;
 //            if (factor < best) {
@@ -296,7 +295,10 @@ public class DefaultBeliefTable implements BeliefTable {
 //                continue;
 //            }
 
-            float minValidConf = Math.max(best, Math.max(newBelief.conf(), x.conf()));
+            int totalEvidence = newBelief.evidence().length + x.evidence().length;
+            float minValidConf = Math.max(newBelief.conf(), x.conf());
+            float minValidRank = BeliefTable.rankEternalByOriginality(minValidConf, totalEvidence);
+            if ((minValidRank < bestRank) || (minValidConf < bestConf)) continue;
 
             Truth c;
             long t;
@@ -319,9 +321,10 @@ public class DefaultBeliefTable implements BeliefTable {
             //float ffreqMatch = 1f/(1f + Math.abs(newBeliefFreq - x.freq()));
 
 
-            float cc = c.conf();
-            if (cc > best) {
-                best = cc;
+            float rank = BeliefTable.rankEternalByOriginality(c.conf(), totalEvidence);
+            if (rank > bestRank) {
+                bestRank = rank;
+                bestConf = c.conf();
                 oldBelief = x;
                 conclusion = c;
                 concTime = t;
