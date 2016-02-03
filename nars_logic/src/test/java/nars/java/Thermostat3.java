@@ -57,7 +57,7 @@ public class Thermostat3 {
         n.core.confidenceDerivationMin.setValue(0.02f);
 
 
-        NALObjects objs = new NALObjects(n) {
+        Naljects objs = new Naljects(n) {
 
 //            @Override
 //            protected Term number(Number o) {

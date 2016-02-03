@@ -19,7 +19,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static nars.java.NALObjects.getMethodOperator;
+import static nars.java.Naljects.getMethodOperator;
 
 /**
  * Created by me on 8/19/15.
@@ -296,7 +296,10 @@ public class DefaultTermizer implements Termizer {
 
     public static Term termPackage(@NotNull Package p) {
         //TODO cache?
-        String[] path = p.getName().split("\\.");
+        if (p == null) return $.the("package");
+        String n = p.getName();
+        //if (n == null) return $.the(p.toString());
+        String[] path = n.split("\\.");
         return $.p(path);
 
         //return Atom.the(p.getName());

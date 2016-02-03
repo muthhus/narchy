@@ -8,7 +8,7 @@ import java.util.Random;
 /**
  * q-learning + SOM agent, cognitive prosthetic. designed by patham9
  */
-public class hai {
+public class HaiQ {
 
     final Random rng;
 
@@ -40,7 +40,7 @@ public class hai {
      */
     float Alpha, Gamma, Lambda;
 
-    public hai(int inputs, int _states, int outputs) {
+    public HaiQ(int inputs, int _states, int outputs) {
         rng = new XorShift128PlusRandom(1);
         nActions = outputs;
 

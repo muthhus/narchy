@@ -36,7 +36,7 @@ import java.util.stream.Stream;
  * <p>
  * TODO option to include stack traces in conjunction with invocation
  */
-public class NALObjects extends DefaultTermizer implements Termizer, MethodHandler {
+public class Naljects extends DefaultTermizer implements Termizer, MethodHandler {
 
 
     @NotNull
@@ -90,7 +90,7 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
     private float metadataPriority = 0.1f;
 
 
-    public NALObjects(NAR n) {
+    public Naljects(NAR n) {
         nar = n;
     }
 
@@ -287,7 +287,7 @@ public class NALObjects extends DefaultTermizer implements Termizer, MethodHandl
         T wrappedInstance = the(identifier, (T)clazz.getConstructors()[0].newInstance(args));
 
         ClassOperator co = classOps.computeIfAbsent(instance, i -> {
-            ClassOperator co2 = new ClassOperator(i, goalInvoke, NALObjects.this);
+            ClassOperator co2 = new ClassOperator(i, goalInvoke, Naljects.this);
             nar.onExec(co2);
             return co2;
         });

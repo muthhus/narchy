@@ -1,6 +1,5 @@
 package nars.nal.nal8.decide;
 
-import nars.Symbols;
 import nars.task.Task;
 import org.jetbrains.annotations.NotNull;
 
@@ -13,7 +12,7 @@ public class DecideAllGoals implements Decider {
 
     @Override
     public boolean test(@NotNull Task task) {
-        return (task.punc() == Symbols.GOAL);
+        return task.isGoal() || task.isCommand();
     }
 
 }

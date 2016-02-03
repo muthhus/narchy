@@ -2,7 +2,7 @@ package nars.java;
 
 import nars.concept.Concept;
 import nars.nar.Default;
-import nars.op.meta.hai;
+import nars.op.meta.HaiQ;
 import nars.task.Task;
 import nars.util.data.UnitVal;
 import nars.util.data.Util;
@@ -39,7 +39,7 @@ public class Thermostat4 {
         //n.initNAL9();
 
 
-        NALObjects objs = new NALObjects(n) {
+        Naljects objs = new Naljects(n) {
 
 //            @Override
 //            protected Term number(Number o) {
@@ -54,7 +54,7 @@ public class Thermostat4 {
 
         this.h = objs.the("h", UnitValTaskInc.class /* new UnitVal(0.5f, speed)*/);
 
-        hai hai = new hai(cols, 9, 3);
+        HaiQ hai = new HaiQ(cols, 9, 3);
         n.onFrame(nn -> {
             int[] x = h.see();
             float[] ff = new float[x.length];

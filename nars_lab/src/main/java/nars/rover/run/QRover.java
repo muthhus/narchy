@@ -1,6 +1,6 @@
 package nars.rover.run;
 
-import nars.op.meta.hai;
+import nars.op.meta.HaiQ;
 import nars.rover.Material;
 import nars.rover.obj.VisionRay;
 import nars.rover.robot.AbstractPolygonBot;
@@ -23,13 +23,13 @@ public class QRover extends AbstractPolygonBot {
     final int inputs = retinaPixels * inputsPerPixel + motionPixels;
 
     final int actions = 6;
-    private final hai hai;
+    private final HaiQ hai;
     private final float[] in;
     float rew = 0;
 
     public QRover(String id) {
         super(id);
-        this.hai = new hai(inputs, actions*2, actions);
+        this.hai = new HaiQ(inputs, actions*2, actions);
         this.hai.setQ(0.13f, 0.7f, 0.9f); //0.1 0.5 0.9
 
         this.in = new float[inputs];

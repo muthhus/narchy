@@ -139,9 +139,10 @@ public abstract class TermFunction<O> extends SyncOperator {
 
     @Override
     public void execute(@NotNull Execution e) {
-        feedback(e,
-            function(Operator.opArgs(e.task.term()), e.nar.index())
-        );
+        O y = function(Operator.opArgs(e.task.term()), e.nar.index());
+        if (!e.task.isCommand()) {
+            feedback(e, y);
+        }
     }
 
     protected void feedback(Execution e, Object y) {

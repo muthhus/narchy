@@ -96,7 +96,7 @@ public enum ThermostatTest2 {
 
         //NAR n = new NAR(new Default().setInternalExperience(null));
 
-        NALObjects nobj = new NALObjects(n);
+        Naljects nobj = new Naljects(n);
 
         String id = "T";
         Model tc = nobj.the(id, Model.class);

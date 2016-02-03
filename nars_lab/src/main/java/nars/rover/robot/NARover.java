@@ -9,7 +9,7 @@ import com.gs.collections.api.block.function.primitive.FloatToFloatFunction;
 import nars.NAR;
 import nars.Symbols;
 import nars.java.MethodOperator;
-import nars.java.NALObjects;
+import nars.java.Naljects;
 import nars.rover.Material;
 import nars.rover.Sim;
 import nars.rover.obj.NARVisionRay;
@@ -36,7 +36,7 @@ public class NARover extends AbstractPolygonBot {
     public final NAR nar;
     //float tasteDistanceThreshold = 1.0f;
     final static int retinaPixels = 9;
-    final NALObjects objs;
+    final Naljects objs;
     private final Sensor linearSpeedBack;
     int retinaRaysPerPixel = 2; //rays per vision sensor
 
@@ -62,7 +62,7 @@ public class NARover extends AbstractPolygonBot {
 
         this.nar = nar;
 
-        objs = new NALObjects(nar);
+        objs = new Naljects(nar);
 
         int maxUpdateTime = 32;
 
