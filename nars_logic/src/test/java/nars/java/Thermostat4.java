@@ -54,7 +54,7 @@ public class Thermostat4 {
 
         this.h = objs.the("h", UnitValTaskInc.class /* new UnitVal(0.5f, speed)*/);
 
-        hai hai = new hai(cols, cols/2, 3);
+        hai hai = new hai(cols, 9, 3);
         n.onFrame(nn -> {
             int[] x = h.see();
             float[] ff = new float[x.length];

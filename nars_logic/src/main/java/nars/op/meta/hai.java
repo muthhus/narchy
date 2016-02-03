@@ -10,14 +10,14 @@ import java.util.Random;
  */
 public class hai {
 
-    final Random rng = new XorShift128PlusRandom(1);
+    final Random rng;
 
     final Hsom som;
-    final float[][][] Q; // [state -> state] x action
-    final float[][][] et;
+    final float[][] q; // [state -> state] x action
+    final float[][] et;
 
     final int nActions, nStates;
-    int lastStateX = 0, lastStateY = 0, lastAction = 0;
+    int lastState = 0, lastAction = 0;
 
 
     /*
@@ -40,67 +40,69 @@ public class hai {
      */
     float Alpha, Gamma, Lambda;
 
-    public hai(int inputs, int states, int outputs) {
+    public hai(int inputs, int _states, int outputs) {
+        rng = new XorShift128PlusRandom(1);
         nActions = outputs;
-        nStates = states;
 
-        som = new Hsom(outputs, inputs);
 
-        Q = new float[states][states][outputs];
-        et = new float[states][states][outputs];
+        int states = (int)Math.ceil(Math.sqrt(_states));
+        nStates = inputs*inputs;
+        som = new Hsom(inputs, states);
+
+        q = new float[nStates][outputs];
+        et = new float[nStates][outputs];
         setQ(0.07f, 0.75f, 0.9f); //0.1 0.5 0.9
     }
 
+    int learn(int state, float reward) {
+
+        //1. decide next action
+        int action = rng.nextFloat() < Alpha ? (int) (rng.nextFloat() * nActions) : choose(state);
 
 
+        //2. learn
+        float DeltaQ = (reward + (Gamma * q[state][action])) - q[lastState][lastAction];
+        et[lastState][lastAction] += 1f;
 
-    static int quantify(float val, int quantsteps) {
-        float step = 1 / ((float) quantsteps);
-        float wander = 0.0f;
-        int ind = -1;
-        while (wander <= val) {
-            wander += step;
-            ind++;
-        }
-        return ind;
+        //3. update
+        update(DeltaQ);
+
+        lastState = state;
+        return (this.lastAction = action);
     }
 
-    int learn(int StateX, int StateY, float reward) {
+    private void update(float deltaQ) {
+
+        float[][] q = this.q;
+        float[][] et = this.et;
+
+        float alphaDelta = Alpha * deltaQ;
+        float gammaLambda = Gamma * Lambda;
+
+        for (int i = 0; i < nStates; i++) {
+            float[] eti = et[i];
+            float[] qi = q[i];
+
+            for (int k = 0; k < nActions; k++) {
+                qi[k] += alphaDelta * eti[k];
+                eti[k] *= gammaLambda;
+            }
+        }
+    }
+
+    private int choose(int state) {
         int maxk = 0;
-        float maxval = -999999;
+        float maxval = Float.NEGATIVE_INFINITY;
+
+        float[] qs = q[state];
         for (int k = 0; k < nActions; k++) {
-            float qq = Q[StateX][StateY][k];
+            float qq = qs[k];
             if (qq > maxval) {
                 maxk = k;
                 maxval = qq;
             }
         }
-        int Action;
-        Action = rng.nextFloat() < Alpha ? (int) (rng.nextFloat() * nActions) : maxk;
-        float DeltaQ = (reward + (Gamma * Q[StateX][StateY][Action])) - Q[lastStateX][lastStateY][lastAction];
-        et[lastStateX][lastStateY][lastAction]+=1f;
-
-        float alphaDelta = Alpha * DeltaQ;
-        float gammaLambda = Gamma * Lambda;
-
-        for (int i = 0; i < nStates; i++) {
-            for (int j = 0; j < nStates; j++) {
-                float[] etij = et[i][j];
-                float[] qij = Q[i][j];
-                for (int k = 0; k < nActions; k++) {
-
-                    float etijk = etij[k];
-
-                    qij[k] += alphaDelta * etijk;
-                    etij[k] *= gammaLambda;
-                }
-            }
-        }
-
-        lastStateX = StateX;
-        lastStateY = StateY;
-        lastAction = Action;
-        return lastAction;
+        return maxk;
     }
 
     public void setQ(float alpha, float gamma, float lambda) {
@@ -109,9 +111,15 @@ public class hai {
         Lambda = lambda;
     }
 
-    public int act(float[] input, float reward) {
+    /** main control function */
+    public final int act(float[] input, float reward) {
+        return learn(perceive(input), reward);
+    }
+
+    /** TODO make abstract */
+    protected int perceive(float[] input) {
         som.learn(input);
-        return learn(som.winnerx, som.winnery, reward);
+        return som.winnerx + (som.winnery * som.SomSize);
     }
 
     class Hsom {
@@ -122,6 +130,7 @@ public class hai {
         //final float[][][] vis;
         final int numInputs;
         final int SomSize;
+        final boolean Leaky = true;
         float gamma;
         float eta = 0.1f;
         float outmul = 1.0f;
@@ -129,15 +138,14 @@ public class hai {
         int winnery = 0;
         float Leak = 0.1f;
         float InMul = 1.0f;
-        final boolean Leaky = true;
 
-        Hsom(int SomSize, int numInputs) {
+        Hsom(int numInputs, int SomSize) {
             links = new float[SomSize][SomSize][numInputs];
             //vis = new float[SomSize][SomSize][numInputs];
             inputs = new float[numInputs];
             coords1 = new float[SomSize][SomSize];
             coords2 = new float[SomSize][SomSize];
-            gamma = SomSize/2f;
+            gamma = SomSize / 2f;
             this.numInputs = numInputs;
             this.SomSize = SomSize;
             for (int i1 = 0; i1 < SomSize; i1++) {
@@ -236,6 +244,16 @@ public class hai {
         }
 
 
+//        static int quantify(float val, int quantsteps) {
+//            float step = 1 / ((float) quantsteps);
+//            float wander = 0.0f;
+//            int ind = -1;
+//            while (wander <= val) {
+//                wander += step;
+//                ind++;
+//            }
+//            return ind;
+//        }
 
         //            void Draw(int x,int y,int RenderSize)
 //            {
@@ -264,7 +282,6 @@ public class hai {
 //            learn(input);
 //            return "x" + String.valueOf(winnerx) + "y" + String.valueOf(winnery);
 //        }
-
 
 
 //        void GetActivationForRendering(float[][] input, boolean forSpecialInput, int specialInputIndex) {

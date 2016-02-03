@@ -24,7 +24,7 @@ public class BeliefLab {
     static final float fps = 20f;
     static boolean enableEternals = false;
     static boolean enableTemporals = true;
-    static int duration = 5;
+    static int duration = 3;
     static int stmInduction = 0;
 
 

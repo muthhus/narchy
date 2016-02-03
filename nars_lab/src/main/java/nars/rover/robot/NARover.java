@@ -37,6 +37,7 @@ public class NARover extends AbstractPolygonBot {
     //float tasteDistanceThreshold = 1.0f;
     final static int retinaPixels = 9;
     final NALObjects objs;
+    private final Sensor linearSpeedBack;
     int retinaRaysPerPixel = 2; //rays per vision sensor
 
     float L = 25f; //vision distance
@@ -46,7 +47,7 @@ public class NARover extends AbstractPolygonBot {
 
 
 
-    final Sensor linearSpeed, leftSpeed, rightSpeed;
+    final Sensor linearSpeedFwd, leftSpeed, rightSpeed;
 
 //    final SimpleAutoRangeTruthFrequency linearVelocity;
 //    final SimpleAutoRangeTruthFrequency motionAngle;
@@ -70,16 +71,28 @@ public class NARover extends AbstractPolygonBot {
             return speed < 0.1 ? 0 : Util.clamp(0.5f + speed);
         };
 
-        linearSpeed = new Sensor(nar, nar.term("speed:linear"), (t) -> {
-            return torso.getLinearVelocity().length()/linearThrustPerCycle/1.25f;
-        }, speedThresholdToFreq).maxTimeBetweenUpdates(maxUpdateTime);
+        Term speedForward = nar.term("speed:forward");
+        Term speedBackward = nar.term("speed:backward");
+        Vec2 forwardVec = new Vec2(1,0f);
+        Vec2 tmp = new Vec2();
+        FloatFunction<Term> linearSpeed = (t) -> {
+            torso.getLinearVelocityFromLocalPointToOut(forwardVec, tmp);
+            float v = tmp.length()/ linearThrustPerCycle / 1.25f;
+            if (v >= 0 && t == speedForward) return v;
+            else if (v <= 0 && t == speedBackward) return -v;
+            return 0;
+        };
+        this.linearSpeedFwd = new Sensor(nar, speedForward,
+                linearSpeed, speedThresholdToFreq).maxTimeBetweenUpdates(maxUpdateTime);
+        this.linearSpeedBack = new Sensor(nar, speedBackward,
+                linearSpeed, speedThresholdToFreq).maxTimeBetweenUpdates(maxUpdateTime);
 
         Term speedLeft = nar.term("speed:left");
         Term speedRight = nar.term("speed:right");
         FloatFunction<Term> angleSpeed = (t) -> {
             float a = torso.getAngularVelocity();
-            if (a < 0 && t == speedLeft) return -a;
-            else if (a > 0 && t == speedRight) return a;
+            if (a <= 0 && t == speedLeft) return -a;
+            else if (a >= 0 && t == speedRight) return a;
             return 0;
         };
         leftSpeed = new Sensor(nar, speedLeft, angleSpeed, speedThresholdToFreq).maxTimeBetweenUpdates(maxUpdateTime);

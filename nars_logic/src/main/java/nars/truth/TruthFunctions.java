@@ -134,8 +134,8 @@ public final class TruthFunctions extends UtilityFunctions {
         long bdt = Math.abs(bt-now);
         float closeness = (adt!=bdt) ? (bdt/(float)(adt+bdt)) : 0.5f;
 
-        float w1 = c2w(a.conf() * closeness);
-        float w2 = c2w(b.conf() * (1-closeness));
+        float w1 = c2w(a.conf()) * closeness;
+        float w2 = c2w(b.conf()) * (1-closeness);
 
         final float w = (w1 + w2);
         float newConf = w2c(w)
