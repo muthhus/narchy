@@ -75,7 +75,5 @@ public class BeliefAnalysis extends EnergyAnalysis {
 		return beliefs().size();
 	}
 
-	public void printWave() {
-		wave().print();
-	}
+
 }

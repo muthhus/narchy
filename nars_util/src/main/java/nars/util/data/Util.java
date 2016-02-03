@@ -16,6 +16,8 @@ package nars.util.data;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
+import nars.util.Texts;
+import org.jetbrains.annotations.NotNull;
 import sun.misc.Unsafe;
 
 import java.lang.invoke.MethodHandle;
@@ -791,5 +793,19 @@ public enum Util {
         float delta = Math.abs(a - b);
         float deltaNorm = delta / sum;
         return sigmoid(deltaNorm);
+    }
+
+    /**
+     * 2 decimal representation of values between 0 and 1. only the tens and hundredth
+     * decimal point are displayed - not the ones, and not a decimal point.
+     * for compact display.
+     * if the value=1.0, then 'aa' is the result
+     */
+    @NotNull
+    public static String n2u(float x) {
+        if ((x < 0) || (x > 1)) throw new RuntimeException("values >=0 and <=1");
+        int hundreds = (int) Texts.hundredths(x);
+        if (x == 100) return "aa";
+        return hundreds < 10 ? "0" + hundreds : Integer.toString(hundreds);
     }
 }

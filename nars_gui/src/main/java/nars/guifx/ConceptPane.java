@@ -20,8 +20,6 @@ import nars.bag.BLink;
 import nars.bag.Bag;
 import nars.budget.UnitBudget;
 import nars.concept.Concept;
-import nars.concept.util.BeliefTable;
-import nars.concept.util.DefaultBeliefTable;
 import nars.guifx.chart.Plot2D;
 import nars.guifx.graph2.TermEdge;
 import nars.guifx.graph2.TermNode;
@@ -42,6 +40,7 @@ import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.truth.TruthWave;
 import nars.util.event.FrameReaction;
 
 import java.util.*;
@@ -52,6 +51,7 @@ import java.util.function.Supplier;
 
 import static java.util.stream.Collectors.toList;
 import static javafx.application.Platform.runLater;
+import static nars.nal.Tense.ETERNAL;
 
 
 /**
@@ -509,8 +509,9 @@ public class ConceptPane extends VBox implements ChangeListener {
 
     }
 
-    public static class BeliefTablePane extends HBox {
+    public static class BeliefTablePane extends HBox implements Runnable {
         final Canvas eternal, temporal;
+        final TruthWave beliefs = new TruthWave(0), goals = new TruthWave(0);
 
         final static ColorMatrix beliefColors = new ColorMatrix(8,8,(f,c)->
             new Color(0.6f+0.4f*c, 0.2f, 1f, 0.15f + 0.8f * c)
@@ -533,6 +534,7 @@ public class ConceptPane extends VBox implements ChangeListener {
                 ge.fillRect(x-w/4,y-h/2,w/2,h);
             }
         };
+        private long now;
 
         public BeliefTablePane() {
             super();
@@ -546,7 +548,11 @@ public class ConceptPane extends VBox implements ChangeListener {
             //setLeft(eternal);
         }
 
-        public void frame(Concept concept, long now) {
+        /** redraw */
+        @Override public void run() {
+            if (!redraw.compareAndSet(false, true)) {
+                return;
+            }
 
             //redraw
             GraphicsContext ge = eternal.getGraphicsContext2D();
@@ -559,29 +565,33 @@ public class ConceptPane extends VBox implements ChangeListener {
             float teh = (float) te.getCanvas().getHeight();
             te.clearRect(0, 0, tew, teh);
 
-            if (concept == null) return;
-
             //compute bounds from combined min/max of beliefs and goals so they align correctly
             long minT = Long.MAX_VALUE;
             long maxT = Long.MIN_VALUE;
             {
 
-                if (concept.hasBeliefs()) {
-                    minT = ((DefaultBeliefTable) concept.beliefs()).getMinT();
-                    maxT = ((DefaultBeliefTable) concept.beliefs()).getMaxT();
+                if (!beliefs.isEmpty()) {
+                    minT = beliefs.start();
+                    maxT = beliefs.end();
                 }
-                if (concept.hasGoals()) {
-                    minT = Math.min(minT, ((DefaultBeliefTable) concept.goals()).getMinT());
-                    maxT = Math.max(maxT, ((DefaultBeliefTable) concept.goals()).getMaxT());
+                if (!goals.isEmpty()) {
+
+                    long min = goals.start();
+                    if (min != ETERNAL) {
+                        minT = Math.min(min, minT);
+                        maxT = Math.max(goals.end(), maxT);
+                    }
+
                 }
+
             }
 
 
             try {
-                if (concept.hasBeliefs())
-                    renderTable(minT, maxT, now, ge, gew, geh, te, tew, teh, concept.beliefs(), beliefRenderer);
-                if (concept.hasGoals())
-                    renderTable(minT, maxT, now, ge, gew, geh, te, tew, teh, concept.goals(), goalRenderer);
+                if (!beliefs.isEmpty())
+                    renderTable(minT, maxT, now, ge, gew, geh, te, tew, teh, beliefs, beliefRenderer);
+                if (!goals.isEmpty())
+                    renderTable(minT, maxT, now, ge, gew, geh, te, tew, teh, goals, goalRenderer);
             }
             catch (Throwable t) {
                 //HACK
@@ -598,9 +608,27 @@ public class ConceptPane extends VBox implements ChangeListener {
                 ge.setStroke(null);
                 te.setStroke(null);
             }
+
+
         }
 
-        private void renderTable(long minT, long maxT, long now, GraphicsContext ge, float gew, float geh, GraphicsContext te, float tew, float teh, BeliefTable table, TaskRenderer r) {
+        final AtomicBoolean redraw = new AtomicBoolean(true);
+
+        public void frame(Concept concept, long now) {
+
+            if (concept == null) return;
+
+            this.now = now;
+            if (concept.hasBeliefs()) beliefs.set(concept.beliefs());
+            if (concept.hasGoals()) goals.set(concept.goals());
+
+
+            if (redraw.compareAndSet(true, false)) {
+                runLater(this);
+            }
+        }
+
+        private void renderTable(long minT, long maxT, long now, GraphicsContext ge, float gew, float geh, GraphicsContext te, float tew, float teh, TruthWave table, TaskRenderer r) {
             float b = 4; //border
 
             //Present axis line
@@ -613,25 +641,24 @@ public class ConceptPane extends VBox implements ChangeListener {
 
             float w = 10;
             float h = 10;
-            for (Task t : table) {
-                float f = t.freq();
-                float cc = t.conf();
+            table.forEach((f,cc,o)->{
+
+                boolean eternal = !Float.isFinite(o);
                 float eh, x;
                 GraphicsContext g;
-                if (t.isEternal()) {
+                if (eternal) {
                     eh = geh;
                     x = b + (gew - b - w) * cc;
                     g = ge;
                 } else  {
                     eh = teh;
-                    float o = t.occurrence();
                     x = xTime(tew, b, minT, maxT, o, w);
                     g = te;
                 }
                 float y = b + (eh - b - h) * (1 - f);
                 r.renderTask(g, f, cc, w, h, x, y);
 
-            }
+            });
         }
 
         @FunctionalInterface interface TaskRenderer {
