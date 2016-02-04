@@ -44,6 +44,7 @@ import static nars.nal.LocalRules.solutionBudget;
 import static nars.nal.Tense.TIMELESS;
 import static nars.truth.TruthFunctions.eternalize;
 import static nars.truth.TruthFunctions.temporalProjectionOld;
+import static nars.truth.TruthFunctions.eternalize;
 
 /**
  * A task to be processed, consists of a Sentence and a BudgetValue.

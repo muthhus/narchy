@@ -9,14 +9,14 @@ import java.util.Random;
  */
 public class HaiQ {
 
-	final Random rng;
+	public final Random rng;
 
 	final Hsom som;
 	final float[][] q; // [state -> state] x action
 	final float[][] et;
 
 	final int nActions, nStates;
-	int lastState = 0, lastAction = 0;
+	int lastState = 0, lastDecidedAction = 0;
 
 	/*
 	 * http://stackoverflow.com/questions/1854659/alpha-and-gamma-parameters-in-
@@ -50,7 +50,7 @@ public class HaiQ {
 	 * more defined path to the goal in fewer episodes. Because of this, we
 	 * chose a final lambda of 0.9.
 	 */
-	float Alpha, Gamma, Lambda;
+	public float Alpha, Gamma, Lambda;
 
 	public HaiQ(int inputs, int _states, int outputs) {
 		rng = new XorShift128PlusRandom(1);
@@ -62,28 +62,41 @@ public class HaiQ {
 
 		q = new float[nStates][outputs];
 		et = new float[nStates][outputs];
-		setQ(0.07f, 0.75f, 0.9f); // 0.1 0.5 0.9
+		setQ(0.05f, 0.5f, 0.7f); // 0.1 0.5 0.9
 	}
 
 	int learn(int state, float reward) {
 
 		// 1. decide next action
-		int action = rng.nextFloat() < Alpha
-				? (int) (rng.nextFloat() * nActions)
-				: choose(state);
+		int action = nextAction(state);
 
 		// 2. learn
-                float strength = 1f;
-		float DeltaQ = (reward + (Gamma * q[state][action]))
-				- q[lastState][lastAction];
-		et[lastState][lastAction] += strength;
+                int lastAction = lastAction();
+                if (lastAction!=-1) {
+                    float strength = 1f;
+                    float DeltaQ = (reward + (Gamma * q[state][action]))
+                                    - q[lastState][lastAction];
+                    et[lastState][lastAction] += strength;
+                    
+                    // 3. update
+                    update(DeltaQ);
+                }
 
-		// 3. update
-		update(DeltaQ);
+		
 
 		lastState = state;
-		return (this.lastAction = action);
+		return (this.lastDecidedAction = action);
 	}
+
+    protected int nextAction(int state) {
+        return rng.nextFloat() < Alpha ?
+                randomAction() : 
+                choose(state);
+    }
+
+    private int randomAction() {
+        return rng.nextInt(nActions);
+    }
 
 	private void update(float deltaQ) {
 
@@ -104,19 +117,21 @@ public class HaiQ {
 		}
 	}
 
-	private int choose(int state) {
-		int maxk = 0;
+	protected int choose(int state) {
+		int maxk = -1;
 		float maxval = Float.NEGATIVE_INFINITY;
 
 		float[] qs = q[state];
 		for (int k = 0; k < nActions; k++) {
 			float qq = qs[k];
+                        //TODO determine if q is significant enough above threshold to count
 			if (qq > maxval) {
 				maxk = k;
 				maxval = qq;
 			}
 		}
-		return maxk;
+                
+		return maxk!=-1 ? maxk : randomAction();
 	}
 
 	public void setQ(float alpha, float gamma, float lambda) {
@@ -135,6 +150,10 @@ public class HaiQ {
 		som.learn(input);
 		return som.winnerx + (som.winnery * som.SomSize);
 	}
+
+        protected int lastAction() {
+            return lastDecidedAction;
+        }
 
 	class Hsom {
 		final float[][][] links;

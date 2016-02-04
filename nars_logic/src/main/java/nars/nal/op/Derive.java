@@ -20,6 +20,7 @@ import org.jetbrains.annotations.Nullable;
 
 import static nars.nal.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.eternalize;
+import static nars.truth.TruthFunctions.eternalize;
 
 /**
  * Handles matched derivation results

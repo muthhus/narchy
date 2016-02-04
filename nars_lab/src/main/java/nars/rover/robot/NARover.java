@@ -16,15 +16,18 @@ import nars.rover.Material;
 import nars.rover.Sim;
 import nars.rover.obj.NARVisionRay;
 import nars.rover.obj.VisionRay;
+import nars.rover.run.SomeRovers;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.truth.Truth;
 import nars.util.data.Util;
 import nars.util.signal.Sensor;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 
+import static nars.util.Texts.n2;
 import static nars.util.Texts.n2;
 
 
@@ -203,9 +206,9 @@ public class NARover extends AbstractPolygonBot {
 
         try {
 
-            if (t < 1500)
+            /*if (t < 1500)
                 train(t);
-            else if (mission == 0) {
+            else */ if (mission == 0) {
                 //seek food
                 //curiosity = 0.05f;
 
@@ -224,7 +227,7 @@ public class NARover extends AbstractPolygonBot {
                 //nar.input("(?x ==> eat:#y)?");
                 //nar.input("(?x && eat:#y)?");
 
-                nar.input("MotorControls(#x,motor,(),#z)! :|: %1.0;0.25%"); //create demand for action
+                //nar.input("MotorControls(#x,motor,(),#z)! :|: %1.0;0.25%"); //create demand for action
                 //nar.input("MotorControls(?x,motor,(),#z)! :|: %1.0;0.25%");
                 //nar.concept("MotorControls(?x,motor,?y,#z)").print();
                 //nar.concept("MotorControls(#x,motor,#y,#z)").print();
@@ -338,7 +341,7 @@ public class NARover extends AbstractPolygonBot {
         //positions.addLast(currentPosition.clone());
 
 
-        String torsoAngle = sim.angleTerm(torso.getAngle());
+        //String torsoAngle = sim.angleTerm(torso.getAngle());
 
 
         //feltMotion.set("(&&+0, speed:{" + f5(linSpeed) + "},angle:{" + torsoAngle + "},rotation:{" + angDir + "," + f5(angSpeed) + "}). :|:");
@@ -387,15 +390,17 @@ public class NARover extends AbstractPolygonBot {
 
         public final NARover rover;
         private final Termed left, right, stop, forward;
+        private final Termed backward;
+        final boolean proportional = true; //thrust proportional to expectation of desire
 
         public MotorControls(NARover rover) {
             this.rover = rover;
 
-            forward = rover.nar.term("MotorControls(forward,motor,(),#x)");
-            //backward = rover.nar.term("MotorControls(backward,motor,(),#x)");
-            left = rover.nar.term("MotorControls(left,motor,(),#x)");
-            right = rover.nar.term("MotorControls(right,motor,(),#x)");
-            stop = rover.nar.term("MotorControls(stop,motor,(),#x)");
+            forward = rover.nar.term(SomeRovers.motorForward);
+            backward = rover.nar.term(SomeRovers.motorBackward);
+            left = rover.nar.term(SomeRovers.motorLeft);
+            right = rover.nar.term(SomeRovers.motorRight);
+            stop = rover.nar.term(SomeRovers.motorStop);
         }
 
         public void stop() {
@@ -403,26 +408,26 @@ public class NARover extends AbstractPolygonBot {
             rover.rotateRelative(0);
         }
 
-        private void forward(boolean forward) {
-            //Task c = MethodOperator.invokingTask();
-            //float thrust = c!=null ? c.expectation() : 1;
-            float thrust = 2f;
+        private Truth forward(boolean forward) {
+            Task c = MethodOperator.invokingTask();
+            float thrust = (proportional && c!=null) ? c.expectation() : 1;
             if (!forward) thrust = -thrust;
             rover.thrustRelative(thrust);
+            return c.truth();
         }
 
-        private void rotate(boolean right) {
-            //Task c = MethodOperator.invokingTask();
-            //float thrust = c!=null ? c.expectation() : 1;
-            float thrust = 2f;
+        private Truth rotate(boolean right) {
+            Task c = MethodOperator.invokingTask();
+            float thrust = (proportional && c!=null) ? c.expectation() : 1;
             if (right) thrust = -thrust;
             rover.rotateRelative(thrust);
+            return c.truth();
         }
 
-        public void left() {  rotate(false); }
-        public void right() {  rotate(true); }
-        public void forward() {  forward(true); }
-        //public void backward() {  forward(false); }
+        public Truth left() {  return rotate(false); }
+        public Truth right() {  return rotate(true); }
+        public Truth forward() {  return forward(true); }
+        public Truth backward() {  return forward(false); }
 
 
         public Task random() {
@@ -430,17 +435,17 @@ public class NARover extends AbstractPolygonBot {
 
             Termed term;
 
-            switch ((int)(4 * Math.random())) {
+            switch ((int)(5 * Math.random())) {
                 case 0:
-                    term = forward; break;
-//                case 1:
-//                    term = backward; break;
-                case 1:
-                    term = left; break;
-                case 2:
-                    term = right; break;
-                case 3:
                     term = stop; break;
+                case 1:
+                    term = forward; break;
+                case 2:
+                    term = backward; break;
+                case 3:
+                    term = left; break;
+                case 4:
+                    term = right; break;
                 default:
                     term = null;
             }
@@ -455,93 +460,93 @@ public class NARover extends AbstractPolygonBot {
 
 
 
-    /** bipolar cycle desire, which resolves two polar opposite desires into one */
-    public abstract static class BiCycleDesire  {
-
-        private final CycleDesire positive;
-        private final CycleDesire negative;
-
-        public float positiveDesire, negativeDesire;
-        float threshold = 0f;
-        private final NAR nar;
-
-        public BiCycleDesire(String positiveTerm, String negativeTerm, ConceptDesire desireFunction, NAR n) {
-            this.nar = n;
-            this.positive = new CycleDesire(positiveTerm, desireFunction, n) {
-
-                @Override
-                float onFrame(final float desire) {
-                    positiveDesire = desire;
-                    return Float.NaN;
-                }
-            };
-            //this will be executed directly after positive, so we put the event handler in negative
-            this.negative = new CycleDesire(negativeTerm, desireFunction, n) {
-
-                @Override
-                float onFrame(float negativeDesire) {
-                    BiCycleDesire.this.negativeDesire = negativeDesire;
-
-                    frame(positiveDesire, negativeDesire);
-
-
-                    return Float.NaN;
-                }
-
-            };
-        }
-
-        protected void frame(final float positiveDesire, final float negativeDesire) {
-
-            float net = positiveDesire - negativeDesire;
-            boolean isPos = (net > 0);
-            if (!isPos)
-                net = -net;
-
-            if (net > threshold) {
-                final float feedback = onFrame(net, isPos);
-                if (Float.isFinite(feedback)) {
-                    if (isPos) {
-                        float posFeedback = feedback;
-                        nar.input(this.positive.getFeedback(posFeedback));
-                        nar.input(this.negative.getFeedback(0));
-
-//                        //counteract the interference
-//                        negFeedback = (negativeDesire - (positiveDesire - feedback));
-//                        if (negFeedback < 0) negFeedback = 0;
-//                        Task iit = this.negative.getFeedback(negFeedback)
-//                                .goal()
-//                                .truth(negFeedback, 0.75f) //adjust confidence too
-//                                .get();
+//    /** bipolar cycle desire, which resolves two polar opposite desires into one */
+//    public abstract static class BiCycleDesire  {
 //
-//                        nar.inputDirect(iit);
-
-                    } else {
-                        float negFeedback = feedback;
-                        nar.input(this.negative.getFeedback(negFeedback));
-                        nar.input(this.positive.getFeedback(0));
-
-//                        //counteract the interference
-//                        posFeedback = (positiveDesire - (negativeDesire - feedback));
-//                        if (posFeedback < 0) posFeedback = 0;
-//                        Task iit = this.positive.getFeedback(posFeedback)
-//                                .goal()
-//                                .truth(posFeedback, 0.75f)
-//                                .get();
+//        private final CycleDesire positive;
+//        private final CycleDesire negative;
 //
-//                        nar.inputDirect(iit);
-
-
-                    }
-                }
-
-            }
-
-        }
-
-        abstract float onFrame(float desire, boolean positive);
-
-    }
+//        public float positiveDesire, negativeDesire;
+//        float threshold = 0f;
+//        private final NAR nar;
+//
+//        public BiCycleDesire(String positiveTerm, String negativeTerm, ConceptDesire desireFunction, NAR n) {
+//            this.nar = n;
+//            this.positive = new CycleDesire(positiveTerm, desireFunction, n) {
+//
+//                @Override
+//                float onFrame(final float desire) {
+//                    positiveDesire = desire;
+//                    return Float.NaN;
+//                }
+//            };
+//            //this will be executed directly after positive, so we put the event handler in negative
+//            this.negative = new CycleDesire(negativeTerm, desireFunction, n) {
+//
+//                @Override
+//                float onFrame(float negativeDesire) {
+//                    BiCycleDesire.this.negativeDesire = negativeDesire;
+//
+//                    frame(positiveDesire, negativeDesire);
+//
+//
+//                    return Float.NaN;
+//                }
+//
+//            };
+//        }
+//
+//        protected void frame(final float positiveDesire, final float negativeDesire) {
+//
+//            float net = positiveDesire - negativeDesire;
+//            boolean isPos = (net > 0);
+//            if (!isPos)
+//                net = -net;
+//
+//            if (net > threshold) {
+//                final float feedback = onFrame(net, isPos);
+//                if (Float.isFinite(feedback)) {
+//                    if (isPos) {
+//                        float posFeedback = feedback;
+//                        nar.input(this.positive.getFeedback(posFeedback));
+//                        nar.input(this.negative.getFeedback(0));
+//
+////                        //counteract the interference
+////                        negFeedback = (negativeDesire - (positiveDesire - feedback));
+////                        if (negFeedback < 0) negFeedback = 0;
+////                        Task iit = this.negative.getFeedback(negFeedback)
+////                                .goal()
+////                                .truth(negFeedback, 0.75f) //adjust confidence too
+////                                .get();
+////
+////                        nar.inputDirect(iit);
+//
+//                    } else {
+//                        float negFeedback = feedback;
+//                        nar.input(this.negative.getFeedback(negFeedback));
+//                        nar.input(this.positive.getFeedback(0));
+//
+////                        //counteract the interference
+////                        posFeedback = (positiveDesire - (negativeDesire - feedback));
+////                        if (posFeedback < 0) posFeedback = 0;
+////                        Task iit = this.positive.getFeedback(posFeedback)
+////                                .goal()
+////                                .truth(posFeedback, 0.75f)
+////                                .get();
+////
+////                        nar.inputDirect(iit);
+//
+//
+//                    }
+//                }
+//
+//            }
+//
+//        }
+//
+//        abstract float onFrame(float desire, boolean positive);
+//
+//    }
 }
 
 //        new CycleDesire("motor(random)", strongestTask, nar) {

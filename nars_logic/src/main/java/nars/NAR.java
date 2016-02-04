@@ -56,6 +56,7 @@ import org.slf4j.LoggerFactory;
 import static nars.Symbols.*;
 import static nars.nal.Tense.ETERNAL;
 import static org.fusesource.jansi.Ansi.ansi;
+import static org.fusesource.jansi.Ansi.ansi;
 
 
 /**
@@ -1086,10 +1087,7 @@ public abstract class NAR implements Level, Consumer<Task> {
     abstract public float conceptPriority(Termed termed, float priIfNonExistent);
 
     public Term[] terms(String... terms) {
-        Term[] t = new Term[terms.length];
-        Stream.of(terms).map(x -> term(x)).toArray(Term[]::new);
-        return t;
-
+        return Stream.of(terms).map(this::term).toArray(Term[]::new);
     }
 
     public static final class InvalidTaskException extends RuntimeException {

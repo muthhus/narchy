@@ -33,7 +33,7 @@ public class SomeRovers {
     public static final String motorLeft = "MotorControls(left,motor,(),#z)";
     public static final String motorRight = "MotorControls(right,motor,(),#z)";
     public static final String motorForward = "MotorControls(forward,motor,(),#z)";
-    ////"MotorControls(backward,motor,(),#z)",
+    public static final String motorBackward = "MotorControls(backward,motor,(),#z)";
     public static final String motorStop = "MotorControls(stop,motor,(),#z)";
 
     public static final String eatFood = "eat:food";
@@ -120,13 +120,13 @@ public class SomeRovers {
         nar.core.confidenceDerivationMin.setValue(0.01f);
 
         //nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
-        nar.core.activationRate.setValue(0.5f);
+        nar.core.activationRate.setValue(0.6f);
 
-        nar.memory.duration.set(5);
+        nar.memory.duration.set(3);
         nar.memory.conceptForgetDurations.setValue(3);
-        nar.memory.termLinkForgetDurations.setValue(10);
-        nar.memory.taskLinkForgetDurations.setValue(20);
-        nar.memory.cyclesPerFrame.set(64);
+        nar.memory.termLinkForgetDurations.setValue(4);
+        nar.memory.taskLinkForgetDurations.setValue(6);
+        nar.memory.cyclesPerFrame.set(16);
         nar.memory.shortTermMemoryHistory.set(4);
         //nar.memory.executionExpectationThreshold.setValue(0.95f);
 
@@ -147,7 +147,7 @@ public class SomeRovers {
                         motorLeft,
                         motorRight,
                         motorForward,
-
+                        motorBackward,
                         motorStop
                 );
 
@@ -175,7 +175,7 @@ public class SomeRovers {
         List<Termed> sensors = Global.newArrayList();
         Collections.addAll(sensors, n.terms(eatFood, eatPoison, speedLeft, speedRight, speedForward));
         
-        for (String material : new String[] { "food" }) {
+        for (String material : new String[] { "food", "poison" }) {
             r.vision.stream().map(v -> 
                     $.prop(
                             ((NARVisionRay)v).angleTerm, 
@@ -187,8 +187,10 @@ public class SomeRovers {
 
         q.set(
             sensors,
-            Lists.mutable.of(n.term("eat:food"), n.term("(--,eat:poison)")),
-            Lists.mutable.of(n.term(motorForward), n.term(motorLeft), n.term(motorRight), n.term(motorStop))
+            Lists.mutable.of(n.terms("eat:food", "(--,eat:poison)" /*, speedForward*/)),
+            Lists.mutable.of(
+                    n.terms(motorStop, motorForward, motorBackward, motorLeft, motorRight)
+            )
         );
 
 

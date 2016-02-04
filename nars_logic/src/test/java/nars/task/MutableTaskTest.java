@@ -6,6 +6,7 @@ import nars.nar.Default;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by me on 6/8/15.

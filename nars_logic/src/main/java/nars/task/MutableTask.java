@@ -54,7 +54,7 @@ public class MutableTask extends AbstractTask {
     MutableTask(@NotNull Task taskToClone, @NotNull Truth newTruth, long now, long occ) {
         super(taskToClone);
         truth(newTruth);
-        time(now, occ);
+        MutableTask.this.time(now, occ);
     }
 
     public MutableTask(@NotNull Termed<Compound> content, char punc) {
@@ -145,7 +145,7 @@ public class MutableTask extends AbstractTask {
     }
 
     @NotNull
-    public MutableTask tense(@NotNull Tense t, @NotNull Memory memory) {
+    public MutableTask time(@NotNull Tense t, @NotNull Memory memory) {
         occurr(Tense.getRelativeOccurrence(memory.time(), t, memory));
         return this;
     }
@@ -156,7 +156,7 @@ public class MutableTask extends AbstractTask {
     }
 
     @NotNull public final MutableTask present(long when) {
-        return time(when, when);
+        return MutableTask.this.time(when, when);
     }
 
     @NotNull

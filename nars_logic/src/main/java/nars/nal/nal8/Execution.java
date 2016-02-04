@@ -73,7 +73,7 @@ public class Execution implements Runnable {
 
         return (MutableTask) new MutableTask(inh)
                 .judgment()  //with default truth value
-                .tense(tense, nar.memory)
+                .time(tense, nar.memory)
                 .budget(goal.budget())
                 .budgetScaled(feedbackPriorityMultiplier, feedbackDurabilityMultiplier)
                 .log("Execution Result")
