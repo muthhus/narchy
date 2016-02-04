@@ -32,6 +32,7 @@ import org.jbox2d.dynamics.Fixture;
 
 /**
  * Contact point for {@link TestbedTest}.
+ * 
  * @author Daniel Murphy
  */
 public class ContactPoint {

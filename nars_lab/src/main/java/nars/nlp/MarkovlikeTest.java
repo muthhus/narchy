@@ -119,11 +119,10 @@ public class MarkovlikeTest {
 
 		n.input("speak:" + sentenceID + "! :|:");
 
-
 		n.run(speakTime);
 
-        //silence
-        //n.input("(--, say(?x))! :|:");
+		// silence
+		// n.input("(--, say(?x))! :|:");
 	}
 
 }

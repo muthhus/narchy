@@ -1,8 +1,7 @@
 package nars.util.signal;
 
-import com.gs.collections.api.set.ImmutableSet;
-import com.gs.collections.impl.factory.Sets;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -13,12 +12,11 @@ import nars.Global;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.concept.util.BeliefTable;
-import nars.nal.Tense;
 import nars.op.meta.HaiQ;
 import nars.task.MutableTask;
 import nars.task.Task;
-import nars.term.Term;
 import nars.term.Termed;
+import static nars.util.signal.NarQ.expectation;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,18 +31,87 @@ public class NarQ implements Consumer<NAR> {
     private final NAR nar;
 
     public HaiQ q = null;
+    
+    
+    /** numeric vector percept */
+    public static class Vercept  {
+        
+        /**
+         * sensor inputs, each providing at least one float value component of the
+         * input vector
+         */
+        final List<DoubleSupplier> ins = Global.newArrayList();
 
-    /**
-     * sensor inputs, each providing at least one float value component of the
-     * input vector
-     */
-    public final List<DoubleSupplier> ins = Global.newArrayList();
+        public void add(DoubleSupplier d) {
+            ins.add(d);
+        }
+        public void addAll(DoubleSupplier... d) {
+            Collections.addAll(ins, d);           
+        }
+        public void addAll(Collection<? extends DoubleSupplier> d) {
+            ins.addAll(d);
+        }
+        public void clear() { ins.clear(); }
+        
+        public float[] get(float[] target) {
+            int s = ins.size();
+            if (target == null || target.length!=s)
+                target = new float[s];
+            for (int i = 0; i < s; i++) {
+                target[i] = (float)ins.get(i).getAsDouble();
+            }
+            return target;
+        }
+    }
 
+    final public Vercept input;
+    
+    
+    public static interface Action {
+        
+        /** activate the procedure with a certain proportional strength from 0..1.0 */
+        void run(float strength);
+        
+        /** estimate of current level of activity; not necessarily the exact value supplied previously to run(f) but that is valid way to compute a simple implementation */
+        float ran(); 
+    }
+
+    /** inputs a goal task for a given term in proportion to the supplied strength value */
+    public static class InputGoal implements Action {
+        final Termed term;
+        final NAR nar;
+        public InputGoal(NAR n, Termed term) {
+            this.nar = n;
+            this.term = term;
+        }
+
+        @Override
+        public void run(float strength) {
+            float existingDesire = Math.max(0.5f, NarQ.expectation(nar, term, 0, false, 0) - 0.5f) * 2f; //range 0..1.0 if >0.5, 0 otherwise
+            float additionalDesire = 0.5f + 0.5f * Math.max(0.01f, (1f - existingDesire)); //some minimal amount if already totally maxed out
+            final Task t = new MutableTask(term).goal().truth(additionalDesire, strength)
+                    //.time(Tense.Future, nar.memory)                   
+                    .time(nar.time(), nar.time() + 1)
+                    .log("Q Action");
+            //logger.info("q act: {}", t );
+            nar.input(t);
+
+        }       
+
+        @Override
+        public float ran() {
+            int dt = 0; //nar.memory.duration()/2; //-1; //duration/2?
+            return NarQ.expectation(nar, term, 0.5f /* equal pos/neg opportunity */, false, dt /* desire in previous time */);
+        }     
+        
+        
+    }
+    
     /**
      * terms representing goals that can be activated in the hope of maximizing
      * future reward
      */
-    public final List<Termed> outs = Global.newArrayList();
+    public final List<Action> outs = Global.newArrayList();
 
     /**
      * reward sensor x strength/factor
@@ -56,8 +123,9 @@ public class NarQ implements Consumer<NAR> {
      */
     float rewardBias = -0.1f;
 
-    public NarQ(NAR n) {
+    public NarQ(NAR n, Vercept input) {
         this.nar = n;
+        this.input = input;
         nar.onFrame(this);
     }
 
@@ -66,16 +134,15 @@ public class NarQ implements Consumer<NAR> {
      */
     @Override
     public void accept(NAR t) {
-        if (validDimensionality()) {
-            float[] ii = inputs();
-            if (ii != null) {          
+        float[] ii = inputs();
+        if (ii != null) {          
+            if (validDimensionality(ii.length)) {
                 act(q.act(ii, reward()));
             }
         }
     }
 
-    protected boolean validDimensionality() {
-        final int inputs = ins.size();
+    protected boolean validDimensionality(int inputs) {
         final int outputs = outs.size();
 
         if (inputs == 0 || outputs == 0 || reward.isEmpty()) {
@@ -124,13 +191,12 @@ public class NarQ implements Consumer<NAR> {
 
             final float a = q.Alpha;
 
-            int dt = 0; //nar.memory.duration()/2; //-1; //duration/2?
-            
+
             for (int j = 0; j < s; j++) {
 
-                float e = NarQ.this.expectation(j, 0.5f /* equal pos/neg opportunity */, false, dt /* desire in previous time */);
-                //if (e < 0.5) continue;
+                float e = outs.get(j).ran();
 
+                //add noise
                 if (a != 0) {
                     e += 2f * (q.rng.nextFloat() - 0.5f) * (float) q.Alpha;
                 }
@@ -151,33 +217,17 @@ public class NarQ implements Consumer<NAR> {
     float[] inputBuffer;
 
     private float[] inputs() {
-        if (this.ins == null) {
-            return null;
-        }
-
-        final int ii = ins.size();
-
-        //return expectation truth values of the assigned input concepts
-        if (inputBuffer == null || inputBuffer.length != ii) {
-            inputBuffer = new float[ii];
-        }
-
-        float[] ib = this.inputBuffer;
-        for (int i = 0; i < ii; i++) {
-            ib[i] = (float) ins.get(i).getAsDouble();
-        }
-
-        return ib;
+        return (this.inputBuffer = input.get(this.inputBuffer));
     }
 
-    private float expectation(int j, float ifNonExists, boolean beliefOrDesire, int dt) {
-        Termed t = outs.get(j);
-        if (t == null) {
-            return ifNonExists;
-        }
-        //TODO cache the Concept reference to avoid lookup but invalidate it if the Concept is deleted so that the new one can be retrieved after
-        return expectation(t, ifNonExists, beliefOrDesire, dt);
-    }
+//    private float expectation(int j, float ifNonExists, boolean beliefOrDesire, int dt) {
+//        Termed t = outs.get(j);
+//        if (t == null) {
+//            return ifNonExists;
+//        }
+//        //TODO cache the Concept reference to avoid lookup but invalidate it if the Concept is deleted so that the new one can be retrieved after
+//        return expectation(t, ifNonExists, beliefOrDesire, dt);
+//    }
 
     public float expectation(Termed x, float ifNonExists, boolean beliefOrDesire, int dt) {
         return expectation(nar, x, ifNonExists, beliefOrDesire, dt);
@@ -293,14 +343,10 @@ public class NarQ implements Consumer<NAR> {
 //            //logger.info("q act: {}", t );
 //            nar.input(t);
 //        }
-        float existingDesire = Math.max(0.5f, expectation(x, 0, false, 0) - 0.5f) * 2f; //range 0..1.0 if >0.5, 0 otherwise
-        float additionalDesire = 0.5f + 0.5f * Math.max(0.01f, (1f - existingDesire)); //some minimal amount if already totally maxed out
-        final Task t = new MutableTask(outs.get(x)).goal().truth(additionalDesire, 1f / outs.size())
-                //.time(Tense.Future, nar.memory)                   
-                .time(nar.time(), nar.time() + 1)
-                .log("Q Action");
-        //logger.info("q act: {}", t );
-        nar.input(t);
+        Action a = outs.get(x);
+        if (a!=null)
+            a.run(1f / outs.size());
+        
     }
 
 }

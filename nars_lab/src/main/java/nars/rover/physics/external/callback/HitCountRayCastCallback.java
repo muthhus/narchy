@@ -36,4 +36,4 @@ package nars.rover.physics.external.callback;//package nars.rover.physics.extern
 //	public void reset(){
 //		hitCount = 0;
 //	}
-//}
+// }

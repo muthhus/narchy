@@ -13,19 +13,20 @@ import java.util.List;
 
 public class AWTPanelHelper {
 
-    static boolean screenDragButtonDown = false;
-    static boolean mouseJointButtonDown = false;
+	static boolean screenDragButtonDown = false;
+	static boolean mouseJointButtonDown = false;
 
-    public static Vec2 worldPos(TestbedState model, MouseEvent arg0) {
-        Vec2 vv;
-        model.getDebugDraw().getScreenToWorldToOut(arg0.getX(), arg0.getY(), vv = new Vec2());
-        return vv;
-    }
+	public static Vec2 worldPos(TestbedState model, MouseEvent arg0) {
+		Vec2 vv;
+		model.getDebugDraw().getScreenToWorldToOut(arg0.getX(), arg0.getY(),
+				vv = new Vec2());
+		return vv;
+	}
 
-    /**
-     * Adds common help text and listeners for awt-based testbeds.
-     */
-    public static void addHelpAndPanelListeners(Component panel, final TestbedState model,
+	/**
+	 * Adds common help text and listeners for awt-based testbeds.
+	 */
+	public static void addHelpAndPanelListeners(Component panel, final TestbedState model,
                                                 final PhysicsController controller, final int screenDragButton) {
         final Vec2 oldDragMouse = new Vec2();
         final Vec2 mouse = new Vec2();
