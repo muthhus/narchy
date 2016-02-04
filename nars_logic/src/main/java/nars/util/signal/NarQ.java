@@ -5,6 +5,7 @@ import com.gs.collections.impl.factory.Sets;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -25,7 +26,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Q-Learning Coprocessor (NAR Operator/Plugin)
  */
-public class NarQ {
+public class NarQ implements Consumer<NAR> {
 
     private static final Logger logger = LoggerFactory.getLogger(NarQ.class);
 
@@ -57,23 +58,23 @@ public class NarQ {
 
     public NarQ(NAR n) {
         this.nar = n;
-        nar.onFrame(nn -> {
-
-            if (!updateDimensions()) {
-                return;
-            }
-
-            float[] ii = inputs();
-            if (ii == null) {
-                return;
-            }
-
-            int a = q.act(ii, reward());
-            act(a);
-        });
+        nar.onFrame(this);
     }
 
-    protected boolean updateDimensions() {
+    /**
+     * called each frame by the NAR
+     */
+    @Override
+    public void accept(NAR t) {
+        if (validDimensionality()) {
+            float[] ii = inputs();
+            if (ii != null) {          
+                act(q.act(ii, reward()));
+            }
+        }
+    }
+
+    protected boolean validDimensionality() {
         final int inputs = ins.size();
         final int outputs = outs.size();
 
@@ -83,20 +84,21 @@ public class NarQ {
         }
 
         if (q == null || q.inputs() != inputs || q.actions() != outputs) {
-            q = new HaiQImpl(inputs, inputs, outputs);
+            //TODO allow substituting an arbitrary I/O agent interface
+            q = new HaiQImpl(inputs, inputs*2, outputs);
         }
 
         return true;
     }
 
     public List<? extends DoubleSupplier> getBeliefExpectations(String... terms) {
-        return Stream.of( nar.terms(terms) ).map( t -> new BeliefExpectation(nar, t)).collect(Collectors.toList());       
+        return Stream.of(nar.terms(terms)).map(t -> new BeliefExpectation(nar, t)).collect(Collectors.toList());
     }
-    
+
     public List<? extends DoubleSupplier> getBeliefRewards(String... terms) {
-        return Stream.of( nar.terms(terms) ).map( t -> new BeliefReward(nar, t)).collect(Collectors.toList());       
+        return Stream.of(nar.terms(terms)).map(t -> new BeliefReward(nar, t)).collect(Collectors.toList());
     }
-    
+
     private class HaiQImpl extends HaiQ {
 
         public HaiQImpl(int inputs, int states, int outputs) {
@@ -105,7 +107,7 @@ public class NarQ {
 
         @Override
         protected int nextAction(int state) {
-            //alpha is instead applied in interpreting the compared desire expectations
+            //alpha is applied elsewhere, so here directly choose
             return choose(state);
         }
 
@@ -118,17 +120,20 @@ public class NarQ {
             int best = -1;
             float bestE = Float.NEGATIVE_INFINITY;
 
-            int s = outs.size();  
-            
+            int s = outs.size();
+
             final float a = q.Alpha;
 
-            for (int j = 0; j < s; j++) {            
+            int dt = 0; //nar.memory.duration()/2; //-1; //duration/2?
+            
+            for (int j = 0; j < s; j++) {
 
-                float e = desireExp(j, 0.5f /* equal pos/neg opportunity */, false, -1 /* desire in previous time */);
+                float e = NarQ.this.expectation(j, 0.5f /* equal pos/neg opportunity */, false, dt /* desire in previous time */);
                 //if (e < 0.5) continue;
 
-                if (a != 0)
+                if (a != 0) {
                     e += 2f * (q.rng.nextFloat() - 0.5f) * (float) q.Alpha;
+                }
 
                 //System.out.println("last action: " + j + " "  + e);
                 if (e > bestE) {
@@ -149,7 +154,7 @@ public class NarQ {
         if (this.ins == null) {
             return null;
         }
-        
+
         final int ii = ins.size();
 
         //return expectation truth values of the assigned input concepts
@@ -157,33 +162,32 @@ public class NarQ {
             inputBuffer = new float[ii];
         }
 
-        
         float[] ib = this.inputBuffer;
-        for (int i = 0; i < ii; i++) {        
-            ib[i] = (float)ins.get(i).getAsDouble();
+        for (int i = 0; i < ii; i++) {
+            ib[i] = (float) ins.get(i).getAsDouble();
         }
 
-        
         return ib;
     }
 
-    private float desireExp(int j, float ifNonExists, boolean beliefOrDesire, int dt) {
+    private float expectation(int j, float ifNonExists, boolean beliefOrDesire, int dt) {
         Termed t = outs.get(j);
-        if (t == null) return ifNonExists;
+        if (t == null) {
+            return ifNonExists;
+        }
         //TODO cache the Concept reference to avoid lookup but invalidate it if the Concept is deleted so that the new one can be retrieved after
-        return eval(t, ifNonExists, beliefOrDesire, dt);
-    }
-    
-    public float eval(Termed x, float ifNonExists, boolean beliefOrDesire, int dt) {
-        return eval(nar, x, ifNonExists, beliefOrDesire, dt);
-    }
-    
-    public static float eval(NAR nar, Termed x, float ifNonExists, boolean beliefOrDesire, int dt) {
-        return NarQ.eval(nar, nar.concept(x), ifNonExists, beliefOrDesire, dt);
+        return expectation(t, ifNonExists, beliefOrDesire, dt);
     }
 
+    public float expectation(Termed x, float ifNonExists, boolean beliefOrDesire, int dt) {
+        return expectation(nar, x, ifNonExists, beliefOrDesire, dt);
+    }
 
-    public static float eval(NAR n, Concept cx, float ifNonExists, boolean beliefOrDesire, int dt) {
+    public static float expectation(NAR nar, Termed x, float ifNonExists, boolean beliefOrDesire, int dt) {
+        return NarQ.expectation(nar, nar.concept(x), ifNonExists, beliefOrDesire, dt);
+    }
+
+    public static float expectation(NAR n, Concept cx, float ifNonExists, boolean beliefOrDesire, int dt) {
         //TODO this an be optimized
         long now = n.time();
 
@@ -197,43 +201,45 @@ public class NarQ {
         }
         return v;
     }
-    
+
     abstract public static class BeliefSensor implements DoubleSupplier {
 
         public final Termed term;
 
         public final NAR nar;
-        
-        public BeliefSensor(NAR nar, Termed t)  {
+
+        public BeliefSensor(NAR nar, Termed t) {
             this.term = t;
             this.nar = nar;
         }
-                        
+
     }
-    
-    public static class BeliefReward extends BeliefSensor {     
+
+    /** positive expectation mapped to a -1,+1 range */
+    public static class BeliefReward extends BeliefSensor {
 
         public BeliefReward(NAR nar, String term) {
-            this(nar, (Termed)nar.term(term));
+            this(nar, (Termed) nar.term(term));
         }
-        
+
         public BeliefReward(NAR nar, Termed t) {
-            super(nar, t);          
+            super(nar, t);
         }
 
         protected float expectation() {
-            return eval(nar, term, 0, true, 0);
+            return NarQ.expectation(nar, (Termed)term, 0f, true, 0);
         }
-        
+
         @Override
         public double getAsDouble() {
             return (expectation() - 0.5f) * 2f;
         }
-    
+
     }
-    
-    public static class NotBeliefReward extends BeliefReward {     
-        
+
+    /** negative expectation mapped to a -1,+1 range */
+    public static class NotBeliefReward extends BeliefReward {
+
         public NotBeliefReward(NAR nar, String term) {
             super(nar, term);
         }
@@ -242,35 +248,34 @@ public class NarQ {
         public float expectation() {
             return 1f - super.expectation();
         }
-        
-        
+
     }
 
-    public static class BeliefExpectation extends BeliefSensor {     
+    /** expectation directly */
+    public static class BeliefExpectation extends BeliefSensor {
 
         public BeliefExpectation(NAR nar, Termed t) {
-            super(nar, t);          
+            super(nar, t);
         }
 
         @Override
         public double getAsDouble() {
-            return eval(nar, term, 0, true, 0);
+            return expectation(nar, term, 0, true, 0);
         }
-    
+
     }
-    
+
     private float reward() {
         //return sum of expectation truth value of the assigned reward concepts(s)
 
-        final float r[] = new float[] { 0 };
-        
-        reward.forEach((sensor,weight)->{
-            float v = ((float)sensor.getAsDouble()) ;
+        final float r[] = new float[]{0};
+
+        reward.forEach((sensor, weight) -> {
+            float v = ((float) sensor.getAsDouble());
             v *= weight.floatValue();
             r[0] += v;
         });
-        
-       
+
         return (r[0] / reward.size()) - rewardBias;
     }
 
@@ -288,7 +293,7 @@ public class NarQ {
 //            //logger.info("q act: {}", t );
 //            nar.input(t);
 //        }
-        float existingDesire = Math.max(0.5f, desireExp(x, 0, false, 0) - 0.5f) * 2f; //range 0..1.0 if >0.5, 0 otherwise
+        float existingDesire = Math.max(0.5f, expectation(x, 0, false, 0) - 0.5f) * 2f; //range 0..1.0 if >0.5, 0 otherwise
         float additionalDesire = 0.5f + 0.5f * Math.max(0.01f, (1f - existingDesire)); //some minimal amount if already totally maxed out
         final Task t = new MutableTask(outs.get(x)).goal().truth(additionalDesire, 1f / outs.size())
                 //.time(Tense.Future, nar.memory)                   
