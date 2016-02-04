@@ -5,6 +5,7 @@ import com.gs.collections.impl.factory.Sets;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.op.meta.HaiQ;
+import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
@@ -75,7 +76,7 @@ public class hai {
             ib[i] = (tt!=null) ? eval(tt.term(), 0) : 0;           
         }
 
-        logger.info("input: {}", inputBuffer);
+        //logger.info("input: {}", inputBuffer);
 
         return inputBuffer;
     }
@@ -111,8 +112,16 @@ public class hai {
     }
 
     void act(int x) {
+        
         //desire action of the given action concept
         //logger.info("act: " + x);
+//        Concept c = nar.concept(outs[x]);
+//        if (c!=null) {
+//            
+//        }
+        final MutableTask t = new MutableTask(outs[x]).goal().present(nar.memory);
+        logger.info("q act: {}", t );
+        nar.input(t);
     }
 
 

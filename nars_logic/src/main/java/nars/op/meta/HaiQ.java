@@ -73,9 +73,10 @@ public class HaiQ {
 				: choose(state);
 
 		// 2. learn
+                float strength = 1f;
 		float DeltaQ = (reward + (Gamma * q[state][action]))
 				- q[lastState][lastAction];
-		et[lastState][lastAction] += 1f;
+		et[lastState][lastAction] += strength;
 
 		// 3. update
 		update(DeltaQ);
