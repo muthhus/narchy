@@ -10,11 +10,12 @@ import nars.term.Term;
 import nars.util.data.Util;
 
 import java.util.function.Consumer;
+import java.util.function.DoubleSupplier;
 
 /**
  * Created by me on 2/2/16.
  */
-public class Sensor implements Consumer<NAR> {
+public class Sensor implements Consumer<NAR>, DoubleSupplier {
 
     /**
      * resolution of the output freq value
@@ -90,6 +91,12 @@ public class Sensor implements Consumer<NAR> {
         return t;
     }
 
+    @Override
+    public double getAsDouble() {
+        return prevF;
+    }
+
+    
     /** sets default confidence */
     public Sensor conf(float conf) {
         this.conf = conf;

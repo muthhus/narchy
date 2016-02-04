@@ -13,6 +13,7 @@ import org.jbox2d.dynamics.World;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import nars.term.Term;
 
 /**
  * Created by me on 1/31/16.
@@ -43,6 +44,8 @@ abstract public class VisionRay extends RayCastClosestCallback implements Abstra
     protected Body hitNext;
     private Vec2 root = new Vec2();
     private Vec2 target = new Vec2();
+    private String hitMaterial;
+    private float hitDist;
 
     //final Sensor sensor;
 
@@ -182,12 +185,16 @@ abstract public class VisionRay extends RayCastClosestCallback implements Abstra
 
 
 
-        this.hitNext = hit;
+
 
     }
 
     protected void perceiveDist(Body hit, float newConf, float nextHitDist) {
 
+        this.hitNext = hit;
+        this.hitMaterial = material(hit);
+        this.hitDist = nextHitDist;
+        
 
         //hitDist = (distMomentum * hitDist) + (1f - distMomentum) * nextHitDist;
         //conf = (confMomentum * conf) + (1f - confMomentum) * newConf;
@@ -244,5 +251,15 @@ abstract public class VisionRay extends RayCastClosestCallback implements Abstra
 
     public void setEats(boolean b) {
         this.eats = b;
+    }
+
+    public boolean hit(String material) {
+        String m = hitMaterial;       
+        return m!=null && material.equals(m);
+    }
+
+    /**  (touching) 0..1.0 (max range) */
+    public float distToHit() {
+        return hitDist;
     }
 }

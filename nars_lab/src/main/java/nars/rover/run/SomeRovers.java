@@ -15,14 +15,21 @@ import nars.rover.world.FoodSpawnWorld1;
 import nars.term.Termed;
 import nars.term.index.MapIndex2;
 import nars.time.SimulatedClock;
-import nars.util.signal.hai;
+import nars.util.signal.NarQ;
 
 import java.util.Collections;
+import static java.util.Collections.addAll;
 import java.util.List;
+import java.util.function.DoubleSupplier;
 import java.util.stream.Collectors;
 import nars.$;
 import nars.rover.obj.NARVisionRay;
 import static nars.rover.obj.VisionRay.material;
+import nars.term.Term;
+import nars.util.signal.NarQ.BeliefExpectation;
+import nars.util.signal.NarQ.BeliefReward;
+import nars.util.signal.NarQ.NotBeliefReward;
+import org.apache.commons.lang3.mutable.MutableFloat;
 
 
 /**
@@ -170,28 +177,31 @@ public class SomeRovers {
     /** attaches a prosthetic q-controller to a NAR */
     public static void q(NARover r) {
         NAR n = r.nar;
-        hai q = new hai(n);
-
-        List<Termed> sensors = Global.newArrayList();
-        Collections.addAll(sensors, n.terms(eatFood, eatPoison, speedLeft, speedRight, speedForward));
+        NarQ nq = new NarQ(n);
+        
+        nq.ins.addAll( nq.getBeliefExpectations(eatFood, eatPoison, speedLeft, speedRight, speedForward));
         
         for (String material : new String[] { "food", "poison" }) {
-            r.vision.stream().map(v -> 
-                    $.prop(
-                            ((NARVisionRay)v).angleTerm, 
-                            $.the(material)
-                    )                     
-            ).collect(Collectors.toCollection(()->sensors));
+            r.vision.forEach(v -> 
+//                new BeliefExpectation( n, $.prop(
+//                        ((NARVisionRay)v).angleTerm, 
+//                        $.the(material)
+//                ) )
+                nq.ins.add((DoubleSupplier)(() -> {
+                  if (v.hit(material)) 
+                      return 1f-v.distToHit();
+                  return 0; //nothing seen within the range
+                }))
+            );
         }
         
-
-        q.set(
-            sensors,
-            Lists.mutable.of(n.terms("eat:food", "(--,eat:poison)" /*, speedForward*/)),
-            Lists.mutable.of(
-                    n.terms(motorStop, motorForward, motorBackward, motorLeft, motorRight)
-            )
-        );
+        
+        nq.reward.put(new BeliefReward(n, "eat:food"), new MutableFloat(1f));
+        nq.reward.put(new NotBeliefReward(n, "eat:poison"), new MutableFloat(0.9f));
+        /*, speedForward*/
+        
+        addAll(nq.outs,  n.terms(motorStop, motorForward, motorBackward, motorLeft, motorRight) );
+        
 
 
 

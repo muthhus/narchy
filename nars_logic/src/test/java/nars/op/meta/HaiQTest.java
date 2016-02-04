@@ -3,7 +3,7 @@ package nars.op.meta;
 import nars.NAR;
 import nars.java.Naljects;
 import nars.nar.Default;
-import nars.util.signal.hai;
+import nars.util.signal.NarQ;
 import org.junit.Test;
 
 /**
@@ -17,7 +17,7 @@ public class HaiQTest {
         NAR n = new Default(200, 4, 3, 2);
         //n.log();
 
-        new Naljects(n).the("q", hai.class, n);
+        new Naljects(n).the("q", NarQ.class, n);
         n.input("hai(set, q, ({x:0,x:1}, {reward:xy}, {y:0, y:1}), #z);");
 
         n.input("x:0. :\\: %0.25%");

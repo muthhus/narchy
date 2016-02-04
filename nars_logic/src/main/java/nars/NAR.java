@@ -1086,8 +1086,8 @@ public abstract class NAR implements Level, Consumer<Task> {
      */
     abstract public float conceptPriority(Termed termed, float priIfNonExistent);
 
-    public Term[] terms(String... terms) {
-        return Stream.of(terms).map(this::term).toArray(Term[]::new);
+    public Termed[] terms(String... terms) {
+        return Stream.of(terms).map(this::term).toArray(Termed[]::new);
     }
 
     public static final class InvalidTaskException extends RuntimeException {
