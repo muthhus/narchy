@@ -19,6 +19,10 @@ import nars.util.signal.hai;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import nars.$;
+import nars.rover.obj.NARVisionRay;
+import static nars.rover.obj.VisionRay.material;
 
 
 /**
@@ -65,7 +69,15 @@ public class SomeRovers {
         boolean addQRover = false;
 
         if (addNARRover) {
-            game.add(q(new NARover("r1", newNAR())));
+            game.add(new NARover("r1", newNAR()) {
+                @Override
+                public void init(Sim p) {
+                    super.init(p);
+                    
+                    q(this);
+                }
+                
+            });
         }
 
 
@@ -156,22 +168,31 @@ public class SomeRovers {
     }
 
     /** attaches a prosthetic q-controller to a NAR */
-    public static NARover q(NARover r) {
+    public static void q(NARover r) {
         NAR n = r.nar;
         hai q = new hai(n);
 
         List<Termed> sensors = Global.newArrayList();
         Collections.addAll(sensors, n.terms(eatFood, eatPoison, speedLeft, speedRight, speedForward));
+        
+        for (String material : new String[] { "food" }) {
+            r.vision.stream().map(v -> 
+                    $.prop(
+                            ((NARVisionRay)v).angleTerm, 
+                            $.the(material)
+                    )                     
+            ).collect(Collectors.toCollection(()->sensors));
+        }
+        
 
         q.set(
             sensors,
-            Lists.mutable.of(n.term("eat:food")),
+            Lists.mutable.of(n.term("eat:food"), n.term("(--,eat:poison)")),
             Lists.mutable.of(n.term(motorForward), n.term(motorLeft), n.term(motorRight), n.term(motorStop))
         );
 
 
 
-        return r;
     }
 
 //    private static class InputActivationController extends CycleReaction {

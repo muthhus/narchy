@@ -6,6 +6,8 @@ package nars.rover.robot;
 
 import com.gs.collections.api.block.function.primitive.FloatFunction;
 import com.gs.collections.api.block.function.primitive.FloatToFloatFunction;
+import java.util.List;
+import nars.Global;
 import nars.NAR;
 import nars.Symbols;
 import nars.java.MethodOperator;
@@ -57,6 +59,7 @@ public class NARover extends AbstractPolygonBot {
     //public class DistanceInput extends ChangedTextInput
 
     private MotorControls motors;
+    public List<VisionRay> vision;
 
     public NARover(String id, NAR nar) {
         super(id);
@@ -275,6 +278,7 @@ public class NARover extends AbstractPolygonBot {
         Body torso = newTriangleTorso(getWorld(), mass);
 
 
+        this.vision = Global.newArrayList();
         for (int i = 0; i < retinaPixels; i++) {
             float aStep = (float) (Math.PI * 2f) / retinaPixels;
             final float angle = aStep * i;
@@ -285,6 +289,7 @@ public class NARover extends AbstractPolygonBot {
             };
             v.setEats(((angle < mouthArc / 2f) || (angle > (Math.PI * 2f) - mouthArc / 2f)));
 
+            vision.add(v);
 
             draw.addLayer(v);
             senses.add(v);

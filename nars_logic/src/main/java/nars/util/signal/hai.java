@@ -51,7 +51,9 @@ public class hai {
         this.ins = ins.toArray(new Term[ins.size()]);
         this.outs = outs.toArray(new Term[outs.size()]);
         this.reward = reward.toArray(new Term[reward.size()]);
-        ;
+        
+        logger.info("Q: " + ins + " x " + reward + " -> " + outs);
+        
         int states = this.ins.length;
         this.q = new HaiQ(states, states, this.outs.length);
     }

@@ -6,29 +6,27 @@ import nars.guifx.NARfx;
 import nars.nar.Default;
 import nars.util.Texts;
 
-
-
 /**
  * Created by me on 1/21/16.
  */
 public class BeliefLab {
 
-//    static {
-//        Global.HORIZON = 2f;
-//    }
-    public static final int beliefCapacity = 80;
-    static float waveFreq = 0.08715f;
-    static float conf = 0.6f;
-    static float predictionProbability = 0.1f; //how often to ask for a prediction
-    static float pastProbability = 0.1f; //how often to ask for a prediction
-    static final float fps = 20f;
-    static boolean enableEternals = false;
-    static boolean enableTemporals = true;
-    static int duration = 2;
-    static int stmInduction = 0;
+	// static {
+	// Global.HORIZON = 2f;
+	// }
+	public static final int beliefCapacity = 80;
+	static float waveFreq = 0.08715f;
+	static float conf = 0.6f;
+	static float predictionProbability = 0.1f; // how often to ask for a
+												// prediction
+	static float pastProbability = 0.1f; // how often to ask for a prediction
+	static final float fps = 20f;
+	static boolean enableEternals = false;
+	static boolean enableTemporals = true;
+	static int duration = 2;
+	static int stmInduction = 0;
 
-
-    public static void main(String[] args) {
+	public static void main(String[] args) {
         NAR nar = new Default();
         //nar.input("y:x.");
         //nar.input("y:x. %0%");

@@ -28,7 +28,7 @@ public class NARVisionRay extends VisionRay {
 
     public final Atom angleTerm;
 
-    private BLink<Concept> angleConcept;
+    public BLink<Concept> angleConcept;
     float pri;
 
     float conceptPriority;
