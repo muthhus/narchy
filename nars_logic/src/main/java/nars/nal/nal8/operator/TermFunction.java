@@ -57,6 +57,7 @@ public abstract class TermFunction<O> extends SyncOperator {
         return false;
     }
 
+    //TODO supply the execution instead of the TermBuilder which is referenced from it. in TermBuilder, supply a dummy Execution context for the ImmediateTransforms that need it
     /** y = function(x) 
      * @return y, or null if unsuccessful
      * @param x

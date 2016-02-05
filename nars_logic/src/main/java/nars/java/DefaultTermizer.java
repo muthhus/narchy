@@ -96,7 +96,7 @@ public class DefaultTermizer implements Termizer {
             return ((Boolean) o) ? TRUE : FALSE;
 
         if (o instanceof Character)
-            return $.the(String.valueOf((Character)o));
+            return $.quote(String.valueOf((Character)o));
 
         if (o instanceof Number)
             return number((Number)o);
