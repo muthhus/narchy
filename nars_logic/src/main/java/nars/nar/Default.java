@@ -346,7 +346,7 @@ public class Default extends AbstractNAR {
 
             LinkedHashSet<Concept> a = this.activated;
             if (!a.isEmpty()) {
-                a.forEach(active::put);
+                active.putAll(a);
                 a.clear();
             }
 

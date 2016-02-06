@@ -24,7 +24,7 @@ import static nars.$.seteMap;
  *
  * < (|, match [, constraints]) ==> (&|, derivation1, ... derivationN)>
  */
-public final class MatchTerm extends AtomicBooleanCondition<PremiseMatch> implements ProcTerm<PremiseMatch> {
+public final class MatchTerm extends AtomicBooleanCondition<PremiseMatch> implements ProcTerm {
 
     public final TaskBeliefPair x;
     @Nullable

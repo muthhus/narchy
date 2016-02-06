@@ -33,7 +33,7 @@ public abstract class SortedIndex<T> implements Collection<T> {
     //public abstract Iterator<T> descendingIterator();
     public abstract void setCapacity(int capacity);
 
-    public abstract List<T> getList();
+    public abstract List<T> list();
     
 
     public abstract boolean isSorted();

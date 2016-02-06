@@ -8,11 +8,11 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Created by me on 12/31/15.
  */
-abstract public class ThenFork<C> extends GenericCompound<ProcTerm<C>> implements ProcTerm<C> {
+abstract public class ThenFork extends GenericCompound<ProcTerm> implements ProcTerm {
 
     //private final MethodHandle method;
 
-    public ThenFork(ProcTerm<C>[] actions) {
+    public ThenFork(ProcTerm[] actions) {
         super(Op.CONJUNCTION, new TermVector(actions));
 
 
@@ -45,7 +45,7 @@ abstract public class ThenFork<C> extends GenericCompound<ProcTerm<C>> implement
     @Override
     public void appendJavaProcedure(@NotNull StringBuilder s) {
         //s.append("/* " + this + "*/");
-        for (ProcTerm<C> p : terms()) {
+        for (ProcTerm p : terms()) {
             s.append("\t\t");
             p.appendJavaProcedure(s);
             s.append('\n');

@@ -96,7 +96,7 @@ public class DefaultBeliefTable implements BeliefTable {
         } else {
             minT = Long.MAX_VALUE;
             maxT = Long.MIN_VALUE;
-            List<Task> list = temporal.items.getList();
+            List<Task> list = temporal.items.list();
             for (int i = 0, listSize = list.size(); i < listSize; i++) {
                 long o = list.get(i).occurrence();
                 if (o > maxT) maxT = o;
@@ -175,7 +175,7 @@ public class DefaultBeliefTable implements BeliefTable {
     public final Task topTemporal(long when, long now) {
         Task best = null;
         float bestRank = -1;
-        List<? extends Task> l = temporal.items.getList();
+        List<? extends Task> l = temporal.items.list();
         int ls = l.size();
         for (int i = 0; i < ls; i++) {
             Task x = l.get(i);
@@ -266,7 +266,7 @@ public class DefaultBeliefTable implements BeliefTable {
     public Task getRevision(@NotNull Task newBelief, @NotNull NAR nar) {
         long now = nar.time();
 
-        List<Task> beliefs = tableFor(newBelief).items.getList();
+        List<Task> beliefs = tableFor(newBelief).items.list();
         int bsize = beliefs.size();
         if (bsize == 0)
             return null; //nothing to revise with

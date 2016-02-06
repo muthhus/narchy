@@ -12,8 +12,8 @@ import nars.term.Termed;
 import nars.term.Terms;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -39,11 +39,16 @@ public class PremisePermutor extends UnifySubst implements Function<Term, Task> 
     /**
      * temporary re-usable array for batch firing
      */
-    private final Set<BLink<Termed>> terms = Global.newHashSet(1);
+    private final Collection<BLink<Termed>> terms =
+            Global.newArrayList();
+            //Global.newHashSet(1);
+
     /**
      * temporary re-usable array for batch firing
      */
-    private final Set<BLink<Task>> tasks = Global.newHashSet(1);
+    private final Collection<BLink<Task>> tasks =
+            Global.newArrayList();
+            //Global.newHashSet(1);
 
     @NotNull
     private BLink[] termsArray = new BLink[0];
@@ -72,12 +77,12 @@ public class PremisePermutor extends UnifySubst implements Function<Term, Task> 
 
         Concept concept = conceptLink.get();
 
-        Set<BLink<Task>> tasksBuffer = this.tasks;
+        Collection<BLink<Task>> tasksBuffer = this.tasks;
         //concept.getTaskLinks().sample(tasklinks, eachTaskLink, tasksBuffer).commit();
         concept.tasklinks().filter(eachTaskLink).sample(tasklinks, tasksBuffer);
         if (tasksBuffer.isEmpty()) return;
 
-        Set<BLink<Termed>> termsBuffer = this.terms;
+        Collection<BLink<Termed>> termsBuffer = this.terms;
         //concept.getTermLinks().sample(termlinks, eachTermLink, termsBuffer).commit();
         concept.termlinks().forEachThen(eachTermLink).sample(termlinks, termsBuffer);
         if (termsBuffer.isEmpty()) return;

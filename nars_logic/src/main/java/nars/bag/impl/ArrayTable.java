@@ -97,15 +97,15 @@ abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements Tabl
 
     public final L top() {
         if (isEmpty()) return null;
-        return getItem(0);
+        return item(0);
     }
 
     public final L bottom() {
         if (isEmpty()) return null;
-        return getItem(size() - 1);
+        return item(size() - 1);
     }
 
-    final L getItem(int index) {
+    final L item(int index) {
         return items.get(index);
     }
 
@@ -117,7 +117,7 @@ abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements Tabl
     @Nullable
     final L removeItem(int index) {
 
-        L ii = getItem(index);
+        L ii = item(index);
         /*if (ii == null)
             throw new RuntimeException("invalid index: " + index + ", size=" + size());*/
 
@@ -146,7 +146,7 @@ abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements Tabl
     @Override
     public final void forEach(@NotNull Consumer<? super L> action) {
 
-        items.getList().forEach(action);
+        items.list().forEach(action);
 
 //        //items.forEach(b -> action.accept(b.get()));
 //
@@ -170,7 +170,7 @@ abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements Tabl
      * default implementation; more optimal implementations will avoid instancing an iterator
      */
     public void forEach(int max, @NotNull Consumer<? super L> action) {
-        List<? extends L> l = items.getList();
+        List<? extends L> l = items.list();
         int n = Math.min(l.size(), max);
         //TODO let the list implementation decide this because it can use the array directly in ArraySortedIndex
         for (int i = 0; i < n; i++) {
@@ -180,7 +180,7 @@ abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements Tabl
 
     @Override
     public void topWhile(@NotNull Predicate<L> action) {
-        List<? extends L> l = items.getList();
+        List<? extends L> l = items.list();
         int n = l.size();
         for (int i = 0; i < n; i++) {
             if (!action.test(l.get(i)))

@@ -79,9 +79,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 
 
 
-
-
-//    /**
+    //    /**
 //     * from: http://stackoverflow.com/a/19333201
 //     */
 //    public static <T> void shuffle(final T[] array, final Random random) {

@@ -69,7 +69,7 @@ public class NarseseIRCBot extends IRCBot {
             int n = Math.min(paragraphSize, l.size());
 
             Iterable<String> ii = Iterables.transform(
-                    l.getList().subList(0, n), (x) -> toString(x.get()) );
+                    l.list().subList(0, n), (x) -> toString(x.get()) );
 
             String s = Joiner.on("  ").join(ii);
             if (!s.isEmpty()) {

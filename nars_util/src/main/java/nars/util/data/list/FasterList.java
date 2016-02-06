@@ -30,10 +30,13 @@ public class FasterList<X> extends FastList<X> {
 
     /** uses array directly */
     @SafeVarargs
+    public FasterList(int size, X... x) {
+        super(size, x);
+    }
+    @SafeVarargs
     public FasterList(X... x) {
         super(x);
     }
-
 
     /**
      * quickly remove the final elements without nulling them by setting the size pointer
@@ -58,6 +61,17 @@ public class FasterList<X> extends FastList<X> {
         return items[index];
         //}
     }
+
+
+    public final boolean addIfCapacity(X newItem) {
+        X[] ii = this.items;
+        if (ii.length == this.size) {
+            return false;
+        }
+        ii[this.size++] = newItem;
+        return true;
+    }
+
 
     /** use with caution.
      *    --this could become invalidated so use it as a snapshot
@@ -146,5 +160,7 @@ public class FasterList<X> extends FastList<X> {
     }
 
 
-
+    public void clearFast() {
+        popTo(-1);
+    }
 }

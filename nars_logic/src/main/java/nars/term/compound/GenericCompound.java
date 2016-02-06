@@ -27,7 +27,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
     /** subterm vector */
     @NotNull
-    public final TermVector<T> terms;
+    public final TermVector<T> subterms;
 
     /** subterm relation, resolves to unique concept */
     public final int relation;
@@ -49,7 +49,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     }
 
     public GenericCompound(@NotNull Op op, int relation, int dt, @NotNull TermVector subterms) {
-        this.terms = subterms;
+        this.subterms = subterms;
         this.normalized = (subterms.vars() == 0);
         this.op = op;
 
@@ -61,9 +61,14 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
         this.relation = relation;
 
-        this.hash = Util.hashCombine(terms.hashCode(), opRel(), dt);
+        this.hash = Util.hashCombine(this.subterms.hashCode(), opRel(), dt);
 
 
+    }
+
+    @Override
+    public final boolean term(int i, Op o) {
+        return subterms.term(i, o);
     }
 
 //    protected GenericCompound(GenericCompound copy, int newT) {
@@ -110,18 +115,18 @@ public class GenericCompound<T extends Term> implements Compound<T> {
         if (this != o) {
             Termed t = (Termed) o;
             //int diff = op().compareTo(t.op());
-            int diff = Integer.compare(op().ordinal(), t.op().ordinal());
+            int diff = Integer.compare(op.ordinal(), t.op().ordinal());
             if (diff != 0) r = diff;
             else {
 
                 Compound c = (Compound) (t.term());
-                int diff2 = Integer.compare(relation(), c.relation());
+                int diff2 = Integer.compare(this.relation, c.relation());
                 if (diff2 != 0) return diff2;
 
                 int diff3 = Integer.compare(this.t, c.t());
                 if (diff3 != 0) return diff3;
 
-                r=subterms().compareTo(c.subterms());
+                r= subterms.compareTo(c.subterms());
             }
         }
 
@@ -131,27 +136,27 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
     @Override
     public final void addAllTo(@NotNull Collection<Term> set) {
-        terms.addAllTo(set);
+        subterms.addAllTo(set);
     }
 
     @NotNull
     @Override
     public final TermVector<T> subterms() {
-        return terms;
+        return subterms;
     }
 
     @Override
     public boolean equals(@NotNull Object that) {
-        return this == that || hashCode() == that.hashCode() && equalsFurther((Termed) that);
+        return this == that || hash == that.hashCode() && equalsFurther((Termed) that);
     }
 
     private boolean equalsFurther(@NotNull Termed thatTerm) {
 
         boolean r=false;
         Term u = thatTerm.term();
-        if ((op == u.op()) /*&& (((t instanceof Compound))*/) {
+        if ((u.op(op)) /*&& (((t instanceof Compound))*/) {
             Compound c = (Compound) u;
-            r=terms.equals(c.subterms())
+            r= subterms.equals(c.terms())
                     && (relation == c.relation())
                     && (t == c.t());
         }
@@ -169,22 +174,22 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
     @Override
     public final int varDep() {
-        return terms.varDep();
+        return subterms.varDep();
     }
 
     @Override
     public final int varIndep() {
-        return terms.varIndep();
+        return subterms.varIndep();
     }
 
     @Override
     public final int varQuery() {
-        return terms.varQuery();
+        return subterms.varQuery();
     }
 
     @Override
     public final int vars() {
-        return terms.vars();
+        return subterms.vars();
     }
 
 //    public final Term[] cloneTermsReplacing(int index, Term replaced) {
@@ -192,17 +197,17 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 //    }
 
     public final boolean isEmpty() {
-        return terms.isEmpty();
+        return subterms.isEmpty();
     }
 
     public final boolean contains(Object o) {
-        return terms.contains(o);
+        return subterms.contains(o);
     }
 
 
     @Override
     public final void forEach(@NotNull Consumer<? super T> action, int start, int stop) {
-        terms.forEach(action, start, stop);
+        subterms.forEach(action, start, stop);
     }
 
     @Override
@@ -212,56 +217,56 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
     @Override
     public final void forEach(@NotNull Consumer<? super T> c) {
-        terms.forEach(c);
+        subterms.forEach(c);
     }
 
     @Override public T[] terms() {
-        return terms.term;
+        return subterms.term;
     }
 
     @Override
     public final Term[] terms(@NotNull IntObjectPredicate<T> filter) {
-        return terms.terms(filter);
+        return subterms.terms(filter);
     }
 
     @Override
     public final Iterator<T> iterator() {
-        return terms.iterator();
+        return subterms.iterator();
     }
 
     @Override
     public int structure() {
-        return terms.structure() | op.bit();
+        return subterms.structure() | op.bit();
     }
 
     @Override
     public final T term(int i) {
-        return terms.term(i);
+        return subterms.term(i);
     }
 
     @Override
     public final boolean containsTerm(@NotNull Term target) {
-        return terms.containsTerm(target);
+        return subterms.containsTerm(target);
     }
 
     @Override
     public final int size() {
-        return terms.size();
+        return subterms.size();
     }
 
     @Override
     public final int complexity() {
-        return terms.complexity();
+        return subterms.complexity();
     }
 
     @Override
     public final int volume() {
-        return terms.volume();
+        return subterms.volume();
     }
 
     @Override
     public final boolean impossibleSubTermVolume(int otherTermVolume) {
-        return terms.impossibleSubTermVolume(otherTermVolume);
+        return subterms.impossibleSubTermVolume(otherTermVolume);
     }
 
     @Override
@@ -272,7 +277,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     /** WARNING: this does not perform commutive handling correctly. use the index newTerm method for now */
     @NotNull @Override public Compound t(int cycles) {
         if (cycles == t) return this;
-        GenericCompound g = new GenericCompound(op(), relation, cycles, subterms());
+        GenericCompound g = new GenericCompound(op, relation, cycles, subterms);
         if (normalized) g.setNormalized();
         return g;
     }

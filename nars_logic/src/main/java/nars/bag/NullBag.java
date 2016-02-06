@@ -61,7 +61,7 @@ public final class NullBag<V> implements Bag<V> {
 
     @NotNull
     @Override
-    public Bag<V> sample(int n, Predicate<? super BLink<V>> each, Collection<? super BLink<V>> target) {
+    public Bag<V> sample(int n, Collection<? super BLink<V>> target) {
         return null;
     }
 

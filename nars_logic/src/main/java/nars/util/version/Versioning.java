@@ -7,6 +7,10 @@ import org.jetbrains.annotations.NotNull;
 /** versioning context that holds versioned instances */
 public class Versioning extends FasterList<Versioned> {
 
+    public Versioning(int capacity) {
+        super(0, new Versioned[capacity]);
+    }
+
     private int now = 0;
 
     /** serial id's assigned to each Versioned */
@@ -23,16 +27,19 @@ public class Versioning extends FasterList<Versioned> {
         return now;
     }
 
+
     /** start a new version with a commit, returns current version  */
     public final int newChange(Versioned v) {
         int c = commit();
-        add(v);
+        if (!addIfCapacity(v))
+            throw new RuntimeException();
         return c;
     }
 
     /** track change on current commit, returns current version */
     public final int continueChange(Versioned v) {
-        add(v);
+        if (!addIfCapacity(v))
+            throw new RuntimeException();
         return now;
     }
 
@@ -49,10 +56,8 @@ public class Versioning extends FasterList<Versioned> {
     /** reverts/undo to previous state */
     public final void revert(int when) {
         int was = now;
-        if (was == when)
-            return; //no change
-
-        doRevert(when, was);
+        if (was != when)
+            doRevert(when, was);
     }
 
     public void doRevert(int when, int was) {
@@ -63,7 +68,8 @@ public class Versioning extends FasterList<Versioned> {
         int s = size()-1;
         if (s == -1) return; //empty
 
-        while (get(s).revertNext(when)) {
+        Versioned[] ii = this.items;
+        while (ii[s].revertNext(when)) {
             if (--s < 0)
                 break;
         }
@@ -127,6 +133,7 @@ public class Versioning extends FasterList<Versioned> {
             return new int[stackLimit];
         }
     }
+
 
 
 //    public boolean toStackString() {

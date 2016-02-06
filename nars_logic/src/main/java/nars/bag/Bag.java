@@ -81,12 +81,8 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
 //        top(c -> (each.test(c) && (toFire[0]--) > 0));
 
 
-    default void sample(int n, Collection<BLink<V>> target) {
-        sample(n, null, target);
-    }
-
     @NotNull
-    Bag<V> sample(int n, Predicate<? super BLink<V>> each, Collection<? super BLink<V>> target);
+    Bag<V> sample(int n, Collection<? super BLink<V>> target);
 //    /**
 //     * fills a collection with at-most N items, if an item passes the predicate.
 //     * returns how many items added
@@ -404,6 +400,10 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
     default Bag<V> forEachThen(Consumer<BLink<? extends V>> each) {
         forEach(each);
         return this;
+    }
+
+    default void putAll(Collection<? extends V> a) {
+        a.forEach(this::put);
     }
 
 }

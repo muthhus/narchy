@@ -41,6 +41,9 @@ and collected until power is depleted. */
 public abstract class FindSubst extends Versioning implements Subst {
 
 
+    /** maximum changes which are stored in stack */
+    final static int defaultHistoryLength = 1000;
+
     public final Random random;
 
     public final Op type;
@@ -117,6 +120,7 @@ public abstract class FindSubst extends Versioning implements Subst {
     }
 
     protected FindSubst(Op type, Random random) {
+        super(defaultHistoryLength);
         this.random = random;
         this.type = type;
 
@@ -743,7 +747,7 @@ public abstract class FindSubst extends Versioning implements Subst {
                 return matchSub(X, Y, 0);
             case 2:
                 //match the target variable first, if exists
-                int first = (X.term(1).op(type)) ? 1 : 0;
+                int first = X.term(1, type) ? 1 : 0;
                 return matchSub(X,Y,first) && matchSub(X,Y,1-first);
             default:
                 return matchLinearForward(X, Y);

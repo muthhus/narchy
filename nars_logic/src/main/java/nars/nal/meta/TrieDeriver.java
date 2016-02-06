@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 public class TrieDeriver extends Deriver {
 
     @NotNull
-    public final ProcTerm<PremiseMatch>[] roots;
+    public final ProcTerm[] roots;
     @Nullable
     public final TermTrie<Term, PremiseRule> trie;
 
@@ -79,7 +79,7 @@ public class TrieDeriver extends Deriver {
 
     @Override
     public final void run(PremiseMatch m) {
-        for (ProcTerm<PremiseMatch> r : roots)
+        for (ProcTerm r : roots)
             r.accept(m);
     }
 
@@ -143,16 +143,16 @@ public class TrieDeriver extends Deriver {
 
 
     @NotNull
-    private static Collection<ProcTerm<PremiseMatch>> compileActions(@NotNull List<Term> t) {
+    private static Collection<ProcTerm> compileActions(@NotNull List<Term> t) {
         //t.forEach(x -> System.out.println(x.getClass() + " " + x));
         return (Collection)t;
     }
 
 
     @NotNull
-    public static ProcTerm<PremiseMatch> branch(
+    public static ProcTerm branch(
             @NotNull Collection<BooleanCondition<PremiseMatch>> condition,
-            @Nullable ThenFork<PremiseMatch> conseq) {
+            @Nullable ThenFork conseq) {
 
         if ((conseq != null) && (conseq.size() > 0)) {
             return new PremiseBranch(condition, conseq);
@@ -161,7 +161,7 @@ public class TrieDeriver extends Deriver {
         }
     }
 
-    protected void compile(@NotNull ProcTerm<PremiseMatch> p) throws IOException, CannotCompileException, NotFoundException {
+    protected void compile(@NotNull ProcTerm p) throws IOException, CannotCompileException, NotFoundException {
         StringBuilder s = new StringBuilder();
 
         final String header = "public final static String wtf=" +

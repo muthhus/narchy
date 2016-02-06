@@ -6,9 +6,9 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Created by me on 12/31/15.
  */
-public final class Return extends Atom implements ProcTerm<PremiseMatch> {
+public final class Return extends Atom implements ProcTerm {
 
-    public static final ProcTerm<PremiseMatch> the = new Return();
+    public static final ProcTerm the = new Return();
 
     private Return() {
         super("return");

@@ -3,6 +3,7 @@ package nars.term.container;
 import com.google.common.base.Joiner;
 import com.gs.collections.api.block.function.Function;
 import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
+import nars.Op;
 import nars.nal.meta.match.Ellipsis;
 import nars.term.*;
 import nars.util.data.Util;
@@ -83,6 +84,10 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
         init();
     }
 
+    @Override
+    public final boolean term(int i, Op o) {
+        return term[i].op(o);
+    }
 
     @Override public T[] terms() {
         return term;

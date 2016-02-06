@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -95,7 +96,7 @@ public class CurveBag<V> implements Bag<V> {
             int index = sampleIndex();
 
             BLink<V> i = remove ?
-                    b.removeItem(index) : b.getItem(index);
+                    b.removeItem(index) : b.item(index);
 
             if (!i.budget().isDeleted()) {
                 return i;
@@ -124,7 +125,7 @@ public class CurveBag<V> implements Bag<V> {
      * */
     @NotNull
     @Override
-    public CurveBag<V> sample(int n, Predicate<? super BLink<V>> each, Collection<? super BLink<V>> target) {
+    public CurveBag<V> sample(int n, Collection<? super BLink<V>> target) {
 
         int ss = size();
         final int begin, end;
@@ -137,11 +138,9 @@ public class CurveBag<V> implements Bag<V> {
             end = begin + n;
         }
 
+        List<BLink<V>> l = arrayBag.items.list();
         for (int i = begin; i < end; i++) {
-            BLink<V> ii = get(i);
-            if (each == null || each.test(ii)) {
-                target.add(ii);
-            }
+            target.add(l.get(i));
         }
 
         return this;
@@ -202,10 +201,6 @@ public class CurveBag<V> implements Bag<V> {
         return this;
     }
 
-    @Override public void sample(int n, Collection<BLink<V>> target) {
-        sample(n, null, target);
-    }
-
     @Override
     public final int size() {
         return arrayBag.size();
@@ -215,6 +210,11 @@ public class CurveBag<V> implements Bag<V> {
     @Override
     public final Iterator<BLink<V>> iterator() {
         return arrayBag.iterator();
+    }
+
+    @Override
+    public void forEach(Consumer<? super BLink<V>> action) {
+        arrayBag.forEach(action);
     }
 
     @Override
@@ -391,9 +391,9 @@ public class CurveBag<V> implements Bag<V> {
 
 
 
-    public BLink<V> get(int i) {
-        return arrayBag.getItem(i);
-    }
+//    public BLink<V> get(int i) {
+//        return arrayBag.item(i);
+//    }
 
 
     /**
@@ -425,9 +425,8 @@ public class CurveBag<V> implements Bag<V> {
         int i = Math.round(y * size);
 
         if (i > size) return size;
-        if (i < 0) return 0;
-
-        return i;
+        //else if (i < 0) return 0;
+        else return i;
     }
 
     @Override
@@ -442,15 +441,12 @@ public class CurveBag<V> implements Bag<V> {
     /** provides a next index to sample from */
     public final int sampleIndex() {
         int s = size();
-        if (s == 1) return 0;
-
-        float x = random.nextFloat();
-
-        BagCurve curve = this.curve;
-        float y = curve.valueOf(x);
-
         //System.out.println("\t range:" +  min + ".." + max + " -> f(" + x + ")=" + y + "-> " + index);
-        return index(y, s);
+        return (s == 1) ? 0 :
+            index(
+                this.curve.valueOf( random.nextFloat()),
+                s
+            );
     }
 
 

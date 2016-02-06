@@ -20,13 +20,12 @@ import org.jetbrains.annotations.Nullable;
 
 import static nars.nal.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.eternalize;
-import static nars.truth.TruthFunctions.eternalize;
 
 /**
  * Handles matched derivation results
  * < (&&, postMatch1, postMatch2) ==> derive(term) >
  */
-public class Derive extends AbstractLiteral implements ProcTerm<PremiseMatch> {
+public class Derive extends AbstractLiteral implements ProcTerm {
 
     @NotNull
     private final String id;

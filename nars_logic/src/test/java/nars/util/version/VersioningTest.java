@@ -12,13 +12,13 @@ import static org.junit.Assert.assertNull;
  */
 public class VersioningTest {
 
-    Versioning v = new Versioning();
+    Versioning v = new Versioning(10);
     Versioned a = new Versioned(v);
     Versioned b = new Versioned(v);
 
     @Test
     public void test1() {
-        Versioning w = new Versioning();
+        Versioning w = new Versioning(10);
         VersionMap m = new VersionMap(w);
         m.put("x", "a");
         assertEquals("{x=a}", m.toString());

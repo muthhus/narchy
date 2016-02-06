@@ -1,5 +1,6 @@
 package nars.bag.impl;
 
+import nars.Global;
 import nars.bag.BLink;
 import nars.bag.Bag;
 import nars.budget.Budget;
@@ -12,7 +13,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -35,8 +35,8 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
 
     public ArrayBag(@NotNull SortedIndex<BLink<V>> items) {
         this(items,
-            //Global.newHashMap(items.capacity()/2)
-            new HashMap(items.capacity()/2)
+            Global.newHashMap(items.capacity()/2)
+            //new HashMap(items.capacity()/2)
         );
     }
 
@@ -116,13 +116,13 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
 
     @NotNull
     @Override
-    public Bag<V> sample(int n, Predicate<? super BLink<V>> each, Collection<? super BLink<V>> target) {
+    public Bag<V> sample(int n, Collection<? super BLink<V>> target) {
         throw new RuntimeException("unimpl");
     }
 
     @Override
     public Bag<V> filter(Predicate<BLink<? extends V>> forEachIfFalseThenRemove) {
-        List<BLink<V>> l = items.getList();
+        List<BLink<V>> l = items.list();
         int n = l.size();
         if (n > 0) {
             for (int i = 0; i < n; i++) {

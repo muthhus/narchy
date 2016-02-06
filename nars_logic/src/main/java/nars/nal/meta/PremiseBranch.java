@@ -12,12 +12,12 @@ import java.util.Collection;
  < (&&, cond1, cond2, ...) ==> (&|, fork1, fork2, ... ) >
  < (&&, cond1, cond2, ...) ==> end >
  */
-public final class PremiseBranch extends GenericCompound implements ProcTerm<PremiseMatch> {
+public final class PremiseBranch extends GenericCompound implements ProcTerm {
 
     @NotNull
     public final transient AndCondition<PremiseMatch> cond;
     @NotNull
-    public final transient ProcTerm<PremiseMatch> conseq;
+    public final transient ProcTerm conseq;
 
 
     @Override
@@ -30,11 +30,11 @@ public final class PremiseBranch extends GenericCompound implements ProcTerm<Pre
         s.append("\n}");
     }
 
-    public PremiseBranch(@NotNull Collection<BooleanCondition<PremiseMatch>> cond, ProcTerm<PremiseMatch> conseq) {
+    public PremiseBranch(@NotNull Collection<BooleanCondition<PremiseMatch>> cond, ProcTerm conseq) {
         super(Op.IMPLICATION,
                 new TermVector(new AndCondition(cond), conseq));
         this.cond = (AndCondition<PremiseMatch>) term(0);
-        this.conseq = (ProcTerm<PremiseMatch>) term(1);
+        this.conseq = (ProcTerm) term(1);
     }
 
     @Override public void accept(@NotNull PremiseMatch m) {

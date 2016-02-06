@@ -5,16 +5,19 @@ import org.jetbrains.annotations.NotNull;
 /**
  * reverting fork for use during premise matching
  */
-public class PremiseMatchFork extends ThenFork<PremiseMatch> {
+public final class PremiseMatchFork extends ThenFork {
 
-    public PremiseMatchFork(ProcTerm<PremiseMatch>[] n) {
+    private final ProcTerm[] termCache;
+
+    public PremiseMatchFork(ProcTerm[] n) {
         super(n);
+        this.termCache = terms();
     }
 
     @Override
-    public void accept(@NotNull PremiseMatch m) {
+    public final void accept(@NotNull PremiseMatch m) {
         int revertTime = m.now();
-        for (ProcTerm<PremiseMatch> s : terms()) {
+        for (ProcTerm s : termCache) {
             s.accept(m);
             m.revert(revertTime);
         }

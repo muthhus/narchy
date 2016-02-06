@@ -33,4 +33,8 @@ public class FasterIntArrayList extends IntArrayList {
         size = index+1;
     }
 
+    public void clearFast() {
+        popTo(-1);
+    }
+
 }

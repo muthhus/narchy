@@ -38,7 +38,7 @@ abstract public class ArraySortedIndex<E> extends SortedIndex<E> {
         return list.hashCode();
     }
 
-    @Override public final List<E> getList() {
+    @Override public final List<E> list() {
         return list;
     }
 

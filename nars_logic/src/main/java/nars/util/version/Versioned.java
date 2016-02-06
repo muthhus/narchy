@@ -130,7 +130,7 @@ public class Versioned<X> extends FasterIntArrayList /*Comparable<Versioned>*/ {
     @Override
     public void clear() {
         super.clear();
-        value.clear();
+        value.clearFast();
         this.current = null;
     }
 
