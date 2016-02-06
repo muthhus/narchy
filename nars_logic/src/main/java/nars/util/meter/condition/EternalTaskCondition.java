@@ -449,7 +449,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
 
         BiConsumer<String,Task> printer = (label,s) -> {
             out.print('\t' + label + ' ');
-            out.println(s.getExplanation().replace("\n", "\n\t\t"));
+            out.println(s.explanation().replace("\n", "\n\t\t"));
         };
 
         if (valid!=null) {

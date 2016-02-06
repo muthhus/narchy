@@ -1019,7 +1019,7 @@ public abstract class NAR implements Level, Consumer<Task> {
             //throw new RuntimeException(
             if (Global.DEBUG) {
                 System.err.println(
-                        input + " " + input.log() + " deleted:\n" + input.getExplanation());
+                        input + " " + input.log() + " deleted:\n" + input.explanation());
             }
             return null;
         }
@@ -1103,7 +1103,7 @@ public abstract class NAR implements Level, Consumer<Task> {
         @NotNull
         @Override
         public String getMessage() {
-            return "Invalid Task: " + task.getExplanation();
+            return "Invalid Task: " + task.explanation();
         }
 
     }

@@ -44,7 +44,6 @@ import static nars.nal.LocalRules.solutionBudget;
 import static nars.nal.Tense.TIMELESS;
 import static nars.truth.TruthFunctions.eternalize;
 import static nars.truth.TruthFunctions.temporalProjectionOld;
-import static nars.truth.TruthFunctions.eternalize;
 
 /**
  * A task to be processed, consists of a Sentence and a BudgetValue.
@@ -56,7 +55,7 @@ import static nars.truth.TruthFunctions.eternalize;
  */
 public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Tasked, Supplier<Task> {
 
-    static void getExplanation(@NotNull Task task, int indent, @NotNull StringBuilder sb) {
+    static void explanation(@NotNull Task task, int indent, @NotNull StringBuilder sb) {
         //TODO StringBuilder
 
         for (int i = 0; i < indent; i++)
@@ -83,11 +82,11 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         sb.append("  ");
         if (pt != null) {
             //sb.append("  PARENT ");
-            getExplanation(pt, indent+1, sb);
+            explanation(pt, indent+1, sb);
         }
         if (pb != null) {
             //sb.append("  BELIEF ");
-            getExplanation(pb, indent+1, sb);
+            explanation(pb, indent+1, sb);
         }
     }
 
@@ -560,15 +559,15 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
 
     @NotNull
-    default String getExplanation() {
+    default String explanation() {
         StringBuilder sb = new StringBuilder();
-        return getExplanation(sb).toString();
+        return explanation(sb).toString();
     }
 
     @NotNull
-    default StringBuilder getExplanation(@NotNull StringBuilder temporary) {
+    default StringBuilder explanation(@NotNull StringBuilder temporary) {
         temporary.setLength(0);
-        getExplanation(this, 0, temporary);
+        explanation(this, 0, temporary);
         return temporary;
     }
 

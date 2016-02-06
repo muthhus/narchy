@@ -202,25 +202,27 @@ public final class ConceptProcess implements Premise {
 
                 }
 
-                if (td == ITERNAL && bd == ITERNAL) {
+                long to = task().occurrence();
+                long bo = belief!=null ? belief().occurrence() : ETERNAL;
+
+                int occDiff = (to!=ETERNAL && bo!=ETERNAL) ? (int) (bo - to) : 0;
+
+                if (td == ITERNAL && bd == ITERNAL)
+                {
 
                     long aTask = tp.subtermTime(ca, td);
                     long aBelief = bp.subtermTime(ca, bd);
                     long bTask = tp.subtermTime(cb, td);
                     long bBelief = bp.subtermTime(cb, bd);
 
-                    if(belief()!=null) {
+                    if (belief() != null) {
 
-                        long to = task().occurrence();
-                        long bo = belief().occurrence();
-
-                        int docc = (int) (bo - to);
 
                         boolean reversed = false;
                         /* reverse subterms if commutive and the terms are opposite the corresponding pattern */
                         if (derived.op().isCommutative()) {
                             if (!p.resolve(((Compound) cp).term(0)).equals(derived.term(0))) {
-                                docc = -docc;
+                                occDiff = -occDiff;
                                 reversed = true;
                             }
                         }
@@ -230,39 +232,48 @@ public final class ConceptProcess implements Premise {
                                 bBelief != ETERNAL && bTask == ETERNAL) {
                             //forward: task -> belief
                             //t = (int) (task().occurrence() - belief().occurrence());
-                            t = docc;
-                            if (reversed) occ-=t; else occ += t;
+                            t = occDiff;
+                            if (reversed) occ -= t;
+                            else occ += t;
 
                         } else if (aTask == ETERNAL && aBelief != ETERNAL &&
                                 bBelief == ETERNAL && bTask != ETERNAL) {
                             //reverse: belief -> task
-                            t = -docc;
+                            t = -occDiff;
                             //t = (int) (belief().occurrence() - task().occurrence());
                             //t = (int) (task().occurrence() - belief().occurrence());
-                            if (reversed) occ+=t; else occ -= t;
+
+                            if (!reversed) {
+                                occ -= t;
+                            } else {
+                                occ += t;
+                            }
+
+
                         } else {
 
                             //both ITERNAL
 
                             if ((to != ETERNAL) && (bo != ETERNAL)) {
-                                t = docc;
-                                if (reversed) occ-=t; else occ += t;
+                                t = occDiff;
+                                if (reversed) occ -= t;
+                                else occ += t;
                             }
 
                         }
                     }
 
-
                 } else if (td == ITERNAL && bd!=ITERNAL) {
                     //belief has dt
-                    t = bd;
+                    t = bd;// + occDiff;
                     //TODO align
                 } else if (td != ITERNAL && bd==ITERNAL) {
                     //task has dt
-                    t = td;
+                    t = td + occDiff;
                     //occ += t; //TODO check this alignment
 
                 }   else {
+                    //t = occDiff;
                     //throw new RuntimeException("unhandled case");
                     //???
                     //t = (td+bd)/2;

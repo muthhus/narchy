@@ -208,10 +208,10 @@ public class NAL8Test extends AbstractNALTester {
     public void belief_deduction_by_condition()  {
         TestNAR tester = test();
 
-        tester.input("(open({t001}) ==>+5 <{t001} --> [opened]>).");
+        tester.input("(open({t001}) ==>+5 [opened]:{t001}).");
         tester.inputAt(10, "open({t001}). :|:");
 
-        tester.mustBelieve(cycles, "<{t001} --> [opened]>", 1.0f, 0.81f, 15);
+        tester.mustBelieve(cycles, "[opened]:{t001}", 1.0f, 0.81f, 15);
 
     }
     @Test
@@ -307,10 +307,10 @@ public class NAL8Test extends AbstractNALTester {
     public void detaching_condition_2()  {
         TestNAR tester = test();
 
-        tester.input("<(SELF,{t001}) --> at>. :|: ");
-        tester.inputAt(10, "((<(SELF,{t001}) --> at> &&+5 open({t001})) ==>+5 <{t001} --> [opened]>). :|:");
+        tester.input("at:(SELF,{t001}). :|: ");
+        tester.inputAt(10, "((at:(SELF,{t001}) &&+5 open({t001})) ==>+5 [opened]:{t001}). :|:");
 
-        tester.mustBelieve(cycles, "(open({t001}) ==>+5 <{t001} --> [opened]>)", 1.0f, 0.81f, 0);
+        tester.mustBelieve(cycles, "(open({t001}) ==>+5 [opened]:{t001})", 1.0f, 0.81f, 0);
 
     }
 
@@ -320,8 +320,8 @@ public class NAL8Test extends AbstractNALTester {
     public void goal_ded_2()  {
         TestNAR tester = test();
 
-        tester.input("<(SELF,{t001}) --> at>. :|:");
-        tester.inputAt(10, "(<(SELF,{t001}) --> at> &&+5 open({t001}))!");
+        tester.input("at:(SELF,{t001}). :|:");
+        tester.inputAt(10, "(at:(SELF,{t001}) &&+5 open({t001}))!");
 
         tester.mustDesire(cycles, "open({t001})", 1.0f, 0.81f);
 
@@ -383,7 +383,7 @@ public class NAL8Test extends AbstractNALTester {
     public void subgoal_2()  {
         TestNAR tester = test();
 
-        tester.input("(<(SELF,{t002}) --> hold> &&+5 (<(SELF,{t001}) --> at> &&+5 open({t001})))!");
+        tester.input("(<(SELF,{t002}) --> hold> &&+5 (at:(SELF,{t001}) &&+5 open({t001})))!");
 
         tester.mustDesire(cycles, "<(SELF,{t002}) --> hold>",
                 1.0f, 0.81f);
@@ -433,9 +433,9 @@ public class NAL8Test extends AbstractNALTester {
 
 
         tester.input("<(SELF,{t002}) --> hold>.");
-        tester.inputAt(10, "(<(SELF,{t002}) --> hold> &&+5 (<(SELF,{t001}) --> at> &&+5 open({t001}) ))!");
+        tester.inputAt(10, "(<(SELF,{t002}) --> hold> &&+5 (at:(SELF,{t001}) &&+5 open({t001}) ))!");
 
-        tester.mustDesire(cycles, "( <(SELF,{t001}) --> at> &&+5 open({t001}))", 1.0f, 0.81f);
+        tester.mustDesire(cycles, "( at:(SELF,{t001}) &&+5 open({t001}))", 1.0f, 0.81f);
 
     }
 
@@ -444,10 +444,10 @@ public class NAL8Test extends AbstractNALTester {
     public void detaching_single_premise2()  {
         TestNAR tester = test();
 
-        tester.input("(<(SELF,{t001}) --> at> &&+5 open({t001}) )!");
+        tester.input("(at:(SELF,{t001}) &&+5 open({t001}) )!");
 
 
-        tester.mustDesire(cycles, "<(SELF,{t001}) --> at>", 1.0f, 0.81f);
+        tester.mustDesire(cycles, "at:(SELF,{t001})", 1.0f, 0.81f);
 
     }
 
@@ -455,10 +455,10 @@ public class NAL8Test extends AbstractNALTester {
     public void detaching_condition()  {
         TestNAR tester = test();
 
-        tester.input("( ( hold:(SELF,{t002}) &&+5 (at:(SELF,{t001}) &&+5 open({t001}))) ==>+5 <{t001} --> [opened]>).");
+        tester.input("( ( hold:(SELF,{t002}) &&+5 (at:(SELF,{t001}) &&+5 open({t001}))) ==>+5 [opened]:{t001}).");
         tester.inputAt(10, "hold:(SELF,{t002}). :|:");
 
-        tester.mustBelieve(cycles, "((at:(SELF,{t001}) &&+5 open({t001})) ==>+5 <{t001} --> [opened]>)", 1.0f, 0.81f, 10);
+        tester.mustBelieve(cycles, "((at:(SELF,{t001}) &&+5 open({t001})) ==>+5 [opened]:{t001})", 1.0f, 0.81f, 10);
 
     }
 

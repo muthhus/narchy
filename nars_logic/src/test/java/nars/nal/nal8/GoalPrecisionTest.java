@@ -64,7 +64,7 @@ public class GoalPrecisionTest {
                 System.out.println(a.task);
                 System.out.println(a.task.log());
                 a.nar.concept(a.task.concept()).print();
-                System.out.println(a.task.getExplanation());
+                System.out.println(a.task.explanation());
             }
 
             //a.task.mulPriority(0);

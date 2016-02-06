@@ -89,19 +89,19 @@ public class NAL7Test extends AbstractNALTester {
 
 
     @Test public void updating_and_revision()  {
-        testTemporalRevision(10, 0.50f, 0.64f, "<(John,key) --> hold>");
+        testTemporalRevision(10, 0.50f, 0.7f, "<(John,key) --> hold>");
     }
     @Test public void updating_and_revision2()  {
-        testTemporalRevision(1, 0f, 0.47f, "<(John,key) --> hold>");
+        testTemporalRevision(1, 0.5f, 0.7f, "<(John,key) --> hold>");
     }
 
     void testTemporalRevision(int delay, float freq, float conf, String belief) {
         TestNAR tester = test();
         tester.nar.log();
         tester.input(belief + ". :|: %1.00;0.65%");
-        tester.inputAt(delay, belief + ". :|: %0.9;0.70%");
+        tester.inputAt(delay, belief + ". :|: %0.5;0.70%");
         tester.inputAt(delay+1, belief + "? :|:");
-        tester.mustBelieve(delay+15, belief,  freq, conf, delay);
+        tester.mustBelieve(delay+50, belief,  freq, conf, delay);
     }
 
     @Test public void testSumNeg() {
@@ -385,15 +385,31 @@ public class NAL7Test extends AbstractNALTester {
         compositionTest(4, 3);
     }
 
-    private void compositionTest(int t, int dt) {
+    @Test public void induction_on_events_composition_post()  {
         TestNAR tester = test();
 
-        //tester.nar.log();
+        int t = 1;
+        int dt = 7;
+        String component = "(open:(John,door) &&+0 hold:(John,key))";
+        tester.inputAt(t, component + ". :|:");
+        tester.inputAt(t + dt, "enter:(John,room). :|:");
 
+        tester.mustBelieve(15, "(" + component + " ==>+" + dt + " enter:(John,room))",
+                1.00f, 0.45f,
+                t);
+
+
+    }
+
+    private void compositionTest(int t, int dt) {
+        TestNAR tester = test();
         tester.inputAt(t, "hold:(John,key). :|:");
         tester.inputAt(t, "(open:(John,door) ==>+" + dt + " enter:(John,room)). :|:");
 
-        String component = "(hold:(John,key) &&+0 open:(John,door))";
+        tester.nar.log();
+
+        String component = "(open:(John,door) &&+0 hold:(John,key))";
+
 
         tester.mustBelieve(cycles, component,
                 1.00f, 0.73f,
@@ -407,9 +423,8 @@ public class NAL7Test extends AbstractNALTester {
                 1.00f, 0.81f,
                 t+dt);
 
-
-        tester.mustBelieve(cycles, "(" + component + " ==>+" + dt + " enter:(John,room))",
-                1.00f, 0.34f,
+        tester.mustBelieve(cycles*2, "(" + component + " ==>+" + dt + " enter:(John,room))",
+                1.00f, 0.45f,
                 t);
     }
 

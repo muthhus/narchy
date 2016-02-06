@@ -309,7 +309,7 @@ public class GrammarTest2 {
                     @Override public double getAsDouble() {
                         //measure of recency/relevancy
                         if (current == c) return 1f;
-                        if (prev == c) return 0f;
+                        if (prev == c) return -0.5f;
                         return -1f;
                        
 //                        switch (dt) {
