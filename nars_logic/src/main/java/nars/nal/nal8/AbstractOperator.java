@@ -22,9 +22,6 @@
 package nars.nal.nal8;
 
 import nars.$;
-import nars.nal.nal8.decide.DecideAboveDecisionThreshold;
-import nars.nal.nal8.decide.Decider;
-import nars.task.Task;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -59,6 +56,7 @@ public abstract class AbstractOperator implements Consumer<Execution> {
     public AbstractOperator() {
         this(null);
     }
+    
     public AbstractOperator(@Nullable String operatorName) {
         if (operatorName == null) {
             operatorName = getClass().getSimpleName();
@@ -67,18 +65,9 @@ public abstract class AbstractOperator implements Consumer<Execution> {
     }
 
 
-    @NotNull
-    public Decider decider() {
-        return DecideAboveDecisionThreshold.the;
-    }
-
-
     @Override
     public void accept(@NotNull Execution execution) {
-        Task o = execution.task;
-        if (o.isCommand() || decider().test(o)) {
-            _execute(execution);
-        }
+        _execute(execution);        
     }
 
     /**

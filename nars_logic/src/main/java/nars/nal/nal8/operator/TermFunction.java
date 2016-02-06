@@ -1,6 +1,7 @@
 package nars.nal.nal8.operator;
 
 import nars.$;
+import nars.Op;
 import nars.Symbols;
 import nars.nal.Tense;
 import nars.nal.nal8.Execution;
@@ -140,8 +141,15 @@ public abstract class TermFunction<O> extends SyncOperator {
 
     @Override
     public void execute(@NotNull Execution e) {
-        O y = function(Operator.opArgs(e.task.term()), e.nar.index());
-        if (!e.task.isCommand()) {
+        final Task tt = e.task;
+        final Compound ttt = tt.term();
+        final Compound args = Operator.opArgs(ttt);
+        if (!tt.isCommand()) {
+            if (!validArgs(args))
+                return;
+        }
+        O y = function(args, e.nar.index());
+        if (!tt.isCommand()) {
             feedback(e, y);
         }
     }
@@ -220,6 +228,11 @@ public abstract class TermFunction<O> extends SyncOperator {
     public float equals(@NotNull Term a, Term b) {
         //default: Term equality
         return a.equals(b) ? 1.0f : 0.0f;
+    }
+
+    private boolean validArgs(Compound args) {
+        //TODO filtering
+        return args.last().op(Op.VAR_DEP);
     }
 }
 

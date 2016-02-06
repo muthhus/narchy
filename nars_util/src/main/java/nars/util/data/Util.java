@@ -645,6 +645,8 @@ public enum Util {
 
     /** from boofcv: */
     public static void pause(long milli) {
+        if (milli == 0) return;
+        
         Thread t = Thread.currentThread();
         long start = System.currentTimeMillis();
 

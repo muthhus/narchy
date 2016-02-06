@@ -2,7 +2,8 @@ package nars.nlp;
 
 import nars.$;
 import nars.NAR;
-import nars.guifx.demo.NARideDefault;
+import nars.guifx.demo.NARide;
+import nars.nar.Default;
 import nars.task.in.Twenglish;
 import nars.term.Term;
 import nars.util.event.On;

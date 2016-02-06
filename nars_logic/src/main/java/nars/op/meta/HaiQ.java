@@ -59,8 +59,8 @@ public class HaiQ {
 
 		actions = outputs;
 
-		int states = (int) Math.ceil(Math.sqrt(_states));
-		nStates = inputs * inputs;
+		int states = (int) Math.ceil(1+Math.sqrt(_states));
+		nStates = states*states;
 
 		this.inputs = inputs;
 

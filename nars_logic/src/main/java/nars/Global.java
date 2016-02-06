@@ -82,7 +82,6 @@ public enum Global {
     public static boolean DEBUG_DETECT_DUPLICATE_DERIVATIONS = false;
     public static boolean DEBUG_DETECT_DUPLICATE_RULES = false;
 
-    public static final float EXECUTION_DESIRE_EXPECTATION_THRESHOLD = 0.5f;
 
 
     //FIELDS BELOW ARE BEING CONVERTED TO DYNAMIC, NO MORE STATIC: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

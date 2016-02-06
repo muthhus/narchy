@@ -2,8 +2,8 @@
 
 ![OpenNARS Logo](https://raw.githubusercontent.com/opennars/opennars/graphplan1/doc/opennars_logo.png)
 
-Theory Overview
----------------
+Theory
+------
 
 Non-Axiomatic Reasoning System ([NARS](https://sites.google.com/site/narswang/home)) processes tasks imposed by its environment, which may include human users or other computer systems. Tasks can arrive at any time, and there is no restriction on their contents as far as they can be expressed in __Narsese__, the I/O language of NARS.
 
@@ -34,69 +34,31 @@ All the **selections** in steps 1 and 2 are **probabilistic**, in the sense that
 
 At the current time, the most comprehensive description of NARS are the books [Rigid Flexibility: The Logic of Intelligence](http://www.springer.com/west/home/computer/artificial?SGWID=4-147-22-173659733-0) and [Non-Axiomatic Logic: A Model of Intelligent Reasoning](http://www.worldscientific.com/worldscibooks/10.1142/8665) . Various aspects of the system are introduced and discussed in many papers, most of which are [available here](http://www.cis.temple.edu/~pwang/papers.html).
 
-Beginners can start at the following online materials:
-
  * The basic ideas behind the project: [The Logic of Intelligence](http://www.cis.temple.edu/~pwang/Publication/logic_intelligence.pdf)
  * The high-level engineering plan: [From NARS to a Thinking Machine](http://www.cis.temple.edu/~pwang/Publication/roadmap.pdf)
  * The core logic: [From Inheritance Relation to Non-Axiomatic Logic](http://www.cis.temple.edu/~pwang/Publication/inheritance_nal.pdf)
  * The semantics: [Experience-Grounded Semantics: A theory for intelligent systems](http://www.cis.temple.edu/~pwang/Publication/semantics.pdf)
  * The memory and control: [Computation and Intelligence in Problem Solving](http://www.cis.temple.edu/~pwang/Writing/computation.pdf)
 
+[![](https://badge.imagelayers.io/automenta/narchy:latest.svg)](https://imagelayers.io/?images=automenta/narchy:latest 'Get your own badge on imagelayers.io')
 
 Contents
 --------
- * **nars_java** - main logic engine
- * **nars_gui** - java.swing GUI
- * **nars_scala** - embryo of NARS in Scala (not currently active, just to see how NARS could look in Scala)
- * **nars_web** - web server
- * **nars_lab** - experiments & demos
- * **nars_test** - unit tests
- * **nal** - examples
-
-In nars_java/ and nars_gui/ are the NARS core and the Swing GUI in Java. This is derived from the code of Pei Wang in nars_java.0/ directory.
-
-For an overview of reasoning features, see working examples explained in SingleStepTestingCases and MultiStepExamples.
+ * **nars_java** - Logic Reasoner
+ * **nars_gui** - JavaFX GUI
+ * **nars_web** - Web server and client
+ * **nars_lab** - Experiments & demos
+ * **nars_test** - Reasoner unit tests
+ * **nars_util** - Non-NARS specific supporting utilities
+ * **nal** - Example files
 
 
-Run Requirements
-----------------
+Requirements
+------------
  * Java 8 (OpenJDK or Oracle JDK)
-
-
-Command Shell Usage
--------------------
-You can launch NARS in several ways from command window (shell):
-
-```
-- console (reads from stdin and writes to stdout):
-    ./nars.sh
-
-- gui (Swing)
-    ./gui.sh [.nal input file]
-    
-- reasoner loaded from an experience file:
-    ./nars.sh Examples/Example-NAL1-edited.txt --silence 90
-
-- web server start for HTML GUI usage:
-    ./web.sh 9999 localhost 9100 1000
-     listen port^     ^IP    ^port ^time for each reasoning step in ms
-```
-
-
-Example Files
--------------
-
-Example experience files are in directory nal/Examples
- * "Example-NALn-*.txt" contains single step examples for most of the inference rules defined in NAL level n. The "edited" version contains English translations, and with the unrelated information removed; the "unedited" version contains the actual input/output data recorded by the "Save Experience" function of the GUI. The files can be loaded using the "Load Experience" function of the GUI. 
- * "Example-MultiStep-edited" contains multi-step inference examples described in http://code.google.com/p/open-nars/wiki/MultiStepExamples
- * "Example-NLP-edited" contains an example of natural language processing described in the AGI-13 paper "Natural Language Processing by Reasoning and Learning".
-
-Unit tests are in nal/test.
-
-
-Development Requirements
-------------------------
+   * Java 9 preferred
  * maven, or an IDE with maven support
+ 
 
 
 History

@@ -15,6 +15,8 @@ import nars.term.variable.Variable;
 import nars.util.event.Topic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static nars.Op.PRODUCT;
 
@@ -27,6 +29,7 @@ import static nars.Op.PRODUCT;
  */
 public class Execution implements Runnable {
 
+    private static final Logger logger = LoggerFactory.getLogger(Execution.class);
 
     public final static float feedbackPriorityMultiplier = 1.0f;
     public final static float feedbackDurabilityMultiplier = 1.0f;
@@ -116,8 +119,12 @@ public class Execution implements Runnable {
 
         //add var dep as last term if missing
         Term xLast = x.last();
-        if (!xLast.op(Op.VAR_DEP))
-            throw new RuntimeException("feedback requires variable in last position");
+        if (!xLast.op(Op.VAR_DEP)) {
+            //logger.warn(
+            throw new RuntimeException(
+                "feedback requires variable in last position: " + operation);
+            //return;
+        }
         //x = $.p(Terms.concat(x.terms(), y)); //defaultResultVariable));
 
         //        } else {

@@ -1,5 +1,18 @@
 package nars.util.signal;
 
+import nars.Global;
+import nars.NAR;
+import nars.Symbols;
+import nars.concept.Concept;
+import nars.concept.util.BeliefTable;
+import nars.op.meta.HaiQ;
+import nars.task.MutableTask;
+import nars.task.Task;
+import nars.term.Termed;
+import org.apache.commons.lang3.mutable.MutableFloat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -8,18 +21,6 @@ import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import nars.Global;
-import nars.NAR;
-import nars.concept.Concept;
-import nars.concept.util.BeliefTable;
-import nars.op.meta.HaiQ;
-import nars.task.MutableTask;
-import nars.task.Task;
-import nars.term.Termed;
-import static nars.util.signal.NarQ.expectation;
-import org.apache.commons.lang3.mutable.MutableFloat;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Q-Learning Coprocessor (NAR Operator/Plugin)
@@ -31,6 +32,9 @@ public class NarQ implements Consumer<NAR> {
     private final NAR nar;
 
     public HaiQ q = null;
+    
+    /** master control of strength factor of output activity */
+    public final MutableFloat power = new MutableFloat(1f);
     
     
     /** numeric vector percept */
@@ -76,20 +80,57 @@ public class NarQ implements Consumer<NAR> {
         float ran(); 
     }
 
+    public static Action NullAction = new Action() {
+        private float last;
+        
+        private void clear() {
+            last = 0f;
+        }
+        
+        @Override
+        public void run(float strength) {
+            last = strength;
+        }
+
+        @Override
+        public float ran() {
+            float l = last;
+            clear();
+            return l;
+        }
+        
+    };
+    
     /** inputs a goal task for a given term in proportion to the supplied strength value */
-    public static class InputGoal implements Action {
+    public static class InputTask implements Action {
         final Termed term;
         final NAR nar;
-        public InputGoal(NAR n, Termed term) {
+        private final char punct;
+        private final boolean invert;
+
+        @Deprecated public InputTask(NAR n, Termed term) {
+            this(n, term, Symbols.GOAL, false);
+        }
+
+        public InputTask(NAR n, Termed term, char punct, boolean invert) {
             this.nar = n;
             this.term = term;
+            this.punct = punct;
+            this.invert = invert;
         }
 
         @Override
         public void run(float strength) {
-            float existingDesire = Math.max(0.5f, NarQ.expectation(nar, term, 0, false, 0) - 0.5f) * 2f; //range 0..1.0 if >0.5, 0 otherwise
-            float additionalDesire = 0.5f + 0.5f * Math.max(0.01f, (1f - existingDesire)); //some minimal amount if already totally maxed out
-            final Task t = new MutableTask(term).goal().truth(additionalDesire, strength)
+            
+            //float existingDesire = Math.max(0.5f, NarQ.expectation(nar, term, 0, false, 0) - 0.5f) * 2f; //range 0..1.0 if >0.5, 0 otherwise
+            //float additionalDesire = 0.5f + 0.5f * Math.max(0.01f, (1f - existingDesire)); //some minimal amount if already totally maxed out
+            
+            float existingExp = NarQ.expectation(nar, term, 0.5f, false, 0); //range 0..1.0 if >0.5, 0 otherwise
+            float additionalExp = Math.max(0.1f, strength - existingExp);
+            
+            
+            //TODO solve for strength/additional desire so expectation is correct
+            final Task t = new MutableTask(term, punct).truth(invert ? 0f : 1f, additionalExp)
                     //.time(Tense.Future, nar.memory)                   
                     .time(nar.time(), nar.time() + 1)
                     .log("Q Action");
@@ -101,7 +142,9 @@ public class NarQ implements Consumer<NAR> {
         @Override
         public float ran() {
             int dt = 0; //nar.memory.duration()/2; //-1; //duration/2?
-            return NarQ.expectation(nar, term, 0.5f /* equal pos/neg opportunity */, false, dt /* desire in previous time */);
+            float e =  NarQ.expectation(nar, term, 0.5f /* equal pos/neg opportunity */, punct == Symbols.GOAL ? false : true, dt /* desire in previous time */);
+            if (invert) e = 1f- e;
+            return e;
         }     
         
         
@@ -119,9 +162,10 @@ public class NarQ implements Consumer<NAR> {
     public final Map<DoubleSupplier /* TODO make FloatSupplier */, MutableFloat> reward = Global.newHashMap();
 
     /**
-     * always hope for your discontent
+     * reward bias
+     * negative value: always hope for your discontent
      */
-    float rewardBias = -0.1f;
+    float rewardBias = -0.5f;
 
     public NarQ(NAR n, Vercept input) {
         this.nar = n;
@@ -135,7 +179,7 @@ public class NarQ implements Consumer<NAR> {
     @Override
     public void accept(NAR t) {
         float[] ii = inputs();
-        if (ii != null) {          
+        if (ii != null) {
             if (validDimensionality(ii.length)) {
                 act(q.act(ii, reward()));
             }
@@ -152,7 +196,7 @@ public class NarQ implements Consumer<NAR> {
 
         if (q == null || q.inputs() != inputs || q.actions() != outputs) {
             //TODO allow substituting an arbitrary I/O agent interface
-            q = new HaiQImpl(inputs, inputs*2, outputs);
+            q = new HaiQImpl(inputs, inputs*3, outputs);
         }
 
         return true;
@@ -343,9 +387,14 @@ public class NarQ implements Consumer<NAR> {
 //            //logger.info("q act: {}", t );
 //            nar.input(t);
 //        }
-        Action a = outs.get(x);
-        if (a!=null)
-            a.run(1f / outs.size());
+
+        final float p  = power.floatValue();        
+        if (p > 0) {
+            final List<Action> o = outs;               
+            Action a = o.get(x);               
+            if (a!=null)
+                a.run(p);
+        }
         
     }
 

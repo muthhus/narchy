@@ -1,11 +1,17 @@
-package nars.java;
+package nars.nlp;
 
+import com.gs.collections.api.tuple.primitive.CharFloatPair;
+import com.gs.collections.impl.map.mutable.primitive.CharFloatHashMap;
 import com.gs.collections.impl.set.mutable.primitive.CharHashSet;
 import nars.Global;
 import nars.NAR;
+import nars.Symbols;
 import nars.concept.Concept;
+import nars.java.MethodOperator;
+import nars.java.Naljects;
 import nars.nar.Default;
 import nars.task.Task;
+import nars.term.Termed;
 import nars.util.data.Util;
 import nars.util.signal.NarQ;
 import nars.util.signal.NarQ.InputTask;
@@ -28,59 +34,79 @@ import java.util.function.DoubleSupplier;
  */
 public class GrammarTest2 {
 
-    int frames = 2048;
     int delay = 0;
+    int charRate = 8;
 
-    public GrammarTest2() throws Exception {
+    protected float reward = 0; //current reward
 
-        //Global.DEBUG = true;
+    public final Tape tape;
+    protected final Default n;
 
-        int charRate = 16;
-        Default n = new Default(1000, 3, 2, 3);
+    public GrammarTest2() throws Exception  {
+        n = new Default(1000, 1, 2, 3);
         Naljects o = new Naljects(n);
-        final Tape tape = o.the("tape", Tape.class, "ababcdcdeeee", charRate);
+        this.tape = o.the("tape", Tape.class, "aaabbbaaabbb               ", charRate);
+    }
+    
+    protected void run() throws Exception {
+                //Global.DEBUG = true;
+
+        
+
+        
         
         Vercept i = new Vercept();
         NarQ q = new NarQ(n, i);
         
+
         //INPUTS
-        i.add(new DoubleSupplier() {           
+        /*i.add(new DoubleSupplier() {           
             @Override public double getAsDouble() {
                 return tape.phase();
             }                        
-        });
-        i.addAll(tape.getCharSensors(-1));
-        i.addAll(tape.getCharSensors(0));
+        });*/
+        i.addAll(tape.getCharSensors());
         
-        q.reward.put(tape.correctPredictionReward, new MutableFloat(1f));
-        
-        q.outs.addAll(tape.getPredictActions(n));
-        
-        //n.logSummaryGT(System.out, 0.2f);
+        q.reward.put(() -> {
+            float s = tape.prevScore;
+            float p = tape.charPeriod != 1 ? 1f - tape.phase(n.time()) : 1f;
+            return (reward = s * p);
+        }, new MutableFloat(1f));
 
+        //q.outs.add(NarQ.NullAction);
+        //q.outs.add(new InputTask(n, n.term("Tape(prev, tape, (), #1)")));
+        //q.outs.add(new InputTask(n, n.term("Tape(current, tape, (), #1)")));
+        q.outs.addAll(tape.getPredictActions(n,false, false));
+        q.outs.addAll(tape.getPredictActions(n,true, false));
+
+        n.logSummaryGT(System.out, 0.8f);
+
+        q.power.setValue(0.3f);
+        n.memory.activationRate.setValue(0.3f);
 
         //n.memory.executionExpectationThreshold.setValue(0.55f);
         n.core.confidenceDerivationMin.setValue(0.01f);
 
+        //n.memory.executionExpectationThreshold.setValue(.6f);
         n.memory.DEFAULT_JUDGMENT_PRIORITY = 0.5f;
         n.memory.DEFAULT_GOAL_PRIORITY = 0.5f;
-        n.memory.activationRate.setValue(0.5f);
 
-        n.memory.duration.set(2);
-        n.memory.shortTermMemoryHistory.set(4);
-        n.memory.cyclesPerFrame.set(1);
+        n.memory.duration.set(1);
+        n.memory.shortTermMemoryHistory.set(3);
+        n.memory.cyclesPerFrame.set(4);
         
         //n.initNAL9();
 
         
         n.onFrame((nn) -> {
-           tape.setTime(nn.time(), this::onStep); 
+           tape.setTime(nn.time(), this::onStep);
         });
 
         tape.charSet();
         
 
-        for (int f = 0; f < frames; f++) {
+        //for (int f = 0; f < frames; f++) {
+        while (true) {
 
             n.step();
 
@@ -88,7 +114,6 @@ public class GrammarTest2 {
         }
 
         //dump(n);
-        
 
     }
 
@@ -101,7 +126,7 @@ public class GrammarTest2 {
     }
 
     public static void main(String[] args) throws Exception {
-        new GrammarTest2();
+        new GrammarTest2().run();
     }
 
 
@@ -142,29 +167,23 @@ public class GrammarTest2 {
         public final CharHashSet chars;
 
         public StringBuilder log;
-        private float score, totalScore;
+        float prevScore, totalScore = 0;
         private long time;
-        private final DoubleSupplier correctPredictionReward;
         int charPeriod; //cycles per char
         private char current, prev;
+        private char next;
+        private long currentTime;
+        protected float coherence;
 
         public Tape(String tape, int charRate) {
             this.buffer = tape;
             this.charPeriod = charRate;
             time = 0;
-            score = 0;
             this.log = new StringBuilder(1024);
 
             chars = new CharHashSet();
             chars.addAll(tape.toCharArray());
             
-            correctPredictionReward = new DoubleSupplier() {
-                
-                @Override public double getAsDouble() {
-                    return score;
-                }
-               
-            };
             
             setTime(0, null);
         }
@@ -195,21 +214,68 @@ public class GrammarTest2 {
 
 
         private void setTime(long t, Runnable onStep) {
-            this.time = t;
+            this.currentTime = t;
+
             //System.out.println("time=" + t + ", " + (time % charRate));
-            if (time % charPeriod == (charPeriod-1)) {               
+            if (t % charPeriod == (charPeriod-1)) {               
+
                 step();
+
+
+
                 if (onStep!=null)
                     onStep.run();
+
+                this.time++;
+
+                current = c(time);
+                current();  //inputs as belief
+                prev = c(time-1);
+                prev(); //inputs as belief
+                next = c(time+1);
             }
 
         }
         
         private void step() {
-            totalScore += score;
-            score = 0; //reset score for the next char
-            current = c(0);
-            prev = c(1);
+
+            //(tt.freq())-0.5f * tt.conf();
+
+            //reward and punish more as it becomes sooner to next update
+            //float p = (1f+phase/2f)/charPeriod * strength;
+
+            //float equalsCurrent = current == c ? 0.5f : 0;
+            //float equalsNext = next == c ? 1 : 0;
+
+            if (!votes.isEmpty()) {
+                CharFloatPair m = votes.keyValuesView().maxBy(CharFloatPair::getTwo);
+
+                float total = (float)votes.keyValuesView().sumOfFloat(CharFloatPair::getTwo);
+
+                if (m != null) {
+                    char predicted = m.getOne();
+                    float amount = m.getTwo() / total;
+
+                    float s = (predicted == next) ? 1 : -1;
+
+                    //            System.out.println("@" + time + " " + prev + "," + current + "," + next +
+                    //                    "  ... score+="+ ds + ", total=" + totalScore
+                    //                    //+ "\n\t" + tt
+                    //            );
+                    float score = s * amount;
+
+                    totalScore += score;
+                    prevScore = score;
+                    coherence = amount;
+
+                    votes.clear();
+                    return;
+                }
+
+            }
+
+            prevScore = -0.5f;
+            coherence = 0;
         }
 
         public char prev() {
@@ -221,30 +287,37 @@ public class GrammarTest2 {
         }
         
         private char next() {
-            return c(time+1);
+            return next;
         }
 
 
                 
         /** time since last update to next char */
-        private float phase() {
-            return (time  % charPeriod) / ((float)(charPeriod));
+        private float phase(long t) {
+            float cp = charPeriod;
+            if (cp == 1)
+                return 1f;
+            return (t % cp) / ((float)(cp)-1);
         }
 
 
 
-        private List<DoubleSupplier> getCharSensors(int dt) {
+        private List<DoubleSupplier> getCharSensors() {
             List<DoubleSupplier> d = Global.newArrayList();
             for (char c : chars()) {
                 d.add(new DoubleSupplier() {
-                    
                     @Override public double getAsDouble() {
-                        switch (dt) {
-                            case 0: return current == c ? 1 : -1;
-                            case -1: return prev == c ? 1 : -1;
-                            default:
-                                return 0; //invalid deltatime
-                        }
+                        //measure of recency/relevancy
+                        if (current == c) return 1f;
+                        if (prev == c) return 0f;
+                        return -1f;
+                       
+//                        switch (dt) {
+//                            case 0: return current == c ? 1 : -1;
+//                            case -1: return prev == c ? 1 : -1;
+//                            default:
+//                                return 0; //invalid deltatime
+//                        }
                     }
                    
                 });                
@@ -253,48 +326,40 @@ public class GrammarTest2 {
         }
 
         public void predict(String s) {
-            if (s.length()==3)                  {
+            final int l = s.length();
+            if (l==3)                  {
                 if ((s.charAt(0) == '\"') && (s.charAt(2) == '\"'))
                    predict(s.charAt(1));   
-            } else if (s.length()==1) {
+            } else if (l==1) {
                 predict(s.charAt(0));
             }
             
             
         }
+
+        final CharFloatHashMap votes = new CharFloatHashMap();
         
-        void predict(char next) {
+        void predict(char c) {
             final Task tt = MethodOperator.invokingTask();
             
-            float strength = (tt.freq())-0.5f * tt.conf();
-            
-            //reward and punish more as it becomes sooner to next update
-            float p = (1f+phase()/2f)/charPeriod * strength;
-            
-            float ds;
-            if (next == next()) {
-                ds = p;
-            } else {
-                ds = -p;
-            }
-            
-//            System.out.println("@" + time + " " + prev + "," + current + "," + next + 
-//                    "  ... score+="+ ds + ", total=" + totalScore 
-//                    //+ "\n\t" + tt
-//            );
-            System.out.println(time + "," + prev + "," + current + "," + next + 
-                    ","+ ds + "," + totalScore 
+            float strength =  tt.expectation() * phase(tt.occurrence());
+            votes.put(c, votes.getIfAbsent(c, 0) + strength);
+
+
+            /*System.out.println(time + "," + prev + "," + current + "," + c +
+                    //","+ strength +
+                    "," + totalScore +","+ tt.log() + "," + tt.truth()
                     //+ "\n\t" + tt
-            );
-            
-            score += ds;
+            );*/
+
         }
         
-        private Collection<NarQ.Action> getPredictActions(NAR n) {
+        private Collection<NarQ.Action> getPredictActions(NAR n, boolean goalOrBelief, boolean invert) {
             List<NarQ.Action> l = new ArrayList();
             for (char c : chars()) {
+                Termed t = n.term("Tape(predict, tape, (\"" + c + "\"), #1)");
                 l.add(
-                    new InputTask(n, n.term("Tape(predict, tape, (\"" + c + "\"), #1)"))
+                    new InputTask(n, t, goalOrBelief ? Symbols.GOAL : Symbols.JUDGMENT, invert)
                 );
             }            
             return l;

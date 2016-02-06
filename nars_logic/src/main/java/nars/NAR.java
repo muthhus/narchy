@@ -4,22 +4,6 @@ package nars;
 import com.google.common.collect.Sets;
 import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.Executors;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.BooleanSupplier;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
 import nars.Narsese.NarseseException;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
@@ -52,10 +36,25 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import static nars.Symbols.*;
 import static nars.nal.Tense.ETERNAL;
-import static org.fusesource.jansi.Ansi.ansi;
 import static org.fusesource.jansi.Ansi.ansi;
 
 
@@ -65,7 +64,7 @@ import static org.fusesource.jansi.Ansi.ansi;
  * Instances of this represent a reasoner connected to a Memory, and set of Input and Output channels.
  * <p>
  * All state is contained within Memory.  A NAR is responsible for managing I/O channels and executing
- * memory operations.  It executesa series sof cycles in two possible modes:
+ * memory operations.  It executes a series sof cycles in two possible modes:
  * * step mode - controlled by an outside system, such as during debugging or testing
  * * thread mode - runs in a pausable closed-loop at a specific maximum framerate.
  */
@@ -487,7 +486,9 @@ public abstract class NAR implements Level, Consumer<Task> {
             Task projectedGoal = goalConcept.goals().top(now);
             float goalExp = projectedGoal.expectation();
 
-            if (goalExp < Global.EXECUTION_DESIRE_EXPECTATION_THRESHOLD) {
+            long occ = projectedGoal.occurrence();
+            if (((occ == now) || (occ == ETERNAL))
+                &&(goalExp < memory.executionExpectationThreshold.floatValue())) {
                 return false;
             }
 

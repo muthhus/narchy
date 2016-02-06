@@ -5,6 +5,7 @@ import javassist.scopedpool.SoftValueHashMap;
 import nars.Global;
 import nars.Memory;
 import nars.NAR;
+import nars.Symbols;
 import nars.guifx.NARfx;
 import nars.nar.Default;
 import nars.rover.RoverWorld;
@@ -14,15 +15,15 @@ import nars.rover.world.FoodSpawnWorld1;
 import nars.term.index.MapIndex2;
 import nars.time.SimulatedClock;
 import nars.util.signal.NarQ;
+import nars.util.signal.NarQ.BeliefReward;
+import nars.util.signal.NarQ.InputTask;
+import nars.util.signal.NarQ.NotBeliefReward;
+import nars.util.signal.NarQ.Vercept;
+import org.apache.commons.lang3.mutable.MutableFloat;
 
 import java.util.function.DoubleSupplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import nars.util.signal.NarQ.BeliefReward;
-import nars.util.signal.NarQ.InputGoal;
-import nars.util.signal.NarQ.NotBeliefReward;
-import nars.util.signal.NarQ.Vercept;
-import org.apache.commons.lang3.mutable.MutableFloat;
 
 /**
  * Created by me on 6/20/15.
@@ -160,6 +161,8 @@ public class SomeRovers {
         Vercept input = new Vercept();
         NarQ nq = new NarQ(n, input);
 
+        nq.power.setValue(0.5f);
+
         input.addAll(nq.getBeliefExpectations(
                 eatFood, eatPoison, speedLeft, speedRight, speedForward
         ));
@@ -184,7 +187,7 @@ public class SomeRovers {
 
         nq.outs.addAll(
                 Stream.of(n.terms(motorStop, motorForward, motorBackward, motorLeft, motorRight))
-                .map(t -> new InputGoal(n, t))
+                .map(t -> new InputTask(n, t, Symbols.GOAL, false))
                 .collect(Collectors.toList())
         );
 

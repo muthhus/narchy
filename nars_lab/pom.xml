@@ -17,18 +17,15 @@
     <dependencies>
         <dependency>
             <groupId>opennars</groupId>
-            <artifactId>nars_util</artifactId>
-            <version>1.7-SNAPSHOT</version>
+            <artifactId>nars_util</artifactId>           
         </dependency>
         <dependency>
             <groupId>opennars</groupId>
             <artifactId>nars_logic</artifactId>
-            <version>1.7-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>opennars</groupId>
             <artifactId>nars_gui</artifactId>
-            <version>1.7-SNAPSHOT</version>
         </dependency>
         <!--<dependency>-->
             <!--<groupId>opennars</groupId>-->
