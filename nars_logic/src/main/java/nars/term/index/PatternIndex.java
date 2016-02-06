@@ -43,7 +43,7 @@ public class PatternIndex extends MapIndex {
 ////            if (!Ellipsis.hasEllipsis(x)) {
 ////            if (!x.isCommutative()) {
 
-        return new PatternCompound(x,
+        return PatternCompound.make(x,
             (TermVector) internSub(x.subterms())
         );
 

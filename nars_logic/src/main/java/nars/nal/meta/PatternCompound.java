@@ -12,36 +12,124 @@ import nars.term.container.TermVector;
 import nars.term.transform.subst.FindSubst;
 import org.jetbrains.annotations.NotNull;
 
-public final class PatternCompound extends GenericCompound {
+abstract public class PatternCompound extends GenericCompound {
 
     public final int sizeCached;
     public final int volCached;
     public final int structureCached;
     public final Term[] termsCached;
-    protected final Ellipsis ellipsis;
-
-    private final boolean potentiallyCommutative;
-
-    private final boolean ellipsisTransform;
 
 
-    public PatternCompound(@NotNull Compound seed) {
+    protected static final class PatternCompoundContainingEllipsis extends PatternCompound {
+
+        protected final Ellipsis ellipsis;
+        private final boolean ellipsisTransform;
+
+        PatternCompoundContainingEllipsis(@NotNull Compound seed, @NotNull TermVector subterms) {
+            super(seed, subterms);
+
+            this.ellipsis = seed.firstEllipsis();
+            this.ellipsisTransform = hasEllipsisTransform(this);
+        }
+
+        @Override
+        public Ellipsis firstEllipsis() {
+            return ellipsis;
+        }
+
+        @Override
+        public boolean match(@NotNull Compound y, @NotNull FindSubst subst) {
+            return canMatch(y) && ((ellipsis == null) ?
+                    ((y.isCommutative()) ?
+                            subst.matchPermute(this, y) :
+                            subst.matchLinear(this, y)) :
+                    subst.matchCompoundWithEllipsis(this, y));
+        }
+
+        @Override protected final boolean canMatch(@NotNull Compound y) {
+
+            int yStructure = y.structure();
+            if ((yStructure | structureCached) != yStructure)
+                return false;
+
+            Ellipsis e = this.ellipsis;
+
+            boolean eNull = (e == null);
+            //in ellipsis zero or more, the size and volume may be less if zero are matched
+            if (eNull && sizeCached != y.size())
+                return false;
+
+            if (eNull || (e instanceof EllipsisOneOrMore)) {
+
+                //since ellipsisTransform instanceof EllipsisOneOrMore
+                if ((volCached > y.volume()) ||
+                        (!ellipsisTransform && (relation != y.relation())))
+                    return false;
+            }
+
+            return true;
+        }
+
+    }
+
+    protected static final class PatternCompoundSimple extends PatternCompound {
+
+        PatternCompoundSimple(@NotNull Compound seed, @NotNull TermVector subterms) {
+            super(seed, subterms);
+        }
+
+        @Override
+        public Ellipsis firstEllipsis() {
+            return null;
+        }
+
+        @Override
+        public boolean match(@NotNull Compound y, @NotNull FindSubst subst) {
+            return canMatch(y) &&
+                    ((y.isCommutative()) ?
+                            subst.matchPermute(this, y) :
+                            subst.matchLinear(this, y));
+        }
+
+        @Override protected final boolean canMatch(@NotNull Compound y) {
+
+            int yStructure = y.structure();
+
+            return  ((yStructure | structureCached) == yStructure) &&
+                    (sizeCached == y.size()) &&
+                    (volCached <= y.volume()) &&
+                    (relation == y.relation());
+        }
+
+
+    }
+
+    public static PatternCompound make(Compound seed) {
+        return make(seed, (TermVector)seed.subterms());
+    }
+
+    public static PatternCompound make(Compound seed, TermVector v) {
+        if (seed.firstEllipsis()!=null) {
+            return new PatternCompoundContainingEllipsis(seed, v);
+        } else {
+            return new PatternCompoundSimple(seed, v);
+        }
+    }
+
+
+    PatternCompound(@NotNull Compound seed) {
         this(seed, (TermVector) seed.subterms());
     }
 
-    public PatternCompound(@NotNull Compound seed, @NotNull TermVector subterms) {
+    PatternCompound(@NotNull Compound seed, @NotNull TermVector subterms) {
         super(seed.op(), seed.relation(), subterms);
 
         sizeCached = seed.size();
         structureCached =
                 //seed.structure() & ~(Op.VariableBits);
                 seed.structure() & ~(Op.VAR_PATTERN.bit());
-
-        this.ellipsis = seed.firstEllipsis();
-        this.ellipsisTransform = hasEllipsisTransform(this);
         this.volCached = seed.volume();
         this.termsCached = subterms.terms();
-        this.potentiallyCommutative = isCommutative() && ((size() > 1) || (this.ellipsis != null));
     }
 
     public static boolean hasEllipsisTransform(@NotNull TermContainer x) {
@@ -51,10 +139,7 @@ public final class PatternCompound extends GenericCompound {
         return false;
     }
 
-    @Override
-    public Ellipsis firstEllipsis() {
-        return ellipsis;
-    }
+
 
     @Override
     public Term[] terms() {
@@ -66,37 +151,9 @@ public final class PatternCompound extends GenericCompound {
         return structureCached;
     }
 
-    @Override public boolean match(@NotNull Compound y, @NotNull FindSubst subst) {
-        return canMatch(y) && (ellipsis==null ?
-                ((potentiallyCommutative && y.isCommutative()) ?
-                        subst.matchPermute(this, y) :
-                        subst.matchLinear(this, y)) :
-                subst.matchCompoundWithEllipsis(this, y));
-    }
+    abstract public boolean match(@NotNull Compound y, @NotNull FindSubst subst);
+    abstract protected boolean canMatch(@NotNull Compound y);
 
-    public final boolean canMatch(@NotNull Compound y) {
-
-        int yStructure = y.structure();
-        if ((yStructure | structureCached) != yStructure)
-            return false;
-
-        Ellipsis e = this.ellipsis;
-
-        boolean eNull = e == null;
-        //in ellipsis zero or more, the size and volume may be less if zero are matched
-        if (eNull && sizeCached != y.size())
-            return false;
-
-        if (eNull || (e instanceof EllipsisOneOrMore)) {
-
-            //since ellipsisTransform instanceof EllipsisOneOrMore
-            if ((volCached > y.volume()) ||
-                    (!ellipsisTransform && (relation != y.relation())))
-                return false;
-        }
-
-        return true;
-    }
 
 }
 /**

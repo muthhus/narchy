@@ -303,7 +303,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
         //and since it doesnt equal, there is no match to test
 
 
-        return firstEllipsis()!=null ?
+        return (firstEllipsis() != null) ?
                 subst.matchCompoundWithEllipsis(this, y) :
                 subst.matchCompound(this, y);
     }

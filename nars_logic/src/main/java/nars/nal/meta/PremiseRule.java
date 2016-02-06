@@ -307,7 +307,7 @@ public class PremiseRule extends GenericCompound  {
         //and not a belief term pattern
         //(which will not reference any particular atoms)
 
-        pattern = new PatternCompound((Compound)$.p(taskTermPattern, beliefTermPattern));
+        pattern = PatternCompound.make((Compound)$.p(taskTermPattern, beliefTermPattern));
 
 
         ListMultimap<Term, MatchConstraint> constraints = MultimapBuilder.treeKeys().arrayListValues().build();

@@ -742,10 +742,12 @@ public abstract class FindSubst extends Versioning implements Subst {
             case 1:
                 return matchSub(X, Y, 0);
             case 2:
-                if (X.term(1).op(type))
-                    return matchLinearReverse(X, Y);
+                //match the target variable first, if exists
+                int first = (X.term(1).op(type)) ? 1 : 0;
+                return matchSub(X,Y,first) && matchSub(X,Y,1-first);
+            default:
+                return matchLinearForward(X, Y);
         }
-        return matchLinearForward(X, Y);
     }
 
 
@@ -857,10 +859,9 @@ public abstract class FindSubst extends Versioning implements Subst {
      * default compound matching; op will already have been compared. no ellipsis will be involved
      */
     public final boolean matchCompound(@NotNull Compound x, @NotNull Compound y) {
-        int xs = x.size();
         int ys = y.size();
-        if ((xs == ys) && (x.relation() == y.relation())) {
-            return ((ys > 1) && (y.isCommutative())) ?
+        if ((x.size() == ys) && (x.relation() == y.relation())) {
+            return (y.isCommutative()) ?
                     matchPermute(x, y) :
                     matchLinear(x.subterms(), y.subterms());
         }
