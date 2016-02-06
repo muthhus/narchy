@@ -5,6 +5,7 @@ import nars.NAR;
 import nars.Symbols;
 import nars.concept.Concept;
 import nars.concept.util.BeliefTable;
+import nars.data.Range;
 import nars.op.meta.HaiQ;
 import nars.task.MutableTask;
 import nars.task.Task;
@@ -34,8 +35,15 @@ public class NarQ implements Consumer<NAR> {
     public HaiQ q = null;
     
     /** master control of strength factor of output activity */
+    @Range(min=0f, max=1f)
     public final MutableFloat power = new MutableFloat(1f);
-    
+
+    /**
+     * reward bias
+     * negative value: always hope for your discontent
+     */
+    @Range(min=-1f, max=1f)
+    public final MutableFloat rewardBias = new MutableFloat(-0.1f);
     
     /** numeric vector percept */
     public static class Vercept  {
@@ -171,11 +179,7 @@ public class NarQ implements Consumer<NAR> {
      */
     public final Map<DoubleSupplier /* TODO make FloatSupplier */, MutableFloat> reward = Global.newHashMap();
 
-    /**
-     * reward bias
-     * negative value: always hope for your discontent
-     */
-    float rewardBias = -0.5f;
+
 
     public NarQ(NAR n, Vercept input) {
         this.nar = n;
@@ -243,7 +247,7 @@ public class NarQ implements Consumer<NAR> {
 
             int s = outs.size();
 
-            final float a = q.Alpha;
+            final float a = q.Alpha.floatValue();
 
 
             for (int j = 0; j < s; j++) {
@@ -252,7 +256,7 @@ public class NarQ implements Consumer<NAR> {
 
                 //add noise
                 if (a != 0) {
-                    e += (q.rng.nextFloat() - 0.5f) * (float) q.Alpha *2f;
+                    e += (q.rng.nextFloat() - 0.5f) * q.Alpha.floatValue() *2f;
                 }
 
                 //System.out.println(outs.get(j) + " " + e);
@@ -382,7 +386,7 @@ public class NarQ implements Consumer<NAR> {
             r[0] += v;
         });
 
-        return (r[0] / reward.size()) - rewardBias;
+        return (r[0] / reward.size()) - rewardBias.floatValue();
     }
 
     void act(int x) {

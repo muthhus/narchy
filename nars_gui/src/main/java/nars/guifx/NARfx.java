@@ -245,6 +245,9 @@ public enum NARfx  {
 
     public static Stage newWindow(String title, Region n) {
 
+        n.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        n.autosize();
+
         Scene scene = new Scene(n);
         scene.getStylesheets().setAll(NARfx.css );
 

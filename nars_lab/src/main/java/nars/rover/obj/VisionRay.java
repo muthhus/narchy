@@ -13,7 +13,6 @@ import org.jbox2d.dynamics.World;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import nars.term.Term;
 
 /**
  * Created by me on 1/31/16.
@@ -64,6 +63,8 @@ abstract public class VisionRay extends RayCastClosestCallback implements Abstra
         normalColor = new Color3f(0.4f, 0.4f, 0.4f);
     }
 
+
+
     private static void drawIt(Vec2 start, float alpha, Vec2 finalEndPoint, float r, float g, float b, float thick, JoglAbstractDraw dd) {
         dd.drawSegment(start, finalEndPoint, r, g, b, alpha, 1f * thick);
     }
@@ -86,7 +87,7 @@ abstract public class VisionRay extends RayCastClosestCallback implements Abstra
         float totalDist = 0;
         float dArc = arc / resolution;
 
-        float angOffset = 0; //(float)Math.random() * (-arc/4f);
+        float angOffset = getLocalAngle(); //(float)Math.random() * (-arc/4f);
 
         JoglAbstractDraw dd = ((JoglAbstractDraw) ap.getDraw());
 
@@ -187,6 +188,10 @@ abstract public class VisionRay extends RayCastClosestCallback implements Abstra
 
 
 
+    }
+
+    public float getLocalAngle() {
+        return 0f;
     }
 
     protected void perceiveDist(Body hit, float newConf, float nextHitDist) {

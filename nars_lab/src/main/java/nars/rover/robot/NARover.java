@@ -16,15 +16,21 @@ import nars.rover.Sim;
 import nars.rover.obj.NARVisionRay;
 import nars.rover.obj.VisionRay;
 import nars.rover.run.SomeRovers;
+import nars.rover.util.Bodies;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Truth;
 import nars.util.data.Util;
+import nars.util.signal.NarQ;
 import nars.util.signal.Sensor;
+import org.apache.commons.lang3.mutable.MutableFloat;
+import org.jbox2d.common.Color3f;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.BodyType;
+import org.jbox2d.dynamics.joints.RevoluteJointDef;
 
 import java.util.List;
 
@@ -40,10 +46,10 @@ public class NARover extends AbstractPolygonBot {
 
     public final NAR nar;
     //float tasteDistanceThreshold = 1.0f;
-    final static int retinaPixels = 9;
+    final static int retinaPixels = 15;
     final Naljects objs;
     //private final Sensor linearSpeedBack;
-    int retinaRaysPerPixel = 2; //rays per vision sensor
+    int retinaRaysPerPixel = 1; //rays per vision sensor
 
     float L = 25f; //vision distance
     final static Vec2 mouthPoint = new Vec2(2.7f, 0); //0.5f);
@@ -297,7 +303,185 @@ public class NARover extends AbstractPolygonBot {
             draw.addLayer(v);
             senses.add(v);
         }
+
+
         return torso;
+    }
+
+    public void addArm(NarQ controller) {
+        int armSegments = 4;
+        Body base = torso;
+
+        Body[] arm = new Body[armSegments];
+
+        Body prev = base;
+
+        float dr = 1f; //getArmLength(armLength, 0) / 2.0;
+
+        float x = -2.5f;
+        float y = 0;
+        float angle = 0.25f;
+
+
+        float px = x;
+        float py = y;
+
+        for (int i = 0; i < armSegments; i++) {
+
+            //float al = 1.5f; //getArmLength(armLength, i);
+            float aw = 0.15f; //getArmWidth(armWidth, i);
+
+            float dx = (float)Math.cos(angle) * dr;
+            float dy = (float)Math.sin(angle) * dr;
+
+            float ax = (float) (px + dx*1f);
+            float ay = (float) (py + dy*1f);
+
+            final Body b = arm[i] = sim.create(new Vec2(ax, ay),
+                    Bodies.rectangle(new Vec2(dr, aw), new Vec2(ax+dx,ay+dy), angle), BodyType.DYNAMIC); //, angle, 1.0f, m);
+
+
+//            float rx = (float) (px + Math.cos(angle) * (dr));
+//            float ry = (float) (py + Math.sin(angle) * (dr));
+
+
+            RevoluteJointDef rv = new RevoluteJointDef();
+            rv.initialize(arm[i], prev, new Vec2(ax,ay));
+            rv.enableLimit = true;
+            rv.enableMotor = true;
+            rv.upperAngle = 2;
+            rv.lowerAngle = -2;
+            rv.collideConnected = false;
+            //rv.referenceAngle = angle;
+
+            px = ax;
+            py = ay;
+
+
+            sim.getWorld().createJoint(rv);
+
+//            new RevoluteJointByIndexVote(brain, j, -servoRange, servoRange, servoSteps);
+//
+//            new QuantizedScalarInput(brain, 4) {
+//                @Override
+//                public float getValue() {
+//                    return j.getJointAngle() / (float) (Math.PI * 2.0f);
+//                }
+//            };
+//            new QuantizedScalarInput(brain, velocityLevels) {
+//                @Override
+//                public float getValue() {
+//                    final float zl = b.getLinearVelocity().len2();
+//                    if (zl == 0) return 0;
+//                    float xx = b.getLinearVelocity().x;
+//                    xx *= xx;
+//                    return xx / zl;
+//                }
+//            };
+//            new QuantizedScalarInput(brain, velocityLevels) {
+//                @Override
+//                public float getValue() {
+//                    final float zl = b.getLinearVelocity().len2();
+//                    if (zl == 0) return 0;
+//                    float yy = b.getLinearVelocity().y;
+//                    yy *= yy;
+//                    return yy / zl;
+//                }
+//            };
+//
+//            new QuantizedScalarInput(brain, orientationSteps) {
+//                @Override
+//                public float getValue() {
+//                    return b.getAngle() / (float) (2.0 * Math.PI);
+//                }
+//            };
+//            new QuantizedScalarInput(brain, velocityLevels) {
+//                @Override
+//                public float getValue() {
+//                    return b.getAngularVelocity() / (float) (2.0 * Math.PI);
+//                }
+//            };
+
+            //DEPRECATED
+            //brain.addInput(new RevoluteJointAngle(j));
+            //brain.addInput(new VelocityAxis(b, true));
+            //brain.addInput(new VelocityAxis(b, false));
+            //Orientation.newVector(brain, b, orientationSteps);
+            //brain.addInput(new VelocityAngular(b));
+
+//            brain.addOutput(new ColorBodyTowards(b, color, 0.95f));
+//            brain.addOutput(new ColorBodyTowards(b, new Color(color.r * 0.5f, color.g * 0.5f, color.b * 0.5f, color.a * 0.25f), 0.95f));
+
+//            int n = numRetinasPerSegment;
+//            for (float z = 0; z < n; z++) {
+//
+//                float a = z * (float) (Math.PI * 2.0 / ((float) n));
+//                retinas.add(new Retina(brain, b, new Vector2(0, 0), a, (float) initialVisionDistance, retinaLevels));
+//            }
+            //TODO Retina.newVector(...)
+
+            //y -= al*0.9f;
+            //dr += al * 0.9f;
+
+            prev = arm[i];
+        }
+
+
+    }
+    public void addEye(NarQ controller, int detail, Vec2 center, float arc, float centerAngle, float distance) {
+        int pixels = 1;
+        float aStep = (float) (Math.PI * 2f)/pixels * (arc);
+
+        final MutableFloat servo = new MutableFloat();
+
+        for (int i = 0; i < pixels; i++) {
+            final float angle = aStep * i + centerAngle;
+
+            VisionRay v = new VisionRay(center, angle, aStep, this,
+                    distance, detail) {
+
+                  @Override public float getLocalAngle () {
+                      return 0.5f * (float)Math.sin(servo.floatValue()); //controller.get();
+                  }
+
+
+                @Override
+                protected void updateColor(Color3f rayColor) {
+                    float s = distToHit();
+                    rayColor.set(s,1f-s,0.5f);
+                }
+            };
+
+            controller.input.add(() -> {
+                return v.distToHit();
+            });
+
+            vision.add(v);
+
+            draw.addLayer(v);
+            senses.add(v);
+        }
+
+        for (float servoSpeed : new float[] { -0.5f, 0.5f } ) {
+            controller.outs.add(new NarQ.Action() {
+
+                public float accum = 0;
+
+                @Override
+                public void run(float strength) {
+                    servo.add(strength * servoSpeed);
+
+                    this.accum = Util.clamp(this.accum + strength);
+
+                }
+
+                @Override
+                public float ran() {
+                    accum *= 0.9f;
+                    return accum;
+                }
+            });
+        }
     }
 
 

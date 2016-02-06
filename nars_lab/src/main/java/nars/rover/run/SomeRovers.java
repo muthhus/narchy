@@ -20,6 +20,7 @@ import nars.util.signal.NarQ.InputTask;
 import nars.util.signal.NarQ.NotBeliefReward;
 import nars.util.signal.NarQ.Vercept;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.jbox2d.common.Vec2;
 
 import java.util.function.DoubleSupplier;
 import java.util.stream.Collectors;
@@ -89,11 +90,11 @@ public class SomeRovers {
 
     }
 	public static Default newNAR() {
-        int conceptsFirePerCycle = 2;
+        int conceptsFirePerCycle = 3;
         Default nar = new Default(
                 new Memory(clock, new MapIndex2(
                         new SoftValueHashMap())),
-                1200, conceptsFirePerCycle, 2, 4);
+                1200, conceptsFirePerCycle, 1, 3);
 
 //            nar.memory.DEFAULT_JUDGMENT_PRIORITY = 0.35f;
 //            nar.memory.DEFAULT_JUDGMENT_DURABILITY = 0.35f;
@@ -108,15 +109,15 @@ public class SomeRovers {
 
 
         //nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
-        nar.core.activationRate.setValue(0.6f);
+        nar.core.activationRate.setValue(0.7f);
 
-        nar.memory.duration.set(3);
+        nar.memory.duration.set(6);
         nar.memory.conceptForgetDurations.setValue(2);
         nar.memory.termLinkForgetDurations.setValue(4);
         nar.memory.taskLinkForgetDurations.setValue(6);
-        nar.memory.cyclesPerFrame.set(8);
+        nar.memory.cyclesPerFrame.set(16);
         nar.memory.shortTermMemoryHistory.set(2);
-        nar.memory.executionThreshold.setValue(0.005f);
+        nar.memory.executionThreshold.setValue(0.002f);
 
         boolean gui = true;
         if (gui) {
@@ -191,6 +192,15 @@ public class SomeRovers {
                 .map(t -> new InputTask(n, t, Symbols.GOAL, false))
                 .collect(Collectors.toList())
         );
+
+
+        r.addEye(nq, 8, new Vec2(3f, 0f), 0.2f, 0f, 2.5f);
+
+        r.addEye(nq, 8, new Vec2(-1f, -2f), 0.2f, -1.7f, 2.5f);
+
+        r.addEye(nq, 8, new Vec2(-1f, 2f), 0.2f, 1.7f, 2.5f);
+
+        r.addArm(nq /* ... */);
 
     }
 	// private static class InputActivationController extends CycleReaction {

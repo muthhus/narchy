@@ -1,6 +1,8 @@
 package nars.op.meta;
 
+import nars.data.Range;
 import nars.util.data.random.XorShift128PlusRandom;
+import org.apache.commons.lang3.mutable.MutableFloat;
 
 import java.util.Random;
 
@@ -51,7 +53,11 @@ public class HaiQ {
 	 * more defined path to the goal in fewer episodes. Because of this, we
 	 * chose a final lambda of 0.9.
 	 */
-	public float Alpha, Gamma, Lambda;
+	public float Gamma, Lambda;
+
+	@Range(min=0, max=1f)
+	public final MutableFloat Alpha = new MutableFloat();
+
 	private final int inputs;
 
 	public HaiQ(int inputs, int _states, int outputs) {
@@ -68,7 +74,7 @@ public class HaiQ {
 
 		q = new float[nStates][outputs];
 		et = new float[nStates][outputs];
-		setQ(0.2f, 0.8f, 0.9f); // 0.1 0.5 0.9
+		setQ(0.1f, 0.5f, 0.9f); // 0.1 0.5 0.9
 	}
 
 	int learn(int state, float reward) {
@@ -93,7 +99,7 @@ public class HaiQ {
 	}
 
 	protected int nextAction(int state) {
-		return rng.nextFloat() < Alpha ? randomAction() : choose(state);
+		return rng.nextFloat() < Alpha.floatValue() ? randomAction() : choose(state);
 	}
 
 	private int randomAction() {
@@ -105,7 +111,7 @@ public class HaiQ {
 		float[][] q = this.q;
 		float[][] et = this.et;
 
-		float alphaDelta = Alpha * deltaQ;
+		float alphaDelta = Alpha.floatValue() * deltaQ;
 		float gammaLambda = Gamma * Lambda;
 
 		for (int i = 0; i < nStates; i++) {
@@ -138,7 +144,7 @@ public class HaiQ {
 	}
 
 	public void setQ(float alpha, float gamma, float lambda) {
-		Alpha = alpha;
+		Alpha.setValue( alpha );
 		Gamma = gamma;
 		Lambda = lambda;
 	}
