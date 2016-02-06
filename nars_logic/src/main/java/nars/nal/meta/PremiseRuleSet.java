@@ -6,6 +6,7 @@ import nars.Narsese;
 import nars.nal.Deriver;
 import nars.term.Compound;
 import nars.term.index.PatternIndex;
+import nars.util.data.Util;
 import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -13,17 +14,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 
 
 /**
@@ -39,7 +39,12 @@ public class PremiseRuleSet {
 
 
     public PremiseRuleSet() throws IOException, URISyntaxException {
-        this(Paths.get(Deriver.class.getResource("default.meta.nal").toURI()));
+        //this(Paths.get(Deriver.class.getResource("default.meta.nal").toURI()));
+        this(Deriver.class.getResourceAsStream("default.meta.nal"));
+    }
+
+    public PremiseRuleSet(InputStream is) throws IOException {
+        this(Util.inputToStrings(is));
     }
 
     public PremiseRuleSet(@NotNull Path path) throws IOException {

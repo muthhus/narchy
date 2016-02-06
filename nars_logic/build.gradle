@@ -7,3 +7,8 @@ dependencies {
 }
 
 
+mainClassName = 'nars.NARjs'
+
+run{
+    standardInput = System.in
+}

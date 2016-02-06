@@ -24,4 +24,17 @@ dependencies {
     compile group: 'org.boofcv', name: 'visualize', version: '0.21'
     compile group: 'org.boofcv', name: 'WebcamCapture', version: '0.21'
     testCompile group: 'junit', name: 'junit', version: '4.12'
+
+}
+
+processResources {
+    from ('src/main/java') {
+        include '**/*.css'
+    }
+}
+
+mainClassName = 'nars.guifx.demo.NARideDefault'
+
+run{
+    standardInput = System.in
 }

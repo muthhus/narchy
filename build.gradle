@@ -1,16 +1,30 @@
+plugins {
+    id 'java'
+    //id "pl.squirrel.classycle" version "1.1"
+    //id "com.github.nullstress.dependency-analysis" version "1.0.3"
+    id "com.github.nwillc.vplugin" version "1.2.5"
+    //id "com.github.tkruse.groovysh" version "1.0.8"  //https://github.com/tkruse/gradle-groovysh-plugin
+
+}
+
+
+
 
 allprojects {
     apply plugin: 'maven'
+    apply plugin: 'build-dashboard'
+    apply plugin: 'application'
+    apply plugin: 'jdepend'
+    apply plugin: 'project-report'
+    apply plugin: "jacoco"
+
 
     group = 'opennars'
     version = '1.7-SNAPSHOT'
 
-//    plugins {
-//        id 'nebula.metrics' version '4.0.1'
-//    }
-
 
 }
+
 
 subprojects {
     apply plugin: 'java'
@@ -18,7 +32,7 @@ subprojects {
     targetCompatibility = 1.8
 
 
-    repositories {
+     repositories {
         mavenLocal()
 
         maven { url "https://jitpack.io" }
@@ -29,6 +43,7 @@ subprojects {
 
     test {
         reports.html.enabled = false
+        ignoreFailures = true
     }
 
     processResources {
@@ -39,8 +54,19 @@ subprojects {
     }
 }
 
+
 task testReport(type: TestReport) {
     destinationDir = file("$buildDir/reports/allTests")
     // Include the results from the `test` task in all subprojects
     reportOn subprojects*.test
 }
+
+
+jacocoTestReport {
+    reports {
+        xml.enabled false
+        csv.enabled false
+        html.destination "${buildDir}/coverage_html"
+    }
+}
+

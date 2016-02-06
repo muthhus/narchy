@@ -14,12 +14,18 @@
  */
 package nars.util.data;
 
+import com.google.common.base.Charsets;
+import com.google.common.io.CharStreams;
+import com.google.common.io.Closeables;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import nars.util.Texts;
 import org.jetbrains.annotations.NotNull;
 import sun.misc.Unsafe;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
@@ -809,5 +815,16 @@ public enum Util {
         int hundreds = (int) Texts.hundredths(x);
         if (x == 100) return "aa";
         return hundreds < 10 ? "0" + hundreds : Integer.toString(hundreds);
+    }
+
+    public static List<String> inputToStrings(InputStream is) throws IOException {
+        List<String> x = CharStreams.readLines(new InputStreamReader(is, Charsets.UTF_8));
+        Closeables.closeQuietly(is);
+        return x;
+    }
+    public static String inputToString(InputStream is) throws IOException {
+        String s = CharStreams.toString(new InputStreamReader(is, Charsets.UTF_8));
+        Closeables.closeQuietly(is);
+        return s;
     }
 }

@@ -19,7 +19,9 @@ import nars.concept.Concept;
 import nars.guifx.util.ColorMatrix;
 import nars.task.Task;
 import nars.term.Termed;
+import nars.util.data.Util;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -33,7 +35,14 @@ import java.util.stream.Stream;
 public enum NARfx  {
     ;
 
-    public static final String css = NARfx.class.getResource("narfx.css").toExternalForm();
+    public static String css;
+    static {
+        try {
+            css = Util.inputToString(NARfx.class.getResourceAsStream("narfx.css"));
+        } catch (IOException e) {
+            css = "";
+        }
+    }
 
     public static final ColorMatrix colors = new ColorMatrix(24, 24,
             (priority, conf) -> {
