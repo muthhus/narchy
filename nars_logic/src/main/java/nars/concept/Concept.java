@@ -28,7 +28,6 @@ import nars.bag.Bag;
 import nars.concept.util.BeliefTable;
 import nars.concept.util.TaskTable;
 import nars.task.Task;
-import nars.term.Compound;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -299,18 +298,16 @@ public interface Concept extends Termed, Comparable<Termed> {
      * @param otherTask task with a term equal to another concept's
      * @return number of links created (0, 1, or 2)
      */
-    default void crossLink(@NotNull Task thisTask, @NotNull Task otherTask, float initialScale, @NotNull NAR nar) {
-        Compound otherTerm = otherTask.term();
-        if (otherTerm.equals(term()))
-            return; //self
+    default void crossLink(@NotNull Task thisTask, @NotNull Task otherTask, float scale, @NotNull NAR nar) {
+        if (!otherTask.term().equals(term())) {
 
-        link(otherTask, initialScale, nar);
+            link(otherTask, scale, nar);
 
-        Concept other = nar.conceptualize(otherTask, thisTask.budget(), initialScale);
-        if (other == null)
-            return;
-
-        other.link(thisTask, initialScale, nar);
+            Concept other = nar.concept(otherTask);
+                            //nar.conceptualize(otherTask, thisTask.budget(), scale);
+            if (other != null)
+                other.link(thisTask, scale, nar);
+        }
     }
 
 

@@ -40,7 +40,7 @@ public enum TermLinkBuilder {
         }
     }
 
-    static final int NegationOrConjunctive = Op.or(Op.ConjunctivesBits, Op.NEGATE);
+    static final int NegationOrConjunction = Op.or(Op.CONJUNCTION, Op.NEGATE);
 
     /**
      * Collect TermLink templates into a list, go down one level except in
@@ -55,8 +55,8 @@ public enum TermLinkBuilder {
         ///** add self link for structural transform: */
         //components.add(t);
 
-        boolean tEquivalence = t.isAny(Op.EquivalencesBits);
-        boolean tImplication = t.isAny(Op.ImplicationsBits);
+        boolean tEquivalence = t.op(Op.EQUIV);
+        boolean tImplication = t.op(Op.IMPLICATION);
 
 
         int ni = t.size();
@@ -72,7 +72,7 @@ public enum TermLinkBuilder {
             }
 
             if ((tEquivalence || (tImplication && (i == 0))) &&
-                    (ti.isAny(NegationOrConjunctive))) {
+                    (ti.isAny(NegationOrConjunction))) {
 
                 prepareComponentLinks((Compound) ti, components, memory);
 

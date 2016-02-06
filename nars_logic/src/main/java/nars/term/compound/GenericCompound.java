@@ -83,8 +83,17 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
     @Override
     public final boolean isCommutative() {
-        return op.isCommutative();
+        if (op.isCommutative() && size() > 1) {
+            int t = t();
+            return (t == ITERNAL || ((op == Op.CONJUNCTION && t == 0)));
+        }
+        return false;
     }
+
+//    /** true if this compound does not involve temporal relation between its terms */
+//    public boolean atemporal() {
+//        return t()==ITERNAL;
+//    }
 
     @Override
     public final void append(@NotNull Appendable p, boolean pretty) throws IOException {

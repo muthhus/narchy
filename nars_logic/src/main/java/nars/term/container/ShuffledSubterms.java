@@ -1,5 +1,6 @@
 package nars.term.container;
 
+import nars.nal.meta.match.Ellipsis;
 import nars.term.Term;
 import nars.util.math.ShuffledPermutations;
 import org.jetbrains.annotations.NotNull;
@@ -59,8 +60,8 @@ public final class ShuffledSubterms extends ShuffledPermutations implements Term
     }
 
     @Override
-    public boolean hasEllipsis() {
-        return compound.hasEllipsis();
+    public Ellipsis firstEllipsis() {
+        return compound.firstEllipsis();
     }
 
     @Override

@@ -111,6 +111,12 @@ public class TermTest {
     }
 
     @Test
+    public void testCommutativivity()  {
+        assertFalse($.sete($.the("x")).isCommutative());
+        assertTrue($.sete($.the("x"), $.the("y")).isCommutative());
+    }
+
+    @Test
     public void testTermSort() throws Exception {
 
         Term a = n.term("a");

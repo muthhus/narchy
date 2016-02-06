@@ -181,7 +181,7 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
     }
 
     @Override
-    public final boolean hasEllipsis() {
+    public final Ellipsis firstEllipsis() {
         return Ellipsis.hasEllipsis(this);
     }
 

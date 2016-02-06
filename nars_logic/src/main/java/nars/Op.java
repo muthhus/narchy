@@ -272,8 +272,10 @@ public enum Op {
     }
 
     public boolean validSize(int length) {
-        if (minSize!=-1 && length < minSize) return false;
-        return !(maxSize != -1 && length > maxSize);
+        int min = this.minSize;
+        if (min!=-1 && length < min) return false;
+        int max = this.maxSize;
+        return !(max != -1 && length > max);
     }
 
     public boolean isImage() {
@@ -281,7 +283,7 @@ public enum Op {
     }
 
     public boolean isConjunctive() {
-        return in(ConjunctivesBits);
+        return this == CONJUNCTION; //in(ConjunctivesBits);
     }
 
 
@@ -303,7 +305,7 @@ public enum Op {
     }
 
     public boolean isImplication() {
-        return in(ImplicationsBits);
+        return this == IMPLICATION; //in(ImplicationsBits);
     }
 
 
@@ -315,14 +317,14 @@ public enum Op {
     }
 
 
-    @Deprecated public static final int ImplicationsBits =
-            Op.or(Op.IMPLICATION);
+//    @Deprecated public static final int ImplicationsBits =
+//            Op.or(Op.IMPLICATION);
+//
+//    @Deprecated public static final int ConjunctivesBits =
+//            Op.or(Op.CONJUNCTION);
 
-    @Deprecated public static final int ConjunctivesBits =
-            Op.or(Op.CONJUNCTION);
-
-    @Deprecated public static final int EquivalencesBits =
-            Op.or(Op.EQUIV);
+//    @Deprecated public static final int EquivalencesBits =
+//            Op.or(Op.EQUIV);
 
     public static final int SetsBits =
             Op.or(Op.SET_EXT, Op.SET_INT);
@@ -333,11 +335,11 @@ public enum Op {
 
     public static final int StatementBits =
             Op.or(Op.INHERIT.bit(), Op.SIMILAR.bit(),
-                    EquivalencesBits,
-                    ImplicationsBits
+                    Op.EQUIV.bit(),
+                    Op.IMPLICATION.bit()
             );
 
-    public static final int ImplicationOrEquivalenceBits = or(Op.EquivalencesBits, Op.ImplicationsBits);
+    public static final int ImplicationOrEquivalenceBits = or(Op.EQUIV.bit(), Op.IMPLICATION.bit());
 
     public static final int ImageBits =
         Op.or(Op.IMAGE_EXT,Op.IMAGE_INT);

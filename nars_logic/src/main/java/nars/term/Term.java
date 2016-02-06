@@ -22,6 +22,7 @@ package nars.term;
 
 
 import nars.Op;
+import nars.nal.meta.match.Ellipsis;
 import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 
@@ -147,9 +148,9 @@ public interface Term extends Termed, Comparable, Termlike {
         return varIndep()!=0;
     }
 
-    @Override
-    default boolean hasEllipsis() {
-        return false;
+    /** returns the first ellipsis subterm or null if not present */
+    @Override default Ellipsis firstEllipsis() {
+        return null;
     }
 
     default boolean hasVarPattern() {

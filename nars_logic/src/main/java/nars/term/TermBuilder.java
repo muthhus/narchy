@@ -524,7 +524,7 @@ public interface TermBuilder {
     }
 
     @Nullable
-    default Term statement2(@NotNull Op op, int t, Term[] u) {
+    default Term statement2(@NotNull Op op, int t, final Term[] u) {
         Term subject = u[0];
         Term predicate = u[1];
 
@@ -545,9 +545,9 @@ public interface TermBuilder {
                 if (subject.isAny(TermIndex.InvalidEquivalenceTerm)) return null;
                 if (predicate.isAny(TermIndex.InvalidImplicationPredicate)) return null;
 
-                if (predicate.isAny(ImplicationsBits)) {
+                if (predicate.op(IMPLICATION)) {
                     Term oldCondition = subj(predicate);
-                    if ((oldCondition.isAny(ConjunctivesBits)) && oldCondition.containsTerm(subject))
+                    if ((oldCondition.op(CONJUNCTION) && oldCondition.containsTerm(subject)))
                         return null;
 
                     return impl2Conj(t, subject, predicate, oldCondition);
@@ -556,15 +556,15 @@ public interface TermBuilder {
 
         }
 
-        if (u[0].equals(u[1]))
-            return u[0];
+        if (subject.equals(predicate))
+            return subject;
 
         //already tested equality, so go to invalidStatement2:
-        if (!Statement.invalidStatement2(u[0], u[1])) {
+        if (!Statement.invalidStatement2(subject, predicate)) {
             TermContainer cc = TermContainer.the(op, u);
             Compound x = ((Compound) make(op, -1, cc).term());
             if(t!= ITERNAL) {
-                boolean reversed = cc.term(0)==u[1];
+                boolean reversed = cc.term(0)==predicate;
                 x = x.t(reversed ? -t : t);
             }
             return x;

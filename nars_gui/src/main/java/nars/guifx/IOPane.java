@@ -142,7 +142,7 @@ public class IOPane extends BorderPane /*implements FXIconPaneBuilder*/ {
 //
 //            }
 //        }
-        return new TaskButton(nar, t.task());
+        return new TaskButton(nar, t);
         //return SubButton.make(nar, t);
     }
 

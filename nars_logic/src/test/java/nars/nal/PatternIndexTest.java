@@ -14,7 +14,7 @@ import org.zhz.dfargx.RegexSearcher;
 import java.util.List;
 
 /**
- * Created by me on 12/25/15.
+ * NOT FINISHED
  */
 public class PatternIndexTest {
 
@@ -68,7 +68,7 @@ public class PatternIndexTest {
             //sb.append( (char)c.structure()  ) //TODO needs special regex opcode to compare since it's not just equals
 
             sb.append( (char)c.op().ordinal() );
-            if (c.hasEllipsis()) {
+            if (c.firstEllipsis()!=null) {
                 sb.append('?'); //any size , TODO min bounds
             } else {
                 sb.append( 'a' + c.size() ); //specific size
@@ -81,10 +81,9 @@ public class PatternIndexTest {
 
             for (Term x : c.terms()) {
 
-                if (x.op() == Op.VAR_PATTERN) {
+                if (x.op(Op.VAR_PATTERN)) {
                     appendVariable(sb, (Variable)x);
-                }
-                else if (x instanceof Compound) {
+                } else if (x instanceof Compound) {
                     append(sb, (Compound)x);
                 } else {
                     appendAtom(sb, x);

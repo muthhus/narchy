@@ -246,10 +246,15 @@ public class ConceptPane extends VBox implements ChangeListener {
         }
 
         Node getNode(BLink<X> n) {
-            Node existing = componentCache.get(n);
-            if (existing == null) {
-                componentCache.put(n, existing = builder.apply(n));
-            }
+            Node existing = componentCache.computeIfAbsent(n, builder::apply);
+//            Node existing = componentCache.get(n);
+//            if (existing == null) {
+//                componentCache.put(n, existing = builder.apply(n));
+//            } else {
+                //since it will already have been run as part of the builder
+                if (existing instanceof Runnable)
+                    ((Runnable) existing).run();
+//            }
             return existing;
         }
 
@@ -281,10 +286,10 @@ public class ConceptPane extends VBox implements ChangeListener {
 
             getChildren().setAll(pending.stream().map(this::getNode).collect(toList()));
 
-            getChildren().forEach(n -> {
-                if (n instanceof Runnable)
-                    ((Runnable) n).run();
-            });
+//            getChildren().forEach(n -> {
+//                if (n instanceof Runnable)
+//                    ((Runnable) n).run();
+//            });
 
             queued.set(false);
 

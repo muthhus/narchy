@@ -24,6 +24,7 @@ import nars.Global;
 import nars.Op;
 import nars.Symbols;
 import nars.nal.Tense;
+import nars.nal.meta.match.Ellipsis;
 import nars.term.container.TermContainer;
 import nars.term.transform.subst.FindSubst;
 import nars.util.data.sexpression.IPair;
@@ -252,15 +253,21 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
     @Override
     default Object _cdr() {
         int len = size();
-        if (len == 1) throw new RuntimeException("Pair fault");
-        if (len == 2) return term(1);
-        if (len == 3) return new Pair(term(1), term(2));
-        if (len == 4) return new Pair(term(1), new Pair(term(2), term(3)));
+        switch (len) {
+            case 1:
+                throw new RuntimeException("Pair fault");
+            case 2:
+                return term(1);
+            case 3:
+                return new Pair(term(1), term(2));
+            case 4:
+                return new Pair(term(1), new Pair(term(2), term(3)));
+        }
 
         //this may need tested better:
         Pair p = null;
         for (int i = len - 2; i >= 0; i--) {
-            p = p == null ? new Pair(term(i), term(i + 1)) : new Pair(term(i), p);
+            p = new Pair(term(i), p == null ? term(i + 1) : p);
         }
         return p;
     }
@@ -296,15 +303,15 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
         //and since it doesnt equal, there is no match to test
 
 
-        return hasEllipsis() ?
+        return firstEllipsis()!=null ?
                 subst.matchCompoundWithEllipsis(this, y) :
                 subst.matchCompound(this, y);
     }
 
 
     @Override
-    default boolean hasEllipsis() {
-        return subterms().hasEllipsis();
+    default Ellipsis firstEllipsis() {
+        return subterms().firstEllipsis();
     }
 
 

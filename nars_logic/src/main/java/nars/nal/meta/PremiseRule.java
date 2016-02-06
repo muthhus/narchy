@@ -366,7 +366,7 @@ public class PremiseRule extends GenericCompound  {
 
 
                 case "notConjunction":
-                    constraints.put(arg1, new NotOpConstraint(Op.ConjunctivesBits));
+                    constraints.put(arg1, new NotOpConstraint(Op.CONJUNCTION));
                     break;
 
 

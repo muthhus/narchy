@@ -858,8 +858,9 @@ public abstract class FindSubst extends Versioning implements Subst {
      */
     public final boolean matchCompound(@NotNull Compound x, @NotNull Compound y) {
         int xs = x.size();
-        if ((xs == y.size()) && (x.relation() == y.relation())) {
-            return ((xs > 1) && (x.isCommutative())) ?
+        int ys = y.size();
+        if ((xs == ys) && (x.relation() == y.relation())) {
+            return ((ys > 1) && (y.isCommutative())) ?
                     matchPermute(x, y) :
                     matchLinear(x.subterms(), y.subterms());
         }

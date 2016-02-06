@@ -1,5 +1,6 @@
 package nars.term;
 
+import nars.nal.meta.match.Ellipsis;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Predicate;
@@ -84,7 +85,7 @@ public interface Termlike  {
      * @param v*/
     boolean or(Predicate<? super Term> v);
 
-    boolean hasEllipsis();
+    Ellipsis firstEllipsis();
 
 
 

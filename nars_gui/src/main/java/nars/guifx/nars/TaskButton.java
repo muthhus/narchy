@@ -24,7 +24,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static javafx.application.Platform.runLater;
 import static javafx.scene.paint.Color.hsb;
 
 /**
@@ -111,7 +110,8 @@ public class TaskButton<X> extends Label implements Runnable {
             //show concept
         }
 
-        runLater(this);
+        //runLater(this);
+        run();
 
     }
 
@@ -145,7 +145,7 @@ public class TaskButton<X> extends Label implements Runnable {
             Scale scale1 = this.scale;
             scale1.setX(scale);
             scale1.setY(scale);
-            setNeedsLayout(true);
+            //setNeedsLayout(true);
 
             Object item = this.item;
             if (item instanceof BLink) item = ((BLink)item).get(); //get what it refers to

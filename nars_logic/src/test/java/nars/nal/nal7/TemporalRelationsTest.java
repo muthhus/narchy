@@ -2,11 +2,11 @@ package nars.nal.nal7;
 
 import nars.nar.Default;
 import nars.term.Compound;
+import nars.term.Term;
 import org.junit.Test;
 
 import static nars.$.$;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.*;
 
 /**
  * Created by me on 1/12/16.
@@ -99,5 +99,16 @@ public class TemporalRelationsTest {
 
     }
 
+    @Test public void testCommutivity() {
+
+        assertTrue( $("(b && a)").isCommutative() );
+        assertFalse( $("(b &&+1 a)").isCommutative() );
+
+
+        Term abc = $("((a &&+0 b) &&+0 c)");
+        assertEquals( "( &&+0 ,a,b,c)", abc.toString() );
+        assertTrue( abc.isCommutative() );
+
+    }
 
 }

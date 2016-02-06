@@ -48,11 +48,11 @@ public abstract class Ellipsis extends VarPattern { //TODO use Immutable
         return 0;
     }
 
-    public static boolean hasEllipsis(@NotNull TermContainer x) {
+    public static Ellipsis hasEllipsis(@NotNull TermContainer x) {
         int xs = x.size();
         for (int i = 0; i < xs; i++)
-            if (x.term(i) instanceof Ellipsis) return true;
-        return false;
+            if (x.term(i) instanceof Ellipsis) return (Ellipsis) x.term(i);
+        return null;
     }
 
 //    /** recursively */
