@@ -8,7 +8,7 @@ import nars.NAR;
 import nars.guifx.space.WebMap;
 import nars.guifx.util.TabXLazy;
 import nars.guifx.wikipedia.NARWikiBrowser;
-import nars.task.in.LibraryInput;
+import nars.op.in.LibraryInput;
 
 import java.util.Map;
 

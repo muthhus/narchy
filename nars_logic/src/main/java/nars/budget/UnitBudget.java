@@ -26,9 +26,6 @@ import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.nal.UtilityFunctions.and;
-import static nars.nal.UtilityFunctions.or;
-
 /**
  * A triple of priority (current), durability (decay), and quality (long-term average).
  *
@@ -112,7 +109,7 @@ public class UnitBudget extends Budget {
         if (v != null) {
             budget(v);
             if (!copyLastForgetTime)
-                setLastForgetTime(-1);
+                setLastForgetTime(Tense.TIMELESS);
         }
     }
 
@@ -207,23 +204,23 @@ public class UnitBudget extends Budget {
         quality = Util.clamp(q);
     }
 
-    /**
-     * Increase quality value by a percentage of the remaining range
-     *
-     * @param v The increasing percent
-     */
-    public void orQuality(float v) {
-        quality = or(quality, v);
-    }
-
-    /**
-     * Decrease quality value by a percentage of the remaining range
-     *
-     * @param v The decreasing percent
-     */
-    public void andQuality(float v) {
-        quality = and(quality, v);
-    }
+//    /**
+//     * Increase quality value by a percentage of the remaining range
+//     *
+//     * @param v The increasing percent
+//     */
+//    public void orQuality(float v) {
+//        quality = or(quality, v);
+//    }
+//
+//    /**
+//     * Decrease quality value by a percentage of the remaining range
+//     *
+//     * @param v The decreasing percent
+//     */
+//    public void andQuality(float v) {
+//        quality = and(quality, v);
+//    }
 
 
     public boolean equals(Object that) {
@@ -266,12 +263,6 @@ public class UnitBudget extends Budget {
 
 
 
-
-
-    @Override
-    public void priMult(float factor) {
-        setPriority(priority * factor);
-    }
 
     public void mulDurability(float factor) {
         setDurability(durability * factor);

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package nars.task.in;
+package nars.op.in;
 
 import nars.NAR;
 import nars.util.data.random.XORShiftRandom;

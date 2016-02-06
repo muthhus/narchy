@@ -97,22 +97,22 @@ public abstract class Budget extends BudgetedHandle {
 
    
 
-    public Budget mult(float priFactor, float durFactor, float quaFactor) {
-        if (priFactor!=1) priMult(priFactor);
-        if (durFactor!=1) durMult(durFactor);
-        if (quaFactor!=1) quaMult(quaFactor);
-        return this;
-    }
-
+//    public Budget mult(float priFactor, float durFactor, float quaFactor) {
+//        if (priFactor!=1) priMult(priFactor);
+//        if (durFactor!=1) durMult(durFactor);
+//        if (quaFactor!=1) quaMult(quaFactor);
+//        return this;
+//    }
+//
     public void priMult(float factor) {
         setPriority(pri() * factor);
     }
-    public void durMult(float factor) {
-        setDurability(dur() * factor);
-    }
-    public void quaMult(float factor) {
-        setQuality(qua() * factor);
-    }
+//    public void durMult(float factor) {
+//        setDurability(dur() * factor);
+//    }
+//    public void quaMult(float factor) {
+//        setQuality(qua() * factor);
+//    }
 
 
     public abstract void setDurability(float d);

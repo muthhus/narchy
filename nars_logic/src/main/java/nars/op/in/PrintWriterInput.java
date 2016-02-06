@@ -1,4 +1,4 @@
-package nars.task.in;
+package nars.op.in;
 
 import nars.NAR;
 import org.jetbrains.annotations.NotNull;

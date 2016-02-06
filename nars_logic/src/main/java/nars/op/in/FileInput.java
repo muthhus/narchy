@@ -1,4 +1,4 @@
-package nars.task.in;
+package nars.op.in;
 
 import com.google.common.io.Files;
 import nars.NAR;

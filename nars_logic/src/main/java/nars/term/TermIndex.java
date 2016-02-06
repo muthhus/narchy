@@ -92,8 +92,9 @@ public interface TermIndex extends TermBuilder {
         TermVector t = (TermVector)s;
         Term[] x = t.terms();
         for (int i = 0; i < x.length; i++) {
-            Term u = theTerm(x[i]); //since they are equal this will not need re-hashed
-            if (u.equals(x[i]))
+            Term xi = x[i];
+            Term u = theTerm(xi); //since they are equal this will not need re-hashed
+            if (u.equals(xi))
                 x[i] = u; //HACK use unified, otherwise keep original
         }
         return s;

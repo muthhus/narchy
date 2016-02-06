@@ -102,7 +102,7 @@ public interface TermBuilder {
 
         Compound tx = transform((Compound) t, normalizeFast((Compound) t));
         if (tx != null)
-            ((GenericCompound)tx.term()).setNormalized();
+            ((GenericCompound)tx).setNormalized();
 
         return tx;
     }
@@ -122,18 +122,15 @@ public interface TermBuilder {
     }
     @Nullable
     default Term newTerm(@NotNull Op op, Term singleton) {
-        return newTerm(op, -1, new TermVector(singleton));
-    }
-    @Nullable
-    default Term newTerm(@NotNull Op op, Term... x) {
-        return newTerm(op, -1, TermContainer.the(op, x));
+        return newTerm(op, new TermVector(singleton));
     }
 
 
-    @Nullable
-    default <X extends Compound> X transform(@NotNull Compound src, @NotNull CompoundTransform t) {
-        return transform(src, t, true);
-    }
+
+//    @Nullable
+//    default <X extends Compound> X transform(@NotNull Compound src, @NotNull CompoundTransform t) {
+//        return transform(src, t);
+//    }
 
 //    @Nullable
 //    default <X extends Compound> X transformRoot(@NotNull Compound src, @NotNull CompoundTransform t) {
@@ -147,7 +144,7 @@ public interface TermBuilder {
 //    }
 
     @Nullable
-    default <X extends Compound> X transform(@NotNull Compound src, @NotNull CompoundTransform t, boolean requireEqualityForNewInstance) {
+    default <X extends Compound> X transform(@NotNull Compound src, @NotNull CompoundTransform t) {
         if (!t.testSuperTerm(src)) {
             return (X) src; //nothing changed
         }
@@ -158,7 +155,7 @@ public interface TermBuilder {
 
         if (mods == -1) {
             return null;
-        } else if (!requireEqualityForNewInstance || (mods > 0)) {
+        } else if ((mods > 0)) {
             return (X) newTerm(src, TermContainer.the(src.op(), newSubterms));
         }
         return (X) src; //nothing changed
@@ -178,13 +175,13 @@ public interface TermBuilder {
 
             if (trans.test(x)) {
 
-                Term y = trans.apply( (Compound<T>)src, (T) x, level);
-                if (y == null)
+                Term x2 = trans.apply( (Compound<T>)src, (T) x, level);
+                if (x2 == null)
                     return -1;
 
-                if (x!=y) {
+                if (x!=x2) {
                     modifications++;
-                    x = y;
+                    x = x2;
                 }
 
             } else if (x instanceof Compound) {
@@ -241,7 +238,7 @@ public interface TermBuilder {
     }
 
     @Nullable
-    default Term newTerm(@NotNull Op op, int relation, int t, @Nullable TermContainer tt) {
+    default Term newTerm(@NotNull Op op, int relation, int t, @NotNull TermContainer tt) {
 
 //        if (tt == null)
 //            return null;
@@ -282,7 +279,7 @@ public interface TermBuilder {
                 if ((relation == -1) || (relation > u.length))
                     return null;
 
-                break; //continued below
+                return finish(op, relation, ITERNAL, tt); //continued below
 
             case DIFF_EXT:
             case DIFF_INT:
@@ -291,17 +288,11 @@ public interface TermBuilder {
                 return newIntersectEXT(u);
             case INTERSECT_INT:
                 return newIntersectINT(u);
-        }
-
-        if (op.isStatement()) {
-
-            return statement(op, t, u);
-
-        } else {
-
-            return finish(op, relation, t, tt);
+            default:
+                return op.isStatement() ? statement(op, t, u) : finish(op, relation, t, tt);
 
         }
+
 
     }
 
@@ -361,7 +352,7 @@ public interface TermBuilder {
 
     }
 
-    public static final class InvalidTermConstruction extends RuntimeException {
+    final class InvalidTermConstruction extends RuntimeException {
         private final Op op;
         private final int rel;
         private final int dt;
@@ -394,15 +385,15 @@ public interface TermBuilder {
 
     @Nullable
     default Term inst(Term subj, Term pred) {
-        return newTerm(INHERIT, newTerm(SET_EXT, subj), pred);
+        return newTerm(INHERIT, new TermVector(newTerm(SET_EXT, subj), pred));
     }
     @Nullable
     default Term prop(Term subj, Term pred) {
-        return newTerm(INHERIT, subj, newTerm(SET_INT, pred));
+        return newTerm(INHERIT, new TermVector(subj, newTerm(SET_INT, pred)));
     }
     @Nullable
     default Term instprop(Term subj, Term pred) {
-        return newTerm(INHERIT, newTerm(SET_EXT, subj), newTerm(SET_INT, pred));
+        return newTerm(INHERIT, new TermVector(newTerm(SET_EXT, subj), newTerm(SET_INT, pred)));
     }
 
     default Term negation(@NotNull Term t) {
@@ -424,15 +415,14 @@ public interface TermBuilder {
             j++;
         }
 
-        if (index == -1) {
+        if (index == -1)
             throw new RuntimeException("invalid image subterms: " + Arrays.toString(res));
-        } else {
-            int serN = res.length - 1;
-            Term[] ser = new Term[serN];
-            System.arraycopy(res, 0, ser, 0, index);
-            System.arraycopy(res, index + 1, ser, index, (serN - index));
-            res = ser;
-        }
+
+        int serN = res.length - 1;
+        Term[] ser = new Term[serN];
+        System.arraycopy(res, 0, ser, 0, index);
+        System.arraycopy(res, index + 1, ser, index, (serN - index));
+        res = ser;
 
         return newTerm(
                 o,
@@ -452,10 +442,12 @@ public interface TermBuilder {
 
             if (t == 0) {
                 //special case: 0
-                Term x = junction(op, 0, TermSet.the(u));
-                if (x.op(op))
-                    return ((Compound)x).t(0);
-                return x;
+                Compound x = (Compound)junction(op, 0, TermSet.the(u));
+                if (x.size() == 1)
+                    return x.term(0);
+                //if (x.op(op))
+                return x.t(0);
+                //return x;
             }
 
             if (u.length == 1) {
@@ -464,7 +456,7 @@ public interface TermBuilder {
 
             if (u.length!=2) {
                 throw new RuntimeException
-                ("invalid temporal conjunction: " + op + " " + t + " "+ Arrays.toString(u));
+                ("invalid temporal conjunction: " + op + ' ' + t + ' ' + Arrays.toString(u));
                 //return null;
             }
 
@@ -495,6 +487,7 @@ public interface TermBuilder {
 
         //TODO use a more efficient flattening that doesnt involve recursion and multiple array creations
         TreeSet<Term> s = new TreeSet();
+
         u.forEach(x -> {
             if (x.op(op) && (((Compound)x).t()==dt) ) {
                 for (Term y : ((TermContainer) x).terms()) {
@@ -629,8 +622,10 @@ public interface TermBuilder {
                 return newIntersection2(t[0], t[1], intersection, setUnion, setIntersection);
             default:
                 //HACK use more efficient way
+                Term a = newIntersection2(t[0], t[1], intersection, setUnion, setIntersection);
+                if (a == null) return null;
                 return newIntersection2(
-                    newIntersection2(t[0], t[1], intersection, setUnion, setIntersection),
+                    a,
                     newIntersection(copyOfRange(t, 2, t.length), intersection, setUnion, setIntersection),
                     intersection, setUnion, setIntersection
                 );
@@ -701,16 +696,13 @@ public interface TermBuilder {
         if (y!=null)
             return y;
 
-        int len = src.size();
 
+
+        Term[] ss = src.terms();
+        int len = ss.length;
         List<Term> sub = Global.newArrayList(len /* estimate */);
-
         for (int i = 0; i < len; i++) {
-            Term t = src.term(i);
-            if (!apply(t, f, sub)) {
-                if (fullMatch)
-                    return null;
-            }
+            apply(ss[i], f, sub);
         }
 
         TermContainer cc = TermContainer.the(src.op(), sub);
@@ -719,15 +711,17 @@ public interface TermBuilder {
 
         //apply any known immediate transform operators
         //TODO decide if this is evaluated incorrectly somehow in reverse
-        if (result!=null && isOperation(result)) {
-            ImmediateTermTransform tf = f.getTransform(Operator.operator((Compound)result));
-            if (tf!=null) {
-                result = applyImmediateTransform(f, result, tf);
+        if (result != null) {
+            if (isOperation(result)) {
+                ImmediateTermTransform tf = f.getTransform(Operator.operator((Compound) result));
+                if (tf != null) {
+                    result = applyImmediateTransform(f, result, tf);
+                }
             }
+        } else {
+            if (!fullMatch)
+                result = src;
         }
-
-        if (result == null && !fullMatch)
-            result = src;
 
         return result;
     }
@@ -754,7 +748,7 @@ public interface TermBuilder {
             return src;
         }
 
-        if (src instanceof Compound) {
+        if (src.isCompound()) {
             return transform((Compound)src, f, false);
         } else if (src instanceof Variable) {
             Term x = f.getXY(src);
@@ -769,7 +763,7 @@ public interface TermBuilder {
 
     /** resolve the this term according to subst by appending to sub.
      * return false if this term fails the substitution */
-    default boolean apply(Term src, @NotNull Subst f, @NotNull Collection<Term> sub) {
+    default void apply(Term src, @NotNull Subst f, @NotNull Collection<Term> sub) {
         Term u = apply(f, src);
         if (u == null) {
             u = src;
@@ -783,8 +777,6 @@ public interface TermBuilder {
         } else {
             sub.add(u);
         }
-
-        return true;
     }
 
 

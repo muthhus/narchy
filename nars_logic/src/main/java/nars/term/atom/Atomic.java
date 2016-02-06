@@ -21,8 +21,11 @@ public abstract class Atomic implements Term {
                 ((u instanceof Termed) && equalsTerm((Termed)u));
     }
 
+    @Override
+    public final boolean isCompound() { return false; }
+
     private final boolean equalsTerm(@NotNull Termed t) {
-        return (op()==t.op()) && toString().equals(t.toString());
+        return op(t.op()) && toString().equals(t.toString());
     }
 
     @Override abstract public String toString();

@@ -2,7 +2,7 @@ package nars.task;
 
 import nars.Global;
 import nars.Memory;
-import nars.budget.Item;
+import nars.budget.UnitBudget;
 import nars.concept.Concept;
 import nars.nal.Tense;
 import nars.term.Compound;
@@ -27,7 +27,7 @@ import static nars.Global.reference;
  * Default Task implementation
  * TODO move all mutable methods to MutableTask and call this ImmutableTask
  */
-public abstract class AbstractTask extends Item<Task>
+public abstract class AbstractTask extends UnitBudget
         implements Task, Temporal {
 
     /** content term of this task */

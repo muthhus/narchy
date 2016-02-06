@@ -2,7 +2,7 @@
  * Here comes the text of your license
  * Each line should be prefixed with  * 
  */
-package nars.task.in;
+package nars.op.in;
 
 import nars.Global;
 import nars.Memory;

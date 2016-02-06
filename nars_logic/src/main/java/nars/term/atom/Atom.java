@@ -19,27 +19,21 @@ public class Atom extends StringAtom {
 //        //return Util.WildPlasserHashNonZero(id, (1+ordinal));
 //    }
 
-    /** TODO use a hash function equivalent to String's but without allocating a String */
-    @Deprecated public static int hash(@NotNull byte[] id, int ordinal) {
-        return hash(new String(id).hashCode(), ordinal);
-    }
+//    /** TODO use a hash function equivalent to String's but without allocating a String */
+//    @Deprecated public static int hash(@NotNull byte[] id, int ordinal) {
+//        return hash(new String(id).hashCode(), ordinal);
+//    }
 
     public static int hash(@NotNull String id, @NotNull Op op) {
-        return hash(id.hashCode(), op);
-    }
+        int id1 = id.hashCode();
 
-    public static int hash(int id, @NotNull Op op) {
-        return hash(id, op.ordinal());
-    }
-
-    public static int hash(int id, int ordinal) {
         /* for Op.ATOM, we use String hashCode() as-is
           avoiding need to calculate or store a
           hash mutated by the Op (below) */
-        if (ordinal == Op.ATOM.ordinal())
-            return id;
+        if (op == Op.ATOM)
+            return id1;
 
-        return Util.hashCombine(id, ordinal);
+        return Util.hashCombine(id1, op.ordinal());
     }
 
     public Atom(@NotNull byte[] n) {

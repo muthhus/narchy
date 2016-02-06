@@ -1,5 +1,6 @@
 package nars.budget;
 
+import nars.Memory;
 import nars.data.BudgetedStruct;
 import org.jetbrains.annotations.NotNull;
 
@@ -8,7 +9,34 @@ import org.jetbrains.annotations.NotNull;
  */
 public interface Budgeted extends BudgetedStruct {
 
-	@NotNull
+    static float getPrioritySum(@NotNull Iterable<? extends Budgeted> c) {
+        float totalPriority = 0;
+        for (Budgeted i : c)
+            totalPriority+=i.pri();
+        return totalPriority;
+    }
+
+    /** randomly selects an item from a collection, weighted by priority */
+    static <E extends Budgeted> E selectRandomByPriority(@NotNull Memory memory, @NotNull Iterable<E> c) {
+        float totalPriority = getPrioritySum(c);
+
+        if (totalPriority == 0) return null;
+
+        float r = memory.random.nextFloat() * totalPriority;
+
+        E s = null;
+        for (E i : c) {
+            s = i;
+            r -= s.pri();
+            if (r < 0)
+                return s;
+        }
+
+        return s;
+
+    }
+
+    @NotNull
 	Budget budget();
 
 	default float summary() {

@@ -62,6 +62,8 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
     }
 
 
+    default boolean isCompound() { return true; }
+
     @Override
     default void recurseTerms(@NotNull SubtermVisitor v) {
         recurseTerms(v, this);

@@ -36,7 +36,6 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.ref.Reference;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import static nars.Global.dereference;
@@ -632,38 +631,38 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     void setTruth(Truth t);
 
 
-
-    /** normalize a collection of tasks to each other
-     * so that the aggregate budget sums to a provided
-     * normalization amount.
-     * @param derived
-     * @param premisePriority the total value that the derivation group should reach, effectively a final scalar factor determined by premise parent and possibly existing belief tasks
-     * @return the input collection, unmodified (elements may be adjusted individually)
-     */
-    static void normalizeCombined(@NotNull Iterable<Task> derived, float premisePriority) {
-
-
-        float totalDerivedPriority = prioritySum(derived);
-        float factor = Math.min(
-                    premisePriority/totalDerivedPriority,
-                    1.0f //limit to only diminish
-                );
-
-        if (!Float.isFinite(factor))
-            throw new RuntimeException("NaN");
-
-        derived.forEach(t -> t.budget().priMult(factor));
-    }
-
-    static void normalize(@NotNull Iterable<Task> derived, float premisePriority) {
-        derived.forEach(t -> t.budget().priMult(premisePriority));
-    }
-    static void inputNormalized(@NotNull Iterable<Task> derived, float premisePriority, @NotNull Consumer<Task> target) {
-        derived.forEach(t -> {
-            t.budget().priMult(premisePriority);
-            target.accept(t);
-        });
-    }
+//
+//    /** normalize a collection of tasks to each other
+//     * so that the aggregate budget sums to a provided
+//     * normalization amount.
+//     * @param derived
+//     * @param premisePriority the total value that the derivation group should reach, effectively a final scalar factor determined by premise parent and possibly existing belief tasks
+//     * @return the input collection, unmodified (elements may be adjusted individually)
+//     */
+//    static void normalizeCombined(@NotNull Iterable<Task> derived, float premisePriority) {
+//
+//
+//        float totalDerivedPriority = prioritySum(derived);
+//        float factor = Math.min(
+//                    premisePriority/totalDerivedPriority,
+//                    1.0f //limit to only diminish
+//                );
+//
+//        if (!Float.isFinite(factor))
+//            throw new RuntimeException("NaN");
+//
+//        derived.forEach(t -> t.budget().priMult(factor));
+//    }
+//
+//    static void normalize(@NotNull Iterable<Task> derived, float premisePriority) {
+//        derived.forEach(t -> t.budget().priMult(premisePriority));
+//    }
+//    static void inputNormalized(@NotNull Iterable<Task> derived, float premisePriority, @NotNull Consumer<Task> target) {
+//        derived.forEach(t -> {
+//            t.budget().priMult(premisePriority);
+//            target.accept(t);
+//        });
+//    }
 
     @NotNull
     static Task command(@NotNull Compound op) {

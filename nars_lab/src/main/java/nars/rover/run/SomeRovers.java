@@ -115,7 +115,7 @@ public class SomeRovers {
         nar.memory.conceptForgetDurations.setValue(2);
         nar.memory.termLinkForgetDurations.setValue(4);
         nar.memory.taskLinkForgetDurations.setValue(6);
-        nar.memory.cyclesPerFrame.set(16);
+        nar.memory.cyclesPerFrame.set(64);
         nar.memory.shortTermMemoryHistory.set(2);
         nar.memory.executionThreshold.setValue(0.002f);
 

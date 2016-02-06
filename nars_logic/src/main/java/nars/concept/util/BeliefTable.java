@@ -278,7 +278,9 @@ public interface BeliefTable extends TaskTable {
 
     /** temporal relevance */
     static float relevance(long from, long to, float ageFactor) {
-        if (from == Tense.ETERNAL) return 0.5f; //weight eternal half as much as temporal; similar to a horizon heuristic
+        if (from == Tense.ETERNAL)
+            return Float.NaN;
+            //return 0.5f; //weight eternal half as much as temporal; similar to a horizon heuristic
 
         return relevance(Math.abs(from - to), ageFactor);
     }

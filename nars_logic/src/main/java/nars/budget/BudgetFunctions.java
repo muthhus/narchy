@@ -37,46 +37,46 @@ import org.jetbrains.annotations.NotNull;
 public final class BudgetFunctions extends UtilityFunctions {
 
 	/* ----------------------- Belief evaluation ----------------------- */
-	/**
-	 * Determine the quality of a judgment by its truth value alone
-	 * <p>
-	 *
-	 * 
-	 * @param t
-	 *            The truth value of a judgment
-	 * @return The quality of the judgment, according to truth value only
-	 */
-	public static float truthToQuality(@NotNull Truth t) {
-		float exp = t.expectation();
 
-		//return Math.max(exp, (1.0f - exp) * 0.75f); //ORIGINAL: Mainly decided by confidence, though binary judgment is also preferred
+    /**
+     * Determine the quality of a judgment by its truth value alone
+     * <p>
+     *
+     * @param t The truth value of a judgment
+     * @return The quality of the judgment, according to truth value only
+     */
+    public static float truthToQuality(@NotNull Truth t) {
+        float exp = t.expectation();
 
-		return Math.max(exp, (1.0f - exp)); //balanced, allows negative frequency equal opportunity
-	}
+        //return Math.max(exp, (1.0f - exp) * 0.75f); //ORIGINAL: Mainly decided by confidence, though binary judgment is also preferred
 
-	/**
-	 * Evaluate the quality of a revision, then de-prioritize the premises
-	 * 
-	 *            The truth value of the judgment in the task of the premise
-	 *            The truth value of the previously existing belief
-	 *            The truth value of the conclusion of revision
-	 * @return The budget for the new task
-	 */
-	@NotNull
-	public static void budgetRevision(@NotNull Task conclusion, @NotNull Task newBelief, @NotNull Task oldBelief) {
+        return Math.max(exp, (1.0f - exp)); //balanced, allows negative frequency equal opportunity
+    }
 
-		Truth nTruth = newBelief.truth();
-		Budget nBudget = newBelief.budget();
+    /**
+     * Evaluate the quality of a revision, then de-prioritize the premises
+     * <p>
+     * The truth value of the judgment in the task of the premise
+     * The truth value of the previously existing belief
+     * The truth value of the conclusion of revision
+     *
+     * @return The budget for the new task
+     */
+    @NotNull
+    public static void budgetRevision(@NotNull Task conclusion, @NotNull Task newBelief, @NotNull Task oldBelief) {
 
-		Truth concTruth = conclusion.truth();
-		Truth bTruth = oldBelief.truth();
-		float difT = concTruth.getExpDifAbs(nTruth);
+        Truth nTruth = newBelief.truth();
+        Budget nBudget = newBelief.budget();
 
-		nBudget.andPriority(1.0f - difT);
-		nBudget.andDurability(1.0f - difT);
+        Truth concTruth = conclusion.truth();
+        Truth bTruth = oldBelief.truth();
+        float difT = concTruth.getExpDifAbs(nTruth);
 
-		float proportion = concTruth.conf()
-				/ Math.max(nTruth.conf(), bTruth.conf());
+        nBudget.andPriority(1.0f - difT);
+        nBudget.andDurability(1.0f - difT);
+
+        float proportion = concTruth.conf()
+                / Math.max(nTruth.conf(), bTruth.conf());
 
 //		float dif = concTruth.conf()
 //				- Math.max(nTruth.conf(), bTruth.conf());
@@ -91,16 +91,16 @@ public final class BudgetFunctions extends UtilityFunctions {
 ////			dif = 0;
 //		}
 
-		float priority =
-				proportion * nBudget.pri();
-				//or(dif, nBudget.pri());
-		float durability =
-				//aveAri(dif, nBudget.dur());
-				proportion * nBudget.dur();
-		float quality = truthToQuality(concTruth);
+        float priority =
+                proportion * nBudget.pri();
+        //or(dif, nBudget.pri());
+        float durability =
+                //aveAri(dif, nBudget.dur());
+                proportion * nBudget.dur();
+        float quality = truthToQuality(concTruth);
 
 		/*
-		 * if (priority < 0) { memory.nar.output(ERR.class, new
+         * if (priority < 0) { memory.nar.output(ERR.class, new
 		 * RuntimeException(
 		 * "BudgetValue.revise resulted in negative priority; set to 0"));
 		 * priority = 0; } if (durability < 0) { memory.nar.output(ERR.class,
@@ -113,115 +113,115 @@ public final class BudgetFunctions extends UtilityFunctions {
 		 * quality = 0; }
 		 */
 
-		conclusion.budget().budget(priority, durability, quality);
+        conclusion.budget().budget(priority, durability, quality);
 
-	}
+    }
 
-	// /**
-	// * Update a belief
-	// *
-	// * @param task The task containing new belief
-	// * @param bTruth Truth value of the previous belief
-	// * @return Budget value of the updating task
-	// */
-	// static Budget update(final Task task, final Truth bTruth) {
-	// final Truth tTruth = task.getTruth();
-	// final float dif = tTruth.getExpDifAbs(bTruth);
-	// final float priority = or(dif, task.getPriority());
-	// final float durability = aveAri(dif, task.getDurability());
-	// final float quality = truthToQuality(bTruth);
-	// return new Budget(priority, durability, quality);
-	// }
+    // /**
+    // * Update a belief
+    // *
+    // * @param task The task containing new belief
+    // * @param bTruth Truth value of the previous belief
+    // * @return Budget value of the updating task
+    // */
+    // static Budget update(final Task task, final Truth bTruth) {
+    // final Truth tTruth = task.getTruth();
+    // final float dif = tTruth.getExpDifAbs(bTruth);
+    // final float priority = or(dif, task.getPriority());
+    // final float durability = aveAri(dif, task.getDurability());
+    // final float quality = truthToQuality(bTruth);
+    // return new Budget(priority, durability, quality);
+    // }
 
-	// /* ----------------------- Links ----------------------- */
-	// /**
-	// * Distribute the budget of a task among the links to it
-	// *
-	// * @param b The original budget
-	// * @param factor to scale dur and qua
-	// * @return Budget value for each tlink
-	// */
-	// public static UnitBudget clonePriorityMultiplied(Budgeted b, float
-	// factor) {
-	// float newPriority = b.getPriority() * factor;
-	// return new UnitBudget(newPriority, b.getDurability(), b.getQuality());
-	// }
+    // /* ----------------------- Links ----------------------- */
+    // /**
+    // * Distribute the budget of a task among the links to it
+    // *
+    // * @param b The original budget
+    // * @param factor to scale dur and qua
+    // * @return Budget value for each tlink
+    // */
+    // public static UnitBudget clonePriorityMultiplied(Budgeted b, float
+    // factor) {
+    // float newPriority = b.getPriority() * factor;
+    // return new UnitBudget(newPriority, b.getDurability(), b.getQuality());
+    // }
 
-	// /**
-	// */
-	// public static void activate(final Budget receiver, final Budget amount,
-	// Activating mode) {
-	// activate(receiver, amount, mode, 1f);
-	// }
+    // /**
+    // */
+    // public static void activate(final Budget receiver, final Budget amount,
+    // Activating mode) {
+    // activate(receiver, amount, mode, 1f);
+    // }
 
-	// /* ---------------- Bag functions, on all Items ------------------- */
-	// /**
-	// * Decrease Priority after an item is used, called in Bag.
-	// * After a constant time, p should become d*p. Since in this period, the
-	// * item is accessed c*p times, each time p-q should multiple d^(1/(c*p)).
-	// * The intuitive meaning of the parameter "forgetRate" is: after this
-	// number
-	// * of times of access, priority 1 will become d, it is a system parameter
-	// * adjustable in run time.
-	// *
-	// * @param budget The previous budget value
-	// * @param forgetCycles The budget for the new item
-	// * @param relativeThreshold The relative threshold of the bag
-	// */
-	// @Deprecated public static float forgetIterative(Budget budget, float
-	// forgetCycles, float relativeThreshold) {
-	// float newPri = budget.getQuality() * relativeThreshold; // re-scaled
-	// quality
-	// float dp = budget.getPriority() - newPri; // priority above quality
-	// if (dp > 0) {
-	// newPri += (float) (dp * pow(budget.getDurability(), 1.0f / (forgetCycles
-	// * dp)));
-	// } // priority Durability
-	// budget.setPriority(newPri);
-	// return newPri;
-	// }
-	//
-	//
-	//
-	// /** forgetting calculation for real-time timing */
-	// public static float forgetPeriodic(Budget budget, float forgetPeriod /*
-	// cycles */, float minPriorityForgettingCanAffect, long currentTime) {
-	//
-	// float currentPriority = budget.getPriority();
-	// long forgetDelta = budget.setLastForgetTime(currentTime);
-	// if (forgetDelta == 0) {
-	// return currentPriority;
-	// }
-	//
-	// minPriorityForgettingCanAffect *= budget.getQuality();
-	//
-	// if (currentPriority < minPriorityForgettingCanAffect) {
-	// //priority already below threshold, don't decrease any further
-	// return currentPriority;
-	// }
-	//
-	// float forgetProportion = forgetDelta / forgetPeriod;
-	// if (forgetProportion <= 0) return currentPriority;
-	//
-	// //more durability = slower forgetting; durability near 1.0 means
-	// forgetting will happen slowly, near 0.0 means will happen at a max rate
-	// forgetProportion *= (1.0f - budget.getDurability());
-	//
-	// float newPriority = forgetProportion > 1.0f ?
-	// minPriorityForgettingCanAffect : currentPriority * (1.0f -
-	// forgetProportion) + minPriorityForgettingCanAffect * (forgetProportion);
-	//
-	//
-	// budget.setPriority(newPriority);
-	//
-	// return newPriority;
-	//
-	//
-	// /*if (forgetDelta > 0)
-	// System.out.println("  " + currentPriority + " -> " +
-	// budget.getPriority());*/
-	//
-	// }
+    // /* ---------------- Bag functions, on all Items ------------------- */
+    // /**
+    // * Decrease Priority after an item is used, called in Bag.
+    // * After a constant time, p should become d*p. Since in this period, the
+    // * item is accessed c*p times, each time p-q should multiple d^(1/(c*p)).
+    // * The intuitive meaning of the parameter "forgetRate" is: after this
+    // number
+    // * of times of access, priority 1 will become d, it is a system parameter
+    // * adjustable in run time.
+    // *
+    // * @param budget The previous budget value
+    // * @param forgetCycles The budget for the new item
+    // * @param relativeThreshold The relative threshold of the bag
+    // */
+    // @Deprecated public static float forgetIterative(Budget budget, float
+    // forgetCycles, float relativeThreshold) {
+    // float newPri = budget.getQuality() * relativeThreshold; // re-scaled
+    // quality
+    // float dp = budget.getPriority() - newPri; // priority above quality
+    // if (dp > 0) {
+    // newPri += (float) (dp * pow(budget.getDurability(), 1.0f / (forgetCycles
+    // * dp)));
+    // } // priority Durability
+    // budget.setPriority(newPri);
+    // return newPri;
+    // }
+    //
+    //
+    //
+    // /** forgetting calculation for real-time timing */
+    // public static float forgetPeriodic(Budget budget, float forgetPeriod /*
+    // cycles */, float minPriorityForgettingCanAffect, long currentTime) {
+    //
+    // float currentPriority = budget.getPriority();
+    // long forgetDelta = budget.setLastForgetTime(currentTime);
+    // if (forgetDelta == 0) {
+    // return currentPriority;
+    // }
+    //
+    // minPriorityForgettingCanAffect *= budget.getQuality();
+    //
+    // if (currentPriority < minPriorityForgettingCanAffect) {
+    // //priority already below threshold, don't decrease any further
+    // return currentPriority;
+    // }
+    //
+    // float forgetProportion = forgetDelta / forgetPeriod;
+    // if (forgetProportion <= 0) return currentPriority;
+    //
+    // //more durability = slower forgetting; durability near 1.0 means
+    // forgetting will happen slowly, near 0.0 means will happen at a max rate
+    // forgetProportion *= (1.0f - budget.getDurability());
+    //
+    // float newPriority = forgetProportion > 1.0f ?
+    // minPriorityForgettingCanAffect : currentPriority * (1.0f -
+    // forgetProportion) + minPriorityForgettingCanAffect * (forgetProportion);
+    //
+    //
+    // budget.setPriority(newPriority);
+    //
+    // return newPriority;
+    //
+    //
+    // /*if (forgetDelta > 0)
+    // System.out.println("  " + currentPriority + " -> " +
+    // budget.getPriority());*/
+    //
+    // }
 
 	/*
 	 * public final static float abs(final float a, final float b) { float c =
@@ -229,126 +229,116 @@ public final class BudgetFunctions extends UtilityFunctions {
 	 */
 
 	/* ----- Task derivation in LocalRules and SyllogisticRules ----- */
-	/**
-	 * Forward logic result and adjustment
-	 * 
-	 * @param truth
-	 *            The truth value of the conclusion
-	 * @return The budget value of the conclusion
-	 */
-	@NotNull
-	public static Budget forward(@NotNull Truth truth, @NotNull ConceptProcess nal) {
-		return budgetInference(truthToQuality(truth), 1, nal);
-	}
 
-	/**
-	 * Backward logic result and adjustment, stronger case
-	 * 
-	 * @param truth
-	 *            The truth value of the belief deriving the conclusion
-	 * @param nal
-	 *            Reference to the memory
-	 * @return The budget value of the conclusion
-	 */
-	@NotNull
-	public static Budget backward(@NotNull Truth truth, @NotNull ConceptProcess nal) {
-		return budgetInference(truthToQuality(truth), 1, nal);
-	}
+    /**
+     * Forward logic result and adjustment
+     *
+     * @param truth The truth value of the conclusion
+     * @return The budget value of the conclusion
+     */
+    @NotNull
+    public static Budget forward(@NotNull Truth truth, @NotNull ConceptProcess nal) {
+        return budgetInference(truthToQuality(truth), 1, nal);
+    }
 
-	/**
-	 * Backward logic result and adjustment, weaker case
-	 * 
-	 * @param truth
-	 *            The truth value of the belief deriving the conclusion
-	 * @param nal
-	 *            Reference to the memory
-	 * @return The budget value of the conclusion
-	 */
-	@NotNull
-	public static Budget backwardWeak(@NotNull Truth truth, @NotNull ConceptProcess nal) {
-		return budgetInference(w2c(1) * truthToQuality(truth), 1, nal);
-	}
+    /**
+     * Backward logic result and adjustment, stronger case
+     *
+     * @param truth The truth value of the belief deriving the conclusion
+     * @param nal   Reference to the memory
+     * @return The budget value of the conclusion
+     */
+    @NotNull
+    public static Budget backward(@NotNull Truth truth, @NotNull ConceptProcess nal) {
+        return budgetInference(truthToQuality(truth), 1, nal);
+    }
+
+    /**
+     * Backward logic result and adjustment, weaker case
+     *
+     * @param truth The truth value of the belief deriving the conclusion
+     * @param nal   Reference to the memory
+     * @return The budget value of the conclusion
+     */
+    @NotNull
+    public static Budget backwardWeak(@NotNull Truth truth, @NotNull ConceptProcess nal) {
+        return budgetInference(w2c(1) * truthToQuality(truth), 1, nal);
+    }
 
 	/* ----- Task derivation in CompositionalRules and StructuralRules ----- */
 
-	@NotNull
-	public static Budget compoundForward(@NotNull Budget target, @NotNull Truth truth,
-										 @NotNull Termed content, @NotNull ConceptProcess nal) {
-		return budgetInference(
-				target,
-				truthToQuality(truth),
-				content.term().complexity(),
-				nal);
-	}
+    @NotNull
+    public static Budget compoundForward(@NotNull Budget target, @NotNull Truth truth,
+                                         @NotNull Termed content, @NotNull ConceptProcess nal) {
+        return budgetInference(
+                target,
+                truthToQuality(truth),
+                content.term().complexity(),
+                nal);
+    }
 
-	/**
-	 * Backward logic with CompoundTerm conclusion, stronger case
-	 * 
-	 * @param content
-	 *            The content of the conclusion
-	 * @return The budget of the conclusion
-	 */
-	@NotNull
-	public static Budget compoundBackward(@NotNull Termed content, @NotNull ConceptProcess nal) {
-		return budgetInference(1.0f, content.term().complexity(), nal);
-	}
+    /**
+     * Backward logic with CompoundTerm conclusion, stronger case
+     *
+     * @param content The content of the conclusion
+     * @return The budget of the conclusion
+     */
+    @NotNull
+    public static Budget compoundBackward(@NotNull Termed content, @NotNull ConceptProcess nal) {
+        return budgetInference(1.0f, content.term().complexity(), nal);
+    }
 
-	/**
-	 * Backward logic with CompoundTerm conclusion, weaker case
-	 * 
-	 * @param content
-	 *            The content of the conclusion
-	 * @param nal
-	 *            Reference to the memory
-	 * @return The budget of the conclusion
-	 */
-	@NotNull
-	public static Budget compoundBackwardWeak(@NotNull Termlike content,
-											  @NotNull ConceptProcess nal) {
-		return budgetInference(w2c(1), content.complexity(), nal);
-	}
+    /**
+     * Backward logic with CompoundTerm conclusion, weaker case
+     *
+     * @param content The content of the conclusion
+     * @param nal     Reference to the memory
+     * @return The budget of the conclusion
+     */
+    @NotNull
+    public static Budget compoundBackwardWeak(@NotNull Termlike content,
+                                              @NotNull ConceptProcess nal) {
+        return budgetInference(w2c(1), content.complexity(), nal);
+    }
 
-	@NotNull
-	static Budget budgetInference(float qual, int complexity, @NotNull ConceptProcess nal) {
-		return budgetInference(new UnitBudget(), qual, complexity, nal);
-	}
+    @NotNull
+    static Budget budgetInference(float qual, int complexity, @NotNull ConceptProcess nal) {
+        return budgetInference(new UnitBudget(), qual, complexity, nal);
+    }
 
-	/**
-	 * Common processing for all logic step
-	 * 
-	 * @param qual
-	 *            Quality of the logic
-	 * @param complexity
-	 *            Syntactic complexity of the conclusion
-	 * @param nal
-	 *            Reference to the memory
-	 * @return Budget of the conclusion task
-	 */
-	@NotNull
-	static Budget budgetInference(@NotNull Budget target, float qual, int complexity,
-								  @NotNull ConceptProcess nal) {
-		//float complexityFactor = complexity > 1 ?
+    /**
+     * Common processing for all logic step
+     *
+     * @param qual       Quality of the logic
+     * @param complexity Syntactic complexity of the conclusion
+     * @param nal        Reference to the memory
+     * @return Budget of the conclusion task
+     */
+    @NotNull
+    static Budget budgetInference(@NotNull Budget target, float qual, int complexity,
+                                  @NotNull ConceptProcess nal) {
+        //float complexityFactor = complexity > 1 ?
 
-		// sqrt factor (experimental)
-		// (float) (1f / Math.sqrt(Math.max(1, complexity))) //experimental,
-		// reduces dur and qua by sqrt of complexity (more slowly)
+        // sqrt factor (experimental)
+        // (float) (1f / Math.sqrt(Math.max(1, complexity))) //experimental,
+        // reduces dur and qua by sqrt of complexity (more slowly)
 
-				// linear factor (original)
-				//(1.0f / Math.max(1, complexity))
+        // linear factor (original)
+        //(1.0f / Math.max(1, complexity))
 
-				//: 1.0f;
-		float complexityFactor = 1f / complexity;
+        //: 1.0f;
+        float complexityFactor = 1f / complexity;
 
-		return budgetInference(target, qual, complexityFactor, nal);
-	}
+        return budgetInference(target, qual, complexityFactor, nal);
+    }
 
-	@NotNull
-	static Budget budgetInference(@NotNull Budget target, float qual, float complexityFactor, @NotNull ConceptProcess nal) {
+    @NotNull
+    static Budget budgetInference(@NotNull Budget target, float qual, float complexityFactor, @NotNull ConceptProcess nal) {
 
         final BLink<? extends Task> taskLink = nal.taskLink;
 
         final Budget t = taskLink;
-            //(taskLink !=null) ? taskLink :  nal.task().budget();
+        //(taskLink !=null) ? taskLink :  nal.task().budget();
 
 
         float priority = t.pri();
@@ -356,19 +346,21 @@ public final class BudgetFunctions extends UtilityFunctions {
         final float quality = qual * complexityFactor;
 
         BLink<? extends Termed> termLink = nal.termLink;
-        if ((termLink!=null) && (!termLink.isDeleted())) {
+        if (/*(termLink != null) && */(!termLink.isDeleted())) {
             priority = or(priority, termLink.pri()); //originally was OR, but this can explode because the result of OR can exceed the inputs
             durability = and(durability, termLink.dur()); //originaly was 'AND'
 
             NAR nar = nal.nar;
             final float targetActivation = nar.conceptPriority(termLink.get(), -1);
 
-			if (targetActivation >= 0) {
+            if (targetActivation >= 0) {
 
-				float sourceActivation = taskLink != null ? nar.conceptPriority(taskLink.get().concept(), 0) : 1f;
+                float sourceActivation =
+                        nar.conceptPriority(taskLink.get(), 0);
+                //taskLink != null ? nar.conceptPriority(taskLink.get().concept(), 0) : 1f;
 
                 //https://groups.google.com/forum/#!topic/open-nars/KnUA43B6iYs
-                termLink.orPriority(or(quality, and(sourceActivation,targetActivation)));
+                termLink.orPriority(or(quality, and(sourceActivation, targetActivation)));
                 //was
                 //termLink.orPriority(or(quality, targetActivation));
                 termLink.orDurability(quality);
@@ -397,26 +389,29 @@ public final class BudgetFunctions extends UtilityFunctions {
             return new BudgetValue(priority, durability, quality);
          */
     }
-	// may be more efficient than the for-loop version above, for 2 params
-	public static float aveAri(float a, float b) {
-		return (a + b) / 2.0f;
-	}
 
-	/**
+    // may be more efficient than the for-loop version above, for 2 params
+    public static float aveAri(float a, float b) {
+        return (a + b) / 2.0f;
+    }
+
+    /**
      * Forward logic with CompoundTerm conclusion
      *
-     * @param truth The truth value of the conclusion
+     * @param truth   The truth value of the conclusion
      * @param content The content of the conclusion
-     * @param nal Reference to the memory
+     * @param nal     Reference to the memory
      * @return The budget of the conclusion
      */
     public static Budget compoundForward(@NotNull Truth truth, @NotNull Termed content, @NotNull ConceptProcess nal) {
         return compoundForward(new UnitBudget(), truth, content, nal);
     }
 
-	/** tests a budget's validity for a task to be processed by a memory */
-	public static boolean valid(Budget budget, Memory m) {
+    /**
+     * tests a budget's validity for a task to be processed by a memory
+     */
+    public static boolean valid(Budget budget, Memory m) {
         return !budget.isDeleted() &&
-				budget.dur() >= m.derivationDurabilityThreshold.floatValue();
+                budget.dur() >= m.derivationDurabilityThreshold.floatValue();
     }
 }

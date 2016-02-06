@@ -102,15 +102,20 @@ public final class MatchTerm extends AtomicBooleanCondition<PremiseMatch> implem
 
     /** delegates a partial or complete match to each of the known derivation handlers */
     public boolean onMatch(@NotNull PremiseMatch m) {
-        if (Global.DEBUG && derive.isEmpty())
-            throw new RuntimeException("invalid MatchTerm with no derivation handlers:" + this);
+//        if (Global.DEBUG && derive.isEmpty())
+//            throw new RuntimeException("invalid MatchTerm with no derivation handlers:" + this);
 
         //TODO HACK dont lazily instantiate this but do it after the TrieDeriver has finished building the rule trie by iterating all known MatchTerm's (in the LinkGraph)
         if (onMatch == null) {
-            onMatch = new PremiseMatchFork(derive.toArray(new Derive[derive.size()]));
+            onMatch = init();
         }
 
         onMatch.accept(m);
         return true;
+    }
+
+    @NotNull
+    private PremiseMatchFork init() {
+        return new PremiseMatchFork(derive.toArray(new Derive[derive.size()]));
     }
 }

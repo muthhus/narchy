@@ -31,9 +31,11 @@ public class EvalSchemeTest extends AbstractNALTester {
         TestNAR t = test();
         t.nar.log();
         t.nar.input("scheme(\"" + factorialFunc + "\", #y)!");
+        t.nar.run(1);
         t.nar.input("scheme(\"factorial\", #x)!");
+        t.nar.run(1);
         t.nar.input("scheme(\"" + factorialTest + "\", #y)!");
-        t.nar.run(6);
+        t.nar.run(1);
 
     }
 

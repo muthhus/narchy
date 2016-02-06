@@ -6,7 +6,6 @@ import com.google.common.collect.Sets;
 import nars.$;
 import nars.Global;
 import nars.Op;
-import nars.nal.Level;
 import nars.nal.meta.constraint.MatchConstraint;
 import nars.nal.meta.constraint.NoCommonSubtermsConstraint;
 import nars.nal.meta.constraint.NotEqualsConstraint;
@@ -46,7 +45,7 @@ import static nars.term.Terms.concat;
  * A rule which matches a Premise and produces a Task
  * contains: preconditions, predicates, postconditions, post-evaluations and metainfo
  */
-public class PremiseRule extends GenericCompound implements Level {
+public class PremiseRule extends GenericCompound  {
 
 
     public static final Class<? extends ImmediateTermTransform>[] Operators = new Class[] {
@@ -656,7 +655,7 @@ public class PremiseRule extends GenericCompound implements Level {
 //
 //    }
 
-    public final int nal() { return minNAL; }
+    //public final int nal() { return minNAL; }
 
     public static final class PremiseRuleVariableNormalization extends VariableNormalization {
 

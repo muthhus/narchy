@@ -214,9 +214,7 @@ public interface Term extends Termed, Comparable, Termlike {
         return op().ordinal()<<16 | (-1 & 0xffff);
     }
 
-    default boolean isCompound() {
-        return size()>0;
-    }
+    boolean isCompound();
 
     @Override
     default boolean isNormalized() {
