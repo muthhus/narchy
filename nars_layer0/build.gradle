@@ -1,0 +1,13 @@
+description = 'OpenNARS Logic Reasoner PreProcess'
+dependencies {
+    compile project(':nars_util')
+    compile group: 'com.github.drapostolos', name: 'type-parser', version: '0.5.0'
+    compile group: 'org.fusesource.jansi', name: 'jansi', version: '1.11'
+    compile group: 'org.semanticweb.yars', name: 'nxparser-parsers', version: '2.3.3'
+    compile(group: 'org.jacop', name: 'jacop', version: '4.4.0') {
+        exclude(module: 'log4j')
+        exclude(module: 'slf4j-log4j12')
+    }
+    compile group: 'net.openhft', name: 'affinity', version: '3.0.1'
+    compile project(':nars_data')
+}

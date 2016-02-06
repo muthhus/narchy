@@ -1,0 +1,44 @@
+rootProject.name = 'opennars'
+include ':nars_data'
+include ':nars_util'
+include ':nars_layer0'
+include ':nars_logic'
+include ':nars_lab'
+include ':nars_web'
+include ':nars_gui'
+include ':nars_perf'
+
+project(':nars_data').projectDir = "$rootDir/nars_data" as File
+project(':nars_util').projectDir = "$rootDir/nars_util" as File
+project(':nars_layer0').projectDir = "$rootDir/nars_layer0" as File
+project(':nars_logic').projectDir = "$rootDir/nars_logic" as File
+project(':nars_lab').projectDir = "$rootDir/nars_lab" as File
+project(':nars_web').projectDir = "$rootDir/nars_web" as File
+project(':nars_gui').projectDir = "$rootDir/nars_gui" as File
+project(':nars_perf').projectDir = "$rootDir/nars_perf" as File
+
+
+
+
+
+//import static groovy.io.FileVisitResult.*
+//import static groovy.io.FileType.*
+//
+//def skipDirs = ~/^(build|..*|src|out)/
+//
+//def preDir = {
+//    if (skipDirs.matcher(it.name).matches())
+//        return SKIP_SUBTREE
+//}
+//
+//rootDir.traverse(type: DIRECTORIES, preDir: preDir) { dir ->
+//
+//    def dstr = dir.toString()
+//    def prj = dir.name
+//
+//    if (skipDirs.matcher(prj).matches() && new File(dstr + "/build.gradle").exists()) {
+//        def tprj = ':' + prj
+//        include(tprj)
+//        project(tprj).projectDir = ("$rootDir/" + prj) as File
+//    }
+//}

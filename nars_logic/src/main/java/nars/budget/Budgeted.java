@@ -1,7 +1,7 @@
 package nars.budget;
 
 import nars.Memory;
-import nars.data.BudgetedStruct;
+//import nars.data.BudgetedStruct;
 import org.jetbrains.annotations.NotNull;
 
 /**

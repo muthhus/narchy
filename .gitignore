@@ -27,3 +27,6 @@ UIFiles
 jmh-result.text
 nars_logic/tree.xml
 nars_logic/vis.xml
+.gradle/
+*/build
+gradle/

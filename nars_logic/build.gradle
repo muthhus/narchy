@@ -1,0 +1,9 @@
+description = 'OpenNARS Logic Reasoner'
+dependencies {
+    compile project(':nars_data')
+    compile project(':nars_layer0')
+    testCompile 'junit:junit:4.12'
+
+}
+
+

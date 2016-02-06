@@ -1,0 +1,46 @@
+
+allprojects {
+    apply plugin: 'maven'
+
+    group = 'opennars'
+    version = '1.7-SNAPSHOT'
+
+//    plugins {
+//        id 'nebula.metrics' version '4.0.1'
+//    }
+
+
+}
+
+subprojects {
+    apply plugin: 'java'
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+
+
+    repositories {
+        mavenLocal()
+
+        maven { url "https://jitpack.io" }
+        maven { url "http://repo.maven.apache.org/maven2" }
+        //maven { url "http://maven.cs.lth.se/content/repositories/public/" }
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+    }
+
+    test {
+        reports.html.enabled = false
+    }
+
+    processResources {
+        from ('src/main/java') {
+            include '**/*.nal'
+            include '**/*.prolog'
+        }
+    }
+}
+
+task testReport(type: TestReport) {
+    destinationDir = file("$buildDir/reports/allTests")
+    // Include the results from the `test` task in all subprojects
+    reportOn subprojects*.test
+}

@@ -1,7 +1,7 @@
 package nars.budget;
 
 import nars.Symbols;
-import nars.data.BudgetedStruct;
+//import nars.data.BudgetedStruct;
 import nars.task.Task;
 import nars.util.Texts;
 import org.fusesource.jansi.Ansi;
