@@ -2,6 +2,8 @@ package nars.guifx;
 
 import com.gs.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import javafx.application.Application;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -16,6 +18,7 @@ import javafx.stage.StageStyle;
 import nars.Global;
 import nars.NAR;
 import nars.concept.Concept;
+import nars.guifx.demo.NARide;
 import nars.guifx.util.ColorMatrix;
 import nars.task.Task;
 import nars.term.Termed;
@@ -24,8 +27,9 @@ import nars.util.data.Util;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Stream.of;
 
 
 /**
@@ -258,7 +262,7 @@ public enum NARfx  {
         n.autosize();
 
         Scene scene = new Scene(n);
-        scene.getStylesheets().setAll(NARfx.css );
+        NARfx.theme(scene);
 
         Stage s = new Stage();
         s.setTitle(title);
@@ -278,7 +282,8 @@ public enum NARfx  {
 
     public static Stage newWindow(String title, Scene scene, Stage stage) {
         stage.setScene(scene);
-        stage.getScene().getStylesheets().setAll(NARfx.css );
+        NARfx.theme(scene);
+
 
         //scene.getRoot().maxWidth(Double.MAX_VALUE);
         //scene.getRoot().maxHeight(Double.MAX_VALUE);
@@ -414,12 +419,12 @@ public enum NARfx  {
     }
 
     public static void newConceptWindow(NAR nar, Pane container, String... concepts) {
-        newConceptWindow(nar, container, Stream.of(concepts).map(
-            s -> nar.concept(s)).collect(Collectors.toList())
+        newConceptWindow(nar, container, (List<Concept>) of(concepts).map(
+            s -> nar.concept(s)).collect(toList())
         );
     }
 
-    private static void newConceptWindow(NAR nar, Pane v, List<Termed> cc) {
+    private static void newConceptWindow(NAR nar, Pane v, List<? extends Termed> cc) {
 
         for (Termed c : cc) {
             ConceptPane wn = new ConceptPane(nar, c);
@@ -436,6 +441,19 @@ public enum NARfx  {
         if (removed!=null)
             removed.close();
 
+    }
+
+    static NARide.FXCSSUpdater updater;
+    static {
+        StringProperty cssProp = new SimpleStringProperty("");
+        updater = new NARide.FXCSSUpdater();
+        updater.bindCss(cssProp);
+        cssProp.setValue(NARfx.css);
+    }
+
+    /** retarded hack because this stylesheet stuff in JavaFX is designed pretty bad */
+    public static void theme(Scene scene) {
+        updater.applyCssToParent(scene);
     }
 
     // This must be public in order to instantiate successfully

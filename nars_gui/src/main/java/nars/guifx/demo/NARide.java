@@ -1,13 +1,10 @@
 package nars.guifx.demo;
 
 
-import javafx.application.Platform;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.event.EventHandler;
 import javafx.geometry.Side;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.SceneAntialiasing;
 import javafx.scene.canvas.GraphicsContext;
@@ -128,10 +125,7 @@ public class NARide extends BorderPane {
 
 
 
-        StringProperty cssProp = new SimpleStringProperty("");
-        FXCSSUpdater updater = new FXCSSUpdater(scene);
-        updater.bindCss(cssProp);
-        cssProp.setValue(NARfx.css);
+        NARfx.theme(scene);
 
 
         //ni.addView(new TaskSheet(nar));
@@ -289,25 +283,25 @@ public class NARide extends BorderPane {
 
         private String css;
 
-        private Scene scene;
 
-        public FXCSSUpdater(Scene scene) {
-            this.scene = scene;
+
+        public FXCSSUpdater() {
+
         }
 
         public void bindCss(StringProperty cssProperty){
             cssProperty.addListener(e -> {
                 this.css = cssProperty.get();
-                Platform.runLater(()->{
+                /*Platform.runLater(()->{
                     scene.getStylesheets().clear();
                     scene.getStylesheets().add("internal:stylesheet.css");
-                });
+                });*/
             });
         }
 
-        public void applyCssToParent(Parent parent){
-            parent.getStylesheets().clear();
-            scene.getStylesheets().add("internal:stylesheet.css");
+        public void applyCssToParent(Scene s){
+            s.getStylesheets().clear();
+            s.getStylesheets().add("internal:stylesheet.css");
         }
 
         /**

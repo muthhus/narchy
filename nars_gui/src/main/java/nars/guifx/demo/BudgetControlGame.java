@@ -56,8 +56,9 @@ public class BudgetControlGame {
             });
 
 
-            b.setScene(new Scene(r));
-            b.getScene().getStylesheets().setAll(NARfx.css);
+            Scene scene;
+            b.setScene(scene = new Scene(r));
+            NARfx.theme(scene);
 
             b.show();
 
