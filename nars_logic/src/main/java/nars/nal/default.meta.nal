@@ -274,6 +274,8 @@
      (&&,X,A..+), X  |- (&&,A..+), (Belief:StructuralDeduction, Desire:StructuralStrong),
                         X, (Belief:StructuralDeduction, Desire:StructuralStrong)
 
+
+
 //// dependent variable elimination - decomposition with elimination of a variable
 //TODO add a precondition that only allows this if B is not a subterm of the conjunction, which is the case above and produces different truth
      (&&,X,A..+), B  |- substituteIfUnifies((&&,A..+),"#",X,B), (Belief:AnonymousAnalogy, Desire:Strong, Order:ForAllSame)

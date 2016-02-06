@@ -12,7 +12,7 @@ import java.util.function.Supplier;
 @RunWith(Parameterized.class)
 public class NAL8Test extends AbstractNALTester {
 
-    final int cycles = 150; //150 worked for most of the initial NAL8 tests converted
+    final int cycles = 250; //150 worked for most of the initial NAL8 tests converted
 
     public NAL8Test(Supplier<NAR> b) { super(b); }
 
@@ -59,16 +59,20 @@ public class NAL8Test extends AbstractNALTester {
 
     }
 
+
+
+
     @Test
     public void subsent_1_simpler()  {
         TestNAR tester = test();
 
-        //TODO decide correct parentheses ordering
+        //tester.nar.log();
 
-        tester.nar.log();
 
-        tester.input("[opened]:t1. :|:");
-        tester.inputAt(10, "(((hold:t2 &&+5 at:t1) &&+5 open(t1)) &&+5 [opened]:t1).");
+        tester.input("hold:t2. :|:");
+        tester.inputAt(5, "at:t1. :|:");
+        tester.inputAt(15, "[opened]:t1. :|:");
+        tester.inputAt(10, "(hold:t2 &&+5 (at:t1 &&+5 (open(t1) &&+5 [opened]:t1))).");
 
         //opened at 0
         //open() @ -5
