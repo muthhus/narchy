@@ -6,7 +6,6 @@ package nars.rover.robot;
 
 import com.gs.collections.api.block.function.primitive.FloatFunction;
 import com.gs.collections.api.block.function.primitive.FloatToFloatFunction;
-import java.util.List;
 import nars.Global;
 import nars.NAR;
 import nars.Symbols;
@@ -27,7 +26,8 @@ import nars.util.signal.Sensor;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 
-import static nars.util.Texts.n2;
+import java.util.List;
+
 import static nars.util.Texts.n2;
 
 
@@ -86,7 +86,7 @@ public class NARover extends AbstractPolygonBot {
         Vec2 tmp = new Vec2();
         FloatFunction<Term> linearSpeed = (t) -> {
             torso.getLinearVelocityFromLocalPointToOut(forwardVec, tmp);
-            float v = tmp.length()/ linearThrustPerCycle * (1f - sick) / 1.25f;
+            float v = tmp.length()/ linearThrustPerCycle / 1.25f;
             if (v >= 0 && t == speedForward) return v;
             //else if (v <= 0 && t == speedBackward) return -v;
             return 0;
@@ -138,7 +138,7 @@ public class NARover extends AbstractPolygonBot {
         else if (m instanceof Sim.PoisonMaterial) {
             nar.logger.warn("poison");
             //nar.input("eat:poison. :|:");
-            sick = Util.clamp(sick + 0.5f);
+            sick = Util.clamp(sick + 0.85f);
 
             //nar.input("goal:{food}. :|: %0.00;0.90%");
             //nar.input("goal:{health}. :|: %0.00;0.90%");
@@ -158,8 +158,8 @@ public class NARover extends AbstractPolygonBot {
             nar.stop();
         }
 
-        sick *= 0.95f;
-        hungry = Util.clamp(hungry + 0.1f);
+        sick *= 0.97f;
+        hungry = Util.clamp(hungry + 0.05f);
     }
 
     public void inputMission() {
@@ -410,7 +410,7 @@ public class NARover extends AbstractPolygonBot {
 
         private Truth forward(boolean forward) {
             Task c = MethodOperator.invokingTask();
-            float thrust = (proportional && c!=null) ? c.expectation() : 1;
+            float thrust = (proportional && c!=null) ? c.motivation() : 1;
             if (!forward) thrust = -thrust;
             rover.thrustRelative(thrust);
             return c.truth();
@@ -418,7 +418,7 @@ public class NARover extends AbstractPolygonBot {
 
         private Truth rotate(boolean right) {
             Task c = MethodOperator.invokingTask();
-            float thrust = (proportional && c!=null) ? c.expectation() : 1;
+            float thrust = (proportional && c!=null) ? c.motivation() : 1;
             if (right) thrust = -thrust;
             rover.rotateRelative(thrust);
             return c.truth();

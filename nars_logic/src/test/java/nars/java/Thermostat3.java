@@ -53,7 +53,6 @@ public class Thermostat3 {
 
         n = new Default(1000, 15, 2, 3);
         //n.log();
-        n.memory.executionExpectationThreshold.setValue(0.65f);
         n.core.confidenceDerivationMin.setValue(0.02f);
 
 

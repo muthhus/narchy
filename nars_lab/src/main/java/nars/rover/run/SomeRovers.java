@@ -104,18 +104,19 @@ public class SomeRovers {
         //nar.initNAL9();
         //nar.memory.the(new Anticipate(nar));
         //nar.memory.perfection.setValue(0.15f);
-        nar.core.confidenceDerivationMin.setValue(0.01f);
+        //nar.core.confidenceDerivationMin.setValue(0.01f);
+
 
         //nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
         nar.core.activationRate.setValue(0.6f);
 
         nar.memory.duration.set(3);
-        nar.memory.conceptForgetDurations.setValue(3);
+        nar.memory.conceptForgetDurations.setValue(2);
         nar.memory.termLinkForgetDurations.setValue(4);
         nar.memory.taskLinkForgetDurations.setValue(6);
-        nar.memory.cyclesPerFrame.set(16);
-        nar.memory.shortTermMemoryHistory.set(4);
-        //nar.memory.executionExpectationThreshold.setValue(0.95f);
+        nar.memory.cyclesPerFrame.set(8);
+        nar.memory.shortTermMemoryHistory.set(2);
+        nar.memory.executionThreshold.setValue(0.005f);
 
         boolean gui = true;
         if (gui) {
@@ -161,7 +162,7 @@ public class SomeRovers {
         Vercept input = new Vercept();
         NarQ nq = new NarQ(n, input);
 
-        nq.power.setValue(0.5f);
+        nq.power.setValue(0.2f);
 
         input.addAll(nq.getBeliefExpectations(
                 eatFood, eatPoison, speedLeft, speedRight, speedForward

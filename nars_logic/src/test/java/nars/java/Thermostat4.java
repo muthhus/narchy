@@ -32,7 +32,6 @@ public class Thermostat4 {
         n = new Default(1000, 1, 2, 3);
         //n.log();
         n.memory.activationRate.setValue(0.05f);
-        n.memory.executionExpectationThreshold.setValue(0.55f);
         n.core.confidenceDerivationMin.setValue(0.01f);
         n.memory.shortTermMemoryHistory.set(3);
         n.memory.cyclesPerFrame.set(4);

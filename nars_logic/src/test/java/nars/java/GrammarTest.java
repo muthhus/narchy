@@ -31,7 +31,7 @@ public class GrammarTest {
         n.logSummaryGT(System.out, 0.3f);
 
 
-        //n.memory.executionExpectationThreshold.setValue(0.55f);
+        //n.memory.executionThreshold.setValue(0.55f);
         n.core.confidenceDerivationMin.setValue(0.01f);
 
         n.memory.DEFAULT_JUDGMENT_PRIORITY = 0.5f;

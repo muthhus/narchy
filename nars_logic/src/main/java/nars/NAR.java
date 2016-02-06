@@ -484,11 +484,11 @@ public abstract class NAR implements Level, Consumer<Task> {
             //Normal Goal
             long now = memory.time();
             Task projectedGoal = goalConcept.goals().top(now);
-            float goalExp = projectedGoal.expectation();
+            float motivation = projectedGoal.motivation();
 
             long occ = projectedGoal.occurrence();
-            if (((occ == now) || (occ == ETERNAL))
-                &&(goalExp < memory.executionExpectationThreshold.floatValue())) {
+            if (((occ == ETERNAL) || (Math.abs(occ-now) < memory.duration()))//right timing
+                &&(motivation < memory.executionThreshold.floatValue())) {
                 return false;
             }
 

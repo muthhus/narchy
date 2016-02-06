@@ -4,6 +4,7 @@ import nars.NAR;
 import nars.java.Naljects;
 import nars.nar.Default;
 import nars.util.signal.NarQ;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -11,6 +12,7 @@ import org.junit.Test;
  */
 public class HaiQTest {
 
+    @Ignore
     @Test
     public void testSimple() throws Exception {
 

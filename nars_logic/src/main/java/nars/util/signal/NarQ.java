@@ -112,6 +112,11 @@ public class NarQ implements Consumer<NAR> {
             this(n, term, Symbols.GOAL, false);
         }
 
+        @Override
+        public String toString() {
+            return ((invert) ? "--" : "") + term.toString() + punct;
+        }
+
         public InputTask(NAR n, Termed term, char punct, boolean invert) {
             this.nar = n;
             this.term = term;
@@ -121,18 +126,22 @@ public class NarQ implements Consumer<NAR> {
 
         @Override
         public void run(float strength) {
+
+            //float strengthExp = strength/2f + 0.5f; //strength -> expectation
+
+
+            float existingExp = NarQ.motivation(nar, term, 0f, false, 0); //range 0..1.0 if >0.5, 0 otherwise
+            float additionalExp = strength - existingExp;
+
+            if (additionalExp < 0) //already desired at least at this level
+                return;
             
-            //float existingDesire = Math.max(0.5f, NarQ.expectation(nar, term, 0, false, 0) - 0.5f) * 2f; //range 0..1.0 if >0.5, 0 otherwise
-            //float additionalDesire = 0.5f + 0.5f * Math.max(0.01f, (1f - existingDesire)); //some minimal amount if already totally maxed out
-            
-            float existingExp = NarQ.expectation(nar, term, 0.5f, false, 0); //range 0..1.0 if >0.5, 0 otherwise
-            float additionalExp = Math.max(0.1f, strength - existingExp);
-            
-            
+
+            int dt = 0;
             //TODO solve for strength/additional desire so expectation is correct
             final Task t = new MutableTask(term, punct).truth(invert ? 0f : 1f, additionalExp)
                     //.time(Tense.Future, nar.memory)                   
-                    .time(nar.time(), nar.time() + 1)
+                    .time(nar.time(), nar.time()  + dt )
                     .log("Q Action");
             //logger.info("q act: {}", t );
             nar.input(t);
@@ -142,8 +151,9 @@ public class NarQ implements Consumer<NAR> {
         @Override
         public float ran() {
             int dt = 0; //nar.memory.duration()/2; //-1; //duration/2?
-            float e =  NarQ.expectation(nar, term, 0.5f /* equal pos/neg opportunity */, punct == Symbols.GOAL ? false : true, dt /* desire in previous time */);
-            if (invert) e = 1f- e;
+            float e =  NarQ.motivation(nar, term, 0f /* equal pos/neg opportunity */, punct == Symbols.GOAL ? false : true, dt /* desire in previous time */);
+            //e = (e-0.5f)*2f; //expectation -> strength?
+            if (invert) e = -e;
             return e;
         }     
         
@@ -196,7 +206,7 @@ public class NarQ implements Consumer<NAR> {
 
         if (q == null || q.inputs() != inputs || q.actions() != outputs) {
             //TODO allow substituting an arbitrary I/O agent interface
-            q = new HaiQImpl(inputs, inputs*3, outputs);
+            q = new HaiQImpl(inputs, inputs*2, outputs);
         }
 
         return true;
@@ -242,11 +252,13 @@ public class NarQ implements Consumer<NAR> {
 
                 //add noise
                 if (a != 0) {
-                    e += 2f * (q.rng.nextFloat() - 0.5f) * (float) q.Alpha;
+                    e += (q.rng.nextFloat() - 0.5f) * (float) q.Alpha *2f;
                 }
 
+                //System.out.println(outs.get(j) + " " + e);
+
                 //System.out.println("last action: " + j + " "  + e);
-                if (e > bestE) {
+                if (e >= bestE) {
                     //best = c; 
                     best = j;
                     bestE = e;
@@ -273,24 +285,24 @@ public class NarQ implements Consumer<NAR> {
 //        return expectation(t, ifNonExists, beliefOrDesire, dt);
 //    }
 
-    public float expectation(Termed x, float ifNonExists, boolean beliefOrDesire, int dt) {
-        return expectation(nar, x, ifNonExists, beliefOrDesire, dt);
+//    public float motivation(Termed x, float ifNonExists, boolean beliefOrDesire, int dt) {
+//        return motivation(nar, x, ifNonExists, beliefOrDesire, dt);
+//    }
+
+    public static float motivation(NAR nar, Termed x, float ifNonExists, boolean beliefOrDesire, int dt) {
+        return NarQ.motivation(nar, nar.concept(x), ifNonExists, beliefOrDesire, dt);
     }
 
-    public static float expectation(NAR nar, Termed x, float ifNonExists, boolean beliefOrDesire, int dt) {
-        return NarQ.expectation(nar, nar.concept(x), ifNonExists, beliefOrDesire, dt);
-    }
-
-    public static float expectation(NAR n, Concept cx, float ifNonExists, boolean beliefOrDesire, int dt) {
+    public static float motivation(NAR n, Concept cx, float ifNonExists, boolean beliefOrDesire, int dt) {
         //TODO this an be optimized
-        long now = n.time();
 
         float v = ifNonExists;
         if (cx != null) {
+            long now = n.time();
             BeliefTable table = beliefOrDesire ? cx.beliefs() : cx.goals();
             Task t = table.top(now + dt, now);
             if (t != null) {
-                v = t.expectation();
+                v = t.motivation();
             }
         }
         return v;
@@ -321,7 +333,7 @@ public class NarQ implements Consumer<NAR> {
         }
 
         protected float expectation() {
-            return NarQ.expectation(nar, (Termed)term, 0f, true, 0);
+            return NarQ.motivation(nar, (Termed)term, 0f, true, 0);
         }
 
         @Override
@@ -354,7 +366,7 @@ public class NarQ implements Consumer<NAR> {
 
         @Override
         public double getAsDouble() {
-            return expectation(nar, term, 0, true, 0);
+            return motivation(nar, term, 0, true, 0);
         }
 
     }

@@ -12,6 +12,11 @@ public interface Truthed {
         return expectation(true);
     }
 
+    /** balanced form of expectation, where -1 = no, +1 = yes, and 0 = maybe */
+    default float motivation() {
+        return (freq() - 0.5f) * conf() * 2f;
+    }
+
     default float expectation(boolean positive) {
         //Truth t = truth();
         //return t == null ? Float.NaN :

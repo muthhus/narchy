@@ -122,7 +122,7 @@ public abstract class Param extends Container implements Level {
 
     /** Minimum expectation for a desire value.
      *  the range of "now" is [-DURATION, DURATION]; */
-    public final MutableFloat executionExpectationThreshold = new MutableFloat();
+    public final MutableFloat executionThreshold = new MutableFloat();
 
 
 

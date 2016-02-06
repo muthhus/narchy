@@ -48,7 +48,6 @@ public class MarkovlikeTest {
 
         d.initNAL9();
 
-        d.memory.executionExpectationThreshold.setValue(0.6f);
         //d.core.activationRate.setValue(0.5f);
         d.memory.shortTermMemoryHistory.set(5);
 

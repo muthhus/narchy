@@ -68,7 +68,7 @@ public class HaiQ {
 
 		q = new float[nStates][outputs];
 		et = new float[nStates][outputs];
-		setQ(0.05f, 0.5f, 0.7f); // 0.1 0.5 0.9
+		setQ(0.2f, 0.8f, 0.9f); // 0.1 0.5 0.9
 	}
 
 	int learn(int state, float reward) {
