@@ -118,12 +118,14 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseMatch> {
             return;
         }
 
+        BooleanCondition addToEndOfPreGuards = null;
+
         if (task.isCompound() && !task.isCommutative() && null==Ellipsis.hasEllipsis((Compound)task) ) {
             int[] beliefInTask = ((Compound)task).isSubterm(belief);
             if (beliefInTask != null) {
                 //add precondition for this constraint that is checked between the premise's terms
                 //assuming this succeeds, only need to test the task half
-                pre.add(new ComponentCondition(0, beliefInTask, 1));
+                addToEndOfPreGuards = new ComponentCondition(0, beliefInTask, 1);
                 belief = null;
             }
         }
@@ -133,7 +135,7 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseMatch> {
             if (taskInBelief != null) {
                 //add precondition for this constraint that is checked between the premise's terms
                 //assuming this succeeds, only need to test the belief half
-                pre.add(new ComponentCondition(1, taskInBelief, 0));
+                addToEndOfPreGuards = new ComponentCondition(1, taskInBelief, 0);
                 task = null;
             }
         }
@@ -141,6 +143,10 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseMatch> {
 
         //default case: exhaustively match both, with appropriate pruning guard preconditions
         compileTaskBelief(pre, code, task, belief, pattern, constraints);
+
+        //put this one after the guards added in the compileTaskBelief like checking for op, subterm vector etc which will be less expensive
+        if (addToEndOfPreGuards!=null)
+            pre.add(addToEndOfPreGuards);
     }
 
     private static void compileTaskBelief(

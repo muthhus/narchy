@@ -4,6 +4,7 @@ import com.google.common.collect.ListMultimap;
 import com.gs.collections.api.map.ImmutableMap;
 import nars.$;
 import nars.Global;
+import nars.Op;
 import nars.nal.meta.*;
 import nars.nal.meta.constraint.AndConstraint;
 import nars.nal.meta.constraint.MatchConstraint;
@@ -39,23 +40,27 @@ abstract public class MatchTerm extends AtomicBooleanCondition<PremiseMatch> imp
     @Nullable
     private PremiseMatchFork onMatch = null;
 
-    public MatchTerm(Term pattern, @Nullable ImmutableMap<Term, MatchConstraint> constraints) {
-        this.id = (constraints == null) ?
-                //no constraints
-                pattern :
-                //constraints stored in atomic string
-                (Compound) ($.sect(pattern, seteMap(constraints.castToMap(), $.ToStringToTerm)));
+    public MatchTerm(Term id, Term pattern, @Nullable ImmutableMap<Term, MatchConstraint> constraints) {
+        this.id = id;
 
         this.x = pattern;
         this.constraints = constraints;
     }
 
 
+    @NotNull static private Term id(Term pattern, @Nullable ImmutableMap<Term, MatchConstraint> constraints) {
+        return (constraints == null) ?
+                //no constraints
+                pattern :
+                //constraints stored in atomic string
+                (Compound) ($.sect(pattern, seteMap(constraints.castToMap(), $.ToStringToTerm)));
+    }
+
 
     public static final class MatchTaskBeliefPair extends MatchTerm {
 
         public MatchTaskBeliefPair(TaskBeliefPair x, @Nullable ImmutableMap<Term, MatchConstraint> constraints) {
-            super(x, constraints);
+            super(id(x, constraints), x, constraints);
         }
 
         /** the entire TaskBeliefPair tuple */
@@ -70,7 +75,12 @@ abstract public class MatchTerm extends AtomicBooleanCondition<PremiseMatch> imp
         private final int subterm;
 
         public MatchOneSubterm(Term x, @Nullable ImmutableMap<Term, MatchConstraint> constraints, int subterm) {
-            super(x, constraints);
+            super(
+                (subterm == 0 ?
+                        $.p(id(x,constraints), Op.Imdex) :
+                        $.p(Op.Imdex, id(x,constraints))),
+                x
+                , constraints);
             this.subterm = subterm;
         }
 
