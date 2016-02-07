@@ -73,7 +73,7 @@ public class CarefulRover extends AbstractPolygonBot {
         float da = (float) (Math.PI * 2 / numPixels);
         float a = 0;
         for (int i = 0; i < numPixels; i++) {
-            NARVisionRay v = new NARVisionRay(nar, this, torso,
+            NARVisionRay v = new NARVisionRay(nar, torso,
                         /*eats ?*/ center /*: new Vec2(0,0)*/,
                     a, da, 3, 10, 1f/numPixels) {
 

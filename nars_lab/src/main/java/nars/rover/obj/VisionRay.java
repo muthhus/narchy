@@ -5,6 +5,7 @@ import nars.rover.Sim;
 import nars.rover.physics.gl.JoglAbstractDraw;
 import nars.rover.physics.j2d.SwingDraw;
 import nars.rover.robot.AbstractPolygonBot;
+import nars.rover.robot.Robotic;
 import nars.rover.util.RayCastClosestCallback;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.Vec2;
@@ -23,13 +24,14 @@ abstract public class VisionRay extends RayCastClosestCallback implements Abstra
     protected final float arc;
     final Vec2 point; //where the retina receives vision at
     final float angle;
+    private final Body base;
+    private final Robotic bot;
     protected float conf;
 
     final Color3f laserUnhitColor = new Color3f(0.25f, 0.25f, 0.25f);
     final Color3f laserHitColor = new Color3f(laserUnhitColor.x, laserUnhitColor.y, laserUnhitColor.z);
     final Color3f rayColor = new Color3f(); //current ray color
 
-    private final AbstractPolygonBot bot;
     public Color3f sparkColor = new Color3f(0.4f, 0.9f, 0.4f);
     public Color3f normalColor = new Color3f(0.9f, 0.9f, 0.4f);
     protected float distance;
@@ -48,9 +50,10 @@ abstract public class VisionRay extends RayCastClosestCallback implements Abstra
 
     //final Sensor sensor;
 
-    public VisionRay(Vec2 point, float angle, float arc, AbstractPolygonBot bot, float length, int resolution) {
-        this.bot = bot;
+    public VisionRay(Vec2 point, float angle, float arc, Body base, float length, int resolution) {
+        this.base = base;
 
+        bot = ((Robotic.NARRoverMaterial)base.getUserData()).robot;
         //this.sensor = new Sensor();
 
         this.point = point;
@@ -78,7 +81,7 @@ abstract public class VisionRay extends RayCastClosestCallback implements Abstra
 
     public void step(boolean feel, boolean drawing) {
 
-        final AbstractPolygonBot ap = this.bot;
+        final Robotic ap = this.bot;
 
         preDraw.clear();
 
@@ -89,10 +92,12 @@ abstract public class VisionRay extends RayCastClosestCallback implements Abstra
 
         float angOffset = getLocalAngle(); //(float)Math.random() * (-arc/4f);
 
-        JoglAbstractDraw dd = ((JoglAbstractDraw) ap.getDraw());
+        JoglAbstractDraw dd = ap.draw;
 
         root.set( point );
-        root = bot.torso.getWorldPoint( root );
+        root = base.getWorldPoint( root );
+
+        float baseAngle = base.getAngle();
 
         Body hit = null;
         for (int r = 0; r < resolution; r++) {
@@ -100,7 +105,7 @@ abstract public class VisionRay extends RayCastClosestCallback implements Abstra
 
             target.set( root );
             float da = (-arc / 2f) + dArc * r + angOffset;
-            final float V = da + angle + bot.torso.getAngle();
+            final float V = da + angle + baseAngle;
             target.addLocal(distance * (float) Math.cos(V), distance * (float) Math.sin(V));
 
             init();
@@ -229,8 +234,9 @@ abstract public class VisionRay extends RayCastClosestCallback implements Abstra
             //if (eats) {
 
 
-            if (di <= biteDistanceThreshold)
+            if (di <= biteDistanceThreshold) {
                 bot.eat(touched);
+            }
 
                             /*} else if (di <= tasteDistanceThreshold) {
                                 //taste(touched, di );

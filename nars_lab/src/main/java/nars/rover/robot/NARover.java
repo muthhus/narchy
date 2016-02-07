@@ -24,11 +24,10 @@ import nars.truth.Truth;
 import nars.util.data.Util;
 import nars.util.signal.NarQ;
 import nars.util.signal.Sensor;
-import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
-import org.jbox2d.dynamics.joints.Joint;
+import org.jbox2d.dynamics.joints.RevoluteJoint;
 import org.jbox2d.dynamics.joints.RevoluteJointDef;
 
 import java.util.List;
@@ -285,13 +284,14 @@ public class NARover extends AbstractPolygonBot {
 
         Body torso = newTriangle(getWorld(), mass);
 
+        torso.setUserData(getMaterial());
 
         this.vision = Global.newArrayList();
         for (int i = 0; i < retinaPixels; i++) {
             float aStep = (float) (Math.PI * 2f) / retinaPixels;
             final float angle = aStep * i;
 
-            VisionRay v = new NARVisionRay(nar, this, torso,
+            VisionRay v = new NARVisionRay(nar, torso,
                     /*eats ?*/ mouthPoint /*: new Vec2(0,0)*/,
                     angle, aStep, retinaRaysPerPixel, L, 1f/retinaPixels) {
             };
@@ -308,96 +308,59 @@ public class NARover extends AbstractPolygonBot {
     }
 
     /** http://stackoverflow.com/questions/20904171/how-to-create-snake-like-body-in-box2d-and-cocos2dx */
-    public void addArm(NarQ controller) {
+    public void addArm(NarQ controller, float ax, float ay, float a) {
 
         Body base = torso;
 
 
-        Vec2 attachPoint = new Vec2(0, 7f);
+        Vec2 attachPoint = new Vec2(ax, ay);
 
-        //sim.getWorld().createJoint(rv);
-
-
-
-//        Body body;
-//        {
-//            BodyDef bodyDef = new BodyDef();
-//            bodyDef.position = new Vec2(pos);
-//            bodyDef.type = BodyType.DYNAMIC;
-//            body = sim.getWorld().createBody(bodyDef);
-//        }
-//
-//
-//        // Nose
-//        {
-//            FixtureDef fixtureDef = new FixtureDef();
-//            fixtureDef.shape = polyShape = new PolygonShape();
-//            fixtureDef.density = 1.0f;
-//            fixtureDef.friction = 1.0f;
-//            fixtureDef.isSensor = false;
-//
-//            List<Vec2> vertices = Global.newArrayList();
-//            vertices.add(new Vec2(4f*VERT_SCALE,2f*VERT_SCALE));
-//            vertices.add(new Vec2(4f*VERT_SCALE,-2f*VERT_SCALE));
-//            vertices.add(new Vec2(8f*VERT_SCALE,-0.5f*VERT_SCALE));
-//            vertices.add(new Vec2(8f*VERT_SCALE,0.5f*VERT_SCALE));
-//
-//            polyShape.set(vertices.toArray(new Vec2[vertices.size()]), vertices.size());
-//            body.createFixture(fixtureDef);
-//        }
-//        body.setLinearDamping(0.25f);
-//        body.setAngularDamping(0.25f);
-
-//        // Main body
-//
-//        {
-//            FixtureDef fixtureDef = new FixtureDef();
-//            fixtureDef.shape = polyShape = new PolygonShape();
-//
-//            List<Vec2> vertices = Global.newArrayList();
-//
-//            vertices.add(new Vec2(-4f*VERT_SCALE,2f*VERT_SCALE));
-//            vertices.add(new Vec2(-4f*VERT_SCALE,-2f*VERT_SCALE));
-//            vertices.add(new Vec2(4f*VERT_SCALE,-2f*VERT_SCALE));
-//            vertices.add(new Vec2(4f*VERT_SCALE,2f*VERT_SCALE));
-//
-//            polyShape.set(vertices.toArray(new Vec2[vertices.size()]), vertices.size());
-//            fixtureDef.density = 1.0f;
-//            fixtureDef.friction = 1.0f;
-//            fixtureDef.isSensor = false;
-//            body.createFixture(fixtureDef);
-//        }
+        float vx = (float)Math.cos(a);
+        float vy = (float)Math.sin(a);
 
         // NOW, create several duplicates of the "Main Body" fixture
         // but offset them from the previous one by a fixed amount and
         // overlap them a bit.
-        int SNAKE_SEGMENTS = 4;
+        int numSegments = 6;
 
         Body pBodyA = base;
         Body pBodyB = null;
-        float w = 1f,
-              h = 2f;
+        float w = 2.5f,
+              h = 1f;
 
         //List<Body> _segments = Global.newArrayList();
 
+        float angRange = 0.35f;
+
         // Add some "regular segments".
-        for(int idx = 0; idx < SNAKE_SEGMENTS; idx++)
+        for(int idx = 0; idx < numSegments; idx++)
         {
             // Create a body for the next segment.
 
+            float dx, dy;
+            if (pBodyA == torso) {
+                dx = w * vx;
+                dy = h * vy;
+            } else {
+                dx = w;
+                dy = 0;
+            }
 
             pBodyB = newRect(getWorld(), 0.2f,
                     w, h,
-                    pBodyA.getPosition().x, pBodyA.getPosition().y + h);
+                    pBodyA.getPosition().x + dx, pBodyA.getPosition().y + dy);
 
-            w*=0.9f;
-            h*=0.9f;
+            float tone= (idx/((float)numSegments));
+            pBodyB.setUserData( ((NARRoverMaterial)base.getUserData()).clone(tone) );
+
+            w*=0.95f;
+            h*=0.6f;
 
             //pBodyB. position = pBodyA.getPosition().add( offset );
             //_segments.add(pBodyB);
             // Add some damping so body parts don't 'flop' around.
             pBodyB.setLinearDamping(0.1f);
-            pBodyB.setAngularDamping(0.1f);
+            pBodyB.setAngularDamping(0.3f);
 
             // Create a Revolute Joint at a position half way
             // between the two bodies.
@@ -411,10 +374,26 @@ public class NARover extends AbstractPolygonBot {
             revJointDef.collideConnected = false;
             revJointDef.enableLimit = true;
             revJointDef.enableMotor = true;
-            revJointDef.upperAngle = 0.5f;
-            revJointDef.lowerAngle = -0.5f;
+            revJointDef.upperAngle = +angRange;
+            revJointDef.lowerAngle = -angRange;
 
-            Joint jj = sim.getWorld().createJoint(revJointDef);
+            RevoluteJoint jj = (RevoluteJoint) sim.getWorld().createJoint(revJointDef);
+            final int finalIdx = idx;
+            for (float speed : new float[] { +1 , -1 }){
+                controller.outs.add(new NarQ.Action() {
+
+                    @Override
+                    public void run(float strength) {
+                        ///System.out.println("motor " + finalIdx + " " + strength);
+                        jj.setMotorSpeed(strength * speed);
+                    }
+
+                    @Override
+                    public float ran() {
+                        return jj.getMotorSpeed();
+                    }
+                });
+            }
 
 
             // Update so the next time through the loop, we are
@@ -424,6 +403,8 @@ public class NARover extends AbstractPolygonBot {
 
 
         }
+
+        addEye(controller, pBodyB, 8, new Vec2(0, 0), 0.2f, 0, 2.5f);
 
 //        // Make the next bunch of segments get "smaller" each time
 //        // to make a tail.
@@ -481,8 +462,7 @@ public class NARover extends AbstractPolygonBot {
 //        }
         // Give the tail some real "drag" so that it pulls the
         // body straight when it can.
-        //pBodyB.setLinearDamping(1.5f);
-        //pBodyB.setAngularDamping(1.5f);
+
 
         // Setup Parameters
         //setMaxAngularAcceleration(4*M_PI);
@@ -564,21 +544,21 @@ public class NARover extends AbstractPolygonBot {
 
 
     }
-    public void addEye(NarQ controller, int detail, Vec2 center, float arc, float centerAngle, float distance) {
+    public void addEye(NarQ controller, Body base, int detail, Vec2 center, float arc, float centerAngle, float distance) {
         int pixels = 1;
         float aStep = (float) (Math.PI * 2f)/pixels * (arc);
 
-        final MutableFloat servo = new MutableFloat();
+        //final MutableFloat servo = new MutableFloat();
 
         for (int i = 0; i < pixels; i++) {
             final float angle = aStep * i + centerAngle;
 
-            VisionRay v = new VisionRay(center, angle, aStep, this,
+            VisionRay v = new VisionRay(center, angle, aStep, base,
                     distance, detail) {
 
-                  @Override public float getLocalAngle () {
-                      return 0.5f * (float)Math.sin(servo.floatValue()); //controller.get();
-                  }
+//                  @Override public float getLocalAngle () {
+//                      return 0.5f * (float)Math.sin(servo.floatValue()); //controller.get();
+//                  }
 
 
                 @Override
@@ -598,26 +578,26 @@ public class NARover extends AbstractPolygonBot {
             senses.add(v);
         }
 
-        for (float servoSpeed : new float[] { -0.5f, 0.5f } ) {
-            controller.outs.add(new NarQ.Action() {
-
-                public float accum = 0;
-
-                @Override
-                public void run(float strength) {
-                    servo.add(strength * servoSpeed);
-
-                    this.accum = Util.clamp(this.accum + strength);
-
-                }
-
-                @Override
-                public float ran() {
-                    accum *= 0.9f;
-                    return accum;
-                }
-            });
-        }
+//        for (float servoSpeed : new float[] { -0.5f, 0.5f } ) {
+//            controller.outs.add(new NarQ.Action() {
+//
+//                public float accum = 0;
+//
+//                @Override
+//                public void run(float strength) {
+//                    servo.add(strength * servoSpeed);
+//
+//                    this.accum = Util.clamp(this.accum + strength);
+//
+//                }
+//
+//                @Override
+//                public float ran() {
+//                    accum *= 0.9f;
+//                    return accum;
+//                }
+//            });
+//        }
     }
 
 

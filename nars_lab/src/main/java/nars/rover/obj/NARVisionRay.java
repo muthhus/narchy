@@ -7,7 +7,6 @@ import nars.concept.Concept;
 import nars.nar.Default;
 import nars.op.in.ChangedTextInput;
 import nars.rover.Sim;
-import nars.rover.robot.AbstractPolygonBot;
 import nars.task.MutableTask;
 import nars.term.Termed;
 import nars.term.atom.Atom;
@@ -37,8 +36,8 @@ public class NARVisionRay extends VisionRay {
 
     final ChangedTextInput sight;
 
-    public NARVisionRay(NAR nar, AbstractPolygonBot abstractPolygonBot, Body body, Vec2 point, float angle, float arc, int resolution, float length, float pri) {
-        super(point, angle, arc, abstractPolygonBot, length, resolution);
+    public NARVisionRay(NAR nar, Body base, Vec2 point, float angle, float arc, int resolution, float length, float pri) {
+        super(point, angle, arc, base, length, resolution);
 
         this.sight = new ChangedTextInput(nar);
 

@@ -30,7 +30,6 @@ abstract public class Robotic {
         this.sim = p;
         this.draw = (JoglAbstractDraw)p.draw();
         this.torso = newTorso();
-        this.torso.setUserData(getMaterial());
     }
 
 
@@ -51,12 +50,17 @@ abstract public class Robotic {
 
     }
 
+    public void eat(Body touched) {
+
+
+    }
+
 
     public static class RoboticMaterial extends Material {
 
 
         protected final Color3f color;
-        private final Robotic robot;
+        public final Robotic robot;
 
         public RoboticMaterial(Robotic r) {
             super();
@@ -88,19 +92,30 @@ abstract public class Robotic {
     public static class NARRoverMaterial extends RoboticMaterial {
 
         private final NAR nar;
+        float tone;
 
         public NARRoverMaterial(Robotic r, NAR nar) {
             super(r);
             this.nar = nar;
+            tone = 1f;
+        }
+
+        public NARRoverMaterial clone(float withTone) {
+            NARRoverMaterial m = new NARRoverMaterial(robot, nar);
+            m.tone = withTone;
+            return m;
         }
 
         @Override
         public void before(Body b, JoglAbstractDraw d, float time) {
-            float bb = nar.memory.emotion.busy() * 0.5f + 0.5f;
+            float bb = /*nar.memory.emotion.busy()* */  0.5f + 0.5f;
             //color.set(c.getRed()/256.0f * bb, c.getGreen()/256.0f * bb, c.getBlue()/256.0f * bb);
-            float hh = nar.memory.emotion.happy() * 0.5f + 0.5f;
-            color.set(Math.min(bb,1f), hh, 0);
+            float hh = /*nar.memory.emotion.happy() * */  0.5f + 0.3f;
+
+            color.set(bb, hh, (tone) * 0.3f);
+
             d.setFillColor(color);
+
         }
 
 

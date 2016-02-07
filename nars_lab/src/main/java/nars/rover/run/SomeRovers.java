@@ -21,7 +21,6 @@ import nars.util.signal.NarQ.InputTask;
 import nars.util.signal.NarQ.NotBeliefReward;
 import nars.util.signal.NarQ.Vercept;
 import org.apache.commons.lang3.mutable.MutableFloat;
-import org.jbox2d.common.Vec2;
 
 import java.util.function.DoubleSupplier;
 import java.util.stream.Collectors;
@@ -163,8 +162,10 @@ public class SomeRovers {
 
         Vercept input = new Vercept();
         NarQ nq = new NarQ(n, input);
+        NarQ nq2 = new NarQ(n, new Vercept());
 
         nq.power.setValue(0.2f);
+        nq.power.setValue(0.3f);
 
         input.addAll(nq.getBeliefExpectations(
                 eatFood, eatPoison, speedLeft, speedRight, speedForward
@@ -195,13 +196,17 @@ public class SomeRovers {
         );
 
 
-        r.addEye(nq, 8, new Vec2(3f, 0f), 0.2f, 0f, 2.5f);
+//        r.addEye(nq, r.torso, 8, new Vec2(3f, 0f), 0.2f, 0f, 2.5f);
+//
+//        r.addEye(nq, r.torso, 8, new Vec2(-1f, -2f), 0.2f, -1.7f, 2.5f);
 
-        r.addEye(nq, 8, new Vec2(-1f, -2f), 0.2f, -1.7f, 2.5f);
 
-        r.addEye(nq, 8, new Vec2(-1f, 2f), 0.2f, 1.7f, 2.5f);
 
-        r.addArm(nq /* ... */);
+        r.addArm(nq2 /* ... */, 7, 0, (float)Math.PI * 1.5f);
+        r.addArm(nq2 /* ... */, -7, 0, (float)Math.PI * 0.5f);
+        nq2.reward.put(() -> {
+            return Math.sin(n.memory.emotion.busy()); //fucking random
+        }, new MutableFloat(1f));
 
     }
 	// private static class InputActivationController extends CycleReaction {

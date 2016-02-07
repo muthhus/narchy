@@ -57,7 +57,7 @@ public class QRover extends AbstractPolygonBot {
 
             final int I = i;
             VisionRay v = new VisionRay(/*eats ?*/ mouthPoint /*: new Vec2(0,0)*/,
-                    angle, aStep, this, L, retinaRaysPerPixel) {
+                    angle, aStep, torso, L, retinaRaysPerPixel) {
 
                 @Override
                 protected void perceiveDist(Body hit, float conf, float dist) {
