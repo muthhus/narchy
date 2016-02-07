@@ -234,7 +234,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
     }
 
     private boolean truthMatches(@NotNull Truthed task) {
-        if ((punc == Symbols.JUDGMENT) || (punc == Symbols.GOAL)) {
+        if ((punc == Symbols.BELIEF) || (punc == Symbols.GOAL)) {
             if (task.truth() == null) {
                 return false;
             }

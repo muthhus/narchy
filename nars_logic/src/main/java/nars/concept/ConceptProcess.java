@@ -13,7 +13,6 @@ import nars.budget.Budget;
 import nars.nal.meta.PremiseMatch;
 import nars.nal.op.Derive;
 import nars.task.DerivedTask;
-import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
@@ -22,8 +21,6 @@ import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.function.Consumer;
 
 import static nars.nal.Tense.*;
 import static nars.truth.TruthFunctions.eternalize;
@@ -35,7 +32,7 @@ import static nars.truth.TruthFunctions.eternalize;
  * Task
  * TermLinks
  */
-public final class ConceptProcess implements Premise {
+abstract public class ConceptProcess implements Premise {
 
 
     public final NAR nar;
@@ -424,45 +421,33 @@ public final class ConceptProcess implements Premise {
 
         char punct = p.punct.get();
 
-        Task task = task();
         Task belief = belief();
-
-        MutableTask deriving = new DerivedTask(c, this);
-
-        if (Global.DEBUG) {
-            deriving.log(d.rule);
-        }
-
-        boolean derivedTemporal = occ != ETERNAL;
 
         //nullify belief for single-premise conclusions
         if ((truth!=null) && (belief!=null)) {
-            if (((punct == Symbols.JUDGMENT) && d.beliefSingle) ||
+            if (((punct == Symbols.BELIEF) && d.beliefSingle) ||
                     ((punct == Symbols.GOAL) && d.desireSingle))
                 belief = null;
         }
 
-        Task derived = deriving
-                .punctuation(punct)
+        boolean derivedTemporal = occ != ETERNAL;
+
+        Task derived = newDerivedTask(c, punct)
                 .truth(truth)
-                .budget(budget)
+                .budget(budget) // copied in, not shared
                 .time(now, occ)
-                .parent(task, belief /* null if single */)
-                .anticipate(derivedTemporal && d.anticipate);
+                .parent(task(), belief /* null if single */)
+                .anticipate(derivedTemporal && d.anticipate)
+                .log( Global.DEBUG ? d.rule : "Derived");
 
-        Consumer<Task> target = p.target;
-
-        if (!complete(derived, target))
+        if (!complete(derived))
             return;
 
         //--------- TASK WAS DERIVED if it reaches here
 
-
         if (derivedTemporal && (truth != null) && d.eternalize) {
 
-            complete(new DerivedTask(c, this) //derived.term())
-
-                    .punctuation(punct)
+            complete(newDerivedTask(c, punct)
                     .truth(
                             truth.freq(),
                             eternalize(truth.conf())
@@ -470,21 +455,25 @@ public final class ConceptProcess implements Premise {
 
                     .time(now, ETERNAL)
 
-                    .budget(budget)
+                    .budget(budget) // copied in, not shared
                     .budgetCompoundForward(this)
 
-                    .parent(derived)  //this is lighter weight and potentially easier on GC
-                    //.parent(task, belief)
+                    .parent(derived)  //this is lighter weight and potentially easier on GC than: parent(task, belief)
 
                     .log("Immediaternalized") //Immediate Eternalization
 
-            , target);
+            );
 
         }
 
     }
 
-    private final boolean complete(Task derived, Consumer<Task> target) {
+    @NotNull
+    public DerivedTask newDerivedTask(@NotNull Termed<Compound> c, char punct) {
+        return new DerivedTask(c, punct, this);
+    }
+
+    private final boolean complete(Task derived) {
 
         //pre-normalize to avoid discovering invalidity after having consumed space while in the input queue
         derived = derived.normalize(memory());
@@ -492,16 +481,28 @@ public final class ConceptProcess implements Premise {
 
             //if (Global.DEBUG) {
             if (task().equals(derived))
-                //return null;
-                throw new RuntimeException("derivation same as task");
+                return false;
+                //throw new RuntimeException("derivation same as task");
             if (belief() != null && belief().equals(derived))
-                //return null;
-                throw new RuntimeException("derivation same as belief");
+                return false;
+                //throw new RuntimeException("derivation same as belief");
             //}
 
-            target.accept(derived);
+            accept(derived);
             return true;
         }
         return false;
+    }
+
+
+    /** when a derivation is accepted, this is called  */
+    abstract protected void accept(Task derivation);
+
+    /** after a derivation has completed, commit is called allowing it to process anything collected */
+    abstract protected void commit();
+
+    public final void run(PremiseMatch matcher) {
+        matcher.start(this);
+        commit();
     }
 }

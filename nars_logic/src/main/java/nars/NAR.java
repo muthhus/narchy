@@ -309,13 +309,13 @@ public abstract class NAR implements Level, Consumer<Task> {
 
     @NotNull
     public NAR believe(@NotNull Termed term, @NotNull Tense tense, float freq, float conf) throws NarseseException {
-        believe(memory.getDefaultPriority(JUDGMENT), term, time(tense), freq, conf);
+        believe(memory.getDefaultPriority(BELIEF), term, time(tense), freq, conf);
         return this;
     }
 
     @Nullable
     public Task believe(float priority, @NotNull Termed term, long when, float freq, float conf) throws NarseseException {
-        return believe(priority, memory.getDefaultDurability(JUDGMENT), term, when, freq, conf);
+        return believe(priority, memory.getDefaultDurability(BELIEF), term, when, freq, conf);
     }
 
     @NotNull
@@ -325,7 +325,7 @@ public abstract class NAR implements Level, Consumer<Task> {
 
     @NotNull
     public NAR believe(@NotNull String term, @NotNull Tense tense, float freq, float conf) throws NarseseException {
-        believe(memory.getDefaultPriority(JUDGMENT), term(term), time(tense), freq, conf);
+        believe(memory.getDefaultPriority(BELIEF), term(term), time(tense), freq, conf);
         return this;
     }
 
@@ -345,12 +345,12 @@ public abstract class NAR implements Level, Consumer<Task> {
 
     @NotNull
     public NAR believe(@NotNull Termed term) throws NarseseException {
-        return believe(term, 1.0f, memory.getDefaultConfidence(JUDGMENT));
+        return believe(term, 1.0f, memory.getDefaultConfidence(BELIEF));
     }
 
     @Nullable
     public Task believe(float pri, float dur, @NotNull Termed term, long occurrenceTime, float freq, float conf) throws NarseseException {
-        return input(pri, dur, term, JUDGMENT, occurrenceTime, freq, conf);
+        return input(pri, dur, term, BELIEF, occurrenceTime, freq, conf);
     }
 
     /**

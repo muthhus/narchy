@@ -122,7 +122,7 @@ public class MutableTask extends AbstractTask {
 
     @NotNull
     public MutableTask judgment() {
-        setPunctuation(Symbols.JUDGMENT);
+        setPunctuation(Symbols.BELIEF);
         return this;
     }
 

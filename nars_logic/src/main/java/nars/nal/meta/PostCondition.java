@@ -121,7 +121,7 @@ public class PostCondition implements Serializable, Level //since there can be m
                             puncOverride = Symbols.GOAL;
                             break;
                         case "Judgment":
-                            puncOverride = Symbols.JUDGMENT;
+                            puncOverride = Symbols.BELIEF;
                             break;
                         case "Quest":
                             puncOverride = Symbols.QUEST;

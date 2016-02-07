@@ -2,6 +2,7 @@ package nars.nal.meta;
 
 import nars.Memory;
 import nars.Premise;
+import nars.task.Task;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -9,23 +10,36 @@ import org.jetbrains.annotations.Nullable;
 
 public interface TruthOperator {
 
-    @Nullable
-    Truth apply(@NotNull Truth task, @Nullable Truth belief, @NotNull Memory m);
+    /**
+     *
+     * @param task
+     * @param belief
+     * @param m
+     * @param minConf if confidence is less than minConf, it can return null without creating the Truth instance;
+     *                if confidence is equal to or greater, then it is valid
+     * @return
+     */
+    Truth apply(@NotNull Truth task, @Nullable Truth belief, @NotNull Memory m, float minConf);
 
-    default boolean  apply(@NotNull PremiseMatch m) {
+    default boolean apply(@NotNull PremiseMatch m) {
+
         Premise premise = m.premise;
+
+
+        @Nullable Task belief = premise.belief();
+
+        float minConf = m.getMinConfidence();
+
         Truth truth = apply(
                 premise.task().truth(),
-                premise.belief() == null ? null : premise.belief().truth(),
-                premise.memory()
+                (belief == null) ? null : belief.truth(),
+                premise.memory(),
+                minConf
         );
 
-        if (truth!=null) {
-            //pre-filter insufficient confidence level
-            if (truth.conf() < m.getMinConfidence()) {
-                return false;
-            }
+        //pre-filter insufficient confidence level
 
+        if ((truth!=null) && (truth.conf() > minConf)) {
             m.truth.set(truth);
             return true;
         }

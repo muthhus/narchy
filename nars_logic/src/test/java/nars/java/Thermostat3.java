@@ -53,7 +53,7 @@ public class Thermostat3 {
 
         n = new Default(1000, 15, 2, 3);
         //n.log();
-        n.core.confidenceDerivationMin.setValue(0.02f);
+        n.premiser.confMin.setValue(0.02f);
 
 
         Naljects objs = new Naljects(n) {

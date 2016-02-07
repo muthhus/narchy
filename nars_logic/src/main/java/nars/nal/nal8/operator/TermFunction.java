@@ -49,7 +49,7 @@ public abstract class TermFunction<O> extends SyncOperator {
 
     public static boolean isPunctuation(char c) {
         switch (c) {
-            case Symbols.JUDGMENT:
+            case Symbols.BELIEF:
             case Symbols.GOAL:
             case Symbols.QUEST:
             case Symbols.QUESTION:

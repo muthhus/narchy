@@ -38,7 +38,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
     private long lastInput;
 
     public Sensor(NAR n, Term t, FloatFunction<Term> value, FloatToFloatFunction valueToFreq) {
-        this(n, t, value, valueToFreq, n.memory.getDefaultConfidence(Symbols.JUDGMENT),
+        this(n, t, value, valueToFreq, n.memory.getDefaultConfidence(Symbols.BELIEF),
                 n.memory.DEFAULT_JUDGMENT_PRIORITY, n.memory.DEFAULT_JUDGMENT_DURABILITY);
     }
 

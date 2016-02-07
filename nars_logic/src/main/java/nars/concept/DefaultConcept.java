@@ -635,7 +635,7 @@ public class DefaultConcept extends AtomConcept {
         task.onConcept(this);
 
         switch (task.punc()) {
-            case Symbols.JUDGMENT:
+            case Symbols.BELIEF:
                 return processBelief(task, nar);
 
             case Symbols.GOAL:

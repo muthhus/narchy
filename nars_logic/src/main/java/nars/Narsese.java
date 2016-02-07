@@ -628,7 +628,7 @@ public class Narsese extends BaseParser<Object> {
         switch (x) {
             case ' ':
             case Symbols.ARGUMENT_SEPARATOR:
-            case Symbols.JUDGMENT:
+            case Symbols.BELIEF:
             case Symbols.GOAL:
             case Symbols.QUESTION:
             case Symbols.QUEST:

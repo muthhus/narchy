@@ -14,8 +14,8 @@ public final class DerivedTask extends MutableTask {
 
     public final ConceptProcess premise;
 
-    public DerivedTask(@NotNull Termed<Compound> tc, ConceptProcess premise) {
-        super(tc);
+    public DerivedTask(@NotNull Termed<Compound> tc, char punct, ConceptProcess premise) {
+        super(tc, punct);
         this.premise = premise;
     }
 

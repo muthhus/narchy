@@ -42,7 +42,7 @@ public abstract class feel extends SyncOperator {
         Term content = $.instprop(nar.self, feeling);
 
         return
-            new MutableTask(content, Symbols.JUDGMENT)
+            new MutableTask(content, Symbols.BELIEF)
                 .judgment()
                 .truth(new DefaultTruth(value, 0.99f))
                 .present(nar.time())

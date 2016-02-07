@@ -272,7 +272,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
      * @return Whether the object is a Judgment
      */
     default boolean isJudgment() {
-        return (punc() == Symbols.JUDGMENT);
+        return (punc() == Symbols.BELIEF);
     }
 
     default boolean isGoal() {

@@ -34,7 +34,7 @@ public enum Symbols {
     /* sentence type and delimitors
        TODO use an enum
     */
-    public static final char JUDGMENT = '.';
+    public static final char BELIEF = '.';
     public static final char QUESTION = '?';
     public static final char GOAL = '!';
     public static final char QUEST = '@';

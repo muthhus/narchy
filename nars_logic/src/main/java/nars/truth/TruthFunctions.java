@@ -88,12 +88,12 @@ public final class TruthFunctions extends UtilityFunctions {
      * @return Truth value of the conclusion
      */
     @NotNull
-    public static Truth contraposition(@NotNull Truth v1) {
+    public static Truth contraposition(@NotNull Truth v1, float minConf) {
         float f1 = v1.freq();
         float c1 = v1.conf();
         float w = and(1 - f1, c1);
         float c = w2c(w);
-        return new DefaultTruth(0, c);
+        return c < minConf ? null : new DefaultTruth(0, c);
     }
 
     /* ----- double argument functions, called in MatchingRules ----- */
@@ -241,14 +241,9 @@ public final class TruthFunctions extends UtilityFunctions {
      * @return Truth value of the conclusion, or null if either truth is analytic already
      */
     @NotNull
-    public static Truth abduction(@NotNull Truth a, @NotNull Truth b) {
-        float f1 = a.freq();
-        float f2 = b.freq();
-        float c1 = a.conf();
-        float c2 = b.conf();
-        float w = and(f2, c1, c2);
-        float c = w2c(w);
-        return new DefaultTruth(f1, c);
+    public static Truth abduction(@NotNull Truth a, @NotNull Truth b, float minConf) {
+        float c = w2c(and(b.freq(), a.conf(), b.conf()));
+        return (c < minConf) ? null : new DefaultTruth(a.freq(), c);
     }
 
     /**
@@ -273,8 +268,8 @@ public final class TruthFunctions extends UtilityFunctions {
      * @return Truth value of the conclusion
      */
     @NotNull
-    public static Truth induction(@NotNull Truth v1, @NotNull Truth v2) {
-        return abduction(v2, v1);
+    public static Truth induction(@NotNull Truth v1, @NotNull Truth v2, float minConf) {
+        return abduction(v2, v1, minConf);
     }
 
     /**
@@ -321,14 +316,14 @@ public final class TruthFunctions extends UtilityFunctions {
      * @return Truth value of the conclusion
      */
     @NotNull
-    public static Truth desireStrong(@NotNull Truth a, @NotNull Truth b) {
-        float f1 = a.freq();
+    public static Truth desireStrong(@NotNull Truth a, @NotNull Truth b, float minConf) {
+
         float f2 = b.freq();
         float c1 = a.conf();
         float c2 = b.conf();
-        float f = and(f1, f2);
         float c = and(c1, c2, f2);
-        return new DefaultTruth(f, c);
+        return (c < minConf) ? null : new DefaultTruth(and(a.freq(), f2), c);
+
     }
 
     /**
@@ -390,14 +385,12 @@ public final class TruthFunctions extends UtilityFunctions {
      * @return Truth value of the conclusion
      */
     @NotNull
-    public static Truth union(@NotNull Truth v1, @NotNull Truth v2) {
-        float f1 = v1.freq();
-        float f2 = v2.freq();
-        float c1 = v1.conf();
-        float c2 = v2.conf();
-        float f = or(f1, f2);
-        float c = and(c1, c2);
-        return new DefaultTruth(f, c);
+    public static Truth union(@NotNull Truth v1, @NotNull Truth v2, float minConf) {
+        float c = and(v1.conf(), v2.conf());
+        return (c < minConf) ?
+                null :
+                new DefaultTruth(or(v1.freq(), v2.freq()), c);
+
     }
 
     /**

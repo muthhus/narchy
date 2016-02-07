@@ -126,9 +126,9 @@ abstract public class Solve extends AtomicBooleanCondition<PremiseMatch> {
     static boolean measure(@NotNull PremiseMatch m, char punct, TruthOperator belief, TruthOperator desire) {
         boolean r;
         switch (punct) {
-            case Symbols.JUDGMENT:
+            case Symbols.BELIEF:
             case Symbols.GOAL:
-                TruthOperator tf = (punct == Symbols.JUDGMENT) ? belief : desire;
+                TruthOperator tf = (punct == Symbols.BELIEF) ? belief : desire;
                 r = (tf != null) && (!m.cyclic || tf.allowOverlap()) && (tf.apply(m));
                 break;
             case Symbols.QUESTION:

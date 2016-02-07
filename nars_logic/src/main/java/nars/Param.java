@@ -13,8 +13,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static nars.Symbols.BELIEF;
 import static nars.Symbols.GOAL;
-import static nars.Symbols.JUDGMENT;
 
 /**
  * NAR Parameters which can be changed during runtime.
@@ -139,7 +139,7 @@ public abstract class Param extends Container implements Level {
     public float getDefaultConfidence(char punctuation) {
 
         switch (punctuation) {
-            case JUDGMENT:
+            case BELIEF:
                 return defaultJudgmentTruth.conf();
 
             case GOAL:
@@ -197,7 +197,7 @@ public abstract class Param extends Container implements Level {
 
     float getDefaultPriority(char punctuation) {
         switch (punctuation) {
-            case Symbols.JUDGMENT:
+            case Symbols.BELIEF:
                 return DEFAULT_JUDGMENT_PRIORITY;
 
             case Symbols.QUEST:
@@ -214,7 +214,7 @@ public abstract class Param extends Container implements Level {
 
     float getDefaultDurability(char punctuation) {
         switch (punctuation) {
-            case Symbols.JUDGMENT:
+            case Symbols.BELIEF:
                 return DEFAULT_JUDGMENT_DURABILITY;
             case Symbols.QUEST:
                 return DEFAULT_QUEST_DURABILITY;
@@ -250,7 +250,7 @@ public abstract class Param extends Container implements Level {
         switch (p) {
             case GOAL:
                 return defaultGoalTruth;
-            case JUDGMENT:
+            case BELIEF:
                 return defaultJudgmentTruth;
             default:
                 return null;

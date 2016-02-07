@@ -12,7 +12,6 @@ import nars.nal.meta.constraint.MatchConstraint;
 import nars.nal.meta.op.MatchTerm;
 import nars.nal.nal8.Operator;
 import nars.nal.op.ImmediateTermTransform;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.TermIndex;
@@ -25,7 +24,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.Random;
-import java.util.function.Consumer;
 
 
 /**
@@ -34,9 +32,6 @@ import java.util.function.Consumer;
 public class PremiseMatch extends FindSubst {
 
     private final Deriver deriver;
-
-    /** accept's the final derivation result */
-    public Consumer<Task> target;
 
     /** current Premise */
     public ConceptProcess premise;
@@ -137,21 +132,20 @@ public class PremiseMatch extends FindSubst {
     /**
      * set the next premise
      */
-    public final void start(@NotNull ConceptProcess p, Consumer<Task> receiver) {
+    public final void start(@NotNull ConceptProcess p) {
 
         this.premise = p;
         this.premisePunc = premise.task().punc();
 
         this.index = premise.memory().index;
-        this.target = receiver;
 
         Compound taskTerm = p.task().term();
 
-        Termed beliefTerm = p.beliefTerm();  //experimental, prefer to use the belief term's Term in case it has more relevant TermMetadata (intermvals)
+        Term beliefTerm = p.beliefTerm().term();  //experimental, prefer to use the belief term's Term in case it has more relevant TermMetadata (intermvals)
 
         this.termutesPerMatch = p.getMaxMatches();
 
-        termPattern.set( taskTerm.term(), beliefTerm.term() );
+        termPattern.set( taskTerm, beliefTerm );
         term.set( termPattern );
 
         cyclic = p.isCyclic();

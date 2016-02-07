@@ -107,7 +107,7 @@ public class DerivationGraph extends DirectedPseudograph<DerivationGraph.Keyed,O
     public DerivationPattern add(@NotNull ConceptProcess n, Task... derived) {
         return add(n.concept(), n.taskLink.get(),
                 n.termLink.get().term(),
-                n.belief(), n.time(), derived);
+                n.belief(), n.nar().time(), derived);
     }
 
 //    public DerivationPattern addExpected(ConceptProcess n, Task... expected) {

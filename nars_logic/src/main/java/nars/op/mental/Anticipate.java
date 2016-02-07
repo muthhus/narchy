@@ -130,7 +130,7 @@ public final class Anticipate {
 
         nar.input(new MutableTask($.neg(prediction))
                 .belief()
-                .truth(nar.memory.getTruthDefault(Symbols.JUDGMENT))
+                .truth(nar.memory.getTruthDefault(Symbols.BELIEF))
                 .time(nar.time(), expectedOccurrenceTime)
                 //.parent(tt, null)
                 .because("Absent Anticipated Event"));

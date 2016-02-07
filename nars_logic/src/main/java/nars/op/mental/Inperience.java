@@ -111,7 +111,7 @@ public class Inperience {
 
             int vol = Math.max(task.term().volume(), belief.term().volume());
             if (random(r, INTERNAL_EXPERIENCE_RARE_PROBABILITY, vol)) {
-                nonInnate(task, belief, p, randomNonInnate(r) );
+                nonInnate(task, belief, randomNonInnate(r) );
             }
 
             if (belief.op().isImplication() &&
@@ -126,7 +126,7 @@ public class Inperience {
     public static Compound reify(@NotNull Task s, Term self, float conceptCreationExpectation) {
         Operator opTerm;
         switch (s.punc()) {
-            case Symbols.JUDGMENT:
+            case Symbols.BELIEF:
                 opTerm = believe;
                 break;
             case Symbols.GOAL:
@@ -229,7 +229,7 @@ public class Inperience {
 
 
 
-    private static void internalizeImplication(@NotNull Task task, @NotNull Task belief, @NotNull Premise nal) {
+    private void internalizeImplication(@NotNull Task task, @NotNull Task belief, @NotNull Premise nal) {
         Compound taskTerm = task.term();
         Compound beliefTerm = belief.term();
 
@@ -259,28 +259,28 @@ public class Inperience {
 
                     beliefReasonDerive(task, belief,
                             c,
-                            nal, 0);
+                            0);
                 }
             }
         }
     }
 
-    static void nonInnate(Task task, @NotNull Task belief, @NotNull Premise nal, Operator op) {
+    void nonInnate(Task task, @NotNull Task belief, Operator op) {
         //the operators which dont have a innate belief
         //also get a chance to reveal its effects to the system this way
 
         Compound c = $.exec(op, belief.term());
         if (c!=null)
-            beliefReasonDerive(task, belief, c, nal, 0);
+            beliefReasonDerive(task, belief, c, 0);
     }
 
-    static void beliefReasonDerive(Task parent, Task belief, @NotNull Compound new_term, @NotNull Premise p, long delay) {
+    void beliefReasonDerive(Task parent, Task belief, @NotNull Compound new_term, long delay) {
 
         //TODO should this be a mew stamp or attached to parent.. originally it was a fresh new stamp from memory
 
-        long now = p.time();
+        long now = nar.time();
 
-        p.nar().input(new MutableTask(new_term).goal()
+        nar.input(new MutableTask(new_term).goal()
                         /*.truth(1, Global.DEFAULT_JUDGMENT_CONFIDENCE)
                         .budget(Global.DEFAULT_GOAL_PRIORITY * INTERNAL_EXPERIENCE_PRIORITY_MUL,
                                 Global.DEFAULT_GOAL_DURABILITY * INTERNAL_EXPERIENCE_DURABILITY_MUL)*/

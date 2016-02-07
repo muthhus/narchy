@@ -19,21 +19,19 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 /** not thread safe; call from only one thread at a time */
-public class PremisePermutor extends UnifySubst implements Function<Term, Task> {
+abstract public class PremiseGenerator extends UnifySubst implements Function<Term, Task> {
 
-    private final NAR nar;
-    private Consumer<ConceptProcess> eachPremise;
+    public final NAR nar;
     private BLink<? extends Termed> termLink;
     private BLink<? extends Concept> concept;
     private BLink<? extends Task> taskLink;
     private final Map<Term, Task> beliefCache = Global.newHashMap();
     long lastMatch = Tense.TIMELESS;
 
-    public PremisePermutor(NAR nar, @NotNull Consumer<ConceptProcess> cp) {
+    public PremiseGenerator(NAR nar) {
         super(Op.VAR_QUERY, nar.memory, true);
         this.nar = nar;
         this.lastMatch = nar.time();
-        this.eachPremise = cp;
     }
 
     /**
@@ -137,9 +135,7 @@ public class PremisePermutor extends UnifySubst implements Function<Term, Task> 
                 beliefCache.computeIfAbsent(beliefTerm, this) :
                 null; //atomic terms will have no beliefs anyway
 
-        eachPremise.accept(new ConceptProcess(
-                nar, concept,
-                taskLink, termLink, belief));
+        premise(concept, taskLink, termLink, belief);
 
         Task task = taskLink.get();
         //Report questions/solution pairs involving query variable that have been matched
@@ -148,6 +144,7 @@ public class PremisePermutor extends UnifySubst implements Function<Term, Task> 
 
     }
 
+    abstract protected void premise(BLink<? extends Concept> concept, BLink<? extends Task> taskLink, BLink<? extends Termed> termLink, Task belief);
 
     /** resolves the most relevant task for a given term/concept */
     @Override public final Task apply(Term beliefTerm) {

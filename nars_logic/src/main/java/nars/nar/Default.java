@@ -1,7 +1,5 @@
 package nars.nar;
 
-import com.gs.collections.impl.bag.mutable.HashBag;
-import nars.$;
 import nars.Global;
 import nars.Memory;
 import nars.NAR;
@@ -13,31 +11,27 @@ import nars.budget.BudgetMerge;
 import nars.budget.Forget;
 import nars.concept.Concept;
 import nars.concept.ConceptProcess;
-import nars.concept.PremisePermutor;
+import nars.concept.PremiseGenerator;
 import nars.data.Range;
 import nars.nal.Deriver;
 import nars.nal.meta.PremiseMatch;
-import nars.nar.experimental.Derivelet;
 import nars.task.Task;
 import nars.task.flow.SetTaskPerception;
 import nars.task.flow.TaskPerception;
 import nars.term.TermIndex;
 import nars.term.Termed;
-import nars.term.transform.subst.FindSubst;
-import nars.term.transform.subst.choice.Termutator;
 import nars.time.FrameClock;
 import nars.util.data.MutableInteger;
-import nars.util.data.list.FasterList;
 import nars.util.event.Active;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
-
-import static java.util.stream.Collectors.toList;
 
 /**
  * Various extensions enabled
@@ -48,6 +42,9 @@ public class Default extends AbstractNAR {
     public final DefaultCycle core;
     @NotNull
     public final TaskPerception input;
+
+    @NotNull
+    public final DefaultPremiseGenerator premiser;
 
 
     @Deprecated
@@ -71,10 +68,14 @@ public class Default extends AbstractNAR {
 
         the("input", input = initInput());
 
+        the("premiser", premiser = newPremiseGenerator());
+        premiser.confMin.setValue(4f * Global.TRUTH_EPSILON);
+
         the("core", core = initCore(
                 activeConcepts,
                 conceptsFirePerCycle,
-                termLinksPerConcept, taskLinksPerConcept
+                termLinksPerConcept, taskLinksPerConcept,
+                premiser
         ));
 
         if (core!=null) {
@@ -107,9 +108,10 @@ public class Default extends AbstractNAR {
     }
 
     @NotNull
-    protected DefaultCycle initCore(int activeConcepts, int conceptsFirePerCycle, int termLinksPerConcept, int taskLinksPerConcept) {
+    protected DefaultCycle initCore(int activeConcepts, int conceptsFirePerCycle, int termLinksPerConcept, int taskLinksPerConcept, PremiseGenerator pg) {
 
-        DefaultCycle c = new DefaultCycle(this, newDeriver(), newConceptBag(activeConcepts));
+
+        DefaultCycle c = new DefaultCycle(this, newDeriver(), newConceptBag(activeConcepts), pg);
 
         //TODO move these to a PremiseGenerator which supplies
         // batches of Premises
@@ -120,9 +122,11 @@ public class Default extends AbstractNAR {
 
         c.capacity.set(activeConcepts);
 
-        c.confidenceDerivationMin.setValue(4f * Global.TRUTH_EPSILON);
-
         return c;
+    }
+
+    public DefaultPremiseGenerator newPremiseGenerator() {
+        return new DefaultPremiseGenerator(this, Deriver.getDefaultDeriver());
     }
 
     @NotNull
@@ -199,7 +203,7 @@ public class Default extends AbstractNAR {
      * The original deterministic memory cycle implementation that is currently used as a standard
      * for development and testing.
      */
-    public abstract static class AbstractCycle implements Consumer<BLink<? extends Concept>> {
+    public abstract static class AbstractCycle  {
 
         @NotNull
         final Active handlers;
@@ -254,7 +258,6 @@ public class Default extends AbstractNAR {
         /** activated concepts pending (re-)insert to bag */
         public final LinkedHashSet<Concept> activated = new LinkedHashSet();
 
-        final Derivelet deriver = new Derivelet();
 
         @NotNull
         @Range(min=0, max=1f,unit="Perfection")
@@ -269,10 +272,9 @@ public class Default extends AbstractNAR {
         @NotNull
         private final Forget.AbstractForget<Concept> conceptForget;
 
-        //cached
-        private transient int termlnksToFire, tasklinksToFire;
 
-        final PremisePermutor tqu;
+
+        final PremiseGenerator premiser;
 
 //        @Deprecated
 //        int tasklinks = 2; //TODO use MutableInteger for this
@@ -281,14 +283,14 @@ public class Default extends AbstractNAR {
 
         /* ---------- Short-term workspace for a single cycle ------- */
 
-        protected AbstractCycle(@NotNull NAR nar, Deriver deriver, Bag<Concept> concepts) {
+        protected AbstractCycle(@NotNull NAR nar, Deriver deriver, Bag<Concept> concepts, PremiseGenerator premiseGenerator) {
 
             this.nar = nar;
 
             this.der = deriver;
 
 
-            this.tqu = new PremisePermutor(nar, this::process);
+            this.premiser = premiseGenerator;
 
             Memory m = nar.memory;
 
@@ -313,23 +315,7 @@ public class Default extends AbstractNAR {
 
         }
 
-        //TODO:
-        final Termutator fireConcepts = new Termutator($.the("FireConcepts")){
-
-            @Override
-            public void run(FindSubst f, Termutator[] chain, int current) {
-
-                //TODO
-            }
-
-            @Override
-            public int getEstimatedPermutations() {
-                return conceptsFiredPerCycle.intValue();
-            }
-
-        };
-
-        protected void cycle(Memory memory) {
+        protected final void cycle(Memory memory) {
 
             fireConcepts(conceptsFiredPerCycle.intValue());
 
@@ -354,13 +340,10 @@ public class Default extends AbstractNAR {
 
         }
 
-        /** processes derivation result */
-        protected abstract void process(ConceptProcess cp);
-
         /**
-         * samples an active concept
+         * samples a next active concept
          */
-        public final Concept next() {
+        @Deprecated public final Concept next() {
             return active.sample().get();
         }
 
@@ -381,55 +364,37 @@ public class Default extends AbstractNAR {
             List<BLink<Concept>> f = this.firing;
             b.sample(conceptsToFire, f);
 
-            tasklinksToFire = tasklinksFiredPerFiredConcept.intValue();
-            termlnksToFire = termlinksFiredPerFiredConcept.intValue();
+            int tasklinksToFire = tasklinksFiredPerFiredConcept.intValue();
+            int termlnksToFire = termlinksFiredPerFiredConcept.intValue();
+            Forget.AbstractForget<Termed> termLinkForget = this.termLinkForget;
+            Forget.ForgetAndDetectDeletion<Task> taskLinkForget = this.taskLinkForget;
 
-            f.forEach(this);
+            PremiseGenerator pg = this.premiser;
+
+            for (int i = 0, fSize = f.size(); i < fSize; i++) {
+                pg.firePremiseSquared(
+                        f.get(i),
+                        tasklinksToFire,
+                        termlnksToFire,
+                        termLinkForget,
+                        taskLinkForget
+                );
+            }
+
             f.clear();
-
         }
 
         final void activate(Concept c, Budget b, float scale) {
             active.put(c, b, scale * activationRate.floatValue());
         }
 
-        /** fires a concept selected by the bag */
-        @Override public final void accept(@NotNull BLink<? extends Concept> cb) {
-
-            tqu.firePremiseSquared(
-                cb,
-                tasklinksToFire,
-                termlnksToFire,
-                termLinkForget,
-                taskLinkForget
-            );
-
-        }
 
         //try to implement some other way, this is here because of serializability
 
     }
 
+    public final static class DefaultConceptProcess extends ConceptProcess {
 
-    /**
-     * groups each derivation's tasks as a group before inputting into
-     * the main perception buffer, allowing post-processing such as budget normalization.
-     * <p>
-     * ex: this can ensure that a premise which produces many derived tasks
-     * will not consume budget unfairly relative to another premise
-     * with less tasks but equal budget.
-     */
-    public static class DefaultCycle extends AbstractCycle {
-
-        /** derived tasks with truth confidence lower than this value are discarded. */
-        @Range(min=0, max=1f)
-        public final MutableFloat confidenceDerivationMin = new MutableFloat(Global.TRUTH_EPSILON);
-
-        /**
-         * re-used, not to be used outside of this
-         */
-        @NotNull
-        private final PremiseMatch matcher;
 
         /**
          * holds the resulting tasks of one derivation so they can
@@ -437,42 +402,25 @@ public class Default extends AbstractNAR {
          * applied collectively.
          */
         @NotNull
-        private final Collection<Task> derivedTasksBuffer;
+        private final Collection<Task> results;
 
-        private final Consumer<Task> onDerived;
-
-
-
-        public DefaultCycle(@NotNull NAR nar, Deriver deriver, Bag<Concept> concepts) {
-            super(nar, deriver, concepts);
-
-            matcher = new PremiseMatch(nar.memory.random, deriver);
-            /* if detecting duplicates, use a list. otherwise use a set to deduplicate anyway */
-            derivedTasksBuffer =
-                    Global.DEBUG_DETECT_DUPLICATE_DERIVATIONS ?
-                            new FasterList() : Global.newHashSet(1);
-
-            onDerived = derivedTasksBuffer::add;
+        public DefaultConceptProcess(NAR nar, BLink<? extends Concept> conceptLink,
+                                     BLink<? extends Task> taskLink,
+                                     BLink<? extends Termed> termLink, @Nullable Task belief, @NotNull Collection<Task> results) {
+            super(nar, conceptLink, taskLink, termLink, belief);
+            this.results = results;
         }
-
-        @Override protected void cycle(Memory memory) {
-            matcher.setMinConfidence(confidenceDerivationMin.floatValue());
-            super.cycle(memory);
-        }
-
 
         @Override
-        public void process(@NotNull ConceptProcess p) {
+        protected void accept(Task derivation) {
+            results.add(derivation);
+        }
 
-            matcher.start(p, onDerived);
+        @Override
+        protected void commit() {
 
-            Collection<Task> buffer = derivedTasksBuffer;
 
-            if (Global.DEBUG_DETECT_DUPLICATE_DERIVATIONS) {
-                HashBag<Task> b = detectDuplicates(buffer);
-                buffer.clear();
-                b.addAll(buffer);
-            }
+            Collection<Task> buffer = results;
 
             if (!buffer.isEmpty()) {
 //                Task.inputNormalized( buffer,
@@ -493,33 +441,95 @@ public class Default extends AbstractNAR {
             }
 
         }
+    }
 
-        @NotNull
-        static HashBag<Task> detectDuplicates(@NotNull Collection<Task> buffer) {
-            HashBag<Task> taskCount = new HashBag<>();
-            taskCount.addAll(buffer);
-            taskCount.forEachWithOccurrences((t, i) -> {
-                if (i == 1) return;
+    /**
+     * groups each derivation's tasks as a group before inputting into
+     * the main perception buffer, allowing post-processing such as budget normalization.
+     * <p>
+     * ex: this can ensure that a premise which produces many derived tasks
+     * will not consume budget unfairly relative to another premise
+     * with less tasks but equal budget.
+     */
+    public static class DefaultCycle extends AbstractCycle {
 
-                System.err.println("DUPLICATE TASK(" + i + "): " + t);
-                List<Task> equiv = buffer.stream().filter(u -> u.equals(t)).collect(toList());
-                HashBag<String> rules = new HashBag();
-                equiv.forEach(u -> {
-                    String rule = u.getLogLast().toString();
-                    rules.add(rule);
 
-//                    System.err.println("\t" + u );
-//                    System.err.println("\t\t" + rule );
-//                    System.err.println();
-                });
-                rules.forEachWithOccurrences((String r, int c) -> System.err.println("\t" + c + '\t' + r));
-                System.err.println("--");
 
-            });
-            return taskCount;
+        public DefaultCycle(@NotNull NAR nar, Deriver deriver, Bag<Concept> concepts, PremiseGenerator premiseGenerator) {
+            super(nar, deriver, concepts, premiseGenerator);
         }
+
+
+
+//        @NotNull
+//        static HashBag<Task> detectDuplicates(@NotNull Collection<Task> buffer) {
+//            HashBag<Task> taskCount = new HashBag<>();
+//            taskCount.addAll(buffer);
+//            taskCount.forEachWithOccurrences((t, i) -> {
+//                if (i == 1) return;
+//
+//                System.err.println("DUPLICATE TASK(" + i + "): " + t);
+//                List<Task> equiv = buffer.stream().filter(u -> u.equals(t)).collect(toList());
+//                HashBag<String> rules = new HashBag();
+//                equiv.forEach(u -> {
+//                    String rule = u.getLogLast().toString();
+//                    rules.add(rule);
+//
+////                    System.err.println("\t" + u );
+////                    System.err.println("\t\t" + rule );
+////                    System.err.println();
+//                });
+//                rules.forEachWithOccurrences((String r, int c) -> System.err.println("\t" + c + '\t' + r));
+//                System.err.println("--");
+//
+//            });
+//            return taskCount;
+//        }
 
     }
 
 
+    /** single-threaded premise generator and processor; re-uses the same result collection buffer */
+    public static class DefaultPremiseGenerator extends PremiseGenerator {
+
+        final Set<Task> sharedResultBuffer;
+
+        /**
+         * re-used, not to be used outside of this
+         */
+        @NotNull
+        final PremiseMatch matcher;
+
+        /** derived tasks with truth confidence lower than this value are discarded. */
+        @Range(min=0, max=1f)
+        public final MutableFloat confMin;
+
+        public DefaultPremiseGenerator(NAR nar, Deriver deriver) {
+            this(nar, deriver, new MutableFloat(Global.TRUTH_EPSILON));
+        }
+
+        public DefaultPremiseGenerator(NAR nar, Deriver deriver, MutableFloat confidenceMin) {
+            super(nar);
+            this.matcher = new PremiseMatch(nar.memory.random, deriver);
+            this.sharedResultBuffer = Global.newHashSet(64);
+            this.confMin = confidenceMin;
+
+            nar.onFrame(this::updateDerivationParameters);
+        }
+
+        /** update derivation parameters (each frame) */
+        private void updateDerivationParameters(NAR nar) {
+            matcher.setMinConfidence(confMin.floatValue());
+        }
+
+        @Override
+        protected void premise(BLink<? extends Concept> concept, BLink<? extends Task> taskLink, BLink<? extends Termed> termLink, Task belief) {
+            newPremise(concept, taskLink, termLink, belief).run(matcher);
+        }
+
+        @NotNull
+        protected Default.DefaultConceptProcess newPremise(BLink<? extends Concept> concept, BLink<? extends Task> taskLink, BLink<? extends Termed> termLink, Task belief) {
+            return new DefaultConceptProcess(nar, concept, taskLink, termLink, belief, sharedResultBuffer);
+        }
+    }
 }

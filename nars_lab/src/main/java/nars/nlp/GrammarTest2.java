@@ -386,7 +386,7 @@ public class GrammarTest2 {
             for (char c : chars()) {
                 Termed t = n.term("Tape(predict, tape, (\"" + c + "\"), #1)");
                 l.add(
-                    new InputTask(n, t, goalOrBelief ? Symbols.GOAL : Symbols.JUDGMENT, invert)
+                    new InputTask(n, t, goalOrBelief ? Symbols.GOAL : Symbols.BELIEF, invert)
                 );
             }            
             return l;

@@ -32,7 +32,7 @@ public class GrammarTest {
 
 
         //n.memory.executionThreshold.setValue(0.55f);
-        n.core.confidenceDerivationMin.setValue(0.01f);
+        n.premiser.confMin.setValue(0.01f);
 
         n.memory.DEFAULT_JUDGMENT_PRIORITY = 0.5f;
         n.memory.DEFAULT_GOAL_PRIORITY = 0.6f;
