@@ -42,7 +42,7 @@ public class QRover extends AbstractPolygonBot {
 
     @Override
     protected Body newTorso() {
-        Body b = newTriangleTorso(getWorld(), 1f);
+        Body b = newTriangle(getWorld(), 1f);
 
 
 

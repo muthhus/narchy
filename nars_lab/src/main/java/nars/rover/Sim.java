@@ -361,9 +361,10 @@ public class Sim extends PhysicsModel {
         }
     }
 
+    public static final Color3f poisonFill = new Color3f(0.45f, 0.15f, 0.15f);
+
     public static class PoisonMaterial extends Material implements Edible {
 
-        static final Color3f poisonFill = new Color3f(0.45f, 0.15f, 0.15f);
 
         @Override
         public void before(Body b, JoglAbstractDraw d, float time) {

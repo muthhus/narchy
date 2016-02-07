@@ -8,6 +8,7 @@ import nars.NAR;
 import nars.Symbols;
 import nars.guifx.NARfx;
 import nars.nar.Default;
+import nars.op.mental.Anticipate;
 import nars.rover.RoverWorld;
 import nars.rover.Sim;
 import nars.rover.robot.NARover;
@@ -43,7 +44,7 @@ public class SomeRovers {
 	public static final String speedRight = "speed:right";
 	public static final String speedForward = "speed:forward";
 
-	private static final SimulatedClock clock = new SimulatedClock();
+	public static final SimulatedClock clock = new SimulatedClock();
 
 	public static void main(String[] args) {
 
@@ -103,7 +104,7 @@ public class SomeRovers {
 //            nar.memory.DEFAULT_QUESTION_PRIORITY = 0.6f;
 //            nar.memory.DEFAULT_QUESTION_DURABILITY = 0.6f;
         //nar.initNAL9();
-        //nar.memory.the(new Anticipate(nar));
+        nar.memory.the(new Anticipate(nar));
         //nar.memory.perfection.setValue(0.15f);
         //nar.core.confidenceDerivationMin.setValue(0.01f);
 
@@ -111,13 +112,13 @@ public class SomeRovers {
         //nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
         nar.core.activationRate.setValue(0.4f);
 
-        nar.memory.duration.set(6);
+        nar.memory.duration.set(3);
         nar.memory.conceptForgetDurations.setValue(2);
         nar.memory.termLinkForgetDurations.setValue(4);
         nar.memory.taskLinkForgetDurations.setValue(6);
         nar.memory.cyclesPerFrame.set(128);
         nar.memory.shortTermMemoryHistory.set(2);
-        nar.memory.executionThreshold.setValue(0.002f);
+        nar.memory.executionThreshold.setValue(0.0f);
 
         boolean gui = true;
         if (gui) {

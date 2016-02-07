@@ -45,6 +45,8 @@ import java.awt.*;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static nars.rover.Sim.poisonFill;
+
 public abstract class JoglAbstractDraw extends DebugDraw {
 
     private JoglAbstractPanel panel;
@@ -95,6 +97,8 @@ public abstract class JoglAbstractDraw extends DebugDraw {
         int flags = getFlags();
         //boolean wireframe = (flags & DebugDraw.e_wireframeDrawingBit) != 0;
 
+        animateColors(time);
+
         //if ((flags & DebugDraw.e_shapeBit) != 0) {
         for (Body b = w.getBodyList(); b != null; b = b.getNext()) {
             drawBody(b, time);
@@ -116,7 +120,10 @@ public abstract class JoglAbstractDraw extends DebugDraw {
 
     }
 
+    private void animateColors(float t) {
+        poisonFill.x = (float) (0.35 + 0.25f * (Math.sin(t) + 1f));
 
+    }
 
 
     Color3f defaultFillColor = new Color3f(0.75f, 0.75f, 0.75f);

@@ -45,8 +45,12 @@ public abstract class AbstractPolygonBot extends Robotic {
     boolean feel_motion = true, feel_senses = true; //todo add option in gui
     int motionPeriod = 1, sensePeriod = 1;
 
+    public static Body newTriangle(World world, float mass) {
+        return newTriangle(world, mass, 0f, 0f);
+    }
+
     @NotNull
-    public static Body newTriangleTorso(World world, float mass) {
+    public static Body newTriangle(World world, float mass, float x, float y) {
         PolygonShape shape = new PolygonShape();
 
         Vec2[] vertices = {new Vec2(3.0f, 0.0f), new Vec2(-1.0f, +2.0f), new Vec2(-1.0f, -2.0f)};
@@ -56,7 +60,7 @@ public abstract class AbstractPolygonBot extends Robotic {
         bd.linearDamping = (linearDamping);
         bd.angularDamping = (angularDamping);
         bd.type = BodyType.DYNAMIC;
-        bd.position.set(0, 0);
+        bd.position.set(x,y);
 
         Body torso = world.createBody(bd);
         Fixture f = torso.createFixture(shape, mass);
@@ -64,7 +68,30 @@ public abstract class AbstractPolygonBot extends Robotic {
         f.setFriction(friction);
         return torso;
     }
+    @NotNull
+    public static Body newRect(World world, float density, float w, float h, float x, float y) {
+        PolygonShape shape = new PolygonShape();
 
+        float mass = density * w * h;
+
+        w/=2;
+        h/=2;
+
+        Vec2[] vertices = {new Vec2(-1f*w, -1f*h), new Vec2(-1f*w, +1f*h), new Vec2(1f*w, 1f*h), new Vec2(1f*w, -1f*h), };
+        shape.set(vertices, vertices.length);
+        //shape.m_centroid.set(bodyDef.position);
+        BodyDef bd = new BodyDef();
+        bd.linearDamping = (linearDamping);
+        bd.angularDamping = (angularDamping);
+        bd.type = BodyType.DYNAMIC;
+        bd.position.set(x,y);
+
+        Body torso = world.createBody(bd);
+        Fixture f = torso.createFixture(shape, mass);
+        f.setRestitution(restitution);
+        f.setFriction(friction);
+        return torso;
+    }
 
     public void thrustRelative(float f) {
         //float velBefore = torso.getLinearVelocity().length();

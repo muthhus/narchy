@@ -216,13 +216,7 @@ public class ConceptPane extends VBox implements ChangeListener {
                 }
             });
 
-
-
-
-
         }
-
-
     }
 
     public static class BagView<X> extends VBox /* FlowPane */ implements Runnable {
