@@ -23,4 +23,8 @@ public interface Termed<TT extends Term>  {
     default boolean isNormalized() {
         return term().isNormalized();
     }
+
+    default boolean isCompound() {
+        return term().isCompound();
+    }
 }

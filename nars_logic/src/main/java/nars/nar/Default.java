@@ -11,6 +11,7 @@ import nars.budget.BudgetMerge;
 import nars.budget.Forget;
 import nars.concept.Concept;
 import nars.concept.ConceptProcess;
+import nars.concept.DefaultConceptProcess;
 import nars.concept.PremiseGenerator;
 import nars.data.Range;
 import nars.nal.Deriver;
@@ -25,12 +26,10 @@ import nars.util.data.MutableInteger;
 import nars.util.event.Active;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -393,56 +392,6 @@ public class Default extends AbstractNAR {
 
     }
 
-    public final static class DefaultConceptProcess extends ConceptProcess {
-
-
-        /**
-         * holds the resulting tasks of one derivation so they can
-         * be normalized or some other filter or aggregation
-         * applied collectively.
-         */
-        @NotNull
-        private final Collection<Task> results;
-
-        public DefaultConceptProcess(NAR nar, BLink<? extends Concept> conceptLink,
-                                     BLink<? extends Task> taskLink,
-                                     BLink<? extends Termed> termLink, @Nullable Task belief, @NotNull Collection<Task> results) {
-            super(nar, conceptLink, taskLink, termLink, belief);
-            this.results = results;
-        }
-
-        @Override
-        protected void accept(Task derivation) {
-            results.add(derivation);
-        }
-
-        @Override
-        protected void commit() {
-
-
-            Collection<Task> buffer = results;
-
-            if (!buffer.isEmpty()) {
-//                Task.inputNormalized( buffer,
-//                        //p.getMeanPriority()
-//                        p.task().pri()
-//
-//                        //p.getTask().getPriority() * 1f/buffer.size()
-//                        //p.getTask().getPriority()/buffer.size()
-//                        //p.taskLink.getPriority()
-//                        //p.getTaskLink().getPriority()/buffer.size()
-//
-//                        //p.conceptLink.getPriority()
-//                        //UtilityFunctions.or(p.conceptLink.getPriority(), p.taskLink.getPriority())
-//
-//                ,nar::input);
-                nar.input(buffer);
-                buffer.clear();
-            }
-
-        }
-    }
-
     /**
      * groups each derivation's tasks as a group before inputting into
      * the main perception buffer, allowing post-processing such as budget normalization.
@@ -492,7 +441,7 @@ public class Default extends AbstractNAR {
     /** single-threaded premise generator and processor; re-uses the same result collection buffer */
     public static class DefaultPremiseGenerator extends PremiseGenerator {
 
-        final Set<Task> sharedResultBuffer;
+        protected final Collection<Task> sharedResultBuffer;
 
         /**
          * re-used, not to be used outside of this
@@ -505,14 +454,14 @@ public class Default extends AbstractNAR {
         public final MutableFloat confMin;
 
         public DefaultPremiseGenerator(NAR nar, Deriver deriver) {
-            this(nar, deriver, new MutableFloat(Global.TRUTH_EPSILON));
+            this(nar, deriver, Global.newHashSet(64));
         }
 
-        public DefaultPremiseGenerator(NAR nar, Deriver deriver, MutableFloat confidenceMin) {
+        public DefaultPremiseGenerator(NAR nar, Deriver deriver, Collection<Task> resultsBuffer) {
             super(nar);
             this.matcher = new PremiseMatch(nar.memory.random, deriver);
-            this.sharedResultBuffer = Global.newHashSet(64);
-            this.confMin = confidenceMin;
+            this.sharedResultBuffer = resultsBuffer;
+            this.confMin = new MutableFloat(Global.TRUTH_EPSILON);
 
             nar.onFrame(this::updateDerivationParameters);
         }
@@ -527,8 +476,7 @@ public class Default extends AbstractNAR {
             newPremise(concept, taskLink, termLink, belief).run(matcher);
         }
 
-        @NotNull
-        protected Default.DefaultConceptProcess newPremise(BLink<? extends Concept> concept, BLink<? extends Task> taskLink, BLink<? extends Termed> termLink, Task belief) {
+        protected @NotNull ConceptProcess newPremise(BLink<? extends Concept> concept, BLink<? extends Task> taskLink, BLink<? extends Termed> termLink, Task belief) {
             return new DefaultConceptProcess(nar, concept, taskLink, termLink, belief, sharedResultBuffer);
         }
     }

@@ -104,7 +104,7 @@ public class GrammarTest2 {
         n.memory.activationRate.setValue(1f);
 
         //n.memory.executionThreshold.setValue(0.55f);
-        n.core.confidenceDerivationMin.setValue(0.01f);
+        n.premiser.confMin.setValue(0.01f);
 
         //n.memory.executionThreshold.setValue(.6f);
         n.memory.DEFAULT_JUDGMENT_PRIORITY = 0.5f;

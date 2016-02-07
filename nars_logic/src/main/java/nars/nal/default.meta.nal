@@ -160,19 +160,26 @@
 
 //Set element takeout:
 
-    (C --> {X,A..+}), C |- (C --> {X}), (Belief:StructuralDeduction)
-    (C --> [X,A..+]), C |- (C --> [X]), (Belief:StructuralDeduction)
-    ({X,A..+} --> C), C |- ({X} --> C), (Belief:StructuralDeduction)
-    ([X,A..+] --> C), C |- ([X] --> C), (Belief:StructuralDeduction)
+//    (C --> {X,A..+}), C |- (C --> {X}), (Belief:StructuralDeduction)
+//    (C --> [X,A..+]), C |- (C --> [X]), (Belief:StructuralDeduction)
+//    ({X,A..+} --> C), C |- ({X} --> C), (Belief:StructuralDeduction)
+//    ([X,A..+] --> C), C |- ([X] --> C), (Belief:StructuralDeduction)
+    (C --> {X,A..+}), {X,A..+} |- (C --> {X}), (Belief:StructuralDeduction)
+    (C --> [X,A..+]), [X,A..+] |- (C --> [X]), (Belief:StructuralDeduction)
+    ({X,A..+} --> C), {X,A..+} |- ({X} --> C), (Belief:StructuralDeduction)
+    ([X,A..+] --> C), [X,A..+] |- ([X] --> C), (Belief:StructuralDeduction)
 
-//NAL3 single premise inference:
+//NAL3 single premise inference: (switched the belief term to the compound one so that less useful termlinks to atoms arent relied upon)
 
-    ((|,X,A..+) --> M), M |- (X --> M), (Belief:StructuralDeduction)
-    (M --> (&,X,A..+)), M |- (M --> X), (Belief:StructuralDeduction)
+//    ((|,X,A..+) --> M), M |- (X --> M), (Belief:StructuralDeduction)
+    ((|,X,A..+) --> M), (|,X,A..+) |- (X --> M), (Belief:StructuralDeduction)
+//    (M --> (&,X,A..+)), M |- (M --> X), (Belief:StructuralDeduction)
+    (M --> (&,X,A..+)), (&,X,A..+) |- (M --> X), (Belief:StructuralDeduction)
 
-    ((B ~ G) --> S), S |- (B --> S), (Belief:StructuralDeduction)
-    (R --> (B - S)), R |- (R --> B), (Belief:StructuralDeduction)
-
+//    ((B ~ G) --> S), S |- (B --> S), (Belief:StructuralDeduction)
+    ((B ~ G) --> S), (B ~ G) |- (B --> S), (Belief:StructuralDeduction)
+//    (R --> (B - S)), R |- (R --> B), (Belief:StructuralDeduction)
+    (R --> (B - S)), (B - S) |- (R --> B), (Belief:StructuralDeduction)
 
 //// implication-based syllogism ////////////////////////////////////////////////////////////////////////////////////
 //       (A ==> B) ------- (B ==> C)

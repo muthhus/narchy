@@ -7,8 +7,8 @@ dependencies {
 }
 
 
-mainClassName = 'nars.NARjs'
+//mainClassName = 'nars.NARjs'
 
-run{
-    standardInput = System.in
-}
+//run{
+//    standardInput = System.in
+//}

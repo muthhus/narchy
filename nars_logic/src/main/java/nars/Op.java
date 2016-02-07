@@ -86,6 +86,7 @@ public enum Op {
     public static final Atom Imdex = $.the("_");
 
 
+
     /**
      * symbol representation of this getOperator
      */
@@ -334,12 +335,13 @@ public enum Op {
             Op.or(Op.INHERIT, Op.PRODUCT, OPERATOR);
 
     public static final int StatementBits =
-            Op.or(Op.INHERIT.bit(), Op.SIMILAR.bit(),
-                    Op.EQUIV.bit(),
-                    Op.IMPLICATION.bit()
+            Op.or(Op.INHERIT, Op.SIMILAR,
+                    Op.EQUIV,
+                    Op.IMPLICATION
             );
 
-    public static final int ImplicationOrEquivalenceBits = or(Op.EQUIV.bit(), Op.IMPLICATION.bit());
+    public static final int ProductOrImageBits = or(Op.PRODUCT, Op.IMAGE_EXT, Op.IMAGE_INT);
+    public static final int ImplicationOrEquivalenceBits = or(Op.EQUIV, Op.IMPLICATION);
 
     public static final int ImageBits =
         Op.or(Op.IMAGE_EXT,Op.IMAGE_INT);

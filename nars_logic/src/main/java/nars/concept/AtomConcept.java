@@ -1,6 +1,7 @@
 package nars.concept;
 
 import nars.NAR;
+import nars.Op;
 import nars.bag.Bag;
 import nars.budget.Budget;
 import nars.concept.util.BeliefTable;
@@ -148,7 +149,8 @@ public class AtomConcept extends AbstractConcept  {
 
 
         /** activate local's termlink to template */
-        termLinks.put(target, b, subScale);
+        if (termLinkOut(this, target.term()))
+            termLinks.put(target, b, subScale);
 
         /** activate (reverse) template's termlink to local */
         target.termlinks().put(this, b, subScale);
@@ -157,7 +159,13 @@ public class AtomConcept extends AbstractConcept  {
         target.link(t, subScale, minScale, nar);
     }
 
-
+    /** filter for inserting an outgoing termlink depending on the target */
+    public static boolean termLinkOut(Termed from, Term to) {
+        if (!to.isCompound()) {
+            return (from.isAny(Op.ProductOrImageBits));
+        }
+        return true;
+    }
 
 
 }
