@@ -12,6 +12,7 @@ import nars.op.mental.Anticipate;
 import nars.rover.RoverWorld;
 import nars.rover.Sim;
 import nars.rover.robot.NARover;
+import nars.rover.robot.Turret;
 import nars.rover.world.FoodSpawnWorld1;
 import nars.term.index.MapIndex2;
 import nars.time.SimulatedClock;
@@ -55,12 +56,12 @@ public class SomeRovers {
         //RoverWorld world = new GridSpaceWorld(GridSpaceWorld.newMazePlanet());
         final Sim game = new Sim(clock, world);
 
-//        game.add(new Turret("turret"));
-//
+        game.add(new Turret("turret"));
+
 //        game.add(new Spider("spider",
 //                3, 3, 0.618f, 30, 30));
         boolean addNARRover = true;
-        boolean addQRover = false;
+        boolean addQRover = true;
 
         if (addNARRover) {
             game.add(new NARover("r1", newNAR()) {
@@ -115,8 +116,8 @@ public class SomeRovers {
         nar.memory.conceptForgetDurations.setValue(2);
         nar.memory.termLinkForgetDurations.setValue(4);
         nar.memory.taskLinkForgetDurations.setValue(6);
-        nar.memory.cyclesPerFrame.set(128);
-        nar.memory.shortTermMemoryHistory.set(2);
+        nar.memory.cyclesPerFrame.set(44);
+        nar.memory.shortTermMemoryHistory.set(3);
         nar.memory.executionThreshold.setValue(0.0f);
 
         boolean gui = true;

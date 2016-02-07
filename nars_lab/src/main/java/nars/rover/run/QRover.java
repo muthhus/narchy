@@ -42,8 +42,8 @@ public class QRover extends AbstractPolygonBot {
 
     @Override
     protected Body newTorso() {
-        Body b = newTriangle(getWorld(), 1f);
-
+        Body torso = newTriangle(getWorld(), 1f);
+        torso.setUserData(getMaterial());
 
 
         int retinaRaysPerPixel = 2;
@@ -90,7 +90,7 @@ public class QRover extends AbstractPolygonBot {
             draw.addLayer(v);
             senses.add(v);
         }
-        return b;
+        return torso;
     }
 
     @Override

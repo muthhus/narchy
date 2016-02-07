@@ -7,17 +7,26 @@ package nars.concept;
 import nars.Global;
 import nars.NAR;
 import nars.Premise;
+import nars.Symbols;
 import nars.bag.BLink;
+import nars.budget.Budget;
 import nars.nal.meta.PremiseMatch;
 import nars.nal.op.Derive;
+import nars.task.DerivedTask;
+import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Stamp;
+import nars.truth.Truth;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.Consumer;
+
 import static nars.nal.Tense.*;
+import static nars.truth.TruthFunctions.eternalize;
 
 /**
  * Firing a concept (reasoning event). Derives new Tasks via reasoning rules
@@ -37,8 +46,10 @@ public final class ConceptProcess implements Premise {
     @Nullable
     private final Task belief;
     private final boolean cyclic;
+
     @Deprecated
-    public long occ;
+    //HACK temporary workspace variable, pertains only to current derivation of which many may occurr for this premise (re-used). TODO find a cleaner way
+    transient public long occ;
 
 
     public ConceptProcess(NAR nar, BLink<? extends Concept> conceptLink,
@@ -407,123 +418,90 @@ public final class ConceptProcess implements Premise {
     }
 
 
-//    /** max(tasktime, belieftime) */
-//    public long getMaxOccurrenceTime() {
-//        long occ= getTask().getOccurrenceTime();
-//        Task b = getBelief();
-//        if (b!=null) {
-//            occ = Math.max(occ, b.getOccurrenceTime());
-//        }
-//        return occ;
-//    }
+
+    /** part 2 */
+    public void derive(@NotNull Termed<Compound> c, @Nullable Truth truth, Budget budget, long now, long occ, PremiseMatch p, Derive d) {
+
+        char punct = p.punct.get();
+
+        Task task = task();
+        Task belief = belief();
+
+        MutableTask deriving = new DerivedTask(c, this);
+
+        if (Global.DEBUG) {
+            deriving.log(d.rule);
+        }
+
+        boolean derivedTemporal = occ != ETERNAL;
+
+        //nullify belief for single-premise conclusions
+        if ((truth!=null) && (belief!=null)) {
+            if (((punct == Symbols.JUDGMENT) && d.beliefSingle) ||
+                    ((punct == Symbols.GOAL) && d.desireSingle))
+                belief = null;
+        }
+
+        Task derived = deriving
+                .punctuation(punct)
+                .truth(truth)
+                .budget(budget)
+                .time(now, occ)
+                .parent(task, belief /* null if single */)
+                .anticipate(derivedTemporal && d.anticipate);
+
+        Consumer<Task> target = p.target;
+
+        if (!complete(derived, target))
+            return;
+
+        //--------- TASK WAS DERIVED if it reaches here
 
 
-    //    /** supplies at most 1 premise containing the pair of next tasklink and termlink into a premise */
-//    public static Stream<Task> nextPremise(NAR nar, final Concept concept, float taskLinkForgetDurations, Function<ConceptProcess,Stream<Task>> proc) {
-//
-//        TaskLink taskLink = concept.getTaskLinks().forgetNext(taskLinkForgetDurations, nar.memory());
-//        if (taskLink == null) return Stream.empty();
-//
-//        TermLink termLink = concept.getTermLinks().forgetNext(nar.memory().termLinkForgetDurations, nar.memory());
-//        if (termLink == null) return Stream.empty();
-//
-//
-//        return proc.apply(premise(nar, concept, taskLink, termLink));
-//
-//    }
+        if (derivedTemporal && (truth != null) && d.eternalize) {
 
-//    public static ConceptProcess premise(NAR nar, Concept concept, TaskLink taskLink, TermLink termLink) {
-////        if (Terms.equalSubTermsInRespectToImageAndProduct(taskLink.getTerm(), termLink.getTerm()))
-////            return null;
-//
-////        if (taskLink.isDeleted())
-////            throw new RuntimeException("tasklink null"); //bag should not have returned this
-//
-//    }
+            complete(new DerivedTask(c, this) //derived.term())
 
+                    .punctuation(punct)
+                    .truth(
+                            truth.freq(),
+                            eternalize(truth.conf())
+                    )
 
-//    public abstract Stream<Task> derive(final Deriver p);
+                    .time(now, ETERNAL)
 
-//    public static void forEachPremise(NAR nar, @Nullable final Concept concept, @Nullable TaskLink taskLink, int termLinks, float taskLinkForgetDurations, Consumer<ConceptProcess> proc) {
-//        if (concept == null) return;
-//
-//        concept.updateLinks();
-//
-//        if (taskLink == null) {
-//            taskLink = concept.getTaskLinks().forgetNext(taskLinkForgetDurations, concept.getMemory());
-//            if (taskLink == null)
-//                return;
-//        }
-//
-//
-//
-//
-//        proc.accept( new ConceptTaskLinkProcess(nar, concept, taskLink) );
-//
-//        if ((termLinks > 0) && (taskLink.type!=TermLink.TRANSFORM))
-//            ConceptProcess.forEachPremise(nar, concept, taskLink,
-//                    termLinks,
-//                    proc
-//            );
-//    }
+                    .budget(budget)
+                    .budgetCompoundForward(this)
 
-//    /** generates a set of termlink processes by sampling
-//     * from a concept's TermLink bag
-//     * @return how many processes generated
-//     * */
-//    public static int forEachPremise(NAR nar, Concept concept, TaskLink t, final int termlinksToReason, Consumer<ConceptProcess> proc) {
-//
-//        int numTermLinks = concept.getTermLinks().size();
-//        if (numTermLinks == 0)
-//            return 0;
-//
-//        TermLink[] termlinks = new TermLink[termlinksToReason];
-//
-//        //int remainingProcesses = Math.min(termlinksToReason, numTermLinks);
-//
-//        //while (remainingProcesses > 0) {
-//
-//            Arrays.fill(termlinks, null);
-//
-//            concept.getPremiseGenerator().nextTermLinks(concept, t, termlinks);
-//
-//            int created = 0;
-//            for (TermLink tl : termlinks) {
-//                if (tl == null) break;
-//
-//                proc.accept(
-//                    new ConceptTaskTermLinkProcess(nar, concept, t, tl)
-//                );
-//                created++;
-//            }
-//
-//
-//          //  remainingProcesses--;
-//
-//
-//        //}
-//
-//        /*if (remainingProcesses == 0) {
-//            System.err.println(now + ": " + currentConcept + ": " + remainingProcesses + "/" + termLinksToFire + " firings over " + numTermLinks + " termlinks" + " " + currentTaskLink.getRecords() + " for TermLinks "
-//                    //+ currentConcept.getTermLinks().values()
-//            );
-//            //currentConcept.taskLinks.printAll(System.out);
-//        }*/
-//
-//        return created;
-//
-//    }
+                    .parent(derived)  //this is lighter weight and potentially easier on GC
+                    //.parent(task, belief)
 
-//    /** override-able filter for derivations which can be applied
-//     * once the term and the truth value are known */
-//    public boolean validJudgment(Term derivedTerm, Truth truth) {
-//        return true;
-//    }
-//
-//    /** override-able filter for derivations which can be applied
-//     * once the term and the truth value are known */
-//    public boolean validGoal(Term derivedTerm, Truth truth) {
-//        return true;
-//    }
+                    .log("Immediaternalized") //Immediate Eternalization
 
+            , target);
+
+        }
+
+    }
+
+    private final boolean complete(Task derived, Consumer<Task> target) {
+
+        //pre-normalize to avoid discovering invalidity after having consumed space while in the input queue
+        derived = derived.normalize(memory());
+        if (derived != null) {
+
+            //if (Global.DEBUG) {
+            if (task().equals(derived))
+                //return null;
+                throw new RuntimeException("derivation same as task");
+            if (belief() != null && belief().equals(derived))
+                //return null;
+                throw new RuntimeException("derivation same as belief");
+            //}
+
+            target.accept(derived);
+            return true;
+        }
+        return false;
+    }
 }

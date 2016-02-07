@@ -42,7 +42,7 @@ public abstract class FindSubst extends Versioning implements Subst {
 
 
     /** maximum changes which are stored in stack */
-    final static int defaultHistoryLength = 1000;
+    final static int defaultHistoryLength = 256;
 
     public final Random random;
 
@@ -320,6 +320,9 @@ public abstract class FindSubst extends Versioning implements Subst {
 
     @Override
     public final boolean isEmpty() {
+//        if (xy.isEmpty() && !yx.isEmpty()) {
+//            System.err.println("YX: " + yx);
+//        }
         return xy.isEmpty();
     }
 

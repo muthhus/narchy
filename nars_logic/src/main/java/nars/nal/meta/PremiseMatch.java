@@ -15,6 +15,7 @@ import nars.nal.op.ImmediateTermTransform;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.TermIndex;
 import nars.term.Termed;
 import nars.term.transform.subst.FindSubst;
 import nars.truth.Truth;
@@ -34,8 +35,8 @@ public class PremiseMatch extends FindSubst {
 
     private final Deriver deriver;
 
-    /** Global Context */
-    public Consumer<Task> receiver;
+    /** accept's the final derivation result */
+    public Consumer<Task> target;
 
     /** current Premise */
     public ConceptProcess premise;
@@ -63,6 +64,7 @@ public class PremiseMatch extends FindSubst {
 
     /** cached value */
     private transient char premisePunc;
+    private TermIndex index;
 
     public PremiseMatch(Random r, Deriver deriver) {
         super(Op.VAR_PATTERN, r );
@@ -140,7 +142,8 @@ public class PremiseMatch extends FindSubst {
         this.premise = p;
         this.premisePunc = premise.task().punc();
 
-        this.receiver = receiver;
+        this.index = premise.memory().index;
+        this.target = receiver;
 
         Compound taskTerm = p.task().term();
 
@@ -209,24 +212,7 @@ public class PremiseMatch extends FindSubst {
     @Nullable
     @Override public final Term resolve(Term t) {
         //TODO make a half resolve that only does xy?
-
-        if (isEmpty())
-            return t;
-
-//        Term ret = getXY(t);
-//        if (ret != null) {
-//            ret = getYX(ret);
-//        }
-//
-//        if (ret != null) return ret;
-//        return t;
-            Term ret = premise.memory().index.apply(this, t);
-
-//            if ((ret != null) /*&& (!yx.isEmpty())*/) {
-//                ret = ret.apply(yx, fullMatch);
-//            }
-            return ret;
-
+        return isEmpty() ? t : index.apply(this, t);
 
     }
 

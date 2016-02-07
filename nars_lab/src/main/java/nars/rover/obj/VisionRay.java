@@ -53,7 +53,7 @@ abstract public class VisionRay extends RayCastClosestCallback implements Abstra
     public VisionRay(Vec2 point, float angle, float arc, Body base, float length, int resolution) {
         this.base = base;
 
-        bot = ((Robotic.NARRoverMaterial)base.getUserData()).robot;
+        bot = ((Robotic.RoboticMaterial)base.getUserData()).robot;
         //this.sensor = new Sensor();
 
         this.point = point;
