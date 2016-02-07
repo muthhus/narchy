@@ -30,3 +30,6 @@ nars_logic/vis.xml
 .gradle/
 */build
 gradle/
+gradlew
+gradlew.bat
+

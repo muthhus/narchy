@@ -162,7 +162,7 @@ public class AtomConcept extends AbstractConcept  {
     /** filter for inserting an outgoing termlink depending on the target */
     public static boolean termLinkOut(Termed from, Term to) {
         if (!to.isCompound()) {
-            return (from.isAny(Op.ProductOrImageBits));
+            return (!from.op().isStatement()); // isAny(Op.ProductOrImageBits)
         }
         return true;
     }

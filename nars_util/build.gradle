@@ -23,6 +23,8 @@ dependencies {
         exclude(module: 'cache2k-jmx-api')
         exclude(module: 'commons-logging')
     }
+    compile(group:'de.ruedigermoeller',name:'fst', version:'2.43')
+
     testCompile(group: 'org.testng', name: 'testng', version: '6.9.10') {
         exclude(module: 'ant')
         exclude(module: 'guice')

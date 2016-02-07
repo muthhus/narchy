@@ -20,7 +20,7 @@ public class DefaultConceptProcess extends ConceptProcess {
      * be normalized or some other filter or aggregation
      * applied collectively.
      */
-    protected final @NotNull Collection<Task> results;
+    public final @NotNull Collection<Task> results;
 
     public DefaultConceptProcess(NAR nar, BLink<? extends Concept> conceptLink,
                                  BLink<? extends Task> taskLink,
