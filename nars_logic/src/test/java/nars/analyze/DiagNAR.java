@@ -30,7 +30,7 @@ import java.util.List;
  */
 public class DiagNAR extends Default {
 
-    private final PrintStream out;
+    private static PrintStream out;
 
     public DiagNAR() throws FileNotFoundException {
         super();
@@ -151,8 +151,12 @@ public class DiagNAR extends Default {
 
 
             byte[] bytes = serialize.asByteArray(this);
-            System.out.println(bytes.length + "  " + new String(bytes));
+            String ss = new String(bytes);
+
+            System.out.println(bytes.length + "  " + ss);
             //Object deser = conf.asObject(bytes);
+
+            out.println(ss);
 
         }
 

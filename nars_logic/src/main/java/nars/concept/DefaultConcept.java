@@ -172,7 +172,7 @@ public class DefaultConcept extends AtomConcept {
      * @param nar
      * @return Whether to continue the processing of the task
      */
-    @NotNull
+    @Nullable
     @Override
     public Task processBelief(@NotNull Task belief, @NotNull NAR nar) {
 
@@ -235,7 +235,7 @@ public class DefaultConcept extends AtomConcept {
      * @param task
      * @return Whether to continue the processing of the task
      */
-    @NotNull
+    @Nullable
     @Override
     public final Task processGoal(@NotNull Task inputGoal, @NotNull NAR nar) {
 
@@ -345,7 +345,7 @@ public class DefaultConcept extends AtomConcept {
      * @param nar
      * @return the relevant task
      */
-    @NotNull
+    @Nullable
     @Override
     public Task processQuestion(@NotNull Task q, @NotNull NAR nar) {
 
@@ -629,7 +629,7 @@ public class DefaultConcept extends AtomConcept {
      * --an existing one which absorbed the input and will re-fire
      * --a revised/projected task which may or may not remain in the belief table
      */
-    @NotNull
+    @Nullable
     public final Task process(@NotNull final Task task, @NotNull NAR nar) {
 
         task.onConcept(this);

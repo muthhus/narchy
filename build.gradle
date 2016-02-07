@@ -74,7 +74,7 @@ compileJava {
     //https://docs.gradle.org/current/dsl/org.gradle.api.tasks.compile.JavaCompile.html
 
     //enable compilation in a separate daemon process
-    options.fork = true
+    options.fork = false
 
     //enable incremental compilation
     options.incremental = true

@@ -45,7 +45,7 @@ public class PremiseMatch extends FindSubst {
     @NotNull
     public final Versioned<Character> punct;
     @NotNull
-    public final Versioned<MatchTerm> pattern;
+    @Deprecated public final Versioned<MatchTerm> pattern;
 
     @NotNull
     private TaskBeliefPair termPattern = new TaskBeliefPair();
@@ -90,13 +90,17 @@ public class PremiseMatch extends FindSubst {
     }
 
 
+    public final void matchAll(@NotNull Term x, @NotNull Term y, MatchTerm callback, ImmutableMap<Term, MatchConstraint> constraints) {
+        /** only one thread should be in here at a time */
+        //public final void match(@NotNull MatchTerm pattern /* callback */, ImmutableMap<Term, MatchConstraint> c) {
 
-    public final void match(@NotNull MatchTerm pattern /* callback */, ImmutableMap<Term, MatchConstraint> c) {
-        this.pattern.set(pattern); //to notify of matches
-        this.constraints = c;
-        matchAll(pattern.x, term.get() /* current term */);
+        this.pattern.set(callback); //to notify of matches
+        this.constraints = constraints;
+        matchAll(x, y, true);
         this.constraints = null;
+        //}
     }
+
 
     @Override
     public void matchAll(@NotNull Term x, @NotNull Term y, boolean finish) {

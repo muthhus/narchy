@@ -11,6 +11,7 @@ import nars.nal.meta.match.Ellipsis;
 import nars.nal.meta.match.EllipsisMatch;
 import nars.nal.meta.match.EllipsisTransform;
 import nars.nal.meta.match.ImageMatch;
+import nars.nal.meta.op.MatchTerm;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termlike;
@@ -170,6 +171,7 @@ public abstract class FindSubst extends Versioning implements Subst {
     public final void matchAll(@NotNull Term x, @NotNull Term y) {
         matchAll(x, y, true);
     }
+
 
     /** appended to the end of termuator execution chains to invoke
      *  any accumulated termutations occurring during the match

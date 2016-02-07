@@ -93,7 +93,7 @@ public class AtomConcept extends AbstractConcept  {
         throw new RuntimeException(shouldntProcess);
     }
 
-    @NotNull
+    @Nullable
     @Override
     public final Task processQuest(Task task, NAR nar) {
         return processQuestion(task, nar );

@@ -20,6 +20,7 @@
  */
 package nars.term;
 
+import com.gs.collections.impl.list.mutable.primitive.IntArrayList;
 import nars.Global;
 import nars.Op;
 import nars.Symbols;
@@ -27,12 +28,14 @@ import nars.nal.Tense;
 import nars.nal.meta.match.Ellipsis;
 import nars.term.container.TermContainer;
 import nars.term.transform.subst.FindSubst;
+import nars.util.data.Util;
 import nars.util.data.sexpression.IPair;
 import nars.util.data.sexpression.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Set;
 
 /**
@@ -155,13 +158,14 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
      * extracts a subterm provided by the address tuple
      * returns null if specified subterm does not exist
      */
-    @NotNull
-    default <X extends Term> X subterm(@NotNull int... address) {
+    @Nullable
+    default <X extends Term> X subterm(@NotNull int... path) {
         Term ptr = this;
-        for (int i : address) {
-            if (ptr instanceof TermContainer) {
-                ptr = ((TermContainer) ptr).term(i);
-            }
+        for (int i : path) {
+            //if (ptr instanceof TermContainer) {
+            if (null == (ptr = ((TermContainer) ptr).termOr(i, null)))
+                return null;
+            //}
         }
         return (X) ptr;
     }
@@ -338,6 +342,36 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 
     default boolean hasT() {
         return t()!= Tense.ITERNAL;
+    }
+
+    /** similar to a indexOf() call, this will search for a int[]
+     * path to the first subterm occurrence of the supplied term,
+     * or null if none was found
+     */
+    default int[] isSubterm(Term t) {
+        if (containsTerm(t)) {
+            IntArrayList l = new IntArrayList();
+            if (isSubterm(this, t, l)) {
+                //reverse the array since it has been constructed in reverse
+                //TODO use more efficient array reversal
+                return l.toReversed().toArray();
+            }
+        }
+        return null;
+    }
+
+    static boolean isSubterm(Compound container, Term t, IntArrayList l) {
+        Term[] x = container.terms();
+        int s = x.length;
+        for (int i = 0; i < s; i++) {
+            Term xx = x[i];
+            if (xx.equals(t) || ((xx.containsTerm(t)) && isSubterm((Compound)xx, t, l))) {
+                l.add(i);
+                return true;
+            } //else, try next subterm and its subtree
+        }
+
+        return false;
     }
 
 

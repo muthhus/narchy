@@ -41,6 +41,10 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
         return term(i).op(o);
     }
 
+    default Term termOr(int i, Term ifOutOfBounds) {
+        return size() <= i ? ifOutOfBounds : term(i);
+    }
+
     default MutableSet<Term> toSet() {
         return Sets.mutable.of(terms());
     }

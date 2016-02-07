@@ -24,71 +24,71 @@ import static nars.$.seteMap;
  *
  * < (|, match [, constraints]) ==> (&|, derivation1, ... derivationN)>
  */
-public final class MatchTerm extends AtomicBooleanCondition<PremiseMatch> implements ProcTerm {
+abstract public class MatchTerm extends AtomicBooleanCondition<PremiseMatch> implements ProcTerm {
 
-    public final TaskBeliefPair x;
     @Nullable
     public final ImmutableMap<Term, MatchConstraint> constraints;
 
     @NotNull
-    private final Compound id;
+    private final Term id;
 
     /** derivation handlers; use the array form for fast iteration */
     private final Set<Derive> derive = Global.newHashSet(1);
+    public final Term x;
+
     @Nullable
     private PremiseMatchFork onMatch = null;
 
-    private MatchTerm(TaskBeliefPair x, @Nullable ImmutableMap<Term, MatchConstraint> constraints) {
+    public MatchTerm(Term pattern, @Nullable ImmutableMap<Term, MatchConstraint> constraints) {
         this.id = (constraints == null) ?
                 //no constraints
-                x :
+                pattern :
                 //constraints stored in atomic string
-                (Compound) ($.sect(x, seteMap(constraints.castToMap(), $.ToStringToTerm)));
+                (Compound) ($.sect(pattern, seteMap(constraints.castToMap(), $.ToStringToTerm)));
 
-        this.x = x;
+        this.x = pattern;
         this.constraints = constraints;
     }
 
-    @NotNull
-    public static MatchTerm get(TaskBeliefPair x, @Nullable ListMultimap<Term, MatchConstraint> c) {
 
-        ImmutableMap<Term, MatchConstraint> constraints =
-                ((c == null) || c.isEmpty()) ?
-                        null :
-                        immutable.ofAll(initConstraints(c));
 
-        return new MatchTerm(x, constraints);
+    public static final class MatchTaskBeliefPair extends MatchTerm {
+
+        public MatchTaskBeliefPair(TaskBeliefPair x, @Nullable ImmutableMap<Term, MatchConstraint> constraints) {
+            super(x, constraints);
+        }
+
+        /** the entire TaskBeliefPair tuple */
+        @Override protected Term target(PremiseMatch p) {
+            return p.term.get();
+        }
     }
 
-    @NotNull
-    public static Map<Term, MatchConstraint> initConstraints(@NotNull ListMultimap<Term, MatchConstraint> c) {
-        Map<Term, MatchConstraint> con = Global.newHashMap();
-        c.asMap().forEach((t, cc) -> {
-            switch (cc.size()) {
-                case 0:
-                    return;
-                case 1:
-                    con.put(t, cc.iterator().next());
-                    break;
-                default:
-                    con.put(t, new AndConstraint(cc));
-                    break;
-            }
-        });
-        return con;
+    public static final class MatchOneSubterm extends MatchTerm {
+
+        /** either 0 (task) or 1 (belief) */
+        private final int subterm;
+
+        public MatchOneSubterm(Term x, @Nullable ImmutableMap<Term, MatchConstraint> constraints, int subterm) {
+            super(x, constraints);
+            this.subterm = subterm;
+        }
+
+        /** the entire TaskBeliefPair tuple */
+        @Override protected Term target(PremiseMatch p) {
+            return ((Compound)p.term.get()).term(subterm);
+        }
     }
 
-
-    @Override
-    public final void accept(PremiseMatch p) {
-        throw new RuntimeException("n/a");
-    }
 
     @Override
     @Deprecated public final boolean booleanValueOf(@NotNull PremiseMatch p) {
-        p.match(this, constraints);
+        p.matchAll(x, target(p) /* current term */, this, constraints);
         return true;
     }
+
+    /** returns the target term that will be compared against; */
+    protected abstract Term target(PremiseMatch p);
 
     @Override
     public final String toString() {
@@ -106,11 +106,12 @@ public final class MatchTerm extends AtomicBooleanCondition<PremiseMatch> implem
 //            throw new RuntimeException("invalid MatchTerm with no derivation handlers:" + this);
 
         //TODO HACK dont lazily instantiate this but do it after the TrieDeriver has finished building the rule trie by iterating all known MatchTerm's (in the LinkGraph)
-        if (onMatch == null) {
-            onMatch = init();
+        PremiseMatchFork o = this.onMatch;
+        if (o == null) {
+            o = this.onMatch = init();
         }
 
-        onMatch.accept(m);
+        o.accept(m);
         return true;
     }
 
@@ -118,4 +119,10 @@ public final class MatchTerm extends AtomicBooleanCondition<PremiseMatch> implem
     private PremiseMatchFork init() {
         return new PremiseMatchFork(derive.toArray(new Derive[derive.size()]));
     }
+
+    @Override
+    public final void accept(PremiseMatch p) {
+        throw new RuntimeException("n/a");
+    }
+
 }

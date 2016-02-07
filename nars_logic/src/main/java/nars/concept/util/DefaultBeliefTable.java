@@ -195,7 +195,7 @@ public class DefaultBeliefTable implements BeliefTable {
 
 
 
-    @NotNull
+    @Nullable
     @Override
     public Task add(@NotNull Task input, @NotNull NAR nar) {
 

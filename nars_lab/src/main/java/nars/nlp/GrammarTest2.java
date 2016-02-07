@@ -42,7 +42,7 @@ public class GrammarTest2 {
     int delay = 0;
 
     @Range(min=1, max=64)
-    public final MutableInteger charRate = new MutableInteger(1);
+    public final MutableInteger charRate = new MutableInteger(32);
 
 
     protected float reward = 0; //current reward
@@ -58,7 +58,7 @@ public class GrammarTest2 {
         Naljects o = new Naljects(n);
         this.tape = o.the("tape", Tape.class,
                 //"aaabbbaaabbb               ",
-                "aabbbbaabbbbaa",
+                "aaabbbababab",
                 charRate);
     }
     
@@ -94,14 +94,14 @@ public class GrammarTest2 {
 
         //q.outs.add(NarQ.NullAction);
         //q.outs.add(new InputTask(n, n.term("Tape(prev, tape, (), #1)")));
-        //q.outs.add(new InputTask(n, n.term("Tape(current, tape, (), #1)")));
+        q.outs.add(new InputTask(n, n.term("Tape(current, tape, (), #1)")));
         //q.outs.addAll(tape.getPredictActions(n,false, false));
         q.outs.addAll(tape.getPredictActions(n,true, false));
 
-        n.logSummaryGT(System.out, 0.8f);
+        //n.logSummaryGT(System.out, 0.5f);
 
         q.power.setValue(0.3f);
-        n.memory.activationRate.setValue(1f);
+        n.memory.activationRate.setValue(0.5f);
 
         //n.memory.executionThreshold.setValue(0.55f);
         n.premiser.confMin.setValue(0.01f);
@@ -110,9 +110,9 @@ public class GrammarTest2 {
         n.memory.DEFAULT_JUDGMENT_PRIORITY = 0.5f;
         n.memory.DEFAULT_GOAL_PRIORITY = 0.5f;
 
-        n.memory.duration.set(8);
-        n.memory.shortTermMemoryHistory.set(2);
-        n.memory.cyclesPerFrame.set(n.memory.duration()/2f);
+        n.memory.duration.set(Math.ceil(charRate.floatValue()/4f));
+        n.memory.shortTermMemoryHistory.set(3);
+        n.memory.cyclesPerFrame.set(64);
         
         //n.initNAL9();
 
@@ -337,8 +337,8 @@ public class GrammarTest2 {
                     @Override public double getAsDouble() {
                         //measure of recency/relevancy
                         if (current == c) return 1f;
-                        if (prev == c) return -0.5f;
-                        return -1f;
+                        //if (prev == c) return -0.5f;
+                        return 0f;
                        
 //                        switch (dt) {
 //                            case 0: return current == c ? 1 : -1;

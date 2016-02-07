@@ -1,26 +1,34 @@
 package nars.nal.meta.pre;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.ListMultimap;
+import com.google.common.primitives.Ints;
+import com.gs.collections.api.map.ImmutableMap;
+import com.gs.collections.impl.list.mutable.primitive.IntArrayList;
 import nars.Global;
 import nars.Op;
 import nars.nal.meta.AtomicBooleanCondition;
 import nars.nal.meta.BooleanCondition;
 import nars.nal.meta.PremiseMatch;
 import nars.nal.meta.TaskBeliefPair;
+import nars.nal.meta.constraint.AndConstraint;
 import nars.nal.meta.constraint.MatchConstraint;
+import nars.nal.meta.match.Ellipsis;
 import nars.nal.meta.op.MatchTerm;
 import nars.nal.meta.op.SubTermOp;
 import nars.nal.meta.op.SubTermStructure;
+import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Terms;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+
+import static com.gs.collections.impl.factory.Maps.immutable;
 
 
-@Deprecated public class MatchTaskBelief extends AtomicBooleanCondition<PremiseMatch> {
-
+@Deprecated
+public class MatchTaskBelief extends AtomicBooleanCondition<PremiseMatch> {
 
 
     @NotNull
@@ -44,11 +52,7 @@ import java.util.List;
         List<BooleanCondition<PremiseMatch>> pre = Global.newArrayList();
         List<BooleanCondition<PremiseMatch>> code = Global.newArrayList();
 
-        if (pattern instanceof TaskBeliefPair) {
-            compileTaskBeliefPair((TaskBeliefPair)pattern, pre, code, constraints);
-        } else {
-            //compile(pattern, code);
-        }
+        compile(pattern, pre, code, constraints);
 
         this.pre = pre.toArray(new BooleanCondition[pre.size()]);
         this.code = code.toArray(new BooleanCondition[code.size()]);
@@ -59,9 +63,9 @@ import java.util.List;
         //if (Global.DEBUG) {
 //            if (beliefPattern.structure() == 0) {
 
-                // if nothing else in the rule involves this term
-                // which will be a singular VAR_PATTERN variable
-                // then allow null
+        // if nothing else in the rule involves this term
+        // which will be a singular VAR_PATTERN variable
+        // then allow null
 //                if (beliefPattern.op() != Op.VAR_PATTERN)
 //                    throw new RuntimeException("not what was expected");
 
@@ -97,33 +101,157 @@ import java.util.List;
     }
 
 
-    private static void compileTaskBeliefPair(@NotNull TaskBeliefPair pattern,
-                                              @NotNull List<BooleanCondition<PremiseMatch>> pre,
-                                              @NotNull List<BooleanCondition<PremiseMatch>> code,
-                                              ListMultimap<Term, MatchConstraint> constraints) {
-        Term x0 = pattern.term(0);
-        boolean x0Pattern = x0.op(Op.VAR_PATTERN);
-        Term x1 = pattern.term(1);
-        boolean x1Pattern = x1.op(Op.VAR_PATTERN);
+    private static void compile(@NotNull TaskBeliefPair pattern,
+                                @NotNull List<BooleanCondition<PremiseMatch>> pre,
+                                @NotNull List<BooleanCondition<PremiseMatch>> code,
+                                ListMultimap<Term, MatchConstraint> constraints) {
 
-        if (!x0Pattern)
-            pre.add(new SubTermOp(0, x0.op()));
-        if (!x1Pattern)
-            pre.add(new SubTermOp(1, x1.op()));
 
-        if (!x0Pattern)
-            pre.add(new SubTermStructure(Op.VAR_PATTERN, 0, x0.structure()));
-        if (!x1Pattern)
-            pre.add(new SubTermStructure(Op.VAR_PATTERN, 1, x1.structure()));
 
-//        } else {
-//            if (x0.containsTermRecursively(x1)) {
-//                //pre.add(new TermContainsRecursively(x0, x1));
-//            }
-//        }
+        Term task = pattern.term(0);
+        Term belief = pattern.term(1);
 
-        code.add(MatchTerm.get(pattern, constraints));
+        //check for any self similarity
+        if (task.equals(belief)) {
+            //add precondition constraint that task and belief must be equal.
+            // assuming this succeeds, only need to test the task half
+            return;
+        }
 
+        if (task.isCompound() && !task.isCommutative() && null==Ellipsis.hasEllipsis((Compound)task) ) {
+            int[] beliefInTask = ((Compound)task).isSubterm(belief);
+            if (beliefInTask != null) {
+                //add precondition for this constraint that is checked between the premise's terms
+                //assuming this succeeds, only need to test the task half
+                pre.add(new ComponentCondition(0, beliefInTask, 1));
+                belief = null;
+            }
+        }
+
+        if (belief!=null && belief.isCompound() && !belief.isCommutative()  && null==Ellipsis.hasEllipsis((Compound)belief) ) {
+            int[] taskInBelief = ((Compound)belief).isSubterm(task);
+            if (taskInBelief != null) {
+                //add precondition for this constraint that is checked between the premise's terms
+                //assuming this succeeds, only need to test the belief half
+                pre.add(new ComponentCondition(1, taskInBelief, 0));
+                task = null;
+            }
+        }
+
+
+        //default case: exhaustively match both, with appropriate pruning guard preconditions
+        compileTaskBelief(pre, code, task, belief, pattern, constraints);
+    }
+
+    private static void compileTaskBelief(
+            @NotNull List<BooleanCondition<PremiseMatch>> pre,
+            List<BooleanCondition<PremiseMatch>> code, Term task, Term belief, TaskBeliefPair pattern, ListMultimap<Term, MatchConstraint> constraints) {
+
+        boolean taskIsPatVar = task!=null && task.op(Op.VAR_PATTERN);
+
+        boolean belIsPatVar = belief!=null && belief.op(Op.VAR_PATTERN);
+
+        if (task!=null && !taskIsPatVar)
+            pre.add(new SubTermOp(0, task.op()));
+        if (belief!=null && !belIsPatVar)
+            pre.add(new SubTermOp(1, belief.op()));
+
+        if (task!=null && !taskIsPatVar)
+            pre.add(new SubTermStructure(Op.VAR_PATTERN, 0, task.structure()));
+        if (belief!=null && !belIsPatVar)
+            pre.add(new SubTermStructure(Op.VAR_PATTERN, 1, belief.structure()));
+
+        //        } else {
+        //            if (x0.containsTermRecursively(x1)) {
+        //                //pre.add(new TermContainsRecursively(x0, x1));
+        //            }
+        //        }
+
+        //@Nullable ListMultimap<Term, MatchConstraint> c){
+
+
+        final MatchTerm mm;
+
+        if (task!=null && belief!=null) {
+            //match both
+            mm = new MatchTerm.MatchTaskBeliefPair(pattern, initConstraints(constraints));
+        } else if (belief!=null) {
+            //match belief only
+            mm = new MatchTerm.MatchOneSubterm(belief, initConstraints(constraints), 1);
+        } else if (task!=null) {
+            //match task only
+            mm = new MatchTerm.MatchOneSubterm(task, initConstraints(constraints), 0);
+        } else {
+            throw new RuntimeException("invalid");
+        }
+
+        code.add(mm);
+
+
+    }
+
+
+    @NotNull
+    public static ImmutableMap<Term, MatchConstraint> initConstraints(@NotNull ListMultimap<Term, MatchConstraint> c) {
+        if ((c == null) | (c.isEmpty())) return null;
+
+        Map<Term, MatchConstraint> con = Global.newHashMap(c.size());
+        c.asMap().forEach((t, cc) -> {
+            switch (cc.size()) {
+                case 0:
+                    return;
+                case 1:
+                    con.put(t, cc.iterator().next());
+                    break;
+                default:
+                    con.put(t, new AndConstraint(cc));
+                    break;
+            }
+        });
+        return immutable.ofAll(con);
+    }
+
+    /** matches the possibility that one half of the premise must be contained within the other.
+     * this would in theory be more efficient than performing a complete match for the redundancies
+     * which we can determine as a precondition of the particular task/belief pair
+     * before even beginning the match. */
+    static final class ComponentCondition extends AtomicBooleanCondition<PremiseMatch> {
+
+        private final String id;
+        private final int container, contained;
+        private final int[] path;
+
+        public ComponentCondition(int container, int[] path, int contained) {
+            this.id = "component(" + container + ",(" + Joiner.on(",").join(
+                    Ints.asList(path)
+            ) + ")," + contained + ")";
+
+            this.container = container;
+            this.contained = contained;
+            this.path = path;
+        }
+
+        @Override
+        public boolean booleanValueOf(PremiseMatch m) {
+            Term[] x =  ((Compound)m.term.get()).terms();
+            Term maybeContainer = x[this.container];
+            if (!maybeContainer.isCompound())
+                return false;
+            Compound container = (Compound)maybeContainer;
+            Term contained = x[this.contained];
+            if (!container.impossibleSubterm(contained)) {
+                Term whatsThere = container.subterm(path);
+                if ((whatsThere != null) && contained.equals(whatsThere))
+                    return true;
+            }
+            return false;
+        }
+
+
+        @Override
+        public String toString() {
+            return id;
+        }
     }
 
 //    private void compile(Term x, List<BooleanCondition<PremiseMatch>> code) {

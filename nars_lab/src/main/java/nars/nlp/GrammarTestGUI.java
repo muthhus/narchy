@@ -18,6 +18,7 @@ import nars.util.data.Util;
  */
 public class GrammarTestGUI extends GrammarTest2 {
 
+    public static final int delay = 50;
     private final Plot2D p, p2, p3, p4, p5, p6;
     private final VBox charts;
 
@@ -82,7 +83,7 @@ public class GrammarTestGUI extends GrammarTest2 {
 
         n.onFrame(n -> {
             updateGraphs();
-            Util.pause(100);
+            Util.pause(delay);
         });
     }
 
