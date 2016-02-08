@@ -136,11 +136,11 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
 //
 //    }
 
-    /** follows semantics of thenSet() */
-    public Versioning thenPut(X key, Y value) {
-        getOrCreateIfAbsent(key).thenSet(value);
-        return context;
-    }
+//    /** follows semantics of thenSet() */
+//    public Versioning thenPut(X key, Y value) {
+//        getOrCreateIfAbsent(key).thenSet(value);
+//        return context;
+//    }
 
     public final Versioned getOrCreateIfAbsent(X key) {
         return map.computeIfAbsent(key, this::newEntry);

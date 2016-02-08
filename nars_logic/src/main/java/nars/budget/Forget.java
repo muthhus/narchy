@@ -59,17 +59,18 @@ public enum Forget { ;
         public AbstractForget(@NotNull NAR nar, @NotNull MutableFloat forgetDurations, @NotNull MutableFloat perfection) {
             this.forgetDurations = forgetDurations;
             this.perfection = perfection;
-            nar.onCycle(this::accept);
+            nar.onFrame(this::accept);
         }
 
         @Override
         public abstract void accept(@NotNull BLink<? extends X> budget);
 
-        final void accept(@NotNull Memory memory) {
+        final void accept(@NotNull NAR nar) {
             //same for duration of the cycle
-            forgetCyclesCached = forgetDurations.floatValue() * memory.duration();
+            @NotNull Memory m = nar.memory;
+            forgetCyclesCached = forgetDurations.floatValue() * m.duration();
             perfectionCached = perfection.floatValue();
-            now = memory.time();
+            now = m.time();
         }
 
         public <B extends Budgeted> ForgetAndDetectDeletion<B> withDeletedItemFiltering() {

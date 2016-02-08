@@ -31,15 +31,17 @@ public class PhenoLab {
 //        game.add(new Spider("spider",
 //                3, 3, 0.618f, 30, 30));
 
-        game.add(new NARover("r1", new Default()) {
-                @Override
-                public void init(Sim p) {
-                    super.init(p);
+        NARover r = new NARover("r1", SomeRovers.newNAR()) {
+            @Override
+            public void init(Sim p) {
+                super.init(p);
 
-                    q(this);
-                }
+                q(this);
+            }
 
-        });
+        };
+
+        game.add(r);
 
 //        {
 //            NAR nar = new Default();

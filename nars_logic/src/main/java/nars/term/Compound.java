@@ -28,14 +28,12 @@ import nars.nal.Tense;
 import nars.nal.meta.match.Ellipsis;
 import nars.term.container.TermContainer;
 import nars.term.transform.subst.FindSubst;
-import nars.util.data.Util;
 import nars.util.data.sexpression.IPair;
 import nars.util.data.sexpression.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Set;
 
 /**
@@ -59,7 +57,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
     default Set<Term> uniqueSubtermSet(Op type) {
         Set<Term> t = Global.newHashSet(size());
         recurseTerms((t1, superterm) -> {
-            if (t1.op(type))
+            if (t1.op() == type)
                 t.add(t1);
         });
         return t;

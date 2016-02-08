@@ -180,9 +180,9 @@ public class NarseseExtendedTest {
 
 
         Compound nab = term("--(a & b)");
-        assertTrue(nab.op(Op.NEGATE));
+        assertTrue(nab.op() == Op.NEGATE);
 
-        assertTrue(nab.term(0).op(Op.INTERSECT_EXT));
+        assertTrue(nab.term(0).op() == Op.INTERSECT_EXT);
 
 //        try {
 //            task("(-- negated illegal_extra_term)!");

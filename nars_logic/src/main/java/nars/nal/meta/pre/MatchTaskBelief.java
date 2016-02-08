@@ -4,7 +4,6 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ListMultimap;
 import com.google.common.primitives.Ints;
 import com.gs.collections.api.map.ImmutableMap;
-import com.gs.collections.impl.list.mutable.primitive.IntArrayList;
 import nars.Global;
 import nars.Op;
 import nars.nal.meta.AtomicBooleanCondition;
@@ -19,7 +18,6 @@ import nars.nal.meta.op.SubTermOp;
 import nars.nal.meta.op.SubTermStructure;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Terms;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -112,14 +110,15 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseMatch> {
         Term task = pattern.term(0);
         Term belief = pattern.term(1);
 
+        BooleanCondition addToEndOfPreGuards = null;
+
         //check for any self similarity
         if (task.equals(belief)) {
             //add precondition constraint that task and belief must be equal.
             // assuming this succeeds, only need to test the task half
-            return;
+            addToEndOfPreGuards = new TaskBeliefEqualCondition();
+            belief = null;
         }
-
-        BooleanCondition addToEndOfPreGuards = null;
 
         if (task.isCompound() && !task.isCommutative() && null==Ellipsis.hasEllipsis((Compound)task) ) {
             int[] beliefInTask = ((Compound)task).isSubterm(belief);
@@ -154,9 +153,9 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseMatch> {
             @NotNull List<BooleanCondition<PremiseMatch>> pre,
             List<BooleanCondition<PremiseMatch>> code, Term task, Term belief, TaskBeliefPair pattern, ListMultimap<Term, MatchConstraint> constraints) {
 
-        boolean taskIsPatVar = task!=null && task.op(Op.VAR_PATTERN);
+        boolean taskIsPatVar = task!=null && task.op() == Op.VAR_PATTERN;
 
-        boolean belIsPatVar = belief!=null && belief.op(Op.VAR_PATTERN);
+        boolean belIsPatVar = belief!=null && belief.op() == Op.VAR_PATTERN;
 
         if (task!=null && !taskIsPatVar)
             pre.add(new SubTermOp(0, task.op()));
@@ -216,6 +215,24 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseMatch> {
             }
         });
         return immutable.ofAll(con);
+    }
+
+    /** matches the possibility that one half of the premise must be contained within the other.
+     * this would in theory be more efficient than performing a complete match for the redundancies
+     * which we can determine as a precondition of the particular task/belief pair
+     * before even beginning the match. */
+    static final class TaskBeliefEqualCondition extends AtomicBooleanCondition<PremiseMatch> {
+
+        @Override
+        public boolean booleanValueOf(PremiseMatch m) {
+            Term[] x =  ((Compound)m.term.get()).terms();
+            return x[0].equals(x[1]);
+        }
+
+        @Override
+        public String toString() {
+            return "taskbeliefEq";
+        }
     }
 
     /** matches the possibility that one half of the premise must be contained within the other.

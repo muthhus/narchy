@@ -29,7 +29,7 @@ public final class TaskBeliefPair extends GenericCompound {
         t[1] = b;
 
         this.actualStructure = a.structure() | b.structure();
-        subterms.init();
+        //subterms.init();
     }
 
     @Override

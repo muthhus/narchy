@@ -112,16 +112,12 @@ public abstract class FindSubst extends Versioning implements Subst {
     }
 
 
-    protected FindSubst(Op type, @NotNull NAR nar) {
-        this(type, nar.memory);
-    }
-
-    protected FindSubst(Op type, @NotNull Memory memory) {
-        this(type, memory.random);
-    }
-
     protected FindSubst(Op type, Random random) {
-        super(defaultHistoryLength);
+        this(type, random, null);
+    }
+
+    protected FindSubst(Op type, Random random, Versioning toSharePool) {
+        super(defaultHistoryLength, toSharePool);
         this.random = random;
         this.type = type;
 
@@ -920,6 +916,7 @@ public abstract class FindSubst extends Versioning implements Subst {
         @Override public boolean isEmpty() {
             if (super.isEmpty())
                 return true;
+
             for (Versioned x : map.values()) {
                 if (x.get()!=null) return false;
             }

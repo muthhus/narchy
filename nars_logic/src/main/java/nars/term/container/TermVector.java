@@ -86,7 +86,7 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
 
     @Override
     public final boolean term(int i, Op o) {
-        return term[i].op(o);
+        return term[i].op() == o;
     }
 
     @Override public T[] terms() {

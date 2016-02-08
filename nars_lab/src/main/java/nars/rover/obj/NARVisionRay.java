@@ -36,14 +36,14 @@ public class NARVisionRay extends VisionRay {
 
     final ChangedTextInput sight;
 
-    public NARVisionRay(NAR nar, Body base, Vec2 point, float angle, float arc, int resolution, float length, float pri) {
+    public NARVisionRay(String id, NAR nar, Body base, Vec2 point, float angle, float arc, int resolution, float length, float pri) {
         super(point, angle, arc, base, length, resolution);
 
         this.sight = new ChangedTextInput(nar);
 
         this.nar = nar;
         this.pri = pri;
-        this.angleTerm = $.the(Sim.angleTerm(angle));
+        this.angleTerm = $.the(id);
         //this.seenAngleTerm = //"see_" + sim.angleTerm(angle);
     }
 

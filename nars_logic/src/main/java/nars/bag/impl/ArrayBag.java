@@ -287,6 +287,9 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
         int size = size();
         if (size == 1) {
             v.commit();
+            /*if (!v.commit()) {
+
+            }*/
             return;
         }
 
@@ -315,8 +318,7 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
     }
 
     protected final BLink<V> removeHighest() {
-        if (isEmpty()) return null;
-        return removeItem(0);
+        return isEmpty() ? null : removeItem(0);
     }
 
     @NotNull
@@ -328,14 +330,12 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
 
     @Override
     public float getPriorityMax() {
-        if (isEmpty()) return 0;
-        return items.getFirst().pri();
+        return isEmpty() ? 0 : items.getFirst().pri();
     }
 
     @Override
     public float getPriorityMin() {
-        if (isEmpty()) return 0;
-        return items.getLast().pri();
+        return isEmpty() ? 0 : items.getLast().pri();
     }
 
     public final void popAll(@NotNull Consumer<BLink<V>> receiver) {

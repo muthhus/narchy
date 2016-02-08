@@ -154,7 +154,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
         boolean r=false;
         Term u = thatTerm.term();
-        if ((u.op(op)) /*&& (((t instanceof Compound))*/) {
+        if ((u.op() == op) /*&& (((t instanceof Compound))*/) {
             Compound c = (Compound) u;
             r= subterms.equals(c.terms())
                     && (relation == c.relation())

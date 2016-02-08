@@ -20,7 +20,10 @@ public final class substituteIfUnifies extends substitute {
         final Term x = xx[2];
         final Term y = xx[3];
 
-        return new OneMatchFindSubst(op, r, term).tryMatch(x, y);
+        OneMatchFindSubst omf = new OneMatchFindSubst(op, r, term);
+        Term mm = omf.tryMatch(x, y);
+        omf.delete();
+        return mm;
     }
 
     private final static class OneMatchFindSubst extends FindSubst {
@@ -30,7 +33,7 @@ public final class substituteIfUnifies extends substitute {
         private Term result = null;
 
         public OneMatchFindSubst(Term op, PremiseMatch r, Term xterm) {
-            super(substitute.getOp(op), r.premise.memory().random);
+            super(substitute.getOp(op), r.premise.memory().random, r);
             this.xterm = xterm;
             this.r = r;
         }
@@ -46,7 +49,6 @@ public final class substituteIfUnifies extends substitute {
             matchAll(x, y, true);
             return result;
         }
-
 
     }
 }

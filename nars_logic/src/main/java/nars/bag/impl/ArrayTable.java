@@ -76,6 +76,10 @@ abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements Tabl
     }
 
 
+    @Override
+    public boolean isEmpty() {
+        return items.isEmpty();
+    }
 
     @Override
     public int size() {

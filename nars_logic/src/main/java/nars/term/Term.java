@@ -44,11 +44,6 @@ public interface Term extends Termed, Comparable, Termlike {
     @Override
     Op op();
 
-    /** syntactic help */
-    default boolean op(Op equalTo) {
-        return op() == equalTo;
-    }
-
     /** volume = total number of terms = complexity + # total variables */
     @Override
     int volume();

@@ -89,7 +89,7 @@ public interface Termlike  {
     Ellipsis firstEllipsis();
 
     default boolean hasVarPattern() {
-        return or(x -> x.op(Op.VAR_PATTERN));
+        return or(x -> x.op() == Op.VAR_PATTERN);
     }
 
 

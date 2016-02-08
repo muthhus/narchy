@@ -20,6 +20,7 @@ public final class BLink<X> extends Budget implements Link<X> {
     private final float[] b = new float[6];
     public final X id;
     private long lastForget = Tense.TIMELESS;
+    boolean changed = false;
 
     public BLink(X id) {
         this.id = id;
@@ -68,14 +69,17 @@ public final class BLink<X> extends Budget implements Link<X> {
     private void clearDelta() {
         float[] b = this.b;
         b[3] = b[4] = b[5] = 0;
+        changed = false;
     }
 
+    /** TODO return false to signal to the bag to remove this item */
     public void commit() {
         float[] b = this.b;
         b[0] = clamp(b[0] + b[3]);
         b[1] = clamp(b[1] + b[4]);
         b[2] = clamp(b[2] + b[5]);
         clearDelta();
+        //return true;
     }
 
     @Override public final float getScore() {
@@ -87,10 +91,15 @@ public final class BLink<X> extends Budget implements Link<X> {
         return b[0];
     }
 
+    protected void setValue(int x, float v) {
+        float[] b = this.b;
+        b[x+3] += clamp(v - b[x]);
+        changed = true;
+    }
+
     @Override
     public void setPriority(float p) {
-        float[] b = this.b;
-        b[3] += (clamp(p)-b[0]);
+        setValue(0, p);
     }
 
     @Override
@@ -100,8 +109,7 @@ public final class BLink<X> extends Budget implements Link<X> {
 
     @Override
     public void setDurability(float d) {
-        float[] b = this.b;
-        b[4] += (clamp(d)-b[1]);
+        setValue(1, d);
     }
 
     @Override
@@ -111,8 +119,7 @@ public final class BLink<X> extends Budget implements Link<X> {
 
     @Override
     public void setQuality(float q) {
-        float[] b = this.b;
-        b[5] += (clamp(q)-b[2]);
+        setValue(2, q);
     }
 
     @Override
@@ -161,12 +168,13 @@ public final class BLink<X> extends Budget implements Link<X> {
     }
 
     public boolean hasDelta() {
-        float[] b = this.b;
-        return nonZero(b[3]) || nonZero(b[4]) || nonZero(b[5]);
+        return changed;
+//        float[] b = this.b;
+//        return nonZero(b[3]) || nonZero(b[4]) || nonZero(b[5]);
     }
 
-    static boolean nonZero(float x) {
-        //return (Math.abs(x) > Global.BUDGET_EPSILON);
-        return x!=0f;
-    }
+//    static boolean nonZero(float x) {
+//        //return (Math.abs(x) > Global.BUDGET_EPSILON);
+//        return x!=0f;
+//    }
 }

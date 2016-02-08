@@ -232,7 +232,7 @@ public abstract class TermFunction<O> extends SyncOperator {
 
     private boolean validArgs(Compound args) {
         //TODO filtering
-        return args.last().op(Op.VAR_DEP);
+        return args.last().op() == Op.VAR_DEP;
     }
 }
 

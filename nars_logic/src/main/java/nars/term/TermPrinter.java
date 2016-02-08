@@ -171,7 +171,7 @@ public interface TermPrinter {
 
         //duplicated from above, dont want to store this as a field in the class
         char opener, closer;
-        if (set.op(Op.SET_EXT)) {
+        if (set.op() == Op.SET_EXT) {
             opener = Op.SET_EXT_OPENER.ch;
             closer = Symbols.SET_EXT_CLOSER;
         } else {

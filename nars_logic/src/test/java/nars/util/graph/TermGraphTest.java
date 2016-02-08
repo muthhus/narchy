@@ -121,7 +121,7 @@ public class TermGraphTest {
             public boolean equivalenceCompare(Term s1, Term s2, Graph<Term, ObjectIntPair<Compound>> g1, Graph<Term, ObjectIntPair<Compound>> g2) {
                 System.out.println("compare " + s1 + ' ' + s2);
                 if ( areRoots(s1, s2) ||
-                        s1.op(Op.VAR_PATTERN) || (s2.op(Op.VAR_PATTERN)))
+                        s1.op() == Op.VAR_PATTERN || (s2.op() == Op.VAR_PATTERN))
                     return true;
                 else {
                     return s1 instanceof Compound ? s1.op() == s2.op() : s1.equals(s2);

@@ -65,7 +65,7 @@ public class UnificationTest  {
 
         AtomicBoolean subbed = new AtomicBoolean(false);
 
-        FindSubst sub = new FindSubst(type, nar) {
+        FindSubst sub = new FindSubst(type, nar.memory.random) {
 
 //            @Override
 //            public void onPartial() {
@@ -85,7 +85,7 @@ public class UnificationTest  {
                     assertFalse("incomplete: " + toString(), this.isEmpty());
 
                     this.forEach((k, v) -> {
-                        if (k.op(type))
+                        if (k.op() == type)
                             assertNotNull(v);
                     });
 

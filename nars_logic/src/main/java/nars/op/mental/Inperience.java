@@ -146,7 +146,7 @@ public class Inperience {
         Term[] arg = new Term[1 + (tr == null ? 1 : 2)];
         Compound tt = s.term();
 
-        boolean negated = tt.op(Op.NEGATE);
+        boolean negated = tt.op() == Op.NEGATE;
         arg[0] = !negated ? tt : $.neg(tt) /* unwrap negation */;
 
         int k = 1;

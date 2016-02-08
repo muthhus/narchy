@@ -315,7 +315,7 @@ public final class TruthFunctions extends UtilityFunctions {
      * @param b Truth value of the second premise
      * @return Truth value of the conclusion
      */
-    @NotNull
+    @Nullable
     public static Truth desireStrong(@NotNull Truth a, @NotNull Truth b, float minConf) {
 
         float f2 = b.freq();
@@ -384,7 +384,7 @@ public final class TruthFunctions extends UtilityFunctions {
      * @param v2 Truth value of the second premise
      * @return Truth value of the conclusion
      */
-    @NotNull
+    @Nullable
     public static Truth union(@NotNull Truth v1, @NotNull Truth v2, float minConf) {
         float c = and(v1.conf(), v2.conf());
         return (c < minConf) ?

@@ -20,17 +20,21 @@ import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import nars.util.data.Util;
 import nars.util.signal.NarQ;
 import nars.util.signal.Sensor;
+import org.jbox2d.callbacks.DebugDraw;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.World;
 import org.jbox2d.dynamics.joints.RevoluteJoint;
 import org.jbox2d.dynamics.joints.RevoluteJointDef;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 import static nars.util.Texts.n2;
 
@@ -40,21 +44,9 @@ import static nars.util.Texts.n2;
  */
 public class NARover extends AbstractPolygonBot {
 
-
-
     public final NAR nar;
-    //float tasteDistanceThreshold = 1.0f;
-    final static int retinaPixels = 15;
+
     final Naljects objs;
-    //private final Sensor linearSpeedBack;
-    int retinaRaysPerPixel = 1; //rays per vision sensor
-
-    float L = 25f; //vision distance
-    final static Vec2 mouthPoint = new Vec2(2.7f, 0); //0.5f);
-    @Deprecated
-    final static double mouthArc = Math.PI / 6f; //in radians
-
-
 
     float hungry, sick;
     final Sensor linearSpeedFwd, leftSpeed, rightSpeed, hungrySensor, sickSensor;
@@ -66,7 +58,7 @@ public class NARover extends AbstractPolygonBot {
     //public class DistanceInput extends ChangedTextInput
 
     private MotorControls motors;
-    public List<VisionRay> vision;
+    private Turret gun;
 
     public NARover(String id, NAR nar) {
         super(id);
@@ -76,6 +68,7 @@ public class NARover extends AbstractPolygonBot {
         objs = new Naljects(nar);
 
         int maxUpdateTime = 32;
+
 
         hungry = 1f;
         sick = 0f;
@@ -127,6 +120,7 @@ public class NARover extends AbstractPolygonBot {
 //        facingAngle = new SimpleAutoRangeTruthFrequency(nar, nar.term("<motion-->[facing]>"), new BipolarAutoRangeTruthFrequency());
 
 
+
     }
 
     @Override
@@ -154,6 +148,7 @@ public class NARover extends AbstractPolygonBot {
     public void step(int time) {
         super.step(time);
 
+        gun.step(time);
 
         try {
             nar.step();
@@ -169,7 +164,7 @@ public class NARover extends AbstractPolygonBot {
     public void inputMission() {
 
         //alpha curiosity parameter
-        long t = nar.time();
+        //long t = nar.time();
 
 
         //nar.input("<{left,right,forward,reverse} --> direction>.");
@@ -272,6 +267,9 @@ public class NARover extends AbstractPolygonBot {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        gun = new Turret(sim);
+        draw.addLayer(gun);
     }
 
     @Override
@@ -286,47 +284,29 @@ public class NARover extends AbstractPolygonBot {
 
         torso.setUserData(getMaterial());
 
-        this.vision = Global.newArrayList();
-        for (int i = 0; i < retinaPixels; i++) {
-            float aStep = (float) (Math.PI * 2f) / retinaPixels;
-            final float angle = aStep * i;
-
-            VisionRay v = new NARVisionRay(nar, torso,
-                    /*eats ?*/ mouthPoint /*: new Vec2(0,0)*/,
-                    angle, aStep, retinaRaysPerPixel, L, 1f/retinaPixels) {
-            };
-            v.setEats(((angle < mouthArc / 2f) || (angle > (Math.PI * 2f) - mouthArc / 2f)));
-
-            vision.add(v);
-
-            draw.addLayer(v);
-            senses.add(v);
-        }
-
-
         return torso;
     }
 
     /** http://stackoverflow.com/questions/20904171/how-to-create-snake-like-body-in-box2d-and-cocos2dx */
-    public void addArm(NarQ controller, float ax, float ay, float a) {
+    public void addArm(String id, NarQ controller, float ax, float ay, float a) {
 
         Body base = torso;
 
 
         Vec2 attachPoint = new Vec2(ax, ay);
 
-        float vx = (float)Math.cos(a);
-        float vy = (float)Math.sin(a);
+        float vx = 1; //(float)Math.cos(a);
+        float vy = 0; ///(float)Math.sin(a);
 
         // NOW, create several duplicates of the "Main Body" fixture
         // but offset them from the previous one by a fixed amount and
         // overlap them a bit.
-        int numSegments = 6;
+        int numSegments = 3;
 
         Body pBodyA = base;
         Body pBodyB = null;
-        float w = 2.5f,
-              h = 1f;
+        float segLength = 2.7f,
+              thick = 0.5f;
 
         //List<Body> _segments = Global.newArrayList();
 
@@ -339,22 +319,22 @@ public class NARover extends AbstractPolygonBot {
 
             float dx, dy;
             if (pBodyA == torso) {
-                dx = w * vx;
-                dy = h * vy;
+                dx = segLength * vx;
+                dy = thick * vy;
             } else {
-                dx = w;
+                dx = segLength;
                 dy = 0;
             }
 
             pBodyB = newRect(getWorld(), 0.2f,
-                    w, h,
+                    segLength, thick,
                     pBodyA.getPosition().x + dx, pBodyA.getPosition().y + dy);
 
             float tone= (idx/((float)numSegments));
             pBodyB.setUserData( ((NARRoverMaterial)base.getUserData()).clone(tone) );
 
-            w*=0.95f;
-            h*=0.6f;
+            segLength*=0.8f;
+            thick*=0.618f;
 
             //pBodyB. position = pBodyA.getPosition().add( offset );
             //_segments.add(pBodyB);
@@ -362,23 +342,23 @@ public class NARover extends AbstractPolygonBot {
             pBodyB.setLinearDamping(0.1f);
             pBodyB.setAngularDamping(0.3f);
 
+            if (pBodyA == torso)
+                pBodyB.getPosition().addLocal(attachPoint);
+
             // Create a Revolute Joint at a position half way
             // between the two bodies.
             Vec2 midpoint = pBodyA.getPosition().add(pBodyB.getPosition()).mul(0.5f);
 
-            if (pBodyA == torso)
-                    pBodyA.getPosition().add(attachPoint);
 
             RevoluteJointDef revJointDef = new RevoluteJointDef();
             revJointDef.initialize(pBodyA, pBodyB, midpoint);
             revJointDef.collideConnected = false;
             revJointDef.enableLimit = true;
             revJointDef.enableMotor = true;
-            revJointDef.upperAngle = +angRange;
-            revJointDef.lowerAngle = -angRange;
+            revJointDef.upperAngle = +angRange+(pBodyA == torso  ? a : 0);
+            revJointDef.lowerAngle = -angRange+(pBodyA == torso  ? a : 0);
 
             RevoluteJoint jj = (RevoluteJoint) sim.getWorld().createJoint(revJointDef);
-            final int finalIdx = idx;
             for (float speed : new float[] { +1 , -1 }){
                 controller.outs.add(new NarQ.Action() {
 
@@ -404,7 +384,7 @@ public class NARover extends AbstractPolygonBot {
 
         }
 
-        addEye(controller, pBodyB, 8, new Vec2(0, 0), 0.2f, 0, 2.5f);
+        addEye(id + "e", controller, pBodyB, 5, new Vec2(0.5f, 0), 0.2f, (float)(+Math.PI/4f), 2.5f);
 
 //        // Make the next bunch of segments get "smaller" each time
 //        // to make a tail.
@@ -544,17 +524,51 @@ public class NARover extends AbstractPolygonBot {
 
 
     }
-    public void addEye(NarQ controller, Body base, int detail, Vec2 center, float arc, float centerAngle, float distance) {
-        int pixels = 1;
+
+//    public void addEye() {
+//        //List<VisionRay> vision = Global.newArrayList();
+//        for (int i = 0; i < retinaPixels; i++) {
+//            float aStep = (float) (Math.PI * 2f) / retinaPixels;
+//            final float angle = aStep * i;
+//
+//            VisionRay v = new NARVisionRay(nar, torso,
+//                    /*eats ?*/ mouthPoint /*: new Vec2(0,0)*/,
+//                    angle, aStep, retinaRaysPerPixel, L, 1f/retinaPixels) {
+//            };
+//
+//
+//            //vision.add(v);
+//
+//            draw.addLayer(v);
+//            senses.add(v);
+//        }
+//
+//    }
+
+
+
+
+    public void addEye(String id, NarQ controller, Body base, int detail, Vec2 center, float arc, float centerAngle, float distance) {
+        addEye(id, controller, base, 1, detail, center, arc, centerAngle, distance, (v) -> {});
+    }
+    public void addEyeWithMouth(String id, NarQ controller, Body base, int pixels, int detail, Vec2 center, float arc, float centerAngle, float distance, float mouthArc) {
+        addEye(id, controller, base, pixels, detail, center, arc, centerAngle, distance, (v) -> {
+            float angle = v.angle;
+            v.setEats(((angle < mouthArc / 2f) || (angle > (Math.PI * 2f) - mouthArc / 2f)));
+        });
+    }
+
+    public void addEye(String id, NarQ controller, Body base, int pixels, int detail, Vec2 center, float arc, float centerAngle, float distance, Consumer<VisionRay> each) {
+
         float aStep = (float) (Math.PI * 2f)/pixels * (arc);
 
         //final MutableFloat servo = new MutableFloat();
 
         for (int i = 0; i < pixels; i++) {
-            final float angle = aStep * i + centerAngle;
+            final float angle = aStep * (i - pixels/2f) + centerAngle;
 
-            VisionRay v = new VisionRay(center, angle, aStep, base,
-                    distance, detail) {
+            VisionRay v = new NARVisionRay(id + i, nar, base, center, angle, aStep,
+                    detail, distance, 1f/pixels) {
 
 //                  @Override public float getLocalAngle () {
 //                      return 0.5f * (float)Math.sin(servo.floatValue()); //controller.get();
@@ -568,15 +582,22 @@ public class NARover extends AbstractPolygonBot {
                 }
             };
 
-            controller.input.add(() -> {
-                return v.distToHit();
-            });
+            each.accept(v);
 
-            vision.add(v);
+            for (String material : new String[]{"food", "poison"}) {
+                controller.input.add(() -> {
+                    if (v.hit(material)) {
+                        return 1f - v.distToHit(); //closer = larger number (up to 1.0)
+                    }
+                    return 0; //nothing seen within the range
+                });
+            }
 
             draw.addLayer(v);
             senses.add(v);
         }
+
+
 
 //        for (float servoSpeed : new float[] { -0.5f, 0.5f } ) {
 //            controller.outs.add(new NarQ.Action() {
@@ -730,7 +751,17 @@ public class NARover extends AbstractPolygonBot {
         public Truth backward() {  return forward(false); }
 
 
-        public Task random() {
+        final static Truth unfired = new DefaultTruth(0.5f, 1f);
+
+        public Truth fire() {
+            Task c = MethodOperator.invokingTask();
+            if (rover.gun.fire(rover.torso, c.motivation())) {
+                return c.truth();
+            }
+            return unfired;
+        }
+
+        @Deprecated public Task random() {
             Task c = MethodOperator.invokingTask();
 
             Termed term;

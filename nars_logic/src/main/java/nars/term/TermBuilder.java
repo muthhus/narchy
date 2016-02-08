@@ -310,7 +310,7 @@ public interface TermBuilder {
                 return t[0];
             case 2:
                 Term et0 = t[0], et1 = t[1];
-                if ((et0.op(set) && et1.op(set) ))
+                if ((et0.op() == set && et1.op() == set))
                     return subtractSet(set, (Compound)et0, (Compound)et1);
 
                 if (et0.equals(et1))
@@ -397,7 +397,7 @@ public interface TermBuilder {
     }
 
     default Term negation(@NotNull Term t) {
-        if (t.op(NEGATE)) {
+        if (t.op() == NEGATE) {
             // (--,(--,P)) = P
             return ((TermContainer) t).term(0);
         }
@@ -446,7 +446,9 @@ public interface TermBuilder {
                 if (x.size() == 1)
                     return x.term(0);
                 //if (x.op(op))
-                return x.t(0);
+
+                return x.op().isTemporal() ? x.t(0) : x;
+
                 //return x;
             }
 
@@ -489,10 +491,10 @@ public interface TermBuilder {
         TreeSet<Term> s = new TreeSet();
 
         u.forEach(x -> {
-            if (x.op(op) && (((Compound)x).t()==dt) ) {
+            if (x.op() == op && (((Compound)x).t()==dt) ) {
                 for (Term y : ((TermContainer) x).terms()) {
                     if (s.add(y))
-                        if (y.op(op))
+                        if (y.op() == op)
                             done[0] = false;
                 }
             } else {
@@ -545,9 +547,9 @@ public interface TermBuilder {
                 if (subject.isAny(TermIndex.InvalidEquivalenceTerm)) return null;
                 if (predicate.isAny(TermIndex.InvalidImplicationPredicate)) return null;
 
-                if (predicate.op(IMPLICATION)) {
+                if (predicate.op() == IMPLICATION) {
                     Term oldCondition = subj(predicate);
-                    if ((oldCondition.op(CONJUNCTION) && oldCondition.containsTerm(subject)))
+                    if ((oldCondition.op() == CONJUNCTION && oldCondition.containsTerm(subject)))
                         return null;
 
                     return impl2Conj(t, subject, predicate, oldCondition);
@@ -686,11 +688,8 @@ public interface TermBuilder {
 
     /** returns the resolved term according to the substitution    */
     @Nullable
-    default Term transform(@NotNull Compound src, @NotNull Subst f, boolean fullMatch) {
+    default Term transform(@NotNull Compound src, @NotNull Subst f) {
 
-        if (f.isEmpty()) {
-            return fullMatch ? null : src;
-        }
 
         Term y = f.getXY(src);
         if (y!=null)
@@ -719,8 +718,7 @@ public interface TermBuilder {
                 }
             }
         } else {
-            if (!fullMatch)
-                result = src;
+            result = src;
         }
 
         return result;
@@ -743,13 +741,13 @@ public interface TermBuilder {
     @Nullable
     default Term apply(@NotNull Subst f, Term src) {
 
-        if (f.isEmpty()) {
-            //return fullMatch ? null : src;
-            return src;
-        }
 
         if (src.isCompound()) {
-            return transform((Compound)src, f, false);
+            //if f is empty there will be no changes to apply anyway
+            if (f.isEmpty())
+                return src;
+
+            return transform((Compound)src, f);
         } else if (src instanceof Variable) {
             Term x = f.getXY(src);
             if (x != null)

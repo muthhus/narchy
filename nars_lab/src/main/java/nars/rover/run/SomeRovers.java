@@ -22,6 +22,7 @@ import nars.util.signal.NarQ.InputTask;
 import nars.util.signal.NarQ.NotBeliefReward;
 import nars.util.signal.NarQ.Vercept;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.jbox2d.common.Vec2;
 
 import java.util.function.DoubleSupplier;
 import java.util.stream.Collectors;
@@ -37,6 +38,7 @@ public class SomeRovers {
 	public static final String motorForward = "MotorControls(forward,motor,(),#z)";
 	public static final String motorBackward = "MotorControls(backward,motor,(),#z)";
 	public static final String motorStop = "MotorControls(stop,motor,(),#z)";
+    public static final String fire = "MotorControls(fire,motor,(),#z)";
 
 	public static final String eatFood = "eat:food";
 	public static final String eatPoison = "eat:poison";
@@ -51,7 +53,7 @@ public class SomeRovers {
         Global.DEBUG = Global.EXIT_ON_EXCEPTION = true;
 
         //RoverWorld world = new ReactorWorld(32, 48, 32);
-        RoverWorld world = new FoodSpawnWorld1(256, 48, 48, 0.5f);
+        RoverWorld world = new FoodSpawnWorld1(64, 48, 48, 0.5f);
 
         //RoverWorld world = new GridSpaceWorld(GridSpaceWorld.newMazePlanet());
         final Sim game = new Sim(clock, world);
@@ -91,13 +93,13 @@ public class SomeRovers {
 
     }
 	public static Default newNAR() {
-        int conceptsFirePerCycle = 3;
+        int conceptsFirePerCycle = 4;
         Default nar = new Default(
                 new Memory(clock, new MapIndex2(
                         new SoftValueHashMap())),
                 1000, conceptsFirePerCycle, 2, 3);
 
-        nar.logSummaryGT(System.out, 0.4f);
+        //nar.logSummaryGT(System.out, 0.4f);
 
 //            nar.memory.DEFAULT_JUDGMENT_PRIORITY = 0.35f;
 //            nar.memory.DEFAULT_JUDGMENT_DURABILITY = 0.35f;
@@ -112,13 +114,13 @@ public class SomeRovers {
 
 
         //nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
-        nar.core.activationRate.setValue(0.5f);
+        nar.core.activationRate.setValue(0.05f);
 
         nar.memory.duration.set(3);
         nar.memory.conceptForgetDurations.setValue(2);
         nar.memory.termLinkForgetDurations.setValue(4);
         nar.memory.taskLinkForgetDurations.setValue(6);
-        nar.memory.cyclesPerFrame.set(64);
+        nar.memory.cyclesPerFrame.set(32);
         nar.memory.shortTermMemoryHistory.set(3);
         nar.memory.executionThreshold.setValue(0.0f);
 
@@ -135,6 +137,7 @@ public class SomeRovers {
                         //new TilePane(Orientation.VERTICAL),
                         new VBox(),
                         "MotorControls(#x,motor,(),#z)",
+                        fire,
                         motorLeft,
                         motorRight,
                         motorForward,
@@ -157,6 +160,8 @@ public class SomeRovers {
 
         return nar;
     }
+
+
 	/**
 	 * attaches a prosthetic q-controller to a NAR
 	 */
@@ -167,25 +172,14 @@ public class SomeRovers {
         NarQ nq = new NarQ(n, input);
         NarQ nq2 = new NarQ(n, new Vercept());
 
-        nq.power.setValue(0.7f);
-        nq.power.setValue(0.7f);
+        nq.power.setValue(0.6f);
+        nq2.power.setValue(0.9f);
 
         input.addAll(nq.getBeliefExpectations(
                 eatFood, eatPoison, speedLeft, speedRight, speedForward
         ));
 
-        for (String material : new String[]{"food", "poison"}) {
-            r.vision.forEach(v -> {
-                
-                input.add((DoubleSupplier) (() -> {
-                    if (v.hit(material)) {
-                        return 1f - v.distToHit(); //closer = larger number (up to 1.0)
-                    }
-                    return 0; //nothing seen within the range
-                }));
-                
-            });
-        }
+
 
         nq.reward.put(new BeliefReward(n, "eat:food"), new MutableFloat(1f));
         nq.reward.put(new NotBeliefReward(n, "eat:poison"), new MutableFloat(0.9f));
@@ -193,7 +187,8 @@ public class SomeRovers {
         
 
         nq.outs.addAll(
-                Stream.of(n.terms(motorStop, motorForward, motorBackward, motorLeft, motorRight))
+                Stream.of(n.terms(
+                        motorStop, fire, motorForward, motorBackward, motorLeft, motorRight))
                 .map(t -> new InputTask(n, t, Symbols.GOAL, false))
                 .collect(Collectors.toList())
         );
@@ -204,9 +199,13 @@ public class SomeRovers {
 //        r.addEye(nq, r.torso, 8, new Vec2(-1f, -2f), 0.2f, -1.7f, 2.5f);
 
 
+        float pi = (float) Math.PI;
 
-        r.addArm(nq2 /* ... */, 7, 0, (float)Math.PI * 1.5f);
-        r.addArm(nq2 /* ... */, -7, 0, (float)Math.PI * 0.5f);
+        r.addEyeWithMouth("e", nq, r.torso, 4, 2, new Vec2(2.7f,0), 0.4f, 0, 15f, pi / 6f);
+
+        r.addArm("al", nq2 /* ... */, -1.75f, 1.5f, 0.8f); //pi * 1.5f
+        r.addArm("ar", nq2 /* ... */, -1.75f, -1.5f, -0.8f);
+
         nq2.reward.put(() -> {
             return Math.sin(n.memory.emotion.busy()); //fucking random
         }, new MutableFloat(1f));

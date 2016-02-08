@@ -558,7 +558,7 @@ public class NarseseTest {
     @Test public void testEmptySetExt() {
         Compound e = term("{}");
         assertNotNull(e);
-        assertTrue(e.op(Op.SET_EXT));
+        assertTrue(e.op() == Op.SET_EXT);
         assertEquals(0, e.size());
         assertEquals(term("{}"),   term("{ }"));
         assertEquals(term("{}"), term(" {   }"));
@@ -566,7 +566,7 @@ public class NarseseTest {
     @Test public void testEmptySetInt() {
         Compound e = term("[]");
         assertNotNull(e);
-        assertTrue(e.op(Op.SET_INT));
+        assertTrue(e.op() == Op.SET_INT);
         assertEquals(0, e.size());
         assertEquals(term("[]"),   term("[ ]"));
         assertEquals(term("[]"), term(" [   ]"));

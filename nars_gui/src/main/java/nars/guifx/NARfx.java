@@ -42,7 +42,7 @@ public enum NARfx  {
     public static String css;
     static {
         try {
-            css = Util.inputToString(NARfx.class.getResourceAsStream("narfx.css"));
+            css = Util.inputToString(NARfx.class.getClassLoader().getResourceAsStream("narfx.css"));
         } catch (IOException e) {
             css = "";
         }

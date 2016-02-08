@@ -73,7 +73,7 @@ public class EllipsisTest {
                         testFurther(selectedFixed, this, varArgTerms);
 
                         //2. test substitution
-                        Term s = index.transform(r, this, false);
+                        Term s = index.transform(r, this);
                         if (s!=null) {
                             //System.out.println(s);
                             selectedFixed.add(s);

@@ -17,16 +17,16 @@ public abstract class Atomic implements Term {
      *  is encoded within its string such that additional op()
      *  comparison would be redundant. */
     @Override public final boolean equals(Object u) {
-        return (this == u) ||
-                ((u instanceof Termed) && equalsTerm((Termed)u));
+        if (this == u) return true;
+
+        //if (hashCode()!=u.hashCode()) return false;
+
+        Termed tu = (Termed)u;
+        return op() == tu.op() && toString().equals(tu.toString());
     }
 
     @Override
     public final boolean isCompound() { return false; }
-
-    private final boolean equalsTerm(@NotNull Termed t) {
-        return op(t.op()) && toString().equals(t.toString());
-    }
 
     @Override abstract public String toString();
 

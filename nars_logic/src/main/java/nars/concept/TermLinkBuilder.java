@@ -55,8 +55,8 @@ public enum TermLinkBuilder {
         ///** add self link for structural transform: */
         //components.add(t);
 
-        boolean tEquivalence = t.op(Op.EQUIV);
-        boolean tImplication = t.op(Op.IMPLICATION);
+        boolean tEquivalence = t.op() == Op.EQUIV;
+        boolean tImplication = t.op() == Op.IMPLICATION;
 
 
         int ni = t.size();

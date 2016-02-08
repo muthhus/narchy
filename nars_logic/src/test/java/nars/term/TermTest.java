@@ -147,7 +147,7 @@ public class TermTest {
         assertTrue(term1.complexity() > 1);
         assertTrue(term1.complexity() == term2.complexity());
 
-        assertTrue(term1.op(Op.INHERIT));
+        assertTrue(term1.op() == Op.INHERIT);
 
 
         //System.out.println("t1: " + term1 + ", complexity=" + term1.getComplexity());
@@ -359,7 +359,7 @@ public class TermTest {
 //    }
 
     @Test public void testPatternVar() {
-        assertTrue($("%x").op(Op.VAR_PATTERN));
+        assertTrue($("%x").op() == Op.VAR_PATTERN);
     }
 
     @Test

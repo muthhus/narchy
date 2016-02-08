@@ -81,7 +81,7 @@ public class PatternIndexTest {
 
             for (Term x : c.terms()) {
 
-                if (x.op(Op.VAR_PATTERN)) {
+                if (x.op() == Op.VAR_PATTERN) {
                     appendVariable(sb, (Variable)x);
                 } else if (x instanceof Compound) {
                     append(sb, (Compound)x);

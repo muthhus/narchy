@@ -299,7 +299,7 @@ public class PremiseRule extends GenericCompound  {
         Term taskTermPattern = getTaskTermPattern();
         Term beliefTermPattern = getBeliefTermPattern();
 
-        if (beliefTermPattern.op(Op.ATOM)) {
+        if (beliefTermPattern.op() == Op.ATOM) {
             throw new RuntimeException("belief term must contain no atoms: " + beliefTermPattern);
         }
 
@@ -608,7 +608,7 @@ public class PremiseRule extends GenericCompound  {
         m.put(getBeliefTermPattern(), newB);
         m.put(getConclusionTermPattern(), newR);
 
-        Compound remapped = (Compound)$.terms.transform(this, new MapSubst(m), false);
+        Compound remapped = (Compound)$.terms.transform(this, new MapSubst(m));
 
         //Append taskQuestion
         Compound pc = (Compound) remapped.term(0);

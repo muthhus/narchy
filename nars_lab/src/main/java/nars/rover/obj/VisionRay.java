@@ -23,7 +23,7 @@ abstract public class VisionRay extends RayCastClosestCallback implements Abstra
     protected final int resolution;
     protected final float arc;
     final Vec2 point; //where the retina receives vision at
-    final float angle;
+    public final float angle;
     private final Body base;
     private final Robotic bot;
     protected float conf;
@@ -90,8 +90,6 @@ abstract public class VisionRay extends RayCastClosestCallback implements Abstra
         float totalDist = 0;
         float dArc = arc / resolution;
 
-        float angOffset = getLocalAngle(); //(float)Math.random() * (-arc/4f);
-
         JoglAbstractDraw dd = ap.draw;
 
         root.set( point );
@@ -104,7 +102,7 @@ abstract public class VisionRay extends RayCastClosestCallback implements Abstra
 
 
             target.set( root );
-            float da = (-arc / 2f) + dArc * r + angOffset;
+            float da = (-arc / 2f) + dArc * r;
             final float V = da + angle + baseAngle;
             target.addLocal(distance * (float) Math.cos(V), distance * (float) Math.sin(V));
 
@@ -193,10 +191,6 @@ abstract public class VisionRay extends RayCastClosestCallback implements Abstra
 
 
 
-    }
-
-    public float getLocalAngle() {
-        return 0f;
     }
 
     protected void perceiveDist(Body hit, float newConf, float nextHitDist) {

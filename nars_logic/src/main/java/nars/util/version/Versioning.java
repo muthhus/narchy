@@ -4,11 +4,24 @@ import nars.util.data.DequePool;
 import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.function.Consumer;
+
 /** versioning context that holds versioned instances */
 public class Versioning extends FasterList<Versioned> {
 
-    public Versioning(int capacity) {
+    public Versioning(int capacity, Versioning toSharePool) {
         super(0, new Versioned[capacity]);
+        if (toSharePool != null) {
+            this.valueStackPool = toSharePool.valueStackPool;
+            this.intStackPool = toSharePool.intStackPool;
+        } else {
+            this.valueStackPool = new FasterListDequePool();
+            this.intStackPool = new intDequePool();
+        }
+    }
+
+    public Versioning(int capacity) {
+        this(capacity, null);
     }
 
     private int now = 0;
@@ -85,8 +98,8 @@ public class Versioning extends FasterList<Versioned> {
     static final int initiALPOOL_CAPACITY = 16;
     static final int stackLimit = 12;
 
-    final DequePool<FasterList> valueStackPool = new FasterListDequePool();
-    final DequePool<int[]> intStackPool = new intDequePool();
+    final DequePool<FasterList> valueStackPool;
+    final DequePool<int[]> intStackPool;
 
     public final <X> FasterList<X> newValueStack() {
         //from heap:
@@ -110,6 +123,11 @@ public class Versioning extends FasterList<Versioned> {
         //TODO reject arrays that have grown beyond a certain size
         valueStackPool.put(vStack);
         intStackPool.put(v.array());
+    }
+
+    public void delete() {
+        forEach((Consumer<? super Versioned>)Versioned::delete);
+        clear();
     }
 
     private static final class FasterListDequePool extends DequePool<FasterList> {

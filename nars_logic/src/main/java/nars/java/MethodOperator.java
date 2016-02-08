@@ -115,7 +115,7 @@ public class MethodOperator  {
 
 
             Term xv = x[paramOffset];
-            if (!xv.op(Op.PRODUCT)) {
+            if (!(xv.op() == Op.PRODUCT)) {
                 if (strict)
                     throw new RuntimeException("method parameters must be a product but is " + xv);
                 else

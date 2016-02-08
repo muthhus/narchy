@@ -176,9 +176,9 @@ public enum Op {
         Compound c = (Compound)t;
         return !c.impossibleStructureMatch(OperationBits) &&
                c.size() == 2 &&
-               c.op(Op.INHERIT) &&
-               c.term(1).op(Op.OPERATOR) &&
-               c.term(0).op(Op.PRODUCT);
+                c.op() == Op.INHERIT &&
+                c.term(1).op() == Op.OPERATOR &&
+                c.term(0).op() == Op.PRODUCT;
     }
 
 

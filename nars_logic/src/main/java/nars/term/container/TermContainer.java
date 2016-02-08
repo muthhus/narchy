@@ -38,7 +38,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
 
     /** tests if subterm i is op o */
     default boolean term(int i, Op o) {
-        return term(i).op(o);
+        return term(i).op() == o;
     }
 
     default Term termOr(int i, Term ifOutOfBounds) {

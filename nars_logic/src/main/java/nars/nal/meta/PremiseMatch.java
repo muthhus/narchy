@@ -210,7 +210,7 @@ public class PremiseMatch extends FindSubst {
     @Nullable
     @Override public final Term resolve(Term t) {
         //TODO make a half resolve that only does xy?
-        return isEmpty() ? t : index.apply(this, t);
+        return index.apply(this, t);
 
     }
 

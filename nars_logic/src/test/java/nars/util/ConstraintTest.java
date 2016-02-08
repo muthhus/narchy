@@ -46,7 +46,7 @@ public class ConstraintTest {
             @Override
             public void addConstraintsFor(Concept c) {
                 Term t = c.term();
-                if (t.op(Op.IMPLICATION)) {
+                if (t.op() == Op.IMPLICATION) {
                     Compound i = (Compound)t;
                     Term effect = i.term(1);
                     if (!concepts.contains(effect))
