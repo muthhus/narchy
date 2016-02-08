@@ -53,6 +53,7 @@ public class CurveBag<V> implements Bag<V> {
     public CurveBag(BagCurve curve, int capacity, Random rng) {
         this(new ArrayBag.BudgetedArraySortedIndex<>(capacity), curve, rng);
 
+
                                 /*if (capacity < 128)*/
         //items = new ArraySortedItemList<>(capacity);
                 /*else  {
@@ -438,8 +439,12 @@ public class CurveBag<V> implements Bag<V> {
         return arrayBag.getPriorityMax();
     }
 
-    /** provides a next index to sample from */
     public final int sampleIndex() {
+        return sampleIndexNormalized();
+    }
+
+    /** provides a next index to sample from */
+    public final int sampleIndexUnnormalized() {
         int s = size();
         //System.out.println("\t range:" +  min + ".." + max + " -> f(" + x + ")=" + y + "-> " + index);
         return (s == 1) ? 0 :
@@ -449,6 +454,23 @@ public class CurveBag<V> implements Bag<V> {
             );
     }
 
+    /** LERPs between the curve and a flat line (y=x) in proportion to the amount the dynamic range falls short of 1.0;
+     *  this is probably equivalent to a naive 1st-order approximation of a way
+     *  to convert percentile to probability but it should suffice for now */
+    public final int sampleIndexNormalized() {
+        int s = size();
+        if (s <= 1) return 0;
+
+        float min = getPriorityMin();
+        float max = getPriorityMax();
+        float dynamicality = (max-min);
+        float uniform = random.nextFloat();
+
+        float normalized = ((1f-dynamicality) * uniform) +
+                           (dynamicality * this.curve.valueOf(uniform));
+
+        return index( normalized , s );
+    }
 
 
 

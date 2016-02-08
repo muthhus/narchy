@@ -95,7 +95,9 @@ public class SomeRovers {
         Default nar = new Default(
                 new Memory(clock, new MapIndex2(
                         new SoftValueHashMap())),
-                1200, conceptsFirePerCycle, 1, 3);
+                1200, conceptsFirePerCycle, 2, 3);
+
+        nar.logSummaryGT(System.out, 0.65f);
 
 //            nar.memory.DEFAULT_JUDGMENT_PRIORITY = 0.35f;
 //            nar.memory.DEFAULT_JUDGMENT_DURABILITY = 0.35f;
@@ -110,13 +112,13 @@ public class SomeRovers {
 
 
         //nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
-        nar.core.activationRate.setValue(0.4f);
+        nar.core.activationRate.setValue(0.8f);
 
         nar.memory.duration.set(3);
-        nar.memory.conceptForgetDurations.setValue(2);
+        nar.memory.conceptForgetDurations.setValue(4);
         nar.memory.termLinkForgetDurations.setValue(4);
         nar.memory.taskLinkForgetDurations.setValue(6);
-        nar.memory.cyclesPerFrame.set(44);
+        nar.memory.cyclesPerFrame.set(128);
         nar.memory.shortTermMemoryHistory.set(3);
         nar.memory.executionThreshold.setValue(0.0f);
 
@@ -165,8 +167,8 @@ public class SomeRovers {
         NarQ nq = new NarQ(n, input);
         NarQ nq2 = new NarQ(n, new Vercept());
 
-        nq.power.setValue(0.2f);
-        nq.power.setValue(0.3f);
+        nq.power.setValue(0.7f);
+        nq.power.setValue(0.7f);
 
         input.addAll(nq.getBeliefExpectations(
                 eatFood, eatPoison, speedLeft, speedRight, speedForward

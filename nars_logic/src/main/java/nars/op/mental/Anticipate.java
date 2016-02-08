@@ -172,7 +172,7 @@ public final class Anticipate {
 
         Iterator<Map.Entry<Compound, Task>> it = anticipations.entries().iterator();
 
-        int halfDur = nar.memory.duration()/2;
+        int halfDur = nar.memory.duration();
         while (it.hasNext()) {
 
             Map.Entry<Compound, Task> t = it.next();
@@ -191,8 +191,8 @@ public final class Anticipate {
     }
 
 
-    public static boolean tooLate(Task t, long occur, int TOLERANCE_DIV) {
-        return occur > t.occurrence() + TOLERANCE_DIV;
+    public static boolean tooLate(Task t, long occur, int tolerance) {
+        return occur > t.occurrence() + tolerance;
     }
 
     public static boolean inTime(float incomingFreq, Task existing, long incomingOccurr, int TOLERANCE_DIV) {
@@ -200,7 +200,7 @@ public final class Anticipate {
         return
                 Util.equal(incomingFreq, existing.freq(), FREQ_TOLERANCE) &&
                 //within time tolerance
-                (incomingOccurr > occurrTime - TOLERANCE_DIV && incomingOccurr < occurrTime + TOLERANCE_DIV);
+                (Math.abs(incomingOccurr - occurrTime) <= TOLERANCE_DIV);
     }
 
 //    /** Prediction point vector / centroid of a group of Tasks

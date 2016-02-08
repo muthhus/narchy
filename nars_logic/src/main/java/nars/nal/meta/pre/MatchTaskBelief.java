@@ -21,6 +21,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -197,7 +198,7 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseMatch> {
     }
 
 
-    @NotNull
+    @Nullable
     public static ImmutableMap<Term, MatchConstraint> initConstraints(@NotNull ListMultimap<Term, MatchConstraint> c) {
         if ((c == null) | (c.isEmpty())) return null;
 

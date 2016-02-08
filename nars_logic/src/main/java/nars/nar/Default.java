@@ -39,6 +39,8 @@ public class Default extends AbstractNAR {
 
     @NotNull
     public final DefaultCycle core;
+
+
     @NotNull
     public final TaskPerception input;
 
@@ -454,6 +456,7 @@ public class Default extends AbstractNAR {
         public final MutableFloat confMin;
 
         public DefaultPremiseGenerator(NAR nar, Deriver deriver) {
+            /** the resutls buffer should probably be a Set because the derivations may duplicate */
             this(nar, deriver, Global.newHashSet(64));
         }
 

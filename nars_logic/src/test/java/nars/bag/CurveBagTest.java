@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
-import java.util.function.Consumer;
+import java.util.function.DoubleSupplier;
 
 import static org.junit.Assert.*;
 
@@ -161,27 +161,26 @@ public class CurveBagTest  {
         System.out.println(Arrays.toString(bag.getPriorityHistogram(4)));
         System.out.println(Arrays.toString(bag.getPriorityHistogram(8)));
 
-        Consumer<EmpiricalDistribution> print = (EmpiricalDistribution f) -> {
 
-
-            System.out.println(f.getSampleStats());
-            f.getBinStats().forEach(
-                    s -> {
-                        if (s.getN() > 0) System.out.println(
-                                s.getMin() + ".." + s.getMax() + ":\t" + s.getN());
-                    }
-            );
-        };
 
         System.out.print("Sampling: " );
-        print.accept(getSamplingDistribution((CurveBag) n.core.active, 1000));
+        printDist(getSamplingDistribution((CurveBag) n.core.active, 1000));
         System.out.print("Priority: " );
         EmpiricalDistribution pri;
-        print.accept(pri = getPriorityDistribution(n.core.active, 1000));
+        printDist(pri = getSamplingPriorityDistribution(n.core.active, 1000));
 
         List<SummaryStatistics> l = pri.getBinStats();
         assertTrue(l.get(0).getN() < l.get(l.size() - 1).getN());
 
+    }
+    static void printDist(EmpiricalDistribution f) {
+        System.out.println(f.getSampleStats().toString().replace("\n"," "));
+        f.getBinStats().forEach(
+                s -> {
+                    if (s.getN() > 0) System.out.println(
+                            s.getMin() + ".." + s.getMax() + ":\t" + s.getN());
+                }
+        );
     }
 
     private EmpiricalDistribution getSamplingDistribution(CurveBag b, int n) {
@@ -193,15 +192,68 @@ public class CurveBagTest  {
         return e;
     }
 
-    private EmpiricalDistribution getPriorityDistribution(Bag b, int n) {
+    private EmpiricalDistribution getSamplingPriorityDistribution(Bag b, int n) {
+        return getSamplingPriorityDistribution(b, n, 10);
+    }
+
+    private EmpiricalDistribution getSamplingPriorityDistribution(Bag b, int n, int bins) {
         DoubleArrayList f = new DoubleArrayList(n);
         for (int i = 0; i < n; i++)
             f.add( b.sample().pri() );
-        EmpiricalDistribution e =new EmpiricalDistribution(10 /* bins */);
+        EmpiricalDistribution e =new EmpiricalDistribution(bins);
         e.load(f.toArray());
         return e;
     }
 
+
+    @Test public void testNormalization() {
+        int n = 64;
+        int bins = 5;
+        int samples = n * 32;
+
+        CurveBag fullDynamicRange = populated(n, () -> Math.random());
+        EmpiricalDistribution unifDistr = getSamplingPriorityDistribution(fullDynamicRange, samples, bins);
+        printDist(unifDistr);
+
+        float ratioUniform = maxMinRatio(unifDistr);
+
+        //smaller dynamic range should be lesser probabailty difference from low to high
+        CurveBag smallDynamicRange = populated(n, () -> 0.1f*Math.random());
+        EmpiricalDistribution flatDistr = getSamplingPriorityDistribution(smallDynamicRange, samples, bins);
+        printDist(flatDistr);
+
+        float ratioFlat = maxMinRatio(flatDistr);
+
+        System.out.println(ratioUniform + " "  + ratioFlat);
+
+        assertTrue(ratioUniform > 7); //should be ideally ~10
+        assertTrue(ratioFlat < 3); //should be ideally ~1
+
+    }
+
+    private float maxMinRatio(EmpiricalDistribution d) {
+        List<SummaryStatistics> bins = d.getBinStats();
+        return  ((float)bins.get(bins.size()-1).getN() / ((float)bins.get(0).getN()));
+    }
+
+    private CurveBag<String> populated(int n , DoubleSupplier random) {
+        Random rng = new XorShift128PlusRandom(1);
+
+        CurveBag<String> a = new CurveBag(n, rng);
+        a.merge(BudgetMerge.plusDQDominant);
+
+
+        //fill with uniform randomness
+        for (int i = 0; i < n; i++) {
+            a.put("x" + i, new UnitBudget((float)random.getAsDouble(), 0.5f, 0.5f));
+        }
+
+        //a.commit();
+        //a.printAll();
+
+        return a;
+
+    }
 
 //
 //    static final BagCurve curve = new CurveBag.FairPriorityProbabilityCurve();

@@ -43,9 +43,10 @@ public class DigestBagTest {
 
         DigestBag d = new DigestBag.OutputBuffer(n, 2).buffer;
 
-        n.input("$0.3$ a:b."); n.run(1);
-        n.input("$0.2$ a:c."); n.run(1);
-        n.input("$0.1$ a:d."); n.run(1);
+        n.input("$0.3$ a:b.");
+        n.input("$0.2$ a:c.");
+        n.input("$0.1$ a:d.");
+        n.run(1);
 
         assertEquals(2, d.list.size());
 

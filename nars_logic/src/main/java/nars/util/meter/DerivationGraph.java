@@ -476,9 +476,13 @@ public class DerivationGraph extends DirectedPseudograph<DerivationGraph.Keyed,O
         String[] s = new String[1];
         s[0] = c instanceof Compound ? c.toString(false) : c.toString();
 
+        //HACK convert to lowercase so it doesnt interfere with the reassignments
+        s[0] = s[0].toLowerCase();
+
         unique.forEachKeyValue( (tn, i) -> {
             if (i > 25) throw new RuntimeException("TODO support > 26 different unique atomic terms");
             String cc = String.valueOf((char) ('A' + i));
+
             s[0] = s[0].replace(tn.toString(), cc); //this is replaceAll but without regex
         });
 

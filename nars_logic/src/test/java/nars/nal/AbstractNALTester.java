@@ -3,6 +3,7 @@ package nars.nal;
 import com.google.common.collect.Lists;
 import nars.Global;
 import nars.NAR;
+import nars.analyze.DiagNAR;
 import nars.nar.Default;
 import nars.nar.Terminal;
 import nars.util.meter.TestNAR;
@@ -76,7 +77,9 @@ public abstract class AbstractNALTester {
 
             for (int c : new int[] {  4/*, 2, 4 */}) { ///concepts fired per cycle
                 l.add(supply("Default[NAL<=" + level + ",c=" + c + ']', () -> {
-                            Default d = new Default(768, c, 2, 3 );
+                            Default d =
+                                    new Default(768, c, 2, 3 );
+                                    //new DiagNAR(768, c, 2, 3 );
                             d.nal(level);
                             return d;
                         }

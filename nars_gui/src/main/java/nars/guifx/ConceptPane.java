@@ -516,7 +516,7 @@ public class ConceptPane extends VBox implements ChangeListener {
         final TruthWave beliefs = new TruthWave(0), goals = new TruthWave(0);
 
         final static ColorMatrix beliefColors = new ColorMatrix(8,8,(f,c)->
-            new Color(0.6f+0.4f*c, 0.2f, 1f, 0.15f + 0.8f * c)
+            new Color(0.6f+0.38f*c, 0.2f, 1f, 0.15f + 0.8f * c)
         );
         final static ColorMatrix goalColors = new ColorMatrix(8,8,(f,c)->
             new Color(0.2f + 0.4f*c, 1f, 0f, 0.15f + 0.8f * c)

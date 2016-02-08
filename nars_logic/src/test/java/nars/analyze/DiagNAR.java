@@ -1,5 +1,6 @@
 package nars.analyze;
 
+import com.google.common.base.Joiner;
 import com.gs.collections.impl.map.mutable.primitive.ObjectIntHashMap;
 import nars.Global;
 import nars.NAR;
@@ -31,20 +32,32 @@ import java.util.List;
 public class DiagNAR extends Default {
 
     private static PrintStream out;
-
-    public DiagNAR() throws FileNotFoundException {
-        super();
-        out = new PrintStream(new FileOutputStream("/tmp/t.csv"));
+    static {
+        try {
+            out = new PrintStream(new FileOutputStream("/tmp/t.csv"));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            out = null;
+        }
+        Runtime.getRuntime().addShutdownHook(new Thread(()->{
+            out.close();
+        }));
     }
 
-    public DiagNAR(int i, int i1, int i2, int i3) throws FileNotFoundException {
+    public DiagNAR()  {
+        super();
+    }
+
+    public DiagNAR(int i, int i1, int i2, int i3)  {
         super(i, i1, i2, i3);
-        out = new PrintStream(new FileOutputStream("/tmp/t.csv"));
     }
 
     @Override
     public DefaultPremiseGenerator newPremiseGenerator() {
-        return new DefaultPremiseGenerator(this, Deriver.getDefaultDeriver(), Global.newArrayList()) {
+        return new DefaultPremiseGenerator(this, Deriver.getDefaultDeriver(),
+                //Global.newArrayList()
+                Global.newHashSet(64)
+        ) {
 
             @Override @NotNull
             protected DefaultConceptProcess newPremise(BLink<? extends Concept> concept, BLink<? extends Task> taskLink, BLink<? extends Termed> termLink, Task belief) {
@@ -106,7 +119,8 @@ public class DiagNAR extends Default {
     static final FSTConfiguration serialize = FSTConfiguration.createJsonConfiguration();
     static {
         serialize.setForceSerializable(true);
-
+        serialize.setCrossPlatform(false);
+        serialize.setForceClzInit(false);
     }
 
 
@@ -121,8 +135,8 @@ public class DiagNAR extends Default {
         public final String t;
         public final String tGen;
         public final String rule;
-        public final float dSumm; /* summary */
-        public final float dConf;
+        public final float dSumm; /* delta summary inflation=negative, reduction=positive  */
+        public final float pConf; /* percent confidence maintained in derivation (of max(task, belief) conf */
 
         public Derivation(DiagConceptProcess cp, Task task, Term beliefTerm, Task belief, Task c) {
             this.t = task.toString();
@@ -144,22 +158,31 @@ public class DiagNAR extends Default {
             dSumm = (c!= null ? c.summary() : 0) -
                             (task.summary() + (belief!=null ? belief.summary() : 0));
 
-            float deltaConfidence = (c!=null && c.isJudgmentOrGoal()) ? c.conf() : 0;
-            deltaConfidence -= (task.isJudgmentOrGoal() ? task.conf() : 0);
-            deltaConfidence -= (belief!=null && belief.isJudgmentOrGoal() ? belief.conf() : 0);
-            this.dConf = deltaConfidence;
+            float pConfNum = (c!=null && c.isJudgmentOrGoal()) ? c.conf() : 0;
+            float pConfDen =
+                    Math.max((task.isJudgmentOrGoal() ? task.conf() : 0),
+                        (belief!=null && belief.isJudgmentOrGoal() ? belief.conf() : 0));
+            this.pConf = (pConfDen != 0) ? pConfNum/pConfDen : 0;
 
 
             byte[] bytes = serialize.asByteArray(this);
             String ss = new String(bytes);
 
-            System.out.println(bytes.length + "  " + ss);
-            //Object deser = conf.asObject(bytes);
 
-            out.println(ss);
+            print();
 
         }
 
+        public void print() {
+
+            String line = Joiner.on("\t").useForNull("null").join(tGen, bGen, cGen, pConf, dSumm, rule);
+            out.println(line);
+//            System.out.println(bytes.length + "  " + ss);
+//            //Object deser = conf.asObject(bytes);
+//
+//            out.println(ss);
+
+        }
 
         public static PremiseRule rule(Task c) {
             @Nullable List l = c.log();
