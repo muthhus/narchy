@@ -24,10 +24,10 @@ public class AnticipationTest {
         new Anticipate(d);
 
         TestNAR t = new TestNAR(d);
-        t.input("(<a --> b> ==>+8 <b --> c>).");
+        t.input("(<a --> b> ==>+16 <b --> c>).");
         t.input("<a --> b>. :|:");
         //t.mustBelieve(55, "(--,(<a --> b> ==>+8 <b --> c>))", 1f, 0.45f, 0); // :\:
-        t.mustBelieve(55, "(--,(b-->c)).", 1f, 0.9f, 8);
+        t.mustBelieve(55, "(--,(b-->c)).", 1f, 0.9f, 16);
         //t.mustBelieve(55, "(<a --> b> ==>+8 <b --> c>)", 0.92f, 0.91f, 0);  // :\:
         t.test();
     }

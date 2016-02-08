@@ -120,7 +120,9 @@ public class AtomConcept extends AbstractConcept  {
         //activate tasklink locally
         Budget taskBudget = t.budget();
 
-        taskLinks.put(t, taskBudget, scale);
+        if (taskLinkOut(this, t)) {
+            taskLinks.put(t, taskBudget, scale);
+        }
 
         Termed[] templates = getTermLinkTemplates();
         if (templates == null) return false;
@@ -145,6 +147,7 @@ public class AtomConcept extends AbstractConcept  {
         return true;
     }
 
+
     protected final void linkTemplate(@NotNull Task t, @NotNull Concept target, Budget b, float minScale, float subScale, @NotNull NAR nar) {
 
 
@@ -167,5 +170,8 @@ public class AtomConcept extends AbstractConcept  {
         return true;
     }
 
+    private static boolean taskLinkOut(Concept c, Task t) {
+        return !(c.term().equals(t.term()));
+    }
 
 }

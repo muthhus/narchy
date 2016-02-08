@@ -56,7 +56,7 @@ public class SomeRovers {
         //RoverWorld world = new GridSpaceWorld(GridSpaceWorld.newMazePlanet());
         final Sim game = new Sim(clock, world);
 
-        game.add(new Turret("turret"));
+        //game.add(new Turret("turret"));
 
 //        game.add(new Spider("spider",
 //                3, 3, 0.618f, 30, 30));
@@ -95,9 +95,9 @@ public class SomeRovers {
         Default nar = new Default(
                 new Memory(clock, new MapIndex2(
                         new SoftValueHashMap())),
-                1200, conceptsFirePerCycle, 2, 3);
+                1000, conceptsFirePerCycle, 2, 3);
 
-        nar.logSummaryGT(System.out, 0.65f);
+        nar.logSummaryGT(System.out, 0.5f);
 
 //            nar.memory.DEFAULT_JUDGMENT_PRIORITY = 0.35f;
 //            nar.memory.DEFAULT_JUDGMENT_DURABILITY = 0.35f;
@@ -118,7 +118,7 @@ public class SomeRovers {
         nar.memory.conceptForgetDurations.setValue(4);
         nar.memory.termLinkForgetDurations.setValue(4);
         nar.memory.taskLinkForgetDurations.setValue(6);
-        nar.memory.cyclesPerFrame.set(128);
+        nar.memory.cyclesPerFrame.set(64);
         nar.memory.shortTermMemoryHistory.set(3);
         nar.memory.executionThreshold.setValue(0.0f);
 
