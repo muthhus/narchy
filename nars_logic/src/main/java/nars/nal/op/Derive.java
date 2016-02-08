@@ -137,7 +137,7 @@ public class Derive extends AbstractLiteral implements ProcTerm {
     /** part 1 */
     private void derive(@NotNull PremiseMatch p, @Nullable Term t) {
 
-        if (Variable.hasPatternVariable(t)) {
+        if (t.hasVarPattern()) {
             return;
         }
 

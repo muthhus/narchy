@@ -12,7 +12,7 @@ import java.util.function.Supplier;
 @RunWith(Parameterized.class)
 public class NAL8Test extends AbstractNALTester {
 
-    final int cycles = 1050; //150 worked for most of the initial NAL8 tests converted
+    final int cycles = 256; //150 worked for most of the initial NAL8 tests converted
 
     public NAL8Test(Supplier<NAR> b) { super(b); }
 

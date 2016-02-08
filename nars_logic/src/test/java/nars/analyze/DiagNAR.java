@@ -153,7 +153,8 @@ public class DiagNAR extends Default {
             this.cGen = c!=null ? DerivationGraph.genericString(c.term(), h) : null;
 
 
-            this.rule = c!=null ? rule(c).toString() : null;
+            PremiseRule r = c != null ? rule(c) : null;
+            this.rule = r != null ? r.toString() : null;
 
             dSumm = (c!= null ? c.summary() : 0) -
                             (task.summary() + (belief!=null ? belief.summary() : 0));
@@ -165,8 +166,8 @@ public class DiagNAR extends Default {
             this.pConf = (pConfDen != 0) ? pConfNum/pConfDen : 0;
 
 
-            byte[] bytes = serialize.asByteArray(this);
-            String ss = new String(bytes);
+            //byte[] bytes = serialize.asByteArray(this);
+            //String ss = new String(bytes);
 
 
             print();
@@ -177,6 +178,7 @@ public class DiagNAR extends Default {
 
             String line = Joiner.on("\t").useForNull("null").join(tGen, bGen, cGen, pConf, dSumm, rule);
             out.println(line);
+            //System.out.println(line);
 //            System.out.println(bytes.length + "  " + ss);
 //            //Object deser = conf.asObject(bytes);
 //
@@ -187,7 +189,7 @@ public class DiagNAR extends Default {
         public static PremiseRule rule(Task c) {
             @Nullable List l = c.log();
             //if (l == null) return null;
-            return (PremiseRule) l.stream().filter(x -> x instanceof PremiseRule).findFirst().get();
+            return (PremiseRule) l.stream().filter(x -> x instanceof PremiseRule).findFirst().orElse(null);
         }
     }
 
@@ -195,14 +197,30 @@ public class DiagNAR extends Default {
 
     public static void main(String[] args) throws Exception {
         Global.DEBUG = true;
-        DiagNAR d = new DiagNAR(1024, 1, 2, 3);
-        d.input("(a-->(b&&c)).");
-        d.input("(c-->d).");
-        d.input("<<$x --> bird> ==> <$x --> flyer>>.");
-        d.input("<{Tweety} --> [withWings]>."); //en("Tweety has wings.");
-        d.input("<(&&,<$x --> [chirping]>,<$x --> [withWings]>) ==> <$x --> bird>>."); //en("If something can chirp and has wings, then it is a bird.");
+        DiagNAR d = new DiagNAR(1024, 1, 1, 3);
+//        d.input("(a-->(b&&c)).");
+//        d.input("(c-->d).");
+//        d.input("<<$x --> bird> ==> <$x --> flyer>>.");
+//        d.input("<{Tweety} --> [withWings]>."); //en("Tweety has wings.");
+//        d.input("<(&&,<$x --> [chirping]>,<$x --> [withWings]>) ==> <$x --> bird>>."); //en("If something can chirp and has wings, then it is a bird.");
 
-        d.run(1000);
+        d.logSummaryGT(System.out, 0);
+
+        //t:(--,b). (t:(--,#y) ==> t:(not,#y)).
+        d.input(
+            "t:a.",
+            "t:(--,b).",
+            //"(t:a && (--,t:b)).",
+            //"(t:(--,$1) ==> t:(not,$1))."
+            //"(t:(--,$1) ==> t:(not,$1)).",
+            "(t:($x | (--,$y)) ==> t:(xor, $x, $y))."
+            //,"xor(a,b)?"
+            //"(($x && $y) ==> and({$x, $y}))."
+        );
+        /*d.memory.eventTaskRemoved.on(t -> {
+            System.err.println("rem: " +t);
+        });*/
+        d.run(15000);
 
     }
 }

@@ -18,6 +18,7 @@ abstract public class PatternCompound extends GenericCompound {
     public final int volCached;
     public final int structureCached;
     public final Term[] termsCached;
+    private final boolean pattern;
 
 
     protected static final class PatternCompoundContainingEllipsis extends PatternCompound {
@@ -46,7 +47,7 @@ abstract public class PatternCompound extends GenericCompound {
                     subst.matchCompoundWithEllipsis(this, y));
         }
 
-        @Override protected final boolean canMatch(@NotNull Compound y) {
+        protected final boolean canMatch(@NotNull Compound y) {
 
             int yStructure = y.structure();
             if ((yStructure | structureCached) != yStructure)
@@ -91,7 +92,7 @@ abstract public class PatternCompound extends GenericCompound {
                             subst.matchLinear(this, y));
         }
 
-        @Override protected final boolean canMatch(@NotNull Compound y) {
+        protected final boolean canMatch(@NotNull Compound y) {
 
             int yStructure = y.structure();
 
@@ -130,6 +131,7 @@ abstract public class PatternCompound extends GenericCompound {
                 seed.structure() & ~(Op.VAR_PATTERN.bit());
         this.volCached = seed.volume();
         this.termsCached = subterms.terms();
+        this.pattern = seed.hasVarPattern();
     }
 
     public static boolean hasEllipsisTransform(@NotNull TermContainer x) {
@@ -152,9 +154,12 @@ abstract public class PatternCompound extends GenericCompound {
     }
 
     abstract public boolean match(@NotNull Compound y, @NotNull FindSubst subst);
-    abstract protected boolean canMatch(@NotNull Compound y);
+    //abstract protected boolean canMatch(@NotNull Compound y);
 
-
+    @Override
+    public boolean hasVarPattern() {
+        return pattern;
+    }
 }
 /**
  * Created by me on 12/26/15.

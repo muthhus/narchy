@@ -1,5 +1,6 @@
 package nars.term;
 
+import nars.Op;
 import nars.nal.meta.match.Ellipsis;
 import org.jetbrains.annotations.NotNull;
 
@@ -87,7 +88,9 @@ public interface Termlike  {
 
     Ellipsis firstEllipsis();
 
-
+    default boolean hasVarPattern() {
+        return or(x -> x.op(Op.VAR_PATTERN));
+    }
 
 
 }

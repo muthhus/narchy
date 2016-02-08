@@ -5,6 +5,7 @@ import nars.Global;
 import nars.NAR;
 import nars.Op;
 import nars.concept.Concept;
+import nars.nal.meta.PatternCompound;
 import nars.nar.Default;
 import nars.term.Compound;
 import nars.term.Term;
@@ -45,7 +46,11 @@ public class UnificationTest  {
         nar.believe(s2);
         nar.run(2);
 
-        Term t1 = nar.concept(s1).term();
+        Term t1 =
+                type == Op.VAR_PATTERN ?
+                    PatternCompound.make((Compound) nar.term(s1).term()) :
+                nar.concept(s1).term();
+
         Term t2 = nar.concept(s2).term();
 
         Set<Term> t1u = ((Compound) t1).uniqueSubtermSet(type);
@@ -76,6 +81,14 @@ public class UnificationTest  {
                         assertTrue( (n2) <= (yx.size()));
                         assertTrue( (n1) <= (xy.size()));
                     }
+
+                    assertFalse("incomplete: " + toString(), this.isEmpty());
+
+                    this.forEach((k, v) -> {
+                        if (k.op(type))
+                            assertNotNull(v);
+                    });
+
                 } else {
                     assertFalse("match found but should not have", true);
                 }
@@ -86,6 +99,8 @@ public class UnificationTest  {
             }
         };
         sub.matchAll(t1, t2);
+
+
 
         assertEquals(shouldSub, subbed.get());
 
@@ -166,8 +181,8 @@ public class UnificationTest  {
                 true);
 
         //additional test that verifies correct common variable substitution result
-        //assertEquals("{$1={t002}, #2=#1#2}", sub.xy().toString());
-        //assertEquals("{#1=#1#2}", sub.yx().toString());
+        assertEquals("{$1={t002}, #2=#1#2}", sub.xy.toString());
+        assertEquals("{#1#2=#1}", sub.yx.toString());
     }
     @Test public void pattern_trySubs_Indep_Var_2_product()  {
         test(Op.VAR_INDEP,
@@ -326,8 +341,8 @@ public class UnificationTest  {
 
     @Test public void pattern_trySubs_set3()  {
         test(Op.VAR_PATTERN,
-                "{a,b,c}",
                 "{%1,%2,%3}",
+                "{a,b,c}",
                 true);
     }
     @Ignore @Test public void pattern_trySubs_set2_1()  {
@@ -343,7 +358,7 @@ public class UnificationTest  {
     }
     @Test public void pattern_trySubs_set2_2()  {
         test(Op.VAR_PATTERN,
-                "{a,b}", "{a,%1}",
+                "{a,%1}", "{a,b}",
                 true);
     }
     @Ignore @Test public void pattern_trySubs_set3_1_b()  {
@@ -392,8 +407,8 @@ public class UnificationTest  {
     }
     @Test public void pattern_trySubs_set4()  {
         test(Op.VAR_PATTERN,
-                "{a,b,c,d}",
                 "{%1,%2,%3,%4}",
+                "{a,b,c,d}",
                 true);
     }
     @Test public void diffVarTypes1()  {
@@ -562,12 +577,12 @@ public class UnificationTest  {
                 "{{a, b, c, d}, {z, b, c, d}}", true);
     }
 
-    @Test public void ellipsisLinearInner()  {
+    @Ignore @Test public void ellipsisLinearInner()  {
 
             //TODO - lower priority
-        /*test(Op.VAR_PATTERN,
+        test(Op.VAR_PATTERN,
                 "(a, %X..+, d)",
-                "(a, b, c, d)", true);*/
+                "(a, b, c, d)", true);
     }
     @Test public void patternImage()  {
         test(Op.VAR_PATTERN,
@@ -703,6 +718,13 @@ public class UnificationTest  {
         FindSubst f = test(Op.VAR_PATTERN,
                 "(<%1 <-> %2>, <%3 <-> %2>)",
                 "(<bird <-> {?1}>, <bird <-> {?1}>)",
+                true);
+    }
+
+    @Test public void varIndep2()  {
+        FindSubst f = test(Op.VAR_INDEP,
+                "t:($x | (--,$y))",
+                "t:(x | (--,y))",
                 true);
     }
 

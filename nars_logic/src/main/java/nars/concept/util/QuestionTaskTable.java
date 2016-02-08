@@ -16,7 +16,7 @@ public interface QuestionTaskTable extends TaskTable {
      * @return: the input task itself, it it was added to the table
      * an existing equivalent task if this was a duplicate
      */
-    @NotNull
+    @Nullable
     Task add(Task t, Memory m);
 
 

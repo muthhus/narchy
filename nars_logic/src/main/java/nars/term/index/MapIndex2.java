@@ -52,7 +52,7 @@ public class MapIndex2 extends AbstractMapIndex {
     }
 
 
-    @NotNull
+    @Nullable
     @Override
     public Termed getTermIfPresent(@NotNull Termed t) {
         return (Termed) getItemIfPresent(

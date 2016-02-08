@@ -152,8 +152,8 @@ public class AtomConcept extends AbstractConcept  {
 
 
         /** activate local's termlink to template */
-        if (termLinkOut(this, target.term()))
-            termLinks.put(target, b, subScale);
+        float termlinkScale = termLinkOut(this, target.term());
+        termLinks.put(target, b, subScale * termlinkScale);
 
         /** activate (reverse) template's termlink to local */
         target.termlinks().put(this, b, subScale);
@@ -163,14 +163,16 @@ public class AtomConcept extends AbstractConcept  {
     }
 
     /** filter for inserting an outgoing termlink depending on the target */
-    public static boolean termLinkOut(Termed from, Term to) {
+    public static float termLinkOut(Termed from, Term to) {
         if (!to.isCompound()) {
-            return (!from.op().isStatement()); // isAny(Op.ProductOrImageBits)
+            if (from.op().isStatement()) // isAny(Op.ProductOrImageBits)
+                return 0.5f;
         }
-        return true;
+        return 1f;
     }
 
     private static boolean taskLinkOut(Concept c, Task t) {
+        //return true;
         return !(c.term().equals(t.term()));
     }
 

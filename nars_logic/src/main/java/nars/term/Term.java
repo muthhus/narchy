@@ -153,10 +153,6 @@ public interface Term extends Termed, Comparable, Termlike {
         return null;
     }
 
-    default boolean hasVarPattern() {
-        return Variable.hasPatternVariable(this);
-    }
-
     default boolean hasVarDep() {
         return varDep()!=0;
     }

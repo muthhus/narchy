@@ -111,6 +111,12 @@ public class Atom extends StringAtom {
         return x;
     }
 
+    @Override
+    public boolean hasVarPattern() {
+        return false;
+    }
+
+
     /*
     // similar to String.intern()
     public final static Atom the(final String name) {

@@ -41,7 +41,7 @@ public enum Terms {
         }
 
         //if one is not a compound, then return their equality
-        if (!((a instanceof Compound) && (b instanceof Compound))) {
+        if (!(a.isCompound() && b.isCompound())) {
             return a.equals(b);
         }
 
@@ -53,9 +53,13 @@ public enum Terms {
                 case INHERIT:
                     return equalSubjectPredicateInRespectToImageAndProduct((Compound)a, (Compound)b);
 
-                case SIMILAR:
-                    return equalSubjectPredicateInRespectToImageAndProduct((Compound)a,(Compound)b)
-                            || equalSubjectPredicateInRespectToImageAndProduct((Compound)b, (Compound)a);
+                case SIMILAR: {
+                    boolean x = equalSubjectPredicateInRespectToImageAndProduct((Compound) a, (Compound) b);
+
+                    //only half seems necessary:
+                    //boolean y = equalSubjectPredicateInRespectToImageAndProduct((Compound) b, (Compound) a);
+                    return x;
+                }
             }
         }
 
@@ -76,16 +80,14 @@ public enum Terms {
     }
 
 
-    public static boolean equalSubjectPredicateInRespectToImageAndProduct(@NotNull Compound a, @NotNull Compound b) {
-        return equalSubjectPredicateInRespectToImageAndProduct(a, b, true);
-    }
-
-    static boolean equalSubjectPredicateInRespectToImageAndProduct(@NotNull Term A, @NotNull Term B, boolean requireEqualImageRelation) {
-
+    public static boolean equalSubjectPredicateInRespectToImageAndProduct(@NotNull Compound A, @NotNull Compound B) {
 
         if (A.equals(B)) {
             return true;
         }
+
+        if (!A.hasAny(Op.ProductOrImageBits) || !B.hasAny(Op.ProductOrImageBits))
+            return false; //the remaining comparisons are unnecessary
 
         Term subjA = Statement.subj(A);
         Term predA = Statement.pred(A);
@@ -95,39 +97,48 @@ public enum Terms {
         Term ta = null, tb = null; //the compound term to put itself in the comparison set
         Term sa = null, sb = null; //the compound term to put its components in the comparison set
 
-        if ((subjA.op(PRODUCT)) && (predB.op(IMAGE_EXT))) {
+        Op sao = subjA.op();
+        Op sbo = subjB.op();
+        Op pao = predA.op();
+        Op pbo = predB.op();
+
+
+        if ((sao == PRODUCT) && (pbo == IMAGE_EXT)) {
             ta = predA;
             sa = subjA;
             tb = subjB;
             sb = predB;
         }
-        if ((subjB.op(PRODUCT)) && (predA.op(IMAGE_EXT))) {
+
+        if ((sbo == PRODUCT) && (pao == IMAGE_EXT)) {
             ta = subjA;
             sa = predA;
             tb = predB;
             sb = subjB;
         }
-        if ((predA.op(IMAGE_EXT)) && (predB.op(IMAGE_EXT))) {
+
+        if ((pao == IMAGE_EXT) && (pbo == IMAGE_EXT)) {
             ta = subjA;
             sa = predA;
             tb = subjB;
             sb = predB;
         }
 
-        if ((subjA.op(IMAGE_INT)) && (subjB.op(IMAGE_INT))) {
+        if ((sao == IMAGE_INT) && (sbo == IMAGE_INT)) {
             ta = predA;
             sa = subjA;
             tb = predB;
             sb = subjB;
         }
 
-        if ((predA.op(PRODUCT)) && (subjB.op(IMAGE_INT))) {
+        if ((pao == PRODUCT) && (sbo == IMAGE_INT)) {
             ta = subjA;
             sa = predA;
             tb = predB;
             sb = subjB;
         }
-        if ((predB.op(PRODUCT)) && (subjA.op(IMAGE_INT))) {
+
+        if ((pbo == PRODUCT) && (sao == IMAGE_INT)) {
             ta = predA;
             sa = subjA;
             tb = subjB;
@@ -140,13 +151,13 @@ public enum Terms {
 
         //original code did not check relation index equality
         //https://code.google.com/p/open-nars/source/browse/trunk/nars_core_java/nars/language/CompoundTerm.java
-        if (requireEqualImageRelation) {
+        //if (requireEqualImageRelation) {
             //if (sa.op().isImage() && sb.op().isImage()) {
                 if (((Compound)sa).relation() != ((Compound)sb).relation()) {
                     return false;
                 }
             //}
-        }
+        //}
 
         return containsAll((Compound) sa, ta, (Compound) sb, tb);
 

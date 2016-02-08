@@ -147,12 +147,12 @@ public class PremiseRule extends GenericCompound  {
 
         if (postconditions.length == 0)
             throw new RuntimeException(this + " has no postconditions");
-        if (!Variable.hasPatternVariable(getTask()))
-            throw new RuntimeException("rule's task term pattern has no pattern variable");
-        if (!Variable.hasPatternVariable(getBelief()))
-            throw new RuntimeException("rule's task belief pattern has no pattern variable");
-        if (!Variable.hasPatternVariable(getConclusionTermPattern()))
-            throw new RuntimeException("rule's conclusion belief pattern has no pattern variable");
+//        if (!getTask().hasVarPattern())
+//            throw new RuntimeException("rule's task term pattern has no pattern variable");
+//        if (!getBelief().hasVarPattern())
+//            throw new RuntimeException("rule's task belief pattern has no pattern variable");
+//        if (!getConclusionTermPattern().hasVarPattern())
+//            throw new RuntimeException("rule's conclusion belief pattern has no pattern variable");
     }
 
 

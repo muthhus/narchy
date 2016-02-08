@@ -46,14 +46,8 @@ subprojects {
         ignoreFailures = true
     }
 
-    processResources {
-        from ('src/main/java') {
-            include '**/*.nal'
-            include '**/*.prolog'
-        }
-    }
-}
 
+}
 
 task testReport(type: TestReport) {
     destinationDir = file("$buildDir/reports/allTests")

@@ -87,7 +87,7 @@ public final class TruthFunctions extends UtilityFunctions {
      * @param v1 Truth value of the premise
      * @return Truth value of the conclusion
      */
-    @NotNull
+    @Nullable
     public static Truth contraposition(@NotNull Truth v1, float minConf) {
         float f1 = v1.freq();
         float c1 = v1.conf();
@@ -156,7 +156,7 @@ public final class TruthFunctions extends UtilityFunctions {
     public static float temporalProjection(long now, long at, long bt) {
         return BeliefTable.relevance(Math.abs(now-at) + Math.abs(now-bt), Math.abs(at-bt));
     }
-      public static float temporalProjectionOld(long sourceTime, long targetTime, long currentTime) {
+    public static float temporalProjectionOld(long sourceTime, long targetTime, long currentTime) {
         long den = (abs(sourceTime - currentTime) + abs(targetTime - currentTime));
         if (den == 0) return 1f;
         return abs(sourceTime - targetTime) / (float)den;
@@ -240,7 +240,7 @@ public final class TruthFunctions extends UtilityFunctions {
      * @param b Truth value of the second premise
      * @return Truth value of the conclusion, or null if either truth is analytic already
      */
-    @NotNull
+    @Nullable
     public static Truth abduction(@NotNull Truth a, @NotNull Truth b, float minConf) {
         float c = w2c(and(b.freq(), a.conf(), b.conf()));
         return (c < minConf) ? null : new DefaultTruth(a.freq(), c);
@@ -267,7 +267,7 @@ public final class TruthFunctions extends UtilityFunctions {
      * @param v2 Truth value of the second premise
      * @return Truth value of the conclusion
      */
-    @NotNull
+    @Nullable
     public static Truth induction(@NotNull Truth v1, @NotNull Truth v2, float minConf) {
         return abduction(v2, v1, minConf);
     }

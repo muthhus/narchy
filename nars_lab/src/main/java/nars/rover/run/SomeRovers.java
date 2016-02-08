@@ -97,7 +97,7 @@ public class SomeRovers {
                         new SoftValueHashMap())),
                 1000, conceptsFirePerCycle, 2, 3);
 
-        nar.logSummaryGT(System.out, 0.5f);
+        nar.logSummaryGT(System.out, 0.4f);
 
 //            nar.memory.DEFAULT_JUDGMENT_PRIORITY = 0.35f;
 //            nar.memory.DEFAULT_JUDGMENT_DURABILITY = 0.35f;
@@ -112,10 +112,10 @@ public class SomeRovers {
 
 
         //nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
-        nar.core.activationRate.setValue(0.8f);
+        nar.core.activationRate.setValue(0.5f);
 
         nar.memory.duration.set(3);
-        nar.memory.conceptForgetDurations.setValue(4);
+        nar.memory.conceptForgetDurations.setValue(2);
         nar.memory.termLinkForgetDurations.setValue(4);
         nar.memory.taskLinkForgetDurations.setValue(6);
         nar.memory.cyclesPerFrame.set(64);

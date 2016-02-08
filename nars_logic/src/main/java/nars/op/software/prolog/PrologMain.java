@@ -11,7 +11,7 @@ public class PrologMain extends Prolog {
 
 		dict = new Builtins(this);
 		ask("reconsult('"
-				+ PrologMain.class.getResource(Prolog.default_lib)
+				+ PrologMain.class.getClassLoader().getResource(Prolog.default_lib)
 						.toExternalForm() + "')");
 	}
 

@@ -18,6 +18,7 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -39,8 +40,8 @@ public class PremiseRuleSet {
 
 
     public PremiseRuleSet() throws IOException, URISyntaxException {
-        //this(Paths.get(Deriver.class.getResource("default.meta.nal").toURI()));
-        this(Deriver.class.getResourceAsStream("default.meta.nal"));
+        this(Paths.get(Deriver.class.getClassLoader().getResource("default.meta.nal").toURI()));
+        //this(Deriver.class.getClassLoader().getResourceAsStream("default.meta.nal"));
     }
 
     public PremiseRuleSet(InputStream is) throws IOException {

@@ -87,15 +87,6 @@ public abstract class Variable extends AbstractStringAtom {
 
 
     /**
-     * true if it has or is a pattern variable
-     * necessary because VAR_PATTERN are hidden from substructure
-     */
-    public static boolean hasPatternVariable(@NotNull Termlike t) {
-        return t.or(x -> x.op() == Op.VAR_PATTERN);
-    }
-
-
-    /**
      * The syntactic complexity of a variable is 0, because it does not refer to
      * any concept.
      *

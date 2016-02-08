@@ -241,10 +241,9 @@ public abstract class FindSubst extends Versioning implements Subst {
             return true;
         }
 
-        /*if ((--power) < 0)
-            return false;*/
-
         Op t = type;
+
+
         Op xOp = x.op();
         Op yOp = y.op();
 
@@ -479,9 +478,11 @@ public abstract class FindSubst extends Versioning implements Subst {
     }
 
     public final boolean matchPermute(@NotNull TermContainer x, @NotNull Compound y) {
+        boolean isPattern = type == Op.VAR_PATTERN;
+
         if
-                (((type != Op.VAR_PATTERN && (0 == (x.structure() & type.bit()))) ||
-                ((type == Op.VAR_PATTERN) && !Variable.hasPatternVariable(x))))
+            ((!isPattern && !x.hasAny(type.bit()) ||
+            (isPattern && !x.hasVarPattern())))
 
         {
             //SPECIAL CASE: no variables

@@ -376,10 +376,19 @@ public class NAL6Test extends AbstractNALTester {
         TestNAR tester = test();
         tester.believe("<(&&,<(*,$a,is,cat) --> test>,<(*,$a,is,$b) --> sentence>) ==> <$a --> $b>>");
         tester.believe("<(*,tim,is,cat) --> test>");
-        tester.mustBelieve(cycles*2, "<<(*,tim,is,$1) --> sentence> ==> <tim --> $1>>", 1.00f, 0.81f); //en("there is a lock which is opened by key1");
+        tester.mustBelieve(cycles, "<<(*,tim,is,$1) --> sentence> ==> <tim --> $1>>", 1.00f, 0.81f); //en("there is a lock which is opened by key1");
 
     }
 
+    @Test //see discussion on https://groups.google.com/forum/#!topic/open-nars/1TmvmQx2hMk
+    public void impliesUnbelievedYet()  {
+        TestNAR tester = test();
+        tester.nar.log();
+        tester.believe("<x:a ==> c:d>."); //x:a, x:#1, x:$1
+        tester.believe("x:a.");
+        tester.mustBelieve(cycles, "c:d", 1.00f, 0.81f); //en("there is a lock which is opened by key1");
+
+    }
 
 
 /* Will be moved to NALMultistepTest.java

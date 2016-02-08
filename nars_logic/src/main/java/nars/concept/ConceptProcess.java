@@ -423,12 +423,6 @@ abstract public class ConceptProcess implements Premise {
 
         Task belief = belief();
 
-        //nullify belief for single-premise conclusions
-        if ((truth!=null) && (belief!=null)) {
-            if (((punct == Symbols.BELIEF) && d.beliefSingle) ||
-                    ((punct == Symbols.GOAL) && d.desireSingle))
-                belief = null;
-        }
 
         boolean derivedTemporal = occ != ETERNAL;
 
