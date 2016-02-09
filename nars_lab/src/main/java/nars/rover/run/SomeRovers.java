@@ -25,6 +25,7 @@ import nars.util.signal.NarQ.NotBeliefReward;
 import nars.util.signal.NarQ.Vercept;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jbox2d.common.Vec2;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.DoubleSupplier;
 import java.util.stream.Collectors;
@@ -112,15 +113,16 @@ public class SomeRovers {
 //            return false;
 //        });
 
-        nar.memory.DEFAULT_JUDGMENT_PRIORITY = 0.5f;
+        @NotNull Memory m = nar.memory;
+        m.DEFAULT_JUDGMENT_PRIORITY = 0.5f;
 //            nar.memory.DEFAULT_JUDGMENT_DURABILITY = 0.35f;
-        nar.memory.DEFAULT_GOAL_PRIORITY = 0.5f;
+        m.DEFAULT_GOAL_PRIORITY = 0.5f;
 //            nar.memory.DEFAULT_GOAL_DURABILITY = 0.7f;
-        nar.memory.DEFAULT_QUESTION_PRIORITY = 0.5f;
+        m.DEFAULT_QUESTION_PRIORITY = 0.5f;
 //            nar.memory.DEFAULT_QUESTION_DURABILITY = 0.6f;
         //nar.initNAL9();
-        nar.memory.the(new Anticipate(nar));
-        nar.memory.the(new Inperience(nar));
+        m.the(new Anticipate(nar));
+        m.the(new Inperience(nar));
         //nar.memory.perfection.setValue(0.15f);
         //nar.core.confidenceDerivationMin.setValue(0.01f);
 
@@ -129,13 +131,13 @@ public class SomeRovers {
         nar.core.activationRate.setValue(0.15f);
         nar.premiser.confMin.setValue(0.02f);
 
-        nar.memory.duration.set(2);
-        nar.memory.conceptForgetDurations.setValue(1);
-        nar.memory.termLinkForgetDurations.setValue(2);
-        nar.memory.taskLinkForgetDurations.setValue(3);
-        nar.memory.cyclesPerFrame.set(4);
-        nar.memory.shortTermMemoryHistory.set(3);
-        nar.memory.executionThreshold.setValue(0.0f);
+        m.duration.set(2);
+        m.conceptForgetDurations.setValue(1);
+        m.termLinkForgetDurations.setValue(2);
+        m.taskLinkForgetDurations.setValue(3);
+        m.cyclesPerFrame.set(4);
+        m.shortTermMemoryHistory.set(3);
+        m.executionThreshold.setValue(0.0f);
 
         boolean gui = true;
         if (gui) {

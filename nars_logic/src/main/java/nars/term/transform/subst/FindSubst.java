@@ -53,7 +53,7 @@ public abstract class FindSubst extends Versioning implements Subst {
      * variables whose contents are disallowed to equal each other
      */
     @Nullable
-    public ImmutableMap<Term, MatchConstraint> constraints = null;
+    public Versioned<ImmutableMap<Term, MatchConstraint>> constraints = null;
 
     //public abstract Term resolve(Term t, Substitution s);
 
@@ -125,6 +125,7 @@ public abstract class FindSubst extends Versioning implements Subst {
         yx = new VarCachedVersionMap(this);
         term = new Versioned(this);
         parent = new Versioned(this);
+        constraints = new Versioned(this);
         //branchPower = new Versioned(this);
 
 
@@ -144,7 +145,6 @@ public abstract class FindSubst extends Versioning implements Subst {
     @Override
     public void clear() {
         revert(0);
-        constraints = null;
     }
 
 
@@ -850,13 +850,19 @@ public abstract class FindSubst extends Versioning implements Subst {
 
     /**
      * true if the match assignment is allowed by constraints
+     * TODO find a way to efficiently eliminate redundant rules shared between versions
      */
     public final boolean assignable(Term x, Term y) {
-        ImmutableMap<Term, MatchConstraint> cc = this.constraints;
-        if (cc == null) return true;
-        MatchConstraint c = cc.get(x);
-        if (c == null) return true;
-        return !c.invalid(x, y, this);
+        Versioned<ImmutableMap<Term, MatchConstraint>> cc = this.constraints;
+        int s = cc.size() - 1;
+        if (s < 0) return true;
+        Object[] ccc = cc.value.array();
+        for ( ; s >=0; s--) {
+            MatchConstraint c = ((ImmutableMap<Term, MatchConstraint>)ccc[s]).get(x);
+            if ((c != null) && c.invalid(x, y, this))
+                return false;
+        }
+        return true;
     }
 
     @Override public void forEach(BiConsumer<? super Term, ? super Term> each) {
