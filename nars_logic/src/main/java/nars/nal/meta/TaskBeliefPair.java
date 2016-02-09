@@ -7,11 +7,11 @@ import nars.term.container.TermVector;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * just holds two terms, not really necessary
+ * just holds two terms, not really necessary. recycled
  */
 public final class TaskBeliefPair extends GenericCompound {
 
-    int actualStructure;
+    //int actualStructure;
 
     public TaskBeliefPair() {
         super(Op.PRODUCT, new TermVector(Op.Imdex, Op.Imdex) /* placeholders */);
@@ -28,13 +28,14 @@ public final class TaskBeliefPair extends GenericCompound {
         t[0] = a;
         t[1] = b;
 
-        this.actualStructure = a.structure() | b.structure();
+        //this.actualStructure = a.structure() | b.structure();
         //subterms.init();
     }
 
     @Override
     public int structure() {
-        return actualStructure;
+        throw new RuntimeException("N/A");
+        //return actualStructure;
     }
 
 

@@ -43,7 +43,7 @@ public abstract class FindSubst extends Versioning implements Subst {
 
 
     /** maximum changes which are stored in stack */
-    final static int defaultHistoryLength = 256;
+    final static int defaultHistoryLength = 192;
 
     public final Random random;
 

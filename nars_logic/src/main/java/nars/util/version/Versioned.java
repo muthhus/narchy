@@ -13,7 +13,7 @@ public class Versioned<X> extends FasterIntArrayList /*Comparable<Versioned>*/ {
     @NotNull
     private final Versioning context;
 
-    X current = null;
+    X current;
 
     /**
      * id, unique within the context this has registered with

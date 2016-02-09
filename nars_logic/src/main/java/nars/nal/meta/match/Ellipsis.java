@@ -6,6 +6,7 @@ import nars.term.container.TermContainer;
 import nars.term.transform.VariableNormalization;
 import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public abstract class Ellipsis extends VarPattern { //TODO use Immutable
 
@@ -50,12 +51,21 @@ public abstract class Ellipsis extends VarPattern { //TODO use Immutable
 
 
     /** this needs to use .term(x) instead of Term[] because of shuffle terms */
-    public static Ellipsis firstEllipsis(@NotNull TermContainer x) {
+    @Nullable public static Ellipsis firstEllipsis(@NotNull TermContainer x) {
         int xsize = x.size();
         for (int i = 0; i < xsize; i++) {
             Term xi = x.term(i);
             if (xi instanceof Ellipsis) {
                 return (Ellipsis) xi;
+            }
+        }
+        return null;
+    }
+    @Nullable
+    public static Ellipsis firstEllipsis(@NotNull Term[] xx) {
+        for (Term x : xx) {
+            if (x instanceof Ellipsis) {
+                return (Ellipsis) x;
             }
         }
         return null;

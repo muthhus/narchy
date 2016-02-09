@@ -1,12 +1,10 @@
 package nars.nal.meta.op;
 
-import com.google.common.collect.ListMultimap;
 import com.gs.collections.api.map.ImmutableMap;
 import nars.$;
 import nars.Global;
 import nars.Op;
 import nars.nal.meta.*;
-import nars.nal.meta.constraint.AndConstraint;
 import nars.nal.meta.constraint.MatchConstraint;
 import nars.nal.op.Derive;
 import nars.term.Compound;
@@ -14,10 +12,8 @@ import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Map;
 import java.util.Set;
 
-import static com.gs.collections.impl.factory.Maps.immutable;
 import static nars.$.seteMap;
 
 /**
@@ -63,9 +59,10 @@ abstract public class MatchTerm extends AtomicBooleanCondition<PremiseMatch> imp
             super(id(x, constraints), x, constraints);
         }
 
-        /** the entire TaskBeliefPair tuple */
-        @Override protected Term target(PremiseMatch p) {
-            return p.term.get();
+        @Override
+        @Deprecated public final boolean booleanValueOf(@NotNull PremiseMatch p) {
+            p.matchAll(x, p.term.get() /* current term */, this, constraints);
+            return true;
         }
     }
 
@@ -74,7 +71,9 @@ abstract public class MatchTerm extends AtomicBooleanCondition<PremiseMatch> imp
         /** either 0 (task) or 1 (belief) */
         private final int subterm;
 
-        public MatchOneSubterm(Term x, @Nullable ImmutableMap<Term, MatchConstraint> constraints, int subterm) {
+        private final MatchOneSubterm callback;
+
+        public MatchOneSubterm(Term x, @Nullable ImmutableMap<Term, MatchConstraint> constraints, int subterm, boolean finish) {
             super(
                 (subterm == 0 ?
                         $.p(id(x,constraints), Op.Imdex) :
@@ -82,23 +81,16 @@ abstract public class MatchTerm extends AtomicBooleanCondition<PremiseMatch> imp
                 x
                 , constraints);
             this.subterm = subterm;
+            this.callback = finish ? this : null;
         }
 
-        /** the entire TaskBeliefPair tuple */
-        @Override protected Term target(PremiseMatch p) {
-            return ((Compound)p.term.get()).term(subterm);
+        @Override
+        @Deprecated public final boolean booleanValueOf(@NotNull PremiseMatch p) {
+            p.matchAll(x, ((Compound) p.term.get()).term(subterm) /* current term */, callback, constraints);
+            return true;
         }
     }
 
-
-    @Override
-    @Deprecated public final boolean booleanValueOf(@NotNull PremiseMatch p) {
-        p.matchAll(x, target(p) /* current term */, this, constraints);
-        return true;
-    }
-
-    /** returns the target term that will be compared against; */
-    protected abstract Term target(PremiseMatch p);
 
     @Override
     public final String toString() {

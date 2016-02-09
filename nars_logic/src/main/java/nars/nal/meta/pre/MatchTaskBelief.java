@@ -176,22 +176,26 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseMatch> {
         //@Nullable ListMultimap<Term, MatchConstraint> c){
 
 
-        final MatchTerm mm;
-
+        @Nullable ImmutableMap<Term, MatchConstraint> cc = initConstraints(constraints);
         if (task!=null && belief!=null) {
+
             //match both
-            mm = new MatchTerm.MatchTaskBeliefPair(pattern, initConstraints(constraints));
+            //code.add(new MatchTerm.MatchTaskBeliefPair(pattern, initConstraints(constraints)));
+
+            code.add(new MatchTerm.MatchOneSubterm(task, cc, 0, false));
+            code.add(new MatchTerm.MatchOneSubterm(belief, cc, 1, true));
+
         } else if (belief!=null) {
             //match belief only
-            mm = new MatchTerm.MatchOneSubterm(belief, initConstraints(constraints), 1);
+            code.add(new MatchTerm.MatchOneSubterm(belief, cc, 1, true));
         } else if (task!=null) {
             //match task only
-            mm = new MatchTerm.MatchOneSubterm(task, initConstraints(constraints), 0);
+            code.add(new MatchTerm.MatchOneSubterm(task, cc, 0, true));
         } else {
             throw new RuntimeException("invalid");
         }
 
-        code.add(mm);
+
 
 
     }

@@ -77,30 +77,29 @@ public class PremiseMatch extends FindSubst {
     }
 
     private void addTransform(@NotNull Class<? extends ImmediateTermTransform> c) {
-        Operator o = $.operator(c.getSimpleName());
         try {
-            transforms.put(o, c.newInstance());
+            transforms.put($.operator(c.getSimpleName()), c.newInstance());
         } catch (Exception e) {
             throw new RuntimeException(c + ": " + e);
         }
     }
 
-    @Override public ImmediateTermTransform getTransform(Operator t) {
+    @Override public final ImmediateTermTransform getTransform(Operator t) {
         return transforms.get(t);
     }
 
-
-    public final void matchAll(@NotNull Term x, @NotNull Term y, MatchTerm callback, ImmutableMap<Term, MatchConstraint> constraints) {
+    public final void matchAll(@NotNull Term x, @NotNull Term y, @Nullable MatchTerm callback, ImmutableMap<Term, MatchConstraint> constraints) {
         /** only one thread should be in here at a time */
-        //public final void match(@NotNull MatchTerm pattern /* callback */, ImmutableMap<Term, MatchConstraint> c) {
 
-        this.pattern.set(callback); //to notify of matches
+
         this.constraints = constraints;
-        matchAll(x, y, true);
+        boolean finished = callback != null;
+        if (finished)
+            this.pattern.set(callback); //to notify of matches
+        matchAll(x, y, finished);
         this.constraints = null;
-        //}
-    }
 
+    }
 
     @Override
     public void matchAll(@NotNull Term x, @NotNull Term y, boolean finish) {
