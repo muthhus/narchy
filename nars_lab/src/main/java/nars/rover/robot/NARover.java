@@ -331,7 +331,7 @@ public class NARover extends AbstractPolygonBot {
                         pBodyA.getPosition().x + dx, pBodyA.getPosition().y + dy);
 
                 //float tone= (idx/((float)numSegments));
-                //pBodyB.setUserData( ((RoboticMaterial)base.getUserData()).clone(tone) );
+                pBodyB.setUserData( ((RoboticMaterial)base.getUserData()).clone() );
 
                 segLength*=0.8f;
                 thick*=0.618f;

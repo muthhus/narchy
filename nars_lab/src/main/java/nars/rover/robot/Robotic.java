@@ -71,6 +71,10 @@ abstract public class Robotic {
             color = new Color3f(c.getRed()*256f, c.getGreen()*256f, c.getBlue()*256f);
         }
 
+        public RoboticMaterial clone() {
+            return new RoboticMaterial(robot);
+        }
+
         @Override
         public void before(Body b, JoglAbstractDraw d, float time) {
 //            color.set(color.x,
