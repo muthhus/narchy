@@ -497,11 +497,11 @@ public enum $  {
     }
 
     @Nullable
-    public static Term the(@NotNull Op op, @NotNull Collection<? extends Term> subterms) {
+    public static Term the(@NotNull Op op, @NotNull Collection<Term> subterms) {
         return the(op, -1, subterms);
     }
     @Nullable
-    public static Term the(@NotNull Op op, int relation, @NotNull Collection<? extends Term> subterms) {
+    public static Term the(@NotNull Op op, int relation, @NotNull Collection<Term> subterms) {
         return the(op, relation, TermContainer.the(op, subterms));
     }
 

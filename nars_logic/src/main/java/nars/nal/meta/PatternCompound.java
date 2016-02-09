@@ -40,11 +40,8 @@ abstract public class PatternCompound extends GenericCompound {
 
         @Override
         public boolean match(@NotNull Compound y, @NotNull FindSubst subst) {
-            return canMatch(y) && ((ellipsis == null) ?
-                    ((y.isCommutative()) ?
-                            subst.matchPermute(this, y) :
-                            subst.matchLinear(this, y)) :
-                    subst.matchCompoundWithEllipsis(this, y));
+            return canMatch(y) &&
+                    subst.matchCompoundWithEllipsis(this, y);
         }
 
         protected final boolean canMatch(@NotNull Compound y) {
@@ -55,12 +52,7 @@ abstract public class PatternCompound extends GenericCompound {
 
             Ellipsis e = this.ellipsis;
 
-            boolean eNull = (e == null);
-            //in ellipsis zero or more, the size and volume may be less if zero are matched
-            if (eNull && sizeCached != y.size())
-                return false;
-
-            if (eNull || (e instanceof EllipsisOneOrMore)) {
+            if (e instanceof EllipsisOneOrMore) {
 
                 //since ellipsisTransform instanceof EllipsisOneOrMore
                 if ((volCached > y.volume()) ||
