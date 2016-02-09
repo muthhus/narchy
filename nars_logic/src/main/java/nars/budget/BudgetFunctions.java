@@ -75,8 +75,9 @@ public final class BudgetFunctions extends UtilityFunctions {
         nBudget.andPriority(1.0f - difT);
         nBudget.andDurability(1.0f - difT);
 
-        float proportion = concTruth.conf()
-                / Math.max(nTruth.conf(), bTruth.conf());
+        float cc = concTruth.conf();
+        float proportion = cc
+                / (cc + Math.min(nTruth.conf(), bTruth.conf()));
 
 //		float dif = concTruth.conf()
 //				- Math.max(nTruth.conf(), bTruth.conf());
@@ -344,11 +345,14 @@ public final class BudgetFunctions extends UtilityFunctions {
         float priority = t.pri();
         float durability = t.dur() * complexityFactor;
         final float quality = qual * complexityFactor;
+        target.budget(priority, durability, qual);
 
         BLink<? extends Termed> termLink = nal.termLink;
         if (/*(termLink != null) && */(!termLink.isDeleted())) {
-            priority = or(priority, termLink.pri()); //originally was OR, but this can explode because the result of OR can exceed the inputs
-            durability = and(durability, termLink.dur()); //originaly was 'AND'
+            //priority = or(priority, termLink.pri()); //originally was OR, but this can explode because the result of OR can exceed the inputs
+            //durability = and(durability, termLink.dur()); //originaly was 'AND'
+
+            BudgetMerge.avgDQBlend.merge(target, termLink);
 
             NAR nar = nal.nar;
             final float targetActivation = nar.conceptPriority(termLink.get(), -1);
@@ -367,7 +371,7 @@ public final class BudgetFunctions extends UtilityFunctions {
             }
         }
 
-        return target.budget(priority, durability, quality);
+        return target; //target.budget(priority, durability, quality);
 
 
         /* ORIGINAL: https://code.google.com/p/open-nars/source/browse/trunk/nars_core_java/nars/inference/BudgetFunctions.java

@@ -20,7 +20,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
     /**
      * resolution of the output freq value
      */
-    static final float freqResolution = 0.05f;
+    float freqResolution = 0.05f;
 
     private final Term term;
     private final FloatFunction<Term> value;
@@ -83,6 +83,10 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
         this.prevF = f;
 
         //this.prevValue = next;
+    }
+
+    public void setFreqResolution(float freqResolution) {
+        this.freqResolution = freqResolution;
     }
 
     private Task input(float f) {

@@ -428,7 +428,7 @@ public abstract class AbstractTask extends UnitBudget
 
         if (getParentTask()!=null) {
             if (isDouble())
-                setEvidence( Stamp.toSetArray( Stamp.zip(getParentTask(), getParentBelief() )));
+                setEvidence( Stamp.zip(getParentTask(), getParentBelief() ));
             else if ( isSingle() )
                 setEvidence(getParentTask().evidence());
         } else {

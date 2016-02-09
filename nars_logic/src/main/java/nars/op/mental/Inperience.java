@@ -23,15 +23,15 @@ import java.util.Random;
 public class Inperience {
 
 
-    public static float MINIMUM_BUDGET_SUMMARY_TO_CREATE = 0.5f; //0.92
+    public static float MINIMUM_BUDGET_SUMMARY_TO_CREATE = 0.75f; //0.92
     public static float MINIMUM_BUDGET_SUMMARY_TO_CREATE_WONDER_EVALUATE = 0.92f;
 
     //internal experience has less durability?
-    public static final float INTERNAL_EXPERIENCE_PROBABILITY = 0.02f;
+    public static final float INTERNAL_EXPERIENCE_PROBABILITY = 0.005f;
 
     //less probable form
     public static final float INTERNAL_EXPERIENCE_RARE_PROBABILITY =
-            INTERNAL_EXPERIENCE_PROBABILITY / 4.0f;
+            INTERNAL_EXPERIENCE_PROBABILITY / 2.0f;
 
 
 //    //internal experience has less durability?

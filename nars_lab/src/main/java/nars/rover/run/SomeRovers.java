@@ -15,6 +15,7 @@ import nars.rover.Sim;
 import nars.rover.robot.NARover;
 import nars.rover.robot.Turret;
 import nars.rover.world.FoodSpawnWorld1;
+import nars.task.Task;
 import nars.term.index.MapIndex2;
 import nars.time.SimulatedClock;
 import nars.util.signal.NarQ;
@@ -94,13 +95,21 @@ public class SomeRovers {
 
     }
 	public static Default newNAR() {
-        int conceptsFirePerCycle = 4;
+        int conceptsFirePerCycle = 1;
         Default nar = new Default(
                 new Memory(clock, new MapIndex2(
                         new SoftValueHashMap())),
-                1000, conceptsFirePerCycle, 2, 3);
+                1000, conceptsFirePerCycle, 1, 2);
 
-        nar.logSummaryGT(System.out, 0.6f);
+        //nar.logSummaryGT(System.out, 0.6f);
+        nar.log(System.out, x -> {
+            if (x instanceof Task) {
+                Task t = (Task)x;
+                if (t.isInput()) return false;
+                return t.budget().summary() > 0f;
+            }
+            return false;
+        });
 
 //            nar.memory.DEFAULT_JUDGMENT_PRIORITY = 0.35f;
 //            nar.memory.DEFAULT_JUDGMENT_DURABILITY = 0.35f;
@@ -116,14 +125,14 @@ public class SomeRovers {
 
 
         //nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
-        nar.core.activationRate.setValue(0.05f);
+        nar.core.activationRate.setValue(0.8f);
         nar.premiser.confMin.setValue(0.05f);
 
-        nar.memory.duration.set(3);
-        nar.memory.conceptForgetDurations.setValue(2);
+        nar.memory.duration.set(2);
+        nar.memory.conceptForgetDurations.setValue(1);
         nar.memory.termLinkForgetDurations.setValue(4);
         nar.memory.taskLinkForgetDurations.setValue(6);
-        nar.memory.cyclesPerFrame.set(8);
+        nar.memory.cyclesPerFrame.set(32);
         nar.memory.shortTermMemoryHistory.set(3);
         nar.memory.executionThreshold.setValue(0.0f);
 

@@ -29,69 +29,80 @@ import java.util.Arrays;
 
 public interface Stamp {
 
+    @NotNull static long[] zip(@NotNull long[] a, @NotNull long[] b) {
+        return zip(a, b, Global.MAXIMUM_EVIDENTAL_BASE_LENGTH);
+    }
     /***
      * zips two evidentialBase arrays into a new one
+     * assumes a and b are already sorted in increasing order
+     * the later-created task should be in 'b'
      */
     @NotNull
-    static long[] zip(@NotNull long[] a, @NotNull long[] b) {
+    static long[] zip(@NotNull long[] a, @NotNull long[] b, int maxLen) {
 
-        int baseLength = Math.min(a.length + b.length, Global.MAXIMUM_EVIDENTAL_BASE_LENGTH);
-
+        int aLen = a.length;
+        int bLen = b.length;
+        int baseLength = Math.min(aLen + bLen, maxLen);
         long[] c = new long[baseLength];
 
-        int firstLength = a.length;
-        int secondLength = b.length;
+        //if it's an even-number of items, we want the (n-1)th's array element to come from 'b'
+        boolean parity = ((baseLength-1)%2==0) ? false : true;
 
-        int i2 = 0, j = 0;
-        //https://code.google.com/p/open-nars/source/browse/trunk/nars_core_java/nars/entity/Stamp.java#143
-        while (i2 < secondLength && j < baseLength) {
-            c[j++] = b[i2++];
+        int ib = bLen-1, ia = aLen-1;
+        for (int i = baseLength-1; i >= 0; ) {
+            boolean ha = ia >= 0;
+            boolean hb = ib >= 0;
+            boolean na;
+            if (ha && hb)
+                na = (i % 2 == 0) ? parity : !parity; //both, choose according to the parity decision
+            else
+                na = (ha ? true : false); //one of them is empty, choose which is not
+
+            c[i--] = (na) ? a[ia--] : b[ib--];
         }
-        int i1 = 0;
-        while (i1 < firstLength && j < baseLength) {
-            c[j++] = a[i1++];
-        }
+
+        Arrays.sort(c);
         return c;
     }
 
-    @NotNull
-    static long[] toSetArray(@NotNull long[] x) {
-        int l = x.length;
-
-        if (l < 2)
-            return x;
-
-        //1. copy evidentialBase and sort it
-        long[] sorted = Arrays.copyOf(x, l);
-        Arrays.sort(sorted);
-
-        //2. count unique elements
-        long lastValue = -1;
-        int uniques = 0; //# of unique items
-        int sLen = sorted.length;
-
-        for (long v : sorted) {
-            if (lastValue != v)
-                uniques++;
-            lastValue = v;
-        }
-
-        if (uniques == sLen) {
-            //if no duplicates, just return it
-            return sorted;
-        }
-
-        //3. de-duplicate
-        long[] deduplicated = new long[uniques];
-        int uniques2 = 0;
-        long lastValue2 = -1;
-        for (long v : sorted) {
-            if (lastValue2 != v)
-                deduplicated[uniques2++] = v;
-            lastValue2 = v;
-        }
-        return deduplicated;
-    }
+//    @NotNull
+//    static long[] toSetArray(@NotNull long[] x) {
+//        int l = x.length;
+//
+//        if (l < 2)
+//            return x;
+//
+//        //1. copy evidentialBase and sort it
+//        long[] sorted = Arrays.copyOf(x, l);
+//        Arrays.sort(sorted);
+//
+//        //2. count unique elements
+//        long lastValue = -1;
+//        int uniques = 0; //# of unique items
+//        int sLen = sorted.length;
+//
+//        for (long v : sorted) {
+//            if (lastValue != v)
+//                uniques++;
+//            lastValue = v;
+//        }
+//
+//        if (uniques == sLen) {
+//            //if no duplicates, just return it
+//            return sorted;
+//        }
+//
+//        //3. de-duplicate
+//        long[] deduplicated = new long[uniques];
+//        int uniques2 = 0;
+//        long lastValue2 = -1;
+//        for (long v : sorted) {
+//            if (lastValue2 != v)
+//                deduplicated[uniques2++] = v;
+//            lastValue2 = v;
+//        }
+//        return deduplicated;
+//    }
 
     static boolean overlapping(@NotNull Stamp a, @Nullable Stamp b) {
 
@@ -150,13 +161,13 @@ public interface Stamp {
     //Stamp setEvidence(long... evidentialSet);
 
     @NotNull
-    static long[] zip(@NotNull Task parentTask, @NotNull Task parentBelief) {
+    static long[] zip(@NotNull Task a, @NotNull Task b) {
 
-        long[] as = parentTask.evidence();
-        long[] bs = parentBelief.evidence();
+        long[] pa = a.evidence();
+        long[] pb = b.evidence();
 
-        return parentTask.creation() > parentBelief.creation() ?
-                Stamp.zip(bs, as) :
-                Stamp.zip(as, bs);
+        return a.creation() > b.creation() ?
+                Stamp.zip(pb, pa) :
+                Stamp.zip(pa, pb);
     }
 }

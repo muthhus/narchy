@@ -60,6 +60,9 @@ public interface BudgetMerge {
     /** merge 'incoming' budget (scaled by incomingScale) into 'existing' */
     void merge(Budget existing, Budget incoming, float incomingScale);
 
+    default void merge(Budget existing, Budget incoming) {
+        merge(existing, incoming, 1f);
+    }
 
     BudgetMerge plusDQDominant = (tgt, src, srcScale) -> {
         float nextPriority = src.pri() * srcScale;

@@ -6,7 +6,7 @@ package nars.rover.robot;
 
 import com.gs.collections.api.block.function.primitive.FloatFunction;
 import com.gs.collections.api.block.function.primitive.FloatToFloatFunction;
-import nars.Global;
+import nars.$;
 import nars.NAR;
 import nars.Symbols;
 import nars.java.MethodOperator;
@@ -25,16 +25,14 @@ import nars.truth.Truth;
 import nars.util.data.Util;
 import nars.util.signal.NarQ;
 import nars.util.signal.Sensor;
-import org.jbox2d.callbacks.DebugDraw;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
-import org.jbox2d.dynamics.World;
 import org.jbox2d.dynamics.joints.RevoluteJoint;
 import org.jbox2d.dynamics.joints.RevoluteJointDef;
 
-import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.DoubleSupplier;
 
 import static nars.util.Texts.n2;
 
@@ -567,7 +565,7 @@ public class NARover extends AbstractPolygonBot {
         for (int i = 0; i < pixels; i++) {
             final float angle = aStep * (i - pixels/2f) + centerAngle;
 
-            VisionRay v = new NARVisionRay(id + i, nar, base, center, angle, aStep,
+            NARVisionRay v = new NARVisionRay(id + i, nar, base, center, angle, aStep,
                     detail, distance, 1f/pixels) {
 
 //                  @Override public float getLocalAngle () {
@@ -582,15 +580,30 @@ public class NARover extends AbstractPolygonBot {
                 }
             };
 
+
             each.accept(v);
 
             for (String material : new String[]{"food", "poison"}) {
-                controller.input.add(() -> {
+
+
+
+
+
+                DoubleSupplier value = () -> {
                     if (v.hit(material)) {
                         return 1f - v.distToHit(); //closer = larger number (up to 1.0)
                     }
                     return 0; //nothing seen within the range
-                });
+                };
+
+                Sensor visionSensor = new Sensor(nar, $.prop(v.visionTerm, $.the(material)),
+                        (t) -> (float) value.getAsDouble(), (x) ->
+                        x == 0 ? 0 :
+                            (0.5f + 0.5f * x)
+                );
+                visionSensor.setFreqResolution(0.1f);
+
+                controller.input.add(value);
             }
 
             draw.addLayer(v);

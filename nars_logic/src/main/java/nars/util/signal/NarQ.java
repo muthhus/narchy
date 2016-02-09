@@ -210,7 +210,7 @@ public class NarQ implements Consumer<NAR> {
 
         if (q == null || q.inputs() != inputs || q.actions() != outputs) {
             //TODO allow substituting an arbitrary I/O agent interface
-            q = new HaiQImpl(inputs, inputs*2, outputs);
+            q = new HaiQImpl(inputs, inputs*4, outputs);
         }
 
         return true;

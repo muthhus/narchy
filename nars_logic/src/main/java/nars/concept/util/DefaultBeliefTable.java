@@ -296,7 +296,7 @@ public class DefaultBeliefTable implements BeliefTable {
 //            }
 
             int totalEvidence = 0; //newBelief.evidence().length + x.evidence().length;
-            float minValidConf = Math.max(newBelief.conf(), x.conf());
+            float minValidConf = Math.min(newBelief.conf(), x.conf());
             if (minValidConf < bestConf) continue;
             float minValidRank = BeliefTable.rankEternalByOriginality(minValidConf, totalEvidence);
             if (minValidRank < bestRank) continue;

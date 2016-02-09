@@ -5,10 +5,6 @@ import nars.NAR;
 import nars.bag.BLink;
 import nars.concept.Concept;
 import nars.nar.Default;
-import nars.op.in.ChangedTextInput;
-import nars.rover.Sim;
-import nars.task.MutableTask;
-import nars.term.Termed;
 import nars.term.atom.Atom;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.Vec2;
@@ -25,7 +21,7 @@ public class NARVisionRay extends VisionRay {
 
     //private final String seenAngleTerm;
 
-    public final Atom angleTerm;
+    public final Atom visionTerm;
 
     public BLink<Concept> angleConcept;
     float pri;
@@ -34,16 +30,14 @@ public class NARVisionRay extends VisionRay {
     float conceptDurability;
     float conceptQuality;
 
-    final ChangedTextInput sight;
 
     public NARVisionRay(String id, NAR nar, Body base, Vec2 point, float angle, float arc, int resolution, float length, float pri) {
         super(point, angle, arc, base, length, resolution);
 
-        this.sight = new ChangedTextInput(nar);
 
         this.nar = nar;
         this.pri = pri;
-        this.angleTerm = $.the(id);
+        this.visionTerm = $.the(id);
         //this.seenAngleTerm = //"see_" + sim.angleTerm(angle);
     }
 
@@ -69,7 +63,7 @@ public class NARVisionRay extends VisionRay {
     public void step(boolean feel, boolean drawing) {
 
         if (angleConcept == null)
-            angleConcept = ((Default)nar).core.active.get(nar.concept(angleTerm));
+            angleConcept = ((Default)nar).core.active.get(nar.concept(visionTerm));
 
         if (angleConcept != null) {
             conceptPriority = 0.5f + 0.5f * angleConcept.pri();
@@ -132,16 +126,6 @@ public class NARVisionRay extends VisionRay {
 //                    throw new RuntimeException("atom name too long");
 
         //  }
-        Termed tt =
-            //$.inh($.p(angleTerm, $.the(Sim.f5(dist))), $.the(material));
-            $.prop(angleTerm, $.the(material(hitNext)));
-
-        float freq = 1f; //0.5f + 0.5f / (1+ hitDist);
-
-        nar.input(
-                new MutableTask(tt).belief().present(nar.memory).
-                        truth(freq, conf).budget(pri, 0.5f));
-        //}
 
 
     }
