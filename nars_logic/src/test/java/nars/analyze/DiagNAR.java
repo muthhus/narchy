@@ -197,7 +197,7 @@ public class DiagNAR extends Default {
 
     public static void main(String[] args) throws Exception {
         Global.DEBUG = true;
-        NAR d = new DiagNAR(768,3, 2, 4);
+        NAR d = new DiagNAR(768,2, 2, 4);
         //NAR d = new Default(768, 3, 2, 4);
 //        d.input("(a-->(b&&c)).");
 //        d.input("(c-->d).");
@@ -227,7 +227,7 @@ public class DiagNAR extends Default {
                 "((believe($x) && want($x)) ==> grateful($x))."
         );
 
-        d.run(10);
+        d.run(64);
 
     }
 }

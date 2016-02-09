@@ -52,7 +52,8 @@ public class SomeRovers {
 
 	public static void main(String[] args) {
 
-        Global.DEBUG = Global.EXIT_ON_EXCEPTION = true;
+        Global.DEBUG = false;
+        Global.EXIT_ON_EXCEPTION = true;
 
         //RoverWorld world = new ReactorWorld(32, 48, 32);
         RoverWorld world = new FoodSpawnWorld1(64, 48, 48, 0.5f);
@@ -95,13 +96,13 @@ public class SomeRovers {
 
     }
 	public static Default newNAR() {
-        int conceptsFirePerCycle = 6;
+        int conceptsFirePerCycle = 3;
         Default nar = new Default(
                 new Memory(clock, new MapIndex2(
                         new SoftValueHashMap())),
                 1000, conceptsFirePerCycle, 2, 3);
 
-        //nar.logSummaryGT(System.out, 0.6f);
+        //nar.logSummaryGT(System.out, 0.2f);
 //        nar.log(System.out, x -> {
 //            if (x instanceof Task) {
 //                Task t = (Task)x;
@@ -125,13 +126,13 @@ public class SomeRovers {
 
 
         //nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
-        nar.core.activationRate.setValue(0.75f);
-        nar.premiser.confMin.setValue(0.05f);
+        nar.core.activationRate.setValue(0.15f);
+        nar.premiser.confMin.setValue(0.02f);
 
         nar.memory.duration.set(2);
         nar.memory.conceptForgetDurations.setValue(1);
-        nar.memory.termLinkForgetDurations.setValue(4);
-        nar.memory.taskLinkForgetDurations.setValue(6);
+        nar.memory.termLinkForgetDurations.setValue(2);
+        nar.memory.taskLinkForgetDurations.setValue(3);
         nar.memory.cyclesPerFrame.set(4);
         nar.memory.shortTermMemoryHistory.set(3);
         nar.memory.executionThreshold.setValue(0.0f);
