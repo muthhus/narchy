@@ -227,7 +227,7 @@ public class DiagNAR extends Default {
                 "((believe($x) && want($x)) ==> grateful($x))."
         );
 
-        d.run(64);
+        d.run(16);
 
     }
 }

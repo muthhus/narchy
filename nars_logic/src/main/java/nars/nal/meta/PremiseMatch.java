@@ -88,15 +88,17 @@ public class PremiseMatch extends FindSubst {
         return transforms.get(t);
     }
 
+    /** only one thread should be in here at a time */
     public final void matchAll(@NotNull Term x, @NotNull Term y, @Nullable MatchTerm callback, ImmutableMap<Term, MatchConstraint> constraints) {
-        /** only one thread should be in here at a time */
 
         int t = now();
-        this.constraints.set( constraints );
+
         boolean finished = callback != null;
 
         if (finished)
             this.pattern.set(callback); //to notify of matches
+
+        this.constraints.set( constraints );
 
         matchAll(x, y, finished);
 

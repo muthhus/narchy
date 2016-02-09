@@ -2,6 +2,7 @@ package nars.term.transform.subst;
 
 import com.gs.collections.api.map.ImmutableMap;
 import com.gs.collections.api.set.MutableSet;
+import com.gs.collections.impl.list.mutable.FastList;
 import nars.Global;
 import nars.Memory;
 import nars.NAR;
@@ -22,6 +23,7 @@ import nars.term.transform.subst.choice.CommutivePermutations;
 import nars.term.transform.subst.choice.Termutator;
 import nars.term.variable.CommonVariable;
 import nars.term.variable.Variable;
+import nars.util.data.list.FasterList;
 import nars.util.version.VersionMap;
 import nars.util.version.Versioned;
 import nars.util.version.Versioning;
@@ -52,8 +54,7 @@ public abstract class FindSubst extends Versioning implements Subst {
     /**
      * variables whose contents are disallowed to equal each other
      */
-    @Nullable
-    public Versioned<ImmutableMap<Term, MatchConstraint>> constraints = null;
+    public final Versioned<ImmutableMap<Term, MatchConstraint>> constraints;
 
     //public abstract Term resolve(Term t, Substitution s);
 
@@ -125,7 +126,7 @@ public abstract class FindSubst extends Versioning implements Subst {
         yx = new VarCachedVersionMap(this);
         term = new Versioned(this);
         parent = new Versioned(this);
-        constraints = new Versioned(this);
+        constraints = new Versioned(this, new int[2], new FasterList(0, new ImmutableMap[2]));
         //branchPower = new Versioned(this);
 
 
@@ -856,9 +857,9 @@ public abstract class FindSubst extends Versioning implements Subst {
         Versioned<ImmutableMap<Term, MatchConstraint>> cc = this.constraints;
         int s = cc.size() - 1;
         if (s < 0) return true;
-        Object[] ccc = cc.value.array();
+        ImmutableMap<Term, MatchConstraint>[] ccc = cc.value.array();
         for ( ; s >=0; s--) {
-            MatchConstraint c = ((ImmutableMap<Term, MatchConstraint>)ccc[s]).get(x);
+            MatchConstraint c = ccc[s].get(x);
             if ((c != null) && c.invalid(x, y, this))
                 return false;
         }

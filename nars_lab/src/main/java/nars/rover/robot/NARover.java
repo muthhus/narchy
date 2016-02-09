@@ -23,6 +23,7 @@ import nars.term.Termed;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import nars.util.data.Util;
+import nars.util.data.list.FasterList;
 import nars.util.signal.NarQ;
 import nars.util.signal.Sensor;
 import org.jbox2d.common.Color3f;
@@ -285,78 +286,104 @@ public class NARover extends AbstractPolygonBot {
         return torso;
     }
 
-    /** http://stackoverflow.com/questions/20904171/how-to-create-snake-like-body-in-box2d-and-cocos2dx */
-    public void addArm(String id, NarQ controller, float ax, float ay, float a) {
+    public static class Arm {
 
-        Body base = torso;
+        final FasterList<Body> segments = new FasterList();
+        final FasterList<RevoluteJoint> joints = new FasterList();
+
+        public Arm(Sim sim, Body base, float ax, float ay, float a) {
+
+            Vec2 attachPoint = new Vec2(ax, ay);
+
+            float vx = 1; //(float)Math.cos(a);
+            float vy = 0; ///(float)Math.sin(a);
+
+            // NOW, create several duplicates of the "Main Body" fixture
+            // but offset them from the previous one by a fixed amount and
+            // overlap them a bit.
+            int numSegments = 3;
+
+            Body pBodyA = base;
+            Body pBodyB = null;
+            float segLength = 2.7f,
+                    thick = 0.5f;
+
+            //List<Body> _segments = Global.newArrayList();
+
+            float angRange = 0.35f;
+
+            // Add some "regular segments".
+            for(int idx = 0; idx < numSegments; idx++)
+            {
+                // Create a body for the next segment.
+
+                float dx, dy;
+                if (pBodyA == base) {
+                    dx = segLength * vx;
+                    dy = thick * vy;
+                } else {
+                    dx = segLength;
+                    dy = 0;
+                }
+
+                pBodyB = newRect(sim.getWorld(), 0.2f,
+                        segLength, thick,
+                        pBodyA.getPosition().x + dx, pBodyA.getPosition().y + dy);
+
+                //float tone= (idx/((float)numSegments));
+                //pBodyB.setUserData( ((RoboticMaterial)base.getUserData()).clone(tone) );
+
+                segLength*=0.8f;
+                thick*=0.618f;
+
+                //pBodyB. position = pBodyA.getPosition().add( offset );
+                //_segments.add(pBodyB);
+                // Add some damping so body parts don't 'flop' around.
+                pBodyB.setLinearDamping(0.1f);
+                pBodyB.setAngularDamping(0.3f);
+
+                if (pBodyA == base)
+                    pBodyB.getPosition().addLocal(attachPoint);
+
+                // Create a Revolute Joint at a position half way
+                // between the two bodies.
+                Vec2 midpoint = pBodyA.getPosition().add(pBodyB.getPosition()).mul(0.5f);
 
 
-        Vec2 attachPoint = new Vec2(ax, ay);
+                RevoluteJointDef revJointDef = new RevoluteJointDef();
+                revJointDef.initialize(pBodyA, pBodyB, midpoint);
+                revJointDef.collideConnected = false;
+                revJointDef.enableLimit = true;
+                revJointDef.enableMotor = true;
+                revJointDef.upperAngle = +angRange+(pBodyA == base  ? a : 0);
+                revJointDef.lowerAngle = -angRange+(pBodyA == base  ? a : 0);
 
-        float vx = 1; //(float)Math.cos(a);
-        float vy = 0; ///(float)Math.sin(a);
+                RevoluteJoint jj = (RevoluteJoint) sim.getWorld().createJoint(revJointDef);
+                joints.add(jj);
 
-        // NOW, create several duplicates of the "Main Body" fixture
-        // but offset them from the previous one by a fixed amount and
-        // overlap them a bit.
-        int numSegments = 3;
+                segments.add(pBodyB);
 
-        Body pBodyA = base;
-        Body pBodyB = null;
-        float segLength = 2.7f,
-              thick = 0.5f;
+                // Update so the next time through the loop, we are
+                // connecting the next body to the one we just
+                // created.
+                pBodyA = pBodyB;
 
-        //List<Body> _segments = Global.newArrayList();
 
-        float angRange = 0.35f;
-
-        // Add some "regular segments".
-        for(int idx = 0; idx < numSegments; idx++)
-        {
-            // Create a body for the next segment.
-
-            float dx, dy;
-            if (pBodyA == torso) {
-                dx = segLength * vx;
-                dy = thick * vy;
-            } else {
-                dx = segLength;
-                dy = 0;
             }
 
-            pBodyB = newRect(getWorld(), 0.2f,
-                    segLength, thick,
-                    pBodyA.getPosition().x + dx, pBodyA.getPosition().y + dy);
 
-            float tone= (idx/((float)numSegments));
-            pBodyB.setUserData( ((NARRoverMaterial)base.getUserData()).clone(tone) );
+        }
+    }
 
-            segLength*=0.8f;
-            thick*=0.618f;
+    /** http://stackoverflow.com/questions/20904171/how-to-create-snake-like-body-in-box2d-and-cocos2dx */
+    public void addArm(String id, NarQ controller, float ax, float ay, float angle) {
 
-            //pBodyB. position = pBodyA.getPosition().add( offset );
-            //_segments.add(pBodyB);
-            // Add some damping so body parts don't 'flop' around.
-            pBodyB.setLinearDamping(0.1f);
-            pBodyB.setAngularDamping(0.3f);
+        Arm a = new Arm(sim, torso, ax, ay, angle);
 
-            if (pBodyA == torso)
-                pBodyB.getPosition().addLocal(attachPoint);
+        addEye(id + "e", controller, a.segments.getLast(), 5, new Vec2(0.5f, 0), 0.2f, (float)(+Math.PI/4f), 2.5f);
 
-            // Create a Revolute Joint at a position half way
-            // between the two bodies.
-            Vec2 midpoint = pBodyA.getPosition().add(pBodyB.getPosition()).mul(0.5f);
+        a.joints.forEach((Consumer<RevoluteJoint>) jj -> {
 
-
-            RevoluteJointDef revJointDef = new RevoluteJointDef();
-            revJointDef.initialize(pBodyA, pBodyB, midpoint);
-            revJointDef.collideConnected = false;
-            revJointDef.enableLimit = true;
-            revJointDef.enableMotor = true;
-            revJointDef.upperAngle = +angRange+(pBodyA == torso  ? a : 0);
-            revJointDef.lowerAngle = -angRange+(pBodyA == torso  ? a : 0);
-
-            RevoluteJoint jj = (RevoluteJoint) sim.getWorld().createJoint(revJointDef);
             for (float speed : new float[] { +1 , -1 }){
                 controller.outs.add(new NarQ.Action() {
 
@@ -373,154 +400,7 @@ public class NARover extends AbstractPolygonBot {
                 });
             }
 
-
-            // Update so the next time through the loop, we are
-            // connecting the next body to the one we just
-            // created.
-            pBodyA = pBodyB;
-
-
-        }
-
-        addEye(id + "e", controller, pBodyB, 5, new Vec2(0.5f, 0), 0.2f, (float)(+Math.PI/4f), 2.5f);
-
-//        // Make the next bunch of segments get "smaller" each time
-//        // to make a tail.
-//        for(int idx = 0; idx < SNAKE_SEGMENTS; idx++)
-//        {
-//            // Create a body for the next segment.
-//            BodyDef bodyDef = new BodyDef();
-//            bodyDef.type = BodyType.DYNAMIC;
-//            bodyDef.position = pBodyA.getPosition().add( offset );
-//            pBodyB = world.createBody(bodyDef);
-//            _segments.add(pBodyB);
-//            // Add some damping so body parts don't 'flop' around.
-//            pBodyB.setLinearDamping(0.25f);
-//            pBodyB.setAngularDamping(0.25f);
-//
-//            List<Vec2> vertices = Global.newArrayList();
-//            vertices.add(new Vec2(-4f*VERT_SCALE,2f*VERT_SCALE));
-//            vertices.add(new Vec2(-4f*VERT_SCALE,-2f*VERT_SCALE));
-//            vertices.add(new Vec2(4f*VERT_SCALE,-2f*VERT_SCALE));
-//            vertices.add(new Vec2(4f*VERT_SCALE,2f*VERT_SCALE));
-//
-//
-//            // Offset the vertices for the fixture.
-//            for(int vidx = 0; vidx < vertices.size(); vidx++)
-//            {
-//                Vec2 vv = vertices.get(vidx);
-//                vv.addLocal(offset);
-//                vv.y = vv.y * 0.75f;
-//            }
-//            // and create the fixture.
-//
-//            {
-//                FixtureDef fixtureDef = new FixtureDef();
-//                fixtureDef.shape = polyShape = new PolygonShape();
-//                polyShape.set(vertices.toArray(new Vec2[vertices.size()]), vertices.size());
-//                fixtureDef.density = 1.0f;
-//                fixtureDef.friction = 1.0f;
-//                fixtureDef.isSensor = false;
-//                pBodyB.createFixture(fixtureDef);
-//            }
-//
-//            // Create a Revolute Joint at a position half way
-//            // between the two bodies.
-//            Vec2 midpoint = pBodyA.getPosition().add( pBodyB.getPosition());
-//
-//            RevoluteJointDef revJointDef = new RevoluteJointDef();
-//            revJointDef.collideConnected = false;
-//            revJointDef.initialize(pBodyA, pBodyB, midpoint);
-//            sim.getWorld().createJoint(revJointDef);
-//
-//            // Update so the next time through the loop, we are
-//            // connecting the next body to the one we just
-//            // created.
-//            pBodyA = pBodyB;
-//        }
-        // Give the tail some real "drag" so that it pulls the
-        // body straight when it can.
-
-
-        // Setup Parameters
-        //setMaxAngularAcceleration(4*M_PI);
-
-        // As long as this is high, they forces will be strong
-        // enough to get the body close to the target position
-        // very quickly so the entity does not "circle" the
-        // point.
-        //SetMaxLinearAcceleration(100);
-        //SetMaxSpeed(10);
-        //SetMinSeekDistance(1.0);
-
-
-//            new RevoluteJointByIndexVote(brain, j, -servoRange, servoRange, servoSteps);
-//
-//            new QuantizedScalarInput(brain, 4) {
-//                @Override
-//                public float getValue() {
-//                    return j.getJointAngle() / (float) (Math.PI * 2.0f);
-//                }
-//            };
-//            new QuantizedScalarInput(brain, velocityLevels) {
-//                @Override
-//                public float getValue() {
-//                    final float zl = b.getLinearVelocity().len2();
-//                    if (zl == 0) return 0;
-//                    float xx = b.getLinearVelocity().x;
-//                    xx *= xx;
-//                    return xx / zl;
-//                }
-//            };
-//            new QuantizedScalarInput(brain, velocityLevels) {
-//                @Override
-//                public float getValue() {
-//                    final float zl = b.getLinearVelocity().len2();
-//                    if (zl == 0) return 0;
-//                    float yy = b.getLinearVelocity().y;
-//                    yy *= yy;
-//                    return yy / zl;
-//                }
-//            };
-//
-//            new QuantizedScalarInput(brain, orientationSteps) {
-//                @Override
-//                public float getValue() {
-//                    return b.getAngle() / (float) (2.0 * Math.PI);
-//                }
-//            };
-//            new QuantizedScalarInput(brain, velocityLevels) {
-//                @Override
-//                public float getValue() {
-//                    return b.getAngularVelocity() / (float) (2.0 * Math.PI);
-//                }
-//            };
-
-            //DEPRECATED
-            //brain.addInput(new RevoluteJointAngle(j));
-            //brain.addInput(new VelocityAxis(b, true));
-            //brain.addInput(new VelocityAxis(b, false));
-            //Orientation.newVector(brain, b, orientationSteps);
-            //brain.addInput(new VelocityAngular(b));
-
-//            brain.addOutput(new ColorBodyTowards(b, color, 0.95f));
-//            brain.addOutput(new ColorBodyTowards(b, new Color(color.r * 0.5f, color.g * 0.5f, color.b * 0.5f, color.a * 0.25f), 0.95f));
-
-//            int n = numRetinasPerSegment;
-//            for (float z = 0; z < n; z++) {
-//
-//                float a = z * (float) (Math.PI * 2.0 / ((float) n));
-//                retinas.add(new Retina(brain, b, new Vector2(0, 0), a, (float) initialVisionDistance, retinaLevels));
-//            }
-            //TODO Retina.newVector(...)
-
-            //y -= al*0.9f;
-            //dr += al * 0.9f;
-
-            //prev = arm[i];
-
-
-
+        });
     }
 
 //    public void addEye() {
