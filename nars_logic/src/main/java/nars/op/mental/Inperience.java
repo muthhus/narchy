@@ -27,7 +27,7 @@ public class Inperience {
     public static float MINIMUM_BUDGET_SUMMARY_TO_CREATE_WONDER_EVALUATE = 0.92f;
 
     //internal experience has less durability?
-    public static final float INTERNAL_EXPERIENCE_PROBABILITY = 0.005f;
+    public static final float INTERNAL_EXPERIENCE_PROBABILITY = 0.02f;
 
     //less probable form
     public static final float INTERNAL_EXPERIENCE_RARE_PROBABILITY =
@@ -57,21 +57,21 @@ public class Inperience {
 //        enableWantBelieve =val;
 //    }
 
-    public static double getMinCreationBudgetSummary() {
-        return MINIMUM_BUDGET_SUMMARY_TO_CREATE;
-    }
-
-    public static void setMinCreationBudgetSummary(double val) {
-        MINIMUM_BUDGET_SUMMARY_TO_CREATE = (float) val;
-    }
-
-    public static double getMinCreationBudgetSummaryWonderEvaluate() {
-        return MINIMUM_BUDGET_SUMMARY_TO_CREATE_WONDER_EVALUATE;
-    }
-
-    public static void setMinCreationBudgetSummaryWonderEvaluate(double val) {
-        MINIMUM_BUDGET_SUMMARY_TO_CREATE_WONDER_EVALUATE = (float) val;
-    }
+//    public static double getMinCreationBudgetSummary() {
+//        return MINIMUM_BUDGET_SUMMARY_TO_CREATE;
+//    }
+//
+//    public static void setMinCreationBudgetSummary(double val) {
+//        MINIMUM_BUDGET_SUMMARY_TO_CREATE = (float) val;
+//    }
+//
+//    public static double getMinCreationBudgetSummaryWonderEvaluate() {
+//        return MINIMUM_BUDGET_SUMMARY_TO_CREATE_WONDER_EVALUATE;
+//    }
+//
+//    public static void setMinCreationBudgetSummaryWonderEvaluate(double val) {
+//        MINIMUM_BUDGET_SUMMARY_TO_CREATE_WONDER_EVALUATE = (float) val;
+//    }
 
 
     public static final Operator believe = $.operator("believe");
@@ -100,7 +100,7 @@ public class Inperience {
 
         this.nar = n;
 
-        n.memory.eventTaskProcess.on(tp -> experienceFromTaskInternal(tp.task()));
+        n.memory.eventTaskProcess.on(this::experienceFromTaskInternal);
 
         n.memory.eventConceptProcess.on(p -> {
             Task belief = p.belief();
@@ -269,7 +269,7 @@ public class Inperience {
         //the operators which dont have a innate belief
         //also get a chance to reveal its effects to the system this way
 
-        Compound c = $.exec(op, belief.term());
+        Compound c = $.exec(op, $.p( belief.term() ) );
         if (c!=null)
             beliefReasonDerive(task, belief, c, 0);
     }

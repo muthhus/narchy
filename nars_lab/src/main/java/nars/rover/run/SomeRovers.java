@@ -9,6 +9,7 @@ import nars.Symbols;
 import nars.guifx.NARfx;
 import nars.nar.Default;
 import nars.op.mental.Anticipate;
+import nars.op.mental.Inperience;
 import nars.rover.RoverWorld;
 import nars.rover.Sim;
 import nars.rover.robot.NARover;
@@ -99,7 +100,7 @@ public class SomeRovers {
                         new SoftValueHashMap())),
                 1000, conceptsFirePerCycle, 2, 3);
 
-        //nar.logSummaryGT(System.out, 0.4f);
+        nar.logSummaryGT(System.out, 0.6f);
 
 //            nar.memory.DEFAULT_JUDGMENT_PRIORITY = 0.35f;
 //            nar.memory.DEFAULT_JUDGMENT_DURABILITY = 0.35f;
@@ -109,18 +110,20 @@ public class SomeRovers {
 //            nar.memory.DEFAULT_QUESTION_DURABILITY = 0.6f;
         //nar.initNAL9();
         nar.memory.the(new Anticipate(nar));
+        nar.memory.the(new Inperience(nar));
         //nar.memory.perfection.setValue(0.15f);
         //nar.core.confidenceDerivationMin.setValue(0.01f);
 
 
         //nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
         nar.core.activationRate.setValue(0.05f);
+        nar.premiser.confMin.setValue(0.05f);
 
         nar.memory.duration.set(3);
         nar.memory.conceptForgetDurations.setValue(2);
         nar.memory.termLinkForgetDurations.setValue(4);
         nar.memory.taskLinkForgetDurations.setValue(6);
-        nar.memory.cyclesPerFrame.set(32);
+        nar.memory.cyclesPerFrame.set(8);
         nar.memory.shortTermMemoryHistory.set(3);
         nar.memory.executionThreshold.setValue(0.0f);
 

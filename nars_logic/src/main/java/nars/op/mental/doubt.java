@@ -17,8 +17,20 @@
 
 package nars.op.mental;
 
+import com.google.common.collect.Lists;
+import nars.NAR;
+import nars.Symbols;
+import nars.budget.Budget;
+import nars.concept.Concept;
+import nars.concept.DefaultConcept;
+import nars.concept.util.BeliefTable;
+import nars.concept.util.TaskTable;
 import nars.nal.nal8.Execution;
 import nars.nal.nal8.operator.SyncOperator;
+import nars.task.Task;
+import nars.term.Term;
+
+import java.util.List;
 
 /**
  * Operator that activates a concept
@@ -32,17 +44,42 @@ public class doubt extends SyncOperator {
      */
     @Override
     public void execute(Execution execution) {
-        //TODO upgrade code below to new api
 
-        System.err.println("^doubt unimpl");
-//        Term term = operation.getTerm().arg();
-//        Budget b = operation.getBudget();
-//
-//        nar.beforeNextFrame(() -> {
-//            Concept concept = nar.conceptualize(term, b);
-//            concept.discountBeliefConfidence();
-//        });
-//        return null;
+        execution.nar.runLater(()->{
+            Task operation = execution.task;
+            Term term = execution.argArray()[0];
+            Budget b = operation.budget();
+
+            Concept concept = execution.nar.conceptualize(term, b, 1f);
+            if (concept!=null) {
+                discountBeliefConfidence(concept, operation.punc(),
+                        //TODO use min/max parameters somehow
+                        0.5f + (1f - operation.motivation()),
+                        execution.nar);
+            }
+
+        });
+
+    }
+
+    public static void discountBeliefConfidence(Concept concept, char punc, float confMultiplied /* < 1.0 */, NAR nar) {
+        BeliefTable table;
+        switch (punc) {
+            case Symbols.BELIEF:
+                table = concept.beliefs(); break;
+            case Symbols.GOAL:
+                table = concept.goals(); break;
+            default:
+                return;
+        }
+
+        List<Task> tt = Lists.newArrayList(table);
+        table.clear();
+        tt.forEach(t-> {
+            t.setTruth(t.truth().withConfMult(confMultiplied));
+            table.add(t, nar);
+        });
+
     }
 
 }
