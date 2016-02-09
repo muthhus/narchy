@@ -95,27 +95,27 @@ public class SomeRovers {
 
     }
 	public static Default newNAR() {
-        int conceptsFirePerCycle = 1;
+        int conceptsFirePerCycle = 6;
         Default nar = new Default(
                 new Memory(clock, new MapIndex2(
                         new SoftValueHashMap())),
-                1000, conceptsFirePerCycle, 1, 2);
+                1000, conceptsFirePerCycle, 2, 3);
 
         //nar.logSummaryGT(System.out, 0.6f);
-        nar.log(System.out, x -> {
-            if (x instanceof Task) {
-                Task t = (Task)x;
-                if (t.isInput()) return false;
-                return t.budget().summary() > 0f;
-            }
-            return false;
-        });
+//        nar.log(System.out, x -> {
+//            if (x instanceof Task) {
+//                Task t = (Task)x;
+//                //if (t.isInput()) return false;
+//                return t.budget().summary() > 0.0f;
+//            }
+//            return false;
+//        });
 
-//            nar.memory.DEFAULT_JUDGMENT_PRIORITY = 0.35f;
+        nar.memory.DEFAULT_JUDGMENT_PRIORITY = 0.2f;
 //            nar.memory.DEFAULT_JUDGMENT_DURABILITY = 0.35f;
-//            nar.memory.DEFAULT_GOAL_PRIORITY = 0.7f;
+        nar.memory.DEFAULT_GOAL_PRIORITY = 0.3f;
 //            nar.memory.DEFAULT_GOAL_DURABILITY = 0.7f;
-//            nar.memory.DEFAULT_QUESTION_PRIORITY = 0.6f;
+        nar.memory.DEFAULT_QUESTION_PRIORITY = 0.25f;
 //            nar.memory.DEFAULT_QUESTION_DURABILITY = 0.6f;
         //nar.initNAL9();
         nar.memory.the(new Anticipate(nar));
@@ -125,14 +125,14 @@ public class SomeRovers {
 
 
         //nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
-        nar.core.activationRate.setValue(0.8f);
-        nar.premiser.confMin.setValue(0.05f);
+        nar.core.activationRate.setValue(0.55f);
+        nar.premiser.confMin.setValue(0.02f);
 
         nar.memory.duration.set(2);
         nar.memory.conceptForgetDurations.setValue(1);
         nar.memory.termLinkForgetDurations.setValue(4);
         nar.memory.taskLinkForgetDurations.setValue(6);
-        nar.memory.cyclesPerFrame.set(32);
+        nar.memory.cyclesPerFrame.set(4);
         nar.memory.shortTermMemoryHistory.set(3);
         nar.memory.executionThreshold.setValue(0.0f);
 
@@ -195,7 +195,7 @@ public class SomeRovers {
 
         nq.reward.put(new BeliefReward(n, "eat:food"), new MutableFloat(1f));
         nq.reward.put(new NotBeliefReward(n, "eat:poison"), new MutableFloat(0.9f));
-        nq.reward.put(new BeliefReward(n, "speed:forward"), new MutableFloat(0.1f));
+        //nq.reward.put(new BeliefReward(n, "speed:forward"), new MutableFloat(0.1f));
         
 
         nq.outs.addAll(
@@ -213,7 +213,11 @@ public class SomeRovers {
 
         float pi = (float) Math.PI;
 
-        r.addEyeWithMouth("e", nq, r.torso, 4, 2, new Vec2(2.7f,0), 0.4f, 0, 15f, pi / 6f);
+        //nearsight
+        r.addEyeWithMouth("n", nq, r.torso, 5, 2, new Vec2(2.7f,0), 0.4f, 0, 10f, pi / 6f);
+
+        //farsight report http://farsight.org/
+        r.addEye("f", nq, r.torso, 3, 4, new Vec2(2.7f,0), 0.6f, 0, 35f,(e) -> {});
 
         r.addArm("al", nq2 /* ... */, -1.75f, 1.5f, 0.8f); //pi * 1.5f
         r.addArm("ar", nq2 /* ... */, -1.75f, -1.5f, -0.8f);

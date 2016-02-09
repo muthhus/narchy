@@ -7,6 +7,8 @@ import nars.nar.Default;
 import nars.task.flow.TaskQueue;
 import org.junit.Test;
 
+import java.util.Arrays;
+
 import static org.junit.Assert.assertArrayEquals;
 
 /**
@@ -62,7 +64,7 @@ public class UniqueInputSerialTest {
         d.memory.eventTaskProcess.on(t -> {
             if (t.isDouble())
                 assertArrayEquals("all double-premise derived terms have this evidence: "
-                        + t, ev, t.evidence());
+                        + t + ": " + Arrays.toString(ev) + "!=" + Arrays.toString(t.evidence()), ev, t.evidence());
 
             //System.out.println(t);
         });

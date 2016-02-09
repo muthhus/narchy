@@ -182,12 +182,12 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     /** called when a Concept processes this Task */
     void onConcept(Concept c);
 
-    @NotNull
+    @Nullable
     default Task answer(@NotNull Compound newTerm, @NotNull Task question, @NotNull Memory memory) {
         return term().equals(newTerm) && occurrence() == question.occurrence() ? this : answerProjected(newTerm, question, memory);
     }
 
-    @NotNull
+    @Nullable
     default Task answerProjected(@NotNull Compound newTerm, @NotNull Task question, @NotNull Memory memory) {
 
         long now = memory.time();

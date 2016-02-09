@@ -334,18 +334,19 @@ public final class BudgetFunctions extends UtilityFunctions {
     }
 
     @NotNull
-    static Budget budgetInference(@NotNull Budget target, float qual, float complexityFactor, @NotNull ConceptProcess nal) {
+    static Budget budgetInference(@NotNull Budget target, float qualRaw, float complexityFactor, @NotNull ConceptProcess nal) {
 
         final BLink<? extends Task> taskLink = nal.taskLink;
 
-        final Budget t = taskLink;
         //(taskLink !=null) ? taskLink :  nal.task().budget();
 
+        Task task = taskLink.get();
 
-        float priority = t.pri();
-        float durability = t.dur() * complexityFactor;
-        final float quality = qual * complexityFactor;
-        target.budget(priority, durability, qual);
+        float priority = taskLink.pri() * task.pri(); //originally: only included taskLink, not also task
+        float durability = taskLink.dur() * task.dur() * complexityFactor;  //originally: only included taskLink, not also task
+        final float quality  = qualRaw * task.qua() * complexityFactor;//originally: not multiplying task
+
+        target.budget(priority, durability, quality);
 
         BLink<? extends Termed> termLink = nal.termLink;
         if (/*(termLink != null) && */(!termLink.isDeleted())) {
@@ -355,7 +356,8 @@ public final class BudgetFunctions extends UtilityFunctions {
             BudgetMerge.avgDQBlend.merge(target, termLink);
 
             NAR nar = nal.nar;
-            final float targetActivation = nar.conceptPriority(termLink.get(), -1);
+
+            final float targetActivation = nal.conceptLink.pri();
 
             if (targetActivation >= 0) {
 

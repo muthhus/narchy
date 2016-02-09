@@ -37,7 +37,7 @@ subprojects {
 
         maven { url "https://jitpack.io" }
         maven { url "http://repo.maven.apache.org/maven2" }
-        //maven { url "http://maven.cs.lth.se/content/repositories/public/" }
+        maven { url "http://maven.cs.lth.se/content/repositories/public/" }
         maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
     }
 

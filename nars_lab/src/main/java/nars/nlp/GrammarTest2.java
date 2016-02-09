@@ -112,7 +112,7 @@ public class GrammarTest2 {
 
         n.memory.duration.set(Math.ceil(charRate.floatValue()/4f));
         n.memory.shortTermMemoryHistory.set(3);
-        n.memory.cyclesPerFrame.set(64);
+        n.memory.cyclesPerFrame.set(4);
         
         //n.initNAL9();
 

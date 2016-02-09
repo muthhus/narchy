@@ -61,48 +61,47 @@ public interface Stamp {
             c[i--] = (na) ? a[ia--] : b[ib--];
         }
 
-        Arrays.sort(c);
-        return c;
+        return toSetArray(c);
     }
 
-//    @NotNull
-//    static long[] toSetArray(@NotNull long[] x) {
-//        int l = x.length;
-//
-//        if (l < 2)
-//            return x;
-//
-//        //1. copy evidentialBase and sort it
-//        long[] sorted = Arrays.copyOf(x, l);
-//        Arrays.sort(sorted);
-//
-//        //2. count unique elements
-//        long lastValue = -1;
-//        int uniques = 0; //# of unique items
-//        int sLen = sorted.length;
-//
-//        for (long v : sorted) {
-//            if (lastValue != v)
-//                uniques++;
-//            lastValue = v;
-//        }
-//
-//        if (uniques == sLen) {
-//            //if no duplicates, just return it
-//            return sorted;
-//        }
-//
-//        //3. de-duplicate
-//        long[] deduplicated = new long[uniques];
-//        int uniques2 = 0;
-//        long lastValue2 = -1;
-//        for (long v : sorted) {
-//            if (lastValue2 != v)
-//                deduplicated[uniques2++] = v;
-//            lastValue2 = v;
-//        }
-//        return deduplicated;
-//    }
+    @NotNull
+    static long[] toSetArray(@NotNull long[] x) {
+        int l = x.length;
+
+        if (l < 2)
+            return x;
+
+        //1. copy evidentialBase and sort it
+        long[] sorted = Arrays.copyOf(x, l);
+        Arrays.sort(sorted);
+
+        //2. count unique elements
+        long lastValue = -1;
+        int uniques = 0; //# of unique items
+        int sLen = sorted.length;
+
+        for (long v : sorted) {
+            if (lastValue != v)
+                uniques++;
+            lastValue = v;
+        }
+
+        if (uniques == sLen) {
+            //if no duplicates, just return it
+            return sorted;
+        }
+
+        //3. de-duplicate
+        long[] deduplicated = new long[uniques];
+        int uniques2 = 0;
+        long lastValue2 = -1;
+        for (long v : sorted) {
+            if (lastValue2 != v)
+                deduplicated[uniques2++] = v;
+            lastValue2 = v;
+        }
+        return deduplicated;
+    }
 
     static boolean overlapping(@NotNull Stamp a, @Nullable Stamp b) {
 

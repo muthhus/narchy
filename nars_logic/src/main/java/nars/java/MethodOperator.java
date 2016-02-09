@@ -1,6 +1,7 @@
 package nars.java;
 
 import com.github.drapostolos.typeparser.TypeParser;
+import nars.Global;
 import nars.Op;
 import nars.task.Task;
 import nars.term.Compound;
@@ -171,8 +172,13 @@ public class MethodOperator  {
             //nar.memory.eventError.emit(e);
             context.volition.set(null);
 
-            //if (Global.DEBUG)
-                throw new RuntimeException(e);
+            if (Global.DEBUG) {
+                e.printStackTrace();
+                //throw new RuntimeException(e);
+            }
+
+
+            return null;
             //else
               //  return context.term(e);
         }

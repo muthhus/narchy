@@ -25,7 +25,7 @@ public class GrammarTestGUI extends GrammarTest2 {
     public GrammarTestGUI() throws Exception {
         super();
 
-        n.logSummaryGT(System.out,0.0f);
+        //n.logSummaryGT(System.out,0.7f);
 
         int points = 200;
         p = new Plot2D(Plot2D.BarWave, points, 800, 200);

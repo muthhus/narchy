@@ -259,7 +259,8 @@ public interface Term extends Termed, Comparable, Termlike {
                 return dt + withinPred;
 
         } else {
-            throw new RuntimeException("invalid temporal type: " + this);
+            //throw new RuntimeException("invalid temporal type: " + this);
+            return 0;
         }
 
         return ETERNAL;

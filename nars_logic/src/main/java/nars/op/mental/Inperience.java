@@ -27,7 +27,7 @@ public class Inperience {
     public static float MINIMUM_BUDGET_SUMMARY_TO_CREATE_WONDER_EVALUATE = 0.92f;
 
     //internal experience has less durability?
-    public static final float INTERNAL_EXPERIENCE_PROBABILITY = 0.005f;
+    public static final float INTERNAL_EXPERIENCE_PROBABILITY = 0.0005f;
 
     //less probable form
     public static final float INTERNAL_EXPERIENCE_RARE_PROBABILITY =
@@ -186,6 +186,9 @@ public class Inperience {
     protected void experienceFromTaskInternal(@NotNull final Task task) {
 
         final Term self = nar.self;
+
+        if (!random(nar.memory.random, INTERNAL_EXPERIENCE_PROBABILITY, task.term().volume()))
+            return;
 
         // if(OLD_BELIEVE_WANT_EVALUATE_WONDER_STRATEGY ||
         //         (!OLD_BELIEVE_WANT_EVALUATE_WONDER_STRATEGY && (task.sentence.punctuation==Symbols.QUESTION || task.sentence.punctuation==Symbols.QUEST))) {
