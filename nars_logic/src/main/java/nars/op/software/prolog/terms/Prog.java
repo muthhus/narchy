@@ -22,9 +22,9 @@ public class Prog extends Source implements Runnable {
     this.parent=parent;
     goal=goal.ccopy();
     this.trail=new Trail();
-    this.orStack=new ObjectStack();
+    this.orStack= new Trail();
     if(null!=goal)
-      orStack.push(nextUnfolder(goal));
+      orStack.add(nextUnfolder(goal));
     
   }
   
@@ -35,7 +35,7 @@ public class Prog extends Source implements Runnable {
   /**
    * Contains Unfolders that may produce answers.
    */
-  private ObjectStack orStack;
+  private Trail orStack;
   
   private final Prog parent;
   
@@ -63,17 +63,17 @@ public class Prog extends Source implements Runnable {
       return null;
     Clause answer=null;
     while(!orStack.isEmpty()) {
-      Unfolder I=(Unfolder)orStack.pop();
+      Unfolder I=(Unfolder) orStack.removeLast();
       answer=I.getAnswer();
       if(null!=answer)
         break;
       Clause nextgoal=I.getElement();
       if(null!=nextgoal) {
         if(I.notLastClause())
-          orStack.push(I);
+          orStack.add(I);
         else
           I.stop();
-        orStack.push(nextUnfolder(nextgoal));
+        orStack.add(nextUnfolder(nextgoal));
       }
     }
     Term head;

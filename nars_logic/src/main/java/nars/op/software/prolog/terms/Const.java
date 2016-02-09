@@ -24,10 +24,11 @@ public class Const extends Nonvar {
 		return (null == X) ? Const.aNo : new Fun("the", X);
 	}
 
-	private final String sym;
+	public final String sym;
 
 	public Const(String s) {
-		sym = s.intern();
+
+		sym = s; //s.intern();
 	}
 
 	public final String name() {

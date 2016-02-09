@@ -123,26 +123,23 @@ public class Builtins extends HashDict {
 	/**
 	 * Creates a new builtin
 	 */
-	public Const newBuiltin(Const S) {
+	public Const the(Const S) {
 		return (Const) get(S.key());
 	}
 
 	public Fun toFunBuiltin(Fun f) {
-		if (f.arity() == 2) {
+		Term[] fa = f.args;
+		if (fa.length == 2) {
 			switch (f.name()) {
 				case ":-" :
-					return new Clause(f.args[0], f.args[1]);
+					return new Clause(fa);
 				case "." :
-					return new Conj(f.args[0], f.args[1]);
+					return new Conj(fa);
 			}
 		}
 
-		FunBuiltin B = (FunBuiltin) prolog.dict.newBuiltin(f);
-		if (null == B)
-			return f;
-		B = (FunBuiltin) B.funClone();
-		B.args = f.args;
-		return B;
+		FunBuiltin B = (FunBuiltin) prolog.dict.the(f);
+		return null == B ? f : B.funClone(fa);
 	}
 
 	/**

@@ -73,10 +73,10 @@ public class DataBase extends BlackBoard {
 	}
 
 	private Term all1(int max,Term FXs) {
-    ArrayList To=new ArrayList();
+    ArrayList<Term> To=new ArrayList();
     for (Object o : keySet())
       all0(max, To, (String) o, FXs);
-    Fun R=new Fun("$",(Term[])To.toArray());
+    Fun R=new Fun("$",To.toArray(new Term[To.size()]));
     // IO.mes("RR"+R);
     // To.copyInto(R.args);
     return ((Cons)R.listify()).args[1];

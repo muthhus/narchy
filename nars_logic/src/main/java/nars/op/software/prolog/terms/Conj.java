@@ -4,6 +4,9 @@ public class Conj extends Cons {
 	public Conj(Term x0, Term x1) {
 		super(",", x0, x1);
 	}
+	public Conj(Term[] x0x1) {
+		this(x0x1[0], x0x1[1]);
+	}
 
 	public String conjToString() {
 		Term h = args[0].ref();

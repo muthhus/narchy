@@ -4,7 +4,7 @@ package nars.op.software.prolog.terms;
  * Part of the Term hierarchy implmenting logical variables. They are subject to
  * reset by application of and undo action keep on the trail stack.
  */
-public class Var extends Term {
+public final class Var extends Term {
 	protected Term val;
 
 	public Var() {
@@ -15,17 +15,14 @@ public class Var extends Term {
 		return Term.VAR;
 	}
 
-	final boolean unbound() {
-		return val == this;
-	}
-
-	public Term ref() {
-		return unbound() ? this : val.ref();
+	public final Term ref() {
+		Term v = this.val;
+		return (v == this) ? this : v.ref();
 	}
 
 	public boolean bind_to(Term x, Trail trail) {
 		val = x;
-		trail.push(this);
+		trail.add(this);
 		return true;
 	}
 
@@ -62,11 +59,12 @@ public class Var extends Term {
 		return R;
 	}
 
-	protected String name() {
+	protected final String name() {
 		return '_' + Integer.toHexString(hashCode());
 	}
 
 	public String toString() {
-		return unbound() ? name() : ref().toString();
+		Term t = ref();
+		return t == this ? name() : t.toString();
 	}
 }

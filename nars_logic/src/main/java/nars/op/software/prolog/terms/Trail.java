@@ -1,5 +1,7 @@
 package nars.op.software.prolog.terms;
 
+import nars.util.data.list.FasterList;
+
 /**
  * Implements a stack of undo actions for backtracking, and in particular,
  * resetting a Var's val fiels to unbound (i.e. this).
@@ -7,7 +9,7 @@ package nars.op.software.prolog.terms;
  * @see Term
  * @see Var
  */
-public class Trail extends ObjectStack {
+public class Trail extends FasterList {
 
 	public Trail() {
 		super();
@@ -32,7 +34,7 @@ public class Trail extends ObjectStack {
 		// if(to>size())
 		// IO.assertion("unwind attempted from smaller to larger top");
 		for (int i = size() - to; i > 0; i--) {
-			Term V = (Term) (pop());
+			Term V = (Term) (removeLast());
 			V.undo();
 		}
 	}

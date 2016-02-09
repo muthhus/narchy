@@ -6,7 +6,7 @@ import nars.op.software.prolog.Prolog;
  * Top element of the Prolog term hierarchy. Describes a simple or compound ter
  * like: X,a,13,f(X,s(X)),[a,s(X),b,c], a:-b,c(X,X),d, etc.
  */
-public abstract class Term extends Object implements Cloneable {
+public abstract class Term implements Cloneable {
 
 	public final static int JAVA = -4;
 
@@ -28,9 +28,7 @@ public abstract class Term extends Object implements Cloneable {
 	 * otherwise vicious non-reentrancy problems may occur in the presence of GC
 	 * and heavy multi-threading!!!
 	 */
-	public Term ref() { // synchronized !!!
-		return this;
-	}
+	abstract public Term ref();
 
 	abstract boolean bind_to(Term that, Trail trail);
 

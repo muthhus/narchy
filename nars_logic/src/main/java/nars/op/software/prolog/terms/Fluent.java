@@ -35,7 +35,7 @@ public class Fluent extends SystemObject {
 	 */
 	protected void trailMe(Prog p) {
 		if (null != p)
-			p.getTrail().push(this);
+			p.getTrail().add(this);
 	}
 
 	public void stop() {

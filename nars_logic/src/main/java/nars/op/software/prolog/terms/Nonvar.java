@@ -14,10 +14,12 @@ public abstract class Nonvar extends Term {
 	}
 
 	boolean unify_to(Term that, Trail trail) {
-		if (bind_to(that, trail))
-			return true;
-		else
-			return that.bind_to(this, trail);
+		return bind_to(that, trail) || that.bind_to(this, trail);
+	}
+
+	@Override
+	public final Term ref() {
+		return this;
 	}
 
 	// /**

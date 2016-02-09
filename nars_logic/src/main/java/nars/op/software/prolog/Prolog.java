@@ -13,24 +13,22 @@ import static nars.op.software.prolog.terms.Prog.firstSolution;
   Ensures that lib.class, obtained from lib.pro->lib.java is loaded.
 */
 public class Prolog {
-  public static final int version=101;
+
+//  public static final int version=101;
+//  public static final String getInfo() {
+//    String s="Kernel Prolog "+version/100.0+ '\n'
+//        +"Copyright (c) Paul Tarau 1999-2011\n";
+//    return s;
+//  }
   
-  public static final String getInfo() {
-    String s="Kernel Prolog "+version/100.0+ '\n'
-        +"Copyright (c) Paul Tarau 1999-2011\n";
-    return s;
-  }
+  public static final String default_lib= "prolog/lib.prolog";
   
-  public static final String default_lib="lib.prolog";
-  
-  public DataBase db;
+  public final DataBase db;
 
   public Builtins dict;
   
   public Clause goal(String line) {
-    Clause G=Clause.goalFromString(this, line);
-    // IO.mes("getGoal: "+G+" DICT: "+G.dict); //OK
-    return G;
+    return Clause.goalFromString(this, line);
   }
   
   public void query(String query) {
@@ -181,7 +179,7 @@ public class Prolog {
     if(c.name().equals(Const.aYes.name()))
       return Const.aYes;
 
-    ConstBuiltin B=(ConstBuiltin) dict.newBuiltin(c);
+    ConstBuiltin B=(ConstBuiltin) dict.the(c);
     if(null==B) {
       // IO.mes("not a builtin:"+this);
       return c;
