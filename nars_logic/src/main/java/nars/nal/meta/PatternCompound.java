@@ -29,7 +29,7 @@ abstract public class PatternCompound extends GenericCompound {
         PatternCompoundContainingEllipsis(@NotNull Compound seed, @NotNull TermVector subterms) {
             super(seed, subterms);
 
-            this.ellipsis = seed.firstEllipsis();
+            this.ellipsis = Ellipsis.firstEllipsis(this);
             this.ellipsisTransform = hasEllipsisTransform(this);
         }
 
@@ -38,10 +38,13 @@ abstract public class PatternCompound extends GenericCompound {
             return ellipsis;
         }
 
+
         @Override
         public boolean match(@NotNull Compound y, @NotNull FindSubst subst) {
             return canMatch(y) &&
-                    subst.matchCompoundWithEllipsis(this, y);
+                    op.isCommutative() ? //currently this is slightly different than Compound.isCommutive because it ignores the size case, which with ellipsis could seem equal to 1 but in fact would be commutive after matching
+                        subst.matchCompoundWithEllipsisCommutative(this, y, ellipsis) :
+                        subst.matchCompoundWithEllipsisLinear(this, y, ellipsis);
         }
 
         protected final boolean canMatch(@NotNull Compound y) {

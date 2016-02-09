@@ -77,16 +77,16 @@ public abstract class FindSubst extends Versioning implements Subst {
 
     public final List<Termutator> termutes = Global.newArrayList();
 
-    public static Ellipsis getFirstEllipsis(@NotNull Compound X) {
-        int xsize = X.size();
-        for (int i = 0; i < xsize; i++) {
-            Term xi = X.term(i);
-            if (xi instanceof Ellipsis) {
-                return (Ellipsis) xi;
-            }
-        }
-        return null;
-    }
+//    public static Ellipsis getFirstEllipsis(@NotNull Compound X) {
+//        int xsize = X.size();
+//        for (int i = 0; i < xsize; i++) {
+//            Term xi = X.term(i);
+//            if (xi instanceof Ellipsis) {
+//                return (Ellipsis) xi;
+//            }
+//        }
+//        return null;
+//    }
 
     /**
      * @param x a compound which contains one or more ellipsis terms
@@ -325,7 +325,7 @@ public abstract class FindSubst extends Versioning implements Subst {
 
     public final boolean matchCompoundWithEllipsis(@NotNull Compound X, @NotNull Compound Y) {
 
-        int xsize = X.size();
+
 
 //        final int numNonpatternVars;
 //        int ellipsisToMatch = Ellipsis.numUnmatchedEllipsis(X, this);
@@ -350,9 +350,8 @@ public abstract class FindSubst extends Versioning implements Subst {
         //TODO see if there is a volume or structural constraint that can terminate early here
 
 
-        Ellipsis e = getFirstEllipsis(X);
+        Ellipsis e = Ellipsis.firstEllipsis(X);
 
-        int ysize = Y.size();
 
 //        if (!e.valid(numNonpatternVars, ysize)) {
 //            return false;
@@ -360,75 +359,85 @@ public abstract class FindSubst extends Versioning implements Subst {
 
 
         if (X.isCommutative()) {
-            return matchEllipsedCommutative(
-                    X, e, Y
-            );
+            return matchCompoundWithEllipsisCommutative(X, Y, e);
         } else {
-
-            if (e instanceof EllipsisTransform) {
-                //this involves a special "image ellipsis transform"
-
-                EllipsisTransform et = (EllipsisTransform) e;
-                if (et.from.equals(Op.Imdex)) {
-
-                    Term n = resolve(et.to);
-                    if (n == null)
-                        return false;
-
-                    //the indicated term should be inserted
-                    //at the index location of the image
-                    //being processed. (this is the opposite
-                    //of the other condition of this if { })
-                    if (matchEllipsedLinear(X, e, Y)) {
-                        EllipsisMatch raw = (EllipsisMatch) getXY(e);
-                        xy.put(e, null); //HACK clear it to replace with a new value
-                        return putXY(e, ImageMatch.put(raw.term, n, Y));
-                    }
-                } else {
-                    Term n = resolve(et.from);
-                    if (n == null)
-                        return false;
-
-                    //resolving may be possible to defer to substitution if
-                    //Y and et.from are components of ImageShrinkEllipsisMatch
-
-                    int imageIndex = Y.indexOf(n);
-                    return ((imageIndex != -1) && matchEllipsedLinear(X, e, Y)) &&
-                            putXY(e, ImageMatch.take((EllipsisMatch) getXY(e), imageIndex));
-
-                }
-                return false;
-            }
-
-            /** if they are images, they must have same relationIndex */
-            if (X.op().isImage()) { //PRECOMPUTABLE
-
-                //if the ellipsis is normal, then interpret the relationIndex as it is
-                if (countNumNonEllipsis(X) > 0) {
-
-                    int xEllipseIndex = X.indexOf(e);
-                    int xRelationIndex = X.relation();
-                    int yRelationIndex = Y.relation();
-
-                    if (xEllipseIndex >= xRelationIndex) {
-                        //compare relation from beginning as in non-ellipsis case
-                        if (xRelationIndex != yRelationIndex)
-                            return false;
-                    } else {
-                        //compare relation from end
-                        if ((xsize - xRelationIndex) != (ysize - yRelationIndex))
-                            return false;
-                    }
-                } else {
-                    //ignore the location of imdex in the pattern and match everything
-
-                }
-
-            }
-
-            return matchEllipsedLinear(X, e, Y);
+            return matchCompoundWithEllipsisLinear(X, Y, e);
         }
 
+    }
+
+    public boolean matchCompoundWithEllipsisLinear(@NotNull Compound X, @NotNull Compound Y, Ellipsis e) {
+        int xsize = X.size();
+        int ysize = Y.size();
+
+        if (e instanceof EllipsisTransform) {
+            //this involves a special "image ellipsis transform"
+
+            EllipsisTransform et = (EllipsisTransform) e;
+            if (et.from.equals(Op.Imdex)) {
+
+                Term n = resolve(et.to);
+                if (n == null)
+                    return false;
+
+                //the indicated term should be inserted
+                //at the index location of the image
+                //being processed. (this is the opposite
+                //of the other condition of this if { })
+                if (matchEllipsedLinear(X, e, Y)) {
+                    EllipsisMatch raw = (EllipsisMatch) getXY(e);
+                    xy.put(e, null); //HACK clear it to replace with a new value
+                    return putXY(e, ImageMatch.put(raw.term, n, Y));
+                }
+            } else {
+                Term n = resolve(et.from);
+                if (n == null)
+                    return false;
+
+                //resolving may be possible to defer to substitution if
+                //Y and et.from are components of ImageShrinkEllipsisMatch
+
+                int imageIndex = Y.indexOf(n);
+                return ((imageIndex != -1) && matchEllipsedLinear(X, e, Y)) &&
+                        putXY(e, ImageMatch.take((EllipsisMatch) getXY(e), imageIndex));
+
+            }
+            return false;
+        }
+
+        /** if they are images, they must have same relationIndex */
+        if (X.op().isImage()) { //PRECOMPUTABLE
+
+            //if the ellipsis is normal, then interpret the relationIndex as it is
+            if (countNumNonEllipsis(X) > 0) {
+
+                int xEllipseIndex = X.indexOf(e);
+                int xRelationIndex = X.relation();
+                int yRelationIndex = Y.relation();
+
+                if (xEllipseIndex >= xRelationIndex) {
+                    //compare relation from beginning as in non-ellipsis case
+                    if (xRelationIndex != yRelationIndex)
+                        return false;
+                } else {
+                    //compare relation from end
+                    if ((xsize - xRelationIndex) != (ysize - yRelationIndex))
+                        return false;
+                }
+            } else {
+                //ignore the location of imdex in the pattern and match everything
+
+            }
+
+        }
+
+        return matchEllipsedLinear(X, e, Y);
+    }
+
+    public boolean matchCompoundWithEllipsisCommutative(@NotNull Compound X, @NotNull Compound Y, Ellipsis e) {
+        return matchEllipsedCommutative(
+                X, e, Y
+        );
     }
 
 //    private boolean matchEllipsisImage(Compound x, Ellipsis e, Compound y) {
