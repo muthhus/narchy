@@ -499,4 +499,11 @@ abstract public class ConceptProcess implements Premise {
         matcher.start(this);
         commit();
     }
+
+    public boolean hasTemporality() {
+        if (task().term().t()!=ITERNAL) return true;
+        @Nullable Task b = belief();
+        if (b == null) return false;
+        return b.term().t()!=ITERNAL;
+    }
 }

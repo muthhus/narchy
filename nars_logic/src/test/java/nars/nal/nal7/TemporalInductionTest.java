@@ -95,7 +95,7 @@ public class TemporalInductionTest {
 
     @Test public void testInductionStability() {
         //two entirely disjoint events, and all inductable beliefs from them, should produce a finite system that doesn't explode
-        Default d = new Default(256,1,2,3);
+        Default d = new Default(1024,8,2,3);
         d.input("a:b. :|:");
         d.run(5);
         d.input("c:d. :|:");

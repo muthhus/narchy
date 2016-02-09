@@ -379,6 +379,9 @@ public class PremiseRule extends GenericCompound  {
                         case "after":
                             preNext = events.after;
                             break;
+                        case "afterOrEternal":
+                            preNext = events.afterOrEternal;
+                            break;
                         default:
                             throw new RuntimeException("invalid events parameters");
                     }

@@ -257,7 +257,7 @@
 
 
 //    (A ==> B), B |- A, (Belief:StructuralDeduction, Desire:Deduction, Order:ForAllSame, Event:Anticipate)
-//    (A ==> B), A |- B, (Belief:StructuralDeduction, Desire:Induction, Order:ForAllSame)
+    (A ==> B), A |- B, (Belief:StructuralDeduction, Desire:Induction, Order:ForAllSame)
 
 ////NAL7 specific inference ////////////////////////////////////////////////////////////////////////////////////
 //Reasoning about temporal statements. those are using the ==> relation because relation in time is a relation of the truth between statements.
@@ -404,7 +404,7 @@
 
     A, B, events(after), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (B ==> A), (Belief:Abduction)
 
-    A, B, events(after), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B), notConjunction(A), notConjunction(B) |- (A && B), (Belief:Intersection)
+    A, B, events(afterOrEternal), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B), notConjunction(A), notConjunction(B) |- (A && B), (Belief:Intersection, Desire:Intersection)
 
 //    A, B, after(_), neq(A,B), notConjunction(A), notConjunction(B),  notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (B && A), (Belief:Intersection)
 

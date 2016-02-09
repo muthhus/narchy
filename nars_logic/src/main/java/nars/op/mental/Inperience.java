@@ -147,13 +147,14 @@ public class Inperience {
         Compound tt = s.term();
 
         boolean negated = tt.op() == Op.NEGATE;
-        arg[0] = !negated ? tt : $.neg(tt) /* unwrap negation */;
-
-        int k = 1;
+        int k = 0;
 
         if (tr != null) {
             arg[k++] = tr.toWordTerm(conceptCreationExpectation, negated);
         }
+
+        arg[k++] = !negated ? tt : $.neg(tt) /* unwrap negation */;
+
         arg[k] = self;
 
         Compound operation = $.exec(opTerm, arg);

@@ -383,12 +383,12 @@ public class NAL6Test extends AbstractNALTester {
     @Test //see discussion on https://groups.google.com/forum/#!topic/open-nars/1TmvmQx2hMk
     public void impliesUnbelievedYet()  {
         TestNAR tester = test();
-        tester.nar.log();
         tester.believe("<x:a ==> c:d>."); //x:a, x:#1, x:$1
         tester.believe("x:a.");
         tester.mustBelieve(cycles, "c:d", 1.00f, 0.81f); //en("there is a lock which is opened by key1");
-
     }
+
+
 
 
 /* Will be moved to NALMultistepTest.java

@@ -1,5 +1,6 @@
 package nars.nal.meta.pre;
 
+import nars.concept.ConceptProcess;
 import nars.nal.meta.AtomicBooleanCondition;
 import nars.nal.meta.PremiseMatch;
 
@@ -17,16 +18,34 @@ abstract public class events extends AtomicBooleanCondition<PremiseMatch> {
         }
 
         @Override
-        boolean allow(long taskOcc, long beliefOcc) {
-            return (beliefOcc - taskOcc) >= 0;
+        public boolean booleanValueOf(PremiseMatch m) {
+            return beliefBeforeOrDuringTask(m.premise);
+        }
+
+    };
+
+    /** task is before or simultaneous with belief which follows (T ... B) */
+    public static final events afterOrEternal = new events() {
+
+        @Override
+        public String toString() {
+            return "afterOrEternal";
+        }
+
+        @Override
+        public boolean booleanValueOf(PremiseMatch m) {
+            ConceptProcess p = m.premise;
+            return p.isEternal() || beliefBeforeOrDuringTask(p);
         }
     };
 
+    private static boolean beliefBeforeOrDuringTask(ConceptProcess p) {
 
-    @Override
-    public final boolean booleanValueOf(PremiseMatch m) {
-        return m.premise.isEvent() && allow(m.premise.task().occurrence(), m.premise.belief().occurrence());
+        return p.isEvent()
+               &&
+               (p.belief().occurrence() - p.task().occurrence()) >= 0;
     }
 
-    abstract boolean allow(long taskOcc, long beliefOcc);
+
+
 }

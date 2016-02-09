@@ -1,5 +1,7 @@
 package nars.util.data.list;
 
+import com.gs.collections.api.list.MutableList;
+import com.gs.collections.api.tuple.Pair;
 import com.gs.collections.impl.list.mutable.FastList;
 
 import java.lang.reflect.Array;
@@ -37,6 +39,8 @@ public class FasterList<X> extends FastList<X> {
     public FasterList(X... x) {
         super(x);
     }
+
+
 
     /**
      * quickly remove the final elements without nulling them by setting the size pointer

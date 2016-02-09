@@ -166,7 +166,7 @@ public class Derive extends AbstractLiteral implements ProcTerm {
 
         Compound ct = (Compound) tNorm.term();
 
-        if (p7) {
+        if (p7 && (!premise.isEternal() || premise.hasTemporality())) {
             Term cp = this.conclusionPattern;
 
             if (Op.isOperation(cp) && p.transforms.containsKey( Operator.operator((Compound) cp) ) ) {

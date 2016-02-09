@@ -303,4 +303,9 @@ public abstract class Budget extends BudgetedHandle {
         }
     }
 
+    public void mul(float pf, float df, float qf) {
+        setPriority(pri()*pf);
+        setDurability(dur()*df);
+        setQuality(qua()*qf);
+    }
 }

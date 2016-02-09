@@ -111,11 +111,11 @@ public class SomeRovers {
 //            return false;
 //        });
 
-        nar.memory.DEFAULT_JUDGMENT_PRIORITY = 0.2f;
+        nar.memory.DEFAULT_JUDGMENT_PRIORITY = 0.5f;
 //            nar.memory.DEFAULT_JUDGMENT_DURABILITY = 0.35f;
-        nar.memory.DEFAULT_GOAL_PRIORITY = 0.3f;
+        nar.memory.DEFAULT_GOAL_PRIORITY = 0.5f;
 //            nar.memory.DEFAULT_GOAL_DURABILITY = 0.7f;
-        nar.memory.DEFAULT_QUESTION_PRIORITY = 0.25f;
+        nar.memory.DEFAULT_QUESTION_PRIORITY = 0.5f;
 //            nar.memory.DEFAULT_QUESTION_DURABILITY = 0.6f;
         //nar.initNAL9();
         nar.memory.the(new Anticipate(nar));
@@ -125,8 +125,8 @@ public class SomeRovers {
 
 
         //nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
-        nar.core.activationRate.setValue(0.55f);
-        nar.premiser.confMin.setValue(0.02f);
+        nar.core.activationRate.setValue(0.75f);
+        nar.premiser.confMin.setValue(0.05f);
 
         nar.memory.duration.set(2);
         nar.memory.conceptForgetDurations.setValue(1);

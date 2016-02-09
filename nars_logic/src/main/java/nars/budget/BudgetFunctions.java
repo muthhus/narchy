@@ -340,11 +340,11 @@ public final class BudgetFunctions extends UtilityFunctions {
 
         //(taskLink !=null) ? taskLink :  nal.task().budget();
 
-        Task task = taskLink.get();
+        //Task task = taskLink.get();
 
-        float priority = taskLink.pri() * task.pri(); //originally: only included taskLink, not also task
-        float durability = taskLink.dur() * task.dur() * complexityFactor;  //originally: only included taskLink, not also task
-        final float quality  = qualRaw * task.qua() * complexityFactor;//originally: not multiplying task
+        float priority = taskLink.pri();
+        float durability = taskLink.dur() * complexityFactor;
+        final float quality  = qualRaw  * complexityFactor /** task.qua()*/;//originally: not multiplying task
 
         target.budget(priority, durability, quality);
 
@@ -372,6 +372,8 @@ public final class BudgetFunctions extends UtilityFunctions {
                 termLink.orDurability(quality);
             }
         }
+
+
 
         return target; //target.budget(priority, durability, quality);
 

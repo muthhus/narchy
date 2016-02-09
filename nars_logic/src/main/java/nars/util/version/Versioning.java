@@ -117,8 +117,8 @@ public class Versioning extends FasterList<Versioned> {
     public <X> void onDeleted(@NotNull Versioned v) {
         FasterList vStack = v.value;
 
-        //TODO maybe flush these periodically for GC
-        //vStack.clear();
+        ////TODO maybe flush these periodically for GC
+        vStack.clear();
 
         //TODO reject arrays that have grown beyond a certain size
         valueStackPool.put(vStack);

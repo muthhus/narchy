@@ -1,0 +1,12 @@
+'NAL9 "Inperience" Rules
+
+derive(believe(TRUE,#X,?who), believe(TRUE,#Y,?who)),
+    believe(TRUE,and:{#X,#Y},?who), {(Belief:Intersection)}).
+
+
+'TODO: "or" rule
+
+((believe(TRUE,#X,?who) && believe(TRUE,--#Y,?who)) ==> believe(TRUE,xor:{#X,#Y},?who)).
+
+((want(TRUE,#X,?who) && believe(TRUE,#X,?who)) ==> grateful(TRUE,#X,?who)).
+((want(TRUE,#X,?who) && believe(TRUE,--#X,?who)) ==> demand(TRUE,#X,?who)).

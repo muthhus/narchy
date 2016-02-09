@@ -197,7 +197,8 @@ public class DiagNAR extends Default {
 
     public static void main(String[] args) throws Exception {
         Global.DEBUG = true;
-        DiagNAR d = new DiagNAR(1024, 1, 1, 3);
+        NAR d = new DiagNAR(768,3, 2, 4);
+        //NAR d = new Default(768, 3, 2, 4);
 //        d.input("(a-->(b&&c)).");
 //        d.input("(c-->d).");
 //        d.input("<<$x --> bird> ==> <$x --> flyer>>.");
@@ -207,20 +208,26 @@ public class DiagNAR extends Default {
         d.logSummaryGT(System.out, 0);
 
         //t:(--,b). (t:(--,#y) ==> t:(not,#y)).
-        d.input(
-            "t:a.",
-            "t:(--,b).",
-            //"(t:a && (--,t:b)).",
-            //"(t:(--,$1) ==> t:(not,$1))."
-            //"(t:(--,$1) ==> t:(not,$1)).",
-            "(t:($x | (--,$y)) ==> t:(xor, $x, $y))."
-            //,"xor(a,b)?"
-            //"(($x && $y) ==> and({$x, $y}))."
-        );
+//        d.input(
+//            "t:a.",
+//            "t:(--,b).",
+//            //"(t:a && (--,t:b)).",
+//            //"(t:(--,$1) ==> t:(not,$1))."
+//            //"(t:(--,$1) ==> t:(not,$1)).",
+//            "(t:($x | (--,$y)) ==> t:(xor, $x, $y))."
+//            //,"xor(a,b)?"
+//            //"(($x && $y) ==> and({$x, $y}))."
+//        );
         /*d.memory.eventTaskRemoved.on(t -> {
             System.err.println("rem: " +t);
         });*/
-        d.run(15000);
+        d.input(
+                "believe(x).",
+                "want(x).",
+                "((believe($x) && want($x)) ==> grateful($x))."
+        );
+
+        d.run(10);
 
     }
 }

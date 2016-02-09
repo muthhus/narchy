@@ -129,8 +129,12 @@ public class Versioned<X> extends FasterIntArrayList /*Comparable<Versioned>*/ {
 
     @Override
     public void clear() {
-        super.clear();
-        value.clearFast();
+        //super.clear();
+        super.clearFast();
+
+        //value.clearFast();
+        value.clear();
+
         this.current = null;
     }
 

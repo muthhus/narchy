@@ -16,7 +16,7 @@ import java.util.function.Supplier;
 @RunWith(Parameterized.class)
 public class NAL7Test extends AbstractNALTester {
 
-    final int cycles = 160;
+    final int cycles = 360;
 
     public NAL7Test(Supplier<NAR> b) {
         super(b);
@@ -46,7 +46,7 @@ public class NAL7Test extends AbstractNALTester {
         float intersectionConf = 0.81f;
 
         TestNAR t = test();
-        t.nar.log();
+        //t.nar.log();
 
         t
         .input("x:before. :|:")
@@ -97,7 +97,7 @@ public class NAL7Test extends AbstractNALTester {
 
     void testTemporalRevision(int delay, float freq, float conf, String belief) {
         TestNAR tester = test();
-        tester.nar.log();
+        //tester.nar.log();
         tester.input(belief + ". :|: %1.00;0.65%");
         tester.inputAt(delay, belief + ". :|: %0.5;0.70%");
         tester.inputAt(delay+1, belief + "? :|:");
@@ -298,7 +298,7 @@ public class NAL7Test extends AbstractNALTester {
     @Test public void induction_on_events3_simple()  {
         TestNAR tester = test();
 
-        tester.nar.log();
+        //tester.nar.log();
         tester.input("<door --> open>. :|:");
         tester.inputAt(4, "<room --> enter>. :|:");
 
@@ -361,7 +361,7 @@ public class NAL7Test extends AbstractNALTester {
     @Test public void induction_on_events_composition_pre()  {
         TestNAR tester = test();
 
-        tester.nar.log();
+        //tester.nar.log();
 
         tester.input("(open:(John,door) ==>+5 enter:(John,room)). :|:");
 
@@ -406,7 +406,7 @@ public class NAL7Test extends AbstractNALTester {
         tester.inputAt(t, "hold:(John,key). :|:");
         tester.inputAt(t, "(open:(John,door) ==>+" + dt + " enter:(John,room)). :|:");
 
-        tester.nar.log();
+        //tester.nar.log();
 
         String component = "(open:(John,door) &&+0 hold:(John,key))";
 
