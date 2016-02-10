@@ -94,7 +94,7 @@ public class SomeRovers {
 
     }
 	public static Default newNAR() {
-        int conceptsFirePerCycle = 48;
+        int conceptsFirePerCycle = 12;
         Default nar = new Default(
                 new Memory(clock, new MapIndex2(
                         new SoftValueHashMap())),
@@ -115,7 +115,7 @@ public class SomeRovers {
 //            nar.memory.DEFAULT_JUDGMENT_DURABILITY = 0.35f;
         m.DEFAULT_GOAL_PRIORITY = 0.5f;
 //            nar.memory.DEFAULT_GOAL_DURABILITY = 0.7f;
-        m.DEFAULT_QUESTION_PRIORITY = 0.5f;
+        m.DEFAULT_QUESTION_PRIORITY = 0.4f;
 //            nar.memory.DEFAULT_QUESTION_DURABILITY = 0.6f;
         //nar.initNAL9();
         m.the(new Anticipate(nar));
@@ -125,16 +125,16 @@ public class SomeRovers {
 
 
         //nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
-        nar.core.activationRate.setValue(0.55f);
-        nar.premiser.confMin.setValue(0.05f);
+        nar.core.activationRate.setValue(0.75f);
+        nar.premiser.confMin.setValue(0.03f);
 
         m.duration.set(2);
         m.conceptForgetDurations.setValue(1f);
         m.termLinkForgetDurations.setValue(2);
         m.taskLinkForgetDurations.setValue(4);
-        m.cyclesPerFrame.set(1);
+        m.cyclesPerFrame.set(4);
         m.shortTermMemoryHistory.set(3);
-        m.executionThreshold.setValue(0.00f);
+        m.executionThreshold.setValue(0.0f);
 
         boolean gui = true;
         if (gui) {
@@ -185,7 +185,7 @@ public class SomeRovers {
         NarQ nqArm = new NarQ(n);
 
         nqSpine.power.setValue(0.8f);
-        nqArm.power.setValue(0.6f);
+        nqArm.power.setValue(0.55f);
 
         nqSpine.input.addAll(nqSpine.getBeliefExpectations(
                 eatFood, eatPoison, speedLeft, speedRight, speedForward

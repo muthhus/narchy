@@ -691,7 +691,7 @@ public interface TermBuilder {
     default Term transform(@NotNull Compound src, @NotNull Subst f) {
 
 
-        Term y = f.getXY(src);
+        Term y = f.term(src);
         if (y!=null)
             return y;
 
@@ -749,7 +749,7 @@ public interface TermBuilder {
 
             return transform((Compound)src, f);
         } else if (src instanceof Variable) {
-            Term x = f.getXY(src);
+            Term x = f.term(src);
             if (x != null)
                 return x;
         }

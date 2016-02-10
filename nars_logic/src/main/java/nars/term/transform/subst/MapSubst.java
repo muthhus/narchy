@@ -41,7 +41,7 @@ public class MapSubst implements Subst {
      * @param t
      */
     @Override
-    public final Term getXY(Term t) {
+    public final Term term(Term t) {
         return xy.get(t);
     }
 

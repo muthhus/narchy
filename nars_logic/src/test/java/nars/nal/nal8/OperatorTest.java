@@ -188,8 +188,8 @@ public class OperatorTest {
             @Override
             public List<Task> run(Task t, Subst s) {
                 System.out.println(t + " " + s);
-                assertEquals($("x"), s.getXY($("%a")));
-                assertEquals($("y"), s.getXY($("%b")));
+                assertEquals($("x"), s.term($("%a")));
+                assertEquals($("y"), s.term($("%b")));
                 count.getAndIncrement();
                 return null;
             }
@@ -223,8 +223,8 @@ public class OperatorTest {
         PatternAnswer addition = new PatternAnswer("add(%a,%b,#x)") {
             final Term A = $("%a"), B = $("%b");
             @Override public List<Task> run(Task question, Subst s) {
-                int a = i(s.getXY(A).toString());
-                int b = i(s.getXY(B).toString());
+                int a = i(s.term(A).toString());
+                int b = i(s.term(B).toString());
 
                 return Lists.newArrayList(
                         $.$("add(" + a + ',' + b + ',' +

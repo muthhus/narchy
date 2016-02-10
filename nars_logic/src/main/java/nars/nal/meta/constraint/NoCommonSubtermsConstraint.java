@@ -20,7 +20,7 @@ public final class NoCommonSubtermsConstraint implements MatchConstraint {
 
     @Override
     public boolean invalid(Term x, Term y, @NotNull FindSubst f) {
-        Term B = f.getXY(b);
+        Term B = f.term(b);
         if (B != null) {
             Set<Term> tmpSet = Global.newHashSet(0);
             return sharedSubterms(y, B, tmpSet);

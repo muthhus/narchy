@@ -250,10 +250,8 @@
 
     B, (A <=> C) |- substituteIfUnifies(C,"$",A,B), (Belief:Deduction, Desire:Induction, Order:ForAllSame)
 
-    B, (A ==> C) |-  substituteIfUnifies( C, "$",A,B), (Belief:Deduction, Order:ForAllSame, Event:Anticipate)
-    B, (C ==> A) |-  substituteIfUnifies( C, "$",A,B), (Belief:Abduction, Order:ForAllSame)
-
-    (A ==> C), B |-  substituteIfUnifies( C, "$",A,B), (Belief:Deduction, Order:ForAllSame, Event:Anticipate)
+    (A ==> C), B |-  substituteIfUnifies( C, "$",A,B), (Belief:BeliefStructuralDeduction, Desire:Induction, Order:ForAllSame, Event:Anticipate)
+    (C ==> A), B |-  substituteIfUnifies( C, "$",A,B), (Belief:StructuralAbduction, Desire:Deduction, Order:ForAllSame)
 
 
 // the following two are probably dangerous and dont seem helpful:
@@ -284,6 +282,8 @@
 //// conjunction decompose
      (&&,X,A..+), X  |- (&&,A..+), (Belief:StructuralDeduction, Desire:StructuralStrong),
                         X, (Belief:StructuralDeduction, Desire:StructuralStrong)
+//     X, (&&,X,A..+)  |- (&&,A..+), (Belief:Deduction, Desire:Induction),
+//                        X, (Belief:Deduction, Desire:Induction)
 
 
 
@@ -312,9 +312,12 @@
 
     Y, ((&&,X,A..+) ==> B) |- substituteIfUnifies(((&&,A..+) ==> B),"$",X,Y), (Belief:Deduction, Order:ForAllSame)
 
+    Y, ((&&,X,A) ==> B) |- substituteIfUnifies((A ==> B),"$",X,Y), (Belief:Deduction, Order:ForAllSame)
+
     ((&&,M,A..+) ==> C), ((&&,A..+) ==> C) |- M, (Belief:Abduction, Order:ForAllSame)
 //single case of previous which doesnt require conjunction in single-term case
-    ((&&,M,A) ==> C), (A ==> C) |- M, (Belief:Abduction, Order:ForAllSame)
+    ((&&,M,A) ==> C), (A==>C) |- M, (Belief:Abduction, Order:ForAllSame)
+
 
 //Can be derived by NAL7 rules so this won't be necessary there (Order:ForAllSame left out here)
 

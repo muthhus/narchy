@@ -43,13 +43,32 @@ public class substitute extends ImmediateTermTransform implements PremiseAware {
 
         return subst(r, term, x, y);
     }
+//
+//    @Nullable
+//    public static Term resolve(@NotNull PremiseMatch r, Term x) {
+//        Term x2 = r.yx.get(x);
+//        if (x2 == null) {
+//
+//            x2 = r.xy.get(x);
+//            if (x2!=null)
+//                System.out.println(x2);
+//        }
+//        return (x2 == null) ? x : x2;
+//    }
 
-    @Nullable
-    public static Term resolve(@NotNull PremiseMatch r, Term x) {
-        Term x2 = r.yx.get(x);
-        if (x2 == null)
-            x2 = x;
-        return x2;
+    public static final Term resolve(PremiseMatch r, Term x) {
+        //TODO make a half resolve that only does xy?
+
+        Term ret = r.yx.get(x);
+        if(ret != null) {
+//            Term ret2 = r.xy.get(ret);
+//            if (ret2!=null)
+//                return ret2;
+//            else
+                return ret;
+        }
+        return ret == null ? x : ret;
+
     }
 
     @Nullable
@@ -72,7 +91,7 @@ public class substitute extends ImmediateTermTransform implements PremiseAware {
         m.forEach( (k,v) -> {
             if (!r.putXY(k, v)) {
                 //throw new RuntimeException("what does this mean");
-                r.xy.put(k, v); //HACK
+                //r.xy.put(k, v); //HACK
             }
         });
 //        if (!m.yx.isEmpty()) {

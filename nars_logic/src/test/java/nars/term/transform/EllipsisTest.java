@@ -12,7 +12,6 @@ import nars.term.TermIndex;
 import nars.term.atom.Atom;
 import nars.term.index.PatternIndex;
 import nars.term.transform.subst.FindSubst;
-import nars.term.variable.Variable;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.junit.Test;
 
@@ -59,7 +58,7 @@ public class EllipsisTest {
                     public boolean onMatch() {
                         //System.out.println(x + "\t" + y + "\t" + this);
 
-                        EllipsisMatch varArgs = (EllipsisMatch)getXY(ellipsisTerm);
+                        EllipsisMatch varArgs = (EllipsisMatch) term(ellipsisTerm);
 
                         matched.set(true);
 
@@ -173,7 +172,7 @@ public class EllipsisTest {
 
         @Override public void testFurther(Set<Term> selectedFixed, FindSubst f, Set<Term> varArgTerms) {
             TestCase.assertEquals(f.toString(), 2, f.xy.size());
-            Term fixedTermValue = f.getXY(fixedTerm);
+            Term fixedTermValue = f.term(fixedTerm);
             TestCase.assertEquals(Atom.class, fixedTermValue.getClass());
             TestCase.assertFalse(varArgTerms.contains(fixedTermValue));
         }

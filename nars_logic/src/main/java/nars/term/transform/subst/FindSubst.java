@@ -146,11 +146,9 @@ public abstract class FindSubst extends Versioning implements Subst {
 
     @Nullable
     @Override
-    public final Term getXY(@NotNull Term t) {
-        return xy.getXY(t);
+    public final Term term(@NotNull Term t) {
+        return xy.term(t);
     }
-
-
 
 
     public final void matchAll(@NotNull Term x, @NotNull Term y) {
@@ -276,7 +274,7 @@ public abstract class FindSubst extends Versioning implements Subst {
 
 
     private final boolean matchXvar(@NotNull Variable x, @NotNull Term y) {
-        Term t = getXY(x);
+        Term t = term(x);
 
         return (t != null) ?
                 match(t, y) :
@@ -285,7 +283,7 @@ public abstract class FindSubst extends Versioning implements Subst {
 
     }
     private final boolean matchYvar(@NotNull Term x, @NotNull Variable y) {
-        Term t = yx.getXY(y);
+        Term t = yx.term(y);
 
         if (t != null) {
             return match(x, t); //loop
@@ -353,7 +351,9 @@ public abstract class FindSubst extends Versioning implements Subst {
 
 
         if (X.isCommutative()) {
-            return matchCompoundWithEllipsisCommutative(X, Y, e);
+            return matchEllipsedCommutative(
+                    X, e, Y
+            );
         } else {
             return matchCompoundWithEllipsisLinear(X, Y, e);
         }
@@ -379,7 +379,7 @@ public abstract class FindSubst extends Versioning implements Subst {
                 //being processed. (this is the opposite
                 //of the other condition of this if { })
                 if (matchEllipsedLinear(X, e, Y)) {
-                    EllipsisMatch raw = (EllipsisMatch) getXY(e);
+                    EllipsisMatch raw = (EllipsisMatch) term(e);
                     xy.put(e, null); //HACK clear it to replace with a new value
                     return putXY(e, ImageMatch.put(raw.term, n, Y));
                 }
@@ -393,7 +393,7 @@ public abstract class FindSubst extends Versioning implements Subst {
 
                 int imageIndex = Y.indexOf(n);
                 return ((imageIndex != -1) && matchEllipsedLinear(X, e, Y)) &&
-                        putXY(e, ImageMatch.take((EllipsisMatch) getXY(e), imageIndex));
+                        putXY(e, ImageMatch.take((EllipsisMatch) term(e), imageIndex));
 
             }
             return false;
@@ -428,13 +428,7 @@ public abstract class FindSubst extends Versioning implements Subst {
         return matchEllipsedLinear(X, e, Y);
     }
 
-    public boolean matchCompoundWithEllipsisCommutative(@NotNull Compound X, @NotNull Compound Y, Ellipsis e) {
-        return matchEllipsedCommutative(
-                X, e, Y
-        );
-    }
-
-//    private boolean matchEllipsisImage(Compound x, Ellipsis e, Compound y) {
+    //    private boolean matchEllipsisImage(Compound x, Ellipsis e, Compound y) {
 //        /*  ex:
 //           (M --> (A..B=_..+))
 //        */
@@ -530,7 +524,7 @@ public abstract class FindSubst extends Versioning implements Subst {
         for (Term x : X.terms()) {
 
             boolean xVar = x.op() == type;
-            Term v = getXY(x); //xVar ? getXY(x) : x;
+            Term v = term(x); //xVar ? getXY(x) : x;
             if (v == null) v = x;
 
             //ellipsis to be matched in stage 2
@@ -669,7 +663,7 @@ public abstract class FindSubst extends Versioning implements Subst {
             if (x instanceof Ellipsis) {
                 int available = ysize - j;
 
-                Term eMatched = getXY(x); //EllipsisMatch, or null
+                Term eMatched = term(x); //EllipsisMatch, or null
                 if (eMatched == null) {
 
                     //COLLECT
@@ -919,7 +913,7 @@ public abstract class FindSubst extends Versioning implements Subst {
         }
 
         @Override
-        public final Term getXY(Term t) {
+        public final Term term(Term t) {
             Versioned<Term> v = map.get(t);
             return v == null ? null : v.get();
         }

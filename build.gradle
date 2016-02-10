@@ -3,6 +3,9 @@ plugins {
 //    //id "pl.squirrel.classycle" version "1.1"
 //    //id "com.github.nullstress.dependency-analysis" version "1.0.3"
 //    //id "com.github.tkruse.groovysh" version "1.0.8"  //https://github.com/tkruse/gradle-groovysh-plugin
+    id 'nebula.metrics' version '4.0.1' //https://github.com/nebula-plugins/gradle-metrics-plugin
+    id 'com.github.ksoichiro.console.reporter' version '0.3.4'
+
 }
 
 
@@ -16,6 +19,10 @@ allprojects {
     apply plugin: 'jdepend'
     apply plugin: 'project-report'
     apply plugin: 'com.github.nwillc.vplugin'
+
+
+
+    //https://github.com/evant/gradle-retrolambda
 
     group = 'opennars'
     version = '1.7-SNAPSHOT'

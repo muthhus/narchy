@@ -43,7 +43,9 @@ abstract public class PatternCompound extends GenericCompound {
         public boolean match(@NotNull Compound y, @NotNull FindSubst subst) {
             return canMatch(y) &&
                     op.isCommutative() ? //currently this is slightly different than Compound.isCommutive because it ignores the size case, which with ellipsis could seem equal to 1 but in fact would be commutive after matching
-                        subst.matchCompoundWithEllipsisCommutative(this, y, ellipsis) :
+                    subst.matchEllipsedCommutative(
+                            this, ellipsis, y
+                    ) :
                         subst.matchCompoundWithEllipsisLinear(this, y, ellipsis);
         }
 
