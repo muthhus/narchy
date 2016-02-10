@@ -7,14 +7,12 @@ package nars.op.software.prolog.terms;
  * @see Nonvar
  */
 public class Real extends Num {
+
+	public final double val;
+
 	public Real(double i) {
+		super(String.valueOf(i));
 		val = i;
-	}
-
-	final double val;
-
-	public String name() {
-		return String.valueOf(val);
 	}
 
 	boolean bind_to(Term that, Trail trail) {

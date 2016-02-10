@@ -1,6 +1,9 @@
 package nars.op.software.prolog.terms;
 
+import nars.Global;
 import nars.op.software.prolog.fluents.HashDict;
+
+import java.util.Map;
 
 /**
  * Used in implementing uniform replacement of variables with new constants.
@@ -10,25 +13,22 @@ import nars.op.software.prolog.fluents.HashDict;
  * @see Clause
  */
 class VarNumberer extends SystemObject {
-	final HashDict dict;
+
+	final Map<Term,PseudoVar> dict;
 
 	int ctr;
 
 	VarNumberer() {
-		dict = new HashDict();
+		super("VarNumberer");
+		dict = Global.newHashMap();
 		ctr = 0;
 	}
 
-	Term action(Term place) {
+	final Term action(Term place) {
 		place = place.ref();
 		// IO.trace(">>action: "+place);
 		if (place instanceof Var) {
-			Const root = (Const) dict.get(place);
-			if (null == root) {
-				root = new PseudoVar(ctr++);
-				dict.put(place, root);
-			}
-			place = root;
+			place = dict.computeIfAbsent(place, p-> new PseudoVar(ctr++));
 		}
 		// IO.trace("<<action: "+place);
 		return place;

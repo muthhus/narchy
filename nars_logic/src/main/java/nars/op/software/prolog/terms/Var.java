@@ -1,5 +1,9 @@
 package nars.op.software.prolog.terms;
 
+import nars.op.software.prolog.io.Base64Codec;
+
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * Part of the Term hierarchy implmenting logical variables. They are subject to
  * reset by application of and undo action keep on the trail stack.
@@ -7,7 +11,25 @@ package nars.op.software.prolog.terms;
 public final class Var extends Term {
 	protected Term val;
 
+	final static AtomicInteger varSerial = new AtomicInteger(1);
+	static String varName(int i) {
+
+		char[] chars = new char[7];
+		chars[0] = '_';
+		Base64Codec.encode2chars((byte)((i & 0xff000000) >> 24),
+								 (byte)((i & 0x00ff0000) >> 16),
+								 chars, 1);
+		Base64Codec.encode2chars((byte)((i & 0x0000ff00) >> 8),
+								 (byte)(i & 0x000000ff),
+								 chars, 4);
+
+		return new String(chars);
+
+		//return "_" + Integer.toString(i,36); //TODO base64+  TODO thread ID/UUID-like prefixed?
+	}
+
 	public Var() {
+		super(varName(varSerial.incrementAndGet()));
 		val = this;
 	}
 
@@ -59,12 +81,9 @@ public final class Var extends Term {
 		return R;
 	}
 
-	protected final String name() {
-		return '_' + Integer.toHexString(hashCode());
-	}
 
 	public String toString() {
 		Term t = ref();
-		return t == this ? name() : t.toString();
+		return t == this ? name : t.toString();
 	}
 }

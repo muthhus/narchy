@@ -26,8 +26,8 @@ public class Builtins extends HashDict {
 
 		// basics
 		register(new is_builtin());
-		register(Const.aTrue);
-		register(Const.aFail);
+		register(Const.TRUE);
+		register(Const.FAIL);
 		register(new halt());
 		register(new compute());
 
@@ -130,7 +130,7 @@ public class Builtins extends HashDict {
 	public Fun toFunBuiltin(Fun f) {
 		Term[] fa = f.args;
 		if (fa.length == 2) {
-			switch (f.name()) {
+			switch (f.name) {
 				case ":-" :
 					return new Clause(fa);
 				case "." :
@@ -171,7 +171,7 @@ public class Builtins extends HashDict {
 		}
 
 		public int exec(Prog p) {
-			String f = ((Const) arg(0)).name();
+			String f = ((Const) arg(0)).name;
 			if (IO.trace())
 				IO.trace("consulting: " + f);
 			return DataBase.fromFile(prolog, f, false) ? 1 : 0;
@@ -211,7 +211,7 @@ public class Builtins extends HashDict {
 		}
 
 		public int exec(Prog p) {
-			String s = ((Const) arg(0)).name();
+			String s = ((Const) arg(0)).name;
 			int i = getIntArg(1);
 			Term T;
 			if (i == 0)
@@ -242,7 +242,7 @@ public class Builtins extends HashDict {
 					f = new ClauseReader(prolog, ((CharReader) I).reader, p);
 
 				else {
-					String s = ((Const) arg(0)).name();
+					String s = ((Const) arg(0)).name;
 					f = new ClauseReader(prolog, s, p);
 				}
 			} catch (Exception e) {
@@ -263,7 +263,7 @@ public class Builtins extends HashDict {
 		}
 
 		public int exec(Prog p) {
-			String f = ((Const) arg(0)).name();
+			String f = ((Const) arg(0)).name;
 			return DataBase.fromFile(prolog, f) ? 1 : 0;
 		}
 	}
@@ -451,7 +451,7 @@ final class system extends FunBuiltin {
 	}
 
 	public int exec(Prog p) {
-		String cmd = ((Const) arg(0)).name();
+		String cmd = ((Const) arg(0)).name;
 		return IO.system(cmd);
 	}
 }
@@ -470,7 +470,7 @@ final class file_char_reader extends FunBuiltin {
 		if (I instanceof CharReader)
 			f = new CharReader(((CharReader) I).reader, p);
 		else {
-			String s = ((Const) I).name();
+			String s = ((Const) I).name;
 			f = new CharReader(s, p);
 		}
 		return putArg(1, f, p);
@@ -486,7 +486,7 @@ final class char_file_writer extends FunBuiltin {
 	}
 
 	public int exec(Prog p) {
-		String s = ((Const) arg(0)).name();
+		String s = ((Const) arg(0)).name;
 		Fluent f = new CharWriter(s, p);
 		return putArg(1, f, p);
 	}
@@ -501,7 +501,7 @@ final class clause_file_writer extends FunBuiltin {
 	}
 
 	public int exec(Prog p) {
-		String s = ((Const) arg(0)).name();
+		String s = ((Const) arg(0)).name;
 		Fluent f = new ClauseWriter(s, p);
 		return putArg(1, f, p);
 	}
@@ -689,7 +689,7 @@ final class arg extends FunBuiltin {
 	public int exec(Prog p) {
 		int i = getIntArg(0);
 		Fun F = (Fun) arg(1);
-		Term A = (i == 0) ? new Const(F.name()) : ((i == -1) ? new Int(
+		Term A = (i == 0) ? new Const(F.name) : ((i == -1) ? new Int(
 				F.arity()) : F.args[i - 1]);
 		return putArg(2, A, p);
 	}
@@ -765,7 +765,7 @@ final class compute extends FunBuiltin {
 		if (!(o instanceof Const) || !(a instanceof Num) || !(b instanceof Num))
 			IO.error("bad arithmetic operation (" + o + "): " + a + ',' + b
 					+ "\nprog: " + p.toString());
-		String opname = ((Const) o).name();
+		String opname = ((Const) o).name;
 		double x = ((Num) a).getValue();
 		double y = ((Num) b).getValue();
 		double r;
@@ -1011,7 +1011,7 @@ final class collect extends FunBuiltin {
 		Sink s = (Sink) arg(0);
 		Term X = s.collect();
 		if (null == X)
-			X = Const.aNo;
+			X = Const.NO;
 		else
 			X = new Fun("the", X);
 		return putArg(1, X, p);
@@ -1075,7 +1075,7 @@ final class set_persistent extends FunBuiltin {
 	public int exec(Prog p) {
 		Fluent F = (Fluent) arg(0);
 		Const R = (Const) arg(1);
-		boolean yesno = !R.equals(Const.aNo);
+		boolean yesno = !R.equals(Const.NO);
 		F.setPersistent(yesno);
 		return 1;
 	}
@@ -1091,7 +1091,7 @@ final class get_persistent extends FunBuiltin {
 
 	public int exec(Prog p) {
 		Fluent F = (Fluent) arg(0);
-		Term R = F.getPersistent() ? Const.aYes : Const.aNo;
+		Term R = F.getPersistent() ? Const.YES : Const.NO;
 		return putArg(1, R, p);
 	}
 }

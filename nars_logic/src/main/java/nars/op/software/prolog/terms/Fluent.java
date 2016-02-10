@@ -6,11 +6,15 @@ package nars.op.software.prolog.terms;
  * 
  */
 public class Fluent extends SystemObject {
+
+	public static final String FluentPrefix = "f";
+
 	public Fluent(Prog p) {
+		super(FluentPrefix);
 		trailMe(p);
 	}
 
-	private boolean persistent = false;
+	private boolean persistent;
 
 	/**
 	 * Dynamically sets the persistence status of this Fluent. A persistent

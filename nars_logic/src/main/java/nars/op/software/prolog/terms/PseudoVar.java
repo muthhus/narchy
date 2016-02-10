@@ -16,6 +16,6 @@ class PseudoVar extends Const {
 	}
 
 	public String toString() {
-		return name();
+		return name;
 	}
 }

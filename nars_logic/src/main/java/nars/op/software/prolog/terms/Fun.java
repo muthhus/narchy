@@ -1,5 +1,7 @@
 package nars.op.software.prolog.terms;
 
+import org.jetbrains.annotations.Nullable;
+
 /**
  * Implements compound terms
  *
@@ -30,7 +32,8 @@ public class Fun extends Const {
         this.args = args;
     }
 
-    public Fun(String s, int arity) {
+    /** null will cause this function to take its class simplename as the identifier */
+    public Fun(@Nullable String s, int arity) {
         super(s);
         args = new Term[arity];
     }
@@ -182,10 +185,10 @@ public class Fun extends Const {
     }
 
     public Const listify() {
-        Cons l = new Cons(new Const(name()), Const.aNil);
+        Cons l = new Cons(new Const(name), Const.NIL);
         Cons curr = l;
         for (int i = 0; i < args.length; i++) {
-            Cons tail = new Cons(args[i], Const.aNil);
+            Cons tail = new Cons(args[i], Const.NIL);
             curr.args[1] = tail;
             curr = tail;
         }
@@ -193,6 +196,6 @@ public class Fun extends Const {
     }
 
     boolean isClause() {
-        return arity() == 2 && name().equals(":-");
+        return arity() == 2 && name.equals(":-");
     }
 }

@@ -24,7 +24,7 @@ public class TermSource extends Source {
 			X = val;
 			val = null;
 		} else if (0 == pos)
-			X = new Const(val.name());
+			X = new Const(val.name);
 		else if (pos <= val.arity())
 			X = ((Fun) val).arg(pos - 1);
 		else {

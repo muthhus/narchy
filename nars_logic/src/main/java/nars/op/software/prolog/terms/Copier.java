@@ -1,10 +1,12 @@
 package nars.op.software.prolog.terms;
 
-import nars.op.software.prolog.fluents.HashDict;
+import nars.Global;
 import nars.op.software.prolog.io.IO;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 //!depends
 
@@ -19,32 +21,20 @@ public class Copier extends SystemObject {
 	 * speeded up through specialization.
 	 */
 	final static Const anAnswer = new Const("answer");
-	private final HashDict dict;
+	private final Map<Term,Var> dict;
 
+	final static String COPIER_PREFIX = "c";
 	/**
 	 * creates a new Copier together with its related HashDict for variables
 	 */
 	Copier() {
-		dict = new HashDict();
+		super(COPIER_PREFIX);
+		dict = Global.newHashMap();
 	}
 
 	// Term copyMe(Term that) {
 	// return that.reaction(this);
 	// }
-
-	/**
-	 * Reifies an Iterator as a ArrayList. ArrayList.iterator() can give back
-	 * the iterator if needed.
-	 * 
-	 * @see Copier
-	 */
-	static ArrayList EnumerationToVector(Iterator e) {
-		ArrayList V = new ArrayList();
-		while (e.hasNext()) {
-			V.add(e.next());
-		}
-		return V;
-	}
 
 	public static ArrayList ConsToVector(Const Xs) {
 		ArrayList V = new ArrayList();
@@ -70,30 +60,13 @@ public class Copier extends SystemObject {
 	}
 
 	/**
-	 * Converts a reified Iterator to functor based on name of Const c and args
-	 * being the elements of the Iterator.
-	 */
-
-	static Term toFun(Const c, Iterator e) {
-		ArrayList V = EnumerationToVector(e);
-		int arity = V.size();
-		if (arity == 0)
-			return c;
-		Fun f = new Fun(c.name(), arity);
-		for (int i = 0; i < arity; i++) {
-			f.args[i] = (Term) V.get(i);
-		}
-		return f;
-	}
-
-	/**
 	 * Represents a list [f,a1...,an] as f(a1,...,an)
 	 */
 
 	static Fun VectorToFun(ArrayList V) {
 		Const f = (Const) V.get(0);
 		int arity = V.size() - 1;
-		Fun T = new Fun(f.name(), arity);
+		Fun T = new Fun(f.name, arity);
 		for (int i = 0; i < arity; i++) {
 			T.args[i] = (Term) V.get(i + 1);
 		}
@@ -108,9 +81,8 @@ public class Copier extends SystemObject {
 	Term action(Term place) {
 
         if (place instanceof Var) {
-            place = (Var) dict.computeIfAbsent(place, p -> {
-                return new Var();
-            });
+            place = dict.computeIfAbsent(place, p -> new Var());
+
 //      Var root=(Var)dict.get(place);
 //      if(null==root) {
 //        root=new Var();
@@ -124,6 +96,17 @@ public class Copier extends SystemObject {
 	Term getMyVars(Term that) {
 		/* Term */
 		that.reaction(this);
-		return toFun(anAnswer, dict.keySet().iterator());
+
+		if (dict.isEmpty())
+			return anAnswer;
+
+		int arity = dict.size();
+		Term[] t = new Term[arity];
+		final int[] i = {0};
+		dict.forEach( (k,v) -> {
+			t[i[0]++] = v;
+		});
+
+		return new Fun(anAnswer.name, t);
 	}
 }

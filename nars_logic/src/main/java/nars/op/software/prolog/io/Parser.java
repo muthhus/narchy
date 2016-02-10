@@ -420,7 +420,7 @@ public class Parser extends Lexer {
 			mes = "unknown_error";
 		Fun f = new Fun("error", new Const(type), new Const(mes), new Fun(
 				"line", new Int(line)));
-		Clause C = new Clause(f, Const.aTrue);
+		Clause C = new Clause(f, Const.TRUE);
 		if (verbose) {
 			IO.error(type + " error at line:" + line);
 			IO.error(C.pprint(), e);
@@ -430,7 +430,7 @@ public class Parser extends Lexer {
 
 	static public final boolean isError(Clause C) {
 		Term H = C.head();
-		return H instanceof Fun && "error".equals(((Fun) H).name())
+		return H instanceof Fun && "error".equals(((Fun) H).name)
 				&& H.arity() == 3 && !(((Fun) H).args[0].ref() instanceof Var);
 	}
 
@@ -566,7 +566,7 @@ public class Parser extends Lexer {
 	private final Term getList() throws IOException {
 		Term n = next();
 		if (n instanceof rbraToken)
-			return Const.aNil;
+			return Const.NIL;
 		Term t = getTerm(n);
 		return getListCont(t);
 	}
@@ -576,7 +576,7 @@ public class Parser extends Lexer {
 		Term n = next();
 		Term t = null;
 		if (n instanceof rbraToken)
-			t = new Cons(curr, Const.aNil);
+			t = new Cons(curr, Const.NIL);
 		else if (n instanceof barToken) {
 			t = new Cons(curr, getTerm());
 			n = next();

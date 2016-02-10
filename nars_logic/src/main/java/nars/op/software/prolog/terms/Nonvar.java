@@ -7,7 +7,9 @@ package nars.op.software.prolog.terms;
  */
 public abstract class Nonvar extends Term {
 
-	public abstract String name();
+	protected Nonvar(String id) {
+		super(id);
+	}
 
 	boolean bind_to(Term that, Trail trail) {
 		return getClass() == that.getClass();

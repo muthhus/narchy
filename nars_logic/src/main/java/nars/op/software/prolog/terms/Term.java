@@ -8,6 +8,9 @@ import nars.op.software.prolog.Prolog;
  */
 public abstract class Term implements Cloneable {
 
+	public final String name;
+
+
 	public final static int JAVA = -4;
 
 	public final static int REAL = -3;
@@ -17,6 +20,22 @@ public abstract class Term implements Cloneable {
 	public final static int VAR = -1;
 
 	public final static int CONST = 0;
+
+	protected Term(String id) {
+		this.name = id;
+	}
+
+	@Override
+	public int hashCode() {
+		return name.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (!(obj instanceof Term)) return false;
+		return name.equals(((Term)obj).name);
+	}
 
 	/**
 	 * returns or fakes an arity for all subtypes
@@ -54,7 +73,7 @@ public abstract class Term implements Cloneable {
 	// }
 
 	public Clause toClause() {
-		return new Clause(this, Const.aTrue);
+		return new Clause(this, Const.TRUE);
 	}
 
 	boolean isClause() {
@@ -111,8 +130,7 @@ public abstract class Term implements Cloneable {
 	 * @see Fun
 	 */
 	Term reaction(Term agent) {
-		Term T = agent.action(this);
-		return T;
+		return agent.action(this);
 	}
 
 	/**
@@ -198,11 +216,11 @@ public abstract class Term implements Cloneable {
 
 	static final Nonvar stringToChars(String s) {
 		if (0 == s.length())
-			return Const.aNil;
-		Cons l = new Cons(new Int((s.charAt(0))), Const.aNil);
+			return Const.NIL;
+		Cons l = new Cons(new Int((s.charAt(0))), Const.NIL);
 		Cons curr = l;
 		for (int i = 1; i < s.length(); i++) {
-			Cons tail = new Cons(new Int((s.charAt(i))), Const.aNil);
+			Cons tail = new Cons(new Int((s.charAt(i))), Const.NIL);
 			curr.args[1] = tail;
 			curr = tail;
 		}

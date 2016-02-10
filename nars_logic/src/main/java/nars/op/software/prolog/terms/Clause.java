@@ -64,7 +64,7 @@ public class Clause extends Fun {
             IO.trace("read string: <" + line + '>');
 
         if (null == line)
-            line = Const.anEof.name();
+            line = Const.anEof.name;
         else if (0 == line.length())
             return null;
 
@@ -251,7 +251,7 @@ public class Clause extends Fun {
         Term body = body();
         return body instanceof Conj ?
                 ((Conj) body).args[1].ref() :
-                Const.aTrue;
+                Const.TRUE;
     }
 
     /**

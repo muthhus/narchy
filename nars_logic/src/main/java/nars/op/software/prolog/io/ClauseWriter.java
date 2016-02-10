@@ -21,7 +21,7 @@ public class ClauseWriter extends CharWriter {
 		if (null == writer)
 			return 0;
 		String s = null;
-		if ((t instanceof Fun) && "$string".equals(((Fun) t).name())) {
+		if ((t instanceof Fun) && "$string".equals(((Fun) t).name)) {
 			Const Xs = (Const) ((Fun) t).arg(0);
 			s = Term.charsToString(Xs);
 		} else

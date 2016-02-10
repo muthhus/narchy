@@ -5,6 +5,7 @@ package nars.op.software.prolog.terms;
  */
 
 abstract public class FunBuiltin extends Fun {
+
 	public FunBuiltin(String f, int i) {
 		super(f, i);
 	}

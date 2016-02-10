@@ -8,41 +8,36 @@ import java.util.Objects;
 
 public class Const extends Nonvar {
 
-	public final static Nil aNil = new Nil();
+	public final static Nil NIL = new Nil();
 
-	public final static Const aTrue = new true_();
+	public final static Const TRUE = new true_();
 
-	public final static Const aFail = new fail_();
+	public final static Const FAIL = new fail_();
 
-	public final static Const aYes = new Const("yes");
+	public final static Const YES = new Const("yes");
 
-	public final static Const aNo = new Const("no");
+	public final static Const NO = new Const("no");
 
 	public final static Const anEof = new Const("end_of_file");
 
 	public final static Const the(Term X) {
-		return (null == X) ? Const.aNo : new Fun("the", X);
+		return (null == X) ? Const.NO : new Fun("the", X);
 	}
 
-	public final String sym;
 
+	/** null will cause this function to take its class simplename as the identifier */
 	public Const(String s) {
-
-		sym = s; //s.intern();
-	}
-
-	public final String name() {
-		return sym;
+		super( s ); //s.intern();
 	}
 
 	public String qname() {
-		if (0 == sym.length())
+		if (0 == name.length())
 			return "''";
-		for (int i = 0; i < sym.length(); i++) {
-			if (!Character.isLowerCase(sym.charAt(i)))
-				return '\'' + sym + '\'';
+		for (int i = 0; i < name.length(); i++) {
+			if (!Character.isLowerCase(name.charAt(i)))
+				return '\'' + name + '\'';
 		}
-		return sym;
+		return name;
 	}
 
 	public String toString() {
@@ -51,11 +46,11 @@ public class Const extends Nonvar {
 
 	boolean bind_to(Term that, Trail trail) {
 		return super.bind_to(that, trail)
-				&& Objects.equals(((Const) that).sym, sym);
+				&& Objects.equals(((Const) that).name, name);
 	}
 
 	public String getKey() {
-		return sym;
+		return name;
 	}
 
 	/**
@@ -74,10 +69,10 @@ public class Const extends Nonvar {
 	 */
 
 	public final String toUnquoted() {
-		return name();
+		return name;
 	}
 
 	public final String key() {
-		return name() + '/' + arity();
+		return name + '/' + arity();
 	}
 }

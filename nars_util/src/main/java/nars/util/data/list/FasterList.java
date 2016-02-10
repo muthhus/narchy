@@ -3,6 +3,7 @@ package nars.util.data.list;
 import com.gs.collections.api.list.MutableList;
 import com.gs.collections.api.tuple.Pair;
 import com.gs.collections.impl.list.mutable.FastList;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
@@ -55,6 +56,12 @@ public class FasterList<X> extends FastList<X> {
 
     public X removeLast() {
         return this.items[--size];
+    }
+
+    @Nullable
+    public X removeLastElseNull() {
+        int s = size;
+        return s == 0 ? null : removeLast();
     }
 
     @Override
@@ -165,4 +172,6 @@ public class FasterList<X> extends FastList<X> {
     public void clearFast() {
         popTo(-1);
     }
+
+
 }
