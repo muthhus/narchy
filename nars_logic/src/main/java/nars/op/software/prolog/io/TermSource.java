@@ -16,8 +16,8 @@ public class TermSource extends Source {
 
 	private int pos;
 
-	public Term getElement() {
-		Term X;
+	public PTerm getElement() {
+		PTerm X;
 		if (null == val)
 			X = null;
 		else if (!(val instanceof Fun)) {

@@ -1,6 +1,6 @@
 package nars.op.software.prolog;
 
-import nars.op.software.prolog.terms.Term;
+import nars.op.software.prolog.terms.PTerm;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -22,7 +22,7 @@ public class PrologMainTest {
     public void test1() {
         PrologMain p = new PrologMain();
         p.ask("['/tmp/x'].");
-        Term r = p.ask("mid.");
+        PTerm r = p.ask("mid.");
         System.out.println(r);
 
         //assertEquals("the(['/tmp/x'])", p.goal("['/tmp/x'].").pprint());

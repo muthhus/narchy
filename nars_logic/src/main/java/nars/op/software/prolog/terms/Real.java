@@ -3,7 +3,7 @@ package nars.op.software.prolog.terms;
 /**
  * Part of the Term hierarchy, implementing double float point numbers.
  * 
- * @see Term
+ * @see PTerm
  * @see Nonvar
  */
 public class Real extends Num {
@@ -15,12 +15,12 @@ public class Real extends Num {
 		val = i;
 	}
 
-	boolean bind_to(Term that, Trail trail) {
+	boolean bind_to(PTerm that, Trail trail) {
 		return super.bind_to(that, trail) && val == ((Real) that).val;
 	}
 
 	public final int arity() {
-		return Term.REAL;
+		return PTerm.REAL;
 	}
 
 	public final double getValue() {

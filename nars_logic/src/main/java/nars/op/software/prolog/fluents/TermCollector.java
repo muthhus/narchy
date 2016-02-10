@@ -2,7 +2,7 @@ package nars.op.software.prolog.fluents;
 
 import nars.op.software.prolog.terms.Prog;
 import nars.op.software.prolog.terms.Sink;
-import nars.op.software.prolog.terms.Term;
+import nars.op.software.prolog.terms.PTerm;
 
 import java.util.ArrayList;
 
@@ -20,7 +20,7 @@ public class TermCollector extends Sink {
 		this.buffer = new ArrayList();
 	}
 
-	public int putElement(Term T) {
+	public int putElement(PTerm T) {
 		buffer.add(T);
 		return 1;
 	}
@@ -29,7 +29,7 @@ public class TermCollector extends Sink {
 		buffer = null;
 	}
 
-	public Term collect() {
+	public PTerm collect() {
 		return new JavaSource(buffer, p);
 	}
 }

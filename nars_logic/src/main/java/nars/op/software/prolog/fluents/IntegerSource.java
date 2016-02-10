@@ -3,7 +3,7 @@ package nars.op.software.prolog.fluents;
 import nars.op.software.prolog.terms.Int;
 import nars.op.software.prolog.terms.Prog;
 import nars.op.software.prolog.terms.Source;
-import nars.op.software.prolog.terms.Term;
+import nars.op.software.prolog.terms.PTerm;
 
 /**
  * creates a source of integers based on x=a*x+b formula
@@ -26,7 +26,7 @@ public class IntegerSource extends Source {
 
 	private long x;
 
-	public Term getElement() {
+	public PTerm getElement() {
 		if (fuel <= 0)
 			return null;
 		Int R = new Int(x);

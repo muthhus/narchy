@@ -1,15 +1,22 @@
 package nars.op.software.prolog.terms;
 
+import nars.Op;
 import nars.op.software.prolog.io.Base64Codec;
+import nars.term.Compound;
+import nars.term.SubtermVisitor;
+import nars.term.Term;
+import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 
 /**
  * Part of the Term hierarchy implmenting logical variables. They are subject to
  * reset by application of and undo action keep on the trail stack.
  */
-public final class Var extends Term {
-	protected Term val;
+public final class Var extends PTerm {
+	protected PTerm val;
 
 	final static AtomicInteger varSerial = new AtomicInteger(1);
 	static String varName(int i) {
@@ -34,15 +41,15 @@ public final class Var extends Term {
 	}
 
 	public int arity() {
-		return Term.VAR;
+		return PTerm.VAR;
 	}
 
-	public final Term ref() {
-		Term v = this.val;
+	public final PTerm ref() {
+		PTerm v = this.val;
 		return (v == this) ? this : v.ref();
 	}
 
-	public boolean bind_to(Term x, Trail trail) {
+	public boolean bind_to(PTerm x, Trail trail) {
 		val = x;
 		trail.add(this);
 		return true;
@@ -52,27 +59,24 @@ public final class Var extends Term {
 		val = this;
 	}
 
-	boolean unify_to(Term that, Trail trail) {
+	boolean unify_to(PTerm that, Trail trail) {
 		// expects: this, that are dereferenced
 		// return (this==that)?true:val.bind_to(that,trail);
 		return val.bind_to(that, trail);
 	}
 
-	public boolean eq(Term x) { // not a term compare!
+	public boolean eq(PTerm x) { // not a term compare!
 		return ref() == x.ref();
 	}
 
 	public String getKey() {
-		Term t = ref();
-		if (t instanceof Var)
-			return null;
-		else
-			return t.getKey();
+		PTerm t = ref();
+		return t instanceof Var ? null : t.getKey();
 	}
 
-	Term reaction(Term agent) {
+	PTerm reaction(PTerm agent) {
 
-		Term R = agent.action(ref());
+		PTerm R = agent.action(ref());
 
 		if (!(R instanceof Var)) {
 			R = R.reaction(agent);
@@ -81,9 +85,106 @@ public final class Var extends Term {
 		return R;
 	}
 
-
-	public String toString() {
-		Term t = ref();
+	@Override
+	public final String toString() {
+		PTerm t = ref();
 		return t == this ? name : t.toString();
+	}
+
+	@Override
+	public Op op() {
+		return null;
+	}
+
+	@Override
+	public int volume() {
+		return 0;
+	}
+
+	@Override
+	public int complexity() {
+		return 0;
+	}
+
+	@Override
+	public int structure() {
+		return 0;
+	}
+
+	@Override
+	public int size() {
+		return 0;
+	}
+
+	@Override
+	public boolean containsTerm(Term t) {
+		return false;
+	}
+
+	@Override
+	public boolean and(Predicate<? super Term> v) {
+		return false;
+	}
+
+	@Override
+	public boolean or(Predicate<? super Term> v) {
+		return false;
+	}
+
+	@Override
+	public void recurseTerms(SubtermVisitor v, Compound parent) {
+
+	}
+
+	@Override
+	public boolean isCommutative() {
+		return false;
+	}
+
+	@Override
+	public int varIndep() {
+		return 0;
+	}
+
+	@Override
+	public int varDep() {
+		return 0;
+	}
+
+	@Override
+	public int varQuery() {
+		return 0;
+	}
+
+	@Override
+	public int vars() {
+		return 0;
+	}
+
+	@Override
+	public void append(Appendable w, boolean pretty) throws IOException {
+
+	}
+
+	@Override
+	public
+	@NotNull
+	StringBuilder toStringBuilder(boolean pretty) {
+		return null;
+	}
+
+	@Override
+	public String toString(boolean pretty) {
+		return null;
+	}
+
+	@Override
+	public boolean isCompound() {
+		return false;
+	}
+
+	@Override
+	public int compareTo(Object o) {
+		return 0;
 	}
 }

@@ -22,7 +22,7 @@ public class CharReader extends Source {
 		makeReader(f);
 	}
 
-	public CharReader(Term t, Prog p) {
+	public CharReader(PTerm t, Prog p) {
 		super(p);
 		this.reader = new StringReader(t.toUnquoted());
 	}
@@ -35,7 +35,7 @@ public class CharReader extends Source {
 		this.reader = IO.url_or_file(f);
 	}
 
-	public Term getElement() {
+	public PTerm getElement() {
 		if (IO.input == reader) {
 			String s = IO.promptln(">:");
 			if (null == s || s.length() == 0)

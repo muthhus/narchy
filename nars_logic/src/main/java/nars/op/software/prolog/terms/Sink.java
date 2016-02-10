@@ -6,9 +6,9 @@ abstract public class Sink extends Fluent {
 		super(p);
 	}
 
-	abstract public int putElement(Term T);
+	abstract public int putElement(PTerm T);
 
-	public Term collect() {
+	public PTerm collect() {
 		return null;
 	}
 }

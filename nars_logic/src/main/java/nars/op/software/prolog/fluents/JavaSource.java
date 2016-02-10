@@ -1,8 +1,8 @@
 package nars.op.software.prolog.fluents;
 
+import nars.op.software.prolog.terms.PTerm;
 import nars.op.software.prolog.terms.Prog;
 import nars.op.software.prolog.terms.Source;
-import nars.op.software.prolog.terms.Term;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -28,11 +28,11 @@ public class JavaSource extends Source {
 		this.e = V.iterator();
 	}
 
-	public Term getElement() {
+	public PTerm getElement() {
 		if (null == e || !e.hasNext())
 			return null;
 		else
-			return (Term) e.next();
+			return (PTerm) e.next();
 	}
 
 	public void stop() {

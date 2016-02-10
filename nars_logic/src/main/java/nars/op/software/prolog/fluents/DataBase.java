@@ -26,8 +26,8 @@ public class DataBase extends BlackBoard {
      * Removes a matching Term from the blackboards and signals failure if no
      * such term is found.
      */
-    public Term cin(String k, Term pattern) {
-        Term found = take(k, pattern);
+    public PTerm cin(String k, PTerm pattern) {
+        PTerm found = take(k, pattern);
         // if(found!=null) {
         // found=found.matching_copy(pattern);
         // }
@@ -41,7 +41,7 @@ public class DataBase extends BlackBoard {
     /**
      * Adds a Term to the blackboard
      */
-    public Term out(String k, Term pattern, boolean copying) {
+    public PTerm out(String k, PTerm pattern, boolean copying) {
         add(k, copying ? pattern.copy() : pattern);
         return yes;
     }
@@ -51,11 +51,11 @@ public class DataBase extends BlackBoard {
      */
 
     // synchronized
-    public Term out(String key, Term pattern) {
+    public PTerm out(String key, PTerm pattern) {
         return out(key, pattern, true); // copies pattern
     }
 
-    private void all0(int max, ArrayList To, String k, Term FXs) {
+    private void all0(int max, ArrayList To, String k, PTerm FXs) {
         if (0 == max)
             max = -1;
         Queue Q = (Queue) get(k);
@@ -63,7 +63,7 @@ public class DataBase extends BlackBoard {
             return;
         // todo: use always the same "server's" trail
         for (Iterator e = Q.toEnumeration(); e.hasNext(); ) {
-            Term t = (Term) e.next();
+            PTerm t = (PTerm) e.next();
             if (null == t)
                 break;
             t = t.matching_copy(FXs);
@@ -72,17 +72,17 @@ public class DataBase extends BlackBoard {
         }
     }
 
-    private Term all1(int max, Term FXs) {
-        ArrayList<Term> To = new ArrayList();
+    private PTerm all1(int max, PTerm FXs) {
+        ArrayList<PTerm> To = new ArrayList();
         for (Object o : keySet())
             all0(max, To, (String) o, FXs);
-        Fun R = new Fun("$", To.toArray(new Term[To.size()]));
+        Fun R = new Fun("$", To.toArray(new PTerm[To.size()]));
         // IO.mes("RR"+R);
         // To.copyInto(R.args);
         return ((Cons) R.listify()).args[1];
     }
 
-    private Term all2(int max, String k, Term FXs) {
+    private PTerm all2(int max, String k, PTerm FXs) {
         if (k == null) {
             // IO.mes("expensive operation: all/2 with unknown key");
             return all1(max, FXs);
@@ -91,16 +91,16 @@ public class DataBase extends BlackBoard {
         all0(max, To, k, FXs);
         if (To.size() == 0)
             return Const.NIL;
-        Fun R = new Fun("$", (Term[]) To.toArray());
+        Fun R = new Fun("$", (PTerm[]) To.toArray());
         // To.copyInto(R.args);
-        Term T = ((Cons) R.listify()).args[1];
+        PTerm T = ((Cons) R.listify()).args[1];
         return T;
     }
 
     /**
      * Returns a (possibly empty) list of matching Term objects
      */
-    public Term all(String k, Term FX) {
+    public PTerm all(String k, PTerm FX) {
         FX = all2(0, k, FX);
         return FX;
     }
@@ -110,7 +110,7 @@ public class DataBase extends BlackBoard {
      * key k
      *
      * @see Queue
-     * @see Term
+     * @see PTerm
      * @see Clause
      */
     public Iterator toEnumerationFor(String k) {
@@ -137,7 +137,7 @@ public class DataBase extends BlackBoard {
         Iterator e = Q.toEnumeration();
         StringBuilder s = new StringBuilder("% " + key + "\n\n");
         while (e.hasNext()) {
-            s.append(((Term) e.next()).pprint());
+            s.append(((PTerm) e.next()).pprint());
             s.append(".\n");
         }
         s.append('\n');

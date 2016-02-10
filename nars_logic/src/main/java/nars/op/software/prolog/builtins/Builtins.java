@@ -115,20 +115,20 @@ public class Builtins extends HashDict {
 	/**
 	 * registers a symbol as name of a builtin
 	 */
-	public void register(Const proto) {
+	public void register(Nonvar proto) {
 		// IO.mes("registering builtin: "+key);
-		put(proto.key(), proto);
+		put(proto.name, proto);
 	}
 
 	/**
 	 * Creates a new builtin
 	 */
-	public Const the(Const S) {
-		return (Const) get(S.key());
+	public Nonvar the(Nonvar S) {
+		return (Nonvar) get(S.name);
 	}
 
 	public Fun toFunBuiltin(Fun f) {
-		Term[] fa = f.args;
+		PTerm[] fa = f.args;
 		if (fa.length == 2) {
 			switch (f.name) {
 				case ":-" :
@@ -190,7 +190,7 @@ public class Builtins extends HashDict {
 			Source from = (Source) arg(0);
 			Sink to = (Sink) arg(1);
 			for (;;) {
-				Term X = from.getElement();
+				PTerm X = from.getElement();
 				if (null == X) {
 					to.stop();
 					break;
@@ -213,7 +213,7 @@ public class Builtins extends HashDict {
 		public int exec(Prog p) {
 			String s = ((Const) arg(0)).name;
 			int i = getIntArg(1);
-			Term T;
+			PTerm T;
 			if (i == 0)
 				T = prolog.toConstBuiltin(new Const(s));
 			else {
@@ -234,7 +234,7 @@ public class Builtins extends HashDict {
 		}
 
 		public int exec(Prog p) {
-			Term I = arg(0);
+			PTerm I = arg(0);
 			Fluent f;
 			try {
 				if (I instanceof CharReader)
@@ -321,7 +321,7 @@ public class Builtins extends HashDict {
 
 		public int exec(Prog p) {
 			Source S = (Source) arg(0);
-			Term Xs = toFunBuiltin(((Fun) S.toFun()));
+			PTerm Xs = toFunBuiltin(((Fun) S.toFun()));
 			return putArg(1, Xs, p);
 		}
 	}
@@ -349,7 +349,7 @@ public class Builtins extends HashDict {
 		}
 
 		public int exec(Prog p) {
-			Term R = prolog.db.all(arg(0).getKey(), new Var());
+			PTerm R = prolog.db.all(arg(0).getKey(), new Var());
 			return putArg(1, R, p);
 		}
 	}
@@ -465,7 +465,7 @@ final class file_char_reader extends FunBuiltin {
 	}
 
 	public int exec(Prog p) {
-		Term I = arg(0);
+		PTerm I = arg(0);
 		Fluent f;
 		if (I instanceof CharReader)
 			f = new CharReader(((CharReader) I).reader, p);
@@ -525,7 +525,7 @@ final class get_stdout extends FunBuiltin {
  * for a variable like X -2 for an integer like 13 -3 for real like 3.14 -4 for
  * a wrapped JavaObject;
  * 
- * @see Term#arity
+ * @see PTerm#arity
  */
 final class get_arity extends FunBuiltin {
 	get_arity() {
@@ -566,7 +566,7 @@ final class ctime extends FunBuiltin {
 	}
 
 	public int exec(Prog p) {
-		Term T = new Int(System.currentTimeMillis() - t0);
+		PTerm T = new Int(System.currentTimeMillis() - t0);
 		return putArg(0, T, p);
 	}
 }
@@ -613,7 +613,7 @@ final class db_add extends FunBuiltin {
 
 	public int exec(Prog p) {
 		DataBase db = (DataBase) arg(0).toObject();
-		Term X = arg(1);
+		PTerm X = arg(1);
 		// IO.mes("X==>"+X);
 		String key = X.getKey();
 		// IO.mes("key==>"+key);
@@ -636,8 +636,8 @@ final class db_remove extends FunBuiltin {
 
 	public int exec(Prog p) {
 		DataBase db = (DataBase) arg(0).toObject();
-		Term X = arg(1);
-		Term R = db.cin(X.getKey(), X);
+		PTerm X = arg(1);
+		PTerm R = db.cin(X.getKey(), X);
 		return putArg(2, R, p);
 	}
 }
@@ -656,8 +656,8 @@ final class db_collect extends FunBuiltin {
 
 	public int exec(Prog p) {
 		DataBase db = (DataBase) arg(0).toObject();
-		Term X = arg(1);
-		Term R = db.all(X.getKey(), X);
+		PTerm X = arg(1);
+		PTerm R = db.all(X.getKey(), X);
 		return putArg(2, R, p);
 	}
 }
@@ -689,7 +689,7 @@ final class arg extends FunBuiltin {
 	public int exec(Prog p) {
 		int i = getIntArg(0);
 		Fun F = (Fun) arg(1);
-		Term A = (i == 0) ? new Const(F.name) : ((i == -1) ? new Int(
+		PTerm A = (i == 0) ? new Const(F.name) : ((i == -1) ? new Int(
 				F.arity()) : F.args[i - 1]);
 		return putArg(2, A, p);
 	}
@@ -704,7 +704,7 @@ final class name_to_chars extends FunBuiltin {
 	}
 
 	public int exec(Prog p) {
-		Term Cs = arg(0).toChars();
+		PTerm Cs = arg(0).toChars();
 		return putArg(1, Cs, p);
 	}
 }
@@ -744,7 +744,7 @@ final class numbervars extends FunBuiltin {
 	}
 
 	public int exec(Prog p) {
-		Term T = arg(0).numbervars();
+		PTerm T = arg(0).numbervars();
 		return putArg(1, T, p);
 	}
 }
@@ -759,9 +759,9 @@ final class compute extends FunBuiltin {
 
 	public int exec(Prog p) {
 
-		Term o = arg(0);
-		Term a = arg(1);
-		Term b = arg(2);
+		PTerm o = arg(0);
+		PTerm a = arg(1);
+		PTerm b = arg(2);
 		if (!(o instanceof Const) || !(a instanceof Num) || !(b instanceof Num))
 			IO.error("bad arithmetic operation (" + o + "): " + a + ',' + b
 					+ "\nprog: " + p.toString());
@@ -843,7 +843,7 @@ final class source_list extends FunBuiltin {
 
 	public int exec(Prog p) {
 		Source S = (Source) arg(0);
-		Term Xs = S.toList();
+		PTerm Xs = S.toList();
 		return putArg(1, Xs, p);
 	}
 }
@@ -924,7 +924,7 @@ final class get extends FunBuiltin {
 	public int exec(Prog p) {
 		// IO.mes("<<"+getArg(0)+"\n"+p+p.getTrail().pprint());
 		Source S = (Source) arg(0);
-		Term A = Const.the(S.getElement());
+		PTerm A = Const.the(S.getElement());
 		// if(null==A) A=Const.aNo;
 		// else A=new Fun("the",A);
 		// IO.mes(">>"+A+"\n"+p+p.getTrail().pprint());
@@ -943,7 +943,7 @@ final class put extends FunBuiltin {
 
 	public int exec(Prog p) {
 		Sink S = (Sink) arg(0);
-		Term X = arg(1);
+		PTerm X = arg(1);
 		if (0 == S.putElement(X)) {
 			IO.error("error in putElement: " + X);
 		}
@@ -978,7 +978,7 @@ final class split_source extends FunBuiltin {
 
 	public int exec(Prog p) {
 		Source original = (Source) arg(0);
-		Const Xs = original.toList();
+		Nonvar Xs = original.toList();
 		return (putArg(1, new ListSource(Xs, p), p) > 0 && putArg(2,
 				new ListSource(Xs, p), p) > 0) ? 1 : 0;
 	}
@@ -1009,7 +1009,7 @@ final class collect extends FunBuiltin {
 
 	public int exec(Prog p) {
 		Sink s = (Sink) arg(0);
-		Term X = s.collect();
+		PTerm X = s.collect();
 		if (null == X)
 			X = Const.NO;
 		else
@@ -1091,7 +1091,7 @@ final class get_persistent extends FunBuiltin {
 
 	public int exec(Prog p) {
 		Fluent F = (Fluent) arg(0);
-		Term R = F.getPersistent() ? Const.YES : Const.NO;
+		PTerm R = F.getPersistent() ? Const.YES : Const.NO;
 		return putArg(1, R, p);
 	}
 }

@@ -4,8 +4,6 @@ import nars.Global;
 import nars.op.software.prolog.io.IO;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 //!depends
@@ -21,7 +19,7 @@ public class Copier extends SystemObject {
 	 * speeded up through specialization.
 	 */
 	final static Const anAnswer = new Const("answer");
-	private final Map<Term,Var> dict;
+	private final Map<PTerm,Var> dict;
 
 	final static String COPIER_PREFIX = "c";
 	/**
@@ -36,9 +34,9 @@ public class Copier extends SystemObject {
 	// return that.reaction(this);
 	// }
 
-	public static ArrayList ConsToVector(Const Xs) {
+	public static ArrayList ConsToVector(Nonvar Xs) {
 		ArrayList V = new ArrayList();
-		Term t = Xs;
+		PTerm t = Xs;
 		for (;;) {
 			if (t instanceof Nil) {
 				break;
@@ -68,7 +66,7 @@ public class Copier extends SystemObject {
 		int arity = V.size() - 1;
 		Fun T = new Fun(f.name, arity);
 		for (int i = 0; i < arity; i++) {
-			T.args[i] = (Term) V.get(i + 1);
+			T.args[i] = (PTerm) V.get(i + 1);
 		}
 		return T;
 	}
@@ -78,7 +76,7 @@ public class Copier extends SystemObject {
 	 * Ageneric mechanism will be used to recurse over Terms in a (truly:-)) OO
 	 * style (well, looks more like some Haskell stuff, but who cares).
 	 */
-	Term action(Term place) {
+	PTerm action(PTerm place) {
 
         if (place instanceof Var) {
             place = dict.computeIfAbsent(place, p -> new Var());
@@ -93,7 +91,7 @@ public class Copier extends SystemObject {
 
         return place;
     }
-	Term getMyVars(Term that) {
+	PTerm getMyVars(PTerm that) {
 		/* Term */
 		that.reaction(this);
 
@@ -101,7 +99,7 @@ public class Copier extends SystemObject {
 			return anAnswer;
 
 		int arity = dict.size();
-		Term[] t = new Term[arity];
+		PTerm[] t = new PTerm[arity];
 		final int[] i = {0};
 		dict.forEach( (k,v) -> {
 			t[i[0]++] = v;

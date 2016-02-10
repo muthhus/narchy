@@ -14,14 +14,14 @@ public class SourceMerger extends JavaSource {
 
 	private final Queue Q;
 
-	public Term getElement() {
+	public PTerm getElement() {
 		if (null == Q)
 			return null;
 		while (!Q.isEmpty()) {
 			Source current = (Source) Q.deq();
 			if (null == current)
 				continue;
-			Term T = current.getElement();
+			PTerm T = current.getElement();
 			if (null == T)
 				continue;
 			Q.enq(current);

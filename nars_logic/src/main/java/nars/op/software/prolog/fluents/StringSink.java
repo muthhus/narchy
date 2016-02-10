@@ -3,7 +3,7 @@ package nars.op.software.prolog.fluents;
 import nars.op.software.prolog.terms.Const;
 import nars.op.software.prolog.terms.Prog;
 import nars.op.software.prolog.terms.Sink;
-import nars.op.software.prolog.terms.Term;
+import nars.op.software.prolog.terms.PTerm;
 
 /**
  * Builds Fluents from Java Streams
@@ -16,7 +16,7 @@ public class StringSink extends Sink {
 		this.buffer = new StringBuilder();
 	}
 
-	public int putElement(Term t) {
+	public int putElement(PTerm t) {
 		buffer.append(t.toUnquoted());
 		return 1;
 	}
@@ -25,7 +25,7 @@ public class StringSink extends Sink {
 		buffer = null;
 	}
 
-	public Term collect() {
+	public PTerm collect() {
 		return new Const(buffer.toString());
 	}
 }

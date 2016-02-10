@@ -80,24 +80,24 @@ class Lexer extends StreamTokenizer {
 		return !inClause;
 	}
 
-	protected final Term make_const(String s) {
+	protected final PTerm make_const(String s) {
 		return new constToken(prolog, s);
 	}
 
-	private final static Term make_fun(String s) {
+	private final static PTerm make_fun(String s) {
 		return new funToken(s);
 	}
 
-	private final static Term make_int(double n) {
+	private final static PTerm make_int(double n) {
 		return new intToken((int) n);
 	}
 
-	private final static Term make_real(double n) {
+	private final static PTerm make_real(double n) {
 		return new realToken(n);
 	}
 
-	private final static Term make_number(double nval) {
-		Term T;
+	private final static PTerm make_number(double nval) {
+		PTerm T;
 		if (Math.floor(nval) == nval)
 			T = make_int(nval);
 		else
@@ -105,7 +105,7 @@ class Lexer extends StreamTokenizer {
 		return T;
 	}
 
-	private final Term make_var(String s) {
+	private final PTerm make_var(String s) {
 		s = s.intern();
 		Var X;
 		long occ;
@@ -135,8 +135,8 @@ class Lexer extends StreamTokenizer {
 
 	HashDict dict;
 
-	private Term getWord(boolean quoted) throws IOException {
-		Term T;
+	private PTerm getWord(boolean quoted) throws IOException {
+		PTerm T;
 		if (quoted && 0 == sval.length())
 			T = make_const("");
 		/*
@@ -160,10 +160,10 @@ class Lexer extends StreamTokenizer {
 		return T;
 	}
 
-	protected Term next() throws IOException {
+	protected PTerm next() throws IOException {
 		int n = nextToken();
 		inClause = true;
-		Term T;
+		PTerm T;
 		switch (n) {
 			case TT_WORD :
 				T = getWord(false);
@@ -429,7 +429,7 @@ public class Parser extends Lexer {
 	}
 
 	static public final boolean isError(Clause C) {
-		Term H = C.head();
+		PTerm H = C.head();
 		return H instanceof Fun && "error".equals(((Fun) H).name)
 				&& H.arity() == 3 && !(((Fun) H).args[0].ref() instanceof Var);
 	}
@@ -438,7 +438,7 @@ public class Parser extends Lexer {
 		IO.error("*** " + C);
 	}
 
-	static protected final Clause toClause(Term T, HashDict dict) {
+	static protected final Clause toClause(PTerm T, HashDict dict) {
 		Clause C = T.toClause(); // adds ...:-true if missing
 		C.dict = dict;
 		return C;
@@ -448,7 +448,7 @@ public class Parser extends Lexer {
 
 		dict = new HashDict();
 
-		Term n = next();
+		PTerm n = next();
 
 		// IO.mes("readClauseOrEOF 0:"+n);
 
@@ -457,14 +457,14 @@ public class Parser extends Lexer {
 
 		if (n instanceof iffToken) {
 			n = next();
-			Term t = getTerm(n);
-			Term bs = getConjCont(t);
+			PTerm t = getTerm(n);
+			PTerm bs = getConjCont(t);
 			Clause C = new Clause(new Const("init"), bs);
 			C.dict = dict;
 			return C;
 		}
 
-		Term h = getTerm(n);
+		PTerm h = getTerm(n);
 
 		// IO.mes("readClauseOrEOF 1:"+h);
 
@@ -479,13 +479,13 @@ public class Parser extends Lexer {
 
 		Clause C = null;
 		if (n instanceof iffToken) {
-			Term t = getTerm();
-			Term bs = getConjCont(t);
+			PTerm t = getTerm();
+			PTerm bs = getConjCont(t);
 			C = new Clause(h, bs);
 			C.dict = dict;
 		} else if (n instanceof commaToken) {
-			Term b = getTerm();
-			Term bs = getConjCont(b);
+			PTerm b = getTerm();
+			PTerm bs = getConjCont(b);
 			C = toClause(new Conj(h, bs), dict);
 		} else {
 			throw new ParserException("':-' or '.' or ','", "bad body element",
@@ -494,14 +494,14 @@ public class Parser extends Lexer {
 		return C;
 	}
 
-	private final Term getConjCont(Term curr) throws IOException {
+	private final PTerm getConjCont(PTerm curr) throws IOException {
 
-		Term n = next();
-		Term t = null;
+		PTerm n = next();
+		PTerm t = null;
 		if (n instanceof eocToken)
 			t = curr;
 		else if (n instanceof commaToken) {
-			Term other = getTerm();
+			PTerm other = getTerm();
 			t = new Conj(curr, getConjCont(other));
 		}
 		if (null == t) {
@@ -510,8 +510,8 @@ public class Parser extends Lexer {
 		return t;
 	}
 
-	protected final Term getTerm(Term n) throws IOException {
-		Term t = n.token();
+	protected final PTerm getTerm(PTerm n) throws IOException {
+		PTerm t = n.token();
 		if (n instanceof varToken || n instanceof intToken
 				|| n instanceof realToken || n instanceof constToken) {
 			// is just OK as it is
@@ -531,27 +531,27 @@ public class Parser extends Lexer {
 		return t;
 	}
 
-	protected Term getTerm() throws IOException {
-		Term n = next();
+	protected PTerm getTerm() throws IOException {
+		PTerm n = next();
 		return getTerm(n);
 	}
 
-	private final Term[] getArgs() throws IOException {
-		Term n = next();
+	private final PTerm[] getArgs() throws IOException {
+		PTerm n = next();
 		if (!(n instanceof lparToken))
 			throw new ParserException("'('", "in getArgs", n);
 		ArrayList v = new ArrayList();
-		Term t = getTerm();
+		PTerm t = getTerm();
 		v.add(t);
 		for (;;) {
 			n = next();
 			if (n instanceof rparToken) {
 				int l = v.size();
-				Term args[] = new Term[l];
+				PTerm args[] = new PTerm[l];
 				// v.copyInto(args);
 				Object[] as = v.toArray();
 				for (int i = 0; i < l; i++) {
-					args[i] = (Term) as[i];
+					args[i] = (PTerm) as[i];
 				}
 				return args;
 			} else if (n instanceof commaToken) {
@@ -563,18 +563,18 @@ public class Parser extends Lexer {
 		}
 	}
 
-	private final Term getList() throws IOException {
-		Term n = next();
+	private final PTerm getList() throws IOException {
+		PTerm n = next();
 		if (n instanceof rbraToken)
 			return Const.NIL;
-		Term t = getTerm(n);
+		PTerm t = getTerm(n);
 		return getListCont(t);
 	}
 
-	private final Term getListCont(Term curr) throws IOException {
+	private final PTerm getListCont(PTerm curr) throws IOException {
 		// IO.trace("curr: "+curr);
-		Term n = next();
-		Term t = null;
+		PTerm n = next();
+		PTerm t = null;
 		if (n instanceof rbraToken)
 			t = new Cons(curr, Const.NIL);
 		else if (n instanceof barToken) {
@@ -584,7 +584,7 @@ public class Parser extends Lexer {
 				throw new ParserException("']'", "bad list end after '|'", n);
 			}
 		} else if (n instanceof commaToken) {
-			Term other = getTerm();
+			PTerm other = getTerm();
 			t = new Cons(curr, getListCont(other));
 		}
 		if (t == null)
@@ -620,7 +620,7 @@ public class Parser extends Lexer {
 }
 
 class ParserException extends IOException {
-	public ParserException(String e, String f, Term n) {
+	public ParserException(String e, String f, PTerm n) {
 		super("expected: " + e + ", found: " + f + '\'' + n + '\'');
 	}
 }

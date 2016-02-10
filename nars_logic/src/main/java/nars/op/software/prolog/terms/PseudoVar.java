@@ -3,7 +3,7 @@ package nars.op.software.prolog.terms;
 /**
  * Special constants, used to Name variables
  * 
- * @see Term
+ * @see PTerm
  * @see Var
  */
 class PseudoVar extends Const {

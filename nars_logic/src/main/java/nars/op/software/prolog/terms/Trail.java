@@ -6,7 +6,7 @@ import nars.util.data.list.FasterList;
  * Implements a stack of undo actions for backtracking, and in particular,
  * resetting a Var's val fiels to unbound (i.e. this).
  * 
- * @see Term
+ * @see PTerm
  * @see Var
  */
 public class Trail extends FasterList {
@@ -34,7 +34,7 @@ public class Trail extends FasterList {
 		// if(to>size())
 		// IO.assertion("unwind attempted from smaller to larger top");
 		for (int i = size() - to; i > 0; i--) {
-			Term V = (Term) (removeLast());
+			PTerm V = (PTerm) (removeLast());
 			V.undo();
 		}
 	}

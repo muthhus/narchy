@@ -3,7 +3,6 @@ package nars.op.software.prolog.terms;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * A SystemObject is a Nonvar with system assigned name
@@ -35,7 +34,7 @@ public class SystemObject extends Nonvar {
 		super(soName(prefix));
 	}
 
-	boolean bind_to(Term that, Trail trail) {
+	boolean bind_to(PTerm that, Trail trail) {
 		return super.bind_to(that, trail)
 				&& name.equals(((SystemObject) that).name);
 	}
@@ -45,6 +44,6 @@ public class SystemObject extends Nonvar {
 	}
 
 	public final int arity() {
-		return Term.JAVA;
+		return PTerm.JAVA;
 	}
 }

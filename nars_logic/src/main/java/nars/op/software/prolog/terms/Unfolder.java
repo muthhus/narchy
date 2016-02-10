@@ -38,7 +38,7 @@ public class Unfolder extends Source {
 		trace_goal(g);
 		reduceBuiltins();
 		if (null != goal) {
-			Term first = goal.getFirst();
+			PTerm first = goal.getFirst();
 			if (null != first) {
 				oldtop = prog.getTrail().size();
 				this.e = prolog.db.toEnumerationFor(first.getKey());
@@ -79,7 +79,7 @@ public class Unfolder extends Source {
 	 */
 	final void reduceBuiltins() {
 		for (;;) {
-			Term first = goal.getFirst();
+			PTerm first = goal.getFirst();
 			if (null == first)
 				break; // cannot reduce further
 			if (first instanceof Conj) { // advances to next (possibly) inline
@@ -124,7 +124,7 @@ public class Unfolder extends Source {
 			return null;
 		Clause unfolded_goal = null;
 		while (e.hasNext()) {
-			Term T = (Term) e.next();
+			PTerm T = (PTerm) e.next();
 			if (!(T instanceof Clause))
 				continue;
 			// resolution step, over goal/resolvent of the form:
@@ -178,7 +178,7 @@ public class Unfolder extends Source {
 	/**
 	 * Tracer for undefined predicates
 	 */
-	static void trace_nomatch(Term first) {
+	static void trace_nomatch(PTerm first) {
 		if (Prog.tracing > 0) {
 			IO.println("*** UNDEFINED CALL: " + first.pprint());
 		}

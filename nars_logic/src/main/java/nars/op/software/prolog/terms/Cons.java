@@ -6,19 +6,19 @@ package nars.op.software.prolog.terms;
  * @see Nil
  */
 public class Cons extends Fun {
-	public Cons(String cons, Term x0, Term x1) {
+	public Cons(String cons, PTerm x0, PTerm x1) {
 		super(cons, x0, x1);
 	}
 
-	public Cons(Term x0, Term x1) {
+	public Cons(PTerm x0, PTerm x1) {
 		this(".", x0, x1);
 	}
 
-	public Term getHead() {
+	public PTerm getHead() {
 		return arg(0);
 	}
 
-	public Term getTail() {
+	public PTerm getTail() {
 		return arg(1);
 	}
 
@@ -26,8 +26,8 @@ public class Cons extends Fun {
 	 * List printer.
 	 */
 	public String toString() {
-		Term h = arg(0);
-		Term t = arg(1);
+		PTerm h = arg(0);
+		PTerm t = arg(1);
 		StringBuilder s = new StringBuilder('[' + watchNull(h));
 		for (;;) {
 			if (t instanceof Nil) {

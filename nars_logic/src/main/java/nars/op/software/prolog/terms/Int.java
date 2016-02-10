@@ -9,7 +9,7 @@ public class Int extends Num {
 		val = i;
 	}
 
-	boolean bind_to(Term that, Trail trail) {
+	boolean bind_to(PTerm that, Trail trail) {
 		return super.bind_to(that, trail)
 				&& (val == ((Int) that).val);
 		// unbelievable but true: converting
@@ -22,7 +22,7 @@ public class Int extends Num {
 	}
 
 	public final int arity() {
-		return Term.INT;
+		return PTerm.INT;
 	}
 
 	public final long longValue() {

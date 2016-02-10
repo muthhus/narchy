@@ -1,8 +1,8 @@
 package nars.op.software.prolog.fluents;
 
+import nars.op.software.prolog.terms.PTerm;
 import nars.op.software.prolog.terms.Prog;
 import nars.op.software.prolog.terms.Source;
-import nars.op.software.prolog.terms.Term;
 
 import java.util.ArrayList;
 
@@ -27,16 +27,16 @@ public class SourceLoop extends Source {
 		this.i = 0;
 	}
 
-	private final Term getMemoized() {
+	private final PTerm getMemoized() {
 		if (null == v || v.size() <= 0)
 			return null;
-		Term T = (Term) v.get(i);
+		PTerm T = (PTerm) v.get(i);
 		i = (i + 1) % v.size();
 		return T;
 	}
 
-	public Term getElement() {
-		Term T = null;
+	public PTerm getElement() {
+		PTerm T = null;
 		if (null != s) { // s is alive
 			T = s.getElement();
 			if (null != T)

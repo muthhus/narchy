@@ -47,9 +47,9 @@ public class Prolog {
      */
     public void eval(Clause goal) {
         Clause NamedGoal = goal.cnumbervars(false);
-        Term Names = NamedGoal.head();
+        PTerm Names = NamedGoal.head();
         if (!(Names instanceof Fun)) { // no vars in Goal
-            Term Result = firstSolution(this, goal.head(), goal.body());
+            PTerm Result = firstSolution(this, goal.head(), goal.body());
             if (!Const.NO.equals(Result))
                 Result = Const.YES;
             IO.println(Result.toString());
@@ -59,7 +59,7 @@ public class Prolog {
         Prog E = new Prog(this, goal, null);
 
         for (int i = 0; ; i++) {
-            Term R = Prog.ask_engine(E);
+            PTerm R = Prog.ask_engine(E);
             // IO.mes("GOAL:"+Goal+"\nANSWER: "+R);
             if (R == null) {
                 IO.println("no");
@@ -130,7 +130,7 @@ public class Prolog {
      * first solution of the form "the(Answer)" or the constant
      * "no" if no solution exists
      */
-    public Term ask(Term answer, Term body) {
+    public PTerm ask(PTerm answer, PTerm body) {
         return firstSolution(this, answer, body);
     }
 
@@ -140,7 +140,7 @@ public class Prolog {
      * Answer is an instance of Goal or the constant
      * "no" if no solution exists
      */
-    public Term ask(Term goal) {
+    public PTerm ask(PTerm goal) {
         return ask(goal, goal);
     }
 
@@ -150,7 +150,7 @@ public class Prolog {
      * of the variables or the first solution to the query or "no"
      * if no such solution exists
      */
-    public Term ask(String query) {
+    public PTerm ask(String query) {
         return ask(goal(query).body());
     }
 
@@ -168,7 +168,7 @@ public class Prolog {
         return this;
     }
 
-    public Term load(String path) {
+    public PTerm load(String path) {
         return ask("[" + path + "]");
     }
 

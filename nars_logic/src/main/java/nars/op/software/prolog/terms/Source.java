@@ -8,10 +8,10 @@ abstract public class Source extends Fluent {
 		super(p);
 	}
 
-	abstract public Term getElement();
+	abstract public PTerm getElement();
 
-	public Const toList() {
-		Term head = getElement();
+	public Nonvar toList() {
+		PTerm head = getElement();
 		if (null == head)
 			return Const.NIL;
 		Cons l = new Cons(head, Const.NIL);
@@ -27,9 +27,9 @@ abstract public class Source extends Fluent {
 		return l;
 	}
 
-	public Term toFun() {
+	public PTerm toFun() {
 		ArrayList V = new ArrayList();
-		Term X;
+		PTerm X;
 		while (null != (X = getElement())) {
 			V.add(X);
 		}

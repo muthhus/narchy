@@ -1,6 +1,14 @@
 package nars.op.software.prolog.terms;
 
+import nars.Op;
+import nars.term.Compound;
+import nars.term.SubtermVisitor;
+import nars.term.Term;
+import org.jetbrains.annotations.NotNull;
+
+import java.io.IOException;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 /**
  * Symbolic constant, of arity 0.
@@ -20,7 +28,7 @@ public class Const extends Nonvar {
 
 	public final static Const anEof = new Const("end_of_file");
 
-	public final static Const the(Term X) {
+	public final static Nonvar the(PTerm X) {
 		return (null == X) ? Const.NO : new Fun("the", X);
 	}
 
@@ -30,7 +38,11 @@ public class Const extends Nonvar {
 		super( s ); //s.intern();
 	}
 
-	public String qname() {
+	String qname() {
+		return qname(name);
+	}
+
+	public static String qname(String name) {
 		if (0 == name.length())
 			return "''";
 		for (int i = 0; i < name.length(); i++) {
@@ -44,22 +56,19 @@ public class Const extends Nonvar {
 		return qname();
 	}
 
-	boolean bind_to(Term that, Trail trail) {
+	boolean bind_to(PTerm that, Trail trail) {
 		return super.bind_to(that, trail)
 				&& Objects.equals(((Const) that).name, name);
 	}
 
-	public String getKey() {
-		return name;
-	}
 
 	/**
 	 * returns an arity normally defined as 0
 	 * 
-	 * @see Term#CONST
+	 * @see PTerm#CONST
 	 */
 	public int arity() {
-		return Term.CONST;
+		return PTerm.CONST;
 	}
 
 	/**
@@ -75,4 +84,5 @@ public class Const extends Nonvar {
 	public final String key() {
 		return name + '/' + arity();
 	}
+
 }

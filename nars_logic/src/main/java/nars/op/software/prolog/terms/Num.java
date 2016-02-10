@@ -5,7 +5,7 @@ package nars.op.software.prolog.terms;
  * 
  * @see Int
  * @see Real
- * @see Term
+ * @see PTerm
  */
 public abstract class Num extends Nonvar {
 

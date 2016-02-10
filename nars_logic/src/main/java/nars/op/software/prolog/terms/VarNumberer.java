@@ -1,7 +1,6 @@
 package nars.op.software.prolog.terms;
 
 import nars.Global;
-import nars.op.software.prolog.fluents.HashDict;
 
 import java.util.Map;
 
@@ -14,7 +13,7 @@ import java.util.Map;
  */
 class VarNumberer extends SystemObject {
 
-	final Map<Term,PseudoVar> dict;
+	final Map<PTerm,PseudoVar> dict;
 
 	int ctr;
 
@@ -24,7 +23,7 @@ class VarNumberer extends SystemObject {
 		ctr = 0;
 	}
 
-	final Term action(Term place) {
+	final PTerm action(PTerm place) {
 		place = place.ref();
 		// IO.trace(">>action: "+place);
 		if (place instanceof Var) {

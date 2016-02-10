@@ -1,12 +1,13 @@
 package nars.op.software.prolog.terms;
 
 import nars.op.software.prolog.Prolog;
+import nars.term.Term;
 
 /**
  * Top element of the Prolog term hierarchy. Describes a simple or compound ter
  * like: X,a,13,f(X,s(X)),[a,s(X),b,c], a:-b,c(X,X),d, etc.
  */
-public abstract class Term implements Cloneable {
+public abstract class PTerm implements Cloneable, Term {
 
 	public final String name;
 
@@ -21,20 +22,20 @@ public abstract class Term implements Cloneable {
 
 	public final static int CONST = 0;
 
-	protected Term(String id) {
+	protected PTerm(String id) {
 		this.name = id;
 	}
 
 	@Override
-	public int hashCode() {
+	public final int hashCode() {
 		return name.hashCode();
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public final boolean equals(Object obj) {
 		if (this == obj) return true;
-		if (!(obj instanceof Term)) return false;
-		return name.equals(((Term)obj).name);
+		if (!(obj instanceof PTerm)) return false;
+		return name.equals(((PTerm)obj).name);
 	}
 
 	/**
@@ -47,15 +48,15 @@ public abstract class Term implements Cloneable {
 	 * otherwise vicious non-reentrancy problems may occur in the presence of GC
 	 * and heavy multi-threading!!!
 	 */
-	abstract public Term ref();
+	abstract public PTerm ref();
 
-	abstract boolean bind_to(Term that, Trail trail);
+	abstract boolean bind_to(PTerm that, Trail trail);
 
 	/** Unify dereferenced */
-	abstract boolean unify_to(Term that, Trail trail);
+	abstract boolean unify_to(PTerm that, Trail trail);
 
 	/** Dereference and unify_to */
-	protected final boolean unify(Term that, Trail trail) {
+	protected final boolean unify(PTerm that, Trail trail) {
 		return ref().unify_to(that.ref(), trail);
 	}
 
@@ -64,7 +65,7 @@ public abstract class Term implements Cloneable {
 
 	// public abstract boolean eq(Term that);
 
-	public Term token() {
+	public PTerm token() {
 		return this;
 	}
 
@@ -80,7 +81,7 @@ public abstract class Term implements Cloneable {
 		return false;
 	}
 
-	public static Term fromString(Prolog p, String s) {
+	public static PTerm fromString(Prolog p, String s) {
 		return Clause.clauseFromString(p, s).toTerm();
 	}
 
@@ -92,11 +93,11 @@ public abstract class Term implements Cloneable {
 	 * SHARED.matches(NONSHARED,trail).
 	 */
 	// synchronized
-	public boolean matches(Term that) {
+	public boolean matches(PTerm that) {
 		return matches(that, new Trail());
 	}
 
-	public boolean matches(Term that, Trail trail) {
+	public boolean matches(PTerm that, Trail trail) {
 		int oldtop = trail.size();
 		boolean ok = unify(that, trail);
 		trail.unwind(oldtop);
@@ -111,7 +112,7 @@ public abstract class Term implements Cloneable {
 	 */
 	// synchronized
 
-	public Term matching_copy(Term that) {
+	public PTerm matching_copy(PTerm that) {
 		Trail trail = new Trail();
 		boolean ok = unify(that, trail);
 		// if(ok) that=that.copy();
@@ -129,14 +130,14 @@ public abstract class Term implements Cloneable {
 	 * 
 	 * @see Fun
 	 */
-	Term reaction(Term agent) {
+	PTerm reaction(PTerm agent) {
 		return agent.action(this);
 	}
 
 	/**
 	 * Identity action.
 	 */
-	Term action(Term that) {
+	PTerm action(PTerm that) {
 		return that;
 	}
 
@@ -145,14 +146,14 @@ public abstract class Term implements Cloneable {
 	 * variables').
 	 */
 	// synchronized
-	public Term copy() {
+	public PTerm copy() {
 		return reaction(new Copier());
 	}
 
 	/**
 	 * Returns '[]'(V1,V2,..Vn) where Vi is a variable occuring in this Term
 	 */
-	public Term varsOf() {
+	public PTerm varsOf() {
 		return (new Copier()).getMyVars(this);
 	}
 
@@ -160,7 +161,7 @@ public abstract class Term implements Cloneable {
 	 * Replaces variables with uppercase constants named `V1', 'V2', etc. to be
 	 * read back as variables.
 	 */
-	public Term numbervars() {
+	public PTerm numbervars() {
 		return copy().reaction(new VarNumberer());
 	}
 
@@ -254,4 +255,7 @@ public abstract class Term implements Cloneable {
 	public boolean isBuiltin() {
 		return false;
 	}
+
+
+
 }

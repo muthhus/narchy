@@ -30,7 +30,7 @@ public class ClauseReader extends CharReader {
 	/**
 	 * parses from a string representation of a term
 	 */
-	public ClauseReader(Prolog prolog, Term t, Prog p) throws Exception {
+	public ClauseReader(Prolog prolog, PTerm t, Prog p) throws Exception {
 		super(t, p);
 		make_parser(prolog, "string parser");
 	}
@@ -46,7 +46,7 @@ public class ClauseReader extends CharReader {
 			this.parser = null;
 	}
 
-	public Term getElement() {
+	public PTerm getElement() {
 		Clause C = null;
 		if (// IO.peer!=null &&
 		reader.equals(IO.input)) {
@@ -72,12 +72,12 @@ public class ClauseReader extends CharReader {
 	static Fun extract_info(Clause C) {
 		if (null == C)
 			return null;
-		Term Vs = C.varsOf();
+		PTerm Vs = C.varsOf();
 		Clause SuperC = new Clause(Vs, C);
 		SuperC.dict = C.dict;
 		Clause NamedSuperC = SuperC.cnumbervars(false);
-		Term Ns = NamedSuperC.head();
-		Term NamedC = NamedSuperC.body();
+		PTerm Ns = NamedSuperC.head();
+		PTerm NamedC = NamedSuperC.body();
 		return new Fun("clause", C, Vs, NamedC, Ns);
 	}
 

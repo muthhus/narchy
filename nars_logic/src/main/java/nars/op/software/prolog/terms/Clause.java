@@ -14,11 +14,11 @@ public class Clause extends Fun {
     /**
      * Builds a clause given its head and its body
      */
-    public Clause(Term head, Term body) {
+    public Clause(PTerm head, PTerm body) {
         super(":-", head, body);
     }
 
-    public Clause(Term[] headBody) {
+    public Clause(PTerm[] headBody) {
         this(headBody[0], headBody[1]);
     }
 
@@ -124,8 +124,8 @@ public class Clause extends Fun {
      * Prints out a clause as Head:-Body
      */
     private static String Clause2String(Clause c) {
-        Term h = c.head();
-        Term t = c.body();
+        PTerm h = c.head();
+        PTerm t = c.body();
         if (t instanceof Conj)
             return h + ":-" + ((Conj) t).conjToString();
         return h + ":-" + t;
@@ -191,7 +191,7 @@ public class Clause extends Fun {
      * Converts a clause to a term. Note that Head:-true will convert to the
      * term Head.
      */
-    public final Term toTerm() {
+    public final PTerm toTerm() {
         return (body() instanceof true_) ?
                 head() :
                 this;
@@ -214,14 +214,14 @@ public class Clause extends Fun {
     /**
      * Extracts the head of a clause (a Term).
      */
-    public final Term head() {
+    public final PTerm head() {
         return args[0].ref();
     }
 
     /**
      * Extracts the body of a clause
      */
-    public final Term body() {
+    public final PTerm body() {
         return args[1].ref();
     }
 
@@ -229,8 +229,8 @@ public class Clause extends Fun {
      * Gets the leftmost (first) goal in the body of a clause, i.e. from
      * H:-B1,B2,...,Bn it will extract B1.
      */
-    final Term getFirst() {
-        Term body = body();
+    final PTerm getFirst() {
+        PTerm body = body();
         if (body instanceof Conj)
             return ((Conj) body).args[0].ref();
         else if (body instanceof true_)
@@ -247,8 +247,8 @@ public class Clause extends Fun {
      * @see True
      * @see Conj
      */
-    final Term getRest() {
-        Term body = body();
+    final PTerm getRest() {
+        PTerm body = body();
         return body instanceof Conj ?
                 ((Conj) body).args[1].ref() :
                 Const.TRUE;
@@ -259,16 +259,16 @@ public class Clause extends Fun {
      *
      * @see Clause#unfold
      */
-    static final Term appendConj(Term x, Term y) {
+    static final PTerm appendConj(PTerm x, PTerm y) {
         y = y.ref();
         if (x instanceof true_)
             return y;
         if (y instanceof true_)
             return x; // comment out if using getState
         if (x instanceof Conj) {
-            Term[] ca = ((Conj) x).args;
-            Term curr = ca[0].ref();
-            Term cont = appendConj(ca[1], y);
+            PTerm[] ca = ((Conj) x).args;
+            PTerm curr = ca[0].ref();
+            PTerm cont = appendConj(ca[1], y);
             // curr.getState(this,cont);
             return new Conj(curr, cont);
         } else
@@ -281,11 +281,11 @@ public class Clause extends Fun {
      * (A0:-B1,..Bm,A2,...An) mgu(A1,B0). Note that it returns null if A1 and B0
      * do not unify.
      *
-     * @see Term#unify()
+     * @see PTerm#unify()
      */
     private final Clause unfold(Clause that, Trail trail) {
         Clause result = null;
-        Term first = getFirst();
+        PTerm first = getFirst();
 
         if (first != null && that.head().matches(first, trail)) {
 
@@ -293,7 +293,7 @@ public class Clause extends Fun {
 
             that.head().unify(first, trail);
 
-            Term cont = appendConj(that.body(), getRest());
+            PTerm cont = appendConj(that.body(), getRest());
             result = new Clause(head(), cont);
         }
         return result;

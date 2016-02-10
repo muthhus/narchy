@@ -58,7 +58,7 @@ public class Prog extends Source implements Runnable {
      * It consists of a chain of "unfolding" steps, possibly
      * involving backtracking, which is managed by the OrStack.
      */
-    public Term getElement() {
+    public PTerm getElement() {
         Trail stack = this.orStack;
 
         if (null == stack)
@@ -79,7 +79,7 @@ public class Prog extends Source implements Runnable {
                 stack.add(nextUnfolder(nextgoal));
             }
         }
-        Term head;
+        PTerm head;
         if (null == answer) {
             head = null;
             stop();
@@ -106,9 +106,9 @@ public class Prog extends Source implements Runnable {
      * Computes a copy of the first solution X of Goal G.
      */
 
-    public static Term firstSolution(Prolog prolog, Term X, Term G) {
+    public static PTerm firstSolution(Prolog prolog, PTerm X, PTerm G) {
         Prog p = new Prog(prolog, new Clause(X, G), null);
-        Term a = ask_engine(p);
+        PTerm a = ask_engine(p);
         if (a != null) {
             a = new Fun("the", a);
             p.stop();
@@ -121,7 +121,7 @@ public class Prog extends Source implements Runnable {
      * asks a logic engine to return a solution
      */
 
-    static public Term ask_engine(Prog p) {
+    static public PTerm ask_engine(Prog p) {
         return p.getElement();
     }
 
@@ -130,7 +130,7 @@ public class Prog extends Source implements Runnable {
      */
     public void run() {
         for (; ; ) {
-            Term Answer = getElement();
+            PTerm Answer = getElement();
             if (null == Answer)
                 break;
         }

@@ -1,7 +1,7 @@
 package nars.op.software.prolog.fluents;
 
 import nars.op.software.prolog.io.IO;
-import nars.op.software.prolog.terms.Term;
+import nars.op.software.prolog.terms.PTerm;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -14,14 +14,14 @@ import java.util.NoSuchElementException;
  * 
  * @see PrologBlackBoard
  * @see Queue
- * @see Term
+ * @see PTerm
  */
 public class BlackBoard extends HashDict {
 
 	/**
 	 * creates a new BlackBoard
 	 * 
-	 * @see Term
+	 * @see PTerm
 	 */
 	public BlackBoard() {
 		super();
@@ -32,7 +32,7 @@ public class BlackBoard extends HashDict {
 	 * null
 	 */
 	// synchronized
-	private final Term pick(String k) {
+	private final PTerm pick(String k) {
 		if (k == null) {
 			Iterator e = this.keySet().iterator();
 			if (!e.hasNext())
@@ -43,7 +43,7 @@ public class BlackBoard extends HashDict {
 		Queue Q = (Queue) get(k);
 		if (Q == null)
 			return null;
-		Term T = (Term) Q.deq();
+		PTerm T = (PTerm) Q.deq();
 		if (Q.isEmpty()) {
 			remove(k);
 			// IO.trace("$$Removed key:"+k+this);
@@ -55,7 +55,7 @@ public class BlackBoard extends HashDict {
 		for (int i = 0, vSize = V.size(); i < vSize; i++) {
 			Object aV = V.get(i);
 			// cannot be here if k==null
-			add(k, (Term) aV);
+			add(k, (PTerm) aV);
 		}
 	}
 
@@ -67,9 +67,9 @@ public class BlackBoard extends HashDict {
 	 */
 
 	// synchronized
-	protected final Term take(String k, Term pattern) {
+	protected final PTerm take(String k, PTerm pattern) {
 		ArrayList V = new ArrayList();
-		Term t;
+		PTerm t;
 		while (true) {
 			t = pick(k);
 			if (null == t)
@@ -91,7 +91,7 @@ public class BlackBoard extends HashDict {
 	 * @see PrologBlackBoard
 	 */
 	// synchronized
-	protected final void add(String k, Term value) {
+	protected final void add(String k, PTerm value) {
 		Queue Q = (Queue) get(k);
 		if (Q == null) {
 			Q = new Queue();
