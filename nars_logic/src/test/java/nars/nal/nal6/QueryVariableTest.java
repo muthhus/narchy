@@ -73,7 +73,7 @@ public class QueryVariableTest extends AbstractNALTester {
         n.ask(question);
 
 
-        n.run(16);
+        n.run(64);
 
 
         assertTrue("Answer/Solution reported?", 0 < answers[0]);

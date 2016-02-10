@@ -286,11 +286,11 @@ public class NARover extends AbstractPolygonBot {
 
 
     /** http://stackoverflow.com/questions/20904171/how-to-create-snake-like-body-in-box2d-and-cocos2dx */
-    public void addArm(String id, NarQ controller, float ax, float ay, float angle) {
+    public Arm addArm(String id, NarQ controller, float ax, float ay, float angle) {
 
         int segs = 3;
         float segLength = 2.7f;
-        float thick = 0.5f;
+        float thick = 1f;
 
         Arm a = new Arm(id, sim, torso, ax, ay, angle, segs, segLength, thick);
 
@@ -299,7 +299,7 @@ public class NARover extends AbstractPolygonBot {
         a.joints.forEach((Consumer<RevoluteJoint>) jj -> {
 
             for (float speed : new float[] { +1 , -1 }){
-                controller.outs.add(new NarQ.Action() {
+                controller.output.add(new NarQ.Action() {
 
                     @Override
                     public void run(float strength) {
@@ -315,6 +315,8 @@ public class NARover extends AbstractPolygonBot {
             }
 
         });
+
+        return a;
     }
 
 //    public void addEye() {
@@ -357,7 +359,7 @@ public class NARover extends AbstractPolygonBot {
         //final MutableFloat servo = new MutableFloat();
 
         for (int i = 0; i < pixels; i++) {
-            final float angle = aStep * (i - pixels/2f) + centerAngle;
+            final float angle = aStep * (i-pixels/2) + centerAngle;
 
             NARVisionRay v = new NARVisionRay(id + i, nar, base, center, angle, aStep,
                     detail, distance, 1f/pixels) {

@@ -12,22 +12,19 @@ import nars.op.mental.Anticipate;
 import nars.op.mental.Inperience;
 import nars.rover.RoverWorld;
 import nars.rover.Sim;
+import nars.rover.robot.Arm;
 import nars.rover.robot.NARover;
-import nars.rover.robot.Turret;
 import nars.rover.world.FoodSpawnWorld1;
-import nars.task.Task;
 import nars.term.index.MapIndex2;
 import nars.time.SimulatedClock;
 import nars.util.signal.NarQ;
 import nars.util.signal.NarQ.BeliefReward;
 import nars.util.signal.NarQ.InputTask;
 import nars.util.signal.NarQ.NotBeliefReward;
-import nars.util.signal.NarQ.Vercept;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jbox2d.common.Vec2;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.function.DoubleSupplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -97,7 +94,7 @@ public class SomeRovers {
 
     }
 	public static Default newNAR() {
-        int conceptsFirePerCycle = 64;
+        int conceptsFirePerCycle = 48;
         Default nar = new Default(
                 new Memory(clock, new MapIndex2(
                         new SoftValueHashMap())),
@@ -114,7 +111,7 @@ public class SomeRovers {
 //        });
 
         @NotNull Memory m = nar.memory;
-        m.DEFAULT_JUDGMENT_PRIORITY = 0.5f;
+        m.DEFAULT_JUDGMENT_PRIORITY = 0.4f;
 //            nar.memory.DEFAULT_JUDGMENT_DURABILITY = 0.35f;
         m.DEFAULT_GOAL_PRIORITY = 0.5f;
 //            nar.memory.DEFAULT_GOAL_DURABILITY = 0.7f;
@@ -128,16 +125,16 @@ public class SomeRovers {
 
 
         //nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
-        nar.core.activationRate.setValue(0.05f);
-        nar.premiser.confMin.setValue(0.01f);
+        nar.core.activationRate.setValue(0.55f);
+        nar.premiser.confMin.setValue(0.05f);
 
         m.duration.set(2);
         m.conceptForgetDurations.setValue(1f);
         m.termLinkForgetDurations.setValue(2);
-        m.taskLinkForgetDurations.setValue(3);
+        m.taskLinkForgetDurations.setValue(4);
         m.cyclesPerFrame.set(1);
         m.shortTermMemoryHistory.set(3);
-        m.executionThreshold.setValue(0.1f);
+        m.executionThreshold.setValue(0.00f);
 
         boolean gui = true;
         if (gui) {
@@ -183,25 +180,25 @@ public class SomeRovers {
 	public static void q(NARover r) {
         NAR n = r.nar;
 
-        Vercept input = new Vercept();
-        NarQ nq = new NarQ(n, input);
-        NarQ nq2 = new NarQ(n, new Vercept());
 
-        nq.power.setValue(0.6f);
-        nq2.power.setValue(0.9f);
+        NarQ nqSpine = new NarQ(n);
+        NarQ nqArm = new NarQ(n);
 
-        input.addAll(nq.getBeliefExpectations(
+        nqSpine.power.setValue(0.8f);
+        nqArm.power.setValue(0.6f);
+
+        nqSpine.input.addAll(nqSpine.getBeliefExpectations(
                 eatFood, eatPoison, speedLeft, speedRight, speedForward
         ));
 
 
 
-        nq.reward.put(new BeliefReward(n, "eat:food"), new MutableFloat(1f));
-        nq.reward.put(new NotBeliefReward(n, "eat:poison"), new MutableFloat(0.9f));
+        nqSpine.goal.put(new BeliefReward(n, "eat:food"), new MutableFloat(1f));
+        nqSpine.goal.put(new NotBeliefReward(n, "eat:poison"), new MutableFloat(0.9f));
         //nq.reward.put(new BeliefReward(n, "speed:forward"), new MutableFloat(0.1f));
         
 
-        nq.outs.addAll(
+        nqSpine.output.addAll(
                 Stream.of(n.terms(
                         motorStop, fire, motorForward, motorBackward, motorLeft, motorRight))
                 .map(t -> new InputTask(n, t, Symbols.GOAL, false))
@@ -217,17 +214,22 @@ public class SomeRovers {
         float pi = (float) Math.PI;
 
         //nearsight
-        r.addEyeWithMouth("n", nq, r.torso, 5, 2, new Vec2(2.7f,0), 0.4f, 0, 10f, pi / 6f);
+        r.addEyeWithMouth("n", nqSpine, r.torso, 7, 3, new Vec2(2.7f,0), 0.4f, 0, 10f, pi / 6f);
 
         //farsight report http://farsight.org/
-        r.addEye("f", nq, r.torso, 3, 4, new Vec2(2.7f,0), 0.6f, 0, 35f,(e) -> {});
+        r.addEye("f", nqSpine, r.torso, 3, 4, new Vec2(2.7f,0), 0.6f, 0, 35f,(e) -> {});
 
-        r.addArm("al", nq2 /* ... */, -1.75f, 1.5f, 0.8f); //pi * 1.5f
-        r.addArm("ar", nq2 /* ... */, -1.75f, -1.5f, -0.8f);
 
-        nq2.reward.put(() -> {
-            return Math.sin(n.memory.emotion.busy()); //fucking random
-        }, new MutableFloat(1f));
+        //arms have their own controller but the two main inputs are controlled by the master Q 'nqSpine'
+
+//        Arm al = r.addArm("al", nqArm /* ... */, -1.75f, 1.5f, 0.8f); //pi * 1.5f
+//        Arm ar = r.addArm("ar", nqArm /* ... */, -1.75f, -1.5f, -0.8f);
+//        nqSpine.outs.addAll(al.controls);
+//        nqSpine.outs.addAll(ar.controls);
+
+        Arm ac = r.addArm("ac", nqArm /* ... */, 0, 0, 0); //pi * 1.5f
+        nqSpine.output.addAll(ac.controls);
+
 
     }
 	// private static class InputActivationController extends CycleReaction {

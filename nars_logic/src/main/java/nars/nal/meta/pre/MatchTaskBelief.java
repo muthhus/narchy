@@ -188,8 +188,15 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseMatch> {
             //match both
             //code.add(new MatchTerm.MatchTaskBeliefPair(pattern, initConstraints(constraints)));
 
-            code.add(new MatchTerm.MatchOneSubterm(task, cc, 0, false));
-            code.add(new MatchTerm.MatchOneSubterm(belief, cc, 1, true));
+            if (task.volume() <= belief.volume()) {
+                //task first
+                code.add(new MatchTerm.MatchOneSubterm(task, cc, 0, false));
+                code.add(new MatchTerm.MatchOneSubterm(belief, cc, 1, true));
+            } else {
+                //belief first
+                code.add(new MatchTerm.MatchOneSubterm(belief, cc, 1, false));
+                code.add(new MatchTerm.MatchOneSubterm(task, cc, 0, true));
+            }
 
         } else if (belief!=null) {
             //match belief only

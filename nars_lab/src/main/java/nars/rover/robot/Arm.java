@@ -1,11 +1,14 @@
 package nars.rover.robot;
 
+import nars.Global;
 import nars.op.meta.HaiQ;
 import nars.rover.Sim;
 import nars.rover.physics.gl.JoglAbstractDraw;
 import nars.rover.physics.j2d.SwingDraw;
 import nars.util.data.Util;
 import nars.util.data.list.FasterList;
+import nars.util.signal.NarQ;
+import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Vec2;
@@ -13,10 +16,8 @@ import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.World;
 import org.jbox2d.dynamics.joints.RevoluteJoint;
 import org.jbox2d.dynamics.joints.RevoluteJointDef;
-import org.jbox2d.dynamics.joints.WeldJoint;
-import org.jbox2d.dynamics.joints.WeldJointDef;
 
-import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by me on 2/10/16.
@@ -34,17 +35,41 @@ public class Arm extends Robotic implements SwingDraw.LayerDraw {
     private final float[] input;
     private final float armSpan;
     private final float jointRange;
-    private final float wiggle;
+
+    private float reward; //current reward value
+
+    //private final float wiggle;
+
+    public static class BoundedMutableFloat extends MutableFloat {
+
+        float min, max;
+
+        public BoundedMutableFloat(float v, float min, float max) {
+            super();
+            this.min = min;
+            this.max = max;
+            setValue(v);
+        }
+
+
+        @Override
+        public void setValue(float value) {
+            if (value < min) value = min;
+            if (value > max) value = max;
+            super.setValue(value);
+        }
+    }
+    /**
+     * proportion of the jointRange angle but relative to the attached base's angle
+     */
+    public final MutableFloat thetaTarget = new BoundedMutableFloat(1, -1, 1);
 
     /**
-     * absolute angle but relative to the attached base's angle
+     * as a proportion of the armspan (0 = root, 1 = armspan radius)
      */
-    private float thetaTarget;
+    public final MutableFloat radiusTarget = new BoundedMutableFloat(1, 0, 1.25f);
 
-    /**
-     * as a proportion of the armspan
-     */
-    private float radiusTarget;
+    public final List<NarQ.Action> controls;
 
     public Arm(String id, Sim sim, Body base, float ax, float ay, float ang,
                int segs, float segLength, float thick
@@ -56,7 +81,7 @@ public class Arm extends Robotic implements SwingDraw.LayerDraw {
 
         ((JoglAbstractDraw)sim.draw()).addLayer(this);
 
-        Vec2 attachPoint = new Vec2(ax, ay);
+        //Vec2 attachPoint = new Vec2(ax, ay);
 
         float vx = 1; //(float)Math.cos(a);
         float vy = 0; ///(float)Math.sin(a);
@@ -85,7 +110,7 @@ public class Arm extends Robotic implements SwingDraw.LayerDraw {
 
 
         jointRange = 2.5f; //joint flexibility
-        wiggle = 0.03f;
+        //wiggle = 0.03f;
 
         float armSpan = 0f;
 
@@ -162,15 +187,44 @@ public class Arm extends Robotic implements SwingDraw.LayerDraw {
         this.armSpan = armSpan;
 
 
+        //adjust R and Theta targets
+
+        controls = Global.newArrayList(4);
+        addControls(thetaTarget);
+        addControls(radiusTarget);
+
+    }
+
+    private void addControls(MutableFloat f) {
+        float speed = 0.1f;
+        for (float polarity: new float[] { -1, +1}) {
+            this.controls.add(new NarQ.Action() {
+
+                float last = 0; //TODO calculate range bounds to reduce the actual applied strength
+
+                @Override
+                public void run(float strength) {
+                    f.setValue(f.getValue() + speed*strength*polarity); //using setValue for its limiters
+                    last = strength;
+                }
+
+                @Override
+                public float ran() {
+                    return last;
+                }
+            });
+        }
     }
 
 
     public void set(float theta, float radius) {
-        this.thetaTarget = theta;
-        this.radiusTarget = radius;
+        this.thetaTarget.setValue(theta);
+        this.radiusTarget.setValue(radius);
     }
 
-    transient final Vec2 a = new Vec2(), b = new Vec2();
+    transient final Vec2 a = new Vec2(), tWorld = new Vec2(), hWorld = new Vec2(),
+            b = new Vec2();
+    transient final Color3f targetColor = new Color3f(0,0,0);
 
     @Override
     public void step(int i) {
@@ -183,28 +237,30 @@ public class Arm extends Robotic implements SwingDraw.LayerDraw {
             float a = (r.getJointAngle()) / (jointRange/2f); //-1..+1
             input[k++] = a;
         }
-        input[k++] = MathUtils.reduceAngle(thetaTarget);
-        input[k++] = radiusTarget;
+        input[k++] = thetaTarget.floatValue();
+        input[k++] = radiusTarget.floatValue();
 
 
         //the polar-specified point relative to the shoulder
         a.set(segments.getFirst().getWorldCenter());
-        float baseAngle = base.getAngle();
-        a.x += Math.cos(thetaTarget + baseAngle) * radiusTarget * armSpan;
-        a.y += Math.sin(thetaTarget + baseAngle) * radiusTarget * armSpan;
+
+        float resultAngle = thetaTarget.floatValue() * (jointRange/2);
+        float rad = Math.max(0f, radiusTarget.floatValue());
+        this.a.x += (float)Math.cos(resultAngle) * rad * armSpan;
+        this.a.y += (float)Math.sin(resultAngle) * rad * armSpan;
 
 
         //where the end of the arm actually is
         b.set(segments.getLast().getWorldCenter());
 
-        input[k++] = (b.x - a.x) / armSpan;
-        input[k++] = (b.y - a.y) / armSpan;
+        input[k++] = (b.x - this.a.x) / armSpan;
+        input[k++] = (b.y - this.a.y) / armSpan;
 
 
         float reward = 0.25f + /* bias */
-                -(b.sub(a).length() / (armSpan / 2f)); /* maybe circumference of armSpan? */
+                -(b.sub(this.a).length() / (armSpan / 2f)); /* maybe circumference of armSpan? */
 
-        reward = (float)Util.sigmoid(reward) - 0.5f;
+        this.reward = (float)Util.sigmoid(reward) - 0.5f;
         int motor = controller.act(input, reward);
         float direction = (motor % 2 == 0) ? +1f : -1f;
 
@@ -258,6 +314,19 @@ public class Arm extends Robotic implements SwingDraw.LayerDraw {
 
     @Override
     public void drawSky(JoglAbstractDraw draw, World w) {
-        draw.drawCircle(a, 1f, Color3f.GREEN);
+
+        if (segments == null || segments.isEmpty()) return;
+
+        hWorld.set( segments.getLast().getWorldCenter() );
+        tWorld.set( base.getWorldCenter() );
+        float resultAngle = thetaTarget.floatValue() * (jointRange/2) + base.getAngle();
+        float rad = radiusTarget.floatValue();
+        tWorld.x += (float)Math.cos(resultAngle) * rad * armSpan;
+        tWorld.y += (float)Math.sin(resultAngle) * rad * armSpan;
+
+        targetColor.set( Util.clamp( -reward), 0.5f, Util.clamp( reward ) );
+        draw.drawCircle(tWorld, 0.5f, targetColor);
+
+        draw.drawSegment(hWorld, tWorld, 0.5f, 0.5f, 0.5f, 0.8f, 2f);
     }
 }

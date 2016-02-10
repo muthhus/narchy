@@ -40,21 +40,21 @@ public class GrammarTest2 {
         Naljects o = new Naljects(n);
         final Tape tape = o.the("tape", Tape.class, "ababcdcdeeee", charRate);
         
-        Vercept i = new Vercept();
-        NarQ q = new NarQ(n, i);
+
+        NarQ q = new NarQ(n);
         
         //INPUTS
-        i.add(new DoubleSupplier() {           
+        q.input.add(new DoubleSupplier() {
             @Override public double getAsDouble() {
                 return tape.phase();
             }                        
         });
-        i.addAll(tape.getCharSensors(-1));
-        i.addAll(tape.getCharSensors(0));
+        q.input.addAll(tape.getCharSensors(-1));
+        q.input.addAll(tape.getCharSensors(0));
         
-        q.reward.put(tape.correctPredictionReward, new MutableFloat(1f));
+        q.goal.put(tape.correctPredictionReward, new MutableFloat(1f));
         
-        q.outs.addAll(tape.getPredictActions(n));
+        q.output.addAll(tape.getPredictActions(n));
         
         //n.logSummaryGT(System.out, 0.2f);
 

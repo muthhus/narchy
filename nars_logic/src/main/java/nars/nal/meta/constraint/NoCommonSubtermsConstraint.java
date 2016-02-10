@@ -34,32 +34,25 @@ public final class NoCommonSubtermsConstraint implements MatchConstraint {
         return "noCommonSubterms(" + b + ')';
     }
 
-    static boolean sharedSubterms(Term a, Term b, Set<Term> s) {
+    private static boolean sharedSubterms(Term a, Term b, Set<Term> s) {
         addUnmatchedSubterms(a, s, null);
         return !addUnmatchedSubterms(b, null, s); //we stop early this way (efficiency)
     }
 
-    static boolean addUnmatchedSubterms(Term x, @Nullable Set<Term> AX, @Nullable Set<Term> BX) {
+    private static boolean addUnmatchedSubterms(Term x, @Nullable Set<Term> AX, @Nullable Set<Term> BX) {
         if (BX != null && BX.contains(x)) { //by this we can stop early
             return false;
         }
 
-        if (AX != null) {
-            if (AX.add(x)) {
-
-                //only on the first time it has been added:
-                if (x instanceof Compound) {
-                    Compound c = (Compound) x;
-                    int l = c.size();
-                    for (int i = 0; i < l; i++) {
-                        Term d = c.term(i);
-                        if (!addUnmatchedSubterms(d, AX, BX)) {
-                            //by this we can stop early
-                            return false;
-                        }
-                    }
+        if (AX != null && AX.add(x) && x instanceof Compound) {
+            Compound c = (Compound) x;
+            int l = c.size();
+            for (int i = 0; i < l; i++) {
+                Term d = c.term(i);
+                if (!addUnmatchedSubterms(d, AX, BX)) {
+                    //by this we can stop early
+                    return false;
                 }
-
             }
         }
 

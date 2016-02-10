@@ -32,7 +32,7 @@ public class NarQ implements Consumer<NAR> {
 
     private final NAR nar;
 
-    public HaiQ q = null;
+    public HaiQ q;
     
     /** master control of strength factor of output activity */
     @Range(min=0f, max=1f)
@@ -79,7 +79,7 @@ public class NarQ implements Consumer<NAR> {
     final public Vercept input;
     
     
-    public static interface Action {
+    public interface Action {
         
         /** activate the procedure with a certain proportional strength from 0..1.0 */
         void run(float strength);
@@ -159,7 +159,7 @@ public class NarQ implements Consumer<NAR> {
         @Override
         public float ran() {
             int dt = 0; //nar.memory.duration()/2; //-1; //duration/2?
-            float e =  NarQ.motivation(nar, term, 0f /* equal pos/neg opportunity */, punct == Symbols.GOAL ? false : true, dt /* desire in previous time */);
+            float e =  NarQ.motivation(nar, term, 0f /* equal pos/neg opportunity */, punct != Symbols.GOAL, dt /* desire in previous time */);
             //e = (e-0.5f)*2f; //expectation -> strength?
             if (invert) e = -e;
             return e;
@@ -172,18 +172,18 @@ public class NarQ implements Consumer<NAR> {
      * terms representing goals that can be activated in the hope of maximizing
      * future reward
      */
-    public final List<Action> outs = Global.newArrayList();
+    public final List<Action> output = Global.newArrayList();
 
     /**
      * reward sensor x strength/factor
      */
-    public final Map<DoubleSupplier /* TODO make FloatSupplier */, MutableFloat> reward = Global.newHashMap();
+    public final Map<DoubleSupplier /* TODO make FloatSupplier */, MutableFloat> goal = Global.newHashMap();
 
 
 
-    public NarQ(NAR n, Vercept input) {
+    public NarQ(NAR n) {
         this.nar = n;
-        this.input = input;
+        this.input = new Vercept();
         nar.onFrame(this);
     }
 
@@ -201,23 +201,23 @@ public class NarQ implements Consumer<NAR> {
     }
 
     protected boolean validDimensionality(int inputs) {
-        final int outputs = outs.size();
+        final int outputs = output.size();
 
-        if (inputs == 0 || outputs == 0 || reward.isEmpty()) {
+        if (inputs == 0 || outputs == 0 || goal.isEmpty()) {
             q = null;
             return false;
         }
 
         if (q == null || q.inputs() != inputs || q.actions() != outputs) {
             //TODO allow substituting an arbitrary I/O agent interface
-            q = new HaiQImpl(inputs, inputs*4, outputs);
+            q = new HaiQImpl(inputs, inputs*outputs*2, outputs);
         }
 
         return true;
     }
 
     public List<? extends DoubleSupplier> getBeliefExpectations(String... terms) {
-        return Stream.of(nar.terms(terms)).map(t -> new BeliefExpectation(nar, t)).collect(Collectors.toList());
+        return Stream.of(nar.terms(terms)).map(t -> new BeliefMotivation(nar, t)).collect(Collectors.toList());
     }
 
     public List<? extends DoubleSupplier> getBeliefRewards(String... terms) {
@@ -245,18 +245,18 @@ public class NarQ implements Consumer<NAR> {
             int best = -1;
             float bestE = Float.NEGATIVE_INFINITY;
 
-            int s = outs.size();
+            int s = output.size();
 
             final float epsi = q.Epsilon;
 
 
             for (int j = 0; j < s; j++) {
 
-                float e = outs.get(j).ran();
+                float e = output.get(j).ran();
 
                 //add noise
                 if (epsi != 0) {
-                    e += (q.rng.nextFloat() - 0.5f) * epsi *2f;
+                    e += epsi * (q.rng.nextFloat() - 0.5f) * 2f;
                 }
 
                 //System.out.println(outs.get(j) + " " + e);
@@ -337,7 +337,7 @@ public class NarQ implements Consumer<NAR> {
         }
 
         protected float expectation() {
-            return NarQ.motivation(nar, (Termed)term, 0f, true, 0);
+            return NarQ.motivation(nar, term, 0f, true, 0);
         }
 
         @Override
@@ -347,7 +347,7 @@ public class NarQ implements Consumer<NAR> {
 
     }
 
-    /** negative expectation mapped to a -1,+1 range */
+    /** negative motivation mapped to a -1,+1 range */
     public static class NotBeliefReward extends BeliefReward {
 
         public NotBeliefReward(NAR nar, String term) {
@@ -362,9 +362,9 @@ public class NarQ implements Consumer<NAR> {
     }
 
     /** expectation directly */
-    public static class BeliefExpectation extends BeliefSensor {
+    public static class BeliefMotivation extends BeliefSensor {
 
-        public BeliefExpectation(NAR nar, Termed t) {
+        public BeliefMotivation(NAR nar, Termed t) {
             super(nar, t);
         }
 
@@ -380,13 +380,11 @@ public class NarQ implements Consumer<NAR> {
 
         final float r[] = new float[]{0};
 
-        reward.forEach((sensor, weight) -> {
-            float v = ((float) sensor.getAsDouble());
-            v *= weight.floatValue();
-            r[0] += v;
+        goal.forEach((reward, weight) -> {
+            r[0] += ((float) reward.getAsDouble()) * weight.floatValue();
         });
 
-        return (r[0] / reward.size()) - rewardBias.floatValue();
+        return (r[0] / goal.size()) - rewardBias.floatValue();
     }
 
     void act(int x) {
@@ -406,10 +404,7 @@ public class NarQ implements Consumer<NAR> {
 
         final float p  = power.floatValue();        
         if (p > 0) {
-            final List<Action> o = outs;               
-            Action a = o.get(x);               
-            if (a!=null)
-                a.run(p);
+            output.get(x).run(p);
         }
         
     }

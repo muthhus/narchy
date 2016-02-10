@@ -200,7 +200,7 @@ public class PremiseMatch extends FindSubst {
 //            throw new RuntimeException("why is " + budget + " deleted");
 //        }
 
-        return BudgetFunctions.valid(budget, p.memory()) ? budget : null;
+        return budget!=null && BudgetFunctions.valid(budget, p.memory()) ? budget : null;
 
 
 //        if (!!budget.summaryLessThan(p.memory().derivationThreshold.floatValue())) {

@@ -69,8 +69,7 @@ public class GrammarTest2 {
 
         
         
-        Vercept i = new Vercept();
-        q = new NarQ(n, i);
+        q = new NarQ(n);
 
         n.input("(#x-->(/,^Tape,current,tape,(),_))? :/:");
         n.input("<?x ==> ($y-->(/,^Tape,current,tape,(),_))>?");
@@ -83,9 +82,9 @@ public class GrammarTest2 {
                 return tape.phase();
             }                        
         });*/
-        i.addAll(tape.getCharSensors());
+        q.input.addAll(tape.getCharSensors());
         
-        q.reward.put(() -> {
+        q.goal.put(() -> {
             float s = tape.prevScore;
             //float p = tape.charPeriod.intValue() != 1 ? 1f - tape.phase(n.time()) : 1f;
             float p = 1f;
@@ -94,9 +93,9 @@ public class GrammarTest2 {
 
         //q.outs.add(NarQ.NullAction);
         //q.outs.add(new InputTask(n, n.term("Tape(prev, tape, (), #1)")));
-        q.outs.add(new InputTask(n, n.term("Tape(current, tape, (), #1)")));
+        q.output.add(new InputTask(n, n.term("Tape(current, tape, (), #1)")));
         //q.outs.addAll(tape.getPredictActions(n,false, false));
-        q.outs.addAll(tape.getPredictActions(n,true, false));
+        q.output.addAll(tape.getPredictActions(n,true, false));
 
         //n.logSummaryGT(System.out, 0.5f);
 

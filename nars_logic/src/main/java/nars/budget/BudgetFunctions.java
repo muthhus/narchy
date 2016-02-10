@@ -26,10 +26,12 @@ import nars.bag.BLink;
 import nars.concept.ConceptProcess;
 import nars.nal.UtilityFunctions;
 import nars.task.Task;
+import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Termlike;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Budget functions for resources allocation
@@ -268,7 +270,7 @@ public final class BudgetFunctions extends UtilityFunctions {
 
 	/* ----- Task derivation in CompositionalRules and StructuralRules ----- */
 
-    @NotNull
+    @Nullable
     public static Budget compoundForward(@NotNull Budget target, @NotNull Truth truth,
                                          @NotNull Termed content, @NotNull ConceptProcess nal) {
         return budgetInference(
@@ -302,7 +304,7 @@ public final class BudgetFunctions extends UtilityFunctions {
         return budgetInference(w2c(1), content.complexity(), nal);
     }
 
-    @NotNull
+    @Nullable
     static Budget budgetInference(float qual, int complexity, @NotNull ConceptProcess nal) {
         return budgetInference(new UnitBudget(), qual, complexity, nal);
     }
@@ -315,7 +317,7 @@ public final class BudgetFunctions extends UtilityFunctions {
      * @param nal        Reference to the memory
      * @return Budget of the conclusion task
      */
-    @NotNull
+    @Nullable
     static Budget budgetInference(@NotNull Budget target, float qual, int complexity,
                                   @NotNull ConceptProcess nal) {
         //float complexityFactor = complexity > 1 ?
@@ -333,17 +335,27 @@ public final class BudgetFunctions extends UtilityFunctions {
         return budgetInference(target, qual, complexityFactor, nal);
     }
 
-    @NotNull
+    @Nullable
     static Budget budgetInference(@NotNull Budget target, float qualRaw, float complexityFactor, @NotNull ConceptProcess nal) {
 
-        final BLink<? extends Task> taskLink = nal.taskLink;
+        Term taskTerm = nal.taskLink.get().term();
+        Budgeted task = nal.taskLink;
+        if (task.isDeleted()) task = nal.taskLink.get();
+
+        float p, d;
+        if (!task.isDeleted()) {
+            p = task.pri();
+            d = task.dur();
+        } else {
+            return null;
+        }
 
         //(taskLink !=null) ? taskLink :  nal.task().budget();
 
         //Task task = taskLink.get();
 
-        float priority = taskLink.pri();
-        float durability = taskLink.dur() * complexityFactor;
+        float priority = p;
+        float durability = d * complexityFactor;
         final float quality  = qualRaw  * complexityFactor /** task.qua()*/;//originally: not multiplying task
 
         target.budget(priority, durability, quality);
@@ -362,7 +374,7 @@ public final class BudgetFunctions extends UtilityFunctions {
             if (targetActivation >= 0) {
 
                 float sourceActivation =
-                        nar.conceptPriority(taskLink.get(), 0);
+                        nar.conceptPriority(taskTerm, 0);
                 //taskLink != null ? nar.conceptPriority(taskLink.get().concept(), 0) : 1f;
 
                 //https://groups.google.com/forum/#!topic/open-nars/KnUA43B6iYs
@@ -419,7 +431,7 @@ public final class BudgetFunctions extends UtilityFunctions {
      * tests a budget's validity for a task to be processed by a memory
      */
     public static boolean valid(Budget budget, Memory m) {
-        return !budget.isDeleted() &&
+        return //!budget.isDeleted() &&
                 budget.dur() >= m.derivationDurabilityThreshold.floatValue();
     }
 }
