@@ -82,16 +82,6 @@ public class QueryVariableTest extends AbstractNALTester {
 
     }
 
-    @Test public void testQueryVariableUnification() {
-        TestNAR t = test();
-        System.out.println();
-        t.nar.log();
-        t.input("(<?x --> y> && <?x --> z>).");
-        t.input("(x --> y).");
-        t.mustBelieve(1000, "(x --> z)", 1.0f, 0.73f);
-
-
-    }
 
 //    /** simple test for solutions to query variable questions */
 //    @Test public void testQueryVariableSolution() throws InvalidInputException {

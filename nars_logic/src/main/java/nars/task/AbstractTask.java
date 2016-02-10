@@ -34,14 +34,14 @@ public abstract class AbstractTask extends UnitBudget
     private Termed<Compound> term;
 
     @Nullable
-    protected TaskState state = null;
+    protected TaskState state;
 
     private char punctuation;
 
     private Truth truth;
 
     @Nullable
-    private long[] evidentialSet = null;
+    private long[] evidentialSet;
 
     private long creationTime = Tense.TIMELESS;
     private long occurrenceTime = Tense.ETERNAL;
@@ -60,7 +60,7 @@ public abstract class AbstractTask extends UnitBudget
 
 
     @Nullable
-    private Reference<List> log = null;
+    private Reference<List> log;
 
 
 //    public AbstractTask(Compound term, char punctuation, Truth truth, Budget bv, Task parentTask, Task parentBelief, Task solution) {
@@ -90,6 +90,7 @@ public abstract class AbstractTask extends UnitBudget
                 task.pri(), task.dur(), task.qua(),
                 task.getParentTaskRef(), task.getParentBeliefRef());
         setEvidence(task.evidence());
+        setOccurrenceTime(task.occurrence());
     }
 
     @NotNull
@@ -173,7 +174,7 @@ public abstract class AbstractTask extends UnitBudget
         if (t == null) throw new RuntimeException("null term");
 
         //normalize term
-        Termed normalizedTerm = (Termed) memory.index.normalized(t);
+        Termed normalizedTerm = memory.index.normalized(t);
         if ((normalizedTerm == null) || (!Task.validTaskTerm(normalizedTerm.term()))) {
             return null;
         }

@@ -308,6 +308,13 @@ public class NAL6Test extends AbstractNALTester {
 
     }
 
+    @Test public void testSimpleIndepUnification() {
+        TestNAR t = test();
+        t.input("(<$x --> y> ==> <$x --> z>).");
+        t.input("(x --> y).");
+        t.mustBelieve(cycles, "(x --> z)", 1.0f, 0.81f);
+    }
+
 //    @Test
 //    public void second_level_variable_unification2_clean()  {
 //        TestNAR tester = test();

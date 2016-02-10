@@ -40,7 +40,7 @@ public class MutableTask extends AbstractTask {
 //    }
 
 
-    MutableTask(@NotNull Task taskToClone, @NotNull Compound newTerm) {
+    public MutableTask(@NotNull Task taskToClone, @NotNull Compound newTerm) {
         super(taskToClone);
         term(newTerm);
     }

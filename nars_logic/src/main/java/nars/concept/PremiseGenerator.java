@@ -5,6 +5,7 @@ import nars.NAR;
 import nars.Op;
 import nars.bag.BLink;
 import nars.nal.Tense;
+import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
@@ -129,11 +130,22 @@ abstract public class PremiseGenerator extends UnifySubst implements Function<Te
 
 
     /** uses the query-unified term to complete a premise */
-    @Override public final void accept(Term beliefTerm) {
+    @Override public final boolean accept(Term beliefTerm, Term unifiedBeliefTerm) {
 
         Task belief = beliefTerm.isCompound() ?
                 beliefCache.computeIfAbsent(beliefTerm, this) :
                 null; //atomic terms will have no beliefs anyway
+
+        //if the unified belief term is different, then clone the known belief with it as the new belief
+        if (belief!=null && (unifiedBeliefTerm instanceof Compound) && !beliefTerm.equals(unifiedBeliefTerm)) {
+            Task unifiedBelief = new MutableTask(belief, (Compound)unifiedBeliefTerm).normalize(memory);
+            if (unifiedBelief!=null) {
+                belief = unifiedBelief;
+            }
+
+        }
+
+        //TODO also modify the termlink / "belief term" in the premise? or leave as variable
 
         premise(concept, taskLink, termLink, belief);
 
@@ -142,6 +154,7 @@ abstract public class PremiseGenerator extends UnifySubst implements Function<Te
         if (belief != null && task.isQuestOrQuestion() && !belief.isQuestOrQuestion())
             memory.onSolve(task, belief);
 
+        return true;
     }
 
     abstract protected void premise(BLink<? extends Concept> concept, BLink<? extends Task> taskLink, BLink<? extends Termed> termLink, Task belief);

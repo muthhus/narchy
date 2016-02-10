@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 /** not thread safe, use 1 per thread (do not interrupt matchAll) */
-public abstract class UnifySubst extends FindSubst implements Consumer<Term> {
+public abstract class UnifySubst extends FindSubst  {
 
     @NotNull
     public final Memory memory;
@@ -46,7 +46,7 @@ public abstract class UnifySubst extends FindSubst implements Consumer<Term> {
         }
 
         if (acceptUnmatched && matches == 0) {
-            accept(y);
+            accept(y, y);
         }
     }
 
@@ -74,11 +74,13 @@ public abstract class UnifySubst extends FindSubst implements Consumer<Term> {
 //            return false;
 
 
-        accept(aa);
-        matches++;
+        if (accept(a, aa))
+            matches++;
 
         return true; //determines how many
     }
+
+    abstract protected boolean accept(Term beliefTerm, Term unifiedBeliefTerm);
 
     @Nullable
     Term applySubstituteAndRenameVariables(Term t, @Nullable Map<Term,Term> subs) {

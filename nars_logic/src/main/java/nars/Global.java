@@ -154,7 +154,7 @@ public enum Global {
     /** extra debugging checks */
     public static boolean DEBUG_PARANOID = false;
 
-    public static float MAX_TERMUTATIONS_PER_MATCH = 6;
+    public static float MAX_TERMUTATIONS_PER_MATCH = 3;
     public static float MIN_TERMUTATIONS_PER_MATCH = 1;
     public static final boolean DEBUG_NON_INPUT_ANSWERED_QUESTIONS = false;
 

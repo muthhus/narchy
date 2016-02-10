@@ -97,7 +97,7 @@ public class SomeRovers {
 
     }
 	public static Default newNAR() {
-        int conceptsFirePerCycle = 32;
+        int conceptsFirePerCycle = 64;
         Default nar = new Default(
                 new Memory(clock, new MapIndex2(
                         new SoftValueHashMap())),
@@ -128,8 +128,8 @@ public class SomeRovers {
 
 
         //nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
-        nar.core.activationRate.setValue(0.15f);
-        nar.premiser.confMin.setValue(0.02f);
+        nar.core.activationRate.setValue(0.05f);
+        nar.premiser.confMin.setValue(0.01f);
 
         m.duration.set(2);
         m.conceptForgetDurations.setValue(1f);

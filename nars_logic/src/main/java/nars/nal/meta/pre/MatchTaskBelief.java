@@ -120,7 +120,10 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseMatch> {
             belief = null;
         }
 
-        if (task.isCompound() && !task.isCommutative() && null==Ellipsis.firstEllipsis((Compound)task) ) {
+        else if (task.isCompound() && belief.isCompound() && !task.isCommutative()
+                && null==Ellipsis.firstEllipsis((Compound)task)
+                && null==Ellipsis.firstEllipsis((Compound)belief)
+                ) {
             int[] beliefInTask = ((Compound)task).isSubterm(belief);
             if (beliefInTask != null) {
                 //add precondition for this constraint that is checked between the premise's terms
@@ -130,7 +133,10 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseMatch> {
             }
         }
 
-        if (belief!=null && belief.isCompound() && !belief.isCommutative()  && null==Ellipsis.firstEllipsis((Compound)belief) ) {
+        else if (belief.isCompound() && task.isCompound() && !belief.isCommutative()
+                && null==Ellipsis.firstEllipsis((Compound)belief)
+                && null==Ellipsis.firstEllipsis((Compound)task)
+         ) {
             int[] taskInBelief = ((Compound)belief).isSubterm(task);
             if (taskInBelief != null) {
                 //add precondition for this constraint that is checked between the premise's terms

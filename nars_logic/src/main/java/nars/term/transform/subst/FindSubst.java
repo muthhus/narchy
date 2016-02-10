@@ -227,25 +227,30 @@ public abstract class FindSubst extends Versioning implements Subst {
             return true;
         }
 
-        Op t = type;
 
-        Op xOp;
-        if ((xOp = x.op()) == t) {
-            return matchXvar((Variable) x, y);
-        }
-
-        Op yOp;
-        if ((yOp = y.op()) == t) {
-            return matchYvar(x, (Variable)y);
-        }
+        Op xOp = x.op();
+        Op yOp = y.op();
 
         if ((x instanceof Compound) && (xOp == yOp)) {
             //Compound cx = (Compound)x;
             //Compound cy = (Compound)y;
             //if (hasAnyVar(cx) || hasAnyVar(cy))
-                return ((Compound) x).match((Compound) y, this);
-        } else if (xOp.isVar() && yOp.isVar()) {
-            return nextVarX((Variable) x, y);
+            return ((Compound) x).match((Compound) y, this);
+        } else {
+
+            Op t = type;
+
+            if (xOp == t) {
+                return matchXvar((Variable) x, y);
+            }
+
+            if (yOp == t) {
+                return matchYvar(x, (Variable)y);
+            }
+
+            if (xOp.isVar() && yOp.isVar()) {
+                return nextVarX((Variable) x, y);
+            }
         }
 
         return false;
@@ -259,7 +264,8 @@ public abstract class FindSubst extends Versioning implements Subst {
         Op xOp = xVar.op();
         return (y.op() == xOp) ? putCommon(xVar, (Variable) y) :
                     (xOp == type) //<-- this condition may not be correct but doesnt seem to make much difference. better if it is more restrictive in what is inserted
-                        && putVarX(xVar, y);
+                        &&
+                putVarX(xVar, y);
 
         //            if ((y.op() == Op.VAR_QUERY && xVar.op() != Op.VAR_QUERY) ||
         //                    (y.op() != Op.VAR_QUERY && xVar.op() == Op.VAR_QUERY)) {
