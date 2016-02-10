@@ -2,17 +2,10 @@ package nars.term.transform.subst;
 
 import com.gs.collections.api.map.ImmutableMap;
 import com.gs.collections.api.set.MutableSet;
-import com.gs.collections.impl.list.mutable.FastList;
 import nars.Global;
-import nars.Memory;
-import nars.NAR;
 import nars.Op;
 import nars.nal.meta.constraint.MatchConstraint;
-import nars.nal.meta.match.Ellipsis;
-import nars.nal.meta.match.EllipsisMatch;
-import nars.nal.meta.match.EllipsisTransform;
-import nars.nal.meta.match.ImageMatch;
-import nars.nal.meta.op.MatchTerm;
+import nars.nal.meta.match.*;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termlike;
@@ -153,19 +146,12 @@ public abstract class FindSubst extends Versioning implements Subst {
 
     @Nullable
     @Override
-    public final Term getXY(@NotNull Object t) {
+    public final Term getXY(@NotNull Term t) {
         return xy.getXY(t);
     }
 
-    @Nullable
-    public Term getYX(@NotNull Term t) {
-        return yx.getXY(t);
-    }
 
 
-//    public final void goSubterm(int index) {
-//        term.set(parent.get().term(index));
-//    }
 
     public final void matchAll(@NotNull Term x, @NotNull Term y) {
         matchAll(x, y, true);
@@ -243,28 +229,46 @@ public abstract class FindSubst extends Versioning implements Subst {
 
         Op t = type;
 
-
-        Op xOp = x.op();
-        Op yOp = y.op();
-
-        if (xOp == t) {
+        Op xOp;
+        if ((xOp = x.op()) == t) {
             return matchXvar((Variable) x, y);
         }
 
-        if (yOp == t) {
-            return matchYvar(x, /*(Variable)*/y);
+        Op yOp;
+        if ((yOp = y.op()) == t) {
+            return matchYvar(x, (Variable)y);
         }
 
-//        if (xOp.isVar() && yOp.isVar()) {
-//            return nextVarX((Variable) x, y);
-//        }
-
         if ((xOp == yOp) && (x instanceof Compound)) {
-            return ((Compound) x).match((Compound) y, this);
+            //Compound cx = (Compound)x;
+            //Compound cy = (Compound)y;
+            //if (hasAnyVar(cx) || hasAnyVar(cy))
+                return ((Compound) x).match((Compound) y, this);
         }
 
         return false;
     }
+
+//    private static boolean hasAnyVar(Compound x) {
+//        return x.complexity()<x.volume() || x.firstEllipsis()!=null;
+//    }
+
+    private boolean nextVarX(@NotNull Variable xVar, @NotNull Term y) {
+        Op xOp = xVar.op();
+
+        if (y.op() == xOp) {
+            return putCommon(xVar, (Variable) y);
+        } else {
+
+//            if ((y.op() == Op.VAR_QUERY && xVar.op() != Op.VAR_QUERY) ||
+//                    (y.op() != Op.VAR_QUERY && xVar.op() == Op.VAR_QUERY)) {
+//                return false;
+//            }
+            return putVarX(xVar, y);
+        }
+
+    }
+
 
     private boolean matchXvar(@NotNull Variable x, @NotNull Term y) {
         Term t = getXY(x);
@@ -274,22 +278,9 @@ public abstract class FindSubst extends Versioning implements Subst {
                 nextVarX(x, y);
 
 
-        /* ORIGINAL ~1.6.4
-
-        if (term1Var && (((Variable) term1).getType() == type)) {
-            final Variable var1 = (Variable) term1;
-            t = map[0]!=null ? map[0].get(var1) : null;
-
-            if (t != null) {
-                return findSubstitute(type, t, term2, map);
-            } else {
-                //NEXTVARX...
-            }
-         */
-
     }
-    private boolean matchYvar(@NotNull Term x, @NotNull Term y) {
-        Term t = getYX(y);
+    private boolean matchYvar(@NotNull Term x, @NotNull Variable y) {
+        Term t = yx.getXY(y);
 
         if (t != null) {
             return match(x, t); //loop
@@ -313,23 +304,6 @@ public abstract class FindSubst extends Versioning implements Subst {
 //    }
 
 
-    private boolean nextVarX(@NotNull Variable xVar, @NotNull Term y) {
-        Op xOp = xVar.op();
-
-        if (y.op() == xOp) {
-            return putCommon(xVar, (Variable) y);
-        } else if (xOp == type) {
-            return putVarX(xVar, y);
-        } else {
-
-            if ((y.op() == Op.VAR_QUERY && xVar.op() != Op.VAR_QUERY) ||
-                    (y.op() != Op.VAR_QUERY && xVar.op() == Op.VAR_QUERY)) {
-                return false;
-            }
-            return putVarX(xVar, y);
-        }
-
-    }
 
     @Override
     public final boolean isEmpty() {
@@ -421,7 +395,7 @@ public abstract class FindSubst extends Versioning implements Subst {
         }
 
         /** if they are images, they must have same relationIndex */
-        if (X.op().isImage()) { //PRECOMPUTABLE
+        if (X.op().isImage()) { //TODO this is precomputable
 
             //if the ellipsis is normal, then interpret the relationIndex as it is
             if (countNumNonEllipsis(X) > 0) {
@@ -746,19 +720,18 @@ public abstract class FindSubst extends Versioning implements Subst {
      * elimination
      */
     private boolean putVarX(Variable x, @NotNull Term y) {
-        if (putXY(x, y)) {
-            if (x instanceof CommonVariable) {
-                return putYX(x, y);
-            }
-            return true;
-        }
-        return false;
+        return putXY(x, y) ?
+                ((x instanceof CommonVariable) ?
+                        putYX(x, y) :
+                        true) :
+                false;
     }
 
 
     private boolean putCommon(@NotNull Variable x, @NotNull Variable y) {
         Variable commonVar = CommonVariable.make(x, y);
         return putXY(x, commonVar) && putYX(y, commonVar);
+        //TODO restore displaced values if putYX fails but putXY succeeded?
     }
 
     /**
@@ -773,15 +746,14 @@ public abstract class FindSubst extends Versioning implements Subst {
                 return matchSub(X, Y, 0);
             case 2:
                 //match the target variable first, if exists
-                int first = X.term(1, type) ? 1 : 0;
-                return matchSub(X, Y, first) && matchSub(X, Y, 1 - first);
+                return matchLinear2(X, Y, X.term(1, type) ? 1 : 0);
             default:
-                return matchLinearForward(X, Y);
+                return matchLinearN(X, Y);
         }
     }
 
 
-    public boolean matchLinearForward(@NotNull TermContainer X, @NotNull TermContainer Y) {
+    public boolean matchLinearN(@NotNull TermContainer X, @NotNull TermContainer Y) {
         final int s = X.size();
         for (int i = 0; i < s; i++) {
             if (!matchSub(X, Y, i)) return false;
@@ -791,6 +763,11 @@ public abstract class FindSubst extends Versioning implements Subst {
 
     public boolean matchSub(@NotNull TermContainer X, @NotNull TermContainer Y, int i) {
         return match(X.term(i), Y.term(i));
+    }
+    /** special match for size=2 compounds, with order reversal ability */
+    public boolean matchLinear2(@NotNull TermContainer X, @NotNull TermContainer Y, int first) {
+        int other = 1-first;
+        return match(X.term(first), Y.term(first)) && match(X.term(other), Y.term(other));
     }
 
     public boolean matchLinearReverse(@NotNull TermContainer X, @NotNull TermContainer Y) {
@@ -937,10 +914,9 @@ public abstract class FindSubst extends Versioning implements Subst {
         }
 
         @Override
-        public Term getXY(Object t) {
+        public final Term getXY(Term t) {
             Versioned<Term> v = map.get(t);
-            if (v == null) return null;
-            return v.get();
+            return v == null ? null : v.get();
         }
 
         /**

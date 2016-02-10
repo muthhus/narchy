@@ -19,7 +19,7 @@ public interface Subst  {
     boolean isEmpty();
 
     @Nullable
-    Term getXY(Object t);
+    Term getXY(Term t);
 
     void clear();
 

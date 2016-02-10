@@ -6,6 +6,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.transform.subst.FindSubst;
 import nars.term.transform.subst.MapSubst;
+import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -24,7 +25,7 @@ public abstract class UnifySubst extends FindSubst implements Consumer<Term> {
     @NotNull
     private Term a, b;
 
-    int matches = 0;
+    int matches;
 
     public UnifySubst(Op varType, @NotNull Memory memory, boolean acceptUnmatched) {
         super(varType, memory.random);
@@ -58,49 +59,29 @@ public abstract class UnifySubst extends FindSubst implements Consumer<Term> {
 
         //TODO combine these two blocks to use the same sub-method
 
-        Term aa = a;
-
-        //FORWARD
-        if (aa instanceof Compound) {
-
-            aa = getXY(a);
-            if (aa == null) aa = a;
-
-            Op aaop = aa.op();
-            if (a.op() == Op.VAR_QUERY && (aaop == Op.VAR_INDEP || aaop == Op.VAR_DEP))
-                return false;
-
+        Term aa = applySubstituteAndRenameVariables(a, xy);
+        if (aa == null) return false;
+        //Op aaop = aa.op();
+        //only set the values if it will return true, otherwise if it returns false the callee can expect its original values untouched
+        if ((a.op() == Op.VAR_QUERY) && (aa.hasVarIndep() || aa.hasVarIndep()) ) {
+            return false;
         }
 
-        Term bb = b;
-
-        //REVERSE
-        if (bb instanceof Compound) {
-            bb = applySubstituteAndRenameVariables(
-                    ((Compound) b),
-                    (Map<Term, Term>)yx //inverse map
-            );
-
-//            if (bb==null)
-//                return false; //WHY?
-
-            Op bbop = bb.op();
-            if (b.op() == Op.VAR_QUERY && (bbop == Op.VAR_INDEP || bbop == Op.VAR_DEP))
-                return false;
-        }
-
-        //t[0] = aa;
-        //t[1] = bb;
+//        Term bb = applySubstituteAndRenameVariables(b, yx);
+//        if (bb == null) return false;
+//        Op bbop = bb.op();
+//        if (bbop == Op.VAR_QUERY && (bbop == Op.VAR_INDEP || bbop == Op.VAR_DEP))
+//            return false;
 
 
-        accept(bb);
+        accept(aa);
         matches++;
 
         return true; //determines how many
     }
 
     @Nullable
-    Term applySubstituteAndRenameVariables(Compound t, @Nullable Map<Term,Term> subs) {
+    Term applySubstituteAndRenameVariables(Term t, @Nullable Map<Term,Term> subs) {
         return (subs == null) || (subs.isEmpty()) ?
                 t /* no change necessary */ :
                 memory.index.apply(new MapSubst(subs), t);

@@ -164,16 +164,16 @@ public class AtomConcept extends AbstractConcept  {
 
     /** filter for inserting an outgoing termlink depending on the target */
     public static float termLinkOut(Termed from, Term to) {
-        if (!to.isCompound()) {
-            if (from.op().isStatement()) // isAny(Op.ProductOrImageBits)
-                return 0.5f;
-        }
+//        if (!to.isCompound()) {
+//            if (from.op().isStatement()) // isAny(Op.ProductOrImageBits)
+//                return 0.5f;
+//        }
         return 1f;
     }
 
     private static boolean taskLinkOut(Concept c, Task t) {
-        //return true;
-        return !(c.term().equals(t.term()));
+        return true;
+        //return !(c.term().equals(t.term()));
     }
 
 }

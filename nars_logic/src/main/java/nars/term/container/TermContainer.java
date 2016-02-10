@@ -9,6 +9,7 @@ import nars.term.Term;
 import nars.term.TermBuilder;
 import nars.term.Termlike;
 import nars.term.Terms;
+import nars.term.transform.subst.FindSubst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -293,4 +294,6 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
     }
 
     TermContainer replacing(int subterm, Term replacement);
+
+
 }

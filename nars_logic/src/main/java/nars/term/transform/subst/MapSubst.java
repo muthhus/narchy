@@ -14,12 +14,12 @@ public class MapSubst implements Subst {
 
     public final Map<Term, Term> xy;
 
-    /**
-     * creates a substitution of one variable; more efficient than supplying a Map
-     */
-    public MapSubst(Term termFrom, Term termTo) {
-        this(UnifiedMap.newWithKeysValues(termFrom, termTo));
-    }
+//    /**
+//     * creates a substitution of one variable; more efficient than supplying a Map
+//     */
+//    public MapSubst(Term termFrom, Term termTo) {
+//        this(UnifiedMap.newWithKeysValues(termFrom, termTo));
+//    }
 
 
     public MapSubst(Map<Term, Term> xy) {
@@ -41,7 +41,7 @@ public class MapSubst implements Subst {
      * @param t
      */
     @Override
-    public final Term getXY(Object t) {
+    public final Term getXY(Term t) {
         return xy.get(t);
     }
 

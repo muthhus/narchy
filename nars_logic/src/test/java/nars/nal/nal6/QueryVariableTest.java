@@ -84,6 +84,7 @@ public class QueryVariableTest extends AbstractNALTester {
 
     @Test public void testQueryVariableUnification() {
         TestNAR t = test();
+        System.out.println();
         t.nar.log();
         t.input("(<?x --> y> && <?x --> z>).");
         t.input("(x --> y).");
