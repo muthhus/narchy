@@ -9,7 +9,7 @@ import nars.util.data.list.FasterList;
  * @see PTerm
  * @see Var
  */
-public class Trail extends FasterList {
+public class Trail extends FasterList<PTerm> {
 
 	public Trail() {
 		super();
@@ -34,7 +34,7 @@ public class Trail extends FasterList {
 		// if(to>size())
 		// IO.assertion("unwind attempted from smaller to larger top");
 		for (int i = size() - to; i > 0; i--) {
-			PTerm V = (PTerm) (removeLast());
+			PTerm V = removeLast();
 			V.undo();
 		}
 	}

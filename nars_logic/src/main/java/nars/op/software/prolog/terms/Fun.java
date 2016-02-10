@@ -17,7 +17,7 @@ import static nars.op.software.prolog.terms.Const.qname;
  *
  * @see nars.op.software.prolog.terms.PTerm
  */
-public class Fun extends Nonvar implements Compound<PTerm> {
+public class Fun extends Const implements Compound<PTerm> {
 
     public PTerm args[]; //TODO make final
 
@@ -122,7 +122,7 @@ public class Fun extends Nonvar implements Compound<PTerm> {
     }
 
     boolean bind_to(nars.op.software.prolog.terms.PTerm that, Trail trail) {
-        return getClass() == that.getClass() && name.equals(that.name) && args.length == ((Fun) that).args.length;
+        return /*getClass() == that.getClass() &&*/ name.equals(that.name) && args.length == ((Fun) that).args.length;
     }
 
     boolean unify_to(nars.op.software.prolog.terms.PTerm that, Trail trail) {

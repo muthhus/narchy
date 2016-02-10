@@ -1,14 +1,6 @@
 package nars.op.software.prolog.terms;
 
-import nars.Op;
-import nars.term.Compound;
-import nars.term.SubtermVisitor;
-import nars.term.Term;
-import org.jetbrains.annotations.NotNull;
-
-import java.io.IOException;
 import java.util.Objects;
-import java.util.function.Predicate;
 
 /**
  * Symbolic constant, of arity 0.
@@ -35,11 +27,7 @@ public class Const extends Nonvar {
 
 	/** null will cause this function to take its class simplename as the identifier */
 	public Const(String s) {
-		super( s ); //s.intern();
-	}
-
-	String qname() {
-		return qname(name);
+		super( s  ); //s.intern();
 	}
 
 	public static String qname(String name) {
@@ -53,7 +41,7 @@ public class Const extends Nonvar {
 	}
 
 	public String toString() {
-		return qname();
+		return qname(name);
 	}
 
 	boolean bind_to(PTerm that, Trail trail) {
@@ -81,7 +69,7 @@ public class Const extends Nonvar {
 		return name;
 	}
 
-	public final String key() {
+	public String getKey() {
 		return name + '/' + arity();
 	}
 

@@ -20,19 +20,22 @@ public final class Var extends PTerm {
 
 	final static AtomicInteger varSerial = new AtomicInteger(1);
 	static String varName(int i) {
-
-		char[] chars = new char[7];
-		chars[0] = '_';
-		Base64Codec.encode2chars((byte)((i & 0xff000000) >> 24),
-								 (byte)((i & 0x00ff0000) >> 16),
-								 chars, 1);
-		Base64Codec.encode2chars((byte)((i & 0x0000ff00) >> 8),
-								 (byte)(i & 0x000000ff),
-								 chars, 4);
-
-		return new String(chars);
+//
+//		char[] chars = new char[7];
+//		chars[0] = '_';
+//		Base64Codec.encode2chars((byte)((i & 0xff000000) >> 24),
+//								 (byte)((i & 0x00ff0000) >> 16),
+//								 chars, 1);
+//		Base64Codec.encode2chars((byte)((i & 0x0000ff00) >> 8),
+//								 (byte)(i & 0x000000ff),
+//								 chars, 4);
+//
+//		return new String(chars);
 
 		//return "_" + Integer.toString(i,36); //TODO base64+  TODO thread ID/UUID-like prefixed?
+
+
+		return "_" + i; //TODO base64+  TODO thread ID/UUID-like prefixed?
 	}
 
 	public Var() {

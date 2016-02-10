@@ -89,22 +89,22 @@ public class Clause extends Fun {
     /**
      * Variable dictionary
      */
-    public HashDict dict = null;
+    public HashDict dict;
 
     /**
      * Remembers if a clause is ground.
      */
-    public boolean ground = false;
+    public boolean ground;
 
     /**
      * File name and line where sources start and end (if applicable)
      */
 
-    public String fname = null;
+    public String fname;
 
-    public int begins_at = 0;
+    public int begins_at;
 
-    public int ends_at = 0;
+    public int ends_at;
 
     public void setFile(String fname, int begins_at, int ends_at) {
         this.fname = fname.intern();

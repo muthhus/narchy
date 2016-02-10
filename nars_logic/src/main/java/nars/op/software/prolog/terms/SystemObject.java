@@ -24,7 +24,9 @@ public class SystemObject extends Nonvar {
 	static String soName(String prefix) {
 		int i = soSerial.incrementAndGet();
 		//TODO base64+  TODO thread ID/UUID-like prefixed?
-		return '{' + prefix + '.' + Integer.toString(i,36) + '}';
+		return '{' + prefix + '.' +
+				Integer.toString(i) + '}';
+				//Integer.toString(i,36) + '}';
 	}
 
 	public SystemObject() {
