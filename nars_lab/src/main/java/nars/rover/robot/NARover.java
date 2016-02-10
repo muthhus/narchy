@@ -23,14 +23,12 @@ import nars.term.Termed;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import nars.util.data.Util;
-import nars.util.data.list.FasterList;
 import nars.util.signal.NarQ;
 import nars.util.signal.Sensor;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.joints.RevoluteJoint;
-import org.jbox2d.dynamics.joints.RevoluteJointDef;
 
 import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
@@ -286,99 +284,15 @@ public class NARover extends AbstractPolygonBot {
         return torso;
     }
 
-    public static class Arm {
-
-        final FasterList<Body> segments = new FasterList();
-        final FasterList<RevoluteJoint> joints = new FasterList();
-
-        public Arm(Sim sim, Body base, float ax, float ay, float a) {
-
-            Vec2 attachPoint = new Vec2(ax, ay);
-
-            float vx = 1; //(float)Math.cos(a);
-            float vy = 0; ///(float)Math.sin(a);
-
-            // NOW, create several duplicates of the "Main Body" fixture
-            // but offset them from the previous one by a fixed amount and
-            // overlap them a bit.
-            int numSegments = 3;
-
-            Body pBodyA = base;
-            Body pBodyB = null;
-            float segLength = 2.7f,
-                    thick = 0.5f;
-
-            //List<Body> _segments = Global.newArrayList();
-
-            float angRange = 0.35f;
-
-            // Add some "regular segments".
-            for(int idx = 0; idx < numSegments; idx++)
-            {
-                // Create a body for the next segment.
-
-                float dx, dy;
-                if (pBodyA == base) {
-                    dx = segLength * vx;
-                    dy = thick * vy;
-                } else {
-                    dx = segLength;
-                    dy = 0;
-                }
-
-                pBodyB = newRect(sim.getWorld(), 0.2f,
-                        segLength, thick,
-                        pBodyA.getPosition().x + dx, pBodyA.getPosition().y + dy);
-
-                //float tone= (idx/((float)numSegments));
-                pBodyB.setUserData( ((RoboticMaterial)base.getUserData()).clone() );
-
-                segLength*=0.8f;
-                thick*=0.618f;
-
-                //pBodyB. position = pBodyA.getPosition().add( offset );
-                //_segments.add(pBodyB);
-                // Add some damping so body parts don't 'flop' around.
-                pBodyB.setLinearDamping(0.1f);
-                pBodyB.setAngularDamping(0.3f);
-
-                if (pBodyA == base)
-                    pBodyB.getPosition().addLocal(attachPoint);
-
-                // Create a Revolute Joint at a position half way
-                // between the two bodies.
-                Vec2 midpoint = pBodyA.getPosition().add(pBodyB.getPosition()).mul(0.5f);
-
-
-                RevoluteJointDef revJointDef = new RevoluteJointDef();
-                revJointDef.initialize(pBodyA, pBodyB, midpoint);
-                revJointDef.collideConnected = false;
-                revJointDef.enableLimit = true;
-                revJointDef.enableMotor = true;
-                revJointDef.upperAngle = +angRange+(pBodyA == base  ? a : 0);
-                revJointDef.lowerAngle = -angRange+(pBodyA == base  ? a : 0);
-
-                RevoluteJoint jj = (RevoluteJoint) sim.getWorld().createJoint(revJointDef);
-                joints.add(jj);
-
-                segments.add(pBodyB);
-
-                // Update so the next time through the loop, we are
-                // connecting the next body to the one we just
-                // created.
-                pBodyA = pBodyB;
-
-
-            }
-
-
-        }
-    }
 
     /** http://stackoverflow.com/questions/20904171/how-to-create-snake-like-body-in-box2d-and-cocos2dx */
     public void addArm(String id, NarQ controller, float ax, float ay, float angle) {
 
-        Arm a = new Arm(sim, torso, ax, ay, angle);
+        int segs = 3;
+        float segLength = 2.7f;
+        float thick = 0.5f;
+
+        Arm a = new Arm(id, sim, torso, ax, ay, angle, segs, segLength, thick);
 
         addEye(id + "e", controller, a.segments.getLast(), 5, new Vec2(0.5f, 0), 0.2f, (float)(+Math.PI/4f), 2.5f);
 

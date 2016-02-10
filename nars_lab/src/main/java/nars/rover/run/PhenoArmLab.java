@@ -3,11 +3,10 @@ package nars.rover.run;
 import nars.Global;
 import nars.rover.RoverWorld;
 import nars.rover.Sim;
-import nars.rover.robot.NARover;
+import nars.rover.robot.Arm;
 import nars.rover.world.FoodSpawnWorld1;
 
 import static nars.rover.run.SomeRovers.clock;
-import static nars.rover.run.SomeRovers.q;
 
 /**
  * Laboratory for experimenting with brainless bodies
@@ -25,12 +24,35 @@ public class PhenoArmLab {
         final Sim game = new Sim(clock, world);
 
         QRover r = new QRover("r2") {
+            public Arm arm;
+
             @Override
             public void init(Sim p) {
                 super.init(p);
-                new NARover.Arm(sim, torso, -1.75f, 1.5f, 0.8f);
+                arm = new Arm("x", sim, torso,
+                        //-1.75f, 1.5f, 0.8f
+                        0, 0, 0,
+                        4, 6f, 1.5f
+                );
+                //torso.setActive(false);
+
+            }
+
+            float t = 0;
+
+            @Override
+            public void step(int time) {
+                super.step(time);
+                if (arm != null) {
+                    arm.set(
+                            (float)Math.PI/3f * (float)Math.sin(t) /* rotate back and forth within an arc */,
+                            0.5f + 0.25f * (float)Math.sin(time/10f) /** oscillate radius */);
+                    arm.step(time);
+                    t += 0.002f;
+                }
             }
         };
+        r.setSpeed(0f, 0f); //still
 
         game.add(r);
 
@@ -43,7 +65,7 @@ public class PhenoArmLab {
 //        }
 
 
-        float fps = 30;
+        float fps = 180;
         game.run(fps);
 
 

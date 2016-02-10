@@ -50,7 +50,7 @@ abstract public class Robotic {
 
     }
 
-    public void eat(Body touched) {
+    @Deprecated public void eat(Body touched) {
 
 
     }

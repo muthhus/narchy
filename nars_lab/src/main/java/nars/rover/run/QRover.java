@@ -27,12 +27,19 @@ public class QRover extends AbstractPolygonBot {
     private final float[] in;
     float rew = 0;
 
+    float linearSpeed = 1f, rotateSpeed = 1f;
+
     public QRover(String id) {
         super(id);
         this.hai = new HaiQ(inputs, actions*2, actions);
-        this.hai.setQ(0.13f, 0.4f, 0.9f); //0.1 0.5 0.9
+        this.hai.setQ(0.2f, 0.4f, 0.9f, 0.07f); //0.1 0.5 0.9
 
         this.in = new float[inputs];
+    }
+
+    public void setSpeed(float linear, float rotate) {
+        this.linearSpeed = linear;
+        this.rotateSpeed = rotate;
     }
 
     @Override
@@ -42,7 +49,7 @@ public class QRover extends AbstractPolygonBot {
 
     @Override
     protected Body newTorso() {
-        Body torso = newTriangle(getWorld(), 1f);
+        Body torso = newTriangle(getWorld(), 50f);
         torso.setUserData(getMaterial());
 
 
@@ -117,10 +124,10 @@ public class QRover extends AbstractPolygonBot {
 
         switch (hai.act(in, rew)) {
             case 0: break; //reserved until actions are balanced
-            case 1: thrustRelative(1f); break;
-            case 2: thrustRelative(-1f); break;
-            case 3: rotateRelative(-1f); break;
-            case 4: rotateRelative(1f); break;
+            case 1: thrustRelative(1f * linearSpeed); break;
+            case 2: thrustRelative(-1f * linearSpeed); break;
+            case 3: rotateRelative(-1f * rotateSpeed); break;
+            case 4: rotateRelative(1f * rotateSpeed); break;
             case 5: stop(); break;
             default: throw new RuntimeException("unknown action");
         }

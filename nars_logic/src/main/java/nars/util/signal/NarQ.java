@@ -247,7 +247,7 @@ public class NarQ implements Consumer<NAR> {
 
             int s = outs.size();
 
-            final float a = q.Alpha.floatValue();
+            final float epsi = q.Epsilon;
 
 
             for (int j = 0; j < s; j++) {
@@ -255,8 +255,8 @@ public class NarQ implements Consumer<NAR> {
                 float e = outs.get(j).ran();
 
                 //add noise
-                if (a != 0) {
-                    e += (q.rng.nextFloat() - 0.5f) * q.Alpha.floatValue() *2f;
+                if (epsi != 0) {
+                    e += (q.rng.nextFloat() - 0.5f) * epsi *2f;
                 }
 
                 //System.out.println(outs.get(j) + " " + e);

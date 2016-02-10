@@ -263,7 +263,8 @@ public class Sim extends PhysicsModel {
 
         super.step(timeStep, settings, panel);
 
-        for (Robotic r : robots) {
+        for (int i = 0, robotsSize = robots.size(); i < robotsSize; i++) {
+            Robotic r = robots.get(i);
             r.step(1);
         }
 
@@ -286,7 +287,7 @@ public class Sim extends PhysicsModel {
 
     @Override
     public String getTestName() {
-        return "NARS Rover";
+        return "Disposabuild";
     }
 
 //    public class RoverPanel extends JPanel {

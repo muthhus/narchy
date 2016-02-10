@@ -59,6 +59,7 @@ public class HaiQ {
 	public final MutableFloat Alpha = new MutableFloat();
 
 	private final int inputs;
+	public float Epsilon;
 
 	public HaiQ(int inputs, int _states, int outputs) {
 		rng = new XorShift128PlusRandom(1);
@@ -74,7 +75,7 @@ public class HaiQ {
 
 		q = new float[nStates][outputs];
 		et = new float[nStates][outputs];
-		setQ(0.1f, 0.5f, 0.9f); // 0.1 0.5 0.9
+		setQ(0.1f, 0.5f, 0.9f, 0.1f); // 0.1 0.5 0.9
 	}
 
 	int learn(int state, float reward) {
@@ -99,7 +100,7 @@ public class HaiQ {
 	}
 
 	protected int nextAction(int state) {
-		return rng.nextFloat() < Alpha.floatValue() ? randomAction() : choose(state);
+		return rng.nextFloat() < Epsilon ? randomAction() : choose(state);
 	}
 
 	private int randomAction() {
@@ -143,10 +144,11 @@ public class HaiQ {
 		return maxk != -1 ? maxk : randomAction();
 	}
 
-	public void setQ(float alpha, float gamma, float lambda) {
+	public void setQ(float alpha, float gamma, float lambda, float epsilon) {
 		Alpha.setValue( alpha );
 		Gamma = gamma;
 		Lambda = lambda;
+		Epsilon = epsilon;
 	}
 
 	/**
