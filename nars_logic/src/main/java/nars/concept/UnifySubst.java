@@ -81,8 +81,8 @@ public abstract class UnifySubst extends FindSubst implements Consumer<Term> {
                     (Map<Term, Term>)yx //inverse map
             );
 
-            if (bb==null)
-                return false; //WHY?
+//            if (bb==null)
+//                return false; //WHY?
 
             Op bbop = bb.op();
             if (b.op() == Op.VAR_QUERY && (bbop == Op.VAR_INDEP || bbop == Op.VAR_DEP))

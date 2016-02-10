@@ -6,6 +6,7 @@ import nars.nal.AbstractNALTester;
 import nars.nar.Default;
 import nars.task.Task;
 import nars.util.data.Util;
+import nars.util.meter.TestNAR;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -81,6 +82,15 @@ public class QueryVariableTest extends AbstractNALTester {
 
     }
 
+    @Test public void testQueryVariableUnification() {
+        TestNAR t = test();
+        t.nar.log();
+        t.input("(<?x --> y> && <?x --> z>).");
+        t.input("(x --> y).");
+        t.mustBelieve(1000, "(x --> z)", 1.0f, 0.73f);
+
+
+    }
 
 //    /** simple test for solutions to query variable questions */
 //    @Test public void testQueryVariableSolution() throws InvalidInputException {

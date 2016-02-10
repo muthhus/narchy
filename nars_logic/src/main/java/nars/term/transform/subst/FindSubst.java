@@ -44,7 +44,9 @@ and collected until power is depleted. */
 public abstract class FindSubst extends Versioning implements Subst {
 
 
-    /** maximum changes which are stored in stack */
+    /**
+     * maximum changes which are stored in stack
+     */
     final static int defaultHistoryLength = 192;
 
     public final Random random;
@@ -170,10 +172,11 @@ public abstract class FindSubst extends Versioning implements Subst {
     }
 
 
-    /** appended to the end of termuator execution chains to invoke
-     *  any accumulated termutations occurring during the match
-     *  or onMatch() if it was stable
-     * **/
+    /**
+     * appended to the end of termuator execution chains to invoke
+     * any accumulated termutations occurring during the match
+     * or onMatch() if it was stable
+     **/
     private final Termutator termunator = new Termutator(".") {
 
         /** should be be synchronized if threadsafe necessary*/
@@ -244,10 +247,6 @@ public abstract class FindSubst extends Versioning implements Subst {
         Op xOp = x.op();
         Op yOp = y.op();
 
-        if ((xOp == yOp) && (x instanceof Compound)) {
-            return ((Compound) x).match((Compound) y, this);
-        }
-
         if (xOp == t) {
             return matchXvar((Variable) x, y);
         }
@@ -256,22 +255,48 @@ public abstract class FindSubst extends Versioning implements Subst {
             return matchYvar(x, /*(Variable)*/y);
         }
 
-        if (xOp.isVar() && yOp.isVar()) {
-            return nextVarX((Variable) x, y);
+//        if (xOp.isVar() && yOp.isVar()) {
+//            return nextVarX((Variable) x, y);
+//        }
+
+        if ((xOp == yOp) && (x instanceof Compound)) {
+            return ((Compound) x).match((Compound) y, this);
         }
 
         return false;
     }
 
-    private boolean matchYvar(@NotNull Term x, @NotNull Term y) {
-        Term ySubst = getYX(y);
+    private boolean matchXvar(@NotNull Variable x, @NotNull Term y) {
+        Term t = getXY(x);
 
-        if (ySubst != null) {
-            return match(x, ySubst); //loop
+        return (t != null) ?
+                match(t, y) :
+                nextVarX(x, y);
+
+
+        /* ORIGINAL ~1.6.4
+
+        if (term1Var && (((Variable) term1).getType() == type)) {
+            final Variable var1 = (Variable) term1;
+            t = map[0]!=null ? map[0].get(var1) : null;
+
+            if (t != null) {
+                return findSubstitute(type, t, term2, map);
+            } else {
+                //NEXTVARX...
+            }
+         */
+
+    }
+    private boolean matchYvar(@NotNull Term x, @NotNull Term y) {
+        Term t = getYX(y);
+
+        if (t != null) {
+            return match(x, t); //loop
         } else {
             if (putYX(/*(Variable)*/ y, x)) {
                 if (y instanceof CommonVariable) {
-                    return putXY(x, /*(Variable)*/ y);
+                    return putXY(y, /*(Variable)*/ x);
                 }
                 return true;
             }
@@ -279,20 +304,6 @@ public abstract class FindSubst extends Versioning implements Subst {
         return false;
     }
 
-    public boolean matchXvar(@NotNull Variable x, @NotNull Term y) {
-        Term xSubst = getXY(x);
-
-        //try {
-            return (xSubst != null) ?
-                    match(xSubst, y) :
-                    nextVarX(x, y);
-        /*}
-        catch (StackOverflowError e) {
-            e.printStackTrace();
-            return false;
-        }*/
-
-    }
 
 //    private static void printComparison(int power, Compound cx, Compound cy) {
 //        System.out.println(cx.structureString() + " " + cx.volume() + "\t" + cx);
@@ -305,15 +316,19 @@ public abstract class FindSubst extends Versioning implements Subst {
     private boolean nextVarX(@NotNull Variable xVar, @NotNull Term y) {
         Op xOp = xVar.op();
 
-        if (xOp == type) {
+        if (y.op() == xOp) {
+            return putCommon(xVar, (Variable) y);
+        } else if (xOp == type) {
             return putVarX(xVar, y);
         } else {
-            if (y.op() == xOp) {
-                return putCommon(xVar, (Variable) y);
+
+            if ((y.op() == Op.VAR_QUERY && xVar.op() != Op.VAR_QUERY) ||
+                    (y.op() != Op.VAR_QUERY && xVar.op() == Op.VAR_QUERY)) {
+                return false;
             }
+            return putVarX(xVar, y);
         }
 
-        return false;
     }
 
     @Override
@@ -325,7 +340,6 @@ public abstract class FindSubst extends Versioning implements Subst {
     }
 
     public final boolean matchCompoundWithEllipsis(@NotNull Compound X, @NotNull Compound Y) {
-
 
 
 //        final int numNonpatternVars;
@@ -487,8 +501,8 @@ public abstract class FindSubst extends Versioning implements Subst {
         boolean isPattern = type == Op.VAR_PATTERN;
 
         if
-            ((!isPattern && !x.hasAny(type.bit()) ||
-            (isPattern && !x.hasVarPattern())))
+                ((!isPattern && !x.hasAny(type.bit()) ||
+                (isPattern && !x.hasVarPattern())))
 
         {
             //SPECIAL CASE: no variables
@@ -734,7 +748,7 @@ public abstract class FindSubst extends Versioning implements Subst {
     private boolean putVarX(Variable x, @NotNull Term y) {
         if (putXY(x, y)) {
             if (x instanceof CommonVariable) {
-                return putYX(y, x);
+                return putYX(x, y);
             }
             return true;
         }
@@ -760,7 +774,7 @@ public abstract class FindSubst extends Versioning implements Subst {
             case 2:
                 //match the target variable first, if exists
                 int first = X.term(1, type) ? 1 : 0;
-                return matchSub(X,Y,first) && matchSub(X,Y,1-first);
+                return matchSub(X, Y, first) && matchSub(X, Y, 1 - first);
             default:
                 return matchLinearForward(X, Y);
         }
@@ -858,7 +872,7 @@ public abstract class FindSubst extends Versioning implements Subst {
         int s = cc.size() - 1;
         if (s < 0) return true;
         ImmutableMap<Term, MatchConstraint>[] ccc = cc.value.array();
-        for ( ; s >=0; s--) {
+        for (; s >= 0; s--) {
             MatchConstraint c = ccc[s].get(x);
             if ((c != null) && c.invalid(x, y, this))
                 return false;
@@ -866,7 +880,8 @@ public abstract class FindSubst extends Versioning implements Subst {
         return true;
     }
 
-    @Override public void forEach(BiConsumer<? super Term, ? super Term> each) {
+    @Override
+    public void forEach(BiConsumer<? super Term, ? super Term> each) {
         xy.forEach(each);
         //TODO yx also?
     }
@@ -928,13 +943,16 @@ public abstract class FindSubst extends Versioning implements Subst {
             return v.get();
         }
 
-        /** must inspect elements because the entries will be there but possibly null */
-        @Override public boolean isEmpty() {
+        /**
+         * must inspect elements because the entries will be there but possibly null
+         */
+        @Override
+        public boolean isEmpty() {
             if (super.isEmpty())
                 return true;
 
             for (Versioned x : map.values()) {
-                if (x.get()!=null) return false;
+                if (x.get() != null) return false;
             }
             return true;
         }

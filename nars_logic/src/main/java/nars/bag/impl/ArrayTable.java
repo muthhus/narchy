@@ -1,6 +1,7 @@
 package nars.bag.impl;
 
 import nars.bag.Table;
+import nars.task.Task;
 import nars.util.CollectorMap;
 import nars.util.data.sorted.SortedIndex;
 import org.jetbrains.annotations.NotNull;
@@ -220,6 +221,8 @@ abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements Tabl
 //        }
         return overflow;
     }
+
+
 
 //    protected final class ArrayMapping extends CollectorMap<V, L> {
 //

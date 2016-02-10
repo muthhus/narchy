@@ -382,6 +382,8 @@ public class DefaultBeliefTable implements BeliefTable {
         return null;
     }
 
+
+
     /** try to insert but dont delete the input task if it wasn't inserted (but delete a displaced if it was)
      *  returns true if it was inserted, false if not
      * */
@@ -391,7 +393,28 @@ public class DefaultBeliefTable implements BeliefTable {
 
         ArrayTable<Task, Task> table = tableFor(incoming);
 
-        Task displaced = table.put(incoming,incoming);
+
+        //AXIOMATIC/CONSTANT BELIEF/GOAL
+        if (incoming.conf() >=1f && table.capacity()!=1 && (table.isEmpty()||table.top().conf()<1f)) {
+            //lock incoming 100% confidence belief/goal into a 1-item capacity table by itself, preventing further insertions or changes
+            //1. clear the corresponding table, set capacity to one, and insert this task
+            Consumer<Task> overridden = t -> {
+                onBeliefRemoved(t, "Overridden", nar);
+            };
+            table.forEach(overridden);
+            table.clear();
+            table.setCapacity(1);
+            table.put(incoming, incoming);
+
+            //2. clear the other table, set capcity to zero preventing temporal tasks
+            table = (table == eternal) ? temporal : eternal;
+            table.forEach(overridden);
+            table.clear();
+            table.setCapacity(0);
+            return true;
+        }
+
+        Task displaced = table.put(incoming, incoming);
 
         boolean inserted = displaced == null || displaced!=incoming;//!displaced.equals(t);
 //        if (displaced!=null && inserted) {

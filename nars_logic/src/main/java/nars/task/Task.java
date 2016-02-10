@@ -138,6 +138,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
     static boolean subjectOrPredicateIsIndependentVar(@NotNull Compound t) {
         if (!t.hasVarIndep()) return false;
+
         return (t.term(0).op() == Op.VAR_INDEP) || (t.term(1).op() == Op.VAR_INDEP);
     }
 

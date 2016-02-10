@@ -77,6 +77,7 @@ public class Arm extends Robotic implements SwingDraw.LayerDraw {
         controller = new HaiQ((segs) + 2 + 2 ,
                 (2+segs) * 6 /* arbitrary # states */,
                 (segs) * 2 //forward and reverse motor impulse for each joint
+                    // TODO: (1+segs) + 1 //segment select (including a position for none), and a direction select
         );
         controller.setQ(0.25f, 0.5f, 0.7f, 0.1f);
 

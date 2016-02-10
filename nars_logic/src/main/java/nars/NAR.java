@@ -2,6 +2,7 @@ package nars;
 
 
 import com.google.common.collect.Sets;
+import com.google.common.io.Files;
 import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
 import nars.Narsese.NarseseException;
@@ -36,8 +37,8 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -1089,6 +1090,19 @@ public abstract class NAR implements Level, Consumer<Task> {
 
     public Termed[] terms(String... terms) {
         return Stream.of(terms).map(this::term).toArray(Termed[]::new);
+    }
+
+    public synchronized void dumpConcepts(String path) throws FileNotFoundException {
+        PrintStream pw = new PrintStream(new FileOutputStream(new File(path)));
+        index().forEach(t -> {
+            if (t instanceof Concept) {
+                Concept cc = (Concept)t;
+                cc.print(pw);
+            } else {
+                pw.append(t.toString());
+            }
+        });
+        pw.close();
     }
 
     public static final class InvalidTaskException extends RuntimeException {
