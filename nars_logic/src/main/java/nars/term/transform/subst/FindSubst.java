@@ -239,11 +239,13 @@ public abstract class FindSubst extends Versioning implements Subst {
             return matchYvar(x, (Variable)y);
         }
 
-        if ((xOp == yOp) && (x instanceof Compound)) {
+        if ((x instanceof Compound) && (xOp == yOp)) {
             //Compound cx = (Compound)x;
             //Compound cy = (Compound)y;
             //if (hasAnyVar(cx) || hasAnyVar(cy))
                 return ((Compound) x).match((Compound) y, this);
+        } else if (xOp.isVar() && yOp.isVar()) {
+            return nextVarX((Variable) x, y);
         }
 
         return false;
@@ -253,24 +255,21 @@ public abstract class FindSubst extends Versioning implements Subst {
 //        return x.complexity()<x.volume() || x.firstEllipsis()!=null;
 //    }
 
-    private boolean nextVarX(@NotNull Variable xVar, @NotNull Term y) {
+    private final boolean nextVarX(@NotNull Variable xVar, @NotNull Term y) {
         Op xOp = xVar.op();
+        return (y.op() == xOp) ? putCommon(xVar, (Variable) y) :
+                    (xOp == type) //<-- this condition may not be correct but doesnt seem to make much difference. better if it is more restrictive in what is inserted
+                        && putVarX(xVar, y);
 
-        if (y.op() == xOp) {
-            return putCommon(xVar, (Variable) y);
-        } else {
-
-//            if ((y.op() == Op.VAR_QUERY && xVar.op() != Op.VAR_QUERY) ||
-//                    (y.op() != Op.VAR_QUERY && xVar.op() == Op.VAR_QUERY)) {
-//                return false;
-//            }
-            return putVarX(xVar, y);
-        }
+        //            if ((y.op() == Op.VAR_QUERY && xVar.op() != Op.VAR_QUERY) ||
+        //                    (y.op() != Op.VAR_QUERY && xVar.op() == Op.VAR_QUERY)) {
+        //                return false;
+        //            }
 
     }
 
 
-    private boolean matchXvar(@NotNull Variable x, @NotNull Term y) {
+    private final boolean matchXvar(@NotNull Variable x, @NotNull Term y) {
         Term t = getXY(x);
 
         return (t != null) ?
@@ -279,7 +278,7 @@ public abstract class FindSubst extends Versioning implements Subst {
 
 
     }
-    private boolean matchYvar(@NotNull Term x, @NotNull Variable y) {
+    private final boolean matchYvar(@NotNull Term x, @NotNull Variable y) {
         Term t = yx.getXY(y);
 
         if (t != null) {
