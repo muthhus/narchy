@@ -113,7 +113,7 @@ public class Prog extends Source implements Runnable {
             a = new Fun("the", a);
             p.stop();
         } else
-            a = Const.NO;
+            a = PTerm.NO;
         return a;
     }
 

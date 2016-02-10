@@ -301,7 +301,7 @@ class eocToken extends Fun {
 
 class eofToken extends Fun {
 	public eofToken() {
-		super("eofToken", Const.anEof);
+		super("eofToken", PTerm.EOF);
 	}
 }
 
@@ -420,7 +420,7 @@ public class Parser extends Lexer {
 			mes = "unknown_error";
 		Fun f = new Fun("error", new Const(type), new Const(mes), new Fun(
 				"line", new Int(line)));
-		Clause C = new Clause(f, Const.TRUE);
+		Clause C = new Clause(f, PTerm.TRUE);
 		if (verbose) {
 			IO.error(type + " error at line:" + line);
 			IO.error(C.pprint(), e);
@@ -566,7 +566,7 @@ public class Parser extends Lexer {
 	private final PTerm getList() throws IOException {
 		PTerm n = next();
 		if (n instanceof rbraToken)
-			return Const.NIL;
+			return PTerm.NIL;
 		PTerm t = getTerm(n);
 		return getListCont(t);
 	}
@@ -576,7 +576,7 @@ public class Parser extends Lexer {
 		PTerm n = next();
 		PTerm t = null;
 		if (n instanceof rbraToken)
-			t = new Cons(curr, Const.NIL);
+			t = new Cons(curr, PTerm.NIL);
 		else if (n instanceof barToken) {
 			t = new Cons(curr, getTerm());
 			n = next();
@@ -598,7 +598,7 @@ public class Parser extends Lexer {
 		return s;
 	}
 
-	public static Clause clsFromString(Prolog prolog, String s) {
+	public static Clause stringToClause(Prolog prolog, String s) {
 		if (null == s)
 			return null;
 		s = patchEOFString(s);

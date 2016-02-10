@@ -26,8 +26,8 @@ public class Builtins extends HashDict {
 
 		// basics
 		register(new is_builtin());
-		register(Const.TRUE);
-		register(Const.FAIL);
+		register(PTerm.TRUE);
+		register(PTerm.FAIL);
 		register(new halt());
 		register(new compute());
 
@@ -614,14 +614,9 @@ final class db_add extends FunBuiltin {
 	public int exec(Prog p) {
 		DataBase db = (DataBase) arg(0).toObject();
 		PTerm X = arg(1);
-		// IO.mes("X==>"+X);
-		String key = X.getKey();
-		// IO.mes("key==>"+key);
-		if (null == key)
-			return 0;
-		db.out(key, X);
+
+		return X!=null && db.add(X)!=null ? 1 : 0;
 		// IO.mes("res==>"+R);
-		return 1;
 	}
 }
 
@@ -1011,7 +1006,7 @@ final class collect extends FunBuiltin {
 		Sink s = (Sink) arg(0);
 		PTerm X = s.collect();
 		if (null == X)
-			X = Const.NO;
+			X = PTerm.NO;
 		else
 			X = new Fun("the", X);
 		return putArg(1, X, p);
@@ -1075,7 +1070,7 @@ final class set_persistent extends FunBuiltin {
 	public int exec(Prog p) {
 		Fluent F = (Fluent) arg(0);
 		Const R = (Const) arg(1);
-		boolean yesno = !R.equals(Const.NO);
+		boolean yesno = !R.equals(PTerm.NO);
 		F.setPersistent(yesno);
 		return 1;
 	}
@@ -1091,7 +1086,7 @@ final class get_persistent extends FunBuiltin {
 
 	public int exec(Prog p) {
 		Fluent F = (Fluent) arg(0);
-		PTerm R = F.getPersistent() ? Const.YES : Const.NO;
+		PTerm R = F.getPersistent() ? PTerm.YES : PTerm.NO;
 		return putArg(1, R, p);
 	}
 }

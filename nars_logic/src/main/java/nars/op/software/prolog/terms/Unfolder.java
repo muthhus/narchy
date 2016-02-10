@@ -42,11 +42,13 @@ public class Unfolder extends Source {
 			if (null != first) {
 				oldtop = prog.getTrail().size();
 				this.e = prolog.db.toEnumerationFor(first.getKey());
-				if (!e.hasNext())
+				/*if (!e.hasNext()) {
 					trace_nomatch(first);
+				}*/
 			}
-		} else
+		} else {
 			trace_failing(g);
+		}
 	}
 
 	/**

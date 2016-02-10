@@ -1,6 +1,7 @@
 package nars.op.software.prolog.terms;
 
 import nars.op.software.prolog.Prolog;
+import nars.op.software.prolog.io.Parser;
 import nars.term.Term;
 
 /**
@@ -9,6 +10,12 @@ import nars.term.Term;
  */
 public abstract class PTerm implements Cloneable, Term {
 
+	public final static Nil NIL = new Nil();
+	public final static Const TRUE = new true_();
+	public final static Const FAIL = new fail_();
+	public final static Const YES = new Const("yes");
+	public final static Const NO = new Const("no");
+	public final static Const EOF = new Const("end_of_file");
 	public final String name;
 
 
@@ -74,7 +81,7 @@ public abstract class PTerm implements Cloneable, Term {
 	// }
 
 	public Clause toClause() {
-		return new Clause(this, Const.TRUE);
+		return new Clause(this, TRUE);
 	}
 
 	boolean isClause() {
@@ -82,7 +89,7 @@ public abstract class PTerm implements Cloneable, Term {
 	}
 
 	public static PTerm fromString(Prolog p, String s) {
-		return Clause.clauseFromString(p, s).toTerm();
+		return Parser.stringToClause(p, s).toTerm();
 	}
 
 	/**
@@ -217,11 +224,11 @@ public abstract class PTerm implements Cloneable, Term {
 
 	static final Nonvar stringToChars(String s) {
 		if (0 == s.length())
-			return Const.NIL;
-		Cons l = new Cons(new Int((s.charAt(0))), Const.NIL);
+			return NIL;
+		Cons l = new Cons(new Int((s.charAt(0))), NIL);
 		Cons curr = l;
 		for (int i = 1; i < s.length(); i++) {
-			Cons tail = new Cons(new Int((s.charAt(i))), Const.NIL);
+			Cons tail = new Cons(new Int((s.charAt(i))), NIL);
 			curr.args[1] = tail;
 			curr = tail;
 		}

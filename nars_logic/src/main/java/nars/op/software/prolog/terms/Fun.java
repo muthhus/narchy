@@ -10,8 +10,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.function.Consumer;
 
-import static nars.op.software.prolog.terms.Const.qname;
-
 /**
  * Implements compound terms
  *
@@ -37,10 +35,7 @@ public class Fun extends Const implements Compound<PTerm> {
   }
   */
 
-    public Fun(String name, PTerm... args) {
-        super(name);
-        this.args = args;
-    }
+
 
     /** null will cause this function to take its class simplename as the identifier */
     public Fun(@Nullable String s, int arity) {
@@ -48,14 +43,15 @@ public class Fun extends Const implements Compound<PTerm> {
         args = new PTerm[arity];
     }
 
-    public void init(int arity) {
-        PTerm[] args = this.args = new PTerm[arity];
+    public static PTerm[] init(int arity) {
+        PTerm[] args = new PTerm[arity];
         for (int i = 0; i < arity; i++) {
             args[i] = new Var();
         }
+        return args;
     }
 
-    public final nars.op.software.prolog.terms.PTerm arg(int i) {
+    public final PTerm arg(int i) {
         return args[i].ref();
     }
 
@@ -63,40 +59,44 @@ public class Fun extends Const implements Compound<PTerm> {
         return (int) ((Int) arg(i)).getValue();
     }
 
-    public final void setArg(int i, PTerm T) {
+/*    public final void setArg(int i, PTerm T) {
         args[i] = T;
-    }
+    }*/
 
     public final int putArg(int i, PTerm T, Prog p) {
         // return getArg(i).unify(T,p.getTrail())?1:0;
         return args[i].unify(T, p.getTrail()) ? 1 : 0;
     }
 
-    public Fun(String s, PTerm x0) {
-        this(s, 1);
-        args[0] = x0;
+    public Fun(String s, PTerm... x0) {
+        this(s, x0.length);
+        this.args = x0;
     }
 
-    public Fun(String s, PTerm x0, PTerm x1) {
-        this(s, 2);
-        args[0] = x0;
-        args[1] = x1;
-    }
-
-    public Fun(String s, PTerm x0, PTerm x1, PTerm x2) {
-        this(s, 3);
-        args[0] = x0;
-        args[1] = x1;
-        args[2] = x2;
-    }
-
-    public Fun(String s, PTerm x0, PTerm x1, PTerm x2, PTerm x3) {
-        this(s, 4);
-        args[0] = x0;
-        args[1] = x1;
-        args[2] = x2;
-        args[3] = x3;
-    }
+//    public Fun(String name, PTerm... args) {
+//        super(name);
+//        this.args = args;
+//    }
+//    public Fun(String s, PTerm x0, PTerm x1) {
+//        this(s, 2);
+//        args[0] = x0;
+//        args[1] = x1;
+//    }
+//
+//    public Fun(String s, PTerm x0, PTerm x1, PTerm x2) {
+//        this(s, 3);
+//        args[0] = x0;
+//        args[1] = x1;
+//        args[2] = x2;
+//    }
+//
+//    public Fun(String s, PTerm x0, PTerm x1, PTerm x2, PTerm x3) {
+//        this(s, 4);
+//        args[0] = x0;
+//        args[1] = x1;
+//        args[2] = x2;
+//        args[3] = x3;
+//    }
 
     protected final String funToString() {
         return qname(name) +
@@ -175,11 +175,11 @@ public class Fun extends Const implements Compound<PTerm> {
         return f;
     }
 
-    protected Fun initializedClone() {
-        Fun f = funClone();
-        f.init(args.length);
-        return f;
-    }
+//    protected Fun initializedClone() {
+//        Fun f = funClone();
+//        f.init(args.length);
+//        return f;
+//    }
 
     final nars.op.software.prolog.terms.PTerm reaction(nars.op.software.prolog.terms.PTerm that) {
         // IO.mes("TRACE>> "+name());
@@ -194,10 +194,10 @@ public class Fun extends Const implements Compound<PTerm> {
     }
 
     public Cons listify() {
-        Cons l = new Cons(new Const(name), Const.NIL);
+        Cons l = new Cons(new Const(name), PTerm.NIL);
         Cons curr = l;
         for (int i = 0; i < args.length; i++) {
-            Cons tail = new Cons(args[i], Const.NIL);
+            Cons tail = new Cons(args[i], PTerm.NIL);
             curr.args[1] = tail;
             curr = tail;
         }

@@ -36,6 +36,6 @@ public class Conj extends Cons {
 
 	static public final PTerm getTail(PTerm T) {
 		T = T.ref();
-		return (T instanceof Conj) ? ((Conj) T).arg(1) : Const.TRUE;
+		return (T instanceof Conj) ? ((Conj) T).arg(1) : PTerm.TRUE;
 	}
 }

@@ -13,14 +13,14 @@ abstract public class Source extends Fluent {
 	public Nonvar toList() {
 		PTerm head = getElement();
 		if (null == head)
-			return Const.NIL;
-		Cons l = new Cons(head, Const.NIL);
+			return PTerm.NIL;
+		Cons l = new Cons(head, PTerm.NIL);
 		Cons curr = l;
 		for (;;) {
 			head = getElement();
 			if (null == head)
 				break;
-			Cons tail = new Cons(head, Const.NIL);
+			Cons tail = new Cons(head, PTerm.NIL);
 			curr.args[1] = tail;
 			curr = tail;
 		}

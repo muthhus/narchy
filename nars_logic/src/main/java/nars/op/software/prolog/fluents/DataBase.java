@@ -4,6 +4,7 @@ import nars.op.software.prolog.Prolog;
 import nars.op.software.prolog.io.IO;
 import nars.op.software.prolog.io.Parser;
 import nars.op.software.prolog.terms.*;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Reader;
 import java.util.ArrayList;
@@ -18,9 +19,9 @@ public class DataBase extends BlackBoard {
         super();
     }
 
-    private static final Const yes = Const.YES;
+    private static final Const yes = PTerm.YES;
 
-    private static final Const no = Const.NO;
+    private static final Const no = PTerm.NO;
 
     /**
      * Removes a matching Term from the blackboards and signals failure if no
@@ -90,7 +91,7 @@ public class DataBase extends BlackBoard {
         ArrayList To = new ArrayList();
         all0(max, To, k, FXs);
         if (To.size() == 0)
-            return Const.NIL;
+            return PTerm.NIL;
         Fun R = new Fun("$", (PTerm[]) To.toArray());
         // To.copyInto(R.args);
         PTerm T = ((Cons) R.listify()).args[1];
@@ -258,5 +259,9 @@ public class DataBase extends BlackBoard {
             // IO.mes("ADDING= "+C.pprint());
             addClause(prolog, C, ktable);
         }
+    }
+
+    public PTerm add(@NotNull PTerm X) {
+        return out(X.getKey(), X);
     }
 }

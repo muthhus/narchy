@@ -15,13 +15,13 @@ public class Trail extends FasterList<PTerm> {
 		super();
 	}
 
-	public String name() {
-		return "trail" + hashCode() % 64;
-	}
-
-	public String pprint() {
-		return name() + '\n' + super.toString() + '\n';
-	}
+//	public String name() {
+//		return "trail" + hashCode() % 64;
+//	}
+//
+//	public String pprint() {
+//		return name() + '\n' + super.toString() + '\n';
+//	}
 
 	/**
 	 * Used to undo bindings after unification, if we intend to leave no side
@@ -34,8 +34,7 @@ public class Trail extends FasterList<PTerm> {
 		// if(to>size())
 		// IO.assertion("unwind attempted from smaller to larger top");
 		for (int i = size() - to; i > 0; i--) {
-			PTerm V = removeLast();
-			V.undo();
+			removeLast().undo();
 		}
 	}
 

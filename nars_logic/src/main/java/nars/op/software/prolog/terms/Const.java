@@ -8,20 +8,8 @@ import java.util.Objects;
 
 public class Const extends Nonvar {
 
-	public final static Nil NIL = new Nil();
-
-	public final static Const TRUE = new true_();
-
-	public final static Const FAIL = new fail_();
-
-	public final static Const YES = new Const("yes");
-
-	public final static Const NO = new Const("no");
-
-	public final static Const anEof = new Const("end_of_file");
-
 	public final static Nonvar the(PTerm X) {
-		return (null == X) ? Const.NO : new Fun("the", X);
+		return (null == X) ? PTerm.NO : new Fun("the", X);
 	}
 
 

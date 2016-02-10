@@ -3,9 +3,10 @@ package nars.op.software.prolog.terms;
 //!depends
 
 import nars.op.software.prolog.Prolog;
-import nars.op.software.prolog.fluents.HashDict;
 import nars.op.software.prolog.io.IO;
 import nars.op.software.prolog.io.Parser;
+
+import java.util.Map;
 
 /**
  * Datatype for a Prolog clause (H:-B) having a head H and a body b
@@ -29,19 +30,11 @@ public class Clause extends Fun {
      */
     public Clause(Prolog p, String s) {
         super(":-");
-        Clause C = clauseFromString(p, s);
+        Clause C = Parser.stringToClause(p, s);
         // IO.mes("CLAUSE:"+C.pprint()+"\nDICT:"+C.dict);
         this.args = C.args;
         this.dict = C.dict;
         this.ground = C.ground;
-    }
-
-    /**
-     * Extracts a clause from its String representation.
-     */
-
-    public static Clause clauseFromString(Prolog p, String s) {
-        return Parser.clsFromString(p, s);
     }
 
     /**
@@ -64,11 +57,11 @@ public class Clause extends Fun {
             IO.trace("read string: <" + line + '>');
 
         if (null == line)
-            line = Const.anEof.name;
+            line = PTerm.EOF.name;
         else if (0 == line.length())
             return null;
 
-        Clause C = clauseFromString(p, line);
+        Clause C = Parser.stringToClause(p, line);
         if (null == C) {
             if (IO.trace())
                 IO.error("warning (null Clause):" + line);
@@ -89,7 +82,7 @@ public class Clause extends Fun {
     /**
      * Variable dictionary
      */
-    public HashDict dict;
+    public Map dict;
 
     /**
      * Remembers if a clause is ground.
@@ -166,22 +159,24 @@ public class Clause extends Fun {
      */
     // synchronized
     public Clause cnumbervars(boolean replaceAnonymous) {
-        HashDict dd = this.dict;
+        Map dd = this.dict;
         if (dd == null)
             return (Clause) numbervars();
         if (provenGround())
             return this;
         Trail trail = new Trail();
 
-        for (Object X : dd.keySet()) {
+        dd.forEach( (X, V) -> {
             if (X instanceof String) {
-                Var V = (Var) dd.get(X);
+
                 long occNb = ((Int) dd.get(V)).longValue();
                 String s = (occNb < 2 && replaceAnonymous) ? "_" : (String) X;
                 // bug: occNb not accurate when adding artif. '[]' head
-                V.unify(new PseudoVar(s), trail);
+
+                //Var V = (Var) dd.get(X);
+                ((Var)V).unify(new PseudoVar(s), trail);
             }
-        }
+        });
         Clause NewC = (Clause) numbervars();
         trail.unwind(0);
         return NewC;
@@ -251,7 +246,7 @@ public class Clause extends Fun {
         PTerm body = body();
         return body instanceof Conj ?
                 ((Conj) body).args[1].ref() :
-                Const.TRUE;
+                PTerm.TRUE;
     }
 
     /**

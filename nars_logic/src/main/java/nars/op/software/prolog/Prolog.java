@@ -1,9 +1,11 @@
 package nars.op.software.prolog;
 
 
+import com.gs.collections.api.block.function.primitive.BooleanFunction;
 import nars.op.software.prolog.builtins.Builtins;
 import nars.op.software.prolog.fluents.DataBase;
 import nars.op.software.prolog.io.IO;
+import nars.op.software.prolog.io.Parser;
 import nars.op.software.prolog.terms.*;
 
 import static nars.op.software.prolog.terms.Prog.firstSolution;
@@ -31,27 +33,68 @@ public class Prolog {
         return Clause.goalFromString(this, line);
     }
 
-    public void query(String query) {
-        timeGoal(goal(query));
+//    public void query(String query) {
+//        timeGoal(goal(query));
+//    }
+
+//    /**
+//     * reads a query from input strea
+//     */
+//    Clause goal() {
+//        return goal(IO.promptln("?- "));
+//    }
+
+
+    public void ask(String goal, BooleanFunction<PTerm> eachAnswer) {
+        ask(Parser.stringToClause(this, goal), eachAnswer);
+    }
+
+    /** eval with lambda callback/visitor.
+     *  it will receive the return value of the question,
+     *  or a successive answer. a null value means nothing remains
+     *  to be reported
+     * */
+    public void ask(Clause goal, BooleanFunction<PTerm> eachAnswer) {
+        Clause NamedGoal = goal.cnumbervars(false);
+        PTerm Names = NamedGoal.head();
+        if (!(Names instanceof Fun)) { // no vars in Goal
+            eachAnswer.booleanValueOf( firstSolution(this, goal.head(), goal.body()) );
+            //ignore the return value since there are no other solutions
+            return;
+        }
+
+        Prog E = new Prog(this, goal, null);
+
+        for (int i = 0; ; i++) {
+            PTerm R = Prog.ask_engine(E);
+            boolean continued = eachAnswer.booleanValueOf(R);
+            if (R == null) {
+                break; //nothing left
+            }
+
+//            Fun NamedR = (Fun) R.numbervars();
+//            for (int j = 0; j < Names.arity(); j++) {
+//                IO.println(((Fun) Names).arg(j) + "=" + NamedR.arg(j));
+//            }
+            // IO.println(";");
+            if (!continued) {
+                E.stop();
+                break;
+            }
+        }
+
     }
 
     /**
-     * reads a query from input strea
+     * evalutes a query (old repl version)
      */
-    Clause goal() {
-        return goal(IO.promptln("?- "));
-    }
-
-    /**
-     * evalutes a query
-     */
-    public void eval(Clause goal) {
+    public void evalIO(Clause goal) {
         Clause NamedGoal = goal.cnumbervars(false);
         PTerm Names = NamedGoal.head();
         if (!(Names instanceof Fun)) { // no vars in Goal
             PTerm Result = firstSolution(this, goal.head(), goal.body());
-            if (!Const.NO.equals(Result))
-                Result = Const.YES;
+            if (!PTerm.NO.equals(Result))
+                Result = PTerm.YES;
             IO.println(Result.toString());
             return;
         }
@@ -98,7 +141,7 @@ public class Prolog {
     public void timeGoal(Clause goal) {
         long t1 = System.currentTimeMillis();
         try {
-            eval(goal);
+            evalIO(goal);
         } catch (Throwable e) {
             IO.error("Execution error in goal:\n  " + goal.pprint() + ".\n", e);
         }
@@ -174,12 +217,12 @@ public class Prolog {
 
     public Const toConstBuiltin(Const c) {
         //TODO switch
-        if (c.name.equals(Const.NIL.name))
-            return Const.NIL;
-        if (c.name.equals(Const.NO.name))
-            return Const.NO;
-        if (c.name.equals(Const.YES.name))
-            return Const.YES;
+        if (c.name.equals(PTerm.NIL.name))
+            return PTerm.NIL;
+        if (c.name.equals(PTerm.NO.name))
+            return PTerm.NO;
+        if (c.name.equals(PTerm.YES.name))
+            return PTerm.YES;
 
         ConstBuiltin B = (ConstBuiltin) dict.the(c);
         if (null == B) {
