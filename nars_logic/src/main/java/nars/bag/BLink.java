@@ -93,7 +93,7 @@ public final class BLink<X> extends Budget implements Link<X> {
 
     protected void setValue(int x, float v) {
         float[] b = this.b;
-        b[x+3] += clamp(v - b[x]);
+        b[x+3] += v - b[x];
         changed = true;
     }
 

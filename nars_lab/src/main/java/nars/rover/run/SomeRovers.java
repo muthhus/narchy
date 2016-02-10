@@ -135,9 +135,9 @@ public class SomeRovers {
         m.conceptForgetDurations.setValue(1f);
         m.termLinkForgetDurations.setValue(2);
         m.taskLinkForgetDurations.setValue(3);
-        m.cyclesPerFrame.set(2);
+        m.cyclesPerFrame.set(1);
         m.shortTermMemoryHistory.set(3);
-        m.executionThreshold.setValue(0.0f);
+        m.executionThreshold.setValue(0.1f);
 
         boolean gui = true;
         if (gui) {
