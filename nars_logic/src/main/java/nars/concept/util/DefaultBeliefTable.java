@@ -229,12 +229,11 @@ public class DefaultBeliefTable implements BeliefTable {
 
     private void tryRevision(@NotNull Task input, @NotNull NAR nar) {
         Task revised = getRevision(input, nar);
-        if (revised!=null)  {
+        if (revised!=null && !revised.isDeleted())  {
             if(Global.DEBUG) {
                 if (revised.equals(input)) // || BeliefTable.stronger(revised, input)==input) {
                     throw new RuntimeException("useless revision: " + revised);
             }
-
             //if (BeliefTable.stronger(revised, input)==revised) {
             nar.input(revised); //will be processed on subsequent cycle
             //}

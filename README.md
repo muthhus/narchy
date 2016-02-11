@@ -1,6 +1,6 @@
 **NARchy** derives from OpenNARS, the open-source version of [NARS](https://sites.google.com/site/narswang/home), a general-purpose AI system, designed in the framework of a reasoning system.
 
-![OpenNARS Logo](https://raw.githubusercontent.com/opennars/opennars/graphplan1/doc/opennars_logo.png)
+![OpenNARS Logo](https://bitbucket.org/seh/narchy/raw/master/doc/narchy.jpg)
 
 Theory
 ------

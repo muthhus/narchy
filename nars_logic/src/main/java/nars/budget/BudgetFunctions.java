@@ -68,7 +68,7 @@ public final class BudgetFunctions extends UtilityFunctions {
     public static void budgetRevision(@NotNull Task conclusion, @NotNull Task newBelief, @NotNull Task oldBelief) {
 
         Truth nTruth = newBelief.truth();
-        Budget nBudget = newBelief.budget();
+        final Budget nBudget = newBelief.budget();
 
         Truth concTruth = conclusion.truth();
         Truth bTruth = oldBelief.truth();
