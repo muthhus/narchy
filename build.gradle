@@ -3,7 +3,7 @@ plugins {
 //    //id "pl.squirrel.classycle" version "1.1"
 //    //id "com.github.nullstress.dependency-analysis" version "1.0.3"
 //    //id "com.github.tkruse.groovysh" version "1.0.8"  //https://github.com/tkruse/gradle-groovysh-plugin
-    id 'nebula.metrics' version '4.0.1' //https://github.com/nebula-plugins/gradle-metrics-plugin
+//    id 'nebula.metrics' version '4.0.1' //https://github.com/nebula-plugins/gradle-metrics-plugin
     id 'com.github.ksoichiro.console.reporter' version '0.3.4'
 
 }
@@ -46,7 +46,9 @@ allprojects {
 
 }
 
-
+//dependencies {
+//    compile group: 'org.bytedeco', name: 'javacpp', version: '1.1'
+//}
 
 subprojects {
 

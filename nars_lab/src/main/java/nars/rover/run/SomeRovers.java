@@ -182,10 +182,10 @@ public class SomeRovers {
 
 
         NarQ nqSpine = new NarQ(n);
-        NarQ nqArm = new NarQ(n);
+
 
         nqSpine.power.setValue(0.8f);
-        nqArm.power.setValue(0.55f);
+
 
         nqSpine.input.addAll(nqSpine.getBeliefExpectations(
                 eatFood, eatPoison, speedLeft, speedRight, speedForward
@@ -227,8 +227,25 @@ public class SomeRovers {
 //        nqSpine.outs.addAll(al.controls);
 //        nqSpine.outs.addAll(ar.controls);
 
+        NarQ nqArm = new NarQ(n) {
+            //HACK
+            @Override
+            protected boolean validDimensionality(int inputs) {
+                boolean b = super.validDimensionality(inputs);
+                if (q!=null)
+                    q.Gamma = 0.1f; //immediate rewards more valuable
+                return b;
+            }
+        };
+        nqArm.power.setValue(0.55f);
+
         Arm ac = r.addArm("ac", nqArm /* ... */, 0, 0, 0); //pi * 1.5f
         nqSpine.output.addAll(ac.controls);
+
+//        Arm ad = r.addArm("ad", nqArm /* ... */, 0, 0, 0); //pi * 1.5f
+//        nqSpine.output.addAll(ad.controls);
+//        Arm ae = r.addArm("ae", nqArm /* ... */, 0, 0, 0); //pi * 1.5f
+//        nqSpine.output.addAll(ae.controls);
 
 
     }

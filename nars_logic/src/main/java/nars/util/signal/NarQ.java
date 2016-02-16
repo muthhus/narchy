@@ -28,7 +28,7 @@ import java.util.stream.Stream;
  */
 public class NarQ implements Consumer<NAR> {
 
-    private static final Logger logger = LoggerFactory.getLogger(NarQ.class);
+    //private static final Logger logger = LoggerFactory.getLogger(NarQ.class);
 
     private final NAR nar;
 
