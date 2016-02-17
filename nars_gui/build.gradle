@@ -5,7 +5,6 @@ apply plugin: 'application'
 dependencies {
     compile project(':nars_util')
     compile project(':nars_logic')
-    compile group: 'org.jbox2d', name: 'jbox2d-library', version: '2.2.1.1'
     compile group: 'org.abego.treelayout', name: 'org.abego.treelayout.core', version: '1.0.3'
     compile group: 'com.fifesoft', name: 'rsyntaxtextarea', version: '2.5.8'
     compile group: 'de.jensd', name: 'fontawesomefx', version: '8.9'

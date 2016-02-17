@@ -21,7 +21,7 @@ public class Explosion {
 			return;
 		float invDistance = 1 / distance;
 		float impulseMag = blastPower * invDistance * invDistance;
-		body.applyLinearImpulse(blastDir.mul(impulseMag), applyPoint);
+		body.applyLinearImpulse(blastDir.mul(impulseMag), applyPoint, true);
 	}
 
 	public static void explodeBlastRadius(World world, Vec2 center, float blastRadius, float blastPower) {

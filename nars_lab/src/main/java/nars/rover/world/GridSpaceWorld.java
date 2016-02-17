@@ -13,8 +13,8 @@
 //import nars.testchamber.Hauto;
 //import nars.testchamber.map.Maze;
 //import nars.util.data.random.XorShift128PlusRandom;
-//import org.jbox2d.dynamics.Body;
-//import org.jbox2d.dynamics.World;
+//import Body;
+//import World;
 //
 //import java.util.Random;
 //

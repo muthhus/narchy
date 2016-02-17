@@ -1,15 +1,15 @@
 package nars.rover;//package nars.rover;
 //
-//import org.jbox2d.collision.shapes.ChainShape;
-//import org.jbox2d.collision.shapes.CircleShape;
-//import org.jbox2d.collision.shapes.EdgeShape;
-//import org.jbox2d.collision.shapes.PolygonShape;
-//import org.jbox2d.common.MathUtils;
-//import org.jbox2d.common.Vec2;
-//import org.jbox2d.dynamics.Body;
-//import org.jbox2d.dynamics.BodyDef;
-//import org.jbox2d.dynamics.BodyType;
-//import org.jbox2d.dynamics.FixtureDef;
+//import ChainShape;
+//import CircleShape;
+//import EdgeShape;
+//import PolygonShape;
+//import MathUtils;
+//import Vec2;
+//import Body;
+//import BodyDef;
+//import BodyType;
+//import FixtureDef;
 //
 ///**
 // * Created by me on 4/24/15.

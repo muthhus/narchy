@@ -8,7 +8,7 @@ package nars.rover.depr;//package nars.rover;
 //import nars.nal.nal8.operator.NullOperator;
 //
 //import nars.nal.term.Term;
-//import org.jbox2d.common.MathUtils;
+//import MathUtils;
 //
 //import java.util.List;
 //

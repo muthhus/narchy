@@ -25,21 +25,21 @@
 // */
 //package nars.rover.physics.j2d;
 //
-//import org.jbox2d.callbacks.DebugDraw;
-//import org.jbox2d.collision.AABB;
-//import org.jbox2d.collision.shapes.ChainShape;
-//import org.jbox2d.collision.shapes.CircleShape;
-//import org.jbox2d.collision.shapes.EdgeShape;
-//import org.jbox2d.collision.shapes.PolygonShape;
+//import org.DebugDraw;
+//import AABB;
+//import ChainShape;
+//import CircleShape;
+//import EdgeShape;
+//import PolygonShape;
 //import org.jbox2d.common.*;
-//import org.jbox2d.dynamics.Body;
-//import org.jbox2d.dynamics.BodyType;
-//import org.jbox2d.dynamics.Fixture;
-//import org.jbox2d.dynamics.World;
-//import org.jbox2d.dynamics.joints.Joint;
-//import org.jbox2d.dynamics.joints.PulleyJoint;
-//import org.jbox2d.pooling.arrays.IntArray;
-//import org.jbox2d.pooling.arrays.Vec2Array;
+//import Body;
+//import BodyType;
+//import Fixture;
+//import World;
+//import Joint;
+//import PulleyJoint;
+//import IntArray;
+//import Vec2Array;
 //
 //import java.awt.*;
 //import java.awt.geom.AffineTransform;

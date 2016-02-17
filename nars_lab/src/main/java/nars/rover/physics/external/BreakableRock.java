@@ -2,9 +2,9 @@ package nars.rover.physics.external;//package nars.rover.physics.external;
 //
 //import nars.checkers.Game;
 //import nars.rover.physics.external.callback.FirstHitRayCastCallback;
-//import org.jbox2d.common.Vec2;
-//import org.jbox2d.dynamics.BodyDef;
-//import org.jbox2d.dynamics.FixtureDef;
+//import Vec2;
+//import BodyDef;
+//import FixtureDef;
 //
 //import java.util.ArrayList;
 //import java.util.Random;

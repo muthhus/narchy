@@ -181,7 +181,7 @@ public abstract class AbstractPolygonBot extends Robotic {
         //torso.applyForceToCenter(new Vec2((float) Math.cos(angle) * force, (float) Math.sin(angle) * force));
         Vec2 v = new Vec2((float) Math.cos(angle) * force, (float) Math.sin(angle) * force);
         //torso.setLinearVelocity(v);
-        torso.applyLinearImpulse(v, torso.getWorldCenter());
+        torso.applyLinearImpulse(v, torso.getWorldCenter(), true);
     }
 
     public void rotate(float v) {

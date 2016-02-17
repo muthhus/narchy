@@ -2,6 +2,8 @@ package nars.rover.physics.gl;
 
 import nars.rover.physics.PhysicsCamera;
 import nars.rover.physics.PhysicsController;
+import org.jbox2d.common.Vec2;
+import org.jbox2d.particle.ParticleColor;
 
 /**
  *
@@ -23,5 +25,15 @@ public class JoglDraw extends JoglAbstractDraw {
         }
 
         return p;
+    }
+
+    @Override
+    public void drawParticles(Vec2[] centers, float radius, ParticleColor[] colors, int count) {
+
+    }
+
+    @Override
+    public void drawParticlesWireframe(Vec2[] centers, float radius, ParticleColor[] colors, int count) {
+
     }
 }
