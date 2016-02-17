@@ -27,7 +27,8 @@ import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.awt.TextRenderer;
 import nars.Video;
 import nars.rover.physics.PhysicsCamera;
-import nars.rover.physics.j2d.SwingDraw;
+import nars.rover.physics.j2d.LayerDraw;
+import nars.util.data.list.FasterList;
 import org.jbox2d.callbacks.DebugDraw;
 import org.jbox2d.collision.shapes.ChainShape;
 import org.jbox2d.collision.shapes.CircleShape;
@@ -51,10 +52,10 @@ public abstract class JoglAbstractDraw extends DebugDraw {
 
     private JoglAbstractPanel panel;
     private final TextRenderer text;
-    private static final int NUM_CIRCLE_POINTS = 13;
-    public final List<SwingDraw.LayerDraw> layers = new CopyOnWriteArrayList();
+    private static final int NUM_CIRCLE_POINTS = 11;
+    public final List<LayerDraw> layers = new FasterList<>();
 
-    Transform xf = new Transform();
+    final Transform xf = new Transform();
 
 
     public JoglAbstractDraw() {
@@ -69,17 +70,15 @@ public abstract class JoglAbstractDraw extends DebugDraw {
         this.panel = panel;
     }
 
-    public void addLayer(SwingDraw.LayerDraw l) {
+    public void addLayer(LayerDraw l) {
         layers.add(l);
     }
 
-    public void removeLayer(SwingDraw.LayerDraw l) {
+    public void removeLayer(LayerDraw l) {
         layers.remove(l);
     }
 
     public void draw(World w, float time) {
-
-
 
         if (w == null) return;
 
@@ -92,9 +91,11 @@ public abstract class JoglAbstractDraw extends DebugDraw {
             viewportTransform.setExtents(p.getTargetScale(), p.getTargetScale());
         }
 
-        for (SwingDraw.LayerDraw l : layers) l.drawGround(this, w);
+        for (int i = 0, layersSize = layers.size(); i < layersSize; i++) {
+            layers.get(i).drawGround(this, w);
+        }
 
-        int flags = getFlags();
+        //int flags = getFlags();
         //boolean wireframe = (flags & DebugDraw.e_wireframeDrawingBit) != 0;
 
         animateColors(time);
@@ -103,18 +104,20 @@ public abstract class JoglAbstractDraw extends DebugDraw {
         for (Body b = w.getBodyList(); b != null; b = b.getNext()) {
             drawBody(b, time);
         }
+
         //drawParticleSystem(m_particleSystem);
         //}
 
         //if ((flags & DebugDraw.e_jointBit) != 0) {
 
-        for (Joint j = w.getJointList(); j != null; j = j.getNext()) {
+        /*for (Joint j = w.getJointList(); j != null; j = j.getNext()) {
             //drawJoint(j);
+        }*/
+
+
+        for (int i = 0, layersSize = layers.size(); i < layersSize; i++) {
+            layers.get(i).drawSky(this, w);
         }
-        //}
-
-
-        for (SwingDraw.LayerDraw l : layers) l.drawSky(this, w);
 
         //flush();
 
@@ -122,7 +125,6 @@ public abstract class JoglAbstractDraw extends DebugDraw {
 
     private void animateColors(float t) {
         poisonFill.x = (float) (0.35 + 0.25f * (Math.sin(t) + 1f));
-
     }
 
 
@@ -167,21 +169,21 @@ public abstract class JoglAbstractDraw extends DebugDraw {
         }
 
 
-        xf.set(b.getTransform());
+        xf.set(b.m_xf);
 
-        boolean wireframe = false;
+        //boolean wireframe = false;
         for (Fixture f = b.getFixtureList(); f != null; f = f.getNext()) {
-            if (!b.isActive()) {
-                drawShape(f, xf, fillColor, wireframe);
-            } else if (b.getType() == BodyType.STATIC) {
-                drawShape(f, xf, fillColor, wireframe);
-            } else if (b.getType() == BodyType.KINEMATIC) {
-                drawShape(f, xf, fillColor, wireframe);
-            } else if (!b.isAwake()) {
-                drawShape(f, xf, fillColor, wireframe);
-            } else {
-                drawShape(f, xf, fillColor, wireframe);
-            }
+            //if (!b.isActive()) {
+                drawShape(f);
+//            } else if (b.getType() == BodyType.STATIC) {
+//                drawShape(f, xf, fillColor, wireframe);
+//            } else if (b.getType() == BodyType.KINEMATIC) {
+//                drawShape(f, xf, fillColor, wireframe);
+//            } else if (!b.isAwake()) {
+//                drawShape(f, xf, fillColor, wireframe);
+//            } else {
+//                drawShape(f, xf, fillColor, wireframe);
+//            }
         }
     }
 
@@ -191,7 +193,11 @@ public abstract class JoglAbstractDraw extends DebugDraw {
     private final Vec2 v2 = new Vec2();
     private final Vec2Array tlvertices = new Vec2Array();
 
-    private void drawShape(Fixture fixture, Transform xf, Color3f color, boolean wireframe) {
+
+    private void drawShape(Fixture fixture) {
+
+        boolean wireframe = false;
+        Color3f color = fillColor;
 
         switch (fixture.getType()) {
             case CIRCLE:
@@ -277,10 +283,10 @@ public abstract class JoglAbstractDraw extends DebugDraw {
     //
     public void transformViewport(GL2 gl, Vec2 center) {
 
-        Vec2 e = viewportTransform.getExtents();
+        //Vec2 e = viewportTransform.getExtents();
         Vec2 vc = viewportTransform.getCenter();
         //Mat22 vt = viewportTransform.getMat22Representation();
-        Vec2 ee = viewportTransform.getExtents();
+        //Vec2 ee = viewportTransform.getExtents();
 
 //    int f = viewportTransform.isYFlip() ? -1 : 1;
 //    mat[0] = exx;//vt.ex.x;
@@ -304,10 +310,11 @@ public abstract class JoglAbstractDraw extends DebugDraw {
         gl.glLoadIdentity();
 
         Vec2 scale = viewportTransform.getExtents();
-        Vec2 translate = new Vec2(center.x - vc.x, center.y - vc.y);
+
 
         gl.glScalef(scale.x, scale.y, 1f);
-        gl.glTranslatef(translate.x, translate.y, 0);
+
+        gl.glTranslatef(center.x - vc.x, center.y - vc.y, 0);
     }
 
     @Override
@@ -337,38 +344,37 @@ public abstract class JoglAbstractDraw extends DebugDraw {
         gl.glPopMatrix();
     }
 
-    public void drawSolidRect(float px, float py, float w, float h, float r, float G, float b) {
-        //saveState(g);
-
-//        getWorldToScreenToOut(px, py, temp);
-//        int ipx = (int)temp.x;  int ipy = (int)temp.y;
-//        getWorldToScreenToOut(px+w, py+h, temp);
+//    public void drawSolidRect(float px, float py, float w, float h, float r, float G, float b) {
+//        //saveState(g);
 //
-//        int jpx = (int)temp.x;  int jpy = (int)temp.y;
-//        int iw = Math.abs(jpx - ipx);
-//        int ih = Math.abs(jpy - ipy);
-
-//        if ((ipy/2 > g.getDeviceConfiguration().getBounds().getHeight()) ||
-//                (ipx/2 > g.getDeviceConfiguration().getBounds().getWidth()))
-//                    return;
-
-//        g.setColor(new Color(r, G, b));
-//        g.fillRect(ipx-iw/2, ipy-ih/2, iw, ih);
-
-        //if (g.getDeviceConfiguration().getBounds().intersects(ipx-iw/2, ipy-ih/2, iw, ih)) {
-        //}
-
-        //float ulx = ipx-iw/2, uly = ipy-ih/2;
-        float ulx = px, uly = py;
-        w/=2;
-        h/=2;
-        Vec2[] vert = new Vec2[4];
-        vert[0] = new Vec2(ulx - w, uly - h);
-        vert[1] = new Vec2(ulx + w, uly - h);
-        vert[2] = new Vec2(ulx + w, uly + h);
-        vert[3] = new Vec2(ulx - w, uly + h);
-        drawSolidPolygon(vert, 4, new Color3f(r, G, b));
-    }
+////        getWorldToScreenToOut(px, py, temp);
+////        int ipx = (int)temp.x;  int ipy = (int)temp.y;
+////        getWorldToScreenToOut(px+w, py+h, temp);
+////
+////        int jpx = (int)temp.x;  int jpy = (int)temp.y;
+////        int iw = Math.abs(jpx - ipx);
+////        int ih = Math.abs(jpy - ipy);
+//
+////        if ((ipy/2 > g.getDeviceConfiguration().getBounds().getHeight()) ||
+////                (ipx/2 > g.getDeviceConfiguration().getBounds().getWidth()))
+////                    return;
+//
+////        g.setColor(new Color(r, G, b));
+////        g.fillRect(ipx-iw/2, ipy-ih/2, iw, ih);
+//
+//        //if (g.getDeviceConfiguration().getBounds().intersects(ipx-iw/2, ipy-ih/2, iw, ih)) {
+//        //}
+//
+//        //float ulx = ipx-iw/2, uly = ipy-ih/2;
+//        w/=2;
+//        h/=2;
+//        Vec2[] vert = new Vec2[4];
+//        vert[0] = new Vec2(px - w, py - h);
+//        vert[1] = new Vec2(px + w, py - h);
+//        vert[2] = new Vec2(px + w, py + h);
+//        vert[3] = new Vec2(px - w, py + h);
+//        drawSolidPolygon(vert, 4, new Color3f(r, G, b));
+//    }
 
     @Override
     public void drawSolidPolygon(Vec2[] vertices, int vertexCount, Color3f color) {
@@ -376,7 +382,7 @@ public abstract class JoglAbstractDraw extends DebugDraw {
         gl.glPushMatrix();
         transformViewport(gl, zero);
         gl.glBegin(GL2.GL_TRIANGLE_FAN);
-        gl.glColor4f(color.x, color.y, color.z, .8f);
+        gl.glColor3f(color.x, color.y, color.z);
         for (int i = 0; i < vertexCount; i++) {
             Vec2 v = vertices[i];
             gl.glVertex2f(v.x, v.y);
@@ -408,7 +414,7 @@ public abstract class JoglAbstractDraw extends DebugDraw {
         float cx = center.x;
         float cy = center.y;
         gl.glBegin(GL2.GL_LINE_LOOP);
-        gl.glColor4f(color.x, color.y, color.z, 1);
+        gl.glColor3f(color.x, color.y, color.z);
         float y = 0;
         for (int i = 0; i < NUM_CIRCLE_POINTS; i++) {
             gl.glVertex3f(x + cx, y + cy, 0);
@@ -433,7 +439,7 @@ public abstract class JoglAbstractDraw extends DebugDraw {
         float cx = center.x;
         float cy = center.y;
         gl.glBegin(GL2.GL_LINE_LOOP);
-        gl.glColor4f(color.x, color.y, color.z, 1);
+        gl.glColor3f(color.x, color.y, color.z);
         float y = 0;
         for (int i = 0; i < NUM_CIRCLE_POINTS; i++) {
             gl.glVertex3f(x + cx, y + cy, 0);
@@ -462,7 +468,7 @@ public abstract class JoglAbstractDraw extends DebugDraw {
         float cx = center.x;
         float cy = center.y;
         gl.glBegin(GL2.GL_TRIANGLE_FAN);
-        gl.glColor4f(color.x, color.y, color.z, .4f);
+        gl.glColor3f(color.x, color.y, color.z);
         float y = 0;
         for (int i = 0; i < NUM_CIRCLE_POINTS; i++) {
             gl.glVertex3f(x + cx, y + cy, 0);
@@ -473,7 +479,7 @@ public abstract class JoglAbstractDraw extends DebugDraw {
         }
         gl.glEnd();
         gl.glBegin(GL2.GL_LINE_LOOP);
-        gl.glColor4f(color.x, color.y, color.z, 1);
+        gl.glColor3f(color.x, color.y, color.z);
         for (int i = 0; i < NUM_CIRCLE_POINTS; i++) {
             gl.glVertex3f(x + cx, y + cy, 0);
             // apply the rotation matrix

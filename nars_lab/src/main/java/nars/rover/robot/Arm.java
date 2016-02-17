@@ -4,13 +4,12 @@ import nars.Global;
 import nars.op.meta.HaiQ;
 import nars.rover.Sim;
 import nars.rover.physics.gl.JoglAbstractDraw;
-import nars.rover.physics.j2d.SwingDraw;
+import nars.rover.physics.j2d.LayerDraw;
 import nars.util.data.Util;
 import nars.util.data.list.FasterList;
 import nars.util.signal.NarQ;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jbox2d.common.Color3f;
-import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.World;
@@ -22,7 +21,7 @@ import java.util.List;
 /**
  * Created by me on 2/10/16.
  */
-public class Arm extends Robotic implements SwingDraw.LayerDraw {
+public class Arm extends Robotic implements LayerDraw {
 
     final FasterList<Body> segments = new FasterList();
     final FasterList<RevoluteJoint> joints = new FasterList();

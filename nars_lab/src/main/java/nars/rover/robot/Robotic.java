@@ -68,7 +68,7 @@ abstract public class Robotic {
 
             float h = (getID().hashCode() % 10) / 10f;
             Color c = Color.getHSBColor(h, 0.5f, 0.95f);
-            color = new Color3f(c.getRed()*256f, c.getGreen()*256f, c.getBlue()*256f);
+            color = new Color3f(c.getRed()*255f, c.getGreen()*255f, c.getBlue()*255f);
         }
 
         public RoboticMaterial clone() {

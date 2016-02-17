@@ -3,7 +3,7 @@ package nars.rover.obj;
 import nars.Global;
 import nars.rover.Sim;
 import nars.rover.physics.gl.JoglAbstractDraw;
-import nars.rover.physics.j2d.SwingDraw;
+import nars.rover.physics.j2d.LayerDraw;
 import nars.rover.robot.AbstractPolygonBot;
 import nars.rover.robot.Robotic;
 import nars.rover.util.RayCastClosestCallback;
@@ -18,7 +18,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 /**
  * Created by me on 1/31/16.
  */
-abstract public class VisionRay extends RayCastClosestCallback implements AbstractPolygonBot.Sense, SwingDraw.LayerDraw {
+abstract public class VisionRay extends RayCastClosestCallback implements AbstractPolygonBot.Sense, LayerDraw {
 
     protected final int resolution;
     protected final float arc;

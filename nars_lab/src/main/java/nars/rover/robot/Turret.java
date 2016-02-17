@@ -4,7 +4,7 @@ package nars.rover.robot;
 import nars.rover.Material;
 import nars.rover.Sim;
 import nars.rover.physics.gl.JoglAbstractDraw;
-import nars.rover.physics.j2d.SwingDraw;
+import nars.rover.physics.j2d.LayerDraw;
 import nars.rover.util.Bodies;
 import nars.rover.util.Explosion;
 import nars.util.data.random.XorShift128PlusRandom;
@@ -18,7 +18,7 @@ import org.jbox2d.dynamics.contacts.Contact;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class Turret implements SwingDraw.LayerDraw {
+public class Turret implements LayerDraw {
 
     final static Random rng = new XorShift128PlusRandom(1);
 
