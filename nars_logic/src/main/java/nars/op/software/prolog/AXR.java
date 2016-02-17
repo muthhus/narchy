@@ -3,6 +3,7 @@ package nars.op.software.prolog;
 import nars.op.software.prolog.builtins.Builtins;
 import nars.op.software.prolog.io.Parser;
 import nars.op.software.prolog.terms.PTerm;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * AXR Axiomatic Reasoner - deterministic, programmable, mostly reliable
@@ -28,6 +29,7 @@ public class AXR extends Prolog {
 	}
 
 	/** introduce a fact */
+	@NotNull
 	public PTerm add(String factString) {
 		return db.add( Parser.stringToClause(this, factString) );
 	}

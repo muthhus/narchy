@@ -46,7 +46,7 @@ public class Derive extends AbstractLiteral implements ProcTerm {
     public final boolean beliefSingle, desireSingle;
 
 
-    public Derive(PremiseRule rule, Term term, @NotNull BooleanCondition[] postMatch,
+    public Derive(@NotNull PremiseRule rule, @NotNull Term term, @NotNull BooleanCondition[] postMatch,
                   boolean beliefSingle, boolean desireSingle, boolean anticipate, boolean eternalize) {
         this.rule = rule;
         this.postMatch = (postMatch.length > 0) ? new AndCondition(postMatch) : BooleanCondition.TRUE;
@@ -107,7 +107,7 @@ public class Derive extends AbstractLiteral implements ProcTerm {
 
     }
 
-    private static boolean ensureValidVolume(Term derivedTerm) {
+    private static boolean ensureValidVolume(@NotNull Term derivedTerm) {
 
         //HARD VOLUME LIMIT
         boolean tooLarge = derivedTerm.volume() > Global.COMPOUND_VOLUME_MAX;

@@ -29,10 +29,12 @@ import static nars.java.Naljects.isMethodVisible;
  */
 public class ClassOperator extends TermFunction {
 
+    @NotNull
     public final Class klass;
+    @NotNull
     final Map<Term, MethodOperator> methods;
 
-    public ClassOperator(Class c, AtomicBoolean enableInvoke, Naljects context) {
+    public ClassOperator(@NotNull Class c, AtomicBoolean enableInvoke, Naljects context) {
         super(c.getSimpleName());
         this.klass = c;
         methods = Global.newHashMap();
@@ -45,7 +47,7 @@ public class ClassOperator extends TermFunction {
         }
     }
 
-    public static Term methodTerm(Method m) {
+    public static Term methodTerm(@NotNull Method m) {
         return $.the(m.getName());
     }
 
@@ -60,7 +62,7 @@ public class ClassOperator extends TermFunction {
         localTask.set(null);
     }
 
-    @Override protected final void feedback(Execution e, Object y) {
+    @Override protected final void feedback(@NotNull Execution e, Object y) {
 
         if (y instanceof Naljects.JavaInvoked)
             return; //ignore, it has already been reported
@@ -70,7 +72,7 @@ public class ClassOperator extends TermFunction {
 
     @Nullable
     @Override
-    public final Object function(Compound x, TermBuilder i) {
+    public final Object function(@NotNull Compound x, TermBuilder i) {
         if (x.size() < 4) {
             //see arguments in this class's documentation
             return null;

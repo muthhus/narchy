@@ -6,6 +6,7 @@ import nars.term.Compound;
 import nars.term.SubtermVisitor;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -19,6 +20,7 @@ public final class Var extends PTerm {
 	protected PTerm val;
 
 	final static AtomicInteger varSerial = new AtomicInteger(1);
+	@NotNull
 	static String varName(int i) {
 //
 //		char[] chars = new char[7];
@@ -47,12 +49,13 @@ public final class Var extends PTerm {
 		return PTerm.VAR;
 	}
 
+	@NotNull
 	public final PTerm ref() {
 		PTerm v = this.val;
 		return (v == this) ? this : v.ref();
 	}
 
-	public boolean bind_to(PTerm x, Trail trail) {
+	public boolean bind_to(PTerm x, @NotNull Trail trail) {
 		val = x;
 		trail.add(this);
 		return true;
@@ -68,7 +71,7 @@ public final class Var extends PTerm {
 		return val.bind_to(that, trail);
 	}
 
-	public boolean eq(PTerm x) { // not a term compare!
+	public boolean eq(@NotNull PTerm x) { // not a term compare!
 		return ref() == x.ref();
 	}
 
@@ -77,7 +80,7 @@ public final class Var extends PTerm {
 		return t instanceof Var ? null : t.getKey();
 	}
 
-	PTerm reaction(PTerm agent) {
+	PTerm reaction(@NotNull PTerm agent) {
 
 		PTerm R = agent.action(ref());
 
@@ -176,6 +179,7 @@ public final class Var extends PTerm {
 		return null;
 	}
 
+	@Nullable
 	@Override
 	public String toString(boolean pretty) {
 		return null;

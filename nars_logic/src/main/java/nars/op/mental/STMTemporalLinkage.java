@@ -27,6 +27,7 @@ public class STMTemporalLinkage {
     @NotNull
     private final NAR nar;
 
+    @NotNull
     @Override
     public final String toString() {
         return id;

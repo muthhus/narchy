@@ -210,6 +210,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
         subterms.forEach(action, start, stop);
     }
 
+    @NotNull
     @Override
     public TermContainer replacing(int subterm, Term replacement) {
         throw new RuntimeException("n/a for compound");

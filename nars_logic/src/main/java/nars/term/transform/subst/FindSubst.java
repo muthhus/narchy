@@ -49,6 +49,7 @@ public abstract class FindSubst extends Versioning implements Subst {
     /**
      * variables whose contents are disallowed to equal each other
      */
+    @NotNull
     public final Versioned<ImmutableMap<Term, MatchConstraint>> constraints;
 
     //public abstract Term resolve(Term t, Substitution s);
@@ -857,7 +858,7 @@ public abstract class FindSubst extends Versioning implements Subst {
     }
 
     @Override
-    public void forEach(BiConsumer<? super Term, ? super Term> each) {
+    public void forEach(@NotNull BiConsumer<? super Term, ? super Term> each) {
         xy.forEach(each);
         //TODO yx also?
     }
@@ -895,7 +896,7 @@ public abstract class FindSubst extends Versioning implements Subst {
         }
 
         @Override
-        public void forEach(BiConsumer<? super Term, ? super Term> each) {
+        public void forEach(@NotNull BiConsumer<? super Term, ? super Term> each) {
             Map<Term, Versioned<Term>> m = this.map;
             if (!m.isEmpty()) {
                 m.forEach((k, vv) -> {

@@ -10,6 +10,7 @@ import nars.term.Term;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -48,7 +49,8 @@ public class Abbreviation implements Consumer<Task> {
 
     }
 
-    static final Compound newAbbreviation(Concept abbreviated, Term id) {
+    @Nullable
+    static final Compound newAbbreviation(@NotNull Concept abbreviated, Term id) {
         return (Compound) $.sim(abbreviated.term(), id);
 
         /*
@@ -57,6 +59,7 @@ public class Abbreviation implements Consumer<Task> {
             Product.make(termArray(termAbbreviating)), abbreviate);*/
     }
 
+    @NotNull
     public Term newSerialTerm() {
         //TODO base64
         //return Atom.the(Utf8.toUtf8(name));

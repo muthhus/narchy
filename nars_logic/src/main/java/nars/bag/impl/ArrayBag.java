@@ -120,8 +120,9 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
         throw new RuntimeException("unimpl");
     }
 
+    @NotNull
     @Override
-    public Bag<V> filter(Predicate<BLink<? extends V>> forEachIfFalseThenRemove) {
+    public Bag<V> filter(@NotNull Predicate<BLink<? extends V>> forEachIfFalseThenRemove) {
         List<BLink<V>> l = items.list();
         int n = l.size();
         if (n > 0) {

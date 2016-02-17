@@ -3,6 +3,8 @@ package nars.op.software.prolog.terms;
 import nars.op.software.prolog.Prolog;
 import nars.op.software.prolog.io.Parser;
 import nars.term.Term;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Top element of the Prolog term hierarchy. Describes a simple or compound ter
@@ -63,7 +65,7 @@ public abstract class PTerm implements Cloneable, Term {
 	abstract boolean unify_to(PTerm that, Trail trail);
 
 	/** Dereference and unify_to */
-	protected final boolean unify(PTerm that, Trail trail) {
+	protected final boolean unify(@NotNull PTerm that, Trail trail) {
 		return ref().unify_to(that.ref(), trail);
 	}
 
@@ -100,11 +102,11 @@ public abstract class PTerm implements Cloneable, Term {
 	 * SHARED.matches(NONSHARED,trail).
 	 */
 	// synchronized
-	public boolean matches(PTerm that) {
+	public boolean matches(@NotNull PTerm that) {
 		return matches(that, new Trail());
 	}
 
-	public boolean matches(PTerm that, Trail trail) {
+	public boolean matches(@NotNull PTerm that, @NotNull Trail trail) {
 		int oldtop = trail.size();
 		boolean ok = unify(that, trail);
 		trail.unwind(oldtop);
@@ -119,7 +121,8 @@ public abstract class PTerm implements Cloneable, Term {
 	 */
 	// synchronized
 
-	public PTerm matching_copy(PTerm that) {
+	@Nullable
+	public PTerm matching_copy(@NotNull PTerm that) {
 		Trail trail = new Trail();
 		boolean ok = unify(that, trail);
 		// if(ok) that=that.copy();
@@ -137,7 +140,7 @@ public abstract class PTerm implements Cloneable, Term {
 	 * 
 	 * @see Fun
 	 */
-	PTerm reaction(PTerm agent) {
+	@Nullable PTerm reaction(@NotNull PTerm agent) {
 		return agent.action(this);
 	}
 
@@ -153,6 +156,7 @@ public abstract class PTerm implements Cloneable, Term {
 	 * variables').
 	 */
 	// synchronized
+	@Nullable
 	public PTerm copy() {
 		return reaction(new Copier());
 	}
@@ -168,6 +172,7 @@ public abstract class PTerm implements Cloneable, Term {
 	 * Replaces variables with uppercase constants named `V1', 'V2', etc. to be
 	 * read back as variables.
 	 */
+	@Nullable
 	public PTerm numbervars() {
 		return copy().reaction(new VarNumberer());
 	}
@@ -190,6 +195,7 @@ public abstract class PTerm implements Cloneable, Term {
 	 * Returns a string key used based on the string name of the term. Note that
 	 * the key for a clause AL-B,C. is the key insted of ':-'.
 	 */
+	@Nullable
 	public String getKey() {
 		return toString();
 	}
@@ -222,7 +228,8 @@ public abstract class PTerm implements Cloneable, Term {
 		return -1;
 	}
 
-	static final Nonvar stringToChars(String s) {
+	@NotNull
+	static final Nonvar stringToChars(@NotNull String s) {
 		if (0 == s.length())
 			return NIL;
 		Cons l = new Cons(new Int((s.charAt(0))), NIL);
@@ -235,6 +242,7 @@ public abstract class PTerm implements Cloneable, Term {
 		return l;
 	}
 
+	@NotNull
 	public Nonvar toChars() {
 		return stringToChars(toUnquoted());
 	}

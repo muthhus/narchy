@@ -1,6 +1,8 @@
 package nars.op.software.prolog.io;
 
 import nars.op.software.prolog.terms.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -10,6 +12,7 @@ import java.io.StringReader;
  * Builds Fluents from Java Streams
  */
 public class CharReader extends Source {
+	@Nullable
 	public Reader reader;
 
 	public CharReader(Reader reader, Prog p) {
@@ -17,12 +20,12 @@ public class CharReader extends Source {
 		this.reader = reader;
 	}
 
-	public CharReader(String f, Prog p) {
+	public CharReader(@NotNull String f, Prog p) {
 		super(p);
 		makeReader(f);
 	}
 
-	public CharReader(PTerm t, Prog p) {
+	public CharReader(@NotNull PTerm t, Prog p) {
 		super(p);
 		this.reader = new StringReader(t.toUnquoted());
 	}
@@ -31,10 +34,11 @@ public class CharReader extends Source {
 		this(IO.input, p);
 	}
 
-	protected void makeReader(String f) {
+	protected void makeReader(@NotNull String f) {
 		this.reader = IO.url_or_file(f);
 	}
 
+	@Nullable
 	public PTerm getElement() {
 		if (IO.input == reader) {
 			String s = IO.promptln(">:");

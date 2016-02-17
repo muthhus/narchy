@@ -31,6 +31,7 @@ public abstract class IntTo<Y> extends TermFunction<Y> {
         return function(n1);
     }
 
+    @NotNull
     protected abstract Y function(int a);
 
     @NotNull

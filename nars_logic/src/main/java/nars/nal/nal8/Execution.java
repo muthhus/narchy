@@ -44,7 +44,7 @@ public class Execution implements Runnable {
         this.listeners = listeners;
     }
 
-    public static MutableTask result(@NotNull NAR nar, @NotNull Task goal, Term y/*, Term[] x0, Term lastTerm*/, Tense tense) {
+    public static MutableTask result(@NotNull NAR nar, @NotNull Task goal, Term y/*, Term[] x0, Term lastTerm*/, @NotNull Tense tense) {
 
         Compound operation = goal.term();
 
@@ -188,7 +188,7 @@ public class Execution implements Runnable {
      *
      * @param operation
      */
-    public static Task noticeExecuted(NAR nar, @NotNull Task operation) {
+    public static Task noticeExecuted(@NotNull NAR nar, @NotNull Task operation) {
 
         Budget b = !operation.isDeleted() ? operation.budget() : UnitBudget.zero;
 

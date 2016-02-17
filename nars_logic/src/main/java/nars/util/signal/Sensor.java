@@ -8,6 +8,7 @@ import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Term;
 import nars.util.data.Util;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
@@ -25,6 +26,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
     private final Term term;
     private final FloatFunction<Term> value;
     private final FloatToFloatFunction freq;
+    @NotNull
     private final NAR nar;
     private final float pri;
     private final float dur;
@@ -37,12 +39,12 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
 
     private long lastInput;
 
-    public Sensor(NAR n, Term t, FloatFunction<Term> value, FloatToFloatFunction valueToFreq) {
+    public Sensor(@NotNull NAR n, Term t, FloatFunction<Term> value, FloatToFloatFunction valueToFreq) {
         this(n, t, value, valueToFreq, n.memory.getDefaultConfidence(Symbols.BELIEF),
                 n.memory.DEFAULT_JUDGMENT_PRIORITY, n.memory.DEFAULT_JUDGMENT_DURABILITY);
     }
 
-    public Sensor(NAR n, Term t, FloatFunction<Term> value, FloatToFloatFunction valueToFreq, float conf, float pri, float dur) {
+    public Sensor(@NotNull NAR n, Term t, FloatFunction<Term> value, FloatToFloatFunction valueToFreq, float conf, float pri, float dur) {
         this.nar = n;
         this.term = t;
         n.onFrame(this);
@@ -58,7 +60,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
     }
 
     @Override
-    public void accept(NAR nar) {
+    public void accept(@NotNull NAR nar) {
 
         int timeSinceLastInput = (int)(nar.time() - lastInput);
 
@@ -89,6 +91,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
         this.freqResolution = freqResolution;
     }
 
+    @NotNull
     private Task input(float f) {
         Task t = new MutableTask(term).belief().truth(f, conf).present(nar.time()).budget(pri, dur);
         nar.input(t);
@@ -102,12 +105,14 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
 
     
     /** sets default confidence */
+    @NotNull
     public Sensor conf(float conf) {
         this.conf = conf;
         return this;
     }
 
     /** sets minimum time between updates, even if nothing changed. zero to disable this */
+    @NotNull
     public Sensor maxTimeBetweenUpdates(int minTimeBetweenUpdates) {
         this.maxTimeBetweenUpdates = minTimeBetweenUpdates;
         return this;

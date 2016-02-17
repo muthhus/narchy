@@ -2,6 +2,8 @@ package nars.op.software.prolog.io;
 
 import nars.op.software.prolog.Prolog;
 import nars.op.software.prolog.terms.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -10,6 +12,7 @@ import java.io.Reader;
  * Builds Fluents from Java Streams
  */
 public class ClauseReader extends CharReader {
+	@Nullable
 	protected Parser parser;
 
 	public ClauseReader(Prolog prolog, Reader reader, Prog p) throws Exception {
@@ -17,7 +20,7 @@ public class ClauseReader extends CharReader {
 		make_parser(prolog, "from shared reader");
 	}
 
-	public ClauseReader(Prolog prolog, String f, Prog p) throws Exception {
+	public ClauseReader(Prolog prolog, @NotNull String f, Prog p) throws Exception {
 		super(f, p);
 		make_parser(prolog, f);
 	}
@@ -30,7 +33,7 @@ public class ClauseReader extends CharReader {
 	/**
 	 * parses from a string representation of a term
 	 */
-	public ClauseReader(Prolog prolog, PTerm t, Prog p) throws Exception {
+	public ClauseReader(Prolog prolog, @NotNull PTerm t, Prog p) throws Exception {
 		super(t, p);
 		make_parser(prolog, "string parser");
 	}
@@ -46,6 +49,7 @@ public class ClauseReader extends CharReader {
 			this.parser = null;
 	}
 
+	@Nullable
 	public PTerm getElement() {
 		Clause C = null;
 		if (// IO.peer!=null &&
@@ -69,7 +73,8 @@ public class ClauseReader extends CharReader {
 		return extract_info(C);
 	}
 
-	static Fun extract_info(Clause C) {
+	@Nullable
+	static Fun extract_info(@Nullable Clause C) {
 		if (null == C)
 			return null;
 		PTerm Vs = C.varsOf();

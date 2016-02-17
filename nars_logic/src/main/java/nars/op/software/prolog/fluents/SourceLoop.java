@@ -3,6 +3,7 @@ package nars.op.software.prolog.fluents;
 import nars.op.software.prolog.terms.PTerm;
 import nars.op.software.prolog.terms.Prog;
 import nars.op.software.prolog.terms.Source;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 
@@ -14,9 +15,10 @@ import java.util.ArrayList;
  * particular, this happens if the original Source is also a Source loop).
  */
 public class SourceLoop extends Source {
+	@Nullable
 	private ArrayList v;
 
-	Source s;
+	@Nullable Source s;
 
 	private int i;
 
@@ -35,6 +37,7 @@ public class SourceLoop extends Source {
 		return T;
 	}
 
+	@Nullable
 	public PTerm getElement() {
 		PTerm T = null;
 		if (null != s) { // s is alive

@@ -3,6 +3,7 @@ package nars.nal.meta.pre;
 import nars.concept.ConceptProcess;
 import nars.nal.meta.AtomicBooleanCondition;
 import nars.nal.meta.PremiseMatch;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * True if the premise task and belief are both non-eternal events
@@ -18,7 +19,7 @@ abstract public class events extends AtomicBooleanCondition<PremiseMatch> {
         }
 
         @Override
-        public boolean booleanValueOf(PremiseMatch m) {
+        public boolean booleanValueOf(@NotNull PremiseMatch m) {
             return beliefBeforeOrDuringTask(m.premise);
         }
 
@@ -33,13 +34,13 @@ abstract public class events extends AtomicBooleanCondition<PremiseMatch> {
         }
 
         @Override
-        public boolean booleanValueOf(PremiseMatch m) {
+        public boolean booleanValueOf(@NotNull PremiseMatch m) {
             ConceptProcess p = m.premise;
             return p.isEternal() || beliefBeforeOrDuringTask(p);
         }
     };
 
-    private static boolean beliefBeforeOrDuringTask(ConceptProcess p) {
+    private static boolean beliefBeforeOrDuringTask(@NotNull ConceptProcess p) {
 
         return p.isEvent()
                &&

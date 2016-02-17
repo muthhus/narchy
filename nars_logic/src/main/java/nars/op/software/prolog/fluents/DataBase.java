@@ -5,6 +5,7 @@ import nars.op.software.prolog.io.IO;
 import nars.op.software.prolog.io.Parser;
 import nars.op.software.prolog.terms.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.Reader;
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ public class DataBase extends BlackBoard {
      * Removes a matching Term from the blackboards and signals failure if no
      * such term is found.
      */
+    @Nullable
     public PTerm cin(String k, PTerm pattern) {
         PTerm found = take(k, pattern);
         // if(found!=null) {
@@ -42,7 +44,8 @@ public class DataBase extends BlackBoard {
     /**
      * Adds a Term to the blackboard
      */
-    public PTerm out(String k, PTerm pattern, boolean copying) {
+    @NotNull
+    public PTerm out(String k, @NotNull PTerm pattern, boolean copying) {
         add(k, copying ? pattern.copy() : pattern);
         return yes;
     }
@@ -52,11 +55,12 @@ public class DataBase extends BlackBoard {
      */
 
     // synchronized
-    public PTerm out(String key, PTerm pattern) {
+    @NotNull
+    public PTerm out(String key, @NotNull PTerm pattern) {
         return out(key, pattern, true); // copies pattern
     }
 
-    private void all0(int max, ArrayList To, String k, PTerm FXs) {
+    private void all0(int max, @NotNull ArrayList To, String k, @NotNull PTerm FXs) {
         if (0 == max)
             max = -1;
         Queue Q = (Queue) get(k);
@@ -73,7 +77,7 @@ public class DataBase extends BlackBoard {
         }
     }
 
-    private PTerm all1(int max, PTerm FXs) {
+    private PTerm all1(int max, @NotNull PTerm FXs) {
         ArrayList<PTerm> To = new ArrayList();
         for (Object o : keySet())
             all0(max, To, (String) o, FXs);
@@ -83,7 +87,7 @@ public class DataBase extends BlackBoard {
         return ((Cons) R.listify()).args[1];
     }
 
-    private PTerm all2(int max, String k, PTerm FXs) {
+    private PTerm all2(int max, @Nullable String k, @NotNull PTerm FXs) {
         if (k == null) {
             // IO.mes("expensive operation: all/2 with unknown key");
             return all1(max, FXs);
@@ -122,6 +126,7 @@ public class DataBase extends BlackBoard {
     /**
      * Returns a formatted String representation of this PrologBlackboard object
      */
+    @NotNull
     public String pprint() {
         StringBuilder s = new StringBuilder(name());
         for (Object o : keySet()) {
@@ -131,6 +136,7 @@ public class DataBase extends BlackBoard {
         return s.toString();
     }
 
+    @Nullable
     public String pred_to_string(String key) {
         Queue Q = (Queue) get(key);
         if (null == Q)
@@ -149,7 +155,7 @@ public class DataBase extends BlackBoard {
      * consults or reconsults a Prolog file by adding or overriding existing
      * predicates to be extended to load from URLs transparently
      */
-    static public boolean fromFile(Prolog p, String f, boolean overwrite) {
+    static public boolean fromFile(@NotNull Prolog p, @NotNull String f, boolean overwrite) {
         if (IO.trace())
             IO.trace("last consulted file was: " + lastFile);
         boolean ok = fileToProg(p, f, overwrite);
@@ -167,7 +173,7 @@ public class DataBase extends BlackBoard {
     /**
      * reconsults a file by overwritting similar predicates in memory
      */
-    static public boolean fromFile(Prolog p, String f) {
+    static public boolean fromFile(@NotNull Prolog p, @NotNull String f) {
         return fromFile(p, f, true);
     }
 
@@ -176,7 +182,7 @@ public class DataBase extends BlackBoard {
     /**
      * reconsults the last reconsulted file
      */
-    static public boolean fromFile(Prolog p) {
+    static public boolean fromFile(@NotNull Prolog p) {
         IO.println("begin('" + lastFile + "')");
         boolean ok = fromFile(p, lastFile);
         if (ok)
@@ -184,7 +190,7 @@ public class DataBase extends BlackBoard {
         return ok;
     }
 
-    static private boolean fileToProg(Prolog prolog, String fname,
+    static private boolean fileToProg(@NotNull Prolog prolog, @NotNull String fname,
                                       boolean overwrite) {
         Reader sname = IO.toFileReader(fname);
         if (null == sname)
@@ -196,13 +202,13 @@ public class DataBase extends BlackBoard {
      * Reads a set of clauses from a stream and adds them to the blackboard.
      * Overwrites old predicates if asked to. Returns true if all went well.
      */
-    static public boolean streamToProg(Prolog prolog, Reader sname,
+    static public boolean streamToProg(@NotNull Prolog prolog, @NotNull Reader sname,
                                        boolean overwrite) {
         return streamToProg(prolog, sname.toString(), sname, overwrite);
     }
 
-    static private boolean streamToProg(Prolog prolog, String fname,
-                                        Reader sname, boolean overwrite) {
+    static private boolean streamToProg(@NotNull Prolog prolog, @NotNull String fname,
+                                        @NotNull Reader sname, boolean overwrite) {
         BlackBoard ktable = overwrite ? (BlackBoard) prolog.db.clone() : null;
         // Clause Err=new Clause(new Const("error"),new Var());
         try {
@@ -215,7 +221,7 @@ public class DataBase extends BlackBoard {
         return true;
     }
 
-    static private void apply_parser(Parser p, String fname, BlackBoard ktable) {
+    static private void apply_parser(@NotNull Parser p, @NotNull String fname, BlackBoard ktable) {
         for (; ; ) {
             if (p.atEOF())
                 return;
@@ -236,7 +242,7 @@ public class DataBase extends BlackBoard {
     /**
      * adds a Clause to the joint Linda and Predicate table
      */
-    public static void addClause(Prolog p, Clause C, HashDict ktable) {
+    public static void addClause(@NotNull Prolog p, @NotNull Clause C, @Nullable HashDict ktable) {
         String k = C.getKey();
         // overwrites previous definitions
         if (null != ktable && null != ktable.get(k)) {
@@ -251,7 +257,7 @@ public class DataBase extends BlackBoard {
      *
      * @see Clause
      */
-    public static void processClause(Prolog prolog, Clause C, HashDict ktable) {
+    public static void processClause(@NotNull Prolog prolog, @NotNull Clause C, HashDict ktable) {
         if (C.head().matches(new Const("init"))) {
             // IO.mes("init: "+C.getBody());
             Prog.firstSolution(prolog, C.head(), C.body());
@@ -261,6 +267,7 @@ public class DataBase extends BlackBoard {
         }
     }
 
+    @NotNull
     public PTerm add(@NotNull PTerm X) {
         return out(X.getKey(), X);
     }

@@ -36,7 +36,7 @@ public enum Forget { ;
         }
 
         @Override
-        public boolean test(BLink<? extends X> b) {
+        public boolean test(@NotNull BLink<? extends X> b) {
             if (b.get().isDeleted() || b.isDeleted())
                 return false;
             forget.accept(b);
@@ -46,7 +46,9 @@ public enum Forget { ;
 
     public abstract static class AbstractForget<X> implements BudgetForget<X> {
 
+        @NotNull
         protected final MutableFloat forgetDurations;
+        @NotNull
         protected final MutableFloat perfection;
 
         //cached values for fast repeated accesses
@@ -73,6 +75,7 @@ public enum Forget { ;
             now = m.time();
         }
 
+        @NotNull
         public <B extends Budgeted> ForgetAndDetectDeletion<B> withDeletedItemFiltering() {
             return new ForgetAndDetectDeletion<B>((BudgetForget<B>) this);
         }

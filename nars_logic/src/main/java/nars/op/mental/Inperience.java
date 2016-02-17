@@ -269,7 +269,7 @@ public class Inperience {
         }
     }
 
-    void nonInnate(Task task, @NotNull Task belief, Operator op) {
+    void nonInnate(@NotNull Task task, @NotNull Task belief, Operator op) {
         //the operators which dont have a innate belief
         //also get a chance to reveal its effects to the system this way
 
@@ -278,7 +278,7 @@ public class Inperience {
             beliefReasonDerive(task, belief, c, 0);
     }
 
-    void beliefReasonDerive(Task parent, Task belief, @NotNull Compound new_term, long delay) {
+    void beliefReasonDerive(@NotNull Task parent, Task belief, @NotNull Compound new_term, long delay) {
 
         //TODO should this be a mew stamp or attached to parent.. originally it was a fresh new stamp from memory
 

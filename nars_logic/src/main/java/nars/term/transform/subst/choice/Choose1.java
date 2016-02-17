@@ -52,7 +52,7 @@ public class Choose1 extends Termutator {
     }
 
     @Override
-    public void run(FindSubst f, Termutator[] chain, int current) {
+    public void run(@NotNull FindSubst f, Termutator[] chain, int current) {
         int l = yy.length-1;
         int shuffle = f.random.nextInt(l); //randomize starting offset
 
@@ -70,7 +70,7 @@ public class Choose1 extends Termutator {
     }
 
 
-    private boolean valid(FindSubst f, Term y) {
+    private boolean valid(@NotNull FindSubst f, @NotNull Term y) {
         return f.match(x, y) && f.putXY(xEllipsis, new EllipsisMatch(yFree, y));
     }
 

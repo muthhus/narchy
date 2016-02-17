@@ -1,5 +1,7 @@
 package nars.op.software.prolog.terms;
 
+import org.jetbrains.annotations.Nullable;
+
 /**
  * A Fluent is a Prolog Object which has its own state, subject to changes over
  * time.
@@ -37,7 +39,7 @@ public class Fluent extends SystemObject {
 	 * Adds this Fluent to the parent Solver's trail, which will eventually call
 	 * the undo method of the Fluent on backtracking.
 	 */
-	protected void trailMe(Prog p) {
+	protected void trailMe(@Nullable Prog p) {
 		if (null != p)
 			p.getTrail().add(this);
 	}

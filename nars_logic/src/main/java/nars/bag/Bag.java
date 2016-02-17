@@ -397,12 +397,13 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
     Bag<V> filter(Predicate<BLink<? extends V>> forEachIfFalseThenRemove);
 
 
-    default Bag<V> forEachThen(Consumer<BLink<? extends V>> each) {
+    @NotNull
+    default Bag<V> forEachThen(@NotNull Consumer<BLink<? extends V>> each) {
         forEach(each);
         return this;
     }
 
-    default void putAll(Collection<? extends V> a) {
+    default void putAll(@NotNull Collection<? extends V> a) {
         a.forEach(this::put);
     }
 

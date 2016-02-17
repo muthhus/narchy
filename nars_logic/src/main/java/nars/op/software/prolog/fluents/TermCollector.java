@@ -3,6 +3,7 @@ package nars.op.software.prolog.fluents;
 import nars.op.software.prolog.terms.Prog;
 import nars.op.software.prolog.terms.Sink;
 import nars.op.software.prolog.terms.PTerm;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 
@@ -10,6 +11,7 @@ import java.util.ArrayList;
  * Builds Fluents from Java Streams
  */
 public class TermCollector extends Sink {
+	@Nullable
 	protected ArrayList buffer;
 
 	private final Prog p;
@@ -29,6 +31,7 @@ public class TermCollector extends Sink {
 		buffer = null;
 	}
 
+	@Nullable
 	public PTerm collect() {
 		return new JavaSource(buffer, p);
 	}

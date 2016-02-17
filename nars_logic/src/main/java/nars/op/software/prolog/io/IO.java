@@ -4,12 +4,16 @@ package nars.op.software.prolog.io;
  * Copyright (C) Paul Tarau 1996-1999
  */
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 
 public class IO {
 
+	@Nullable
 	public static IOPeer peer = null;
 
 	public static final boolean showOutput = true;
@@ -24,19 +28,23 @@ public class IO {
 
 	public static final Writer output = toWriter(System.out);
 
-	static Reader toReader(InputStream f) {
+	@NotNull
+	static Reader toReader(@NotNull InputStream f) {
 		return new BufferedReader(new InputStreamReader(f));
 	}
 
-	public static Reader toFileReader(String fname) {
+	@Nullable
+	public static Reader toFileReader(@NotNull String fname) {
 		return url_or_file(fname);
 	}
 
-	static Writer toWriter(OutputStream f) {
+	@NotNull
+	static Writer toWriter(@NotNull OutputStream f) {
 		return new BufferedWriter(new OutputStreamWriter(f));
 	}
 
-	static Writer toFileWriter(String s) {
+	@Nullable
+	static Writer toFileWriter(@NotNull String s) {
 		Writer f = null;
 		// mes("HERE"+s);
 		try {
@@ -47,16 +55,18 @@ public class IO {
 		return f;
 	}
 
+	@NotNull
 	public static Reader getStdInput() {
 		return input;
 	}
 
+	@NotNull
 	public static Writer getStdOutput() {
 		return output;
 	}
 
 	// synchronized
-	static public final void print(Writer f, String s) {
+	static public final void print(@NotNull Writer f, @NotNull String s) {
 		if (!showOutput)
 			return;
 		if (peer == null) {
@@ -71,11 +81,11 @@ public class IO {
 		return;
 	}
 
-	public static final void println(Writer o, String s) {
+	public static final void println(@NotNull Writer o, String s) {
 		print(o, s + '\n');
 	}
 
-	public static final void print(String s) {
+	public static final void print(@NotNull String s) {
 		print(output, s);
 	}
 
@@ -84,18 +94,19 @@ public class IO {
 	}
 
 	// for now just stubs: usable if IO comes from elswere i.e. sockets
+	@Nullable
 	static final String read_from(Reader f) {
 		return readln(f);
 	}
 
 	// for now just stubs: usable if IO comes from elswere i.e. sockets
-	static final void write_to(Writer f, String s) {
+	static final void write_to(@NotNull Writer f, String s) {
 		println(f, s);
 	}
 
 	static final int MAXBUF = 1 << 30;
 
-	static String readLine(Reader f) throws IOException {
+	static String readLine(@NotNull Reader f) throws IOException {
 		StringBuilder s = new StringBuilder();
 		for (int i = 0; i < MAXBUF; i++) {
 			int c = f.read();
@@ -110,6 +121,7 @@ public class IO {
 		return s.toString();
 	}
 
+	@Nullable
 	static final String readln(Reader f) {
 		trace(2, "READLN TRACE: entering");
 		String s = null;
@@ -125,6 +137,7 @@ public class IO {
 		return s;
 	}
 
+	@Nullable
 	public static final String readln() {
 		String s;
 		if (peer == null) {
@@ -135,7 +148,8 @@ public class IO {
 		return s;
 	}
 
-	public static final String promptln(String prompt) {
+	@Nullable
+	public static final String promptln(@NotNull String prompt) {
 		print(prompt);
 		return readln();
 	}
@@ -162,7 +176,7 @@ public class IO {
 		}
 	}
 
-	public static void printStackTrace(Throwable e) {
+	public static void printStackTrace(@NotNull Throwable e) {
 		if (showErrors) {
 			// ByteArrayOutputStream b=new ByteArrayOutputStream();
 			// PrintWriter fb=new PrintWriter(b);
@@ -181,7 +195,7 @@ public class IO {
 	}
 
 	// synchronized
-	public static final void error(String s, Throwable e) {
+	public static final void error(String s, @NotNull Throwable e) {
 		error(s);
 		printStackTrace(e);
 	}
@@ -201,11 +215,12 @@ public class IO {
 		return 1;
 	}
 
-	public static final Reader url2stream(String f) {
+	@Nullable
+	public static final Reader url2stream(@NotNull String f) {
 		return url2stream(f, false);
 	}
 
-	public static final Reader url2stream(String f, boolean quiet) {
+	public static final Reader url2stream(@NotNull String f, boolean quiet) {
 		Reader stream = null;
 		try {
 			URL url = new URL(f);
@@ -229,7 +244,8 @@ public class IO {
 
 	}
 
-	public static final Reader url_or_file(String s) {
+	@Nullable
+	public static final Reader url_or_file(@NotNull String s) {
 		Reader stream = null;
 		try {
 
@@ -243,11 +259,13 @@ public class IO {
 		return stream;
 	}
 
-	public static final Reader string_to_stream(String s) {
+	@NotNull
+	public static final Reader string_to_stream(@NotNull String s) {
 		StringReader stream = new StringReader(s);
 		return stream;
 	}
 
+	@Nullable
 	public static final URL find_url(String s) {
 		String valid = null;
 		Reader stream;

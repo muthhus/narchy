@@ -71,6 +71,7 @@ public class CurveBag<V> implements Bag<V> {
     }
 
 
+    @NotNull
     public CurveBag<V> merge(BudgetMerge mergeFunction) {
         arrayBag.merge(mergeFunction);
         return this;
@@ -126,7 +127,7 @@ public class CurveBag<V> implements Bag<V> {
      * */
     @NotNull
     @Override
-    public CurveBag<V> sample(int n, Collection<? super BLink<V>> target) {
+    public CurveBag<V> sample(int n, @NotNull Collection<? super BLink<V>> target) {
 
         int ss = size();
         final int begin, end;
@@ -196,8 +197,9 @@ public class CurveBag<V> implements Bag<V> {
         return arrayBag.capacity();
     }
 
+    @NotNull
     @Override
-    public final CurveBag<V> filter(Predicate<BLink<? extends V>> forEachIfFalseThenRemove) {
+    public final CurveBag<V> filter(@NotNull Predicate<BLink<? extends V>> forEachIfFalseThenRemove) {
         arrayBag.filter(forEachIfFalseThenRemove);
         return this;
     }
@@ -214,7 +216,7 @@ public class CurveBag<V> implements Bag<V> {
     }
 
     @Override
-    public void forEach(Consumer<? super BLink<V>> action) {
+    public void forEach(@NotNull Consumer<? super BLink<V>> action) {
         arrayBag.forEach(action);
     }
 

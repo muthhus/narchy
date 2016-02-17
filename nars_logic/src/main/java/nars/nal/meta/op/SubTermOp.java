@@ -31,7 +31,7 @@ public final class SubTermOp extends AtomicBooleanCondition<PremiseMatch> {
     }
 
     @Override
-    public boolean booleanValueOf(PremiseMatch ff) {
+    public boolean booleanValueOf(@NotNull PremiseMatch ff) {
         Compound parent = (Compound) ff.term.get();
         return parent.term(subterm, op);
     }

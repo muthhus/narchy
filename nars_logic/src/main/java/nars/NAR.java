@@ -407,7 +407,7 @@ public abstract class NAR implements Level, Consumer<Task> {
     /**
      * logs tasks and other budgeted items with a summary exceeding a threshold
      */
-    public void logSummaryGT(Appendable out, float summaryThreshold) {
+    public void logSummaryGT(@NotNull Appendable out, float summaryThreshold) {
         log(out, v -> {
             Budgeted b = null;
             if (v instanceof Budgeted) {
@@ -462,7 +462,7 @@ public abstract class NAR implements Level, Consumer<Task> {
     }
 
     @Override
-    public final void accept(Task task) {
+    public final void accept(@NotNull Task task) {
         input(task);
     }
 
@@ -1092,7 +1092,7 @@ public abstract class NAR implements Level, Consumer<Task> {
         return Stream.of(terms).map(this::term).toArray(Termed[]::new);
     }
 
-    public synchronized void dumpConcepts(String path) throws FileNotFoundException {
+    public synchronized void dumpConcepts(@NotNull String path) throws FileNotFoundException {
         PrintStream pw = new PrintStream(new FileOutputStream(new File(path)));
         index().forEach(t -> {
             if (t instanceof Concept) {

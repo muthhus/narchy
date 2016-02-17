@@ -57,12 +57,12 @@ public class DefaultBeliefTable implements BeliefTable {
 
         /** Ranking by originality is a metric used to conserve original information in balance with confidence */
         eternal = new SetTable<Task>(cap/2, map, new ArraySortedIndex<Task>(cap) {
-            @Override public float score(Task v) {
+            @Override public float score(@NotNull Task v) {
                 return BeliefTable.rankEternalByOriginality(v);
             }
         });
         temporal = new SetTable<Task>(cap/2, map, new ArraySortedIndex<Task>(cap) {
-            @Override public float score(Task v) {
+            @Override public float score(@NotNull Task v) {
                 return rankTemporalByOriginality(v);
             }
         });
@@ -213,7 +213,7 @@ public class DefaultBeliefTable implements BeliefTable {
 
     /** if a duplicate exists, it will merge the incoming task and return true.
      * otherwise false */
-    private boolean filterDuplicate(Task input, NAR nar) {
+    private boolean filterDuplicate(@NotNull Task input, @NotNull NAR nar) {
         Task existing = contains(input);
         if (existing!=null) {
             if (existing!=input) {
@@ -262,6 +262,7 @@ public class DefaultBeliefTable implements BeliefTable {
      * creates a revision task (but does not input it)
      * if failed, returns null
      */
+    @Nullable
     public Task getRevision(@NotNull Task newBelief, @NotNull NAR nar) {
         long now = nar.time();
 

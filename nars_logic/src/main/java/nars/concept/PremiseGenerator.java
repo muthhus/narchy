@@ -12,6 +12,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Terms;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Map;
@@ -22,14 +23,16 @@ import java.util.function.Predicate;
 /** not thread safe; call from only one thread at a time */
 abstract public class PremiseGenerator extends UnifySubst implements Function<Term, Task> {
 
+    @NotNull
     public final NAR nar;
     private BLink<? extends Termed> termLink;
     private BLink<? extends Concept> concept;
+    @Nullable
     private BLink<? extends Task> taskLink;
     private final Map<Term, Task> beliefCache = Global.newHashMap();
     long lastMatch = Tense.TIMELESS;
 
-    public PremiseGenerator(NAR nar) {
+    public PremiseGenerator(@NotNull NAR nar) {
         super(Op.VAR_QUERY, nar.memory, true);
         this.nar = nar;
         this.lastMatch = nar.time();
@@ -105,7 +108,7 @@ abstract public class PremiseGenerator extends UnifySubst implements Function<Te
 
 
 
-    void match(BLink<? extends Concept> concept, BLink<? extends Task>[] taskLinks, @NotNull BLink<? extends Termed> termLink) {
+    void match(BLink<? extends Concept> concept, @NotNull BLink<? extends Task>[] taskLinks, @NotNull BLink<? extends Termed> termLink) {
 
 
         this.concept = concept;
@@ -130,7 +133,7 @@ abstract public class PremiseGenerator extends UnifySubst implements Function<Te
 
 
     /** uses the query-unified term to complete a premise */
-    @Override public final boolean accept(Term beliefTerm, Term unifiedBeliefTerm) {
+    @Override public final boolean accept(@NotNull Term beliefTerm, Term unifiedBeliefTerm) {
 
         Task belief = beliefTerm.isCompound() ?
                 beliefCache.computeIfAbsent(beliefTerm, this) :
@@ -160,6 +163,7 @@ abstract public class PremiseGenerator extends UnifySubst implements Function<Te
     abstract protected void premise(BLink<? extends Concept> concept, BLink<? extends Task> taskLink, BLink<? extends Termed> termLink, Task belief);
 
     /** resolves the most relevant task for a given term/concept */
+    @Nullable
     @Override public final Task apply(Term beliefTerm) {
 
         Concept beliefConcept = nar.concept(beliefTerm);

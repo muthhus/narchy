@@ -80,43 +80,6 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 
 
 
-    //    /**
-//     * from: http://stackoverflow.com/a/19333201
-//     */
-//    public static <T> void shuffle(final T[] array, final Random random) {
-//        int count = array.length;
-//
-//        //probabality for no shuffle at all:
-//        if (random.nextInt(factorial(count)) == 0) return;
-//
-//        for (int i = count; i > 1; i--) {
-//            final int a = i - 1;
-//            final int b = random.nextInt(i);
-//            if (b!=a) {
-//                final T t = array[b];
-//                array[b] = array[a];
-//                array[a] = t;
-//            }
-//        }
-//    }
-
-//    static Term unwrap(Term x, boolean unwrapLen1SetExt, boolean unwrapLen1SetInt, boolean unwrapLen1Product) {
-//        if (x instanceof Compound) {
-//            Compound c = (Compound) x;
-//            if (c.size() == 1) {
-//                if ((unwrapLen1SetInt && (c instanceof SetInt)) ||
-//                        (unwrapLen1SetExt && (c instanceof SetExt)) ||
-//                        (unwrapLen1Product && (c instanceof Product))
-//                        ) {
-//                    return c.term(0);
-//                }
-//            }
-//        }
-//
-//        return x;
-//    }
-
-
     @Override
     default void append(@NotNull Appendable p, boolean pretty) throws IOException {
         TermPrinter.compoundAppend(this, p, pretty);
@@ -171,59 +134,6 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 
 
 
-
-
-
-
-
-//    @Override
-//    public boolean equals(final Object that) {
-//        if (!(that instanceof CompoundTerm))
-//            return false;
-//        
-//        final CompoundTerm t = (CompoundTerm)that;
-//        return name().equals(t.name());
-//        
-//        /*if (hashCode() != t.hashCode())
-//            return false;
-//        
-//        if (operate() != t.operate())
-//            return false;
-//        
-//        if (size() != t.size())
-//            return false;
-//        
-//        for (int i = 0; i < term.size(); i++) {
-//            final Term c = term.get(i);
-//            if (!c.equals(t.componentAt(i)))
-//                return false;
-//        }
-//        
-//        return true;*/
-//        
-//    }
-
-
-
-
-
-    //boolean transform(CompoundTransform<Compound<T>, T> trans, int depth);
-
-
-
-//    /**
-//     * returns result of applySubstitute, if and only if it's a CompoundTerm.
-//     * otherwise it is null
-//     */
-//    default Compound applySubstituteToCompound(Map<Term, Term> substitute) {
-//        Term t = Term.substituted(this,
-//                new MapSubst(substitute));
-//        if (t instanceof Compound)
-//            return ((Compound) t);
-//        return null;
-//    }
-
-
     @NotNull
     TermContainer<T> subterms();
 
@@ -234,12 +144,13 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
         return toString(false);
     }
 
-    @NotNull
+    @Nullable
     @Override
     default String toString(boolean pretty) {
         return toStringBuilder(pretty).toString();
     }
 
+    @Nullable
     @Override
     default Object _car() {
         //if length > 0
@@ -309,6 +220,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
     }
 
 
+    @Nullable
     @Override
     default Ellipsis firstEllipsis() {
         return subterms().firstEllipsis();
@@ -319,6 +231,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
         return op().ordinal()<<16 | (relation() & 0xffff);
     }
 
+    @Nullable
     default Term last() {
         return term(size()-1);
     }
@@ -346,6 +259,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
      * path to the first subterm occurrence of the supplied term,
      * or null if none was found
      */
+    @Nullable
     default int[] isSubterm(Term t) {
         if (containsTerm(t)) {
             IntArrayList l = new IntArrayList();
@@ -358,7 +272,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
         return null;
     }
 
-    static boolean isSubterm(Compound container, Term t, IntArrayList l) {
+    static boolean isSubterm(@NotNull Compound container, Term t, @NotNull IntArrayList l) {
         Term[] x = container.terms();
         int s = x.length;
         for (int i = 0; i < s; i++) {
@@ -861,14 +775,14 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 
         }*/
 
-/**
- * Check whether the compound contains a certain component
- * Also matches variables, ex: (&&,<a --> b>,<b --> c>) also contains <a --> #1>
- *  ^^^ is this right? if so then try containsVariablesAsWildcard
- *
- * @param t The component to be checked
- * @return Whether the component is in the compound
- */
+///**
+// * Check whether the compound contains a certain component
+// * Also matches variables, ex: (&&,<a --> b>,<b --> c>) also contains <a --> #1>
+// *  ^^^ is this right? if so then try containsVariablesAsWildcard
+// *
+// * @param t The component to be checked
+// * @return Whether the component is in the compound
+// */
 //return Terms.containsVariablesAsWildcard(term, t);
 //^^ ???
 
@@ -927,4 +841,90 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 //            return Terms.contains(term, t);
 //        }
 //    }
+
+
+
+//    @Override
+//    public boolean equals(final Object that) {
+//        if (!(that instanceof CompoundTerm))
+//            return false;
+//
+//        final CompoundTerm t = (CompoundTerm)that;
+//        return name().equals(t.name());
+//
+//        /*if (hashCode() != t.hashCode())
+//            return false;
+//
+//        if (operate() != t.operate())
+//            return false;
+//
+//        if (size() != t.size())
+//            return false;
+//
+//        for (int i = 0; i < term.size(); i++) {
+//            final Term c = term.get(i);
+//            if (!c.equals(t.componentAt(i)))
+//                return false;
+//        }
+//
+//        return true;*/
+//
+//    }
+
+
+
+
+
+//boolean transform(CompoundTransform<Compound<T>, T> trans, int depth);
+
+
+
+//    /**
+//     * returns result of applySubstitute, if and only if it's a CompoundTerm.
+//     * otherwise it is null
+//     */
+//    default Compound applySubstituteToCompound(Map<Term, Term> substitute) {
+//        Term t = Term.substituted(this,
+//                new MapSubst(substitute));
+//        if (t instanceof Compound)
+//            return ((Compound) t);
+//        return null;
+//    }
+
+//    /**
+//     * from: http://stackoverflow.com/a/19333201
+//     */
+//    public static <T> void shuffle(final T[] array, final Random random) {
+//        int count = array.length;
+//
+//        //probabality for no shuffle at all:
+//        if (random.nextInt(factorial(count)) == 0) return;
+//
+//        for (int i = count; i > 1; i--) {
+//            final int a = i - 1;
+//            final int b = random.nextInt(i);
+//            if (b!=a) {
+//                final T t = array[b];
+//                array[b] = array[a];
+//                array[a] = t;
+//            }
+//        }
+//    }
+
+//    static Term unwrap(Term x, boolean unwrapLen1SetExt, boolean unwrapLen1SetInt, boolean unwrapLen1Product) {
+//        if (x instanceof Compound) {
+//            Compound c = (Compound) x;
+//            if (c.size() == 1) {
+//                if ((unwrapLen1SetInt && (c instanceof SetInt)) ||
+//                        (unwrapLen1SetExt && (c instanceof SetExt)) ||
+//                        (unwrapLen1Product && (c instanceof Product))
+//                        ) {
+//                    return c.term(0);
+//                }
+//            }
+//        }
+//
+//        return x;
+//    }
+
 

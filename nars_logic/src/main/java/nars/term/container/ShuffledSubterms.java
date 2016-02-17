@@ -4,6 +4,7 @@ import nars.nal.meta.match.Ellipsis;
 import nars.term.Term;
 import nars.util.math.ShuffledPermutations;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -44,6 +45,7 @@ public final class ShuffledSubterms extends ShuffledPermutations implements Term
         return compound.size();
     }
 
+    @Nullable
     @Override
     public Term term(int i) {
         return compound.term(get(i));
@@ -125,6 +127,7 @@ public final class ShuffledSubterms extends ShuffledPermutations implements Term
         return x;
     }
 
+    @NotNull
     @Override
     public TermContainer replacing(int subterm, Term replacement) {
         throw new RuntimeException("n/a for shuffle"); //TODO maybe is valid

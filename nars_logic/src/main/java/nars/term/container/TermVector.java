@@ -9,6 +9,7 @@ import nars.term.*;
 import nars.util.data.Util;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
 import java.lang.reflect.Array;
@@ -185,6 +186,7 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
         return size() != 0;
     }
 
+    @Nullable
     @Override
     public final Ellipsis firstEllipsis() {
         return Ellipsis.firstEllipsis(term);
@@ -262,12 +264,12 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
             subt |= t.structure();
         }
 
-        //MAX 255 variables
+        //MAX 127 variables
         hasVarDeps = (byte) deps;
         hasVarIndeps = (byte) indeps;
         hasVarQueries = (byte) queries;
-        structureHash = subt;
         varTotal = (byte) (deps + indeps + queries);
+        structureHash = subt;
 
         complexity = (short) compl;
         volume = (short) vol;
@@ -391,6 +393,7 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
     }
 
     /** creates a copy if changed */
+    @NotNull
     @Override public TermVector replacing(int subterm, Term replacement) {
         if (term(subterm).equals(replacement))
             return this;

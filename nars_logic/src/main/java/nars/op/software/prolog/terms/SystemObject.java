@@ -36,7 +36,7 @@ public class SystemObject extends Nonvar {
 		super(soName(prefix));
 	}
 
-	boolean bind_to(PTerm that, Trail trail) {
+	boolean bind_to(@NotNull PTerm that, Trail trail) {
 		return super.bind_to(that, trail)
 				&& name.equals(((SystemObject) that).name);
 	}

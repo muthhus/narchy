@@ -14,6 +14,7 @@ import java.util.List;
  */
 public final class AndCondition<C> extends GenericCompound<BooleanCondition<C>> implements BooleanCondition<C> {
 
+    @NotNull
     private final BooleanCondition[] termCache;
 
     public AndCondition(@NotNull BooleanCondition<C>[] p) {
@@ -23,7 +24,7 @@ public final class AndCondition<C> extends GenericCompound<BooleanCondition<C>> 
         this(new TermVector(p, BooleanCondition.class));
     }
 
-    public AndCondition(TermVector termVector) {
+    public AndCondition(@NotNull TermVector termVector) {
         super(Op.CONJUNCTION, termVector);
         this.termCache = (BooleanCondition[]) termVector.terms();
     }

@@ -16,6 +16,7 @@
 package nars.op.software.prolog.io;
 
 
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A Base 64 codec implementation.
@@ -37,6 +38,7 @@ public class Base64Codec  {
     private static class LazyHolder {
         private static final byte[] DECODED = decodeTable();
         
+        @NotNull
         private static byte[] decodeTable() {
             final byte[] dest = new byte['z'+1];
             
@@ -62,7 +64,8 @@ public class Base64Codec  {
     private static final byte[] alphabets = toBytesDirect("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/");
 
 
-    public static byte[] toBytesDirect(final String singleOctets) {
+    @NotNull
+    public static byte[] toBytesDirect(@NotNull final String singleOctets) {
         final char[] src = singleOctets.toCharArray();
         final byte[] dest = new byte[src.length];
 
@@ -77,7 +80,8 @@ public class Base64Codec  {
     }
 
 
-    public byte[] encode(byte[] src) {
+    @NotNull
+    public byte[] encode(@NotNull byte[] src) {
         final int num3bytes = src.length / 3;
         final int remainder = src.length % 3;
         

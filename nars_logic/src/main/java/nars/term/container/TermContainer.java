@@ -35,13 +35,14 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
     int vars();
 
     /** gets subterm at index i */
-    T term(int i);
+    @Nullable T term(int i);
 
     /** tests if subterm i is op o */
     default boolean term(int i, Op o) {
         return term(i).op() == o;
     }
 
+    @Nullable
     default Term termOr(int i, Term ifOutOfBounds) {
         return size() <= i ? ifOutOfBounds : term(i);
     }
@@ -71,7 +72,8 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
 
 
     /** returns null if empty set; not sorted */
-    @Deprecated static Term difference(TermBuilder i, Op op, @NotNull TermContainer a, @NotNull TermContainer b) {
+    @Nullable
+    @Deprecated static Term difference(@NotNull TermBuilder i, @NotNull Op op, @NotNull TermContainer a, @NotNull TermContainer b) {
 
         if (a.equals(b))
             return Terms.empty(op);
@@ -293,7 +295,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
         return true;
     }
 
-    TermContainer replacing(int subterm, Term replacement);
+    @Nullable TermContainer replacing(int subterm, Term replacement);
 
 
 }

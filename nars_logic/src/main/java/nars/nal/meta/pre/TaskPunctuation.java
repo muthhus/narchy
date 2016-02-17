@@ -19,7 +19,7 @@ final public class TaskPunctuation extends AtomicBooleanCondition<PremiseMatch> 
     public static final AtomicBooleanCondition<PremiseMatch> TaskQuestion = new AtomicBooleanCondition<PremiseMatch>() {
 
         @Override
-        public boolean booleanValueOf(PremiseMatch o) {
+        public boolean booleanValueOf(@NotNull PremiseMatch o) {
             char taskPunc = o.punc();
             return taskPunc == Symbols.QUESTION || taskPunc == Symbols.QUEST;
         }

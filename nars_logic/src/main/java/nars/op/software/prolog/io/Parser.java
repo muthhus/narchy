@@ -3,6 +3,8 @@ package nars.op.software.prolog.io;
 import nars.op.software.prolog.Prolog;
 import nars.op.software.prolog.fluents.HashDict;
 import nars.op.software.prolog.terms.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -14,10 +16,11 @@ import java.util.Objects;
  * Lexicographic analyser reading from a stream
  */
 class Lexer extends StreamTokenizer {
+	@NotNull
 	protected final Reader input;
 	private final Prolog prolog;
 
-	public Lexer(Prolog p, Reader I) {
+	public Lexer(Prolog p, @NotNull Reader I) {
 		super(I);
 		this.prolog = p;
 		this.input = I;
@@ -48,7 +51,7 @@ class Lexer extends StreamTokenizer {
 	 * String based constructor. Used in queries ended by \n + prolog2java.
 	 */
 
-	public Lexer(Prolog p, String s) throws Exception {
+	public Lexer(Prolog p, @NotNull String s) throws Exception {
 		this(p, IO.string_to_stream(s));
 	}
 
@@ -80,18 +83,22 @@ class Lexer extends StreamTokenizer {
 		return !inClause;
 	}
 
+	@NotNull
 	protected final PTerm make_const(String s) {
 		return new constToken(prolog, s);
 	}
 
+	@NotNull
 	private final static PTerm make_fun(String s) {
 		return new funToken(s);
 	}
 
+	@NotNull
 	private final static PTerm make_int(double n) {
 		return new intToken((int) n);
 	}
 
+	@NotNull
 	private final static PTerm make_real(double n) {
 		return new realToken(n);
 	}
@@ -105,6 +112,7 @@ class Lexer extends StreamTokenizer {
 		return T;
 	}
 
+	@NotNull
 	private final PTerm make_var(String s) {
 		s = s.intern();
 		Var X;
@@ -270,19 +278,19 @@ class realToken extends Fun {
 }
 
 class constToken extends Fun {
-	public constToken(Prolog prolog, Const c) {
+	public constToken(@NotNull Prolog prolog, Const c) {
 		super("constToken", c);
 
 		args[0] = prolog.toConstBuiltin(c);
 	}
 
-	public constToken(Prolog prolog, String s) {
+	public constToken(@NotNull Prolog prolog, String s) {
 		this(prolog, new Const(s));
 	}
 }
 
 class stringToken extends Fun {
-	public stringToken(constToken c) {
+	public stringToken(@NotNull constToken c) {
 		super("stringToken", (c.args[0]));
 	}
 }
@@ -374,11 +382,11 @@ public class Parser extends Lexer {
 	// super(p,s);
 	// }
 	//
-	public Parser(Prolog p, String s) throws Exception {
+	public Parser(Prolog p, @NotNull String s) throws Exception {
 		super(p, s);
 		this.prolog = p;
 	}
-	public Parser(Prolog p, Reader s) throws Exception {
+	public Parser(Prolog p, @NotNull Reader s) throws Exception {
 		super(p, s);
 		this.prolog = p;
 	}
@@ -386,6 +394,7 @@ public class Parser extends Lexer {
 	 * Main Parser interface: reads a clause together with variable name
 	 * information
 	 */
+	@Nullable
 	public Clause readClause() {
 		Clause t = null;
 		boolean verbose = false;
@@ -412,8 +421,9 @@ public class Parser extends Lexer {
 		return t;
 	}
 
-	static final Clause errorClause(Exception e, String type, int line,
-			boolean verbose) {
+	@NotNull
+	static final Clause errorClause(@NotNull Exception e, String type, int line,
+									boolean verbose) {
 
 		String mes = e.getMessage();
 		if (null == mes)
@@ -428,7 +438,7 @@ public class Parser extends Lexer {
 		return C;
 	}
 
-	static public final boolean isError(Clause C) {
+	static public final boolean isError(@NotNull Clause C) {
 		PTerm H = C.head();
 		return H instanceof Fun && "error".equals(((Fun) H).name)
 				&& H.arity() == 3 && !(((Fun) H).args[0].ref() instanceof Var);
@@ -438,7 +448,7 @@ public class Parser extends Lexer {
 		IO.error("*** " + C);
 	}
 
-	static protected final Clause toClause(PTerm T, HashDict dict) {
+	static protected final Clause toClause(@NotNull PTerm T, HashDict dict) {
 		Clause C = T.toClause(); // adds ...:-true if missing
 		C.dict = dict;
 		return C;
@@ -494,6 +504,7 @@ public class Parser extends Lexer {
 		return C;
 	}
 
+	@Nullable
 	private final PTerm getConjCont(PTerm curr) throws IOException {
 
 		PTerm n = next();
@@ -510,7 +521,8 @@ public class Parser extends Lexer {
 		return t;
 	}
 
-	protected final PTerm getTerm(PTerm n) throws IOException {
+	@Nullable
+	protected final PTerm getTerm(@NotNull PTerm n) throws IOException {
 		PTerm t = n.token();
 		if (n instanceof varToken || n instanceof intToken
 				|| n instanceof realToken || n instanceof constToken) {
@@ -531,11 +543,13 @@ public class Parser extends Lexer {
 		return t;
 	}
 
+	@Nullable
 	protected PTerm getTerm() throws IOException {
 		PTerm n = next();
 		return getTerm(n);
 	}
 
+	@NotNull
 	private final PTerm[] getArgs() throws IOException {
 		PTerm n = next();
 		if (!(n instanceof lparToken))
@@ -563,6 +577,7 @@ public class Parser extends Lexer {
 		}
 	}
 
+	@Nullable
 	private final PTerm getList() throws IOException {
 		PTerm n = next();
 		if (n instanceof rbraToken)
@@ -571,6 +586,7 @@ public class Parser extends Lexer {
 		return getListCont(t);
 	}
 
+	@Nullable
 	private final PTerm getListCont(PTerm curr) throws IOException {
 		// IO.trace("curr: "+curr);
 		PTerm n = next();
@@ -592,13 +608,15 @@ public class Parser extends Lexer {
 		return t;
 	}
 
-	private static final String patchEOFString(String s) {
+	@NotNull
+	private static final String patchEOFString(@NotNull String s) {
 		if (!(s.lastIndexOf('.') >= s.length() - 2))
 			s = s + '.';
 		return s;
 	}
 
-	public static Clause stringToClause(Prolog prolog, String s) {
+	@Nullable
+	public static Clause stringToClause(Prolog prolog, @Nullable String s) {
 		if (null == s)
 			return null;
 		s = patchEOFString(s);

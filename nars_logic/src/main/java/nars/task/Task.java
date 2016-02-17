@@ -321,7 +321,8 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         return term();
     }
 
-    default Concept concept(NAR n) {
+    @Nullable
+    default Concept concept(@NotNull NAR n) {
         return n.concept(concept());
     }
 
@@ -352,6 +353,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         return t.conf();
     }
 
+    @NotNull
     default Task projectTask(long when, long now) {
         Truth adjustedTruth = projectTruth(when, now, false);
         long occ = occurrence();

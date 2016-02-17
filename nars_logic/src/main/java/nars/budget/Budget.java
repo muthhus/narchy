@@ -291,7 +291,8 @@ public abstract class Budget extends BudgetedHandle {
         budget(b.pri(), b.dur(), b.qua());
     }
 
-    public static Ansi.Color budgetSummaryColor(Task tv) {
+    @NotNull
+    public static Ansi.Color budgetSummaryColor(@NotNull Task tv) {
         int s = (int)Math.floor(tv.summary()*5);
         switch (s) {
             case 1: return Ansi.Color.MAGENTA;

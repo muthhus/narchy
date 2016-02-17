@@ -2,6 +2,8 @@ package nars.op.software.prolog.fluents;
 
 import nars.op.software.prolog.io.IO;
 import nars.op.software.prolog.terms.PTerm;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -32,7 +34,7 @@ public class BlackBoard extends HashDict {
 	 * null
 	 */
 	// synchronized
-	private final PTerm pick(String k) {
+	private final PTerm pick(@Nullable String k) {
 		if (k == null) {
 			Iterator e = this.keySet().iterator();
 			if (!e.hasNext())
@@ -51,7 +53,7 @@ public class BlackBoard extends HashDict {
 		return T;
 	}
 
-	private final void addBack(String k, ArrayList V) {
+	private final void addBack(String k, @NotNull ArrayList V) {
 		for (int i = 0, vSize = V.size(); i < vSize; i++) {
 			Object aV = V.get(i);
 			// cannot be here if k==null
@@ -67,7 +69,8 @@ public class BlackBoard extends HashDict {
 	 */
 
 	// synchronized
-	protected final PTerm take(String k, PTerm pattern) {
+	@Nullable
+	protected final PTerm take(String k, @NotNull PTerm pattern) {
 		ArrayList V = new ArrayList();
 		PTerm t;
 		while (true) {
@@ -114,6 +117,7 @@ public class BlackBoard extends HashDict {
 	}
 
 	// synchronized
+	@NotNull
 	public Iterator toEnumeration() {
 		return new BBoardEnumerator(this.keySet().iterator());
 	}
@@ -132,6 +136,7 @@ class BBoardEnumerator implements Iterator {
 		this.EH = EH; // elements();
 	}
 
+	@Nullable
 	private Iterator EQ;
 
 	private final Iterator EH;

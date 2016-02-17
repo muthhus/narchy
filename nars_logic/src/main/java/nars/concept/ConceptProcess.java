@@ -116,6 +116,7 @@ abstract public class ConceptProcess implements Premise {
         return cyclic;
     }
 
+    @NotNull
     @Override
     public String toString() {
         return new StringBuilder().append(
@@ -142,7 +143,8 @@ abstract public class ConceptProcess implements Premise {
      * apply temporal characteristics to a newly derived term according to the premise's
      * @param cp Rule's (effective) Conclusion Term Pattern
      */
-    public final Compound temporalize(Compound derived, Term cp, PremiseMatch p, Derive d) {
+    @NotNull
+    public final Compound temporalize(@NotNull Compound derived, @NotNull Term cp, @NotNull PremiseMatch p, @NotNull Derive d) {
 
 
         Term tp = d.rule.getTaskTermPattern();
@@ -417,7 +419,7 @@ abstract public class ConceptProcess implements Premise {
 
 
     /** part 2 */
-    public void derive(@NotNull Termed<Compound> c, @Nullable Truth truth, Budget budget, long now, long occ, PremiseMatch p, Derive d) {
+    public void derive(@NotNull Termed<Compound> c, @Nullable Truth truth, Budget budget, long now, long occ, @NotNull PremiseMatch p, @NotNull Derive d) {
 
         char punct = p.punct.get();
 
@@ -495,7 +497,7 @@ abstract public class ConceptProcess implements Premise {
     /** after a derivation has completed, commit is called allowing it to process anything collected */
     abstract protected void commit();
 
-    public final void run(PremiseMatch matcher) {
+    public final void run(@NotNull PremiseMatch matcher) {
         matcher.start(this);
         commit();
     }

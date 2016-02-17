@@ -16,11 +16,14 @@
  */
 package nars.op.math;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Count the number of elements in a set
  */
 public class add extends IntIntTo<Integer> {
 
+    @NotNull
     @Override protected Integer function(int a, int b) {
         return a+b;
     }

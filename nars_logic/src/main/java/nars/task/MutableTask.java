@@ -25,7 +25,7 @@ import static nars.Global.reference;
  */
 public class MutableTask extends AbstractTask {
 
-    public MutableTask(Termed<Compound> term) {
+    public MutableTask(@NotNull Termed<Compound> term) {
         /** budget triple - to be valid, at least the first 2 of these must be non-NaN (unless it is a question)  */
         super(term.term(), (char) 0, null,
             /* budget: */ 0, Float.NaN, Float.NaN);
@@ -195,6 +195,7 @@ public class MutableTask extends AbstractTask {
     }
 
 
+    @NotNull
     public final MutableTask parent(@NotNull Task parentTask, @Nullable Task parentBelief) {
         /*if (parentTask == null)
             throw new RuntimeException("parent task being set to null");*/
@@ -242,7 +243,8 @@ public class MutableTask extends AbstractTask {
         return this;
     }
 
-    public final MutableTask parent(Task task) {
+    @NotNull
+    public final MutableTask parent(@NotNull Task task) {
         return parent(task, null);
     }
 
@@ -279,6 +281,7 @@ public class MutableTask extends AbstractTask {
         return this;
     }
 
+    @NotNull
     public MutableTask state(TaskState s) {
         this.state = s;
         return this;

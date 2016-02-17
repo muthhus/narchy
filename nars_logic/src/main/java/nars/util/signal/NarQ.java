@@ -11,6 +11,8 @@ import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Termed;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +34,7 @@ public class NarQ implements Consumer<NAR> {
 
     private final NAR nar;
 
+    @Nullable
     public HaiQ q;
     
     /** master control of strength factor of output activity */
@@ -60,12 +63,13 @@ public class NarQ implements Consumer<NAR> {
         public void addAll(DoubleSupplier... d) {
             Collections.addAll(ins, d);           
         }
-        public void addAll(Collection<? extends DoubleSupplier> d) {
+        public void addAll(@NotNull Collection<? extends DoubleSupplier> d) {
             ins.addAll(d);
         }
         public void clear() { ins.clear(); }
         
-        public float[] get(float[] target) {
+        @Nullable
+        public float[] get(@Nullable float[] target) {
             int s = ins.size();
             if (target == null || target.length!=s)
                 target = new float[s];
@@ -76,6 +80,7 @@ public class NarQ implements Consumer<NAR> {
         }
     }
 
+    @NotNull
     final public Vercept input;
     
     
@@ -88,6 +93,7 @@ public class NarQ implements Consumer<NAR> {
         float ran(); 
     }
 
+    @NotNull
     public static Action NullAction = new Action() {
         private float last;
         
@@ -120,6 +126,7 @@ public class NarQ implements Consumer<NAR> {
             this(n, term, Symbols.GOAL, false);
         }
 
+        @NotNull
         @Override
         public String toString() {
             return ((invert) ? "--" : "") + term.toString() + punct;
@@ -274,8 +281,9 @@ public class NarQ implements Consumer<NAR> {
 
     }
 
-    float[] inputBuffer;
+    @Nullable float[] inputBuffer;
 
+    @Nullable
     private float[] inputs() {
         return (this.inputBuffer = input.get(this.inputBuffer));
     }
@@ -293,11 +301,11 @@ public class NarQ implements Consumer<NAR> {
 //        return motivation(nar, x, ifNonExists, beliefOrDesire, dt);
 //    }
 
-    public static float motivation(NAR nar, Termed x, float ifNonExists, boolean beliefOrDesire, int dt) {
+    public static float motivation(@NotNull NAR nar, Termed x, float ifNonExists, boolean beliefOrDesire, int dt) {
         return NarQ.motivation(nar, nar.concept(x), ifNonExists, beliefOrDesire, dt);
     }
 
-    public static float motivation(NAR n, Concept cx, float ifNonExists, boolean beliefOrDesire, int dt) {
+    public static float motivation(@NotNull NAR n, @Nullable Concept cx, float ifNonExists, boolean beliefOrDesire, int dt) {
         //TODO this an be optimized
 
         float v = ifNonExists;
@@ -328,7 +336,7 @@ public class NarQ implements Consumer<NAR> {
     /** positive expectation mapped to a -1,+1 range */
     public static class BeliefReward extends BeliefSensor {
 
-        public BeliefReward(NAR nar, String term) {
+        public BeliefReward(@NotNull NAR nar, @NotNull String term) {
             this(nar, (Termed) nar.term(term));
         }
 
@@ -350,7 +358,7 @@ public class NarQ implements Consumer<NAR> {
     /** negative motivation mapped to a -1,+1 range */
     public static class NotBeliefReward extends BeliefReward {
 
-        public NotBeliefReward(NAR nar, String term) {
+        public NotBeliefReward(@NotNull NAR nar, @NotNull String term) {
             super(nar, term);
         }
 

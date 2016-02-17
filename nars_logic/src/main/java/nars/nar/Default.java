@@ -26,6 +26,7 @@ import nars.util.data.MutableInteger;
 import nars.util.event.Active;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -126,6 +127,7 @@ public class Default extends AbstractNAR {
         return c;
     }
 
+    @Nullable
     public DefaultPremiseGenerator newPremiseGenerator() {
         return new DefaultPremiseGenerator(this, Deriver.getDefaultDeriver());
     }
@@ -452,15 +454,16 @@ public class Default extends AbstractNAR {
         final PremiseMatch matcher;
 
         /** derived tasks with truth confidence lower than this value are discarded. */
+        @NotNull
         @Range(min=0, max=1f)
         public final MutableFloat confMin;
 
-        public DefaultPremiseGenerator(NAR nar, Deriver deriver) {
+        public DefaultPremiseGenerator(@NotNull NAR nar, Deriver deriver) {
             /** the resutls buffer should probably be a Set because the derivations may duplicate */
             this(nar, deriver, Global.newHashSet(64));
         }
 
-        public DefaultPremiseGenerator(NAR nar, Deriver deriver, Collection<Task> resultsBuffer) {
+        public DefaultPremiseGenerator(@NotNull NAR nar, Deriver deriver, Collection<Task> resultsBuffer) {
             super(nar);
             this.matcher = new PremiseMatch(nar.memory.random, deriver);
             this.sharedResultBuffer = resultsBuffer;

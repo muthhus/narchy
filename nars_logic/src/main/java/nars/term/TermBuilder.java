@@ -219,21 +219,21 @@ public interface TermBuilder {
     }
 
     @Nullable
-    default Term newTerm(@NotNull Compound csrc, TermContainer subs) {
+    default Term newTerm(@NotNull Compound csrc, @NotNull TermContainer subs) {
         if (csrc.subterms().equals(subs))
             return csrc;
         return newTerm(csrc.op(), csrc.relation(), csrc.t(), subs);
     }
 
     @Nullable
-    default Term newTerm(@NotNull Op op, TermContainer subs) {
+    default Term newTerm(@NotNull Op op, @NotNull TermContainer subs) {
         return newTerm(op, -1, subs);
     }
 
 
 
     @Nullable
-    default Term newTerm(@NotNull Op op, int relation, TermContainer tt) {
+    default Term newTerm(@NotNull Op op, int relation, @NotNull TermContainer tt) {
         return newTerm(op, relation, ITERNAL, tt);
     }
 
@@ -366,11 +366,13 @@ public interface TermBuilder {
             this.args = args;
         }
 
+        @NotNull
         @Override
         public String getMessage() {
             return toString();
         }
 
+        @NotNull
         @Override
         public String toString() {
             return "InvalidTermConstruction{" +
@@ -396,6 +398,7 @@ public interface TermBuilder {
         return newTerm(INHERIT, new TermVector(newTerm(SET_EXT, subj), newTerm(SET_INT, pred)));
     }
 
+    @Nullable
     default Term negation(@NotNull Term t) {
         if (t.op() == NEGATE) {
             // (--,(--,P)) = P
@@ -739,7 +742,7 @@ public interface TermBuilder {
 
 
     @Nullable
-    default Term apply(@NotNull Subst f, Term src) {
+    default Term apply(@NotNull Subst f, @NotNull Term src) {
 
 
         if (src.isCompound()) {
@@ -761,7 +764,7 @@ public interface TermBuilder {
 
     /** resolve the this term according to subst by appending to sub.
      * return false if this term fails the substitution */
-    default void apply(Term src, @NotNull Subst f, @NotNull Collection<Term> sub) {
+    default void apply(@NotNull Term src, @NotNull Subst f, @NotNull Collection<Term> sub) {
         Term u = apply(f, src);
         if (u == null) {
             u = src;

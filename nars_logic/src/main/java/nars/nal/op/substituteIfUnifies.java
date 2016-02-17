@@ -29,10 +29,12 @@ public final class substituteIfUnifies extends substitute {
     private final static class OneMatchFindSubst extends FindSubst {
 
         private final Term xterm;
+        @NotNull
         private final PremiseMatch r;
+        @Nullable
         private Term result;
 
-        public OneMatchFindSubst(Term op, PremiseMatch r, Term xterm) {
+        public OneMatchFindSubst(@NotNull Term op, @NotNull PremiseMatch r, Term xterm) {
             super(substitute.getOp(op), r.premise.memory().random, r);
             this.xterm = xterm;
             this.r = r;
@@ -45,7 +47,8 @@ public final class substituteIfUnifies extends substitute {
             return false;
         }
 
-        public Term tryMatch(Term x, Term y) {
+        @Nullable
+        public Term tryMatch(@NotNull Term x, @NotNull Term y) {
             matchAll(x, y, true);
             return result;
         }

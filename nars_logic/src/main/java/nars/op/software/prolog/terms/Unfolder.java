@@ -2,6 +2,8 @@ package nars.op.software.prolog.terms;
 
 import nars.op.software.prolog.Prolog;
 import nars.op.software.prolog.io.IO;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 
@@ -19,8 +21,10 @@ import java.util.Iterator;
 public class Unfolder extends Source {
 	private int oldtop;
 
+	@Nullable
 	private Iterator e;
 
+	@Nullable
 	private Clause goal;
 
 	private final Prog prog;
@@ -30,7 +34,7 @@ public class Unfolder extends Source {
 	 * p. Iterator e is set to range over matching clauses in the database of
 	 * program p.
 	 */
-	public Unfolder(Prolog prolog, Clause g, Prog p) {
+	public Unfolder(@NotNull Prolog prolog, @NotNull Clause g, Prog p) {
 		super(p);
 		this.goal = g;
 		this.prog = p;
@@ -61,7 +65,7 @@ public class Unfolder extends Source {
 	/**
 	 * Extracts an answer at the end of an AND-derivation
 	 */
-	Clause getAnswer() {
+	@Nullable Clause getAnswer() {
 		if (null != goal && goal.body() instanceof true_)
 			return goal.ccopy();
 		else
@@ -121,6 +125,7 @@ public class Unfolder extends Source {
 	 * Returns a new clause by unfolding the goal with a matching clause in the
 	 * database, or null if no such clause exists.
 	 */
+	@Nullable
 	public Clause getElement() {
 		if (null == e)
 			return null;
@@ -152,7 +157,7 @@ public class Unfolder extends Source {
 	/**
 	 * Tracer on entering g
 	 */
-	static void trace_goal(Clause g) {
+	static void trace_goal(@NotNull Clause g) {
 		switch (Prog.tracing) {
 			case 2 :
 				IO.println(">>>: " + g.getFirst());
@@ -166,7 +171,7 @@ public class Unfolder extends Source {
 	/**
 	 * Tracer on exiting g
 	 */
-	static void trace_failing(Clause g) {
+	static void trace_failing(@NotNull Clause g) {
 		switch (Prog.tracing) {
 			case 2 :
 				IO.println("FAILING CALL IN<<<: " + g.getFirst());
@@ -180,7 +185,7 @@ public class Unfolder extends Source {
 	/**
 	 * Tracer for undefined predicates
 	 */
-	static void trace_nomatch(PTerm first) {
+	static void trace_nomatch(@NotNull PTerm first) {
 		if (Prog.tracing > 0) {
 			IO.println("*** UNDEFINED CALL: " + first.pprint());
 		}
@@ -190,6 +195,7 @@ public class Unfolder extends Source {
 	 * Returns a string representation of this unfolder, based on the original
 	 * clause it is based on.
 	 */
+	@NotNull
 	public String toString() {
 		return (null == goal) ? "{Unfolder}" : "{Unfolder=> " + goal.pprint()
 				+ '}';

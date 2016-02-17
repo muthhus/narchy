@@ -5,6 +5,7 @@ import nars.term.Compound;
 import nars.term.SubtermVisitor;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.function.Predicate;
@@ -20,14 +21,15 @@ public abstract class Nonvar extends PTerm {
 		super(id);
 	}
 
-	boolean bind_to(PTerm that, Trail trail) {
+	boolean bind_to(@NotNull PTerm that, Trail trail) {
 		return getClass() == that.getClass();
 	}
 
-	boolean unify_to(PTerm that, Trail trail) {
+	boolean unify_to(@NotNull PTerm that, Trail trail) {
 		return bind_to(that, trail) || that.bind_to(this, trail);
 	}
 
+	@NotNull
 	@Override
 	public final PTerm ref() {
 		return this;
@@ -40,6 +42,7 @@ public abstract class Nonvar extends PTerm {
 	// return new Cons(this,Const.aNil);
 	// }
 
+	@Nullable
 	@Override
 	public Op op() {
 		return null;
@@ -122,6 +125,7 @@ public abstract class Nonvar extends PTerm {
 		return null;
 	}
 
+	@Nullable
 	@Override
 	public String toString(boolean pretty) {
 		return null;

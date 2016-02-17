@@ -1,6 +1,7 @@
 package nars.op.software.prolog.fluents;
 
 import nars.op.software.prolog.io.IO;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -28,7 +29,7 @@ public class Queue implements Cloneable {
 		this(0);
 	}
 
-	public Queue(ArrayList V) {
+	public Queue(@NotNull ArrayList V) {
 		this(V.size() + MIN_QUEUE);
 		for (int i = 0; i < V.size(); i++) {
 			enq(V.get(i));
@@ -120,6 +121,7 @@ public class Queue implements Cloneable {
 	}
 
 	// synchronized
+	@NotNull
 	public ArrayList toVector() {
 		// enterCritical(); DEADLOCKS!
 		ArrayList v = new ArrayList();
@@ -129,10 +131,12 @@ public class Queue implements Cloneable {
 		return v;
 	}
 
+	@NotNull
 	public Iterator toEnumeration() {
 		return toVector().iterator();
 	}
 
+	@NotNull
 	public String toString() {
 		return count() + "/" + queue.length + "=>" + toVector().toString();
 	}

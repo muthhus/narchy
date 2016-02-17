@@ -1,5 +1,7 @@
 package nars.op.software.prolog.terms;
 
+import org.jetbrains.annotations.Nullable;
+
 abstract public class Sink extends Fluent {
 
 	public Sink(Prog p) {
@@ -8,6 +10,7 @@ abstract public class Sink extends Fluent {
 
 	abstract public int putElement(PTerm T);
 
+	@Nullable
 	public PTerm collect() {
 		return null;
 	}

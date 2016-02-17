@@ -1,6 +1,7 @@
 package nars.op.software.prolog.io;
 
 import nars.op.software.prolog.terms.*;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Maps a Term to an Source for iterating over its arguments
@@ -12,10 +13,12 @@ public class TermSource extends Source {
 		pos = 0;
 	}
 
+	@Nullable
 	private Nonvar val;
 
 	private int pos;
 
+	@Nullable
 	public PTerm getElement() {
 		PTerm X;
 		if (null == val)

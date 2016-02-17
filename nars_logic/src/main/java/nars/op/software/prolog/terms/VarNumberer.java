@@ -1,6 +1,7 @@
 package nars.op.software.prolog.terms;
 
 import nars.Global;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
@@ -13,6 +14,7 @@ import java.util.Map;
  */
 class VarNumberer extends SystemObject {
 
+	@NotNull
 	final Map<PTerm,PseudoVar> dict;
 
 	int ctr;

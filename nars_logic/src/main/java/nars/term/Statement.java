@@ -81,9 +81,11 @@ public interface Statement {
         return t.op().isStatement();
     }
 
+    @Nullable
     static Term subj(@NotNull Termed t) {
         return ((TermContainer)t.term()).term(0);
     }
+    @Nullable
     static Term pred(@NotNull Termed t) {
         return ((TermContainer)t.term()).term(1);
     }

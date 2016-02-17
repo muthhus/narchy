@@ -2,6 +2,7 @@ package nars.op.software.prolog.terms;
 
 import nars.op.software.prolog.Prolog;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Basic toplevel Prolog Engine. Loads and executes Prolog
@@ -30,15 +31,18 @@ public class Prog extends Source implements Runnable {
 
     // INSTANCE FIELDS
 
+    @Nullable
     private Trail trail;
 
     /**
      * Contains Unfolders that may produce answers.
      */
+    @Nullable
     private Trail orStack;
 
     private final Prog parent;
 
+    @Nullable
     public final Trail getTrail() {
         return trail;
     }
@@ -58,6 +62,7 @@ public class Prog extends Source implements Runnable {
      * It consists of a chain of "unfolding" steps, possibly
      * involving backtracking, which is managed by the OrStack.
      */
+    @Nullable
     public PTerm getElement() {
         Trail stack = this.orStack;
 
@@ -106,6 +111,7 @@ public class Prog extends Source implements Runnable {
      * Computes a copy of the first solution X of Goal G.
      */
 
+    @Nullable
     public static PTerm firstSolution(Prolog prolog, PTerm X, PTerm G) {
         Prog p = new Prog(prolog, new Clause(X, G), null);
         PTerm a = ask_engine(p);
@@ -121,7 +127,8 @@ public class Prog extends Source implements Runnable {
      * asks a logic engine to return a solution
      */
 
-    static public PTerm ask_engine(Prog p) {
+    @Nullable
+    static public PTerm ask_engine(@NotNull Prog p) {
         return p.getElement();
     }
 

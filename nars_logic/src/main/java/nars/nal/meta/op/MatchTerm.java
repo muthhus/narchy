@@ -36,7 +36,7 @@ abstract public class MatchTerm extends AtomicBooleanCondition<PremiseMatch> imp
     @Nullable
     private PremiseMatchFork onMatch = null;
 
-    public MatchTerm(Term id, Term pattern, @Nullable ImmutableMap<Term, MatchConstraint> constraints) {
+    public MatchTerm(@NotNull Term id, Term pattern, @Nullable ImmutableMap<Term, MatchConstraint> constraints) {
         this.id = id;
 
         this.x = pattern;
@@ -44,7 +44,7 @@ abstract public class MatchTerm extends AtomicBooleanCondition<PremiseMatch> imp
     }
 
 
-    @NotNull static private Term id(Term pattern, @Nullable ImmutableMap<Term, MatchConstraint> constraints) {
+    @NotNull static private Term id(@NotNull Term pattern, @Nullable ImmutableMap<Term, MatchConstraint> constraints) {
         return (constraints == null) ?
                 //no constraints
                 pattern :
@@ -55,7 +55,7 @@ abstract public class MatchTerm extends AtomicBooleanCondition<PremiseMatch> imp
 
     public static final class MatchTaskBeliefPair extends MatchTerm {
 
-        public MatchTaskBeliefPair(TaskBeliefPair x, @Nullable ImmutableMap<Term, MatchConstraint> constraints) {
+        public MatchTaskBeliefPair(@NotNull TaskBeliefPair x, @Nullable ImmutableMap<Term, MatchConstraint> constraints) {
             super(id(x, constraints), x, constraints);
         }
 
@@ -71,9 +71,10 @@ abstract public class MatchTerm extends AtomicBooleanCondition<PremiseMatch> imp
         /** either 0 (task) or 1 (belief) */
         private final int subterm;
 
+        @Nullable
         private final MatchOneSubterm callback;
 
-        public MatchOneSubterm(Term x, @Nullable ImmutableMap<Term, MatchConstraint> constraints, int subterm, boolean finish) {
+        public MatchOneSubterm(@NotNull Term x, @Nullable ImmutableMap<Term, MatchConstraint> constraints, int subterm, boolean finish) {
             super(
                 (subterm == 0 ?
                         $.p(id(x,constraints), Op.Imdex) :

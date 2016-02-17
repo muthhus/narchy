@@ -11,6 +11,7 @@ import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.transform.subst.FindSubst;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 abstract public class PatternCompound extends GenericCompound {
 
@@ -23,6 +24,7 @@ abstract public class PatternCompound extends GenericCompound {
 
     protected static final class PatternCompoundContainingEllipsis extends PatternCompound {
 
+        @Nullable
         protected final Ellipsis ellipsis;
         private final boolean ellipsisTransform;
 
@@ -33,6 +35,7 @@ abstract public class PatternCompound extends GenericCompound {
             this.ellipsisTransform = hasEllipsisTransform(this);
         }
 
+        @Nullable
         @Override
         public Ellipsis firstEllipsis() {
             return ellipsis;
@@ -102,11 +105,13 @@ abstract public class PatternCompound extends GenericCompound {
 
     }
 
-    public static PatternCompound make(Compound seed) {
+    @NotNull
+    public static PatternCompound make(@NotNull Compound seed) {
         return make(seed, (TermVector)seed.subterms());
     }
 
-    public static PatternCompound make(Compound seed, TermVector v) {
+    @NotNull
+    public static PatternCompound make(@NotNull Compound seed, @NotNull TermVector v) {
         if (seed.firstEllipsis()!=null) {
             return new PatternCompoundContainingEllipsis(seed, v);
         } else {

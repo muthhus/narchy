@@ -68,7 +68,8 @@ public abstract class TermFunction<O> extends SyncOperator {
     public abstract O function(Compound x, TermBuilder i);
 
 
-    protected MutableTask result(Execution e, Term y/*, Term[] x0, Term lastTerm*/) {
+    @Nullable
+    protected MutableTask result(@NotNull Execution e, Term y/*, Term[] x0, Term lastTerm*/) {
         return Execution.result(e.nar, e.task, y, getResultTense());
     }
 
@@ -154,7 +155,7 @@ public abstract class TermFunction<O> extends SyncOperator {
         }
     }
 
-    protected void feedback(Execution e, Object y) {
+    protected void feedback(@NotNull Execution e, @Nullable Object y) {
 
         if (y == null || (y instanceof Term)) {
             e.feedback( result(e, (Term) y) );
@@ -230,7 +231,7 @@ public abstract class TermFunction<O> extends SyncOperator {
         return a.equals(b) ? 1.0f : 0.0f;
     }
 
-    private boolean validArgs(Compound args) {
+    private boolean validArgs(@NotNull Compound args) {
         //TODO filtering
         return args.last().op() == Op.VAR_DEP;
     }

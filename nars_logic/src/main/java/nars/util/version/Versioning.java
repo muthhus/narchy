@@ -3,13 +3,14 @@ package nars.util.version;
 import nars.util.data.DequePool;
 import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
 /** versioning context that holds versioned instances */
 public class Versioning extends FasterList<Versioned> {
 
-    public Versioning(int capacity, Versioning toSharePool) {
+    public Versioning(int capacity, @Nullable Versioning toSharePool) {
         super(0, new Versioned[capacity]);
         if (toSharePool != null) {
             this.valueStackPool = toSharePool.valueStackPool;

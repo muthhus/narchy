@@ -4,6 +4,8 @@ import nars.op.software.prolog.terms.Int;
 import nars.op.software.prolog.terms.Prog;
 import nars.op.software.prolog.terms.Source;
 import nars.op.software.prolog.terms.PTerm;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * creates a source of integers based on x=a*x+b formula
@@ -26,6 +28,7 @@ public class IntegerSource extends Source {
 
 	private long x;
 
+	@Nullable
 	public PTerm getElement() {
 		if (fuel <= 0)
 			return null;
@@ -39,6 +42,7 @@ public class IntegerSource extends Source {
 		fuel = 0;
 	}
 
+	@NotNull
 	public String toString() {
 		return "{(x->" + a + "*x+" + b + ")[" + fuel + "]=" + x + '}';
 	}

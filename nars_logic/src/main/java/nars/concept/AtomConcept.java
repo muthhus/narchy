@@ -87,7 +87,7 @@ public class AtomConcept extends AbstractConcept  {
     public Task processGoal(Task task, NAR nar) {
         throw new RuntimeException(shouldntProcess);
     }
-    @NotNull
+    @Nullable
     @Override
     public Task processQuestion(Task task, NAR nar) {
         throw new RuntimeException(shouldntProcess);
@@ -99,7 +99,7 @@ public class AtomConcept extends AbstractConcept  {
         return processQuestion(task, nar );
     }
 
-    @NotNull
+    @Nullable
     @Override
     public Task process(Task task, NAR nar) {
         throw new RuntimeException(shouldntProcess);
@@ -171,7 +171,7 @@ public class AtomConcept extends AbstractConcept  {
         return 1f;
     }
 
-    private static boolean taskLinkOut(Concept c, Task t) {
+    private static boolean taskLinkOut(@NotNull Concept c, @NotNull Task t) {
 //        return true;
         return !(c.term().equals(t.term()));
     }

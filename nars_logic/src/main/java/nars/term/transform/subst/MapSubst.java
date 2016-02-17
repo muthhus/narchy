@@ -45,7 +45,7 @@ public class MapSubst implements Subst {
         return xy.get(t);
     }
 
-    @Override public void forEach(BiConsumer<? super Term, ? super Term> each) {
+    @Override public void forEach(@NotNull BiConsumer<? super Term, ? super Term> each) {
         if (xy.isEmpty()) return;
         xy.forEach(each);
     }

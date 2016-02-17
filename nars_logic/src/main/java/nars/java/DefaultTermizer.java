@@ -225,6 +225,7 @@ public class DefaultTermizer implements Termizer {
     protected static Term number(Number o) {
         return $.the((Number) o);
     }
+    @NotNull
     public Compound getOperation(@NotNull Method m, Term[] args) {
         return getMethodOperator(m, args);
     }
@@ -294,6 +295,7 @@ public class DefaultTermizer implements Termizer {
         return $.p(termPackage(c.getPackage()), classTerm(c));
     }
 
+    @NotNull
     public static Term termPackage(@NotNull Package p) {
         //TODO cache?
         if (p == null) return $.the("package");

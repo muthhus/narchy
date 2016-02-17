@@ -4,6 +4,8 @@ import nars.op.software.prolog.terms.Int;
 import nars.op.software.prolog.terms.PTerm;
 import nars.op.software.prolog.terms.Prog;
 import nars.op.software.prolog.terms.Sink;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -12,9 +14,10 @@ import java.io.Writer;
  * Writer
  */
 public class CharWriter extends Sink {
+	@Nullable
 	protected Writer writer;
 
-	public CharWriter(String f, Prog p) {
+	public CharWriter(@NotNull String f, Prog p) {
 		super(p);
 		this.writer = IO.toFileWriter(f);
 	}
@@ -24,7 +27,7 @@ public class CharWriter extends Sink {
 		this.writer = IO.output;
 	}
 
-	public int putElement(PTerm t) {
+	public int putElement(@NotNull PTerm t) {
 		if (null == writer)
 			return 0;
 		try {

@@ -56,7 +56,7 @@ public enum Tense  {
 //
 //    }
 
-    public static float solutionQuality(@NotNull Task problem, @NotNull Task solution, Truth projectedTruth, long now) {
+    public static float solutionQuality(@NotNull Task problem, @NotNull Task solution, @NotNull Truth projectedTruth, long now) {
         return !problem.hasQueryVar() ?
                     rankEternalByOriginality(solution) :
                     or(solution.originality(), projectedTruth.expectation() / solution.term().complexity());

@@ -205,6 +205,7 @@ public class Naljects extends DefaultTermizer implements Termizer, MethodHandler
 
     }
 
+    @NotNull
     private Term[] getMethodInvocationTerms(@NotNull Method method, Object instance, Object[] args) {
 
         //TODO handle static methods
@@ -330,7 +331,7 @@ public class Naljects extends DefaultTermizer implements Termizer, MethodHandler
 
     @Nullable
     @Override
-    public final Object invoke(Object obj, @NotNull Method wrapped, @NotNull Method wrapper, Object[] args) throws Throwable {
+    public final Object invoke(@NotNull Object obj, @NotNull Method wrapped, @NotNull Method wrapper, @NotNull Object[] args) throws Throwable {
 
         if (methodExclusions.contains(wrapped.getName()))
             return wrapper.invoke(obj, args);

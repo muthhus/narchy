@@ -22,6 +22,7 @@ public class intToBitSet extends IntTo<Compound> {
 
     public static final int bits = 8;
 
+    @NotNull
     @Override protected Compound function(int a) {
 
         return the(a, this::bit);

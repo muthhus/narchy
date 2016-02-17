@@ -25,8 +25,7 @@ public interface BeliefTable extends TaskTable {
 
     /** main method */
 
-    @NotNull
-    Task add(@NotNull Task input, NAR nar);
+    @Nullable Task add(@NotNull Task input, NAR nar);
 
     /* when does projecting to now not play a role? I guess there is no case,
     //wo we use just one ranker anymore, the normal solution ranker which takes
@@ -207,6 +206,7 @@ public interface BeliefTable extends TaskTable {
 //        return topTruth;
 //    }
 
+    @Nullable
     default Task top(long now) {
         return top(now, now);
     }
@@ -272,7 +272,7 @@ public interface BeliefTable extends TaskTable {
 //
 //    }
 
-    static float relevance(Task t, long time, float ageFactor) {
+    static float relevance(@NotNull Task t, long time, float ageFactor) {
         return relevance(t.occurrence(), time, ageFactor);
     }
 
@@ -312,7 +312,8 @@ public interface BeliefTable extends TaskTable {
 //
 //    }
 
-    static Task stronger(Task a, Task b) {
+    @NotNull
+    static Task stronger(@NotNull Task a, @NotNull Task b) {
         return a.conf() > b.conf() ? a : b;
     }
 
@@ -324,13 +325,14 @@ public interface BeliefTable extends TaskTable {
      * @param ageFactor effectively a ratio for trading off confidence against time
      * @return
      */
-    static float rankTemporalByConfidence(Task t, long time, float ageFactor) {
+    static float rankTemporalByConfidence(@NotNull Task t, long time, float ageFactor) {
         return
             t.conf() * BeliefTable.relevance(t, time, ageFactor)
         ;
     }
 
-    default Task top(NAR n) {
+    @Nullable
+    default Task top(@NotNull NAR n) {
         return top(n.memory.time());
     }
 

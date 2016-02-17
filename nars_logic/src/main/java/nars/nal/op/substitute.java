@@ -56,7 +56,8 @@ public class substitute extends ImmediateTermTransform implements PremiseAware {
 //        return (x2 == null) ? x : x2;
 //    }
 
-    public static final Term resolve(PremiseMatch r, Term x) {
+    @Nullable
+    public static final Term resolve(@NotNull PremiseMatch r, Term x) {
         //TODO make a half resolve that only does xy?
 
         Term ret = r.yx.get(x);

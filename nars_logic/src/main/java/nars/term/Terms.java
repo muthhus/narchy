@@ -34,6 +34,7 @@ public enum Terms {
 
 
     public static final IntFunction<Term[]> TermArrayBuilder = Term[]::new;
+    @NotNull
     public static int[] EmptyIntArray = new int[0];
 
     public static boolean equalSubTermsInRespectToImageAndProduct(@Nullable Term a, @Nullable Term b) {
@@ -405,7 +406,7 @@ public enum Terms {
      * a totally separate meaning for each, and in-between if
      * some intermediate aspect is different (ex: temporal relation dt)
      */
-    public static float termRelevance(Compound a, Compound b) {
+    public static float termRelevance(@NotNull Compound a, @NotNull Compound b) {
         Op aop = a.op();
         if (aop !=b.op()) return 0f;
         if (aop.isTemporal()) {
@@ -437,7 +438,7 @@ public enum Terms {
         return 1f;
     }
 
-    public static Term empty(Op op) {
+    public static Term empty(@NotNull Op op) {
         switch (op) {
             case SET_EXT_OPENER: return EmptySetExt;
             case SET_INT_OPENER: return EmptySetInt;

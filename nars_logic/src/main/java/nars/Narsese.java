@@ -515,7 +515,7 @@ public class Narsese extends BaseParser<Object> {
     }
 
 
-    Rule EmptyCompound(char c, Op op) {
+    Rule EmptyCompound(char c, @NotNull Op op) {
         return sequence(
             s(), c, push(Terms.empty(op))
         );

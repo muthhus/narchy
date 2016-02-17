@@ -124,7 +124,7 @@ public interface Concept extends Termed, Comparable<Termed> {
     @Nullable
     Task processGoal(Task task, NAR nar);
 
-    Task processQuestion(Task task, NAR nar);
+    @Nullable Task processQuestion(Task task, NAR nar);
 
 
 //    /** returns the best belief of the specified types */
@@ -154,7 +154,7 @@ public interface Concept extends Termed, Comparable<Termed> {
 //        return null;
 //    }
 
-    Task processQuest(Task task, NAR nar);
+    @Nullable Task processQuest(Task task, NAR nar);
 
     default void print() {
         print(System.out);

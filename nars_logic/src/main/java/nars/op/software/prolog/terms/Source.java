@@ -1,5 +1,8 @@
 package nars.op.software.prolog.terms;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 
 abstract public class Source extends Fluent {
@@ -8,8 +11,10 @@ abstract public class Source extends Fluent {
 		super(p);
 	}
 
+	@Nullable
 	abstract public PTerm getElement();
 
+	@Nullable
 	public Nonvar toList() {
 		PTerm head = getElement();
 		if (null == head)
@@ -27,6 +32,7 @@ abstract public class Source extends Fluent {
 		return l;
 	}
 
+	@NotNull
 	public PTerm toFun() {
 		ArrayList V = new ArrayList();
 		PTerm X;

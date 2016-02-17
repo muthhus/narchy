@@ -2,6 +2,7 @@ package nars.truth;
 
 import nars.concept.util.BeliefTable;
 import nars.nal.Tense;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 
@@ -32,13 +33,13 @@ public class TruthWave {
         truth = new float[3*cap];
     }
 
-    public TruthWave(BeliefTable b) {
+    public TruthWave(@NotNull BeliefTable b) {
         this(b.size());
         set(b);
     }
 
     /** clears and fills this wave with the data from a table */
-    public void set(BeliefTable b) {
+    public void set(@NotNull BeliefTable b) {
         if (b.isEmpty()) {
             clear();
             return;
@@ -92,7 +93,7 @@ public class TruthWave {
         void onTruth(float f, float c, float occ);
     }
 
-    public final void forEach(TruthWaveVisitor v) {
+    public final void forEach(@NotNull TruthWaveVisitor v) {
         int s = this.size;
         float[] t = this.truth;
         int p = 0;

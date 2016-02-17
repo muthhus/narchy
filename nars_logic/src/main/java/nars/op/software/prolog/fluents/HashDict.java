@@ -1,5 +1,7 @@
 package nars.op.software.prolog.fluents;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.HashMap;
 
 /**
@@ -7,6 +9,7 @@ import java.util.HashMap;
  */
 public class HashDict extends HashMap {
 
+	@NotNull
 	public String name() {
 		return getClass().getName() + hashCode();
 	}

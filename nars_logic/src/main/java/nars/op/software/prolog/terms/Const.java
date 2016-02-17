@@ -1,5 +1,8 @@
 package nars.op.software.prolog.terms;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Objects;
 
 /**
@@ -8,7 +11,8 @@ import java.util.Objects;
 
 public class Const extends Nonvar {
 
-	public final static Nonvar the(PTerm X) {
+	@NotNull
+	public final static Nonvar the(@Nullable PTerm X) {
 		return (null == X) ? PTerm.NO : new Fun("the", X);
 	}
 
@@ -18,7 +22,8 @@ public class Const extends Nonvar {
 		super( s  ); //s.intern();
 	}
 
-	public static String qname(String name) {
+	@NotNull
+	public static String qname(@NotNull String name) {
 		if (0 == name.length())
 			return "''";
 		for (int i = 0; i < name.length(); i++) {
@@ -32,7 +37,7 @@ public class Const extends Nonvar {
 		return qname(name);
 	}
 
-	boolean bind_to(PTerm that, Trail trail) {
+	boolean bind_to(@NotNull PTerm that, Trail trail) {
 		return super.bind_to(that, trail)
 				&& Objects.equals(((Const) that).name, name);
 	}

@@ -3,6 +3,7 @@ package nars.op.meta;
 import nars.data.Range;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Random;
 
@@ -11,11 +12,15 @@ import java.util.Random;
  */
 public class HaiQ {
 
+	@NotNull
 	public final Random rng;
 
+	@NotNull
 	final Hsom som;
 
+	@NotNull
 	final float[][] q; // state x action
+	@NotNull
 	final float[][] et;
 
 	final int actions, nStates;
@@ -180,9 +185,13 @@ public class HaiQ {
 
 	class Hsom {
 
+		@NotNull
 		final float[][][] links;
+		@NotNull
 		final float[] inputs;
+		@NotNull
 		final float[][] coords1;
+		@NotNull
 		final float[][] coords2;
 		// final float[][][] vis;
 		final int numInputs;

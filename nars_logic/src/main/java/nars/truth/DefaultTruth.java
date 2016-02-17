@@ -45,6 +45,7 @@ public class DefaultTruth extends AbstractScalarTruth {
         return factor == 1 ? this : new DefaultTruth(freq, conf() * factor);
     }
 
+    @NotNull
     @Override public final Truth withConf(float newConf) {
         newConf = round(newConf, Global.TRUTH_EPSILON);
         return (conf != newConf) ? new DefaultTruth(freq, newConf) : this;

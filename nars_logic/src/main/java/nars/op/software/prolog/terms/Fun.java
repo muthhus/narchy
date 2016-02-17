@@ -17,6 +17,7 @@ import java.util.function.Consumer;
  */
 public class Fun extends Const implements Compound<PTerm> {
 
+    @Nullable
     public PTerm args[]; //TODO make final
 
     public final int arity() {
@@ -43,6 +44,7 @@ public class Fun extends Const implements Compound<PTerm> {
         args = new PTerm[arity];
     }
 
+    @NotNull
     public static PTerm[] init(int arity) {
         PTerm[] args = new PTerm[arity];
         for (int i = 0; i < arity; i++) {
@@ -63,12 +65,12 @@ public class Fun extends Const implements Compound<PTerm> {
         args[i] = T;
     }*/
 
-    public final int putArg(int i, PTerm T, Prog p) {
+    public final int putArg(int i, PTerm T, @NotNull Prog p) {
         // return getArg(i).unify(T,p.getTrail())?1:0;
         return args[i].unify(T, p.getTrail()) ? 1 : 0;
     }
 
-    public Fun(String s, PTerm... x0) {
+    public Fun(String s, @NotNull PTerm... x0) {
         this(s, x0.length);
         this.args = x0;
     }
@@ -98,6 +100,7 @@ public class Fun extends Const implements Compound<PTerm> {
 //        args[3] = x3;
 //    }
 
+    @NotNull
     protected final String funToString() {
         return qname(name) +
                 ((args == null) ?
@@ -108,7 +111,8 @@ public class Fun extends Const implements Compound<PTerm> {
         return funToString();
     }
 
-    protected static String watchNull(nars.op.software.prolog.terms.PTerm x) {
+    @NotNull
+    protected static String watchNull(@Nullable nars.op.software.prolog.terms.PTerm x) {
         return ((null == x) ? "null" : x.toString());
     }
 
@@ -121,17 +125,17 @@ public class Fun extends Const implements Compound<PTerm> {
         return s.toString();
     }
 
-    boolean bind_to(nars.op.software.prolog.terms.PTerm that, Trail trail) {
+    boolean bind_to(@NotNull nars.op.software.prolog.terms.PTerm that, Trail trail) {
         return /*getClass() == that.getClass() &&*/ name.equals(that.name) && args.length == ((Fun) that).args.length;
     }
 
-    boolean unify_to(nars.op.software.prolog.terms.PTerm that, Trail trail) {
+    boolean unify_to(@NotNull nars.op.software.prolog.terms.PTerm that, Trail trail) {
         return bind_to(that, trail) ?
                 unifyBind((Fun) that, args, trail) :
                 that.bind_to(this, trail);
     }
 
-    static boolean unifyBind(Fun that, nars.op.software.prolog.terms.PTerm[] a, Trail trail) {
+    static boolean unifyBind(Fun that, @NotNull nars.op.software.prolog.terms.PTerm[] a, Trail trail) {
         Fun other = that;
         int len = a.length;
         nars.op.software.prolog.terms.PTerm[] oa = other.args;
@@ -150,6 +154,7 @@ public class Fun extends Const implements Compound<PTerm> {
     // without using reflection - should be probaly faster than
     // reflection classes - to check
 
+    @Nullable
     final public Fun funClone() {
         Fun f = null;
 
@@ -163,12 +168,14 @@ public class Fun extends Const implements Compound<PTerm> {
         return f;
     }
 
+    @Nullable
     final public Fun funClone(nars.op.software.prolog.terms.PTerm[] newArgs) {
         Fun f = funClone();
         f.args = newArgs;
         return f;
     }
 
+    @Nullable
     protected Fun unInitializedClone() {
         Fun f = funClone();
         f.args = new nars.op.software.prolog.terms.PTerm[args.length];
@@ -181,6 +188,7 @@ public class Fun extends Const implements Compound<PTerm> {
 //        return f;
 //    }
 
+    @Nullable
     final nars.op.software.prolog.terms.PTerm reaction(nars.op.software.prolog.terms.PTerm that) {
         // IO.mes("TRACE>> "+name());
 
@@ -193,6 +201,7 @@ public class Fun extends Const implements Compound<PTerm> {
         return funClone(fargs);
     }
 
+    @NotNull
     public Cons listify() {
         Cons l = new Cons(new Const(name), PTerm.NIL);
         Cons curr = l;
@@ -230,11 +239,13 @@ public class Fun extends Const implements Compound<PTerm> {
         return 0;
     }
 
+    @Nullable
     @Override
     public Iterator<PTerm> iterator() {
         return null;
     }
 
+    @Nullable
     @Override
     public PTerm term(int i) {
         return null;
@@ -245,6 +256,7 @@ public class Fun extends Const implements Compound<PTerm> {
 
     }
 
+    @NotNull
     @Override
     public PTerm[] terms() {
         return new PTerm[0];
@@ -255,6 +267,7 @@ public class Fun extends Const implements Compound<PTerm> {
 
     }
 
+    @Nullable
     @Override
     public TermContainer replacing(int subterm, Term replacement) {
         return null;

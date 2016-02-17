@@ -49,10 +49,12 @@ public abstract class AbstractTask extends UnitBudget
     /**
      * Task from which the Task is derived, or null if input
      */
+    @Nullable
     protected transient Reference<Task> parentTask; //should this be transient? we may want a Special kind of Reference that includes at least the parent's Term
     /**
      * Belief from which the Task is derived, or null if derived from a theorem
      */
+    @Nullable
     protected transient Reference<Task> parentBelief;
 
     private transient int hash;
@@ -549,11 +551,13 @@ public abstract class AbstractTask extends UnitBudget
     }
 
 
+    @Nullable
     @Override
     public Reference<Task> getParentTaskRef() {
         return parentTask;
     }
 
+    @Nullable
     @Override
     public Reference<Task> getParentBeliefRef() {
         return parentBelief;

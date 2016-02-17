@@ -213,7 +213,7 @@ public class DefaultConcept extends AtomConcept {
 //        }
     }
 
-    private float updateSuccess(Task inputGoal, float successBefore, Memory memory) {
+    private float updateSuccess(@Nullable Task inputGoal, float successBefore, @NotNull Memory memory) {
         /** update happiness meter on solution  TODO revise */
         float successAfter = getSuccess(memory.time());
 

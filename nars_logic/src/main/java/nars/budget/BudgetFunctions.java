@@ -423,6 +423,7 @@ public final class BudgetFunctions extends UtilityFunctions {
      * @param nal     Reference to the memory
      * @return The budget of the conclusion
      */
+    @Nullable
     public static Budget compoundForward(@NotNull Truth truth, @NotNull Termed content, @NotNull ConceptProcess nal) {
         return compoundForward(new UnitBudget(), truth, content, nal);
     }
@@ -430,7 +431,7 @@ public final class BudgetFunctions extends UtilityFunctions {
     /**
      * tests a budget's validity for a task to be processed by a memory
      */
-    public static boolean valid(Budget budget, Memory m) {
+    public static boolean valid(@NotNull Budget budget, @NotNull Memory m) {
         return //!budget.isDeleted() &&
                 budget.dur() >= m.derivationDurabilityThreshold.floatValue();
     }

@@ -577,7 +577,7 @@ public class Memory extends Param {
     };
 
     /** called when a solution is found */
-    public void onSolve(Task question, Task solution) {
+    public void onSolve(@NotNull Task question, Task solution) {
 
         //TODO use an Answer class which is Runnable, combining that with the Twin info
         if (Global.DEBUG_NON_INPUT_ANSWERED_QUESTIONS || question.isInput()) {

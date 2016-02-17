@@ -3,6 +3,7 @@ package nars.term;
 import nars.Op;
 import nars.nal.meta.match.Ellipsis;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Predicate;
 
@@ -86,7 +87,7 @@ public interface Termlike  {
      * @param v*/
     boolean or(Predicate<? super Term> v);
 
-    Ellipsis firstEllipsis();
+    @Nullable Ellipsis firstEllipsis();
 
     default boolean hasVarPattern() {
         return or(x -> x.op() == Op.VAR_PATTERN);

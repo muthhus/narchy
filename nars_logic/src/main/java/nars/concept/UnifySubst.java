@@ -83,7 +83,7 @@ public abstract class UnifySubst extends FindSubst  {
     abstract protected boolean accept(Term beliefTerm, Term unifiedBeliefTerm);
 
     @Nullable
-    Term applySubstituteAndRenameVariables(Term t, @Nullable Map<Term,Term> subs) {
+    Term applySubstituteAndRenameVariables(@NotNull Term t, @Nullable Map<Term,Term> subs) {
         return (subs == null) || (subs.isEmpty()) ?
                 t /* no change necessary */ :
                 memory.index.apply(new MapSubst(subs), t);

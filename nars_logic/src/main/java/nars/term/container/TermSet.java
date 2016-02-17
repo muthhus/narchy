@@ -45,6 +45,7 @@ public class TermSet<X extends Term> extends TermVector<X> {
         return true;
     }
 
+    @NotNull
     @Override
     public TermVector replacing(int subterm, Term replacement) {
         throw new RuntimeException("n/a for set");

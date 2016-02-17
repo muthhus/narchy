@@ -1,5 +1,7 @@
 package nars.op.software.prolog.terms;
 
+import org.jetbrains.annotations.NotNull;
+
 public class Int extends Num {
 
 	public final long val;
@@ -9,7 +11,7 @@ public class Int extends Num {
 		val = i;
 	}
 
-	boolean bind_to(PTerm that, Trail trail) {
+	boolean bind_to(@NotNull PTerm that, Trail trail) {
 		return super.bind_to(that, trail)
 				&& (val == ((Int) that).val);
 		// unbelievable but true: converting

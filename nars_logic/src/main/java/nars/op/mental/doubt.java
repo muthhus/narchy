@@ -29,6 +29,7 @@ import nars.nal.nal8.Execution;
 import nars.nal.nal8.operator.SyncOperator;
 import nars.task.Task;
 import nars.term.Term;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -43,7 +44,7 @@ public class doubt extends SyncOperator {
      * @return Immediate results as Tasks
      */
     @Override
-    public void execute(Execution execution) {
+    public void execute(@NotNull Execution execution) {
 
         execution.nar.runLater(()->{
             Task operation = execution.task;
@@ -62,7 +63,7 @@ public class doubt extends SyncOperator {
 
     }
 
-    public static void discountBeliefConfidence(Concept concept, char punc, float confMultiplied /* < 1.0 */, NAR nar) {
+    public static void discountBeliefConfidence(@NotNull Concept concept, char punc, float confMultiplied /* < 1.0 */, NAR nar) {
         BeliefTable table;
         switch (punc) {
             case Symbols.BELIEF:

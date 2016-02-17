@@ -2,6 +2,8 @@ package nars.op.software.prolog.terms;
 
 import nars.Global;
 import nars.op.software.prolog.io.IO;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -19,6 +21,7 @@ public class Copier extends SystemObject {
 	 * speeded up through specialization.
 	 */
 	final static Const anAnswer = new Const("answer");
+	@NotNull
 	private final Map<PTerm,Var> dict;
 
 	final static String COPIER_PREFIX = "c";
@@ -34,6 +37,7 @@ public class Copier extends SystemObject {
 	// return that.reaction(this);
 	// }
 
+	@Nullable
 	public static ArrayList ConsToVector(Nonvar Xs) {
 		ArrayList V = new ArrayList();
 		PTerm t = Xs;
@@ -61,7 +65,8 @@ public class Copier extends SystemObject {
 	 * Represents a list [f,a1...,an] as f(a1,...,an)
 	 */
 
-	static Fun VectorToFun(ArrayList V) {
+	@NotNull
+	static Fun VectorToFun(@NotNull ArrayList V) {
 		Const f = (Const) V.get(0);
 		int arity = V.size() - 1;
 		Fun T = new Fun(f.name, arity);
@@ -91,7 +96,7 @@ public class Copier extends SystemObject {
 
         return place;
     }
-	PTerm getMyVars(PTerm that) {
+	@NotNull PTerm getMyVars(@NotNull PTerm that) {
 		/* Term */
 		that.reaction(this);
 

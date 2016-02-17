@@ -185,7 +185,7 @@ public class MethodOperator  {
 
     }
 
-    static void setCurrentTask(Task m) {
+    static void setCurrentTask(@Nullable Task m) {
         Task ct = currentTask.get();
 
         if (m == ct) return;

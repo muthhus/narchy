@@ -52,7 +52,7 @@ public class RuleTest extends TestNAR {
 				minConf, maxConf);
 
 	}
-	public RuleTest(@NotNull NAR nar, Task task, Task belief, String result,
+	public RuleTest(@NotNull NAR nar, @NotNull Task task, @NotNull Task belief, String result,
 					float minFreq, float maxFreq, float minConf, float maxConf) {
 		super(nar);
 

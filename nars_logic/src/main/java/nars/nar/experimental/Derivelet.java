@@ -40,7 +40,7 @@ public class Derivelet {
      */
     public DeriveletContext context;
 
-    PremiseMatch matcher;
+    @Nullable PremiseMatch matcher;
 
 
     @NotNull

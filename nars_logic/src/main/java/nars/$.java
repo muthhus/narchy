@@ -432,7 +432,8 @@ public enum $  {
 
         logEncoder = new PatternLayoutEncoder();
         logEncoder.setContext(loggerContext);
-        logEncoder.setPattern("\\( %highlight(%level),%green(%thread),%yellow(%logger{0}) \\): \"%message\".%n");
+        //logEncoder.setPattern("\\( %highlight(%level),%green(%thread),%yellow(%logger{0}) \\): \"%message\".%n");
+        logEncoder.setPattern("\\( %green(%thread),%yellow(%logger{0}) \\): \"%message\".%n");
         logEncoder.start();
 
 
@@ -506,12 +507,12 @@ public enum $  {
     }
 
     @Nullable
-    public static Term the(@NotNull Op op, int relation, TermContainer subterms) {
+    public static Term the(@NotNull Op op, int relation, @NotNull TermContainer subterms) {
         return the(op, relation, Tense.ITERNAL, subterms);
     }
 
     @Nullable
-    public static Term the(@NotNull Op op, int relation, int t, TermContainer subterms) {
+    public static Term the(@NotNull Op op, int relation, int t, @NotNull TermContainer subterms) {
         return terms.newTerm(op, relation, t, subterms);
     }
 
@@ -550,7 +551,7 @@ public enum $  {
 
 
     /** create a literal atom from a class (it's name) */
-    public static Atom the(Class c) {
+    public static Atom the(@NotNull Class c) {
         return $.the(c.getName());
     }
 
@@ -652,7 +653,8 @@ public enum $  {
         //  }
     }
 
-    public static Term inhImageExt(@NotNull Compound operation, @Nullable Term y, Compound x) {
+    @Nullable
+    public static Term inhImageExt(@NotNull Compound operation, @Nullable Term y, @NotNull Compound x) {
         return inh(
                 y,
                 imageExt(x, operation.term(1), x.size() - 1 /* position of the variable */)

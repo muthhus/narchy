@@ -36,7 +36,7 @@ public abstract class AbstractTruth<T> implements MetaTruth<T> {
                ((that instanceof Truth) && equalsTruth((Truth)that));
     }
 
-    protected final boolean equalsTruth(Truth t) {
+    protected final boolean equalsTruth(@NotNull Truth t) {
         return equalsConfidence(t) && equalsFrequency(t);
     }
 

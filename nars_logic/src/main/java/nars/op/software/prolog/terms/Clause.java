@@ -5,6 +5,8 @@ package nars.op.software.prolog.terms;
 import nars.op.software.prolog.Prolog;
 import nars.op.software.prolog.io.IO;
 import nars.op.software.prolog.io.Parser;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
@@ -42,6 +44,7 @@ public class Clause extends Fun {
      * it
      */
 
+    @NotNull
     public Clause toGoal() {
         Clause G = new Clause(varsOf(), head());
         G.dict = dict;
@@ -52,7 +55,7 @@ public class Clause extends Fun {
         return G;
     }
 
-    public static Clause goalFromString(Prolog p, String line) {
+    public static Clause goalFromString(Prolog p, @Nullable String line) {
         if (IO.trace())
             IO.trace("read string: <" + line + '>');
 
@@ -82,6 +85,7 @@ public class Clause extends Fun {
     /**
      * Variable dictionary
      */
+    @Nullable
     public Map dict;
 
     /**
@@ -99,7 +103,7 @@ public class Clause extends Fun {
 
     public int ends_at;
 
-    public void setFile(String fname, int begins_at, int ends_at) {
+    public void setFile(@NotNull String fname, int begins_at, int ends_at) {
         this.fname = fname.intern();
         this.begins_at = begins_at;
         this.ends_at = ends_at;
@@ -116,7 +120,8 @@ public class Clause extends Fun {
     /**
      * Prints out a clause as Head:-Body
      */
-    private static String Clause2String(Clause c) {
+    @NotNull
+    private static String Clause2String(@NotNull Clause c) {
         PTerm h = c.head();
         PTerm t = c.body();
         if (t instanceof Conj)
@@ -133,6 +138,7 @@ public class Clause extends Fun {
     /**
      * Pretty prints a clause after replacing ugly variable names
      */
+    @NotNull
     public String pprint() {
         return pprint(false);
     }
@@ -140,6 +146,7 @@ public class Clause extends Fun {
     /**
      * Pretty prints a clause after replacing ugly variable names
      */
+    @NotNull
     public String pprint(boolean replaceAnonymous) {
         String s = Clause2String(this.cnumbervars(replaceAnonymous));
         // if(fname!=null) s="%% "+fname+":"+begins_at+"-"+ends_at+"\n"+s;
@@ -149,6 +156,7 @@ public class Clause extends Fun {
     /**
      * Clause to Term converter: the joy of strong typing:-)
      */
+    @NotNull
     public Clause toClause() { // overrides toClause in Term
         return this;
     }
@@ -158,6 +166,7 @@ public class Clause extends Fun {
      * purposes
      */
     // synchronized
+    @Nullable
     public Clause cnumbervars(boolean replaceAnonymous) {
         Map dd = this.dict;
         if (dd == null)
@@ -186,6 +195,7 @@ public class Clause extends Fun {
      * Converts a clause to a term. Note that Head:-true will convert to the
      * term Head.
      */
+    @NotNull
     public final PTerm toTerm() {
         return (body() instanceof true_) ?
                 head() :
@@ -197,6 +207,7 @@ public class Clause extends Fun {
      * something like f(s(X),Y,X) becomes f(s(X1),Y1,X1)) with X1,Y1 variables
      * garantted not to occurring in the the current resolvant.
      */
+    @Nullable
     final Clause ccopy() {
         if (ground)
             return this;
@@ -242,6 +253,7 @@ public class Clause extends Fun {
      * @see True
      * @see Conj
      */
+    @NotNull
     final PTerm getRest() {
         PTerm body = body();
         return body instanceof Conj ?
@@ -278,7 +290,8 @@ public class Clause extends Fun {
      *
      * @see PTerm#unify()
      */
-    private final Clause unfold(Clause that, Trail trail) {
+    @Nullable
+    private final Clause unfold(@NotNull Clause that, @NotNull Trail trail) {
         Clause result = null;
         PTerm first = getFirst();
 
@@ -295,7 +308,8 @@ public class Clause extends Fun {
     }
 
     // synchronized
-    final Clause unfold_with_goal(Clause goal, Trail trail) {
+    @Nullable
+    final Clause unfold_with_goal(@NotNull Clause goal, @NotNull Trail trail) {
         return goal.unfold(this, trail);
     }
 
@@ -310,6 +324,7 @@ public class Clause extends Fun {
      * Returns a key based on the principal functor of the head of the clause
      * and its arity.
      */
+    @Nullable
     final public String getKey() {
         return head().getKey();
     }

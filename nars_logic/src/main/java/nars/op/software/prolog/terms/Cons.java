@@ -1,5 +1,7 @@
 package nars.op.software.prolog.terms;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * List Constructor. Cooperates with terminator Nil.
  * 
@@ -25,6 +27,7 @@ public class Cons extends Fun {
 	/**
 	 * List printer.
 	 */
+	@NotNull
 	public String toString() {
 		PTerm h = arg(0);
 		PTerm t = arg(1);

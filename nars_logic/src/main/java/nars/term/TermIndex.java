@@ -57,12 +57,12 @@ public interface TermIndex extends TermBuilder {
 
 
     @NotNull
-    static Task spawn(Task parent, @NotNull Compound content, char punctuation, Truth truth, long occ, @NotNull Budget budget) {
+    static Task spawn(@NotNull Task parent, @NotNull Compound content, char punctuation, Truth truth, long occ, @NotNull Budget budget) {
         return spawn(parent, content, punctuation, truth, occ, budget.pri(), budget.dur(), budget.qua());
     }
 
     @NotNull
-    static Task spawn(Task parent, @NotNull Compound content, char punctuation, Truth truth, long occ, float p, float d, float q) {
+    static Task spawn(@NotNull Task parent, @NotNull Compound content, char punctuation, Truth truth, long occ, float p, float d, float q) {
         return new MutableTask(content, punctuation)
                 .truth(truth)
                 .budget(p, d, q)

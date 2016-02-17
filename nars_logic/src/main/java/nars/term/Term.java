@@ -25,6 +25,7 @@ import nars.Op;
 import nars.nal.meta.match.Ellipsis;
 import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 
@@ -41,6 +42,7 @@ public interface Term extends Termed, Comparable, Termlike {
         return this;
     }
 
+    @Nullable
     @Override
     Op op();
 
@@ -144,6 +146,7 @@ public interface Term extends Termed, Comparable, Termlike {
     }
 
     /** returns the first ellipsis subterm or null if not present */
+    @Nullable
     @Override default Ellipsis firstEllipsis() {
         return null;
     }
@@ -175,7 +178,7 @@ public interface Term extends Termed, Comparable, Termlike {
 //        return name().toStringBuilder(pretty);
 //    }
 
-    String toString(boolean pretty);
+    @Nullable String toString(boolean pretty);
 //    default public String toString(boolean pretty) {
 //        return toStringBuilder(pretty).toString();
 //    }

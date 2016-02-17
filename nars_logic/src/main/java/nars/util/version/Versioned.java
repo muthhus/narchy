@@ -3,6 +3,7 @@ package nars.util.version;
 import nars.util.data.list.FasterIntArrayList;
 import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Maintains a versioned snapshot history (stack) of a changing value
@@ -13,7 +14,7 @@ public class Versioned<X> extends FasterIntArrayList /*Comparable<Versioned>*/ {
     @NotNull
     private final Versioning context;
 
-    X current;
+    @Nullable X current;
 
     /**
      * id, unique within the context this has registered with
@@ -77,6 +78,7 @@ public class Versioned<X> extends FasterIntArrayList /*Comparable<Versioned>*/ {
     /**
      * gets the latest value
      */
+    @Nullable
     public final X get() {
         return current;
     }

@@ -38,10 +38,11 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseMatch> {
     public final Term[] pre;
     @NotNull
     public final Term[] code;
+    @NotNull
     public final Term term;
 
 
-    public MatchTaskBelief(@NotNull TaskBeliefPair pattern, ListMultimap<Term, MatchConstraint> constraints) {
+    public MatchTaskBelief(@NotNull TaskBeliefPair pattern, @NotNull ListMultimap<Term, MatchConstraint> constraints) {
 
         //this.pattern = pattern;
         //compiled = new TermPattern(pattern, constraints);
@@ -103,7 +104,7 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseMatch> {
     private static void compile(@NotNull TaskBeliefPair pattern,
                                 @NotNull List<BooleanCondition<PremiseMatch>> pre,
                                 @NotNull List<BooleanCondition<PremiseMatch>> code,
-                                ListMultimap<Term, MatchConstraint> constraints) {
+                                @NotNull ListMultimap<Term, MatchConstraint> constraints) {
 
 
 
@@ -157,7 +158,7 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseMatch> {
 
     private static void compileTaskBelief(
             @NotNull List<BooleanCondition<PremiseMatch>> pre,
-            List<BooleanCondition<PremiseMatch>> code, Term task, Term belief, TaskBeliefPair pattern, ListMultimap<Term, MatchConstraint> constraints) {
+            @NotNull List<BooleanCondition<PremiseMatch>> code, @Nullable Term task, @Nullable Term belief, TaskBeliefPair pattern, @NotNull ListMultimap<Term, MatchConstraint> constraints) {
 
         boolean taskIsPatVar = task!=null && task.op() == Op.VAR_PATTERN;
 
@@ -241,7 +242,7 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseMatch> {
     static final class TaskBeliefEqualCondition extends AtomicBooleanCondition<PremiseMatch> {
 
         @Override
-        public boolean booleanValueOf(PremiseMatch m) {
+        public boolean booleanValueOf(@NotNull PremiseMatch m) {
             Term[] x =  ((Compound)m.term.get()).terms();
             return x[0].equals(x[1]);
         }
@@ -258,6 +259,7 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseMatch> {
      * before even beginning the match. */
     static final class ComponentCondition extends AtomicBooleanCondition<PremiseMatch> {
 
+        @NotNull
         private final String id;
         private final int container, contained;
         private final int[] path;
@@ -273,7 +275,7 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseMatch> {
         }
 
         @Override
-        public boolean booleanValueOf(PremiseMatch m) {
+        public boolean booleanValueOf(@NotNull PremiseMatch m) {
             Term[] x =  ((Compound)m.term.get()).terms();
             Term maybeContainer = x[this.container];
             if (!maybeContainer.isCompound())
@@ -289,6 +291,7 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseMatch> {
         }
 
 
+        @NotNull
         @Override
         public String toString() {
             return id;

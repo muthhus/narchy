@@ -1,5 +1,7 @@
 package nars.op.software.prolog.terms;
 
+import org.jetbrains.annotations.NotNull;
+
 public class Conj extends Cons {
 	public Conj(PTerm x0, PTerm x1) {
 		super(",", x0, x1);
@@ -8,6 +10,7 @@ public class Conj extends Cons {
 		this(x0x1[0], x0x1[1]);
 	}
 
+	@NotNull
 	public String conjToString() {
 		PTerm h = args[0].ref();
 		PTerm t = args[1].ref();
@@ -25,6 +28,7 @@ public class Conj extends Cons {
 		return s.toString();
 	}
 
+	@NotNull
 	public String toString() {
 		return funToString();
 	}

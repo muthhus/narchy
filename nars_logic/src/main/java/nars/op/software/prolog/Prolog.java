@@ -7,6 +7,8 @@ import nars.op.software.prolog.fluents.DataBase;
 import nars.op.software.prolog.io.IO;
 import nars.op.software.prolog.io.Parser;
 import nars.op.software.prolog.terms.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import static nars.op.software.prolog.terms.Prog.firstSolution;
 
@@ -25,10 +27,12 @@ public class Prolog {
 
     public static final String default_lib = "prolog/lib.prolog";
 
+    @NotNull
     public final DataBase db;
 
     public Builtins dict;
 
+    @Nullable
     public Clause goal(String line) {
         return Clause.goalFromString(this, line);
     }
@@ -45,7 +49,7 @@ public class Prolog {
 //    }
 
 
-    public void ask(String goal, BooleanFunction<PTerm> eachAnswer) {
+    public void ask(String goal, @NotNull BooleanFunction<PTerm> eachAnswer) {
         ask(Parser.stringToClause(this, goal), eachAnswer);
     }
 
@@ -54,7 +58,7 @@ public class Prolog {
      *  or a successive answer. a null value means nothing remains
      *  to be reported
      * */
-    public void ask(Clause goal, BooleanFunction<PTerm> eachAnswer) {
+    public void ask(@NotNull Clause goal, @NotNull BooleanFunction<PTerm> eachAnswer) {
         Clause NamedGoal = goal.cnumbervars(false);
         PTerm Names = NamedGoal.head();
         if (!(Names instanceof Fun)) { // no vars in Goal
@@ -88,7 +92,7 @@ public class Prolog {
     /**
      * evalutes a query (old repl version)
      */
-    public void evalIO(Clause goal) {
+    public void evalIO(@NotNull Clause goal) {
         Clause NamedGoal = goal.cnumbervars(false);
         PTerm Names = NamedGoal.head();
         if (!(Names instanceof Fun)) { // no vars in Goal
@@ -138,7 +142,7 @@ public class Prolog {
      * evaluates and times a Goal querying program P
      */
 
-    public void timeGoal(Clause goal) {
+    public void timeGoal(@NotNull Clause goal) {
         long t1 = System.currentTimeMillis();
         try {
             evalIO(goal);
@@ -157,7 +161,7 @@ public class Prolog {
         standardTop("?- ");
     }
 
-    public void standardTop(String prompt) {
+    public void standardTop(@NotNull String prompt) {
         for (; ; ) {
             Clause G = goal(IO.promptln(prompt));
             if (null == G) {
@@ -173,6 +177,7 @@ public class Prolog {
      * first solution of the form "the(Answer)" or the constant
      * "no" if no solution exists
      */
+    @Nullable
     public PTerm ask(PTerm answer, PTerm body) {
         return firstSolution(this, answer, body);
     }
@@ -183,6 +188,7 @@ public class Prolog {
      * Answer is an instance of Goal or the constant
      * "no" if no solution exists
      */
+    @Nullable
     public PTerm ask(PTerm goal) {
         return ask(goal, goal);
     }
@@ -193,11 +199,13 @@ public class Prolog {
      * of the variables or the first solution to the query or "no"
      * if no such solution exists
      */
+    @Nullable
     public PTerm ask(String query) {
         return ask(goal(query).body());
     }
 
-    public Prolog run(String... args) {
+    @Nullable
+    public Prolog run(@Nullable String... args) {
         if (null != args) {
             for (String arg : args) {
                 String result = ask(arg).pprint();
@@ -211,11 +219,13 @@ public class Prolog {
         return this;
     }
 
+    @Nullable
     public PTerm load(String path) {
         return ask("[" + path + "]");
     }
 
-    public Const toConstBuiltin(Const c) {
+    @NotNull
+    public Const toConstBuiltin(@NotNull Const c) {
         //TODO switch
         if (c.name.equals(PTerm.NIL.name))
             return PTerm.NIL;

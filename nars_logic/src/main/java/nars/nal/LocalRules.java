@@ -331,7 +331,8 @@ public enum LocalRules {
 
 
     /** assumes the compounds are the same except for possible numeric metadata differences */
-    public static Termed<Compound> intermpolate(Termed<Compound> a, Termed<Compound> b, float aConf, float bConf) {
+    @NotNull
+    public static Termed<Compound> intermpolate(@NotNull Termed<Compound> a, @NotNull Termed<Compound> b, float aConf, float bConf) {
         if (a.equals(b)) return a;
 
         int at = a.term().t();

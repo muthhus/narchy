@@ -4,12 +4,13 @@ import nars.op.software.prolog.terms.Const;
 import nars.op.software.prolog.terms.Fun;
 import nars.op.software.prolog.terms.PTerm;
 import nars.op.software.prolog.terms.Prog;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Writer
  */
 public class ClauseWriter extends CharWriter {
-	public ClauseWriter(String f, Prog p) {
+	public ClauseWriter(@NotNull String f, Prog p) {
 		super(f, p);
 	}
 

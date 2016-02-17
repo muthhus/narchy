@@ -10,6 +10,7 @@ import nars.util.data.MutableInteger;
 import objenome.Container;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -22,6 +23,7 @@ import static nars.Symbols.GOAL;
 public abstract class Param extends Container implements Level {
 
 
+    @Nullable
     private Truth defaultGoalTruth = null, defaultJudgmentTruth = null;
 
     public final MutableInteger cyclesPerFrame = new MutableInteger(1);

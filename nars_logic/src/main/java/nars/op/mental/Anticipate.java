@@ -191,11 +191,11 @@ public final class Anticipate {
     }
 
 
-    public static boolean tooLate(Task t, long occur, int tolerance) {
+    public static boolean tooLate(@NotNull Task t, long occur, int tolerance) {
         return occur > t.occurrence() + tolerance;
     }
 
-    public static boolean inTime(float incomingFreq, Task existing, long incomingOccurr, int TOLERANCE_DIV) {
+    public static boolean inTime(float incomingFreq, @NotNull Task existing, long incomingOccurr, int TOLERANCE_DIV) {
         long occurrTime= existing.occurrence();
         return
                 Util.equal(incomingFreq, existing.freq(), FREQ_TOLERANCE) &&

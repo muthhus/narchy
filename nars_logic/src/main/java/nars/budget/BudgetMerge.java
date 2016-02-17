@@ -1,6 +1,7 @@
 package nars.budget;
 
 import nars.util.data.Util;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Budget merge function, with input scale factor
@@ -8,7 +9,7 @@ import nars.util.data.Util;
 @FunctionalInterface
 public interface BudgetMerge {
 
-    static void dqBlendByPri(Budget tgt, Budget src, float srcScale, boolean addOrAvgPri) {
+    static void dqBlendByPri(@NotNull Budget tgt, @NotNull Budget src, float srcScale, boolean addOrAvgPri) {
         float incomingPri = src.pri() * srcScale;
 
         float currentPri = tgt.priIfFiniteElseZero();
@@ -21,7 +22,7 @@ public interface BudgetMerge {
                 sumPri :
                 ((cp * currentPri) + ((1f-cp) * incomingPri)), cp);
     }
-    static void dqBlendBySummary(Budget tgt, Budget src, float srcScale, boolean addOrAvgPri) {
+    static void dqBlendBySummary(@NotNull Budget tgt, @NotNull Budget src, float srcScale, boolean addOrAvgPri) {
         float incomingPri = src.pri() * srcScale;
         float incomingSummary = src.summary() * srcScale;
 
@@ -37,7 +38,7 @@ public interface BudgetMerge {
                 ((cp * currentPri) + ((1f-cp) * incomingPri)), cp);
     }
 
-    static void dqBlend(Budget tgt, Budget src, float nextPri, float cp) {
+    static void dqBlend(@NotNull Budget tgt, @NotNull Budget src, float nextPri, float cp) {
         float ip = 1f - cp; // inverse proportion
 
         tgt.budget(nextPri,

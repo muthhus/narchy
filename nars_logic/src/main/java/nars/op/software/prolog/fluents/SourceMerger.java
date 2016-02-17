@@ -1,6 +1,8 @@
 package nars.op.software.prolog.fluents;
 
 import nars.op.software.prolog.terms.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Merges a List of Sources into a new Source which (fairly) iterates over them
@@ -12,8 +14,10 @@ public class SourceMerger extends JavaSource {
 		this.Q = new Queue(Copier.ConsToVector(Xs));
 	}
 
+	@NotNull
 	private final Queue Q;
 
+	@Nullable
 	public PTerm getElement() {
 		if (null == Q)
 			return null;
