@@ -1,4 +1,4 @@
-package nars.util.signal;
+package nars.learn;
 
 import com.gs.collections.api.block.function.primitive.FloatFunction;
 import com.gs.collections.api.block.function.primitive.FloatToFloatFunction;

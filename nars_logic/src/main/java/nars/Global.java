@@ -51,7 +51,7 @@ public enum Global {
 
     //TODO use 'I' for SELf, it is 3 characters shorter
     public static final Atom DEFAULT_SELF = $.the("I");
-    public static float TRUTH_EPSILON = 0.01f;
+    public static final float TRUTH_EPSILON = 0.01f;
 
 
 

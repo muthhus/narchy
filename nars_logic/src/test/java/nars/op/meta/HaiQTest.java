@@ -3,7 +3,7 @@ package nars.op.meta;
 import nars.NAR;
 import nars.java.Naljects;
 import nars.nar.Default;
-import nars.util.signal.NarQ;
+import nars.learn.NarQ;
 import org.junit.Ignore;
 import org.junit.Test;
 

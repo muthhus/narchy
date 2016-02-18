@@ -1,13 +1,13 @@
 package nars.rover.robot;
 
 import nars.Global;
-import nars.op.meta.HaiQ;
+import nars.learn.HaiQ;
 import nars.rover.Sim;
 import nars.rover.physics.gl.JoglAbstractDraw;
 import nars.rover.physics.j2d.LayerDraw;
 import nars.util.data.Util;
 import nars.util.data.list.FasterList;
-import nars.util.signal.NarQ;
+import nars.learn.NarQ;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.Vec2;
@@ -17,6 +17,9 @@ import org.jbox2d.dynamics.joints.RevoluteJoint;
 import org.jbox2d.dynamics.joints.RevoluteJointDef;
 
 import java.util.List;
+import java.util.Random;
+
+import static nars.rover.robot.Turret.rng;
 
 /**
  * Created by me on 2/10/16.
@@ -44,15 +47,27 @@ public class Arm extends Robotic implements LayerDraw {
 
     public static class BoundedMutableFloat extends MutableFloat {
 
+        private final Random rng;
+        private final float noise;
         float min, max;
 
-        public BoundedMutableFloat(float v, float min, float max) {
+        public BoundedMutableFloat(float v, float min, float max, Random rng, float noise) {
             super();
             this.min = min;
             this.max = max;
+            this.rng = rng;
+            this.noise = noise;
             setValue(v);
         }
 
+
+        @Override
+        public float floatValue() {
+            float v = super.floatValue();
+            if (noise!=0)
+                v += rng.nextFloat() * noise;
+            return v;
+        }
 
         @Override
         public void setValue(float value) {
@@ -64,12 +79,14 @@ public class Arm extends Robotic implements LayerDraw {
     /**
      * proportion of the jointRange angle but relative to the attached base's angle
      */
-    public final MutableFloat thetaTarget = new BoundedMutableFloat(0, -1, 1);
+    public final MutableFloat thetaTarget = new BoundedMutableFloat(0,
+            -1, 1,
+            rng, 0);
 
     /**
      * as a proportion of the armspan (0 = root, 1 = armspan radius)
      */
-    public final MutableFloat radiusTarget = new BoundedMutableFloat(0.5f, 0.5f, 1f);
+    public final MutableFloat radiusTarget = new BoundedMutableFloat(0.5f, 0.5f, 1f, rng, 0f);
 
     public final List<NarQ.Action> controls;
 
@@ -100,12 +117,12 @@ public class Arm extends Robotic implements LayerDraw {
                 target polar theta and radius
                 delta x, y of current position to target, both independently normalized to armLength
                 */
-        controller = new HaiQ((segs) + 2 + 2 ,
+        controller = new HaiQ((segs) + 2 ,
                 (2+segs) * 6 /* arbitrary # states */,
                 (segs) * 2 //forward and reverse motor impulse for each joint
                     // TODO: (1+segs) + 1 //segment select (including a position for none), and a direction select
         );
-        controller.setQ(0.25f, 0.5f, 0.7f, 0.1f);
+        controller.setQ(0.25f, 0.1f, 0.5f, 0.2f);
 
         this.input = new float[controller.inputs()];
 
@@ -243,22 +260,18 @@ public class Arm extends Robotic implements LayerDraw {
 
 
         //the polar-specified point relative to the shoulder
-        a.set(segments.getFirst().getWorldCenter());
-
-        float resultAngle = thetaTarget.floatValue() * (jointRange/2) + ang;
-        float rad = Math.max(0f, radiusTarget.floatValue());
+        a.set(base.getWorldCenter());
+        float resultAngle = thetaTarget.floatValue() * (jointRange/2) + base.getAngle() + ang;
+        float rad = radiusTarget.floatValue();
         this.a.x += (float)Math.cos(resultAngle) * rad * armSpan;
         this.a.y += (float)Math.sin(resultAngle) * rad * armSpan;
+        b.set(segments.getLast().getWorldCenter()); //where the end of the arm actually is
+
+        //input[k++] = (b.x - this.a.x) / armSpan;
+        //input[k++] = (b.y - this.a.y) / armSpan;
 
 
-        //where the end of the arm actually is
-        b.set(segments.getLast().getWorldCenter());
-
-        input[k++] = (b.x - this.a.x) / armSpan;
-        input[k++] = (b.y - this.a.y) / armSpan;
-
-
-        float reward = 0.01f + /* bias, tolerance */
+        float reward = 0.1f + /* bias, tolerance */
                 -(b.sub(this.a).length() / (armSpan)); /* maybe circumference of armSpan? */
 
         this.reward = reward; //Util.sigmoid(reward) - 0.5f;

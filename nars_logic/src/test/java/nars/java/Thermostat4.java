@@ -2,7 +2,7 @@ package nars.java;
 
 import nars.concept.Concept;
 import nars.nar.Default;
-import nars.op.meta.HaiQ;
+import nars.learn.HaiQ;
 import nars.task.Task;
 import nars.util.data.UnitVal;
 import nars.util.data.Util;

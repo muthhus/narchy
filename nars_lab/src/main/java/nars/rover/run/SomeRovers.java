@@ -17,10 +17,10 @@ import nars.rover.robot.NARover;
 import nars.rover.world.FoodSpawnWorld1;
 import nars.term.index.MapIndex2;
 import nars.time.SimulatedClock;
-import nars.util.signal.NarQ;
-import nars.util.signal.NarQ.BeliefReward;
-import nars.util.signal.NarQ.InputTask;
-import nars.util.signal.NarQ.NotBeliefReward;
+import nars.learn.NarQ;
+import nars.learn.NarQ.BeliefReward;
+import nars.learn.NarQ.InputTask;
+import nars.learn.NarQ.NotBeliefReward;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jbox2d.common.Vec2;
 import org.jetbrains.annotations.NotNull;
@@ -88,12 +88,12 @@ public class SomeRovers {
 //
 //            game.add(new CarefulRover("r2", nar));
 //        }
-        float fps = 15;
+        float fps = 40;
         game.run(fps);
 
     }
 	public static Default newNAR() {
-        int conceptsFirePerCycle = 16;
+        int conceptsFirePerCycle = 8;
         Default nar = new Default(
                 new Memory(clock, new MapIndex2(
                         new SoftValueHashMap())),
@@ -115,7 +115,6 @@ public class SomeRovers {
         m.DEFAULT_GOAL_PRIORITY = 0.6f;
 //            nar.memory.DEFAULT_GOAL_DURABILITY = 0.7f;
         m.DEFAULT_QUESTION_PRIORITY = 0.4f;
-        Global.TRUTH_EPSILON = 0.02f;
 
 //            nar.memory.DEFAULT_QUESTION_DURABILITY = 0.6f;
         //nar.initNAL9();
@@ -126,7 +125,7 @@ public class SomeRovers {
 
 
         //nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
-        nar.core.activationRate.setValue(0.6f);
+        nar.core.activationRate.setValue(0.8f);
 
 
         m.duration.set(2);
@@ -137,7 +136,7 @@ public class SomeRovers {
         m.shortTermMemoryHistory.set(4);
         m.executionThreshold.setValue(0.0f);
 
-        boolean gui = true;
+        boolean gui = false;
         if (gui) {
             //NARide.loop(nar, false);
 
@@ -201,7 +200,7 @@ public class SomeRovers {
         nqSpine.output.addAll(
                 Stream.of(n.terms(
                         motorStop,
-                        //fire,
+                        fire,
                         motorForward, motorBackward, motorLeft, motorRight))
                 .map(t -> new InputTask(n, t, Symbols.GOAL, false))
                 .collect(Collectors.toList())
@@ -229,22 +228,12 @@ public class SomeRovers {
 //        nqSpine.outs.addAll(al.controls);
 //        nqSpine.outs.addAll(ar.controls);
 
-        NarQ nqArm = new NarQ(n) {
-            //HACK
-            @Override
-            protected boolean validDimensionality(int inputs) {
-                boolean b = super.validDimensionality(inputs);
-                if (q!=null) {
-                    q.Epsilon = 0.2f;//wild
-                    q.Gamma = 0.01f; //immediate rewards more valuable
-                }
-                return b;
-            }
-        };
-        nqArm.power.setValue(0.75f);
 
-        Arm ac = r.addArm("ac", nqArm /* ... */, 0, 0, 0); //pi * 1.5f
+
+        Arm ac = r.addArm("ac", new NarQ(n)/* ... */, 0, 0, 0); //pi * 1.5f
         nqSpine.output.addAll(ac.controls);
+        Arm ad = r.addArm("ad", new NarQ(n)/* ... */, 0, 0, 0); //pi * 1.5f
+        nqSpine.output.addAll(ad.controls);
 
 //        Arm ad = r.addArm("ad", nqArm /* ... */, 0, 0, 0); //pi * 1.5f
 //        nqSpine.output.addAll(ad.controls);

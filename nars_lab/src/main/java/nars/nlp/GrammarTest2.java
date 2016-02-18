@@ -15,9 +15,8 @@ import nars.nar.Default;
 import nars.task.Task;
 import nars.term.Termed;
 import nars.util.data.MutableInteger;
-import nars.util.signal.NarQ;
-import nars.util.signal.NarQ.InputTask;
-import nars.util.signal.NarQ.Vercept;
+import nars.learn.NarQ;
+import nars.learn.NarQ.InputTask;
 import org.apache.commons.lang3.mutable.MutableFloat;
 
 import java.util.ArrayList;

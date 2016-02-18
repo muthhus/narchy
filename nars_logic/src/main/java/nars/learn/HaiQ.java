@@ -1,4 +1,4 @@
-package nars.op.meta;
+package nars.learn;
 
 import nars.data.Range;
 import nars.util.data.random.XorShift128PlusRandom;

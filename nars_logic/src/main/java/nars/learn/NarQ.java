@@ -1,4 +1,4 @@
-package nars.util.signal;
+package nars.learn;
 
 import nars.Global;
 import nars.NAR;
@@ -6,15 +6,12 @@ import nars.Symbols;
 import nars.concept.Concept;
 import nars.concept.util.BeliefTable;
 import nars.data.Range;
-import nars.op.meta.HaiQ;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Termed;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.Collections;
