@@ -63,32 +63,32 @@ public class PrismaticJointDef extends JointDef {
   /**
    * Enable/disable the joint limit.
    */
-  public boolean enableLimit;
+  public final boolean enableLimit;
 
   /**
    * The lower translation limit, usually in meters.
    */
-  public float lowerTranslation;
+  public final float lowerTranslation;
 
   /**
    * The upper translation limit, usually in meters.
    */
-  public float upperTranslation;
+  public final float upperTranslation;
 
   /**
    * Enable/disable the joint motor.
    */
-  public boolean enableMotor;
+  public final boolean enableMotor;
 
   /**
    * The maximum motor torque, usually in N-m.
    */
-  public float maxMotorForce;
+  public final float maxMotorForce;
 
   /**
    * The desired motor speed in radians per second.
    */
-  public float motorSpeed;
+  public final float motorSpeed;
 
   public PrismaticJointDef() {
     super(JointType.PRISMATIC);

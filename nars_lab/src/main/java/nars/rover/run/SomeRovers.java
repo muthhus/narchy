@@ -42,9 +42,8 @@ public class SomeRovers {
 
 	public static final String eatFood = "eat:food";
 	public static final String eatPoison = "eat:poison";
-	public static final String speedLeft = "speed:left";
-	public static final String speedRight = "speed:right";
-	public static final String speedForward = "speed:forward";
+	public static final String speedAngular = "speed:angular";
+	public static final String speedLinear = "speed:forward";
 
 	public static final SimulatedClock clock = new SimulatedClock();
 
@@ -89,16 +88,16 @@ public class SomeRovers {
 //
 //            game.add(new CarefulRover("r2", nar));
 //        }
-        float fps = 30;
+        float fps = 15;
         game.run(fps);
 
     }
 	public static Default newNAR() {
-        int conceptsFirePerCycle = 12;
+        int conceptsFirePerCycle = 16;
         Default nar = new Default(
                 new Memory(clock, new MapIndex2(
                         new SoftValueHashMap())),
-                1000, conceptsFirePerCycle, 2, 3);
+                2000, conceptsFirePerCycle, 3, 6);
 
         //nar.logSummaryGT(System.out, 0.2f);
 //        nar.log(System.out, x -> {
@@ -113,9 +112,11 @@ public class SomeRovers {
         @NotNull Memory m = nar.memory;
         m.DEFAULT_JUDGMENT_PRIORITY = 0.4f;
 //            nar.memory.DEFAULT_JUDGMENT_DURABILITY = 0.35f;
-        m.DEFAULT_GOAL_PRIORITY = 0.5f;
+        m.DEFAULT_GOAL_PRIORITY = 0.6f;
 //            nar.memory.DEFAULT_GOAL_DURABILITY = 0.7f;
         m.DEFAULT_QUESTION_PRIORITY = 0.4f;
+        Global.TRUTH_EPSILON = 0.02f;
+
 //            nar.memory.DEFAULT_QUESTION_DURABILITY = 0.6f;
         //nar.initNAL9();
         m.the(new Anticipate(nar));
@@ -125,15 +126,15 @@ public class SomeRovers {
 
 
         //nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
-        nar.core.activationRate.setValue(0.75f);
-        nar.premiser.confMin.setValue(0.03f);
+        nar.core.activationRate.setValue(0.6f);
+
 
         m.duration.set(2);
         m.conceptForgetDurations.setValue(1f);
-        m.termLinkForgetDurations.setValue(2);
-        m.taskLinkForgetDurations.setValue(4);
-        m.cyclesPerFrame.set(4);
-        m.shortTermMemoryHistory.set(3);
+        m.termLinkForgetDurations.setValue(3);
+        m.taskLinkForgetDurations.setValue(8);
+        m.cyclesPerFrame.set(2);
+        m.shortTermMemoryHistory.set(4);
         m.executionThreshold.setValue(0.0f);
 
         boolean gui = true;
@@ -145,27 +146,26 @@ public class SomeRovers {
 //
 //                    }, new Stage());
 
-                NARfx.newConceptWindow(nar,
-                        //new TilePane(Orientation.VERTICAL),
-                        new VBox(),
-                        "MotorControls(#x,motor,(),#z)",
-                        fire,
-                        motorLeft,
-                        motorRight,
-                        motorForward,
-                        motorBackward,
-                        motorStop
-                );
+//
+//                NARfx.newConceptWindow(nar,
+//                        //new TilePane(Orientation.VERTICAL),
+//                        new VBox(),
+//                        "MotorControls(#x,motor,(),#z)",
+//                        fire,
+//                        motorLeft,
+//                        motorRight,
+//                        motorForward,
+//                        motorBackward,
+//                        motorStop
+//                );
 
                 NARfx.newConceptWindow(nar,
                         //new TilePane(Orientation.VERTICAL),
                         new VBox(),
                         eatFood,
                         eatPoison,
-                        speedLeft,
-                        speedRight,
-                        speedForward
-                //"speed:backward"
+                        speedAngular,
+                        speedLinear
                 );
             });
         }
@@ -188,7 +188,7 @@ public class SomeRovers {
 
 
         nqSpine.input.addAll(nqSpine.getBeliefExpectations(
-                eatFood, eatPoison, speedLeft, speedRight, speedForward
+                eatFood, eatPoison, speedAngular, speedLinear
         ));
 
 
@@ -200,7 +200,9 @@ public class SomeRovers {
 
         nqSpine.output.addAll(
                 Stream.of(n.terms(
-                        motorStop, fire, motorForward, motorBackward, motorLeft, motorRight))
+                        motorStop,
+                        //fire,
+                        motorForward, motorBackward, motorLeft, motorRight))
                 .map(t -> new InputTask(n, t, Symbols.GOAL, false))
                 .collect(Collectors.toList())
         );
@@ -214,7 +216,7 @@ public class SomeRovers {
         float pi = (float) Math.PI;
 
         //nearsight
-        r.addEyeWithMouth("n", nqSpine, r.torso, 7, 3, new Vec2(2.7f,0), 0.4f, 0, 10f, pi / 6f);
+        r.addEyeWithMouth("n", nqSpine, r.torso, 11, 1, new Vec2(2.7f,0), 0.4f, 0, 20f, pi / 6f);
 
         //farsight report http://farsight.org/
         r.addEye("f", nqSpine, r.torso, 3, 4, new Vec2(2.7f,0), 0.6f, 0, 35f,(e) -> {});
@@ -232,12 +234,14 @@ public class SomeRovers {
             @Override
             protected boolean validDimensionality(int inputs) {
                 boolean b = super.validDimensionality(inputs);
-                if (q!=null)
-                    q.Gamma = 0.1f; //immediate rewards more valuable
+                if (q!=null) {
+                    q.Epsilon = 0.2f;//wild
+                    q.Gamma = 0.01f; //immediate rewards more valuable
+                }
                 return b;
             }
         };
-        nqArm.power.setValue(0.55f);
+        nqArm.power.setValue(0.75f);
 
         Arm ac = r.addArm("ac", nqArm /* ... */, 0, 0, 0); //pi * 1.5f
         nqSpine.output.addAll(ac.controls);

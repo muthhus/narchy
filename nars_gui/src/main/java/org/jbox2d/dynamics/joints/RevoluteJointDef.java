@@ -100,12 +100,12 @@ public class RevoluteJointDef extends JointDef {
   /**
    * The desired motor speed. Usually in radians per second.
    */
-  public float motorSpeed;
+  public final float motorSpeed;
 
   /**
    * The maximum motor torque used to achieve the desired motor speed. Usually in N-m.
    */
-  public float maxMotorTorque;
+  public final float maxMotorTorque;
 
   public RevoluteJointDef() {
     super(JointType.REVOLUTE);

@@ -35,15 +35,15 @@ import org.jbox2d.dynamics.contacts.Velocity;
 public class ConstantVolumeJoint extends Joint {
 
   private final Body[] bodies;
-  private float[] targetLengths;
+  private final float[] targetLengths;
   private float targetVolume;
 
-  private Vec2[] normals;
-  private float m_impulse = 0.0f;
+  private final Vec2[] normals;
+  private float m_impulse;
 
-  private World world;
+  private final World world;
 
-  private DistanceJoint[] distanceJoints;
+  private final DistanceJoint[] distanceJoints;
 
   public Body[] getBodies() {
     return bodies;
@@ -102,8 +102,8 @@ public class ConstantVolumeJoint extends Joint {
 
   @Override
   public void destructor() {
-    for (int i = 0; i < distanceJoints.length; ++i) {
-      world.destroyJoint(distanceJoints[i]);
+    for (DistanceJoint distanceJoint : distanceJoints) {
+      world.destroyJoint(distanceJoint);
     }
   }
 

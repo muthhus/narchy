@@ -25,6 +25,7 @@ package org.jbox2d.pooling.arrays;
 
 import java.util.HashMap;
 
+import com.gs.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import org.jbox2d.common.Vec2;
 
 /**
@@ -32,19 +33,17 @@ import org.jbox2d.common.Vec2;
  * @author dmurph
  *
  */
-public class Vec2Array {
-
-	private final HashMap<Integer, Vec2[]> map = new HashMap<Integer, Vec2[]>();
+public class Vec2Array extends IntObjectHashMap<Vec2[]> {
 	
 	public Vec2[] get( int argLength){
-		assert(argLength > 0);
-		
-		if(!map.containsKey(argLength)){
-			map.put(argLength, getInitializedArray(argLength));
-		}
-		
-		assert(map.get(argLength).length == argLength) : "Array not built of correct length";
-		return map.get(argLength);
+		//assert(argLength > 0);
+
+
+		return getIfAbsentPutWithKey(argLength, a->{
+			return getInitializedArray(a);
+		});
+
+		//assert(get(argLength).length == argLength) : "Array not built of correct length";
 	}
 	
 	protected Vec2[] getInitializedArray(int argLength){

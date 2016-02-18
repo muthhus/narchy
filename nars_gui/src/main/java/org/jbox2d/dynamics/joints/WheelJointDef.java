@@ -58,17 +58,17 @@ public class WheelJointDef extends JointDef {
   /**
    * Enable/disable the joint motor.
    */
-  public boolean enableMotor;
+  public final boolean enableMotor;
 
   /**
    * The maximum motor torque, usually in N-m.
    */
-  public float maxMotorTorque;
+  public final float maxMotorTorque;
 
   /**
    * The desired motor speed in radians per second.
    */
-  public float motorSpeed;
+  public final float motorSpeed;
 
   /**
    * Suspension frequency, zero indicates no suspension

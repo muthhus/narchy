@@ -51,9 +51,8 @@ public enum Global {
 
     //TODO use 'I' for SELf, it is 3 characters shorter
     public static final Atom DEFAULT_SELF = $.the("I");
-    public static final float TRUTH_EPSILON = 0.01f;
+    public static float TRUTH_EPSILON = 0.01f;
 
-    public static float EXECUTION_SATISFACTION_TRESHOLD = 0.0f; //decision threshold is enough for now
 
 
 //    public static int UNIFICATION_POWER = 400;
@@ -106,7 +105,7 @@ public enum Global {
     public static float BUDGET_DERIVATION_DURABILITY_THRESHOLD = 0.01f;
 
     /** minimum difference necessary to indicate a significant modification in budget float number components */
-    public static final float BUDGET_PROPAGATION_EPSILON = 0.0001f;
+    public static final float BUDGET_PROPAGATION_EPSILON = 0.001f;
 
 
 //    /* ---------- default input values ---------- */

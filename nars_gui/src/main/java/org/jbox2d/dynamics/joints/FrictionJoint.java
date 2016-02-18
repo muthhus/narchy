@@ -239,43 +239,40 @@ public class FrictionJoint extends Joint {
     }
 
     // Solve linear friction
-    {
-      final Vec2 Cdot = pool.popVec2();
-      final Vec2 temp = pool.popVec2();
+    final Vec2 Cdot = pool.popVec2();
+    final Vec2 temp = pool.popVec2();
 
-      Vec2.crossToOutUnsafe(wA, m_rA, temp);
-      Vec2.crossToOutUnsafe(wB, m_rB, Cdot);
-      Cdot.addLocal(vB).subLocal(vA).subLocal(temp);
+    Vec2.crossToOutUnsafe(wA, m_rA, temp);
+    Vec2.crossToOutUnsafe(wB, m_rB, Cdot);
+    Cdot.addLocal(vB).subLocal(vA).subLocal(temp);
 
-      final Vec2 impulse = pool.popVec2();
-      Mat22.mulToOutUnsafe(m_linearMass, Cdot, impulse);
-      impulse.negateLocal();
+    final Vec2 impulse = pool.popVec2();
+    Mat22.mulToOutUnsafe(m_linearMass, Cdot, impulse);
+    impulse.negateLocal();
 
 
-      final Vec2 oldImpulse = pool.popVec2();
-      oldImpulse.set(m_linearImpulse);
-      m_linearImpulse.addLocal(impulse);
+    final Vec2 oldImpulse = pool.popVec2();
+    oldImpulse.set(m_linearImpulse);
+    m_linearImpulse.addLocal(impulse);
 
-      float maxImpulse = h * m_maxForce;
+    float maxImpulse = h * m_maxForce;
 
-      if (m_linearImpulse.lengthSquared() > maxImpulse * maxImpulse) {
-        m_linearImpulse.normalize();
-        m_linearImpulse.mulLocal(maxImpulse);
-      }
-
-      impulse.set(m_linearImpulse).subLocal(oldImpulse);
-
-      temp.set(impulse).mulLocal(mA);
-      vA.subLocal(temp);
-      wA -= iA * Vec2.cross(m_rA, impulse);
-
-      temp.set(impulse).mulLocal(mB);
-      vB.addLocal(temp);
-      wB += iB * Vec2.cross(m_rB, impulse);
-      
+    if (m_linearImpulse.lengthSquared() > maxImpulse * maxImpulse) {
+      m_linearImpulse.normalize();
+      m_linearImpulse.mulLocal(maxImpulse);
     }
 
-//    data.velocities[m_indexA].v.set(vA);
+    impulse.set(m_linearImpulse).subLocal(oldImpulse);
+
+    temp.set(impulse).mulLocal(mA);
+    vA.subLocal(temp);
+    wA -= iA * Vec2.cross(m_rA, impulse);
+
+    temp.set(impulse).mulLocal(mB);
+    vB.addLocal(temp);
+    wB += iB * Vec2.cross(m_rB, impulse);
+
+    //    data.velocities[m_indexA].v.set(vA);
     if( data.velocities[m_indexA].w != wA) {
       assert(data.velocities[m_indexA].w != wA);
     }

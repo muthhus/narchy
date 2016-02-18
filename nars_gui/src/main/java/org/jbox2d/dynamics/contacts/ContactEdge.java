@@ -37,20 +37,20 @@ public class ContactEdge {
   /**
    * provides quick access to the other body attached.
    */
-  public Body other = null;
+  public Body other;
 
   /**
    * the contact
    */
-  public Contact contact = null;
+  public Contact contact;
 
   /**
    * the previous contact edge in the body's contact list
    */
-  public ContactEdge prev = null;
+  public ContactEdge prev;
 
   /**
    * the next contact edge in the body's contact list
    */
-  public ContactEdge next = null;
+  public ContactEdge next;
 }

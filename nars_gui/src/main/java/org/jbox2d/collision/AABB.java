@@ -311,16 +311,13 @@ public class AABB {
       return false;
     }
 
-    if (a.lowerBound.x - b.upperBound.x > 0.0f || a.lowerBound.y - b.upperBound.y > 0.0f) {
-      return false;
-    }
+    return !(a.lowerBound.x - b.upperBound.x > 0.0f || a.lowerBound.y - b.upperBound.y > 0.0f);
 
-    return true;
   }
 
   @Override
   public final String toString() {
-    final String s = "AABB[" + lowerBound + " . " + upperBound + "]";
+    final String s = "AABB[" + lowerBound + " . " + upperBound + ']';
     return s;
   }
 }

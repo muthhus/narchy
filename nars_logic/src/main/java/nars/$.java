@@ -433,7 +433,7 @@ public enum $  {
         logEncoder = new PatternLayoutEncoder();
         logEncoder.setContext(loggerContext);
         //logEncoder.setPattern("\\( %highlight(%level),%green(%thread),%yellow(%logger{0}) \\): \"%message\".%n");
-        logEncoder.setPattern("\\( %green(%thread),%yellow(%logger{0}) \\): \"%message\".%n");
+        logEncoder.setPattern("\\(%green(%thread),%yellow(%logger{0})\\): \"%message\".%n");
         logEncoder.start();
 
 

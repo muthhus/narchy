@@ -115,7 +115,7 @@ public class PrismaticJoint extends Joint {
   protected final Vec2 m_localAnchorB;
   protected final Vec2 m_localXAxisA;
   protected final Vec2 m_localYAxisA;
-  protected float m_referenceAngle;
+  protected final float m_referenceAngle;
   private final Vec3 m_impulse;
   private float m_motorImpulse;
   private float m_lowerTranslation;
@@ -441,28 +441,26 @@ public class PrismaticJoint extends Joint {
     }
 
     // Prismatic constraint.
-    {
-      Rot.mulToOutUnsafe(qA, m_localYAxisA, m_perp);
+    Rot.mulToOutUnsafe(qA, m_localYAxisA, m_perp);
 
-      temp.set(d).addLocal(rA);
-      m_s1 = Vec2.cross(temp, m_perp);
-      m_s2 = Vec2.cross(rB, m_perp);
+    temp.set(d).addLocal(rA);
+    m_s1 = Vec2.cross(temp, m_perp);
+    m_s2 = Vec2.cross(rB, m_perp);
 
-      float k11 = mA + mB + iA * m_s1 * m_s1 + iB * m_s2 * m_s2;
-      float k12 = iA * m_s1 + iB * m_s2;
-      float k13 = iA * m_s1 * m_a1 + iB * m_s2 * m_a2;
-      float k22 = iA + iB;
-      if (k22 == 0.0f) {
-        // For bodies with fixed rotation.
-        k22 = 1.0f;
-      }
-      float k23 = iA * m_a1 + iB * m_a2;
-      float k33 = mA + mB + iA * m_a1 * m_a1 + iB * m_a2 * m_a2;
-
-      m_K.ex.set(k11, k12, k13);
-      m_K.ey.set(k12, k22, k23);
-      m_K.ez.set(k13, k23, k33);
+    float k11 = mA + mB + iA * m_s1 * m_s1 + iB * m_s2 * m_s2;
+    float k12 = iA * m_s1 + iB * m_s2;
+    float k13 = iA * m_s1 * m_a1 + iB * m_s2 * m_a2;
+    float k22 = iA + iB;
+    if (k22 == 0.0f) {
+      // For bodies with fixed rotation.
+      k22 = 1.0f;
     }
+    float k23 = iA * m_a1 + iB * m_a2;
+    float k33 = mA + mB + iA * m_a1 * m_a1 + iB * m_a2 * m_a2;
+
+    m_K.ex.set(k11, k12, k13);
+    m_K.ey.set(k12, k22, k23);
+    m_K.ez.set(k13, k23, k33);
 
     // Compute motor and limit terms.
     if (m_enableLimit) {

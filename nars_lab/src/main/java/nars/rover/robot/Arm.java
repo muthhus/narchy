@@ -35,6 +35,9 @@ public class Arm extends Robotic implements LayerDraw {
     private final float armSpan;
     private final float jointRange;
 
+    /** base angle, angle relative to base */
+    private final float ang;
+
     private float reward; //current reward value
 
     //private final float wiggle;
@@ -61,12 +64,12 @@ public class Arm extends Robotic implements LayerDraw {
     /**
      * proportion of the jointRange angle but relative to the attached base's angle
      */
-    public final MutableFloat thetaTarget = new BoundedMutableFloat(1, -1, 1);
+    public final MutableFloat thetaTarget = new BoundedMutableFloat(0, -1, 1);
 
     /**
      * as a proportion of the armspan (0 = root, 1 = armspan radius)
      */
-    public final MutableFloat radiusTarget = new BoundedMutableFloat(1, 0, 1.25f);
+    public final MutableFloat radiusTarget = new BoundedMutableFloat(0.5f, 0.5f, 1f);
 
     public final List<NarQ.Action> controls;
 
@@ -76,14 +79,13 @@ public class Arm extends Robotic implements LayerDraw {
         super(((RoboticMaterial) base.getUserData()).clone().getID() + "_" + id);
 
 
+        this.ang = ang;
         this.base = base;
 
         ((JoglAbstractDraw)sim.draw()).addLayer(this);
 
         //Vec2 attachPoint = new Vec2(ax, ay);
 
-        float vx = 1; //(float)Math.cos(a);
-        float vy = 0; ///(float)Math.sin(a);
 
         // NOW, create several duplicates of the "Main Body" fixture
         // but offset them from the previous one by a fixed amount and
@@ -127,7 +129,7 @@ public class Arm extends Robotic implements LayerDraw {
                     dx, thick,
                     pBodyA.getPosition().x + dx, pBodyA.getPosition().y);
 
-            armSpan += dx;
+            armSpan += segLength;
 
             //float tone= (idx/((float)numSegments));
 
@@ -199,7 +201,7 @@ public class Arm extends Robotic implements LayerDraw {
         for (float polarity: new float[] { -1, +1}) {
             this.controls.add(new NarQ.Action() {
 
-                float last = 0; //TODO calculate range bounds to reduce the actual applied strength
+                float last; //TODO calculate range bounds to reduce the actual applied strength
 
                 @Override
                 public void run(float strength) {
@@ -243,7 +245,7 @@ public class Arm extends Robotic implements LayerDraw {
         //the polar-specified point relative to the shoulder
         a.set(segments.getFirst().getWorldCenter());
 
-        float resultAngle = thetaTarget.floatValue() * (jointRange/2);
+        float resultAngle = thetaTarget.floatValue() * (jointRange/2) + ang;
         float rad = Math.max(0f, radiusTarget.floatValue());
         this.a.x += (float)Math.cos(resultAngle) * rad * armSpan;
         this.a.y += (float)Math.sin(resultAngle) * rad * armSpan;
@@ -256,10 +258,11 @@ public class Arm extends Robotic implements LayerDraw {
         input[k++] = (b.y - this.a.y) / armSpan;
 
 
-        float reward = 0.25f + /* bias */
-                -(b.sub(this.a).length() / (armSpan / 2f)); /* maybe circumference of armSpan? */
+        float reward = 0.01f + /* bias, tolerance */
+                -(b.sub(this.a).length() / (armSpan)); /* maybe circumference of armSpan? */
 
-        this.reward = (float)Util.sigmoid(reward) - 0.5f;
+        this.reward = reward; //Util.sigmoid(reward) - 0.5f;
+
         int motor = controller.act(input, reward);
         float direction = (motor % 2 == 0) ? +1f : -1f;
 
@@ -318,7 +321,7 @@ public class Arm extends Robotic implements LayerDraw {
 
         hWorld.set( segments.getLast().getWorldCenter() );
         tWorld.set( base.getWorldCenter() );
-        float resultAngle = thetaTarget.floatValue() * (jointRange/2) + base.getAngle();
+        float resultAngle = thetaTarget.floatValue() * (jointRange/2) + base.getAngle() + ang;
         float rad = radiusTarget.floatValue();
         tWorld.x += (float)Math.cos(resultAngle) * rad * armSpan;
         tWorld.y += (float)Math.sin(resultAngle) * rad * armSpan;

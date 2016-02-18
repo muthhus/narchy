@@ -69,7 +69,7 @@ public class PolygonShape extends Shape {
   private final Vec2 pool2 = new Vec2();
   private final Vec2 pool3 = new Vec2();
   private final Vec2 pool4 = new Vec2();
-  private Transform poolt1 = new Transform();
+  private final Transform poolt1 = new Transform();
 
   public PolygonShape() {
     super(ShapeType.POLYGON);
@@ -676,7 +676,7 @@ public class PolygonShape extends Shape {
 
   /** Get the centroid and apply the supplied transform. */
   public Vec2 centroidToOut(final Transform xf, final Vec2 out) {
-    Transform.mulToOutUnsafe(xf, m_centroid, out);
+    Transform.mulToOut(xf, m_centroid, out);
     return out;
   }
 }

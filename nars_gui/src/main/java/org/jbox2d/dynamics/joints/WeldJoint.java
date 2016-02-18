@@ -64,7 +64,7 @@ public class WeldJoint extends Joint {
   // Solver shared
   private final Vec2 m_localAnchorA;
   private final Vec2 m_localAnchorB;
-  private float m_referenceAngle;
+  private final float m_referenceAngle;
   private float m_gamma;
   private final Vec3 m_impulse;
 

@@ -54,7 +54,7 @@ public class DynamicTree implements BroadPhaseStrategy {
 
   private final Vec2[] drawVecs = new Vec2[4];
   private DynamicTreeNode[] nodeStack = new DynamicTreeNode[20];
-  private int nodeStackIndex = 0;
+  private int nodeStackIndex;
 
   public DynamicTree() {
     m_root = null;
@@ -871,7 +871,7 @@ public class DynamicTree implements BroadPhaseStrategy {
     argDraw.drawPolygon(drawVecs, 4, color);
 
     argDraw.getViewportTranform().getWorldToScreen(node.aabb.upperBound, textVec);
-    argDraw.drawString(textVec.x, textVec.y, node.id + "-" + (spot + 1) + "/" + height, color);
+    argDraw.drawString(textVec.x, textVec.y, node.id + "-" + (spot + 1) + '/' + height, color);
 
     if (node.child1 != null) {
       drawTree(argDraw, node.child1, spot + 1, height);

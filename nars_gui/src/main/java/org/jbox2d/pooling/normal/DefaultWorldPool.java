@@ -64,9 +64,9 @@ public class DefaultWorldPool implements IWorldPool {
   private final OrderedStack<AABB> aabbs;
   private final OrderedStack<Rot> rots;
 
-  private final HashMap<Integer, float[]> afloats = new HashMap<Integer, float[]>();
-  private final HashMap<Integer, int[]> aints = new HashMap<Integer, int[]>();
-  private final HashMap<Integer, Vec2[]> avecs = new HashMap<Integer, Vec2[]>();
+  private final HashMap<Integer, float[]> afloats = new HashMap<>();
+  private final HashMap<Integer, int[]> aints = new HashMap<>();
+  private final HashMap<Integer, Vec2[]> avecs = new HashMap<>();
 
   private final IWorldPool world = this;
 
@@ -117,24 +117,12 @@ public class DefaultWorldPool implements IWorldPool {
   private final Distance dist;
 
   public DefaultWorldPool(int argSize, int argContainerSize) {
-    vecs = new OrderedStack<Vec2>(argSize, argContainerSize) {
-      protected Vec2 newInstance() { return new Vec2(); }
-    };
-    vec3s = new OrderedStack<Vec3>(argSize, argContainerSize) {
-      protected Vec3 newInstance() { return new Vec3(); }
-    };
-    mats = new OrderedStack<Mat22>(argSize, argContainerSize) {
-      protected Mat22 newInstance() { return new Mat22(); }
-    };
-    aabbs = new OrderedStack<AABB>(argSize, argContainerSize) {
-      protected AABB newInstance() { return new AABB(); }
-    };
-    rots = new OrderedStack<Rot>(argSize, argContainerSize) {
-      protected Rot newInstance() { return new Rot(); }
-    };
-    mat33s = new OrderedStack<Mat33>(argSize, argContainerSize) {
-      protected Mat33 newInstance() { return new Mat33(); }
-    };
+    vecs = new Vec2OrderedStack(argSize, argContainerSize);
+    vec3s = new Vec3OrderedStack(argSize, argContainerSize);
+    mats = new Mat22OrderedStack(argSize, argContainerSize);
+    aabbs = new AABBOrderedStack(argSize, argContainerSize);
+    rots = new RotOrderedStack(argSize, argContainerSize);
+    mat33s = new Mat33OrderedStack(argSize, argContainerSize);
 
     dist = new Distance();
     collision = new Collision(this);
@@ -278,5 +266,53 @@ public class DefaultWorldPool implements IWorldPool {
 
     assert (avecs.get(argLength).length == argLength) : "Array not built with correct length";
     return avecs.get(argLength);
+  }
+
+  private static class Mat33OrderedStack extends OrderedStack<Mat33> {
+    public Mat33OrderedStack(int argSize, int argContainerSize) {
+      super(argSize, argContainerSize);
+    }
+
+    protected Mat33 newInstance() { return new Mat33(); }
+  }
+
+  private static class RotOrderedStack extends OrderedStack<Rot> {
+    public RotOrderedStack(int argSize, int argContainerSize) {
+      super(argSize, argContainerSize);
+    }
+
+    protected Rot newInstance() { return new Rot(); }
+  }
+
+  private static class AABBOrderedStack extends OrderedStack<AABB> {
+    public AABBOrderedStack(int argSize, int argContainerSize) {
+      super(argSize, argContainerSize);
+    }
+
+    protected AABB newInstance() { return new AABB(); }
+  }
+
+  private static class Mat22OrderedStack extends OrderedStack<Mat22> {
+    public Mat22OrderedStack(int argSize, int argContainerSize) {
+      super(argSize, argContainerSize);
+    }
+
+    protected Mat22 newInstance() { return new Mat22(); }
+  }
+
+  private static class Vec3OrderedStack extends OrderedStack<Vec3> {
+    public Vec3OrderedStack(int argSize, int argContainerSize) {
+      super(argSize, argContainerSize);
+    }
+
+    protected Vec3 newInstance() { return new Vec3(); }
+  }
+
+  private static class Vec2OrderedStack extends OrderedStack<Vec2> {
+    public Vec2OrderedStack(int argSize, int argContainerSize) {
+      super(argSize, argContainerSize);
+    }
+
+    protected Vec2 newInstance() { return new Vec2(); }
   }
 }

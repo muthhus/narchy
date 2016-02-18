@@ -70,10 +70,10 @@ public class Body {
   public final Sweep m_sweep = new Sweep();
 
   public final Vec2 m_linearVelocity = new Vec2();
-  public float m_angularVelocity = 0;
+  public float m_angularVelocity;
 
   public final Vec2 m_force = new Vec2();
-  public float m_torque = 0;
+  public float m_torque;
 
   public World m_world;
   public Body m_prev;
@@ -324,7 +324,7 @@ public class Body {
     m_xf.p.set(position);
 
     // m_sweep.c0 = m_sweep.c = Mul(m_xf, m_sweep.localCenter);
-    Transform.mulToOutUnsafe(m_xf, m_sweep.localCenter, m_sweep.c);
+    Transform.mulToOut(m_xf, m_sweep.localCenter, m_sweep.c);
     m_sweep.a = angle;
 
     m_sweep.c0.set(m_sweep.c);
@@ -638,7 +638,7 @@ public class Body {
     oldCenter.set(m_sweep.c);
     m_sweep.localCenter.set(massData.center);
     // m_sweep.c0 = m_sweep.c = Mul(m_xf, m_sweep.localCenter);
-    Transform.mulToOutUnsafe(m_xf, m_sweep.localCenter, m_sweep.c0);
+    Transform.mulToOut(m_xf, m_sweep.localCenter, m_sweep.c0);
     m_sweep.c.set(m_sweep.c0);
 
     // Update center of mass velocity.
@@ -719,7 +719,7 @@ public class Body {
     oldCenter.set(m_sweep.c);
     m_sweep.localCenter.set(localCenter);
     // m_sweep.c0 = m_sweep.c = Mul(m_xf, m_sweep.localCenter);
-    Transform.mulToOutUnsafe(m_xf, m_sweep.localCenter, m_sweep.c0);
+    Transform.mulToOut(m_xf, m_sweep.localCenter, m_sweep.c0);
     m_sweep.c.set(m_sweep.c0);
 
     // Update center of mass velocity.
@@ -782,7 +782,7 @@ public class Body {
   }
 
   public final void getLocalPointToOut(Vec2 worldPoint, Vec2 out) {
-    Transform.mulTransToOut(m_xf, worldPoint, out);
+    Transform.mulTransToOutUnsafe(m_xf, worldPoint, out);
   }
 
   /**

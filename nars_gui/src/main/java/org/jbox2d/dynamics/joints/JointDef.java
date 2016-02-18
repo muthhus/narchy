@@ -41,12 +41,12 @@ public class JointDef {
 	/**
 	 * The joint type is set automatically for concrete joint types.
 	 */
-	public JointType type;
+	public final JointType type;
 	
 	/**
 	 * Use this to attach application specific data to your joints.
 	 */
-	public Object userData;
+	public final Object userData;
 	
 	/**
 	 * The first attached body.

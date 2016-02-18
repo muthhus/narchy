@@ -84,7 +84,7 @@ public abstract class Joint {
   protected Body m_bodyB;
 
   public boolean m_islandFlag;
-  private boolean m_collideConnected;
+  private final boolean m_collideConnected;
 
   public Object m_userData;
 

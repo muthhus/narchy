@@ -340,7 +340,10 @@ public final class BudgetFunctions extends UtilityFunctions {
 
         Term taskTerm = nal.taskLink.get().term();
         Budgeted task = nal.taskLink;
-        if (task.isDeleted()) task = nal.taskLink.get();
+        if (task.isDeleted()) {
+            task = nal.taskLink.get();
+        }
+
 
         float p, d;
         if (!task.isDeleted()) {
@@ -364,6 +367,7 @@ public final class BudgetFunctions extends UtilityFunctions {
         if (/*(termLink != null) && */(!termLink.isDeleted())) {
             //priority = or(priority, termLink.pri()); //originally was OR, but this can explode because the result of OR can exceed the inputs
             //durability = and(durability, termLink.dur()); //originaly was 'AND'
+
 
             BudgetMerge.avgDQBlend.merge(target, termLink);
 

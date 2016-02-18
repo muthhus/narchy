@@ -264,16 +264,14 @@ public class WheelJoint extends Joint {
     d.set(cB).addLocal(rB).subLocal(cA).subLocal(rA);
 
     // Point to line constraint
-    {
-      Rot.mulToOut(qA, m_localYAxisA, m_ay);
-      m_sAy = Vec2.cross(temp.set(d).addLocal(rA), m_ay);
-      m_sBy = Vec2.cross(rB, m_ay);
+    Rot.mulToOut(qA, m_localYAxisA, m_ay);
+    m_sAy = Vec2.cross(temp.set(d).addLocal(rA), m_ay);
+    m_sBy = Vec2.cross(rB, m_ay);
 
-      m_mass = mA + mB + iA * m_sAy * m_sAy + iB * m_sBy * m_sBy;
+    m_mass = mA + mB + iA * m_sAy * m_sAy + iB * m_sBy * m_sBy;
 
-      if (m_mass > 0.0f) {
-        m_mass = 1.0f / m_mass;
-      }
+    if (m_mass > 0.0f) {
+      m_mass = 1.0f / m_mass;
     }
 
     // Spring constraint
@@ -412,24 +410,22 @@ public class WheelJoint extends Joint {
     }
 
     // Solve point to line constraint
-    {
-      float Cdot = Vec2.dot(m_ay, temp.set(vB).subLocal(vA)) + m_sBy * wB - m_sAy * wA;
-      float impulse = -m_mass * Cdot;
-      m_impulse += impulse;
+    float Cdot = Vec2.dot(m_ay, temp.set(vB).subLocal(vA)) + m_sBy * wB - m_sAy * wA;
+    float impulse = -m_mass * Cdot;
+    m_impulse += impulse;
 
-      P.x = impulse * m_ay.x;
-      P.y = impulse * m_ay.y;
-      float LA = impulse * m_sAy;
-      float LB = impulse * m_sBy;
+    P.x = impulse * m_ay.x;
+    P.y = impulse * m_ay.y;
+    float LA = impulse * m_sAy;
+    float LB = impulse * m_sBy;
 
-      vA.x -= mA * P.x;
-      vA.y -= mA * P.y;
-      wA -= iA * LA;
+    vA.x -= mA * P.x;
+    vA.y -= mA * P.y;
+    wA -= iA * LA;
 
-      vB.x += mB * P.x;
-      vB.y += mB * P.y;
-      wB += iB * LB;
-    }
+    vB.x += mB * P.x;
+    vB.y += mB * P.y;
+    wB += iB * LB;
     pool.pushVec2(2);
 
     // data.velocities[m_indexA].v = vA;

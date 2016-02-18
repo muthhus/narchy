@@ -67,16 +67,16 @@ public class ParticleSystem {
   int m_count;
   int m_internalAllocatedCapacity;
   int m_maxCount;
-  ParticleBufferInt m_flagsBuffer;
-  ParticleBuffer<Vec2> m_positionBuffer;
-  ParticleBuffer<Vec2> m_velocityBuffer;
+  final ParticleBufferInt m_flagsBuffer;
+  final ParticleBuffer<Vec2> m_positionBuffer;
+  final ParticleBuffer<Vec2> m_velocityBuffer;
   float[] m_accumulationBuffer; // temporary values
   Vec2[] m_accumulation2Buffer; // temporary vector values
   float[] m_depthBuffer; // distance from the surface
 
-  public ParticleBuffer<ParticleColor> m_colorBuffer;
+  public final ParticleBuffer<ParticleColor> m_colorBuffer;
   ParticleGroup[] m_groupBuffer;
-  ParticleBuffer<Object> m_userDataBuffer;
+  final ParticleBuffer<Object> m_userDataBuffer;
 
   int m_proxyCount;
   int m_proxyCapacity;
@@ -101,18 +101,18 @@ public class ParticleSystem {
   int m_groupCount;
   ParticleGroup m_groupList;
 
-  float m_pressureStrength;
+  final float m_pressureStrength;
   float m_dampingStrength;
-  float m_elasticStrength;
-  float m_springStrength;
-  float m_viscousStrength;
-  float m_surfaceTensionStrengthA;
-  float m_surfaceTensionStrengthB;
-  float m_powderStrength;
-  float m_ejectionStrength;
-  float m_colorMixingStrength;
+  final float m_elasticStrength;
+  final float m_springStrength;
+  final float m_viscousStrength;
+  final float m_surfaceTensionStrengthA;
+  final float m_surfaceTensionStrengthB;
+  final float m_powderStrength;
+  final float m_ejectionStrength;
+  final float m_colorMixingStrength;
 
-  World m_world;
+  final World m_world;
 
   public ParticleSystem(World world) {
     m_world = world;
@@ -159,10 +159,10 @@ public class ParticleSystem {
     m_colorMixingStrength = 0.5f;
 
     m_flagsBuffer = new ParticleBufferInt();
-    m_positionBuffer = new ParticleBuffer<Vec2>(Vec2.class);
-    m_velocityBuffer = new ParticleBuffer<Vec2>(Vec2.class);
-    m_colorBuffer = new ParticleBuffer<ParticleColor>(ParticleColor.class);
-    m_userDataBuffer = new ParticleBuffer<Object>(Object.class);
+    m_positionBuffer = new ParticleBuffer<>(Vec2.class);
+    m_velocityBuffer = new ParticleBuffer<>(Vec2.class);
+    m_colorBuffer = new ParticleBuffer<>(ParticleColor.class);
+    m_userDataBuffer = new ParticleBuffer<>(Object.class);
   }
   
 //  public void assertNotSamePosition() {
@@ -270,7 +270,7 @@ public class ParticleSystem {
   private final Vec2 tempVec = new Vec2();
   private final Transform tempTransform = new Transform();
   private final Transform tempTransform2 = new Transform();
-  private CreateParticleGroupCallback createParticleGroupCallback =
+  private final CreateParticleGroupCallback createParticleGroupCallback =
       new CreateParticleGroupCallback();
   private final ParticleDef tempParticleDef = new ParticleDef();
 
@@ -651,7 +651,7 @@ public class ParticleSystem {
     m_world.queryAABB(ubccallback, aabb);
   }
 
-  private SolveCollisionCallback sccallback = new SolveCollisionCallback();
+  private final SolveCollisionCallback sccallback = new SolveCollisionCallback();
 
   public void solveCollision(TimeStep step) {
     final AABB aabb = temp;
@@ -919,7 +919,7 @@ public class ParticleSystem {
         velocityTransform.q.s = step.inv_dt * tempXf.q.s;
         velocityTransform.q.c = step.inv_dt * (tempXf.q.c - 1);
         for (int i = group.m_firstIndex; i < group.m_lastIndex; i++) {
-          Transform.mulToOutUnsafe(velocityTransform, m_positionBuffer.data[i],
+          Transform.mulToOut(velocityTransform, m_positionBuffer.data[i],
               m_velocityBuffer.data[i]);
         }
       }
@@ -1817,8 +1817,7 @@ public class ParticleSystem {
       if (obj == null) return false;
       if (getClass() != obj.getClass()) return false;
       Proxy other = (Proxy) obj;
-      if (tag != other.tag) return false;
-      return true;
+      return tag == other.tag;
     }
   }
 
@@ -1958,7 +1957,7 @@ public class ParticleSystem {
     ParticleSystem system;
     ParticleGroup groupA;
     ParticleGroup groupB;
-  };
+  }
 
   static class DestroyParticlesInShapeCallback implements ParticleQueryCallback {
     ParticleSystem system;
@@ -2114,7 +2113,7 @@ public class ParticleSystem {
             Vec2 av = system.m_velocityBuffer.data[a];
             final Vec2 temp = tempVec;
             Transform.mulTransToOutUnsafe(body.m_xf0, ap, temp);
-            Transform.mulToOutUnsafe(body.m_xf, temp, input.p1);
+            Transform.mulToOut(body.m_xf, temp, input.p1);
             input.p2.x = ap.x + step.dt * av.x;
             input.p2.y = ap.y + step.dt * av.y;
             input.maxFraction = 1;
@@ -2168,5 +2167,5 @@ public class ParticleSystem {
     static boolean IsTriadInvalid(final Triad triad) {
       return triad.indexA < 0 || triad.indexB < 0 || triad.indexC < 0;
     }
-  };
+  }
 }

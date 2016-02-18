@@ -48,14 +48,14 @@ public class PulleyJoint extends Joint {
 
   private final Vec2 m_groundAnchorA = new Vec2();
   private final Vec2 m_groundAnchorB = new Vec2();
-  private float m_lengthA;
-  private float m_lengthB;
+  private final float m_lengthA;
+  private final float m_lengthB;
 
   // Solver shared
   private final Vec2 m_localAnchorA = new Vec2();
   private final Vec2 m_localAnchorB = new Vec2();
-  private float m_constant;
-  private float m_ratio;
+  private final float m_constant;
+  private final float m_ratio;
   private float m_impulse;
 
   // Solver temp

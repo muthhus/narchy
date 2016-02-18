@@ -290,39 +290,37 @@ public class MotorJoint extends Joint {
     final Vec2 Cdot = pool.popVec2();
 
     // Solve linear friction
-    {
-      // Cdot = vB + b2Cross(wB, m_rB) - vA - b2Cross(wA, m_rA) + inv_h * m_correctionFactor *
-      // m_linearError;
-      Cdot.x =
-          vB.x + -wB * m_rB.y - vA.x - -wA * m_rA.y + inv_h * m_correctionFactor * m_linearError.x;
-      Cdot.y =
-          vB.y + wB * m_rB.x - vA.y - wA * m_rA.x + inv_h * m_correctionFactor * m_linearError.y;
+    // Cdot = vB + b2Cross(wB, m_rB) - vA - b2Cross(wA, m_rA) + inv_h * m_correctionFactor *
+    // m_linearError;
+    Cdot.x =
+        vB.x + -wB * m_rB.y - vA.x - -wA * m_rA.y + inv_h * m_correctionFactor * m_linearError.x;
+    Cdot.y =
+        vB.y + wB * m_rB.x - vA.y - wA * m_rA.x + inv_h * m_correctionFactor * m_linearError.y;
 
-      final Vec2 impulse = temp;
-      Mat22.mulToOutUnsafe(m_linearMass, Cdot, impulse);
-      impulse.negateLocal();
-      final Vec2 oldImpulse = pool.popVec2();
-      oldImpulse.set(m_linearImpulse);
-      m_linearImpulse.addLocal(impulse);
+    final Vec2 impulse = temp;
+    Mat22.mulToOutUnsafe(m_linearMass, Cdot, impulse);
+    impulse.negateLocal();
+    final Vec2 oldImpulse = pool.popVec2();
+    oldImpulse.set(m_linearImpulse);
+    m_linearImpulse.addLocal(impulse);
 
-      float maxImpulse = h * m_maxForce;
+    float maxImpulse = h * m_maxForce;
 
-      if (m_linearImpulse.lengthSquared() > maxImpulse * maxImpulse) {
-        m_linearImpulse.normalize();
-        m_linearImpulse.mulLocal(maxImpulse);
-      }
-
-      impulse.x = m_linearImpulse.x - oldImpulse.x;
-      impulse.y = m_linearImpulse.y - oldImpulse.y;
-
-      vA.x -= mA * impulse.x;
-      vA.y -= mA * impulse.y;
-      wA -= iA * (m_rA.x * impulse.y - m_rA.y * impulse.x);
-
-      vB.x += mB * impulse.x;
-      vB.y += mB * impulse.y;
-      wB += iB * (m_rB.x * impulse.y - m_rB.y * impulse.x);
+    if (m_linearImpulse.lengthSquared() > maxImpulse * maxImpulse) {
+      m_linearImpulse.normalize();
+      m_linearImpulse.mulLocal(maxImpulse);
     }
+
+    impulse.x = m_linearImpulse.x - oldImpulse.x;
+    impulse.y = m_linearImpulse.y - oldImpulse.y;
+
+    vA.x -= mA * impulse.x;
+    vA.y -= mA * impulse.y;
+    wA -= iA * (m_rA.x * impulse.y - m_rA.y * impulse.x);
+
+    vB.x += mB * impulse.x;
+    vB.y += mB * impulse.y;
+    wB += iB * (m_rB.x * impulse.y - m_rB.y * impulse.x);
 
     pool.pushVec2(3);
 

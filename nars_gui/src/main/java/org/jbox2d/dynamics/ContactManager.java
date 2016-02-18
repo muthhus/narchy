@@ -37,7 +37,7 @@ import org.jbox2d.dynamics.contacts.ContactEdge;
  */
 public class ContactManager implements PairCallback {
 
-  public BroadPhase m_broadPhase;
+  public final BroadPhase m_broadPhase;
   public Contact m_contactList;
   public int m_contactCount;
   public ContactFilter m_contactFilter;

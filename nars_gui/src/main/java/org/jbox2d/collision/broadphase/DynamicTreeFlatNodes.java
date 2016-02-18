@@ -859,7 +859,7 @@ public class DynamicTreeFlatNodes implements BroadPhaseStrategy {
     argDraw.drawPolygon(drawVecs, 4, color);
 
     argDraw.getViewportTranform().getWorldToScreen(a.upperBound, textVec);
-    argDraw.drawString(textVec.x, textVec.y, node + "-" + (spot + 1) + "/" + height, color);
+    argDraw.drawString(textVec.x, textVec.y, node + "-" + (spot + 1) + '/' + height, color);
 
     int c1 = m_child1[node];
     int c2 = m_child2[node];

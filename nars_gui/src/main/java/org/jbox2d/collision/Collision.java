@@ -188,7 +188,7 @@ public class Collision {
   // #### COLLISION STUFF (not from collision.h or collision.cpp) ####
 
   // djm pooling
-  private static Vec2 d = new Vec2();
+  private static final Vec2 d = new Vec2();
 
   /**
    * Compute the collision manifold between two circles.
@@ -457,7 +457,7 @@ public class Collision {
     for (int i = 0; i < count1; i++) {
       // Get poly1 normal in frame2.
       Rot.mulToOutUnsafe(xfq, n1s[i], n);
-      Transform.mulToOutUnsafe(xf, v1s[i], v1);
+      Transform.mulToOut(xf, v1s[i], v1);
 
       // Find deepest point for normal i.
       float si = Float.MAX_VALUE;
@@ -727,7 +727,7 @@ public class Collision {
 
     // Compute circle in frame of edge
     // Vec2 Q = MulT(xfA, Mul(xfB, circleB.m_p));
-    Transform.mulToOutUnsafe(xfB, circleB.m_p, temp);
+    Transform.mulToOut(xfB, circleB.m_p, temp);
     Transform.mulTransToOutUnsafe(xfA, temp, Q);
 
     final Vec2 A = edgeA.m_vertex1;
@@ -890,7 +890,7 @@ public class Collision {
    * 
    * @author Daniel Murphy
    */
-  public static enum PointState {
+  public enum PointState {
     /**
      * point does not exist
      */
@@ -1005,7 +1005,7 @@ public class Collision {
         final PolygonShape polygonB, final Transform xfB) {
 
       Transform.mulTransToOutUnsafe(xfA, xfB, m_xf);
-      Transform.mulToOutUnsafe(m_xf, polygonB.m_centroid, m_centroidB);
+      Transform.mulToOut(m_xf, polygonB.m_centroid, m_centroidB);
 
       m_v0 = edgeA.m_vertex0;
       m_v1 = edgeA.m_vertex1;
@@ -1205,7 +1205,7 @@ public class Collision {
       // Get polygonB in frameA
       m_polygonB.count = polygonB.m_count;
       for (int i = 0; i < polygonB.m_count; ++i) {
-        Transform.mulToOutUnsafe(m_xf, polygonB.m_vertices[i], m_polygonB.vertices[i]);
+        Transform.mulToOut(m_xf, polygonB.m_vertices[i], m_polygonB.vertices[i]);
         Rot.mulToOutUnsafe(m_xf.q, polygonB.m_normals[i], m_polygonB.normals[i]);
       }
 

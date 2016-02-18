@@ -28,7 +28,7 @@ import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 
 public class ContactVelocityConstraint {
-  public VelocityConstraintPoint[] points = new VelocityConstraintPoint[Settings.maxManifoldPoints];
+  public final VelocityConstraintPoint[] points = new VelocityConstraintPoint[Settings.maxManifoldPoints];
   public final Vec2 normal = new Vec2();
   public final Mat22 normalMass = new Mat22();
   public final Mat22 K = new Mat22();

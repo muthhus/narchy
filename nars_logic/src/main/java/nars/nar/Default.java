@@ -71,7 +71,7 @@ public class Default extends AbstractNAR {
         the("input", input = initInput());
 
         the("premiser", premiser = newPremiseGenerator());
-        premiser.confMin.setValue(4f * Global.TRUTH_EPSILON);
+        premiser.confMin.setValue(Global.TRUTH_EPSILON);
 
         the("core", core = initCore(
                 activeConcepts,

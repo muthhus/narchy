@@ -38,20 +38,20 @@ public class JointEdge {
 	/**
 	 * Provides quick access to the other body attached
 	 */
-	public Body other = null;
+	public Body other;
 	
 	/**
 	 * the joint
 	 */
-	public Joint joint = null;
+	public Joint joint;
 	
 	/**
 	 * the previous joint edge in the body's joint list
 	 */
-	public JointEdge prev = null;
+	public JointEdge prev;
 	
 	/**
 	 * the next joint edge in the body's joint list
 	 */
-	public JointEdge next = null;
+	public JointEdge next;
 }

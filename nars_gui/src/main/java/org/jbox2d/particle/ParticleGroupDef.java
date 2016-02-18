@@ -10,10 +10,10 @@ import org.jbox2d.common.Vec2;
 public class ParticleGroupDef {
 
   /** The particle-behavior flags. */
-  public int flags;
+  public final int flags;
 
   /** The group-construction flags. */
-  public int groupFlags;
+  public final int groupFlags;
 
   /**
    * The world position of the group. Moves the group's shape a distance equal to the value of
@@ -25,13 +25,13 @@ public class ParticleGroupDef {
    * The world angle of the group in radians. Rotates the shape by an angle equal to the value of
    * angle.
    */
-  public float angle;
+  public final float angle;
 
   /** The linear velocity of the group's origin in world co-ordinates. */
   public final Vec2 linearVelocity = new Vec2();
 
   /** The angular velocity of the group. */
-  public float angularVelocity;
+  public final float angularVelocity;
 
   /** The color of all particles in the group. */
   public ParticleColor color;
@@ -40,13 +40,13 @@ public class ParticleGroupDef {
    * The strength of cohesion among the particles in a group with flag b2_elasticParticle or
    * b2_springParticle.
    */
-  public float strength;
+  public final float strength;
 
   /** Shape containing the particle group. */
   public Shape shape;
 
   /** If true, destroy the group automatically after its last particle has been destroyed. */
-  public boolean destroyAutomatically;
+  public final boolean destroyAutomatically;
 
   /** Use this to store application-specific group data. */
   public Object userData;

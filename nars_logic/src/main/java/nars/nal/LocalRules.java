@@ -324,8 +324,8 @@ public enum LocalRules {
     public static boolean isRevisible(@NotNull Task newBelief, Task oldBelief) {
         Term t = newBelief.term();
         return
+            !(t.op().isConjunctive() && t.hasAny(Op.VAR_DEP)) &&  // t.hasVarDep());
             !newBelief.equals(oldBelief) &&
-            !(t.op().isConjunctive() && t.hasAny(Op.VAR_DEP)) &&   // t.hasVarDep());
             !Stamp.overlapping(newBelief, oldBelief);
     }
 

@@ -37,8 +37,8 @@ public class Mat22 implements Serializable {
   @Override
   public String toString() {
     String s = "";
-    s += "[" + ex.x + "," + ey.x + "]\n";
-    s += "[" + ex.y + "," + ey.y + "]";
+    s += "[" + ex.x + ',' + ey.x + "]\n";
+    s += "[" + ex.y + ',' + ey.y + ']';
     return s;
   }
 

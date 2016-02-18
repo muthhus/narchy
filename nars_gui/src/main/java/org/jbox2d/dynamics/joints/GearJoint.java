@@ -86,10 +86,10 @@ public class GearJoint extends Joint {
   private final Vec2 m_localAxisC = new Vec2();
   private final Vec2 m_localAxisD = new Vec2();
 
-  private float m_referenceAngleA;
-  private float m_referenceAngleB;
+  private final float m_referenceAngleA;
+  private final float m_referenceAngleB;
 
-  private float m_constant;
+  private final float m_constant;
   private float m_ratio;
 
   private float m_impulse;

@@ -28,7 +28,7 @@ import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 
 public class ContactPositionConstraint {
-  Vec2[] localPoints = new Vec2[Settings.maxManifoldPoints];
+  final Vec2[] localPoints = new Vec2[Settings.maxManifoldPoints];
   final Vec2 localNormal = new Vec2();
   final Vec2 localPoint = new Vec2();
   int indexA;

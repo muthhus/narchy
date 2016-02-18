@@ -46,7 +46,10 @@ public class NARover extends AbstractPolygonBot {
     final Naljects objs;
 
     float hungry, sick;
-    final Sensor linearSpeedFwd, leftSpeed, rightSpeed, hungrySensor, sickSensor;
+    final Sensor linearSpeedFwd, leftSpeed,
+            //rightSpeed,
+            hungrySensor, sickSensor;
+
 
 //    final SimpleAutoRangeTruthFrequency linearVelocity;
 //    final SimpleAutoRangeTruthFrequency motionAngle;
@@ -71,7 +74,10 @@ public class NARover extends AbstractPolygonBot {
         sick = 0f;
 
         FloatToFloatFunction speedThresholdToFreq = (speed) -> {
-            return speed < 0.1 ? 0 : Util.clamp(0.5f + speed);
+            return speed < 0.01 ? 0 : Util.clamp(0.5f + speed);
+        };
+        FloatToFloatFunction sigmoid = (speed) -> {
+            return Util.sigmoid(speed);
         };
 
         Term speedForward = nar.term("speed:forward");
@@ -79,27 +85,28 @@ public class NARover extends AbstractPolygonBot {
         Vec2 forwardVec = new Vec2(1,0f);
         Vec2 tmp = new Vec2();
         FloatFunction<Term> linearSpeed = (t) -> {
-            torso.getLinearVelocityFromLocalPointToOut(forwardVec, tmp);
-            float v = tmp.length()/ linearThrustPerCycle / 1.25f;
-            if (v >= 0 && t == speedForward) return v;
+            torso.getWorldPointToOut(forwardVec, tmp);
+            return Vec2.dot(torso.getLinearVelocity(), tmp) / 2f /* sensitivity */;
+            //float v = tmp.length()/ linearThrustPerCycle / 1.25f;
+            //if (v >= 0 && t == speedForward) return v;
             //else if (v <= 0 && t == speedBackward) return -v;
-            return 0;
+            //return 0;
         };
         this.linearSpeedFwd = new Sensor(nar, speedForward,
-                linearSpeed, speedThresholdToFreq).maxTimeBetweenUpdates(maxUpdateTime);
+                linearSpeed, sigmoid).maxTimeBetweenUpdates(maxUpdateTime);
         /*this.linearSpeedBack = new Sensor(nar, speedBackward,
                 linearSpeed, speedThresholdToFreq).maxTimeBetweenUpdates(maxUpdateTime);*/
 
-        Term speedLeft = nar.term("speed:left");
-        Term speedRight = nar.term("speed:right");
+        Term speedLeft = nar.term("speed:angular");
         FloatFunction<Term> angleSpeed = (t) -> {
             float a = torso.getAngularVelocity();
-            if (a <= 0 && t == speedLeft) return -a;
-            else if (a >= 0 && t == speedRight) return a;
-            return 0;
+//            if (a <= 0 && t == speedLeft) return -a;
+//            else if (a >= 0 && t == speedRight) return a;
+            //return 0;
+            return a;
         };
-        leftSpeed = new Sensor(nar, speedLeft, angleSpeed, speedThresholdToFreq).maxTimeBetweenUpdates(maxUpdateTime);
-        rightSpeed = new Sensor(nar, speedRight, angleSpeed, speedThresholdToFreq).maxTimeBetweenUpdates(maxUpdateTime);
+        leftSpeed = new Sensor(nar, speedLeft, angleSpeed, sigmoid).maxTimeBetweenUpdates(maxUpdateTime);
+
 
         //TODO torso angle
 
@@ -266,7 +273,6 @@ public class NARover extends AbstractPolygonBot {
         }
 
         gun = new Turret(sim);
-        draw.addLayer(gun);
     }
 
     @Override
@@ -288,13 +294,13 @@ public class NARover extends AbstractPolygonBot {
     /** http://stackoverflow.com/questions/20904171/how-to-create-snake-like-body-in-box2d-and-cocos2dx */
     public Arm addArm(String id, NarQ controller, float ax, float ay, float angle) {
 
-        int segs = 3;
-        float segLength = 2.7f;
-        float thick = 1f;
+        int segs = 4;
+        float segLength = 3.7f;
+        float thick = 1.5f;
 
         Arm a = new Arm(id, sim, torso, ax, ay, angle, segs, segLength, thick);
 
-        addEye(id + "e", controller, a.segments.getLast(), 5, new Vec2(0.5f, 0), 0.2f, (float)(+Math.PI/4f), 2.5f);
+        addEye(id + "e", controller, a.segments.getLast(), 9, new Vec2(0.5f, 0), 1f, (float)(+Math.PI/4f), 2.5f);
 
         a.joints.forEach((Consumer<RevoluteJoint>) jj -> {
 
@@ -533,9 +539,11 @@ public class NARover extends AbstractPolygonBot {
             stop = rover.nar.term(SomeRovers.motorStop);
         }
 
-        public void stop() {
+        public Truth stop() {
+            Task c = MethodOperator.invokingTask();
             rover.thrustRelative(0);
             rover.rotateRelative(0);
+            return c.truth(); //TODO use feedback discounting how much actually was stopped already
         }
 
         private Truth forward(boolean forward) {
@@ -563,6 +571,7 @@ public class NARover extends AbstractPolygonBot {
         final static Truth unfired = new DefaultTruth(0.5f, 1f);
 
         public Truth fire() {
+
             Task c = MethodOperator.invokingTask();
             if (rover.gun.fire(rover.torso, c.motivation())) {
                 return c.truth();

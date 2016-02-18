@@ -36,7 +36,7 @@ public class FixtureDef {
    * The shape, this must be set. The shape will be cloned, so you can create the shape on the
    * stack.
    */
-  public Shape shape = null;
+  public Shape shape;
 
   /**
    * Use this to store application specific fixture data.

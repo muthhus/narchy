@@ -148,10 +148,10 @@ public class UnitBudget extends Budget {
      */
     @Override
     public final void setPriority(float p) {
-        if (Budget.isDeleted(p))
+        if (!Float.isFinite(p))
             throw new InvalidPriorityException();
 
-        priority = Util.clamp(p);
+        this.priority = Util.clamp(p);
     }
 
     @Override

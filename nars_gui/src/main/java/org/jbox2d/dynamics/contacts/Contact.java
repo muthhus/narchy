@@ -66,8 +66,8 @@ public abstract class Contact {
   public Contact m_next;
 
   // Nodes for connecting bodies.
-  public ContactEdge m_nodeA = null;
-  public ContactEdge m_nodeB = null;
+  public final ContactEdge m_nodeA;
+  public final ContactEdge m_nodeB;
 
   public Fixture m_fixtureA;
   public Fixture m_fixtureB;

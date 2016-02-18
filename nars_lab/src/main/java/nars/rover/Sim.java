@@ -334,7 +334,7 @@ public class Sim extends PhysicsModel {
 
     public static class FoodMaterial extends Material implements Edible {
 
-        static final Color3f foodFill = new Color3f(0.15f, 0.6f, 0.15f);
+        static final Color3f foodFill = new Color3f(0.15f, 0.15f, 0.6f);
 
         @Override
         public void before(Body b, JoglAbstractDraw d, float time) {

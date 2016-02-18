@@ -122,7 +122,7 @@ abstract public class VisionRay extends RayCastClosestCallback implements Abstra
 
                 if (drawing) {
                     rayColor.set(laserHitColor);
-                    rayColor.x = Math.min(1.0f, laserUnhitColor.x + 0.75f * (1.0f - d));
+                    rayColor.z = Math.min(1.0f, laserUnhitColor.x + 0.75f * (1.0f - d));
                     //Vec2 pp = ccallback.m_point.clone();
 //                        toDraw.add(new Runnable() {
 //                            @Override public void run() {

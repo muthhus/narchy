@@ -27,7 +27,7 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
     //public static final Procedure2<Budget, Budget> DEFAULT_MERGE_METHOD = UnitBudget.average;
 
     @Nullable
-    protected BudgetMerge mergeFunction = null;
+    protected BudgetMerge mergeFunction;
 
     public ArrayBag(int cap) {
         this(new BudgetedArraySortedIndex<>(cap));
@@ -69,7 +69,7 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
             return existing;
         } else {
             return existing != null ? existing :
-                    put((V) v, getDefaultBudget(v));
+                    put(v, getDefaultBudget(v));
         }
     }
 
@@ -237,7 +237,7 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
 
             BLink<V> newBudget;
             if (!(b instanceof BLink)) {
-                newBudget = new BLink<V>(i, b, scale);
+                newBudget = new BLink<>(i, b, scale);
             } else {
                 //use provided
                 newBudget = (BLink)b;

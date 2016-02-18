@@ -201,7 +201,7 @@ public abstract class JoglAbstractDraw extends DebugDraw {
                 CircleShape circle = (CircleShape) fixture.getShape();
 
                 // Vec2 center = Mul(xf, circle.m_p);
-                Transform.mulToOutUnsafe(xf, circle.m_p, center);
+                Transform.mulToOut(xf, circle.m_p, center);
                 float radius = circle.m_radius;
                 xf.q.getXAxis(axis);
 
@@ -238,7 +238,7 @@ public abstract class JoglAbstractDraw extends DebugDraw {
 
                 for (int i = 0; i < vertexCount; ++i) {
                     // vertices[i] = Mul(xf, poly.m_vertices[i]);
-                    Transform.mulToOutUnsafe(xf, poly.m_vertices[i], vertices[i]);
+                    Transform.mulToOut(xf, poly.m_vertices[i], vertices[i]);
                 }
                 if (wireframe) {
                     drawPolygon(vertices, vertexCount, color);
@@ -249,8 +249,8 @@ public abstract class JoglAbstractDraw extends DebugDraw {
             break;
             case EDGE:
                 EdgeShape edge = (EdgeShape) fixture.getShape();
-                Transform.mulToOutUnsafe(xf, edge.m_vertex1, v1);
-                Transform.mulToOutUnsafe(xf, edge.m_vertex2, v2);
+                Transform.mulToOut(xf, edge.m_vertex1, v1);
+                Transform.mulToOut(xf, edge.m_vertex2, v2);
                 drawSegment(v1, v2, color);
                 break;
             case CHAIN:
@@ -258,9 +258,9 @@ public abstract class JoglAbstractDraw extends DebugDraw {
                 int count = chain.m_count;
                 Vec2[] vertices = chain.m_vertices;
 
-                Transform.mulToOutUnsafe(xf, vertices[0], v1);
+                Transform.mulToOut(xf, vertices[0], v1);
                 for (int i = 1; i < count; ++i) {
-                    Transform.mulToOutUnsafe(xf, vertices[i], v2);
+                    Transform.mulToOut(xf, vertices[i], v2);
                     drawSegment(v1, v2, color);
                     drawCircle(v1, 0.05f, color);
                     v1.set(v2);

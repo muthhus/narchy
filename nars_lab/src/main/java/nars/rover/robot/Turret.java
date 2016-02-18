@@ -27,6 +27,8 @@ public class Turret implements LayerDraw {
 
     public Turret(Sim sim) {
         this.sim = sim;
+        ((JoglAbstractDraw)sim.draw()).addLayer(this);
+
     }
 
 

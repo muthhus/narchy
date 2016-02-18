@@ -50,12 +50,12 @@ public class FrictionJointDef extends JointDef {
   /**
    * The maximum friction force in N.
    */
-  public float maxForce;
+  public final float maxForce;
 
   /**
    * The maximum friction torque in N-m.
    */
-  public float maxTorque;
+  public final float maxTorque;
 
   public FrictionJointDef() {
     super(JointType.FRICTION);

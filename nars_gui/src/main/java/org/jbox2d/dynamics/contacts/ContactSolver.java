@@ -1070,7 +1070,7 @@ class PositionSolverManifold {
         break;
       }
 
-      case FACE_B: {
+      case FACE_B:
         // Rot.mulToOutUnsafe(xfBq, pc.localNormal, normal);
         // Transform.mulToOutUnsafe(xfB, pc.localPoint, planePoint);
         //
@@ -1097,7 +1097,6 @@ class PositionSolverManifold {
         point.y = clipPointy;
         normal.x *= -1;
         normal.y *= -1;
-      }
         break;
     }
   }

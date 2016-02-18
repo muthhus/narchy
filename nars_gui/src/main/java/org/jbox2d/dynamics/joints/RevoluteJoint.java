@@ -69,7 +69,7 @@ public class RevoluteJoint extends Joint {
   private float m_motorSpeed;
 
   private boolean m_enableLimit;
-  protected float m_referenceAngle;
+  protected final float m_referenceAngle;
   private float m_lowerAngle;
   private float m_upperAngle;
 
@@ -396,42 +396,40 @@ public class RevoluteJoint extends Joint {
       aB += m_invIB * limitImpulse;
     }
     // Solve point-to-point constraint.
-    {
-      qA.set(aA);
-      qB.set(aB);
+    qA.set(aA);
+    qB.set(aB);
 
-      final Vec2 rA = pool.popVec2();
-      final Vec2 rB = pool.popVec2();
-      final Vec2 C = pool.popVec2();
-      final Vec2 impulse = pool.popVec2();
+    final Vec2 rA = pool.popVec2();
+    final Vec2 rB = pool.popVec2();
+    final Vec2 C = pool.popVec2();
+    final Vec2 impulse = pool.popVec2();
 
-      Rot.mulToOutUnsafe(qA, C.set(m_localAnchorA).subLocal(m_localCenterA), rA);
-      Rot.mulToOutUnsafe(qB, C.set(m_localAnchorB).subLocal(m_localCenterB), rB);
-      C.set(cB).addLocal(rB).subLocal(cA).subLocal(rA);
-      positionError = C.length();
+    Rot.mulToOutUnsafe(qA, C.set(m_localAnchorA).subLocal(m_localCenterA), rA);
+    Rot.mulToOutUnsafe(qB, C.set(m_localAnchorB).subLocal(m_localCenterB), rB);
+    C.set(cB).addLocal(rB).subLocal(cA).subLocal(rA);
+    positionError = C.length();
 
-      float mA = m_invMassA, mB = m_invMassB;
-      float iA = m_invIA, iB = m_invIB;
+    float mA = m_invMassA, mB = m_invMassB;
+    float iA = m_invIA, iB = m_invIB;
 
-      final Mat22 K = pool.popMat22();
-      K.ex.x = mA + mB + iA * rA.y * rA.y + iB * rB.y * rB.y;
-      K.ex.y = -iA * rA.x * rA.y - iB * rB.x * rB.y;
-      K.ey.x = K.ex.y;
-      K.ey.y = mA + mB + iA * rA.x * rA.x + iB * rB.x * rB.x;
-      K.solveToOut(C, impulse);
-      impulse.negateLocal();
+    final Mat22 K = pool.popMat22();
+    K.ex.x = mA + mB + iA * rA.y * rA.y + iB * rB.y * rB.y;
+    K.ex.y = -iA * rA.x * rA.y - iB * rB.x * rB.y;
+    K.ey.x = K.ex.y;
+    K.ey.y = mA + mB + iA * rA.x * rA.x + iB * rB.x * rB.x;
+    K.solveToOut(C, impulse);
+    impulse.negateLocal();
 
-      cA.x -= mA * impulse.x;
-      cA.y -= mA * impulse.y;
-      aA -= iA * Vec2.cross(rA, impulse);
+    cA.x -= mA * impulse.x;
+    cA.y -= mA * impulse.y;
+    aA -= iA * Vec2.cross(rA, impulse);
 
-      cB.x += mB * impulse.x;
-      cB.y += mB * impulse.y;
-      aB += iB * Vec2.cross(rB, impulse);
+    cB.x += mB * impulse.x;
+    cB.y += mB * impulse.y;
+    aB += iB * Vec2.cross(rB, impulse);
 
-      pool.pushVec2(4);
-      pool.pushMat22(1);
-    }
+    pool.pushVec2(4);
+    pool.pushMat22(1);
     // data.positions[m_indexA].c.set(cA);
     data.positions[m_indexA].a = aA;
     // data.positions[m_indexB].c.set(cB);

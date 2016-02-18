@@ -32,15 +32,15 @@ import org.jbox2d.dynamics.Body;
  * maintain a constant volume within them.
  */
 public class ConstantVolumeJointDef extends JointDef {
-  public float frequencyHz;
-  public float dampingRatio;
+  public final float frequencyHz;
+  public final float dampingRatio;
 
-  ArrayList<Body> bodies;
+  final ArrayList<Body> bodies;
   ArrayList<DistanceJoint> joints;
 
   public ConstantVolumeJointDef() {
     super(JointType.CONSTANT_VOLUME);
-    bodies = new ArrayList<Body>();
+    bodies = new ArrayList<>();
     joints = null;
     collideConnected = false;
     frequencyHz = 0.0f;
@@ -68,7 +68,7 @@ public class ConstantVolumeJointDef extends JointDef {
   public void addBodyAndJoint(Body argBody, DistanceJoint argJoint) {
     addBody(argBody);
     if (joints == null) {
-      joints = new ArrayList<DistanceJoint>();
+      joints = new ArrayList<>();
     }
     joints.add(argJoint);
   }

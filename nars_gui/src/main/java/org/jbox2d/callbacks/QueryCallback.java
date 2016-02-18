@@ -41,5 +41,5 @@ public interface QueryCallback {
 	 * @param fixture
 	 * @return false to terminate the query.
 	 */
-	public boolean reportFixture(Fixture fixture);
+	boolean reportFixture(Fixture fixture);
 }

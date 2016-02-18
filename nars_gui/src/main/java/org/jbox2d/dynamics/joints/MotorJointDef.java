@@ -22,17 +22,17 @@ public class MotorJointDef extends JointDef {
   /**
    * The maximum motor force in N.
    */
-  public float maxForce;
+  public final float maxForce;
 
   /**
    * The maximum motor torque in N-m.
    */
-  public float maxTorque;
+  public final float maxTorque;
 
   /**
    * Position correction factor in the range [0,1].
    */
-  public float correctionFactor;
+  public final float correctionFactor;
 
   public MotorJointDef() {
     super(JointType.MOTOR);

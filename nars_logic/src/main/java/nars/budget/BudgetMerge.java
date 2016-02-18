@@ -10,13 +10,13 @@ import org.jetbrains.annotations.NotNull;
 public interface BudgetMerge {
 
     static void dqBlendByPri(@NotNull Budget tgt, @NotNull Budget src, float srcScale, boolean addOrAvgPri) {
-        float incomingPri = src.pri() * srcScale;
+        float incomingPri = src.priIfFiniteElseZero() * srcScale;
 
         float currentPri = tgt.priIfFiniteElseZero();
 
         float sumPri = currentPri + incomingPri;
 
-        float cp = currentPri / sumPri; // current proportion
+        float cp = sumPri > 0 ? currentPri / sumPri : 0.5f; // current proportion
 
         dqBlend(tgt, src, addOrAvgPri ?
                 sumPri :

@@ -31,11 +31,11 @@ public class VoronoiDiagram {
     }
   }
 
-  public static interface VoronoiDiagramCallback {
+  public interface VoronoiDiagramCallback {
     void callback(int aTag, int bTag, int cTag);
   }
 
-  private Generator[] m_generatorBuffer;
+  private final Generator[] m_generatorBuffer;
   private int m_generatorCount;
   private int m_countX, m_countY;
   // The diagram is an array of "pointers".
@@ -81,19 +81,9 @@ public class VoronoiDiagram {
 
   private final Vec2 lower = new Vec2();
   private final Vec2 upper = new Vec2();
-  private MutableStack<VoronoiDiagramTask> taskPool =
-      new MutableStack<VoronoiDiagramTask>(50) {
-        @Override
-        protected VoronoiDiagramTask newInstance() {
-          return new VoronoiDiagramTask();
-        }
-
-        @Override
-        protected VoronoiDiagramTask[] newArray(int size) {
-          return new VoronoiDiagramTask[size];
-        }
-      };
-  private final StackQueue<VoronoiDiagramTask> queue = new StackQueue<VoronoiDiagramTask>();
+  private final MutableStack<VoronoiDiagramTask> taskPool =
+          new VoronoiDiagramTaskMutableStack();
+  private final StackQueue<VoronoiDiagramTask> queue = new StackQueue<>();
 
   public void generate(float radius) {
     assert (m_diagram == null);
@@ -204,6 +194,22 @@ public class VoronoiDiagram {
       if (!updated) {
         break;
       }
+    }
+  }
+
+  private static class VoronoiDiagramTaskMutableStack extends MutableStack<VoronoiDiagramTask> {
+    public VoronoiDiagramTaskMutableStack() {
+      super(50);
+    }
+
+    @Override
+    protected VoronoiDiagramTask newInstance() {
+      return new VoronoiDiagramTask();
+    }
+
+    @Override
+    protected VoronoiDiagramTask[] newArray(int size) {
+      return new VoronoiDiagramTask[size];
     }
   }
 }

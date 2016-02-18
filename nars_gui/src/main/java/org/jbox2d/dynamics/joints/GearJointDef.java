@@ -36,12 +36,12 @@ public class GearJointDef extends JointDef {
   /**
    * The first revolute/prismatic joint attached to the gear joint.
    */
-  public Joint joint1;
+  public final Joint joint1;
 
   /**
    * The second revolute/prismatic joint attached to the gear joint.
    */
-  public Joint joint2;
+  public final Joint joint2;
 
   /**
    * Gear ratio.

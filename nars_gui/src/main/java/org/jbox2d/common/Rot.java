@@ -49,7 +49,7 @@ public class Rot implements Serializable {
 
   @Override
   public String toString() {
-    return "Rot(s:" + s + ", c:" + c + ")";
+    return "Rot(s:" + s + ", c:" + c + ')';
   }
 
   public float getCos() {

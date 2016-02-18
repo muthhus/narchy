@@ -92,12 +92,12 @@ public class World {
 
 
   // statistics gathering
-  public int activeContacts = 0;
-  public int contactPoolCount = 0;
+  public int activeContacts;
+  public int contactPoolCount;
 
   protected int m_flags;
 
-  protected ContactManager m_contactManager;
+  protected final ContactManager m_contactManager;
 
   private Body m_bodyList;
   private Joint m_jointList;
@@ -128,12 +128,12 @@ public class World {
 
   private boolean m_stepComplete;
 
-  private Profile m_profile;
+  private final Profile m_profile;
 
-  private ParticleSystem m_particleSystem;
+  private final ParticleSystem m_particleSystem;
 
 
-  private ContactRegister[][] contactStacks =
+  private final ContactRegister[][] contactStacks =
       new ContactRegister[ShapeType.values().length][ShapeType.values().length];
 
   /**
@@ -1532,14 +1532,13 @@ public class World {
         m_debugDraw.drawSegment(p1, p2, color);
         break;
 
-      case PULLEY: {
+      case PULLEY:
         PulleyJoint pulley = (PulleyJoint) joint;
         Vec2 s1 = pulley.getGroundAnchorA();
         Vec2 s2 = pulley.getGroundAnchorB();
         m_debugDraw.drawSegment(s1, p1, color);
         m_debugDraw.drawSegment(s2, p2, color);
         m_debugDraw.drawSegment(s1, s2, color);
-      }
         break;
       case CONSTANT_VOLUME:
       case MOUSE:
@@ -1555,8 +1554,8 @@ public class World {
 
   // NOTE this corresponds to the liquid test, so the debugdraw can draw
   // the liquid particles correctly. They should be the same.
-  private static Integer LIQUID_INT = new Integer(1234598372);
-  private float liquidLength = .12f;
+  private static final Integer LIQUID_INT = new Integer(1234598372);
+  private final float liquidLength = .12f;
   private float averageLinearVel = -1;
   private final Vec2 liquidOffset = new Vec2();
   private final Vec2 circCenterMoved = new Vec2();
@@ -1570,11 +1569,11 @@ public class World {
 
   private void drawShape(Fixture fixture, Transform xf, Color3f color, boolean wireframe) {
     switch (fixture.getType()) {
-      case CIRCLE: {
+      case CIRCLE:
         CircleShape circle = (CircleShape) fixture.getShape();
 
         // Vec2 center = Mul(xf, circle.m_p);
-        Transform.mulToOutUnsafe(xf, circle.m_p, center);
+        Transform.mulToOut(xf, circle.m_p, center);
         float radius = circle.m_radius;
         xf.q.getXAxis(axis);
 
@@ -1598,7 +1597,6 @@ public class World {
         } else {
           m_debugDraw.drawSolidCircle(center, radius, axis, color);
         }
-      }
         break;
 
       case POLYGON: {
@@ -1609,7 +1607,7 @@ public class World {
 
         for (int i = 0; i < vertexCount; ++i) {
           // vertices[i] = Mul(xf, poly.m_vertices[i]);
-          Transform.mulToOutUnsafe(xf, poly.m_vertices[i], vertices[i]);
+          Transform.mulToOut(xf, poly.m_vertices[i], vertices[i]);
         }
         if (wireframe) {
           m_debugDraw.drawPolygon(vertices, vertexCount, color);
@@ -1618,26 +1616,24 @@ public class World {
         }
       }
         break;
-      case EDGE: {
+      case EDGE:
         EdgeShape edge = (EdgeShape) fixture.getShape();
-        Transform.mulToOutUnsafe(xf, edge.m_vertex1, v1);
-        Transform.mulToOutUnsafe(xf, edge.m_vertex2, v2);
+        Transform.mulToOut(xf, edge.m_vertex1, v1);
+        Transform.mulToOut(xf, edge.m_vertex2, v2);
         m_debugDraw.drawSegment(v1, v2, color);
-      }
         break;
-      case CHAIN: {
+      case CHAIN:
         ChainShape chain = (ChainShape) fixture.getShape();
         int count = chain.m_count;
         Vec2[] vertices = chain.m_vertices;
 
-        Transform.mulToOutUnsafe(xf, vertices[0], v1);
+        Transform.mulToOut(xf, vertices[0], v1);
         for (int i = 1; i < count; ++i) {
-          Transform.mulToOutUnsafe(xf, vertices[i], v2);
+          Transform.mulToOut(xf, vertices[i], v2);
           m_debugDraw.drawSegment(v1, v2, color);
           m_debugDraw.drawCircle(v1, 0.05f, color);
           v1.set(v2);
         }
-      }
         break;
       default:
         break;
@@ -2015,7 +2011,7 @@ class WorldQueryWrapper implements TreeCallback {
 
   BroadPhase broadPhase;
   QueryCallback callback;
-};
+}
 
 
 class WorldRayCastWrapper implements TreeRayCastCallback {
@@ -2045,4 +2041,4 @@ class WorldRayCastWrapper implements TreeRayCastCallback {
 
   BroadPhase broadPhase;
   RayCastCallback callback;
-};
+}

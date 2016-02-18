@@ -46,7 +46,7 @@ public class ChainShape extends Shape {
   public Vec2[] m_vertices;
   public int m_count;
   public final Vec2 m_prevVertex = new Vec2(), m_nextVertex = new Vec2();
-  public boolean m_hasPrevVertex = false, m_hasNextVertex = false;
+  public boolean m_hasPrevVertex, m_hasNextVertex;
 
   private final EdgeShape pool0 = new EdgeShape();
 

@@ -37,7 +37,7 @@ public class OBBViewportTransform implements IViewportTransform {
   }
 
   protected final OBB box = new OBB();
-  private boolean yFlip = false;
+  private boolean yFlip;
   private final Mat22 yFlipMat = new Mat22(1, 0, 0, -1);
 
   public OBBViewportTransform() {

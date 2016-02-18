@@ -30,10 +30,10 @@ public abstract class Budget extends BudgetedHandle {
         return (float) pow(a * b * c, 1.0 / 3.0);
     }
 
-    //@Contract(pure = true)
-    public static boolean isDeleted(float pri) {
-        return !Float.isFinite(pri);
-    }
+//    //@Contract(pure = true)
+//    public static boolean isDeleted(float pri) {
+//        return !Float.isFinite(pri);
+//    }
     
     public final boolean isDeleted() {
         return getDeleted();
@@ -41,7 +41,7 @@ public abstract class Budget extends BudgetedHandle {
 
     @Override
     public final boolean getDeleted() {
-        return isDeleted(pri());
+        return !Float.isFinite(pri());
     }   
 
     public static String toString(@NotNull Budget b) {
