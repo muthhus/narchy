@@ -8,6 +8,7 @@ import nars.Global;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;
+import nars.term.variable.GenericVariable;
 import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,7 +30,7 @@ public class DefaultTermizer implements Termizer {
 
     public static final Atom PACKAGE = $.the("package");
     public static final Atom PRIMITIVE = $.the("primitive");
-    public static final Variable INSTANCE_VAR = $.varDep("instance");
+    public static final GenericVariable INSTANCE_VAR = $.varDep("instance");
 
     final Map<Package, Term> packages = new HashMap();
     final Map<Class, Term> classes = new HashMap();

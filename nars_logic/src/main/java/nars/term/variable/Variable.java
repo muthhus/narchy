@@ -23,56 +23,85 @@ package nars.term.variable;
 
 import nars.$;
 import nars.Op;
+import nars.term.Term;
 import nars.term.Termlike;
+import nars.term.Terms;
 import nars.term.atom.AbstractStringAtom;
+import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.IOException;
 
 /**
- * A variable term, which does not correspond to a concept
+ * Normalized variable
+ * "highly immutable" and re-used
  */
-public abstract class Variable extends AbstractStringAtom {
+public abstract class Variable extends Atomic {
 
-    protected Variable(String n) {
-        super(n);
+    public final int id;
+    public final Op type;
+    public final String str;
+    private final int hash;
+
+    protected Variable(Op type, int id) {
+        this.type = type;
+        this.id = id;
+        this.str = type.ch + Integer.toString(id);
+        this.hash = (type.ordinal() << 8) | id;
     }
 
-    protected Variable(@NotNull byte[] n) {
-        super(n);
+    @Override
+    public final boolean equals(Object obj) {
+        return obj == this;
     }
 
-    protected Variable(String n, Op specificOp) {
-        super(n, specificOp);
+    @Override
+    public final int hashCode() {
+        return hash;
     }
 
-    public static Variable v(@NotNull Op varType, String baseName) {
-        return v(varType.ch, baseName);
+    @Override
+    public final int compareTo(Object o) {
+        //hashcode can serve as the ordering too
+        return o instanceof Variable ? -1 : Integer.compare(hash, o.hashCode());
     }
 
-    public static Variable v(char ch, String name) {
-        return $.v(ch, name);
+    @Override
+    public final String toString() {
+        return str;
     }
 
-
-    public static final int MAX_VARIABLE_CACHED_PER_TYPE = 16;
+    public static final int MAX_VARIABLE_CACHED_PER_TYPE = 32;
 
     /**
      * numerically-indexed variable instance cache; prevents duplicates and speeds comparisons
      */
     public static final Variable[][] varCache = new Variable[4][MAX_VARIABLE_CACHED_PER_TYPE];
 
-//    public static Op typeIndex(char c) {
-//        switch (c) {
-//            case '%':
-//                return Op.VAR_PATTERN;
-//            case '#':
-//                return Op.VAR_DEP;
-//            case '$':
-//                return Op.VAR_INDEP;
-//            case '?':
-//                return Op.VAR_QUERY;
-//        }
-//        throw new RuntimeException(c + " not a variable");
-//    }
+    public static Op typeIndex(char c) {
+        switch (c) {
+            case '%':
+                return Op.VAR_PATTERN;
+            case '#':
+                return Op.VAR_DEP;
+            case '$':
+                return Op.VAR_INDEP;
+            case '?':
+                return Op.VAR_QUERY;
+        }
+        throw new RuntimeException(c + " not a variable");
+    }
+
+//    @Override
+//    abstract public int volume();
+
+    @Override
+    public final int volume() {
+        //TODO decide if this is the case for zero-or-more ellipsis
+        return 1;
+    }
+
 
     //    //TODO replace this with a generic counting method of how many subterms there are present
 //    public static int numPatternVariables(Term t) {
@@ -97,142 +126,6 @@ public abstract class Variable extends AbstractStringAtom {
         return 0;
     }
 
-    /** produce a normalized version of this identified by the serial integer */
-    @NotNull
-    public abstract Variable normalize(int serial);
-
-
-    public static final class VarDep extends Variable {
-
-        public VarDep(String name) {
-            super(Op.VAR_DEP.ch + name);
-        }
-
-        @Override
-        public Variable normalize(int serial) {
-            return $.v(Op.VAR_DEP, serial);
-        }
-
-        @NotNull
-        @Override
-        public Op op() {
-            return Op.VAR_DEP;
-        }
-
-        @Override
-        public int vars() {
-            return 1;
-        }
-
-        @Override
-        public int varDep() {
-            return 1;
-        }
-
-        @Override
-        public int varIndep() {
-            return 0;
-        }
-
-        @Override
-        public int varQuery() {
-            return 0;
-        }
-
-        @Override
-        public int varPattern() {
-            return 0;
-        }
-    }
-
-    public static final class VarIndep extends Variable {
-
-
-        public VarIndep(String name) {
-            super(Op.VAR_INDEP.ch + name);
-        }
-
-        @Override
-        public Variable normalize(int serial) {
-            return $.v(Op.VAR_INDEP, serial);
-        }
-
-        @NotNull
-        @Override
-        public Op op() {
-            return Op.VAR_INDEP;
-        }
-
-        @Override
-        public int vars() {
-            return 1;
-        }
-
-        @Override
-        public int varDep() {
-            return 0;
-        }
-
-        @Override
-        public int varIndep() {
-            return 1;
-        }
-
-        @Override
-        public int varQuery() {
-            return 0;
-        }
-
-        @Override
-        public int varPattern() {
-            return 0;
-        }
-    }
-
-    public static final class VarQuery extends Variable {
-
-
-        public VarQuery(String name) {
-            super(Op.VAR_QUERY.ch + name);
-        }
-
-        @Override
-        public Variable normalize(int serial) {
-            return $.v(Op.VAR_QUERY, serial);
-        }
-
-        @NotNull
-        @Override
-        public Op op() {
-            return Op.VAR_QUERY;
-        }
-
-        @Override
-        public int vars() {
-            return 1;
-        }
-
-        @Override
-        public int varDep() {
-            return 0;
-        }
-
-        @Override
-        public int varIndep() {
-            return 0;
-        }
-
-        @Override
-        public int varQuery() {
-            return 1;
-        }
-
-        @Override
-        public int varPattern() {
-            return 0;
-        }
-
-    }
 
 
 }

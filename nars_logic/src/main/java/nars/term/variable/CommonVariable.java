@@ -6,11 +6,16 @@ import org.jetbrains.annotations.NotNull;
 
 public final class CommonVariable extends Variable  {
 
-    private final Op type;
 
-    CommonVariable(Op type, String n) {
-        super(n, type);
-        this.type = type;
+    CommonVariable(Op type, int a, int b) {
+        super(type, a << 8 + b); //this limits # of variables to 256 per term
+    }
+
+
+    @Override
+    public final int vars() {
+        // pattern variable hidden in the count 0
+        return type == Op.VAR_PATTERN ? 0 : 1;
     }
 
     @Override
@@ -18,10 +23,6 @@ public final class CommonVariable extends Variable  {
         return type;
     }
 
-    @Override
-    public final int vars() {
-        return 1;
-    }
 
     @Override
     public final int varIndep() {
@@ -60,14 +61,14 @@ public final class CommonVariable extends Variable  {
         if (v2.op()!=type)
             throw new RuntimeException("differing types");
 
-        String a = v1.id;
-        String b = v2.id;
+        int a = v1.id;
+        int b = v2.id;
 
-        int cmp = a.compareTo(b);
+        int cmp = Integer.compare(a, b);
 
         //lexical ordering: swap
         if (cmp > 0) {
-            String t = a;
+            int t = a;
             a = b;
             b = t;
         }
@@ -75,7 +76,7 @@ public final class CommonVariable extends Variable  {
             throw new RuntimeException("variables equal");
         }
 
-        return new CommonVariable(type, a + b);
+        return new CommonVariable(type, a, b);
     }
 
 //    //TODO use a 2d array not an enum map, just flatten the 4 op types to 0,1,2,3
@@ -92,8 +93,5 @@ public final class CommonVariable extends Variable  {
 //        }
 //    }
 
-    @Override
-    public Variable normalize(int serial) {
-        return $.v(type, serial);
-    }
+
 }

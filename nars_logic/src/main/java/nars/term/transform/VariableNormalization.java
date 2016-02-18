@@ -3,6 +3,8 @@ package nars.term.transform;
 import nars.$;
 import nars.Global;
 import nars.term.Compound;
+import nars.term.Term;
+import nars.term.variable.GenericVariable;
 import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,7 +21,7 @@ import java.util.function.Function;
  * information - the particular labels the input has attached.
  *
  */
-public class VariableNormalization extends VariableTransform implements Function<Variable,Variable> {
+public class VariableNormalization extends VariableTransform implements Function<Term,Term> {
 
 //    final static Comparator<Map.Entry<Variable, Variable>> comp = new Comparator<Map.Entry<Variable, Variable>>() {
 //        @Override
@@ -59,21 +61,21 @@ public class VariableNormalization extends VariableTransform implements Function
     public static final VariableTransform singleVariableNormalization = new VariableTransform() {
 
         @Override
-        public Variable apply(Compound containing, @NotNull Variable current, int depth) {
+        public Variable apply(Compound containing, @NotNull Term current, int depth) {
             //      (containing, current, depth) ->
             return $.v(current.op(), 1);
         }
     };
 
-    final Map<Variable, Variable> rename = Global.newHashMap(8);
+    final Map<Term, Term /*Variable*/> rename = Global.newHashMap(8);
 
-    boolean renamed = false;
+    boolean renamed;
 
 
     @NotNull
     @Override
-    public final Variable apply(@NotNull Variable v) {
-        Variable rvv = newVariable(v, rename.size()+1);
+    public final Term apply(@NotNull Term v) {
+        Term rvv = newVariable(v, rename.size()+1);
         if (!renamed) {
             //test for any rename to know if modification occurred
             renamed = !rvv.equals(v);
@@ -82,14 +84,17 @@ public class VariableNormalization extends VariableTransform implements Function
     }
 
     @Override
-    public final Variable apply(Compound ct, Variable v, int depth) {
+    public final Term apply(Compound ct, Term v, int depth) {
         return rename.computeIfAbsent(v, this);
     }
 
     /** if already normalized, alreadyNormalized will be non-null with the value */
     @NotNull
-    protected Variable newVariable(@NotNull Variable v, int serial) {
-        return v.normalize(serial);
+    protected Term newVariable(@NotNull Term v, int serial) {
+        if (v instanceof GenericVariable)
+            return ((GenericVariable)v).normalize(serial); //HACK
+        else
+            return $.v(v.op(), serial);
     }
 
 }

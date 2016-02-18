@@ -13,44 +13,11 @@ import java.util.function.Predicate;
 public abstract class Atomic implements Term {
 
 
-    /** Assumes that the op()
-     *  is encoded within its string such that additional op()
-     *  comparison would be redundant. */
-    @Override public final boolean equals(Object u) {
-        if (this == u) return true;
-
-        //if (hashCode()!=u.hashCode()) return false;
-
-        Termed tu = (Termed)u;
-        return op() == tu.op() && toString().equals(tu.toString());
-    }
 
     @Override
     public final boolean isCompound() { return false; }
 
     @Override abstract public String toString();
-
-    @Override
-    public final int hashCode() {
-        return toString().hashCode();
-    }
-
-    /**
-     * @param that The Term to be compared with the current Term
-     */
-    @Override public final int compareTo(@NotNull Object that) {
-        if (that==this) return 0;
-
-        Termed t = (Termed)that;
-        //TODO compare
-        //int d = op().compareTo(t.op());
-        int d = Integer.compare(op().ordinal(), t.op().ordinal());
-        if (d!=0) return d;
-
-        //if the op is the same, it is required to be a subclass of Atomic
-        //which should have an ordering determined by its toString()
-        return toString().compareTo((/*(Atomic)*/that).toString());
-    }
 
 
 

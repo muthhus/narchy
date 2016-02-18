@@ -30,6 +30,7 @@ import nars.term.index.PatternIndex;
 import nars.term.transform.CompoundTransform;
 import nars.term.transform.VariableNormalization;
 import nars.term.transform.subst.MapSubst;
+import nars.term.variable.GenericVariable;
 import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 
@@ -262,7 +263,7 @@ public class PremiseRule extends GenericCompound  {
                     ((Compound) containingCompound).term(1)))
                 return v;
 
-            return Variable.v(Op.VAR_PATTERN, v.toString());
+            return $.v(Op.VAR_PATTERN, v.toString());
         }
     }
 
@@ -670,18 +671,17 @@ public class PremiseRule extends GenericCompound  {
         }
 
         @NotNull
-        @Override protected Variable newVariable(@NotNull Variable v, int serial) {
+        @Override protected Term newVariable(@NotNull Term v, int serial) {
 
 
             if (v instanceof Ellipsis) {
                 Ellipsis e = (Ellipsis)v;
-                Variable r = e.clone(varPattern(serial+offset), this);
+                Term r = e.clone(varPattern(serial+offset), this);
                 offset = 0; //return to zero
                 return r;
             }
             else {
-                Variable newVar = v.normalize(serial+offset);
-                return newVar;
+                return ((GenericVariable)v).normalize(serial+offset); //HACK
             }
         }
 

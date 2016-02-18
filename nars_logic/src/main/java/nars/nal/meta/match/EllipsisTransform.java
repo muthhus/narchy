@@ -15,7 +15,7 @@ public class EllipsisTransform extends EllipsisOneOrMore {
     public final Term from;
     public final Term to;
 
-    public EllipsisTransform(@NotNull Variable name, Term from, Term to) {
+    public EllipsisTransform(@NotNull Term name, Term from, Term to) {
         super(name, ".." + from + '=' + to + "..+");
 
 //        if (from instanceof VarPattern)
@@ -31,14 +31,14 @@ public class EllipsisTransform extends EllipsisOneOrMore {
 
     @NotNull
     @Override
-    public Variable normalize(int serial) {
+    public Term normalize(int serial) {
         //handled in a special way elsewhere
         return this;
     }
 
     @NotNull
     @Override
-    public Variable clone(@NotNull Variable v, VariableNormalization normalizer) {
+    public Term clone(@NotNull Variable v, VariableNormalization normalizer) {
         //normalizes any variable parameter terms of an EllipsisTransform
         PremiseRule.PremiseRuleVariableNormalization vnn = (PremiseRule.PremiseRuleVariableNormalization) normalizer;
         return new EllipsisTransform(v,

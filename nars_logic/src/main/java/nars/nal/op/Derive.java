@@ -18,6 +18,7 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static nars.Op.ATOM;
 import static nars.nal.Tense.ETERNAL;
 
 /**
@@ -74,6 +75,12 @@ public class Derive extends AbstractLiteral implements ProcTerm {
         this.id = i;
     }
 
+
+    @Override
+    public@Nullable
+    Op op() {
+        return ATOM; //product?
+    }
 
     @NotNull
     @Override

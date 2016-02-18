@@ -17,7 +17,7 @@ import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.term.container.TermSet;
 import nars.term.container.TermVector;
-import nars.term.variable.Variable;
+import nars.term.variable.*;
 import nars.truth.Truth;
 import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
@@ -202,38 +202,38 @@ public enum $  {
     }
 
     @NotNull
-    public static Variable v(@NotNull Op type, String s) {
+    public static GenericVariable v(@NotNull Op type, String s) {
         return v(type.ch, s);
     }
 
 
     @NotNull
-    public static Variable varDep(int i) {
+    @Deprecated public static Variable varDep(int i) {
         return v(VAR_DEP, i);
     }
 
     @NotNull
-    public static Variable varDep(String s) {
+    public static GenericVariable varDep(String s) {
         return v(VAR_DEP, s);
     }
 
     @NotNull
-    public static Variable varIndep(int i) {
+    @Deprecated public static Variable varIndep(int i) {
         return v(VAR_INDEP, i);
     }
 
     @NotNull
-    public static Variable varIndep(String s) {
+    public static GenericVariable varIndep(String s) {
         return v(VAR_INDEP, s);
     }
 
     @NotNull
-    public static Variable varQuery(int i) {
+    @Deprecated public static Variable varQuery(int i) {
         return v(VAR_QUERY, i);
     }
 
     @NotNull
-    public static Variable varQuery(String s) {
+    public static GenericVariable varQuery(String s) {
         return v(VAR_QUERY, s);
     }
 
@@ -332,8 +332,8 @@ public enum $  {
         return inh(subject, $.seti(predicate));
     }
 
-    @NotNull
-    public static Variable v(char ch, String name) {
+    /** unnormalized variable */
+    @NotNull public static GenericVariable v(char ch, String name) {
 
 //        if (name.length() < 3) {
 //            int digit = Texts.i(name, -1);
@@ -343,30 +343,27 @@ public enum $  {
 //            }
 //        }
 
-        switch (ch) {
-            case Symbols.VAR_DEPENDENT:
-                return new Variable.VarDep(name);
-            case Symbols.VAR_INDEPENDENT:
-                return new Variable.VarIndep(name);
-            case Symbols.VAR_QUERY:
-                return new Variable.VarQuery(name);
-            case Symbols.VAR_PATTERN:
-                return new VarPattern(name);
-            default:
-                throw new RuntimeException("invalid variable type: " + ch);
-        }
-
+        return new GenericVariable(Variable.typeIndex(ch), name);
     }
 
-    @NotNull
-    public static Variable v(@NotNull Op type, int counter) {
-        if (counter < Variable.MAX_VARIABLE_CACHED_PER_TYPE) {
-            Variable[] vct = Variable.varCache[typeIndex(type)];
-            Variable existing = vct[counter];
-            return existing != null ? existing : (vct[counter] = v(type.ch, String.valueOf(counter)));
+    /** normalized variable */
+    @NotNull public static Variable v(@NotNull Op type, int counter) {
+        if (counter >= Variable.MAX_VARIABLE_CACHED_PER_TYPE) {
+            throw new RuntimeException("too many variables");
         }
 
-        return v(type.ch, String.valueOf(counter));
+        Variable[] vct = Variable.varCache[typeIndex(type)];
+        Variable v = vct[counter];
+        if (v == null) {
+            switch (type) {
+                case VAR_PATTERN: v = new VarPattern(counter);  break;
+                case VAR_QUERY: v = new VarQuery(counter);  break;
+                case VAR_DEP: v = new VarDep(counter);  break;
+                case VAR_INDEP: v = new VarIndep(counter);  break;
+            }
+            vct[counter] = v;
+        }
+        return v;
     }
 
     @Nullable
@@ -692,4 +689,5 @@ public enum $  {
 
         return the(IMAGE_EXT, index + 1, argument);
     }
+
 }

@@ -11,7 +11,7 @@ import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.variable.Variable;
+import nars.term.variable.GenericVariable;
 import nars.util.event.Topic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,11 +29,11 @@ import static nars.Op.PRODUCT;
  */
 public class Execution implements Runnable {
 
-    private static final Logger logger = LoggerFactory.getLogger(Execution.class);
+    //private static final Logger logger = LoggerFactory.getLogger(Execution.class);
 
     public final static float feedbackPriorityMultiplier = 1.0f;
     public final static float feedbackDurabilityMultiplier = 1.0f;
-    public static final Variable defaultResultVariable = $.varDep("defaultResultVariable");
+    public static final GenericVariable defaultResultVariable = $.varDep("defaultResultVariable");
     public final NAR nar;
     public final Task task;
     private final Topic<Execution> listeners;

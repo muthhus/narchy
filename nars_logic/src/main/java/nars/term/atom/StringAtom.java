@@ -1,14 +1,29 @@
 package nars.term.atom;
 
 import nars.Op;
+import nars.nal.meta.AbstractLiteral;
 import org.jetbrains.annotations.NotNull;
 
+/** implemented with a native Java string.
+ *  this should be the ideal choice for JDK9
+ *  since it does Utf8 internally and many
+ *  string operations are intrinsics.  */
+public abstract class StringAtom extends AbstractLiteral {
 
-/** atom backed by a native java String */
-public class StringAtom extends AbstractStringAtomRaw {
+    public final String id;
 
-    public StringAtom(String id) {
-        super(id);
+    protected StringAtom(String id) {
+        this.id = id;
+    }
+
+
+    @Override
+    public final int complexity() {
+        return 1;
+    }
+
+    @Override public final String toString() {
+        return id;
     }
 
     @NotNull
@@ -17,43 +32,20 @@ public class StringAtom extends AbstractStringAtomRaw {
         return Op.ATOM;
     }
 
-    static final int AtomBit = Op.ATOM.bit();
+
+    public static final int AtomBit = Op.ATOM.bit();
 
     @Override
     public final int structure() {
         return AtomBit;
     }
 
-    @Override
-    public final int complexity() {
-        return 1;
+
+    public final int init(int[] meta) {
+
+        meta[4] ++;
+        meta[5] |= AtomBit;
+
+        return hashCode();
     }
-
-
-
-    @Override
-    public final int varIndep() {
-        return 0;
-    }
-
-    @Override
-    public final int varDep() {
-        return 0;
-    }
-
-    @Override
-    public final int varQuery() {
-        return 0;
-    }
-
-    @Override
-    public final int varPattern() {
-        return 0;
-    }
-
-    @Override
-    public final int vars() {
-        return 0;
-    }
-
 }

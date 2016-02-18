@@ -2,6 +2,7 @@ package nars.nal.meta.match;
 
 import nars.$;
 import nars.Op;
+import nars.term.Term;
 import nars.term.transform.VariableNormalization;
 import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
@@ -11,23 +12,22 @@ import org.jetbrains.annotations.NotNull;
  */
 public class EllipsisOneOrMore extends Ellipsis {
 
-    public EllipsisOneOrMore(@NotNull Variable name) {
+    public EllipsisOneOrMore(@NotNull Term /*Variable*/ name) {
         this(name, "..+");
     }
 
     @NotNull
     @Override
-    public Variable normalize(int serial) {
+    public Term normalize(int serial) {
         return new EllipsisOneOrMore($.v(Op.VAR_PATTERN, serial));
     }
 
-    @NotNull
     @Override
-    public Variable clone(@NotNull Variable newVar, VariableNormalization normalizer) {
+    public @NotNull Term clone(@NotNull Variable newVar, VariableNormalization normalizer) {
         return new EllipsisOneOrMore(newVar);
     }
 
-    public EllipsisOneOrMore(@NotNull Variable name, String s) {
+    public EllipsisOneOrMore(@NotNull Term name, String s) {
         super(name, s);
     }
 

@@ -1,14 +1,16 @@
 package nars.nal.meta.match;
 
+import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.container.TermContainer;
 import nars.term.transform.VariableNormalization;
+import nars.term.variable.GenericVariable;
 import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class Ellipsis extends VarPattern { //TODO use Immutable
+public abstract class Ellipsis extends GenericVariable { //TODO use Immutable
 
 
 //    /** a placeholder that indicates an expansion of one or more terms that will be provided by an Ellipsis match.
@@ -26,15 +28,16 @@ public abstract class Ellipsis extends VarPattern { //TODO use Immutable
 //    };
 
     @NotNull
-    public abstract Variable clone(Variable newVar, VariableNormalization normalizer);
+    public abstract Term clone(Variable newVar, VariableNormalization normalizer);
 
 
 
     //public final Variable target;
 
 
-    protected Ellipsis(@NotNull Variable target, String suffix) {
+    protected Ellipsis(@NotNull Term target, String suffix) {
         super(
+            Op.VAR_PATTERN,
             target.toString().substring(1) /* exclude variable type char */
                     + suffix
         );

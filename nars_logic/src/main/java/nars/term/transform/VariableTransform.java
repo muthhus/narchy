@@ -2,17 +2,18 @@ package nars.term.transform;
 
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.variable.GenericVariable;
 import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by me on 6/1/15.
  */
-public abstract class VariableTransform implements CompoundTransform<Compound, Variable> {
+public abstract class VariableTransform implements CompoundTransform<Compound, Term> {
 
     @Override
     public final boolean test(Term possiblyAVariable) {
-        return (possiblyAVariable instanceof Variable);
+        return possiblyAVariable.op().isVar();
     }
 
     @Override

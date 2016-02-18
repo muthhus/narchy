@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Created by me on 12/4/15.
  */
-public abstract class AbstractStringAtom extends AbstractStringAtomRaw {
+public abstract class AbstractStringAtom extends StringAtom {
 
 	protected AbstractStringAtom(@NotNull byte[] id) {
 		this(id, null);

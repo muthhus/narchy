@@ -1,9 +1,13 @@
 package nars.nal.meta;
 
+import nars.Op;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+
+import static nars.Op.ATOM;
 
 /**
  * each precondition is testesd for equality by its toString() method reprsenting an immutable key.
@@ -18,6 +22,7 @@ public abstract class AtomicBooleanCondition<C> extends AbstractLiteral implemen
     public AtomicBooleanCondition() {
         super();
     }
+
 
     public abstract String toString();
 

@@ -27,7 +27,7 @@ import nars.task.Task;
 import nars.term.*;
 import nars.term.atom.Atom;
 import nars.term.container.TermVector;
-import nars.term.variable.Variable;
+import nars.term.variable.*;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import nars.util.Texts;
@@ -451,9 +451,9 @@ public class Narsese extends BaseParser<Object> {
                                 firstOf(
 
                                         //empty operator parens
-                                        sequence(s(), COMPOUND_TERM_CLOSER, push(popTerm(Op.OPERATOR, false))),
+                                        sequence(s(), COMPOUND_TERM_CLOSER, push(popTerm(OPERATOR, false))),
 
-                                        MultiArgTerm(Op.OPERATOR, COMPOUND_TERM_CLOSER, false, false, false, true)
+                                        MultiArgTerm(OPERATOR, COMPOUND_TERM_CLOSER, false, false, false, true)
                                 )
                         ),
 
@@ -465,34 +465,34 @@ public class Narsese extends BaseParser<Object> {
                         Variable(),
 
 //                        //negation shorthand
-                        seq(Op.NEGATE.str, s(), Term(), push(
+                        seq(NEGATE.str, s(), Term(), push(
                                 //Negation.make(popTerm(null, true)))),
                                 $.neg(Atom.the(pop())))),
 
-                        seq(Op.SET_EXT_OPENER.str,
+                        seq(SET_EXT_OPENER.str,
 
                                 firstOf(
-                                    EmptyCompound(SET_EXT_CLOSER, Op.SET_EXT),
-                                    MultiArgTerm(Op.SET_EXT_OPENER, SET_EXT_CLOSER)
+                                    EmptyCompound(SET_EXT_CLOSER, SET_EXT),
+                                    MultiArgTerm(SET_EXT_OPENER, SET_EXT_CLOSER)
                                 )
                         ),
 
-                        seq(Op.SET_INT_OPENER.str,
+                        seq(SET_INT_OPENER.str,
                                 firstOf(
-                                    EmptyCompound(SET_INT_CLOSER, Op.SET_INT),
-                                    MultiArgTerm(Op.SET_INT_OPENER, SET_INT_CLOSER)
+                                    EmptyCompound(SET_INT_CLOSER, SET_INT),
+                                    MultiArgTerm(SET_INT_OPENER, SET_INT_CLOSER)
                                 )
                         ),
 
                         seq(COMPOUND_TERM_OPENER,
                                 firstOf(
 
-                                        EmptyCompound(COMPOUND_TERM_CLOSER, Op.PRODUCT),
+                                        EmptyCompound(COMPOUND_TERM_CLOSER, PRODUCT),
 
                                         MultiArgTerm(null, COMPOUND_TERM_CLOSER, true, false, false, false),
 
                                         //default to product if no operator specified in ( )
-                                        MultiArgTerm(Op.PRODUCT, COMPOUND_TERM_CLOSER, false, false, false, false),
+                                        MultiArgTerm(PRODUCT, COMPOUND_TERM_CLOSER, false, false, false, false),
 
                                         MultiArgTerm(null, COMPOUND_TERM_CLOSER, false, true, true, false)
                                 )
@@ -721,13 +721,13 @@ public class Narsese extends BaseParser<Object> {
                         seq(Term(false, false), "=", Term(false, false), "..+",
                                 swap(3),
                                 push(new EllipsisTransform(
-                                        (Variable) pop(), (Term) pop(), (Term) pop()))
+                                        (Term /*Variable*/) pop(), (Term) pop(), (Term) pop()))
                         ),
                         seq("+",
-                                push(new EllipsisOneOrMore((Variable) pop()))
+                                push(new EllipsisOneOrMore((Term) pop()))
                         ),
                         seq("*",
-                                push(new EllipsisZeroOrMore((Variable) pop()))
+                                push(new EllipsisZeroOrMore((Term) pop()))
                         )
                 )
         );
@@ -764,10 +764,10 @@ public class Narsese extends BaseParser<Object> {
                         | "%"[<word>]                        // pattern variable in rule
         */
         return firstOf(
-                sequence(Symbols.VAR_INDEPENDENT, Atom(), push(new Variable.VarIndep((String) pop()))),
-                sequence(Symbols.VAR_DEPENDENT, Atom(), push(new Variable.VarDep((String) pop()))),
-                sequence(Symbols.VAR_QUERY, Atom(), push(new Variable.VarQuery((String) pop()))),
-                sequence(Symbols.VAR_PATTERN, Atom(), push(new VarPattern((String) pop())))
+                sequence(Symbols.VAR_INDEPENDENT, Atom(), push($.v(VAR_INDEP, (String) pop()))),
+                sequence(Symbols.VAR_DEPENDENT, Atom(), push($.v(VAR_DEP, ((String) pop())))),
+                sequence(Symbols.VAR_QUERY, Atom(), push($.v(Op.VAR_QUERY, (String) pop()))),
+                sequence(Symbols.VAR_PATTERN, Atom(), push($.v(Op.VAR_PATTERN, (String) pop())))
 //                anyOf(variables),
 //                push(match().charAt(0)), Atom(), swap(),
 //                    push($.v((char)pop(), (String) pop())
@@ -904,7 +904,7 @@ public class Narsese extends BaseParser<Object> {
 
                 /*s(),*/ COMPOUND_TERM_OPENER, s(), COMPOUND_TERM_CLOSER,
 
-                push(popTerm(Op.OPERATOR, false))
+                push(popTerm(OPERATOR, false))
         );
     }
 

@@ -29,7 +29,7 @@ public class PatternIndexTest {
          * may contain duplicates in which case a discrepency
          * can fail the match.
          */
-        public final List<Variable> variableSequence =
+        public final List<Term> variableSequence =
                 Global.newArrayList();
 
         public CompoundRegex(Compound c) {
@@ -82,7 +82,7 @@ public class PatternIndexTest {
             for (Term x : c.terms()) {
 
                 if (x.op() == Op.VAR_PATTERN) {
-                    appendVariable(sb, (Variable)x);
+                    appendVariable(sb, x);
                 } else if (x instanceof Compound) {
                     append(sb, (Compound)x);
                 } else {
@@ -93,7 +93,7 @@ public class PatternIndexTest {
             sb.append(' ');
         }
 
-        private void appendVariable(StringBuilder sb, Variable x) {
+        private void appendVariable(StringBuilder sb, Term x) {
             int id = atomics.getIfAbsentPut(x, atomics.size());
             //sb.append((char)x.op().ordinal());
             //sb.append((char)id);

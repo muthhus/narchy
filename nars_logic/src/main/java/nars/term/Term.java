@@ -279,12 +279,17 @@ public interface Term extends Termed, Comparable, Termlike {
      3: queryVars
      4: volume
      5: struct
+
+     subclasses can override this for more efficient aggregation if certain features are sure to be absent
      */
     default int init(int[] meta) {
 
-        meta[0] += varDep();
-        meta[1] += varIndep();
-        meta[2] += varQuery();
+        if (vars() > 0) {
+            meta[0] += varDep();
+            meta[1] += varIndep();
+            meta[2] += varQuery();
+        }
+
         meta[3] += varPattern();
         meta[4] += volume();
         meta[5] |= structure();

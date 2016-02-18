@@ -1,9 +1,11 @@
 package nars.nal.nal8;
 
 import nars.Op;
+import nars.nal.meta.AbstractLiteral;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.AbstractStringAtom;
+import nars.term.atom.StringAtom;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -18,14 +20,16 @@ import org.jetbrains.annotations.NotNull;
  * as shown above, but is not an "Operator").
  *
  */
-public final class Operator<T extends Term> extends AbstractStringAtom { //implements Term {
+public final class Operator<T extends Term> extends AbstractLiteral {
+
+    private final String str;
 
     public Operator(@NotNull T the) {
         this(the.toString());
     }
 
     public Operator(@NotNull String the) {
-        super(the.charAt(0)!=Op.OPERATOR.ch ? Op.OPERATOR.ch + the : the); //prepends ^ if necessary
+        this.str = (the.charAt(0)!=Op.OPERATOR.ch ? Op.OPERATOR.ch + the : the); //prepends ^ if necessary
     }
 
     /** returns the Product arguments compound of an operation. does not check if the input is actually an operation */
@@ -54,29 +58,9 @@ public final class Operator<T extends Term> extends AbstractStringAtom { //imple
         return 1;
     }
 
-    @Override
-    public int varIndep() {
-        return 0;
-    }
 
     @Override
-    public int varDep() {
-        return 0;
+    public String toString() {
+        return str;
     }
-
-    @Override
-    public int varQuery() {
-        return 0;
-    }
-
-    @Override
-    public int varPattern() {
-        return 0;
-    }
-
-    @Override
-    public int vars() {
-        return 0;
-    }
-
 }

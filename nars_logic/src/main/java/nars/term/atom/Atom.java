@@ -11,18 +11,7 @@ import org.jetbrains.annotations.Nullable;
 /** default Atom implementation */
 public class Atom extends StringAtom {
 
-    //private static final Map<String,Atom> atoms = Global.newHashMap();
 
-
-//    public static int hash(byte[] id, int ordinal) {
-//        return Util.ELFHashNonZero(id, Util.PRIME1 * (1+ordinal));
-//        //return Util.WildPlasserHashNonZero(id, (1+ordinal));
-//    }
-
-//    /** TODO use a hash function equivalent to String's but without allocating a String */
-//    @Deprecated public static int hash(@NotNull byte[] id, int ordinal) {
-//        return hash(new String(id).hashCode(), ordinal);
-//    }
 
     public static int hash(@NotNull String id, @NotNull Op op) {
         int id1 = id.hashCode();

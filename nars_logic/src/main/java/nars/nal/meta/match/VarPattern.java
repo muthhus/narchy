@@ -2,35 +2,38 @@ package nars.nal.meta.match;
 
 import nars.$;
 import nars.Op;
+import nars.term.Compound;
+import nars.term.SubtermVisitor;
+import nars.term.Term;
 import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.IOException;
+import java.util.function.Predicate;
 
 /**
- * Created by me on 12/5/15.
+ * normalized pattern variable
  */
 public class VarPattern extends Variable {
 
-
-    public VarPattern(String name) {
-        super(Op.VAR_PATTERN.ch + name);
+    public VarPattern(int id) {
+        super(Op.VAR_PATTERN, id);
     }
 
-    @NotNull
-    @Override
-    public Variable normalize(int serial) {
-        return $.v(Op.VAR_PATTERN, serial);
-    }
 
     @Override
     public final int structure() {
         return 0;
     }
 
+
     @NotNull
     @Override
     public final Op op() {
         return Op.VAR_PATTERN;
     }
+
 
     /**
      * pattern variable hidden in the count 0
