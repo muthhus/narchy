@@ -13,44 +13,46 @@ public class StringAtom extends AbstractStringAtomRaw {
 
     @NotNull
     @Override
-    public Op op() {
+    public final Op op() {
         return Op.ATOM;
     }
 
-
-
-
+    static final int AtomBit = Op.ATOM.bit();
 
     @Override
-    public int complexity() {
+    public final int structure() {
+        return AtomBit;
+    }
+
+    @Override
+    public final int complexity() {
         return 1;
     }
 
-    @Override
-    public int structure() {
-        return Op.ATOM.bit();
-    }
-
-
 
 
     @Override
-    public int varIndep() {
+    public final int varIndep() {
         return 0;
     }
 
     @Override
-    public int varDep() {
+    public final int varDep() {
         return 0;
     }
 
     @Override
-    public int varQuery() {
+    public final int varQuery() {
         return 0;
     }
 
     @Override
-    public int vars() {
+    public final int varPattern() {
+        return 0;
+    }
+
+    @Override
+    public final int vars() {
         return 0;
     }
 

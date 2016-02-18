@@ -55,7 +55,10 @@ public class VarPattern extends Variable {
         return 0;
     }
 
-
+    @Override
+    public final int varPattern() {
+        return 1;
+    }
 
 
 }

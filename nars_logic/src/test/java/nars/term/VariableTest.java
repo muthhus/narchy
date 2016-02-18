@@ -74,10 +74,14 @@ public class VariableTest {
     }
 
     @Test public void testBooleanReductionViaHasPatternVar() {
-        Compound c = $.$("<a <-> <%1 --> b>>");
-        assertTrue( c.hasVarPattern() );
-
         Compound d = $.$("<a <-> <$1 --> b>>");
-        assertFalse( d.hasVarPattern() );
+        assertEquals(0,  d.varPattern() );
+
+        Compound c = $.$("<a <-> <%1 --> b>>");
+        assertEquals(1,  c.varPattern() );
+
+        Compound e = $.$("<%2 <-> <%1 --> b>>");
+        assertEquals(2,  e.varPattern() );
+
     }
 }

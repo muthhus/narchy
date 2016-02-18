@@ -138,6 +138,11 @@ public abstract class Variable extends AbstractStringAtom {
         public int varQuery() {
             return 0;
         }
+
+        @Override
+        public int varPattern() {
+            return 0;
+        }
     }
 
     public static final class VarIndep extends Variable {
@@ -178,6 +183,10 @@ public abstract class Variable extends AbstractStringAtom {
             return 0;
         }
 
+        @Override
+        public int varPattern() {
+            return 0;
+        }
     }
 
     public static final class VarQuery extends Variable {
@@ -216,6 +225,11 @@ public abstract class Variable extends AbstractStringAtom {
         @Override
         public int varQuery() {
             return 1;
+        }
+
+        @Override
+        public int varPattern() {
+            return 0;
         }
 
     }

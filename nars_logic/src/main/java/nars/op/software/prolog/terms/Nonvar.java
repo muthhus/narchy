@@ -107,7 +107,10 @@ public abstract class Nonvar extends PTerm {
 	public int varQuery() {
 		return 0;
 	}
-
+	@Override
+	public int varPattern() {
+		return 0;
+	}
 	@Override
 	public int vars() {
 		return 0;

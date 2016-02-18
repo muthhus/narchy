@@ -50,7 +50,7 @@ public enum ImageMatch /*extends ArrayEllipsisMatch<Term>*/ {
         //mask the relation term
         Term[] t = m.term;
         t[imageIndex] = Op.Imdex;
-        m.init();//rehash because it changed
+        //m.init();//rehash because it changed?
         return m;
     }
 

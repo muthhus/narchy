@@ -53,7 +53,13 @@ public class Thermostat4 {
 
         this.h = objs.the("h", UnitValTaskInc.class /* new UnitVal(0.5f, speed)*/);
 
-        HaiQ hai = new HaiQ(cols, 9, 3);
+        HaiQ hai = new HaiQ(cols, 9, 3) {
+            @Override
+            protected int perceive(float[] input) {
+                //TODO
+                return 0;
+            }
+        };
         n.onFrame(nn -> {
             int[] x = h.see();
             float[] ff = new float[x.length];

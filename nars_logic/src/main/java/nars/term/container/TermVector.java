@@ -13,10 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
 import java.lang.reflect.Array;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
+import java.util.*;
 import java.util.function.Consumer;
 
 /**
@@ -41,18 +38,20 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
     /**
      * bitvector of subterm types, indexed by NALOperator's .ordinal() and OR'd into by each subterm
      */
-    protected transient int structureHash;
-    protected transient int contentHash;
-    protected transient short volume;
-    protected transient short complexity;
+    protected final int structureHash;
+    protected final int contentHash;
+    protected final short volume;
+    protected final short complexity;
 
     /**
      * # variables contained, of each type & total
+     * this means maximum of 127 variables per compound
      */
-    protected transient byte varTotal;
-    protected transient byte hasVarQueries;
-    protected transient byte hasVarIndeps;
-    protected transient byte hasVarDeps;
+    protected final byte varTotal;
+    protected final byte varQueries;
+    protected final byte varIndeps;
+    protected final byte varPattern;
+    protected final byte varDeps;
 
     //    public TermVector() {
 //        this(null);
@@ -72,18 +71,52 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
     }
 
     @SafeVarargs
-    public TermVector(T... t) {
-        term = t;
-        init();
+    public TermVector(T... terms) {
+        this.term = terms;
+
+        /**
+         0: depVars
+         1: indepVars
+         2: queryVars
+         3: patternVar
+         4: volume
+         5: struct
+         */
+        int[] meta = new int[6];
+        int h = 1;
+        for (Term t : term) {
+            h = 31 /*Util.PRIME1 */ * h + t.init(meta);
+        }
+        this.contentHash = h;
+
+
+
+        int varTot = 0;
+        final int vD = meta[0]; this.varDeps = (byte)vD; varTot+=vD;
+        final int vI = meta[1]; this.varIndeps = (byte)vI; varTot+=vI;
+        final int vQ = meta[2]; this.varQueries = (byte)vQ; varTot+=vQ;
+        this.varTotal = (byte)varTot;
+
+        final int vP = meta[3]; this.varPattern = (byte)vP; //varTot+=0; //pattern variables do not count toward total variables
+
+        final int vol = meta[4] + 1;
+        this.volume = (short)( vol );
+        this.complexity = (short)(vol - varTot  );
+
+        this.structureHash = meta[5];
+
+        //if (h == 0) h = 1; //nonzero to indicate hash calculated
     }
 
-    public TermVector(@NotNull T[] source, @NotNull Function<T,Termed<T>> mapping) {
-        int len = source.length;
-        Term[] t = this.term = (T[]) new Term[len];
-        for (int i = 0; i < len; i++)
-            t[i] = mapping.valueOf(source[i]).term();
-        init();
-    }
+
+//    public TermVector(@NotNull T[] source, @NotNull Function<T,Termed<T>> mapping) {
+//        int len = source.length;
+//        Term[] t = this.term = (T[]) new Term[len];
+//        for (int i = 0; i < len; i++)
+//            t[i] = mapping.valueOf(source[i]).term();
+//        init();
+//    }
+
 
     @Override
     public final boolean term(int i, Op o) {
@@ -158,17 +191,22 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
 
     @Override
     public final int varDep() {
-        return hasVarDeps;
+        return varDeps;
     }
 
     @Override
     public final int varIndep() {
-        return hasVarIndeps;
+        return varIndeps;
     }
 
     @Override
     public final int varQuery() {
-        return hasVarQueries;
+        return varQueries;
+    }
+
+    @Override
+    public final int varPattern() {
+        return varPattern;
     }
 
     @Override
@@ -231,54 +269,6 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
     }
 
 
-//    static int nextContentHash(int hash, int subtermHash) {
-//        return Util.PRIME2 * hash + subtermHash;
-//        //return (hash << 4) +  subtermHash;
-//        //(Util.PRIME2 * contentHash)
-//    }
-
-
-    /** returns hashcode */
-    public final int init() {
-
-        int deps = 0, indeps = 0, queries = 0;
-        int compl = 1, vol = 1;
-
-        int subt = 0;
-        int contentHash = 1;
-
-        for (Term t : term) {
-
-            if (t == this)
-                throw new RecursiveTermContentException(t);
-            if (t == null)
-                throw new NullPointerException();
-
-            contentHash = Util.hashCombine(contentHash, t.hashCode());
-
-            compl += t.complexity();
-            vol += t.volume();
-            deps += t.varDep();
-            indeps += t.varIndep();
-            queries += t.varQuery();
-            subt |= t.structure();
-        }
-
-        //MAX 127 variables
-        hasVarDeps = (byte) deps;
-        hasVarIndeps = (byte) indeps;
-        hasVarQueries = (byte) queries;
-        varTotal = (byte) (deps + indeps + queries);
-        structureHash = subt;
-
-        complexity = (short) compl;
-        volume = (short) vol;
-
-        if (contentHash == 0) contentHash = 1; //nonzero to indicate hash calculated
-        this.contentHash = contentHash;
-        return contentHash;
-    }
-
     @Override
     public final void addAllTo(@NotNull Collection<Term> set) {
         Collections.addAll(set, term);
@@ -287,13 +277,6 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
     @Override
     public final int hashCode() {
         return contentHash;
-//        final int h = contentHash;
-//        if (h == 0) {
-//            //if hash is zero, it means it needs calculated
-//            //return init(term);
-//            throw new RuntimeException("unhashed");
-//        }
-//        return h;
     }
 
     @Override

@@ -163,6 +163,11 @@ public final class Var extends PTerm {
 	}
 
 	@Override
+	public int varPattern() {
+		return 0;
+	}
+
+	@Override
 	public int vars() {
 		return 0;
 	}

@@ -472,18 +472,10 @@ public abstract class FindSubst extends Versioning implements Subst {
     }
 
     public final boolean matchPermute(@NotNull TermContainer x, @NotNull Compound y) {
-        boolean isPattern = type == Op.VAR_PATTERN;
+        //detect special case of no variables
+        boolean actuallyCommutative = (type == Op.VAR_PATTERN) ? (x.varPattern() == 0) : !x.hasAny(type.bit());
 
-        if
-                ((!isPattern && !x.hasAny(type.bit()) ||
-                (isPattern && !x.hasVarPattern())))
-
-        {
-            //SPECIAL CASE: no variables
-            return matchLinear(x, y);
-        }
-
-        return addTermutator(new CommutivePermutations(this, x, y));
+        return actuallyCommutative ? matchLinear(x, y) : addTermutator(new CommutivePermutations(this, x, y));
     }
 
 

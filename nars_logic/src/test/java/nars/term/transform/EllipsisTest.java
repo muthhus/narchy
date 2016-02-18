@@ -76,7 +76,7 @@ public class EllipsisTest {
                         if (s!=null) {
                             //System.out.println(s);
                             selectedFixed.add(s);
-                            assertFalse(s.hasVarPattern());
+                            assertEquals(0, s.varPattern());
                         }
 
                         return true;

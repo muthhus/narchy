@@ -89,9 +89,6 @@ public interface Termlike  {
 
     @Nullable Ellipsis firstEllipsis();
 
-    default boolean hasVarPattern() {
-        return or(x -> x.op() == Op.VAR_PATTERN);
-    }
 
 
 }

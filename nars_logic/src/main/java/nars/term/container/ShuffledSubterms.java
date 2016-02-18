@@ -92,6 +92,11 @@ public final class ShuffledSubterms extends ShuffledPermutations implements Term
     }
 
     @Override
+    public int varPattern() {
+        return compound.varPattern();
+    }
+
+    @Override
     public int vars() {
         return compound.vars();
     }

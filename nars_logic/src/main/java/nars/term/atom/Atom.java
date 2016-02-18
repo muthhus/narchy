@@ -111,12 +111,6 @@ public class Atom extends StringAtom {
         return x;
     }
 
-    @Override
-    public boolean hasVarPattern() {
-        return false;
-    }
-
-
     /*
     // similar to String.intern()
     public final static Atom the(final String name) {
@@ -137,12 +131,8 @@ public class Atom extends StringAtom {
         return null;
     }
 
-    static final int AtomBit = Op.ATOM.bit();
 
-    @Override
-    public final int structure() {
-        return AtomBit;
-    }
+
 
     @NotNull
     public final String toStringUnquoted() {

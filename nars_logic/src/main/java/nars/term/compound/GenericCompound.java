@@ -188,6 +188,12 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     }
 
     @Override
+    public final int varPattern() {
+        return subterms.varPattern();
+    }
+
+
+    @Override
     public final int vars() {
         return subterms.vars();
     }

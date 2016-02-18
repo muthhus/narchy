@@ -32,6 +32,8 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
 
     int varQuery();
 
+    int varPattern();
+
     int vars();
 
     /** gets subterm at index i */

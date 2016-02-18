@@ -70,6 +70,11 @@ public final class Operator<T extends Term> extends AbstractStringAtom { //imple
     }
 
     @Override
+    public int varPattern() {
+        return 0;
+    }
+
+    @Override
     public int vars() {
         return 0;
     }

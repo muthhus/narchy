@@ -38,6 +38,11 @@ public final class CommonVariable extends Variable  {
         return type == Op.VAR_QUERY ? 1 : 0;
     }
 
+    @Override
+    public int varPattern() {
+        return type == Op.VAR_QUERY ? 1 : 0;
+    }
+
     @NotNull
     public static CommonVariable make(@NotNull Variable v1, @NotNull Variable v2) {
 

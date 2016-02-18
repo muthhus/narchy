@@ -136,6 +136,8 @@ public interface Term extends Termed, Comparable, Termlike {
     int varDep();
     /** # of contained query variables */
     int varQuery();
+    /** # of contained pattern variables */
+    int varPattern();
 
 
     /** total # of variables, excluding pattern variables */
@@ -267,6 +269,27 @@ public interface Term extends Termed, Comparable, Termlike {
         }
 
         return ETERNAL;
+    }
+
+    /**
+     meta is int[] that collects term metadata:
+     0: patternVar
+     1: depVars
+     2: indepVars
+     3: queryVars
+     4: volume
+     5: struct
+     */
+    default int init(int[] meta) {
+
+        meta[0] += varDep();
+        meta[1] += varIndep();
+        meta[2] += varQuery();
+        meta[3] += varPattern();
+        meta[4] += volume();
+        meta[5] |= structure();
+
+        return hashCode();
     }
 
 //    default public boolean hasAll(final Op... op) {
