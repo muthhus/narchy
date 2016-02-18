@@ -16,9 +16,9 @@ public abstract class VectorMap {
 
 	protected VectorMap(NAR n, String prefix, int numInputs,
 			float inputPriority, int numOutputs, float outputPriority) {
-		input = new UniformVector(n, prefix + "_i", new double[numInputs])
+		input = new UniformVector(n, prefix + "_i", new float[numInputs])
 				.setPriority(inputPriority);
-		output = new UniformVector(n, prefix + "_o", new double[numOutputs])
+		output = new UniformVector(n, prefix + "_o", new float[numOutputs])
 				.setPriority(outputPriority);
 
 	}
@@ -29,6 +29,6 @@ public abstract class VectorMap {
 		output.update();
 	}
 
-	protected abstract void map(double[] in, double[] out);
+	protected abstract void map(float[] in, float[] out);
 
 }

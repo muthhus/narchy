@@ -31,7 +31,14 @@ public class QRover extends AbstractPolygonBot {
 
     public QRover(String id) {
         super(id);
-        this.hai = new HaiQ(inputs, actions*2, actions);
+        this.hai = new HaiQ(inputs, actions*2, actions) {
+
+            @Override
+            protected int perceive(float[] input) {
+                //TODO
+                return 0;
+            }
+        };
         this.hai.setQ(0.2f, 0.4f, 0.9f, 0.07f); //0.1 0.5 0.9
 
         this.in = new float[inputs];

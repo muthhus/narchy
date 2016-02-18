@@ -1,6 +1,7 @@
 package nars.util.signal;
 
 import nars.util.data.Util;
+import nars.util.data.random.XorShift128PlusRandom;
 
 import java.util.Random;
 
@@ -39,8 +40,8 @@ public class Autoencoder {
 	 */
 
 
-	public Autoencoder(int n_visible, int n_hidden) {
-		this(n_visible, n_hidden, null, null, null, null);
+	public Autoencoder(int n_visible, int n_hidden, Random r) {
+		this(n_visible, n_hidden, null, null, null, r);
 	}
 
 	public Autoencoder(int n_visible, int n_hidden, float[][] W,
@@ -48,7 +49,7 @@ public class Autoencoder {
 		this.n_visible = n_visible;
 		this.n_hidden = n_hidden;
 
-		this.rng = rng == null ? new Random() : rng;
+		this.rng = rng;
 
 		if (W == null) {
 			this.W = new float[n_hidden][n_visible];
@@ -257,7 +258,7 @@ public class Autoencoder {
 	 * finds the index of the highest output value, or returns a random one if
 	 * none are
 	 */
-	public int getMax() {
+	public int max() {
 
 		float m = Float.MIN_VALUE;
 		int best = -1;

@@ -9,6 +9,8 @@ import nars.data.Range;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Termed;
+import nars.util.data.random.XorShift128PlusRandom;
+import nars.util.signal.Autoencoder;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -30,6 +32,7 @@ public class NarQ implements Consumer<NAR> {
     //private static final Logger logger = LoggerFactory.getLogger(NarQ.class);
 
     private final NAR nar;
+    private final StateCompressionRatio stateCompression;
 
     @Nullable
     public HaiQ q;
@@ -185,9 +188,18 @@ public class NarQ implements Consumer<NAR> {
 
 
 
+    @FunctionalInterface  public interface StateCompressionRatio {
+        public int states(int inputs, int outputs);
+    }
+
     public NarQ(NAR n) {
+        this(n, (i,o)->i*o /*default */);
+    }
+
+    public NarQ(NAR n, StateCompressionRatio s) {
         this.nar = n;
         this.input = new Vercept();
+        this.stateCompression = s;
         nar.onFrame(this);
     }
 
@@ -214,7 +226,7 @@ public class NarQ implements Consumer<NAR> {
 
         if (q == null || q.inputs() != inputs || q.actions() != outputs) {
             //TODO allow substituting an arbitrary I/O agent interface
-            q = new HaiQImpl(inputs, inputs*outputs*2, outputs);
+            q = new HaiQImpl(inputs, stateCompression.states(inputs, outputs), outputs);
         }
 
         return true;
@@ -230,14 +242,26 @@ public class NarQ implements Consumer<NAR> {
 
     private class HaiQImpl extends HaiQ {
 
+        //Hsom...
+        final static float perceptionAlpha = 0.02f;
+        final Autoencoder ae;
+
         public HaiQImpl(int inputs, int states, int outputs) {
             super(inputs, states, outputs);
+            ae = new Autoencoder(inputs, states, new XorShift128PlusRandom(1));
         }
 
         @Override
         protected int nextAction(int state) {
             //alpha is applied elsewhere, so here directly choose
             return choose(state);
+        }
+
+        @Override
+        protected int perceive(float[] input) {
+            ae.train(input, perceptionAlpha,  0.03f, 0.03f, false);
+            int w = ae.max();
+            return w;
         }
 
         @Override
@@ -251,7 +275,7 @@ public class NarQ implements Consumer<NAR> {
 
             int s = output.size();
 
-            final float epsi = q.Epsilon;
+            final float epsi = Epsilon;
 
 
             for (int j = 0; j < s; j++) {
@@ -260,7 +284,7 @@ public class NarQ implements Consumer<NAR> {
 
                 //add noise
                 if (epsi != 0) {
-                    e += epsi * (q.rng.nextFloat() - 0.5f) * 2f;
+                    e += epsi * (rng.nextFloat() - 0.5f) * 2f;
                 }
 
                 //System.out.println(outs.get(j) + " " + e);

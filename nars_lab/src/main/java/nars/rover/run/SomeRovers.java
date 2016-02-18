@@ -180,7 +180,7 @@ public class SomeRovers {
         NAR n = r.nar;
 
 
-        NarQ nqSpine = new NarQ(n);
+        NarQ nqSpine = new NarQ(n, (i,o) -> (int) Math.ceil(Math.sqrt(i * o)));
 
 
         nqSpine.power.setValue(0.8f);

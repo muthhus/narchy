@@ -233,7 +233,8 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 
     @Nullable
     default Term last() {
-        return term(size()-1);
+        int s = size();
+        return s == 0 ? null : term(s - 1);
     }
 
     default int relation() {

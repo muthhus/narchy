@@ -21,7 +21,7 @@ public class VectorMapTest {
     @Test 
     public void testUniformVector() {
         
-        double[] d = new double[3];
+        float[] d = new float[3];
         
         UniformVector v = new UniformVector(n, "d", d);                
         v.update();
@@ -50,11 +50,11 @@ public class VectorMapTest {
         
             Autoencoder d;
             
-            @Override protected void map(double[] in, double[] out) {
+            @Override protected void map(float[] in, float[] out) {
                 if (d == null)
                     d = new Autoencoder(in.length, out.length);
 
-                d.train(in, 0, 0.05, 0, true);
+                d.train(in, 0, 0.05f, 0, true);
                 d.encode(in, out, true, true);                
             }          
         };
@@ -76,7 +76,7 @@ public class VectorMapTest {
 
 
                 for (int i = 0; i < v.input.data.length; i++)
-                    v.input.data[i] = 0.5 * (1.0 + Math.sin((t+i)/ 20.0f));
+                    v.input.data[i] = 0.5f * (float)(1.0 + Math.sin((t+i)/ 20.0f));
                 v.update();
             }
         };

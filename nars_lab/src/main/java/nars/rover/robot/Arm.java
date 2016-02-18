@@ -2,12 +2,14 @@ package nars.rover.robot;
 
 import nars.Global;
 import nars.learn.HaiQ;
+import nars.learn.Hsom;
 import nars.rover.Sim;
 import nars.rover.physics.gl.JoglAbstractDraw;
 import nars.rover.physics.j2d.LayerDraw;
 import nars.util.data.Util;
 import nars.util.data.list.FasterList;
 import nars.learn.NarQ;
+import nars.util.data.random.XorShift128PlusRandom;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.Vec2;
@@ -117,11 +119,20 @@ public class Arm extends Robotic implements LayerDraw {
                 target polar theta and radius
                 delta x, y of current position to target, both independently normalized to armLength
                 */
-        controller = new HaiQ((segs) + 2 ,
-                (2+segs) * 6 /* arbitrary # states */,
+        controller = new HaiQ((segs) + 2,
+                (2 + segs) * 6 /* arbitrary # states */,
                 (segs) * 2 //forward and reverse motor impulse for each joint
-                    // TODO: (1+segs) + 1 //segment select (including a position for none), and a direction select
-        );
+                // TODO: (1+segs) + 1 //segment select (including a position for none), and a direction select
+        ) {
+
+            final Hsom h = new Hsom(segs+2, 2+segs*6, new XorShift128PlusRandom(1));
+
+            @Override
+            protected int perceive(float[] input) {
+                h.learn(input);
+                return h.winner();
+            }
+        };
         controller.setQ(0.25f, 0.1f, 0.5f, 0.2f);
 
         this.input = new float[controller.inputs()];

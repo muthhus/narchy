@@ -16,13 +16,13 @@ public class UniformVector  {
 
     float epsilon = Global.TRUTH_EPSILON;
     @Nullable
-    public double[] lastData = null;
-    public final double[] data;
+    public float[] lastData;
+    public final float[] data;
     private final String prefix;
     private final NAR nar;
     private float priority;
 
-    public UniformVector(NAR n, String prefix, double[] data) {
+    public UniformVector(NAR n, String prefix, float[] data) {
         nar = n;
         this.prefix = prefix;
         this.data = data;
@@ -41,18 +41,18 @@ public class UniformVector  {
         boolean changed = false;
         if ((lastData == null) || (lastData.length!=data.length)) {
             //first time
-            lastData = new double[data.length];     
+            lastData = new float[data.length];     
             changed = true;
         }
 
         
         StringBuilder s = new StringBuilder();
         for (int i = 0; i < data.length; i++) {
-            double v = data[i];
+            float v = data[i];
             if ((changed) || (different(v,lastData[i]))) {
-                if (v > 1.0) v = 1.0;
-                if (v < 0.0) v = 0.0;
-                float truth = (float)v;
+                if (v > 1.0) v = 1.0f;
+                else if (v < 0.0) v = 0.0f;
+                float truth = v;
                 float conf = 0.99f;
                 s.append('$').append(n2(priority)).append("$ <").append(prefix).append('_').append(i).append(" --> ").append(prefix).append(">. :|: %").append(n2(truth)).append(';').append(n2(conf)).append("%\n");
             }
@@ -64,7 +64,7 @@ public class UniformVector  {
         
     }
 
-    public boolean different(double a, double b) {
+    public boolean different(float a, float b) {
         return Math.abs(a - b) >= epsilon;
     }
     
