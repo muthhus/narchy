@@ -36,7 +36,7 @@ public class GrammarTest2 {
 
         int charRate = 16;
         Default n = new Default(1000, 3, 2, 3);
-        Naljects o = new Naljects(n);
+        Lobjects o = new Lobjects(n);
         final Tape tape = o.the("tape", Tape.class, "ababcdcdeeee", charRate);
         
 

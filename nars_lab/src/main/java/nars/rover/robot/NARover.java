@@ -10,7 +10,7 @@ import nars.$;
 import nars.NAR;
 import nars.Symbols;
 import nars.java.MethodOperator;
-import nars.java.Naljects;
+import nars.java.Lobjects;
 import nars.rover.Material;
 import nars.rover.Sim;
 import nars.rover.obj.NARVisionRay;
@@ -43,7 +43,7 @@ public class NARover extends AbstractPolygonBot {
 
     public final NAR nar;
 
-    final Naljects objs;
+    final Lobjects objs;
 
     float hungry, sick;
     final Sensor linearSpeedFwd, leftSpeed,
@@ -65,7 +65,7 @@ public class NARover extends AbstractPolygonBot {
 
         this.nar = nar;
 
-        objs = new Naljects(nar);
+        objs = new Lobjects(nar);
 
         int maxUpdateTime = 32;
 

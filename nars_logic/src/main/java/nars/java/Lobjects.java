@@ -29,14 +29,14 @@ import java.util.stream.Stream;
 
 
 /**
- * Dynamic proxy for any POJO that intercepts specific
+ * Logicized Objects - Dynamic proxy class for any POJO that intercepts specific
  * methods and generates reasoner events which can be
  * stored, input to one or more reasoners, etc..
  * <p>
  * <p>
  * TODO option to include stack traces in conjunction with invocation
  */
-public class Naljects extends DefaultTermizer implements Termizer, MethodHandler {
+public class Lobjects extends DefaultTermizer implements Termizer, MethodHandler {
 
 
     @NotNull
@@ -90,7 +90,7 @@ public class Naljects extends DefaultTermizer implements Termizer, MethodHandler
     private float metadataPriority = 0.1f;
 
 
-    public Naljects(NAR n) {
+    public Lobjects(NAR n) {
         nar = n;
     }
 
@@ -288,7 +288,7 @@ public class Naljects extends DefaultTermizer implements Termizer, MethodHandler
         T wrappedInstance = the(identifier, (T)clazz.getConstructors()[0].newInstance(args));
 
         ClassOperator co = classOps.computeIfAbsent(instance, i -> {
-            ClassOperator co2 = new ClassOperator(i, goalInvoke, Naljects.this);
+            ClassOperator co2 = new ClassOperator(i, goalInvoke, Lobjects.this);
             nar.onExec(co2);
             return co2;
         });

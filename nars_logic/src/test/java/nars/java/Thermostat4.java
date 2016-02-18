@@ -38,7 +38,7 @@ public class Thermostat4 {
         //n.initNAL9();
 
 
-        Naljects objs = new Naljects(n) {
+        Lobjects objs = new Lobjects(n) {
 
 //            @Override
 //            protected Term number(Number o) {

@@ -19,7 +19,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static nars.java.Naljects.getMethodOperator;
+import static nars.java.Lobjects.getMethodOperator;
 
 /**
  * Created by me on 8/19/15.

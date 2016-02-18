@@ -16,7 +16,7 @@ import java.lang.reflect.Modifier;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static nars.java.Naljects.isMethodVisible;
+import static nars.java.Lobjects.isMethodVisible;
 
 /**
  * Reacts to operations with 4 arguments:
@@ -34,7 +34,7 @@ public class ClassOperator extends TermFunction {
     @NotNull
     final Map<Term, MethodOperator> methods;
 
-    public ClassOperator(@NotNull Class c, AtomicBoolean enableInvoke, Naljects context) {
+    public ClassOperator(@NotNull Class c, AtomicBoolean enableInvoke, Lobjects context) {
         super(c.getSimpleName());
         this.klass = c;
         methods = Global.newHashMap();
@@ -64,7 +64,7 @@ public class ClassOperator extends TermFunction {
 
     @Override protected final void feedback(@NotNull Execution e, Object y) {
 
-        if (y instanceof Naljects.JavaInvoked)
+        if (y instanceof Lobjects.JavaInvoked)
             return; //ignore, it has already been reported
 
         super.feedback(e, y);

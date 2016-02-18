@@ -2,26 +2,30 @@ package nars.learn;
 
 import org.encog.engine.network.activation.ActivationSigmoid;
 import org.encog.mathutil.error.ErrorCalculation;
-import org.encog.ml.MLMethod;
 import org.encog.ml.TrainingImplementationType;
-import org.encog.ml.data.MLData;
-import org.encog.ml.data.MLDataPair;
-import org.encog.ml.data.MLDataSet;
-import org.encog.ml.train.BasicTraining;
-import org.encog.neural.freeform.FreeformConnection;
-import org.encog.neural.freeform.FreeformNetwork;
-import org.encog.neural.freeform.FreeformNeuron;
-import org.encog.neural.freeform.task.ConnectionTask;
 
-import java.util.HashSet;
-import java.util.Set;
+import org.encog.ml.train.MLTrain;
+import org.encog.neural.freeform.FreeformConnection;
+import org.encog.neural.freeform.FreeformNeuron;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.function.Consumer;
 
 /**
  * From Encog https://github.com/encog/encog-java-core
  * Provides basic propagation functions to other trainers.
  */
-public abstract class FreeformPropagationTraining extends BasicTraining {
+public abstract class FreeformPropagationTraining {
+//    /**
+//     * The training data.
+//     */
+//    private MLDataSet training;
 
+//
+//    /**
+//     * The current iteration.
+//     */
+//    private int iteration;
 
 	/**
 	 * The constant to use to fix the flat spot problem.
@@ -33,10 +37,6 @@ public abstract class FreeformPropagationTraining extends BasicTraining {
 	 */
 	private final FreeformNetwork network;
 
-	/**
-	 * The training set to use.
-	 */
-	private final MLDataSet training;
 
 	/**
 	 * The number of iterations.
@@ -48,42 +48,33 @@ public abstract class FreeformPropagationTraining extends BasicTraining {
 	 */
 	private double error;
 
-	/**
-	 * The neurons that have been visited.
-	 */
-	private final Set<FreeformNeuron> visited = new HashSet<>();
+//	/**
+//	 * The neurons that have been visited.
+//	 */
+//	private final Set<FreeformNeuron> visited = new HashSet<>();
 
 	/**
 	 * Are we fixing the flat spot problem?  (default = true)
 	 */
 	private boolean fixFlatSopt = true;
 
-	/**
-	 * The batch size. Specify 1 for pure online training. Specify 0 for pure
-	 * batch training (complete training set in one batch). Otherwise specify
-	 * the batch size for batch training.
-	 */
-	private int batchSize;
+//	/**
+//	 * The batch size. Specify 1 for pure online training. Specify 0 for pure
+//	 * batch training (complete training set in one batch). Otherwise specify
+//	 * the batch size for batch training.
+//	 */
+//	private int batchSize;
 
-	/**
-	 * Don't use this constructor, it is for serialization only.
-	 */
-	public FreeformPropagationTraining() {
-		super(TrainingImplementationType.Iterative);
-		this.network = null;
-		this.training = null;
-	}
+
 
 	/**
 	 * Construct the trainer.
 	 * @param theNetwork The network to train.
 	 * @param theTraining The training data.
 	 */
-	public FreeformPropagationTraining(final FreeformNetwork theNetwork,
-			final MLDataSet theTraining) {
-		super(TrainingImplementationType.Iterative);
+	public FreeformPropagationTraining(final FreeformNetwork theNetwork) {
+		//super(TrainingImplementationType.Iterative);
 		this.network = theNetwork;
-		this.training = theTraining;
 	}
 
 	/**
@@ -110,7 +101,7 @@ public abstract class FreeformPropagationTraining extends BasicTraining {
 
 				// calculate the next layer delta
 				final FreeformNeuron fromNeuron = connection.getSource();
-				double sum = 0;
+				double sum = 0.0;
 				for (final FreeformConnection toConnection : fromNeuron
 						.getOutputs()) {
 					sum += toConnection.getTarget().getTempTraining(0)
@@ -163,61 +154,15 @@ public abstract class FreeformPropagationTraining extends BasicTraining {
 		neuron.setTempTraining(0, layerDelta);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean canContinue() {
-		return false;
-	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void finishTraining() {
-		this.network.tempTrainingClear();
-	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public double getError() {
-		return this.error;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public TrainingImplementationType getImplementationType() {
-		return TrainingImplementationType.Iterative;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public int getIteration() {
-		return this.iterationCount;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public MLMethod getMethod() {
-		return this.network;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public MLDataSet getTraining() {
-		return this.training;
-	}
+//	/**
+//	 * {@inheritDoc}
+//	 */
+//	@Override
+//	public MLDataSet getTraining() {
+//		return this.training;
+//	}
 
 	/**
 	 * @return True, if we are fixing the flat spot problem.
@@ -232,116 +177,148 @@ public abstract class FreeformPropagationTraining extends BasicTraining {
 	 */
 
 	public void iteration() {
-		preIteration();
+		//preIteration();
 		this.iterationCount++;
-		this.network.clearContext();
+		this.network.clear();
 
-		if (this.batchSize == 0) {
-			processPureBatch();
-		} else {
-			processBatches();
-		}
-
-		postIteration();
+        processPureBatch();
+		//postIteration();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void iteration(final int count) {
-		for (int i = 0; i < count; i++) {
-			this.iteration();
-		}
 
-	}
+
+    public static class MLDataPair {
+        public double weight;
+        public double[] ideal;
+        public double[] input;
+    }
+
 
 	/**
 	 * Process training for pure batch mode (one single batch).
 	 */
-	protected void processPureBatch() {
+	protected void processPureBatch(MLDataPair... training) {
 		final ErrorCalculation errorCalc = new ErrorCalculation();
-		this.visited.clear();
+		//this.visited.clear();
 
-		for (final MLDataPair pair : this.training) {
-			final MLData input = pair.getInput();
-			final MLData ideal = pair.getIdeal();
-			final MLData actual = this.network.compute(input);
-			final double sig = pair.getSignificance();
+        double[] actual = null;
+		for (final MLDataPair pair : training) {
+			final double[] input = pair.input;
+			final double[] ideal = pair.ideal;
+			actual  = this.compute(input, actual);
+			final double sig = pair.weight;
 
-			errorCalc.updateError(actual.getData(), ideal.getData(), sig);
+			errorCalc.updateError(actual, ideal, sig);
 
-			for (int i = 0; i < this.network.getOutputCount(); i++) {
-				final double diff = (ideal.getData(i) - actual.getData(i))
-						* sig;
-				final FreeformNeuron neuron = this.network.getOutputLayer()
-						.getNeurons().get(i);
-				calculateOutputDelta(neuron, diff);
-				calculateNeuronGradient(neuron);
-			}
-		}
+            process(ideal, actual, sig);
+        }
 
 		// Set the overall error.
-		setError(errorCalc.calculate());
+        this.error = errorCalc.calculate();
 
-		// Learn for all data.
+        // Learn for all data.
 		learn();
 	}
 
-	/**
-	 * Process training batches.
-	 */
-	protected void processBatches() {
-		int lastLearn = 0;
-		final ErrorCalculation errorCalc = new ErrorCalculation();
-		this.visited.clear();
+    public static final class FreeformNetwork {
+        final FreeformNeuron[] in, out;
 
-		for (final MLDataPair pair : this.training) {
-			final MLData input = pair.getInput();
-			final MLData ideal = pair.getIdeal();
-			final MLData actual = this.network.compute(input);
-			final double sig = pair.getSignificance();
+        public FreeformNetwork(FreeformNeuron[] in, FreeformNeuron[] out) {
+            this.in = in;
+            this.out = out;
+        }
 
-			errorCalc.updateError(actual.getData(), ideal.getData(), sig);
+        public void clear() {
+            eachVertex((FreeformNeuron f) -> {
+                f.setActivation(0);
+            });
+        }
 
-			for (int i = 0; i < this.network.getOutputCount(); i++) {
-				final double diff = (ideal.getData(i) - actual.getData(i))
-						* sig;
-				final FreeformNeuron neuron = this.network.getOutputLayer()
-						.getNeurons().get(i);
-				calculateOutputDelta(neuron, diff);
-				calculateNeuronGradient(neuron);
-			}
+        //vertex
+        public void eachVertex(Consumer<FreeformNeuron> c) {
 
-			// Are we at the end of a batch.
-			lastLearn++;
-			if( lastLearn>=this.batchSize ) {
-				lastLearn = 0;
-				learn();
-			}
-		}
+        }
 
-		// Handle any remaining data.
-		if( lastLearn>0 ) {
-			learn();
-		}
+        //edge
+        public void eachEdge(Consumer<FreeformConnection> c) {
 
-		// Set the overall error.
-		setError(errorCalc.calculate());
+        }
+    }
 
-	}
+    private double[] compute(double[] input, @Nullable double[] result) {
 
-	/**
+        int outs = network.out.length;
+        if ((result == null) || (result.length!= outs))
+                result = new double[outs];
+
+        for (int i = 0; i < input.length; i++) {
+            network.in[i].setActivation(input[i]);
+        }
+
+        // Request calculation of outputs
+        for (int i = 0; i < result.length; i++) {
+            final FreeformNeuron o = network.out[i];
+            o.performCalculation();
+            result[i] = o.getActivation();
+        }
+
+        return result;
+    }
+
+
+//    /**
+//	 * Process training batches.
+//	 */
+//	protected void processBatches() {
+//		int lastLearn = 0;
+//		final ErrorCalculation errorCalc = new ErrorCalculation();
+//		//this.visited.clear();
+//
+//		for (final MLDataPair pair : this.training) {
+//			final MLData input = pair.getInput();
+//			final MLData ideal = pair.getIdeal();
+//			final MLData actual = this.network.compute(input);
+//			final double sig = pair.getSignificance();
+//
+//			errorCalc.updateError(actual.getData(), ideal.getData(), sig);
+//
+//            process(ideal, actual, sig);
+//
+//            // Are we at the end of a batch.
+//			lastLearn++;
+//			if( lastLearn>=this.batchSize ) {
+//				lastLearn = 0;
+//				learn();
+//			}
+//		}
+//
+//		// Handle any remaining data.
+//		if( lastLearn>0 ) {
+//			learn();
+//		}
+//
+//		// Set the overall error.
+//        this.error = errorCalc.calculate();
+//
+//    }
+
+    private void process(double[] ideal, double[] actual, double sig) {
+        for (int i = 0; i < this.network.out.length; i++) {
+            final double diff = (ideal[i] - actual[i]) * sig;
+            final FreeformNeuron neuron = this.network.out[i];
+            calculateOutputDelta(neuron, diff);
+            calculateNeuronGradient(neuron);
+        }
+    }
+
+    /**
 	 * Learn for the entire network.
 	 */
 	protected void learn() {
-		this.network.performConnectionTask(new ConnectionTask() {
-			@Override
-			public void task(final FreeformConnection connection) {
-				learnConnection(connection);
-				connection.setTempTraining(0, 0);
-			}
-		});
+		this.network.eachEdge(connection -> {
+            learnConnection(connection);
+            connection.setTempTraining(0, 0.0);
+        });
 	}
 
 	/**
@@ -350,44 +327,8 @@ public abstract class FreeformPropagationTraining extends BasicTraining {
 	 */
 	protected abstract void learnConnection(FreeformConnection connection);
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void setError(final double theError) {
-		this.error = theError;
 
-	}
 
-	/**
-	 * Set if we should fix the flat spot problem.
-	 * @param fixFlatSopt True, if we should fix the flat spot problem.
-	 */
-	public void setFixFlatSopt(final boolean fixFlatSopt) {
-		this.fixFlatSopt = fixFlatSopt;
-	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void setIteration(final int iteration) {
-		this.iterationCount = iteration;
-	}
-
-	/**
-	 * @return The batch size.
-	 */
-	public int getBatchSize() {
-		return batchSize;
-	}
-
-	/**
-	 * Set the batch size.
-	 * @param batchSize The batch size.
-	 */
-	public void setBatchSize(int batchSize) {
-		this.batchSize = batchSize;
-	}
 
 }

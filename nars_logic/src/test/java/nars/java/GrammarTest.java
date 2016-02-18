@@ -44,7 +44,7 @@ public class GrammarTest {
         //n.initNAL9();
 
 
-        Trainer grammar = new Naljects(n).
+        Trainer grammar = new Lobjects(n).
                 the("grammar", Trainer.class, "ababcdcdeeee");
 
         //get the vocabulary

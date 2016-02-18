@@ -56,7 +56,7 @@ public class Thermostat3 {
         n.premiser.confMin.setValue(0.02f);
 
 
-        Naljects objs = new Naljects(n) {
+        Lobjects objs = new Lobjects(n) {
 
 //            @Override
 //            protected Term number(Number o) {

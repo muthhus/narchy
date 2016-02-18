@@ -26,9 +26,6 @@ package nars.learn;
 import org.encog.ml.data.MLDataSet;
 import org.encog.neural.freeform.FreeformConnection;
 import org.encog.neural.freeform.FreeformNetwork;
-import org.encog.neural.networks.training.propagation.TrainingContinuation;
-
-import java.io.Serializable;
 
 /**
  * From Encog https://github.com/encog/encog-java-core
@@ -50,19 +47,18 @@ public class FreeformBackPropagation extends FreeformPropagationTraining		{
 
 	/**
 	 * Construct a back propagation trainer.
-	 * @param theNetwork The network to train.
-	 * @param theTraining The training data to use. The coefficient for how much of the gradient is applied to each weight.
-	 * @param theLearningRate The learning rate. The coefficient for how much of the previous delta is applied to each weight.  
+	 * @param n The network to train.
+	 * @param t The training data to use. The coefficient for how much of the gradient is applied to each weight.
+	 * @param learningRate The learning rate. The coefficient for how much of the previous delta is applied to each weight.
 	 * In theory, prevents local minima stall.
-	 * @param theMomentum The momentum.
+	 * @param momentum The momentum.
 	 */
-	public FreeformBackPropagation(final FreeformNetwork theNetwork,
-								   final MLDataSet theTraining, final double theLearningRate,
-								   final double theMomentum) {
-		super(theNetwork, theTraining);
-		theNetwork.tempTrainingAllocate(1, 2);
-		this.learningRate = theLearningRate;
-		this.momentum = theMomentum;
+	public FreeformBackPropagation(final FreeformNetwork n,
+								   final MLDataSet t, final double learningRate,
+								   final double momentum) {
+		super(n);
+		this.learningRate = learningRate;
+		this.momentum = momentum;
 	}
 
 	/**
@@ -77,22 +73,5 @@ public class FreeformBackPropagation extends FreeformPropagationTraining		{
 		connection.addWeight(delta);
 	}
 
-//	/**
-//	 * {@inheritDoc}
-//	 */
-//	@Override
-//	public TrainingContinuation pause() {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
-//
-//	/**
-//	 * {@inheritDoc}
-//	 */
-//	@Override
-//	public void resume(final TrainingContinuation state) {
-//		// TODO Auto-generated method stub
-//
-//	}
 
 }

@@ -31,7 +31,7 @@ public class MethodOperator  {
 
     private static final Object[] empty = new Object[0];
     private final AtomicBoolean enable;
-    private final Naljects context;
+    private final Lobjects context;
     boolean feedback = true;
 
     //public static final Atom ERROR = Atom.the("ERR");
@@ -41,7 +41,7 @@ public class MethodOperator  {
 
     private static final boolean strict = false;
 
-    public MethodOperator(AtomicBoolean enable, @NotNull Method m, Naljects context) {
+    public MethodOperator(AtomicBoolean enable, @NotNull Method m, Lobjects context) {
         //super(getParentMethodName(m));
         /*
             Class<?> sc = m.getDeclaringClass();
@@ -81,7 +81,7 @@ public class MethodOperator  {
         Object ll = curTask.getLogLast();
 
         //Check if this was previously executed by the Java invocation pathway
-        if (ll instanceof Naljects.JavaInvoked)
+        if (ll instanceof Lobjects.JavaInvoked)
             return ll; //signals already invoked
 
         Term[] x = o.terms();
@@ -105,7 +105,7 @@ public class MethodOperator  {
         }
 
         Object instance = paramOffset == 0 ? null : context.object(x[paramOffset-1]);
-        Naljects ctx = this.context;
+        Lobjects ctx = this.context;
 
         Object[] args;
         if (pc == 0) {

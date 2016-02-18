@@ -57,7 +57,7 @@ public class NALObjectsTest  {
             Method[] m = getClass().getMethods();
             List<Method> l = Global.newArrayList(m.length);
             for (Method x : m)
-                if (Naljects.isMethodVisible(x))
+                if (Lobjects.isMethodVisible(x))
                     if (!"getClassMethods".equals(x.getName()))
                         l.add(x);
             return l;
@@ -96,7 +96,7 @@ public class NALObjectsTest  {
 
         int startSize = n.memory.exe.size();
 
-        Naljects no = new Naljects(n);
+        Lobjects no = new Lobjects(n);
 
         T wrapper = no.theOrNull(instance, T.class);
 
@@ -188,7 +188,7 @@ public class NALObjectsTest  {
 
         EventCount count = new EventCount(n);
 
-        T tc = new Naljects(n).the("myJavaObject", T.class);
+        T tc = new Lobjects(n).the("myJavaObject", T.class);
 
         tc.noParamMethodReturningVoid();
         assertEquals(6.0, tc.mul(2, 3), 0.001);
@@ -265,7 +265,7 @@ public class NALObjectsTest  {
     @Test public void testOverloadedMethods() throws Exception {
         NAR n = new Default();
 
-        Naljects no = new Naljects(n);
+        Lobjects no = new Lobjects(n);
         ArrayList nc = no.the("ourList", ArrayList.class);
 
 
@@ -312,7 +312,7 @@ public class NALObjectsTest  {
 
         //EventCount count = new EventCount(n);
 
-        T tc = new Naljects(n).the("obj", T.class);
+        T tc = new Lobjects(n).the("obj", T.class);
 
 
         System.out.println( tc.getClassMethods() );

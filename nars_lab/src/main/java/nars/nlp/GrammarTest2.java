@@ -10,7 +10,7 @@ import nars.Symbols;
 import nars.concept.Concept;
 import nars.data.Range;
 import nars.java.MethodOperator;
-import nars.java.Naljects;
+import nars.java.Lobjects;
 import nars.nar.Default;
 import nars.task.Task;
 import nars.term.Termed;
@@ -54,7 +54,7 @@ public class GrammarTest2 {
         n = new Default(1000, 1, 2, 3);
 
         this.executionFilter = n.memory.executionThreshold;
-        Naljects o = new Naljects(n);
+        Lobjects o = new Lobjects(n);
         this.tape = o.the("tape", Tape.class,
                 //"aaabbbaaabbb               ",
                 "aaabbbababab",
