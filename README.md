@@ -58,28 +58,12 @@ Requirements
  * Java 8 (OpenJDK or Oracle JDK)
    * Java 9 preferred
  * maven, or an IDE with maven support
- 
 
 
-History
--------
-Under the nars_java.0/ directory is the code Pei Wang originally moved into the project, which is still the base of his own programming. This is no active anymore, replaced by nars_java/ and nars_gui/ .
+References
+----------
+http://code.google.com/p/open-nars/wiki/ProjectStatus
 
-Later Joe Geldart started the nars_java.geldart/ version of NARS, which contains many good ideas (many of which are accepted into 1.5), but it isn't fully consistent with Pei's plan, especially about the new layers (7,8,9), so Pei didn't continue on that code base.
-
-Jean-Marc Vanel continued work on this roadmap, mainly in GUI and software engineering tasks contributing a non-regression test suite and separating NARS into Core and GUI modules.
-
-
-Source Code status
-------------------
-See also http://code.google.com/p/open-nars/wiki/ProjectStatus
-
-Current version has been fully tested for single capability at a time; there may still be bugs when combining capabilities.
-
-
-
-Links
------
 An (outdated) HTML user manual:
  * http://www.cis.temple.edu/~pwang/Implementation/NARS/NARS-GUI-Guide.html
 

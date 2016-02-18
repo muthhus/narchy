@@ -25,6 +25,9 @@ dependencies {
     }
     compile(group:'de.ruedigermoeller',name:'fst', version:'2.43')
 
+
+    compile(group:'org.encog', name:'encog-core',version:'3.3.0')
+
     testCompile(group: 'org.testng', name: 'testng', version: '6.9.10') {
         exclude(module: 'ant')
         exclude(module: 'guice')

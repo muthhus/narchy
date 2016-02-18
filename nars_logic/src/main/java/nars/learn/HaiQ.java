@@ -24,7 +24,7 @@ public class HaiQ {
 	final float[][] et;
 
 	final int actions, nStates;
-	int lastState = 0, lastDecidedAction = 0;
+	int lastState, lastDecidedAction;
 
 	/*
 	 * http://stackoverflow.com/questions/1854659/alpha-and-gamma-parameters-in-
@@ -200,8 +200,8 @@ public class HaiQ {
 		float gamma;
 		float eta = 0.1f;
 		float outmul = 1.0f;
-		int winnerx = 0;
-		int winnery = 0;
+		int winnerx;
+		int winnery;
 		float Leak = 0.1f;
 		float InMul = 1.0f;
 

@@ -33,8 +33,8 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
     private float conf;
     private float prevF;
 
-    boolean inputIfSame = false;
-    int maxTimeBetweenUpdates = 0;
+    boolean inputIfSame;
+    int maxTimeBetweenUpdates;
     //TODO int minTimeBetweenUpdates..
 
     private long lastInput;
