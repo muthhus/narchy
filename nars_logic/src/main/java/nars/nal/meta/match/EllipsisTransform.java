@@ -6,6 +6,7 @@ import nars.nal.meta.PremiseRule;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.transform.VariableNormalization;
+import nars.term.variable.GenericVariable;
 import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,7 +16,7 @@ public class EllipsisTransform extends EllipsisOneOrMore {
     public final Term from;
     public final Term to;
 
-    public EllipsisTransform(@NotNull Term name, Term from, Term to) {
+    public EllipsisTransform(@NotNull Variable name, Term from, Term to) {
         super(name, ".." + from + '=' + to + "..+");
 
 //        if (from instanceof VarPattern)
@@ -29,21 +30,16 @@ public class EllipsisTransform extends EllipsisOneOrMore {
           this.to = to;
     }
 
-    @NotNull
-    @Override
-    public Term normalize(int serial) {
-        //handled in a special way elsewhere
-        return this;
-    }
+
 
     @NotNull
     @Override
-    public Term clone(@NotNull Variable v, VariableNormalization normalizer) {
+    public Variable clone(@NotNull Variable v, VariableNormalization normalizer) {
         //normalizes any variable parameter terms of an EllipsisTransform
         PremiseRule.PremiseRuleVariableNormalization vnn = (PremiseRule.PremiseRuleVariableNormalization) normalizer;
         return new EllipsisTransform(v,
-                from instanceof Variable ? vnn.applyAfter((Variable)from) : from,
-                to instanceof Variable ? vnn.applyAfter((Variable)to) : to);
+                from instanceof GenericVariable ? vnn.applyAfter((GenericVariable)from) : from,
+                to instanceof GenericVariable ? vnn.applyAfter((GenericVariable)to) : to);
     }
 
     @NotNull

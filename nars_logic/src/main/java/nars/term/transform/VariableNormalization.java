@@ -21,7 +21,7 @@ import java.util.function.Function;
  * information - the particular labels the input has attached.
  *
  */
-public class VariableNormalization extends VariableTransform implements Function<Term,Term> {
+public class VariableNormalization extends VariableTransform implements Function<Term,Variable> {
 
 //    final static Comparator<Map.Entry<Variable, Variable>> comp = new Comparator<Map.Entry<Variable, Variable>>() {
 //        @Override
@@ -63,34 +63,39 @@ public class VariableNormalization extends VariableTransform implements Function
         @Override
         public Variable apply(Compound containing, @NotNull Term current, int depth) {
             //      (containing, current, depth) ->
-            return $.v(current.op(), 1);
+            //return $.v(current.op(), 1);
+            return _newVariable(current, 1);
         }
     };
 
-    final Map<Term, Term /*Variable*/> rename = Global.newHashMap(8);
+    final Map<Term, Variable /*Variable*/> rename = Global.newHashMap(8);
 
     boolean renamed;
 
 
     @NotNull
     @Override
-    public final Term apply(@NotNull Term v) {
-        Term rvv = newVariable(v, rename.size()+1);
-        if (!renamed) {
-            //test for any rename to know if modification occurred
-            renamed = !rvv.equals(v);
+    public final Variable apply(@NotNull Term v) {
+        Variable rvv = newVariable(v, rename.size()+1);
+        if (!this.renamed) {
+            //track if modification occurred
+            this.renamed = (rvv!=v); //!rvv.equals(v);
         }
         return rvv;
     }
 
     @Override
-    public final Term apply(Compound ct, Term v, int depth) {
+    public final Variable apply(Compound ct, Term v, int depth) {
         return rename.computeIfAbsent(v, this);
     }
 
-    /** if already normalized, alreadyNormalized will be non-null with the value */
+    protected Variable newVariable(@NotNull Term v, int serial) {
+        return VariableNormalization._newVariable(v, serial);
+    }
+
+        /** if already normalized, alreadyNormalized will be non-null with the value */
     @NotNull
-    protected Term newVariable(@NotNull Term v, int serial) {
+    protected static Variable _newVariable(@NotNull Term v, int serial) {
         if (v instanceof GenericVariable)
             return ((GenericVariable)v).normalize(serial); //HACK
         else

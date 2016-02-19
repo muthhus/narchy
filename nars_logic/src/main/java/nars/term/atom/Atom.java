@@ -3,13 +3,52 @@ package nars.term.atom;
 import nars.$;
 import nars.Narsese;
 import nars.Op;
+import nars.nal.nal8.AtomicStringConstant;
 import nars.term.Term;
 import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /** default Atom implementation */
-public class Atom extends StringAtom {
+public class Atom extends AtomicStringConstant {
+
+    public final String id;
+
+    public Atom(String id) {
+        this.id = id;
+    }
+
+    @Override
+    public final int complexity() {
+        return 1;
+    }
+
+    @Override public final String toString() {
+        return id;
+    }
+
+    @NotNull
+    @Override
+    public final Op op() {
+        return Op.ATOM;
+    }
+
+
+    public static final int AtomBit = Op.ATOM.bit();
+
+    @Override
+    public final int structure() {
+        return AtomBit;
+    }
+
+
+    public final int init(int[] meta) {
+
+        meta[4] ++;
+        meta[5] |= AtomBit;
+
+        return hashCode();
+    }
 
 
 
@@ -25,13 +64,6 @@ public class Atom extends StringAtom {
         return Util.hashCombine(id1, op.ordinal());
     }
 
-    public Atom(@NotNull byte[] n) {
-        super( new String(n) );
-    }
-
-    public Atom(String n) {
-        super(n);//Utf8.toUtf8(n)
-    }
 
 
 
@@ -77,7 +109,7 @@ public class Atom extends StringAtom {
 
     @NotNull
     public static Atom the(@NotNull byte[] id) {
-        return new Atom(id);
+        return new Atom(new String(id));
     }
 
 

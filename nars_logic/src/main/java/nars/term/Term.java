@@ -91,13 +91,6 @@ public interface Term extends Termed, Comparable, Termlike {
         return this;
     }
 
-    /**
-     * Whether this compound term contains any variable term
-     */
-    default boolean hasVar() {
-        return vars() > 0;
-    }
-
 
     //boolean hasVar(final Op type);
 

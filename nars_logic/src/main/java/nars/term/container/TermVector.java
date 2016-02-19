@@ -95,13 +95,13 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
         final int vD = meta[0]; this.varDeps = (byte)vD; varTot+=vD;
         final int vI = meta[1]; this.varIndeps = (byte)vI; varTot+=vI;
         final int vQ = meta[2]; this.varQueries = (byte)vQ; varTot+=vQ;
-        final int vP = meta[3]; this.varPattern = (byte)vP; //varTot+=0; //not counted as "logical" variables
+        final int vP = meta[3]; this.varPattern = (byte)vP; //varTot+=vP;
         this.varTotal = (byte)(varTot);
 
 
         final int vol = meta[4] + 1;
         this.volume = (short)( vol );
-        this.complexity = (short)(vol - varTot - vP );
+        this.complexity = (short)(vol - varTot - vP);
 
 
         this.structureHash = meta[5];

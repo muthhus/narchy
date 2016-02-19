@@ -2,20 +2,16 @@ package nars.term.variable;
 
 import nars.$;
 import nars.Op;
-import nars.nal.meta.AbstractLiteral;
-import nars.term.Term;
-import nars.term.atom.AbstractStringAtom;
-import nars.term.atom.Atomic;
-import nars.term.atom.StringAtom;
+import nars.nal.meta.AtomicString;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Unnormalized, labeled variable
  */
-public class GenericVariable extends Atomic {
+public class GenericVariable extends AtomicString {
 
-    private final Op type;
-    private final String label;
+    public final Op type;
+    public  final String label;
     private final String str;
 
     public GenericVariable(Op type, String label) {
@@ -62,7 +58,7 @@ public class GenericVariable extends Atomic {
     }
 
     /** produce a normalized version of this identified by the serial integer */
-    public @NotNull Term normalize(int serial) {
+    public @NotNull Variable normalize(int serial) {
         return $.v(type, serial);
     }
 

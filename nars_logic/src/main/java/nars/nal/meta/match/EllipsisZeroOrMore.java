@@ -11,14 +11,8 @@ import org.jetbrains.annotations.NotNull;
  * Created by me on 12/5/15.
  */
 public class EllipsisZeroOrMore extends Ellipsis {
-    public EllipsisZeroOrMore(@NotNull Term /*Variable*/ name) {
+    public EllipsisZeroOrMore(@NotNull Variable /*Variable*/ name) {
         super(name, "..*");
-    }
-
-    @NotNull
-    @Override
-    public EllipsisZeroOrMore normalize(int serial) {
-        return new EllipsisZeroOrMore($.v(Op.VAR_PATTERN, serial));
     }
 
     @Override
@@ -27,7 +21,7 @@ public class EllipsisZeroOrMore extends Ellipsis {
     }
 
     @Override
-    public @NotNull Term clone(@NotNull Variable newVar, VariableNormalization normalizer) {
+    public @NotNull Variable clone(@NotNull Variable newVar, VariableNormalization normalizer) {
         return new EllipsisZeroOrMore(newVar);
     }
 }

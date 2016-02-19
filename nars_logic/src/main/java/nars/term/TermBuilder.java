@@ -20,6 +20,7 @@ import nars.term.transform.CompoundTransform;
 import nars.term.transform.VariableNormalization;
 import nars.term.transform.VariableTransform;
 import nars.term.transform.subst.Subst;
+import nars.term.variable.GenericVariable;
 import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -103,6 +104,13 @@ public interface TermBuilder {
         Compound tx = transform((Compound) t, normalizeFast((Compound) t));
         if (tx != null)
             ((GenericCompound)tx).setNormalized();
+
+        //DEBUG
+        tx.forEach(c -> {
+            if (c instanceof GenericVariable) {
+                throw new RuntimeException("not actually normalized");
+            }
+        });
 
         return tx;
     }
@@ -699,16 +707,32 @@ public interface TermBuilder {
             return y;
 
 
+        Op sop = src.op();
+        final int maxArity = sop.maxSize;
 
         Term[] ss = src.terms();
         int len = ss.length;
         List<Term> sub = Global.newArrayList(len /* estimate */);
         for (int i = 0; i < len; i++) {
-            apply(ss[i], f, sub);
+            Term t = ss[i];
+            Term u = apply(f, t);
+
+            if (u instanceof EllipsisMatch) {
+                EllipsisMatch m = (EllipsisMatch)u;
+                if (m.size() > maxArity - sub.size()) {
+                    //invalid
+                    return src;
+                }
+                m.apply(sub);
+            } else if (u!=null) {
+                sub.add(u);
+            } else {
+                sub.add(t);
+            }
         }
 
-        TermContainer cc = TermContainer.the(src.op(), sub);
-        Term result = newTerm(src, cc);
+
+        Term result = newTerm(src, TermContainer.the(sop, sub));
 
 
         //apply any known immediate transform operators
@@ -761,24 +785,6 @@ public interface TermBuilder {
 
     }
 
-
-    /** resolve the this term according to subst by appending to sub.
-     * return false if this term fails the substitution */
-    default void apply(@NotNull Term src, @NotNull Subst f, @NotNull Collection<Term> sub) {
-        Term u = apply(f, src);
-        if (u == null) {
-            u = src;
-        }
-        /*else
-            changed |= (u!=this);*/
-
-        if (u instanceof EllipsisMatch) {
-            EllipsisMatch m = (EllipsisMatch)u;
-            m.apply(sub);
-        } else {
-            sub.add(u);
-        }
-    }
 
 
 }

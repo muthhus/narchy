@@ -21,6 +21,7 @@ public abstract class Atomic implements Term {
 
 
 
+
     @Override
     public final void recurseTerms(@NotNull SubtermVisitor v, Compound parent) {
         v.accept(this, parent);

@@ -17,7 +17,7 @@ public class TermNormalizationTest {
             Term a = eq.subterm(0, 0);
             Term b = eq.subterm(1, 0);
             assertNotEquals(a, eq.subterm(0, 1));
-            assertEquals(a, b);
+            assertEquals(eq + " subterms (0,0)==(1,0)", a, b);
             assertTrue(a == b);
         }
     }

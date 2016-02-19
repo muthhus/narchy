@@ -1,18 +1,29 @@
 package nars.java;
 
-import nars.term.atom.StringAtom;
+import nars.Op;
+import nars.nal.nal8.AtomicStringConstant;
 
-/** refers to a java object instance */
-public final class AtomObject<O> extends StringAtom {
+/** refers to a java object instance TODO */
+public final class AtomObject<O> extends AtomicStringConstant {
 
     public final O value;
 
     public AtomObject(String name, O value) {
-        super(name);
+
         this.value = value;
     }
 
     public O object() {
         return value;
+    }
+
+    @Override
+    public String toString() {
+        return null;
+    }
+
+    @Override
+    public    Op op() {
+        return null;
     }
 }

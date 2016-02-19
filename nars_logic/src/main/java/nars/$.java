@@ -202,8 +202,8 @@ public enum $  {
     }
 
     @NotNull
-    public static GenericVariable v(@NotNull Op type, String s) {
-        return v(type.ch, s);
+    public static GenericVariable v(@NotNull Op type, @NotNull String name) {
+        return new GenericVariable(type, name);
     }
 
 

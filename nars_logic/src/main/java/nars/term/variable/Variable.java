@@ -26,7 +26,6 @@ import nars.Op;
 import nars.term.Term;
 import nars.term.Termlike;
 import nars.term.Terms;
-import nars.term.atom.AbstractStringAtom;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -40,20 +39,25 @@ import java.io.IOException;
 public abstract class Variable extends Atomic {
 
     public final int id;
-    public final Op type;
     public final String str;
-    private final int hash;
+    protected final int hash;
 
     protected Variable(Op type, int id) {
-        this.type = type;
+        this(type, id, type.ch + Integer.toString(id));
+    }
+
+    protected Variable(Op type, int id, String str) {
         this.id = id;
-        this.str = type.ch + Integer.toString(id);
+        this.str = str;
         this.hash = (type.ordinal() << 8) | id;
     }
 
+
+    //@Override abstract public boolean equals(Object other);
+
     @Override
     public final boolean equals(Object obj) {
-        return obj == this;
+        return obj==this || (obj instanceof Variable) && ((Variable)obj).id == id;
     }
 
     @Override
@@ -64,7 +68,7 @@ public abstract class Variable extends Atomic {
     @Override
     public final int compareTo(Object o) {
         //hashcode can serve as the ordering too
-        return o instanceof Variable ? -1 : Integer.compare(hash, o.hashCode());
+        return o instanceof Variable ? Integer.compare(hash, o.hashCode()) : 1;
     }
 
     @Override

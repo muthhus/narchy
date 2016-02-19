@@ -1,11 +1,8 @@
 package nars.nal.nal8;
 
 import nars.Op;
-import nars.nal.meta.AbstractLiteral;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.atom.AbstractStringAtom;
-import nars.term.atom.StringAtom;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -20,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
  * as shown above, but is not an "Operator").
  *
  */
-public final class Operator<T extends Term> extends AbstractLiteral {
+public final class Operator<T extends Term> extends AtomicStringConstant {
 
     private final String str;
 
@@ -63,4 +60,6 @@ public final class Operator<T extends Term> extends AbstractLiteral {
     public String toString() {
         return str;
     }
+
+
 }

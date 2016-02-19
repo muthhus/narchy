@@ -560,7 +560,7 @@ public class TermTest {
         assertEquals(varQuery != 0, t.hasVarQuery());
 
         assertEquals(varDep + varIndep + varQuery, t.vars());
-        assertEquals((varDep + varIndep + varQuery) != 0, t.hasVar());
+        assertEquals((varDep + varIndep + varQuery) != 0, t.vars() > 0);
     }
 
     public <C extends Compound> C testStructure(String term, String bits) {
@@ -651,10 +651,10 @@ public class TermTest {
 
 
         assertEquals(
-            "(A-->(/,%X,_))", $("<A --> (/, %X, _)>").toString()
+            "(A-->(/,%1,_))", $("<A --> (/, %1, _)>").toString()
         );
         assertEquals(
-            "(A-->(/,_,%X))", $("<A --> (/, _, %X)>").toString()
+            "(A-->(/,_,%1))", $("<A --> (/, _, %1)>").toString()
         );
 //        assertEquals(
 //                "(/,_,%X)", $("(/, _, %X)").toString()

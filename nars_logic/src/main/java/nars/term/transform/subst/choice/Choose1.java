@@ -1,8 +1,12 @@
 package nars.term.transform.subst.choice;
 
+import nars.$;
+import nars.nal.meta.match.Ellipsis;
 import nars.nal.meta.match.EllipsisMatch;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.transform.subst.FindSubst;
+import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
@@ -30,18 +34,20 @@ public class Choose1 extends Termutator {
                 '}';
     }
 
-    public Choose1(Term xEllipsis, Term x, @NotNull Set<Term> yFree) {
+    public Choose1(Ellipsis xEllipsis, Variable x, @NotNull Set<Term> yFree) {
         super(xEllipsis);
+
+
 
         int ysize = yFree.size();
         if (ysize < 2) {
             throw new RuntimeException(yFree + " offers no choice");
         }
 
+        this.xEllipsis = xEllipsis;
         this.x = x;
 
         this.yFree = yFree;
-        this.xEllipsis = xEllipsis;
 
         yy = yFree.toArray(new Term[ysize]);
     }

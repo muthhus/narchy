@@ -2,6 +2,8 @@ package nars.term;
 
 import nars.nar.Terminal;
 import nars.term.variable.CommonVariable;
+import nars.term.variable.GenericNormalizedVariable;
+import nars.term.variable.GenericVariable;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -20,14 +22,13 @@ public class CommonVariableTest {
     public void commonVariableTest1() {
         assertEquals("%1%2",
                 CommonVariable.make(
-                        p.term("%1"),
-                        p.term("%2")).toString());
+                        (GenericVariable)p.term("%1"),
+                        (GenericVariable)p.term("%2")).toString(),
 
         //reverse order
-        assertEquals("%1%2",
                 CommonVariable.make(
-                        p.term("%2"),
-                        p.term("%1")).toString());
+                        (GenericVariable)p.term("%2"),
+                        (GenericVariable)p.term("%1")).toString());
     }
 
     @Test
@@ -35,13 +36,12 @@ public class CommonVariableTest {
         //different lengths
         assertEquals("%12%2",
                 CommonVariable.make(
-                        p.term("%12"),
-                        p.term("%2")).toString());
+                        (GenericVariable)p.term("%12"),
+                        (GenericVariable)p.term("%2")).toString(),
         //different lengths
-        assertEquals("%12%2",
                 CommonVariable.make(
-                        p.term("%2"),
-                        p.term("%12")).toString());
+                        (GenericVariable)p.term("%2"),
+                        (GenericVariable)p.term("%12")).toString());
 
     }
 
@@ -50,12 +50,12 @@ public class CommonVariableTest {
     public void commonVariableInstancing() {
         //different lengths
 
-        CommonVariable ca = CommonVariable.make(
-                p.term("%1"),
-                p.term("%2"));
-        CommonVariable cb = CommonVariable.make(
-                p.term("%2"),
-                p.term("%1"));
+        GenericNormalizedVariable ca = CommonVariable.make(
+                (GenericVariable)p.term("%1"),
+                (GenericVariable)p.term("%2"));
+        GenericNormalizedVariable cb = CommonVariable.make(
+                (GenericVariable)p.term("%2"),
+                (GenericVariable)p.term("%1"));
 
         assertEquals(ca, cb);
         Assert.assertTrue("efficient re-use of common variable of name length=1", ca == cb);

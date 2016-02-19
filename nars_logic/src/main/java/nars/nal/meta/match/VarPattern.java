@@ -22,6 +22,8 @@ public class VarPattern extends Variable {
     }
 
 
+
+
     @Override
     public final int structure() {
         return 0;

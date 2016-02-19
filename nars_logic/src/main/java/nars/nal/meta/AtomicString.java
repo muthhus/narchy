@@ -5,12 +5,10 @@ import nars.term.Termed;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 
-import static nars.term.atom.StringAtom.AtomBit;
-
 /**
  * Created by me on 1/1/16.
  */
-public abstract class AbstractLiteral extends Atomic {
+public abstract class AtomicString extends Atomic {
 
     /** Assumes that the op()
      *  is encoded within its string such that additional op()
@@ -37,7 +35,7 @@ public abstract class AbstractLiteral extends Atomic {
     /**
      * @param that The Term to be compared with the current Term
      */
-    @Override public final int compareTo(@NotNull Object that) {
+    @Override public int compareTo(@NotNull Object that) {
         if (that==this) return 0;
 
         Termed t = (Termed)that;
@@ -53,30 +51,6 @@ public abstract class AbstractLiteral extends Atomic {
 
 
 
-    @Override
-    public final int vars() {
-        return 0;
-    }
-
-    @Override
-    public final int varQuery() {
-        return 0;
-    }
-
-    @Override
-    public final int varDep() {
-        return 0;
-    }
-
-    @Override
-    public final int varIndep() {
-        return 0;
-    }
-
-    @Override
-    public final int varPattern() {
-        return 0;
-    }
 
 
 }

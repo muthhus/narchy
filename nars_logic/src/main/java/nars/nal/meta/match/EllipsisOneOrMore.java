@@ -12,22 +12,17 @@ import org.jetbrains.annotations.NotNull;
  */
 public class EllipsisOneOrMore extends Ellipsis {
 
-    public EllipsisOneOrMore(@NotNull Term /*Variable*/ name) {
+    public EllipsisOneOrMore(@NotNull Variable /*Variable*/ name) {
         this(name, "..+");
     }
 
-    @NotNull
-    @Override
-    public Term normalize(int serial) {
-        return new EllipsisOneOrMore($.v(Op.VAR_PATTERN, serial));
-    }
 
     @Override
-    public @NotNull Term clone(@NotNull Variable newVar, VariableNormalization normalizer) {
+    public @NotNull Variable clone(@NotNull Variable newVar, VariableNormalization normalizer) {
         return new EllipsisOneOrMore(newVar);
     }
 
-    public EllipsisOneOrMore(@NotNull Term name, String s) {
+    public EllipsisOneOrMore(@NotNull Variable name, String s) {
         super(name, s);
     }
 

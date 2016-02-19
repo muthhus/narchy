@@ -15,10 +15,7 @@ import com.github.fge.grappa.stack.ValueStack;
 import com.github.fge.grappa.support.Var;
 import nars.nal.Tense;
 import nars.nal.meta.PremiseRule;
-import nars.nal.meta.match.EllipsisOneOrMore;
-import nars.nal.meta.match.EllipsisTransform;
-import nars.nal.meta.match.EllipsisZeroOrMore;
-import nars.nal.meta.match.VarPattern;
+import nars.nal.meta.match.*;
 import nars.nal.nal8.Operator;
 import nars.nal.nal8.operator.ImmediateOperator;
 import nars.op.io.echo;
@@ -718,16 +715,16 @@ public class Narsese extends BaseParser<Object> {
                 Variable(), "..",
                 firstOf(
 
-                        seq(Term(false, false), "=", Term(false, false), "..+",
+                        seq(Variable(), "=", Variable(), "..+",
                                 swap(3),
-                                push(new EllipsisTransform(
-                                        (Term /*Variable*/) pop(), (Term) pop(), (Term) pop()))
+                                push(new Ellipsis.EllipsisTransformPrototype(/*Op.VAR_PATTERN,*/
+                                        (GenericVariable /*Variable*/) pop(), (GenericVariable) pop(), (GenericVariable) pop()))
                         ),
                         seq("+",
-                                push(new EllipsisOneOrMore((Term) pop()))
+                                push(new Ellipsis.EllipsisPrototype(Op.VAR_PATTERN, (GenericVariable) pop(), 1))
                         ),
                         seq("*",
-                                push(new EllipsisZeroOrMore((Term) pop()))
+                                push(new Ellipsis.EllipsisPrototype(Op.VAR_PATTERN, (GenericVariable) pop(), 0))
                         )
                 )
         );

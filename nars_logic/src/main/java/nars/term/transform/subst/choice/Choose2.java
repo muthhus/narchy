@@ -1,10 +1,12 @@
 package nars.term.transform.subst.choice;
 
+import nars.nal.meta.match.Ellipsis;
 import nars.nal.meta.match.EllipsisMatch;
 import nars.term.Term;
 import nars.term.container.ShuffledSubterms;
 import nars.term.container.TermVector;
 import nars.term.transform.subst.FindSubst;
+import nars.term.variable.Variable;
 import nars.util.data.array.IntArrays;
 import nars.util.math.Combinations;
 import org.jetbrains.annotations.NotNull;
@@ -20,8 +22,8 @@ public class Choose2 extends Termutator {
     final Combinations comb;
     @NotNull
     private final Set<Term> yFree;
-    private final Term[] x;
-    private final Term xEllipsis;
+    private final Variable[] x;
+    private final Ellipsis xEllipsis;
     @NotNull
     private final FindSubst f;
     @NotNull
@@ -39,7 +41,7 @@ public class Choose2 extends Termutator {
 
     }
 
-    public Choose2(@NotNull FindSubst f, Term xEllipsis, Term[] x, @NotNull Set<Term> yFree) {
+    public Choose2(@NotNull FindSubst f, Ellipsis xEllipsis, Variable[] x, @NotNull Set<Term> yFree) {
         super(xEllipsis);
         this.f = f;
         this.x = x;

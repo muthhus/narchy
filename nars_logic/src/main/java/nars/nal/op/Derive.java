@@ -9,11 +9,11 @@ import nars.budget.Budget;
 import nars.concept.ConceptProcess;
 import nars.nal.meta.*;
 import nars.nal.meta.match.EllipsisMatch;
+import nars.nal.nal8.AtomicStringConstant;
 import nars.nal.nal8.Operator;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.variable.Variable;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -25,7 +25,7 @@ import static nars.nal.Tense.ETERNAL;
  * Handles matched derivation results
  * < (&&, postMatch1, postMatch2) ==> derive(term) >
  */
-public class Derive extends AbstractLiteral implements ProcTerm {
+public class Derive extends AtomicStringConstant implements ProcTerm {
 
     @NotNull
     public final String id;
@@ -100,6 +100,7 @@ public class Derive extends AbstractLiteral implements ProcTerm {
             return;
 
         if ((derivedTerm instanceof EllipsisMatch)) {
+            //TODO hack prevent this
             throw new RuntimeException("invalid ellipsis match: " + derivedTerm);
 //            EllipsisMatch em = ((EllipsisMatch)derivedTerm);
 //            if (em.size()!=1) {

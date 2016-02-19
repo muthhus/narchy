@@ -11,6 +11,7 @@ import nars.nal.meta.constraint.NoCommonSubtermsConstraint;
 import nars.nal.meta.constraint.NotEqualsConstraint;
 import nars.nal.meta.constraint.NotOpConstraint;
 import nars.nal.meta.match.Ellipsis;
+import nars.nal.meta.match.EllipsisTransform;
 import nars.nal.meta.pre.*;
 import nars.nal.op.ImmediateTermTransform;
 import nars.nal.op.Solve;
@@ -73,9 +74,9 @@ public class PremiseRule extends GenericCompound  {
         }
     };
 
-    public boolean immediate_eternalize = false;
+    public boolean immediate_eternalize;
 
-    public boolean anticipate = false;
+    public boolean anticipate;
     //public boolean sequenceIntervalsFromTask = false;
     //public boolean sequenceIntervalsFromBelief = false;
 
@@ -92,7 +93,7 @@ public class PremiseRule extends GenericCompound  {
     //it has certain pre-conditions, all given as predicates after the two input premises
 
 
-    boolean allowBackward = false;
+    boolean allowBackward;
 
     /** maximum of the minimum NAL levels involved in the postconditions of this rule */
     public int minNAL;
@@ -183,9 +184,8 @@ public class PremiseRule extends GenericCompound  {
 
         match.addConditions(l); //the match itself
 
-        { /* FOR EACH MATCH */
-            l.add(truth.getDerive()); //will be linked to and invoked by match callbacks
-        }
+        /* FOR EACH MATCH */
+        l.add(truth.getDerive()); //will be linked to and invoked by match callbacks
 
 
         l.add(END);
@@ -260,7 +260,7 @@ public class PremiseRule extends GenericCompound  {
             //do not alter postconditions
             if ((containingCompound.op() == Op.INHERIT)
                     && PostCondition.reservedMetaInfoCategories.contains(
-                    ((Compound) containingCompound).term(1)))
+                    containingCompound.term(1)))
                 return v;
 
             return $.v(Op.VAR_PATTERN, v.toString());
@@ -308,7 +308,7 @@ public class PremiseRule extends GenericCompound  {
         //and not a belief term pattern
         //(which will not reference any particular atoms)
 
-        pattern = PatternCompound.make((Compound)$.p(taskTermPattern, beliefTermPattern));
+        pattern = PatternCompound.make($.p(taskTermPattern, beliefTermPattern));
 
 
         ListMultimap<Term, MatchConstraint> constraints = MultimapBuilder.treeKeys().arrayListValues().build();
@@ -664,24 +664,28 @@ public class PremiseRule extends GenericCompound  {
     public static final class PremiseRuleVariableNormalization extends VariableNormalization {
 
 
-        int offset = 0;
+        int offset;
 
         public static Variable varPattern(int i) {
             return $.v(VAR_PATTERN, i);
         }
 
         @NotNull
-        @Override protected Term newVariable(@NotNull Term v, int serial) {
+        @Override protected Variable newVariable(@NotNull Term v, int serial) {
 
 
-            if (v instanceof Ellipsis) {
+            if (v instanceof Ellipsis.EllipsisTransformPrototype) {
+                //special
+                Ellipsis.EllipsisTransformPrototype ep = (Ellipsis.EllipsisTransformPrototype)v;
+                return new EllipsisTransform(varPattern(serial+offset), applyAfter(ep.from), apply(ep.to));
+            } else if (v instanceof Ellipsis) {
                 Ellipsis e = (Ellipsis)v;
-                Term r = e.clone(varPattern(serial+offset), this);
+                Variable r = e.clone(varPattern(serial+offset), this);
                 offset = 0; //return to zero
                 return r;
-            }
-            else {
+            } else {
                 return ((GenericVariable)v).normalize(serial+offset); //HACK
+
             }
         }
 
@@ -691,7 +695,7 @@ public class PremiseRule extends GenericCompound  {
             return true;
         }
 
-        public Term applyAfter(Variable secondary) {
+        public Term applyAfter(GenericVariable secondary) {
             offset++;
             return apply(null, secondary, -1);
         }

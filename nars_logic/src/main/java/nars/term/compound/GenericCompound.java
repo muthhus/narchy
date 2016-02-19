@@ -37,7 +37,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
 
     private final transient int hash;
-    private transient boolean normalized = false;
+    private transient boolean normalized;
 
 
     public GenericCompound(@NotNull Op op, @NotNull TermVector subterms) {
@@ -50,7 +50,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
     public GenericCompound(@NotNull Op op, int relation, int dt, @NotNull TermVector subterms) {
         this.subterms = subterms;
-        this.normalized = (subterms.vars() == 0);
+        this.normalized = (subterms.vars() == 0) && (subterms.varPattern()==0) /* not included in the count */;
         this.op = op;
 
         if (!op.isTemporal() && dt!=ITERNAL)

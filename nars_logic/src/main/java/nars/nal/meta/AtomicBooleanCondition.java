@@ -1,13 +1,10 @@
 package nars.nal.meta;
 
-import nars.Op;
+import nars.nal.nal8.AtomicStringConstant;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-
-import static nars.Op.ATOM;
 
 /**
  * each precondition is testesd for equality by its toString() method reprsenting an immutable key.
@@ -17,7 +14,7 @@ import static nars.Op.ATOM;
  * WARNING: no preconditions should store any state so that their instances may be used by
  * different contexts (ex: NAR's)
  */
-public abstract class AtomicBooleanCondition<C> extends AbstractLiteral implements BooleanCondition<C> {
+public abstract class AtomicBooleanCondition<C> extends AtomicStringConstant implements BooleanCondition<C> {
 
     public AtomicBooleanCondition() {
         super();

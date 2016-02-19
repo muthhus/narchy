@@ -15,6 +15,7 @@ import nars.term.transform.subst.choice.Choose2;
 import nars.term.transform.subst.choice.CommutivePermutations;
 import nars.term.transform.subst.choice.Termutator;
 import nars.term.variable.CommonVariable;
+import nars.term.variable.GenericNormalizedVariable;
 import nars.term.variable.Variable;
 import nars.util.data.list.FasterList;
 import nars.util.version.VersionMap;
@@ -290,7 +291,7 @@ public abstract class FindSubst extends Versioning implements Subst {
             return match(x, t); //loop
         } else {
             if (putYX(/*(Variable)*/ y, x)) {
-                if (y instanceof CommonVariable) {
+                if (y instanceof GenericNormalizedVariable) {
                     return putXY(y, /*(Variable)*/ x);
                 }
                 return true;
@@ -508,7 +509,7 @@ public abstract class FindSubst extends Versioning implements Subst {
     public final boolean matchEllipsedCommutative(@NotNull Compound X, Ellipsis Xellipsis, @NotNull Compound Y) {
 
         //ALL OF THIS CAN BE PRECOMPUTED
-        Set<Term> xSpecific = Global.newHashSet(0); //Global.newHashSet(0);
+        Set<Variable> xSpecific = Global.newHashSet(0); //Global.newHashSet(0);
 
         //constant terms which have been verified existing in Y and will not need matched
         Set<Term> ineligible = Global.newHashSet(0);
@@ -543,7 +544,7 @@ public abstract class FindSubst extends Versioning implements Subst {
             }
 
             if (x != Xellipsis)
-                xSpecific.add(x);
+                xSpecific.add((Variable)x);
 
 
         }
@@ -570,7 +571,7 @@ public abstract class FindSubst extends Versioning implements Subst {
     /**
      * toMatch matched into some or all of Y's terms
      */
-    private boolean matchCommutiveRemaining(Term xEllipsis, @NotNull Set<Term> x, @NotNull MutableSet<Term> yFree) {
+    private boolean matchCommutiveRemaining(Ellipsis xEllipsis, @NotNull Set<Variable> x, @NotNull MutableSet<Term> yFree) {
         int xs = x.size();
 
         switch (xs) {
@@ -581,7 +582,7 @@ public abstract class FindSubst extends Versioning implements Subst {
                         xEllipsis, x.iterator().next(), yFree));
             case 2:
                 return addTermutator(new Choose2(this,
-                        xEllipsis, x.toArray(new Term[x.size()]), yFree));
+                        xEllipsis, x.toArray(new Variable[x.size()]), yFree));
             default:
                 //3 or more combination
                 throw new RuntimeException("unimpl: " + xs + " arity combination unimplemented");
@@ -713,7 +714,7 @@ public abstract class FindSubst extends Versioning implements Subst {
      */
     private boolean putVarX(Variable x, @NotNull Term y) {
         return putXY(x, y) ?
-                ((x instanceof CommonVariable) ?
+                ((x instanceof GenericNormalizedVariable) ?
                         putYX(x, y) :
                         true) :
                 false;
@@ -762,12 +763,12 @@ public abstract class FindSubst extends Versioning implements Subst {
         return match(X.term(first), Y.term(first)) && match(X.term(other), Y.term(other));
     }
 
-    public boolean matchLinearReverse(@NotNull TermContainer X, @NotNull TermContainer Y) {
-        for (int i = X.size() - 1; i >= 0; i--) {
-            if (!matchSub(X, Y, i)) return false;
-        }
-        return true;
-    }
+//    public boolean matchLinearReverse(@NotNull TermContainer X, @NotNull TermContainer Y) {
+//        for (int i = X.size() - 1; i >= 0; i--) {
+//            if (!matchSub(X, Y, i)) return false;
+//        }
+//        return true;
+//    }
 
 
 //    public void termute(int i, Termutator[] chain) {
@@ -902,7 +903,8 @@ public abstract class FindSubst extends Versioning implements Subst {
         @Override
         public boolean cache(Term key) {
             //since these should always be normalized variables, they will not exceed a predictable range of entries (ex: $1, $2, .. $n)
-            return key instanceof Variable;
+            //return key instanceof Variable;
+            return false;
         }
 
         @Override

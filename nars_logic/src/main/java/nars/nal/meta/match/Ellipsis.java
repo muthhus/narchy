@@ -1,16 +1,18 @@
 package nars.nal.meta.match;
 
+import nars.$;
 import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.container.TermContainer;
 import nars.term.transform.VariableNormalization;
+import nars.term.variable.GenericNormalizedVariable;
 import nars.term.variable.GenericVariable;
 import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class Ellipsis extends GenericVariable { //TODO use Immutable
+public abstract class Ellipsis extends GenericNormalizedVariable {
 
 
 //    /** a placeholder that indicates an expansion of one or more terms that will be provided by an Ellipsis match.
@@ -28,29 +30,71 @@ public abstract class Ellipsis extends GenericVariable { //TODO use Immutable
 //    };
 
     @NotNull
-    public abstract Term clone(Variable newVar, VariableNormalization normalizer);
+    public abstract Variable clone(Variable newVar, VariableNormalization normalizer);
 
 
 
     //public final Variable target;
 
+    public static class EllipsisPrototype extends GenericVariable {
 
-    protected Ellipsis(@NotNull Term target, String suffix) {
+        private final int minArity;
+
+        public EllipsisPrototype(Op type, GenericVariable target, int minArity) {
+            super(type, target.label /* exclude variable type char */
+                    + ".." + (minArity == 0 ? '*' : '+'));
+            this.minArity = minArity;
+
+        }
+
+        @Override
+        public
+        @NotNull
+        Ellipsis normalize(int serial) {
+            if (minArity == 0) {
+                return new EllipsisZeroOrMore($.v(op(), serial));
+            } else if (minArity == 1) {
+                return new EllipsisOneOrMore($.v(op(), serial));
+            } else {
+                throw new RuntimeException("invalid ellipsis minArity");
+            }
+        }
+    }
+
+    public static class EllipsisTransformPrototype extends GenericVariable {
+
+        public final GenericVariable name, from, to;
+
+        public EllipsisTransformPrototype(/*Op type, */GenericVariable name, GenericVariable from, GenericVariable to) {
+            super(Op.VAR_PATTERN, "Unnormalized_EllipsisTransform(" + from + "," + to + ")");
+            this.name = name;
+            this.from = from;
+            this.to = to;
+        }
+
+        @Override public Variable normalize(int serial) {
+            throw new RuntimeException("n/a");
+        }
+
+    }
+
+
+    protected Ellipsis(@NotNull Variable target, String suffix) {
         super(
-            Op.VAR_PATTERN,
-            target.toString().substring(1) /* exclude variable type char */
-                    + suffix
+            target.op(), target.id, target.toString() + suffix
         );
 
-        //this.target = target;
     }
 
+//    @Override
+//    public final boolean equals(Object obj) {
+//        return //((obj instanceof Ellipsis) && id == ((Ellipsis)obj).id)
+//                //||
+//                ((obj instanceof Variable) && id == ((Variable)obj).id)
+//                ;
+//    }
+//
 
-
-    @Override
-    public int volume() {
-        return 0;
-    }
 
 
     /** this needs to use .term(x) instead of Term[] because of shuffle terms */
@@ -73,6 +117,7 @@ public abstract class Ellipsis extends GenericVariable { //TODO use Immutable
         }
         return null;
     }
+
 
 //    /** recursively */
 //    public static boolean containsEllipsis(Compound x) {

@@ -12,6 +12,7 @@ import nars.term.TermIndex;
 import nars.term.atom.Atom;
 import nars.term.index.PatternIndex;
 import nars.term.transform.subst.FindSubst;
+import nars.term.variable.GenericVariable;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.junit.Test;
 
@@ -20,6 +21,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static nars.$.$;
+import static nars.nal.meta.match.Ellipsis.firstEllipsis;
 import static org.junit.Assert.*;
 
 /**
@@ -31,7 +33,6 @@ public class EllipsisTest {
     public interface EllipsisTestCase {
         Compound getPattern();
         Compound getResult();
-        String getEllipsis();
         Compound getMatchable(int arity);
 
         default Set<Term> test(int arity, int repeats) {
@@ -41,12 +42,19 @@ public class EllipsisTest {
 
             Compound y = getMatchable(arity);
             assertNotNull(y);
+            assertTrue(y.isNormalized());
+            y.forEach(yy -> { assertFalse(yy instanceof GenericVariable); });
 
             Compound r = getResult();
+            assertTrue(r.isNormalized());
 
             Compound x = getPattern();
+            assertTrue(x.isNormalized());
+            x.forEach(xx -> { assertFalse(xx instanceof GenericVariable); });
 
-            Term ellipsisTerm = $(getEllipsis());
+            Term ellipsisTerm = firstEllipsis(r);
+
+
 
             for (int seed = 0; seed < Math.max(1,repeats*arity) /* enough chances to select all combinations */; seed++) {
 
@@ -62,12 +70,24 @@ public class EllipsisTest {
 
                         matched.set(true);
 
-                        TestCase.assertEquals(getExpectedUniqueTerms(arity), varArgs.size());
+                        assertEquals(getExpectedUniqueTerms(arity), varArgs.size());
 
                         Set<Term> varArgTerms = Global.newHashSet(1);
-                        index.apply(varArgs, this, varArgTerms);
+                        Term u = index.apply(this, varArgs);
+                        if (u == null) {
+                            u = varArgs;
+                        }
+        /*else
+            changed |= (u!=this);*/
 
-                        TestCase.assertEquals(getExpectedUniqueTerms(arity), varArgTerms.size());
+                        if (u instanceof EllipsisMatch) {
+                            EllipsisMatch m = (EllipsisMatch)u;
+                            m.apply(varArgTerms);
+                        } else {
+                            varArgTerms.add(u);
+                        }
+
+                        assertEquals(getExpectedUniqueTerms(arity), varArgTerms.size());
 
                         testFurther(selectedFixed, this, varArgTerms);
 
@@ -112,13 +132,15 @@ public class EllipsisTest {
         protected final String prefix;
         protected final String suffix;
         protected final Compound p;
-        private final String ellipsis;
 
         public CommutiveEllipsisTest(String ellipsisTerm, String prefix, String suffix) {
             this.prefix = prefix;
             this.suffix = suffix;
-            ellipsis = ellipsisTerm;
             p = getPattern(prefix, suffix);
+        }
+
+        public Ellipsis getEllipsis() {
+            return firstEllipsis(getResult());
         }
 
         static String termSequence(int arity) {
@@ -134,7 +156,6 @@ public class EllipsisTest {
         protected abstract Compound getPattern(String prefix, String suffix);
 
 
-        @Override public String getEllipsis() { return ellipsis; }
 
         @Override
         public Compound getPattern() {
@@ -151,9 +172,11 @@ public class EllipsisTest {
     public static class CommutiveEllipsisTest1 extends CommutiveEllipsisTest {
 
         static final Term fixedTerm = $("%1");
+        private final String ellipsisTerm;
 
         public CommutiveEllipsisTest1(String ellipsisTerm, String[] openClose) {
-            super(ellipsisTerm, openClose[0], openClose[1]);
+            super(null, openClose[0], openClose[1]);
+            this.ellipsisTerm = ellipsisTerm;
         }
 
         @Override
@@ -186,7 +209,7 @@ public class EllipsisTest {
 
         @Override
         public Compound getResult() {
-            return $('<' + prefix + getEllipsis() + suffix + " --> %1>");
+            return $('<' + prefix + ellipsisTerm + suffix + " --> %1>");
         }
 
     }
@@ -194,8 +217,11 @@ public class EllipsisTest {
     /** for testing zero-or-more matcher */
     public static class CommutiveEllipsisTest2 extends CommutiveEllipsisTest {
 
+        private final String elllipsisTerm;
+
         public CommutiveEllipsisTest2(String ellipsisTerm, String[] openClose) {
-            super(ellipsisTerm, openClose[0], openClose[1]);
+            super(null, openClose[0], openClose[1]);
+            this.elllipsisTerm = ellipsisTerm;
         }
 
         @Override
@@ -215,7 +241,7 @@ public class EllipsisTest {
 
         @Override
         public Compound getResult() {
-            String s = prefix + "Z, " + getEllipsis() + suffix;
+            String s = prefix + "Z, " + elllipsisTerm + suffix;
             Compound c = $(s);
             assertNotNull(s.toString() + " produced null compound", c);
             return c;
@@ -230,40 +256,41 @@ public class EllipsisTest {
     @Test
     public void testEllipsisOneOrMore() {
         String s = "%prefix..+";
-        Ellipsis t = $(s);
+        Ellipsis.EllipsisPrototype t = $(s);
         assertNotNull(t);
         assertEquals(s, t.toString());
         //assertEquals("%prefix", t.target.toString());
-        assertEquals(EllipsisOneOrMore.class, t.getClass());
+        assertEquals(EllipsisOneOrMore.class, t.normalize(1).getClass());
 
         //assertEquals(t.target, $("%prefix")); //equality between target and itself
     }
 
     @Test public void testEllipsisZeroOrMore() {
         String s = "%prefix..*";
-        Ellipsis t = $(s);
+        Ellipsis.EllipsisPrototype t = $(s);
         assertNotNull(t);
         assertEquals(s, t.toString());
         //assertEquals("%prefix", t.target.toString());
-        assertEquals(EllipsisZeroOrMore.class, t.getClass());
+        assertEquals(EllipsisZeroOrMore.class, t.normalize(0).getClass());
     }
     @Test public void testEllipsisTransform() {
-        String s = "%A..%B=C..+";
-        EllipsisTransform t = $(s);
+        String s = "%A..%B=%C..+";
+        Ellipsis.EllipsisTransformPrototype t = $(s);
+
         assertNotNull(t);
         assertEquals(s, t.toString());
         assertEquals(EllipsisTransform.class, t.getClass());
         assertEquals($("%B"), t.from);
-        assertEquals($("C"), t.to);
+        assertEquals($("%C"), t.to);
 
         TermIndex i = TermIndex.memory(128);
 
         Term u = i.transform(
                 $.p(t), new PremiseRule.PremiseRuleVariableNormalization());
-        t = (EllipsisTransform)((Compound)u).term(0);
+        EllipsisTransform tt = (EllipsisTransform)((Compound)u).term(0);
         assertEquals("(%1..%2=C..+)", u.toString());
-        assertEquals($("%2"), t.from);
-        assertEquals($("C"), t.to);
+        assertEquals($("%2"), tt.from);
+        assertEquals($("C"), tt.to);
     }
 
     @Test public void testEllipsisExpression() {
@@ -275,9 +302,12 @@ public class EllipsisTest {
     @Test public void testVarArg0() {
         //String rule = "(%S --> %M), ((|, %S, %A..+ ) --> %M) |- ((|, %A, ..) --> %M), (Belief:DecomposePositiveNegativeNegative)";
         String rule = "(%S ==> %M), ((&&,%S,%A..+) ==> %M) |- ((&&,%A..+) ==> %M), (Belief:DecomposeNegativePositivePositive, Order:ForAllSame, SequenceIntervals:FromBelief)";
-        Compound x = $.$('<' + rule + '>');
+
+        Compound _x = $.$('<' + rule + '>');
+        assertTrue(_x.toString(), _x instanceof PremiseRule);
+        PremiseRule x = (PremiseRule)_x;
         //System.out.println(x);
-        x = ((PremiseRule)x).normalizeRule(new PatternIndex());
+        x = x.normalizeRule(new PatternIndex());
         //System.out.println(x);
 
         assertEquals(

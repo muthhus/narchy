@@ -1,10 +1,10 @@
 package nars.term.variable;
 
-import nars.$;
 import nars.Op;
 import org.jetbrains.annotations.NotNull;
 
-public final class CommonVariable extends Variable  {
+public final class CommonVariable extends GenericNormalizedVariable {
+
 
 
     CommonVariable(Op type, int a, int b) {
@@ -12,40 +12,11 @@ public final class CommonVariable extends Variable  {
     }
 
 
-    @Override
-    public final int vars() {
-        // pattern variable hidden in the count 0
-        return type == Op.VAR_PATTERN ? 0 : 1;
+    public static @NotNull GenericNormalizedVariable make(@NotNull GenericVariable v1, @NotNull GenericVariable v2) {
+        return make(v1.normalize(1), v2.normalize(2));
     }
 
-    @Override
-    public final Op op() {
-        return type;
-    }
-
-
-    @Override
-    public final int varIndep() {
-        return type == Op.VAR_INDEP ? 1 : 0;
-    }
-
-    @Override
-    public final int varDep() {
-        return type == Op.VAR_DEP ? 1 : 0;
-    }
-
-    @Override
-    public final int varQuery() {
-        return type == Op.VAR_QUERY ? 1 : 0;
-    }
-
-    @Override
-    public int varPattern() {
-        return type == Op.VAR_QUERY ? 1 : 0;
-    }
-
-    @NotNull
-    public static CommonVariable make(@NotNull Variable v1, @NotNull Variable v2) {
+    public static @NotNull GenericNormalizedVariable make(@NotNull Variable v1, @NotNull Variable v2) {
 
 
 //        if (v1 instanceof CommonVariable) {
