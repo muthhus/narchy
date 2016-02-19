@@ -29,7 +29,7 @@ public class Hsom {
     float Leak = 0.1f;
     float InMul = 1.0f;
 
-    public Hsom(int numInputs, int SomSize, Random rng) {
+    public Hsom(int numInputs, int SomSize, @NotNull Random rng) {
         links = new float[SomSize][SomSize][numInputs];
         // vis = new float[SomSize][SomSize][numInputs];
         inputs = new float[numInputs];

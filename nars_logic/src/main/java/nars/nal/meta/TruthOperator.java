@@ -19,7 +19,7 @@ public interface TruthOperator {
      *                if confidence is equal to or greater, then it is valid
      * @return
      */
-    Truth apply(@NotNull Truth task, @Nullable Truth belief, @NotNull Memory m, float minConf);
+    @Nullable Truth apply(@NotNull Truth task, @Nullable Truth belief, @NotNull Memory m, float minConf);
 
     default boolean apply(@NotNull PremiseMatch m) {
 

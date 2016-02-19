@@ -25,10 +25,7 @@ import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.TreeSet;
+import java.util.*;
 
 import static java.util.Arrays.copyOfRange;
 import static nars.Op.*;
@@ -70,13 +67,12 @@ public interface TermBuilder {
     }
 
 
-    @NotNull
+    @Nullable
     default Termed make(Op op, int relation, TermContainer subterms) {
         return make(op, relation, subterms, Tense.ITERNAL);
     }
 
-    @NotNull
-    Termed make(Op op, int relation, TermContainer subterms, int dt);
+    @Nullable Termed make(Op op, int relation, TermContainer subterms, int dt);
 
     /** unifies a term with this; by default it passes through unchanged */
     @Nullable
@@ -356,8 +352,10 @@ public interface TermBuilder {
             //return null;
         }
 
-        return make(op, relation, TermContainer.the(op, args), dt).term();
-
+        Termed m = make(op, relation, TermContainer.the(op, args), dt);
+        if (m == null)
+            return null;
+        return m.term();
     }
 
     final class InvalidTermConstruction extends RuntimeException {
@@ -575,12 +573,15 @@ public interface TermBuilder {
         //already tested equality, so go to invalidStatement2:
         if (!Statement.invalidStatement2(subject, predicate)) {
             TermContainer cc = TermContainer.the(op, u);
-            Compound x = ((Compound) make(op, -1, cc).term());
-            if(t!= ITERNAL) {
-                boolean reversed = cc.term(0)==predicate;
-                x = x.t(reversed ? -t : t);
+            Termed xx = make(op, -1, cc);
+            if (xx !=null) {
+                Compound x = (Compound) (xx.term());
+                if (t != ITERNAL) {
+                    boolean reversed = cc.term(0) == predicate;
+                    x = x.t(reversed ? -t : t);
+                }
+                return x;
             }
-            return x;
         }
 
         return null;
@@ -718,16 +719,22 @@ public interface TermBuilder {
             Term u = apply(f, t);
 
             if (u instanceof EllipsisMatch) {
+
                 EllipsisMatch m = (EllipsisMatch)u;
-                if (m.size() > maxArity - sub.size()) {
-                    //invalid
-                    return src;
+
+                if (maxArity!=-1 && m.size() + sub.size() > maxArity) {
+                    return src; //invalid transformation, violates arity constraint
                 }
-                m.apply(sub);
-            } else if (u!=null) {
-                sub.add(u);
+
+                Collections.addAll(sub, m.term);
+
             } else {
-                sub.add(t);
+
+                if (maxArity!=-1 && 1 + sub.size() > maxArity) {
+                    return src; //invalid transformation, violates arity constraint
+                }
+
+                sub.add(u != null ? u : t);
             }
         }
 

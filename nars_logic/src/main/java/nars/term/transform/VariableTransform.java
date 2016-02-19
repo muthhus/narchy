@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 public abstract class VariableTransform implements CompoundTransform<Compound, Term> {
 
     @Override
-    public final boolean test(Term possiblyAVariable) {
+    public final boolean test(@NotNull Term possiblyAVariable) {
         return possiblyAVariable.op().isVar();
     }
 

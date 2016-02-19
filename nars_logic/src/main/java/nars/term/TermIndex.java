@@ -88,14 +88,16 @@ public interface TermIndex extends TermBuilder {
 
     void putTerm(Termed termed);
 
+    @Nullable
     default TermContainer unifySubterms(TermContainer s) {
         TermVector t = (TermVector)s;
         Term[] x = t.terms();
         for (int i = 0; i < x.length; i++) {
             Term xi = x[i];
-            Term u = theTerm(xi); //since they are equal this will not need re-hashed
-            if (u.equals(xi))
-                x[i] = u; //HACK use unified, otherwise keep original
+            Termed u = the(xi); //since they are equal this will not need re-hashed
+            if (u == null) return null;
+            //if (u.equals(xi))
+                x[i] = u.term(); //HACK use unified, otherwise keep original
         }
         return s;
     }
@@ -105,7 +107,7 @@ public interface TermIndex extends TermBuilder {
         return t; /* as-is */
     }
 
-    @NotNull
+    @Nullable
     default Termed makeTerm(Term t) {
         return t instanceof Compound ?
                 makeCompound((Compound) t)
@@ -120,7 +122,7 @@ public interface TermIndex extends TermBuilder {
 //    }
 
 
-    @NotNull
+    @Nullable
     default Termed makeCompound(@NotNull Compound t) {
         return make(t.op(), t.relation(), t.subterms(), t.t());
     }

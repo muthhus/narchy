@@ -57,11 +57,6 @@ public final class EllipsisMatch extends TermVector<Term> implements Term {
 
     //abstract public boolean addContained(Compound Y, Set<Term> target);
 
-    /** expand the matched results to a target buffer */
-    public void apply(@NotNull Collection<Term> sub) {
-        Collections.addAll(sub, term);
-    }
-
     @NotNull
     @Override
     public Op op() {

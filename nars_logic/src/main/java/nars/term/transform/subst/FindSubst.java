@@ -700,7 +700,7 @@ public abstract class FindSubst extends Versioning implements Subst {
 
                 }
             } else {
-                if (!match(x, Y.term(j++)))
+                if (ysize>=j || !match(x, Y.term(j++)))
                     return false;
             }
         }

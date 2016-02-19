@@ -1,18 +1,16 @@
 package nars.term.variable;
 
 import nars.Op;
+import org.jetbrains.annotations.NotNull;
 
 
 public abstract class GenericNormalizedVariable extends Variable {
 
+    @NotNull
     public final Op type;
 
-    public GenericNormalizedVariable(Op type, int id) {
+    public GenericNormalizedVariable(@NotNull Op type, int id) {
         super(type, id);
-        this.type = type;
-    }
-    public GenericNormalizedVariable(Op type, int id, String str) {
-        super(type, id, str);
         this.type = type;
     }
 
@@ -46,7 +44,7 @@ public abstract class GenericNormalizedVariable extends Variable {
 
     @Override
     public final int varPattern() {
-        return type == Op.VAR_QUERY ? 1 : 0;
+        return type == Op.VAR_PATTERN ? 1 : 0;
     }
 
 }

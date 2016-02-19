@@ -14,13 +14,17 @@ import nars.term.index.PatternIndex;
 import nars.term.transform.subst.FindSubst;
 import nars.term.variable.GenericVariable;
 import nars.util.data.random.XorShift128PlusRandom;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static nars.$.$;
+import static nars.Op.VAR_DEP;
+import static nars.Op.VAR_PATTERN;
 import static nars.nal.meta.match.Ellipsis.firstEllipsis;
 import static org.junit.Assert.*;
 
@@ -60,7 +64,7 @@ public class EllipsisTest {
 
                 AtomicBoolean matched = new AtomicBoolean(false);
 
-                FindSubst f = new FindSubst(Op.VAR_PATTERN, new XorShift128PlusRandom(1+seed)) {
+                FindSubst f = new FindSubst(VAR_PATTERN, new XorShift128PlusRandom(1+seed)) {
 
                     @Override
                     public boolean onMatch() {
@@ -82,7 +86,7 @@ public class EllipsisTest {
 
                         if (u instanceof EllipsisMatch) {
                             EllipsisMatch m = (EllipsisMatch)u;
-                            m.apply(varArgTerms);
+                            Collections.addAll(varArgTerms, m.term);
                         } else {
                             varArgTerms.add(u);
                         }
@@ -254,6 +258,16 @@ public class EllipsisTest {
     }
 
     @Test
+    public void testEllipsisEqualToPatternVariable() {
+
+        @NotNull Ellipsis tt = $.<Ellipsis.EllipsisPrototype>$("%x..+").normalize(1);
+
+        assertEquals(tt, $.v(VAR_PATTERN, 1));
+        assertNotEquals(tt, $.v(VAR_PATTERN, 2));
+        assertNotEquals(tt, $.v(VAR_DEP, 1));
+    }
+
+    @Test
     public void testEllipsisOneOrMore() {
         String s = "%prefix..+";
         Ellipsis.EllipsisPrototype t = $(s);
@@ -358,7 +372,7 @@ public class EllipsisTest {
             Set<String> results = Global.newHashSet(0);
 
             Random rng = new XorShift128PlusRandom(seed);
-            FindSubst f = new FindSubst(Op.VAR_PATTERN, rng) {
+            FindSubst f = new FindSubst(VAR_PATTERN, rng) {
                 @Override
                 public boolean onMatch() {
                     results.add(xy.toString());
@@ -428,7 +442,7 @@ public class EllipsisTest {
 
 
             assertEquals(o + " with ellipsis not reduced",
-                    o.isStatement() ? Op.VAR_PATTERN : o,
+                    o.isStatement() ? VAR_PATTERN : o,
                     $.terms.newTerm(o,b).op());
         }
     }

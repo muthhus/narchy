@@ -17,20 +17,17 @@ public class EllipsisTransform extends EllipsisOneOrMore {
     public final Term to;
 
     public EllipsisTransform(@NotNull Variable name, Term from, Term to) {
-        super(name, ".." + from + '=' + to + "..+");
+        super(name);
 
-//        if (from instanceof VarPattern)
-//            this.from = new VarPattern(((VarPattern) from).id);
-//        else
-          this.from = from;
-//
-//        if (from instanceof VarPattern)
-//            this.to = new VarPattern(((VarPattern) to).id);
-//        else
-          this.to = to;
+
+        this.from = from;
+        this.to = to;
     }
 
-
+    @Override
+    public String toString() {
+        return super.toString() + ".." + from + '=' + to + "..+";
+    }
 
     @NotNull
     @Override
@@ -44,7 +41,7 @@ public class EllipsisTransform extends EllipsisOneOrMore {
 
     @NotNull
     public EllipsisMatch collect(@NotNull Compound y, int a, int b, @NotNull PremiseMatch subst) {
-        if (from.equals(Op.Imdex) && (y.op().isImage())) {
+        if (from == Op.Imdex && (y.op().isImage())) {
 
             int rel = y.relation();
             int n = (b-a)+1;

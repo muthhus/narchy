@@ -44,7 +44,7 @@ public class Atom extends AtomicStringConstant {
 
     public final int init(int[] meta) {
 
-        meta[4] ++;
+        meta[4] ++; //volume
         meta[5] |= AtomBit;
 
         return hashCode();

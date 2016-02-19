@@ -394,7 +394,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
     }
 
 
-    Bag<V> filter(Predicate<BLink<? extends V>> forEachIfFalseThenRemove);
+    @Nullable Bag<V> filter(Predicate<BLink<? extends V>> forEachIfFalseThenRemove);
 
 
     @NotNull

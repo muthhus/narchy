@@ -16,7 +16,7 @@ public class NAL2Test extends AbstractNALTester {
 
     public NAL2Test(Supplier<NAR> b) { super(b); }
 
-    static final int cycles = 600;
+    static final int cycles = 100;
 
     @Parameterized.Parameters(name = "{index}:{0}")
     public static Iterable<Supplier<NAR>> configurations() {
@@ -29,7 +29,6 @@ public class NAL2Test extends AbstractNALTester {
         tester.believe("<robin <-> swan>") ;//;//Robin is similar to swan.");
         tester.believe("<robin <-> swan>", 0.1f, 0.6f);
         tester.mustBelieve(cycles,"<robin <-> swan>",0.87f,0.91f) ;//;//Robin is probably similar to swan.");
-
     }
 
     @Test
@@ -193,6 +192,10 @@ public class NAL2Test extends AbstractNALTester {
 
     @Test
     public void structureTransformation3() throws Narsese.NarseseException {
+        /*
+        <bright <-> smart>. %0.9;0.9%
+        <{bright} --> {smart}>?
+         */
         TestNAR tester = test();
         tester.believe("<bright <-> smart>", 0.9f, 0.9f);//Bright is similar to smart.");
         tester.ask("<{bright} --> {smart}>");//Is bright thing a type of smart thing?");

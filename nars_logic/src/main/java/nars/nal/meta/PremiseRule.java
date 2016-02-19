@@ -34,6 +34,7 @@ import nars.term.transform.subst.MapSubst;
 import nars.term.variable.GenericVariable;
 import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.List;
@@ -100,6 +101,7 @@ public class PremiseRule extends GenericCompound  {
 
     private final String str;
     protected String source;
+    @Nullable
     public MatchTaskBelief match;
 
     @NotNull
@@ -205,6 +207,7 @@ public class PremiseRule extends GenericCompound  {
         return source;
     }
 
+    @Nullable
     protected final Term getTask() {
         return getPremise().term(0);
     }
@@ -212,10 +215,12 @@ public class PremiseRule extends GenericCompound  {
 
 
 
+    @Nullable
     protected final Term getBelief() {
         return getPremise().term(1);
     }
 
+    @Nullable
     protected final Term getConclusionTermPattern() {
         return getConclusion().term(0);
     }
@@ -227,9 +232,11 @@ public class PremiseRule extends GenericCompound  {
         return str;
     }
 
+    @Nullable
     public final Term task() {
         return pattern.term(0);
     }
+    @Nullable
     public final Term belief() {
         return pattern.term(1);
     }
@@ -674,18 +681,29 @@ public class PremiseRule extends GenericCompound  {
         @Override protected Variable newVariable(@NotNull Term v, int serial) {
 
 
+            int actualSerial = serial + offset;
+
             if (v instanceof Ellipsis.EllipsisTransformPrototype) {
                 //special
+
                 Ellipsis.EllipsisTransformPrototype ep = (Ellipsis.EllipsisTransformPrototype)v;
-                return new EllipsisTransform(varPattern(serial+offset), applyAfter(ep.from), apply(ep.to));
+
+//                Term from = ep.from;
+//                if (from != Op.Imdex) from = applyAfter((GenericVariable)from);
+//                Term to = ep.to;
+//                if (to != Op.Imdex) to = applyAfter((GenericVariable)to);
+//
+                return new EllipsisTransform(varPattern(actualSerial), ep.from, ep.to);
+
             } else if (v instanceof Ellipsis) {
                 Ellipsis e = (Ellipsis)v;
-                Variable r = e.clone(varPattern(serial+offset), this);
+                Variable r = e.clone(varPattern(actualSerial), this);
                 offset = 0; //return to zero
                 return r;
+            } else if (v instanceof GenericVariable) {
+                return ((GenericVariable)v).normalize(actualSerial); //HACK
             } else {
-                return ((GenericVariable)v).normalize(serial+offset); //HACK
-
+                return $.v(v.op(), actualSerial);
             }
         }
 

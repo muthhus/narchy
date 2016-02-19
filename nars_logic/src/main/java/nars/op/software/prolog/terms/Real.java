@@ -1,5 +1,7 @@
 package nars.op.software.prolog.terms;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Part of the Term hierarchy, implementing double float point numbers.
  * 
@@ -15,7 +17,7 @@ public class Real extends Num {
 		val = i;
 	}
 
-	boolean bind_to(PTerm that, Trail trail) {
+	boolean bind_to(@NotNull PTerm that, Trail trail) {
 		return super.bind_to(that, trail) && val == ((Real) that).val;
 	}
 

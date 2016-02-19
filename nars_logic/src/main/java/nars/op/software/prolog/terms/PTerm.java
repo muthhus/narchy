@@ -57,6 +57,7 @@ public abstract class PTerm implements Cloneable, Term {
 	 * otherwise vicious non-reentrancy problems may occur in the presence of GC
 	 * and heavy multi-threading!!!
 	 */
+	@NotNull
 	abstract public PTerm ref();
 
 	abstract boolean bind_to(PTerm that, Trail trail);
@@ -82,6 +83,7 @@ public abstract class PTerm implements Cloneable, Term {
 	// return this;
 	// }
 
+	@NotNull
 	public Clause toClause() {
 		return new Clause(this, TRUE);
 	}
@@ -164,6 +166,7 @@ public abstract class PTerm implements Cloneable, Term {
 	/**
 	 * Returns '[]'(V1,V2,..Vn) where Vi is a variable occuring in this Term
 	 */
+	@NotNull
 	public PTerm varsOf() {
 		return (new Copier()).getMyVars(this);
 	}

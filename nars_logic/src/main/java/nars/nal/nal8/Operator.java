@@ -19,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class Operator<T extends Term> extends AtomicStringConstant {
 
+    @NotNull
     private final String str;
 
     public Operator(@NotNull T the) {
@@ -56,6 +57,7 @@ public final class Operator<T extends Term> extends AtomicStringConstant {
     }
 
 
+    @NotNull
     @Override
     public String toString() {
         return str;

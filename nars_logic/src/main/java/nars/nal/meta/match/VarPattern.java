@@ -37,6 +37,11 @@ public class VarPattern extends Variable {
     }
 
 
+    @Override
+    public int volume() {
+        return 0;
+    }
+
     /**
      * pattern variable hidden in the count 0
      */

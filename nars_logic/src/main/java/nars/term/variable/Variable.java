@@ -39,17 +39,12 @@ import java.io.IOException;
 public abstract class Variable extends Atomic {
 
     public final int id;
-    public final String str;
     protected final int hash;
 
-    protected Variable(Op type, int id) {
-        this(type, id, type.ch + Integer.toString(id));
-    }
+    protected Variable(@NotNull Op type, int id) {
 
-    protected Variable(Op type, int id, String str) {
         this.id = id;
-        this.str = str;
-        this.hash = (type.ordinal() << 8) | id;
+        this.hash = (type.ordinal() << 16) | id; //lower 16 bits reserved for the type, which includes all permutations of 2x 8-bit id'd common variables
     }
 
 
@@ -57,7 +52,7 @@ public abstract class Variable extends Atomic {
 
     @Override
     public final boolean equals(Object obj) {
-        return obj==this || (obj instanceof Variable) && ((Variable)obj).id == id;
+        return obj==this || (obj instanceof Variable) && ((Variable)obj).hash == hash;
     }
 
     @Override
@@ -68,12 +63,13 @@ public abstract class Variable extends Atomic {
     @Override
     public final int compareTo(Object o) {
         //hashcode can serve as the ordering too
+        if (o == this) return 0;
         return o instanceof Variable ? Integer.compare(hash, o.hashCode()) : 1;
     }
 
     @Override
-    public final String toString() {
-        return str;
+    public String toString() {
+        return op().ch + Integer.toString(id);
     }
 
     public static final int MAX_VARIABLE_CACHED_PER_TYPE = 32;
@@ -83,6 +79,7 @@ public abstract class Variable extends Atomic {
      */
     public static final Variable[][] varCache = new Variable[4][MAX_VARIABLE_CACHED_PER_TYPE];
 
+    @NotNull
     public static Op typeIndex(char c) {
         switch (c) {
             case '%':
@@ -101,11 +98,20 @@ public abstract class Variable extends Atomic {
 //    abstract public int volume();
 
     @Override
-    public final int volume() {
+    public int volume() {
         //TODO decide if this is the case for zero-or-more ellipsis
         return 1;
     }
-
+    /**
+     * The syntactic complexity of a variable is 0, because it does not refer to
+     * any concept.
+     *
+     * @return The complexity of the term, an integer
+     */
+    @Override
+    public final int complexity() {
+        return 0;
+    }
 
     //    //TODO replace this with a generic counting method of how many subterms there are present
 //    public static int numPatternVariables(Term t) {
@@ -119,16 +125,7 @@ public abstract class Variable extends Atomic {
 //    }
 
 
-    /**
-     * The syntactic complexity of a variable is 0, because it does not refer to
-     * any concept.
-     *
-     * @return The complexity of the term, an integer
-     */
-    @Override
-    public final int complexity() {
-        return 0;
-    }
+
 
 
 

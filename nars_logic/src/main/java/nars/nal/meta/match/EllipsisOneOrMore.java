@@ -6,6 +6,7 @@ import nars.term.Term;
 import nars.term.transform.VariableNormalization;
 import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Created by me on 12/5/15.
@@ -13,21 +14,30 @@ import org.jetbrains.annotations.NotNull;
 public class EllipsisOneOrMore extends Ellipsis {
 
     public EllipsisOneOrMore(@NotNull Variable /*Variable*/ name) {
-        this(name, "..+");
+        super(name);
     }
 
 
     @Override
     public @NotNull Variable clone(@NotNull Variable newVar, VariableNormalization normalizer) {
+//        if (newVar.hashCode()==hash)
+//            return this;
         return new EllipsisOneOrMore(newVar);
     }
 
-    public EllipsisOneOrMore(@NotNull Variable name, String s) {
-        super(name, s);
-    }
 
     @Override
     public boolean valid(int collectable) {
         return collectable > 0;
     }
+
+    @Override
+    public String toString() {
+        return super.toString() + "..+";
+    }
+
+
+
+
+
 }

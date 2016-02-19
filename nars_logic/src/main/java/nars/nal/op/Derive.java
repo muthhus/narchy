@@ -101,12 +101,15 @@ public class Derive extends AtomicStringConstant implements ProcTerm {
 
         if ((derivedTerm instanceof EllipsisMatch)) {
             //TODO hack prevent this
-            throw new RuntimeException("invalid ellipsis match: " + derivedTerm);
-//            EllipsisMatch em = ((EllipsisMatch)derivedTerm);
-//            if (em.size()!=1) {
-//                throw new RuntimeException("invalid ellipsis match: " + em);
-//            }
-//            derivedTerm = em.term(0); //unwrap the item
+            //throw new RuntimeException("invalid ellipsis match: " + derivedTerm);
+            EllipsisMatch em = ((EllipsisMatch)derivedTerm);
+            switch (em.size()) {
+                case 1: derivedTerm = em.term(0); //unwrap the item
+                    break;
+                case 0: return;
+                default:
+                    throw new RuntimeException("invalid ellipsis match: " + em);
+            }
         }
 
         if (ensureValidVolume(derivedTerm) && postMatch.booleanValueOf(m))
@@ -129,7 +132,7 @@ public class Derive extends AtomicStringConstant implements ProcTerm {
 
                 String message = "Term volume overflow: " + derivedTerm;
                 $.logger.error(message);
-                System.exit(1);
+                //System.exit(1);
                 //throw new RuntimeException(message);
             }
 

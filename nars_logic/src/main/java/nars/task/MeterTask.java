@@ -17,7 +17,7 @@ public abstract class MeterTask extends MutableTask {
 
     private final Active active = new Active();
 
-    public MeterTask(Termed<Compound> c) {
+    public MeterTask(@NotNull Termed<Compound> c) {
         super(c);
     }
 

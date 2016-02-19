@@ -244,6 +244,7 @@ public class NarQ implements Consumer<NAR> {
 
         //Hsom...
         final static float perceptionAlpha = 0.02f;
+        @NotNull
         final Autoencoder ae;
 
         public HaiQImpl(int inputs, int states, int outputs) {

@@ -11,6 +11,7 @@ import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -294,6 +295,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
         return t;
     }
 
+    @Nullable
     @Override
     public String toString() {
         return toString(false);

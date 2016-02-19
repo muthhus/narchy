@@ -73,7 +73,7 @@ public class substitute extends ImmediateTermTransform implements PremiseAware {
     }
 
     @Nullable
-    public static Term subst(@NotNull PremiseMatch r, Term term, @NotNull Term x, Term y) {
+    public static Term subst(@NotNull PremiseMatch r, @NotNull Term term, @NotNull Term x, Term y) {
         if (x.equals(y))
             return term;
 
@@ -87,7 +87,7 @@ public class substitute extends ImmediateTermTransform implements PremiseAware {
     }
 
     @Nullable
-    public static Term subst(@NotNull PremiseMatch r, @NotNull Subst m, Term term) {
+    public static Term subst(@NotNull PremiseMatch r, @NotNull Subst m, @NotNull Term term) {
         //copy the new mappings to the match
         m.forEach( (k,v) -> {
             if (!r.putXY(k, v)) {

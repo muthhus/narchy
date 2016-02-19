@@ -29,7 +29,7 @@ public class DataBase extends BlackBoard {
      * such term is found.
      */
     @Nullable
-    public PTerm cin(String k, PTerm pattern) {
+    public PTerm cin(String k, @NotNull PTerm pattern) {
         PTerm found = take(k, pattern);
         // if(found!=null) {
         // found=found.matching_copy(pattern);

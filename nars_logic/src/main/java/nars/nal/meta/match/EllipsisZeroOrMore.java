@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class EllipsisZeroOrMore extends Ellipsis {
     public EllipsisZeroOrMore(@NotNull Variable /*Variable*/ name) {
-        super(name, "..*");
+        super(name);
     }
 
     @Override
@@ -22,6 +22,13 @@ public class EllipsisZeroOrMore extends Ellipsis {
 
     @Override
     public @NotNull Variable clone(@NotNull Variable newVar, VariableNormalization normalizer) {
+//        if (newVar.hashCode()==hash)
+//            return this;
         return new EllipsisZeroOrMore(newVar);
+    }
+
+    @Override
+    public final String toString() {
+        return super.toString() + "..*";
     }
 }

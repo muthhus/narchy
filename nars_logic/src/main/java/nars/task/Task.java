@@ -164,13 +164,13 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         return dereference(getParentTaskRef());
     }
 
-    Reference<Task> getParentTaskRef();
+    @Nullable Reference<Task> getParentTaskRef();
 
 
     @Nullable
     Task getParentBelief();
 
-    Reference<Task> getParentBeliefRef();
+    @Nullable Reference<Task> getParentBeliefRef();
 
     /**
      * Check whether different aspects of sentence are equivalent to another one

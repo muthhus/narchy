@@ -93,7 +93,11 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
         this.confMax = Math.min(1.0f, confMax);
         this.confMin = Math.max(0.0f, confMin);
         this.punc = punc;
-        this.term = Narsese.the().termRaw(sentenceTerm);
+        this.term =
+            //Narsese.the().termRaw(
+            Narsese.the().term(
+                sentenceTerm
+            );
         //this.duration = n.memory.duration();
     }
 

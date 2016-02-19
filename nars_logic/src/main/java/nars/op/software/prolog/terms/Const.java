@@ -62,6 +62,7 @@ public class Const extends Nonvar {
 		return name;
 	}
 
+	@Nullable
 	public String getKey() {
 		return name + '/' + arity();
 	}

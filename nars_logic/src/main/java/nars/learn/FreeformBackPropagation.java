@@ -24,6 +24,7 @@
 package nars.learn;
 
 import org.encog.neural.freeform.FreeformConnection;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * From Encog https://github.com/encog/encog-java-core
@@ -62,7 +63,7 @@ public class FreeformBackPropagation extends FreeformPropagationTraining		{
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void learnConnection(final FreeformConnection connection) {
+	protected void learnConnection(@NotNull final FreeformConnection connection) {
 		final double gradient = connection.getTempTraining(0);
 		final double delta = (gradient * this.learningRate)
 				+ (connection.getTempTraining(1) * this.momentum);

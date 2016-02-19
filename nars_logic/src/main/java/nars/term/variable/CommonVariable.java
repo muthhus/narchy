@@ -8,13 +8,9 @@ public final class CommonVariable extends GenericNormalizedVariable {
 
 
     CommonVariable(Op type, int a, int b) {
-        super(type, a << 8 + b); //this limits # of variables to 256 per term
+        super(type, ((a+1) << 8) | (b+1)); //this limits # of variables to 256 per term
     }
 
-
-    public static @NotNull GenericNormalizedVariable make(@NotNull GenericVariable v1, @NotNull GenericVariable v2) {
-        return make(v1.normalize(1), v2.normalize(2));
-    }
 
     public static @NotNull GenericNormalizedVariable make(@NotNull Variable v1, @NotNull Variable v2) {
 

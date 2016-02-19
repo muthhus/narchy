@@ -2,10 +2,13 @@ package nars.term.index;
 
 import nars.nal.meta.PatternCompound;
 import nars.nal.meta.PremiseRule;
+import nars.nal.meta.match.Ellipsis;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.term.Termed;
 import nars.term.container.TermVector;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 
@@ -58,7 +61,13 @@ public class PatternIndex extends MapIndex {
 //        return super.compileCompound(x);
     }
 
-
+    @Override
+    public
+    @Nullable
+    Termed the(Term x) {
+        //HACK - ellipsis contains additional metadata we want to save
+        return (x instanceof Ellipsis) ? x : super.the(x);
+    }
 
 
     //

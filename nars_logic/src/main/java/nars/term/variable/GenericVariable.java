@@ -10,11 +10,13 @@ import org.jetbrains.annotations.NotNull;
  */
 public class GenericVariable extends AtomicString {
 
+    @NotNull
     public final Op type;
     public  final String label;
+    @NotNull
     private final String str;
 
-    public GenericVariable(Op type, String label) {
+    public GenericVariable(@NotNull Op type, String label) {
         this.label = label;
         this.type = type;
         this.str = type.ch + label;
@@ -62,6 +64,7 @@ public class GenericVariable extends AtomicString {
         return $.v(type, serial);
     }
 
+    @NotNull
     @Override
     public String toString() {
         return str;

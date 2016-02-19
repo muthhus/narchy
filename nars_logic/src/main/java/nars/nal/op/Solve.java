@@ -23,7 +23,7 @@ abstract public class Solve extends AtomicBooleanCondition<PremiseMatch> {
     }
 
     @NotNull
-    public static Solve the(@NotNull PostCondition p, PremiseRule rule, boolean anticipate, boolean eternalize,
+    public static Solve the(@NotNull PostCondition p, @NotNull PremiseRule rule, boolean anticipate, boolean eternalize,
                             @NotNull BooleanCondition[] postPreconditions) {
 
         char puncOverride = p.puncOverride;

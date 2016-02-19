@@ -145,9 +145,9 @@ public class GuavaIndex implements TermIndex {
     @Override
     public Termed the(@NotNull Term x) {
 
-        if (!AbstractMapIndex.isInternable(x)) {
-            return x;
-        }
+//        if (!AbstractMapIndex.isInternable(x)) {
+//            return x;
+//        }
 
         try {
             return data.get(x, () -> makeTerm(x));

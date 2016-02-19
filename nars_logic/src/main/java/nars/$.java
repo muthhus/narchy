@@ -213,7 +213,7 @@ public enum $  {
     }
 
     @NotNull
-    public static GenericVariable varDep(String s) {
+    public static GenericVariable varDep(@NotNull String s) {
         return v(VAR_DEP, s);
     }
 
@@ -223,7 +223,7 @@ public enum $  {
     }
 
     @NotNull
-    public static GenericVariable varIndep(String s) {
+    public static GenericVariable varIndep(@NotNull String s) {
         return v(VAR_INDEP, s);
     }
 
@@ -233,7 +233,7 @@ public enum $  {
     }
 
     @NotNull
-    public static GenericVariable varQuery(String s) {
+    public static GenericVariable varQuery(@NotNull String s) {
         return v(VAR_QUERY, s);
     }
 
@@ -349,7 +349,7 @@ public enum $  {
     /** normalized variable */
     @NotNull public static Variable v(@NotNull Op type, int counter) {
         if (counter >= Variable.MAX_VARIABLE_CACHED_PER_TYPE) {
-            throw new RuntimeException("too many variables");
+            throw new RuntimeException("variable cache overflow");
         }
 
         Variable[] vct = Variable.varCache[typeIndex(type)];

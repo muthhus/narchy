@@ -65,7 +65,7 @@ public class Fun extends Const implements Compound<PTerm> {
         args[i] = T;
     }*/
 
-    public final int putArg(int i, PTerm T, @NotNull Prog p) {
+    public final int putArg(int i, @NotNull PTerm T, @NotNull Prog p) {
         // return getArg(i).unify(T,p.getTrail())?1:0;
         return args[i].unify(T, p.getTrail()) ? 1 : 0;
     }
@@ -107,6 +107,7 @@ public class Fun extends Const implements Compound<PTerm> {
                 "()" : (args.length <= 0 ? "" : '(' + show_args() + ')'));
     }
 
+    @NotNull
     public String toString() {
         return funToString();
     }
@@ -189,7 +190,7 @@ public class Fun extends Const implements Compound<PTerm> {
 //    }
 
     @Nullable
-    final nars.op.software.prolog.terms.PTerm reaction(nars.op.software.prolog.terms.PTerm that) {
+    final nars.op.software.prolog.terms.PTerm reaction(@NotNull nars.op.software.prolog.terms.PTerm that) {
         // IO.mes("TRACE>> "+name());
 
         nars.op.software.prolog.terms.PTerm[] args = this.args;

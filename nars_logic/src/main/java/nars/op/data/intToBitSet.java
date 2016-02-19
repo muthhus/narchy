@@ -29,7 +29,7 @@ public class intToBitSet extends IntTo<Compound> {
     }
 
     @NotNull
-    public static Compound the(int a, IntFunction<Term> f) {
+    public static Compound the(int a, @NotNull IntFunction<Term> f) {
         BitSet b = BitSet.valueOf(new long[]{a});
 
         TreeSet<Term> bb = new TreeSet();

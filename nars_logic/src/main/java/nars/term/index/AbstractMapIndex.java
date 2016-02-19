@@ -3,6 +3,7 @@ package nars.term.index;
 import nars.$;
 import nars.Op;
 import nars.nal.Tense;
+import nars.nal.meta.match.Ellipsis;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.TermIndex;
@@ -23,26 +24,23 @@ public abstract class AbstractMapIndex implements TermIndex {
         super();
     }
 
-    public static boolean isInternable(Term t) {
-        return true; //!TermMetadata.hasMetadata(t);
-    }
 
     /** get the instance that will be internalized */
     @NotNull
-    public static Termed intern(@NotNull Op op, int relation, TermContainer t) {
+    public static Termed intern(@NotNull Op op, int relation, @NotNull TermContainer t) {
         //return (TermMetadata.hasMetadata(t) || op.isA(TermMetadata.metadataBits)) ?
                 //newMetadataCompound(op, relation, t) :
         return newInternCompound(op, t, relation);
     }
 
     @Nullable
-    public static Term newMetadataCompound(@NotNull Op op, int relation, TermContainer t) {
+    public static Term newMetadataCompound(@NotNull Op op, int relation, @NotNull TermContainer t) {
         //create unique
         return $.the(op, relation, t);
     }
 
     @NotNull
-    protected static Termed newInternCompound(@NotNull Op op, TermContainer subterms, int relation) {
+    protected static Termed newInternCompound(@NotNull Op op, @NotNull TermContainer subterms, int relation) {
         return new GenericCompound(
             op, relation, (TermVector) subterms
         );
@@ -52,16 +50,22 @@ public abstract class AbstractMapIndex implements TermIndex {
     @Override
     public Termed the(Term x) {
 
-        if (!isInternable(x)) {
-            //TODO intern any subterms which can be
-            return x;
-        }
+//        if (x instanceof Ellipsis)
+//            ///throw new RuntimeException("ellipsis not allowed in this index");
+//            return null;
+
+//        if (!isInternable(x)) {
+//            //TODO intern any subterms which can be
+//            return x;
+//        }
 
         Termed y = getTermIfPresent(x);
         if (y == null) {
-            putTerm(y = makeTerm(x));
-            if (!y.equals(x))
-                return x; //return original non-anonymized
+            if ((y = makeTerm(x)) !=null) {
+                putTerm(y);
+                if (!y.equals(x))
+                    return x; //return original non-anonymized
+            }
         }
 
         return y;
@@ -79,11 +83,14 @@ public abstract class AbstractMapIndex implements TermIndex {
 //    @Override
 //    public abstract int size();
 
-    @NotNull
+    @Nullable
     @Override
     public Termed make(@NotNull Op op, int relation, TermContainer t, int dt) {
-        Termed x = intern(op, relation, internSub(t));
-        if (dt!= Tense.ITERNAL && x.term().isCompound()) {
+        @Nullable TermContainer subs = internSub(t);
+        if (subs == null)
+            return null;
+        Termed x = intern(op, relation, subs);
+        if (dt!= Tense.ITERNAL && x!=null && x.term().isCompound()) {
             x = ((Compound)x.term()).t(dt);
         }
         return x;
@@ -97,8 +104,11 @@ public abstract class AbstractMapIndex implements TermIndex {
     @Override public TermContainer internSub(TermContainer s) {
         TermContainer existing = getSubtermsIfPresent(s);
         if (existing == null) {
-            putSubterms(unifySubterms(s));
-            return s;
+            TermContainer us = unifySubterms(s);
+            if (us !=null) {
+                putSubterms(us);
+                existing = s;
+            }
         }
         return existing;
     }

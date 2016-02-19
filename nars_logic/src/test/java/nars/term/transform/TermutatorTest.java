@@ -39,7 +39,7 @@ public class TermutatorTest {
     public void testChoose1_2() {
 
         assertTermutatorProducesUniqueResults(
-                new Choose1($("%A..+"), $("%X"),
+                new Choose1(e1, p2,
                         p("a", "b").toSet()), 2);
 
     }
@@ -47,20 +47,21 @@ public class TermutatorTest {
     public void testChoose1_3() {
 
         assertTermutatorProducesUniqueResults(
-                new Choose1($("%A..+"), $("%X"),
+                new Choose1(e1, p2,
                         p("a", "b", "c").toSet()), 3);
     }
     @Test
     public void testChoose1_4() {
 
         assertTermutatorProducesUniqueResults(
-                new Choose1($("%A..+"), $("%X"),
+                new Choose1(e1, p2,
                         p("a", "b", "c", "d").toSet()), 4);
     }
 
 
     static final @NotNull Ellipsis e1 = ((Ellipsis.EllipsisPrototype) $("%A..+")).normalize(1);
-    static final Variable[] p2p3 = {v(Op.VAR_PATTERN, 2), v(Op.VAR_PATTERN, 3)};
+    static final Variable p2= v(Op.VAR_PATTERN, 2);
+    static final Variable[] p2p3 = { p2, v(Op.VAR_PATTERN, 3)};
 
     @Test public void testChoose2_2() {
 
@@ -84,8 +85,8 @@ public class TermutatorTest {
         for (int i = 0; i < 4; i++) {
             series.add(
                 assertTermutatorProducesUniqueResults(
-                    new Choose2(f, (Ellipsis)$("%A..+"),
-                            new Variable[]{$("%X"), $("%Y")},
+                    new Choose2(f, e1,
+                            p2p3,
                             p("a", "b", "c", "d").toSet()), 12)
             );
         }

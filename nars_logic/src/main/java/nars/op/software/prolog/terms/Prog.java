@@ -94,7 +94,7 @@ public class Prog extends Source implements Runnable {
     }
 
     @NotNull
-    private Unfolder nextUnfolder(Clause nextgoal) {
+    private Unfolder nextUnfolder(@NotNull Clause nextgoal) {
         return new Unfolder(prolog, nextgoal, this);
     }
 

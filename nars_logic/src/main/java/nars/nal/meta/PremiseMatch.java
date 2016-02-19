@@ -214,7 +214,7 @@ public class PremiseMatch extends FindSubst {
     }
 
     @Nullable
-    @Override public final Term resolve(Term t) {
+    @Override public final Term resolve(@NotNull Term t) {
         //TODO make a half resolve that only does xy?
         return index.apply(this, t);
 

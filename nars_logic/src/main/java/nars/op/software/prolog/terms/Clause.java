@@ -220,6 +220,7 @@ public class Clause extends Fun {
     /**
      * Extracts the head of a clause (a Term).
      */
+    @NotNull
     public final PTerm head() {
         return args[0].ref();
     }
@@ -227,6 +228,7 @@ public class Clause extends Fun {
     /**
      * Extracts the body of a clause
      */
+    @NotNull
     public final PTerm body() {
         return args[1].ref();
     }

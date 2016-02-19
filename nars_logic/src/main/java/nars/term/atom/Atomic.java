@@ -5,6 +5,7 @@ import nars.term.SubtermVisitor;
 import nars.term.Term;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.function.Predicate;
@@ -17,6 +18,7 @@ public abstract class Atomic implements Term {
     @Override
     public final boolean isCompound() { return false; }
 
+    @Nullable
     @Override abstract public String toString();
 
 

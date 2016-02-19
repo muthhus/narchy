@@ -278,7 +278,7 @@ class realToken extends Fun {
 }
 
 class constToken extends Fun {
-	public constToken(@NotNull Prolog prolog, Const c) {
+	public constToken(@NotNull Prolog prolog, @NotNull Const c) {
 		super("constToken", c);
 
 		args[0] = prolog.toConstBuiltin(c);

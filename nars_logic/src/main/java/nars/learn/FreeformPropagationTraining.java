@@ -7,6 +7,7 @@ import org.encog.ml.TrainingImplementationType;
 import org.encog.ml.train.MLTrain;
 import org.encog.neural.freeform.FreeformConnection;
 import org.encog.neural.freeform.FreeformNeuron;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
@@ -81,7 +82,7 @@ public abstract class FreeformPropagationTraining {
 	 * Calculate the gradient for a neuron.
 	 * @param toNeuron The neuron to calculate for.
 	 */
-	private void calculateNeuronGradient(final FreeformNeuron toNeuron) {
+	private void calculateNeuronGradient(@NotNull final FreeformNeuron toNeuron) {
 
 		// Only calculate if layer has inputs, because we've already handled the
 		// output
@@ -140,8 +141,8 @@ public abstract class FreeformPropagationTraining {
 	 * @param neuron
 	 * @param diff
 	 */
-	private void calculateOutputDelta(final FreeformNeuron neuron,
-			final double diff) {
+	private void calculateOutputDelta(@NotNull final FreeformNeuron neuron,
+                                      final double diff) {
 		final double neuronOutput = neuron.getActivation();
 		final double neuronSum = neuron.getInputSummation().getSum();
 		double deriv = neuron.getInputSummation().getActivationFunction()
@@ -197,7 +198,7 @@ public abstract class FreeformPropagationTraining {
 	/**
 	 * Process training for pure batch mode (one single batch).
 	 */
-	protected void processPureBatch(MLDataPair... training) {
+	protected void processPureBatch(@NotNull MLDataPair... training) {
 		final ErrorCalculation errorCalc = new ErrorCalculation();
 		//this.visited.clear();
 
@@ -245,7 +246,8 @@ public abstract class FreeformPropagationTraining {
         }
     }
 
-    private double[] compute(double[] input, @Nullable double[] result) {
+    @Nullable
+    private double[] compute(@NotNull double[] input, @Nullable double[] result) {
 
         int outs = network.out.length;
         if ((result == null) || (result.length!= outs))

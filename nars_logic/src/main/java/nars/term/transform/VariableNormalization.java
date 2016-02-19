@@ -2,6 +2,7 @@ package nars.term.transform;
 
 import nars.$;
 import nars.Global;
+import nars.nal.meta.match.Ellipsis;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.variable.GenericVariable;
@@ -62,13 +63,18 @@ public class VariableNormalization extends VariableTransform implements Function
 
         @Override
         public Variable apply(Compound containing, @NotNull Term current, int depth) {
-            //      (containing, current, depth) ->
-            //return $.v(current.op(), 1);
-            return _newVariable(current, 1);
+
+
+            if (current instanceof Ellipsis)
+                //throw new RuntimeException("not allowed");
+                return null;
+
+            return $.v(current.op(), 1);
+            //return _newVariable(current, 1);
         }
     };
 
-    final Map<Term, Variable /*Variable*/> rename = Global.newHashMap(8);
+    final Map<Term, Variable /*Variable*/> rename = Global.newHashMap();
 
     boolean renamed;
 
@@ -89,17 +95,16 @@ public class VariableNormalization extends VariableTransform implements Function
         return rename.computeIfAbsent(v, this);
     }
 
-    protected Variable newVariable(@NotNull Term v, int serial) {
-        return VariableNormalization._newVariable(v, serial);
-    }
-
-        /** if already normalized, alreadyNormalized will be non-null with the value */
     @NotNull
-    protected static Variable _newVariable(@NotNull Term v, int serial) {
+    protected Variable newVariable(@NotNull Term v, int serial) {
         if (v instanceof GenericVariable)
             return ((GenericVariable)v).normalize(serial); //HACK
-        else
-            return $.v(v.op(), serial);
+        else if (v instanceof Ellipsis) {
+            return ((Ellipsis)v).clone($.v(v.op(), serial), this);
+        } else {
+            return $.v(v.op(), serial); //N/A
+        }
+
     }
 
 }

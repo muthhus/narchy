@@ -246,6 +246,8 @@ public class TestNAR  {
     @NotNull
     public TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long cycleStart, long cycleEnd, String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax, long occTimeAbsolute)  {
 
+
+
         float h = (freqMin!=-1) ? truthTolerance / 2.0f : 0;
 
         if (freqMin == -1) freqMin = freqMax;
