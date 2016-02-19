@@ -17,7 +17,7 @@ public class EllipsisZeroOrMore extends Ellipsis {
     }
 
     @Override
-    public boolean valid(int collectable) {
+    public boolean validSize(int collectable) {
         return collectable >= 0;
     }
 

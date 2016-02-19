@@ -34,7 +34,7 @@ public class Choose1 extends Termutator {
                 '}';
     }
 
-    public Choose1(Ellipsis xEllipsis, Variable x, @NotNull Set<Term> yFree) {
+    public Choose1(Ellipsis xEllipsis, Term x, @NotNull Set<Term> yFree) {
         super(xEllipsis);
 
 

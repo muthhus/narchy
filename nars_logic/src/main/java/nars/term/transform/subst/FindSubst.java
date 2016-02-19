@@ -509,10 +509,10 @@ public abstract class FindSubst extends Versioning implements Subst {
     public final boolean matchEllipsedCommutative(@NotNull Compound X, Ellipsis Xellipsis, @NotNull Compound Y) {
 
         //ALL OF THIS CAN BE PRECOMPUTED
-        Set<Variable> xSpecific = Global.newHashSet(0); //Global.newHashSet(0);
+        Set<Term> xFree = Global.newHashSet(0); //Global.newHashSet(0);
 
         //constant terms which have been verified existing in Y and will not need matched
-        Set<Term> ineligible = Global.newHashSet(0);
+        Set<Term> alreadyThere = Global.newHashSet(0);
 
         boolean ellipsisMatched = false;
         for (Term x : X.terms()) {
@@ -522,13 +522,13 @@ public abstract class FindSubst extends Versioning implements Subst {
             if (v == null) v = x;
 
             //ellipsis to be matched in stage 2
-            //if (x == Xellipsis) {
-            //    continue;
-            //}
+            if (x == Xellipsis)
+                continue;
+
 
             if (v instanceof EllipsisMatch) {
                 //assume it's THE ellipsis here, ie. x == xEllipsis by testing that Y contains all of these
-                if (!((EllipsisMatch) v).addWhileMatching(Y, ineligible, Xellipsis.sizeMin()))
+                if (!((EllipsisMatch) v).addWhileMatching(Y, alreadyThere, Xellipsis.sizeMin()))
                     return false;
 
                 Xellipsis = null;
@@ -536,14 +536,17 @@ public abstract class FindSubst extends Versioning implements Subst {
 
                 continue;
             } else if (!xVar) {
-                if (!Y.containsTerm(v))
-                    return false;
-                ineligible.add(v);
-                continue;
+                if (Y.containsTerm(v)) {
+                    alreadyThere.add(v);
+                    continue;
+                }
+                //else
+                //    return false; //something needed by X but not in Y
             }
 
-            if (x != Xellipsis)
-                xSpecific.add((Variable)x);
+            if (v != Xellipsis) {
+                xFree.add(v);
+            }
 
 
         }
@@ -552,17 +555,18 @@ public abstract class FindSubst extends Versioning implements Subst {
 
         if (ellipsisMatched) {
             //Xellipsis = null;
-            return ineligible.equals(yFree);
+            return alreadyThere.equals(yFree);
         }
 
-        yFree.removeAll(ineligible);
+        yFree.removeAll(alreadyThere);
 
-        if (!Xellipsis.valid(yFree.size() - xSpecific.size())) {
+        int numRemainingForEllipsis = yFree.size() - xFree.size();
+        if (!Xellipsis.validSize(numRemainingForEllipsis)) {
             //wouldnt be enough remaining matches to satisfy ellipsis cardinality
             return false;
         }
 
-        return matchCommutiveRemaining(Xellipsis, xSpecific, yFree);
+        return matchCommutiveRemaining(Xellipsis, xFree, yFree);
 
     }
 
@@ -570,18 +574,19 @@ public abstract class FindSubst extends Versioning implements Subst {
     /**
      * toMatch matched into some or all of Y's terms
      */
-    private boolean matchCommutiveRemaining(Ellipsis xEllipsis, @NotNull Set<Variable> x, @NotNull MutableSet<Term> yFree) {
-        int xs = x.size();
+    private boolean matchCommutiveRemaining(Ellipsis xEllipsis, @NotNull Set<Term> xFree, @NotNull MutableSet<Term> yFree) {
+        int xs = xFree.size();
 
         switch (xs) {
             case 0:
+                //match everything
                 return putXY(xEllipsis, new EllipsisMatch(yFree));
             case 1:
                 return addTermutator(new Choose1(
-                        xEllipsis, x.iterator().next(), yFree));
+                        xEllipsis, xFree.iterator().next(), yFree));
             case 2:
                 return addTermutator(new Choose2(this,
-                        xEllipsis, x.toArray(new Variable[x.size()]), yFree));
+                        xEllipsis, xFree.toArray(new Term[xFree.size()]), yFree));
             default:
                 //3 or more combination
                 throw new RuntimeException("unimpl: " + xs + " arity combination unimplemented");
@@ -662,7 +667,7 @@ public abstract class FindSubst extends Versioning implements Subst {
                     //COLLECT
                     if (i == xsize) {
                         //SUFFIX
-                        if (!Xellipsis.valid(available))
+                        if (!Xellipsis.validSize(available))
                             return false;
 
                         //TODO special handling to extract intermvals from Sequence terms here

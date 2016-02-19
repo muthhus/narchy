@@ -282,6 +282,7 @@
 //// conjunction decompose
      (&&,X,A..+), X  |- (&&,A..+), (Belief:StructuralDeduction, Desire:StructuralStrong),
                         X, (Belief:StructuralDeduction, Desire:StructuralStrong)
+
 //     X, (&&,X,A..+)  |- (&&,A..+), (Belief:Deduction, Desire:Induction),
 //                        X, (Belief:Deduction, Desire:Induction)
 
@@ -311,11 +312,11 @@
 //Inference about the pre/postconditions
 
     Y, ((&&,X,A..+) ==> B) |- substituteIfUnifies(((&&,A..+) ==> B),"$",X,Y), (Belief:Deduction, Order:ForAllSame)
-
+//single case of previous which doesnt require conjunction in single-term case (remove it when correctly working)
     Y, ((&&,X,A) ==> B) |- substituteIfUnifies((A ==> B),"$",X,Y), (Belief:Deduction, Order:ForAllSame)
 
     ((&&,M,A..+) ==> C), ((&&,A..+) ==> C) |- M, (Belief:Abduction, Order:ForAllSame)
-//single case of previous which doesnt require conjunction in single-term case
+//single case of previous which doesnt require conjunction in single-term case (remove it when correctly working)
     ((&&,M,A) ==> C), (A==>C) |- M, (Belief:Abduction, Order:ForAllSame)
 
 
@@ -362,13 +363,10 @@
 //conditional abduction by dependent variable
 
     ((X --> R) ==> Z), ((&&,(#Y --> B),(#Y --> R),A..*) ==> Z) |- (X --> B), (Belief:Abduction)
-    ((X --> R) ==> Z), ((&&,(#Y --> B),(#Y --> R)) ==> Z) |- (X --> B), (Belief:Abduction)
 
 // conditional deduction "An inverse inference has been implemented as a form of deduction" https://code.google.com/p/open-nars/issues/detail?id=40&can=1
 
     (U --> L), ((&&,A..*,(#X --> L),(#X --> R)) ==> Z) |- substitute(((&&,A..*,(U --> R)) ==> Z),#X,U), (Belief:Deduction)
-//this shoudlnt be necesssary if the previous works (with zero or more):
-    (U --> L), ((&&,(#X --> L),(#X --> R)) ==> Z) |- ((U --> R) ==> Z), (Belief:Deduction)
 
 
 
@@ -409,6 +407,9 @@
     A, B, time(dtReverseAfter), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (B ==> A), (Belief:Abduction)
 
     A, B, time(dtAfterOrEternal), neq(A,B), notImplicationEquivalenceOrConjunction(A), notImplicationEquivalenceOrConjunction(B) |- (A && B), (Belief:Intersection, Desire:Intersection)
+
+
+
 
 //    A, B, after(_), neq(A,B), notConjunction(A), notConjunction(B),  notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (B && A), (Belief:Intersection)
 

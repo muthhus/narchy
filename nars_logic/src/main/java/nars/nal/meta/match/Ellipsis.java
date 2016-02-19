@@ -238,7 +238,7 @@ public abstract class Ellipsis extends Variable {
 //    }
 
 
-    public abstract boolean valid(int collectable);
+    public abstract boolean validSize(int collectable);
 
     @Override
     public

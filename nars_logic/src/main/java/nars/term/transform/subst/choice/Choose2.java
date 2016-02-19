@@ -22,7 +22,7 @@ public class Choose2 extends Termutator {
     final Combinations comb;
     @NotNull
     private final Set<Term> yFree;
-    private final Variable[] x;
+    private final Term[] x;
     private final Ellipsis xEllipsis;
     @NotNull
     private final FindSubst f;
@@ -41,7 +41,7 @@ public class Choose2 extends Termutator {
 
     }
 
-    public Choose2(@NotNull FindSubst f, Ellipsis xEllipsis, Variable[] x, @NotNull Set<Term> yFree) {
+    public Choose2(@NotNull FindSubst f, Ellipsis xEllipsis, Term[] x, @NotNull Set<Term> yFree) {
         super(xEllipsis);
         this.f = f;
         this.x = x;
@@ -60,15 +60,16 @@ public class Choose2 extends Termutator {
     @Override
     public void run(FindSubst versioneds, Termutator[] chain, int current) {
 
-        comb.reset();
+        @NotNull Combinations ccc = this.comb;
+        ccc.reset();
 
         boolean state = true;
 
         int start = f.now();
 
-        while (!(!(comb.hasNext() || !state))) {
+        while (!(!(ccc.hasNext() || !state))) {
 
-            int[] c = state ? comb.next() : comb.prev();
+            int[] c = state ? ccc.next() : ccc.prev();
             state = !state;
 
             Term y1 = yy.term(c[0]);
@@ -82,8 +83,8 @@ public class Choose2 extends Termutator {
 
                 Term y2 = yy.term(c1);
 
-                if (f.match(x[1], y2) && f.putXY(xEllipsis,
-                            new EllipsisMatch(yFree, y1, y2))) {
+                if (f.match(x[1], y2) &&
+                        f.putXY(xEllipsis, new EllipsisMatch(yFree, y1, y2))) {
 
                     next(f, chain, current);
                 }
