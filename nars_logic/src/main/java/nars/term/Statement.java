@@ -40,46 +40,29 @@ public interface Statement {
      * @param predicate The second component
      * @return Whether The Statement is invalid
      */
-    static boolean invalidStatement(@Nullable Term subject, @Nullable Term predicate) {
-        if (subject == null || predicate == null)
-            return true;
+    static boolean invalidStatement(@NotNull Term subject, @NotNull Term predicate) {
+        return subject.equals(predicate) || invalidStatement2(subject, predicate);
 
-        if (subject.equals(predicate))
-            return true;
-
-        return invalidStatement2(subject, predicate);
     }
 
     /** skips the null and equality test */
     static boolean invalidStatement2(@NotNull Term subject, @NotNull Term predicate) {
 
         //TODO combine these mirrored invalidReflexive calls into one combined, unredundant operation
-        if (invalidReflexive(subject, predicate))
+        if (invalidReflexive(subject, predicate) || invalidReflexive(predicate, subject))
             return true;
 
-        if (invalidReflexive(predicate, subject))
-            return true;
+        if (!subject.op().isStatement() || !predicate.op().isStatement())
+            return false;
 
 
-        if ((Statement.is(subject)) && (Statement.is(predicate))) {
+        Term[] ss = ((Compound)subject).terms();
+        Term[] pp = ((Compound)predicate).terms();
 
-            Term t11 = Statement.subj(subject);
-            Term t22 = Statement.pred(predicate);
-            if (!t11.equals(t22))
-                return false;
-
-            Term t12 = Statement.pred(subject);
-            Term t21 = Statement.subj(predicate);
-            if (t12.equals(t21))
-                return true;
-        }
-        return false;
+        return ss[0].equals(pp[1]) && ss[1].equals(pp[0]);
     }
 
 
-    static boolean is(@NotNull Termed t) {
-        return t.op().isStatement();
-    }
 
     @Nullable
     static Term subj(@NotNull Termed t) {
@@ -101,7 +84,7 @@ public interface Statement {
      */
     static boolean invalidReflexive(Term t1, Term t2) {
 
-        return !(!(t1 instanceof Compound) || (t1.op().isImage()/*Ext) || (t1 instanceof ImageInt*/)) && t1.containsTerm(t2);
+        return !(!(t1 instanceof Compound) || t1.op().isImage() || !t1.containsTerm(t2));
     }
 
 
