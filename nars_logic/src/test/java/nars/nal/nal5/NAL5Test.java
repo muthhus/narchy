@@ -294,9 +294,9 @@ public class NAL5Test extends AbstractNALTester {
     public void conditional_abduction_viaMultiConditionalSyllogism(){
         //((&&,M,A_1..n) ==> C), ((&&,A_1..n) ==> C) |- M, (Truth:Abduction, Order:ForAllSame)
         TestNAR tester = test();
-        tester.believe("<<robin --> [flying]> ==> <robin --> bird>>"); //.en("If robin can fly then robin is a bird.");
-        tester.believe("<(&&,<robin --> swimmer>,<robin --> [flying]>) ==> <robin --> bird>>"); //.en("If robin both swims and flys then robin is a bird.");
-        tester.mustBelieve(cycles,"<robin --> swimmer>",1.00f,0.45f); //.en("I guess robin swims.");
+        tester.believe("(<robin --> [flying]> ==> bird:robin)"); //.en("If robin can fly then robin is a bird.");
+        tester.believe("((&&,swimmer:robin,<robin --> [flying]>) ==> bird:robin)"); //.en("If robin both swims and flys then robin is a bird.");
+        tester.mustBelieve(cycles,"swimmer:robin",1.00f,0.45f); //.en("I guess robin swims.");
 
     }
 

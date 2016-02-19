@@ -313,7 +313,10 @@
 
     Y, ((&&,X,A..+) ==> B) |- substituteIfUnifies(((&&,A..+) ==> B),"$",X,Y), (Belief:Deduction, Order:ForAllSame)
 
+//conditional abduction
     ((&&,M,A..+) ==> C), ((&&,A..+) ==> C) |- M, (Belief:Abduction, Order:ForAllSame)
+//not sure why this also appears necessary
+    ((&&,M,N) ==> C), (N ==> C) |- M, (Belief:Abduction, Order:ForAllSame)
 
 
 //Can be derived by NAL7 rules so this won't be necessary there (Order:ForAllSame left out here)
