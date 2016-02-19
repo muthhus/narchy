@@ -50,8 +50,7 @@ public enum ImageMatch /*extends ArrayEllipsisMatch<Term>*/ {
         //mask the relation term
         Term[] t = m.term;
         t[imageIndex] = Op.Imdex;
-        //m.init();//rehash because it changed?
-        return m;
+        return new EllipsisMatch(t); //needs rehashed; this will be redone with a visitor that applies the Imdex mask on first and only needed construction
     }
 
 //    @Override

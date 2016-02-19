@@ -11,7 +11,9 @@ import nars.nal.meta.constraint.NoCommonSubtermsConstraint;
 import nars.nal.meta.constraint.NotEqualsConstraint;
 import nars.nal.meta.constraint.NotOpConstraint;
 import nars.nal.meta.match.Ellipsis;
+import nars.nal.meta.match.EllipsisOneOrMore;
 import nars.nal.meta.match.EllipsisTransform;
+import nars.nal.meta.match.EllipsisZeroOrMore;
 import nars.nal.meta.pre.*;
 import nars.nal.op.ImmediateTermTransform;
 import nars.nal.op.Solve;
@@ -48,20 +50,22 @@ import static nars.term.Terms.concat;
  * A rule which matches a Premise and produces a Task
  * contains: preconditions, predicates, postconditions, post-evaluations and metainfo
  */
-public class PremiseRule extends GenericCompound  {
+public class PremiseRule extends GenericCompound {
 
 
-    public static final Class<? extends ImmediateTermTransform>[] Operators = new Class[] {
-        intersect.class,
-        differ.class,
-        union.class,
-        substitute.class,
-        substituteIfUnifies.class,
+    public static final Class<? extends ImmediateTermTransform>[] Operators = new Class[]{
+            intersect.class,
+            differ.class,
+            union.class,
+            substitute.class,
+            substituteIfUnifies.class,
 //        occurrsForward.class,
 //        occurrsBackward.class
     };
 
-    /** blank marker trie node indicating the derivation and terminating the branch */
+    /**
+     * blank marker trie node indicating the derivation and terminating the branch
+     */
     public static final BooleanCondition END = new AtomicBooleanCondition<PremiseMatch>() {
 
 
@@ -70,7 +74,8 @@ public class PremiseRule extends GenericCompound  {
             return true;
         }
 
-        @Override public String toString() {
+        @Override
+        public String toString() {
             return "End";
         }
     };
@@ -81,10 +86,14 @@ public class PremiseRule extends GenericCompound  {
     //public boolean sequenceIntervalsFromTask = false;
     //public boolean sequenceIntervalsFromBelief = false;
 
-    /** conditions which can be tested before term matching */
+    /**
+     * conditions which can be tested before term matching
+     */
     public BooleanCondition[] prePreconditions;
 
-    /** conditions which are tested after term matching, including term matching itself */
+    /**
+     * conditions which are tested after term matching, including term matching itself
+     */
     public BooleanCondition[] postPreconditions;
 
     public PostCondition[] postconditions;
@@ -96,7 +105,9 @@ public class PremiseRule extends GenericCompound  {
 
     boolean allowBackward;
 
-    /** maximum of the minimum NAL levels involved in the postconditions of this rule */
+    /**
+     * maximum of the minimum NAL levels involved in the postconditions of this rule
+     */
     public int minNAL;
 
     private final String str;
@@ -115,11 +126,11 @@ public class PremiseRule extends GenericCompound  {
     }
 
     PremiseRule(@NotNull Compound premisesResultProduct) {
-        this((Compound)premisesResultProduct.term(0), (Compound)premisesResultProduct.term(1));
+        this((Compound) premisesResultProduct.term(0), (Compound) premisesResultProduct.term(1));
     }
 
     public PremiseRule(Compound premises, Compound result) {
-        super(Op.PRODUCT, new TermVector(premises, result) );
+        super(Op.PRODUCT, new TermVector(premises, result));
         str = super.toString();
     }
 
@@ -160,17 +171,15 @@ public class PremiseRule extends GenericCompound  {
     }
 
 
-
-
-
-
-    /** add the sequence of involved conditions to a list, for one given postcondition (ex: called for each this.postconditions)  */
+    /**
+     * add the sequence of involved conditions to a list, for one given postcondition (ex: called for each this.postconditions)
+     */
     @NotNull
     public List<Term> getConditions(@NotNull PostCondition post) {
 
         int n = prePreconditions.length + postPreconditions.length;
 
-        List<Term> l = Global.newArrayList(n+4 /* estimate */);
+        List<Term> l = Global.newArrayList(n + 4 /* estimate */);
 
         ///--------------
         for (BooleanCondition p : prePreconditions)
@@ -179,7 +188,7 @@ public class PremiseRule extends GenericCompound  {
         match.addPreConditions(l); //pre-conditions
 
         Solve truth = Solve.the(post,
-            this, anticipate, immediate_eternalize,  postPreconditions
+                this, anticipate, immediate_eternalize, postPreconditions
         );
 
         truth.addConditions(l);
@@ -196,13 +205,13 @@ public class PremiseRule extends GenericCompound  {
     }
 
 
-
-
     public void setSource(String source) {
         this.source = source;
     }
 
-    /** source string that generated this rule (for debugging) */
+    /**
+     * source string that generated this rule (for debugging)
+     */
     public String getSource() {
         return source;
     }
@@ -211,8 +220,6 @@ public class PremiseRule extends GenericCompound  {
     protected final Term getTask() {
         return getPremise().term(0);
     }
-
-
 
 
     @Nullable
@@ -226,7 +233,6 @@ public class PremiseRule extends GenericCompound  {
     }
 
 
-
     @Override
     public final String toString() {
         return str;
@@ -236,12 +242,15 @@ public class PremiseRule extends GenericCompound  {
     public final Term task() {
         return pattern.term(0);
     }
+
     @Nullable
     public final Term belief() {
         return pattern.term(1);
     }
 
-    /** deduplicate and generate match-optimized compounds for rules */
+    /**
+     * deduplicate and generate match-optimized compounds for rules
+     */
     public void compile(@NotNull TermIndex index) {
         Term[] premisePattern = ((Compound) term(0)).terms();
         premisePattern[0] = index.theTerm(premisePattern[0]); //task pattern
@@ -280,12 +289,11 @@ public class PremiseRule extends GenericCompound  {
     @NotNull
     public final PremiseRule normalizeRule(@NotNull PatternIndex index) {
         return new PremiseRule(
-                (Compound)index.the(
-                $.terms.transform(
-                    $.terms.transform(this, UppercaseAtomsToPatternVariables),
-                new PremiseRuleVariableNormalization()) ) );
+                (Compound) index.the(
+                        $.terms.transform(
+                                $.terms.transform(this, UppercaseAtomsToPatternVariables),
+                                new PremiseRuleVariableNormalization())));
     }
-
 
 
     @NotNull
@@ -334,8 +342,8 @@ public class PremiseRule extends GenericCompound  {
             Term arg1, arg2;
 
             //if (predicate.getSubject() instanceof SetExt) {
-                //decode precondition predicate arguments
-            args = ((Compound)(predicate.term(0))).terms();
+            //decode precondition predicate arguments
+            args = ((Compound) (predicate.term(0))).terms();
             arg1 = (args.length > 0) ? args[0] : null;
             arg2 = (args.length > 1) ? args[1] : null;
             /*} else {
@@ -369,7 +377,7 @@ public class PremiseRule extends GenericCompound  {
 
 
                 case "notSet":
-                    constraints.put( arg1, new NotOpConstraint(Op.SetsBits) );
+                    constraints.put(arg1, new NotOpConstraint(Op.SetsBits));
                     break;
 
 
@@ -447,7 +455,6 @@ public class PremiseRule extends GenericCompound  {
                     break;
 
 
-
                 case "task":
                     switch (arg1.toString()) {
                         case "negative":
@@ -474,7 +481,7 @@ public class PremiseRule extends GenericCompound  {
             }
 
 
-            if (preNext!=null) {
+            if (preNext != null) {
                 if (!prePreConditionsList.contains(preNext)) //unique
                     prePreConditionsList.add(preNext);
             }
@@ -484,8 +491,8 @@ public class PremiseRule extends GenericCompound  {
 
 
         this.match = new MatchTaskBelief(
-                            new TaskBeliefPair(pattern.term(0), pattern.term(1)), //HACK
-                            constraints);
+                new TaskBeliefPair(pattern.term(0), pattern.term(1)), //HACK
+                constraints);
 
 
         //store to arrays
@@ -506,24 +513,24 @@ public class PremiseRule extends GenericCompound  {
             PostCondition pc = PostCondition.make(this, t,
                     Terms.toSortedSetArray(modifiers));
 
-            if (pc!=null)
-                postConditions.add( pc );
+            if (pc != null)
+                postConditions.add(pc);
         }
 
-        if (Sets.newHashSet(postConditions).size()!=postConditions.size())
+        if (Sets.newHashSet(postConditions).size() != postConditions.size())
             throw new RuntimeException("postcondition duplicates:\n\t" + postConditions);
 
-        postconditions = postConditions.toArray( new PostCondition[postConditions.size() ] );
+        postconditions = postConditions.toArray(new PostCondition[postConditions.size()]);
 
 
         //TODO add modifiers to affect minNAL (ex: anything temporal set to 7)
         //this will be raised by conclusion postconditions of higher NAL level
         minNAL =
                 Math.max(minNAL,
-                    Math.max(
-                            Terms.maxLevel(pattern.term(0)),
-                            Terms.maxLevel(pattern.term(1)
-                            )));
+                        Math.max(
+                                Terms.maxLevel(pattern.term(0)),
+                                Terms.maxLevel(pattern.term(1)
+                                )));
 
 
         ensureValid();
@@ -534,6 +541,7 @@ public class PremiseRule extends GenericCompound  {
     public final Term getTaskTermPattern() {
         return ((Compound) term(0)).terms()[0];
     }
+
     public final Term getBeliefTermPattern() {
         return ((Compound) term(0)).terms()[1];
     }
@@ -547,7 +555,7 @@ public class PremiseRule extends GenericCompound  {
      * for each calculable "question reverse" rule,
      * supply to the consumer
      */
-    public final void forEachQuestionReversal(@NotNull BiConsumer<PremiseRule,String> w) {
+    public final void forEachQuestionReversal(@NotNull BiConsumer<PremiseRule, String> w) {
 
         //String s = w.toString();
         /*if(s.contains("task(\"?") || s.contains("task(\"@")) { //these are backward inference already
@@ -576,7 +584,6 @@ public class PremiseRule extends GenericCompound  {
         w.accept(clone2, "C,T,[pre],question |- B,[post]");
 
     }
-
 
 
 //    @Override
@@ -614,21 +621,21 @@ public class PremiseRule extends GenericCompound  {
     @NotNull
     private PremiseRule clone(Term newT, Term newB, Term newR, boolean question) {
 
-        Map<Term,Term> m = new HashMap(3);
+        Map<Term, Term> m = new HashMap(3);
         m.put(getTaskTermPattern(), newT);
         m.put(getBeliefTermPattern(), newB);
         m.put(getConclusionTermPattern(), newR);
 
-        Compound remapped = (Compound)$.terms.transform(this, new MapSubst(m));
+        Compound remapped = (Compound) $.terms.transform(this, new MapSubst(m));
 
         //Append taskQuestion
         Compound pc = (Compound) remapped.term(0);
         Term[] pp = pc.terms(); //premise component
         Compound newPremise = question ?
-                $.p(concat(pp, TaskQuestionTerm) ) :
+                $.p(concat(pp, TaskQuestionTerm)) :
                 pc;
 
-        return new PremiseRule(newPremise, (Compound)remapped.term(1));
+        return new PremiseRule(newPremise, (Compound) remapped.term(1));
 
 
 //
@@ -671,7 +678,10 @@ public class PremiseRule extends GenericCompound  {
     public static final class PremiseRuleVariableNormalization extends VariableNormalization {
 
 
-        public static final int ELLIPSIS_ID_OFFSET = 255;
+        public static final int ELLIPSIS_ZERO_OR_MORE_ID_OFFSET = 1 * 256;
+        public static final int ELLIPSIS_ONE_OR_MORE_ID_OFFSET = 2 * 256;
+        public static final int ELLIPSIS_TRANSFORM_ID_OFFSET = 3 * 256;
+
         int offset;
 
         public static Variable varPattern(int i) {
@@ -679,7 +689,8 @@ public class PremiseRule extends GenericCompound  {
         }
 
         @NotNull
-        @Override protected Variable newVariable(@NotNull Term v, int serial) {
+        @Override
+        protected Variable newVariable(@NotNull Term v, int serial) {
 
 
             int actualSerial = serial + offset;
@@ -687,25 +698,38 @@ public class PremiseRule extends GenericCompound  {
             if (v instanceof Ellipsis.EllipsisTransformPrototype) {
                 //special
 
-                Ellipsis.EllipsisTransformPrototype ep = (Ellipsis.EllipsisTransformPrototype)v;
+                Ellipsis.EllipsisTransformPrototype ep = (Ellipsis.EllipsisTransformPrototype) v;
 
 //                Term from = ep.from;
 //                if (from != Op.Imdex) from = applyAfter((GenericVariable)from);
 //                Term to = ep.to;
 //                if (to != Op.Imdex) to = applyAfter((GenericVariable)to);
 //
-                return EllipsisTransform.make(varPattern(actualSerial+ ELLIPSIS_ID_OFFSET), ep.from, ep.to, this);
+                return EllipsisTransform.make(varPattern(actualSerial + ELLIPSIS_TRANSFORM_ID_OFFSET), ep.from, ep.to, this);
 
             } else if (v instanceof Ellipsis.EllipsisPrototype) {
-                Ellipsis.EllipsisPrototype ep = (Ellipsis.EllipsisPrototype)v;
-                return ep.make(actualSerial + ELLIPSIS_ID_OFFSET, ep.minArity);
+                Ellipsis.EllipsisPrototype ep = (Ellipsis.EllipsisPrototype) v;
+                return ep.make(actualSerial +
+                        (ep.minArity == 0 ? ELLIPSIS_ZERO_OR_MORE_ID_OFFSET : ELLIPSIS_ONE_OR_MORE_ID_OFFSET) //these need to be distinct
+                        , ep.minArity);
             } else if (v instanceof Ellipsis) {
-                Ellipsis e = (Ellipsis)v;
-                Variable r = e.clone(varPattern(actualSerial + ELLIPSIS_ID_OFFSET), this);
+
+                int idOffset;
+                if (v instanceof EllipsisTransform) {
+                    idOffset = ELLIPSIS_TRANSFORM_ID_OFFSET;
+                } else if (v instanceof EllipsisZeroOrMore) {
+                    idOffset = ELLIPSIS_ZERO_OR_MORE_ID_OFFSET;
+                } else  if (v instanceof EllipsisOneOrMore) {
+                    idOffset = ELLIPSIS_ONE_OR_MORE_ID_OFFSET;
+                } else {
+                    throw new RuntimeException("N/A");
+                }
+
+                Variable r = ((Ellipsis) v).clone(varPattern(actualSerial + idOffset), this);
                 offset = 0; //return to zero
                 return r;
             } else if (v instanceof GenericVariable) {
-                return ((GenericVariable)v).normalize(actualSerial); //HACK
+                return ((GenericVariable) v).normalize(actualSerial); //HACK
             } else {
                 return $.v(v.op(), actualSerial);
             }

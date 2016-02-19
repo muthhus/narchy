@@ -109,7 +109,7 @@ public abstract class Variable extends Atomic {
      * @return The complexity of the term, an integer
      */
     @Override
-    public final int complexity() {
+    public int complexity() {
         return 0;
     }
 

@@ -202,7 +202,6 @@ public abstract class FindSubst extends Versioning implements Subst {
         if (match(x, y) && finish) {
 
             termunator.run(this, null, -1);
-
         }
 
     }
@@ -395,7 +394,7 @@ public abstract class FindSubst extends Versioning implements Subst {
 
                 int imageIndex = Y.indexOf(n);
                 return ((imageIndex != -1) && matchEllipsedLinear(X, e, Y)) &&
-                        putXY(e, ImageMatch.take((EllipsisMatch) term(e), imageIndex));
+                        replaceXY(e, ImageMatch.take((EllipsisMatch) term(e), imageIndex));
 
             }
             return false;
@@ -806,6 +805,12 @@ public abstract class FindSubst extends Versioning implements Subst {
         return true;
     }
 
+
+    public final boolean replaceXY(Term x /* usually a Variable */, @NotNull Term y) {
+        Versioned<Term> v = xy.getOrCreateIfAbsent(x);
+        v.set(y);
+        return true;
+    }
 
     /**
      * returns true if the assignment was allowed, false otherwise

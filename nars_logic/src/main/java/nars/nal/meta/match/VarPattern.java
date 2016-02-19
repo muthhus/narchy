@@ -39,7 +39,7 @@ public class VarPattern extends Variable {
 
     @Override
     public int volume() {
-        return 0;
+        return 1;
     }
 
     /**

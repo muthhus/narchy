@@ -99,7 +99,7 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
         this.varTotal = (byte)(varTot);
 
 
-        final int vol = meta[4] + 1;
+        final int vol = meta[4]  + 1 /* for the compound wrapping it */;
         this.volume = (short)( vol );
 
         int cmp = vol - varTot - vP;

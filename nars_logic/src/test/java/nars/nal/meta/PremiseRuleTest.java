@@ -49,26 +49,30 @@ public class PremiseRuleTest extends TestCase {
             // assertEquals(12, x.getVolume());
         }
 
-        {
-            PremiseRule x = (PremiseRule)p.term("< <A --> B>, <B --> A> |- <A <-> B>, (Belief:Revision, Desire:Weak)>");
-            x = normalize(x);
-            assertEquals(19, x.volume());
-            assertEquals("(((%1-->%2),(%2-->%1)),((%1<->%2),((Revision-->Belief),(Weak-->Desire))))", x.toString());
-
-        }
-        {
-            PremiseRule x = (PremiseRule)p.term("< <A --> B>, <B --> A> |- <A <-> nonvar>, (Belief:Revision, Desire:Weak)>");
-            x = normalize(x);
-            assertEquals(19, x.volume()); //same volume as previous block
-            assertEquals("(((%1-->%2),(%2-->%1)),((nonvar<->%1),((Revision-->Belief),(Weak-->Desire))))", x.toString());
-        }
 
         {
-            PremiseRule x = (PremiseRule)p.term("< <A --> B>, <B --> A> |- <A <-> B>,  (Belief:Conversion, Punctuation:Judgment)>");
-            x = normalize(x);
-            assertEquals(19, x.volume());
-            assertEquals("(((%1-->%2),(%2-->%1)),((%1<->%2),((Conversion-->Belief),(Judgment-->Punctuation))))", x.toString());
-        }
+            int vv = 19;
+            {
+                PremiseRule x = (PremiseRule) p.term("< <A --> B>, <B --> A> |- <A <-> B>, (Belief:Revision, Desire:Weak)>");
+                x = normalize(x);
+                assertEquals(vv, x.volume());
+                assertEquals("(((%1-->%2),(%2-->%1)),((%1<->%2),((Revision-->Belief),(Weak-->Desire))))", x.toString());
+
+            }
+            {
+                PremiseRule x = (PremiseRule) p.term("< <A --> B>, <B --> A> |- <A <-> nonvar>, (Belief:Revision, Desire:Weak)>");
+                x = normalize(x);
+                assertEquals(vv, x.volume()); //same volume as previous block
+                assertEquals("(((%1-->%2),(%2-->%1)),((nonvar<->%1),((Revision-->Belief),(Weak-->Desire))))", x.toString());
+            }
+            {
+                PremiseRule x = (PremiseRule) p.term("< <A --> B>, <B --> A> |- <A <-> B>,  (Belief:Conversion, Punctuation:Judgment)>");
+                x = normalize(x);
+                assertEquals(vv, x.volume());
+                assertEquals("(((%1-->%2),(%2-->%1)),((%1<->%2),((Conversion-->Belief),(Judgment-->Punctuation))))", x.toString());
+            }
+
+
 
 //        {
 //            TaskRule x = p.termRaw("<<A --> b> |- (X & y)>");
@@ -76,11 +80,15 @@ public class PremiseRuleTest extends TestCase {
 //            assertEquals(9, x.getVolume());
 //        }
 
-        //and the first complete rule:
-        PremiseRule x = (PremiseRule) p.term("<(S --> M), (P --> M) |- (P <-> S), (Belief:Comparison,Desire:Strong)>");
-        x = normalize(x);
-        assertEquals("(((%1-->%2),(%3-->%2)),((%1<->%3),((Comparison-->Belief),(Strong-->Desire))))", x.toString());
-        assertEquals(19, x.volume());
+            //and the first complete rule:
+            {
+                PremiseRule x = (PremiseRule) p.term("<(S --> M), (P --> M) |- (P <-> S), (Belief:Comparison,Desire:Strong)>");
+                x = normalize(x);
+                assertEquals("(((%1-->%2),(%3-->%2)),((%1<->%3),((Comparison-->Belief),(Strong-->Desire))))", x.toString());
+                assertEquals(vv, x.volume());
+            }
+
+        }
 
     }
 
@@ -126,12 +134,6 @@ public class PremiseRuleTest extends TestCase {
         Compound y = (Compound)p.term("<(S --> P), --S |- (P --> S), (Belief:Conversion, Info:SeldomUseful)>");
         printRecursive(y);
     }
-
-
-
-
-
-
 
 
 }

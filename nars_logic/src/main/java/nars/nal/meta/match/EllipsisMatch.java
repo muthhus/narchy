@@ -96,4 +96,6 @@ public final class EllipsisMatch extends TermVector<Term> implements Term {
         }
         return true;
     }
+
+
 }

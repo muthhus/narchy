@@ -79,7 +79,7 @@ public class TrieDeriverTest {
             "(&&, A..+, X), B |- substituteIfUnifies((&&,A..+),\"#\",X,B), (Belief:AnonymousAnalogy, Desire:Strong, Order:ForAllSame, SequenceIntervals:FromTask)\n"
         );
         //test that A..+ survives as an ellipsis
-        assertTrue(d.trie.getSummary().contains("%1..+"));
+        assertTrue(d.trie.getSummary().contains("..+"));
     }
 
     @Test public void testConditionalAbductionRule() {

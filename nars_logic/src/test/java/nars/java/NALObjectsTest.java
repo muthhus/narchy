@@ -232,8 +232,7 @@ public class NALObjectsTest  {
         Map map = new HashMap();
         map.put("k1", "v1");
         map.put("k2", "v2");
-        //testTermizer(map, "{<{\"v1\"}-->\"k1\">,<{\"v2\"}-->\"k2\">}");
-        testTermizer(map, "{(\"v2\"-->\"k2\"),(\"v1\"-->\"k1\")}");
+        testTermizer(map, "{(\"v1\"-->\"k1\"),(\"v2\"-->\"k2\")}");
     }
 
     static void testTermizer(Object o, String termtoString) {
