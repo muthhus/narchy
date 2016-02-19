@@ -89,12 +89,15 @@ public final class EllipsisMatch extends TermVector<Term> implements Term {
         return toString();
     }
 
-    public boolean addWhileMatching(@NotNull Compound y, @NotNull Collection<Term> target) {
+    public boolean addWhileMatching(@NotNull Compound y, @NotNull Collection<Term> target, int min) {
+        int count = 0;
         for (Term e : term) {
-            if (!y.containsTerm(e)) return false;
-            target.add(e);
+            if (!y.containsTerm(e) || !target.add(e))
+                return false; //not present or already taken
+            else
+                count++;
         }
-        return true;
+        return (count >= min);
     }
 
 

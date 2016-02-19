@@ -525,13 +525,12 @@ public abstract class FindSubst extends Versioning implements Subst {
             //}
 
             if (v instanceof EllipsisMatch) {
-                //assume it's THE ellipsis here, ie. x == xEllipsis
-                ellipsisMatched = true;
-                Xellipsis = null;
-
-                //check that Y contains all of these
-                if (!((EllipsisMatch) v).addWhileMatching(Y, ineligible))
+                //assume it's THE ellipsis here, ie. x == xEllipsis by testing that Y contains all of these
+                if (!((EllipsisMatch) v).addWhileMatching(Y, ineligible, Xellipsis.sizeMin()))
                     return false;
+
+                Xellipsis = null;
+                ellipsisMatched = true;
 
                 continue;
             } else if (!xVar) {

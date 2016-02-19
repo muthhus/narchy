@@ -27,6 +27,11 @@ public class EllipsisOneOrMore extends Ellipsis {
 
 
     @Override
+    public int sizeMin() {
+        return 1;
+    }
+
+    @Override
     public boolean valid(int collectable) {
         return collectable > 0;
     }

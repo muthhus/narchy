@@ -32,6 +32,8 @@ public abstract class Ellipsis extends Variable {
     @NotNull
     public abstract Variable clone(Variable newVar, VariableNormalization normalizer);
 
+    public abstract int sizeMin();
+
 
 
     //public final Variable target;

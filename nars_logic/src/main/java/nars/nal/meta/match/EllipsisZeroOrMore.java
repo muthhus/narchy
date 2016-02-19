@@ -32,4 +32,9 @@ public class EllipsisZeroOrMore extends Ellipsis {
     public final String toString() {
         return super.toString() + "..*";
     }
+
+    @Override
+    public int sizeMin() {
+        return 0;
+    }
 }
