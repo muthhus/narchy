@@ -312,12 +312,8 @@
 //Inference about the pre/postconditions
 
     Y, ((&&,X,A..+) ==> B) |- substituteIfUnifies(((&&,A..+) ==> B),"$",X,Y), (Belief:Deduction, Order:ForAllSame)
-//single case of previous which doesnt require conjunction in single-term case (remove it when correctly working)
-    Y, ((&&,X,A) ==> B) |- substituteIfUnifies((A ==> B),"$",X,Y), (Belief:Deduction, Order:ForAllSame)
 
     ((&&,M,A..+) ==> C), ((&&,A..+) ==> C) |- M, (Belief:Abduction, Order:ForAllSame)
-//single case of previous which doesnt require conjunction in single-term case (remove it when correctly working)
-    ((&&,M,A) ==> C), (A==>C) |- M, (Belief:Abduction, Order:ForAllSame)
 
 
 //Can be derived by NAL7 rules so this won't be necessary there (Order:ForAllSame left out here)
@@ -391,7 +387,7 @@
 
 //second level variable introduction
 
-    (Y --> L), ((Y --> S) ==> R), neq(L,S) |- ((&&,(#X --> L),(#X --> S)) ==> R), (Belief:Induction, Desire:Induction)
+    (Y --> L), ((Y --> S) ==> R), neq(L,S) |- substitute(((&&,(#X --> L),(#X --> S)) ==> R),Y,#X), (Belief:Induction, Desire:Induction)
     (Y --> L), ((&&,(Y --> S),A..+) ==> R), neq(L,S) |- substitute(((&&,(#X --> L),(#X --> S),A..+) ==> R),Y,#X), (Belief:Intersection)
 
 
@@ -494,12 +490,6 @@
 
 //experimental 2-arity extension
 //    ((/,_,A) --> Z), (B --> A), task("?") |- ((/,_,A) --> (/,_,B)), (Belief:BeliefStructuralDeduction, Punctuation:Judgment)
-
-//experimental 4-arity extension TODO use image ellipsis untested
-//    ((/,M,N,_,B) --> Z), (S --> B), task("?") |- ((/,M,N,_,B) --> (/,M,N,_,S)), (Belief:BeliefStructuralDeduction, Punctuation:Judgment)
-//    ((/,N,_,B,M) --> Z), (S --> B), task("?") |- ((/,N,_,B,M) --> (/,N,_,S,M)), (Belief:BeliefStructuralDeduction, Punctuation:Judgment)
-//    ((\,M,N,A,_) --> Z), (N --> R), task("?") |- ((\,M,N,A,_) --> (\,M,R,A,_)), (Belief:BeliefStructuralDeduction, Punctuation:Judgment)
-//    ((\,N,A,_,M) --> Z), (N --> R), task("?") |- ((\,N,A,_,M) --> (\,R,A,_,M)), (Belief:BeliefStructuralDeduction, Punctuation:Judgment)
 
 
 
