@@ -138,7 +138,8 @@ public class CurveBag<V> implements Bag<V> {
             begin = 0;
             end = ss;
         } else {
-            begin = Math.min(sampleIndex(), ss-n);
+            //shift upward by the radius to be fair about what is being sampled. to start from the sample index is biased against lower ranked items because they will be selected in increasing values
+            begin = sampleIndex(ss,n);
             end = begin + n;
         }
 
@@ -426,7 +427,7 @@ public class CurveBag<V> implements Bag<V> {
 //        }
 
     /**
-     * maps y in 0..1.0 to an index in [0..size)
+     * maps y in 0..1.0 to an index in [0..size). as if window=1
      */
     static int index(float y, int size) {
         size--;
@@ -435,6 +436,24 @@ public class CurveBag<V> implements Bag<V> {
 
         if (i > size) return size;
         //else if (i < 0) return 0;
+        else return i;
+    }
+    /**
+     * maps y in 0..1.0 to an index in [0..size). fairly for a window of size N (>1, <S)
+     * THIS STILL NEEDS WORK
+     */
+    static int index(float y, int size, int window) {
+
+        /** effective size for sliding around the window within the prioritization */
+        int es = (size - 1) -  window;
+
+
+
+        //float slotRad = 0.5f / es;
+        int i = (int)Math.floor(y * es) - window/2;
+
+        if (i > size) return size;
+        if (i < 0) return 0;
         else return i;
     }
 
@@ -448,12 +467,17 @@ public class CurveBag<V> implements Bag<V> {
     }
 
     public final int sampleIndex() {
-        return sampleIndexNormalized();
+        int s = size();
+        return index( sampleNormalized(s), s );
+    }
+
+    public final int sampleIndex(int size, int window) {
+        return index( sampleNormalized(size), size, window );
+
     }
 
     /** provides a next index to sample from */
-    public final int sampleIndexUnnormalized() {
-        int s = size();
+    public final int sampleIndexUnnormalized(int s) {
         //System.out.println("\t range:" +  min + ".." + max + " -> f(" + x + ")=" + y + "-> " + index);
         return (s == 1) ? 0 :
             index(
@@ -465,8 +489,7 @@ public class CurveBag<V> implements Bag<V> {
     /** LERPs between the curve and a flat line (y=x) in proportion to the amount the dynamic range falls short of 1.0;
      *  this is probably equivalent to a naive 1st-order approximation of a way
      *  to convert percentile to probability but it should suffice for now */
-    public final int sampleIndexNormalized() {
-        int s = size();
+    public final float sampleNormalized(int s) {
         if (s <= 1) return 0;
 
         float min = getPriorityMin();
@@ -477,7 +500,7 @@ public class CurveBag<V> implements Bag<V> {
         float normalized = ((1f-dynamicality) * uniform) +
                            (dynamicality * this.curve.valueOf(uniform));
 
-        return index( normalized , s );
+        return normalized;
     }
 
 

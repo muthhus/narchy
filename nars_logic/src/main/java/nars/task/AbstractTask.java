@@ -261,7 +261,9 @@ public abstract class AbstractTask extends UnitBudget
         state = TaskState.Executed;
     }
 
-    /** if validated and entered into the system. can be overridden in subclasses to handle this event */
+    /** if validated and entered into the system. can be overridden in subclasses to handle this event
+     *  isnt called for Command tasks currently; they will be executed right away anyway
+     * */
     protected void onInput(Memory m) {
 
     }

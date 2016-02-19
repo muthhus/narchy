@@ -2,6 +2,7 @@ package nars.nal.op;
 
 import nars.Op;
 import nars.Symbols;
+import nars.concept.Temporalize;
 import nars.nal.meta.*;
 import nars.truth.BeliefFunction;
 import nars.truth.DesireFunction;
@@ -22,40 +23,10 @@ abstract public class Solve extends AtomicBooleanCondition<PremiseMatch> {
         this.derive = derive;
     }
 
-    @NotNull
-    public static Solve the(@NotNull PostCondition p, @NotNull PremiseRule rule, boolean anticipate, boolean eternalize,
-                            @NotNull BooleanCondition[] postPreconditions) {
-
-        char puncOverride = p.puncOverride;
-
-        BeliefFunction belief = BeliefFunction.get(p.beliefTruth);
-        DesireFunction desire = DesireFunction.get(p.goalTruth);
-
-        String beliefLabel = belief == null ? "_" :
-                p.beliefTruth.toString();
-        String desireLabel = desire == null ? "_" :
-                p.goalTruth.toString();
-
-        String sn = "Truth:(";
-        String i = puncOverride == 0 ?
-                sn + beliefLabel + ',' + desireLabel :
-                sn + beliefLabel + ',' + desireLabel + ",punc:\"" + puncOverride + '\"';
-
-        i += ')';
-
-        Derive der = new Derive(rule, p.term,
-                postPreconditions,
-                belief!=null ? belief.single() : false,
-                desire!=null ? desire.single() : false,
-                anticipate,
-                eternalize);
-
-        return puncOverride == 0 ?
-                new SolvePuncFromTask(i, der, belief, desire) :
-                new SolvePuncOverride(i, der, puncOverride, belief, desire);
 
 
-//
+
+    //
 //        try {
 //            MethodHandles.Lookup l = MethodHandles.publicLookup();
 //
@@ -72,7 +43,6 @@ abstract public class Solve extends AtomicBooleanCondition<PremiseMatch> {
 //            e.printStackTrace();
 //            throw new RuntimeException(e);
 //        }
-    }
 
     @Override
     public String toString() {
@@ -148,7 +118,7 @@ abstract public class Solve extends AtomicBooleanCondition<PremiseMatch> {
     }
 
 
-    private static final class SolvePuncFromTask extends Solve {
+    public static final class SolvePuncFromTask extends Solve {
         private final BeliefFunction belief;
         private final DesireFunction desire;
 
@@ -165,7 +135,7 @@ abstract public class Solve extends AtomicBooleanCondition<PremiseMatch> {
         }
     }
 
-    private static final class SolvePuncOverride extends Solve {
+    public static final class SolvePuncOverride extends Solve {
         private final char puncOverride;
         private final BeliefFunction belief;
         private final DesireFunction desire;

@@ -7,6 +7,7 @@ import nars.Memory;
 import nars.Op;
 import nars.budget.Budget;
 import nars.concept.ConceptProcess;
+import nars.concept.Temporalize;
 import nars.nal.meta.*;
 import nars.nal.meta.match.EllipsisMatch;
 import nars.nal.nal8.AtomicStringConstant;
@@ -35,6 +36,7 @@ public class Derive extends AtomicStringConstant implements ProcTerm {
 
     @NotNull
     public final PremiseRule rule;
+    private final Temporalize temporalizer;
 
     /** result pattern */
     @NotNull
@@ -48,8 +50,9 @@ public class Derive extends AtomicStringConstant implements ProcTerm {
 
 
     public Derive(@NotNull PremiseRule rule, @NotNull Term term, @NotNull BooleanCondition[] postMatch,
-                  boolean beliefSingle, boolean desireSingle, boolean anticipate, boolean eternalize) {
+                  boolean beliefSingle, boolean desireSingle, boolean anticipate, boolean eternalize, Temporalize temporalizer) {
         this.rule = rule;
+        this.temporalizer = temporalizer;
         this.postMatch = (postMatch.length > 0) ? new AndCondition(postMatch) : BooleanCondition.TRUE;
         this.conclusionPattern = term;
         this.beliefSingle = beliefSingle;
@@ -185,11 +188,13 @@ public class Derive extends AtomicStringConstant implements ProcTerm {
                 cp = Operator.argArray((Compound) cp)[0];
             }
 
-            ct = premise.temporalize(ct,
-                    cp, p, this
+            long[] occReturn = new long[1];
+
+            ct = this.temporalizer.compute(ct,
+                    p, this, occReturn
             );
 
-            occ = premise.occ;
+            occ = occReturn[0];
 
         } else {
             occ = ETERNAL;

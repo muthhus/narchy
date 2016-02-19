@@ -172,8 +172,8 @@ public class AtomConcept extends AbstractConcept  {
     }
 
     private static boolean taskLinkOut(@NotNull Concept c, @NotNull Task t) {
-//        return true;
-        return !(c.term().equals(t.term()));
+        return true;
+        //return !(c.term().equals(t.term()));
     }
 
 }

@@ -20,7 +20,6 @@ import nars.term.transform.CompoundTransform;
 import nars.term.transform.VariableNormalization;
 import nars.term.transform.VariableTransform;
 import nars.term.transform.subst.Subst;
-import nars.term.variable.GenericVariable;
 import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -353,7 +352,7 @@ public interface TermBuilder {
 
         if (!op.validSize(currentSize)) {
             //throw new RuntimeException(Arrays.toString(t) + " invalid size for " + op);
-            throw new InvalidTermConstruction(op, relation, dt, args.terms());
+            throw new UnbuildableTerm(op, relation, dt, args.terms());
             //return null;
         }
 
@@ -363,13 +362,13 @@ public interface TermBuilder {
         return m.term();
     }
 
-    final class InvalidTermConstruction extends RuntimeException {
+    final class UnbuildableTerm extends RuntimeException {
         private final Op op;
         private final int rel;
         private final int dt;
         private final Term[] args;
 
-        public InvalidTermConstruction(Op op, int rel, int dt, Term[] args) {
+        public UnbuildableTerm(Op op, int rel, int dt, Term[] args) {
 
             this.op = op;
             this.rel = rel;
@@ -386,7 +385,7 @@ public interface TermBuilder {
         @NotNull
         @Override
         public String toString() {
-            return "InvalidTermConstruction{" +
+            return getClass().getSimpleName() + "{" +
                     "op=" + op +
                     ", rel=" + rel +
                     ", dt=" + dt +

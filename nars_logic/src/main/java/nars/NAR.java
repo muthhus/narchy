@@ -436,25 +436,24 @@ public abstract class NAR implements Level, Consumer<Task> {
         Task u;
         if (i.isCommand()) {
             //direct execution
-            if (!execute(i, null)) {
+            if (execute(i, null)) {
+                u = i;
+            } else {
                 m.remove(i, "Unmatched Command");
                 u = null;
-            } else {
-                u = i;
             }
         } else {
-            if (i.isDeleted()) {
-                m.remove(i, "Pre-Deleted");
-                u = null;
-            } else {
+            if (!i.isDeleted()) {
                 //accept input if it can be normalized
-                u = i.normalize(m);
-                if (u == null) {
-                    m.remove(i, "Unnormalizable");
-                } else {
+                if ((u = i.normalize(m)) != null) {
                     //ACCEPT TASK FOR INPUT
                     m.eventInput.emit(u);
+                } else {
+                    m.remove(i, "Unnormalizable");
                 }
+            } else {
+                m.remove(i, "Pre-Deleted");
+                u = null;
             }
         }
 

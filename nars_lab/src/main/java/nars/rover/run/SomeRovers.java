@@ -99,7 +99,7 @@ public class SomeRovers {
                         new SoftValueHashMap())),
                 2000, conceptsFirePerCycle, 3, 4);
 
-        //nar.logSummaryGT(System.out, 0.2f);
+        //nar.logSummaryGT(System.out, 0f);
 //        nar.log(System.out, x -> {
 //            if (x instanceof Task) {
 //                Task t = (Task)x;
@@ -136,7 +136,7 @@ public class SomeRovers {
         m.shortTermMemoryHistory.set(3);
         m.executionThreshold.setValue(0.0f);
 
-        boolean gui = true;
+        boolean gui = false;
         if (gui) {
             //NARide.loop(nar, false);
 

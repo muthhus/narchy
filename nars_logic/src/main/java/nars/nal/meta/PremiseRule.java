@@ -6,6 +6,7 @@ import com.google.common.collect.Sets;
 import nars.$;
 import nars.Global;
 import nars.Op;
+import nars.concept.Temporalize;
 import nars.nal.meta.constraint.MatchConstraint;
 import nars.nal.meta.constraint.NoCommonSubtermsConstraint;
 import nars.nal.meta.constraint.NotEqualsConstraint;
@@ -15,10 +16,7 @@ import nars.nal.meta.match.EllipsisOneOrMore;
 import nars.nal.meta.match.EllipsisTransform;
 import nars.nal.meta.match.EllipsisZeroOrMore;
 import nars.nal.meta.pre.*;
-import nars.nal.op.ImmediateTermTransform;
-import nars.nal.op.Solve;
-import nars.nal.op.substitute;
-import nars.nal.op.substituteIfUnifies;
+import nars.nal.op.*;
 import nars.op.data.differ;
 import nars.op.data.intersect;
 import nars.op.data.union;
@@ -35,6 +33,8 @@ import nars.term.transform.VariableNormalization;
 import nars.term.transform.subst.MapSubst;
 import nars.term.variable.GenericVariable;
 import nars.term.variable.Variable;
+import nars.truth.BeliefFunction;
+import nars.truth.DesireFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -53,7 +53,7 @@ import static nars.term.Terms.concat;
 public class PremiseRule extends GenericCompound {
 
 
-    public static final Class<? extends ImmediateTermTransform>[] Operators = new Class[]{
+    public static final Class[] Operators = new Class[]{
             intersect.class,
             differ.class,
             union.class,
@@ -67,7 +67,6 @@ public class PremiseRule extends GenericCompound {
      * blank marker trie node indicating the derivation and terminating the branch
      */
     public static final BooleanCondition END = new AtomicBooleanCondition<PremiseMatch>() {
-
 
         @Override
         public boolean booleanValueOf(PremiseMatch versioneds) {
@@ -83,8 +82,7 @@ public class PremiseRule extends GenericCompound {
     public boolean immediate_eternalize;
 
     public boolean anticipate;
-    //public boolean sequenceIntervalsFromTask = false;
-    //public boolean sequenceIntervalsFromBelief = false;
+
 
     /**
      * conditions which can be tested before term matching
@@ -111,9 +109,13 @@ public class PremiseRule extends GenericCompound {
     public int minNAL;
 
     private final String str;
+
     protected String source;
+
     @Nullable
     public MatchTaskBelief match;
+
+    private Temporalize temporalize = Temporalize.Auto;
 
     @NotNull
     public final Compound getPremise() {
@@ -177,37 +179,67 @@ public class PremiseRule extends GenericCompound {
     @NotNull
     public List<Term> getConditions(@NotNull PostCondition post) {
 
-        int n = prePreconditions.length + postPreconditions.length;
+        List<Term> l = Global.newArrayList(prePreconditions.length + postPreconditions.length + 4 /* estimate */);
 
-        List<Term> l = Global.newArrayList(n + 4 /* estimate */);
-
-        ///--------------
         for (BooleanCondition p : prePreconditions)
             p.addConditions(l);
 
         match.addPreConditions(l); //pre-conditions
 
-        Solve truth = Solve.the(post,
-                this, anticipate, immediate_eternalize, postPreconditions
+        Solve truth = solver(post,
+                this, anticipate, immediate_eternalize, postPreconditions, temporalize
         );
 
         truth.addConditions(l);
 
         match.addConditions(l); //the match itself
 
-        /* FOR EACH MATCH */
         l.add(truth.getDerive()); //will be linked to and invoked by match callbacks
-
 
         l.add(END);
 
         return l;
     }
 
+    @NotNull
+    public static Solve solver(@NotNull PostCondition p, @NotNull PremiseRule rule, boolean anticipate, boolean eternalize,
+                               @NotNull BooleanCondition[] postPreconditions, Temporalize temporalizer) {
+
+
+        char puncOverride = p.puncOverride;
+
+        BeliefFunction belief = BeliefFunction.get(p.beliefTruth);
+        String beliefLabel = belief != null ? p.beliefTruth.toString() : "_";
+        DesireFunction desire = DesireFunction.get(p.goalTruth);
+        String desireLabel = desire != null ? p.goalTruth.toString() : "_";
+
+        String sn = "Truth:(";
+        String i = puncOverride == 0 ?
+                sn + beliefLabel + ',' + desireLabel :
+                sn + beliefLabel + ',' + desireLabel + ",punc:\"" + puncOverride + '\"';
+        i += ')';
+
+
+        Derive der = new Derive(rule, p.term,
+                postPreconditions,
+                belief != null ? belief.single() : false,
+                desire != null ? desire.single() : false,
+                anticipate,
+                eternalize, temporalizer);
+
+        return puncOverride == 0 ?
+                new Solve.SolvePuncFromTask(i, der, belief, desire) :
+                new Solve.SolvePuncOverride(i, der, puncOverride, belief, desire);
+
+
+    }
+
+
 
     public void setSource(String source) {
         this.source = source;
     }
+
 
     /**
      * source string that generated this rule (for debugging)
@@ -710,7 +742,7 @@ public class PremiseRule extends GenericCompound {
             } else if (v instanceof Ellipsis.EllipsisPrototype) {
                 Ellipsis.EllipsisPrototype ep = (Ellipsis.EllipsisPrototype) v;
                 return ep.make(actualSerial +
-                        (ep.minArity == 0 ? ELLIPSIS_ZERO_OR_MORE_ID_OFFSET : ELLIPSIS_ONE_OR_MORE_ID_OFFSET) //these need to be distinct
+                                (ep.minArity == 0 ? ELLIPSIS_ZERO_OR_MORE_ID_OFFSET : ELLIPSIS_ONE_OR_MORE_ID_OFFSET) //these need to be distinct
                         , ep.minArity);
             } else if (v instanceof Ellipsis) {
 
@@ -719,7 +751,7 @@ public class PremiseRule extends GenericCompound {
                     idOffset = ELLIPSIS_TRANSFORM_ID_OFFSET;
                 } else if (v instanceof EllipsisZeroOrMore) {
                     idOffset = ELLIPSIS_ZERO_OR_MORE_ID_OFFSET;
-                } else  if (v instanceof EllipsisOneOrMore) {
+                } else if (v instanceof EllipsisOneOrMore) {
                     idOffset = ELLIPSIS_ONE_OR_MORE_ID_OFFSET;
                 } else {
                     throw new RuntimeException("N/A");
