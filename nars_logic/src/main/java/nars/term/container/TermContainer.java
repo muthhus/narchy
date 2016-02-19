@@ -9,7 +9,6 @@ import nars.term.Term;
 import nars.term.TermBuilder;
 import nars.term.Termlike;
 import nars.term.Terms;
-import nars.term.transform.subst.FindSubst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -261,7 +260,9 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
 
 
     static boolean requiresTermSet(@NotNull Op op, int num) {
-        return op.isCommutative() && (num > 1);
+        return
+            /*(dt==0 || dt==ITERNAL) &&*/ //non-zero or non-iternal dt disqualifies any reason for needing a TermSet
+            (op.isCommutative() && (num > 1));
     }
 
 
@@ -287,7 +288,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
 
     @NotNull
     static TermContainer the(@NotNull Op op, @NotNull Term... tt) {
-        return requiresTermSet(op, tt.length) ?
+        return  requiresTermSet(op, tt.length) ?
                 TermSet.the(tt) :
                 new TermVector(tt);
     }

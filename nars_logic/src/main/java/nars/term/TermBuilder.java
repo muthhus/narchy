@@ -1,6 +1,5 @@
 package nars.term;
 
-import com.google.common.collect.Lists;
 import com.gs.collections.api.set.MutableSet;
 import nars.$;
 import nars.Global;
@@ -206,8 +205,9 @@ public interface TermBuilder {
 
                         //method 2: on heap
                         Op op = cx.op();
-                        x = $.the(op, cx.relation(), cx.dt(),
-                                TermContainer.the(op, yy)
+                        int dt = cx.dt();
+                        x = $.the(op, cx.relation(), dt,
+                            TermContainer.the(op, yy)
                         );
 
                         if (x == null)
@@ -322,7 +322,7 @@ public interface TermBuilder {
                 if (et0.equals(et1))
                     return Terms.empty(set);
 
-                return finish(op, -1, TermContainer.the(op, tt));
+                return finish(op, -1, TermContainer.the(op, t));
             }
             default:
                 return null;
@@ -468,7 +468,7 @@ public interface TermBuilder {
 
             if (t == 0) {
                 //special case: 0
-                Compound x = (Compound) junction(op, 0, TermSet.the(u));
+                Compound x = (Compound) junctionFlat(op, t, u);
                 if (x.size() == 1) {
                     return x.term(0);
                 }
@@ -499,7 +499,7 @@ public interface TermBuilder {
             boolean reversed = cx.term(0) == u[1];
             return cx.dt(reversed ? -t : t);
         } else {
-            return junction(op, t, Lists.newArrayList(u));
+            return junctionFlat(op, t, u);
         }
     }
 
@@ -511,35 +511,32 @@ public interface TermBuilder {
      * flattening junction builder, don't use with temporal relation
      */
     @Nullable
-    default Term junction(@NotNull Op op, int dt, @NotNull Iterable<Term> u) {
+    default Term junctionFlat(@NotNull Op op, int dt, Term[] u) {
 
-//        if (t!=ITERNAL) {
-//            return junction(op, t, Iterables.toArray(u, Term.class));
-//        }
+        TermContainer tc;
+        if (dt ==0 || dt == ITERNAL) {
+            List<Term> s = Global.newArrayList(u.length);
+            flatten(op, u, dt, s);
+            tc = TermSet.the(s);
+        } else {
+            tc = TermSet.the(u);
+        }
 
-        final boolean[] done = {true};
+        return finish(op, -1, dt, tc);
 
-        //TODO use a more efficient flattening that doesnt involve recursion and multiple array creations
-        TreeSet<Term> s = new TreeSet();
-
-        u.forEach(x -> {
-            if (x.op() == op && (((Compound) x).dt() == dt)) {
-                /*if (ellipsisoid(x)) {
-                    s.add(x); //add whole
-                } else */{
-                    for (Term y : ((TermContainer) x).terms()) {
-                        if (s.add(y) && (y.op() == op))
-                            done[0] = false;
-                    }
-                }
-            } else {
-                s.add(x);
-            }
-        });
-
-        return !done[0] ? junction(op, dt, s) :
-                finish(op, -1, dt, TermSet.the(s));
     }
+
+    static void flatten(@NotNull Op op, Term[] u, int dt, Collection<Term> s) {
+        for (Term x : u) {
+            if ((x.op() == op) && (((Compound) x).dt()==dt)) {
+                flatten(op, ((Compound) x).terms(), dt, s); //recurse
+            } else {
+                s.add(x); //ordinary term, add
+            }
+        }
+    }
+
+
 
     @Nullable
     default Term statement(@NotNull Op op, int t, @NotNull Term[] u) {
@@ -555,9 +552,12 @@ public interface TermBuilder {
     }
 
     @Nullable
-    default Term statement2(@NotNull Op op, int t, final Term[] u) {
+    default Term statement2(@NotNull Op op, int dt, final Term[] u) {
         Term subject = u[0];
         Term predicate = u[1];
+
+        if (subject.equals(predicate))
+            return subject;
 
         //DEBUG:
         //if (subject == null || predicate == null)
@@ -581,14 +581,13 @@ public interface TermBuilder {
                     if ((oldCondition.op() == CONJUNCTION && oldCondition.containsTerm(subject)))
                         return null;
 
-                    return impl2Conj(t, subject, predicate, oldCondition);
+                    return impl2Conj(dt, subject, predicate, oldCondition);
                 }
                 break;
 
         }
 
-        if (subject.equals(predicate))
-            return subject;
+
 
         //already tested equality, so go to invalidStatement2:
         if (!Statement.invalidStatement2(subject, predicate)) {
@@ -596,9 +595,9 @@ public interface TermBuilder {
             Termed xx = make(op, -1, cc);
             if (xx != null) {
                 Compound x = (Compound) (xx.term());
-                if (t != ITERNAL) {
+                if (dt != ITERNAL) {
                     boolean reversed = cc.term(0) == predicate;
-                    x = x.dt(reversed ? -t : t);
+                    x = x.dt(reversed ? -dt : dt);
                 }
                 return x;
             }

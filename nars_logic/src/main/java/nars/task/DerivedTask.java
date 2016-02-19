@@ -12,20 +12,34 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class DerivedTask extends MutableTask {
 
-    public final ConceptProcess premise;
+    private BLink<? extends Task> premiseTaskLink;
+    private BLink<? extends Termed> premiseTermLink;
+
+    //avoid storing the ConceptProcess reference because it creates a garbage-collection chain of derivedtask -> premise -> derivedtask etc..
+    //public final ConceptProcess premise;
 
     public DerivedTask(@NotNull Termed<Compound> tc, char punct, ConceptProcess premise) {
         super(tc, punct);
-        this.premise = premise;
+        //this.premise = premise;
+        this.premiseTaskLink = premise.taskLink;
+        this.premiseTermLink = premise.termLink;
+
     }
+
+    @Override public void delete() {
+        super.delete();
+        premiseTaskLink = null; //clear GC paths
+        premiseTermLink = null; //clear GC paths
+    }
+
 
     @Override
     public boolean onRevision(@NotNull Task t) {
         Truth conclusion = t.truth();
 
-        ConceptProcess p = this.premise;
+        //ConceptProcess p = this.premise;
 
-        BLink<? extends Task> tLink = p.taskLink;
+        BLink<? extends Task> tLink = premiseTaskLink;
 
         //TODO check this Question case is right
         Truth tLinkTruth = tLink.get().truth();
@@ -35,9 +49,9 @@ public final class DerivedTask extends MutableTask {
             tLink.andDurability(oneMinusDifT);
         }
 
-        Task belief = p.belief();
+        Task belief = t.getParentBelief();
         if (belief != null) {
-            BLink<? extends Termed> bLink = p.termLink;
+            BLink<? extends Termed> bLink = premiseTermLink;
             float oneMinusDifB = 1f - conclusion.getExpDifAbs(belief.truth());
             bLink.andPriority(oneMinusDifB);
             bLink.andDurability(oneMinusDifB);

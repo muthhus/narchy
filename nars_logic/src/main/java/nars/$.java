@@ -6,7 +6,6 @@ import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.ConsoleAppender;
 import nars.op.sys.java.AtomObject;
-import nars.nal.Tense;
 import nars.nal.meta.match.VarPattern;
 import nars.nal.nal8.Operator;
 import nars.task.MutableTask;
@@ -31,6 +30,7 @@ import java.util.function.Function;
 
 import static java.util.stream.Collectors.toList;
 import static nars.Op.*;
+import static nars.nal.Tense.ITERNAL;
 
 /**
  * core utility class for:
@@ -511,7 +511,7 @@ public enum $  {
 
     @Nullable
     public static Term the(@NotNull Op op, int relation, @NotNull TermContainer subterms) {
-        return the(op, relation, Tense.ITERNAL, subterms);
+        return the(op, relation, ITERNAL, subterms);
     }
 
     @Nullable

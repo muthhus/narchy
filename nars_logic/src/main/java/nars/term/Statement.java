@@ -100,13 +100,8 @@ public interface Statement {
      * @return Whether they cannot be related in a statement
      */
     static boolean invalidReflexive(Term t1, Term t2) {
-        if (!(t1 instanceof Compound)) {
-            return false;
-        }
-        if ((t1.op().isImage()/*Ext) || (t1 instanceof ImageInt*/)) {
-            return false;
-        }
-        return t1.containsTerm(t2);
+
+        return !(!(t1 instanceof Compound) || (t1.op().isImage()/*Ext) || (t1 instanceof ImageInt*/)) && t1.containsTerm(t2);
     }
 
 

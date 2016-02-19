@@ -281,8 +281,10 @@ public class TermReductionsTest {
     }
     @Test
     public void testTemporalConjunctionReduction5() {
-        assertEquals("((a &&+0 b)&&(a &&+1 b))", $("( (a &&+0 b) && (a &&+1 b) )").toString());
+        assertEquals("((a &&+0 b)&&(a &&+1 b))",
+                $("( (a &&+0 b) && (a &&+1 b) )").toString());
     }
+
     @Test
     public void testTemporalConjunctionReduction4() {
         assertEquals("(a &&+0 b)", $("( a &&+0 (b && b) )").toString());

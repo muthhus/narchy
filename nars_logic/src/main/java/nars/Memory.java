@@ -336,7 +336,7 @@ public class Memory extends Param {
 
         if (!task.isDeleted()) {
 
-            task.budget().delete();
+            task.delete();
 
 
             /*if (Global.DEBUG_DERIVATION_STACKTRACES && Global.DEBUG_TASK_LOG)

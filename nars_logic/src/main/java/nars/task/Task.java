@@ -366,6 +366,8 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     /** performs the procedure that should happen when this task is invoked due to goal desire */
     boolean execute(NAR nar);
 
+    void delete();
+
 //    /** get the absolute time of an event subterm, if present, TIMELESS otherwise */
 //    default long subtermTimeAbs(Term x) {
 //        long t = subtermTime(x);
