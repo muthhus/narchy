@@ -50,9 +50,9 @@ public abstract class AbstractMapIndex implements TermIndex {
     @Override
     public Termed the(Term x) {
 
-//        if (x instanceof Ellipsis)
-//            ///throw new RuntimeException("ellipsis not allowed in this index");
-//            return null;
+        if (x instanceof Ellipsis)
+            ///throw new RuntimeException("ellipsis not allowed in this index");
+            return null;
 
 //        if (!isInternable(x)) {
 //            //TODO intern any subterms which can be

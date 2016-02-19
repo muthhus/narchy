@@ -280,6 +280,12 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
     }
 
     @NotNull
+    static TermContainer the(@NotNull Term one) {
+        return new TermVector(one);
+    }
+
+
+    @NotNull
     static TermContainer the(@NotNull Op op, @NotNull Term... tt) {
         return requiresTermSet(op, tt.length) ?
                 TermSet.the(tt) :

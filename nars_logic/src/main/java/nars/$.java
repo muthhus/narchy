@@ -349,21 +349,27 @@ public enum $  {
     /** normalized variable */
     @NotNull public static Variable v(@NotNull Op type, int counter) {
         if (counter >= Variable.MAX_VARIABLE_CACHED_PER_TYPE) {
-            throw new RuntimeException("variable cache overflow");
+            return vNew(type, counter);
+            //throw new RuntimeException("variable cache overflow");
         }
 
         Variable[] vct = Variable.varCache[typeIndex(type)];
         Variable v = vct[counter];
         if (v == null) {
-            switch (type) {
-                case VAR_PATTERN: v = new VarPattern(counter);  break;
-                case VAR_QUERY: v = new VarQuery(counter);  break;
-                case VAR_DEP: v = new VarDep(counter);  break;
-                case VAR_INDEP: v = new VarIndep(counter);  break;
-            }
+            v = vNew(type, counter);
             vct[counter] = v;
         }
         return v;
+    }
+
+    static Variable vNew(@NotNull Op type, int counter) {
+        switch (type) {
+            case VAR_PATTERN: return new VarPattern(counter);
+            case VAR_QUERY: return  new VarQuery(counter);
+            case VAR_DEP: return  new VarDep(counter);
+            case VAR_INDEP: return  new VarIndep(counter);
+        }
+        return null;
     }
 
     @Nullable

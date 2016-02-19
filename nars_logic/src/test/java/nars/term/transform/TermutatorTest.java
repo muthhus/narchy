@@ -59,7 +59,7 @@ public class TermutatorTest {
     }
 
 
-    static final @NotNull Ellipsis e1 = ((Ellipsis.EllipsisPrototype) $("%A..+")).normalize(1);
+    static final @NotNull Ellipsis e1 = ((Ellipsis.EllipsisPrototype) $("%A..+")).make(1,1);
     static final Variable p2= v(Op.VAR_PATTERN, 2);
     static final Variable[] p2p3 = { p2, v(Op.VAR_PATTERN, 3)};
 

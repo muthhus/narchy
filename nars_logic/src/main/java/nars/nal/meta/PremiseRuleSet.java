@@ -157,62 +157,62 @@ public class PremiseRuleSet {
     @Nullable
     private static final String[] unchanged = {null};
 
-    /**
-     * //TODO do this on the parsed rule, because string contents could be unpredictable:
-     * permute(rule, Map<Op,Op[]> alternates)
-     *
-     * @param rules
-     * @param ruleString
-     */
-    static void permuteTenses(@NotNull Collection<String> rules /* results collection */,
-                              @NotNull String ruleString) {
-
-        //Original version which permutes in different tenses
-
-        if (!ruleString.contains("Order:ForAllSame")) {
-            rules.add(ruleString);
-            return;
-        }
-
-        String[] equs =
-                ruleString.contains("<=>") ?
-                        equFull :
-                        unchanged;
-
-
-        String[] impls =
-                ruleString.contains("==>") ?
-                        implFull :
-                        unchanged;
-
-        String[] conjs =
-                ruleString.contains("&&") ?
-                        conjFull :
-                        unchanged;
-
-
-        rules.add(ruleString);
-
-
-        for (String equ : equs) {
-
-            String p1 = equ != null ? equivOperatorPattern.matcher(ruleString).replaceAll(Matcher.quoteReplacement(equ)) : ruleString;
-
-            for (String imp : impls) {
-
-                String p2 = imp != null ? implOperatorPattern.matcher(p1).replaceAll(Matcher.quoteReplacement(imp)) : p1;
-
-                for (String conj : conjs) {
-
-                    String p3 = conj != null ? conjOperatorPattern.matcher(p2).replaceAll(Matcher.quoteReplacement(conj)) : p2;
-
-                    rules.add(p3);
-                }
-            }
-        }
-
-
-    }
+//    /**
+//     * //TODO do this on the parsed rule, because string contents could be unpredictable:
+//     * permute(rule, Map<Op,Op[]> alternates)
+//     *
+//     * @param rules
+//     * @param ruleString
+//     */
+//    static void permuteTenses(@NotNull Collection<String> rules /* results collection */,
+//                              @NotNull String ruleString) {
+//
+//        //Original version which permutes in different tenses
+//
+//        if (!ruleString.contains("Order:ForAllSame")) {
+//            rules.add(ruleString);
+//            return;
+//        }
+//
+//        String[] equs =
+//                ruleString.contains("<=>") ?
+//                        equFull :
+//                        unchanged;
+//
+//
+//        String[] impls =
+//                ruleString.contains("==>") ?
+//                        implFull :
+//                        unchanged;
+//
+//        String[] conjs =
+//                ruleString.contains("&&") ?
+//                        conjFull :
+//                        unchanged;
+//
+//
+//        rules.add(ruleString);
+//
+//
+//        for (String equ : equs) {
+//
+//            String p1 = equ != null ? equivOperatorPattern.matcher(ruleString).replaceAll(Matcher.quoteReplacement(equ)) : ruleString;
+//
+//            for (String imp : impls) {
+//
+//                String p2 = imp != null ? implOperatorPattern.matcher(p1).replaceAll(Matcher.quoteReplacement(imp)) : p1;
+//
+//                for (String conj : conjs) {
+//
+//                    String p3 = conj != null ? conjOperatorPattern.matcher(p2).replaceAll(Matcher.quoteReplacement(conj)) : p2;
+//
+//                    rules.add(p3);
+//                }
+//            }
+//        }
+//
+//
+//    }
 
 
     @NotNull
@@ -225,13 +225,14 @@ public class PremiseRuleSet {
         rawRules/*.parallelStream()*/.forEach(rule -> {
 
             String p = preprocess(rule);
+            expanded.add(p);
 
 
             //there might be now be A_1..maxVarArgsToMatch in it, if this is the case we have to add up to maxVarArgsToMatch ur
             /*if (p.contains("A_1..n") || p.contains("A_1..A_i.substitute(_)..A_n")) {
                 addUnrolledVarArgs(expanded, p, maxVarArgsToMatch);
             } else {*/
-            permuteTenses(expanded, p);
+            //permuteTenses(expanded, p);
 
 
 
@@ -284,12 +285,12 @@ public class PremiseRuleSet {
         return ur;
     }
 
-    private static void addQuestions(@NotNull Collection<PremiseRule> target, @NotNull PremiseRule r, String src, @NotNull PatternIndex patterns) {
-
-        r.forEachQuestionReversal((q,reason) ->
-                add(target, q, src + "//" + reason, patterns));
-
-     }
+//    private static void addQuestions(@NotNull Collection<PremiseRule> target, @NotNull PremiseRule r, String src, @NotNull PatternIndex patterns) {
+//
+//        r.forEachQuestionReversal((q,reason) ->
+//                add(target, q, src + "//" + reason, patterns));
+//
+//     }
 
     @Nullable
     static PremiseRule add(@NotNull Collection<PremiseRule> target, @Nullable PremiseRule q, String src, @NotNull PatternIndex index) {

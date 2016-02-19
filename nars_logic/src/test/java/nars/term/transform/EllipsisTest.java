@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static nars.$.$;
+import static nars.Op.Imdex;
 import static nars.Op.VAR_DEP;
 import static nars.Op.VAR_PATTERN;
 import static nars.nal.meta.match.Ellipsis.firstEllipsis;
@@ -258,11 +259,13 @@ public class EllipsisTest {
     }
 
     @Test
-    public void testEllipsisEqualToPatternVariable() {
+    public void testEllipsisEqualityWithPatternVariable() {
 
-        @NotNull Ellipsis tt = $.<Ellipsis.EllipsisPrototype>$("%x..+").normalize(1);
+        @NotNull Ellipsis tt = Ellipsis.EllipsisPrototype.make(1,1);
+        @NotNull Ellipsis uu = Ellipsis.EllipsisPrototype.make(1,1);
 
-        assertEquals(tt, $.v(VAR_PATTERN, 1));
+        assertEquals(tt, uu);
+        assertNotEquals(tt, $.v(VAR_PATTERN, 1));
         assertNotEquals(tt, $.v(VAR_PATTERN, 2));
         assertNotEquals(tt, $.v(VAR_DEP, 1));
     }
@@ -288,23 +291,21 @@ public class EllipsisTest {
         assertEquals(EllipsisZeroOrMore.class, t.normalize(0).getClass());
     }
     @Test public void testEllipsisTransform() {
-        String s = "%A..%B=%C..+";
+        String s = "%A..%B=_..+";
         Ellipsis.EllipsisTransformPrototype t = $(s);
 
         assertNotNull(t);
-        assertEquals(s, t.toString());
-        assertEquals(EllipsisTransform.class, t.getClass());
         assertEquals($("%B"), t.from);
-        assertEquals($("%C"), t.to);
+        assertEquals(Imdex, t.to);
 
-        TermIndex i = TermIndex.memory(128);
+        TermIndex i = new PatternIndex();
 
         Term u = i.transform(
                 $.p(t), new PremiseRule.PremiseRuleVariableNormalization());
         EllipsisTransform tt = (EllipsisTransform)((Compound)u).term(0);
-        assertEquals("(%1..%2=C..+)", u.toString());
+        assertEquals("(%33554433..%2=_..+)", u.toString());
         assertEquals($("%2"), tt.from);
-        assertEquals($("C"), tt.to);
+        assertEquals(Imdex, tt.to);
     }
 
     @Test public void testEllipsisExpression() {

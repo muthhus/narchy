@@ -671,6 +671,7 @@ public class PremiseRule extends GenericCompound  {
     public static final class PremiseRuleVariableNormalization extends VariableNormalization {
 
 
+        public static final int ELLIPSIS_ID_OFFSET = 255;
         int offset;
 
         public static Variable varPattern(int i) {
@@ -693,11 +694,14 @@ public class PremiseRule extends GenericCompound  {
 //                Term to = ep.to;
 //                if (to != Op.Imdex) to = applyAfter((GenericVariable)to);
 //
-                return new EllipsisTransform(varPattern(actualSerial), ep.from, ep.to);
+                return EllipsisTransform.make(varPattern(actualSerial+ ELLIPSIS_ID_OFFSET), ep.from, ep.to, this);
 
+            } else if (v instanceof Ellipsis.EllipsisPrototype) {
+                Ellipsis.EllipsisPrototype ep = (Ellipsis.EllipsisPrototype)v;
+                return ep.make(actualSerial + ELLIPSIS_ID_OFFSET, ep.minArity);
             } else if (v instanceof Ellipsis) {
                 Ellipsis e = (Ellipsis)v;
-                Variable r = e.clone(varPattern(actualSerial), this);
+                Variable r = e.clone(varPattern(actualSerial + ELLIPSIS_ID_OFFSET), this);
                 offset = 0; //return to zero
                 return r;
             } else if (v instanceof GenericVariable) {

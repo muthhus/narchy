@@ -257,7 +257,10 @@ public class Memory extends Param {
             t = index.normalized(tt);
             if (t instanceof Concept)
                 return ((Concept)t);
-            tt = t.term();
+            else if (t == null)
+                return null;
+            else
+                tt = t.term();
         }
 
         //TODO ? put the unnormalized term for cached future normalizations?

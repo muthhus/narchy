@@ -1160,10 +1160,9 @@ public class Narsese extends BaseParser<Object> {
     }
 
     /**
-     * parse one term unnormalized
+     * parse one term NOT NORMALIZED
      */
-    @Nullable
-    public Term term(CharSequence s) {
+    @Nullable public Term term(CharSequence s) {
 
         ParsingResult r = singleTermParser.run(s);
 
@@ -1197,8 +1196,8 @@ public class Narsese extends BaseParser<Object> {
         return null;
     }
 
-    @Nullable
-    public Termed term(String s, @NotNull TermBuilder t) {
+
+    @Nullable public Termed term(String s, @NotNull TermBuilder t) {
         return term(s, t, true);
     }
 

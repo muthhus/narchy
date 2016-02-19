@@ -3,12 +3,15 @@ package nars.term.transform;
 import com.gs.collections.impl.factory.Sets;
 import nars.Global;
 import nars.NAR;
+import nars.Narsese;
 import nars.Op;
 import nars.concept.Concept;
 import nars.nal.meta.PatternCompound;
 import nars.nar.Default;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Termed;
+import nars.term.index.PatternIndex;
 import nars.term.transform.subst.FindSubst;
 import nars.util.meter.RuleTest;
 import nars.util.meter.TestNAR;
@@ -37,19 +40,28 @@ public class UnificationTest  {
         return t;
     }
 
+    final static PatternIndex pi = new PatternIndex();
+
     FindSubst test(Op type, String s1, String s2, boolean shouldSub) {
 
         Global.DEBUG = true;
         TestNAR test = test();
         NAR nar = test.nar;
-        nar.believe(s1);
+
+        Term t1;
+        if (type == Op.VAR_PATTERN) {
+            //special handling
+            Termed ts1 = Narsese.the().term(s1, pi);
+            nar.believe(ts1);
+            t1 = PatternCompound.make((Compound) ts1.term());
+        } else {
+            nar.believe(s1);
+            t1 = nar.concept(s1).term();
+        }
         nar.believe(s2);
         nar.run(2);
 
-        Term t1 =
-                type == Op.VAR_PATTERN ?
-                    PatternCompound.make((Compound) nar.term(s1).term()) :
-                nar.concept(s1).term();
+
 
         Term t2 = nar.concept(s2).term();
 
@@ -520,27 +532,39 @@ public class UnificationTest  {
                 "{a, b, c, d}", false);
     }
 
-    @Test public void ellipsisLinear1() {
+    @Test public void ellipsisLinearOneOrMoreAll() {
         test(Op.VAR_PATTERN,
                 "(%X..+)",
                 "(a)", true);
-        test(Op.VAR_PATTERN,
-                "(a, %X..+)",
-                "(a)", false);
-        test(Op.VAR_PATTERN,
-                "(a, %X..*)",
-                "(a)", true);
-
+    }
+    @Test public void ellipsisLinearOneOrMoreSuffix() {
         test(Op.VAR_PATTERN,
                 "(a, %X..+)",
                 "(a, b, c, d)", true);
+    }
+    @Test public void ellipsisLinearOneOrMoreSuffixNoneButRequired() {
+        test(Op.VAR_PATTERN,
+                "(a, %X..+)",
+                "(a)", false);
+    }
+
+    @Test public void ellipsisLinearOneOrMorePrefix() {
         test(Op.VAR_PATTERN,
                 "(%X..+, a)",
                 "(a, b, c, d)", false);
+    }
+    @Test public void ellipsisLinearOneOrMoreInfix() {
         test(Op.VAR_PATTERN,
                 "(a, %X..+, a)",
                 "(a, b, c, d)", false);
     }
+
+    @Test public void ellipsisLinearZeroOrMore() {
+        test(Op.VAR_PATTERN,
+                "(a, %X..*)",
+                "(a)", true);
+    }
+
 
     @Test public void ellipsisLinearRepeat1() {
         test(Op.VAR_PATTERN,

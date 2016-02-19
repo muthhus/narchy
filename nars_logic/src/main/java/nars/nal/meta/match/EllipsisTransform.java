@@ -26,12 +26,19 @@ public class EllipsisTransform extends EllipsisOneOrMore {
 
     @Override
     public String toString() {
-        return super.toString() + ".." + from + '=' + to + "..+";
+
+        String ss = super.toString();
+        return ss.substring(0,ss.length()-3) /* minus the ..+, as-if calling super.super.toString() */ +
+                ".." + from + '=' + to + "..+";
     }
 
     @NotNull
     @Override
-    public Variable clone(@NotNull Variable v, VariableNormalization normalizer) {
+    @Deprecated public Variable clone(@NotNull Variable v, VariableNormalization normalizer) {
+        throw new RuntimeException("n/a");
+    }
+
+    public static Variable make(@NotNull Variable v, Term from, Term to, VariableNormalization normalizer) {
         //normalizes any variable parameter terms of an EllipsisTransform
         PremiseRule.PremiseRuleVariableNormalization vnn = (PremiseRule.PremiseRuleVariableNormalization) normalizer;
         return new EllipsisTransform(v,

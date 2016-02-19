@@ -101,7 +101,10 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
 
         final int vol = meta[4] + 1;
         this.volume = (short)( vol );
-        this.complexity = (short)(vol - varTot - vP);
+
+        int cmp = vol - varTot - vP;
+        if (cmp < 0) cmp = 0;
+        this.complexity = (short)(cmp);
 
 
         this.structureHash = meta[5];

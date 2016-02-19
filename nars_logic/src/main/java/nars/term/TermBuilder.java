@@ -39,9 +39,10 @@ import static nars.term.Statement.subj;
 public interface TermBuilder {
 
 
-
-    /** allows using the single variable normalization,
-     * which is safe if the term doesnt contain pattern variables */
+    /**
+     * allows using the single variable normalization,
+     * which is safe if the term doesnt contain pattern variables
+     */
     @NotNull
     static VariableTransform normalizeFast(@NotNull Compound target) {
         return target.vars() == 1 ? VariableNormalization.singleVariableNormalization : new VariableNormalization();
@@ -74,7 +75,9 @@ public interface TermBuilder {
 
     @Nullable Termed make(Op op, int relation, TermContainer subterms, int dt);
 
-    /** unifies a term with this; by default it passes through unchanged */
+    /**
+     * unifies a term with this; by default it passes through unchanged
+     */
     @Nullable
     default Termed the(Term t) {
         return t;
@@ -84,7 +87,8 @@ public interface TermBuilder {
     default Termed the(@NotNull Termed t) {
         return the(t.term());
     }
-//    default Term theTerm(Termed t) {
+
+    //    default Term theTerm(Termed t) {
 //        return the(t).term();
 //    }
     default Term theTerm(Term t) {
@@ -99,14 +103,7 @@ public interface TermBuilder {
 
         Compound tx = transform((Compound) t, normalizeFast((Compound) t));
         if (tx != null)
-            ((GenericCompound)tx).setNormalized();
-
-        //DEBUG
-        tx.forEach(c -> {
-            if (c instanceof GenericVariable) {
-                throw new RuntimeException("not actually normalized");
-            }
-        });
+            ((GenericCompound) tx).setNormalized();
 
         return tx;
     }
@@ -120,15 +117,16 @@ public interface TermBuilder {
     default Term newTerm(@NotNull Op op, @NotNull Collection<Term> t) {
         return newTerm(op, -1, t);
     }
+
     @Nullable
     default Term newTerm(@NotNull Op op, int relation, @NotNull Collection<Term> t) {
         return newTerm(op, relation, TermContainer.the(op, t));
     }
+
     @Nullable
     default Term newTerm(@NotNull Op op, Term singleton) {
         return newTerm(op, new TermVector(singleton));
     }
-
 
 
 //    @Nullable
@@ -166,7 +164,9 @@ public interface TermBuilder {
     }
 
 
-    /** returns how many subterms were modified, or -1 if failure (ex: results in invalid term) */
+    /**
+     * returns how many subterms were modified, or -1 if failure (ex: results in invalid term)
+     */
     default <T extends Term> int transform(@NotNull Compound src, @NotNull CompoundTransform<Compound<T>, T> trans, Term[] target, int level) {
         int n = src.size();
 
@@ -179,11 +179,11 @@ public interface TermBuilder {
 
             if (trans.test(x)) {
 
-                Term x2 = trans.apply( (Compound<T>)src, (T) x, level);
+                Term x2 = trans.apply((Compound<T>) src, (T) x, level);
                 if (x2 == null)
                     return -1;
 
-                if (x!=x2) {
+                if (x != x2) {
                     modifications++;
                     x = x2;
                 }
@@ -207,12 +207,12 @@ public interface TermBuilder {
                         //method 2: on heap
                         Op op = cx.op();
                         x = $.the(op, cx.relation(), cx.t(),
-                            TermContainer.the(op, yy)
+                                TermContainer.the(op, yy)
                         );
 
                         if (x == null)
                             return -1;
-                        modifications+= (cx!=x) ? 1 : 0;
+                        modifications += (cx != x) ? 1 : 0;
                     }
                 }
             }
@@ -235,7 +235,6 @@ public interface TermBuilder {
     }
 
 
-
     @Nullable
     default Term newTerm(@NotNull Op op, int relation, @NotNull TermContainer tt) {
         return newTerm(op, relation, ITERNAL, tt);
@@ -252,19 +251,19 @@ public interface TermBuilder {
         /* special handling */
         switch (op) {
             case NEGATE:
-                if (u.length!=1)
+                if (u.length != 1)
                     throw new RuntimeException("invalid negation subterms: " + Arrays.toString(u));
                 return negation(u[0]);
 
 
             case INSTANCE:
-                if (u.length!=2 || t!= ITERNAL) throw new RuntimeException("invalid inst");
+                if (u.length != 2 || t != ITERNAL) throw new RuntimeException("invalid inst");
                 return inst(u[0], u[1]);
             case PROPERTY:
-                if (u.length!=2 || t!= ITERNAL) throw new RuntimeException("invalid prop");
+                if (u.length != 2 || t != ITERNAL) throw new RuntimeException("invalid prop");
                 return prop(u[0], u[1]);
             case INSTANCE_PROPERTY:
-                if (u.length!=2 || t!= ITERNAL) throw new RuntimeException("invalid instprop");
+                if (u.length != 2 || t != ITERNAL) throw new RuntimeException("invalid instprop");
                 return instprop(u[0], u[1]);
 
             case CONJUNCTION:
@@ -308,19 +307,23 @@ public interface TermBuilder {
 
         Term[] t = tt.terms();
         switch (t.length) {
-            case 1:
-                if (t[0] instanceof Ellipsis)
+            case 1: {
+                Term t0 = t[0];
+                if (ellipsisoid(t0))
                     return finish(op, -1, tt);
-                return t[0];
-            case 2:
-                Term et0 = t[0], et1 = t[1];
+                return t0;
+            }
+            case 2: {
+                Term t0 = t[0];
+                Term et0 = t0, et1 = t[1];
                 if ((et0.op() == set && et1.op() == set))
-                    return subtractSet(set, (Compound)et0, (Compound)et1);
+                    return subtractSet(set, (Compound) et0, (Compound) et1);
 
                 if (et0.equals(et1))
                     return Terms.empty(set);
 
                 return finish(op, -1, TermContainer.the(op, tt));
+            }
             default:
                 return null;
         }
@@ -331,7 +334,9 @@ public interface TermBuilder {
         return finish(op, relation, Tense.ITERNAL, tt);
     }
 
-    /** step before calling Make, do not call manually from outside */
+    /**
+     * step before calling Make, do not call manually from outside
+     */
     @Nullable
     default Term finish(@NotNull Op op, int relation, int dt, @NotNull TermContainer args) {
 
@@ -343,7 +348,7 @@ public interface TermBuilder {
             if (u[0] instanceof Ellipsis)
                 currentSize++; //increase to make it seem valid and allow constrct below
             else
-              return u[0]; //reduction
+                return u[0]; //reduction
         }
 
         if (!op.validSize(currentSize)) {
@@ -395,10 +400,12 @@ public interface TermBuilder {
     default Term inst(Term subj, Term pred) {
         return newTerm(INHERIT, new TermVector(newTerm(SET_EXT, subj), pred));
     }
+
     @Nullable
     default Term prop(Term subj, Term pred) {
         return newTerm(INHERIT, new TermVector(subj, newTerm(SET_INT, pred)));
     }
+
     @Nullable
     default Term instprop(Term subj, Term pred) {
         return newTerm(INHERIT, new TermVector(newTerm(SET_EXT, subj), newTerm(SET_INT, pred)));
@@ -441,19 +448,27 @@ public interface TermBuilder {
     @Nullable
     default Term junction(@NotNull Op op, int t, @NotNull Term... u) {
 //        if (u.length == 1)
-//            return u[0];
 
+        if (u.length == 1) {
+            Term only = u[0];
+            if (ellipsisoid(only)) {
+                return finish(op, -1, t, TermContainer.the(only)); //preserve unitary ellipsis
+            } else {
+                return only;
+            }
+        }
 
-        if (t!=ITERNAL) {
+        if (t != ITERNAL) {
             if (op == DISJUNCTION) {
                 throw new RuntimeException("invalid temporal disjunction");
             }
 
             if (t == 0) {
                 //special case: 0
-                Compound x = (Compound)junction(op, 0, TermSet.the(u));
-                if (x.size() == 1)
+                Compound x = (Compound) junction(op, 0, TermSet.the(u));
+                if (x.size() == 1) {
                     return x.term(0);
+                }
                 //if (x.op(op))
 
                 return x.op().isTemporal() ? x.t(0) : x;
@@ -461,32 +476,36 @@ public interface TermBuilder {
                 //return x;
             }
 
-            if (u.length == 1) {
-                return u[0];
-            }
 
-            if (u.length!=2) {
+
+           if (u.length == 2) {
+                if (u[0].equals(u[1]))
+                    return u[0];
+            } else {
                 throw new RuntimeException
-                ("invalid temporal conjunction: " + op + ' ' + t + ' ' + Arrays.toString(u));
+                        ("invalid temporal conjunction: " + op + ' ' + t + ' ' + Arrays.toString(u));
                 //return null;
             }
-
-            if (u[0].equals(u[1])) return u[0];
-
 
             Term x = make(op, -1, TermContainer.the(op, u)).term();
             if (!x.isCompound()) return x;
 
-            Compound cx = (Compound)x;
+            Compound cx = (Compound) x;
 
-            boolean reversed = cx.term(0)==u[1];
+            boolean reversed = cx.term(0) == u[1];
             return cx.t(reversed ? -t : t);
         } else {
             return junction(op, t, Lists.newArrayList(u));
         }
     }
 
-    /** flattening junction builder, don't use with temporal relation */
+    default boolean ellipsisoid(Term only) {
+        return (only instanceof Ellipsis) || (only instanceof Ellipsis.EllipsisPrototype);
+    }
+
+    /**
+     * flattening junction builder, don't use with temporal relation
+     */
     @Nullable
     default Term junction(@NotNull Op op, int dt, @NotNull Iterable<Term> u) {
 
@@ -500,24 +519,19 @@ public interface TermBuilder {
         TreeSet<Term> s = new TreeSet();
 
         u.forEach(x -> {
-            if (x.op() == op && (((Compound)x).t()==dt) ) {
-                for (Term y : ((TermContainer) x).terms()) {
-                    if (s.add(y))
-                        if (y.op() == op)
+            if (x.op() == op && (((Compound) x).t() == dt)) {
+                /*if (ellipsisoid(x)) {
+                    s.add(x); //add whole
+                } else */{
+                    for (Term y : ((TermContainer) x).terms()) {
+                        if (s.add(y) && (y.op() == op))
                             done[0] = false;
+                    }
                 }
             } else {
                 s.add(x);
             }
         });
-
-//        if (s.size() == 1) {
-//            return s.iterator().next();
-//        }
-//        if (s.size() == 2 && t!=ITERNAL) {
-//            Iterator<Term> ii = s.iterator();
-//            return junction(op, t, ii.next(), ii.next());
-//        }
 
         return !done[0] ? junction(op, dt, s) :
                 finish(op, -1, dt, TermSet.the(s));
@@ -527,8 +541,10 @@ public interface TermBuilder {
     default Term statement(@NotNull Op op, int t, @NotNull Term[] u) {
 
         switch (u.length) {
-            case 2: return statement2(op, t, u);
-            case 1: return u[0];
+            case 2:
+                return statement2(op, t, u);
+            case 1:
+                return u[0];
             default:
                 throw new RuntimeException("invalid statement arguments: " + Arrays.toString(u));
         }
@@ -574,7 +590,7 @@ public interface TermBuilder {
         if (!Statement.invalidStatement2(subject, predicate)) {
             TermContainer cc = TermContainer.the(op, u);
             Termed xx = make(op, -1, cc);
-            if (xx !=null) {
+            if (xx != null) {
                 Compound x = (Compound) (xx.term());
                 if (t != ITERNAL) {
                     boolean reversed = cc.term(0) == predicate;
@@ -639,9 +655,9 @@ public interface TermBuilder {
                 Term a = newIntersection2(t[0], t[1], intersection, setUnion, setIntersection);
                 if (a == null) return null;
                 return newIntersection2(
-                    a,
-                    newIntersection(copyOfRange(t, 2, t.length), intersection, setUnion, setIntersection),
-                    intersection, setUnion, setIntersection
+                        a,
+                        newIntersection(copyOfRange(t, 2, t.length), intersection, setUnion, setIntersection),
+                        intersection, setUnion, setIntersection
                 );
         }
 
@@ -649,9 +665,10 @@ public interface TermBuilder {
     }
 
     @Nullable
-    @Deprecated default Term newIntersection2(@NotNull Term term1, @Nullable Term term2, @NotNull Op intersection, @NotNull Op setUnion, @NotNull Op setIntersection) {
+    @Deprecated
+    default Term newIntersection2(@NotNull Term term1, @Nullable Term term2, @NotNull Op intersection, @NotNull Op setUnion, @NotNull Op setIntersection) {
 
-        if(term2 == null) {
+        if (term2 == null) {
             throw new NullPointerException();
         }
 
@@ -670,7 +687,7 @@ public interface TermBuilder {
             return newTerm(setIntersection, i);
         }
 
-        if (o2 == intersection && o1!=intersection) {
+        if (o2 == intersection && o1 != intersection) {
             //put them in the right order so everything fits in the switch:
             Term x = term1;
             term1 = term2;
@@ -687,7 +704,7 @@ public interface TermBuilder {
 
             return finish(intersection, -1,
                     TermSet.the(Terms.concat(
-                        ((TermContainer) term1).terms(), suffix
+                            ((TermContainer) term1).terms(), suffix
                     ))
             );
         }
@@ -698,13 +715,15 @@ public interface TermBuilder {
     }
 
 
-    /** returns the resolved term according to the substitution    */
+    /**
+     * returns the resolved term according to the substitution
+     */
     @Nullable
     default Term transform(@NotNull Compound src, @NotNull Subst f) {
 
 
         Term y = f.term(src);
-        if (y!=null)
+        if (y != null)
             return y;
 
 
@@ -720,9 +739,9 @@ public interface TermBuilder {
 
             if (u instanceof EllipsisMatch) {
 
-                EllipsisMatch m = (EllipsisMatch)u;
+                EllipsisMatch m = (EllipsisMatch) u;
 
-                if (maxArity!=-1 && m.size() + sub.size() > maxArity) {
+                if (maxArity != -1 && m.size() + sub.size() > maxArity) {
                     return src; //invalid transformation, violates arity constraint
                 }
 
@@ -730,7 +749,7 @@ public interface TermBuilder {
 
             } else {
 
-                if (maxArity!=-1 && 1 + sub.size() > maxArity) {
+                if (maxArity != -1 && 1 + sub.size() > maxArity) {
                     return src; //invalid transformation, violates arity constraint
                 }
 
@@ -759,7 +778,6 @@ public interface TermBuilder {
     }
 
 
-
     @Nullable
     default Term applyImmediateTransform(Subst f, Term result, ImmediateTermTransform tf) {
 
@@ -781,7 +799,7 @@ public interface TermBuilder {
             if (f.isEmpty())
                 return src;
 
-            return transform((Compound)src, f);
+            return transform((Compound) src, f);
         } else if (src instanceof Variable) {
             Term x = f.term(src);
             if (x != null)
@@ -791,7 +809,6 @@ public interface TermBuilder {
         return src;
 
     }
-
 
 
 }

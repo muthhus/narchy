@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
  * Created by me on 12/5/15.
  */
 public class EllipsisZeroOrMore extends Ellipsis {
+
     public EllipsisZeroOrMore(@NotNull Variable /*Variable*/ name) {
         super(name);
     }

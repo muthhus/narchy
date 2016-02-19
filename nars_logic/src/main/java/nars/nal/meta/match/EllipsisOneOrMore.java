@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 public class EllipsisOneOrMore extends Ellipsis {
 
     public EllipsisOneOrMore(@NotNull Variable /*Variable*/ name) {
-        super(name);
+        super(name); //TODO decide if EllipsisTransform, a subclass, needs its own uniqueness hashmask
     }
 
 

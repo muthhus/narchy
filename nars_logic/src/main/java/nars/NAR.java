@@ -230,13 +230,14 @@ public abstract class NAR implements Level, Consumer<Task> {
         return i;
     }
 
-    @NotNull
+    @Nullable
     public <T extends Termed> T term(@NotNull String t) throws NarseseException {
 
         T x = (T) Narsese.the().term(t, index());
 
         if (x == null) {
-            NAR.logger.error("Term syntax error: '{}'", t);
+            if (Global.DEBUG)
+                NAR.logger.error("Term syntax error: '{}'", t);
         } else {
 
             //this is applied automatically when a task is entered.
@@ -341,7 +342,10 @@ public abstract class NAR implements Level, Consumer<Task> {
 
     @NotNull
     public NAR believe(@NotNull String termString) throws NarseseException {
-        return believe((Termed) term(termString));
+        Termed term = term(termString);
+        if (term == null)
+            throw new NarseseException(termString);
+        return believe(term);
     }
 
     @NotNull
@@ -417,7 +421,7 @@ public abstract class NAR implements Level, Consumer<Task> {
                     b = (Budgeted) ((Twin) v).getOne();
                 }
             }
-            return b == null ? false : b.summary() > summaryThreshold;
+            return b != null && b.summary() > summaryThreshold;
         });
     }
 

@@ -97,9 +97,9 @@ public class VariableNormalization extends VariableTransform implements Function
 
     @NotNull
     protected Variable newVariable(@NotNull Term v, int serial) {
-        if (v instanceof GenericVariable)
-            return ((GenericVariable)v).normalize(serial); //HACK
-        else if (v instanceof Ellipsis) {
+        if (v instanceof GenericVariable) {
+            return ((GenericVariable) v).normalize(serial); //HACK
+        } else if (v instanceof Ellipsis) {
             return ((Ellipsis)v).clone($.v(v.op(), serial), this);
         } else {
             return $.v(v.op(), serial); //N/A

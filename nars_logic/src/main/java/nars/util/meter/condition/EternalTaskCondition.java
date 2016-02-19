@@ -1,10 +1,7 @@
 package nars.util.meter.condition;
 
 
-import nars.Global;
-import nars.NAR;
-import nars.Narsese;
-import nars.Symbols;
+import nars.*;
 import nars.nal.Tense;
 import nars.task.Task;
 import nars.task.Tasked;
@@ -96,8 +93,9 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
         this.term =
             //Narsese.the().termRaw(
             Narsese.the().term(
-                sentenceTerm
-            );
+                sentenceTerm,
+                $.terms
+            ).term();
         //this.duration = n.memory.duration();
     }
 

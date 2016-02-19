@@ -38,7 +38,7 @@ public abstract class Ellipsis extends Variable {
 
     public static class EllipsisPrototype extends GenericVariable {
 
-        private final int minArity;
+        public final int minArity;
 
         public EllipsisPrototype(Op type, @NotNull GenericVariable target, int minArity) {
             super(type, target.label /* exclude variable type char */
@@ -47,11 +47,17 @@ public abstract class Ellipsis extends Variable {
 
         }
 
+
         @Override
         public
         @NotNull
-        Ellipsis normalize(int serial) {
-            @NotNull Variable v = $.v(op(), serial);
+        @Deprecated Variable normalize(int serial) {
+            return make(serial, minArity);
+        }
+
+        @NotNull
+        public static Ellipsis make(int serial, int minArity) {
+            @NotNull Variable v = $.v(Op.VAR_PATTERN, serial);
             if (minArity == 0) {
                 return new EllipsisZeroOrMore(v);
             } else if (minArity == 1) {
@@ -68,7 +74,7 @@ public abstract class Ellipsis extends Variable {
         public final Term from, to;
 
         public EllipsisTransformPrototype(/*Op type, */GenericVariable name, Term from, Term to) {
-            super(Op.VAR_PATTERN, "Unnormalized_EllipsisTransform(" + from + "," + to + ")");
+            super(Op.VAR_PATTERN, ".." + from + "=" + to + "..+");
             this.name = name;
             this.from = from;
             this.to = to;
