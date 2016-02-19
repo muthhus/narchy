@@ -254,9 +254,9 @@
     (C ==> A), B |-  substituteIfUnifies( C, "$",A,B), (Belief:StructuralAbduction, Desire:Deduction, Order:ForAllSame)
 
 
-// the following two are probably dangerous and dont seem helpful:
-//    (A ==> B), B |- A, (Belief:StructuralDeduction, Desire:Deduction, Order:ForAllSame, Event:Anticipate)
-//    (A ==> B), A |- B, (Belief:StructuralDeduction, Desire:Induction, Order:ForAllSame)
+//todo write temporalizers for this:
+    (A ==> B), B |- A, (Belief:StructuralDeduction, Desire:Deduction, Order:ForAllSame, Event:Anticipate)
+    (A ==> B), A |- B, (Belief:StructuralDeduction, Desire:Induction, Order:ForAllSame)
 
 ////NAL7 specific inference ////////////////////////////////////////////////////////////////////////////////////
 //Reasoning about temporal statements. those are using the ==> relation because relation in time is a relation of the truth between statements.
