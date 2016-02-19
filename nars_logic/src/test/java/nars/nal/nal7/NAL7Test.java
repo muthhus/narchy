@@ -333,6 +333,8 @@ public class NAL7Test extends AbstractNALTester {
         );
 
     }
+
+
     @Test
     public void induction_on_events_with_variable_introduction2()  {
         TestNAR tester = test();

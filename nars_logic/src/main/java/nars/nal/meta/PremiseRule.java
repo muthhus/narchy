@@ -430,6 +430,15 @@ public class PremiseRule extends GenericCompound {
                         case "afterOrEternal":
                             preNext = events.afterOrEternal;
                             break;
+                        case "dt":
+                            temporalize = Temporalize.dt;
+                            break;
+                        case "dtReverse":
+                            temporalize = Temporalize.dtReverse;
+                            break;
+                        case "dtIfEvent":
+                            temporalize = Temporalize.dtIfEvent;
+                            break;
                         case "dtAfter":
                             temporalize = Temporalize.dt;
                             preNext = events.after;

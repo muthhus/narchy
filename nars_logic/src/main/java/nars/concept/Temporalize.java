@@ -37,17 +37,28 @@ public interface Temporalize {
      *  should be used in combination with a "premise Event" precondition
      *  */
     Temporalize dt = (derived, p, d, occReturn) -> {
-        return dt(derived, p, occReturn, +1);
+        return dtBelief(derived, p, occReturn, +1);
     };
     Temporalize dtReverse = (derived, p, d, occReturn) -> {
-        return dt(derived, p, occReturn, -1);
+        return dtBelief(derived, p, occReturn, -1);
+    };
+
+    /** if the premise is an event (and it is allowed to not be) then the dt is the difference
+     * in task and belief occurrence times, and the occurrence time is the belief's.
+     */
+    Temporalize dtIfEvent = (derived, p, d, occReturn) -> {
+        if (!p.premise.isEvent()) {
+            return derived;
+        } else {
+            return dtBelief(derived, p, occReturn, -1);
+        }
     };
 
     @NotNull
-    static Compound dt(Compound derived, PremiseMatch p, long[] occReturn, int polarity) {
+    static Compound dtBelief(Compound derived, PremiseMatch p, long[] occReturn, int polarity) {
         ConceptProcess premise = p.premise;
 
-        occReturn[0] = premise.occurrenceTarget((t, b) -> b); //the belief time, since it will occurr after
+        occReturn[0] = premise.occurrenceTarget((t, b) -> t >= b ? t :b); //latest occurring one
 
         long eventDelta = premise.belief().occurrence() -
                 premise.task().occurrence();

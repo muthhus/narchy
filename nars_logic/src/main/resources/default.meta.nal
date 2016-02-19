@@ -331,14 +331,14 @@
 //// variable introduction ////////////////////////////////////////////////////////////////////////////////////
 //Introduce variables by common subject or predicate
 
-    (S --> M), (P --> M), neq(S,P) |- ((P --> $X) ==> (S --> $X)), (Belief:Abduction),
+    (S --> M), (P --> M), neq(S,P), time(dtIfEvent) |- ((P --> $X) ==> (S --> $X)), (Belief:Abduction),
                                       ((S --> $X) ==> (P --> $X)), (Belief:Induction),
                                       ((P --> $X) <=> (S --> $X)), (Belief:Comparison),
                                       (&&,(S --> #Y),(P --> #Y)), (Belief:Intersection)
 
 
 
-    (M --> S), (M --> P), neq(S,P) |- (($X --> S) ==> ($X --> P)), (Belief:Induction),
+    (M --> S), (M --> P), neq(S,P), time(dtIfEvent) |- (($X --> S) ==> ($X --> P)), (Belief:Induction),
                                       (($X --> P) ==> ($X --> S)), (Belief:Abduction),
                                       (($X --> S) <=> ($X --> P)), (Belief:Comparison),
                                       (&&,(#Y --> S),(#Y --> P)), (Belief:Intersection)

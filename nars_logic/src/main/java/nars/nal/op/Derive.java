@@ -190,7 +190,7 @@ public class Derive extends AtomicStringConstant implements ProcTerm {
                 cp = Operator.argArray((Compound) cp)[0];
             }
 
-            long[] occReturn = new long[1];
+            long[] occReturn = new long[] { ETERNAL };
 
             ct = this.temporalizer.compute(ct,
                     p, this, occReturn
