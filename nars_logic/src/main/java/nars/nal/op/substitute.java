@@ -141,7 +141,7 @@ public class substitute extends ImmediateTermTransform implements PremiseAware {
         else if (type.equals(QUERY_VAR)) o = Op.VAR_QUERY;
             //...else
         else
-            throw new RuntimeException("unrecognizd subst type: " + type);
+            o = null;
         return o;
     }
 

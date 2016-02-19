@@ -5,6 +5,8 @@ import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
+import static nars.Op.Imdex;
+
 /**
  * the indicated relation term is inserted
  * at the index location of the original image
@@ -26,18 +28,34 @@ public enum ImageMatch /*extends ArrayEllipsisMatch<Term>*/ {
     @NotNull
     public static EllipsisMatch put(@NotNull Term[] t, Term relationTerm, @NotNull Compound y) {
 
+        //not sure why this works
+
         int l = t.length;
-        Term[] t2 = new Term[l + 1];
         int yOffset = y.size() - l; //where 't' begins in Y
         int relOffset = y.relation() - yOffset; //where to expect _ in t
         int j = 0;
-        for (Term x : t) {
-            if (j == relOffset)
-                t2[j++] = relationTerm;
-            t2[j++] = x;
+        Term[] t2;
+        if (relOffset > -1) {
+            //insert the relation term
+            t2 = new Term[l+1];
+            for (Term x : t) {
+                if (j == relOffset)
+                    t2[j++] = relationTerm;
+                t2[j++] = x;
+            }
+            if (j < l+1)
+                t2[j] = relationTerm; //it replaces the final position
+        } else {
+            t2 = new Term[l];
+            relOffset = y.indexOf(relationTerm);
+            for (Term x : t) {
+                if (j == relOffset)
+                    t2[j++] = Imdex;
+                else
+                    t2[j++] = x;
+            }
         }
-        if (j < l+1)
-            t2[j] = relationTerm; //it replaces the final position
+
 
         return new EllipsisMatch(t2);
     }
@@ -49,7 +67,7 @@ public enum ImageMatch /*extends ArrayEllipsisMatch<Term>*/ {
 
         //mask the relation term
         Term[] t = m.term;
-        t[imageIndex] = Op.Imdex;
+        t[imageIndex] = Imdex;
         return new EllipsisMatch(t); //needs rehashed; this will be redone with a visitor that applies the Imdex mask on first and only needed construction
     }
 

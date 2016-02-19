@@ -106,9 +106,9 @@ public class Derive extends AtomicStringConstant implements ProcTerm {
             switch (em.size()) {
                 case 1: derivedTerm = em.term(0); //unwrap the item
                     break;
-                case 0: return;
                 default:
-                    throw new RuntimeException("invalid ellipsis match: " + em);
+                    //throw new RuntimeException("invalid ellipsis match: " + em);
+                case 0: return;
             }
         }
 

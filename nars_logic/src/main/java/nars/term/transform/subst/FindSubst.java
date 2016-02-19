@@ -375,13 +375,15 @@ public abstract class FindSubst extends Versioning implements Subst {
                 if (n == null)
                     return false;
 
-                //the indicated term should be inserted
-                //at the index location of the image
-                //being processed. (this is the opposite
-                //of the other condition of this if { })
-                if (matchEllipsedLinear(X, e, Y)) {
-                    EllipsisMatch raw = (EllipsisMatch) term(e);
-                    return replaceXY(e, ImageMatch.put(raw.term, n, Y));
+                if (n != Y) {
+                    //the indicated term should be inserted
+                    //at the index location of the image
+                    //being processed. (this is the opposite
+                    //of the other condition of this if { })
+                    if (matchEllipsedLinear(X, e, Y)) {
+                        EllipsisMatch raw = (EllipsisMatch) term(e);
+                        return replaceXY(e, ImageMatch.put(raw.term, n, Y));
+                    }
                 }
             } else {
                 Term n = resolve(et.from);
