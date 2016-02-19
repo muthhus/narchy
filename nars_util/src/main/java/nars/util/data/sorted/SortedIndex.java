@@ -1,6 +1,8 @@
 package nars.util.data.sorted;
 
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.PrintStream;
 import java.util.Collection;
 import java.util.List;
@@ -49,9 +51,20 @@ public abstract class SortedIndex<T> implements Collection<T> {
     public abstract float score(T v);
 
 
+    public final boolean scoreBetween(int currentIndex, int size, T v) {
+        final float newScore = score(v);
+        return (newScore < scoreAt(currentIndex+1, size)) || //score of item below
+                (newScore > scoreAt(currentIndex-1, size)); //score of item above
+    }
+
     public final float scoreAt(int i, int size) {
         if (i == -1) return Float.POSITIVE_INFINITY;
         if (i == size) return Float.NEGATIVE_INFINITY;
         return score(get(i));
+    }
+
+    public final void reinsert(int currentIndex, T v) {
+        remove(currentIndex);
+        insert(v); //reinsert
     }
 }

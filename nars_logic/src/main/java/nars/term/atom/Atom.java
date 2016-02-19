@@ -13,9 +13,17 @@ import org.jetbrains.annotations.Nullable;
 public class Atom extends AtomicStringConstant {
 
     public final String id;
+    public final int hash;
 
     public Atom(String id) {
+
         this.id = id;
+        this.hash = id.hashCode();
+    }
+
+    @Override
+    public final int hashCode() {
+        return hash;
     }
 
     @Override
@@ -47,22 +55,22 @@ public class Atom extends AtomicStringConstant {
         meta[4] ++; //volume
         meta[5] |= AtomBit;
 
-        return hashCode();
+        return hash;
     }
 
 
 
-    public static int hash(@NotNull String id, @NotNull Op op) {
-        int id1 = id.hashCode();
-
-        /* for Op.ATOM, we use String hashCode() as-is
-          avoiding need to calculate or store a
-          hash mutated by the Op (below) */
-        if (op == Op.ATOM)
-            return id1;
-
-        return Util.hashCombine(id1, op.ordinal());
-    }
+//    public static int hash(@NotNull String id, @NotNull Op op) {
+//        int id1 = id.hashCode();
+//
+//        /* for Op.ATOM, we use String hashCode() as-is
+//          avoiding need to calculate or store a
+//          hash mutated by the Op (below) */
+//        if (op == Op.ATOM)
+//            return id1;
+//
+//        return Util.hashCombine(id1, op.ordinal());
+//    }
 
 
 

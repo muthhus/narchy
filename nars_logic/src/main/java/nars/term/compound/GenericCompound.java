@@ -26,15 +26,21 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     @NotNull
     public final Op op;
 
-    /** subterm vector */
+    /**
+     * subterm vector
+     */
     @NotNull
     public final TermVector<T> subterms;
 
-    /** subterm relation, resolves to unique concept */
+    /**
+     * subterm relation, resolves to unique concept
+     */
     public final int relation;
 
-    /** temporal relation (dt), resolves to same concept */
-    public final int t;
+    /**
+     * temporal relation (dt), resolves to same concept
+     */
+    public final int dt;
 
 
     private final transient int hash;
@@ -51,14 +57,14 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
     public GenericCompound(@NotNull Op op, int relation, int dt, @NotNull TermVector subterms) {
         this.subterms = subterms;
-        this.normalized = (subterms.vars() == 0) && (subterms.varPattern()==0) /* not included in the count */;
+        this.normalized = (subterms.vars() == 0) && (subterms.varPattern() == 0) /* not included in the count */;
         this.op = op;
 
-        if (!op.isTemporal() && dt!=ITERNAL)
+        if (!op.isTemporal() && dt != ITERNAL)
             throw new RuntimeException("invalid temporal relation for " + op);
 
         //t = op.isTemporal() ? t : ITERNAL;
-        this.t = dt;
+        this.dt = dt;
 
         this.relation = relation;
 
@@ -106,32 +112,37 @@ public class GenericCompound<T extends Term> implements Compound<T> {
         TermPrinter.append(this, p, pretty);
     }
 
-    @Override public Compound anonymous() {
+    @Override
+    public Compound anonymous() {
         return this.dt(ITERNAL);
     }
 
     @Override
     public int compareTo(@NotNull Object o) {
-        int r=0;
-        if (this != o) {
-            Termed t = (Termed) o;
-            //int diff = op().compareTo(t.op());
-            int diff = Integer.compare(op.ordinal(), t.op().ordinal());
-            if (diff != 0) r = diff;
-            else {
+        if (this == o) return 0;
 
-                Compound c = (Compound) (t.term());
-                int diff2 = Integer.compare(this.relation, c.relation());
-                if (diff2 != 0) return diff2;
+        Termed t = (Termed) o;
+        //int diff = op().compareTo(t.op());
 
-                int diff3 = Integer.compare(this.t, c.dt());
-                if (diff3 != 0) return diff3;
+        //sort by op and relation first
+        int diff = Integer.compare(opRel(), t.opRel()); //op.ordinal(), t.op().ordinal());
+        if (diff != 0)
+            return diff;
 
-                r= subterms.compareTo(c.subterms());
-            }
-        }
 
-        return r;
+        Compound c = (Compound) (t.term());
+
+//        int diff2 = Integer.compare(this.hash, c.hashCode());
+//        if (diff2 != 0)
+//            return diff2;
+
+
+        int diff3 = Integer.compare(this.dt, c.dt());
+        if (diff3 != 0)
+            return diff3;
+
+        return subterms.compareTo(c.subterms());
+
     }
 
 
@@ -153,18 +164,16 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
     private boolean equalsFurther(@NotNull Termed thatTerm) {
 
-        boolean r=false;
+        boolean r = false;
         Term u = thatTerm.term();
         if ((u.op() == op) /*&& (((t instanceof Compound))*/) {
             Compound c = (Compound) u;
-            r= subterms.equals(c.terms())
+            r = subterms.equals(c.terms())
                     && (relation == c.relation())
-                    && (t == c.dt());
+                    && (dt == c.dt());
         }
         return r;
     }
-
-
 
 
     @Override
@@ -228,7 +237,8 @@ public class GenericCompound<T extends Term> implements Compound<T> {
         subterms.forEach(c);
     }
 
-    @Override public T[] terms() {
+    @Override
+    public T[] terms() {
         return subterms.term;
     }
 
@@ -282,9 +292,13 @@ public class GenericCompound<T extends Term> implements Compound<T> {
         return normalized;
     }
 
-    /** WARNING: this does not perform commutive handling correctly. use the index newTerm method for now */
-    @NotNull @Override public Compound dt(int cycles) {
-        if (cycles == t) return this;
+    /**
+     * WARNING: this does not perform commutive handling correctly. use the index newTerm method for now
+     */
+    @NotNull
+    @Override
+    public Compound dt(int cycles) {
+        if (cycles == dt) return this;
         GenericCompound g = new GenericCompound(op, relation, cycles, subterms);
         if (normalized) g.setNormalized();
         return g;
@@ -292,7 +306,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
     @Override
     public int dt() {
-        return t;
+        return dt;
     }
 
     @Nullable
@@ -306,7 +320,9 @@ public class GenericCompound<T extends Term> implements Compound<T> {
         return relation;
     }
 
-    /** do not call this manually, it will be set by VariableNormalization only */
+    /**
+     * do not call this manually, it will be set by VariableNormalization only
+     */
     public final void setNormalized() {
         this.normalized = true;
     }
@@ -358,8 +374,6 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 //    public final boolean or(Predicate<? super Term> v) {
 //        return v.test(this) || terms.or(v);
 //    }
-
-
 
 
 }

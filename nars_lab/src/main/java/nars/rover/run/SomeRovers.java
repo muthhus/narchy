@@ -94,13 +94,13 @@ public class SomeRovers {
 
     }
 	public static Default newNAR() {
-        int conceptsFirePerCycle = 32;
+        int conceptsFirePerCycle = 24;
         Default nar = new Default(
                 new Memory(clock, new MapIndex2(
-                    //new SoftValueHashMap()
-                    new WeakHashMap()
+                    new SoftValueHashMap()
+                    //new WeakHashMap()
                 )),
-                2000, conceptsFirePerCycle, 3, 4);
+                1024, conceptsFirePerCycle, 2, 3);
 
         //nar.logSummaryGT(System.out, 0f);
 //        nar.log(System.out, x -> {

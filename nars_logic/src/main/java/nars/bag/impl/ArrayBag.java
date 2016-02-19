@@ -226,6 +226,8 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
 
         if (existing != null) {
 
+            //its already here
+
             if (existing!=b)
                 merge(existing, b, scale);
 
@@ -284,37 +286,29 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
         if (!v.hasDelta()) {
             return;
         }
+
         int size = size();
         if (size == 1) {
+            //its the only item
             v.commit();
-            /*if (!v.commit()) {
-
-            }*/
             return;
         }
 
         SortedIndex ii = this.items;
 
         int currentIndex = ii.locate(v);
+
+        v.commit(); //after finding where it was, apply its updates to find where it will be next
+
         if (currentIndex == -1) {
             //an update for an item which has been removed already. must be re-inserted
-            v.commit();
             put(v.get(), v);
-            return;
+        } else if (ii.scoreBetween(currentIndex, size, v)) { //has position changed?
+            ii.reinsert(currentIndex, v);
         }
-
-        v.commit();
-
-        float newScore = ii.score(v);
-
-        if ((newScore < ii.scoreAt(currentIndex+1, size)) || //score of item below
-                (newScore > ii.scoreAt(currentIndex-1, size)) //score of item above
-            ) {
-            ii.remove(currentIndex);
-            ii.insert(v); //reinsert
-        } else {
-            //otherwise, it remains in the same position and move unnecessary
-        }
+        /*} else {
+            //otherwise, it remains in the same position and a move is unnecessary
+        }*/
     }
 
     protected final BLink<V> removeHighest() {

@@ -24,12 +24,20 @@ public final class Operator<T extends Term> extends AtomicStringConstant {
     @NotNull
     private final String str;
 
+    private final int hash;
+
     public Operator(@NotNull T the) {
         this(the.toString());
     }
 
     public Operator(@NotNull String the) {
         this.str = (the.charAt(0)!=Op.OPERATOR.ch ? Op.OPERATOR.ch + the : the); //prepends ^ if necessary
+        this.hash = str.hashCode();
+    }
+
+    @Override
+    public final int hashCode() {
+        return hash;
     }
 
     /** returns the Product arguments compound of an operation. does not check if the input is actually an operation */

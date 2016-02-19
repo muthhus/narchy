@@ -28,7 +28,7 @@ public abstract class AtomicString extends Atomic {
     }
 
     @Override
-    public final int hashCode() {
+    public int hashCode() {
         return toString().hashCode();
     }
 
