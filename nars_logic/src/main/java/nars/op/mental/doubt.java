@@ -22,10 +22,8 @@ import nars.NAR;
 import nars.Symbols;
 import nars.budget.Budget;
 import nars.concept.Concept;
-import nars.concept.DefaultConcept;
 import nars.concept.util.BeliefTable;
-import nars.concept.util.TaskTable;
-import nars.nal.nal8.Execution;
+import nars.nal.nal8.Operator;
 import nars.nal.nal8.operator.SyncOperator;
 import nars.task.Task;
 import nars.term.Term;
@@ -44,19 +42,19 @@ public class doubt extends SyncOperator {
      * @return Immediate results as Tasks
      */
     @Override
-    public void execute(@NotNull Execution execution) {
+    public void execute(@NotNull Task execution) {
 
-        execution.nar.runLater(()->{
-            Task operation = execution.task;
-            Term term = execution.argArray()[0];
+        nar.runLater(()->{
+            Task operation = execution;
+            Term term = Operator.argArray(execution.term())[0];
             Budget b = operation.budget();
 
-            Concept concept = execution.nar.conceptualize(term, b, 1f);
+            Concept concept = nar.conceptualize(term, b, 1f);
             if (concept!=null) {
                 discountBeliefConfidence(concept, operation.punc(),
                         //TODO use min/max parameters somehow
                         0.5f + (1f - operation.motivation()),
-                        execution.nar);
+                        nar);
             }
 
         });

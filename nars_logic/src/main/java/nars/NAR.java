@@ -2,7 +2,6 @@ package nars;
 
 
 import com.google.common.collect.Sets;
-import com.google.common.io.Files;
 import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
 import nars.Narsese.NarseseException;
@@ -12,7 +11,6 @@ import nars.concept.Concept;
 import nars.nal.Level;
 import nars.nal.Tense;
 import nars.nal.nal8.AbstractOperator;
-import nars.nal.nal8.Execution;
 import nars.nal.nal8.Operator;
 import nars.nal.nal8.PatternAnswer;
 import nars.nal.nal8.operator.TermFunction;
@@ -38,7 +36,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -503,24 +500,7 @@ public abstract class NAR implements Level, Consumer<Task> {
         }
 
 
-        Topic<Execution> tt = memory.exe.get(
-                Operator.operator((Compound) goalTerm)
-        );
-
-        boolean executed = (tt != null && !tt.isEmpty());
-        if (executed) {
-            //beforeNextFrame( //<-- enqueue after this frame, before next
-            new Execution(this, goal, tt).run();
-
-//            if (!inputGoal.isEternal()) {
-//                //execution drains temporal task's budget in proportion to durability
-//                Budget inputGoalBudget = inputGoal.budget();
-//                inputGoalBudget.priMult(1f - inputGoalBudget.dur());
-//            }
-
-        }
-
-        return executed;
+        return goal.execute(this);
 
         /*else {
             System.err.println("Unexecutable: " + goal);
@@ -600,23 +580,24 @@ public abstract class NAR implements Level, Consumer<Task> {
     }
 
     public On onExec(@NotNull AbstractOperator r) {
+        r.init(this);
         return onExecution(r.getOperatorTerm(), r);
     }
 
 
     public On onExec(@NotNull String op, @NotNull Consumer<Term[]> each) {
         return onExecution($.operator(op), e -> {
-            each.accept(e.argArray());
+            each.accept(Operator.argArray(e.term()));
         });
     }
 
-    public On onExecution(@NotNull String op, @NotNull Consumer<Execution> each) {
+    public On onExecution(@NotNull String op, @NotNull Consumer<Task> each) {
         return onExecution($.operator(op), each);
     }
 
-    public On onExecution(@NotNull Operator op, @NotNull Consumer<Execution> each) {
+    public On onExecution(@NotNull Operator op, @NotNull Consumer<Task> each) {
         return memory.exe.computeIfAbsent(op,
-                o -> new DefaultTopic<Execution>())
+                o -> new DefaultTopic<Task>())
                 .on(each);
     }
 

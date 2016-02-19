@@ -119,7 +119,7 @@ public enum Forget { ;
             if (forgetProportion >= 1.0f) {
                 //total drain; simplification of the complete LERP formula
                 newPriority = minPriorityForgettingCanAffect;
-            } if (forgetProportion <= 0f) {
+            } else if (forgetProportion <= 0f) {
                 //??
                 newPriority = currentPriority;
             } else {

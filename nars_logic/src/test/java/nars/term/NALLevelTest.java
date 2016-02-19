@@ -4,7 +4,7 @@ package nars.term;
 import nars.Global;
 import nars.NAR;
 import nars.nar.Default;
-import nars.util.meter.EventCount;
+import nars.util.signal.EventCount;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

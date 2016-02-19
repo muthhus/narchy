@@ -30,7 +30,7 @@ public class CommandTest {
             public void execute(Execution execution) {
 
                 invoked.set(true);
-                Term[] a = Operator.opArgsArray(execution.term());
+                Term[] a = Operator.argArray(execution.term());
                 assertEquals(1, a.length);
                 assertEquals("x", a[0].toString());
 

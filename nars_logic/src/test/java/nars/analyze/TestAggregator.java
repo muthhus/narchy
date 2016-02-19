@@ -2,7 +2,7 @@ package nars.analyze;
 
 import nars.NAR;
 import nars.nar.Default;
-import nars.util.meter.MemoryBudget;
+import nars.util.signal.MemoryBudget;
 import org.junit.runner.Description;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;

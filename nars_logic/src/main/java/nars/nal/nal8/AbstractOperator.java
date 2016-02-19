@@ -22,6 +22,8 @@
 package nars.nal.nal8;
 
 import nars.$;
+import nars.NAR;
+import nars.task.Task;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,11 +32,13 @@ import java.util.function.Consumer;
 /**
  * An operator implementation
  */
-public abstract class AbstractOperator implements Consumer<Execution> {
+public abstract class AbstractOperator implements Consumer<Task> {
 
 
     @NotNull
     public final Operator operatorTerm;
+
+    protected NAR nar; //TODO make private
 
     @NotNull
     @Override
@@ -66,7 +70,7 @@ public abstract class AbstractOperator implements Consumer<Execution> {
 
 
     @Override
-    public void accept(@NotNull Execution execution) {
+    public void accept(@NotNull Task execution) {
         _execute(execution);        
     }
 
@@ -84,17 +88,17 @@ public abstract class AbstractOperator implements Consumer<Execution> {
      * @param op     The operate to be executed
      * @return true if successful, false if an error occurred
      */
-    public final void _execute(@NotNull Execution execution) {
+    public final void _execute(@NotNull Task execution) {
         if (async()) {
             //asynch
-            execution.nar.runAsync(() -> execute(execution));
+            nar.runAsync(() -> execute(execution));
         } else {
             //synchronous
             execute(execution);
         }
     }
 
-    public abstract void execute(Execution execution);
+    public abstract void execute(Task execution);
 
 //    {
 //        try {
@@ -121,6 +125,11 @@ public abstract class AbstractOperator implements Consumer<Execution> {
     @Nullable
     public final Operator getOperatorTerm() {
         return operatorTerm;
+    }
+
+    /** this will be called prior to any execution */
+    public void init(NAR nar) {
+        this.nar = nar;
     }
 
 

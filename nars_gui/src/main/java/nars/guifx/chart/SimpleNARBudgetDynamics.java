@@ -13,7 +13,7 @@ import nars.guifx.util.POJOPane;
 import nars.nar.Default;
 import nars.task.Task;
 import nars.term.Term;
-import nars.util.meter.MemoryBudget;
+import nars.util.signal.MemoryBudget;
 
 import java.util.HashMap;
 import java.util.Map;

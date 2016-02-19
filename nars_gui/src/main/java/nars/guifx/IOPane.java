@@ -11,6 +11,7 @@ import javafx.scene.web.WebView;
 import nars.NAR;
 import nars.guifx.nars.TaskButton;
 import nars.guifx.util.NSlider;
+import nars.nal.nal8.Operator;
 import nars.task.Task;
 import nars.term.Term;
 import nars.term.atom.Atom;
@@ -101,7 +102,7 @@ public class IOPane extends BorderPane /*implements FXIconPaneBuilder*/ {
             super.appear();
             On commands = nar.onExecution("html", (e) -> {
 
-                Term[] a = e.argArray();
+                Term[] a = Operator.argArray(e.term());
                 String content = ((Atom)a[0]).toStringUnquoted();
 
                 runLater(() -> {

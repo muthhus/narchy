@@ -27,24 +27,24 @@ import static nars.Op.PRODUCT;
  * and utility methods for extracting features
  * of the operation task in the context of the executing NAR.
  */
-public class Execution implements Runnable {
+public interface Execution  {
 
     //private static final Logger logger = LoggerFactory.getLogger(Execution.class);
 
-    public final static float feedbackPriorityMultiplier = 1.0f;
-    public final static float feedbackDurabilityMultiplier = 1.0f;
-    public static final GenericVariable defaultResultVariable = $.varDep("defaultResultVariable");
-    public final NAR nar;
-    public final Task task;
-    private final Topic<Execution> listeners;
+    float feedbackPriorityMultiplier = 1.0f;
+    float feedbackDurabilityMultiplier = 1.0f;
+    GenericVariable defaultResultVariable = $.varDep("defaultResultVariable");
+//    public final NAR nar;
+//    public final Task task;
 
-    public Execution(NAR nar, Task task, Topic<Execution> listeners) {
-        this.nar = nar;
-        this.task = task;
-        this.listeners = listeners;
-    }
+//    public Execution(NAR nar, Task task, Topic<Execution> listeners) {
+//        this.nar = nar;
+//        this.task = task;
+//
 
-    public static MutableTask result(@NotNull NAR nar, @NotNull Task goal, Term y/*, Term[] x0, Term lastTerm*/, @NotNull Tense tense) {
+//    }
+
+    static MutableTask result(@NotNull NAR nar, @NotNull Task goal, Term y/*, Term[] x0, Term lastTerm*/, @NotNull Tense tense) {
 
         Compound operation = goal.term();
 
@@ -142,30 +142,22 @@ public class Execution implements Runnable {
         //return $.exec(Operator.operatorTerm(operation), x);
     }
 
-    /**
-     * should only be called by NAR
-     */
-    @Override
-    public final void run() {
-        //if (task.getDeleted()) return; //in case it was delayed and got deleted in the meantime
-        listeners.emit(this);
-    }
 
-    public final Compound term() {
-        return task.term();
-    }
+//    public final Compound term() {
+//        return task.term();
+//    }
 
     /**
      * unwrapped (without ^)
      */
-    @NotNull
-    public final Operator operator() {
-        return Operator.operator(term());
-    }
-
-    public final Term[] argArray() {
-        return Operator.opArgsArray(term());
-    }
+//    @NotNull
+//    public final Operator operator() {
+//        return Operator.operator(term());
+//    }
+//
+//    public final Term[] argArray() {
+//        return Operator.opArgsArray(term());
+//    }
 
 
     //arg(int i)
@@ -175,10 +167,9 @@ public class Execution implements Runnable {
     //feedback(Task[] t)
     //feedback(Object o)
 
-    public final void feedback(Task feedback) {
-        NAR n = this.nar;
+    static void feedback(Task cause, Task feedback, NAR n) {
         n.input(
-            noticeExecuted(n, task),
+            noticeExecuted(n, cause),
             feedback
         );
     }
@@ -188,7 +179,7 @@ public class Execution implements Runnable {
      *
      * @param operation
      */
-    public static Task noticeExecuted(@NotNull NAR nar, @NotNull Task operation) {
+    static Task noticeExecuted(@NotNull NAR nar, @NotNull Task operation) {
 
         Budget b = !operation.isDeleted() ? operation.budget() : UnitBudget.zero;
 

@@ -9,14 +9,14 @@ import nars.NAR;
 import nars.Symbols;
 import nars.concept.Concept;
 import nars.data.Range;
-import nars.java.MethodOperator;
-import nars.java.Lobjects;
+import nars.op.sys.java.MethodOperator;
+import nars.op.sys.java.Lobjects;
 import nars.nar.Default;
 import nars.task.Task;
 import nars.term.Termed;
 import nars.util.data.MutableInteger;
-import nars.learn.NarQ;
-import nars.learn.NarQ.InputTask;
+import nars.op.sys.NarQ;
+import nars.op.sys.NarQ.InputTask;
 import org.apache.commons.lang3.mutable.MutableFloat;
 
 import java.util.ArrayList;

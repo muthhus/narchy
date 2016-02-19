@@ -81,8 +81,14 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
 //        top(c -> (each.test(c) && (toFire[0]--) > 0));
 
 
+    default Bag<V> sample(float percent, Consumer<? super BLink<V>> target) {
+        int n = (int)Math.ceil(percent * size());
+        sample(n, target);
+        return this;
+    }
+
     @NotNull
-    Bag<V> sample(int n, Collection<? super BLink<V>> target);
+    Bag<V> sample(int n, Consumer<? super BLink<V>> target);
 //    /**
 //     * fills a collection with at-most N items, if an item passes the predicate.
 //     * returns how many items added

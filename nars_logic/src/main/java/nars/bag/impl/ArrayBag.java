@@ -116,7 +116,7 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
 
     @NotNull
     @Override
-    public Bag<V> sample(int n, Collection<? super BLink<V>> target) {
+    public Bag<V> sample(int n, Consumer<? super BLink<V>> target) {
         throw new RuntimeException("unimpl");
     }
 

@@ -20,6 +20,7 @@ package nars.op.mental;
 import nars.$;
 import nars.NAR;
 import nars.nal.nal8.Execution;
+import nars.task.Task;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,10 +36,9 @@ public class feelBusy extends feel {
      * To get the current value of an internal sensor
      */
     @Override
-    public void execute(@NotNull Execution e) {
-        NAR n = e.nar;
-        e.feedback(
-            feeling(n.memory.emotion.busy(), n, business)
+    public void execute(@NotNull Task e) {
+        Execution.feedback(e,
+            feeling(nar.memory.emotion.busy(), nar, business), nar
         );
     }
 

@@ -2,6 +2,7 @@ package nars.op.mental;
 
 import nars.nal.nal8.Execution;
 import nars.nal.nal8.operator.SyncOperator;
+import nars.task.Task;
 
 /**
  * Counting and Cardinality
@@ -10,7 +11,7 @@ import nars.nal.nal8.operator.SyncOperator;
 public class Counting extends SyncOperator {
 
     @Override
-    public void execute(Execution execution) {
+    public void execute(Task execution) {
         //TODO upgrade code below to new api
     }
 

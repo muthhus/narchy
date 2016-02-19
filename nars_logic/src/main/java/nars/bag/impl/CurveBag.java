@@ -5,6 +5,8 @@ import nars.bag.BLink;
 import nars.bag.Bag;
 import nars.budget.Budget;
 import nars.budget.BudgetMerge;
+import nars.util.data.FastBitSet;
+import nars.util.data.list.FasterList;
 import nars.util.data.sorted.SortedIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -127,7 +129,7 @@ public class CurveBag<V> implements Bag<V> {
      * */
     @NotNull
     @Override
-    public CurveBag<V> sample(int n, @NotNull Collection<? super BLink<V>> target) {
+    public CurveBag<V> sample(int n, @NotNull Consumer<? super BLink<V>> target) {
 
         int ss = size();
         final int begin, end;
@@ -140,9 +142,13 @@ public class CurveBag<V> implements Bag<V> {
             end = begin + n;
         }
 
+        //BLink<V>[] ll = ((FasterList<BLink<V>>) arrayBag.items.list()).array();
         List<BLink<V>> l = arrayBag.items.list();
         for (int i = begin; i < end; i++) {
-            target.add(l.get(i));
+            target.accept(
+                //ll[i]
+                l.get(i)
+            );
         }
 
         return this;

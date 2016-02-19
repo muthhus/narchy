@@ -17,10 +17,10 @@ import nars.rover.robot.NARover;
 import nars.rover.world.FoodSpawnWorld1;
 import nars.term.index.MapIndex2;
 import nars.time.SimulatedClock;
-import nars.learn.NarQ;
-import nars.learn.NarQ.BeliefReward;
-import nars.learn.NarQ.InputTask;
-import nars.learn.NarQ.NotBeliefReward;
+import nars.op.sys.NarQ;
+import nars.op.sys.NarQ.BeliefReward;
+import nars.op.sys.NarQ.InputTask;
+import nars.op.sys.NarQ.NotBeliefReward;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jbox2d.common.Vec2;
 import org.jetbrains.annotations.NotNull;
@@ -93,7 +93,7 @@ public class SomeRovers {
 
     }
 	public static Default newNAR() {
-        int conceptsFirePerCycle = 8;
+        int conceptsFirePerCycle = 32;
         Default nar = new Default(
                 new Memory(clock, new MapIndex2(
                         new SoftValueHashMap())),

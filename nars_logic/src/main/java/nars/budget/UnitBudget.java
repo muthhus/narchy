@@ -38,6 +38,8 @@ public class UnitBudget extends Budget {
 
     //common instance for a 'deleted budget'.  TODO use a wrapper class to make it unmodifiable
     public static final Budget deleted = new UnitBudget();
+    public static final Budget One = new UnitBudget(1f,1f,1f);
+
     static {  deleted.delete(); }
 
     //common instance for a 'zero budget'.  TODO use a wrapper class to make it unmodifiable

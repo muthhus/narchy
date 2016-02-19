@@ -2,9 +2,12 @@ package nars.task;
 
 import nars.Global;
 import nars.Memory;
+import nars.NAR;
 import nars.budget.UnitBudget;
 import nars.concept.Concept;
 import nars.nal.Tense;
+import nars.nal.nal8.Execution;
+import nars.nal.nal8.Operator;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -12,6 +15,7 @@ import nars.truth.DefaultTruth;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import nars.util.data.Util;
+import nars.util.event.Topic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -238,7 +242,7 @@ public abstract class AbstractTask extends UnitBudget
 
         //hash = rehash();
 
-        onNormalized(memory);
+        onInput(memory);
 
         return this;
     }
@@ -257,9 +261,36 @@ public abstract class AbstractTask extends UnitBudget
         state = TaskState.Executed;
     }
 
-    /** can be overridden in subclasses to handle this event */
-    protected void onNormalized(Memory m) {
+    /** if validated and entered into the system. can be overridden in subclasses to handle this event */
+    protected void onInput(Memory m) {
 
+    }
+
+    /** when executed; can be overridden in subclasses to handle this event;
+     *  returns whether there was any activity executed
+     * */
+    @Override public boolean execute(NAR n) {
+
+        //DEFAULT EXECUTION PROCEDURE: trigger listener reactions
+
+        Topic<Task> tt = n.memory.exe.get(
+            Operator.operator(term())
+        );
+
+        boolean executable = (tt != null && !tt.isEmpty());
+        if (executable) {
+            //beforeNextFrame( //<-- enqueue after this frame, before next
+
+            tt.emit(this);
+
+//            if (!inputGoal.isEternal()) {
+//                //execution drains temporal task's budget in proportion to durability
+//                Budget inputGoalBudget = inputGoal.budget();
+//                inputGoalBudget.priMult(1f - inputGoalBudget.dur());
+//            }
+
+        }
+        return executable;
     }
 
     protected final void setPunctuation(char punctuation) {

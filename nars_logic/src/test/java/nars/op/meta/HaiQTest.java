@@ -1,9 +1,9 @@
 package nars.op.meta;
 
 import nars.NAR;
-import nars.java.Lobjects;
+import nars.op.sys.java.Lobjects;
 import nars.nar.Default;
-import nars.learn.NarQ;
+import nars.op.sys.NarQ;
 import org.junit.Ignore;
 import org.junit.Test;
 

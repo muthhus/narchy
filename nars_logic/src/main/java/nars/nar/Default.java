@@ -365,7 +365,7 @@ public class Default extends AbstractNAR {
             if (conceptsToFire == 0 || b.isEmpty()) return;
 
             List<BLink<Concept>> f = this.firing;
-            b.sample(conceptsToFire, f);
+            b.sample(conceptsToFire, f::add);
 
             int tasklinksToFire = tasklinksFiredPerFiredConcept.intValue();
             int termlnksToFire = termlinksFiredPerFiredConcept.intValue();

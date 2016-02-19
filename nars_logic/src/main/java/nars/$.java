@@ -5,7 +5,7 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.ConsoleAppender;
-import nars.java.AtomObject;
+import nars.op.sys.java.AtomObject;
 import nars.nal.Tense;
 import nars.nal.meta.match.VarPattern;
 import nars.nal.nal8.Operator;

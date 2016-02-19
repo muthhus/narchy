@@ -182,7 +182,7 @@ public class Derive extends AtomicStringConstant implements ProcTerm {
 
             if (Op.isOperation(cp) && p.transforms.containsKey( Operator.operator((Compound) cp) ) ) {
                 //unwrap operation from conclusion pattern; the pattern we want is its first argument
-                cp = Operator.opArgsArray((Compound) cp)[0];
+                cp = Operator.argArray((Compound) cp)[0];
             }
 
             ct = premise.temporalize(ct,

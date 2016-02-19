@@ -8,7 +8,7 @@ import nars.guifx.StatusPane;
 import nars.guifx.chart.PlotBox;
 import nars.guifx.util.NSlider;
 import nars.nar.Default;
-import nars.util.meter.MemoryBudget;
+import nars.util.signal.MemoryBudget;
 
 /**
  * Created by me on 10/10/15.

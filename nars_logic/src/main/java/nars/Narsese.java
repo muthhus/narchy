@@ -18,7 +18,7 @@ import nars.nal.meta.PremiseRule;
 import nars.nal.meta.match.*;
 import nars.nal.nal8.Operator;
 import nars.nal.nal8.operator.ImmediateOperator;
-import nars.op.io.echo;
+import nars.op.out.echo;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.*;

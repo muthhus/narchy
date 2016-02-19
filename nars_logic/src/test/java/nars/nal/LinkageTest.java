@@ -9,7 +9,7 @@ import nars.nar.Default;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.util.graph.TermLinkGraph;
-import nars.util.meter.TestNAR;
+import nars.util.signal.TestNAR;
 import org.jetbrains.annotations.NotNull;
 import org.jgrapht.alg.StrongConnectivityInspector;
 import org.junit.Test;

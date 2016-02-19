@@ -46,8 +46,8 @@ import nars.time.Clock;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.event.DefaultTopic;
 import nars.util.event.Topic;
-import nars.util.meter.EmotionMeter;
-import nars.util.meter.LogicMeter;
+import nars.util.signal.EmotionMeter;
+import nars.util.signal.LogicMeter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -108,7 +108,7 @@ public class Memory extends Param {
     /** executables (incl. operators).
      * keys in this map should be OPERATOR (^something)
      * */
-    public final transient Map<Operator, Topic<Execution>> exe = new HashMap();
+    public final transient Map<Operator, Topic<Task>> exe = new HashMap();
 
 
 

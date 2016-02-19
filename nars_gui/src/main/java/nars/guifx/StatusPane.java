@@ -4,7 +4,7 @@ import nars.NAR;
 import nars.guifx.chart.Plot2D;
 import nars.guifx.chart.PlotBox;
 import nars.util.event.FrameReaction;
-import nars.util.meter.MemoryBudget;
+import nars.util.signal.MemoryBudget;
 
 /**
  * Created by me on 9/6/15.

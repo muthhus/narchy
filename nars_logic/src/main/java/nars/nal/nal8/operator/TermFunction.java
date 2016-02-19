@@ -69,8 +69,8 @@ public abstract class TermFunction<O> extends SyncOperator {
 
 
     @Nullable
-    protected MutableTask result(@NotNull Execution e, Term y/*, Term[] x0, Term lastTerm*/) {
-        return Execution.result(e.nar, e.task, y, getResultTense());
+    protected MutableTask result(@NotNull Task e, Term y/*, Term[] x0, Term lastTerm*/) {
+        return Execution.result(nar, e, y, getResultTense());
     }
 
     /** default tense applied to result tasks */
@@ -141,24 +141,23 @@ public abstract class TermFunction<O> extends SyncOperator {
 
 
     @Override
-    public void execute(@NotNull Execution e) {
-        final Task tt = e.task;
+    public void execute(@NotNull Task tt) {
         final Compound ttt = tt.term();
         final Compound args = Operator.opArgs(ttt);
         if (!tt.isCommand()) {
             if (!validArgs(args))
                 return;
         }
-        O y = function(args, e.nar.index());
+        O y = function(args, nar.index());
         if (!tt.isCommand()) {
-            feedback(e, y);
+            feedback(tt, y);
         }
     }
 
-    protected void feedback(@NotNull Execution e, @Nullable Object y) {
+    protected void feedback(@NotNull Task cause, @Nullable Object y) {
 
         if (y == null || (y instanceof Term)) {
-            e.feedback( result(e, (Term) y) );
+            Execution.feedback( cause, result(cause, (Term) y), nar );
             return;
         }
 
@@ -168,7 +167,7 @@ public abstract class TermFunction<O> extends SyncOperator {
         }
 
         if (y instanceof Truth) {
-            e.feedback( result(e, null).truth((Truth)y) );
+            Execution.feedback( cause, result(cause, null).truth((Truth)y), nar );
             return;
         }
 
@@ -176,9 +175,9 @@ public abstract class TermFunction<O> extends SyncOperator {
             Task ty = (Task)y;
             if (ty.pri() == 0) {
                 //set a resulting zero budget to the input task's
-                ty.budget().set(e.task.budget());
+                ty.budget().set(cause.budget());
             }
-            e.feedback( (Task)y );
+            Execution.feedback( cause, (Task)y, nar );
             return;
         }
 
@@ -194,9 +193,9 @@ public abstract class TermFunction<O> extends SyncOperator {
         char mustBePuncToBeTask = ys.charAt(ys.length()-1); //early prevention from invoking parser
         if (isPunctuation(mustBePuncToBeTask) || mustBePuncToBeTask == ':' /* tense ending character */) {
             try {
-                Task t = e.nar.task(ys);
+                Task t = nar.task(ys);
                 if (t != null) {
-                    e.feedback( t );
+                    Execution.feedback(cause, t, nar );
                     return;
                 }
             } catch (Throwable t) {
@@ -209,7 +208,7 @@ public abstract class TermFunction<O> extends SyncOperator {
         Term t = $.the(ys, true);
 
         if (t != null) {
-            e.feedback( result(e, t/*, x, lastTerm*/) );
+            Execution.feedback( cause, result(cause, t/*, x, lastTerm*/), nar );
             return;
         }
 

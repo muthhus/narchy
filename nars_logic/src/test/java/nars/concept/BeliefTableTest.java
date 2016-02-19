@@ -7,8 +7,8 @@ import nars.nar.AbstractNAR;
 import nars.nar.Default;
 import nars.task.Task;
 import nars.truth.DefaultTruth;
-import nars.util.meter.BeliefAnalysis;
-import nars.util.meter.MemoryBudget;
+import nars.util.signal.BeliefAnalysis;
+import nars.util.signal.MemoryBudget;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

@@ -1,8 +1,10 @@
 package nars.nal.nal8;
 
 import nars.Op;
+import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -35,8 +37,12 @@ public final class Operator<T extends Term> extends AtomicStringConstant {
         return (Compound) operation.term(0);
     }
 
+//    @NotNull public static Compound opArgs(@NotNull Termed<Compound> t) {
+//        return opArgs((Compound)t.term());
+//    }
+
     /** returns the terms array of the arguments of an operation. does not check if the input is actually an operation */
-    @NotNull public static Term[] opArgsArray(@NotNull Compound term) {
+    @NotNull public static Term[] argArray(@NotNull Compound term) {
         return opArgs(term).terms();
     }
 

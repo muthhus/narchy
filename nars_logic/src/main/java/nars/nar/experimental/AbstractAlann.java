@@ -2,7 +2,7 @@ package nars.nar.experimental;
 
 import nars.Memory;
 import nars.nar.AbstractNAR;
-import nars.op.app.Commander;
+import nars.op.sys.Commander;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
 

@@ -81,12 +81,12 @@ abstract public class PremiseGenerator extends UnifySubst implements Function<Te
 
         Collection<BLink<Task>> tasksBuffer = this.tasks;
         //concept.getTaskLinks().sample(tasklinks, eachTaskLink, tasksBuffer).commit();
-        concept.tasklinks().filter(eachTaskLink).sample(tasklinks, tasksBuffer);
+        concept.tasklinks().filter(eachTaskLink).sample(tasklinks, tasksBuffer::add);
         if (tasksBuffer.isEmpty()) return;
 
         Collection<BLink<Termed>> termsBuffer = this.terms;
         //concept.getTermLinks().sample(termlinks, eachTermLink, termsBuffer).commit();
-        concept.termlinks().forEachThen(eachTermLink).sample(termlinks, termsBuffer);
+        concept.termlinks().forEachThen(eachTermLink).sample(termlinks, termsBuffer::add);
         if (termsBuffer.isEmpty()) return;
 
         //convert to array for fast for-within-for iterations

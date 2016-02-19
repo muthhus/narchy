@@ -44,7 +44,7 @@ public class length extends TermFunction<Integer> {
 
     @Override
     public Integer function(@NotNull Compound o, TermBuilder i) {
-        Term[] x = Operator.opArgsArray(o);
+        Term[] x = Operator.argArray(o);
         Term content = x[0];
         /*if (!(content instanceof SetExt) && !(content instanceof SetInt)) {
             throw new RuntimeException("Requires 1 SetExt or SetInt argument");

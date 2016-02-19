@@ -3,13 +3,12 @@ package nars.io;
 import nars.*;
 import nars.nal.nal8.Operator;
 import nars.nar.Terminal;
-import nars.op.io.echo;
+import nars.op.out.echo;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.variable.GenericVariable;
-import nars.term.variable.Variable;
 import nars.truth.Truth;
 import org.junit.Test;
 
@@ -255,7 +254,7 @@ public class NarseseTest {
 
 
     protected void testBelieveAB(Compound t) {
-        Term[] aa = Operator.opArgsArray(t);
+        Term[] aa = Operator.argArray(t);
         assertEquals(2, aa.length);
         assertEquals("^believe", t.term(1).toString());
         assertEquals("^believe", Operator.operator(t).toString());

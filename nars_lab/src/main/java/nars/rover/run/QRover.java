@@ -1,6 +1,6 @@
 package nars.rover.run;
 
-import nars.learn.HaiQ;
+import nars.util.learn.HaiQ;
 import nars.rover.Material;
 import nars.rover.obj.VisionRay;
 import nars.rover.robot.AbstractPolygonBot;

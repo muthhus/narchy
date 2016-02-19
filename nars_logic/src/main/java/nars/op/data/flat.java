@@ -26,7 +26,7 @@ public abstract class flat extends TermFunction {
     @Override
     public Term function(@NotNull Compound op, TermBuilder i) {
         List<Term> l = new ArrayList();
-        collect(Operator.opArgsArray(op), l);
+        collect(Operator.argArray(op), l);
         return result(l);
     }
 

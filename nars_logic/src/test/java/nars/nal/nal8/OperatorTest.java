@@ -11,7 +11,7 @@ import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.transform.subst.Subst;
-import nars.util.meter.TestNAR;
+import nars.util.signal.TestNAR;
 import org.junit.Test;
 
 import java.util.List;

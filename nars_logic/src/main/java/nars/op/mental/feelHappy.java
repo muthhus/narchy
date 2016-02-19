@@ -20,6 +20,7 @@ package nars.op.mental;
 import nars.$;
 import nars.NAR;
 import nars.nal.nal8.Execution;
+import nars.task.Task;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,12 +36,12 @@ public class feelHappy extends feel {
      * @return Immediate results as Tasks
      */
     @Override
-    public void execute(@NotNull Execution e) {
-        NAR n = e.nar;
-        e.feedback(
+    public void execute(@NotNull Task e) {
+        NAR n = nar;
+        Execution.feedback(e,
                 feeling(n.memory.emotion.happy(),
                         n,
-                        happiness)
+                        happiness), n
         );
     }
 }

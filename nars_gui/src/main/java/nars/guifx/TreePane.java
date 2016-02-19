@@ -11,7 +11,7 @@ import nars.NAR;
 import nars.guifx.nars.TaskLabel;
 import nars.guifx.util.NSlider;
 import nars.nal.nal8.operator.ImmediateOperator;
-import nars.op.io.echo;
+import nars.op.out.echo;
 import nars.task.Task;
 import nars.util.event.FrameReaction;
 

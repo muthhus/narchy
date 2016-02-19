@@ -2,7 +2,7 @@ package nars.util.sort;
 
 import nars.bag.impl.ArrayBag;
 import nars.util.ArraySortedIndex;
-import nars.util.meter.bag.NullItem;
+import nars.util.signal.bag.NullItem;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;

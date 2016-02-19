@@ -3,7 +3,7 @@ package nars.op.scheme;
 
 import nars.NAR;
 import nars.nal.AbstractNALTester;
-import nars.util.meter.TestNAR;
+import nars.util.signal.TestNAR;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
