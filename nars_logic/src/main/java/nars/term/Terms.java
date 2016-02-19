@@ -6,7 +6,6 @@ import nars.Global;
 import nars.Op;
 import nars.term.container.TermContainer;
 import nars.util.Texts;
-import nars.util.data.Util;
 import nars.util.data.sorted.SortedList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -410,8 +409,8 @@ public enum Terms {
         Op aop = a.op();
         if (aop !=b.op()) return 0f;
         if (aop.isTemporal()) {
-            int at = a.t();
-            int bt = b.t();
+            int at = a.dt();
+            int bt = b.dt();
             if (at != bt) {
                 if ((at == ITERNAL) || (bt == ITERNAL)) {
                     //either is atemporal but not both

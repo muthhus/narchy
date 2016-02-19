@@ -335,10 +335,10 @@ public enum LocalRules {
     public static Termed<Compound> intermpolate(@NotNull Termed<Compound> a, @NotNull Termed<Compound> b, float aConf, float bConf) {
         if (a.equals(b)) return a;
 
-        int at = a.term().t();
-        int bt = b.term().t();
+        int at = a.term().dt();
+        int bt = b.term().dt();
 
-        return a.term().t( Math.round(Util.lerp(at, bt, aConf/(aConf+bConf))) );
+        return a.term().dt( Math.round(Util.lerp(at, bt, aConf/(aConf+bConf))) );
     }
 
 

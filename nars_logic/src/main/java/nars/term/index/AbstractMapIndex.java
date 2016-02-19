@@ -91,7 +91,7 @@ public abstract class AbstractMapIndex implements TermIndex {
             return null;
         Termed x = intern(op, relation, subs);
         if (dt!= Tense.ITERNAL && x!=null && x.term().isCompound()) {
-            x = ((Compound)x.term()).t(dt);
+            x = ((Compound)x.term()).dt(dt);
         }
         return x;
     }

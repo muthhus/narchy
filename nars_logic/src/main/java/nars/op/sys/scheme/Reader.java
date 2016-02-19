@@ -1,11 +1,11 @@
-package nars.op.software.scheme;
+package nars.op.sys.scheme;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import nars.op.software.scheme.cons.Cons;
-import nars.op.software.scheme.exception.UnmatchedDoubleQuotes;
-import nars.op.software.scheme.exception.UnmatchedParenthesisExpection;
-import nars.op.software.scheme.expressions.*;
+import nars.op.sys.scheme.cons.Cons;
+import nars.op.sys.scheme.exception.UnmatchedDoubleQuotes;
+import nars.op.sys.scheme.exception.UnmatchedParenthesisExpection;
+import nars.op.sys.scheme.expressions.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -13,8 +13,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import static nars.op.software.scheme.cons.Cons.cons;
-import static nars.op.software.scheme.cons.Cons.empty;
+import static nars.op.sys.scheme.cons.Cons.cons;
+import static nars.op.sys.scheme.cons.Cons.empty;
 
 
 public enum Reader {

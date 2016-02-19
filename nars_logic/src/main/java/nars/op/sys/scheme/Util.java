@@ -1,4 +1,4 @@
-package nars.op.software.scheme;
+package nars.op.sys.scheme;
 
 import org.jetbrains.annotations.NotNull;
 

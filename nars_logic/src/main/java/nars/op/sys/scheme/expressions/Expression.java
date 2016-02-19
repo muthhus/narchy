@@ -1,7 +1,7 @@
-package nars.op.software.scheme.expressions;
+package nars.op.sys.scheme.expressions;
 
 
-import nars.op.software.scheme.exception.UnexpectedExpression;
+import nars.op.sys.scheme.exception.UnexpectedExpression;
 import org.jetbrains.annotations.NotNull;
 
 public interface Expression  {

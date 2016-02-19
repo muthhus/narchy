@@ -1,4 +1,4 @@
-package nars.op.software.scheme.exception;
+package nars.op.sys.scheme.exception;
 
 public class SchemeError extends RuntimeException {
 	public SchemeError(String message) {

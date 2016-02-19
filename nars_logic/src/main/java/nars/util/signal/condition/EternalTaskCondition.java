@@ -124,7 +124,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
         }
 
         if (a instanceof Compound) {
-            if ( ((Compound)a).t() != ((Compound)b).t()) {
+            if ( ((Compound)a).dt() != ((Compound)b).dt()) {
                 dist += 0.2f;
                 if (dist >= ifLessThan) return dist;
             }

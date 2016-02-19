@@ -247,13 +247,13 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 
     /** sets temporal relation value (TEMPORARY). returns new value */
     @NotNull
-    @Deprecated Compound t(int cycles);
+    @Deprecated Compound dt(int cycles);
 
     /** gets temporal relation value */
-    int t();
+    int dt();
 
     default boolean hasT() {
-        return t()!= Tense.ITERNAL;
+        return dt()!= Tense.ITERNAL;
     }
 
     /** similar to a indexOf() call, this will search for a int[]

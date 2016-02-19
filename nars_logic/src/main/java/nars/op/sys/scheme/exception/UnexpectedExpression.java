@@ -1,4 +1,4 @@
-package nars.op.software.scheme.exception;
+package nars.op.sys.scheme.exception;
 
 public class UnexpectedExpression extends RuntimeException {
 	public UnexpectedExpression(String message) {

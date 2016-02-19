@@ -1,20 +1,20 @@
 package nars.op.scheme;
 
 
-import nars.op.software.scheme.DefaultEnvironment;
-import nars.op.software.scheme.cons.Cons;
-import nars.op.software.scheme.expressions.Expression;
-import nars.op.software.scheme.expressions.NumberExpression;
+import nars.op.sys.scheme.DefaultEnvironment;
+import nars.op.sys.scheme.cons.Cons;
+import nars.op.sys.scheme.expressions.Expression;
+import nars.op.sys.scheme.expressions.NumberExpression;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.function.Function;
 
-import static nars.op.software.scheme.cons.Cons.cons;
-import static nars.op.software.scheme.expressions.BooleanExpression.bool;
-import static nars.op.software.scheme.expressions.ListExpression.list;
-import static nars.op.software.scheme.expressions.NumberExpression.number;
-import static nars.op.software.scheme.expressions.SymbolExpression.symbol;
+import static nars.op.sys.scheme.cons.Cons.cons;
+import static nars.op.sys.scheme.expressions.BooleanExpression.bool;
+import static nars.op.sys.scheme.expressions.ListExpression.list;
+import static nars.op.sys.scheme.expressions.NumberExpression.number;
+import static nars.op.sys.scheme.expressions.SymbolExpression.symbol;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 public class DefaultEnvironmentTest {

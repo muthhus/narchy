@@ -237,7 +237,7 @@ public class Inperience {
         Compound taskTerm = task.term();
         Compound beliefTerm = belief.term();
 
-        if (beliefTerm.hasT() && beliefTerm.t() > 0) {
+        if (beliefTerm.hasT() && beliefTerm.dt() > 0) {
             //1. check if its (&/,term,+i1,...,+in) =/> anticipateTerm form:
             boolean valid = true;
             Term impsub = beliefTerm.term(0);

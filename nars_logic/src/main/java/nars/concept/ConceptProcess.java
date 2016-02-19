@@ -7,7 +7,6 @@ package nars.concept;
 import nars.Global;
 import nars.NAR;
 import nars.Premise;
-import nars.Symbols;
 import nars.bag.BLink;
 import nars.budget.Budget;
 import nars.nal.meta.PremiseMatch;
@@ -15,7 +14,6 @@ import nars.nal.op.Derive;
 import nars.task.DerivedTask;
 import nars.task.Task;
 import nars.term.Compound;
-import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Stamp;
 import nars.truth.Truth;
@@ -224,9 +222,9 @@ abstract public class ConceptProcess implements Premise {
     }
 
     public boolean hasTemporality() {
-        if (task().term().t()!=ITERNAL) return true;
+        if (task().term().dt()!=ITERNAL) return true;
         @Nullable Task b = belief();
         if (b == null) return false;
-        return b.term().t()!=ITERNAL;
+        return b.term().dt()!=ITERNAL;
     }
 }

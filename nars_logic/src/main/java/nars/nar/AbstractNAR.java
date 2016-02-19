@@ -7,7 +7,6 @@ import nars.concept.Concept;
 import nars.nal.Deriver;
 import nars.nal.meta.PremiseRule;
 import nars.nal.nal8.AbstractOperator;
-import nars.nal.nal8.operator.NullOperator;
 import nars.nal.nal8.operator.TermFunction;
 import nars.op.data.flat;
 import nars.op.data.intToBitSet;
@@ -22,7 +21,6 @@ import nars.op.mental.*;
 import nars.op.data.complexity;
 import nars.op.data.reflect;
 import nars.op.sys.js;
-import nars.op.software.scheme.scheme;
 import nars.term.TermIndex;
 import nars.time.Clock;
 import nars.util.data.random.XorShift128PlusRandom;
@@ -97,8 +95,8 @@ public abstract class AbstractNAR extends NAR {
         for (AbstractOperator o : defaultOperators)
             onExec(o);
 
-        for (AbstractOperator o : exampleOperators)
-            onExec(o);
+//        for (AbstractOperator o : exampleOperators)
+//            onExec(o);
     }
 
     @Deprecated public void initNAL9() {
@@ -128,15 +126,15 @@ public abstract class AbstractNAR extends NAR {
 
         m.duration.set(5);
 
-        m.conceptBeliefsMax.set(18);
-        m.conceptGoalsMax.set(14);
+        m.conceptBeliefsMax.set(16);
+        m.conceptGoalsMax.set(12);
         m.conceptQuestionsMax.set(3);
 
         m.conceptForgetDurations.setValue(2.0);
         m.termLinkForgetDurations.setValue(5.0);
         m.taskLinkForgetDurations.setValue(3.0);
 
-        m.derivationDurabilityThreshold.setValue(Global.BUDGET_DERIVATION_DURABILITY_THRESHOLD);
+        m.derivationDurabilityThreshold.setValue(Global.DERIVATION_DURABILITY_THRESHOLD);
 
         m.taskProcessThreshold.setValue(0); //warning: if this is not zero, it could remove un-TaskProcess-able tasks even if they are stored by a Concept
 
@@ -150,18 +148,18 @@ public abstract class AbstractNAR extends NAR {
     }
 
 
-    public static final AbstractOperator[] exampleOperators = {
-            //new Wait(),
-            new NullOperator("break"),
-            new NullOperator("drop"),
-            new NullOperator("goto"),
-            new NullOperator("open"),
-            new NullOperator("pick"),
-            new NullOperator("strike"),
-            new NullOperator("throw"),
-            new NullOperator("activate"),
-            new NullOperator("deactivate")
-    };
+//    public static final AbstractOperator[] exampleOperators = {
+//            //new Wait(),
+//            new NullOperator("break"),
+//            new NullOperator("drop"),
+//            new NullOperator("goto"),
+//            new NullOperator("open"),
+//            new NullOperator("pick"),
+//            new NullOperator("strike"),
+//            new NullOperator("throw"),
+//            new NullOperator("activate"),
+//            new NullOperator("deactivate")
+//    };
 
 
 
@@ -212,7 +210,7 @@ public abstract class AbstractNAR extends NAR {
             new similaritree(),
 
             //TODO move Javascript to a UnsafeOperators set, because of remote execution issues
-            new scheme(),      // scheme evaluation
+            new nars.op.sys.scheme.scheme(),      // scheme evaluation
 
             //new NumericCertainty(),
 

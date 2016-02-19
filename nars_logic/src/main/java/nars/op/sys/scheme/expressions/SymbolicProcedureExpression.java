@@ -1,6 +1,6 @@
-package nars.op.software.scheme.expressions;
+package nars.op.sys.scheme.expressions;
 
-import nars.op.software.scheme.cons.Cons;
+import nars.op.sys.scheme.cons.Cons;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;

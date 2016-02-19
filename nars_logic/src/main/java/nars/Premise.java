@@ -215,7 +215,7 @@ public interface Premise extends Level, Tasked {
     /** true if both task and belief (if not null) are eternal */
     default boolean isEternal() {
         Task b = belief();
-        return (b == null) || (!b.isEternal()) ? false : task().isEternal();
+        return !((b == null) || (!b.isEternal())) && task().isEternal();
     }
 
     boolean isCyclic();
@@ -224,19 +224,26 @@ public interface Premise extends Level, Tasked {
     Termed beliefTerm();
 
 
-    /** computes a base occurrence time from the premise task and belief */
-    default long occurrenceTarget() {
-        long t = task().occurrence();
+    @FunctionalInterface
+    interface OccurrenceSolver {
+        long compute(long taskOcc, long beliefOcc);
+    }
+
+    /** default method of computing occurrence time of the conclusion task from the premise task and belief
+     *  @param taskOrBelief if there is a choice, which event to use
+     * */
+    default long occurrenceTarget(OccurrenceSolver whenBothNonEternal) {
+        long tOcc = task().occurrence();
         Task b = belief();
-        if (b == null) return t;
+        if (b == null) return tOcc;
         else {
             long bOcc = b.occurrence();
 
-            if (t == ETERNAL) {
+            if (tOcc == ETERNAL) {
                 if (bOcc!=ETERNAL) return bOcc;
                 else return ETERNAL;
             } else { //if (bOcc == ETERNAL) {
-                return t;
+                return whenBothNonEternal.compute(tOcc, bOcc);
             }
         }
     }

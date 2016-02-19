@@ -231,12 +231,12 @@ public class Fun extends Const implements Compound<PTerm> {
 
     @NotNull
     @Override
-    public Compound t(int cycles) {
+    public Compound dt(int cycles) {
         return null;
     }
 
     @Override
-    public int t() {
+    public int dt() {
         return 0;
     }
 

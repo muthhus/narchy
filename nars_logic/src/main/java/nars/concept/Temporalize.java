@@ -28,6 +28,40 @@ public interface Temporalize {
     Compound compute(@NotNull Compound derived, @NotNull PremiseMatch p, @NotNull Derive d, long[] occReturn);
 
 
+
+
+
+    /** simple delta-time between task and belief resulting in the dt of the temporal compound.
+     *  this assumes the conclusion term is size=2 compound.
+     *  no occurence shift
+     *  should be used in combination with a "premise Event" precondition
+     *  */
+    Temporalize dt = (derived, p, d, occReturn) -> {
+        return dt(derived, p, occReturn, +1);
+    };
+    Temporalize dtReverse = (derived, p, d, occReturn) -> {
+        return dt(derived, p, occReturn, -1);
+    };
+
+    @NotNull
+    static Compound dt(Compound derived, PremiseMatch p, long[] occReturn, int polarity) {
+        ConceptProcess premise = p.premise;
+
+        occReturn[0] = premise.occurrenceTarget((t, b) -> b); //the belief time, since it will occurr after
+
+        long eventDelta = premise.belief().occurrence() -
+                premise.task().occurrence();
+
+        if (eventDelta!=0 && derived.op().isCommutative()) {
+            //flip temporal polarity if reversed
+            if (!derived.term(0).equals(premise.task().term())) {
+                eventDelta = -eventDelta;
+            }
+        }
+
+        return derived.dt(((int)eventDelta) * polarity);
+    }
+
     /**
      * "automatic" implementation of Temporalize, used by default. slow and wrong about 25..30% of the time sux needs rewritten or replaced
      * apply temporal characteristics to a newly derived term according to the premise's
@@ -42,13 +76,13 @@ public interface Temporalize {
         Task task = premise.task();
         Task belief = premise.belief();
 
-        long occ = premise.occurrenceTarget(); //reset
+        long occ = premise.occurrenceTarget((t,b)->t); //reset
 
         Compound tt = task.term();
         Term bb = premise.beliefTerm().term(); // belief() != null ? belief().term() : null;
 
-        int td = tt.t();
-        int bd = bb instanceof Compound ? ((Compound)bb).t() : ITERNAL;
+        int td = tt.dt();
+        int bd = bb instanceof Compound ? ((Compound)bb).dt() : ITERNAL;
 
         int t = ITERNAL;
 
@@ -289,7 +323,7 @@ public interface Temporalize {
         /*derived = (Compound) p.premise.nar.memory.index.newTerm(derived.op(), derived.relation(),
                 t, derived.subterms());*/
 
-            derived = derived.t(t);
+            derived = derived.dt(t);
 
 //            int nt = derived.t();
 //            if (occ > TIMELESS) {

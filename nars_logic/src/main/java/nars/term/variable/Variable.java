@@ -52,7 +52,9 @@ public abstract class Variable extends Atomic {
 
     @Override
     public final boolean equals(Object obj) {
-        return obj==this || (obj instanceof Variable) && ((Variable)obj).hash == hash;
+        return obj==this ||
+                (obj.hashCode() == hash && (obj instanceof Variable)); //hash first, it is more likely to differ
+                //((obj instanceof Variable) && ((Variable)obj).hash == hash);
     }
 
     @Override

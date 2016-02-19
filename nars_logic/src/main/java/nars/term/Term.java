@@ -23,7 +23,6 @@ package nars.term;
 
 import nars.Op;
 import nars.nal.meta.match.Ellipsis;
-import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -212,7 +211,7 @@ public interface Term extends Termed, Comparable, Termlike {
     }
 
     default long subtermTime(Term x) {
-        return subtermTime(x, this instanceof Compound ? ((Compound)this).t() : ITERNAL);
+        return subtermTime(x, this instanceof Compound ? ((Compound)this).dt() : ITERNAL);
     }
 
     /** matches the first occuring event's time relative to this temporal relation, with parameter for a hypothetical dt */

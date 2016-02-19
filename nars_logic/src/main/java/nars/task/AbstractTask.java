@@ -160,9 +160,10 @@ public abstract class AbstractTask extends UnitBudget
         if (punc == 0)
             throw new RuntimeException("Punctuation must be specified before generating a default budget");
 
-        if (!isCommand()) {
+        //this conflicts with weakref's
+        /*if (!isCommand()) {
             ensureValidParentTaskRef();
-        }
+        }*/
 
         //noinspection IfStatementWithTooManyBranches
         if (isJudgmentOrGoal()) {

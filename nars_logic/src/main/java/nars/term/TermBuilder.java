@@ -27,6 +27,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 import static java.util.Arrays.copyOfRange;
+import static java.util.Arrays.parallelSetAll;
 import static nars.Op.*;
 import static nars.nal.Tense.ITERNAL;
 import static nars.term.Statement.pred;
@@ -205,7 +206,7 @@ public interface TermBuilder {
 
                         //method 2: on heap
                         Op op = cx.op();
-                        x = $.the(op, cx.relation(), cx.t(),
+                        x = $.the(op, cx.relation(), cx.dt(),
                                 TermContainer.the(op, yy)
                         );
 
@@ -225,7 +226,7 @@ public interface TermBuilder {
     default Term newTerm(@NotNull Compound csrc, @NotNull TermContainer subs) {
         if (csrc.subterms().equals(subs))
             return csrc;
-        return newTerm(csrc.op(), csrc.relation(), csrc.t(), subs);
+        return newTerm(csrc.op(), csrc.relation(), csrc.dt(), subs);
     }
 
     @Nullable
@@ -344,16 +345,19 @@ public interface TermBuilder {
 
         if (op.minSize > 1 && currentSize == 1) {
             //special case: allow for ellipsis to occupy one item even if minArity>1
-            if (u[0] instanceof Ellipsis)
+            Term u0 = u[0];
+            if ((u0 instanceof Ellipsis) || (u0 instanceof Ellipsis.EllipsisPrototype))
                 currentSize++; //increase to make it seem valid and allow constrct below
             else
-                return u[0]; //reduction
+                return u0; //reduction
         }
 
         if (!op.validSize(currentSize)) {
             //throw new RuntimeException(Arrays.toString(t) + " invalid size for " + op);
-            throw new UnbuildableTerm(op, relation, dt, args.terms());
-            //return null;
+            if (Global.DEBUG)
+                throw new UnbuildableTerm(op, relation, dt, args.terms());
+            else
+                return null;
         }
 
         Termed m = make(op, relation, TermContainer.the(op, args), dt);
@@ -470,7 +474,7 @@ public interface TermBuilder {
                 }
                 //if (x.op(op))
 
-                return x.op().isTemporal() ? x.t(0) : x;
+                return x.op().isTemporal() ? x.dt(0) : x;
 
                 //return x;
             }
@@ -481,9 +485,10 @@ public interface TermBuilder {
                 if (u[0].equals(u[1]))
                     return u[0];
             } else {
-                throw new RuntimeException
-                        ("invalid temporal conjunction: " + op + ' ' + t + ' ' + Arrays.toString(u));
-                //return null;
+                if (Global.DEBUG)
+                    throw new UnbuildableTerm(op, -1, t, u);
+                else
+                    return null;
             }
 
             Term x = make(op, -1, TermContainer.the(op, u)).term();
@@ -492,7 +497,7 @@ public interface TermBuilder {
             Compound cx = (Compound) x;
 
             boolean reversed = cx.term(0) == u[1];
-            return cx.t(reversed ? -t : t);
+            return cx.dt(reversed ? -t : t);
         } else {
             return junction(op, t, Lists.newArrayList(u));
         }
@@ -518,7 +523,7 @@ public interface TermBuilder {
         TreeSet<Term> s = new TreeSet();
 
         u.forEach(x -> {
-            if (x.op() == op && (((Compound) x).t() == dt)) {
+            if (x.op() == op && (((Compound) x).dt() == dt)) {
                 /*if (ellipsisoid(x)) {
                     s.add(x); //add whole
                 } else */{
@@ -593,7 +598,7 @@ public interface TermBuilder {
                 Compound x = (Compound) (xx.term());
                 if (t != ITERNAL) {
                     boolean reversed = cc.term(0) == predicate;
-                    x = x.t(reversed ? -t : t);
+                    x = x.dt(reversed ? -t : t);
                 }
                 return x;
             }

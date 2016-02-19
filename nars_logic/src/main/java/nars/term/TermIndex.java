@@ -124,7 +124,7 @@ public interface TermIndex extends TermBuilder {
 
     @Nullable
     default Termed makeCompound(@NotNull Compound t) {
-        return make(t.op(), t.relation(), t.subterms(), t.t());
+        return make(t.op(), t.relation(), t.subterms(), t.dt());
     }
 
 

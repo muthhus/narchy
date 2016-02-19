@@ -1,11 +1,11 @@
 package nars.op.scheme;
 
 import com.google.common.collect.ImmutableList;
-import nars.op.software.scheme.cons.Cons;
+import nars.op.sys.scheme.cons.Cons;
 import org.junit.Test;
 
-import static nars.op.software.scheme.cons.Cons.cons;
-import static nars.op.software.scheme.cons.Cons.empty;
+import static nars.op.sys.scheme.cons.Cons.cons;
+import static nars.op.sys.scheme.cons.Cons.empty;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 

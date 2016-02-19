@@ -107,16 +107,35 @@ public class Derive extends AtomicStringConstant implements ProcTerm {
             //throw new RuntimeException("invalid ellipsis match: " + derivedTerm);
             EllipsisMatch em = ((EllipsisMatch)derivedTerm);
             switch (em.size()) {
-                case 1: derivedTerm = em.term(0); //unwrap the item
+                case 1:
+                    derivedTerm = em.term(0); //unwrap the item
                     break;
+                case 0:
+                    return;
                 default:
                     //throw new RuntimeException("invalid ellipsis match: " + em);
-                case 0: return;
+                    return;
             }
         }
 
-        if (ensureValidVolume(derivedTerm) && postMatch.booleanValueOf(m))
-            derive(m, derivedTerm);
+        if (ensureValidVolume(derivedTerm)) {
+            if (postMatch.booleanValueOf(m))
+                derive(m, derivedTerm);
+        } else {
+
+                if (Global.DEBUG) {
+                    //$.logger.error("Term volume overflow");
+                /*c.forEach(x -> {
+                    Terms.printRecursive(x, (String line) ->$.logger.error(line) );
+                });*/
+
+                    String message = "Term volume overflow: " + derivedTerm;
+                    $.logger.error(message + "\n" + rule);
+                    //System.exit(1);
+                    //throw new RuntimeException(message);
+                }
+
+        }
 
 
     }
@@ -125,25 +144,8 @@ public class Derive extends AtomicStringConstant implements ProcTerm {
 
         //HARD VOLUME LIMIT
         boolean tooLarge = derivedTerm.volume() > Global.COMPOUND_VOLUME_MAX;
-        if (tooLarge) {
 
-            if (Global.DEBUG) {
-                //$.logger.error("Term volume overflow");
-                /*c.forEach(x -> {
-                    Terms.printRecursive(x, (String line) ->$.logger.error(line) );
-                });*/
-
-                String message = "Term volume overflow: " + derivedTerm;
-                $.logger.error(message);
-                //System.exit(1);
-                //throw new RuntimeException(message);
-            }
-
-            return false;
-
-        }
-
-        return true;
+        return !tooLarge;
 
     }
 

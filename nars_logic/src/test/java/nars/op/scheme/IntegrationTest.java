@@ -1,21 +1,21 @@
 package nars.op.scheme;
 
 
-import nars.op.software.scheme.DefaultEnvironment;
-import nars.op.software.scheme.Evaluator;
-import nars.op.software.scheme.Reader;
-import nars.op.software.scheme.SchemeClosure;
-import nars.op.software.scheme.exception.UnexpectedExpression;
-import nars.op.software.scheme.expressions.Expression;
+import nars.op.sys.scheme.DefaultEnvironment;
+import nars.op.sys.scheme.Evaluator;
+import nars.op.sys.scheme.Reader;
+import nars.op.sys.scheme.SchemeClosure;
+import nars.op.sys.scheme.exception.UnexpectedExpression;
+import nars.op.sys.scheme.expressions.Expression;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import static nars.op.software.scheme.cons.Cons.cons;
-import static nars.op.software.scheme.cons.Cons.empty;
-import static nars.op.software.scheme.expressions.BooleanExpression.bool;
-import static nars.op.software.scheme.expressions.ListExpression.list;
-import static nars.op.software.scheme.expressions.NumberExpression.number;
+import static nars.op.sys.scheme.cons.Cons.cons;
+import static nars.op.sys.scheme.cons.Cons.empty;
+import static nars.op.sys.scheme.expressions.BooleanExpression.bool;
+import static nars.op.sys.scheme.expressions.ListExpression.list;
+import static nars.op.sys.scheme.expressions.NumberExpression.number;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 

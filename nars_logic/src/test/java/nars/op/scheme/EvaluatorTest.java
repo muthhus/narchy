@@ -1,18 +1,18 @@
 package nars.op.scheme;
 
-import nars.op.software.scheme.DefaultEnvironment;
-import nars.op.software.scheme.Evaluator;
-import nars.op.software.scheme.SchemeClosure;
-import nars.op.software.scheme.expressions.*;
+import nars.op.sys.scheme.DefaultEnvironment;
+import nars.op.sys.scheme.Evaluator;
+import nars.op.sys.scheme.SchemeClosure;
+import nars.op.sys.scheme.expressions.*;
 import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static nars.op.software.scheme.expressions.BooleanExpression.bool;
-import static nars.op.software.scheme.expressions.ListExpression.list;
-import static nars.op.software.scheme.expressions.NumberExpression.number;
-import static nars.op.software.scheme.expressions.SymbolExpression.symbol;
+import static nars.op.sys.scheme.expressions.BooleanExpression.bool;
+import static nars.op.sys.scheme.expressions.ListExpression.list;
+import static nars.op.sys.scheme.expressions.NumberExpression.number;
+import static nars.op.sys.scheme.expressions.SymbolExpression.symbol;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;

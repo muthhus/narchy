@@ -1,9 +1,9 @@
 package nars.op.scheme;
 
 import com.google.common.collect.ImmutableList;
-import nars.op.software.scheme.Reader;
-import nars.op.software.scheme.exception.UnmatchedParenthesisExpection;
-import nars.op.software.scheme.expressions.Expression;
+import nars.op.sys.scheme.Reader;
+import nars.op.sys.scheme.exception.UnmatchedParenthesisExpection;
+import nars.op.sys.scheme.expressions.Expression;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -11,9 +11,9 @@ import org.junit.rules.ExpectedException;
 import java.util.Iterator;
 import java.util.List;
 
-import static nars.op.software.scheme.expressions.ListExpression.list;
-import static nars.op.software.scheme.expressions.NumberExpression.number;
-import static nars.op.software.scheme.expressions.SymbolExpression.symbol;
+import static nars.op.sys.scheme.expressions.ListExpression.list;
+import static nars.op.sys.scheme.expressions.NumberExpression.number;
+import static nars.op.sys.scheme.expressions.SymbolExpression.symbol;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 

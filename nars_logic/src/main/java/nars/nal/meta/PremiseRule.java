@@ -340,8 +340,8 @@ public class PremiseRule extends GenericCompound {
         Term[] postcons = ((Compound) term(1)).terms();
 
 
-        List<BooleanCondition> prePreConditionsList = Global.newArrayList(precon.length);
-        List<BooleanCondition> preConditionsList = Global.newArrayList(precon.length);
+        List<BooleanCondition> pres = Global.newArrayList(precon.length);
+        List<BooleanCondition> posts = Global.newArrayList(precon.length);
 
 
         Term taskTermPattern = getTaskTermPattern();
@@ -386,48 +386,60 @@ public class PremiseRule extends GenericCompound {
 
             switch (predicateNameStr) {
 
+                //postcondition test
+                case "not_equal":
+                    next = NotEqual.make(arg1, arg2);
+                    break;
+
                 case "neq":
                     constraints.put(arg1, new NotEqualsConstraint(arg2));
                     constraints.put(arg2, new NotEqualsConstraint(arg1));
 
-                    //TODO eliminate need for:
-                    //next = NotEqual.make(arg1, arg2);
+                    //next = NotEqual.make(arg1, arg2); //TODO decide if necesary
 
                     break;
 
                 case "no_common_subterm":
                     constraints.put(arg1, new NoCommonSubtermsConstraint(arg2));
                     constraints.put(arg2, new NoCommonSubtermsConstraint(arg1));
-
-                    //next = NoCommonSubterm.make(arg1, arg2);
-                    break;
-
-                //postcondition test
-                case "not_equal":
-                    next = NotEqual.make(arg1, arg2);
                     break;
 
 
                 case "notSet":
                     constraints.put(arg1, new NotOpConstraint(Op.SetsBits));
                     break;
-
-
                 case "notConjunction":
                     constraints.put(arg1, new NotOpConstraint(Op.CONJUNCTION));
                     break;
 
-
                 case "notImplicationOrEquivalence":
                     constraints.put(arg1, new NotOpConstraint(Op.ImplicationOrEquivalenceBits));
                     break;
+                case "notImplicationEquivalenceOrConjunction":
+                    constraints.put(arg1, new NotOpConstraint(Op.ImplicationOrEquivalenceBits | Op.CONJUNCTION.bit()));
+                    break;
 
                 case "events":
+                    throw new RuntimeException("depr");
+
+                case "time":
                     switch (arg1.toString()) {
                         case "after":
                             preNext = events.after;
                             break;
                         case "afterOrEternal":
+                            preNext = events.afterOrEternal;
+                            break;
+                        case "dtAfter":
+                            temporalize = Temporalize.dt;
+                            preNext = events.after;
+                            break;
+                        case "dtReverseAfter":
+                            temporalize = Temporalize.dtReverse;
+                            preNext = events.after;
+                            break;
+                        case "dtAfterOrEternal":
+                            temporalize = Temporalize.dt;
                             preNext = events.afterOrEternal;
                             break;
                         default:
@@ -439,9 +451,9 @@ public class PremiseRule extends GenericCompound {
 //                    preNext = Temporality.either;
 //                    break;
 
-                case "occurr":
-//                    preNext = new occurr(arg1,arg2);
-                    break;
+//                case "occurr":
+////                    preNext = new occurr(arg1,arg2);
+//                    break;
 
 //                case "after":
 //                    switch (arg1.toString()) {
@@ -459,32 +471,32 @@ public class PremiseRule extends GenericCompound {
 //                    }
 //                    break;
 
-                case "dt":
-//                    switch (arg1.toString()) {
-//                        case "avg":
-//                            preNext = dt.avg; break;
-//                        case "task":
-//                            preNext = dt.task; break;
-//                        case "belief":
-//                            preNext = dt.belief; break;
-//                        case "exact":
-//                            preNext = dt.exact; break;
-//                        case "sum":
-//                            preNext = dt.sum; break;
-//                        case "sumNeg":
-//                            preNext = dt.sumNeg; break;
-//                        case "bmint":
-//                            preNext = dt.bmint; break;
-//                        case "tminb":
-//                            preNext = dt.tminb; break;
-//
-//                        case "occ":
-//                            preNext = dt.occ; break;
-//
-//                        default:
-//                            throw new RuntimeException("invalid dt() argument: " + arg1);
-//                    }
-                    break;
+//                case "dt":
+////                    switch (arg1.toString()) {
+////                        case "avg":
+////                            preNext = dt.avg; break;
+////                        case "task":
+////                            preNext = dt.task; break;
+////                        case "belief":
+////                            preNext = dt.belief; break;
+////                        case "exact":
+////                            preNext = dt.exact; break;
+////                        case "sum":
+////                            preNext = dt.sum; break;
+////                        case "sumNeg":
+////                            preNext = dt.sumNeg; break;
+////                        case "bmint":
+////                            preNext = dt.bmint; break;
+////                        case "tminb":
+////                            preNext = dt.tminb; break;
+////
+////                        case "occ":
+////                            preNext = dt.occ; break;
+////
+////                        default:
+////                            throw new RuntimeException("invalid dt() argument: " + arg1);
+////                    }
+//                    break;
 
 
                 case "task":
@@ -514,11 +526,11 @@ public class PremiseRule extends GenericCompound {
 
 
             if (preNext != null) {
-                if (!prePreConditionsList.contains(preNext)) //unique
-                    prePreConditionsList.add(preNext);
+                if (!pres.contains(preNext)) //unique
+                    pres.add(preNext);
             }
             if (next != null)
-                preConditionsList.add(next);
+                posts.add(next);
         }
 
 
@@ -528,8 +540,8 @@ public class PremiseRule extends GenericCompound {
 
 
         //store to arrays
-        prePreconditions = prePreConditionsList.toArray(new BooleanCondition[prePreConditionsList.size()]);
-        postPreconditions = preConditionsList.toArray(new BooleanCondition[preConditionsList.size()]);
+        prePreconditions = pres.toArray(new BooleanCondition[pres.size()]);
+        postPreconditions = posts.toArray(new BooleanCondition[posts.size()]);
 
 
         List<PostCondition> postConditions = Global.newArrayList();

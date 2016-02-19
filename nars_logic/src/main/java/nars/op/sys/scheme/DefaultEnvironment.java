@@ -1,10 +1,10 @@
-package nars.op.software.scheme;
+package nars.op.sys.scheme;
 
 import com.google.common.collect.ImmutableMap;
-import nars.op.software.scheme.cons.Cons;
-import nars.op.software.scheme.expressions.Expression;
-import nars.op.software.scheme.expressions.NumberExpression;
-import nars.op.software.scheme.expressions.SymbolExpression;
+import nars.op.sys.scheme.cons.Cons;
+import nars.op.sys.scheme.expressions.Expression;
+import nars.op.sys.scheme.expressions.NumberExpression;
+import nars.op.sys.scheme.expressions.SymbolExpression;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -18,15 +18,15 @@ import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import static nars.op.software.scheme.Evaluator.evaluate;
-import static nars.op.software.scheme.Reader.read;
-import static nars.op.software.scheme.cons.Cons.cons;
-import static nars.op.software.scheme.cons.Cons.empty;
-import static nars.op.software.scheme.expressions.BooleanExpression.bool;
-import static nars.op.software.scheme.expressions.ListExpression.Nil.nil;
-import static nars.op.software.scheme.expressions.ListExpression.list;
-import static nars.op.software.scheme.expressions.ProcedureExpression.procedure;
-import static nars.op.software.scheme.expressions.SymbolExpression.symbol;
+import static nars.op.sys.scheme.Evaluator.evaluate;
+import static nars.op.sys.scheme.Reader.read;
+import static nars.op.sys.scheme.cons.Cons.cons;
+import static nars.op.sys.scheme.cons.Cons.empty;
+import static nars.op.sys.scheme.expressions.BooleanExpression.bool;
+import static nars.op.sys.scheme.expressions.ListExpression.Nil.nil;
+import static nars.op.sys.scheme.expressions.ListExpression.list;
+import static nars.op.sys.scheme.expressions.ProcedureExpression.procedure;
+import static nars.op.sys.scheme.expressions.SymbolExpression.symbol;
 
 
 public enum DefaultEnvironment {

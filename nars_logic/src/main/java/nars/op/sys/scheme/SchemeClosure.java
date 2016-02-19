@@ -1,9 +1,9 @@
-package nars.op.software.scheme;
+package nars.op.sys.scheme;
 
 
-import nars.op.software.scheme.exception.VariableNotDefinedException;
-import nars.op.software.scheme.expressions.Expression;
-import nars.op.software.scheme.expressions.SymbolExpression;
+import nars.op.sys.scheme.exception.VariableNotDefinedException;
+import nars.op.sys.scheme.expressions.Expression;
+import nars.op.sys.scheme.expressions.SymbolExpression;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,7 +28,7 @@ public class SchemeClosure {
     }
 
     public SchemeClosure() {
-        this(new HashMap<>(DefaultEnvironment.PRIMITIVES));
+        this(new HashMap<>(nars.op.sys.scheme.DefaultEnvironment.PRIMITIVES));
     }
 
     @NotNull

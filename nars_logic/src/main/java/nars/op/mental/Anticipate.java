@@ -128,9 +128,9 @@ public final class Anticipate {
 //        if (debug)
 //            System.err.println("Anticipation Negated " + tt.task);
 
-        nar.input(new MutableTask($.neg(prediction))
+        nar.input(new MutableTask(prediction) //$.neg(prediction))
                 .belief()
-                .truth(nar.memory.getTruthDefault(Symbols.BELIEF))
+                .truth(0f /* FALSE */, nar.memory.getTruthDefault(Symbols.BELIEF).conf())
                 .time(nar.time(), expectedOccurrenceTime)
                 //.parent(tt, null)
                 .because("Absent Anticipated Event"));

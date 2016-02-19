@@ -1,15 +1,15 @@
-package nars.op.software.scheme;
+package nars.op.sys.scheme;
 
-import nars.op.software.scheme.cons.Cons;
-import nars.op.software.scheme.expressions.*;
+import nars.op.sys.scheme.cons.Cons;
+import nars.op.sys.scheme.expressions.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static nars.op.software.scheme.expressions.ListExpression.list;
-import static nars.op.software.scheme.expressions.SymbolExpression.symbol;
+import static nars.op.sys.scheme.expressions.ListExpression.list;
+import static nars.op.sys.scheme.expressions.SymbolExpression.symbol;
 
 
 public enum Evaluator {

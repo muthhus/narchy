@@ -197,7 +197,7 @@ public enum Op {
 
     @NotNull
     public final String toString(@NotNull Compound c)  {
-        int t = c.t();
+        int t = c.dt();
         boolean hasTime = t != Tense.ITERNAL;
 
         if (!hasTime) {
@@ -211,7 +211,7 @@ public enum Op {
      * writes this operator to a Writer in (human-readable) expanded UTF16 mode
      */
     public final void append(@NotNull Compound c, @NotNull Appendable w) throws IOException {
-        int t = c.t();
+        int t = c.dt();
         boolean hasTime = t != Tense.ITERNAL;
 
         if (hasTime)

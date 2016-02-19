@@ -90,7 +90,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     @Override
     public final boolean isCommutative() {
         if (op.isCommutative() && size() > 1) {
-            int t = t();
+            int t = dt();
             return (t == ITERNAL || ((op == Op.CONJUNCTION && t == 0)));
         }
         return false;
@@ -107,7 +107,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     }
 
     @Override public Compound anonymous() {
-        return this.t(ITERNAL);
+        return this.dt(ITERNAL);
     }
 
     @Override
@@ -124,7 +124,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
                 int diff2 = Integer.compare(this.relation, c.relation());
                 if (diff2 != 0) return diff2;
 
-                int diff3 = Integer.compare(this.t, c.t());
+                int diff3 = Integer.compare(this.t, c.dt());
                 if (diff3 != 0) return diff3;
 
                 r= subterms.compareTo(c.subterms());
@@ -159,7 +159,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
             Compound c = (Compound) u;
             r= subterms.equals(c.terms())
                     && (relation == c.relation())
-                    && (t == c.t());
+                    && (t == c.dt());
         }
         return r;
     }
@@ -283,7 +283,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     }
 
     /** WARNING: this does not perform commutive handling correctly. use the index newTerm method for now */
-    @NotNull @Override public Compound t(int cycles) {
+    @NotNull @Override public Compound dt(int cycles) {
         if (cycles == t) return this;
         GenericCompound g = new GenericCompound(op, relation, cycles, subterms);
         if (normalized) g.setNormalized();
@@ -291,7 +291,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     }
 
     @Override
-    public int t() {
+    public int dt() {
         return t;
     }
 

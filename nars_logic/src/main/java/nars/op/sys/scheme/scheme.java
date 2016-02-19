@@ -1,11 +1,11 @@
-package nars.op.software.scheme;
+package nars.op.sys.scheme;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import nars.$;
 import nars.nal.nal8.operator.TermFunction;
-import nars.op.software.scheme.cons.Cons;
-import nars.op.software.scheme.expressions.*;
+import nars.op.sys.scheme.cons.Cons;
+import nars.op.sys.scheme.expressions.*;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.TermBuilder;
@@ -17,12 +17,12 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import static nars.op.software.scheme.DefaultEnvironment.load;
+import static nars.op.sys.scheme.DefaultEnvironment.load;
 
 
 public class scheme extends TermFunction {
 
-    @Deprecated public static final SchemeClosure env = DefaultEnvironment.newInstance();
+    @Deprecated public static final nars.op.sys.scheme.SchemeClosure env = nars.op.sys.scheme.DefaultEnvironment.newInstance();
 
 
 

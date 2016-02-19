@@ -25,6 +25,7 @@ import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jbox2d.common.Vec2;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.WeakHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -96,7 +97,9 @@ public class SomeRovers {
         int conceptsFirePerCycle = 32;
         Default nar = new Default(
                 new Memory(clock, new MapIndex2(
-                        new SoftValueHashMap())),
+                    //new SoftValueHashMap()
+                    new WeakHashMap()
+                )),
                 2000, conceptsFirePerCycle, 3, 4);
 
         //nar.logSummaryGT(System.out, 0f);
