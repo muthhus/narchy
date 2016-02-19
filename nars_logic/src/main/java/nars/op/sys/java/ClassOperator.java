@@ -57,6 +57,8 @@ public class ClassOperator extends TermFunction {
 
         localTask.set(e);
 
+        super.execute(e);
+
         localTask.set(null);
     }
 

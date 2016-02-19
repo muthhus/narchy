@@ -4,6 +4,7 @@ import nars.$;
 import nars.Global;
 import nars.NAR;
 import nars.nar.Default;
+import nars.task.Task;
 import nars.term.Term;
 import org.junit.Test;
 
@@ -41,9 +42,9 @@ public class GoalPrecisionTest {
     protected void run(NAR n, int end) {
 
         Global.DEBUG = true;
-        n.onExecution($.operator("x"), (Execution a) -> {
-            Term[] aa = a.argArray();
-            float pri = a.task.pri() * a.task.expectation();
+        n.onExecution($.operator("x"), (Task a) -> {
+            Term[] aa = Operator.argArray(a.term());
+            float pri = a.pri() * a.expectation();
 
             float[] d = plan.get(aa[0].toString());
             if (d == null) {
@@ -55,16 +56,16 @@ public class GoalPrecisionTest {
                 //first time
                 d[1] = (int) n.time();
                 d[2] = pri;
-                System.out.println("OK " + a.task);
+                System.out.println("OK " + a);
             } else {
                 d[3] += pri;
                 d[4]++;
 
                 System.out.println();
-                System.out.println(a.task);
-                System.out.println(a.task.log());
-                a.nar.concept(a.task.concept()).print();
-                System.out.println(a.task.explanation());
+                System.out.println(a);
+                System.out.println(a.log());
+                n.concept(a.concept()).print();
+                System.out.println(a.explanation());
             }
 
             //a.task.mulPriority(0);

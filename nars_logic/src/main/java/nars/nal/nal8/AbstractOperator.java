@@ -71,7 +71,13 @@ public abstract class AbstractOperator implements Consumer<Task> {
 
     @Override
     public void accept(@NotNull Task execution) {
-        _execute(execution);        
+        if (async()) {
+            //asynch
+            nar.runAsync(() -> execute(execution));
+        } else {
+            //synchronous
+            execute(execution);
+        }
     }
 
     /**
@@ -81,22 +87,6 @@ public abstract class AbstractOperator implements Consumer<Task> {
      * @return The direct collectable results and feedback of the
      * reportExecution
      */
-    /**
-     * The standard way to carry out an operation, which invokes the execute
-     * method defined for the operate, and handles feedback tasks as input
-     *
-     * @param op     The operate to be executed
-     * @return true if successful, false if an error occurred
-     */
-    public final void _execute(@NotNull Task execution) {
-        if (async()) {
-            //asynch
-            nar.runAsync(() -> execute(execution));
-        } else {
-            //synchronous
-            execute(execution);
-        }
-    }
 
     public abstract void execute(Task execution);
 

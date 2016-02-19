@@ -77,9 +77,9 @@ public class SomeRovers {
             });
         }
 
-        if (addQRover) {
-            game.add(new QRover("r2"));
-        }
+//        if (addQRover) {
+//            game.add(new QRover("r2"));
+//        }
 
 //        {
 //            NAR nar = new Default();
@@ -97,7 +97,7 @@ public class SomeRovers {
         Default nar = new Default(
                 new Memory(clock, new MapIndex2(
                         new SoftValueHashMap())),
-                2000, conceptsFirePerCycle, 3, 6);
+                2000, conceptsFirePerCycle, 3, 4);
 
         //nar.logSummaryGT(System.out, 0.2f);
 //        nar.log(System.out, x -> {
@@ -133,10 +133,10 @@ public class SomeRovers {
         m.termLinkForgetDurations.setValue(3);
         m.taskLinkForgetDurations.setValue(8);
         m.cyclesPerFrame.set(2);
-        m.shortTermMemoryHistory.set(4);
+        m.shortTermMemoryHistory.set(3);
         m.executionThreshold.setValue(0.0f);
 
-        boolean gui = false;
+        boolean gui = true;
         if (gui) {
             //NARide.loop(nar, false);
 
@@ -146,17 +146,17 @@ public class SomeRovers {
 //                    }, new Stage());
 
 //
-//                NARfx.newConceptWindow(nar,
-//                        //new TilePane(Orientation.VERTICAL),
-//                        new VBox(),
-//                        "MotorControls(#x,motor,(),#z)",
-//                        fire,
-//                        motorLeft,
-//                        motorRight,
-//                        motorForward,
-//                        motorBackward,
-//                        motorStop
-//                );
+                NARfx.newConceptWindow(nar,
+                        //new TilePane(Orientation.VERTICAL),
+                        new VBox(),
+                        "MotorControls(#x,motor,(),#z)",
+                        fire,
+                        motorLeft,
+                        motorRight,
+                        motorForward,
+                        motorBackward,
+                        motorStop
+                );
 
                 NARfx.newConceptWindow(nar,
                         //new TilePane(Orientation.VERTICAL),

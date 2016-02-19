@@ -27,10 +27,10 @@ public class CommandTest {
         n.onExec(new NullOperator("c") {
 
             @Override
-            public void execute(Execution execution) {
+            public void execute(Task t) {
 
                 invoked.set(true);
-                Term[] a = Operator.argArray(execution.term());
+                Term[] a = Operator.argArray(t.term());
                 assertEquals(1, a.length);
                 assertEquals("x", a[0].toString());
 
