@@ -381,8 +381,7 @@ public abstract class FindSubst extends Versioning implements Subst {
                 //of the other condition of this if { })
                 if (matchEllipsedLinear(X, e, Y)) {
                     EllipsisMatch raw = (EllipsisMatch) term(e);
-                    xy.put(e, null); //HACK clear it to replace with a new value
-                    return putXY(e, ImageMatch.put(raw.term, n, Y));
+                    return replaceXY(e, ImageMatch.put(raw.term, n, Y));
                 }
             } else {
                 Term n = resolve(et.from);
@@ -699,7 +698,7 @@ public abstract class FindSubst extends Versioning implements Subst {
 
                 }
             } else {
-                if (ysize>=j || !match(x, Y.term(j++)))
+                if (ysize<=j || !match(x, Y.term(j++)))
                     return false;
             }
         }
