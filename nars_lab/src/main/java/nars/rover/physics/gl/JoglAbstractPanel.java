@@ -1,5 +1,7 @@
 package nars.rover.physics.gl;
 
+import automenta.spacegraph.Space2D;
+import automenta.spacegraph.demo.spacegraph.DemoTextButton;
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.glu.GLU;
@@ -63,6 +65,8 @@ public abstract class JoglAbstractPanel extends GLCanvas implements TestbedPanel
 
     private final TestbedState model;
     private Point center;
+
+    final Space2D sg = new DemoTextButton().getSpace();
 
     // model can be null
     // if it is null world and debugDraw can be null, because they are retrived from model
@@ -530,9 +534,12 @@ axis.
 //
 //
 //
+            //layer #1
             JoglAbstractDraw phys2d = ((JoglAbstractDraw) getDebugDraw());
-
             phys2d.draw(getWorld(), time);
+
+            //layer #2
+            sg.draw(gl);
 
 
             matrix.rewind();
