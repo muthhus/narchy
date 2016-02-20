@@ -58,7 +58,7 @@ public class TestPanelJ2D extends JPanel implements TestbedPanel {
         setIgnoreRepaint(true);
         updateSize(INIT_WIDTH, INIT_HEIGHT);
 
-        AWTPanelHelper.addHelpAndPanelListeners(this, model, controller, SCREEN_DRAG_BUTTON);
+        //AWTPanelHelper.addHelpAndPanelListeners(this, model, controller, SCREEN_DRAG_BUTTON);
 //        addComponentListener(new ComponentAdapter() {
 //            @Override
 //            public void componentResized(ComponentEvent e) {

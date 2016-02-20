@@ -141,9 +141,6 @@ public abstract class AbstractPolygonBot extends Robotic {
         eaten.setTransform(new Vec2(x * 2.0f, y * 2.0f), eaten.getAngle());
     }
 
-    public DebugDraw getDraw() {
-        return draw;
-    }
 
 
     @Override

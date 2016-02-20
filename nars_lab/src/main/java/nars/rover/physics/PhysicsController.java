@@ -111,13 +111,9 @@ public class PhysicsController {
         resetPending = true;
     }
 
-    public void queueLaunchBomb() {
-        inputQueue.add(new QueueItem());
-    }
-
-    public void queuePause() {
+    /*public void queuePause() {
         inputQueue.add(new QueueItem(QueueItemType.Pause));
-    }
+    }*/
 
     public void queueMouseUp(Vec2 screenPos, int button) {
         inputQueue.add(new QueueItem(QueueItemType.MouseUp, screenPos, button));
@@ -243,12 +239,9 @@ public class PhysicsController {
                 case MouseDrag:
                     currTest.mouseDrag(i.p, i.button);
                     break;
-                case LaunchBomb:
-                    currTest.lanchBomb();
-                    break;
-                case Pause:
-                    model.getSettings().pause = !model.getSettings().pause;
-                    break;
+//                case Pause:
+//                    model.getSettings().pause = !model.getSettings().pause;
+//                    break;
             }
         }
 
@@ -405,7 +398,7 @@ public class PhysicsController {
 
 enum QueueItemType {
 
-    MouseDown, MouseMove, MouseUp, MouseDrag, KeyPressed, KeyReleased, LaunchBomb, Pause
+    MouseDown, MouseMove, MouseUp, MouseDrag, KeyPressed, KeyReleased
 }
 
 class QueueItem {
@@ -416,10 +409,6 @@ class QueueItem {
     final public char c;
     final public int button;
     final public int code;
-
-    public QueueItem() {
-        this(QueueItemType.LaunchBomb);
-    }
 
     public QueueItem(QueueItemType t) {
         this(t, null, -1);

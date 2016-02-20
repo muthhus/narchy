@@ -31,12 +31,13 @@ import nars.rover.physics.PhysicsController;
 import nars.rover.physics.PhysicsController.MouseBehavior;
 import nars.rover.physics.PhysicsController.UpdateBehavior;
 import nars.rover.physics.TestbedState;
+import nars.rover.physics.gl.Box2DJoglPanel;
 import nars.rover.physics.gl.JoglAbstractDraw;
-import nars.rover.physics.gl.JoglAbstractPanel;
+import nars.rover.physics.gl.AbstractJoglPanel;
 import nars.rover.physics.gl.JoglDraw;
-import nars.rover.physics.gl.JoglPanel;
 import nars.rover.physics.j2d.TestPanelJ2D;
 import nars.rover.physics.j2d.TestbedSidePanel;
+import org.jbox2d.callbacks.DebugDraw;
 
 import javax.swing.*;
 import java.awt.*;
@@ -79,7 +80,7 @@ public class PhysicsRun {
         config.setNumSamples(1);
         //config.setBackgroundOpaque(false);
 
-        JoglAbstractPanel panel = new JoglPanel(model, controller, config) {
+        AbstractJoglPanel panel = new Box2DJoglPanel(model, controller, config) {
 
         };
 
@@ -90,7 +91,7 @@ public class PhysicsRun {
         model.setPanel(panel);
 
         //model.setDebugDraw(new DrawPhy2D(panel, true));
-        model.setDebugDraw(joglDraw);
+        //model.setDebugDraw(joglDraw);
 
         for (PhysicsModel test : tests) {
             model.addTest(test);

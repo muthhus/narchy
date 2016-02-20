@@ -5,7 +5,6 @@ import automenta.spacegraph.demo.spacegraph.DemoTextButton;
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.glu.GLU;
-import com.jogamp.opengl.util.FPSAnimator;
 import com.sun.prism.impl.BufferUtil;
 import nars.rover.physics.PhysicsController;
 import nars.rover.physics.TestbedPanel;
@@ -49,40 +48,37 @@ import static com.jogamp.opengl.fixedfunc.GLMatrixFunc.GL_PROJECTION;
 /**
  *
  */
-public abstract class JoglAbstractPanel extends GLCanvas implements TestbedPanel, GLEventListener {
+public abstract class AbstractJoglPanel extends GLCanvas implements TestbedPanel, GLEventListener {
     private static final long serialVersionUID = 1L;
 
-    public static final int SCREEN_DRAG_BUTTON = 3;
+    //public static final int SCREEN_DRAG_BUTTON = 3;
 
     public static final int INIT_WIDTH = 600;
     public static final int INIT_HEIGHT = 600;
 
-    public final PhysicsController controller;
-    private final World world;
-    private final DebugDraw debugDraw;
-    private Timer timer;
+    public final World world;
+    //private Timer timer;
     //LightEngine light = new LightEngine();
 
-    private final TestbedState model;
+    public final TestbedState model;
     private Point center;
 
-    final Space2D sg = new DemoTextButton().getSpace();
+
 
     // model can be null
     // if it is null world and debugDraw can be null, because they are retrived from model
-    public JoglAbstractPanel(final World world, DebugDraw debugDraw, final PhysicsController controller, TestbedState model, GLCapabilitiesImmutable config) {
+    public AbstractJoglPanel(final World world, final PhysicsController controller, TestbedState model, GLCapabilitiesImmutable config) {
         super(config);
-        this.controller = controller;
         setSize(INIT_WIDTH, INIT_HEIGHT);
         //(new Dimension(600, 600));
         //setAutoSwapBufferMode(true);
         addGLEventListener(this);
         enableInputMethods(true);
 
-        if (model != null && controller != null) {
-            //AWTPanelHelper.addHelpAndPanelListeners(this, model, controller, SCREEN_DRAG_BUTTON);
-            AWTPanelHelper.addHelpAndPanelListeners(this, model, controller, SCREEN_DRAG_BUTTON);
-        }
+//        if (model != null && controller != null) {
+//            //AWTPanelHelper.addHelpAndPanelListeners(this, model, controller, SCREEN_DRAG_BUTTON);
+//            AWTPanelHelper.addHelpAndPanelListeners(this, model, controller, SCREEN_DRAG_BUTTON);
+//        }
 
         addComponentListener(new ComponentAdapter() {
             @Override
@@ -93,7 +89,7 @@ public abstract class JoglAbstractPanel extends GLCanvas implements TestbedPanel
         });
 
         this.world = world;
-        this.debugDraw = debugDraw;
+
         this.model = model;
     }
 
@@ -144,7 +140,7 @@ public abstract class JoglAbstractPanel extends GLCanvas implements TestbedPanel
             time = model.model.getTime();
         }
 
-        game.draw(gl, time);
+        game.render(gl, time);
 
 
         //https://www.opengl.org/sdk/docs/man2/xhtml/glAccum.xml
@@ -164,13 +160,11 @@ public abstract class JoglAbstractPanel extends GLCanvas implements TestbedPanel
 
     }
 
-    private World getWorld() {
-        return model != null ? model.getCurrTest().getWorld() : world;
-    }
+//    protected World getWorld() {
+//        return model != null ? model.getCurrTest().getWorld() : world;
+//    }
 
-    private DebugDraw getDebugDraw() {
-        return model != null ? model.getDebugDraw() : debugDraw;
-    }
+
 
     @Override
     public void dispose(GLAutoDrawable arg0) {
@@ -469,9 +463,8 @@ axis.
 
  */
 
-        final GLU glu = new GLU();
 
-        public void draw(GL2 gl, float time) {
+        public void render(GL2 gl, float dt) {
 
             pollEvents();
 
@@ -530,17 +523,8 @@ axis.
                     }
                 }
             }
-//
-//
-//
-//
-            //layer #1
-            JoglAbstractDraw phys2d = ((JoglAbstractDraw) getDebugDraw());
-            phys2d.draw(getWorld(), time);
 
-            //layer #2
-            sg.draw(gl);
-
+            draw(gl, dt);
 
             matrix.rewind();
 
@@ -550,19 +534,24 @@ axis.
 
     }
 
+    abstract protected void draw(GL2 gl, float dt);
+
     Game game;
     private int w = 1024, h = 768;
 
     private int forward = KeyEvent.VK_W;
     private int backward = KeyEvent.VK_S;
-    private int strafel = KeyEvent.VK_A;
-    private int strafer = KeyEvent.VK_D;
+    private int strafeL = KeyEvent.VK_A;
+    private int strafeR = KeyEvent.VK_D;
     private int shoot = InputEvent.BUTTON1_MASK;
     private int use = InputEvent.BUTTON3_MASK;
 
     public void init(GLAutoDrawable drawable) {
 
+
         GL2 gl = (GL2) drawable.getGL();
+
+        initEffects(gl);
 
         game = new Game(gl);
 
@@ -612,13 +601,14 @@ axis.
 
                 }
 
+                //TODO switch/table
                 if (k == forward) game.forward(+1f);
 
-                if (k == backward) game.forward(-1);
+                else if (k == backward) game.forward(-1);
 
-                if (k == strafel) game.strafe(+1);
+                else if (k == strafeL) game.strafe(+1);
 
-                if (k == strafer) game.strafe(-1);
+                else if (k == strafeR) game.strafe(-1);
 
             }
 
@@ -628,7 +618,7 @@ axis.
 
                 int k = e.getKeyCode();
                 if (k == forward || k == backward) game.forward(0);
-                else if (k == strafel || k == strafer) game.strafe(0);
+                else if (k == strafeL || k == strafeR) game.strafe(0);
 
             }
 
@@ -655,19 +645,18 @@ axis.
     }
 
 
-    public void init2D(GLAutoDrawable arg0) {
-        GL gl2 = getGL();
+//    public void init2D(GLAutoDrawable arg0) {
+//        GL gl2 = getGL();
+//
+//
+//        //getGL().getGL2().glClearColor(0f, 0f, 0f, 1f);
+//
+//
+//        new FPSAnimator(this, 25);
+//    }
 
-        initTweaks(gl2);
-
-        //getGL().getGL2().glClearColor(0f, 0f, 0f, 1f);
-
-
-        new FPSAnimator(this, 25);
-    }
-
-    public void initTweaks(GL gl2) {
-        gl2.glLineWidth(1f);
+    public void initEffects(GL gl2) {
+        gl2.glLineWidth(2f);
 
         gl2.glEnable(GL.GL_LINE_SMOOTH);
         gl2.glEnable(GL.GL_LINE_WIDTH);
@@ -726,8 +715,5 @@ axis.
 
         gl2.glViewport(0, 0, getWidth(), getHeight());
 
-        if (controller != null) {
-            controller.updateExtents(arg3 / 2f, arg4 / 2f);
-        }
     }
 }

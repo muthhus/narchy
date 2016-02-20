@@ -39,7 +39,6 @@ import java.util.Vector;
 public class TestbedState {
   private final DefaultComboBoxModel tests = new DefaultComboBoxModel();
   private final TestbedSettings settings = new TestbedSettings();
-  private DebugDraw draw;
   public PhysicsModel model;
   private final Vector<TestChangedListener> listeners = new Vector<>();
   private final boolean[] keys = new boolean[512];
@@ -85,18 +84,12 @@ public class TestbedState {
     return calculatedFps;
   }
 
-  public void setViewportTransform(IViewportTransform transform) {
-    draw.getViewportTranform().setExtents(transform.getExtents());
-    draw.getViewportTranform().setCenter(transform.getCenter());
-  }
+//  public void setViewportTransform(IViewportTransform transform) {
+//    draw.getViewportTranform().setExtents(transform.getExtents());
+//    draw.getViewportTranform().setCenter(transform.getCenter());
+//  }
 
-  public void setDebugDraw(DebugDraw argDraw) {
-    draw = argDraw;
-  }
 
-  public DebugDraw getDebugDraw() {
-    return draw;
-  }
 
   public PhysicsModel getCurrTest() {
     return model;

@@ -101,7 +101,7 @@ public class Arm extends Robotic implements LayerDraw {
         this.ang = ang;
         this.base = base;
 
-        ((JoglAbstractDraw)sim.draw()).addLayer(this);
+        ((JoglAbstractDraw)sim.getModel().getPanel()).addLayer(this); //HACKAAHACK
 
         //Vec2 attachPoint = new Vec2(ax, ay);
 

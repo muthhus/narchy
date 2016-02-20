@@ -376,9 +376,9 @@ public class NARover extends AbstractPolygonBot {
 
 
                 @Override
-                protected void updateColor(Color3f rayColor) {
-                    float s = distToHit();
-                    rayColor.set(s,1f-s,0.5f);
+                @Deprecated protected void updateColor(Color3f rayColor) {
+//                    float s = v.hitDist;
+//                    rayColor.set(s,1f-s,0.5f);
                 }
             };
 
@@ -387,13 +387,9 @@ public class NARover extends AbstractPolygonBot {
 
             for (String material : new String[]{"food", "poison"}) {
 
-
-
-
-
                 DoubleSupplier value = () -> {
                     if (v.hit(material)) {
-                        return 1f - v.distToHit(); //closer = larger number (up to 1.0)
+                        return 1f - v.hitDist; //closer = larger number (up to 1.0)
                     }
                     return 0; //nothing seen within the range
                 };
@@ -408,7 +404,7 @@ public class NARover extends AbstractPolygonBot {
                 controller.input.add(value);
             }
 
-            draw.addLayer(v);
+            //draw.addLayer(v);
             senses.add(v);
         }
 

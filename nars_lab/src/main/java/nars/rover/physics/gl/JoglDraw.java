@@ -9,22 +9,23 @@ import org.jbox2d.particle.ParticleColor;
  *
  */
 public class JoglDraw extends JoglAbstractDraw {
-    private final JoglAbstractPanel panel;
+    private final AbstractJoglPanel panel;
 
-    public JoglDraw(JoglAbstractPanel panel) {
+    public JoglDraw(AbstractJoglPanel panel) {
         this.panel = panel;
     }
 
     @Override
     protected PhysicsCamera getPhysicsCamera() {
-        PhysicsCamera p = null;
-
-        PhysicsController controller = panel.controller;
-        if( controller != null ) {
-            p = controller.getCamera();
-        }
-
-        return p;
+//        PhysicsCamera p = null;
+//
+//        PhysicsController controller = panel.controller;
+//        if( controller != null ) {
+//            p = controller.getCamera();
+//        }
+//
+//        return p;
+        return null;
     }
 
     @Override

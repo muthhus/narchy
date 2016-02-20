@@ -3,6 +3,7 @@ package nars.rover.robot;
 import nars.NAR;
 import nars.rover.Material;
 import nars.rover.Sim;
+import nars.rover.physics.gl.AbstractJoglPanel;
 import nars.rover.physics.gl.JoglAbstractDraw;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.dynamics.Body;
@@ -19,7 +20,7 @@ abstract public class Robotic {
     //public class ChangedNumericInput //discretizer
     public Sim sim;
     public final String id;
-    public JoglAbstractDraw draw;
+
     float mass = 1f;
 
     public Robotic(String id) {
@@ -28,7 +29,7 @@ abstract public class Robotic {
 
     public void init(Sim p) {
         this.sim = p;
-        this.draw = (JoglAbstractDraw)p.draw();
+
         this.torso = newTorso();
     }
 

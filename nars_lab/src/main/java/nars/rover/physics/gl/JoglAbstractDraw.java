@@ -48,7 +48,7 @@ import static nars.rover.Sim.poisonFill;
 public abstract class JoglAbstractDraw extends DebugDraw {
 
     public static final int MAX_POLYGON_VERTICES = Settings.maxPolygonVertices;
-    private JoglAbstractPanel panel;
+    private AbstractJoglPanel panel;
     private final TextRenderer text;
     private static final int NUM_CIRCLE_POINTS = 11;
     public final List<LayerDraw> layers = new FasterList<>();
@@ -63,7 +63,7 @@ public abstract class JoglAbstractDraw extends DebugDraw {
         viewportTransform.setCamera(0, 0, 50.0f);
     }
 
-    public void setPanel(JoglAbstractPanel panel) {
+    public void setPanel(AbstractJoglPanel panel) {
 
         this.panel = panel;
     }
