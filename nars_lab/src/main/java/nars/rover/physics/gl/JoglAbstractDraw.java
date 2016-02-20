@@ -47,6 +47,7 @@ import static nars.rover.Sim.poisonFill;
 
 public abstract class JoglAbstractDraw extends DebugDraw {
 
+    public static final int MAX_POLYGON_VERTICES = Settings.maxPolygonVertices;
     private JoglAbstractPanel panel;
     private final TextRenderer text;
     private static final int NUM_CIRCLE_POINTS = 11;
@@ -79,14 +80,14 @@ public abstract class JoglAbstractDraw extends DebugDraw {
 
         if (w == null) return;
 
-        PhysicsCamera p = getPhysicsCamera();
-
-        if (p != null) {
-            Vec2 center = p.getTransform().getCenter();
-
-            viewportTransform.setCenter(center);
-            viewportTransform.setExtents(p.getTargetScale(), p.getTargetScale());
-        }
+//        PhysicsCamera p = getPhysicsCamera();
+//
+//        if (p != null) {
+//            Vec2 center = p.getTransform().getCenter();
+//
+//            viewportTransform.setCenter(center);
+//            viewportTransform.setExtents(p.getTargetScale(), p.getTargetScale());
+//        }
 
         for (int i = 0, layersSize = layers.size(); i < layersSize; i++) {
             layers.get(i).drawGround(this, w);
@@ -232,8 +233,8 @@ public abstract class JoglAbstractDraw extends DebugDraw {
             case POLYGON: {
                 PolygonShape poly = (PolygonShape) fixture.getShape();
                 int vertexCount = poly.m_count;
-                assert (vertexCount <= Settings.maxPolygonVertices);
-                Vec2[] vertices = tlvertices.get(Settings.maxPolygonVertices);
+                assert (vertexCount <= MAX_POLYGON_VERTICES);
+                Vec2[] vertices = tlvertices.get(MAX_POLYGON_VERTICES);
 
 
                 for (int i = 0; i < vertexCount; ++i) {
@@ -277,42 +278,42 @@ public abstract class JoglAbstractDraw extends DebugDraw {
         return super.getViewportTranform();
     }
 
-    //
-    public void transformViewport(GL2 gl, Vec2 center) {
-
-        //Vec2 e = viewportTransform.getExtents();
-        Vec2 vc = viewportTransform.getCenter();
-        //Mat22 vt = viewportTransform.getMat22Representation();
-        //Vec2 ee = viewportTransform.getExtents();
-
-//    int f = viewportTransform.isYFlip() ? -1 : 1;
-//    mat[0] = exx;//vt.ex.x;
-//    mat[4] = eyx; //vt.ey.x;
-//    // mat[8] = 0;
-//    mat[12] = e.x;
-//    mat[1] = f * exy; //vt.ex.y;
-//    mat[5] = f * eyy; //vt.ey.y;
-//    // mat[9] = 0;
-//    mat[13] = e.y;
-//    // mat[2] = 0;
-//    // mat[6] = 0;
-//    // mat[10] = 1;
-//    // mat[14] = 0;
-//    // mat[3] = 0;
-//    // mat[7] = 0;
-//    // mat[11] = 0;
-//    // mat[15] = 1;
-
-        //gl.glMultMatrixf(mat, 0);
-        gl.glLoadIdentity();
-
-        Vec2 scale = viewportTransform.getExtents();
-
-
-        gl.glScalef(scale.x, scale.y, 1f);
-
-        gl.glTranslatef(center.x - vc.x, center.y - vc.y, 0);
-    }
+//    //
+//    public void transformViewport(GL2 gl, Vec2 center) {
+//
+//        //Vec2 e = viewportTransform.getExtents();
+//        Vec2 vc = viewportTransform.getCenter();
+//        //Mat22 vt = viewportTransform.getMat22Representation();
+//        //Vec2 ee = viewportTransform.getExtents();
+//
+////    int f = viewportTransform.isYFlip() ? -1 : 1;
+////    mat[0] = exx;//vt.ex.x;
+////    mat[4] = eyx; //vt.ey.x;
+////    // mat[8] = 0;
+////    mat[12] = e.x;
+////    mat[1] = f * exy; //vt.ex.y;
+////    mat[5] = f * eyy; //vt.ey.y;
+////    // mat[9] = 0;
+////    mat[13] = e.y;
+////    // mat[2] = 0;
+////    // mat[6] = 0;
+////    // mat[10] = 1;
+////    // mat[14] = 0;
+////    // mat[3] = 0;
+////    // mat[7] = 0;
+////    // mat[11] = 0;
+////    // mat[15] = 1;
+//
+//        //gl.glMultMatrixf(mat, 0);
+//        gl.glLoadIdentity();
+//
+//        Vec2 scale = viewportTransform.getExtents();
+//
+//
+//        gl.glScalef(scale.x, scale.y, 1f);
+//
+//        gl.glTranslatef(center.x - vc.x, center.y - vc.y, 0);
+//    }
 
     @Override
     public void drawPoint(Vec2 argPoint, float argRadiusOnScreen, Color3f argColor) {
@@ -329,8 +330,8 @@ public abstract class JoglAbstractDraw extends DebugDraw {
     @Override
     public void drawPolygon(Vec2[] vertices, int vertexCount, Color3f color) {
         GL2 gl = panel.getGL().getGL2();
-        gl.glPushMatrix();
-        transformViewport(gl, zero);
+        //gl.glPushMatrix();
+        //transformViewport(gl, zero);
         gl.glBegin(GL2.GL_LINE_LOOP);
         gl.glColor4f(color.x, color.y, color.z, 1f);
         for (int i = 0; i < vertexCount; i++) {
@@ -338,7 +339,7 @@ public abstract class JoglAbstractDraw extends DebugDraw {
             gl.glVertex2f(v.x, v.y);
         }
         gl.glEnd();
-        gl.glPopMatrix();
+        //gl.glPopMatrix();
     }
 
 //    public void drawSolidRect(float px, float py, float w, float h, float r, float G, float b) {
@@ -376,8 +377,8 @@ public abstract class JoglAbstractDraw extends DebugDraw {
     @Override
     public void drawSolidPolygon(Vec2[] vertices, int vertexCount, Color3f color) {
         GL2 gl = panel.getGL().getGL2();
-        gl.glPushMatrix();
-        transformViewport(gl, zero);
+        //gl.glPushMatrix();
+        //transformViewport(gl, zero);
         gl.glBegin(GL2.GL_TRIANGLE_FAN);
         gl.glColor3f(color.x, color.y, color.z);
         for (int i = 0; i < vertexCount; i++) {
@@ -402,8 +403,8 @@ public abstract class JoglAbstractDraw extends DebugDraw {
     @Override
     public void drawCircle(Vec2 center, float radius, Color3f color) {
         GL2 gl = panel.getGL().getGL2();
-        gl.glPushMatrix();
-        transformViewport(gl, zero);
+        //gl.glPushMatrix();
+        //transformViewport(gl, zero);
         float theta = 2 * MathUtils.PI / NUM_CIRCLE_POINTS;
         float c = MathUtils.cos(theta);
         float s = MathUtils.sin(theta);
@@ -421,14 +422,14 @@ public abstract class JoglAbstractDraw extends DebugDraw {
             y = s * temp + c * y;
         }
         gl.glEnd();
-        gl.glPopMatrix();
+        //gl.glPopMatrix();
     }
 
 
     public void drawCircle(Vec2 center, float radius, Vec2 axis, Color3f color) {
         GL2 gl = panel.getGL().getGL2();
-        gl.glPushMatrix();
-        transformViewport(gl, zero);
+        //gl.glPushMatrix();
+        //transformViewport(gl, zero);
         float theta = 2 * MathUtils.PI / NUM_CIRCLE_POINTS;
         float c = MathUtils.cos(theta);
         float s = MathUtils.sin(theta);
@@ -450,14 +451,14 @@ public abstract class JoglAbstractDraw extends DebugDraw {
         gl.glVertex3f(cx, cy, 0);
         gl.glVertex3f(cx + axis.x * radius, cy + axis.y * radius, 0);
         gl.glEnd();
-        gl.glPopMatrix();
+        //gl.glPopMatrix();
     }
 
     @Override
     public void drawSolidCircle(Vec2 center, float radius, Vec2 axis, Color3f color) {
         GL2 gl = panel.getGL().getGL2();
-        gl.glPushMatrix();
-        transformViewport(gl, zero);
+        //gl.glPushMatrix();
+        //transformViewport(gl, zero);
         float theta = 2 * MathUtils.PI / NUM_CIRCLE_POINTS;
         float c = MathUtils.cos(theta);
         float s = MathUtils.sin(theta);
@@ -489,32 +490,32 @@ public abstract class JoglAbstractDraw extends DebugDraw {
         gl.glVertex3f(cx, cy, 0);
         gl.glVertex3f(cx + axis.x * radius, cy + axis.y * radius, 0);
         gl.glEnd();
-        gl.glPopMatrix();
+        //gl.glPopMatrix();
     }
 
     @Override
     public void drawSegment(Vec2 p1, Vec2 p2, Color3f color) {
         GL2 gl = panel.getGL().getGL2();
-        gl.glPushMatrix();
-        transformViewport(gl, zero);
+        //gl.glPushMatrix();
+        //transformViewport(gl, zero);
         gl.glBegin(GL2.GL_LINES);
         gl.glColor3f(color.x, color.y, color.z);
         gl.glVertex3f(p1.x, p1.y, 0);
         gl.glVertex3f(p2.x, p2.y, 0);
         gl.glEnd();
-        gl.glPopMatrix();
+        //gl.glPopMatrix();
     }
     public void drawSegment(Vec2 p1, Vec2 p2, float r, float g, float b, float a, float width) {
         GL2 gl = panel.getGL().getGL2();
-        gl.glPushMatrix();
-        transformViewport(gl, zero);
+        //gl.glPushMatrix();
+        //transformViewport(gl, zero);
         gl.glLineWidth(width);
         gl.glBegin(GL2.GL_LINES);
         gl.glColor4f(r, g, b, a);
         gl.glVertex3f(p1.x, p1.y, 0);
         gl.glVertex3f(p2.x, p2.y, 0);
         gl.glEnd();
-        gl.glPopMatrix();
+        //gl.glPopMatrix();
     }
 
 //  @Override
