@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!--
+Test bracket matcher definition. This tries several extreme cases.
+rli@chello.at
+-->
+<REDConfig>
+	<BracketMatcher id="Tilt1">
+		<StyleSet id="styles">
+			<IgnoreStyle>ThisStyle won't exist</IgnoreStyle>
+		</StyleSet>
+		<RuleSet id="rules">
+			<BeforeLeft>FALSE</BeforeLeft>
+			<AfterLeft>1</AfterLeft>
+		</RuleSet>
+		<Pattern RuleSet="rules" StyleSet="styles">
+			<Left>(</Left>
+			<Right>)</Right>
+		</Pattern>
+		<Pattern RuleSet="rules" StyleSet="styles">
+			<Left>{</Left>
+			<Right>}</Right>
+		</Pattern>
+		<Style>ThisStyle won't exist</Style>
+		<MaxLines>1oo</MaxLines>
+		<MaxChars>2oo</MaxChars>
+	</BracketMatcher>
+</REDConfig>

@@ -63,7 +63,7 @@ public abstract class JoglAbstractPanel extends GLCanvas implements TestbedPanel
     public JoglAbstractPanel(final World world, DebugDraw debugDraw, final PhysicsController controller, TestbedState model, GLCapabilitiesImmutable config) {
         super(config);
         this.controller = controller;
-        setSize(800, 800);
+        setSize(INIT_WIDTH, INIT_HEIGHT);
         //(new Dimension(600, 600));
         //setAutoSwapBufferMode(true);
         addGLEventListener(this);
@@ -107,6 +107,7 @@ public abstract class JoglAbstractPanel extends GLCanvas implements TestbedPanel
     public void display(GLAutoDrawable arg0) {
         repainter();
     }
+
     protected void repainter() {
 
         GL2 gl = getGL().getGL2();
@@ -184,8 +185,8 @@ public abstract class JoglAbstractPanel extends GLCanvas implements TestbedPanel
 
     @Override
     public void reshape(GLAutoDrawable arg0, int arg1, int arg2, int arg3, int arg4) {
-        float width = (float)getWidth();
-        float height = (float)getHeight();
+        float width = getWidth();
+        float height = getHeight();
 
         GL2 gl2 = arg0.getGL().getGL2();
 

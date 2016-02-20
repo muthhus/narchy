@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<!-- Test incomplete style: TestStyle4 has not got a font size or super style. -->
+<REDConfig>
+	<Style id="ThemesTestStyle1">
+		<FontFace>Helvetica</FontFace>
+		<FontSize>12</FontSize>
+		<FontStyle>plain</FontStyle>
+		<Lining>none</Lining>
+		<Foreground red="0" green="0" blue="0"/>
+		<Background red="255" green="255" blue="255"/>
+	</Style>
+	<Style id="ThemesTestStyle1" theme="TestTheme1">
+		<FontFace>Monospaced</FontFace>
+		<FontSize>10</FontSize>
+		<FontStyle>italic</FontStyle>
+		<Lining>doubleunder</Lining>
+		<Foreground red="10" green="10" blue="10"/>
+		<Background red="245" green="245" blue="245"/>
+	</Style>
+	<Style id="ThemesTestStyle1" theme="TestTheme2">
+		<FontFace>Tahoma</FontFace>
+		<FontSize>8</FontSize>
+		<FontStyle>bolditalic</FontStyle>
+		<Lining>doublethrough</Lining>
+		<Foreground red="20" green="20" blue="20"/>
+		<Background red="55" green="55" blue="55"/>
+	</Style>
+	<Style id="ThemesTestStyle2">
+		<FontFace>Arial</FontFace>
+		<Super>ThemesTestStyle1</Super>
+	</Style>
+	<Style id="ThemesTestStyle2" theme="TestTheme1">
+		<FontFace>Helvetica</FontFace>
+		<Super>ThemesTestStyle1</Super>
+	</Style>
+	<Style id="ThemesTestStyle2" theme="TestTheme2">
+		<FontSize>18</FontSize>
+		<Super>Default</Super>
+	</Style>
+</REDConfig>

@@ -1,0 +1,104 @@
+<?xml version="1.0"?>
+<!--
+C++ syntax highlighter definition.
+robert.lichtenberger@windriver.com
+-->
+<REDConfig>
+	<Syntaxhighlighter id="C++">
+<!--	Simplified for better performance
+		<Pattern>
+			<Style>KeywordLogic</Style>
+			<RegExp>and|and_eq|bitand|bitor|compl|not|not_eq|or|or_eq|xor|xor_eq</RegExp>
+		</Pattern>   
+        <Pattern>
+            <Style>Keyword</Style>
+            <RegExp>asm|sizeof|typeid|typename</RegExp>
+        </Pattern>
+        <Pattern>
+            <Style>KeywordModifier</Style>
+            <RegExp>auto|const|explicit|export|extern|inline|mutable|register|virtual|private|protected|public|static|volatile</RegExp>
+        </Pattern>
+        <Pattern>
+            <Style>KeywordDataType</Style>
+            <RegExp>bool|char|double|float|int|long|short|signed|unsigned|void|wchar_t</RegExp>
+        </Pattern>
+        <Pattern>
+            <Style>KeywordControl</Style>
+            <RegExp>break|case|catch|continue|default|do|else|for|goto|if|return|switch|throw|try|while</RegExp>
+        </Pattern>
+        <Pattern>
+            <Style>KeywordStructures</Style>
+            <RegExp>class|delete|enum|friend|namespace|new|template|this|typedef|union|using</RegExp>
+        </Pattern>
+        <Pattern>
+            <Style>KeywordCasts</Style>
+            <RegExp>const_cast|dynamic_cast|reinterpret_cast|static_cast|struct</RegExp>
+        </Pattern>-->
+		
+		<Pattern>
+			<Style>Keyword</Style>
+			<RegExp>and|and_eq|bitand|bitor|compl|not|not_eq|or|or_eq|xor|xor_eq|asm|sizeof|typeid|typename|auto|const|explicit|export|extern|inline|mutable|register|virtual|private|protected|public|static|volatile|bool|char|double|float|int|long|short|signed|unsigned|void|wchar_t|break|case|catch|continue|default|do|else|for|goto|if|return|switch|throw|try|while|class|delete|enum|friend|namespace|new|template|this|typedef|union|using|const_cast|dynamic_cast|reinterpret_cast|static_cast|struct</RegExp>
+        </Pattern>
+		
+		<Pattern>
+			<Style>Character</Style>
+			<RegExp>L?'([^\\'\n\r]|\\['"?\\abfnrtv]|\\[0-7]{1,3}|\\x[0-9a-fA-F]+|\\u[0-9a-fA-F]{4}|\\U[0-9a-fA-F]{8})+'</RegExp>
+		</Pattern>
+		<Pattern>
+			<Style>Integer</Style>
+			<RegExp>(0(([xX][0-9a-fA-F]+)|[0-7]+)?|[1-9][0-9]*)[ulUL]{0,2}</RegExp>
+		</Pattern>
+		<Pattern>
+			<Style>Float</Style>
+			<RegExp>(([0-9]+\.[0-9]*|\.[0-9]+)([eE][+-]?[0-9]+)?[fFdD]?)|([0-9]+(([eE][+-]?[0-9]+)[fFdD]?))</RegExp>
+		</Pattern>
+		<Pattern>
+			<Style>Boolean</Style>
+			<RegExp>true|false</RegExp>
+		</Pattern>
+		<Range>
+			<Style>String</Style>
+			<Start>L?"</Start>
+			<End>"|\n|\r\n|\r</End>
+			<SubParsers>
+				<Pattern>
+					<Style>StringQuoted</Style>
+					<RegExp>
+						\\\r|\\\n|\\\r\n|\\['"ß\\abfnrtv]|\\[0-7]{1,3}|
+						\\x[0-9a-fA-F]+|\\u[0-9a-fA-F]{4}|\\U[0-9a-fA-F]{8}
+					</RegExp>
+				</Pattern>
+			</SubParsers>
+		</Range>
+
+        <Range>
+			<Style>Preprocessor</Style>
+			<Start>#|#include</Start>
+			<End>\n|\r\n|\r</End>
+			<SubParsers>
+				<Range>
+					<Style>String</Style>
+					<Start>&lt;</Start>
+					<End>&gt;|\n|\r\n|\r</End>
+					<Rewind/>
+				</Range>
+				<Range>
+					<Style>String</Style>
+					<Start>"</Start>
+					<End>"</End>
+					<Rewind/>
+				</Range>
+			</SubParsers>
+		</Range>
+        <Range>
+            <Style>Comment</Style>
+            <Start>\/\/</Start>
+            <End>\n|\r\n|\r</End>
+		</Range>
+        <Range>
+            <Style>Comment</Style>
+            <Start>/\*</Start>
+            <End>\*/</End>
+		</Range>
+	</Syntaxhighlighter>
+</REDConfig>

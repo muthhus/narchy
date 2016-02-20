@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!-- Test incomplete style: TestStyle4 has not got a font size or super style. -->
+<REDConfig>
+	<Style id="TestStyle4">	
+		<FontFace>Helvetica</FontFace>
+		<FontStyle>plain</FontStyle>
+		<Lining>none</Lining>
+		<Foreground red="0" green="0" blue="0"/>
+		<Background red="255" green="255" blue="255"/>
+	</Style>
+	<Style id="TestStyle4" theme="FunkyTheme">
+		<Description>This should be ignored and a warning issued.</Description>
+		<DisplayName>Ignore me</DisplayName>
+		<Super>Default</Super>
+	</Style>
+</REDConfig>

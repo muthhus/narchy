@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!--
+Buildoutput syntax highlighter definition.
+johann.draschwandtner@windriver.com
+-->
+<REDConfig>
+	<Syntaxhighlighter id="Build">
+        <Range>
+            <Style>BuildInfo</Style>
+            <Start>ROME\ Build</Start>
+            <End>\n|\r\n|\r</End>
+	</Range>
+
+        <Range>
+            <Style>BuildInfoMake</Style>
+            <Start>ROME\ Info</Start>
+            <End>\n|\r\n|\r</End>
+	</Range>
+
+        <Range>
+            <Style>BuildError</Style>
+            <Start>Makefile\:</Start>
+            <End>\n|\r\n|\r</End>
+	</Range>
+
+        <Range>
+            <Style>BuildInfoDirectory</Style>
+            <Start>\*\*\*BUILD\ DIR\*\*\*</Start>
+            <End>\n|\r\n|\r</End>
+	</Range>
+
+        <Range>
+            <Style>BuildInfoFile</Style>
+            <Start>\*\*\*building\*\*\*</Start>
+            <End>\n|\r\n|\r</End>
+	</Range>
+
+        <Pattern>
+            <Style>BuildError</Style>
+            <RegExp>"Stop\.</RegExp>
+	</Pattern>
+
+	</Syntaxhighlighter>
+</REDConfig>

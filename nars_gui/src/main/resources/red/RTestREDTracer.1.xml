@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+
+<REDConfig>
+	<Tracer level="Off">
+		<TracePackage id="pack1">
+			<On>Class1|!Class2</On>
+		</TracePackage>
+		<TracePackage id="pack2">
+			<On>!Class1|*</On>
+		</TracePackage>
+		<TracePackage id="pack3">
+			<On>*|!Class1</On>
+		</TracePackage>
+	</Tracer>
+</REDConfig>
+

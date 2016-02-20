@@ -1,0 +1,220 @@
+# Master part included by real Makefiles for simplicity
+
+# Make variable is slightly altered to allow multiple make systems (temporarily!)
+MAKE=""make --no-print-directory --makefile=Makefile.wheel""
+
+DEBUG = 0
+TRACEON = $(DEBUG:0=@)
+TRACE = $(TRACEON:1=)
+
+#General Variables
+RIVERBED_ROOT := $(CURDIR)
+RIVERBED_PROJECT := $(notdir $(CURDIR))
+JAVA_INTERPRETER = $(JAVA_ROME_ROOT)/bin/java
+JAVA_INTERPRETER_PARAMS = -enableassertions
+JAVA = $(JAVA_INTERPRETER) $(JAVA_INTERPRETER_PARAMS)
+
+# Java Compiler variables
+JAVAC = $(JAVA_ROME_ROOT)/bin/javac
+JAVAC_FLAGS = $(JAVAC_USER_FLAGS) -source 1.4
+
+# Java Archiver variables (jar)
+JAR = $(JAVA_ROME_ROOT)/bin/jar
+JAR_FLAGS = -0cf
+
+# JavaDepend Variables
+JAVA_DEPEND =  $(JAVA) -cp $(JAVA_ROME_LIBS)/jdeps.jar smr.JavaDeps.JavaDeps
+JAVA_DEPEND_DEBUG_ON = $(DEBUG:1=-v)
+JAVA_DEPEND_DEBUG = $(JAVA_DEPEND_DEBUG_ON:0=)
+JAVA_DEPEND_FLAGS =  -f java.files --silent -d $(JAVA_GENDIR_ROOT) -o $@
+
+# JavaDoc Variables
+JAVADOC = $(JAVA_ROME_ROOT)/bin/javadoc
+JAVADOC_FLAGS = -source 1.4 $(JAVADOC_USER_FLAGS)
+JAVDOC_GENDIR_ROOT = $(JAVA_GENDIR_ROOT)/javadoc/$(RIVERBED_PROJECT)
+HEADER_STRING = "JavaDoc for $(RIVERBED_PROJECT), generated on `date +%d.%m.%y`"
+FOOTER_STRING = "Internal Document, no disclosure outside WindRiver"
+BOTTOM_STRING = "&copy; Copyright 2002 <A HREF="http://www.windriver.com" target="_top">Wind River Systems Inc.</A> All rights reserved."
+WINDOW_TITLE = "$(RIVERBED_PROJECT) Java Source Documentation"
+DOCUMENT_TITLE = "$(RIVERBED_PROJECT) Java Source Documentation"
+
+
+# Java classpath
+ifeq ("$(OS)", "Windows_NT")
+CP_SEP := ;
+else
+CP_SEP := :
+endif
+
+REAL_CLASSPATH = $(shell echo $(JAVA_CLASSPATH) | awk '{ for (i = 1; i < NF ; i++) printf "%s$(CP_SEP)", $$i;printf "%s", $$NF }')
+
+# general Rules
+
+all:: Makefile.JavaDepend check_java_gendir compile_java_files
+tests:: all
+
+ifdef FORCE_DEPS
+.PHONY: Makefile.JavaDepend java.files
+endif
+Makefile.JavaDepend: java.files
+	$(TRACE) echo "Generating Java Dependencies"; \
+	$(JAVA_DEPEND) $(JAVA_DEPEND_DEBUG) $(JAVA_DEPEND_FLAGS);\
+	ret=$$?;\
+	if [ "$$ret" != "0" ]; then\
+		echo "Removing corrupt $@";\
+		rm -f $@;\
+	fi;\
+	exit $$ret
+
+java.files:
+	$(TRACE) echo "Generating Java FileList of project $(RIVERBED_PROJECT)"; \
+	find . -name "*.java" > java.files
+
+include Makefile.JavaDepend
+
+check_java_gendir:
+	$(TRACE) echo "Checking java output directory"; \
+	mkdir -p $(JAVA_GENDIR_ROOT)
+
+compile_java_files: remove_filelist generate_filelist compile_filelist remove_filelist
+
+remove_filelist:
+	$(TRACE) echo "Removing old Filelist"; \
+	rm -f filelist.txt filelist.remove
+
+generate_filelist : info_generating_filelist  $(CLASSES)
+	$(TRACE) echo "Filelist containing javafiles to compile was generated"
+
+info_generating_filelist:
+	$(TRACE) echo "Generating filelist of javafiles to compile"
+
+compile_filelist:
+	$(TRACE) echo "Compiling Java Files"; \
+	touch filelist.txt filelist.remove; \
+	if [ `wc -w < filelist.remove` != 0  ]; then \
+		for file in `cat filelist.remove`; do\
+			rm -f $$file;\
+		done;\
+	fi;\
+	if [ `wc -w < filelist.txt` != 0  ]; then \
+		echo compiling files;\
+		cat filelist.txt;\
+		echo compiling `wc -l < filelist.txt` files;\
+		$(JAVAC) $(JAVAC_FLAGS) -classpath "$(REAL_CLASSPATH)" -d $(JAVA_GENDIR_ROOT) @filelist.txt ;\
+	else\
+		echo "Nothing to compile";\
+	fi
+
+rebuild: clean
+	$(TRACE) echo "===============================================";\
+	echo "Rebuilding Project $(RIVERBED_PROJECT) complete";\
+	echo "===============================================";\
+	rm -f Makefile.JavaDepend java.files;\
+	$(MAKE) $(MFLAGS) all || exit
+
+
+#CLASSES_FOR_CLEAN := $(subst .class,*.class,$(subst \,/,$(CLASSES)))
+#	$(foreach n, $(CLASSES_FOR_CLEAN), rm -f $(n);)
+RIVERBED_ROOT_PACKAGE = $(RIVERBED_PROJECT)
+clean:: Makefile.JavaDepend
+	$(TRACE) echo "remove all class files of the project"; \
+	rm -rf $(JAVA_GENDIR_ROOT)/$(RIVERBED_ROOT_PACKAGE)
+
+print_make_env:
+	$(TRACE) echo CLASSPATH="$(REAL_CLASSPATH)"; \
+	echo JAVA="$(JAVA)"; \
+	echo JAVAC="$(JAVAC)"; \
+	echo JAR="$(JAR)"; \
+	echo JAVA_GENDIR_ROOT="$(JAVA_GENDIR_ROOT)"; \
+	echo MAIN_TEST_FLAGS="$(MAIN_TEST_FLAGS)";\
+	echo RIVERBED_ROOT="$(RIVERBED_ROOT)"
+
+%.jar:
+	$(TRACE) echo "Generating Archive $@ $*"; \
+	_PWD=$(CURDIR); \
+	cd $(JAVA_GENDIR_ROOT); \
+	if [ -f $@ ]; then \
+		rm -f $@; \
+	fi; \
+	$(JAR) $(JAR_FLAGS) $@ \
+		$(foreach n, $($*JAR_PACKAGES), $(n)/*.class) \
+		$(foreach xx, $(wildcard $(foreach n, $($*JAR_PACKAGES), $(foreach e, $($*JAR_EXTRAS),$(n)/$(e)))), -C $$_PWD $(xx));\
+	cd $$_PWD; \
+	cp $(JAVA_GENDIR_ROOT)/$@ .
+
+%_test:
+	$(TRACE) echo "Running Test $*";\
+	$(JAVA)  $($*_TEST_JAVA_FLAGS) -classpath "$(REAL_CLASSPATH)" $($*_TEST_MAIN_CLASS) $($*_TEST_CLASS)
+
+generate_java_docu: check_java_gendir java.files
+	$(TRACE) echo "Creating javadocu for rome into '$(JAVDOC_GENDIR_ROOT)'" ;\
+	if [ ! -d $(JAVDOC_GENDIR_ROOT) ]; then\
+		mkdir -p $(JAVDOC_GENDIR_ROOT);\
+	fi;\
+	$(JAVADOC) $(JAVADOC_FLAGS) \
+		-classpath "$(REAL_CLASSPATH)" \
+		-package \
+		-d "$(JAVDOC_GENDIR_ROOT)" \
+		-author \
+		-windowtitle $(WINDOW_TITLE) \
+		-doctitle $(DOCUMENT_TITLE) \
+		-header $(HEADER_STRING) \
+		-footer $(FOOTER_STRING) \
+		-bottom $(BOTTOM_STRING) \
+		-splitindex \
+		@java.files \
+		> $(JAVA_GENDIR_ROOT)/javadoc.output 2>&1; \
+	if [ "`egrep error $(JAVA_GENDIR_ROOT)/javadoc.output`" = "" ]; then \
+		echo "This javadoc session produced the followin output: ";\
+		cat $(JAVA_GENDIR_ROOT)/javadoc.output;\
+	else\
+		echo "#########################-BEGIN ERROR DESCRIPTION-##########################";\
+		cat $(JAVA_GENDIR_ROOT)/javadoc.output;\
+		echo "#########################-END ERROR DESCRIPTION-############################";\
+	fi;\
+	rm -rf $(JAVA_GENDIR_ROOT)/javadoc.output
+
+
+help:
+	$(TRACE) echo "GENERAL TARGETS";\
+	echo "===============";\
+	echo "    all                  make the entire project (default)";\
+	echo "    rebuild              rebuild the entire project (clean + all with FORCE_DEPS=1)";\
+	echo "    clean                remove all generated .class files";\
+	echo "    tests                all + tests";\
+	echo "    generate_java_docu   build the javadoc";\
+	echo "    jar                  build the project's jar file";\
+	echo "    print_make_env"      print useful variables like classpath;\
+	echo;\
+	echo "MAKE FLAGS";\
+	echo "==========";\
+	echo "    DEBUG=1              Print verbose output of make run. ";\
+	echo "    FORCE_DEPS=1         Regenerate the list of files and dependencies for make. ";\
+	echo "                         (Use, when files are added or removed from the project)";\
+	echo;\
+	echo "SPECIFIC TARGETS";\
+	echo "================"
+
+
+# special targets for SNiFF+ Users only
+
+%_run: $*_run.sh
+	. $(RIVERBED_ROOT)sniff_data/$(RIVERBED_PROJECT)/$*_run.sh
+
+%_run.sh :
+	$(TRACE) echo "Generating SNiFF+ script for $*";\
+	tgtDir=$(RIVERBED_ROOT)sniff_data/$(RIVERBED_PROJECT);\
+	rm -f $$tgtDir/$*_run.sh $$tgtDir/$*_run.env ;\
+	echo "$(JAVA) $($*_RUN_JAVA_FLAGS) -classpath \"$(REAL_CLASSPATH)\" $($*_RUN_MAIN_CLASS)" > $$tgtDir/$*_run.sh ;\
+	echo "if [ \$$? != 0 ]; then" >> $$tgtDir/$*_run.sh ;\
+	echo "	echo \"\"" >> $$tgtDir/$*_run.sh ;\
+	echo "	echo \"Error(s) occured!\"" >> $$tgtDir/$*_run.sh ;\
+	echo "fi" >> $$tgtDir/$*_run.sh ;\
+	echo "echo \"Press RETURN to exit\"" >> $$tgtDir/$*_run.sh ;\
+	echo "read a" >> $$tgtDir/$*_run.sh ;\
+	chmod a+x $$tgtDir/$*_run.sh ;\
+	echo "CLASSPATH=\"$(REAL_CLASSPATH)\"" > $$tgtDir/$*_run.env ;\
+	echo "JAVA_INTERPRETER=\"$(JAVA_INTERPRETER)\"" >> $$tgtDir/$*_run.env ;\
+	echo "JAVA_INTERPRETER_PARAMS=\"$($*_RUN_JAVA_FLAGS)\"" >> $$tgtDir/$*_run.env ;\
+	echo "JAVA_TARGET=\"$($*_RUN_MAIN_CLASS)\"" >> $$tgtDir/$*_run.env ;\
+	echo "export CLASSPATH JAVA_INTERPRETER JAVA_INTERPRETER_PARAMS JAVA_TARGET" >> $$tgtDir/$*_run.env

@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<!--
+C++ bracket matcher definition.
+rli@chello.at
+-->
+<REDConfig>
+	<BracketMatcher id="C++">
+<!--Style sets-->
+		<StyleSet id="Normal">
+			<IgnoreStyle>Comment</IgnoreStyle>
+			<IgnoreStyle>Literal</IgnoreStyle>
+		</StyleSet>
+		<StyleSet id="String">
+			<IgnoreStyle>StringQuoted</IgnoreStyle>
+			<PreStyle>String</PreStyle>
+		</StyleSet>
+		<StyleSet id="Comment">
+			<PreStyle>Comment</PreStyle>
+		</StyleSet>
+
+<!--Rule sets-->
+		<RuleSet id="Range">
+			<BeforeLeft>false</BeforeLeft>
+			<AfterLeft>false</AfterLeft>
+			<BeforeRight>false</BeforeRight>
+			<AfterRight>false</AfterRight>
+			<DoubleClickSelect>true</DoubleClickSelect>
+		</RuleSet>
+		<RuleSet id="Normal">
+			<BeforeLeft>true</BeforeLeft>
+			<AfterLeft>false</AfterLeft>
+			<BeforeRight>false</BeforeRight>
+			<AfterRight>true</AfterRight>
+			<DoubleClickSelect>true</DoubleClickSelect>
+		</RuleSet>
+			
+<!--Patterns-->
+		<Pattern StyleSet="Normal" RuleSet="Normal">
+			<Left>(</Left>
+			<Right>)</Right>
+		</Pattern>
+		<Pattern StyleSet="Normal" RuleSet="Normal">
+			<Left>[</Left>
+			<Right>]</Right>
+		</Pattern>
+		<Pattern StyleSet="Normal" RuleSet="Normal">
+			<Left>{</Left>
+			<Right>}</Right>
+		</Pattern>
+		<Pattern StyleSet="Normal" RuleSet="Normal">
+			<Left>&lt;</Left>
+			<Right>&gt;</Right>
+		</Pattern>
+		<Pattern StyleSet="String" RuleSet="Range">
+			<Left>"</Left>
+			<Right>"</Right>
+			<Nested>false</Nested>
+		</Pattern>
+		<Pattern StyleSet="Comment" RuleSet="Range">
+			<Left>/*</Left>
+			<Right>*/</Right>
+			<Nested>false</Nested>
+		</Pattern>
+
+<!--General options-->
+		<Style>BracketMatcher</Style>
+		<MaxLines>1000</MaxLines>
+		<MaxChars>50000</MaxChars>
+	</BracketMatcher>
+</REDConfig>
