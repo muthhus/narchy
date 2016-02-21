@@ -47,7 +47,7 @@ public interface Temporalize {
      * in task and belief occurrence times, and the occurrence time is the belief's.
      */
     Temporalize dtIfEvent = (derived, p, d, occReturn) -> {
-        if (!p.premise.isEvent()) {
+        if (!p.currentPremise.isEvent()) {
             return derived;
         } else {
             return dtBelief(derived, p, occReturn, -1);
@@ -56,7 +56,7 @@ public interface Temporalize {
 
     @NotNull
     static Compound dtBelief(Compound derived, PremiseMatch p, long[] occReturn, int polarity) {
-        ConceptProcess premise = p.premise;
+        ConceptProcess premise = p.currentPremise;
 
         occReturn[0] = premise.occurrenceTarget((t, b) -> t >= b ? t :b); //latest occurring one
 
@@ -82,7 +82,7 @@ public interface Temporalize {
         Term tp = d.rule.getTaskTermPattern();
         Term bp = d.rule.getBeliefTermPattern();
 
-        ConceptProcess premise = p.premise;
+        ConceptProcess premise = p.currentPremise;
 
         Task task = premise.task();
         Task belief = premise.belief();

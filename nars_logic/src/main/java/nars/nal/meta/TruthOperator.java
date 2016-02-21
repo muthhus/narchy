@@ -23,7 +23,7 @@ public interface TruthOperator {
 
     default boolean apply(@NotNull PremiseMatch m) {
 
-        Premise premise = m.premise;
+        Premise premise = m.currentPremise;
 
 
         @Nullable Task belief = premise.belief();

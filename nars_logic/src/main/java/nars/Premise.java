@@ -218,7 +218,7 @@ public interface Premise extends Level, Tasked {
         return !((b == null) || (!b.isEternal())) && task().isEternal();
     }
 
-    boolean isCyclic();
+    boolean cyclic();
 
 
     Termed beliefTerm();

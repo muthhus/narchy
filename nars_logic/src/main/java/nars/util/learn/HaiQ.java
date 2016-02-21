@@ -84,24 +84,33 @@ abstract public class HaiQ {
 	}
 
 	int learn(int state, float reward) {
+		return learn(state, reward, 1f, true);
+	}
+
+	int learn(int state, float reward, float confidence, boolean decide) {
 
 		// 1. decide next action
-		int action = nextAction(state);
+		int action = decide ? nextAction(state) : -1;
 
 		// 2. learn
 		int lastAction = lastAction();
+		final int lastState = this.lastState;
 		if (lastAction != -1) {
-			float strength = 1f;
+
 			float DeltaQ = (reward + (Gamma * q[state][action]))
 					- q[lastState][lastAction];
-			et[lastState][lastAction] += strength;
+			et[lastState][lastAction] += confidence;
 
 			// 3. update
 			update(DeltaQ);
 		}
 
-		lastState = state;
-		return (this.lastDecidedAction = action);
+		if (decide) {
+			this.lastState = state;
+			this.lastDecidedAction = action;
+		}
+
+		return action;
 	}
 
 	protected int nextAction(int state) {
@@ -119,6 +128,7 @@ abstract public class HaiQ {
 
 		float alphaDelta = Alpha.floatValue() * deltaQ;
 		float gammaLambda = Gamma * Lambda;
+
 
 		for (int i = 0; i < nStates; i++) {
 			float[] eti = et[i];

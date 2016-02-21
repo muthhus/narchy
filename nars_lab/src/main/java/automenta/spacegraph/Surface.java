@@ -26,7 +26,7 @@ import java.util.Set;
 public class Surface extends SG {
 
     private Vec3f background = new Vec3f(0, 0, 0);
-    float nearF = 1.5f;
+    float nearF = 0.075f;
     float farF = 40.0f;
     private GLU glu = new GLU();
     protected final Time time = new SystemTime();
@@ -35,7 +35,7 @@ public class Surface extends SG {
     private Pointer pointer = new Pointer();
     float focus = 45.0f;
     boolean showFPS = false;
-    protected Space2D space = new Space2D();
+    protected Space2D space = new Space2D(); /* default: empty */
     private int w;
     private int h;
 
@@ -129,7 +129,7 @@ public class Surface extends SG {
         GLU glu = new GLU();
 
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
-        gl.glClearColor(background.x(), background.y(), background.z(), 1f);
+        gl.glClearColor(background.x(), background.y(), background.z(), 0.99f);
 
         gl.glMatrixMode(GL2.GL_MODELVIEW);
         gl.glLoadIdentity();

@@ -32,17 +32,18 @@ import static nars.truth.TruthFunctions.eternalize;
  */
 abstract public class ConceptProcess implements Premise {
 
-
     public final NAR nar;
     public final BLink<? extends Task> taskLink;
     public final BLink<? extends Concept> conceptLink;
     public final BLink<? extends Termed> termLink;
+    @Nullable private final Task belief;
 
-    @Nullable
-    private final Task belief;
-    private final boolean cyclic;
-
-
+    /** lazily cached value :=
+     *      -1: unknown
+     *      0: not cyclic
+     *      1: cyclic
+     */
+    private transient int cyclic = -1;
 
     public ConceptProcess(NAR nar, BLink<? extends Concept> conceptLink,
                           BLink<? extends Task> taskLink,
@@ -54,7 +55,17 @@ abstract public class ConceptProcess implements Premise {
         this.termLink = termLink;
 
         this.belief = belief;
-        this.cyclic = Stamp.overlapping(task(), belief);
+    }
+
+    @Override public boolean cyclic() {
+        int cc = this.cyclic;
+        if (cc != -1) {
+            return cc > 0;
+        } else {
+            boolean isCyclic = Stamp.overlapping(task(), belief);
+            this.cyclic = (isCyclic ? 1 : 0);
+            return isCyclic;
+        }
     }
 
 
@@ -106,10 +117,6 @@ abstract public class ConceptProcess implements Premise {
         return belief;
     }
 
-    @Override
-    public final boolean isCyclic() {
-        return cyclic;
-    }
 
     @NotNull
     @Override

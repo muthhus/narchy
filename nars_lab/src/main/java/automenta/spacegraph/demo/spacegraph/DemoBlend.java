@@ -8,6 +8,7 @@ import automenta.spacegraph.shape.Rect;
 import automenta.spacegraph.ui.GridRect;
 import automenta.spacegraph.ui.PointerLayer;
 import automenta.vivisect.swing.NWindow;
+import nars.util.data.Util;
 
 /**
  *
@@ -22,7 +23,7 @@ public class DemoBlend extends AbstractSurfaceDemo {
 
     @Override
     public String getDescription() {
-        return "Zoomable fractal 2D surface.  Multiple adjustable layers.  Adjustable control logic.";
+        return "";
     }
 
     public DemoBlend() {
@@ -36,9 +37,9 @@ public class DemoBlend extends AbstractSurfaceDemo {
         --color
         --tilt
          */
-        int numRectangles = 32;
+        int numRectangles = 512;
         float maxRadius = 0.1f;
-        float r = 4.0f;
+        float r = 6.0f;
         float w = 1.5f;
         float h = 0.75f;
         for (int i = 0; i < numRectangles; i++) {
@@ -51,9 +52,14 @@ public class DemoBlend extends AbstractSurfaceDemo {
             float green = (float)Math.random();
             float blue = (float)Math.random();
 
-            Rect r1 = new Rect().color(red, green, blue, 0.5f);
-            r1.center(x, y, 0);
-            r1.scale(w, h);
+            float heightVariance = 5f;
+
+            Rect r1 = new Rect().color(red, green, blue, 1f/numRectangles + 0.1f);
+            r1.center(x, y, Util.sigmoid((float)Math.random()-0.5f)*heightVariance);
+            r1.scale(
+                0.1f + (float)Math.random() * w,
+                0.1f + (float)Math.random() * h);
+
 
             add(r1);
 

@@ -12,6 +12,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.transform.subst.Subst;
 import nars.util.signal.TestNAR;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.List;
@@ -156,7 +157,7 @@ public class OperatorTest {
 //
 //    }
 
-    @Test public void testPatternOperation() {
+    @Test public void testPatternExecution() {
         AtomicInteger count = new AtomicInteger();
 
         PatternOperation f = new PatternOperation("(%A,%B)") {
@@ -217,6 +218,7 @@ public class OperatorTest {
         assertEquals(1, count.get()); //should only be triggered once, by the matching term
     }
 
+    @Ignore
     @Test public void testPatternAnswererInNAR() {
         NAR n = new Default(100,1,1,1);
 

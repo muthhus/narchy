@@ -3,9 +3,12 @@ package automenta.spacegraph;
 import automenta.spacegraph.shape.Drawable;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.util.gl2.GLUT;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.jogamp.opengl.fixedfunc.GLLightingFunc.GL_LIGHTING;
 
 
 public class Space2D implements Drawable {
@@ -60,5 +63,27 @@ public class Space2D implements Drawable {
         synchronized (drawables) {
             return drawables.add(d);
         }
+    }
+
+    static final GLUT glut = new GLUT();
+
+    public static void renderstring2d(GL2 gl, char string[], float r, float g, float b, float x, float y)
+    {
+        gl.glColor3f(r, g, b);
+
+
+        gl.glRasterPos2f(x, y);
+        for(int i = 0; i < string.length; i++)
+            glut.glutBitmapCharacter(GLUT.BITMAP_9_BY_15, string[i]);
+    }
+
+    public static void renderstring3d(GL2 gl, char string[], float r, float g, float b, float x, float y, float z)
+    {
+        gl.glDisable(GL_LIGHTING);
+        gl.glColor3f(r, g, b);
+
+        gl.glRasterPos3f(x, y, z);
+        for(int i = 0; i < string.length; i++)
+            glut.glutBitmapCharacter(GLUT.BITMAP_9_BY_15, string[i]);
     }
 }

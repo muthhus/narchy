@@ -157,7 +157,7 @@ public class Derive extends AtomicStringConstant implements ProcTerm {
             return;
         }
 
-        ConceptProcess premise = p.premise;
+        ConceptProcess premise = p.currentPremise;
         Memory mem = premise.memory();
 
         //get the normalized term to determine the budget (via it's complexity)

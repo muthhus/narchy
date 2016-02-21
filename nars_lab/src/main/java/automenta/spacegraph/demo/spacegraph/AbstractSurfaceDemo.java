@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *
  * @author me
  */
 abstract public class AbstractSurfaceDemo extends Surface implements Demo {
@@ -30,8 +29,20 @@ abstract public class AbstractSurfaceDemo extends Surface implements Demo {
         super();
     }
 
-    
     public static JPanel newPanel(Surface space) {
+        JPanel j = new JPanel(new BorderLayout());
+
+        SGPanel sdc = new SGPanel(space);
+
+        new FractalControl(sdc);
+
+        j.add(sdc, BorderLayout.CENTER);
+
+        return j;
+    }
+
+    /** TODO this needs work */
+    public static JPanel newPanelWithControls(Surface space) {
         JPanel j = new JPanel(new BorderLayout());
         {
             SGPanel sdc = new SGPanel(space);
@@ -70,7 +81,7 @@ abstract public class AbstractSurfaceDemo extends Surface implements Demo {
         super.handleTouch(p);
         Set<Touchable> touchingNow = new HashSet();
         final Vec2f v = new Vec2f(p.world.x(), p.world.y());
-        
+
         synchronized (getSpace().getDrawables()) {
             for (Drawable d : getSpace().getDrawables()) {
                 if (d instanceof Touchable) {

@@ -33,23 +33,22 @@ public class PremiseMatch extends FindSubst {
 
     private final Deriver deriver;
 
-    /** current Premise */
-    public ConceptProcess premise;
+    /** current Premise
+     *  TODO make private
+     * */
+    public transient ConceptProcess currentPremise;
 
-//    @NotNull
-//    public final Versioned<Integer> occDelta;
-//    @NotNull
-//    public final Versioned<Integer> tDelta;
     @NotNull
     public final Versioned<Truth> truth;
     @NotNull
     public final Versioned<Character> punct;
+
     @NotNull
     @Deprecated public final Versioned<MatchTerm> pattern;
 
     @NotNull
     private TaskBeliefPair termPattern = new TaskBeliefPair();
-    public boolean cyclic;
+
     int termutesPerMatch, termutes;
 
     public final Map<Operator, ImmediateTermTransform> transforms =
@@ -128,7 +127,7 @@ public class PremiseMatch extends FindSubst {
     @Override
     public String toString() {
         return "RuleMatch:{" +
-                "premise:" + premise +
+                "premise:" + currentPremise +
                 ", subst:" + super.toString() +
                 (pattern.get()!=null ? (", derived:" + pattern) : "")+
                 (truth.get()!=null ? (", truth:" + truth) : "")+
@@ -144,10 +143,10 @@ public class PremiseMatch extends FindSubst {
      */
     public final void start(@NotNull ConceptProcess p) {
 
-        this.premise = p;
-        this.premisePunc = premise.task().punc();
+        this.currentPremise = p;
+        this.premisePunc = currentPremise.task().punc();
 
-        this.index = premise.memory().index;
+        this.index = currentPremise.memory().index;
 
         Compound taskTerm = p.task().term();
 
@@ -157,8 +156,6 @@ public class PremiseMatch extends FindSubst {
 
         termPattern.set( taskTerm, beliefTerm );
         term.set( termPattern );
-
-        cyclic = p.isCyclic();
 
 //        //set initial power which will be divided by branch
 //        setPower(
@@ -190,7 +187,7 @@ public class PremiseMatch extends FindSubst {
      *  returns null if invalid / insufficient */
     public final Budget getBudget(@Nullable Truth truth, @NotNull Termed c) {
 
-        ConceptProcess p = this.premise;
+        ConceptProcess p = this.currentPremise;
 
         Budget budget = truth != null ?
                 BudgetFunctions.compoundForward(truth, c, p) :
