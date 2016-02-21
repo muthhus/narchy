@@ -33,7 +33,7 @@ package nars.rover.physics;
  * 
  * @author Daniel Murphy
  */
-public interface TestbedPanel {
+public interface Display {
 
 	void grabFocus();
 

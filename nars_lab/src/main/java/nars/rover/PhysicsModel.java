@@ -26,30 +26,21 @@
 package nars.rover;
 
 import nars.rover.physics.*;
-import nars.rover.physics.gl.AbstractJoglPanel;
-import nars.rover.physics.gl.JoglDraw;
 import nars.rover.robot.Collidable;
 import nars.rover.util.Bodies;
 import org.jbox2d.callbacks.*;
-import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.Collision;
 import org.jbox2d.collision.Collision.PointState;
 import org.jbox2d.collision.Manifold;
 import org.jbox2d.collision.WorldManifold;
-import org.jbox2d.collision.shapes.CircleShape;
-import org.jbox2d.common.Color3f;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.*;
 import org.jbox2d.dynamics.contacts.Contact;
-import org.jbox2d.dynamics.joints.MouseJoint;
-import org.jbox2d.dynamics.joints.MouseJointDef;
 
 import javax.swing.*;
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -74,18 +65,12 @@ public abstract class PhysicsModel extends Bodies implements ContactListener, Ru
      * Only visible for compatibility. Should use {@link #getWorld()} instead.
      */
     protected Body groundBody;
-    private MouseJoint mouseJoint;
 
-    private Body bomb;
-    private final Vec2 bombMousePoint = new Vec2();
-    private final Vec2 bombSpawnPoint = new Vec2();
-    private boolean bombSpawning = false;
 
     protected boolean mouseTracing;
     private final Vec2 mouseTracerPosition = new Vec2();
     private final Vec2 mouseTracerVelocity = new Vec2();
 
-    private final Vec2 mouseWorld = new Vec2();
     private int pointCount;
     private int stepCount;
 
@@ -96,12 +81,11 @@ public abstract class PhysicsModel extends Bodies implements ContactListener, Ru
     protected int m_textLine;
     private final LinkedList<String> textList = new LinkedList<>();
 
-    private final PhysicsCamera camera;
+    //private final PhysicsCamera camera;
 
     private final Transform identity = new Transform();
-    private TestbedSettings settings;
     private float timeStep;
-    protected TestbedPanel panel;
+    protected Display panel;
     private float time;
 
     public PhysicsModel() {
@@ -136,7 +120,7 @@ public abstract class PhysicsModel extends Bodies implements ContactListener, Ru
 //        particleGroupDestroyed(group);
 //      }
 //    };
-        camera = new PhysicsCamera(getDefaultCameraPos(), getDefaultCameraScale(), ZOOM_SCALE_DIFF);
+        //camera = new PhysicsCamera(getDefaultCameraPos(), getDefaultCameraScale(), ZOOM_SCALE_DIFF);
     }
 
     @Override
@@ -159,14 +143,11 @@ public abstract class PhysicsModel extends Bodies implements ContactListener, Ru
     public void postSolve(Contact contact, ContactImpulse impulse) {
     }
 
-    public void init(TestbedState model) {
+    @Deprecated public void init(TestbedState model) {
         this.model = model;
 
-        Vec2 gravity = new Vec2(0, -10f);
-        world = model.getWorldCreator().createWorld(gravity);
 
-        bomb = null;
-        mouseJoint = null;
+
 
         mouseTracing = false;
         mouseTracerPosition.setZero();
@@ -177,22 +158,25 @@ public abstract class PhysicsModel extends Bodies implements ContactListener, Ru
 
         pointCount = 0;
         stepCount = 0;
-        bombSpawning = false;
         //model.getDebugDraw().setViewportTransform(camera.getTransform());
 
         world.setDestructionListener(destructionListener);
 
         world.setContactListener(this);
-        //world.setDebugDraw(new JoglDraw((AbstractJoglPanel) panel));
-        world.setAllowSleep(settings.getSetting(TestbedSettings.AllowSleep).enabled);
-        world.setWarmStarting(settings.getSetting(TestbedSettings.WarmStarting).enabled);
-        world.setSubStepping(settings.getSetting(TestbedSettings.SubStepping).enabled);
-        world.setContinuousPhysics(settings.getSetting(TestbedSettings.ContinuousCollision).enabled);
 
         title = getTestName();
         initTest(false);
 
         init(world);
+
+
+
+        //world.setDebugDraw(new JoglDraw((AbstractJoglPanel) panel));
+        world.setAllowSleep(true);
+        world.setWarmStarting(false);
+        world.setSubStepping(false); //settings.getSetting(TestbedSettings.SubStepping).enabled);
+        world.setContinuousPhysics(true); //settings.getSetting(TestbedSettings.ContinuousCollision).enabled);
+
     }
 
 
@@ -210,79 +194,55 @@ public abstract class PhysicsModel extends Bodies implements ContactListener, Ru
         return model;
     }
 
-    /**
-     * Gets the contact points for the current test
-     */
-    public ContactPoint[] getContactPoints() {
-        return points;
-    }
+//    /**
+//     * Gets the contact points for the current test
+//     */
+//    public ContactPoint[] getContactPoints() {
+//        return points;
+//    }
+//
+//    /**
+//     * Gets the ground body of the world, used for some joints
+//     */
+//    public Body getGroundBody() {
+//        return groundBody;
+//    }
+//
+//    /**
+//     * Gets the debug draw for the testbed
+//     */
+//
+//
+//    /**
+//     * Gets the world position of the mouse
+//     */
+//    public Vec2 getWorldMouse() {
+//        return mouseWorld;
+//    }
+//
+//    public int getStepCount() {
+//        return stepCount;
+//    }
+//
+//    /**
+//     * The number of contact points we're storing
+//     */
+//    public int getPointCount() {
+//        return pointCount;
+//    }
 
-    /**
-     * Gets the ground body of the world, used for some joints
-     */
-    public Body getGroundBody() {
-        return groundBody;
-    }
 
-    /**
-     * Gets the debug draw for the testbed
-     */
-
-
-    /**
-     * Gets the world position of the mouse
-     */
-    public Vec2 getWorldMouse() {
-        return mouseWorld;
-    }
-
-    public int getStepCount() {
-        return stepCount;
-    }
-
-    /**
-     * The number of contact points we're storing
-     */
-    public int getPointCount() {
-        return pointCount;
-    }
-
-    public PhysicsCamera getCamera() {
-        return camera;
-    }
-
-    /**
-     * Gets the 'bomb' body if it's present
-     */
-    public Body getBomb() {
-        return bomb;
-    }
-
-    /**
-     * Override for a different default camera position
-     */
-    public Vec2 getDefaultCameraPos() {
-        return new Vec2(-getDefaultCameraScale() * 2, getDefaultCameraScale() * 2);
-    }
-
-    /**
-     * Override for a different default camera scale
-     */
-    public float getDefaultCameraScale() {
-        return 10;
-    }
-
-    public boolean isMouseTracing() {
-        return mouseTracing;
-    }
-
-    public Vec2 getMouseTracerPosition() {
-        return mouseTracerPosition;
-    }
-
-    public Vec2 getMouseTracerVelocity() {
-        return mouseTracerVelocity;
-    }
+//    public boolean isMouseTracing() {
+//        return mouseTracing;
+//    }
+//
+//    public Vec2 getMouseTracerPosition() {
+//        return mouseTracerPosition;
+//    }
+//
+//    public Vec2 getMouseTracerVelocity() {
+//        return mouseTracerVelocity;
+//    }
 
     /**
      * Gets the filename of the current test. Default implementation uses the
@@ -292,19 +252,19 @@ public abstract class PhysicsModel extends Bodies implements ContactListener, Ru
         return getTestName().toLowerCase().replaceAll(" ", "_") + ".box2d";
     }
 
-    /**
-     * @deprecated use {@link #getCamera()}
-     */
-    public void setCamera(Vec2 argPos) {
-        camera.setCamera(argPos);
-    }
-
-    /**
-     * @deprecated use {@link #getCamera()}
-     */
-    public void setCamera(Vec2 argPos, float scale) {
-        camera.setCamera(argPos, scale);
-    }
+//    /**
+//     * @deprecated use {@link #getCamera()}
+//     */
+//    public void setCamera(Vec2 argPos) {
+//        camera.setCamera(argPos);
+//    }
+//
+//    /**
+//     * @deprecated use {@link #getCamera()}
+//     */
+//    public void setCamera(Vec2 argPos, float scale) {
+//        camera.setCamera(argPos, scale);
+//    }
 
     /**
      * Initializes the current test.
@@ -319,12 +279,12 @@ public abstract class PhysicsModel extends Bodies implements ContactListener, Ru
      */
     public abstract String getTestName();
 
-    /**
-     * Adds a text line to the reporting area
-     */
-    public void addTextLine(String line) {
-        textList.add(line);
-    }
+//    /**
+//     * Adds a text line to the reporting area
+//     */
+//    public void addTextLine(String line) {
+//        textList.add(line);
+//    }
 
     /**
      * called when the tests exits
@@ -332,36 +292,36 @@ public abstract class PhysicsModel extends Bodies implements ContactListener, Ru
     public void exit() {
     }
 
-    private final Color3f color1 = new Color3f(.3f, .95f, .3f);
-    private final Color3f color2 = new Color3f(.3f, .3f, .95f);
-    private final Color3f color3 = new Color3f(.9f, .9f, .9f);
-    private final Color3f color4 = new Color3f(.6f, .61f, 1);
-    private final Color3f color5 = new Color3f(.9f, .9f, .3f);
-    private final Color3f mouseColor = new Color3f(0f, 1f, 0f);
-    private final Vec2 p1 = new Vec2();
-    private final Vec2 p2 = new Vec2();
-    private final Vec2 tangent = new Vec2();
-    private final List<String> statsList = new ArrayList<>();
-
-    private final Vec2 acceleration = new Vec2();
-    private final CircleShape pshape = new CircleShape();
-
-    private final AABB paabb = new AABB();
+//    private final Color3f color1 = new Color3f(.3f, .95f, .3f);
+//    private final Color3f color2 = new Color3f(.3f, .3f, .95f);
+//    private final Color3f color3 = new Color3f(.9f, .9f, .9f);
+//    private final Color3f color4 = new Color3f(.6f, .61f, 1);
+//    private final Color3f color5 = new Color3f(.9f, .9f, .3f);
+//    private final Color3f mouseColor = new Color3f(0f, 1f, 0f);
+//    private final Vec2 p1 = new Vec2();
+//    private final Vec2 p2 = new Vec2();
+//    private final Vec2 tangent = new Vec2();
+//    private final List<String> statsList = new ArrayList<>();
+//
+//    private final Vec2 acceleration = new Vec2();
+//    private final CircleShape pshape = new CircleShape();
+//
+//    private final AABB paabb = new AABB();
     
-    AtomicBoolean drawingQueued = new AtomicBoolean(false);
+    final AtomicBoolean drawPending = new AtomicBoolean(false);
 
     public float getTime() {
         return time;
     }
 
-    public void step(float timeStep, TestbedSettings settings, TestbedPanel panel) {
+    public void step(float timeStep, TestbedSettings settings, Display panel) {
     //float hz = settings.getSetting(TestbedSettings.Hz).value;
 
         
         this.timeStep = timeStep;
         this.time += timeStep;
-        this.settings = settings;
-        camera.update(timeStep);
+
+        //camera.update(timeStep);
 
         if (settings.singleStep && !settings.pause) {
             settings.pause = true;
@@ -385,10 +345,10 @@ public abstract class PhysicsModel extends Bodies implements ContactListener, Ru
 
     //pointCount = 0;
         world.step(timeStep, settings.getSetting(TestbedSettings.VelocityIterations).value, settings.getSetting(TestbedSettings.PositionIterations).value);
-        
-        if (!drawingQueued.get()) {
+
+        AtomicBoolean dq = this.drawPending;
+        if (!dq.compareAndSet(false, true)) {
             this.panel = panel;
-            drawingQueued.set(true);
             SwingUtilities.invokeLater(this);
         }
 

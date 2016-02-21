@@ -276,7 +276,7 @@ public class NARover extends AbstractPolygonBot {
     }
 
     @Override
-    public RoboticMaterial getMaterial() {
+    public BeingMaterial getMaterial() {
         return new NARRoverMaterial(this, nar);
     }
 

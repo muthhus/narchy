@@ -64,7 +64,7 @@ public class PhysicsController {
     private float targetFrameRate;
     private float frameRate = 0;
     private final boolean animating = false;
-    private Thread animator;
+    //private Thread animator;
 
     public final TestbedState model;
 
@@ -145,9 +145,9 @@ public class PhysicsController {
         viewportHalfHeight = halfHeight;
         viewportHalfWidth = halfWidth;
 
-        if (currTest != null) {
-            currTest.getCamera().setExtents(halfWidth, halfHeight);
-        }
+//        if (currTest != null) {
+//            currTest.getCamera().setExtents(halfWidth, halfHeight);
+//        }
     }
 
     protected void loopInit() {
@@ -158,14 +158,14 @@ public class PhysicsController {
         }
     }
 
-    public PhysicsCamera getCamera() {
-        if (currTest == null) return null;
-        return currTest.getCamera();
-    }
+//    public PhysicsCamera getCamera() {
+//        if (currTest == null) return null;
+//        return currTest.getCamera();
+//    }
 
     private void initTest(PhysicsModel test) {
         test.init(model);
-        test.getCamera().setExtents(viewportHalfWidth, viewportHalfHeight);
+        //test.getCamera().setExtents(viewportHalfWidth, viewportHalfHeight);
         model.getPanel().grabFocus();
     }
 

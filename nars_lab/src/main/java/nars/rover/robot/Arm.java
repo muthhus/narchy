@@ -26,7 +26,7 @@ import static nars.rover.robot.Turret.rng;
 /**
  * Created by me on 2/10/16.
  */
-public class Arm extends Robotic implements LayerDraw {
+public class Arm extends Being implements LayerDraw {
 
     final FasterList<Body> segments = new FasterList();
     final FasterList<RevoluteJoint> joints = new FasterList();
@@ -95,13 +95,12 @@ public class Arm extends Robotic implements LayerDraw {
     public Arm(String id, Sim sim, Body base, float ax, float ay, float ang,
                int segs, float segLength, float thick
     ) {
-        super(((RoboticMaterial) base.getUserData()).clone().getID() + "_" + id);
+        super(((BeingMaterial) base.getUserData()).clone().getID() + "_" + id);
 
 
         this.ang = ang;
         this.base = base;
 
-        ((JoglAbstractDraw)sim.getModel().getPanel()).addLayer(this); //HACKAAHACK
 
         //Vec2 attachPoint = new Vec2(ax, ay);
 
@@ -323,8 +322,8 @@ public class Arm extends Robotic implements LayerDraw {
     }
 
     @Override
-    public RoboticMaterial getMaterial() {
-        return ((RoboticMaterial) base.getUserData()).clone();
+    public BeingMaterial getMaterial() {
+        return ((BeingMaterial) base.getUserData()).clone();
     }
 
     @Deprecated

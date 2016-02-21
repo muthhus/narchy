@@ -1,10 +1,13 @@
 package nars.rover;
 
 import nars.Global;
-import nars.rover.physics.TestbedPanel;
+import nars.rover.physics.Display;
+import nars.rover.physics.TestbedSetting;
 import nars.rover.physics.TestbedSettings;
+import nars.rover.physics.TestbedState;
 import nars.rover.physics.gl.JoglAbstractDraw;
-import nars.rover.robot.Robotic;
+import nars.rover.physics.j2d.LayerDraw;
+import nars.rover.robot.Being;
 import nars.time.SimulatedClock;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.MathUtils;
@@ -12,6 +15,7 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.FixtureDef;
+import org.jbox2d.dynamics.World;
 
 import java.util.List;
 
@@ -29,11 +33,11 @@ public class Sim extends PhysicsModel {
     private static final double TWO_PI = 2 * Math.PI;
     static String[] angleTerms = new String[angleResolution];
     public final SimulatedClock clock;
-    public final List<Robotic> robots = Global.newArrayList();
+    public final List<Being> robots = Global.newArrayList();
     /* how often to input mission, in frames */
     public int missionPeriod = 32;
-    public RoverWorld world;
-    PhysicsRun phy = new PhysicsRun(10, this);
+    public World world;
+    //PhysicsRun phy = new PhysicsRun(10, this);
 
 
 //        //new NARPrologMirror(nar,0.75f, true).temporal(true, true);
@@ -105,18 +109,20 @@ public class Sim extends PhysicsModel {
     private long delayMS;
     private float fps;
     private boolean running = false;
+    final PhysicsRun runner;
 
-
-    public Sim(SimulatedClock clock, RoverWorld world) {
+    public Sim(World world, SimulatedClock clock) {
         this.clock = clock;
 
-        this.world = world;
+        runner = new PhysicsRun(30f, this);
 
-        init(phy.model);
+        init(this.world = world);
 
-        cycle();
+//        cycle();
+//        protected final void cycle() {
+//            phy.cycle(fps);
+//        }
 
-        this.world.init(this);
     }
 
     public static double normalizeAngle(final double theta) {
@@ -225,7 +231,7 @@ public class Sim extends PhysicsModel {
 
         running = true;
         while (running) {
-            cycle();
+            //cycle();
             try {
                 Thread.sleep(delayMS);
             } catch (InterruptedException e) {
@@ -238,7 +244,7 @@ public class Sim extends PhysicsModel {
         running = false;
     }
 
-    public void add(Robotic r) {
+    public void add(Being r) {
         r.init(this);
         robots.add(r);
     }
@@ -258,13 +264,13 @@ public class Sim extends PhysicsModel {
     }
 
     @Override
-    public void step(float timeStep, TestbedSettings settings, TestbedPanel panel) {
+    public void step(float timeStep, TestbedSettings settings, Display panel) {
 
 
         super.step(timeStep, settings, panel);
 
         for (int i = 0, robotsSize = robots.size(); i < robotsSize; i++) {
-            Robotic r = robots.get(i);
+            Being r = robots.get(i);
             r.step(1);
         }
 
@@ -281,14 +287,13 @@ public class Sim extends PhysicsModel {
 
     }
 
-    protected final void cycle() {
-        phy.cycle(fps);
-    }
 
     @Override
     public String getTestName() {
         return "Disposabuild";
     }
+
+
 
 //    public class RoverPanel extends JPanel {
 //

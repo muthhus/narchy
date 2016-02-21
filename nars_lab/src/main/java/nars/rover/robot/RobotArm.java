@@ -4,7 +4,7 @@ package nars.rover.robot;
  * 
  * @author me
  */
-abstract public class RobotArm extends Robotic {
+abstract public class RobotArm extends Being {
 
 	public RobotArm(String id) {
 		super(id);

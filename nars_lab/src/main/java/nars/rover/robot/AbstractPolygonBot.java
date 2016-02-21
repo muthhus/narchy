@@ -7,7 +7,6 @@ import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Term;
 import nars.util.event.FrameReaction;
-import org.jbox2d.callbacks.DebugDraw;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.*;
@@ -19,7 +18,7 @@ import java.util.List;
 /**
  * Created by me on 8/3/15.
  */
-public abstract class AbstractPolygonBot extends Robotic {
+public abstract class AbstractPolygonBot extends Being {
 
 //    private Consumer<Task> goalSolutionAnswered = (x)->{
 //        $.logger.warn("Plan: {0}", x);
@@ -28,6 +27,8 @@ public abstract class AbstractPolygonBot extends Robotic {
     public AbstractPolygonBot(String id) {
         super(id);
     }
+
+
 
 
     static float linearDamping = 0.8f;

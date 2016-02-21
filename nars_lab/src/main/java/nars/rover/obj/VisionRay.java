@@ -4,7 +4,7 @@ import nars.rover.Sim;
 import nars.rover.physics.gl.JoglAbstractDraw;
 import nars.rover.physics.j2d.LayerDraw;
 import nars.rover.robot.AbstractPolygonBot;
-import nars.rover.robot.Robotic;
+import nars.rover.robot.Being;
 import nars.rover.util.RayCastClosestCallback;
 import org.jbox2d.callbacks.RayCastCallback;
 import org.jbox2d.common.Color3f;
@@ -23,7 +23,7 @@ abstract public class VisionRay extends RayCastClosestCallback implements Abstra
     final Vec2 point; //where the retina receives vision at
     public final float angle;
     private final Body base;
-    private final Robotic bot;
+    private final Being bot;
     protected float conf;
 
     final Color3f laserUnhitColor = new Color3f(0.25f, 0.25f, 0.25f);
@@ -49,7 +49,7 @@ abstract public class VisionRay extends RayCastClosestCallback implements Abstra
     public VisionRay(Vec2 point, float angle, float arc, Body base, float length, int resolution) {
         this.base = base;
 
-        bot = ((Robotic.RoboticMaterial)base.getUserData()).robot;
+        bot = ((Being.BeingMaterial)base.getUserData()).robot;
         //this.sensor = new Sensor();
 
         this.point = point;
@@ -82,7 +82,8 @@ abstract public class VisionRay extends RayCastClosestCallback implements Abstra
         for (int r = 0; r < resolution; r++) {
 
             RayDrawer rd = rayDrawers[r];
-            rd.update();
+            if (rd!=null)
+                rd.update();
         }
 
 

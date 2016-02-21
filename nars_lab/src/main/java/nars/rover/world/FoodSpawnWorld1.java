@@ -5,8 +5,9 @@
 package nars.rover.world;
 
 import nars.rover.Material;
-import nars.rover.PhysicsModel;
 import nars.rover.RoverWorld;
+import nars.rover.Sim;
+import org.jbox2d.dynamics.World;
 
 /**
  *
@@ -18,19 +19,15 @@ public class FoodSpawnWorld1 extends RoverWorld {
     private final float foodToPoisonRatio;
     private final int numFood;
 
-    public FoodSpawnWorld1(int numFood, float w, float h, float foodtoPoisonRatio) {
-        super();
+
+    public FoodSpawnWorld1(Sim sim, int numFood, float w, float h, float foodtoPoisonRatio) {
+        super(sim.world);
         this.w = w;
         this.h = h;
 
         this.numFood = numFood;
         this.foodToPoisonRatio = foodtoPoisonRatio;
 
-    }
-
-    @Override
-    public void init(PhysicsModel p) {
-        super.init(p);
 
 
         float foodSpawnR = w / 1.5f;
@@ -38,16 +35,17 @@ public class FoodSpawnWorld1 extends RoverWorld {
             float minSize = 0.2f;
             float maxSize = 2.5f;
             float mass = 0.3f;
-            addFood(foodSpawnR, foodSpawnR, minSize, maxSize, mass,
+
+            addFood(world, foodSpawnR, foodSpawnR, minSize, maxSize, mass,
                     Math.random() < foodToPoisonRatio ?
                             Material.food : Material.poison
             );
         }
         float wt = 1f;
-        addWall(0, h, w, wt, 0);
-        addWall(-w, 0, wt, h, 0);
-        addWall(w, 0, wt, h, 0);
-        addWall(0, -h, w, wt, 0);
+        addWall(world, 0, h, w, wt, 0);
+        addWall(world, -w, 0, wt, h, 0);
+        addWall(world, w, 0, wt, h, 0);
+        addWall(world, 0, -h, w, wt, 0);
 
     }
 }

@@ -24,8 +24,10 @@
 package nars.rover.physics;
 
 import nars.rover.PhysicsModel;
+import nars.rover.physics.gl.AbstractJoglPanel;
 import org.jbox2d.callbacks.DebugDraw;
 import org.jbox2d.common.IViewportTransform;
+import org.jbox2d.common.Vec2;
 
 import javax.swing.*;
 import java.util.List;
@@ -47,8 +49,9 @@ public class TestbedState {
   private int currTestIndex = -1;
   private PhysicsModel runningTest;
   private List<String> implSpecificHelp;
-  private TestbedPanel panel;
+  private AbstractJoglPanel panel;
   private WorldCreator worldCreator = new DefaultWorldCreator();
+  public Vec2 gravity = new Vec2();
 
   public TestbedState() {}
 
@@ -60,11 +63,11 @@ public class TestbedState {
     this.worldCreator = worldCreator;
   }
 
-  public void setPanel(TestbedPanel panel) {
+  public void setPanel(AbstractJoglPanel panel) {
     this.panel = panel;
   }
 
-  public TestbedPanel getPanel() {
+  public AbstractJoglPanel getPanel() {
     return panel;
   }
 

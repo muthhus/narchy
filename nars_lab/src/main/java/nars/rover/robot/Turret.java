@@ -3,7 +3,9 @@ package nars.rover.robot;
 
 import nars.rover.Material;
 import nars.rover.Sim;
+import nars.rover.physics.gl.AbstractJoglPanel;
 import nars.rover.physics.gl.JoglAbstractDraw;
+import nars.rover.physics.gl.JoglDraw;
 import nars.rover.physics.j2d.LayerDraw;
 import nars.rover.util.Bodies;
 import nars.rover.util.Explosion;
@@ -27,7 +29,8 @@ public class Turret implements LayerDraw {
 
     public Turret(Sim sim) {
         this.sim = sim;
-        ((JoglAbstractDraw)sim.getModel().getPanel()).addLayer(this); //HACKAAHACK
+        ///sim.getModel().getPanel().addLayer(this); //HACKAAHACK
+
 
     }
 

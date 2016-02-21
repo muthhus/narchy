@@ -3,8 +3,9 @@ package nars.rover.robot;
 import nars.NAR;
 import nars.rover.Material;
 import nars.rover.Sim;
-import nars.rover.physics.gl.AbstractJoglPanel;
 import nars.rover.physics.gl.JoglAbstractDraw;
+import nars.rover.physics.j2d.LayerDraw;
+import nars.util.data.list.FasterList;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.World;
@@ -12,9 +13,9 @@ import org.jbox2d.dynamics.World;
 import java.awt.*;
 
 /**
- * Created by me on 7/18/15.
+ * Human, Animal, Machine, Alien, Ghost
  */
-abstract public class Robotic {
+abstract public class Being {
 
     public Body torso;
     //public class ChangedNumericInput //discretizer
@@ -23,7 +24,7 @@ abstract public class Robotic {
 
     float mass = 1f;
 
-    public Robotic(String id) {
+    public Being(String id) {
         this.id = id;
     }
 
@@ -38,7 +39,7 @@ abstract public class Robotic {
         return id;
     }
 
-    public abstract RoboticMaterial getMaterial();
+    public abstract BeingMaterial getMaterial();
 
     /** create the body and return its central component */
     protected abstract Body newTorso();
@@ -57,13 +58,14 @@ abstract public class Robotic {
     }
 
 
-    public static class RoboticMaterial extends Material {
+    public static class BeingMaterial extends Material {
 
 
         protected final Color3f color;
-        public final Robotic robot;
+        public final Being robot;
+        public final java.util.List<LayerDraw> layers = new FasterList<>();
 
-        public RoboticMaterial(Robotic r) {
+        public BeingMaterial(Being r) {
             super();
             this.robot = r;
 
@@ -72,8 +74,8 @@ abstract public class Robotic {
             color = new Color3f(c.getRed()*255f, c.getGreen()*255f, c.getBlue()*255f);
         }
 
-        public RoboticMaterial clone() {
-            return new RoboticMaterial(robot);
+        public BeingMaterial clone() {
+            return new BeingMaterial(robot);
         }
 
         @Override
@@ -81,8 +83,19 @@ abstract public class Robotic {
 //            color.set(color.x,
 //                    color.y,
 //                    color.z);
+
+
+            World w = b.m_world;
+            for (int i = 0, layersSize = layers.size(); i < layersSize; i++) {
+                layers.get(i).drawGround(d, w);
+            }
+            //TODO draw this after the inbetween
+            for (int i = 0, layersSize = layers.size(); i < layersSize; i++) {
+                layers.get(i).drawSky(d, w);
+            }
             d.setFillColor(color);
         }
+
 
         @Override
         public String toString() {
@@ -94,12 +107,12 @@ abstract public class Robotic {
         }
     }
 
-    public static class NARRoverMaterial extends RoboticMaterial {
+    public static class NARRoverMaterial extends BeingMaterial {
 
         private final NAR nar;
         float tone;
 
-        public NARRoverMaterial(Robotic r, NAR nar) {
+        public NARRoverMaterial(Being r, NAR nar) {
             super(r);
             this.nar = nar;
             tone = 1f;

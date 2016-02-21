@@ -20,7 +20,7 @@ public class TextRect extends Rect {
     private TextRenderer textRenderer;
     private float textScaleFactor;
     private String text;
-    private boolean useVertexArrays = false;
+    private boolean useVertexArrays = true;
     private Vec4f textColor = new Vec4f(1f,1f,1f, 1f);
 
     public TextRect(String initialText) {
@@ -37,27 +37,28 @@ public class TextRect extends Rect {
         this.text = text;
     }
     
-    public static TextRenderer newTextRenderer(Font font) {
-        TextRenderer textRenderer = new TextRenderer(font);
-        return textRenderer;
-    }
+//    public static TextRenderer newTextRenderer(Font font) {
+//        TextRenderer textRenderer = new TextRenderer(font);
+//        return textRenderer;
+//    }
 
     @Override
     public void draw(GL2 gl) {
         //super.draw(gl);
 
         if (textRenderer == null) {
-            textRenderer = new TextRenderer(new Font("Arial", Font.PLAIN, 72));
+            textRenderer = new TextRenderer(new Font("Monospaced", Font.PLAIN, 72), true, true);
+            textRenderer.setSmoothing(true);
+            textRenderer.setUseVertexArrays(useVertexArrays);
         }
 
-        textRenderer.setSmoothing(false);
-        textRenderer.setUseVertexArrays(useVertexArrays);
+
 
         // Compute the scale factor of the largest string which will make
         // them all fit on the faces of the cube
         Rectangle2D bounds = textRenderer.getBounds("Bottom");
         float w = (float) bounds.getWidth();
-        float h = (float) bounds.getHeight();
+        //float h = (float) bounds.getHeight();
         textScaleFactor = 1.0f / (w * 1.1f);
 
 
@@ -72,7 +73,7 @@ public class TextRect extends Rect {
         // Note that because the TextRenderer pushes the enable state
         // internally we don't have to reset the depth test or cull face
         // bits after we're done.
-        textRenderer.begin3DRendering();
+
         gl.glEnable(GL2.GL_DEPTH_TEST);
         gl.glEnable(GL2.GL_CULL_FACE);
 
@@ -81,7 +82,9 @@ public class TextRect extends Rect {
         // of front-facing text.
         bounds = textRenderer.getBounds(text);
         w = (float) bounds.getWidth();
-        h = (float) bounds.getHeight();
+        float h = (float) bounds.getHeight();
+
+        textRenderer.begin3DRendering();
         textRenderer.setColor(textColor.x(), textColor.y(), textColor.z(), 1f);
         textRenderer.draw3D(text,
             w / -2.0f * textScaleFactor,

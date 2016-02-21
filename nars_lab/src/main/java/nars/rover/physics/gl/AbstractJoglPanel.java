@@ -1,17 +1,12 @@
 package nars.rover.physics.gl;
 
-import automenta.spacegraph.Space2D;
-import automenta.spacegraph.demo.spacegraph.DemoTextButton;
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.glu.GLU;
 import com.sun.prism.impl.BufferUtil;
+import nars.rover.physics.Display;
 import nars.rover.physics.PhysicsController;
-import nars.rover.physics.TestbedPanel;
 import nars.rover.physics.TestbedState;
-import nars.rover.physics.j2d.AWTPanelHelper;
-import org.jbox2d.callbacks.DebugDraw;
-import org.jbox2d.common.Timer;
 import org.jbox2d.dynamics.World;
 
 import java.awt.*;
@@ -48,13 +43,13 @@ import static com.jogamp.opengl.fixedfunc.GLMatrixFunc.GL_PROJECTION;
 /**
  *
  */
-public abstract class AbstractJoglPanel extends GLCanvas implements TestbedPanel, GLEventListener {
+public abstract class AbstractJoglPanel extends GLCanvas implements Display, GLEventListener {
     private static final long serialVersionUID = 1L;
 
     //public static final int SCREEN_DRAG_BUTTON = 3;
 
-    public static final int INIT_WIDTH = 600;
-    public static final int INIT_HEIGHT = 600;
+    public static final int INIT_WIDTH = 1200;
+    public static final int INIT_HEIGHT = 900;
 
     public final World world;
     //private Timer timer;
@@ -62,7 +57,6 @@ public abstract class AbstractJoglPanel extends GLCanvas implements TestbedPanel
 
     public final TestbedState model;
     private Point center;
-
 
 
     // model can be null
@@ -118,21 +112,20 @@ public abstract class AbstractJoglPanel extends GLCanvas implements TestbedPanel
 
         GL2 gl = getGL().getGL2();
 
-        gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+        //gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
 
 
         //getGL().getGL2().glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
 
-        getGL().glClearColor(0.0f, 0.0f, 0.0f, 0.8f);
-        getGL().glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT | GL2.GL_STENCIL_BUFFER_BIT);
+        gl.glClearColor(0.0f, 0.0f, 0.0f, 0.8f);
+        gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT | GL2.GL_STENCIL_BUFFER_BIT);
 
 
-        //gl.glClearAccum(0, 0, 0, 1f);
-        //gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
+        gl.glClearAccum(0, 0, 0, 1f);
+        gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
 
 
-        gl.glAccum(GL2.GL_RETURN, 0.9f); //adding the current frame to the buffer
-
+        //gl.glAccum(GL2.GL_RETURN, 0.9f); //adding the current frame to the buffer
 
 
         float time = 0.0f; // what does this?
@@ -152,7 +145,7 @@ public abstract class AbstractJoglPanel extends GLCanvas implements TestbedPanel
         //gl.glAccum(GL2.GL_MULT, 0.95f ); //make current frame in buffer dim
 
 
-        getGL().glFlush();
+        gl.glFlush();
 
 
         repaint();
@@ -163,7 +156,6 @@ public abstract class AbstractJoglPanel extends GLCanvas implements TestbedPanel
 //    protected World getWorld() {
 //        return model != null ? model.getCurrTest().getWorld() : world;
 //    }
-
 
 
     @Override
@@ -212,102 +204,9 @@ public abstract class AbstractJoglPanel extends GLCanvas implements TestbedPanel
 
  */
 
-        private void pollEvents() {
-
- /*
-
- * Polled keyboard events are either true of false. However, we want to
-
- * send the Player class an amount to move. Sending through a static
-
- * amount like 0.5 eg would not be a good idea, because fast machines
-
- * would update the player's position 0.5 every loop and so to would
-
- * slow machines... the speed of the machine would affect the speed of
-
- * the player. So what we do is gab the amount from the nano timer.
-
- * This means that fast machines send out smaller amounts more often,
-
- * and slower machines bigger amounts less often. We also 'multiply' the
-
- * lastTime to nowTime by a suitable factor so we do not require
-
- * a further 'multiplication' later.
-
- */
-
-            //long now=System.nanoTime();
-
-            //float period=(float)((now-lastTime)*0.000005);
-            float period = 1f;
-
-            //lastTime=now;
-
-            dx = MouseInfo.getPointerInfo().getLocation().x;
-
-            dy = MouseInfo.getPointerInfo().getLocation().y;
-
-            //System.out.println(x + " " + y + " " + z);
-
-            float head = mouseCenter.x - dx;
-
-
- /*
-
- * At each loop the Player class creates the correct ModelViewMatrix that
-
-defines
-
- * where the player should be, and in what direction they should be heading.
-
- * This matrix is later loaded into GL instead of the identity matrix.
-
- * The following methods activate the player to setup relevant parts of the
-
- * matrix.
-
- */
-
-            if (head != 0) updateHeading(head);
-
-            float pit = mouseCenter.y - dy;
-
-            if (pit != 0) updatePitch(pit);
-//
-            if (ford != 0) updateForward(ford * (float) period);
-            if (strafe != 0) updateStrafe(strafe * (float) period);
-
-            matrix.put(0, cosc * cosb - sinc * sina * sinb);
-
-            matrix.put(1, sinc * cosb + cosc * sina * sinb);
-
-            matrix.put(2, -cosa * sinb);
-
-            matrix.put(4, -sinc * cosa);
-
-            matrix.put(5, cosc * cosa);
-
-            matrix.put(6, sina);
-
-            matrix.put(8, cosc * sinb + sinc * sina * cosb);
-
-            matrix.put(9, sinc * sinb - cosc * sina * cosb);
-
-            matrix.put(10, cosa * cosb);
-
-            matrix.put(12, matrix.get(0) * x + matrix.get(4) * y + matrix.get(8) * z);
-
-            matrix.put(13, matrix.get(1) * x + matrix.get(5) * y + matrix.get(9) * z);
-
-            matrix.put(14, matrix.get(2) * x + matrix.get(6) * y + matrix.get(10) * z);
-
-        }
-
         private final float _90 = (float) Math.toRadians(90);
 
-        private final float _maxPitch = (float) Math.toRadians(85);
+        private final float _maxPitch = (float) Math.toRadians(90);
 
         private float heading = 0.0f;
 
@@ -348,7 +247,8 @@ axis.
 
  */
 
-        private float[] mat = {1, 0, 0, 0,
+        private float[] mat = {
+                1, 0, 0, 0,
 
                 0, 1, 0, 0,
 
@@ -361,10 +261,11 @@ axis.
         {
             matrix.put(mat);
 
-            x = z = 1.0f;
+            x = -5f;
+            z = 0f;
 
             //there is no floor collider so we set a static y value
-            y = -2.2f;
+            y = 0f;
 
         }
 
@@ -381,6 +282,8 @@ axis.
  */
 
         public void updateHeading(float amount) {
+
+            //amount = (float)Math.log(amount)/5f; //prefilter curve the amount actually turning
 
             heading -= amount * angleSpeed;
 
@@ -403,6 +306,10 @@ axis.
  */
 
         public void updatePitch(float amount) {
+
+
+            //amount = (float)Math.log(amount)/5f; //prefilter curve the amount actually turning
+
 
             pitch -= amount * angleSpeed;
 
@@ -466,7 +373,97 @@ axis.
 
         public void render(GL2 gl, float dt) {
 
-            pollEvents();
+            /*
+
+            * Polled keyboard events are either true of false. However, we want to
+
+            * send the Player class an amount to move. Sending through a static
+
+            * amount like 0.5 eg would not be a good idea, because fast machines
+
+            * would update the player's position 0.5 every loop and so to would
+
+            * slow machines... the speed of the machine would affect the speed of
+
+            * the player. So what we do is gab the amount from the nano timer.
+
+            * This means that fast machines send out smaller amounts more often,
+
+            * and slower machines bigger amounts less often. We also 'multiply' the
+
+            * lastTime to nowTime by a suitable factor so we do not require
+
+            * a further 'multiplication' later.
+
+            */
+
+            //long now=System.nanoTime();
+
+            //float period=(float)((now-lastTime)*0.000005);
+            float period = 1f;
+
+            //lastTime=now;
+
+            Point l = MouseInfo.getPointerInfo().getLocation();
+            dx = l.x;
+            dy = l.y;
+
+            //System.out.println(x + " " + y + " " + z);
+
+
+             /*
+
+ * At each loop the Player class creates the correct ModelViewMatrix that
+
+defines
+
+ * where the player should be, and in what direction they should be heading.
+
+ * This matrix is later loaded into GL instead of the identity matrix.
+
+ * The following methods activate the player to setup relevant parts of the
+
+ * matrix.
+
+ */
+            float head = mouseCenter.x - dx;
+
+
+            if (head != 0) updateHeading(head);
+
+            float pit = mouseCenter.y - dy;
+
+            if (pit != 0) updatePitch(pit);
+//
+            if (ford != 0) updateForward(ford * (float) period);
+            if (strafe != 0) updateStrafe(strafe * (float) period);
+
+            FloatBuffer m = this.matrix;
+
+            //TODO cache some of these components
+            m.put(0, cosc * cosb - sinc * sina * sinb);
+
+            m.put(1, sinc * cosb + cosc * sina * sinb);
+
+            m.put(2, -cosa * sinb);
+
+            m.put(4, -sinc * cosa);
+
+            m.put(5, cosc * cosa);
+
+            m.put(6, sina);
+
+            m.put(8, cosc * sinb + sinc * sina * cosb);
+
+            m.put(9, sinc * sinb - cosc * sina * cosb);
+
+            m.put(10, cosa * cosb);
+
+            m.put(12, m.get(0) * x + m.get(4) * y + m.get(8) * z);
+
+            m.put(13, m.get(1) * x + m.get(5) * y + m.get(9) * z);
+
+            m.put(14, m.get(2) * x + m.get(6) * y + m.get(10) * z);
 
             //if(robot!=null)
 
@@ -496,16 +493,18 @@ axis.
 
             gl.glLoadMatrixf(matrix);
 
+            gl.glScalef(3, 0.05f, 1); //why is this restoring the balance of dmensions
+
             for (int a = -8; a < 8; a++) {
                 for (int b = -8; b < 4; b++) {
                     for (int c = -4; c < 4; c++) {
                         gl.glPushMatrix();
 
                         gl.glTranslatef(
-                                a * 10f, b * 0.1f, c * 10f
+                                a * 10f, b *10f, c * 10f
                         );
 
-                        gl.glColor4f(100f + (float)Math.sin(a*3f) * 75f, 100+0.5f, 0.5f, 0.2f);
+                        gl.glColor4f(100f + (float) Math.sin(a * 3f) * 75f, 100 + 0.5f, ((a ^ b) + c) % 2 == 0 ? 0.9f : 0.1f, 0.7f);
 
                         gl.glBegin(gl.GL_QUADS);
 
@@ -563,7 +562,7 @@ axis.
 
         gl.glMatrixMode(GL_PROJECTION);
 
-        glu.gluPerspective(75.0f, ((float) w / (float) h), 0.1f, 25.0f);
+        glu.gluPerspective(25.0f, (((float) w) / h), 0.01f, 100f);
 
         gl.glMatrixMode(GL_MODELVIEW);
 
@@ -577,7 +576,7 @@ axis.
 
         gl.glDepthFunc(gl.GL_LEQUAL);
 
-        //gl.glHint(gl.GL_PERSPECTIVE_CORRECTION_HINT, gl.GL_NICEST);
+        gl.glHint(gl.GL_PERSPECTIVE_CORRECTION_HINT, gl.GL_NICEST);
 
 
         this.addKeyListener(new KeyAdapter() {
@@ -667,27 +666,27 @@ axis.
     @Override
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
 
-        GL2 gl = (GL2) drawable.getGL();
+//        GL2 gl = (GL2) drawable.getGL();
 
-        GLU glu = new GLU();
-
-        if (height <= 0) {
-            height = 1;
-        }
-
-        final float h = (float) width / (float) height;
-
-        gl.glViewport(0, 0, width, height);
-
-        gl.glMatrixMode(GL_PROJECTION);
-
-        gl.glLoadIdentity();
-
-        glu.gluPerspective(45.0f, h, 1.0, 20.0);
-
-        gl.glMatrixMode(GL_MODELVIEW);
-
-        gl.glLoadIdentity();
+//        GLU glu = new GLU();
+//
+//        if (height <= 0) {
+//            height = 1;
+//        }
+//
+//        final float h = (float) width / (float) height;
+//
+//        gl.glViewport(0, 0, width, height);
+//
+//        gl.glMatrixMode(GL_PROJECTION);
+//
+//        gl.glLoadIdentity();
+//
+//        glu.gluPerspective(45.0f, h, 1.0, 20.0);
+//
+//        gl.glMatrixMode(GL_MODELVIEW);
+//
+//        gl.glLoadIdentity();
 
         center = new Point(x + width / 2, y + height / 2);
 

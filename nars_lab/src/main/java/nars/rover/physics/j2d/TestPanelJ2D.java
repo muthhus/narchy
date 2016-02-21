@@ -26,7 +26,7 @@
 package nars.rover.physics.j2d;
 
 import nars.rover.physics.PhysicsController;
-import nars.rover.physics.TestbedPanel;
+import nars.rover.physics.Display;
 import nars.rover.physics.TestbedState;
 
 import javax.swing.*;
@@ -36,7 +36,7 @@ import java.awt.*;
  * @author Daniel Murphy
  */
 @SuppressWarnings("serial")
-public class TestPanelJ2D extends JPanel implements TestbedPanel {
+public class TestPanelJ2D extends JPanel implements Display {
 
     public static final int SCREEN_DRAG_BUTTON = 3;
 

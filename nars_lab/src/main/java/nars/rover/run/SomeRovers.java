@@ -23,6 +23,7 @@ import nars.op.sys.NarQ.InputTask;
 import nars.op.sys.NarQ.NotBeliefReward;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.World;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.WeakHashMap;
@@ -53,11 +54,12 @@ public class SomeRovers {
         Global.DEBUG = false;
         Global.EXIT_ON_EXCEPTION = true;
 
-        //RoverWorld world = new ReactorWorld(32, 48, 32);
-        RoverWorld world = new FoodSpawnWorld1(64, 48, 48, 0.5f);
-
         //RoverWorld world = new GridSpaceWorld(GridSpaceWorld.newMazePlanet());
-        final Sim game = new Sim(clock, world);
+        final Sim game = new Sim(new World(), clock);
+
+        //RoverWorld world = new ReactorWorld(32, 48, 32);
+        new FoodSpawnWorld1(game, 64, 48, 48, 0.5f);
+
 
         //game.add(new Turret("turret"));
 

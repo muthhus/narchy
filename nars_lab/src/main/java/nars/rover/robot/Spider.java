@@ -7,7 +7,7 @@ import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.joints.RevoluteJointDef;
 
-public class Spider extends Robotic {
+public class Spider extends Being {
 
     int arms;
     float armLength = 4.5f;
@@ -181,8 +181,8 @@ public class Spider extends Robotic {
     }
 
     @Override
-    public RoboticMaterial getMaterial() {
-        return new RoboticMaterial(this);
+    public BeingMaterial getMaterial() {
+        return new BeingMaterial(this);
     }
 
     @Override

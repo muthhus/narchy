@@ -143,6 +143,9 @@ public class World {
   public World(Vec2 gravity) {
     this(gravity, new DefaultWorldPool(WORLD_POOL_SIZE, WORLD_POOL_CONTAINER_SIZE));
   }
+  public World() {
+    this(new Vec2(0,0), new DefaultWorldPool(WORLD_POOL_SIZE, WORLD_POOL_CONTAINER_SIZE));
+  }
 
   /**
    * Construct a world object.

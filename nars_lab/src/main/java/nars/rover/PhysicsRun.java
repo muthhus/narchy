@@ -38,6 +38,7 @@ import nars.rover.physics.gl.JoglDraw;
 import nars.rover.physics.j2d.TestPanelJ2D;
 import nars.rover.physics.j2d.TestbedSidePanel;
 import org.jbox2d.callbacks.DebugDraw;
+import org.jbox2d.dynamics.World;
 
 import javax.swing.*;
 import java.awt.*;
@@ -49,12 +50,14 @@ import java.awt.event.KeyListener;
  *
  * @author Daniel Murphy
  */
-public class PhysicsRun {
+@Deprecated public class PhysicsRun {
     public final PhysicsController controller;
     public final TestbedState model;
     // private static final Logger log = LoggerFactory.getLogger(TestbedMain.class);
 
     private final float simulationRate;
+    public final AbstractJoglPanel panel;
+
     public PhysicsRun(float simulationRate, PhysicsModel... tests) {
         this.simulationRate = simulationRate;
     // try {
@@ -80,15 +83,16 @@ public class PhysicsRun {
         config.setNumSamples(1);
         //config.setBackgroundOpaque(false);
 
-        AbstractJoglPanel panel = new Box2DJoglPanel(model, controller, config) {
+        World world = model.getWorldCreator().createWorld(model.gravity);
 
-        };
+        AbstractJoglPanel panel = new Box2DJoglPanel(world, model, controller, config);
 
         JoglAbstractDraw joglDraw = new JoglDraw(panel);
 
 
         joglDraw.setPanel(panel);
         model.setPanel(panel);
+        this.panel = panel;
 
         //model.setDebugDraw(new DrawPhy2D(panel, true));
         //model.setDebugDraw(joglDraw);
@@ -100,7 +104,7 @@ public class PhysicsRun {
         JFrame window = new JFrame();
         window.setTitle("NAR Physics");
         window.setLayout(new BorderLayout());
-        TestbedSidePanel side = new TestbedSidePanel(model, controller);
+        //TestbedSidePanel side = new TestbedSidePanel(model, controller);
         window.add(panel, "Center");
         //window.add(new JScrollPane(side), "East");
         window.pack();
@@ -177,7 +181,7 @@ public class PhysicsRun {
 //
 //    }
 
-    public void cycle(float fps) {
+    public void cycle() {
 
         controller.cycle(1f/simulationRate);
 
