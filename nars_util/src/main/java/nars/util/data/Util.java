@@ -628,24 +628,24 @@ public enum Util {
     }
 
     public static boolean equals(double a, double b) {
-        return equal(a, b, Double.MIN_VALUE * 2);
+        return equals(a, b, Double.MIN_VALUE * 2);
     }
 
     public static boolean equals(float a, float b) {
-        return equal(a, b, Float.MIN_VALUE * 2);
+        return equals(a, b, Float.MIN_VALUE * 2);
     }
 
     /**
      * tests equivalence (according to epsilon precision)
      */
-    public static boolean equal(float a, float b, float epsilon) {
+    public static boolean equals(float a, float b, float epsilon) {
         return Math.abs(a - b) < epsilon;
     }
 
     /**
      * tests equivalence (according to epsilon precision)
      */
-    public static boolean equal(double a, double b, double epsilon) {
+    public static boolean equals(double a, double b, double epsilon) {
         return Math.abs(a - b) < epsilon;
     }
 

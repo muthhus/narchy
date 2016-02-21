@@ -57,7 +57,7 @@
 
 .control {
     -fx-base-color: /*transparent;*/ /*rgb(30,30,30); */
-        rgba(0,0,0,1);
+        rgb(0.1,0.1,0.1);
 }
 
 .text-input-control {
@@ -66,13 +66,24 @@
         rgba(125,125,125,0.25);
 }
 
-/*
-.button {
-    -fx-padding: 10 10 10 10;
-    -fx-background: rgb(30, 30, 30);
-    -fx-background: transparent;
+
+
+.label, .toggle-button, .button, .tree-cell {
+    /*-fx-text-fill: -fx-text-base-color;
+    -fx-fill: -fx-text-base-color;*/
+    -fx-padding: 2px;
+    -fx-label-padding: 2px;
 }
-*/
+.toggle-button:hover, .button:hover, .slider:hover {
+    -fx-text-fill: #000;
+    -fx-background-color: #fb0;
+}
+.toggle-button:armed, .button:armed {
+    -fx-text-fill: #000;
+    -fx-background-color: #f50;
+}
+
+
 /*
 .spaceselector {
     -fx-fill: transparent !important;
@@ -252,12 +263,7 @@
  ******************************************************************************/
 
 
-.label, .toggle-button, .button, .tree-cell {
-    /*-fx-text-fill: -fx-text-base-color;
-    -fx-fill: -fx-text-base-color;*/
-    -fx-padding: 1px;
-    -fx-label-padding: 0em;
-}
+
 
 .tree-cell .tree-disclosure-node .arrow {
     -fx-background-color: #f00;
@@ -276,15 +282,6 @@
     /*-fx-content-display: LEFT;*/
 }
 
-.toggle-button:hover, .button:hover, .slider:hover {
-    -fx-text-fill: #000;
-    -fx-background-color: #fb0;
-}
-.toggle-button:armed, .button:armed {
-    -fx-text-fill: #000;
-    -fx-fill: #000;
-    -fx-background-color: #f50;
-}
 
 /*.toggle-button:focused,
 .button:focused,

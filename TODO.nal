@@ -1,5 +1,20 @@
 //knowledge representation of development plans. ex:
 //  TODO(author:{"unparsed raw NLP string"})!
 
-TODO(#all:{"= as optional shorthand syntax for <->"})!
-TODO(#all:{"analyze benefits and risks of allowing empty set compounds"})!
+TODO({"= as optional shorthand syntax for <->"})!
+TODO({"analyze benefits and risks of allowing empty set compounds"})!
+
+TODO({"""md
+
+Package refactoring
+-------------------
+
+nars_util -> narchy.data, narchy.logic
+nars_logic -> narchy.logic, narchy.nal
+
+divide nars_gui -> datafx?, logicfx, nalfx
+
+nars_lab -> lab
+
+
+"""})!

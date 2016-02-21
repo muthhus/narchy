@@ -335,9 +335,10 @@ public class FastOrganicLayout<V extends TermNode> implements IterativeLayout<V>
                 vd = new TermNode(vertex);
                 displayed.put(vertex, vd);
             }*/
-            
-            if (cellLocation[i]==null)
-                cellLocation[i] = new double[2];
+
+            double[][] cl = this.cellLocation;
+            if (cl[i]==null)
+                cl[i] = new double[2];
 
             // Set up the mapping from array indices to cells
             indices.put(vd, i);
@@ -349,12 +350,14 @@ public class FastOrganicLayout<V extends TermNode> implements IterativeLayout<V>
             double width = ww*2f; //bounds.getWidth();
             double height = ww*2f; //bounds.getHeight();
 
+
+
             // Randomize (0, 0) locations
             //TODO re-use existing location
             double x, y;
             if (vd==null) {
-                x = 0;//Math.random() * 100.0;//Math.random() * 100; //bounds.getX();
-                y = 0;//Math.random() * 100.0;
+                x = Math.random() * 100.0;//Math.random() * 100; //bounds.getX();
+                y = Math.random() * 100.0;//Math.random() * 100.0;
             }
             else {
                 x = vd.x();
@@ -362,8 +365,8 @@ public class FastOrganicLayout<V extends TermNode> implements IterativeLayout<V>
             }
             
 
-            cellLocation[i][0] = x + width / 2.0;
-            cellLocation[i][1] = y + height / 2.0;
+            cl[i][0] = x + width / 2.0;
+            cl[i][1] = y + height / 2.0;
 
             double r = radius[i] = Math.min(width, height);
             radiusSquared[i] = r*r;

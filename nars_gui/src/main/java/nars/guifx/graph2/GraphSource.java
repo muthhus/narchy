@@ -31,25 +31,10 @@ public abstract class GraphSource/* W? */ {
         return grapher.isReady();
     }
 
+    private final NodeVisitor nodeVisitor = new NodeVisitor();
+
     public void updateNode(SpaceGrapher g, Termed s, TermNode sn) {
-
-
-
-        forEachOutgoingEdgeOf(s, t -> {
-
-            if (t == null) return;
-
-            TermNode tn = g.getTermNode(((BLink<Termed>)t).get());
-            if (tn == null)
-                return;
-
-            TermEdge ee = getEdge(g, sn, tn, g.edgeVis);
-            if (ee != null) {
-                updateEdge(ee, t);
-            }
-
-        });
-        sn.commitEdges();
+        nodeVisitor.run(s, sn);
     }
 
     protected void updateNode(TermNode tn, Object indexing) {
@@ -155,6 +140,40 @@ public abstract class GraphSource/* W? */ {
 
     /** applies updates each frame */
     public abstract void commit();
+
+
+    private class NodeVisitor implements Consumer {
+
+        private TermNode sn;
+
+        public NodeVisitor() {
+        }
+
+        @Override
+        public void accept(Object t) {
+
+            if (t == null) return;
+
+            SpaceGrapher g = GraphSource.this.grapher;
+
+            TermNode tn = g.getTermNode(((BLink<Termed>) t).get());
+            if (tn == null)
+                return;
+
+            TermEdge ee = getEdge(g, sn, tn, g.edgeVis);
+            if (ee != null) {
+                GraphSource.this.updateEdge(ee, t);
+            }
+
+        }
+
+        public void run(Termed s, TermNode sn) {
+            this.sn = sn;
+
+            forEachOutgoingEdgeOf(s, this);
+            sn.commitEdges();
+        }
+    }
 
 //
 //        //final Term source = c.getTerm();

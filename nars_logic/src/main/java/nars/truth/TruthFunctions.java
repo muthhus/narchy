@@ -61,7 +61,7 @@ public final class TruthFunctions extends UtilityFunctions {
         float fPos = v1.freq();
 
         //if = 0.5, negating will produce same result
-        if (Util.equal(fPos, 0.5f, Global.TRUTH_EPSILON))
+        if (Util.equals(fPos, 0.5f, Global.TRUTH_EPSILON))
             return v1;
 
         float f = 1.0f - fPos;

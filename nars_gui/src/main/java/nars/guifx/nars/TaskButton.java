@@ -130,7 +130,7 @@ public class TaskButton<X> extends Label implements Runnable {
     public void run() {
         float pri = (item instanceof Budgeted) ? ((Budgeted) item).pri() : 0;
 
-        if (!Util.equal(lastPri,pri,priTolerance)) {
+        if (!Util.equals(lastPri,pri,priTolerance)) {
 
 
             double scale = getScale(pri);

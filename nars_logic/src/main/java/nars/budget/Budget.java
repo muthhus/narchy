@@ -1,9 +1,9 @@
 package nars.budget;
 
 import nars.Symbols;
-//import nars.data.BudgetedStruct;
 import nars.task.Task;
 import nars.util.Texts;
+import nars.util.data.Util;
 import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
 
@@ -12,7 +12,6 @@ import javax.annotation.Nullable;
 import static java.lang.Math.pow;
 import static nars.nal.UtilityFunctions.and;
 import static nars.nal.UtilityFunctions.or;
-import static nars.util.data.Util.equal;
 
 /**
  * Created by me on 12/11/15.
@@ -122,9 +121,9 @@ public abstract class Budget extends BudgetedHandle {
     public abstract void setQuality(float q);
 
     public boolean equalsByPrecision(@NotNull Budget t, float epsilon) {
-        return equal(pri(), t.pri(), epsilon) &&
-                equal(dur(), t.dur(), epsilon) &&
-                equal(qua(), t.qua(), epsilon);
+        return Util.equals(pri(), t.pri(), epsilon) &&
+                Util.equals(dur(), t.dur(), epsilon) &&
+                Util.equals(qua(), t.qua(), epsilon);
     }
 
     /**

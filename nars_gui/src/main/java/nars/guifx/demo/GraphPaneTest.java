@@ -57,6 +57,7 @@ public enum GraphPaneTest {
 
         SpaceGrapher g = new DefaultGrapher(
 
+                nar,
                 src,
 
                 new DefaultNodeVis() {

@@ -91,8 +91,8 @@ public enum JFX {
         double r = d / 2;
         for (int i = 0; i < sides; i++) {
             polygon.getPoints().addAll(
-                    r * Math.cos(a),
-                    r * Math.sin(a)
+                    r * (Math.cos(a)),
+                    r * (Math.sin(a))
             );
             a += da;
         }

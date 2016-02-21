@@ -1,6 +1,7 @@
 package nars.guifx.graph2.source;
 
 import javafx.beans.InvalidationListener;
+import nars.NAR;
 import nars.guifx.annotation.Implementation;
 import nars.guifx.annotation.ImplementationProperty;
 import nars.guifx.graph2.GraphSource;
@@ -31,6 +32,9 @@ public class DefaultGrapher extends SpaceGrapher {
     //@Implementation(TimeGraph.class)
     public final ImplementationProperty<IterativeLayout> layoutType = new ImplementationProperty();
 
+    public final NAR nar;
+    public final POJOPane menuButton;
+
 
 //    public DefaultGrapher(int capacity, ConceptsSource source) {
 //        this(
@@ -38,12 +42,14 @@ public class DefaultGrapher extends SpaceGrapher {
 //                new CanvasEdgeRenderer());
 //    }
 
-    public DefaultGrapher(GraphSource source,
+    public DefaultGrapher(NAR nar, GraphSource source,
                           NodeVis v,
                           BiFunction<TermNode, TermNode, TermEdge> edgeBuilder,
                           CanvasEdgeRenderer edgeRenderer) {
 
-        super(source, v, edgeBuilder, edgeRenderer);
+        super(nar, source, v, edgeBuilder, edgeRenderer);
+
+        this.nar = nar;
 
         InvalidationListener layoutChange = e -> {
             IterativeLayout il = layoutType.getInstance();
@@ -59,10 +65,10 @@ public class DefaultGrapher extends SpaceGrapher {
 
         runLater(() -> layoutChange.invalidated(null));
 
-        POJOPane c = new POJOPane(this);
-        c.layout();
-        c.autosize();
-        getChildren().add(c);
+        menuButton = new POJOPane(this);
+        menuButton.layout();
+        menuButton.autosize();
+        getChildren().add(menuButton);
 
 
     }

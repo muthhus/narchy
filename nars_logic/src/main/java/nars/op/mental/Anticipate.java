@@ -24,7 +24,6 @@ package nars.op.mental;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
-import nars.$;
 import nars.Global;
 import nars.NAR;
 import nars.Symbols;
@@ -198,7 +197,7 @@ public final class Anticipate {
     public static boolean inTime(float incomingFreq, @NotNull Task existing, long incomingOccurr, int TOLERANCE_DIV) {
         long occurrTime= existing.occurrence();
         return
-                Util.equal(incomingFreq, existing.freq(), FREQ_TOLERANCE) &&
+                Util.equals(incomingFreq, existing.freq(), FREQ_TOLERANCE) &&
                 //within time tolerance
                 (Math.abs(incomingOccurr - occurrTime) <= TOLERANCE_DIV);
     }

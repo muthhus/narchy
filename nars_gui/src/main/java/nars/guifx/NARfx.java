@@ -298,7 +298,7 @@ public enum NARfx  {
 //        NARide.show(nar.loop(), (Consumer)null);
 //    }
 
-    public static void newConceptWindow(NAR nar, Concept c) {
+    public static void newWindow(NAR nar, Termed c) {
         //TODO //ConceptPane wn = new ConceptPane(nar, c);
         ConceptPane wn = new ConceptPane(nar, c);
 

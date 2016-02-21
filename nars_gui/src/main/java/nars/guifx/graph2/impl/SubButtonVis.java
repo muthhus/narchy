@@ -1,6 +1,7 @@
 package nars.guifx.graph2.impl;
 
 import javafx.scene.Node;
+import nars.NAR;
 import nars.concept.Concept;
 import nars.guifx.graph2.TermNode;
 import nars.guifx.graph2.scene.DefaultNodeVis;
@@ -20,10 +21,9 @@ public class SubButtonVis extends DefaultNodeVis {
     }
 
     @Override
-    public TermNode newNode(Termed term) {
-        return new LabeledCanvasNode(term, 32, e -> {
-        }, e -> {
-        }) {
+    public TermNode newNode(Termed term, NAR nar) {
+        return new LabeledCanvasNode(nar, term, 32, null, null) {
+
             @Override
             protected Node newBase() {
                 SubButton s = SubButton.make(

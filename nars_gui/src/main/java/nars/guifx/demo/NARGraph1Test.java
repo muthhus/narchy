@@ -39,6 +39,7 @@ public enum NARGraph1Test {
 
 
         DefaultGrapher g = new DefaultGrapher(
+                n,
 
                 new ConceptsSource(n),
 

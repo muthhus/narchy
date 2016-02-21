@@ -68,7 +68,7 @@ public class DefaultTruth extends AbstractScalarTruth {
 
     @Override
     protected boolean equalsFrequency(@NotNull Truth t) {
-        return (Util.equal(freq, t.freq(), Global.TRUTH_EPSILON));
+        return (Util.equals(freq, t.freq(), Global.TRUTH_EPSILON));
     }
 
     private static final int hashDiscreteness = (int)(1.0f / Global.TRUTH_EPSILON);

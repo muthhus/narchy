@@ -242,7 +242,7 @@ public class NARMenu extends HBox {
         }
 
         private String clockText() {
-            return Texts.n4((clock.time()-startTime)/1000f) + "ms";
+            return Texts.n4((clock.time()-startTime)/1000f) + "s";
         }
     }
 

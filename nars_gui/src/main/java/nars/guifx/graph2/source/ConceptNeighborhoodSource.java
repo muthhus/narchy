@@ -21,7 +21,7 @@ public class ConceptNeighborhoodSource extends ConceptsSource {
     private final ArrayList<Termed> roots;
     int termLinkNeighbors = 16;
 
-    public ConceptNeighborhoodSource(NAR nar, Concept... c) {
+    public ConceptNeighborhoodSource(NAR nar, Termed... c) {
         super(nar);
         this.roots = Lists.newArrayList(c);
     }

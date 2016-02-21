@@ -156,7 +156,7 @@ public class NARide extends BorderPane {
                         ConceptSummaryPane src = (ConceptSummaryPane) e.getSource();
 
                         Concept cc = src.concept;
-                        NARfx.newConceptWindow(nar,cc);
+                        NARfx.newWindow(nar,cc);
                     };
 
             @Override public Node make(Concept cc) {
@@ -167,6 +167,9 @@ public class NARide extends BorderPane {
         });
         ni.addTool("Task Tree", () -> new TreePane(nar));
         ni.addTool("Concept Network", () -> new DefaultGrapher(
+
+            nar,
+
             new ConceptsSource(nar),
 
             //new DefaultNodeVis(),

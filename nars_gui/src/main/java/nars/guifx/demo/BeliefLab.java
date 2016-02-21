@@ -71,7 +71,7 @@ public class BeliefLab {
 
 
         NARfx.run((a,s)->{
-            NARfx.newConceptWindow(nar, c);
+            NARfx.newWindow(nar, c);
 
 
             nar.loop(fps);

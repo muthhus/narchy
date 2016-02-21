@@ -3,6 +3,7 @@ package nars.guifx.graph2.source;
 
 import com.gs.collections.impl.map.mutable.UnifiedMap;
 import javafx.beans.property.SimpleObjectProperty;
+import nars.NAR;
 import nars.guifx.Spacegraph;
 import nars.guifx.graph2.*;
 import nars.guifx.graph2.impl.CanvasEdgeRenderer;
@@ -214,6 +215,7 @@ public class SpaceGrapher extends Spacegraph {
     }
 
 
+
     protected final TermNode newNode(Termed k) {
         TermNode n = nodeVis.get().newNode(k);
         if (n !=null) {
@@ -336,6 +338,7 @@ public class SpaceGrapher extends Spacegraph {
 
         Set<TermNode> active = new LinkedHashSet(v.size()); //Global.newHashSet(maxNodes);
 
+
         while (cc.hasNext()) {
 
             Termed k = cc.next();
@@ -436,7 +439,7 @@ public class SpaceGrapher extends Spacegraph {
     }
 
 
-    public SpaceGrapher(GraphSource g,
+    public SpaceGrapher(NAR nar, GraphSource g,
                         NodeVis vv,
                         BiFunction<TermNode, TermNode, TermEdge> edgeVis,
                         CanvasEdgeRenderer edgeRenderer) {
@@ -463,7 +466,7 @@ public class SpaceGrapher extends Spacegraph {
             if (p != null)
                 p.stop(gg);
             if (n != null) {
-                n.start(gg);
+                n.start(gg,nar);
             }
         });
 

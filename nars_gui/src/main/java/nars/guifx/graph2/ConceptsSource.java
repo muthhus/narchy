@@ -82,7 +82,7 @@ public class ConceptsSource extends GraphSource {
 
     @Override
     public void updateNode(SpaceGrapher g, Termed s, TermNode sn) {
-        sn.priNorm = nar.conceptPriority(s, 0f);
+        sn.pri(nar.conceptPriority(s, 0f));
         super.updateNode(g, s, sn);
     }
 

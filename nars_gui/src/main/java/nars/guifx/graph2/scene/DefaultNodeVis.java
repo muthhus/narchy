@@ -1,5 +1,6 @@
 package nars.guifx.graph2.scene;
 
+import com.gs.collections.api.tuple.Pair;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.event.EventHandler;
@@ -13,12 +14,14 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeType;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontSmoothingType;
+import nars.NAR;
 import nars.data.Range;
 import nars.guifx.NARfx;
 import nars.guifx.graph2.NodeVis;
 import nars.guifx.graph2.TermNode;
 import nars.guifx.graph2.source.SpaceGrapher;
 import nars.guifx.util.ColorMatrix;
+import nars.task.Task;
 import nars.term.Termed;
 
 import java.util.concurrent.atomic.AtomicReference;
@@ -28,14 +31,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class DefaultNodeVis implements NodeVis {
 
-//    public static class HexagonNodeVis<C extends Termed> extends DefaultNodeVis<C> {
-//
-//        @Override public TermNode newNode(C c) {
-//            return new HexTermNode(c, (e) -> { }, (e) -> { });
-//        }
-//    }
-
-    static final Font nodeFont = NARfx.mono(0.25);
+    //static final Font nodeFont = NARfx.mono(0.25);
 
     protected double minSize = 16;
     protected double maxSize = 64;
@@ -48,6 +44,7 @@ public class DefaultNodeVis implements NodeVis {
     public final SimpleDoubleProperty nodeScale = new SimpleDoubleProperty(1.0);
     private SpaceGrapher graph = null;
     final Rectangle hoverPanel = new Rectangle();
+    private NAR nar;
 
     public DefaultNodeVis() {
         nodeScale.addListener((e) -> {
@@ -68,9 +65,9 @@ public class DefaultNodeVis implements NodeVis {
     }
     //public Function<Term,TermNode> nodeBuilder;
 
-    @Override
-    public TermNode newNode(Termed term) {
-        return new LabeledCanvasNode(term, maxEdges, mouseActivity, mouseUntivity);
+    //TODO make abstract
+    public TermNode newNode(Termed term, NAR nar) {
+        return new LabeledCanvasNode(nar, term, maxEdges, mouseActivity, mouseUntivity);
     }
 
     @Override
@@ -114,6 +111,7 @@ public class DefaultNodeVis implements NodeVis {
         //if (!hoverPanel.isVisible()) {
         //runLater(() -> {
 
+        //TODO use setUserObject
 
         if (e.getTarget() instanceof Node) {
             //base.widthProperty().bind( hoverPanel.widthProperty() );
@@ -212,7 +210,12 @@ public class DefaultNodeVis implements NodeVis {
 
 
     @Override
-    public void start(SpaceGrapher g) {
+    public TermNode newNode(Termed t) {
+        return newNode(t, nar);
+    }
+
+    @Override
+    public void start(SpaceGrapher g, NAR nar) {
         if (graph != null)
             throw new RuntimeException("already running this vis");
 
@@ -220,6 +223,8 @@ public class DefaultNodeVis implements NodeVis {
         hoverPanel.setVisible(false);
         hoverPanel.setMouseTransparent(true);
 
+
+        this.nar = nar;
 
         //TODO see if this is destructive
         g.setOnMouseMoved((MouseEvent e) -> {
@@ -240,6 +245,33 @@ public class DefaultNodeVis implements NodeVis {
         graph = null;
     }
 
+    //public static final ConcurrentHashMap<NAR,EventHandler<? super MouseEvent>> clickHandlerCache = new ConcurrentHashMap(2);
+
+    public static final EventHandler<MouseEvent> onDoubleClickTerm = e -> {
+
+        if (e.getClickCount() == 2) {
+            //Doubleclick:
+
+            System.out.println(e.getSource() + " " + e.getTarget() + "\n" +
+                    ((Node)e.getSource()).getUserData() + " " +
+                    ((Node)e.getTarget()).getUserData() + " "
+            );
+
+            Pair<NAR,?> nt = (Pair<NAR,?>)(((Node)(e.getTarget())).getUserData());
+            if (nt!=null) {
+                Object x = nt.getTwo();
+
+                if (x != null) {
+
+                    if (x instanceof Task)
+                        NARfx.newWindow(nt.getOne(), (Task) x);
+                    if (x instanceof Termed)
+                        NARfx.newWindow(nt.getOne(), (Termed) x);
+                }
+            }
+        }
+    };
+
     public static class LabeledCanvasNode<N extends Termed> extends TermNode {
 
 
@@ -247,26 +279,20 @@ public class DefaultNodeVis implements NodeVis {
 
         private GraphicsContext g = null;
 
-        public LabeledCanvasNode(N t, int maxEdges, EventHandler<MouseEvent> mouseActivity, EventHandler<MouseEvent> mouseUntivity) {
+        public LabeledCanvasNode(NAR n, N t, int maxEdges, EventHandler<MouseEvent> mouseActivity, EventHandler<MouseEvent> mouseUntivity) {
             super(t, maxEdges);
 
             base = newBase();
+
             setManaged(false);
 
-            base.setOnMouseClicked(e -> {
-                //System.out.println("click " + e.getClickCount());
-                if (e.getClickCount() == 2) {
-                    if (c != null) {
-                        //NARfx.run((a, b) -> {
-                        System.out.println("doubleclicked " + t);
-                        //});
-                    }
-                }
-            });
+            base.setOnMouseClicked(onDoubleClickTerm);
 
-            base.setOnMouseEntered(mouseActivity);
+            if (mouseActivity!=null)
+                base.setOnMouseEntered(mouseActivity);
 
-            base.setOnMouseExited(mouseUntivity);
+            if (mouseUntivity!=null)
+                base.setOnMouseExited(mouseUntivity);
 
             setPickOnBounds(false);
 

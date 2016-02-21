@@ -31,7 +31,7 @@ public class TermNode extends GraphNode {
     public final Termed term;
 
     /** priority normalized to visual context */
-    public double priNorm = 0;
+    public float priNorm = 0;
 
     public Concept c = null;
     private TermEdge[] edges = TermEdge.empty;
@@ -95,10 +95,14 @@ public class TermNode extends GraphNode {
 //
 //    }
 
+    public float pri() {
+        return priNorm;
+    }
 
     public final TermEdge putEdge(Termed b, TermEdge e) {
         TermEdge r = edge.put(b, e);
-        modified |= (e != r);
+        if (e!=r)
+            modified = true;
         return r;
     }
 
@@ -172,6 +176,12 @@ public class TermNode extends GraphNode {
 
         }
 
+    }
+
+    /** sets the internal priority value, returns whether change registered */
+    public boolean pri(float v) {
+        this.priNorm = v;
+        return true;
     }
 
 

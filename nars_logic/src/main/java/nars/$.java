@@ -605,7 +605,7 @@ public enum $  {
     }
 
     public static Atom the(float v) {
-        if (Util.equal( (float)Math.floor(v), v, Float.MIN_VALUE*2 )) {
+        if (Util.equals( (float)Math.floor(v), v, Float.MIN_VALUE*2 )) {
             //close enough to be an int, so it doesnt need to be quoted
             return the((int)v);
         }

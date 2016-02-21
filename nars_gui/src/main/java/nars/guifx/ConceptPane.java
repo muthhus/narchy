@@ -3,6 +3,7 @@ package nars.guifx;
 import com.gs.collections.impl.set.mutable.UnifiedSet;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
@@ -24,6 +25,7 @@ import nars.guifx.chart.Plot2D;
 import nars.guifx.graph2.TermEdge;
 import nars.guifx.graph2.TermNode;
 import nars.guifx.graph2.impl.BlurCanvasEdgeRenderer;
+import nars.guifx.graph2.impl.HexButtonVis;
 import nars.guifx.graph2.scene.DefaultNodeVis;
 import nars.guifx.graph2.source.ConceptNeighborhoodSource;
 import nars.guifx.graph2.source.DefaultGrapher;
@@ -51,13 +53,14 @@ import java.util.function.Supplier;
 
 import static java.util.stream.Collectors.toList;
 import static javafx.application.Platform.runLater;
+import static nars.$.neg;
 import static nars.nal.Tense.ETERNAL;
 
 
 /**
  * Created by me on 8/10/15.
  */
-public class ConceptPane extends VBox implements ChangeListener {
+public class ConceptPane extends BorderPane implements ChangeListener {
 
     private final NAR nar;
     private final BeliefTablePane beliefChart;
@@ -295,8 +298,8 @@ public class ConceptPane extends VBox implements ChangeListener {
 
 
 
-        Term conceptTerm = cconceptTerm.term();
-        this.term = conceptTerm;
+        Term term = cconceptTerm.term();
+        this.term = term;
         this.nar = nar;
 
 
@@ -315,18 +318,38 @@ public class ConceptPane extends VBox implements ChangeListener {
 
 
         Button activateButton = new NARActionButton(nar, "+", (n) -> {
-                n.conceptualize(conceptTerm, new UnitBudget(1f, 0.75f, 0.75f), 1f);
+                n.conceptualize(term, new UnitBudget(1f, 0.75f, 0.75f), 1f);
         });
-        Button goalButton = new NARActionButton(nar, "!", (n) -> {
-            n.input(new MutableTask(conceptTerm, '!').present(n.memory).log("GUI"));
+        Button yesGoalButton = new NARActionButton(nar, "+!", (n) -> {
+            n.input(new MutableTask(term, '!').present(n.memory).log("GUI Goal"));
+        });
+        Button noGoalButton = new NARActionButton(nar, "-!", (n) -> {
+            n.input(new MutableTask(term, '!').truth(0f, n.memory.getDefaultConfidence('!')).present(n.memory).log("GUI Goal"));
+        });
+        Button trueButton = new NARActionButton(nar, "T", (n) -> {
+            n.input(new MutableTask(term, '.').present(n.memory).log("GUI True"));
+        });
+        Button falseButton = new NARActionButton(nar, "F", (n) -> {
+            n.input(new MutableTask(neg(term), '.').present(n.memory).log("GUI False"));
+        });
+        Button isTrueButton = new NARActionButton(nar, "?", (n) -> {
+            n.input(new MutableTask(term, '?').present(n.memory).log("GUI Question"));
         });
 
-        Menu conceptMenu = new Menu(conceptTerm.toString());
+        if (!term.isCompound()) {
+            trueButton.setVisible(false); //TODO dont create these task buttons in the first place
+            falseButton.setVisible(false);
+            yesGoalButton.setVisible(false);
+            noGoalButton.setVisible(false);
+            isTrueButton.setVisible(false);
+        }
+
+        Menu conceptMenu = new Menu(term.toString());
         conceptMenu.getItems().add(new SimpleMenuItem("Dump",()->{
             nar.runLater(()-> {
 
-                System.out.println(conceptTerm + ": " + nar.conceptPriority(conceptTerm, Float.NaN));
-                nar.concept(conceptTerm).print();
+                System.out.println(term + ": " + nar.conceptPriority(term, Float.NaN));
+                nar.concept(term).print();
 
             });
         }));
@@ -362,31 +385,69 @@ public class ConceptPane extends VBox implements ChangeListener {
                 maxDisplayedBagItems
         );
 
-        GridPane bags = new GridPane();
-        ColumnConstraints column1 = new ColumnConstraints();
-        column1.setPercentWidth(50);
-        ColumnConstraints column2 = new ColumnConstraints();
-        column2.setPercentWidth(50);
-        bags.getColumnConstraints().addAll(column1, column2); // each get 50% of width
-        bags.addRow(0,termlinkView, tasklinkView);
-        bags.maxWidth(Double.MAX_VALUE);
+//        GridPane bags = new GridPane();
+//        ColumnConstraints column1 = new ColumnConstraints();
+//        column1.setPercentWidth(50);
+//        ColumnConstraints column2 = new ColumnConstraints();
+//        column2.setPercentWidth(50);
+//        bags.getColumnConstraints().addAll(column1, column2); // each get 50% of width
+//        bags.addRow(0,termlinkView, tasklinkView);
+//        bags.maxWidth(Double.MAX_VALUE);
 
-        getChildren().setAll(
-            new FlowPane(new MenuBar(conceptMenu), activateButton, goalButton),
+        //BorderPane bbb = new BorderPane();
+        FlowPane menu = new FlowPane(new MenuBar(conceptMenu), activateButton, trueButton, falseButton, yesGoalButton, noGoalButton, isTrueButton);
 
-                //new VBox(
-                        beliefChart,
-                        budgetGraph,
-                        bags);
+        beliefChart.setMouseTransparent(true);
+        beliefChart.setPickOnBounds(false);
+
+        budgetGraph.setMouseTransparent(true);
+        budgetGraph.setPickOnBounds(false);
 
 
-        //setCenter(new ConceptNeighborhoodGraph(nar, concept));
+
+
+        //vb.setMouseTransparent(true);
+
+
+
+
+
+
+        budgetGraph.setAlignment(Pos.BOTTOM_CENTER);
+        beliefChart.setAlignment(Pos.TOP_RIGHT);
+        termlinkView.setAlignment(Pos.CENTER_LEFT);
+        tasklinkView.setAlignment(Pos.CENTER_RIGHT);
+
+        DefaultGrapher neighborhood = ConceptNeighborhoodGraph(nar, cconceptTerm);
+
+        neighborhood.maxWidth(Double.MAX_VALUE);
+        neighborhood.maxHeight(Double.MAX_VALUE);
+
+        maxWidth(Double.MAX_VALUE);
+        maxHeight(Double.MAX_VALUE);
+
+        menu.setAlignment(Pos.TOP_LEFT);
+
+        //setCenter(bbb);
+
+
+        StackPane content = new StackPane(
+                neighborhood,
+
+                //overlay
+                budgetGraph, beliefChart, termlinkView, tasklinkView
+        );
+        for (Node x : content.getChildren()) {
+            if (x == neighborhood) continue;
+            x.setMouseTransparent(true);
+            x.setPickOnBounds(false);
+            x.setOpacity(0.8f);
+        }
+
+        setTop(menu);
+        setCenter(content);
 
         runLater(()->{
-
-
-
-
             visibleProperty().addListener(this);
             changed(null,null,null);
         });
@@ -394,39 +455,13 @@ public class ConceptPane extends VBox implements ChangeListener {
 
     }
 
-    public static class ConceptNeighborhoodGraph extends BorderPane {
-
-        public ConceptNeighborhoodGraph(NAR n, Concept c) {
-            DefaultGrapher g = new DefaultGrapher(
+    public static DefaultGrapher ConceptNeighborhoodGraph(NAR n, Termed c) {
+            DefaultGrapher g = new DefaultGrapher(n,
 
                     //new ConceptsSource(n),
-                    new ConceptNeighborhoodSource(n,
-                            c
-                    ),
+                    new ConceptNeighborhoodSource(n, c),
 
-                    new DefaultNodeVis() {
-
-                        @Override
-                        public TermNode newNode(Termed term) {
-                            return new LabeledCanvasNode(term, 32, e-> { }, e-> { }) {
-                                @Override
-                                protected Node newBase() {
-                                    SubButton s = SubButton.make(n, (Concept) term);
-
-                                    s.setScaleX(0.02f);
-                                    s.setScaleY(0.02f);
-                                    s.shade(1f);
-
-                                    s.setManaged(false);
-                                    s.setCenterShape(false);
-
-                                    return s;
-                                }
-                            };
-                            //return new HexTermNode(term.term(), 32, e-> { }, e-> { });
-                            //return super.newNode(term);
-                        }
-                    },
+                    new HexButtonVis(n),
                     //new DefaultNodeVis.HexTermNode(),
 
                     (A, B) -> {
@@ -442,9 +477,33 @@ public class ConceptPane extends VBox implements ChangeListener {
 
                     new BlurCanvasEdgeRenderer()
             );
-            setCenter(g);
+            //setCenter(g);
+        return g;
         }
-    }
+
+//        private static class SubButtonGraphNode extends DefaultNodeVis.LabeledCanvasNode {
+//            private final NAR n;
+//
+//            public SubButtonGraphNode(NAR n, Termed term) {
+//                super(n, term, 32, null, null);
+//                this.n = n;
+//            }
+//
+//            @Override
+//            protected Node newBase() {
+//                SubButton s = SubButton.make(n, (Concept) term);
+//
+//                s.setScaleX(0.02f);
+//                s.setScaleY(0.02f);
+//                s.shade(1f);
+//
+//                s.setManaged(false);
+//                s.setCenterShape(false);
+//
+//                return s;
+//            }
+//        }
+
 
 
 
@@ -499,7 +558,7 @@ public class ConceptPane extends VBox implements ChangeListener {
         n.run(16);
 
         NARfx.run((a,s) -> {
-            NARfx.newConceptWindow(n, n.concept("<a-->b>"));
+            NARfx.newWindow(n, n.concept("<a-->b>"));
 //            s.setScene(new ConsolePanel(n, n.concept("<a-->b>")),
 //                    800,600);
 
