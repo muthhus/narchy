@@ -2,7 +2,7 @@ package nars.guifx.demo;
 
 import nars.guifx.graph2.ConceptsSource;
 import nars.guifx.graph2.TermEdge;
-import nars.guifx.graph2.impl.HalfHalfRightTriangleCanvasEdgeRenderer;
+import nars.guifx.graph2.impl.HalfHalfIsoTriangleCanvasEdgeRenderer;
 import nars.guifx.graph2.impl.HexButtonVis;
 import nars.guifx.graph2.source.DefaultGrapher;
 import nars.guifx.graph2.source.SpaceGrapher;
@@ -75,7 +75,7 @@ public enum NARGraph1Test {
                 },
 
                 //new HalfHalfLineCanvasEdgeRenderer()
-                new HalfHalfRightTriangleCanvasEdgeRenderer()
+                new HalfHalfIsoTriangleCanvasEdgeRenderer()
                 //new BlurCanvasEdgeRenderer()
         );
 

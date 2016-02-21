@@ -3,6 +3,7 @@ package nars.guifx.graph2.impl;
 import com.gs.collections.impl.tuple.Tuples;
 import javafx.geometry.Bounds;
 import javafx.geometry.VPos;
+import javafx.scene.CacheHint;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
@@ -23,8 +24,12 @@ import nars.util.data.Util;
  */
 public class HexButtonVis extends DefaultNodeVis {
 
-    public static final Font labelFont = NARfx.mono(12f);
+    public static final Font labelFont = NARfx.mono(2f);
     private final NAR n;
+
+    static float labelMinScale = 30f; //label visibilty cutoff
+
+    final static float fontScale = 1/2f;
 
     public HexButtonVis(NAR n) {
         this.n = n;
@@ -36,8 +41,8 @@ public class HexButtonVis extends DefaultNodeVis {
         public final Node base;
         public Node label = null;
 
-        static final float sizeRatio = 6;
-        final int maxLabelLength = 64;
+        //static final float sizeRatio = 6;
+        final int maxLabelLength = 32;
 
         public HexButton(X object) {
             super();
@@ -49,18 +54,15 @@ public class HexButtonVis extends DefaultNodeVis {
 
             this.base = getBase();
 
-            setScaleX(1/sizeRatio);
-            setScaleY(1/sizeRatio);
+            //setScaleX(1/sizeRatio);
+            //setScaleY(1/sizeRatio);
 
             getChildren().add(base);
 
-            if (null!=(this.label = getLabel())) {
-                //label.setCacheHint(CacheHint.SCALE_AND_ROTATE);
-                label.setCache(true);
-                getChildren().add(label);
-            }
+            setCacheHint(CacheHint.SCALE_AND_ROTATE);
+            setCache(true);
 
-
+            //label will be added if visible scale is significant
 
             //base.setCacheHint(CacheHint.SCALE_AND_ROTATE);
             //base.setCache(true);
@@ -80,28 +82,9 @@ public class HexButtonVis extends DefaultNodeVis {
             //s.setTextAlignment(TextAlignment.CENTER);
             s.setTextOrigin(VPos.CENTER);
 
-            //s.setCenterShape(true);
+
             s.setTextAlignment(TextAlignment.CENTER);
 
-            Bounds labelBounds = s.getBoundsInLocal();
-            Bounds baseBounds = base.getBoundsInLocal();
-
-            double ls = labelFont.getSize();
-            s.setScaleX(1.0/ ls);
-            s.setScaleY(1.0/ ls);
-            double labelWidth = labelBounds.getWidth();
-            double baseWidth = baseBounds.getWidth();
-            if (labelWidth > baseWidth) {
-                s.setLayoutX(-labelWidth /2 - baseWidth /2);
-            } else {
-                //s.setLayoutX( (baseWidth-labelWidth) / 2); //not quite right
-            }
-
-//            //manually align it
-//            double textCenter = (labelBounds.getMaxX() + labelBounds.getMinX())/2f;
-//            double baseCenter = (baseBounds.getMaxX() + baseBounds.getMinX())/2f;
-//            System.out.println(textCenter + " " + baseCenter);
-//            s.setTranslateX( -(textCenter - baseCenter)/2 ); //if text is wider than base, align center
 
             s.setFont(labelFont);
             s.setStroke(null);
@@ -110,11 +93,33 @@ public class HexButtonVis extends DefaultNodeVis {
 
             s.setFill(Color.WHITE);
 
+
+            Bounds labelBounds = s.getBoundsInLocal();
+            Bounds baseBounds = base.getBoundsInLocal();
+
+
+            double ls = labelFont.getSize();
+            s.setScaleX(fontScale / ls);
+            s.setScaleY(fontScale / ls);
+            double labelWidth = labelBounds.getWidth();
+            double baseWidth = baseBounds.getWidth();
+            //if (labelWidth > baseWidth) {
+                s.setLayoutX( -(labelWidth + baseWidth) /2);
+//
+//            } else {
+//                s.setTranslateX( (baseWidth) / 2); //not quite right
+//
+//            }
+
+            s.setMouseTransparent(true);
+            s.setPickOnBounds(false);
+
+
             return s;
         }
 
         private Node getBase() {
-            Polygon s = JFX.newPoly(6, sizeRatio);
+            Polygon s = JFX.newPoly(6, 1.0);
             //s.setStrokeType(StrokeType.INSIDE);
             //s.setManaged(false);
 
@@ -143,7 +148,7 @@ public class HexButtonVis extends DefaultNodeVis {
         private final HexButton<Termed> button;
 
         public HexNode(NAR nar, Termed term) {
-            super(term, 32);
+            super(term, 8);
             HexButton<Termed> h = new HexButton<>(this.term);
             this.button = h;
             //TODO HexButton.setFillColor
@@ -155,8 +160,7 @@ public class HexButtonVis extends DefaultNodeVis {
             );
             h.base.setUserData(Tuples.pair(nar, term));
             h.base.setOnMouseClicked(onDoubleClickTerm);
-            h.base.setMouseTransparent(false);
-            h.base.setPickOnBounds(true);
+
 
             getChildren().add(h);
 
@@ -164,13 +168,38 @@ public class HexButtonVis extends DefaultNodeVis {
 
         }
 
+        @Override
+        public void scale(double scale) {
+            super.scale(scale);
 
-        static final float EPSILON = 0.001f;
+
+            Node bl = button.label;
+            if (scale < labelMinScale) {
+                if (bl !=null) {
+                    bl.setVisible(false);
+                } else {
+                    //keep it off
+                }
+            } else {
+                if (bl == null) {
+                    Node label = button.getLabel();
+
+                    if (label!=null) {
+                        button.label = label;
+                        button.getChildren().add(label);
+                    }
+                } else {
+                    bl.setVisible(true);
+                }
+            }
+        }
+
+        static final float BUDGET_EPSILON = 0.002f;
 
         @Override
         public boolean pri(float v) {
             float lastPri = pri();
-            if (!Util.equals(v, lastPri, EPSILON)) {
+            if (!Util.equals(v, lastPri, BUDGET_EPSILON)) {
                 super.pri(v);
                 return true;
             }

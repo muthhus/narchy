@@ -2,6 +2,7 @@ package nars.guifx.graph2.layout;
 
 import javafx.scene.Group;
 import nars.guifx.graph2.TermEdge;
+import nars.util.data.Util;
 
 
 public class GraphNode extends Group {
@@ -9,6 +10,9 @@ public class GraphNode extends Group {
 	/**
 	 * cached from last set
 	 */
+
+	final static double SCALE_EPSILON = 0.05f;
+
 	private double scaled = 0.0;
 	private double tx = 0.0;
 	private double ty = 0.0;
@@ -19,15 +23,17 @@ public class GraphNode extends Group {
 	}
 
 	public boolean visible() {
+
 		return isVisible() && getParent()!=null;
 	}
 
 	public void scale(double scale) {
-		scaled = scale;
+		if (!Util.equals(this.scaled, scale, SCALE_EPSILON)) {
+			scaled = scale;
 
-
-		setScaleX(scale);
-		setScaleY(scale);
+			setScaleX(scale);
+			setScaleY(scale);
+		}
 
 		//float conf = c != null ? c.getBeliefs().getConfidenceMax(0, 1) : 0;
             /*base.setFill(NARGraph.vis.get().getVertexColor(priNorm, conf));*/
@@ -89,11 +95,12 @@ public class GraphNode extends Group {
 		double y = ty;
 		double nx = v[0];
 		double ny = v[1];
-		if (!((Math.abs(x - nx) < threshold) && (Math.abs(y - ny) < threshold))) {
+		if (Math.abs(x - nx) < threshold && Math.abs(y - ny) < threshold) {
+			return false;
+		} else {
 			move(nx, ny);
 			return true;
 		}
-		return false;
 	}
 
 	public final double width() {

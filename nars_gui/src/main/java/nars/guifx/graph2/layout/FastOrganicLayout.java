@@ -322,10 +322,15 @@ public class FastOrganicLayout<V extends TermNode> implements IterativeLayout<V>
         // ints which represents the neighbours cells to that vertex as
         // the indices into vertexArray
 
-        final double spacing = this.spacing.get();
+        //final double spacing = this.spacing.get();
+        FasterList<TermNode> cells = this.cells;
+        ObjectIntHashMap<TermNode> indices = this.indices;
+        int[][] neighbors = this.neighbors;
+        List<TermNode> verts = this.vertexArray;
 
         for (int i = 0; i < n; i++) {
-            TermNode vd = vertexArray.get(i);
+
+            TermNode vd = verts.get(i);
             
             //TODO is this necessary?
             /*if (!graph.containsVertex(vd.getVertex()))
@@ -354,19 +359,14 @@ public class FastOrganicLayout<V extends TermNode> implements IterativeLayout<V>
 
             // Randomize (0, 0) locations
             //TODO re-use existing location
-            double x, y;
-            if (vd==null) {
-                x = Math.random() * 100.0;//Math.random() * 100; //bounds.getX();
-                y = Math.random() * 100.0;//Math.random() * 100.0;
-            }
-            else {
-                x = vd.x();
-                y = vd.y();
-            }
-            
 
-            cl[i][0] = x + width / 2.0;
-            cl[i][1] = y + height / 2.0;
+            final double x = vd.x();
+            final double y = vd.y();
+
+            double[] cli = cl[i];
+
+            cli[0] = x + width / 2.0;
+            cli[1] = y + height / 2.0;
 
             double r = radius[i] = Math.min(width, height);
             radiusSquared[i] = r*r;
@@ -397,6 +397,7 @@ public class FastOrganicLayout<V extends TermNode> implements IterativeLayout<V>
 
                 final Object[] ccells;
                 int cellsSize = edges.length;
+
                 cells.clear();
                 cells.ensureCapacity(cellsSize);
                 ccells = cells.array();
@@ -419,27 +420,23 @@ public class FastOrganicLayout<V extends TermNode> implements IterativeLayout<V>
                     //else if (target!=vd)  cells.add(target);
                 }
 
-                int[] ni;// = neighbors[i];
-                //if (ni == null || ni.length != cellsSize)
-                    ni = neighbors[i] = new int[cellsSize];
+                int[] ni = neighbors[i] = new int[cellsSize];
 //                else {
 //                    Arrays.fill(neighbors[i], -1);
 //                }
 
                 for (int j = 0; j < cellsSize; j++) {
+
                     int index = indices.getIfAbsent(ccells[j], -1);
 
                     // Check the connected cell in part of the vertex list to be
                     // acted on by this layout
-                    if (index != -1) {
-                        ni[j] = index;
-                    } // Else if index of the other cell doesn't correspond to
+                 // Else if index of the other cell doesn't correspond to
                     // any cell listed to be acted upon in this layout. Set
                     // the index to the value of this vertex (a dummy self-loop)
                     // so the attraction force of the edge is not calculated
-                    else {
-                        ni[j] = i;
-                    }
+
+                    ni[j] = index != -1 ? index : i;
                 }
             }
         }

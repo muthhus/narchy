@@ -4,6 +4,7 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import javafx.scene.transform.Affine;
 import nars.guifx.ResizableCanvas;
 import nars.guifx.graph2.EdgeRenderer;
 import nars.guifx.graph2.TermEdge;
@@ -11,6 +12,7 @@ import nars.guifx.graph2.TermNode;
 import nars.guifx.graph2.scene.DefaultNodeVis;
 import nars.guifx.graph2.source.SpaceGrapher;
 import nars.guifx.util.ColorMatrix;
+import scala.reflect.internal.transform.Transforms;
 
 /**
  * Created by me on 9/6/15.
@@ -35,25 +37,29 @@ public abstract class CanvasEdgeRenderer implements EdgeRenderer<TermEdge> {
     private double ty = 0.0;
     private double s = 0.0;
 
+
+
 //    //for iterative auto-normalization
 //    public double maxPri = 1;
 //    public double minPri = 0;
 
     double minWidth = 2;
-    double maxWidth = 10;
+    double maxWidth = 40;
 
     @Override
     public void accept(TermEdge i) {
 
         TermNode aSrc = i.aSrc;
-        TermNode bSrc = i.bSrc;
-
-        boolean v = i.visible = !(!aSrc.visible() || !bSrc.visible());
-        if (!v) {
+        if (!aSrc.visible()) {
+            i.visible = false;
             return;
         }
 
-
+        TermNode bSrc = i.bSrc;
+        if (!bSrc.visible()) {
+            i.visible = false;
+            return;
+        }
 
         /*boolean aVis = a.update(), bVis = b.update();
         visible = (aVis || bVis);
@@ -61,9 +67,9 @@ public abstract class CanvasEdgeRenderer implements EdgeRenderer<TermEdge> {
 
 
         double tx = this.tx;
-        double ty = this.ty;
         double s = this.s;
         double x1 = s*(tx+aSrc.x());// + fw / 2d;
+        double ty = this.ty;
         double y1 = s*(ty+aSrc.y());// + fh / 2d;
         double x2 = s*(tx+bSrc.x());// + tw / 2d;
         double y2 = s*(ty+bSrc.y());// + th / 2d;
@@ -99,11 +105,13 @@ public abstract class CanvasEdgeRenderer implements EdgeRenderer<TermEdge> {
 
             floorCanvas = new ResizableCanvas();//g.widthProperty(), g.heightProperty());
 
+
             g.getChildren().
                     add(0, floorCanvas); //underneath, background must be transparent to see
                     //add(floorCanvas); //over
 
             gfx = floorCanvas.getGraphicsContext2D();
+
         }
         else {
 
@@ -112,15 +120,15 @@ public abstract class CanvasEdgeRenderer implements EdgeRenderer<TermEdge> {
         Scene scene = g.getScene();
         if (scene == null) return;
 
-        double w = scene.getWidth(); //g.getWidth();
-        double h = scene.getHeight();
+        //double w = scene.getWidth(); //g.getWidth();
+        //double h = scene.getHeight();
 
         tx = g.translate.getX();
         ty = g.translate.getY();
         s = g.scale.getX();
 
 
-        clear(w, h);
+        clear(g.getWidth(), g.getHeight());
 
         //unnormalize(0.1);
     }
@@ -130,10 +138,11 @@ public abstract class CanvasEdgeRenderer implements EdgeRenderer<TermEdge> {
     }
 
     protected final void clearTotally(double w, double h) {
-
-        gfx.clearRect(0, 0, w, h );
+        gfx.setTransform(reset);
+        gfx.clearRect(0,0,w,h);
     }
 
+    final Affine reset = new Affine();
     final Color FADEOUT = new Color(0,0,0,0.25);
 
 

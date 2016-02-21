@@ -135,10 +135,11 @@ public class TermNode extends GraphNode {
 
 
 
+    final static double numOps = ((double) Op.values().length);
 
     public static Color getTermColor(Termed term, ColorMatrix colors, double v) {
         return colors.get(
-                (term.term().op().ordinal() % colors.cc.length) / ((double) Op.values().length),
+                (term.op().ordinal() % colors.cc.length) / numOps,
                 v);
     }
 

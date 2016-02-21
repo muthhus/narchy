@@ -36,7 +36,10 @@ public class HalfHalfLineCanvasEdgeRenderer extends CanvasEdgeRenderer {
         if (t.term instanceof Termed) {
             gfx.setStroke(
                     TermNode.getTermColor(t.term,
-                        DefaultNodeVis.colorsTransparent,
+
+                        //DefaultNodeVis.colorsTransparent,
+                        DefaultNodeVis.colors,
+
                         0.6 /* baesOpacity */ +
                         0.4f * 0.5f * (i.pri + t.priNorm) )
             );

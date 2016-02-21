@@ -40,8 +40,9 @@ public class DefaultNodeVis implements NodeVis {
 
     double nodeScaleCache = 1.0;
 
-    @Range(min = 0, max = 16)
+    @Range(min = 0, max = 4)
     public final SimpleDoubleProperty nodeScale = new SimpleDoubleProperty(1.0);
+
     private SpaceGrapher graph = null;
     final Rectangle hoverPanel = new Rectangle();
     private NAR nar;
@@ -90,19 +91,26 @@ public class DefaultNodeVis implements NodeVis {
 //            d.setFill(Color.hsb(v*360,1,1));
 //            d.fillRect(0,0,10,10);
 
+        scaleNode(t, nodeScaleCache);
+    }
+
+    private void scaleNode(TermNode t, double nodeScaleCache) {
         t.scale(nodeScaleCache * (minSize + (maxSize - minSize) * t.priNorm));
     }
 
     static final Font mono = NARfx.mono(8);
 
     public static final ColorMatrix colors = new ColorMatrix(17 /* op hashcode color, hopefully prime */, 17 /* activation  */,
-            (op, activation) -> Color.hsb(op * 360.0,
-                    0.35 + 0.64 * activation,
-                    0.25 + activation * 0.74));
+            (op, activation) -> termcolor(op,activation));
+
+    private static Color termcolor(double op, double activation) {
+        return Color.hsb(op * 360.0,
+                0.75,
+                0.15 + activation * 0.84);
+    }
+
     public static final ColorMatrix colorsTransparent = new ColorMatrix(17 /* op hashcode color, hopefully prime */, 17 /* activation  */,
-            (op, p) -> Color.hsb(op * 360.0,
-                    0.8 + 0.2 * p,
-                    0.5 + p * 0.5).interpolate(Color.TRANSPARENT, 1f-p));
+            (op, p) -> termcolor(op,p).interpolate(Color.TRANSPARENT, 1f-p));
 
 
     private final AtomicReference<Node> selected = new AtomicReference();
@@ -250,12 +258,11 @@ public class DefaultNodeVis implements NodeVis {
     public static final EventHandler<MouseEvent> onDoubleClickTerm = e -> {
 
         if (e.getClickCount() == 2) {
-            //Doubleclick:
 
-            System.out.println(e.getSource() + " " + e.getTarget() + "\n" +
-                    ((Node)e.getSource()).getUserData() + " " +
-                    ((Node)e.getTarget()).getUserData() + " "
-            );
+//            System.out.println(e.getSource() + " " + e.getTarget() + "\n" +
+//                    ((Node)e.getSource()).getUserData() + " " +
+//                    ((Node)e.getTarget()).getUserData() + " "
+//            );
 
             Pair<NAR,?> nt = (Pair<NAR,?>)(((Node)(e.getTarget())).getUserData());
             if (nt!=null) {
@@ -265,7 +272,7 @@ public class DefaultNodeVis implements NodeVis {
 
                     if (x instanceof Task)
                         NARfx.newWindow(nt.getOne(), (Task) x);
-                    if (x instanceof Termed)
+                    else if (x instanceof Termed)
                         NARfx.newWindow(nt.getOne(), (Termed) x);
                 }
             }
