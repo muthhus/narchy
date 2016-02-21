@@ -16,6 +16,8 @@ import nars.nal.nal8.PatternAnswer;
 import nars.nal.nal8.operator.TermFunction;
 import nars.op.in.FileInput;
 import nars.op.in.TextInput;
+import nars.op.mental.Anticipate;
+import nars.op.mental.Inperience;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.task.flow.Input;
@@ -1087,6 +1089,11 @@ public abstract class NAR implements Level, Consumer<Task> {
             }
         });
         pw.close();
+    }
+
+    public final <X extends NAR> X with(Object... values) {
+        memory.with(values);
+        return (X)this;
     }
 
     public static final class InvalidTaskException extends RuntimeException {

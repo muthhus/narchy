@@ -203,11 +203,11 @@ import java.util.Map;
     }
 
     public <X extends Object & Event> AbstractStat<X> stat(AbstractStat<X> a) {
-        if (!stat.containsKey(a.getClass())) {
-            stat.put(a.getClass(), a);
-            return the(a.getClass(), a);
-        }
-        return super.the(a.getClass());
+        Class<? extends AbstractStat> aclass = a.getClass();
+        return super.the(stat.computeIfAbsent(aclass, ac -> {
+            the(aclass, a);
+            return a;
+        }));
     }
 
     /**
@@ -230,7 +230,7 @@ import java.util.Map;
     }
 
     @Override
-    public <T> T the(Object key, Object value) {
+    public <T> T the(Object key, T value) {
         T x = super.the(key, value);
         setContainerAware(this, value);
         return x;

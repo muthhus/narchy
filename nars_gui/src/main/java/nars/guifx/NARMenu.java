@@ -3,14 +3,16 @@ package nars.guifx;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import nars.NAR;
+import nars.guifx.chart.Plot2D;
 import nars.guifx.util.NSlider;
 import nars.op.in.NQuadsRDF;
+import nars.time.RealtimeMSClock;
+import nars.util.Texts;
 import nars.util.event.Active;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -183,24 +185,71 @@ public class NARMenu extends HBox {
 
 
     public static class RTClockPane extends CycleClockPane {
+
+        private final RealtimeMSClock clock;
+        private final TextField clockTextField;
+        private final Plot2D busyPlot;
+        long startTime;
+        final static int WINDOW_SIZE = 32;
+
+        final DescriptiveStatistics busyAvgShort = new DescriptiveStatistics(WINDOW_SIZE);
+        final DescriptiveStatistics busyAvgLong = new DescriptiveStatistics(WINDOW_SIZE*8);
+
         public RTClockPane(NAR nar) {
             super(nar);
 
-            getChildren().addAll(
-                    new FlowPane(
-                            new NSlider("Power", 48, 48, NSlider.BarSlider, 0.5),
-                            new NSlider("Duration", 48, 48, NSlider.CircleKnob, 0.75),
-                            new NSlider("Focus", 48, 48, NSlider.CircleKnob, 0.6),
-                            new Button("Relax")
-                    )
+
+            this.clock = (RealtimeMSClock)nar.memory.clock;
+            this.startTime = nar.time();
+
+            clockTextField = new TextField();
+            clockTextField.setEditable(false);
+
+
+            busyPlot = new Plot2D(Plot2D.Line, WINDOW_SIZE, 192);
+            busyPlot.add("Busy", ()->(double)nar.memory.emotion.busy());
+            busyPlot.add("avg short", ()->rollingAverage(busyAvgShort, (double)nar.memory.emotion.busy()));
+            busyPlot.add("avg long", ()->rollingAverage(busyAvgLong, (double)nar.memory.emotion.busy()));
+
+//            final Pane controls = new VBox(
+//                    timeDisplay,
+//                    new NSlider("Power", 32, 32, NSlider.BarSlider, 0.5),
+//                    new NSlider("Duration", 32, 32, NSlider.BarSlider, 0.75),
+//                    new NSlider("Focus", 32, 32, NSlider.BarSlider, 0.6),
+//                    new FlowPane(new Button("Relax"), new Button("Random"))
+//            );
+
+
+            getChildren().setAll(
+                    new VBox(clockTextField, busyPlot)
             );
+
+            nar.onFrame(n -> {
+                busyPlot.update();
+                String s = clockText();
+                runLater(()->display(s));
+            });
+            display(clockText());
+        }
+
+        public static double rollingAverage(DescriptiveStatistics var, double newValue) {
+            var.addValue(newValue);
+            return var.getMean();
+        }
+
+        private void display(String text) {
+            clockTextField.setText(clockText());
+        }
+
+        private String clockText() {
+            return Texts.n4((clock.time()-startTime)/1000f) + "ms";
         }
     }
 
 
     public static class CycleClockPane extends VBox implements Runnable {
 
-        final Label clock = new Label("?");
+
         private final NAR nar;
         private final Active regs;
         //final AtomicBoolean pendingClockUpdate = new AtomicBoolean(false);
@@ -221,7 +270,7 @@ public class NARMenu extends HBox {
 //
 //
 //                });
-            clock.setText("" + nar.time());
+
         }
 
         public CycleClockPane(NAR n) {

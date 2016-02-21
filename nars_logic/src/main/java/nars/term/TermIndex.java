@@ -1,5 +1,6 @@
 package nars.term;
 
+import javassist.scopedpool.SoftValueHashMap;
 import nars.Op;
 import nars.budget.Budget;
 import nars.task.MutableTask;
@@ -9,6 +10,7 @@ import nars.term.container.TermContainer;
 import nars.term.container.TermSet;
 import nars.term.container.TermVector;
 import nars.term.index.MapIndex;
+import nars.term.index.MapIndex2;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -224,7 +226,20 @@ public interface TermIndex extends TermBuilder {
 //                //new UnifriedMap()
 //        );
     }
-
+    /** default memory-based (Guava) cache */
+    @NotNull
+    static TermIndex softMemory(int capacity) {
+//        CacheBuilder builder = CacheBuilder.newBuilder()
+//            .maximumSize(capacity);
+        return new MapIndex2(
+                new SoftValueHashMap(capacity)
+                //new WeakHashMap()
+        );
+//        return new MapIndex2(
+//                new HashMap(capacity)
+//                //new UnifriedMap()
+//        );
+    }
 //    static GuavaIndex memoryGuava(Clock c, int expirationCycles) {
 //        return new GuavaIndex(c, expirationCycles);
 ////        return new MapIndex(

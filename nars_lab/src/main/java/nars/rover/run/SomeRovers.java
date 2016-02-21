@@ -15,6 +15,7 @@ import nars.rover.Sim;
 import nars.rover.robot.Arm;
 import nars.rover.robot.NARover;
 import nars.rover.world.FoodSpawnWorld1;
+import nars.term.TermIndex;
 import nars.term.index.MapIndex2;
 import nars.time.SimulatedClock;
 import nars.op.sys.NarQ;
@@ -98,11 +99,12 @@ public class SomeRovers {
 	public static Default newNAR() {
         int conceptsFirePerCycle = 24;
         Default nar = new Default(
-                new Memory(clock, new MapIndex2(
-                    new SoftValueHashMap()
-                    //new WeakHashMap()
-                )),
-                1024, conceptsFirePerCycle, 2, 3);
+                new Memory(clock, TermIndex.softMemory(64*1024)),
+                1024, conceptsFirePerCycle, 2, 3)
+            .with(
+                Anticipate.class,
+                Inperience.class
+        );
 
         //nar.logSummaryGT(System.out, 0f);
 //        nar.log(System.out, x -> {
@@ -123,8 +125,7 @@ public class SomeRovers {
 
 //            nar.memory.DEFAULT_QUESTION_DURABILITY = 0.6f;
         //nar.initNAL9();
-        m.the(new Anticipate(nar));
-        m.the(new Inperience(nar));
+
         //nar.memory.perfection.setValue(0.15f);
         //nar.core.confidenceDerivationMin.setValue(0.01f);
 

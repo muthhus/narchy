@@ -30,6 +30,10 @@ public class POJOPane<X> extends BorderPane {
     public final X obj;
 
     public POJOPane(X obj) {
+        this(obj, true);
+    }
+
+    public POJOPane(X obj, boolean unfold) {
         this.obj = obj;
 
         List<Node> pn = propertyNodes(obj);
@@ -42,17 +46,21 @@ public class POJOPane<X> extends BorderPane {
             controls.getChildren().addAll(pn);
 
             ToggleButton toggle = new ToggleButton("[X] " + obj);
+            toggle.setSelected(false);
+            toggle.setWrapText(true);
             toggle.selectedProperty().addListener(e->{
                 setCenter(toggle.isSelected() ? controls : null);
                 layout();
             });
             setTop(toggle);
 
-            runLater(()-> toggle.setSelected(true));
+
+            //runLater(()-> toggle.setSelected(!unfold));
         }
         else {
             setCenter(new Label(obj.toString()));
         }
+
 
 
     }

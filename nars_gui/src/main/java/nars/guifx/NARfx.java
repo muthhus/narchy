@@ -67,9 +67,13 @@ public enum NARfx  {
     }
 
     public static ScrollPane scrolled(Node n, boolean stretchwide, boolean stretchhigh) {
+        return scrolled(n, stretchwide, stretchwide, stretchhigh, stretchhigh);
+    }
+
+    public static ScrollPane scrolled(Node n, boolean slideWide, boolean stretchwide, boolean slideHigh, boolean stretchhigh) {
         ScrollPane s = new ScrollPane();
-        s.setHbarPolicy(stretchwide ? ScrollPane.ScrollBarPolicy.AS_NEEDED : ScrollPane.ScrollBarPolicy.NEVER);
-        s.setVbarPolicy(stretchwide ? ScrollPane.ScrollBarPolicy.AS_NEEDED : ScrollPane.ScrollBarPolicy.NEVER);
+        s.setHbarPolicy(slideWide ? ScrollPane.ScrollBarPolicy.AS_NEEDED : ScrollPane.ScrollBarPolicy.NEVER);
+        s.setVbarPolicy(slideHigh ? ScrollPane.ScrollBarPolicy.AS_NEEDED : ScrollPane.ScrollBarPolicy.NEVER);
 
         s.setContent(n);
 

@@ -20,7 +20,7 @@ import static javafx.application.Platform.runLater;
 /**
  * Created by me on 10/9/15.
  */
-public class LoopPane extends VBox {
+public class LoopPane extends FlowPane {
 
     final Label label = new Label();
     //        final static Text play = GlyphsDude.createIcon(FontAwesomeIcon.PLAY, GlyphIcon.DEFAULT_FONT_SIZE);

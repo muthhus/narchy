@@ -142,13 +142,13 @@ public class NARide extends BorderPane {
         //ni.addView(additional components);
 
         ni.addTool("I/O", () -> new IOPane(nar));
-        ni.addTool("Active Concepts (Buttons)", () -> new ActiveConceptsLog(nar) {
+        ni.addTool("Active Concepts (Buttons)", () -> new ConceptsListPane(nar) {
 
             @Override public Node make(Concept cc) {
                 return SubButton.make(nar, cc);
             }
         });
-        ni.addTool("Active Concepts (Log)", () -> new ActiveConceptsLog(nar) {
+        ni.addTool("Active Concepts (Log)", () -> new ConceptsListPane(nar) {
 
             final EventHandler<? super MouseEvent> clickHandler =
                     e -> {
@@ -565,7 +565,7 @@ public class NARide extends BorderPane {
 //        p.setDividerPositions(0.5f);
 
         setCenter(content);
-        setBottom(scrolled(pp,true,false));
+        setBottom(scrolled(pp,true,false,false,false));
 
 
         runLater(() -> {
@@ -640,7 +640,7 @@ public class NARide extends BorderPane {
             });
             setTop(status);
 
-            setCenter(scrolled(new POJOPane(l)));
+            setCenter(scrolled(new POJOPane(l, false)));
         }
 //            this.activation = new NSlider(150, 50, 1.0) {
 //

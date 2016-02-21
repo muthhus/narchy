@@ -237,14 +237,20 @@ public class Container extends AbstractPrototainer implements AbstractContainer 
         }
         return existing;        
     }
-    public <T> T the(Object key, Object value) {
+    public <T> T the(Object key, T value) {
         if (value == null) {
             return remove(key);
         }
         return the(key, new SingletonBuilder(value));
     }
 
-    public <T> T the(Object value) {    
+    public void with(Object... values) {
+        for (Object x : values) {
+            the(x);
+        }
+    }
+
+    public <T> T the(Object value) {
         T existing = get(value);
         if (existing == null) {
             return the(value.getClass(), new SingletonBuilder(value));

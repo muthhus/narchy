@@ -27,7 +27,12 @@ public class Plot2D extends NControl/*Canvas */  {
     public static final ColorMatrix ca = new ColorMatrix(17, 1, (x, y) -> Color.hsb(x * 360.0, 0.6f, y * 0.5 + 0.5));
 
     public static abstract class Series {
-        public final FloatArrayList history = new FloatArrayList(); //TODO make Float
+        public final FloatArrayList history = new FloatArrayList() {
+            @Override
+            public float[] toArray() {
+                return items;
+            }
+        }; //TODO make Float
         final String name;
         final Color color; //main color
 
@@ -119,11 +124,11 @@ public class Plot2D extends NControl/*Canvas */  {
         Series s;
         add(s = new Series(name, maxHistory) {
             @Override public void update() {
-                limit();
                 double v = valueFunc.getAsDouble();
                 if (!Double.isFinite(v)) {
                     throw new RuntimeException("invalid value");
                 }
+                limit();
                 if (v < min) v = min;
                 if (v > max) v = max;
                 push(v);
@@ -244,9 +249,6 @@ public class Plot2D extends NControl/*Canvas */  {
 
             series.forEach(s -> {
 
-
-
-
                 double mid = ypos.valueOf(0.5 * (s.minValue + s.maxValue));
 
                 g.setFill(s.color);
@@ -257,8 +259,10 @@ public class Plot2D extends NControl/*Canvas */  {
                 g.beginPath();
 
                 FloatArrayList sh = s.history;
-
                 int ss = sh.size();
+
+                float[] ssh = sh.toArray();
+
                 int histSize = ss;
 
                 double dx = (w / histSize);
@@ -266,7 +270,7 @@ public class Plot2D extends NControl/*Canvas */  {
                 double x = 0;
                 for (int i = 0; i < ss; i++) { //TODO why does the array change
                     //System.out.println(x + " " + y);
-                    g.lineTo(x, ypos.valueOf(sh.get(i)));
+                    g.lineTo(x, ypos.valueOf(ssh[i]));
 
                     x += dx;
                 }

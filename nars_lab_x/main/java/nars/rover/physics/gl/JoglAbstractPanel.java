@@ -115,7 +115,7 @@ public abstract class JoglAbstractPanel extends GLCanvas implements TestbedPanel
 
 
 
-        gl.glAccum(GL2.GL_RETURN, 0.9f); //adding the current frame to the buffer
+        gl.glAccum(GL2.GL_RETURN, 0.5f); //adding the current frame to the buffer
 
 
         JoglAbstractDraw drawer = ((JoglAbstractDraw)getDebugDraw());
@@ -125,7 +125,7 @@ public abstract class JoglAbstractPanel extends GLCanvas implements TestbedPanel
             time = model.model.getTime();
         }
 
-        drawer.draw(getWorld(), time);
+        drawer.draw(model.getWorld(), time);
 
 
         //https://www.opengl.org/sdk/docs/man2/xhtml/glAccum.xml

@@ -1,7 +1,11 @@
 package nars.guifx.demo;
 
 import nars.Memory;
+import nars.NAR;
 import nars.nar.Default;
+import nars.op.mental.Abbreviation;
+import nars.op.mental.Anticipate;
+import nars.op.mental.Inperience;
 import nars.term.TermIndex;
 import nars.time.RealtimeMSClock;
 
@@ -17,22 +21,28 @@ public enum NARideRealtimeDefault {
 
         //Global.DEBUG = true;
 
+
         Memory mem = new Memory(new RealtimeMSClock(),
             //new MapCacheBag(
                     //new WeakValueHashMap<>()
-                TermIndex.memory(1024)
+                TermIndex.softMemory(128*1024)
                 //GuavaCacheBag.make(1024*1024)
                 /*new InfiniCacheBag(
                     InfiniPeer.tmp().getCache()
                 )*/
             //)
         );
-        Default nar = new Default(mem, 1024, 1, 3, 1);
+
+        Default nar = new Default(mem, 1024, 1, 2, 2).with(
+                Anticipate.class,
+                Inperience.class
+        );
+        nar.with(new Abbreviation(nar,"is"));
+
         //nar.nal(9);
         nar.setTaskLinkBagSize(32);
         nar.setTermLinkBagSize(128);
 
-        //new BagForgettingEnhancer(nar.memory, nar.core.concepts(), 0.75f, 0.75f, 0.75f);
 
 
         /*nar.memory.conceptForgetDurations.set(10);

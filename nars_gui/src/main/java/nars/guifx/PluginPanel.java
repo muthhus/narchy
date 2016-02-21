@@ -1,12 +1,12 @@
 package nars.guifx;
 
+import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.*;
 import nars.Global;
 import nars.NAR;
 import nars.guifx.demo.NARide;
@@ -22,18 +22,27 @@ import static javafx.application.Platform.runLater;
  * Manages the activated set of plugins in a NAR, and a menu for adding additional ones
  * and presets of them.
  */
-public class PluginPanel extends HBox {
+public class PluginPanel extends FlowPane {
 
     final Map<String, Node> nodes = new ConcurrentHashMap<>();
 
     private final NAR nar;
     private final NARide ide;
 
-    //static final double itemSpacnig = 4.0;
+    static final double itemSpacing = 4.0;
 
     public PluginPanel(NARide ide) {
+        super(Orientation.VERTICAL, itemSpacing, itemSpacing);
+
+        //super(Orientation.HORIZONTAL, itemSpacing, itemSpacing);
+
+        maxWidth(Double.MAX_VALUE);
+        setPrefWrapLength(0);
+
+
         //super(Orientation.HORIZONTAL, itemSpacnig, itemSpacnig);
-        //setSpacing(itemSpacing);
+        //setgasetSpacing(itemSpacing);
+
 
         this.ide = ide;
         nar = ide.nar;
@@ -51,7 +60,9 @@ public class PluginPanel extends HBox {
         Map<String, Object> ss = nar.memory.getSingletons();
 
         List<Node> toAdd = Global.newArrayList(ss.size());
-        ss.forEach((k, v) -> toAdd.add(node(k, v)));
+        ss.forEach((k, v) -> {
+            toAdd.add(node(k, v));
+        });
 
         //TODO use faster comparison method
 
@@ -97,8 +108,8 @@ public class PluginPanel extends HBox {
     }
 
 
-    private Node node(String k, Object v) {
-        return nodes.computeIfAbsent(k, (K) -> {
+    private final Node node(String k, Object v) {
+        Node n = nodes.computeIfAbsent(k, (K) -> {
 
             Node s = icon(K, v);
 
@@ -112,12 +123,17 @@ public class PluginPanel extends HBox {
             //p.prefHeight(100);
 
 
-            p.maxWidth(64);
-            p.maxHeight(64);
-            p.minHeight(64);
-            p.minWidth(64);
+            int minItemWidth = 256;
+            p.maxHeight(256);
+            p.prefWidth(minItemWidth);
+            p.minWidth(minItemWidth);
+            p.maxWidth(minItemWidth*1.5);
             return p;
         });
+
+
+
+        return n;
     }
 
     private Node icon(String k, Object v) {

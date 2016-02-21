@@ -13,17 +13,17 @@ import static javafx.application.Platform.runLater;
 /**
  * Created by me on 10/15/15.
  */
-public abstract class ActiveConceptsLog extends LogPane {
+public abstract class ConceptsListPane extends LogPane {
 
     private List<Node> displayed;
-    LinkedHashSet<Concept> display = new LinkedHashSet();
+    LinkedHashSet<Concept> pendingDisplay = new LinkedHashSet();
     int maxShown = 64;
 
     final AtomicBoolean pendingShown = new AtomicBoolean(false);
 
     long now;
 
-    public ActiveConceptsLog(NAR n) {
+    public ConceptsListPane(NAR n) {
 
         now = n.time();
 
@@ -38,16 +38,18 @@ public abstract class ActiveConceptsLog extends LogPane {
             Concept c = n.concept(tp.concept());
 
             //TODO more efficient:
-            display.remove(c);
-            display.add(c);
+            pendingDisplay.remove(c);
+            pendingDisplay.add(c);
+
 
             //if (!pendingUpdate) ..
             //  runLater(update);
             if (pendingShown.compareAndSet(false, true)) {
 
-                displayed = Global.newArrayList();
-                Iterator<Concept> ii = display.iterator();
-                int toSkip = display.size() - maxShown;
+                List<Node> toDisplay = this.displayed = Global.newArrayList( Math.max(maxShown, pendingDisplay.size()) );
+                Iterator<Concept> ii = pendingDisplay.iterator();
+                int toSkip = toDisplay.size() - maxShown;
+
                 while (ii.hasNext()) {
 
                     Concept cc = ii.next();
@@ -58,7 +60,7 @@ public abstract class ActiveConceptsLog extends LogPane {
                         continue;
                     }
 
-                    displayed.add( node(cc) );
+                    toDisplay.add( node(cc) );
                 }
 
                 runLater(() -> {
