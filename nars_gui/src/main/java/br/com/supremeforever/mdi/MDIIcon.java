@@ -96,10 +96,10 @@ public class MDIIcon extends Button {
     }
 
     private void removeIcon() {
-        MDIIcon icon = mdiCanvas.getItemFromToolBar(getId());
-        if (icon != null) {
-            mdiCanvas.taskBar.getChildren().remove(icon);
-        }
+//        MDIIcon icon = mdiCanvas.getItemFromToolBar(getId());
+//        if (icon != null) {
+//            mdiCanvas.taskBar.getChildren().remove(icon);
+//        }
     }
 
     private ImageView getImageFromAssets(String imageName) throws Exception {

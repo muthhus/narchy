@@ -16,6 +16,7 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import nars.$;
@@ -67,7 +68,7 @@ import static nars.guifx.NARfx.scrolled;
 /**
  * NAR ide panel
  */
-public class NARide extends BorderPane {
+public class NARide extends StackPane {
 
 
     //private final TabPane taskBar = new TabPane();
@@ -120,7 +121,7 @@ public class NARide extends BorderPane {
         NAR nar = loop.nar;
         NARide ni = new NARide(loop);
 
-        Scene scene = new Scene(ni, 1000, 800,
+        Scene scene = new Scene(ni, 1400, 800,
                 false, SceneAntialiasing.DISABLED);
 
 
@@ -481,6 +482,7 @@ public class NARide extends BorderPane {
         );
 
         pp = new WidgetLayer(this);
+
         //spp = scrolled();
         addIcon(() -> controlPane); //first
 
@@ -494,9 +496,6 @@ public class NARide extends BorderPane {
 //                    pp.getChildren()::addAll);
 //        });
 //        controlPane.getChildren().add(addIcon);
-
-
-        BorderPane f = new BorderPane();
 
 
         /*LinePlot lp = new LinePlot(
@@ -567,8 +566,11 @@ public class NARide extends BorderPane {
 //        p.getItems().setAll(f, content);
 //        p.setDividerPositions(0.5f);
 
-        setCenter(content);
-        setBottom(scrolled(pp,true,false,false,false));
+        //setCenter(content);
+        //setBottom(scrolled(pp,true,false,false,false));
+
+        pp.setOpacity(0.8f);
+        getChildren().setAll(content, pp);
 
 
         runLater(() -> {

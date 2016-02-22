@@ -673,8 +673,6 @@
     -fx-text-fill: white !important;
 }
 
-
-
 .taskBar {
     -fx-border-color: #C4C4C4;
     -fx-faint-focus-color: transparent;
@@ -686,6 +684,7 @@
 }
 
 .taskBarIcon{
+    /*
     -fx-background-color:
             linear-gradient(#f2f2f2, #d6d6d6),
             linear-gradient(#fcfcfc 0%, #d9d9d9 20%, #d6d6d6 100%),
@@ -694,6 +693,7 @@
     -fx-background-insets: 0,1,2;
     -fx-text-fill: black;
     -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+    */
 }
 
 .titleText{
@@ -703,15 +703,16 @@
 
 .mdiWindow{
     -fx-border-color: #C4C4C4;
-    -fx-background-radius: 10 10 0 0;
-    -fx-border-radius: 10 10 0 0;
+    /*-fx-background-radius: 10 10 0 0;
+    -fx-border-radius: 10 10 0 0;*/
 }
 
 .mdiWindowTitleBar{
-    -fx-background-color: linear-gradient(to bottom, -fx-base, derive(#E9E9E9,10%),derive(#D0D0D0,10%),derive(#E9E9E9,10%));
-    -fx-border-color: transparent transparent #C4C4C4 transparent;
+    //-fx-background-color: linear-gradient(to bottom, -fx-base, derive(#E9E9E9,10%),derive(#D0D0D0,10%),derive(#E9E9E9,10%));
+    -fx-background-color: gray;
+    /*-fx-border-color: transparent transparent #C4C4C4 transparent;
     -fx-background-radius: 10 10 0 0;
-    -fx-border-radius: 10 10 0 0;
+    -fx-border-radius: 10 10 0 0;*/
 }
 
 .mdiCanvasContainer{

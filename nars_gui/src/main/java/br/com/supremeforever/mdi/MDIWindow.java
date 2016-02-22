@@ -46,7 +46,7 @@ public class MDIWindow extends BorderPane {
     private Button btnClose;
     private Button btnMinimize;
     private Button btnMaximize;
-    private final BorderPane borderPane = this;
+    @Deprecated private final BorderPane borderPane = this;
     private boolean isMaximized = false;
     private BooleanProperty isClosed = new SimpleBooleanProperty(false);
     private ResizeMode resizeMode;
@@ -123,6 +123,11 @@ public class MDIWindow extends BorderPane {
         this.setTop(makeTitlePane(title));
         mdiContent = makeContentPane(content);
         this.setCenter(mdiContent);
+
+
+        //overrides the transparent parent
+        setPickOnBounds(true);
+        setMouseTransparent(false);
     }
 
     public Node getContent() {

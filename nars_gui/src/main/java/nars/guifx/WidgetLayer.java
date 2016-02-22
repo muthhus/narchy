@@ -1,11 +1,13 @@
 package nars.guifx;
 
 import br.com.supremeforever.mdi.MDICanvas;
+import br.com.supremeforever.mdi.MDIWindow;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.Tooltip;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import nars.Global;
 import nars.NAR;
@@ -29,7 +31,6 @@ public class WidgetLayer extends MDICanvas {
     private final NAR nar;
     private final NARide ide;
 
-    static final double itemSpacing = 4.0;
 
     public WidgetLayer(NARide ide) {
         super();
@@ -37,6 +38,7 @@ public class WidgetLayer extends MDICanvas {
         //super(Orientation.HORIZONTAL, itemSpacing, itemSpacing);
 
         maxWidth(Double.MAX_VALUE);
+        maxHeight(Double.MAX_VALUE);
         //setPrefWrapLength(0);
 
 
@@ -48,8 +50,9 @@ public class WidgetLayer extends MDICanvas {
         nar = ide.nar;
 
 
-        nar.onFrame((n) -> update());
-        update();
+        nar.onFrame((n) -> runLater(this::update));
+
+        runLater(this::update);
 
 
     }
@@ -64,13 +67,13 @@ public class WidgetLayer extends MDICanvas {
             toAdd.add(node(k, v));
         });
 
-        //TODO use faster comparison method
-
-        if (!getChildren().equals(toAdd))
-            runLater(() -> {
-                getChildren().setAll(toAdd);
-                layout();
-            });
+//        //TODO use faster comparison method
+//
+//        if (!getChildren().equals(toAdd))
+//            runLater(() -> {
+//                getChildren().setAll(toAdd);
+//                layout();
+//            });
 
 
 //        menu.add(new JLabel(" + "));
@@ -113,24 +116,25 @@ public class WidgetLayer extends MDICanvas {
 
             Node s = icon(K, v);
 
+            runLater(()-> {
+                MDIWindow w = new MDIWindow(k, new ImageView("mdi/restore.png"), k, s);
+                ((Region)s).setPrefSize(128,128);
+                ((Region)s).setMinSize(32,32);
+                ((Region)s).setMaxSize(256,256);
+                newWindow(w);
 
-            Button p = new Button();
-            p.getStyleClass().add("plugin_button");
-            p.setGraphic(s);
+            });
+
+            //Button p = new Button();
+            //p.getStyleClass().add("plugin_button");
+            //p.setGraphic(s);
             //p.setMaxWidth(Double.MAX_VALUE);
             //p.setMaxHeight(Double.MAX_VALUE);
             //p.maxHeight(100);
             //p.prefHeight(100);
 
-
-            int minItemWidth = 256;
-            p.maxHeight(256);
-            p.prefWidth(minItemWidth);
-            p.minWidth(minItemWidth);
-            p.maxWidth(minItemWidth*1.5);
-            return p;
+            return s;
         });
-
 
 
         return n;

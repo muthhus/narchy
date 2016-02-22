@@ -5,9 +5,11 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 
+import java.awt.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -51,7 +53,7 @@ public class MDICanvas extends AnchorPane {
         }
     }
 
-    public final HBox taskBar;
+    //public final HBox taskBar;
 
 
     /**
@@ -60,8 +62,13 @@ public class MDICanvas extends AnchorPane {
     public MDICanvas() {
         super();
 
-        maxWidth(Double.MAX_VALUE);
-        maxHeight(Double.MAX_VALUE);
+        setStyle(null);
+        //setMouseTransparent(true);
+        setPickOnBounds(false);
+
+        //maxWidth(Double.MAX_VALUE);
+        //maxHeight(Double.MAX_VALUE);
+
 
         //setAlignment(Pos.TOP_LEFT);
 
@@ -75,7 +82,7 @@ public class MDICanvas extends AnchorPane {
 //        taskBar.setAlignment(Pos.CENTER_LEFT);
         //setVgrow(container, Priority.ALWAYS);
 //        taskBar = new ScrollPane(tbWindows);
-        taskBar = new HBox();
+        //taskBar = new HBox();
 //        Platform.runLater(() -> {
 //            Node viewport = taskBar.lookup(".viewport");
 //            try {
@@ -111,22 +118,22 @@ public class MDICanvas extends AnchorPane {
         //getChildren().addAll(taskBar);
     }
 
-    /**
-     * *************************REMOVE_WINDOW******************************
-     */
-    public void removeMDIWindow(String mdiWindowID) {
-        Node mdi = getItemFromMDIContainer(mdiWindowID);
-        Node iconBar = getItemFromToolBar(mdiWindowID);
-
-        if (mdi != null) {
-            getItemFromMDIContainer(mdiWindowID).isClosed(true);
-
-            this.getChildren().remove(mdi);
-        }
-        if (iconBar != null) {
-            taskBar.getChildren().remove(iconBar);
-        }
-    }
+//    /**
+//     * *************************REMOVE_WINDOW******************************
+//     */
+//    public void removeMDIWindow(String mdiWindowID) {
+//        Node mdi = getItemFromMDIContainer(mdiWindowID);
+//        Node iconBar = getItemFromToolBar(mdiWindowID);
+//
+//        if (mdi != null) {
+//            getItemFromMDIContainer(mdiWindowID).isClosed(true);
+//
+//            this.getChildren().remove(mdi);
+//        }
+////        if (iconBar != null) {
+////            taskBar.getChildren().remove(iconBar);
+////        }
+//    }
 
     /**
      * *****************************ADD_WINDOW*********************************
@@ -161,9 +168,9 @@ public class MDICanvas extends AnchorPane {
     }
 
     private void restoreExisting(MDIWindow mdiWindow) {
-        if (getItemFromToolBar(mdiWindow.getId()) != null) {
-            taskBar.getChildren().remove(getItemFromToolBar(mdiWindow.getId()));
-        }
+        //if (getItemFromToolBar(mdiWindow.getId()) != null) {
+            //taskBar.getChildren().remove(getItemFromToolBar(mdiWindow.getId()));
+        //}
         for (int i = 0; i < this.getChildren().size(); i++) {
             Node node = this.getChildren().get(i);
             if (node.getId().equals(mdiWindow.getId())) {
@@ -180,7 +187,7 @@ public class MDICanvas extends AnchorPane {
         @Override
         public void handle(MDIEvent event) {
             MDIWindow win = (MDIWindow) event.getTarget();
-            taskBar.getChildren().remove(getItemFromToolBar(win.getId()));
+            //taskBar.getChildren().remove(getItemFromToolBar(win.getId()));
         }
     };
     public final EventHandler<MDIEvent> mdiMinimizedHandler = new EventHandler<MDIEvent>() {
@@ -188,36 +195,37 @@ public class MDICanvas extends AnchorPane {
         public void handle(MDIEvent event) {
             MDIWindow win = (MDIWindow) event.getTarget();
             String id = win.getId();
-            if (getItemFromToolBar(id) == null) {
+            /*if (getItemFromToolBar(id) == null) {
                 try {
-                    MDIIcon icon = new MDIIcon(event.imgLogo, (MDICanvas) MDICanvas.this, win.getWindowsTitle());
+                    MDIIcon icon = new MDIIcon(event.imgLogo, (MDICanvas) MDICanvas.this,
+                            win.getWindowsTitle());
                     icon.setId(win.getId());
                     icon.getBtnClose().disableProperty().bind(win.getBtnClose().disableProperty());
-                    taskBar.getChildren().add(icon);
+                    //taskBar.getChildren().add(icon);
                 } catch (Exception ex) {
                     Logger.getLogger(MDICanvas.class.getName()).log(Level.SEVERE, null, ex);
                 }
 
-            }
+            }*/
         }
     };
 
-    /**
-     * ***************** UTILITIES******************************************
-     */
-    public final MDIIcon getItemFromToolBar(String id) {
-        for (Node node : taskBar.getChildren()) {
-            if (node instanceof MDIIcon) {
-                MDIIcon icon = (MDIIcon) node;
-                //String key = icon.getLblName().getText();
-                String key = icon.getId();
-                if (key.equalsIgnoreCase(id)) {
-                    return icon;
-                }
-            }
-        }
-        return null;
-    }
+//    /**
+//     * ***************** UTILITIES******************************************
+//     */
+//    public final MDIIcon getItemFromToolBar(String id) {
+//        for (Node node : taskBar.getChildren()) {
+//            if (node instanceof MDIIcon) {
+//                MDIIcon icon = (MDIIcon) node;
+//                //String key = icon.getLblName().getText();
+//                String key = icon.getId();
+//                if (key.equalsIgnoreCase(id)) {
+//                    return icon;
+//                }
+//            }
+//        }
+//        return null;
+//    }
 
     public final MDIWindow getItemFromMDIContainer(String id) {
         for (Node node : this.getChildren()) {
@@ -324,8 +332,9 @@ public class MDICanvas extends AnchorPane {
             );
         }
 
-        if ((containerWidth - point.getX() < 40) ||
-                (containerHeight - point.getY() < 40)) {
+        int borderSensitivityExclusionZone = 40;
+        if ((Math.abs(containerWidth - point.getX()) < borderSensitivityExclusionZone) ||
+                (Math.abs(containerHeight - point.getY()) < borderSensitivityExclusionZone)) {
             throw new PositionOutOfBoundsException(
                     "Tried to place MDI Window with ID " + mdiWindow.getId() +
                             " at a coordinate " + point.toString() +
