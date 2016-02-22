@@ -27,7 +27,7 @@ public class HexButtonVis extends DefaultNodeVis {
     public static final Font labelFont = NARfx.mono(2f);
     private final NAR n;
 
-    static float labelMinScale = 30f; //label visibilty cutoff
+    static float labelMinScale = 10f; //label visibilty cutoff
 
     final static float fontScale = 1/2f;
 
@@ -43,6 +43,7 @@ public class HexButtonVis extends DefaultNodeVis {
 
         //static final float sizeRatio = 6;
         final int maxLabelLength = 32;
+        public final int numChars;
 
         public HexButton(X object) {
             super();
@@ -54,12 +55,15 @@ public class HexButtonVis extends DefaultNodeVis {
 
             this.base = getBase();
 
+            this.str = value.toString();
+            this.numChars = str.length();
+
             //setScaleX(1/sizeRatio);
             //setScaleY(1/sizeRatio);
 
             getChildren().add(base);
 
-            setCacheHint(CacheHint.SCALE_AND_ROTATE);
+            //setCacheHint(CacheHint.SCALE_AND_ROTATE);
             setCache(true);
 
             //label will be added if visible scale is significant
@@ -71,12 +75,14 @@ public class HexButtonVis extends DefaultNodeVis {
             //setCache(true);
         }
 
+        final String str;
+
         private Node getLabel() {
-            String vs = value.toString();
-            if (vs.length() > maxLabelLength)
+
+            if (str.length() > maxLabelLength)
                 return null;
 
-            Text s = new Text(vs);
+            Text s = new Text(str);
             //s.setManaged(false);
 
             //s.setTextAlignment(TextAlignment.CENTER);
@@ -172,9 +178,9 @@ public class HexButtonVis extends DefaultNodeVis {
         public void scale(double scale) {
             super.scale(scale);
 
-
             Node bl = button.label;
-            if (scale < labelMinScale) {
+            int v = button.value.term().volume();
+            if (scale < (1 + v) * labelMinScale ) {
                 if (bl !=null) {
                     bl.setVisible(false);
                 } else {

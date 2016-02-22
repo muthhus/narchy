@@ -57,7 +57,7 @@
 
 .control {
     -fx-base-color: /*transparent;*/ /*rgb(30,30,30); */
-        rgb(0.1,0.1,0.1);
+        rgb(0,0,0);
 }
 
 .text-input-control {
@@ -75,12 +75,10 @@
     -fx-label-padding: 2px;
 }
 .toggle-button:hover, .button:hover, .slider:hover {
-    -fx-text-fill: #000;
-    -fx-background-color: #fb0;
+    -fx-background-color: #014;
 }
 .toggle-button:armed, .button:armed {
-    -fx-text-fill: #000;
-    -fx-background-color: #f50;
+    -fx-background-color: #410;
 }
 
 
