@@ -9,7 +9,7 @@
 
     -fx-base: transparent;
 
-    -fx-text-base-color: rgb(230,230,230);
+    /*-fx-text-base-color: rgb(230,230,230);*/
 
     -fx-background: rgb(0, 0, 0);
 
@@ -208,9 +208,9 @@
     -fx-stroke: transparent;
 }
 
-.text {
-    /*-fx-font-smoothing-type: lcd;*/
-}
+/*.text {
+    -fx-font-smoothing-type: lcd;
+}*/
 
 .emoji-text {
     -fx-fill: -fx-text-base-color;

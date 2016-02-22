@@ -4,9 +4,7 @@ import com.google.common.collect.Lists;
 import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
 import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
@@ -54,8 +52,9 @@ public class POJOPane<X> extends BorderPane {
             });
             setTop(toggle);
 
-
-            //runLater(()-> toggle.setSelected(!unfold));
+            if (unfold) {
+                runLater(() -> toggle.setSelected(true));
+            }
         }
         else {
             setCenter(new Label(obj.toString()));
@@ -127,9 +126,11 @@ public class POJOPane<X> extends BorderPane {
 
 
 
-            Node label = methodBox.getOne();
+            Labeled label = (Labeled) methodBox.getOne();
+            label.setGraphic(methodBox.getTwo());
             Tooltip.install(label, new Tooltip(f + "\n\t" + methodBox.getTwo()));
-            nodes.add(new FlowPane(label, methodBox.getTwo()));
+            //nodes.add(new FlowPane(label, methodBox.getTwo()));
+            nodes.add(label);
         }
         return nodes;
     }
@@ -138,8 +139,8 @@ public class POJOPane<X> extends BorderPane {
 
 
         String name = POJONode.getName(field);
-        Label label = new Label(name);
-        label.getStyleClass().addAll("built-label");
+        Button label = new Button(name);
+        //label.getStyleClass().addAll("built-label");
         //label.setPrefWidth(200);
         //Node valueNode = getValueField(object, method, readOnly || getSetter(method) == null, name, params);*/
 

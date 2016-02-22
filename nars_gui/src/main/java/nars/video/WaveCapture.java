@@ -55,12 +55,12 @@ public class WaveCapture implements Runnable {
         start(0);
     }
 
-    public Pane newMonitorPane() {
+    public VBox newMonitorPane() {
 
 
-        Plot2D audioPlot = new Plot2D(Plot2D.Line, bufferSamples, 450, 175);
+        Plot2D audioPlot = new Plot2D(Plot2D.Line, bufferSamples, 450, 60);
         audioPlot.add(rawWave);
-        Plot2D audioPlot2 = new Plot2D(Plot2D.Line, bufferSamples, 450, 175);
+        Plot2D audioPlot2 = new Plot2D(Plot2D.Line, bufferSamples, 450, 60);
         audioPlot2.add(wavelet1d);
 
 
@@ -69,9 +69,12 @@ public class WaveCapture implements Runnable {
             audioPlot2.update();
         };
 
-        Pane v = new VBox(
+        VBox v = new VBox(
                 audioPlot,
                 audioPlot2);
+
+        v.maxWidth(Double.MAX_VALUE);
+        v.maxHeight(Double.MAX_VALUE);
 
         //noinspection OverlyComplexAnonymousInnerClass
         ChangeListener onParentChange = new ChangeListener() {
@@ -84,8 +87,8 @@ public class WaveCapture implements Runnable {
                 if (t1 == null) {
                     if (observe != null) {
                         //System.out.println("stopping view");
-                        observe.off();
-                        observe = null;
+                        this.observe.off();
+                        this.observe = null;
                     }
                 } else {
                     if (observe == null) {
