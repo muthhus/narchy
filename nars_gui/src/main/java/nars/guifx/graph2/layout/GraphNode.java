@@ -20,6 +20,7 @@ public class GraphNode extends Group {
 	public GraphNode() {
 		setManaged(false);
 		setPickOnBounds(true);
+		setVisible(false);
 	}
 
 	public boolean visible() {

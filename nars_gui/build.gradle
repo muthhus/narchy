@@ -5,16 +5,20 @@ apply plugin: 'application'
 dependencies {
     compile project(':nars_util')
     compile project(':nars_logic')
+
     compile group: 'org.abego.treelayout', name: 'org.abego.treelayout.core', version: '1.0.3'
-    compile group: 'com.fifesoft', name: 'rsyntaxtextarea', version: '2.5.8'
+
     compile group: 'de.jensd', name: 'fontawesomefx', version: '8.9'
     compile group: 'org.fxmisc.richtext', name: 'richtextfx', version: '1.0.0-SNAPSHOT'
     compile group: 'org.jfxtras', name: 'jfxtras-common', version: '8.0-r4'
     compile group: 'org.jfxtras', name: 'jfxtras-controls', version: '8.0-r4'
     compile group: 'org.jfxtras', name: 'jfxtras-menu', version: '8.0-r4'
     compile group: 'org.jfxtras', name: 'jfxtras-labs', version: '8.0-r4'
-    compile group: 'org.controlsfx', name: 'controlsfx', version: '8.40.10'
     compile group: 'org.jfxtras', name: 'jfxtras-window', version: '8.0-r4'
+    testCompile 'org.jfxtras:jfxtras-test-support:8.0-r4'
+
+
+    compile group: 'org.controlsfx', name: 'controlsfx', version: '8.40.10'
     compile group: 'com.github.dejv78.commons.jfx', name: 'jfx-binding', version: '1.1.0'
     compile group: 'com.github.dejv78.commons.jfx', name: 'jfx-geometry', version: '1.1.0'
     compile group: 'com.github.dejv78.commons.jfx', name: 'jfx-input', version: '1.1.0'

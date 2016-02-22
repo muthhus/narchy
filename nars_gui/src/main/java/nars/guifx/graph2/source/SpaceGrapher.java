@@ -477,8 +477,8 @@ public class SpaceGrapher extends Spacegraph {
 
     static final int defaultFramePeriodMS = 50; //~60hz/2
 
-    protected synchronized void checkVisibility() {
-        if (isVisible() && getParent() != null && getScene() != null) {
+    protected void checkVisibility() {
+        if (getParent() != null && isVisible() /*&& getScene() != null*/) {
             start(defaultFramePeriodMS);
         } else
             stop();

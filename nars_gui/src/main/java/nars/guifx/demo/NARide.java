@@ -75,7 +75,7 @@ public class NARide extends BorderPane {
     public final TabPane content = new TabPane();
 
     public final NARMenu controlPane;
-    public final PluginPanel pp;
+    public final WidgetLayer pp;
 
     public final Map<Class, Function<Object,Node>> nodeBuilders = Global.newHashMap();
     public final LoopPane loopPane;
@@ -480,7 +480,7 @@ public class NARide extends BorderPane {
                 new DefaultCyclePane((Default.AbstractCycle) c) //cast is hack
         );
 
-        pp = new PluginPanel(this);
+        pp = new WidgetLayer(this);
         //spp = scrolled();
         addIcon(() -> controlPane); //first
 

@@ -1,6 +1,6 @@
 package nars.guifx;
 
-import javafx.geometry.Orientation;
+import br.com.supremeforever.mdi.MDICanvas;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -22,7 +22,7 @@ import static javafx.application.Platform.runLater;
  * Manages the activated set of plugins in a NAR, and a menu for adding additional ones
  * and presets of them.
  */
-public class PluginPanel extends FlowPane {
+public class WidgetLayer extends MDICanvas {
 
     final Map<String, Node> nodes = new ConcurrentHashMap<>();
 
@@ -31,13 +31,13 @@ public class PluginPanel extends FlowPane {
 
     static final double itemSpacing = 4.0;
 
-    public PluginPanel(NARide ide) {
-        super(Orientation.VERTICAL, itemSpacing, itemSpacing);
+    public WidgetLayer(NARide ide) {
+        super();
 
         //super(Orientation.HORIZONTAL, itemSpacing, itemSpacing);
 
         maxWidth(Double.MAX_VALUE);
-        setPrefWrapLength(0);
+        //setPrefWrapLength(0);
 
 
         //super(Orientation.HORIZONTAL, itemSpacnig, itemSpacnig);

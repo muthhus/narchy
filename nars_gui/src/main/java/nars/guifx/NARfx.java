@@ -39,6 +39,15 @@ import static java.util.stream.Stream.of;
 public enum NARfx  {
     ;
 
+    //Prism Renderer options - http://adamish.com/blog/archives/320
+    static {
+        System.setProperty("javafx.animation.framerate", "30");
+        System.setProperty("prism.verbose", "true");
+        System.setProperty("prism.dirtyopts", "false");
+        //System.setProperty("javafx.animation.fullspeed", "true");
+        System.setProperty("javafx.animation.pulse", "10");
+    }
+
     public static String css;
     static {
         try {

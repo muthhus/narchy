@@ -7,17 +7,18 @@
     /*-fx-font-family: 'Monospaced';*/
 
 
-    -fx-base: transparent;
+    /*-fx-base: transparent;*/
 
     /*-fx-text-base-color: rgb(230,230,230);*/
 
-    -fx-background: rgb(0, 0, 0);
+    -fx-background-color: rgb(0, 0, 0);
+    -fx-base: rgb(0, 0, 0);
 
     -fx-fill: #fff;
 
     -fx-background-insets:  0.0;
     -fx-background-radius: 0.0;
-    -fx-border-radius:0,0;
+    -fx-border-radius: 0;
     -fx-border-width: 0;
 
     /*-fx-control-inner-background: transparent;*/
@@ -72,7 +73,7 @@
     /*-fx-text-fill: -fx-text-base-color;
     -fx-fill: -fx-text-base-color;*/
     -fx-padding: 2px;
-    -fx-label-padding: 2px;
+    /*-fx-label-padding: 2px;*/
 }
 .toggle-button:hover, .button:hover, .slider:hover {
     -fx-background-color: #014;
@@ -487,7 +488,7 @@
 }
 
 .menu {
-    padding: 0.05em;
+    padding: 1px;
     background: transparent;
 }
 
@@ -670,4 +671,48 @@
 
 .taskbutton:hover {
     -fx-text-fill: white !important;
+}
+
+
+
+.taskBar {
+    -fx-border-color: #C4C4C4;
+    -fx-faint-focus-color: transparent;
+    -fx-focus-color: transparent;
+}
+
+.controlButtons{
+
+}
+
+.taskBarIcon{
+    -fx-background-color:
+            linear-gradient(#f2f2f2, #d6d6d6),
+            linear-gradient(#fcfcfc 0%, #d9d9d9 20%, #d6d6d6 100%),
+            linear-gradient(#dddddd 0%, #f6f6f6 50%);
+    -fx-background-radius: 8,7,6;
+    -fx-background-insets: 0,1,2;
+    -fx-text-fill: black;
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+}
+
+.titleText{
+    -fx-font-weight: bold;
+    -fx-text-fill: black;
+}
+
+.mdiWindow{
+    -fx-border-color: #C4C4C4;
+    -fx-background-radius: 10 10 0 0;
+    -fx-border-radius: 10 10 0 0;
+}
+
+.mdiWindowTitleBar{
+    -fx-background-color: linear-gradient(to bottom, -fx-base, derive(#E9E9E9,10%),derive(#D0D0D0,10%),derive(#E9E9E9,10%));
+    -fx-border-color: transparent transparent #C4C4C4 transparent;
+    -fx-background-radius: 10 10 0 0;
+    -fx-border-radius: 10 10 0 0;
+}
+
+.mdiCanvasContainer{
 }
