@@ -14,6 +14,7 @@ import nars.term.Term;
 import nars.term.Termed;
 
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiFunction;
 
@@ -387,58 +388,6 @@ public class SpaceGrapher extends Spacegraph {
 //    }
 
 
-    /**
-     * called in JavaFX thread
-     */
-    public void rerender() {
-
-        /** apply layout */
-        IterativeLayout<TermNode> l;
-        if ((l = layout.get()) != null) {
-            l.run(this, 1);
-        } else {
-            System.err.println(this + " has no layout");
-        }
-
-        EdgeRenderer<TermEdge> er = edgeRenderer.get();
-        er.reset(this);
-
-        /** apply vis properties */
-        NodeVis v = nodeVis.get();
-        for (TermNode n : displayed) {
-            v.accept(n);
-
-            //termList.forEach((Consumer<TermNode>) n -> {
-
-//        for (int i = 0, termListSize = termList.size(); i < termListSize; i++) {
-//            final TermNode n = termList.get(i);
-//            for (final TermEdge e : n.getEdges()) {
-//                removable.remove(e);
-//            }
-//        });
-//
-//
-//
-//        termList.forEach((Consumer<TermNode>)n -> {
-//        for (int i = 0, termListSize = termList.size(); i < termListSize; i++) {
-//            final TermNode n = termList.get(i);
-            if (n != null) {
-                for (TermEdge e : n.getEdges())
-                    if (e != null) er.accept(e);
-            }
-        }
-
-//        removable.forEach(x -> {
-//            edges.getChildren().remove(x);
-//        });
-//        edges.getChildren().removeAll(removable);
-
-//        removable.clear();
-
-
-    }
-
-
     public SpaceGrapher(NAR nar, GraphSource g,
                         NodeVis vv,
                         BiFunction<TermNode, TermNode, TermEdge> edgeVis,
@@ -509,7 +458,7 @@ public class SpaceGrapher extends Spacegraph {
     /**
      * called when layout changes to restart the source & layout
      */
-    synchronized void layoutUpdated() {
+    synchronized void layoutSwitch() {
         int lastAnimPeriodMS;
         lastAnimPeriodMS = animator != null ? animator.getPeriod() : -1;
 
@@ -519,14 +468,14 @@ public class SpaceGrapher extends Spacegraph {
         getVertices().forEach(t -> t.setVisible(true));
 
 
-        rerender();
+        //rerender();
 
         if (lastAnimPeriodMS != -1)
             start(lastAnimPeriodMS);
     }
 
 
-    static final int defaultFramePeriodMS = 30; //~60hz/2
+    static final int defaultFramePeriodMS = 50; //~60hz/2
 
     protected synchronized void checkVisibility() {
         if (isVisible() && getParent() != null && getScene() != null) {
@@ -536,6 +485,67 @@ public class SpaceGrapher extends Spacegraph {
     }
 
 
+//    final static ExecutorService updater = Executors.newFixedThreadPool(1);
+//    final AtomicBoolean updated = new AtomicBoolean(true);
+//    final Callable<Void> updateTask = ()-> {
+//
+
+//        runLater(this::rerender);
+//
+//        updated.set(true);
+//
+//        return null;
+//    };
+
+    public void reupdate() {
+        /** apply layout */
+        IterativeLayout<TermNode> l;
+        if ((l = layout.get()) != null) {
+            l.run(this, 1);
+        } else {
+            //System.err.println(this + " has no layout");
+        }
+    }
+    public void rerender() {
+
+        EdgeRenderer<TermEdge> er = edgeRenderer.get();
+        er.reset(this);
+
+        /** apply vis properties */
+        NodeVis v = nodeVis.get();
+        for (TermNode n : displayed) {
+            v.accept(n);
+
+            //termList.forEach((Consumer<TermNode>) n -> {
+
+//        for (int i = 0, termListSize = termList.size(); i < termListSize; i++) {
+//            final TermNode n = termList.get(i);
+//            for (final TermEdge e : n.getEdges()) {
+//                removable.remove(e);
+//            }
+//        });
+//
+//
+//
+//        termList.forEach((Consumer<TermNode>)n -> {
+//        for (int i = 0, termListSize = termList.size(); i < termListSize; i++) {
+//            final TermNode n = termList.get(i);
+            if (n != null) {
+                for (TermEdge e : n.getEdges())
+                    if (e != null) er.accept(e);
+            }
+        }
+
+//        removable.forEach(x -> {
+//            edges.getChildren().remove(x);
+//        });
+//        edges.getChildren().removeAll(removable);
+
+//        removable.clear();
+
+
+    };
+
     public synchronized void start(int layoutPeriodMS) {
 
         stop();
@@ -544,25 +554,30 @@ public class SpaceGrapher extends Spacegraph {
 
         if (animator == null && src!=null)  {
             animator = new Animate(layoutPeriodMS, a -> {
+//                if (updated.compareAndSet(true, false)) {
+//                    updater.execute(
+//                        new javafx.concurrent.Task<Void>() {
+//
+//                            @Override
+//                            protected Void call() throws Exception {
+//                                return updateTask.call();
+//                            }
+//                        }
+//
+//                    );
+//                }
+                reupdate();
                 rerender();
-                /*if (displayed.length != 0) {
 
-                }*/
             });
 
-            //System.out.println(this + " started");
-
-
-                /*this.updaterSlow = new Animate(updatePeriodMS, a -> {
-                    if (!termList.isEmpty()) {
-                        layoutNodes();
-                        renderEdges();
-                    }
-                });*/
+            reupdate();
+            rerender();
 
             animator.start();
 
             src.start(this);
+
 
             //updaterSlow.start();
         }
@@ -573,7 +588,6 @@ public class SpaceGrapher extends Spacegraph {
         if (animator != null) {
             animator.stop();
             animator = null;
-
         }
 
         GraphSource s = source.get();

@@ -105,7 +105,7 @@ public class WebcamFX extends StackPane implements Runnable {
             BorderPane control = new POJOPane(this);
             //control.setStyle("-fx-background-color: gray");
             control.setStyle("-fx-text-fill: gray");
-            control.setBlendMode(BlendMode.EXCLUSION);
+            //control.setBlendMode(BlendMode.EXCLUSION);
             control.setOpacity(0.92);
 
             VBox wcon = new VBox(control);

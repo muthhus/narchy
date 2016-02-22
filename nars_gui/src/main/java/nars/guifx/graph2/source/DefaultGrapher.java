@@ -55,7 +55,7 @@ public class DefaultGrapher extends SpaceGrapher {
             IterativeLayout il = layoutType.getInstance();
             if (il!=null) {
                 layout.set(il);
-                layoutUpdated();
+                layoutSwitch();
             } else {
                 layout.set(nullLayout);
             }

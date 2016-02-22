@@ -48,7 +48,7 @@ public class HexButtonVis extends DefaultNodeVis {
         public HexButton(X object) {
             super();
 
-            //setManaged(false);
+            setManaged(false);
             //setAutoSizeChildren(false);
 
             this.value = object;
@@ -63,8 +63,8 @@ public class HexButtonVis extends DefaultNodeVis {
 
             getChildren().add(base);
 
-            //setCacheHint(CacheHint.SCALE_AND_ROTATE);
-            setCache(true);
+            base.setCacheHint(CacheHint.SCALE);
+            base.setCache(true);
 
             //label will be added if visible scale is significant
 
@@ -83,7 +83,7 @@ public class HexButtonVis extends DefaultNodeVis {
                 return null;
 
             Text s = new Text(str);
-            //s.setManaged(false);
+            s.setManaged(false);
 
             //s.setTextAlignment(TextAlignment.CENTER);
             s.setTextOrigin(VPos.CENTER);
@@ -119,6 +119,10 @@ public class HexButtonVis extends DefaultNodeVis {
 
             s.setMouseTransparent(true);
             s.setPickOnBounds(false);
+
+            s.setCacheHint(CacheHint.SCALE);
+            s.setCache(true);
+
 
 
             return s;

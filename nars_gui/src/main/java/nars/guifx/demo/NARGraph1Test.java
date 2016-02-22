@@ -35,6 +35,7 @@ public enum NARGraph1Test {
 
         n.input("<a --> b>.");
         n.input("<b --> c>.");
+        n.input("<c --> d>.");
         n.run(5);
 
 
