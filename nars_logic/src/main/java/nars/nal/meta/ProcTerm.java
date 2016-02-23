@@ -12,5 +12,5 @@ public interface ProcTerm extends Term {
         s.append("/* TODO: " + this + " */\n");
     }
 
-    void accept(PremiseMatch c);
+    void accept(PremiseEval c);
 }

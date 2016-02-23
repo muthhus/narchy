@@ -9,7 +9,7 @@ import nars.NAR;
 import nars.Premise;
 import nars.bag.BLink;
 import nars.budget.Budget;
-import nars.nal.meta.PremiseMatch;
+import nars.nal.meta.PremiseEval;
 import nars.nal.op.Derive;
 import nars.task.DerivedTask;
 import nars.task.Task;
@@ -145,7 +145,7 @@ abstract public class ConceptProcess implements Premise {
 
 
     /** part 2 */
-    public void derive(@NotNull Termed<Compound> c, @Nullable Truth truth, Budget budget, long now, long occ, @NotNull PremiseMatch p, @NotNull Derive d) {
+    public void derive(@NotNull Termed<Compound> c, @Nullable Truth truth, Budget budget, long now, long occ, @NotNull PremiseEval p, @NotNull Derive d) {
 
         char punct = p.punct.get();
 
@@ -223,7 +223,7 @@ abstract public class ConceptProcess implements Premise {
     /** after a derivation has completed, commit is called allowing it to process anything collected */
     abstract protected void commit();
 
-    public final void run(@NotNull PremiseMatch matcher) {
+    public final void run(@NotNull PremiseEval matcher) {
         matcher.start(this);
         commit();
     }

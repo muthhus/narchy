@@ -28,7 +28,7 @@ public class SimpleDeriver extends Deriver {
     }
 
     @Override
-    public void run(@NotNull PremiseMatch m) {
+    public void run(@NotNull PremiseEval m) {
 
         int now = m.now();
 

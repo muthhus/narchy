@@ -78,7 +78,7 @@ public class TrieDeriver extends Deriver {
     }
 
     @Override
-    public final void run(PremiseMatch m) {
+    public final void run(PremiseEval m) {
         for (ProcTerm r : roots)
             r.accept(m);
     }
@@ -109,7 +109,7 @@ public class TrieDeriver extends Deriver {
     }
 
 
-    private Collection<BooleanCondition<PremiseMatch>> compileConditions(@NotNull Collection<Term> t, @NotNull AtomicReference<MatchTerm> matchParent) {
+    private Collection<BooleanCondition<PremiseEval>> compileConditions(@NotNull Collection<Term> t, @NotNull AtomicReference<MatchTerm> matchParent) {
 
         return t.stream().filter(x -> {
             if (x instanceof BooleanCondition) {
@@ -137,7 +137,7 @@ public class TrieDeriver extends Deriver {
                 //System.out.println("\tnot boolean condition");
                 //return false;
             }
-        }).map(x -> (BooleanCondition<PremiseMatch>)x).collect(Collectors.toList());
+        }).map(x -> (BooleanCondition<PremiseEval>)x).collect(Collectors.toList());
     }
 
 
@@ -151,7 +151,7 @@ public class TrieDeriver extends Deriver {
 
     @NotNull
     public static ProcTerm branch(
-            @NotNull Collection<BooleanCondition<PremiseMatch>> condition,
+            @NotNull Collection<BooleanCondition<PremiseEval>> condition,
             @Nullable ThenFork conseq) {
 
         if ((conseq != null) && (conseq.size() > 0)) {

@@ -2,13 +2,13 @@ package nars.nal.meta.pre;
 
 import nars.Symbols;
 import nars.nal.meta.AtomicBooleanCondition;
-import nars.nal.meta.PremiseMatch;
+import nars.nal.meta.PremiseEval;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by me on 8/27/15.
  */
-final public class TaskPunctuation extends AtomicBooleanCondition<PremiseMatch> {
+final public class TaskPunctuation extends AtomicBooleanCondition<PremiseEval> {
 
     public final char punc;
     public final String id;
@@ -16,10 +16,10 @@ final public class TaskPunctuation extends AtomicBooleanCondition<PremiseMatch> 
 
     public static final TaskPunctuation TaskJudgment = new TaskPunctuation('.');
 
-    public static final AtomicBooleanCondition<PremiseMatch> TaskQuestion = new AtomicBooleanCondition<PremiseMatch>() {
+    public static final AtomicBooleanCondition<PremiseEval> TaskQuestion = new AtomicBooleanCondition<PremiseEval>() {
 
         @Override
-        public boolean booleanValueOf(@NotNull PremiseMatch o) {
+        public boolean booleanValueOf(@NotNull PremiseEval o) {
             char taskPunc = o.punc();
             return taskPunc == Symbols.QUESTION || taskPunc == Symbols.QUEST;
         }
@@ -58,7 +58,7 @@ final public class TaskPunctuation extends AtomicBooleanCondition<PremiseMatch> 
     }
 
     @Override
-    public final boolean booleanValueOf(@NotNull PremiseMatch m) {
+    public final boolean booleanValueOf(@NotNull PremiseEval m) {
         return m.punc() == punc;
     }
 

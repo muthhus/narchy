@@ -6,5 +6,5 @@ import org.jetbrains.annotations.Nullable;
 
 public interface PremiseAware {
 	@Nullable
-	Term function(Compound args, PremiseMatch r);
+	Term function(Compound args, PremiseEval r);
 }

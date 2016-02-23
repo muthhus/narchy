@@ -14,7 +14,7 @@ import static nars.Op.ATOM;
 public interface BooleanCondition<C> extends Term, BooleanFunction<C> {
 
     /** contant TRUE condition */
-    BooleanCondition<PremiseMatch> TRUE = new AtomicBooleanCondition() {
+    BooleanCondition<PremiseEval> TRUE = new AtomicBooleanCondition() {
 
         @Override
         public boolean booleanValueOf(Object o) {

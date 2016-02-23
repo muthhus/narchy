@@ -66,10 +66,10 @@ public class PremiseRule extends GenericCompound {
     /**
      * blank marker trie node indicating the derivation and terminating the branch
      */
-    public static final BooleanCondition END = new AtomicBooleanCondition<PremiseMatch>() {
+    public static final BooleanCondition END = new AtomicBooleanCondition<PremiseEval>() {
 
         @Override
-        public boolean booleanValueOf(PremiseMatch versioneds) {
+        public boolean booleanValueOf(PremiseEval versioneds) {
             return true;
         }
 

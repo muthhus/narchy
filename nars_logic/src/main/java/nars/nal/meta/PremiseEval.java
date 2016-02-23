@@ -27,9 +27,9 @@ import java.util.Random;
 
 
 /**
- * rule matching context, re-recyclable as thread local
+ * evaluates a premise (task, belief, termlink, taskLink, ...) to derive 0 or more new tasks
  */
-public class PremiseMatch extends FindSubst {
+public class PremiseEval extends FindSubst {
 
     private final Deriver deriver;
 
@@ -60,7 +60,7 @@ public class PremiseMatch extends FindSubst {
     private transient char premisePunc;
     private TermIndex index;
 
-    public PremiseMatch(Random r, Deriver deriver) {
+    public PremiseEval(Random r, Deriver deriver) {
         super(Op.VAR_PATTERN, r );
 
         for (Class<? extends ImmediateTermTransform> c : PremiseRule.Operators) {

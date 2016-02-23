@@ -15,7 +15,7 @@ import java.util.Collection;
 public final class PremiseBranch extends GenericCompound implements ProcTerm {
 
     @NotNull
-    public final transient AndCondition<PremiseMatch> cond;
+    public final transient AndCondition<PremiseEval> cond;
     @NotNull
     public final transient ProcTerm conseq;
 
@@ -30,14 +30,14 @@ public final class PremiseBranch extends GenericCompound implements ProcTerm {
         s.append("\n}");
     }
 
-    public PremiseBranch(@NotNull Collection<BooleanCondition<PremiseMatch>> cond, ProcTerm conseq) {
+    public PremiseBranch(@NotNull Collection<BooleanCondition<PremiseEval>> cond, ProcTerm conseq) {
         super(Op.IMPLICATION,
                 new TermVector(new AndCondition(cond), conseq));
-        this.cond = (AndCondition<PremiseMatch>) term(0);
+        this.cond = (AndCondition<PremiseEval>) term(0);
         this.conseq = (ProcTerm) term(1);
     }
 
-    @Override public void accept(@NotNull PremiseMatch m) {
+    @Override public void accept(@NotNull PremiseEval m) {
         int r = m.now();
         if (cond.booleanValueOf(m)) {
             conseq.accept(m);

@@ -1,12 +1,12 @@
 package nars.nal.meta.pre;
 
 import nars.nal.meta.AtomicBooleanCondition;
-import nars.nal.meta.PremiseMatch;
+import nars.nal.meta.PremiseEval;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
 /** tests the resolved terms specified by pattern variable terms */
-public abstract class PreCondition2 extends AtomicBooleanCondition<PremiseMatch> {
+public abstract class PreCondition2 extends AtomicBooleanCondition<PremiseEval> {
     public final Term arg1, arg2;
     @NotNull
     private final String str;
@@ -18,13 +18,13 @@ public abstract class PreCondition2 extends AtomicBooleanCondition<PremiseMatch>
     }
 
     @Override
-    public boolean booleanValueOf(@NotNull PremiseMatch m) {
+    public boolean booleanValueOf(@NotNull PremiseEval m) {
         return test(m,
                 m.resolve(arg1),
                 m.resolve(arg2));
     }
 
-    public abstract boolean test(PremiseMatch m, Term a, Term b);
+    public abstract boolean test(PremiseEval m, Term a, Term b);
 
     @NotNull
     @Override

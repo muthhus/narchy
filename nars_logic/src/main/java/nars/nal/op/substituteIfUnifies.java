@@ -1,7 +1,7 @@
 package nars.nal.op;
 
 import nars.Op;
-import nars.nal.meta.PremiseMatch;
+import nars.nal.meta.PremiseEval;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.transform.subst.FindSubst;
@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 public final class substituteIfUnifies extends substitute {
 
     @Nullable
-    @Override public Term function(@NotNull Compound p, @NotNull PremiseMatch r) {
+    @Override public Term function(@NotNull Compound p, @NotNull PremiseEval r) {
         final Term[] xx = p.terms();
         final Term term = xx[0];
         final Term opT = xx[1];
@@ -35,12 +35,11 @@ public final class substituteIfUnifies extends substitute {
     private final static class OneMatchFindSubst extends FindSubst {
 
         private final Term xterm;
-        @NotNull
-        private final PremiseMatch r;
+        private final @NotNull PremiseEval r;
         @Nullable
         private Term result;
 
-        public OneMatchFindSubst(@NotNull Op op, @NotNull PremiseMatch r, Term xterm) {
+        public OneMatchFindSubst(@NotNull Op op, @NotNull PremiseEval r, Term xterm) {
             super(op, r.currentPremise.memory().random, r);
             this.xterm = xterm;
             this.r = r;

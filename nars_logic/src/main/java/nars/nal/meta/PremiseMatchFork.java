@@ -15,7 +15,7 @@ public final class PremiseMatchFork extends ThenFork {
     }
 
     @Override
-    public final void accept(@NotNull PremiseMatch m) {
+    public final void accept(@NotNull PremiseEval m) {
         int revertTime = m.now();
         for (ProcTerm s : termCache) {
             s.accept(m);

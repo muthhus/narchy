@@ -1,6 +1,6 @@
 package nars.concept;
 
-import nars.nal.meta.PremiseMatch;
+import nars.nal.meta.PremiseEval;
 import nars.nal.op.Derive;
 import nars.task.Task;
 import nars.term.Compound;
@@ -25,7 +25,7 @@ public interface Temporalize {
      * @param occReturn holds the occurrence time as a return value for the callee to use in building the task
      * @return
      */
-    Compound compute(@NotNull Compound derived, @NotNull PremiseMatch p, @NotNull Derive d, long[] occReturn);
+    Compound compute(@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn);
 
 
 
@@ -55,7 +55,7 @@ public interface Temporalize {
     };
 
     @NotNull
-    static Compound dtBelief(Compound derived, PremiseMatch p, long[] occReturn, int polarity) {
+    static Compound dtBelief(Compound derived, PremiseEval p, long[] occReturn, int polarity) {
         ConceptProcess premise = p.currentPremise;
 
         occReturn[0] = premise.occurrenceTarget((t, b) -> t >= b ? t :b); //latest occurring one

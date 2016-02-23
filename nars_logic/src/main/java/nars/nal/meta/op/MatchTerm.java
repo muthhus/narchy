@@ -21,7 +21,7 @@ import static nars.$.seteMap;
  *
  * < (|, match [, constraints]) ==> (&|, derivation1, ... derivationN)>
  */
-abstract public class MatchTerm extends AtomicBooleanCondition<PremiseMatch> implements ProcTerm {
+abstract public class MatchTerm extends AtomicBooleanCondition<PremiseEval> implements ProcTerm {
 
     @Nullable
     public final ImmutableMap<Term, MatchConstraint> constraints;
@@ -60,7 +60,7 @@ abstract public class MatchTerm extends AtomicBooleanCondition<PremiseMatch> imp
         }
 
         @Override
-        @Deprecated public final boolean booleanValueOf(@NotNull PremiseMatch p) {
+        @Deprecated public final boolean booleanValueOf(@NotNull PremiseEval p) {
             p.matchAll(x, p.term.get() /* current term */, this, constraints);
             return true;
         }
@@ -86,7 +86,7 @@ abstract public class MatchTerm extends AtomicBooleanCondition<PremiseMatch> imp
         }
 
         @Override
-        @Deprecated public final boolean booleanValueOf(@NotNull PremiseMatch p) {
+        @Deprecated public final boolean booleanValueOf(@NotNull PremiseEval p) {
             p.matchAll(x, ((Compound) p.term.get()).term(subterm) /* current term */, callback, constraints);
             return true;
         }
@@ -104,7 +104,7 @@ abstract public class MatchTerm extends AtomicBooleanCondition<PremiseMatch> imp
     }
 
     /** delegates a partial or complete match to each of the known derivation handlers */
-    public boolean onMatch(@NotNull PremiseMatch m) {
+    public boolean onMatch(@NotNull PremiseEval m) {
 //        if (Global.DEBUG && derive.isEmpty())
 //            throw new RuntimeException("invalid MatchTerm with no derivation handlers:" + this);
 
@@ -124,7 +124,7 @@ abstract public class MatchTerm extends AtomicBooleanCondition<PremiseMatch> imp
     }
 
     @Override
-    public final void accept(PremiseMatch p) {
+    public final void accept(PremiseEval p) {
         throw new RuntimeException("n/a");
     }
 

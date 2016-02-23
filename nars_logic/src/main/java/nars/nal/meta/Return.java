@@ -21,7 +21,7 @@ public final class Return extends Atom implements ProcTerm {
     }
 
     @Override
-    public void accept(PremiseMatch versioneds) {
+    public void accept(PremiseEval versioneds) {
 
     }
 

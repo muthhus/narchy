@@ -8,7 +8,7 @@ import nars.Global;
 import nars.Op;
 import nars.nal.meta.AtomicBooleanCondition;
 import nars.nal.meta.BooleanCondition;
-import nars.nal.meta.PremiseMatch;
+import nars.nal.meta.PremiseEval;
 import nars.nal.meta.TaskBeliefPair;
 import nars.nal.meta.constraint.AndConstraint;
 import nars.nal.meta.constraint.MatchConstraint;
@@ -27,7 +27,7 @@ import static com.gs.collections.impl.factory.Maps.immutable;
 
 
 @Deprecated
-public class MatchTaskBelief extends AtomicBooleanCondition<PremiseMatch> {
+public class MatchTaskBelief extends AtomicBooleanCondition<PremiseEval> {
 
 
     @NotNull
@@ -49,8 +49,8 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseMatch> {
 
         this.term = pattern;
 
-        List<BooleanCondition<PremiseMatch>> pre = Global.newArrayList();
-        List<BooleanCondition<PremiseMatch>> code = Global.newArrayList();
+        List<BooleanCondition<PremiseEval>> pre = Global.newArrayList();
+        List<BooleanCondition<PremiseEval>> code = Global.newArrayList();
 
         compile(pattern, pre, code, constraints);
 
@@ -90,7 +90,7 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseMatch> {
     }
 
     @Override
-    public boolean booleanValueOf(PremiseMatch m) {
+    public boolean booleanValueOf(PremiseEval m) {
         throw new RuntimeException("this should not be called");
     }
 
@@ -102,8 +102,8 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseMatch> {
 
 
     private static void compile(@NotNull TaskBeliefPair pattern,
-                                @NotNull List<BooleanCondition<PremiseMatch>> pre,
-                                @NotNull List<BooleanCondition<PremiseMatch>> code,
+                                @NotNull List<BooleanCondition<PremiseEval>> pre,
+                                @NotNull List<BooleanCondition<PremiseEval>> code,
                                 @NotNull ListMultimap<Term, MatchConstraint> constraints) {
 
 
@@ -157,8 +157,8 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseMatch> {
     }
 
     private static void compileTaskBelief(
-            @NotNull List<BooleanCondition<PremiseMatch>> pre,
-            @NotNull List<BooleanCondition<PremiseMatch>> code, @Nullable Term task, @Nullable Term belief, TaskBeliefPair pattern, @NotNull ListMultimap<Term, MatchConstraint> constraints) {
+            @NotNull List<BooleanCondition<PremiseEval>> pre,
+            @NotNull List<BooleanCondition<PremiseEval>> code, @Nullable Term task, @Nullable Term belief, TaskBeliefPair pattern, @NotNull ListMultimap<Term, MatchConstraint> constraints) {
 
         boolean taskIsPatVar = task!=null && task.op() == Op.VAR_PATTERN;
 
@@ -239,10 +239,10 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseMatch> {
      * this would in theory be more efficient than performing a complete match for the redundancies
      * which we can determine as a precondition of the particular task/belief pair
      * before even beginning the match. */
-    static final class TaskBeliefEqualCondition extends AtomicBooleanCondition<PremiseMatch> {
+    static final class TaskBeliefEqualCondition extends AtomicBooleanCondition<PremiseEval> {
 
         @Override
-        public boolean booleanValueOf(@NotNull PremiseMatch m) {
+        public boolean booleanValueOf(@NotNull PremiseEval m) {
             Term[] x =  ((Compound)m.term.get()).terms();
             return x[0].equals(x[1]);
         }
@@ -257,7 +257,7 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseMatch> {
      * this would in theory be more efficient than performing a complete match for the redundancies
      * which we can determine as a precondition of the particular task/belief pair
      * before even beginning the match. */
-    static final class ComponentCondition extends AtomicBooleanCondition<PremiseMatch> {
+    static final class ComponentCondition extends AtomicBooleanCondition<PremiseEval> {
 
         @NotNull
         private final String id;
@@ -275,7 +275,7 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseMatch> {
         }
 
         @Override
-        public boolean booleanValueOf(@NotNull PremiseMatch m) {
+        public boolean booleanValueOf(@NotNull PremiseEval m) {
             Term[] x =  ((Compound)m.term.get()).terms();
             Term maybeContainer = x[this.container];
             if (!maybeContainer.isCompound())

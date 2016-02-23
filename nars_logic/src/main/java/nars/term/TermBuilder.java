@@ -6,7 +6,7 @@ import nars.Global;
 import nars.Op;
 import nars.nal.Tense;
 import nars.nal.meta.PremiseAware;
-import nars.nal.meta.PremiseMatch;
+import nars.nal.meta.PremiseEval;
 import nars.nal.meta.match.Ellipsis;
 import nars.nal.meta.match.EllipsisMatch;
 import nars.nal.nal8.Operator;
@@ -787,8 +787,8 @@ public interface TermBuilder {
         //Compound args = (Compound) Operator.opArgs((Compound) result).apply(f);
         Compound args = Operator.opArgs((Compound) result);
 
-        return ((tf instanceof PremiseAware) && (f instanceof PremiseMatch)) ?
-                ((PremiseAware) tf).function(args, (PremiseMatch) f) :
+        return ((tf instanceof PremiseAware) && (f instanceof PremiseEval)) ?
+                ((PremiseAware) tf).function(args, (PremiseEval) f) :
                 tf.function(args, this);
     }
 

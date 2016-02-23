@@ -20,7 +20,8 @@ public abstract class PatternAnswer implements Function<Task, List<Task>> {
     public final Term pattern;
 
     protected PatternAnswer(String pattern) {
-        this.pattern = Narsese.the().termRaw(pattern);
+        Term p = this.pattern = Narsese.the().termRaw(pattern);
+
     }
 
     @NotNull
@@ -42,13 +43,13 @@ public abstract class PatternAnswer implements Function<Task, List<Task>> {
         return null;
     }
 
-    @NotNull
-    private List<Task> process(Task question, @NotNull List<Task> answers) {
-        answers.forEach(a -> {
-//            a.setParentTask(question);
-        });
-        return answers;
-    }
+//    @NotNull
+//    private List<Task> process(Task question, @NotNull List<Task> answers) {
+//        answers.forEach(a -> {
+////            a.setParentTask(question);
+//        });
+//        return answers;
+//    }
 
     @Nullable
     public abstract List<Task> run(Task operationTask, Subst map1);

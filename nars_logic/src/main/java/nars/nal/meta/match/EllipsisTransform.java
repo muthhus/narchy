@@ -1,7 +1,7 @@
 package nars.nal.meta.match;
 
 import nars.Op;
-import nars.nal.meta.PremiseMatch;
+import nars.nal.meta.PremiseEval;
 import nars.nal.meta.PremiseRule;
 import nars.term.Compound;
 import nars.term.Term;
@@ -47,7 +47,7 @@ public class EllipsisTransform extends EllipsisOneOrMore {
     }
 
     @NotNull
-    public EllipsisMatch collect(@NotNull Compound y, int a, int b, @NotNull PremiseMatch subst) {
+    public EllipsisMatch collect(@NotNull Compound y, int a, int b, @NotNull PremiseEval subst) {
         if (from == Op.Imdex && (y.op().isImage())) {
 
             int rel = y.relation();

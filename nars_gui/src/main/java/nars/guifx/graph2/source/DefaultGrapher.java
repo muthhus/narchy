@@ -33,7 +33,7 @@ public class DefaultGrapher extends SpaceGrapher {
     public final ImplementationProperty<IterativeLayout> layoutType = new ImplementationProperty();
 
     public final NAR nar;
-    public final POJOPane menuButton;
+    public final POJOPane pojo;
 
 
 //    public DefaultGrapher(int capacity, ConceptsSource source) {
@@ -65,10 +65,10 @@ public class DefaultGrapher extends SpaceGrapher {
 
         runLater(() -> layoutChange.invalidated(null));
 
-        menuButton = new POJOPane(this);
-        menuButton.layout();
-        menuButton.autosize();
-        getChildren().add(menuButton);
+        pojo = new POJOPane(this);
+        pojo.layout();
+        pojo.autosize();
+        getChildren().add(pojo);
 
 
     }

@@ -4,7 +4,7 @@ import nars.NAR;
 import nars.bag.BLink;
 import nars.concept.Concept;
 import nars.concept.ConceptProcess;
-import nars.nal.meta.PremiseMatch;
+import nars.nal.meta.PremiseEval;
 import nars.task.Task;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
@@ -40,7 +40,7 @@ public class Derivelet {
      */
     public DeriveletContext context;
 
-    @Nullable PremiseMatch matcher;
+    @Nullable PremiseEval matcher;
 
 
     @NotNull
@@ -133,7 +133,7 @@ public class Derivelet {
         this.context = context;
         this.concept = new BLink(concept, 0, 0, 0); //TODO
         this.ttl = ttl;
-        this.matcher = new PremiseMatch(context.rng, DeriveletContext.deriver);
+        this.matcher = new PremiseEval(context.rng, DeriveletContext.deriver);
     }
 
     @NotNull

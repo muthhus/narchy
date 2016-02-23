@@ -2,7 +2,6 @@ package nars.nal.op;
 
 import nars.Op;
 import nars.Symbols;
-import nars.concept.Temporalize;
 import nars.nal.meta.*;
 import nars.truth.BeliefFunction;
 import nars.truth.DesireFunction;
@@ -11,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Evaluates the truth of a premise
  */
-abstract public class Solve extends AtomicBooleanCondition<PremiseMatch> {
+abstract public class Solve extends AtomicBooleanCondition<PremiseEval> {
 
     private final transient String id;
 
@@ -93,7 +92,7 @@ abstract public class Solve extends AtomicBooleanCondition<PremiseMatch> {
 //        return measureTruthOverride(m, punct, belief, desire);
 //    }
 
-    static boolean measure(@NotNull PremiseMatch m, char punct, TruthOperator belief, TruthOperator desire) {
+    static boolean measure(@NotNull PremiseEval m, char punct, TruthOperator belief, TruthOperator desire) {
         boolean r;
         switch (punct) {
             case Symbols.BELIEF:
@@ -128,7 +127,7 @@ abstract public class Solve extends AtomicBooleanCondition<PremiseMatch> {
             this.desire = desire;
         }
 
-        @Override public boolean booleanValueOf(@NotNull PremiseMatch m) {
+        @Override public boolean booleanValueOf(@NotNull PremiseEval m) {
             return measure(m,
                     m.punc(),
                     belief, desire);
@@ -147,7 +146,7 @@ abstract public class Solve extends AtomicBooleanCondition<PremiseMatch> {
             this.desire = desire;
         }
 
-        @Override public boolean booleanValueOf(@NotNull PremiseMatch m) {
+        @Override public boolean booleanValueOf(@NotNull PremiseEval m) {
             return measure(m, puncOverride, belief, desire);
         }
     }

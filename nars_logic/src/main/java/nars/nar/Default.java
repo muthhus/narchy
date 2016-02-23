@@ -15,7 +15,7 @@ import nars.concept.DefaultConceptProcess;
 import nars.concept.PremiseGenerator;
 import nars.data.Range;
 import nars.nal.Deriver;
-import nars.nal.meta.PremiseMatch;
+import nars.nal.meta.PremiseEval;
 import nars.task.Task;
 import nars.task.flow.SetTaskPerception;
 import nars.task.flow.TaskPerception;
@@ -450,8 +450,7 @@ public class Default extends AbstractNAR {
         /**
          * re-used, not to be used outside of this
          */
-        @NotNull
-        final PremiseMatch matcher;
+        final @NotNull PremiseEval matcher;
 
         /** derived tasks with truth confidence lower than this value are discarded. */
         @NotNull
@@ -465,7 +464,7 @@ public class Default extends AbstractNAR {
 
         public DefaultPremiseGenerator(@NotNull NAR nar, Deriver deriver, Collection<Task> resultsBuffer) {
             super(nar);
-            this.matcher = new PremiseMatch(nar.memory.random, deriver);
+            this.matcher = new PremiseEval(nar.memory.random, deriver);
             this.sharedResultBuffer = resultsBuffer;
             this.confMin = new MutableFloat(Global.TRUTH_EPSILON);
 

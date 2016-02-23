@@ -1,6 +1,6 @@
 package nars.nal;
 
-import nars.nal.meta.PremiseMatch;
+import nars.nal.meta.PremiseEval;
 import nars.nal.meta.PremiseRuleSet;
 import nars.nal.meta.TrieDeriver;
 import org.jetbrains.annotations.Nullable;
@@ -85,7 +85,7 @@ public abstract class Deriver  {
 //    }
 
     /** run an initialized rule matcher */
-    public abstract void run(PremiseMatch matcher);
+    public abstract void run(PremiseEval matcher);
 
 
 

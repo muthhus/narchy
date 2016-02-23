@@ -21,7 +21,7 @@ public interface TruthOperator {
      */
     @Nullable Truth apply(@NotNull Truth task, @Nullable Truth belief, @NotNull Memory m, float minConf);
 
-    default boolean apply(@NotNull PremiseMatch m) {
+    default boolean apply(@NotNull PremiseEval m) {
 
         Premise premise = m.currentPremise;
 

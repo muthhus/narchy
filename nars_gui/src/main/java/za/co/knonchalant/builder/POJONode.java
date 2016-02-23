@@ -563,7 +563,7 @@ public enum POJONode {
             else {
                 w.getItems().addAll(impls);
             }
-            d.bind(w.valueProperty());
+            d.bindBidirectional(w.valueProperty());
             return w;
         }
 

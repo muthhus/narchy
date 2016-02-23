@@ -1,6 +1,6 @@
 package nars.nal.meta.pre;
 
-import nars.nal.meta.PremiseMatch;
+import nars.nal.meta.PremiseEval;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,7 +21,7 @@ public class NotEqual extends PreCondition2 {
     }
 
     @Override
-    public final boolean test(PremiseMatch m, @Nullable Term a, @Nullable Term b) {
+    public final boolean test(PremiseEval m, @Nullable Term a, @Nullable Term b) {
         return (a != null) && (b != null) && !a.equals(b);
     }
 

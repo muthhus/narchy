@@ -3,7 +3,7 @@ package nars.nal.op;
 import nars.$;
 import nars.Op;
 import nars.nal.meta.PremiseAware;
-import nars.nal.meta.PremiseMatch;
+import nars.nal.meta.PremiseEval;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.TermBuilder;
@@ -29,7 +29,7 @@ public class substitute extends ImmediateTermTransform implements PremiseAware {
 
     @Nullable
     @Override
-    public Term function(@NotNull Compound p, @NotNull PremiseMatch r) {
+    public Term function(@NotNull Compound p, @NotNull PremiseEval r) {
         final Term[] xx = p.terms();
 
         //term to possibly transform
@@ -57,7 +57,7 @@ public class substitute extends ImmediateTermTransform implements PremiseAware {
 //    }
 
     @Nullable
-    public static final Term resolve(@NotNull PremiseMatch r, Term x) {
+    public static final Term resolve(@NotNull PremiseEval r, Term x) {
         //TODO make a half resolve that only does xy?
 
         Term ret = r.yx.get(x);
@@ -73,7 +73,7 @@ public class substitute extends ImmediateTermTransform implements PremiseAware {
     }
 
     @Nullable
-    public static Term subst(@NotNull PremiseMatch r, @NotNull Term term, @NotNull Term x, Term y) {
+    public static Term subst(@NotNull PremiseEval r, @NotNull Term term, @NotNull Term x, Term y) {
         if (x.equals(y))
             return term;
 
@@ -87,7 +87,7 @@ public class substitute extends ImmediateTermTransform implements PremiseAware {
     }
 
     @Nullable
-    public static Term subst(@NotNull PremiseMatch r, @NotNull Subst m, @NotNull Term term) {
+    public static Term subst(@NotNull PremiseEval r, @NotNull Subst m, @NotNull Term term) {
         //copy the new mappings to the match
         m.forEach( (k,v) -> {
             if (!r.putXY(k, v)) {

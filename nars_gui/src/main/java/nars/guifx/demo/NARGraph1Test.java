@@ -4,6 +4,7 @@ import nars.guifx.graph2.ConceptsSource;
 import nars.guifx.graph2.TermEdge;
 import nars.guifx.graph2.impl.HalfHalfIsoTriangleCanvasEdgeRenderer;
 import nars.guifx.graph2.impl.HexButtonVis;
+import nars.guifx.graph2.layout.Spiral;
 import nars.guifx.graph2.source.DefaultGrapher;
 import nars.guifx.graph2.source.SpaceGrapher;
 import nars.guifx.util.TabX;
@@ -33,10 +34,7 @@ public enum NARGraph1Test {
 //        n.input("<(&&, <#x --> hydochloric>, eat:#x) --> nice>. %0.75;0.90%");
 //        n.input("<(&&,a,b,ca)-->#x>?");
 
-        n.input("<a --> b>.");
-        n.input("<b --> c>.");
-        n.input("<c --> d>.");
-        n.run(5);
+
 
 
         DefaultGrapher g = new DefaultGrapher(
@@ -79,6 +77,7 @@ public enum NARGraph1Test {
                 new HalfHalfIsoTriangleCanvasEdgeRenderer()
                 //new BlurCanvasEdgeRenderer()
         );
+        g.layoutType.setValue(Spiral.class);
 
         //g.setLayout(HyperassociativeMap2D.class);
         //g.pan(2000,2000);
@@ -91,7 +90,15 @@ public enum NARGraph1Test {
     public static void main(String[] args)  {
 
         Default n = new Default(1024,1,1,2);
+        n.input("<a --> b>.");
+        n.input("<b --> c>.");
+        n.input("<c --> d>.");
+        n.run(5);
 
+        graphIDE(n);
+    }
+
+    public static void graphIDE(Default n) {
         NARide.show(n.loop(), ide -> {
 
             //ide.addView(new IOPane(n));
@@ -103,26 +110,6 @@ public enum NARGraph1Test {
             //n.frame(5);
 
         });
-
-//        NARfx.run((a,b)-> {
-//            b.setScene(
-//                new Scene(newGraph(n), 600, 600)
-//            );
-//            b.show();
-//
-//            n.spawnThread(250, x -> {
-//
-//            });
-//        });
-
-
-
-
-
-//        TextOutput.out(n);
-//        new Thread(() -> n.loop(185)).start();
-
-
     }
 
 }

@@ -42,7 +42,7 @@ public class Derive extends AtomicStringConstant implements ProcTerm {
     @NotNull
     public final Term conclusionPattern;
 
-    @NotNull private final BooleanCondition<PremiseMatch> postMatch; //TODO use AND condition
+    @NotNull private final BooleanCondition<PremiseEval> postMatch; //TODO use AND condition
 
     /** whether this a single or double premise derivation; necessary in case premise
      * does have a belief but it was not involved in determining Truth */
@@ -95,7 +95,7 @@ public class Derive extends AtomicStringConstant implements ProcTerm {
     /** main entry point for derivation result handler.
      * @return true to allow the matcher to continue matching,
      * false to stop it */
-    @Override public final void accept(@NotNull PremiseMatch m) {
+    @Override public final void accept(@NotNull PremiseEval m) {
 
         Term derivedTerm = m.resolve(conclusionPattern);
 
@@ -151,7 +151,7 @@ public class Derive extends AtomicStringConstant implements ProcTerm {
 
 
     /** part 1 */
-    private void derive(@NotNull PremiseMatch p, @Nullable Term t) {
+    private void derive(@NotNull PremiseEval p, @Nullable Term t) {
 
         if (t.varPattern()!=0) {
             return;
