@@ -1,4 +1,4 @@
-package nars.nal.meta.pre;
+package nars.nal.meta.op;
 
 import nars.concept.ConceptProcess;
 import nars.nal.meta.AtomicBooleanCondition;

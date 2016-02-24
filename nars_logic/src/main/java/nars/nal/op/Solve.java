@@ -150,5 +150,7 @@ abstract public class Solve extends AtomicBooleanCondition<PremiseEval> {
             return measure(m, puncOverride, belief, desire);
         }
     }
+
+
 }
 

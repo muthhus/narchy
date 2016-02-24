@@ -4,7 +4,6 @@ dependencies {
   compile project(':nars_util')
   compile project(':nars_logic')
   compile project(':nars_gui')
-    compile group: 'org.codehaus.janino', name: 'janino', version:'2.7.8'
     compile group: 'org.boofcv', name: 'visualize', version:'0.21'
     compile group: 'org.boofcv', name: 'WebcamCapture', version:'0.21'
     compile group: 'org.jogamp.gluegen', name: 'gluegen-rt-main', version:'2.3.2'

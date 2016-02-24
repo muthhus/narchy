@@ -12,6 +12,7 @@ import nars.op.data.flat;
 import nars.op.data.intToBitSet;
 import nars.op.data.similaritree;
 import nars.op.out.echo;
+import nars.op.sys.java.java;
 import nars.op.sys.reset;
 import nars.op.out.say;
 import nars.op.mental.schizo;
@@ -61,7 +62,6 @@ public abstract class AbstractNAR extends NAR {
         rng = new XorShift128PlusRandom(1);
 
         initDefaults();
-
 
     }
 
@@ -167,8 +167,10 @@ public abstract class AbstractNAR extends NAR {
 
     public final AbstractOperator[] defaultOperators = {
 
+            new java(),
+
             //system control
-            new echo(),
+
             //PauseInput.the,
             new reset(),
             //new eval(),

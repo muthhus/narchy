@@ -1,4 +1,4 @@
-package nars.nal.meta.pre;
+package nars.nal.meta.op;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ListMultimap;

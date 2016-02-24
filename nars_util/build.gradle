@@ -25,6 +25,7 @@ dependencies {
     }
     compile(group:'de.ruedigermoeller',name:'fst', version:'2.44')
 
+    compile group: 'org.codehaus.janino', name: 'janino', version:'2.7.8'
 
     compile(group:'org.encog', name:'encog-core',version:'3.3.0')
 

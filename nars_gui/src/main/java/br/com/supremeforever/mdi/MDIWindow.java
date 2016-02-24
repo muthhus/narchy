@@ -421,13 +421,14 @@ public class MDIWindow extends BorderPane {
 
         st.play();
         borderPane.fireEvent(new MDIEvent(null, MDIEvent.EVENT_CLOSED));
-        st.setOnFinished((ActionEvent t) -> {
 
-            MDICanvas mdiCanvas = (MDICanvas) this.getParent().getParent();
-            ObservableList<Node> cc = mdiCanvas.getChildren();
+        st.setOnFinished((ActionEvent t) -> {
+            String bpid = borderPane.getId();
+
+            ObservableList<Node> cc = ((MDICanvas) this.getParent()).getChildren();
             for (int i = 0; i < cc.size(); i++) {
                 MDIWindow window = (MDIWindow) cc.get(i);
-                if (window.getId().equals(borderPane.getId())) {
+                if (window.getId().equals(bpid)) {
                     cc.remove(i);
                 }
             }

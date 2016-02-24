@@ -500,4 +500,13 @@ public class NAL8Test extends AbstractNALTester {
 
 
     }
+
+    @Test
+    public void goalInferredFromSimilarity()  {
+        TestNAR tester = test();
+
+        tester.input("(a:b<->c:d).");
+        tester.input("c:d!");
+        tester.mustDesire(cycles, "a:b", 1.0f, 0.81f);
+    }
 }

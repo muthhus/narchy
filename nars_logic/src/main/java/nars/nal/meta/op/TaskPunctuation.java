@@ -1,4 +1,4 @@
-package nars.nal.meta.pre;
+package nars.nal.meta.op;
 
 import nars.Symbols;
 import nars.nal.meta.AtomicBooleanCondition;

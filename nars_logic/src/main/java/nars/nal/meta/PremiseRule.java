@@ -15,7 +15,7 @@ import nars.nal.meta.match.Ellipsis;
 import nars.nal.meta.match.EllipsisOneOrMore;
 import nars.nal.meta.match.EllipsisTransform;
 import nars.nal.meta.match.EllipsisZeroOrMore;
-import nars.nal.meta.pre.*;
+import nars.nal.meta.op.*;
 import nars.nal.op.*;
 import nars.op.data.differ;
 import nars.op.data.intersect;
@@ -112,8 +112,7 @@ public class PremiseRule extends GenericCompound {
 
     protected String source;
 
-    @Nullable
-    public MatchTaskBelief match;
+    public @Nullable MatchTaskBelief match;
 
     private Temporalize temporalize = Temporalize.Auto;
 
@@ -181,16 +180,40 @@ public class PremiseRule extends GenericCompound {
 
         List<Term> l = Global.newArrayList(prePreconditions.length + postPreconditions.length + 4 /* estimate */);
 
+        List<Term> beforeMatch = Global.newArrayList();
         for (BooleanCondition p : prePreconditions)
             p.addConditions(l);
 
-        match.addPreConditions(l); //pre-conditions
+
 
         Solve truth = solver(post,
                 this, anticipate, immediate_eternalize, postPreconditions, temporalize
         );
 
-        truth.addConditions(l);
+
+        beforeMatch.add(truth);
+        match.addPreConditions(beforeMatch); //pre-conditions
+
+        //TODO sort beforeMatch because the order can determine performance HACK
+
+        if (beforeMatch.size() > 1) {
+            Term second = beforeMatch.get(1);
+
+            //pull these Task comparisons to the front
+            if ((second instanceof TaskPunctuation) ||
+                (second instanceof TaskNegative)) {
+                beforeMatch.remove(1);
+                beforeMatch.add(0, second);
+            }
+        }
+
+//        Collections.sort(beforeMatch, (a,b)-> {
+//
+//        });
+
+
+
+        l.addAll(beforeMatch);
 
         match.addConditions(l); //the match itself
 

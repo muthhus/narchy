@@ -1,4 +1,4 @@
-package nars.nal.meta.pre;
+package nars.nal.meta.op;
 
 import nars.nal.meta.AtomicBooleanCondition;
 import nars.nal.meta.PremiseEval;
