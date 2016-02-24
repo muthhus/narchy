@@ -4,6 +4,7 @@ import nars.Global;
 import nars.Memory;
 import nars.NAR;
 import nars.concept.Concept;
+import nars.concept.DefaultConceptBuilder;
 import nars.nal.Deriver;
 import nars.nal.meta.PremiseRule;
 import nars.nal.nal8.AbstractOperator;
@@ -22,6 +23,7 @@ import nars.op.mental.*;
 import nars.op.data.complexity;
 import nars.op.data.reflect;
 import nars.op.sys.js;
+import nars.term.Term;
 import nars.term.TermIndex;
 import nars.time.Clock;
 import nars.util.data.random.XorShift128PlusRandom;
@@ -30,6 +32,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 
 /**
@@ -42,15 +45,14 @@ import java.util.function.Consumer;
 public abstract class AbstractNAR extends NAR {
 
 
-    /** default for new concepts */
-    @Deprecated int taskLinkBagSize;
-    /** default for new concepts */
-    @Deprecated int termLinkBagSize;
 
 
     //public final Random rng = new RandomAdaptor(new MersenneTwister(1));
     @NotNull
     public final Random rng;
+
+    public Function<Term,Concept> conceptBuilder;
+
 
     public AbstractNAR(@NotNull Clock clock) {
         this(new Memory(clock, TermIndex.memory(1024) ));
@@ -121,8 +123,7 @@ public abstract class AbstractNAR extends NAR {
     protected void initDefaults() {
 
         final Memory m = this.memory;
-        setTaskLinkBagSize(12);
-        setTermLinkBagSize(16);
+
 
         m.duration.set(5);
 
@@ -145,7 +146,13 @@ public abstract class AbstractNAR extends NAR {
         m.executionThreshold.setValue(Global.TRUTH_EPSILON);
 
         m.shortTermMemoryHistory.set(2);
+
+
+        this.conceptBuilder = newDefaultConceptBuilder();
+
     }
+
+    abstract protected Function<Term, Concept> newDefaultConceptBuilder();
 
 
 //    public static final AbstractOperator[] exampleOperators = {
@@ -296,6 +303,11 @@ public abstract class AbstractNAR extends NAR {
         return this;
     }
 
+    protected final Concept newConcept(Term t) {
+        return conceptBuilder.apply(t);
+    }
+
+
 
 
     //    /**
@@ -310,17 +322,6 @@ public abstract class AbstractNAR extends NAR {
 
 
 
-    @NotNull
-    public AbstractNAR setTaskLinkBagSize(int taskLinkBagSize) {
-        this.taskLinkBagSize = taskLinkBagSize;
-        return this;
-    }
-
-    @NotNull
-    public AbstractNAR setTermLinkBagSize(int termLinkBagSize) {
-        this.termLinkBagSize = termLinkBagSize;
-        return this;
-    }
 
     @NotNull
     @Override

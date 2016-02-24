@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import nars.NAR;
 import nars.bag.BLink;
 import nars.concept.Concept;
+import nars.concept.DefaultConceptBuilder;
 import nars.nar.AbstractNAR;
 import nars.nar.Default;
 import nars.term.Term;
@@ -16,6 +17,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static org.junit.Assert.*;
@@ -32,9 +34,13 @@ public class LinkageTest extends AbstractNALTester {
     @Parameterized.Parameters(name= "{0}")
     public static Iterable<Supplier> configurations() {
         return Lists.newArrayList(() -> {
-            Default d = new Default(0, 0, 0, 0);
-            d.setTermLinkBagSize(TERM_LINK_BAG_SIZE);
-            d.setTaskLinkBagSize(0);
+            Default d = new Default(0, 0, 0, 0) {
+
+                @Override
+                public Function<Term, Concept> newDefaultConceptBuilder() {
+                    return new DefaultConceptBuilder(this, TERM_LINK_BAG_SIZE, 1);
+                }
+            };
             d.nal(6);
             return d;
         });

@@ -173,9 +173,7 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
 
         @Override
         public void clear() {
-//            super.clear();
-//            removeFromMap();
-            throw new RuntimeException("what is this supposed to do");
+            throw new UnsupportedOperationException();
         }
 
         private void removeFromMap() {

@@ -57,12 +57,12 @@ public class GrammarTest2 {
         Lobjects o = new Lobjects(n);
         this.tape = o.the("tape", Tape.class,
                 //"aaabbbaaabbb               ",
-                "aaabbbababab",
+                "abbbccc",
                 charRate);
     }
     
     protected void run() throws Exception {
-                //Global.DEBUG = true;
+        Global.DEBUG = true;
 
         
 
@@ -70,8 +70,8 @@ public class GrammarTest2 {
         
         q = new NarQ(n);
 
-        n.input("(#x-->(/,^Tape,current,tape,(),_))? :/:");
-        n.input("<?x ==> ($y-->(/,^Tape,current,tape,(),_))>?");
+        //n.input("(#x-->(/,^Tape,current,tape,(),_))? :/:");
+        //n.input("<?x ==> ($y-->(/,^Tape,current,tape,(),_))>?");
 
         //n.input("($1 --> ")
 
@@ -109,8 +109,8 @@ public class GrammarTest2 {
         n.memory.DEFAULT_GOAL_PRIORITY = 0.5f;
 
         n.memory.duration.set(Math.ceil(charRate.floatValue()/4f));
-        n.memory.shortTermMemoryHistory.set(3);
-        n.memory.cyclesPerFrame.set(4);
+        n.memory.shortTermMemoryHistory.set(2);
+        n.memory.cyclesPerFrame.set(2);
         
         //n.initNAL9();
 

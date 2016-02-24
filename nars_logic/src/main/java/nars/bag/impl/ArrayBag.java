@@ -207,7 +207,7 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
     @Nullable
     @Override
     public BLink<V> pop() {
-        throw new RuntimeException("unimpl");
+        throw new UnsupportedOperationException();
     }
 
 
@@ -220,45 +220,20 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
      */
     @Override
     public BLink<V> put(V i, Budgeted b, float scale) {
+//    }
+//
+//    public BLink<V> putFast(V i, Budgeted b, float scale) {
+//        BLink<V> existing = get(i);
+//
+//    }
 
+    ///** updates an item, merging and re-inserting inserting */
+    //public BLink<V> putSync(V i, Budgeted b, float scale) {
         BLink<V> existing = get(i);
 
-        if (existing != null) {
-
-            //its already here
-
-            if (existing!=b)
-                merge(existing, b, scale);
-
-            update(existing);
-
-            return existing;
-
-        } else {
-
-            BLink<V> newBudget;
-            if (!(b instanceof BLink)) {
-                newBudget = new BLink<>(i, b, scale);
-            } else {
-                //use provided
-                newBudget = (BLink)b;
-                newBudget.commit();
-            }
-
-            BLink<V> displaced = put( i, newBudget);
-            if (displaced!=null) {
-                if (displaced == newBudget) {
-                    return null; //wasnt inserted
-                }
-                /*else {
-                    //remove what was been removed from the items list
-                    removeKey(displaced.get());
-                }*/
-            }
-
-            return newBudget;
-
-        }
+        return (existing != null) ?
+                putExists(b, scale, existing) :
+                putNew(i, b, scale);
 
 //        //TODO optional displacement until next update, allowing sub-threshold to grow beyond threshold
 //        BagBudget<V> displaced = null;
@@ -274,6 +249,43 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
 
     }
 
+    public BLink<V> putExists(Budgeted b, float scale, BLink<V> existing) {
+        BLink<V> newBudget;//its already here
+
+        if (existing!=b)
+            merge(existing, b, scale);
+
+        //update(existing); //<- delaying/buffering this is the whole reason of the buffering
+
+        newBudget = existing;
+        return newBudget;
+    }
+
+    @Nullable
+    protected BLink<V> putNew(V i, Budgeted b, float scale) {
+        BLink<V> newBudget;
+        if (!(b instanceof BLink)) {
+            newBudget = new BLink<>(i, b, scale);
+        } else {
+            //use provided
+            newBudget = (BLink)b;
+            newBudget.commit();
+        }
+
+        {
+            BLink<V> displaced = put(i, newBudget);
+            if (displaced != null) {
+                if (displaced == newBudget) {
+                    return null;
+                }
+                /*else {
+                    //remove what was been removed from the items list
+                    removeKey(displaced.get());
+                }*/
+            }
+        }
+        return newBudget;
+    }
 
 
     @Override

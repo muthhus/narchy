@@ -75,8 +75,8 @@ public class Versioning extends FasterList<Versioned> {
     }
 
     public void doRevert(int when, int was) {
-        if (was < when)
-            throw new RuntimeException("reverting to future time");
+        //if (was < when)
+            //throw new RuntimeException("reverting to future time");
         now = when;
 
         int s = size()-1;
@@ -119,7 +119,7 @@ public class Versioning extends FasterList<Versioned> {
         FasterList vStack = v.value;
 
         ////TODO maybe flush these periodically for GC
-        vStack.clear();
+        vStack.clearFast();
 
         //TODO reject arrays that have grown beyond a certain size
         valueStackPool.put(vStack);

@@ -15,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
@@ -55,15 +56,17 @@ public class Terminal extends AbstractNAR {
     }
 
     @Override
+    protected Function<Term, Concept> newDefaultConceptBuilder() {
+        return (t) -> {
+            return null;
+        };
+    }
+
+    @Override
     public Concept conceptualize(Termed termed, Budget activation, float scale, float toTermLinks) {
         return concept(termed); //ignore activation
     }
 
-    @Override @Nullable
-    protected Concept newConcept(Term t) {
-        //throw new UnsupportedOperationException();
-        return null;
-    }
 
     @Override
     public float conceptPriority(Termed termed, float priIfNonExistent) {

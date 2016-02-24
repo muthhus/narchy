@@ -34,6 +34,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * Various extensions enabled
@@ -115,7 +116,7 @@ public class Default extends AbstractNAR {
     protected DefaultCycle initCore(int activeConcepts, int conceptsFirePerCycle, int termLinksPerConcept, int taskLinksPerConcept, PremiseGenerator pg) {
 
 
-        DefaultCycle c = new DefaultCycle(this, newDeriver(), newConceptBag(activeConcepts), pg);
+        DefaultCycle c = new DefaultCycle(this, newDeriver(), pg);
 
         //TODO move these to a PremiseGenerator which supplies
         // batches of Premises
@@ -134,47 +135,9 @@ public class Default extends AbstractNAR {
         return new DefaultPremiseGenerator(this, Deriver.getDefaultDeriver());
     }
 
-    @NotNull
-    public Bag<Concept> newConceptBag(int initialCapacity) {
-        return new CurveBag<Concept>(initialCapacity, rng)
-                //.mergePlus();
-                .merge(BudgetMerge.plusDQBlend);
-    }
 
-    protected Concept newConcept(Term t) {
 
-        int termLinkBagSize = 32;
-        int taskLinkBagSize = 32;
 
-        Random random = memory.random;
-
-        Bag<Task> taskLinks =
-                new CurveBag<Task>(taskLinkBagSize, random)
-                        .merge(BudgetMerge.plusDQBlend);
-
-        Bag<Termed> termLinks =
-                new CurveBag<Termed>(termLinkBagSize, random)
-                        .merge(BudgetMerge.plusDQBlend);
-
-        return (!(t.isCompound())) ?
-
-                newAtomConcept(t, taskLinks, termLinks) :
-
-                newCompoundConcept(t, taskLinks, termLinks);
-    }
-
-    @NotNull
-    protected Concept newCompoundConcept(Term t, Bag<Task> taskLinks, Bag<Termed> termLinks) {
-        return (!(t instanceof Space)) ?
-
-                new DefaultConcept(t, taskLinks, termLinks, this) :
-
-                new SpaceConcept((Space)t, taskLinks, termLinks, this);
-    }
-
-    protected @NotNull AtomConcept newAtomConcept(Term t, Bag<Task> taskLinks, Bag<Termed> termLinks) {
-        return new AtomConcept(t, termLinks, taskLinks);
-    }
 
 
 //    public Bag<Concept> newConceptBagAggregateLinks(int initialCapacity) {
@@ -284,7 +247,6 @@ public class Default extends AbstractNAR {
 
     public void conceptualizeLink(Budget activation, float toTermLinks, Concept c, BLink<? extends Termed> bt, float s) {
 
-
         if (s * activation.pri() > Global.BUDGET_PROPAGATION_EPSILON) {
 
             Concept tc = conceptualize(bt.get(), activation, s, toTermLinks);
@@ -302,8 +264,12 @@ public class Default extends AbstractNAR {
         return this;
     }
 
-
-
+    @Override
+    public Function<Term, Concept> newDefaultConceptBuilder() {
+        return new DefaultConceptBuilder(this,
+                12 /* tasklinks*/,
+                16 /*termlinks */);
+    }
 
     /**
      * The original deterministic memory cycle implementation that is currently used as a standard
@@ -512,8 +478,17 @@ public class Default extends AbstractNAR {
 
 
 
-        public DefaultCycle(@NotNull NAR nar, Deriver deriver, Bag<Concept> concepts, PremiseGenerator premiseGenerator) {
-            super(nar, deriver, concepts, premiseGenerator);
+        public DefaultCycle(@NotNull NAR nar, Deriver deriver, PremiseGenerator premiseGenerator) {
+            super(nar, deriver, newConceptBag(nar.memory.random,16), premiseGenerator);
+        }
+
+
+
+        @NotNull
+        public static Bag<Concept> newConceptBag(Random r, int initialCapacity) {
+            return new CurveBag<Concept>(initialCapacity, r)
+                    //.mergePlus();
+                    .merge(BudgetMerge.plusDQBlend);
         }
 
 
@@ -588,5 +563,7 @@ public class Default extends AbstractNAR {
         protected @NotNull ConceptProcess newPremise(BLink<? extends Concept> concept, BLink<? extends Task> taskLink, BLink<? extends Termed> termLink, Task belief) {
             return new DefaultConceptProcess(nar, concept, taskLink, termLink, belief, sharedResultBuffer);
         }
+
     }
+
 }
