@@ -6,12 +6,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.StringTokenizer;
+import java.util.*;
 
+import com.google.common.collect.Lists;
+import com.gs.collections.api.set.ImmutableSet;
+import com.gs.collections.impl.factory.Sets;
+import nars.$;
 import nars.NAR;
 import nars.op.sys.java.Lobjects;
 import org.apache.commons.vfs2.*;
@@ -200,7 +200,7 @@ public class shell {
                 throw new Exception("USAGE: rm <path>");
             }
 
-            final FileObject file = mgr.resolveFile(cwd, cmd[1]);
+            final FileObject file = resolveFileRelativeToCwd(cmd, 1);
             file.delete(Selectors.SELECT_SELF);
         }
 
@@ -212,8 +212,8 @@ public class shell {
                 throw new Exception("USAGE: cp <src> <dest>");
             }
 
-            final FileObject src = mgr.resolveFile(cwd, cmd[1]);
-            FileObject dest = mgr.resolveFile(cwd, cmd[2]);
+            final FileObject src = resolveFileRelativeToCwd(cmd, 1);
+            FileObject dest = resolveFileRelativeToCwd(cmd, 2);
             if (dest.exists() && dest.getType() == FileType.FOLDER) {
                 dest = dest.resolveFile(src.getName().getBaseName());
             }
@@ -230,7 +230,7 @@ public class shell {
             }
 
             // Locate the file
-            final FileObject file = mgr.resolveFile(cwd, cmd[1]);
+            final FileObject file = resolveFileRelativeToCwd(cmd, 1);
 
             // Dump the contents to System.out
             FileUtil.writeContent(file, System.out);
@@ -268,6 +268,7 @@ public class shell {
             System.out.println("Current folder is " + cwd.getName());
         }
 
+
         /**
          * Does an 'ls' command.
          */
@@ -283,7 +284,7 @@ public class shell {
 
             final FileObject file;
             if (cmd.length > pos) {
-                file = mgr.resolveFile(cwd, cmd[pos]);
+                file = resolveFileRelativeToCwd(cmd, pos);
             } else {
                 file = cwd;
             }
@@ -304,6 +305,10 @@ public class shell {
             }
         }
 
+        private FileObject resolveFileRelativeToCwd(String[] cmd, int pos) throws FileSystemException {
+            return mgr.resolveFile(cwd, cmd[pos]);
+        }
+
         /**
          * Does a 'touch' command.
          */
@@ -311,13 +316,27 @@ public class shell {
             if (cmd.length < 2) {
                 throw new Exception("USAGE: touch <path>");
             }
-            final FileObject file = mgr.resolveFile(cwd, cmd[1]);
+            final FileObject file = resolveFileRelativeToCwd(cmd, 1);
             if (!file.exists()) {
                 file.createFile();
             }
             file.getContent().setLastModifiedTime(System.currentTimeMillis());
         }
 
+        public Object ls() {
+            try {
+                final FileObject file = cwd;
+
+                        //resolveFileRelativeToCwd(new String[] { "." }, 0);
+                if (file.getType() == FileType.FOLDER) {
+                    return $.seteCollection(Lists.newArrayList(file.getChildren()));
+                } else {
+                    return file;
+                }
+            } catch (Exception e) {
+                return null; //throw new RuntimeException(e.getCause());
+            }
+        }
         /**
          * Lists the children of a folder.
          */
@@ -338,6 +357,7 @@ public class shell {
                     System.out.println();
                 }
             }
+
         }
 
         /**

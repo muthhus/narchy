@@ -17,7 +17,7 @@ public class ShellTest {
     static {
         Global.DEBUG = true;
     }
-    final NAR d = new Default(1024, 4, 3, 3);
+    final NAR d = new Default(1024, 8, 2, 3);
     final shell s = new shell(d);
 
     public ShellTest() throws Exception {
@@ -44,12 +44,11 @@ public class ShellTest {
         assertTrue(d.memory.exe.containsKey($.operator("sh")));
 
         d.log();
-        d.input("(go($w) ==> sh($w,I,(),#z)). %1.0;1.0%");
-        //d.input("sh(ls,I,(),#x)!");
-        //d.input("go(ls)! :|:");
-        d.input("go(ls). :|:");
 
-        d.run(15);
+        d.input("(go($w) <=> sh($w,I,(),#z)). %1.0;0.95%");
+        d.input("go(ls)! :|:");
+
+        d.run(145);
         //expect: ("file:///home/me/opennars/nars_logic"-->(/,^sh,pwd,I,(),_)). :|: %1.0;.90%
     }
 }

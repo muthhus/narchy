@@ -8,6 +8,8 @@ import ch.qos.logback.core.ConsoleAppender;
 import nars.op.sys.java.AtomObject;
 import nars.nal.meta.match.VarPattern;
 import nars.nal.nal8.Operator;
+import nars.op.sys.java.DefaultTermizer;
+import nars.op.sys.java.Termizer;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.*;
@@ -26,8 +28,11 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
+import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 import static nars.Op.*;
 import static nars.nal.Tense.ITERNAL;
@@ -292,7 +297,34 @@ public enum $  {
     public static Compound sete(@NotNull Collection<? extends Term> t) {
         return (Compound) terms.finish(SET_EXT, -1, TermSet.the(t));
     }
+    @NotNull
+    public static Compound seteCollection(@NotNull Collection<? extends Object> c) {
 
+        Termizer z = new DefaultTermizer();
+
+        //return (Compound) terms.finish(SET_EXT, -1, TermSet.the(t));
+        return $.sete(
+                (Collection<? extends Term>) c.stream().map(
+                        z::term).collect( toCollection((Supplier<TreeSet>) TreeSet::new)));
+
+    }
+    /** construct set_ext of key,value pairs from a Map */
+    @NotNull
+    public static Compound seteMap(@NotNull Map<Term,Term> map) {
+        return $.sete(
+                (Collection<? extends Term>) map.entrySet().stream().map(
+                        e -> $.p(e.getKey(),e.getValue()))
+                        .collect( toList())
+        );
+    }
+    @NotNull
+    public static <X> Compound seteMap(@NotNull Map<Term,? extends X> map, @NotNull Function<X, Term> toTerm) {
+        return $.sete(
+                (Collection<? extends Term>) map.entrySet().stream().map(
+                        e -> $.p(e.getKey(), toTerm.apply(e.getValue())))
+                        .collect( toList())
+        );
+    }
 
    private static Term[] array(@NotNull Collection<? extends Term> t) {
         return t.toArray(new Term[t.size()]);
@@ -534,23 +566,7 @@ public enum $  {
         throw new RuntimeException(o + " not a variable");
     }
 
-    /** construct set_ext of key,value pairs from a Map */
-    @NotNull
-    public static Compound seteMap(@NotNull Map<Term,Term> map) {
-        return $.sete(
-                (Collection<? extends Term>) map.entrySet().stream().map(
-                    e -> $.p(e.getKey(),e.getValue()))
-                .collect( toList())
-        );
-    }
-    @NotNull
-    public static <X> Compound seteMap(@NotNull Map<Term,? extends X> map, @NotNull Function<X, Term> toTerm) {
-        return $.sete(
-                (Collection<? extends Term>) map.entrySet().stream().map(
-                    e -> $.p(e.getKey(), toTerm.apply(e.getValue())))
-                .collect( toList())
-        );
-    }
+
 
 
     /** create a literal atom from a class (it's name) */

@@ -38,6 +38,7 @@ public enum DesireFunction implements TruthOperator {
             return TruthFunctions.desireWeak(T, B);
         }
     },
+
     Induction() {
         @Nullable
         @Override public Truth apply(@NotNull final Truth T, @Nullable final Truth B, Memory m, float minConf) {
@@ -71,6 +72,7 @@ public enum DesireFunction implements TruthOperator {
             return TruthFunctions.desireStrong(T, newDefaultTruth(m), minConf);
         }
     },
+
     Intersection() {
         @Nullable
         @Override public Truth apply(@NotNull final Truth T, @Nullable final Truth B, Memory m, float minConf) {
