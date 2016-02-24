@@ -51,7 +51,7 @@ public class SortedTaskPerception extends TaskPerception {
 //    }
 
     @Override
-    public final void nextFrame(@NotNull Consumer<Task> receiver) {
+    public final void nextFrame(@NotNull Consumer<Task[]> receiver) {
         ItemAccumulator<Task> buffer = this.buffer;
         int available = size();
         if (available > 0) {
@@ -63,7 +63,7 @@ public class SortedTaskPerception extends TaskPerception {
             }
 
             buffer.bag().pop(
-                t -> receiver.accept(t.get()),
+                t -> receiver.accept(new Task[] { t.get() }),
                 Math.min(available, inputsPerCyc)
             );
         }

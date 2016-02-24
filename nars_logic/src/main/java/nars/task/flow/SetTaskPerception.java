@@ -20,11 +20,12 @@ public final class SetTaskPerception extends TaskPerception {
 
 
     private final BudgetedSet<Task> data;
+    private Task[] tmp = null;
 
 
-    public SetTaskPerception(@NotNull Memory m, Consumer<Task> receiver, BudgetMerge merge) {
+    public SetTaskPerception(@NotNull Memory m, Consumer<Task[]> receiver, BudgetMerge merge) {
         super(m, receiver);
-        this.data = new BudgetedSet(merge);
+        this.data = new BudgetedSet(merge, Task[]::new);
     }
 
 // this isnt safe
@@ -39,12 +40,9 @@ public final class SetTaskPerception extends TaskPerception {
     }
 
     @Override
-    protected final void nextFrame(@NotNull Consumer<Task> receiver) {
+    protected final void nextFrame(@NotNull Consumer<Task[]> receiver) {
 
-
-        //create an array copy in case the table is modified as a result of executing a task
-        data.flush(receiver, Task[]::new);
-
+        data.flushAll(receiver);
     }
 
     @Override

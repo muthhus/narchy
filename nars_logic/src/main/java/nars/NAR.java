@@ -998,10 +998,12 @@ public abstract class NAR implements Level, Consumer<Task> {
         input(new TaskStream(taskStream));
     }
 
-    @Nullable
-    protected final void process(@NotNull Task[] input) {
-        for (Task t : input)
+    protected final void process(Task[] input) {
+        for (Task t : input) {
+            if (t == null)
+                break;
             process(t);
+        }
     }
 
     /**

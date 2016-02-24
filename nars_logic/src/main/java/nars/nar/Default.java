@@ -423,9 +423,10 @@ public class Default extends AbstractNAR {
 
         protected final void cycle(Memory memory) {
 
+            commit();
+
             fireConcepts(conceptsFiredPerCycle.intValue());
 
-            commit();
         }
 
         /** apply pending activity at the end of a cycle */

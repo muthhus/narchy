@@ -11,6 +11,9 @@ import nars.util.data.sorted.SortedIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -27,7 +30,7 @@ public class BufferedArrayBag<X> extends ArrayBag<X> {
 //    }
     public BufferedArrayBag(@NotNull SortedIndex<BLink<X>> items) {
         super(items);
-        pending = new BudgetedSet(BudgetMerge.plusDQBlend);
+        pending = new BudgetedSet(BudgetMerge.plusDQBlend, new LinkedHashMap(), BLink[]::new);
     }
 
     @Override
@@ -35,8 +38,11 @@ public class BufferedArrayBag<X> extends ArrayBag<X> {
         return pending.put(new BLink(i, b));
     }
 
-    private final Consumer<BLink<X>> flushAction = (BLink<X> b) -> {
-        super.put(b.id, b, 1f);
+    private final Consumer<BLink<X>[]> flushAction = (BLink<X>[] b) -> {
+        for (BLink<X> c : b) {
+            if (c == null) break;
+            super.put(c.id, c, 1f);
+        }
     };
 
     @Nullable
@@ -53,6 +59,13 @@ public class BufferedArrayBag<X> extends ArrayBag<X> {
         return super.filter(forEachIfFalseThenRemove);
     }
 
+    @NotNull
+    @Override
+    public Bag<X> sample(int n, Consumer<? super BLink<X>> target) {
+        commit(false);
+        return super.sample(n, target);
+    }
+
     @Override
     public final void commit() {
         commit(true);
@@ -65,10 +78,13 @@ public class BufferedArrayBag<X> extends ArrayBag<X> {
      */
     private final void commit(boolean hard) {
         BudgetedSet<BLink<X>> p = this.pending;
-        if (!p.isEmpty()) {
-            p.flush(flushAction, BLink[]::new);
+        boolean added = !p.isEmpty();
+        if (added) {
+            p.flushAll(flushAction);
         }
-        super.commit();
+
+        if (added || hard)
+            super.commit();
     }
 
     @Override
@@ -81,6 +97,13 @@ public class BufferedArrayBag<X> extends ArrayBag<X> {
     public @NotNull Bag<X> forEachThen(Consumer<BLink<? extends X>> each) {
         commit();
         return super.forEachThen(each);
+    }
+
+
+    @Override
+    public @NotNull Iterator<BLink<X>> iterator() {
+        commit(true);
+        return super.iterator();
     }
 
     @Override

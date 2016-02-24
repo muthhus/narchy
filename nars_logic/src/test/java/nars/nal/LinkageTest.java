@@ -107,7 +107,7 @@ public class LinkageTest extends AbstractNALTester {
         //System.err.println(premise1 + " not linked with " + premise2);
         TermLinkGraph g = new TermLinkGraph(nar);
         assertTrue(g.vertexSet().size() > 0);
-        assertTrue(g.edgeSet().size() > 0);
+        assertTrue(g.toString(), g.edgeSet().size() > 0);
 
         //g.print(System.out);
         //System.out.println(g.isConnected() + " " + g.vertexSet().size() + " " + g.edgeSet().size());

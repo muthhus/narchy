@@ -48,7 +48,7 @@ public class CurveBag<V> implements Bag<V> {
     public CurveBag(int capacity, Random rng) {
         this(
             //CurveBag.power6BagCurve,
-            power4BagCurve,
+            power2BagCurve,
             capacity, rng);
     }
 
@@ -69,8 +69,10 @@ public class CurveBag<V> implements Bag<V> {
     public CurveBag(@NotNull SortedIndex<BLink<V>> items, BagCurve curve, Random rng) {
         super();
         this.arrayBag
-                //= new ArrayBag(items);
-                = new BufferedArrayBag(items);
+                = new ArrayBag(items);
+
+                //HACK heuristic to choose Buffered bag when # of items is large, attempting to help avoid sorting costs by batching them
+                //= items.capacity() > 100 ? new BufferedArrayBag(items) : new ArrayBag(items);
 
         this.curve = curve;
         this.random = rng;

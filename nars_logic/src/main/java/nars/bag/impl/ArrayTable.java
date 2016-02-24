@@ -167,7 +167,7 @@ abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements Tabl
 
     @NotNull
     @Override
-    public final Iterator<L> iterator() {
+    public Iterator<L> iterator() {
         return items.iterator();
     }
 

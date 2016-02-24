@@ -31,7 +31,7 @@ public abstract class TaskPerception implements Consumer<Task> {
 
     }
 
-    protected TaskPerception(@NotNull Memory m, Consumer<Task> eachFrameSupplyTo) {
+    protected TaskPerception(@NotNull Memory m, Consumer<Task[]> eachFrameSupplyTo) {
         this(m);
         //active.add(
             m.eventFrameStart.on((M) -> nextFrame(eachFrameSupplyTo));
@@ -90,7 +90,7 @@ public abstract class TaskPerception implements Consumer<Task> {
     public abstract void accept(Task t);
 
     /** here the buffer should apply any updates and send some/all inputs to the Memory */
-    protected abstract void nextFrame(Consumer<Task> receiver);
+    protected abstract void nextFrame(Consumer<Task[]> receiver);
 
     public abstract void clear();
 }

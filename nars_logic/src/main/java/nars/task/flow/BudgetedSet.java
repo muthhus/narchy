@@ -3,28 +3,29 @@ package nars.task.flow;
 import com.gs.collections.api.block.function.primitive.IntToObjectFunction;
 import nars.budget.BudgetMerge;
 import nars.budget.Budgeted;
-import nars.util.data.list.FasterList;
 
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.function.Consumer;
 
 /**
- * Created by me on 2/24/16.
+ * for use by single=thread at a time only
  */
 public class BudgetedSet<B extends Budgeted> {
 
     final Map<B, B> table;
     final BudgetMerge merge;
+    final IntToObjectFunction<B[]> arrayer; //sharing this is what makes it valid only for single thread case
+    B[] buffer = null;
 
-    public BudgetedSet(BudgetMerge merge) {
-        this(merge, new LinkedHashMap<>());
+    public BudgetedSet(BudgetMerge merge, IntToObjectFunction<B[]> tmpArrayBuilder) {
+        this(merge, new LinkedHashMap<>(), tmpArrayBuilder);
     }
 
-    public BudgetedSet(BudgetMerge merge, Map<B, B> table) {
+    public BudgetedSet(BudgetMerge merge, Map<B, B> table, IntToObjectFunction<B[]> tmpArrayBuilder) {
         this.merge = merge;
         this.table = table;
+        this.arrayer = tmpArrayBuilder;
     }
 
     public B put(B t) {
@@ -42,25 +43,52 @@ public class BudgetedSet<B extends Budgeted> {
         return table.containsKey(b);
     }
 
-    public boolean flush(Consumer<B> each, IntToObjectFunction<B[]> tmpArrayBuilder) {
+
+
+    public B[] flushArray() {
         Map<B, B> t = this.table;
-        int size = t.size();
-        if (size > 0) {
 
-            B[] a = tmpArrayBuilder.valueOf(size);
+        int s = t.size();
 
-            FasterList l = new FasterList(0, a);
-            l.addAll(t.keySet());
-            t.clear();
+        B[] buffer = this.buffer;
 
-            for (B b : a) {
-                each.accept(b);
-            }
+        if (s == 0)
+            return buffer;
 
-            return true;
-        }
-        return false;
+        //flush(each, t, s,
+        buffer =
+                ((buffer == null) || (buffer.length < s)) ?
+                        //alloc new buffer
+                        (this.buffer = arrayer.valueOf(s)) :
+                        //use existing
+                        buffer;
+
+        t.keySet().toArray(buffer);
+        t.clear();
+
+        if (s < buffer.length)
+            buffer[s] = null; //null terminator
+
+        return buffer;
     }
+
+    public void flush(Consumer<B> each) {
+        B[] x = flushArray();
+        if (x != null) {
+            for (B o : buffer) {
+                if ( o == null) break;
+                each.accept(o);
+            }
+        }
+    }
+
+    /** each will be a null-terminated array */
+    public void flushAll(Consumer<B[]> each) {
+        B[] x = flushArray();
+        if (x != null)
+            each.accept(x);
+    }
+
 
 
     public void clear() {
@@ -71,5 +99,6 @@ public class BudgetedSet<B extends Budgeted> {
 
         return table.isEmpty();
     }
+
 
 }

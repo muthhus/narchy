@@ -45,7 +45,7 @@ public class FIFOTaskPerception extends TaskPerception {
      */
     protected final Predicate<Task> filter;
 
-    public FIFOTaskPerception(@NotNull NAR nar, Predicate<Task> filter, Consumer<Task> receiver) {
+    public FIFOTaskPerception(@NotNull NAR nar, Predicate<Task> filter, Consumer<Task[]> receiver) {
         super(nar.memory, receiver);
         this.filter = filter;
     }
@@ -96,13 +96,15 @@ public class FIFOTaskPerception extends TaskPerception {
 
     /** sends the next batch of tasks to the receiver */
     @Override
-    public void nextFrame(@NotNull Consumer<Task> receiver) {
+    public void nextFrame(@NotNull Consumer<Task[]> receiver) {
 
 
         int s = buffer.size();
         int n = Math.min(s, inputsPerCycleMax.get()); //counts down successful sends
         int r = n; //actual cycles counted
 
+
+        Task[] tt = new Task[1];
 
         //n will be equal to or greater than r
         for (; n > 0 && r > 0; r--) {
@@ -113,7 +115,8 @@ public class FIFOTaskPerception extends TaskPerception {
                 continue;
             }
 
-            receiver.accept(t);
+            tt[0] = t;
+            receiver.accept( tt ); //inefficient
             n--;
         }
 
