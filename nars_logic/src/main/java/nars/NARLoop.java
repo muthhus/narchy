@@ -47,10 +47,10 @@ public class NARLoop implements Runnable {
         return 1000.0 / periodMS;
     }
 
-    public int getPeriodMS() {
-        return periodMS;
-    }
-
+//    public int getPeriodMS() {
+//        return periodMS;
+//    }
+//
 
     public NARLoop(@NotNull NAR n, int initialPeriod) {
         this(n, initialPeriod, false);
@@ -142,6 +142,8 @@ public class NARLoop implements Runnable {
             if (periodMS != -1)
                 logger.info("started, period={}", periodMS);
 
+            prevTime = System.currentTimeMillis();
+
             do {
                 try {
                     while (!stopped)
@@ -160,6 +162,8 @@ public class NARLoop implements Runnable {
         logger.info("stopped");
     }
 
+    long prevTime;
+
     public void frame(@NotNull NAR nar) {
         int periodMS = this.periodMS;
 
@@ -168,46 +172,52 @@ public class NARLoop implements Runnable {
             Util.pause(sleepTimeMS);
         } else {
 
-            long start = System.currentTimeMillis();
-
             if (!nar.running.get()) {
+
                 nar.run(cyclesPerFrame);
-                throttle(periodMS, System.currentTimeMillis() - start);
+
+                //this.prevTime = Util.pauseUntil(prevTime + periodMS);
+                this.prevTime = Util.pauseWaitUntil(prevTime + periodMS);
+
+                //throttle(periodMS, System.currentTimeMillis() - lastTime);
+
+
             } else {
                 //logger.warn("nar began running before this frame attempted to start");
                 Thread.yield();
             }
+
         }
 
     }
 
-    protected static long throttle(long minFramePeriodMS, long frameTimeMS) {
-        double remainingTime = (minFramePeriodMS - frameTimeMS) / 1.0E3;
-
-        if (remainingTime > 0) {
-
-            //        try {
-//            Thread.sleep(sleepTime);
-//        } catch (InterruptedException e) {
-//            //e.printStackTrace();
+//    protected static long throttle(long minFramePeriodMS, long frameTimeMS) {
+//        double remainingTime = (minFramePeriodMS - frameTimeMS) / 1.0E3;
+//
+//        if (remainingTime > 0) {
+//
+//            //        try {
+////            Thread.sleep(sleepTime);
+////        } catch (InterruptedException e) {
+////            //e.printStackTrace();
+////        }
+//
+//            Util.pause(minFramePeriodMS);
+//
+//        } else if (remainingTime < 0) {
+//
+//            Thread.yield();
+//
+//            if (Global.DEBUG) {
+//                //TODO blink a non-intrusive indicator in GUI
+//                logger.warn("lag {}ms", remainingTime);
+//            }
+//
+//            //minFramePeriodMS++;
+//            //; incresing frame period to " + minFramePeriodMS + "ms");
 //        }
-
-            Util.pause(minFramePeriodMS);
-
-        } else if (remainingTime < 0) {
-
-            Thread.yield();
-
-            if (Global.DEBUG) {
-                //TODO blink a non-intrusive indicator in GUI
-                logger.warn("lag {}ms", remainingTime);
-            }
-
-            //minFramePeriodMS++;
-            //; incresing frame period to " + minFramePeriodMS + "ms");
-        }
-        return minFramePeriodMS;
-    }
+//        return minFramePeriodMS;
+//    }
 
 
     public final void pause() {

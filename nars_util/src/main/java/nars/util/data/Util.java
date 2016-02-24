@@ -30,6 +30,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.concurrent.locks.LockSupport;
 import java.util.function.Consumer;
 
 import static java.util.Arrays.stream;
@@ -649,8 +650,43 @@ public enum Util {
         return Math.abs(a - b) < epsilon;
     }
 
-    /** from boofcv: */
     public static void pause(long milli) {
+        pauseWait(milli);
+    }
+
+    private final static Object waitLock = new Object();
+
+    public static long pauseWaitUntil(long untilTargetTime) {
+        long now = System.currentTimeMillis();
+        long dt = untilTargetTime-now;
+        if (dt > 0) {
+            synchronized(waitLock) {
+                try {
+                    waitLock.wait(dt);
+                } catch (InterruptedException e) { }
+            }
+
+            now = System.currentTimeMillis();
+        }
+        return now;
+    }
+
+    /** from: http://stackoverflow.com/a/1205300 */
+    public static long pauseLockUntil(long untilTargetTime) {
+
+    // Wait until the desired next time arrives using nanosecond
+    // accuracy timer (wait(time) isn't accurate enough on most platforms)
+        long now = System.currentTimeMillis();
+        long dt = (untilTargetTime-now) * 1000000;
+        if (dt > 0) {
+            LockSupport.parkNanos(dt);
+            now = System.currentTimeMillis();
+        }
+        return now;
+    }
+
+    /** from boofcv: */
+    static void pauseWait(long milli) {
         if (milli == 0) return;
         
         Thread t = Thread.currentThread();
@@ -827,4 +863,6 @@ public enum Util {
         Closeables.closeQuietly(is);
         return s;
     }
+
+
 }
