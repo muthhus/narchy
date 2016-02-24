@@ -1,19 +1,16 @@
 package nars.bag.impl;
 
-import nars.Global;
 import nars.bag.BLink;
 import nars.bag.Bag;
 import nars.budget.BudgetMerge;
 import nars.budget.Budgeted;
 import nars.task.flow.BudgetedSet;
-import nars.task.flow.SetTaskPerception;
 import nars.util.data.sorted.SortedIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -67,8 +64,9 @@ public class BufferedArrayBag<X> extends ArrayBag<X> {
     }
 
     @Override
-    public final void commit() {
+    public final Bag<X> commit() {
         commit(true);
+        return null;
     }
 
     /** hard commit will re-sort everything (due to changing forgetting rates this has to be iteratively evaluated)

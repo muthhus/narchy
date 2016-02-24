@@ -10,6 +10,7 @@ import nars.budget.Budget;
 import nars.budget.UnitBudget;
 import nars.concept.AtomConcept;
 import nars.concept.Concept;
+import nars.concept.DefaultConceptBuilder;
 import nars.guifx.demo.AbstractNARGraphDemo;
 import nars.nar.Default;
 import nars.task.Task;
@@ -20,13 +21,14 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * Created by me on 2/23/16.
  */
 public class DemoAttentionFlow extends AbstractNARGraphDemo {
 
-    static Twin<Termed> addTermLinkChain(NAR nar, int n, IntToObjectFunction<Termed> each) {
+    static Twin<Termed> addTermLinkChain(NAR nar, int n, IntToObjectFunction<Termed> each, boolean forward, boolean reverse) {
         Termed first = null, last = null;
 
         Concept prev = null;
@@ -41,15 +43,22 @@ public class DemoAttentionFlow extends AbstractNARGraphDemo {
             /* linking function, TODO extract as a lambda for alternate procedures */
             if (prev!=null) {
 
-                List<Termed> ct = c.termlinkTemplates();
-                if (!ct.contains(prev))
-                    ct.add(prev);
+                if (reverse) {
+                    //the reverse
+                    List<Termed> ct = c.termlinkTemplates();
+                    if (!ct.contains(prev))
+                        ct.add(prev);
+                    AtomConcept.linkTerm(c, prev, UnitBudget.Mid, 1f, true, false);
+                }
 
-                List<Termed> pt = prev.termlinkTemplates();
-                if (!pt.contains(c))
-                    pt.add(c);
+                if (forward) {
+                    List<Termed> pt = prev.termlinkTemplates();
+                    if (!pt.contains(c))
+                        pt.add(c);
+                    AtomConcept.linkTerm(prev, c, UnitBudget.Mid, 1f, true, false);
+                }
 
-                ((AtomConcept)c).linkTerm(prev, UnitBudget.Zero, 1f);
+
 
             }
 
@@ -63,31 +72,39 @@ public class DemoAttentionFlow extends AbstractNARGraphDemo {
 
     public static void main(String[] args)  {
 
-        Default n = new Default(128,1,1,1) {
+        Default n = new Default(128,4,1,1) {
             @Override
-            protected
-            @NotNull
-            AtomConcept newAtomConcept(Term t, Bag<Task> taskLinks, Bag<Termed> termLinks) {
-                return new AtomConcept(t, termLinks, taskLinks) {
+            public Function<Term, Concept> newConceptBuilder() {
+                return new DefaultConceptBuilder(this, 16, 16) {
+
+                    @Override
+                    protected
+                    @NotNull
+                    AtomConcept newAtomConcept(Term t, Bag<Task> taskLinks, Bag<Termed> termLinks) {
+                        return new AtomConcept(t, termLinks, taskLinks) {
 
 
-                    public List<Termed> templates = new FasterList();
+                            public List<Termed> templates = new FasterList();
 
-                    public List<Termed> termlinkTemplates() {
-                        return templates;
+                            public List<Termed> termlinkTemplates() {
+                                return templates;
+                            }
+                        };
                     }
+
                 };
             }
+
         };
-        n.memory.duration.set(10);
+        n.memory.duration.set(5);
         n.memory.perfection.setValue(0);
         n.run(5);
 
         graphIDE(n, (e)-> {
 
             IntToObjectFunction<Termed> tt = (i) -> $.the("a" + i);
-            int chainSize = 25;
-            Twin<Termed> ends = addTermLinkChain(n, chainSize, tt);
+            int chainSize = 8;
+            Twin<Termed> ends = addTermLinkChain(n, chainSize, tt, true,false);
             n.forEachConcept(c->c.print());
 
             new Thread(()-> {
@@ -102,8 +119,13 @@ public class DemoAttentionFlow extends AbstractNARGraphDemo {
 
                     n.runLater(() -> {
                         n.conceptualize(
-                                tt.valueOf( n.memory.random.nextInt(chainSize)),
-                                new UnitBudget(1f, 0.5f, 0.5f), 0.1f, 1f);
+
+                                tt.valueOf(
+                                        0
+                                        //n.memory.random.nextInt(chainSize)
+                                ),
+
+                                new UnitBudget(1f, 0.5f, 0.5f), 1f, 0.6f);
                     });
                 }
             }).start();

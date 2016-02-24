@@ -134,7 +134,6 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
                     n--;
                 }
             }
-            commit();
         }
         return this;
     }
@@ -255,7 +254,7 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
         if (existing!=b)
             merge(existing, b, scale);
 
-        //update(existing); //<- delaying/buffering this is the whole reason of the buffering
+        update(existing); //<- delaying/buffering this is the whole reason of the buffering
 
         newBudget = existing;
         return newBudget;
@@ -289,8 +288,9 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
 
 
     @Override
-    public void commit() {
+    public Bag<V> commit() {
         forEach(this::update);
+        return this;
     }
 
     public void update(@NotNull BLink<V> v) {

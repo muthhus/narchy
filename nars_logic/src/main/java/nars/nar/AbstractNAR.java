@@ -4,7 +4,6 @@ import nars.Global;
 import nars.Memory;
 import nars.NAR;
 import nars.concept.Concept;
-import nars.concept.DefaultConceptBuilder;
 import nars.nal.Deriver;
 import nars.nal.meta.PremiseRule;
 import nars.nal.nal8.AbstractOperator;
@@ -12,7 +11,6 @@ import nars.nal.nal8.operator.TermFunction;
 import nars.op.data.flat;
 import nars.op.data.intToBitSet;
 import nars.op.data.similaritree;
-import nars.op.out.echo;
 import nars.op.sys.java.java;
 import nars.op.sys.reset;
 import nars.op.out.say;
@@ -148,11 +146,11 @@ public abstract class AbstractNAR extends NAR {
         m.shortTermMemoryHistory.set(2);
 
 
-        this.conceptBuilder = newDefaultConceptBuilder();
+        this.conceptBuilder = newConceptBuilder();
 
     }
 
-    abstract protected Function<Term, Concept> newDefaultConceptBuilder();
+    abstract protected Function<Term, Concept> newConceptBuilder();
 
 
 //    public static final AbstractOperator[] exampleOperators = {

@@ -56,7 +56,7 @@ public class Terminal extends AbstractNAR {
     }
 
     @Override
-    protected Function<Term, Concept> newDefaultConceptBuilder() {
+    protected Function<Term, Concept> newConceptBuilder() {
         return (t) -> {
             return null;
         };

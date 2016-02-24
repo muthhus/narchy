@@ -34,10 +34,10 @@ public class LinkageTest extends AbstractNALTester {
     @Parameterized.Parameters(name= "{0}")
     public static Iterable<Supplier> configurations() {
         return Lists.newArrayList(() -> {
-            Default d = new Default(0, 0, 0, 0) {
+            Default d = new Default(1000, 1, 1, 1) {
 
                 @Override
-                public Function<Term, Concept> newDefaultConceptBuilder() {
+                public Function<Term, Concept> newConceptBuilder() {
                     return new DefaultConceptBuilder(this, TERM_LINK_BAG_SIZE, 1);
                 }
             };

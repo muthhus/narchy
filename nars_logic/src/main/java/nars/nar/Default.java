@@ -116,16 +116,14 @@ public class Default extends AbstractNAR {
     protected DefaultCycle initCore(int activeConcepts, int conceptsFirePerCycle, int termLinksPerConcept, int taskLinksPerConcept, PremiseGenerator pg) {
 
 
-        DefaultCycle c = new DefaultCycle(this, newDeriver(), pg);
+        DefaultCycle c = new DefaultCycle(this, newDeriver(), pg, activeConcepts);
 
         //TODO move these to a PremiseGenerator which supplies
-        // batches of Premises
         c.termlinksFiredPerFiredConcept.set(termLinksPerConcept);
         c.tasklinksFiredPerFiredConcept.set(taskLinksPerConcept);
 
         c.conceptsFiredPerCycle.set(conceptsFirePerCycle);
 
-        c.capacity.set(activeConcepts);
 
         return c;
     }
@@ -265,7 +263,7 @@ public class Default extends AbstractNAR {
     }
 
     @Override
-    public Function<Term, Concept> newDefaultConceptBuilder() {
+    public Function<Term, Concept> newConceptBuilder() {
         return new DefaultConceptBuilder(this,
                 12 /* tasklinks*/,
                 16 /*termlinks */);
@@ -324,8 +322,8 @@ public class Default extends AbstractNAR {
         @Deprecated
         public final transient NAR nar;
 
-        @Range(min=0,max=8192,unit="Concept")
-        public final MutableInteger capacity = new MutableInteger();
+//        @Range(min=0,max=8192,unit="Concept")
+//        public final MutableInteger capacity = new MutableInteger();
 
         /** activated concepts pending (re-)insert to bag */
         public final LinkedHashSet<Concept> activated = new LinkedHashSet();
@@ -389,9 +387,9 @@ public class Default extends AbstractNAR {
 
         protected final void cycle(Memory memory) {
 
-            commit();
 
             fireConcepts(conceptsFiredPerCycle.intValue());
+            commit();
 
         }
 
@@ -431,7 +429,6 @@ public class Default extends AbstractNAR {
 
             Bag<Concept> b = this.active;
 
-            b.setCapacity(capacity.intValue()); //TODO share the MutableInteger so that this doesnt need to be called ever
             if (conceptsToFire == 0 || b.isEmpty()) return;
 
             List<BLink<Concept>> f = this.firing;
@@ -478,15 +475,15 @@ public class Default extends AbstractNAR {
 
 
 
-        public DefaultCycle(@NotNull NAR nar, Deriver deriver, PremiseGenerator premiseGenerator) {
-            super(nar, deriver, newConceptBag(nar.memory.random,16), premiseGenerator);
+        public DefaultCycle(@NotNull NAR nar, Deriver deriver, PremiseGenerator premiseGenerator, int activeConcepts) {
+            super(nar, deriver, newConceptBag(nar.memory.random, activeConcepts), premiseGenerator);
         }
 
 
 
         @NotNull
-        public static Bag<Concept> newConceptBag(Random r, int initialCapacity) {
-            return new CurveBag<Concept>(initialCapacity, r)
+        public static Bag<Concept> newConceptBag(Random r, int n) {
+            return new CurveBag<Concept>(n, r)
                     //.mergePlus();
                     .merge(BudgetMerge.plusDQBlend);
         }

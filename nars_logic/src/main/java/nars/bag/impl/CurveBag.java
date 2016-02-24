@@ -92,8 +92,9 @@ public class CurveBag<V> implements Bag<V> {
     }
 
     @Override
-    public void commit() {
+    public Bag<V> commit() {
         arrayBag.commit();
+        return this;
     }
 
     @Nullable

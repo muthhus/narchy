@@ -249,7 +249,7 @@ public enum Global {
 //    //public static float HAPPY_EVENT_HIGHER_THRESHOLD=0.75f;
 //    public static float HAPPY_EVENT_CHANGE_THRESHOLD =0.01f;
 //    //public static float BUSY_EVENT_HIGHER_THRESHOLD=0.9f; //1.6.4, step by step^, there is already enough new things ^^
-    public static float BUSY_EVENT_CHANGE_THRESHOLD =0.5f;
+//    public static float BUSY_EVENT_CHANGE_THRESHOLD =0.5f;
 //    public static boolean REFLECT_META_HAPPY_GOAL = false;
 //    public static boolean REFLECT_META_BUSY_BELIEF = false;
 //    public static boolean CONSIDER_REMIND=true;

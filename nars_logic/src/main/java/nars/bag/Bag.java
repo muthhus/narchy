@@ -191,8 +191,10 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
 
     /**
      * commits the next set of changes and updates any sorting
+     * should return this bag
      */
-    void commit();
+    @NotNull
+    Bag<V> commit();
 
     /**
      * implements the Consumer<V> interface; invokes a put()

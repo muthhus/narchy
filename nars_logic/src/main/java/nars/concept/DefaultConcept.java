@@ -624,12 +624,12 @@ public class DefaultConcept extends AtomConcept {
             float subScale;
             int numTemplates = templates.size();
             switch (numTemplates) {
-                case 0: return false;
+                case 0: return true;
                 //case 1: subScale = 0.5f; break; //HACK
                 default:
                     subScale = scale / numTemplates;
                     if (subScale < minScale)
-                        return false;
+                        return true;
             }
 
             for (int i = 0, templatesSize = templates.size(); i < templatesSize; i++) {

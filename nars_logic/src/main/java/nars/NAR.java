@@ -1016,17 +1016,17 @@ public abstract class NAR implements Level, Consumer<Task> {
 
         if (input.isDeleted()) {
             //throw new RuntimeException(
-            if (Global.DEBUG) {
+            /*if (Global.DEBUG) {
                 System.err.println(
                         input + " " + input.log() + " Deleted:\n" + input.explanation());
-            }
+            }*/
             return null;
         }
 
         final Memory memory = this.memory;
 
         float activation = memory.activationRate.floatValue();
-        Concept c = conceptualize(input.concept(), input.budget(), activation, 0);
+        Concept c = conceptualize(input.concept(), input.budget(), activation, 0f);
         if (c == null) {
             //throw new RuntimeException("Inconceivable: " + input);
             memory.remove(input, "Inconceivable");
@@ -1041,7 +1041,8 @@ public abstract class NAR implements Level, Consumer<Task> {
             return null;
         }
 
-        c.link(t, activation, this);
+        //complete the activation process
+        c.link(t, activation, 0f, this);
 
         memory.eventTaskProcess.emit(t);
 

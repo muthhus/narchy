@@ -2,12 +2,17 @@ package nars.guifx.demo;
 
 import nars.Memory;
 import nars.NAR;
+import nars.concept.Concept;
+import nars.concept.DefaultConceptBuilder;
 import nars.nar.Default;
 import nars.op.mental.Abbreviation;
 import nars.op.mental.Anticipate;
 import nars.op.mental.Inperience;
+import nars.term.Term;
 import nars.term.TermIndex;
 import nars.time.RealtimeMSClock;
+
+import java.util.function.Function;
 
 
 /**
@@ -33,15 +38,18 @@ public enum NARideRealtimeDefault {
             //)
         );
 
-        Default nar = new Default(mem, 1024, 1, 2, 2).with(
+        Default nar = new Default(mem, 1024, 1, 2, 2) {
+            @Override
+            public Function<Term, Concept> newConceptBuilder() {
+                return new DefaultConceptBuilder(this, 32, 128);
+            }
+        }.with(
                 Anticipate.class,
                 Inperience.class
         );
         nar.with(new Abbreviation(nar,"is"));
 
-        //nar.nal(9);
-        nar.setTaskLinkBagSize(32);
-        nar.setTermLinkBagSize(128);
+ 
 
 
 

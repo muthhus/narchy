@@ -58,7 +58,7 @@ public class RawBudget extends Budget {
     @Override
     public void delete() {
         if (isDeleted())
-            throw new RuntimeException("already Deleted");
+            throw new RuntimeException("Already Deleted");
         this.priority = Float.NaN;
     }
 

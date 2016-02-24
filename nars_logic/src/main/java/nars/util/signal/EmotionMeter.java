@@ -156,7 +156,7 @@ public class EmotionMeter extends FrameReaction implements Serializable {
 
         if (lastbusy != -1) {
             //float frequency = -1;
-            float frequency = changeSignificance(lastbusy, busy, Global.BUSY_EVENT_CHANGE_THRESHOLD);
+            //float frequency = changeSignificance(lastbusy, busy, Global.BUSY_EVENT_CHANGE_THRESHOLD);
             //            if (busy > Global.BUSY_EVENT_HIGHER_THRESHOLD && lastbusy <= Global.BUSY_EVENT_HIGHER_THRESHOLD) {
 //                frequency = 1.0f;
 //            }

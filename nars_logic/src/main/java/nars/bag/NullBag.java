@@ -88,8 +88,8 @@ public final class NullBag<V> implements Bag<V> {
     }
 
     @Override
-    public void commit() {
-
+    public Bag<V> commit() {
+        return this;
     }
 
 
