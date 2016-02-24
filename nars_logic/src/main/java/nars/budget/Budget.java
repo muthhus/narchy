@@ -246,15 +246,6 @@ public abstract class Budget extends BudgetedHandle {
         return budget(source.budget());
     }
 
-    public float priIfFiniteElseZero() {
-        return priIfFiniteElse(0);
-    }
-
-    public float priIfFiniteElse(float ifNonFinite) {
-        float p = pri();
-        return Float.isFinite(p) ? p : ifNonFinite;
-    }
-
     /**
      * Briefly display the BudgetValue
      *

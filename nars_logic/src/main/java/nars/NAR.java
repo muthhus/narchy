@@ -16,8 +16,6 @@ import nars.nal.nal8.PatternAnswer;
 import nars.nal.nal8.operator.TermFunction;
 import nars.op.in.FileInput;
 import nars.op.in.TextInput;
-import nars.op.mental.Anticipate;
-import nars.op.mental.Inperience;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.task.flow.Input;
@@ -25,6 +23,7 @@ import nars.task.flow.TaskQueue;
 import nars.task.flow.TaskStream;
 import nars.term.*;
 import nars.term.atom.Atom;
+import nars.term.variable.Variable;
 import nars.time.Clock;
 import nars.util.event.AnswerReaction;
 import nars.util.event.DefaultTopic;
@@ -38,10 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
@@ -53,6 +49,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import static nars.Memory.CompoundAnonymizer;
 import static nars.Symbols.*;
 import static nars.nal.Tense.ETERNAL;
 import static org.fusesource.jansi.Ansi.ansi;
@@ -254,8 +251,16 @@ public abstract class NAR implements Level, Consumer<Task> {
      * gets a concept if it exists, or returns null if it does not
      */
     @Nullable
-    public Concept concept(@NotNull String conceptTerm) throws NarseseException {
-        return memory.concept(term(conceptTerm));
+    public final Concept concept(@NotNull String conceptTerm) throws NarseseException {
+        return concept(termOrException(conceptTerm));
+    }
+
+    /** parses a term, returning it, or throws an exception (but will not return null) */
+    @NotNull public final Termed termOrException(@NotNull String conceptTerm) {
+        Termed t = term(conceptTerm);
+        if (t == null)
+            throw new NarseseException(conceptTerm);
+        return t;
     }
 
     /**
@@ -264,9 +269,7 @@ public abstract class NAR implements Level, Consumer<Task> {
     @NotNull
     public Task ask(@NotNull String termString) throws NarseseException {
         //TODO remove '?' if it is attached at end
-        /*if (t instanceof Compound)
-            return ((T)t).normalizeDestructively();*/
-        return ask((Compound) Narsese.the().<Compound>term(termString));
+        return ask((Compound)termOrException(termString));
     }
 
     /**
@@ -278,24 +281,24 @@ public abstract class NAR implements Level, Consumer<Task> {
         return ask(c, QUESTION);
     }
 
-    /**
-     * ask quest
-     */
-    @Nullable
-    public Task askShould(@NotNull String questString) throws NarseseException {
-        Term c = term(questString);
-        if (c instanceof Compound)
-            return askShould((Compound) c);
-        return null;
-    }
-
-    /**
-     * ask quest
-     */
-    @NotNull
-    public Task askShould(@NotNull Compound quest) {
-        return ask(quest, QUEST);
-    }
+//    /**
+//     * ask quest
+//     */
+//    @Nullable
+//    public Task askShould(@NotNull String questString) throws NarseseException {
+//        Term c = term(questString);
+//        if (c instanceof Compound)
+//            return askShould((Compound) c);
+//        return null;
+//    }
+//
+//    /**
+//     * ask quest
+//     */
+//    @NotNull
+//    public Task askShould(@NotNull Compound quest) {
+//        return ask(quest, QUEST);
+//    }
 
     /**
      * desire goal
@@ -341,9 +344,7 @@ public abstract class NAR implements Level, Consumer<Task> {
 
     @NotNull
     public NAR believe(@NotNull String termString) throws NarseseException {
-        Termed term = term(termString);
-        if (term == null)
-            throw new NarseseException(termString);
+        Termed term = termOrException(termString);
         return believe(term);
     }
 
@@ -960,8 +961,11 @@ public abstract class NAR implements Level, Consumer<Task> {
     @Nullable
     public abstract NAR forEachConcept(@NotNull Consumer<Concept> recip);
 
-    @Nullable
-    public abstract Concept conceptualize(@NotNull Termed termed, Budget activation, float scale);
+    public abstract Concept conceptualize(@NotNull Termed termed, Budget activation, float scale, float toTermLinks);
+
+    final public Concept conceptualize(@NotNull Termed termed, Budget activation) {
+        return conceptualize(termed, activation, 1f, 0);
+    }
 
     @NotNull
     public NAR stopIf(@NotNull BooleanSupplier stopCondition) {
@@ -1014,7 +1018,7 @@ public abstract class NAR implements Level, Consumer<Task> {
         final Memory memory = this.memory;
 
         float activation = memory.activationRate.floatValue();
-        Concept c = conceptualize(input.concept(), input.budget(), activation);
+        Concept c = conceptualize(input.concept(), input.budget(), activation, 0);
         if (c == null) {
             //throw new RuntimeException("Inconceivable: " + input);
             memory.remove(input, "Inconceivable");
@@ -1039,15 +1043,72 @@ public abstract class NAR implements Level, Consumer<Task> {
         return c;
     }
 
-    /**
-     * convenience method shortcut for concept(t.getTerm())
-     * when possible, try to provide an existing Concept instance
-     * to avoid a lookup
-     */
-    @Nullable
-    public Concept concept(Termed termed) {
-        return memory.concept(termed);
+
+
+
+    boolean validConceptTerm(Term term) {
+        return !(term instanceof Variable);
     }
+
+    @NotNull
+    abstract protected Concept newConcept(Term t);
+
+
+    @Nullable
+    public Concept concept(Termed t) {
+        if (t instanceof Concept)
+            return ((Concept)t);
+
+        Term tt = t.term();
+        if (!validConceptTerm(tt))
+            return null;
+
+        TermIndex index = memory.index;
+
+        if (!tt.isNormalized()) {
+            t = index.normalized(tt);
+            if (t instanceof Concept)
+                return ((Concept)t);
+            else if (t == null)
+                return null;
+            else
+                tt = t.term();
+        }
+
+        //TODO ? put the unnormalized term for cached future normalizations?
+
+        if (tt.isCompound() ) {
+
+            tt = tt.anonymous();
+
+            tt = index.transform((Compound)tt, CompoundAnonymizer);
+
+            if (tt == null)
+                return null;
+        }
+
+
+
+        Termed uu = index.getTermIfPresent(tt);
+
+        if (uu instanceof Concept) {
+            return (Concept) uu;
+        } else {
+            if (uu == null) uu = t;
+
+            Concept n = newConcept(uu.term());
+            if (n!=null) {
+                index.putTerm(n);
+                return n;
+            } else {
+                return null; //no concept could be made
+            }
+        }
+
+    }
+
+
+
 
     public On onQuestion(@NotNull PatternAnswer p) {
         return memory.eventTaskProcess.on(question -> {

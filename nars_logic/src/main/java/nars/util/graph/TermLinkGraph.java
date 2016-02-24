@@ -74,7 +74,7 @@ public class TermLinkGraph extends DirectedPseudograph<Termed, Termed> {
         @Override protected void addTermLinks(@NotNull Concept c) {
             Term sourceTerm = c.term();
 
-            for (Termed t : c.getTermLinkTemplates()) {
+            for (Termed t : c.termlinkTemplates()) {
                 Term targetTerm = t.term();
                 if (!containsVertex(targetTerm)) {
                     addVertex(targetTerm);

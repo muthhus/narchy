@@ -49,7 +49,7 @@ public class doubt extends SyncOperator {
             Term term = Operator.argArray(execution.term())[0];
             Budget b = operation.budget();
 
-            Concept concept = nar.conceptualize(term, b, 1f);
+            Concept concept = nar.conceptualize(term, b);
             if (concept!=null) {
                 discountBeliefConfidence(concept, operation.punc(),
                         //TODO use min/max parameters somehow

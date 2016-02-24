@@ -23,16 +23,13 @@ import nars.budget.UnitBudget;
 import nars.concept.Concept;
 import nars.guifx.chart.Plot2D;
 import nars.guifx.graph2.TermEdge;
-import nars.guifx.graph2.TermNode;
 import nars.guifx.graph2.impl.BlurCanvasEdgeRenderer;
 import nars.guifx.graph2.impl.HexButtonVis;
-import nars.guifx.graph2.scene.DefaultNodeVis;
 import nars.guifx.graph2.source.ConceptNeighborhoodSource;
 import nars.guifx.graph2.source.DefaultGrapher;
 import nars.guifx.graph3.SpaceNet;
 import nars.guifx.graph3.Xform;
 import nars.guifx.nars.NARActionButton;
-import nars.guifx.nars.SubButton;
 import nars.guifx.nars.TaskButton;
 import nars.guifx.util.ColorArray;
 import nars.guifx.util.ColorMatrix;
@@ -318,7 +315,7 @@ public class ConceptPane extends BorderPane implements ChangeListener {
 
 
         Button activateButton = new NARActionButton(nar, "+", (n) -> {
-                n.conceptualize(term, new UnitBudget(1f, 0.75f, 0.75f), 1f);
+                n.conceptualize(term, new UnitBudget(1f, 0.75f, 0.75f), 1f, 0);
         });
         Button yesGoalButton = new NARActionButton(nar, "+!", (n) -> {
             n.input(new MutableTask(term, '!').present(n.memory).log("GUI Goal"));

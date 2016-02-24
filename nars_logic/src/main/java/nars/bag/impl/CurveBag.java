@@ -5,6 +5,7 @@ import nars.bag.BLink;
 import nars.bag.Bag;
 import nars.budget.Budget;
 import nars.budget.BudgetMerge;
+import nars.budget.Budgeted;
 import nars.util.data.FastBitSet;
 import nars.util.data.list.FasterList;
 import nars.util.data.sorted.SortedIndex;
@@ -181,7 +182,7 @@ public class CurveBag<V> implements Bag<V> {
 
     @Nullable
     @Override
-    public BLink<V> put(V v, Budget vBagBudget, float scale) {
+    public BLink<V> put(V v, Budgeted vBagBudget, float scale) {
         return arrayBag.put(v, vBagBudget, scale);
     }
 

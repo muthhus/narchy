@@ -1,6 +1,7 @@
 package nars.nal.space;
 
 import nars.Memory;
+import nars.NAR;
 import nars.bag.Bag;
 import nars.concept.DefaultConcept;
 import nars.task.Task;
@@ -12,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
  * shape of the vector space formed by known Space terms
  */
 public class SpaceConcept extends DefaultConcept {
-    public SpaceConcept(@NotNull Space term, Bag<Task> taskLinks, Bag<Termed> termLinks, @NotNull Memory p) {
+    public SpaceConcept(@NotNull Space term, Bag<Task> taskLinks, Bag<Termed> termLinks, @NotNull NAR p) {
         super(term.anonymous(), taskLinks, termLinks, p);
     }
 

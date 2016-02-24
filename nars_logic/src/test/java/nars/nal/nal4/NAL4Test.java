@@ -92,7 +92,7 @@ public class NAL4Test extends AbstractNALTester {
     public void structural_transformation5_extended2b()  {
         TestNAR tester = test();
         tester.believe("<(\\,neutralization,substance,acid,_,reaction) --> base>",1.0f,0.9f);
-        tester.mustBelieve(CYCLES, "<neutralization --> (substance,acid,base,reaction)>", 1.0f, 0.9f);
+        tester.mustBelieve(CYCLES*2, "<neutralization --> (substance,acid,base,reaction)>", 1.0f, 0.9f);
     }
 
     @Test

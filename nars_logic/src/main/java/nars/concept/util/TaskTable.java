@@ -1,11 +1,14 @@
 package nars.concept.util;
 
+import com.google.common.collect.Iterators;
+import nars.Memory;
 import nars.task.Task;
 import org.apache.commons.math3.analysis.interpolation.BivariateGridInterpolator;
 import org.apache.commons.math3.analysis.interpolation.UnivariateInterpolator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Iterator;
 import java.util.function.Consumer;
 
 /**
@@ -58,4 +61,50 @@ public interface TaskTable extends Iterable<Task> {
 
     //boolean contains(Task t);
 
+    public static QuestionTaskTable EMPTY = new QuestionTaskTable() {
+
+        @Override
+        public
+        @Nullable
+        Task add(Task t, Memory m) {
+            return t;
+        }
+
+        @Override
+        public
+        @Nullable
+        Task contains(Task t) {
+            return null;
+        }
+
+        @Override
+        public Iterator<Task> iterator() {
+            return Iterators.emptyIterator();
+        }
+
+        @Override
+        public int getCapacity() {
+            return 0;
+        }
+
+        @Override
+        public void setCapacity(int newCapacity) {
+
+        }
+
+        @Override
+        public int size() {
+            return 0;
+        }
+
+        @Override
+        public void clear() {
+
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return true;
+        }
+    };
 }

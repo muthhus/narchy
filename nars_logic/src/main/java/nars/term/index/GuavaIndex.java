@@ -20,6 +20,8 @@ import java.util.function.Function;
  * optional WeakRef policy.
  * suitable for running indefnitely and obeying AIKR
  * principles
+ *
+ * NOT TESTED  to be replaced with a better cache impl
  * */
 public class GuavaIndex implements TermIndex {
 
@@ -80,15 +82,15 @@ public class GuavaIndex implements TermIndex {
         data.asMap().forEach((k,v) -> c.accept(k));
     }
 
-    /** gets an existing item or applies the builder to produce something to return */
-    @Override
-    public <K extends Term> Termed<K> apply(@NotNull K key, @NotNull Function<K, Termed> builder)  {
-        try {
-            return data.get(key, () -> builder.apply(key));
-        } catch (ExecutionException e) {
-            throw new RuntimeException(e);
-        }
-    }
+//    /** gets an existing item or applies the builder to produce something to return */
+//    @Override
+//    public <K extends Term> Termed<K> apply(@NotNull K key)  {
+//        try {
+//            return data.get(key, () -> builder.apply(key));
+//        } catch (ExecutionException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 
 
 

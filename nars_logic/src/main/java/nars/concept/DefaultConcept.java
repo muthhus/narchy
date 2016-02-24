@@ -4,16 +4,17 @@ import nars.Memory;
 import nars.NAR;
 import nars.Symbols;
 import nars.bag.Bag;
-import nars.concept.util.ArrayListTaskTable;
-import nars.concept.util.BeliefTable;
-import nars.concept.util.DefaultBeliefTable;
-import nars.concept.util.QuestionTaskTable;
+import nars.budget.Budget;
+import nars.concept.util.*;
 import nars.nal.LocalRules;
 import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Collections;
+import java.util.List;
 
 
 public class DefaultConcept extends AtomConcept {
@@ -34,7 +35,7 @@ public class DefaultConcept extends AtomConcept {
      */
 
     @Nullable
-    private final Termed[] termLinkTemplates;
+    private List<Termed> termLinkTemplates = null;
 
     @Nullable
     protected QuestionTaskTable questions = null;
@@ -57,18 +58,8 @@ public class DefaultConcept extends AtomConcept {
      * @param taskLinks
      * @param termLinks
      */
-    public DefaultConcept(Term term, Bag<Task> taskLinks, Bag<Termed> termLinks, @NotNull Memory m) {
+    public DefaultConcept(Term term, Bag<Task> taskLinks, Bag<Termed> termLinks, @NotNull NAR n) {
         super(term, termLinks, taskLinks);
-
-        //lazily instantiated
-        //beliefs = null; //new DefaultBeliefTable(m.conceptBeliefsMax.intValue(), m.duration());
-        //goals = null; //new DefaultBeliefTable(m.conceptGoalsMax.intValue(), m.duration());
-
-        int maxQuestions = m.conceptQuestionsMax.intValue();
-        questions = new ArrayListTaskTable(maxQuestions);
-        quests = new ArrayListTaskTable(maxQuestions);
-
-        this.termLinkTemplates = TermLinkBuilder.build(term, m);
     }
 
     /**
@@ -77,13 +68,18 @@ public class DefaultConcept extends AtomConcept {
     @Nullable
     @Override
     public final QuestionTaskTable quests() {
-        return quests;
+        return tableOrEmpty(quests);
     }
 
     @Nullable
     @Override
     public final QuestionTaskTable questions() {
-        return questions;
+        return tableOrEmpty(questions);
+    }
+
+    private static QuestionTaskTable tableOrEmpty(QuestionTaskTable q) {
+        if (q == null) return TaskTable.EMPTY;
+        return q;
     }
 
 
@@ -612,8 +608,51 @@ public class DefaultConcept extends AtomConcept {
 //        return true;
 //    }
 
+
     @Override
-    public Termed[] getTermLinkTemplates() {
+    public boolean link(@NotNull Task task, float scale, float minScale, @NotNull NAR nar) {
+        if (super.link(task, scale, minScale, nar)) {
+
+
+            List<Termed> templates = termlinkTemplates();
+            if (templates == null) {
+                templates = this.termLinkTemplates = TermLinkBuilder.build(this, nar);
+            }
+
+            Budget taskBudget = task.budget();
+
+            float subScale;
+            int numTemplates = templates.size();
+            switch (numTemplates) {
+                case 0: return false;
+                //case 1: subScale = 0.5f; break; //HACK
+                default:
+                    subScale = scale / numTemplates;
+                    if (subScale < minScale)
+                        return false;
+            }
+
+            for (int i = 0, templatesSize = templates.size(); i < templatesSize; i++) {
+                Termed linkTemplate = templates.get(i);
+
+                Concept templateConcept = nar.conceptualize(linkTemplate, taskBudget, subScale, 0);
+                if (templateConcept != null) {
+                    linkTerm(templateConcept, taskBudget, subScale);
+
+                    /** recursively activate the template's task tlink */
+                    templateConcept.link(task, subScale, minScale, nar);
+                }
+
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    @Nullable @Override
+    public List<Termed> termlinkTemplates() {
         return termLinkTemplates;
     }
 

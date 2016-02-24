@@ -13,7 +13,6 @@ import nars.nal.nal8.Operator;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Term;
-import nars.term.Termed;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -72,7 +71,7 @@ public class Kernel {
         schedule.sample(updateRate.floatValue(), cl -> {
             Task t = cl.get();
             if (t.isGoal())
-                n.conceptualize(t, UnitBudget.One, strength(cl) );
+                n.conceptualize(t, UnitBudget.One, strength(cl), 0);
             else /* t.isCommand */
                 n.input(t); //re-input
         });

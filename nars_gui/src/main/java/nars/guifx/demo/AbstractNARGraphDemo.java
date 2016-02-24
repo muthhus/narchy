@@ -4,17 +4,24 @@ import nars.guifx.graph2.ConceptsSource;
 import nars.guifx.graph2.TermEdge;
 import nars.guifx.graph2.impl.HalfHalfIsoTriangleCanvasEdgeRenderer;
 import nars.guifx.graph2.impl.HexButtonVis;
+import nars.guifx.graph2.impl.SubButtonVis;
+import nars.guifx.graph2.layout.Grid;
 import nars.guifx.graph2.layout.Spiral;
+import nars.guifx.graph2.scene.DefaultNodeVis;
 import nars.guifx.graph2.source.DefaultGrapher;
 import nars.guifx.graph2.source.SpaceGrapher;
 import nars.guifx.util.TabX;
 import nars.nar.Default;
 
+import java.util.function.Consumer;
+
+import static javafx.application.Platform.runLater;
+
 /**
  * Created by me on 8/15/15.
  */
-public enum NARGraph1Test {
-    ;
+public abstract class AbstractNARGraphDemo {
+
 
     public static SpaceGrapher newGraph(Default n) {
 
@@ -60,7 +67,7 @@ public enum NARGraph1Test {
 
                 //new SubButtonVis(n),
                 new HexButtonVis(n),
-                //new DefaultNodeVis.HexTermNode(),
+                //new DefaultNodeVis(),
 
                 (A, B) -> {
                     return new TermEdge(A, B) {
@@ -77,7 +84,12 @@ public enum NARGraph1Test {
                 new HalfHalfIsoTriangleCanvasEdgeRenderer()
                 //new BlurCanvasEdgeRenderer()
         );
-        g.layoutType.setValue(Spiral.class);
+
+        //initial settings
+
+        runLater(()-> {
+            g.setLayout(new Grid());
+        });
 
         //g.setLayout(HyperassociativeMap2D.class);
         //g.pan(2000,2000);
@@ -87,18 +99,11 @@ public enum NARGraph1Test {
         return g;
     }
 
-    public static void main(String[] args)  {
-
-        Default n = new Default(1024,1,1,2);
-        n.input("<a --> b>.");
-        n.input("<b --> c>.");
-        n.input("<c --> d>.");
-        n.run(5);
-
-        graphIDE(n);
-    }
 
     public static void graphIDE(Default n) {
+        graphIDE(n, null);
+    }
+    public static void graphIDE(Default n, Consumer<NARide> onReady) {
         NARide.show(n.loop(), ide -> {
 
             //ide.addView(new IOPane(n));
@@ -109,7 +114,9 @@ public enum NARGraph1Test {
             ide.setSpeed(150);
             //n.frame(5);
 
+            if (onReady!=null)
+                onReady.accept(ide);
+
         });
     }
-
 }

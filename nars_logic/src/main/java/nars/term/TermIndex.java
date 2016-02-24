@@ -73,16 +73,6 @@ public interface TermIndex extends TermBuilder {
     }
 
 
-    /** gets an existing item or applies the builder to produce something to return */
-    @Nullable
-    default <K extends Term> Termed<K> apply(K key, @NotNull Function<K,Termed> builder) {
-        Termed existing = getTermIfPresent(key);
-        if (existing == null) {
-            putTerm(existing = builder.apply(key));
-        }
-        return existing;
-    }
-
     @Nullable
     TermContainer internSub(TermContainer s);
 

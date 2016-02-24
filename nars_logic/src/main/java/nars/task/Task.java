@@ -23,6 +23,7 @@ package nars.task;
 import nars.*;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
+import nars.concept.AtomConcept;
 import nars.concept.Concept;
 import nars.nal.Tense;
 import nars.term.*;
@@ -367,6 +368,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     boolean execute(NAR nar);
 
     void delete();
+
 
 //    /** get the absolute time of an event subterm, if present, TIMELESS otherwise */
 //    default long subtermTimeAbs(Term x) {

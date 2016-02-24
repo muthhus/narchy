@@ -35,7 +35,7 @@ public class ConceptButton extends JButton implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (concept == null) {
-            concept = nar.memory.concept(term);
+            concept = nar.concept(term);
         }
         //popup(nar, concept);
     }

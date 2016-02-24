@@ -381,7 +381,7 @@ public class TermTest {
 
         Term a = n.term(s);
 
-        NAR n2 = new Terminal();
+        NAR n2 = new Default();
         Term b = n.term(s);
 
         //assertTrue(a != b);
@@ -453,7 +453,7 @@ public class TermTest {
         String s = "(&&, <<$1 --> key> ==> <#2 --> (/, open, $1, _)>>, <#2 --> lock>)";
         Term a = n.term(s);
 
-        NAR n2 = new Terminal();
+        NAR n2 = new Default();
         Term b = n2.term(s);
 
         assertTrue(a != b);

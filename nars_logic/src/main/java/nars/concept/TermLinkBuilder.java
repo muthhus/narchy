@@ -2,14 +2,18 @@ package nars.concept;
 
 import nars.Global;
 import nars.Memory;
+import nars.NAR;
 import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.variable.Variable;
+import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 
@@ -26,18 +30,14 @@ public enum TermLinkBuilder {
 //    protected float forgetCycles;
 //    protected long now;
 
-    @Nullable
-    public static Termed[] build(Term host, @NotNull Memory memory) {
+    public static @NotNull List<Termed> build(Termed<Compound> host, @NotNull NAR nar) {
+        Set<Termed> components = Global.newHashSet(0);
+        prepareComponentLinks(host.term(), components, nar);
 
-        if (!(host instanceof Compound)) {
-            return null;
-        } else {
-
-            Set<Termed> components = Global.newHashSet(host.complexity());
-            prepareComponentLinks((Compound) host, components, memory);
-
-            return components.toArray(new Termed[components.size()]);
-        }
+        if (components.isEmpty())
+            return Collections.emptyList();
+        else
+            return new FasterList(components);
     }
 
     static final int NegationOrConjunction = Op.or(Op.CONJUNCTION, Op.NEGATE);
@@ -50,7 +50,7 @@ public enum TermLinkBuilder {
      * @param t          The CompoundTerm for which to build links
      * @param components set of components being accumulated, to avoid duplicates
      */
-    static void prepareComponentLinks(@NotNull Compound t, @NotNull Set<Termed> components, @NotNull Memory memory) {
+    static void prepareComponentLinks(@NotNull Compound t, @NotNull Set<Termed> components, @NotNull NAR nar) {
 
         ///** add self link for structural transform: */
         //components.add(t);
@@ -62,7 +62,7 @@ public enum TermLinkBuilder {
         int ni = t.size();
         for (int i = 0; i < ni; i++) {
 
-            Term ti = growComponent(t.term(i), 0, memory);
+            Term ti = growComponent(t.term(i), 0, nar);
             if (ti == null)
                 continue;
 
@@ -74,7 +74,7 @@ public enum TermLinkBuilder {
             if ((tEquivalence || (tImplication && (i == 0))) &&
                     (ti.isAny(NegationOrConjunction))) {
 
-                prepareComponentLinks((Compound) ti, components, memory);
+                prepareComponentLinks((Compound) ti, components, nar);
 
             } else if (ti instanceof Compound) {
                 Compound cti = (Compound) ti;
@@ -82,7 +82,7 @@ public enum TermLinkBuilder {
 
                 int nj = cti.size();
                 for (int j = 0; j < nj; j++) {
-                    Term tj = growComponent(cti.term(j), 1, memory);
+                    Term tj = growComponent(cti.term(j), 1, nar);
                     if (tj == null)
                         continue;
 
@@ -97,7 +97,7 @@ public enum TermLinkBuilder {
                         int nk = cctj.size();
                         for (int k = 0; k < nk; k++) {
 
-                            Term tk = growComponent(cctj.term(k), 2, memory);
+                            Term tk = growComponent(cctj.term(k), 2, nar);
                             if (tk == null)
                                 continue;
 
@@ -119,9 +119,9 @@ public enum TermLinkBuilder {
     /**
      * determines whether to grow a 1st-level termlink to a subterm
      */
-    protected static Term growComponent(Term t, int level, @NotNull Memory memory) {
+    protected static Term growComponent(Term t, int level, @NotNull NAR nar) {
 
-        Concept tti = memory.concept(t);
+        Concept tti = nar.concept(t);
         if (tti == null)
             return null;
 

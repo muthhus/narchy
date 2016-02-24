@@ -45,7 +45,7 @@ public enum NARfx  {
         System.setProperty("prism.verbose", "true");
         System.setProperty("prism.dirtyopts", "false");
         //System.setProperty("javafx.animation.fullspeed", "true");
-        System.setProperty("javafx.animation.pulse", "10");
+        System.setProperty("javafx.animation.pulse", "30"); //by default this is 60
     }
 
     public static String css;

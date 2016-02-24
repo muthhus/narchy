@@ -70,6 +70,9 @@ public final class Operator<T extends Term> extends AtomicStringConstant {
         return 1;
     }
 
+    @Override public boolean isCompound() {
+        return false;
+    }
 
     @NotNull
     @Override

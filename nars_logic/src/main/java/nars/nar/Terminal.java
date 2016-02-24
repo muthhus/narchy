@@ -6,6 +6,7 @@ import nars.budget.Budget;
 import nars.concept.Concept;
 import nars.task.Task;
 import nars.task.flow.FIFOTaskPerception;
+import nars.term.Term;
 import nars.term.TermIndex;
 import nars.term.Termed;
 import nars.time.Clock;
@@ -53,10 +54,15 @@ public class Terminal extends AbstractNAR {
         this(TermIndex.memory(1024), c);
     }
 
-    @Nullable
     @Override
-    public Concept conceptualize(Termed termed, Budget activation, float scale) {
-        return memory.concept(termed); //ignore activation
+    public Concept conceptualize(Termed termed, Budget activation, float scale, float toTermLinks) {
+        return concept(termed); //ignore activation
+    }
+
+    @Override @Nullable
+    protected Concept newConcept(Term t) {
+        //throw new UnsupportedOperationException();
+        return null;
     }
 
     @Override

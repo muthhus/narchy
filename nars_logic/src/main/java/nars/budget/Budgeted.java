@@ -55,7 +55,19 @@ public interface Budgeted extends BudgetedStruct {
             return getDurability();
         }
         
-        default long lastForgetTime() { return getLastForgetTime(); }
-        
+//        default long lastForgetTime() { return getLastForgetTime(); }
+//
         default boolean isDeleted() { return getDeleted(); }
+
+
+
+    default float priIfFiniteElseZero() {
+        return priIfFiniteElse(0);
+    }
+
+    default float priIfFiniteElse(float ifNonFinite) {
+        float p = pri();
+        return Float.isFinite(p) ? p : ifNonFinite;
+    }
+
 }

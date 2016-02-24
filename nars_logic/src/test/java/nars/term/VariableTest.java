@@ -41,37 +41,37 @@ public class VariableTest {
         assertEquals(1, $.$("<$x <-> %y>").vars());
     }
 
-    @Test
-    public void testIndpVarNorm() {
-        assertEquals(2, $.$("<$x <-> $y>").vars());
-
-        testIndpVarNorm("$x", "$y", "($1,$2)");
-        testIndpVarNorm("$x", "$x", "($1,$1)");
-        testIndpVarNorm("$x", "#x", "($1,#2)");
-        testIndpVarNorm("#x", "#x", "(#1,#1)");
-    }
-
-    @Test
-    public void testIndpVarNormCompound() {
-        //testIndpVarNorm("<$x <-> $y>", "<$x <-> $y>", "(<$1 <-> $2>, <$3 <-> $4>)");
-
-        testIndpVarNorm("$x", "$x", "($1,$1)");
-        testIndpVarNorm("#x", "#x", "(#1,#1)");
-        testIndpVarNorm("<#x<->#y>", "<#x<->#y>", "((#1<->#2),(#1<->#2))");
-        testIndpVarNorm("<$x<->$y>", "<$x<->$y>", "(($1<->$2),($1<->$2))");
-    }
-    public void testIndpVarNorm(String vara, String varb, String expect) {
-
-
-        Term a = $.$(vara);
-        Term b = $.$(varb);
-        //System.out.println(a + " " + b + " "  + Product.make(a, b).normalized().toString());
-
-        assertEquals(
-            expect,
-            t.concept($.p(a, b)).toString()
-        );
-    }
+//    @Test
+//    public void testIndpVarNorm() {
+//        assertEquals(2, $.$("<$x <-> $y>").vars());
+//
+//        testIndpVarNorm("$x", "$y", "($1,$2)");
+//        testIndpVarNorm("$x", "$x", "($1,$1)");
+//        testIndpVarNorm("$x", "#x", "($1,#2)");
+//        testIndpVarNorm("#x", "#x", "(#1,#1)");
+//    }
+//
+//    @Test
+//    public void testIndpVarNormCompound() {
+//        //testIndpVarNorm("<$x <-> $y>", "<$x <-> $y>", "(<$1 <-> $2>, <$3 <-> $4>)");
+//
+//        testIndpVarNorm("$x", "$x", "($1,$1)");
+//        testIndpVarNorm("#x", "#x", "(#1,#1)");
+//        testIndpVarNorm("<#x<->#y>", "<#x<->#y>", "((#1<->#2),(#1<->#2))");
+//        testIndpVarNorm("<$x<->$y>", "<$x<->$y>", "(($1<->$2),($1<->$2))");
+//    }
+//    public void testIndpVarNorm(String vara, String varb, String expect) {
+//
+//
+//        Term a = $.$(vara);
+//        Term b = $.$(varb);
+//        //System.out.println(a + " " + b + " "  + Product.make(a, b).normalized().toString());
+//
+//        assertEquals(
+//            expect,
+//            t.concept($.p(a, b)).toString()
+//        );
+//    }
 
     @Test public void testBooleanReductionViaHasPatternVar() {
         Compound d = $.$("<a <-> <$1 --> b>>");

@@ -56,7 +56,7 @@ public class CurveBagTest  {
 
         assertEquals(0, c.getPriorityMin(), 0.001f);
 
-        assertTrue(UnitBudget.zero.equalsByPrecision( c.get("x"), 0.01f) );
+        assertTrue(UnitBudget.Zero.equalsByPrecision( c.get("x"), 0.01f) );
 
     }
 

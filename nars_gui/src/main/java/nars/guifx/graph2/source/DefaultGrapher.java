@@ -30,10 +30,11 @@ public class DefaultGrapher extends SpaceGrapher {
     @Implementation(HyperassociativeMap1D.class)
     @Implementation(Hilbert.class)
     //@Implementation(TimeGraph.class)
-    public final ImplementationProperty<IterativeLayout> layoutType = new ImplementationProperty();
+    public final ImplementationProperty<IterativeLayout> layoutType = new ImplementationProperty<>();
 
     public final NAR nar;
     public final POJOPane pojo;
+
 
 
 //    public DefaultGrapher(int capacity, ConceptsSource source) {
@@ -53,22 +54,28 @@ public class DefaultGrapher extends SpaceGrapher {
 
         InvalidationListener layoutChange = e -> {
             IterativeLayout il = layoutType.getInstance();
+
             if (il!=null) {
-                layout.set(il);
-                layoutSwitch();
+                setLayout(il);
             } else {
-                layout.set(nullLayout);
+                //layout.set(nullLayout);
             }
         };
 
         layoutType.addListener(layoutChange);
 
-        runLater(() -> layoutChange.invalidated(null));
+
 
         pojo = new POJOPane(this);
         pojo.layout();
         pojo.autosize();
         getChildren().add(pojo);
+
+
+
+        //layoutChange.invalidated(null); //set current value
+        runLater(() -> layoutChange.invalidated(null));
+
 
 
     }

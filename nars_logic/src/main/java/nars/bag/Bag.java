@@ -1,6 +1,7 @@
 package nars.bag;
 
 import nars.budget.Budget;
+import nars.budget.Budgeted;
 import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -68,7 +69,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
     }
 
     @Nullable
-    BLink<V> put(V i, Budget b, float scale);
+    BLink<V> put(V i, Budgeted b, float scale);
 
 
 

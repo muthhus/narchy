@@ -1210,11 +1210,6 @@ public class Narsese extends BaseParser<Object> {
                 index.normalized(raw) : index.the(raw);
     }
 
-    @Nullable
-    public Termed concept(String s, @NotNull Memory m) {
-        return m.concept(term(s));
-    }
-
 //    public TaskRule taskRule(String input) {
 //        Term x = termRaw(input, singleTaskRuleParser);
 //        if (x==null) return null;

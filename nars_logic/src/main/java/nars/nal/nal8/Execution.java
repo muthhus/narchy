@@ -12,11 +12,8 @@ import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.variable.GenericVariable;
-import nars.util.event.Topic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static nars.Op.PRODUCT;
 
@@ -181,7 +178,7 @@ public interface Execution  {
      */
     static Task noticeExecuted(@NotNull NAR nar, @NotNull Task operation) {
 
-        Budget b = !operation.isDeleted() ? operation.budget() : UnitBudget.zero;
+        Budget b = !operation.isDeleted() ? operation.budget() : UnitBudget.Zero;
 
         Memory memory = nar.memory;
 

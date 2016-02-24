@@ -1,11 +1,20 @@
 package nars.guifx.annotation;
 
 import javafx.beans.property.SimpleObjectProperty;
+import nars.guifx.graph2.layout.Grid;
 
 /**
  * Annotate with @Implementation
  */
 public class ImplementationProperty<C> extends SimpleObjectProperty<Class<? extends C>> {
+
+
+    public ImplementationProperty() {
+        super();
+    }
+    public ImplementationProperty(Class c) {
+        super(c);
+    }
 
     public C getInstance() {
         Class<? extends C> lc = get();
@@ -19,6 +28,5 @@ public class ImplementationProperty<C> extends SimpleObjectProperty<Class<? exte
         }
         return null;
     }
-
 
 }

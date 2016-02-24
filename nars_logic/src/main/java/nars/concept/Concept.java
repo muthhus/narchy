@@ -28,12 +28,14 @@ import nars.bag.Bag;
 import nars.concept.util.BeliefTable;
 import nars.concept.util.TaskTable;
 import nars.task.Task;
+import nars.term.Term;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -249,8 +251,7 @@ public interface Concept extends Termed, Comparable<Termed> {
         out.println();
     }
 
-    @Nullable
-    Termed[] getTermLinkTemplates();
+    @Nullable List<Termed> termlinkTemplates();
 
     @NotNull
     default Iterator<Task> iterateTasks(boolean onbeliefs, boolean ongoals, boolean onquestions, boolean onquests) {

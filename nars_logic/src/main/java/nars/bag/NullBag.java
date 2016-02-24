@@ -1,6 +1,7 @@
 package nars.bag;
 
 import nars.budget.Budget;
+import nars.budget.Budgeted;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -55,7 +56,7 @@ public final class NullBag<V> implements Bag<V> {
 
     @Nullable
     @Override
-    public BLink<V> put(Object i, Budget b, float scale) {
+    public BLink<V> put(Object i, Budgeted b, float scale) {
         return null;
     }
 

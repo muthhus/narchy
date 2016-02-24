@@ -9,18 +9,19 @@ import nars.bag.impl.CurveBag;
 import nars.budget.Budget;
 import nars.budget.BudgetMerge;
 import nars.budget.Forget;
-import nars.concept.Concept;
-import nars.concept.ConceptProcess;
-import nars.concept.DefaultConceptProcess;
-import nars.concept.PremiseGenerator;
+import nars.concept.*;
 import nars.data.Range;
 import nars.nal.Deriver;
 import nars.nal.meta.PremiseEval;
+import nars.nal.space.Space;
+import nars.nal.space.SpaceConcept;
 import nars.task.Task;
 import nars.task.flow.SetTaskPerception;
 import nars.task.flow.TaskPerception;
+import nars.term.Term;
 import nars.term.TermIndex;
 import nars.term.Termed;
+import nars.term.atom.Atom;
 import nars.time.FrameClock;
 import nars.util.data.MutableInteger;
 import nars.util.event.Active;
@@ -31,6 +32,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.function.Consumer;
 
 /**
@@ -139,6 +141,42 @@ public class Default extends AbstractNAR {
                 .merge(BudgetMerge.plusDQBlend);
     }
 
+    protected Concept newConcept(Term t) {
+
+        int termLinkBagSize = 32;
+        int taskLinkBagSize = 32;
+
+        Random random = memory.random;
+
+        Bag<Task> taskLinks =
+                new CurveBag<Task>(taskLinkBagSize, random)
+                        .merge(BudgetMerge.plusDQBlend);
+
+        Bag<Termed> termLinks =
+                new CurveBag<Termed>(termLinkBagSize, random)
+                        .merge(BudgetMerge.plusDQBlend);
+
+        return (!(t.isCompound())) ?
+
+                newAtomConcept(t, taskLinks, termLinks) :
+
+                newCompoundConcept(t, taskLinks, termLinks);
+    }
+
+    @NotNull
+    protected Concept newCompoundConcept(Term t, Bag<Task> taskLinks, Bag<Termed> termLinks) {
+        return (!(t instanceof Space)) ?
+
+                new DefaultConcept(t, taskLinks, termLinks, this) :
+
+                new SpaceConcept((Space)t, taskLinks, termLinks, this);
+    }
+
+    protected @NotNull AtomConcept newAtomConcept(Term t, Bag<Task> taskLinks, Bag<Termed> termLinks) {
+        return new AtomConcept(t, termLinks, taskLinks);
+    }
+
+
 //    public Bag<Concept> newConceptBagAggregateLinks(int initialCapacity) {
 //        return new CurveBag<Concept>(initialCapacity, rng) {
 //
@@ -184,12 +222,77 @@ public class Default extends AbstractNAR {
     }
 
     @Override
-    public Concept conceptualize(Termed termed, Budget activation, float scale) {
+    public Concept conceptualize(Termed termed, Budget activation, float scale, float toTermLinks) {
         Concept c = concept(termed);
         if (c!=null) {
             core.activate(c, activation, scale);
+
+            if (toTermLinks!=0) {
+                int numTermLinks = c.termlinks().size();
+                if (numTermLinks > 0) {
+                    float baseScale = toTermLinks * scale / numTermLinks; //minimum wage termlinks can receive
+                    c.termlinks().forEach(bt -> {
+                        conceptualizeLink(activation, toTermLinks, c, bt, baseScale);
+                    });
+
+                }
+//                    float basePriIncrease = baseScale * activation.pri();
+//                    //if (baseScale > Global.BUDGET_PROPAGATION_EPSILON) {
+//
+//
+//                        final float[] priDemand = {0}, priSurplus = {0};
+//                        c.termlinks().forEach(t -> {
+//                            float p = t.pri();
+//
+//                            if (1f - p > 0)
+//                                priDemand[0] += 1f-p;
+//
+//                            float pot = (p + basePriIncrease);
+//                            float potentialSurplus = pot - 1f;
+//                            if (potentialSurplus > 0)
+//                                priSurplus[0] += potentialSurplus;
+//                        });
+//
+//
+//                        //float tlScale = toTermLinks * scale / numTLToActivate;
+//
+//                        System.out.println(c + " " + priDemand[0] + " " + priSurplus[0]);
+//
+//                                //numTermLinks - priPotential[0];
+//                        //float tlScale = toTermLinks * scale * (1f + surplus * (1f - bt.pri())/priPotential[0])/numTLToActivate;
+//                        //if (tlScale >= Global.BUDGET_PROPAGATION_EPSILON) {
+//                        c.termlinks().forEach(bt -> {
+//
+//                            float s = baseScale +
+//                                    (priSurplus[0] *
+//                                        (1f - bt.pri()) / priDemand[0]); //share of the total demand
+//                            System.out.println("  " + c + " " + s);
+//                            conceptualizeLink(activation, toTermLinks, c, bt, s);
+//                        });
+//
+//
+//                }
+//
+//
+            }
+
         }
+
+
         return c;
+    }
+
+    public void conceptualizeLink(Budget activation, float toTermLinks, Concept c, BLink<? extends Termed> bt, float s) {
+
+
+        if (s * activation.pri() > Global.BUDGET_PROPAGATION_EPSILON) {
+
+            Concept tc = conceptualize(bt.get(), activation, s, toTermLinks);
+
+            if (tc != null) {
+                AtomConcept.linkTerm(c, tc, activation, s, true, false);
+            }
+        }
     }
 
     @NotNull

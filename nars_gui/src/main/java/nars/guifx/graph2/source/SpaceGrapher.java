@@ -12,6 +12,8 @@ import nars.guifx.graph2.layout.None;
 import nars.guifx.util.Animate;
 import nars.term.Term;
 import nars.term.Termed;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -24,6 +26,8 @@ import static javafx.application.Platform.runLater;
  * Created by me on 8/6/15.
  */
 public class SpaceGrapher extends Spacegraph {
+
+    public static final Logger logger = LoggerFactory.getLogger(SpaceGrapher.class);
 
     final Map<Term, TermNode> terms = new UnifiedMap();
     //new WeakValueHashMap<>();
@@ -218,6 +222,7 @@ public class SpaceGrapher extends Spacegraph {
 
 
     protected final TermNode newNode(Termed k) {
+
         TermNode n = nodeVis.get().newNode(k);
         if (n !=null) {
             IterativeLayout<TermNode> l = layout.get();
@@ -437,10 +442,6 @@ public class SpaceGrapher extends Spacegraph {
                 })*/
         ;
 
-        //TODO add enable override boolean switch
-        sceneProperty().addListener(v -> checkVisibility());
-        parentProperty().addListener(v -> checkVisibility());
-        visibleProperty().addListener(v -> checkVisibility());
 
         //runLater(() -> checkVisibility());
 
@@ -453,14 +454,24 @@ public class SpaceGrapher extends Spacegraph {
 
 
 
+        //TODO add enable override boolean switch
+        runLater(()-> {
+            sceneProperty().addListener(v -> checkVisibility());
+            parentProperty().addListener(v -> checkVisibility());
+            visibleProperty().addListener(v -> checkVisibility());
+        });
     }
 
     /**
      * called when layout changes to restart the source & layout
      */
-    synchronized void layoutSwitch() {
+    synchronized public void setLayout(IterativeLayout il) {
+
+        logger.info("layout switch: {}", il);
+        layout.set(il);
+
         int lastAnimPeriodMS;
-        lastAnimPeriodMS = animator != null ? animator.getPeriod() : -1;
+        lastAnimPeriodMS = animator != null ? animator.getPeriod() : defaultFramePeriodMS;
 
         stop();
 
@@ -470,8 +481,8 @@ public class SpaceGrapher extends Spacegraph {
 
         //rerender();
 
-        if (lastAnimPeriodMS != -1)
-            start(lastAnimPeriodMS);
+        //if (lastAnimPeriodMS != -1)
+        start(lastAnimPeriodMS);
     }
 
 
@@ -548,7 +559,7 @@ public class SpaceGrapher extends Spacegraph {
 
     public synchronized void start(int layoutPeriodMS) {
 
-        stop();
+        logger.info("start at {}ms", layoutPeriodMS);
 
         GraphSource src = source.get();
 
@@ -571,12 +582,13 @@ public class SpaceGrapher extends Spacegraph {
 
             });
 
+            src.start(this);
+
             reupdate();
             rerender();
 
             animator.start();
 
-            src.start(this);
 
 
             //updaterSlow.start();
@@ -585,6 +597,9 @@ public class SpaceGrapher extends Spacegraph {
     }
 
     public synchronized void stop() {
+
+        logger.info("stop: {}");
+
         if (animator != null) {
             animator.stop();
             animator = null;

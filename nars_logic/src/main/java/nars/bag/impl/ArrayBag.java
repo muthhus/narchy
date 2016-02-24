@@ -12,7 +12,6 @@ import nars.util.data.sorted.SortedIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -73,14 +72,14 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
         }
     }
 
-    protected final void merge(Budget target, Budget incoming, float scale) {
+    protected final void merge(Budget target, Budgeted incoming, float scale) {
         mergeFunction.merge(target, incoming, scale);
     }
 
     private Budget getDefaultBudget(V v) {
         if (v instanceof Budgeted)
             return ((Budgeted)v).budget();
-        return UnitBudget.zero;
+        return UnitBudget.Zero;
     }
 
 
@@ -220,7 +219,7 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
      * @return The updated budget
      */
     @Override
-    public final BLink<V> put(V i, Budget b, float scale) {
+    public final BLink<V> put(V i, Budgeted b, float scale) {
 
         BLink<V> existing = get(i);
 
