@@ -12,6 +12,7 @@ import nars.nal.meta.constraint.MatchConstraint;
 import nars.nal.meta.op.MatchTerm;
 import nars.nal.nal8.Operator;
 import nars.nal.op.ImmediateTermTransform;
+import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.TermIndex;
@@ -57,7 +58,6 @@ public class PremiseEval extends FindSubst {
 
 
     /** cached value */
-    private transient char premisePunc;
     private TermIndex index;
 
     public PremiseEval(Random r, Deriver deriver) {
@@ -144,11 +144,12 @@ public class PremiseEval extends FindSubst {
     public final void start(@NotNull ConceptProcess p) {
 
         this.currentPremise = p;
-        this.premisePunc = currentPremise.task().punc();
 
         this.index = currentPremise.memory().index;
 
-        Compound taskTerm = p.task().term();
+        Task task = p.task();
+        Compound taskTerm = task.term();
+        punct.set(task.punc());
 
         Term beliefTerm = p.beliefTerm().term();  //experimental, prefer to use the belief term's Term in case it has more relevant TermMetadata (intermvals)
 
@@ -225,9 +226,6 @@ public class PremiseEval extends FindSubst {
         return minConfidence;
     }
 
-    public char punc() {
-        return premisePunc;
-    }
 }
 
 

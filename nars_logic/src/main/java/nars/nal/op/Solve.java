@@ -129,7 +129,7 @@ abstract public class Solve extends AtomicBooleanCondition<PremiseEval> {
 
         @Override public boolean booleanValueOf(@NotNull PremiseEval m) {
             return measure(m,
-                    m.punc(),
+                    m.punct.get(),
                     belief, desire);
         }
     }

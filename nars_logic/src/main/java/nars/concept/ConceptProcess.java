@@ -148,6 +148,11 @@ abstract public class ConceptProcess implements Premise {
     public void derive(@NotNull Termed<Compound> c, @Nullable Truth truth, Budget budget, long now, long occ, @NotNull PremiseEval p, @NotNull Derive d) {
 
         char punct = p.punct.get();
+//        Character _punct = p.punct.get();
+//        if (_punct == null) {
+//            throw new RuntimeException("punct is null");
+//        }
+//        char punct = _punct;
 
         Task belief = belief();
 

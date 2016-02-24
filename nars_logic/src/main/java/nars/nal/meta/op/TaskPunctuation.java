@@ -20,7 +20,7 @@ final public class TaskPunctuation extends AtomicBooleanCondition<PremiseEval> {
 
         @Override
         public boolean booleanValueOf(@NotNull PremiseEval o) {
-            char taskPunc = o.punc();
+            char taskPunc = o.punct.get();
             return taskPunc == Symbols.QUESTION || taskPunc == Symbols.QUEST;
         }
 
@@ -59,7 +59,7 @@ final public class TaskPunctuation extends AtomicBooleanCondition<PremiseEval> {
 
     @Override
     public final boolean booleanValueOf(@NotNull PremiseEval m) {
-        return m.punc() == punc;
+        return m.punct.get() == punc;
     }
 
     //    @NotNull

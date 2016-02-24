@@ -20,7 +20,7 @@
     (S <-> P), (S --> P), task("?") |- (S <-> P), (Belief:StructuralAbduction, Punctuation:Judgment)
 
 //desire spreading by similarity
-    S, (S <-> P), task("!") |- P, (Desire:Intersection)
+    S, (S <-> P), task("!") |- P, (Desire:Intersection, Punctuation:Goal)
 
 //// Immediate Inference ////////////////////////////////////////////////////////////////////////////////////
 
@@ -348,9 +348,9 @@
 
 
 //// 2nd variable introduction ////////////////////////////////////////////////////////////////////////////////////
-
-    (A ==> (M --> P)), (M --> S), not_equal(A, (M --> S)) |- ((&&,A,($X --> S)) ==> ($X --> P)), (Belief:Induction),
-                                                             (&&,(A ==> (#Y --> P)), (#Y --> S)), (Belief:Intersection)
+//, not_equal(A, (M --> S))
+    (A ==> (M --> P)), (M --> S) |- ((&&,A,($X --> S)) ==> ($X --> P)), (Belief:Induction),
+                                    (&&,(A ==> (#Y --> P)), (#Y --> S)), (Belief:Intersection)
 
     (&&,(M --> P), A..+), (M --> S), neq(S,P) |- (($Y --> S) ==> (&&,($Y --> P), A..+)), (Belief:Induction),
                                                  (&&,(#Y --> S), (#Y --> P), A..+), (Belief:Intersection)

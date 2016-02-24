@@ -195,7 +195,6 @@ public class PremiseRule extends GenericCompound {
         match.addPreConditions(beforeMatch); //pre-conditions
 
         //TODO sort beforeMatch because the order can determine performance HACK
-
         if (beforeMatch.size() > 1) {
             Term second = beforeMatch.get(1);
 
