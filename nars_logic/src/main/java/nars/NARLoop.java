@@ -74,7 +74,7 @@ public class NARLoop implements Runnable {
 
         thread = new Thread(this, n.self + ":loop");
         thread.start();
-        logger.info("starting {}", thread);
+        logger.info("startied {}", thread);
     }
 
 

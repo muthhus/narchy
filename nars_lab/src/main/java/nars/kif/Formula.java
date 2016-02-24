@@ -1903,7 +1903,7 @@ public class Formula implements Comparable {
 
     /**
      * ***************************************************************
-     * A utility helper method for computing predicate data types.
+     * A utility sh method for computing predicate data types.
      */
     private String[] addToTypeList(String pred, ArrayList al, String[] result, String classP) {
         try {
@@ -5575,7 +5575,7 @@ public class Formula implements Comparable {
 
     /**
      * ***************************************************************
-     * This is a helper method for standardizeApart(renameMap). It assumes that
+     * This is a sh method for standardizeApart(renameMap). It assumes that
      * the Formula will be a single clause.
      *
      * @see clausify()

@@ -47,6 +47,11 @@ public class ClassOperator extends TermFunction {
         }
     }
 
+    @Override
+    public boolean async() {
+        return true;
+    }
+
     public static Term methodTerm(@NotNull Method m) {
         return $.the(m.getName());
     }
