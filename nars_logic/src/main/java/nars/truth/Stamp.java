@@ -29,9 +29,11 @@ import java.util.Arrays;
 
 public interface Stamp {
 
-    @NotNull static long[] zip(@NotNull long[] a, @NotNull long[] b) {
+    @NotNull
+    static long[] zip(@NotNull long[] a, @NotNull long[] b) {
         return zip(a, b, Global.MAXIMUM_EVIDENTAL_BASE_LENGTH);
     }
+
     /***
      * zips two evidentialBase arrays into a new one
      * assumes a and b are already sorted in increasing order
@@ -46,26 +48,35 @@ public interface Stamp {
         long[] c = new long[baseLength];
 
         //if it's an even-number of items, we want the (n-1)th's array element to come from 'b'
-        boolean parity = ((baseLength-1)%2==0) ? false : true;
+        boolean parity = true;
 
-        int ib = bLen-1, ia = aLen-1;
-        for (int i = baseLength-1; i >= 0; ) {
-            boolean ha = ia >= 0;
-            boolean hb = ib >= 0;
-            boolean na;
-            if (ha && hb)
-                na = (i % 2 == 0) ? parity : !parity; //both, choose according to the parity decision
-            else
-                na = (ha ? true : false); //one of them is empty, choose which is not
+        //int ib = bLen-1, ia = aLen-1; //reverse
+        int ib = 0, ia = 0; //fwd
+        //for (int i = baseLength-1; i >= 0; ) {  //reverse
 
-            c[i--] = (na) ? a[ia--] : b[ib--];
+        for (int i = 0; i < baseLength; ) {   //fwd
+            boolean ha = ia < aLen;
+            boolean hb = ib < bLen;
+
+            //both, choose according to the parity decision
+            //one of them is empty, select from which is not
+
+            //c[i--] = (na) ? a[ia--] : b[ib--]; //reverse
+            c[i++] = ((ha && hb) ?
+                        ((i & 1) == 1) == parity : ha) ?
+                            a[ia++] : b[ib++]; //fwd
         }
 
-        return toSetArray(c);
+        return toSetArray(c, maxLen);
     }
 
     @NotNull
     static long[] toSetArray(@NotNull long[] x) {
+        return toSetArray(x, x.length);
+    }
+
+    @NotNull
+    static long[] toSetArray(@NotNull long[] x, final int outputLen) {
         int l = x.length;
 
         if (l < 2)
@@ -78,7 +89,7 @@ public interface Stamp {
         //2. count unique elements
         long lastValue = -1;
         int uniques = 0; //# of unique items
-        int sLen = sorted.length;
+        int sLen = outputLen;
 
         for (long v : sorted) {
             if (lastValue != v)
@@ -86,21 +97,24 @@ public interface Stamp {
             lastValue = v;
         }
 
-        if (uniques == sLen) {
-            //if no duplicates, just return it
+        if ((uniques == sLen) && (sorted.length == sLen)) {
+            //if no duplicates and it's the right size, just return it
             return sorted;
         }
 
         //3. de-duplicate
-        long[] deduplicated = new long[uniques];
+        int outSize = Math.min(uniques, sLen);
+        long[] dedupAndTrimmed = new long[outSize];
         int uniques2 = 0;
         long lastValue2 = -1;
         for (long v : sorted) {
             if (lastValue2 != v)
-                deduplicated[uniques2++] = v;
+                dedupAndTrimmed[uniques2++] = v;
+            if (uniques2 == outSize)
+                break;
             lastValue2 = v;
         }
-        return deduplicated;
+        return dedupAndTrimmed;
     }
 
     static boolean overlapping(@NotNull Stamp a, @Nullable Stamp b) {
@@ -113,6 +127,7 @@ public interface Stamp {
 
     /**
      * true if there are any common elements; assumes the arrays are sorted and contain no duplicates
+     *
      * @param a evidence stamp in sorted order
      * @param b evidence stamp in sorted order
      */
