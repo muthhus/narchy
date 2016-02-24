@@ -32,7 +32,7 @@ public class Versioned<X> extends FasterIntArrayList /*Comparable<Versioned>*/ {
         id = context.track();
     }
 
-    /** called when this versioned is removed/deleted from a context */
+    /** called when this versioned is removed/Deleted from a context */
     void delete() {
         context.onDeleted(this);
         current = null;

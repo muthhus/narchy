@@ -49,19 +49,19 @@ public class DefaultBeliefTable implements BeliefTable {
         if (cap == 1) cap = 2;
 
         this.map =
-                Global.newHashMap(cap/4);
+                Global.newHashMap(0);
                 //new HashMap(cap);
 
         this.minT = this.maxT = this.lastUpdate = memory.time();
         this.ageFactor = 1f/(memory.duration()*2f);
 
         /** Ranking by originality is a metric used to conserve original information in balance with confidence */
-        eternal = new SetTable<Task>(cap/2, map, new ArraySortedIndex<Task>(cap) {
+        eternal = new SetTable<Task>(map, new ArraySortedIndex<Task>(cap) {
             @Override public float score(@NotNull Task v) {
                 return BeliefTable.rankEternalByOriginality(v);
             }
         });
-        temporal = new SetTable<Task>(cap/2, map, new ArraySortedIndex<Task>(cap) {
+        temporal = new SetTable<Task>(map, new ArraySortedIndex<Task>(cap) {
             @Override public float score(@NotNull Task v) {
                 return rankTemporalByOriginality(v);
             }
@@ -450,7 +450,7 @@ public class DefaultBeliefTable implements BeliefTable {
 
 //    static void checkForDeleted(@NotNull Task input, @NotNull ArrayTable<Task,Task> table) {
 //        if (input.getDeleted())
-//            throw new RuntimeException("deleted task being added");
+//            throw new RuntimeException("Deleted task being added");
 //
 //        table.forEach((Task dt) -> {
 ////            if (dt == null)
@@ -458,7 +458,7 @@ public class DefaultBeliefTable implements BeliefTable {
 //            if (dt.getDeleted()) {
 //                throw new RuntimeException(
 //                        //System.err.println(
-//                        "deleted tasks should not be present in belief tables: " + dt);
+//                        "Deleted tasks should not be present in belief tables: " + dt);
 //                //System.err.println(dt.getExplanation());
 //                //remove(i);
 //                //i--;
@@ -468,7 +468,7 @@ public class DefaultBeliefTable implements BeliefTable {
 //    }
 
     final static class SetTable<T> extends ArrayTable<T,T> {
-        public SetTable(int cap, Map<T,T> index, ArraySortedIndex<T> items) {
+        public SetTable(Map<T, T> index, ArraySortedIndex<T> items) {
             super(items, index);
         }
 
@@ -540,7 +540,7 @@ public class DefaultBeliefTable implements BeliefTable {
 //
 //        if (Global.DEBUG) {
 //            if (input.getDeleted())
-//                throw new RuntimeException("deleted task being added");
+//                throw new RuntimeException("Deleted task being added");
 //            checkForDeleted();
 //        }
 //

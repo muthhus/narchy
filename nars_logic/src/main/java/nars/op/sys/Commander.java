@@ -40,7 +40,7 @@ public class Commander implements Consumer<NAR>, Supplier<Concept> {
 //    private final On cycleEnd;
 //    private final NAR nar;
 
-    /** how far away from the occurence time of a temporal belief before it is deleted */
+    /** how far away from the occurence time of a temporal belief before it is Deleted */
     private final int maxTemporalBeliefAge;
     private final int maxTemporalBeliefDurations = 16 /* should be tuned */;
     @NotNull

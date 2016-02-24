@@ -191,7 +191,7 @@ public enum LocalRules {
 //            return null;
 //        }
 //        if (budget.getDeleted()) {
-//            throw new RuntimeException("deleted solution budget");
+//            throw new RuntimeException("Deleted solution budget");
 //        }
 //        sol.getBudget().set(budget);
 //        return sol;

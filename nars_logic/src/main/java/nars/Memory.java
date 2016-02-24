@@ -237,7 +237,7 @@ public class Memory extends Param {
     /* ---------- new task entries ---------- */
 
     /**
-     * called anytime a task has been removed, deleted, discarded, ignored, etc.
+     * called anytime a task has been removed, Deleted, discarded, ignored, etc.
      */
     public final void remove(@NotNull Task task, @Nullable Object removalReason) {
 
@@ -328,7 +328,7 @@ public class Memory extends Param {
 //
 //    }
 //
-//    /** called by Memory at end of each cycle to flush deleted concepts */
+//    /** called by Memory at end of each cycle to flush Deleted concepts */
 //    protected void deletePendingConcepts() {
 //        if (!pendingDeletions.isEmpty()) {
 //

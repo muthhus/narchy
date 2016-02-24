@@ -18,7 +18,7 @@
 //
 //
 //abstract public class PGraphPanel<V,E> extends PPanel implements ActionListener  {
-////(^break,0_0)! //<0_0 --> deleted>>! (--,<0_0 --> deleted>>)!
+////(^break,0_0)! //<0_0 --> Deleted>>! (--,<0_0 --> Deleted>>)!
 //
 /////////////////HAMLIB
 ////processingjs compatibility layer

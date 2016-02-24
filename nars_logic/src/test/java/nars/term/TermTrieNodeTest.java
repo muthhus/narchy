@@ -113,7 +113,7 @@
 //////        trieMap.put("Moon", "walk"); // Collides with "Melinda" and turns "Moo" into a prefix.
 //////        trieMap.put("", "Root"); // You can store one value at the empty key if you like.
 //////
-//////        // Test for inserted, nonexistent, and deleted keys.
+//////        // Test for inserted, nonexistent, and Deleted keys.
 //////        System.out.println("123 = " + trieMap.get("123"));
 //////        System.out.println("Java = " + trieMap.get("Java"));
 //////        System.out.println("Melinda = " + trieMap.get("Melinda"));

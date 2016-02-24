@@ -32,37 +32,14 @@ import org.jetbrains.annotations.Nullable;
  * Mutable, unit-scaled (1.0 max) budget value
  *
  */
-public class UnitBudget extends Budget {
+public class UnitBudget extends RawBudget {
 
-
-
-    //common instance for a 'deleted budget'.  TODO use a wrapper class to make it unmodifiable
-    public static final Budget deleted = new UnitBudget();  static {  deleted.delete(); }
+    //common instance for a 'Deleted budget'.  TODO use a wrapper class to make it unmodifiable
+    public static final Budget Deleted = new UnitBudget();  static {  Deleted.delete(); }
     public static final Budget One = new UnitBudget(1f,1f,1f);
     public static final Budget Mid = new UnitBudget(0.5f, 0.5f, 0.5f);
     //common instance for a 'zero budget'.  TODO use a wrapper class to make it unmodifiable
     public static final Budget Zero = new UnitBudget();     static {  Zero.zero(); }
-
-
-
-
-    /**
-     * The relative share of time resource to be allocated
-     */
-    private float priority;
-
-    /**
-     * The percent of priority to be kept in a constant period; All priority
-     * values "decay" over time, though at different rates. Each item is given a
-     * "durability" factor in (0, 1) to specify the percentage of priority level
-     * left after each reevaluation
-     */
-    private float durability;
-
-    /**
-     * The overall (context-independent) evaluation
-     */
-    private float quality;
 
 
     /**
@@ -85,9 +62,7 @@ public class UnitBudget extends Budget {
      * @param q Initial quality
      */
     public UnitBudget(float p, float d, float q) {
-        setPriority(p);
-        setDurability(d);
-        setQuality(q);
+        super(p, d, q);
     }
 
 
@@ -130,83 +105,7 @@ public class UnitBudget extends Budget {
     }
 
 
-
-
-    /**
-     * Get priority value
-     *
-     * @return The current priority
-     */
-    @Override
-    @Deprecated public final float getPriority() {
-        return priority;
-    }
-
-    /**
-     * Change priority value
-     *
-     * @param p The new priority
-     * @return whether the operation had any effect
-     */
-    @Override
-    public final void setPriority(float p) {
-        if (!Float.isFinite(p))
-            throw new InvalidPriorityException();
-
-        this.priority = Util.clamp(p);
-    }
-
-    @Override
-    public void delete() {
-        if (isDeleted())
-            throw new RuntimeException("already deleted");
-        this.priority = Float.NaN;
-    }
-
-    /**
-     * Get durability value
-     *
-     * @return The current durability
-     */
-    @Override
-    @Deprecated public final float getDurability() {
-        return durability;
-    }
-
-    /**
-     * Change durability value
-     *
-     * @param d The new durability
-     */
-    @Override
-    public final void setDurability(float d) {
-        durability = Util.clamp(d);
-
-    }
-
-
-
-    /**
-     * Get quality value
-     *
-     * @return The current quality
-     */
-    @Override
-    @Deprecated public final float getQuality() {
-        return quality;
-    }
-
-    /**
-     * Change quality value
-     *
-     * @param q The new quality
-     */
-    @Override
-    public final void setQuality(float q) {
-        quality = Util.clamp(q);
-    }
-
-//    /**
+    //    /**
 //     * Increase quality value by a percentage of the remaining range
 //     *
 //     * @param v The increasing percent
@@ -223,30 +122,6 @@ public class UnitBudget extends Budget {
 //    public void andQuality(float v) {
 //        quality = and(quality, v);
 //    }
-
-
-    public boolean equals(Object that) {
-        throw new RuntimeException("N/A");
-    }
-
-    @Override
-    public int hashCode() {
-        throw new RuntimeException("N/A");
-     }
-
-
-    /**
-     * Fully display the BudgetValue
-     *
-     * @return String representation of the value
-     */
-    @NotNull
-    @Override
-    public String toString() {
-        return getBudgetString();
-    }
-
-
 
 
     @Override
@@ -270,18 +145,5 @@ public class UnitBudget extends Budget {
         setDurability(durability * factor);
     }
 
-
-
-
-    final static class InvalidPriorityException extends RuntimeException {
-        public InvalidPriorityException() {
-            super();
-        }
-
-        @Override
-        public String getMessage() {
-            return "NaN priority";
-        }
-    }
 
 }

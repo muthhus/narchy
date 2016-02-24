@@ -461,7 +461,7 @@
 //    }
 //
 //
-//    //TODO handle deleted items like Bag.update(..)
+//    //TODO handle Deleted items like Bag.update(..)
 ////    @Override
 ////    public E update(BagTransaction<K, E> selector) {
 ////

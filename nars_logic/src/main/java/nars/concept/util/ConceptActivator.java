@@ -184,7 +184,7 @@
 //////        if (c != null) {
 //////
 //////            if (c.isDeleted()) {
-//////                throw new RuntimeException("deleted concept should not have been returned by index");
+//////                throw new RuntimeException("Deleted concept should not have been returned by index");
 //////                //throw new RuntimeException(c + " is invalid state " + c.getState() + " after conceptualization");
 //////                //return null;
 //////            }

@@ -98,7 +98,7 @@ public final class BLink<X> extends Budget implements Link<X> {
     }
 
     @Override
-    public void setPriority(float p) {
+    public void _setPriority(float p) {
         setValue(0, p);
     }
 
@@ -108,7 +108,7 @@ public final class BLink<X> extends Budget implements Link<X> {
     }
 
     @Override
-    public void setDurability(float d) {
+    public void _setDurability(float d) {
         setValue(1, d);
     }
 
@@ -118,7 +118,7 @@ public final class BLink<X> extends Budget implements Link<X> {
     }
 
     @Override
-    public void setQuality(float q) {
+    public void _setQuality(float q) {
         setValue(2, q);
     }
 

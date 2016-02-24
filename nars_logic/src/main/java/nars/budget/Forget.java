@@ -26,7 +26,7 @@ public enum Forget { ;
 
     }
 
-    /** for BLinked budgeted items: if that item becomes deleted, then the enclosing BLink is removed during a Bag.filter operation that applies this Predicate */
+    /** for BLinked budgeted items: if that item becomes Deleted, then the enclosing BLink is removed during a Bag.filter operation that applies this Predicate */
     public static final class ForgetAndDetectDeletion<X extends Budgeted> implements BudgetForgetFilter<X> {
 
         final BudgetForget<X> forget;

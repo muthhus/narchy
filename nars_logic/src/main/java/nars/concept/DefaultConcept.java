@@ -362,7 +362,7 @@ public class DefaultConcept extends AtomConcept {
 //            }
 //            questionTable.forEach(qq -> {
 //                if (qq.getDeleted())
-//                    throw new RuntimeException("question is deleted: " + qq);
+//                    throw new RuntimeException("question is Deleted: " + qq);
 //            });
         //}
 
@@ -663,7 +663,7 @@ public class DefaultConcept extends AtomConcept {
      * <p>
      * called in Memory.immediateProcess only
      *
-     * @return the relevant, non-null, non-deleted Task, which will either be:
+     * @return the relevant, non-null, non-Deleted Task, which will either be:
      * --the input
      * --an existing one which absorbed the input and will re-fire
      * --a revised/projected task which may or may not remain in the belief table

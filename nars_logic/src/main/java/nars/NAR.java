@@ -998,6 +998,12 @@ public abstract class NAR implements Level, Consumer<Task> {
         input(new TaskStream(taskStream));
     }
 
+    @Nullable
+    protected final void process(@NotNull Task[] input) {
+        for (Task t : input)
+            process(t);
+    }
+
     /**
      * execute a Task as a TaskProcess (synchronous)
      * <p>
@@ -1010,7 +1016,7 @@ public abstract class NAR implements Level, Consumer<Task> {
             //throw new RuntimeException(
             if (Global.DEBUG) {
                 System.err.println(
-                        input + " " + input.log() + " deleted:\n" + input.explanation());
+                        input + " " + input.log() + " Deleted:\n" + input.explanation());
             }
             return null;
         }

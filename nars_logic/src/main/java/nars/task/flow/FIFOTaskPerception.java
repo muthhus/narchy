@@ -69,7 +69,7 @@ public class FIFOTaskPerception extends TaskPerception {
         if (f == null || f.test(t)) {
 
             if (t.isDeleted())
-                throw new RuntimeException("task deleted");
+                throw new RuntimeException("task Deleted");
 
             buffer.add(t);
         }
@@ -109,7 +109,7 @@ public class FIFOTaskPerception extends TaskPerception {
             Task t = buffer.removeFirst();
 
             if (t.isDeleted()) {
-                //the task became deleted while this was in the buffer. no need to repeat Memory.removed
+                //the task became Deleted while this was in the buffer. no need to repeat Memory.removed
                 continue;
             }
 

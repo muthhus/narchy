@@ -68,7 +68,10 @@ public class CurveBag<V> implements Bag<V> {
 
     public CurveBag(@NotNull SortedIndex<BLink<V>> items, BagCurve curve, Random rng) {
         super();
-        this.arrayBag = new ArrayBag(items);
+        this.arrayBag
+                //= new ArrayBag(items);
+                = new BufferedArrayBag(items);
+
         this.curve = curve;
         this.random = rng;
     }
@@ -107,7 +110,7 @@ public class CurveBag<V> implements Bag<V> {
                 return i;
             }
 
-            //ignore this deleted item now that it's removed from the bag
+            //ignore this Deleted item now that it's removed from the bag
             //if it wasnt already removed above
             if (!remove)
                 remove(i.get());
@@ -182,7 +185,7 @@ public class CurveBag<V> implements Bag<V> {
 
     @Nullable
     @Override
-    public BLink<V> put(V v, Budgeted vBagBudget, float scale) {
+    public final BLink<V> put(V v, Budgeted vBagBudget, float scale) {
         return arrayBag.put(v, vBagBudget, scale);
     }
 

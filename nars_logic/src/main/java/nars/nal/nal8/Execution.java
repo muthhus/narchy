@@ -68,7 +68,7 @@ public interface Execution  {
         }
 
         if (goal.isDeleted()) {
-            throw new RuntimeException("goal deleted");
+            throw new RuntimeException("goal Deleted");
         }
 
         return (MutableTask) new MutableTask(inh)

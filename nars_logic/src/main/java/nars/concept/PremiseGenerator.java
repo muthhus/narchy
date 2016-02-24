@@ -179,7 +179,7 @@ abstract public class PremiseGenerator extends UnifySubst implements Function<Te
                     now);
 
             if (belief == null || belief.isDeleted()) {
-                throw new RuntimeException("deleted belief: " + belief + " " + beliefConcept.hasBeliefs());
+                throw new RuntimeException("Deleted belief: " + belief + " " + beliefConcept.hasBeliefs());
             }
 
         }

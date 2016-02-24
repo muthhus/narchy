@@ -83,9 +83,34 @@ public abstract class Budget extends BudgetedHandle {
         return this;
     }
 
-    
+
+    final static class InvalidPriorityException extends RuntimeException {
+        public InvalidPriorityException() {
+            super();
+        }
+
+        @Override
+        public String getMessage() {
+            return "NaN priority";
+        }
+    }
+
+    /**
+     * Change priority value
+     *
+     * @param p The new priority
+     * @return whether the operation had any effect
+     */
     @Override
-    public abstract void setPriority(float p);
+    public final void setPriority(float p) {
+        if (!Float.isFinite(p))
+            throw new InvalidPriorityException();
+
+        _setPriority(Util.clamp(p));
+    }
+
+    /** called from setPriority after validation */
+    public abstract void _setPriority(float p);
 
     /**
      * returns the period in time: currentTime - lastForgetTime and sets the lastForgetTime to currentTime
@@ -114,11 +139,18 @@ public abstract class Budget extends BudgetedHandle {
 //    }
 
 
-    public abstract void setDurability(float d);
+    public final void setDurability(float d) {
+        _setDurability(Util.clamp(d));
+    }
+
+    public abstract void _setDurability(float d);
 
 
+    public final void setQuality(float q) {
+        _setQuality(Util.clamp(q));
+    }
 
-    public abstract void setQuality(float q);
+    public abstract void _setQuality(float q);
 
     public boolean equalsByPrecision(@NotNull Budget t, float epsilon) {
         return Util.equals(pri(), t.pri(), epsilon) &&

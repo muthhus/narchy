@@ -84,7 +84,7 @@ public class AdaptiveResonanceTheory2
         int i;
         for (i = 0;i < seq.get(iprot).size();i++)
         {
-            // find and erase in the prototype sequence the instance which should be deleted
+            // find and erase in the prototype sequence the instance which should be Deleted
             if (seq.get(iprot).get(i) == iinst)
             {
                 seq.get(iprot).remove(i);
@@ -103,7 +103,7 @@ public class AdaptiveResonanceTheory2
         {
             // if it is not empty - re-create it from the rest examples
             float score;
-            // build prototype but without instance which should be deleted
+            // build prototype but without instance which should be Deleted
             // at first -- prototype is the first item in the prototype sequence
             prot.set(iprot, sample.get(seq.get(iprot).get(0)));
             // if PE < vigilance -- it won't stop (infinite looping)

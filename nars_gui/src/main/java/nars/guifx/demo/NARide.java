@@ -46,6 +46,8 @@ import nars.time.RealtimeMSClock;
 import nars.util.data.Util;
 import nars.video.WebcamFX;
 import org.jewelsea.willow.browser.WebBrowser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -114,6 +116,8 @@ public class NARide extends StackPane {
 //        return ni;
     }
 
+    private static final Logger logger = LoggerFactory.getLogger(NARide.class);
+
     public static void newIDE(NARLoop loop, Consumer<NARide> ide, Stage b) {
         Thread.currentThread().setName("NARide");
 
@@ -153,11 +157,14 @@ public class NARide extends StackPane {
 
             final EventHandler<? super MouseEvent> clickHandler =
                     e -> {
-                        System.out.println(e);
-                        ConceptSummaryPane src = (ConceptSummaryPane) e.getSource();
+                        if (e.getSource() instanceof ConceptSummaryPane) {
+                            ConceptSummaryPane src = (ConceptSummaryPane) e.getSource();
 
-                        Concept cc = src.concept;
-                        NARfx.newWindow(nar,cc);
+                            Concept cc = src.concept;
+                            NARfx.newWindow(nar, cc);
+                        } else {
+                            logger.warn("unhandled: " + e.getSource());
+                        }
                     };
 
             @Override public Node make(Concept cc) {

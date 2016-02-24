@@ -157,7 +157,7 @@
 //        return null;
 //    }
 //
-//    //TODO handle deleted items like Bag.update(..)
+//    //TODO handle Deleted items like Bag.update(..)
 ////    @Override
 ////    public V update(BagTransaction<K, V> selector) {
 ////

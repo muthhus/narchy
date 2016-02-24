@@ -195,7 +195,7 @@ public class PremiseEval extends FindSubst {
                 BudgetFunctions.compoundBackward(c, p);
 
 //        if (Budget.isDeleted(budget.getPriority())) {
-//            throw new RuntimeException("why is " + budget + " deleted");
+//            throw new RuntimeException("why is " + budget + " Deleted");
 //        }
 
         return budget!=null && BudgetFunctions.valid(budget, p.memory()) ? budget : null;

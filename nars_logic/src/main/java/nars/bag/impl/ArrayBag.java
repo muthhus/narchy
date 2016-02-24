@@ -34,7 +34,7 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
 
     public ArrayBag(@NotNull SortedIndex<BLink<V>> items) {
         this(items,
-            Global.newHashMap(items.capacity()/2)
+            Global.newHashMap(0) //start zero to minimize cost of creating temporary bags
             //new HashMap(items.capacity()/2)
         );
     }
@@ -219,7 +219,7 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
      * @return The updated budget
      */
     @Override
-    public final BLink<V> put(V i, Budgeted b, float scale) {
+    public BLink<V> put(V i, Budgeted b, float scale) {
 
         BLink<V> existing = get(i);
 
@@ -277,7 +277,7 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
 
 
     @Override
-    public final void commit() {
+    public void commit() {
         forEach(this::update);
     }
 
@@ -286,14 +286,15 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
             return;
         }
 
-        int size = size();
+        SortedIndex ii = this.items;
+
+        int size = ii.size();
         if (size == 1) {
             //its the only item
             v.commit();
             return;
         }
 
-        SortedIndex ii = this.items;
 
         int currentIndex = ii.locate(v);
 

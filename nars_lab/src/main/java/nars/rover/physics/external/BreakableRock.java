@@ -15,7 +15,7 @@ package nars.rover.physics.external;//package nars.rover.physics.external;
 //	private static final int NUM_SPLITS = 3;
 //	/** How much smaller the new rocks will be (1.0 == same size, 0.5 == half, etc.)*/
 //	private static final float SPLIT_SIZE = 0.75f;
-//	/** Smallest sized rock possible (if new rock is smaller, just gets deleted) */
+//	/** Smallest sized rock possible (if new rock is smaller, just gets Deleted) */
 //	private static final float MIN_SIZE = 0.3f;
 //	/** How far new rocks will check to see if they're spawning inside of something. Gets scaled with rocks (smaller rocks check shorter distances) */
 //	private static final float CHECK_DISTANCE = 5.0f;

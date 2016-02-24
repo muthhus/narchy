@@ -198,8 +198,10 @@ public class CurveBagTest  {
 
     private EmpiricalDistribution getSamplingPriorityDistribution(Bag b, int n, int bins) {
         DoubleArrayList f = new DoubleArrayList(n);
-        for (int i = 0; i < n; i++)
-            f.add( b.sample().pri() );
+        if (!b.isEmpty()) {
+            for (int i = 0; i < n; i++)
+                f.add(b.sample().pri());
+        }
         EmpiricalDistribution e =new EmpiricalDistribution(bins);
         e.load(f.toArray());
         return e;

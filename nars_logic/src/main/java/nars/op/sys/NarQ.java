@@ -315,7 +315,7 @@ public class NarQ implements Consumer<NAR> {
 //        if (t == null) {
 //            return ifNonExists;
 //        }
-//        //TODO cache the Concept reference to avoid lookup but invalidate it if the Concept is deleted so that the new one can be retrieved after
+//        //TODO cache the Concept reference to avoid lookup but invalidate it if the Concept is Deleted so that the new one can be retrieved after
 //        return expectation(t, ifNonExists, beliefOrDesire, dt);
 //    }
 

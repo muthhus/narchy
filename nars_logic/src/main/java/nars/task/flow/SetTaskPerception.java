@@ -18,13 +18,13 @@ import java.util.function.Consumer;
  */
 public final class SetTaskPerception extends TaskPerception {
 
-    final UnifriedMap<Task,Task> table = new UnifriedMap<>();
-    final BudgetMerge merge;
+
+    private final BudgetedSet<Task> data;
 
 
     public SetTaskPerception(@NotNull Memory m, Consumer<Task> receiver, BudgetMerge merge) {
         super(m, receiver);
-        this.merge = merge;
+        this.data = new BudgetedSet(merge);
     }
 
 // this isnt safe
@@ -35,13 +35,7 @@ public final class SetTaskPerception extends TaskPerception {
 
     @Override
     public void accept(@NotNull Task t) {
-        if (t.isDeleted()) {
-            throw new RuntimeException("deleted: " + t);
-        }
-        Task existing = table.put(t, t);
-        if ((existing!=null) && (existing!=t) && (!existing.isDeleted())) {
-            merge.merge(t.budget(), existing.budget(), 1f);
-        }
+        data.put(t);
     }
 
     @Override
@@ -49,16 +43,12 @@ public final class SetTaskPerception extends TaskPerception {
 
 
         //create an array copy in case the table is modified as a result of executing a task
-        Task[] aa = table.toArray(new Task[table.size()]);
-        table.clear();
-        for (Task x: aa) {
-            receiver.accept(x);
-        }
+        data.flush(receiver, Task[]::new);
 
     }
 
     @Override
     public void clear() {
-        table.clear();
+        data.clear();
     }
 }
