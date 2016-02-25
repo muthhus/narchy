@@ -2,9 +2,13 @@ package nars.term.index;
 
 import com.google.common.cache.CacheBuilder;
 import com.gs.collections.impl.map.mutable.primitive.IntObjectHashMap;
+import nars.concept.AtomConcept;
+import nars.concept.Concept;
+import nars.term.Atoms;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.atom.AtomicString;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,6 +24,7 @@ public class MapIndex2 extends AbstractMapIndex {
 
     private static final int SUBTERM_RELATION = Integer.MIN_VALUE;
 
+    final Atoms atoms = new Atoms();
     final Map<Object /* vector(t) */, IntObjectHashMap> data;
     int count;
 
@@ -39,7 +44,7 @@ public class MapIndex2 extends AbstractMapIndex {
             (k) -> new IntObjectHashMap(8);
 
     /** returns previous value */
-    public Object putItem(Object vv, int index, Object value) {
+    private Object putItem(Object vv, int index, Object value) {
 
         IntObjectHashMap g = group(vv);
         Object res = g.put(index, value);
@@ -79,9 +84,13 @@ public class MapIndex2 extends AbstractMapIndex {
 
     @Override
     public void putTerm(@NotNull Termed t) {
-        Object replaced = putItem(vector(t.term()), t.opRel(), t);
-        if (replaced == null)
-            count++;
+        if (t.term() instanceof AtomicString) {
+            atoms.putIfAbsent(t.toString(), ()->(AtomConcept)t);
+        } else {
+            Object replaced = putItem(vector(t.term()), t.opRel(), t);
+            if (replaced == null)
+                count++;
+        }
     }
 
     @Override

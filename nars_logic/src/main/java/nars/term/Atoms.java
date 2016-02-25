@@ -12,8 +12,12 @@ import com.googlecode.concurrenttrees.radix.node.concrete.voidvalue.VoidValue;
 import com.googlecode.concurrenttrees.radix.node.util.NodeCharacterComparator;
 import com.googlecode.concurrenttrees.radix.node.util.NodeUtil;
 import com.googlecode.concurrenttrees.radix.node.util.PrettyPrintable;
+import nars.$;
 import nars.Op;
+import nars.concept.AtomConcept;
+import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
+import nars.term.atom.AtomicString;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
@@ -24,7 +28,7 @@ import java.util.concurrent.atomic.AtomicReferenceArray;
  * String interner that maps strings to integers and resolves them
  * bidirectionally with a globally shared Atomic concept
  */
-public class Atoms extends MyConcurrentRadixTree<InternedAtom> {
+public class Atoms extends MyConcurrentRadixTree<AtomConcept> {
 
     private static volatile int serial;
 
@@ -37,13 +41,16 @@ public class Atoms extends MyConcurrentRadixTree<InternedAtom> {
         return serial;
     }
 
-    public final InternedAtom resolve(CharSequence id) {
+    public final AtomConcept resolve(CharSequence id) {
         return getValueForExactKey(id);
     }
-    public final InternedAtom resolveOrAdd(CharSequence id) {
-        Object x = putIfAbsent(id,
-                () -> new InternedAtom(++serial));
-        return (InternedAtom) x;
+    public final AtomConcept resolveOrAdd(String s) {
+        return resolveOrAdd($.the(s));
+    }
+    public final AtomConcept resolveOrAdd(Atom a) {
+        return putIfAbsent(a.id,
+                () -> new AtomConcept(a, null, null)); //new AtomicString(++serial));
+
     }
 
     public void print() {
@@ -111,134 +118,55 @@ public class Atoms extends MyConcurrentRadixTree<InternedAtom> {
         }
     }
 
-    final class InternedAtom extends Atomic implements Node /* implements Concept */ {
-
-        private final int id;
-
-        InternedAtom(int id) {
-            this.id = id;
-
-        }
-
-        @Override
-        public Character getIncomingEdgeFirstCharacter() {
-            return null;
-        }
-
-        @Override
-        public CharSequence getIncomingEdge() {
-            return null;
-        }
-
-        @Override
-        public Object getValue() {
-            return this;
-        }
-
-        @Override
-        public Node getOutgoingEdge(Character edgeFirstCharacter) {
-            return null;
-        }
-
-        @Override
-        public void updateOutgoingEdge(Node childNode) {
-
-        }
-
-        @Override
-        public List<Node> getOutgoingEdges() {
-            return null;
-        }
-
-        @Override
-        public
-        @Nullable
-        String toString() {
-            return Integer.toString(id);
-        }
-
-        @Override
-        public
-        @Nullable
-        Op op() {
-            return null;
-        }
-
-        @Override
-        public int complexity() {
-            return 0;
-        }
-
-        @Override
-        public int varIndep() {
-            return 0;
-        }
-
-        @Override
-        public int varDep() {
-            return 0;
-        }
-
-        @Override
-        public int varQuery() {
-            return 0;
-        }
-
-        @Override
-        public int varPattern() {
-            return 0;
-        }
-
-        @Override
-        public int vars() {
-            return 0;
-        }
-
-        @Override
-        public int compareTo(Object o) {
-            return 0;
-        }
-    }
-
-
-//    /** modified from ByteArrayNodeDefault */
-//    public final class InternedAtom extends Atomic implements Node /* implements Concept */ {
+//    final class InternedAtom extends Atomic implements Node /* implements Concept */ {
 //
-//        // Characters in the edge arriving at this node from a parent node.
-//        // Once assigned, we never modify this...
-//        private final byte[] incomingEdgeCharArray;
+//        private final int id;
 //
-//        // References to child nodes representing outgoing edges from this node.
-//        // Once assigned we never add or remove references, but we do update existing references to point to new child
-//        // nodes provided new edges start with the same first character...
-//        private final AtomicReferenceArray<Node> outgoingEdges;
-//
-////        // An arbitrary value which the application associates with a key matching the path to this node in the tree.
-////        // This value can be null...
-////        private final Object value;
-//
-//        public final int id;
-//
-//        public InternedAtom(int id, CharSequence edgeCharSequence, List<Node> outgoingEdges) {
+//        InternedAtom(int id) {
 //            this.id = id;
 //
-//            Node[] childNodeArray = outgoingEdges.toArray(new Node[outgoingEdges.size()]);
-//            // Sort the child nodes...
-//            Arrays.sort(childNodeArray, new NodeCharacterComparator());
-//            this.outgoingEdges = new AtomicReferenceArray<Node>(childNodeArray);
-//            this.incomingEdgeCharArray = ByteArrayCharSequence.toSingleByteUtf8Encoding(edgeCharSequence);
-//            //this.value = value;
+//        }
+//
+//        @Override
+//        public Character getIncomingEdgeFirstCharacter() {
+//            return null;
+//        }
+//
+//        @Override
+//        public CharSequence getIncomingEdge() {
+//            return null;
+//        }
+//
+//        @Override
+//        public Object getValue() {
+//            return this;
+//        }
+//
+//        @Override
+//        public Node getOutgoingEdge(Character edgeFirstCharacter) {
+//            return null;
+//        }
+//
+//        @Override
+//        public void updateOutgoingEdge(Node childNode) {
+//
+//        }
+//
+//        @Override
+//        public List<Node> getOutgoingEdges() {
+//            return null;
 //        }
 //
 //        @Override
 //        public
 //        @Nullable
 //        String toString() {
-//            return null;
+//            return Integer.toString(id);
 //        }
 //
 //        @Override
-//        public @Nullable
+//        public
+//        @Nullable
 //        Op op() {
 //            return null;
 //        }
@@ -276,36 +204,6 @@ public class Atoms extends MyConcurrentRadixTree<InternedAtom> {
 //        @Override
 //        public int compareTo(Object o) {
 //            return 0;
-//        }
-//
-//        @Override
-//        public Character getIncomingEdgeFirstCharacter() {
-//            return null;
-//        }
-//
-//        @Override
-//        public CharSequence getIncomingEdge() {
-//            return null;
-//        }
-//
-//        @Override
-//        public final Atomic getValue() {
-//            return this;
-//        }
-//
-//        @Override
-//        public Node getOutgoingEdge(Character edgeFirstCharacter) {
-//            return null;
-//        }
-//
-//        @Override
-//        public void updateOutgoingEdge(Node childNode) {
-//
-//        }
-//
-//        @Override
-//        public List<Node> getOutgoingEdges() {
-//            return null;
 //        }
 //    }
 
