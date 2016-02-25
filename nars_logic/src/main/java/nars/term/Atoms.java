@@ -2,61 +2,164 @@ package nars.term;
 
 import com.googlecode.concurrenttrees.common.*;
 import com.googlecode.concurrenttrees.radix.MyConcurrentRadixTree;
-import com.googlecode.concurrenttrees.radix.node.concrete.SmartArrayBasedNodeFactory;
+import com.googlecode.concurrenttrees.radix.node.Node;
+import com.googlecode.concurrenttrees.radix.node.NodeFactory;
+import com.googlecode.concurrenttrees.radix.node.concrete.DefaultByteArrayNodeFactory;
+import com.googlecode.concurrenttrees.radix.node.concrete.DefaultCharArrayNodeFactory;
+import com.googlecode.concurrenttrees.radix.node.concrete.bytearray.*;
+import com.googlecode.concurrenttrees.radix.node.concrete.chararray.*;
+import com.googlecode.concurrenttrees.radix.node.concrete.voidvalue.VoidValue;
+import com.googlecode.concurrenttrees.radix.node.util.NodeCharacterComparator;
+import com.googlecode.concurrenttrees.radix.node.util.NodeUtil;
 import com.googlecode.concurrenttrees.radix.node.util.PrettyPrintable;
 import nars.Op;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReferenceArray;
+
 /**
  * String interner that maps strings to integers and resolves them
  * bidirectionally with a globally shared Atomic concept
  */
-public class Atoms extends MyConcurrentRadixTree<Integer> {
+public class Atoms extends MyConcurrentRadixTree<InternedAtom> {
 
-    private static volatile int serial = 0;
+    private static volatile int serial;
 
     public Atoms() {
-        super(new SmartArrayBasedNodeFactory());
+        super(new AtomNodeFactory());
     }
 
-    public final int resolve(CharSequence id) {
-        Integer i = getValueForExactKey(id);
-        return i == null ? -1 : i;
+
+    public int getLastSerial() {
+        return serial;
     }
-    public final int resolveOrAdd(CharSequence id) {
-        int exists = resolve(id);
-        if (exists == -1) {
-            int newSerial = ++serial;
-            putIfAbsent(id, newSerial);
-            return newSerial;
-        }
-        return exists;
+
+    public final InternedAtom resolve(CharSequence id) {
+        return getValueForExactKey(id);
+    }
+    public final InternedAtom resolveOrAdd(CharSequence id) {
+        Object x = putIfAbsent(id,
+                () -> new InternedAtom(++serial));
+        return (InternedAtom) x;
     }
 
     public void print() {
         System.out.println("Tree structure:");
         // PrettyPrintable is a non-public API for testing, prints semi-graphical representations of trees...
-        PrettyPrinter.prettyPrint((PrettyPrintable) tree, System.out);
+        PrettyPrinter.prettyPrint((PrettyPrintable) this, System.out);
     }
 
-    public final class InternedAtom extends Atomic /* implements Concept */ {
 
-        public final int id;
 
-        public InternedAtom(int id) {
+    private static final class AtomNodeFactory implements NodeFactory {
+
+        @Override
+        public Node createNode(CharSequence edgeCharacters, Object value, List<Node> childNodes, boolean isRoot) {
+            assert edgeCharacters != null : "The edgeCharacters argument was null";
+            assert !(!isRoot && edgeCharacters.length() == 0) : "Invalid edge characters for non-root node: " + CharSequences.toString(edgeCharacters);
+            assert childNodes != null : "The childNodes argument was null";
+            NodeUtil.ensureNoDuplicateEdges(childNodes);
+
+            //try {
+
+                if (childNodes.isEmpty()) {
+                    // Leaf node...
+                    if (value instanceof VoidValue) {
+                        return new ByteArrayNodeLeafVoidValue(edgeCharacters);
+                    } else if (value!=null) {
+                        return new ByteArrayNodeLeafWithValue(edgeCharacters, value);
+                    } else {
+                        return new ByteArrayNodeLeafNullValue(edgeCharacters);
+                    }
+                } else {
+                    // Non-leaf node...
+                    if (value instanceof VoidValue) {
+                        return new ByteArrayNodeNonLeafVoidValue(edgeCharacters, childNodes);
+//                    else if (value == null) {
+//                        return new ByteArrayNodeNonLeafNullValue(edgeCharacters, childNodes);
+                    } else {
+                        return new ByteArrayNodeDefault(edgeCharacters, value, childNodes);
+                    }
+                }
+            }
+//            catch (ByteArrayCharSequence.IncompatibleCharacterException e) {
+//
+//                if (childNodes.isEmpty()) {
+//                    // Leaf node...
+////                    if (value instanceof VoidValue) {
+////                        return new CharArrayNodeLeafVoidValue(edgeCharacters);
+////                    } else if (value != null) {
+//                        return new CharArrayNodeLeafWithValue(edgeCharacters, value);
+////                    } else {
+////                        return new CharArrayNodeLeafNullValue(edgeCharacters);
+////                    }
+//                } else {
+//                    // Non-leaf node...
+//                    if (value instanceof VoidValue) {
+//                        return new CharArrayNodeNonLeafVoidValue(edgeCharacters, childNodes);
+////                    }
+////                    else if (value == null) {
+////                        return new CharArrayNodeNonLeafNullValue(edgeCharacters, childNodes);
+//                    } else {
+//                        return new CharArrayNodeDefault(edgeCharacters, value, childNodes);
+//                    }
+//                }
+//            }
+        }
+    }
+
+    final class InternedAtom extends Atomic implements Node /* implements Concept */ {
+
+        private final int id;
+
+        InternedAtom(int id) {
             this.id = id;
+
+        }
+
+        @Override
+        public Character getIncomingEdgeFirstCharacter() {
+            return null;
+        }
+
+        @Override
+        public CharSequence getIncomingEdge() {
+            return null;
+        }
+
+        @Override
+        public Object getValue() {
+            return this;
+        }
+
+        @Override
+        public Node getOutgoingEdge(Character edgeFirstCharacter) {
+            return null;
+        }
+
+        @Override
+        public void updateOutgoingEdge(Node childNode) {
+
+        }
+
+        @Override
+        public List<Node> getOutgoingEdges() {
+            return null;
         }
 
         @Override
         public
         @Nullable
         String toString() {
-            return null;
+            return Integer.toString(id);
         }
 
         @Override
-        public @Nullable
+        public
+        @Nullable
         Op op() {
             return null;
         }
@@ -98,4 +201,113 @@ public class Atoms extends MyConcurrentRadixTree<Integer> {
     }
 
 
-}
+//    /** modified from ByteArrayNodeDefault */
+//    public final class InternedAtom extends Atomic implements Node /* implements Concept */ {
+//
+//        // Characters in the edge arriving at this node from a parent node.
+//        // Once assigned, we never modify this...
+//        private final byte[] incomingEdgeCharArray;
+//
+//        // References to child nodes representing outgoing edges from this node.
+//        // Once assigned we never add or remove references, but we do update existing references to point to new child
+//        // nodes provided new edges start with the same first character...
+//        private final AtomicReferenceArray<Node> outgoingEdges;
+//
+////        // An arbitrary value which the application associates with a key matching the path to this node in the tree.
+////        // This value can be null...
+////        private final Object value;
+//
+//        public final int id;
+//
+//        public InternedAtom(int id, CharSequence edgeCharSequence, List<Node> outgoingEdges) {
+//            this.id = id;
+//
+//            Node[] childNodeArray = outgoingEdges.toArray(new Node[outgoingEdges.size()]);
+//            // Sort the child nodes...
+//            Arrays.sort(childNodeArray, new NodeCharacterComparator());
+//            this.outgoingEdges = new AtomicReferenceArray<Node>(childNodeArray);
+//            this.incomingEdgeCharArray = ByteArrayCharSequence.toSingleByteUtf8Encoding(edgeCharSequence);
+//            //this.value = value;
+//        }
+//
+//        @Override
+//        public
+//        @Nullable
+//        String toString() {
+//            return null;
+//        }
+//
+//        @Override
+//        public @Nullable
+//        Op op() {
+//            return null;
+//        }
+//
+//        @Override
+//        public int complexity() {
+//            return 0;
+//        }
+//
+//        @Override
+//        public int varIndep() {
+//            return 0;
+//        }
+//
+//        @Override
+//        public int varDep() {
+//            return 0;
+//        }
+//
+//        @Override
+//        public int varQuery() {
+//            return 0;
+//        }
+//
+//        @Override
+//        public int varPattern() {
+//            return 0;
+//        }
+//
+//        @Override
+//        public int vars() {
+//            return 0;
+//        }
+//
+//        @Override
+//        public int compareTo(Object o) {
+//            return 0;
+//        }
+//
+//        @Override
+//        public Character getIncomingEdgeFirstCharacter() {
+//            return null;
+//        }
+//
+//        @Override
+//        public CharSequence getIncomingEdge() {
+//            return null;
+//        }
+//
+//        @Override
+//        public final Atomic getValue() {
+//            return this;
+//        }
+//
+//        @Override
+//        public Node getOutgoingEdge(Character edgeFirstCharacter) {
+//            return null;
+//        }
+//
+//        @Override
+//        public void updateOutgoingEdge(Node childNode) {
+//
+//        }
+//
+//        @Override
+//        public List<Node> getOutgoingEdges() {
+//            return null;
+//        }
+//    }
+
+
+

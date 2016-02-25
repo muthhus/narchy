@@ -19,14 +19,24 @@ public class AtomsTest {
         tree.resolveOrAdd("concept");
         tree.resolveOrAdd("term");
         tree.resolveOrAdd("termutator");
+        tree.print();
 
-        assertEquals(2, tree.resolveOrAdd("term"));
-        assertEquals(-1, tree.resolve("xerm"));
+        assertNotNull(tree.resolve("term"));
+        assertNull(tree.resolve("xerm"));
+        assertNull(tree.resolve("te")); //partial
 
-        String stringWithUnicode = "unicode\u00easomething";
-        assertEquals(4, tree.resolveOrAdd(stringWithUnicode));
+        assertNotNull(tree.resolveOrAdd("term"));
+
+        assertNotNull(tree.resolveOrAdd("termunator"));
 
         tree.print();
+
+        assertEquals(4, tree.getLastSerial());
+
+
+//        String stringWithUnicode = "unicode\u00easomething";
+//        assertNull( tree.resolveOrAdd(stringWithUnicode)); //unicode not supported yet
+
     }
 
 

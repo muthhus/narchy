@@ -16,6 +16,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static com.googlecode.concurrenttrees.radix.ConcurrentRadixTree.SearchResult.*;
 
@@ -44,14 +45,8 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
     // If true, force reading threads to acquire read lock (they will block on writes).
     private final boolean restrictConcurrency;
 
-    private final Function3<CharSequence, SearchResult, Object, Node> putOp =
-        (k,r,newValue) -> {
-            return newNode(r, newValue);
-        };
-    private final Function3<CharSequence, SearchResult, Object, Node> putIfAbsentOp = (k, r, newValue) -> {
-        Node oldNode = r.nodeFound;
-        return (oldNode != null) ? oldNode : newNode(r, newValue);
-    };
+
+
 
     /**
      * Creates a new {@link MyConcurrentRadixTree} which will use the given {@link NodeFactory} to create nodes.
@@ -118,20 +113,36 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
      * {@inheritDoc}
      */
     @Override
-    public O put(CharSequence key, O value) {
+    public final O put(CharSequence key, O value) {
 //        @SuppressWarnings({"unchecked", "UnnecessaryLocalVariable"})
 //        O existingValue = (O) putInternal(key, value, true);  // putInternal acquires write lock
 //        return existingValue;
 
-        return (O) compute(key, value, putOp);
+        return (O) compute(key, (k, r) -> {
+            return value;
+        });
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public O putIfAbsent(CharSequence key, O value) {
-        return (O) compute(key, value, putIfAbsentOp);
+    public final O putIfAbsent(CharSequence key, O value) {
+        throw new UnsupportedOperationException();
+    }
+
+    public final O putIfAbsent(CharSequence key, Supplier<O> newValue) {
+        return compute(key, (k, r) -> {
+
+            Node oldNode = r.nodeFound;
+            if (oldNode != null) {
+                if (r.charsMatched == key.length()) {
+                    return (O) oldNode.getValue();
+                }
+            }
+
+            return newValue.get();
+        });
     }
 
     /**
@@ -501,15 +512,6 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
         }
     }
 
-    final Node newNode(SearchResult searchResult, Object value) {
-        // Create a replacement for the existing node containing the new value...
-        Node found = searchResult.nodeFound;
-
-        Node n = nodeFactory.createNode(found.getIncomingEdge(), value, found.getOutgoingEdges(), false);
-        searchResult.parentNode.updateOutgoingEdge(n);
-
-        return n;
-    }
 
     // ------------- Helper method for put() -------------
     Object putInternal(CharSequence key, Object value, boolean overwrite) {
@@ -526,21 +528,27 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
      * @param overwrite If true, should replace any existing value, if false should not replace any existing value
      * @return The existing value for this key, if there was one, otherwise null
      */
-    Object compute(CharSequence key, Object newValue, Function3<CharSequence,SearchResult,Object,Node> computeFunc) {
+    O compute(CharSequence key, BiFunction<CharSequence,SearchResult,O> computeFunc) {
         if (key == null) {
             throw new IllegalArgumentException("The key argument was null");
         }
         if (key.length() == 0) {
             throw new IllegalArgumentException("The key argument was zero-length");
         }
-        if (newValue == null) {
-            throw new IllegalArgumentException("The value argument was null");
-        }
+
         acquireWriteLock();
         try {
             // Note we search the tree here after we have acquired the write lock...
             SearchResult searchResult = searchTree(key);
             SearchResult.Classification classification = searchResult.classification;
+
+
+            NodeFactory factory = this.nodeFactory;
+            Node found = searchResult.nodeFound;
+            int matched = searchResult.charsMatched;
+            Object foundValue = found!=null ? found.getValue() : null;
+            O newValue = computeFunc.apply(key, searchResult);
+
 
             switch (classification) {
                 case EXACT_MATCH: {
@@ -551,25 +559,31 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
                     // First check if existing node has a value, and if we are allowed to overwrite it.
                     // Return early without overwriting if necessary...
 
-                    return computeFunc.value(key, searchResult, newValue);
+                    if (newValue!=foundValue) {
+                        //clone and reattach
+                        cloneAndReattach(searchResult, factory, found, foundValue, found.getOutgoingEdges());
+                    }
+                    return newValue;
                 }
                 case KEY_ENDS_MID_EDGE: {
                     // Search ran out of characters from the key while in the middle of an edge in the node.
                     // -> Split the node in two: Create a new parent node storing the new value,
                     // and a new child node holding the original value and edges from the existing node...
-                    CharSequence keyCharsFromStartOfNodeFound = key.subSequence(searchResult.charsMatched - searchResult.charsMatchedInNodeFound, key.length());
-                    CharSequence commonPrefix = CharSequences.getCommonPrefix(keyCharsFromStartOfNodeFound, searchResult.nodeFound.getIncomingEdge());
-                    CharSequence suffixFromExistingEdge = CharSequences.subtractPrefix(searchResult.nodeFound.getIncomingEdge(), commonPrefix);
+                    CharSequence keyCharsFromStartOfNodeFound = key.subSequence(matched - searchResult.charsMatchedInNodeFound, key.length());
+                    CharSequence commonPrefix = CharSequences.getCommonPrefix(keyCharsFromStartOfNodeFound, found.getIncomingEdge());
+                    CharSequence suffixFromExistingEdge = CharSequences.subtractPrefix(found.getIncomingEdge(), commonPrefix);
+
 
                     // Create new nodes...
-                    Node newChild = nodeFactory.createNode(suffixFromExistingEdge, searchResult.nodeFound.getValue(), searchResult.nodeFound.getOutgoingEdges(), false);
-                    Node newParent = nodeFactory.createNode(commonPrefix, newValue, Arrays.asList(newChild), false);
+                    Node newChild = factory.createNode(suffixFromExistingEdge, foundValue, found.getOutgoingEdges(), false);
+
+                    Node newParent = factory.createNode(commonPrefix, newValue, Arrays.asList(newChild), false);
 
                     // Add the new parent to the parent of the node being replaced (replacing the existing node)...
                     searchResult.parentNode.updateOutgoingEdge(newParent);
 
                     // Return null for the existing value...
-                    return null;
+                    return (O) newValue;
                 }
                 case INCOMPLETE_MATCH_TO_END_OF_EDGE: {
                     // Search found a difference in characters between the key and the start of all child edges leaving the
@@ -580,24 +594,18 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
                     // (Root node's own edge is "" empty string, so is considered a prefixing edge of every key)
 
                     // Create a new child node containing the trailing characters...
-                    CharSequence keySuffix = key.subSequence(searchResult.charsMatched, key.length());
-                    Node newChild = nodeFactory.createNode(keySuffix, newValue, Collections.<Node>emptyList(), false);
+                    CharSequence keySuffix = key.subSequence(matched, key.length());
+
+                    Node newChild = factory.createNode(keySuffix, newValue, Collections.<Node>emptyList(), false);
 
                     // Clone the current node adding the new child...
-                    List<Node> edges = new ArrayList<Node>(searchResult.nodeFound.getOutgoingEdges().size() + 1);
-                    edges.addAll(searchResult.nodeFound.getOutgoingEdges());
+                    List<Node> edges = new ArrayList<Node>(found.getOutgoingEdges().size() + 1);
+                    edges.addAll(found.getOutgoingEdges());
                     edges.add(newChild);
-                    Node clonedNode = nodeFactory.createNode(searchResult.nodeFound.getIncomingEdge(), searchResult.nodeFound.getValue(), edges, searchResult.nodeFound == root);
-
-                    // Re-add the cloned node to its parent node...
-                    if (searchResult.nodeFound == root) {
-                        this.root = clonedNode;
-                    } else {
-                        searchResult.parentNode.updateOutgoingEdge(clonedNode);
-                    }
+                    cloneAndReattach(searchResult, factory, found, foundValue, edges);
 
                     // Return null for the existing value...
-                    return null;
+                    return (O)newValue;
                 }
                 case INCOMPLETE_MATCH_TO_MIDDLE_OF_EDGE: {
                     // Search found a difference in characters between the key and the characters in the middle of the
@@ -612,21 +620,21 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
                     // the key and the edge, and add N1 and N2 as child nodes of N3
                     // (4) Re-add N3 to the parent node of NF, effectively replacing NF in the tree
 
-                    CharSequence keyCharsFromStartOfNodeFound = key.subSequence(searchResult.charsMatched - searchResult.charsMatchedInNodeFound, key.length());
-                    CharSequence commonPrefix = CharSequences.getCommonPrefix(keyCharsFromStartOfNodeFound, searchResult.nodeFound.getIncomingEdge());
-                    CharSequence suffixFromExistingEdge = CharSequences.subtractPrefix(searchResult.nodeFound.getIncomingEdge(), commonPrefix);
-                    CharSequence suffixFromKey = key.subSequence(searchResult.charsMatched, key.length());
+                    CharSequence keyCharsFromStartOfNodeFound = key.subSequence(matched - searchResult.charsMatchedInNodeFound, key.length());
+                    CharSequence commonPrefix = CharSequences.getCommonPrefix(keyCharsFromStartOfNodeFound, found.getIncomingEdge());
+                    CharSequence suffixFromExistingEdge = CharSequences.subtractPrefix(found.getIncomingEdge(), commonPrefix);
+                    CharSequence suffixFromKey = key.subSequence(matched, key.length());
 
                     // Create new nodes...
-                    Node n1 = nodeFactory.createNode(suffixFromKey, newValue, Collections.<Node>emptyList(), false);
-                    Node n2 = nodeFactory.createNode(suffixFromExistingEdge, searchResult.nodeFound.getValue(), searchResult.nodeFound.getOutgoingEdges(), false);
+                    Node n1 = factory.createNode(suffixFromKey, newValue, Collections.<Node>emptyList(), false);
+                    Node n2 = factory.createNode(suffixFromExistingEdge, foundValue, found.getOutgoingEdges(), false);
                     @SuppressWarnings({"NullableProblems"})
-                    Node n3 = nodeFactory.createNode(commonPrefix, null, Arrays.asList(n1, n2), false);
+                    Node n3 = factory.createNode(commonPrefix, null, Arrays.asList(n1, n2), false);
 
                     searchResult.parentNode.updateOutgoingEdge(n3);
 
                     // Return null for the existing value...
-                    return null;
+                    return (O)newValue;
                 }
                 default: {
                     // This is a safeguard against a new enum constant being added in future.
@@ -635,6 +643,17 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
             }
         } finally {
             releaseWriteLock();
+        }
+    }
+
+    private void cloneAndReattach(SearchResult searchResult, NodeFactory factory, Node found, Object foundValue, List<Node> edges) {
+        Node clonedNode = factory.createNode(found.getIncomingEdge(), foundValue, edges, found == root);
+
+        // Re-add the cloned node to its parent node...
+        if (found == root) {
+            this.root = clonedNode;
+        } else {
+            searchResult.parentNode.updateOutgoingEdge(clonedNode);
         }
     }
 
