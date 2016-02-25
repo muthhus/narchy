@@ -80,14 +80,14 @@ public class Lobjects extends DefaultTermizer implements Termizer, MethodHandler
     /**
      * for externally-puppeted method invocation goals
      */
-    private float invocationGoalFreq = 1.0f;
-    private float invocationGoalConf = 0.9f;
+    private final float invocationGoalFreq = 1.0f;
+    private final float invocationGoalConf = 0.9f;
     /**
      * for meta-data beliefs about (classes, objects, packages, etc..)
      */
-    private float metadataBeliefFreq = 1.0f;
-    private float metadataBeliefConf = 0.99f;
-    private float metadataPriority = 0.1f;
+    private final float metadataBeliefFreq = 1.0f;
+    private final float metadataBeliefConf = 0.99f;
+    private final float metadataPriority = 0.1f;
 
 
     public Lobjects(NAR n) {
@@ -165,7 +165,7 @@ public class Lobjects extends DefaultTermizer implements Termizer, MethodHandler
 
         Term s = $.sim(oterm, prevOterm);
         if (s instanceof Compound)
-            nar.believe(metadataPriority, ((Compound) s),
+            nar.believe(metadataPriority, s,
                     Tense.ETERNAL,
                     metadataBeliefFreq, metadataBeliefConf);
 
@@ -193,10 +193,11 @@ public class Lobjects extends DefaultTermizer implements Termizer, MethodHandler
 
             /** pretend as if it were a goal of its own volition, although it was invoked externally
              *  Master of puppets, I'm pulling your strings */
-            nar.input(
+            NAR one = this.nar;
+            one.input(
                 invokingGoal.log(JavaInvoked.the),
-                Execution.noticeExecuted(nar, invokingGoal),
-                Execution.result(nar, invokingGoal, term(result), Tense.Present).log("Java Execution Result")
+                Execution.noticeExecuted(one, invokingGoal),
+                Execution.result(one, invokingGoal, term(result), Tense.Present).log("Java Execution Result")
             );
 
         } else {

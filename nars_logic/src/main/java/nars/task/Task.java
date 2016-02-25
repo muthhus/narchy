@@ -316,7 +316,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     }
 
     @NotNull
-    @Override default public Task get() { return this ;}
+    @Override default Task get() { return this ;}
 
     default Termed<Compound> concept() {
         return term();

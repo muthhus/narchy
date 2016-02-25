@@ -58,7 +58,7 @@ public final class Anticipate {
     //private long nextUpdateTime = -1;
 
     /** called each cycle to update calculations of anticipations */
-    int happeneds = 0, didnts = 0;
+    int happeneds, didnts;
 
 //    public static boolean testing = false;
 //    public static String teststring = "";

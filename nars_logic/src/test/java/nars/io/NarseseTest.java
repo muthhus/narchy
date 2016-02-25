@@ -1,7 +1,7 @@
 package nars.io;
 
 import nars.*;
-import nars.nal.nal8.Operator;
+import nars.term.Operator;
 import nars.nar.Terminal;
 import nars.op.out.echo;
 import nars.task.Task;

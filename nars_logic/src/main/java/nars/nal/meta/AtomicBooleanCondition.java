@@ -1,6 +1,6 @@
 package nars.nal.meta;
 
-import nars.nal.nal8.AtomicStringConstant;
+import nars.term.atom.AtomicStringConstant;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 

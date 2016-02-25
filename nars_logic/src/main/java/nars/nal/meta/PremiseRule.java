@@ -244,8 +244,8 @@ public class PremiseRule extends GenericCompound {
 
         Derive der = new Derive(rule, p.term,
                 postPreconditions,
-                belief != null ? belief.single() : false,
-                desire != null ? desire.single() : false,
+                belief != null && belief.single(),
+                desire != null && desire.single(),
                 anticipate,
                 eternalize, temporalizer);
 
@@ -784,7 +784,7 @@ public class PremiseRule extends GenericCompound {
 
             } else if (v instanceof Ellipsis.EllipsisPrototype) {
                 Ellipsis.EllipsisPrototype ep = (Ellipsis.EllipsisPrototype) v;
-                return ep.make(actualSerial +
+                return Ellipsis.EllipsisPrototype.make(actualSerial +
                                 (ep.minArity == 0 ? ELLIPSIS_ZERO_OR_MORE_ID_OFFSET : ELLIPSIS_ONE_OR_MORE_ID_OFFSET) //these need to be distinct
                         , ep.minArity);
             } else if (v instanceof Ellipsis) {

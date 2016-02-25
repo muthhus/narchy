@@ -19,7 +19,7 @@ import java.util.function.Consumer;
  */
 public class ArrayListTaskTable implements QuestionTaskTable {
 
-    protected int capacity = 0;
+    protected int capacity;
 
     @NotNull
     private final List<Task> list;

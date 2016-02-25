@@ -16,7 +16,7 @@ public class BudgetedSet<B extends Budgeted> {
     final Map<B, B> table;
     final BudgetMerge merge;
     final IntToObjectFunction<B[]> arrayer; //sharing this is what makes it valid only for single thread case
-    B[] buffer = null;
+    B[] buffer;
 
     public BudgetedSet(BudgetMerge merge, IntToObjectFunction<B[]> tmpArrayBuilder) {
         this(merge, new LinkedHashMap<>(), tmpArrayBuilder);

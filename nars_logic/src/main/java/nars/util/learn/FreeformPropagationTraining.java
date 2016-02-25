@@ -55,7 +55,7 @@ public abstract class FreeformPropagationTraining {
 	/**
 	 * Are we fixing the flat spot problem?  (default = true)
 	 */
-	private boolean fixFlatSopt = true;
+	private final boolean fixFlatSopt = true;
 
 //	/**
 //	 * The batch size. Specify 1 for pure online training. Specify 0 for pure

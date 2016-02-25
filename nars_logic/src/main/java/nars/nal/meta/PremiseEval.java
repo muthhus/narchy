@@ -10,7 +10,7 @@ import nars.concept.ConceptProcess;
 import nars.nal.Deriver;
 import nars.nal.meta.constraint.MatchConstraint;
 import nars.nal.meta.op.MatchTerm;
-import nars.nal.nal8.Operator;
+import nars.term.Operator;
 import nars.nal.op.ImmediateTermTransform;
 import nars.task.Task;
 import nars.term.Compound;
@@ -48,7 +48,7 @@ public class PremiseEval extends FindSubst {
     @Deprecated public final Versioned<MatchTerm> pattern;
 
     @NotNull
-    private TaskBeliefPair termPattern = new TaskBeliefPair();
+    private final TaskBeliefPair termPattern = new TaskBeliefPair();
 
     int termutesPerMatch, termutes;
 
@@ -115,9 +115,7 @@ public class PremiseEval extends FindSubst {
 
     @Override
     public boolean onMatch() {
-        return (termutes-- > 0) ?
-            pattern.get().onMatch(this) :
-            false;
+        return (termutes-- > 0) && pattern.get().onMatch(this);
     }
 
 

@@ -15,7 +15,7 @@ public class ListExpression implements Expression, Iterable<Expression> {
         private static final Nil NIL = new Nil();
 
         private Nil() {
-            super(Cons.<Expression>empty());
+            super(Cons.empty());
         }
 
         @NotNull

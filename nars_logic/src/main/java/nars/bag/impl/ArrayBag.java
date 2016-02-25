@@ -249,15 +249,13 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
     }
 
     public BLink<V> putExists(Budgeted b, float scale, BLink<V> existing) {
-        BLink<V> newBudget;//its already here
 
-        if (existing!=b)
+        if (existing!=b) {
             merge(existing, b, scale);
+            update(existing); //<- delaying/buffering this is the whole reason of the buffering
+        }
 
-        update(existing); //<- delaying/buffering this is the whole reason of the buffering
-
-        newBudget = existing;
-        return newBudget;
+        return existing;
     }
 
     @Nullable
@@ -271,7 +269,7 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
             newBudget.commit();
         }
 
-        {
+
             BLink<V> displaced = put(i, newBudget);
             if (displaced != null) {
                 if (displaced == newBudget) {
@@ -282,7 +280,7 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
                     removeKey(displaced.get());
                 }*/
             }
-        }
+
         return newBudget;
     }
 

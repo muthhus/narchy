@@ -2,7 +2,7 @@ package nars.rdfowl;
 
 import nars.$;
 import nars.NAR;
-import nars.nal.nal8.Operator;
+import nars.term.Operator;
 import nars.term.Term;
 import nars.term.atom.Atom;
 

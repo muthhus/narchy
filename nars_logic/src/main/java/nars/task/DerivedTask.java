@@ -37,16 +37,15 @@ public final class DerivedTask extends MutableTask {
     public boolean onRevision(@NotNull Task t) {
         Truth conclusion = t.truth();
 
-        //ConceptProcess p = this.premise;
-
         BLink<? extends Task> tLink = premiseTaskLink;
-
-        //TODO check this Question case is right
-        Truth tLinkTruth = tLink.get().truth();
-        if (tLinkTruth != null) {
-            float oneMinusDifT = 1f - conclusion.getExpDifAbs(tLinkTruth);
-            tLink.andPriority(oneMinusDifT);
-            tLink.andDurability(oneMinusDifT);
+        if (!tLink.isDeleted()) {
+            //TODO check this Question case is right
+            Truth tLinkTruth = tLink.get().truth();
+            if (tLinkTruth != null) {
+                float oneMinusDifT = 1f - conclusion.getExpDifAbs(tLinkTruth);
+                tLink.andPriority(oneMinusDifT);
+                tLink.andDurability(oneMinusDifT);
+            }
         }
 
         Task belief = t.getParentBelief();
@@ -58,6 +57,6 @@ public final class DerivedTask extends MutableTask {
         }
 
         return true;
-
     }
+
 }

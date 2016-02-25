@@ -9,6 +9,7 @@ import nars.nar.Default;
 import nars.nar.Terminal;
 import nars.task.Task;
 import nars.term.Compound;
+import nars.term.Operator;
 import nars.term.Term;
 import nars.term.transform.subst.Subst;
 import nars.util.signal.TestNAR;

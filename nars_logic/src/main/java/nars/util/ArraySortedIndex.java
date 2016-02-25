@@ -201,7 +201,6 @@ abstract public class ArraySortedIndex<E> extends SortedIndex<E> {
         int s = size();
         if (s == 0) return -1;
 
-
         //estimated position according to current priority,
         //which if it hasnt changed much has a chance of being
         //close to the index
@@ -209,15 +208,26 @@ abstract public class ArraySortedIndex<E> extends SortedIndex<E> {
         if (p >= s) p = s-1;
         if (p < 0)  p = 0;
 
-        if (attemptEqual(o, p))
-            return p;
+        return attemptEqual(this.list, o, p) ?
+                p :
+                locateAt(o, s, p);
+    }
 
+    /**
+     *
+     * @param o object being sought
+     * @param s size
+     * @param p scan start index
+     * @return
+     */
+    private int locateAt(Object o, int s, int p) {
         int r = 0;
         int maxDist = Math.max(s - p, p);
 
         boolean phase = false;
 
         //scan in an expanding radius around the point
+        List<E> list = this.list;
         do {
 
             phase = !phase;
@@ -235,7 +245,7 @@ abstract public class ArraySortedIndex<E> extends SortedIndex<E> {
                 if (u < 0) continue;
             }
 
-            if (attemptEqual(o, u))
+            if (attemptEqual(list, o, u))
                 return u;
 
         } while ( r <= maxDist );
@@ -243,8 +253,7 @@ abstract public class ArraySortedIndex<E> extends SortedIndex<E> {
         return -1;
     }
 
-    private boolean attemptEqual(Object o, /*final Object oName, */ int i) {
-        List<E> l = list;
+    private static boolean attemptEqual(List l, Object o, /*final Object oName, */ int i) {
         return o == l.get(i);
     }
 

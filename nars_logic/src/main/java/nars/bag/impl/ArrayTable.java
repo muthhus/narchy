@@ -95,10 +95,10 @@ abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements Tabl
         return (size() >= capacity());
     }
 
-    protected final L removeBottom() {
-        if (isEmpty()) return null;
-        return removeItem(size() - 1);
-    }
+//    protected final L removeBottom() {
+//        if (isEmpty()) return null;
+//        return removeItem(size() - 1);
+//    }
 
     public final L top() {
         if (isEmpty()) return null;
@@ -106,8 +106,8 @@ abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements Tabl
     }
 
     public final L bottom() {
-        if (isEmpty()) return null;
-        return item(size() - 1);
+        int s = size();
+        return s == 0 ? null : item(s - 1);
     }
 
     final L item(int index) {
@@ -213,13 +213,12 @@ abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements Tabl
 
     @Override
     protected final L addItem(L i) {
-        L overflow = items.insert(i);
-//        if (overflow!=null) {
+        //        if (overflow!=null) {
 //            L v = removeKeyForValue(overflow);
 //            if (v!=overflow)
 //                throw new RuntimeException("bag inconsistency: " + overflow + " mismatched with " + v);
 //        }
-        return overflow;
+        return items.insert(i);
     }
 
 

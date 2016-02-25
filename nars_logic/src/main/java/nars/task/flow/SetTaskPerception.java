@@ -20,8 +20,6 @@ public final class SetTaskPerception extends TaskPerception {
 
 
     private final BudgetedSet<Task> data;
-    private Task[] tmp = null;
-
 
     public SetTaskPerception(@NotNull Memory m, Consumer<Task[]> receiver, BudgetMerge merge) {
         super(m, receiver);

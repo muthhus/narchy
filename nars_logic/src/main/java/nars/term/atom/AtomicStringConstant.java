@@ -1,6 +1,6 @@
-package nars.nal.nal8;
+package nars.term.atom;
 
-import nars.nal.meta.AtomicString;
+import nars.term.atom.AtomicString;
 
 /**
  * Created by me on 2/18/16.

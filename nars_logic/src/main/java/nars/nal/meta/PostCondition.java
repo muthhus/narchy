@@ -76,7 +76,7 @@ public class PostCondition implements Serializable, Level //since there can be m
      * if puncOverride == 0 (unspecified), then the default punctuation rule determines the
      * derived task's punctuation.  otherwise, its punctuation will be set to puncOverride's value
      */
-    public transient char puncOverride = 0;
+    public transient char puncOverride;
 
 
     /**

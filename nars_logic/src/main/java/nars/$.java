@@ -7,7 +7,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.ConsoleAppender;
 import nars.op.sys.java.AtomObject;
 import nars.nal.meta.match.VarPattern;
-import nars.nal.nal8.Operator;
+import nars.term.Operator;
 import nars.op.sys.java.DefaultTermizer;
 import nars.op.sys.java.Termizer;
 import nars.task.MutableTask;

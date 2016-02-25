@@ -4,7 +4,7 @@ package nars.task.filter;
  * Prevent a duplicate belief from entering the system again
  */
 public enum FilterDuplicateExistingBelief {
-    ; //implements DerivationFilter {
+    //implements DerivationFilter {
 
 //    public final static String DUPLICATE = "DuplicateExistingBelief";
 //

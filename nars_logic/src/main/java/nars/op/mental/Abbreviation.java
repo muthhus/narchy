@@ -122,7 +122,7 @@ public class Abbreviation implements Consumer<Task> {
                         abbreviation.put(Abbreviation.class, abbreviation); //abbreviated by itself
                         abbreviated.put(Abbreviation.class, id); //abbreviated by the serial
 
-                        nar.logger.info("Abbreviation " + abbreviation);
+                        NAR.logger.info("Abbreviation " + abbreviation);
 
                         nar.input(
                                 new MutableTask(abbreviation)

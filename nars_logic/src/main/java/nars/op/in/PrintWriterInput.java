@@ -20,7 +20,7 @@ public class PrintWriterInput extends ReaderInput {
 	 */
 	@NotNull
 	public final PipedWriter out;
-	boolean outClosed = false;
+	boolean outClosed;
 
 	public PrintWriterInput(NAR n) throws IOException {
 		super(n);

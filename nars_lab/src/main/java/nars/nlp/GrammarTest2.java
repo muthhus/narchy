@@ -51,7 +51,7 @@ public class GrammarTest2 {
     public NarQ q;
 
     public GrammarTest2() throws Exception  {
-        n = new Default(1000, 1, 2, 3);
+        n = new Default(2000, 8, 3, 3);
 
         this.executionFilter = n.memory.executionThreshold;
         Lobjects o = new Lobjects(n);

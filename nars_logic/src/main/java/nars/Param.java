@@ -24,7 +24,7 @@ public abstract class Param extends Container implements Level {
 
 
     @Nullable
-    private Truth defaultGoalTruth = null, defaultJudgmentTruth = null;
+    private Truth defaultGoalTruth, defaultJudgmentTruth;
 
     public final MutableInteger cyclesPerFrame = new MutableInteger(1);
 
@@ -240,7 +240,7 @@ public abstract class Param extends Container implements Level {
     }
 
     //decision threshold is enough for now
-    float EXECUTION_SATISFACTION_TRESHOLD = 0;
+    float EXECUTION_SATISFACTION_TRESHOLD;
 
     public float getExecutionSatisfactionThreshold() {
         return EXECUTION_SATISFACTION_TRESHOLD;

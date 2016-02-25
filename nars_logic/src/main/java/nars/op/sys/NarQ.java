@@ -189,7 +189,7 @@ public class NarQ implements Consumer<NAR> {
 
 
     @FunctionalInterface  public interface StateCompressionRatio {
-        public int states(int inputs, int outputs);
+        int states(int inputs, int outputs);
     }
 
     public NarQ(NAR n) {

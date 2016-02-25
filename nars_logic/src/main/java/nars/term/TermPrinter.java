@@ -2,7 +2,6 @@ package nars.term;
 
 import nars.Op;
 import nars.Symbols;
-import nars.nal.nal8.Operator;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;

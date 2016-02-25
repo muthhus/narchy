@@ -65,7 +65,7 @@ class Lexer extends StreamTokenizer {
 		return String.valueOf((char) c);
 	}
 
-	private boolean inClause = false;
+	private boolean inClause;
 
 	public boolean atEOF() {
 		boolean yes = (TT_EOF == ttype);

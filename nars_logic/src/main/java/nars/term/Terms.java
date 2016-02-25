@@ -55,13 +55,12 @@ public enum Terms {
                 case INHERIT:
                     return equalSubjectPredicateInRespectToImageAndProduct((Compound)a, (Compound)b);
 
-                case SIMILAR: {
+                case SIMILAR:
                     boolean x = equalSubjectPredicateInRespectToImageAndProduct((Compound) a, (Compound) b);
 
                     //only half seems necessary:
                     //boolean y = equalSubjectPredicateInRespectToImageAndProduct((Compound) b, (Compound) a);
                     return x;
-                }
             }
         }
 

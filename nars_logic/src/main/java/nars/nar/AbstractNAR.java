@@ -21,6 +21,7 @@ import nars.op.mental.*;
 import nars.op.data.complexity;
 import nars.op.data.reflect;
 import nars.op.sys.js;
+import nars.op.sys.shell.shell;
 import nars.term.Term;
 import nars.term.TermIndex;
 import nars.time.Clock;
@@ -92,8 +93,10 @@ public abstract class AbstractNAR extends NAR {
             }
         }
 
+        new shell(this);
         for (AbstractOperator o : defaultOperators)
             onExec(o);
+
 
 //        for (AbstractOperator o : exampleOperators)
 //            onExec(o);

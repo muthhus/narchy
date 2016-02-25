@@ -2,7 +2,7 @@ package nars.util.signal.condition;
 
 import nars.NAR;
 import nars.nal.Tense;
-import nars.nal.nal8.Operator;
+import nars.term.Operator;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -15,7 +15,7 @@ public class ExecutionCondition implements NARCondition {
     private final Operator opTerm;
     private final long start, end;
     private final float minExpect, maxExpect;
-    private boolean success = false;
+    private boolean success;
     private long successTime = Tense.TIMELESS;
 
     public ExecutionCondition(@NotNull NAR n, long start, long end, @NotNull Operator opTerm, float minExpect, float maxExpect) {

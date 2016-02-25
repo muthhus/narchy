@@ -17,7 +17,7 @@
 
 package nars.op.math;
 
-import nars.nal.nal8.Operator;
+import nars.term.Operator;
 import nars.nal.nal8.operator.TermFunction;
 import nars.term.Compound;
 import nars.term.Term;

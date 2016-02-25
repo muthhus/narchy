@@ -13,8 +13,8 @@ public class ChangedTextInput {
 
 	private final NAR nar;
 	@Nullable
-	private Input last = null;
-	private boolean allowRepeats = false;
+	private Input last;
+	private boolean allowRepeats;
 
 	public ChangedTextInput(NAR n) {
 		nar = n;

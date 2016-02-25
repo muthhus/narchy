@@ -34,7 +34,7 @@ abstract public class MatchTerm extends AtomicBooleanCondition<PremiseEval> impl
     public final Term x;
 
     @Nullable
-    private PremiseMatchFork onMatch = null;
+    private PremiseMatchFork onMatch;
 
     public MatchTerm(@NotNull Term id, Term pattern, @Nullable ImmutableMap<Term, MatchConstraint> constraints) {
         this.id = id;

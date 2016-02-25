@@ -31,7 +31,7 @@ public interface BooleanCondition<C> extends Term, BooleanFunction<C> {
 
 
     @Override
-    default public Op op() {
+    default Op op() {
         return ATOM; //shouldnt this be a product?
     }
 }

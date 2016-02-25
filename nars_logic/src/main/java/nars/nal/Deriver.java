@@ -16,9 +16,9 @@ public abstract class Deriver  {
 
     //@Deprecated public static final TermIndex terms = TermIndex.memory(16384);
     @Nullable
-    private static Deriver defaultDeriver = null;
+    private static Deriver defaultDeriver;
     @Nullable
-    private static PremiseRuleSet defaultRules = null;
+    private static PremiseRuleSet defaultRules;
 
     @Nullable
     public static synchronized PremiseRuleSet getDefaultRules() {

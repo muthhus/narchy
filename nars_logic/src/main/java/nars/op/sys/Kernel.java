@@ -9,7 +9,7 @@ import nars.bag.impl.CurveBag;
 import nars.budget.BudgetMerge;
 import nars.budget.Forget;
 import nars.budget.UnitBudget;
-import nars.nal.nal8.Operator;
+import nars.term.Operator;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Term;

@@ -1,10 +1,7 @@
-package nars.nal.nal8;
+package nars.term;
 
 import nars.Op;
-import nars.task.Task;
-import nars.term.Compound;
-import nars.term.Term;
-import nars.term.Termed;
+import nars.term.atom.AtomicStringConstant;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -68,10 +65,6 @@ public final class Operator<T extends Term> extends AtomicStringConstant {
     @Override
     public int complexity() {
         return 1;
-    }
-
-    @Override public boolean isCompound() {
-        return false;
     }
 
     @NotNull

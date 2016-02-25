@@ -96,7 +96,7 @@ public class DefaultTermizer implements Termizer {
             return ((Boolean) o) ? TRUE : FALSE;
 
         if (o instanceof Character)
-            return $.quote(String.valueOf((Character)o));
+            return $.quote(String.valueOf(o));
 
         if (o instanceof Number)
             return number((Number)o);
@@ -223,7 +223,7 @@ public class DefaultTermizer implements Termizer {
     }
 
     protected static Term number(Number o) {
-        return $.the((Number) o);
+        return $.the(o);
     }
     @NotNull
     public Compound getOperation(@NotNull Method m, Term[] args) {

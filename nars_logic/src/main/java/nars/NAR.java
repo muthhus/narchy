@@ -11,7 +11,7 @@ import nars.concept.Concept;
 import nars.nal.Level;
 import nars.nal.Tense;
 import nars.nal.nal8.AbstractOperator;
-import nars.nal.nal8.Operator;
+import nars.term.Operator;
 import nars.nal.nal8.PatternAnswer;
 import nars.nal.nal8.operator.TermFunction;
 import nars.op.in.FileInput;
@@ -486,13 +486,22 @@ public abstract class NAR implements Level, Consumer<Task> {
 
         if (goalConcept != null) {
             //Normal Goal
-            long now = memory.time();
+            long now = time();
             Task projectedGoal = goalConcept.goals().top(now);
             float motivation = projectedGoal.motivation();
 
+            //counteract with content from any (--, concept
+            Term antiTerm = $.neg(projectedGoal.term());
+            Concept antiConcept = concept(antiTerm);
+            if (antiConcept!=null)
+                motivation -= antiConcept.motivationElse(now, 0);
+
+            if (motivation < memory.executionThreshold.floatValue())
+                return false;
+
             long occ = projectedGoal.occurrence();
-            if (((occ == ETERNAL) || (Math.abs(occ-now) < memory.duration()))//right timing
-                &&(motivation < memory.executionThreshold.floatValue())) {
+            if ((!((occ == ETERNAL) || (Math.abs(occ-now) < memory.duration()*2)))//right timing
+                    ) { //sufficient motivation
                 return false;
             }
 

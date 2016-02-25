@@ -1,21 +1,15 @@
 package nars.op.sys.java;
 
-import nars.nal.nal8.Operator;
 import nars.nal.nal8.operator.TermFunction;
-import nars.nar.Default;
-import nars.op.mental.Inperience;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.TermBuilder;
 import nars.term.atom.Atom;
-import nars.truth.Truth;
 import org.codehaus.commons.compiler.CompileException;
 import org.codehaus.janino.ExpressionEvaluator;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.function.Function;
 
 /**
  * Created by me on 2/24/16.

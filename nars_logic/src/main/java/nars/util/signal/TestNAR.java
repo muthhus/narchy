@@ -35,8 +35,8 @@ public class TestNAR  {
     @NotNull
     public final NAR nar;
     boolean showFail = true;
-    boolean showSuccess = false;
-    boolean showExplanations = false;
+    boolean showSuccess;
+    boolean showExplanations;
     final boolean showOutput = false;
 
 
@@ -63,7 +63,7 @@ public class TestNAR  {
      */
     static final boolean collectTrace = false;
 
-    boolean finished = false;
+    boolean finished;
     @NotNull
     final Topic<Task> answerReceiver;
 
@@ -158,7 +158,7 @@ public class TestNAR  {
     final class EarlyExit extends CycleReaction {
 
         final int checkResolution; //every # cycles to check for completion
-        int cycle = 0;
+        int cycle;
 
         public EarlyExit(int checkResolution) {
             super(nar);
@@ -440,7 +440,7 @@ public class TestNAR  {
         @NotNull
         public final HitMeter[] eventMeters;
         @Nullable
-        protected Serializable error = null;
+        protected Serializable error;
         protected Task[] inputs;
         @NotNull
         protected List<NARCondition> cond = Global.newArrayList(1);

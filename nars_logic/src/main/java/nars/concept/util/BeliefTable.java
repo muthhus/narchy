@@ -176,10 +176,10 @@ public interface BeliefTable extends TaskTable {
     }
 
 
-    static public float rankEternalByOriginality(@NotNull Task b) {
+    static float rankEternalByOriginality(@NotNull Task b) {
         return or(b.conf(), b.originality());
     }
-    static public float rankEternalByOriginality(float conf, int evidenceLength) {
+    static float rankEternalByOriginality(float conf, int evidenceLength) {
         return or(conf, 1.0f / (evidenceLength + 1));
     }
 
@@ -335,6 +335,20 @@ public interface BeliefTable extends TaskTable {
     default Task top(@NotNull NAR n) {
         return top(n.memory.time());
     }
+
+    /** simple metric that guages the level of inconsistency (ex: variance) aggregated by contained belief states.
+     *  returns 0 if no tasks exist */
+    default float coherence() {
+        //TODO
+        return 0;
+    }
+
+    /** simple metric that guages the level of inconsistency between two differnt tables, used in measuring graph intercoherency */
+    /*default float coherenceAgainst(BeliefTable other) {
+        //TODO
+        return Float.NaN;
+    }*/
+
 
 
 //    @FunctionalInterface

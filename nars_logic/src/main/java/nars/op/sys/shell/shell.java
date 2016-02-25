@@ -1,10 +1,7 @@
 package nars.op.sys.shell;
 
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.text.DateFormat;
 import java.util.*;
 
@@ -13,6 +10,7 @@ import com.gs.collections.api.set.ImmutableSet;
 import com.gs.collections.impl.factory.Sets;
 import nars.$;
 import nars.NAR;
+import nars.nar.Default;
 import nars.op.sys.java.Lobjects;
 import org.apache.commons.vfs2.*;
 import org.apache.commons.vfs2.operations.FileOperationProvider;
@@ -25,10 +23,19 @@ public class shell {
 
     private final sh shell;
 
-    public shell(NAR n) throws Exception {
+    public shell(NAR n) {
 
         Lobjects l = new Lobjects(n);
-        this.shell = l.the("I", sh.class);
+
+        sh sh;
+        try {
+            sh = l.the("I", sh.class, n);
+        } catch (Exception e) {
+            //n.input(e);
+            e.printStackTrace();
+            sh = null;
+        }
+        this.shell = sh;
 
 
     }
@@ -61,10 +68,13 @@ public class shell {
      */
     public static class sh {
         private final FileSystemManager mgr;
+        private final NAR nar;
         private FileObject cwd;
         private final BufferedReader reader;
 
-        public sh() throws IOException {
+        public sh(NAR n) throws IOException {
+            this.nar = n;
+
             mgr = VFS.getManager();
             cwd = mgr.toFileObject(new File(System.getProperty("user.dir")));
             reader = new BufferedReader(
@@ -73,7 +83,7 @@ public class shell {
 
         public static void main(final String[] args) {
             try {
-                new sh().repl();
+                new sh(new Default()).repl();
             } catch (final Exception e) {
                 e.printStackTrace();
                 System.exit(1);
@@ -130,6 +140,40 @@ public class shell {
             } else {
                 System.err.println("Unknown command \"" + cmdName + "\" (Try 'help').");
             }
+        }
+
+        public String memstat() {
+
+
+            StringWriter sw = new StringWriter(1024);
+
+              /* Total number of processors or cores available to the JVM */
+              sw.append("Available processors (cores): " + Runtime.getRuntime().availableProcessors()).append('\n');
+
+              /* Total amount of free memory available to the JVM */
+            sw.append("Free memory (bytes): " + Runtime.getRuntime().freeMemory()).append('\n');
+
+              /* This will return Long.MAX_VALUE if there is no preset limit */
+              long maxMemory = Runtime.getRuntime().maxMemory();
+              /* Maximum amount of memory the JVM will attempt to use */
+            sw.append("Maximum memory (bytes): " + (maxMemory == Long.MAX_VALUE ? "no limit" : maxMemory)).append('\n');
+
+              /* Total memory currently in use by the JVM */
+            sw.append("Total memory (bytes): " + Runtime.getRuntime().totalMemory()).append('\n');
+
+              /* Get a list of all filesystem roots on this system */
+              File[] roots = File.listRoots();
+
+              /* For each filesystem root, print some info */
+              for (File root : roots) {
+                  sw.append("File system root: " + root.getAbsolutePath()).append('\n');
+                  sw.append("Total space (bytes): " + root.getTotalSpace()).append('\n');
+                  sw.append("Free space (bytes): " + root.getFreeSpace()).append('\n');
+                  sw.append("Usable space (bytes): " + root.getUsableSpace()).append('\n');
+              }
+
+
+            return sw.getBuffer().toString();
         }
 
         private void info(String[] cmd) throws Exception {

@@ -301,7 +301,7 @@ public abstract class NQuadsRDF {
                 }
             //}
 
-            belief = (Compound) inh(subject, object);
+            belief = inh(subject, object);
 
         } else if ((predicate.equals(parentOf))) {
             //.. parentOf is probably redundant
@@ -362,7 +362,7 @@ public abstract class NQuadsRDF {
         }
         else {
             if (subject!=null && object!=null && predicate!=null) {
-                belief = (Compound) inst(
+                belief = inst(
                         p(subject, object),
                         predicate
                 );
@@ -372,7 +372,7 @@ public abstract class NQuadsRDF {
         if (belief instanceof Compound) {
             //System.out.println(subject + " " + predicate + " " + object + " :: " + belief);
 
-            return new MutableTask((Compound)belief).
+            return new MutableTask(belief).
                     belief().truth(1.0f,0.95f)
                     .time(nar.time(),
                     Tense.ETERNAL //TODO Tense parameter

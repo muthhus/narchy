@@ -20,7 +20,7 @@ public final class BLink<X> extends Budget implements Link<X> {
     private final float[] b = new float[6];
     public final X id;
     private long lastForget = Tense.TIMELESS;
-    boolean changed = false;
+    boolean changed;
 
     public BLink(X id) {
         this.id = id;

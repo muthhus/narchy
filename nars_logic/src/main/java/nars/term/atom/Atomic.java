@@ -16,7 +16,7 @@ public abstract class Atomic implements Term {
 
 
     @Override
-    public boolean isCompound() { return false; }
+    public final boolean isCompound() { return false; }
 
     @Nullable
     @Override abstract public String toString();

@@ -1,7 +1,7 @@
 package nars.term.transform.subst;
 
 import nars.Global;
-import nars.nal.nal8.Operator;
+import nars.term.Operator;
 import nars.nal.op.ImmediateTermTransform;
 import nars.term.Compound;
 import nars.term.Term;

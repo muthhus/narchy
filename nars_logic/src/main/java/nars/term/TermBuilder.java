@@ -9,7 +9,6 @@ import nars.nal.meta.PremiseAware;
 import nars.nal.meta.PremiseEval;
 import nars.nal.meta.match.Ellipsis;
 import nars.nal.meta.match.EllipsisMatch;
-import nars.nal.nal8.Operator;
 import nars.nal.op.ImmediateTermTransform;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
@@ -313,7 +312,7 @@ public interface TermBuilder {
                     return finish(op, -1, tt);
                 return t0;
             }
-            case 2: {
+            case 2:
                 Term t0 = t[0];
                 Term et0 = t0, et1 = t[1];
                 if ((et0.op() == set && et1.op() == set))
@@ -323,7 +322,6 @@ public interface TermBuilder {
                     return Terms.empty(set);
 
                 return finish(op, -1, TermContainer.the(op, t));
-            }
             default:
                 return null;
         }

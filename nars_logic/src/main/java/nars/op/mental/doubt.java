@@ -23,7 +23,7 @@ import nars.Symbols;
 import nars.budget.Budget;
 import nars.concept.Concept;
 import nars.concept.util.BeliefTable;
-import nars.nal.nal8.Operator;
+import nars.term.Operator;
 import nars.nal.nal8.operator.SyncOperator;
 import nars.task.Task;
 import nars.term.Term;

@@ -31,7 +31,7 @@ public class scheme extends TermFunction {
 
 
         public SchemeProduct(@NotNull Iterable<Term> p) {
-            super((Cons<Expression>)Cons.copyOf( Iterables.transform(p, (Term term) -> {
+            super(Cons.copyOf( Iterables.transform(p, (Term term) -> {
 
                 if (term instanceof Iterable) {
                     //return ListExpression.list(SymbolExpression.symbol("quote"), new SchemeProduct((Product)term));

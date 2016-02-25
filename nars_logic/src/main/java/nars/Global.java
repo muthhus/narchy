@@ -67,10 +67,10 @@ public enum Global {
 
     /** use this for advanced error checking, at the expense of lower performance.
         it is enabled for unit tests automatically regardless of the value here.    */
-    public static boolean DEBUG = false;
+    public static boolean DEBUG;
     //public static final boolean DEBUG_BAG_MASS = false;
     //public static boolean DEBUG_TRACE_EVENTS = false; //shows all emitted events
-    public static boolean DEBUG_DERIVATION_STACKTRACES = false; //includes stack trace in task's derivation rule string
+    public static boolean DEBUG_DERIVATION_STACKTRACES; //includes stack trace in task's derivation rule string
     //public static boolean DEBUG_INVALID_SENTENCES = true;
     //public static boolean DEBUG_NONETERNAL_QUESTIONS = false;
     public static boolean DEBUG_TASK_LOG = true; //false disables task history completely
@@ -78,7 +78,7 @@ public enum Global {
     //public static final boolean DEBUG_DERIVATION_GRAPH = false;
     public static final boolean DEBUG_REMOVED_CYCLIC_DERIVATIONS = false;
     public static final boolean DEBUG_REMOVED_INSUFFICIENT_BUDGET_DERIVATIONS = false;
-    public static boolean DEBUG_DETECT_DUPLICATE_RULES = false;
+    public static boolean DEBUG_DETECT_DUPLICATE_RULES;
 
 
 
@@ -152,7 +152,7 @@ public enum Global {
     public static final int COMPOUND_VOLUME_MAX = 256;
 
     /** extra debugging checks */
-    public static boolean DEBUG_PARANOID = false;
+    public static boolean DEBUG_PARANOID;
 
     public static float MAX_TERMUTATIONS_PER_MATCH = 4;
     public static float MIN_TERMUTATIONS_PER_MATCH = 1;

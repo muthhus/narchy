@@ -325,8 +325,6 @@ public class Default extends AbstractNAR {
 //        @Range(min=0,max=8192,unit="Concept")
 //        public final MutableInteger capacity = new MutableInteger();
 
-        /** activated concepts pending (re-)insert to bag */
-        public final LinkedHashSet<Concept> activated = new LinkedHashSet();
 
 
         @NotNull
@@ -401,12 +399,6 @@ public class Default extends AbstractNAR {
             active.forEach(conceptForget); //TODO use downsampling % of concepts not TOP
             //active.printAll();
 
-            LinkedHashSet<Concept> a = this.activated;
-            if (!a.isEmpty()) {
-                active.putAll(a);
-                a.clear();
-            }
-
             active.commit();
 
         }
@@ -421,7 +413,6 @@ public class Default extends AbstractNAR {
 
         private void reset(Memory m) {
             active.clear();
-            activated.clear();
         }
 
 

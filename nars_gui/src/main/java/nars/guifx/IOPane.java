@@ -11,7 +11,7 @@ import javafx.scene.web.WebView;
 import nars.NAR;
 import nars.guifx.nars.TaskButton;
 import nars.guifx.util.NSlider;
-import nars.nal.nal8.Operator;
+import nars.term.Operator;
 import nars.task.Task;
 import nars.term.Term;
 import nars.term.atom.Atom;

@@ -31,6 +31,8 @@ dependencies {
 
     compile(group:'jline', name:'jline', version:'2.12')
 
+//    compile(group:'io.reactives', name:'rxjava', version:'1.0.10')
+
     testCompile(group: 'org.testng', name: 'testng', version: '6.9.10') {
         exclude(module: 'ant')
         exclude(module: 'guice')

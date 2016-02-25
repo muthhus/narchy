@@ -23,25 +23,14 @@ package nars;
 
 import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
-import nars.bag.Bag;
-import nars.bag.impl.CurveBag;
-import nars.budget.BudgetMerge;
-import nars.concept.AtomConcept;
-import nars.concept.Concept;
 import nars.concept.ConceptProcess;
-import nars.concept.DefaultConcept;
-import nars.nal.nal8.Execution;
-import nars.nal.nal8.Operator;
-import nars.nal.space.Space;
-import nars.nal.space.SpaceConcept;
+import nars.term.Operator;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.TermIndex;
-import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.term.transform.CompoundTransform;
-import nars.term.variable.Variable;
 import nars.time.Clock;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.event.DefaultTopic;
@@ -55,7 +44,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-import java.util.function.Function;
 
 
 /**

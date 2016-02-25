@@ -29,7 +29,7 @@ abstract public class PremiseGenerator extends UnifySubst implements Function<Te
     private BLink<? extends Concept> concept;
     @Nullable
     private BLink<? extends Task> taskLink;
-    private final Map<Term, Task> beliefCache = Global.newHashMap();
+    //private final Map<Term, Task> beliefCache = Global.newHashMap();
     long lastMatch = Tense.TIMELESS;
 
     public PremiseGenerator(@NotNull NAR nar) {
@@ -73,7 +73,7 @@ abstract public class PremiseGenerator extends UnifySubst implements Function<Te
         long now = nar.time();
         if (lastMatch!= now) {
             lastMatch = now;
-            beliefCache.clear();
+            //beliefCache.clear();
         }
 
 
@@ -136,7 +136,10 @@ abstract public class PremiseGenerator extends UnifySubst implements Function<Te
     @Override public final boolean accept(@NotNull Term beliefTerm, Term unifiedBeliefTerm) {
 
         Task belief = beliefTerm.isCompound() ?
-                beliefCache.computeIfAbsent(beliefTerm, this) :
+
+                //beliefCache.computeIfAbsent(beliefTerm, this) :
+                apply(beliefTerm) :
+
                 null; //atomic terms will have no beliefs anyway
 
         //if the unified belief term is different, then clone the known belief with it as the new belief
@@ -152,10 +155,10 @@ abstract public class PremiseGenerator extends UnifySubst implements Function<Te
 
         premise(concept, taskLink, termLink, belief);
 
-        Task task = taskLink.get();
-        //Report questions/solution pairs involving query variable that have been matched
-        if (belief != null && task.isQuestOrQuestion() && !belief.isQuestOrQuestion())
-            memory.onSolve(task, belief);
+//        Task task = taskLink.get();
+//        //Report questions/solution pairs involving query variable that have been matched
+//        if (belief != null && task.isQuestOrQuestion() && !belief.isQuestOrQuestion())
+//            memory.onSolve(task, belief);
 
         return true;
     }

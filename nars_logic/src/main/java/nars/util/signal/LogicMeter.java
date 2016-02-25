@@ -109,8 +109,8 @@ public class LogicMeter extends FrameReaction {
 
     public static class ItemMeter<I extends BudgetedHandle> implements Consumer<I> {
 
-        double prioritySum = 0;
-        double prioritySumSq = 0;
+        double prioritySum;
+        double prioritySumSq;
         static final int histogramBins = 4;
         @NotNull
         double[] histogram = new double[histogramBins];
@@ -195,9 +195,9 @@ public class LogicMeter extends FrameReaction {
 
     public class ConceptMeter implements Consumer<Concept> {
 
-        int count = 0;
-        int totalQuestions = 0;
-        int totalBeliefs = 0;
+        int count;
+        int totalQuestions;
+        int totalBeliefs;
 
         public void reset() {
             totalQuestions = totalBeliefs = 0;

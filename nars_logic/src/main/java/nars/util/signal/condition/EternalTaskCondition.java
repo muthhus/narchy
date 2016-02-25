@@ -31,7 +31,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
     private final char punc;
     @Nullable
     private final Term term;
-    boolean succeeded = false;
+    boolean succeeded;
     long successTime = Tense.TIMELESS;
 
     //@Expose

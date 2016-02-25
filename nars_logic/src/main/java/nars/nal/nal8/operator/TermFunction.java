@@ -5,7 +5,7 @@ import nars.Op;
 import nars.Symbols;
 import nars.nal.Tense;
 import nars.nal.nal8.Execution;
-import nars.nal.nal8.Operator;
+import nars.term.Operator;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;

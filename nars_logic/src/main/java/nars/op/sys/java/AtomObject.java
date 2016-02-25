@@ -1,7 +1,7 @@
 package nars.op.sys.java;
 
 import nars.Op;
-import nars.nal.nal8.AtomicStringConstant;
+import nars.term.atom.AtomicStringConstant;
 
 /** refers to a java object instance TODO */
 public final class AtomObject<O> extends AtomicStringConstant {

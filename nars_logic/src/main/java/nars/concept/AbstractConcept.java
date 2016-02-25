@@ -16,7 +16,7 @@ public abstract class AbstractConcept implements Concept {
     private final Term term;
 
     @Nullable
-    protected Map meta = null;
+    protected Map meta;
 
     protected AbstractConcept(Term term) {
         this.term = term;

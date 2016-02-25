@@ -40,7 +40,7 @@ import java.util.*;
  */
 abstract public class BeliefClusterer<T>  {
 
-    private DistanceMeasure measure;
+    private final DistanceMeasure measure;
 
     public DistanceMeasure getDistanceMeasure() {
         return this.measure;

@@ -34,7 +34,18 @@ import java.util.function.BiConsumer;
 /* recurses a pair of compound term tree's subterms
 across a hierarchy of sequential and permutative fanouts
 where valid matches are discovered, backtracked,
-and collected until power is depleted. */
+and collected until power is depleted.
+
+
+
+https://github.com/rupertlssmith/lojix/blob/master/lojix/prolog/src/main/com/thesett/aima/logic/fol/prolog/PrologUnifier.java
+https://github.com/rupertlssmith/lojix/blob/master/lojix/wam_prolog/src/main/com/thesett/aima/logic/fol/wam/compiler/WAMInstruction.java
+see this code for a clear explanation of what a prolog unifier does.
+this code does some additional things but shares a general structure with the lojix code which i just found now
+So it can be useful for a more easy to understand rewrite of this class TODO
+
+
+*/
 public abstract class FindSubst extends Versioning implements Subst {
 
 

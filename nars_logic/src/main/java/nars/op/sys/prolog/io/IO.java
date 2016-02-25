@@ -14,7 +14,7 @@ import java.net.URL;
 public class IO {
 
 	@Nullable
-	public static IOPeer peer = null;
+	public static IOPeer peer;
 
 	public static final boolean showOutput = true;
 
@@ -22,7 +22,7 @@ public class IO {
 
 	public final static int showTrace = 0;
 
-	public static long maxAnswers = 0; // 0 means all, >0 means ask
+	public static long maxAnswers; // 0 means all, >0 means ask
 
 	public static final Reader input = toReader(System.in);
 

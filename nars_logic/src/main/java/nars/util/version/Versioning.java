@@ -25,7 +25,7 @@ public class Versioning extends FasterList<Versioned> {
         this(capacity, null);
     }
 
-    private int now = 0;
+    private int now;
 
     /** serial id's assigned to each Versioned */
     private int nextID = 1;

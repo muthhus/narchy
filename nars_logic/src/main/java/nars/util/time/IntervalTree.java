@@ -10,7 +10,7 @@ import java.util.Map.Entry;
 public class IntervalTree<K extends Comparable<? super K>, V> {
 	
 	@Nullable
-	public IntervalTreeNode<K, V> root = null;
+	public IntervalTreeNode<K, V> root;
 
 	@NotNull
 	public List<V> searchOverlapping(Between<K> range){

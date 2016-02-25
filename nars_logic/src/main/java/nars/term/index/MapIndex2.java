@@ -1,5 +1,6 @@
 package nars.term.index;
 
+import com.google.common.cache.CacheBuilder;
 import com.gs.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import nars.term.Compound;
 import nars.term.Term;
@@ -20,10 +21,12 @@ public class MapIndex2 extends AbstractMapIndex {
     private static final int SUBTERM_RELATION = Integer.MIN_VALUE;
 
     final Map<Object /* vector(t) */, IntObjectHashMap> data;
-    int count = 0;
+    int count;
 
     public MapIndex2(Map<Object, IntObjectHashMap> data) {
+
         this.data = data;
+
     }
 
     @NotNull
@@ -33,7 +36,7 @@ public class MapIndex2 extends AbstractMapIndex {
     }
 
     static final Function<Object, IntObjectHashMap> groupBuilder =
-            (k) -> new IntObjectHashMap(2);
+            (k) -> new IntObjectHashMap(8);
 
     /** returns previous value */
     public Object putItem(Object vv, int index, Object value) {

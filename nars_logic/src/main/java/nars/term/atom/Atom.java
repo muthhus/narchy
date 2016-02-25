@@ -3,9 +3,7 @@ package nars.term.atom;
 import nars.$;
 import nars.Narsese;
 import nars.Op;
-import nars.nal.nal8.AtomicStringConstant;
 import nars.term.Term;
-import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

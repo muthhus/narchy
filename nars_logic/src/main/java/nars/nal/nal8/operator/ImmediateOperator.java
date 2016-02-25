@@ -2,7 +2,7 @@ package nars.nal.nal8.operator;
 
 
 import nars.$;
-import nars.nal.nal8.Operator;
+import nars.term.Operator;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;

@@ -311,6 +311,21 @@ public interface Concept extends Termed, Comparable<Termed> {
         }
     }
 
+    default float beliefElse(long now, float valueIfMissing) {
+        if (hasBeliefs())
+            return beliefs().top(now).motivation();
+        else
+            return valueIfMissing;
+    }
+
+    default float motivationElse(long now, float valueIfMissing) {
+        if (hasGoals())
+            return goals().top(now).motivation();
+        else
+            return valueIfMissing;
+    }
+
+
 
 //    public Task getTask(boolean hasQueryVar, long occTime, Truth truth, List<Task>... lists);
 //
