@@ -32,6 +32,11 @@ public class TermSet<X extends Term> extends TermVector<X> {
 //        return new TermSet(presorted);
 //    }
 
+    /** empty */
+    public TermSet() {
+        super();
+    }
+
     private TermSet(X[] x) {
         super(x);
     }

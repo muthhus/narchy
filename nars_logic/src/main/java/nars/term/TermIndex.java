@@ -15,7 +15,6 @@ import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.term.container.TermSet;
 import nars.term.container.TermVector;
-import nars.term.index.MapIndex;
 import nars.term.index.MapIndex2;
 import nars.term.transform.CompoundTransform;
 import nars.term.transform.VariableNormalization;
@@ -27,12 +26,14 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
 
 import static nars.Op.*;
+import static nars.nal.Tense.ITERNAL;
 
 /**
  *
@@ -56,11 +57,31 @@ public interface TermIndex  {
         //DEFAULT IMPL to be moved to a concrete class: BUILDS ON THE HEAP:
         return builder().make(t.op(), t.relation(), t.subterms(), t.dt());
     }
+    @Nullable
+    default Termed resolveCompound(Op op, int relation, TermContainer subterms, int dt) {
+        //DEFAULT IMPL to be moved to a concrete class: BUILDS ON THE HEAP:
+        return builder().make(op, relation, subterms, dt);
+    }
+    @Nullable
+    default Termed resolveCompound(Op op, int relation, TermContainer subterms) {
+        //DEFAULT IMPL to be moved to a concrete class: BUILDS ON THE HEAP:
+        return resolveCompound(op, relation, subterms, ITERNAL);
+    }
+    @Nullable
+    default Termed resolveCompound(Op op, TermContainer subterms) {
+        //DEFAULT IMPL to be moved to a concrete class: BUILDS ON THE HEAP:
+        return resolveCompound(op, -1, subterms, ITERNAL);
+    }
+    @Nullable
+    default Termed resolveCompound(Op op, Collection<Term> subterms) {
+        //DEFAULT IMPL to be moved to a concrete class: BUILDS ON THE HEAP:
+        return resolveCompound(op, TermContainer.the(op, subterms));
+    }
 
     /** universal zero-length product */
     Compound Empty = new GenericCompound(Op.PRODUCT, -1, TermVector.Empty);
     TermVector EmptyList = new TermVector();
-    TermSet EmptySet = TermSet.the();
+    TermSet EmptySet = new TermSet();
 
     void clear();
 
@@ -319,8 +340,8 @@ public interface TermIndex  {
     static TermIndex memory(int capacity) {
 //        CacheBuilder builder = CacheBuilder.newBuilder()
 //            .maximumSize(capacity);
-        return new MapIndex(
-            new HashMap(capacity),new HashMap(capacity*2)
+        return new MapIndex2(
+            new HashMap(capacity*2)
             //new UnifriedMap()
         );
 //        return new MapIndex2(
@@ -334,7 +355,7 @@ public interface TermIndex  {
 //        CacheBuilder builder = CacheBuilder.newBuilder()
 //            .maximumSize(capacity);
         return new MapIndex2(
-                new SoftValueHashMap(capacity)
+                new SoftValueHashMap(capacity*2)
                 //new WeakHashMap()
         );
 //        return new MapIndex2(

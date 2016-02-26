@@ -19,6 +19,5 @@ public abstract class BinaryTermOperator extends ImmediateTermTransform {
         return apply(x.term(0), x.term(1), i);
     }
 
-    @Nullable
-    public abstract Term apply(Term a, Term b, TermBuilder i);
+    public abstract Term apply(Term a, Term b, TermIndex i);
 }

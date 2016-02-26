@@ -7,6 +7,7 @@ import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.TermBuilder;
+import nars.term.TermIndex;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -72,7 +73,7 @@ public class MethodOperator  {
 
 
     @Nullable
-    public Object function(@NotNull Compound o, TermBuilder ti) {
+    public Object function(@NotNull Compound o, TermIndex ti) {
 
         if (!enable.get())
             return null;

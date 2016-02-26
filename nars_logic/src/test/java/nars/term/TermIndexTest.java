@@ -1,12 +1,11 @@
 package nars.term;
 
 import javassist.scopedpool.SoftValueHashMap;
+import nars.Global;
 import nars.NAR;
 import nars.nar.Default;
 import nars.nar.Terminal;
 import nars.task.Task;
-import nars.term.index.GuavaIndex;
-import nars.term.index.MapIndex;
 import nars.term.index.MapIndex2;
 import nars.time.FrameClock;
 import nars.util.data.map.UnifriedMap;
@@ -42,25 +41,28 @@ public class TermIndexTest {
         //testSequenceNotShared(i);
     }
 
-    @Test public void testTermSharing1() {
-        testIndex(new MapIndex(new HashMap(), new HashMap()));
-    }
-    @Test public void testTermSharing2() {
-        testIndex(new MapIndex(new UnifriedMap(), new UnifriedMap()));
-    }
-    @Test public void testTermSharing3() {
-        testIndex(new MapIndex(new SoftValueHashMap(), new SoftValueHashMap()));
-    }
-    @Test public void testTermSharing5() {
+//    @Test public void testTermSharing1() {
+//        testIndex(new MapIndex(new HashMap(), new HashMap()));
+//    }
+//    @Test public void testTermSharing2() {
+//        testIndex(new MapIndex(new UnifriedMap(), new UnifriedMap()));
+//    }
+//    @Test public void testTermSharing3() {
+//        testIndex(new MapIndex(new SoftValueHashMap(), new SoftValueHashMap()));
+//    }
+    @Test public void testTermSharing5a() {
         testIndex(new MapIndex2(new HashMap()));
+    }
+    @Test public void testTermSharing5b() {
+        testIndex(new MapIndex2(Global.newHashMap()));
     }
 
 //    @Test public void testTermSharing4() {
 //        testIndex(new MapIndex(new WeakHashMap(), new WeakHashMap()));
 //    }
-    @Test public void testTermSharingGuava() {
-        testIndex(new GuavaIndex());
-    }
+//    @Test public void testTermSharingGuava() {
+//        testIndex(new GuavaIndex());
+//    }
 
 
     void testTermSharing(TermIndex tt) {

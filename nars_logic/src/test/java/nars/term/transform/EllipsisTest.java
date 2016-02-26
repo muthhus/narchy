@@ -459,12 +459,12 @@ public class EllipsisTest {
             if (o.minSize <= 1) continue;
 
             assertEquals(o + " with normal term",
-                    a, $.terms.newCompound(o,a));
+                    a, $.the(o,a));
 
 
             assertEquals(o + " with ellipsis not reduced",
                     o.isStatement() ? VAR_PATTERN : o,
-                    $.terms.newCompound(o,b).op());
+                    $.the(o,b).op());
         }
     }
 

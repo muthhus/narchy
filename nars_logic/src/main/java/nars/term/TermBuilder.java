@@ -53,7 +53,7 @@ public abstract class TermBuilder {
     }
 
     @Nullable
-    protected abstract Termed make(Op op, int relation, TermContainer subterms, int dt);
+    public abstract Termed make(Op op, int relation, TermContainer subterms, int dt);
 
 //    @Nullable
 //    public Termed the(@NotNull Termed t) {
@@ -491,7 +491,7 @@ public abstract class TermBuilder {
 
     @Nullable
     public Term subtractSet(@NotNull Op setType, @NotNull Compound A, @NotNull Compound B) {
-        return TermContainer.difference(this, setType, A, B);
+        return TermContainer.difference(setType, A, B);
     }
 
     @Nullable

@@ -2,6 +2,8 @@ package nars.term.index;
 
 import com.google.common.cache.CacheBuilder;
 import com.gs.collections.impl.map.mutable.primitive.IntObjectHashMap;
+import nars.$;
+import nars.Op;
 import nars.concept.AtomConcept;
 import nars.concept.Concept;
 import nars.term.*;
@@ -24,12 +26,19 @@ public class MapIndex2 extends AbstractMapIndex {
 
     final Atoms atoms = new Atoms();
     final Map<TermVector, IntObjectHashMap> data;
-    private final TermBuilder builder;
+    final TermBuilder builder;
     int count;
 
     public MapIndex2(Map<TermVector, IntObjectHashMap> data) {
 
-        this.builder = new TermBuilder();
+        this.builder = new TermBuilder() {
+
+            @Override
+            @Nullable
+            public Termed make(Op op, int relation, TermContainer subterms, int dt) {
+                return $.builder.make(op, relation, subterms, dt);
+            }
+        };
 
         this.data = data;
 

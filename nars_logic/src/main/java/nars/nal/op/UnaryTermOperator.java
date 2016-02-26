@@ -19,5 +19,5 @@ public abstract class UnaryTermOperator extends ImmediateTermTransform {
     }
 
     @NotNull
-    public abstract Term apply(Term a, TermBuilder i);
+    public abstract Term apply(Term a, TermIndex i);
 }

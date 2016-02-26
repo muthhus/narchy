@@ -3,12 +3,10 @@ package nars.term.container;
 import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
 import com.gs.collections.api.set.MutableSet;
 import com.gs.collections.impl.factory.Sets;
+import nars.$;
 import nars.Global;
 import nars.Op;
-import nars.term.Term;
-import nars.term.TermBuilder;
-import nars.term.Termlike;
-import nars.term.Terms;
+import nars.term.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -74,21 +72,22 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
 
     /** returns null if empty set; not sorted */
     @Nullable
-    @Deprecated static Term difference(@NotNull TermBuilder i, @NotNull Op op, @NotNull TermContainer a, @NotNull TermContainer b) {
+    @Deprecated static Term difference(@NotNull Op op, @NotNull TermContainer a, @NotNull TermContainer b) {
 
         if (a.equals(b))
             return Terms.empty(op);
 
-        TreeSet<Term> terms = new TreeSet();
-
         Term[] aa = a.terms();
+
+        List<Term> terms = Global.newArrayList(aa.length);
+
         for(Term x: aa) { //set difference
             if (!b.containsTerm(x))
                 terms.add(x);
         }
 
         if (terms.isEmpty()) return Terms.empty(op);
-        return i.newCompound(op, TermSet.the(terms));
+        return $.the(op, terms).term();
 
 //        if (a.size() == 1 && b.size() == 1) {
 //            //special case
@@ -276,6 +275,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
     }
     @NotNull
     static TermContainer the(@NotNull Op op, @NotNull Collection<Term> tt) {
+        //if (tt.isEmpty()) ...
         return requiresTermSet(op, tt.size()) ?
                 TermSet.the(tt) : new TermVector(tt);
     }

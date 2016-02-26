@@ -165,7 +165,7 @@ public class TermReductionsTest {
         //check consistency with differenceSorted
         assertArrayEquals(
             new Term[] { r, s },
-            ((Compound)TermContainer.difference($.terms, Op.SET_EXT, sete(r, p, q, s), sete(p, q))).terms()
+            ((Compound)TermContainer.difference(Op.SET_EXT, sete(r, p, q, s), sete(p, q))).terms()
         );
     }
     @Test public void testDifferenceSortedEmpty() {
@@ -176,7 +176,7 @@ public class TermReductionsTest {
         //check consistency with differenceSorted
         assertEquals(
             Terms.EmptySetExt,
-            TermContainer.difference($.terms, Op.SET_EXT, sete(p, q), sete(p, q))
+            TermContainer.difference(Op.SET_EXT, sete(p, q), sete(p, q))
         );
     }
 
@@ -190,7 +190,7 @@ public class TermReductionsTest {
         assertEquals(
                 $("{Mars,Venus}"),
                 TermContainer.difference(
-                        $.terms, Op.SET_EXT,
+                        Op.SET_EXT,
                         $("{Mars,Pluto,Venus}"),
                         $("{Pluto,Saturn}")
                 )
@@ -198,7 +198,7 @@ public class TermReductionsTest {
         assertEquals(
                 $("{Saturn}"),
                 TermContainer.difference(
-                        $.terms, Op.SET_EXT,
+                        Op.SET_EXT,
                         $("{Pluto,Saturn}"),
                         $("{Mars,Pluto,Venus}")
                 )

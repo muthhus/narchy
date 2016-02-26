@@ -53,10 +53,9 @@ public enum $  {
         final TermBuilder builder = new TermBuilder() {
 
             @Override
-            protected
             @Nullable
-            Termed make(Op op, int relation, TermContainer subterms, int dt) {
-                return new GenericCompound(op, relation, (TermVector)subterms);
+            public Termed make(Op op, int relation, TermContainer subterms, int dt) {
+                return new GenericCompound(op, relation, (TermVector)subterms).dt(dt);
             }
         };
 
@@ -105,7 +104,7 @@ public enum $  {
         }
 
     };
-    final static TermBuilder builder = terms.builder();
+    public final static TermBuilder builder = terms.builder();
 
 
     public static final org.slf4j.Logger logger = LoggerFactory.getLogger($.class);
