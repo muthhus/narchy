@@ -28,7 +28,6 @@ import nars.bag.Bag;
 import nars.concept.util.BeliefTable;
 import nars.concept.util.TaskTable;
 import nars.task.Task;
-import nars.term.Term;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -39,7 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-public interface Concept extends Termed, Comparable<Termed> {
+public interface Concept extends Termed, Comparable {
 
     Ordering<Task> taskCreationTime = new Ordering<Task>() {
         @Override
@@ -55,7 +54,7 @@ public interface Concept extends Termed, Comparable<Termed> {
     Bag<Termed> termlinks();
 
     @Nullable
-    Map<Object, Object> getMeta();
+    Map<Object, Object> meta();
 
     default boolean hasGoals() {
         return !goals().isEmpty();
@@ -82,7 +81,7 @@ public interface Concept extends Termed, Comparable<Termed> {
     @Nullable
     default <C> C get(@NotNull Object key) {
         Map<Object, Object> m;
-        return null == (m = getMeta()) ? null : (C) m.get(key);
+        return null == (m = meta()) ? null : (C) m.get(key);
     }
 
     /**

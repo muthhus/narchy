@@ -1,13 +1,14 @@
 package nars.concept;
 
 import nars.NAR;
+import nars.Op;
 import nars.bag.Bag;
-import nars.budget.Budget;
 import nars.concept.util.BeliefTable;
 import nars.concept.util.TaskTable;
 import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,10 +17,7 @@ import java.util.List;
 /**
  * Created by me on 9/2/15.
  */
-public class AtomConcept extends AbstractConcept  {
-
-    protected final Bag<Task> taskLinks;
-    protected final Bag<Termed> termLinks;
+public class AtomConcept extends AbstractConcept implements Atomic {
 
 
 //    /** creates with no termlink and tasklink ability */
@@ -28,29 +26,14 @@ public class AtomConcept extends AbstractConcept  {
 //    }
 
     public AtomConcept(Term atom, Bag<Termed> termLinks, Bag<Task> taskLinks) {
-        super(atom);
-        this.termLinks = termLinks;
-        this.taskLinks = taskLinks;
+        super(atom, taskLinks, termLinks);
     }
 
 
-
-    /**
-     * Task links for indirect processing
-     */
-    @Override
-    public final Bag<Task> tasklinks() {
-        return taskLinks;
+    /** the atom in this case is the concept itself, exposing this and not the internal 'term' field */
+    @Override @NotNull public final Term term() {
+        return this;
     }
-
-    /**
-     * Term links between the term and its components and compounds; beliefs
-     */
-    @Override
-    public final Bag<Termed> termlinks() {
-        return termLinks;
-    }
-
 
     @Nullable
     @Override
@@ -76,22 +59,22 @@ public class AtomConcept extends AbstractConcept  {
         return BeliefTable.EMPTY;
     }
 
-    static final String shouldntProcess = "should not have attempted to process task here";
+    
 
     @Nullable
     @Override
     public Task processBelief(Task task, NAR nar) {
-        throw new RuntimeException(shouldntProcess);
+        throw new UnsupportedOperationException();
     }
     @Nullable
     @Override
     public Task processGoal(Task task, NAR nar) {
-        throw new RuntimeException(shouldntProcess);
+        throw new UnsupportedOperationException();
     }
     @Nullable
     @Override
     public Task processQuestion(Task task, NAR nar) {
-        throw new RuntimeException(shouldntProcess);
+        throw new UnsupportedOperationException();
     }
 
     @Nullable
@@ -103,51 +86,54 @@ public class AtomConcept extends AbstractConcept  {
     @Nullable
     @Override
     public Task process(Task task, NAR nar) {
-        throw new RuntimeException(shouldntProcess);
+        throw new UnsupportedOperationException();
     }
 
-    /** atoms have no termlink templates, they are irreducible */
-    @Override public @Nullable List<Termed> termlinkTemplates() {
+    @Nullable @Override
+    public List<Termed> termlinkTemplates() {
         return null;
     }
 
-    /**
-     * when a task is processed, a tasklink
-     * can be created at the concept of its term
-     */
-    @Override public boolean link(@NotNull Task task, float scale, float minScale, @NotNull NAR nar) {
-
-        //activate tasklink locally
-        Budget taskBudget = task.budget();
-
-        /*if (taskLinkOut(this, t)) {*/
-            taskLinks.put(task, taskBudget, scale);
-        //}
-
-        return true;
+    @Override
+    public @Nullable
+    Op op() {
+        return term.op();
     }
 
-    public final void linkTerm(@NotNull Concept target, Budget b, float subScale) {
-        linkTerm(this, target, b, subScale, true, true);
+    @Override
+    public int complexity() {
+        return term.complexity();
     }
 
-    public static final void linkTerm(@NotNull Concept source, @NotNull Concept target, Budget b, float subScale, boolean out, boolean in) {
-
-        if (source == target)
-            throw new RuntimeException("termlink self-loop");
-
-        /** activate local's termlink to template */
-        //float termlinkScale = termLinkOut(this, target.term());
-        if (out)
-            source.termlinks().put(target, b, subScale /* * termlinkScale*/);
-
-        /** activate (reverse) template's termlink to local */
-        if (in)
-            target.termlinks().put(source, b, subScale);
-
+    @Override
+    public int varIndep() {
+        return term.varIndep();
     }
 
-//    /** filter for inserting an outgoing termlink depending on the target */
+    @Override
+    public int varDep() {
+        return term.varDep();
+    }
+
+    @Override
+    public int varQuery() {
+        return term.varQuery();
+    }
+
+    @Override
+    public int varPattern() {
+        return term.varPattern();
+    }
+
+    @Override
+    public int vars() {
+        return term.vars();
+    }
+
+
+
+
+    //    /** filter for inserting an outgoing termlink depending on the target */
 //    public static float termLinkOut(Termed from, Term to) {
 ////        if (!to.isCompound()) {
 ////            if (from.op().isStatement()) // isAny(Op.ProductOrImageBits)

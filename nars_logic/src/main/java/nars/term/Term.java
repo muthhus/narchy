@@ -166,13 +166,13 @@ public interface Term extends Termed, Comparable, Termlike {
 //    }
 
     @NotNull
-    StringBuilder toStringBuilder(boolean pretty);
+    @Deprecated StringBuilder toStringBuilder(boolean pretty);
 
 //    default public StringBuilder toStringBuilder(boolean pretty) {
 //        return name().toStringBuilder(pretty);
 //    }
 
-    @Nullable String toString(boolean pretty);
+    @Deprecated @Nullable String toString(boolean pretty);
 //    default public String toString(boolean pretty) {
 //        return toStringBuilder(pretty).toString();
 //    }

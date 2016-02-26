@@ -222,7 +222,7 @@ public abstract class NAR implements Level, Consumer<Task> {
 
     @Nullable
     public <T extends Termed> T term(@NotNull String t) throws NarseseException {
-        return index().resolve(t);
+        return index().the(t);
     }
 
     /**
@@ -1085,7 +1085,7 @@ public abstract class NAR implements Level, Consumer<Task> {
 
 
 
-        Termed uu = index.getIfPresent(tt);
+        Termed uu = index.the(tt);
 
         if (uu instanceof Concept) {
             return (Concept) uu;
@@ -1094,7 +1094,7 @@ public abstract class NAR implements Level, Consumer<Task> {
 
             Concept n = newConcept(uu.term());
             if (n!=null) {
-                index.putTerm(n);
+                index.put(n);
                 return n;
             } else {
                 return null; //no concept could be made

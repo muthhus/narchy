@@ -44,9 +44,15 @@ public class Atoms extends MyConcurrentRadixTree<AtomConcept> {
     public final AtomConcept resolve(CharSequence id) {
         return getValueForExactKey(id);
     }
+
+    public final AtomConcept resolve(AtomicString a) {
+        return getValueForExactKey(a.toString());
+    }
+
     public final AtomConcept resolveOrAdd(String s) {
         return resolveOrAdd($.the(s));
     }
+
     public final AtomConcept resolveOrAdd(Atom a) {
 
         return putIfAbsent(a.id, () -> {
@@ -56,45 +62,48 @@ public class Atoms extends MyConcurrentRadixTree<AtomConcept> {
 
     }
 
-    public void print() {
+    public void print(Appendable out) {
         System.out.println("Tree structure:");
         // PrettyPrintable is a non-public API for testing, prints semi-graphical representations of trees...
-        PrettyPrinter.prettyPrint((PrettyPrintable) this, System.out);
+        PrettyPrinter.prettyPrint((PrettyPrintable) this, out);
     }
-
 
 
     private static final class AtomNodeFactory implements NodeFactory {
 
+        public static final boolean DEBUG = false;
+
         @Override
         public Node createNode(CharSequence edgeCharacters, Object value, List<Node> childNodes, boolean isRoot) {
-            assert edgeCharacters != null : "The edgeCharacters argument was null";
-            assert !(!isRoot && edgeCharacters.length() == 0) : "Invalid edge characters for non-root node: " + CharSequences.toString(edgeCharacters);
-            assert childNodes != null : "The childNodes argument was null";
-            NodeUtil.ensureNoDuplicateEdges(childNodes);
+            if (DEBUG) {
+                assert edgeCharacters != null : "The edgeCharacters argument was null";
+                assert !(!isRoot && edgeCharacters.length() == 0) : "Invalid edge characters for non-root node: " + CharSequences.toString(edgeCharacters);
+                assert childNodes != null : "The childNodes argument was null";
+                NodeUtil.ensureNoDuplicateEdges(childNodes);
+            }
 
             //try {
 
-                if (childNodes.isEmpty()) {
-                    // Leaf node...
-                    if (value instanceof VoidValue) {
-                        return new ByteArrayNodeLeafVoidValue(edgeCharacters);
-                    } else if (value!=null) {
-                        return new ByteArrayNodeLeafWithValue(edgeCharacters, value);
-                    } else {
-                        return new ByteArrayNodeLeafNullValue(edgeCharacters);
-                    }
+            if (childNodes.isEmpty()) {
+                // Leaf node...
+                if (value instanceof VoidValue) {
+                    return new ByteArrayNodeLeafVoidValue(edgeCharacters);
+                } else if (value != null) {
+                    return new ByteArrayNodeLeafWithValue(edgeCharacters, value);
                 } else {
-                    // Non-leaf node...
-                    if (value instanceof VoidValue) {
-                        return new ByteArrayNodeNonLeafVoidValue(edgeCharacters, childNodes);
+                    return new ByteArrayNodeLeafNullValue(edgeCharacters);
+                }
+            } else {
+                // Non-leaf node...
+                if (value instanceof VoidValue) {
+                    return new ByteArrayNodeNonLeafVoidValue(edgeCharacters, childNodes);
 //                    else if (value == null) {
 //                        return new ByteArrayNodeNonLeafNullValue(edgeCharacters, childNodes);
-                    } else {
-                        return new ByteArrayNodeDefault(edgeCharacters, value, childNodes);
-                    }
+                } else {
+                    return new ByteArrayNodeDefault(edgeCharacters, value, childNodes);
                 }
             }
+        }
 //            catch (ByteArrayCharSequence.IncompatibleCharacterException e) {
 //
 //                if (childNodes.isEmpty()) {
@@ -118,8 +127,8 @@ public class Atoms extends MyConcurrentRadixTree<AtomConcept> {
 //                    }
 //                }
 //            }
-        }
     }
+}
 
 //    final class InternedAtom extends Atomic implements Node /* implements Concept */ {
 //
@@ -209,6 +218,4 @@ public class Atoms extends MyConcurrentRadixTree<AtomConcept> {
 //            return 0;
 //        }
 //    }
-
-
 

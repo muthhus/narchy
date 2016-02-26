@@ -48,6 +48,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 import static javafx.application.Platform.runLater;
 import static nars.$.neg;
@@ -260,10 +261,11 @@ public class ConceptPane extends BorderPane implements ChangeListener {
             }
 
             if (!queued.compareAndSet(false, true)) {
-                pending.clear();
-                bLinks.forEach(limit, pending::add);
+                List<BLink<X>> p = this.pending;
+                p.clear();
+                bLinks.forEach(limit, p::add);
 
-                if (!getChildren().equals(pending)) {
+                if (!getChildren().equals(p)) {
                     runLater(this);
                 } else {
                     queued.set(false);
@@ -278,7 +280,8 @@ public class ConceptPane extends BorderPane implements ChangeListener {
             if (!queued.get())
                 return;
 
-            getChildren().setAll(pending.stream().map(this::getNode).collect(toList()));
+            getChildren().clear();
+            pending.stream().map(this::getNode).collect(toCollection(()->getChildren()));
 
 //            getChildren().forEach(n -> {
 //                if (n instanceof Runnable)

@@ -228,7 +228,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 
 
     @Override default int opRel() {
-        return op().ordinal()<<16 | (relation() & 0xffff);
+        return Terms.opRel(op().ordinal(), relation());
     }
 
     @Nullable

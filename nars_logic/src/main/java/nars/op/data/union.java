@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 public class union extends BinaryTermOperator {
     
     @Override public Term apply(@NotNull Term a, Term b, TermIndex i) {
-        return i.resolveCompound(a.op(), TermSet.union(
+        return i.the(a.op(), TermSet.union(
                 (TermContainer) a, (TermContainer) b
         )).term();
     }

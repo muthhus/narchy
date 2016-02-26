@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 public class intersect extends BinaryTermOperator {
 
     @Override public Term apply(@NotNull Term a, Term b, TermIndex i) {
-        return i.resolveCompound(a.op(),
+        return i.the(a.op(),
                 TermContainer.intersect(
                     (TermContainer) a, (TermContainer) b
                 )

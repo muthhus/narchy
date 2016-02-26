@@ -13,15 +13,12 @@ import nars.concept.*;
 import nars.data.Range;
 import nars.nal.Deriver;
 import nars.nal.meta.PremiseEval;
-import nars.nal.space.Space;
-import nars.nal.space.SpaceConcept;
 import nars.task.Task;
 import nars.task.flow.SetTaskPerception;
 import nars.task.flow.TaskPerception;
 import nars.term.Term;
 import nars.term.TermIndex;
 import nars.term.Termed;
-import nars.term.atom.Atom;
 import nars.time.FrameClock;
 import nars.util.data.MutableInteger;
 import nars.util.event.Active;
@@ -30,7 +27,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
@@ -250,7 +246,7 @@ public class Default extends AbstractNAR {
             Concept tc = conceptualize(bt.get(), activation, s, toTermLinks);
 
             if (tc != null) {
-                AtomConcept.linkTerm(c, tc, activation, s, true, false);
+                AbstractConcept.linkTerm(c, tc, activation, s, true, false);
             }
         }
     }

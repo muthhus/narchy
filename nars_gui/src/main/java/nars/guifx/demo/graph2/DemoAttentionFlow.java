@@ -8,6 +8,7 @@ import nars.NAR;
 import nars.bag.Bag;
 import nars.budget.Budget;
 import nars.budget.UnitBudget;
+import nars.concept.AbstractConcept;
 import nars.concept.AtomConcept;
 import nars.concept.Concept;
 import nars.concept.DefaultConceptBuilder;
@@ -41,21 +42,21 @@ public class DemoAttentionFlow extends AbstractNARGraphDemo {
             Concept c = nar.conceptualize(x, initialConceptBudget);
 
             /* linking function, TODO extract as a lambda for alternate procedures */
-            if (prev!=null) {
+            if (prev!= null) {
 
                 if (reverse) {
                     //the reverse
                     List<Termed> ct = c.termlinkTemplates();
                     if (!ct.contains(prev))
                         ct.add(prev);
-                    AtomConcept.linkTerm(c, prev, UnitBudget.Mid, 1f, true, false);
+                    AbstractConcept.linkTerm(c, prev, UnitBudget.Mid, 1f, true, false);
                 }
 
                 if (forward) {
                     List<Termed> pt = prev.termlinkTemplates();
                     if (!pt.contains(c))
                         pt.add(c);
-                    AtomConcept.linkTerm(prev, c, UnitBudget.Mid, 1f, true, false);
+                    AbstractConcept.linkTerm(prev, c, UnitBudget.Mid, 1f, true, false);
                 }
 
 

@@ -445,4 +445,12 @@ public enum Terms {
                 return null;
         }
     }
+
+    public static int opRel(int opOrdinal, int relation) {
+        return opOrdinal<<16 | (relation & 0xffff);
+    }
+    public static int opRel(Op op, int relation) {
+        return opRel(op.ordinal(), relation);
+    }
+
 }

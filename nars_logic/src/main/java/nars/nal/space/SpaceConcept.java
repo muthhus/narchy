@@ -1,6 +1,5 @@
 package nars.nal.space;
 
-import nars.Memory;
 import nars.NAR;
 import nars.bag.Bag;
 import nars.concept.DefaultConcept;
@@ -14,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class SpaceConcept extends DefaultConcept {
     public SpaceConcept(@NotNull Space term, Bag<Task> taskLinks, Bag<Termed> termLinks, @NotNull NAR p) {
-        super(term.anonymous(), taskLinks, termLinks, p);
+        super(term.anonymous(), taskLinks, termLinks);
     }
 
 }

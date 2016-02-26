@@ -1,19 +1,16 @@
 package nars.concept;
 
 import nars.NAR;
-import nars.Op;
 import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
 import nars.budget.BudgetMerge;
 import nars.nal.space.Space;
 import nars.nal.space.SpaceConcept;
-import nars.nar.Default;
 import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.jetbrains.annotations.NotNull;
-import scala.tools.nsc.backend.icode.Primitives;
 
 import java.util.Random;
 import java.util.function.Function;
@@ -80,7 +77,7 @@ public class DefaultConceptBuilder implements Function<Term, Concept> {
     protected Concept newCompoundConcept(Term t, Bag<Task> taskLinks, Bag<Termed> termLinks) {
         return (!(t instanceof Space)) ?
 
-                new DefaultConcept(t, taskLinks, termLinks, nar) :
+                new DefaultConcept(t, taskLinks, termLinks) :
 
                 new SpaceConcept((Space) t, taskLinks, termLinks, nar);
     }

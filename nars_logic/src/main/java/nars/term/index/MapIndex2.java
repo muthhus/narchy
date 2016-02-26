@@ -1,11 +1,8 @@
 package nars.term.index;
 
-import com.google.common.cache.CacheBuilder;
 import com.gs.collections.impl.map.mutable.primitive.IntObjectHashMap;
-import nars.$;
 import nars.Op;
 import nars.concept.AtomConcept;
-import nars.concept.Concept;
 import nars.term.*;
 import nars.term.atom.AtomicString;
 import nars.term.container.TermContainer;
@@ -22,23 +19,25 @@ import java.util.function.Function;
  */
 public class MapIndex2 extends AbstractMapIndex {
 
-    private static final int SUBTERM_RELATION = Integer.MIN_VALUE;
 
-    final Atoms atoms = new Atoms();
-    final Map<TermVector, IntObjectHashMap> data;
-    final TermBuilder builder;
+    public static class SubtermNode extends IntObjectHashMap<Termed> {
+        public final TermContainer vector;
+
+        public SubtermNode(TermContainer normalized) {
+            this.vector = normalized;
+        }
+
+        /*
+            g.compact();
+        */
+
+    }
+
+    public final Map<TermContainer, SubtermNode> data;
     int count;
 
-    public MapIndex2(Map<TermVector, IntObjectHashMap> data) {
-
-        this.builder = new TermBuilder() {
-
-            @Override
-            @Nullable
-            public Termed make(Op op, int relation, TermContainer subterms, int dt) {
-                return $.builder.make(op, relation, subterms, dt);
-            }
-        };
+    public MapIndex2(Map<TermContainer, SubtermNode> data) {
+        super(new DefaultTermBuilder());
 
         this.data = data;
 
@@ -54,59 +53,105 @@ public class MapIndex2 extends AbstractMapIndex {
         return (TermVector)((Compound)t).subterms();
     }
 
-    static final Function<TermVector, IntObjectHashMap> groupBuilder =
-            (k) -> new IntObjectHashMap(8);
 
     /** returns previous value */
-    private Object putItem(TermVector vv, int index, Object value) {
+    private Object putItem(TermVector vv, int index, Termed value) {
+        SubtermNode g = getOrAddNode(vv);
+        return value != null ? g.put(index, value) : null;
+    }
 
-        IntObjectHashMap g = group(vv);
-        Object res = g.put(index, value);
-        if (res==null) {
-            //insertion
-            g.compact();
+
+    final Function<TermContainer, SubtermNode> termContainerSubtermNodeFunction =
+            k -> new SubtermNode(normalize(k));
+
+
+//    @Nullable
+//    @Override
+//    public Termed get(@NotNull Termed t) {
+//        Term u = t.term();
+//        return u instanceof Atom ?
+//                    atoms.resolve((Atom)u) :
+//                    get(vector(u), t.opRel());
+//
+//
+//    }
+
+
+    @Override
+    public
+    @Nullable
+    Termed the(Op op, int relation, TermContainer subsBefore, int dt) {
+        SubtermNode node = getOrAddNode(subsBefore);
+        int oprel = Terms.opRel(op, relation);
+        Termed interned = node.get(oprel);
+        if (interned == null) {
+            interned = internCompound(node.vector, op, relation, dt);
+            if (interned == null)
+                return null;
+            node.put(oprel, interned);
         }
-        return res;
+        return interned;
     }
-
-    public IntObjectHashMap group(TermVector vv) {
-        return data.computeIfAbsent(vv, groupBuilder);
-    }
-
 
     @Nullable
-    @Override
-    public Termed getIfPresent(@NotNull Termed t) {
-        Term u = t.term();
-        if (u instanceof AtomicString) {
-            return atoms.resolve(((AtomicString)u).toString());
-        } else {
-            return (Termed) getItemIfPresent(
-                    vector(u), t.opRel());
+    @Override protected Termed theCompound(@NotNull Compound t) {
+
+        TermContainer subsBefore = t.subterms();
+        int oprel = t.opRel();
+
+        SubtermNode node = getOrAddNode(subsBefore);
+
+        Termed interned = node.get(oprel);
+        if (interned == null) {
+
+            TermContainer subsAfter = node.vector;
+            if (subsAfter!=subsBefore) { //rebuild if necessary
+                if ((interned = internCompound(subsAfter, t.op(), t.relation(), t.dt())) == null)
+                    return null;
+            } else {
+                interned = t; //use input directly; for more isolation, this could be replaced with a clone creator
+            }
+
+            node.put(oprel, interned);
         }
+
+        return interned;
+    }
+
+    @NotNull
+    private Termed internCompound(TermContainer subsAfter, Op op, int rel, int dt) {
+        Termed interned;
+        interned = builder.make(op, rel, subsAfter, dt);
+        assert(interned!=null); //should not fail unless the input was invalid to begin with
+        return interned;
     }
 
 
+    @NotNull
+    @Override public TermContainer theSubterms(TermContainer s) {
+        return getOrAddNode(s).vector;
+    }
+
+    @NotNull public SubtermNode getOrAddNode(TermContainer s) {
+        return data.computeIfAbsent(s, termContainerSubtermNodeFunction);
+    }
 
     @Nullable
     @Override
-    protected TermContainer getSubtermsIfPresent(TermContainer subterms) {
-        return (TermContainer) getItemIfPresent(
-                subterms, SUBTERM_RELATION);
+    protected TermContainer get(TermContainer subterms) {
+        SubtermNode g = data.get(subterms);
+        return g != null ? g.vector : null;
     }
 
 
     @Nullable
-    public Object getItemIfPresent(Object vv, int index) {
-
-            IntObjectHashMap group = data.get(vv);
-            if (group == null) return null;
-            return group.get(index);
-
+    public Termed get(TermContainer vv, int index) {
+        SubtermNode n = data.get(vv);
+        return n != null ? n.get(index) : null;
     }
 
     @Override
-    public void putTerm(@NotNull Termed t) {
+    @Deprecated public void put(@NotNull Termed t) {
         Term u = t.term();
         if (u instanceof AtomicString) {
             atoms.putIfAbsent(t.toString(), ()->(AtomConcept)t);
@@ -117,11 +162,7 @@ public class MapIndex2 extends AbstractMapIndex {
         }
     }
 
-    @Override
-    protected void putSubterms(TermContainer subterms) {
 
-        putItem((TermVector)subterms, SUBTERM_RELATION, subterms);
-    }
 
 
     @Override
@@ -142,10 +183,11 @@ public class MapIndex2 extends AbstractMapIndex {
         return count;
     }
 
-
-
     @Override
     public void forEach(Consumer<? super Termed> c) {
-        throw new RuntimeException("unimpl");
+        data.values().forEach(v->v.forEach(c));
+
+        //throw new UnsupportedOperationException();
+        //atoms.getKeyValuePairsForKeysStartingWith()
     }
 }

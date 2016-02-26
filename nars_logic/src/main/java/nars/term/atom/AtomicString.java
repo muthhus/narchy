@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Created by me on 1/1/16.
  */
-public abstract class AtomicString extends Atomic {
+public abstract class AtomicString implements Atomic {
 
     /** Assumes that the op()
      *  is encoded within its string such that additional op()

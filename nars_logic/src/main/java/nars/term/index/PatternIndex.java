@@ -2,13 +2,10 @@ package nars.term.index;
 
 import nars.nal.meta.PatternCompound;
 import nars.nal.meta.PremiseRule;
-import nars.nal.meta.match.Ellipsis;
 import nars.term.Compound;
-import nars.term.Term;
 import nars.term.Termed;
 import nars.term.container.TermVector;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 
@@ -22,9 +19,10 @@ public class PatternIndex extends MapIndex2 {
     }
 
 
+
     @NotNull
     @Override
-    public Termed resolveCompound(@NotNull Compound x) {
+    public Termed theCompound(@NotNull Compound t) {
 
         /*if (!(x instanceof AbstractCompoundPattern)) {
             if (x instanceof Compound) {
@@ -38,16 +36,17 @@ public class PatternIndex extends MapIndex2 {
         ///** only compile top-level terms, not their subterms */
         //if (!(x instanceof AbstractCompoundPattern)) {
 
-        if (x instanceof PremiseRule) {
-            return new PremiseRule((Compound)x.term(0), (Compound)x.term(1));
+        if (t instanceof PremiseRule) {
+            //return new PremiseRule((Compound)x.term(0), (Compound)x.term(1));
+            return t;
         }
 
 //        if (!(x instanceof TermMetadata)) {
 ////            if (!Ellipsis.hasEllipsis(x)) {
 ////            if (!x.isCommutative()) {
 
-        return PatternCompound.make(x,
-            (TermVector) internSub(x.subterms())
+        return PatternCompound.make(t,
+            (TermVector) theSubterms(t.subterms())
         );
 
 //                    return new LinearCompoundPattern(x, (TermVector) subs);
@@ -60,6 +59,15 @@ public class PatternIndex extends MapIndex2 {
 //
 //        return super.compileCompound(x);
     }
+
+//    private static class PatternTermBuilder extends TermBuilder {
+//        @Override
+//        public
+//        @Nullable
+//        Termed make(Op op, int relation, TermContainer subterms, int dt) {
+//            return null;
+//        }
+//    }
 
 //    @Override
 //    public

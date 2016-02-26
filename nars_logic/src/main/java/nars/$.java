@@ -18,6 +18,7 @@ import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.term.container.TermSet;
 import nars.term.container.TermVector;
+import nars.term.index.AbstractMapIndex;
 import nars.term.variable.*;
 import nars.truth.Truth;
 import nars.util.data.Util;
@@ -50,14 +51,7 @@ public enum $  {
     //TransientTermIndex = holds no state
     public static final TermIndex terms = new TermIndex() {
 
-        final TermBuilder builder = new TermBuilder() {
-
-            @Override
-            @Nullable
-            public Termed make(Op op, int relation, TermContainer subterms, int dt) {
-                return new GenericCompound(op, relation, (TermVector)subterms).dt(dt);
-            }
-        };
+        final TermBuilder builder = new AbstractMapIndex.DefaultTermBuilder();
 
         @Override
         public void clear() {
@@ -72,9 +66,17 @@ public enum $  {
         @Override
         public
         @Nullable
-        Termed getIfPresent(Termed t) {
+        Termed the(Termed t) {
             return t;
         }
+
+        @Override
+        public
+        @Nullable
+        Termed the(Op op, int relation, TermContainer subterms, int dt) {
+            return builder.make(op, relation, subterms, dt);
+        }
+
 
         @Override
         public int size() {
@@ -89,12 +91,12 @@ public enum $  {
         @Override
         public
         @Nullable
-        TermContainer internSub(TermContainer s) {
+        TermContainer theSubterms(TermContainer s) {
             return s;
         }
 
         @Override
-        public void putTerm(Termed termed) {
+        public void put(Termed termed) {
 
         }
 
@@ -229,16 +231,9 @@ public enum $  {
         return $.p(t.toArray((T[]) new Term[t.size()]));
     }
 
-    @NotNull
+    @Nullable
     public static Compound p(@Nullable Term... t) {
-        if (t == null)
-            return TermIndex.Empty;
-
-        int l = t.length;
-        if (l == 0) //length 0 product are allowd and shared
-            return TermIndex.Empty;
-
-        return (Compound) the(PRODUCT, t);
+        return (t == null) || (t.length == 0) ? TermIndex.Empty : (Compound) the(PRODUCT, t);
     }
 
     /** creates from a sublist of a list */

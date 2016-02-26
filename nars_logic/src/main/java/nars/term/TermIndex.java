@@ -41,42 +41,30 @@ import static nars.nal.Tense.ITERNAL;
  */
 public interface TermIndex  {
 
-    @Nullable
-    default Termed resolve(Term t) {
-        return t instanceof Compound ? resolveCompound((Compound) t)
-                : resolveAtomic(t);
-    }
 
-    default Termed resolveAtomic(Term t) {
-        //DEFAULT IMPL to be moved to a concrete class: Uses input value as-is
-        return t; /* as-is */
-    }
+    /** getOrAdd the term */
+    @Nullable Termed the(@NotNull Termed t);
+    @Nullable Termed the(Op op, int relation, TermContainer subterms, int dt);
 
 
-    @Nullable
-    default Termed resolveCompound(@NotNull Compound t) {
         //DEFAULT IMPL to be moved to a concrete class: BUILDS ON THE HEAP:
-        return builder().make(t.op(), t.relation(), t.subterms(), t.dt());
+        //return builder().make(op, relation, subterms, dt);
+    //}
+
+//    @Nullable
+//    default Termed newCompound(Op op, int relation, TermContainer subterms) {
+//        //DEFAULT IMPL to be moved to a concrete class: BUILDS ON THE HEAP:
+//        return newCompound(op, relation, subterms, ITERNAL);
+//    }
+    @Nullable
+    default Termed the(Op op, TermContainer subterms) {
+        //DEFAULT IMPL to be moved to a concrete class: BUILDS ON THE HEAP:
+        return the(op, -1, subterms, ITERNAL);
     }
     @Nullable
-    default Termed resolveCompound(Op op, int relation, TermContainer subterms, int dt) {
+    default Termed the(Op op, Collection<Term> subterms) {
         //DEFAULT IMPL to be moved to a concrete class: BUILDS ON THE HEAP:
-        return builder().make(op, relation, subterms, dt);
-    }
-    @Nullable
-    default Termed resolveCompound(Op op, int relation, TermContainer subterms) {
-        //DEFAULT IMPL to be moved to a concrete class: BUILDS ON THE HEAP:
-        return resolveCompound(op, relation, subterms, ITERNAL);
-    }
-    @Nullable
-    default Termed resolveCompound(Op op, TermContainer subterms) {
-        //DEFAULT IMPL to be moved to a concrete class: BUILDS ON THE HEAP:
-        return resolveCompound(op, -1, subterms, ITERNAL);
-    }
-    @Nullable
-    default Termed resolveCompound(Op op, Collection<Term> subterms) {
-        //DEFAULT IMPL to be moved to a concrete class: BUILDS ON THE HEAP:
-        return resolveCompound(op, TermContainer.the(op, subterms));
+        return the(op, TermContainer.the(op, subterms));
     }
 
     /** universal zero-length product */
@@ -90,8 +78,6 @@ public interface TermIndex  {
 
     //Termed get(Object t);
 
-    @Nullable
-    Termed getIfPresent(Termed t);
 
     /** # of contained terms */
     int size();
@@ -125,23 +111,23 @@ public interface TermIndex  {
     }
 
 
-    @Nullable
-    TermContainer internSub(TermContainer s);
+    @NotNull
+    TermContainer theSubterms(TermContainer s);
 
+    void put(Termed termed);
 
-
-    void putTerm(Termed termed);
-
-    @Nullable
-    default TermContainer unifySubterms(TermContainer s) {
-        TermVector t = (TermVector)s;
-        Term[] x = t.terms();
+    /** should be called after a new entry needed to be created for the novel termcontainer */
+    @Nullable default TermContainer normalize(TermContainer s) {
+        Term[] x = s.terms();
         for (int i = 0; i < x.length; i++) {
-            Term xi = x[i];
-            Termed u = xi; //since they are equal this will not need re-hashed
-            if (u == null) return null;
-            //if (u.equals(xi))
-                x[i] = u.term(); //HACK use unified, otherwise keep original
+            Term a = x[i];
+            Termed b = the(a);
+            if (b == null) {
+                //throw new UnbuildableTerm(s.terms());
+                //return null;
+                //just use the input term
+            } else if (a!=b)
+                x[i] = b.term();
         }
         return s;
     }
@@ -430,7 +416,7 @@ public interface TermIndex  {
         for (int i = 0; i < n; i++) {
             Term x = src.term(i);
             if (x == null)
-                throw new RuntimeException("null subterm");
+                throw new UnbuildableTerm();
 
             if (trans.test(x)) {
 
@@ -479,7 +465,7 @@ public interface TermIndex  {
     }
 
     /** return null if nothing matched */
-    default <T extends Termed> T resolve(String termToParse) throws Narsese.NarseseException {
+    default <T extends Termed> T the(String termToParse) throws Narsese.NarseseException {
 
         return (T) Narsese.the().term(termToParse, this);
 

@@ -11,83 +11,88 @@ import java.io.IOException;
 import java.util.function.Predicate;
 
 /** Base class for Atomic types. */
-public abstract class Atomic implements Term {
-
+public interface Atomic extends Term {
 
 
     @Override
-    public final boolean isCompound() { return false; }
+    default boolean isCompound() { return false; }
 
     @Nullable
-    @Override abstract public String toString();
-
-
-
-
     @Override
-    public final void recurseTerms(@NotNull SubtermVisitor v, Compound parent) {
+    String toString();
+
+    
+    @Override
+    default void recurseTerms(@NotNull SubtermVisitor v, Compound parent) {
         v.accept(this, parent);
     }
 
-    @Override public final boolean and(@NotNull Predicate<? super Term> v) {
+    @Override
+    default boolean and(@NotNull Predicate<? super Term> v) {
         return v.test(this);
     }
 
-    @Override public final boolean or(@NotNull Predicate<? super Term> v) {
+    @Override
+    default boolean or(@NotNull Predicate<? super Term> v) {
         return and(v); //re-use and, even though it's so similar
     }
 
     @Override
-    public final String toString(boolean pretty) {
+    default String toString(boolean pretty) {
         return toString();
     }
 
     @Override
-    public final void append(@NotNull Appendable w, boolean pretty) throws IOException {
+    default void append(@NotNull Appendable w, boolean pretty) throws IOException {
         w.append(toString());
     }
 
     /** preferably use toCharSequence if needing a CharSequence; it avoids a duplication */
     @NotNull
     @Override
-    public final StringBuilder toStringBuilder(boolean pretty) {
+    default StringBuilder toStringBuilder(boolean pretty) {
         return new StringBuilder(toString());
     }
 
     /** number of subterms; for atoms this must be zero */
-    @Override public final int size() {
+    @Override
+    default int size() {
         return 0;
     }
 
     /** atoms contain no subterms so impossible for anything to fit "inside" it */
-    @Override public final boolean impossibleSubTermVolume(int otherTermVolume) {
+    @Override
+    default boolean impossibleSubTermVolume(int otherTermVolume) {
         return true;
     }
 
-    @Override public final boolean containsTerm(Term t) {
+    @Override
+    default boolean containsTerm(Term t) {
         return false;
     }
 
-    @Override public final boolean isCommutative() {
+    @Override
+    default boolean isCommutative() {
         return false;
     }
 
 
     /** default volume = 1 */
-    @Override public int volume() { return 1; }
+    @Override
+    default int volume() { return 1; }
 
 
     @Override
-    public abstract int varIndep();
+    int varIndep();
 
     @Override
-    public abstract int varDep();
+    int varDep();
 
     @Override
-    public abstract int varQuery();
+    int varQuery();
 
     @Override
-    public int structure() {
+    default int structure() {
         return op().bit();
     }
 

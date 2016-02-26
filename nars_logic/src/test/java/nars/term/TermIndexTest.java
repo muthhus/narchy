@@ -1,14 +1,14 @@
 package nars.term;
 
-import javassist.scopedpool.SoftValueHashMap;
 import nars.Global;
 import nars.NAR;
 import nars.nar.Default;
 import nars.nar.Terminal;
 import nars.task.Task;
+import nars.term.container.TermContainer;
+import nars.term.container.TermVector;
 import nars.term.index.MapIndex2;
 import nars.time.FrameClock;
-import nars.util.data.map.UnifriedMap;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeSet;
 
+import static nars.$.$;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -164,6 +165,29 @@ public class TermIndexTest {
         assertTrue(t.size() > 100); //approximate
 
         //t.forEach(System.out::println);
+
+    }
+
+
+
+    @Test public void testSubtermIntern() {
+        MapIndex2 i = (MapIndex2)(new Default().index());
+
+        Term at = $("a");
+        TermVector a = new TermVector(at, $("b"), $("cd"));
+        TermContainer b = i.theSubterms(a);
+        assertEquals(a, b);
+
+        i.print(System.out);
+
+        System.out.println(a.term(0));
+        System.out.println(a.term(0));
+        System.out.println(i.data);
+        a.forEach(bb->System.out.println(bb + " " + bb.getClass()));
+
+        assertTrue(at!=b.term(0));
+
+
 
     }
 }

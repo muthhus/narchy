@@ -1,11 +1,16 @@
 package nars.concept;
 
 import nars.Global;
+import nars.NAR;
+import nars.bag.Bag;
+import nars.budget.Budget;
+import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -13,18 +18,40 @@ import java.util.Map;
  */
 public abstract class AbstractConcept implements Concept {
 
-    private final Term term;
+    protected final Bag<Task> taskLinks;
+    protected final Bag<Termed> termLinks;
+
+    @NotNull
+    public final Term term;
 
     @Nullable
-    protected Map meta;
+    protected Map meta = null;
 
-    protected AbstractConcept(Term term) {
+    protected AbstractConcept(@NotNull Term term, Bag<Task> taskLinks, Bag<Termed> termLinks) {
         this.term = term;
+        this.taskLinks = taskLinks;
+        this.termLinks = termLinks;
+    }
+
+    public static final void linkTerm(@NotNull Concept source, @NotNull Concept target, Budget b, float subScale, boolean out, boolean in) {
+
+        if (source == target)
+            throw new RuntimeException("termlink self-loop");
+
+        /** activate local's termlink to template */
+        //float termlinkScale = termLinkOut(this, target.term());
+        if (out)
+            source.termlinks().put(target, b, subScale /* * termlinkScale*/);
+
+        /** activate (reverse) template's termlink to local */
+        if (in)
+            target.termlinks().put(source, b, subScale);
+
     }
 
 
-    @Override
-    public final Term term() {
+    @Override @NotNull
+    public Term term() {
         return term;
     }
 
@@ -33,12 +60,12 @@ public abstract class AbstractConcept implements Concept {
      */
     @Nullable
     @Override
-    public final Map<Object, Object> getMeta() {
+    public final Map<Object, Object> meta() {
         return meta;
     }
 
 
-    private void setMeta(Map<Object, Object> meta) {
+    private void setMeta(@NotNull Map<Object, Object> meta) {
         this.meta = meta;
     }
 
@@ -50,11 +77,12 @@ public abstract class AbstractConcept implements Concept {
     @Nullable
     public final Object put(@NotNull Object key, @Nullable Object value) {
 
-        Map<Object, Object> currMeta = getMeta();
+        Map<Object, Object> currMeta = meta();
 
         if (value != null) {
 
-            if (currMeta == null) setMeta(currMeta = Global.newHashMap());
+            if (currMeta == null)
+                setMeta(currMeta = Global.newHashMap()); //lazy allocate
 
             return currMeta.put(key, value);
         }
@@ -66,8 +94,7 @@ public abstract class AbstractConcept implements Concept {
 
     @Override
     public final boolean equals(Object obj) {
-        return (this == obj) || ((obj instanceof Termed)
-                && ((Termed) obj).term().equals(term));
+        return (this == obj) || term.equals(obj);
     }
 
     @Override
@@ -76,8 +103,8 @@ public abstract class AbstractConcept implements Concept {
     }
 
     @Override
-    public final int compareTo(@NotNull Termed o) {
-        return term.compareTo(o.term());
+    public final int compareTo(@NotNull Object o) {
+        return term.compareTo(o);
     }
 
     /**
@@ -90,6 +117,45 @@ public abstract class AbstractConcept implements Concept {
         //return (super.toStringBrief() + " " + key);
         //return super.toStringExternal();
         return term.toString();
+    }
+
+    /**
+     * Task links for indirect processing
+     */
+    @Override
+    public final Bag<Task> tasklinks() {
+        return taskLinks;
+    }
+
+    /**
+     * Term links between the term and its components and compounds; beliefs
+     */
+    @Override
+    public final Bag<Termed> termlinks() {
+        return termLinks;
+    }
+
+    /** atoms have no termlink templates, they are irreducible */
+    @Nullable @Override public abstract List<Termed> termlinkTemplates();
+
+    /**
+     * when a task is processed, a tasklink
+     * can be created at the concept of its term
+     */
+    @Override public boolean link(@NotNull Task task, float scale, float minScale, @NotNull NAR nar) {
+
+        //activate tasklink locally
+        Budget taskBudget = task.budget();
+
+        /*if (taskLinkOut(this, t)) {*/
+            taskLinks.put(task, taskBudget, scale);
+        //}
+
+        return true;
+    }
+
+    public final void linkTerm(@NotNull Concept target, Budget b, float subScale) {
+        linkTerm(this, target, b, subScale, true, true);
     }
 
 //    /**

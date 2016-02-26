@@ -19,7 +19,7 @@ public class AtomsTest {
         tree.resolveOrAdd("concept");
         tree.resolveOrAdd("term");
         tree.resolveOrAdd("termutator");
-        tree.print();
+        tree.print(System.out);
 
         assertNotNull(tree.resolve("term"));
         assertNull(tree.resolve("xerm"));
@@ -29,7 +29,7 @@ public class AtomsTest {
 
         assertNotNull(tree.resolveOrAdd("termunator"));
 
-        tree.print();
+        tree.print(System.out);
 
         assertEquals(4, tree.getLastSerial());
 

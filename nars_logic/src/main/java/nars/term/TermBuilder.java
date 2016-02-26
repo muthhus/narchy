@@ -249,38 +249,6 @@ public abstract class TermBuilder {
         return m.term();
     }
 
-    final class UnbuildableTerm extends RuntimeException {
-        private final Op op;
-        private final int rel;
-        private final int dt;
-        private final Term[] args;
-
-        public UnbuildableTerm(Op op, int rel, int dt, Term[] args) {
-
-            this.op = op;
-            this.rel = rel;
-            this.dt = dt;
-            this.args = args;
-        }
-
-        @NotNull
-        @Override
-        public String getMessage() {
-            return toString();
-        }
-
-        @NotNull
-        @Override
-        public String toString() {
-            return getClass().getSimpleName() + "{" +
-                    "op=" + op +
-                    ", rel=" + rel +
-                    ", dt=" + dt +
-                    ", args=" + Arrays.toString(args) +
-                    '}';
-        }
-    }
-
 
     @Nullable
     public Term inst(Term subj, Term pred) {

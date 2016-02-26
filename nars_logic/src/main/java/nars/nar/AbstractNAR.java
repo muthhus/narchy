@@ -93,7 +93,7 @@ public abstract class AbstractNAR extends NAR {
             }
         }
 
-        new shell(this);
+        //new shell(this);
         for (AbstractOperator o : defaultOperators)
             onExec(o);
 

@@ -36,7 +36,7 @@ import java.io.IOException;
  * Normalized variable
  * "highly immutable" and re-used
  */
-public abstract class Variable extends Atomic {
+public abstract class Variable implements Atomic {
 
     public final int id;
     protected final int hash;

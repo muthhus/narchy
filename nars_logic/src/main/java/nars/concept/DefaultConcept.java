@@ -17,7 +17,7 @@ import java.util.Collections;
 import java.util.List;
 
 
-public class DefaultConcept extends AtomConcept {
+public class DefaultConcept extends AbstractConcept {
 
 //    public static final BiPredicate<Task, Task> questionEquivalence = new BiPredicate<Task, Task>() {
 //
@@ -58,8 +58,8 @@ public class DefaultConcept extends AtomConcept {
      * @param taskLinks
      * @param termLinks
      */
-    public DefaultConcept(Term term, Bag<Task> taskLinks, Bag<Termed> termLinks, @NotNull NAR n) {
-        super(term, termLinks, taskLinks);
+    public DefaultConcept(Term term, Bag<Task> taskLinks, Bag<Termed> termLinks) {
+        super(term, taskLinks, termLinks);
     }
 
     /**
@@ -102,8 +102,15 @@ public class DefaultConcept extends AtomConcept {
         return goals == null ? BeliefTable.EMPTY : goals;
     }
 
+    @Override
+    public
+    @Nullable
+    Task processQuest(Task task, NAR nar) {
+        return processQuestion(task, nar);
+    }
 
-//    /** updates the concept-has-questions index if the concept transitions from having no questions to having, or from having to not having */
+
+    //    /** updates the concept-has-questions index if the concept transitions from having no questions to having, or from having to not having */
 //    public void onTableUpdated(char punctuation, int originalSize) {
 //
 //        switch (punctuation) {
@@ -188,7 +195,7 @@ public class DefaultConcept extends AtomConcept {
         //TODO only compute updates if belief was actually added, not merged with duplicate
 
         {
-            if (belief!=null && hasQuestions()) {
+            if (belief!= null && hasQuestions()) {
                 //TODO move this to a subclass of TaskTable which is customized for questions. then an arraylist impl of TaskTable can iterate by integer index and not this iterator/lambda
                 final Task solution = belief;
                 questions().forEach(question -> {

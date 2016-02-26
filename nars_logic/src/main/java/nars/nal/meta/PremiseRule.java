@@ -20,10 +20,7 @@ import nars.nal.op.*;
 import nars.op.data.differ;
 import nars.op.data.intersect;
 import nars.op.data.union;
-import nars.term.Compound;
-import nars.term.Term;
-import nars.term.TermIndex;
-import nars.term.Terms;
+import nars.term.*;
 import nars.term.atom.Atom;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermVector;
@@ -43,6 +40,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
+import static nars.$.*;
+import static nars.$.terms;
 import static nars.Op.VAR_PATTERN;
 import static nars.term.Terms.concat;
 
@@ -307,8 +306,8 @@ public class PremiseRule extends GenericCompound {
      */
     public void compile(@NotNull TermIndex index) {
         Term[] premisePattern = ((Compound) term(0)).terms();
-        premisePattern[0] = index.resolve(premisePattern[0]).term(); //task pattern
-        premisePattern[1] = index.resolve(premisePattern[1]).term(); //belief pattern
+        premisePattern[0] = index.the(premisePattern[0]).term(); //task pattern
+        premisePattern[1] = index.the(premisePattern[1]).term(); //belief pattern
     }
 
     static final class UppercaseAtomsToPatternVariables implements CompoundTransform<Compound, Term> {
@@ -333,7 +332,7 @@ public class PremiseRule extends GenericCompound {
                     containingCompound.term(1)))
                 return v;
 
-            return $.v(Op.VAR_PATTERN, v.toString());
+            return v(Op.VAR_PATTERN, v.toString());
         }
     }
 
@@ -342,11 +341,22 @@ public class PremiseRule extends GenericCompound {
 
     @NotNull
     public final PremiseRule normalizeRule(@NotNull PatternIndex index) {
-        return new PremiseRule(
-                (Compound) index.the(
-                        $.terms.transform(
-                                $.terms.transform(this, UppercaseAtomsToPatternVariables),
-                                new PremiseRuleVariableNormalization())));
+        try {
+
+            Compound premiseComponents = (Compound) index.the((Termed)
+                    terms.transform(
+                            terms.transform(this, UppercaseAtomsToPatternVariables),
+                            new PremiseRuleVariableNormalization()));
+
+            return new PremiseRule( premiseComponents );
+
+        } catch (UnbuildableTerm e) {
+            e.printStackTrace();
+            logger.error("normalizeRule untransformed: {} {}", this, e.getCause());
+            return null;
+        }
+
+
     }
 
 
@@ -377,7 +387,7 @@ public class PremiseRule extends GenericCompound {
         //and not a belief term pattern
         //(which will not reference any particular atoms)
 
-        pattern = PatternCompound.make($.p(taskTermPattern, beliefTermPattern));
+        pattern = PatternCompound.make(p(taskTermPattern, beliefTermPattern));
 
 
         ListMultimap<Term, MatchConstraint> constraints = MultimapBuilder.treeKeys().arrayListValues().build();
@@ -691,7 +701,7 @@ public class PremiseRule extends GenericCompound {
         return clone(B, T, C, false);
     }
 
-    static final Term TaskQuestionTerm = $.exec("task", "\"?\"");
+    static final Term TaskQuestionTerm = exec("task", "\"?\"");
 
     @NotNull
     private PremiseRule clone(Term newT, Term newB, Term newR, boolean question) {
@@ -701,13 +711,13 @@ public class PremiseRule extends GenericCompound {
         m.put(getBeliefTermPattern(), newB);
         m.put(getConclusionTermPattern(), newR);
 
-        Compound remapped = (Compound) $.terms.transform(this, new MapSubst(m));
+        Compound remapped = (Compound) terms.transform(this, new MapSubst(m));
 
         //Append taskQuestion
         Compound pc = (Compound) remapped.term(0);
         Term[] pp = pc.terms(); //premise component
         Compound newPremise = question ?
-                $.p(concat(pp, TaskQuestionTerm)) :
+                p(concat(pp, TaskQuestionTerm)) :
                 pc;
 
         return new PremiseRule(newPremise, (Compound) remapped.term(1));
@@ -760,7 +770,7 @@ public class PremiseRule extends GenericCompound {
         int offset;
 
         public static Variable varPattern(int i) {
-            return $.v(VAR_PATTERN, i);
+            return v(VAR_PATTERN, i);
         }
 
         @NotNull
@@ -806,7 +816,7 @@ public class PremiseRule extends GenericCompound {
             } else if (v instanceof GenericVariable) {
                 return ((GenericVariable) v).normalize(actualSerial); //HACK
             } else {
-                return $.v(v.op(), actualSerial);
+                return v(v.op(), actualSerial);
             }
         }
 

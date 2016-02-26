@@ -4,52 +4,72 @@ import nars.$;
 import nars.Op;
 import nars.nal.Tense;
 import nars.nal.meta.match.Ellipsis;
-import nars.term.Compound;
-import nars.term.Term;
-import nars.term.TermIndex;
-import nars.term.Termed;
+import nars.term.*;
+import nars.term.atom.Atom;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.PrintStream;
 import java.util.function.Consumer;
 
 /**
  * Created by me on 12/31/15.
  */
 public abstract class AbstractMapIndex implements TermIndex {
-    public AbstractMapIndex() {
+
+    protected final Atoms atoms = new Atoms();
+    protected final TermBuilder builder;
+
+
+    public AbstractMapIndex(TermBuilder builder) {
         super();
+        this.builder = builder;
     }
 
 
-    /** get the instance that will be internalized */
-    @NotNull
-    public static Termed intern(@NotNull Op op, int relation, @NotNull TermContainer t) {
-        //return (TermMetadata.hasMetadata(t) || op.isA(TermMetadata.metadataBits)) ?
-                //newMetadataCompound(op, relation, t) :
-        return newInternCompound(op, t, relation);
+//    /** get the instance that will be internalized */
+//    @NotNull
+//    public static Termed intern(@NotNull Op op, int relation, @NotNull TermContainer t) {
+//        //return (TermMetadata.hasMetadata(t) || op.isA(TermMetadata.metadataBits)) ?
+//                //newMetadataCompound(op, relation, t) :
+//        return newInternCompound(op, t, relation);
+//    }
+
+
+
+//    @Nullable
+//    public static Term newMetadataCompound(@NotNull Op op, int relation, @NotNull TermContainer t) {
+//        //create unique
+//        return $.the(op, relation, t);
+//    }
+
+//    @NotNull
+//    static Termed newInternCompound(@NotNull Op op, @NotNull TermContainer subterms, int relation) {
+//        return new GenericCompound(
+//            op, relation, (TermVector) subterms
+//        );
+//    }
+
+//    @Nullable
+//    default Termed getOrAdd(@NotNull Termed t) {
+//    }
+
+    final Termed theAtom(Term t) {
+        return (t instanceof Atom) ?
+                atoms.resolveOrAdd((Atom)t)
+                : t;
     }
+
+    abstract protected Termed theCompound(@NotNull Compound x);
+
 
     @Nullable
-    public static Term newMetadataCompound(@NotNull Op op, int relation, @NotNull TermContainer t) {
-        //create unique
-        return $.the(op, relation, t);
-    }
+    @Override public Termed the(Termed t) {
 
-    @NotNull
-    static Termed newInternCompound(@NotNull Op op, @NotNull TermContainer subterms, int relation) {
-        return new GenericCompound(
-            op, relation, (TermVector) subterms
-        );
-    }
-
-    @Nullable
-    public Termed the(Term x) {
-
-        if (x instanceof Ellipsis)
+        if (t instanceof Ellipsis)
             ///throw new RuntimeException("ellipsis not allowed in this index");
             return null;
 
@@ -58,16 +78,17 @@ public abstract class AbstractMapIndex implements TermIndex {
 //            return x;
 //        }
 
-        Termed y = getIfPresent(x);
-        if (y == null) {
-            if ((y = resolve(x)) !=null) {
-                putTerm(y);
-                if (!y.equals(x))
-                    return x; //return original non-anonymized
-            }
-        }
+//        Termed y = the(x);
+//        if (y == null) {
+//            if ((y = the(x)) !=null) {
+//                put(y);
+//                if (!y.equals(x))
+//                    return x; //return original non-anonymized
+//            }
+//        }
 
-        return y;
+        return t instanceof Compound ? theCompound((Compound) t)
+                : theAtom(t.term());
     }
 
 //    @Override
@@ -82,39 +103,17 @@ public abstract class AbstractMapIndex implements TermIndex {
 //    @Override
 //    public abstract int size();
 
-    @Nullable
-    public Termed make(@NotNull Op op, int relation, TermContainer t, int dt) {
-        @Nullable TermContainer subs = internSub(t);
-        if (subs == null)
-            return null;
-        Termed x = intern(op, relation, subs);
-        if (dt!= Tense.ITERNAL && x!=null && x.term().isCompound()) {
-            x = ((Compound)x.term()).dt(dt);
-        }
-        return x;
-    }
 
-    @Override public Termed resolveAtomic(Term t) {
-        return t;
+    @Override
+    public void print(@NotNull PrintStream out) {
+
+        atoms.print(System.out);
+        forEach(out::println);
+
     }
 
     @Nullable
-    @Override public TermContainer internSub(TermContainer s) {
-        TermContainer existing = getSubtermsIfPresent(s);
-        if (existing == null) {
-            TermContainer us = unifySubterms(s);
-            if (us !=null) {
-                putSubterms(us);
-                existing = s;
-            }
-        }
-        return existing;
-    }
-
-
-    abstract protected void putSubterms(TermContainer subterms);
-    @Nullable
-    abstract protected TermContainer getSubtermsIfPresent(TermContainer subterms);
+    abstract protected TermContainer get(TermContainer subterms);
 
 
 //    @Override
@@ -127,4 +126,14 @@ public abstract class AbstractMapIndex implements TermIndex {
 
     @Override
     public abstract void forEach(Consumer<? super Termed> c);
+
+    public static class DefaultTermBuilder extends TermBuilder {
+
+        @Override
+        public
+        @Nullable
+        Termed make(Op op, int relation, TermContainer subterms, int dt) {
+            return new GenericCompound(op, relation, dt, (TermVector)subterms);
+        }
+    }
 }
