@@ -1,8 +1,10 @@
 package nars.nal;
 
+import nars.Op;
 import nars.nal.meta.PremiseEval;
 import nars.nal.meta.PremiseRuleSet;
 import nars.nal.meta.TrieDeriver;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -15,38 +17,37 @@ import org.jetbrains.annotations.Nullable;
 public abstract class Deriver  {
 
     //@Deprecated public static final TermIndex terms = TermIndex.memory(16384);
-    @Nullable
-    private static Deriver defaultDeriver;
-    @Nullable
+
+    private static TrieDeriver defaultDeriver;
+
     private static PremiseRuleSet defaultRules;
 
-    @Nullable
-    public static synchronized PremiseRuleSet getDefaultRules() {
+    @NotNull
+    public static TrieDeriver getDefaultDeriver() {
         if (defaultRules == null) {
-            try {
-                defaultRules = new PremiseRuleSet();
-            } catch (Exception e) {
-                e.printStackTrace();
-                System.exit(1);  //e.printStackTrace();
+            synchronized(Op.VAR_PATTERN) {
+                if (defaultDeriver == null) { //double boiler
+                    try {
+                        defaultRules = new PremiseRuleSet();
+                        defaultDeriver = new TrieDeriver( defaultRules );
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        System.exit(1);  //e.printStackTrace();
+                    }
+                }
             }
 
-        }
-        return defaultRules;
-    }
-
-    @Nullable
-    public static synchronized Deriver getDefaultDeriver() {
-        if (defaultDeriver == null) {
-            defaultDeriver = new TrieDeriver( getDefaultRules());
-            //defaultDeriver = new SimpleDeriver( getDefaultRules() );
         }
         return defaultDeriver;
     }
 
+
+
     /**
      * default set of rules, statically available
      */
-    @Nullable
+    @NotNull
+
     public final PremiseRuleSet rules;
 
 

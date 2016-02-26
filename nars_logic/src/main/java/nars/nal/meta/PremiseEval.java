@@ -10,13 +10,13 @@ import nars.concept.ConceptProcess;
 import nars.nal.Deriver;
 import nars.nal.meta.constraint.MatchConstraint;
 import nars.nal.meta.op.MatchTerm;
-import nars.term.Operator;
 import nars.nal.op.ImmediateTermTransform;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.TermIndex;
 import nars.term.Termed;
+import nars.term.atom.Atomic;
 import nars.term.transform.subst.FindSubst;
 import nars.truth.Truth;
 import nars.util.version.Versioned;
@@ -52,7 +52,7 @@ public class PremiseEval extends FindSubst {
 
     int termutesPerMatch, termutes;
 
-    public final Map<Operator, ImmediateTermTransform> transforms =
+    public final Map<Atomic, ImmediateTermTransform> transforms =
             Global.newHashMap();
     private float minConfidence = Global.TRUTH_EPSILON;
 
@@ -83,7 +83,7 @@ public class PremiseEval extends FindSubst {
         }
     }
 
-    @Override public final ImmediateTermTransform getTransform(Operator t) {
+    @Override public final ImmediateTermTransform getTransform(Atomic t) {
         return transforms.get(t);
     }
 

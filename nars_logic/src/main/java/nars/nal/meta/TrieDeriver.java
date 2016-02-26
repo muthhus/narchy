@@ -62,7 +62,8 @@ public class TrieDeriver extends Deriver {
             }
         };
 
-        this.roots = getBranches(trie.trie.root).toArray(new ProcTerm[0]);
+        @NotNull List<ProcTerm> bb = getBranches(trie.trie.root);
+        this.roots = bb.toArray(new ProcTerm[bb.size()]);
 
 
         /*
@@ -88,9 +89,9 @@ public class TrieDeriver extends Deriver {
     final transient AtomicReference<MatchTerm> matchParent = new AtomicReference<MatchTerm>(null);
 
     @NotNull
-    private List<Term> getBranches(@NotNull TrieNode<List<Term>, PremiseRule> node) {
+    private List<ProcTerm> getBranches(@NotNull TrieNode<List<Term>, PremiseRule> node) {
 
-        List<Term> bb = Global.newArrayList(node.getChildCount());
+        List<ProcTerm> bb = Global.newArrayList(node.getChildCount());
 
 
         node.forEach(n -> {
@@ -102,7 +103,7 @@ public class TrieDeriver extends Deriver {
 
             bb.add(branch(
                     compileConditions(seq.subList(from, to), matchParent),
-                    new PremiseMatchFork(compileActions(TrieDeriver.this.getBranches(n)).toArray(new ProcTerm[0]))));
+                    new PremiseMatchFork(compileActions(TrieDeriver.this.getBranches(n)))));
         });
 
         return bb;
@@ -143,9 +144,9 @@ public class TrieDeriver extends Deriver {
 
 
     @NotNull
-    private static Collection<ProcTerm> compileActions(@NotNull List<Term> t) {
+    private static ProcTerm[] compileActions(@NotNull List<ProcTerm> t) {
         //t.forEach(x -> System.out.println(x.getClass() + " " + x));
-        return (Collection)t;
+        return t.toArray(new ProcTerm[t.size()]);
     }
 
 

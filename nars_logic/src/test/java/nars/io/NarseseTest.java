@@ -8,6 +8,7 @@ import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;
+import nars.term.atom.Atomic;
 import nars.term.variable.GenericVariable;
 import nars.truth.Truth;
 import org.junit.Test;
@@ -599,7 +600,7 @@ public class NarseseTest {
 
     @Test
     public void testOperatorTerm() {
-        Operator o = term("^op");
+        Atomic o = term("^op");
         assertNotNull(o);
         assertEquals("^op", o.toString());
         assertEquals(Operator.class, o.getClass());

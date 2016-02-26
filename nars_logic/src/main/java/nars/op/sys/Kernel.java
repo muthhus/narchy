@@ -9,10 +9,10 @@ import nars.bag.impl.CurveBag;
 import nars.budget.BudgetMerge;
 import nars.budget.Forget;
 import nars.budget.UnitBudget;
-import nars.term.Operator;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Term;
+import nars.term.atom.Atomic;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -85,7 +85,7 @@ public class Kernel {
 
 
     public Task run(float priority, String operator, Runnable r, Term... args) {
-        Operator op = $.operator(operator);
+        Atomic op = $.operator(operator);
 
 //        //HACK for command tasks which do not get an eventInput emission, tracked here
 //        nar.onExecution(op, (Task tt) -> {

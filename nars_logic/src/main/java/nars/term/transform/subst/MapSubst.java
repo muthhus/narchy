@@ -1,6 +1,5 @@
 package nars.term.transform.subst;
 
-import com.gs.collections.impl.map.mutable.UnifiedMap;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 

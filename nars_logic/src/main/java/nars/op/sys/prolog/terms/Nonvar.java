@@ -84,7 +84,7 @@ public abstract class Nonvar extends PTerm {
 	}
 
 	@Override
-	public void recurseTerms(SubtermVisitor v, Compound parent) {
+	public void recurseTerms(@NotNull SubtermVisitor v, Compound parent) {
 
 	}
 
@@ -117,7 +117,7 @@ public abstract class Nonvar extends PTerm {
 	}
 
 	@Override
-	public void append(Appendable w, boolean pretty) throws IOException {
+	public void append(@NotNull Appendable w, boolean pretty) throws IOException {
 
 	}
 

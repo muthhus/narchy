@@ -1,12 +1,10 @@
 package nars.term;
 
-import javassist.scopedpool.SoftValueHashMap;
 import nars.$;
 import nars.Global;
 import nars.Narsese;
 import nars.Op;
 import nars.budget.Budget;
-import nars.concept.DefaultConceptBuilder;
 import nars.nal.meta.PremiseAware;
 import nars.nal.meta.PremiseEval;
 import nars.nal.meta.match.EllipsisMatch;
@@ -17,7 +15,6 @@ import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.term.container.TermSet;
 import nars.term.container.TermVector;
-import nars.term.index.MapIndex2;
 import nars.term.transform.CompoundTransform;
 import nars.term.transform.VariableNormalization;
 import nars.term.transform.VariableTransform;
@@ -30,7 +27,6 @@ import org.jetbrains.annotations.Nullable;
 import java.io.PrintStream;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -162,11 +158,11 @@ public interface TermIndex  {
         Op sop = src.op();
         final int maxArity = sop.maxSize;
 
-        Term[] ss = src.terms();
-        int len = ss.length;
+
+        int len = src.size();
         List<Term> sub = Global.newArrayList(len /* estimate */);
         for (int i = 0; i < len; i++) {
-            Term t = ss[i];
+            Term t = src.term(i);
             Term u = apply(f, t);
 
             if (u instanceof EllipsisMatch) {

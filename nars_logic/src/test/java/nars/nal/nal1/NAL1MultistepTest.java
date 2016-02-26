@@ -1,7 +1,7 @@
 package nars.nal.nal1;
 
 import nars.NAR;
-import nars.nal.AbstractNALTester;
+import nars.nal.AbstractNALTest;
 import nars.util.signal.experiment.DeductiveChainTest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,7 +14,7 @@ import static nars.util.signal.experiment.DeductiveChainTest.inh;
 //import static nars.util.meter.experiment.DeductiveChainTest.inh;
 
 @RunWith(Parameterized.class)
-public class NAL1MultistepTest extends AbstractNALTester {
+public class NAL1MultistepTest extends AbstractNALTest {
 
     public NAL1MultistepTest(Supplier<NAR> b) {
         super(b);
@@ -22,7 +22,7 @@ public class NAL1MultistepTest extends AbstractNALTester {
 
     @Parameterized.Parameters(name = "{index}:{0}")
     public static Iterable<Supplier<NAR>> configurations() {
-        return AbstractNALTester.nars(1, true);
+        return AbstractNALTest.nars(1, true);
     }
 
 

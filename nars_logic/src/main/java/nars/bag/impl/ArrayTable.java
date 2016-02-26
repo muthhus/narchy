@@ -1,7 +1,6 @@
 package nars.bag.impl;
 
 import nars.bag.Table;
-import nars.task.Task;
 import nars.util.CollectorMap;
 import nars.util.data.sorted.SortedIndex;
 import org.jetbrains.annotations.NotNull;

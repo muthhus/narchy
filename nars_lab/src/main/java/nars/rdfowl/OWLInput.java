@@ -2,9 +2,9 @@ package nars.rdfowl;
 
 import nars.$;
 import nars.NAR;
-import nars.term.Operator;
 import nars.term.Term;
 import nars.term.atom.Atom;
+import nars.term.atom.Atomic;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
@@ -448,7 +448,7 @@ public class OWLInput  {
             nar.believe($.inh(atom(subject), atom(object)));
         }
         else {
-            nar.believe($.exec((Operator) atom(predicate),
+            nar.believe($.exec((Atomic) atom(predicate),
                     $.p(atom(subject), atom(object))));
         }
 

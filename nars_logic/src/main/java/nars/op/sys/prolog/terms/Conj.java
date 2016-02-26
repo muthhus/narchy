@@ -17,7 +17,7 @@ public class Conj extends Cons {
 		StringBuilder s = new StringBuilder(watchNull(h));
 		for (;;) {
 			if (!(t instanceof Conj)) {
-				s.append(",").append(t);
+				s.append(',').append(t);
 				break;
 			} else {
 				h = ((Conj) t).args[0].ref();

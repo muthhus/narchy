@@ -25,7 +25,7 @@ public abstract class AbstractConcept implements Concept {
     public final Term term;
 
     @Nullable
-    protected Map meta = null;
+    protected Map meta;
 
     protected AbstractConcept(@NotNull Term term, Bag<Task> taskLinks, Bag<Termed> termLinks) {
         this.term = term;

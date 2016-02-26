@@ -5,7 +5,6 @@ import nars.Global;
 import nars.Op;
 import nars.nal.Tense;
 import nars.nal.meta.match.Ellipsis;
-import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.term.container.TermSet;
 import nars.term.container.TermVector;
@@ -15,7 +14,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 import static java.util.Arrays.copyOfRange;
-import static java.util.Arrays.parallelSetAll;
 import static nars.Op.*;
 import static nars.nal.Tense.ITERNAL;
 import static nars.term.Statement.pred;
@@ -354,7 +352,7 @@ public abstract class TermBuilder {
         }
     }
 
-    public boolean ellipsisoid(Term only) {
+    public static boolean ellipsisoid(Term only) {
         return (only instanceof Ellipsis) || (only instanceof Ellipsis.EllipsisPrototype);
     }
 
@@ -458,7 +456,7 @@ public abstract class TermBuilder {
     }
 
     @Nullable
-    public Term subtractSet(@NotNull Op setType, @NotNull Compound A, @NotNull Compound B) {
+    public static Term subtractSet(@NotNull Op setType, @NotNull Compound A, @NotNull Compound B) {
         return TermContainer.difference(setType, A, B);
     }
 

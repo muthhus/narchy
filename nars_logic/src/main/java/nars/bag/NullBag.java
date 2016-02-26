@@ -1,11 +1,9 @@
 package nars.bag;
 
-import nars.budget.Budget;
 import nars.budget.Budgeted;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.function.Consumer;
 import java.util.function.Predicate;

@@ -25,7 +25,7 @@ import static org.junit.Assert.*;
 //don't touch this file - patham9
 
 @RunWith(Parameterized.class)
-public class LinkageTest extends AbstractNALTester {
+public class LinkageTest extends AbstractNALTest {
 
     public static final int TERM_LINK_BAG_SIZE = 8;
 

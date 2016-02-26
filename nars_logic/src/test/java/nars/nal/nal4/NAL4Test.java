@@ -1,7 +1,7 @@
 package nars.nal.nal4;
 
 import nars.NAR;
-import nars.nal.AbstractNALTester;
+import nars.nal.AbstractNALTest;
 import nars.util.signal.RuleTest;
 import nars.util.signal.TestNAR;
 import org.junit.Test;
@@ -11,7 +11,7 @@ import org.junit.runners.Parameterized;
 import java.util.function.Supplier;
 
 @RunWith(Parameterized.class)
-public class NAL4Test extends AbstractNALTester {
+public class NAL4Test extends AbstractNALTest {
 
 
     public static final int CYCLES = 150;
@@ -20,7 +20,7 @@ public class NAL4Test extends AbstractNALTester {
 
     @Parameterized.Parameters(name= "{0}")
     public static Iterable configurations() {
-        return AbstractNALTester.nars(4, false);
+        return AbstractNALTest.nars(4, false);
     }
 
     @Test

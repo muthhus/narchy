@@ -130,7 +130,7 @@ public class Derive extends AtomicStringConstant implements ProcTerm {
                 });*/
 
                     String message = "Term volume overflow: " + derivedTerm;
-                    $.logger.error(message + "\n" + rule);
+                    $.logger.error("{} {}", message , rule);
                     //System.exit(1);
                     //throw new RuntimeException(message);
                 }

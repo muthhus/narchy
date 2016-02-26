@@ -1,6 +1,5 @@
 package nars.op.sys.prolog.fluents;
 
-import nars.op.sys.prolog.terms.Const;
 import nars.op.sys.prolog.terms.Copier;
 import nars.op.sys.prolog.terms.Nonvar;
 import nars.op.sys.prolog.terms.Prog;

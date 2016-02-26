@@ -1,10 +1,10 @@
 package nars.term.transform.subst;
 
 import nars.Global;
-import nars.term.Operator;
 import nars.nal.op.ImmediateTermTransform;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,7 +40,7 @@ public interface Subst  {
     void forEach(BiConsumer<? super Term, ? super Term> each);
 
     @Nullable
-    default ImmediateTermTransform getTransform(Operator t) {
+    default ImmediateTermTransform getTransform(Atomic t) {
         return null;
     }
 

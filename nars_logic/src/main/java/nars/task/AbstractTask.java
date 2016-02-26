@@ -8,7 +8,6 @@ import nars.concept.Concept;
 import nars.nal.Tense;
 import nars.term.Operator;
 import nars.term.Compound;
-import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.DefaultTruth;
 import nars.truth.Stamp;
@@ -129,7 +128,8 @@ public abstract class AbstractTask extends UnitBudget
     }
 
 
-    public AbstractTask(@NotNull Termed<Compound> term, char punctuation, Truth truth, float p, float d, float q, Reference<Task> parentTask, Reference<Task> parentBelief) {
+    public AbstractTask(@NotNull Termed<Compound> term, char punctuation, @Nullable Truth truth, float p, float d, float q,
+                        @Nullable Reference<Task> parentTask, @Nullable Reference<Task> parentBelief) {
         super(p, d, q);
         this.truth = truth;
         this.punctuation = punctuation;
@@ -150,7 +150,7 @@ public abstract class AbstractTask extends UnitBudget
         if (isDeleted())
             return null;
 
-        Term t = term();
+        Compound t = term();
         if (!t.levelValid( memory.nal() ))
             return null;
 
@@ -176,11 +176,8 @@ public abstract class AbstractTask extends UnitBudget
             throw new RuntimeException("invalid punctuation: " + punc);
         }
 
-
-        if (t == null) throw new RuntimeException("null term");
-
         //normalize term
-        Termed normalizedTerm = memory.index.normalized(t);
+        Termed<Compound> normalizedTerm = memory.index.normalized(t);
         if ((normalizedTerm == null) || (!Task.validTaskTerm(normalizedTerm.term()))) {
             return null;
         }
@@ -422,18 +419,19 @@ public abstract class AbstractTask extends UnitBudget
 
 
     @Override
-    public int compareTo(Object obj) {
+    public int compareTo(@NotNull Object obj) {
         if (this == obj) return 0;
 
         Task o = (Task)obj;
         int tt = term().compareTo(o.term());
         if (tt != 0) return tt;
 
-        int tc = Character.compare(punctuation, o.punc());
+        int tc = Character.compare(punc(), o.punc());
         if (tc != 0) return tc;
 
-        if (truth!=null) {
-            int tu = Truth.compare(o.truth(), truth);
+        Truth tr = this.truth();
+        if (tr !=null) {
+            int tu = Truth.compare(o.truth(), tr);
             if (tu!=0) return tu;
         }
 

@@ -11,7 +11,6 @@ import nars.concept.Concept;
 import nars.nal.Level;
 import nars.nal.Tense;
 import nars.nal.nal8.AbstractOperator;
-import nars.term.Operator;
 import nars.nal.nal8.PatternAnswer;
 import nars.nal.nal8.operator.TermFunction;
 import nars.op.in.FileInput;
@@ -23,6 +22,7 @@ import nars.task.flow.TaskQueue;
 import nars.task.flow.TaskStream;
 import nars.term.*;
 import nars.term.atom.Atom;
+import nars.term.atom.Atomic;
 import nars.term.variable.Variable;
 import nars.time.Clock;
 import nars.util.event.AnswerReaction;
@@ -83,7 +83,7 @@ public abstract class NAR implements Level, Consumer<Task> {
 
 
     public static final Logger logger = LoggerFactory.getLogger(NAR.class);
-    static final ThreadPoolExecutor asyncs =
+    static ThreadPoolExecutor asyncs =
             (ThreadPoolExecutor) Executors.newCachedThreadPool();
     static final Set<String> logEvents = Sets.newHashSet(
             "eventTaskProcess", "eventAnswer",
@@ -584,7 +584,7 @@ public abstract class NAR implements Level, Consumer<Task> {
         return onExecution($.operator(op), each);
     }
 
-    public On onExecution(@NotNull Operator op, @NotNull Consumer<Task> each) {
+    public On onExecution(@NotNull Atomic op, @NotNull Consumer<Task> each) {
         return memory.exe.computeIfAbsent(op,
                 o -> new DefaultTopic<Task>())
                 .on(each);
@@ -729,13 +729,11 @@ public abstract class NAR implements Level, Consumer<Task> {
         return trace(out, NAR.logEvents::contains, includeValue);
     }
 
-    public void outputEvent(@NotNull Appendable out, String previou, @NotNull String k, Object v) throws IOException {
+    public void outputEvent(@NotNull Appendable out, String previou, @NotNull String chan, Object v) throws IOException {
         //indent each cycle
-        if (!"eventCycleStart".equals(k)) {
+        if (!"eventCycleStart".equals(chan)) {
             out.append("  ");
         }
-
-        String chan = k.toString();
 
         if (!chan.equals(previou)) {
             out

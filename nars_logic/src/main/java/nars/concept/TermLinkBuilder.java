@@ -1,7 +1,6 @@
 package nars.concept;
 
 import nars.Global;
-import nars.Memory;
 import nars.NAR;
 import nars.Op;
 import nars.term.Compound;
@@ -10,7 +9,6 @@ import nars.term.Termed;
 import nars.term.variable.Variable;
 import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;

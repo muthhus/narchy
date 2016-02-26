@@ -1,7 +1,7 @@
 package nars.nal.nal6;
 
 import nars.NAR;
-import nars.nal.AbstractNALTester;
+import nars.nal.AbstractNALTest;
 import nars.util.signal.TestNAR;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,7 +10,7 @@ import org.junit.runners.Parameterized;
 import java.util.function.Supplier;
 
 @RunWith(Parameterized.class)
-public class NAL6Test extends AbstractNALTester {
+public class NAL6Test extends AbstractNALTest {
 
 
     final int cycles = 100;
@@ -21,7 +21,7 @@ public class NAL6Test extends AbstractNALTester {
 
     @Parameterized.Parameters(name = "{0}")
     public static Iterable configurations() {
-        return AbstractNALTester.nars(6, true, true);
+        return AbstractNALTest.nars(6, true, true);
     }
 
     @Test

@@ -161,10 +161,7 @@ public class Atom extends AtomicStringConstant {
 
 
 
-    @NotNull
-    public final String toStringUnquoted() {
-        return toUnquoted(toString());
-    }
+
 
 
     /** performs a thorough check of the validity of a term (by cloneDeep it) to see if it's valid */

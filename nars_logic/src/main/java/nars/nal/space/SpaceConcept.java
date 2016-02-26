@@ -1,6 +1,5 @@
 package nars.nal.space;
 
-import nars.NAR;
 import nars.bag.Bag;
 import nars.concept.DefaultConcept;
 import nars.task.Task;

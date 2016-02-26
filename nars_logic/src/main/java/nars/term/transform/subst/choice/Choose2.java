@@ -6,7 +6,6 @@ import nars.term.Term;
 import nars.term.container.ShuffledSubterms;
 import nars.term.container.TermVector;
 import nars.term.transform.subst.FindSubst;
-import nars.term.variable.Variable;
 import nars.util.data.array.IntArrays;
 import nars.util.math.Combinations;
 import org.jetbrains.annotations.NotNull;

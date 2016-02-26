@@ -24,7 +24,7 @@ public class SimpleDeriver extends Deriver {
         }
         this.unrolled = u;
 
-        u.forEach(s -> System.out.println(s));
+        u.forEach(System.out::println);
     }
 
     @Override

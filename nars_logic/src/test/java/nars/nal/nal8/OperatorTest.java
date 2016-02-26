@@ -9,8 +9,8 @@ import nars.nar.Default;
 import nars.nar.Terminal;
 import nars.task.Task;
 import nars.term.Compound;
-import nars.term.Operator;
 import nars.term.Term;
+import nars.term.atom.Atomic;
 import nars.term.transform.subst.Subst;
 import nars.util.signal.TestNAR;
 import org.junit.Ignore;
@@ -90,7 +90,7 @@ public class OperatorTest {
     @Test public void testInhIsOperation() {
         Compound o = $("<(a,b,c)-->^x>");
         assertTrue(o.term(0).op() == Op.PRODUCT);
-        assertTrue(o.term(1) instanceof Operator);
+        assertTrue(o.term(1) instanceof Atomic);
         assertTrue(o.term(1).op() == Op.OPERATOR);
         assertEquals("x(a,b,c)", o.toString());
         assertEquals(Op.INHERIT, o.op());

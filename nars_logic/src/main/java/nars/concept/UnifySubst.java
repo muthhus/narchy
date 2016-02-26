@@ -2,16 +2,13 @@ package nars.concept;
 
 import nars.Memory;
 import nars.Op;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.term.transform.subst.FindSubst;
 import nars.term.transform.subst.MapSubst;
-import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
-import java.util.function.Consumer;
 
 /** not thread safe, use 1 per thread (do not interrupt matchAll) */
 public abstract class UnifySubst extends FindSubst  {

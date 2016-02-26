@@ -1,6 +1,5 @@
 package nars.term.transform.subst.choice;
 
-import nars.term.Compound;
 import nars.term.container.ShuffledSubterms;
 import nars.term.container.TermContainer;
 import nars.term.transform.subst.FindSubst;

@@ -1,6 +1,5 @@
 package nars.term.variable;
 
-import nars.$;
 import nars.Op;
 import org.jetbrains.annotations.NotNull;
 

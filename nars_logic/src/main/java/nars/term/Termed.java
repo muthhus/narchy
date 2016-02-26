@@ -1,15 +1,16 @@
 package nars.term;
 
 import nars.Op;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 /** has, or is associated with a specific term */
 @FunctionalInterface
 public interface Termed<TT extends Term>  {
 
+    @NotNull
     TT term();
 
-    @Nullable
+    @NotNull
     default Op op() { return term().op(); }
 
     default boolean isAny(int vector) { return term().isAny(vector); }

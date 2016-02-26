@@ -24,12 +24,12 @@ package nars;
 import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
 import nars.concept.ConceptProcess;
-import nars.term.Operator;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.TermIndex;
 import nars.term.atom.Atom;
+import nars.term.atom.Atomic;
 import nars.term.transform.CompoundTransform;
 import nars.time.Clock;
 import nars.util.data.random.XorShift128PlusRandom;
@@ -96,7 +96,7 @@ public class Memory extends Param {
     /** executables (incl. operators).
      * keys in this map should be OPERATOR (^something)
      * */
-    public final transient Map<Operator, Topic<Task>> exe = new HashMap();
+    public final transient Map<Atomic, Topic<Task>> exe = new HashMap();
 
 
 
@@ -189,7 +189,7 @@ public class Memory extends Param {
 
 
     @Override
-    public synchronized void clear() {
+    public void clear() {
 
         eventReset.emit(this);
 

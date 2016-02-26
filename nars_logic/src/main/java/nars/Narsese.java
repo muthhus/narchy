@@ -16,7 +16,6 @@ import com.github.fge.grappa.support.Var;
 import nars.nal.Tense;
 import nars.nal.meta.PremiseRule;
 import nars.nal.meta.match.*;
-import nars.term.Operator;
 import nars.nal.nal8.operator.ImmediateOperator;
 import nars.op.out.echo;
 import nars.task.MutableTask;

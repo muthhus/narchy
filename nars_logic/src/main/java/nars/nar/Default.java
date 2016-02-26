@@ -17,7 +17,6 @@ import nars.task.Task;
 import nars.task.flow.SetTaskPerception;
 import nars.task.flow.TaskPerception;
 import nars.term.Term;
-import nars.term.TermIndex;
 import nars.term.Termed;
 import nars.time.FrameClock;
 import nars.util.data.MutableInteger;

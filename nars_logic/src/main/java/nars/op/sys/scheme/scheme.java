@@ -10,6 +10,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.TermIndex;
 import nars.term.atom.Atom;
+import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -37,9 +38,9 @@ public class scheme extends TermFunction {
                     //return ListExpression.list(SymbolExpression.symbol("quote"), new SchemeProduct((Product)term));
                      return new SchemeProduct((Iterable) term);
                 }
-                if (term instanceof Atom) {
+                if (term instanceof Atomic) {
 
-                    String s = ((Atom)term).toStringUnquoted();
+                    String s = ((Atomic)term).toStringUnquoted();
 
                     //attempt to parse as number
                     try {

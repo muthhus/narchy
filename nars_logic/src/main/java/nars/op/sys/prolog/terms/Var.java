@@ -1,7 +1,6 @@
 package nars.op.sys.prolog.terms;
 
 import nars.Op;
-import nars.op.sys.prolog.io.Base64Codec;
 import nars.term.Compound;
 import nars.term.SubtermVisitor;
 import nars.term.Term;

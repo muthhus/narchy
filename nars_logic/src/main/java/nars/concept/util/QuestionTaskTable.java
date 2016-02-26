@@ -2,7 +2,6 @@ package nars.concept.util;
 
 import nars.Memory;
 import nars.task.Task;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /** task table used for storing Questions and Quests.

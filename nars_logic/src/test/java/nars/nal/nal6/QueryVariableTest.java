@@ -2,7 +2,7 @@ package nars.nal.nal6;
 
 import nars.Global;
 import nars.NAR;
-import nars.nal.AbstractNALTester;
+import nars.nal.AbstractNALTest;
 import nars.nar.Default;
 import nars.task.Task;
 import nars.util.data.Util;
@@ -21,7 +21,7 @@ import static org.junit.Assert.assertTrue;
 
 
 @RunWith(Parameterized.class)
-public class QueryVariableTest extends AbstractNALTester {
+public class QueryVariableTest extends AbstractNALTest {
 
     public QueryVariableTest(Supplier<NAR> b) { super(b); }
 

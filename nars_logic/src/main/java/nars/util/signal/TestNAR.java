@@ -30,6 +30,10 @@ import java.util.*;
 */
 public class TestNAR  {
 
+    static {
+        $.logger.hashCode(); //trigger logging?
+    }
+
     @NotNull
     public final Map<Object, HitMeter> eventMeters;
     @NotNull
@@ -252,7 +256,7 @@ public class TestNAR  {
 
         if (freqMin == -1) freqMin = freqMax;
 
-        int tt = getTemporalTolerance();
+        int tt = temporalTolerance;
 
         cycleStart -= tt;
         cycleEnd += tt;
@@ -553,7 +557,7 @@ public class TestNAR  {
     public Report getReport() {
         Report report = new Report(this);
 
-        report.setError(getError());
+        report.setError(error);
 
         requires.forEach(report::add);
 

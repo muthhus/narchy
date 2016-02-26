@@ -12,6 +12,7 @@ import nars.op.in.TextInput;
 import nars.op.in.Twenglish;
 import nars.task.Task;
 import nars.term.TermIndex;
+import nars.term.index.MapIndex2;
 import nars.time.RealtimeMSClock;
 import nars.util.data.Util;
 import nars.util.data.sorted.SortedIndex;
@@ -270,7 +271,8 @@ public class NarseseIRCBot extends IRCBot {
 
         nar = new Default(new Memory(new RealtimeMSClock(),
                 //TermIndex.memoryWeak(numConcepts * 2)
-                TermIndex.memory(1000)), 1024, 1, 4, 3);
+                new MapIndex2(null, null //TODO
+                         )), 1024, 1, 4, 3);
 
         output = new DigestBag.OutputBuffer(nar, 128);
 

@@ -222,7 +222,7 @@ public class Builtins extends HashDict {
 				T = prolog.toConstBuiltin(new Const(s));
 			else {
 				Fun F = new Fun(s);
-				F.init(i);
+				init(i);
 				T = toFunBuiltin(F);
 			}
 			return putArg(2, T, p);

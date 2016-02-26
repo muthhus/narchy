@@ -1,6 +1,5 @@
 package nars.op.mental;
 
-import nars.nal.nal8.Execution;
 import nars.nal.nal8.operator.SyncOperator;
 import nars.task.Task;
 

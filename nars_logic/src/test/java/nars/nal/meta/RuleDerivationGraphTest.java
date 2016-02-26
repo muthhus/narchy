@@ -8,7 +8,6 @@ import org.junit.Test;
 
 import java.util.*;
 
-import static nars.nal.Deriver.getDefaultRules;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -17,7 +16,7 @@ import static org.junit.Assert.assertEquals;
 public class RuleDerivationGraphTest {
 
     @Test public void testRuleTrie() {
-        TrieDeriver x = new TrieDeriver(Deriver.getDefaultRules());
+        TrieDeriver x = Deriver.getDefaultDeriver();
         x.trie.printSummary();
 
 
@@ -32,7 +31,7 @@ public class RuleDerivationGraphTest {
         //SimpleDeriver d = new SimpleDeriver(Deriver.standard);
 
         //return Collections.unmodifiableList(premiseRules);
-        List<PremiseRule> R = getDefaultRules().rules;
+        List<PremiseRule> R = Deriver.getDefaultDeriver().rules.rules;
         int registeredRules = R.size();
 
 

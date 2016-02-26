@@ -3,16 +3,12 @@ package nars.bag.impl;
 import com.gs.collections.api.block.function.primitive.FloatToFloatFunction;
 import nars.bag.BLink;
 import nars.bag.Bag;
-import nars.budget.Budget;
 import nars.budget.BudgetMerge;
 import nars.budget.Budgeted;
-import nars.util.data.FastBitSet;
-import nars.util.data.list.FasterList;
 import nars.util.data.sorted.SortedIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -91,6 +87,7 @@ public class CurveBag<V> implements Bag<V> {
         return peekNext(true);
     }
 
+    @NotNull
     @Override
     public Bag<V> commit() {
         arrayBag.commit();
@@ -170,7 +167,7 @@ public class CurveBag<V> implements Bag<V> {
     }
 
     @Override
-    public BLink<V> get(V key) {
+    public BLink<V> get(@NotNull V key) {
         return arrayBag.get(key);
     }
 

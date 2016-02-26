@@ -6,8 +6,6 @@ import java.text.DateFormat;
 import java.util.*;
 
 import com.google.common.collect.Lists;
-import com.gs.collections.api.set.ImmutableSet;
-import com.gs.collections.impl.factory.Sets;
 import nars.$;
 import nars.NAR;
 import nars.nar.Default;
@@ -215,7 +213,7 @@ public class shell {
             }
             FileOperationProvider[] ops = mgr.getOperationProviders(scheme);
             if (ops != null && ops.length > 0) {
-                System.out.println("  operations: " + ops);
+                System.out.println("  operations: " + Arrays.toString(ops));
             }
         }
 

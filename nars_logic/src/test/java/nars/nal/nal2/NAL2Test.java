@@ -3,7 +3,7 @@ package nars.nal.nal2;
 
 import nars.NAR;
 import nars.Narsese;
-import nars.nal.AbstractNALTester;
+import nars.nal.AbstractNALTest;
 import nars.util.signal.TestNAR;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,7 +12,7 @@ import org.junit.runners.Parameterized;
 import java.util.function.Supplier;
 
 @RunWith(Parameterized.class)
-public class NAL2Test extends AbstractNALTester {
+public class NAL2Test extends AbstractNALTest {
 
     public NAL2Test(Supplier<NAR> b) { super(b); }
 
@@ -20,7 +20,7 @@ public class NAL2Test extends AbstractNALTester {
 
     @Parameterized.Parameters(name = "{index}:{0}")
     public static Iterable<Supplier<NAR>> configurations() {
-        return AbstractNALTester.nars(2, false);
+        return AbstractNALTest.nars(2, false);
     }
 
     @Test

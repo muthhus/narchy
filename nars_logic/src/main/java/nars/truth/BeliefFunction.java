@@ -277,11 +277,12 @@ public enum BeliefFunction implements TruthOperator {
     };
 
 
-    @Nullable
+    @NotNull
     public static Truth newDefaultTruth(@NotNull Memory m) {
         return m.getTruthDefault(Symbols.BELIEF);
     }
 
+    @NotNull
     public static float defaultConfidence(@NotNull Memory m) {
         return m.getDefaultConfidence(Symbols.BELIEF);
     }
@@ -298,6 +299,7 @@ public enum BeliefFunction implements TruthOperator {
 
 
 
+    //TODO use an enum map with terms bound to the enum values directly
     static final Map<Term, BeliefFunction> atomToTruthModifier = Global.newHashMap(BeliefFunction.values().length);
 
     static {
@@ -305,6 +307,7 @@ public enum BeliefFunction implements TruthOperator {
             atomToTruthModifier.put($.the(tm.toString()), tm);
     }
 
+    @Nullable
     public static BeliefFunction get(Term a) {
         return atomToTruthModifier.get(a);
     }

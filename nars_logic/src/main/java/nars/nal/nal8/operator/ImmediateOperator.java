@@ -6,14 +6,14 @@ import nars.term.Operator;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 
 /** an operation that executes immediately, and without logical consequences;
  *  used for system control functions  */
 public abstract class ImmediateOperator extends NullOperator  {
 
-    @NotNull
-    public final Operator op;
+    public final @NotNull Atomic op;
 
     protected ImmediateOperator() {
         op = new Operator(getOperatorTerm());

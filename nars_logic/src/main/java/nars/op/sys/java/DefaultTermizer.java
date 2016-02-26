@@ -133,7 +133,7 @@ public class DefaultTermizer implements Termizer {
 
         if (o instanceof int[]) {
             List<Term> arg = Arrays.stream((int[]) o)
-                    .mapToObj((i) -> $.the(i)).collect(Collectors.toList());
+                    .mapToObj($::the).collect(Collectors.toList());
             if (arg.isEmpty()) return EMPTY;
             return $.p( arg );
         }

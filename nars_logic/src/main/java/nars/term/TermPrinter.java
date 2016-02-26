@@ -2,6 +2,7 @@ package nars.term;
 
 import nars.Op;
 import nars.Symbols;
+import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -64,7 +65,7 @@ public interface TermPrinter {
             default:
                 if (op.isStatement() || c.size()==2) {
                     if (Op.isOperation(c)) {
-                        operationAppend((Compound) c.term(0), (Operator) c.term(1), p, pretty); //TODO Appender
+                        operationAppend((Compound) c.term(0), (Atomic)c.term(1), p, pretty); //TODO Appender
                     } else {
                         statementAppend(c, p, pretty, op);
                     }
@@ -187,7 +188,7 @@ public interface TermPrinter {
         p.append(closer);
     }
 
-    static void operationAppend(@NotNull Compound argsProduct, @NotNull Operator operator, @NotNull Appendable p, boolean pretty) throws IOException {
+    static void operationAppend(@NotNull Compound argsProduct, @NotNull Atomic operator, @NotNull Appendable p, boolean pretty) throws IOException {
 
         //Term predTerm = operator.identifier(); //getOperatorTerm();
 //        if ((predTerm.volume() != 1) || (predTerm.hasVar())) {

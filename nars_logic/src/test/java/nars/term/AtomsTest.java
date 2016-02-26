@@ -1,7 +1,5 @@
 package nars.term;
 
-import com.googlecode.concurrenttrees.common.PrettyPrinter;
-import com.googlecode.concurrenttrees.radix.node.util.PrettyPrintable;
 import nars.concept.DefaultConceptBuilder;
 import org.junit.Test;
 
@@ -17,7 +15,7 @@ public class AtomsTest {
 
         Atoms tree = new Atoms(new DefaultConceptBuilder());
 
-        int start = tree.getLastSerial();
+        int start = Atoms.getLastSerial();
 
         tree.resolveOrAdd("concept");
         tree.resolveOrAdd("term");
@@ -34,7 +32,7 @@ public class AtomsTest {
 
         tree.print(System.out);
 
-        assertEquals(4, tree.getLastSerial() - start);
+        assertEquals(4, Atoms.getLastSerial() - start);
 
 
 //        String stringWithUnicode = "unicode\u00easomething";

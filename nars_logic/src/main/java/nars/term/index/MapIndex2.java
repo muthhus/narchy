@@ -1,14 +1,12 @@
 package nars.term.index;
 
 import com.gs.collections.impl.map.mutable.primitive.IntObjectHashMap;
-import nars.$;
 import nars.Op;
 import nars.concept.AtomConcept;
 import nars.concept.Concept;
 import nars.term.*;
-import nars.term.atom.AtomicString;
+import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
-import nars.term.container.TermVector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -74,13 +72,13 @@ public class MapIndex2 extends AbstractMapIndex {
     }
 
     @NotNull
-    static TermVector vector(@NotNull Term t) {
-        return (TermVector)((Compound)t).subterms();
+    static TermContainer vector(@NotNull Term t) {
+        return ((Compound)t).subterms();
     }
 
 
     /** returns previous value */
-    private Object putItem(TermVector vv, int index, Termed value) {
+    private Object putItem(TermContainer vv, int index, Termed value) {
         SubtermNode g = getOrAddNode(vv);
         return value != null ? g.put(index, value) : null;
     }
@@ -164,7 +162,7 @@ public class MapIndex2 extends AbstractMapIndex {
     @Override
     @Deprecated public void put(@NotNull Termed t) {
         Term u = t.term();
-        if (u instanceof AtomicString) {
+        if (u instanceof Atomic) {
             atoms.putIfAbsent(t.toString(), ()->(AtomConcept)t);
         } else {
             Object replaced = putItem(vector(u), t.opRel(), t);

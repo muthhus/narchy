@@ -20,7 +20,6 @@
  */
 package nars.nal.nal8.operator;
 
-import nars.nal.nal8.Execution;
 import nars.task.Task;
 
 /**

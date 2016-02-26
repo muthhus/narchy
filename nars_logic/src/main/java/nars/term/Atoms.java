@@ -4,27 +4,16 @@ import com.googlecode.concurrenttrees.common.*;
 import com.googlecode.concurrenttrees.radix.MyConcurrentRadixTree;
 import com.googlecode.concurrenttrees.radix.node.Node;
 import com.googlecode.concurrenttrees.radix.node.NodeFactory;
-import com.googlecode.concurrenttrees.radix.node.concrete.DefaultByteArrayNodeFactory;
-import com.googlecode.concurrenttrees.radix.node.concrete.DefaultCharArrayNodeFactory;
 import com.googlecode.concurrenttrees.radix.node.concrete.bytearray.*;
-import com.googlecode.concurrenttrees.radix.node.concrete.chararray.*;
 import com.googlecode.concurrenttrees.radix.node.concrete.voidvalue.VoidValue;
-import com.googlecode.concurrenttrees.radix.node.util.NodeCharacterComparator;
 import com.googlecode.concurrenttrees.radix.node.util.NodeUtil;
-import com.googlecode.concurrenttrees.radix.node.util.PrettyPrintable;
 import nars.$;
-import nars.Op;
 import nars.concept.AtomConcept;
 import nars.concept.Concept;
-import nars.concept.DefaultConceptBuilder;
 import nars.term.atom.Atom;
-import nars.term.atom.Atomic;
 import nars.term.atom.AtomicString;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.function.Function;
 
 /**
@@ -42,7 +31,7 @@ public class Atoms extends MyConcurrentRadixTree<AtomConcept> {
     }
 
 
-    public int getLastSerial() {
+    public static int getLastSerial() {
         return serial;
     }
 
@@ -61,7 +50,8 @@ public class Atoms extends MyConcurrentRadixTree<AtomConcept> {
     public final AtomConcept resolveOrAdd(Atom a) {
 
         return putIfAbsent(a.id, () -> {
-            int s = (serial++);
+            int s = serial;
+            serial++;
             return (AtomConcept) conceptBuilder.apply(a);
         }); //new AtomicString(++serial));
 
@@ -70,7 +60,7 @@ public class Atoms extends MyConcurrentRadixTree<AtomConcept> {
     public void print(Appendable out) {
         System.out.println("Tree structure:");
         // PrettyPrintable is a non-public API for testing, prints semi-graphical representations of trees...
-        PrettyPrinter.prettyPrint((PrettyPrintable) this, out);
+        PrettyPrinter.prettyPrint(this, out);
     }
 
 

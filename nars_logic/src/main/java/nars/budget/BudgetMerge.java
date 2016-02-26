@@ -114,12 +114,12 @@ public interface BudgetMerge {
     /** add priority, interpolate durability and quality according to the relative change in priority
      *  WARNING untested
      * */
-    BudgetMerge max = (tgt, src, srcScaleIgnored) -> {
-        tgt.budget(
-                Util.max(src.priIfFiniteElseZero(), tgt.priIfFiniteElseZero()),
-                Util.max(src.dur(), tgt.dur()),
-                Util.max(src.qua(), tgt.qua()));
-    };
+    BudgetMerge max = (tgt, src, srcScaleIgnored) ->
+            tgt.budget(
+            Util.max(src.priIfFiniteElseZero(), tgt.priIfFiniteElseZero()),
+            Util.max(src.dur(), tgt.dur()),
+            Util.max(src.qua(), tgt.qua())
+        );
 
 //    /** the max priority, durability, and quality of two tasks */
 //    default Budget mergeMax(Budget b) {

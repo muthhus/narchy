@@ -2,6 +2,7 @@ package nars.term.variable;
 
 import nars.$;
 import nars.Op;
+import nars.term.atom.Atomic;
 import nars.term.atom.AtomicString;
 import org.jetbrains.annotations.NotNull;
 
@@ -12,11 +13,12 @@ public class GenericVariable extends AtomicString {
 
     @NotNull
     public final Op type;
+    @NotNull
     public  final String label;
     @NotNull
     private final String str;
 
-    public GenericVariable(@NotNull Op type, String label) {
+    public GenericVariable(@NotNull Op type, @NotNull String label) {
         this.label = label;
         this.type = type;
         this.str = type.ch + label;
@@ -70,11 +72,4 @@ public class GenericVariable extends AtomicString {
         return str;
     }
 
-    @Override
-    public final int compareTo(Object o) {
-        if (o instanceof GenericVariable) {
-            return str.compareTo(((GenericVariable)o).str);
-        }
-        return -1;
-    }
 }

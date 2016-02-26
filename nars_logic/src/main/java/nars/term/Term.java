@@ -68,7 +68,7 @@ public interface Term extends Termed, Comparable, Termlike {
         recurseTerms(v, null);
     }
 
-    void recurseTerms(@NotNull SubtermVisitor v, Compound parent);
+    void recurseTerms(@NotNull SubtermVisitor v, @Nullable Compound parent);
 
 
     /**

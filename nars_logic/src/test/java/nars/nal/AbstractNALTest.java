@@ -19,7 +19,7 @@ import static nars.util.data.LabeledSupplier.supply;
  * Created by me on 2/10/15.
  */
 @Ignore
-public abstract class AbstractNALTester {
+public abstract class AbstractNALTest {
 
 
     //final ThreadLocal<NAR> nars;
@@ -27,12 +27,12 @@ public abstract class AbstractNALTester {
     //private final NAR the;
     private TestNAR created;
 
-    protected AbstractNALTester(NAR nar) {
+    protected AbstractNALTest(NAR nar) {
         Global.DEBUG = true;
         this.nar = () -> nar;
     }
 
-    protected AbstractNALTester(Supplier<NAR> nar) {
+    protected AbstractNALTest(Supplier<NAR> nar) {
         Global.DEBUG = true;
         //this.the = nar.get();
         this.nar = nar;

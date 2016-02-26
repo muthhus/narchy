@@ -1,6 +1,5 @@
 package nars.op.data;
 
-import nars.nal.nal8.Execution;
 import nars.nal.nal8.operator.SyncOperator;
 import nars.task.Task;
 import nars.term.Term;

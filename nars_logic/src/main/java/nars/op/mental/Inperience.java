@@ -3,11 +3,11 @@ package nars.op.mental;
 import com.google.common.util.concurrent.AtomicDouble;
 import nars.*;
 import nars.budget.Budget;
-import nars.term.Operator;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.atom.Atomic;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -74,13 +74,13 @@ public class Inperience {
 //    }
 
 
-    public static final Operator believe = $.operator("believe");
-    public static final Operator want = $.operator("want");
-    public static final Operator wonder = $.operator("wonder");
-    public static final Operator evaluate = $.operator("evaluate");
-    public static final Operator anticipate = $.operator("anticipate");
+    public static final Atomic believe = $.operator("believe");
+    public static final Atomic want = $.operator("want");
+    public static final Atomic wonder = $.operator("wonder");
+    public static final Atomic evaluate = $.operator("evaluate");
+    public static final Atomic anticipate = $.operator("anticipate");
 
-    static final Operator[] nonInnateBeliefOperators = {
+    static final Atomic[] NON_INNATE_BELIEF_ATOMICs = {
             $.operator("remind"),
             $.operator("doubt"),
             $.operator("consider"),
@@ -124,7 +124,7 @@ public class Inperience {
 
     @Nullable
     public static Compound reify(@NotNull Task s, Term self, float conceptCreationExpectation) {
-        Operator opTerm;
+        Atomic opTerm;
         switch (s.punc()) {
             case Symbols.BELIEF:
                 opTerm = believe;
@@ -166,8 +166,8 @@ public class Inperience {
 
 
 
-    public static Operator randomNonInnate(@NotNull Random r) {
-        return nonInnateBeliefOperators[r.nextInt(nonInnateBeliefOperators.length)];
+    public static Atomic randomNonInnate(@NotNull Random r) {
+        return NON_INNATE_BELIEF_ATOMICs[r.nextInt(NON_INNATE_BELIEF_ATOMICs.length)];
     }
 
 
@@ -269,7 +269,7 @@ public class Inperience {
         }
     }
 
-    void nonInnate(@NotNull Task task, @NotNull Task belief, Operator op) {
+    void nonInnate(@NotNull Task task, @NotNull Task belief, Atomic op) {
         //the operators which dont have a innate belief
         //also get a chance to reveal its effects to the system this way
 

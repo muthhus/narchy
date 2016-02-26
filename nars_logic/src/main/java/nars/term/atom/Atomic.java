@@ -3,12 +3,12 @@ package nars.term.atom;
 import nars.term.Compound;
 import nars.term.SubtermVisitor;
 import nars.term.Term;
-import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.function.Predicate;
+
+import static nars.term.atom.Atom.toUnquoted;
 
 /** Base class for Atomic types. */
 public interface Atomic extends Term {
@@ -17,7 +17,7 @@ public interface Atomic extends Term {
     @Override
     default boolean isCompound() { return false; }
 
-    @Nullable
+    @NotNull
     @Override
     String toString();
 
@@ -40,6 +40,11 @@ public interface Atomic extends Term {
     @Override
     default String toString(boolean pretty) {
         return toString();
+    }
+
+    @NotNull
+    default String toStringUnquoted() {
+        return toUnquoted(toString());
     }
 
     @Override

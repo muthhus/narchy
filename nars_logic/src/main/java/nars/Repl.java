@@ -1,11 +1,9 @@
 package nars;
 
 import jline.console.ConsoleReader;
-import jline.console.completer.CompletionHandler;
 import nars.nar.Default;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  * TODO

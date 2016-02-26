@@ -1,11 +1,9 @@
 package nars.nal.meta;
 
-import nars.$;
 import nars.Global;
 import nars.Narsese;
 import nars.nal.Deriver;
 import nars.term.Compound;
-import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Terms;
 import nars.term.index.PatternIndex;
@@ -72,7 +70,7 @@ public class PremiseRuleSet {
     public PremiseRuleSet(@NotNull Collection<String> ruleStrings) {
         int[] errors = {0};
 
-        parse(load(ruleStrings), patterns).forEach(s -> rules.add(s));
+        parse(load(ruleStrings), patterns).forEach(rules::add);
 
 
         logger.info("indexed " + rules.size() + " total rules, consisting of " + patterns.size() + " unique pattern components terms");
@@ -152,11 +150,11 @@ public class PremiseRuleSet {
     }
 
 
-    private static final String[] equFull = {"<=>"/*, "</>", "<|>"*/};
-    private static final String[] implFull = {"==>"/*, "=/>" , "=|>", "=\\>"*/};
-    private static final String[] conjFull = {"&&"/*, "&|", "&/"*/};
-    @Nullable
-    private static final String[] unchanged = {null};
+//    private static final String[] equFull = {"<=>"/*, "</>", "<|>"*/};
+//    private static final String[] implFull = {"==>"/*, "=/>" , "=|>", "=\\>"*/};
+//    private static final String[] conjFull = {"&&"/*, "&|", "&/"*/};
+//    @Nullable
+//    private static final String[] unchanged = {null};
 
 //    /**
 //     * //TODO do this on the parsed rule, because string contents could be unpredictable:

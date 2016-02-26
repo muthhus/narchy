@@ -255,8 +255,8 @@ public abstract class Param extends Container implements Level {
             case BELIEF:
                 return defaultJudgmentTruth;
             default:
-                return null;
-                //throw new RuntimeException("invalid punctuation");
+                //return null;
+                throw new RuntimeException("invalid punctuation");
         }
     }
 

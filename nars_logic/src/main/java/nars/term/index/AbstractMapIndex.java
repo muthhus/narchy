@@ -1,15 +1,10 @@
 package nars.term.index;
 
-import nars.$;
-import nars.Op;
 import nars.concept.Concept;
-import nars.nal.Tense;
 import nars.nal.meta.match.Ellipsis;
 import nars.term.*;
 import nars.term.atom.Atom;
-import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
-import nars.term.container.TermVector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -70,7 +65,7 @@ public abstract class AbstractMapIndex implements TermIndex {
 
 
     @Nullable
-    @Override public Termed the(Termed t) {
+    @Override public Termed the(@NotNull Termed t) {
 
         if (t instanceof Ellipsis)
             ///throw new RuntimeException("ellipsis not allowed in this index");

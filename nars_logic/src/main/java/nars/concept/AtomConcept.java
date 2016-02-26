@@ -85,7 +85,7 @@ public class AtomConcept extends AbstractConcept implements Atomic {
 
     @Nullable
     @Override
-    public Task process(Task task, NAR nar) {
+    public Task process(@NotNull Task task, @NotNull NAR nar) {
         throw new UnsupportedOperationException();
     }
 

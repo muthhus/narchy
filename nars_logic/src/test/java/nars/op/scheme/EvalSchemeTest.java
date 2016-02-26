@@ -2,7 +2,7 @@ package nars.op.scheme;
 
 
 import nars.NAR;
-import nars.nal.AbstractNALTester;
+import nars.nal.AbstractNALTest;
 import nars.util.signal.TestNAR;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,7 +11,7 @@ import org.junit.runners.Parameterized;
 import java.util.function.Supplier;
 
 @RunWith(Parameterized.class)
-public class EvalSchemeTest extends AbstractNALTester {
+public class EvalSchemeTest extends AbstractNALTest {
 
     public EvalSchemeTest(Supplier<NAR> build) {
         super(build);
@@ -19,7 +19,7 @@ public class EvalSchemeTest extends AbstractNALTester {
 
     @Parameterized.Parameters(name = "{0}")
     public static Iterable configurations() {
-        return AbstractNALTester.nars(8, false);
+        return AbstractNALTest.nars(8, false);
     }
 
     String factorialFunc = "(define factorial (lambda (n) (if (= n 1) 1 (* n (factorial (- n 1))))))";

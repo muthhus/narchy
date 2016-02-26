@@ -36,8 +36,6 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.Set;
 
-import static nars.nal.Tense.ITERNAL;
-
 /**
  * a compound term
  * TODO make this an interface extending Subterms

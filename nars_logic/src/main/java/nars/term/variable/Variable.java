@@ -21,16 +21,9 @@
 package nars.term.variable;
 
 
-import nars.$;
 import nars.Op;
-import nars.term.Term;
-import nars.term.Termlike;
-import nars.term.Terms;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.io.IOException;
 
 /**
  * Normalized variable

@@ -24,7 +24,7 @@ package nars.nal.nal8;
 import nars.$;
 import nars.NAR;
 import nars.task.Task;
-import nars.term.Operator;
+import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,14 +36,14 @@ import java.util.function.Consumer;
 public abstract class AbstractOperator implements Consumer<Task> {
 
 
-    public final @NotNull Operator operatorTerm;
+    public final @NotNull Atomic atomicTerm;
 
     protected NAR nar; //TODO make private
 
     @NotNull
     @Override
     public String toString() {
-        return operatorTerm.toString();
+        return atomicTerm.toString();
     }
 
 //    public AbstractOperator(@Nullable Term term) {
@@ -65,7 +65,7 @@ public abstract class AbstractOperator implements Consumer<Task> {
         if (operatorName == null) {
             operatorName = getClass().getSimpleName();
         }
-        this.operatorTerm = $.operator(operatorName);
+        this.atomicTerm = $.operator(operatorName);
     }
 
 
@@ -112,9 +112,8 @@ public abstract class AbstractOperator implements Consumer<Task> {
      */
     public boolean async() { return false; }
 
-    @Nullable
-    public final Operator getOperatorTerm() {
-        return operatorTerm;
+    public final @Nullable Atomic getOperatorTerm() {
+        return atomicTerm;
     }
 
     /** this will be called prior to any execution */

@@ -7,13 +7,13 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.ConsoleAppender;
 import nars.op.sys.java.ObjRef;
 import nars.nal.meta.match.VarPattern;
-import nars.term.Operator;
 import nars.op.sys.java.DefaultTermizer;
 import nars.op.sys.java.Termizer;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.*;
 import nars.term.atom.Atom;
+import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.term.variable.*;
 import nars.truth.Truth;
@@ -133,7 +133,7 @@ public enum $ /* TODO: implements TermIndex */ {
 
     /** execution (NARS "operation") */
     @NotNull
-    public static Compound exec(@NotNull Operator opTerm, Term... arg) {
+    public static Compound exec(@NotNull Atomic opTerm, Term... arg) {
         return exec(opTerm, $.p(arg));
     }
 
@@ -143,7 +143,7 @@ public enum $ /* TODO: implements TermIndex */ {
 
     /** execution (NARS "operation") */
     @NotNull
-    public static Compound exec(@NotNull Operator opTerm, @Nullable Compound arg) {
+    public static Compound exec(@NotNull Atomic opTerm, @Nullable Compound arg) {
         return (Compound) the(
                 INHERIT,
                 arg == null ? Empty : arg,
@@ -163,8 +163,8 @@ public enum $ /* TODO: implements TermIndex */ {
     }
 
     @NotNull
-    public static <T extends Term> Compound<T> p(@NotNull Collection<? super T> t) {
-        return $.p(t.toArray((T[]) new Term[t.size()]));
+    public static Compound<?> p(@NotNull Collection<? super Term> t) {
+        return $.p(t.toArray(new Term[t.size()]));
     }
 
     @Nullable
@@ -184,8 +184,8 @@ public enum $ /* TODO: implements TermIndex */ {
     }
 
     @NotNull
-    public static Compound<Atom> p(@NotNull String... t) {
-        return $.p((Atom[]) $.the(t));
+    public static Compound/*<Atom>*/ p(@NotNull String... t) {
+        return $.p((Term[]) $.the(t));
     }
 
     @NotNull
@@ -501,8 +501,7 @@ public enum $ /* TODO: implements TermIndex */ {
     }
 
 
-    @NotNull
-    public static Operator operator(@NotNull String name) {
+    public static @NotNull Atomic operator(@NotNull String name) {
         return new Operator(name);
     }
 

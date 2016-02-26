@@ -1,16 +1,8 @@
 package nars.nal.meta.match;
 
-import nars.$;
 import nars.Op;
-import nars.term.Compound;
-import nars.term.SubtermVisitor;
-import nars.term.Term;
 import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.io.IOException;
-import java.util.function.Predicate;
 
 /**
  * normalized pattern variable

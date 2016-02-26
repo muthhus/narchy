@@ -1,12 +1,9 @@
 package nars.term.transform.subst.choice;
 
-import nars.$;
 import nars.nal.meta.match.Ellipsis;
 import nars.nal.meta.match.EllipsisMatch;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.term.transform.subst.FindSubst;
-import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;

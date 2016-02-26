@@ -23,7 +23,6 @@ package nars.task;
 import nars.*;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
-import nars.concept.AtomConcept;
 import nars.concept.Concept;
 import nars.nal.Tense;
 import nars.term.*;
@@ -417,12 +416,12 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
 
 
-    @Nullable
+    @NotNull
     default StringBuilder toString(/**@Nullable*/Memory memory) {
         return appendTo(null, memory);
     }
 
-    @Nullable
+    @NotNull
     default StringBuilder appendTo(@Nullable StringBuilder sb, /**@Nullable*/Memory memory) {
         if (sb == null) sb = new StringBuilder();
         return appendTo(sb, memory, false);

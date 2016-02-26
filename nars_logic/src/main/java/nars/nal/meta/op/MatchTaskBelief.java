@@ -267,7 +267,7 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseEval> {
         public ComponentCondition(int container, int[] path, int contained) {
             this.id = "component(" + container + ",(" + Joiner.on(",").join(
                     Ints.asList(path)
-            ) + ")," + contained + ")";
+            ) + ")," + contained + ')';
 
             this.container = container;
             this.contained = contained;

@@ -84,7 +84,7 @@ public class DataBase extends BlackBoard {
         Fun R = new Fun("$", To.toArray(new PTerm[To.size()]));
         // IO.mes("RR"+R);
         // To.copyInto(R.args);
-        return ((Cons) R.listify()).args[1];
+        return R.listify().args[1];
     }
 
     private PTerm all2(int max, @Nullable String k, @NotNull PTerm FXs) {
@@ -98,7 +98,7 @@ public class DataBase extends BlackBoard {
             return PTerm.NIL;
         Fun R = new Fun("$", (PTerm[]) To.toArray());
         // To.copyInto(R.args);
-        PTerm T = ((Cons) R.listify()).args[1];
+        PTerm T = R.listify().args[1];
         return T;
     }
 

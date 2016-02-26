@@ -1,6 +1,7 @@
 package nars.term;
 
 import nars.Op;
+import nars.term.atom.Atomic;
 import nars.term.atom.AtomicStringConstant;
 import org.jetbrains.annotations.NotNull;
 
@@ -51,9 +52,10 @@ public final class Operator<T extends Term> extends AtomicStringConstant {
         return opArgs(term).terms();
     }
 
-    /** returns the Operator predicate of an operation. does not check if the input is actually an operation */
-    @NotNull public static Operator operator(@NotNull Compound operation) {
-        return ((Operator) operation.term(1));
+    /** returns the Operator predicate of an operation. */
+    @NotNull public static Atomic operator(@NotNull Compound operation) {
+        Term o = operation.term(1);
+        return (o!=null && o.op() == Op.OPERATOR) ? ((Atomic) o) : null;
     }
 
     @NotNull

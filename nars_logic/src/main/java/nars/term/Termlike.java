@@ -1,6 +1,5 @@
 package nars.term;
 
-import nars.Op;
 import nars.nal.meta.match.Ellipsis;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

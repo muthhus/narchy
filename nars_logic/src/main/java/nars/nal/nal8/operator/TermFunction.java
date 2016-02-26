@@ -226,7 +226,7 @@ public abstract class TermFunction<O> extends SyncOperator {
         return a.equals(b) ? 1.0f : 0.0f;
     }
 
-    private boolean validArgs(@NotNull Compound args) {
+    private static boolean validArgs(@NotNull Compound args) {
         //TODO filtering
         return args.size()>=1 && args.last().op() == Op.VAR_DEP;
     }

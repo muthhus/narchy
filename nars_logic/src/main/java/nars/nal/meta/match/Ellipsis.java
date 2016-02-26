@@ -6,7 +6,6 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.container.TermContainer;
 import nars.term.transform.VariableNormalization;
-import nars.term.variable.GenericNormalizedVariable;
 import nars.term.variable.GenericVariable;
 import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
@@ -240,6 +239,7 @@ public abstract class Ellipsis extends Variable {
 
     public abstract boolean validSize(int collectable);
 
+    @NotNull
     @Override
     public
     Op op() {

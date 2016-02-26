@@ -122,7 +122,7 @@ public class Twenglish {
                 case "!": sentenceType = GOAL; break;
             }
         }
-        if (!"fragment".equals(sentenceType))
+        if (!"fragment".equals(sentenceType.toString()))
             t.removeLast(); //remove the punctuation, it will be redundant
 
         List<Task> tt = new ArrayList();

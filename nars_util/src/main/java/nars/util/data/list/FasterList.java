@@ -32,10 +32,10 @@ public class FasterList<X> extends FastList<X> {
     }
 
     /** uses array directly */
-    @SafeVarargs
-    public FasterList(int size, X... x) {
+    public FasterList(int size, X[] x) {
         super(size, x);
     }
+
     @SafeVarargs
     public FasterList(X... x) {
         super(x);

@@ -19,7 +19,7 @@ public final class SubTermOps2 extends AtomicBooleanCondition<PremiseEval> {
     public SubTermOps2(Op left, Op right) {
         this.left = left;
         this.right = right;
-        this.id = "SubTermOps:(\"" + left + "\",\"" + right + "\"" + "\")";
+        this.id = "SubTermOps:(\"" + left + "\",\"" + right + '"' + "\")";
     }
 
     @NotNull
