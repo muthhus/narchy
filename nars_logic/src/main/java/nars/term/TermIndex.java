@@ -13,7 +13,6 @@ import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
-import nars.term.container.TermSet;
 import nars.term.container.TermVector;
 import nars.term.transform.CompoundTransform;
 import nars.term.transform.VariableNormalization;
@@ -111,18 +110,31 @@ public interface TermIndex  {
 
     void put(Termed termed);
 
-    /** should be called after a new entry needed to be created for the novel termcontainer */
     @Nullable default TermContainer normalize(TermContainer s) {
+        if (s instanceof TermVector)
+            return normalize((TermVector)s);
+        else if (s instanceof Terms.EmptyTermContainer)
+            return s;
+
+        //TODO implement normalization for any non-container types
+        throw new UnsupportedOperationException();
+    }
+
+    /** should be called after a new entry needed to be created for the novel termcontainer */
+    @Nullable default TermContainer normalize(TermVector s) {
         Term[] x = s.terms();
-        for (int i = 0; i < x.length; i++) {
+        int l = x.length;
+        for (int i = 0; i < l; i++) {
             Term a = x[i];
             Termed b = the(a);
             if (b == null) {
                 //throw new UnbuildableTerm(s.terms());
                 //return null;
                 //just use the input term
-            } else if (a!=b)
+
+            } else if (a!=b) {
                 x[i] = b.term();
+            }
         }
         return s;
     }
@@ -181,6 +193,25 @@ public interface TermIndex  {
                 }
 
                 sub.add(u != null ? u : t);
+            }
+        }
+
+        final int minArity = sop.minSize;
+        int resultSize = sub.size();
+
+        //early filter for invalid image
+        if (sop.isImage()) {
+            if (sub.isEmpty() || (resultSize==1 && sub.get(0).equals( Imdex)) )
+                return null;
+        }
+
+        if ((minArity!=-1) && (resultSize < minArity)) {
+            //?
+        } else if (resultSize == 0) {
+            switch (sop) {
+                case SET_EXT_OPENER: return Terms.ZeroSetExt;
+                case SET_INT_OPENER: return Terms.ZeroSetInt;
+                case PRODUCT: return Terms.ZeroProduct;
             }
         }
 

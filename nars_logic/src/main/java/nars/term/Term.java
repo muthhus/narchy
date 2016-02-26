@@ -172,12 +172,12 @@ public interface Term extends Termed, Comparable, Termlike {
 //        return name().toStringBuilder(pretty);
 //    }
 
-    @Deprecated @Nullable String toString(boolean pretty);
+    @Deprecated @NotNull String toString(boolean pretty);
 //    default public String toString(boolean pretty) {
 //        return toStringBuilder(pretty).toString();
 //    }
 
-    default String toStringCompact() {
+    @NotNull default String toStringCompact() {
         return toString();
     }
 
@@ -200,7 +200,7 @@ public interface Term extends Termed, Comparable, Termlike {
 
     /** upper 16 bits: ordinal, lower 16 bits: relation (default=-1) */
     @Override default int opRel() {
-        return op().ordinal()<<16 | (-1 & 0xffff);
+        return op().ordinal()<<16 | (0xffff);
     }
 
     boolean isCompound();

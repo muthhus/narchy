@@ -10,6 +10,8 @@ import nars.term.TermIndex;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -24,6 +26,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class MethodOperator  {
 
     static final TypeParser parser = TypeParser.newBuilder().build();
+    final static Logger logger = LoggerFactory.getLogger(MethodOperator.class);
 
     @NotNull
     private final Method method;
@@ -168,14 +171,12 @@ public class MethodOperator  {
             }
 
         } catch (Throwable e) {
+
+            logger.error("{}",e);
+
             //System.err.println(method + " <- " + instance + " (" + instance.getClass() + " =?= " + method.getDeclaringClass() + "\n\t<<< " + Arrays.toString(args));
             //nar.memory.eventError.emit(e);
             context.volition.set(null);
-
-            if (Global.DEBUG) {
-                e.printStackTrace();
-                //throw new RuntimeException(e);
-            }
 
 
             return null;

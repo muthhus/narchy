@@ -99,8 +99,6 @@ public class Derive extends AtomicStringConstant implements ProcTerm {
 
         Term derivedTerm = m.resolve(conclusionPattern);
 
-        if (derivedTerm == null)
-            return;
 
         if ((derivedTerm instanceof EllipsisMatch)) {
             //TODO hack prevent this
@@ -117,6 +115,9 @@ public class Derive extends AtomicStringConstant implements ProcTerm {
                     return;
             }
         }
+
+        if (derivedTerm == null)
+            return;
 
         if (ensureValidVolume(derivedTerm)) {
             if (postMatch.booleanValueOf(m))
@@ -151,7 +152,7 @@ public class Derive extends AtomicStringConstant implements ProcTerm {
 
 
     /** part 1 */
-    private void derive(@NotNull PremiseEval p, @Nullable Term t) {
+    private void derive(@NotNull PremiseEval p, @NotNull Term t) {
 
         if (t.varPattern()!=0) {
             return;

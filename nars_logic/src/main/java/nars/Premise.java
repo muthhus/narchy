@@ -239,12 +239,13 @@ public interface Premise extends Level, Tasked {
         else {
             long bOcc = b.occurrence();
 
-            if (tOcc == ETERNAL) {
-                if (bOcc!=ETERNAL) return bOcc;
-                else return ETERNAL;
-            } else { //if (bOcc == ETERNAL) {
-                return whenBothNonEternal.compute(tOcc, bOcc);
-            }
+            //if (bOcc == ETERNAL) {
+            return (tOcc != ETERNAL) ?
+                        whenBothNonEternal.compute(tOcc, bOcc) :
+                        ((bOcc != ETERNAL) ?
+                            bOcc :
+                            ETERNAL
+            );
         }
     }
 

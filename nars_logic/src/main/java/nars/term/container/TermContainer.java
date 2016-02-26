@@ -36,8 +36,9 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
     @Nullable T term(int i);
 
     /** tests if subterm i is op o */
-    default boolean term(int i, Op o) {
-        return term(i).op() == o;
+    default boolean term(int i, @NotNull Op o) {
+        @Nullable T ti = term(i);
+        return ti!=null && (ti.op() == o);
     }
 
     @Nullable
@@ -45,11 +46,11 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
         return size() <= i ? ifOutOfBounds : term(i);
     }
 
-    default MutableSet<Term> toSet() {
+    default @NotNull  MutableSet<Term> toSet() {
         return Sets.mutable.of(terms());
     }
 
-    static MutableSet<Term> intersect(@NotNull TermContainer a, @NotNull TermContainer b) {
+    static @NotNull MutableSet<Term> intersect(@NotNull TermContainer a, @NotNull TermContainer b) {
         return Sets.intersect(a.toSet(),b.toSet());
     }
 

@@ -48,7 +48,7 @@ public abstract class Budget extends BudgetedHandle {
         return toStringBuilder(new StringBuilder(), Texts.n4(b.pri()), Texts.n4(b.dur()), Texts.n4(b.qua())).toString();
     }
 
-    @org.jetbrains.annotations.Nullable
+    @NotNull
     public static StringBuilder toStringBuilder(@org.jetbrains.annotations.Nullable StringBuilder sb, @NotNull CharSequence priorityString, @NotNull CharSequence durabilityString, @NotNull CharSequence qualityString) {
         int c = 1 + priorityString.length() + 1 + durabilityString.length() + 1 + qualityString.length() + 1;
         if (sb == null)

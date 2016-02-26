@@ -180,7 +180,7 @@ public final class Var extends PTerm {
 	public
 	@NotNull
 	StringBuilder toStringBuilder(boolean pretty) {
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	@Nullable

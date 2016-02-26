@@ -33,7 +33,7 @@ public class TermSet<X extends Term> extends TermVector<X> {
 
     @NotNull
     public static TermSet union(@NotNull TermContainer a, @NotNull TermContainer b) {
-        TreeSet<Term> t = new TreeSet<Term>();
+        TreeSet<Term> t = new TreeSet<>();
         a.addAllTo(t);
         b.addAllTo(t);
         return TermSet.the(t);
@@ -53,7 +53,7 @@ public class TermSet<X extends Term> extends TermVector<X> {
     }
 
     public static Term[] toSortedSetArray(Collection<? extends Term> c) {
-        TreeSet<Term> t = c instanceof TreeSet ? (TreeSet<Term>) c : new TreeSet<Term>(c);
+        TreeSet<Term> t = c instanceof TreeSet ? (TreeSet<Term>) c : new TreeSet<>(c);
         return t.toArray(new Term[t.size()]);
     }
 

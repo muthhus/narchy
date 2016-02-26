@@ -108,8 +108,8 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseEval> {
 
 
 
-        Term task = pattern.term(0);
-        Term belief = pattern.term(1);
+        @NotNull Term task = pattern.term(0);
+        @NotNull Term belief = pattern.term(1);
 
         BooleanCondition addToEndOfPreGuards = null;
 

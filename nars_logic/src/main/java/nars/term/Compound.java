@@ -144,7 +144,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
         return toString(false);
     }
 
-    @Nullable
+    @NotNull
     @Override
     default String toString(boolean pretty) {
         return toStringBuilder(pretty).toString();

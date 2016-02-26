@@ -97,7 +97,7 @@ public interface Temporalize {
 
         int t = ITERNAL;
 
-        Term cp = d.conclusionPattern;
+        Term cp = d.conclusionPattern; //TODO this may be a wrapped immediatefunction?
 
         if (derived.op().isTemporal() && cp.isCompound()) {
 

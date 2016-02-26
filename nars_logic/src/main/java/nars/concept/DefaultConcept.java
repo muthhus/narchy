@@ -71,14 +71,18 @@ public class DefaultConcept extends AbstractConcept {
         return tableOrEmpty(quests);
     }
 
-    @Nullable
+    @NotNull
     @Override
     public final QuestionTaskTable questions() {
         return tableOrEmpty(questions);
     }
 
-    private static QuestionTaskTable tableOrEmpty(QuestionTaskTable q) {
+    @NotNull private static QuestionTaskTable tableOrEmpty(QuestionTaskTable q) {
         if (q == null) return TaskTable.EMPTY;
+        return q;
+    }
+    @NotNull private static BeliefTable tableOrEmpty(BeliefTable q) {
+        if (q == null) return BeliefTable.EMPTY;
         return q;
     }
 
@@ -87,19 +91,19 @@ public class DefaultConcept extends AbstractConcept {
      * Judgments directly made about the term Use ArrayList because of access
      * and insertion in the middle
      */
-    @Nullable
+    @NotNull
     @Override
     public final BeliefTable beliefs() {
-        return beliefs == null ? BeliefTable.EMPTY : beliefs;
+        return tableOrEmpty(beliefs);
     }
 
     /**
      * Desire values on the term, similar to the above one
      */
-    @Nullable
+    @NotNull
     @Override
     public final BeliefTable goals() {
-        return goals == null ? BeliefTable.EMPTY : goals;
+        return tableOrEmpty(goals);
     }
 
     @Override

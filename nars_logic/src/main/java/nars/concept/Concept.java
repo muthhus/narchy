@@ -311,17 +311,11 @@ public interface Concept extends Termed, Comparable {
     }
 
     default float beliefElse(long now, float valueIfMissing) {
-        if (hasBeliefs())
-            return beliefs().top(now).motivation();
-        else
-            return valueIfMissing;
+        return hasBeliefs() ? beliefs().top(now).motivation() : valueIfMissing;
     }
 
     default float motivationElse(long now, float valueIfMissing) {
-        if (hasGoals())
-            return goals().top(now).motivation();
-        else
-            return valueIfMissing;
+        return hasGoals() ? goals().top(now).motivation() : valueIfMissing;
     }
 
 

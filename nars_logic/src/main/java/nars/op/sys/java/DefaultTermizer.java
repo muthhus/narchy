@@ -261,7 +261,7 @@ public class DefaultTermizer implements Termizer {
     }
 
     @NotNull
-    private Term[] getArgVariables(String prefix, int numParams) {
+    private static Term[] getArgVariables(String prefix, int numParams) {
         Term[] x = new Term[numParams];
         for (int i = 0; i < numParams; i++) {
             x[i] = $.varDep(prefix + i);

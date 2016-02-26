@@ -10,9 +10,7 @@ import com.googlecode.concurrenttrees.radix.node.util.NodeUtil;
 import nars.$;
 import nars.concept.AtomConcept;
 import nars.concept.Concept;
-import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
-import nars.term.atom.AtomicString;
 
 import java.util.List;
 import java.util.function.Function;

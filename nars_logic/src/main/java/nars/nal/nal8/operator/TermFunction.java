@@ -14,6 +14,8 @@ import nars.truth.Truth;
 import nars.util.Texts;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /** 
@@ -22,6 +24,8 @@ import org.jetbrains.annotations.Nullable;
  * with the result of the function substituted in the variable's place.
  */
 public abstract class TermFunction<O> extends SyncOperator {
+
+    private static final Logger logger = LoggerFactory.getLogger(TermFunction.class);
 
     protected TermFunction() {
     }
@@ -195,7 +199,7 @@ public abstract class TermFunction<O> extends SyncOperator {
                     return;
                 }
             } catch (Throwable t) {
-                t.printStackTrace();
+                logger.error("execution {} threw {}", cause, t);
             }
         }
 

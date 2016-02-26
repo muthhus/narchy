@@ -211,11 +211,9 @@ public class Terms extends TermBuilder implements TermIndex {
                     return equalSubjectPredicateInRespectToImageAndProduct((Compound) a, (Compound) b);
 
                 case SIMILAR:
-                    boolean x = equalSubjectPredicateInRespectToImageAndProduct((Compound) a, (Compound) b);
-
                     //only half seems necessary:
                     //boolean y = equalSubjectPredicateInRespectToImageAndProduct((Compound) b, (Compound) a);
-                    return x;
+                    return equalSubjectPredicateInRespectToImageAndProduct((Compound) a, (Compound) b);
             }
         }
 
@@ -226,10 +224,8 @@ public class Terms extends TermBuilder implements TermIndex {
             return false;
 
         //match all subterms
-        Term[] at = A.terms();
-        Term[] bt = B.terms();
         for (int i = 0; i < aLen; i++) {
-            if (!equalSubTermsInRespectToImageAndProduct(at[i], bt[i]))
+            if (!equalSubTermsInRespectToImageAndProduct(A.term(i), B.term(i)))
                 return false;
         }
         return true;

@@ -125,8 +125,8 @@ public class Derivelet {
             n.input(derived);
     };
 
-    final Consumer<ConceptProcess> perPremise = p ->
-            matcher.start(p);
+//    final Consumer<ConceptProcess> perPremise = p ->
+//            matcher.start(p);
 
 
     public final void start(final Concept concept, int ttl, @NotNull final DeriveletContext context) {

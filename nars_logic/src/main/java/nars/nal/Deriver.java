@@ -5,7 +5,8 @@ import nars.nal.meta.PremiseEval;
 import nars.nal.meta.PremiseRuleSet;
 import nars.nal.meta.TrieDeriver;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -22,6 +23,8 @@ public abstract class Deriver  {
 
     private static PremiseRuleSet defaultRules;
 
+    final static Logger logger = LoggerFactory.getLogger(Deriver.class);
+
     @NotNull
     public static TrieDeriver getDefaultDeriver() {
         if (defaultRules == null) {
@@ -31,7 +34,7 @@ public abstract class Deriver  {
                         defaultRules = new PremiseRuleSet();
                         defaultDeriver = new TrieDeriver( defaultRules );
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        logger.error("{}",e.getCause());
                         System.exit(1);  //e.printStackTrace();
                     }
                 }
@@ -46,8 +49,6 @@ public abstract class Deriver  {
     /**
      * default set of rules, statically available
      */
-    @NotNull
-
     public final PremiseRuleSet rules;
 
 

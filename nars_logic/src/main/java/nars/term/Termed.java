@@ -30,4 +30,6 @@ public interface Termed<TT extends Term>  {
     default boolean isCompound() {
         return term().isCompound();
     }
+
+
 }

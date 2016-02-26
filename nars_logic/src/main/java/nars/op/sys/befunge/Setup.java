@@ -1,4 +1,4 @@
-package nars.op.software.befunge;
+package nars.op.sys.befunge;
 
 import java.io.BufferedReader;
 import java.io.IOException;

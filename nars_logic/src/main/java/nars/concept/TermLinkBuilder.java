@@ -32,10 +32,7 @@ public enum TermLinkBuilder {
         Set<Termed> components = Global.newHashSet(0);
         prepareComponentLinks(host.term(), components, nar);
 
-        if (components.isEmpty())
-            return Collections.emptyList();
-        else
-            return new FasterList(components);
+        return !components.isEmpty() ? new FasterList(components) : Collections.emptyList();
     }
 
     static final int NegationOrConjunction = Op.or(Op.CONJUNCTION, Op.NEGATE);

@@ -240,7 +240,7 @@ public final class BudgetFunctions extends UtilityFunctions {
      * @param truth The truth value of the conclusion
      * @return The budget value of the conclusion
      */
-    @NotNull
+    @Nullable
     public static Budget forward(@NotNull Truth truth, @NotNull ConceptProcess nal) {
         return budgetInference(truthToQuality(truth), 1, nal);
     }
@@ -252,7 +252,7 @@ public final class BudgetFunctions extends UtilityFunctions {
      * @param nal   Reference to the memory
      * @return The budget value of the conclusion
      */
-    @NotNull
+    @Nullable
     public static Budget backward(@NotNull Truth truth, @NotNull ConceptProcess nal) {
         return budgetInference(truthToQuality(truth), 1, nal);
     }
@@ -264,7 +264,7 @@ public final class BudgetFunctions extends UtilityFunctions {
      * @param nal   Reference to the memory
      * @return The budget value of the conclusion
      */
-    @NotNull
+    @Nullable
     public static Budget backwardWeak(@NotNull Truth truth, @NotNull ConceptProcess nal) {
         return budgetInference(w2c(1) * truthToQuality(truth), 1, nal);
     }
@@ -287,7 +287,7 @@ public final class BudgetFunctions extends UtilityFunctions {
      * @param content The content of the conclusion
      * @return The budget of the conclusion
      */
-    @NotNull
+    @Nullable
     public static Budget compoundBackward(@NotNull Termed content, @NotNull ConceptProcess nal) {
         return budgetInference(1.0f, content.term().complexity(), nal);
     }
@@ -299,7 +299,7 @@ public final class BudgetFunctions extends UtilityFunctions {
      * @param nal     Reference to the memory
      * @return The budget of the conclusion
      */
-    @NotNull
+    @Nullable
     public static Budget compoundBackwardWeak(@NotNull Termlike content,
                                               @NotNull ConceptProcess nal) {
         return budgetInference(w2c(1), content.complexity(), nal);

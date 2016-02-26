@@ -66,7 +66,7 @@ public class Choose2 extends Termutator {
 
         int start = f.now();
 
-        while (!(!(ccc.hasNext() || !state))) {
+        while (ccc.hasNext() || !state) {
 
             int[] c = state ? ccc.next() : ccc.prev();
             state = !state;

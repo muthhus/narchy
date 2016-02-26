@@ -367,7 +367,7 @@ public class Lobjects extends DefaultTermizer implements Termizer, MethodHandler
      * the id will be the atom term label for the created instance
      */
     @NotNull
-    <T> T the(Atom identifier, @NotNull T wrappedInstance) throws Exception {
+    <T> T the(Atom identifier, @NotNull T wrappedInstance) {
 
 
         map(identifier, wrappedInstance);

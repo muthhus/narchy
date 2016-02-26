@@ -56,13 +56,15 @@ public class DefaultBeliefTable implements BeliefTable {
         this.ageFactor = 1f/(memory.duration()*2f);
 
         /** Ranking by originality is a metric used to conserve original information in balance with confidence */
-        eternal = new SetTable<Task>(map, new ArraySortedIndex<Task>(cap) {
-            @Override public float score(@NotNull Task v) {
+        eternal = new SetTable<>(map, new ArraySortedIndex<Task>(cap) {
+            @Override
+            public float score(@NotNull Task v) {
                 return BeliefTable.rankEternalByOriginality(v);
             }
         });
-        temporal = new SetTable<Task>(map, new ArraySortedIndex<Task>(cap) {
-            @Override public float score(@NotNull Task v) {
+        temporal = new SetTable<>(map, new ArraySortedIndex<Task>(cap) {
+            @Override
+            public float score(@NotNull Task v) {
                 return rankTemporalByOriginality(v);
             }
         });

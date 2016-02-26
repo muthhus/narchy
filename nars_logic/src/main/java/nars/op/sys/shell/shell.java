@@ -181,8 +181,8 @@ public class shell {
                 System.out.println("Default manager: \"" + mgr.getClass().getName() + "\" " +
                         "version " + getVersion(mgr.getClass()));
                 String[] schemes = mgr.getSchemes();
-                List<String> virtual = new ArrayList<String>();
-                List<String> physical = new ArrayList<String>();
+                List<String> virtual = new ArrayList<>();
+                List<String> physical = new ArrayList<>();
                 for (int i = 0; i < schemes.length; i++) {
                     Collection<Capability> caps = mgr.getProviderCapabilities(schemes[i]);
                     if (caps != null) {
@@ -411,7 +411,7 @@ public class shell {
             if (line == null) {
                 return null;
             }
-            final ArrayList<String> cmd = new ArrayList<String>();
+            final ArrayList<String> cmd = new ArrayList<>();
             final StringTokenizer tokens = new StringTokenizer(line);
             while (tokens.hasMoreTokens()) {
                 cmd.add(tokens.nextToken());

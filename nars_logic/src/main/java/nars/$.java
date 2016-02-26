@@ -162,7 +162,7 @@ public enum $ /* TODO: implements TermIndex */ {
     }
 
     @NotNull
-    public static Compound<?> p(@NotNull Collection<? super Term> t) {
+    public static Compound p(@NotNull Collection<? super Term> t) {
         return $.p(t.toArray(new Term[t.size()]));
     }
 

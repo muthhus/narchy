@@ -3,7 +3,6 @@ package nars.term.container;
 import com.google.common.base.Joiner;
 import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
 import nars.Op;
-import nars.nal.meta.ProcTerm;
 import nars.nal.meta.match.Ellipsis;
 import nars.term.*;
 import org.apache.commons.lang3.ArrayUtils;
@@ -55,11 +54,11 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
 //        this(null);
 //    }
 
-    public TermVector(@NotNull Collection<T> t, Class c) {
+    public TermVector(@NotNull Collection<? extends T> t, Class c) {
         this((T[]) t.toArray((T[]) Array.newInstance(c, t.size())));
     }
 
-    public TermVector(@NotNull Collection<T> t) {
+    public TermVector(@NotNull Collection<? extends T> t) {
         this((T[]) t.toArray(new Term[t.size()]));
     }
 
@@ -320,8 +319,8 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
 
     /** creates a copy if changed */
     @NotNull
-    @Override public TermVector replacing(int subterm, Term replacement) {
-        if (term(subterm).equals(replacement))
+    @Override public TermVector replacing(int subterm, @NotNull Term replacement) {
+        if (replacement.equals(term(subterm)))
             return this;
 
         Term[] t = terms().clone();

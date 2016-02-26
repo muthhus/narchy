@@ -185,7 +185,7 @@ public class Builtins extends HashDict {
 	/**
 	 * Flushes to a Sink the content of a Source Fluent
 	 */
-	final class discharge extends FunBuiltin {
+	final static class discharge extends FunBuiltin {
 		discharge() {
 			super("discharge", 2);
 		}

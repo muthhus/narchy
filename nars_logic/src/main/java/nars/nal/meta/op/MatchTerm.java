@@ -44,7 +44,7 @@ abstract public class MatchTerm extends AtomicBooleanCondition<PremiseEval> impl
     }
 
 
-    @NotNull static private Term id(@NotNull Term pattern, @Nullable ImmutableMap<Term, MatchConstraint> constraints) {
+    @Nullable static private Term id(@NotNull Term pattern, @Nullable ImmutableMap<Term, MatchConstraint> constraints) {
         return (constraints == null) ?
                 //no constraints
                 pattern :
@@ -53,18 +53,18 @@ abstract public class MatchTerm extends AtomicBooleanCondition<PremiseEval> impl
     }
 
 
-    public static final class MatchTaskBeliefPair extends MatchTerm {
-
-        public MatchTaskBeliefPair(@NotNull TaskBeliefPair x, @Nullable ImmutableMap<Term, MatchConstraint> constraints) {
-            super(id(x, constraints), x, constraints);
-        }
-
-        @Override
-        @Deprecated public final boolean booleanValueOf(@NotNull PremiseEval p) {
-            p.matchAll(x, p.term.get() /* current term */, this, constraints);
-            return true;
-        }
-    }
+//    public static final class MatchTaskBeliefPair extends MatchTerm {
+//
+//        public MatchTaskBeliefPair(@NotNull TaskBeliefPair x, @Nullable ImmutableMap<Term, MatchConstraint> constraints) {
+//            super(id(x, constraints), x, constraints);
+//        }
+//
+//        @Override
+//        @Deprecated public final boolean booleanValueOf(@NotNull PremiseEval p) {
+//            p.matchAll(x, p.term.get() /* current term */, this, constraints);
+//            return true;
+//        }
+//    }
 
     public static final class MatchOneSubterm extends MatchTerm {
 

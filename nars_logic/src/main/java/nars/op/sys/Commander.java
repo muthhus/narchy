@@ -53,7 +53,7 @@ public class Commander implements Consumer<NAR>, Supplier<Concept> {
 //            priorityRemaining = 0; //change left over from last cycle
 
     public Commander(@NotNull NAR nar, int capacity) {
-        this(nar, new ItemAccumulator<Task>(capacity));
+        this(nar, new ItemAccumulator<>(capacity));
     }
 
     public Commander(@NotNull NAR nar, ItemAccumulator<Task> buffer) {

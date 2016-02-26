@@ -1,4 +1,4 @@
-package nars.op.software.befunge;
+package nars.op.sys.befunge;
 
 
 import org.jetbrains.annotations.NotNull;

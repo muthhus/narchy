@@ -12,9 +12,11 @@ import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import nars.truth.Truthed;
 import nars.util.Texts;
+import org.apache.commons.logging.LogFactory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.PrintStream;
 import java.util.List;
@@ -27,12 +29,17 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
 
     //private static final Logger logger = LoggerFactory.getLogger(EternalTaskCondition.class);
 
+    @NotNull
     protected final NAR nar;
     private final char punc;
-    @Nullable
+
+    @NotNull
     private final Term term;
+
     boolean succeeded;
     long successTime = Tense.TIMELESS;
+
+    final static Logger logger = LoggerFactory.getLogger(EternalTaskCondition.class);
 
     //@Expose
 
@@ -74,29 +81,35 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
 //        return DefaultTruth.NULL;
 //    }
 
-    public EternalTaskCondition(NAR n, long creationStart, long creationEnd, String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax) throws Narsese.NarseseException {
+    public EternalTaskCondition(@NotNull NAR n, long creationStart, long creationEnd, String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax) throws RuntimeException, Narsese.NarseseException {
         //super(n.task(sentenceTerm + punc).normalize(n.memory));
-        nar = n;
+        try {
+            nar = n;
 
-        if (freqMax < freqMin) throw new RuntimeException("freqMax < freqMin");
-        if (confMax < confMin) throw new RuntimeException("confMax < confMin");
+            if (freqMax < freqMin) throw new RuntimeException("freqMax < freqMin");
+            if (confMax < confMin) throw new RuntimeException("confMax < confMin");
 
-        if (creationEnd - creationStart < 1) throw new RuntimeException("cycleEnd must be after cycleStart by at least 1 cycle");
+            if (creationEnd - creationStart < 1)
+                throw new RuntimeException("cycleEnd must be after cycleStart by at least 1 cycle");
 
-        this.creationStart = creationStart;
-        this.creationEnd = creationEnd;
-        this.freqMax = Math.min(1.0f, freqMax);
-        this.freqMin = Math.max(0.0f, freqMin);
-        this.confMax = Math.min(1.0f, confMax);
-        this.confMin = Math.max(0.0f, confMin);
-        this.punc = punc;
-        this.term =
-            //Narsese.the().termRaw(
-            Narsese.the().term(
-                sentenceTerm,
-                Terms.terms
-            ).term();
-        //this.duration = n.memory.duration();
+            this.creationStart = creationStart;
+            this.creationEnd = creationEnd;
+            this.freqMax = Math.min(1.0f, freqMax);
+            this.freqMin = Math.max(0.0f, freqMin);
+            this.confMax = Math.min(1.0f, confMax);
+            this.confMin = Math.max(0.0f, confMin);
+            this.punc = punc;
+            this.term =
+                    //Narsese.the().termRaw(
+                    Narsese.the().term(
+                            sentenceTerm,
+                            Terms.terms
+                    ).term();
+            //this.duration = n.memory.duration();
+        } catch (Throwable t) {
+            logger.error("{},", t);
+            throw new RuntimeException(t);
+        }
     }
 
     @NotNull
@@ -116,18 +129,19 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
             //50% for equal term
             dist += 0.2f;
             if (dist >= ifLessThan) return dist;
+        } else {
+            if (a.isCompound()) { //b also a compound
+                if (((Compound) a).dt() != ((Compound) b).dt()) {
+                    dist += 0.2f;
+                    if (dist >= ifLessThan) return dist;
+                }
+            }
         }
+
 
         if (a.size()!=b.size()) {
             dist += 0.2f;
             if (dist >= ifLessThan) return dist;
-        }
-
-        if (a instanceof Compound) {
-            if ( ((Compound)a).dt() != ((Compound)b).dt()) {
-                dist += 0.2f;
-                if (dist >= ifLessThan) return dist;
-            }
         }
 
 

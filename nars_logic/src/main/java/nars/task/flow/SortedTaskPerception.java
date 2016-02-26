@@ -29,7 +29,7 @@ public class SortedTaskPerception extends TaskPerception {
         this.inputPerCycle.set( inputPerCycle );
 
         //TODO use MutableInteger for capacity for all Bags
-        buffer = new ItemAccumulator<Task>(capacity);
+        buffer = new ItemAccumulator<>(capacity);
     }
 
     @Override

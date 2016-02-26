@@ -48,13 +48,13 @@ public abstract class NQuadsRDF {
 //            "(<[^\\s]+>|_:(?:[A-Za-z][A-Za-z0-9\\-_]*))\\s+(<[^\\s]+>)\\s+(<[^\\s]+>|_:(?:[A-Za-z][A-Za-z0-9\\-_]*)|\\\"(?:(?:\\\"|[^\"])*)\\\"(?:@(?:[a-z]+[\\-A-Za-z0-9]*)|\\^\\^<(?:[^>]+)>)?)\\s+(<[^\\s]+>).*"
 //    );
 
-    public static void input(@NotNull NAR nar, String input) throws Exception {
+    public static void input(@NotNull NAR nar, String input) {
         NxParser p  = new NxParser();
         p.parse(Collections.singleton(input));
         input(nar, p);
     }
 
-    public static void input(@NotNull NAR nar, @NotNull InputStream input) throws Exception {
+    public static void input(@NotNull NAR nar, @NotNull InputStream input) {
         //try {
             NxParser p = new NxParser();
             p.parse(input);

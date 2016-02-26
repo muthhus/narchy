@@ -51,7 +51,7 @@ class Lexer extends StreamTokenizer {
 	 * String based constructor. Used in queries ended by \n + prolog2java.
 	 */
 
-	public Lexer(Prolog p, @NotNull String s) throws Exception {
+	public Lexer(Prolog p, @NotNull String s) {
 		this(p, IO.string_to_stream(s));
 	}
 
@@ -382,11 +382,11 @@ public class Parser extends Lexer {
 	// super(p,s);
 	// }
 	//
-	public Parser(Prolog p, @NotNull String s) throws Exception {
+	public Parser(Prolog p, @NotNull String s)  {
 		super(p, s);
 		this.prolog = p;
 	}
-	public Parser(Prolog p, @NotNull Reader s) throws Exception {
+	public Parser(Prolog p, @NotNull Reader s) {
 		super(p, s);
 		this.prolog = p;
 	}

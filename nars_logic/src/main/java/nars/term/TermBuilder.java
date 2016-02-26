@@ -221,12 +221,12 @@ public abstract class TermBuilder {
     @Nullable
     public Term finish(@NotNull Op op, int relation, int dt, @NotNull TermContainer args) {
 
-        Term[] u = args.terms();
-        int currentSize = u.length;
+        //Term[] u = args.terms();
+        int currentSize = args.size();
 
         if (op.minSize > 1 && currentSize == 1) {
             //special case: allow for ellipsis to occupy one item even if minArity>1
-            Term u0 = u[0];
+            Term u0 = args.term(0);
             if ((u0 instanceof Ellipsis) || (u0 instanceof Ellipsis.EllipsisPrototype))
                 currentSize++; //increase to make it seem valid and allow constrct below
             else

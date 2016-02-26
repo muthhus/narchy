@@ -123,7 +123,7 @@ public class Default extends AbstractNAR {
         return c;
     }
 
-    @Nullable
+    @NotNull
     public DefaultPremiseGenerator newPremiseGenerator() {
         return new DefaultPremiseGenerator(this, Deriver.getDefaultDeriver());
     }

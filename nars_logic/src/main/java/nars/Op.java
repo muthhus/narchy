@@ -87,6 +87,7 @@ public enum Op {
 
 
 
+
     /**
      * symbol representation of this getOperator
      */
@@ -198,13 +199,10 @@ public enum Op {
     @NotNull
     public final String toString(@NotNull Compound c)  {
         int t = c.dt();
-        boolean hasTime = t != Tense.ITERNAL;
 
-        if (!hasTime) {
-            return str;
-        } else {
-            return str + ( (t >= 0) ? "+" : "") + (Integer.toString(t));
-        }
+        return !(t != Tense.ITERNAL) ?
+                    str :
+                    str + ((t >= 0) ? "+" : "") + (Integer.toString(t));
     }
 
     /**
@@ -340,6 +338,7 @@ public enum Op {
                     Op.IMPLICATION
             );
 
+    public static int VarDepOrIndep = Op.or( Op.VAR_DEP, Op.VAR_INDEP );
     public static final int ProductOrImageBits = or(Op.PRODUCT, Op.IMAGE_EXT, Op.IMAGE_INT);
     public static final int ImplicationOrEquivalenceBits = or(Op.EQUIV, Op.IMPLICATION);
 

@@ -39,14 +39,11 @@ public class ClauseReader extends CharReader {
 	}
 
 	void make_parser(Prolog prolog, String f) throws Exception {
-		if (null != reader)
-			try {
-				this.parser = new Parser(prolog, reader);
-			} catch (IOException e) {
-				IO.error("unable to build parser for: " + f);
-			}
-		else
-			this.parser = null;
+		///try {
+//			} catch (IOException e) {
+//				IO.error("unable to build parser for: " + f);
+//			}
+		this.parser = (null != reader) ? new Parser(prolog, reader) : null;
 	}
 
 	@Nullable

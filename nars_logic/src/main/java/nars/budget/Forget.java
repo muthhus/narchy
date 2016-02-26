@@ -77,7 +77,7 @@ public enum Forget { ;
 
         @NotNull
         public <B extends Budgeted> ForgetAndDetectDeletion<B> withDeletedItemFiltering() {
-            return new ForgetAndDetectDeletion<B>((BudgetForget<B>) this);
+            return new ForgetAndDetectDeletion<>((BudgetForget<B>) this);
         }
 
     }

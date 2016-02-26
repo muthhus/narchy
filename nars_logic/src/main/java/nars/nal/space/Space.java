@@ -6,7 +6,6 @@ import nars.term.Compound;
 import nars.term.Termed;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
-import nars.term.container.TermVector;
 import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

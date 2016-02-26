@@ -85,8 +85,8 @@ public class TrieDeriver extends Deriver {
     }
 
     /** HACK warning: use of this singular matchParent tracker is not thread-safe. assumes branches will be processed in a linear, depth first order */
-    @Nullable
-    final transient AtomicReference<MatchTerm> matchParent = new AtomicReference<MatchTerm>(null);
+    @NotNull
+    final transient AtomicReference<MatchTerm> matchParent = new AtomicReference<>(null);
 
     @NotNull
     private List<ProcTerm> getBranches(@NotNull TrieNode<List<Term>, PremiseRule> node) {
@@ -110,7 +110,7 @@ public class TrieDeriver extends Deriver {
     }
 
 
-    private Collection<BooleanCondition<PremiseEval>> compileConditions(@NotNull Collection<Term> t, @NotNull AtomicReference<MatchTerm> matchParent) {
+    @NotNull private Collection<BooleanCondition<PremiseEval>> compileConditions(@NotNull Collection<Term> t, @NotNull AtomicReference<MatchTerm> matchParent) {
 
         return t.stream().filter(x -> {
             if (x instanceof BooleanCondition) {

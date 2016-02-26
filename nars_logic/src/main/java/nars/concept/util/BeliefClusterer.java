@@ -276,7 +276,7 @@ abstract public class BeliefClusterer<T>  {
         final int max = (maxIterations < 0) ? Integer.MAX_VALUE : maxIterations;
         for (int count = 0; count < max; count++) {
             boolean emptyCluster = false;
-            List<Cluster> newClusters = new ArrayList<Cluster>();
+            List<Cluster> newClusters = new ArrayList<>();
             for (final Cluster cluster : clusters) {
                 final ArrayRealVector newCenter;
                 if (cluster.getPoints().isEmpty()) {
@@ -351,7 +351,7 @@ abstract public class BeliefClusterer<T>  {
 
         // Convert to list for indexed access. Make it unmodifiable, since removal of items
         // would screw up the logic of this method.
-        final List<T> pointList = new ArrayList<T> (points);
+        final List<T> pointList = new ArrayList<>(points);
 
         // The number of points in the list.
         final int numPoints = pointList.size();

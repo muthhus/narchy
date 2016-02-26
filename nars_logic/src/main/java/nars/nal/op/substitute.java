@@ -67,7 +67,7 @@ public class substitute extends ImmediateTermTransform implements PremiseAware {
 //            else
                 return ret;
         }
-        return ret == null ? x : ret;
+        return x;
 
     }
 

@@ -4,6 +4,7 @@ import nars.Op;
 import nars.term.atom.Atomic;
 import nars.term.atom.AtomicStringConstant;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * the 1-arity '^' compound which wraps a term to
@@ -39,7 +40,8 @@ public final class Operator<T extends Term> extends AtomicStringConstant {
     }
 
     /** returns the Product arguments compound of an operation. does not check if the input is actually an operation */
-    @NotNull public static Compound opArgs(@NotNull Compound operation) {
+    @Nullable
+    public static Compound opArgs(@NotNull Compound operation) {
         return (Compound) operation.term(0);
     }
 
