@@ -11,6 +11,7 @@ import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.index.MapIndex2;
 import nars.time.FrameClock;
+import nars.util.data.random.XorShift128PlusRandom;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -55,9 +56,18 @@ public class TermIndexTest {
 //        testIndex(new MapIndex(new SoftValueHashMap(), new SoftValueHashMap()));
 //    }
     @Test public void testTermSharing5a() {
-        testIndex(new MapIndex2(new HashMap(), new DefaultConceptBuilder()));
+        testIndex(new MapIndex2(new HashMap(),
+                new DefaultConceptBuilder(
+                    new XorShift128PlusRandom(2), 32, 32
+                )));
     }
     @Test public void testTermSharing5b() {
+        testIndex(
+                new MapIndex2(Global.newHashMap(),
+                    new DefaultConceptBuilder(
+                        new XorShift128PlusRandom(2), 32, 32
+                    ))
+        );
         //testIndex(new MapIndex2(newHashMap(), conceptBuilder));
     }
 

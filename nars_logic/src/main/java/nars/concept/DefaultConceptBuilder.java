@@ -74,9 +74,6 @@ public class DefaultConceptBuilder implements Function<Term,Concept> {
     public final Random rng;
 
 
-    public DefaultConceptBuilder() {
-        this(null, 1, 1);
-    }
 
     public DefaultConceptBuilder(Random r, int tasklinkBagSize, int termlinkBagSize) {
 
@@ -86,17 +83,13 @@ public class DefaultConceptBuilder implements Function<Term,Concept> {
     }
 
 
-    @NotNull
+    @Nullable
     public Concept apply(@NotNull Term term) {
 
         //already a concept, assume it is from here
         if (term instanceof Concept) {
             return (Concept)term;
         }
-
-        if (!term.isNormalized())
-            return null; //TODO ??
-
 
         Concept result = null;
         if (term instanceof Compound) {
@@ -117,7 +110,8 @@ public class DefaultConceptBuilder implements Function<Term,Concept> {
             throw new UnsupportedOperationException();
         }
 
-        logger.info("{} conceptualized to {}", term, result);
+        //logger.trace("{} conceptualized to {}", term, result);
+
         return result;
 
     }

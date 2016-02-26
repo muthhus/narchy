@@ -238,9 +238,8 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
         return s == 0 ? null : term(s - 1);
     }
 
-    default int relation() {
-        return -1; //by default, not relation present except for Images
-    }
+    int relation();
+    //    return -1; //by default, not relation present (value: -1), except for Images
 
 
     @Override

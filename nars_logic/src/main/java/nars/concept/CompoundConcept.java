@@ -716,6 +716,11 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
         return term.subterms();
     }
 
+    @Override
+    public int relation() {
+        return term.relation();
+    }
+
     @Override @NotNull
     public Op op() {
         return term.op();

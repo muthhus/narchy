@@ -4,6 +4,7 @@ import javassist.scopedpool.SoftValueHashMap;
 import nars.Global;
 import nars.Memory;
 import nars.concept.DefaultConceptBuilder;
+import nars.nar.AbstractNAR;
 import nars.nar.Default;
 import nars.term.TermIndex;
 import nars.term.index.MapIndex2;
@@ -24,8 +25,9 @@ public enum NARideDefault {
         Default n = new Default(
                 new Memory(
                         clock,
+                        new AbstractNAR.DefaultTermIndex(2048)),
                         //TermIndex.memoryGuava(clock, 100)),
-                        memoryWeak(1024 * 128)),
+//                        memoryWeak(1024 * 128)),
                 1024, 1, 3, 2);
         //new Inperience(n);
 
@@ -47,13 +49,14 @@ public enum NARideDefault {
     //                new SoftValueHashMap(capacity*2)
     //        );
     //    }
-        public static TermIndex memoryWeak(int capacity) {
-    //        return new MapIndex(
-    //            new SoftValueHashMap(capacity),
-    //            new SoftValueHashMap(capacity*2)
-    //        );
-            return new MapIndex2(
-                new SoftValueHashMap(capacity), new DefaultConceptBuilder()
-                    );
-        }
+//        public static TermIndex memoryWeak(int capacity) {
+//    //        return new MapIndex(
+//    //            new SoftValueHashMap(capacity),
+//    //            new SoftValueHashMap(capacity*2)
+//    //        );
+//            return new MapIndex2(
+//                new SoftValueHashMap(capacity),
+//                new DefaultConceptBuilder()
+//                    );
+//        }
 }

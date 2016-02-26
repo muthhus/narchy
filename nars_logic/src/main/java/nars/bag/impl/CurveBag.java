@@ -41,10 +41,10 @@ public class CurveBag<V> implements Bag<V> {
     public final BagCurve curve;
     private final Random random;
 
-    public CurveBag(int capacity, @Nullable Random rng) {
+    public CurveBag(int capacity, @NotNull Random rng) {
         this(
             //CurveBag.power6BagCurve,
-            power2BagCurve,
+            power6BagCurve,
             capacity, rng);
     }
 

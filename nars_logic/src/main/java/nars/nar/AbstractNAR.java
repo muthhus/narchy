@@ -28,6 +28,7 @@ import nars.term.TermIndex;
 import nars.term.index.MapIndex2;
 import nars.time.Clock;
 import nars.util.data.map.UnifriedMap;
+import nars.util.data.random.XORShiftRandom;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -343,10 +344,11 @@ public abstract class AbstractNAR extends NAR {
     public abstract NAR forEachConcept(Consumer<Concept> recip);
 
 
-    static class DefaultTermIndex extends MapIndex2 implements TermIndex {
+    public static class DefaultTermIndex extends MapIndex2 implements TermIndex {
 
         public DefaultTermIndex(int capacity) {
-            super(new UnifriedMap(), new DefaultConceptBuilder());
+            super(new UnifriedMap(capacity),
+                  new DefaultConceptBuilder(new XORShiftRandom(2), 32, 32));
 
         }
 

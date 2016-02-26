@@ -27,6 +27,11 @@ public class MapIndex2 extends AbstractMapIndex {
             this.vector = normalized;
         }
 
+        @Override
+        public Termed put(int key, Termed value) {
+            return super.put(key, value);
+        }
+
         /*
             g.compact();
         */
@@ -97,10 +102,15 @@ public class MapIndex2 extends AbstractMapIndex {
                 getOrAddNode(subsBefore) :
                 getNode(subsBefore);
 
+
+
         return node!=null ? get(t, node, subsBefore, create) : null;
     }
 
     @NotNull private Termed get(@NotNull Compound t, @NotNull SubtermNode node, @NotNull TermContainer subsBefore, boolean create) {
+
+
+
         int oprel = t.opRel();
 
         Termed interned = node.get(oprel);

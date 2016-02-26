@@ -345,4 +345,9 @@ public class Fun extends Const implements Compound<PTerm> {
     public int compareTo(Object o) {
         return 0;
     }
+
+    @Override
+    public int relation() {
+        return -1;
+    }
 }

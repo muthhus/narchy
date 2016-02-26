@@ -29,6 +29,41 @@ public abstract class AbstractMapIndex implements TermIndex {
         this.conceptBuilder = conceptBuilder;
     }
 
+    public final Termed get(@NotNull Termed key, boolean createIfMissing) {
+
+        if (key instanceof Ellipsis)
+            ///throw new RuntimeException("ellipsis not allowed in this index");
+            return null;
+
+        if (!key.isNormalized()) {
+            Termed u = normalized(key.term());
+            if (u==null) {
+                return null; //this one component could not be conceptualized, this is somewhat normal depending on variable rules
+            } else {
+                key = u.term();
+            }
+        }
+
+
+//        if (!isInternable(x)) {
+//            //TODO intern any subterms which can be
+//            return x;
+//        }
+
+//        Termed y = the(x);
+//        if (y == null) {
+//            if ((y = the(x)) !=null) {
+//                put(y);
+//                if (!y.equals(x))
+//                    return x; //return original non-anonymized
+//            }
+//        }
+
+        return key instanceof Compound ?
+                theCompound((Compound) key, createIfMissing)
+                : theAtom(key.term(), createIfMissing);
+    }
+
 
 //    /** get the instance that will be internalized */
 //    @NotNull
@@ -76,30 +111,6 @@ public abstract class AbstractMapIndex implements TermIndex {
         return get(t, false);
     }
 
-    public Termed get(@NotNull Termed key, boolean createIfMissing) {
-
-        if (key instanceof Ellipsis)
-            ///throw new RuntimeException("ellipsis not allowed in this index");
-            return null;
-
-//        if (!isInternable(x)) {
-//            //TODO intern any subterms which can be
-//            return x;
-//        }
-
-//        Termed y = the(x);
-//        if (y == null) {
-//            if ((y = the(x)) !=null) {
-//                put(y);
-//                if (!y.equals(x))
-//                    return x; //return original non-anonymized
-//            }
-//        }
-
-        return key instanceof Compound ?
-                theCompound((Compound) key, createIfMissing)
-                : theAtom(key.term(), createIfMissing);
-    }
 
 //    @Override
 //    public abstract Termed getTermIfPresent(Termed t);

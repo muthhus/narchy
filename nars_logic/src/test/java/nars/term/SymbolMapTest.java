@@ -1,6 +1,7 @@
 package nars.term;
 
 import nars.concept.DefaultConceptBuilder;
+import nars.util.data.random.XorShift128PlusRandom;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -13,7 +14,9 @@ public class SymbolMapTest {
     @Test
     public void testAtomInsertion() {
 
-        SymbolMap tree = new SymbolMap(new DefaultConceptBuilder());
+        SymbolMap tree = new SymbolMap(new DefaultConceptBuilder(
+            new XorShift128PlusRandom(2), 32, 32
+        ));
 
         //int start = SymbolMap.getLastSerial();
 

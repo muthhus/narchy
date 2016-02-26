@@ -13,6 +13,7 @@ import nars.term.Term;
 import nars.term.TermIndex;
 import nars.term.index.MapIndex2;
 import nars.time.RealtimeMSClock;
+import nars.util.data.random.XORShiftRandom;
 
 import java.util.function.Function;
 
@@ -31,7 +32,7 @@ public enum NARideRealtimeDefault {
 
         Memory mem = new Memory(new RealtimeMSClock(),
                 new MapIndex2(
-                        new SoftValueHashMap(128*1024), new DefaultConceptBuilder()
+                        new SoftValueHashMap(128*1024), new DefaultConceptBuilder(new XORShiftRandom(), 32, 32)
                 )
             //new MapCacheBag(
                     //new WeakValueHashMap<>()

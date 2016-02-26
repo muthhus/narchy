@@ -3,6 +3,7 @@ package nars.term.index;
 import nars.concept.DefaultConceptBuilder;
 import nars.nal.meta.PatternCompound;
 import nars.nal.meta.PremiseRule;
+import nars.nar.AbstractNAR;
 import nars.term.Compound;
 import nars.term.Termed;
 import nars.term.container.TermVector;
@@ -14,10 +15,10 @@ import java.util.HashMap;
 /**
  * Index which specifically holds the components of a deriver ruleset
  */
-public class PatternIndex extends MapIndex2 {
+public class PatternIndex extends AbstractNAR.DefaultTermIndex {
 
     public PatternIndex() {
-        super(new HashMap(1024), new DefaultConceptBuilder());
+        super(256);
     }
 
 

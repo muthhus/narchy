@@ -1,6 +1,7 @@
 package nars.nal;
 
 import com.google.common.collect.Lists;
+import nars.$;
 import nars.NAR;
 import nars.bag.BLink;
 import nars.concept.Concept;
@@ -92,18 +93,18 @@ public class LinkageTest extends AbstractNALTest {
         NAR nar = test().nar;
 
         Termed premise1 = nar.term(spremise1);
-        assertEquals(spremise1, premise1.toString());
+        assertEquals("reparsed", $.$(spremise1), premise1);
         assertNotNull(premise1);
         assertEquals(nar.term(spremise1), premise1);
 
         Termed premise2 = nar.term(spremise2);
-        assertEquals(spremise2, premise2.toString());
+        assertEquals("reparsed", $.$(spremise2), premise2);
         assertNotNull(premise2);
         assertEquals(nar.term(spremise2), premise2);
 
         nar.input(getTask(punc, premise1));
         nar.input(getTask(punc, premise2));
-        nar.run(1);
+        nar.run(2);
 
         //List<String> fails = new ArrayList();
 
@@ -120,17 +121,17 @@ public class LinkageTest extends AbstractNALTest {
         //g.print(System.out);
         //System.out.println(g.isConnected() + " " + g.vertexSet().size() + " " + g.edgeSet().size());
         //if (!g.isConnected()) {
-        if (!g.isStronglyConnected()) {
-            StrongConnectivityInspector ci =
-                    //new ConnectivityInspector(g);
-                    new StrongConnectivityInspector(g);
-            System.out.println("pemise: " + premise1 + " and " + premise2 + " termlink strongly connected subgraphs");
-            ci
-                //.connectedSets()
-                .stronglyConnectedSubgraphs()
-                .forEach( s -> System.out.println("\t" + s));
-
-        }
+//        if (!g.isStronglyConnected()) {
+//            StrongConnectivityInspector ci =
+//                    //new ConnectivityInspector(g);
+//                    new StrongConnectivityInspector(g);
+//            System.out.println("pemise: " + premise1 + " and " + premise2 + " termlink strongly connected subgraphs");
+//            ci
+//                //.connectedSets()
+//                .stronglyConnectedSubgraphs()
+//                .forEach( s -> System.out.println("\t" + s));
+//
+//        }
         assertTrue(g.isConnected());
 
         assertTrue(passed);
@@ -149,7 +150,7 @@ public class LinkageTest extends AbstractNALTest {
 
     public boolean linksIndirectly(NAR nar, Termed premise2, Concept ret) {
         boolean passed = false;
-        if(ret!=null && ret.termlinks()!=null) {
+        if (ret.termlinks()!=null) {
             for (BLink<Termed> entry : ret.termlinks()) {
                 Term p2Term = premise2.term();
                 if(entry.get().term().equals(p2Term)) {

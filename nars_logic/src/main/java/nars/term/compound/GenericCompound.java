@@ -243,7 +243,6 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
     @Override @Deprecated
     public T[] terms() {
-
         return subterms.terms();
     }
 
@@ -310,7 +309,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     }
 
     @Override
-    public int dt() {
+    public final int dt() {
         return dt;
     }
 
@@ -321,7 +320,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     }
 
     @Override
-    public int relation() {
+    public final int relation() {
         return relation;
     }
 

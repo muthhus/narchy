@@ -22,6 +22,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Random;
 import java.util.Set;
 
@@ -46,7 +47,11 @@ public class EllipsisTest {
         default Set<Term> test(int arity, int repeats) {
             Set<Term> selectedFixed = Global.newHashSet(arity);
 
-            TermIndex index = new MapIndex2(Global.newHashMap(128), new DefaultConceptBuilder());
+            TermIndex index =
+                    new MapIndex2(new HashMap(),
+                            new DefaultConceptBuilder(
+                                    new XorShift128PlusRandom(2), 32, 32
+                            ));
 
             Compound y = getMatchable(arity);
             assertNotNull(y);
