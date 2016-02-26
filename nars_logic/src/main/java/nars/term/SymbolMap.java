@@ -9,8 +9,11 @@ import com.googlecode.concurrenttrees.radix.node.concrete.voidvalue.VoidValue;
 import com.googlecode.concurrenttrees.radix.node.util.NodeUtil;
 import nars.$;
 import nars.concept.AtomConcept;
+import nars.concept.CompoundConcept;
 import nars.concept.Concept;
+import nars.concept.VariableConcept;
 import nars.term.atom.Atomic;
+import nars.term.variable.Variable;
 
 import java.util.List;
 import java.util.function.Function;
@@ -19,20 +22,21 @@ import java.util.function.Function;
  * String interner that maps strings to integers and resolves them
  * bidirectionally with a globally shared Atomic concept
  */
-public class Atoms extends MyConcurrentRadixTree<AtomConcept> {
+public class SymbolMap extends MyConcurrentRadixTree<AtomConcept> {
 
-    private static volatile int serial;
+    //private static volatile int serial;
     private final Function<Term, Concept> conceptBuilder;
 
-    public Atoms(Function<Term, Concept> conceptBuilder) {
+    public SymbolMap(Function<Term, Concept> conceptBuilder) {
         super(new AtomNodeFactory());
+
         this.conceptBuilder = conceptBuilder;
     }
 
 
-    public static int getLastSerial() {
+    /*public static int getLastSerial() {
         return serial;
-    }
+    }*/
 
     public final AtomConcept resolve(CharSequence id) {
         return getValueForExactKey(id);
@@ -47,18 +51,13 @@ public class Atoms extends MyConcurrentRadixTree<AtomConcept> {
     }
 
     public final AtomConcept resolveOrAdd(Atomic a) {
-
-        return putIfAbsent(a.toString(), () -> {
-            int s = serial;
-            serial++;
-            return (AtomConcept) conceptBuilder.apply(a);
-        }); //new AtomicString(++serial));
-
+        return putIfAbsent(a.toString(),
+            () -> (AtomConcept)conceptBuilder.apply(a)
+        );
     }
 
+    /** // PrettyPrintable is a non-public API for testing, prints semi-graphical representations of trees... */
     public void print(Appendable out) {
-        System.out.println("Tree structure:");
-        // PrettyPrintable is a non-public API for testing, prints semi-graphical representations of trees...
         PrettyPrinter.prettyPrint(this, out);
     }
 

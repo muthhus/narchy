@@ -1,6 +1,7 @@
 package nars.nal.meta.match;
 
 import nars.term.transform.VariableNormalization;
+import nars.term.variable.AbstractVariable;
 import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 
@@ -9,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class EllipsisZeroOrMore extends Ellipsis {
 
-    public EllipsisZeroOrMore(@NotNull Variable /*Variable*/ name) {
+    public EllipsisZeroOrMore(@NotNull AbstractVariable /*Variable*/ name) {
         super(name);
     }
 
@@ -19,7 +20,7 @@ public class EllipsisZeroOrMore extends Ellipsis {
     }
 
     @Override
-    public @NotNull Variable clone(@NotNull Variable newVar, VariableNormalization normalizer) {
+    public @NotNull Variable clone(@NotNull AbstractVariable newVar, VariableNormalization normalizer) {
 //        if (newVar.hashCode()==hash)
 //            return this;
         return new EllipsisZeroOrMore(newVar);

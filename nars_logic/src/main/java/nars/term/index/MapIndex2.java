@@ -88,51 +88,39 @@ public class MapIndex2 extends AbstractMapIndex {
             k -> new SubtermNode(normalize(k));
 
 
-//    @Nullable
-//    @Override
-//    public Termed get(@NotNull Termed t) {
-//        Term u = t.term();
-//        return u instanceof Atom ?
-//                    atoms.resolve((Atom)u) :
-//                    get(vector(u), t.opRel());
-//
-//
-//    }
-
-
-
-
     @Nullable
     @Override protected Termed theCompound(@NotNull Compound t, boolean create) {
 
         TermContainer subsBefore = t.subterms();
 
-        SubtermNode node;
-        if (create) {
-            node = getOrAddNode(subsBefore);
-        } else {
-            node = getNode(subsBefore);
-            if (node == null)
-                return null;
-        }
+        SubtermNode node = create ?
+                getOrAddNode(subsBefore) :
+                getNode(subsBefore);
 
-        return get(t, node, subsBefore, create);
+        return node!=null ? get(t, node, subsBefore, create) : null;
     }
 
-    private Termed get(Compound t, SubtermNode node, TermContainer subsBefore, boolean create) {
+    @NotNull private Termed get(@NotNull Compound t, @NotNull SubtermNode node, @NotNull TermContainer subsBefore, boolean create) {
         int oprel = t.opRel();
+
         Termed interned = node.get(oprel);
         if (create && (interned == null)) {
 
             TermContainer subsAfter = node.vector;
             if (subsAfter!=subsBefore) { //rebuild if necessary
                 if ((interned = internCompound(subsAfter, t.op(), t.relation(), t.dt())) == null)
-                    return null;
+                    throw new UnbuildableTerm(t);
+                    //return null;
             } else {
-                interned = t; //use input directly; for more isolation, this could be replaced with a clone creator
+                interned = t; //use original parameter itself; for more isolation, this could be replaced with a clone creator
             }
 
-            node.put(oprel, interned);
+            interned = conceptBuilder.apply(interned.term());
+            if (interned == null)
+                throw new UnbuildableTerm(t);
+
+            Termed preExisting = node.put(oprel, interned);
+            assert(preExisting == null);
         }
 
         return interned;
@@ -144,6 +132,7 @@ public class MapIndex2 extends AbstractMapIndex {
         Termed interned;
         interned = builder.make(op, rel, subs, dt);
         assert(interned!=null); //should not fail unless the input was invalid to begin with
+
         return interned;
     }
 

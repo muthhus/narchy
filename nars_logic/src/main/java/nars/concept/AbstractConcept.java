@@ -16,18 +16,18 @@ import java.util.Map;
 /**
  * Created by me on 7/29/15.
  */
-public abstract class AbstractConcept implements Concept {
+public abstract class AbstractConcept<T extends Term> implements Concept {
 
     protected final Bag<Task> taskLinks;
     protected final Bag<Termed> termLinks;
 
     @NotNull
-    public final Term term;
+    public final T term;
 
     @Nullable
     protected Map meta;
 
-    protected AbstractConcept(@NotNull Term term, Bag<Task> taskLinks, Bag<Termed> termLinks) {
+    protected AbstractConcept(@NotNull T term, Bag<Task> taskLinks, Bag<Termed> termLinks) {
         this.term = term;
         this.taskLinks = taskLinks;
         this.termLinks = termLinks;

@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * normalized indep var
  */
-public final class VarIndep extends Variable {
+public final class VarIndep extends AbstractVariable {
 
     public VarIndep(int id) {
         super(Op.VAR_INDEP, id);

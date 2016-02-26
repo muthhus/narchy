@@ -8,14 +8,14 @@ import static org.junit.Assert.*;
 /**
  * Created by me on 2/25/16.
  */
-public class AtomsTest {
+public class SymbolMapTest {
 
     @Test
     public void testAtomInsertion() {
 
-        Atoms tree = new Atoms(new DefaultConceptBuilder());
+        SymbolMap tree = new SymbolMap(new DefaultConceptBuilder());
 
-        int start = Atoms.getLastSerial();
+        //int start = SymbolMap.getLastSerial();
 
         tree.resolveOrAdd("concept");
         tree.resolveOrAdd("term");
@@ -27,12 +27,13 @@ public class AtomsTest {
         assertNull(tree.resolve("te")); //partial
 
         assertNotNull(tree.resolveOrAdd("term"));
+        assertEquals(3, tree.size());
 
         assertNotNull(tree.resolveOrAdd("termunator"));
 
         tree.print(System.out);
 
-        assertEquals(4, Atoms.getLastSerial() - start);
+        assertEquals(4, tree.size());
 
 
 //        String stringWithUnicode = "unicode\u00easomething";

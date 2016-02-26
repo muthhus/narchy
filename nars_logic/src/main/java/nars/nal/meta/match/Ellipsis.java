@@ -6,12 +6,13 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.container.TermContainer;
 import nars.term.transform.VariableNormalization;
+import nars.term.variable.AbstractVariable;
 import nars.term.variable.GenericVariable;
 import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class Ellipsis extends Variable {
+public abstract class Ellipsis extends AbstractVariable {
 
 
 //    /** a placeholder that indicates an expansion of one or more terms that will be provided by an Ellipsis match.
@@ -29,7 +30,7 @@ public abstract class Ellipsis extends Variable {
 //    };
 
     @NotNull
-    public abstract Variable clone(Variable newVar, VariableNormalization normalizer);
+    public abstract Variable clone(AbstractVariable newVar, VariableNormalization normalizer);
 
     public abstract int sizeMin();
 
@@ -51,14 +52,14 @@ public abstract class Ellipsis extends Variable {
 
         @Override
         public
-        @NotNull
-        @Deprecated Variable normalize(int serial) {
+        @Deprecated
+        @NotNull AbstractVariable normalize(int serial) {
             return make(serial, minArity);
         }
 
         @NotNull
         public static Ellipsis make(int serial, int minArity) {
-            @NotNull Variable v = $.v(Op.VAR_PATTERN, serial);
+            @NotNull AbstractVariable v = $.v(Op.VAR_PATTERN, serial);
             if (minArity == 0) {
                 return new EllipsisZeroOrMore(v);
             } else if (minArity == 1) {
@@ -81,15 +82,14 @@ public abstract class Ellipsis extends Variable {
             this.to = to;
         }
 
-        @NotNull
-        @Override public Variable normalize(int serial) {
+        @Override public @NotNull AbstractVariable normalize(int serial) {
             throw new RuntimeException("n/a");
         }
 
     }
 
 
-    protected Ellipsis(@NotNull Variable target) {
+    protected Ellipsis(@NotNull AbstractVariable target) {
         super(
             target.op(), target.id
         );

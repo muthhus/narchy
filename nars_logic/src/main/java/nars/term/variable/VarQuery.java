@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * normalized query variable
  */
-public final class VarQuery extends Variable {
+public final class VarQuery extends AbstractVariable {
 
     public VarQuery(int id) {
         super(Op.VAR_QUERY, id);

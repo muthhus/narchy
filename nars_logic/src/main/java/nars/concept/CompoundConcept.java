@@ -2,22 +2,30 @@ package nars.concept;
 
 import nars.Memory;
 import nars.NAR;
+import nars.Op;
 import nars.Symbols;
 import nars.bag.Bag;
 import nars.budget.Budget;
 import nars.concept.util.*;
 import nars.nal.LocalRules;
 import nars.task.Task;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.function.Consumer;
+
+import static nars.nal.Tense.ITERNAL;
 
 
-public class DefaultConcept extends AbstractConcept {
+public class CompoundConcept extends AbstractConcept<Compound> implements Compound {
 
 //    public static final BiPredicate<Task, Task> questionEquivalence = new BiPredicate<Task, Task>() {
 //
@@ -53,12 +61,11 @@ public class DefaultConcept extends AbstractConcept {
 
     /**
      * Constructor, called in Memory.getConcept only
-     *
-     * @param term      A term corresponding to the concept
-     * @param taskLinks
+     *  @param term      A term corresponding to the concept
      * @param termLinks
+     * @param taskLinks
      */
-    public DefaultConcept(Term term, Bag<Task> taskLinks, Bag<Termed> termLinks) {
+    public CompoundConcept(Compound term, Bag<Termed> termLinks, Bag<Task> taskLinks) {
         super(term, taskLinks, termLinks);
     }
 
@@ -704,4 +711,124 @@ public class DefaultConcept extends AbstractConcept {
     }
 
 
+    @Override
+    public @NotNull TermContainer subterms() {
+        return term.subterms();
+    }
+
+    @Override @NotNull
+    public Op op() {
+        return term.op();
+    }
+
+    @Override
+    public int volume() {
+        return term.volume();
+    }
+
+    @Override
+    public int complexity() {
+        return term.complexity();
+    }
+
+    @Override
+    public int structure() {
+        return term.structure();
+    }
+
+    @Override
+    public int size() {
+        return term.size();
+    }
+
+    @Override
+    public boolean containsTerm(Term t) {
+        return term.containsTerm(t);
+    }
+
+    @Override
+    public boolean isCommutative() {
+        return term.isCommutative();
+    }
+
+    @Override
+    public int varIndep() {
+        return term.varIndep();
+    }
+
+    @Override
+    public int varDep() {
+        return term.varDep();
+    }
+
+    @Override
+    public int varQuery() {
+        return term.varQuery();
+    }
+
+    @Override
+    public int varPattern() {
+        return term.varPattern();
+    }
+
+    @Override
+    public int vars() {
+        return term.vars();
+    }
+
+    @Nullable
+    @Override
+    public Term term(int i) {
+        return term.term(i);
+    }
+
+    @Override
+    public boolean equalTerms(TermContainer c) {
+        return term.equalTerms(c);
+    }
+
+    @NotNull
+    @Override
+    public Term[] terms() {
+        return term.terms();
+    }
+
+    @Override
+    public void forEach(Consumer action, int start, int end) {
+        term.forEach(action, start, end);
+    }
+
+    @Nullable
+    @Override
+    public TermContainer replacing(int subterm, Term replacement) {
+        return term.replacing(subterm, replacement);
+    }
+
+    @Override
+    public void addAllTo(Collection set) {
+        Collections.addAll(set, term);
+    }
+
+    @Override
+    public boolean isNormalized() {
+        return true; //must be normalized to create the concept
+    }
+
+    @NotNull
+    @Override
+    public Compound dt(int cycles) {
+        //the concept will not hold any particular temporality in its ID term. however its tasks may utliize them
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int dt() {
+        //concept itself is eternal
+        return ITERNAL;
+    }
+
+    @Override
+    public Iterator iterator() {
+        return term.iterator();
+    }
 }

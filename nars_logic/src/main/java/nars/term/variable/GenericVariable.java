@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Unnormalized, labeled variable
  */
-public class GenericVariable extends AtomicString {
+public class GenericVariable extends AtomicString implements Variable {
 
     @NotNull
     public final Op type;
@@ -21,6 +21,11 @@ public class GenericVariable extends AtomicString {
         this.label = label;
         this.type = type;
         this.str = type.ch + label;
+    }
+
+    @Override
+    public int id() {
+        return 0;
     }
 
     @Override
@@ -61,7 +66,7 @@ public class GenericVariable extends AtomicString {
     }
 
     /** produce a normalized version of this identified by the serial integer */
-    public @NotNull Variable normalize(int serial) {
+    public @NotNull AbstractVariable normalize(int serial) {
         return $.v(type, serial);
     }
 

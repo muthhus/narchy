@@ -3,7 +3,7 @@ package nars.term.index;
 import nars.concept.Concept;
 import nars.nal.meta.match.Ellipsis;
 import nars.term.*;
-import nars.term.atom.Atom;
+import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,14 +17,16 @@ import java.util.function.Function;
  */
 public abstract class AbstractMapIndex implements TermIndex {
 
-    protected final Atoms atoms;
+    protected final SymbolMap atoms;
     protected final TermBuilder builder;
+    protected final Function<Term, Concept> conceptBuilder;
 
 
     public AbstractMapIndex(TermBuilder termBuilder, Function<Term, Concept> conceptBuilder) {
         super();
         this.builder = termBuilder;
-        this.atoms = new Atoms(conceptBuilder);
+        this.atoms = new SymbolMap(conceptBuilder);
+        this.conceptBuilder = conceptBuilder;
     }
 
 
@@ -56,8 +58,9 @@ public abstract class AbstractMapIndex implements TermIndex {
 //    }
 
     final Termed theAtom(Term t, boolean createIfMissing) {
-        return (t instanceof Atom) ?
-                (createIfMissing ? atoms.resolveOrAdd((Atom)t) : atoms.resolve((Atom)t))
+        SymbolMap a = this.atoms;
+        return (t instanceof Atomic) ?
+                (createIfMissing ? a.resolveOrAdd((Atomic)t) : a.resolve((Atomic)t))
                 : t;
     }
 

@@ -113,16 +113,14 @@ public class scheme extends TermFunction {
 
         if (code instanceof Atom) {
             //interpret as eval string
-            Atom a = (Atom)code;
-
             return schemeToNars.apply(
                 Evaluator.evaluate(
-                    load(a.toStringUnquoted(), env), env)
+                    load(((Atom)code).toStringUnquoted(), env), env)
             );
-
         }
 
         return code instanceof Compound ?
+
                 schemeToNars.apply(
                     Evaluator.evaluate(
                         new SchemeProduct(((Iterable) code)), env)) :

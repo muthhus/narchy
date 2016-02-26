@@ -1,5 +1,6 @@
 package nars.term;
 
+import nars.Op;
 import nars.nal.meta.match.Ellipsis;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,7 +28,14 @@ public interface Termlike  {
     default boolean hasAny(int structuralVector) {
         return (structure() & structuralVector) != 0;
     }
-
+    /** tests if contains a term in the structural hash
+     *  WARNING currently this does not detect presence of pattern variables
+     * */
+    default boolean hasAny(@NotNull Op op) {
+//        if (op == Op.VAR_PATTERN)
+//            return Variable.hasPatternVariable(this);
+        return hasAny(op.bit());
+    }
 
     default boolean impossibleStructureMatch(int possibleSubtermStructure) {
         return impossibleStructureMatch(

@@ -23,7 +23,7 @@ import nars.task.flow.TaskStream;
 import nars.term.*;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
-import nars.term.variable.Variable;
+import nars.term.variable.AbstractVariable;
 import nars.time.Clock;
 import nars.util.event.AnswerReaction;
 import nars.util.event.DefaultTopic;
@@ -1042,7 +1042,7 @@ public abstract class NAR implements Level, Consumer<Task> {
 
 
     boolean validConceptTerm(Term term) {
-        return !(term instanceof Variable);
+        return !(term instanceof AbstractVariable);
     }
 
     @NotNull
@@ -1051,10 +1051,11 @@ public abstract class NAR implements Level, Consumer<Task> {
 
     @Nullable
     public Concept concept(Termed t) {
-        if (t instanceof Concept)
-            return ((Concept)t);
-
         Term tt = t.term();
+
+        if (tt instanceof Concept)
+            return ((Concept)tt); //assume this is the instance already indexed; may not be a safe assumption
+
         if (!validConceptTerm(tt))
             return null;
 
@@ -1075,14 +1076,13 @@ public abstract class NAR implements Level, Consumer<Task> {
         if (tt.isCompound() ) {
 
             Term at = tt;
-            tt = tt.anonymous();
-            if (at!=tt) {
+
+            if (at!=(tt = tt.anonymous())) {
                 //complete anonymization process
-                tt = index.transform((Compound) tt, CompoundAnonymizer);
+                if (null == (tt = index.transform((Compound) tt, CompoundAnonymizer)))
+                    throw new UnbuildableTerm((Compound) at);
             }
 
-            if (tt == null)
-                return null;
         }
 
 
@@ -1092,15 +1092,16 @@ public abstract class NAR implements Level, Consumer<Task> {
         if (uu instanceof Concept) {
             return (Concept) uu;
         } else {
-            if (uu == null) uu = t;
-
-            Concept n = newConcept(uu.term());
-            if (n!=null) {
-                index.put(n);
-                return n;
-            } else {
-                return null; //no concept could be made
-            }
+            throw new RuntimeException("unconceptualizable: " + uu + " " + uu.getClass());
+//            if (uu == null) uu = t;
+//
+//            Concept n = newConcept(uu.term());
+//            if (n!=null) {
+//                index.put(n);
+//                return n;
+//            } else {
+//                return null; //no concept could be made
+//            }
         }
 
     }

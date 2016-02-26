@@ -84,7 +84,7 @@ public abstract class TermBuilder {
 
 
     static boolean validEquivalenceTerm(@NotNull Term t) {
-        return !t.isAny(TermIndex.InvalidEquivalenceTerm);
+        return !t.isAnyOf(TermIndex.InvalidEquivalenceTerm);
 //        if ( instanceof Implication) || (subject instanceof Equivalence)
 //                || (predicate instanceof Implication) || (predicate instanceof Equivalence) ||
 //                (subject instanceof CyclesInterval) || (predicate instanceof CyclesInterval)) {
@@ -422,8 +422,8 @@ public abstract class TermBuilder {
                 break;
 
             case IMPLICATION:
-                if (subject.isAny(TermIndex.InvalidEquivalenceTerm)) return null;
-                if (predicate.isAny(TermIndex.InvalidImplicationPredicate)) return null;
+                if (subject.isAnyOf(TermIndex.InvalidEquivalenceTerm)) return null;
+                if (predicate.isAnyOf(TermIndex.InvalidImplicationPredicate)) return null;
 
                 if (predicate.op() == IMPLICATION) {
                     Term oldCondition = subj(predicate);

@@ -85,8 +85,7 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
          5: struct
          */
         int[] meta = new int[6];
-        this.contentHash = TermContainer.hash(term, meta);
-
+        this.contentHash = Terms.hashSubterms(term, meta);
 
 
         int varTot = 0;
@@ -294,14 +293,16 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
 
     @NotNull
     public TermVector reverse() {
-        Term[] r = terms().clone();
+        T[] s = this.term;
+        if (s.length < 2)
+            return this; //no change needed
+        Term[] r = s.clone();
         ArrayUtils.reverse(r);
         return new TermVector(r);
     }
 
     public static TermContainer the(Term... t) {
-        if (t.length == 0) return Terms.ZeroSubterms;
-        return new TermVector(t);
+        return t.length == 0 ? Terms.ZeroSubterms : new TermVector(t);
     }
 
 
@@ -323,9 +324,14 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
         if (replacement.equals(term(subterm)))
             return this;
 
-        Term[] t = terms().clone();
-        t[subterm] = replacement;
-        return new TermVector(t);
+        Term[] u = term;
+        if (!u[subterm].equals(replacement)) {
+            Term[] t = u.clone();
+            t[subterm] = replacement;
+            return new TermVector(t);
+        } else
+            return this;
+
     }
 
 }

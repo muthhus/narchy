@@ -28,8 +28,8 @@ public final class CommonVariable extends GenericNormalizedVariable {
         if (v2.op()!=type)
             throw new RuntimeException("differing types");
 
-        int a = v1.id;
-        int b = v2.id;
+        int a = v1.id();
+        int b = v2.id();
 
         int cmp = Integer.compare(a, b);
 

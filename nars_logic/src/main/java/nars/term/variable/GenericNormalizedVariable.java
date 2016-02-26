@@ -4,7 +4,7 @@ import nars.Op;
 import org.jetbrains.annotations.NotNull;
 
 
-public abstract class GenericNormalizedVariable extends Variable {
+public abstract class GenericNormalizedVariable extends AbstractVariable {
 
     @NotNull
     public final Op type;

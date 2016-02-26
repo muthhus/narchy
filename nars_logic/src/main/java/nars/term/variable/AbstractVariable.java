@@ -1,0 +1,170 @@
+/*
+ * Variable.java
+ *
+ * Copyright (C) 2008  Pei Wang
+ *
+ * This file is part of Open-NARS.
+ *
+ * Open-NARS is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Open-NARS is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Open-NARS.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package nars.term.variable;
+
+
+import nars.Op;
+import nars.nal.meta.match.VarPattern;
+import nars.term.Terms;
+import org.jetbrains.annotations.NotNull;
+
+/**
+ * Normalized variable
+ * "highly immutable" and re-used
+ */
+public abstract class AbstractVariable implements Variable {
+
+    public final int id;
+    protected final int hash;
+    private transient final String str;
+
+    protected AbstractVariable(@NotNull Op type, int id) {
+
+        this.id = id;
+        this.hash = Terms.hashVar(type, id); //lower 16 bits reserved for the type, which includes all permutations of 2x 8-bit id'd common variables
+        this.str = type.ch + Integer.toString(id);
+    }
+
+    @Override public final int id() {
+        return id;
+    }
+
+    //@Override abstract public boolean equals(Object other);
+
+    @Override
+    public final boolean equals(Object obj) {
+        return obj==this ||
+                (obj.hashCode() == hash && (obj instanceof AbstractVariable)); //hash first, it is more likely to differ
+                //((obj instanceof Variable) && ((Variable)obj).hash == hash);
+    }
+
+    @Override
+    public final int hashCode() {
+        return hash;
+    }
+
+    @Override
+    public final int compareTo(Object o) {
+        //hashcode can serve as the ordering too
+        if (o == this) return 0;
+        return o instanceof AbstractVariable ? Integer.compare(hash, o.hashCode()) : 1;
+    }
+
+    @Override
+    public String toString() {
+        return str;
+    }
+
+    public static final int MAX_VARIABLE_CACHED_PER_TYPE = 32;
+
+    /**
+     * numerically-indexed variable instance cache; prevents duplicates and speeds comparisons
+     */
+    private static final AbstractVariable[][] varCache = new AbstractVariable[4][MAX_VARIABLE_CACHED_PER_TYPE];
+
+    @NotNull
+    public static Op typeIndex(char c) {
+        switch (c) {
+            case '%':
+                return Op.VAR_PATTERN;
+            case '#':
+                return Op.VAR_DEP;
+            case '$':
+                return Op.VAR_INDEP;
+            case '?':
+                return Op.VAR_QUERY;
+        }
+        throw new RuntimeException(c + " not a variable");
+    }
+//    @NotNull
+//    static Op varCacheFor(Op c) {
+//        switch (c) {
+//            case Op.VAR_PATTERN:
+//                return varCache[0]
+//            case '#':
+//                return varCacheFor
+//            case '$':
+//                return Op.VAR_INDEP;
+//            case '?':
+//                return Op.VAR_QUERY;
+//        }
+//        throw new RuntimeException(c + " not a variable");
+//    }
+    static int typeIndex(@NotNull Op o) {
+        switch (o) {
+            case VAR_PATTERN:  return 0;
+            case VAR_DEP:  return 1;
+            case VAR_INDEP:  return 2;
+            case VAR_QUERY: return 3;
+            default:
+                throw new UnsupportedOperationException();
+        }
+    }
+
+
+//    @Override
+//    abstract public int volume();
+
+    public static AbstractVariable cached(Op type, int counter) {
+        if (counter >= AbstractVariable.MAX_VARIABLE_CACHED_PER_TYPE) {
+            return vNew(type, counter);
+            //throw new RuntimeException("variable cache overflow");
+        } else {
+            AbstractVariable[] vct = AbstractVariable.varCache[typeIndex(type)];
+            AbstractVariable v = vct[counter];
+            if (v == null) {
+                v = vNew(type, counter);
+                vct[counter] = v;
+            }
+            return v;
+        }
+    }
+
+    /** TODO move this to TermBuilder */
+    static AbstractVariable vNew(@NotNull Op type, int counter) {
+        switch (type) {
+            case VAR_PATTERN: return new VarPattern(counter);
+            case VAR_QUERY: return  new VarQuery(counter);
+            case VAR_DEP: return  new VarDep(counter);
+            case VAR_INDEP: return  new VarIndep(counter);
+            default:
+                throw new UnsupportedOperationException();
+        }
+    }
+
+
+    //    //TODO replace this with a generic counting method of how many subterms there are present
+//    public static int numPatternVariables(Term t) {
+//        t.value(new TermToInt()) //..
+////        final int[] has = {0};
+////        t.recurseTerms((t1, superterm) -> {
+////            if (t1.op() == Op.VAR_PATTERN)
+////                has[0]++;
+////        });
+////        return has[0];
+//    }
+
+
+
+
+
+
+}

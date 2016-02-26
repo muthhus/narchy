@@ -18,7 +18,7 @@ import nars.term.transform.CompoundTransform;
 import nars.term.transform.VariableNormalization;
 import nars.term.transform.VariableTransform;
 import nars.term.transform.subst.Subst;
-import nars.term.variable.Variable;
+import nars.term.variable.AbstractVariable;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -258,7 +258,7 @@ public interface TermIndex  {
                 return src;
 
             return transform((Compound) src, f);
-        } else if (src instanceof Variable) {
+        } else if (src instanceof AbstractVariable) {
             Term x = f.term(src);
             if (x != null)
                 return x;

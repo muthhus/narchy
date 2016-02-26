@@ -406,22 +406,4 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
     @Nullable TermContainer replacing(int subterm, Term replacement);
 
 
-    /** should be consistent with the other hash method(s) */
-    static int hash(TermContainer<?> container) {
-        int h = 1;
-        for (Term t : container) {
-            h = 31 /*Util.PRIME1 */ * h + t.hashCode();
-        }
-        return h;
-    }
-
-    /** computes the content hash while accumulating subterm metadata summary fields into int[] meta */
-    static int hash(Term[] term, int[] meta) {
-        int h = 1;
-        for (Term t : term) {
-            h = 31 /*Util.PRIME1 */ * h + t.init(meta);
-        }
-        return h;
-    }
-
 }

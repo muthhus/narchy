@@ -74,27 +74,27 @@ public class DemoAttentionFlow extends AbstractNARGraphDemo {
     public static void main(String[] args)  {
 
         Default n = new Default(128,4,1,1) {
-            @Override
-            public Function<Term, Concept> newConceptBuilder() {
-                return new DefaultConceptBuilder(this.memory.random, 16, 16) {
-
-                    @Override
-                    protected
-                    @NotNull
-                    AtomConcept newAtomConcept(Term t, Bag<Task> taskLinks, Bag<Termed> termLinks) {
-                        return new AtomConcept(t, termLinks, taskLinks) {
-
-
-                            public List<Termed> templates = new FasterList();
-
-                            public List<Termed> termlinkTemplates() {
-                                return templates;
-                            }
-                        };
-                    }
-
-                };
-            }
+//            @Override
+//            public Function<Term, Concept> newConceptBuilder() {
+//                return new DefaultConceptBuilder(this.memory.random, 16, 16) {
+//
+//                    @Override
+//                    protected
+//                    @NotNull
+//                    AtomConcept newAtomConcept(Term t, Bag<Task> taskLinks, Bag<Termed> termLinks) {
+//                        return new AtomConcept(t, termLinks, taskLinks) {
+//
+//
+//                            public List<Termed> templates = new FasterList();
+//
+//                            public List<Termed> termlinkTemplates() {
+//                                return templates;
+//                            }
+//                        };
+//                    }
+//
+//                };
+  //          }
 
         };
         n.memory.duration.set(5);

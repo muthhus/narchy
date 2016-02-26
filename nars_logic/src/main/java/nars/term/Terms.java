@@ -32,9 +32,43 @@ import static nars.nal.Tense.ITERNAL;
 public class Terms extends TermBuilder implements TermIndex {
 
     public static final Terms terms = new Terms();
+    public static final int[] ZeroIntArray = new int[0];
+    public static final Term[] ZeroTermArray = new Term[0];
+    public static final TermContainer ZeroSubterms = new EmptyTermContainer();
+    public static final Compound ZeroProduct = $.compound(Op.PRODUCT, ZeroSubterms);
+    public static final Compound ZeroSetExt = $.compound(Op.SET_EXT, ZeroSubterms);
+    public static final Compound ZeroSetInt = $.compound(Op.SET_INT, ZeroSubterms);
+    public static final IntFunction<Term[]> NewTermArray = Term[]::new;
+
 
     Terms() {
 
+    }
+
+    /**
+     * TODO decide on some reasonable coding scheme for bundling these numeric values
+     * into 32-bit or 64-bit fields/arrays
+     */
+    public static int hashVar(@NotNull Op type, int id) {
+        return (type.ordinal() << 16) | id;
+    }
+
+    /** computes the content hash while accumulating subterm metadata summary fields into int[] meta */
+    public static int hashSubterms(Term[] term, int[] meta) {
+        int h = 1;
+        for (Term t : term) {
+            h = 31 /*Util.PRIME1 */ * h + t.init(meta);
+        }
+        return h;
+    }
+
+    /** should be consistent with the other hash method(s) */
+    public static int hashSubterms(TermContainer<?> container) {
+        int h = 1;
+        for (Term t : container) {
+            h = 31 /*Util.PRIME1 */ * h + t.hashCode();
+        }
+        return h;
     }
 
     @Override
@@ -65,12 +99,6 @@ public class Terms extends TermBuilder implements TermIndex {
     }
 
 
-    public static final Term[] ZeroTermArray = new Term[0];
-    public static final TermContainer ZeroSubterms = new EmptyTermContainer();
-    public static final Compound ZeroProduct = $.compound(Op.PRODUCT, ZeroSubterms);
-    public static final Compound ZeroSetExt = $.compound(Op.SET_EXT, ZeroSubterms);
-    public static final Compound ZeroSetInt = $.compound(Op.SET_INT, ZeroSubterms);
-    public static final IntFunction<Term[]> NewTermArray = Term[]::new;
 
 
     static final class EmptyTermContainer implements TermContainer {
@@ -78,7 +106,7 @@ public class Terms extends TermBuilder implements TermIndex {
         private final int hash;
 
         EmptyTermContainer() {
-            this.hash = TermContainer.hash(Terms.ZeroTermArray, new int[6] /* dummy */);
+            this.hash = hashSubterms(Terms.ZeroTermArray, Terms.ZeroIntArray /* dummy */);
         }
 
         @Override

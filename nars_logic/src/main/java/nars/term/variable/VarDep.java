@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * normalized dep var
  */
-public final class VarDep extends Variable {
+public final class VarDep extends AbstractVariable {
 
     public VarDep(int id) {
         super(Op.VAR_DEP, id);

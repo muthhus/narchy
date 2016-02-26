@@ -6,7 +6,7 @@ import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.variable.Variable;
+import nars.term.variable.AbstractVariable;
 import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 
@@ -50,8 +50,9 @@ public enum TermLinkBuilder {
         ///** add self link for structural transform: */
         //components.add(t);
 
-        boolean tEquivalence = t.op() == Op.EQUIV;
-        boolean tImplication = t.op() == Op.IMPLICATION;
+        Op tOp = t.op();
+        boolean tEquivalence = tOp == Op.EQUIV;
+        boolean tImplication = tOp == Op.IMPLICATION;
 
 
         int ni = t.size();
@@ -61,13 +62,14 @@ public enum TermLinkBuilder {
             if (ti == null)
                 continue;
 
-
-            if (!(ti instanceof Variable)) {
+            if (!(ti instanceof AbstractVariable)) {
                 components.add(ti);
             }
 
+            //if ((tEquivalence || (tImplication && (i == 0))) && ((ti instanceof Conjunction) || (ti instanceof Negation))) {
+
             if ((tEquivalence || (tImplication && (i == 0))) &&
-                    (ti.isAny(NegationOrConjunction))) {
+                (ti.isAnyOf(NegationOrConjunction))) {
 
                 prepareComponentLinks((Compound) ti, components, nar);
 
@@ -82,21 +84,22 @@ public enum TermLinkBuilder {
                         continue;
 
 
-                    if (!(tj instanceof Variable)) {
+                    if (!(tj instanceof AbstractVariable)) {
                         components.add(tj);
                     }
 
 
                     if (tj instanceof Compound) {
-                        Compound cctj = (Compound) tj;
-                        int nk = cctj.size();
+                        Compound ctj = (Compound) tj;
+
+                        int nk = ctj.size();
                         for (int k = 0; k < nk; k++) {
 
-                            Term tk = growComponent(cctj.term(k), 2, nar);
+                            Term tk = growComponent(ctj.term(k), 2, nar);
                             if (tk == null)
                                 continue;
 
-                            if (!(tk instanceof Variable)) {
+                            if (!(tk instanceof AbstractVariable)) {
                                 components.add(tk);
                             }
                         }

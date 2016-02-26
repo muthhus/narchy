@@ -6,6 +6,7 @@ import nars.nal.meta.PremiseRule;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.transform.VariableNormalization;
+import nars.term.variable.AbstractVariable;
 import nars.term.variable.GenericVariable;
 import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
@@ -16,7 +17,7 @@ public class EllipsisTransform extends EllipsisOneOrMore {
     public final Term from;
     public final Term to;
 
-    public EllipsisTransform(@NotNull Variable name, Term from, Term to) {
+    public EllipsisTransform(@NotNull AbstractVariable name, Term from, Term to) {
         super(name);
 
 
@@ -34,11 +35,11 @@ public class EllipsisTransform extends EllipsisOneOrMore {
 
     @NotNull
     @Override
-    @Deprecated public Variable clone(@NotNull Variable v, VariableNormalization normalizer) {
+    @Deprecated public Variable clone(@NotNull AbstractVariable v, VariableNormalization normalizer) {
         throw new RuntimeException("n/a");
     }
 
-    public static Variable make(@NotNull Variable v, Term from, Term to, VariableNormalization normalizer) {
+    public static Variable make(@NotNull AbstractVariable v, Term from, Term to, VariableNormalization normalizer) {
         //normalizes any variable parameter terms of an EllipsisTransform
         PremiseRule.PremiseRuleVariableNormalization vnn = (PremiseRule.PremiseRuleVariableNormalization) normalizer;
         return new EllipsisTransform(v,

@@ -1,23 +1,64 @@
 package nars.concept;
 
+import com.gs.collections.api.block.function.primitive.ObjectIntToObjectFunction;
 import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
 import nars.budget.BudgetMerge;
-import nars.nal.space.Space;
-import nars.nal.space.SpaceConcept;
 import nars.task.Task;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.atom.Atomic;
+import nars.term.variable.Variable;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Random;
 import java.util.function.Function;
+import java.util.function.IntFunction;
 
 /**
  * Created by me on 2/24/16.
  */
-public class DefaultConceptBuilder implements Function<Term, Concept> {
+public class DefaultConceptBuilder implements Function<Term,Concept> {
+
+    final Function<Atomic, AtomConcept> atomBuilder =
+            (Atomic a) -> new AtomConcept(a, taskbag(), termbag());
+
+
+    //private static volatile int serial = 0;
+
+    final Function<Variable, VariableConcept> varBuilder =
+            (Variable v) -> new VariableConcept(v, termbag(), taskbag());
+
+    final Function<Compound, CompoundConcept> compoundBuilder =
+            (Compound t) -> new CompoundConcept(t, termbag(), taskbag());
+
+
+
+    //return (!(t instanceof Space)) ?
+    //new SpaceConcept((Space) t, taskLinks, termLinks);
+
+    private Bag<Task> taskbag() {
+          return new CurveBag<Task>(taskLinkBagSize.intValue(), rng)
+              .merge(mergeDefault());
+    }
+
+    private BudgetMerge mergeDefault() {
+        return BudgetMerge.plusDQBlend;
+    }
+
+    private Bag<Termed> termbag() {
+        return new CurveBag<Termed>(termLinkBagSize.intValue(), rng)
+                .merge(mergeDefault());
+
+    }
+
+    final static Logger logger = LoggerFactory.getLogger(DefaultConceptBuilder.class);
+
 
     /**
      * default for new concepts
@@ -28,6 +69,8 @@ public class DefaultConceptBuilder implements Function<Term, Concept> {
      * default for new concepts
      */
     public final MutableInt termLinkBagSize = new MutableInt(16);
+
+
     public final Random rng;
 
 
@@ -42,48 +85,40 @@ public class DefaultConceptBuilder implements Function<Term, Concept> {
         this.termLinkBagSize.setValue(termlinkBagSize);
     }
 
-    @Override
-    public Concept apply(Term t) {
-
-
-        Random random = rng;
-
-        Bag<Task> taskLinks =
-                new CurveBag<Task>(taskLinkBagSize.intValue(), random)
-                        .merge(BudgetMerge.plusDQBlend);
-
-        Bag<Termed> termLinks =
-                new CurveBag<Termed>(termLinkBagSize.intValue(), random)
-                        .merge(BudgetMerge.plusDQBlend);
-
-        Concept c;
-        //switch (t.op()) {
-            /*Op.NEGATE:
-
-                break;*/
-            //default:
-        c = (!(t.isCompound())) ?
-
-                newAtomConcept(t, taskLinks, termLinks) :
-
-                newCompoundConcept(t, taskLinks, termLinks);
-        //}
-        return c;
-    }
 
     @NotNull
-    protected Concept newCompoundConcept(Term t, Bag<Task> taskLinks, Bag<Termed> termLinks) {
-        return (!(t instanceof Space)) ?
+    public Concept apply(@NotNull Term term) {
 
-                new DefaultConcept(t, taskLinks, termLinks) :
+        //already a concept, assume it is from here
+        if (term instanceof Concept) {
+            return (Concept)term;
+        }
 
-                new SpaceConcept((Space) t, taskLinks, termLinks);
+        if (!term.isNormalized())
+            return null; //TODO ??
+
+
+        Concept result = null;
+        if (term instanceof Compound) {
+            result = compoundBuilder.apply((Compound) term);
+        } else {
+
+            if (term instanceof Variable) {
+                //final int s = this.serial;
+                //serial++;
+                result = varBuilder.apply((Variable) term);
+            } else if (term instanceof Atomic) {
+                result = atomBuilder.apply((Atomic) term);
+            }
+
+        }
+        if (result == null) {
+            logger.error("unknown conceptualization method for term: {} of class {} ", term, term.getClass());
+            throw new UnsupportedOperationException();
+        }
+
+        logger.info("{} conceptualized to {}", term, result);
+        return result;
+
     }
-
-    protected @NotNull AtomConcept newAtomConcept(Term t, Bag<Task> taskLinks, Bag<Termed> termLinks) {
-        return new AtomConcept(t, termLinks, taskLinks);
-    }
-
-
-
 }

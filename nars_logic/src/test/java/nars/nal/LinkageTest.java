@@ -91,12 +91,12 @@ public class LinkageTest extends AbstractNALTest {
 
         NAR nar = test().nar;
 
-        Term premise1 = nar.term(spremise1);
+        Termed premise1 = nar.term(spremise1);
         assertEquals(spremise1, premise1.toString());
         assertNotNull(premise1);
         assertEquals(nar.term(spremise1), premise1);
 
-        Term premise2 = nar.term(spremise2);
+        Termed premise2 = nar.term(spremise2);
         assertEquals(spremise2, premise2.toString());
         assertNotNull(premise2);
         assertEquals(nar.term(spremise2), premise2);
@@ -139,7 +139,7 @@ public class LinkageTest extends AbstractNALTest {
     }
 
     @NotNull
-    public String getTask(char punc, Term premise1) {
+    public String getTask(char punc, Termed premise1) {
         if (punc=='?') {
             return premise1.toString() + String.valueOf(punc);
         } else {
@@ -147,11 +147,12 @@ public class LinkageTest extends AbstractNALTest {
         }
     }
 
-    public boolean linksIndirectly(NAR nar, Term premise2, Concept ret) {
+    public boolean linksIndirectly(NAR nar, Termed premise2, Concept ret) {
         boolean passed = false;
         if(ret!=null && ret.termlinks()!=null) {
             for (BLink<Termed> entry : ret.termlinks()) {
-                if(entry.get().term().equals(premise2.term())) {
+                Term p2Term = premise2.term();
+                if(entry.get().term().equals(p2Term)) {
                     passed = true;
                     break;
                 }
@@ -160,7 +161,7 @@ public class LinkageTest extends AbstractNALTest {
                 Concept Wc = nar.concept(w);
                 if(Wc != null) {
                     for (BLink<Termed> entry2 : Wc.termlinks()) {
-                        if(entry2.get().term().equals(premise2.term())) {
+                        if(entry2.get().term().equals(p2Term)) {
                             passed = true;
                             break;
                         }

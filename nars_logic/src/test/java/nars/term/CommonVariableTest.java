@@ -1,9 +1,11 @@
 package nars.term;
 
+import nars.Op;
 import nars.nar.Terminal;
 import nars.term.variable.CommonVariable;
 import nars.term.variable.GenericNormalizedVariable;
 import nars.term.variable.GenericVariable;
+import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -19,9 +21,9 @@ public class CommonVariableTest {
 
     static final Terminal p = new Terminal();
 
-    static final GenericVariable p1 = (GenericVariable) p.term("%1");
-    static final GenericVariable p2 = (GenericVariable) p.term("%2");
-    static final GenericVariable p12 = (GenericVariable) p.term("%12");
+    static final GenericVariable p1 = new GenericVariable(Op.VAR_PATTERN, "1");
+    static final GenericVariable p2 = new GenericVariable(Op.VAR_PATTERN, "2");
+    static final GenericVariable p12 = new GenericVariable(Op.VAR_PATTERN, "12");
 
     @Test
     public void commonVariableTest1() {
@@ -61,13 +63,13 @@ public class CommonVariableTest {
         //different lengths
 
         GenericNormalizedVariable ca = make(
-                (GenericVariable)p.term("%1"),
-                (GenericVariable)p.term("%2"));
+                p1,
+                p2);
         GenericNormalizedVariable cb = make(
-                (GenericVariable)p.term("%2"),
-                (GenericVariable)p.term("%1"));
+                p2,
+                p1);
 
         assertEquals(ca, cb);
-        Assert.assertTrue(ca == cb);
+        Assert.assertTrue(ca != cb);
     }
 }

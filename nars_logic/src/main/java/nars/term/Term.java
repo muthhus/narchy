@@ -94,14 +94,18 @@ public interface Term extends Termed, Comparable, Termlike {
     //boolean hasVar(final Op type);
 
 
-    /** tests if contains a term in the structural hash
-     *  WARNING currently this does not detect presence of pattern variables
-     * */
-    default boolean hasAny(@NotNull Op op) {
-//        if (op == Op.VAR_PATTERN)
-//            return Variable.hasPatternVariable(this);
-        return hasAny(op.bit());
+
+
+    /** true if the operator bit is included in the enabld bits of the provided vector */
+    default boolean isAnyOf(int bitsetOfOperators) {
+        int s = op().bit();
+        return (s & bitsetOfOperators) == s;
     }
+
+//    /** for multiple Op comparsions, use Op.or to produce an int and call isAny(int vector) */
+//    default boolean isA(@NotNull Op otherOp) {
+//        return op() == otherOp;
+//    }
 
 
 
@@ -112,15 +116,6 @@ public interface Term extends Termed, Comparable, Termlike {
 //    }
 //
 
-    /** true if the operator's bit is included in the enabld bits of the provided vector */
-    @Override default boolean isAny(int structuralVector) {
-        int s = op().bit();
-        return (s & structuralVector) == s;
-    }
-    /** for multiple Op comparsions, use Op.or to produce an int and call isAny(int vector) */
-    default boolean isAny(@NotNull Op op) {
-        return isAny(op.bit());
-    }
 
     /** # of contained independent variables */
     int varIndep();
@@ -200,7 +195,8 @@ public interface Term extends Termed, Comparable, Termlike {
 
     /** upper 16 bits: ordinal, lower 16 bits: relation (default=-1) */
     @Override default int opRel() {
-        return op().ordinal()<<16 | (0xffff);
+        return Terms.opRel(op(), -1);
+        //return op().ordinal()<<16 | (0xffff);
     }
 
     boolean isCompound();
@@ -288,6 +284,7 @@ public interface Term extends Termed, Comparable, Termlike {
 
         return hashCode();
     }
+
 
 //    default public boolean hasAll(final Op... op) {
 //        //TODO

@@ -12,7 +12,8 @@ import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;
-import nars.term.variable.Variable;
+import nars.term.atom.Atomic;
+import nars.term.variable.AbstractVariable;
 import nars.util.Texts;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -465,7 +466,7 @@ public class DerivationGraph extends DirectedPseudograph<DerivationGraph.Keyed,O
 
     public static String genericLiteral(@NotNull Term c, @NotNull ObjectIntHashMap<Term> unique) {
         c.recurseTerms((t, superterm) -> {
-            if ((t instanceof Atom) && (!(t instanceof Variable))) {
+            if ((t instanceof Atomic) && (!(t instanceof AbstractVariable))) {
                 unique.getIfAbsentPut(t, unique.size());
             }
         });
@@ -526,7 +527,7 @@ public class DerivationGraph extends DirectedPseudograph<DerivationGraph.Keyed,O
         if (t instanceof AbstractOperator) {
             return t.toString();
         }
-        if (t instanceof Variable || t instanceof Compound) {
+        if (t instanceof AbstractVariable || t instanceof Compound) {
             //return t.toString();
             return genericLiteral(t, unique);
         }

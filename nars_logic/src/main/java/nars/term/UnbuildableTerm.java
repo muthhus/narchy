@@ -21,6 +21,10 @@ public final class UnbuildableTerm extends RuntimeException {
         this(null, -1, ITERNAL, null);
     }
 
+    public UnbuildableTerm(Compound x /* incomplete or invalid */) {
+        this(x.op(), x.relation(), x.dt(), x.terms());
+    }
+
     public UnbuildableTerm(Term[] args) {
         this(null, -1, ITERNAL, args);
     }

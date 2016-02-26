@@ -9,6 +9,8 @@ import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
+import nars.term.variable.AbstractVariable;
+import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,7 +19,7 @@ import java.util.List;
 /**
  * Created by me on 9/2/15.
  */
-public class AtomConcept extends AbstractConcept implements Atomic {
+public class AtomConcept<E extends Atomic> extends AbstractConcept<E> implements Atomic {
 
 
 //    /** creates with no termlink and tasklink ability */
@@ -25,7 +27,7 @@ public class AtomConcept extends AbstractConcept implements Atomic {
 //        this(atom, budget, new NullBag(), new NullBag());
 //    }
 
-    public AtomConcept(Term atom, Bag<Termed> termLinks, Bag<Task> taskLinks) {
+    public AtomConcept(E atom, Bag<Termed> termLinks, Bag<Task> taskLinks) {
         super(atom, taskLinks, termLinks);
     }
 

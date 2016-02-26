@@ -5,15 +5,12 @@ import org.jetbrains.annotations.NotNull;
 
 /** has, or is associated with a specific term */
 @FunctionalInterface
-public interface Termed<TT extends Term>  {
+public interface Termed<T extends Term>  {
 
-    @NotNull
-    TT term();
+    @NotNull T term();
 
     @NotNull
     default Op op() { return term().op(); }
-
-    default boolean isAny(int vector) { return term().isAny(vector); }
 
     default int opRel() {
         return term().opRel();

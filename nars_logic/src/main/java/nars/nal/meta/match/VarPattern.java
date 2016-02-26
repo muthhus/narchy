@@ -1,13 +1,13 @@
 package nars.nal.meta.match;
 
 import nars.Op;
-import nars.term.variable.Variable;
+import nars.term.variable.AbstractVariable;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * normalized pattern variable
  */
-public class VarPattern extends Variable {
+public class VarPattern extends AbstractVariable {
 
     public VarPattern(int id) {
         super(Op.VAR_PATTERN, id);

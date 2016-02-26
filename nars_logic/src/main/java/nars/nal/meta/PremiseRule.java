@@ -20,13 +20,14 @@ import nars.op.data.differ;
 import nars.op.data.intersect;
 import nars.op.data.union;
 import nars.term.*;
-import nars.term.atom.Atom;
+import nars.term.atom.Atomic;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermVector;
 import nars.term.index.PatternIndex;
 import nars.term.transform.CompoundTransform;
 import nars.term.transform.VariableNormalization;
 import nars.term.transform.subst.MapSubst;
+import nars.term.variable.AbstractVariable;
 import nars.term.variable.GenericVariable;
 import nars.term.variable.Variable;
 import nars.truth.BeliefFunction;
@@ -129,7 +130,7 @@ public class PremiseRule extends GenericCompound {
         this((Compound) premisesResultProduct.term(0), (Compound) premisesResultProduct.term(1));
     }
 
-    public PremiseRule(Compound premises, Compound result) {
+    public PremiseRule(@NotNull Compound premises, @NotNull Compound result) {
         super(Op.PRODUCT, TermVector.the(premises, result));
         str = super.toString();
     }
@@ -315,7 +316,7 @@ public class PremiseRule extends GenericCompound {
 
         @Override
         public boolean test(Term term) {
-            if (term instanceof Atom) {
+            if (term instanceof Atomic) {
                 String name = term.toString();
                 return (Character.isUpperCase(name.charAt(0)));
             }
@@ -346,7 +347,8 @@ public class PremiseRule extends GenericCompound {
             Compound premiseComponents = (Compound) index.the((Termed)
                     terms.transform(
                         terms.transform(this, UppercaseAtomsToPatternVariables),
-                            new PremiseRuleVariableNormalization()));
+                            new PremiseRuleVariableNormalization())
+                    );
 
             return new PremiseRule( premiseComponents );
 
@@ -769,7 +771,7 @@ public class PremiseRule extends GenericCompound {
 
         int offset;
 
-        public static Variable varPattern(int i) {
+        public static AbstractVariable varPattern(int i) {
             return v(VAR_PATTERN, i);
         }
 

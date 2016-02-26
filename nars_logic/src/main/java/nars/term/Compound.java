@@ -28,6 +28,7 @@ import nars.nal.Tense;
 import nars.nal.meta.match.Ellipsis;
 import nars.term.container.TermContainer;
 import nars.term.transform.subst.FindSubst;
+import nars.util.data.Util;
 import nars.util.data.sexpression.IPair;
 import nars.util.data.sexpression.Pair;
 import org.jetbrains.annotations.NotNull;
@@ -186,13 +187,13 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
     @NotNull
     @Override
     default Object setFirst(Object first) {
-        throw new RuntimeException(this + " not modifiable");
+        throw new UnsupportedOperationException();
     }
 
     @NotNull
     @Override
     default Object setRest(Object rest) {
-        throw new RuntimeException(this + " not modifiable");
+        throw new UnsupportedOperationException();
     }
 
 
@@ -269,20 +270,12 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 
             if (isSubterm(this, t, l)) {
 
-                switch (l.size()) {
-                    case 0: throw new UnsupportedOperationException(); //should never happen
-                    case 1: return new int[] {l.get(0)};
-                    case 2: return new int[] {l.get(1), l.get(0)};
-                    case 3: return new int[] {l.get(2), l.get(1), l.get(0)};
-                    default:
-                        //reverse the array since it has been constructed in reverse
-                        //TODO use more efficient array reversal
-                        return l.toReversed().toArray();
-                }
+                return Util.reverse(l);
             }
         }
         return null;
     }
+
 
     static boolean isSubterm(@NotNull Compound container, @NotNull Term t, @NotNull IntArrayList l) {
         Term[] x = container.terms();

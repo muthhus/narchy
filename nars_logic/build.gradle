@@ -1,3 +1,17 @@
+buildscript {
+   repositories {
+       mavenCentral()
+   }
+   configurations.maybeCreate("pitest")
+   dependencies {
+       classpath 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.1.9'
+       pitest 'org.pitest.plugins:pitest-fancy-plugin:0.0.1'
+   }
+}
+plugins {
+    id "info.solidsoft.pitest" version "1.1.4" //http://gradle-pitest-plugin.solidsoft.info/
+}
+
 description = 'OpenNARS Logic Reasoner'
 
 apply plugin: 'application'
@@ -23,7 +37,7 @@ dependencies {
 }
 
 
-mainClassName = 'nars.NARjs'
+mainClassName = 'nars.Repl'
 
 //run{
 //    standardInput = System.in
@@ -35,4 +49,13 @@ jacocoTestReport {
         csv.enabled false
         html.destination "${buildDir}/coverage_html"
     }
+}
+
+pitest {
+    targetClasses = ['nars.budget.*','nars.task.*','nars.concept.*']
+    threads = 1
+    outputFormats = ['XML', 'HTML']
+    enableDefaultIncrementalAnalysis = true
+    jvmArgs = ['-Xmx512m']
+
 }

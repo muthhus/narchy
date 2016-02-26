@@ -19,6 +19,7 @@ import com.google.common.io.CharStreams;
 import com.google.common.io.Closeables;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
+import com.gs.collections.impl.list.mutable.primitive.IntArrayList;
 import nars.util.Texts;
 import org.jetbrains.annotations.NotNull;
 import sun.misc.Unsafe;
@@ -865,4 +866,16 @@ public enum Util {
     }
 
 
+    public static int[] reverse(IntArrayList l) {
+        switch (l.size()) {
+            case 0: throw new UnsupportedOperationException(); //should never happen
+            case 1: return new int[] {l.get(0)};
+            case 2: return new int[] {l.get(1), l.get(0)};
+            case 3: return new int[] {l.get(2), l.get(1), l.get(0)};
+            default:
+                //reverse the array since it has been constructed in reverse
+                //TODO use more efficient array reversal
+                return l.asReversed().toArray();//toReversed().toArray();
+        }
+    }
 }

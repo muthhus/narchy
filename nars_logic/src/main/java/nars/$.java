@@ -358,33 +358,12 @@ public enum $ /* TODO: implements TermIndex */ {
 //            }
 //        }
 
-        return new GenericVariable(Variable.typeIndex(ch), name);
+        return new GenericVariable(AbstractVariable.typeIndex(ch), name);
     }
 
     /** normalized variable */
-    @NotNull public static Variable v(@NotNull Op type, int counter) {
-        if (counter >= Variable.MAX_VARIABLE_CACHED_PER_TYPE) {
-            return vNew(type, counter);
-            //throw new RuntimeException("variable cache overflow");
-        }
-
-        Variable[] vct = Variable.varCache[typeIndex(type)];
-        Variable v = vct[counter];
-        if (v == null) {
-            v = vNew(type, counter);
-            vct[counter] = v;
-        }
-        return v;
-    }
-
-    static Variable vNew(@NotNull Op type, int counter) {
-        switch (type) {
-            case VAR_PATTERN: return new VarPattern(counter);
-            case VAR_QUERY: return  new VarQuery(counter);
-            case VAR_DEP: return  new VarDep(counter);
-            case VAR_INDEP: return  new VarIndep(counter);
-        }
-        return null;
+    public static @NotNull AbstractVariable v(@NotNull Op type, int counter) {
+        return AbstractVariable.cached(type, counter);
     }
 
     @Nullable
@@ -548,19 +527,6 @@ public enum $ /* TODO: implements TermIndex */ {
     }
 
 
-    public static int typeIndex(@NotNull Op o) {
-        switch (o) {
-            case VAR_PATTERN:
-                return 0;
-            case VAR_DEP:
-                return 1;
-            case VAR_INDEP:
-                return 2;
-            case VAR_QUERY:
-                return 3;
-        }
-        throw new RuntimeException(o + " not a variable");
-    }
 
 
 

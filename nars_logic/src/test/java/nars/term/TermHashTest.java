@@ -20,12 +20,14 @@ public class TermHashTest {
                 .hasAny(Op.or(Op.ATOM, Op.PRODUCT)));
 
         assertFalse(inh(p("a"), $("b"))
-                .isAny(Op.or(Op.SIMILAR, Op.PRODUCT)));
+                .isAnyOf(Op.or(Op.SIMILAR, Op.PRODUCT)));
         assertFalse(inh(p("a"), $("b"))
-                .isAny(Op.PRODUCT));
+                .op() == Op.PRODUCT);
 
+        assertTrue(inh("a", "b").op() == Op.INHERIT);
         assertTrue(inh("a", "b").hasAny(Op.INHERIT));
-        assertTrue(inh("a", "b").isAny(Op.INHERIT));
+        assertTrue(inh("a", "b").hasAny(Op.ATOM));
+        assertFalse(inh("a", "b").hasAny(Op.SIMILAR));
     }
 
 //    @Test

@@ -251,15 +251,15 @@ public abstract class FindSubst extends Versioning implements Subst {
             Op t = type;
 
             if (xOp == t) {
-                return matchXvar((Variable) x, y);
+                return matchXvar(x, y);
             }
 
             if (yOp == t) {
-                return matchYvar(x, (Variable)y);
+                return matchYvar(x, y);
             }
 
             if (xOp.isVar() && yOp.isVar()) {
-                return nextVarX((Variable) x, y);
+                return nextVarX( x, y);
             }
         }
 
@@ -270,9 +270,9 @@ public abstract class FindSubst extends Versioning implements Subst {
 //        return x.complexity()<x.volume() || x.firstEllipsis()!=null;
 //    }
 
-    private final boolean nextVarX(@NotNull Variable xVar, @NotNull Term y) {
+    private final boolean nextVarX(@NotNull Term /* var */ xVar, @NotNull Term /* var */ y) {
         Op xOp = xVar.op();
-        return (y.op() == xOp) ? putCommon(xVar, (Variable) y) :
+        return (y.op() == xOp) ? putCommon((Variable)xVar, (Variable)y) :
                     (xOp == type) //<-- this condition may not be correct but doesnt seem to make much difference. better if it is more restrictive in what is inserted
                         &&
                 putVarX(xVar, y);
@@ -285,7 +285,7 @@ public abstract class FindSubst extends Versioning implements Subst {
     }
 
 
-    private final boolean matchXvar(@NotNull Variable x, @NotNull Term y) {
+    private final boolean matchXvar(@NotNull Term /* var */ x, @NotNull Term y) {
         Term t = term(x);
 
         return (t != null) ?
@@ -294,7 +294,7 @@ public abstract class FindSubst extends Versioning implements Subst {
 
 
     }
-    private final boolean matchYvar(@NotNull Term x, @NotNull Variable y) {
+    private final boolean matchYvar(@NotNull Term x, @NotNull Term /* var */ y) {
         Term t = yx.term(y);
 
         if (t != null) {
@@ -727,7 +727,7 @@ public abstract class FindSubst extends Versioning implements Subst {
     /**
      * elimination
      */
-    private boolean putVarX(Variable x, @NotNull Term y) {
+    private boolean putVarX(Term /* var */ x, @NotNull Term y) {
         return putXY(x, y) ?
                 ((x instanceof GenericNormalizedVariable) ?
                         putYX(x, y) :
@@ -736,7 +736,7 @@ public abstract class FindSubst extends Versioning implements Subst {
     }
 
 
-    private boolean putCommon(@NotNull Variable x, @NotNull Variable y) {
+    private boolean putCommon(@NotNull Variable /* var */ x, @NotNull Variable y) {
         Variable commonVar = CommonVariable.make(x, y);
         return putXY(x, commonVar) && putYX(y, commonVar);
         //TODO restore displaced values if putYX fails but putXY succeeded?

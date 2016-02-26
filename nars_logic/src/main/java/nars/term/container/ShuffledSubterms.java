@@ -2,6 +2,7 @@ package nars.term.container;
 
 import nars.nal.meta.match.Ellipsis;
 import nars.term.Term;
+import nars.term.Terms;
 import nars.util.math.ShuffledPermutations;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -114,7 +115,7 @@ public final class ShuffledSubterms extends ShuffledPermutations implements Term
 
     @Override
     public int hashCode() {
-        return TermContainer.hash(this);
+        return Terms.hashSubterms(this);
     }
 
     @Override
