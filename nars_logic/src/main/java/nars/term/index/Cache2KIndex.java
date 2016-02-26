@@ -70,7 +70,7 @@ public class Cache2KIndex extends CacheLoader<Termlike,IntObjectHashMap<Termed>>
     @Override
     public
     @Nullable
-    Termed getTermIfPresent(Termed t) {
+    Termed getIfPresent(Termed t) {
         return null;
     }
 

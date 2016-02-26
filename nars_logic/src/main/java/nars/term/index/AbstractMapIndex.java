@@ -40,14 +40,13 @@ public abstract class AbstractMapIndex implements TermIndex {
     }
 
     @NotNull
-    protected static Termed newInternCompound(@NotNull Op op, @NotNull TermContainer subterms, int relation) {
+    static Termed newInternCompound(@NotNull Op op, @NotNull TermContainer subterms, int relation) {
         return new GenericCompound(
             op, relation, (TermVector) subterms
         );
     }
 
     @Nullable
-    @Override
     public Termed the(Term x) {
 
         if (x instanceof Ellipsis)
@@ -59,9 +58,9 @@ public abstract class AbstractMapIndex implements TermIndex {
 //            return x;
 //        }
 
-        Termed y = getTermIfPresent(x);
+        Termed y = getIfPresent(x);
         if (y == null) {
-            if ((y = makeTerm(x)) !=null) {
+            if ((y = resolve(x)) !=null) {
                 putTerm(y);
                 if (!y.equals(x))
                     return x; //return original non-anonymized
@@ -84,7 +83,6 @@ public abstract class AbstractMapIndex implements TermIndex {
 //    public abstract int size();
 
     @Nullable
-    @Override
     public Termed make(@NotNull Op op, int relation, TermContainer t, int dt) {
         @Nullable TermContainer subs = internSub(t);
         if (subs == null)
@@ -96,7 +94,7 @@ public abstract class AbstractMapIndex implements TermIndex {
         return x;
     }
 
-    @Override public Termed makeAtomic(Term t) {
+    @Override public Termed resolveAtomic(Term t) {
         return t;
     }
 

@@ -17,11 +17,8 @@
 
 package nars.op.math;
 
-import nars.term.Operator;
+import nars.term.*;
 import nars.nal.nal8.operator.TermFunction;
-import nars.term.Compound;
-import nars.term.Term;
-import nars.term.TermBuilder;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -43,7 +40,7 @@ public class length extends TermFunction<Integer> {
     //TODO 'volume' of any term
 
     @Override
-    public Integer function(@NotNull Compound o, TermBuilder i) {
+    public Integer function(@NotNull Compound o, TermIndex i) {
         Term[] x = Operator.argArray(o);
         Term content = x[0];
         /*if (!(content instanceof SetExt) && !(content instanceof SetInt)) {

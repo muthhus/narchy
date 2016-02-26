@@ -3,6 +3,7 @@ package nars.nal.op;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.TermBuilder;
+import nars.term.TermIndex;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -10,8 +11,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public abstract class UnaryTermOperator extends ImmediateTermTransform {
 
-    @NotNull
-    @Override public final Term function(@NotNull Compound x, TermBuilder i) {
+    @Override public final Term function(@NotNull Compound x, TermIndex i) {
         if (x.size()<1)
             throw new RuntimeException(this + " requires >= 2 args");
 

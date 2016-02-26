@@ -29,7 +29,7 @@ public class MapIndex extends AbstractMapIndex {
 
 
     @Override
-    public final Termed getTermIfPresent(Termed t) {
+    public final Termed getIfPresent(Termed t) {
         return data.get(t);
     }
 

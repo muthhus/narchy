@@ -88,7 +88,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
         }
 
         if (terms.isEmpty()) return Terms.empty(op);
-        return i.newTerm(op, TermSet.the(terms));
+        return i.newCompound(op, TermSet.the(terms));
 
 //        if (a.size() == 1 && b.size() == 1) {
 //            //special case

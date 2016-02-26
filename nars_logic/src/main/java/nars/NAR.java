@@ -583,7 +583,7 @@ public abstract class NAR implements Level, Consumer<Task> {
         return onExec(new TermFunction(operator) {
 
             @Override
-            public Object function(@NotNull Compound x, TermBuilder i) {
+            public Object function(@NotNull Compound x, TermIndex i) {
                 return func.apply(x.terms());
             }
 
@@ -1107,7 +1107,7 @@ public abstract class NAR implements Level, Consumer<Task> {
 
 
 
-        Termed uu = index.getTermIfPresent(tt);
+        Termed uu = index.getIfPresent(tt);
 
         if (uu instanceof Concept) {
             return (Concept) uu;

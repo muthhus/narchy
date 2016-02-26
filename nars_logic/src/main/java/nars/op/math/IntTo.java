@@ -4,15 +4,14 @@ import nars.nal.Tense;
 import nars.nal.nal8.operator.TermFunction;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.TermBuilder;
+import nars.term.TermIndex;
 import org.jetbrains.annotations.NotNull;
 
 
 public abstract class IntTo<Y> extends TermFunction<Y> {
 
-    @NotNull
     @Override
-    public final Y function(@NotNull Compound o, TermBuilder i) {
+    public final Y function(@NotNull Compound o, TermIndex i) {
 
         Term[] x = o.terms();
 

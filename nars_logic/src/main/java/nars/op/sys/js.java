@@ -1,16 +1,12 @@
 package nars.op.sys;
 
 import nars.NAR;
-import nars.term.Operator;
+import nars.term.*;
 import nars.nal.nal8.operator.NullOperator;
 import nars.nal.nal8.operator.TermFunction;
 import nars.task.Task;
-import nars.term.Compound;
-import nars.term.Term;
-import nars.term.TermBuilder;
 import nars.term.atom.Atom;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
@@ -51,7 +47,7 @@ public class js extends TermFunction {
             }
         }
 
-        @Override public Object function(@NotNull Compound o, TermBuilder i) {
+        @Override public Object function(@NotNull Compound o, TermIndex i) {
             Term[] args = Operator.argArray(o);
             Bindings bindings = newBindings(null, args);
             bindings.put("_o", fnCompiled);
@@ -187,8 +183,7 @@ public class js extends TermFunction {
     }
 
 
-    @Nullable
-    @Override public Object function(@NotNull Compound o, TermBuilder i) {
+    @Override public Object function(@NotNull Compound o, TermIndex i) {
         Term[] args = Operator.argArray(o);
         if (args.length < 1) {
             return null;

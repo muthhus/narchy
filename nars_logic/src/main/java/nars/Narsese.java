@@ -1197,17 +1197,17 @@ public class Narsese extends BaseParser<Object> {
     }
 
 
-    @Nullable public Termed term(String s, @NotNull TermBuilder t) {
+    @Nullable public Termed term(String s, @NotNull TermIndex t) {
         return term(s, t, true);
     }
 
     @Nullable
-    public Termed term(String s, @NotNull TermBuilder index, boolean normalize) {
+    public Termed term(String s, @NotNull TermIndex index, boolean normalize) {
         Term raw = term(s);
         if (raw == null) return null;
 
         return (normalize && !raw.isNormalized()) ?
-                index.normalized(raw) : index.the(raw);
+                index.normalized(raw) : raw;
     }
 
 //    public TaskRule taskRule(String input) {

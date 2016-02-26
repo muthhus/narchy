@@ -4,12 +4,10 @@ import com.google.common.cache.CacheBuilder;
 import com.gs.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import nars.concept.AtomConcept;
 import nars.concept.Concept;
-import nars.term.Atoms;
-import nars.term.Compound;
-import nars.term.Term;
-import nars.term.Termed;
+import nars.term.*;
 import nars.term.atom.AtomicString;
 import nars.term.container.TermContainer;
+import nars.term.container.TermVector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,26 +23,34 @@ public class MapIndex2 extends AbstractMapIndex {
     private static final int SUBTERM_RELATION = Integer.MIN_VALUE;
 
     final Atoms atoms = new Atoms();
-    final Map<Object /* vector(t) */, IntObjectHashMap> data;
+    final Map<TermVector, IntObjectHashMap> data;
+    private final TermBuilder builder;
     int count;
 
-    public MapIndex2(Map<Object, IntObjectHashMap> data) {
+    public MapIndex2(Map<TermVector, IntObjectHashMap> data) {
+
+        this.builder = new TermBuilder();
 
         this.data = data;
 
     }
 
-    @NotNull
-    static Object vector(@NotNull Term t) {
-        if (t.isCompound()) return ((Compound)t).subterms();
-        return t;
+    @Override
+    public final TermBuilder builder() {
+        return builder;
     }
 
-    static final Function<Object, IntObjectHashMap> groupBuilder =
+    @NotNull
+    static TermVector vector(@NotNull Term t) {
+        return (t.isCompound())  ?
+                    (TermVector)((Compound)t).subterms() : null;
+    }
+
+    static final Function<TermVector, IntObjectHashMap> groupBuilder =
             (k) -> new IntObjectHashMap(8);
 
     /** returns previous value */
-    private Object putItem(Object vv, int index, Object value) {
+    private Object putItem(TermVector vv, int index, Object value) {
 
         IntObjectHashMap g = group(vv);
         Object res = g.put(index, value);
@@ -55,14 +61,14 @@ public class MapIndex2 extends AbstractMapIndex {
         return res;
     }
 
-    public IntObjectHashMap group(Object vv) {
+    public IntObjectHashMap group(TermVector vv) {
         return data.computeIfAbsent(vv, groupBuilder);
     }
 
 
     @Nullable
     @Override
-    public Termed getTermIfPresent(@NotNull Termed t) {
+    public Termed getIfPresent(@NotNull Termed t) {
         return (Termed) getItemIfPresent(
                 vector(t.term()), t.opRel());
     }
@@ -95,7 +101,8 @@ public class MapIndex2 extends AbstractMapIndex {
 
     @Override
     protected void putSubterms(TermContainer subterms) {
-        putItem(subterms, SUBTERM_RELATION, subterms);
+
+        putItem((TermVector)subterms, SUBTERM_RELATION, subterms);
     }
 
 
@@ -103,6 +110,7 @@ public class MapIndex2 extends AbstractMapIndex {
     public void clear() {
         count = 0;
         data.clear();
+        //TODO atoms.clear();
     }
 
     @Override

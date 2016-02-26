@@ -1,8 +1,14 @@
 package nars.term;
 
 import javassist.scopedpool.SoftValueHashMap;
+import nars.$;
+import nars.Global;
 import nars.Op;
 import nars.budget.Budget;
+import nars.nal.meta.PremiseAware;
+import nars.nal.meta.PremiseEval;
+import nars.nal.meta.match.EllipsisMatch;
+import nars.nal.op.ImmediateTermTransform;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.compound.GenericCompound;
@@ -11,23 +17,45 @@ import nars.term.container.TermSet;
 import nars.term.container.TermVector;
 import nars.term.index.MapIndex;
 import nars.term.index.MapIndex2;
+import nars.term.transform.CompoundTransform;
+import nars.term.transform.VariableNormalization;
+import nars.term.transform.VariableTransform;
+import nars.term.transform.subst.Subst;
+import nars.term.variable.Variable;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import static nars.Op.*;
 
 /**
  *
  */
-public interface TermIndex extends TermBuilder {
+public interface TermIndex  {
+
+    @Nullable
+    default Termed resolve(Term t) {
+        return t instanceof Compound ? resolveCompound((Compound) t)
+                : resolveAtomic(t);
+    }
+
+    default Termed resolveAtomic(Term t) {
+        //DEFAULT IMPL to be moved to a concrete class: Uses input value as-is
+        return t; /* as-is */
+    }
 
 
+    @Nullable
+    default Termed resolveCompound(@NotNull Compound t) {
+        //DEFAULT IMPL to be moved to a concrete class: BUILDS ON THE HEAP:
+        return builder().make(t.op(), t.relation(), t.subterms(), t.dt());
+    }
 
     /** universal zero-length product */
     Compound Empty = new GenericCompound(Op.PRODUCT, -1, TermVector.Empty);
@@ -41,7 +69,7 @@ public interface TermIndex extends TermBuilder {
     //Termed get(Object t);
 
     @Nullable
-    Termed getTermIfPresent(Termed t);
+    Termed getIfPresent(Termed t);
 
     /** # of contained terms */
     int size();
@@ -55,6 +83,8 @@ public interface TermIndex extends TermBuilder {
      */
     int InvalidImplicationPredicate = or(EQUIV);
 
+
+    TermBuilder builder();
 
 
 
@@ -86,7 +116,7 @@ public interface TermIndex extends TermBuilder {
         Term[] x = t.terms();
         for (int i = 0; i < x.length; i++) {
             Term xi = x[i];
-            Termed u = the(xi); //since they are equal this will not need re-hashed
+            Termed u = xi; //since they are equal this will not need re-hashed
             if (u == null) return null;
             //if (u.equals(xi))
                 x[i] = u.term(); //HACK use unified, otherwise keep original
@@ -95,16 +125,7 @@ public interface TermIndex extends TermBuilder {
     }
 
 
-    default Termed makeAtomic(Term t) {
-        return t; /* as-is */
-    }
 
-    @Nullable
-    default Termed makeTerm(Term t) {
-        return t instanceof Compound ?
-                makeCompound((Compound) t)
-                : makeAtomic(t);
-    }
 
 
     int subtermsCount();
@@ -114,13 +135,104 @@ public interface TermIndex extends TermBuilder {
 //    }
 
 
+
+
+
+
+    /**
+     * returns the resolved term according to the substitution
+     */
     @Nullable
-    default Termed makeCompound(@NotNull Compound t) {
-        return make(t.op(), t.relation(), t.subterms(), t.dt());
+    default Term transform(@NotNull Compound src, @NotNull Subst f) {
+
+
+        Term y = f.term(src);
+        if (y != null)
+            return y;
+
+
+        Op sop = src.op();
+        final int maxArity = sop.maxSize;
+
+        Term[] ss = src.terms();
+        int len = ss.length;
+        List<Term> sub = Global.newArrayList(len /* estimate */);
+        for (int i = 0; i < len; i++) {
+            Term t = ss[i];
+            Term u = apply(f, t);
+
+            if (u instanceof EllipsisMatch) {
+
+                EllipsisMatch m = (EllipsisMatch) u;
+
+                if (maxArity != -1 && m.size() + sub.size() > maxArity) {
+                    return src; //invalid transformation, violates arity constraint
+                }
+
+                Collections.addAll(sub, m.term);
+
+            } else {
+
+                if (maxArity != -1 && 1 + sub.size() > maxArity) {
+                    return src; //invalid transformation, violates arity constraint
+                }
+
+                sub.add(u != null ? u : t);
+            }
+        }
+
+
+        Term result = this.builder().newCompound(src, TermContainer.the(sop, sub));
+
+
+        //apply any known immediate transform operators
+        //TODO decide if this is evaluated incorrectly somehow in reverse
+        if (result != null) {
+            if (isOperation(result)) {
+                ImmediateTermTransform tf = f.getTransform(Operator.operator((Compound) result));
+                if (tf != null) {
+                    result = applyImmediateTransform(f, result, tf);
+                }
+            }
+        } else {
+            result = src;
+        }
+
+        return result;
     }
 
 
+    @Nullable
+    default Term applyImmediateTransform(Subst f, Term result, ImmediateTermTransform tf) {
 
+        //Compound args = (Compound) Operator.opArgs((Compound) result).apply(f);
+        Compound args = Operator.opArgs((Compound) result);
+
+        return ((tf instanceof PremiseAware) && (f instanceof PremiseEval)) ?
+                ((PremiseAware) tf).function(args, (PremiseEval) f) :
+                tf.function(args, this);
+    }
+
+
+    @Nullable
+    default Term apply(@NotNull Subst f, @NotNull Term src) {
+
+
+        if (src.isCompound()) {
+            //if f is empty there will be no changes to apply anyway
+            if (f.isEmpty())
+                return src;
+
+            return transform((Compound) src, f);
+        } else if (src instanceof Variable) {
+            Term x = f.term(src);
+            if (x != null)
+                return x;
+        }
+
+        return src;
+
+    }
 
 
 
@@ -242,6 +354,108 @@ public interface TermIndex extends TermBuilder {
     default void print(@NotNull PrintStream out) {
         forEach(out::println);
     }
+
+
+    @Nullable
+    default Termed normalized(@NotNull Term t) {
+        if (t.isNormalized()) {
+            return t;
+        }
+
+        Compound tx = transform((Compound) t, normalizeFast((Compound) t));
+        if (tx != null)
+            ((GenericCompound) tx).setNormalized();
+
+        return tx;
+    }
+
+
+    /**
+     * allows using the single variable normalization,
+     * which is safe if the term doesnt contain pattern variables
+     */
+    static @NotNull VariableTransform normalizeFast(@NotNull Compound target) {
+        return target.vars() == 1 ? VariableNormalization.singleVariableNormalization : new VariableNormalization();
+    }
+
+    @Nullable
+    default <X extends Compound> X transform(@NotNull Compound src, @NotNull CompoundTransform t) {
+        if (!t.testSuperTerm(src)) {
+            return (X) src; //nothing changed
+        }
+
+        Term[] newSubterms = new Term[src.size()];
+
+        int mods = transform(src, t, newSubterms, 0);
+
+        if (mods == -1) {
+            return null;
+        } else if ((mods > 0)) {
+            return (X) builder().newCompound(src, TermContainer.the(src.op(), newSubterms));
+        }
+        return (X) src; //nothing changed
+    }
+
+
+    /**
+     * returns how many subterms were modified, or -1 if failure (ex: results in invalid term)
+     */
+    default <T extends Term> int transform(@NotNull Compound src, @NotNull CompoundTransform<Compound<T>, T> trans, Term[] target, int level) {
+        int n = src.size();
+
+        int modifications = 0;
+
+        for (int i = 0; i < n; i++) {
+            Term x = src.term(i);
+            if (x == null)
+                throw new RuntimeException("null subterm");
+
+            if (trans.test(x)) {
+
+                Term x2 = trans.apply((Compound<T>) src, (T) x, level);
+                if (x2 == null)
+                    return -1;
+
+                if (x != x2) {
+                    modifications++;
+                    x = x2;
+                }
+
+            } else if (x instanceof Compound) {
+                //recurse
+                Compound cx = (Compound) x;
+                if (trans.testSuperTerm(cx)) {
+
+                    Term[] yy = new Term[cx.size()];
+                    int submods = transform(cx, trans, yy, level + 1);
+
+                    if (submods == -1) return -1;
+                    if (submods > 0) {
+
+                        //method 1: using termindex
+//                        x = newTerm(cx.op(), cx.relation(), cx.t(),
+//                            TermContainer.the(cx.op(), yy)
+//                        );
+
+                        //method 2: on heap
+                        Op op = cx.op();
+                        int dt = cx.dt();
+                        x = $.the(op, cx.relation(), dt,
+                                TermContainer.the(op, yy)
+                        );
+
+                        if (x == null)
+                            return -1;
+                        modifications += (cx != x) ? 1 : 0;
+                    }
+                }
+            }
+            target[i] = x;
+        }
+
+        return modifications;
+    }
+
 
 //    /** for long-running processes, this uses
 //     * a weak-value policy */

@@ -14,7 +14,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 /** TermIndex implemented with GuavaCache with
  * optional WeakRef policy.
@@ -96,7 +95,7 @@ public class GuavaIndex implements TermIndex {
 
     @Nullable
     @Override
-    public Termed getTermIfPresent(@NotNull Termed t) {
+    public Termed getIfPresent(@NotNull Termed t) {
         return data.getIfPresent(t.term());
     }
 
@@ -152,7 +151,7 @@ public class GuavaIndex implements TermIndex {
 //        }
 
         try {
-            return data.get(x, () -> makeTerm(x));
+            return data.get(x, () -> resolve(x));
         } catch (ExecutionException e) {
             throw new RuntimeException(e);
         }

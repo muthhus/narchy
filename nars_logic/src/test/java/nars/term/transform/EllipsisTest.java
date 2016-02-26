@@ -22,7 +22,6 @@ import org.junit.Test;
 import java.util.Collections;
 import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import static nars.$.$;
 import static nars.Op.Imdex;
@@ -460,12 +459,12 @@ public class EllipsisTest {
             if (o.minSize <= 1) continue;
 
             assertEquals(o + " with normal term",
-                    a, $.terms.newTerm(o,a));
+                    a, $.terms.newCompound(o,a));
 
 
             assertEquals(o + " with ellipsis not reduced",
                     o.isStatement() ? VAR_PATTERN : o,
-                    $.terms.newTerm(o,b).op());
+                    $.terms.newCompound(o,b).op());
         }
     }
 

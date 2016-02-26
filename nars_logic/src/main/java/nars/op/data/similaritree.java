@@ -1,10 +1,7 @@
 package nars.op.data;
 
-import nars.term.Operator;
+import nars.term.*;
 import nars.nal.nal8.operator.TermFunction;
-import nars.term.Compound;
-import nars.term.Term;
-import nars.term.TermBuilder;
 import nars.util.Texts;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,7 +14,7 @@ public class similaritree extends TermFunction<Float> {
     //TODO integrate Ters Terms.termDistance()
 
     @Override
-    public Float function(@NotNull Compound o, TermBuilder i) {
+    public Float function(@NotNull Compound o, TermIndex i) {
 
         Term[] x = Operator.argArray(o);
         if (x.length!=2) return Float.NaN;

@@ -6,7 +6,7 @@ import nars.nal.meta.PremiseAware;
 import nars.nal.meta.PremiseEval;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.TermBuilder;
+import nars.term.TermIndex;
 import nars.term.atom.Atom;
 import nars.term.transform.subst.MapSubst;
 import nars.term.transform.subst.Subst;
@@ -21,9 +21,8 @@ public class substitute extends ImmediateTermTransform implements PremiseAware {
     public static final Atom QUERY_VAR = $.the("?", true);
     public static final Atom DEP_VAR = $.the("#", true);
 
-    @NotNull
     @Override
-    public Term function(Compound x, TermBuilder i) {
+    public Term function(Compound x, TermIndex i) {
         throw new RuntimeException("n/a");
     }
 

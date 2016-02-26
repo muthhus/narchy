@@ -4,10 +4,9 @@ import nars.$;
 import nars.nal.nal8.operator.TermFunction;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.TermBuilder;
+import nars.term.TermIndex;
 import nars.term.atom.Atom;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * resolve a java class from String to its usage knowledge
@@ -16,8 +15,7 @@ public class jclass extends TermFunction {
 
     final Termizer termizer = new DefaultTermizer();
 
-    @Nullable
-    @Override public Object function(@NotNull Compound x, TermBuilder i) {
+    @Override public Object function(@NotNull Compound x, TermIndex i) {
 
         try {
             Term t = x.term(0);

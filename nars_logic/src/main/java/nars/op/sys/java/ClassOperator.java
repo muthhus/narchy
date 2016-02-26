@@ -2,14 +2,12 @@ package nars.op.sys.java;
 
 import nars.$;
 import nars.Global;
-import nars.nal.nal8.Execution;
 import nars.nal.nal8.operator.TermFunction;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.TermBuilder;
+import nars.term.TermIndex;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -75,9 +73,8 @@ public class ClassOperator extends TermFunction {
         super.feedback(e, y);
     }
 
-    @Nullable
     @Override
-    public final Object function(@NotNull Compound x, TermBuilder i) {
+    public final Object function(@NotNull Compound x, TermIndex i) {
         if (x.size() < 4) {
             //see arguments in this class's documentation
             return null;

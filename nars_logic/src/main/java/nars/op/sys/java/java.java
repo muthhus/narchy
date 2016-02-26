@@ -3,7 +3,7 @@ package nars.op.sys.java;
 import nars.nal.nal8.operator.TermFunction;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.TermBuilder;
+import nars.term.TermIndex;
 import nars.term.atom.Atom;
 import org.codehaus.commons.compiler.CompileException;
 import org.codehaus.janino.ExpressionEvaluator;
@@ -18,9 +18,8 @@ public class java extends TermFunction {
 
 
 
-    @Nullable
     @Override
-    public Object function(Compound args, TermBuilder i) {
+    public Object function(Compound args, TermIndex i) {
         //TODO handle multi-arg by returning a tuple of that # elements each processed
         Term x = args.term(0);
         if (x instanceof Atom) {

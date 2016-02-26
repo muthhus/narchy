@@ -15,16 +15,16 @@ import java.util.HashMap;
 /**
  * Created by me on 12/7/15.
  */
-public class PatternIndex extends MapIndex {
+public class PatternIndex extends MapIndex2 {
 
     public PatternIndex() {
-        super(new HashMap(1024),new HashMap(1024));
+        super(new HashMap(1024));
     }
 
 
     @NotNull
     @Override
-    public Termed makeCompound(@NotNull Compound x) {
+    public Termed resolveCompound(@NotNull Compound x) {
 
         /*if (!(x instanceof AbstractCompoundPattern)) {
             if (x instanceof Compound) {
@@ -61,13 +61,13 @@ public class PatternIndex extends MapIndex {
 //        return super.compileCompound(x);
     }
 
-    @Override
-    public
-    @Nullable
-    Termed the(Term x) {
-        //HACK - ellipsis contains additional metadata we want to save
-        return (x instanceof Ellipsis) ? x : super.the(x);
-    }
+//    @Override
+//    public
+//    @Nullable
+//    Termed the(Term x) {
+//        //HACK - ellipsis contains additional metadata we want to save
+//        return (x instanceof Ellipsis) ? x : super.the(x);
+//    }
 
 
     //

@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -46,14 +47,65 @@ import static nars.nal.Tense.ITERNAL;
 public enum $  {
     ;
 
-    public static final TermBuilder terms = new TermBuilder() {
+    //TransientTermIndex = holds no state
+    public static final TermIndex terms = new TermIndex() {
 
-        @NotNull
+        final TermBuilder builder = new TermBuilder() {
+
+            @Override
+            protected
+            @Nullable
+            Termed make(Op op, int relation, TermContainer subterms, int dt) {
+                return new GenericCompound(op, relation, (TermVector)subterms);
+            }
+        };
+
         @Override
-        public Termed make(@NotNull Op op, int relation, TermContainer subterms, int dt) {
-            return new GenericCompound(op, relation, (TermVector)subterms);
+        public void clear() {
+
         }
+
+        @Override
+        public void forEach(Consumer<? super Termed> c) {
+
+        }
+
+        @Override
+        public
+        @Nullable
+        Termed getIfPresent(Termed t) {
+            return t;
+        }
+
+        @Override
+        public int size() {
+            return 0;
+        }
+
+        @Override
+        public TermBuilder builder() {
+            return builder;
+        }
+
+        @Override
+        public
+        @Nullable
+        TermContainer internSub(TermContainer s) {
+            return s;
+        }
+
+        @Override
+        public void putTerm(Termed termed) {
+
+        }
+
+        @Override
+        public int subtermsCount() {
+            return 0;
+        }
+
     };
+    final static TermBuilder builder = terms.builder();
 
 
     public static final org.slf4j.Logger logger = LoggerFactory.getLogger($.class);
@@ -258,19 +310,19 @@ public enum $  {
      */
     @Nullable
     public static Term inst(Term subj, Term pred) {
-        return terms.inst(subj, pred);
+        return builder.inst(subj, pred);
     }
     @Nullable
     public static Term instprop(Term subject, Term predicate) {
-        return terms.instprop(subject, predicate);
+        return builder.instprop(subject, predicate);
     }
     @Nullable
     public static Term prop(Term subject, Term predicate) {
-        return terms.prop(subject, predicate);
+        return builder.prop(subject, predicate);
     }
 
 //    public static Term term(final Op op, final Term... args) {
-//        return Terms.term(op, args);
+//        return builder.term(op, args);
 //    }
 
     @NotNull
@@ -295,14 +347,14 @@ public enum $  {
 
     @NotNull
     public static Compound sete(@NotNull Collection<? extends Term> t) {
-        return (Compound) terms.finish(SET_EXT, -1, TermSet.the(t));
+        return (Compound) builder.finish(SET_EXT, -1, TermSet.the(t));
     }
     @NotNull
     public static Compound seteCollection(@NotNull Collection<? extends Object> c) {
 
         Termizer z = new DefaultTermizer();
 
-        //return (Compound) terms.finish(SET_EXT, -1, TermSet.the(t));
+        //return (Compound) builder.finish(SET_EXT, -1, TermSet.the(t));
         return $.sete(
                 (Collection<? extends Term>) c.stream().map(
                         z::term).collect( toCollection((Supplier<TreeSet>) TreeSet::new)));
@@ -548,7 +600,7 @@ public enum $  {
 
     @Nullable
     public static Term the(@NotNull Op op, int relation, int t, @NotNull TermContainer subterms) {
-        return terms.newTerm(op, relation, t, subterms);
+        return builder.newCompound(op, relation, t, subterms);
     }
 
 
@@ -703,7 +755,7 @@ public enum $  {
 //            }
 //        }
         /*Term[] argument =
-            Terms.concat(new Term[] { relation }, product.cloneTerms()
+            builder.concat(new Term[] { relation }, product.cloneTerms()
         );*/
         Term[] argument = new Term[pl];
         argument[0] = relation;

@@ -5,12 +5,9 @@ import nars.Op;
 import nars.Symbols;
 import nars.nal.Tense;
 import nars.nal.nal8.Execution;
-import nars.term.Operator;
+import nars.term.*;
 import nars.task.MutableTask;
 import nars.task.Task;
-import nars.term.Compound;
-import nars.term.Term;
-import nars.term.TermBuilder;
 import nars.term.atom.Atom;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
@@ -64,8 +61,7 @@ public abstract class TermFunction<O> extends SyncOperator {
      * @param arguments - the product subject of an Operation
      * @param i
      */
-    @Nullable
-    public abstract O function(Compound arguments, TermBuilder i);
+    public abstract O function(Compound arguments, TermIndex i);
 
 
     @Nullable

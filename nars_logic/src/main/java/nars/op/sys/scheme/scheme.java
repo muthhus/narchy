@@ -8,7 +8,7 @@ import nars.op.sys.scheme.cons.Cons;
 import nars.op.sys.scheme.expressions.*;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.TermBuilder;
+import nars.term.TermIndex;
 import nars.term.atom.Atom;
 import org.jetbrains.annotations.NotNull;
 
@@ -106,7 +106,7 @@ public class scheme extends TermFunction {
     };
 
     @Override
-    public Term function(@NotNull Compound o, TermBuilder i) {
+    public Object function(@NotNull Compound o, TermIndex i) {
         Term[] x = o.terms();
         Term code = x[0];
 

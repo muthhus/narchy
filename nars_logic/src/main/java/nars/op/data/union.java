@@ -12,7 +12,7 @@ public class union extends BinaryTermOperator {
     
     @Nullable
     @Override public Term apply(@NotNull Term a, Term b, @NotNull TermBuilder i) {
-        return i.newTerm(a.op(), TermSet.union(
+        return i.newCompound(a.op(), TermSet.union(
                 (TermContainer) a, (TermContainer) b
         ));
     }

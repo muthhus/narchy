@@ -307,8 +307,8 @@ public class PremiseRule extends GenericCompound {
      */
     public void compile(@NotNull TermIndex index) {
         Term[] premisePattern = ((Compound) term(0)).terms();
-        premisePattern[0] = index.theTerm(premisePattern[0]); //task pattern
-        premisePattern[1] = index.theTerm(premisePattern[1]); //belief pattern
+        premisePattern[0] = index.resolve(premisePattern[0]).term(); //task pattern
+        premisePattern[1] = index.resolve(premisePattern[1]).term(); //belief pattern
     }
 
     static final class UppercaseAtomsToPatternVariables implements CompoundTransform<Compound, Term> {

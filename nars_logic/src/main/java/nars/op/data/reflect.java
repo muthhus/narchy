@@ -8,7 +8,7 @@ import nars.$;
 import nars.nal.nal8.operator.TermFunction;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.TermBuilder;
+import nars.term.TermIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,7 +25,7 @@ public class reflect extends TermFunction {
 
     
     @Override
-    public Term function(@NotNull Compound x, TermBuilder i) {
+    public Object function(@NotNull Compound x, TermIndex i) {
 
         Term content = x.term(0);
 
