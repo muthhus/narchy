@@ -99,7 +99,7 @@ public class SomeRovers {
 	public static Default newNAR() {
         int conceptsFirePerCycle = 24;
         Default nar = new Default(
-                new Memory(clock, TermIndex.softMemory(64*1024)),
+                //new Memory(clock, TermIndex.softMemory(64*1024)),
                 1024, conceptsFirePerCycle, 2, 3)
             .with(
                 Anticipate.class,

@@ -58,7 +58,7 @@ public abstract class AbstractNAR extends NAR {
 
 
     public AbstractNAR(@NotNull Clock clock) {
-        this(new Memory(clock, new DefaultTermIndex(1024) ));
+        this(new Memory(clock, new DefaultTermIndex(256) ));
     }
 
     public AbstractNAR(@NotNull Memory memory) {

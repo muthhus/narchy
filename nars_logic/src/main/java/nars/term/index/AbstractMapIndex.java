@@ -35,14 +35,14 @@ public abstract class AbstractMapIndex implements TermIndex {
             ///throw new RuntimeException("ellipsis not allowed in this index");
             return null;
 
-        if (!key.isNormalized()) {
-            Termed u = normalized(key.term());
-            if (u==null) {
-                return null; //this one component could not be conceptualized, this is somewhat normal depending on variable rules
-            } else {
-                key = u.term();
-            }
-        }
+//        if (!key.isNormalized()) {
+//            Termed u = normalized(key.term());
+//            if (u==null) {
+//                return null; //this one component could not be conceptualized, this is somewhat normal depending on variable rules
+//            } else {
+//                key = u.term();
+//            }
+//        }
 
 
 //        if (!isInternable(x)) {

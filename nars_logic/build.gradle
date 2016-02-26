@@ -59,5 +59,6 @@ pitest {
     enableDefaultIncrementalAnalysis = true
     jvmArgs = ['-Xmx768m']
     maxMutationsPerClass = 0
-
+    exportLineCoverage = true
+    failWhenNoMutations = false
 }

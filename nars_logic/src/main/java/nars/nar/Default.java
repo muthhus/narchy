@@ -58,7 +58,7 @@ public class Default extends AbstractNAR {
                    int termlinkFirePerConcept) {
         this(new Memory(new FrameClock(),
                 //TermIndex.memoryWeak(numConcepts * 2)
-                new DefaultTermIndex(1024*256)
+                new DefaultTermIndex(256)
 
         ), numConcepts, conceptsFirePerCycle, tasklinkFirePerConcept, termlinkFirePerConcept);
     }

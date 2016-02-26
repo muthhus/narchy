@@ -181,7 +181,7 @@ public class NAL1Test extends AbstractNALTest {
 
 
         TestNAR test = test();
-        test.nar.log();
+        //test.nar.log();
         test
                 .believe("<bird --> swimmer>", 1.0f, 0.8f)
                 .ask("<?1 --> swimmer>")
