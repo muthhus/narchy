@@ -14,8 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static nars.Symbols.BELIEF;
-import static nars.Symbols.GOAL;
+import static nars.Symbols.*;
 
 /**
  * NAR Parameters which can be changed during runtime.
@@ -202,10 +201,10 @@ public abstract class Param extends Container implements Level {
             case Symbols.BELIEF:
                 return DEFAULT_JUDGMENT_PRIORITY;
 
-            case Symbols.QUEST:
+            case QUEST:
                 return DEFAULT_QUEST_PRIORITY;
 
-            case Symbols.QUESTION:
+            case QUESTION:
                 return DEFAULT_QUESTION_PRIORITY;
 
             case Symbols.GOAL:
@@ -218,9 +217,9 @@ public abstract class Param extends Container implements Level {
         switch (punctuation) {
             case Symbols.BELIEF:
                 return DEFAULT_JUDGMENT_DURABILITY;
-            case Symbols.QUEST:
+            case QUEST:
                 return DEFAULT_QUEST_DURABILITY;
-            case Symbols.QUESTION:
+            case QUESTION:
                 return DEFAULT_QUESTION_DURABILITY;
             case Symbols.GOAL:
                 return DEFAULT_GOAL_DURABILITY;
@@ -229,9 +228,9 @@ public abstract class Param extends Container implements Level {
     }
     float getDefaultQuality(char punctuation) {
         switch (punctuation) {
-            case Symbols.QUEST:
+            case QUEST:
                 return DEFAULT_QUEST_QUALITY;
-            case Symbols.QUESTION:
+            case QUESTION:
                 return DEFAULT_QUESTION_QUALITY;
             /*case Symbols.GOAL:
                 return DEFAULT_GOAL_QUALITY;*/
@@ -248,14 +247,17 @@ public abstract class Param extends Container implements Level {
 
 
 
-    public final Truth getTruthDefault(char p) {
+    @Nullable public final Truth getTruthDefault(char p) {
         switch (p) {
             case GOAL:
                 return defaultGoalTruth;
             case BELIEF:
                 return defaultJudgmentTruth;
+            case QUEST:
+                return null;
+            case QUESTION:
+                return null;
             default:
-                //return null;
                 throw new RuntimeException("invalid punctuation");
         }
     }

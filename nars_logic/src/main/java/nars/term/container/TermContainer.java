@@ -386,7 +386,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
             return diff;
 
         for (int i = 0; i < s; i++) {
-            int d = a.term(i).compareTo(c.term(s));
+            int d = a.term(i).compareTo(c.term(i));
 
             /*
             if (Global.DEBUG) {
