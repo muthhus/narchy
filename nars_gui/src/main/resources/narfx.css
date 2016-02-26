@@ -11,8 +11,8 @@
 
     /*-fx-text-base-color: rgb(230,230,230);*/
 
-    -fx-background-color: rgb(0, 0, 0);
     -fx-base: rgb(0, 0, 0);
+    /*-fx-base-color: rgb(0, 0, 0);*/
 
     -fx-fill: #fff;
 
@@ -23,18 +23,9 @@
 
     /*-fx-control-inner-background: transparent;*/
 
-    /* A bright blue for highlighting/accenting objects.  For example: selected
-     * text; selected items in menus, lists, trees, and tables; progress bars;
-     * default buttons.
-     */
+
     -fx-accent: #333;
 
-    /* A bright blue for the focus indicator of objects. Typically used as the
-     * first color in -fx-background-color for the "focused" pseudo-class. Also
-     * typically used with insets of -1.4 to provide a glowing effect.
-     *
-     * TODO: should this be derived from -fx-accent?
-     */
     -fx-focus-color: #222;
 
     /*-fx-text-base-color: rgb(252.0, 240.0, 237.0);
@@ -55,17 +46,16 @@
     -fx-background-color: black;
     -fx-border-width: 0;
 }
-
+/*
 .control {
-    -fx-base-color: /*transparent;*/ /*rgb(30,30,30); */
-        rgb(0,0,0);
 }
+*/
 
-.text-input-control {
-    -fx-fill: gray;
-    -fx-base-color: /*transparent;*/ /*rgb(30,30,30); */
-        rgba(125,125,125,0.25);
-}
+/*.text-input-control { }*/
+    /*-fx-fill: gray;*/
+    /*-fx-base-color:
+        rgba(10,10,10);*/ /*transparent;*/ /*rgb(30,30,30); */
+
 
 
 
@@ -82,6 +72,10 @@
     -fx-background-color: #410;
 }
 
+
+.list-view {
+    -fx-background-color: transparent;
+}
 
 /*
 .spaceselector {
@@ -708,7 +702,7 @@
 }
 
 .mdiWindowTitleBar{
-    //-fx-background-color: linear-gradient(to bottom, -fx-base, derive(#E9E9E9,10%),derive(#D0D0D0,10%),derive(#E9E9E9,10%));
+    /*-fx-background-color: linear-gradient(to bottom, -fx-base, derive(#E9E9E9,10%),derive(#D0D0D0,10%),derive(#E9E9E9,10%));*/
     -fx-background-color: gray;
     /*-fx-border-color: transparent transparent #C4C4C4 transparent;
     -fx-background-radius: 10 10 0 0;
