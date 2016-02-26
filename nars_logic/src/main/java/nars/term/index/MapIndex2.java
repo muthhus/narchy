@@ -50,6 +50,24 @@ public class MapIndex2 extends AbstractMapIndex {
 
     }
 
+
+    //TODO this needs to go somewhere:
+    /*@Override
+    public
+    @Nullable
+    Termed the(Op op, int relation, TermContainer subsBefore, int dt) {
+        SubtermNode node = getOrAddNode(subsBefore);
+        int oprel = Terms.opRel(op, relation);
+        Termed interned = node.get(oprel);
+        if (interned == null) {
+            interned = internCompound(node.vector, op, relation, dt);
+            if (interned == null)
+                return null;
+            node.put(oprel, interned);
+        }
+        return interned;
+    }*/
+
     @Override
     public final TermBuilder builder() {
         return builder;
@@ -84,21 +102,7 @@ public class MapIndex2 extends AbstractMapIndex {
 //    }
 
 
-    @Override
-    public
-    @Nullable
-    Termed the(Op op, int relation, TermContainer subsBefore, int dt) {
-        SubtermNode node = getOrAddNode(subsBefore);
-        int oprel = Terms.opRel(op, relation);
-        Termed interned = node.get(oprel);
-        if (interned == null) {
-            interned = internCompound(node.vector, op, relation, dt);
-            if (interned == null)
-                return null;
-            node.put(oprel, interned);
-        }
-        return interned;
-    }
+
 
     @Nullable
     @Override protected Termed theCompound(@NotNull Compound t) {

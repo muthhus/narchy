@@ -86,11 +86,7 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
          5: struct
          */
         int[] meta = new int[6];
-        int h = 1;
-        for (Term t : term) {
-            h = 31 /*Util.PRIME1 */ * h + t.init(meta);
-        }
-        this.contentHash = h;
+        this.contentHash = TermContainer.hash(term, meta);
 
 
 
@@ -115,14 +111,6 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
         //if (h == 0) h = 1; //nonzero to indicate hash calculated
     }
 
-
-//    public TermVector(@NotNull T[] source, @NotNull Function<T,Termed<T>> mapping) {
-//        int len = source.length;
-//        Term[] t = this.term = (T[]) new Term[len];
-//        for (int i = 0; i < len; i++)
-//            t[i] = mapping.valueOf(source[i]).term();
-//        init();
-//    }
 
 
     @Override
@@ -299,47 +287,6 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
     }
 
 
-    @Override
-    public final int compareTo(@NotNull Object o) {
-        if (this == o) return 0;
-
-        int diff;
-        if ((diff = Integer.compare(hashCode(), o.hashCode())) != 0)
-            return diff;
-
-        //TODO dont assume it's a TermVector
-        TermVector c = (TermVector) o;
-        int diff2;
-        if ((diff2 = Integer.compare(structure(), c.structure())) != 0)
-            return diff2;
-
-        return compareContent(c);
-    }
-
-    public int compareContent(@NotNull TermVector c) {
-
-        int s = size(), diff;
-        if ((diff = Integer.compare(s, c.size())) != 0)
-            return diff;
-
-        T[] thisTerms = this.term;
-        final Term[] thatTerms = c.term;
-        for (int i = 0; i < s; i++) {
-            int d = thisTerms[i].compareTo(thatTerms[i]);
-
-        /*
-        if (Global.DEBUG) {
-            int d2 = b.compareTo(a);
-            if (d2!=-d)
-                throw new RuntimeException("ordering inconsistency: " + a + ", " + b );
-        }
-        */
-
-            if (d != 0) return d;
-        }
-
-        return 0;
-    }
 
     public final void visit(@NotNull SubtermVisitor v, Compound parent) {
         for (Term t : term)

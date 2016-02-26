@@ -159,7 +159,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
     @Override
     public boolean equals(@NotNull Object that) {
-        return this == that || hash == that.hashCode() && equalsFurther((Termed) that);
+        return this == that ||( hash == that.hashCode() && equalsFurther((Termed) that) );
     }
 
     @Override
@@ -173,7 +173,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
         Term u = thatTerm.term();
         if ((u.op() == op) /*&& (((t instanceof Compound))*/) {
             Compound c = (Compound) u;
-            r = subterms.equals(c.terms())
+            r = subterms.equals(c.subterms())
                     && (relation == c.relation())
                     && (dt == c.dt());
         }

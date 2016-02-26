@@ -170,6 +170,16 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
     void forEach(Consumer<? super T> action, int start, int stop);
 
 
+    default void forEach(Consumer<? super T> action) {
+        forEach(action, 0, size());
+    }
+
+    static void forEach(TermContainer c, Consumer action, int start, int stop) {
+        for (int i = start; i < stop; i++) {
+            action.accept(c.term(i));
+        }
+    }
+
 //    static Term[] copyByIndex(TermContainer c) {
 //        int s = c.size();
 //        Term[] x = new Term[s];
@@ -348,7 +358,70 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
         return true;
     }
 
+    @Override
+    default int compareTo(@NotNull Object o) {
+        return compareTo(this, o);
+    }
+
+    static int compareTo(TermContainer a, @NotNull Object b) {
+        if (a == b) return 0;
+
+        int diff;
+        if ((diff = Integer.compare(a.hashCode(), b.hashCode())) != 0)
+            return diff;
+
+        TermContainer c = (TermContainer) b;
+        int diff2;
+        if ((diff2 = Integer.compare(a.structure(), c.structure())) != 0)
+            return diff2;
+
+        return compareContent(a, c);
+    }
+
+
+    static int compareContent(@NotNull TermContainer a, @NotNull TermContainer c) {
+
+        int s = a.size(), diff;
+        if ((diff = Integer.compare(s, c.size())) != 0)
+            return diff;
+
+        for (int i = 0; i < s; i++) {
+            int d = a.term(i).compareTo(c.term(s));
+
+            /*
+            if (Global.DEBUG) {
+                int d2 = b.compareTo(a);
+                if (d2!=-d)
+                    throw new RuntimeException("ordering inconsistency: " + a + ", " + b );
+            }
+            */
+
+            if (d != 0) return d;
+        }
+
+        return 0;
+    }
+
+
     @Nullable TermContainer replacing(int subterm, Term replacement);
 
+
+    /** should be consistent with the other hash method(s) */
+    static int hash(TermContainer<?> container) {
+        int h = 1;
+        for (Term t : container) {
+            h = 31 /*Util.PRIME1 */ * h + t.hashCode();
+        }
+        return h;
+    }
+
+    /** computes the content hash while accumulating subterm metadata summary fields into int[] meta */
+    static int hash(Term[] term, int[] meta) {
+        int h = 1;
+        for (Term t : term) {
+            h = 31 /*Util.PRIME1 */ * h + t.init(meta);
+        }
+        return h;
+    }
 
 }

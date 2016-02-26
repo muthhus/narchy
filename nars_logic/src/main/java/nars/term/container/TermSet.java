@@ -17,6 +17,14 @@ public class TermSet<X extends Term> extends TermVector<X> {
     }
 
 
+    @NotNull
+    public static TermSet the(TermContainer possiblyUnsorted) {
+        if (possiblyUnsorted instanceof TermSet) {
+            return (TermSet) possiblyUnsorted;
+        } else {
+            return new TermSet(possiblyUnsorted.terms());
+        }
+    }
 
 
     @NotNull

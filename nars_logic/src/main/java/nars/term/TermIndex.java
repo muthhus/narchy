@@ -45,7 +45,6 @@ public interface TermIndex  {
 
     /** getOrAdd the term */
     @Nullable Termed the(@NotNull Termed t);
-    @Nullable Termed the(Op op, int relation, TermContainer subterms, int dt);
 
 
         //DEFAULT IMPL to be moved to a concrete class: BUILDS ON THE HEAP:
@@ -60,7 +59,7 @@ public interface TermIndex  {
     @Nullable
     default Termed the(Op op, TermContainer subterms) {
         //DEFAULT IMPL to be moved to a concrete class: BUILDS ON THE HEAP:
-        return the(op, -1, subterms, ITERNAL);
+        return builder().the(op, -1, ITERNAL, subterms);
     }
     @Nullable
     default Termed the(Op op, Collection<Term> subterms) {

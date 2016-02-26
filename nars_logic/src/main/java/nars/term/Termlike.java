@@ -44,7 +44,8 @@ public interface Termlike  {
     }
 
     default boolean impossibleSubterm(@NotNull Term target) {
-        return ((impossibleStructureMatch(structure(), target.structure()))) ||
+        return  this==target ||
+                ((impossibleStructureMatch(structure(), target.structure()))) ||
                 (impossibleSubTermVolume(target.volume()));
     }
 
@@ -87,7 +88,7 @@ public interface Termlike  {
      * @param v*/
     boolean or(Predicate<? super Term> v);
 
-    @Nullable Ellipsis firstEllipsis();
+    @Deprecated @Nullable Ellipsis firstEllipsis();
 
 
 

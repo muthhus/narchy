@@ -16,44 +16,45 @@ import java.util.function.Consumer;
  */
 public final class ShuffledSubterms extends ShuffledPermutations implements TermContainer<Term> {
 
-    public final TermContainer source;
+    public final TermContainer srcsubs;
     private final Random rng;
 
-    public ShuffledSubterms(Random rng, TermContainer x) {
+    public ShuffledSubterms(Random rng, TermContainer subterms) {
         this.rng = rng;
-        this.source = x;
+        this.srcsubs = subterms;
         reset();
     }
 
     @Override
     public int structure() {
-        return source.structure();
+        return srcsubs.structure();
     }
 
     @Override
     public int volume() {
-        return source.volume();
+        return srcsubs.volume();
     }
 
     @Override
     public int complexity() {
-        return source.complexity();
+        return srcsubs.complexity();
     }
 
     @Override
     public int size() {
-        return source.size();
+        return srcsubs.size();
     }
 
     @Nullable
     @Override
     public Term term(int i) {
-        return source.term(get(i));
+        return srcsubs.term(super.get(i));
     }
 
     @Override
     public boolean equalTerms(TermContainer c) {
-        return source.equalTerms(c);
+        //to compare them in-order
+        return TermContainer.equals(this, c);
     }
 
     @Override
@@ -63,67 +64,67 @@ public final class ShuffledSubterms extends ShuffledPermutations implements Term
 
     @Override
     public boolean impossibleSubTermVolume(int otherTermVolume) {
-        return source.impossibleSubTermVolume(otherTermVolume);
+        return srcsubs.impossibleSubTermVolume(otherTermVolume);
     }
 
     @Override
     public Ellipsis firstEllipsis() {
-        return source.firstEllipsis();
+        return srcsubs.firstEllipsis();
     }
 
     @Override
     public boolean containsTerm(Term term) {
-        return source.containsTerm(term);
+        return srcsubs.containsTerm(term);
     }
 
     @Override
     public void forEach(Consumer action, int start, int stop) {
-        source.forEach(action, start, stop);
+        TermContainer.forEach(this, action, start, stop);
     }
 
     @Override
     public int varDep() {
-        return source.varDep();
+        return srcsubs.varDep();
     }
 
     @Override
     public int varIndep() {
-        return source.varIndep();
+        return srcsubs.varIndep();
     }
 
     @Override
     public int varQuery() {
-        return source.varQuery();
+        return srcsubs.varQuery();
     }
 
     @Override
     public int varPattern() {
-        return source.varPattern();
+        return srcsubs.varPattern();
     }
 
     @Override
     public int vars() {
-        return source.vars();
+        return srcsubs.vars();
     }
 
     @Override
     public boolean equals(Object obj) {
-        return source.equals(obj);
+        return TermContainer.equals(this, obj);
     }
 
     @Override
     public int hashCode() {
-        return source.hashCode();
+        return TermContainer.hash(this);
     }
 
     @Override
     public int compareTo(@NotNull Object o) {
-        return source.compareTo(o);
+        return TermContainer.compareTo(this, o);
     }
 
     @Override
     public Iterator iterator() {
-        return source.iterator();
+        throw new UnsupportedOperationException();
     }
 
 
@@ -137,10 +138,12 @@ public final class ShuffledSubterms extends ShuffledPermutations implements Term
         return x;
     }
 
+
+
     @NotNull
     @Override
     public TermContainer replacing(int subterm, Term replacement) {
-        throw new RuntimeException("n/a for shuffle"); //TODO maybe is valid
+        throw new UnsupportedOperationException(); //TODO maybe is valid
     }
 
 
@@ -150,7 +153,7 @@ public final class ShuffledSubterms extends ShuffledPermutations implements Term
     }
 
     public void reset() {
-        restart(source.size(), rng);
+        restart(srcsubs.size(), rng);
     }
 
 

@@ -1,5 +1,6 @@
 package nars.term.transform.subst.choice;
 
+import nars.term.Compound;
 import nars.term.container.ShuffledSubterms;
 import nars.term.container.TermContainer;
 import nars.term.transform.subst.FindSubst;
@@ -19,7 +20,7 @@ public class CommutivePermutations extends Termutator {
     public String toString() {
 
             return "CommutivePermutations{" +
-                    "perm=" + perm.source +
+                    "perm=" + perm.srcsubs +
                     ", y=" + y +
                     '}';
     }
@@ -27,7 +28,7 @@ public class CommutivePermutations extends Termutator {
     public CommutivePermutations(@NotNull FindSubst f, @NotNull TermContainer x, @NotNull TermContainer Y) {
         super(x);
         this.y = Y;
-        this.perm = new ShuffledSubterms(f.random, x);
+        this.perm = new ShuffledSubterms(f.random,  x);
     }
 
     @Override

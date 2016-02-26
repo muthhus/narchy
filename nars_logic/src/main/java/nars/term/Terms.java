@@ -50,12 +50,7 @@ public class Terms extends TermBuilder implements TermIndex {
         return t;
     }
 
-    @Override
-    public
-    @Nullable
-    Termed the(Op op, int relation, TermContainer subterms, int dt) {
-        return make(op, relation, subterms, dt);
-    }
+
 
     @Override
     public TermBuilder builder() {

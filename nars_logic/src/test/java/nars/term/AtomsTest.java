@@ -17,6 +17,8 @@ public class AtomsTest {
 
         Atoms tree = new Atoms(new DefaultConceptBuilder());
 
+        int start = tree.getLastSerial();
+
         tree.resolveOrAdd("concept");
         tree.resolveOrAdd("term");
         tree.resolveOrAdd("termutator");
@@ -32,7 +34,7 @@ public class AtomsTest {
 
         tree.print(System.out);
 
-        assertEquals(4, tree.getLastSerial());
+        assertEquals(4, tree.getLastSerial() - start);
 
 
 //        String stringWithUnicode = "unicode\u00easomething";
