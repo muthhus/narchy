@@ -29,9 +29,11 @@ import java.util.Arrays;
 
 public interface Stamp {
 
-    @NotNull
-    static long[] zip(@NotNull long[] a, @NotNull long[] b) {
-        return zip(a, b, Global.MAXIMUM_EVIDENTAL_BASE_LENGTH);
+    /** "default" zipping config */
+    @NotNull static long[] zip(@NotNull long[] a, @NotNull long[] b) {
+        return zip(a, b,
+                Global.MAXIMUM_EVIDENTAL_BASE_LENGTH,
+                true);
     }
 
     /***
@@ -40,31 +42,44 @@ public interface Stamp {
      * the later-created task should be in 'b'
      */
     @NotNull
-    static long[] zip(@NotNull long[] a, @NotNull long[] b, int maxLen) {
+    static long[] zip(@NotNull long[] a, @NotNull long[] b, int maxLen, boolean newToOld) {
 
-        int aLen = a.length;
-        int bLen = b.length;
+        int aLen = a.length, bLen = b.length;
         int baseLength = Math.min(aLen + bLen, maxLen);
         long[] c = new long[baseLength];
 
         //if it's an even-number of items, we want the (n-1)th's array element to come from 'b'
         boolean parity = true;
 
-        //int ib = bLen-1, ia = aLen-1; //reverse
-        int ib = 0, ia = 0; //fwd
         //for (int i = baseLength-1; i >= 0; ) {  //reverse
 
-        for (int i = 0; i < baseLength; ) {   //fwd
-            boolean ha = ia < aLen;
-            boolean hb = ib < bLen;
+        if (newToOld) {
+            //"forward" starts with newes, oldest are trimmed
+            int ib = bLen-1, ia = aLen-1;
+            for (int i = baseLength-1; i >= 0; ) {
+                boolean ha = (ia >=0), hb = (ib >= 0);
 
-            //both, choose according to the parity decision
-            //one of them is empty, select from which is not
+                //both, choose according to the parity decision
+                //one of them is empty, select from which is not
 
-            //c[i--] = (na) ? a[ia--] : b[ib--]; //reverse
-            c[i++] = ((ha && hb) ?
+                c[i--] = ((ha && hb) ?
                         ((i & 1) == 1) == parity : ha) ?
-                            a[ia++] : b[ib++]; //fwd
+                            a[ia--] : b[ib--];
+            }
+        } else {
+            //"reverse" starts with oldest, newest are trimmed
+            int ib = 0, ia = 0;
+            for (int i = 0; i < baseLength; ) {
+
+                //both, choose according to the parity decision
+                //one of them is empty, select from which is not
+                boolean ha = ia < aLen, hb = ib < bLen;
+                c[i++] = ((ha && hb) ?
+                            ((i & 1) == 1) == parity :
+                            ha) ?
+                                a[ia++] :
+                                b[ib++];
+            }
         }
 
         return toSetArray(c, maxLen);
@@ -118,11 +133,10 @@ public interface Stamp {
     }
 
     static boolean overlapping(@NotNull Stamp a, @Nullable Stamp b) {
-
-        if (b == null) return false;
-        if (a.equals(b)) return true;
-
-        return overlapping(a.evidence(), b.evidence());
+        assert(a!=null);
+        return (b != null) &&
+                    ((a == b) ||
+                    overlapping(a.evidence(), b.evidence()));
     }
 
     /**

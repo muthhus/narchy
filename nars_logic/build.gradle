@@ -52,10 +52,12 @@ jacocoTestReport {
 }
 
 pitest {
-    targetClasses = ['nars.budget.*','nars.task.*','nars.concept.*']
+    targetClasses = ['nars.budget.*','nars.task.*','nars.concept.*','nars.util.*',
+    'nars.nal.TrieDeriverTest']
     threads = 1
     outputFormats = ['XML', 'HTML']
     enableDefaultIncrementalAnalysis = true
-    jvmArgs = ['-Xmx512m']
+    jvmArgs = ['-Xmx768m']
+    maxMutationsPerClass = 0
 
 }
