@@ -1,9 +1,11 @@
 package nars.term;
 
+import com.google.common.collect.Iterators;
 import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
 import nars.$;
 import nars.Global;
 import nars.Op;
+import nars.nal.meta.match.Ellipsis;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.util.Texts;
@@ -49,7 +51,12 @@ public class Terms extends TermBuilder implements TermIndex {
     Termed the(Termed t) {
         return t;
     }
-
+    @Override
+    public
+    @Nullable
+    Termed get(Termed t) {
+        return null;
+    }
 
 
     @Override
@@ -58,12 +65,131 @@ public class Terms extends TermBuilder implements TermIndex {
     }
 
 
-    public static final Term[] EmptyArray = new Term[0];
-    public static final Compound EmptyProduct = $.compound(Op.PRODUCT, TermContainer.Empty);
-    public static final Compound EmptySetExt = $.compound(Op.SET_EXT, TermContainer.Empty);
-    public static final Compound EmptySetInt = $.compound(Op.SET_INT, TermContainer.Empty);
+    public static final Term[] ZeroTermArray = new Term[0];
+    public static final TermContainer ZeroSubterms = new EmptyTermContainer();
+    public static final Compound ZeroProduct = $.compound(Op.PRODUCT, ZeroSubterms);
+    public static final Compound ZeroSetExt = $.compound(Op.SET_EXT, ZeroSubterms);
+    public static final Compound ZeroSetInt = $.compound(Op.SET_INT, ZeroSubterms);
     public static final IntFunction<Term[]> NewTermArray = Term[]::new;
 
+
+    static final class EmptyTermContainer implements TermContainer {
+
+        private final int hash;
+
+        EmptyTermContainer() {
+            this.hash = TermContainer.hash(Terms.ZeroTermArray, new int[6] /* dummy */);
+        }
+
+        @Override
+        public int hashCode() {
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return TermContainer.equals(this, obj);
+        }
+
+        @Override
+        public int volume() {
+            return 0;
+        }
+
+        @Override
+        public int complexity() {
+            return 0;
+        }
+
+        @Override
+        public int structure() {
+            return 0;
+        }
+
+        @Override
+        public int size() {
+            return 0;
+        }
+
+        @Override
+        public boolean containsTerm(Term t) {
+            return false;
+        }
+
+        @Override
+        public @Nullable
+        Ellipsis firstEllipsis() {
+            return null;
+        }
+
+        @Override
+        public Iterator iterator() {
+            return Iterators.emptyIterator();
+        }
+
+        @Override
+        public int compareTo(Object o) {
+            return Integer.compare(hashCode(), o.hashCode());
+        }
+
+        @Override
+        public int varDep() {
+            return 0;
+        }
+
+        @Override
+        public int varIndep() {
+            return 0;
+        }
+
+        @Override
+        public int varQuery() {
+            return 0;
+        }
+
+        @Override
+        public int varPattern() {
+            return 0;
+        }
+
+        @Override
+        public int vars() {
+            return 0;
+        }
+
+        @Nullable
+        @Override
+        public Term term(int i) {
+            return null;
+        }
+
+        @Override
+        public boolean equalTerms(TermContainer c) {
+            return c.size() == 0;
+        }
+
+        @NotNull
+        @Override
+        public Term[] terms() {
+            return Terms.ZeroTermArray;
+        }
+
+        @Override
+        public void forEach(Consumer action, int start, int stop) {
+
+        }
+
+        @Nullable
+        @Override
+        public TermContainer replacing(int subterm, Term replacement) {
+            return null;
+        }
+
+        @Override
+        public void addAllTo(Collection set) {
+
+        }
+    }
 
     public static boolean equalSubTermsInRespectToImageAndProduct(@Nullable Term a, @Nullable Term b) {
 
@@ -237,7 +363,7 @@ public class Terms extends TermBuilder implements TermIndex {
         switch (arg.length) {
 
             case 0:
-                return Terms.EmptyArray;
+                return Terms.ZeroTermArray;
 
             case 1:
                 return arg; //new Term[] { arg[0] };
@@ -391,7 +517,7 @@ public class Terms extends TermBuilder implements TermIndex {
             if (filter.accept(i, t))
                 l.add(t);
         }
-        if (l.isEmpty()) return Terms.EmptyArray;
+        if (l.isEmpty()) return Terms.ZeroTermArray;
         return l.toArray(new Term[l.size()]);
     }
 
@@ -409,7 +535,7 @@ public class Terms extends TermBuilder implements TermIndex {
     public static Term[] toArray(@NotNull Collection<Term> l) {
         int s = l.size();
         if (s == 0)
-            return Terms.EmptyArray;
+            return Terms.ZeroTermArray;
         return l.toArray(new Term[s]);
     }
 
@@ -475,11 +601,11 @@ public class Terms extends TermBuilder implements TermIndex {
     public static Term empty(@NotNull Op op) {
         switch (op) {
             case SET_EXT_OPENER:
-                return EmptySetExt;
+                return ZeroSetExt;
             case SET_INT_OPENER:
-                return EmptySetInt;
+                return ZeroSetInt;
             case PRODUCT:
-                return EmptyProduct;
+                return ZeroProduct;
             default:
                 return null;
         }

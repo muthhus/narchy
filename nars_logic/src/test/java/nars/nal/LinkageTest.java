@@ -92,10 +92,12 @@ public class LinkageTest extends AbstractNALTest {
         NAR nar = test().nar;
 
         Term premise1 = nar.term(spremise1);
+        assertEquals(spremise1, premise1.toString());
         assertNotNull(premise1);
         assertEquals(nar.term(spremise1), premise1);
 
         Term premise2 = nar.term(spremise2);
+        assertEquals(spremise2, premise2.toString());
         assertNotNull(premise2);
         assertEquals(nar.term(spremise2), premise2);
 

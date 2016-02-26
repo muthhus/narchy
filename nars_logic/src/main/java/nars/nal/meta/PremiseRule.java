@@ -130,7 +130,7 @@ public class PremiseRule extends GenericCompound {
     }
 
     public PremiseRule(Compound premises, Compound result) {
-        super(Op.PRODUCT, new TermVector(premises, result));
+        super(Op.PRODUCT, TermVector.the(premises, result));
         str = super.toString();
     }
 

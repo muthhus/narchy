@@ -11,6 +11,7 @@ import nars.$;
 import nars.concept.AtomConcept;
 import nars.concept.Concept;
 import nars.term.atom.Atom;
+import nars.term.atom.Atomic;
 import nars.term.atom.AtomicString;
 
 import java.util.List;
@@ -39,7 +40,7 @@ public class Atoms extends MyConcurrentRadixTree<AtomConcept> {
         return getValueForExactKey(id);
     }
 
-    public final AtomConcept resolve(AtomicString a) {
+    public final AtomConcept resolve(Atomic a) {
         return getValueForExactKey(a.toString());
     }
 
@@ -47,9 +48,9 @@ public class Atoms extends MyConcurrentRadixTree<AtomConcept> {
         return resolveOrAdd($.the(s));
     }
 
-    public final AtomConcept resolveOrAdd(Atom a) {
+    public final AtomConcept resolveOrAdd(Atomic a) {
 
-        return putIfAbsent(a.id, () -> {
+        return putIfAbsent(a.toString(), () -> {
             int s = serial;
             serial++;
             return (AtomConcept) conceptBuilder.apply(a);

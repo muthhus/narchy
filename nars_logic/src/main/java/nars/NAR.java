@@ -230,6 +230,7 @@ public abstract class NAR implements Level, Consumer<Task> {
      */
     @Nullable
     public final Concept concept(@NotNull String conceptTerm) throws NarseseException {
+
         return concept(termOrException(conceptTerm));
     }
 
@@ -1073,9 +1074,12 @@ public abstract class NAR implements Level, Consumer<Task> {
 
         if (tt.isCompound() ) {
 
+            Term at = tt;
             tt = tt.anonymous();
-
-            tt = index.transform((Compound)tt, CompoundAnonymizer);
+            if (at!=tt) {
+                //complete anonymization process
+                tt = index.transform((Compound) tt, CompoundAnonymizer);
+            }
 
             if (tt == null)
                 return null;

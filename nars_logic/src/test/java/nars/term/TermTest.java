@@ -469,7 +469,7 @@ public class TermTest {
 
     @Test
     public void validStatement() {
-        Compound t = $.$("<({tom},{vienna}) --> livingIn>");
+        Compound t = $("<({tom},{vienna}) --> livingIn>");
         assertFalse(Statement.invalidStatement(t.term(0), t.term(1)));
 
     }
@@ -805,5 +805,14 @@ public class TermTest {
         assertTrue( $("[y]}").op().isSet() );
         assertFalse( $("x").op().isSet() );
         assertFalse( $("a:b").op().isSet() );
+    }
+
+    @Test public void testEmptySetEquality()  {
+        assertEquals( $("{}"),$("{}") );
+        assertEquals( $("[]"),$("[]") );
+        assertEquals( $("()"),$("()") );
+        assertEquals( $("{}"),Terms.ZeroSetExt);
+        assertEquals( $("[]"),Terms.ZeroSetInt);
+        assertEquals( $("()"),Terms.ZeroProduct);
     }
 }

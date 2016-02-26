@@ -103,15 +103,26 @@ public class MapIndex2 extends AbstractMapIndex {
 
 
     @Nullable
-    @Override protected Termed theCompound(@NotNull Compound t) {
+    @Override protected Termed theCompound(@NotNull Compound t, boolean create) {
 
         TermContainer subsBefore = t.subterms();
+
+        SubtermNode node;
+        if (create) {
+            node = getOrAddNode(subsBefore);
+        } else {
+            node = getNode(subsBefore);
+            if (node == null)
+                return null;
+        }
+
+        return get(t, node, subsBefore, create);
+    }
+
+    private Termed get(Compound t, SubtermNode node, TermContainer subsBefore, boolean create) {
         int oprel = t.opRel();
-
-        SubtermNode node = getOrAddNode(subsBefore);
-
         Termed interned = node.get(oprel);
-        if (interned == null) {
+        if (create && (interned == null)) {
 
             TermContainer subsAfter = node.vector;
             if (subsAfter!=subsBefore) { //rebuild if necessary
@@ -127,10 +138,11 @@ public class MapIndex2 extends AbstractMapIndex {
         return interned;
     }
 
-    @NotNull
-    private Termed internCompound(TermContainer subsAfter, Op op, int rel, int dt) {
+
+    @Nullable
+    private Termed internCompound(@NotNull TermContainer subs, @NotNull Op op, int rel, int dt) {
         Termed interned;
-        interned = builder.make(op, rel, subsAfter, dt);
+        interned = builder.make(op, rel, subs, dt);
         assert(interned!=null); //should not fail unless the input was invalid to begin with
         return interned;
     }
@@ -143,6 +155,9 @@ public class MapIndex2 extends AbstractMapIndex {
 
     @NotNull public SubtermNode getOrAddNode(TermContainer s) {
         return data.computeIfAbsent(s, termContainerSubtermNodeFunction);
+    }
+    @Nullable public SubtermNode getNode(TermContainer s) {
+        return data.get(s);
     }
 
     @Nullable

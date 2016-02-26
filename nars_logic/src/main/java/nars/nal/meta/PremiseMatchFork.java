@@ -11,7 +11,7 @@ public final class PremiseMatchFork extends ThenFork {
 
     public PremiseMatchFork(ProcTerm[] n) {
         super(n);
-        this.termCache = terms();
+        this.termCache = n;
     }
 
     @Override

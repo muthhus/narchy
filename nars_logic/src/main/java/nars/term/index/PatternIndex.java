@@ -7,6 +7,7 @@ import nars.term.Compound;
 import nars.term.Termed;
 import nars.term.container.TermVector;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 
@@ -20,10 +21,10 @@ public class PatternIndex extends MapIndex2 {
     }
 
 
-
-    @NotNull
     @Override
-    public Termed theCompound(@NotNull Compound t) {
+    protected
+    @Nullable
+    Termed theCompound(@NotNull Compound t, boolean create) {
 
         /*if (!(x instanceof AbstractCompoundPattern)) {
             if (x instanceof Compound) {

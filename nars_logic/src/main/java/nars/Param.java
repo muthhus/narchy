@@ -253,6 +253,9 @@ public abstract class Param extends Container implements Level {
                 return defaultGoalTruth;
             case BELIEF:
                 return defaultJudgmentTruth;
+
+            case COMMAND:
+                return null;
             case QUEST:
                 return null;
             case QUESTION:

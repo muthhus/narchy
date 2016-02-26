@@ -2,6 +2,7 @@ package nars.term;
 
 import nars.$;
 import nars.term.atom.Atom;
+import nars.term.container.TermContainer;
 import nars.term.container.TermSet;
 import nars.term.container.TermVector;
 import org.junit.Test;
@@ -72,9 +73,9 @@ public class TermVectorTest {
     }
 
     @Test public void testSortedTermContainer() {
-        TermVector a = new TermVector((Atom)$.$("a"), (Atom)$.$("b"));
+        TermContainer a = TermVector.the($.$("a"), $.$("b"));
         assertTrue(a.isSorted());
-        TermVector b = new TermVector((Atom)$.$("b"), (Atom)$.$("a"));
+        TermContainer b = TermVector.the($.$("b"), $.$("a"));
         assertFalse(b.isSorted());
         TermVector s = TermSet.the(b.terms());
         assertTrue(s.isSorted());

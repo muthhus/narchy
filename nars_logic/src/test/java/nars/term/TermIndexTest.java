@@ -177,7 +177,7 @@ public class TermIndexTest {
         MapIndex2 i = (MapIndex2)(new Default().index());
 
         Term at = $("a");
-        TermVector a = new TermVector(at, $("b"), $("cd"));
+        TermContainer a = TermVector.the(at, $("b"), $("cd"));
         TermContainer b = i.theSubterms(a);
         assertEquals(a, b);
 

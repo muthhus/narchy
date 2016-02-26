@@ -22,8 +22,6 @@ import java.util.function.Predicate;
  */
 public interface TermContainer<T extends Term> extends Termlike, Comparable, Iterable<T> {
 
-    EmptyTermContainer Empty = new EmptyTermContainer();
-
     int varDep();
 
     int varIndep();
@@ -163,7 +161,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
                 added++;
             }
         }
-        return added > 0 ? Terms.EmptyArray : l.toArray(new Term[added]);
+        return added > 0 ? Terms.ZeroTermArray : l.toArray(new Term[added]);
     }
 
 
@@ -330,7 +328,8 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
     static TermContainer the(@NotNull Op op, @NotNull Collection<Term> tt) {
         //if (tt.isEmpty()) ...
         return requiresTermSet(op, tt.size()) ?
-                TermSet.the(tt) : new TermVector(tt);
+                TermSet.the(tt) :
+                TermVector.the(tt.toArray(new Term[tt.size()]));
     }
 
     @NotNull

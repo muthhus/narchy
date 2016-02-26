@@ -31,7 +31,6 @@ import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -542,7 +541,7 @@ public class Narsese extends BaseParser<Object> {
 
     @Nullable
     public static Term TemporalRelationBuilder(Term pred, int cycles, @NotNull Op o, Term subj) {
-        return $.the(o, -1, cycles, new TermVector(subj, pred));
+        return $.the(o, -1, cycles, TermVector.the(subj, pred));
     }
 
     public final static String invalidCycleDeltaString = Integer.toString(Integer.MIN_VALUE);
@@ -1120,20 +1119,20 @@ public class Narsese extends BaseParser<Object> {
         ParsingResult r;
         try {
             r = singleTaskParser.run(input);
+            if (r == null)
+                throw new NarseseException(input);
+
+            try {
+                return decodeTask(memory, (Object[]) r.getValueStack().peek());
+            } catch (Exception e) {
+                throw new NarseseException(input, r, e);
+            }
+
         } catch (Throwable ge) {
             //ge.printStackTrace();
-            throw new NarseseException(ge.toString() + ' ' + ge.getCause() + ": parsing: " + input);
+            throw new NarseseException(input, ge.getCause());
         }
 
-        if (r == null)
-            throw new NarseseException("null parse: " + input);
-
-
-        try {
-            return decodeTask(memory, (Object[]) r.getValueStack().peek());
-        } catch (Exception e) {
-            throw newParseException(input, r, e);
-        }
     }
 
     /**
@@ -1253,30 +1252,7 @@ public class Narsese extends BaseParser<Object> {
     }
 
 
-    @NotNull
-    public static NarseseException newParseException(String input, ParsingResult r, @Nullable Exception e) {
-
-        //CharSequenceInputBuffer ib = (CharSequenceInputBuffer) r.getInputBuffer();
-
-
-        //if (!r.isSuccess()) {
-        return new NarseseException("input: " + input + " (" + r + ")  " +
-                (e != null ? e.toString() + ' ' + Arrays.toString(e.getStackTrace()) : ""));
-
-        //}
-//        if (r.parseErrors.isEmpty())
-//            return new InvalidInputException("No parse result for: " + input);
-//
-//        String all = "\n";
-//        for (Object o : r.getParseErrors()) {
-//            ParseError pe = (ParseError)o;
-//            all += pe.getClass().getSimpleName() + ": " + pe.getErrorMessage() + " @ " + pe.getStartIndex() + "\n";
-//        }
-//        return new InvalidInputException(all + " for input: " + input);
-    }
-
-
-//    /**
+    //    /**
 //     * interactive parse test
 //     */
 //    public static void main(String[] args) {
@@ -1333,17 +1309,24 @@ public class Narsese extends BaseParser<Object> {
      */
     public static class NarseseException extends RuntimeException {
 
+        public final ParsingResult result;
+
         /**
          * An invalid addInput line.
          *
-         * @param s type of error
+         * @param message type of error
          */
-        public NarseseException(String s) {
-            super(s);
+        public NarseseException(String message) {
+            super(message);
+            this.result = null;
         }
 
-        public NarseseException(String message, Throwable cause) {
-            super(message, cause);
+        public NarseseException(String input, Throwable cause) {
+            this(input, null, cause);
+        }
+        public NarseseException(String input, ParsingResult result, Throwable cause) {
+            super(input, cause);
+            this.result = result;
         }
     }
 }

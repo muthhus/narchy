@@ -5,7 +5,9 @@ import nars.NAR;
 import nars.concept.Concept;
 import nars.nar.Default;
 import nars.term.atom.Atom;
+import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -17,8 +19,8 @@ public class SpaceTest {
     final static Atom x = $.the("x");
     final static Atom y = $.the("y");
     final static Atom z = $.the("z");
-    final static TermVector xy = new TermVector(x, y);
-    final static TermVector xyz = new TermVector(x, y, z);
+    final static TermContainer xy = TermVector.the(x, y);
+    final static TermContainer xyz = TermVector.the(x, y, z);
 
     @Test public void test1() {
 
@@ -32,9 +34,10 @@ public class SpaceTest {
         assertEquals(0, xy00.compareTo(new Space(xy, 0, 0)));
         assertEquals(xy00, new Space(xy, 0, 0));
 
-        assertEquals(xy.reverse(), new TermVector(y, x)); //TODO move this to TermVctor test
 
-        assertNotEquals(xy00, new Space(xy.reverse(), 0, 0));
+        @NotNull TermVector rxy = ((TermVector) xy).reverse();
+        assertEquals(rxy, TermVector.the(y, x)); //TODO move this to TermVctor test
+        assertNotEquals(xy00, new Space(rxy, 0, 0));
 
         Space xy11 = new Space(xy, 1, 1);
         assertEquals("(+,x*1.0,y*1.0)", xy11.toString());

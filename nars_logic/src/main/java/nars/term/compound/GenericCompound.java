@@ -47,7 +47,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     private transient boolean normalized;
 
 
-    public GenericCompound(@NotNull Op op, @NotNull TermVector subterms) {
+    public GenericCompound(@NotNull Op op, @NotNull TermContainer subterms) {
         this(op, -1, subterms);
     }
 

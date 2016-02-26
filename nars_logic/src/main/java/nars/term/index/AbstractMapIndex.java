@@ -55,19 +55,27 @@ public abstract class AbstractMapIndex implements TermIndex {
 //    default Termed getOrAdd(@NotNull Termed t) {
 //    }
 
-    final Termed theAtom(Term t) {
+    final Termed theAtom(Term t, boolean createIfMissing) {
         return (t instanceof Atom) ?
-                atoms.resolveOrAdd((Atom)t)
+                (createIfMissing ? atoms.resolveOrAdd((Atom)t) : atoms.resolve((Atom)t))
                 : t;
     }
 
-    abstract protected Termed theCompound(@NotNull Compound x);
-
+    abstract protected Termed theCompound(@NotNull Compound x, boolean create);
 
     @Nullable
     @Override public Termed the(@NotNull Termed t) {
+        return get(t, true);
+    }
 
-        if (t instanceof Ellipsis)
+    @Nullable
+    @Override public Termed get(@NotNull Termed t) {
+        return get(t, false);
+    }
+
+    public Termed get(@NotNull Termed key, boolean createIfMissing) {
+
+        if (key instanceof Ellipsis)
             ///throw new RuntimeException("ellipsis not allowed in this index");
             return null;
 
@@ -85,8 +93,9 @@ public abstract class AbstractMapIndex implements TermIndex {
 //            }
 //        }
 
-        return t instanceof Compound ? theCompound((Compound) t)
-                : theAtom(t.term());
+        return key instanceof Compound ?
+                theCompound((Compound) key, createIfMissing)
+                : theAtom(key.term(), createIfMissing);
     }
 
 //    @Override

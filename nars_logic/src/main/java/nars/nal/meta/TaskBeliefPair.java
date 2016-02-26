@@ -14,7 +14,7 @@ public final class TaskBeliefPair extends GenericCompound {
     //int actualStructure;
 
     public TaskBeliefPair() {
-        super(Op.PRODUCT, new TermVector(Op.Imdex, Op.Imdex) /* placeholders */);
+        super(Op.PRODUCT, TermVector.the(Op.Imdex, Op.Imdex) /* placeholders */);
     }
 
     public TaskBeliefPair(@NotNull Term a, @NotNull Term b) {

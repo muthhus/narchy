@@ -141,7 +141,7 @@ public abstract class TermBuilder {
 
     @Nullable
     public Term newCompound(@NotNull Op op, Term singleton) {
-        return newCompound(op, new TermVector(singleton));
+        return newCompound(op, TermVector.the(singleton));
     }
 
 
@@ -250,17 +250,17 @@ public abstract class TermBuilder {
 
     @Nullable
     public Term inst(Term subj, Term pred) {
-        return newCompound(INHERIT, new TermVector(newCompound(SET_EXT, subj), pred));
+        return newCompound(INHERIT, TermVector.the(newCompound(SET_EXT, subj), pred));
     }
 
     @Nullable
     public Term prop(Term subj, Term pred) {
-        return newCompound(INHERIT, new TermVector(subj, newCompound(SET_INT, pred)));
+        return newCompound(INHERIT, TermVector.the(subj, newCompound(SET_INT, pred)));
     }
 
     @Nullable
     public Term instprop(@NotNull Term subj, @NotNull Term pred) {
-        return newCompound(INHERIT, new TermVector(newCompound(SET_EXT, subj), newCompound(SET_INT, pred)));
+        return newCompound(INHERIT, TermVector.the(newCompound(SET_EXT, subj), newCompound(SET_INT, pred)));
     }
 
     @Nullable
@@ -269,7 +269,7 @@ public abstract class TermBuilder {
             // (--,(--,P)) = P
             return ((TermContainer) t).term(0);
         }
-        return make(NEGATE, -1, new TermVector(t)).term();
+        return make(NEGATE, -1, TermVector.the(t)).term();
     }
 
     @Nullable
@@ -294,7 +294,7 @@ public abstract class TermBuilder {
 
         return newCompound(
                 o,
-                index, new TermVector(res));
+                index, TermVector.the(res));
     }
 
     @Nullable
@@ -466,7 +466,7 @@ public abstract class TermBuilder {
         if (s == null)
             return null;
 
-        return newCompound(IMPLICATION, t, new TermVector(s, pred(predicate)));
+        return newCompound(IMPLICATION, t, TermVector.the(s, pred(predicate)));
     }
 
     @Nullable

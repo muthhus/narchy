@@ -5,6 +5,7 @@ import nars.Op;
 import nars.term.Compound;
 import nars.term.Termed;
 import nars.term.compound.GenericCompound;
+import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
@@ -22,22 +23,22 @@ public class Space extends GenericCompound {
     final FloatArrayList vector;
     final int hash2;
 
-    public Space(@NotNull TermVector subterms) {
+    public Space(@NotNull TermContainer subterms) {
         //this(subterms, FloatArrayList.newWithNValues((int)subterms.size(), (float)Float.NaN) /* blank */);
         this(subterms, (FloatArrayList) null);
     }
 
-    public Space(@NotNull TermVector subterms, float... f) {
+    public Space(@NotNull TermContainer subterms, float... f) {
         this(subterms, new FloatArrayList(f));
     }
 
     @Override public Compound anonymous() {
         if (vector == null) return super.anonymous();
-        else return new Space((TermVector)subterms);
+        else return new Space(subterms);
     }
 
 
-    public Space(@NotNull TermVector subterms, @Nullable FloatArrayList vector) {
+    public Space(@NotNull TermContainer subterms, @Nullable FloatArrayList vector) {
         super(Op.SPACE, -1, subterms);
         this.vector = vector;
         if (vector!=null) {

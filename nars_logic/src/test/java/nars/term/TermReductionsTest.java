@@ -41,7 +41,7 @@ public class TermReductionsTest {
         //UNION if (term1.op(Op.SET_INT) && term2.op(Op.SET_INT)) {
         assertEquals("{P,Q,R,S}", sect(sete(p, q), sete(r, s)).toString());
         assertEquals("{P,Q,R,S}", $("(&,{P,Q},{R,S})").toString());
-        assertEquals(Terms.EmptySetInt, sect(seti(p, q), seti(r, s)));
+        assertEquals(Terms.ZeroSetInt, sect(seti(p, q), seti(r, s)));
 
     }
 
@@ -66,7 +66,12 @@ public class TermReductionsTest {
 
     }
     @Test public void testIntersectIntReductionToZero() {
-        assertEquals(Terms.EmptySetExt, $("(|,{P,Q},{R,S})"));
+        Term e = $("(|,{P,Q},{R,S})");
+
+        e.equals(Terms.ZeroSetExt);
+        Terms.ZeroSetExt.equals(e);
+
+        assertEquals(Terms.ZeroSetExt, e);
     }
 
     @Test public void testIntersectIntReduction_to_one() {
@@ -152,10 +157,10 @@ public class TermReductionsTest {
     }
 
     @Test public void testDiffIntEqual() {
-        assertEquals(Terms.EmptySetInt, diffInt(p, p));
+        assertEquals(Terms.ZeroSetInt, diffInt(p, p));
     }
     @Test public void testDiffExtEqual() {
-        assertEquals(Terms.EmptySetExt, diffExt(p, p));
+        assertEquals(Terms.ZeroSetExt, diffExt(p, p));
     }
     @Test public void testDifferenceSorted() {
 //        assertArrayEquals(
@@ -175,7 +180,7 @@ public class TermReductionsTest {
 //        );
         //check consistency with differenceSorted
         assertEquals(
-            Terms.EmptySetExt,
+            Terms.ZeroSetExt,
             TermContainer.difference(Op.SET_EXT, sete(p, q), sete(p, q))
         );
     }

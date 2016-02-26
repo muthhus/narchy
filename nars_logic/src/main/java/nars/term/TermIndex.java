@@ -42,6 +42,9 @@ public interface TermIndex  {
     /** getOrAdd the term */
     @Nullable Termed the(@NotNull Termed t);
 
+    /** get if not absent */
+    @Nullable Termed get(@NotNull Termed t);
+
 
         //DEFAULT IMPL to be moved to a concrete class: BUILDS ON THE HEAP:
         //return builder().make(op, relation, subterms, dt);
@@ -63,16 +66,12 @@ public interface TermIndex  {
         return the(op, TermContainer.the(op, subterms));
     }
 
-    /** universal zero-length product */
-    Compound Empty = new GenericCompound(Op.PRODUCT, -1, TermVector.Empty);
-    TermVector EmptyList = new TermVector();
-    TermSet EmptySet = new TermSet();
+
 
     void clear();
 
     void forEach(Consumer<? super Termed> c);
 
-    //Termed get(Object t);
 
 
     /** # of contained terms */
@@ -462,24 +461,17 @@ public interface TermIndex  {
     }
 
     /** return null if nothing matched */
-    default <T extends Termed> T the(String termToParse) throws Narsese.NarseseException {
+    @Nullable default <T extends Termed> T get(@NotNull String termToParse) throws Narsese.NarseseException {
+        return (T)get(parse(termToParse));
+    }
 
-        return (T) Narsese.the().term(termToParse, this);
+    @Nullable
+    default Termed parse(@NotNull String termToParse) {
+        return Narsese.the().term(termToParse, this);
+    }
 
-
-//        if (x == null) {
-//
-//        } else {
-//
-//            //this is applied automatically when a task is entered.
-//            //it's only necessary here where a term is requested
-//            //TODO apply this in index on the original copy only
-////            Term xt = x.term();
-////            if (xt.isCompound()) {
-////                xt.setDuration(memory.duration());
-////            }
-//        }
-
+    @Nullable default <T extends Termed> T the(@NotNull String termToParse) throws Narsese.NarseseException {
+        return (T)the(parse(termToParse));
     }
 
 

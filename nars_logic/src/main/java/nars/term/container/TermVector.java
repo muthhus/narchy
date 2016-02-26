@@ -3,6 +3,7 @@ package nars.term.container;
 import com.google.common.base.Joiner;
 import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
 import nars.Op;
+import nars.nal.meta.ProcTerm;
 import nars.nal.meta.match.Ellipsis;
 import nars.term.*;
 import org.apache.commons.lang3.ArrayUtils;
@@ -23,7 +24,6 @@ import java.util.function.Consumer;
  */
 public class TermVector<T extends Term> implements TermContainer<T>, Serializable {
 
-    public final static TermVector Empty = new TermVector();
 
     /**
      * list of (direct) term
@@ -74,7 +74,7 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
 
 
     @SafeVarargs
-    public TermVector(T... terms) {
+     protected TermVector(T... terms) {
         this.term = terms;
 
         /**
@@ -298,6 +298,11 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
         Term[] r = terms().clone();
         ArrayUtils.reverse(r);
         return new TermVector(r);
+    }
+
+    public static TermContainer the(Term... t) {
+        if (t.length == 0) return Terms.ZeroSubterms;
+        return new TermVector(t);
     }
 
 

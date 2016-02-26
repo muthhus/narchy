@@ -33,8 +33,7 @@ import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 import static nars.Op.*;
 import static nars.nal.Tense.ITERNAL;
-import static nars.term.TermIndex.Empty;
-import static nars.term.Terms.EmptySetExt;
+import static nars.term.Terms.ZeroSetExt;
 
 /**
  * core utility class for:
@@ -146,7 +145,7 @@ public enum $ /* TODO: implements TermIndex */ {
     public static Compound exec(@NotNull Atomic opTerm, @Nullable Compound arg) {
         return (Compound) the(
                 INHERIT,
-                arg == null ? Empty : arg,
+                arg == null ? Terms.ZeroProduct : arg,
                 opTerm
         );
     }
@@ -169,7 +168,7 @@ public enum $ /* TODO: implements TermIndex */ {
 
     @Nullable
     public static Compound p(@Nullable Term... t) {
-        return (t == null) || (t.length == 0) ? Empty : (Compound) the(PRODUCT, t);
+        return (t == null) || (t.length == 0) ? Terms.ZeroProduct : (Compound) the(PRODUCT, t);
     }
 
     /** creates from a sublist of a list */
@@ -321,7 +320,7 @@ public enum $ /* TODO: implements TermIndex */ {
     public static Compound sete(Term... t) {
         return ((t != null) && (t.length > 0)) ?
                 (Compound) the(SET_EXT, t) :
-                EmptySetExt;
+                ZeroSetExt;
     }
 
     /** shorthand for extensional set */
