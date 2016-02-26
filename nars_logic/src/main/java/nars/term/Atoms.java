@@ -48,8 +48,11 @@ public class Atoms extends MyConcurrentRadixTree<AtomConcept> {
         return resolveOrAdd($.the(s));
     }
     public final AtomConcept resolveOrAdd(Atom a) {
-        return putIfAbsent(a.id,
-                () -> new AtomConcept(a, null, null)); //new AtomicString(++serial));
+
+        return putIfAbsent(a.id, () -> {
+            int s = (serial++);
+            return new AtomConcept(a, null, null);
+        }); //new AtomicString(++serial));
 
     }
 

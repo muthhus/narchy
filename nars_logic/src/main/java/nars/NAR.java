@@ -216,35 +216,13 @@ public abstract class NAR implements Level, Consumer<Task> {
     }
 
     @NotNull
-    public TextInput input(@NotNull String text) {
-        TextInput i = new TextInput(this, text);
-        if (i.size() == 0) {
-            //TODO replace with real parser error
-            error(new NarseseException("Input syntax error: " + text));
-        }
-        input((Input) i);
-        return i;
+    public TextInput input(@NotNull String text) throws NarseseException {
+        return (TextInput) input((Input)new TextInput(this, text));
     }
 
     @Nullable
     public <T extends Termed> T term(@NotNull String t) throws NarseseException {
-
-        T x = (T) Narsese.the().term(t, index());
-
-        if (x == null) {
-            if (Global.DEBUG)
-                NAR.logger.error("Term syntax error: '{}'", t);
-        } else {
-
-            //this is applied automatically when a task is entered.
-            //it's only necessary here where a term is requested
-            //TODO apply this in index on the original copy only
-//            Term xt = x.term();
-//            if (xt.isCompound()) {
-//                xt.setDuration(memory.duration());
-//            }
-        }
-        return x;
+        return index().resolve(t);
     }
 
     /**

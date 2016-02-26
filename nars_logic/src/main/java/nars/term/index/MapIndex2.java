@@ -51,8 +51,7 @@ public class MapIndex2 extends AbstractMapIndex {
 
     @NotNull
     static TermVector vector(@NotNull Term t) {
-        return (t.isCompound())  ?
-                    (TermVector)((Compound)t).subterms() : null;
+        return (TermVector)((Compound)t).subterms();
     }
 
     static final Function<TermVector, IntObjectHashMap> groupBuilder =
@@ -78,17 +77,16 @@ public class MapIndex2 extends AbstractMapIndex {
     @Nullable
     @Override
     public Termed getIfPresent(@NotNull Termed t) {
-        return (Termed) getItemIfPresent(
-                vector(t.term()), t.opRel());
+        Term u = t.term();
+        if (u instanceof AtomicString) {
+            return atoms.resolve(((AtomicString)u).toString());
+        } else {
+            return (Termed) getItemIfPresent(
+                    vector(u), t.opRel());
+        }
     }
 
 
-    @Nullable
-    public Object getItemIfPresent(Object vv, int index) {
-        IntObjectHashMap group = data.get(vv);
-        if (group == null) return null;
-        return group.get(index);
-    }
 
     @Nullable
     @Override
@@ -97,12 +95,23 @@ public class MapIndex2 extends AbstractMapIndex {
                 subterms, SUBTERM_RELATION);
     }
 
+
+    @Nullable
+    public Object getItemIfPresent(Object vv, int index) {
+
+            IntObjectHashMap group = data.get(vv);
+            if (group == null) return null;
+            return group.get(index);
+
+    }
+
     @Override
     public void putTerm(@NotNull Termed t) {
-        if (t.term() instanceof AtomicString) {
+        Term u = t.term();
+        if (u instanceof AtomicString) {
             atoms.putIfAbsent(t.toString(), ()->(AtomConcept)t);
         } else {
-            Object replaced = putItem(vector(t.term()), t.opRel(), t);
+            Object replaced = putItem(vector(u), t.opRel(), t);
             if (replaced == null)
                 count++;
         }

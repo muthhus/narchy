@@ -33,14 +33,11 @@ import java.util.Collection;
  */
 public class TextInput extends TaskQueue {
 
-	public TextInput(@NotNull NAR n, String input) {
-		process(n, input);
+	public TextInput(@NotNull NAR nar, String input) throws Narsese.NarseseException {
+		int n = Narsese.the().tasks(input,
+				(Collection<Task>) this, nar.memory);
+		if (n == 0)
+			throw new Narsese.NarseseException("No tasks parsed");
 	}
 
-	protected int process(@NotNull NAR nar, String input) {
-        //..
-
-        return Narsese.the().tasks(input,
-                (Collection<Task>) this, nar.memory);
-    }
 }

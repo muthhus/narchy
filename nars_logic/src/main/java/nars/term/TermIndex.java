@@ -3,6 +3,7 @@ package nars.term;
 import javassist.scopedpool.SoftValueHashMap;
 import nars.$;
 import nars.Global;
+import nars.Narsese;
 import nars.Op;
 import nars.budget.Budget;
 import nars.nal.meta.PremiseAware;
@@ -475,6 +476,27 @@ public interface TermIndex  {
         }
 
         return modifications;
+    }
+
+    /** return null if nothing matched */
+    default <T extends Termed> T resolve(String termToParse) throws Narsese.NarseseException {
+
+        return (T) Narsese.the().term(termToParse, this);
+
+
+//        if (x == null) {
+//
+//        } else {
+//
+//            //this is applied automatically when a task is entered.
+//            //it's only necessary here where a term is requested
+//            //TODO apply this in index on the original copy only
+////            Term xt = x.term();
+////            if (xt.isCompound()) {
+////                xt.setDuration(memory.duration());
+////            }
+//        }
+
     }
 
 

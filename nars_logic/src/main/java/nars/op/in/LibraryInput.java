@@ -116,12 +116,6 @@ public class LibraryInput extends TextInput {
         return l;
     }
 
-    @Override
-    protected int process(@NotNull NAR nar, String input) {
-        int n = super.process(nar, input);
-        this.input = input;
-        return n;
-    }
 
 
     public String getSource() {
