@@ -1,9 +1,9 @@
-package nars.op.software.prolog.fluents;
+package nars.op.sys.prolog.fluents;
 
-import nars.op.software.prolog.Prolog;
-import nars.op.software.prolog.io.IO;
-import nars.op.software.prolog.io.Parser;
-import nars.op.software.prolog.terms.*;
+import nars.op.sys.prolog.Prolog;
+import nars.op.sys.prolog.io.IO;
+import nars.op.sys.prolog.io.Parser;
+import nars.op.sys.prolog.terms.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

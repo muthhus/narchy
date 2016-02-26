@@ -1,4 +1,4 @@
-package nars.op.software.prolog.io;
+package nars.op.sys.prolog.io;
 
 /*
  * Copyright (C) Paul Tarau 1996-1999

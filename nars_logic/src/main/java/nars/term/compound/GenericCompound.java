@@ -30,7 +30,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
      * subterm vector
      */
     @NotNull
-    public final TermVector<T> subterms;
+    public final TermContainer<T> subterms;
 
     /**
      * subterm relation, resolves to unique concept
@@ -51,11 +51,11 @@ public class GenericCompound<T extends Term> implements Compound<T> {
         this(op, -1, subterms);
     }
 
-    public GenericCompound(@NotNull Op op, int relation, @NotNull TermVector subterms) {
+    public GenericCompound(@NotNull Op op, int relation, @NotNull TermContainer subterms) {
         this(op, relation, Tense.ITERNAL, subterms);
     }
 
-    public GenericCompound(@NotNull Op op, int relation, int dt, @NotNull TermVector subterms) {
+    public GenericCompound(@NotNull Op op, int relation, int dt, @NotNull TermContainer subterms) {
         this.subterms = subterms;
         this.normalized = (subterms.vars() == 0) && (subterms.varPattern() == 0) /* not included in the count */;
         this.op = op;
@@ -112,10 +112,6 @@ public class GenericCompound<T extends Term> implements Compound<T> {
         TermPrinter.append(this, p, pretty);
     }
 
-    @Override
-    public Compound anonymous() {
-        return this.dt(ITERNAL);
-    }
 
     @Override
     public int compareTo(@NotNull Object o) {
@@ -145,6 +141,10 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
     }
 
+    @Override
+    public Compound anonymous() {
+        return this.dt(ITERNAL);
+    }
 
     @Override
     public final void addAllTo(@NotNull Collection<Term> set) {
@@ -153,13 +153,18 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
     @NotNull
     @Override
-    public final TermVector<T> subterms() {
+    public final TermContainer<T> subterms() {
         return subterms;
     }
 
     @Override
     public boolean equals(@NotNull Object that) {
         return this == that || hash == that.hashCode() && equalsFurther((Termed) that);
+    }
+
+    @Override
+    public boolean equalTerms(TermContainer c) {
+        return subterms.equalTerms(c);
     }
 
     private boolean equalsFurther(@NotNull Termed thatTerm) {
@@ -237,9 +242,10 @@ public class GenericCompound<T extends Term> implements Compound<T> {
         subterms.forEach(c);
     }
 
-    @Override
+    @Override @Deprecated
     public T[] terms() {
-        return subterms.term;
+
+        return subterms.terms();
     }
 
     @Override

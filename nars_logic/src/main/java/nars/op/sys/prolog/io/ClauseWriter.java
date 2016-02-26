@@ -1,9 +1,9 @@
-package nars.op.software.prolog.io;
+package nars.op.sys.prolog.io;
 
-import nars.op.software.prolog.terms.Const;
-import nars.op.software.prolog.terms.Fun;
-import nars.op.software.prolog.terms.PTerm;
-import nars.op.software.prolog.terms.Prog;
+import nars.op.sys.prolog.terms.Const;
+import nars.op.sys.prolog.terms.Fun;
+import nars.op.sys.prolog.terms.PTerm;
+import nars.op.sys.prolog.terms.Prog;
 import org.jetbrains.annotations.NotNull;
 
 /**

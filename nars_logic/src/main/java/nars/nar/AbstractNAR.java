@@ -4,6 +4,7 @@ import nars.Global;
 import nars.Memory;
 import nars.NAR;
 import nars.concept.Concept;
+import nars.concept.DefaultConceptBuilder;
 import nars.nal.Deriver;
 import nars.nal.meta.PremiseRule;
 import nars.nal.nal8.AbstractOperator;
@@ -24,7 +25,9 @@ import nars.op.sys.js;
 import nars.op.sys.shell.shell;
 import nars.term.Term;
 import nars.term.TermIndex;
+import nars.term.index.MapIndex2;
 import nars.time.Clock;
+import nars.util.data.map.UnifriedMap;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -54,7 +57,7 @@ public abstract class AbstractNAR extends NAR {
 
 
     public AbstractNAR(@NotNull Clock clock) {
-        this(new Memory(clock, TermIndex.memory(1024) ));
+        this(new Memory(clock, new DefaultTermIndex(1024) ));
     }
 
     public AbstractNAR(@NotNull Memory memory) {
@@ -340,6 +343,12 @@ public abstract class AbstractNAR extends NAR {
     public abstract NAR forEachConcept(Consumer<Concept> recip);
 
 
+    static class DefaultTermIndex extends MapIndex2 implements TermIndex {
 
+        public DefaultTermIndex(int capacity) {
+            super(new UnifriedMap(), new DefaultConceptBuilder());
 
+        }
+
+    }
 }

@@ -5,12 +5,14 @@ import nars.$;
 import nars.Global;
 import nars.Narsese;
 import nars.Op;
+import nars.concept.DefaultConceptBuilder;
 import nars.nal.meta.PremiseRule;
 import nars.nal.meta.match.*;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.TermIndex;
 import nars.term.atom.Atom;
+import nars.term.index.MapIndex2;
 import nars.term.index.PatternIndex;
 import nars.term.transform.subst.FindSubst;
 import nars.term.variable.GenericVariable;
@@ -44,7 +46,7 @@ public class EllipsisTest {
         default Set<Term> test(int arity, int repeats) {
             Set<Term> selectedFixed = Global.newHashSet(arity);
 
-            TermIndex index = TermIndex.memory(128);
+            TermIndex index = new MapIndex2(Global.newHashMap(128), new DefaultConceptBuilder());
 
             Compound y = getMatchable(arity);
             assertNotNull(y);

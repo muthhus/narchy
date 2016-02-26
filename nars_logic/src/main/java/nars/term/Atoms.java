@@ -15,6 +15,8 @@ import com.googlecode.concurrenttrees.radix.node.util.PrettyPrintable;
 import nars.$;
 import nars.Op;
 import nars.concept.AtomConcept;
+import nars.concept.Concept;
+import nars.concept.DefaultConceptBuilder;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.atom.AtomicString;
@@ -23,6 +25,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReferenceArray;
+import java.util.function.Function;
 
 /**
  * String interner that maps strings to integers and resolves them
@@ -31,9 +34,11 @@ import java.util.concurrent.atomic.AtomicReferenceArray;
 public class Atoms extends MyConcurrentRadixTree<AtomConcept> {
 
     private static volatile int serial;
+    private final Function<Term, Concept> conceptBuilder;
 
-    public Atoms() {
+    public Atoms(Function<Term, Concept> conceptBuilder) {
         super(new AtomNodeFactory());
+        this.conceptBuilder = conceptBuilder;
     }
 
 
@@ -57,7 +62,7 @@ public class Atoms extends MyConcurrentRadixTree<AtomConcept> {
 
         return putIfAbsent(a.id, () -> {
             int s = (serial++);
-            return new AtomConcept(a, null, null);
+            return (AtomConcept) conceptBuilder.apply(a);
         }); //new AtomicString(++serial));
 
     }

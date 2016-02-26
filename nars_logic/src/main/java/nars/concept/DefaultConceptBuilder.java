@@ -1,6 +1,5 @@
 package nars.concept;
 
-import nars.NAR;
 import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
 import nars.budget.BudgetMerge;
@@ -20,8 +19,6 @@ import java.util.function.Function;
  */
 public class DefaultConceptBuilder implements Function<Term, Concept> {
 
-
-    private final NAR nar;
     /**
      * default for new concepts
      */
@@ -31,12 +28,16 @@ public class DefaultConceptBuilder implements Function<Term, Concept> {
      * default for new concepts
      */
     public final MutableInt termLinkBagSize = new MutableInt(16);
+    public final Random rng;
 
 
+    public DefaultConceptBuilder() {
+        this(null, 1, 1);
+    }
 
-    public DefaultConceptBuilder(NAR n, int tasklinkBagSize, int termlinkBagSize) {
+    public DefaultConceptBuilder(Random r, int tasklinkBagSize, int termlinkBagSize) {
 
-        this.nar = n;
+        this.rng = r;
         this.taskLinkBagSize.setValue(tasklinkBagSize);
         this.termLinkBagSize.setValue(termlinkBagSize);
     }
@@ -45,31 +46,28 @@ public class DefaultConceptBuilder implements Function<Term, Concept> {
     public Concept apply(Term t) {
 
 
-        int termLinkBagSize = 32;
-        int taskLinkBagSize = 32;
-
-        Random random = nar.memory.random;
+        Random random = rng;
 
         Bag<Task> taskLinks =
-                new CurveBag<Task>(taskLinkBagSize, random)
+                new CurveBag<Task>(taskLinkBagSize.intValue(), random)
                         .merge(BudgetMerge.plusDQBlend);
 
         Bag<Termed> termLinks =
-                new CurveBag<Termed>(termLinkBagSize, random)
+                new CurveBag<Termed>(termLinkBagSize.intValue(), random)
                         .merge(BudgetMerge.plusDQBlend);
 
         Concept c;
-        switch (t.op()) {
+        //switch (t.op()) {
             /*Op.NEGATE:
 
                 break;*/
-            default:
-                c = (!(t.isCompound())) ?
+            //default:
+        c = (!(t.isCompound())) ?
 
-                        newAtomConcept(t, taskLinks, termLinks) :
+                newAtomConcept(t, taskLinks, termLinks) :
 
-                        newCompoundConcept(t, taskLinks, termLinks);
-        }
+                newCompoundConcept(t, taskLinks, termLinks);
+        //}
         return c;
     }
 
@@ -79,7 +77,7 @@ public class DefaultConceptBuilder implements Function<Term, Concept> {
 
                 new DefaultConcept(t, taskLinks, termLinks) :
 
-                new SpaceConcept((Space) t, taskLinks, termLinks, nar);
+                new SpaceConcept((Space) t, taskLinks, termLinks);
     }
 
     protected @NotNull AtomConcept newAtomConcept(Term t, Bag<Task> taskLinks, Bag<Termed> termLinks) {

@@ -7,6 +7,7 @@ import nars.nal.Deriver;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.Terms;
 import nars.term.index.PatternIndex;
 import nars.util.data.Util;
 import nars.util.data.list.FasterList;
@@ -248,7 +249,7 @@ public class PremiseRuleSet {
             try {
 
 
-                Termed prt = Narsese.the().term(src, $.terms, false /* raw */);
+                Termed prt = Narsese.the().term(src, Terms.terms, false /* raw */);
                 if (!(prt instanceof Compound))
                     throw new Narsese.NarseseException("rule parse error: " + src + " -> " + prt);
 

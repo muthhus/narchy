@@ -2,6 +2,7 @@ package nars.term;
 
 import com.googlecode.concurrenttrees.common.PrettyPrinter;
 import com.googlecode.concurrenttrees.radix.node.util.PrettyPrintable;
+import nars.concept.DefaultConceptBuilder;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -14,7 +15,7 @@ public class AtomsTest {
     @Test
     public void testAtomInsertion() {
 
-        Atoms tree = new Atoms();
+        Atoms tree = new Atoms(new DefaultConceptBuilder());
 
         tree.resolveOrAdd("concept");
         tree.resolveOrAdd("term");

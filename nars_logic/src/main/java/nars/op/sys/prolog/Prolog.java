@@ -1,16 +1,16 @@
-package nars.op.software.prolog;
+package nars.op.sys.prolog;
 
 
 import com.gs.collections.api.block.function.primitive.BooleanFunction;
-import nars.op.software.prolog.builtins.Builtins;
-import nars.op.software.prolog.fluents.DataBase;
-import nars.op.software.prolog.io.IO;
-import nars.op.software.prolog.io.Parser;
-import nars.op.software.prolog.terms.*;
+import nars.op.sys.prolog.builtins.Builtins;
+import nars.op.sys.prolog.fluents.DataBase;
+import nars.op.sys.prolog.io.IO;
+import nars.op.sys.prolog.io.Parser;
+import nars.op.sys.prolog.terms.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.op.software.prolog.terms.Prog.firstSolution;
+import static nars.op.sys.prolog.terms.Prog.firstSolution;
 
 /**
  * Initializes Prolog. Sets up shared data areas.

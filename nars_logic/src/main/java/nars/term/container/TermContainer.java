@@ -12,7 +12,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.TreeSet;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -22,6 +21,8 @@ import java.util.function.Predicate;
  * T = subterm type
  */
 public interface TermContainer<T extends Term> extends Termlike, Comparable, Iterable<T> {
+
+    EmptyTermContainer Empty = new EmptyTermContainer();
 
     int varDep();
 
@@ -54,6 +55,41 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
         return Sets.intersect(a.toSet(),b.toSet());
     }
 
+    default boolean isEmpty() {
+        return size() != 0;
+    }
+
+    /**
+     * scans first level only, not recursive
+     */
+    default boolean contains(Object o) {
+        return o instanceof Term && containsTerm((Term) o);
+    }
+
+
+    static boolean equals(TermContainer a, Object b) {
+        return b instanceof TermContainer && TermContainer.equals(a, (TermContainer)b);
+    }
+
+    /** can be called from equals() */
+    static boolean equals(TermContainer a, TermContainer b) {
+
+        return
+                (a == b) ||
+
+                ((a.equalMeta(b)) &&
+                 (a.equalTerms(b)));
+    }
+
+    default boolean equalMeta(TermContainer b) {
+        return (hashCode() == b.hashCode()) &&
+                (structure() == b.structure()) &&
+                (volume() == b.volume()) &&
+                (size() == b.size());
+    }
+
+    /** test for exhaustive equality */
+    boolean equalTerms(TermContainer c);
 
 
 //    static TermSet differ(TermSet a, TermSet b) {
@@ -112,20 +148,22 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
      *  if this creates a new array, consider using .term(i) to access
      *  subterms iteratively.
      */
-    T[] terms();
+    @Deprecated @NotNull T[] terms();
 
 
     @NotNull
     default Term[] terms(@NotNull IntObjectPredicate<T> filter) {
         List<T> l = Global.newArrayList(size());
         int s = size();
+        int added = 0;
         for (int i = 0; i < s; i++) {
             T t = term(i);
-            if (filter.accept(i, t))
+            if (filter.accept(i, t)) {
                 l.add(t);
+                added++;
+            }
         }
-        if (l.isEmpty()) return Terms.Empty;
-        return l.toArray(new Term[l.size()]);
+        return added > 0 ? Terms.EmptyArray : l.toArray(new Term[added]);
     }
 
 
@@ -158,6 +196,9 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
     /** extract a sublist of terms as an array */
     @NotNull
     default Term[] terms(int start, int end) {
+        //TODO for TermVector, create an Array copy directly
+        //TODO for TermVector, if (start == 0) && end == just return its array
+
         Term[] t = new Term[end-start];
         int j = 0;
         for (int i = start; i < end; i++)
@@ -166,12 +207,10 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
     }
 
     /** follows normal indexOf() semantics; -1 if not found */
-    default int indexOf(@Nullable Term t) {
-        if (t == null)
-            throw new RuntimeException("not found");
-            //return -1;
-
+    default int indexOf(@NotNull Term t) {
         int s = size();
+        if (impossibleSubterm(t))
+            return -1;
         for (int i = 0; i < s; i++) {
             if (t.equals(term(i)))
                 return i;
@@ -227,7 +266,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
     default boolean equivalent(@NotNull List<Term> sub) {
         int s = size();
         if (s!=sub.size()) return false;
-        for (int i = 0; i < size(); i++) {
+        for (int i = 0; i < s; i++) {
             if (!term(i).equals(sub.get(i))) return false;
         }
         return true;
@@ -237,7 +276,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
     /** returns true if evaluates true for any terms
      * @param p*/
     @Override
-    default boolean or(Predicate<? super Term> p) {
+    default boolean or(@NotNull Predicate<? super Term> p) {
         for (Term t : terms()) {
             if (t.or(p))
                 return true;
@@ -258,27 +297,18 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
     }
 
 
-    static boolean requiresTermSet(@NotNull Op op, int num) {
-        return
-            /*(dt==0 || dt==ITERNAL) &&*/ //non-zero or non-iternal dt disqualifies any reason for needing a TermSet
-            (op.isCommutative() && (num > 1));
-    }
-
 
     /** produces the correct TermContainer for the given Op,
      * according to the existing type
      */
     @NotNull
     static TermContainer the(@NotNull Op op, @NotNull TermContainer tt) {
-        return (!requiresTermSet(op, tt.size()) || tt.isSorted()) ? tt :
-            TermSet.the(tt.terms());
+        return (!requiresTermSet(op, tt.size()) ||
+                tt.isSorted()) ?
+                    tt :
+                    TermSet.the(tt.terms());
     }
-    @NotNull
-    static TermContainer the(@NotNull Op op, @NotNull Collection<Term> tt) {
-        //if (tt.isEmpty()) ...
-        return requiresTermSet(op, tt.size()) ?
-                TermSet.the(tt) : new TermVector(tt);
-    }
+
 
     @NotNull
     static TermContainer the(@NotNull Term one) {
@@ -287,10 +317,24 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
 
 
     @NotNull
+    static TermContainer the(@NotNull Op op, @NotNull Collection<Term> tt) {
+        //if (tt.isEmpty()) ...
+        return requiresTermSet(op, tt.size()) ?
+                TermSet.the(tt) : new TermVector(tt);
+    }
+
+    @NotNull
     static TermContainer the(@NotNull Op op, @NotNull Term... tt) {
         return  requiresTermSet(op, tt.length) ?
                 TermSet.the(tt) :
                 new TermVector(tt);
+    }
+
+
+    static boolean requiresTermSet(@NotNull Op op, int num) {
+        return
+            /*(dt==0 || dt==ITERNAL) &&*/ //non-zero or non-iternal dt disqualifies any reason for needing a TermSet
+                ((num > 1) && op.isCommutative());
     }
 
     default boolean isSorted() {

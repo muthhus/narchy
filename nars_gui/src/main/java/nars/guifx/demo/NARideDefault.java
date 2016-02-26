@@ -3,6 +3,7 @@ package nars.guifx.demo;
 import javassist.scopedpool.SoftValueHashMap;
 import nars.Global;
 import nars.Memory;
+import nars.concept.DefaultConceptBuilder;
 import nars.nar.Default;
 import nars.term.TermIndex;
 import nars.term.index.MapIndex2;
@@ -52,7 +53,7 @@ public enum NARideDefault {
     //            new SoftValueHashMap(capacity*2)
     //        );
             return new MapIndex2(
-                new SoftValueHashMap(capacity)
-            );
+                new SoftValueHashMap(capacity), new DefaultConceptBuilder()
+                    );
         }
 }

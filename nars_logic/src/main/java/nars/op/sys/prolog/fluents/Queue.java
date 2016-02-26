@@ -1,6 +1,6 @@
-package nars.op.software.prolog.fluents;
+package nars.op.sys.prolog.fluents;
 
-import nars.op.software.prolog.io.IO;
+import nars.op.sys.prolog.io.IO;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;

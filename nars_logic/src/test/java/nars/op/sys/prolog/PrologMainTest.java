@@ -1,8 +1,6 @@
-package nars.op.software.prolog;
+package nars.op.sys.prolog;
 
-import nars.op.software.prolog.io.IO;
-import nars.op.software.prolog.terms.Fun;
-import nars.op.software.prolog.terms.PTerm;
+import nars.op.sys.prolog.terms.PTerm;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

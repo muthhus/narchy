@@ -2,6 +2,8 @@ package nars.term;
 
 import nars.Global;
 import nars.NAR;
+import nars.concept.AtomConcept;
+import nars.concept.DefaultConceptBuilder;
 import nars.nar.Default;
 import nars.nar.Terminal;
 import nars.task.Task;
@@ -17,6 +19,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import static nars.$.$;
+import static nars.Global.newHashMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -52,10 +55,10 @@ public class TermIndexTest {
 //        testIndex(new MapIndex(new SoftValueHashMap(), new SoftValueHashMap()));
 //    }
     @Test public void testTermSharing5a() {
-        testIndex(new MapIndex2(new HashMap()));
+        testIndex(new MapIndex2(new HashMap(), new DefaultConceptBuilder()));
     }
     @Test public void testTermSharing5b() {
-        testIndex(new MapIndex2(Global.newHashMap()));
+        //testIndex(new MapIndex2(newHashMap(), conceptBuilder));
     }
 
 //    @Test public void testTermSharing4() {
@@ -185,8 +188,11 @@ public class TermIndexTest {
         System.out.println(i.data);
         a.forEach(bb->System.out.println(bb + " " + bb.getClass()));
 
-        assertTrue(at!=b.term(0));
-
+        Term B = b.term(0);
+        assertTrue(at!= B);
+        assertTrue(B instanceof AtomConcept);
+        assertTrue(B.term() == B);
+        assertEquals(at.toString(), B.toString());
 
 
     }

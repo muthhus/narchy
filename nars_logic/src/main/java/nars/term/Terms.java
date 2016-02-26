@@ -4,6 +4,7 @@ import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
 import nars.$;
 import nars.Global;
 import nars.Op;
+import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.util.Texts;
 import nars.util.data.sorted.SortedList;
@@ -21,20 +22,53 @@ import static nars.nal.Tense.ITERNAL;
 
 /**
  * Static utility class for static methods related to Terms
+ * <p>
+ * Also serves as stateless/memory-less transient static (on-heap) TermIndex
+ *
  * @author me
  */
-public enum Terms {
-    ;
+public class Terms extends TermBuilder implements TermIndex {
 
-    public static final Term[] Empty = new Term[0];
-    public static final Compound EmptyProduct = $.p(Empty);
-    public static final Compound EmptySetExt = $.sete(Empty);
-    public static final Compound EmptySetInt = $.seti(Empty);
+    public static final Terms terms = new Terms();
+
+    Terms() {
+
+    }
+
+    @Override
+    public
+    @Nullable
+    Termed make(Op op, int relation, TermContainer subterms, int dt) {
+        return new GenericCompound(op, relation, subterms).dt(dt);
+    }
 
 
-    public static final IntFunction<Term[]> TermArrayBuilder = Term[]::new;
-    @NotNull
-    public static int[] EmptyIntArray = new int[0];
+    @Override
+    public
+    @Nullable
+    Termed the(Termed t) {
+        return t;
+    }
+
+    @Override
+    public
+    @Nullable
+    Termed the(Op op, int relation, TermContainer subterms, int dt) {
+        return make(op, relation, subterms, dt);
+    }
+
+    @Override
+    public TermBuilder builder() {
+        return this;
+    }
+
+
+    public static final Term[] EmptyArray = new Term[0];
+    public static final Compound EmptyProduct = $.compound(Op.PRODUCT, TermContainer.Empty);
+    public static final Compound EmptySetExt = $.compound(Op.SET_EXT, TermContainer.Empty);
+    public static final Compound EmptySetInt = $.compound(Op.SET_INT, TermContainer.Empty);
+    public static final IntFunction<Term[]> NewTermArray = Term[]::new;
+
 
     public static boolean equalSubTermsInRespectToImageAndProduct(@Nullable Term a, @Nullable Term b) {
 
@@ -53,7 +87,7 @@ public enum Terms {
         if (equalOps) {
             switch (o) {
                 case INHERIT:
-                    return equalSubjectPredicateInRespectToImageAndProduct((Compound)a, (Compound)b);
+                    return equalSubjectPredicateInRespectToImageAndProduct((Compound) a, (Compound) b);
 
                 case SIMILAR:
                     boolean x = equalSubjectPredicateInRespectToImageAndProduct((Compound) a, (Compound) b);
@@ -153,11 +187,11 @@ public enum Terms {
         //original code did not check relation index equality
         //https://code.google.com/p/open-nars/source/browse/trunk/nars_core_java/nars/language/CompoundTerm.java
         //if (requireEqualImageRelation) {
-            //if (sa.op().isImage() && sb.op().isImage()) {
-                if (((Compound)sa).relation() != ((Compound)sb).relation()) {
-                    return false;
-                }
-            //}
+        //if (sa.op().isImage() && sb.op().isImage()) {
+        if (((Compound) sa).relation() != ((Compound) sb).relation()) {
+            return false;
+        }
+        //}
         //}
 
         return containsAll((Compound) sa, ta, (Compound) sb, tb);
@@ -183,7 +217,9 @@ public enum Terms {
     }
 
 
-    /** brute-force equality test */
+    /**
+     * brute-force equality test
+     */
     public static boolean contains(@NotNull Term[] container, @NotNull Term v) {
         for (Term e : container)
             if (v.equals(e))
@@ -206,7 +242,7 @@ public enum Terms {
         switch (arg.length) {
 
             case 0:
-                return Terms.Empty;
+                return Terms.EmptyArray;
 
             case 1:
                 return arg; //new Term[] { arg[0] };
@@ -231,7 +267,7 @@ public enum Terms {
 
             default:
                 //terms > 2:
-                return new SortedList<>(arg).toArray(TermArrayBuilder);
+                return new SortedList<>(arg).toArray(NewTermArray);
         }
     }
 
@@ -290,7 +326,9 @@ public enum Terms {
         return Arrays.asList(t);
     }
 
-    /** makes a set from the array of terms */
+    /**
+     * makes a set from the array of terms
+     */
     @NotNull
     public static Set<Term> toSet(@NotNull Term[] t) {
         if (t.length == 1)
@@ -358,7 +396,7 @@ public enum Terms {
             if (filter.accept(i, t))
                 l.add(t);
         }
-        if (l.isEmpty()) return Terms.Empty;
+        if (l.isEmpty()) return Terms.EmptyArray;
         return l.toArray(new Term[l.size()]);
     }
 
@@ -376,7 +414,7 @@ public enum Terms {
     public static Term[] toArray(@NotNull Collection<Term> l) {
         int s = l.size();
         if (s == 0)
-            return Terms.Empty;
+            return Terms.EmptyArray;
         return l.toArray(new Term[s]);
     }
 
@@ -392,21 +430,24 @@ public enum Terms {
         return y;
     }
 
-    /** returns lev distance divided by max(a.length(), b.length() */
+    /**
+     * returns lev distance divided by max(a.length(), b.length()
+     */
     public static float levenshteinDistancePercent(@NotNull CharSequence a, @NotNull CharSequence b) {
         float len = Math.max(a.length(), b.length());
         if (len == 0) return 0;
-        return Texts.levenshteinDistance(a,b) / len;
+        return Texts.levenshteinDistance(a, b) / len;
     }
 
-    /** heuristic which evaluates the semantic similarity of two terms
+    /**
+     * heuristic which evaluates the semantic similarity of two terms
      * returning 1f if there is a complete match, 0f if there is
      * a totally separate meaning for each, and in-between if
      * some intermediate aspect is different (ex: temporal relation dt)
      */
     public static float termRelevance(@NotNull Compound a, @NotNull Compound b) {
         Op aop = a.op();
-        if (aop !=b.op()) return 0f;
+        if (aop != b.op()) return 0f;
         if (aop.isTemporal()) {
             int at = a.dt();
             int bt = b.dt();
@@ -420,7 +461,7 @@ public enum Terms {
                 if (symmetric) {
                     int ata = Math.abs(at);
                     int bta = Math.abs(bt);
-                    return 1f - (ata / ((float)(ata + bta)));
+                    return 1f - (ata / ((float) (ata + bta)));
                 } else {
                     boolean ap = at >= 0;
                     boolean bp = bt >= 0;
@@ -438,19 +479,57 @@ public enum Terms {
 
     public static Term empty(@NotNull Op op) {
         switch (op) {
-            case SET_EXT_OPENER: return EmptySetExt;
-            case SET_INT_OPENER: return EmptySetInt;
-            case PRODUCT: return EmptyProduct;
+            case SET_EXT_OPENER:
+                return EmptySetExt;
+            case SET_INT_OPENER:
+                return EmptySetInt;
+            case PRODUCT:
+                return EmptyProduct;
             default:
                 return null;
         }
     }
 
     public static int opRel(int opOrdinal, int relation) {
-        return opOrdinal<<16 | (relation & 0xffff);
+        return opOrdinal << 16 | (relation & 0xffff);
     }
+
     public static int opRel(Op op, int relation) {
         return opRel(op.ordinal(), relation);
+    }
+
+
+    @Override
+    public int size() {
+        return 0;
+    }
+
+
+    @Override
+    public
+    @Nullable
+    TermContainer theSubterms(TermContainer s) {
+        return s;
+    }
+
+    @Override
+    public void put(Termed termed) {
+
+    }
+
+    @Override
+    public int subtermsCount() {
+        return 0;
+    }
+
+    @Override
+    public void clear() {
+
+    }
+
+    @Override
+    public void forEach(Consumer<? super Termed> c) {
+
     }
 
 }

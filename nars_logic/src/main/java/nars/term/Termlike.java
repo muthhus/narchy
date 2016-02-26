@@ -59,7 +59,7 @@ public interface Termlike  {
     default boolean impossibleSubTermVolume(int otherTermVolume) {
 //        return otherTermVolume >
 //                volume()
-//                        - 1 /* for the compound itself */
+//                        - 0|1 /* 0 if subterms, 1 for the compound itself */
 //                        - (size() - 1) /* each subterm has a volume >= 1, so if there are more than 1, each reduces the potential space of the insertable */
 
         /*

@@ -19,7 +19,7 @@ public class CommutivePermutations extends Termutator {
     public String toString() {
 
             return "CommutivePermutations{" +
-                    "perm=" + perm.compound +
+                    "perm=" + perm.source +
                     ", y=" + y +
                     '}';
     }

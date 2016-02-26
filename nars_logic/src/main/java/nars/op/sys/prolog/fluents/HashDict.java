@@ -1,4 +1,4 @@
-package nars.op.software.prolog.fluents;
+package nars.op.sys.prolog.fluents;
 
 import org.jetbrains.annotations.NotNull;
 

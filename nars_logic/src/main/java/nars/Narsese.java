@@ -1031,7 +1031,7 @@ public class Narsese extends BaseParser<Object> {
     /**
      * whitespace, optional
      */
-    Rule s() {
+    @NotNull Rule s() {
         return zeroOrMore(anyOf(" \t\f\n\r"));
     }
 
@@ -1052,7 +1052,7 @@ public class Narsese extends BaseParser<Object> {
     /**
      * returns number of tasks created
      */
-    public static int tasks(String input, @NotNull Collection<Task> c, @NotNull Memory m) {
+    public static int tasks(@NotNull String input, @NotNull Collection<Task> c, @NotNull Memory m) {
         int[] i = new int[1];
         tasks(input, t -> {
             c.add(t);
@@ -1066,7 +1066,7 @@ public class Narsese extends BaseParser<Object> {
      * which can be re-used because a Memory can generate them
      * ondemand
      */
-    public static void tasks(String input, @NotNull Consumer<Task> c, @NotNull Memory m) {
+    public static void tasks(@NotNull String input, @NotNull Consumer<Task> c, @NotNull Memory m) {
         tasksRaw(input, o -> {
             Task t = decodeTask(m, o);
             if (t == null) {
@@ -1081,7 +1081,7 @@ public class Narsese extends BaseParser<Object> {
     /**
      * supplies the source array of objects that can construct a Task
      */
-    public static void tasksRaw(CharSequence input, @NotNull Consumer<Object[]> c) {
+    public static void tasksRaw(@NotNull CharSequence input, @NotNull Consumer<Object[]> c) {
 
         ParsingResult r = the().inputParser.run(input);
 
@@ -1117,7 +1117,7 @@ public class Narsese extends BaseParser<Object> {
      * parse one task
      */
     @Nullable
-    public Task task(String input, @NotNull Memory memory) throws NarseseException {
+    public Task task(@NotNull String input, @NotNull Memory memory) throws NarseseException {
         ParsingResult r;
         try {
             r = singleTaskParser.run(input);
@@ -1162,7 +1162,7 @@ public class Narsese extends BaseParser<Object> {
     /**
      * parse one term NOT NORMALIZED
      */
-    @Nullable public Term term(CharSequence s) {
+    @Nullable public Term term(@NotNull CharSequence s) {
 
         ParsingResult r = singleTermParser.run(s);
 
@@ -1197,7 +1197,7 @@ public class Narsese extends BaseParser<Object> {
     }
 
 
-    @Nullable public Termed term(String s, @NotNull TermIndex t) {
+    @Nullable public Termed term(@NotNull String s, @NotNull TermIndex t) {
         return term(s, t, true);
     }
 

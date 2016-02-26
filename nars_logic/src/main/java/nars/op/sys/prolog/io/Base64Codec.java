@@ -13,7 +13,7 @@
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
-package nars.op.software.prolog.io;
+package nars.op.sys.prolog.io;
 
 
 import org.jetbrains.annotations.NotNull;

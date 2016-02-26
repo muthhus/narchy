@@ -1,6 +1,7 @@
 package nars.term.container;
 
 
+import nars.Op;
 import nars.term.Term;
 import nars.term.Terms;
 import org.jetbrains.annotations.NotNull;
@@ -14,6 +15,9 @@ public class TermSet<X extends Term> extends TermVector<X> {
     public static TermSet the(Term... x) {
         return new TermSet(Terms.toSortedSetArray(x));
     }
+
+
+
 
     @NotNull
     public static TermSet the(Collection<? extends Term> x) {

@@ -1,5 +1,6 @@
-package nars.op.software.prolog.terms;
+package nars.op.sys.prolog.terms;
 
+import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.container.TermContainer;
@@ -13,11 +14,10 @@ import java.util.function.Consumer;
 /**
  * Implements compound terms
  *
- * @see nars.op.software.prolog.terms.PTerm
+ * @see nars.op.sys.prolog.terms.PTerm
  */
 public class Fun extends Const implements Compound<PTerm> {
 
-    @Nullable
     public PTerm args[]; //TODO make final
 
     public final int arity() {
@@ -113,12 +113,12 @@ public class Fun extends Const implements Compound<PTerm> {
     }
 
     @NotNull
-    protected static String watchNull(@Nullable nars.op.software.prolog.terms.PTerm x) {
+    protected static String watchNull(@Nullable nars.op.sys.prolog.terms.PTerm x) {
         return ((null == x) ? "null" : x.toString());
     }
 
     private String show_args() {
-        nars.op.software.prolog.terms.PTerm[] a = this.args;
+        nars.op.sys.prolog.terms.PTerm[] a = this.args;
         StringBuilder s = new StringBuilder(watchNull(a[0]));
         for (int i = 1; i < a.length; i++) {
             s.append(',').append(watchNull(a[i]));
@@ -126,20 +126,20 @@ public class Fun extends Const implements Compound<PTerm> {
         return s.toString();
     }
 
-    boolean bind_to(@NotNull nars.op.software.prolog.terms.PTerm that, Trail trail) {
+    boolean bind_to(@NotNull nars.op.sys.prolog.terms.PTerm that, Trail trail) {
         return /*getClass() == that.getClass() &&*/ name.equals(that.name) && args.length == ((Fun) that).args.length;
     }
 
-    boolean unify_to(@NotNull nars.op.software.prolog.terms.PTerm that, Trail trail) {
+    boolean unify_to(@NotNull nars.op.sys.prolog.terms.PTerm that, Trail trail) {
         return bind_to(that, trail) ?
                 unifyBind((Fun) that, args, trail) :
                 that.bind_to(this, trail);
     }
 
-    static boolean unifyBind(Fun that, @NotNull nars.op.software.prolog.terms.PTerm[] a, Trail trail) {
+    static boolean unifyBind(Fun that, @NotNull nars.op.sys.prolog.terms.PTerm[] a, Trail trail) {
         Fun other = that;
         int len = a.length;
-        nars.op.software.prolog.terms.PTerm[] oa = other.args;
+        nars.op.sys.prolog.terms.PTerm[] oa = other.args;
         for (int i = 0; i < len; i++) {
             if (!a[i].unify(oa[i], trail))
                 return false;
@@ -147,7 +147,7 @@ public class Fun extends Const implements Compound<PTerm> {
         return true;
     }
 
-    public nars.op.software.prolog.terms.PTerm token() {
+    public nars.op.sys.prolog.terms.PTerm token() {
         return args[0];
     }
 
@@ -170,7 +170,7 @@ public class Fun extends Const implements Compound<PTerm> {
     }
 
     @Nullable
-    final public Fun funClone(nars.op.software.prolog.terms.PTerm[] newArgs) {
+    final public Fun funClone(nars.op.sys.prolog.terms.PTerm[] newArgs) {
         Fun f = funClone();
         f.args = newArgs;
         return f;
@@ -179,7 +179,7 @@ public class Fun extends Const implements Compound<PTerm> {
     @Nullable
     protected Fun unInitializedClone() {
         Fun f = funClone();
-        f.args = new nars.op.software.prolog.terms.PTerm[args.length];
+        f.args = new nars.op.sys.prolog.terms.PTerm[args.length];
         return f;
     }
 
@@ -190,12 +190,12 @@ public class Fun extends Const implements Compound<PTerm> {
 //    }
 
     @Nullable
-    final nars.op.software.prolog.terms.PTerm reaction(@NotNull nars.op.software.prolog.terms.PTerm that) {
+    final nars.op.sys.prolog.terms.PTerm reaction(@NotNull nars.op.sys.prolog.terms.PTerm that) {
         // IO.mes("TRACE>> "+name());
 
-        nars.op.software.prolog.terms.PTerm[] args = this.args;
+        nars.op.sys.prolog.terms.PTerm[] args = this.args;
         int n = args.length;
-        nars.op.software.prolog.terms.PTerm[] fargs = new nars.op.software.prolog.terms.PTerm[n];
+        nars.op.sys.prolog.terms.PTerm[] fargs = new nars.op.sys.prolog.terms.PTerm[n];
         for (int i = 0; i < n; i++) {
             fargs[i] = args[i].reaction(that);
         }
@@ -207,7 +207,7 @@ public class Fun extends Const implements Compound<PTerm> {
         Cons l = new Cons(new Const(name), PTerm.NIL);
         Cons curr = l;
         for (int i = 0; i < args.length; i++) {
-            Cons tail = new Cons(args[i], PTerm.NIL);
+            Cons tail = new nars.op.sys.prolog.terms.Cons(args[i], nars.op.sys.prolog.terms.PTerm.NIL);
             curr.args[1] = tail;
             curr = tail;
         }
@@ -216,6 +216,68 @@ public class Fun extends Const implements Compound<PTerm> {
 
     boolean isClause() {
         return arity() == 2 && name.equals(":-");
+    }
+
+
+    @Override
+    public @NotNull
+    Op op() {
+        return null;
+    }
+
+    @Override
+    public int volume() {
+        return 0;
+    }
+
+    @Override
+    public int complexity() {
+        return 0;
+    }
+
+    @Override
+    public int structure() {
+        return 0;
+    }
+
+    @Override
+    public int size() {
+        return 0;
+    }
+
+    @Override
+    public boolean containsTerm(Term t) {
+        return false;
+    }
+
+    @Override
+    public boolean isCommutative() {
+        return false;
+    }
+
+    @Override
+    public int varIndep() {
+        return 0;
+    }
+
+    @Override
+    public int varDep() {
+        return 0;
+    }
+
+    @Override
+    public int varQuery() {
+        return 0;
+    }
+
+    @Override
+    public int varPattern() {
+        return 0;
+    }
+
+    @Override
+    public int vars() {
+        return 0;
     }
 
     @NotNull
@@ -253,6 +315,11 @@ public class Fun extends Const implements Compound<PTerm> {
     }
 
     @Override
+    public boolean equalTerms(TermContainer c) {
+        return false;
+    }
+
+    @Override
     public void addAllTo(Collection<Term> set) {
 
     }
@@ -272,5 +339,10 @@ public class Fun extends Const implements Compound<PTerm> {
     @Override
     public TermContainer replacing(int subterm, Term replacement) {
         return null;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        return 0;
     }
 }

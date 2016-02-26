@@ -1,9 +1,9 @@
-package nars.op.software.prolog.io;
+package nars.op.sys.prolog.io;
 
-import nars.op.software.prolog.terms.Int;
-import nars.op.software.prolog.terms.PTerm;
-import nars.op.software.prolog.terms.Prog;
-import nars.op.software.prolog.terms.Sink;
+import nars.op.sys.prolog.terms.Int;
+import nars.op.sys.prolog.terms.PTerm;
+import nars.op.sys.prolog.terms.Prog;
+import nars.op.sys.prolog.terms.Sink;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

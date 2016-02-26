@@ -76,7 +76,7 @@ public class DemoAttentionFlow extends AbstractNARGraphDemo {
         Default n = new Default(128,4,1,1) {
             @Override
             public Function<Term, Concept> newConceptBuilder() {
-                return new DefaultConceptBuilder(this, 16, 16) {
+                return new DefaultConceptBuilder(this.memory.random, 16, 16) {
 
                     @Override
                     protected

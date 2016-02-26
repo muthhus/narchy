@@ -1,5 +1,6 @@
 package nars.term.index;
 
+import nars.concept.DefaultConceptBuilder;
 import nars.nal.meta.PatternCompound;
 import nars.nal.meta.PremiseRule;
 import nars.term.Compound;
@@ -10,12 +11,12 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 
 /**
- * Created by me on 12/7/15.
+ * Index which specifically holds the components of a deriver ruleset
  */
 public class PatternIndex extends MapIndex2 {
 
     public PatternIndex() {
-        super(new HashMap(1024));
+        super(new HashMap(1024), new DefaultConceptBuilder());
     }
 
 

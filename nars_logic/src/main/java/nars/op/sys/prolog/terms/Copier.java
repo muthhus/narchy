@@ -1,7 +1,7 @@
-package nars.op.software.prolog.terms;
+package nars.op.sys.prolog.terms;
 
 import nars.Global;
-import nars.op.software.prolog.io.IO;
+import nars.op.sys.prolog.io.IO;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

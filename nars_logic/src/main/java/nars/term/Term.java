@@ -41,7 +41,7 @@ public interface Term extends Termed, Comparable, Termlike {
         return this;
     }
 
-    @Nullable
+    @NotNull
     @Override
     Op op();
 
@@ -68,7 +68,7 @@ public interface Term extends Termed, Comparable, Termlike {
         recurseTerms(v, null);
     }
 
-    void recurseTerms(SubtermVisitor v, Compound parent);
+    void recurseTerms(@NotNull SubtermVisitor v, Compound parent);
 
 
     /**
@@ -86,7 +86,7 @@ public interface Term extends Termed, Comparable, Termlike {
     boolean isCommutative();
 
     /** provides the "anonymized" form of the compound which is used to reference the concept it would be associated with */
-    default Term anonymous() {
+    @NotNull default Term anonymous() {
         return this;
     }
 

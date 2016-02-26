@@ -1,8 +1,8 @@
-package nars.op.software.prolog;
+package nars.op.sys.prolog;
 
-import nars.op.software.prolog.builtins.Builtins;
-import nars.op.software.prolog.io.Parser;
-import nars.op.software.prolog.terms.PTerm;
+import nars.op.sys.prolog.builtins.Builtins;
+import nars.op.sys.prolog.io.Parser;
+import nars.op.sys.prolog.terms.PTerm;
 import org.jetbrains.annotations.NotNull;
 
 /**

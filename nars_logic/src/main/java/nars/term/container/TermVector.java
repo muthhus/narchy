@@ -1,12 +1,10 @@
 package nars.term.container;
 
 import com.google.common.base.Joiner;
-import com.gs.collections.api.block.function.Function;
 import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
 import nars.Op;
 import nars.nal.meta.match.Ellipsis;
 import nars.term.*;
-import nars.util.data.Util;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -70,6 +68,11 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
         this((T[]) t.toArray(new Term[n]));
     }
 
+
+
+
+
+
     @SafeVarargs
     public TermVector(T... terms) {
         this.term = terms;
@@ -127,7 +130,7 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
         return term[i].op() == o;
     }
 
-    @Override public T[] terms() {
+    @NotNull @Override public final T[] terms() {
         return term;
     }
 
@@ -149,7 +152,7 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
         return term[i];
     }
 
-    public boolean equals(Term[] t) {
+    public final boolean equals(Term[] t) {
         return Arrays.equals(term, t);
     }
 
@@ -224,9 +227,7 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
 //        return y;
 //    }
 
-    public final boolean isEmpty() {
-        return size() != 0;
-    }
+
 
     @Nullable
     @Override
@@ -234,12 +235,6 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
         return Ellipsis.firstEllipsis(term);
     }
 
-    /**
-     * first level only, not recursive
-     */
-    public final boolean contains(Object o) {
-        return o instanceof Term && containsTerm((Term) o);
-    }
 
     @Override
     public final Iterator<T> iterator() {
@@ -284,25 +279,17 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
     }
 
     @Override
-    public boolean equals(Object that) {
-
-        if (this == that) return true;
-
-        if (!(that instanceof TermVector)) return false;
-
-        TermVector c = (TermVector) that;
-        return (contentHash == c.contentHash) &&
-                (structureHash == c.structureHash) &&
-                (volume == c.volume) &&
-                equalTerms(c);
+    public boolean equals(Object obj) {
+        return TermContainer.equals(this, obj);
     }
 
-    private boolean equalTerms(@NotNull TermContainer c) {
-        int s = size();
+    @Override public boolean equalTerms(@NotNull TermContainer c) {
+        T[] tt = this.term;
+
+        int s = tt.length;
         if (s!=c.size())
             return false;
 
-        T[] tt = this.term;
         for (int i = 0; i < s; i++) {
             if (!tt[i].equals(c.term(i)))
                 return false;
@@ -389,4 +376,5 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
         t[subterm] = replacement;
         return new TermVector(t);
     }
+
 }

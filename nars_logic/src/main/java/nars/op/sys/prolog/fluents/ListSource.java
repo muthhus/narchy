@@ -1,9 +1,9 @@
-package nars.op.software.prolog.fluents;
+package nars.op.sys.prolog.fluents;
 
-import nars.op.software.prolog.terms.Const;
-import nars.op.software.prolog.terms.Copier;
-import nars.op.software.prolog.terms.Nonvar;
-import nars.op.software.prolog.terms.Prog;
+import nars.op.sys.prolog.terms.Const;
+import nars.op.sys.prolog.terms.Copier;
+import nars.op.sys.prolog.terms.Nonvar;
+import nars.op.sys.prolog.terms.Prog;
 
 /**
  * Builds an iterator from a list

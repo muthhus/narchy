@@ -2,6 +2,7 @@ package nars.term.index;
 
 import nars.$;
 import nars.Op;
+import nars.concept.Concept;
 import nars.nal.Tense;
 import nars.nal.meta.match.Ellipsis;
 import nars.term.*;
@@ -14,19 +15,21 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * Created by me on 12/31/15.
  */
 public abstract class AbstractMapIndex implements TermIndex {
 
-    protected final Atoms atoms = new Atoms();
+    protected final Atoms atoms;
     protected final TermBuilder builder;
 
 
-    public AbstractMapIndex(TermBuilder builder) {
+    public AbstractMapIndex(TermBuilder termBuilder, Function<Term, Concept> conceptBuilder) {
         super();
-        this.builder = builder;
+        this.builder = termBuilder;
+        this.atoms = new Atoms(conceptBuilder);
     }
 
 
@@ -127,13 +130,5 @@ public abstract class AbstractMapIndex implements TermIndex {
     @Override
     public abstract void forEach(Consumer<? super Termed> c);
 
-    public static class DefaultTermBuilder extends TermBuilder {
 
-        @Override
-        public
-        @Nullable
-        Termed make(Op op, int relation, TermContainer subterms, int dt) {
-            return new GenericCompound(op, relation, dt, (TermVector)subterms);
-        }
-    }
 }

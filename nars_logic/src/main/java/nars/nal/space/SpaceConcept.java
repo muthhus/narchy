@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
  * shape of the vector space formed by known Space terms
  */
 public class SpaceConcept extends DefaultConcept {
-    public SpaceConcept(@NotNull Space term, Bag<Task> taskLinks, Bag<Termed> termLinks, @NotNull NAR p) {
+    public SpaceConcept(@NotNull Space term, Bag<Task> taskLinks, Bag<Termed> termLinks) {
         super(term.anonymous(), taskLinks, termLinks);
     }
 

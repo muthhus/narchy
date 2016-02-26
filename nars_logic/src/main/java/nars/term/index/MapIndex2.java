@@ -1,8 +1,10 @@
 package nars.term.index;
 
 import com.gs.collections.impl.map.mutable.primitive.IntObjectHashMap;
+import nars.$;
 import nars.Op;
 import nars.concept.AtomConcept;
+import nars.concept.Concept;
 import nars.term.*;
 import nars.term.atom.AtomicString;
 import nars.term.container.TermContainer;
@@ -36,8 +38,13 @@ public class MapIndex2 extends AbstractMapIndex {
     public final Map<TermContainer, SubtermNode> data;
     int count;
 
-    public MapIndex2(Map<TermContainer, SubtermNode> data) {
-        super(new DefaultTermBuilder());
+    public MapIndex2(Map<TermContainer, SubtermNode> data, Function<Term, Concept> conceptBuilder) {
+        this(data, Terms.terms, conceptBuilder);
+    }
+
+    public MapIndex2(Map<TermContainer, SubtermNode> data, TermBuilder termBuilder, Function<Term, Concept> conceptBuilder) {
+
+        super(termBuilder, conceptBuilder);
 
         this.data = data;
 

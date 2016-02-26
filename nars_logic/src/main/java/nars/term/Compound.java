@@ -36,6 +36,8 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.Set;
 
+import static nars.nal.Tense.ITERNAL;
+
 /**
  * a compound term
  * TODO make this an interface extending Subterms
@@ -54,7 +56,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
      * TODO generalize to a provided lambda predicate selector
      * */
     @NotNull
-    default Set<Term> uniqueSubtermSet(Op type) {
+    default Set<Term> uniqueSubtermSet(@NotNull Op type) {
         Set<Term> t = Global.newHashSet(size());
         recurseTerms((t1, superterm) -> {
             if (t1.op() == type)
@@ -72,7 +74,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
     }
 
     @Override
-    default void recurseTerms(@NotNull SubtermVisitor v, Compound parent) {
+    default void recurseTerms(@NotNull SubtermVisitor v, @Nullable Compound parent) {
         v.accept(this, parent);
         subterms().forEach(a -> a.recurseTerms(v, this));
     }
@@ -252,28 +254,39 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
     /** gets temporal relation value */
     int dt();
 
-    default boolean hasT() {
+    default boolean temporal() {
         return dt()!= Tense.ITERNAL;
     }
+
+
 
     /** similar to a indexOf() call, this will search for a int[]
      * path to the first subterm occurrence of the supplied term,
      * or null if none was found
      */
     @Nullable
-    default int[] isSubterm(Term t) {
+    default int[] isSubterm(@NotNull Term t) {
         if (containsTerm(t)) {
             IntArrayList l = new IntArrayList();
+
             if (isSubterm(this, t, l)) {
-                //reverse the array since it has been constructed in reverse
-                //TODO use more efficient array reversal
-                return l.toReversed().toArray();
+
+                switch (l.size()) {
+                    case 0: throw new UnsupportedOperationException(); //should never happen
+                    case 1: return new int[] {l.get(0)};
+                    case 2: return new int[] {l.get(1), l.get(0)};
+                    case 3: return new int[] {l.get(2), l.get(1), l.get(0)};
+                    default:
+                        //reverse the array since it has been constructed in reverse
+                        //TODO use more efficient array reversal
+                        return l.toReversed().toArray();
+                }
             }
         }
         return null;
     }
 
-    static boolean isSubterm(@NotNull Compound container, Term t, @NotNull IntArrayList l) {
+    static boolean isSubterm(@NotNull Compound container, @NotNull Term t, @NotNull IntArrayList l) {
         Term[] x = container.terms();
         int s = x.length;
         for (int i = 0; i < s; i++) {

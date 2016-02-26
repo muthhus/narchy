@@ -6,6 +6,7 @@ import nars.Global;
 import nars.Narsese;
 import nars.Op;
 import nars.budget.Budget;
+import nars.concept.DefaultConceptBuilder;
 import nars.nal.meta.PremiseAware;
 import nars.nal.meta.PremiseEval;
 import nars.nal.meta.match.EllipsisMatch;
@@ -322,42 +323,42 @@ public interface TermIndex  {
 //
 //    }
 
-    /** default memory-based (Guava) cache */
-    @NotNull
-    static TermIndex memory(int capacity) {
-//        CacheBuilder builder = CacheBuilder.newBuilder()
-//            .maximumSize(capacity);
-        return new MapIndex2(
-            new HashMap(capacity*2)
-            //new UnifriedMap()
-        );
+//    /** default memory-based (Guava) cache */
+//    @NotNull
+//    static TermIndex memory(int capacity) {
+////        CacheBuilder builder = CacheBuilder.newBuilder()
+////            .maximumSize(capacity);
 //        return new MapIndex2(
-//                new HashMap(capacity)
+//            new HashMap(capacity*2),
 //                //new UnifriedMap()
-//        );
-    }
-    /** default memory-based (Guava) cache */
-    @NotNull
-    static TermIndex softMemory(int capacity) {
-//        CacheBuilder builder = CacheBuilder.newBuilder()
-//            .maximumSize(capacity);
-        return new MapIndex2(
-                new SoftValueHashMap(capacity*2)
-                //new WeakHashMap()
-        );
-//        return new MapIndex2(
-//                new HashMap(capacity)
-//                //new UnifriedMap()
-//        );
-    }
-//    static GuavaIndex memoryGuava(Clock c, int expirationCycles) {
-//        return new GuavaIndex(c, expirationCycles);
-////        return new MapIndex(
-////
-////                new WeakValueHashMap(capacity),
-////                new WeakValueHashMap(capacity*2)
+//                new DefaultConceptBuilder());
+////        return new MapIndex2(
+////                new HashMap(capacity)
+////                //new UnifriedMap()
 ////        );
 //    }
+//    /** default memory-based (Guava) cache */
+//    @NotNull
+//    static TermIndex softMemory(int capacity) {
+////        CacheBuilder builder = CacheBuilder.newBuilder()
+////            .maximumSize(capacity);
+//        return new MapIndex2(
+//                new SoftValueHashMap(capacity*2),
+//                //new WeakHashMap()
+//                conceptBuilder);
+////        return new MapIndex2(
+////                new HashMap(capacity)
+////                //new UnifriedMap()
+////        );
+//    }
+////    static GuavaIndex memoryGuava(Clock c, int expirationCycles) {
+////        return new GuavaIndex(c, expirationCycles);
+//////        return new MapIndex(
+//////
+//////                new WeakValueHashMap(capacity),
+//////                new WeakValueHashMap(capacity*2)
+//////        );
+////    }
 
     default void print(@NotNull PrintStream out) {
         forEach(out::println);
@@ -370,7 +371,8 @@ public interface TermIndex  {
             return t;
         }
 
-        Compound tx = transform((Compound) t, normalizeFast((Compound) t));
+        Compound cct = (Compound) t;
+        Compound tx = transform(cct, normalizeFast(cct));
         if (tx != null)
             ((GenericCompound) tx).setNormalized();
 

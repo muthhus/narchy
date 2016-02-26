@@ -1,5 +1,6 @@
 package nars.guifx.demo;
 
+import javassist.scopedpool.SoftValueHashMap;
 import nars.Memory;
 import nars.NAR;
 import nars.concept.Concept;
@@ -10,6 +11,7 @@ import nars.op.mental.Anticipate;
 import nars.op.mental.Inperience;
 import nars.term.Term;
 import nars.term.TermIndex;
+import nars.term.index.MapIndex2;
 import nars.time.RealtimeMSClock;
 
 import java.util.function.Function;
@@ -28,9 +30,12 @@ public enum NARideRealtimeDefault {
 
 
         Memory mem = new Memory(new RealtimeMSClock(),
+                new MapIndex2(
+                        new SoftValueHashMap(128*1024), new DefaultConceptBuilder()
+                )
             //new MapCacheBag(
                     //new WeakValueHashMap<>()
-                TermIndex.softMemory(128*1024)
+
                 //GuavaCacheBag.make(1024*1024)
                 /*new InfiniCacheBag(
                     InfiniPeer.tmp().getCache()
@@ -41,7 +46,7 @@ public enum NARideRealtimeDefault {
         Default nar = new Default(mem, 1024, 1, 2, 2) {
             @Override
             public Function<Term, Concept> newConceptBuilder() {
-                return new DefaultConceptBuilder(this, 32, 128);
+                return new DefaultConceptBuilder(this.memory.random, 32, 128);
             }
         }.with(
                 Anticipate.class,

@@ -52,7 +52,7 @@ public class Terminal extends AbstractNAR {
     }
 
     public Terminal(@NotNull Clock c) {
-        this(TermIndex.memory(1024), c);
+        this(new DefaultTermIndex(1024*128), c);
     }
 
     @Override

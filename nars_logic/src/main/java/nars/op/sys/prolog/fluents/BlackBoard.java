@@ -1,7 +1,7 @@
-package nars.op.software.prolog.fluents;
+package nars.op.sys.prolog.fluents;
 
-import nars.op.software.prolog.io.IO;
-import nars.op.software.prolog.terms.PTerm;
+import nars.op.sys.prolog.io.IO;
+import nars.op.sys.prolog.terms.PTerm;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

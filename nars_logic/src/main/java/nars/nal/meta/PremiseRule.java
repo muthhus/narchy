@@ -3,7 +3,6 @@ package nars.nal.meta;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.MultimapBuilder;
 import com.google.common.collect.Sets;
-import nars.$;
 import nars.Global;
 import nars.Op;
 import nars.concept.Temporalize;
@@ -41,9 +40,10 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 
 import static nars.$.*;
-import static nars.$.terms;
 import static nars.Op.VAR_PATTERN;
+import static nars.term.Terms.*;
 import static nars.term.Terms.concat;
+import static nars.term.Terms.terms;
 
 /**
  * A rule which matches a Premise and produces a Task
@@ -345,7 +345,7 @@ public class PremiseRule extends GenericCompound {
 
             Compound premiseComponents = (Compound) index.the((Termed)
                     terms.transform(
-                            terms.transform(this, UppercaseAtomsToPatternVariables),
+                        terms.transform(this, UppercaseAtomsToPatternVariables),
                             new PremiseRuleVariableNormalization()));
 
             return new PremiseRule( premiseComponents );
@@ -596,7 +596,7 @@ public class PremiseRule extends GenericCompound {
             Term[] modifiers = ((Compound) postcons[i++]).terms();
 
             PostCondition pc = PostCondition.make(this, t,
-                    Terms.toSortedSetArray(modifiers));
+                    toSortedSetArray(modifiers));
 
             if (pc != null)
                 postConditions.add(pc);
@@ -613,8 +613,8 @@ public class PremiseRule extends GenericCompound {
         minNAL =
                 Math.max(minNAL,
                         Math.max(
-                                Terms.maxLevel(pattern.term(0)),
-                                Terms.maxLevel(pattern.term(1)
+                                maxLevel(pattern.term(0)),
+                                maxLevel(pattern.term(1)
                                 )));
 
 

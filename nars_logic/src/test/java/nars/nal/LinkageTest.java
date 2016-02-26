@@ -38,7 +38,7 @@ public class LinkageTest extends AbstractNALTester {
 
                 @Override
                 public Function<Term, Concept> newConceptBuilder() {
-                    return new DefaultConceptBuilder(this, TERM_LINK_BAG_SIZE, 1);
+                    return new DefaultConceptBuilder(this.memory.random, TERM_LINK_BAG_SIZE, 1);
                 }
             };
             d.nal(6);

@@ -16,39 +16,44 @@ import java.util.function.Consumer;
  */
 public final class ShuffledSubterms extends ShuffledPermutations implements TermContainer<Term> {
 
-    public final TermContainer compound;
+    public final TermContainer source;
     private final Random rng;
 
     public ShuffledSubterms(Random rng, TermContainer x) {
         this.rng = rng;
-        this.compound = x;
+        this.source = x;
         reset();
     }
 
     @Override
     public int structure() {
-        return compound.structure();
+        return source.structure();
     }
 
     @Override
     public int volume() {
-        return compound.volume();
+        return source.volume();
     }
 
     @Override
     public int complexity() {
-        return compound.complexity();
+        return source.complexity();
     }
 
     @Override
     public int size() {
-        return compound.size();
+        return source.size();
     }
 
     @Nullable
     @Override
     public Term term(int i) {
-        return compound.term(get(i));
+        return source.term(get(i));
+    }
+
+    @Override
+    public boolean equalTerms(TermContainer c) {
+        return source.equalTerms(c);
     }
 
     @Override
@@ -58,67 +63,67 @@ public final class ShuffledSubterms extends ShuffledPermutations implements Term
 
     @Override
     public boolean impossibleSubTermVolume(int otherTermVolume) {
-        return compound.impossibleSubTermVolume(otherTermVolume);
+        return source.impossibleSubTermVolume(otherTermVolume);
     }
 
     @Override
     public Ellipsis firstEllipsis() {
-        return compound.firstEllipsis();
+        return source.firstEllipsis();
     }
 
     @Override
     public boolean containsTerm(Term term) {
-        return compound.containsTerm(term);
+        return source.containsTerm(term);
     }
 
     @Override
     public void forEach(Consumer action, int start, int stop) {
-        compound.forEach(action, start, stop);
+        source.forEach(action, start, stop);
     }
 
     @Override
     public int varDep() {
-        return compound.varDep();
+        return source.varDep();
     }
 
     @Override
     public int varIndep() {
-        return compound.varIndep();
+        return source.varIndep();
     }
 
     @Override
     public int varQuery() {
-        return compound.varQuery();
+        return source.varQuery();
     }
 
     @Override
     public int varPattern() {
-        return compound.varPattern();
+        return source.varPattern();
     }
 
     @Override
     public int vars() {
-        return compound.vars();
+        return source.vars();
     }
 
     @Override
     public boolean equals(Object obj) {
-        return compound.equals(obj);
+        return source.equals(obj);
     }
 
     @Override
     public int hashCode() {
-        return compound.hashCode();
+        return source.hashCode();
     }
 
     @Override
     public int compareTo(@NotNull Object o) {
-        return compound.compareTo(o);
+        return source.compareTo(o);
     }
 
     @Override
     public Iterator iterator() {
-        return compound.iterator();
+        return source.iterator();
     }
 
 
@@ -145,7 +150,7 @@ public final class ShuffledSubterms extends ShuffledPermutations implements Term
     }
 
     public void reset() {
-        restart(compound.size(), rng);
+        restart(source.size(), rng);
     }
 
 

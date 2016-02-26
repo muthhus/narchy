@@ -1,4 +1,4 @@
-package nars.op.software.prolog.terms;
+package nars.op.sys.prolog.terms;
 
 import nars.util.data.list.FasterList;
 

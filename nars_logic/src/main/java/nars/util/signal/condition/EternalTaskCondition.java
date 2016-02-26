@@ -94,7 +94,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
             //Narsese.the().termRaw(
             Narsese.the().term(
                 sentenceTerm,
-                $.terms
+                Terms.terms
             ).term();
         //this.duration = n.memory.duration();
     }

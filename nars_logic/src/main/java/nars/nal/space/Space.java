@@ -33,7 +33,7 @@ public class Space extends GenericCompound {
 
     @Override public Compound anonymous() {
         if (vector == null) return super.anonymous();
-        else return new Space(subterms);
+        else return new Space((TermVector)subterms);
     }
 
 

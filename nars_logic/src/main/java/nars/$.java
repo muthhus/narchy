@@ -5,7 +5,7 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.ConsoleAppender;
-import nars.op.sys.java.AtomObject;
+import nars.op.sys.java.ObjRef;
 import nars.nal.meta.match.VarPattern;
 import nars.term.Operator;
 import nars.op.sys.java.DefaultTermizer;
@@ -14,11 +14,7 @@ import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.*;
 import nars.term.atom.Atom;
-import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
-import nars.term.container.TermSet;
-import nars.term.container.TermVector;
-import nars.term.index.AbstractMapIndex;
 import nars.term.variable.*;
 import nars.truth.Truth;
 import nars.util.data.Util;
@@ -30,7 +26,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -38,6 +33,8 @@ import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 import static nars.Op.*;
 import static nars.nal.Tense.ITERNAL;
+import static nars.term.TermIndex.Empty;
+import static nars.term.Terms.EmptySetExt;
 
 /**
  * core utility class for:
@@ -45,75 +42,15 @@ import static nars.nal.Tense.ITERNAL;
        (which can be constructed in a static context)
     --??
  */
-public enum $  {
+public enum $ /* TODO: implements TermIndex */ {
     ;
-
-    //TransientTermIndex = holds no state
-    public static final TermIndex terms = new TermIndex() {
-
-        final TermBuilder builder = new AbstractMapIndex.DefaultTermBuilder();
-
-        @Override
-        public void clear() {
-
-        }
-
-        @Override
-        public void forEach(Consumer<? super Termed> c) {
-
-        }
-
-        @Override
-        public
-        @Nullable
-        Termed the(Termed t) {
-            return t;
-        }
-
-        @Override
-        public
-        @Nullable
-        Termed the(Op op, int relation, TermContainer subterms, int dt) {
-            return builder.make(op, relation, subterms, dt);
-        }
-
-
-        @Override
-        public int size() {
-            return 0;
-        }
-
-        @Override
-        public TermBuilder builder() {
-            return builder;
-        }
-
-        @Override
-        public
-        @Nullable
-        TermContainer theSubterms(TermContainer s) {
-            return s;
-        }
-
-        @Override
-        public void put(Termed termed) {
-
-        }
-
-        @Override
-        public int subtermsCount() {
-            return 0;
-        }
-
-    };
-    public final static TermBuilder builder = terms.builder();
 
 
     public static final org.slf4j.Logger logger = LoggerFactory.getLogger($.class);
     public static final Function<Object, Term> ToStringToTerm = (x) -> $.the(x.toString());
 
     public static <T extends Term> T $(String term) {
-        Termed normalized = Narsese.the().term(term, terms);
+        Termed normalized = Narsese.the().term(term, Terms.terms);
         if (normalized!=null)
             return (T)(normalized.term());
         return null;
@@ -122,7 +59,7 @@ public enum $  {
         //        catch (InvalidInputException e) { }
     }
 
-    @Deprecated public static <C extends Compound> MutableTask $(String term, char punc) {
+    @Deprecated public static MutableTask $(String term, char punc) {
         Term t = Narsese.the().term(term).term();
         //TODO normalize etc
         if (!Task.validTaskTerm(t))
@@ -134,9 +71,8 @@ public enum $  {
                 //.normalized();
     }
 
-    @NotNull
-    public static <O> AtomObject<O> ref(String term, O instance) {
-        return new AtomObject(term, instance);
+    public static @NotNull <O> ObjRef<O> ref(String term, O instance) {
+        return new ObjRef(term, instance);
     }
 
     @NotNull
@@ -184,7 +120,7 @@ public enum $  {
 
 
     @Nullable
-    public static Term sim(Term subj, Term pred) {
+    public static Term sim(@NotNull Term subj, @NotNull Term pred) {
         return the(SIMILAR, subj, pred);
     }
 
@@ -197,7 +133,7 @@ public enum $  {
 
     /** execution (NARS "operation") */
     @NotNull
-    public static Compound exec(Operator opTerm, Term... arg) {
+    public static Compound exec(@NotNull Operator opTerm, Term... arg) {
         return exec(opTerm, $.p(arg));
     }
 
@@ -207,22 +143,22 @@ public enum $  {
 
     /** execution (NARS "operation") */
     @NotNull
-    public static Compound exec(Operator opTerm, @Nullable Compound arg) {
+    public static Compound exec(@NotNull Operator opTerm, @Nullable Compound arg) {
         return (Compound) the(
                 INHERIT,
-                arg == null ? TermIndex.Empty : arg,
+                arg == null ? Empty : arg,
                 opTerm
         );
     }
 
 
     @Nullable
-    public static Term impl(Term a, Term b) {
+    public static Term impl(@NotNull Term a, @NotNull Term b) {
         return the(IMPLICATION, a, b);
     }
 
     @Nullable
-    public static Term neg(Term x) {
+    public static Term neg(@NotNull Term x) {
         return the(NEGATE, x);
     }
 
@@ -233,7 +169,7 @@ public enum $  {
 
     @Nullable
     public static Compound p(@Nullable Term... t) {
-        return (t == null) || (t.length == 0) ? TermIndex.Empty : (Compound) the(PRODUCT, t);
+        return (t == null) || (t.length == 0) ? Empty : (Compound) the(PRODUCT, t);
     }
 
     /** creates from a sublist of a list */
@@ -248,7 +184,7 @@ public enum $  {
     }
 
     @NotNull
-    public static Compound<Atom> p(String... t) {
+    public static Compound<Atom> p(@NotNull String... t) {
         return $.p((Atom[]) $.the(t));
     }
 
@@ -303,16 +239,16 @@ public enum $  {
      * @return A compound generated or null
      */
     @Nullable
-    public static Term inst(Term subj, Term pred) {
-        return builder.inst(subj, pred);
+    public static Term inst(@NotNull Term subj, Term pred) {
+        return Terms.terms.builder().inst(subj, pred);
     }
     @Nullable
     public static Term instprop(Term subject, Term predicate) {
-        return builder.instprop(subject, predicate);
+        return Terms.terms.builder().instprop(subject, predicate);
     }
     @Nullable
     public static Term prop(Term subject, Term predicate) {
-        return builder.prop(subject, predicate);
+        return Terms.terms.prop(subject, predicate);
     }
 
 //    public static Term term(final Op op, final Term... args) {
@@ -341,7 +277,7 @@ public enum $  {
 
     @NotNull
     public static Compound sete(@NotNull Collection<? extends Term> t) {
-        return (Compound) builder.finish(SET_EXT, -1, TermSet.the(t));
+        return (Compound) the(SET_EXT, -1, (Collection)t);
     }
     @NotNull
     public static Compound seteCollection(@NotNull Collection<? extends Object> c) {
@@ -383,7 +319,9 @@ public enum $  {
 
     @NotNull
     public static Compound sete(Term... t) {
-        return (Compound) the(SET_EXT, t);
+        return ((t != null) && (t.length > 0)) ?
+                (Compound) the(SET_EXT, t) :
+                EmptySetExt;
     }
 
     /** shorthand for extensional set */
@@ -591,10 +529,24 @@ public enum $  {
     public static Term the(@NotNull Op op, int relation, @NotNull TermContainer subterms) {
         return the(op, relation, ITERNAL, subterms);
     }
+    @Nullable
+    public static Term the(@NotNull Op op, @NotNull TermContainer subterms) {
+        return the(op, -1, subterms);
+    }
+
+
+    /** returns null if the result is not a compound */
+    @Nullable public static Compound compound(@NotNull Op op, @NotNull TermContainer subterms) {
+        Term t = the(op, -1, subterms);
+        if (!(t instanceof Compound))
+            return null;
+        return (Compound)t;
+    }
+
 
     @Nullable
     public static Term the(@NotNull Op op, int relation, int t, @NotNull TermContainer subterms) {
-        return builder.newCompound(op, relation, t, subterms);
+        return Terms.terms.the(op, relation, t, subterms);
     }
 
 

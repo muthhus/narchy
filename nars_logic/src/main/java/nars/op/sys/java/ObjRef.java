@@ -4,11 +4,11 @@ import nars.Op;
 import nars.term.atom.AtomicStringConstant;
 
 /** refers to a java object instance TODO */
-public final class AtomObject<O> extends AtomicStringConstant {
+public final class ObjRef<O> extends AtomicStringConstant {
 
     public final O value;
 
-    public AtomObject(String name, O value) {
+    public ObjRef(String name, O value) {
 
         this.value = value;
     }

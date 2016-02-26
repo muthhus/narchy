@@ -5,6 +5,7 @@ import nars.Global;
 import nars.Op;
 import nars.nal.Tense;
 import nars.nal.meta.match.Ellipsis;
+import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.term.container.TermSet;
 import nars.term.container.TermVector;
@@ -25,6 +26,63 @@ import static nars.term.Statement.subj;
  */
 public abstract class TermBuilder {
 
+    @Nullable
+    public Term the(@NotNull Op op, int relation, int t, @NotNull TermContainer tt) throws UnbuildableTerm {
+
+//        if (tt == null)
+//            return null;
+
+        Term[] u = tt.terms();
+
+        /* special handling */
+        switch (op) {
+            case NEGATE:
+                if (u.length != 1)
+                    throw new RuntimeException("invalid negation subterms: " + Arrays.toString(u));
+                return negation(u[0]);
+
+
+            case INSTANCE:
+                if (u.length != 2 || t != ITERNAL) throw new UnbuildableTerm(INSTANCE);
+                return inst(u[0], u[1]);
+            case PROPERTY:
+                if (u.length != 2 || t != ITERNAL) throw new UnbuildableTerm(PROPERTY);
+                return prop(u[0], u[1]);
+            case INSTANCE_PROPERTY:
+                if (u.length != 2 || t != ITERNAL) throw new UnbuildableTerm(INSTANCE_PROPERTY);
+                return instprop(u[0], u[1]);
+
+            case CONJUNCTION:
+                return junction(CONJUNCTION, t, u);
+            case DISJUNCTION:
+                return junction(DISJUNCTION, t, u);
+
+            case IMAGE_INT:
+            case IMAGE_EXT:
+                //if no relation was specified and it's an Image,
+                //it must contain a _ placeholder
+                if (hasImdex(u)) {
+                    //TODO use result of hasImdex in image construction to avoid repeat iteration to find it
+                    return image(op, u);
+                } else if ((relation == -1) || (relation > u.length)) {
+                    return null;
+                } else
+                    return finish(op, relation, ITERNAL, tt); //continued below
+
+            case DIFF_EXT:
+            case DIFF_INT:
+                return newDiff(op, tt);
+            case INTERSECT_EXT:
+                return newIntersectEXT(u);
+            case INTERSECT_INT:
+                return newIntersectINT(u);
+            default:
+                return op.isStatement() ? statement(op, t, u) : finish(op, relation, t, tt);
+
+        }
+
+
+    }
 
 
     static boolean validEquivalenceTerm(@NotNull Term t) {
@@ -110,7 +168,7 @@ public abstract class TermBuilder {
     public Term newCompound(@NotNull Compound csrc, @NotNull TermContainer subs) {
         if (csrc.subterms().equals(subs))
             return csrc;
-        return newCompound(csrc.op(), csrc.relation(), csrc.dt(), subs);
+        return the(csrc.op(), csrc.relation(), csrc.dt(), subs);
     }
 
     @Nullable
@@ -121,67 +179,9 @@ public abstract class TermBuilder {
 
     @Nullable
     public Term newCompound(@NotNull Op op, int relation, @NotNull TermContainer tt) {
-        return newCompound(op, relation, ITERNAL, tt);
+        return the(op, relation, ITERNAL, tt);
     }
 
-    @Nullable
-    public Term newCompound(@NotNull Op op, int relation, int t, @NotNull TermContainer tt) {
-
-//        if (tt == null)
-//            return null;
-
-        Term[] u = tt.terms();
-
-        /* special handling */
-        switch (op) {
-            case NEGATE:
-                if (u.length != 1)
-                    throw new RuntimeException("invalid negation subterms: " + Arrays.toString(u));
-                return negation(u[0]);
-
-
-            case INSTANCE:
-                if (u.length != 2 || t != ITERNAL) throw new RuntimeException("invalid inst");
-                return inst(u[0], u[1]);
-            case PROPERTY:
-                if (u.length != 2 || t != ITERNAL) throw new RuntimeException("invalid prop");
-                return prop(u[0], u[1]);
-            case INSTANCE_PROPERTY:
-                if (u.length != 2 || t != ITERNAL) throw new RuntimeException("invalid instprop");
-                return instprop(u[0], u[1]);
-
-            case CONJUNCTION:
-                return junction(CONJUNCTION, t, u);
-            case DISJUNCTION:
-                return junction(DISJUNCTION, t, u);
-
-            case IMAGE_INT:
-            case IMAGE_EXT:
-                //if no relation was specified and it's an Image,
-                //it must contain a _ placeholder
-                if (hasImdex(u)) {
-                    //TODO use result of hasImdex in image construction to avoid repeat iteration to find it
-                    return image(op, u);
-                }
-                if ((relation == -1) || (relation > u.length))
-                    return null;
-
-                return finish(op, relation, ITERNAL, tt); //continued below
-
-            case DIFF_EXT:
-            case DIFF_INT:
-                return newDiff(op, tt);
-            case INTERSECT_EXT:
-                return newIntersectEXT(u);
-            case INTERSECT_INT:
-                return newIntersectINT(u);
-            default:
-                return op.isStatement() ? statement(op, t, u) : finish(op, relation, t, tt);
-
-        }
-
-
-    }
 
     @Nullable
     public Term newDiff(@NotNull Op op, @NotNull TermContainer tt) {
@@ -261,7 +261,7 @@ public abstract class TermBuilder {
     }
 
     @Nullable
-    public Term instprop(Term subj, Term pred) {
+    public Term instprop(@NotNull Term subj, @NotNull Term pred) {
         return newCompound(INHERIT, new TermVector(newCompound(SET_EXT, subj), newCompound(SET_INT, pred)));
     }
 
