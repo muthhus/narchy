@@ -13,7 +13,8 @@ public class BasicRulesTest {
     public void testNAL1() {
         //Deriver d = Deriver.defaults;
 
-        AbstractNAR n = new Terminal().nal(3);
+        AbstractNAR n = new Terminal();
+        n.nal(3);
 
 
 

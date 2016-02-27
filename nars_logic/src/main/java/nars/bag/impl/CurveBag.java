@@ -434,9 +434,11 @@ public class CurveBag<V> implements Bag<V> {
      * maps y in 0..1.0 to an index in [0..size). as if window=1
      */
     static int index(float y, int size) {
-        size--;
+        //size--;
 
-        int i = Math.round(y * size);
+        int i =
+                //Math.round(y * size);
+                (int)Math.floor(y * size);
 
         if (i > size) return size;
         //else if (i < 0) return 0;
@@ -480,15 +482,15 @@ public class CurveBag<V> implements Bag<V> {
 
     }
 
-    /** provides a next index to sample from */
-    public final int sampleIndexUnnormalized(int s) {
-        //System.out.println("\t range:" +  min + ".." + max + " -> f(" + x + ")=" + y + "-> " + index);
-        return (s == 1) ? 0 :
-            index(
-                this.curve.valueOf( random.nextFloat()),
-                s
-            );
-    }
+//    /** provides a next index to sample from */
+//    public final int sampleIndexUnnormalized(int s) {
+//        //System.out.println("\t range:" +  min + ".." + max + " -> f(" + x + ")=" + y + "-> " + index);
+//        return (s == 1) ? 0 :
+//            index(
+//                this.curve.valueOf( random.nextFloat()),
+//                s
+//            );
+//    }
 
     /** LERPs between the curve and a flat line (y=x) in proportion to the amount the dynamic range falls short of 1.0;
      *  this is probably equivalent to a naive 1st-order approximation of a way

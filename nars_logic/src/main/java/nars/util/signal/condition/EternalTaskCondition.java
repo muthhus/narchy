@@ -81,7 +81,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
 //        return DefaultTruth.NULL;
 //    }
 
-    public EternalTaskCondition(@NotNull NAR n, long creationStart, long creationEnd, String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax) throws RuntimeException, Narsese.NarseseException {
+    public EternalTaskCondition(@NotNull NAR n, long creationStart, long creationEnd, String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax) throws RuntimeException {
         //super(n.task(sentenceTerm + punc).normalize(n.memory));
         try {
             nar = n;
@@ -105,6 +105,8 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
                             sentenceTerm,
                             Terms.terms
                     ).term();
+
+
             //this.duration = n.memory.duration();
         } catch (Throwable t) {
             logger.error("{},", t);
@@ -461,46 +463,52 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
 
     @Override
     public void toString(@NotNull PrintStream out) {
-        out.println(succeeded ? " OK" : "ERR" + '\t' + toString());
+        throw new UnsupportedOperationException(); //USE THE LOGGER
 
-        BiConsumer<String,Task> printer = (label,s) -> {
-            out.print('\t' + label + ' ');
-            out.println(s.explanation().replace("\n", "\n\t\t"));
-        };
-
-        if (valid!=null) {
-            valid.forEach(s -> printer.accept("VALID", s));
-        }
-        if (similar!=null) {
-            similar.values().forEach(s -> printer.accept("SIMILAR", s));
-        }
+//        out.println(succeeded ? " OK" : "ERR" + '\t' + toString());
+//
+//        BiConsumer<String,Task> printer = (label,s) -> {
+//            out.print('\t' + label + ' ');
+//            out.println(s.explanation().replace("\n", "\n\t\t"));
+//        };
+//
+//        if (valid!=null) {
+//            valid.forEach(s -> printer.accept("VALID", s));
+//        }
+//        if (similar!=null) {
+//            similar.values().forEach(s -> printer.accept("SIMILAR", s));
+//        }
     }
 
     @Override
     public void toLogger(@NotNull Logger logger) {
         String msg = succeeded ? " OK" : "ERR" + '\t' + toString();
-        if (succeeded)
+        if (succeeded) {
             logger.info(msg);
-        else
-            logger.warn(msg);
 
-
-
-
-        if (valid!=null) {
-            valid.forEach( s -> {
-                logger.trace("\t{}", s);
-                //logger.debug("\t\t{}", s.getLog());
-                //logger.debug(s.getExplanation().replace("\n", "\n\t\t"));
-            });
+            if (valid!=null && logger.isTraceEnabled())  {
+                valid.forEach( s -> {
+                    logger.trace("\t{}", s);
+                    //logger.debug("\t\t{}", s.getLog());
+                    //logger.debug(s.getExplanation().replace("\n", "\n\t\t"));
+                });
+            }
         }
-        if (similar!=null) {
-            similar.values().forEach(s -> {
-                logger.info("\t{}", s);
-                logger.debug("\t\t{}", s.getParentTask() + " , " + s.getParentBelief());
-                logger.debug("\t\t{}", s.log());
-                //logger.debug(s.getExplanation().replace("\n", "\n\t\t"));
-            });
+        else {
+            assert(valid.isEmpty());
+
+            logger.error(msg);
+
+            if (similar!=null) {
+                similar.values().forEach(s -> {
+                    String pattern = "SIM \t{}\n\t\t{},{} : {}";
+                    logger.info(pattern, s, s.getParentTask(), s.getParentBelief(), s.log());
+                    //logger.debug(s.getExplanation().replace("\n", "\n\t\t"));
+                });
+            }
         }
+
+
+
     }
 }

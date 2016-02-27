@@ -24,7 +24,10 @@ import nars.term.*;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.variable.AbstractVariable;
+import nars.term.variable.Variable;
 import nars.time.Clock;
+import nars.time.FrameClock;
+import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.event.AnswerReaction;
 import nars.util.event.DefaultTopic;
 import nars.util.event.On;
@@ -48,8 +51,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
-
-import static nars.Memory.CompoundAnonymizer;
 import static nars.Symbols.*;
 import static nars.nal.Tense.ETERNAL;
 import static org.fusesource.jansi.Ansi.ansi;
@@ -60,12 +61,12 @@ import static org.fusesource.jansi.Ansi.ansi;
  * <p>
  * Instances of this represent a reasoner connected to a Memory, and set of Input and Output channels.
  * <p>
- * All state is contained within Memory.  A NAR is responsible for managing I/O channels and executing
+ * All state is contained within   A NAR is responsible for managing I/O channels and executing
  * memory operations.  It executes a series sof cycles in two possible modes:
  * * step mode - controlled by an outside system, such as during debugging or testing
  * * thread mode - runs in a pausable closed-loop at a specific maximum framerate.
  */
-public abstract class NAR implements Level, Consumer<Task> {
+public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
 
     /**
@@ -96,7 +97,7 @@ public abstract class NAR implements Level, Consumer<Task> {
      * TODO dont expose as public
      */
     @NotNull
-    public final Memory memory;
+    public final Memory memory = this;
     /**
      * The id/name of the reasoner
      * TODO
@@ -113,23 +114,18 @@ public abstract class NAR implements Level, Consumer<Task> {
 
     private final transient Collection<Runnable> nextTasks = new CopyOnWriteArrayList(); //ConcurrentLinkedDeque();
 
-    public NAR(@NotNull Memory m) {
-        this(m, Global.DEFAULT_SELF);
-    }
+    public NAR(Clock clock, TermIndex index, Random rng, @NotNull Atom self) {
+        super(clock, rng, index);
 
-    public NAR(@NotNull Memory m, @NotNull Atom self) {
-
-        memory = m;
-
-        m.the(NAR.class, this);
+        the(NAR.class, this);
 
         this.self = self;
 
         /** register some components in the dependency context, Container (which Memory subclasses from) */
-        m.the("clock", m.clock);
+        the("clock", clock);
 
 
-        m.eventError.on(e -> {
+        eventError.on(e -> {
             if (e instanceof Throwable) {
                 Throwable ex = (Throwable) e;
 
@@ -145,13 +141,13 @@ public abstract class NAR implements Level, Consumer<Task> {
             }
         });
 
-        m.start();
+        start();
 
     }
 
-    private static void cycles(Memory memory, @NotNull Topic<Memory> cycleStart, int cyclesPerFrame) {
+    private void cycles(@NotNull Topic<Memory> cycleStart, int cyclesPerFrame) {
         for (; cyclesPerFrame > 0; cyclesPerFrame--) {
-            cycleStart.emit(memory);
+            cycleStart.emit(this);
         }
     }
 
@@ -167,7 +163,7 @@ public abstract class NAR implements Level, Consumer<Task> {
 
         NAR.asyncs.shutdown();
 
-        memory.clear();
+        clear();
 
         return this;
     }
@@ -285,20 +281,20 @@ public abstract class NAR implements Level, Consumer<Task> {
     @Nullable
     public Task goal(@NotNull Compound goalTerm, @NotNull Tense tense, float freq, float conf) throws NarseseException {
         return goal(
-                memory.getDefaultPriority(GOAL),
-                memory.getDefaultDurability(GOAL),
+                getDefaultPriority(GOAL),
+                getDefaultDurability(GOAL),
                 goalTerm, time(tense), freq, conf);
     }
 
     @NotNull
     public NAR believe(@NotNull Termed term, @NotNull Tense tense, float freq, float conf) throws NarseseException {
-        believe(memory.getDefaultPriority(BELIEF), term, time(tense), freq, conf);
+        believe(getDefaultPriority(BELIEF), term, time(tense), freq, conf);
         return this;
     }
 
     @Nullable
     public Task believe(float priority, @NotNull Termed term, long when, float freq, float conf) throws NarseseException {
-        return believe(priority, memory.getDefaultDurability(BELIEF), term, when, freq, conf);
+        return believe(priority, getDefaultDurability(BELIEF), term, when, freq, conf);
     }
 
     @NotNull
@@ -308,7 +304,7 @@ public abstract class NAR implements Level, Consumer<Task> {
 
     @NotNull
     public NAR believe(@NotNull String term, @NotNull Tense tense, float freq, float conf) throws NarseseException {
-        believe(memory.getDefaultPriority(BELIEF), term(term), time(tense), freq, conf);
+        believe(getDefaultPriority(BELIEF), term(term), time(tense), freq, conf);
         return this;
     }
 
@@ -329,7 +325,7 @@ public abstract class NAR implements Level, Consumer<Task> {
 
     @NotNull
     public NAR believe(@NotNull Termed term) throws NarseseException {
-        return believe(term, 1.0f, memory.getDefaultConfidence(BELIEF));
+        return believe(term, 1.0f, getDefaultConfidence(BELIEF));
     }
 
     @Nullable
@@ -475,11 +471,11 @@ public abstract class NAR implements Level, Consumer<Task> {
             if (antiConcept!=null)
                 motivation -= antiConcept.motivationElse(now, 0);
 
-            if (motivation < memory.executionThreshold.floatValue())
+            if (motivation < executionThreshold.floatValue())
                 return false;
 
             long occ = projectedGoal.occurrence();
-            if ((!((occ == ETERNAL) || (Math.abs(occ-now) < memory.duration()*2)))//right timing
+            if ((!((occ == ETERNAL) || (Math.abs(occ-now) < duration()*2)))//right timing
                     ) { //sufficient motivation
                 return false;
             }
@@ -522,18 +518,13 @@ public abstract class NAR implements Level, Consumer<Task> {
 
     }
 
-    /**
-     * register a singleton
-     */
-    public final <X> X the(Object key, X value) {
-        return memory.the(key, value);
-    }
+
 
     /**
      * returns the global concept index
      */
     public final TermIndex index() {
-        return memory.index;
+        return index;
     }
 
     @NotNull
@@ -586,7 +577,7 @@ public abstract class NAR implements Level, Consumer<Task> {
     }
 
     public On onExecution(@NotNull Atomic op, @NotNull Consumer<Task> each) {
-        return memory.exe.computeIfAbsent(op,
+        return exe.computeIfAbsent(op,
                 o -> new DefaultTopic<Task>())
                 .on(each);
     }
@@ -663,17 +654,17 @@ public abstract class NAR implements Level, Consumer<Task> {
     private final void _frame(int frames) {
         Memory memory = this.memory;
 
-        Topic<NAR> frameStart = memory.eventFrameStart;
+        Topic<NAR> frameStart = eventFrameStart;
 
-        Topic<Memory> cycleStart = memory.eventCycleEnd;
+        Topic<Memory> cycleStart = eventCycleEnd;
 
-        Clock clock = memory.clock;
+        Clock clock = this.clock;
 
-        int cpf = memory.cyclesPerFrame.intValue();
+        int cpf = cyclesPerFrame.intValue();
         for (; frames > 0; frames--) {
             clock.tick();
             frameStart.emit(this);
-            cycles(memory, cycleStart, cpf);
+            cycles(cycleStart, cpf);
             runNextTasks();
         }
     }
@@ -798,22 +789,6 @@ public abstract class NAR implements Level, Consumer<Task> {
         return new NARLoop(this, initialFramePeriodMS);
     }
 
-    /**
-     * sets current maximum allowed NAL level (1..8)
-     */
-    @NotNull
-    public NAR nal(int level) {
-        memory.nal(level);
-        return this;
-    }
-
-    /**
-     * returns the current level
-     */
-    @Override
-    public int nal() {
-        return memory.nal();
-    }
 
     /**
      * adds a task to the queue of task which will be executed in batch
@@ -844,7 +819,7 @@ public abstract class NAR implements Level, Consumer<Task> {
      * signals an error through one or more event notification systems
      */
     protected void error(@NotNull Throwable ex) {
-        memory.eventError.emit(ex);
+        eventError.emit(ex);
     }
 
     /**
@@ -857,8 +832,8 @@ public abstract class NAR implements Level, Consumer<Task> {
 
     public boolean runAsync(@NotNull Runnable t, @Nullable Consumer<RejectedExecutionException> onError) {
         try {
-            memory.eventSpeak.emit("execAsync " + t);
-            memory.eventSpeak.emit("pool: " + NAR.asyncs.getActiveCount() + " running, " + NAR.asyncs.getTaskCount() + " pending");
+            eventSpeak.emit("execAsync " + t);
+            eventSpeak.emit("pool: " + NAR.asyncs.getActiveCount() + " running, " + NAR.asyncs.getTaskCount() + " pending");
 
             NAR.asyncs.execute(t);
 
@@ -873,17 +848,9 @@ public abstract class NAR implements Level, Consumer<Task> {
     @NotNull
     @Override
     public String toString() {
-        return getClass().getSimpleName() + '[' + memory.toString() + ']';
+        return getClass().getSimpleName() + '[' + toString() + ']';
     }
 
-    /**
-     * Get the current time from the clock
-     *
-     * @return The current time
-     */
-    public final long time() {
-        return memory.time();
-    }
 
     @NotNull
     public NAR onAnswer(@NotNull String question, @NotNull Consumer<Task> recvSolution) {
@@ -963,14 +930,14 @@ public abstract class NAR implements Level, Consumer<Task> {
 
     /** reasoning cycles occurr zero or more times per frame */
     @NotNull public NAR onCycle(Consumer<Memory> receiver) {
-        regs.add(memory.eventCycleEnd.on(receiver));
+        regs.add(eventCycleEnd.on(receiver));
         return this;
     }
 
     /** a frame batches a burst of multiple cycles, for coordinating with external systems in which multiple cycles
      * must be run per control frame. */
     @NotNull public NAR onFrame(Consumer<NAR> receiver) {
-        regs.add(memory.eventFrameStart.on(receiver));
+        regs.add(eventFrameStart.on(receiver));
         return this;
     }
 
@@ -1011,15 +978,15 @@ public abstract class NAR implements Level, Consumer<Task> {
 
         final Memory memory = this.memory;
 
-        float activation = memory.activationRate.floatValue();
+        float activation = activationRate.floatValue();
         Concept c = conceptualize(input.concept(), input.budget(), activation, 0f);
         if (c == null) {
             //throw new RuntimeException("Inconceivable: " + input);
-            memory.remove(input, "Inconceivable");
+            remove(input, "Inconceivable");
             return null;
         }
 
-        memory.emotion.busy(input);
+        emotion.busy(input);
 
         Task t = c.process(input, this);
         if (t == null) {
@@ -1030,7 +997,7 @@ public abstract class NAR implements Level, Consumer<Task> {
         //complete the activation process
         c.link(t, activation, 0f, this);
 
-        memory.eventTaskProcess.emit(t);
+        eventTaskProcess.emit(t);
 
         if (t.isGoal())
             execute(t, c);
@@ -1042,11 +1009,8 @@ public abstract class NAR implements Level, Consumer<Task> {
 
 
     boolean validConceptTerm(Term term) {
-        return !(term instanceof AbstractVariable);
+        return !(term instanceof Variable);
     }
-
-    @NotNull
-    abstract protected Concept newConcept(Term t);
 
 
     @Nullable
@@ -1059,10 +1023,9 @@ public abstract class NAR implements Level, Consumer<Task> {
         if (!validConceptTerm(tt))
             return null;
 
-        TermIndex index = memory.index;
-
+        t = index.normalized(t);
         if (!tt.isNormalized()) {
-            t = index.normalized(tt);
+
             if (t instanceof Concept)
                 return ((Concept)t);
             else if (t == null)
@@ -1110,12 +1073,12 @@ public abstract class NAR implements Level, Consumer<Task> {
 
 
     public On onQuestion(@NotNull PatternAnswer p) {
-        return memory.eventTaskProcess.on(question -> {
+        return eventTaskProcess.on(question -> {
             if (question.punc() == Symbols.QUESTION) {
                 runLater(() -> {
                     List<Task> l = p.apply(question);
                     if (l != null) {
-                        l.forEach(answer -> memory.eventAnswer.emit(Tuples.twin(question, answer)));
+                        l.forEach(answer -> eventAnswer.emit(Tuples.twin(question, answer)));
                         input(l);
                     }
                 });
@@ -1151,10 +1114,10 @@ public abstract class NAR implements Level, Consumer<Task> {
         pw.close();
     }
 
-    public final <X extends NAR> X with(Object... values) {
-        memory.with(values);
-        return (X)this;
-    }
+//    public final void with(Object... values) {
+//        with(values);
+//        //return (X)this;
+//    }
 
     public static final class InvalidTaskException extends RuntimeException {
 

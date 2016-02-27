@@ -21,11 +21,13 @@ public class NALLevelTest {
         NAR nDefault = new Default();
         assertEquals(Global.DEFAULT_NAL_LEVEL, nDefault.nal());
 
-        NAR n1 = new Default().nal(1);
+        NAR n1 = new Default();
+        n1.nal(1);
         EventCount n1Count = new EventCount(n1);
         assertEquals(1, n1.nal());
 
-        NAR n8 = new Default().nal(8);
+        NAR n8 = new Default();
+        n1.nal(8);
         EventCount n8Count = new EventCount(n8);
 
         String productSentence = "<(a,b) --> c>.\n<c <-> a>?\n";

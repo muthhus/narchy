@@ -16,7 +16,6 @@ import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.transform.CompoundTransform;
 import nars.term.transform.VariableNormalization;
-import nars.term.transform.VariableTransform;
 import nars.term.transform.subst.Subst;
 import nars.term.variable.AbstractVariable;
 import nars.truth.Truth;
@@ -198,7 +197,7 @@ public interface TermIndex  {
         //early filter for invalid image
         if (sop.isImage()) {
             if (sub.isEmpty() || (resultSize==1 && sub.get(0).equals( Imdex)) )
-                return null;
+                return src;
         }
 
         if ((minArity!=-1) && (resultSize < minArity)) {
@@ -208,6 +207,8 @@ public interface TermIndex  {
                 case SET_EXT_OPENER: return Terms.ZeroSetExt;
                 case SET_INT_OPENER: return Terms.ZeroSetInt;
                 case PRODUCT: return Terms.ZeroProduct;
+                default:
+                    return src;
             }
         }
 
@@ -387,27 +388,19 @@ public interface TermIndex  {
 
 
     @Nullable
-    default Termed normalized(@NotNull Term t) {
-        if (t.isNormalized()) {
-            return t;
+    default Termed normalized(@NotNull Termed t) {
+        if (t.isCompound() && !t.isNormalized()) {
+            Compound ct = (Compound)(t.term());
+            t = transform(ct, (ct.vars() == 1) ?
+                    VariableNormalization.singleVariableNormalization :
+                    new VariableNormalization());
+
+            if (t != null)
+                ((GenericCompound) t).setNormalized();
         }
-
-        Compound cct = (Compound) t;
-        Compound tx = transform(cct, normalizeFast(cct));
-        if (tx != null)
-            ((GenericCompound) tx).setNormalized();
-
-        return tx;
+        return t;
     }
 
-
-    /**
-     * allows using the single variable normalization,
-     * which is safe if the term doesnt contain pattern variables
-     */
-    static @NotNull VariableTransform normalizeFast(@NotNull Compound target) {
-        return target.vars() == 1 ? VariableNormalization.singleVariableNormalization : new VariableNormalization();
-    }
 
     @Nullable
     default <X extends Compound> X transform(@NotNull Compound src, @NotNull CompoundTransform t) {

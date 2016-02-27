@@ -18,7 +18,7 @@ import java.util.HashMap;
 public class PatternIndex extends AbstractNAR.DefaultTermIndex {
 
     public PatternIndex() {
-        super(256);
+        super(512);
     }
 
 

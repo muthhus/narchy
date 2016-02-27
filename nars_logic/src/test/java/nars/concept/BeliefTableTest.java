@@ -52,7 +52,8 @@ public class BeliefTableTest  {
 //    }
 
     public AbstractNAR newNAR(int maxBeliefs) {
-        AbstractNAR d = new Default(256,1,2,3).nal(7);// {
+        AbstractNAR d = new Default(256,1,2,3);
+        d.nal(7);// {
 
             /*
             @Override

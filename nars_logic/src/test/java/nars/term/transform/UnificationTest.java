@@ -720,7 +720,10 @@ public class UnificationTest  {
 
     void testIntroduction(String subj, Op relation, String pred, String belief, String concl) {
 
-        new TestNAR(new Default().nal(6))
+        NAR n = new Default();
+        n.nal(6);
+
+        new TestNAR(n)
                 .believe('<' + subj + ' ' + relation + ' ' + pred + '>')
                 .believe(belief)
                 .mustBelieve(16, concl, 0.81f);
@@ -734,7 +737,9 @@ public class UnificationTest  {
 
         String c = "(<$x --> bird> ==> <$x --> animal>).";
 
-        NAR n = new Default().nal(6);
+        NAR n = new Default();
+        n.nal(6);
+
         n.input(c);
         n.run(1);
 

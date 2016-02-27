@@ -3,7 +3,6 @@ package nars.irc;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import nars.Global;
-import nars.Memory;
 import nars.NARLoop;
 import nars.bag.BLink;
 import nars.bag.impl.DigestBag;
@@ -11,9 +10,6 @@ import nars.nar.Default;
 import nars.op.in.TextInput;
 import nars.op.in.Twenglish;
 import nars.task.Task;
-import nars.term.TermIndex;
-import nars.term.index.MapIndex2;
-import nars.time.RealtimeMSClock;
 import nars.util.data.Util;
 import nars.util.data.sorted.SortedIndex;
 
@@ -269,10 +265,7 @@ public class NarseseIRCBot extends IRCBot {
             oldnar.stop();
         }
 
-        nar = new Default(new Memory(new RealtimeMSClock(),
-                //TermIndex.memoryWeak(numConcepts * 2)
-                new MapIndex2(null, null //TODO
-                         )), 1024, 1, 4, 3);
+        nar = new Default(1024, 1, 4, 3);
 
         output = new DigestBag.OutputBuffer(nar, 128);
 

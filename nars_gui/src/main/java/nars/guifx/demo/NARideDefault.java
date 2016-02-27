@@ -1,13 +1,7 @@
 package nars.guifx.demo;
 
-import javassist.scopedpool.SoftValueHashMap;
 import nars.Global;
-import nars.Memory;
-import nars.concept.DefaultConceptBuilder;
-import nars.nar.AbstractNAR;
 import nars.nar.Default;
-import nars.term.TermIndex;
-import nars.term.index.MapIndex2;
 import nars.time.FrameClock;
 
 /**
@@ -23,10 +17,7 @@ public enum NARideDefault {
         FrameClock clock = new FrameClock();
 
         Default n = new Default(
-                new Memory(
-                        clock,
-                        new AbstractNAR.DefaultTermIndex(256)),
-                        //TermIndex.memoryGuava(clock, 100)),
+                //TermIndex.memoryGuava(clock, 100)),
 //                        memoryWeak(1024 * 128)),
                 1024, 1, 3, 2);
         //new Inperience(n);

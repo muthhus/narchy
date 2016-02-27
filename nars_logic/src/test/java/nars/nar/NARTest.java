@@ -62,7 +62,7 @@ public class NARTest {
 
         //a new nar with the same memory is allowed to
         //take control of it after the first stops
-        AbstractNAR nar2 = new Default(nar.memory, 1000, 1, 3, 1);
+        AbstractNAR nar2 = new Default(1000, 1, 3, 1);
 
         assertTrue(nar2.memory.time() > 1);
 
@@ -119,14 +119,16 @@ public class NARTest {
                 "<a --> b>" /* unknown solution to be derived */ :
                 "<b --> a>" /* existing solution, to test finding existing solutions */;
 
-        new Default(100, 1, 1, 3).nal(2)
+        NAR n = new Default(100, 1, 1, 3);
+        n.nal(2);
                 //.trace()
-                .input("<a <-> b>. %1.0;0.5%",
+                n.input("<a <-> b>. %1.0;0.5%",
                        "<b --> a>. %1.0;0.5%").run(cyclesBeforeQuestion);
 
-        NAR nar = new Default(100, 1, 1, 3).nal(2)
+        NAR nar = new Default(100, 1, 1, 3);
+        n.nal(2);
                 //.trace()
-                .input("<a <-> b>. %1.0;0.5%",
+                n.input("<a <-> b>. %1.0;0.5%",
                         "<b --> a>. %1.0;0.5%")
                 .onAnswer(question, t -> b.set(true) )
                 .stopIf(b::get);

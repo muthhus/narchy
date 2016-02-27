@@ -58,9 +58,9 @@ import java.util.Random;
  */
 public class Memory extends Param {
 
-    protected Atom self;
+    @NotNull protected Atom self;
 
-    public final Random random;
+    @NotNull public final Random random;
 
     public final transient Topic<Task> eventTaskRemoved = new DefaultTopic<>();
     public final transient Topic<ConceptProcess> eventConceptProcess = new DefaultTopic<>();
@@ -157,6 +157,9 @@ public class Memory extends Param {
         return level;
     }
 
+    /**
+     * sets current maximum allowed NAL level (1..8)
+     */
     public final void nal(int newLevel) {
         level = newLevel;
     }

@@ -57,7 +57,8 @@ public class UniqueInputSerialTest {
     @Test
     public void testDoublePremiseMultiEvidence() {
 
-        AbstractNAR d = new Default(100,1,1,3).nal(2);
+        AbstractNAR d = new Default(100,1,1,3);
+        d.nal(2);
         d.input("<a --> b>.", "<b --> c>.");
 
         long[] ev = {1, 2};

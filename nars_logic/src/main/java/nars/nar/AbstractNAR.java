@@ -25,6 +25,7 @@ import nars.op.sys.js;
 import nars.op.sys.shell.shell;
 import nars.term.Term;
 import nars.term.TermIndex;
+import nars.term.atom.Atom;
 import nars.term.index.MapIndex2;
 import nars.time.Clock;
 import nars.util.data.map.UnifriedMap;
@@ -51,20 +52,16 @@ public abstract class AbstractNAR extends NAR {
 
 
     //public final Random rng = new RandomAdaptor(new MersenneTwister(1));
-    @NotNull
-    public final Random rng;
 
     public Function<Term,Concept> conceptBuilder;
 
 
-    public AbstractNAR(@NotNull Clock clock) {
-        this(new Memory(clock, new DefaultTermIndex(256) ));
+    public AbstractNAR(Clock clock, TermIndex index) {
+        this(clock, index, new XorShift128PlusRandom(1), Global.DEFAULT_SELF);
     }
 
-    public AbstractNAR(@NotNull Memory memory) {
-        super(memory);
-
-        rng = new XorShift128PlusRandom(1);
+    public AbstractNAR(Clock clock, TermIndex index, Random rng, @NotNull Atom self) {
+        super(clock, index, rng, self);
 
         initDefaults();
 
@@ -302,15 +299,10 @@ public abstract class AbstractNAR extends NAR {
 //        };
 //    }
 
-    @NotNull
-    public AbstractNAR nal(int maxNALlevel) {
-        memory.nal(maxNALlevel);
-        return this;
-    }
 
-    protected final Concept newConcept(Term t) {
-        return conceptBuilder.apply(t);
-    }
+//    protected final Concept newConcept(Term t) {
+//        return conceptBuilder.apply(t);
+//    }
 
 
 

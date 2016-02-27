@@ -30,11 +30,7 @@ public class Terminal extends AbstractNAR {
             Task::isCommand;
 
     public Terminal(TermIndex termIndex, @NotNull Clock c) {
-        super(new Memory(
-                c,
-                termIndex
-                //new TrieCacheBag()
-        ));
+        super(c, termIndex);
 
         the("input", initInput());
 

@@ -3,6 +3,7 @@ package nars;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
+import ch.qos.logback.classic.net.SyslogAppender;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.ConsoleAppender;
 import nars.op.sys.java.ObjRef;
@@ -22,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.LoggerFactory;
 
+import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -440,10 +442,21 @@ public enum $ /* TODO: implements TermIndex */ {
         appender.start();
         logRoot.addAppender(appender);
 
-//        rootLogger.debug("Message 1");
-//        rootLogger.info("Message 1");
-//        rootLogger.warn("Message 2");
-//        rootLogger.error("Message 2");
+
+        //---TEMPORARY---
+        SyslogAppender syslog = new SyslogAppender();
+        syslog.setPort(10010);
+        syslog.setFacility("LOCAL6");
+        syslog.setContext(loggerContext);
+        syslog.setCharset(Charset.forName("UTF8"));
+        syslog.start();
+
+        logRoot.addAppender(syslog);
+
+        logRoot.debug("Message 1");
+        logRoot.info("Message 1");
+        logRoot.warn("Message 2");
+        logRoot.error("Message 2");
     }
 
     @Nullable

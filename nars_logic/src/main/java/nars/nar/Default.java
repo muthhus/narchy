@@ -20,6 +20,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.time.FrameClock;
 import nars.util.data.MutableInteger;
+import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.event.Active;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -52,19 +53,23 @@ public class Default extends AbstractNAR {
         this(1024, 1, 1, 3);
     }
 
-    public Default(int numConcepts,
-                   int conceptsFirePerCycle,
-                   int tasklinkFirePerConcept,
-                   int termlinkFirePerConcept) {
-        this(new Memory(new FrameClock(),
-                //TermIndex.memoryWeak(numConcepts * 2)
-                new DefaultTermIndex(256)
+//    public Default(int numConcepts,
+//                   int conceptsFirePerCycle,
+//                   int tasklinkFirePerConcept,
+//                   int termlinkFirePerConcept) {
+//
+//        this(new Memory(new FrameClock(),
+//                //TermIndex.memoryWeak(numConcepts * 2)
+//                new DefaultTermIndex(256)
+//
+//        ), numConcepts, conceptsFirePerCycle, tasklinkFirePerConcept, termlinkFirePerConcept);
+//    }
 
-        ), numConcepts, conceptsFirePerCycle, tasklinkFirePerConcept, termlinkFirePerConcept);
-    }
-
-    public Default(@NotNull Memory mem, int activeConcepts, int conceptsFirePerCycle, int taskLinksPerConcept, int termLinksPerConcept) {
-        super(mem);
+    public Default(int activeConcepts, int conceptsFirePerCycle, int taskLinksPerConcept, int termLinksPerConcept) {
+        super(new FrameClock(),
+              new DefaultTermIndex(256),
+              new XorShift128PlusRandom(1),
+              Global.DEFAULT_SELF);
 
         the("input", input = initInput());
 

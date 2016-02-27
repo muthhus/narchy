@@ -18,6 +18,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(Parameterized.class)
 public class NAL1Test extends AbstractNALTest {
 
+    final int withinCycles = 64;
 
     public NAL1Test(Supplier<NAR> b) {
         super(b);
@@ -83,7 +84,7 @@ public class NAL1Test extends AbstractNALTest {
     @Test
     public void abduction() throws Narsese.NarseseException {
 
-        int time = 64;
+        int time = withinCycles;
 
         test().mustBelieve(time, "<sport --> chess>", 1.0f, 0.42f)
               /*  .en("I guess sport is a type of chess.")
@@ -98,7 +99,7 @@ public class NAL1Test extends AbstractNALTest {
 
     @Test
     public void induction() throws Narsese.NarseseException {
-        int withinCycles = 64;
+        
         /*
         <swan --> swimmer>. %0.9;0.9%
         <swan --> bird>.
@@ -121,29 +122,28 @@ public class NAL1Test extends AbstractNALTest {
             //.debug()
             .believe("<robin --> bird>")
             .believe("<bird --> animal>")
-            .mustOutput(64, "<animal --> robin>. %1.00;0.4475%");
+            .mustOutput(withinCycles, "<animal --> robin>. %1.00;0.4475%");
     }
 
 
     @Test
     public void conversion() throws Narsese.NarseseException {
 
-        long time = 64;
         TestNAR test = test();
         test.believe("<bird --> swimmer>")
             .ask("<swimmer --> bird>") //.en("Is swimmer a type of bird?");
-            .mustOutput(time, "<swimmer --> bird>. %1.00;0.47%");
+            .mustOutput(withinCycles, "<swimmer --> bird>. %1.00;0.47%");
     }
 
 
     @Test
     public void whQuestionUnifyQueryVar() throws Narsese.NarseseException {
-        testQuestionAnswer(64, "<bird --> swimmer>", "<?x --> swimmer>", "<bird --> swimmer>");
+        testQuestionAnswer(withinCycles, "<bird --> swimmer>", "<?x --> swimmer>", "<bird --> swimmer>");
     }
 
     @Test
     public void yesNoQuestion() throws Narsese.NarseseException {
-        testQuestionAnswer(64, "<bird --> swimmer>", "<bird --> swimmer>", "<bird --> swimmer>");
+        testQuestionAnswer(withinCycles, "<bird --> swimmer>", "<bird --> swimmer>", "<bird --> swimmer>");
     }
 
     /** question to answer matching */
@@ -177,7 +177,7 @@ public class NAL1Test extends AbstractNALTest {
 
     @Test
     public void backwardInference() throws Narsese.NarseseException {
-        long time = 64;
+        long time = withinCycles;
 
 
         TestNAR test = test();
