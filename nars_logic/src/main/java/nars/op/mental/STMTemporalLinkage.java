@@ -1,6 +1,7 @@
 package nars.op.mental;
 
 import nars.Global;
+import nars.Memory;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.task.Task;
@@ -35,18 +36,19 @@ public class STMTemporalLinkage {
 
     public STMTemporalLinkage(@NotNull NAR nar) {
 
+        this.nar = nar;
+
         //this.deriver = deriver;
         //this.stmSize = 1;
         stm = Global.THREADS == 1 ? new ArrayDeque() : new ConcurrentLinkedDeque<>();
         //I=this; //hm there needs to be a way to query plugins from the NAR/NAL object like in 1.6.x, TODO find out
 
 
-        nar.memory.eventTaskProcess.on(n -> {
+        nar.eventTaskProcess.on(n -> {
             if (!n.task().isDeleted())
                 inductionOnSucceedingEvents(n, false);
         });
-        nar.memory.eventReset.on(n -> stm.clear());
-        this.nar = nar;
+        nar.eventReset.on(n -> stm.clear());
 
     }
 
@@ -64,7 +66,7 @@ public class STMTemporalLinkage {
     public boolean inductionOnSucceedingEvents(@NotNull Task currentTask, boolean anticipation) {
 
 
-        int stmSize = nar.memory.shortTermMemoryHistory.intValue();
+        int stmSize = nar.shortTermMemoryHistory.intValue();
 
 
 //        if (!currentTask.isTemporalInductable() && !anticipation) { //todo refine, add directbool in task

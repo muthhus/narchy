@@ -2,6 +2,7 @@ package nars.guifx;
 
 import javafx.scene.Node;
 import nars.Global;
+import nars.Memory;
 import nars.NAR;
 import nars.concept.Concept;
 
@@ -33,7 +34,7 @@ public abstract class ConceptsListPane extends LogPane {
                 displayed.forEach(this::update);
         });
 
-        n.memory.eventTaskProcess.on(tp -> {
+        ((Memory) NAR.this).eventTaskProcess.on(tp -> {
 
             Concept c = n.concept(tp.concept());
 

@@ -4,6 +4,7 @@ import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.text.TextFlow;
+import nars.Memory;
 import nars.NAR;
 import nars.budget.BudgetMerge;
 import nars.guifx.NARfx;
@@ -40,10 +41,10 @@ public class NARtop<N extends Node> implements Supplier<Pane> {
 
         //setLeft(new TreePane(d));
 
-        active = new SetTaskPerception(n.memory, f -> {
+        active = new SetTaskPerception((Memory) NAR.this, f -> {
             update();
         }, BudgetMerge.plusDQBlend);
-        n.memory.eventTaskProcess.on(t -> {
+        ((Memory) NAR.this).eventTaskProcess.on(t -> {
             if (t.isInput()) {
                 runLater( () -> {
                     addInput(t);

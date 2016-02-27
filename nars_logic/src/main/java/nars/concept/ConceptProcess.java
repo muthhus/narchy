@@ -203,7 +203,7 @@ abstract public class ConceptProcess implements Premise {
     private final boolean complete(Task derived) {
 
         //pre-normalize to avoid discovering invalidity after having consumed space while in the input queue
-        derived = derived.normalize(memory());
+        derived = derived.normalize(nar());
         if (derived != null) {
 
             //if (Global.DEBUG) {
@@ -239,4 +239,5 @@ abstract public class ConceptProcess implements Premise {
         if (b == null) return false;
         return b.term().dt()!=ITERNAL;
     }
+
 }

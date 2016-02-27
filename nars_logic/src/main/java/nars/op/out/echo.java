@@ -1,5 +1,7 @@
 package nars.op.out;
 
+import nars.Memory;
+import nars.NAR;
 import nars.term.Operator;
 import nars.nal.nal8.operator.ImmediateOperator;
 import nars.task.Task;
@@ -12,7 +14,7 @@ public class echo extends ImmediateOperator {
 
     @Override
     public void execute(@NotNull Task e) {
-        nar.memory.eventSpeak.emit( Operator.opArgs(e.term()) );
+        nar.eventSpeak.emit( Operator.opArgs(e.term()) );
     }
 
 }

@@ -3,13 +3,13 @@ package nars.guifx;
 import br.com.supremeforever.mdi.MDICanvas;
 import br.com.supremeforever.mdi.MDIWindow;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import nars.Global;
+import nars.Memory;
 import nars.NAR;
 import nars.guifx.demo.NARide;
 
@@ -60,7 +60,7 @@ public class WidgetLayer extends MDICanvas {
 
     public void update() {
 
-        Map<String, Object> ss = nar.memory.getSingletons();
+        Map<String, Object> ss = ((Memory) NAR.this).getSingletons();
 
         List<Node> toAdd = Global.newArrayList(ss.size());
         ss.forEach((k, v) -> {

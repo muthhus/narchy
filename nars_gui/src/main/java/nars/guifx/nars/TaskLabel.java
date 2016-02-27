@@ -3,6 +3,7 @@ package nars.guifx.nars;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
+import nars.Memory;
 import nars.NAR;
 import nars.guifx.AutoLabel;
 import nars.guifx.NARfx;
@@ -172,7 +173,7 @@ public class TaskLabel extends AutoLabel<Task> {
     @Override
     protected String getText(Task task) {
         if (nar!=null)
-            return task.appendTo(new StringBuilder(), nar.memory, true, false, false, false).toString();
+            return task.appendTo(new StringBuilder(), (Memory) NAR.this, true, false, false, false).toString();
         return "";
     }
 }

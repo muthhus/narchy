@@ -98,7 +98,7 @@ public class substitute extends ImmediateTermTransform implements PremiseAware {
 //            throw new RuntimeException("do these need copied too?");
 //        }
 
-        return r.currentPremise.memory().index.apply(m, term);
+        return r.currentPremise.nar().index.apply(m, term);
     }
 
     //    protected boolean substitute(Compound p, MapSubst m, Term a, Term b) {

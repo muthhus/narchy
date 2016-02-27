@@ -1,5 +1,6 @@
 package nars.util.signal;
 
+import nars.Memory;
 import nars.NAR;
 import nars.util.event.FrameReaction;
 import nars.util.meter.SignalData;
@@ -23,7 +24,7 @@ public class NARMetrics extends FrameReaction {
 
         metrics = new TemporalMetrics(historySize);
 
-        metrics.addViaReflection(n.memory.emotion);
+        metrics.addViaReflection(n.emotion);
 //
 //        if (n.memory.resource!=null)
 //            metrics.addViaReflection(n.memory.resource);
@@ -33,7 +34,7 @@ public class NARMetrics extends FrameReaction {
 //        if (n.memory.resource!=null)
 //            metrics.add(new FirstOrderDifference(metrics, n.memory.resource.CYCLE_RAM_USED.id()));
 
-        metrics.addViaReflection(n.memory.logic);
+        metrics.addViaReflection(n.logic);
     }
 
     @Override

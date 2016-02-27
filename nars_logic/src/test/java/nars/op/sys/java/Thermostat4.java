@@ -1,5 +1,7 @@
 package nars.op.sys.java;
 
+import nars.Memory;
+import nars.NAR;
 import nars.concept.Concept;
 import nars.nar.Default;
 import nars.util.learn.HaiQ;
@@ -31,10 +33,10 @@ public class Thermostat4 {
 
         n = new Default(1000, 1, 2, 3);
         //n.log();
-        n.memory.activationRate.setValue(0.05f);
+        n.activationRate.setValue(0.05f);
         n.premiser.confMin.setValue(0.01f);
-        n.memory.shortTermMemoryHistory.set(3);
-        n.memory.cyclesPerFrame.set(4);
+        n.shortTermMemoryHistory.set(3);
+        n.cyclesPerFrame.set(4);
         //n.initNAL9();
 
 

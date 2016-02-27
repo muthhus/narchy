@@ -1,6 +1,7 @@
 package nars.task;
 
 import nars.Global;
+import nars.Memory;
 import nars.NAR;
 import nars.nar.AbstractNAR;
 import nars.nar.Default;
@@ -62,7 +63,7 @@ public class UniqueInputSerialTest {
         d.input("<a --> b>.", "<b --> c>.");
 
         long[] ev = {1, 2};
-        d.memory.eventTaskProcess.on(t -> {
+        d.eventTaskProcess.on(t -> {
             if (t.isDouble())
                 assertArrayEquals("all double-premise derived terms have this evidence: "
                         + t + ": " + Arrays.toString(ev) + "!=" + Arrays.toString(t.evidence()), ev, t.evidence());

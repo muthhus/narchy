@@ -20,17 +20,17 @@ public class EventCount {
     @Nullable
     private Active sub;
 
-    public EventCount(@NotNull NAR n) {
+    public EventCount(@NotNull NAR nar) {
 
         Map<Object, HitMeter> eventMeters
                 = this.eventMeters = Global.newHashMap();
 
-        Topic.each(n.memory, (field) -> {
+        Topic.each(nar, (field) -> {
             String nn = field.getName();
             eventMeters.put(nn, new HitMeter(nn));
         });
 
-        sub = Topic.all(n.memory, (event, value) ->
+        sub = Topic.all(nar, (event, value) ->
             eventMeters.get(event).hit());
     }
 

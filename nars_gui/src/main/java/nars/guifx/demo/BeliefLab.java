@@ -1,5 +1,6 @@
 package nars.guifx.demo;
 
+import nars.Memory;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.guifx.NARfx;
@@ -30,10 +31,10 @@ public class BeliefLab {
         NAR nar = new Default();
         //nar.input("y:x.");
         //nar.input("y:x. %0%");
-        nar.memory.duration.set(duration);
+        ((Memory) NAR.this).duration.set(duration);
 
-        nar.memory.shortTermMemoryHistory.set(stmInduction);
-        nar.memory.conceptBeliefsMax.set(beliefCapacity);
+        ((Memory) NAR.this).shortTermMemoryHistory.set(stmInduction);
+        ((Memory) NAR.this).conceptBeliefsMax.set(beliefCapacity);
         nar.run(2);
 
         Concept c = nar.concept("y:x");
@@ -55,9 +56,9 @@ public class BeliefLab {
             //random temporals
             if (enableTemporals) {
 
-                if (nar.memory.random.nextFloat() < predictionProbability)
+                if (((Memory) NAR.this).random.nextFloat() < predictionProbability)
                     nar.input("y:x? :/:");
-                else if (nar.memory.random.nextFloat() < pastProbability)
+                else if (((Memory) NAR.this).random.nextFloat() < pastProbability)
                     nar.input("y:x? :\\:");
                 else {
                     CharSequence y = Texts.n2(0.5f * ((float) Math.sin(nar.time() * waveFreq) + 1f));

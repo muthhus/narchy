@@ -1,17 +1,13 @@
 package nars.nal.op;
 
 import com.google.common.base.Joiner;
-import nars.$;
-import nars.Global;
-import nars.Memory;
-import nars.Op;
+import nars.*;
 import nars.budget.Budget;
 import nars.concept.ConceptProcess;
 import nars.concept.Temporalize;
 import nars.nal.meta.*;
 import nars.nal.meta.match.EllipsisMatch;
 import nars.term.atom.AtomicStringConstant;
-import nars.term.Operator;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -159,7 +155,7 @@ public class Derive extends AtomicStringConstant implements ProcTerm {
         }
 
         ConceptProcess premise = p.currentPremise;
-        Memory mem = premise.memory();
+        Memory mem = premise.nar();
 
         //get the normalized term to determine the budget (via it's complexity)
         //this way we can determine if the budget is insufficient

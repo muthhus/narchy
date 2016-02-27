@@ -33,7 +33,7 @@ public interface TruthOperator {
         Truth truth = apply(
                 premise.task().truth(),
                 (belief == null) ? null : belief.truth(),
-                premise.memory(),
+                premise.nar(),
                 minConf
         );
 

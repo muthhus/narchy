@@ -1,6 +1,8 @@
 package nars.op.sys.java;
 
 import com.gs.collections.impl.set.mutable.primitive.CharHashSet;
+import nars.Memory;
+import nars.NAR;
 import nars.concept.Concept;
 import nars.nar.Default;
 import nars.util.data.Util;
@@ -34,13 +36,13 @@ public class GrammarTest {
         //n.memory.executionThreshold.setValue(0.55f);
         n.premiser.confMin.setValue(0.01f);
 
-        n.memory.DEFAULT_JUDGMENT_PRIORITY = 0.5f;
-        n.memory.DEFAULT_GOAL_PRIORITY = 0.6f;
-        n.memory.activationRate.setValue(0.1f);
+        n.DEFAULT_JUDGMENT_PRIORITY = 0.5f;
+        n.DEFAULT_GOAL_PRIORITY = 0.6f;
+        n.activationRate.setValue(0.1f);
 
-        n.memory.duration.set(1);
-        n.memory.shortTermMemoryHistory.set(3);
-        n.memory.cyclesPerFrame.set(8);
+        n.duration.set(1);
+        n.shortTermMemoryHistory.set(3);
+        n.cyclesPerFrame.set(8);
         //n.initNAL9();
 
 

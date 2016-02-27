@@ -13,7 +13,6 @@ import nars.term.Termed;
 import nars.util.graph.TermLinkGraph;
 import nars.util.signal.TestNAR;
 import org.jetbrains.annotations.NotNull;
-import org.jgrapht.alg.StrongConnectivityInspector;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -39,7 +38,7 @@ public class LinkageTest extends AbstractNALTest {
 
                 @Override
                 public Function<Term, Concept> newConceptBuilder() {
-                    return new DefaultConceptBuilder(this.memory.random, TERM_LINK_BAG_SIZE, 1);
+                    return new DefaultConceptBuilder(random, TERM_LINK_BAG_SIZE, 1);
                 }
             };
             d.nal(6);

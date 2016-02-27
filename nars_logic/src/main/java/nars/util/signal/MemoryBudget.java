@@ -116,7 +116,6 @@ public class MemoryBudget extends EnumMap<MemoryBudget.Budgeted,Object>  {
     }
 
     public static @NotNull Signals onConcept(@NotNull NARMetrics nm, @NotNull Term termConcept) {
-        Memory m = nm.nar.memory;
         String prefix = termConcept.toString();
         Signals s = new Signals() {
 

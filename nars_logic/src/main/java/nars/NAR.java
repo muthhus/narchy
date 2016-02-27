@@ -23,11 +23,8 @@ import nars.task.flow.TaskStream;
 import nars.term.*;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
-import nars.term.variable.AbstractVariable;
 import nars.term.variable.Variable;
 import nars.time.Clock;
-import nars.time.FrameClock;
-import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.event.AnswerReaction;
 import nars.util.event.DefaultTopic;
 import nars.util.event.On;
@@ -92,12 +89,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             "eventSpeak"
 
     );
-    /**
-     * The memory of the reasoner
-     * TODO dont expose as public
-     */
-    @NotNull
-    public final Memory memory = this;
     /**
      * The id/name of the reasoner
      * TODO
@@ -196,13 +187,13 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      */
     @Nullable
     public Task task(@NotNull String taskText) {
-        return Narsese.the().task(taskText, memory);
+        return Narsese.the().task(taskText, this);
     }
 
     @NotNull
     public List<Task> tasks(@NotNull String parse) {
         List<Task> result = Global.newArrayList(1);
-        Narsese.the().tasks(parse, result, memory);
+        Narsese.the().tasks(parse, result, this);
         return result;
     }
 
@@ -309,7 +300,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
 
     public long time(@NotNull Tense tense) {
-        return Tense.getRelativeOccurrence(tense, memory);
+        return Tense.getRelativeOccurrence(tense, this);
     }
 
     @NotNull
@@ -409,7 +400,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      */
     public final void input(@NotNull Task i) {
 
-        Memory m = memory;
+        Memory m = this;
 
         Task u;
         if (i.isCommand()) {
@@ -652,7 +643,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
 
     private final void _frame(int frames) {
-        Memory memory = this.memory;
+        Memory memory = this;
 
         Topic<NAR> frameStart = eventFrameStart;
 
@@ -683,7 +674,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
         String[] previous = {null};
 
-        Topic.all(memory, (k, v) -> {
+        Topic.all(this, (k, v) -> {
 
             if (includeValue != null && !includeValue.test(v))
                 return;
@@ -752,7 +743,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
                     .a(tv.dur() > 0.5f ? Ansi.Attribute.UNDERLINE : Ansi.Attribute.UNDERLINE_OFF)
                     .fg(Budget.budgetSummaryColor(tv))
                     .a(
-                            tv.toString(memory, true)
+                            tv.toString(this, true)
                     )
                     .reset()
                     .toString();
@@ -976,7 +967,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             return null;
         }
 
-        final Memory memory = this.memory;
+        final Memory memory = this;
 
         float activation = activationRate.floatValue();
         Concept c = conceptualize(input.concept(), input.budget(), activation, 0f);

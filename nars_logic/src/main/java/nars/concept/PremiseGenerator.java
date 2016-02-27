@@ -1,6 +1,7 @@
 package nars.concept;
 
 import nars.Global;
+import nars.Memory;
 import nars.NAR;
 import nars.Op;
 import nars.bag.BLink;
@@ -32,7 +33,7 @@ abstract public class PremiseGenerator extends UnifySubst implements Function<Te
     long lastMatch = Tense.TIMELESS;
 
     public PremiseGenerator(@NotNull NAR nar) {
-        super(Op.VAR_QUERY, nar.memory, true);
+        super(Op.VAR_QUERY, nar, true);
         this.nar = nar;
         this.lastMatch = nar.time();
     }

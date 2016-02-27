@@ -1,5 +1,6 @@
 package nars.io;
 
+import nars.Memory;
 import nars.NAR;
 import nars.nar.Default;
 import nars.op.in.NQuadsRDF;
@@ -18,7 +19,7 @@ public class NQuadsRDFTest {
         //n.stdout();
         NQuadsRDF.input(n, "<http://example.org/#spiderman> <http://xmlns.com/foaf/0.1/name> \"Человек-паук\"@ru .");
         n.run(1);
-        assertTrue(n.memory.index.size() > 2);
+        assertTrue(n.index.size() > 2);
     }
 
 

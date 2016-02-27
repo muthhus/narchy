@@ -23,6 +23,7 @@ package nars.concept;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Ordering;
 import com.google.common.primitives.Longs;
+import nars.Memory;
 import nars.NAR;
 import nars.bag.Bag;
 import nars.concept.util.BeliefTable;
@@ -288,7 +289,7 @@ public interface Concept extends Termed, Comparable {
 
     default boolean link(@NotNull Task task, float initialScale, @NotNull NAR nar) {
         float minScale =
-                nar.memory.taskLinkThreshold.floatValue() / task.budget().pri();
+                nar.taskLinkThreshold.floatValue() / task.budget().pri();
 
         return Float.isFinite(minScale) && link(task, initialScale, minScale, nar);
     }

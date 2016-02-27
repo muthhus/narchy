@@ -24,7 +24,6 @@ import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.event.Active;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
@@ -101,7 +100,7 @@ public class Default extends AbstractNAR {
     public TaskPerception initInput() {
 
         return new SetTaskPerception(
-                memory, this::process, BudgetMerge.plusDQBlend);
+                this, this::process, BudgetMerge.plusDQBlend);
 
         /* {
             @Override
@@ -264,7 +263,7 @@ public class Default extends AbstractNAR {
 
     @Override
     public Function<Term, Concept> newConceptBuilder() {
-        return new DefaultConceptBuilder(this.memory.random,
+        return new DefaultConceptBuilder(random,
                 12 /* tasklinks*/,
                 16 /*termlinks */);
     }
@@ -360,20 +359,18 @@ public class Default extends AbstractNAR {
 
             this.premiser = premiseGenerator;
 
-            Memory m = nar.memory;
-
-            this.activationRate = m.activationRate;
-            this.conceptRemembering = m.conceptForgetDurations;
-            this.termLinkRemembering = m.termLinkForgetDurations;
-            this.taskLinkRemembering = m.taskLinkForgetDurations;
-            this.perfection = m.perfection;
+            this.activationRate = nar.activationRate;
+            this.conceptRemembering = nar.conceptForgetDurations;
+            this.termLinkRemembering = nar.termLinkForgetDurations;
+            this.taskLinkRemembering = nar.taskLinkForgetDurations;
+            this.perfection = nar.perfection;
 
             conceptsFiredPerCycle = new MutableInteger(1);
             active = concepts;
 
             this.handlers = new Active(
-                m.eventCycleEnd.on(this::cycle),
-                m.eventReset.on(this::reset)
+                nar.eventCycleEnd.on(this::cycle),
+                nar.eventReset.on(this::reset)
             );
 
             conceptForget = new Forget.ExpForget(nar, conceptRemembering, perfection);
@@ -467,7 +464,7 @@ public class Default extends AbstractNAR {
 
 
         public DefaultCycle(@NotNull NAR nar, Deriver deriver, PremiseGenerator premiseGenerator, int activeConcepts) {
-            super(nar, deriver, newConceptBag(nar.memory.random, activeConcepts), premiseGenerator);
+            super(nar, deriver, newConceptBag(nar.random, activeConcepts), premiseGenerator);
         }
 
 
@@ -531,7 +528,7 @@ public class Default extends AbstractNAR {
 
         public DefaultPremiseGenerator(@NotNull NAR nar, Deriver deriver, Collection<Task> resultsBuffer) {
             super(nar);
-            this.matcher = new PremiseEval(nar.memory.random, deriver);
+            this.matcher = new PremiseEval(nar.random, deriver);
             this.sharedResultBuffer = resultsBuffer;
             this.confMin = new MutableFloat(Global.TRUTH_EPSILON);
 

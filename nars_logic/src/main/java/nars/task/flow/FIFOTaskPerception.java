@@ -1,5 +1,6 @@
 package nars.task.flow;
 
+import nars.Memory;
 import nars.NAR;
 import nars.task.Task;
 import org.jetbrains.annotations.NotNull;
@@ -46,12 +47,12 @@ public class FIFOTaskPerception extends TaskPerception {
     protected final Predicate<Task> filter;
 
     public FIFOTaskPerception(@NotNull NAR nar, Predicate<Task> filter, Consumer<Task[]> receiver) {
-        super(nar.memory, receiver);
+        super(nar, receiver);
         this.filter = filter;
     }
 
     public FIFOTaskPerception(@NotNull NAR nar, Predicate<Task> filter) {
-        super(nar.memory);
+        super(nar);
         this.filter = filter;
     }
     public FIFOTaskPerception(@NotNull NAR nar) {

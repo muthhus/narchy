@@ -114,7 +114,7 @@ public enum LocalRules {
      * @param question     The question to be processed
      * @return the projected Task, or the original Task
      */
-    public static void forEachSolution(@NotNull Task question, @NotNull Task sol, @NotNull NAR nal, @NotNull Consumer<Task> eachSolutions) {
+    public static void forEachSolution(@NotNull Task question, @NotNull Task sol, @NotNull NAR nal) {
 
 
         if (Stamp.overlapping(question, sol)) {
@@ -132,8 +132,6 @@ public enum LocalRules {
 //        }
 
 
-        Memory memory = nal.memory;
-
         /** temporary for comparing the result before unification and after */
         //float newQ0 = TemporalRules.solutionQuality(question, belief, projectedTruth, now);
 
@@ -142,15 +140,15 @@ public enum LocalRules {
         Consumer<Term> proc = (st) -> {
 
 
-            Task validSolution = sol.answer((Compound)st, question, memory );
+            Task validSolution = sol.answer((Compound)st, question, nal);
 
             if (validSolution!=null) {
 
-                memory.onSolve(question, validSolution);
+                nal.onSolve(question, validSolution);
 
                 //System.out.println("\twith: " + validSolution);
 
-                eachSolutions.accept(validSolution);
+                nal.accept(validSolution);
                 //System.out.println(question + " " + ss + " " + ss.getExplanation());
 
             }
@@ -158,7 +156,7 @@ public enum LocalRules {
         };
 
 
-        Compound quesTerm = question.term();
+        //Compound quesTerm = question.term();
         Compound solTerm = sol.term();
 
         //if (solTerm.hasVarIndep() && !solTerm.equals(quesTerm)) {

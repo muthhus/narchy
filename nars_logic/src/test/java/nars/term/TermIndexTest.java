@@ -1,6 +1,7 @@
 package nars.term;
 
 import nars.Global;
+import nars.Memory;
 import nars.NAR;
 import nars.concept.AtomConcept;
 import nars.concept.DefaultConceptBuilder;
@@ -115,7 +116,7 @@ public class TermIndexTest {
     }
 
     private void testShared(NAR n, String s) {
-        TermIndex i = n.memory.index;
+        TermIndex i = n.index;
         int t0 = i.size();
         int s0 = i.subtermsCount();
 
@@ -173,7 +174,7 @@ public class TermIndexTest {
     public void testRuleTermsAddedToMemoryTermIndex() {
         NAR d = new Default(100, 1, 1, 1);
         Set<Term> t = new TreeSet();
-        d.memory.index.forEach(x -> t.add(x.term()));
+        d.index.forEach(x -> t.add(x.term()));
 
         assertTrue(t.size() > 100); //approximate
 

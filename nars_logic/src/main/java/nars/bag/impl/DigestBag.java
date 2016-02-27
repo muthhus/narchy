@@ -1,5 +1,6 @@
 package nars.bag.impl;
 
+import nars.Memory;
 import nars.NAR;
 import nars.bag.BLink;
 import nars.task.Task;
@@ -39,10 +40,10 @@ public class DigestBag implements Consumer<Task> {
         public OutputBuffer(@NotNull NAR n, int capacity) {
             this.buffer = new DigestBag(capacity);
 
-            n.memory.eventTaskProcess.on(buffer);
+            n.eventTaskProcess.on(buffer);
 
             /** answer adapter */
-            n.memory.eventAnswer.on(tt -> {
+            n.eventAnswer.on(tt -> {
                 if (tt.getOne().isInput()) {
                     Task t = tt.getTwo();
                     //t.log("Answers " + tt.getOne());

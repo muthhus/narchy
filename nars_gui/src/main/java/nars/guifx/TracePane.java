@@ -7,6 +7,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import nars.$;
+import nars.Memory;
 import nars.NAR;
 import nars.util.data.list.CircularArrayList;
 import nars.util.data.list.FasterList;
@@ -187,8 +188,8 @@ public abstract class TracePane extends LogPane implements ChangeListener, Consu
     }
     public void appear() {
         if (reg==null && events == null) {
-            reg = nar.memory.eventFrameStart.on(this);
-            events = Topic.all(nar.memory, this::output,
+            reg = ((Memory) NAR.this).eventFrameStart.on(this);
+            events = Topic.all(NAR.this, this::output,
                     (k) ->  !k.equals("eventConceptProcess") &&
                             !k.equals("eventConceptActivated") &&
                             !k.equals("eventConceptChanged") &&

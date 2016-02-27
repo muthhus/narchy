@@ -195,11 +195,9 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
         //boolean hasGoals = hasGoals();
         //float successBefore = hasGoals ? getSuccess(now) : 0;
 
-        Memory memory = nar.memory;
-
         BeliefTable beliefs = this.beliefs;
         if (beliefs == null)
-            beliefs = this.beliefs = new DefaultBeliefTable(memory.conceptBeliefsMax.intValue(), memory);
+            beliefs = this.beliefs = new DefaultBeliefTable(nar.conceptBeliefsMax.intValue(), nar);
 
         belief = beliefs.add(belief, nar);
 
@@ -210,7 +208,7 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
                 //TODO move this to a subclass of TaskTable which is customized for questions. then an arraylist impl of TaskTable can iterate by integer index and not this iterator/lambda
                 final Task solution = belief;
                 questions().forEach(question -> {
-                    LocalRules.forEachSolution(question, solution, nar, nar);
+                    LocalRules.forEachSolution(question, solution, nar);
                 });
             }
 
@@ -253,12 +251,12 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
     @Override
     public final Task processGoal(@NotNull Task inputGoal, @NotNull NAR nar) {
 
-        Memory memory = nar.memory;
+
 
         BeliefTable g = goals();
         if (goals == null) {
             g = this.goals = new DefaultBeliefTable(
-                memory.conceptGoalsMax.intValue(), memory);
+                nar.conceptGoalsMax.intValue(), nar);
         }
 
         return g.add(inputGoal, nar);
@@ -365,10 +363,10 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
 
         final QuestionTaskTable questionTable;
         if (q.isQuestion()) {
-            if (questions == null) questions = new ArrayListTaskTable(nar.memory.conceptQuestionsMax.intValue());
+            if (questions == null) questions = new ArrayListTaskTable(nar.conceptQuestionsMax.intValue());
             questionTable = questions();
         } else { // else if (q.isQuest())
-            if (quests == null) quests = new ArrayListTaskTable(nar.memory.conceptQuestionsMax.intValue());
+            if (quests == null) quests = new ArrayListTaskTable(nar.conceptQuestionsMax.intValue());
             questionTable = quests();
         }
 
@@ -390,7 +388,7 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
         //boolean tableAffected = false;
         //boolean newQuestion = table.isEmpty();
 
-        q = questionTable.add(q, nar.memory);
+        q = questionTable.add(q, nar);
 
         //TODO if the table was not affected, does the following still need to happen:
 
@@ -400,7 +398,7 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
 
             Task sol = answerTable.top(q.occurrence(), nar.time());
             if (sol != null) {
-                LocalRules.forEachSolution(q, sol, nar, nar);
+                LocalRules.forEachSolution(q, sol, nar);
             }
         }
 

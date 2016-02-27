@@ -16,6 +16,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
 import nars.Global;
+import nars.Memory;
 import nars.NAR;
 import nars.bag.BLink;
 import nars.bag.Bag;
@@ -49,7 +50,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static java.util.stream.Collectors.toCollection;
-import static java.util.stream.Collectors.toList;
 import static javafx.application.Platform.runLater;
 import static nars.$.neg;
 import static nars.nal.Tense.ETERNAL;
@@ -321,19 +321,19 @@ public class ConceptPane extends BorderPane implements ChangeListener {
                 n.conceptualize(term, new UnitBudget(1f, 0.75f, 0.75f), 1f, 0);
         });
         Button yesGoalButton = new NARActionButton(nar, "+!", (n) -> {
-            n.input(new MutableTask(term, '!').present(n.memory).log("GUI Goal"));
+            n.input(new MutableTask(term, '!').present((Memory) NAR.this).log("GUI Goal"));
         });
         Button noGoalButton = new NARActionButton(nar, "-!", (n) -> {
-            n.input(new MutableTask(term, '!').truth(0f, n.memory.getDefaultConfidence('!')).present(n.memory).log("GUI Goal"));
+            n.input(new MutableTask(term, '!').truth(0f, ((Memory) NAR.this).getDefaultConfidence('!')).present((Memory) NAR.this).log("GUI Goal"));
         });
         Button trueButton = new NARActionButton(nar, "T", (n) -> {
-            n.input(new MutableTask(term, '.').present(n.memory).log("GUI True"));
+            n.input(new MutableTask(term, '.').present((Memory) NAR.this).log("GUI True"));
         });
         Button falseButton = new NARActionButton(nar, "F", (n) -> {
-            n.input(new MutableTask(neg(term), '.').present(n.memory).log("GUI False"));
+            n.input(new MutableTask(neg(term), '.').present((Memory) NAR.this).log("GUI False"));
         });
         Button isTrueButton = new NARActionButton(nar, "?", (n) -> {
-            n.input(new MutableTask(term, '?').present(n.memory).log("GUI Question"));
+            n.input(new MutableTask(term, '?').present((Memory) NAR.this).log("GUI Question"));
         });
 
         if (!term.isCompound()) {

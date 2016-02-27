@@ -73,7 +73,7 @@ public interface Execution  {
 
         return (MutableTask) new MutableTask(inh)
                 .judgment()  //with default truth value
-                .time(tense, nar.memory)
+                .time(tense, nar)
                 .budget(goal.budget())
                 .budgetScaled(feedbackPriorityMultiplier, feedbackDurabilityMultiplier)
                 .log("Execution Result")
@@ -180,7 +180,6 @@ public interface Execution  {
 
         Budget b = !operation.isDeleted() ? operation.budget() : UnitBudget.Zero;
 
-        Memory memory = nar.memory;
 
         return $.belief(operation.term(),
 
@@ -188,7 +187,7 @@ public interface Execution  {
                 //1f, DEFAULT_EXECUTION_CONFIDENCE).
 
                         budget(b).
-                        present(memory).
+                        present(nar).
                 //parent(operation). //https://github.com/opennars/opennars/commit/23d34d5ddaf7c71348d0a70a88e2805ec659ed1c#diff-abb6b480847c96e2dbf488d303fb4962L235
                         because("Executed")
                 ;

@@ -1,5 +1,6 @@
 package nars.nar;
 
+import nars.Memory;
 import nars.NAR;
 import nars.Narsese;
 import org.junit.Ignore;
@@ -64,7 +65,7 @@ public class NARTest {
         //take control of it after the first stops
         AbstractNAR nar2 = new Default(1000, 1, 3, 1);
 
-        assertTrue(nar2.memory.time() > 1);
+        assertTrue(nar.time() > 1);
 
         //it should have existing concepts
         assertEquals(nc, nar2.index().size());

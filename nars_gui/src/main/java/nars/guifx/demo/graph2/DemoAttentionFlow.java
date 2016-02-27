@@ -4,25 +4,18 @@ import com.gs.collections.api.block.function.primitive.IntToObjectFunction;
 import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
 import nars.$;
+import nars.Memory;
 import nars.NAR;
-import nars.bag.Bag;
 import nars.budget.Budget;
 import nars.budget.UnitBudget;
 import nars.concept.AbstractConcept;
-import nars.concept.AtomConcept;
 import nars.concept.Concept;
-import nars.concept.DefaultConceptBuilder;
 import nars.guifx.demo.AbstractNARGraphDemo;
 import nars.nar.Default;
-import nars.task.Task;
-import nars.term.Term;
 import nars.term.Termed;
-import nars.util.data.list.FasterList;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.function.Function;
 
 /**
  * Created by me on 2/23/16.
@@ -97,8 +90,8 @@ public class DemoAttentionFlow extends AbstractNARGraphDemo {
   //          }
 
         };
-        n.memory.duration.set(5);
-        n.memory.perfection.setValue(0);
+        ((Memory) NAR.this).duration.set(5);
+        ((Memory) NAR.this).perfection.setValue(0);
         n.run(5);
 
         graphIDE(n, (e)-> {

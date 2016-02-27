@@ -272,7 +272,7 @@ public abstract class AbstractTask extends UnitBudget
 
         //DEFAULT EXECUTION PROCEDURE: trigger listener reactions
 
-        Topic<Task> tt = n.memory.exe.get(
+        Topic<Task> tt = n.exe.get(
             Operator.operator(term())
         );
 

@@ -1,9 +1,7 @@
 package nars.nal.meta;
 
 import com.gs.collections.api.map.ImmutableMap;
-import nars.$;
-import nars.Global;
-import nars.Op;
+import nars.*;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.concept.ConceptProcess;
@@ -143,7 +141,7 @@ public class PremiseEval extends FindSubst {
 
         this.currentPremise = p;
 
-        this.index = currentPremise.memory().index;
+        this.index = currentPremise.nar().index;
 
         Task task = p.task();
         Compound taskTerm = task.term();
@@ -165,7 +163,7 @@ public class PremiseEval extends FindSubst {
 
         //setPower(branchPower.get()); //HACK is this where it should be assigned?
 
-        p.nar.memory.eventConceptProcess.emit(p);
+        p.nar.eventConceptProcess.emit(p);
 
         deriver.run(this);
 
@@ -196,7 +194,7 @@ public class PremiseEval extends FindSubst {
 //            throw new RuntimeException("why is " + budget + " Deleted");
 //        }
 
-        return budget!=null && BudgetFunctions.valid(budget, p.memory()) ? budget : null;
+        return budget!=null && BudgetFunctions.valid(budget, p.nar()) ? budget : null;
 
 
 //        if (!!budget.summaryLessThan(p.memory().derivationThreshold.floatValue())) {

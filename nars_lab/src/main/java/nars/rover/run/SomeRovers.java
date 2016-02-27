@@ -1,7 +1,6 @@
 package nars.rover.run;
 
 import javafx.scene.layout.VBox;
-import javassist.scopedpool.SoftValueHashMap;
 import nars.Global;
 import nars.Memory;
 import nars.NAR;
@@ -10,13 +9,10 @@ import nars.guifx.NARfx;
 import nars.nar.Default;
 import nars.op.mental.Anticipate;
 import nars.op.mental.Inperience;
-import nars.rover.RoverWorld;
 import nars.rover.Sim;
 import nars.rover.robot.Arm;
 import nars.rover.robot.NARover;
 import nars.rover.world.FoodSpawnWorld1;
-import nars.term.TermIndex;
-import nars.term.index.MapIndex2;
 import nars.time.SimulatedClock;
 import nars.op.sys.NarQ;
 import nars.op.sys.NarQ.BeliefReward;
@@ -27,7 +23,6 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.World;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.WeakHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -116,7 +111,7 @@ public class SomeRovers {
 //            return false;
 //        });
 
-        @NotNull Memory m = nar.memory;
+        @NotNull Memory m = (Memory) NAR.this;
         m.DEFAULT_JUDGMENT_PRIORITY = 0.4f;
 //            nar.memory.DEFAULT_JUDGMENT_DURABILITY = 0.35f;
         m.DEFAULT_GOAL_PRIORITY = 0.6f;

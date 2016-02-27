@@ -2,9 +2,9 @@ package nars.op.sys.shell;
 
 import nars.$;
 import nars.Global;
+import nars.Memory;
 import nars.NAR;
 import nars.nar.Default;
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
@@ -26,9 +26,9 @@ public class ShellTest {
     @Test
     public void testLobjectized()  {
 
-        System.out.println(d.memory.exe);
+        System.out.println(d.exe);
 
-        assertTrue(d.memory.exe.containsKey($.operator("sh")));
+        assertTrue(d.exe.containsKey($.operator("sh")));
 
         d.log();
         d.input("sh(pwd,I,(),#x)!");
@@ -39,9 +39,9 @@ public class ShellTest {
     @Test
     public void testWrappedDirectoryConcept()  {
 
-        System.out.println(d.memory.exe);
+        System.out.println(d.exe);
 
-        assertTrue(d.memory.exe.containsKey($.operator("sh")));
+        assertTrue(d.exe.containsKey($.operator("sh")));
 
         d.log();
 

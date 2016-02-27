@@ -18,6 +18,7 @@
 package nars.op.mental;
 
 import nars.$;
+import nars.Memory;
 import nars.NAR;
 import nars.nal.nal8.Execution;
 import nars.task.Task;
@@ -39,7 +40,7 @@ public class feelHappy extends feel {
     public void execute(@NotNull Task e) {
         NAR n = nar;
         Execution.feedback(e,
-                feeling(n.memory.emotion.happy(),
+                feeling(nar.emotion.happy(),
                         n,
                         happiness), n
         );

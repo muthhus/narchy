@@ -20,6 +20,7 @@
  */
 package nars.op.in;
 
+import nars.Memory;
 import nars.NAR;
 import nars.Narsese;
 import nars.task.Task;
@@ -35,7 +36,7 @@ public class TextInput extends TaskQueue {
 
 	public TextInput(@NotNull NAR nar, String input) throws Narsese.NarseseException {
 		int n = Narsese.the().tasks(input,
-				(Collection<Task>) this, nar.memory);
+				(Collection<Task>) this, nar);
 		if (n == 0)
 			throw new Narsese.NarseseException("No tasks parsed");
 	}

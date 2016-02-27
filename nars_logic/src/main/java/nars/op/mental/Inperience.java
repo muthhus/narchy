@@ -100,14 +100,14 @@ public class Inperience {
 
         this.nar = n;
 
-        n.memory.eventTaskProcess.on(this::experienceFromTaskInternal);
+        n.eventTaskProcess.on(this::experienceFromTaskInternal);
 
-        n.memory.eventConceptProcess.on(p -> {
+        n.eventConceptProcess.on(p -> {
             Task belief = p.belief();
             if (belief == null) return;
             Task task = p.task();
 
-            Random r = p.memory().random;
+            Random r = p.nar().random;
 
             int vol = Math.max(task.term().volume(), belief.term().volume());
             if (random(r, INTERNAL_EXPERIENCE_RARE_PROBABILITY, vol)) {
@@ -188,7 +188,7 @@ public class Inperience {
 
         final Term self = nar.self;
 
-        if (!random(nar.memory.random, INTERNAL_EXPERIENCE_PROBABILITY, task.term().volume()))
+        if (!random(nar.random, INTERNAL_EXPERIENCE_PROBABILITY, task.term().volume()))
             return;
 
         // if(OLD_BELIEVE_WANT_EVALUATE_WONDER_STRATEGY ||

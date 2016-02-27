@@ -1,6 +1,7 @@
 package nars.op.sys;
 
 import com.google.common.collect.Iterators;
+import nars.Memory;
 import nars.NAR;
 import nars.bag.BLink;
 import nars.budget.ItemAccumulator;
@@ -62,17 +63,17 @@ public class Commander implements Consumer<NAR>, Supplier<Concept> {
 
         //TODO reset event
         //this.cycleEnd = active ?
-                nar.memory.eventFrameStart.on(this);
+                nar.eventFrameStart.on(this);
                 //: null;
 
         commands = buffer;
         commandIterator = Iterators.cycle(commands.bag());
 
 
-        maxTemporalBeliefAge = nar.memory.duration() * maxTemporalBeliefDurations;
+        maxTemporalBeliefAge = nar.duration() * maxTemporalBeliefDurations;
 
 
-        nar.memory.eventInput.on((tp) -> {
+        nar.eventInput.on((tp) -> {
             Task t = tp.task();
             if (t.isInput() && !commands.bag().contains(t))
                 input(t);

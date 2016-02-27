@@ -1,6 +1,7 @@
 package nars.nal;
 
 import nars.Global;
+import nars.Memory;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.nar.Default;
@@ -105,8 +106,8 @@ public class TuffySmokesTest {
 		Global.DEBUG = true;
 
 		NAR n = new Default(1000, 3, 2, 3);
-		n.memory.activationRate.setValue(0.5f);
-		n.memory.conceptForgetDurations.setValue(5);
+		((Memory) NAR.this).activationRate.setValue(0.5f);
+		((Memory) NAR.this).conceptForgetDurations.setValue(5);
 
 		// n.log();
 

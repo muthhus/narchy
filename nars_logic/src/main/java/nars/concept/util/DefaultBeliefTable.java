@@ -222,7 +222,7 @@ public class DefaultBeliefTable implements BeliefTable {
                 //Average allows duplicate tasks to not explode like plus would
                 BudgetMerge.plusDQBlend.merge(existing.budget(), input.budget(), 1f);
                 ((MutableTask) existing).state(input.state()); //reset execution / anticipated state
-                nar.memory.remove(input, "Duplicate Belief/Goal");
+                nar.remove(input, "Duplicate Belief/Goal");
             }
             return true;
         }
@@ -363,7 +363,7 @@ public class DefaultBeliefTable implements BeliefTable {
 
         BudgetFunctions.budgetRevision(t, newBelief, oldBelief);
 
-        if (!BudgetFunctions.valid(t.budget(), nar.memory))
+        if (!BudgetFunctions.valid(t.budget(), nar))
             return null;
 
         return oldBelief.onRevision(t) ? t : null;
@@ -443,7 +443,7 @@ public class DefaultBeliefTable implements BeliefTable {
 
 
     private static void onBeliefRemoved(@NotNull Task t, String reason, @NotNull NAR nar) {
-        onBeliefRemoved(t, reason, nar.memory);
+        onBeliefRemoved(t, reason, nar);
     }
 
     private static void onBeliefRemoved(@NotNull Task t, String reason, @NotNull Memory memory) {

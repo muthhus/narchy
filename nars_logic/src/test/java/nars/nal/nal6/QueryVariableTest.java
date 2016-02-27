@@ -1,6 +1,7 @@
 package nars.nal.nal6;
 
 import nars.Global;
+import nars.Memory;
 import nars.NAR;
 import nars.nal.AbstractNALTest;
 import nars.nar.Default;
@@ -57,13 +58,13 @@ public class QueryVariableTest extends AbstractNALTest {
 
         int[] answers = new int[1];
 
-        n.memory.eventTaskProcess.on( d-> {
+        n.eventTaskProcess.on(d-> {
             if (d.term().hasVarQuery())
                 derivations.add(d);
             if (d.isJudgment() && d.term().toString().equals(belief))
                 assertFalse(d + " should not have been derived", Util.equals(d.conf(), 0.81f, 0.01f));
         } );
-        n.memory.eventAnswer.on( p -> {
+        n.eventAnswer.on(p -> {
             System.out.println("q: " + p.getOne() + " a: " + p.getTwo());
             answers[0]++;
         });

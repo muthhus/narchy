@@ -5,6 +5,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
+import nars.Memory;
 import nars.NAR;
 import nars.guifx.chart.Plot2D;
 import nars.guifx.util.NSlider;
@@ -88,7 +89,7 @@ public class NARMenu extends HBox {
                     try {
                         NQuadsRDF.input(n, new FileInputStream(f));
                     } catch (Exception e) {
-                        n.memory.eventError.emit(e);
+                        ((Memory) NAR.this).eventError.emit(e);
                     }
                 }
             }
@@ -199,7 +200,7 @@ public class NARMenu extends HBox {
             super(nar);
 
 
-            this.clock = (RealtimeMSClock)nar.memory.clock;
+            this.clock = (RealtimeMSClock) ((Memory) NAR.this).clock;
             this.startTime = nar.time();
 
             clockTextField = new TextField();
@@ -207,9 +208,9 @@ public class NARMenu extends HBox {
 
 
             busyPlot = new Plot2D(Plot2D.Line, WINDOW_SIZE, 192);
-            busyPlot.add("Busy", ()->(double)nar.memory.emotion.busy());
-            busyPlot.add("avg short", ()->rollingAverage(busyAvgShort, (double)nar.memory.emotion.busy()));
-            busyPlot.add("avg long", ()->rollingAverage(busyAvgLong, (double)nar.memory.emotion.busy()));
+            busyPlot.add("Busy", ()->(double) ((Memory) NAR.this).emotion.busy());
+            busyPlot.add("avg short", ()->rollingAverage(busyAvgShort, (double) ((Memory) NAR.this).emotion.busy()));
+            busyPlot.add("avg long", ()->rollingAverage(busyAvgLong, (double) ((Memory) NAR.this).emotion.busy()));
 
 //            final Pane controls = new VBox(
 //                    timeDisplay,
@@ -283,11 +284,11 @@ public class NARMenu extends HBox {
             nar = n;
 
             regs = new Active().add(
-                    n.memory.eventFrameStart.on(nn -> {
+                    ((Memory) NAR.this).eventFrameStart.on(nn -> {
                         //System.out.println("frame: " + nn.time());
                         run();
                     }),
-                    n.memory.eventReset.on(nn -> run())
+                    ((Memory) NAR.this).eventReset.on(nn -> run())
             );
 
 

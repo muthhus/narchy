@@ -2,6 +2,7 @@ package nars.op.sys.java;
 
 import com.google.common.collect.Lists;
 import nars.Global;
+import nars.Memory;
 import nars.NAR;
 import nars.nar.Default;
 import nars.term.Term;
@@ -94,13 +95,13 @@ public class NALObjectsTest  {
 
         String instance = "o";
 
-        int startSize = n.memory.exe.size();
+        int startSize = n.exe.size();
 
         Lobjects no = new Lobjects(n);
 
         T wrapper = no.theOrNull(instance, T.class);
 
-        assertEquals("one ClassOperator registered", 1, n.memory.exe.size() - startSize);
+        assertEquals("one ClassOperator registered", 1, n.exe.size() - startSize);
 
         assertNotEquals(T.class, wrapper.getClass());
         assertEquals(T.class, wrapper.getClass().getSuperclass());
@@ -117,7 +118,7 @@ public class NALObjectsTest  {
         AtomicInteger puppets = new AtomicInteger(0);
         AtomicInteger inputs = new AtomicInteger(0);
 
-        n.memory.eventTaskProcess.on(t -> {
+        n.eventTaskProcess.on(t -> {
             List log = t.log();
             if (log == null)
                 return;

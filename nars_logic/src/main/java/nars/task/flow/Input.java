@@ -19,6 +19,7 @@
 
 package nars.task.flow;
 
+import nars.Memory;
 import nars.NAR;
 import nars.task.Task;
 import nars.util.data.buffer.Source;
@@ -75,7 +76,7 @@ public interface Input extends Source<Task> {
             }
         };
 
-        reg[0] = n.memory.eventFrameStart.on(inputNext);
+        reg[0] = n.eventFrameStart.on(inputNext);
 
         inputNext.accept(n);//first input
     }

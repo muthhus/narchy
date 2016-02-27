@@ -306,7 +306,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
     @Nullable
     default CharSequence toString(@NotNull NAR nar, boolean showStamp) {
-        return toString(nar.memory, showStamp);
+        return toString(nar, showStamp);
     }
 
     @Nullable

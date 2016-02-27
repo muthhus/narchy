@@ -2,6 +2,8 @@ package nars.bag;
 
 import com.gs.collections.impl.list.mutable.primitive.DoubleArrayList;
 import nars.Global;
+import nars.Memory;
+import nars.NAR;
 import nars.bag.impl.ArrayBag;
 import nars.bag.impl.CurveBag;
 import nars.budget.BudgetMerge;
@@ -142,10 +144,10 @@ public class CurveBagTest  {
 
     @Test public void testDistribution() {
         Default n = new Default(48, 4, 2, 4);
-        n.memory.conceptForgetDurations.setValue(100);
-        n.memory.termLinkForgetDurations.setValue(100);
-        n.memory.taskLinkForgetDurations.setValue(100);
-        n.memory.perfection.setValue(1f);
+        n.conceptForgetDurations.setValue(100);
+        n.termLinkForgetDurations.setValue(100);
+        n.taskLinkForgetDurations.setValue(100);
+        n.perfection.setValue(1f);
         n.input("$1$ a:b.");
         n.input("$1$ b:c.");
         n.input("$1$ c:d.");

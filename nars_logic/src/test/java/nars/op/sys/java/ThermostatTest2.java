@@ -2,6 +2,8 @@ package nars.op.sys.java;
 
 import com.gs.collections.api.tuple.Twin;
 import nars.Global;
+import nars.Memory;
+import nars.NAR;
 import nars.nar.Default;
 import nars.task.Task;
 import nars.task.Tasked;
@@ -89,7 +91,7 @@ public enum ThermostatTest2 {
         int dur = 5;
 
         Default n = new Default(1024, 1, 2, 3);
-        n.memory.duration.set(dur);
+        n.duration.set(dur);
 
         //n.getInput().inputPerCycle.set(2);
 
@@ -224,9 +226,9 @@ public enum ThermostatTest2 {
 
             for (int j = 0; j < runLength; j++){
 
-                if (n.memory.random.nextFloat() < inputRate) {
-                    if (n.memory.random.nextFloat() < gamma) {
-                        tc.go( n.memory.random.nextBoolean() );
+                if (n.random.nextFloat() < inputRate) {
+                    if (n.random.nextFloat() < gamma) {
+                        tc.go( n.random.nextBoolean() );
                     } else {
                         //n.input("Model_go((T,(true),#1))! :|: %0.51%");
                         //n.input("Model_go((T,((--,true)),#1))! :|: %0.51%");

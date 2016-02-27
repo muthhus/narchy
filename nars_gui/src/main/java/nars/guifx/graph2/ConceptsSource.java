@@ -3,6 +3,7 @@ package nars.guifx.graph2;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import nars.Global;
+import nars.Memory;
 import nars.NAR;
 import nars.bag.BLink;
 import nars.bag.Bag;
@@ -149,7 +150,7 @@ public class ConceptsSource extends GraphSource {
                 /*nar.memory.eventConceptActivated.on(
                         c -> refresh.set(true)
                 ),*/
-                nar.memory.eventFrameStart.on(h -> {
+                ((Memory) NAR.this).eventFrameStart.on(h -> {
                     refresh.set(true);
                     updateGraph();
                 })

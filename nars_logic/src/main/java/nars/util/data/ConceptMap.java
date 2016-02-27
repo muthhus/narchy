@@ -1,5 +1,6 @@
 package nars.util.data;
 
+import nars.Memory;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.util.event.Active;
@@ -27,11 +28,11 @@ public abstract class ConceptMap {
 	protected ConceptMap(@NotNull NAR nar) {
 
         regs = new Active(
-        nar.memory.eventReset.on(n -> {
+        nar.eventReset.on(n -> {
             frame = 0;
             reset();
         }),
-        nar.memory.eventFrameStart.on(n -> {
+        nar.eventFrameStart.on(n -> {
             frame++;
             onFrame();
             cycleInFrame = 0;
@@ -40,7 +41,7 @@ public abstract class ConceptMap {
 //        nar.memory.eventConceptForget.on(c -> {
 //            onConceptForget(c);
 //        }),
-        nar.memory.eventCycleEnd.on(m -> {
+        nar.eventCycleEnd.on(m -> {
             cycleInFrame++;
             onCycle();
         }) );

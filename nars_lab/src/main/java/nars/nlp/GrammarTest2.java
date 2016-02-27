@@ -5,6 +5,7 @@ import com.gs.collections.api.tuple.primitive.CharFloatPair;
 import com.gs.collections.impl.map.mutable.primitive.CharFloatHashMap;
 import com.gs.collections.impl.set.mutable.primitive.CharHashSet;
 import nars.Global;
+import nars.Memory;
 import nars.NAR;
 import nars.Symbols;
 import nars.concept.Concept;
@@ -53,7 +54,7 @@ public class GrammarTest2 {
     public GrammarTest2() throws Exception  {
         n = new Default(2000, 8, 3, 3);
 
-        this.executionFilter = n.memory.executionThreshold;
+        this.executionFilter = ((Memory) NAR.this).executionThreshold;
         Lobjects o = new Lobjects(n);
         this.tape = o.the("tape", Tape.class,
                 //"aaabbbaaabbb               ",
@@ -99,18 +100,18 @@ public class GrammarTest2 {
         //n.logSummaryGT(System.out, 0.5f);
 
         q.power.setValue(0.3f);
-        n.memory.activationRate.setValue(0.9f);
+        ((Memory) NAR.this).activationRate.setValue(0.9f);
 
         //n.memory.executionThreshold.setValue(0.55f);
         n.premiser.confMin.setValue(0.01f);
 
         //n.memory.executionThreshold.setValue(.6f);
-        n.memory.DEFAULT_JUDGMENT_PRIORITY = 0.5f;
-        n.memory.DEFAULT_GOAL_PRIORITY = 0.5f;
+        ((Memory) NAR.this).DEFAULT_JUDGMENT_PRIORITY = 0.5f;
+        ((Memory) NAR.this).DEFAULT_GOAL_PRIORITY = 0.5f;
 
-        n.memory.duration.set(Math.ceil(charRate.floatValue()/4f));
-        n.memory.shortTermMemoryHistory.set(2);
-        n.memory.cyclesPerFrame.set(2);
+        ((Memory) NAR.this).duration.set(Math.ceil(charRate.floatValue()/4f));
+        ((Memory) NAR.this).shortTermMemoryHistory.set(2);
+        ((Memory) NAR.this).cyclesPerFrame.set(2);
         
         //n.initNAL9();
 

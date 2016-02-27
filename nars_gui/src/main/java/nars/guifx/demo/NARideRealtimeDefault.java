@@ -2,6 +2,7 @@ package nars.guifx.demo;
 
 import javassist.scopedpool.SoftValueHashMap;
 import nars.Memory;
+import nars.NAR;
 import nars.concept.Concept;
 import nars.concept.DefaultConceptBuilder;
 import nars.nar.Default;
@@ -45,7 +46,7 @@ public enum NARideRealtimeDefault {
         Default nar = new Default(1024, 1, 2, 2) {
             @Override
             public Function<Term, Concept> newConceptBuilder() {
-                return new DefaultConceptBuilder(this.memory.random, 32, 128);
+                return new DefaultConceptBuilder(NAR.this.random, 32, 128);
             }
         }.with(
                 Anticipate.class,
@@ -60,7 +61,7 @@ public enum NARideRealtimeDefault {
         /*nar.memory.conceptForgetDurations.set(10);
         nar.memory.termLinkForgetDurations.set(100);*/
 
-        nar.memory.duration.set(750 /* ie, milliseconds */);
+        ((Memory) NAR.this).duration.set(750 /* ie, milliseconds */);
         //nar.spawnThread(1000/60);
 
 

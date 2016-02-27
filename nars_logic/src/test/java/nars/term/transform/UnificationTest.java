@@ -1,10 +1,7 @@
 package nars.term.transform;
 
 import com.gs.collections.impl.factory.Sets;
-import nars.Global;
-import nars.NAR;
-import nars.Narsese;
-import nars.Op;
+import nars.*;
 import nars.concept.Concept;
 import nars.nal.meta.PatternCompound;
 import nars.nar.Default;
@@ -78,7 +75,7 @@ public class UnificationTest  {
 
         AtomicBoolean subbed = new AtomicBoolean(false);
 
-        FindSubst sub = new FindSubst(type, nar.memory.random) {
+        FindSubst sub = new FindSubst(type, nar.random) {
 
 //            @Override
 //            public void onPartial() {

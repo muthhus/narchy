@@ -11,9 +11,6 @@ public abstract class CycleReaction implements Consumer<Memory> {
 
     private final On cycleReg;
 
-    protected CycleReaction(@NotNull NAR nar) {
-        this(nar.memory);
-    }
 
     protected CycleReaction(@NotNull Memory memory) {
         cycleReg = memory.eventCycleEnd.on(this);

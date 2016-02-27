@@ -1,5 +1,6 @@
 package nars.task.flow;
 
+import nars.Memory;
 import nars.NAR;
 import nars.budget.ItemAccumulator;
 import nars.task.Task;
@@ -24,7 +25,7 @@ public class SortedTaskPerception extends TaskPerception {
      */
     public SortedTaskPerception(@NotNull NAR nar,
                                 int capacity, int inputPerCycle) {
-        super(nar.memory);
+        super(nar);
 
         this.inputPerCycle.set( inputPerCycle );
 

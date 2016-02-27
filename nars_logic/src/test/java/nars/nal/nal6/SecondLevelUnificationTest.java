@@ -1,5 +1,6 @@
 package nars.nal.nal6;
 
+import nars.Memory;
 import nars.NAR;
 import nars.Narsese;
 import nars.nar.Default;
@@ -16,7 +17,7 @@ public class SecondLevelUnificationTest {
         NAR n = new Default(512, 1, 2, 3);
 
         //n.log();
-        n.memory.eventTaskRemoved.on(t -> {
+        n.eventTaskRemoved.on(t -> {
            //System.err.println("rm: " + t + " " + t.getLogLast());
         });
 
@@ -30,7 +31,7 @@ public class SecondLevelUnificationTest {
         NAR n = new Default(512, 1, 2, 3);
 
         //n.log();
-        n.memory.eventTaskRemoved.on(t -> {
+        n.eventTaskRemoved.on(t -> {
             //System.err.println("rm: " + t + " " + t.getLogLast());
         });
 

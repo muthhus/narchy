@@ -19,10 +19,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import nars.$;
-import nars.Global;
-import nars.NAR;
-import nars.NARLoop;
+import nars.*;
 import nars.budget.Budget;
 import nars.budget.BudgetedHandle;
 import nars.concept.Concept;
@@ -257,8 +254,8 @@ public class NARide extends StackPane {
 
         nar.onExec("memstat", (c) -> {
             String report = "";
-            report += "Busy: " + nar.memory.emotion.busy() + "<br/>";
-            report += "Index Size (Terms): " + nar.memory.index.size() + "<br/>";
+            report += "Busy: " + ((Memory) NAR.this).emotion.busy() + "<br/>";
+            report += "Index Size (Terms): " + ((Memory) NAR.this).index.size() + "<br/>";
             report += "Active Concept Bag Histogram: " +
                     Arrays.toString(((Default)nar).core.active.getPriorityHistogram(10)) + "<br/>";
             nar.input("html(\"" + report + "\");");
@@ -425,12 +422,12 @@ public class NARide extends StackPane {
 //    }
 
     public void addIcon(FXIconPaneBuilder n) {
-        nar.memory.the(n);
+        ((Memory) NAR.this).the(n);
         pp.update();
     }
 
     public void addView(Node n) {
-        nar.memory.the(n);
+        ((Memory) NAR.this).the(n);
 
         content.getTabs().add(new TabX(
                 n.getClass().getSimpleName(),
@@ -636,7 +633,7 @@ public class NARide extends StackPane {
             nar.onFrame(c -> {
 
                 int activeConcepts = l.active.size();
-                TermIndex index = nar.memory.index;
+                TermIndex index = ((Memory) NAR.this).index;
                 int totalConcepts = index.size();
                 int uniqueSubterms = index.subtermsCount();
 

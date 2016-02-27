@@ -1,6 +1,7 @@
 package nars.concept;
 
 import nars.Global;
+import nars.Memory;
 import nars.NAR;
 import nars.nal.Tense;
 import nars.nar.AbstractNAR;
@@ -66,7 +67,7 @@ public class BeliefTableTest  {
             */
 
         //}
-        d.memory.conceptBeliefsMax.set(maxBeliefs);
+        d.conceptBeliefsMax.set(maxBeliefs);
         return d;
     }
 
@@ -119,7 +120,7 @@ public class BeliefTableTest  {
     public void testTruthOscillation() {
 
         NAR n = newNAR(8);
-        n.memory.duration.set(1);
+        n.duration.set(1);
 
         int offCycles = 2;
 
@@ -167,7 +168,7 @@ public class BeliefTableTest  {
         int maxBeliefs = 16;
         NAR n = newNAR(maxBeliefs);
 
-        n.memory.duration.set(1);
+        n.duration.set(1);
 
 
         BeliefAnalysis b = new BeliefAnalysis(n, "<a-->b>");
@@ -238,7 +239,7 @@ public class BeliefTableTest  {
 
         NAR n = newNAR(12);
 
-        n.memory.duration.set(5);
+        n.duration.set(5);
 
         BeliefAnalysis b = new BeliefAnalysis(n, "a:b");
 
@@ -269,7 +270,7 @@ public class BeliefTableTest  {
         int maxBeliefs = 12;
         NAR n = newNAR(maxBeliefs);
 
-        n.memory.duration.set(5);
+        n.duration.set(5);
 
         BeliefAnalysis b = new BeliefAnalysis(n, "<a-->b>");
 

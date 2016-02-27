@@ -1,6 +1,7 @@
 package nars.concept.util;
 
 import com.google.common.collect.Iterators;
+import nars.Memory;
 import nars.NAR;
 import nars.nal.Tense;
 import nars.task.Task;
@@ -333,7 +334,7 @@ public interface BeliefTable extends TaskTable {
 
     @Nullable
     default Task top(@NotNull NAR n) {
-        return top(n.memory.time());
+        return top(n.time());
     }
 
     /** simple metric that guages the level of inconsistency (ex: variance) aggregated by contained belief states.

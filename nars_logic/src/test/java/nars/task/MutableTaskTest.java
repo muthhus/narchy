@@ -1,5 +1,6 @@
 package nars.task;
 
+import nars.Memory;
 import nars.NAR;
 import nars.nal.Tense;
 import nars.nar.Default;
@@ -24,7 +25,7 @@ public class MutableTaskTest {
 
         assertTrue("tense=eternal is eternal", Tense.isEternal(new MutableTask(n.term(s)).eternal().occurrence()));
 
-        assertTrue("present is non-eternal", !Tense.isEternal(new MutableTask(n.term(s)).present(n.memory).occurrence()));
+        assertTrue("present is non-eternal", !Tense.isEternal(new MutableTask(n.term(s)).present(n).occurrence()));
 
     }
 
@@ -36,7 +37,7 @@ public class MutableTaskTest {
 
         //the final occurr() or tense() is the value applied
         assertTrue(!Tense.isEternal(new MutableTask(n.term(s)).eternal().occurr(100).occurrence()));
-        assertTrue(!Tense.isEternal(new MutableTask(n.term(s)).eternal().present(n.memory).occurrence()));
+        assertTrue(!Tense.isEternal(new MutableTask(n.term(s)).eternal().present(n).occurrence()));
         assertTrue(Tense.isEternal(new MutableTask(n.term(s)).occurr(100).eternal().occurrence()));
     }
 

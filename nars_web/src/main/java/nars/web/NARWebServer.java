@@ -8,6 +8,7 @@ import io.undertow.websockets.WebSocketConnectionCallback;
 import io.undertow.websockets.core.*;
 import io.undertow.websockets.extensions.PerMessageDeflateHandshake;
 import io.undertow.websockets.spi.WebSocketHttpExchange;
+import nars.Memory;
 import nars.NAR;
 import nars.NARLoop;
 import nars.nar.Default;
@@ -60,13 +61,13 @@ public class NARWebServer extends PathHandler {
 
 
             active = new Active(
-                nar.memory.eventInput.on(t -> send(socket,
+                ((Memory) NAR.this).eventInput.on(t -> send(socket,
                         " IN: " + t)),
                 /*nar.memory.eventDerived.on(t -> send(socket,
                         "DER: " + t)),*/
-                nar.memory.eventAnswer.on(t -> send(socket,
+                ((Memory) NAR.this).eventAnswer.on(t -> send(socket,
                         "ANS: " + t)),
-                nar.memory.eventError.on(t -> send(socket,
+                ((Memory) NAR.this).eventError.on(t -> send(socket,
                         "ERR: " + t))
             );
 

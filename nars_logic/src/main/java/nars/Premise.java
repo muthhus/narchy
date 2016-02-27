@@ -39,13 +39,6 @@ public interface Premise extends Level, Tasked {
 
 
 
-    @NotNull
-    default Memory memory() {
-        return nar().memory;
-    }
-
-
-
 
 //    /**
 //     * produces a cropped and filtered stack trace (list of methods called)

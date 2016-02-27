@@ -22,7 +22,6 @@ import nars.op.mental.*;
 import nars.op.data.complexity;
 import nars.op.data.reflect;
 import nars.op.sys.js;
-import nars.op.sys.shell.shell;
 import nars.term.Term;
 import nars.term.TermIndex;
 import nars.term.atom.Atom;
@@ -81,7 +80,7 @@ public abstract class AbstractNAR extends NAR {
 
     public void initNAL7() {
         //NAL7 plugins
-        memory.the(new STMTemporalLinkage(this));
+        the(new STMTemporalLinkage(this));
     }
 
     public void initNAL8() {
@@ -105,8 +104,8 @@ public abstract class AbstractNAR extends NAR {
 
     @Deprecated public void initNAL9() {
 
-        memory.the(new Anticipate(this));
-        memory.the(new Inperience(this));
+        the(new Anticipate(this));
+        the(new Inperience(this));
         //memory.the(new Abbreviation(this, "_"));
 
         //onExec(Counting.class);
@@ -124,30 +123,28 @@ public abstract class AbstractNAR extends NAR {
 
     protected void initDefaults() {
 
-        final Memory m = this.memory;
 
+        this.duration.set(5);
 
-        m.duration.set(5);
+        this.conceptBeliefsMax.set(16);
+        this.conceptGoalsMax.set(12);
+        this.conceptQuestionsMax.set(3);
 
-        m.conceptBeliefsMax.set(16);
-        m.conceptGoalsMax.set(12);
-        m.conceptQuestionsMax.set(3);
+        this.conceptForgetDurations.setValue(2.0);
+        this.termLinkForgetDurations.setValue(5.0);
+        this.taskLinkForgetDurations.setValue(3.0);
 
-        m.conceptForgetDurations.setValue(2.0);
-        m.termLinkForgetDurations.setValue(5.0);
-        m.taskLinkForgetDurations.setValue(3.0);
+        this.derivationDurabilityThreshold.setValue(Global.DERIVATION_DURABILITY_THRESHOLD);
 
-        m.derivationDurabilityThreshold.setValue(Global.DERIVATION_DURABILITY_THRESHOLD);
-
-        m.taskProcessThreshold.setValue(0); //warning: if this is not zero, it could remove un-TaskProcess-able tasks even if they are stored by a Concept
+        this.taskProcessThreshold.setValue(0); //warning: if this is not zero, it could remove un-TaskProcess-able tasks even if they are stored by a Concept
 
         //budget propagation thresholds
-        m.termLinkThreshold.setValue(Global.BUDGET_PROPAGATION_EPSILON);
-        m.taskLinkThreshold.setValue(Global.BUDGET_PROPAGATION_EPSILON);
+        this.termLinkThreshold.setValue(Global.BUDGET_PROPAGATION_EPSILON);
+        this.taskLinkThreshold.setValue(Global.BUDGET_PROPAGATION_EPSILON);
 
-        m.executionThreshold.setValue(Global.TRUTH_EPSILON);
+        this.executionThreshold.setValue(Global.TRUTH_EPSILON);
 
-        m.shortTermMemoryHistory.set(2);
+        this.shortTermMemoryHistory.set(2);
 
 
         this.conceptBuilder = newConceptBuilder();

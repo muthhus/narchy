@@ -69,10 +69,9 @@ public enum Forget { ;
 
         final void accept(@NotNull NAR nar) {
             //same for duration of the cycle
-            @NotNull Memory m = nar.memory;
-            forgetCyclesCached = forgetDurations.floatValue() * m.duration();
+            forgetCyclesCached = forgetDurations.floatValue() * nar.duration();
             perfectionCached = perfection.floatValue();
-            now = m.time();
+            now = nar.time();
         }
 
         @NotNull

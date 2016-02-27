@@ -2,6 +2,7 @@ package nars.sonification;
 
 import nars.Audio;
 import nars.Global;
+import nars.Memory;
 import nars.NAR;
 import nars.audio.SoundProducer;
 import nars.audio.granular.Granulize;
@@ -65,7 +66,7 @@ public class ConceptSonification extends FrameReaction {
 
         updateSamples();
 
-        nar.memory.eventConceptProcess.on(c -> update(c.concept()));
+        ((Memory) NAR.this).eventConceptProcess.on(c -> update(c.concept()));
         //TODO update all existing concepts on start?
     }
 

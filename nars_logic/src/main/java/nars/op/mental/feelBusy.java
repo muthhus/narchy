@@ -18,6 +18,8 @@
 package nars.op.mental;
 
 import nars.$;
+import nars.Memory;
+import nars.NAR;
 import nars.nal.nal8.Execution;
 import nars.task.Task;
 import nars.term.Term;
@@ -37,7 +39,7 @@ public class feelBusy extends feel {
     @Override
     public void execute(@NotNull Task e) {
         Execution.feedback(e,
-            feeling(nar.memory.emotion.busy(), nar, business), nar
+            feeling(nar.emotion.busy(), nar, business), nar
         );
     }
 

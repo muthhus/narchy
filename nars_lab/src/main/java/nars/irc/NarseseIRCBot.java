@@ -3,6 +3,8 @@ package nars.irc;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import nars.Global;
+import nars.Memory;
+import nars.NAR;
 import nars.NARLoop;
 import nars.bag.BLink;
 import nars.bag.impl.DigestBag;
@@ -31,7 +33,7 @@ public class NarseseIRCBot extends IRCBot {
         if (t instanceof Task) {
             Task tt = (Task)t;
 
-            String ss = ((Task)t).toStringWithoutBudget(nar.memory);
+            String ss = ((Task)t).toStringWithoutBudget((Memory) NAR.this);
 
             if (tt.log()!=null && tt.getLogLast().toString().startsWith("Answer"))
                 ss += " " + tt.getLogLast();
@@ -269,7 +271,7 @@ public class NarseseIRCBot extends IRCBot {
 
         output = new DigestBag.OutputBuffer(nar, 128);
 
-        nar.memory.duration.set(2000);
+        ((Memory) NAR.this).duration.set(2000);
         nar.core.conceptsFiredPerCycle.set(256);
 
         //nar.log();

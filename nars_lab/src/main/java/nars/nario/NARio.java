@@ -3,6 +3,7 @@ package nars.nario;
 import com.gs.collections.impl.list.mutable.primitive.DoubleArrayList;
 import jurls.reinforcementlearning.domains.RLEnvironment;
 import nars.Global;
+import nars.Memory;
 import nars.NAR;
 import nars.Video;
 import nars.guifx.demo.NARide;
@@ -508,12 +509,12 @@ public class NARio extends Run implements RLEnvironment {
 
         //new TextOutput(nar, System.out).setShowInput(true);
 
-        nar.memory.duration.set(memoryCyclesPerFrame * 3);
-        nar.memory.cyclesPerFrame.set(memoryCyclesPerFrame);
+        ((Memory) NAR.this).duration.set(memoryCyclesPerFrame * 3);
+        ((Memory) NAR.this).cyclesPerFrame.set(memoryCyclesPerFrame);
 
         //nar.memory.outputVolume.set(0);
         //nar.memory.executionThreshold.set(0.75);
-        nar.memory.shortTermMemoryHistory.set(5);
+        ((Memory) NAR.this).shortTermMemoryHistory.set(5);
 
         float fps = 70.0f;
         gameRate = 1.0f / fps;

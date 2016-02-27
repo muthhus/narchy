@@ -2,6 +2,7 @@ package nars.util.signal;
 
 import nars.$;
 import nars.Global;
+import nars.Memory;
 import nars.NAR;
 import nars.nal.Tense;
 import nars.task.Task;
@@ -78,8 +79,8 @@ public class TestNAR  {
         this.outputEvents = new Topic[] {
             //nar.memory.eventDerived,
             //nar.memory.eventInput,
-            nar.memory.eventTaskProcess,
-            nar.memory.eventTaskRemoved,
+            nar.eventTaskProcess,
+            nar.eventTaskRemoved,
             //nar.memory.eventRevision,
             answerReceiver
         };
@@ -87,7 +88,7 @@ public class TestNAR  {
         this.nar = nar;
 
         //adapt 'answer' events (Twin<Task>) answer task component to the answerReceiver topic
-        nar.memory.eventAnswer.on(tt -> {
+        nar.eventAnswer.on(tt -> {
             Task t = tt.getTwo();
             //t.log("Answers " + tt.getOne());
             answerReceiver.emit(t);

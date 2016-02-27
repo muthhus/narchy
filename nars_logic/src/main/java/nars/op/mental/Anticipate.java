@@ -25,6 +25,7 @@ package nars.op.mental;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import nars.Global;
+import nars.Memory;
 import nars.NAR;
 import nars.Symbols;
 import nars.task.MutableTask;
@@ -70,8 +71,8 @@ public final class Anticipate {
     public Anticipate(@NotNull NAR nar) {
         this.nar = nar;
 
-        nar.memory.eventFrameStart.on(c -> updateAnticipations());
-        nar.memory.eventTaskProcess.on(this::onInput);
+        nar.eventFrameStart.on(c -> updateAnticipations());
+        nar.eventTaskProcess.on(this::onInput);
     }
 
     public void onInput(@NotNull Task t) {
@@ -129,7 +130,7 @@ public final class Anticipate {
 
         nar.input(new MutableTask(prediction) //$.neg(prediction))
                 .belief()
-                .truth(0f /* FALSE */, nar.memory.getTruthDefault(Symbols.BELIEF).conf())
+                .truth(0f /* FALSE */, nar.getTruthDefault(Symbols.BELIEF).conf())
                 .time(nar.time(), expectedOccurrenceTime)
                 //.parent(tt, null)
                 .because("Absent Anticipated Event"));
@@ -148,7 +149,7 @@ public final class Anticipate {
 
         final List<Task> toRemove = this.toRemove;
 
-        int tolerance = nar.memory.duration();
+        int tolerance = nar.duration();
 
         Multimap<Compound, Task> a = this.anticipations;
         Compound ct = c.term();
@@ -167,11 +168,11 @@ public final class Anticipate {
 
         if (anticipations.isEmpty()) return;
 
-        long now = nar.memory.time();
+        long now = nar.time();
 
         Iterator<Map.Entry<Compound, Task>> it = anticipations.entries().iterator();
 
-        int halfDur = nar.memory.duration();
+        int halfDur = nar.duration();
         while (it.hasNext()) {
 
             Map.Entry<Compound, Task> t = it.next();

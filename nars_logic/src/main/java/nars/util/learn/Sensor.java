@@ -2,6 +2,7 @@ package nars.util.learn;
 
 import com.gs.collections.api.block.function.primitive.FloatFunction;
 import com.gs.collections.api.block.function.primitive.FloatToFloatFunction;
+import nars.Memory;
 import nars.NAR;
 import nars.Symbols;
 import nars.task.MutableTask;
@@ -40,8 +41,8 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
     private long lastInput;
 
     public Sensor(@NotNull NAR n, Term t, FloatFunction<Term> value, FloatToFloatFunction valueToFreq) {
-        this(n, t, value, valueToFreq, n.memory.getDefaultConfidence(Symbols.BELIEF),
-                n.memory.DEFAULT_JUDGMENT_PRIORITY, n.memory.DEFAULT_JUDGMENT_DURABILITY);
+        this(n, t, value, valueToFreq, n.getDefaultConfidence(Symbols.BELIEF),
+                n.DEFAULT_JUDGMENT_PRIORITY, n.DEFAULT_JUDGMENT_DURABILITY);
     }
 
     public Sensor(@NotNull NAR n, Term t, FloatFunction<Term> value, FloatToFloatFunction valueToFreq, float conf, float pri, float dur) {

@@ -5,6 +5,7 @@
 package nars.util.event;
 
 import com.gs.collections.api.tuple.Twin;
+import nars.Memory;
 import nars.NAR;
 import nars.Narsese;
 import nars.concept.Concept;
@@ -44,7 +45,7 @@ public abstract class AnswerReaction implements Consumer<Twin<Task>> {
         nar = n;
         this.question = question;
 
-        reg = n.memory.eventAnswer.on(this);
+        reg = n.eventAnswer.on(this);
 
         if (question!=null) {
             reportAnyExistingSolutions();

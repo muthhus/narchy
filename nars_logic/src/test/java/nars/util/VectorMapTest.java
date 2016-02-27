@@ -1,5 +1,6 @@
 package nars.util;
 
+import nars.Memory;
 import nars.NAR;
 import nars.nar.Default;
 import nars.util.data.UniformVector;
@@ -52,7 +53,7 @@ public class VectorMapTest {
             
             @Override protected void map(float[] in, float[] out) {
                 if (d == null)
-                    d = new Autoencoder(in.length, out.length, n.memory.random);
+                    d = new Autoencoder(in.length, out.length, n.random);
 
                 d.train(in, 0, 0.05f, 0, true);
                 d.encode(in, out, true, true);                

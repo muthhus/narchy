@@ -1,5 +1,6 @@
 package nars.nar.experimental;
 
+import nars.Memory;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.nal.Deriver;
@@ -32,7 +33,7 @@ public abstract class DeriveletContext implements Consumer<NAR> {
         this.nar = nar;
         this.rng = rng;
         this.conceptSupply = conceptSupply;
-        nar.memory.eventFrameStart.on(this);
+        nar.eventFrameStart.on(this);
     }
 
     @Override

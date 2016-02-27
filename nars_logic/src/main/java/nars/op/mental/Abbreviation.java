@@ -1,6 +1,7 @@
 package nars.op.mental;
 
 import nars.$;
+import nars.Memory;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.task.MutableTask;
@@ -11,6 +12,8 @@ import org.apache.commons.lang3.mutable.MutableFloat;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -21,6 +24,7 @@ import java.util.function.Consumer;
  */
 public class Abbreviation implements Consumer<Task> {
 
+    public static final Logger logger = LoggerFactory.getLogger(Abbreviation.class);
 
     private static final AtomicInteger currentTermSerial = new AtomicInteger(1);
     //when a concept is important and exceeds a syntactic complexity, let NARS name it:
@@ -45,7 +49,7 @@ public class Abbreviation implements Consumer<Task> {
         this.nar = n;
         this.termPrefix = termPrefix;
 
-        n.memory.eventTaskProcess.on(this);
+        n.eventTaskProcess.on(this);
 
     }
 
@@ -109,7 +113,7 @@ public class Abbreviation implements Consumer<Task> {
 
         //is it complex and also important? then give it a name:
         if (canAbbreviate(task)) {
-            if ((nar.memory.random.nextFloat() <= abbreviationProbability.floatValue())) {
+            if (nar.random.nextFloat() <= abbreviationProbability.floatValue()) {
 
                 Concept abbreviated = task.concept(nar);
                 if (abbreviated != null && abbreviated.get(Abbreviation.class) == null) {
@@ -122,12 +126,13 @@ public class Abbreviation implements Consumer<Task> {
                         abbreviation.put(Abbreviation.class, abbreviation); //abbreviated by itself
                         abbreviated.put(Abbreviation.class, id); //abbreviated by the serial
 
-                        NAR.logger.info("Abbreviation " + abbreviation);
+                        logger.info("Abbreviation " + abbreviation);
 
                         nar.input(
                                 new MutableTask(abbreviation)
-                                        .judgment().truth(1, abbreviationConfidence.floatValue())
-                                        .present(nar.memory)
+                                        .judgment()
+                                        .truth(1, abbreviationConfidence.floatValue())
+                                        .present(nar)
                         );
 
                     }

@@ -7,6 +7,7 @@ package nars.rover.robot;
 import com.gs.collections.api.block.function.primitive.FloatFunction;
 import com.gs.collections.api.block.function.primitive.FloatToFloatFunction;
 import nars.$;
+import nars.Memory;
 import nars.NAR;
 import nars.Symbols;
 import nars.op.sys.java.MethodOperator;
@@ -598,7 +599,7 @@ public class NARover extends AbstractPolygonBot {
             return new MutableTask(term, Symbols.GOAL)
                     .budget(c.budget())
                     .truth( c.truth() )
-                    .present(rover.nar.memory)
+                    .present((Memory) NAR.this)
                     .log("Curiosity");
         }
     }

@@ -1,6 +1,7 @@
 package nars.nlp;
 
 import nars.$;
+import nars.Memory;
 import nars.NAR;
 import nars.guifx.demo.NARide;
 import nars.nar.Default;
@@ -49,7 +50,7 @@ public class MarkovlikeTest {
         d.initNAL9();
 
         //d.core.activationRate.setValue(0.5f);
-        d.memory.shortTermMemoryHistory.set(5);
+        ((Memory) NAR.this).shortTermMemoryHistory.set(5);
 
         //d.memory.conceptForgetDurations.setValue(1);
 
@@ -86,7 +87,7 @@ public class MarkovlikeTest {
         int sentenceDelay = 500;
         int speakTime = wordDelay * 16;
         int silenceTime = 1000;
-        d.memory.duration.set(wordDelay/2);
+        ((Memory) NAR.this).duration.set(wordDelay/2);
 
         for (int i = 0; i < repeats; i++) {
 

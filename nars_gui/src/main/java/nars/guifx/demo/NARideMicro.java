@@ -1,5 +1,6 @@
 package nars.guifx.demo;
 
+import nars.NAR;
 import nars.concept.Concept;
 import nars.concept.DefaultConceptBuilder;
 import nars.nar.Default;
@@ -22,7 +23,7 @@ public enum NARideMicro {
         Default nar = new Default(64, 1, 1, 1) {
             @Override
             public Function<Term, Concept> newConceptBuilder() {
-                return new DefaultConceptBuilder(this.memory.random, 4,4);
+                return new DefaultConceptBuilder(NAR.this.random, 4,4);
             }
         };
         //nar.trace();

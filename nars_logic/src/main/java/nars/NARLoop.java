@@ -149,7 +149,7 @@ public class NARLoop implements Runnable {
                     while (!stopped)
                         frame(nar);
                 } catch (Exception e) {
-                    nar.memory.eventError.emit(e);
+                    nar.eventError.emit(e);
                     if (Global.DEBUG) stopped = true;
                 }
             } while (!stopped);

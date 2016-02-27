@@ -32,7 +32,7 @@ public class NarseseTest {
         //TODO n.task(s) when the parser is replaced
         //return p.parseTask(s, true);
         List<Task> l = Global.newArrayList(1);
-        p.tasks(s, l, n.memory);
+        p.tasks(s, l, n);
         return l;
     }
 

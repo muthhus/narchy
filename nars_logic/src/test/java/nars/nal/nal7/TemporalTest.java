@@ -1,5 +1,6 @@
 package nars.nal.nal7;
 
+import nars.Memory;
 import nars.NAR;
 import nars.nar.Default;
 import nars.task.Task;
@@ -26,7 +27,7 @@ public class TemporalTest {
         NAR n = new Default(); //for cycle/frame clock, not realtime like Terminal
         Task t = n.inputTask("<a --> b>. :\\:");
         Assert.assertEquals(0, t.creation());
-        Assert.assertEquals(-(n.memory.duration()), t.occurrence());
+        Assert.assertEquals(-(n.duration()), t.occurrence());
     }
 
 
