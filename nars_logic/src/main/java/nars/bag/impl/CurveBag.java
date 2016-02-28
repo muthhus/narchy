@@ -402,7 +402,9 @@ public class CurveBag<V> implements Bag<V> {
         return arrayBag.isSorted();
     }
 
-
+    public final float priAt(int cap) {
+        return arrayBag.priAt(cap);
+    }
 
 
 //    public BLink<V> get(int i) {

@@ -1,9 +1,8 @@
 package nars.concept;
 
-import nars.Global;
+import com.sun.jna.WeakIdentityHashMap;
 import nars.NAR;
 import nars.bag.Bag;
-import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.task.Task;
 import nars.term.Term;
@@ -13,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 /**
  * Created by me on 7/29/15.
@@ -67,11 +67,15 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
     }
 
 
-    private void setMeta(@NotNull Map<Object, Object> meta) {
-        this.meta = meta;
+    @Override public Object putCompute(Object key, BiFunction value) {
+        if (meta == null) {
+            Object v;
+            put(key, v = value.apply(key, null));
+            return v;
+        } else {
+            return meta.compute(key, value);
+        }
     }
-
-
 
     /** like Map.put for storing data in meta map
      *  @param value if null will perform a removal
@@ -79,12 +83,13 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
     @Nullable
     public final Object put(@NotNull Object key, @Nullable Object value) {
 
-        Map<Object, Object> currMeta = meta();
+        Map<Object, Object> currMeta = meta;
 
         if (value != null) {
 
-            if (currMeta == null)
-                setMeta(currMeta = Global.newHashMap()); //lazy allocate
+            if (currMeta == null) {
+                this.meta = currMeta = new WeakIdentityHashMap();
+            }
 
             return currMeta.put(key, value);
         }

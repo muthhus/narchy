@@ -1,7 +1,6 @@
 package nars.op.mental;
 
 import nars.$;
-import nars.Memory;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.task.MutableTask;

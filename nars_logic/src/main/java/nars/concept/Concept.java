@@ -37,7 +37,10 @@ import java.io.PrintStream;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public interface Concept extends Termed, Comparable {
 
@@ -322,6 +325,8 @@ public interface Concept extends Termed, Comparable {
         return hasGoals() ? goals().top(now).motivation() : valueIfMissing;
     }
 
+    /** follows Map.compute() semantics */
+    Object putCompute(Object key, BiFunction value);
 
 
 //    public Task getTask(boolean hasQueryVar, long occTime, Truth truth, List<Task>... lists);
