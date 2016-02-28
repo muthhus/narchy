@@ -1,24 +1,23 @@
 package nars.guifx.highdim;
 
-import javafx.scene.Group;
 import javafx.scene.control.Label;
 import nars.Global;
 import nars.bag.BLink;
 import nars.bag.Bag;
-import nars.bag.impl.ArrayBag;
 import nars.bag.impl.CurveBag;
 import nars.concept.Concept;
 import nars.guifx.Spacegraph;
 import nars.guifx.demo.NARide;
+import nars.guifx.graph2.TermNode;
+import nars.guifx.util.Animate;
 import nars.guifx.util.TabX;
 import nars.nar.Default;
-import nars.term.Term;
 import nars.term.Termed;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -27,32 +26,61 @@ import static javafx.application.Platform.runLater;
 /**
  * Created by me on 2/28/16.
  */
-public class HighDim<T extends Termed> extends Spacegraph {
+abstract public class HighDim<T extends Termed> extends Spacegraph {
+
+    final List<TermGroup> node = Global.newArrayList();
+    //SimpleIntDeque free;
+    final Deque<TermGroup> free = new ArrayDeque();
+    private int capacity;
+    final int input, output;
 
 
-    private class TermGroup extends Group implements Runnable {
+    /** infer a feature vector from the visualizable instance */
+    abstract public float[] vectorize(@NotNull BLink<? extends T> t, @NotNull float[] tmpIn);
 
-        private T term;
+    /** learn and classify the vector */
+    abstract public void project(float[] tmpIn, TermNode target);
+
+    private class TermGroup extends TermNode /* Group*/  {
+
         Label l = new Label();
+        private BLink<? extends T> bterm;
 
         public TermGroup() {
+            super(8);
             this.term = null;
             getChildren().add(l);
         }
 
-        public void set(T next) {
-            T prev = this.term;
+        public void set(BLink<? extends T> next) {
+            Object prev = this.bterm;
             if (prev == next) return;
 
-            this.term = next;
+            this.term = ((this.bterm = next)!=null) ? bterm.get() : null;
 
-            runLater(this);
 
             //..
         }
 
+        float tmp[];
+
+        public void update() {
+            BLink<? extends T> bterm = this.bterm;
+            if (bterm == null)
+                return;
+
+            float[] tmp = this.tmp;
+            if ((tmp == null) || (tmp.length!=input))
+                tmp = this.tmp = new float[input];
+
+            vectorize(bterm, tmp);
+
+            //learn(tmpIn);
+            project(tmp, this);
+        }
+
         /** render */
-        public void run() {
+        public void commit() {
             if (term != null) {
                 l.setText(term.toString());
                 setVisible(true);
@@ -61,27 +89,30 @@ public class HighDim<T extends Termed> extends Spacegraph {
             }
         }
 
-        public void update() {
-
-        }
 
         @Override
         public String toString() {
             return "TermNode[" + term + ']';
         }
 
-        public Termed get() {
-            return term;
-        }
+
+//        @Override
+//        public int hashCode() {
+//            return (term == null) ? 0 : super.hashCode();
+//        }
+//
+//        @Override
+//        public boolean equals(Object o) {
+//            return (term != null) && super.equals(o);
+//        }
     }
 
-    final List<TermGroup> node = Global.newArrayList();
-    //SimpleIntDeque free;
-    final Deque<TermGroup> free = new ArrayDeque();
-    private int capacity;
 
     public HighDim(int capacity, int inputs, int outputs) {
         super();
+
+        this.input = inputs;
+        this.output = outputs;
 
         resize(capacity);
     }
@@ -113,7 +144,7 @@ public class HighDim<T extends Termed> extends Spacegraph {
 
         node.forEach((TermGroup n) -> {
 
-            T nt = n.term;
+            T nt = (T) n.term;
             if (nt != null) {
                 BLink<T> bc = items.get(nt);
 
@@ -131,9 +162,9 @@ public class HighDim<T extends Termed> extends Spacegraph {
             }
             //else: it continues visibility or invisibility
         });
-        //System.out.print("\tmid=" + free.size() + "\n");
-        items.forEach(cap, next -> {
-            T c = next.get();
+
+        items.forEach(cap, cLink -> {
+            T c = cLink.get();
             //TODO find somethign more efficient
             ((Concept) c).putCompute(this, (C, vis) -> {
                 if (vis == null) {
@@ -144,13 +175,13 @@ public class HighDim<T extends Termed> extends Spacegraph {
                         return vis;
                     }
                     TermGroup g = free.removeFirst();
-                    g.set(c);
+                    g.set(cLink);
                     change[0] = true;
                     return g;
                 } else {
                     //already has
-                    ((TermGroup) vis).update();
-                    return vis;
+                    TermGroup g = (TermGroup) vis;
+                    return g;
                 }
             });
         });
@@ -177,11 +208,33 @@ public class HighDim<T extends Termed> extends Spacegraph {
         NARide.show(n.loop(), ide -> {
 
 
-            HighDim<Concept> dim = new HighDim(4, 1, 1);
+            HighDim<Concept> dim = new HighDim<Concept>(32, 4, 2){
+
+
+                @Override
+                public float[] vectorize(@NotNull BLink<? extends Concept> concept, float[] x) {
+                    x[0] = 100f*(concept.hashCode() % 8192) / 8192.0f;
+                    float cpri = concept.pri();
+                    x[1] = cpri;
+                    x[2] = 100f * cpri;
+                    return x;
+                }
+
+                @Override
+                public void project(float[] x, TermNode target) {
+                    target.move(x[0], x[1]);
+                    target.setScaleX(x[2]);
+                    target.setScaleY(x[2]);
+                }
+            };
+
             n.onFrame(N -> {
-                if (dim.commit(((Default) N).core.active))
-                    System.out.println(dim.node + " free=" + dim.free.size());
+                dim.commit(((Default) N).core.active);
+                    //System.out.println(dim.node + " free=" + dim.free.size());
             });
+            new Animate(10, (a)->{
+               dim.update();
+            }).start();
 
 
             //ide.addView(new IOPane(n));
@@ -197,6 +250,21 @@ public class HighDim<T extends Termed> extends Spacegraph {
 
 
         });
+    }
+
+    /** compute the values for the next iteration */
+    public void update() {
+
+        List<TermGroup> node = this.node;
+        for (int i = 0, nodeSize = node.size(); i < nodeSize; i++) {
+            TermGroup n = node.get(i);
+            if (n.term != null) {
+                n.update();
+                n.commit();
+            } else {
+
+            }
+        }
     }
 }
 

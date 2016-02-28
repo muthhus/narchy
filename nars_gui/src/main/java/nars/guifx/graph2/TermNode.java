@@ -3,6 +3,7 @@ package nars.guifx.graph2;
 import javafx.scene.paint.Color;
 import nars.Global;
 import nars.Op;
+import nars.bag.BLink;
 import nars.concept.Concept;
 import nars.guifx.graph2.layout.GraphNode;
 import nars.guifx.util.ColorMatrix;
@@ -28,7 +29,7 @@ public class TermNode extends GraphNode {
      */
     boolean modified = false;
 
-    public final Termed term;
+    public Termed term;
 
     /** priority normalized to visual context */
     public float priNorm = 0;
@@ -45,6 +46,9 @@ public class TermNode extends GraphNode {
 
 
 
+    public TermNode(int maxEdges) {
+        this(null, maxEdges);
+    }
 
     public TermNode(Termed t, int maxEdges) {
 
@@ -57,44 +61,44 @@ public class TermNode extends GraphNode {
 
     }
 
-    @Override
-    public boolean equals(Object o) {
-        return this == o;
-//        if (this == o) return true;
-//        if (o == null /*|| getClass() != o.getClass()*/) return false;
-//
-//        TermNode termNode = (TermNode) o;
-//
-//        return term.equals(termNode.term);
-
-    }
-
-    @Override
-    public int hashCode() {
-        return term.hashCode();
-    }
-//    /**
-//     * NAR update thread
-//     */
-//    public void update() {
-//
-//
-////        double vertexScale = NARGraph1.visModel.getVertexScale(c);
-//
-//        /*if ((int) (priorityDisplayedResolution * priorityDisplayed) !=
-//                (int) (priorityDisplayedResolution * vertexScale))*/ {
-//
-//
-////            System.out.println("update " + Thread.currentThread() + " " + vertexScale + " " + getParent() + " " + isVisible() + " " + localToScreen(0,0));
-//
-//            double scale = minSize + (maxSize - minSize) * priNorm;
-//            scale(scale);
-//
-//
-//        }
-//
+//    @Override
+//    public boolean equals(Object o) {
+//        return this == o;
+////        if (this == o) return true;
+////        if (o == null /*|| getClass() != o.getClass()*/) return false;
+////
+////        TermNode termNode = (TermNode) o;
+////
+////        return term.equals(termNode.term);
 //
 //    }
+//
+//    @Override
+//    public int hashCode() {
+//        return term.hashCode();
+//    }
+////    /**
+////     * NAR update thread
+////     */
+////    public void update() {
+////
+////
+//////        double vertexScale = NARGraph1.visModel.getVertexScale(c);
+////
+////        /*if ((int) (priorityDisplayedResolution * priorityDisplayed) !=
+////                (int) (priorityDisplayedResolution * vertexScale))*/ {
+////
+////
+//////            System.out.println("update " + Thread.currentThread() + " " + vertexScale + " " + getParent() + " " + isVisible() + " " + localToScreen(0,0));
+////
+////            double scale = minSize + (maxSize - minSize) * priNorm;
+////            scale(scale);
+////
+////
+////        }
+////
+////
+////    }
 
     public float pri() {
         return priNorm;
