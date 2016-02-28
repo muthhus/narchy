@@ -59,12 +59,13 @@ public class TermNode extends GraphNode {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        TermNode termNode = (TermNode) o;
-
-        return term.equals(termNode.term);
+        return this == o;
+//        if (this == o) return true;
+//        if (o == null /*|| getClass() != o.getClass()*/) return false;
+//
+//        TermNode termNode = (TermNode) o;
+//
+//        return term.equals(termNode.term);
 
     }
 

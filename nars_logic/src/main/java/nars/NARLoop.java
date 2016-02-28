@@ -176,8 +176,8 @@ public class NARLoop implements Runnable {
 
                 nar.run(cyclesPerFrame);
 
-                //this.prevTime = Util.pauseUntil(prevTime + periodMS);
-                this.prevTime = Util.pauseWaitUntil(prevTime + periodMS);
+                this.prevTime = Util.pauseLockUntil(prevTime + periodMS);
+                //this.prevTime = Util.pauseWaitUntil(prevTime + periodMS);
 
                 //throttle(periodMS, System.currentTimeMillis() - lastTime);
 

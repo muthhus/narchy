@@ -10,6 +10,8 @@ import javafx.scene.transform.Scale;
 import javafx.scene.transform.Translate;
 import org.apache.commons.math3.linear.ArrayRealVector;
 
+import java.util.function.Consumer;
+
 
 /**
  * JavaFX container, that allows to freely zoom and scroll its content.
@@ -18,7 +20,7 @@ import org.apache.commons.math3.linear.ArrayRealVector;
  * @author dejv78 (dejv78.github.io)
  * @since 1.0.0
  */
-public class ZoomFX extends AnchorPane {
+public class ZoomFX extends AnchorPane implements Consumer<Animate> {
 
     @Deprecated private static final double SCROLLING_DIVISOR = 200.0d;
 
@@ -97,27 +99,31 @@ public class ZoomFX extends AnchorPane {
     }
 
 
-    private void start() {
-        synchronized (content) {
-            if (positionAnimation == null) {
-                positionAnimation = new Animate(0, a -> {
-                    zoomFactor.update();
-
-                    panX.update();
-
-                    panY.update();
-                });
-                positionAnimation.start();
-            }
-        }
+    @Override
+    public void accept(Animate animate) {
+        zoomFactor.update();
+        panX.update();
+        panY.update();
     }
-    private void stop() {
-        synchronized (content) {
-            if (positionAnimation!=null) {
-                positionAnimation.stop();
-                positionAnimation = null;
-            }
+
+    private synchronized boolean start() {
+
+        if (positionAnimation == null) {
+            (positionAnimation = new Animate(0, this)).start();
+            return true;
         }
+
+        return false;
+    }
+
+    private synchronized boolean stop() {
+        if (positionAnimation!=null) {
+            positionAnimation.stop();
+            positionAnimation = null;
+            return true;
+        }
+
+        return false;
     }
 
 

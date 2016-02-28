@@ -32,33 +32,39 @@ public class ConceptsSource extends GraphSource {
     private Active regs = null;
 
     final int maxNodes = 128;
-    final int maxNodeLinks = 16; //per type
+    final int maxNodeLinks = 8; //per type
 
     public final SimpleDoubleProperty maxPri = new SimpleDoubleProperty(1.0);
     public final SimpleDoubleProperty minPri = new SimpleDoubleProperty(0.0);
     public final SimpleStringProperty includeString = new SimpleStringProperty("");
 
-    private final BiFunction<TermNode, TermNode, TermEdge> edgeBuilder =
-            TLinkEdge::new;
+//    private final BiFunction<TermNode, TermNode, TermEdge> edgeBuilder =
+//            TLinkEdge::new;
 
-    private float _maxPri = 0, _minPri = 0;
+    private float _maxPri = 1f, _minPri = 0f;
     protected final List<Termed> concepts = Global.newArrayList();
     private String keywordFilter = null;
     private final Predicate<BLink<Concept>> eachConcept = cc -> {
 
-        float p = cc.pri();
-        if ((p < _minPri) || (p > _maxPri))
+        List<Termed> concepts1 = concepts;
+        if (concepts1.size() < maxNodes) {
+
+            float p = cc.pri();
+            if ((p >= _minPri) || (p <= _maxPri)) {
+
+                Concept c = cc.get();
+                String keywordFilter1 = keywordFilter;
+
+                if ((keywordFilter1 == null) || (!c.toString().contains(keywordFilter1))) {
+                    concepts1.add(c);
+                }
+
+            }
             return true;
-
-
-        if (keywordFilter != null) {
-            if (cc.get().toString().contains(keywordFilter))
-                return true;
         }
 
-        concepts.add(cc.get());
+        return false;
 
-        return concepts.size() < maxNodes;
     };
 
     public ConceptsSource(NAR nar) {
@@ -75,9 +81,11 @@ public class ConceptsSource extends GraphSource {
     @Override
     public void updateEdge(TermEdge ee, Object link) {
         //rolling average
-        ee.pri = lerp(
+        /*ee.pri = lerp(
                 ((BLink)link).pri(), ee.pri,
-                      0.1f);
+                      0.1f);*/
+
+        ee.pri = ((BLink)link).pri();
     }
 
 
@@ -93,9 +101,8 @@ public class ConceptsSource extends GraphSource {
 
 
         SpaceGrapher sg = grapher;
-        if (sg == null) return; //???
-
-
+        if (sg == null)
+            throw new RuntimeException("grapher null");
 
 
         Consumer linkUpdater = link -> {
@@ -129,43 +136,45 @@ public class ConceptsSource extends GraphSource {
 
     @Override
     public Termed getTargetVertex(Termed edge) {
+
         return grapher.getTermNode(edge.term()).c;
     }
 
 
     @Override
-    public void start(SpaceGrapher g) {
+    public synchronized void start(SpaceGrapher g) {
+
+        if (g!=null) {
+
+            //.stdout()
+            //.stdoutTrace()
+            //                .input("<a --> b>. %1.00;0.7%", //$0.9;0.75;0.2$
+            //                        "<b --> c>. %1.00;0.7%")
+
+            if (regs != null)
+                throw new RuntimeException("already started");
 
 
-        //.stdout()
-        //.stdoutTrace()
-//                .input("<a --> b>. %1.00;0.7%", //$0.9;0.75;0.2$
-//                        "<b --> c>. %1.00;0.7%")
+            regs = new Active(
+                    /*nar.memory.eventConceptActivated.on(
+                            c -> refresh.set(true)
+                    ),*/
+                    nar.eventFrameStart.on(h -> {
+                        refresh.set(true);
+                        updateGraph();
+                    })
+            );
 
-        if (regs != null)
+            super.start(g);
+        } else {
+            if (regs == null)
+                throw new RuntimeException("already stopped");
+
             regs.off();
-
-
-        regs = new Active(
-                /*nar.memory.eventConceptActivated.on(
-                        c -> refresh.set(true)
-                ),*/
-                nar.eventFrameStart.on(h -> {
-                    refresh.set(true);
-                    updateGraph();
-                })
-        );
-
-        super.start(g);
-
-
+            regs = null;
+        }
     }
 
-    @Override
-    public void stop(SpaceGrapher vnarGraph) {
-        regs.off();
-        regs = null;
-    }
 
 
     @Override
@@ -201,13 +210,12 @@ public class ConceptsSource extends GraphSource {
 //        }).collect(Collectors.toList());
 
         commit(concepts);
-
-        concepts.clear();
     }
 
 
     protected final void commit(Collection<Termed> ii) {
         grapher.setVertices(ii);
+        ii.clear();
     }
 
 

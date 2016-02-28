@@ -331,7 +331,7 @@ public final class BudgetFunctions extends UtilityFunctions {
         //(1.0f / Math.max(1, complexity))
 
         //: 1.0f;
-        float complexityFactor = 1f / complexity;
+        float complexityFactor = 1f / Math.max(1, complexity);
 
         return budgetInference(target, qual, complexityFactor, nal);
     }

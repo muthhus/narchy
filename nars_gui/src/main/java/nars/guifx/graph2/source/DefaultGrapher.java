@@ -55,11 +55,8 @@ public class DefaultGrapher extends SpaceGrapher {
         InvalidationListener layoutChange = e -> {
             IterativeLayout il = layoutType.getInstance();
 
-            if (il!=null) {
-                setLayout(il);
-            } else {
-                //layout.set(nullLayout);
-            }
+            setLayout(il!=null ? il : nullLayout);
+
         };
 
         layoutType.addListener(layoutChange);
@@ -74,7 +71,7 @@ public class DefaultGrapher extends SpaceGrapher {
 
 
         //layoutChange.invalidated(null); //set current value
-        runLater(() -> layoutChange.invalidated(null));
+        //runLater(() -> layoutChange.invalidated(null));
 
 
 

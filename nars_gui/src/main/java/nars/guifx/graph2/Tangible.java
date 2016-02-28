@@ -93,22 +93,22 @@ public class Tangible {
 	}
 
 	protected void hover(boolean b) {
-
-		if (parent == null) {
-			findSpace();
-			if (parent == null)
-				return;
-		}
-
-		if (b) {
-			ww = new Overlay(node);
-			parent.hud.getChildren().add(ww);
-		} else {
-			if (ww != null) {
-				parent.hud.getChildren().remove(ww);
-				ww = null;
-			}
-		}
+//
+//		if (parent == null) {
+//			findSpace();
+//			if (parent == null)
+//				return;
+//		}
+//
+//		if (b) {
+//			ww = new Overlay(node);
+//			parent.hud.getChildren().add(ww);
+//		} else {
+//			if (ww != null) {
+//				parent.hud.getChildren().remove(ww);
+//				ww = null;
+//			}
+//		}
 
 	}
 

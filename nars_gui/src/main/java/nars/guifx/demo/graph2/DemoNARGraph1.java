@@ -10,7 +10,7 @@ public class DemoNARGraph1 extends AbstractNARGraphDemo {
 
     public static void main(String[] args)  {
 
-        Default n = new Default(1024,1,2,2);
+        Default n = new Default(1024,1,5,5);
         n.input("<a --> b>.");
         n.input("<b --> c>.");
         n.input("<c --> d>.");

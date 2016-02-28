@@ -3,10 +3,12 @@ package nars.guifx.graph2;
 import nars.bag.BLink;
 import nars.guifx.graph2.source.SpaceGrapher;
 import nars.term.Termed;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.logging.Logger;
 
 import static javafx.application.Platform.runLater;
 
@@ -18,6 +20,7 @@ public abstract class GraphSource/* W? */ {
     /** current grapher after it starts this */
     protected SpaceGrapher grapher;
 
+    static final org.slf4j.Logger logger = LoggerFactory.getLogger(GraphSource.class);
 
     public abstract void forEachOutgoingEdgeOf(Termed src, Consumer eachTarget);
 
@@ -27,8 +30,7 @@ public abstract class GraphSource/* W? */ {
     /** if the grapher is ready */
     public final boolean isReady() {
         SpaceGrapher grapher = this.grapher;
-        if (grapher == null) return false;
-        return grapher.isReady();
+        return grapher == null ? false : grapher.isReady();
     }
 
     private final NodeVisitor nodeVisitor = new NodeVisitor();
@@ -37,9 +39,9 @@ public abstract class GraphSource/* W? */ {
         nodeVisitor.run(s, sn);
     }
 
-    protected void updateNode(TermNode tn, Object indexing) {
-
-    }
+//    protected void updateNode(TermNode tn, Object indexing) {
+//
+//    }
 
 
     public void updateEdge(TermEdge ee, Object link) {
@@ -74,18 +76,38 @@ public abstract class GraphSource/* W? */ {
     }
 
     public void stop() {
-        grapher = null;
+        start(null);
     }
 
-    public void start(SpaceGrapher g) {
-        if (grapher!=null) {
-            throw new RuntimeException(this + " already attached to grapher " + grapher + ", can not switch to " + g);
+    public synchronized void start(SpaceGrapher g) {
+
+        if (g == grapher) return; //no change
+
+        if(g!=null) {
+
+            logger.info("start {}", this);
+
+            if (grapher != null) {
+                throw new RuntimeException(this + " already started graphing " + grapher + ", can not switch to " + g);
+            }
+
+            grapher = g;
+
+            setUpdateable();
+            updateGraph();
+
+        } else{
+
+            logger.info("stop {}", this);
+
+            if (grapher == null) {
+                throw new RuntimeException("already stopped");
+            }
+
+            grapher = null;
+
+
         }
-
-        updateGraph();
-        setUpdateable();
-
-        grapher = g;
     }
 
 //    public Animate start(SpaceGrapher<V, N> g, int loopMS) {
@@ -113,14 +135,11 @@ public abstract class GraphSource/* W? */ {
     /** called once per frame to update anything about the grapher scope */
     public final void updateGraph() {
 
-        //System.out.println(isReady() + " " + canUpdate() + " " + graph);
-
-        if (!isReady())
-            return;
-
-
-        if (canUpdate()) {
+        if (isReady() && canUpdate()) {
+            //logger.info("updateGraph ready");
             commit();
+        } else {
+            //logger.info("updateGraph not ready");
         }
 
     }
@@ -134,9 +153,6 @@ public abstract class GraphSource/* W? */ {
         runLater(() -> refresh.set(true));
     }
 
-    public void stop(SpaceGrapher g) {
-
-    }
 
     /** applies updates each frame */
     public abstract void commit();

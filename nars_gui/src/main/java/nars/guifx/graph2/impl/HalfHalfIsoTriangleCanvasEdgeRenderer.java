@@ -51,7 +51,7 @@ public class HalfHalfIsoTriangleCanvasEdgeRenderer extends CanvasEdgeRenderer {
 
     }
 
-    final static Translate identity = Affine.translate(0,0);
+    //final static Translate identity = Affine.translate(0,0);
 
     @Override
     public void draw(TermEdge e, TermNode aSrc, TermNode bSrc, double x1, double y1, double x2, double y2) {

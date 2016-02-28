@@ -137,9 +137,7 @@ public interface Stamp {
 //        return (b != null) &&
 //                    ((a == b) ||
 //                    overlapping(a.evidence(), b.evidence()));
-        if (b == null)
-            return false;
-        return overlapping(a.evidence(), b.evidence());
+        return a == b || (b == null ? false : overlapping(a.evidence(), b.evidence()));
     }
 
     /**
@@ -151,8 +149,8 @@ public interface Stamp {
     static boolean overlapping(@NotNull long[] a, @NotNull long[] b) {
 
         if (Global.DEBUG) {
-            if (a == null || b == null)
-                throw new RuntimeException("null evidence");
+//            if (a == null || b == null)
+//                throw new RuntimeException("null evidence");
             if (a.length == 0 || b.length == 0) {
                 throw new RuntimeException("missing evidence");
             }

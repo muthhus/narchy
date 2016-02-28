@@ -42,10 +42,10 @@ public class LogPane extends BorderPane  {
     ScrollPane scrollParent = null;
 
 
-    public void commit(Node[] c) {
-        content.getChildren().setAll(c);
-        scrollBottom.run();
-    }
+//    public void commit(Node[] c) {
+//        content.getChildren().setAll(c);
+//        scrollBottom.run();
+//    }
     public void commit(Collection<? extends Node> c) {
         content.getChildren().setAll(c);
         scrollBottom.run();

@@ -43,8 +43,8 @@ public abstract class CanvasEdgeRenderer implements EdgeRenderer<TermEdge> {
 //    public double maxPri = 1;
 //    public double minPri = 0;
 
-    double minWidth = 2;
-    double maxWidth = 40;
+    double minWidth = 7;
+    double maxWidth = 15;
 
     @Override
     public void accept(TermEdge i) {

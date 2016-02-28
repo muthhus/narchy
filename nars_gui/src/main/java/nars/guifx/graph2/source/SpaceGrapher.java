@@ -3,6 +3,8 @@ package nars.guifx.graph2.source;
 
 import com.gs.collections.impl.map.mutable.UnifiedMap;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import nars.NAR;
 import nars.guifx.Spacegraph;
 import nars.guifx.graph2.*;
@@ -32,6 +34,7 @@ public class SpaceGrapher extends Spacegraph {
     final Map<Term, TermNode> terms = new UnifiedMap();
     //new WeakValueHashMap<>();
 
+    static final int defaultFramePeriodMS = 30; //~60hz/2
 
     public final SimpleObjectProperty<EdgeRenderer<TermEdge>> edgeRenderer = new SimpleObjectProperty<>();
 
@@ -43,10 +46,9 @@ public class SpaceGrapher extends Spacegraph {
     public final SimpleObjectProperty<GraphSource> source = new SimpleObjectProperty<>();
     public final BiFunction<TermNode, TermNode, TermEdge> edgeVis;
 
-    /** graph source update period MS */
-    private final int updatePeriodMS = -1;
-
-    private int animatinPeriodMS = -1;
+    /**
+     * graph source update period MS
+     */
 
 
     private Animate animator; //TODO atomic reference
@@ -211,6 +213,7 @@ public class SpaceGrapher extends Spacegraph {
     public final TermNode getTermNode(Term t) {
         return terms.get(t);
     }
+
     public final TermNode getTermNode(Termed t) {
         return getTermNode(t.term());
     }
@@ -220,11 +223,10 @@ public class SpaceGrapher extends Spacegraph {
     }
 
 
-
     protected final TermNode newNode(Termed k) {
 
         TermNode n = nodeVis.get().newNode(k);
-        if (n !=null) {
+        if (n != null) {
             IterativeLayout<TermNode> l = layout.get();
             if (l != null)
                 l.init(n);
@@ -292,7 +294,7 @@ public class SpaceGrapher extends Spacegraph {
 
     protected final Runnable clear = () -> {
         displayed = TermNode.empty;
-        getVertices().clear();
+        //getVertices().clear();
         edgeRenderer.get().reset(this);
         ready.set(true);
     };
@@ -354,8 +356,7 @@ public class SpaceGrapher extends Spacegraph {
 
                 ss.updateNode(ths, k, t);
                 vv.updateNode(t);
-            }
-            else {
+            } else {
                 cc.remove();
             }
         }
@@ -403,25 +404,30 @@ public class SpaceGrapher extends Spacegraph {
 
         source.addListener((e, c, v) -> {
 
-            if (v != null) {
-                if (c != null) {
-                    v.stop(this);
-                }
+            runLater(()-> {
+                logger.info("source {} <- {}", v, c);
+                if (c != null)
+                    c.stop();
+                if (v!=null)
+                    v.start(this);
+            });
 
-                v.start(this);
-            }
             /*else {
                 System.out.println("no signal");
             }*/
         });
 
-        nodeVis.addListener((l, p, n) -> {
-            SpaceGrapher gg = SpaceGrapher.this;
-            if (p != null)
-                p.stop(gg);
-            if (n != null) {
-                n.start(gg,nar);
-            }
+        nodeVis.addListener((l, c, v) -> {
+
+            runLater(()-> {
+                SpaceGrapher gg = SpaceGrapher.this;
+                logger.info("nodeVis {} <- {}", v, c);
+                if (c != null)
+                    c.stop(gg);
+                if (v!=null)
+                    v.start(gg, nar);
+            });
+
         });
 
 
@@ -452,10 +458,8 @@ public class SpaceGrapher extends Spacegraph {
         this.edgeRenderer.set(edgeRenderer);
 
 
-
-
         //TODO add enable override boolean switch
-        runLater(()-> {
+        runLater(() -> {
             sceneProperty().addListener(v -> checkVisibility());
             parentProperty().addListener(v -> checkVisibility());
             visibleProperty().addListener(v -> checkVisibility());
@@ -465,28 +469,34 @@ public class SpaceGrapher extends Spacegraph {
     /**
      * called when layout changes to restart the source & layout
      */
-    synchronized public void setLayout(IterativeLayout il) {
-
-        logger.info("layout switch: {}", il);
-        layout.set(il);
+    public synchronized void setLayout(IterativeLayout il) {
 
         int lastAnimPeriodMS;
-        lastAnimPeriodMS = animator != null ? animator.getPeriod() : defaultFramePeriodMS;
+        if (animator!=null) {
+            lastAnimPeriodMS = animator.getPeriod();
+            stop();
+        } else {
+            lastAnimPeriodMS = defaultFramePeriodMS;
+        }
 
-        stop();
 
         //reset visiblity state to true for all, in case previous layout had hidden then
-        getVertices().forEach(t -> t.setVisible(true));
+        ObservableList<Node> verts = getVertices();
 
+        verts.forEach(t -> t.setVisible(true));
+
+        logger.info("layout change: " + il);
+        layout.set(il);
 
         //rerender();
 
         //if (lastAnimPeriodMS != -1)
         start(lastAnimPeriodMS);
+
+        logger.info("setLayout {} on {} vertices", il, verts.size());
+
     }
 
-
-    static final int defaultFramePeriodMS = 50; //~60hz/2
 
     protected void checkVisibility() {
         if (getParent() != null && isVisible() /*&& getScene() != null*/) {
@@ -517,6 +527,7 @@ public class SpaceGrapher extends Spacegraph {
             //System.err.println(this + " has no layout");
         }
     }
+
     public void rerender() {
 
         EdgeRenderer<TermEdge> er = edgeRenderer.get();
@@ -555,60 +566,62 @@ public class SpaceGrapher extends Spacegraph {
 //        removable.clear();
 
 
-    };
+    }
 
     public synchronized void start(int layoutPeriodMS) {
 
-        logger.info("start at {}ms", layoutPeriodMS);
+        if (layoutPeriodMS > 0) {
 
-        GraphSource src = source.get();
+            logger.info("start @ period={}ms", layoutPeriodMS);
 
-        if (animator == null && src!=null)  {
+            if (animator != null) {
+                throw new RuntimeException("already started");
+            }
+
+            GraphSource src = source.get();
+
             animator = new Animate(layoutPeriodMS, a -> {
-//                if (updated.compareAndSet(true, false)) {
-//                    updater.execute(
-//                        new javafx.concurrent.Task<Void>() {
-//
-//                            @Override
-//                            protected Void call() throws Exception {
-//                                return updateTask.call();
-//                            }
-//                        }
-//
-//                    );
-//                }
+                //                if (updated.compareAndSet(true, false)) {
+                //                    updater.execute(
+                //                        new javafx.concurrent.Task<Void>() {
+                //
+                //                            @Override
+                //                            protected Void call() throws Exception {
+                //                                return updateTask.call();
+                //                            }
+                //                        }
+                //
+                //                    );
+                //                }
                 reupdate();
                 rerender();
-
             });
 
             src.start(this);
 
-            reupdate();
-            rerender();
-
             animator.start();
+        } else {
 
+            logger.info("stop");
 
+            if (animator == null) {
+                throw new RuntimeException("already stopped");
+            }
 
-            //updaterSlow.start();
-        }
+            GraphSource s = source.get();
+            if (s != null) {
+                s.stop();
+            }
 
-    }
-
-    public synchronized void stop() {
-
-        logger.info("stop: {}");
-
-        if (animator != null) {
             animator.stop();
             animator = null;
-        }
 
-        GraphSource s = source.get();
-        if (s!=null) {
-            s.stop();
+
         }
+    }
+
+    public void stop() {
+        start(-1);
     }
 
     //    private class TermEdgeConsumer implements Consumer<TermEdge> {

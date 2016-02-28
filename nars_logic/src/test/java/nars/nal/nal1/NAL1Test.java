@@ -150,7 +150,8 @@ public class NAL1Test extends AbstractNALTest {
     public void testQuestionAnswer(int cycles, String belief, String question, String expectedSolution) {
         AtomicBoolean solved = new AtomicBoolean(false);
 
-        NAR nar = nar();
+        TestNAR test = test();
+        NAR nar = test.nar;
 
         //TODO abstract the %1.0;0.8% hardcoded here
 
@@ -171,7 +172,9 @@ public class NAL1Test extends AbstractNALTest {
 
             }).run(cycles);
 
-        assertTrue(solved.get());
+        test.mustBelieve(cycles, expectedTask.term().toString(), expectedTask.punc());
+
+        //assertTrue(solved.get());
     }
 
 

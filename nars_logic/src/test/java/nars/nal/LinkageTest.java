@@ -112,7 +112,7 @@ public class LinkageTest extends AbstractNALTest {
 
         nar.input(getTask(punc, premise1));
         nar.input(getTask(punc, premise2));
-        nar.run(2);
+        nar.run(1);
 
         //List<String> fails = new ArrayList();
 

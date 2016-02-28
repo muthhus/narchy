@@ -6,18 +6,17 @@
     -fx-font-family: monospace;
     /*-fx-font-family: 'Monospaced';*/
 
-
-    /*-fx-base: transparent;*/
-
     /*-fx-text-base-color: rgb(230,230,230);*/
 
-    -fx-base: rgb(0, 0, 0);
-    -fx-base-color: rgb(0, 0, 0);
+    /*-fx-base: rgb(0, 0, 0);
+    */
 
-    -fx-fill: #fff;
+    -fx-base: transparent;
+    -fx-text-base-color: rgb(230,230,230);
 
-    -fx-background-insets:  0.0;
-    -fx-background-radius: 0.0;
+    -fx-background-color: black;
+    -fx-background-insets:  0;
+    -fx-background-radius: 0;
     -fx-border-radius: 0;
     -fx-border-width: 0;
 
@@ -48,8 +47,7 @@
 }
 
 .control {
--fx-base-color:
-        rgba(10,10,10);
+    -fx-base-color: black;
 }
 
 
@@ -221,7 +219,7 @@
 }*/
 
 .label {
-    -fx-text-fill: -fx-text-base-color;
+    /*-fx-text-fill: -fx-text-base-color;*/
 }
 
 /* http://javadox.com/org.controlsfx/controlsfx/8.0.6/org/controlsfx/control/spreadsheet/SpreadsheetCellBase.html */

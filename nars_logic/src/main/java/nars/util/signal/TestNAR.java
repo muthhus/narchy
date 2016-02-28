@@ -304,7 +304,7 @@ public class TestNAR  {
         //TODO avoid reparsing term from string
 
         long now = time();
-        String termString = t.toString();
+        String termString = t.term().toString();
         if (t.truth()!=null) {
             float freq = t.freq();
             float conf = t.conf();

@@ -3,6 +3,7 @@ package nars.guifx.demo;
 import nars.guifx.graph2.ConceptsSource;
 import nars.guifx.graph2.TermEdge;
 import nars.guifx.graph2.impl.HalfHalfIsoTriangleCanvasEdgeRenderer;
+import nars.guifx.graph2.impl.HalfHalfLineCanvasEdgeRenderer;
 import nars.guifx.graph2.impl.HexButtonVis;
 import nars.guifx.graph2.impl.SubButtonVis;
 import nars.guifx.graph2.layout.Grid;
@@ -87,14 +88,14 @@ public abstract class AbstractNARGraphDemo {
 
         //initial settings
 
-        runLater(()-> {
-            g.setLayout(new Grid());
-        });
+//        runLater(()-> {
+//            g.setLayout(new Grid());
+//        });
 
         //g.setLayout(HyperassociativeMap2D.class);
         //g.pan(2000,2000);
 
-
+        //g.start(100);
 
         return g;
     }

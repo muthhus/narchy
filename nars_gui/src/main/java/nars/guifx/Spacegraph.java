@@ -154,16 +154,16 @@ public class Spacegraph extends ZoomFX {
         return ((int) y) + 0.5;
     }
 
-    public final Group bg = new Group();
+    //public final Group bg = new Group();
 
     public final Group ground = new Group();
 
     //public final Group edges = new Group();
     public final Group verts = new Group();
 
-    public final Group sky = new Group();
+    //public final Group sky = new Group();
 
-    public final Group hud = new Group();
+    //public final Group hud = new Group();
 
 
 
@@ -178,6 +178,7 @@ public class Spacegraph extends ZoomFX {
 //        edges.maxWidth(Double.MAX_VALUE);
 //        edges.maxHeight(Double.MAX_VALUE);
 
+        ground.setPickOnBounds(false);
         verts.setPickOnBounds(false);
         //edges.setPickOnBounds(false);
 
@@ -185,9 +186,9 @@ public class Spacegraph extends ZoomFX {
 
 
 
-        getChildren().add( 0, bg );
-        content().addAll( ground, /*edges,*/verts, sky);
-        getChildren().add( hud );
+
+        content().setAll( ground, /*edges,*/verts /*, sky*/);
+        getChildren().setAll( content /*, hud*/ );
 
 
 
@@ -237,11 +238,11 @@ public class Spacegraph extends ZoomFX {
 
     public Scene newScene(double width, double height) {
         Scene s = new Scene(this, width, height);
-        s.getStylesheets().add(Spacegraph.spacegraphCSS);
-        s.getStylesheets().add(NARfx.css);
+        s.getStylesheets().setAll(Spacegraph.spacegraphCSS, NARfx.css);
         return s;
     }
-    public SubScene newSubScene(double width, double height) {
-        return new SubScene(this, width, height);
-    }
+//    public SubScene newSubScene(double width, double height) {
+//
+//        return new SubScene(this, width, height);
+//    }
 }

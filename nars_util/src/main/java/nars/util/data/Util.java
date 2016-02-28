@@ -715,8 +715,9 @@ public enum Util {
 
         int xlen = x.length;
 
-        if (xlen != y.length) {
-            return Integer.compare(xlen, y.length);
+        int yLen = y.length;
+        if (xlen != yLen) {
+            return Integer.compare(xlen, yLen);
         } else {
 
             for (int i = 0; i < xlen; i++) {

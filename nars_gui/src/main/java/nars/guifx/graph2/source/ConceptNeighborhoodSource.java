@@ -52,7 +52,7 @@ public class ConceptNeighborhoodSource extends ConceptsSource {
 
         //System.out.println(concepts);
 
-        conceptsSet.clear();
+
 
     }
 }

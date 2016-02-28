@@ -110,7 +110,7 @@ public abstract class Budget extends BudgetedHandle {
     }
 
     /** called from setPriority after validation */
-    public abstract void _setPriority(float p);
+    protected abstract void _setPriority(float p);
 
     /**
      * returns the period in time: currentTime - lastForgetTime and sets the lastForgetTime to currentTime
