@@ -493,16 +493,15 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
                     //logger.debug(s.getExplanation().replace("\n", "\n\t\t"));
                 });
             }
-        }
-        else {
+        } else {
             assert(valid.isEmpty());
 
             logger.error(msg);
 
-            if (similar!=null) {
+            if (similar!=null && !similar.isEmpty()) {
                 similar.values().forEach(s -> {
-                    String pattern = "SIM \t{}\n\t\t{},{} : {}";
-                    logger.info(pattern, s, s.getParentTask(), s.getParentBelief(), s.log());
+                    String pattern = "SIM\n{}";
+                    logger.info(pattern, s.explanation());
                     //logger.debug(s.getExplanation().replace("\n", "\n\t\t"));
                 });
             }

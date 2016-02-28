@@ -440,13 +440,7 @@ public class DefaultBeliefTable implements BeliefTable {
         return t.isEternal() ? this.eternal : this.temporal;
     }
 
-
-
-    private static void onBeliefRemoved(@NotNull Task t, String reason, @NotNull NAR nar) {
-        onBeliefRemoved(t, reason, nar);
-    }
-
-    private static void onBeliefRemoved(@NotNull Task t, String reason, @NotNull Memory memory) {
+    private static void onBeliefRemoved(@NotNull Task t, @Nullable String reason, @NotNull Memory memory) {
         memory.remove(t, reason);
     }
 

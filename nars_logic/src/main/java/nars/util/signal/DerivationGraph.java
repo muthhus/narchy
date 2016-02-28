@@ -183,7 +183,7 @@ public class DerivationGraph extends DirectedPseudograph<DerivationGraph.Keyed,O
     public static String parseTerm(@NotNull String i) {
         String s = parsedTerm.get(i);
         if (s == null) {
-            s = np.term(i).term().toStringCompact();
+            s = np.term(i).term().toString();
 
             parsedTerm.put(i, s);
         }

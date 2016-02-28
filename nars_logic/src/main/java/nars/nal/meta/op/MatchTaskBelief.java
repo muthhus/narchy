@@ -13,9 +13,6 @@ import nars.nal.meta.TaskBeliefPair;
 import nars.nal.meta.constraint.AndConstraint;
 import nars.nal.meta.constraint.MatchConstraint;
 import nars.nal.meta.match.Ellipsis;
-import nars.nal.meta.op.MatchTerm;
-import nars.nal.meta.op.SubTermOp;
-import nars.nal.meta.op.SubTermStructure;
 import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
@@ -76,7 +73,7 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseEval> {
                         pStructure) + " " + pattern
         );*/
 
-        id = getClass().getSimpleName() + '[' + pattern.toStringCompact() + ']';
+        id = getClass().getSimpleName() + '[' + pattern.toString(false) + ']';
 
     }
 

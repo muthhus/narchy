@@ -46,6 +46,15 @@ public class LinkageTest extends AbstractNALTest {
         });
     }
 
+    @Override
+    public void start() {
+        tester = new TestNAR(nar()) {
+            @Override protected boolean requireConditions() {
+                return false;
+            }
+        };
+    }
+
     public void ProperlyLinkedTest(String premise1, String premise2) throws Exception {
         TestNAR tester = test();
         tester.believe(premise1); //.en("If robin is a type of bird then robin can fly.");

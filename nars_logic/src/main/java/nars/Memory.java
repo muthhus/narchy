@@ -44,6 +44,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicLong;
 
 
 /**
@@ -116,10 +117,7 @@ public class Memory extends Param {
     /** maximum NAL level currently supported by this memory, for restricting it to activity below NAL8 */
     int level;
 
-    /** for creating new stamps
-     * TODO move this to and make this the repsonsibility of Clock implementations
-     * */
-    long currentStampSerial = 1;
+    private final AtomicLong currentStampSerial = new AtomicLong();
 
 
     public Memory(@NotNull Clock clock, TermIndex index) {
@@ -206,10 +204,6 @@ public class Memory extends Param {
 
 
 
-
-
-
-
 //    public void add(final Iterable<Task> source) {
 //        for (final Task t : source)
 //            add((Task) t);
@@ -221,10 +215,6 @@ public class Memory extends Param {
     }
 
 
-
-
-
-
     /* ---------- new task entries ---------- */
 
     /**
@@ -232,22 +222,17 @@ public class Memory extends Param {
      */
     public final void remove(@NotNull Task task, @Nullable Object removalReason) {
 
+        task.delete();
 
         if (removalReason!=null)
             task.log(removalReason);
 
-        if (!task.isDeleted()) {
+        /*if (Global.DEBUG_DERIVATION_STACKTRACES && Global.DEBUG_TASK_LOG)
+            task.log(Premise.getStack());*/
 
-            task.delete();
+        eventTaskRemoved.emit(task);
 
-
-            /*if (Global.DEBUG_DERIVATION_STACKTRACES && Global.DEBUG_TASK_LOG)
-                task.log(Premise.getStack());*/
-
-            eventTaskRemoved.emit(task);
-
-            /* else: a more destructive cleanup of the discarded task? */
-        }
+        /* else: a more destructive cleanup of the discarded task? */
 
     }
 
@@ -271,7 +256,7 @@ public class Memory extends Param {
      */
     public final long newStampSerial() {
         //TODO maybe AtomicLong ?
-        return currentStampSerial++;
+        return currentStampSerial.getAndIncrement();
     }
 
 //    /** whether the NAR is currently accepting new inputs */

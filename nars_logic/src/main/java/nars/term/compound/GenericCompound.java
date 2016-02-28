@@ -313,7 +313,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
     @Nullable
     @Override
-    public String toString() {
+    public final String toString() {
         return toString(false);
     }
 

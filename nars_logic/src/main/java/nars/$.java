@@ -432,7 +432,7 @@ public enum $ /* TODO: implements TermIndex */ {
         logEncoder = new PatternLayoutEncoder();
         logEncoder.setContext(loggerContext);
         //logEncoder.setPattern("\\( %highlight(%level),%green(%thread),%yellow(%logger{0}) \\): \"%message\".%n");
-        logEncoder.setPattern("\\( %green(%thread),%yellow(%logger{0}) \\): \"%message\".%n");
+        logEncoder.setPattern("\\( %green(%thread),%highlight(%logger{0}) \\): \"%message\".%n");
         logEncoder.start();
 
 
@@ -453,10 +453,10 @@ public enum $ /* TODO: implements TermIndex */ {
 
         logRoot.addAppender(syslog);
 
-        logRoot.debug("Message 1");
-        logRoot.info("Message 1");
-        logRoot.warn("Message 2");
-        logRoot.error("Message 2");
+//        logRoot.debug("Message 1");
+//        logRoot.info("Message 1");
+//        logRoot.warn("Message 2");
+//        logRoot.error("Message 2");
     }
 
     @Nullable

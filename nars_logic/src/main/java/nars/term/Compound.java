@@ -110,7 +110,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
         try {
             append(sb, pretty);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return sb;
     }
@@ -138,12 +138,6 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
     @NotNull
     TermContainer<T> subterms();
 
-
-    @NotNull
-    @Override
-    default String toStringCompact() {
-        return toString(false);
-    }
 
     @NotNull
     @Override

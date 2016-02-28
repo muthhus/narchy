@@ -45,6 +45,7 @@ public class PremiseRuleTest extends TestCase {
 
         {
             PremiseRule x = p.termRaw("< A, A |- A, (Belief:Revision, Desire:Weak)>");
+            assertNotNull(x);
             assertEquals("((A,A),(A,((Revision-->Belief),(Weak-->Desire))))", x.toString());
             // assertEquals(12, x.getVolume());
         }
@@ -104,6 +105,8 @@ public class PremiseRuleTest extends TestCase {
 
         String l = "<((B,P) --> ?X) ,(B --> A), task(\"?\") |- ((B,P) --> (A,P)), (Belief:BeliefStructuralDeduction, Punctuation:Judgment)>";
         Compound x = ((PremiseRule)p.term(l)).normalizeRule(i);
+        assertNotNull(x);
+        assertNotNull(x.toString());
         assertTrue(!x.toString().contains("%B"));
     }
 
@@ -121,7 +124,9 @@ public class PremiseRuleTest extends TestCase {
 
 
         Compound y = (Compound)p.term("<(S --> P), --S |- (P --> S), (Belief:Conversion)>");
+        assertNotNull(y);
         y = ((PremiseRule)y).normalizeRule(i);
+        assertNotNull(y);
         printRecursive(y);
 
         assertEquals("(((%1-->%2),(--,%1)),((%2-->%1),((Conversion-->Belief))))", y.toString());

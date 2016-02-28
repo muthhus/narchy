@@ -25,7 +25,7 @@ public abstract class AbstractNALTest {
     //final ThreadLocal<NAR> nars;
     private final Supplier<NAR> nar;
     //private final NAR the;
-    private TestNAR created;
+    protected TestNAR tester;
 
     protected AbstractNALTest(NAR nar) {
         Global.DEBUG = true;
@@ -40,7 +40,7 @@ public abstract class AbstractNALTest {
 
 
     public final TestNAR test() {
-        return created;
+        return tester;
     }
 
 
@@ -57,11 +57,11 @@ public abstract class AbstractNALTest {
 
     @Before
     public void start() {
-        created = new TestNAR(nar());
+        tester = new TestNAR(nar());
     }
     @After
     public void end() {
-        created.test();
+        tester.test();
     }
 
     @Deprecated public static Iterable<Supplier<NAR>> nars(int level, boolean requireMultistep) {

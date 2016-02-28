@@ -288,7 +288,7 @@ public class PremiseRule extends GenericCompound {
 
 
     @Override
-    public final String toString() {
+    public final String toString(boolean pretty) {
         return str;
     }
 

@@ -172,10 +172,6 @@ public interface Term extends Termed, Comparable, Termlike {
 //        return toStringBuilder(pretty).toString();
 //    }
 
-    @NotNull default String toStringCompact() {
-        return toString();
-    }
-
 
     @Override
     default boolean levelValid(int nal) {

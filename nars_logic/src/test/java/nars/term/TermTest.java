@@ -264,6 +264,7 @@ public class TermTest {
     public void invalidTermIndep() {
 
         String t = "($1-->({place4}~$1))";
+
         NAR n = new Terminal();
 
 
@@ -301,7 +302,7 @@ public class TermTest {
         forced.terms()[0] = subj;
         forced.terms()[1] = pred;
 
-        assertEquals(t, forced.toStringCompact());
+        assertEquals(t, forced.toString());
 
 
 //        } catch (Throwable ex) {

@@ -2,7 +2,6 @@ package nars.util.signal;
 
 import nars.$;
 import nars.Global;
-import nars.Memory;
 import nars.NAR;
 import nars.nal.Tense;
 import nars.task.Task;
@@ -20,10 +19,10 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.PrintStream;
-import java.io.Serializable;
 import java.io.StringWriter;
 import java.util.*;
+
+import static junit.framework.Assert.assertTrue;
 
 
 /**
@@ -32,32 +31,31 @@ import java.util.*;
 public class TestNAR  {
 
     static {
-        $.logger.hashCode(); //trigger logging?
+        $.logger.hashCode(); //HACK trigger logging?
     }
+
+    static final Logger logger = LoggerFactory.getLogger(TestNAR.class);
 
     @NotNull
     public final Map<Object, HitMeter> eventMeters;
     @NotNull
     public final NAR nar;
-    boolean showFail = true;
-    boolean showSuccess;
-    boolean showExplanations;
+
+//    boolean showFail = true;
+//    boolean showSuccess;
+//    boolean showExplanations;
     final boolean showOutput = false;
+    final List<NARCondition> requires = new ArrayList();
 
-
-    static final Logger logger = LoggerFactory.getLogger(TestNAR.class);
-
-    /** "must" requirement conditions specification */
-    public final Collection<NARCondition> requires = new ArrayList();
     //public final List<ExplainableTask> explanations = new ArrayList();
     @Nullable
-    private Exception error;
+    private Object result;
     private static final transient boolean exitOnAllSuccess = true;
     @NotNull
     public List<Task> inputs = new ArrayList();
     private static final int temporalTolerance = 0;
     protected static final float truthTolerance = Global.TESTS_TRUTH_ERROR_TOLERANCE;
-    private StringWriter trace;
+    //private StringWriter trace;
 
     /** enable this to print reports even if the test was successful.
      * it can cause a lot of output that can be noisy and slow down
@@ -100,6 +98,7 @@ public class TestNAR  {
 
         eventMeters = new EventCount(nar).eventMeters;
 
+
     }
 
 //    /** returns the "cost", which can be considered the inverse of a "score".
@@ -130,13 +129,6 @@ public class TestNAR  {
 //        assert("termlinks form a fully connected graph:\n" + g.toString(), g.isConnected());
 //        return this;
 //    }
-
-    /** returns a new TestNAR continuing with the current nar */
-    @NotNull
-    public TestNAR next() {
-        finished = false;
-        return new TestNAR(nar);
-    }
 
     @NotNull
     public TestNAR input(@NotNull String s) {
@@ -172,15 +164,11 @@ public class TestNAR  {
 
         @Override
         public void onCycle() {
-            cycle++;
-            if (cycle % checkResolution == 0) {
 
-                if (requires.isEmpty())
-                    return;
+            if (++cycle % checkResolution == 0 && !requires.isEmpty()) {
 
                 boolean finished = true;
 
-                int nr = requires.size();
                 for (NARCondition require : requires) {
                     if (!require.isTrue()) {
                         finished = false;
@@ -190,7 +178,6 @@ public class TestNAR  {
 
                 if (finished) {
                     stop();
-
                 }
 
             }
@@ -298,8 +285,8 @@ public class TestNAR  {
 //    }
 
     @Nullable
-    public Exception getError() {
-        return error;
+    public Object getResult() {
+        return result;
     }
 
 //    public TestNAR mustInput(long withinCycles, String task) {
@@ -438,89 +425,62 @@ public class TestNAR  {
     }
 
 
+    //    public static final class Report implements Serializable {
+//
+//        public final long time;
+//        @NotNull
+//        public final HitMeter[] eventMeters;
+//        //@Nullable
+//        protected final Serializable error;
+//        protected final Task[] inputs;
+//        private final TestNAR test;
+        //final transient int stackElements = 4;
 
-    public static class Report implements Serializable {
 
-        public final long time;
-        @NotNull
-        public final HitMeter[] eventMeters;
-        @Nullable
-        protected Serializable error;
-        protected Task[] inputs;
-        @NotNull
-        protected List<NARCondition> cond = Global.newArrayList(1);
-        final transient int stackElements = 4;
 
-        public Report(@NotNull TestNAR n) {
-            time = n.time();
+//
+//        public boolean isSuccess() {
+//            return true;
+//        }
 
-            inputs = n.inputs.toArray(new Task[n.inputs.size()]);
-            Collection<HitMeter> var = n.eventMeters.values();
-            eventMeters = var.toArray(new HitMeter[var.size()]);
-        }
-
-        public void setError(@Nullable Exception e) {
-            if (e!=null) {
-                error = new Object[]{e.toString(), Arrays.copyOf(e.getStackTrace(), stackElements)};
-            }
-        }
-
-        public void add(NARCondition o) {
-            cond.add(o);
-        }
-
-        public boolean isSuccess() {
-            for (NARCondition t : cond)
-                if (!t.isTrue())
-                    return false;
-            return true;
-        }
-
-        public void toString(@NotNull PrintStream out) {
-
-            if (error!=null) {
-                out.print(error);
-            }
-
-            out.print("@" + time + ' ');
-            out.print(Arrays.toString(eventMeters) + '\n');
-
-            for (Task t : inputs) {
-                out.println("IN " + t);
-            }
-
-            cond.forEach(c ->
-                c.toString(out)
-            );
-        }
-
-        public void toLogger() {
-
-            if (error!=null) {
-                logger.error(error.toString());
-            }
-
-            logger.info("@" + time + ' ');
-            logger.debug(Arrays.toString(eventMeters) + '\n');
-
-            for (Task t : inputs) {
-                logger.info("IN " + t);
-            }
-
-            cond.forEach(c ->
-                c.toLogger(logger)
-            );
-        }
-
-    }
+//        public void toString(@NotNull PrintStream out) {
+//
+//            if (error!=null) {
+//                out.print(error);
+//            }
+//
+//            out.print("@" + time + ' ');
+//            out.print(Arrays.toString(eventMeters) + '\n');
+//
+//            for (Task t : inputs) {
+//                out.println("IN " + t);
+//            }
+//
+//            cond.forEach(c ->
+//                c.toString(out)
+//            );
+//        }
+//    }
 
     @NotNull
     public TestNAR test() {
         return run(true);
     }
 
+    protected boolean requireConditions() {
+        return true;
+    }
+
     @NotNull
     public TestNAR run(boolean testAndPrintReport /* for use with JUnit */) {
+
+        if (requireConditions())
+            assertTrue("No conditions tested", !requires.isEmpty());
+
+
+        //TODO cache requires & logger, it wont change often
+        String id = requires.toString();
+
         long finalCycle = 0;
         for (NARCondition oc : requires) {
             long oce = oc.getFinalCycle();
@@ -528,68 +488,60 @@ public class TestNAR  {
                 finalCycle = oce + 1;
         }
 
+        StringWriter trace;
         if (collectTrace)
             nar.trace(trace = new StringWriter());
+        else
+            trace = null;
 
         runUntil(finalCycle);
 
+        boolean success = true;
+        for (NARCondition t : requires) {
+            if (!t.isTrue()) {
+                success = false;
+                break;
+            }
+        }
 
         if (testAndPrintReport) {
 
-            if (requires.isEmpty())
-                return this;
+            //if (requires.isEmpty())
+                //return this;
 
-            //assertTrue("No conditions tested", !requires.isEmpty());
 
             //assertTrue("No cycles elapsed", tester.nar.memory().time/*SinceLastCycle*/() > 0);
 
-            Report r = getReport();
+            long time = time();
 
-            if (!r.isSuccess())
-                report(r, r.isSuccess());
+            //Task[] inputs = n.inputs.toArray(new Task[n.inputs.size()]);
+            Collection<HitMeter> var = eventMeters.values();
+            HitMeter[] eventMeters1 = var.toArray(new HitMeter[var.size()]);
+
+
+            String pattern = "{}\n\t{} {} {}IN \ninputs";
+            Object[] args = new Object[] { id, time, result, eventMeters1 };
+
+           if (result!=null) {
+                logger.error(pattern, args);
+            } else {
+                logger.info(pattern ,args);
+            }
+
+            requires.forEach(c ->
+                c.toLogger(logger)
+            );
+
+            if (trace !=null)
+                logger.trace("{}", trace.getBuffer());
 
         }
 
+        assertTrue(success);
 
         return this;
     }
 
-    @NotNull
-    public Report getReport() {
-        Report report = new Report(this);
-
-        report.setError(error);
-
-        requires.forEach(report::add);
-
-
-        return report;
-    }
-
-    protected void report(@NotNull Report report, boolean success) {
-
-        //String s = //JSONOutput.stringFromFieldsPretty(report);
-            //report.toString();
-
-        //explain all validated conditions
-//        if (requires!=null) {
-//            requires.forEach(NARCondition::report);
-//        }
-
-
-        if (success) {
-            report.toLogger();
-        }
-        else  {
-
-            report.toLogger();
-            if (collectTrace)
-                logger.debug(trace.getBuffer().toString());
-
-            assert(false);
-        }
-
-    }
 
     @NotNull
     public TestNAR run(long extraCycles) {
@@ -599,7 +551,7 @@ public class TestNAR  {
     @NotNull
     public TestNAR runUntil(long finalCycle) {
 
-        error = null;
+        result = null;
 
         if (showOutput)
             nar.trace();

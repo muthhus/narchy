@@ -173,10 +173,10 @@ public class NarseseExtendedTest {
     @Test
     public void testNegation3() {
         //without comma
-        assertEquals( "(--,x)", term("--x").toStringCompact() );
-        assertEquals( "(--,x)", term("-- x").toStringCompact() );
+        assertEquals( "(--,x)", term("--x").toString() );
+        assertEquals( "(--,x)", term("-- x").toString() );
 
-        assertEquals( "(--,(x&&y))", term("-- (x && y)").toStringCompact() );
+        assertEquals( "(--,(x&&y))", term("-- (x && y)").toString() );
 
 
         Compound nab = term("--(a & b)");

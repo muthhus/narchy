@@ -120,12 +120,19 @@ public class DeductiveChainTest extends TestNAR {
 
         //while (true) {
 
-        Report r = test.getReport();
-
-        System.out.println(
-                (r.isSuccess() ? "OK" : "ERR") +
-                "\t@" + time + " (" + ts + "ms) " +
-                nc + 'C');
+//        Report report = new Report(test, test.error);
+//
+//
+//
+//        test.requires.forEach(report::add);
+//
+//
+//        Report r = report;
+//
+//        System.out.println(
+//                (r.isSuccess() ? "OK" : "ERR") +
+//                "\t@" + time + " (" + ts + "ms) " +
+//                nc + 'C');
 
 
         //TextOutput.out(n).setOutputPriorityMin(0.85f);
