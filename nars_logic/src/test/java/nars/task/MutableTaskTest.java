@@ -19,13 +19,13 @@ public class MutableTaskTest {
 
         String s = "<a --> b>";
 
-        assertTrue(Tense.isEternal(new MutableTask(n.term(s)).eternal().occurrence()));
+        assertTrue(Tense.isEternal(new MutableTask(n,s).eternal().occurrence()));
 
-        assertTrue("default is timeless", new MutableTask(n.term(s)).isTimeless());
+        assertTrue("default is timeless", new MutableTask(n,s).isTimeless());
 
-        assertTrue("tense=eternal is eternal", Tense.isEternal(new MutableTask(n.term(s)).eternal().occurrence()));
+        assertTrue("tense=eternal is eternal", Tense.isEternal(new MutableTask(n,s).eternal().occurrence()));
 
-        assertTrue("present is non-eternal", !Tense.isEternal(new MutableTask(n.term(s)).present(n).occurrence()));
+        assertTrue("present is non-eternal", !Tense.isEternal(new MutableTask(n,s).present(n).occurrence()));
 
     }
 

@@ -10,30 +10,30 @@ import static nars.nal.Tense.ITERNAL;
 /**
  * Created by me on 2/26/16.
  */
-public final class UnbuildableTerm extends RuntimeException {
+public final class InvalidTerm extends RuntimeException {
 
     private final Op op;
     private final int rel;
     private final int dt;
     private final Term[] args;
 
-    public UnbuildableTerm() {
+    public InvalidTerm() {
         this(null, -1, ITERNAL, null);
     }
 
-    public UnbuildableTerm(Compound x /* incomplete or invalid */) {
+    public InvalidTerm(Compound x /* incomplete or invalid */) {
         this(x.op(), x.relation(), x.dt(), x.terms());
     }
 
-    public UnbuildableTerm(Term[] args) {
+    public InvalidTerm(Term[] args) {
         this(null, -1, ITERNAL, args);
     }
 
-    public UnbuildableTerm(Op op) {
+    public InvalidTerm(Op op) {
         this(op, -1, ITERNAL, null);
     }
 
-    public UnbuildableTerm(Op op, int rel, int dt, Term[] args) {
+    public InvalidTerm(Op op, int rel, int dt, Term[] args) {
 
         this.op = op;
         this.rel = rel;

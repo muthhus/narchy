@@ -254,8 +254,8 @@ public class NARide extends StackPane {
 
         nar.onExec("memstat", (c) -> {
             String report = "";
-            report += "Busy: " + ((Memory) NAR.this).emotion.busy() + "<br/>";
-            report += "Index Size (Terms): " + ((Memory) NAR.this).index.size() + "<br/>";
+            report += "Busy: " + nar.emotion.busy() + "<br/>";
+            report += "Index Size (Terms): " + nar.index.size() + "<br/>";
             report += "Active Concept Bag Histogram: " +
                     Arrays.toString(((Default)nar).core.active.getPriorityHistogram(10)) + "<br/>";
             nar.input("html(\"" + report + "\");");
@@ -422,12 +422,12 @@ public class NARide extends StackPane {
 //    }
 
     public void addIcon(FXIconPaneBuilder n) {
-        ((Memory) NAR.this).the(n);
+        nar.the(n);
         pp.update();
     }
 
     public void addView(Node n) {
-        ((Memory) NAR.this).the(n);
+        nar.the(n);
 
         content.getTabs().add(new TabX(
                 n.getClass().getSimpleName(),
@@ -633,7 +633,7 @@ public class NARide extends StackPane {
             nar.onFrame(c -> {
 
                 int activeConcepts = l.active.size();
-                TermIndex index = ((Memory) NAR.this).index;
+                TermIndex index = nar.index;
                 int totalConcepts = index.size();
                 int uniqueSubterms = index.subtermsCount();
 

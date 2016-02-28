@@ -9,9 +9,12 @@ import nars.NAR;
 import nars.budget.Budget;
 import nars.budget.UnitBudget;
 import nars.concept.AbstractConcept;
+import nars.concept.AtomConcept;
 import nars.concept.Concept;
 import nars.guifx.demo.AbstractNARGraphDemo;
 import nars.nar.Default;
+import nars.task.MutableTask;
+import nars.term.Term;
 import nars.term.Termed;
 
 import java.io.IOException;
@@ -40,15 +43,19 @@ public class DemoAttentionFlow extends AbstractNARGraphDemo {
                 if (reverse) {
                     //the reverse
                     List<Termed> ct = c.termlinkTemplates();
-                    if (!ct.contains(prev))
-                        ct.add(prev);
+                    if (ct!=null) {
+                        if (!ct.contains(prev))
+                            ct.add(prev);
+                    }
                     AbstractConcept.linkTerm(c, prev, UnitBudget.Mid, 1f, true, false);
                 }
 
                 if (forward) {
                     List<Termed> pt = prev.termlinkTemplates();
-                    if (!pt.contains(c))
-                        pt.add(c);
+                    if (pt!=null) {
+                        if (!pt.contains(c))
+                            pt.add(c);
+                    }
                     AbstractConcept.linkTerm(prev, c, UnitBudget.Mid, 1f, true, false);
                 }
 
@@ -87,19 +94,27 @@ public class DemoAttentionFlow extends AbstractNARGraphDemo {
 //                    }
 //
 //                };
-  //          }
+//            }
 
         };
-        ((Memory) NAR.this).duration.set(5);
-        ((Memory) NAR.this).perfection.setValue(0);
-        n.run(5);
+
+        n.duration.set(10);
+        n.perfection.setValue(0);
+
+
+        IntToObjectFunction<Termed> tt = (i) -> $.$("a:" + i);
+        int chainSize = 16;
+        Twin<Termed> ends = addTermLinkChain(n, chainSize, tt, true,false);
+        n.forEachConcept(c->c.print());
+        n.log();
+
+        n.step();
 
         graphIDE(n, (e)-> {
 
-            IntToObjectFunction<Termed> tt = (i) -> $.the("a" + i);
-            int chainSize = 8;
-            Twin<Termed> ends = addTermLinkChain(n, chainSize, tt, true,false);
-            n.forEachConcept(c->c.print());
+            n.onCycle(m->{
+                printState(n, tt, chainSize);
+            });
 
             new Thread(()-> {
                 while (true) {
@@ -109,20 +124,42 @@ public class DemoAttentionFlow extends AbstractNARGraphDemo {
                     } catch (IOException e1) {
                         e1.printStackTrace();
                     }
+
                     System.out.println("firing");
-
-                    n.runLater(() -> {
-                        n.conceptualize(
-
-                                tt.valueOf(
-                                        0
-                                        //n.memory.random.nextInt(chainSize)
-                                ),
-
-                                new UnitBudget(1f, 0.5f, 0.5f), 1f, 0.6f);
-                    });
+                    fire(n,tt.valueOf(0));
                 }
             }).start();
         });
+
+
+        console(n, tt, chainSize);
+    }
+
+    public static void console(Default n, IntToObjectFunction<Termed> tt, int chainSize) {
+        fire(n, tt.valueOf(
+                0
+                //n.memory.random.nextInt(chainSize)
+        ));
+
+        int time = 10;
+        for (int i = 0; i < time; i++) {
+            printState(n, tt, chainSize);
+            n.step();
+        }
+    }
+
+    public static void printState(Default n, IntToObjectFunction<Termed> tt, int chainSize) {
+        for (int j = 0; j < chainSize; j++) {
+            System.out.print( n.conceptPriority( tt.valueOf(j), 0f ) + ", " );
+        }
+        System.out.println();
+    }
+
+    protected static void fire(NAR n, Termed t) {
+        n.input(
+                new MutableTask(t).belief().budget(
+                        new UnitBudget(1f, 0.5f, 0.5f) ).present(n)
+        );
+
     }
 }

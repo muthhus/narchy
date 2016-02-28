@@ -38,10 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.Executors;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
@@ -80,9 +77,11 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
                     "               IRC:  http://webchat.freenode.net/?channels=nars \n";
 
 
-    public static final Logger logger = LoggerFactory.getLogger(NAR.class);
-    static ThreadPoolExecutor asyncs =
+    private static final Logger logger = LoggerFactory.getLogger(NAR.class);
+
+    private static final ExecutorService asyncs = //shared
             (ThreadPoolExecutor) Executors.newCachedThreadPool();
+
     static final Set<String> logEvents = Sets.newHashSet(
             "eventTaskProcess", "eventAnswer",
             "eventExecute", //"eventRevision", /* eventDerive */ "eventError",
@@ -152,7 +151,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
         nextTasks.clear();
 
-        NAR.asyncs.shutdown();
+        if (asyncs!=null)
+            asyncs.shutdown();
 
         clear();
 
@@ -817,22 +817,16 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * queues a task to (hopefully) be executed at an unknown time in the future,
      * in its own thread in a thread pool
      */
-    public boolean runAsync(@NotNull Runnable t) {
-        return runAsync(t, null);
-    }
+    public Future runAsync(@NotNull Runnable t) {
 
-    public boolean runAsync(@NotNull Runnable t, @Nullable Consumer<RejectedExecutionException> onError) {
+        logger.info("runAsyncs run {}", t);
+
         try {
-            eventSpeak.emit("execAsync " + t);
-            eventSpeak.emit("pool: " + NAR.asyncs.getActiveCount() + " running, " + NAR.asyncs.getTaskCount() + " pending");
-
-            NAR.asyncs.execute(t);
-
-            return true;
+            Future<?> f = asyncs.submit(t);
+            return f;
         } catch (RejectedExecutionException e) {
-            if (onError != null)
-                onError.accept(e);
-            return false;
+            logger.error("execAsync error {} in {}", t, e);
+            return null;
         }
     }
 
@@ -902,13 +896,28 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return this;
     }
 
+
+    public final Concept concept(Termed t) {
+        return concept(t, false);
+    }
+
+    @Nullable
+    public final Concept concept(Termed t, boolean createIfMissing) {
+        Term tt = validConceptTerm(t);
+        return (tt != null) ?
+                (Concept)(createIfMissing ? index.the(tt) : index.get(tt)) :
+                null;
+    }
+
     @Nullable
     public abstract NAR forEachConcept(@NotNull Consumer<Concept> recip);
 
-    public abstract Concept conceptualize(@NotNull Termed termed, Budget activation, float scale, float toTermLinks);
+    /** activate the concept and other features (termlinks, etc) */
+    public abstract Concept conceptualize(Termed termed, Budgeted activation, float scale);
 
-    final public Concept conceptualize(@NotNull Termed termed, Budget activation) {
-        return conceptualize(termed, activation, 1f, 0);
+
+    final public Concept conceptualize(@NotNull Termed termed, Budgeted activation) {
+        return conceptualize(termed, activation, 1f);
     }
 
     @NotNull
@@ -942,124 +951,44 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         input(new TaskStream(taskStream));
     }
 
-    protected final void process(Task[] input) {
-        for (Task t : input) {
+
+
+
+
+    /** applies normalization and anonymization to resolve the term of the concept the input term maps t */
+    Term validConceptTerm(Termed input) {
+
+        Term term = input.term();
+
+        //PREFILTER
+        if (term instanceof Variable)
+            return null;
+
+
+        //NORMALIZATION
+        if ((term instanceof Compound) && (!term.isNormalized())) {
+            Termed t = index.normalized((Compound)term);
             if (t == null)
-                break;
-            process(t);
-        }
-    }
-
-    /**
-     * execute a Task as a TaskProcess (synchronous)
-     * <p>
-     * TODO make private
-     */
-    @Nullable
-    protected final Concept process(@NotNull Task input) {
-
-        if (input.isDeleted()) {
-            //throw new RuntimeException(
-            /*if (Global.DEBUG) {
-                System.err.println(
-                        input + " " + input.log() + " Deleted:\n" + input.explanation());
-            }*/
-            return null;
-        }
-
-        final Memory memory = this;
-
-        float activation = activationRate.floatValue();
-        Concept c = conceptualize(input.concept(), input.budget(), activation, 0f);
-        if (c == null) {
-            //throw new RuntimeException("Inconceivable: " + input);
-            remove(input, "Inconceivable");
-            return null;
-        }
-
-        emotion.busy(input);
-
-        Task t = c.process(input, this);
-        if (t == null) {
-            //dont delete 'input' because it may be a duplicate which was already in the table and remains there
-            return null;
-        }
-
-        //complete the activation process
-        c.link(t, activation, 0f, this);
-
-        eventTaskProcess.emit(t);
-
-        if (t.isGoal())
-            execute(t, c);
-
-        return c;
-    }
-
-
-
-
-    boolean validConceptTerm(Term term) {
-        return !(term instanceof Variable);
-    }
-
-
-    @Nullable
-    public Concept concept(Termed t) {
-        Term tt = t.term();
-
-        if (tt instanceof Concept)
-            return ((Concept)tt); //assume this is the instance already indexed; may not be a safe assumption
-
-        if (!validConceptTerm(tt))
-            return null;
-
-        t = index.normalized(t);
-        if (!tt.isNormalized()) {
-
-            if (t instanceof Concept)
-                return ((Concept)t);
-            else if (t == null)
                 return null;
-            else
-                tt = t.term();
+            term = t.term();
         }
 
+
+        //ANONYMIZATION
         //TODO ? put the unnormalized term for cached future normalizations?
-
-        if (tt.isCompound() ) {
-
-            Term at = tt;
-
-            if (at!=(tt = tt.anonymous())) {
+        if (term instanceof Compound) {
+            Term at = term.anonymous();
+            if (at!=term) {
                 //complete anonymization process
-                if (null == (tt = index.transform((Compound) tt, CompoundAnonymizer)))
-                    throw new UnbuildableTerm((Compound) at);
+                if (null == (at = index.transform((Compound) at, CompoundAnonymizer)))
+                    throw new InvalidTerm((Compound) term);
+
+                term = at;
             }
-
         }
 
-
-
-        Termed uu = index.the(tt);
-
-        if (uu instanceof Concept) {
-            return (Concept) uu;
-        } else {
-            throw new RuntimeException("unconceptualizable: " + uu + " " + uu.getClass());
-//            if (uu == null) uu = t;
-//
-//            Concept n = newConcept(uu.term());
-//            if (n!=null) {
-//                index.put(n);
-//                return n;
-//            } else {
-//                return null; //no concept could be made
-//            }
-        }
-
+        return term;
     }
-
 
 
 

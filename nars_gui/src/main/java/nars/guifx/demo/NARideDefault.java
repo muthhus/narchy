@@ -14,8 +14,6 @@ public enum NARideDefault {
 
         Global.DEBUG = false;
 
-        FrameClock clock = new FrameClock();
-
         Default n = new Default(
                 //TermIndex.memoryGuava(clock, 100)),
 //                        memoryWeak(1024 * 128)),

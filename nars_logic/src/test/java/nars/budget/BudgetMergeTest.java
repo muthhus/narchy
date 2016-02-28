@@ -20,7 +20,7 @@ public class BudgetMergeTest {
     public void testPlusPQBlend() {
         BudgetMerge m = BudgetMerge.plusDQBlend;
 
-        testMerge(1f, m, z(),  a,   1, 0.7f, 0.3f);  //adding to zero equals the incoming
+        testMerge(1f, m, z(),  a,   1, 0.7f, 0.3f, 0 /*overflow*/);  //adding to zero equals the incoming
         testMerge(0.5f, m, z(),  a,   0.5f, 0.7f, 0.3f); //scale of half should affect priority only
         testMerge(1f, m, a,  z(),   a.pri(), a.dur(), a.qua());  //merging with zero should hae no effect
 
@@ -29,8 +29,11 @@ public class BudgetMergeTest {
         testMerge(1, m, b,  c,   (c.pri() + b.pri()), 0.33f, 0.16f); //test correct affect of components
         testMerge(0.5f, m, b,  c,   (c.pri()/2f + b.pri()), 0.36f, 0.18f); //lesser affect (dur and qua closer to original values)
 
-        testMerge(1f, m, a,  c,   1, 0.6f, 0.26f); //priority saturation behavior
-        testMerge(0.5f, m, a,  c,   1, 0.65f, 0.277f); //priority saturation behavior, lesser affect (dur and qua closer to original values)
+        testMerge(1f, m, a,  c,   1, 0.6f, 0.26f, //priority saturation behavior
+            0.25f); //with overflow
+
+        testMerge(0.5f, m, a,  c,   1, 0.65f, 0.277f, //priority saturation behavior, lesser affect (dur and qua closer to original values)
+            0f);  //no overflow
 
         testMerge(1f, m, a,  a,   a.pri(), a.dur(), a.qua()); //no change since saturated with the same incoming values
 
@@ -73,14 +76,21 @@ public class BudgetMergeTest {
         UnitBudget y = new UnitBudget(inPri, inDur, inQua);
         return testMerge(scale, m, x, y, ouPri, ouDur, ouQua);
     }
-
     @NotNull
     private static Budget testMerge(float scale, BudgetMerge m, Budget x, Budget y, float ouPri, float ouDur, float ouQua) {
+        return testMerge(scale, m, x, y, ouPri, ouDur, ouQua, -1f);
+    }
+    @NotNull
+    private static Budget testMerge(float scale, BudgetMerge m, Budget x, Budget y, float ouPri, float ouDur, float ouQua, float expectedOverflow) {
         x = x.clone();
-        m.merge(x, y, scale);
+        float overflow = m.merge(x, y, scale);
         assertEquals(ouPri, x.pri(), tol);
         assertEquals(ouDur, x.dur(), tol);
         assertEquals(ouQua, x.qua(), tol);
+
+        if (expectedOverflow > 0)
+            assertEquals(overflow, expectedOverflow, 0.01f);
+
         return x;
     }
 }

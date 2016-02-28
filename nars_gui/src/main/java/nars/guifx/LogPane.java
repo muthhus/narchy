@@ -229,13 +229,13 @@ public class LogPane extends BorderPane  {
     }
 
 
-    static class ConceptActivationIcon extends Button {
-
-        public ConceptActivationIcon(Concept c) {
-           super(c.term().toStringCompact());
-            setCache(true);
-        }
-    }
+//    static class ConceptActivationIcon extends Button {
+//
+//        public ConceptActivationIcon(Concept c) {
+//           super(c.term().toString());
+//            setCache(true);
+//        }
+//    }
 
     /** displays a specific (from) or a range (from..to) of cycle time values */
     static class CycleActivationBar extends Label {

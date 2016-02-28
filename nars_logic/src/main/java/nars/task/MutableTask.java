@@ -1,8 +1,6 @@
 package nars.task;
 
-import nars.Global;
-import nars.Memory;
-import nars.Symbols;
+import nars.*;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.concept.ConceptProcess;
@@ -25,13 +23,16 @@ import static nars.Global.reference;
  */
 public class MutableTask extends AbstractTask {
 
+    public MutableTask(@NotNull NAR nar, @NotNull String termString) throws Narsese.NarseseException {
+        this(nar.term(termString));
+    }
+
     public MutableTask(@NotNull Termed<Compound> term) {
         /** budget triple - to be valid, at least the first 2 of these must be non-NaN (unless it is a question)  */
         super(term.term(), (char) 0, null,
             /* budget: */ 0, Float.NaN, Float.NaN);
 
         setEternal();
-        setOccurrenceTime(Tense.TIMELESS);
     }
 
 //    @NotNull
@@ -41,7 +42,7 @@ public class MutableTask extends AbstractTask {
 
 
     public MutableTask(@NotNull Task taskToClone, @NotNull Compound newTerm) {
-        super(taskToClone);
+        this(taskToClone);
         term(newTerm);
     }
 
@@ -52,9 +53,12 @@ public class MutableTask extends AbstractTask {
     }
 
     MutableTask(@NotNull Task taskToClone, @NotNull Truth newTruth, long now, long occ) {
-        super(taskToClone);
+        this(taskToClone);
+        punctuation(taskToClone.punc());
+        setEvidence(taskToClone.evidence());
         truth(newTruth);
         MutableTask.this.time(now, occ);
+        parent(taskToClone);
     }
 
     public MutableTask(@NotNull Termed<Compound> content, char punc) {

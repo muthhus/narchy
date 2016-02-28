@@ -462,7 +462,7 @@ public class UnificationTest  {
     public void posNegQuestion() {
         //((p1, (--,p1), task("?")), (p1, (<BeliefNegation --> Truth>, <Judgment --> Punctuation>)))
         //  ((a:b, (--,a:b), task("?")), (a:b, (<BeliefNegation --> Truth>, <Judgment --> Punctuation>)))
-        new RuleTest(
+        RuleTest.get(test(),
                 "a:b?", "(--,a:b).",
                 "a:b.",
                 0,0,0.9f,0.9f);

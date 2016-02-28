@@ -4,6 +4,7 @@ import nars.Global;
 import nars.NAR;
 import nars.bag.Bag;
 import nars.budget.Budget;
+import nars.budget.Budgeted;
 import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
@@ -33,7 +34,8 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
         this.termLinks = termLinks;
     }
 
-    public static final void linkTerm(@NotNull Concept source, @NotNull Concept target, Budget b, float subScale, boolean out, boolean in) {
+    public static final void linkTerm(@NotNull Concept source, @NotNull Concept target,
+                                      @NotNull Budgeted b, float subScale, boolean out, boolean in) {
 
         if (source == target)
             throw new RuntimeException("termlink self-loop");
@@ -142,21 +144,15 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
      * when a task is processed, a tasklink
      * can be created at the concept of its term
      */
-    @Override public boolean link(@NotNull Task task, float scale, float minScale, @NotNull NAR nar) {
+    @Override public boolean linkTask(@NotNull Budgeted task, float scale, float minScale, @NotNull NAR nar) {
 
-        //activate tasklink locally
-        Budget taskBudget = task.budget();
-
-        /*if (taskLinkOut(this, t)) {*/
-            taskLinks.put(task, taskBudget, scale);
-        //}
+        if (task instanceof Task)
+            taskLinks.put((Task)task, task.budget(), scale);
 
         return true;
     }
 
-    public final void linkTerm(@NotNull Concept target, Budget b, float subScale) {
-        linkTerm(this, target, b, subScale, true, true);
-    }
+
 
 //    /**
 //     * called from {@link NARRun}

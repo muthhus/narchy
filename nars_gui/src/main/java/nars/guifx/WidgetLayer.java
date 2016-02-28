@@ -60,7 +60,7 @@ public class WidgetLayer extends MDICanvas {
 
     public void update() {
 
-        Map<String, Object> ss = ((Memory) NAR.this).getSingletons();
+        Map<String, Object> ss = nar.getSingletons();
 
         List<Node> toAdd = Global.newArrayList(ss.size());
         ss.forEach((k, v) -> {

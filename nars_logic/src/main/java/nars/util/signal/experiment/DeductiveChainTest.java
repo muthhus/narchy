@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Created by me on 8/25/15.
  */
-public class DeductiveChainTest extends TestNAR {
+public class DeductiveChainTest  {
 
     @NotNull
     public final Compound q;
@@ -39,8 +39,7 @@ public class DeductiveChainTest extends TestNAR {
     public static final IndexedStatementBuilder equiv = (int x, int y) ->
             (Compound)$.equiv(a(x), a(y));
 
-    public DeductiveChainTest(@NotNull NAR n, int length, int timeLimit, @NotNull IndexedStatementBuilder b) {
-        super(n);
+    public DeductiveChainTest(@NotNull TestNAR n, int length, int timeLimit, @NotNull IndexedStatementBuilder b) {
 
         beliefs = new Compound[length];
         for (int x = 0; x < length; x++) {
@@ -50,11 +49,11 @@ public class DeductiveChainTest extends TestNAR {
         q = b.apply(0, length);
 
         for (Compound belief : beliefs) {
-            n.believe(belief);
+            n.nar.believe(belief);
         }
-        n.ask( q );
+        n.nar.ask( q );
 
-        mustBelieve(timeLimit, q.toString(), 1f, 1f, 0.01f, 1f);
+        n.mustBelieve(timeLimit, q.toString(), 1f, 1f, 0.01f, 1f);
 
     }
 
@@ -79,7 +78,8 @@ public class DeductiveChainTest extends TestNAR {
     static void test(@NotNull NAR n, int chainLen, int cycles, @NotNull IndexedStatementBuilder statementType) {
 
 
-        DeductiveChainTest test = new DeductiveChainTest(n, chainLen, cycles, statementType) {
+        TestNAR testnar = new TestNAR(n);
+        DeductiveChainTest test = new DeductiveChainTest(testnar, chainLen, cycles, statementType) {
 //            @Override
 //            public TestNAR mustBelieve(long withinCycles, String term, float confidence, float x, float y, float z) throws InvalidInputException {
 //                return this;
@@ -105,7 +105,7 @@ public class DeductiveChainTest extends TestNAR {
 //        };
 
 
-        test.run(false);
+        testnar.run(false);
 
 
         //n.stdout();

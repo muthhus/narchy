@@ -25,7 +25,7 @@ import static nars.term.Statement.subj;
 public abstract class TermBuilder {
 
     @Nullable
-    public Term the(@NotNull Op op, int relation, int t, @NotNull TermContainer tt) throws UnbuildableTerm {
+    public Term the(@NotNull Op op, int relation, int t, @NotNull TermContainer tt) throws InvalidTerm {
 
 //        if (tt == null)
 //            return null;
@@ -41,13 +41,13 @@ public abstract class TermBuilder {
 
 
             case INSTANCE:
-                if (u.length != 2 || t != ITERNAL) throw new UnbuildableTerm(INSTANCE);
+                if (u.length != 2 || t != ITERNAL) throw new InvalidTerm(INSTANCE);
                 return inst(u[0], u[1]);
             case PROPERTY:
-                if (u.length != 2 || t != ITERNAL) throw new UnbuildableTerm(PROPERTY);
+                if (u.length != 2 || t != ITERNAL) throw new InvalidTerm(PROPERTY);
                 return prop(u[0], u[1]);
             case INSTANCE_PROPERTY:
-                if (u.length != 2 || t != ITERNAL) throw new UnbuildableTerm(INSTANCE_PROPERTY);
+                if (u.length != 2 || t != ITERNAL) throw new InvalidTerm(INSTANCE_PROPERTY);
                 return instprop(u[0], u[1]);
 
             case CONJUNCTION:
@@ -236,7 +236,7 @@ public abstract class TermBuilder {
         if (!op.validSize(currentSize)) {
             //throw new RuntimeException(Arrays.toString(t) + " invalid size for " + op);
             if (Global.DEBUG)
-                throw new UnbuildableTerm(op, relation, dt, args.terms());
+                throw new InvalidTerm(op, relation, dt, args.terms());
             else
                 return null;
         }
@@ -335,7 +335,7 @@ public abstract class TermBuilder {
                     return u[0];
             } else {
                 if (Global.DEBUG)
-                    throw new UnbuildableTerm(op, -1, t, u);
+                    throw new InvalidTerm(op, -1, t, u);
                 else
                     return null;
             }

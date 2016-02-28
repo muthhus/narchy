@@ -46,9 +46,10 @@ public enum NARideRealtimeDefault {
         Default nar = new Default(1024, 1, 2, 2) {
             @Override
             public Function<Term, Concept> newConceptBuilder() {
-                return new DefaultConceptBuilder(NAR.this.random, 32, 128);
+                return new DefaultConceptBuilder(random, 32, 128);
             }
-        }.with(
+        };
+        nar.with(
                 Anticipate.class,
                 Inperience.class
         );
@@ -61,7 +62,7 @@ public enum NARideRealtimeDefault {
         /*nar.memory.conceptForgetDurations.set(10);
         nar.memory.termLinkForgetDurations.set(100);*/
 
-        ((Memory) NAR.this).duration.set(750 /* ie, milliseconds */);
+        nar.duration.set(750 /* ie, milliseconds */);
         //nar.spawnThread(1000/60);
 
 

@@ -349,7 +349,7 @@ public class DefaultBeliefTable implements BeliefTable {
 //        conclusion.setConfidence( conclusion.conf() * termRelevance );
 
 
-        Termed<Compound> term = LocalRules.intermpolate(newBelief.concept(), oldBelief.concept(), newBelief.conf(), oldBelief.conf());
+        Termed<Compound> term = LocalRules.intermpolate(newBelief, oldBelief, newBelief.conf(), oldBelief.conf());
 
         MutableTask t = new MutableTask(term, newBelief.punc())
                 .truth(conclusion)

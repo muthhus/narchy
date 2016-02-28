@@ -2,6 +2,7 @@ package nars.task.flow;
 
 import nars.Memory;
 import nars.NAR;
+import nars.budget.BudgetMerge;
 import nars.budget.ItemAccumulator;
 import nars.task.Task;
 import nars.util.data.MutableInteger;
@@ -24,13 +25,13 @@ public class SortedTaskPerception extends TaskPerception {
      * @param inputPerCycle -1 for everything
      */
     public SortedTaskPerception(@NotNull NAR nar,
-                                int capacity, int inputPerCycle) {
-        super(nar);
+                                int capacity, int inputPerCycle, BudgetMerge merge) {
+        super(nar, nar::input);
 
         this.inputPerCycle.set( inputPerCycle );
 
         //TODO use MutableInteger for capacity for all Bags
-        buffer = new ItemAccumulator<>(capacity);
+        buffer = new ItemAccumulator<>(capacity, merge);
     }
 
     @Override

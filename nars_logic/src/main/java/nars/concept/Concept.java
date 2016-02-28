@@ -23,9 +23,9 @@ package nars.concept;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Ordering;
 import com.google.common.primitives.Longs;
-import nars.Memory;
 import nars.NAR;
 import nars.bag.Bag;
+import nars.budget.Budgeted;
 import nars.concept.util.BeliefTable;
 import nars.concept.util.TaskTable;
 import nars.task.Task;
@@ -282,16 +282,19 @@ public interface Concept extends Termed, Comparable {
      * attempt insert a tasklink into this concept's tasklink bag
      * return true if successfully inserted
      */
-    boolean link(@NotNull Task task, float scale, float minScale, @NotNull NAR nar);
+    boolean linkTask(@NotNull Budgeted task, float scale, float minScale, @NotNull NAR nar);
 
     //void linkTemplates(Budget budget, float scale, NAR nar);
 
 
-    default boolean link(@NotNull Task task, float initialScale, @NotNull NAR nar) {
-        float minScale =
-                nar.taskLinkThreshold.floatValue() / task.budget().pri();
+    default boolean linkTask(@NotNull Budgeted b, float initialScale, @NotNull NAR nar) {
+        if (initialScale <= 0) return false;
+        if (b.isDeleted()) return false;
 
-        return Float.isFinite(minScale) && link(task, initialScale, minScale, nar);
+        float minScale =
+                nar.taskLinkThreshold.floatValue() / b.pri();
+
+        return Float.isFinite(minScale) && linkTask(b, initialScale, minScale, nar);
     }
 
     /**
@@ -302,12 +305,12 @@ public interface Concept extends Termed, Comparable {
     default void crossLink(@NotNull Task thisTask, @NotNull Task otherTask, float scale, @NotNull NAR nar) {
         if (!otherTask.term().equals(term())) {
 
-            link(otherTask, scale, nar);
+            linkTask(otherTask, scale, nar);
 
             Concept other = nar.concept(otherTask);
                             //nar.conceptualize(otherTask, thisTask.budget(), scale);
             if (other != null)
-                other.link(thisTask, scale, nar);
+                other.linkTask(thisTask, scale, nar);
         }
     }
 

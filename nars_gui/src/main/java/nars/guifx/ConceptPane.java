@@ -318,22 +318,22 @@ public class ConceptPane extends BorderPane implements ChangeListener {
 
 
         Button activateButton = new NARActionButton(nar, "+", (n) -> {
-                n.conceptualize(term, new UnitBudget(1f, 0.75f, 0.75f), 1f, 0);
+                n.conceptualize(term, new UnitBudget(1f, 0.75f, 0.75f), 1f);
         });
         Button yesGoalButton = new NARActionButton(nar, "+!", (n) -> {
-            n.input(new MutableTask(term, '!').present((Memory) NAR.this).log("GUI Goal"));
+            n.input(new MutableTask(term, '!').present(nar).log("GUI Goal"));
         });
         Button noGoalButton = new NARActionButton(nar, "-!", (n) -> {
-            n.input(new MutableTask(term, '!').truth(0f, ((Memory) NAR.this).getDefaultConfidence('!')).present((Memory) NAR.this).log("GUI Goal"));
+            n.input(new MutableTask(term, '!').truth(0f, (nar).getDefaultConfidence('!')).present(nar).log("GUI Goal"));
         });
         Button trueButton = new NARActionButton(nar, "T", (n) -> {
-            n.input(new MutableTask(term, '.').present((Memory) NAR.this).log("GUI True"));
+            n.input(new MutableTask(term, '.').present(nar).log("GUI True"));
         });
         Button falseButton = new NARActionButton(nar, "F", (n) -> {
-            n.input(new MutableTask(neg(term), '.').present((Memory) NAR.this).log("GUI False"));
+            n.input(new MutableTask(neg(term), '.').present(nar).log("GUI False"));
         });
         Button isTrueButton = new NARActionButton(nar, "?", (n) -> {
-            n.input(new MutableTask(term, '?').present((Memory) NAR.this).log("GUI Question"));
+            n.input(new MutableTask(term, '?').present(nar).log("GUI Question"));
         });
 
         if (!term.isCompound()) {

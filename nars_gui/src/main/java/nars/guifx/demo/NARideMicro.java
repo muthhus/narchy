@@ -23,7 +23,7 @@ public enum NARideMicro {
         Default nar = new Default(64, 1, 1, 1) {
             @Override
             public Function<Term, Concept> newConceptBuilder() {
-                return new DefaultConceptBuilder(NAR.this.random, 4,4);
+                return new DefaultConceptBuilder(random, 4,4);
             }
         };
         //nar.trace();

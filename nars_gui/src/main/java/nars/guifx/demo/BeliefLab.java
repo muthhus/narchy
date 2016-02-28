@@ -31,10 +31,10 @@ public class BeliefLab {
         NAR nar = new Default();
         //nar.input("y:x.");
         //nar.input("y:x. %0%");
-        ((Memory) NAR.this).duration.set(duration);
+        nar.duration.set(duration);
 
-        ((Memory) NAR.this).shortTermMemoryHistory.set(stmInduction);
-        ((Memory) NAR.this).conceptBeliefsMax.set(beliefCapacity);
+        nar.shortTermMemoryHistory.set(stmInduction);
+        nar.conceptBeliefsMax.set(beliefCapacity);
         nar.run(2);
 
         Concept c = nar.concept("y:x");
@@ -56,9 +56,9 @@ public class BeliefLab {
             //random temporals
             if (enableTemporals) {
 
-                if (((Memory) NAR.this).random.nextFloat() < predictionProbability)
+                if (nar.random.nextFloat() < predictionProbability)
                     nar.input("y:x? :/:");
-                else if (((Memory) NAR.this).random.nextFloat() < pastProbability)
+                else if (nar.random.nextFloat() < pastProbability)
                     nar.input("y:x? :\\:");
                 else {
                     CharSequence y = Texts.n2(0.5f * ((float) Math.sin(nar.time() * waveFreq) + 1f));

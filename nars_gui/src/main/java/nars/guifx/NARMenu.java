@@ -89,7 +89,7 @@ public class NARMenu extends HBox {
                     try {
                         NQuadsRDF.input(n, new FileInputStream(f));
                     } catch (Exception e) {
-                        ((Memory) NAR.this).eventError.emit(e);
+                        n.eventError.emit(e);
                     }
                 }
             }
@@ -200,7 +200,7 @@ public class NARMenu extends HBox {
             super(nar);
 
 
-            this.clock = (RealtimeMSClock) ((Memory) NAR.this).clock;
+            this.clock = (RealtimeMSClock) nar.clock;
             this.startTime = nar.time();
 
             clockTextField = new TextField();
@@ -208,9 +208,9 @@ public class NARMenu extends HBox {
 
 
             busyPlot = new Plot2D(Plot2D.Line, WINDOW_SIZE, 192);
-            busyPlot.add("Busy", ()->(double) ((Memory) NAR.this).emotion.busy());
-            busyPlot.add("avg short", ()->rollingAverage(busyAvgShort, (double) ((Memory) NAR.this).emotion.busy()));
-            busyPlot.add("avg long", ()->rollingAverage(busyAvgLong, (double) ((Memory) NAR.this).emotion.busy()));
+            busyPlot.add("Busy", ()->(double) nar.emotion.busy());
+            busyPlot.add("avg short", ()->rollingAverage(busyAvgShort, (double) nar.emotion.busy()));
+            busyPlot.add("avg long", ()->rollingAverage(busyAvgLong, (double) nar.emotion.busy()));
 
 //            final Pane controls = new VBox(
 //                    timeDisplay,
@@ -284,11 +284,11 @@ public class NARMenu extends HBox {
             nar = n;
 
             regs = new Active().add(
-                    ((Memory) NAR.this).eventFrameStart.on(nn -> {
+                    n.eventFrameStart.on(nn -> {
                         //System.out.println("frame: " + nn.time());
                         run();
                     }),
-                    ((Memory) NAR.this).eventReset.on(nn -> run())
+                    n.eventReset.on(nn -> run())
             );
 
 

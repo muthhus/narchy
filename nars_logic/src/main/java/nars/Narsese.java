@@ -1050,7 +1050,7 @@ public class Narsese extends BaseParser<Object> {
     /**
      * returns number of tasks created
      */
-    public static int tasks(@NotNull String input, @NotNull Collection<Task> c, @NotNull Memory m) {
+    public static int tasks(@NotNull String input, @NotNull Collection<Task> c, @NotNull Memory m) throws NarseseException  {
         int[] i = new int[1];
         tasks(input, t -> {
             c.add(t);
@@ -1064,7 +1064,7 @@ public class Narsese extends BaseParser<Object> {
      * which can be re-used because a Memory can generate them
      * ondemand
      */
-    public static void tasks(@NotNull String input, @NotNull Consumer<Task> c, @NotNull Memory m) {
+    public static void tasks(@NotNull String input, @NotNull Consumer<Task> c, @NotNull Memory m) throws NarseseException  {
         tasksRaw(input, o -> {
             Task t = decodeTask(m, o);
             if (t == null) {
@@ -1139,14 +1139,14 @@ public class Narsese extends BaseParser<Object> {
      * returns null if the Task is invalid (ex: invalid term)
      */
     @Nullable
-    public static Task decodeTask(@NotNull Memory m, @NotNull Object[] x) {
+    public static Task decodeTask(@NotNull Memory m, @NotNull Object[] x) throws NarseseException  {
         if (x.length == 1 && x[0] instanceof Task) {
             return (Task) x[0];
         }
         Term contentRaw = (Term) x[1];
         Termed content = m.index.normalized(contentRaw);
         if (content == null)
-            throw new RuntimeException("Task term unnormalizable: " + contentRaw);
+            throw new NarseseException("Task term unnormalizable: " + contentRaw);
 
         char punct = (Character) x[2];
 
@@ -1160,7 +1160,7 @@ public class Narsese extends BaseParser<Object> {
     /**
      * parse one term NOT NORMALIZED
      */
-    @Nullable public Term term(@NotNull CharSequence s) {
+    @Nullable public Term term(@NotNull CharSequence s) throws NarseseException {
 
         ParsingResult r = singleTermParser.run(s);
 
@@ -1188,19 +1188,19 @@ public class Narsese extends BaseParser<Object> {
             case 0:
                 return null;
             default:
-                throw new RuntimeException("Invalid parse stack: " + sstack);
+                throw new NarseseException("Invalid parse: " + s + " " + sstack);
         }
 
         return null;
     }
 
 
-    @Nullable public Termed term(@NotNull String s, @NotNull TermIndex t) {
+    @Nullable public Termed term(@NotNull String s, @NotNull TermIndex t) throws NarseseException  {
         return term(s, t, true);
     }
 
     @Nullable
-    public Termed term(String s, @NotNull TermIndex index, boolean normalize) {
+    public Termed term(String s, @NotNull TermIndex index, boolean normalize) throws NarseseException  {
         Term raw = term(s);
         if (raw == null) return null;
 

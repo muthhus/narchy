@@ -6,9 +6,7 @@ import nars.NAR;
 import nars.bag.BLink;
 import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
-import nars.budget.Budget;
-import nars.budget.BudgetMerge;
-import nars.budget.Forget;
+import nars.budget.*;
 import nars.concept.*;
 import nars.data.Range;
 import nars.nal.Deriver;
@@ -24,6 +22,7 @@ import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.event.Active;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
@@ -66,9 +65,9 @@ public class Default extends AbstractNAR {
 
     public Default(int activeConcepts, int conceptsFirePerCycle, int taskLinksPerConcept, int termLinksPerConcept) {
         super(new FrameClock(),
-              new DefaultTermIndex(256),
-              new XorShift128PlusRandom(1),
-              Global.DEFAULT_SELF);
+                new DefaultTermIndex(256),
+                new XorShift128PlusRandom(1),
+                Global.DEFAULT_SELF);
 
         the("input", input = initInput());
 
@@ -82,7 +81,7 @@ public class Default extends AbstractNAR {
                 premiser
         ));
 
-        if (core!=null) {
+        if (core != null) {
             runLater(this::initHigherNAL);
         }
 
@@ -95,12 +94,76 @@ public class Default extends AbstractNAR {
 
     }
 
+    final Activator processor = new Activator() {
+
+        final NAR nar = Default.this; //temporary
+
+        @Override
+        public final void accept(@NotNull Task[] input, float activation) {
+            for (Task t : input) {
+                if (t == null)
+                    break;
+                if (!t.isDeleted())
+                    apply(t, activation);
+            }
+        }
+
+        /**
+         * execute a Task as a TaskProcess (synchronous)
+         * <p>
+         * TODO make private
+         */
+        @Nullable
+        public final Concept apply(@NotNull Task input, float activation) {
+
+            Concept c = concept(input, true);
+            if (c == null) {
+                remove(input, "Inconceivable");
+                return null;
+            }
+
+            emotion.busy(input);
+
+            Task t = c.process(input, nar);
+            boolean processed = t != null;
+
+            activate(t, c, processed ? activation : 0);
+
+            if (processed) {
+
+                eventTaskProcess.emit(t);
+
+                if (t.isGoal())
+                    execute(t, c);
+
+            }
+
+            return c;
+        }
+
+        public void activate(Task t, Concept c, float activation) {
+            if (activation == 0) {
+                return;
+            }
+
+            //complete the activation process
+            c.linkTask(t, activation, Default.this);
+
+        }
+    };
 
     @NotNull
     public TaskPerception initInput() {
 
         return new SetTaskPerception(
-                this, this::process, BudgetMerge.plusDQBlend);
+                this,
+                (t) -> processor.accept(t, 1f),
+                //BudgetMerge.plusDQBlend
+                BudgetMerge.avgDQBlend
+        );
+
+
+        //return new SortedTaskPerception(this, 64, 4, BudgetMerge.avgDQBlend);
 
         /* {
             @Override
@@ -131,10 +194,6 @@ public class Default extends AbstractNAR {
     public DefaultPremiseGenerator newPremiseGenerator() {
         return new DefaultPremiseGenerator(this, Deriver.getDefaultDeriver());
     }
-
-
-
-
 
 
 //    public Bag<Concept> newConceptBagAggregateLinks(int initialCapacity) {
@@ -171,7 +230,8 @@ public class Default extends AbstractNAR {
 //    }
 
 
-    @Override public final float conceptPriority(Termed termed, float priIfNonExistent) {
+    @Override
+    public final float conceptPriority(Termed termed, float priIfNonExistent) {
         Concept cc = concept(termed);
         if (cc != null) {
             BLink<Concept> c = core.active.get(cc);
@@ -181,78 +241,108 @@ public class Default extends AbstractNAR {
         return priIfNonExistent;
     }
 
+
     @Override
-    public Concept conceptualize(Termed termed, Budget activation, float scale, float toTermLinks) {
-        Concept c = concept(termed);
-        if (c!=null) {
-            core.activate(c, activation, scale);
+    public Concept conceptualize(Termed termed, Budgeted activation, float scale) {
 
-            if (toTermLinks!=0) {
-                int numTermLinks = c.termlinks().size();
-                if (numTermLinks > 0) {
-                    float baseScale = toTermLinks * scale / numTermLinks; //minimum wage termlinks can receive
-                    c.termlinks().forEach(bt -> {
-                        conceptualizeLink(activation, toTermLinks, c, bt, baseScale);
-                    });
+        Budget b = activation.budget();
 
-                }
-//                    float basePriIncrease = baseScale * activation.pri();
-//                    //if (baseScale > Global.BUDGET_PROPAGATION_EPSILON) {
+        Concept c = concept(termed, true);
+        if (c != null) {
+
+            core.activate(c, b, scale);
+
+            c.linkTask(activation, scale, Default.this);
+
+
+
+
+
+//            if (templateConcept != null) {
+//                templateConcept.linkTask(task, subScale, minScale, nar);
 //
+//                linkTerm(templateConcept, taskBudget, subScale);
 //
-//                        final float[] priDemand = {0}, priSurplus = {0};
-//                        c.termlinks().forEach(t -> {
-//                            float p = t.pri();
+//                /** recursively activate the template's task tlink */
 //
-//                            if (1f - p > 0)
-//                                priDemand[0] += 1f-p;
+//            }
+
+
+
+//            float toTermLinks = 0;
+//            if (toTermLinks != 0) {
+//                int numTermLinks = c.termlinks().size();
+//                if (numTermLinks > 0) {
+//                    float baseScale = toTermLinks * scale / numTermLinks; //minimum wage termlinks can receive
 //
-//                            float pot = (p + basePriIncrease);
-//                            float potentialSurplus = pot - 1f;
-//                            if (potentialSurplus > 0)
-//                                priSurplus[0] += potentialSurplus;
-//                        });
+//                    List<Termed> l = c.termlinkTemplates();
+//                    for (Termed bt : l) {
 //
+//                    }
 //
-//                        //float tlScale = toTermLinks * scale / numTLToActivate;
-//
-//                        System.out.println(c + " " + priDemand[0] + " " + priSurplus[0]);
-//
-//                                //numTermLinks - priPotential[0];
-//                        //float tlScale = toTermLinks * scale * (1f + surplus * (1f - bt.pri())/priPotential[0])/numTLToActivate;
-//                        //if (tlScale >= Global.BUDGET_PROPAGATION_EPSILON) {
-//                        c.termlinks().forEach(bt -> {
-//
-//                            float s = baseScale +
-//                                    (priSurplus[0] *
-//                                        (1f - bt.pri()) / priDemand[0]); //share of the total demand
-//                            System.out.println("  " + c + " " + s);
-//                            conceptualizeLink(activation, toTermLinks, c, bt, s);
-//                        });
-//
+//                    /*c.termlinks().forEach(bt -> {
+//                        conceptualizeLink(activation, c, bt, baseScale);
+//                    });*/
 //
 //                }
+////                    float basePriIncrease = baseScale * activation.pri();
+////                    //if (baseScale > Global.BUDGET_PROPAGATION_EPSILON) {
+////
+////
+////                        final float[] priDemand = {0}, priSurplus = {0};
+////                        c.termlinks().forEach(t -> {
+////                            float p = t.pri();
+////
+////                            if (1f - p > 0)
+////                                priDemand[0] += 1f-p;
+////
+////                            float pot = (p + basePriIncrease);
+////                            float potentialSurplus = pot - 1f;
+////                            if (potentialSurplus > 0)
+////                                priSurplus[0] += potentialSurplus;
+////                        });
+////
+////
+////                        //float tlScale = toTermLinks * scale / numTLToActivate;
+////
+////                        System.out.println(c + " " + priDemand[0] + " " + priSurplus[0]);
+////
+////                                //numTermLinks - priPotential[0];
+////                        //float tlScale = toTermLinks * scale * (1f + surplus * (1f - bt.pri())/priPotential[0])/numTLToActivate;
+////                        //if (tlScale >= Global.BUDGET_PROPAGATION_EPSILON) {
+////                        c.termlinks().forEach(bt -> {
+////
+////                            float s = baseScale +
+////                                    (priSurplus[0] *
+////                                        (1f - bt.pri()) / priDemand[0]); //share of the total demand
+////                            System.out.println("  " + c + " " + s);
+////                            conceptualizeLink(activation, toTermLinks, c, bt, s);
+////                        });
+////
+////
+////                }
+////
+////
 //
-//
-            }
+//            }
+
 
         }
-
-
         return c;
+
     }
-
-    public void conceptualizeLink(Budget activation, float toTermLinks, Concept c, BLink<? extends Termed> bt, float s) {
-
-        if (s * activation.pri() > Global.BUDGET_PROPAGATION_EPSILON) {
-
-            Concept tc = conceptualize(bt.get(), activation, s, toTermLinks);
-
-            if (tc != null) {
-                AbstractConcept.linkTerm(c, tc, activation, s, true, false);
-            }
-        }
-    }
+//
+//    public void conceptualizeLink(Budget activation, Concept c, BLink<? extends Termed> bt, float s) {
+//
+//        if (s * activation.pri() > Global.BUDGET_PROPAGATION_EPSILON) {
+//
+//            Concept tc = conceptualize(bt.get(), activation, s);
+//
+//            if (tc != null) {
+//                AbstractConcept.linkTerm(c, tc, activation, s, true, false);
+//            }
+//        }
+//    }
 
     @NotNull
     @Override
@@ -272,36 +362,36 @@ public class Default extends AbstractNAR {
      * The original deterministic memory cycle implementation that is currently used as a standard
      * for development and testing.
      */
-    public abstract static class AbstractCycle  {
+    public abstract static class AbstractCycle {
 
         @NotNull
         final Active handlers;
 
-        public final Deriver  der;
+        public final Deriver der;
 
         /**
          * How many concepts to fire each cycle; measures degree of parallelism in each cycle
          */
         @NotNull
-        @Range(min=0,max=64,unit="Concept")
+        @Range(min = 0, max = 64, unit = "Concept")
         public final MutableInteger conceptsFiredPerCycle;
 
-        @Range(min=0,max=16,unit="TaskLink") //TODO use float percentage
+        @Range(min = 0, max = 16, unit = "TaskLink") //TODO use float percentage
         public final MutableInteger tasklinksFiredPerFiredConcept = new MutableInteger(1);
 
-        @Range(min=0,max=16,unit="TermLink")
+        @Range(min = 0, max = 16, unit = "TermLink")
         public final MutableInteger termlinksFiredPerFiredConcept = new MutableInteger(1);
 
-        @Range(min=0.0f,max=1.0,unit="Percent")
+        @Range(min = 0.0f, max = 1.0, unit = "Percent")
         public final MutableFloat activationRate;
 
-        @Range(min=0.01f,max=8,unit="Duration")
+        @Range(min = 0.01f, max = 8, unit = "Duration")
         public final MutableFloat conceptRemembering;
 
-        @Range(min=0.01f,max=8,unit="Duration")
+        @Range(min = 0.01f, max = 8, unit = "Duration")
         public final MutableFloat termLinkRemembering;
 
-        @Range(min=0.01f,max=8,unit="Duration")
+        @Range(min = 0.01f, max = 8, unit = "Duration")
         public final MutableFloat taskLinkRemembering;
 
         //public final MutableFloat activationFactor = new MutableFloat(1.0f);
@@ -309,7 +399,6 @@ public class Default extends AbstractNAR {
 //        final Function<Task, Task> derivationPostProcess = d -> {
 //            return LimitDerivationPriority.limitDerivation(d);
 //        };
-
 
 
         /**
@@ -325,9 +414,8 @@ public class Default extends AbstractNAR {
 //        public final MutableInteger capacity = new MutableInteger();
 
 
-
         @NotNull
-        @Range(min=0, max=1f,unit="Perfection")
+        @Range(min = 0, max = 1f, unit = "Perfection")
         public final MutableFloat perfection;
 
         final List<BLink<Concept>> firing = Global.newArrayList(1);
@@ -338,7 +426,6 @@ public class Default extends AbstractNAR {
         private final Forget.AbstractForget<Termed> termLinkForget;
         @NotNull
         private final Forget.AbstractForget<Concept> conceptForget;
-
 
 
         final PremiseGenerator premiser;
@@ -369,8 +456,8 @@ public class Default extends AbstractNAR {
             active = concepts;
 
             this.handlers = new Active(
-                nar.eventCycleEnd.on(this::cycle),
-                nar.eventReset.on(this::reset)
+                    nar.eventCycleEnd.on(this::cycle),
+                    nar.eventReset.on(this::reset)
             );
 
             conceptForget = new Forget.ExpForget(nar, conceptRemembering, perfection);
@@ -388,7 +475,9 @@ public class Default extends AbstractNAR {
 
         }
 
-        /** apply pending activity at the end of a cycle */
+        /**
+         * apply pending activity at the end of a cycle
+         */
         private final void commit() {
 
             Bag<Concept> active = this.active;
@@ -403,7 +492,8 @@ public class Default extends AbstractNAR {
         /**
          * samples a next active concept
          */
-        @Deprecated public final Concept next() {
+        @Deprecated
+        public final Concept next() {
             return active.sample().get();
         }
 
@@ -462,11 +552,9 @@ public class Default extends AbstractNAR {
     public static class DefaultCycle extends AbstractCycle {
 
 
-
         public DefaultCycle(@NotNull NAR nar, Deriver deriver, PremiseGenerator premiseGenerator, int activeConcepts) {
             super(nar, deriver, newConceptBag(nar.random, activeConcepts), premiseGenerator);
         }
-
 
 
         @NotNull
@@ -475,7 +563,6 @@ public class Default extends AbstractNAR {
                     //.mergePlus();
                     .merge(BudgetMerge.plusDQBlend);
         }
-
 
 
 //        @NotNull
@@ -506,7 +593,9 @@ public class Default extends AbstractNAR {
     }
 
 
-    /** single-threaded premise generator and processor; re-uses the same result collection buffer */
+    /**
+     * single-threaded premise generator and processor; re-uses the same result collection buffer
+     */
     public static class DefaultPremiseGenerator extends PremiseGenerator {
 
         protected final Collection<Task> sharedResultBuffer;
@@ -516,9 +605,11 @@ public class Default extends AbstractNAR {
          */
         final @NotNull PremiseEval matcher;
 
-        /** derived tasks with truth confidence lower than this value are discarded. */
+        /**
+         * derived tasks with truth confidence lower than this value are discarded.
+         */
         @NotNull
-        @Range(min=0, max=1f)
+        @Range(min = 0, max = 1f)
         public final MutableFloat confMin;
 
         public DefaultPremiseGenerator(@NotNull NAR nar, Deriver deriver) {
@@ -535,7 +626,9 @@ public class Default extends AbstractNAR {
             nar.onFrame(this::updateDerivationParameters);
         }
 
-        /** update derivation parameters (each frame) */
+        /**
+         * update derivation parameters (each frame)
+         */
         private void updateDerivationParameters(NAR nar) {
             matcher.setMinConfidence(confMin.floatValue());
         }

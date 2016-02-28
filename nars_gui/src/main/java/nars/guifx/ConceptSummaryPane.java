@@ -27,8 +27,7 @@ public class ConceptSummaryPane extends Text {
             0.1 + 0.9f * conf));
 
     public ConceptSummaryPane(Concept c, long now) {
-        super(c.term().toStringCompact());
-
+        super(c.term().toString());
 
         concept = c;
 

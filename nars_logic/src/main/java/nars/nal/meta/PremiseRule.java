@@ -108,8 +108,6 @@ public class PremiseRule extends GenericCompound {
      */
     public int minNAL;
 
-    private final String str;
-
     protected String source;
 
     public @Nullable MatchTaskBelief match;
@@ -132,7 +130,6 @@ public class PremiseRule extends GenericCompound {
 
     public PremiseRule(@NotNull Compound premises, @NotNull Compound result) {
         super(Op.PRODUCT, TermVector.the(premises, result));
-        str = super.toString();
     }
 
 
@@ -287,10 +284,10 @@ public class PremiseRule extends GenericCompound {
     }
 
 
-    @Override
-    public final String toString(boolean pretty) {
-        return str;
-    }
+//    @Override
+//    public final String toString(boolean pretty) {
+//        return str;
+//    }
 
     @Nullable
     public final Term task() {
@@ -352,7 +349,7 @@ public class PremiseRule extends GenericCompound {
 
             return new PremiseRule( premiseComponents );
 
-        } catch (UnbuildableTerm e) {
+        } catch (InvalidTerm e) {
             e.printStackTrace();
             logger.error("normalizeRule untransformed: {} {}", this, e.getCause());
             return null;

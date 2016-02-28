@@ -5,6 +5,7 @@ import nars.Global;
 import nars.Narsese;
 import nars.Op;
 import nars.budget.Budget;
+import nars.concept.Concept;
 import nars.nal.meta.PremiseAware;
 import nars.nal.meta.PremiseEval;
 import nars.nal.meta.match.EllipsisMatch;
@@ -432,7 +433,7 @@ public interface TermIndex  {
         for (int i = 0; i < n; i++) {
             Term x = src.term(i);
             if (x == null)
-                throw new UnbuildableTerm();
+                throw new InvalidTerm();
 
             if (trans.test(x)) {
 
@@ -464,6 +465,9 @@ public interface TermIndex  {
                         //method 2: on heap
                         Op op = cx.op();
                         int dt = cx.dt();
+
+                        //this constructs the new term on the heap, not in this index.
+                        //TODO make this configurable
                         x = $.the(op, cx.relation(), dt,
                                 TermContainer.the(op, yy)
                         );

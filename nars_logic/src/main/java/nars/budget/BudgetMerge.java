@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 @FunctionalInterface
 public interface BudgetMerge {
 
-    static void dqBlendByPri(@NotNull Budget tgt, @NotNull Budgeted src, float srcScale, boolean addOrAvgPri) {
+    static float dqBlendByPri(@NotNull Budget tgt, @NotNull Budgeted src, float srcScale, boolean addOrAvgPri) {
         float incomingPri = src.priIfFiniteElseZero() * srcScale;
 
         float currentPri = tgt.priIfFiniteElseZero();
@@ -18,11 +18,11 @@ public interface BudgetMerge {
 
         float cp = sumPri > 0 ? currentPri / sumPri : 0.5f; // current proportion
 
-        dqBlend(tgt, src, addOrAvgPri ?
+        return dqBlend(tgt, src, addOrAvgPri ?
                 sumPri :
                 ((cp * currentPri) + ((1f-cp) * incomingPri)), cp);
     }
-    static void dqBlendBySummary(@NotNull Budget tgt, @NotNull Budgeted src, float srcScale, boolean addOrAvgPri) {
+    static float dqBlendBySummary(@NotNull Budget tgt, @NotNull Budgeted src, float srcScale, boolean addOrAvgPri) {
         float incomingPri = src.pri() * srcScale;
         float incomingSummary = src.summary() * srcScale;
 
@@ -33,36 +33,49 @@ public interface BudgetMerge {
 
         float cp = currentSummary / sumSummary; // current proportion
 
-        dqBlend(tgt, src, addOrAvgPri ?
+        return dqBlend(tgt, src, addOrAvgPri ?
                 currentPri + incomingPri :
                 ((cp * currentPri) + ((1f-cp) * incomingPri)), cp);
     }
 
-    static void dqBlend(@NotNull Budget tgt, @NotNull Budgeted src, float nextPri, float cp) {
+    static float dqBlend(@NotNull Budget tgt, @NotNull Budgeted src, float nextPri, float cp) {
         float ip = 1f - cp; // inverse proportion
+
+        float overflow;
+        if (nextPri > 1f) {
+            overflow = nextPri - 1f;
+            nextPri = 1f;
+        } else {
+            overflow = 0;
+        }
+
 
         tgt.budget(nextPri,
                 (cp * tgt.dur()) + (ip * src.dur()),
                 (cp * tgt.qua()) + (ip * src.qua()));
+
+        return overflow;
     }
 
     /** sum priority, LERP other components in proportion to the priorities */
     BudgetMerge plusDQBlend = (tgt, src, srcScale) -> {
-        dqBlendByPri(tgt, src, srcScale, true);
+        return dqBlendByPri(tgt, src, srcScale, true);
         //dqBlendBySummary(tgt, src, srcScale, true);
     };
 
     /** avg priority, LERP other components in proportion to the priorities */
     BudgetMerge avgDQBlend = (tgt, src, srcScale) -> {
-        dqBlendByPri(tgt, src, srcScale, false);
+        return dqBlendByPri(tgt, src, srcScale, false);
         //dqBlendBySummary(tgt, src, srcScale, false);
     };
 
-    /** merge 'incoming' budget (scaled by incomingScale) into 'existing' */
-    void merge(Budget existing, Budgeted incoming, float incomingScale);
+    /** merge 'incoming' budget (scaled by incomingScale) into 'existing'
+     * @return any resultng overflow priority which was not absorbed by the target, >=0
+     * */
+    float merge(Budget existing, Budgeted incoming, float incomingScale);
 
-    default void merge(Budget existing, Budget incoming) {
-        merge(existing, incoming, 1f);
+    default float merge(Budget existing, Budget incoming) {
+        return merge(existing, incoming, 1f);
     }
 
     BudgetMerge plusDQDominant = (tgt, src, srcScale) -> {
@@ -71,13 +84,21 @@ public interface BudgetMerge {
         float currentPriority = tgt.priIfFiniteElseZero();
 
         float sumPriority = currentPriority + nextPriority;
-        if (sumPriority > 1) sumPriority = 1f;
+        float overflow;
+        if (sumPriority > 1) {
+            overflow = sumPriority - 1f;
+            sumPriority = 1f;
+        } else {
+            overflow = 0;
+        }
 
         boolean currentWins = currentPriority > nextPriority;
 
         tgt.budget( sumPriority,
                 (currentWins ? tgt.dur() : src.dur()),
                 (currentWins ? tgt.qua() : src.qua()));
+
+        return overflow;
     };
 
 //    /** add priority, interpolate durability and quality according to the relative change in priority
@@ -114,12 +135,14 @@ public interface BudgetMerge {
     /** add priority, interpolate durability and quality according to the relative change in priority
      *  WARNING untested
      * */
-    BudgetMerge max = (tgt, src, srcScaleIgnored) ->
-            tgt.budget(
+    BudgetMerge max = (tgt, src, srcScaleIgnored) -> {
+        tgt.budget(
             Util.max(src.priIfFiniteElseZero(), tgt.priIfFiniteElseZero()),
             Util.max(src.dur(), tgt.dur()),
-            Util.max(src.qua(), tgt.qua())
-        );
+            Util.max(src.qua(), tgt.qua()));
+        return 0;
+    };
+
 
 //    /** the max priority, durability, and quality of two tasks */
 //    default Budget mergeMax(Budget b) {

@@ -34,9 +34,9 @@ public abstract class ConceptsListPane extends LogPane {
                 displayed.forEach(this::update);
         });
 
-        ((Memory) NAR.this).eventTaskProcess.on(tp -> {
+        n.eventTaskProcess.on(tp -> {
 
-            Concept c = n.concept(tp.concept());
+            Concept c = n.concept(tp.concept(n));
 
             //TODO more efficient:
             pendingDisplay.remove(c);

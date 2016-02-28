@@ -305,6 +305,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     }
 
 
+
     @Nullable
     default CharSequence toString(Memory memory, boolean showStamp) {
         return appendTo(new StringBuilder(), memory, showStamp);
@@ -313,19 +314,15 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     @NotNull
     @Override default Task get() { return this ;}
 
-    default Termed<Compound> concept() {
-        return term();
-    }
-
-    @Nullable
+    @NotNull
     default Concept concept(@NotNull NAR n) {
-        return n.concept(concept());
+        return n.concept(term());
     }
 
-    @Override
+    @NotNull @Override
     Compound term();
 
-    @Override
+    @Nullable @Override
     Truth truth();
 
     default boolean isQuestOrQuestion() {
@@ -341,13 +338,11 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         return true;
     }
 
-    void setExecuted();
-
-    default float getConfidenceIfTruthOr(float v) {
-        Truth t = truth();
-        if (t == null) return v;
-        return t.conf();
-    }
+//    default float getConfidenceIfTruthOr(float v) {
+//        Truth t = truth();
+//        if (t == null) return v;
+//        return t.conf();
+//    }
 
     @NotNull
     default Task projectTask(long when, long now) {

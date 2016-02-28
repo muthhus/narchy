@@ -1,6 +1,8 @@
 
 package nars.util.event;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.lang.reflect.Field;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -70,11 +72,11 @@ public interface Topic<V> {
     /** TODO rename to 'out' to match Streams api */
     void emit(V arg);
 
-    On on(Consumer<V> o);
-    void off(On<V> reaction);
+    @NotNull On on(@NotNull Consumer<V> o);
+    void off(@NotNull On<V> reaction);
 
     @SafeVarargs
-    static <V> Active onAll(Consumer<V> o, Topic<V>... w) {
+    static <V> Active onAll(@NotNull Consumer<V> o, Topic<V>... w) {
         Active r = new Active(w.length);
     
         for (Topic<V> c : w)

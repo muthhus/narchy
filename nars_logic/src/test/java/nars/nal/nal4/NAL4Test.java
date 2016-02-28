@@ -217,7 +217,7 @@ public class NAL4Test extends AbstractNALTest {
     @Test public void missingEdgeCase2() {
         //((<(%1) --> %2>, %2), (<%2 --> (/, %1, _)>, (<Identity --> Truth>, <Identity --> Desire>)))
         //  ((<(p1) --> p2>, p2), (<p2 --> (/, p1, _)>, (<Identity --> Truth>, <Identity --> Desire>)))
-        new RuleTest(
+        RuleTest.get(test(),
                 "<(p1) --> belief:p2>.", "belief:p2.",
                 "<belief:p2 --> (/, _, p1)>.",
                 1.0f, 1.0f, 0.9f, 0.9f);
@@ -227,7 +227,7 @@ public class NAL4Test extends AbstractNALTest {
     @Test public void missingEdgeCase3() {
         //((<(%1) --> %2>, %1), (<%1 --> (/, %2, _)>, (<Identity --> Truth>, <Identity --> Desire>)))
         //  ((<(p1) --> p2>, p1), (<p1 --> (/, p2, _)>, (<Identity --> Truth>, <Identity --> Desire>)))
-        new RuleTest(
+        RuleTest.get(test(),
                 "<(belief:p1) --> p2>.", "belief:p1.",
                 "<belief:p1 --> (/, p2, _)>.",
                 1.0f, 1.0f, 0.9f, 0.9f);
@@ -235,7 +235,7 @@ public class NAL4Test extends AbstractNALTest {
 
     @Test public void missingEdgeCase4() {
         //((<%1 --> (%2)>, %1), (<(\, %2, _) --> %1>, (<Identity --> Truth>, <Identity --> Desire>)))
-        new RuleTest(
+        RuleTest.get(test(),
                 "<belief:p1 --> (p2)>.", "belief:p1.",
                 "<(\\, _, p2) --> belief:p1>.",
                 1.0f, 1.0f, 0.9f, 0.9f);
@@ -243,7 +243,7 @@ public class NAL4Test extends AbstractNALTest {
 
     @Test public void missingEdgeCase5() {
         //((<%1 --> (%2)>, %2), (<(\, %1, _) --> %2>, (<Identity --> Truth>, <Identity --> Desire>)))
-        new RuleTest(
+        RuleTest.get(test(),
                 "<p1 --> (belief:p2)>.", "belief:p2.",
                 "<(\\, p1, _) --> belief:p2>.",
                 1.0f, 1.0f, 0.9f, 0.9f);

@@ -190,6 +190,14 @@ public class NarseseTest {
     }
 
     @Test
+    public void testStatementTerms() throws Narsese.NarseseException {
+
+        assertNotNull(term("< a --> b >"));
+        assertNotNull(term("(a-->b)"));
+
+    }
+
+    @Test
     public void testProduct() throws Narsese.NarseseException {
 
         Compound pt = term("(a, b, c)");

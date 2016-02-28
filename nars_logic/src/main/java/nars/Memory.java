@@ -117,7 +117,7 @@ public class Memory extends Param {
     /** maximum NAL level currently supported by this memory, for restricting it to activity below NAL8 */
     int level;
 
-    private final AtomicLong currentStampSerial = new AtomicLong();
+    private final AtomicLong currentStampSerial = new AtomicLong(1);
 
 
     public Memory(@NotNull Clock clock, TermIndex index) {

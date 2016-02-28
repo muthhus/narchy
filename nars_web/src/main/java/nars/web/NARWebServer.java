@@ -61,13 +61,13 @@ public class NARWebServer extends PathHandler {
 
 
             active = new Active(
-                ((Memory) NAR.this).eventInput.on(t -> send(socket,
+                nar.eventInput.on(t -> send(socket,
                         " IN: " + t)),
                 /*nar.memory.eventDerived.on(t -> send(socket,
                         "DER: " + t)),*/
-                ((Memory) NAR.this).eventAnswer.on(t -> send(socket,
+                nar.eventAnswer.on(t -> send(socket,
                         "ANS: " + t)),
-                ((Memory) NAR.this).eventError.on(t -> send(socket,
+                nar.eventError.on(t -> send(socket,
                         "ERR: " + t))
             );
 

@@ -5,6 +5,7 @@ import nars.Memory;
 import nars.NAR;
 import nars.Op;
 import nars.bag.BLink;
+import nars.bag.Bag;
 import nars.nal.Tense;
 import nars.task.MutableTask;
 import nars.task.Task;
@@ -41,7 +42,7 @@ abstract public class PremiseGenerator extends UnifySubst implements Function<Te
     /**
      * temporary re-usable array for batch firing
      */
-    private final Collection<BLink<Termed>> terms =
+    private final Collection<BLink<? extends Termed>> terms =
             Global.newArrayList();
             //Global.newHashSet(1);
 
@@ -76,25 +77,38 @@ abstract public class PremiseGenerator extends UnifySubst implements Function<Te
             //beliefCache.clear();
         }
 
-
         Concept concept = conceptLink.get();
 
-        Collection<BLink<Task>> tasksBuffer = this.tasks;
-        //concept.getTaskLinks().sample(tasklinks, eachTaskLink, tasksBuffer).commit();
-        concept.tasklinks().filter(eachTaskLink).commit().sample(tasklinks, tasksBuffer::add);
-        if (tasksBuffer.isEmpty()) return;
 
-        Collection<BLink<Termed>> termsBuffer = this.terms;
-        //concept.getTermLinks().sample(termlinks, eachTermLink, termsBuffer).commit();
-        concept.termlinks().forEachThen(eachTermLink).commit().sample(termlinks, termsBuffer::add);
-        if (termsBuffer.isEmpty()) return;
+        Collection<BLink<Task>> tasksBuffer;
+        Collection<BLink<? extends Termed>> termsBuffer;
+        {
+            termsBuffer = this.terms;
+
+            Bag<Termed> termLinks = concept.termlinks();
+            boolean tlEmpty = termLinks.isEmpty();
+            if (!tlEmpty) {
+                termsBuffer.clear();
+                termLinks.forEachThen(eachTermLink).commit().sample(termlinks, termsBuffer::add);
+            }
+
+            if (termsBuffer.isEmpty())
+                return; //no termlink available
+        }
+
+
+        {
+            tasksBuffer = this.tasks;
+            tasksBuffer.clear();
+            //concept.getTaskLinks().sample(tasklinks, eachTaskLink, tasksBuffer).commit();
+            concept.tasklinks().filter(eachTaskLink).commit().sample(tasklinks, tasksBuffer::add);
+            if (tasksBuffer.isEmpty()) return;
+        }
 
         //convert to array for fast for-within-for iterations
         BLink[] tasksArray = this.tasksArray = tasksBuffer.toArray(this.tasksArray);
-        tasksBuffer.clear();
 
         BLink[] termsArray = this.termsArray = termsBuffer.toArray(this.termsArray);
-        termsBuffer.clear();
 
         for (BLink<? extends Termed> termLink : (BLink<? extends Termed>[]) termsArray) {
 

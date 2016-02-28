@@ -188,13 +188,19 @@ public abstract class TracePane extends LogPane implements ChangeListener, Consu
     }
     public void appear() {
         if (reg==null && events == null) {
-            reg = ((Memory) NAR.this).eventFrameStart.on(this);
-            events = Topic.all(NAR.this, this::output,
-                    (k) ->  !k.equals("eventConceptProcess") &&
-                            !k.equals("eventConceptActivated") &&
-                            !k.equals("eventConceptChanged") &&
-                            !k.equals("eventTaskRemoved") &&
-                            !k.equals("eventDerived")
+            reg = nar.eventFrameStart.on(this);
+            events = Topic.all(nar, this::output,
+                    (k) -> {
+                        switch (k) {
+                            case "eventConceptProcess":
+                            case "eventConceptActivated":
+                            case "eventConceptChanged":
+                            case "eventTaskRemoved":
+                                return false;
+                            default:
+                                return true;
+                        }
+                    }
             );
 
             appender = new UnsynchronizedAppenderBase() {

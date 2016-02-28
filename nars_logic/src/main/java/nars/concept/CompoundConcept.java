@@ -6,6 +6,7 @@ import nars.Op;
 import nars.Symbols;
 import nars.bag.Bag;
 import nars.budget.Budget;
+import nars.budget.Budgeted;
 import nars.concept.util.*;
 import nars.nal.LocalRules;
 import nars.task.Task;
@@ -626,16 +627,16 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
 
 
     @Override
-    public boolean link(@NotNull Task task, float scale, float minScale, @NotNull NAR nar) {
-        if (super.link(task, scale, minScale, nar)) {
+    public boolean linkTask(@NotNull Budgeted task, float scale, float minScale, @NotNull NAR nar) {
+        //1. Link the Task
 
+        if (super.linkTask(task, scale, minScale, nar)) {
 
+            //3. Link the termlink templates
             List<Termed> templates = termlinkTemplates();
             if (templates == null) {
                 templates = this.termLinkTemplates = TermLinkBuilder.build(this, nar);
             }
-
-            Budget taskBudget = task.budget();
 
             float subScale;
             int numTemplates = templates.size();
@@ -650,15 +651,10 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
 
             for (int i = 0, templatesSize = templates.size(); i < templatesSize; i++) {
                 Termed linkTemplate = templates.get(i);
+                Concept target = nar.conceptualize(linkTemplate, task, subScale);
 
-                Concept templateConcept = nar.conceptualize(linkTemplate, taskBudget, subScale, 0);
-                if (templateConcept != null) {
-                    linkTerm(templateConcept, taskBudget, subScale);
-
-                    /** recursively activate the template's task tlink */
-                    templateConcept.link(task, subScale, minScale, nar);
-                }
-
+                //2. Link the peer termlink bidirectionally
+                linkTerm(this, target, task, scale, true, true);
             }
 
             return true;

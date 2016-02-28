@@ -107,9 +107,7 @@ public class MapIndex2 extends AbstractMapIndex {
         return node!=null ? get(t, node, subsBefore, create) : null;
     }
 
-    @NotNull private Termed get(@NotNull Compound t, @NotNull SubtermNode node, @NotNull TermContainer subsBefore, boolean create) {
-
-
+    @Nullable private Termed get(@NotNull Compound t, @NotNull SubtermNode node, @NotNull TermContainer subsBefore, boolean create) {
 
         int oprel = t.opRel();
 
@@ -119,7 +117,7 @@ public class MapIndex2 extends AbstractMapIndex {
             TermContainer subsAfter = node.vector;
             if (subsAfter!=subsBefore) { //rebuild if necessary
                 if ((interned = internCompound(subsAfter, t.op(), t.relation(), t.dt())) == null)
-                    throw new UnbuildableTerm(t);
+                    throw new InvalidTerm(t);
                     //return null;
             } else {
                 interned = t; //use original parameter itself; for more isolation, this could be replaced with a clone creator
@@ -127,7 +125,7 @@ public class MapIndex2 extends AbstractMapIndex {
 
             interned = conceptBuilder.apply(interned.term());
             if (interned == null)
-                throw new UnbuildableTerm(t);
+                throw new InvalidTerm(t);
 
             Termed preExisting = node.put(oprel, interned);
             assert(preExisting == null);
@@ -153,7 +151,12 @@ public class MapIndex2 extends AbstractMapIndex {
     }
 
     @NotNull public SubtermNode getOrAddNode(TermContainer s) {
-        return data.computeIfAbsent(s, termContainerSubtermNodeFunction);
+        //return data.computeIfAbsent(s, termContainerSubtermNodeFunction);
+        SubtermNode d = data.get(s);
+        if (d == null) {
+            data.put(s, d = termContainerSubtermNodeFunction.apply(s));
+        }
+        return d;
     }
     @Nullable public SubtermNode getNode(TermContainer s) {
         return data.get(s);

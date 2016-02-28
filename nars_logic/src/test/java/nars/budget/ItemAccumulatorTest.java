@@ -24,10 +24,9 @@ public class ItemAccumulatorTest {
     @Test
     public void testAccumulatorDeduplication() {
         ItemAccumulator<Task> ii = new ItemAccumulator<Task>(
-                2 //capacity = 2 but this test will only grow to size 1 if successful
+                2, //capacity = 2 but this test will only grow to size 1 if successful
+                BudgetMerge.plusDQDominant
         );
-
-        ii.bag().merge(BudgetMerge.plusDQDominant);
 
         assertEquals(0, ii.bag().size());
 
@@ -57,7 +56,8 @@ public class ItemAccumulatorTest {
         int capacity = 4;
 
         ItemAccumulator<Task> ii = new ItemAccumulator<Task>(
-                capacity
+                capacity,
+                BudgetMerge.plusDQBlend
         );
 
 
@@ -110,7 +110,7 @@ public class ItemAccumulatorTest {
 
         int capacity = 8;
 
-        ItemAccumulator<Task> ii = new ItemAccumulator<Task>(capacity);
+        ItemAccumulator<Task> ii = new ItemAccumulator<Task>(capacity, BudgetMerge.plusDQBlend);
         assertTrue(ii.bag().isSorted());
 
         for (int i = 0; i < capacity - 1; i++) {
@@ -139,7 +139,7 @@ public class ItemAccumulatorTest {
 
         int capacity = 8;
 
-        ItemAccumulator<Task> ii = new ItemAccumulator<Task>(capacity);
+        ItemAccumulator<Task> ii = new ItemAccumulator<Task>(capacity,BudgetMerge.plusDQBlend);
 
         for (int i = 0; i < capacity-1; i++) {
             float dur = i * 0.05f;

@@ -53,9 +53,7 @@ public class Commander implements Consumer<NAR>, Supplier<Concept> {
 //    float priorityPerCycle = 1,
 //            priorityRemaining = 0; //change left over from last cycle
 
-    public Commander(@NotNull NAR nar, int capacity) {
-        this(nar, new ItemAccumulator<>(capacity));
-    }
+
 
     public Commander(@NotNull NAR nar, ItemAccumulator<Task> buffer) {
 
@@ -116,7 +114,7 @@ public class Commander implements Consumer<NAR>, Supplier<Concept> {
                 Task next = commandIterator.next().get();
                 if (valid(now, next)) {
                     /*Concept c = */nar.input(next);
-                    Concept c = nar.concept( next.concept() );
+                    Concept c = nar.concept( next );
                     if (c!=null) {
                         concepts.add(c);
                         //TODO add recursive components?

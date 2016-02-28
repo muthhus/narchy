@@ -250,14 +250,6 @@ public abstract class AbstractTask extends UnitBudget
         return state;
     }
 
-    @Override
-    public void setExecuted() {
-        if (state==TaskState.Executed)
-            throw new RuntimeException("can not execute already executed");
-
-        state = TaskState.Executed;
-    }
-
     /** if validated and entered into the system. can be overridden in subclasses to handle this event
      *  isnt called for Command tasks currently; they will be executed right away anyway
      * */
@@ -338,11 +330,6 @@ public abstract class AbstractTask extends UnitBudget
 
         //if debug, check that they are equal..
         //term = (Compound) c.getTerm(); //HACK the cast
-    }
-
-
-    @Override public final Termed<Compound> concept() {
-        return term;
     }
 
     @Override

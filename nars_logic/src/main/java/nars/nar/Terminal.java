@@ -3,6 +3,7 @@ package nars.nar;
 import nars.Memory;
 import nars.NAR;
 import nars.budget.Budget;
+import nars.budget.Budgeted;
 import nars.concept.Concept;
 import nars.task.Task;
 import nars.task.flow.FIFOTaskPerception;
@@ -59,7 +60,7 @@ public class Terminal extends AbstractNAR {
     }
 
     @Override
-    public Concept conceptualize(Termed termed, Budget activation, float scale, float toTermLinks) {
+    public Concept conceptualize(Termed termed, Budgeted activation, float scale) {
         return concept(termed); //ignore activation
     }
 
@@ -94,7 +95,7 @@ public class Terminal extends AbstractNAR {
     public FIFOTaskPerception initInput() {
         return new FIFOTaskPerception(this,
                 taskFilter,
-                this::process
+                null //TODO
         );
     }
 }

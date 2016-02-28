@@ -12,7 +12,7 @@
     /*-fx-text-base-color: rgb(230,230,230);*/
 
     -fx-base: rgb(0, 0, 0);
-    /*-fx-base-color: rgb(0, 0, 0);*/
+    -fx-base-color: rgb(0, 0, 0);
 
     -fx-fill: #fff;
 
@@ -46,10 +46,12 @@
     -fx-background-color: black;
     -fx-border-width: 0;
 }
-/*
+
 .control {
+-fx-base-color:
+        rgba(10,10,10);
 }
-*/
+
 
 /*.text-input-control { }*/
     /*-fx-fill: gray;*/

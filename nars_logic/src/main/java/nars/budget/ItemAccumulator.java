@@ -22,7 +22,7 @@ public class ItemAccumulator<V extends Budgeted > {
     @NotNull
     private final MyArrayBag arrayBag;
 
-    public ItemAccumulator(int capacity) {
+    public ItemAccumulator(int capacity, BudgetMerge merge) {
         arrayBag = new MyArrayBag(new ArraySortedIndex<BLink<V>>(capacity) {
 
             @Override
@@ -30,7 +30,7 @@ public class ItemAccumulator<V extends Budgeted > {
                 return v.pri();
             }
         });
-        arrayBag.merge(BudgetMerge.plusDQBlend);
+        arrayBag.merge(merge);
     }
 
 
