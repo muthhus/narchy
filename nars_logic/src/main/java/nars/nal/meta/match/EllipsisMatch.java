@@ -73,18 +73,17 @@ public final class EllipsisMatch extends TermVector<Term> implements Term {
     }
 
     @Override
-    public void append(@NotNull Appendable w, boolean pretty) throws IOException {
+    public void append(@NotNull Appendable w) throws IOException {
         w.append(toString());
     }
 
-    @NotNull
     @Override
-    public StringBuilder toStringBuilder(boolean pretty) {
+    public StringBuilder toStringBuilder() {
         return new StringBuilder(toString());
     }
 
     @Override
-    public String toString(boolean pretty) {
+    public String toString() {
         return toString();
     }
 

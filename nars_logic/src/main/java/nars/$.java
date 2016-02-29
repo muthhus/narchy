@@ -1,6 +1,7 @@
 package nars;
 
 import ch.qos.logback.classic.Logger;
+
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.net.SyslogAppender;
@@ -412,17 +413,25 @@ public enum $ /* TODO: implements TermIndex */ {
     }
 
     @NotNull
-    public static final Logger logRoot;
+    public static Logger logRoot;
 
     /** NALogging non-axiomatic logging encoder. log events expressed in NAL terms */
     @NotNull
-    public static final PatternLayoutEncoder logEncoder;
+    public static PatternLayoutEncoder logEncoder;
 
     static {
         Thread.currentThread().setName("$");
 
         //http://logback.qos.ch/manual/layouts.html
 
+        try {
+            initLogger();
+        } catch (Throwable t) {
+            System.err.println("Logging Disabled: " + t);
+        }
+    }
+
+    static void initLogger() {
         logRoot = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
 
         LoggerContext loggerContext = logRoot.getLoggerContext();
@@ -457,6 +466,7 @@ public enum $ /* TODO: implements TermIndex */ {
 //        logRoot.info("Message 1");
 //        logRoot.warn("Message 2");
 //        logRoot.error("Message 2");
+
     }
 
     @Nullable

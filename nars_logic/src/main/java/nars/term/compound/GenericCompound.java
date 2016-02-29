@@ -105,8 +105,8 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 //    }
 
     @Override
-    public final void append(@NotNull Appendable p, boolean pretty) throws IOException {
-        TermPrinter.append(this, p, pretty);
+    public final void append(@NotNull Appendable p) throws IOException {
+        TermPrinter.append(this, p);
     }
 
 
@@ -314,7 +314,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     @Nullable
     @Override
     public final String toString() {
-        return toString(false);
+        return toStringBuilder().toString();
     }
 
     @Override

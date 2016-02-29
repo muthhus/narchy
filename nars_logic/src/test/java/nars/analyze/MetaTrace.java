@@ -13,12 +13,12 @@ package nars.analyze;
  *
  *******************************************************************************/
 
-        import java.io.InputStream;
-        import java.io.PrintStream;
+        import java.io.*;
         import java.util.HashMap;
         import java.util.Map;
+        import java.util.function.Predicate;
 
-        import nars.task.StampTest;
+        import nars.nal.nal1.NAL1Test;
         import org.jacoco.core.analysis.Analyzer;
         import org.jacoco.core.analysis.CoverageBuilder;
         import org.jacoco.core.analysis.IClassCoverage;
@@ -65,38 +65,6 @@ public final class MetaTrace {
 //        }
 //
 //    }
-
-    /**
-     * A class loader that loads classes from in-memory data.
-     */
-    public static class MemoryClassLoader extends ClassLoader {
-
-        private final Map<String, byte[]> definitions = new HashMap<String, byte[]>();
-
-        /**
-         * Add a in-memory representation of a class.
-         *
-         * @param name
-         *            name of the class
-         * @param bytes
-         *            class definition
-         */
-        public void addDefinition(final String name, final byte[] bytes) {
-            definitions.put(name, bytes);
-        }
-
-        @Override
-        protected Class<?> loadClass(final String name, final boolean resolve)
-                throws ClassNotFoundException {
-            final byte[] bytes = definitions.get(name);
-            if (bytes != null) {
-                return defineClass(name, bytes, 0, bytes.length);
-            }
-            return super.loadClass(name, resolve);
-        }
-
-    }
-
     private final PrintStream out;
 
     /**
@@ -108,6 +76,37 @@ public final class MetaTrace {
     public MetaTrace(final Class c, final PrintStream out) {
         this.clazz = c;
         this.out = out;
+    }
+
+    public static int analyzeAll(Analyzer a, final File file, Predicate<File> include) throws IOException {
+        int count = 0;
+        if (file == null) {
+            throw new NullPointerException();
+        } else if (file.isDirectory()) {
+            for (final File f : file.listFiles()) {
+                if (include.test(f))
+                    count += analyzeAll(a, f, include);
+            }
+        } else {
+            if (include.test(file)) {
+                try (InputStream in = new FileInputStream(file)) {
+                    count += a.analyzeAll(in, file.getPath());
+                }
+            }
+        }
+        return count;
+    }
+
+    /**
+     * Entry point to run this examples as a Java application.
+     *
+     * @param args
+     *            list of program arguments
+     * @throws Exception
+     *             in case of errors
+     */
+    public static void main(final String[] args) throws Exception {
+        new MetaTrace(NAL1Test.class, System.out).execute();
     }
 
     /**
@@ -129,6 +128,7 @@ public final class MetaTrace {
         final Instrumenter instr = new Instrumenter(runtime);
         final byte[] instrumented = instr.instrument(
                 getTargetClass(targetName), targetName);
+
 
 
         // Now we're ready to run our instrumented class and need to startup the
@@ -155,7 +155,9 @@ public final class MetaTrace {
             for (Failure failure : result.getFailures()) {
                 System.out.println(failure.toString());
             }
-            System.out.println(result.wasSuccessful());
+            boolean success = result.wasSuccessful();
+
+            //System.out.println(result.wasSuccessful());
 
             //throw new RuntimeException("unknown execution strategy: " + targetInstance);
         }
@@ -173,14 +175,28 @@ public final class MetaTrace {
 
 
         final Analyzer analyzer = new Analyzer(executionData, coverageBuilder);
-        System.out.println(getClass().getResource(targetName).toExternalForm());
-        //analyzer.analyzeAll()
+
+        analyzeAll(analyzer,
+                //new File(MetaTrace.class.getClassLoader().getResource("..").toURI())
+                new File("/home/me/opennars/nars_logic/build/classes/main")
+        ,
+
+                (p)->{
+                    /*return p.isDirectory() ||
+                            p.toString();*/
+                    System.out.println("analyze: " + p);
+                    return true;
+                });
+
+
 
         analyzer.analyzeClass(getTargetClass(targetName), targetName);
 
         // Let's dump some metrics and line coverage information:
         for (final IClassCoverage cc : coverageBuilder.getClasses()) {
             out.printf("Coverage of class %s%n", cc.getName());
+
+
 
             printCounter("instructions", cc.getInstructionCounter());
             printCounter("branches", cc.getBranchCounter());
@@ -189,7 +205,7 @@ public final class MetaTrace {
             printCounter("complexity", cc.getComplexityCounter());
 
             for (int i = cc.getFirstLine(); i <= cc.getLastLine(); i++) {
-                out.printf("Line %s: %s%n", Integer.valueOf(i), getColor(cc
+                out.printf("Line %s: %s%n", i, getColor(cc
                         .getLine(i).getStatus()));
             }
         }
@@ -201,12 +217,12 @@ public final class MetaTrace {
     }
 
     private void printCounter(final String unit, final ICounter counter) {
-        final Integer missed = Integer.valueOf(counter.getMissedCount());
-        final Integer total = Integer.valueOf(counter.getTotalCount());
+        final Integer missed = counter.getMissedCount();
+        final Integer total = counter.getTotalCount();
         out.printf("%s of %s %s missed%n", missed, total, unit);
     }
 
-    private String getColor(final int status) {
+    private static String getColor(final int status) {
         switch (status) {
             case ICounter.NOT_COVERED:
                 return "red";
@@ -219,15 +235,34 @@ public final class MetaTrace {
     }
 
     /**
-     * Entry point to run this examples as a Java application.
-     *
-     * @param args
-     *            list of program arguments
-     * @throws Exception
-     *             in case of errors
+     * A class loader that loads classes from in-memory data.
      */
-    public static void main(final String[] args) throws Exception {
-        new MetaTrace(StampTest.class, System.out).execute();
+    public static class MemoryClassLoader extends ClassLoader {
+
+        private final Map<String, byte[]> definitions = new HashMap<>();
+
+        /**
+         * Add a in-memory representation of a class.
+         *
+         * @param name
+         *            name of the class
+         * @param bytes
+         *            class definition
+         */
+        public void addDefinition(final String name, final byte[] bytes) {
+            definitions.put(name, bytes);
+        }
+
+        @Override
+        protected Class<?> loadClass(final String name, final boolean resolve)
+                throws ClassNotFoundException {
+            final byte[] bytes = definitions.get(name);
+            if (bytes != null) {
+                return defineClass(name, bytes, 0, bytes.length);
+            }
+            return super.loadClass(name, resolve);
+        }
+
     }
 
 }

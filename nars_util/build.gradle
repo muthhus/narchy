@@ -16,8 +16,9 @@ dependencies {
     }
     compile group: 'net.bytebuddy', name: 'byte-buddy', version: '1.2.3'
     compile group: 'org.apache.commons', name: 'commons-math3', version: '3.6'
-    compile group: 'ch.qos.logback', name: 'logback-core', version: '1.1.5'
+
     compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.5'
+
     //compile group: 'com.github.jnorthrup', name: 'jype', version: 'LATEST'
     compile(group: 'org.cache2k', name: 'cache2k-core', version: '0.23') {
         exclude(module: 'cache2k-jmx-api')

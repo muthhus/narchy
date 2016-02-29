@@ -5,7 +5,6 @@ import nars.term.Compound;
 import nars.term.SubtermVisitor;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -172,22 +171,19 @@ public final class Var extends PTerm {
 	}
 
 	@Override
-	public void append(Appendable w, boolean pretty) throws IOException {
+	public void append(Appendable w) throws IOException {
 
 	}
 
 	@Override
-	public
-	@NotNull
-	StringBuilder toStringBuilder(boolean pretty) {
+	public StringBuilder toStringBuilder() {
 		throw new UnsupportedOperationException();
 	}
 
-	@Nullable
-	@Override
-	public String toString(boolean pretty) {
-		return null;
-	}
+//	@Override
+//	public String toString() {
+//		return null;
+//	}
 
 	@Override
 	public boolean isCompound() {

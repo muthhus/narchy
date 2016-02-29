@@ -21,7 +21,7 @@ public class MutableTaskTest {
 
         assertTrue(Tense.isEternal(new MutableTask(n,s).eternal().occurrence()));
 
-        assertTrue("default is timeless", new MutableTask(n,s).isTimeless());
+        assertTrue("default is eternal", new MutableTask(n,s).isEternal());
 
         assertTrue("tense=eternal is eternal", Tense.isEternal(new MutableTask(n,s).eternal().occurrence()));
 

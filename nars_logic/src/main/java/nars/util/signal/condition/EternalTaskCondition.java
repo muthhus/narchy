@@ -12,7 +12,6 @@ import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import nars.truth.Truthed;
 import nars.util.Texts;
-import org.apache.commons.logging.LogFactory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -21,7 +20,6 @@ import org.slf4j.LoggerFactory;
 import java.io.PrintStream;
 import java.util.List;
 import java.util.TreeMap;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -154,8 +152,8 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
 
         //HACK use toString for now
         dist += Terms.levenshteinDistancePercent(
-                a.toString(false),
-                b.toString(false)) * 0.2f;
+                a.toString(),
+                b.toString()) * 0.2f;
 
         return dist;
     }

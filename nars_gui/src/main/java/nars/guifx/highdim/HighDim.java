@@ -1,6 +1,7 @@
 package nars.guifx.highdim;
 
 import com.sun.tools.javac.util.Log;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import nars.Global;
 import nars.bag.BLink;
@@ -88,10 +89,11 @@ public class HighDim<T extends Termed> extends Spacegraph {
         public TermGroup() {
             super(8);
 
-            l = new Label();
-            l.setCache(true);
-
             this.term = null;
+
+            l = new Label();
+            setCache(true);
+
             getChildren().add(l);
         }
 
@@ -120,6 +122,16 @@ public class HighDim<T extends Termed> extends Spacegraph {
             l.setText(
                 Util.s(newTerm.toString(), 8)
             );
+//            if (getChildren().size() > 1)
+//                getChildren().remove(1);
+//            if (newTerm!=null) {
+//                HexButtonVis.HexButton<Termed> b = new HexButtonVis.HexButton<>(newTerm);
+//                b.setManaged(true);
+//                getChildren().add(
+//                        b
+//                    //new Button(newTerm.toString())
+//                );
+//            }
         }
 
         /** cycle update, same term */
@@ -314,28 +326,29 @@ public class HighDim<T extends Termed> extends Spacegraph {
 
                 @Override
                 public void project(float[] x, TermNode target) {
-                    float err = enc.train(x, 0.004f, 0.1f, 0.1f, false);
+                    float err = enc.train(x, 0.004f, 0.05f, 0.05f, false);
                     enc.encode(x, y0, true, true);
-                    float err2 = enc2.train(y0, 0.008f, 0.1f, 0.1f, false);
+                    float err2 = enc2.train(y0, 0.008f, 0.05f, 0.05f, false);
                     enc2.encode(y0, y, false, true);
 
                     //System.out.println(Arrays.toString(x) + " " + Arrays.toString(y));
                     float pri = x[2]; /* use original value directly */
                     //target.move( (y[0]-y[1]) *250, pri*250);
-                    target.move( (y[0]-y[2]) * 500, (y[1]-y[3]) * 500);
+                    //target.move( (y[0]-y[2]) * 500, (y[1]-y[3]) * 500);
+                    target.move( (2*y[0]+y[1]) * 100, (2*y[2]+y[3] )* 100);
                     target.scale(1f+pri);
                 }
 
 
             };
 
-            HighDim<Concept> dim = new HighDim<Concept>(64, autoenc1);
+            HighDim<Concept> dim = new HighDim<Concept>(16, autoenc1);
 
             n.onFrame(N -> {
                 dim.commit(((Default) N).core.active);
                     //System.out.println(dim.node + " free=" + dim.free.size());
             });
-            new Animate(10, (a)->{
+            new Animate(30, (a)->{
                dim.update();
             }).start();
 

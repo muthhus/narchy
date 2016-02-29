@@ -17,6 +17,7 @@
 package nars.term;
 
 import nars.*;
+import nars.budget.UnitBudget;
 import nars.concept.Concept;
 import nars.nar.Default;
 import nars.nar.Terminal;
@@ -399,9 +400,12 @@ public class TermTest {
         assertEquals(0, b.compareTo(a));
 
         if (normalize) {
-            assertEquals(n2.concept(a).toString(), b.toString());
-            assertEquals(n2.concept(a).hashCode(), b.hashCode());
-            assertEquals(n2.concept(a), b);
+            Concept n2a = n2.conceptualize(a, UnitBudget.One);
+            assertNotNull(a + " should conceptualize", n2a);
+            assertNotNull(b);
+            assertEquals(n2a.toString(), b.toString());
+            assertEquals(n2a.hashCode(), b.hashCode());
+            assertEquals(n2a, b);
         }
 
     }
@@ -567,7 +571,7 @@ public class TermTest {
     public <C extends Compound> C testStructure(String term, String bits) {
         C a = n.term(term);
         assertEquals(bits, toBinaryString(a.structure()));
-        assertEquals(term, a.toString(true));
+        assertEquals(term, a.toString());
         return a;
     }
 
@@ -725,8 +729,8 @@ public class TermTest {
     @Test
     public void testImageStructuralVector() {
 
-        String i1 = "(/, x, y, _)";
-        String i2 = "(/, x, _, y)";
+        String i1 = "(/,x,y,_)";
+        String i2 = "(/,x,_,y)";
         Compound a = testStructure(i1, "10000000000001");
         Compound b = testStructure(i2, "10000000000001");
 

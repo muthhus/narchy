@@ -37,10 +37,10 @@ public interface Atomic extends Term {
         return and(v); //re-use and, even though it's so similar
     }
 
-    @Override
-    default String toString(boolean pretty) {
-        return toString();
-    }
+//    @Override
+//    default String toString() {
+//        return toString();
+//    }
 
     @NotNull
     default String toStringUnquoted() {
@@ -48,14 +48,13 @@ public interface Atomic extends Term {
     }
 
     @Override
-    default void append(@NotNull Appendable w, boolean pretty) throws IOException {
+    default void append(@NotNull Appendable w) throws IOException {
         w.append(toString());
     }
 
     /** preferably use toCharSequence if needing a CharSequence; it avoids a duplication */
-    @NotNull
     @Override
-    default StringBuilder toStringBuilder(boolean pretty) {
+    default StringBuilder toStringBuilder() {
         return new StringBuilder(toString());
     }
 

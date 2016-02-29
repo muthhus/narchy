@@ -155,7 +155,7 @@ public class SubButton extends HBox {
             }
             //sb.add(ig);
         } else {
-            sb.add(make(t.toString(true)));
+            sb.add(make(t.toString()));
         }
         sb.setOnMouseClicked(onTermClicked);
 

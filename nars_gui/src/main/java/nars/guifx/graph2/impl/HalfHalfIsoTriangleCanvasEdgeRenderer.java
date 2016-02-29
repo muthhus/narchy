@@ -7,7 +7,6 @@ import javafx.scene.transform.Translate;
 import nars.guifx.graph2.TermEdge;
 import nars.guifx.graph2.TermNode;
 import nars.guifx.graph2.source.SpaceGrapher;
-import scala.reflect.internal.transform.Transforms;
 
 /** (slower, nicer rendering) half edges are drawn as overlapping polygons */
 public class HalfHalfIsoTriangleCanvasEdgeRenderer extends CanvasEdgeRenderer {

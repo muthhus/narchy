@@ -26,6 +26,7 @@ public class NAL4Test extends AbstractNALTest {
     @Test
     public void structural_transformation()  {
         TestNAR t = test();
+        t.nar.log();
         t.believe("<(acid,base) --> reaction>",1.0f,0.9f); //en("An acid and a base can have a reaction.");
         t.mustBelieve(CYCLES, "<acid --> (/,reaction,_,base)>", 1.0f, 0.9f); //en("Acid can react with base.");
         t.mustBelieve(CYCLES, "<base --> (/,reaction,acid,_)>", 1.0f, 0.9f); //en("A base is something that has a reaction with an acid.");

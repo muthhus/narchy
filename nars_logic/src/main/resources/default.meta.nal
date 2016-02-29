@@ -499,7 +499,7 @@
 
 
 
-    ((A..B=_..+) --> M), B |- (B --> (/, M, A..B=_..+, _ )), (Belief:Identity, Desire:Identity)
+    ((A..B=_..+) --> M), M |- (B --> (/, M, A..B=_..+, _ )), (Belief:Identity, Desire:Identity)
     ((A..+) --> M), M |- (M --> (/,_, A..+)), (Belief:Identity, Desire:Identity)
 
     (M --> (A..B=_..+)), B |- ((\, M, A..B=_..+, _ ) --> B), (Belief:Identity, Desire:Identity)

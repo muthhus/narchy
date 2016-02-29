@@ -97,7 +97,7 @@ public class TermIDTest {
         //byte[] b = i.bytes();
 
         if (expectedCompactOutput != null)
-            assertEquals(expectedCompactOutput, i.toString(false));
+            assertEquals(expectedCompactOutput, i.toString());
 
         areEqualAndIfNotWhy(expectedPrettyOutput, i.toString());
 

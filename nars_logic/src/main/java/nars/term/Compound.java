@@ -44,10 +44,10 @@ import java.util.Set;
 public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> {
 
 
-    static void argSep(@NotNull Appendable p, boolean pretty) throws IOException {
-        if (pretty)
+    static void argSep(@NotNull Appendable p) throws IOException {
+        /*if (pretty)
             p.append(Symbols.ARGUMENT_SEPARATOR_PRETTY);
-        else
+        else*/
             p.append(Symbols.ARGUMENT_SEPARATOR);
     }
 
@@ -82,33 +82,33 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 
 
     @Override
-    default void append(@NotNull Appendable p, boolean pretty) throws IOException {
-        TermPrinter.compoundAppend(this, p, pretty);
+    default void append(@NotNull Appendable p) throws IOException {
+        TermPrinter.append(this, p);
     }
 
-    default void appendArgs(@NotNull Appendable p, boolean pretty, boolean appendedOperator) throws IOException {
+    default void appendArgs(@NotNull Appendable p, boolean appendedOperator) throws IOException {
         int nterms = size();
 
         boolean bb = nterms > 1 && appendedOperator;
         for (int i = 0; i < nterms; i++) {
             if ((i != 0) || bb) {
-                argSep(p, pretty);
+                argSep(p);
             }
-            appendArg(p, pretty, i);
+            appendArg(p, i);
         }
     }
 
-    default void appendArg(Appendable p, boolean pretty, int i) throws IOException {
-        term(i).append(p, pretty);
+    default void appendArg(Appendable p, int i) throws IOException {
+        term(i).append(p);
     }
 
 
     @NotNull
     @Override
-    default StringBuilder toStringBuilder(boolean pretty) {
+    default StringBuilder toStringBuilder() {
         StringBuilder sb = new StringBuilder();
         try {
-            append(sb, pretty);
+            append(sb);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -139,11 +139,10 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
     TermContainer<T> subterms();
 
 
-    @NotNull
-    @Override
-    default String toString(boolean pretty) {
-        return toStringBuilder(pretty).toString();
-    }
+    /*@Override
+    default String toString() {
+        return toStringBuilder().toString();
+    }*/
 
     @Nullable
     @Override

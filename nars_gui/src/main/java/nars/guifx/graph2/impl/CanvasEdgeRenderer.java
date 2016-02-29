@@ -12,7 +12,6 @@ import nars.guifx.graph2.TermNode;
 import nars.guifx.graph2.scene.DefaultNodeVis;
 import nars.guifx.graph2.source.SpaceGrapher;
 import nars.guifx.util.ColorMatrix;
-import scala.reflect.internal.transform.Transforms;
 
 /**
  * Created by me on 9/6/15.

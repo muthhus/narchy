@@ -475,7 +475,7 @@ public class DerivationGraph extends DirectedPseudograph<DerivationGraph.Keyed,O
         //maybe use a sorted Map so that the longest terms to be replaced are iterated first, so that a shorter subterm will not interfere with subsequent longer replacement
 
         String[] s = new String[1];
-        s[0] = c instanceof Compound ? c.toString(false) : c.toString();
+        s[0] = c instanceof Compound ? c.toString() : c.toString();
 
         //HACK convert to lowercase so it doesnt interfere with the reassignments
         s[0] = s[0].toLowerCase();

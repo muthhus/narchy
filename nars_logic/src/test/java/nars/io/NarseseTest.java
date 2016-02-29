@@ -448,8 +448,8 @@ public class NarseseTest {
     @Test
     public void testImageIndex() {
         Compound t = term("(/,open,$1,_)");
-        assertEquals("(/,open,$1,_)", t.toString(false));
-        assertEquals("(/, open, $1, _)", t.toString(true));
+        assertEquals("(/,open,$1,_)", t.toString());
+        assertEquals("(/, open, $1, _)", t.toString());
         assertEquals("index psuedo-term should not count toward its size", 2, t.size());
     }
 

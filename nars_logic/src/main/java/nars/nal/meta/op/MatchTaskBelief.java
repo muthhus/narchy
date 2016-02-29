@@ -73,7 +73,7 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseEval> {
                         pStructure) + " " + pattern
         );*/
 
-        id = getClass().getSimpleName() + '[' + pattern.toString(false) + ']';
+        id = getClass().getSimpleName() + '[' + pattern.toString() + ']';
 
     }
 

@@ -383,8 +383,7 @@ public abstract class FindSubst extends Versioning implements Subst {
             if (et.from.equals(Op.Imdex)) {
 
                 Term n = resolve(et.to);
-                if (n == null)
-                    return false;
+
 
                 if (n != Y) {
                     //the indicated term should be inserted
@@ -398,14 +397,20 @@ public abstract class FindSubst extends Versioning implements Subst {
                 }
             } else {
                 Term n = resolve(et.from);
-                if (n == null)
+                int imageIndex;
+                if (n.op() == type) {
+
                     return false;
 
-                //resolving may be possible to defer to substitution if
-                //Y and et.from are components of ImageShrinkEllipsisMatch
+                } else {
 
-                int imageIndex = Y.indexOf(n);
-                return ((imageIndex != -1) && matchEllipsedLinear(X, e, Y)) &&
+                    //resolving may be possible to defer to substitution if
+                    //Y and et.from are components of ImageShrinkEllipsisMatch
+
+                    imageIndex = Y.indexOf(n);
+
+                }
+                return (matchEllipsedLinear(X, e, Y)) &&
                         replaceXY(e, ImageMatch.take((EllipsisMatch) term(e), imageIndex));
 
             }

@@ -82,8 +82,8 @@ public class Space extends GenericCompound {
     }
 
     @Override
-    public void appendArg(@NotNull Appendable p, boolean pretty, int i) throws IOException {
-        term(i).append(p, pretty);
+    public void appendArg(@NotNull Appendable p, int i) throws IOException {
+        term(i).append(p);
 
         FloatArrayList vv = this.vector;
         if (vv !=null) {

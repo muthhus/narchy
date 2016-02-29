@@ -117,20 +117,17 @@ public abstract class Nonvar extends PTerm {
 	}
 
 	@Override
-	public void append(@NotNull Appendable w, boolean pretty) throws IOException {
+	public void append(@NotNull Appendable w) throws IOException {
 
 	}
 
 	@Override
-	public
-	@NotNull
-	StringBuilder toStringBuilder(boolean pretty) {
+	public StringBuilder toStringBuilder() {
 		return null;
 	}
 
-	@Nullable
 	@Override
-	public String toString(boolean pretty) {
+	public String toString() {
 		return null;
 	}
 

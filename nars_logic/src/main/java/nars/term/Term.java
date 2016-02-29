@@ -150,7 +150,7 @@ public interface Term extends Termed, Comparable, Termlike {
 
 
 
-    void append(Appendable w, boolean pretty) throws IOException;
+    void append(Appendable w) throws IOException;
 
 //    default public void append(Writer w, boolean pretty) throws IOException {
 //        //try {
@@ -160,14 +160,15 @@ public interface Term extends Termed, Comparable, Termlike {
 ////        }
 //    }
 
-    @NotNull
-    @Deprecated StringBuilder toStringBuilder(boolean pretty);
+    @Deprecated
+    StringBuilder toStringBuilder();
 
 //    default public StringBuilder toStringBuilder(boolean pretty) {
 //        return name().toStringBuilder(pretty);
 //    }
 
-    @Deprecated @NotNull String toString(boolean pretty);
+//    @Deprecated
+//    String toString();
 //    default public String toString(boolean pretty) {
 //        return toStringBuilder(pretty).toString();
 //    }

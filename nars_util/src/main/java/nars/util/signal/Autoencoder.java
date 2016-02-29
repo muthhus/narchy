@@ -251,9 +251,14 @@ public class Autoencoder {
 		// hbias
 		for (int i = 0; i < nh; i++) {
 			L_hbias[i] = 0;
+			float[] wi = W[i];
+
+			float lbi = 0;
 			for (int j = 0; j < n; j++) {
-				L_hbias[i] += W[i][j] * L_vbias[j];
+				lbi += wi[j] * L_vbias[j];
 			}
+			L_hbias[i] += lbi;
+
 			float yi = y[i];
 			L_hbias[i] *= yi * (1 - yi);
 			hbias[i] += learningRate * L_hbias[i];
@@ -263,8 +268,9 @@ public class Autoencoder {
 		for (int i = 0; i < nh; i++) {
 			float yi = y[i];
 			float lhb = L_hbias[i];
+			float[] wi = W[i];
 			for (int j = 0; j < n; j++) {
-				W[i][j] += learningRate * (lhb * tilde_x[j] + L_vbias[j] * yi);
+				wi[j] += learningRate * (lhb * tilde_x[j] + L_vbias[j] * yi);
 			}
 		}
 
@@ -286,8 +292,9 @@ public class Autoencoder {
 	 */
 	public int max() {
 
-		float m = Float.MIN_VALUE;
+		float m = Float.NEGATIVE_INFINITY;
 		int best = -1;
+		float[] y = this.y;
 		for (int i = 0; i < y.length; i++) {
 			float Y = y[i];
 			if (Y > m) {
@@ -295,8 +302,6 @@ public class Autoencoder {
 				best = i;
 			}
 		}
-		if (best == -1)
-			return (int) (rng.nextFloat() * y.length);
-		return best;
+		return best == -1 ? (int) (rng.nextFloat() * y.length) : best;
 	}
 }

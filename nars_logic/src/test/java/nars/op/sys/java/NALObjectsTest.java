@@ -2,7 +2,6 @@ package nars.op.sys.java;
 
 import com.google.common.collect.Lists;
 import nars.Global;
-import nars.Memory;
 import nars.NAR;
 import nars.nar.Default;
 import nars.term.Term;
@@ -240,7 +239,7 @@ public class NALObjectsTest  {
         DefaultTermizer t = new DefaultTermizer();
         Term term = t.term(o);
         assertNotNull(term);
-        assertEquals(termtoString, term.toString(false));
+        assertEquals(termtoString, term.toString());
     }
 
     static void testTermizer(Object o) {

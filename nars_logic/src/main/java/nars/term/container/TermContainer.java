@@ -138,7 +138,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
 
 
 
-    void addAllTo(Collection<Term> set);
+    void addAllTo(Collection<Term> target);
 
 
 
