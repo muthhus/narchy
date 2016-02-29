@@ -2,7 +2,9 @@ package nars.util.signal;
 
 import nars.util.data.Util;
 import nars.util.data.random.XorShift128PlusRandom;
+import org.apache.commons.math3.util.MathArrays;
 
+import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -12,8 +14,8 @@ import java.util.Random;
  */
 public class Autoencoder {
 
-	private final int n_visible;
-	private final int n_hidden;
+	public final int n_visible;
+	public final int n_hidden;
 	public final float[][] W;
 	private final float[] hbias;
 	private final float[] vbias;
@@ -140,12 +142,36 @@ public class Autoencoder {
 		}
 
 		if ((normalize) && (max != min)) {
+			float maxMin = max-min;
 			for (int i = 0; i < nh; i++) {
-				y[i] = (y[i] - min) / (max - min);
+				y[i] = (y[i]-min) / maxMin;
 			}
+
+//to check unit result:
+//			float len = cartesianLength(y);
+//			if (len > 0) {
+//				for (int i = 0; i < nh; i++) {
+//					y[i] = y[i] / len;
+//				}
+//				System.out.println(Arrays.toString(y) + " " + len + " " + cartesianLength(y));
+//			}
+
+//			for (int i = 0; i < nh; i++) {
+//				y[i] = (y[i] - min) / (max-min);
+//			}
 		}
 
+
+
 		return y;
+	}
+
+	private float cartesianLength(float[] y) {
+		float d = 0;
+		for (float z : y) {
+			d += z*z;
+		}
+		return (float)Math.sqrt(d);
 	}
 
 	// Decode

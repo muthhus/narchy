@@ -879,4 +879,18 @@ public enum Util {
                 return l.asReversed().toArray();//toReversed().toArray();
         }
     }
+
+    public static String s(String s, int maxLen) {
+        if (s.length() < maxLen) return  s;
+        return s.substring(maxLen-2) + "..";
+    }
+
+    public static void writeBits(int x, int numBits, float[] y,  int offset) {
+
+        for (int i= 0, j =offset; i < numBits; i++, j++) {
+            int mask = 1 << i;
+            y[j] = ((x & mask) == 1) ? 1f :0f;
+        }
+
+    }
 }

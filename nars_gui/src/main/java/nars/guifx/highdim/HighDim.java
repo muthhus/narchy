@@ -1,5 +1,6 @@
 package nars.guifx.highdim;
 
+import com.sun.tools.javac.util.Log;
 import javafx.scene.control.Label;
 import nars.Global;
 import nars.bag.BLink;
@@ -9,13 +10,24 @@ import nars.concept.Concept;
 import nars.guifx.Spacegraph;
 import nars.guifx.demo.NARide;
 import nars.guifx.graph2.TermNode;
+import nars.guifx.graph2.impl.HexButtonVis;
 import nars.guifx.util.Animate;
 import nars.guifx.util.TabX;
 import nars.nar.Default;
+import nars.term.Term;
 import nars.term.Termed;
+import nars.term.variable.Variable;
+import nars.util.Texts;
+import nars.util.data.Util;
+import nars.util.data.bit.BitVector;
+import nars.util.data.random.XorShift128PlusRandom;
+import nars.util.io.StringUtil;
+import nars.util.signal.Autoencoder;
+import org.bridj.ann.Bits;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.Deque;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,28 +38,59 @@ import static javafx.application.Platform.runLater;
 /**
  * Created by me on 2/28/16.
  */
-abstract public class HighDim<T extends Termed> extends Spacegraph {
+public class HighDim<T extends Termed> extends Spacegraph {
 
     final List<TermGroup> node = Global.newArrayList();
     //SimpleIntDeque free;
     final Deque<TermGroup> free = new ArrayDeque();
     private int capacity;
-    final int input, output;
+
+    private HighDimProjection model;
 
 
-    /** infer a feature vector from the visualizable instance */
-    abstract public float[] vectorize(@NotNull BLink<? extends T> t, @NotNull float[] tmpIn);
 
-    /** learn and classify the vector */
-    abstract public void project(float[] tmpIn, TermNode target);
+    private abstract static class HighDimProjection<C> {
+
+        abstract public int inputs();
+
+        abstract public void project(float[] x, TermNode target);
+
+        abstract public float[] vectorize(@NotNull BLink<? extends C> item, float[] x);
+    }
+
+    private static class ScatterPlot1 extends HighDimProjection<Concept> {
+        @Override
+        public float[] vectorize(@NotNull BLink<? extends Concept> concept, float[] x) {
+            x[0] = 100f*(concept.hashCode() % 8192) / 8192.0f;
+            float cpri = concept.pri();
+            x[1] = 400 * cpri;
+            x[2] = 1 + 0.1f * cpri;
+            return x;
+        }
+
+        @Override
+        public int inputs() {
+            return 3;
+        }
+
+        @Override
+        public void project(float[] x, TermNode target) {
+            target.move(x[0], x[1]);
+            target.scale(x[2]);
+        }
+    }
 
     private class TermGroup extends TermNode /* Group*/  {
 
-        Label l = new Label();
+
         private BLink<? extends T> bterm;
 
         public TermGroup() {
             super(8);
+
+            l = new Label();
+            l.setCache(true);
+
             this.term = null;
             getChildren().add(l);
         }
@@ -56,33 +99,48 @@ abstract public class HighDim<T extends Termed> extends Spacegraph {
             Object prev = this.bterm;
             if (prev == next) return;
 
-            this.term = ((this.bterm = next)!=null) ? bterm.get() : null;
+            Termed term = ((this.bterm = next) != null) ? bterm.get() : null;
+            this.term = term;
 
+            if (term!=null) {
+                runLater(()->{
+                    update(term);
+                });
+            }
 
             //..
         }
 
         float tmp[];
 
+        /** when term changes */
+        Label l;
+
+        /* TODO abstract */ protected void update(Termed newTerm) {
+            l.setText(
+                Util.s(newTerm.toString(), 8)
+            );
+        }
+
+        /** cycle update, same term */
         public void update() {
             BLink<? extends T> bterm = this.bterm;
             if (bterm == null)
                 return;
 
+            HighDimProjection m = HighDim.this.model;
+            int input = m.inputs();
+
             float[] tmp = this.tmp;
             if ((tmp == null) || (tmp.length!=input))
                 tmp = this.tmp = new float[input];
 
-            vectorize(bterm, tmp);
-
-            //learn(tmpIn);
-            project(tmp, this);
+            m.project(m.vectorize(bterm, tmp), this);
         }
 
         /** render */
         public void commit() {
             if (term != null) {
-                l.setText(term.toString());
                 setVisible(true);
             } else {
                 setVisible(false);
@@ -108,13 +166,16 @@ abstract public class HighDim<T extends Termed> extends Spacegraph {
     }
 
 
-    public HighDim(int capacity, int inputs, int outputs) {
+    public HighDim(int capacity, HighDimProjection model) {
         super();
 
-        this.input = inputs;
-        this.output = outputs;
-
         resize(capacity);
+        setModel(model);
+    }
+
+    private void setModel(HighDimProjection model) {
+
+        this.model = model;
     }
 
     public synchronized void resize(int capacity) {
@@ -203,30 +264,72 @@ abstract public class HighDim<T extends Termed> extends Spacegraph {
         Default n = new Default();
         n.input("<a --> b>.");
         n.input("<b --> c>.");
-        n.input("<c --> d>.");
+        n.input("(c:d,b).");
 
         NARide.show(n.loop(), ide -> {
 
 
-            HighDim<Concept> dim = new HighDim<Concept>(32, 4, 2){
 
+
+            HighDimProjection<Concept> autoenc1 = new HighDimProjection<Concept>() {
+                final int inputs = 20;
+                final int inner = 8;
+
+
+                Autoencoder enc = new Autoencoder(inputs, inner, new XorShift128PlusRandom(1));
+                Autoencoder enc2 = new Autoencoder(inner, 2, new XorShift128PlusRandom(1));
+
+                float[] y0 = new float[enc.n_hidden];
+                float[] y = new float[inner];
 
                 @Override
-                public float[] vectorize(@NotNull BLink<? extends Concept> concept, float[] x) {
-                    x[0] = 100f*(concept.hashCode() % 8192) / 8192.0f;
-                    float cpri = concept.pri();
-                    x[1] = cpri;
-                    x[2] = 100f * cpri;
+                public int inputs() {
+                    return inputs;
+                }
+
+                @Override
+                public float[] vectorize(BLink<? extends Concept> clink, float[] x) {
+                    Concept c = clink.get();
+
+                    Term t = c.term();
+
+                    //x[0] = c.op().ordinal() / 16f; //approx;
+                    //x[1] = clink.pri();
+
+
+                    x[0] = (c.hashCode() % 8) / 8.0f;
+                    x[1] = (t.isCompound() ? 1f : 0f);
+                    x[2] = clink.pri();
+                    x[3] = clink.dur();
+                    x[4] = clink.qua();
+                    Util.writeBits(t.op().ordinal() +1, 5, x, 5); //+5
+                    Util.writeBits(t.volume()+1, 5, x, 10); //+5
+                    Util.writeBits(t.size()+1, 5, x, 15); //+5
+
+
+                    //System.out.println(Arrays.toString(x));
+
                     return x;
                 }
 
                 @Override
                 public void project(float[] x, TermNode target) {
-                    target.move(x[0], x[1]);
-                    target.setScaleX(x[2]);
-                    target.setScaleY(x[2]);
+                    float err = enc.train(x, 0.05f, 0.03f, 0.03f, false);
+                    enc.encode(x, y0, true, true);
+                    float err2 = enc2.train(y0, 0.05f, 0.03f, 0.03f, false);
+                    enc2.encode(y0, y, false, true);
+
+                    //System.out.println(Arrays.toString(x) + " " + Arrays.toString(y));
+                    float pri = x[2]; /* use original value directly */
+                    //target.move( (y[0]-y[1]) *250, pri*250);
+                    target.move( y[0] * 50, y[1] * 50);
+                    target.scale(1f+pri);
                 }
+
+
             };
+
+            HighDim<Concept> dim = new HighDim<Concept>(16, autoenc1);
 
             n.onFrame(N -> {
                 dim.commit(((Default) N).core.active);
@@ -261,8 +364,6 @@ abstract public class HighDim<T extends Termed> extends Spacegraph {
             if (n.term != null) {
                 n.update();
                 n.commit();
-            } else {
-
             }
         }
     }
