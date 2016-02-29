@@ -273,11 +273,11 @@ public class HighDim<T extends Termed> extends Spacegraph {
 
             HighDimProjection<Concept> autoenc1 = new HighDimProjection<Concept>() {
                 final int inputs = 20;
-                final int inner = 8;
+                final int inner = 64;
 
 
                 Autoencoder enc = new Autoencoder(inputs, inner, new XorShift128PlusRandom(1));
-                Autoencoder enc2 = new Autoencoder(inner, 2, new XorShift128PlusRandom(1));
+                Autoencoder enc2 = new Autoencoder(inner, 4, new XorShift128PlusRandom(1));
 
                 float[] y0 = new float[enc.n_hidden];
                 float[] y = new float[inner];
@@ -314,22 +314,22 @@ public class HighDim<T extends Termed> extends Spacegraph {
 
                 @Override
                 public void project(float[] x, TermNode target) {
-                    float err = enc.train(x, 0.05f, 0.03f, 0.03f, false);
+                    float err = enc.train(x, 0.004f, 0.1f, 0.1f, false);
                     enc.encode(x, y0, true, true);
-                    float err2 = enc2.train(y0, 0.05f, 0.03f, 0.03f, false);
+                    float err2 = enc2.train(y0, 0.008f, 0.1f, 0.1f, false);
                     enc2.encode(y0, y, false, true);
 
                     //System.out.println(Arrays.toString(x) + " " + Arrays.toString(y));
                     float pri = x[2]; /* use original value directly */
                     //target.move( (y[0]-y[1]) *250, pri*250);
-                    target.move( y[0] * 50, y[1] * 50);
+                    target.move( (y[0]-y[2]) * 500, (y[1]-y[3]) * 500);
                     target.scale(1f+pri);
                 }
 
 
             };
 
-            HighDim<Concept> dim = new HighDim<Concept>(16, autoenc1);
+            HighDim<Concept> dim = new HighDim<Concept>(64, autoenc1);
 
             n.onFrame(N -> {
                 dim.commit(((Default) N).core.active);
