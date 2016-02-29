@@ -17,6 +17,7 @@ import nars.term.container.TermVector;
 import nars.term.transform.CompoundTransform;
 import nars.term.transform.VariableNormalization;
 import nars.term.transform.subst.Subst;
+import nars.term.variable.GenericVariable;
 import nars.term.variable.Variable;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -106,8 +107,6 @@ public interface TermIndex  {
 
     @NotNull
     TermContainer theSubterms(TermContainer s);
-
-    void put(Termed termed);
 
     @Nullable default TermContainer normalize(TermContainer s) {
         if (s instanceof TermVector)
@@ -390,18 +389,33 @@ public interface TermIndex  {
 
 
     @Nullable
-    default Termed normalized(@NotNull Term t) {
+    default Term normalized(@NotNull Term t) {
         if (t instanceof Compound && !t.isNormalized()) {
-            Compound ct = (Compound)(t.term());
-            t = transform(ct, (ct.vars() == 1) ?
-                    VariableNormalization.singleVariableNormalization :
-                    new VariableNormalization());
+            Compound ct = (Compound)t;
+            t = transform(ct,
+                    (ct.vars() == 1) ?
+                        VariableNormalization.singleVariableNormalization :
+                        new VariableNormalization()
+            );
 
-            if (t != null)
+            if (t != null) {
                 ((GenericCompound) t).setNormalized();
+            }
         }
         return t;
     }
+
+
+    CompoundTransform CompoundAnonymizer = new CompoundTransform<Compound,Term>() {
+
+        @Override public boolean test(Term term) {
+            return true;
+        }
+
+        @Override public Term apply(Compound parent, @NotNull Term subterm, int depth) {
+            return subterm.anonymous();
+        }
+    };
 
 
     @Nullable
@@ -442,7 +456,7 @@ public interface TermIndex  {
                 if (x2 == null)
                     return -1;
 
-                if (!x.equals(x2)) {
+                if (x!=x2) { //REFERENCE EQUALTY
                     modifications++;
                     x = x2;
                 }
@@ -475,7 +489,7 @@ public interface TermIndex  {
 
                         if (x == null)
                             return -1;
-                        modifications += (!cx.equals(x)) ? 1 : 0;
+                        modifications += (x!=cx) ? 1 : 0; //REFERENCE EQUALTY
                     }
                 }
             }

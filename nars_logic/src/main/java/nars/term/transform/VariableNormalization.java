@@ -66,8 +66,8 @@ public class VariableNormalization extends VariableTransform implements Function
 
 
             if (current instanceof Ellipsis)
-                //throw new RuntimeException("not allowed");
-                return null;
+                throw new RuntimeException("not allowed");
+                //return null;
 
             return $.v(current.op(), 1);
             //return _newVariable(current, 1);

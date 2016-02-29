@@ -133,10 +133,10 @@ public abstract class AbstractMapIndex implements TermIndex {
 
     }
 
-    @Nullable
-    abstract protected TermContainer get(TermContainer subterms);
-
-
+//    @Nullable
+//    abstract protected TermContainer get(TermContainer subterms);
+//
+//
 //    @Override
 //    public void print(PrintStream out) {
 //        BiConsumer itemPrinter = (k, v) -> System.out.println(v.getClass().getSimpleName() + ": " + v);

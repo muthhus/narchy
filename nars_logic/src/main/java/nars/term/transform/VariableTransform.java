@@ -2,6 +2,7 @@ package nars.term.transform;
 
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -11,7 +12,8 @@ public abstract class VariableTransform implements CompoundTransform<Compound, T
 
     @Override
     public final boolean test(@NotNull Term possiblyAVariable) {
-        return possiblyAVariable.op().isVar();
+        return //possiblyAVariable.op().isVar();
+            possiblyAVariable instanceof Variable;
     }
 
     @Override

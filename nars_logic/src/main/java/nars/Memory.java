@@ -451,20 +451,6 @@ public class Memory extends Param {
 //        return getClass().getSimpleName();
 //    }
 
-    public void start() {
-
-    }
-
-    final static CompoundTransform CompoundAnonymizer = new CompoundTransform<Compound,Term>() {
-
-        @Override public boolean test(Term term) {
-            return true;
-        }
-
-        @Override public Term apply(Compound parent, @NotNull Term subterm, int depth) {
-            return subterm.anonymous();
-        }
-    };
 
     /** called when a solution is found */
     public void onSolve(@NotNull Task question, Task solution) {

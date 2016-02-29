@@ -8,6 +8,7 @@ import nars.term.Term;
 import nars.term.TermPrinter;
 import nars.term.Termed;
 import nars.term.container.TermContainer;
+import nars.term.variable.GenericVariable;
 import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
 
@@ -42,7 +43,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
 
     private final transient int hash;
-    private transient boolean normalized;
+    public transient boolean normalized;
 
 
     public GenericCompound(@NotNull Op op, @NotNull TermContainer subterms) {

@@ -23,6 +23,7 @@ import nars.task.flow.TaskStream;
 import nars.term.*;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
+import nars.term.variable.GenericVariable;
 import nars.term.variable.Variable;
 import nars.time.Clock;
 import nars.util.event.AnswerReaction;
@@ -47,6 +48,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 import static nars.Symbols.*;
 import static nars.nal.Tense.ETERNAL;
+import static nars.term.TermIndex.CompoundAnonymizer;
 import static org.fusesource.jansi.Ansi.ansi;
 
 
@@ -130,8 +132,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
                 logger.error(e.toString());
             }
         });
-
-        start();
 
     }
 
@@ -904,8 +904,9 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     @Nullable
     public final Concept concept(Termed t, boolean createIfMissing) {
         Term tt = validConceptTerm(t);
+        TermIndex ii = this.index;
         return (tt != null) ?
-                (Concept)(createIfMissing ? index.the(tt) : index.get(tt)) :
+                (Concept)(createIfMissing ? ii.the(tt) : ii.get(tt)) :
                 null;
     }
 
@@ -966,25 +967,18 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
 
         //NORMALIZATION
-        if ((term instanceof Compound) && (!term.isNormalized())) {
-            Termed t = index.normalized((Compound)term);
-            if (t == null)
-                return null;
-            term = t.term();
-        }
-
+        if ((term = index.normalized(term)) == null)
+            return null;
 
         //ANONYMIZATION
         //TODO ? put the unnormalized term for cached future normalizations?
-        if (term instanceof Compound) {
-            Termed at = term.anonymous();
-            if (at!=term) {
-                //complete anonymization process
-                if (null == (at = index.transform((Compound) at, CompoundAnonymizer)))
-                    throw new InvalidTerm((Compound) term);
+        Termed at = term.anonymous();
+        if (at!= term) {
+            //complete anonymization process
+            if (null == (at = index.transform((Compound) at, CompoundAnonymizer)))
+                throw new InvalidTerm((Compound) term);
 
-                term = at.term();
-            }
+            term = at.term();
         }
 
         return term;

@@ -658,11 +658,6 @@ public class Terms extends TermBuilder implements TermIndex {
     }
 
     @Override
-    public void put(Termed termed) {
-
-    }
-
-    @Override
     public int subtermsCount() {
         return 0;
     }

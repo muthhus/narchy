@@ -76,17 +76,17 @@ public class MapIndex2 extends AbstractMapIndex {
         return builder;
     }
 
-    @NotNull
-    static TermContainer vector(@NotNull Term t) {
-        return ((Compound)t).subterms();
-    }
-
-
-    /** returns previous value */
-    private Object putItem(TermContainer vv, int index, Termed value) {
-        SubtermNode g = getOrAddNode(vv);
-        return value != null ? g.put(index, value) : null;
-    }
+//    @NotNull
+//    static TermContainer vector(@NotNull Term t) {
+//        return ((Compound)t).subterms();
+//    }
+//
+//
+//    /** returns previous value */
+//    private Object putItem(TermContainer vv, int index, Termed value) {
+//        SubtermNode g = getOrAddNode(vv);
+//        return value != null ? g.put(index, value) : null;
+//    }
 
 
     final Function<TermContainer, SubtermNode> termContainerSubtermNodeFunction =
@@ -162,31 +162,28 @@ public class MapIndex2 extends AbstractMapIndex {
         return data.get(s);
     }
 
-    @Nullable
-    @Override
-    protected TermContainer get(TermContainer subterms) {
-        SubtermNode g = data.get(subterms);
-        return g != null ? g.vector : null;
-    }
-
-
-    @Nullable
-    public Termed get(TermContainer vv, int index) {
-        SubtermNode n = data.get(vv);
-        return n != null ? n.get(index) : null;
-    }
-
-    @Override
-    @Deprecated public void put(@NotNull Termed t) {
-        Term u = t.term();
-        if (u instanceof Atomic) {
-            atoms.putIfAbsent(t.toString(), ()->(AtomConcept)t);
-        } else {
-            Object replaced = putItem(vector(u), t.opRel(), t);
-            if (replaced == null)
-                count++;
-        }
-    }
+//    @Nullable
+//    @Override
+//    protected TermContainer get(TermContainer subterms) {
+//        SubtermNode g = data.get(subterms);
+//        return g != null ? g.vector : null;
+//    }
+//    @Nullable
+//    public Termed get(TermContainer vv, int index) {
+//        SubtermNode n = data.get(vv);
+//        return n != null ? n.get(index) : null;
+//    }
+//    @Override
+//    @Deprecated public void put(@NotNull Termed t) {
+//        Term u = t.term();
+//        if (u instanceof Atomic) {
+//            atoms.putIfAbsent(t.toString(), ()->(AtomConcept)t);
+//        } else {
+//            Object replaced = putItem(vector(u), t.opRel(), t);
+//            if (replaced == null)
+//                count++;
+//        }
+//    }
 
 
 
