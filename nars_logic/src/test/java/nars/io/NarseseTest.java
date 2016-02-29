@@ -9,7 +9,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
-import nars.term.variable.GenericVariable;
+import nars.term.variable.Variable;
 import nars.truth.Truth;
 import org.junit.Test;
 
@@ -328,18 +328,18 @@ public class NarseseTest {
         assertEquals(abcd + " != " + ABCD, abcd, ABCD);
     }
 
-    protected GenericVariable testVar(char prefix) {
+    protected Variable testVar(char prefix) {
         Term x = term(prefix + "x");
         assertNotNull(x);
-        assertTrue(x instanceof GenericVariable);
-        GenericVariable i = (GenericVariable) x;
+        assertTrue(x instanceof Variable);
+        Variable i = (Variable) x;
         assertEquals(prefix + "x", i.toString());
         return i;
     }
 
     @Test
     public void testVariables() throws Narsese.NarseseException {
-        GenericVariable v;
+        Variable v;
         v = testVar(Symbols.VAR_DEPENDENT);
         assertTrue(v.hasVarDep());
 

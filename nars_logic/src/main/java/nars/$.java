@@ -190,8 +190,7 @@ public enum $ /* TODO: implements TermIndex */ {
         return $.p((Term[]) $.the(t));
     }
 
-    @NotNull
-    public static GenericVariable v(@NotNull Op type, @NotNull String name) {
+    public static @NotNull Variable v(@NotNull Op type, @NotNull String name) {
         return new GenericVariable(type, name);
     }
 
@@ -201,8 +200,7 @@ public enum $ /* TODO: implements TermIndex */ {
         return v(VAR_DEP, i);
     }
 
-    @NotNull
-    public static GenericVariable varDep(@NotNull String s) {
+    public static @NotNull Variable varDep(@NotNull String s) {
         return v(VAR_DEP, s);
     }
 
@@ -211,8 +209,7 @@ public enum $ /* TODO: implements TermIndex */ {
         return v(VAR_INDEP, i);
     }
 
-    @NotNull
-    public static GenericVariable varIndep(@NotNull String s) {
+    public static @NotNull Variable varIndep(@NotNull String s) {
         return v(VAR_INDEP, s);
     }
 
@@ -221,8 +218,7 @@ public enum $ /* TODO: implements TermIndex */ {
         return v(VAR_QUERY, i);
     }
 
-    @NotNull
-    public static GenericVariable varQuery(@NotNull String s) {
+    public static @NotNull Variable varQuery(@NotNull String s) {
         return v(VAR_QUERY, s);
     }
 
@@ -351,7 +347,7 @@ public enum $ /* TODO: implements TermIndex */ {
     }
 
     /** unnormalized variable */
-    @NotNull public static GenericVariable v(char ch, String name) {
+    public static @NotNull Variable v(char ch, String name) {
 
 //        if (name.length() < 3) {
 //            int digit = Texts.i(name, -1);

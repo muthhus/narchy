@@ -44,8 +44,8 @@ public class EllipsisTransform extends EllipsisOneOrMore {
         //normalizes any variable parameter terms of an EllipsisTransform
         PremiseRule.PremiseRuleVariableNormalization vnn = (PremiseRule.PremiseRuleVariableNormalization) normalizer;
         return new EllipsisTransform(v,
-                from instanceof GenericVariable ? vnn.applyAfter((GenericVariable)from) : from,
-                to instanceof GenericVariable ? vnn.applyAfter((GenericVariable)to) : to);
+                from instanceof Variable ? vnn.applyAfter((Variable)from) : from,
+                to instanceof Variable ? vnn.applyAfter((Variable)to) : to);
     }
 
     @NotNull

@@ -716,12 +716,12 @@ public class Narsese extends BaseParser<Object> {
                         seq("_=", Term(false,false), "..+",
                                 swap(2),
                                 push(new Ellipsis.EllipsisTransformPrototype(/*Op.VAR_PATTERN,*/
-                                        (GenericVariable) pop(), Op.Imdex, (Term) pop()))
+                                        (Variable) pop(), Op.Imdex, (Term) pop()))
                         ),
                         seq(Term(false,false), "=_..+",
                                 swap(2),
                                 push(new Ellipsis.EllipsisTransformPrototype(/*Op.VAR_PATTERN,*/
-                                        (GenericVariable) pop(), (Term) pop(), Op.Imdex))
+                                        (Variable) pop(), (Term) pop(), Op.Imdex))
                         ),
                         seq("+",
                                 push(new Ellipsis.EllipsisPrototype(Op.VAR_PATTERN, (GenericVariable) pop(), 1))

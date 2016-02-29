@@ -22,7 +22,6 @@ import nars.concept.Concept;
 import nars.nar.Default;
 import nars.nar.Terminal;
 import nars.task.Task;
-import nars.term.compound.GenericCompound;
 import org.junit.Test;
 
 import java.util.TreeSet;
@@ -644,7 +643,7 @@ public class TermTest {
     @Test public void testStatemntString() {
         assertTrue( inh("a", "b").op().isStatement() );
         Term aInhB = $("<a-->b>");
-        assertTrue(aInhB instanceof GenericCompound);
+        assertTrue(aInhB instanceof Compound);
         assertEquals("(a-->b)",
                      aInhB.toString());
     }

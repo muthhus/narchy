@@ -16,6 +16,7 @@ import nars.term.index.MapIndex2;
 import nars.term.index.PatternIndex;
 import nars.term.transform.subst.FindSubst;
 import nars.term.variable.GenericVariable;
+import nars.term.variable.Variable;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Ignore;
@@ -56,14 +57,14 @@ public class EllipsisTest {
             Compound y = getMatchable(arity);
             assertNotNull(y);
             assertTrue(y.isNormalized());
-            y.forEach(yy -> { assertFalse(yy instanceof GenericVariable); });
+            y.forEach(yy -> { assertFalse(yy instanceof Variable); });
 
             Compound r = getResult();
             assertTrue(r.isNormalized());
 
             Compound x = getPattern();
             assertTrue(x.isNormalized());
-            x.forEach(xx -> { assertFalse(xx instanceof GenericVariable); });
+            x.forEach(xx -> { assertFalse(xx instanceof Variable); });
 
             Term ellipsisTerm = firstEllipsis(x);
 

@@ -25,7 +25,7 @@ public class GenericVariable extends AtomicString implements Variable {
 
     @Override
     public int id() {
-        return 0;
+        throw new UnsupportedOperationException();
     }
 
     @Override

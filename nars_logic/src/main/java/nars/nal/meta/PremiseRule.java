@@ -827,7 +827,7 @@ public class PremiseRule extends GenericCompound {
             return true;
         }
 
-        public Term applyAfter(GenericVariable secondary) {
+        public Term applyAfter(Variable secondary) {
             offset++;
             return apply(null, secondary, -1);
         }

@@ -1,7 +1,6 @@
 package nars.nal.nal8;
 
 import nars.$;
-import nars.Memory;
 import nars.NAR;
 import nars.Op;
 import nars.budget.Budget;
@@ -11,7 +10,7 @@ import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.variable.GenericVariable;
+import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,7 +29,7 @@ public interface Execution  {
 
     float feedbackPriorityMultiplier = 1.0f;
     float feedbackDurabilityMultiplier = 1.0f;
-    GenericVariable defaultResultVariable = $.varDep("defaultResultVariable");
+    Variable defaultResultVariable = $.varDep("defaultResultVariable");
 //    public final NAR nar;
 //    public final Task task;
 

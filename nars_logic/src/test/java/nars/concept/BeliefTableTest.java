@@ -322,14 +322,14 @@ public class BeliefTableTest  {
 
         b.believe(1.0f, 0.5f); n.step();
         b.print();
-        assertEquals(0.5, b.concept().beliefs().topEternal().conf(), 0.001);
         assertEquals(2, b.concept().beliefs().size());
+        assertEquals(0.5, b.concept().beliefs().topEternal().conf(), 0.001);
 
         b.believe(1.0f, 0.5f); n.step();
         b.print();
+        assertEquals(4, b.concept().beliefs().size());
         assertEquals(0.67, b.concept().beliefs().topEternal().conf(), 0.001);
         assertEquals(0.67, b.concept().beliefs().top(n.time()).conf(), 0.001);
-        assertEquals(4, b.concept().beliefs().size());
 
         b.believe(1.0f, 0.5f); n.step();
         b.print();
