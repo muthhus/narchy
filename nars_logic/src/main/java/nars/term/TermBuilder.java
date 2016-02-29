@@ -317,7 +317,7 @@ public abstract class TermBuilder {
 
             if (t == 0) {
                 //special case: 0
-                Compound x = (Compound) junctionFlat(op, t, u);
+                Compound x = (Compound) junctionFlat(op, 0, u);
                 if (x.size() == 1) {
                     return x.term(0);
                 }

@@ -18,6 +18,7 @@ public class ClauseWriter extends CharWriter {
 		super(p);
 	}
 
+	@Override
 	public int putElement(PTerm t) {
 		if (null == writer)
 			return 0;

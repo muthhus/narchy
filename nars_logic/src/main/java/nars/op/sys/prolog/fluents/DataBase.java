@@ -118,6 +118,7 @@ public class DataBase extends BlackBoard {
      * @see PTerm
      * @see Clause
      */
+    @Override
     public Iterator toEnumerationFor(String k) {
         Iterator E = super.toEnumerationFor(k);
         return E;

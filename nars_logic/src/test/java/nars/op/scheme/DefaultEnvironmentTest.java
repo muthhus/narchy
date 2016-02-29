@@ -121,7 +121,7 @@ public class DefaultEnvironmentTest {
     public void car() {
         Function<Cons<Expression>, Expression> function = lookupFunction("car");
 
-        assertThat(function.apply(cons(list(numberList(1, 2, 3)), Cons.<Expression>empty())), is(number(1)));
+        assertThat(function.apply(cons(list(numberList(1, 2, 3)), Cons.empty())), is(number(1)));
     }
 
     private static Cons<Expression> numberList(Integer... numbers) {

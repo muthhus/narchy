@@ -16,6 +16,7 @@ public interface FloatSupplier extends DoubleSupplier {
 
     float asFloat();
     
+    @Override
     default double getAsDouble() { return asFloat(); }
 
 }

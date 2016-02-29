@@ -86,12 +86,10 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
     }
 
     @NotNull private static QuestionTaskTable tableOrEmpty(QuestionTaskTable q) {
-        if (q == null) return TaskTable.EMPTY;
-        return q;
+        return q == null ? TaskTable.EMPTY : q;
     }
     @NotNull private static BeliefTable tableOrEmpty(BeliefTable q) {
-        if (q == null) return BeliefTable.EMPTY;
-        return q;
+        return q == null ? BeliefTable.EMPTY : q;
     }
 
 

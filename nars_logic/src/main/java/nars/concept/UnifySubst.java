@@ -32,6 +32,7 @@ public abstract class UnifySubst extends FindSubst  {
 
     }
 
+    @Override
     public void matchAll(@NotNull Term x, @NotNull Term y, boolean finish) {
         this.a = x;
         this.b = y;

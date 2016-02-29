@@ -44,6 +44,8 @@ public class MutableTask extends AbstractTask {
     public MutableTask(@NotNull Task taskToClone, @NotNull Compound newTerm) {
         this(taskToClone);
         term(newTerm);
+        punc(taskToClone.punc());
+
     }
 
 
@@ -126,25 +128,25 @@ public class MutableTask extends AbstractTask {
 
     @NotNull
     public MutableTask judgment() {
-        setPunctuation(Symbols.BELIEF);
+        punc(Symbols.BELIEF);
         return this;
     }
 
     @NotNull
     public MutableTask question() {
-        setPunctuation(Symbols.QUESTION);
+        punc(Symbols.QUESTION);
         return this;
     }
 
     @NotNull
     public MutableTask quest() {
-        setPunctuation(Symbols.QUEST);
+        punc(Symbols.QUEST);
         return this;
     }
 
     @NotNull
     public MutableTask goal() {
-        setPunctuation(Symbols.GOAL);
+        punc(Symbols.GOAL);
         return this;
     }
 
@@ -180,7 +182,7 @@ public class MutableTask extends AbstractTask {
 
     @NotNull
     public MutableTask punctuation(char punctuation) {
-        setPunctuation(punctuation);
+        punc(punctuation);
         return this;
     }
 
@@ -206,7 +208,7 @@ public class MutableTask extends AbstractTask {
 
         ensureParentNonLoop(parentTask, parentBelief);
 
-        this.parentTask = ((parentTask != null) && !parentTask.isCommand()) ? reference(parentTask) : null;
+        this.parentTask = (/*(parentTask != null) &&*/ !parentTask.isCommand()) ? reference(parentTask) : null;
 
         this.parentBelief = ((parentBelief != null) && !parentBelief.isCommand()) ? reference(parentBelief) : null;
 
@@ -289,5 +291,12 @@ public class MutableTask extends AbstractTask {
     public MutableTask state(TaskState s) {
         this.state = s;
         return this;
+    }
+
+    protected final void punc(char punctuation) {
+        if (this.punctuation!=punctuation) {
+            this.punctuation = punctuation;
+            invalidate();
+        }
     }
 }

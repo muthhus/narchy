@@ -19,15 +19,18 @@ public class StringSink extends Sink {
 		this.buffer = new StringBuilder();
 	}
 
+	@Override
 	public int putElement(@NotNull PTerm t) {
 		buffer.append(t.toUnquoted());
 		return 1;
 	}
 
+	@Override
 	public void stop() {
 		buffer = null;
 	}
 
+	@Override
 	@NotNull
 	public PTerm collect() {
 		return new Const(buffer.toString());

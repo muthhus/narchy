@@ -65,6 +65,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
     }
 
 
+    @Override
     default boolean isCompound() { return true; }
 
     @Override

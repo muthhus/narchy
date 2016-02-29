@@ -25,6 +25,7 @@ class VarNumberer extends SystemObject {
 		ctr = 0;
 	}
 
+	@Override
 	final PTerm action(PTerm place) {
 		place = place.ref();
 		// IO.trace(">>action: "+place);

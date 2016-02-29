@@ -17,14 +17,17 @@ public class Real extends Num {
 		val = i;
 	}
 
+	@Override
 	boolean bind_to(@NotNull PTerm that, Trail trail) {
 		return super.bind_to(that, trail) && val == ((Real) that).val;
 	}
 
+	@Override
 	public final int arity() {
 		return PTerm.REAL;
 	}
 
+	@Override
 	public final double getValue() {
 		return val;
 	}

@@ -31,6 +31,7 @@ public class JavaSource extends Source {
 		this.e = V.iterator();
 	}
 
+	@Override
 	@Nullable
 	public PTerm getElement() {
 		if (null == e || !e.hasNext())
@@ -39,6 +40,7 @@ public class JavaSource extends Source {
 			return (PTerm) e.next();
 	}
 
+	@Override
 	public void stop() {
 		e = null;
 	}

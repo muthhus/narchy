@@ -96,14 +96,14 @@ public enum Reader {
 
             if ("'".equals(token)) {
                 String nextToken = i.next();
-                result = "(".equals(nextToken) ? add(result, ListExpression.list(SymbolExpression.symbol("quote"), ListExpression.list(parseSequence(i)))) : add(result, ListExpression.list(SymbolExpression.symbol("quote"), symbolOrNumber(nextToken)));
+                result = add(result, ListExpression.list(SymbolExpression.symbol("quote"), "(".equals(nextToken) ? ListExpression.list(parseSequence(i)) : symbolOrNumber(nextToken)));
                 continue;
             }
             if (")".equals(token)) {
                 return result;
             }
 
-            result = "(".equals(token) ? add(result, ListExpression.list(parseSequence(i))) : add(result, symbolOrNumber(token));
+            result = add(result, "(".equals(token) ? ListExpression.list(parseSequence(i)) : symbolOrNumber(token));
         }
 
         return result;

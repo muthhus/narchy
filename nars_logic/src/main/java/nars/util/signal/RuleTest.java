@@ -35,8 +35,8 @@ public interface RuleTest {
 //	public RuleTest(@NotNull String task, @NotNull String belief, String result) {
 //		this(task, belief, result, 0, 1, 0, 1);
 //	}
-	public static TestNAR get(TestNAR test, @NotNull String task, @NotNull String belief, String result, float minFreq,
-					float maxFreq, float minConf, float maxConf) {
+	static TestNAR get(TestNAR test, @NotNull String task, @NotNull String belief, String result, float minFreq,
+					   float maxFreq, float minConf, float maxConf) {
 		RuleTest(
 				// new SingleStepNAR(),
 				test, task, belief, result, minFreq, maxFreq, minConf,
@@ -46,14 +46,14 @@ public interface RuleTest {
 
 	//private static final Narsese p = Narsese.the();
 
-	public static void RuleTest(@NotNull TestNAR test, @NotNull String task, @NotNull String belief, String result,
-					float minFreq, float maxFreq, float minConf, float maxConf) {
+	static void RuleTest(@NotNull TestNAR test, @NotNull String task, @NotNull String belief, String result,
+						 float minFreq, float maxFreq, float minConf, float maxConf) {
 		RuleTest(test, test.nar.task(task), test.nar.task(belief), result, minFreq, maxFreq,
 				minConf, maxConf);
 
 	}
-	public static void RuleTest(@NotNull TestNAR test, @NotNull Task task, @NotNull Task belief, String result,
-					float minFreq, float maxFreq, float minConf, float maxConf) {
+	static void RuleTest(@NotNull TestNAR test, @NotNull Task task, @NotNull Task belief, String result,
+						 float minFreq, float maxFreq, float minConf, float maxConf) {
 
 		test.nar.input(task);
 		test.nar.input(belief);

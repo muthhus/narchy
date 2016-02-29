@@ -16,7 +16,7 @@ public enum ThermostatTest  {
         public int target;
         public int current;
         public int increment;
-        public boolean log = false;
+        public boolean log;
 
 
         public boolean valid() {

@@ -8,6 +8,7 @@ class true_ extends ConstBuiltin {
 		super("true");
 	}
 
+	@Override
 	public int exec(Prog p) {
 		return 1;
 	}

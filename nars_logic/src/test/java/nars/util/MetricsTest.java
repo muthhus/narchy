@@ -97,7 +97,7 @@ public class MetricsTest {
         //noinspection OverlyComplexAnonymousInnerClass
         PrintStream sb = new PrintStream(System.out) {
         
-            int line = 0;
+            int line;
             
             @Override
             public void println(String x) {

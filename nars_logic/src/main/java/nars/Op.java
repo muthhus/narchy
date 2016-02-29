@@ -175,11 +175,11 @@ public enum Op {
     public static boolean isOperation(@NotNull Term t) {
         if (!(t.isCompound())) return false;
         Compound c = (Compound)t;
-        return !c.impossibleStructureMatch(OperationBits) &&
-               c.size() == 2 &&
+        return  c.size() == 2 &&
+                (!c.impossibleStructureMatch(OperationBits)) &&
                 c.op() == Op.INHERIT &&
-                c.term(1).op() == Op.OPERATOR &&
-                c.term(0).op() == Op.PRODUCT;
+                c.term(1, Op.OPERATOR) &&
+                c.term(0, Op.PRODUCT);
     }
 
 

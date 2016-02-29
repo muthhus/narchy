@@ -17,7 +17,7 @@ public class Thermostat3 {
     static final float speed = 0.02f;
     final float tolerance = 0.15f;
     private final UnitVal h;
-    long cyclePause = 0;
+    long cyclePause;
 
     Default n;
     float targetX;

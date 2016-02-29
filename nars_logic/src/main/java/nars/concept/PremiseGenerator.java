@@ -82,28 +82,24 @@ abstract public class PremiseGenerator extends UnifySubst implements Function<Te
 
         Collection<BLink<Task>> tasksBuffer;
         Collection<BLink<? extends Termed>> termsBuffer;
-        {
-            termsBuffer = this.terms;
+        termsBuffer = this.terms;
 
-            Bag<Termed> termLinks = concept.termlinks();
-            boolean tlEmpty = termLinks.isEmpty();
-            if (!tlEmpty) {
-                termsBuffer.clear();
-                termLinks.forEachThen(eachTermLink).commit().sample(termlinks, termsBuffer::add);
-            }
-
-            if (termsBuffer.isEmpty())
-                return; //no termlink available
+        Bag<Termed> termLinks = concept.termlinks();
+        boolean tlEmpty = termLinks.isEmpty();
+        if (!tlEmpty) {
+            termsBuffer.clear();
+            termLinks.forEachThen(eachTermLink).commit().sample(termlinks, termsBuffer::add);
         }
 
+        if (termsBuffer.isEmpty())
+            return; //no termlink available
 
-        {
-            tasksBuffer = this.tasks;
-            tasksBuffer.clear();
-            //concept.getTaskLinks().sample(tasklinks, eachTaskLink, tasksBuffer).commit();
-            concept.tasklinks().filter(eachTaskLink).commit().sample(tasklinks, tasksBuffer::add);
-            if (tasksBuffer.isEmpty()) return;
-        }
+
+        tasksBuffer = this.tasks;
+        tasksBuffer.clear();
+        //concept.getTaskLinks().sample(tasklinks, eachTaskLink, tasksBuffer).commit();
+        concept.tasklinks().filter(eachTaskLink).commit().sample(tasklinks, tasksBuffer::add);
+        if (tasksBuffer.isEmpty()) return;
 
         //convert to array for fast for-within-for iterations
         BLink[] tasksArray = this.tasksArray = tasksBuffer.toArray(this.tasksArray);

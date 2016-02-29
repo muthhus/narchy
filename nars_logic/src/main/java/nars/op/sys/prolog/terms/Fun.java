@@ -20,6 +20,7 @@ public class Fun extends Const implements Compound<PTerm> {
 
     public PTerm args[]; //TODO make final
 
+    @Override
     public final int arity() {
         return args.length;
     }
@@ -126,10 +127,12 @@ public class Fun extends Const implements Compound<PTerm> {
         return s.toString();
     }
 
+    @Override
     boolean bind_to(@NotNull nars.op.sys.prolog.terms.PTerm that, Trail trail) {
         return /*getClass() == that.getClass() &&*/ name.equals(that.name) && args.length == ((Fun) that).args.length;
     }
 
+    @Override
     boolean unify_to(@NotNull nars.op.sys.prolog.terms.PTerm that, Trail trail) {
         return bind_to(that, trail) ?
                 unifyBind((Fun) that, args, trail) :
@@ -147,6 +150,7 @@ public class Fun extends Const implements Compound<PTerm> {
         return true;
     }
 
+    @Override
     public nars.op.sys.prolog.terms.PTerm token() {
         return args[0];
     }
@@ -189,6 +193,7 @@ public class Fun extends Const implements Compound<PTerm> {
 //        return f;
 //    }
 
+    @Override
     @Nullable
     final nars.op.sys.prolog.terms.PTerm reaction(@NotNull nars.op.sys.prolog.terms.PTerm that) {
         // IO.mes("TRACE>> "+name());
@@ -214,6 +219,7 @@ public class Fun extends Const implements Compound<PTerm> {
         return l;
     }
 
+    @Override
     boolean isClause() {
         return arity() == 2 && name.equals(":-");
     }

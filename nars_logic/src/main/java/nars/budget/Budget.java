@@ -34,6 +34,7 @@ public abstract class Budget extends BudgetedHandle {
 //        return !Float.isFinite(pri);
 //    }
     
+    @Override
     public final boolean isDeleted() {
         return getDeleted();
     }
@@ -175,6 +176,7 @@ public abstract class Budget extends BudgetedHandle {
      *
      * @return The summary value
      */
+    @Override
     public float summary() {
         return aveGeo(pri(), dur(), qua());
     }
@@ -283,12 +285,12 @@ public abstract class Budget extends BudgetedHandle {
      *
      * @return String representation of the value with 2-digit accuracy
      */
-    @org.jetbrains.annotations.Nullable
+    @NotNull
     public StringBuilder toBudgetStringExternal() {
         return toBudgetStringExternal(null);
     }
 
-    @org.jetbrains.annotations.Nullable
+    @NotNull
     public StringBuilder toBudgetStringExternal(StringBuilder sb) {
         //return MARK + priority.toStringBrief() + SEPARATOR + durability.toStringBrief() + SEPARATOR + quality.toStringBrief() + MARK;
 

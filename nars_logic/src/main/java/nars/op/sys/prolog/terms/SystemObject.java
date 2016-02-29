@@ -36,6 +36,7 @@ public class SystemObject extends Nonvar {
 		super(soName(prefix));
 	}
 
+	@Override
 	boolean bind_to(@NotNull PTerm that, Trail trail) {
 		return super.bind_to(that, trail)
 				&& name.equals(((SystemObject) that).name);
@@ -45,6 +46,7 @@ public class SystemObject extends Nonvar {
 		return name;
 	}
 
+	@Override
 	public final int arity() {
 		return PTerm.JAVA;
 	}

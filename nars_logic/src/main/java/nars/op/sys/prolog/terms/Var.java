@@ -43,26 +43,31 @@ public final class Var extends PTerm {
 		val = this;
 	}
 
+	@Override
 	public int arity() {
 		return PTerm.VAR;
 	}
 
+	@Override
 	@NotNull
 	public final PTerm ref() {
 		PTerm v = this.val;
 		return (v == this) ? this : v.ref();
 	}
 
+	@Override
 	public boolean bind_to(PTerm x, @NotNull Trail trail) {
 		val = x;
 		trail.add(this);
 		return true;
 	}
 
+	@Override
 	protected void undo() {
 		val = this;
 	}
 
+	@Override
 	boolean unify_to(PTerm that, Trail trail) {
 		// expects: this, that are dereferenced
 		// return (this==that)?true:val.bind_to(that,trail);
@@ -73,11 +78,13 @@ public final class Var extends PTerm {
 		return ref() == x.ref();
 	}
 
+	@Override
 	public String getKey() {
 		PTerm t = ref();
 		return t instanceof Var ? null : t.getKey();
 	}
 
+	@Override
 	PTerm reaction(@NotNull PTerm agent) {
 
 		PTerm R = agent.action(ref());
@@ -171,7 +178,7 @@ public final class Var extends PTerm {
 	}
 
 	@Override
-	public void append(Appendable w) throws IOException {
+	public void append(Appendable w) {
 
 	}
 

@@ -217,10 +217,12 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 //        return terms.cloneTermsReplacing(index, replaced);
 //    }
 
+    @Override
     public final boolean isEmpty() {
         return subterms.isEmpty();
     }
 
+    @Override
     public final boolean contains(Object o) {
         return subterms.contains(o);
     }

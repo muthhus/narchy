@@ -19,7 +19,7 @@ public final class AndCondition<C> extends GenericCompound<BooleanCondition<C>> 
     private final BooleanCondition[] termCache;
 
     public AndCondition(@NotNull BooleanCondition<C>[] p) {
-        this(TermVector.the(p));
+        this(TermVector.the((Term[])p));
     }
     public AndCondition(@NotNull Collection<BooleanCondition<C>> p) {
         this(new TermVector(p, BooleanCondition.class));

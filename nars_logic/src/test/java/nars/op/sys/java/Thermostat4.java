@@ -22,7 +22,7 @@ public class Thermostat4 {
     //final static float tolerance = 0.1f;
     static float targetX;
     private final UnitValTaskInc h;
-    long cyclePause = 0;
+    long cyclePause;
     Default n;
 
 

@@ -666,20 +666,27 @@ public class UnificationTest  {
 
     }
 
-    @Test public void testEllipsisImage2() {
+    @Test public void testEllipsisImage2a() {
         test(Op.VAR_PATTERN,
                 "(/,_, B, %X..+)",
                 "(/,_, B, C, D)", true);
+    }
+    @Test public void testEllipsisImage2b() {
         test(Op.VAR_PATTERN,
                 "(/,_, %X..+)",
                 "(/,_, B, C, D)", true);
-
+    }
+    @Test public void testEllipsisImage2c() {
         test(Op.VAR_PATTERN,
                 "<A --> (/,_, B, %X..+)>",
                 "<A --> (/,_, B, C, D)>", true);
+    }
+    @Test public void testEllipsisImage2d() {
         test(Op.VAR_PATTERN,
                 "<A --> (/,_, E, %X..+)>",
                 "<A --> (/,_, B, C, D)>", false);
+    }
+    @Test public void testEllipsisImage2e() {
         test(Op.VAR_PATTERN,
                 "<A --> (/, B, _, %X..+)>",
                 "<A --> (/, B, _, C, D)>", true);

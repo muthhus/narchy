@@ -154,6 +154,7 @@ public class Builtins extends HashDict {
 			super("get_stdin", 1);
 		}
 
+		@Override
 		public int exec(@NotNull Prog p) {
 			try {
 				return putArg(0, new ClauseReader(prolog, p), p);
@@ -174,6 +175,7 @@ public class Builtins extends HashDict {
 			super("consult", 1);
 		}
 
+		@Override
 		public int exec(Prog p) {
 			String f = ((Const) arg(0)).name;
 			if (IO.trace())
@@ -190,6 +192,7 @@ public class Builtins extends HashDict {
 			super("discharge", 2);
 		}
 
+		@Override
 		public int exec(Prog p) {
 			Source from = (Source) arg(0);
 			Sink to = (Sink) arg(1);
@@ -214,6 +217,7 @@ public class Builtins extends HashDict {
 			super("new_fun", 3);
 		}
 
+		@Override
 		public int exec(@NotNull Prog p) {
 			String s = ((Const) arg(0)).name;
 			int i = getIntArg(1);
@@ -237,6 +241,7 @@ public class Builtins extends HashDict {
 			super("file_clause_reader", 2);
 		}
 
+		@Override
 		public int exec(@NotNull Prog p) {
 			PTerm I = arg(0);
 			Fluent f;
@@ -266,6 +271,7 @@ public class Builtins extends HashDict {
 			super("reconsult", 1);
 		}
 
+		@Override
 		public int exec(Prog p) {
 			String f = ((Const) arg(0)).name;
 			return DataBase.fromFile(prolog, f) ? 1 : 0;
@@ -280,6 +286,7 @@ public class Builtins extends HashDict {
 			super("unfolder_source", 2);
 		}
 
+		@Override
 		public int exec(@NotNull Prog p) {
 			Clause goal = arg(0).toClause();
 			Prog newp = new Prog(prolog, goal, p);
@@ -296,6 +303,7 @@ public class Builtins extends HashDict {
 			super("db_to_string", 1);
 		}
 
+		@Override
 		public int exec(@NotNull Prog p) {
 			return putArg(0, new Const(prolog.db.pprint()), p);
 		}
@@ -309,6 +317,7 @@ public class Builtins extends HashDict {
 			super("get_default_db", 1);
 		}
 
+		@Override
 		public int exec(@NotNull Prog p) {
 			return putArg(0, new JavaObject(prolog.db), p);
 		}
@@ -323,6 +332,7 @@ public class Builtins extends HashDict {
 			super("source_term", 2);
 		}
 
+		@Override
 		public int exec(@NotNull Prog p) {
 			Source S = (Source) arg(0);
 			PTerm Xs = toFunBuiltin(((Fun) S.toFun()));
@@ -338,6 +348,7 @@ public class Builtins extends HashDict {
 			super("reconsult_again");
 		}
 
+		@Override
 		public int exec(Prog p) {
 			return DataBase.fromFile(prolog) ? 1 : 0;
 		}
@@ -352,6 +363,7 @@ public class Builtins extends HashDict {
 			super("at_key", 2);
 		}
 
+		@Override
 		public int exec(@NotNull Prog p) {
 			PTerm R = prolog.db.all(arg(0).getKey(), new Var());
 			return putArg(1, R, p);
@@ -371,6 +383,7 @@ public class Builtins extends HashDict {
 			super("answer_source", 3);
 		}
 
+		@Override
 		public int exec(@NotNull Prog p) {
 			Clause goal = new Clause(arg(0), arg(1));
 			Prog U = new Prog(prolog, goal, p);
@@ -386,6 +399,7 @@ public class Builtins extends HashDict {
 			super("string_clause_reader", 2);
 		}
 
+		@Override
 		public int exec(@NotNull Prog p) {
 			try {
 				return putArg(1, new ClauseReader(prolog, arg(0), p), p);
@@ -405,6 +419,7 @@ public class Builtins extends HashDict {
 			super("pred_to_string", 2);
 		}
 
+		@Override
 		public int exec(@NotNull Prog p) {
 			String key = arg(0).getKey();
 			String listing = prolog.db.pred_to_string(key);
@@ -427,6 +442,7 @@ final class is_builtin extends FunBuiltin {
 		super("is_builtin", 1);
 	}
 
+	@Override
 	public int exec(Prog p) {
 		return arg(0).isBuiltin() ? 1 : 0;
 	}
@@ -440,6 +456,7 @@ final class halt extends ConstBuiltin {
 		super("halt");
 	}
 
+	@Override
 	public int exec(Prog p) {
 		Runtime.getRuntime().exit(0);
 		return 1;
@@ -454,6 +471,7 @@ final class system extends FunBuiltin {
 		super("system", 1);
 	}
 
+	@Override
 	public int exec(Prog p) {
 		String cmd = ((Const) arg(0)).name;
 		return IO.system(cmd);
@@ -468,6 +486,7 @@ final class file_char_reader extends FunBuiltin {
 		super("file_char_reader", 2);
 	}
 
+	@Override
 	public int exec(@NotNull Prog p) {
 		PTerm I = arg(0);
 		Fluent f;
@@ -489,6 +508,7 @@ final class char_file_writer extends FunBuiltin {
 		super("char_file_writer", 2);
 	}
 
+	@Override
 	public int exec(@NotNull Prog p) {
 		String s = ((Const) arg(0)).name;
 		Fluent f = new CharWriter(s, p);
@@ -504,6 +524,7 @@ final class clause_file_writer extends FunBuiltin {
 		super("clause_file_writer", 2);
 	}
 
+	@Override
 	public int exec(@NotNull Prog p) {
 		String s = ((Const) arg(0)).name;
 		Fluent f = new ClauseWriter(s, p);
@@ -519,6 +540,7 @@ final class get_stdout extends FunBuiltin {
 		super("get_stdout", 1);
 	}
 
+	@Override
 	public int exec(@NotNull Prog p) {
 		return putArg(0, new ClauseWriter(p), p);
 	}
@@ -536,6 +558,7 @@ final class get_arity extends FunBuiltin {
 		super("get_arity", 2);
 	}
 
+	@Override
 	public int exec(@NotNull Prog p) {
 		Int N = new Int(arg(0).arity());
 		return putArg(1, N, p);
@@ -551,6 +574,7 @@ final class stack_dump extends FunBuiltin {
 		super("stack_dump", 1);
 	}
 
+	@Override
 	public int exec(Prog p) {
 		String s = arg(0).toString();
 		IO.error("User requested dump", (new Exception(s)));
@@ -569,6 +593,7 @@ final class ctime extends FunBuiltin {
 		super("ctime", 1);
 	}
 
+	@Override
 	public int exec(@NotNull Prog p) {
 		PTerm T = new Int(System.currentTimeMillis() - t0);
 		return putArg(0, T, p);
@@ -585,6 +610,7 @@ final class set_max_answers extends FunBuiltin {
 		super("set_max_answers", 1);
 	}
 
+	@Override
 	public int exec(Prog p) {
 		IO.maxAnswers = getIntArg(0);
 		return 1;
@@ -601,6 +627,7 @@ final class new_db extends FunBuiltin {
 		super("new_db", 1);
 	}
 
+	@Override
 	public int exec(@NotNull Prog p) {
 		return putArg(0, new JavaObject(new DataBase()), p);
 	}
@@ -615,6 +642,7 @@ final class db_add extends FunBuiltin {
 		super("db_add", 2);
 	}
 
+	@Override
 	public int exec(Prog p) {
 		DataBase db = (DataBase) arg(0).toObject();
 		PTerm X = arg(1);
@@ -633,6 +661,7 @@ final class db_remove extends FunBuiltin {
 		super("db_remove", 3);
 	}
 
+	@Override
 	public int exec(@NotNull Prog p) {
 		DataBase db = (DataBase) arg(0).toObject();
 		PTerm X = arg(1);
@@ -653,6 +682,7 @@ final class db_collect extends FunBuiltin {
 		super("db_collect", 3);
 	}
 
+	@Override
 	public int exec(@NotNull Prog p) {
 		DataBase db = (DataBase) arg(0).toObject();
 		PTerm X = arg(1);
@@ -670,6 +700,7 @@ final class db_source extends FunBuiltin {
 		super("db_source", 2);
 	}
 
+	@Override
 	public int exec(@NotNull Prog p) {
 		DataBase db = (DataBase) arg(0).toObject();
 		Source S = new JavaSource(db.toEnumeration(), p);
@@ -685,6 +716,7 @@ final class arg extends FunBuiltin {
 		super("arg", 3);
 	}
 
+	@Override
 	public int exec(@NotNull Prog p) {
 		int i = getIntArg(0);
 		Fun F = (Fun) arg(1);
@@ -702,6 +734,7 @@ final class name_to_chars extends FunBuiltin {
 		super("name_to_chars", 2);
 	}
 
+	@Override
 	public int exec(@NotNull Prog p) {
 		PTerm Cs = arg(0).toChars();
 		return putArg(1, Cs, p);
@@ -716,6 +749,7 @@ final class chars_to_name extends FunBuiltin {
 		super("chars_to_name", 3);
 	}
 
+	@Override
 	public int exec(@NotNull Prog p) {
 		int convert = getIntArg(0);
 		String s = charsToString((Nonvar) arg(1));
@@ -742,6 +776,7 @@ final class numbervars extends FunBuiltin {
 		super("numbervars", 2);
 	}
 
+	@Override
 	public int exec(@NotNull Prog p) {
 		PTerm T = arg(0).numbervars();
 		return putArg(1, T, p);
@@ -756,6 +791,7 @@ final class compute extends FunBuiltin {
 		super("compute", 4);
 	}
 
+	@Override
 	public int exec(@NotNull Prog p) {
 
 		PTerm o = arg(0);
@@ -825,6 +861,7 @@ final class set_trace extends FunBuiltin {
 		super("set_trace", 1);
 	}
 
+	@Override
 	public int exec(Prog p) {
 		Prog.tracing = getIntArg(0);
 		return 1;
@@ -840,6 +877,7 @@ final class source_list extends FunBuiltin {
 		super("source_list", 2);
 	}
 
+	@Override
 	public int exec(@NotNull Prog p) {
 		Source S = (Source) arg(0);
 		PTerm Xs = S.toList();
@@ -856,6 +894,7 @@ final class list_source extends FunBuiltin {
 		super("list_source", 2);
 	}
 
+	@Override
 	public int exec(@NotNull Prog p) {
 		Source E = new ListSource((Const) arg(0), p);
 		return putArg(1, E, p);
@@ -871,6 +910,7 @@ final class term_source extends FunBuiltin {
 		super("term_source", 2);
 	}
 
+	@Override
 	public int exec(@NotNull Prog p) {
 		TermSource E = new TermSource((Nonvar) arg(0), p);
 		return putArg(1, E, p);
@@ -888,6 +928,7 @@ final class integer_source extends FunBuiltin {
 		super("integer_source", 5);
 	}
 
+	@Override
 	public int exec(@NotNull Prog p) {
 		IntegerSource E = new IntegerSource(((Int) arg(0)).longValue(),
 				((Int) arg(1)).longValue(), ((Int) arg(2)).longValue(),
@@ -904,6 +945,7 @@ final class source_loop extends FunBuiltin {
 		super("source_loop", 2);
 	}
 
+	@Override
 	public int exec(@NotNull Prog p) {
 		Source s = (Source) arg(0);
 		return putArg(1, new SourceLoop(s, p), p);
@@ -920,6 +962,7 @@ final class get extends FunBuiltin {
 		super("get", 2);
 	}
 
+	@Override
 	public int exec(@NotNull Prog p) {
 		// IO.mes("<<"+getArg(0)+"\n"+p+p.getTrail().pprint());
 		Source S = (Source) arg(0);
@@ -940,6 +983,7 @@ final class put extends FunBuiltin {
 		super("put", 2);
 	}
 
+	@Override
 	public int exec(Prog p) {
 		Sink S = (Sink) arg(0);
 		PTerm X = arg(1);
@@ -959,6 +1003,7 @@ final class stop extends FunBuiltin {
 		super("stop", 1);
 	}
 
+	@Override
 	public int exec(Prog p) {
 		Fluent S = (Fluent) arg(0);
 		S.stop();
@@ -975,6 +1020,7 @@ final class split_source extends FunBuiltin {
 		super("split_source", 3);
 	}
 
+	@Override
 	public int exec(@NotNull Prog p) {
 		Source original = (Source) arg(0);
 		Nonvar Xs = original.toList();
@@ -991,6 +1037,7 @@ final class merge_sources extends FunBuiltin {
 		super("merge_sources", 2);
 	}
 
+	@Override
 	public int exec(@NotNull Prog p) {
 		Const list = (Const) arg(0);
 		return putArg(1, new SourceMerger(list, p), p);
@@ -1006,6 +1053,7 @@ final class collect extends FunBuiltin {
 		super("collect", 2);
 	}
 
+	@Override
 	public int exec(@NotNull Prog p) {
 		Sink s = (Sink) arg(0);
 		PTerm X = s.collect();
@@ -1026,6 +1074,7 @@ final class term_string_collector extends FunBuiltin {
 		super("term_string_collector", 1);
 	}
 
+	@Override
 	public int exec(@NotNull Prog p) {
 		return putArg(0, new StringSink(p), p);
 	}
@@ -1040,6 +1089,7 @@ final class term_collector extends FunBuiltin {
 		super("term_collector", 1);
 	}
 
+	@Override
 	public int exec(@NotNull Prog p) {
 		return putArg(0, new TermCollector(p), p);
 	}
@@ -1053,6 +1103,7 @@ final class string_char_reader extends FunBuiltin {
 		super("string_char_reader", 2);
 	}
 
+	@Override
 	public int exec(@NotNull Prog p) {
 		return putArg(1, new CharReader(arg(0), p), p);
 	}
@@ -1071,6 +1122,7 @@ final class set_persistent extends FunBuiltin {
 		super("set_persistent", 2);
 	}
 
+	@Override
 	public int exec(Prog p) {
 		Fluent F = (Fluent) arg(0);
 		Const R = (Const) arg(1);
@@ -1088,6 +1140,7 @@ final class get_persistent extends FunBuiltin {
 		super("get_persistent", 2);
 	}
 
+	@Override
 	public int exec(@NotNull Prog p) {
 		Fluent F = (Fluent) arg(0);
 		PTerm R = F.getPersistent() ? PTerm.YES : PTerm.NO;

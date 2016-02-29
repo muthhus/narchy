@@ -143,6 +143,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     }
 
 
+    @Override
     @NotNull
     default Task task() { return this; }
 
@@ -447,9 +448,9 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     default StringBuilder appendTo(@Nullable StringBuilder buffer, /**@Nullable*/@Nullable Memory memory, boolean term, boolean showStamp, boolean showBudget, boolean showLog) {
 
 
-        String contentName;
+
         Compound t = term();
-        contentName = term && t != null ? t.toString() : "";
+        String contentName = t.toString();
 
         CharSequence tenseString;
         if (memory!=null) {

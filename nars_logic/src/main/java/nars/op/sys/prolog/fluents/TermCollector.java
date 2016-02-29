@@ -22,15 +22,18 @@ public class TermCollector extends Sink {
 		this.buffer = new ArrayList();
 	}
 
+	@Override
 	public int putElement(PTerm T) {
 		buffer.add(T);
 		return 1;
 	}
 
+	@Override
 	public void stop() {
 		buffer = null;
 	}
 
+	@Override
 	@Nullable
 	public PTerm collect() {
 		return new JavaSource(buffer, p);

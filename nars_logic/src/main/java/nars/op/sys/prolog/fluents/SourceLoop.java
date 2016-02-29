@@ -37,6 +37,7 @@ public class SourceLoop extends Source {
 		return T;
 	}
 
+	@Override
 	@Nullable
 	public PTerm getElement() {
 		PTerm T = null;
@@ -53,6 +54,7 @@ public class SourceLoop extends Source {
 		return T;
 	}
 
+	@Override
 	public void stop() {
 		v = null;
 		s = null;

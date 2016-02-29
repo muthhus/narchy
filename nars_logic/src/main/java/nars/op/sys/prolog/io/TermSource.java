@@ -18,6 +18,7 @@ public class TermSource extends Source {
 
 	private int pos;
 
+	@Override
 	@Nullable
 	public PTerm getElement() {
 		PTerm X;
@@ -38,6 +39,7 @@ public class TermSource extends Source {
 		return X;
 	}
 
+	@Override
 	public void stop() {
 		val = null;
 	}

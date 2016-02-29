@@ -10,8 +10,10 @@ abstract public class ConstBuiltin extends Const {
 		super(s);
 	}
 
+	@Override
 	abstract public int exec(Prog p);
 
+	@Override
 	public final boolean isBuiltin() {
 		return true;
 	}

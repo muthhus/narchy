@@ -145,7 +145,7 @@ public enum Lispy {
                     case "quote":                        // (quote exp)
                         return l.get(1);
                     case "if":                           // (if test conseq alt)
-                        x = ((Boolean) eval(l.get(1), env)) ? l.get(2) : l.get(3);
+                        x = l.get((Boolean) eval(l.get(1), env) ? 2 : 3);
                         continue;
                     case "set!":                         // (set! var exp)
                         var = string(l.get(1));

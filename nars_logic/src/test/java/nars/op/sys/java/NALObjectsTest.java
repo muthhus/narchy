@@ -27,7 +27,7 @@ public class NALObjectsTest  {
     /** test class */
     public static class T {
 
-        public int count = 0;
+        public int count;
         public int val = -1;
 
 

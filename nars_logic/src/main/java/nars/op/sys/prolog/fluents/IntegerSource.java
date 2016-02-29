@@ -28,6 +28,7 @@ public class IntegerSource extends Source {
 
 	private long x;
 
+	@Override
 	@Nullable
 	public PTerm getElement() {
 		if (fuel <= 0)
@@ -38,6 +39,7 @@ public class IntegerSource extends Source {
 		return R;
 	}
 
+	@Override
 	public void stop() {
 		fuel = 0;
 	}

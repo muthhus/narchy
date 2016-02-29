@@ -104,13 +104,13 @@ public interface Concept extends Termed, Comparable {
                         goals().top(now).expectation()) : 0;
     }
 
-    @Nullable
+    @NotNull
     BeliefTable beliefs();
 
-    @Nullable
+    @NotNull
     BeliefTable goals();
 
-    @Nullable
+    @NotNull
     TaskTable questions();
 
 
@@ -120,7 +120,7 @@ public interface Concept extends Termed, Comparable {
 //            throw new RuntimeException("Deleted concept should not activate TermLinks");
 //    }
 
-    @Nullable
+    @NotNull
     TaskTable quests();
 
     @Nullable

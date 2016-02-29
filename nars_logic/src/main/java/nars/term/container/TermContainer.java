@@ -65,6 +65,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
         return o instanceof Term && containsTerm((Term) o);
     }
 
+    boolean equals(Object o);
 
     static boolean equals(TermContainer a, Object b) {
         return b instanceof TermContainer && TermContainer.equals(a, (TermContainer)b);
@@ -169,6 +170,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
     void forEach(Consumer<? super T> action, int start, int stop);
 
 
+    @Override
     default void forEach(Consumer<? super T> action) {
         forEach(action, 0, size());
     }

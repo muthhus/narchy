@@ -82,6 +82,7 @@ abstract public class ConceptProcess implements Premise {
 //        return termLink;
 //    }
 
+    @Override
     public Concept concept() {
         return conceptLink.get();
     }
@@ -105,6 +106,7 @@ abstract public class ConceptProcess implements Premise {
 //        return c;
 //    }
 
+    @Override
     public final Termed beliefTerm() {
         Task x = belief();
         return x == null ? termLink.get() :

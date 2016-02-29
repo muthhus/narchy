@@ -67,8 +67,7 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
                     getDefaultBudget(v), 1f);
             return existing;
         } else {
-            return existing != null ? existing :
-                    put(v, getDefaultBudget(v));
+            return put(v, getDefaultBudget(v));
         }
     }
 

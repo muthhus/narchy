@@ -257,14 +257,14 @@ public class Inperience {
 
             if (valid) {
                 Compound c = $.exec(anticipate, beliefTerm.term(1));
-                if (c!=null) {
+                //if (c!=null) {
                     //long interval = (impsub instanceof Interval ? ((Interval)impsub).duration() : 0);
                     //int interval = 0;
 
                     beliefReasonDerive(task, belief,
                             c,
                             0);
-                }
+                //}
             }
         }
     }

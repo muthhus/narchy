@@ -117,7 +117,7 @@ public interface TermPrinter {
         p.append(COMPOUND_TERM_CLOSER);
     }
 
-    static void sep(@NotNull Appendable w) throws IOException {
+    static void sep(@NotNull Appendable w) {
         //if (pretty) w.append(' ');
     }
 
@@ -225,7 +225,7 @@ public interface TermPrinter {
 
     }
 
-    public static StringBuilder stringify(Compound c) {
+    static StringBuilder stringify(Compound c) {
         StringBuilder sb = new StringBuilder(/* conservative estimate */ c.volume()*2 );
         try {
             c.append(sb);

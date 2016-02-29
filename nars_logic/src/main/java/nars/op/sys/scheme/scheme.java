@@ -119,12 +119,9 @@ public class scheme extends TermFunction {
             );
         }
 
-        return code instanceof Compound ?
-
-                schemeToNars.apply(
-                    Evaluator.evaluate(
-                        new SchemeProduct(((Iterable) code)), env)) :
-                schemeToNars.apply(Evaluator.evaluate(new SchemeProduct($.p(x)), env));
+        return schemeToNars.apply(
+            Evaluator.evaluate(
+                new SchemeProduct(code instanceof Compound ? (Iterable) code : $.p(x)), env));
         //Set = evaluate as a cond?
 //        else {
 //

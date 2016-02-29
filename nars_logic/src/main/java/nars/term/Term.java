@@ -36,6 +36,7 @@ public interface Term extends Termed, Comparable, Termlike {
 
 
 
+
     @NotNull
     @Override default Term term() {
         return this;
@@ -62,7 +63,8 @@ public interface Term extends Termed, Comparable, Termlike {
     @Override
     int size();
 
-
+    @Override boolean equals(Object o);
+    @Override int hashCode();
 
     default void recurseTerms(SubtermVisitor v) {
         recurseTerms(v, null);
@@ -193,6 +195,7 @@ public interface Term extends Termed, Comparable, Termlike {
         //return op().ordinal()<<16 | (0xffff);
     }
 
+    @Override
     boolean isCompound();
 
     @Override

@@ -159,6 +159,7 @@ abstract public class PatternCompound extends GenericCompound {
         return structureCached;
     }
 
+    @Override
     abstract public boolean match(@NotNull Compound y, @NotNull FindSubst subst);
     //abstract protected boolean canMatch(@NotNull Compound y);
 

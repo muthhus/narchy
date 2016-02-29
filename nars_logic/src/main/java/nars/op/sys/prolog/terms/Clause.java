@@ -138,6 +138,7 @@ public class Clause extends Fun {
     /**
      * Pretty prints a clause after replacing ugly variable names
      */
+    @Override
     @NotNull
     public String pprint() {
         return pprint(false);
@@ -156,6 +157,7 @@ public class Clause extends Fun {
     /**
      * Clause to Term converter: the joy of strong typing:-)
      */
+    @Override
     @NotNull
     public Clause toClause() { // overrides toClause in Term
         return this;
@@ -326,11 +328,13 @@ public class Clause extends Fun {
      * Returns a key based on the principal functor of the head of the clause
      * and its arity.
      */
+    @Override
     @Nullable
     final public String getKey() {
         return head().getKey();
     }
 
+    @Override
     final boolean isClause() {
         return true;
     }

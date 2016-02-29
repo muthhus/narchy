@@ -48,6 +48,7 @@ public class Atom extends AtomicStringConstant {
     }
 
 
+    @Override
     public final int init(int[] meta) {
 
         meta[4] ++; //volume

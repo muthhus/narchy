@@ -10,6 +10,7 @@ public class JavaObject extends SystemObject {
 
 	final Object val;
 
+	@Override
 	public Object toObject() {
 		return val;
 	}

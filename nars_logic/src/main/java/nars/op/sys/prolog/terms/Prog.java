@@ -62,6 +62,7 @@ public class Prog extends Source implements Runnable {
      * It consists of a chain of "unfolding" steps, possibly
      * involving backtracking, which is managed by the OrStack.
      */
+    @Override
     @Nullable
     public PTerm getElement() {
         Trail stack = this.orStack;
@@ -98,6 +99,7 @@ public class Prog extends Source implements Runnable {
         return new Unfolder(prolog, nextgoal, this);
     }
 
+    @Override
     public void stop() {
         Trail t = this.trail;
         if (null != t) {
@@ -135,6 +137,7 @@ public class Prog extends Source implements Runnable {
     /**
      * usable for launching on a separate thread
      */
+    @Override
     public void run() {
         for (; ; ) {
             PTerm Answer = getElement();

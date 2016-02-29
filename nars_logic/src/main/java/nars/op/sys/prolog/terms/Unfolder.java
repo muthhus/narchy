@@ -58,6 +58,7 @@ public class Unfolder extends Source {
 	/**
 	 * Overrides default trailing by empty action
 	 */
+	@Override
 	protected void trailMe(Prog p) {
 		// IO.mes("not trailing"+this);
 	}
@@ -125,6 +126,7 @@ public class Unfolder extends Source {
 	 * Returns a new clause by unfolding the goal with a matching clause in the
 	 * database, or null if no such clause exists.
 	 */
+	@Override
 	@Nullable
 	public Clause getElement() {
 		if (null == e)
@@ -150,6 +152,7 @@ public class Unfolder extends Source {
 	 * Stops production of more alternatives by setting the clause enumerator to
 	 * null
 	 */
+	@Override
 	public void stop() {
 		e = null;
 	}

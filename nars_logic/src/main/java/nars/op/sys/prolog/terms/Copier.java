@@ -81,6 +81,7 @@ public class Copier extends SystemObject {
 	 * Ageneric mechanism will be used to recurse over Terms in a (truly:-)) OO
 	 * style (well, looks more like some Haskell stuff, but who cares).
 	 */
+	@Override
 	PTerm action(PTerm place) {
 
         if (place instanceof Var) {

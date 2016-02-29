@@ -29,7 +29,7 @@ import java.util.function.DoubleSupplier;
 public class GrammarTest2 {
 
     int frames = 2048;
-    int delay = 0;
+    int delay;
 
     public GrammarTest2() throws Exception {
 

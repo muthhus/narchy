@@ -332,6 +332,7 @@ public class DefaultTermizer implements Termizer {
         return null;
     }
 
+    @Override
     @Nullable
     public Term term(@Nullable Object o) {
         if (o == null) return NULL;

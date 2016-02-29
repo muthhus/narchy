@@ -83,6 +83,7 @@ public class DefaultConceptBuilder implements Function<Term,Concept> {
     }
 
 
+    @Override
     @Nullable
     public Concept apply(@NotNull Term term) {
 

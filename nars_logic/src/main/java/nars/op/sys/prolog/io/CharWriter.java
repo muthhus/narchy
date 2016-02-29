@@ -27,6 +27,7 @@ public class CharWriter extends Sink {
 		this.writer = IO.output;
 	}
 
+	@Override
 	public int putElement(@NotNull PTerm t) {
 		if (null == writer)
 			return 0;
@@ -39,6 +40,7 @@ public class CharWriter extends Sink {
 		return 1;
 	}
 
+	@Override
 	public void stop() {
 		if (null != writer && IO.output != writer) {
 			try {

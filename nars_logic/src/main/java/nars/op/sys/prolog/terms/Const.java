@@ -37,6 +37,7 @@ public class Const extends Nonvar {
 		return qname(name);
 	}
 
+	@Override
 	boolean bind_to(@NotNull PTerm that, Trail trail) {
 		return super.bind_to(that, trail)
 				&& Objects.equals(((Const) that).name, name);
@@ -48,6 +49,7 @@ public class Const extends Nonvar {
 	 * 
 	 * @see PTerm#CONST
 	 */
+	@Override
 	public int arity() {
 		return PTerm.CONST;
 	}
@@ -58,10 +60,12 @@ public class Const extends Nonvar {
 	 * Prolog constant with no builtin code attached to it
 	 */
 
+	@Override
 	public final String toUnquoted() {
 		return name;
 	}
 
+	@Override
 	@Nullable
 	public String getKey() {
 		return name + '/' + arity();

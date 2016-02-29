@@ -81,9 +81,7 @@ public class Default extends AbstractNAR {
                 premiser
         ));
 
-        if (core != null) {
-            runLater(this::initHigherNAL);
-        }
+        runLater(this::initHigherNAL);
 
 
         //new QueryVariableExhaustiveResults(this.memory());

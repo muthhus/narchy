@@ -32,7 +32,7 @@ public class NarseseTest {
         //TODO n.task(s) when the parser is replaced
         //return p.parseTask(s, true);
         List<Task> l = Global.newArrayList(1);
-        p.tasks(s, l, n);
+        Narsese.tasks(s, l, n);
         return l;
     }
 
@@ -454,11 +454,9 @@ public class NarseseTest {
                 assertEquals("index psuedo-term should not count toward its size", 2, t.size());
             }
 
-            {
-                Compound t = term("(" + c + ",open,_,$1)");
-                assertEquals("(" + c + ",open,_,$1)", t.toString());
-                assertEquals("index psuedo-term should not count toward its size", 2, t.size());
-            }
+            Compound t = term("(" + c + ",open,_,$1)");
+            assertEquals("(" + c + ",open,_,$1)", t.toString());
+            assertEquals("index psuedo-term should not count toward its size", 2, t.size());
         }
     }
 
@@ -546,7 +544,7 @@ public class NarseseTest {
         String a = "<a --> b>.\n//comment1234\n<b-->c>.";
         List<Task> l = tasks(a);
         assertEquals(3, l.size());
-        Compound op = ((Task)l.get(1)).term();
+        Compound op = l.get(1).term();
         ensureIsEcho(op);
         assertEquals("echo(\"comment1234\")", op.toString());
     }

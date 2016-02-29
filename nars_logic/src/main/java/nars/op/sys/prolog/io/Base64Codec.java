@@ -49,9 +49,9 @@ public class Base64Codec  {
                 else if (i >= '0' && i <= '9')
                     dest[i] = (byte)(i - OFFSET_OF_0);
                 else if (i == '+')
-                    dest[i] = (byte)(i - OFFSET_OF_PLUS);
+                    dest['+'] = (byte)(i - OFFSET_OF_PLUS);
                 else if (i == '/')
-                    dest[i] = (byte)(i - OFFSET_OF_SLASH);
+                    dest['/'] = (byte)(i - OFFSET_OF_SLASH);
                 else if (i >= 'a' && i <= 'z')
                     dest[i] = (byte)(i - OFFSET_OF_a);
                 else 

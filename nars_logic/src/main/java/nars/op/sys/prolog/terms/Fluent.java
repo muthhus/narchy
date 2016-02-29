@@ -50,6 +50,7 @@ public class Fluent extends SystemObject {
 	/**
 	 * applies a non-persistent Fluent's stop() method on backtracking
 	 */
+	@Override
 	protected void undo() {
 		if (!persistent)
 			stop();

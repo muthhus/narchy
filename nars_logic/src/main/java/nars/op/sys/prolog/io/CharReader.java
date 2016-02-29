@@ -38,6 +38,7 @@ public class CharReader extends Source {
 		this.reader = IO.url_or_file(f);
 	}
 
+	@Override
 	@Nullable
 	public PTerm getElement() {
 		if (IO.input == reader) {
@@ -61,6 +62,7 @@ public class CharReader extends Source {
 			return new Int(c);
 	}
 
+	@Override
 	public void stop() {
 		if (null != reader && IO.input != reader) {
 			try {

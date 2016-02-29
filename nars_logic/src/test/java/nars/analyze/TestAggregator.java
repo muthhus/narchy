@@ -20,7 +20,7 @@ public class TestAggregator extends RunListener {
 
     private final NAR nar;
 
-    String testName = null;
+    String testName;
     Set<Description> success = new HashSet();
 
     @Override

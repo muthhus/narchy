@@ -1,6 +1,7 @@
 package nars.nal.meta;
 
 import nars.Op;
+import nars.term.Term;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermVector;
 import org.jetbrains.annotations.NotNull;
@@ -13,7 +14,7 @@ abstract public class ThenFork extends GenericCompound<ProcTerm> implements Proc
     //private final MethodHandle method;
 
     public ThenFork(ProcTerm[] actions) {
-        super(Op.CONJUNCTION, TermVector.the(actions));
+        super(Op.CONJUNCTION, TermVector.the((Term[])actions));
 
 
 //            try {

@@ -21,10 +21,12 @@ public abstract class Nonvar extends PTerm {
 		super(id);
 	}
 
+	@Override
 	boolean bind_to(@NotNull PTerm that, Trail trail) {
 		return getClass() == that.getClass();
 	}
 
+	@Override
 	boolean unify_to(@NotNull PTerm that, Trail trail) {
 		return bind_to(that, trail) || that.bind_to(this, trail);
 	}

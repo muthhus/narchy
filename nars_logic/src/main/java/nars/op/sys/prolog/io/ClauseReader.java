@@ -46,6 +46,7 @@ public class ClauseReader extends CharReader {
 		this.parser = (null != reader) ? new Parser(prolog, reader) : null;
 	}
 
+	@Override
 	@Nullable
 	public PTerm getElement() {
 		Clause C = null;
@@ -83,6 +84,7 @@ public class ClauseReader extends CharReader {
 		return new Fun("clause", C, Vs, NamedC, Ns);
 	}
 
+	@Override
 	public void stop() {
 		super.stop();
 		parser = null;

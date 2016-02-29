@@ -10,8 +10,10 @@ abstract public class FunBuiltin extends Fun {
 		super(f, i);
 	}
 
+	@Override
 	abstract public int exec(Prog p);
 
+	@Override
 	public final boolean isBuiltin() {
 		return true;
 	}

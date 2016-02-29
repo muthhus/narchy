@@ -8,6 +8,7 @@ class fail_ extends ConstBuiltin {
 		super("fail");
 	}
 
+	@Override
 	public int exec(Prog p) {
 		return 0;
 	}

@@ -135,6 +135,7 @@ abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements Tabl
     }
 
     /** gets the key associated with a value */
+    @Override
     abstract public V key(L l);
 
 //    @Override

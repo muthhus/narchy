@@ -18,6 +18,7 @@ public interface Premise extends Level, Tasked {
 
     Concept concept();
 
+    @Override
     Task task();
 
     @Nullable
@@ -33,6 +34,7 @@ public interface Premise extends Level, Tasked {
     /**
      * curent maximum allowed NAL level the reasoner is configured to support
      */
+    @Override
     default int nal() {
         return nar().nal();
     }

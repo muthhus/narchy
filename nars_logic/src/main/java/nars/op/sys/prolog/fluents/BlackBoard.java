@@ -142,6 +142,7 @@ class BBoardEnumerator implements Iterator {
 	private final Iterator EH;
 
 	// synchronized
+	@Override
 	public boolean hasNext() {
 		if ((EQ == null || !EQ.hasNext()) && EH.hasNext()) {
 			EQ = ((Queue) EH.next()).toEnumeration();
@@ -150,12 +151,14 @@ class BBoardEnumerator implements Iterator {
 	}
 
 	// synchronized
+	@Override
 	public Object next() {
 		if (hasNext())
 			return EQ.next();
 		throw new NoSuchElementException("BBoardEnumerator");
 	}
 
+	@Override
 	public void remove() {
 	}
 }

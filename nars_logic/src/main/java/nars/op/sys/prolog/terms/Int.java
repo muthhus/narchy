@@ -11,6 +11,7 @@ public class Int extends Num {
 		val = i;
 	}
 
+	@Override
 	boolean bind_to(@NotNull PTerm that, Trail trail) {
 		return super.bind_to(that, trail)
 				&& (val == ((Int) that).val);
@@ -23,6 +24,7 @@ public class Int extends Num {
 
 	}
 
+	@Override
 	public final int arity() {
 		return PTerm.INT;
 	}
@@ -35,6 +37,7 @@ public class Int extends Num {
 		return (int) val;
 	}
 
+	@Override
 	public final double getValue() {
 		return val;
 	}

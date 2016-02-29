@@ -158,7 +158,7 @@ public interface Temporalize {
                 if (td == ITERNAL && bd == ITERNAL)
                 {
 
-                    long aTask = tp.subtermTime(ca, td);
+                    long aTask = tp.subtermTime(ca, ITERNAL);
                     long aBelief = bp.subtermTime(ca, bd);
                     long bTask = tp.subtermTime(cb, td);
                     long bBelief = bp.subtermTime(cb, bd);

@@ -17,6 +17,7 @@ public class SourceMerger extends JavaSource {
 	@NotNull
 	private final Queue Q;
 
+	@Override
 	@Nullable
 	public PTerm getElement() {
 		if (null == Q)

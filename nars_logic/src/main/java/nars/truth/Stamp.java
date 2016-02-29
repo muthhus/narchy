@@ -63,7 +63,7 @@ public interface Stamp {
                 //one of them is empty, select from which is not
 
                 c[i--] = ((ha && hb) ?
-                        ((i & 1) == 1) == parity : ha) ?
+                        ((i & 1) == 1) == true : ha) ?
                             a[ia--] : b[ib--];
             }
         } else {
@@ -75,7 +75,7 @@ public interface Stamp {
                 //one of them is empty, select from which is not
                 boolean ha = ia < aLen, hb = ib < bLen;
                 c[i++] = ((ha && hb) ?
-                            ((i & 1) == 1) == parity :
+                            ((i & 1) == 1) == true :
                             ha) ?
                                 a[ia++] :
                                 b[ib++];
@@ -137,7 +137,7 @@ public interface Stamp {
 //        return (b != null) &&
 //                    ((a == b) ||
 //                    overlapping(a.evidence(), b.evidence()));
-        return a == b || (b == null ? false : overlapping(a.evidence(), b.evidence()));
+        return a == b || (b != null && overlapping(a.evidence(), b.evidence()));
     }
 
     /**
@@ -178,7 +178,7 @@ public interface Stamp {
     Stamp setCreationTime(long t);
 
     default float originality() {
-        return 1.0f / (evidence().length + 1);
+        return 1.0f / (evidence().length);
     }
 
     /**
@@ -193,12 +193,10 @@ public interface Stamp {
 
     @NotNull
     static long[] zip(@NotNull Task a, @NotNull Task b) {
-
-        long[] pa = a.evidence();
-        long[] pb = b.evidence();
-
-        return a.creation() > b.creation() ?
-                Stamp.zip(pb, pa) :
-                Stamp.zip(pa, pb);
+        @Nullable long[] bb = b.evidence();
+        @Nullable long[] aa = a.evidence();
+        return (a.creation() > b.creation()) ?
+                Stamp.zip(bb, aa) :
+                Stamp.zip(aa, bb);
     }
 }

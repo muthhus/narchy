@@ -19,7 +19,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class QuestTest {
 
-    int exeCount = 0;
+    int exeCount;
 
     @Test
     public void testQuest() throws Narsese.NarseseException {

@@ -38,7 +38,7 @@ public abstract class AbstractTask extends UnitBudget
     @Nullable
     protected TaskState state;
 
-    private char punctuation;
+    protected char punctuation;
 
     private Truth truth;
 
@@ -284,13 +284,6 @@ public abstract class AbstractTask extends UnitBudget
         return executable;
     }
 
-    protected final void setPunctuation(char punctuation) {
-        if (this.punctuation!=punctuation) {
-            this.punctuation = punctuation;
-            invalidate();
-        }
-    }
-
     /** includes: evidentialset, occurrencetime, truth, term, punctuation */
     private int rehash() {
 
@@ -453,7 +446,7 @@ public abstract class AbstractTask extends UnitBudget
             else if ( isSingle() )
                 setEvidence(getParentTask().evidence());
         } else {
-            setEvidence(null);
+            setEvidence((long[])null);
         }
 
     }
