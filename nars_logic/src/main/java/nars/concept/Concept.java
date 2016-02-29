@@ -25,6 +25,7 @@ import com.google.common.collect.Ordering;
 import com.google.common.primitives.Longs;
 import nars.NAR;
 import nars.bag.Bag;
+import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.concept.util.BeliefTable;
 import nars.concept.util.TaskTable;
@@ -203,15 +204,12 @@ public interface Concept extends Termed, Comparable {
             out.print(" Beliefs:");
             if (beliefs().isEmpty()) out.println(" none");
             else {
-                out.println();
-
-                beliefs().forEach(printTask);
+                out.println(); beliefs().forEach(printTask);
             }
             out.print(" Questions:");
             if (questions().isEmpty()) out.println(" none");
             else {
-                out.println();
-                questions().forEach(printTask);
+                out.println(); questions().forEach(printTask);
             }
         }
 
@@ -219,18 +217,18 @@ public interface Concept extends Termed, Comparable {
             out.print(" Goals:");
             if (goals().isEmpty()) out.println(" none");
             else {
-                out.println();
-                goals().forEach(printTask);
+                out.println();                goals().forEach(printTask);
             }
             out.print(" Quests:");
             if (questions().isEmpty()) out.println(" none");
             else {
-                out.println();
-                quests().forEach(printTask);
+                out.println();                quests().forEach(printTask);
             }
         }
 
         if (showtermlinks) {
+            out.print("TermLinkTemplates: ");
+            out.println(termlinkTemplates());
 
             out.println("\n TermLinks:");
             termlinks().forEach(b -> {
@@ -249,7 +247,7 @@ public interface Concept extends Termed, Comparable {
             });
         }
 
-        out.println();
+        out.println('\n');
     }
 
     @Nullable List<Termed> termlinkTemplates();
@@ -290,7 +288,9 @@ public interface Concept extends Termed, Comparable {
 
     default boolean linkTask(@NotNull Budgeted b, float initialScale, @NotNull NAR nar) {
         if (initialScale <= 0) return false;
-        if (b.isDeleted()) return false;
+        if (b.isDeleted())
+            throw new Budget.BudgetException();
+            //return false;
 
         float minScale =
                 nar.taskLinkThreshold.floatValue() / b.pri();

@@ -13,6 +13,7 @@ import nars.term.Termed;
 import nars.util.graph.TermLinkGraph;
 import nars.util.signal.TestNAR;
 import org.jetbrains.annotations.NotNull;
+import org.jgrapht.alg.ConnectivityInspector;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -100,6 +101,8 @@ public class LinkageTest extends AbstractNALTest {
 
         NAR nar = test().nar;
 
+        //nar.log();
+
         Termed premise1 = nar.term(spremise1);
         assertEquals("reparsed", $.$(spremise1), premise1);
         assertNotNull(premise1);
@@ -128,18 +131,23 @@ public class LinkageTest extends AbstractNALTest {
 
         //g.print(System.out);
         //System.out.println(g.isConnected() + " " + g.vertexSet().size() + " " + g.edgeSet().size());
-        //if (!g.isConnected()) {
+        if (!g.isConnected()) {
 //        if (!g.isStronglyConnected()) {
 //            StrongConnectivityInspector ci =
-//                    //new ConnectivityInspector(g);
+            ConnectivityInspector ci = new ConnectivityInspector(g);
 //                    new StrongConnectivityInspector(g);
-//            System.out.println("pemise: " + premise1 + " and " + premise2 + " termlink strongly connected subgraphs");
-//            ci
-//                //.connectedSets()
-//                .stronglyConnectedSubgraphs()
-//                .forEach( s -> System.out.println("\t" + s));
-//
-//        }
+
+            System.out.println("premises: " + premise1 + " and " + premise2 + " termlink subgraph connectivity:");
+
+            ci
+                .connectedSets()
+                //.stronglyConnectedSubgraphs()
+                .forEach( s -> System.out.println("\t" + s));
+
+            ((Default)nar).core.active.printAll();
+            nar.forEachConcept(c->c.print());
+
+        }
         assertTrue(g.isConnected());
 
         assertTrue(passed);

@@ -125,9 +125,8 @@ public class Default extends AbstractNAR {
             Task t = c.process(input, nar);
             boolean processed = t != null;
 
-            activate(t, c, processed ? activation : 0);
-
             if (processed) {
+                activate(t, c, activation);
 
                 eventTaskProcess.emit(t);
 
@@ -139,14 +138,10 @@ public class Default extends AbstractNAR {
             return c;
         }
 
+        /** complete the activation process */
         public void activate(Task t, Concept c, float activation) {
-            if (activation == 0) {
-                return;
-            }
-
-            //complete the activation process
-            c.linkTask(t, activation, Default.this);
-
+            if (activation > 0)
+                conceptualize(c, t.budget(), activation);
         }
     };
 
@@ -243,12 +238,11 @@ public class Default extends AbstractNAR {
     @Override
     public Concept conceptualize(Termed termed, Budgeted activation, float scale) {
 
-        Budget b = activation.budget();
 
         Concept c = concept(termed, true);
         if (c != null) {
 
-            core.activate(c, b, scale);
+            core.activate(c, activation.budget(), scale);
 
             c.linkTask(activation, scale, Default.this);
 

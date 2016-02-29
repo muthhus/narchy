@@ -10,6 +10,7 @@ import nars.term.variable.Variable;
 import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -32,7 +33,7 @@ public enum TermLinkBuilder {
         Set<Termed> components = Global.newHashSet(0);
         prepareComponentLinks(host.term(), components, nar);
 
-        return !components.isEmpty() ? new FasterList(components) : Collections.emptyList();
+        return new FasterList(components);
     }
 
     static final int NegationOrConjunction = Op.or(Op.CONJUNCTION, Op.NEGATE);
@@ -45,7 +46,7 @@ public enum TermLinkBuilder {
      * @param t          The CompoundTerm for which to build links
      * @param components set of components being accumulated, to avoid duplicates
      */
-    static void prepareComponentLinks(@NotNull Compound t, @NotNull Set<Termed> components, @NotNull NAR nar) {
+    static void prepareComponentLinks(@NotNull Compound t, @NotNull Collection<Termed> components, @NotNull NAR nar) {
 
         ///** add self link for structural transform: */
         //components.add(t);
@@ -58,13 +59,9 @@ public enum TermLinkBuilder {
         int ni = t.size();
         for (int i = 0; i < ni; i++) {
 
-            Term ti = growComponent(t.term(i), 0, nar);
+            Term ti = growComponent(t.term(i), 0, nar, components);
             if (ti == null)
                 continue;
-
-            if (!(ti instanceof Variable)) {
-                components.add(ti);
-            }
 
             //if ((tEquivalence || (tImplication && (i == 0))) && ((ti instanceof Conjunction) || (ti instanceof Negation))) {
 
@@ -79,29 +76,16 @@ public enum TermLinkBuilder {
 
                 int nj = cti.size();
                 for (int j = 0; j < nj; j++) {
-                    Term tj = growComponent(cti.term(j), 1, nar);
-                    if (tj == null)
-                        continue;
 
-
-                    if (!(tj instanceof Variable)) {
-                        components.add(tj);
-                    }
-
-
+                    Term tj = growComponent(cti.term(j), 1, nar, components);
                     if (tj instanceof Compound) {
                         Compound ctj = (Compound) tj;
 
                         int nk = ctj.size();
                         for (int k = 0; k < nk; k++) {
 
-                            Term tk = growComponent(ctj.term(k), 2, nar);
-                            if (tk == null)
-                                continue;
+                            growComponent(ctj.term(k), 2, nar, components);
 
-                            if (!(tk instanceof Variable)) {
-                                components.add(tk);
-                            }
                         }
                     }
 
@@ -117,13 +101,15 @@ public enum TermLinkBuilder {
     /**
      * determines whether to grow a 1st-level termlink to a subterm
      */
-    protected static Term growComponent(Term t, int level, @NotNull NAR nar) {
-
-        Concept tti = nar.concept(t);
-        if (tti == null)
+    protected static Term growComponent(Term t, int level, @NotNull NAR nar, Collection<Termed> target) {
+        Concept ct = nar.concept(t, true);
+        if ((ct == null) || (ct instanceof Variable)) {
             return null;
-
-        return tti.term();
+        }
+        else {
+            target.add(t = ct.term());
+            return t;
+        }
     }
 
 //    static final boolean growLevel1(Term t) {

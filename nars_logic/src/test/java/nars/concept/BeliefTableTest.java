@@ -2,6 +2,7 @@ package nars.concept;
 
 import nars.Global;
 import nars.NAR;
+import nars.concept.util.BeliefTable;
 import nars.nal.Tense;
 import nars.nar.AbstractNAR;
 import nars.nar.Default;
@@ -9,6 +10,7 @@ import nars.task.Task;
 import nars.truth.DefaultTruth;
 import nars.util.signal.BeliefAnalysis;
 import nars.util.signal.MemoryBudget;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -310,7 +312,6 @@ public class BeliefTableTest  {
         int maxBeliefs = 10;
         NAR n = newNAR(maxBeliefs);
 
-
         BeliefAnalysis b = new BeliefAnalysis(n, "<a-->b>");
 
         b.believe(1.0f, 0.5f); n.step();
@@ -327,12 +328,13 @@ public class BeliefTableTest  {
         b.believe(1.0f, 0.5f); n.step();
         b.print();
         assertEquals(4, b.concept().beliefs().size());
-        assertEquals(0.67, b.concept().beliefs().topEternal().conf(), 0.001);
-        assertEquals(0.67, b.concept().beliefs().top(n.time()).conf(), 0.001);
+        @NotNull BeliefTable bb = b.concept().beliefs();
+        assertEquals(0.5, bb.topEternal().conf(), 0.001);
+        assertEquals(0.5, bb.top(n.time()).conf(), 0.001);
 
         b.believe(1.0f, 0.5f); n.step();
         b.print();
-        assertEquals(0.75, b.concept().beliefs().topEternal().conf(), 0.001);
+        assertEquals(0.5, b.concept().beliefs().topEternal().conf(), 0.001);
         assertEquals(6, b.concept().beliefs().size());
 
         n.step();

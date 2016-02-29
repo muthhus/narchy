@@ -9,6 +9,8 @@ import nars.term.Term;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -34,16 +36,20 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
         this.termLinks = termLinks;
     }
 
+    public static final Logger logger = LoggerFactory.getLogger(AbstractConcept.class);
+
     public static final void linkTerm(@NotNull Concept source, @NotNull Concept target,
                                       @NotNull Budgeted b, float subScale, boolean out, boolean in) {
+
+        /*if (logger.isDebugEnabled())
+            logger.debug("TermLink: {} <//> {} ", source, target); */
 
         if (source == target)
             throw new RuntimeException("termlink self-loop");
 
         /** activate local's termlink to template */
-        //float termlinkScale = termLinkOut(this, target.term());
         if (out)
-            source.termlinks().put(target, b, subScale /* * termlinkScale*/);
+            source.termlinks().put(target, b, subScale);
 
         /** activate (reverse) template's termlink to local */
         if (in)

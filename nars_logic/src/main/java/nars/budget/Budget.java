@@ -322,4 +322,13 @@ public abstract class Budget extends BudgetedHandle {
         setDurability(dur()*df);
         setQuality(qua()*qf);
     }
+
+    public static class BudgetException extends RuntimeException {
+        public BudgetException() {
+            super();
+        }
+        public BudgetException(String reason) {
+            super(reason);
+        }
+    }
 }

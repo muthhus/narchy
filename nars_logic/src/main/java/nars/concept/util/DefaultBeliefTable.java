@@ -178,6 +178,7 @@ public class DefaultBeliefTable implements BeliefTable {
         Task best = null;
         float bestRank = -1;
         List<? extends Task> l = temporal.items.list();
+
         int ls = l.size();
         for (int i = 0; i < ls; i++) {
             Task x = l.get(i);
