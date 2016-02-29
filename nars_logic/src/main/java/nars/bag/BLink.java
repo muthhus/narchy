@@ -17,10 +17,37 @@ import static nars.util.data.Util.clamp;
  */
 public final class BLink<X> extends Budget implements Link<X> {
 
-    private final float[] b = new float[6];
+    /** the referred item */
     public final X id;
+
+    /** time of last forget */
     private long lastForget = Tense.TIMELESS;
+
+    /** changed status bit */
     boolean changed;
+
+    /** priority */
+    final static int PRI = 0;
+    /** delta pri */
+    final static int DPRI = 1;
+
+    /** durability */
+    final static int DUR = 2;
+    /** delta dur */
+    final static int DDUR = 3;
+
+    /** quality */
+    final static int QUA = 4;
+    /** delta qua */
+    final static int DQUA = 5;
+
+    /** overflow/backpressure buffer variable */
+    final static int BUFFERED = 6;
+
+
+    private final float[] b = new float[7];
+
+
 
     public BLink(X id) {
         this.id = id;
@@ -41,7 +68,7 @@ public final class BLink<X> extends Budget implements Link<X> {
         init(b, scale);
     }
 
-    @Override
+    @NotNull @Override
     public X get() {
         return id;
     }
@@ -56,8 +83,8 @@ public final class BLink<X> extends Budget implements Link<X> {
     public void init(float p, float d, float q) {
         float[] b = this.b;
         b[0] = clamp(p);
-        b[1] = clamp(d);
-        b[2] = clamp(q);
+        b[2] = clamp(d);
+        b[4] = clamp(q);
     }
 
     @Override
@@ -68,16 +95,16 @@ public final class BLink<X> extends Budget implements Link<X> {
 
     private void clearDelta() {
         float[] b = this.b;
-        b[3] = b[4] = b[5] = 0;
+        b[1] = b[3] = b[5] = 0;
         changed = false;
     }
 
     /** TODO return false to signal to the bag to remove this item */
     public void commit() {
         float[] b = this.b;
-        b[0] = clamp(b[0] + b[3]);
-        b[1] = clamp(b[1] + b[4]);
-        b[2] = clamp(b[2] + b[5]);
+        b[0] = clamp(b[0] + b[1]);
+        b[2] = clamp(b[2] + b[3]);
+        b[4] = clamp(b[4] + b[5]);
         clearDelta();
         //return true;
     }
@@ -93,7 +120,8 @@ public final class BLink<X> extends Budget implements Link<X> {
 
     protected void setValue(int x, float v) {
         float[] b = this.b;
-        b[x+3] += v - b[x];
+        int twoX = 2 * x;
+        b[twoX + 1] += v - b[twoX];
         changed = true;
     }
 
@@ -104,7 +132,7 @@ public final class BLink<X> extends Budget implements Link<X> {
 
     @Override
     public float getDurability() {
-        return b[1];
+        return b[2];
     }
 
     @Override
@@ -114,7 +142,7 @@ public final class BLink<X> extends Budget implements Link<X> {
 
     @Override
     public float getQuality() {
-        return b[2];
+        return b[4];
     }
 
     @Override

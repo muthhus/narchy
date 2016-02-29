@@ -281,12 +281,12 @@ public interface Concept extends Termed, Comparable {
      * attempt insert a tasklink into this concept's tasklink bag
      * return true if successfully inserted
      */
-    boolean linkTask(@NotNull Budgeted task, float scale, float minScale, @NotNull NAR nar);
+    boolean link(@NotNull Budgeted task, float scale, float minScale, @NotNull NAR nar);
 
     //void linkTemplates(Budget budget, float scale, NAR nar);
 
 
-    default boolean linkTask(@NotNull Budgeted b, float initialScale, @NotNull NAR nar) {
+    default boolean link(@NotNull Budgeted b, float initialScale, @NotNull NAR nar) {
         if (initialScale <= 0) return false;
         if (b.isDeleted())
             throw new Budget.BudgetException();
@@ -295,7 +295,7 @@ public interface Concept extends Termed, Comparable {
         float minScale =
                 nar.taskLinkThreshold.floatValue() / b.pri();
 
-        return Float.isFinite(minScale) && linkTask(b, initialScale, minScale, nar);
+        return Float.isFinite(minScale) && link(b, initialScale, minScale, nar);
     }
 
     /**
@@ -306,12 +306,12 @@ public interface Concept extends Termed, Comparable {
     default void crossLink(@NotNull Task thisTask, @NotNull Task otherTask, float scale, @NotNull NAR nar) {
         if (!otherTask.term().equals(term())) {
 
-            linkTask(otherTask, scale, nar);
+            link(otherTask, scale, nar);
 
             Concept other = nar.concept(otherTask);
                             //nar.conceptualize(otherTask, thisTask.budget(), scale);
             if (other != null)
-                other.linkTask(thisTask, scale, nar);
+                other.link(thisTask, scale, nar);
         }
     }
 

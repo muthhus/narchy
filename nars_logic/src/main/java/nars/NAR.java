@@ -441,7 +441,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      *
      * @return number of invoked handlers
      */
-    public final boolean execute(@NotNull Task inputGoal, @Nullable Concept goalConcept) {
+    protected final boolean execute(@NotNull Task inputGoal, @Nullable Concept goalConcept) {
 
         Term goalTerm = inputGoal.term();
         if (!Op.isOperation(goalTerm)) {

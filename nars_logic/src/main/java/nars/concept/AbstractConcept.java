@@ -156,10 +156,10 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
      * when a task is processed, a tasklink
      * can be created at the concept of its term
      */
-    @Override public boolean linkTask(@NotNull Budgeted task, float scale, float minScale, @NotNull NAR nar) {
+    @Override public boolean link(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar) {
 
-        if (task instanceof Task)
-            taskLinks.put((Task)task, task.budget(), scale);
+        if (b instanceof Task)
+            taskLinks.put((Task)b, b.budget(), scale);
 
         return true;
     }

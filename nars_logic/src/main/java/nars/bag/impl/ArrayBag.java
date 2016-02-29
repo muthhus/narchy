@@ -63,22 +63,22 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
         //TODO combine with CurveBag.put(v)
         BLink<V> existing = get(v);
         if (existing!=null) {
-            merge(existing.budget(),
-                    getDefaultBudget(v), 1f);
+            merge(existing, getDefaultBudget(v), 1f);
             return existing;
         } else {
             return put(v, getDefaultBudget(v));
         }
     }
 
-    protected final void merge(Budget target, Budgeted incoming, float scale) {
-        mergeFunction.merge(target, incoming, scale);
+    protected final void merge(BLink<V> target, Budgeted incoming, float scale) {
+        float overflow = mergeFunction.merge(target, incoming, scale);
+
     }
 
     private Budget getDefaultBudget(V v) {
-        if (v instanceof Budgeted)
-            return ((Budgeted)v).budget();
-        return UnitBudget.Zero;
+        return v instanceof Budgeted ?
+                ((Budgeted) v).budget() :
+                UnitBudget.Zero;
     }
 
 
@@ -218,15 +218,15 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
      */
     @Override
     public BLink<V> put(V i, Budgeted b, float scale) {
-//    }
-//
-//    public BLink<V> putFast(V i, Budgeted b, float scale) {
-//        BLink<V> existing = get(i);
-//
-//    }
+        //    }
+        //
+        //    public BLink<V> putFast(V i, Budgeted b, float scale) {
+        //        BLink<V> existing = get(i);
+        //
+        //    }
 
-    ///** updates an item, merging and re-inserting inserting */
-    //public BLink<V> putSync(V i, Budgeted b, float scale) {
+            ///** updates an item, merging and re-inserting inserting */
+            //public BLink<V> putSync(V i, Budgeted b, float scale) {
         BLink<V> existing = get(i);
 
         return (existing != null) ?

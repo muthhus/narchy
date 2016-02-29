@@ -5,7 +5,6 @@ import nars.NAR;
 import nars.Op;
 import nars.Symbols;
 import nars.bag.Bag;
-import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.concept.util.*;
 import nars.nal.LocalRules;
@@ -625,10 +624,10 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
 
 
     @Override
-    public boolean linkTask(@NotNull Budgeted task, float scale, float minScale, @NotNull NAR nar) {
+    public boolean link(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar) {
         //1. Link the Task
 
-        if (super.linkTask(task, scale, minScale, nar)) {
+        if (super.link(b, scale, minScale, nar)) {
 
             //3. Link the termlink templates
             List<Termed> templates = termlinkTemplates();
@@ -643,22 +642,26 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
                 //case 1: subScale = 0.5f; break; //HACK
                 default:
                     subScale = scale / numTemplates;
-                    if (subScale < minScale)
-                        return true;
             }
 
-            for (int i = 0, templatesSize = templates.size(); i < templatesSize; i++) {
-                Termed linkTemplate = templates.get(i);
-                Concept target = nar.conceptualize(linkTemplate, task, subScale);
-
-                //2. Link the peer termlink bidirectionally
-                linkTerm(this, target, task, scale, true, true);
+            if (subScale >= minScale) {
+                for (int i = 0; i < numTemplates; i++) {
+                    linkTemplate(b, templates.get(i), subScale, nar);
+                }
             }
 
             return true;
         }
 
         return false;
+    }
+
+    public void linkTemplate(@NotNull Budgeted task, Termed template, float subScale, @NotNull NAR nar) {
+        Concept target = nar.conceptualize(template, task, subScale);
+        assert(target!=null);
+
+        //2. Link the peer termlink bidirectionally
+        linkTerm(this, target, task, subScale, true, true);
     }
 
     @Nullable @Override

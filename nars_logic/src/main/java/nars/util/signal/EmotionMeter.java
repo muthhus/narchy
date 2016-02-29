@@ -146,8 +146,8 @@ public class EmotionMeter extends FrameReaction implements Serializable {
     }
 
 
-    public void busy(@NotNull Task cause) {
-        busy += cause.pri();
+    public void busy(@NotNull Task cause, float activation) {
+        busy += cause.pri() * activation;
     }
 
 

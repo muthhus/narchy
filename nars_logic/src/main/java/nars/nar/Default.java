@@ -99,7 +99,7 @@ public class Default extends AbstractNAR {
         @Override
         public final void accept(@NotNull Task[] input, float activation) {
             for (Task t : input) {
-                if (t == null)
+                if (t == null) //for null-terminated arrays
                     break;
                 if (!t.isDeleted())
                     apply(t, activation);
@@ -120,13 +120,14 @@ public class Default extends AbstractNAR {
                 return null;
             }
 
-            emotion.busy(input);
+            emotion.busy(input, activation);
 
             Task t = c.process(input, nar);
-            boolean processed = t != null;
+            if (t != null) {
 
-            if (processed) {
-                activate(t, c, activation);
+                //TaskProcess succeeded
+
+                conceptualize(c, t.budget(), activation);
 
                 eventTaskProcess.emit(t);
 
@@ -138,11 +139,6 @@ public class Default extends AbstractNAR {
             return c;
         }
 
-        /** complete the activation process */
-        public void activate(Task t, Concept c, float activation) {
-            if (activation > 0)
-                conceptualize(c, t.budget(), activation);
-        }
     };
 
     @NotNull
@@ -244,11 +240,7 @@ public class Default extends AbstractNAR {
 
             core.activate(c, activation.budget(), scale);
 
-            c.linkTask(activation, scale, Default.this);
-
-
-
-
+            c.link(activation, scale, Default.this);
 
 //            if (templateConcept != null) {
 //                templateConcept.linkTask(task, subScale, minScale, nar);
