@@ -1,7 +1,6 @@
 package nars.op.sys.java;
 
 import com.github.drapostolos.typeparser.TypeParser;
-import nars.Global;
 import nars.Op;
 import nars.task.Task;
 import nars.term.Compound;

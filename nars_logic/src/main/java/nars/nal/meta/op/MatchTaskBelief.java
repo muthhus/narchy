@@ -118,7 +118,7 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseEval> {
             belief = null;
         }
 
-        else if (task.isCompound() && belief.isCompound() && !task.isCommutative()
+        else if (task instanceof Compound && belief instanceof Compound && !task.isCommutative()
                 && null==Ellipsis.firstEllipsis((Compound)task)
                 && null==Ellipsis.firstEllipsis((Compound)belief)
                 ) {
@@ -131,7 +131,7 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseEval> {
             }
         }
 
-        else if (belief.isCompound() && task.isCompound() && !belief.isCommutative()
+        else if (belief instanceof Compound && task instanceof Compound && !belief.isCommutative()
                 && null==Ellipsis.firstEllipsis((Compound)belief)
                 && null==Ellipsis.firstEllipsis((Compound)task)
          ) {
@@ -275,7 +275,7 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseEval> {
         public boolean booleanValueOf(@NotNull PremiseEval m) {
             Term[] x =  ((Compound)m.term.get()).terms();
             Term maybeContainer = x[this.container];
-            if (!maybeContainer.isCompound())
+            if (!(maybeContainer instanceof Compound))
                 return false;
             Compound container = (Compound)maybeContainer;
             Term contained = x[this.contained];

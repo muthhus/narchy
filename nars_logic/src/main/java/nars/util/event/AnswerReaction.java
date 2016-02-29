@@ -5,7 +5,6 @@
 package nars.util.event;
 
 import com.gs.collections.api.tuple.Twin;
-import nars.Memory;
 import nars.NAR;
 import nars.Narsese;
 import nars.concept.Concept;

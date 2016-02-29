@@ -1,7 +1,6 @@
 package nars.util.event;
 
 import nars.Memory;
-import nars.NAR;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;

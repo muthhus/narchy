@@ -2,7 +2,6 @@ package nars.op.sys.shell;
 
 import nars.$;
 import nars.Global;
-import nars.Memory;
 import nars.NAR;
 import nars.nar.Default;
 import org.junit.Test;

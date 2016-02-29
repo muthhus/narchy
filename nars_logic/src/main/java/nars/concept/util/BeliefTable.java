@@ -1,7 +1,6 @@
 package nars.concept.util;
 
 import com.google.common.collect.Iterators;
-import nars.Memory;
 import nars.NAR;
 import nars.nal.Tense;
 import nars.task.Task;

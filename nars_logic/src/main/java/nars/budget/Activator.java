@@ -1,10 +1,6 @@
 package nars.budget;
 
-import nars.NAR;
-import nars.concept.Concept;
 import nars.task.Task;
-
-import java.util.function.Consumer;
 
 /**
  * Defines an event-driven activation policy for reacting to

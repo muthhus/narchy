@@ -303,7 +303,7 @@ public class TermGraphTest {
                 Set<V> vertexSet1,
                 Set<V> vertexSet2)
         {
-            return new CollectionPermutationIter<V>(vertexSet2);
+            return new CollectionPermutationIter<>(vertexSet2);
         }
 
         /**
@@ -357,10 +357,10 @@ public class TermGraphTest {
 
         public static EquivalenceComparator<Object, Object>
                 edgeDefaultIsomorphismComparator =
-                new UniformEquivalenceComparator<Object, Object>();
+                new UniformEquivalenceComparator<>();
         public static EquivalenceComparator<Object, Object>
                 vertexDefaultIsomorphismComparator =
-                new UniformEquivalenceComparator<Object, Object>();
+                new UniformEquivalenceComparator<>();
 
 
 
@@ -456,12 +456,12 @@ public class TermGraphTest {
         private void init()
         {
             this.nextSupplier =
-                    new PrefetchIterator<IsomorphismRelation>(
+                    new PrefetchIterator<>(
 
                             // XXX hb 280106: I don't understand this warning, yet :-)
                             new NextFunctor());
 
-            this.graph1VertexSet = new LinkedHashSet<V>(this.graph1.vertexSet());
+            this.graph1VertexSet = new LinkedHashSet<>(this.graph1.vertexSet());
 
             // vertexPermuteIter will be null, if there is no match
             this.vertexPermuteIter =
@@ -470,12 +470,12 @@ public class TermGraphTest {
                             this.graph2.vertexSet());
 
             this.lableGraph1 =
-                    new GraphOrdering<V, E>(
+                    new GraphOrdering<>(
                             this.graph1,
                             this.graph1VertexSet,
                             this.graph1.edgeSet());
 
-            this.graph2EdgeSet = new LinkedHashSet<E>(this.graph2.edgeSet());
+            this.graph2EdgeSet = new LinkedHashSet<>(this.graph2.edgeSet());
         }
 
         /**
@@ -551,7 +551,7 @@ public class TermGraphTest {
 
                     // compare edges
                     GraphOrdering<V, E> currPermuteGraph =
-                            new GraphOrdering<V, E>(
+                            new GraphOrdering<>(
                                     this.graph2,
                                     currVertexPermutation,
                                     this.graph2EdgeSet);
@@ -560,9 +560,9 @@ public class TermGraphTest {
                     if (this.lableGraph1.equalsByEdgeOrder(currPermuteGraph)) {
                         // create result object.
                         resultRelation =
-                                new IsomorphismRelation<V, E>(
-                                        new ArrayList<V>(graph1VertexSet),
-                                        new ArrayList<V>(currVertexPermutation),
+                                new IsomorphismRelation<>(
+                                        new ArrayList<>(graph1VertexSet),
+                                        new ArrayList<>(currVertexPermutation),
                                         graph1,
                                         graph2);
 

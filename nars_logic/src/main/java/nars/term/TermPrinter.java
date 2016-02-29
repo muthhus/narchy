@@ -3,7 +3,6 @@ package nars.term;
 import nars.Op;
 import nars.Symbols;
 import nars.term.atom.Atomic;
-import nars.term.compound.GenericCompound;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;

@@ -163,7 +163,7 @@ public class Derive extends AtomicStringConstant implements ProcTerm {
         Termed tNorm = mem.index.normalized(t);
 
         //HACK why?
-        if ((tNorm == null) || !tNorm.term().isCompound())
+        if ((tNorm == null) || !(tNorm.term() instanceof Compound))
             return;
 
         Truth truth = p.truth.get();

@@ -1,7 +1,6 @@
 package nars.term;
 
 import nars.Global;
-import nars.Memory;
 import nars.NAR;
 import nars.concept.AtomConcept;
 import nars.concept.DefaultConceptBuilder;
@@ -21,7 +20,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import static nars.$.$;
-import static nars.Global.newHashMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -126,7 +124,7 @@ public class TermIndexTest {
         int s1 = i.subtermsCount();
 
         //some terms and subterms were added
-        if (a.isCompound()) {
+        if (a instanceof Compound) {
             assertTrue(t0 < t1);
             assertTrue(s1 + " subterms indexed for " + t0 + " terms", s0 < s1);
         }

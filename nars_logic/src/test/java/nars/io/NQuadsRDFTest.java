@@ -1,6 +1,5 @@
 package nars.io;
 
-import nars.Memory;
 import nars.NAR;
 import nars.nar.Default;
 import nars.op.in.NQuadsRDF;

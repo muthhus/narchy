@@ -1,7 +1,6 @@
 package nars.concept;
 
 import nars.Global;
-import nars.Memory;
 import nars.NAR;
 import nars.Op;
 import nars.bag.BLink;
@@ -145,7 +144,7 @@ abstract public class PremiseGenerator extends UnifySubst implements Function<Te
     /** uses the query-unified term to complete a premise */
     @Override public final boolean accept(@NotNull Term beliefTerm, Term unifiedBeliefTerm) {
 
-        Task belief = beliefTerm.isCompound() ?
+        Task belief = beliefTerm instanceof Compound ?
 
                 //beliefCache.computeIfAbsent(beliefTerm, this) :
                 apply(beliefTerm) :

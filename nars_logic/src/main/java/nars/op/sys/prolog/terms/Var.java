@@ -6,7 +6,6 @@ import nars.term.SubtermVisitor;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 
@@ -182,15 +181,6 @@ public final class Var extends PTerm {
 
 	}
 
-	//	@Override
-//	public String toString() {
-//		return null;
-//	}
-
-	@Override
-	public boolean isCompound() {
-		return false;
-	}
 
 	@Override
 	public int compareTo(Object o) {

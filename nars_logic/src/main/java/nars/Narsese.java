@@ -617,7 +617,7 @@ public class Narsese extends BaseParser<Object> {
     }
 
     public static boolean isValidAtomChar(char c) {
-        int x = (int) c;
+        int x = c;
 
         //TODO replace these with Symbols. constants
         switch (x) {

@@ -28,7 +28,7 @@ public abstract class Deriver  {
     @NotNull
     public static TrieDeriver getDefaultDeriver() {
         if (defaultRules == null) {
-            synchronized(Op.VAR_PATTERN) {
+            synchronized(logger) {
                 if (defaultDeriver == null) { //double boiler
                     try {
                         defaultRules = new PremiseRuleSet();

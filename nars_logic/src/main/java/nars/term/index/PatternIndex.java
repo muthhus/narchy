@@ -1,6 +1,5 @@
 package nars.term.index;
 
-import nars.concept.DefaultConceptBuilder;
 import nars.nal.meta.PatternCompound;
 import nars.nal.meta.PremiseRule;
 import nars.nar.AbstractNAR;
@@ -9,8 +8,6 @@ import nars.term.Termed;
 import nars.term.container.TermVector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.HashMap;
 
 /**
  * Index which specifically holds the components of a deriver ruleset

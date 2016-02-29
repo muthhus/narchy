@@ -24,10 +24,6 @@ import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertNull;
 import static nars.$.$;
 import static nars.util.Texts.i;
-import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertNull;
-import static nars.$.$;
-import static nars.util.Texts.i;
 import static org.junit.Assert.*;
 
 public class OperatorTest {

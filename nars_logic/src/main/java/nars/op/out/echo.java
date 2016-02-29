@@ -1,7 +1,5 @@
 package nars.op.out;
 
-import nars.Memory;
-import nars.NAR;
 import nars.term.Operator;
 import nars.nal.nal8.operator.ImmediateOperator;
 import nars.task.Task;

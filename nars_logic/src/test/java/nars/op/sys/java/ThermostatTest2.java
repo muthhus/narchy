@@ -2,8 +2,6 @@ package nars.op.sys.java;
 
 import com.gs.collections.api.tuple.Twin;
 import nars.Global;
-import nars.Memory;
-import nars.NAR;
 import nars.nar.Default;
 import nars.task.Task;
 import nars.task.Tasked;

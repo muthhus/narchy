@@ -13,8 +13,6 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
-import static org.junit.Assert.assertTrue;
-
 @RunWith(Parameterized.class)
 public class NAL1Test extends AbstractNALTest {
 

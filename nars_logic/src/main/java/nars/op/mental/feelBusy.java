@@ -18,8 +18,6 @@
 package nars.op.mental;
 
 import nars.$;
-import nars.Memory;
-import nars.NAR;
 import nars.nal.nal8.Execution;
 import nars.task.Task;
 import nars.term.Term;

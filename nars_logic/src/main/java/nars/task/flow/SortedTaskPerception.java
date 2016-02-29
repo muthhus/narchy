@@ -1,6 +1,5 @@
 package nars.task.flow;
 
-import nars.Memory;
 import nars.NAR;
 import nars.budget.BudgetMerge;
 import nars.budget.ItemAccumulator;

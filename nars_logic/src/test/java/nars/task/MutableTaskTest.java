@@ -1,12 +1,10 @@
 package nars.task;
 
-import nars.Memory;
 import nars.NAR;
 import nars.nal.Tense;
 import nars.nar.Default;
 import org.junit.Test;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertTrue;
 
 /**

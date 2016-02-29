@@ -16,7 +16,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
 import nars.Global;
-import nars.Memory;
 import nars.NAR;
 import nars.bag.BLink;
 import nars.bag.Bag;
@@ -38,6 +37,7 @@ import nars.guifx.util.SimpleMenuItem;
 import nars.nar.Default;
 import nars.task.MutableTask;
 import nars.task.Task;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.TruthWave;
@@ -336,7 +336,7 @@ public class ConceptPane extends BorderPane implements ChangeListener {
             n.input(new MutableTask(term, '?').present(nar).log("GUI Question"));
         });
 
-        if (!term.isCompound()) {
+        if (!(term instanceof Compound)) {
             trueButton.setVisible(false); //TODO dont create these task buttons in the first place
             falseButton.setVisible(false);
             yesGoalButton.setVisible(false);

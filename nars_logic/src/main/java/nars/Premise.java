@@ -6,7 +6,6 @@ import nars.nal.Tense;
 import nars.task.Task;
 import nars.task.Tasked;
 import nars.term.Termed;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static nars.nal.Tense.ETERNAL;

@@ -196,9 +196,6 @@ public interface Term extends Termed, Comparable, Termlike {
     }
 
     @Override
-    boolean isCompound();
-
-    @Override
     default boolean isNormalized() {
         return true;
     }

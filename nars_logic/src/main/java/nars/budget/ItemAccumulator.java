@@ -43,7 +43,7 @@ public class ItemAccumulator<V extends Budgeted > {
         return arrayBag;
     }
 
-    class MyArrayBag extends ArrayBag<V> {
+    final class MyArrayBag extends ArrayBag<V> {
         public MyArrayBag(@NotNull SortedIndex<BLink<V>> items) {
             super(items);
         }

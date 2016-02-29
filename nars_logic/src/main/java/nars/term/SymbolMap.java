@@ -9,11 +9,8 @@ import com.googlecode.concurrenttrees.radix.node.concrete.voidvalue.VoidValue;
 import com.googlecode.concurrenttrees.radix.node.util.NodeUtil;
 import nars.$;
 import nars.concept.AtomConcept;
-import nars.concept.CompoundConcept;
 import nars.concept.Concept;
-import nars.concept.VariableConcept;
 import nars.term.atom.Atomic;
-import nars.term.variable.Variable;
 
 import java.util.List;
 import java.util.function.Function;

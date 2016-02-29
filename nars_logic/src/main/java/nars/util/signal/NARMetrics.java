@@ -1,6 +1,5 @@
 package nars.util.signal;
 
-import nars.Memory;
 import nars.NAR;
 import nars.util.event.FrameReaction;
 import nars.util.meter.SignalData;

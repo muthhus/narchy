@@ -1,7 +1,6 @@
 package nars.task;
 
 import nars.Global;
-import nars.Memory;
 import nars.NAR;
 import nars.nar.AbstractNAR;
 import nars.nar.Default;

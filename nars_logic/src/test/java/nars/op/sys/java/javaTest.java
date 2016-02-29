@@ -2,14 +2,11 @@ package nars.op.sys.java;
 
 import nars.NAR;
 import nars.nar.Default;
-import nars.task.Task;
-import nars.term.Term;
 import org.codehaus.commons.compiler.CompileException;
 import org.codehaus.janino.ExpressionEvaluator;
 import org.junit.Test;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.function.Consumer;
 
 import static org.junit.Assert.*;
 

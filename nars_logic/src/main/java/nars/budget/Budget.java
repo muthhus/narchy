@@ -69,7 +69,7 @@ public abstract class Budget extends BudgetedHandle {
     /**
      * set all quantities to zero
      */
-    @org.jetbrains.annotations.Nullable
+    @Nullable
     public Budget zero() {
         return budget(0, 0, 0);
     }
@@ -275,11 +275,6 @@ public abstract class Budget extends BudgetedHandle {
         return this;
     }
 
-    @NotNull
-    public BudgetedStruct budget(@NotNull BudgetedHandle source) {
-        return budget(source.budget());
-    }
-
     /**
      * Briefly display the BudgetValue
      *
@@ -292,13 +287,7 @@ public abstract class Budget extends BudgetedHandle {
 
     @NotNull
     public StringBuilder toBudgetStringExternal(StringBuilder sb) {
-        //return MARK + priority.toStringBrief() + SEPARATOR + durability.toStringBrief() + SEPARATOR + quality.toStringBrief() + MARK;
-
-        CharSequence priorityString = Texts.n2(pri());
-        CharSequence durabilityString = Texts.n2(dur());
-        CharSequence qualityString = Texts.n2(qua());
-
-        return toStringBuilder(sb, priorityString, durabilityString, qualityString);
+        return toStringBuilder(sb, Texts.n2(pri()), Texts.n2(dur()), Texts.n2(qua()));
     }
 
     @NotNull

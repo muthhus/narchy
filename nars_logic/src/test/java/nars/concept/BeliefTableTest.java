@@ -1,7 +1,6 @@
 package nars.concept;
 
 import nars.Global;
-import nars.Memory;
 import nars.NAR;
 import nars.nal.Tense;
 import nars.nar.AbstractNAR;

@@ -2,7 +2,6 @@ package nars.op.sys.java;
 
 import com.gs.collections.impl.set.mutable.primitive.CharHashSet;
 import nars.Global;
-import nars.Memory;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.nar.Default;

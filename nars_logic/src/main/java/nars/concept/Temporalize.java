@@ -99,7 +99,7 @@ public interface Temporalize {
 
         Term cp = d.conclusionPattern; //TODO this may be a wrapped immediatefunction?
 
-        if (derived.op().isTemporal() && cp.isCompound()) {
+        if (derived.op().isTemporal() && cp instanceof Compound) {
 
             Compound ccc = (Compound) cp;
             Term ca = ccc.term(0);
@@ -298,7 +298,7 @@ public interface Temporalize {
                     long ob = bp.subtermTime(cp, bd);
 
                     if (ot != ETERNAL) {
-                        if (tp.isCompound()) {
+                        if (tp instanceof Compound) {
                             Compound ctp = (Compound) tp;
                             if (ctp.term(0).equals(cp)) {
                                 ot -= td;
@@ -308,7 +308,7 @@ public interface Temporalize {
                     } else if (ob != ETERNAL) {
 
                         if (belief.occurrence() != task.occurrence()) { //why?
-                            if (bp.isCompound()) {
+                            if (bp instanceof Compound) {
                                 Compound cbp = (Compound) bp;
                                 if (!cbp.term(1).equals(cp)) {
                                     ob -= bd;

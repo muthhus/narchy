@@ -173,7 +173,7 @@ public enum Op {
     }
 
     public static boolean isOperation(@NotNull Term t) {
-        if (!(t.isCompound())) return false;
+        if (!(t instanceof Compound)) return false;
         Compound c = (Compound)t;
         return  c.size() == 2 &&
                 (!c.impossibleStructureMatch(OperationBits)) &&

@@ -5,10 +5,8 @@ import nars.nar.Terminal;
 import nars.term.variable.CommonVariable;
 import nars.term.variable.GenericNormalizedVariable;
 import nars.term.variable.GenericVariable;
-import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;

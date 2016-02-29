@@ -19,7 +19,6 @@
 
 package nars.task.flow;
 
-import nars.Memory;
 import nars.NAR;
 import nars.task.Task;
 import nars.util.data.buffer.Source;

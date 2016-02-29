@@ -6,8 +6,6 @@ import nars.nar.Default;
 import org.apache.commons.math3.stat.Frequency;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 /**
  * Created by me on 2/19/16.
  */

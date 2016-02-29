@@ -1,9 +1,5 @@
 package nars.util.signal;
 
-import nars.NAR;
-import nars.Narsese;
-import nars.nal.meta.PremiseRule;
-import nars.nar.Default;
 import nars.task.Task;
 import org.jetbrains.annotations.NotNull;
 

@@ -9,8 +9,6 @@ import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
-import nars.term.variable.AbstractVariable;
-import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -131,22 +129,5 @@ public class AtomConcept<E extends Atomic> extends AbstractConcept<E> implements
     public int vars() {
         return term.vars();
     }
-
-
-
-
-    //    /** filter for inserting an outgoing termlink depending on the target */
-//    public static float termLinkOut(Termed from, Term to) {
-////        if (!to.isCompound()) {
-////            if (from.op().isStatement()) // isAny(Op.ProductOrImageBits)
-////                return 0.5f;
-////        }
-//        return 1f;
-//    }
-//
-//    private static boolean taskLinkOut(@NotNull Concept c, @NotNull Task t) {
-//        return true;
-//        //return !(c.term().equals(t.term()));
-//    }
 
 }

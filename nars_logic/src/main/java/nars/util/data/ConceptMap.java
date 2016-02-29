@@ -1,6 +1,5 @@
 package nars.util.data;
 
-import nars.Memory;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.util.event.Active;

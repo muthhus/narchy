@@ -15,7 +15,6 @@ import nars.term.atom.Atom;
 import nars.term.index.MapIndex2;
 import nars.term.index.PatternIndex;
 import nars.term.transform.subst.FindSubst;
-import nars.term.variable.GenericVariable;
 import nars.term.variable.Variable;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;

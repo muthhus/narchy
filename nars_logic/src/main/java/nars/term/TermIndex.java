@@ -253,12 +253,10 @@ public interface TermIndex  {
     default Term apply(@NotNull Subst f, @NotNull Term src) {
 
 
-        if (src.isCompound()) {
+        if (src instanceof Compound) {
             //if f is empty there will be no changes to apply anyway
-            if (f.isEmpty())
-                return src;
+            return f.isEmpty() ? src : transform(src, f);
 
-            return transform((Compound) src, f);
         } else if (src instanceof Variable) {
             Term x = f.term(src);
             if (x != null)
@@ -392,8 +390,8 @@ public interface TermIndex  {
 
 
     @Nullable
-    default Termed normalized(@NotNull Termed t) {
-        if (t.isCompound() && !t.isNormalized()) {
+    default Termed normalized(@NotNull Term t) {
+        if (t instanceof Compound && !t.isNormalized()) {
             Compound ct = (Compound)(t.term());
             t = transform(ct, (ct.vars() == 1) ?
                     VariableNormalization.singleVariableNormalization :

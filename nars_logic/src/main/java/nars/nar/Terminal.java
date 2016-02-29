@@ -1,8 +1,6 @@
 package nars.nar;
 
-import nars.Memory;
 import nars.NAR;
-import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.concept.Concept;
 import nars.task.Task;
@@ -54,9 +52,7 @@ public class Terminal extends AbstractNAR {
 
     @Override
     protected Function<Term, Concept> newConceptBuilder() {
-        return (t) -> {
-            return null;
-        };
+        return (t) -> null;
     }
 
     @Override

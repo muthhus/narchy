@@ -49,10 +49,6 @@ public final class EllipsisMatch extends TermVector<Term> implements Term {
         super(t);
     }
 
-    @Override
-    public boolean isCompound() {
-        return false;
-    }
 
     //abstract public boolean addContained(Compound Y, Set<Term> target);
 

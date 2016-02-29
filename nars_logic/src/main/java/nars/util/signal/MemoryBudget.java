@@ -1,7 +1,6 @@
 package nars.util.signal;
 
 import com.google.common.collect.Lists;
-import nars.Memory;
 import nars.NAR;
 import nars.term.Term;
 import nars.util.Texts;

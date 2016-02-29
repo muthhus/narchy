@@ -226,7 +226,7 @@ public class Terms extends TermBuilder implements TermIndex {
         }
 
         //if one is not a compound, then return their equality
-        if (!(a.isCompound() && b.isCompound())) {
+        if (!(a instanceof Compound && b instanceof Compound)) {
             return a.equals(b);
         }
 

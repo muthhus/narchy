@@ -70,7 +70,8 @@ public class java extends TermFunction {
         return ee.evaluate(null);
     }
     public
-    @Nullable Class resolveClass(String s) {
+    @Nullable
+    static Class resolveClass(String s) {
         Class cl;
         try {
             cl = Class.forName(s);

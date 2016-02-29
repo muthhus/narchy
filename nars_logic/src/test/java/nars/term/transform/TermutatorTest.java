@@ -2,7 +2,6 @@ package nars.term.transform;
 
 import nars.Op;
 import nars.nal.meta.match.Ellipsis;
-import nars.term.Term;
 import nars.term.transform.subst.FindSubst;
 import nars.term.transform.subst.choice.Choose1;
 import nars.term.transform.subst.choice.Choose2;

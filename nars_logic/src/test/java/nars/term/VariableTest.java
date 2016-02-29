@@ -5,7 +5,6 @@ import nars.Narsese;
 import nars.concept.VariableConcept;
 import nars.nal.meta.match.VarPattern;
 import nars.nar.Terminal;
-import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 

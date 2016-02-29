@@ -1,7 +1,6 @@
 package nars.term;
 
 import nars.$;
-import nars.term.atom.Atom;
 import nars.term.container.TermContainer;
 import nars.term.container.TermSet;
 import nars.term.container.TermVector;

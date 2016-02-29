@@ -1,6 +1,5 @@
 package nars.util;
 
-import nars.Memory;
 import nars.NAR;
 import nars.nar.Default;
 import nars.util.data.UniformVector;

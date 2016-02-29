@@ -1,6 +1,5 @@
 package nars.nar;
 
-import nars.Memory;
 import nars.NAR;
 import nars.Narsese;
 import org.junit.Ignore;

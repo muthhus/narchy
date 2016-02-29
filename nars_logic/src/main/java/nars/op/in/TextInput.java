@@ -20,7 +20,6 @@
  */
 package nars.op.in;
 
-import nars.Memory;
 import nars.NAR;
 import nars.Narsese;
 import nars.task.Task;

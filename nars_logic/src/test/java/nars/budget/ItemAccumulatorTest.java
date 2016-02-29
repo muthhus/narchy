@@ -13,8 +13,6 @@ import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static junit.framework.TestCase.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 
 public class ItemAccumulatorTest {
@@ -23,7 +21,7 @@ public class ItemAccumulatorTest {
 
     @Test
     public void testAccumulatorDeduplication() {
-        ItemAccumulator<Task> ii = new ItemAccumulator<Task>(
+        ItemAccumulator<Task> ii = new ItemAccumulator<>(
                 2, //capacity = 2 but this test will only grow to size 1 if successful
                 BudgetMerge.plusDQDominant
         );
@@ -55,7 +53,7 @@ public class ItemAccumulatorTest {
 
         int capacity = 4;
 
-        ItemAccumulator<Task> ii = new ItemAccumulator<Task>(
+        ItemAccumulator<Task> ii = new ItemAccumulator<>(
                 capacity,
                 BudgetMerge.plusDQBlend
         );
@@ -110,7 +108,7 @@ public class ItemAccumulatorTest {
 
         int capacity = 8;
 
-        ItemAccumulator<Task> ii = new ItemAccumulator<Task>(capacity, BudgetMerge.plusDQBlend);
+        ItemAccumulator<Task> ii = new ItemAccumulator<>(capacity, BudgetMerge.plusDQBlend);
         assertTrue(ii.bag().isSorted());
 
         for (int i = 0; i < capacity - 1; i++) {
@@ -139,7 +137,7 @@ public class ItemAccumulatorTest {
 
         int capacity = 8;
 
-        ItemAccumulator<Task> ii = new ItemAccumulator<Task>(capacity,BudgetMerge.plusDQBlend);
+        ItemAccumulator<Task> ii = new ItemAccumulator<>(capacity, BudgetMerge.plusDQBlend);
 
         for (int i = 0; i < capacity-1; i++) {
             float dur = i * 0.05f;

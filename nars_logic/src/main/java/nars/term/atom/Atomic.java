@@ -13,15 +13,10 @@ import static nars.term.atom.Atom.toUnquoted;
 /** Base class for Atomic types. */
 public interface Atomic extends Term {
 
-
-    @Override
-    default boolean isCompound() { return false; }
-
     @NotNull
     @Override
     String toString();
 
-    
     @Override
     default void recurseTerms(@NotNull SubtermVisitor v, Compound parent) {
         v.accept(this, parent);

@@ -2,7 +2,6 @@ package nars.util.learn;
 
 import com.gs.collections.api.block.function.primitive.FloatFunction;
 import com.gs.collections.api.block.function.primitive.FloatToFloatFunction;
-import nars.Memory;
 import nars.NAR;
 import nars.Symbols;
 import nars.task.MutableTask;

@@ -1,6 +1,5 @@
 package nars.nal.nal7;
 
-import nars.Memory;
 import nars.NAR;
 import nars.nar.Default;
 import nars.task.Task;

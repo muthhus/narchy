@@ -7,7 +7,6 @@ import javassist.util.proxy.ProxyFactory;
 import javassist.util.proxy.ProxyObject;
 import nars.$;
 import nars.Global;
-import nars.Memory;
 import nars.NAR;
 import nars.nal.Tense;
 import nars.nal.nal8.Execution;

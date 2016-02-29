@@ -3,6 +3,7 @@ package nars.guifx.highdim;
 import nars.bag.BLink;
 import nars.concept.Concept;
 import nars.guifx.graph2.TermNode;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.util.data.Util;
 
@@ -22,7 +23,7 @@ public class AEConcept1 extends HighDim.AutoEnc2Projection {
         Concept c = clink.get();
         Term t = c.term();
         x[0] = (c.hashCode() % 8) / 8.0f;
-        x[1] = (t.isCompound() ? 1f : 0f);
+        x[1] = (t instanceof Compound ? 1f : 0f);
         x[2] = clink.pri();
         x[3] = clink.dur();
         x[4] = clink.qua();

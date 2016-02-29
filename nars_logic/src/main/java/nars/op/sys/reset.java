@@ -1,7 +1,5 @@
 package nars.op.sys;
 
-import nars.Memory;
-import nars.NAR;
 import nars.nal.nal8.operator.ImmediateOperator;
 import nars.task.Task;
 import org.jetbrains.annotations.NotNull;

@@ -1,6 +1,5 @@
 package nars.concept;
 
-import com.gs.collections.api.block.function.primitive.ObjectIntToObjectFunction;
 import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
 import nars.budget.BudgetMerge;
@@ -18,7 +17,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Random;
 import java.util.function.Function;
-import java.util.function.IntFunction;
 
 /**
  * Created by me on 2/24/16.

@@ -36,13 +36,7 @@ public class NARGraph<V,E> extends DirectedMultigraph<V,E> {
         boolean includeConcept(Concept c);
     }
 
-    public static final Filter IncludeEverything = new Filter() {
-
-        @Override
-        public boolean includeConcept(Concept c) {
-            return true;
-        }
-    };
+    public static final Filter IncludeEverything = c -> true;
 
     public static final class ExcludeBelowPriority implements Filter {
 

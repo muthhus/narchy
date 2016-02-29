@@ -1,7 +1,6 @@
 package nars.op.sys;
 
 import com.google.common.collect.Iterators;
-import nars.Memory;
 import nars.NAR;
 import nars.bag.BLink;
 import nars.budget.ItemAccumulator;

@@ -1,7 +1,5 @@
 package nars.op.sys.java;
 
-import nars.Memory;
-import nars.NAR;
 import nars.concept.Concept;
 import nars.nar.Default;
 import nars.util.learn.HaiQ;

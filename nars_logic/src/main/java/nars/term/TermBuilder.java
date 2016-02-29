@@ -341,7 +341,7 @@ public abstract class TermBuilder {
             }
 
             Term x = make(op, -1, TermContainer.the(op, u)).term();
-            if (!x.isCompound()) return x;
+            if (!(x instanceof Compound)) return x;
 
             Compound cx = (Compound) x;
 

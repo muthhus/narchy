@@ -1,7 +1,6 @@
 package nars.nal.nal6;
 
 import nars.Global;
-import nars.Memory;
 import nars.NAR;
 import nars.nal.AbstractNALTest;
 import nars.nar.Default;

@@ -6,7 +6,6 @@ import nars.Global;
 import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.variable.Variable;
 import org.junit.Test;
 import org.zhz.dfargx.MatchedText;
 import org.zhz.dfargx.RegexSearcher;
@@ -41,9 +40,7 @@ public class PatternIndexTest {
             this.regex = sb.toString();
 
             index = new Term[atomics.size()];
-            atomics.forEachKeyValue( (k, v) -> {
-                index[v] = k;
-            });
+            atomics.forEachKeyValue( (k, v) -> index[v] = k);
 
             matcher = new RegexSearcher(regex);
         }

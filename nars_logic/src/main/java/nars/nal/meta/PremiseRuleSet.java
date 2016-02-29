@@ -358,7 +358,7 @@ public class PremiseRuleSet  {
         public Term unpatternify(Term subterm) {
             String ruleID = Integer.toString(id, 36);
             if (subterm.op() == Op.VAR_PATTERN) {
-                return $.quote("" + ruleID + "_" + ((Variable) subterm).id());
+                return $.quote("%" + ((Variable) subterm).id() + "_" + ruleID);
             } else if (subterm instanceof Compound) {
                  return ruleComponent((Compound) subterm, this);
             }

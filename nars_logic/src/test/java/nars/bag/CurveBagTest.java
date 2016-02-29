@@ -2,8 +2,6 @@ package nars.bag;
 
 import com.gs.collections.impl.list.mutable.primitive.DoubleArrayList;
 import nars.Global;
-import nars.Memory;
-import nars.NAR;
 import nars.bag.impl.ArrayBag;
 import nars.bag.impl.CurveBag;
 import nars.budget.BudgetMerge;
@@ -123,6 +121,20 @@ public class CurveBagTest  {
 
     }
 
+    @Test public void testRemoveByKey() {
+        ArrayBag<String> a = new ArrayBag(2);
+        a.merge(BudgetMerge.plusDQDominant);
+
+        a.put("x", new UnitBudget(0.1f, 0.5f, 0.5f));
+        assertEquals(1, a.size());
+        a.remove("x");
+        assertEquals(0, a.size());
+        assertTrue(a.isEmpty());
+        assertTrue(a.items.isEmpty());
+        assertTrue(a.keySet().isEmpty());
+
+    }
+
     @Test public void testScalePut() {
         ArrayBag<String> a = new ArrayBag(2);
         a.merge(BudgetMerge.plusDQDominant);
@@ -184,6 +196,7 @@ public class CurveBagTest  {
                 }
         );
     }
+
 
     private EmpiricalDistribution getSamplingDistribution(CurveBag b, int n) {
         DoubleArrayList f = new DoubleArrayList(n);
@@ -258,6 +271,8 @@ public class CurveBagTest  {
         return a;
 
     }
+
+
 
 //
 //    static final BagCurve curve = new CurveBag.FairPriorityProbabilityCurve();

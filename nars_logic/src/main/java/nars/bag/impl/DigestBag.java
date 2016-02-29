@@ -1,6 +1,5 @@
 package nars.bag.impl;
 
-import nars.Memory;
 import nars.NAR;
 import nars.bag.BLink;
 import nars.task.Task;

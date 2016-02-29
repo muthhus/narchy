@@ -1,6 +1,5 @@
 package nars.nal.nal6;
 
-import nars.Memory;
 import nars.NAR;
 import nars.Narsese;
 import nars.nar.Default;

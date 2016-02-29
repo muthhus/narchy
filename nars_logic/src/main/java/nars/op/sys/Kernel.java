@@ -52,9 +52,7 @@ public class Kernel {
            if (t.isInput() && (t.isGoal() || t.isCommand()))
                onInput(t);
         });
-        nar.eventFrameStart.on(x->{
-           update();
-        });
+        nar.eventFrameStart.on(x-> update());
     }
 
     private void onInput(Task t) {

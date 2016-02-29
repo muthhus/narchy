@@ -128,10 +128,6 @@ public abstract class Nonvar extends PTerm {
 		return null;
 	}
 
-	@Override
-	public boolean isCompound() {
-		return false;
-	}
 
 	@Override
 	public int compareTo(Object o) {

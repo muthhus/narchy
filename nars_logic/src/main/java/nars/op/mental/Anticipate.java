@@ -25,7 +25,6 @@ package nars.op.mental;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import nars.Global;
-import nars.Memory;
 import nars.NAR;
 import nars.Symbols;
 import nars.task.MutableTask;

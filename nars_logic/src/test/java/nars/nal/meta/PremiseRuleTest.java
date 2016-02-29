@@ -11,10 +11,12 @@ import nars.term.Terms;
 import nars.term.index.PatternIndex;
 import org.junit.Test;
 
+import static org.junit.Assert.*;
+
 /**
  * Created by me on 7/7/15.
  */
-public class PremiseRuleTest extends TestCase {
+public class PremiseRuleTest  {
 
 
     static final Narsese p = Narsese.the();
