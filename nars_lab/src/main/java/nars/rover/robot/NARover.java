@@ -30,6 +30,8 @@ import org.jbox2d.common.Color3f;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.joints.RevoluteJoint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
@@ -57,6 +59,8 @@ public class NARover extends AbstractPolygonBot {
 //    final SimpleAutoRangeTruthFrequency facingAngle;
 
     //public class DistanceInput extends ChangedTextInput
+
+    final static Logger logger = LoggerFactory.getLogger(NARover.class);
 
     private MotorControls motors;
     private Turret gun;
@@ -131,7 +135,7 @@ public class NARover extends AbstractPolygonBot {
     @Override
     protected void onEat(Body eaten, Material m) {
         if (m instanceof Sim.FoodMaterial) {
-            nar.logger.warn("food");
+            logger.warn("food");
             //nar.input("eat:food. :|: %1.0;0.9%");
             hungry = Util.clamp(hungry - 0.85f);
 
@@ -139,7 +143,7 @@ public class NARover extends AbstractPolygonBot {
             //nar.input("goal:{health}. :|: %1.00;0.75%");
         }
         else if (m instanceof Sim.PoisonMaterial) {
-            nar.logger.warn("poison");
+            logger.warn("poison");
             //nar.input("eat:poison. :|:");
             sick = Util.clamp(sick + 0.85f);
 
@@ -599,7 +603,7 @@ public class NARover extends AbstractPolygonBot {
             return new MutableTask(term, Symbols.GOAL)
                     .budget(c.budget())
                     .truth( c.truth() )
-                    .present((Memory) NAR.this)
+                    .present(rover.nar)
                     .log("Curiosity");
         }
     }

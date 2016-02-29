@@ -54,7 +54,7 @@ public class GrammarTest2 {
     public GrammarTest2() throws Exception  {
         n = new Default(2000, 8, 3, 3);
 
-        this.executionFilter = ((Memory) NAR.this).executionThreshold;
+        this.executionFilter = n.executionThreshold;
         Lobjects o = new Lobjects(n);
         this.tape = o.the("tape", Tape.class,
                 //"aaabbbaaabbb               ",
@@ -100,18 +100,18 @@ public class GrammarTest2 {
         //n.logSummaryGT(System.out, 0.5f);
 
         q.power.setValue(0.3f);
-        ((Memory) NAR.this).activationRate.setValue(0.9f);
+        n.activationRate.setValue(0.9f);
 
         //n.memory.executionThreshold.setValue(0.55f);
         n.premiser.confMin.setValue(0.01f);
 
         //n.memory.executionThreshold.setValue(.6f);
-        ((Memory) NAR.this).DEFAULT_JUDGMENT_PRIORITY = 0.5f;
-        ((Memory) NAR.this).DEFAULT_GOAL_PRIORITY = 0.5f;
+        n.DEFAULT_JUDGMENT_PRIORITY = 0.5f;
+        n.DEFAULT_GOAL_PRIORITY = 0.5f;
 
-        ((Memory) NAR.this).duration.set(Math.ceil(charRate.floatValue()/4f));
-        ((Memory) NAR.this).shortTermMemoryHistory.set(2);
-        ((Memory) NAR.this).cyclesPerFrame.set(2);
+        n.duration.set(Math.ceil(charRate.floatValue()/4f));
+        n.shortTermMemoryHistory.set(2);
+        n.cyclesPerFrame.set(2);
         
         //n.initNAL9();
 

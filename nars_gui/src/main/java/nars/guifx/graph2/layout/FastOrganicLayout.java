@@ -413,6 +413,7 @@ public class FastOrganicLayout<V extends TermNode> implements IterativeLayout<V>
 //                        //setEdgeStyleEnabled(edge[k], false);
 //                    }
 
+                    if (e == null) continue; //HACK shouldlnt happen
 
                     TermNode source = e.aSrc; //graph.getEdgeSource(e);
                     TermNode target = e.bSrc; //graph.getEdgeTarget(e);

@@ -5,7 +5,6 @@ import nars.Global;
 import nars.Narsese;
 import nars.Op;
 import nars.budget.Budget;
-import nars.concept.Concept;
 import nars.nal.meta.PremiseAware;
 import nars.nal.meta.PremiseEval;
 import nars.nal.meta.match.EllipsisMatch;
@@ -18,7 +17,7 @@ import nars.term.container.TermVector;
 import nars.term.transform.CompoundTransform;
 import nars.term.transform.VariableNormalization;
 import nars.term.transform.subst.Subst;
-import nars.term.variable.AbstractVariable;
+import nars.term.variable.Variable;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -154,19 +153,23 @@ public interface TermIndex  {
      * returns the resolved term according to the substitution
      */
     @Nullable
-    default Term transform(@NotNull Compound src, @NotNull Subst f) {
+    default Term transform(@Nullable Term trc, @NotNull Subst f) {
 
+        if (trc == null)
+            return null; //pass-through
 
-        Term y = f.term(src);
+        Term y = f.term(trc);
         if (y != null)
             return y;
 
+        int len = trc.size();
+        if (len == 0)
+            return trc; //atomic, proceed no further
 
+        Compound src = (Compound)trc;
         Op sop = src.op();
         final int maxArity = sop.maxSize;
 
-
-        int len = src.size();
         List<Term> sub = Global.newArrayList(len /* estimate */);
         for (int i = 0; i < len; i++) {
             Term t = src.term(i);
@@ -256,7 +259,7 @@ public interface TermIndex  {
                 return src;
 
             return transform((Compound) src, f);
-        } else if (src instanceof AbstractVariable) {
+        } else if (src instanceof Variable) {
             Term x = f.term(src);
             if (x != null)
                 return x;
@@ -404,9 +407,9 @@ public interface TermIndex  {
 
 
     @Nullable
-    default <X extends Compound> X transform(@NotNull Compound src, @NotNull CompoundTransform t) {
+    default Term transform(@NotNull Compound src, @NotNull CompoundTransform t) {
         if (!t.testSuperTerm(src)) {
-            return (X) src; //nothing changed
+            return src; //nothing changed
         }
 
         Term[] newSubterms = new Term[src.size()];
@@ -416,9 +419,9 @@ public interface TermIndex  {
         if (mods == -1) {
             return null;
         } else if ((mods > 0)) {
-            return (X) builder().newCompound(src, TermContainer.the(src.op(), newSubterms));
+            return builder().newCompound(src, TermContainer.the(src.op(), newSubterms));
         }
-        return (X) src; //nothing changed
+        return src; //nothing changed
     }
 
 
@@ -441,7 +444,7 @@ public interface TermIndex  {
                 if (x2 == null)
                     return -1;
 
-                if (x != x2) {
+                if (!x.equals(x2)) {
                     modifications++;
                     x = x2;
                 }
@@ -474,7 +477,7 @@ public interface TermIndex  {
 
                         if (x == null)
                             return -1;
-                        modifications += (cx != x) ? 1 : 0;
+                        modifications += (!cx.equals(x)) ? 1 : 0;
                     }
                 }
             }

@@ -341,15 +341,17 @@ public class PremiseRule extends GenericCompound {
     public final PremiseRule normalizeRule(@NotNull PatternIndex index) {
         try {
 
-            Compound premiseComponents = (Compound) index.the((Termed)
-                    terms.transform(
-                        terms.transform(this, UppercaseAtomsToPatternVariables),
-                            new PremiseRuleVariableNormalization())
-                    );
+            //HACK
+            Term tt = terms.transform(
+                            (Compound)terms.transform(this, UppercaseAtomsToPatternVariables),
+                            new PremiseRuleVariableNormalization());
+
+            Compound premiseComponents = (Compound) index.the((Term)tt);
+
 
             return new PremiseRule( premiseComponents );
 
-        } catch (InvalidTerm e) {
+        } catch (Exception e) {
             e.printStackTrace();
             logger.error("normalizeRule untransformed: {} {}", this, e.getCause());
             return null;

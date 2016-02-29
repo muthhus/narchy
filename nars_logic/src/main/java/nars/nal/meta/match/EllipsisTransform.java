@@ -36,7 +36,8 @@ public class EllipsisTransform extends EllipsisOneOrMore {
     @NotNull
     @Override
     @Deprecated public Variable clone(@NotNull AbstractVariable v, VariableNormalization normalizer) {
-        throw new RuntimeException("n/a");
+        //throw new RuntimeException("n/a");
+        return new GenericVariable(Op.VAR_QUERY, "Ellipsis_Transform_Clone_Unknown");
     }
 
     public static Variable make(@NotNull AbstractVariable v, Term from, Term to, VariableNormalization normalizer) {

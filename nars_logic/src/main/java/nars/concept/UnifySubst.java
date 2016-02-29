@@ -58,13 +58,13 @@ public abstract class UnifySubst extends FindSubst  {
         //TODO combine these two blocks to use the same sub-method
 
         Term aa = applySubstituteAndRenameVariables(a, xy);
-        if ((aa == null) ||
-        //Op aaop = aa.op();
-        //only set the values if it will return true, otherwise if it returns false the callee can expect its original values untouched
-            ((a.op() == Op.VAR_QUERY) && (aa.op().in(Op.VarDepOrIndep)))
-         ) {
-            return false;
-        }
+//        if ((aa == null) ||
+//        //Op aaop = aa.op();
+//        //only set the values if it will return true, otherwise if it returns false the callee can expect its original values untouched
+//            ((a.op() == Op.VAR_QUERY) && (aa.op().in(Op.VarDepOrIndep)))
+//         ) {
+//            return false;
+//        }
 
 //        Term bb = applySubstituteAndRenameVariables(b, yx);
 //        if (bb == null) return false;

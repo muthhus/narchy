@@ -24,14 +24,11 @@ import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertNull;
 import static nars.$.$;
 import static nars.util.Texts.i;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertNull;
 import static nars.$.$;
 import static nars.util.Texts.i;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class OperatorTest {
 
@@ -253,6 +250,15 @@ public class OperatorTest {
         assertEquals(1, n.concept("add(1, 1, 2)").beliefs().size());
         assertEquals(1, n.concept("add(1, 1, #x)").questions().size());
         n.concept("add(1, 1, 2)").print(System.out);
+    }
+
+
+
+    @Test public void testOperatorEquality() {
+        assertNotNull( $.operator("echo") );
+        assertEquals( $.operator("echo"), $.operator("echo"));
+        assertNotEquals( $.operator("echo"), $.the("echo")); //echo vs. ^echo
+        assertNotEquals( $.operator("echo"), $.the("^echo")); //'^echo' vs echo .. this should be disallowed
     }
 
 //TODO: allow this in a special eval operator

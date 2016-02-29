@@ -45,19 +45,19 @@ public class MarkovlikeTest {
 	public static void main(String[] args) {
     //public void testLanguage() {
 
-        Default d = new Default(1000,1,2,3);
+        Default n = new Default(1000,1,2,3);
 
-        d.initNAL9();
+        n.initNAL9();
 
         //d.core.activationRate.setValue(0.5f);
-        ((Memory) NAR.this).shortTermMemoryHistory.set(5);
+        n.shortTermMemoryHistory.set(5);
 
         //d.memory.conceptForgetDurations.setValue(1);
 
         //d.log();
 
         final AtomicReference<Term> prev = new AtomicReference($.the(""));
-        final On l = d.onExecTerm("say", e -> {
+        final On l = n.onExecTerm("say", e -> {
             Term r;
             synchronized (prev) {
                 //$.logger.debug(e.task.getExplanation());
@@ -87,32 +87,32 @@ public class MarkovlikeTest {
         int sentenceDelay = 500;
         int speakTime = wordDelay * 16;
         int silenceTime = 1000;
-        ((Memory) NAR.this).duration.set(wordDelay/2);
+        n.duration.set(wordDelay/2);
 
         for (int i = 0; i < repeats; i++) {
 
             $.logger.warn("train");
 
-            String sentenceID = Twenglish.learnSentence(d, wordDelay,
+            String sentenceID = Twenglish.learnSentence(n, wordDelay,
                     getSentence2()
                     //"this is a sentence for learning language."
                     //"a b c."
                     //"a b c d e f g."
             );
-            d.run(sentenceDelay);
+            n.run(sentenceDelay);
 
             $.logger.warn("speak");
 
-            speak(d, sentenceID, speakTime);
+            speak(n, sentenceID, speakTime);
 
             $.logger.warn("off");
 
-            d.run(silenceTime); //verify it is quiet
+            n.run(silenceTime); //verify it is quiet
 
         }
 
 
-        NARide.show(d.loop(), e-> {});
+        NARide.show(n.loop(), e-> {});
 
     }
 	public static void speak(NAR n, String sentenceID, int speakTime) {

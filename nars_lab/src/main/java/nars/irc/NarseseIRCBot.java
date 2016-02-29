@@ -33,7 +33,7 @@ public class NarseseIRCBot extends IRCBot {
         if (t instanceof Task) {
             Task tt = (Task)t;
 
-            String ss = ((Task)t).toStringWithoutBudget((Memory) NAR.this);
+            String ss = ((Task)t).toStringWithoutBudget(nar);
 
             if (tt.log()!=null && tt.getLogLast().toString().startsWith("Answer"))
                 ss += " " + tt.getLogLast();
@@ -271,7 +271,7 @@ public class NarseseIRCBot extends IRCBot {
 
         output = new DigestBag.OutputBuffer(nar, 128);
 
-        ((Memory) NAR.this).duration.set(2000);
+        nar.duration.set(2000);
         nar.core.conceptsFiredPerCycle.set(256);
 
         //nar.log();

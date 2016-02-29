@@ -977,13 +977,13 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         //ANONYMIZATION
         //TODO ? put the unnormalized term for cached future normalizations?
         if (term instanceof Compound) {
-            Term at = term.anonymous();
+            Termed at = term.anonymous();
             if (at!=term) {
                 //complete anonymization process
                 if (null == (at = index.transform((Compound) at, CompoundAnonymizer)))
                     throw new InvalidTerm((Compound) term);
 
-                term = at;
+                term = at.term();
             }
         }
 

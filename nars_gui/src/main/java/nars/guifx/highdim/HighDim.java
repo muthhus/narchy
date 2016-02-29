@@ -1,7 +1,5 @@
 package nars.guifx.highdim;
 
-import com.sun.tools.javac.util.Log;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import nars.Global;
 import nars.bag.BLink;
@@ -11,24 +9,16 @@ import nars.concept.Concept;
 import nars.guifx.Spacegraph;
 import nars.guifx.demo.NARide;
 import nars.guifx.graph2.TermNode;
-import nars.guifx.graph2.impl.HexButtonVis;
 import nars.guifx.util.Animate;
 import nars.guifx.util.TabX;
 import nars.nar.Default;
-import nars.term.Term;
 import nars.term.Termed;
-import nars.term.variable.Variable;
-import nars.util.Texts;
 import nars.util.data.Util;
-import nars.util.data.bit.BitVector;
 import nars.util.data.random.XorShift128PlusRandom;
-import nars.util.io.StringUtil;
 import nars.util.signal.Autoencoder;
-import org.bridj.ann.Bits;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayDeque;
-import java.util.Arrays;
 import java.util.Deque;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -52,17 +42,21 @@ public class HighDim<T extends Termed> extends Spacegraph {
 
     private abstract static class HighDimProjection<C> {
 
+        /** inputs this projection demands */
         abstract public int inputs();
 
+
+        /** applies the vectorized representation to a component */
         abstract public void project(float[] x, TermNode target);
 
+        /** accepts input link and vectorizes it by some encoding to the dimensionality returned by inputs() */
         abstract public float[] vectorize(@NotNull BLink<? extends C> item, float[] x);
     }
 
     private static class ScatterPlot1 extends HighDimProjection<Concept> {
         @Override
         public float[] vectorize(@NotNull BLink<? extends Concept> concept, float[] x) {
-            x[0] = 100f*(concept.hashCode() % 8192) / 8192.0f;
+            x[0] = 100f*(concept.hashCode() % 16) / 16.0f;
             float cpri = concept.pri();
             x[1] = 400 * cpri;
             x[2] = 1 + 0.1f * cpri;
@@ -79,6 +73,56 @@ public class HighDim<T extends Termed> extends Spacegraph {
             target.move(x[0], x[1]);
             target.scale(x[2]);
         }
+    }
+
+
+    /** hardwired 2 layer autoencoder projection */
+    abstract public static class AutoEnc2Projection extends HighDimProjection<Concept> {
+        final int inputs;
+        final int inner;
+
+        final Autoencoder enc0;
+        final Autoencoder enc1;
+
+        final float[] y0;
+        final float[] y1;
+
+        public AutoEnc2Projection(int inputs, int inner, int outputs) {
+            this.inputs = inputs;
+            this.inner = inner;
+            this.enc0 = new Autoencoder(inputs, inner, new XorShift128PlusRandom(1));
+            this.y0 = new float[inner];
+            this.enc1 = new Autoencoder(inner, outputs, new XorShift128PlusRandom(1));;
+            this.y1 = new float[inner];
+        }
+
+        @Override
+        public int inputs() {
+            return inputs;
+        }
+
+        @Override
+        public float[] vectorize(BLink<? extends Concept> clink, float[] x) {
+            vectorizeIt(clink, x);
+            return x;
+        }
+
+        protected abstract void vectorizeIt(BLink<? extends Concept> clink, float[] x);
+
+        @Override
+        public void project(float[] x, TermNode target) {
+            float err = enc0.train(x, 0.004f, 0.05f, 0.05f, false);
+            enc0.encode(x, y0, true, true);
+            float err2 = enc1.train(y0, 0.008f, 0.05f, 0.05f, false);
+            enc1.encode(y0, y1, false, true);
+
+            applyIt(x, target);
+
+        }
+
+        protected abstract void applyIt(float[] x, TermNode target);
+
+
     }
 
     private class TermGroup extends TermNode /* Group*/  {
@@ -281,68 +325,7 @@ public class HighDim<T extends Termed> extends Spacegraph {
         NARide.show(n.loop(), ide -> {
 
 
-
-
-            HighDimProjection<Concept> autoenc1 = new HighDimProjection<Concept>() {
-                final int inputs = 20;
-                final int inner = 64;
-
-
-                Autoencoder enc = new Autoencoder(inputs, inner, new XorShift128PlusRandom(1));
-                Autoencoder enc2 = new Autoencoder(inner, 4, new XorShift128PlusRandom(1));
-
-                float[] y0 = new float[enc.n_hidden];
-                float[] y = new float[inner];
-
-                @Override
-                public int inputs() {
-                    return inputs;
-                }
-
-                @Override
-                public float[] vectorize(BLink<? extends Concept> clink, float[] x) {
-                    Concept c = clink.get();
-
-                    Term t = c.term();
-
-                    //x[0] = c.op().ordinal() / 16f; //approx;
-                    //x[1] = clink.pri();
-
-
-                    x[0] = (c.hashCode() % 8) / 8.0f;
-                    x[1] = (t.isCompound() ? 1f : 0f);
-                    x[2] = clink.pri();
-                    x[3] = clink.dur();
-                    x[4] = clink.qua();
-                    Util.writeBits(t.op().ordinal() +1, 5, x, 5); //+5
-                    Util.writeBits(t.volume()+1, 5, x, 10); //+5
-                    Util.writeBits(t.size()+1, 5, x, 15); //+5
-
-
-                    //System.out.println(Arrays.toString(x));
-
-                    return x;
-                }
-
-                @Override
-                public void project(float[] x, TermNode target) {
-                    float err = enc.train(x, 0.004f, 0.05f, 0.05f, false);
-                    enc.encode(x, y0, true, true);
-                    float err2 = enc2.train(y0, 0.008f, 0.05f, 0.05f, false);
-                    enc2.encode(y0, y, false, true);
-
-                    //System.out.println(Arrays.toString(x) + " " + Arrays.toString(y));
-                    float pri = x[2]; /* use original value directly */
-                    //target.move( (y[0]-y[1]) *250, pri*250);
-                    //target.move( (y[0]-y[2]) * 500, (y[1]-y[3]) * 500);
-                    target.move( (2*y[0]+y[1]) * 100, (2*y[2]+y[3] )* 100);
-                    target.scale(1f+pri);
-                }
-
-
-            };
-
-            HighDim<Concept> dim = new HighDim<Concept>(16, autoenc1);
+            HighDim<Concept> dim = new HighDim<Concept>(16, new AEConcept1());
 
             n.onFrame(N -> {
                 dim.commit(((Default) N).core.active);

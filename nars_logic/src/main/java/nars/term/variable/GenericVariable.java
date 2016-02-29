@@ -66,7 +66,7 @@ public class GenericVariable extends AtomicString implements Variable {
     }
 
     /** produce a normalized version of this identified by the serial integer */
-    public @NotNull AbstractVariable normalize(int serial) {
+    public @NotNull Variable normalize(int serial) {
         return $.v(type, serial);
     }
 

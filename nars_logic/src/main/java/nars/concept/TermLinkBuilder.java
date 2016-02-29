@@ -6,7 +6,7 @@ import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.variable.AbstractVariable;
+import nars.term.variable.Variable;
 import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 
@@ -62,7 +62,7 @@ public enum TermLinkBuilder {
             if (ti == null)
                 continue;
 
-            if (!(ti instanceof AbstractVariable)) {
+            if (!(ti instanceof Variable)) {
                 components.add(ti);
             }
 
@@ -84,7 +84,7 @@ public enum TermLinkBuilder {
                         continue;
 
 
-                    if (!(tj instanceof AbstractVariable)) {
+                    if (!(tj instanceof Variable)) {
                         components.add(tj);
                     }
 
@@ -99,7 +99,7 @@ public enum TermLinkBuilder {
                             if (tk == null)
                                 continue;
 
-                            if (!(tk instanceof AbstractVariable)) {
+                            if (!(tk instanceof Variable)) {
                                 components.add(tk);
                             }
                         }

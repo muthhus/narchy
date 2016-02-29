@@ -1,12 +1,15 @@
 package nars.nal.meta;
 
-import nars.Global;
-import nars.Narsese;
+import nars.*;
 import nars.nal.Deriver;
+import nars.task.MutableTask;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Terms;
 import nars.term.index.PatternIndex;
+import nars.term.transform.CompoundTransform;
+import nars.term.variable.Variable;
 import nars.util.data.Util;
 import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
@@ -32,7 +35,37 @@ import java.util.regex.Pattern;
 /**
  * Holds an array of derivation rules
  */
-public class PremiseRuleSet {
+public class PremiseRuleSet  {
+
+    final static Term rule = $.the("rule");
+
+    public void reifyTo(NAR n) {
+        rules.forEach(r-> reifyTo(n,r));
+    }
+
+
+
+    //TODO abstract
+    protected static void reifyTo(NAR n, PremiseRule r) {
+
+        PatternVarReifier pr = new PatternVarReifier(r.hashCode()); //HACK todo use not hashcode this unsafe way
+
+        //a rule is fundamentally an implication associating precondition to postcondition
+        n.input(
+            new MutableTask(
+                $.inh( $.p(
+                    ruleComponent((Compound) r.term(0), pr),
+                    ruleComponent((Compound) r.term(1), pr),
+                    $.the(pr.id)
+                ), rule),
+            Symbols.BELIEF) //.truth(1f,1f)
+        );
+    }
+
+    private static Term ruleComponent(Compound term, PatternVarReifier r) {
+        return Terms.terms.transform(term, r);
+    }
+
 
     private static final Pattern twoSpacePattern = Pattern.compile("  ", Pattern.LITERAL);
     private static final Pattern equivOperatorPattern = Pattern.compile("<=>", Pattern.LITERAL);
@@ -303,5 +336,34 @@ public class PremiseRuleSet {
     private static final Pattern spacePattern = Pattern.compile(" ", Pattern.LITERAL);
 
 
+    private static class PatternVarReifier implements CompoundTransform<Compound,Term> {
+
+        final int id;
+
+        public PatternVarReifier(int ruleID) {
+            this.id = ruleID;
+        }
+
+        @Override
+        public boolean test(Term superterm) {
+            return (superterm.varPattern()>0);
+            //return (o instanceof Compound) && ((Compound)o).varPattern() > 0;
+        }
+
+        @Override
+        public Term apply(Compound parent, Term subterm, int depth) {
+            return unpatternify(subterm);
+        }
+
+        public Term unpatternify(Term subterm) {
+            String ruleID = Integer.toString(id, 36);
+            if (subterm.op() == Op.VAR_PATTERN) {
+                return $.quote("" + ruleID + "_" + ((Variable) subterm).id());
+            } else if (subterm instanceof Compound) {
+                 return ruleComponent((Compound) subterm, this);
+            }
+            return subterm;
+        }
+    }
 }
 

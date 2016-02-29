@@ -12,6 +12,7 @@ import nars.nal.nal8.operator.TermFunction;
 import nars.op.data.flat;
 import nars.op.data.intToBitSet;
 import nars.op.data.similaritree;
+import nars.op.out.echo;
 import nars.op.sys.java.java;
 import nars.op.sys.reset;
 import nars.op.out.say;
@@ -46,13 +47,6 @@ import java.util.function.Function;
  * to create multiple NAR with the same Default seed model
  */
 public abstract class AbstractNAR extends NAR {
-
-
-
-
-    //public final Random rng = new RandomAdaptor(new MersenneTwister(1));
-
-    public Function<Term,Concept> conceptBuilder;
 
 
     public AbstractNAR(Clock clock, TermIndex index) {
@@ -147,7 +141,6 @@ public abstract class AbstractNAR extends NAR {
         this.shortTermMemoryHistory.set(2);
 
 
-        this.conceptBuilder = newConceptBuilder();
 
     }
 
@@ -192,6 +185,10 @@ public abstract class AbstractNAR extends NAR {
 //            new name(),         // turn a compount term into an atomic term
             //new Abbreviate(),
             //new Register(),
+
+            new echo(),
+
+
             new doubt(),        // decrease the confidence of a belief
 //            new hesitate(),      // decrease the confidence of a goal
 

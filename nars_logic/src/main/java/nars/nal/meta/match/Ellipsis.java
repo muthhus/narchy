@@ -53,7 +53,7 @@ public abstract class Ellipsis extends AbstractVariable {
         @Override
         public
         @Deprecated
-        @NotNull AbstractVariable normalize(int serial) {
+        @NotNull Variable normalize(int serial) {
             return make(serial, minArity);
         }
 
@@ -82,7 +82,7 @@ public abstract class Ellipsis extends AbstractVariable {
             this.to = to;
         }
 
-        @Override public @NotNull AbstractVariable normalize(int serial) {
+        @Override public @NotNull Variable normalize(int serial) {
             throw new RuntimeException("n/a");
         }
 

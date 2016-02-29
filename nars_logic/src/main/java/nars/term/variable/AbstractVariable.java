@@ -52,7 +52,7 @@ public abstract class AbstractVariable implements Variable {
     @Override
     public final boolean equals(Object obj) {
         return obj==this ||
-                (obj.hashCode() == hash && (obj instanceof AbstractVariable)); //hash first, it is more likely to differ
+                (obj.hashCode() == hash && (obj instanceof Variable)); //hash first, it is more likely to differ
                 //((obj instanceof Variable) && ((Variable)obj).hash == hash);
     }
 
@@ -65,7 +65,7 @@ public abstract class AbstractVariable implements Variable {
     public final int compareTo(Object o) {
         //hashcode can serve as the ordering too
         if (o == this) return 0;
-        return o instanceof AbstractVariable ? Integer.compare(hash, o.hashCode()) : 1;
+        return o instanceof Variable ? Integer.compare(hash, o.hashCode()) : 1;
     }
 
     @Override

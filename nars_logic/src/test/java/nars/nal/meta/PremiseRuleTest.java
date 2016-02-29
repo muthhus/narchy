@@ -2,6 +2,9 @@ package nars.nal.meta;
 
 import junit.framework.TestCase;
 import nars.Narsese;
+import nars.Op;
+import nars.nal.Deriver;
+import nars.nar.Default;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
@@ -135,4 +138,23 @@ public class PremiseRuleTest extends TestCase {
     }
 
 
+    @Test public void testReifyPatternVariables() {
+        Default n = new Default(1024, 2, 3, 3);
+        //n.core.activationRate.setValue(0.75f);
+
+
+        Deriver.getDefaultDeriver().rules.reifyTo(n);
+        n.run(2);
+        n.forEachConcept(c->{
+            assertEquals(0, c.term().varPattern());
+            c.term().recurseTerms((s,x)->{
+                assertFalse(s.op() == Op.VAR_PATTERN );
+                //System.out.println(c + " " + s + " " + s.volume() + "," + s.getClass());
+            });
+            //System.out.println(c);
+        });
+
+
+
+    }
 }

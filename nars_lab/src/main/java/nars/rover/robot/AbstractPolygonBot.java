@@ -371,7 +371,7 @@ public abstract class AbstractPolygonBot extends Being {
 
         public Task getFeedback(float feedback) {
             //since it's expectation, using 0.99 conf is like preserving the necessary truth as was desired, if feedback = desire
-            return new MutableTask(term).present((Memory) NAR.this).belief().truth(feedback, 0.9f);
+            return new MutableTask(term).present(nar).belief().truth(feedback, 0.9f);
         }
 
         public Concept getConcept() {

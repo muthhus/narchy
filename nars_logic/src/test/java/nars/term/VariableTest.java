@@ -2,8 +2,11 @@ package nars.term;
 
 import nars.$;
 import nars.Narsese;
+import nars.concept.VariableConcept;
+import nars.nal.meta.match.VarPattern;
 import nars.nar.Terminal;
 import nars.term.variable.Variable;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -83,5 +86,13 @@ public class VariableTest {
         Compound e = $.$("<%2 <-> <%1 --> b>>");
         assertEquals(2,  e.varPattern() );
 
+    }
+
+    @Test public void testEqualityOfVariablesAndTheirConceptInstances() {
+        @NotNull VarPattern vp0 = $.varPattern(0);
+        VariableConcept vc0 = new VariableConcept(vp0, null, null);
+        assertEquals(vp0, vc0);
+        assertEquals(vc0, vp0); //reverse
+        assertEquals(vp0, vc0.term());
     }
 }
