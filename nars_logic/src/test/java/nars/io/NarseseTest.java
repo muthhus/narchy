@@ -447,10 +447,19 @@ public class NarseseTest {
 
     @Test
     public void testImageIndex() {
-        Compound t = term("(/,open,$1,_)");
-        assertEquals("(/,open,$1,_)", t.toString());
-        assertEquals("(/, open, $1, _)", t.toString());
-        assertEquals("index psuedo-term should not count toward its size", 2, t.size());
+        for (char c : new char[] { '/', '\\'}) {
+            {
+                Compound t = term("(" + c + ",open,$1,_)");
+                assertEquals("(" + c + ",open,$1,_)", t.toString());
+                assertEquals("index psuedo-term should not count toward its size", 2, t.size());
+            }
+
+            {
+                Compound t = term("(" + c + ",open,_,$1)");
+                assertEquals("(" + c + ",open,_,$1)", t.toString());
+                assertEquals("index psuedo-term should not count toward its size", 2, t.size());
+            }
+        }
     }
 
     @Test

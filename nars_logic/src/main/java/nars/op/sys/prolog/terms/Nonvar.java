@@ -122,11 +122,6 @@ public abstract class Nonvar extends PTerm {
 	}
 
 	@Override
-	public StringBuilder toStringBuilder() {
-		return null;
-	}
-
-	@Override
 	public String toString() {
 		return null;
 	}

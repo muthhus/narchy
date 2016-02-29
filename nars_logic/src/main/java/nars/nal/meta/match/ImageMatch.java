@@ -1,11 +1,8 @@
 package nars.nal.meta.match;
 
-import nars.Global;
 import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
 
 import static nars.Op.Imdex;
 
@@ -32,48 +29,34 @@ public enum ImageMatch /*extends ArrayEllipsisMatch<Term>*/ {
 
         //not sure why this works
 
-        //int j = 0;
-        //Term[] t2 = new Term[y.size()+1];
+        int l = t.length;
+        int yOffset = y.size() - l; //where 't' begins in Y
 
-        Term maskTerm = t[0];
+        int j = 0;
+        Term[] t2;
 
-        List<Term> tt = Global.newArrayList(y.size()+1);
-        y.addAllTo(tt);
-
-
-        //2. replace with imdex
-        int m = tt.indexOf(maskTerm);
-        tt.set(m, Imdex);
-
-        //1. replace the imdex (where it should occurr) with the relationTerm
-        tt.add(0, relationTerm);
-
-
-        return new EllipsisMatch(tt);
-//
-//
-//        int relOffset = y.indexOf(relationTerm);
-//        if (relOffset == -1) {
-//            int yOff = yOffset;//y.relation() - yOffset; //where to expect _ in t
-//            //insert the relation term
-//            t2 = new Term[l+1];
-//            for (Term x : t) {
-//                if (j == yOff)
-//                    t2[j++] = relationTerm;
-//                t2[j++] = x;
-//            }
-//            if (j < l+1)
-//                t2[j] = relationTerm; //it replaces the final position
-//        } else {
-//            //mask the relation term where found
-//            t2 = new Term[l];
-//            for (Term x : t) {
-//                t2[j++] = (j == relOffset) ? Imdex : x;
-//            }
-//        }
-//
+        int relOffset = y.indexOf(relationTerm);
+        if (relOffset == -1) {
+            int yOff = y.relation() - yOffset; //where to expect _ in t
+            //insert the relation term
+            t2 = new Term[l+1];
+            for (Term x : t) {
+                if (j == yOff)
+                    t2[j++] = relationTerm;
+                t2[j++] = x;
+            }
+            if (j < l+1)
+                t2[j] = relationTerm; //it replaces the final position
+        } else {
+            //mask the relation term where found
+            t2 = new Term[l];
+            for (Term x : t) {
+                t2[j++] = (j == relOffset) ? Imdex : x;
+            }
+        }
 
 
+        return new EllipsisMatch(t2);
     }
 
     @NotNull

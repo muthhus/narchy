@@ -10,7 +10,6 @@ import nars.term.Termed;
 import nars.term.container.TermContainer;
 import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -109,6 +108,10 @@ public class GenericCompound<T extends Term> implements Compound<T> {
         TermPrinter.append(this, p);
     }
 
+    @Override
+    public String toString() {
+        return TermPrinter.stringify(this).toString();
+    }
 
     @Override
     public int compareTo(@NotNull Object o) {
@@ -311,11 +314,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
         return dt;
     }
 
-    @Nullable
-    @Override
-    public final String toString() {
-        return toStringBuilder().toString();
-    }
+
 
     @Override
     public final int relation() {

@@ -3,6 +3,7 @@ package nars.term;
 import nars.Op;
 import nars.Symbols;
 import nars.term.atom.Atomic;
+import nars.term.compound.GenericCompound;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -222,5 +223,15 @@ public interface TermPrinter {
 
         p.append(COMPOUND_TERM_CLOSER);
 
+    }
+
+    public static StringBuilder stringify(Compound c) {
+        StringBuilder sb = new StringBuilder(/* conservative estimate */ c.volume()*2 );
+        try {
+            c.append(sb);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return sb;
     }
 }

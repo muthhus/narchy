@@ -52,12 +52,6 @@ public interface Atomic extends Term {
         w.append(toString());
     }
 
-    /** preferably use toCharSequence if needing a CharSequence; it avoids a duplication */
-    @Override
-    default StringBuilder toStringBuilder() {
-        return new StringBuilder(toString());
-    }
-
     /** number of subterms; for atoms this must be zero */
     @Override
     default int size() {

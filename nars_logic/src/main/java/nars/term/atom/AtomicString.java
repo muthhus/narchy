@@ -48,8 +48,4 @@ public abstract class AtomicString implements Atomic {
         return toString().compareTo((/*(Atomic)*/that).toString());
     }
 
-
-
-
-
 }

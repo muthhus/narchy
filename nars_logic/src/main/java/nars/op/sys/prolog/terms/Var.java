@@ -175,12 +175,7 @@ public final class Var extends PTerm {
 
 	}
 
-	@Override
-	public StringBuilder toStringBuilder() {
-		throw new UnsupportedOperationException();
-	}
-
-//	@Override
+	//	@Override
 //	public String toString() {
 //		return null;
 //	}

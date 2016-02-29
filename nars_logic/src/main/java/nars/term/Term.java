@@ -160,10 +160,7 @@ public interface Term extends Termed, Comparable, Termlike {
 ////        }
 //    }
 
-    @Deprecated
-    StringBuilder toStringBuilder();
-
-//    default public StringBuilder toStringBuilder(boolean pretty) {
+    //    default public StringBuilder toStringBuilder(boolean pretty) {
 //        return name().toStringBuilder(pretty);
 //    }
 

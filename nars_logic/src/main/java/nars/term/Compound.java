@@ -103,19 +103,6 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
     }
 
 
-    @NotNull
-    @Override
-    default StringBuilder toStringBuilder() {
-        StringBuilder sb = new StringBuilder();
-        try {
-            append(sb);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return sb;
-    }
-
-
     /**
      * extracts a subterm provided by the address tuple
      * returns null if specified subterm does not exist

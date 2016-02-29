@@ -77,15 +77,6 @@ public final class EllipsisMatch extends TermVector<Term> implements Term {
         w.append(toString());
     }
 
-    @Override
-    public StringBuilder toStringBuilder() {
-        return new StringBuilder(toString());
-    }
-
-    @Override
-    public String toString() {
-        return toString();
-    }
 
     public boolean addWhileMatching(@NotNull Compound y, @NotNull Collection<Term> target, int min) {
         for (Term e : term) {
