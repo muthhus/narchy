@@ -134,10 +134,11 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
     public final O putIfAbsent(CharSequence key, Supplier<O> newValue) {
         return compute(key, (k, r) -> {
 
-            Node oldNode = r.nodeFound;
-            if (oldNode != null) {
-                if (r.charsMatched == key.length()) {
-                    return (O) oldNode.getValue();
+            Node existingNode = r.nodeFound;
+            if (existingNode != null) {
+                Object existingValue = existingNode.getValue();
+                if (existingValue != null && key.equals(existingValue.toString())) {
+                    return (O) existingValue;
                 }
             }
 

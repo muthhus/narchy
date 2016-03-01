@@ -335,18 +335,24 @@ public class PremiseRuleSet  {
     }
 
     /** whether a rule will be forward permuted */
-    private static boolean forwardPermutes(PremiseRule r) {
+    static boolean forwardPermutes(PremiseRule r) {
         boolean[] fwd = new boolean[] { true };
         r.recurseTerms((s,c) -> {
-            if (!fwd[0]) return; //already disqualified
+
+            if (!fwd[0])
+                return; //already disqualified
 
             String x = s.toString();
-            if (x.contains("task("))
+            if ((x.contains("task(")) ||
+                (x.contains("time(")) ||
+                (x.contains("after(")) ||
+                (x.contains("Structural")) ||
+                (x.contains("Identity")) ||
+                (x.contains("substitute")) || //TESTING THIS
+                (x.contains("Negation"))) {
+
                 fwd[0] = false;
-
-            //!s.contains("task(") && !s.contains("after(") && !s.contains("measure_time(") && !s.contains("Structural") && !s.contains("Identity") && !s.contains("Negation"):
-
-            //...
+            }
         });
         return fwd[0];
     }

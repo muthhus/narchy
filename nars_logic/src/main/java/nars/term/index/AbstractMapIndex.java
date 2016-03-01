@@ -17,7 +17,7 @@ import java.util.function.Function;
  */
 public abstract class AbstractMapIndex implements TermIndex {
 
-    protected final SymbolMap atoms;
+    public final SymbolMap atoms;
     protected final TermBuilder builder;
     protected final Function<Term, Concept> conceptBuilder;
 

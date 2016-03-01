@@ -7,11 +7,13 @@ import nars.concept.DefaultConceptBuilder;
 import nars.nar.Default;
 import nars.nar.Terminal;
 import nars.task.Task;
+import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.index.MapIndex2;
 import nars.time.FrameClock;
 import nars.util.data.random.XorShift128PlusRandom;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -20,7 +22,9 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import static nars.$.$;
+import static nars.$.operator;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 
@@ -202,6 +206,37 @@ public class TermIndexTest {
         assertTrue(B.term() == B);
         assertEquals(at.toString(), B.toString());
 
+
+    }
+
+    @Test public void testCommonPrefix1() {
+        testCommonPrefix(true);
+    }
+    @Test public void testCommonPrefix2() {
+        testCommonPrefix(false);
+    }
+
+    public static void testCommonPrefix(boolean direction) {
+        MapIndex2 i = (MapIndex2)(new Default().index());
+        Atomic sui = operator("substituteIfUnifies");
+        Atomic su = operator("substitute");
+
+        if (direction) {
+            i.the(sui);
+            i.the(su);
+        } else { //reverse
+            i.the(su);
+            i.the(sui);
+        }
+
+
+        System.out.println(i);
+        i.print(System.out);
+
+        assertEquals(2, i.atoms.size());
+        assertEquals(sui, i.get(sui));
+        assertEquals(su, i.get(su));
+        assertNotEquals(sui, i.get(su));
 
     }
 }

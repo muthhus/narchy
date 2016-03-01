@@ -197,4 +197,12 @@ public class PremiseRuleTest {
         assertTrue(x.contains("(((%1-->%2),(%3-->%2),neq(%1,%2),task(\"?\")),((%1-->%3),"));
 
     }
+
+    @Test public void testSubstIfUnifies() {
+        PremiseRule r = rule("<(Y --> L), ((Y --> S) ==> R), neq(L,S) |- substitute(((&&,(#X --> L),(#X --> S)) ==> R),Y,#X), (Belief:Induction, Desire:Induction)>");
+        System.out.println(r);
+        System.out.println(r.source);
+        Set<PremiseRule> s = PremiseRuleSet.permute(r);
+        System.out.println(Joiner.on('\n').join(s));
+    }
 }

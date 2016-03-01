@@ -87,8 +87,8 @@ public class SymbolMap extends MyConcurrentRadixTree<AtomConcept> {
                 // Non-leaf node...
                 if (value instanceof VoidValue) {
                     return new ByteArrayNodeNonLeafVoidValue(edgeCharacters, childNodes);
-//                    else if (value == null) {
-//                        return new ByteArrayNodeNonLeafNullValue(edgeCharacters, childNodes);
+                } else if (value == null) {
+                    return new ByteArrayNodeNonLeafNullValue(edgeCharacters, childNodes);
                 } else {
                     return new ByteArrayNodeDefault(edgeCharacters, value, childNodes);
                 }

@@ -19,6 +19,9 @@ public final class substituteIfUnifies extends substitute {
         final Term term = xx[0];
         final Term opT = xx[1];
         final Term x = xx[2];
+        if (xx.length < 4) {
+            throw new UnsupportedOperationException();
+        }
         final Term y = xx[3];
 
         Op op = substitute.getOp(opT);
