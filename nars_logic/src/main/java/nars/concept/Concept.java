@@ -196,7 +196,7 @@ public interface Concept extends Termed, Comparable {
             out.print(indent);
             out.print(s);
             out.print(" ");
-            out.print(s.getLogLast());
+            out.print(s.lastLogged());
             out.println();
         };
 

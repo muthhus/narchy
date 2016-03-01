@@ -80,7 +80,7 @@ public class MethodOperator  {
             return null;
 
         Task curTask = currentTask.get();
-        Object ll = curTask.getLogLast();
+        Object ll = curTask.lastLogged();
 
         //Check if this was previously executed by the Java invocation pathway
         if (ll instanceof Lobjects.JavaInvoked)

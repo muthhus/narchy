@@ -44,46 +44,41 @@ public class QueryVariableTest extends AbstractNALTest {
     @Test public void testQueryVariableAnswerUnified() {
         testQueryVariableAnswer("<a --> b>", "<?x --> b>");
     }
+    @Test public void testQueryVariableAnswerUnified2() {
+        testQueryVariableAnswer("<c --> (a&b)>", "<?x --> (a&b)>");
+    }
 
     void testQueryVariableAnswer(String belief, String question) {
-        //$0.25;0.23;0.50$ <?1 <-> a>? {?: 1;2}
-        //$0.63;0.34;0.50$ <?1 --> a>? {?: 1;2}
 
-        Global.DEBUG = true;
+        int time = 32;
 
+        test().log()
+            .believe(belief)
+            .ask(question)
+            .mustAnswer(time, belief, 1f, 0.9f, Tense.ETERNAL);
 
-        //Set<Task> derivations = new HashSet();
-
-        TestNAR t = test();
-        NAR n = t.nar;
-        n.log();
-
-        int[] answers = new int[1];
-
-        n.eventTaskProcess.on(d-> {
-            //if (d.term().hasVarQuery())
-                //derivations.add(d);
-            if (d.isJudgment() && d.term().toString().equals(belief))
-                assertFalse(d + " should not have been derived", Util.equals(d.conf(), 0.81f, 0.01f));
-        } );
-        /*n.eventConceptProcess.on(c -> {
-            System.out.println("\t" + c);
-        });*/
-        n.eventAnswer.on(p -> {
-            System.out.println("q: " + p.getOne() + " a: " + p.getTwo());
-            answers[0]++;
-        });
-        t.mustAnswer(2, belief, 1f, 0.9f, Tense.ETERNAL);
+//        int[] answers = new int[1];
+//        n.eventTaskProcess.on(d-> {
+//            //if (d.term().hasVarQuery())
+//                //derivations.add(d);
+//            if (d.isJudgment() && d.term().toString().equals(belief))
+//                assertFalse(d + " should not have been derived", Util.equals(d.conf(), 0.81f, 0.01f));
+//        } );
+//        /*n.eventConceptProcess.on(c -> {
+//            System.out.println("\t" + c);
+//        });*/
+//        n.eventAnswer.on(p -> {
+//            System.out.println("q: " + p.getOne() + " a: " + p.getTwo());
+//            answers[0]++;
+//        });
 
 
-        n.believe(belief);
-        n.ask(question);
 
 
-        n.run(16);
+        //n.run(16);
 
 
-        assertTrue("Answer/Solution reported?", 0 < answers[0]);
+        //assertTrue("Answer/Solution reported?", 0 < answers[0]);
 
 
 

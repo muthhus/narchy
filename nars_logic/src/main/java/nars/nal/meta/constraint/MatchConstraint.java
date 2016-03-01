@@ -2,6 +2,7 @@ package nars.nal.meta.constraint;
 
 import nars.term.Term;
 import nars.term.transform.subst.FindSubst;
+import org.jetbrains.annotations.NotNull;
 
 
 @FunctionalInterface
@@ -13,5 +14,5 @@ public interface MatchConstraint {
      * @param f match context
      * @return true if match is INVALID, false if VALID (reversed)
      */
-    boolean invalid(Term assignee, Term value, FindSubst f);
+    boolean invalid(@NotNull Term assignee, @NotNull Term value, @NotNull FindSubst f);
 }

@@ -215,7 +215,7 @@ public abstract class AbstractTask extends UnitBudget
         //finally, assign a unique stamp if none specified (input)
         if (evidence() == null) {
             if (!isInput()) {
-                throw new RuntimeException("non-Input task without evidence: " + this);
+                throw new RuntimeException("derived task without evidence: " + this);
             } else {
 
                 setEvidence(memory.newStampSerial());

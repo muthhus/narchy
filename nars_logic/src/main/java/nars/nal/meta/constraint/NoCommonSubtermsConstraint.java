@@ -3,6 +3,8 @@ package nars.nal.meta.constraint;
 import nars.Global;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.TermBuilder;
+import nars.term.container.TermContainer;
 import nars.term.transform.subst.FindSubst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -14,18 +16,18 @@ public final class NoCommonSubtermsConstraint implements MatchConstraint {
 
     private final Term b;
 
-    public NoCommonSubtermsConstraint(Term b) {
+    public NoCommonSubtermsConstraint(@NotNull Term b) {
         this.b = b;
     }
 
     @Override
-    public boolean invalid(Term x, Term y, @NotNull FindSubst f) {
+    public boolean invalid(@NotNull Term x, @NotNull Term y, @NotNull FindSubst f) {
         Term B = f.term(b);
-        if (B != null) {
-            Set<Term> tmpSet = Global.newHashSet(0);
-            return sharedSubterms(y, B, tmpSet);
-        }
-        return false;
+
+        //Set<Term> tmpSet = Global.newHashSet(0);
+        //return  commonSubterms(y, B, tmpSet);
+
+        return B != null && TermContainer.commonSubterms(y, B);
     }
 
     @NotNull
@@ -34,30 +36,30 @@ public final class NoCommonSubtermsConstraint implements MatchConstraint {
         return "noCommonSubterms(" + b + ')';
     }
 
-    private static boolean sharedSubterms(Term a, Term b, Set<Term> s) {
-        addUnmatchedSubterms(a, s, null);
-        return !addUnmatchedSubterms(b, null, s); //we stop early this way (efficiency)
-    }
-
-    private static boolean addUnmatchedSubterms(Term x, @Nullable Set<Term> AX, @Nullable Set<Term> BX) {
-        if (BX != null && BX.contains(x)) { //by this we can stop early
-            return false;
-        }
-
-        if (AX != null && AX.add(x) && x instanceof Compound) {
-            Compound c = (Compound) x;
-            int l = c.size();
-            for (int i = 0; i < l; i++) {
-                Term d = c.term(i);
-                if (!addUnmatchedSubterms(d, AX, BX)) {
-                    //by this we can stop early
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
+//    public static boolean commonSubterms(Term a, Term b, Set<Term> s) {
+//        addUnmatchedSubterms(a, s, null);
+//        return !addUnmatchedSubterms(b, null, s); //we stop early this way (efficiency)
+//    }
+//
+//    private static boolean addUnmatchedSubterms(Term x, @Nullable Set<Term> AX, @Nullable Set<Term> BX) {
+//        if (BX != null && BX.contains(x)) { //by this we can stop early
+//            return false;
+//        }
+//
+//        if (AX != null && AX.add(x) && x instanceof Compound) {
+//            Compound c = (Compound) x;
+//            int l = c.size();
+//            for (int i = 0; i < l; i++) {
+//                Term d = c.term(i);
+//                if (!addUnmatchedSubterms(d, AX, BX)) {
+//                    //by this we can stop early
+//                    return false;
+//                }
+//            }
+//        }
+//
+//        return true;
+//    }
 
 
 

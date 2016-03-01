@@ -32,10 +32,9 @@ public class PremiseEval extends FindSubst {
 
     private final Deriver deriver;
 
-    /** current Premise
-     *  TODO make private
-     * */
-    public transient ConceptProcess currentPremise;
+
+    /** the current premise being evaluated in this context TODO make private again */
+    public transient ConceptProcess premise = null;
 
     @NotNull
     public final Versioned<Truth> truth;
@@ -123,7 +122,7 @@ public class PremiseEval extends FindSubst {
     @Override
     public String toString() {
         return "RuleMatch:{" +
-                "premise:" + currentPremise +
+                "premise:" + premise +
                 ", subst:" + super.toString() +
                 (pattern.get()!=null ? (", derived:" + pattern) : "")+
                 (truth.get()!=null ? (", truth:" + truth) : "")+
@@ -139,9 +138,9 @@ public class PremiseEval extends FindSubst {
      */
     public final void start(@NotNull ConceptProcess p) {
 
-        this.currentPremise = p;
+        this.premise = p;
 
-        this.index = currentPremise.nar().index;
+        this.index = premise.nar().index;
 
         Task task = p.task();
         Compound taskTerm = task.term();
@@ -184,7 +183,7 @@ public class PremiseEval extends FindSubst {
      *  returns null if invalid / insufficient */
     public final Budget getBudget(@Nullable Truth truth, @NotNull Termed c) {
 
-        ConceptProcess p = this.currentPremise;
+        ConceptProcess p = this.premise;
 
         Budget budget = truth != null ?
                 BudgetFunctions.compoundForward(truth, c, p) :

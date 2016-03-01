@@ -93,16 +93,15 @@ public class Derive extends AtomicStringConstant implements ProcTerm {
      * false to stop it */
     @Override public final void accept(@NotNull PremiseEval m) {
 
-        Term derivedTerm = m.resolve(conclusionPattern);
+        Term d = m.resolve(conclusionPattern);
 
-
-        if ((derivedTerm instanceof EllipsisMatch)) {
+        if ((d instanceof EllipsisMatch)) {
             //TODO hack prevent this
             //throw new RuntimeException("invalid ellipsis match: " + derivedTerm);
-            EllipsisMatch em = ((EllipsisMatch)derivedTerm);
+            EllipsisMatch em = ((EllipsisMatch)d);
             switch (em.size()) {
                 case 1:
-                    derivedTerm = em.term(0); //unwrap the item
+                    d = em.term(0); //unwrap the item
                     break;
                 case 0:
                     return;
@@ -112,12 +111,14 @@ public class Derive extends AtomicStringConstant implements ProcTerm {
             }
         }
 
-        if (derivedTerm == null)
+        if (d == null)
             return;
+        if (d.varPattern()!=0)
+            return; //incomplete
 
-        if (ensureValidVolume(derivedTerm)) {
+        if (ensureValidVolume(d)) {
             if (postMatch.booleanValueOf(m))
-                derive(m, derivedTerm);
+                derive(m, d);
         } else {
 
                 if (Global.DEBUG) {
@@ -126,8 +127,10 @@ public class Derive extends AtomicStringConstant implements ProcTerm {
                     Terms.printRecursive(x, (String line) ->$.logger.error(line) );
                 });*/
 
-                    String message = "Term volume overflow: " + derivedTerm;
-                    $.logger.error("{} {}", message , rule);
+                $.logger.warn("Term volume overflow {} {}", d, rule);
+
+                    //System.err.println(m.premise.task().explanation());
+                    //System.err.println( (m.premise.belief()!=null) ? m.premise.belief().explanation() : "belief: null");
                     //System.exit(1);
                     //throw new RuntimeException(message);
                 }
@@ -150,11 +153,9 @@ public class Derive extends AtomicStringConstant implements ProcTerm {
     /** part 1 */
     private void derive(@NotNull PremiseEval p, @NotNull Term t) {
 
-        if (t.varPattern()!=0) {
-            return;
-        }
 
-        ConceptProcess premise = p.currentPremise;
+
+        ConceptProcess premise = p.premise;
         Memory mem = premise.nar();
 
         //get the normalized term to determine the budget (via it's complexity)
@@ -180,7 +181,7 @@ public class Derive extends AtomicStringConstant implements ProcTerm {
         Compound ct = (Compound) tNorm.term();
 
         if (p7 && (!premise.isEternal() || premise.hasTemporality())) {
-            Term cp = this.conclusionPattern;
+            //Term cp = this.conclusionPattern;
 
             //if (Op.isOperation(cp) && p.transforms.containsKey( Operator.operator((Compound) cp) ) ) {
                 //unwrap operation from conclusion pattern; the pattern we want is its first argument

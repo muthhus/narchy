@@ -19,7 +19,7 @@ public final class TaskNegative extends AtomicBooleanCondition<PremiseEval> {
 
     @Override
     public boolean booleanValueOf(@NotNull PremiseEval m) {
-        Task task = m.currentPremise.task();
+        Task task = m.premise.task();
         return (task.isJudgmentOrGoal() && task.freq() < PostCondition.HALF);
     }
 

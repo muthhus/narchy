@@ -129,35 +129,46 @@ public class Default extends AbstractNAR {
             emotion.busy(input, activation);
 
             Task t = c.process(input, nar);
-            if (t != null) {
+
+            boolean novel = (t!=null);
+
+            if (novel) {
 
                 //TaskProcess succeeded in affecting its concept's state (ex: not a duplicate belief)
 
                 //1. propagate budget
                 conceptualize(c, t.budget(), activation);
 
-
                 switch (t.punc()) {
                     case Symbols.GOAL:
                         execute(t, c);
-
                         //TODO check for answer to parent quest task
-                        break;
-                    case Symbols.BELIEF:
-                        //check for answer to parent question task(s) and emit an event
-                        Task parentTask = t.getParentTask();
-                        if (parentTask!=null && parentTask.isQuestion()) {
-                            eventAnswer.emit(Tuples.twin(parentTask, t));
-                        }
                         break;
                 }
 
                 //3. signal any additional processes
                 eventTaskProcess.emit(t);
 
+            } else {
+                t = input;
+            }
+
+            if (t.isJudgment()) {
+                //check for answer to parent question task(s) and emit an event
+                onSolution(input, novel);
             }
 
             return c;
+        }
+
+        void onSolution(Task t, boolean novel) {
+            Task parentTask = t.getParentTask();
+            if (parentTask!=null && parentTask.isQuestion()) {
+
+                if (novel || parentTask.isInput()) //filter
+                    eventAnswer.emit(Tuples.twin(parentTask, t));
+
+            }
         }
 
     };

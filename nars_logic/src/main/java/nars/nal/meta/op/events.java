@@ -20,7 +20,7 @@ abstract public class events extends AtomicBooleanCondition<PremiseEval> {
 
         @Override
         public boolean booleanValueOf(@NotNull PremiseEval m) {
-            return beliefBeforeOrDuringTask(m.currentPremise);
+            return beliefBeforeOrDuringTask(m.premise);
         }
 
     };
@@ -35,7 +35,7 @@ abstract public class events extends AtomicBooleanCondition<PremiseEval> {
 
         @Override
         public boolean booleanValueOf(@NotNull PremiseEval m) {
-            ConceptProcess p = m.currentPremise;
+            ConceptProcess p = m.premise;
             return p.isEternal() || beliefBeforeOrDuringTask(p);
         }
     };

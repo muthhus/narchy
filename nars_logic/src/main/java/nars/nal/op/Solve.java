@@ -98,7 +98,7 @@ abstract public class Solve extends AtomicBooleanCondition<PremiseEval> {
             case Symbols.BELIEF:
             case Symbols.GOAL:
                 TruthOperator tf = (punct == Symbols.BELIEF) ? belief : desire;
-                r = (tf != null) && (tf.allowOverlap() || !m.currentPremise.cyclic()) && (tf.apply(m));
+                r = (tf != null) && (tf.allowOverlap() || !m.premise.cyclic()) && (tf.apply(m));
                 break;
             case Symbols.QUESTION:
             case Symbols.QUEST:

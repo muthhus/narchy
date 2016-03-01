@@ -60,7 +60,6 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         for (int i = 0; i < indent; i++)
             sb.append("  ");
 
-
         task.appendTo(sb, null, true);
 
 //        List l = task.getLog();
@@ -74,11 +73,10 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 //            }
 //        }
 
+        sb.append("\n  ");
+
         Task pt = task.getParentTask();
         Task pb = task.getParentBelief();
-        sb.append('\n');
-
-        sb.append("  ");
         if (pt != null) {
             //sb.append("  PARENT ");
             explanation(pt, indent+1, sb);
@@ -129,12 +127,12 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         return true;
     }
 
-    static float prioritySum(@NotNull Iterable<? extends Budgeted > dd) {
-        float f = 0;
-        for (Budgeted  x : dd)
-            f += x.pri();
-        return f;
-    }
+//    static float prioritySum(@NotNull Iterable<? extends Budgeted > dd) {
+//        float f = 0;
+//        for (Budgeted  x : dd)
+//            f += x.pri();
+//        return f;
+//    }
 
     static boolean subjectOrPredicateIsIndependentVar(@NotNull Compound t) {
         if (!t.hasVarIndep()) return false;
@@ -332,11 +330,6 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         return true;
     }
 
-//    default float getConfidenceIfTruthOr(float v) {
-//        Truth t = truth();
-//        if (t == null) return v;
-//        return t.conf();
-//    }
 
     @NotNull
     default Task projectTask(long when, long now) {
@@ -386,20 +379,17 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     @Nullable
     TaskState state();
 
-    final class Solution extends AtomicReference<Task> {
-        Solution(Task referent) {
-            super(referent);
-        }
-
-        @NotNull
-        @Override
-        public String toString() {
-            return "Solved: " + get();
-        }
-    }
-
-
-
+//    final class Solution extends AtomicReference<Task> {
+//        Solution(Task referent) {
+//            super(referent);
+//        }
+//
+//        @NotNull
+//        @Override
+//        public String toString() {
+//            return "Solved: " + get();
+//        }
+//    }
 
     @NotNull
     default StringBuilder toString(/**@Nullable*/Memory memory) {
@@ -472,7 +462,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
         String finalLog;
         if (showLog) {
-            Object ll = getLogLast();
+            Object ll = lastLogged();
 
             finalLog = (ll!=null ? ll.toString() : null);
             if (finalLog!=null)
@@ -504,8 +494,9 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
             truth().appendString(buffer, 2);
         }
 
-        if (showStamp)
+        if (showStamp) {
             buffer.append(' ').append(stampString);
+        }
 
         if (showLog) {
             buffer.append(' ').append(finalLog);
@@ -515,10 +506,9 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     }
 
     @Nullable
-    default Object getLogLast() {
+    default Object lastLogged() {
         List<String> log = log();
-        if (log ==null || log.isEmpty()) return null;
-        return log.get(log.size()-1);
+        return log == null || log.isEmpty() ? null : log.get(log.size() - 1);
     }
 
 
@@ -596,17 +586,17 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
      * or if its origin has been forgotten or never known
      */
     default boolean isInput() {
-        return getParentTask() == null;
-        //return evidence().length <= 1;
+        return (getParentTask() == null);
+        //return (evidence().length <= 1) && ;
     }
 
 
-    /**
-     * a task is considered amnesiac (origin not rememebered) if its parent task has been forgotten (garbage collected via a soft/weakref)
-     */
-    default boolean isAmnesiac() {
-        return !isInput() && getParentTask() == null;
-    }
+//    /**
+//     * a task is considered amnesiac (origin not rememebered) if its parent task has been forgotten (garbage collected via a soft/weakref)
+//     */
+//    default boolean isAmnesiac() {
+//        return !isInput() && getParentTask() == null;
+//    }
 
 
     /** if unnormalized, returns a normalized version of the task,
@@ -616,10 +606,10 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     Task normalize(Memory memory);
 
 
-    default void ensureValidParentTaskRef() {
-        if ((getParentTaskRef() != null && getParentTask() == null))
-            throw new RuntimeException("parentTask must be null itself, or reference a non-null Task");
-    }
+//    default void ensureValidParentTaskRef() {
+//        if ((getParentTaskRef() != null && getParentTask() == null))
+//            throw new RuntimeException("parentTask must be null itself, or reference a non-null Task");
+//    }
 
 
     void setTruth(Truth t);
@@ -685,7 +675,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
             if (ct == TIMELESS) {
                 sb.append(":-:");
             } else {
-                sb.append(':').append(Long.toString(ct)).append(':');
+                sb.append(':').append(ct).append(':');
             }
 
         } else if (oc == TIMELESS) {
@@ -694,8 +684,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         } else {
             int estTimeLength = 8; /* # digits */
             sb.ensureCapacity(estTimeLength);
-
-            sb.append(Long.toString(ct));
+            sb.append(ct);
 
             long OCrelativeToCT = (oc - ct);
             if (OCrelativeToCT >= 0)

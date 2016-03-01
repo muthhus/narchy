@@ -1,6 +1,8 @@
 package nars.term.container;
 
+import com.gs.collections.api.block.predicate.Predicate2;
 import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
+import com.gs.collections.api.set.ImmutableSet;
 import com.gs.collections.api.set.MutableSet;
 import com.gs.collections.impl.factory.Sets;
 import nars.$;
@@ -12,8 +14,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+
+import static com.gs.collections.impl.factory.Sets.*;
 
 
 /**
@@ -46,13 +51,44 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
         return size() <= i ? ifOutOfBounds : term(i);
     }
 
-    default @NotNull  MutableSet<Term> toSet() {
-        return Sets.mutable.of(terms());
+    default @NotNull MutableSet<Term> toSet() {
+        return mutable.of(terms());
+    }
+
+    default @NotNull ImmutableSet<Term> toSetImmutable() {
+        return immutable.of(terms());
     }
 
     static @NotNull MutableSet<Term> intersect(@NotNull TermContainer a, @NotNull TermContainer b) {
         return Sets.intersect(a.toSet(),b.toSet());
     }
+
+
+
+    static Predicate2<Object,ImmutableSet> commonSubtermPredicate = (Object yy, ImmutableSet xx) -> {
+        return xx.contains(yy);
+    };
+    static @NotNull boolean commonSubterms(@NotNull Term a, @NotNull Term b) {
+
+        boolean aCompound = a instanceof Compound;
+        boolean bCompound = b instanceof Compound;
+        if (!aCompound && !bCompound) {
+            return a.equals(b); //shortcut
+        }
+
+        ImmutableSet x = aCompound ? ((Compound)a).toSetImmutable() : immutable.of(a);
+        ImmutableSet y = bCompound ? ((Compound)b).toSetImmutable() : immutable.of(b);
+        if (x.size() < y.size()) {
+            //swap so that y is smaller
+            ImmutableSet tmp = x;
+            x = y;
+            y = tmp;
+        }
+
+        return y.anySatisfyWith(commonSubtermPredicate, (ImmutableSet<?>)x);
+    }
+
+
 
     default boolean isEmpty() {
         return size() != 0;

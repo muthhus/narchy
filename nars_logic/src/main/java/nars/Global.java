@@ -148,10 +148,10 @@ public enum Global {
     /** hard upper-bound limit on Compound term complexity;
      * if this is exceeded it may indicate a recursively
      * malformed term due to a serious inference bug */
-    public static final int COMPOUND_VOLUME_MAX = 768;
+    public static final int COMPOUND_VOLUME_MAX = 256;
 
     /** extra debugging checks */
-    public static boolean DEBUG_PARANOID;
+    public static final boolean DEBUG_PARANOID = false;
 
     public static float MAX_TERMUTATIONS_PER_MATCH = 4;
     public static float MIN_TERMUTATIONS_PER_MATCH = 1;

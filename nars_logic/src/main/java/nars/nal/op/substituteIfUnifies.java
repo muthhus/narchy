@@ -43,7 +43,7 @@ public final class substituteIfUnifies extends substitute {
         private Term result;
 
         public OneMatchFindSubst(@NotNull Op op, @NotNull PremiseEval r, Term xterm) {
-            super(op, r.currentPremise.nar().random, r);
+            super(op, r.premise.nar().random, r);
             this.xterm = xterm;
             this.r = r;
         }

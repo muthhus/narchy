@@ -3,8 +3,6 @@ package nars.irc;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import nars.Global;
-import nars.Memory;
-import nars.NAR;
 import nars.NARLoop;
 import nars.bag.BLink;
 import nars.bag.impl.DigestBag;
@@ -35,8 +33,8 @@ public class NarseseIRCBot extends IRCBot {
 
             String ss = ((Task)t).toStringWithoutBudget(nar);
 
-            if (tt.log()!=null && tt.getLogLast().toString().startsWith("Answer"))
-                ss += " " + tt.getLogLast();
+            if (tt.log()!=null && tt.lastLogged().toString().startsWith("Answer"))
+                ss += " " + tt.lastLogged();
 
             return ss;
         }
