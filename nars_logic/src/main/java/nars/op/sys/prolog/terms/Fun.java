@@ -4,6 +4,7 @@ import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.container.TermContainer;
+import nars.term.transform.subst.FindSubst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -290,6 +291,11 @@ public class Fun extends Const implements Compound<PTerm> {
     @Override
     public TermContainer<PTerm> subterms() {
         return null;
+    }
+
+    @Override
+    public boolean match(Compound y, FindSubst subst) {
+        return false;
     }
 
     @Override

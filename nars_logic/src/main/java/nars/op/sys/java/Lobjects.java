@@ -144,21 +144,21 @@ public class Lobjects extends DefaultTermizer implements Termizer, MethodHandler
         return t;
     }
 
-    @Override
-    protected void onInstanceOfClass(Object o, Term oterm, Term clas) {
-        /** only point to type if non-numeric? */
-        //if (!Primitives.isWrapperType(instance.getClass()))
+//    @Override
+//    protected void onInstanceOfClass(Object o, Term oterm, Term clas) {
+//        /** only point to type if non-numeric? */
+//        //if (!Primitives.isWrapperType(instance.getClass()))
+//
+//        //nar.believe(Instance.make(oterm, clas));
+//    }
 
-        //nar.believe(Instance.make(oterm, clas));
-    }
-
-    protected void onInstanceOfClass(Term identifier, Term clas) {
-//        if (metadata) {
-//            nar.believe(metadataPriority, $.inst(identifier, clas),
-//                    Tense.ETERNAL,
-//                    metadataBeliefFreq, metadataBeliefConf);
-//        }
-    }
+//    protected void onInstanceOfClass(Term identifier, Term clas) {
+////        if (metadata) {
+////            nar.believe(metadataPriority, $.inst(identifier, clas),
+////                    Tense.ETERNAL,
+////                    metadataBeliefFreq, metadataBeliefConf);
+////        }
+//    }
 
     @Override
     protected void onInstanceChange(Term oterm, Term prevOterm) {
@@ -294,7 +294,7 @@ public class Lobjects extends DefaultTermizer implements Termizer, MethodHandler
             return co2;
         });
 
-        onInstanceOfClass(identifier, term(instance));
+        //onInstanceOfClass(identifier, term(instance));
 
         return wrappedInstance;
     }

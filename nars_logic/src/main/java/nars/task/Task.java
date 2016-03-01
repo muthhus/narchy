@@ -300,13 +300,6 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         return appendTo(sb, null);
     }
 
-    @NotNull
-    default Task name() {
-        return this;
-    }
-
-
-
     @Nullable
     default CharSequence toString(Memory memory, boolean showStamp) {
         return appendTo(new StringBuilder(), memory, showStamp);

@@ -27,10 +27,6 @@ public class Atom extends AtomicStringConstant {
         return hash;
     }
 
-    @Override
-    public final int complexity() {
-        return 1;
-    }
 
     @Override public final String toString() {
         return id;

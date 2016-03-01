@@ -28,11 +28,10 @@ public class VarPattern extends AbstractVariable {
         return Op.VAR_PATTERN;
     }
 
-
-    @Override
-    public int volume() {
-        return 1;
-    }
+//    @Override
+//    public int volume() {
+//        return 1;
+//    }
 
     /**
      * pattern variable hidden in the count 0

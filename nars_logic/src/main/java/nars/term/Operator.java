@@ -66,10 +66,6 @@ public final class Operator<T extends Term> extends AtomicStringConstant {
         return Op.OPERATOR;
     }
 
-    @Override
-    public int complexity() {
-        return 1;
-    }
 
     @NotNull
     @Override

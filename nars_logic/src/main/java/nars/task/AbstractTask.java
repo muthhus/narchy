@@ -97,12 +97,6 @@ public abstract class AbstractTask extends UnitBudget
         setOccurrenceTime(task.occurrence());
     }
 
-    @NotNull
-    @Override
-    public Task task() {
-        return this;
-    }
-
     void setTime(long creation, long occurrence) {
         this.creationTime = creation;
 
@@ -647,13 +641,6 @@ public abstract class AbstractTask extends UnitBudget
         return dereference(parentBelief);
     }
 
-
-
-    @NotNull
-    @Override
-    public final Task name() {
-        return this;
-    }
 
     @NotNull
     @Override
