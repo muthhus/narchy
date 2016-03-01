@@ -162,7 +162,7 @@ public class OperatorTest {
                 return null;
             }
         };
-        Terminal t = new Terminal();
+        Terminal t = new Terminal(16);
 
         Task matching = t.task("(x,y)!");
         f.apply(matching);
@@ -189,7 +189,7 @@ public class OperatorTest {
                 return null;
             }
         };
-        Terminal t = new Terminal();
+        Terminal t = new Terminal(16);
 
         Task matching = t.task("add(x,y,#x)?");
         f.apply(matching);

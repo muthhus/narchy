@@ -29,7 +29,7 @@ public class TermIndexTest {
     @Test
     public void testTaskTermSharing1() {
 
-        NAR t = new Terminal();
+        NAR t = new Terminal(16);
 
         String term = "<a --> b>.";
 
@@ -79,13 +79,12 @@ public class TermIndexTest {
 
 
     void testTermSharing(TermIndex tt) {
-        NAR n = new Terminal(tt, new FrameClock());
 
-        testShared(n, "<<x-->w> --> <y-->z>>");
-        testShared(n, "<a --> b>");
-        testShared(n, "(c, d)");
-        testShared(n, "<e <=> f>");
-        testShared(n, "g");
+        testShared(tt, "<<x-->w> --> <y-->z>>");
+        testShared(tt, "<a --> b>");
+        testShared(tt, "(c, d)");
+        testShared(tt, "<e <=> f>");
+        testShared(tt, "g");
 
         //tt.print(System.out);
         //System.out.println();
@@ -113,12 +112,12 @@ public class TermIndexTest {
         assertTrue(t1 != t2);
     }
 
-    private void testShared(NAR n, String s) {
-        TermIndex i = n.index;
+    private void testShared(TermIndex i, String s) {
+
         int t0 = i.size();
         int s0 = i.subtermsCount();
 
-        Term a = n.term(s); //create by parsing
+        Term a = i.the(s); //create by parsing
 
         int t1 = i.size();
         int s1 = i.subtermsCount();
@@ -129,7 +128,7 @@ public class TermIndexTest {
             assertTrue(s1 + " subterms indexed for " + t0 + " terms", s0 < s1);
         }
 
-        Term a2 = n.term(s); //create by parsing again
+        Term a2 = i.the(s); //create by parsing again
         testShared(a, a2);
 
         assertEquals(i.size(), t1 /* unchanged */);
@@ -138,7 +137,7 @@ public class TermIndexTest {
         //i.print(System.out); System.out.println();
 
         //create by composition
-        Compound b = n.term('(' + s + ')');
+        Compound b = i.the('(' + s + ')');
         testShared(a, b.term(0));
 
         assertEquals(i.size(), t1 + 1 /* one more for the product container */);

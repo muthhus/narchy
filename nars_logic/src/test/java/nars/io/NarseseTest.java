@@ -20,7 +20,7 @@ import static org.junit.Assert.*;
 
 public class NarseseTest {
 
-    static final NAR n = new Terminal();
+    static final NAR n = new Terminal(16);
     static final Narsese p = Narsese.the();
 
     static <T extends Term> T term(String s) throws Narsese.NarseseException {

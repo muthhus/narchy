@@ -143,7 +143,7 @@ public class NARTest {
 
     @Test public void testBeforeNextFrameOnlyOnce() {
         AtomicInteger b = new AtomicInteger(0);
-        NAR n = new Terminal();
+        NAR n = new Terminal(64);
 
         n.runLater(b::incrementAndGet);
         n.run(4);

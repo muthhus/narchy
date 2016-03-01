@@ -10,9 +10,12 @@ import nars.term.TermIndex;
 import nars.term.Termed;
 import nars.time.Clock;
 import nars.time.FrameClock;
+import nars.util.data.random.XORShiftRandom;
+import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -28,27 +31,16 @@ public class Terminal extends AbstractNAR {
     final Predicate<Task> taskFilter =
             Task::isCommand;
 
-    public Terminal(TermIndex termIndex, @NotNull Clock c) {
-        super(c, termIndex);
-
+    public Terminal(int capacity) {
+        this(capacity, new XORShiftRandom(1), new FrameClock());
+    }
+    public Terminal(int capacity, Random random, Clock c) {
+        super(c, new AbstractNAR.DefaultTermIndex(capacity, random), random);
         the("input", initInput());
-
     }
 
-    public Terminal() {
-        this(
-            new FrameClock()
-        );
-        //new RealtimeMSClock());
-    }
 
-    public Terminal(TermIndex i) {
-        this (i, new FrameClock());
-    }
 
-    public Terminal(@NotNull Clock c) {
-        this(new DefaultTermIndex(256), c);
-    }
 
     @Override
     protected Function<Term, Concept> newConceptBuilder() {

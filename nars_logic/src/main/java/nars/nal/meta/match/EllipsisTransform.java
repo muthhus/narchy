@@ -6,6 +6,7 @@ import nars.nal.meta.PremiseRule;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.transform.VariableNormalization;
+import nars.term.transform.subst.FindSubst;
 import nars.term.variable.AbstractVariable;
 import nars.term.variable.GenericVariable;
 import nars.term.variable.Variable;
@@ -49,7 +50,7 @@ public class EllipsisTransform extends EllipsisOneOrMore {
     }
 
     @NotNull
-    public EllipsisMatch collect(@NotNull Compound y, int a, int b, @NotNull PremiseEval subst) {
+    public EllipsisMatch collect(@NotNull Compound y, int a, int b, @NotNull FindSubst subst) {
         if (from == Op.Imdex && (y.op().isImage())) {
 
             int rel = y.relation();

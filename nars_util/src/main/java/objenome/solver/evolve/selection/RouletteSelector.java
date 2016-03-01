@@ -22,6 +22,7 @@
 package objenome.solver.evolve.selection;
 
 import nars.util.data.random.XORShiftRandom;
+import nars.util.data.random.XorShift128PlusRandom;
 import objenome.goal.DoubleFitness;
 import objenome.solver.evolve.*;
 
@@ -34,7 +35,7 @@ import java.util.Random;
  */
 public class RouletteSelector extends AbstractSelector {
 
-    static final Random rng = XORShiftRandom.global;
+    static final Random rng = new XorShift128PlusRandom(1);
 
     /**
      * The individuals' selection probabilities.

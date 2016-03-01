@@ -24,7 +24,7 @@ public class VariableTransformationTest {
     public void testDestructiveNormalization() {
         String t = "<$x --> y>";
         String n = "($1-->y)";
-        NAR nar = new Terminal();
+        NAR nar = new Terminal(32);
         Term x = nar.term(t);
         assertEquals(n, x.toString());
         //assertTrue("immediate construction of a term from a string should automatically be normalized", x.isNormalized());
@@ -50,7 +50,7 @@ public class VariableTransformationTest {
     @Test public void varNormTestIndVar() {
         //<<($1, $2) --> bigger> ==> <($2, $1) --> smaller>>. gets changed to this: <<($1, $4) --> bigger> ==> <($2, $1) --> smaller>>. after input
 
-        NAR n = new Terminal();
+        NAR n = new Terminal(16);
 
         String t = "<<($1, $2) --> bigger> ==> <($2, $1) --> smaller>>";
 

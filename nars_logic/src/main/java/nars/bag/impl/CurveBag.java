@@ -143,7 +143,11 @@ public class CurveBag<V> implements Bag<V> {
             end = ss;
         } else {
             //shift upward by the radius to be fair about what is being sampled. to start from the sample index is biased against lower ranked items because they will be selected in increasing values
-            begin = sampleIndex(ss,n);
+            int b = sampleIndex();
+            if (b + n > ss) {
+                b = ss - n;
+            }
+            begin = b;
             end = begin + n;
         }
 
@@ -436,34 +440,31 @@ public class CurveBag<V> implements Bag<V> {
      * maps y in 0..1.0 to an index in [0..size). as if window=1
      */
     static int index(float y, int size) {
-        //size--;
+        size--;
 
-        int i =
-                //Math.round(y * size);
-                (int)Math.floor(y * size);
-
-        if (i > size) return size;
-        //else if (i < 0) return 0;
-        else return i;
+        return Math.max(Math.min(
+            Math.round(y * size - 0.5f),
+            size), 0);
     }
-    /**
-     * maps y in 0..1.0 to an index in [0..size). fairly for a window of size N (>1, <S)
-     * THIS STILL NEEDS WORK
-     */
-    static int index(float y, int size, int window) {
-
-        /** effective size for sliding around the window within the prioritization */
-        int es = (size - 1) -  window;
 
 
-
-        //float slotRad = 0.5f / es;
-        int i = (int)Math.floor(y * es) - window/2;
-
-        if (i > size) return size;
-        if (i < 0) return 0;
-        else return i;
-    }
+//    /**
+//     * maps y in 0..1.0 to an index in [0..size). fairly for a window of size N (>1, <S)
+//     * THIS STILL NEEDS WORK
+//     */
+//    static int index(float y, int size, int window) {
+//
+//        /** effective size for sliding around the window within the prioritization */
+//        int es = (size - 1);// -  window;
+//
+//
+//        //float slotRad = 0.5f / es;
+//        int i = (int)Math.floor(y * es);// - window/2;
+//
+//        if (i >= es) return es;
+//        if (i < 0) return 0;
+//        else return i;
+//    }
 
     @Override
     public float getPriorityMin() {
@@ -479,10 +480,10 @@ public class CurveBag<V> implements Bag<V> {
         return index( sampleNormalized(s), s );
     }
 
-    public final int sampleIndex(int size, int window) {
-        return index( sampleNormalized(size), size, window );
-
-    }
+//    public final int sampleIndex(int size, int window) {
+//        return index( sampleNormalized(size), size, window );
+//
+//    }
 
 //    /** provides a next index to sample from */
 //    public final int sampleIndexUnnormalized(int s) {
@@ -500,15 +501,12 @@ public class CurveBag<V> implements Bag<V> {
     public final float sampleNormalized(int s) {
         if (s <= 1) return 0;
 
-        float min = getPriorityMin();
-        float max = getPriorityMax();
-        float dynamicality = (max-min);
+        float dynamicRange = (getPriorityMax() - getPriorityMin());
         float uniform = random.nextFloat();
+        float curved = this.curve.valueOf(uniform);
 
-        float normalized = ((1f-dynamicality) * uniform) +
-                           (dynamicality * this.curve.valueOf(uniform));
-
-        return normalized;
+        return ((1f-dynamicRange) * uniform) +
+               (dynamicRange * curved);
     }
 
 

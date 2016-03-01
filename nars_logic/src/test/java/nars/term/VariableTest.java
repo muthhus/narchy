@@ -15,7 +15,6 @@ import static org.junit.Assert.*;
  */
 public class VariableTest {
 
-    Terminal t = new Terminal();
 
     static final Narsese p = Narsese.the();
 

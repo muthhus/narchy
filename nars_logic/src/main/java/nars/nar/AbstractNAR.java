@@ -49,8 +49,8 @@ import java.util.function.Function;
 public abstract class AbstractNAR extends NAR {
 
 
-    public AbstractNAR(Clock clock, TermIndex index) {
-        this(clock, index, new XorShift128PlusRandom(1), Global.DEFAULT_SELF);
+    public AbstractNAR(Clock clock, TermIndex index, Random random) {
+        this(clock, index, random, Global.DEFAULT_SELF);
     }
 
     public AbstractNAR(Clock clock, TermIndex index, Random rng, @NotNull Atom self) {
@@ -332,9 +332,9 @@ public abstract class AbstractNAR extends NAR {
 
     public static class DefaultTermIndex extends MapIndex2 implements TermIndex {
 
-        public DefaultTermIndex(int capacity) {
+        public DefaultTermIndex(int capacity, Random random) {
             super(new UnifriedMap(capacity),
-                  new DefaultConceptBuilder(new XORShiftRandom(2), 32, 32));
+                  new DefaultConceptBuilder(random, 32, 32));
 
         }
 

@@ -84,6 +84,12 @@ public class NAL4Test extends AbstractNALTest {
     }
 
     @Test
+    public void structural_transformation5_extended2c() {
+        TestNAR tester = test();
+        tester.believe("<(\\,neutralization,_,acid,base,reaction) --> substance>", 1.0f, 0.9f);
+        tester.mustBelieve(CYCLES, "<neutralization --> (substance,acid,base,reaction)>", 1.0f, 0.9f);
+    }
+    @Test
     public void structural_transformation5_extended2a()  {
         TestNAR tester = test();
         tester.believe("<(\\,neutralization,substance,_,base,reaction) --> acid>",1.0f,0.9f);
@@ -93,7 +99,14 @@ public class NAL4Test extends AbstractNALTest {
     public void structural_transformation5_extended2b()  {
         TestNAR tester = test();
         tester.believe("<(\\,neutralization,substance,acid,_,reaction) --> base>",1.0f,0.9f);
-        tester.mustBelieve(CYCLES*2, "<neutralization --> (substance,acid,base,reaction)>", 1.0f, 0.9f);
+        tester.mustBelieve(CYCLES, "<neutralization --> (substance,acid,base,reaction)>", 1.0f, 0.9f);
+    }
+
+    @Test
+    public void structural_transformation5_extended2d()  {
+        TestNAR tester = test();
+        tester.believe("<(\\,neutralization,substance,acid,base,_) --> reaction>",1.0f,0.9f);
+        tester.mustBelieve(CYCLES, "<neutralization --> (substance,acid,base,reaction)>", 1.0f, 0.9f);
     }
 
     @Test
@@ -215,14 +228,15 @@ public class NAL4Test extends AbstractNALTest {
 //                1f, 1f, 0.1f, 1f);
 //        tester.run(true);
 //    }
-    @Test public void missingEdgeCase2() {
-        //((<(%1) --> %2>, %2), (<%2 --> (/, %1, _)>, (<Identity --> Truth>, <Identity --> Desire>)))
-        //  ((<(p1) --> p2>, p2), (<p2 --> (/, p1, _)>, (<Identity --> Truth>, <Identity --> Desire>)))
-        RuleTest.get(test(),
-                "<(p1) --> belief:p2>.", "belief:p2.",
-                "<belief:p2 --> (/, _, p1)>.",
-                1.0f, 1.0f, 0.9f, 0.9f);
-    }
+
+//    @Test public void missingEdgeCase2() {
+//        //((<(%1) --> %2>, %2), (<%2 --> (/, %1, _)>, (<Identity --> Truth>, <Identity --> Desire>)))
+//        //  ((<(p1) --> p2>, p2), (<p2 --> (/, p1, _)>, (<Identity --> Truth>, <Identity --> Desire>)))
+//        RuleTest.get(test(),
+//                "<(p1) --> belief:p2>.", "belief:p2.",
+//                "<belief:p2 --> (/, _, p1)>.",
+//                1.0f, 1.0f, 0.9f, 0.9f);
+//    }
 
 
     @Test public void missingEdgeCase3() {
@@ -234,13 +248,13 @@ public class NAL4Test extends AbstractNALTest {
                 1.0f, 1.0f, 0.9f, 0.9f);
     }
 
-    @Test public void missingEdgeCase4() {
-        //((<%1 --> (%2)>, %1), (<(\, %2, _) --> %1>, (<Identity --> Truth>, <Identity --> Desire>)))
-        RuleTest.get(test(),
-                "<belief:p1 --> (p2)>.", "belief:p1.",
-                "<(\\, _, p2) --> belief:p1>.",
-                1.0f, 1.0f, 0.9f, 0.9f);
-    }
+//    @Test public void missingEdgeCase4() {
+//        //((<%1 --> (%2)>, %1), (<(\, %2, _) --> %1>, (<Identity --> Truth>, <Identity --> Desire>)))
+//        RuleTest.get(test(),
+//                "<belief:p1 --> (p2)>.", "belief:p1.",
+//                "<(\\, _, p2) --> belief:p1>.",
+//                1.0f, 1.0f, 0.9f, 0.9f);
+//    }
 
     @Test public void missingEdgeCase5() {
         //((<%1 --> (%2)>, %2), (<(\, %1, _) --> %2>, (<Identity --> Truth>, <Identity --> Desire>)))

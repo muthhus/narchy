@@ -191,18 +191,20 @@ public class CurveBagTest  {
         System.out.println(f.getSampleStats().toString().replace("\n"," "));
         f.getBinStats().forEach(
                 s -> {
-                    if (s.getN() > 0) System.out.println(
+                    /*if (s.getN() > 0)*/ System.out.println(
                             s.getMin() + ".." + s.getMax() + ":\t" + s.getN());
                 }
         );
     }
 
-
     private EmpiricalDistribution getSamplingDistribution(CurveBag b, int n) {
+        return getSamplingDistribution(b, n, 10);
+    }
+    private EmpiricalDistribution getSamplingDistribution(CurveBag b, int n, int bins) {
         DoubleArrayList f = new DoubleArrayList(n);
         for (int i = 0; i < n; i++)
             f.add( b.sampleIndex() );
-        EmpiricalDistribution e =new EmpiricalDistribution(10 /* bins */);
+        EmpiricalDistribution e =new EmpiricalDistribution(bins);
         e.load(f.toArray());
         return e;
     }
@@ -270,6 +272,30 @@ public class CurveBagTest  {
 
         return a;
 
+    }
+
+    @Test public void testFlatBagRemainsRandom() {
+        Random rng = new XorShift128PlusRandom(1);
+        int n = 8;
+
+        float level = 0.04f;
+
+        CurveBag<String> a = new CurveBag(n, rng);
+
+        for (int i = 0; i < n; i++) {
+            a.put("x" + i, new UnitBudget(level, 0.5f, 0.5f));
+        }
+
+        assertEquals(a.getPriorityMin(), level, 0.01f);
+        assertEquals(a.getPriorityMin(),a.getPriorityMax(),0.01f);
+
+        int rrr = 100;
+        EmpiricalDistribution d = getSamplingDistribution(a, n * rrr, n-1);
+        //printDist(d);
+        for (int i = 0; i < n-1; i++) {
+            long bi = d.getBinStats().get(i).getN();
+            assertTrue("bin " + i + " sampled x " + bi, bi > (rrr/2)); //received enough samples
+        }
     }
 
 

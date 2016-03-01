@@ -387,6 +387,7 @@ public abstract class FindSubst extends Versioning implements Subst {
 
 
                 if (n != Y) {
+
                     //the indicated term should be inserted
                     //at the index location of the image
                     //being processed. (this is the opposite

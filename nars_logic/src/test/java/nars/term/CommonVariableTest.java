@@ -17,7 +17,7 @@ import static junit.framework.Assert.assertEquals;
  */
 public class CommonVariableTest {
 
-    static final Terminal p = new Terminal();
+    static final Terminal p = new Terminal(32);
 
     static final GenericVariable p1 = new GenericVariable(Op.VAR_PATTERN, "1");
     static final GenericVariable p2 = new GenericVariable(Op.VAR_PATTERN, "2");

@@ -15,9 +15,8 @@ import org.jetbrains.annotations.Nullable;
 public class PatternIndex extends AbstractNAR.DefaultTermIndex {
 
     public PatternIndex() {
-        super(512);
+        super(512, null /* no randomness need be involved */);
     }
-
 
     @Override
     protected

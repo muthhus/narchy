@@ -13,7 +13,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class TermIDTest {
 
-    static final NAR nar = new Terminal();
+    static final NAR nar = new Terminal(8);
 
 
     /* i will make these 3 pass soon, this is an improvement on the representation

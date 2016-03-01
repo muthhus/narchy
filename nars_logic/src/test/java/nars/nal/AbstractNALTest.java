@@ -51,7 +51,7 @@ public abstract class AbstractNALTest {
 
     public static Iterable<Supplier<NAR>> terminal() {
         return Lists.newArrayList(
-            new Supplier[] {supply("Terminal", Terminal::new)}
+            new Supplier[] {supply("Terminal", ()->new Terminal(128))}
         );
     }
 

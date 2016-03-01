@@ -64,9 +64,13 @@ public class Default extends AbstractNAR {
 //    }
 
     public Default(int activeConcepts, int conceptsFirePerCycle, int taskLinksPerConcept, int termLinksPerConcept) {
+        this(activeConcepts, conceptsFirePerCycle, taskLinksPerConcept, termLinksPerConcept, new XorShift128PlusRandom(1));
+    }
+
+    public Default(int activeConcepts, int conceptsFirePerCycle, int taskLinksPerConcept, int termLinksPerConcept, Random random) {
         super(new FrameClock(),
-                new DefaultTermIndex(256),
-                new XorShift128PlusRandom(1),
+                new DefaultTermIndex(256, random),
+                random,
                 Global.DEFAULT_SELF);
 
         the("input", input = initInput());
@@ -504,8 +508,11 @@ public class Default extends AbstractNAR {
             PremiseGenerator pg = this.premiser;
 
             for (int i = 0, fSize = f.size(); i < fSize; i++) {
+                BLink<Concept> nextConcept = f.get(i);
+                if (nextConcept == null)
+                    throw new NullPointerException();
                 pg.firePremiseSquared(
-                        f.get(i),
+                        nextConcept,
                         tasklinksToFire,
                         termlnksToFire,
                         termLinkForget,

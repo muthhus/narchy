@@ -42,7 +42,7 @@ public class TermTest {
         Global.DEBUG = true;
     }
 
-    NAR n = new Terminal();
+    NAR n = new Terminal(16);
 
     public static Term imageInt(Term... x) {
         return the(IMAGE_INT, x);
@@ -180,7 +180,7 @@ public class TermTest {
 
     @Test
     public void testUnconceptualizedTermInstancing() throws Narsese.NarseseException {
-        NAR n = new Terminal();
+        NAR n = new Terminal(7);
 
         String term1String = "<a --> b>";
         Term term1 = n.term(term1String);
@@ -265,7 +265,7 @@ public class TermTest {
 
         String t = "($1-->({place4}~$1))";
 
-        NAR n = new Terminal();
+        NAR n = new Terminal(8);
 
 
         try {
@@ -314,7 +314,7 @@ public class TermTest {
     @Test
     public void testParseOperationInFunctionalForm() {
 
-        NAR n = new Terminal();
+        NAR n = new Terminal(8);
 
         assertFalse(Op.isOperation(n.term("(a,b)")));
         assertFalse(Op.isOperation(n.term("^wonder")));
@@ -365,7 +365,7 @@ public class TermTest {
 
     @Test
     public void termEqualityWithQueryVariables() {
-        NAR n = new Terminal();
+        NAR n = new Terminal(8);
         String a = "<?1-->bird>";
         assertEquals(n.term(a), n.term(a));
         String b = "<bird-->?1>";
@@ -528,7 +528,7 @@ public class TermTest {
 
     @Test
     public void testTermComplexityMass() {
-        NAR n = new Terminal();
+        NAR n = new Terminal(8);
 
         testTermComplexityMass(n, "x", 1, 1);
 
@@ -739,7 +739,7 @@ public class TermTest {
         assertNotEquals("structure code influenced contentHash",
                 b.hashCode(), a.hashCode());
 
-        NAR n = new Terminal();
+        NAR n = new Terminal(8);
         Compound x3 = n.term('<' + i1 + " --> z>");
         Compound x4 = n.term('<' + i1 + " --> z>");
 

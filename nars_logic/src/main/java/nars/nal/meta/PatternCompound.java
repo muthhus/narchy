@@ -66,10 +66,15 @@ abstract public class PatternCompound extends GenericCompound {
 
             if (e instanceof EllipsisOneOrMore) {
 
-                //since ellipsisTransform instanceof EllipsisOneOrMore
-                if ((volCached > y.volume()) ||
-                        (!ellipsisTransform && (relation != y.relation())))
-                    return false;
+                if (!ellipsisTransform) {
+                    if (relation != y.relation())
+                        return false;
+                }
+
+//                //since ellipsisTransform instanceof EllipsisOneOrMore
+//                if ((volCached > y.volume()) ||
+//                        (!ellipsisTransform && (relation != y.relation())))
+//                    return false;
             }
 
             return true;
