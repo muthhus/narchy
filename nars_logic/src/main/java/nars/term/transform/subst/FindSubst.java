@@ -403,16 +403,15 @@ public abstract class FindSubst extends Versioning implements Subst {
 
                     return false;
 
-                } else {
+                } //else {
 
-                    //resolving may be possible to defer to substitution if
-                    //Y and et.from are components of ImageShrinkEllipsisMatch
 
-                    imageIndex = Y.indexOf(n);
+                imageIndex = Y.indexOf(n);
+                if (imageIndex!=-1)
 
-                }
-                return (matchEllipsedLinear(X, e, Y)) &&
-                        replaceXY(e, ImageMatch.take((EllipsisMatch) term(e), imageIndex));
+                    //}
+                    return (matchEllipsedLinear(X, e, Y)) &&
+                            replaceXY(e, ImageMatch.take((EllipsisMatch) term(e), imageIndex));
 
             }
             return false;

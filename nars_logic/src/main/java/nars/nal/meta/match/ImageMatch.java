@@ -51,7 +51,8 @@ public enum ImageMatch /*extends ArrayEllipsisMatch<Term>*/ {
             //mask the relation term where found
             t2 = new Term[l];
             for (Term x : t) {
-                t2[j++] = (j == relOffset) ? Imdex : x;
+                t2[j] = (j == relOffset) ? Imdex : x;
+                j++;
             }
         }
 

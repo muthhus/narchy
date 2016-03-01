@@ -243,8 +243,8 @@ public class CurveBagTest  {
 
         System.out.println(ratioUniform + " "  + ratioFlat);
 
-        assertTrue(ratioUniform > 4); //should be ideally ~10
-        assertTrue(ratioFlat < 4); //should be ideally ~1
+        assertTrue(ratioUniform > 7); //should be ideally ~10
+        assertTrue(ratioFlat < 6); //should be ideally ~1
 
     }
 

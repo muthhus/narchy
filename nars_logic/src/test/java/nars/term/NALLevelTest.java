@@ -27,7 +27,7 @@ public class NALLevelTest {
         assertEquals(1, n1.nal());
 
         NAR n8 = new Default();
-        n1.nal(8);
+        n8.nal(8);
         EventCount n8Count = new EventCount(n8);
 
         String productSentence = "<(a,b) --> c>.\n<c <-> a>?\n";
