@@ -2,6 +2,7 @@ package nars.concept;
 
 import com.sun.jna.WeakIdentityHashMap;
 import nars.NAR;
+import nars.bag.BLink;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
 import nars.task.Task;
@@ -38,7 +39,8 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
 
     public static final Logger logger = LoggerFactory.getLogger(AbstractConcept.class);
 
-    public static final void linkTerm(@NotNull Concept source, @NotNull Concept target,
+    /** returns overflow of the outgoing component only; the incoming component will accumulate in its buffer until it is drained by a similar operation by its concept */
+    public static final float linkTerm(@NotNull Concept source, @NotNull Concept target,
                                       @NotNull Budgeted b, float subScale, boolean out, boolean in) {
 
         /*if (logger.isDebugEnabled())
@@ -47,14 +49,27 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
         if (source == target)
             throw new RuntimeException("termlink self-loop");
 
+        if (in && out) {
+            subScale /= 2; //divide among both directions
+        }
+
+        float overflow = 0;
+
         /** activate local's termlink to template */
-        if (out)
-            source.termlinks().put(target, b, subScale);
+        if (out) {
+            BLink<Termed> ol = source.termlinks().put(target, b, subScale);
+            if (ol!=null)
+                overflow += ol.drain();
+        }
 
         /** activate (reverse) template's termlink to local */
-        if (in)
-            target.termlinks().put(source, b, subScale);
+        if (in) {
+            BLink<Termed> il = target.termlinks().put(source, b, subScale);
+            /*if (il!=null)
+                overflow += il.drain();*/
+        }
 
+        return overflow;
     }
 
 

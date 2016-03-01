@@ -645,8 +645,31 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
             }
 
             if (subScale >= minScale) {
+                float sumOver = 0;
+                int numUnder = 0;
                 for (int i = 0; i < numTemplates; i++) {
-                    linkTemplate(b, templates.get(i), subScale, nar);
+                    float overflow = linkTemplate(b, templates.get(i), subScale, nar);
+                    if (overflow == 0) {
+                        numUnder++;
+                    } else {
+                        sumOver += overflow;
+                    }
+                }
+
+                //logger.debug("{} link: {} budget overflow {}", this, b, overflow);
+
+                //redistribute overflow to termlink templates:
+                if ((sumOver > 0) && (numUnder > 0)) {
+
+                    /** the last visited termlink will have the opportunity to receive the biggest bonus,
+                     *  so ordering the templates by volume could allow the most complex ones to receive the most bonus */
+                    for (int i = 0; i < numTemplates; i++) {
+                        sumOver += linkTemplate(b, templates.get(i),
+                                sumOver / (numUnder--), nar);
+
+                        if (numUnder == 0) break; //finished
+                    }
+
                 }
             }
 
@@ -656,12 +679,13 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
         return false;
     }
 
-    public void linkTemplate(@NotNull Budgeted task, Termed template, float subScale, @NotNull NAR nar) {
+    /** returns overflow amount of the outward template only */
+    float linkTemplate(@NotNull Budgeted task, Termed template, float subScale, @NotNull NAR nar) {
         Concept target = nar.conceptualize(template, task, subScale);
         assert(target!=null);
 
         //2. Link the peer termlink bidirectionally
-        linkTerm(this, target, task, subScale, true, true);
+        return linkTerm(this, target, task, subScale, true, true);
     }
 
     @Nullable @Override

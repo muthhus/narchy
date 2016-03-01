@@ -72,7 +72,8 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
 
     protected final void merge(BLink<V> target, Budgeted incoming, float scale) {
         float overflow = mergeFunction.merge(target, incoming, scale);
-
+        if (overflow > 0)
+            target.charge(overflow);
     }
 
     private Budget getDefaultBudget(V v) {

@@ -201,6 +201,19 @@ public final class BLink<X> extends Budget implements Link<X> {
 //        return nonZero(b[3]) || nonZero(b[4]) || nonZero(b[5]);
     }
 
+    public void charge(float overflow) {
+        assert(overflow > 0);
+        b[6] += overflow;
+    }
+    public float drain() {
+        float[] b = this.b;
+        float o = b[6];
+        if (o > 0) {
+            b[6] = 0; //clear
+        }
+        return o;
+    }
+
 //    static boolean nonZero(float x) {
 //        //return (Math.abs(x) > Global.BUDGET_EPSILON);
 //        return x!=0f;

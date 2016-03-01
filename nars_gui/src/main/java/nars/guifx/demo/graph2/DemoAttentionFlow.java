@@ -14,6 +14,7 @@ import nars.concept.Concept;
 import nars.guifx.demo.AbstractNARGraphDemo;
 import nars.nar.Default;
 import nars.task.MutableTask;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 
@@ -102,11 +103,15 @@ public class DemoAttentionFlow extends AbstractNARGraphDemo {
         n.perfection.setValue(0);
 
 
-        IntToObjectFunction<Termed> tt = (i) -> $.$("a:" + i);
+        IntToObjectFunction<Termed> tt = (i) ->
+                //$.$("a:" + i);
+                $.$("a" + i + ":b" + i); //dstinct
+                //$.$("a" + i);
+
         int chainSize = 16;
         Twin<Termed> ends = addTermLinkChain(n, chainSize, tt, true,false);
         n.forEachConcept(c->c.print());
-        n.log();
+        //n.log();
 
         n.step();
 
@@ -143,7 +148,7 @@ public class DemoAttentionFlow extends AbstractNARGraphDemo {
 
         int time = 10;
         for (int i = 0; i < time; i++) {
-            printState(n, tt, chainSize);
+            //printState(n, tt, chainSize);
             n.step();
         }
     }
@@ -156,10 +161,16 @@ public class DemoAttentionFlow extends AbstractNARGraphDemo {
     }
 
     protected static void fire(NAR n, Termed t) {
-        n.input(
-                new MutableTask(t).belief().budget(
-                        new UnitBudget(1f, 0.5f, 0.5f) ).present(n)
-        );
+        UnitBudget b = new UnitBudget(1f, 0.5f, 0.5f);
+
+        if (t instanceof Compound) {
+            n.input(
+                    new MutableTask(t).belief().budget(
+                            b).present(n)
+            );
+        } else {
+            n.conceptualize(t, b);
+        }
 
     }
 }
