@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static nars.op.sys.scheme.DefaultEnvironment.load;
+import static nars.op.sys.scheme.expressions.Expression.NONE;
 
 
 public class scheme extends TermFunction {
@@ -78,7 +79,7 @@ public class scheme extends TermFunction {
                 //return Term.get("\"" + schemeObj.print() + "\"" );
                 //return Atom.the(Utf8.toUtf8(name));
 
-                return $.the(schemeObj.print());
+                return schemeObj == NONE ? null : $.the(schemeObj.print());
 
 //        int olen = name.length();
 //        switch (olen) {
@@ -111,11 +112,11 @@ public class scheme extends TermFunction {
         Term[] x = o.terms();
         Term code = x[0];
 
-        if (code instanceof Atom) {
+        if (code instanceof Atomic) {
             //interpret as eval string
             return schemeToNars.apply(
                 Evaluator.evaluate(
-                    load(((Atom)code).toStringUnquoted(), env), env)
+                    load(((Atomic)code).toStringUnquoted(), env), env)
             );
         }
 

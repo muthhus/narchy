@@ -149,7 +149,10 @@ public class TestNAR  {
         nar.believe(t, tense, f, c);
     }
 
-
+    public TestNAR log() {
+        nar.log();
+        return this;
+    }
 
 
     final class EarlyExit extends CycleReaction {

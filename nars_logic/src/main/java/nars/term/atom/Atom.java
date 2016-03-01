@@ -15,6 +15,9 @@ public class Atom extends AtomicStringConstant {
 
     public Atom(String id) {
 
+        if ((id == null) || (id.isEmpty()))
+            throw new UnsupportedOperationException("Empty Atom ID");
+
         this.id = id;
         this.hash = id.hashCode();
     }

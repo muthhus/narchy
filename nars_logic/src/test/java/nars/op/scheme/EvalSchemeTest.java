@@ -28,28 +28,23 @@ public class EvalSchemeTest extends AbstractNALTest {
     @Test
     public void testSharedSchemeNALRepresentations() {
 
-        TestNAR t = test();
-        t.nar.log();
-        t.nar.input("scheme(\"" + factorialFunc + "\", #y)!");
-        t.nar.run(1);
-        t.nar.input("scheme(\"factorial\", #x)!");
-        t.nar.run(1);
-        t.nar.input("scheme(\"" + factorialTest + "\", #y)!");
-        t.nar.run(1);
+        String defineFactorial = "scheme(\"" + factorialFunc + "\", #y)!";
+
+        test()
+        //.log()
+        .inputAt(1, defineFactorial)
+        .inputAt(2, "scheme(\"factorial\", #x)!")
+        .inputAt(3, "scheme(\"" + factorialTest + "\", #y)!")
+        .mustBelieve(7, "(6-->(/,^scheme,\"(factorial 3)\",_))", 1f, 0.9f, 9);
 
     }
 
     @Test
     public void testCAR() {
 
-        TestNAR t = test();
-        t.nar.log();
-        t.nar.input("scheme((car, (quote, (2, 3))), #x)!");
-
-        t.run(4);
-
-        //assertTrue("test impl unfinished", false);
-        //tester.requires.add(new OutputContainsCondition(tester.nar, "<2 --> (/, scheme, (car, (quote, (2, 3))), _, SELF)>. :|: %1.00;0.99%", 1));
+        test()
+            .input("scheme((car, (quote, (2, 3))), #x)!")
+            .mustBelieve(4, "<2 --> (/, ^scheme, (car, (quote, (2, 3))), _)>", 1f, 0.9f, 3);
 
 
     }
