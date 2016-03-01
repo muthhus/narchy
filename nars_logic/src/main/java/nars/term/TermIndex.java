@@ -125,7 +125,7 @@ public interface TermIndex  {
         for (int i = 0; i < l; i++) {
             Term a = x[i];
             Termed b = the(a);
-            if ((a!=b) && b!=null && a.equals(b)) {
+            if ((a!=b) && b!=null/* && a.equals(b)*/) {
                 //different instance but still equal so replace it in the origin array, otherwise leave as-is
                 x[i] = b.term();
             }

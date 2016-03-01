@@ -73,7 +73,7 @@ public class DefaultConceptBuilder implements Function<Term,Concept> {
 
 
 
-    public DefaultConceptBuilder(Random r, int tasklinkBagSize, int termlinkBagSize) {
+    public DefaultConceptBuilder(@NotNull Random r, int tasklinkBagSize, int termlinkBagSize) {
 
         this.rng = r;
         this.taskLinkBagSize.setValue(tasklinkBagSize);

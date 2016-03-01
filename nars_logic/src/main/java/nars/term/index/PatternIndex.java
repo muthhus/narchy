@@ -6,6 +6,7 @@ import nars.nar.AbstractNAR;
 import nars.term.Compound;
 import nars.term.Termed;
 import nars.term.container.TermVector;
+import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 public class PatternIndex extends AbstractNAR.DefaultTermIndex {
 
     public PatternIndex() {
-        super(512, null /* no randomness need be involved */);
+        super(512, new XorShift128PlusRandom(1));
     }
 
     @Override

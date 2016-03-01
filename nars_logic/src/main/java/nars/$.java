@@ -87,9 +87,9 @@ public enum $ /* TODO: implements TermIndex */ {
     }
 
     @NotNull
-    public static Atom[] the(@NotNull String... id) {
+    public static Term[] the(@NotNull String... id) {
         int l = id.length;
-        Atom[] x = new Atom[l];
+        Term[] x = new Term[l];
         for (int i = 0; i < l; i++)
             x[i] = the(id[i]);
         return x;
@@ -569,16 +569,16 @@ public enum $ /* TODO: implements TermIndex */ {
         return the(o.toString(), true);
     }
 
-    private static final Atom[] digits = new Atom[10];
+    private static final Term[] digits = new Term[10];
 
     /** gets the atomic term of an integer, with specific radix (up to 36) */
     public static Atom the(int i, int radix) {
         //fast lookup for single digits
         if ((i >= 0) && (i <= 9)) {
-            Atom a = digits[i];
+            Term a = digits[i];
             if (a == null)
                 a = digits[i] = the(Integer.toString(i, radix));
-            return a;
+            return (Atom) a;
         }
         //return Atom.the(Utf8.toUtf8(name));
 

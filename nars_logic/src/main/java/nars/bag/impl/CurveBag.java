@@ -49,7 +49,7 @@ public class CurveBag<V> implements Bag<V> {
     }
 
 
-    public CurveBag(BagCurve curve, int capacity, Random rng) {
+    public CurveBag(BagCurve curve, int capacity, @NotNull Random rng) {
         this(new ArrayBag.BudgetedArraySortedIndex<>(capacity), curve, rng);
 
 
@@ -62,7 +62,7 @@ public class CurveBag<V> implements Bag<V> {
 
     }
 
-    public CurveBag(@NotNull SortedIndex<BLink<V>> items, BagCurve curve, Random rng) {
+    public CurveBag(@NotNull SortedIndex<BLink<V>> items, @NotNull BagCurve curve, @NotNull Random rng) {
         super();
         this.arrayBag
                 = new ArrayBag(items);
@@ -76,7 +76,7 @@ public class CurveBag<V> implements Bag<V> {
 
 
     @NotNull
-    public CurveBag<V> merge(BudgetMerge mergeFunction) {
+    public CurveBag<V> merge(@NotNull BudgetMerge mergeFunction) {
         arrayBag.merge(mergeFunction);
         return this;
     }
@@ -182,20 +182,20 @@ public class CurveBag<V> implements Bag<V> {
     }
 
     @Override
-    public BLink<V> remove(V key) {
+    public BLink<V> remove(@NotNull V key) {
         return arrayBag.remove(key);
     }
 
 
     @Nullable
     @Override
-    public final BLink<V> put(V v, Budgeted vBagBudget, float scale) {
+    public final BLink<V> put(@NotNull V v, @NotNull Budgeted vBagBudget, float scale) {
         return arrayBag.put(v, vBagBudget, scale);
     }
 
 
     @Nullable
-    @Override public BLink<V> put(V v) {
+    @Override public BLink<V> put(@NotNull V v) {
         BLink<V> existing = get(v);
         return (existing != null) ?
                 existing :
@@ -203,7 +203,7 @@ public class CurveBag<V> implements Bag<V> {
     }
 
     @NotNull
-    protected BLink<V> getDefaultBudget(V v) {
+    protected BLink<V> getDefaultBudget(@NotNull V v) {
         return new BLink(v, 0,0,0);
     }
 

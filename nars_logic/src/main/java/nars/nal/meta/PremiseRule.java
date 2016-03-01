@@ -640,34 +640,29 @@ public class PremiseRule extends GenericCompound {
     /**
      * for each calculable "question reverse" rule,
      * supply to the consumer
+     *
+     * ex:
+     * (A --> B), (B --> C), not_equal(A,C) |- (A --> C), (Truth:Deduction, Desire:Strong, Derive:AllowBackward)
+     * 1. Deriving of backward inference rules, since Derive:AllowBackward it allows deriving:
+     (A --> B), (A --> C), not_equal(A,C), task("?") |- (B --> C), (Truth:Deduction, Desire:Strong, Derive:AllowBackward)
+     (A --> C), (B --> C), not_equal(A,C), task("?") |- (A --> B), (Truth:Deduction, Desire:Strong, Derive:AllowBackward)
+     so each premise gets exchanged with the conclusion in order to form a own rule,
+     additionally task("?") is added to ensure that the derived rule is only used in backward inference.
+
      */
-    public final void forEachQuestionReversal(@NotNull BiConsumer<PremiseRule, String> w) {
+    public final void backwardPermutation(@NotNull BiConsumer<PremiseRule, String> w) {
 
-        //String s = w.toString();
-        /*if(s.contains("task(\"?") || s.contains("task(\"@")) { //these are backward inference already
-            return;
-        }
-        if(s.contains("substitute(")) { //these can't be reversed
-            return;
-        }*/
+        Term T = getTaskTermPattern(); //Task
+        Term B = getBeliefTermPattern(); //Belief
+        Term C = getConclusionTermPattern(); //Conclusion
 
-//        if(!allowBackward) { //explicitely stated in the rules now
-//            return;
-//        }
+        // C, B, [pre], task_is_question() |- T, [post]
+        PremiseRule clone1 = clonePermutation(C, B, T, true);
+        w.accept(clone1, "C,B,question |- B");
 
-        // T, B, [pre] |- C, [post] ||--
-
-        Term T = getTaskTermPattern();
-        Term B = getBeliefTermPattern();
-        Term C = getConclusionTermPattern();
-
-        //      C, B, [pre], task_is_question() |- T, [post]
-        PremiseRule clone1 = clone(C, B, T, true);
-        w.accept(clone1, "C,B,[pre],question |- T,[post]");
-
-        //      C, T, [pre], task_is_question() |- B, [post]
-        PremiseRule clone2 = clone(C, T, B, true);
-        w.accept(clone2, "C,T,[pre],question |- B,[post]");
+        // T, C, [pre], task_is_question() |- B, [post]
+        PremiseRule clone2 = clonePermutation(T, C, B, true);
+        w.accept(clone2, "T,C,question |- B");
 
     }
 
@@ -686,6 +681,11 @@ public class PremiseRule extends GenericCompound {
     /**
      * for each calculable "question reverse" rule,
      * supply to the consumer
+     *
+     2. Deriving of forward inference rule by swapping the premises since !s.contains("task(") && !s.contains("after(") && !s.contains("measure_time(") && !s.contains("Structural") && !s.contains("Identity") && !s.contains("Negation"):
+     (B --> C), (A --> B), not_equal(A,C) |- (A --> C), (Truth:Deduction, Desire:Strong, Derive:AllowBackward)
+     *
+     * after generating, these are then backward permuted
      */
     @NotNull
     public final PremiseRule forwardPermutation() {
@@ -699,13 +699,13 @@ public class PremiseRule extends GenericCompound {
         ////      B, T, [pre], task_is_question() |- T, [post]
         //      B, T, [pre], task_is_question() |- C, [post]
 
-        return clone(B, T, C, false);
+        return clonePermutation(B, T, C, false);
     }
 
     static final Term TaskQuestionTerm = exec("task", "\"?\"");
 
     @NotNull
-    private PremiseRule clone(Term newT, Term newB, Term newR, boolean question) {
+    private PremiseRule clonePermutation(Term newT, Term newB, Term newR, boolean question) {
 
         Map<Term, Term> m = new HashMap(3);
         m.put(getTaskTermPattern(), newT);

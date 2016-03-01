@@ -286,26 +286,7 @@ public class PremiseRuleSet  {
 
                 PremiseRule preNorm = new PremiseRule((Compound) prt);
 
-                PremiseRule r = add(ur, preNorm, src, index);
-
-                if (r.allowBackward) {
-
-                    //System.err.println("r: " + r);
-
-                    BiConsumer<PremiseRule, String> eachQuestion = (q, reason) ->
-                            //System.err.println("  q: " + q + " " + reason);
-                            add(ur, q, src + "//" + reason, index);
-
-                    r.forEachQuestionReversal(eachQuestion);
-
-                    PremiseRule f = r.forwardPermutation();
-                    //System.err.println("  f: " + f);
-
-                        //addQuestions(ur, f, src, index);
-                    f.forEachQuestionReversal(eachQuestion);
-
-                    add(ur, f, src, index);
-                }
+                permute(index, ur, src, preNorm);
 
 
             } catch (Exception ex) {
@@ -314,6 +295,60 @@ public class PremiseRuleSet  {
         });
 
         return ur;
+    }
+
+    public static Set<PremiseRule> permute(PremiseRule preNorm) {
+        return permute(new PatternIndex(), Global.newHashSet(1), "", preNorm);
+    }
+
+    public static Set<PremiseRule> permute(@NotNull PatternIndex index, Set<PremiseRule> ur, String src, PremiseRule preNorm) {
+        PremiseRule r = add(ur, preNorm, src, index);
+
+
+        if (forwardPermutes(r)) {
+            permuteForward(index, ur, src, r, r.allowBackward);
+        }
+
+        if (r.allowBackward) {
+
+            //System.err.println("r: " + r);
+
+            r.backwardPermutation((q, reason) -> {
+                //System.err.println("  q: " + q + " " + reason);
+
+                PremiseRule b = add(ur, q, src + ":" + reason, index);
+                if (forwardPermutes(b)) {
+                    permuteForward(index, ur, src, b, r.allowBackward);
+                }
+            });
+        }
+        return ur;
+    }
+
+    public static void permuteForward(@NotNull PatternIndex index, Set<PremiseRule> ur, String src, PremiseRule b, boolean thenBackward) {
+        PremiseRule f = add(ur, b.forwardPermutation(), src + ":forward", index);
+        if (thenBackward) {
+            f.backwardPermutation((s, reasonBF) -> {
+                add(ur, s, src + ':' + reasonBF, index);
+            });
+        }
+    }
+
+    /** whether a rule will be forward permuted */
+    private static boolean forwardPermutes(PremiseRule r) {
+        boolean[] fwd = new boolean[] { true };
+        r.recurseTerms((s,c) -> {
+            if (!fwd[0]) return; //already disqualified
+
+            String x = s.toString();
+            if (x.contains("task("))
+                fwd[0] = false;
+
+            //!s.contains("task(") && !s.contains("after(") && !s.contains("measure_time(") && !s.contains("Structural") && !s.contains("Identity") && !s.contains("Negation"):
+
+            //...
+        });
+        return fwd[0];
     }
 
 //    private static void addQuestions(@NotNull Collection<PremiseRule> target, @NotNull PremiseRule r, String src, @NotNull PatternIndex patterns) {
@@ -328,11 +363,12 @@ public class PremiseRuleSet  {
 //        if (q == null)
 //            throw new RuntimeException("null: " + q + ' ' + src);
 
-        q = q.normalizeRule(index).setup(index);
-        q.setSource(src);
-        target.add(q);
-        return q;
+        PremiseRule normalized = q.normalizeRule(index).setup(index);
+        normalized.setSource(src);
+        target.add(normalized);
+        return normalized;
     }
+
     private static final Pattern spacePattern = Pattern.compile(" ", Pattern.LITERAL);
 
 

@@ -31,7 +31,7 @@ public class AtomConcept<E extends Atomic> extends AbstractConcept<E> implements
 
 
     /** the atom in this case is the concept itself, exposing this and not the internal 'term' field */
-    @Override @NotNull public final Term term() {
+    @Override @NotNull public final AtomConcept term() {
         return this;
     }
 
