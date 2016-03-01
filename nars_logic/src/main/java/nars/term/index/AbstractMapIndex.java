@@ -29,6 +29,12 @@ public abstract class AbstractMapIndex implements TermIndex {
         this.conceptBuilder = conceptBuilder;
     }
 
+    @Override
+    public final TermBuilder builder() {
+        return builder;
+    }
+
+
     public final Termed get(@NotNull Termed key, boolean createIfMissing) {
 
         if (key instanceof Ellipsis)

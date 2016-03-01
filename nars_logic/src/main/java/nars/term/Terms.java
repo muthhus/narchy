@@ -1,7 +1,9 @@
 package nars.term;
 
 import com.google.common.collect.Iterators;
+import com.google.common.primitives.SignedBytes;
 import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
+import com.gs.collections.api.block.predicate.primitive.ShortIntPredicate;
 import nars.$;
 import nars.Global;
 import nars.Op;
@@ -643,6 +645,12 @@ public class Terms extends TermBuilder implements TermIndex {
         return opRel(op.ordinal(), relation);
     }
 
+    public static int opComponent(int oprel) {
+        return oprel >> 16;
+    }
+    public static int relComponent(int oprel) {
+        return oprel & 0xffff; //HACK do something here with signed and unsigned short/int
+    }
 
     @Override
     public int size() {

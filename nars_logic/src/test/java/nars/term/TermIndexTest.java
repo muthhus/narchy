@@ -11,6 +11,7 @@ import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.index.MapIndex2;
+import nars.term.index.MapIndex3;
 import nars.time.FrameClock;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
@@ -33,14 +34,15 @@ public class TermIndexTest {
     @Test
     public void testTaskTermSharing1() {
 
-        NAR t = new Terminal(16);
+        NAR t = new Default();
 
         String term = "<a --> b>.";
 
         Task t1 = t.inputTask(term);
         Task t2 = t.inputTask(term);
+        t.step();
 
-        testShared(t1, t2);
+        testShared(t.concept(t1), t.concept(t2));
 
     }
 
@@ -58,8 +60,16 @@ public class TermIndexTest {
 //    @Test public void testTermSharing3() {
 //        testIndex(new MapIndex(new SoftValueHashMap(), new SoftValueHashMap()));
 //    }
+
+    @Test public void testCaffeine() {
+        testIndex(new MapIndex3(128, Terms.terms,
+                new DefaultConceptBuilder(
+                        new XorShift128PlusRandom(2), 32, 32
+                )));
+    }
+
     @Test public void testTermSharing5a() {
-        testIndex(new MapIndex2(new HashMap(),
+        testIndex(new MapIndex2(new HashMap<>(),
                 new DefaultConceptBuilder(
                     new XorShift128PlusRandom(2), 32, 32
                 )));
@@ -142,7 +152,7 @@ public class TermIndexTest {
 
         //create by composition
         Compound b = i.the('(' + s + ')');
-        testShared(a, b.term(0));
+        testShared(a.term(), b.term(0));
 
         assertEquals(i.size(), t1 + 1 /* one more for the product container */);
 
@@ -162,6 +172,7 @@ public class TermIndexTest {
             System.err.println("share failed: " + t1 + ' ' + t1.getClass() + ' ' + t2 + ' ' + t2.getClass());
 
         assertTrue(t1 == t2);
+        assertEquals(t1, t2);
 
         if (t1 instanceof Compound) {
             //test all subterms are shared

@@ -32,21 +32,22 @@ public class RUCache<K, V> {
                 }
                 return false;
             }
-
-            ;
         };
     }
 
-    public synchronized V tryGet(K key) {
-        V value = MRUdata.get(key);
-        if (value != null)
-            return value;
-        value = LRUdata.get(key);
-        if (value != null) {
-            LRUdata.remove(key);
-            MRUdata.put(key, value);
-        }
-        return value;
+    public synchronized V tryGet(K k) {
+        Map<K, V> MRU = MRUdata;
+        return MRU.compute(k, (key, value) -> {
+            if (value != null)
+                return value;
+            else {
+                value = LRUdata.remove(key);
+                if (value != null) {
+                    MRU.put(key, value);
+                }
+                return value;
+            }
+        });
     }
 
     public synchronized void set(K key, V value) {

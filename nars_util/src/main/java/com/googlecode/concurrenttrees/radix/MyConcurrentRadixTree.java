@@ -46,8 +46,6 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
     private final boolean restrictConcurrency;
 
 
-
-
     /**
      * Creates a new {@link MyConcurrentRadixTree} which will use the given {@link NodeFactory} to create nodes.
      *
@@ -82,7 +80,7 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
         readWriteLock.writeLock().lock();
     }
 
-    protected final  void releaseWriteLock() {
+    protected final void releaseWriteLock() {
         readWriteLock.writeLock().unlock();
     }
 
@@ -91,6 +89,7 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
     protected final void acquireReadLockIfNecessary() {
         readLockIfNecessary(true, restrictConcurrency);
     }
+
     protected final void releaseReadLockIfNecessary() {
         readLockIfNecessary(false, restrictConcurrency);
     }
@@ -173,17 +172,18 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
         acquireReadLockIfNecessary();
         try {
             SearchResult searchResult = searchTree(prefix);
+            Node nodeFound = searchResult.nodeFound;
             switch (searchResult.classification) {
                 case EXACT_MATCH: {
-                    return getDescendantKeys(prefix, searchResult.nodeFound);
+                    return getDescendantKeys(prefix, nodeFound);
                 }
                 case KEY_ENDS_MID_EDGE: {
                     // Append the remaining characters of the edge to the key.
                     // For example if we searched for CO, but first matching node was COFFEE,
                     // the key associated with the first node should be COFFEE...
-                    CharSequence edgeSuffix = CharSequences.getSuffix(searchResult.nodeFound.getIncomingEdge(), searchResult.charsMatchedInNodeFound);
+                    CharSequence edgeSuffix = CharSequences.getSuffix(nodeFound.getIncomingEdge(), searchResult.charsMatchedInNodeFound);
                     prefix = CharSequences.concatenate(prefix, edgeSuffix);
-                    return getDescendantKeys(prefix, searchResult.nodeFound);
+                    return getDescendantKeys(prefix, nodeFound);
                 }
                 default: {
                     // Incomplete match means key is not a prefix of any node...
@@ -525,11 +525,11 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
      * on the given value of the <code>overwrite</code> flag.
      *
      * @param key       The key against which the value should be stored
-     * @param newValue     The value to store against the key
+     * @param newValue  The value to store against the key
      * @param overwrite If true, should replace any existing value, if false should not replace any existing value
      * @return The existing value for this key, if there was one, otherwise null
      */
-    O compute(CharSequence key, BiFunction<CharSequence,SearchResult,O> computeFunc) {
+    O compute(CharSequence key, BiFunction<CharSequence, SearchResult, O> computeFunc) {
         if (key == null) {
             throw new IllegalArgumentException("The key argument was null");
         }
@@ -547,7 +547,7 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
             NodeFactory factory = this.nodeFactory;
             Node found = searchResult.nodeFound;
             int matched = searchResult.charsMatched;
-            Object foundValue = found!=null ? found.getValue() : null;
+            Object foundValue = found != null ? found.getValue() : null;
             O newValue = computeFunc.apply(key, searchResult);
 
 
@@ -560,7 +560,7 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
                     // First check if existing node has a value, and if we are allowed to overwrite it.
                     // Return early without overwriting if necessary...
 
-                    if (newValue!=foundValue) {
+                    if (newValue != foundValue) {
                         //clone and reattach
                         cloneAndReattach(searchResult, factory, found, foundValue, found.getOutgoingEdges());
                     }
@@ -606,7 +606,7 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
                     cloneAndReattach(searchResult, factory, found, foundValue, edges);
 
                     // Return null for the existing value...
-                    return (O)newValue;
+                    return (O) newValue;
                 }
                 case INCOMPLETE_MATCH_TO_MIDDLE_OF_EDGE: {
                     // Search found a difference in characters between the key and the characters in the middle of the
@@ -635,7 +635,7 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
                     searchResult.parentNode.updateOutgoingEdge(n3);
 
                     // Return null for the existing value...
-                    return (O)newValue;
+                    return (O) newValue;
                 }
                 default: {
                     // This is a safeguard against a new enum constant being added in future.
@@ -669,36 +669,7 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
      */
     @SuppressWarnings({"JavaDoc"})
     Iterable<CharSequence> getDescendantKeys(final CharSequence startKey, final Node startNode) {
-        return new Iterable<CharSequence>() {
-            @Override
-            public Iterator<CharSequence> iterator() {
-                return new LazyIterator<CharSequence>() {
-                    Iterator<NodeKeyPair> descendantNodes = lazyTraverseDescendants(startKey, startNode).iterator();
-
-                    @Override
-                    protected CharSequence computeNext() {
-                        // Traverse to the next matching node in the tree and return its key and value...
-                        while (descendantNodes.hasNext()) {
-                            NodeKeyPair nodeKeyPair = descendantNodes.next();
-                            Object value = nodeKeyPair.node.getValue();
-                            if (value != null) {
-                                // Dealing with a node explicitly added to tree (rather than an automatically-added split node).
-
-                                // Call the transformKeyForResult method to allow key to be transformed before returning to client.
-                                // Used by subclasses such as ReversedRadixTree implementations...
-                                CharSequence optionallyTransformedKey = transformKeyForResult(nodeKeyPair.key);
-
-                                // -> Convert the CharSequence to a String before returning, to avoid set equality issues,
-                                // because equals() and hashCode() is not specified by the CharSequence API contract...
-                                return CharSequences.toString(optionallyTransformedKey);
-                            }
-                        }
-                        // Finished traversing the tree, no more matching nodes to return...
-                        return endOfData();
-                    }
-                };
-            }
-        };
+        return new DescendantKeys(startKey, startNode);
     }
 
     /**
@@ -789,6 +760,7 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
 
         final String key;
         final O value;
+        final int hash;
 
         /**
          * Constructor.
@@ -809,6 +781,7 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
             @SuppressWarnings({"unchecked", "UnnecessaryLocalVariable"})
             O valueTyped = (O) value;
             this.value = valueTyped;
+            this.hash = key.hashCode();
         }
 
         /**
@@ -832,17 +805,18 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
          */
         @Override
         public final boolean equals(Object o) {
-            if (this == o) return true;
-            return (this == o) || (o instanceof KeyValuePairImpl) &&
-            key.equals(((KeyValuePairImpl)o).key);
+            //if (this == o) return true;
+            return (this == o) ||
+                    //(o instanceof KeyValuePairImpl) &&
+                    key.equals(((KeyValuePairImpl) o).key);
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public int hashCode() {
-            return key.hashCode();
+        public final int hashCode() {
+            return hash;
         }
 
         /**
@@ -875,7 +849,9 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
             public Iterator<NodeKeyPair> iterator() {
                 return new LazyIterator<NodeKeyPair>() {
 
-                    Deque<NodeKeyPair> stack = new LinkedList<NodeKeyPair>();
+                    final Deque<NodeKeyPair> stack =
+                            //new LinkedList<NodeKeyPair>();
+                            new ArrayDeque();
 
                     {
                         stack.push(new NodeKeyPair(startNode, startKey));
@@ -883,6 +859,8 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
 
                     @Override
                     protected NodeKeyPair computeNext() {
+                        Deque<NodeKeyPair> stack = this.stack;
+
                         if (stack.isEmpty()) {
                             return endOfData();
                         }
@@ -892,9 +870,11 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
                         // -> Iterate child nodes in reverse order and so push them onto the stack in reverse order,
                         // to counteract that pushing them onto the stack alone would otherwise reverse their processing order.
                         // This ensures that we actually process nodes in ascending alphabetical order.
-                        for (int i = childNodes.size(); i > 0; i--) {
-                            Node child = childNodes.get(i - 1);
-                            stack.push(new NodeKeyPair(child, CharSequences.concatenate(current.key, child.getIncomingEdge())));
+                        for (int i = childNodes.size()-1; i >= 0; i--) {
+                            Node child = childNodes.get(i);
+                            stack.push(new NodeKeyPair(child,
+                                CharSequences.concatenate(current.key, child.getIncomingEdge())
+                            ));
                         }
                         return current;
                     }
@@ -1065,16 +1045,18 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
         }
 
         protected SearchResult.Classification classify(CharSequence key, Node nodeFound, int charsMatched, int charsMatchedInNodeFound) {
-            if (charsMatched == key.length()) {
-                if (charsMatchedInNodeFound == nodeFound.getIncomingEdge().length()) {
+            int len = nodeFound.getIncomingEdge().length();
+            int keyLen = key.length();
+            if (charsMatched == keyLen) {
+                if (charsMatchedInNodeFound == len) {
                     return SearchResult.Classification.EXACT_MATCH;
-                } else if (charsMatchedInNodeFound < nodeFound.getIncomingEdge().length()) {
+                } else if (charsMatchedInNodeFound < len) {
                     return SearchResult.Classification.KEY_ENDS_MID_EDGE;
                 }
-            } else if (charsMatched < key.length()) {
-                if (charsMatchedInNodeFound == nodeFound.getIncomingEdge().length()) {
+            } else if (charsMatched < keyLen) {
+                if (charsMatchedInNodeFound == len) {
                     return SearchResult.Classification.INCOMPLETE_MATCH_TO_END_OF_EDGE;
-                } else if (charsMatchedInNodeFound < nodeFound.getIncomingEdge().length()) {
+                } else if (charsMatchedInNodeFound < len) {
                     return SearchResult.Classification.INCOMPLETE_MATCH_TO_MIDDLE_OF_EDGE;
                 }
             }
@@ -1102,4 +1084,45 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
         return root;
     }
 
+    private class DescendantKeys extends LazyIterator<CharSequence> implements Iterable<CharSequence>, Iterator<CharSequence> {
+        private final CharSequence startKey;
+        private final Node startNode;
+        private Iterator<NodeKeyPair> descendantNodes;
+
+        public DescendantKeys(CharSequence startKey, Node startNode) {
+            this.startKey = startKey;
+            this.startNode = startNode;
+        }
+
+        @Override
+        public Iterator<CharSequence> iterator() {
+            descendantNodes = lazyTraverseDescendants(startKey, startNode).iterator();
+            return this;
+        }
+
+        @Override
+        protected CharSequence computeNext() {
+            // Traverse to the next matching node in the tree and return its key and value...
+            Iterator<NodeKeyPair> nodes = this.descendantNodes;
+            while (nodes.hasNext()) {
+                NodeKeyPair nodeKeyPair = nodes.next();
+                Object value = nodeKeyPair.node.getValue();
+                if (value != null) {
+                    // Dealing with a node explicitly added to tree (rather than an automatically-added split node).
+
+                    // Call the transformKeyForResult method to allow key to be transformed before returning to client.
+                    // Used by subclasses such as ReversedRadixTree implementations...
+                    CharSequence optionallyTransformedKey = transformKeyForResult(nodeKeyPair.key);
+
+                    // -> Convert the CharSequence to a String before returning, to avoid set equality issues,
+                    // because equals() and hashCode() is not specified by the CharSequence API contract...
+                    return CharSequences.toString(optionallyTransformedKey);
+                }
+            }
+            // Finished traversing the tree, no more matching nodes to return...
+            return endOfData();
+        }
+
+
+    }
 }

@@ -24,19 +24,67 @@ public class MapIndex2 extends AbstractMapIndex {
         public final TermContainer vector;
 
         public SubtermNode(TermContainer normalized) {
+            super(4);
             this.vector = normalized;
         }
 
-        @Override
-        public Termed put(int key, Termed value) {
-            return super.put(key, value);
-        }
+//        @Override
+//        public Termed put(int key, Termed value) {
+//            return super.put(key, value);
+//        }
 
         /*
             g.compact();
         */
 
     }
+
+    /** uses an array for fast lookup and write access to basic term types where relation isnt used */
+    public static class SubtermNodeWithArray extends SubtermNode {
+        public final TermContainer vector;
+
+        final static int NUM_FAST = 16;
+        private final Termed[] fast;
+
+        public SubtermNodeWithArray(TermContainer normalized) {
+            super(normalized);
+            this.vector = normalized;
+            this.fast = new Termed[NUM_FAST];
+        }
+
+        @Override
+        public Termed get(int key) {
+            if (Terms.relComponent(key) == 0xffff) {
+                int o = Terms.opComponent(key);
+                if (o < NUM_FAST) {
+                    return fast[o];
+                }
+            }
+            return super.get(key);
+        }
+
+        @Override
+        public Termed put(int key, Termed value) {
+            if (Terms.relComponent(key) == 0xffff) {
+                int o = Terms.opComponent(key);
+                if (o < NUM_FAST) {
+                    fast[o] = value;
+                }
+            }
+            return super.put(key, value);
+        }
+
+        //        @Override
+//        public Termed put(int key, Termed value) {
+//            return super.put(key, value);
+//        }
+
+        /*
+            g.compact();
+        */
+
+    }
+
 
     public final Map<TermContainer, SubtermNode> data;
     int count;
@@ -50,7 +98,6 @@ public class MapIndex2 extends AbstractMapIndex {
         super(termBuilder, conceptBuilder);
 
         this.data = data;
-
     }
 
 
@@ -71,10 +118,6 @@ public class MapIndex2 extends AbstractMapIndex {
         return interned;
     }*/
 
-    @Override
-    public final TermBuilder builder() {
-        return builder;
-    }
 
 //    @NotNull
 //    static TermContainer vector(@NotNull Term t) {
@@ -101,8 +144,6 @@ public class MapIndex2 extends AbstractMapIndex {
         SubtermNode node = create ?
                 getOrAddNode(subsBefore) :
                 getNode(subsBefore);
-
-
 
         return node!=null ? get(t, node, subsBefore, create) : null;
     }
@@ -203,7 +244,7 @@ public class MapIndex2 extends AbstractMapIndex {
     @Override
     public int size() {
         /** WARNING: not accurate */
-        return count;
+        return data.size() + atoms.size();
     }
 
     @Override

@@ -25,8 +25,10 @@ import nars.op.data.reflect;
 import nars.op.sys.js;
 import nars.term.Term;
 import nars.term.TermIndex;
+import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.term.index.MapIndex2;
+import nars.term.index.MapIndex3;
 import nars.time.Clock;
 import nars.util.data.map.UnifriedMap;
 import nars.util.data.random.XORShiftRandom;
@@ -330,13 +332,22 @@ public abstract class AbstractNAR extends NAR {
     public abstract NAR forEachConcept(Consumer<Concept> recip);
 
 
-    public static class DefaultTermIndex extends MapIndex2 implements TermIndex {
+//    public static class DefaultTermIndex extends MapIndex2  {
+//
+//        public DefaultTermIndex(int capacity, Random random) {
+//            super(new UnifriedMap(capacity),
+//                  new DefaultConceptBuilder(random, 32, 32));
+//
+//        }
+//    }
+
+    public static class DefaultTermIndex extends MapIndex3 {
 
         public DefaultTermIndex(int capacity, Random random) {
-            super(new UnifriedMap(capacity),
-                  new DefaultConceptBuilder(random, 32, 32));
+            super(capacity, Terms.terms, new DefaultConceptBuilder(random, 32, 32));
 
         }
 
     }
+
 }
