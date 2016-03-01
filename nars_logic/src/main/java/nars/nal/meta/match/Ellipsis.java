@@ -95,8 +95,13 @@ public abstract class Ellipsis extends AbstractVariable {
         );
     }
 
+    @Override
+    public int structure() {
+        return 0;
+    }
 
-//    @Override
+
+    //    @Override
 //    public final boolean equals(Object obj) {
 //        return //((obj instanceof Ellipsis) && id == ((Ellipsis)obj).id)
 //                //||

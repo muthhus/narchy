@@ -16,6 +16,7 @@ import nars.term.transform.subst.choice.CommutivePermutations;
 import nars.term.transform.subst.choice.Termutator;
 import nars.term.variable.CommonVariable;
 import nars.term.variable.GenericNormalizedVariable;
+import nars.term.variable.GenericVariable;
 import nars.term.variable.Variable;
 import nars.util.data.list.FasterList;
 import nars.util.version.VersionMap;
@@ -52,7 +53,7 @@ public abstract class FindSubst extends Versioning implements Subst {
     /**
      * maximum changes which are stored in stack
      */
-    final static int defaultHistoryLength = 256;
+    final static int defaultHistoryLength = 64;
 
     public final Random random;
 
@@ -424,8 +425,11 @@ public abstract class FindSubst extends Versioning implements Subst {
             if (countNumNonEllipsis(X) > 0) {
 
                 int xEllipseIndex = X.indexOf(e);
+                assert(xEllipseIndex!=-1);
+
                 int xRelationIndex = X.relation();
                 int yRelationIndex = Y.relation();
+
 
                 if (xEllipseIndex >= xRelationIndex) {
                     //compare relation from beginning as in non-ellipsis case
@@ -935,6 +939,10 @@ public abstract class FindSubst extends Versioning implements Subst {
 
         @Override
         public final Term term(Term t) {
+
+            if (t instanceof GenericVariable)
+                throw new RuntimeException("variables must be normalized");
+
             Versioned<Term> v = map.get(t);
             return v == null ? null : v.get();
         }

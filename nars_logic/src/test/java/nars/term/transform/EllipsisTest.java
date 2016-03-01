@@ -56,14 +56,17 @@ public class EllipsisTest {
             Compound y = getMatchable(arity);
             assertNotNull(y);
             assertTrue(y.isNormalized());
+            //no variables in Y
             y.forEach(yy -> { assertFalse(yy instanceof Variable); });
 
             Compound r = getResult();
             assertTrue(r.isNormalized());
 
-            Compound x = getPattern();
+            Compound<?> x = getPattern();
             assertTrue(x.isNormalized());
-            x.forEach(xx -> { assertFalse(xx instanceof Variable); });
+
+            //no unmatched variables
+            ///x.forEach(xx -> { assertFalse(xx.toString() + " is var", xx instanceof Variable ); });
 
             Term ellipsisTerm = firstEllipsis(x);
 
@@ -104,7 +107,7 @@ public class EllipsisTest {
 
                             assertEquals(getExpectedUniqueTerms(arity), varArgTerms.size());
 
-                            //testFurther(selectedFixed, this, varArgTerms);
+                            testFurther(selectedFixed, this, varArgTerms);
                         } else {
                             assertNotNull(a);
                             //assertEquals("?", a);
@@ -200,7 +203,7 @@ public class EllipsisTest {
 
     public static class CommutiveEllipsisTest1 extends CommutiveEllipsisTest {
 
-        static final Term fixedTerm = $("%1");
+        static final Term fixedTerm = $.varPattern(1);
 
 
         public CommutiveEllipsisTest1(String ellipsisTerm, String[] openClose) {
@@ -212,7 +215,7 @@ public class EllipsisTest {
             Set<Term> selectedFixed = super.test(arity, repeats);
 
             /** should have iterated all */
-            TestCase.assertEquals(selectedFixed.toString(), arity, selectedFixed.size());
+            assertEquals(selectedFixed.toString(), arity, selectedFixed.size());
             return selectedFixed;
         }
 
@@ -222,11 +225,11 @@ public class EllipsisTest {
         }
 
         @Override public void testFurther(Set<Term> selectedFixed, FindSubst f, Set<Term> varArgTerms) {
-            TestCase.assertEquals(f.toString(), 2, f.xy.size());
+            assertEquals(2, f.xy.size());
             Term fixedTermValue = f.term(fixedTerm);
-            assertNotNull(fixedTermValue);
-            TestCase.assertEquals(Atom.class, fixedTermValue.getClass());
-            TestCase.assertFalse(varArgTerms.contains(fixedTermValue));
+            assertNotNull(f.toString(), fixedTermValue);
+            assertEquals(Atom.class, fixedTermValue.getClass());
+            assertFalse(varArgTerms.contains(fixedTermValue));
         }
 
 
@@ -242,7 +245,7 @@ public class EllipsisTest {
         @Override
         public Compound getResult() {
             final PatternIndex pi = new PatternIndex();
-            return (Compound)( Narsese.the().term("<%1 --> (" + ellipsisTerm +  ")>", pi).term());
+            return (Compound)( pi.normalized(pi.the("<%1 --> (" + ellipsisTerm +  ")>")).term());
         }
 
     }
@@ -259,7 +262,7 @@ public class EllipsisTest {
             Set<Term> s = super.test(arity, repeats);
             Term the = s.isEmpty() ? null : s.iterator().next();
             assertNotNull(the);
-            TestCase.assertTrue(the.toString().substring(1).length() > 0 && the.toString().substring(1).charAt(0) == 'Z');
+            assertTrue(the.toString().substring(1).length() > 0 && the.toString().substring(1).charAt(0) == 'Z');
             return s;
         }
 
