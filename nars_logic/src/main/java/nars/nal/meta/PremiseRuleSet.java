@@ -314,9 +314,10 @@ public class PremiseRuleSet  {
             //System.err.println("r: " + r);
 
             r.backwardPermutation((q, reason) -> {
-                //System.err.println("  q: " + q + " " + reason);
 
+                //System.err.println("  q: " + q + " " + reason);
                 PremiseRule b = add(ur, q, src + ":" + reason, index);
+
                 if (forwardPermutes(b)) {
                     permuteForward(index, ur, src, b, r.allowBackward);
                 }
@@ -346,9 +347,10 @@ public class PremiseRuleSet  {
             if ((x.contains("task(")) ||
                 (x.contains("time(")) ||
                 (x.contains("after(")) ||
+                (x.contains("Punctuation")) ||
                 (x.contains("Structural")) ||
                 (x.contains("Identity")) ||
-                (x.contains("substitute")) || //TESTING THIS
+                //(x.contains("substitute")) || //TESTING THIS
                 (x.contains("Negation"))) {
 
                 fwd[0] = false;

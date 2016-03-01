@@ -103,7 +103,7 @@ public class TrieDeriver extends Deriver {
 
             bb.add(branch(
                     compileConditions(seq.subList(from, to), matchParent),
-                    new PremiseMatchFork(compileActions(TrieDeriver.this.getBranches(n)))));
+                    new PremiseFork(compileActions(TrieDeriver.this.getBranches(n)))));
         });
 
         return bb;

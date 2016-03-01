@@ -38,7 +38,8 @@ public class MapIndex3 extends MapIndex2 {
         cache = Caffeine.newBuilder()
                 //.expireAfterWrite(10, TimeUnit.MINUTES)
                 .initialCapacity(capacity)
-                .maximumSize(capacity*2)
+                .maximumSize(capacity*1024)
+
 //                .build(new CacheLoader<TermContainer, MapIndex2.SubtermNode>() {
 //
 //                    @Override
@@ -81,21 +82,21 @@ public class MapIndex3 extends MapIndex2 {
     public
     @NotNull
     MapIndex2.SubtermNode getOrAddNode(TermContainer s) {
-        //s = normalize(s);
-        return cache.get(s, k -> {
-            //@Nullable TermContainer n = normalize(k);
+        @Nullable TermContainer kk = normalize(s);
+        return cache.get(kk, k -> {
             return new SubtermNodeWithArray(k);
         });
 
-        /*SubtermNode existing = getNode(s);
-        if (existing==null) {
-            existing =
-                    //new MapIndex2.SubtermNode(normalize(s));
-                    new MapIndex2.SubtermNodeWithArray(normalize(s));
-
-            cache.put(s, existing);
-        }
-        return existing; */
+//        SubtermNode existing = getNode(s);
+//        if (existing==null) {
+//            s = normalize(s);
+//            existing =
+//                    //new MapIndex2.SubtermNode(normalize(s));
+//                    new MapIndex2.SubtermNodeWithArray(normalize);
+//
+//            cache.put(s, existing);
+//        }
+//        return existing;
     }
 
     @Override

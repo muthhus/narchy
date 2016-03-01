@@ -21,7 +21,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 /** not thread safe; call from only one thread at a time */
-abstract public class PremiseGenerator extends UnifySubst implements Function<Term, Task> {
+abstract public class PremiseGenerator /*extends UnifySubst */implements Function<Term, Task> {
 
     @NotNull
     public final NAR nar;
@@ -33,7 +33,7 @@ abstract public class PremiseGenerator extends UnifySubst implements Function<Te
     long lastMatch = Tense.TIMELESS;
 
     public PremiseGenerator(@NotNull NAR nar) {
-        super(Op.VAR_QUERY, nar, true);
+        //super(Op.VAR_QUERY, nar, true);
         this.nar = nar;
         this.lastMatch = nar.time();
     }
@@ -136,41 +136,43 @@ abstract public class PremiseGenerator extends UnifySubst implements Function<Te
 
             this.taskLink = taskLink;
 
-            matchAll(taskLinkTerm, termLinkTerm );
+            //matchAll(taskLinkTerm, termLinkTerm );
+            premise(concept, taskLink, termLink, apply(termLinkTerm));
         }
     }
 
 
-    /** uses the query-unified term to complete a premise */
-    @Override public final boolean accept(@NotNull Term beliefTerm, Term unifiedBeliefTerm) {
 
-        Task belief = beliefTerm instanceof Compound ?
-
-                //beliefCache.computeIfAbsent(beliefTerm, this) :
-                apply(beliefTerm) :
-
-                null; //atomic terms will have no beliefs anyway
-
-        //if the unified belief term is different, then clone the known belief with it as the new belief
-        if (belief!=null && (unifiedBeliefTerm instanceof Compound) && !beliefTerm.equals(unifiedBeliefTerm)) {
-            Task unifiedBelief = new MutableTask(belief, (Compound)unifiedBeliefTerm).normalize(memory);
-            if (unifiedBelief!=null) {
-                belief = unifiedBelief;
-            }
-
-        }
-
-        //TODO also modify the termlink / "belief term" in the premise? or leave as variable
-
-        premise(concept, taskLink, termLink, belief);
-
-//        Task task = taskLink.get();
-//        //Report questions/solution pairs involving query variable that have been matched
-//        if (belief != null && task.isQuestOrQuestion() && !belief.isQuestOrQuestion())
-//            memory.onSolve(task, belief);
-
-        return true;
-    }
+//    /** uses the query-unified term to complete a premise */
+//    @Override public final boolean accept(@NotNull Term beliefTerm, Term unifiedBeliefTerm) {
+//
+//        Task belief = beliefTerm instanceof Compound ?
+//
+//                //beliefCache.computeIfAbsent(beliefTerm, this) :
+//                apply(beliefTerm) :
+//
+//                null; //atomic terms will have no beliefs anyway
+//
+//        //if the unified belief term is different, then clone the known belief with it as the new belief
+//        if (belief!=null && (unifiedBeliefTerm instanceof Compound) && !beliefTerm.equals(unifiedBeliefTerm)) {
+//            Task unifiedBelief = new MutableTask(belief, (Compound)unifiedBeliefTerm).normalize(memory);
+//            if (unifiedBelief!=null) {
+//                belief = unifiedBelief;
+//            }
+//
+//        }
+//
+//        //TODO also modify the termlink / "belief term" in the premise? or leave as variable
+//
+//        premise(concept, taskLink, termLink, belief);
+//
+////        Task task = taskLink.get();
+////        //Report questions/solution pairs involving query variable that have been matched
+////        if (belief != null && task.isQuestOrQuestion() && !belief.isQuestOrQuestion())
+////            memory.onSolve(task, belief);
+//
+//        return true;
+//    }
 
     abstract protected void premise(BLink<? extends Concept> concept, BLink<? extends Task> taskLink, BLink<? extends Termed> termLink, Task belief);
 

@@ -1,8 +1,10 @@
 package nars.nar;
 
+import com.gs.collections.impl.tuple.Tuples;
 import nars.Global;
 import nars.Memory;
 import nars.NAR;
+import nars.Symbols;
 import nars.bag.BLink;
 import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
@@ -129,14 +131,29 @@ public class Default extends AbstractNAR {
             Task t = c.process(input, nar);
             if (t != null) {
 
-                //TaskProcess succeeded
+                //TaskProcess succeeded in affecting its concept's state (ex: not a duplicate belief)
 
+                //1. propagate budget
                 conceptualize(c, t.budget(), activation);
 
-                eventTaskProcess.emit(t);
 
-                if (t.isGoal())
-                    execute(t, c);
+                switch (t.punc()) {
+                    case Symbols.GOAL:
+                        execute(t, c);
+
+                        //TODO check for answer to parent quest task
+                        break;
+                    case Symbols.BELIEF:
+                        //check for answer to parent question task(s) and emit an event
+                        Task parentTask = t.getParentTask();
+                        if (parentTask!=null && parentTask.isQuestion()) {
+                            eventAnswer.emit(Tuples.twin(parentTask, t));
+                        }
+                        break;
+                }
+
+                //3. signal any additional processes
+                eventTaskProcess.emit(t);
 
             }
 

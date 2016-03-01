@@ -25,24 +25,26 @@ public interface TruthOperator {
 
         Premise premise = m.currentPremise;
 
+        @Nullable Truth taskTruth = premise.task().truth();
 
         @Nullable Task belief = premise.belief();
 
         float minConf = m.getMinConfidence();
 
         Truth truth = apply(
-                premise.task().truth(),
-                (belief == null) ? null : belief.truth(),
+                taskTruth,
+                belief != null ? belief.truth() : null,
                 premise.nar(),
                 minConf
         );
 
         //pre-filter insufficient confidence level
 
-        if ((truth!=null) && (truth.conf() > minConf)) {
+        if ((truth != null) && (truth.conf() > minConf)) {
             m.truth.set(truth);
             return true;
         }
+
         return false;
     }
 

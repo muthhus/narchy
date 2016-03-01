@@ -46,7 +46,7 @@ public class Versioning extends FasterList<Versioned> {
     public final int newChange(Versioned v) {
         int c = commit();
         if (!addIfCapacity(v))
-            throw new RuntimeException();
+            throw new OutOfMemoryError("Versioned stack fault");
         return c;
     }
 

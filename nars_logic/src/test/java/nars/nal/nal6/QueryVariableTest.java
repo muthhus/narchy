@@ -3,9 +3,11 @@ package nars.nal.nal6;
 import nars.Global;
 import nars.NAR;
 import nars.nal.AbstractNALTest;
+import nars.nal.Tense;
 import nars.nar.Default;
 import nars.task.Task;
 import nars.util.data.Util;
+import nars.util.signal.TestNAR;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -50,29 +52,35 @@ public class QueryVariableTest extends AbstractNALTest {
         Global.DEBUG = true;
 
 
-        Set<Task> derivations = new HashSet();
+        //Set<Task> derivations = new HashSet();
 
-        NAR n = nar();
+        TestNAR t = test();
+        NAR n = t.nar;
         n.log();
 
         int[] answers = new int[1];
 
         n.eventTaskProcess.on(d-> {
-            if (d.term().hasVarQuery())
-                derivations.add(d);
+            //if (d.term().hasVarQuery())
+                //derivations.add(d);
             if (d.isJudgment() && d.term().toString().equals(belief))
                 assertFalse(d + " should not have been derived", Util.equals(d.conf(), 0.81f, 0.01f));
         } );
+        /*n.eventConceptProcess.on(c -> {
+            System.out.println("\t" + c);
+        });*/
         n.eventAnswer.on(p -> {
             System.out.println("q: " + p.getOne() + " a: " + p.getTwo());
             answers[0]++;
         });
+        t.mustAnswer(2, belief, 1f, 0.9f, Tense.ETERNAL);
+
 
         n.believe(belief);
         n.ask(question);
 
 
-        n.run(64);
+        n.run(16);
 
 
         assertTrue("Answer/Solution reported?", 0 < answers[0]);

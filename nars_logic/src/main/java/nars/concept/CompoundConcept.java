@@ -202,13 +202,13 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
         //TODO only compute updates if belief was actually added, not merged with duplicate
 
         {
-            if (belief!= null && hasQuestions()) {
-                //TODO move this to a subclass of TaskTable which is customized for questions. then an arraylist impl of TaskTable can iterate by integer index and not this iterator/lambda
-                final Task solution = belief;
-                questions().forEach(question -> {
-                    LocalRules.forEachSolution(question, solution, nar);
-                });
-            }
+//            if (belief!= null && hasQuestions()) {
+//                //TODO move this to a subclass of TaskTable which is customized for questions. then an arraylist impl of TaskTable can iterate by integer index and not this iterator/lambda
+//                final Task solution = belief;
+//                questions().forEach(question -> {
+//                    LocalRules.forEachSolution(question, solution, nar);
+//                });
+//            }
 
 //            if (hasGoals) {
 //                updateSuccess(null, successBefore, memory);
@@ -390,15 +390,15 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
 
         //TODO if the table was not affected, does the following still need to happen:
 
-        if (q != null) {
-            BeliefTable answerTable = q.isQuest() ?
-                    goals() : beliefs();
-
-            Task sol = answerTable.top(q.occurrence(), nar.time());
-            if (sol != null) {
-                LocalRules.forEachSolution(q, sol, nar);
-            }
-        }
+//        if (q != null) {
+//            BeliefTable answerTable = q.isQuest() ?
+//                    goals() : beliefs();
+//
+//            Task sol = answerTable.top(q.occurrence(), nar.time());
+//            if (sol != null) {
+//                LocalRules.forEachSolution(q, sol, nar);
+//            }
+//        }
 
         return q;
     }

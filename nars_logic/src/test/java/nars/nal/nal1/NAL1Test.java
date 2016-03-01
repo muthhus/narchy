@@ -146,31 +146,33 @@ public class NAL1Test extends AbstractNALTest {
 
     /** question to answer matching */
     public void testQuestionAnswer(int cycles, String belief, String question, String expectedSolution) {
-        AtomicBoolean solved = new AtomicBoolean(false);
+        //AtomicBoolean solved = new AtomicBoolean(false);
 
         TestNAR test = test();
         NAR nar = test.nar;
 
         //TODO abstract the %1.0;0.8% hardcoded here
 
-        Task expectedTask = nar.task(expectedSolution + ". %1.00;0.80%");
+        //Task expectedTask = nar.task(expectedSolution + ". %1.00;0.90%");
 
-        //nar.log();
+        test
+        .log()
+        .believe(belief, 1.0f, 0.9f)
+        .ask(question)
+        .mustBelieve(cycles, belief, 1f, 0.9f);
 
-        nar.believe(belief, 1.0f, 0.8f)
-           .onAnswer(question, a -> { //.en("What is a type of swimmer?")
+//           .onAnswer(question, a -> { //.en("What is a type of swimmer?")
+//
+//                System.out.println(nar.time() + ": " + question + " " + a);
+//                //test for a few task conditions, everything except for evidence
+//                if (a.punc() == expectedTask.punc())
+//                    if (a.term().equals(expectedTask.term())) {
+//                        if (Objects.equals(a.truth(), expectedTask.truth()))
+//                            solved.set(true);
+//                }
+//
+//            }).run(cycles);
 
-                System.out.println(nar.time() + ": " + question + " " + a);
-                //test for a few task conditions, everything except for evidence
-                if (a.punc() == expectedTask.punc())
-                    if (a.term().equals(expectedTask.term())) {
-                        if (Objects.equals(a.truth(), expectedTask.truth()))
-                            solved.set(true);
-                }
-
-            }).run(cycles);
-
-        test.mustBelieve(cycles, expectedTask.term().toString(), expectedTask.punc());
 
         //assertTrue(solved.get());
     }

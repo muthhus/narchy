@@ -133,7 +133,9 @@ public class MapIndex2 extends AbstractMapIndex {
 
 
     final Function<TermContainer, SubtermNode> termContainerSubtermNodeFunction =
-            k -> new SubtermNode(normalize(k));
+            k ->
+                new SubtermNode(normalize(k));
+                //new SubtermNodeWithArray(normalize(k));
 
 
     @Nullable

@@ -248,7 +248,7 @@
 //// conditional syllogism ////////////////////////////////////////////////////////////////////////////////////
 //If after M, P usually happens, and M happens, it means P is expected to happen
 
-    B, (A ==> C) |- substituteIfUnifies(C,"$",A,B), (Belief:Deduction, Desire:I, Order:ForAllSame, Event:Anticipate)
+    B, (A ==> C) |- substituteIfUnifies(C,"$",A,B), (Belief:Deduction, Desire:Induction, Order:ForAllSame, Event:Anticipate)
     B, (C ==> A) |- substituteIfUnifies(C,"$",A,B), (Belief:Abduction, Desire:Abduction, Order:ForAllSame)
 
     B, (A <=> C) |- substituteIfUnifies(C,"$",A,B), (Belief:Deduction, Desire:Induction, Order:ForAllSame)
@@ -509,3 +509,8 @@
 //compound composition one premise
 
     (||,B,A..+), B, task("?") |- (||,B,A..+), (Belief:BeliefStructuralDeduction, Punctuation:Judgment)
+
+
+//query-variable queston answering
+    A, B, task("?") |- substituteIfUnifies(B, "?", A, B), (Belief:BeliefIdentity, Punctuation:Judgment)
+

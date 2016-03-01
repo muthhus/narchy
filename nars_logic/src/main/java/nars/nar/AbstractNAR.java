@@ -332,18 +332,18 @@ public abstract class AbstractNAR extends NAR {
     public abstract NAR forEachConcept(Consumer<Concept> recip);
 
 
-//    public static class DefaultTermIndex extends MapIndex2  {
-//
-//        public DefaultTermIndex(int capacity, Random random) {
-//            super(new UnifriedMap(capacity),
-//                  new DefaultConceptBuilder(random, 32, 32));
-//
-//        }
-//    }
-
-    public static class DefaultTermIndex extends MapIndex3 {
+    public static class DefaultTermIndex extends MapIndex2  {
 
         public DefaultTermIndex(int capacity, Random random) {
+            super(new UnifriedMap(capacity),
+                  new DefaultConceptBuilder(random, 32, 32));
+
+        }
+    }
+
+    public static class DefaultTermIndex2 extends MapIndex3 {
+
+        public DefaultTermIndex2(int capacity, Random random) {
             super(capacity, Terms.terms, new DefaultConceptBuilder(random, 32, 32));
 
         }

@@ -5,11 +5,11 @@ import org.jetbrains.annotations.NotNull;
 /**
  * reverting fork for use during premise matching
  */
-public final class PremiseMatchFork extends ThenFork {
+public final class PremiseFork extends ThenFork {
 
     private final ProcTerm[] termCache;
 
-    public PremiseMatchFork(ProcTerm[] n) {
+    public PremiseFork(ProcTerm[] n) {
         super(n);
         this.termCache = n;
     }

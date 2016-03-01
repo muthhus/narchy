@@ -17,11 +17,18 @@ public class TuffySmokesTest {
             String t = "<" + name + " --> [Cancer]>";
             //n.input(t + "?");
             Concept c = n.concept(t);
+
+			System.err.print(System.identityHashCode(c) + " " );
+
             if (c == null)  {
-                System.err.println(t + " unknown");
+                System.err.println(t + " unknown" + " ");
             } else {
                 if (!c.hasBeliefs()) {
                     System.err.println(t + " no beliefs");
+
+
+					n.input(t + ". %0.5;0.1%");
+
                 } else {
                     Task b = c.beliefs().top(n.time());
                     System.err.println(t + " = " + b);
@@ -105,24 +112,24 @@ public class TuffySmokesTest {
 
 		Global.DEBUG = true;
 
-		NAR n = new Default(1000, 3, 2, 3);
-		((Memory) NAR.this).activationRate.setValue(0.5f);
-		((Memory) NAR.this).conceptForgetDurations.setValue(5);
+		NAR n = new Default(1000, 1, 2, 3);
+		n.activationRate.setValue(0.75f);
+		n.conceptForgetDurations.setValue(2);
 
-		// n.log();
+		n.logSummaryGT(System.out, 0.75f);
 
-		axioms(n);
-		n.run(100);
 
-		input(n);
-		n.run(4000);
-		question(n);
 
-		n.run(4000);
-		question(n);
+		for (int i = 0; i < 10; i++) {
+			System.err.println();
 
-		n.run(4000);
-		question(n);
+			axioms(n);
+			n.run(50);
+			input(n);
+			n.run(50);
+			question(n);
+			n.run(50);
+		}
 
 		// NARide.loop(n, true);
 

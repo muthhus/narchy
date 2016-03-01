@@ -31,21 +31,21 @@ import java.util.stream.Stream;
  */
 public class SomeRovers {
 
-	public static final String motorLeft = "MotorControls(left,motor,(),#z)";
-	public static final String motorRight = "MotorControls(right,motor,(),#z)";
-	public static final String motorForward = "MotorControls(forward,motor,(),#z)";
-	public static final String motorBackward = "MotorControls(backward,motor,(),#z)";
-	public static final String motorStop = "MotorControls(stop,motor,(),#z)";
+    public static final String motorLeft = "MotorControls(left,motor,(),#z)";
+    public static final String motorRight = "MotorControls(right,motor,(),#z)";
+    public static final String motorForward = "MotorControls(forward,motor,(),#z)";
+    public static final String motorBackward = "MotorControls(backward,motor,(),#z)";
+    public static final String motorStop = "MotorControls(stop,motor,(),#z)";
     public static final String fire = "MotorControls(fire,motor,(),#z)";
 
-	public static final String eatFood = "eat:food";
-	public static final String eatPoison = "eat:poison";
-	public static final String speedAngular = "speed:angular";
-	public static final String speedLinear = "speed:forward";
+    public static final String eatFood = "eat:food";
+    public static final String eatPoison = "eat:poison";
+    public static final String speedAngular = "speed:angular";
+    public static final String speedLinear = "speed:forward";
 
-	public static final SimulatedClock clock = new SimulatedClock();
+    public static final SimulatedClock clock = new SimulatedClock();
 
-	public static void main(String[] args) {
+    public static void main(String[] args) {
 
         Global.DEBUG = false;
         Global.EXIT_ON_EXCEPTION = true;
@@ -83,7 +83,7 @@ public class SomeRovers {
 //        {
 //            NAR nar = new Default();
 //
-//            //nar.param.outputVolume.set(0);
+//            //nar.paranar.outputVolume.set(0);
 //
 //            game.add(new CarefulRover("r2", nar));
 //        }
@@ -91,18 +91,19 @@ public class SomeRovers {
         game.run(fps);
 
     }
-	public static Default newNAR() {
+
+    public static Default newNAR() {
         int conceptsFirePerCycle = 24;
         Default nar = new Default(
                 //new Memory(clock, TermIndex.softMemory(64*1024)),
-                1024, conceptsFirePerCycle, 2, 3)
-            .with(
+                1024, conceptsFirePerCycle, 2, 3);
+        nar.with(
                 Anticipate.class,
                 Inperience.class
         );
 
-        //nar.logSummaryGT(System.out, 0f);
-//        nar.log(System.out, x -> {
+        //nar.logSummaryGT(Systenar.out, 0f);
+//        nar.log(Systenar.out, x -> {
 //            if (x instanceof Task) {
 //                Task t = (Task)x;
 //                //if (t.isInput()) return false;
@@ -111,12 +112,12 @@ public class SomeRovers {
 //            return false;
 //        });
 
-        @NotNull Memory m = (Memory) NAR.this;
-        m.DEFAULT_JUDGMENT_PRIORITY = 0.4f;
+        
+        nar.DEFAULT_JUDGMENT_PRIORITY = 0.4f;
 //            nar.memory.DEFAULT_JUDGMENT_DURABILITY = 0.35f;
-        m.DEFAULT_GOAL_PRIORITY = 0.6f;
+        nar.DEFAULT_GOAL_PRIORITY = 0.6f;
 //            nar.memory.DEFAULT_GOAL_DURABILITY = 0.7f;
-        m.DEFAULT_QUESTION_PRIORITY = 0.4f;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
 
 //            nar.memory.DEFAULT_QUESTION_DURABILITY = 0.6f;
         //nar.initNAL9();
@@ -129,13 +130,13 @@ public class SomeRovers {
         nar.core.activationRate.setValue(0.8f);
 
 
-        m.duration.set(2);
-        m.conceptForgetDurations.setValue(1f);
-        m.termLinkForgetDurations.setValue(3);
-        m.taskLinkForgetDurations.setValue(8);
-        m.cyclesPerFrame.set(2);
-        m.shortTermMemoryHistory.set(3);
-        m.executionThreshold.setValue(0.0f);
+        nar.duration.set(2);
+        nar.conceptForgetDurations.setValue(1f);
+        nar.termLinkForgetDurations.setValue(3);
+        nar.taskLinkForgetDurations.setValue(8);
+        nar.cyclesPerFrame.set(2);
+        nar.shortTermMemoryHistory.set(3);
+        nar.executionThreshold.setValue(0.0f);
 
         boolean gui = false;
         if (gui) {
@@ -174,14 +175,14 @@ public class SomeRovers {
     }
 
 
-	/**
-	 * attaches a prosthetic q-controller to a NAR
-	 */
-	public static void q(NARover r) {
+    /**
+     * attaches a prosthetic q-controller to a NAR
+     */
+    public static void q(NARover r) {
         NAR n = r.nar;
 
 
-        NarQ nqSpine = new NarQ(n, (i,o) -> (int) Math.ceil(Math.sqrt(i * o)));
+        NarQ nqSpine = new NarQ(n, (i, o) -> (int) Math.ceil(Math.sqrt(i * o)));
 
 
         nqSpine.power.setValue(0.8f);
@@ -192,19 +193,18 @@ public class SomeRovers {
         ));
 
 
-
         nqSpine.goal.put(new BeliefReward(n, "eat:food"), new MutableFloat(1f));
         nqSpine.goal.put(new NotBeliefReward(n, "eat:poison"), new MutableFloat(0.9f));
         //nq.reward.put(new BeliefReward(n, "speed:forward"), new MutableFloat(0.1f));
-        
+
 
         nqSpine.output.addAll(
                 Stream.of(n.terms(
                         motorStop,
                         fire,
                         motorForward, motorBackward, motorLeft, motorRight))
-                .map(t -> new InputTask(n, t, Symbols.GOAL, false))
-                .collect(Collectors.toList())
+                        .map(t -> new InputTask(n, t, Symbols.GOAL, false))
+                        .collect(Collectors.toList())
         );
 
 
@@ -216,10 +216,11 @@ public class SomeRovers {
         float pi = (float) Math.PI;
 
         //nearsight
-        r.addEyeWithMouth("n", nqSpine, r.torso, 11, 1, new Vec2(2.7f,0), 0.4f, 0, 20f, pi / 6f);
+        r.addEyeWithMouth("n", nqSpine, r.torso, 11, 1, new Vec2(2.7f, 0), 0.4f, 0, 20f, pi / 6f);
 
         //farsight report http://farsight.org/
-        r.addEye("f", nqSpine, r.torso, 3, 4, new Vec2(2.7f,0), 0.6f, 0, 35f,(e) -> {});
+        r.addEye("f", nqSpine, r.torso, 3, 4, new Vec2(2.7f, 0), 0.6f, 0, 35f, (e) -> {
+        });
 
 
         //arms have their own controller but the two main inputs are controlled by the master Q 'nqSpine'
@@ -228,7 +229,6 @@ public class SomeRovers {
 //        Arm ar = r.addArm("ar", nqArm /* ... */, -1.75f, -1.5f, -0.8f);
 //        nqSpine.outs.addAll(al.controls);
 //        nqSpine.outs.addAll(ar.controls);
-
 
 
         Arm ac = r.addArm("ac", new NarQ(n)/* ... */, 0, 0, 0); //pi * 1.5f
@@ -243,48 +243,48 @@ public class SomeRovers {
 
 
     }
-	// private static class InputActivationController extends CycleReaction {
-	//
-	// private final NAR nar;
-	//
-	// final int windowSize;
-	//
-	// final DescriptiveStatistics busyness;
-	//
-	// public InputActivationController(NAR nar) {
-	// super(nar);
-	// this.nar = nar;
-	// this.windowSize = nar.memory.duration();
-	// this.busyness = new DescriptiveStatistics(windowSize);
-	// }
-	//
-	// @Override
-	// public void onCycle() {
-	//
-	// final float bInst = nar.memory.emotion.busy();
-	// busyness.addValue(bInst);
-	//
-	// // float bAvg = (float)busyness.getMean();
-	//
-	// // float busyMax = 3f;
-	//
-	// // double a = nar.memory.inputActivationFactor.get();
-	// // if (bAvg > busyMax) {
-	// // a -= 0.01f;
-	// // }
-	// // else {
-	// // a += 0.01f;
-	// // }
-	// //
-	// // final float min = 0.01f;
-	// // if (a < min) a = min;
-	// // if (a > 1f) a = 1f;
-	// //
-	// // //System.out.println("act: " + a + " (" + bInst + "," + bAvg);
-	// //
-	// // nar.param.inputActivationFactor.set(a);
-	// // nar.param.conceptActivationFactor.set( 0.5f * (1f + a) /** half as
-	// attenuated */ );
-	// }
-	// }
+    // private static class InputActivationController extends CycleReaction {
+    //
+    // private final NAR nar;
+    //
+    // final int windowSize;
+    //
+    // final DescriptiveStatistics busyness;
+    //
+    // public InputActivationController(NAR nar) {
+    // super(nar);
+    // this.nar = nar;
+    // this.windowSize = nar.memory.duration();
+    // this.busyness = new DescriptiveStatistics(windowSize);
+    // }
+    //
+    // @Override
+    // public void onCycle() {
+    //
+    // final float bInst = nar.memory.emotion.busy();
+    // busyness.addValue(bInst);
+    //
+    // // float bAvg = (float)busyness.getMean();
+    //
+    // // float busyMax = 3f;
+    //
+    // // double a = nar.memory.inputActivationFactor.get();
+    // // if (bAvg > busyMax) {
+    // // a -= 0.01f;
+    // // }
+    // // else {
+    // // a += 0.01f;
+    // // }
+    // //
+    // // final float min = 0.01f;
+    // // if (a < min) a = min;
+    // // if (a > 1f) a = 1f;
+    // //
+    // // //Systenar.out.println("act: " + a + " (" + bInst + "," + bAvg);
+    // //
+    // // nar.paranar.inputActivationFactor.set(a);
+    // // nar.paranar.conceptActivationFactor.set( 0.5f * (1f + a) /** half as
+    // attenuated */ );
+    // }
+    // }
 }
