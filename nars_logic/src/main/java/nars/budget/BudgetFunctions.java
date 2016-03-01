@@ -339,11 +339,11 @@ public final class BudgetFunctions extends UtilityFunctions {
     @Nullable
     static Budget budgetInference(@NotNull Budget target, float qualRaw, float complexityFactor, @NotNull ConceptProcess nal) {
 
-        BLink<? extends Task> tl = nal.taskLink;
-        Term taskTerm = tl.get().term();
-        Budgeted task = tl;
+        BLink<? extends Task> taskLink = nal.taskLink;
+
+        Budgeted task = taskLink;
         if (task.isDeleted()) {
-            task = tl.get(); //if tasklink deleted, use the task
+            task = taskLink.get(); //if tasklink deleted, use the task
             if (task.isDeleted()) //if the task is deleted, fail
                 return null;
         }
@@ -352,9 +352,11 @@ public final class BudgetFunctions extends UtilityFunctions {
 
         //Task task = taskLink.get();
 
-        float priority = task.pri() * complexityFactor;
-        float durability = task.dur() * complexityFactor;
-        float quality  = qualRaw * complexityFactor;
+        float priority = task.pri();
+        float durability = task.dur();
+        float quality  = qualRaw;
+
+        Term taskTerm = taskLink.get().term();
 
         BLink<? extends Termed> termLink = nal.termLink;
         if (/*(termLink != null) && */(!termLink.isDeleted())) {
@@ -362,6 +364,9 @@ public final class BudgetFunctions extends UtilityFunctions {
             durability = and(durability, termLink.dur()); //originaly was 'AND'
 
             //BudgetMerge.avgDQBlend.merge(target, termLink);
+            //priority *= complexityFactor;
+            durability *= complexityFactor;
+            quality *= complexityFactor;
 
             final float targetActivation = nal.conceptLink.pri();
             if (targetActivation >= 0) {
