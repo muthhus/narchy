@@ -339,47 +339,35 @@ public final class BudgetFunctions extends UtilityFunctions {
     @Nullable
     static Budget budgetInference(@NotNull Budget target, float qualRaw, float complexityFactor, @NotNull ConceptProcess nal) {
 
-        Term taskTerm = nal.taskLink.get().term();
-        Budgeted task = nal.taskLink;
+        BLink<? extends Task> tl = nal.taskLink;
+        Term taskTerm = tl.get().term();
+        Budgeted task = tl;
         if (task.isDeleted()) {
-            task = nal.taskLink.get();
-        }
-
-
-        float p, d;
-        if (!task.isDeleted()) {
-            p = task.pri();
-            d = task.dur();
-        } else {
-            return null;
+            task = tl.get(); //if tasklink deleted, use the task
+            if (task.isDeleted()) //if the task is deleted, fail
+                return null;
         }
 
         //(taskLink !=null) ? taskLink :  nal.task().budget();
 
         //Task task = taskLink.get();
 
-        float priority = p;
-        float durability = d * complexityFactor;
-        final float quality  = qualRaw  * complexityFactor /** task.qua()*/;//originally: not multiplying task
-
-        target.budget(priority, durability, quality);
+        float priority = task.pri() * complexityFactor;
+        float durability = task.dur() * complexityFactor;
+        float quality  = qualRaw * complexityFactor;
 
         BLink<? extends Termed> termLink = nal.termLink;
         if (/*(termLink != null) && */(!termLink.isDeleted())) {
-            //priority = or(priority, termLink.pri()); //originally was OR, but this can explode because the result of OR can exceed the inputs
-            //durability = and(durability, termLink.dur()); //originaly was 'AND'
+            priority = or(priority, termLink.pri()); //originally was OR, but this can explode because the result of OR can exceed the inputs
+            durability = and(durability, termLink.dur()); //originaly was 'AND'
 
-
-            BudgetMerge.avgDQBlend.merge(target, termLink);
-
-            NAR nar = nal.nar;
+            //BudgetMerge.avgDQBlend.merge(target, termLink);
 
             final float targetActivation = nal.conceptLink.pri();
-
             if (targetActivation >= 0) {
 
                 float sourceActivation =
-                        nar.conceptPriority(taskTerm, 0);
+                        nal.nar.conceptPriority(taskTerm, 0);
                 //taskLink != null ? nar.conceptPriority(taskLink.get().concept(), 0) : 1f;
 
                 //https://groups.google.com/forum/#!topic/open-nars/KnUA43B6iYs
@@ -390,9 +378,7 @@ public final class BudgetFunctions extends UtilityFunctions {
             }
         }
 
-
-
-        return target; //target.budget(priority, durability, quality);
+        return target.budget(priority, durability, quality);
 
 
         /* ORIGINAL: https://code.google.com/p/open-nars/source/browse/trunk/nars_core_java/nars/inference/BudgetFunctions.java
@@ -438,6 +424,6 @@ public final class BudgetFunctions extends UtilityFunctions {
      */
     public static boolean valid(@NotNull Budget budget, @NotNull Memory m) {
         return //!budget.isDeleted() &&
-                budget.dur() >= m.derivationDurabilityThreshold.floatValue();
+            budget.dur() >= m.derivationDurabilityThreshold.floatValue();
     }
 }

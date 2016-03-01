@@ -34,14 +34,19 @@ public class Derive extends AtomicStringConstant implements ProcTerm {
     public final PremiseRule rule;
     private final Temporalize temporalizer;
 
-    /** result pattern */
+    /**
+     * result pattern
+     */
     @NotNull
     public final Term conclusionPattern;
 
-    @NotNull private final BooleanCondition<PremiseEval> postMatch; //TODO use AND condition
+    @NotNull
+    private final BooleanCondition<PremiseEval> postMatch; //TODO use AND condition
 
-    /** whether this a single or double premise derivation; necessary in case premise
-     * does have a belief but it was not involved in determining Truth */
+    /**
+     * whether this a single or double premise derivation; necessary in case premise
+     * does have a belief but it was not involved in determining Truth
+     */
     public final boolean beliefSingle, desireSingle;
 
 
@@ -76,7 +81,7 @@ public class Derive extends AtomicStringConstant implements ProcTerm {
 
 
     @Override
-    public@Nullable
+    public @Nullable
     Op op() {
         return ATOM; //product?
     }
@@ -88,17 +93,21 @@ public class Derive extends AtomicStringConstant implements ProcTerm {
     }
 
 
-    /** main entry point for derivation result handler.
+    /**
+     * main entry point for derivation result handler.
+     *
      * @return true to allow the matcher to continue matching,
-     * false to stop it */
-    @Override public final void accept(@NotNull PremiseEval m) {
+     * false to stop it
+     */
+    @Override
+    public final void accept(@NotNull PremiseEval m) {
 
         Term d = m.resolve(conclusionPattern);
 
         if ((d instanceof EllipsisMatch)) {
             //TODO hack prevent this
             //throw new RuntimeException("invalid ellipsis match: " + derivedTerm);
-            EllipsisMatch em = ((EllipsisMatch)d);
+            EllipsisMatch em = ((EllipsisMatch) d);
             switch (em.size()) {
                 case 1:
                     d = em.term(0); //unwrap the item
@@ -111,60 +120,51 @@ public class Derive extends AtomicStringConstant implements ProcTerm {
             }
         }
 
-        if (d == null)
-            return;
-        if (d.varPattern()!=0)
-            return; //incomplete
+        if (d != null && d.varPattern() == 0 && ensureValidVolume(d) && postMatch.booleanValueOf(m))
+            derive(m, d);
 
-        if (ensureValidVolume(d)) {
-            if (postMatch.booleanValueOf(m))
-                derive(m, d);
-        } else {
+    }
 
-                if (Global.DEBUG) {
-                    //$.logger.error("Term volume overflow");
+    private static boolean ensureValidVolume(@NotNull Term derived) {
+
+        //HARD VOLUME LIMIT
+        boolean valid = derived.volume() <= Global.COMPOUND_VOLUME_MAX;
+        if (!valid && Global.DEBUG) {
+            //$.logger.error("Term volume overflow");
                 /*c.forEach(x -> {
                     Terms.printRecursive(x, (String line) ->$.logger.error(line) );
                 });*/
 
-                $.logger.warn("Term volume overflow {} {}", d, rule);
+            $.logger.warn("Derivation explosion: {}", derived/*, rule*/);
 
-                    //System.err.println(m.premise.task().explanation());
-                    //System.err.println( (m.premise.belief()!=null) ? m.premise.belief().explanation() : "belief: null");
-                    //System.exit(1);
-                    //throw new RuntimeException(message);
-                }
-
+            //System.err.println(m.premise.task().explanation());
+            //System.err.println( (m.premise.belief()!=null) ? m.premise.belief().explanation() : "belief: null");
+            //System.exit(1);
+            //throw new RuntimeException(message);
+            return false;
         }
 
-
-    }
-
-    private static boolean ensureValidVolume(@NotNull Term derivedTerm) {
-
-        //HARD VOLUME LIMIT
-        boolean tooLarge = derivedTerm.volume() > Global.COMPOUND_VOLUME_MAX;
-
-        return !tooLarge;
+        return valid;
 
     }
 
 
-    /** part 1 */
+    /**
+     * part 1
+     */
     private void derive(@NotNull PremiseEval p, @NotNull Term t) {
 
 
-
         ConceptProcess premise = p.premise;
-        Memory mem = premise.nar();
+        NAR nar = premise.nar();
 
         //get the normalized term to determine the budget (via it's complexity)
         //this way we can determine if the budget is insufficient
         //before conceptualizating in mem.taskConcept
-        Termed tNorm = mem.index.normalized(t);
+        Term tNorm = nar.index.normalized(t);
 
         //HACK why?
-        if ((tNorm == null) || !(tNorm.term() instanceof Compound))
+        if ((tNorm == null) || !(tNorm instanceof Compound))
             return;
 
         Truth truth = p.truth.get();
@@ -173,9 +173,9 @@ public class Derive extends AtomicStringConstant implements ProcTerm {
         if (budget == null)
             return;
 
-        boolean p7 = mem.nal() >= 7;
+        boolean p7 = nar.nal() >= 7;
 
-        long now = mem.time();
+        long now = nar.time();
         long occ;
 
         Compound ct = (Compound) tNorm.term();
@@ -184,11 +184,11 @@ public class Derive extends AtomicStringConstant implements ProcTerm {
             //Term cp = this.conclusionPattern;
 
             //if (Op.isOperation(cp) && p.transforms.containsKey( Operator.operator((Compound) cp) ) ) {
-                //unwrap operation from conclusion pattern; the pattern we want is its first argument
-                //cp = Operator.argArray((Compound) cp)[0];
+            //unwrap operation from conclusion pattern; the pattern we want is its first argument
+            //cp = Operator.argArray((Compound) cp)[0];
             //}
 
-            long[] occReturn = new long[] { ETERNAL };
+            long[] occReturn = new long[]{ETERNAL};
 
             ct = this.temporalizer.compute(ct,
                     p, this, occReturn
@@ -203,10 +203,6 @@ public class Derive extends AtomicStringConstant implements ProcTerm {
         premise.derive(ct, truth, budget, now, occ, p, this);
 
     }
-
-
-
-
 
 
 }
