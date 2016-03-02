@@ -463,6 +463,9 @@ public class PremiseRule extends GenericCompound {
                         case "afterOrEternal":
                             preNext = events.afterOrEternal;
                             break;
+                        /*case "taskPredicate":
+                            preNext = events.taskPredicate;
+                            break;*/
                         case "dt":
                             temporalize = Temporalize.dt;
                             break;

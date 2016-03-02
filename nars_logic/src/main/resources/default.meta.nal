@@ -174,9 +174,7 @@
 
 //NAL3 single premise inference: (switched the belief term to the compound one so that less useful termlinks to atoms arent relied upon)
 
-//    ((|,X,A..+) --> M), M |- (X --> M), (Belief:StructuralDeduction)
     ((|,X,A..+) --> M), (|,X,A..+) |- (X --> M), (Belief:StructuralDeduction)
-//    (M --> (&,X,A..+)), M |- (M --> X), (Belief:StructuralDeduction)
     (M --> (&,X,A..+)), (&,X,A..+) |- (M --> X), (Belief:StructuralDeduction)
 
 //    ((B ~ G) --> S), S |- (B --> S), (Belief:StructuralDeduction)
@@ -248,18 +246,21 @@
 //// conditional syllogism ////////////////////////////////////////////////////////////////////////////////////
 //If after M, P usually happens, and M happens, it means P is expected to happen
 
-    B, (A ==> C) |- substituteIfUnifies(C,"$",A,B), (Belief:Deduction, Desire:Induction, Order:ForAllSame, Event:Anticipate)
+//    B, (A ==> C) |- substituteIfUnifies(C,"$",A,B), (Belief:Deduction, Desire:Induction, Order:ForAllSame, Event:Anticipate)
     B, (C ==> A) |- substituteIfUnifies(C,"$",A,B), (Belief:Abduction, Desire:Abduction, Order:ForAllSame)
 
     B, (A <=> C) |- substituteIfUnifies(C,"$",A,B), (Belief:Deduction, Desire:Induction, Order:ForAllSame)
 
     (A ==> C), B |-  substituteIfUnifies( C, "$",A,B), (Belief:BeliefStructuralDeduction, Desire:Induction, Order:ForAllSame, Event:Anticipate)
-    (C ==> A), B |-  substituteIfUnifies( C, "$",A,B), (Belief:StructuralAbduction, Desire:Deduction, Order:ForAllSame)
+//    (C ==> A), B |-  substituteIfUnifies( C, "$",A,B), (Belief:StructuralAbduction, Desire:Deduction, Order:ForAllSame)
 
 
-//todo write temporalizers for this:
+
     (A ==> B), B |- A, (Belief:StructuralDeduction, Desire:Deduction, Order:ForAllSame, Event:Anticipate)
     (A ==> B), A |- B, (Belief:StructuralDeduction, Desire:Induction, Order:ForAllSame)
+
+    B, (A ==> B) |- A, (Belief:Deduction, Desire:Deduction, Order:ForAllSame, Event:Anticipate)
+    A, (A ==> B) |- B, (Belief:Abduction, Desire:Abduction, Order:ForAllSame)
 
 ////NAL7 specific inference ////////////////////////////////////////////////////////////////////////////////////
 //Reasoning about temporal statements. those are using the ==> relation because relation in time is a relation of the truth between statements.

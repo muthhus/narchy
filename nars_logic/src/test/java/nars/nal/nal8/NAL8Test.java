@@ -496,7 +496,7 @@ public class NAL8Test extends AbstractNALTest {
         tester.believe("want(x)."); //psuedo operators since operation is > nal6
         tester.believe("((believe($1) && want($1)) ==> grateful($1))");
         tester.mustBelieve(cycles*3, "(believe(x) && want(x)).", 1.00f, 0.81f); //en("there is a lock which is opened by key1");
-        tester.mustBelieve(cycles*3, "grateful(x).", 1.00f, 0.59f); //en("there is a lock which is opened by key1");
+        tester.mustBelieve(cycles*3, "grateful(x).", 1.00f, 0.42f); //en("there is a lock which is opened by key1");
 
 
     }

@@ -59,6 +59,16 @@ public interface Temporalize {
         }
     };
 
+//    /** shifts to task's predicate by the task's dt (if present) */
+//    Temporalize taskPredicate = (derived, p, d, occReturn) -> {
+//        long oc = p.premise.occurrenceTarget(latestOccurrence);
+//        int tdt = p.premise.task().term().dt();
+//        if (tdt!=ITERNAL)
+//            oc += tdt;
+//        occReturn[0] = oc;
+//        return derived;
+//    };
+
     @NotNull
     static Compound dtBeliefMinTask(Compound derived, PremiseEval p, long[] occReturn, int polarity) {
         ConceptProcess premise = p.premise;
@@ -76,18 +86,22 @@ public interface Temporalize {
     /** dt is supplied by Task */
     Temporalize dtTask = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn) ->
             dtTaskOrBelief(derived, p, occReturn, latestOccurrence, true);
+
     /** dt is supplied by Belief */
     Temporalize dtBelief = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn) ->
             dtTaskOrBelief(derived, p, occReturn, latestOccurrence, false);
 
     @NotNull
-    static Compound dtTaskOrBelief(@NotNull Compound derived, @NotNull PremiseEval p, long[] occReturn, Premise.OccurrenceSolver latestOccurrence, boolean taskOrBelief) {
+    static Compound dtTaskOrBelief(@NotNull Compound derived, @NotNull PremiseEval p, long[] occReturn, Premise.OccurrenceSolver latestOccurrence, boolean taskOrBelief/*, boolean shiftToPredicate*/) {
         ConceptProcess premise = p.premise;
-
-        occReturn[0] = premise.occurrenceTarget(latestOccurrence);
 
         int eventDelta =
                 (taskOrBelief ? premise.task() : premise.belief()).term().dt();
+
+        long o = premise.occurrenceTarget(latestOccurrence);
+//        if (shiftToPredicate)
+//            o += eventDelta;
+        occReturn[0] = o;
 
         return deriveDT(derived, 1, premise, eventDelta);
     }
