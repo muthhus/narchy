@@ -23,24 +23,10 @@ public interface Subst  {
 
     void clear();
 
-    /** match a range of subterms of Y.  */
-    @NotNull
-    static List<Term> collect(@NotNull Compound y, int from, int to) {
-        int s = to-from;
-
-        List<Term> l = Global.newArrayList(s);
-
-        for (int i = 0; i < s; i++) {
-            l.add(y.term(i+from));
-        }
-
-        return l;
-    }
-
-    void forEach(BiConsumer<? super Term, ? super Term> each);
+    void forEach(@NotNull BiConsumer<? super Term, ? super Term> each);
 
     @Nullable
-    default ImmediateTermTransform getTransform(Atomic t) {
+    default ImmediateTermTransform getTransform(@NotNull Atomic t) {
         return null;
     }
 

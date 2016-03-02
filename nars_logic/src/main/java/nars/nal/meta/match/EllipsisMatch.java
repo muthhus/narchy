@@ -4,14 +4,12 @@ import nars.Op;
 import nars.term.Compound;
 import nars.term.SubtermVisitor;
 import nars.term.Term;
+import nars.term.Terms;
 import nars.term.container.TermVector;
-import nars.term.transform.subst.Subst;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.Collection;
-
-import static java.util.stream.Collectors.toList;
 
 /**
  * Holds results of an ellipsis match and
@@ -30,25 +28,27 @@ public final class EllipsisMatch extends TermVector<Term> implements Term {
 //        return new ArrayEllipsisMatch(arrayGen.apply( filter ));
 //    }
 
+
+    public EllipsisMatch(Term[] t) {
+        super(t);
+    }
+
     public EllipsisMatch(@NotNull Compound y, int from, int to) {
-        this(Subst.collect(y, from, to));
+        this(Terms.subRange(y, from, to));
     }
 
     public EllipsisMatch(@NotNull Collection<Term> term) {
         this(term.toArray(new Term[term.size()]));
     }
 
-    public EllipsisMatch(@NotNull Collection<Term> term, Term except) {
-        this(term.stream().filter(t -> ((t!=except) )).collect(toList()));
-    }
+//    public EllipsisMatch(@NotNull Collection<Term> term, Term except) {
+//        this(term.stream().filter(t -> ((t!=except) )).collect(toList()));
+//    }
 
 //    @Deprecated public EllipsisMatch(@NotNull Collection<Term> term, Term except, Term except2) {
 //        this(term.stream().filter(t -> ((t!=except) && (t!=except2) )).collect(toList()));
 //    }
 
-    public EllipsisMatch(Term[] t) {
-        super(t);
-    }
 
 
     //abstract public boolean addContained(Compound Y, Set<Term> target);

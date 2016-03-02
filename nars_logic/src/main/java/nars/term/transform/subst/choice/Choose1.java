@@ -3,6 +3,7 @@ package nars.term.transform.subst.choice;
 import nars.nal.meta.match.Ellipsis;
 import nars.nal.meta.match.EllipsisMatch;
 import nars.term.Term;
+import nars.term.container.TermContainer;
 import nars.term.transform.subst.FindSubst;
 import org.jetbrains.annotations.NotNull;
 
@@ -61,9 +62,16 @@ public class Choose1 extends Termutator {
 
         int start = f.now();
 
+        Term x = this.x;
+        Term xEllipsis = this.xEllipsis;
+
+        Term[] m = new Term[l];
+
         for ( ; l >=0; l--) {
 
-            if (valid(f, next(shuffle, l))) {
+            Term y = next(shuffle, l);
+            if (f.match(x, y) &&
+                    f.putXY(xEllipsis, new EllipsisMatch(TermContainer.except(yy, y, m)))) {
                 next(f, chain, current);
             }
 
@@ -72,10 +80,6 @@ public class Choose1 extends Termutator {
 
     }
 
-
-    private boolean valid(@NotNull FindSubst f, @NotNull Term y) {
-        return f.match(x, y) && f.putXY(xEllipsis, new EllipsisMatch(yFree, y));
-    }
 
     private Term next(int shuffle, int permute) {
         Term[] yy = this.yy;

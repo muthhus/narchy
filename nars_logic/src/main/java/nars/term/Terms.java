@@ -73,6 +73,21 @@ public class Terms extends TermBuilder implements TermIndex {
         return h;
     }
 
+    /** match a range of subterms of Y.  */
+    @NotNull
+    public static Term[] subRange(@NotNull Compound c, int from, int to) {
+        int s = to-from;
+
+        Term[] l = new Term[to-from];
+
+        int x = 0, y = from;
+        for (int i = 0; i < s; i++) {
+            l[x++] = c.term(y++);
+        }
+
+        return l;
+    }
+
     @Override
     public
     @Nullable

@@ -459,4 +459,19 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
 
         return output;
     }
+    /** a must be in input, and output must be of size input.length-1 */
+    static Term[] except(Term[] input, Term a, Term[] output) {
+//        int targetLen = input.size() - 1;
+//        if (output.length!= targetLen) {
+//            throw new RuntimeException("wrong size");
+//        }
+        int j = 0;
+        for (Term x : input) {
+            if (x!=a)
+                output[j++] = x;
+        }
+
+        return output;
+    }
+
 }
