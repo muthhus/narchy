@@ -605,7 +605,8 @@ public class SpaceGrapher extends Spacegraph {
             logger.info("stop");
 
             if (animator == null) {
-                throw new RuntimeException("already stopped");
+                //throw new RuntimeException("already stopped");
+                return;
             }
 
             GraphSource s = source.get();

@@ -1,5 +1,6 @@
 package nars.op.in;
 
+import nars.$;
 import nars.NAR;
 import nars.nal.Tense;
 import nars.task.MutableTask;
@@ -26,7 +27,7 @@ import static nars.$.*;
 public abstract class NQuadsRDF {
 
 
-    private static final String RDF_URI = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+    //private static final String RDF_URI = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
 
     //private static String parentTagName = null;
 
@@ -175,7 +176,7 @@ public abstract class NQuadsRDF {
 
             if (s.contains("#")) {
                 String[] a = s.split("#");
-                String p = a[0]; //TODO handle the namespace
+                //String p = a[0]; //TODO handle the namespace
                 s = a[1];
             }
             else {
@@ -275,12 +276,35 @@ public abstract class NQuadsRDF {
                 subject);
     }
 
-    /**
-     * Saves the relation into the database. Both entities must exist if the
-     * relation is to be saved. Takes care of updating relation_types as well.
-     *
-     */
+
     public static Task input(@NotNull NAR nar,
+                              @Nullable Atom subject,
+                              @NotNull Atom predicate, @NotNull Term object) {
+
+        if ((subject == null) || (predicate == null) || (object == null))
+            return null;
+
+        try {
+            Term term = $.inst($.p(subject, object), predicate);
+            if (term == null)
+                throw new NullPointerException();
+            Task t = new MutableTask(
+                    term, '.');
+            return t;
+        } catch (Exception e) {
+            logger.error("rdf({}) to task: {}", new Term[] { subject, object, predicate }, e);
+            return null;
+        }
+
+    }
+
+
+        /**
+         * Saves the relation into the database. Both entities must exist if the
+         * relation is to be saved. Takes care of updating relation_types as well.
+         *
+         */
+    public static Task input0(@NotNull NAR nar,
                              @Nullable Atom subject,
                              @NotNull Atom predicate, @NotNull Term object) {
 

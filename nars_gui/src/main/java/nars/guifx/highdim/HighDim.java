@@ -1,5 +1,6 @@
 package nars.guifx.highdim;
 
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import nars.Global;
 import nars.bag.BLink;
@@ -162,7 +163,7 @@ public class HighDim<T extends Termed> extends Spacegraph {
 
             this.term = null;
 
-            l = new Label();
+            l = new Button();
             setCache(true);
 
             getChildren().add(l);
@@ -187,7 +188,7 @@ public class HighDim<T extends Termed> extends Spacegraph {
         float tmp[];
 
         /** when term changes */
-        Label l;
+        Button l;
 
         /* TODO abstract */ protected void update(Termed newTerm) {
             l.setText(

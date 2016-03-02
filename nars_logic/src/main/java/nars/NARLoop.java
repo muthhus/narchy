@@ -84,6 +84,7 @@ public class NARLoop implements Runnable {
         if (prevPeriod == period) return false;
 
         periodMS = period;
+
         if (period == -1) {
             logger.info("pause");
         } else {
@@ -176,8 +177,8 @@ public class NARLoop implements Runnable {
 
                 nar.run(cyclesPerFrame);
 
-                this.prevTime = Util.pauseLockUntil(prevTime + periodMS);
-                //this.prevTime = Util.pauseWaitUntil(prevTime + periodMS);
+                //this.prevTime = Util.pauseLockUntil(prevTime + periodMS);
+                this.prevTime = Util.pauseWaitUntil(prevTime + periodMS);
 
                 //throttle(periodMS, System.currentTimeMillis() - lastTime);
 

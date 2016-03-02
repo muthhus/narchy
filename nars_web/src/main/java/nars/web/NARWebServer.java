@@ -13,9 +13,14 @@ import nars.NAR;
 import nars.NARLoop;
 import nars.nar.Default;
 import nars.util.event.Active;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 
 import static io.undertow.Handlers.resource;
 import static io.undertow.Handlers.websocket;
@@ -31,6 +36,7 @@ public class NARWebServer extends PathHandler {
 
     long idleFPS = 7 /* low alpha brainwaves */;
 
+    final static Logger logger = LoggerFactory.getLogger(NARWebServer.class);
 
     public class WebSocketCore extends AbstractReceiveListener implements WebSocketCallback<Void>, WebSocketConnectionCallback {
 
@@ -61,14 +67,14 @@ public class NARWebServer extends PathHandler {
 
 
             active = new Active(
-                nar.eventInput.on(t -> send(socket,
-                        " IN: " + t)),
+                    nar.eventInput.on(t -> send(socket,
+                            " IN: " + t)),
                 /*nar.memory.eventDerived.on(t -> send(socket,
                         "DER: " + t)),*/
-                nar.eventAnswer.on(t -> send(socket,
-                        "ANS: " + t)),
-                nar.eventError.on(t -> send(socket,
-                        "ERR: " + t))
+                    nar.eventAnswer.on(t -> send(socket,
+                            "ANS: " + t)),
+                    nar.eventError.on(t -> send(socket,
+                            "ERR: " + t))
             );
 
 //            textOutput = new TextOutput(nar) {
@@ -166,7 +172,7 @@ public class NARWebServer extends PathHandler {
     }
 
     @SuppressWarnings("HardcodedFileSeparator")
-    public NARWebServer(NAR nar, int httpPort) {
+    public NARWebServer(NAR nar, int httpPort) throws URISyntaxException {
 
         this.nar = nar;
 
@@ -174,8 +180,12 @@ public class NARWebServer extends PathHandler {
         //websockets.start();
 
         //TODO use resource path
-        String clientPath = "./nars_web/src/main/web";
-        File c = new File(clientPath);
+
+
+        //URL pc = NARWebServer.class.getResource("./public");
+        File c = new File("./nars_web/src/main/resources/");
+        logger.info("Serving resources: {}", c.getAbsolutePath());
+
 
         //https://github.com/undertow-io/undertow/blob/master/examples/src/main/java/io/undertow/examples/sessionhandling/SessionServer.java
         addPrefixPath("/", resource(
@@ -183,47 +193,39 @@ public class NARWebServer extends PathHandler {
                 setDirectoryListingEnabled(false));
         addPrefixPath("/ws", new WebSocketCore().get());
 
-
         server = Undertow.builder()
                 .addHttpListener(httpPort, "localhost")
                 .setIoThreads(2)
                 .setHandler(this)
                 .build();
 
+        logger.info("NARS Web Server starting, port={}", httpPort);
+
+        //narThread.start();
+        //TextOutput.out(nar).setShowInput(false);
+
+        loop = nar.loop(idleFPS);
+
+        server.start();
 
     }
 
-
-    public void start() {
-
-        synchronized (server) {
-            if (loop == null) {
-                System.out.println("starting");
-                //narThread.start();
-                //TextOutput.out(nar).setShowInput(false);
-                server.start();
-
-                loop = nar.loop(idleFPS);
-            }
-        }
-
-    }
 
     public void stop() {
         synchronized (server) {
+            server.stop();
+
             try {
                 loop.waitForTermination();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            server.stop();
         }
     }
 
     public static void main(String[] args) throws Exception {
 
 
-        NAR nar = new Default(1024, 1, 1, 3);
 //                new Default(
 //                new Memory(
 //                        new RealtimeMSClock(),
@@ -235,23 +237,16 @@ public class NARWebServer extends PathHandler {
 //                1, 2, 3
 //        );
 
-
         //nar.forEachConcept(c -> System.out.println(c));
 
-        int httpPort;
+        int httpPort = args.length < 1 ? 8080 : Integer.parseInt(args[0]);
 
-        httpPort = args.length < 1 ? 8080 : Integer.parseInt(args[0]);
+        new NARWebServer(new Default(1024, 1, 1, 3), httpPort);
 
-        NARWebServer s = new NARWebServer(nar, httpPort);
-
-        System.out.println("NARS Web Server ready. port: " + httpPort);
         /*if (nlp!=null) {
             System.out.println("  NLP enabled, using: " + nlpHost + ":" + nlpPort);
         }*/
 
-
-
-        s.start();
     }
 
 

@@ -672,19 +672,19 @@ public enum Util {
         return now;
     }
 
-    /** from: http://stackoverflow.com/a/1205300 */
-    public static long pauseLockUntil(long untilTargetTime) {
-
-    // Wait until the desired next time arrives using nanosecond
-    // accuracy timer (wait(time) isn't accurate enough on most platforms)
-        long now = System.currentTimeMillis();
-        long dt = (untilTargetTime-now) * 1000000;
-        if (dt > 0) {
-            LockSupport.parkNanos(dt);
-            now = System.currentTimeMillis();
-        }
-        return now;
-    }
+//    /** from: http://stackoverflow.com/a/1205300 */
+//    public static long pauseLockUntil(long untilTargetTime) {
+//
+//    // Wait until the desired next time arrives using nanosecond
+//    // accuracy timer (wait(time) isn't accurate enough on most platforms)
+//        long now = System.currentTimeMillis();
+//        long dt = (untilTargetTime-now) * 1000000;
+//        if (dt > 0) {
+//            LockSupport.parkNanos(dt);
+//            now = System.currentTimeMillis();
+//        }
+//        return now;
+//    }
 
     /** from boofcv: */
     static void pauseWait(long milli) {
