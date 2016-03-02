@@ -52,7 +52,11 @@ public enum Global {
     //TODO use 'I' for SELf, it is 3 characters shorter
     public static final Atom DEFAULT_SELF = $.the("I");
     public static final float TRUTH_EPSILON = 0.01f;
-
+    /**
+     * maximum changes which are stored in stack
+     */
+    public final static int unificationStackMax = 64;
+    public final static int unificationTermutesMax = 8;
 
 
 //    public static int UNIFICATION_POWER = 400;

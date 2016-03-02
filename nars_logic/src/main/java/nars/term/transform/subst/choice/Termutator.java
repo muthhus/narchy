@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 public abstract class Termutator  {
 
     public final Termlike key;
+    private String asStringCached = null;
 
     public Termutator(String key) {
         this($.the(key));
@@ -41,6 +42,13 @@ public abstract class Termutator  {
     @Override
     public final int hashCode() {
         return key.hashCode();
+    }
+
+    public final String toStringCached() {
+        String s = this.asStringCached;
+        if (s == null)
+            s = this.asStringCached = toString();
+        return s;
     }
 
 }

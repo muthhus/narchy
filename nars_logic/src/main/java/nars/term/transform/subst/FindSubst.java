@@ -50,11 +50,6 @@ So it can be useful for a more easy to understand rewrite of this class TODO
 public abstract class FindSubst extends Versioning implements Subst {
 
 
-    /**
-     * maximum changes which are stored in stack
-     */
-    final static int defaultHistoryLength = 64;
-
     public final Random random;
 
     public final Op type;
@@ -85,7 +80,27 @@ public abstract class FindSubst extends Versioning implements Subst {
     public final Versioned<Compound> parent;
 
 
-    public final List<Termutator> termutes = Global.newArrayList();
+    public final List<Termutator> termutes = new FasterList(Global.unificationTermutesMax) {
+
+        final void ensureLimit() {
+            if (size()+1 > Global.unificationTermutesMax) {
+                throw new RuntimeException("Termute limit exceeded");
+                        //+ this + " while trying to add " + x);
+            }
+        }
+
+        @Override
+        public boolean add(Object newItem) {
+            ensureLimit();
+            return super.add(newItem);
+        }
+
+        @Override
+        public void add(int index, Object element) {
+            ensureLimit();
+            super.add(index, element);
+        }
+    };
 
 //    public static Ellipsis getFirstEllipsis(@NotNull Compound X) {
 //        int xsize = X.size();
@@ -127,7 +142,7 @@ public abstract class FindSubst extends Versioning implements Subst {
     }
 
     protected FindSubst(Op type, Random random, Versioning toSharePool) {
-        super(defaultHistoryLength, toSharePool);
+        super(Global.unificationStackMax, toSharePool);
         this.random = random;
         this.type = type;
 
@@ -136,8 +151,6 @@ public abstract class FindSubst extends Versioning implements Subst {
         term = new Versioned(this);
         parent = new Versioned(this);
         constraints = new Versioned(this, new int[2], new FasterList(0, new ImmutableMap[2]));
-        //branchPower = new Versioned(this);
-
 
     }
 
@@ -461,23 +474,26 @@ public abstract class FindSubst extends Versioning implements Subst {
     protected boolean addTermutator(@NotNull Termutator x) {
 
         //resolve termutator interferences that the addition may cause
-        Termlike a = x.key;
+        Termlike xKey = x.key;
+        Class xKeyClass = xKey.getClass();
+
         List<Termutator> t = this.termutes;
         int s = t.size();
+
         for (int i = 0; i < s; i++) {
             Termutator y = t.get(i);
-            Termlike b = y.key;
-            if (a.equals(b)) {
+            Termlike yKey = y.key;
+            if (xKey.equals(yKey)) {
                 //TODO maybe bifurcate a termutator tree with an OR branch?
 
                 //if exact same conditions, dont add duplicate
-                if (a.getClass() == b.getClass() &&
-                        y.toString().equals(t.toString()))
+                if (xKeyClass == yKey.getClass() &&
+                        y.toStringCached().equals(x.toStringCached()))
                     return true;
                 else
                     continue;
             }
-            if (a.containsTerm((Term) b)) {
+            if (xKey.containsTerm((Term) yKey)) {
                 //insert b before a since it is more specific
                 t.add(i, x);
                 return true;
