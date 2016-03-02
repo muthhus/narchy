@@ -67,11 +67,9 @@ public abstract class FindSubst extends Versioning implements Subst {
     @NotNull
     public final VarCachedVersionMap yx;
 
-    /**
-     * current "y"-term being matched against
-     */
-    @NotNull
-    public final Versioned<Term> term;
+
+//    @NotNull
+//    public final Versioned<Term> term;
 
     /**
      * parent, if in subterms
@@ -128,7 +126,7 @@ public abstract class FindSubst extends Versioning implements Subst {
         return "subst:{" +
                 "now:" + now() +
                 ", type:" + type +
-                ", term:" + term +
+                //", term:" + term +
                 ", parent:" + parent +
                 //"random:" + random +
                 ", xy:" + xy +
@@ -148,7 +146,7 @@ public abstract class FindSubst extends Versioning implements Subst {
 
         xy = new VarCachedVersionMap(this);
         yx = new VarCachedVersionMap(this);
-        term = new Versioned(this);
+        //term = new Versioned(this);
         parent = new Versioned(this);
         constraints = new Versioned(this, new int[2], new FasterList(0, new ImmutableMap[2]));
 

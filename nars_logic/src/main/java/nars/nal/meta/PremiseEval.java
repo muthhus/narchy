@@ -47,6 +47,12 @@ public class PremiseEval extends FindSubst {
     @NotNull
     private final TaskBeliefPair termPattern = new TaskBeliefPair();
 
+    //    /**
+    //     * current "y"-term being matched against
+    //     */
+    public Term term = null;
+
+
     int termutesPerMatch, termutes;
 
     public final Map<Atomic, ImmediateTermTransform> transforms =
@@ -151,7 +157,8 @@ public class PremiseEval extends FindSubst {
         this.termutesPerMatch = p.getMaxMatches();
 
         termPattern.set( taskTerm, beliefTerm );
-        term.set( termPattern );
+        this.term = termPattern;
+        //term.set( termPattern );
 
 //        //set initial power which will be divided by branch
 //        setPower(

@@ -30,8 +30,8 @@ public final class SubTermOps2 extends AtomicBooleanCondition<PremiseEval> {
 
     @Override
     public boolean booleanValueOf(@NotNull PremiseEval ff) {
-        Compound parent = (Compound) ff.term.get();
-        return parent.term(0).op() == left &&
-                parent.term(1).op() == right;
+        Compound parent = (Compound) ff.term;
+        return parent.term(0, left) &&
+                parent.term(1, right);
     }
 }

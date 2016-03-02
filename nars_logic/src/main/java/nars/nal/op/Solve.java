@@ -102,6 +102,7 @@ abstract public class Solve extends AtomicBooleanCondition<PremiseEval> {
                 break;
             case Symbols.QUESTION:
             case Symbols.QUEST:
+                m.truth.set(null);
                 r = true; //a truth function is not involved, so succeed
                 break;
             default:

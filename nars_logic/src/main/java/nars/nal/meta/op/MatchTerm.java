@@ -86,7 +86,7 @@ abstract public class MatchTerm extends AtomicBooleanCondition<PremiseEval> impl
 
         @Override
         @Deprecated public final boolean booleanValueOf(@NotNull PremiseEval p) {
-            p.matchAll(x, ((Compound) p.term.get()).term(subterm) /* current term */, callback, constraints);
+            p.matchAll(x, ((Compound) p.term).term(subterm) /* current term */, callback, constraints);
             return true;
         }
     }
