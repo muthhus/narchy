@@ -444,4 +444,19 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
     @Nullable TermContainer replacing(int subterm, Term replacement);
 
 
+    /** a and b must be instances of input, and output must be of size input.length-2 */
+    static Term[] except(TermContainer input, Term a, Term b, Term[] output) {
+//        int targetLen = input.size() - 2;
+//        if (output.length!= targetLen) {
+//            throw new RuntimeException("wrong size");
+//        }
+        int j = 0;
+        for (int i = 0; i < input.size(); i++) {
+            Term x = input.term(i);
+            if ((x!=a) && (x!=b))
+                output[j++] = x;
+        }
+
+        return output;
+    }
 }

@@ -4,12 +4,15 @@ import nars.nal.meta.match.Ellipsis;
 import nars.nal.meta.match.EllipsisMatch;
 import nars.term.Term;
 import nars.term.container.ShuffledSubterms;
+import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.transform.subst.FindSubst;
+import nars.util.data.Util;
 import nars.util.data.array.IntArrays;
 import nars.util.math.Combinations;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -20,7 +23,7 @@ public class Choose2 extends Termutator {
     @NotNull
     final Combinations comb;
     @NotNull
-    private final Set<Term> yFree;
+    private final Term[] yFree;
     private final Term[] x;
     private final Ellipsis xEllipsis;
     @NotNull
@@ -32,23 +35,25 @@ public class Choose2 extends Termutator {
     @Override
     public String toString() {
 
-            return "Choose2{" +
-                    "yFree=" + yFree +
-                    ", xEllipsis=" + xEllipsis +
-                    ", x=" + x[0] + ',' + x[1] +
-                    '}';
+        return "Choose2{" +
+                "yFree=" + yFree +
+                ", xEllipsis=" + xEllipsis +
+                ", x=" + x[0] + ',' + x[1] +
+                '}';
 
     }
 
-    public Choose2(@NotNull FindSubst f, Ellipsis xEllipsis, Term[] x, @NotNull Set<Term> yFree) {
+    public Choose2(@NotNull FindSubst f, @NotNull Ellipsis xEllipsis, @NotNull Collection<Term> x, @NotNull Collection<Term> yFreeSet) {
         super(xEllipsis);
         this.f = f;
-        this.x = x;
-        this.yFree = yFree;
         this.xEllipsis = xEllipsis;
-        //yy = yFree.toArray(new Term[ysize]);
-        yy = new ShuffledSubterms(f.random, new TermVector(yFree));
-        comb = new Combinations(yy.size(), 2);
+        this.x = x.toArray(new Term[x.size()]);
+
+        int yFreeSize = yFreeSet.size();
+        this.yFree = yFreeSet.toArray(new Term[yFreeSize]);
+        this.yy = new ShuffledSubterms(f.random, this.yFree);
+
+        this.comb = new Combinations(yFreeSize, 2);
     }
 
     @Override
@@ -62,14 +67,17 @@ public class Choose2 extends Termutator {
         @NotNull Combinations ccc = this.comb;
         ccc.reset();
 
-        boolean state = true;
+        boolean phase = true;
 
         int start = f.now();
+        @NotNull ShuffledSubterms yy = this.yy;
 
-        while (ccc.hasNext() || !state) {
+        Term[] m = new Term[this.yy.size()-2];
 
-            int[] c = state ? ccc.next() : ccc.prev();
-            state = !state;
+        while (ccc.hasNext() || !phase) {
+
+            int[] c = phase ? ccc.next() : ccc.prev();
+            phase = !phase;
 
             Term y1 = yy.term(c[0]);
             int c1 = c[1];
@@ -83,7 +91,7 @@ public class Choose2 extends Termutator {
                 Term y2 = yy.term(c1);
 
                 if (f.match(x[1], y2) &&
-                        f.putXY(xEllipsis, new EllipsisMatch(yFree, y1, y2))) {
+                        f.putXY(xEllipsis, new EllipsisMatch(TermContainer.except(yy, y1, y2, m)))) {
 
                     next(f, chain, current);
                 }

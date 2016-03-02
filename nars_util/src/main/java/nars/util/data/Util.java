@@ -893,4 +893,22 @@ public enum Util {
         }
 
     }
+
+    /** a and b must be instances of input, and output must be of size input.length-2 */
+    public static <X> X[] except(X[] input, X a, X b, X[] output) {
+        int targetLen = input.length - 2;
+        if (output.length!= targetLen) {
+            throw new RuntimeException("wrong size");
+        }
+        int j = 0;
+        for (X x : input) {
+            if ((x!=a) && (x!=b))
+                output[j++] = x;
+        }
+
+        return output;
+    }
+
+
+
 }

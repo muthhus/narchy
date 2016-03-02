@@ -274,9 +274,9 @@ public abstract class FindSubst extends Versioning implements Subst {
     private final boolean nextVarX(@NotNull Term /* var */ xVar, @NotNull Term /* var */ y) {
         Op xOp = xVar.op();
         return (y.op() == xOp) ? putCommon((Variable)xVar, (Variable)y) :
-                    (xOp == type) //<-- this condition may not be correct but doesnt seem to make much difference. better if it is more restrictive in what is inserted
+                (xOp == type) //<-- this condition may not be correct but doesnt seem to make much difference. better if it is more restrictive in what is inserted
                         &&
-                putVarX(xVar, y);
+                        putVarX(xVar, y);
 
         //            if ((y.op() == Op.VAR_QUERY && xVar.op() != Op.VAR_QUERY) ||
         //                    (y.op() != Op.VAR_QUERY && xVar.op() == Op.VAR_QUERY)) {
@@ -526,7 +526,7 @@ public abstract class FindSubst extends Versioning implements Subst {
      * @param X the pattern term
      * @param Y the compound being matched into X
      */
-    public final boolean matchEllipsedCommutative(@NotNull Compound X, Ellipsis Xellipsis, @NotNull Compound Y) {
+    public final boolean matchEllipsedCommutative(@NotNull Compound X, @NotNull Ellipsis Xellipsis, @NotNull Compound Y) {
 
         //ALL OF THIS CAN BE PRECOMPUTED
         Set<Term> xFree = Global.newHashSet(0); //Global.newHashSet(0);
@@ -594,7 +594,7 @@ public abstract class FindSubst extends Versioning implements Subst {
     /**
      * toMatch matched into some or all of Y's terms
      */
-    private boolean matchCommutiveRemaining(Ellipsis xEllipsis, @NotNull Set<Term> xFree, @NotNull MutableSet<Term> yFree) {
+    private boolean matchCommutiveRemaining(@NotNull Ellipsis xEllipsis, @NotNull Set<Term> xFree, @NotNull MutableSet<Term> yFree) {
         int xs = xFree.size();
 
         switch (xs) {
@@ -606,7 +606,7 @@ public abstract class FindSubst extends Versioning implements Subst {
                         xEllipsis, xFree.iterator().next(), yFree));
             case 2:
                 return addTermutator(new Choose2(this,
-                        xEllipsis, xFree.toArray(new Term[xFree.size()]), yFree));
+                        xEllipsis, xFree, yFree));
             default:
                 //3 or more combination
                 throw new RuntimeException("unimpl: " + xs + " arity combination unimplemented");
@@ -736,7 +736,7 @@ public abstract class FindSubst extends Versioning implements Subst {
     /**
      * elimination
      */
-    private boolean putVarX(Term /* var */ x, @NotNull Term y) {
+    private boolean putVarX(@NotNull Term /* var */ x, @NotNull Term y) {
         return putXY(x, y) ?
                 ((x instanceof GenericNormalizedVariable) ?
                         putYX(x, y) :
@@ -840,7 +840,7 @@ public abstract class FindSubst extends Versioning implements Subst {
     /**
      * returns true if the assignment was allowed, false otherwise
      */
-    public final boolean putXY(Term x /* usually a Variable */, @NotNull Term y) {
+    public final boolean putXY(@NotNull Term x /* usually a Variable */, @NotNull Term y) {
 
 //        if (x.equals(y))
 //            throw new RuntimeException("x==y");
@@ -867,7 +867,7 @@ public abstract class FindSubst extends Versioning implements Subst {
      * true if the match assignment is allowed by constraints
      * TODO find a way to efficiently eliminate redundant rules shared between versions
      */
-    public final boolean assignable(Term x, Term y) {
+    public final boolean assignable(@NotNull Term x, @NotNull Term y) {
         Versioned<ImmutableMap<Term, MatchConstraint>> cc = this.constraints;
         int s = cc.size() - 1;
         if (s < 0) return true;

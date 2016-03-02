@@ -20,6 +20,10 @@ public final class ShuffledSubterms extends ShuffledPermutations implements Term
     public final TermContainer srcsubs;
     private final Random rng;
 
+    public ShuffledSubterms(Random rng, Term[] subterms) {
+        this(rng, TermVector.the(subterms));
+    }
+
     public ShuffledSubterms(Random rng, TermContainer subterms) {
         this.rng = rng;
         this.srcsubs = subterms;
@@ -53,7 +57,7 @@ public final class ShuffledSubterms extends ShuffledPermutations implements Term
     }
 
     @Override
-    public boolean equalTerms(TermContainer c) {
+    public boolean equalTerms(@NotNull TermContainer c) {
         //to compare them in-order
         return TermContainer.equals(this, c);
     }
@@ -79,7 +83,7 @@ public final class ShuffledSubterms extends ShuffledPermutations implements Term
     }
 
     @Override
-    public void forEach(Consumer action, int start, int stop) {
+    public void forEach(@NotNull Consumer action, int start, int stop) {
         TermContainer.forEach(this, action, start, stop);
     }
 
@@ -123,6 +127,7 @@ public final class ShuffledSubterms extends ShuffledPermutations implements Term
         return TermContainer.compareTo(this, o);
     }
 
+    @NotNull
     @Override
     public Iterator iterator() {
         throw new UnsupportedOperationException();

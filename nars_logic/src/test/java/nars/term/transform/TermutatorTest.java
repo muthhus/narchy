@@ -1,7 +1,9 @@
 package nars.term.transform;
 
+import com.google.common.collect.Lists;
 import nars.Op;
 import nars.nal.meta.match.Ellipsis;
+import nars.term.Term;
 import nars.term.transform.subst.FindSubst;
 import nars.term.transform.subst.choice.Choose1;
 import nars.term.transform.subst.choice.Choose2;
@@ -12,6 +14,7 @@ import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -60,7 +63,7 @@ public class TermutatorTest {
 
     static final @NotNull Ellipsis e1 = ((Ellipsis.EllipsisPrototype) $("%A..+")).make(1,1);
     static final Variable p2= v(Op.VAR_PATTERN, 2);
-    static final Variable[] p2p3 = { p2, v(Op.VAR_PATTERN, 3)};
+    static final Collection<Term> p2p3 = Lists.newArrayList( p2, v(Op.VAR_PATTERN, 3) );
 
     @Test public void testChoose2_2() {
 
@@ -83,10 +86,10 @@ public class TermutatorTest {
         Set<String> series = new HashSet();
         for (int i = 0; i < 4; i++) {
             series.add(
-                assertTermutatorProducesUniqueResults(
-                    new Choose2(f, e1,
-                            p2p3,
-                            p("a", "b", "c", "d").toSet()), 12)
+                    assertTermutatorProducesUniqueResults(
+                            new Choose2(f, e1,
+                                    p2p3,
+                                    p("a", "b", "c", "d").toSet()), 12)
             );
         }
 
@@ -111,7 +114,7 @@ public class TermutatorTest {
                         $("{w,x,y,z}")), 24);
     }
 
-    String assertTermutatorProducesUniqueResults(Termutator t, int num) {
+    String assertTermutatorProducesUniqueResults(@NotNull Termutator t, int num) {
 
         assertEquals(num, t.getEstimatedPermutations());
 
@@ -123,7 +126,7 @@ public class TermutatorTest {
         t.run(f, new Termutator[] { t, new Termutator("evaluate") {
 
             @Override
-            public void run(FindSubst f, Termutator[] chain, int current) {
+            public void run(@NotNull FindSubst f, Termutator[] chain, int current) {
                 if (s.add( f.xy.toString() )) {
                     actual[0]++;
                 } else {

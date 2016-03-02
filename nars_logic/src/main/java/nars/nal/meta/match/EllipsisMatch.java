@@ -33,6 +33,7 @@ public final class EllipsisMatch extends TermVector<Term> implements Term {
     public EllipsisMatch(@NotNull Compound y, int from, int to) {
         this(Subst.collect(y, from, to));
     }
+
     public EllipsisMatch(@NotNull Collection<Term> term) {
         this(term.toArray(new Term[term.size()]));
     }
@@ -41,9 +42,9 @@ public final class EllipsisMatch extends TermVector<Term> implements Term {
         this(term.stream().filter(t -> ((t!=except) )).collect(toList()));
     }
 
-    public EllipsisMatch(@NotNull Collection<Term> term, Term except, Term except2) {
-        this(term.stream().filter(t -> ((t!=except) && (t!=except2) )).collect(toList()));
-    }
+//    @Deprecated public EllipsisMatch(@NotNull Collection<Term> term, Term except, Term except2) {
+//        this(term.stream().filter(t -> ((t!=except) && (t!=except2) )).collect(toList()));
+//    }
 
     public EllipsisMatch(Term[] t) {
         super(t);
