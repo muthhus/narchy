@@ -74,6 +74,10 @@ public class Choose2 extends Termutator {
 
         Term[] m = new Term[this.yy.size()-2];
 
+        Ellipsis xEllipsis = this.xEllipsis;
+        FindSubst f = this.f;
+        Term[] x = this.x;
+
         while (ccc.hasNext() || !phase) {
 
             int[] c = phase ? ccc.next() : ccc.prev();
@@ -82,9 +86,6 @@ public class Choose2 extends Termutator {
             Term y1 = yy.term(c[0]);
             int c1 = c[1];
             IntArrays.reverse(c); //swap to try the reverse next iteration
-
-            FindSubst f = this.f;
-            Term[] x = this.x;
 
             if (f.match(x[0], y1)) {
 

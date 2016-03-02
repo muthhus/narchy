@@ -14,17 +14,25 @@ public class DefaultTruth extends AbstractScalarTruth {
     private final int hash;
 
     /** unspecified confidence, will be invalid unless updated later */
-    public DefaultTruth(float f) {
+    @Deprecated public DefaultTruth(float f) {
         super(f, Float.NaN);
         this.hash = 0;
     }
 
     public DefaultTruth(float f, float c) {
+        this(f, c, Global.TRUTH_EPSILON, hashDiscreteness);
+    }
+
+    public DefaultTruth(float f, float c, float epsilon) {
+        this(f, c, Global.TRUTH_EPSILON, (int)(1f/epsilon));
+    }
+
+    public DefaultTruth(float f, float c, float epsilon, int discreteness) {
         super(
-            round(f, Global.TRUTH_EPSILON),
-            round(c, Global.TRUTH_EPSILON)
+            round(f, epsilon),
+            round(c, epsilon)
         );
-        this.hash = Truth.hash(this, hashDiscreteness);
+        this.hash = Truth.hash(this, discreteness);
     }
 
     public DefaultTruth(char punctuation, @NotNull Memory m) {

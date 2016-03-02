@@ -1,7 +1,7 @@
 package nars.perf;
 
 import nars.perf.nars.nar.perf.NARBenchmark;
-import org.openjdk.jmh.profile.StackProfiler;
+import org.openjdk.jmh.profile.*;
 import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
@@ -29,22 +29,24 @@ public enum Main {
 				// .verbosity(VerboseMode.EXTRA) //VERBOSE OUTPUT
 
 				.addProfiler(StackProfiler.class,
-						"lines=3;top=50;period=4;detailLine=true")
+						"lines=3;top=50;period=1;detailLine=true")
 
-				// .addProfiler(HotspotRuntimeProfiler.class)
-				// .addProfiler(HotspotMemoryProfiler.class)
+				 //.addProfiler(HotspotRuntimeProfiler.class)
+				//.addProfiler(HotspotMemoryProfiler.class)
 				// .addProfiler(HotspotThreadProfiler.class)
-				// .addProfiler(HotspotCompilationProfiler.class)
+
+				//.addProfiler(HotspotCompilationProfiler.class)
 				// .addProfiler(HotspotClassloadingProfiler.class)
+				.addProfiler(LinuxPerfProfiler.class)
 				/*
-				 * .addProfiler(LinuxPerfProfiler.class)
+
 				 * .addProfiler(LinuxPerfAsmProfiler.class)
 				 * .addProfiler(LinuxPerfNormProfiler.class)
 				 */
-				// .addProfiler(CompilerProfiler.class)
+				 //.addProfiler(CompilerProfiler.class)
 				// .addProfiler(GCProfiler.class)
 
-				.timeout(TimeValue.seconds(5)).build();
+				.timeout(TimeValue.seconds(15)).build();
 
 		new Runner(opt).run();
 	}

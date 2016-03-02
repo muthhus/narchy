@@ -9,6 +9,7 @@ import nars.concept.Concept;
 import nars.guifx.Spacegraph;
 import nars.guifx.demo.NARide;
 import nars.guifx.graph2.TermNode;
+import nars.guifx.graph2.layout.IterativeLayout;
 import nars.guifx.util.Animate;
 import nars.guifx.util.TabX;
 import nars.nar.Default;
@@ -52,6 +53,32 @@ public class HighDim<T extends Termed> extends Spacegraph {
         /** accepts input link and vectorizes it by some encoding to the dimensionality returned by inputs() */
         abstract public float[] vectorize(@NotNull BLink<? extends C> item, float[] x);
     }
+
+//    static class IteratveLayoutAdapter extends HighDimProjection<Concept> {
+//
+//        private final IterativeLayout layout;
+//
+//        public IteratveLayoutAdapter(IterativeLayout l) {
+//            this.layout = l;
+//        }
+//
+//        /** inputs this projection demands */
+//        public int inputs() {
+//            return 2;
+//        }
+//
+//
+//
+//        /** applies the vectorized representation to a component */
+//        public void project(float[] x, TermNode target) {
+//
+//        }
+//
+//        /** accepts input link and vectorizes it by some encoding to the dimensionality returned by inputs() */
+//        public float[] vectorize(@NotNull BLink<? extends Concept> item, float[] x) {
+//
+//        }
+//    }
 
     private static class ScatterPlot1 extends HighDimProjection<Concept> {
         @Override
@@ -325,7 +352,7 @@ public class HighDim<T extends Termed> extends Spacegraph {
         NARide.show(n.loop(), ide -> {
 
 
-            HighDim<Concept> dim = new HighDim<Concept>(16, new AEConcept1());
+            HighDim<Concept> dim = new HighDim<Concept>(64, new AEConcept1());
 
             n.onFrame(N -> {
                 dim.commit(((Default) N).core.active);

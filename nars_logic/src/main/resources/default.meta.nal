@@ -78,8 +78,8 @@
 
 // "If not smoking lets you be healthy, being not healthy may be the result of smoking"
 
-    ( --S ==> P),   P |- ( --P ==> S), (Belief:Contraposition, Derive:AllowBackward)
-    ( --S ==> P), --S |- ( --P ==> S), (Belief:Contraposition, Derive:AllowBackward)
+    ( --S ==> P),   P, time(dtTask) |- ( --P ==> S), (Belief:Contraposition, Derive:AllowBackward)
+    ( --S ==> P), --S, time(dtTask) |- ( --P ==> S), (Belief:Contraposition, Derive:AllowBackward)
 
 
 
@@ -208,7 +208,7 @@
 //// implication to equivalence ////////////////////////////////////////////////////////////////////////////////////
 //If when S happens, P happens, and before P happens, S has happened, then they are truth-related equivalent
 
-    (S ==> P), (P ==> S), neq(S,P) |- (S <=> P), (Belief:Intersection, Derive:AllowBackward)
+    (S ==> P), (P ==> S), neq(S,P), time(dtCombine) |- (S <=> P), (Belief:Intersection, Derive:AllowBackward)
 
 //// equivalence-based syllogism ////////////////////////////////////////////////////////////////////////////////////
 //Same as for inheritance again
@@ -227,11 +227,11 @@
 //// implication-based composition ////////////////////////////////////////////////////////////////////////////////////
 //Same as for inheritance again
 
-    (P ==> M), (S ==> M), neq(S,P) |- ((P || S) ==> M), (Belief:Intersection),
-                                      ((P && S) ==> M), (Belief:Union)
+    (P ==> M), (S ==> M), neq(S,P), time(dtCombine) |- ((P || S) ==> M), (Belief:Intersection),
+                                                       ((P && S) ==> M), (Belief:Union)
 
-    (M ==> P), (M ==> S), neq(S,P) |- (M ==> (P && S)), (Belief:Intersection),
-                                      (M ==> (P || S)), (Belief:Union)
+    (M ==> P), (M ==> S), neq(S,P), time(dtCombine) |- (M ==> (P && S)), (Belief:Intersection),
+                                                       (M ==> (P || S)), (Belief:Union)
 
 //    (D =/> R), (D =\> K), neq(R,K) |- (K =/> R), (Belief:Abduction),
 //                                      (R =\> K), (Belief:Induction),
@@ -240,10 +240,10 @@
 //// implication-based decomposition ////////////////////////////////////////////////////////////////////////////////////
 //Same as for inheritance again
 
-    (S ==> M), ((||,S,A..+) ==> M) |- ((||,A..+) ==> M), (Belief:DecomposePositiveNegativeNegative, Order:ForAllSame)
-    (S ==> M), ((&&,S,A..+) ==> M) |- ((&&,A..+) ==> M), (Belief:DecomposeNegativePositivePositive, Order:ForAllSame)
-    (M ==> S), (M ==> (&&,S,A..+)) |- (M ==> (&&,A..+)), (Belief:DecomposePositiveNegativeNegative, Order:ForAllSame)
-    (M ==> S), (M ==> (||,S,A..+)) |- (M ==> (||,A..+)), (Belief:DecomposeNegativePositivePositive, Order:ForAllSame)
+    (S ==> M), ((||,S,A..+) ==> M), time(dtCombine) |- ((||,A..+) ==> M), (Belief:DecomposePositiveNegativeNegative, Order:ForAllSame)
+    (S ==> M), ((&&,S,A..+) ==> M), time(dtCombine) |- ((&&,A..+) ==> M), (Belief:DecomposeNegativePositivePositive, Order:ForAllSame)
+    (M ==> S), (M ==> (&&,S,A..+)), time(dtCombine) |- (M ==> (&&,A..+)), (Belief:DecomposePositiveNegativeNegative, Order:ForAllSame)
+    (M ==> S), (M ==> (||,S,A..+)), time(dtCombine) |- (M ==> (||,A..+)), (Belief:DecomposeNegativePositivePositive, Order:ForAllSame)
 
 //// conditional syllogism ////////////////////////////////////////////////////////////////////////////////////
 //If after M, P usually happens, and M happens, it means P is expected to happen

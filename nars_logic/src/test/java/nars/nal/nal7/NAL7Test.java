@@ -151,10 +151,11 @@ public class NAL7Test extends AbstractNALTest {
     }
     @Test public void testImplQueryTenseFuture() {
         test()
+        .log()
         .input("(y ==>+3 x). :\\:")
-        .inputAt(45, "(y ==>+3 ?x)? :/:")
+        .inputAt(25, "(y ==>+3 ?z)? :/:")
         //.mustAnswer(50, "(y ==>+3 x)", 1.00f, 0.74f, 15);
-        .mustAnswer(50, "(y ==>+3 x)", 1.00f, 0.9f, -5);
+        .mustAnswer(50, "(y ==>+3 x)", 1.00f, 0.9f, 25+5);
     }
 
 //    @Test public void testImplQuery2() {
@@ -396,7 +397,7 @@ public class NAL7Test extends AbstractNALTest {
         tester.inputAt(t, component + ". :|:");
         tester.inputAt(t + dt, "enter:(John,room). :|:");
 
-        tester.mustBelieve(15, "(" + component + " ==>+" + dt + " enter:(John,room))",
+        tester.mustBelieve((t+dt)*2, "(" + component + " ==>+" + dt + " enter:(John,room))",
                 1.00f, 0.45f,
                 t);
 

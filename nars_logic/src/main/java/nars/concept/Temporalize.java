@@ -1,11 +1,14 @@
 package nars.concept;
 
+import nars.Premise;
 import nars.nal.meta.PremiseEval;
 import nars.nal.op.Derive;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import static nars.nal.Tense.ETERNAL;
 import static nars.nal.Tense.ITERNAL;
@@ -16,6 +19,8 @@ import static nars.nal.Tense.TIMELESS;
  */
 @FunctionalInterface
 public interface Temporalize {
+
+    nars.Premise.OccurrenceSolver latestOccurrence = (t, b) -> t >= b ? t : b;
 
     /**
      *
@@ -37,10 +42,10 @@ public interface Temporalize {
      *  should be used in combination with a "premise Event" precondition
      *  */
     Temporalize dt = (derived, p, d, occReturn) -> {
-        return dtBelief(derived, p, occReturn, +1);
+        return dtBeliefMinTask(derived, p, occReturn, +1);
     };
     Temporalize dtReverse = (derived, p, d, occReturn) -> {
-        return dtBelief(derived, p, occReturn, -1);
+        return dtBeliefMinTask(derived, p, occReturn, -1);
     };
 
     /** if the premise is an event (and it is allowed to not be) then the dt is the difference
@@ -50,19 +55,45 @@ public interface Temporalize {
         if (!p.premise.isEvent()) {
             return derived;
         } else {
-            return dtBelief(derived, p, occReturn, -1);
+            return dtBeliefMinTask(derived, p, occReturn, -1);
         }
     };
 
     @NotNull
-    static Compound dtBelief(Compound derived, PremiseEval p, long[] occReturn, int polarity) {
+    static Compound dtBeliefMinTask(Compound derived, PremiseEval p, long[] occReturn, int polarity) {
         ConceptProcess premise = p.premise;
 
-        occReturn[0] = premise.occurrenceTarget((t, b) -> t >= b ? t :b); //latest occurring one
+        occReturn[0] = premise.occurrenceTarget(latestOccurrence);
 
-        long eventDelta = premise.belief().occurrence() -
-                premise.task().occurrence();
+        //TODO check valid int/long conversion
+        int eventDelta = (int)(premise.belief().occurrence() -
+                premise.task().occurrence());
 
+        return deriveDT(derived, polarity, premise, eventDelta);
+    }
+
+
+    /** dt is supplied by Task */
+    Temporalize dtTask = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn) ->
+            dtTaskOrBelief(derived, p, occReturn, latestOccurrence, true);
+    /** dt is supplied by Belief */
+    Temporalize dtBelief = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn) ->
+            dtTaskOrBelief(derived, p, occReturn, latestOccurrence, false);
+
+    @NotNull
+    static Compound dtTaskOrBelief(@NotNull Compound derived, @NotNull PremiseEval p, long[] occReturn, Premise.OccurrenceSolver latestOccurrence, boolean taskOrBelief) {
+        ConceptProcess premise = p.premise;
+
+        occReturn[0] = premise.occurrenceTarget(latestOccurrence);
+
+        int eventDelta =
+                (taskOrBelief ? premise.task() : premise.belief()).term().dt();
+
+        return deriveDT(derived, 1, premise, eventDelta);
+    }
+
+    @NotNull
+    static Compound deriveDT(Compound derived, int polarity, ConceptProcess premise, int eventDelta) {
         if (eventDelta!=0 && derived.op().isCommutative()) {
             //flip temporal polarity if reversed
             if (!derived.term(0).equals(premise.task().term())) {
@@ -73,11 +104,61 @@ public interface Temporalize {
         return derived.dt(((int)eventDelta) * polarity);
     }
 
+    /** combine any existant DT's in the premise (assumes both task and belief are present) */
+    Temporalize dtCombine = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn) -> {
+        ConceptProcess premise = p.premise;
+
+        Task task = premise.task();
+        int taskDT = task.term().dt();
+        int beliefDT = ((Compound)premise.beliefTerm().term()).dt();
+
+        int eventDelta;
+        if (taskDT==ITERNAL && beliefDT == ITERNAL) {
+            eventDelta = ITERNAL;
+        } else if (taskDT!=ITERNAL && beliefDT != ITERNAL) {
+
+            Task belief = premise.belief();
+
+            if (belief!=null && task.isJudgmentOrGoal() && belief.task().isJudgmentOrGoal()) {
+                //blend task and belief's DT's weighted by their relative confidence
+                float taskConf = task.conf();
+                eventDelta = Math.round(Util.lerp(
+                        taskDT,
+                        beliefDT,
+                        taskConf / (taskConf + belief.conf())
+                ));
+            } else {
+                eventDelta = taskDT;
+            }
+
+        } else if (taskDT == ITERNAL) {
+            eventDelta = beliefDT;
+        } else /*if (beliefDT == ITERNAL)*/ {
+            eventDelta = taskDT;
+        }
+
+        occReturn[0] = premise.occurrenceTarget((t, b) -> t >= b ? t :b); //latest occurring one
+
+        return deriveDT(derived, 1, premise, eventDelta);
+    };
+
+    Temporalize AutoSimple = (derived, p, d, occReturn) -> {
+
+        ConceptProcess premise = p.premise;
+
+        long occ = premise.occurrenceTarget((t,b)->t); //reset
+
+        occReturn[0] = occ;
+
+        return derived;
+    };
+
     /**
      * "automatic" implementation of Temporalize, used by default. slow and wrong about 25..30% of the time sux needs rewritten or replaced
      * apply temporal characteristics to a newly derived term according to the premise's
      */
     Temporalize Auto = (derived, p, d, occReturn) -> {
+
 
         Term tp = d.rule.getTaskTermPattern();
         Term bp = d.rule.getBeliefTermPattern();

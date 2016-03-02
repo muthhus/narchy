@@ -40,9 +40,15 @@ public interface TruthOperator {
 
         //pre-filter insufficient confidence level
 
-        if ((truth != null) && (truth.conf() > minConf)) {
-            m.truth.set(truth);
-            return true;
+        if (truth != null) {
+            if ( truth.conf() > minConf) {
+                m.truth.set(truth);
+                return true;
+            }
+            //use this to find truth functions which do not utilize minConf before allocating a result Truth instance
+            /*else {
+                throw new RuntimeException("minConf did not prevent calculation");
+            }*/
         }
 
         return false;

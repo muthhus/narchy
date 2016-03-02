@@ -279,14 +279,14 @@ public final class TruthFunctions extends UtilityFunctions {
      * @return Truth value of the conclusion
      */
     @NotNull
-    public static Truth exemplification(@NotNull Truth a, @NotNull Truth b) {
+    public static Truth exemplification(@NotNull Truth a, @NotNull Truth b, float minConf) {
         float f1 = a.freq();
         float f2 = b.freq();
         float c1 = a.conf();
         float c2 = b.conf();
         float w = and(f1, f2, c1, c2);
         float c = w2c(w);
-        return new DefaultTruth(1, c);
+        return c < minConf ? null : new DefaultTruth(1, c);
     }
 
     /**
@@ -499,14 +499,16 @@ public final class TruthFunctions extends UtilityFunctions {
     }
 
     @NotNull
-    public static Truth decomposeNegativeNegativeNegative(@NotNull Truth a, @NotNull Truth b) {
+    public static Truth decomposeNegativeNegativeNegative(@NotNull Truth a, @NotNull Truth b, float minConf) {
         float f1 = a.freq();
         float c1 = a.conf();
         float f2 = b.freq();
         float c2 = b.conf();
 
         float fn = and((1-f1),(1-f2));
-        return new DefaultTruth(1-fn, and(fn,c1,c2));
+        float c = and(fn, c1, c2);
+        if (c < minConf) return null;
+        return new DefaultTruth(1-fn, c);
     }
 
     @NotNull

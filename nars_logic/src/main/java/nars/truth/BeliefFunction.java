@@ -152,7 +152,7 @@ public enum BeliefFunction implements TruthOperator {
     //@AllowOverlap
     Intersection() {
         @Nullable
-        @Override public Truth apply(@NotNull final Truth T, @Nullable final Truth B, Memory m, float minConf) {
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, Memory m, float minConf) {
             if (B == null) return null;
             if (T == null) return null;
             return TruthFunctions.intersection(T,B);
@@ -162,7 +162,7 @@ public enum BeliefFunction implements TruthOperator {
     @AllowOverlap
     Difference() {
         @Nullable
-        @Override public Truth apply(@NotNull final Truth T, @Nullable final Truth B, Memory m, float minConf) {
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, Memory m, float minConf) {
             if (B == null) return null;
             if (T == null) return null;
             return TruthFunctions.difference(T,B);
@@ -215,7 +215,7 @@ public enum BeliefFunction implements TruthOperator {
         @Override public Truth apply(@NotNull final Truth T, @Nullable final Truth B, Memory m, float minConf) {
             if (B==null) return null;
             if (T == null) return null;
-            return TruthFunctions.exemplification(T,B);
+            return TruthFunctions.exemplification(T, B, minConf);
         }
     },
     DecomposeNegativeNegativeNegative() {
@@ -223,7 +223,7 @@ public enum BeliefFunction implements TruthOperator {
         @Override public Truth apply(@NotNull final Truth T, @Nullable final Truth B, Memory m, float minConf) {
             if (B==null) return null;
             if (T == null) return null;
-            return TruthFunctions.decomposeNegativeNegativeNegative(T,B);
+            return TruthFunctions.decomposeNegativeNegativeNegative(T, B, minConf);
         }
     },
     DecomposePositiveNegativePositive() {

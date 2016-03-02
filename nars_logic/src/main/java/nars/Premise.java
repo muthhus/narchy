@@ -206,10 +206,13 @@ public interface Premise extends Level, Tasked {
                 (!Tense.isEternal(b.occurrence())));
     }
 
-    /** true if both task and belief (if not null) are eternal */
+    /** true if task and belief (if not null) are eternal */
     default boolean isEternal() {
-        Task b = belief();
-        return !((b == null) || (!b.isEternal())) && task().isEternal();
+        if (task().isEternal()) {
+            Task b = belief();
+            return (b == null) || (b.isEternal());
+        }
+        return false;
     }
 
     boolean cyclic();

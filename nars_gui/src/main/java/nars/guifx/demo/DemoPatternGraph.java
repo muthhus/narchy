@@ -25,7 +25,7 @@ public class DemoPatternGraph {
 
         NARide.show(n.loop(), ide -> {
 
-                    HighDim<Concept> dim = new HighDim<Concept>(16, new AEConcept1());
+                    HighDim<Concept> dim = new HighDim<Concept>(64, new AEConcept1());
 
                     n.onFrame(N -> {
                         dim.commit(((Default) N).core.active);

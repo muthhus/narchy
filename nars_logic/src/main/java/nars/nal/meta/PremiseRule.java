@@ -466,6 +466,15 @@ public class PremiseRule extends GenericCompound {
                         case "dt":
                             temporalize = Temporalize.dt;
                             break;
+                        case "dtBelief":
+                            temporalize = Temporalize.dtBelief;
+                            break;
+                        case "dtTask":
+                            temporalize = Temporalize.dtTask;
+                            break;
+                        case "dtCombine":
+                            temporalize = Temporalize.dtCombine;
+                            break;
                         case "dtReverse":
                             temporalize = Temporalize.dtReverse;
                             break;
@@ -566,13 +575,14 @@ public class PremiseRule extends GenericCompound {
 
             }
 
-
             if (preNext != null) {
                 if (!pres.contains(preNext)) //unique
                     pres.add(preNext);
             }
+
             if (next != null)
                 posts.add(next);
+
         }
 
 

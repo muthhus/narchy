@@ -882,7 +882,7 @@ public enum Util {
 
     public static String s(String s, int maxLen) {
         if (s.length() < maxLen) return  s;
-        return s.substring(maxLen-2) + "..";
+        return s.substring(0,maxLen-2) + "..";
     }
 
     public static void writeBits(int x, int numBits, float[] y,  int offset) {
