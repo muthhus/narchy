@@ -214,7 +214,7 @@ public class SpaceGrapher extends Spacegraph {
     }
 
     public final TermNode getOrNewTermNode(Termed t/*, boolean createIfMissing*/) {
-        TermNode tn = terms.computeIfAbsent(t.term(), k -> newNode(t));
+        TermNode tn = terms.computeIfAbsent(t, this::newNode);
         tn.edge.clear(); //they will be re-calculated shortly
         return tn;
     }

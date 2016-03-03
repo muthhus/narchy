@@ -4,6 +4,7 @@ package nars.guifx.graph2;
 //import scala.tools.nsc.doc.model.Object;
 
 
+import nars.util.data.Util;
 
 /**
  * Created by me on 9/5/15.
@@ -14,6 +15,7 @@ public abstract class TermEdge /*implements ChangeListener*/ {
     public static final TermEdge[] empty = new TermEdge[0];
     public final TermNode aSrc, //source
                     bSrc; //target
+    private final int hash;
 
 //    //public double len = 0.0;
 //    public boolean visible = false;
@@ -27,36 +29,16 @@ public abstract class TermEdge /*implements ChangeListener*/ {
 
         //setAutoSizeChildren(true);
 
+        this.hash = Util.hashCombine(aSrc.hashCode(), bSrc.hashCode());
         this.aSrc = aSrc;
         this.bSrc = bSrc;
 
-        //a = new TermEdgeHalf(aSrc, bSrc, this);
-        //a.setVisible(false);
-        //b = new TermEdgeHalf(bSrc, aSrc, this);
-        //b.setVisible(false);
 
-        if (aSrc.term.term().compareTo(bSrc.term.term()) > 0) {
+        /*if (aSrc.term.term().compareTo(bSrc.term.term()) > 0) {
             throw new RuntimeException("invalid term order for TermEdge: " + aSrc + ' ' + bSrc);
-        }
-
-        //getChildren().setAll(a, b);
-
-        //aSrc.layoutXProperty().addListener(this);
-        //aSrc.layoutXProperty().addListener(this);
-//            aSrc.localToSceneTransformProperty().addListener(this);
-//            bSrc.localToSceneTransformProperty().addListener(this);
+        }*/
 
 
-//        getTransforms().setAll(
-//                translate = Transform.translate(0, 0),
-//                rotate = Transform.rotate(0, 0, 0),
-//                scale = Transform.scale(1, 1)
-//        );
-//
-//            setNeedsLayout(false);
-//            setCacheShape(true);
-        //setCache(true);
-        //setCacheHint(CacheHint.DEFAULT);
     }
 
     //public void delete() {
@@ -117,29 +99,26 @@ public abstract class TermEdge /*implements ChangeListener*/ {
 //            return a.update() || b.update();
 //        }
 
-    public final TermNode otherNode(TermNode x) {
-        if (aSrc == x) return bSrc;
-        return aSrc;
-    }
+//    public final TermNode otherNode(TermNode x) {
+//        if (aSrc == x) return bSrc;
+//        return aSrc;
+//    }
 
     public abstract double getWeight();
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        //if (o == null || getClass() != o.getClass()) return false;
 
         TermEdge termEdge = (TermEdge) o;
 
-        if (!aSrc.equals(termEdge.aSrc)) return false;
-        return bSrc.equals(termEdge.bSrc);
+        return aSrc.equals(termEdge.aSrc) && bSrc.equals(termEdge.bSrc);
 
     }
 
     @Override
-    public int hashCode() {
-        int result = aSrc.hashCode();
-        result = 31 * result + bSrc.hashCode();
-        return result;
+    public final int hashCode() {
+        return hash;
     }
 }

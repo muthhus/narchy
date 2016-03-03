@@ -153,24 +153,24 @@ public class TermNode extends GraphNode {
         return edge.get(b);
     }
 
-    public Set<Termed> getEdgeSet() {
-        if (edges.length == 0) return Collections.emptySet();
+//    public Set<Termed> getEdgeSet() {
+//        if (edges.length == 0) return Collections.emptySet();
+//
+//        Set<Termed> ss = Global.newHashSet(edges.length);
+//        for (TermEdge ee : edges)
+//            ss.add(ee.bSrc.term);
+//        return ss;
+//        //edge.keySet());
+//    }
 
-        Set<Termed> ss = Global.newHashSet(edges.length);
-        for (TermEdge ee : edges)
-            ss.add(ee.bSrc.term);
-        return ss;
-        //edge.keySet());
-    }
-
-    public void removeEdges(Set<Termed> toRemove) {
-        if (!toRemove.isEmpty()) {
-
-            toRemove.forEach(edge::remove);
-            modified = true;
-        }
-
-    }
+//    public void removeEdges(Set<Termed> toRemove) {
+//        if (!toRemove.isEmpty()) {
+//
+//            toRemove.forEach(edge::remove);
+//            modified = true;
+//        }
+//
+//    }
 
     public final Term getTerm() {
         return term.term();
@@ -180,7 +180,6 @@ public class TermNode extends GraphNode {
         if (modified) {
             modified = false;
             edges = !edge.isEmpty() ? updateEdges() : TermEdge.empty;
-
         }
 
     }
