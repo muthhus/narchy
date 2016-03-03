@@ -26,7 +26,7 @@ public abstract class GraphSource/* W? */ {
     /** if the grapher is ready */
     public final boolean getReady() {
         SpaceGrapher grapher = this.grapher;
-        return grapher == null ? false : grapher.getReady();
+        return grapher != null && grapher.getReady();
     }
 
     private final NodeVisitor nodeVisitor = new NodeVisitor();
@@ -79,7 +79,7 @@ public abstract class GraphSource/* W? */ {
 
         if (g == grapher) return; //no change
 
-        if(g!=null) {
+        if (g!=null) {
 
             logger.info("start {}", this);
 

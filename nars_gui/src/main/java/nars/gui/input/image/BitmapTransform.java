@@ -65,8 +65,8 @@ public class BitmapTransform {
 		Graphics2D graphics = (Graphics2D) newImage.getGraphics();
 		graphics.setPaint(backgrounColor);
 		graphics.fillRect(0, 0, image.getWidth(), image.getHeight());
-		graphics.rotate(Math.toRadians(angle), newImage.getWidth() / 2,
-				newImage.getHeight() / 2);
+		graphics.rotate(Math.toRadians(angle), newImage.getWidth() / 2d,
+				newImage.getHeight() / 2d);
 		// Use this if pictures are NOT square-shaped.
 		// graphics.translate((newImage.getWidth() - image.getWidth()) / 2,
 		// (newImage.getHeight() - image.getHeight()) / 2);

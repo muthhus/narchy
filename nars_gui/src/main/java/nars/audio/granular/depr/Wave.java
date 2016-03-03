@@ -78,7 +78,7 @@ public abstract class Wave {
     public int normalize(int min, int max, int i) {
         double minPossible = 0 - Math.pow(2, 15);
         double maxPossible = Math.pow(2, 15) - 1;
-        double half = (max - min) / 2;
+        double half = (max - min) / 2d;
 
         double f1 = (double) (i - min) / (max - min);
 

@@ -281,7 +281,7 @@ public class ConceptPane extends BorderPane implements ChangeListener {
                 return;
 
             getChildren().clear();
-            pending.stream().map(this::getNode).collect(toCollection(()->getChildren()));
+            pending.stream().map(this::getNode).collect(toCollection(this::getChildren));
 
 //            getChildren().forEach(n -> {
 //                if (n instanceof Runnable)
@@ -317,24 +317,12 @@ public class ConceptPane extends BorderPane implements ChangeListener {
         }, 0, 1f);
 
 
-        Button activateButton = new NARActionButton(nar, "+", (n) -> {
-                n.conceptualize(term, new UnitBudget(1f, 0.75f, 0.75f), 1f);
-        });
-        Button yesGoalButton = new NARActionButton(nar, "+!", (n) -> {
-            n.input(new MutableTask(term, '!').present(nar).log("GUI Goal"));
-        });
-        Button noGoalButton = new NARActionButton(nar, "-!", (n) -> {
-            n.input(new MutableTask(term, '!').truth(0f, (nar).getDefaultConfidence('!')).present(nar).log("GUI Goal"));
-        });
-        Button trueButton = new NARActionButton(nar, "T", (n) -> {
-            n.input(new MutableTask(term, '.').present(nar).log("GUI True"));
-        });
-        Button falseButton = new NARActionButton(nar, "F", (n) -> {
-            n.input(new MutableTask(neg(term), '.').present(nar).log("GUI False"));
-        });
-        Button isTrueButton = new NARActionButton(nar, "?", (n) -> {
-            n.input(new MutableTask(term, '?').present(nar).log("GUI Question"));
-        });
+        Button activateButton = new NARActionButton(nar, "+", (n) -> n.conceptualize(term, new UnitBudget(1f, 0.75f, 0.75f), 1f));
+        Button yesGoalButton = new NARActionButton(nar, "+!", (n) -> n.input(new MutableTask(term, '!').present(nar).log("GUI Goal")));
+        Button noGoalButton = new NARActionButton(nar, "-!", (n) -> n.input(new MutableTask(term, '!').truth(0f, (nar).getDefaultConfidence('!')).present(nar).log("GUI Goal")));
+        Button trueButton = new NARActionButton(nar, "T", (n) -> n.input(new MutableTask(term, '.').present(nar).log("GUI True")));
+        Button falseButton = new NARActionButton(nar, "F", (n) -> n.input(new MutableTask(neg(term), '.').present(nar).log("GUI False")));
+        Button isTrueButton = new NARActionButton(nar, "?", (n) -> n.input(new MutableTask(term, '?').present(nar).log("GUI Question")));
 
         if (!(term instanceof Compound)) {
             trueButton.setVisible(false); //TODO dont create these task buttons in the first place
@@ -345,14 +333,12 @@ public class ConceptPane extends BorderPane implements ChangeListener {
         }
 
         Menu conceptMenu = new Menu(term.toString());
-        conceptMenu.getItems().add(new SimpleMenuItem("Dump",()->{
-            nar.runLater(()-> {
+        conceptMenu.getItems().add(new SimpleMenuItem("Dump",()-> nar.runLater(()-> {
 
-                System.out.println(term + ": " + nar.conceptPriority(term, Float.NaN));
-                nar.concept(term).print();
+            System.out.println(term + ": " + nar.conceptPriority(term, Float.NaN));
+            nar.concept(term).print();
 
-            });
-        }));
+        })));
 
 
 
@@ -373,15 +359,15 @@ public class ConceptPane extends BorderPane implements ChangeListener {
 
         int maxDisplayedBagItems = 16;
         
-        termlinkView = new BagView<Termed>(
-            ()->currentConcept!=null ? currentConcept.termlinks() : null,
-            //(t) -> SubButton.make(nar, t.term())
-            (t) -> new TaskButton(nar, t),
+        termlinkView = new BagView<>(
+                () -> currentConcept != null ? currentConcept.termlinks() : null,
+                //(t) -> SubButton.make(nar, t.term())
+                (t) -> new TaskButton(nar, t),
                 maxDisplayedBagItems
         );
-        tasklinkView = new BagView<Task>(
-            ()->currentConcept!=null ? currentConcept.tasklinks() : null,
-            (t) -> new TaskButton(nar, t),
+        tasklinkView = new BagView<>(
+                () -> currentConcept != null ? currentConcept.tasklinks() : null,
+                (t) -> new TaskButton(nar, t),
                 maxDisplayedBagItems
         );
 
@@ -524,7 +510,7 @@ public class ConceptPane extends BorderPane implements ChangeListener {
     }
 
     @Override
-    public synchronized void changed(ObservableValue observable, Object oldValue, Object newValue) {
+    public void changed(ObservableValue observable, Object oldValue, Object newValue) {
 
         if (isVisible()) {
             if (reaction==null) {
@@ -582,18 +568,14 @@ public class ConceptPane extends BorderPane implements ChangeListener {
         );
 
         //horizontal block
-        final static TaskRenderer beliefRenderer = new TaskRenderer() {
-            @Override public void renderTask(GraphicsContext ge, float f, float c, float w, float h, float x, float y) {
-                ge.setFill(beliefColors.get(f, c));
-                ge.fillRect(x-w/2,y-h/4,w,h/2);
-            }
+        final static TaskRenderer beliefRenderer = (ge, f, c, w, h, x, y) -> {
+            ge.setFill(beliefColors.get(f, c));
+            ge.fillRect(x-w/2,y-h/4,w,h/2);
         };
         //vertical block
-        final static TaskRenderer goalRenderer = new TaskRenderer() {
-            @Override public void renderTask(GraphicsContext ge, float f, float c, float w, float h, float x, float y) {
-                ge.setFill(goalColors.get(f, c));
-                ge.fillRect(x-w/4,y-h/2,w/2,h);
-            }
+        final static TaskRenderer goalRenderer = (ge, f, c, w, h, x, y) -> {
+            ge.setFill(goalColors.get(f, c));
+            ge.fillRect(x-w/4,y-h/2,w/2,h);
         };
         private long now;
 

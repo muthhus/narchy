@@ -30,15 +30,15 @@ dependencies {
         exclude(module: 'log4j')
         exclude(module: 'slf4j-log4j12')
     }
-    compile group: 'net.openhft', name: 'affinity', version: '3.0.1'
+    compile group: 'net.openhft', name: 'affinity', version: '3.0.2'
     compile project(':nars_data')
 
     testCompile 'junit:junit:4.12'
 
-    testCompile 'org.jacoco:org.jacoco.agent:0.7.5.201505241946'
-    testCompile 'org.jacoco:org.jacoco.build:0.7.5.201505241946'
-    testCompile 'org.jacoco:org.jacoco.core:0.7.5.201505241946'
-    testCompile 'org.jacoco:org.jacoco.report:0.7.5.201505241946'
+    testCompile 'org.jacoco:org.jacoco.agent:0.7.6.201602180812'
+    testCompile 'org.jacoco:org.jacoco.build:0.7.6.201602180812'
+    testCompile 'org.jacoco:org.jacoco.core:0.7.6.201602180812'
+    testCompile 'org.jacoco:org.jacoco.report:0.7.6.201602180812'
 }
 
 

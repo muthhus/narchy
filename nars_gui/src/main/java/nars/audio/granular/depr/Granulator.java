@@ -133,12 +133,10 @@ public class Granulator extends Wave {
 
         for (int i = 0; i < density; i++) {
             int[][] grain;
-            grain = SYNCMODE ? grains.get(wavetableIndex++ % grains.size()) : grains.get(random.nextInt(grains.size()));
+            grain = grains.get(SYNCMODE ? wavetableIndex++ % grains.size() : random.nextInt(grains.size()));
             //if grain is larger then grainCloud duration, only play a portion
             //of the grain.
-            int grainPortion = (grainCloud[0].length < grain[0].length)
-                    ? grainCloud[0].length - 1
-                    : grain[0].length - 1;
+            int grainPortion = (grainCloud[0].length < grain[0].length ? grainCloud[0].length : grain[0].length) - 1;
 
             int offset = random.nextInt(
                     grainCloud[0].length - grainPortion);

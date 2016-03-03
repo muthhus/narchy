@@ -234,7 +234,7 @@ public class ConceptsSource extends GraphSource {
             }
 
             concepts.add(c);
-            return count++ > maxNodes ? false : true;
+            return count++ <= maxNodes;
 
         }
     }

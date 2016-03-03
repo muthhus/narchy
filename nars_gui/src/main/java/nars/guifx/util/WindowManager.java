@@ -42,7 +42,7 @@ public final class WindowManager /*implements ShutdownHandler*/ {
     private final OnWindowHidingHelper onWindowHiding = new OnWindowHidingHelper();
     private final OnWindowShownHelper onWindowShown = new OnWindowShownHelper();
     private final OnWindowHiddenHelper onWindowHidden = new OnWindowHiddenHelper();
-    private final Map<String, Window> windows = new ConcurrentHashMap<String, Window>();
+    private final Map<String, Window> windows = new ConcurrentHashMap<>();
     private final NARide app;
 
     /**
@@ -100,7 +100,7 @@ public final class WindowManager /*implements ShutdownHandler*/ {
             //LOG.debug("javafx.windowManager.startingWindow configured to " + value);
         //}
         //if (value == null || value instanceof ConfigObject) {
-            if (windows.size() > 0) {
+            if (!windows.isEmpty()) {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("No startingWindow configured, selecting the first one in the list of windows");
                 }

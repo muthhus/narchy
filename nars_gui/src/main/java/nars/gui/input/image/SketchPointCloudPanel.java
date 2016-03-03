@@ -48,7 +48,7 @@ public class SketchPointCloudPanel extends Panel implements MouseListener, Mouse
             lineColors[i] = new Color((float) Math.random(), (float) Math.random(), (float) Math.random());
         }
 
-        String[] s = _library.getNames().toArray(new String[0]);
+        String[] s = _library.getNames().toArray(new String[_library.getNames().size()]);
 
         for (String value : s) {
             standardNames.add(value);

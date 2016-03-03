@@ -120,7 +120,7 @@ public class HighDim<T extends Termed> extends Spacegraph {
             this.inner = inner;
             this.enc0 = new Autoencoder(inputs, inner, new XorShift128PlusRandom(1));
             this.y0 = new float[inner];
-            this.enc1 = new Autoencoder(inner, outputs, new XorShift128PlusRandom(1));;
+            this.enc1 = new Autoencoder(inner, outputs, new XorShift128PlusRandom(1));
             this.y1 = new float[inner];
         }
 
@@ -177,9 +177,7 @@ public class HighDim<T extends Termed> extends Spacegraph {
             this.term = term;
 
             if (term!=null) {
-                runLater(()->{
-                    update(term);
-                });
+                runLater(()-> update(term));
             }
 
             //..
@@ -317,7 +315,7 @@ public class HighDim<T extends Termed> extends Spacegraph {
                     if (free.isEmpty()) {
                         //System.out.println("could not show: " + c);
                         //but maybe it will be visible next cycle
-                        return vis;
+                        return null /*vis*/;
                     }
                     TermGroup g = free.removeFirst();
                     g.set(cLink);
@@ -334,9 +332,7 @@ public class HighDim<T extends Termed> extends Spacegraph {
 
         boolean changed = change[0];
         if (changed) {
-            runLater(() -> {
-                verts.getChildren().setAll(node);
-            });
+            runLater(() -> verts.getChildren().setAll(node));
         }
 
         return changed;
@@ -353,15 +349,13 @@ public class HighDim<T extends Termed> extends Spacegraph {
         NARide.show(n.loop(), ide -> {
 
 
-            HighDim<Concept> dim = new HighDim<Concept>(64, new AEConcept1());
+            HighDim<Concept> dim = new HighDim<>(64, new AEConcept1());
 
             n.onFrame(N -> {
                 dim.commit(((Default) N).core.active);
                     //System.out.println(dim.node + " free=" + dim.free.size());
             });
-            new Animate(30, (a)->{
-               dim.update();
-            }).start();
+            new Animate(30, (a)-> dim.update()).start();
 
 
             //ide.addView(new IOPane(n));

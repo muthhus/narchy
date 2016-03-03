@@ -64,7 +64,7 @@ public class ConstantVolumeJoint extends Joint {
       throw new IllegalArgumentException(
           "You cannot create a constant volume joint with less than three bodies.");
     }
-    bodies = def.bodies.toArray(new Body[0]);
+    bodies = def.bodies.toArray(new Body[def.bodies.size()]);
 
     targetLengths = new float[bodies.length];
     for (int i = 0; i < targetLengths.length; ++i) {
@@ -91,7 +91,7 @@ public class ConstantVolumeJoint extends Joint {
         distanceJoints[i] = (DistanceJoint) world.createJoint(djd);
       }
     } else {
-      distanceJoints = def.joints.toArray(new DistanceJoint[0]);
+      distanceJoints = def.joints.toArray(new DistanceJoint[def.joints.size()]);
     }
 
     normals = new Vec2[bodies.length];

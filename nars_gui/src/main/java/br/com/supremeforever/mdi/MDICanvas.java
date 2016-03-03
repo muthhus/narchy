@@ -5,20 +5,14 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
 
-import java.awt.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Point2D;
-import javafx.scene.layout.StackPane;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -183,32 +177,8 @@ public class MDICanvas extends AnchorPane {
     /**
      * *****************************MDI_EVENT_HANDLERS**************************
      */
-    public final EventHandler<MDIEvent> mdiCloseHandler = new EventHandler<MDIEvent>() {
-        @Override
-        public void handle(MDIEvent event) {
-            MDIWindow win = (MDIWindow) event.getTarget();
-            //taskBar.getChildren().remove(getItemFromToolBar(win.getId()));
-        }
-    };
-    public final EventHandler<MDIEvent> mdiMinimizedHandler = new EventHandler<MDIEvent>() {
-        @Override
-        public void handle(MDIEvent event) {
-            MDIWindow win = (MDIWindow) event.getTarget();
-            String id = win.getId();
-            /*if (getItemFromToolBar(id) == null) {
-                try {
-                    MDIIcon icon = new MDIIcon(event.imgLogo, (MDICanvas) MDICanvas.this,
-                            win.getWindowsTitle());
-                    icon.setId(win.getId());
-                    icon.getBtnClose().disableProperty().bind(win.getBtnClose().disableProperty());
-                    //taskBar.getChildren().add(icon);
-                } catch (Exception ex) {
-                    Logger.getLogger(MDICanvas.class.getName()).log(Level.SEVERE, null, ex);
-                }
-
-            }*/
-        }
-    };
+    public final EventHandler<MDIEvent> mdiCloseHandler = new MDICloseHandler();
+    public final EventHandler<MDIEvent> mdiMinimizedHandler = new MDIMinimizeHandler();
 
 //    /**
 //     * ***************** UTILITIES******************************************
@@ -271,7 +241,7 @@ public class MDICanvas extends AnchorPane {
         return resourceURL(path).toURI();
     }
 
-    public static @NotNull URL resourceURL(String path) throws URISyntaxException {
+    public static @NotNull URL resourceURL(String path) {
         return MDICanvas.class.getClassLoader().getResource(path);
     }
 
@@ -369,5 +339,33 @@ public class MDICanvas extends AnchorPane {
 
         DEFAULT,
         DARK,
+    }
+
+    private static class MDIMinimizeHandler implements EventHandler<MDIEvent> {
+        @Override
+        public void handle(MDIEvent event) {
+            MDIWindow win = (MDIWindow) event.getTarget();
+            String id = win.getId();
+            /*if (getItemFromToolBar(id) == null) {
+                try {
+                    MDIIcon icon = new MDIIcon(event.imgLogo, (MDICanvas) MDICanvas.this,
+                            win.getWindowsTitle());
+                    icon.setId(win.getId());
+                    icon.getBtnClose().disableProperty().bind(win.getBtnClose().disableProperty());
+                    //taskBar.getChildren().add(icon);
+                } catch (Exception ex) {
+                    Logger.getLogger(MDICanvas.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+            }*/
+        }
+    }
+
+    private static class MDICloseHandler implements EventHandler<MDIEvent> {
+        @Override
+        public void handle(MDIEvent event) {
+            MDIWindow win = (MDIWindow) event.getTarget();
+            //taskBar.getChildren().remove(getItemFromToolBar(win.getId()));
+        }
     }
 }

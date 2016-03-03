@@ -55,7 +55,7 @@ public class Granulize implements SoundProducer, SoundProducer.Amplifiable {
 
 	public void process(float[] output, int readRate) {
 		if (currentGrain == null && isPlaying) {
-			currentGrain = nextGrain(currentGrain);
+			currentGrain = nextGrain(null);
 		}
         float dNow = ((granulator.sampleRate / readRate)) * pitchFactor.floatValue();
 

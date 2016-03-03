@@ -54,7 +54,7 @@ public class MDIIcon extends Button {
 //Removing the shadow when the mouse cursor is off
         btnClose.addEventHandler(MouseEvent.MOUSE_EXITED, e -> {
             btnClose.setEffect(null);
-            System.out.println("Height:" + getParent().getLayoutBounds().getHeight());
+            //System.out.println("Height:" + getParent().getLayoutBounds().getHeight());
         });
         btnClose.addEventHandler(MouseEvent.MOUSE_CLICKED, handleClose);
         hBox.getChildren().addAll(imgLogo == null ? new ImageView() : new ImageView(imgLogo.getImage()), lblName, btnClose);

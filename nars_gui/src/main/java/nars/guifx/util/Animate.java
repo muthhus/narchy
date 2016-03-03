@@ -8,10 +8,10 @@ import java.util.function.Consumer;
 public final class Animate extends AnimationTimer {
 
     private final Consumer<Animate> run;
-    private final int periodMS;
+    private final long periodMS;
     private long last;
 
-    public Animate(int periodMS, Consumer<Animate> r) {
+    public Animate(long periodMS, Consumer<Animate> r) {
         this.periodMS = periodMS;
         run = r;
     }
@@ -25,7 +25,7 @@ public final class Animate extends AnimationTimer {
         }
     }
 
-    public int getPeriod() {
+    public long getPeriod() {
         return periodMS;
     }
 }

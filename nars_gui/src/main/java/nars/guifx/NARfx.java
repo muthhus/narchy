@@ -43,9 +43,10 @@ public enum NARfx  {
     static {
         System.setProperty("javafx.animation.framerate", "30");
         System.setProperty("prism.verbose", "true");
-        System.setProperty("prism.dirtyopts", "false");
+        //System.setProperty("prism.dirtyopts", "false");
         //System.setProperty("javafx.animation.fullspeed", "true");
         System.setProperty("javafx.animation.pulse", "30"); //by default this is 60
+        //System.setProperty("prism.forceGPU", "true");
     }
 
     public static String css;
@@ -390,9 +391,7 @@ public enum NARfx  {
     /** run in FX context in separate thread */
     public static void run(Runnable r) {
         new Thread( () -> {
-            run((a, b) -> {
-                r.run();
-            });
+            run((a, b) -> r.run());
         }).start();
     }
 
@@ -433,7 +432,7 @@ public enum NARfx  {
 
     public static void newConceptWindow(NAR nar, Pane container, String... concepts) {
         newConceptWindow(nar, container, (List<Concept>) of(concepts).map(
-            s -> nar.concept(s)).collect(toList())
+                nar::concept).collect(toList())
         );
     }
 

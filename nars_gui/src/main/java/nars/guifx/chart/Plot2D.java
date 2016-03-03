@@ -153,7 +153,7 @@ public class Plot2D extends NControl/*Canvas */  {
     @Override
     public void run() {
 
-        if (ready.get() != false)
+        if (ready.get())
             return;
 
         List<Series> series = this.series;

@@ -18,6 +18,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiFunction;
 
@@ -389,7 +392,6 @@ public class SpaceGrapher extends Spacegraph {
         });
 
         nodeVis.addListener((l, c, v) -> {
-
             runLater(()-> {
                 SpaceGrapher gg = SpaceGrapher.this;
                 logger.info("nodeVis {} <- {}", v, c);
@@ -417,7 +419,6 @@ public class SpaceGrapher extends Spacegraph {
                             nar.memory.getActivePrioritySum(false, false, true)  );
 
                 })*/
-        ;
 
 
         //runLater(() -> checkVisibility());
@@ -442,7 +443,7 @@ public class SpaceGrapher extends Spacegraph {
      */
     public synchronized void setLayout(IterativeLayout il) {
 
-        int lastAnimPeriodMS;
+        long lastAnimPeriodMS;
         if (animator!=null) {
             lastAnimPeriodMS = animator.getPeriod();
             stop();
@@ -452,11 +453,10 @@ public class SpaceGrapher extends Spacegraph {
 
 
         //reset visiblity state to true for all, in case previous layout had hidden then
-        ObservableList<Node> verts = getVertices();
+        //ObservableList<Node> verts = getVertices();
+        //verts.forEach(t -> t.setVisible(true));
 
-        verts.forEach(t -> t.setVisible(true));
-
-        logger.info("layout change: " + il);
+        logger.info("layout {}", il);
         layout.set(il);
 
         //rerender();
@@ -464,7 +464,7 @@ public class SpaceGrapher extends Spacegraph {
         //if (lastAnimPeriodMS != -1)
         start(lastAnimPeriodMS);
 
-        logger.info("setLayout {} on {} vertices", il, verts.size());
+        //logger.info("setLayout {} on {} vertices", il, verts.size());
 
     }
 
@@ -540,7 +540,9 @@ public class SpaceGrapher extends Spacegraph {
 
     }
 
-    public synchronized void start(int layoutPeriodMS) {
+    final Executor updater = Executors.newSingleThreadExecutor();
+
+    public synchronized void start(long layoutPeriodMS) {
 
         if (layoutPeriodMS > 0) {
 
@@ -565,7 +567,11 @@ public class SpaceGrapher extends Spacegraph {
                 //
                 //                    );
                 //                }
-                reupdate();
+
+
+                updater.execute(this::reupdate);
+                //reupdate();
+
                 rerender();
             });
 

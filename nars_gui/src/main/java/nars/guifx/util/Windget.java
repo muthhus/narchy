@@ -86,12 +86,8 @@ public class Windget extends DefaultWindow  {
 
             setOpacity(0.75f);
 
-            setOnMouseEntered(event -> {
-                setFill(Color.GREEN);
-            });
-            setOnMouseExited(event -> {
-                setFill(Color.ORANGE);
-            });
+            setOnMouseEntered(event -> setFill(Color.GREEN));
+            setOnMouseExited(event -> setFill(Color.ORANGE));
             /*setOnMouseClicked(new EventHandler<MouseEvent>() {
                 @Override
                 public void handle(MouseEvent event) {

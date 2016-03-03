@@ -23,8 +23,6 @@
  ******************************************************************************/
 package org.jbox2d.pooling.arrays;
 
-import java.util.HashMap;
-
 import com.gs.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import org.jbox2d.common.Vec2;
 

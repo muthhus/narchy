@@ -9,7 +9,7 @@ import javafx.scene.layout.VBox;
 public class PlotBox extends VBox {
 
     public PlotBox(Plot2D... plots) {
-        super(plots);
+        super((Node[])plots);
 
         setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         /*for (int i = 0; i < plots.length; i++) {

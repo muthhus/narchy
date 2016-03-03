@@ -14,8 +14,6 @@ public final class SimpleMenuItem extends MenuItem {
 
 	public SimpleMenuItem(Node i, String s, Runnable r) {
         super(s, i);
-        setOnAction(e -> {
-            r.run();
-        });
+        setOnAction(e -> r.run());
     }
 }

@@ -110,16 +110,14 @@ public class DemoAttentionFlow extends AbstractNARGraphDemo {
 
         int chainSize = 16;
         Twin<Termed> ends = addTermLinkChain(n, chainSize, tt, true,false);
-        n.forEachConcept(c->c.print());
+        n.forEachConcept(Concept::print);
         //n.log();
 
         n.step();
 
         graphIDE(n, (e)-> {
 
-            n.onCycle(m->{
-                printState(n, tt, chainSize);
-            });
+            n.onCycle(m-> printState(n, tt, chainSize));
 
             new Thread(()-> {
                 while (true) {

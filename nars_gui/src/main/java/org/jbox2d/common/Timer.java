@@ -41,6 +41,6 @@ public class Timer {
   }
 
   public float getMilliseconds() {
-    return (System.nanoTime() - resetNanos) / 1000 * 1f / 1000;
+    return (System.nanoTime() - resetNanos) / 1000f * 1f / 1000f;
   }
 }

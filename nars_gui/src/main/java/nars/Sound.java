@@ -74,10 +74,15 @@ public class Sound implements SoundSource, Comparable
     }
 
     @Override
-    public int compareTo(Object o)
-    {
-        Sound s = (Sound)o;
-        return Double.compare(score, s.score);
+    public int compareTo(Object o) {
+        if (this == o) return 0;
+        int s = Double.compare(score, ((Sound)o).score);
+        return s == 0 ? Integer.compare(hashCode(), o.hashCode()) : s;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return this == obj;
     }
 
     @Override

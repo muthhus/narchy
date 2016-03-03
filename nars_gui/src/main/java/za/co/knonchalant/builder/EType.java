@@ -37,7 +37,7 @@ public enum EType {
         this.defaultForType = defaultForType;
     }
 
-    public static EType getConverterForClass(Class<? extends Object> aClass) {
+    public static EType getConverterForClass(Class<?> aClass) {
         return values.get(aClass);
     }
 

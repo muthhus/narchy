@@ -131,9 +131,7 @@ public enum GraphPaneTest {
 
             gggg.start(50);
 
-            runLater(()->{
-                gggg.source.get().updateGraph();
-            });
+            runLater(()-> gggg.source.get().updateGraph());
             //gggg.start(35);
 
 //            n.spawnThread(250, x -> {

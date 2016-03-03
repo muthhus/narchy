@@ -122,7 +122,7 @@ public class BeanPathAdapterTest extends Application {
         }
 
         @Override
-        public Optional<ObservableValue<? extends Object>> getObservableValue() {
+        public Optional<ObservableValue<?>> getObservableValue() {
             return null;
         }
     }

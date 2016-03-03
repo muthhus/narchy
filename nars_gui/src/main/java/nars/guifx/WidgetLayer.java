@@ -63,9 +63,7 @@ public class WidgetLayer extends MDICanvas {
         Map<String, Object> ss = nar.getSingletons();
 
         List<Node> toAdd = Global.newArrayList(ss.size());
-        ss.forEach((k, v) -> {
-            toAdd.add(node(k, v));
-        });
+        ss.forEach((k, v) -> toAdd.add(node(k, v)));
 
 //        //TODO use faster comparison method
 //

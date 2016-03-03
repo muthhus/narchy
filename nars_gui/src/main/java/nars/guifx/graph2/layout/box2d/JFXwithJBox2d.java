@@ -116,18 +116,15 @@ public class JFXwithJBox2d extends Application {
         }
         
         //Draw hurdles on mouse event.
-        EventHandler<MouseEvent> addHurdle = new EventHandler<MouseEvent>(){
-            @Override
-            public void handle(MouseEvent me) {
-                    //Get mouse's x and y coordinates on the scene
-                    float dragX = (float)me.getSceneX();
-                    float dragY = (float)me.getSceneY();
-                    
-                    //Draw ball on this location. Set balls body type to static.
-                    Ball hurdle = new Ball(dragX, dragY, 2, BodyType.STATIC, Color.BLUE);
-                    //Add ball to the root group
-                    root.getChildren().add(hurdle.node);
-            }
+        EventHandler<MouseEvent> addHurdle = me -> {
+                //Get mouse's x and y coordinates on the scene
+                float dragX = (float)me.getSceneX();
+                float dragY = (float)me.getSceneY();
+
+                //Draw ball on this location. Set balls body type to static.
+                Ball hurdle = new Ball(dragX, dragY, 2, BodyType.STATIC, Color.BLUE);
+                //Add ball to the root group
+                root.getChildren().add(hurdle.node);
         };
         
         scene.setOnMouseDragged(addHurdle);

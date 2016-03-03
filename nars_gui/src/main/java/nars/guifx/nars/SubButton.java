@@ -266,23 +266,19 @@ public class SubButton extends HBox {
         //↔ ⇔ ⇒ ⇄ ⇾ ⇥ ⇵
     }
 
-    private static final InvalidationListener TextNodeHoverListener  = new InvalidationListener() {
+    private static final InvalidationListener TextNodeHoverListener  = k -> {
 
-        @Override
-        public void invalidated(Observable k) {
+        Text kk = (Text) ((ReadOnlyProperty) k).getBean();
 
-            Text kk = (Text) ((ReadOnlyProperty) k).getBean();
-
-            //Text kk = (Text)
-            //Label kk = (Label)l;
-            kk.setUnderline(kk.isHover());
-            if (kk.isHover()) {
-                kk.setUnderline(true);
-            } else {
-                kk.setUnderline(false);
-            }
-
+        //Text kk = (Text)
+        //Label kk = (Label)l;
+        kk.setUnderline(kk.isHover());
+        if (kk.isHover()) {
+            kk.setUnderline(true);
+        } else {
+            kk.setUnderline(false);
         }
+
     };
 
 //    public void update() {

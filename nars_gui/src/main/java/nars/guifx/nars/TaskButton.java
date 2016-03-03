@@ -46,12 +46,7 @@ public class TaskButton<X> extends Label implements Runnable {
         this.item = t;
 
         Object ref;
-        if (t instanceof BLink) {
-            ref = ((BLink) t).get();
-        }
-        else {
-            ref = t;
-        }
+        ref = t instanceof BLink ? ((BLink) t).get() : t;
 
         String s;
         if (ref instanceof Task) {

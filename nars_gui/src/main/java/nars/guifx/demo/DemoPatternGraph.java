@@ -25,15 +25,13 @@ public class DemoPatternGraph {
 
         NARide.show(n.loop(), ide -> {
 
-                    HighDim<Concept> dim = new HighDim<Concept>(64, new AEConcept1());
+                    HighDim<Concept> dim = new HighDim<>(64, new AEConcept1());
 
                     n.onFrame(N -> {
                         dim.commit(((Default) N).core.active);
                         //System.out.println(dim.node + " free=" + dim.free.size());
                     });
-                    new Animate(30, (a) -> {
-                        dim.update();
-                    }).start();
+                    new Animate(30, (a) -> dim.update()).start();
 
 
                     //ide.addView(new IOPane(n));

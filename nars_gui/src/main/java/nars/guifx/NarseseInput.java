@@ -19,9 +19,7 @@ public class NarseseInput extends CodeInput {
         String s = _s.trim();
 
         if (!s.isEmpty()) {
-            nar.runLater(() -> {
-                nar.input(s);
-            });
+            nar.runLater(() -> nar.input(s));
         }
 
         try {

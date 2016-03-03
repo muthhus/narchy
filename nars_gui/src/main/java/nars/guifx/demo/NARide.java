@@ -89,10 +89,7 @@ public class NARide extends StackPane {
 
         //SizeAwareWindow wn = NARide.newWindow(nar, ni = new NARide(nar));
 
-        NARfx.run((a,b) -> {
-
-            newIDE(loop, ide, b);
-        });
+        NARfx.run((a,b) -> newIDE(loop, ide, b));
 //        SizeAwareWindow wn = NARide.newWindow(nar, ni = new NARide(nar));
 //
 //        ni.resize(500,500);
@@ -198,9 +195,7 @@ public class NARide extends StackPane {
         ni.addTool("Fractal Workspace", () -> new NARspace(nar));
 
 
-        ni.addTool("Webcam", () -> {
-            return new WebcamFX();
-        });
+        ni.addTool("Webcam", WebcamFX::new);
 
 
         ni.addTool("Terminal (bash)", LocalTerminal::new);
@@ -243,14 +238,12 @@ public class NARide extends StackPane {
 //                }*/
 //                return () -> ni;
 //            });
-        nar.onExec("gc", (c) -> {
-            nar.runLater(() -> {
-                long before = Runtime.getRuntime().freeMemory();
-                System.gc();
-                long after = Runtime.getRuntime().freeMemory();
-                $.logger.info("GarbageCollect:\"" + (after - before)/1024 + "k collected, " + after/1024 + "k available\".");
-            });
-        });
+        nar.onExec("gc", (c) -> nar.runLater(() -> {
+            long before = Runtime.getRuntime().freeMemory();
+            System.gc();
+            long after = Runtime.getRuntime().freeMemory();
+            $.logger.info("GarbageCollect:\"" + (after - before)/1024 + "k collected, " + after/1024 + "k available\".");
+        }));
 
         nar.onExec("memstat", (c) -> {
             String report = "";
@@ -590,7 +583,7 @@ public class NARide extends StackPane {
 
     }
 
-    public <C extends Object> NARide icon(Class<C> c, Function<Object,Node> iconBuilder) {
+    public <C> NARide icon(Class<C> c, Function<Object,Node> iconBuilder) {
         nodeBuilders.put(c, iconBuilder);
         return this;
     }

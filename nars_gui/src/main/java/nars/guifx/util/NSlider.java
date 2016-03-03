@@ -59,9 +59,7 @@ public class NSlider extends NControl {
     public void addValueLabel() {
         StringProperty s = new SimpleStringProperty();
         SimpleDoubleProperty v = value[0];
-        InvalidationListener valuer = (c) -> {
-            s.setValue(Texts.n4(v.floatValue()));
-        };
+        InvalidationListener valuer = (c) -> s.setValue(Texts.n4(v.floatValue()));
         v.addListener(valuer);
         valuer.invalidated(null);
         addLabel(s);

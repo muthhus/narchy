@@ -524,12 +524,12 @@ public class GranularSynthesizer extends JFrame {
         //Size of grain
         int grainSize = Integer.parseInt(grainSizeTxt.getText());
         //random size deviation
-        double sizeDeviation = sizeDeviationSlider.getValue() / 100;//[0:no deviation, 1: max deviation]
+        double sizeDeviation = sizeDeviationSlider.getValue() / 100d;//[0:no deviation, 1: max deviation]
 
         //pitch of grain, 1 is normal
-        double grainPitch = (double) pitchSlider.getValue() / 50;
+        double grainPitch = (double) pitchSlider.getValue() / 50d;
         //random pitch deviation
-        double pitchDeviation = pitchDeviationSlider.getValue() / 100;//[0:no deviation, 1: max deviation]
+        double pitchDeviation = pitchDeviationSlider.getValue() / 100d;//[0:no deviation, 1: max deviation]
 
         //distance between grains in the grain cloud
         int grainDistance = Integer.parseInt(grainDistanceTxt.getText());

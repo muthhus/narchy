@@ -131,7 +131,7 @@ class TreemapLayout extends Parent {
             totalArea += area;
         }
 
-        if (layoutOrient.equals(LayoutOrient.VERTICAL)) {
+        if (layoutOrient == LayoutOrient.VERTICAL) {
 
 
             double rowWidth = totalArea / w;
@@ -182,7 +182,7 @@ class TreemapLayout extends Parent {
     }
 
     private void changeLayout() {
-        layoutOrient = layoutOrient.equals(LayoutOrient.HORIZONTAL) ? LayoutOrient.VERTICAL : LayoutOrient.HORIZONTAL;
+        layoutOrient = layoutOrient == LayoutOrient.HORIZONTAL ? LayoutOrient.VERTICAL : LayoutOrient.HORIZONTAL;
     }
 
     private boolean isDoubleEqual(double one, double two) {
