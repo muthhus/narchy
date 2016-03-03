@@ -11,6 +11,7 @@ import nars.guifx.graph2.source.SpaceGrapher;
 /** (slower, nicer rendering) half edges are drawn as overlapping polygons */
 public class HalfHalfIsoTriangleCanvasEdgeRenderer extends CanvasEdgeRenderer {
 
+
     private final double[] xp = new double[3];
     private final double[] yp = new double[3];
 
@@ -25,10 +26,6 @@ public class HalfHalfIsoTriangleCanvasEdgeRenderer extends CanvasEdgeRenderer {
     @Override
     public void reset(SpaceGrapher g) {
         super.reset(g);
-
-        gfx.setStroke(null);
-        gfx.setLineCap(null);
-        gfx.setLineJoin(null);
 
         //if (aSrc.isVisible()) {
         double[] X = this.xp;
@@ -74,7 +71,7 @@ public class HalfHalfIsoTriangleCanvasEdgeRenderer extends CanvasEdgeRenderer {
 
 
         double p = e.getWeight();
-        final double t = p *maxWidth + minWidth;
+        final double t = p * maxWidth + minWidth;
 
         //gfx.getTransform().setToIdentity();
         //gfx.save();
@@ -87,7 +84,7 @@ public class HalfHalfIsoTriangleCanvasEdgeRenderer extends CanvasEdgeRenderer {
 
 
         double rot = /*Fast*/Math.atan2(dy, dx);
-        double rotAngle = rot * 180f/3.14150;
+        double rotAngle = rot * 180f/3.14159;
         tra.appendRotation(rotAngle);
 
         tra.appendScale(len, t);
@@ -102,13 +99,24 @@ public class HalfHalfIsoTriangleCanvasEdgeRenderer extends CanvasEdgeRenderer {
 
 
         gfx.setFill(TermNode.getTermColor(aSrc.term, colors, p*aSrc.priNorm));
-        gfx.fillPolygon(X, Y, 3);
+        //gfx.fillPolygon(X, Y, 3);
+        gfx.beginPath();
+        gfx.moveTo(X[0], Y[0]);
+        gfx.lineTo(X[1], Y[1]);
+        gfx.lineTo(X[2], Y[2]);
+        gfx.closePath();
+        gfx.fill();
 
         gfx.transform(reverse);
 
         gfx.setFill(TermNode.getTermColor(bSrc.term, colors, p*bSrc.priNorm));
-        gfx.fillPolygon(X, Y, 3);
-
+//        gfx.fillPolygon(X, Y, 3);
+        gfx.beginPath();
+        gfx.moveTo(X[0], Y[0]);
+        gfx.lineTo(X[1], Y[1]);
+        gfx.lineTo(X[2], Y[2]);
+        gfx.closePath();
+        gfx.fill();
 
         //gfx.restore();
     }

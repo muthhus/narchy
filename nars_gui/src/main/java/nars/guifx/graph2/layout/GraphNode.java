@@ -16,6 +16,7 @@ public class GraphNode extends Group {
 	private double scaled = 0.0;
 	private double tx = 0.0;
 	private double ty = 0.0;
+	private double px = Double.NaN, py = Double.NaN;
 
 	public GraphNode() {
 		setManaged(false);
@@ -52,9 +53,16 @@ public class GraphNode extends Group {
 
 	//Point2D sceneCoord;// = new Point2D(0,0);
 
+	public void commit() {
+		if (this.px!=tx)
+			setTranslateX(this.px = tx);
+		if (this.py!=ty)
+			setTranslateY(this.py = ty);
+	}
+
 	public GraphNode move(double x, double y) {
-		setTranslateX(tx = x);
-		setTranslateY(ty = y);
+		tx = x;
+		ty = y;
 
 		//sceneCoord = null;
 		return this;

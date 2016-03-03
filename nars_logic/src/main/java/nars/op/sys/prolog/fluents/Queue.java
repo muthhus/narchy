@@ -55,8 +55,8 @@ public class Queue implements Cloneable {
 		int newSize = 2 * count();
 		if (newSize > MAX_QUEUE || newSize < MIN_QUEUE)
 			return false;
-		if (IO.trace())
-			IO.trace(Mes + "!!! " + toString());
+		/*if (IO.trace())
+			IO.trace(Mes + "!!! " + toString());*/
 		Object[] nqueue = new Object[newSize];
 		int j = 0;
 		for (int i = head; i != tail; i = inc(i))

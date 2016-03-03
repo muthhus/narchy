@@ -965,8 +965,14 @@ final class get extends FunBuiltin {
 	@Override
 	public int exec(@NotNull Prog p) {
 		// IO.mes("<<"+getArg(0)+"\n"+p+p.getTrail().pprint());
-		Source S = (Source) arg(0);
-		PTerm A = Const.the(S.getElement());
+		PTerm a = arg(0);
+		PTerm A;
+		if (a instanceof Source) {
+			Source S = (Source) a;
+			A = Const.the(S.getElement());
+		} else {
+			A = NO;
+		}
 		// if(null==A) A=Const.aNo;
 		// else A=new Fun("the",A);
 		// IO.mes(">>"+A+"\n"+p+p.getTrail().pprint());

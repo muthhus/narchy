@@ -114,7 +114,7 @@ class Lexer extends StreamTokenizer {
 
 	@NotNull
 	private final PTerm make_var(String s) {
-		s = s.intern();
+		//s = s.intern();
 		Var X;
 		long occ;
 		if (Objects.equals(s, anonymous)) {

@@ -56,17 +56,17 @@ public class Clause extends Fun {
     }
 
     public static Clause goalFromString(Prolog p, @Nullable String line) {
-        if (IO.trace())
-            IO.trace("read string: <" + line + '>');
+        /*if (IO.trace())
+            IO.trace("read string: <" + line + '>');*/
 
         if (null == line)
             line = PTerm.EOF.name;
-        else if (0 == line.length())
+        else if (line.isEmpty())
             return null;
 
         Clause C = Parser.stringToClause(p, line);
         if (null == C) {
-            if (IO.trace())
+            //if (IO.trace())
                 IO.error("warning (null Clause):" + line);
             return null;
         }
@@ -104,7 +104,7 @@ public class Clause extends Fun {
     public int ends_at;
 
     public void setFile(@NotNull String fname, int begins_at, int ends_at) {
-        this.fname = fname.intern();
+        this.fname = fname;//.intern();
         this.begins_at = begins_at;
         this.ends_at = ends_at;
     }

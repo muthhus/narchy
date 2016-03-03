@@ -507,6 +507,7 @@ public class SpaceGrapher extends Spacegraph {
         /** apply vis properties */
         NodeVis v = nodeVis.get();
         for (TermNode n : displayed) {
+            n.commit();
             v.accept(n);
 
             //termList.forEach((Consumer<TermNode>) n -> {
@@ -523,10 +524,10 @@ public class SpaceGrapher extends Spacegraph {
 //        termList.forEach((Consumer<TermNode>)n -> {
 //        for (int i = 0, termListSize = termList.size(); i < termListSize; i++) {
 //            final TermNode n = termList.get(i);
-            if (n != null) {
-                for (TermEdge e : n.getEdges())
-                    if (e != null) er.accept(e);
-            }
+
+            for (TermEdge e : n.getEdges())
+                if (e != null) er.accept(e);
+
         }
 
 //        removable.forEach(x -> {

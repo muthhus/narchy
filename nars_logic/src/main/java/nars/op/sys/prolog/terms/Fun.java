@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 /**
  * Implements compound terms
  *
- * @see nars.op.sys.prolog.terms.PTerm
+ * @see PTerm
  */
 public class Fun extends Const implements Compound<PTerm> {
 
@@ -115,12 +115,12 @@ public class Fun extends Const implements Compound<PTerm> {
     }
 
     @NotNull
-    protected static String watchNull(@Nullable nars.op.sys.prolog.terms.PTerm x) {
+    protected static String watchNull(@Nullable PTerm x) {
         return ((null == x) ? "null" : x.toString());
     }
 
     private String show_args() {
-        nars.op.sys.prolog.terms.PTerm[] a = this.args;
+        PTerm[] a = this.args;
         StringBuilder s = new StringBuilder(watchNull(a[0]));
         for (int i = 1; i < a.length; i++) {
             s.append(',').append(watchNull(a[i]));
@@ -129,21 +129,21 @@ public class Fun extends Const implements Compound<PTerm> {
     }
 
     @Override
-    boolean bind_to(@NotNull nars.op.sys.prolog.terms.PTerm that, Trail trail) {
+    boolean bind_to(@NotNull PTerm that, Trail trail) {
         return /*getClass() == that.getClass() &&*/ name.equals(that.name) && args.length == ((Fun) that).args.length;
     }
 
     @Override
-    boolean unify_to(@NotNull nars.op.sys.prolog.terms.PTerm that, Trail trail) {
+    boolean unify_to(@NotNull PTerm that, Trail trail) {
         return bind_to(that, trail) ?
                 unifyBind((Fun) that, args, trail) :
                 that.bind_to(this, trail);
     }
 
-    static boolean unifyBind(Fun that, @NotNull nars.op.sys.prolog.terms.PTerm[] a, Trail trail) {
+    static boolean unifyBind(Fun that, @NotNull PTerm[] a, Trail trail) {
         Fun other = that;
         int len = a.length;
-        nars.op.sys.prolog.terms.PTerm[] oa = other.args;
+        PTerm[] oa = other.args;
         for (int i = 0; i < len; i++) {
             if (!a[i].unify(oa[i], trail))
                 return false;
@@ -152,7 +152,7 @@ public class Fun extends Const implements Compound<PTerm> {
     }
 
     @Override
-    public nars.op.sys.prolog.terms.PTerm token() {
+    public PTerm token() {
         return args[0];
     }
 
@@ -175,7 +175,7 @@ public class Fun extends Const implements Compound<PTerm> {
     }
 
     @Nullable
-    final public Fun funClone(nars.op.sys.prolog.terms.PTerm[] newArgs) {
+    final public Fun funClone(PTerm[] newArgs) {
         Fun f = funClone();
         f.args = newArgs;
         return f;
@@ -184,7 +184,7 @@ public class Fun extends Const implements Compound<PTerm> {
     @Nullable
     protected Fun unInitializedClone() {
         Fun f = funClone();
-        f.args = new nars.op.sys.prolog.terms.PTerm[args.length];
+        f.args = new PTerm[args.length];
         return f;
     }
 
@@ -196,12 +196,12 @@ public class Fun extends Const implements Compound<PTerm> {
 
     @Override
     @Nullable
-    final nars.op.sys.prolog.terms.PTerm reaction(@NotNull nars.op.sys.prolog.terms.PTerm that) {
+    final PTerm reaction(@NotNull PTerm that) {
         // IO.mes("TRACE>> "+name());
 
-        nars.op.sys.prolog.terms.PTerm[] args = this.args;
+        PTerm[] args = this.args;
         int n = args.length;
-        nars.op.sys.prolog.terms.PTerm[] fargs = new nars.op.sys.prolog.terms.PTerm[n];
+        PTerm[] fargs = new PTerm[n];
         for (int i = 0; i < n; i++) {
             fargs[i] = args[i].reaction(that);
         }
@@ -212,8 +212,9 @@ public class Fun extends Const implements Compound<PTerm> {
     public Cons listify() {
         Cons l = new Cons(new Const(name), PTerm.NIL);
         Cons curr = l;
+        PTerm[] args = this.args;
         for (int i = 0; i < args.length; i++) {
-            Cons tail = new nars.op.sys.prolog.terms.Cons(args[i], nars.op.sys.prolog.terms.PTerm.NIL);
+            Cons tail = new Cons(args[i], PTerm.NIL);
             curr.args[1] = tail;
             curr = tail;
         }

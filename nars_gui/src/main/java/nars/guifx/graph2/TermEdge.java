@@ -15,8 +15,8 @@ public abstract class TermEdge /*implements ChangeListener*/ {
     public final TermNode aSrc, //source
                     bSrc; //target
 
-    //public double len = 0.0;
-    public boolean visible = false;
+//    //public double len = 0.0;
+//    public boolean visible = false;
 
     public float pri;
 

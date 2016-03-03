@@ -34,11 +34,7 @@ public class DataBase extends BlackBoard {
         // if(found!=null) {
         // found=found.matching_copy(pattern);
         // }
-        if (found == null)
-            found = no;
-        else
-            found = new Fun("the", found.copy());
-        return found;
+        return (found == null) ? no : new Fun("the", found.copy());
     }
 
     /**
@@ -110,19 +106,19 @@ public class DataBase extends BlackBoard {
         return FX;
     }
 
-    /**
-     * Gives an Iterator view to the Queue of Term or Clause objects stored at
-     * key k
-     *
-     * @see Queue
-     * @see PTerm
-     * @see Clause
-     */
-    @Override
-    public Iterator toEnumerationFor(String k) {
-        Iterator E = super.toEnumerationFor(k);
-        return E;
-    }
+//    /**
+//     * Gives an Iterator view to the Queue of Term or Clause objects stored at
+//     * key k
+//     *
+//     * @see Queue
+//     * @see PTerm
+//     * @see Clause
+//     */
+//    @Override
+//    public Iterator toEnumerationFor(String k) {
+//        Iterator E = super.toEnumerationFor(k);
+//        return E;
+//    }
 
     /**
      * Returns a formatted String representation of this PrologBlackboard object
@@ -131,8 +127,7 @@ public class DataBase extends BlackBoard {
     public String pprint() {
         StringBuilder s = new StringBuilder(name());
         for (Object o : keySet()) {
-            s.append(pred_to_string((String) o));
-            s.append('\n');
+            s.append(pred_to_string((String) o)).append('\n');
         }
         return s.toString();
     }
@@ -145,8 +140,7 @@ public class DataBase extends BlackBoard {
         Iterator e = Q.toEnumeration();
         StringBuilder s = new StringBuilder("% " + key + "\n\n");
         while (e.hasNext()) {
-            s.append(((PTerm) e.next()).pprint());
-            s.append(".\n");
+            s.append(((PTerm) e.next()).pprint()).append(".\n");
         }
         s.append('\n');
         return s.toString();

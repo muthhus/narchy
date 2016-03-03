@@ -233,7 +233,7 @@ public abstract class PTerm implements Cloneable, Term {
 
 	@NotNull
 	static final Nonvar stringToChars(@NotNull String s) {
-		if (0 == s.length())
+		if (s.isEmpty())
 			return NIL;
 		Cons l = new Cons(new Int((s.charAt(0))), NIL);
 		Cons curr = l;

@@ -88,11 +88,8 @@ public final class Var extends PTerm {
 
 		PTerm R = agent.action(ref());
 
-		if (!(R instanceof Var)) {
-			R = R.reaction(agent);
-		}
+		return !(R instanceof Var) ? R.reaction(agent) : R;
 
-		return R;
 	}
 
 	@Override

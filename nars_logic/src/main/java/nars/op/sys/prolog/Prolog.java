@@ -210,7 +210,7 @@ public class Prolog {
             for (String arg : args) {
                 String result = ask(arg).pprint();
                 IO.trace(result);
-                if ("no".equals(result.intern())) {
+                if ("no".equals(result/*.intern()*/)) {
                     IO.error("failing cmd line argument: " + arg);
                     return null;
                 }

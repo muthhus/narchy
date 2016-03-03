@@ -50,13 +50,13 @@ public abstract class CanvasEdgeRenderer implements EdgeRenderer<TermEdge> {
 
         TermNode aSrc = i.aSrc;
         if (!aSrc.visible()) {
-            i.visible = false;
+            //i.visible = false;
             return;
         }
 
         TermNode bSrc = i.bSrc;
         if (!bSrc.visible()) {
-            i.visible = false;
+            //i.visible = false;
             return;
         }
 
@@ -99,6 +99,8 @@ public abstract class CanvasEdgeRenderer implements EdgeRenderer<TermEdge> {
     @Override
     public void reset(SpaceGrapher g) {
 
+        Scene scene = g.getScene();
+        if (scene == null) return;
 
         if (floorCanvas == null) {
 
@@ -116,8 +118,7 @@ public abstract class CanvasEdgeRenderer implements EdgeRenderer<TermEdge> {
 
         }
 
-        Scene scene = g.getScene();
-        if (scene == null) return;
+
 
         //double w = scene.getWidth(); //g.getWidth();
         //double h = scene.getHeight();
