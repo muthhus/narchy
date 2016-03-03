@@ -20,12 +20,12 @@ public class GraphNode extends Group {
 	public GraphNode() {
 		setManaged(false);
 		setPickOnBounds(true);
-		setVisible(false);
+		//setVisible(false);
 	}
 
 	public boolean visible() {
 
-		return isVisible() && getParent()!=null;
+		return /*isVisible() &&*/ getParent()!=null;
 	}
 
 	public void scale(double scale) {
