@@ -12,9 +12,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.semanticweb.yars.nx.Node;
 import org.semanticweb.yars.nx.parser.NxParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.namespace.QName;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Collections;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -70,6 +72,7 @@ public abstract class NQuadsRDF {
     }
 
     public static void input(@NotNull NAR nar, @NotNull Iterable<Node[]> nxp) {
+
         input(nar, StreamSupport.stream(nxp.spliterator(), false));
     }
 
@@ -266,6 +269,7 @@ public abstract class NQuadsRDF {
     static final Atom sameAs = the("sameAs");
     static final Atom differentFrom = the("differentFrom");
     static final Atom dataTypeProperty = the("DatatypeProperty");
+    static final Atom COMMENT = the("comment");
 
     @Nullable
     static Term subjObjInst(Term subject, char subjType, char objType, boolean reverse) {
@@ -282,6 +286,9 @@ public abstract class NQuadsRDF {
                               @NotNull Atom predicate, @NotNull Term object) {
 
         if ((subject == null) || (predicate == null) || (object == null))
+            return null;
+
+        if (predicate == COMMENT)
             return null;
 
         try {
@@ -445,6 +452,15 @@ public abstract class NQuadsRDF {
             englishNameBuilder.append(namechars[i]);
         }
         return englishNameBuilder.toString();
+    }
+
+
+    final static Logger logger = LoggerFactory.getLogger(NQuadsRDF.class);
+
+    public static void input(NAR n, File f) throws FileNotFoundException {
+        logger.info("loading {}", f);
+        input(n, new BufferedInputStream(new FileInputStream(f)));
+
     }
 
 //    public static void main(String[] args) throws Exception {

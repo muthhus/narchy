@@ -5,6 +5,7 @@ import com.googlecode.concurrenttrees.radix.MyConcurrentRadixTree;
 import com.googlecode.concurrenttrees.radix.node.Node;
 import com.googlecode.concurrenttrees.radix.node.NodeFactory;
 import com.googlecode.concurrenttrees.radix.node.concrete.bytearray.*;
+import com.googlecode.concurrenttrees.radix.node.concrete.chararray.*;
 import com.googlecode.concurrenttrees.radix.node.concrete.voidvalue.VoidValue;
 import com.googlecode.concurrenttrees.radix.node.util.NodeUtil;
 import nars.$;
@@ -49,11 +50,13 @@ public class SymbolMap extends MyConcurrentRadixTree<AtomConcept> {
 
     public final AtomConcept resolveOrAdd(Atomic a) {
         return putIfAbsent(a.toString(),
-            () -> (AtomConcept)conceptBuilder.apply(a)
+                () -> (AtomConcept) conceptBuilder.apply(a)
         );
     }
 
-    /** // PrettyPrintable is a non-public API for testing, prints semi-graphical representations of trees... */
+    /**
+     * // PrettyPrintable is a non-public API for testing, prints semi-graphical representations of trees...
+     */
     public void print(Appendable out) {
         PrettyPrinter.prettyPrint(this, out);
     }
@@ -72,52 +75,52 @@ public class SymbolMap extends MyConcurrentRadixTree<AtomConcept> {
                 NodeUtil.ensureNoDuplicateEdges(childNodes);
             }
 
-            //try {
+            try {
 
-            if (childNodes.isEmpty()) {
-                // Leaf node...
-                if (value instanceof VoidValue) {
-                    return new ByteArrayNodeLeafVoidValue(edgeCharacters);
-                } else if (value != null) {
-                    return new ByteArrayNodeLeafWithValue(edgeCharacters, value);
+                if (childNodes.isEmpty()) {
+                    // Leaf node...
+                    if (value instanceof VoidValue) {
+                        return new ByteArrayNodeLeafVoidValue(edgeCharacters);
+                    } else if (value != null) {
+                        return new ByteArrayNodeLeafWithValue(edgeCharacters, value);
+                    } else {
+                        return new ByteArrayNodeLeafNullValue(edgeCharacters);
+                    }
                 } else {
-                    return new ByteArrayNodeLeafNullValue(edgeCharacters);
+                    // Non-leaf node...
+                    if (value instanceof VoidValue) {
+                        return new ByteArrayNodeNonLeafVoidValue(edgeCharacters, childNodes);
+                    } else if (value == null) {
+                        return new ByteArrayNodeNonLeafNullValue(edgeCharacters, childNodes);
+                    } else {
+                        return new ByteArrayNodeDefault(edgeCharacters, value, childNodes);
+                    }
                 }
-            } else {
-                // Non-leaf node...
-                if (value instanceof VoidValue) {
-                    return new ByteArrayNodeNonLeafVoidValue(edgeCharacters, childNodes);
-                } else if (value == null) {
-                    return new ByteArrayNodeNonLeafNullValue(edgeCharacters, childNodes);
+            } catch (ByteArrayCharSequence.IncompatibleCharacterException e) {
+
+                if (childNodes.isEmpty()) {
+                    // Leaf node...
+                    if (value instanceof VoidValue) {
+                        return new CharArrayNodeLeafVoidValue(edgeCharacters);
+                    } else if (value != null) {
+                        return new CharArrayNodeLeafWithValue(edgeCharacters, value);
+                    } else {
+                        return new CharArrayNodeLeafNullValue(edgeCharacters);
+                    }
                 } else {
-                    return new ByteArrayNodeDefault(edgeCharacters, value, childNodes);
+                    // Non-leaf node...
+                    if (value instanceof VoidValue) {
+                        return new CharArrayNodeNonLeafVoidValue(edgeCharacters, childNodes);
+                    } else if (value == null) {
+                        return new CharArrayNodeNonLeafNullValue(edgeCharacters, childNodes);
+                    } else {
+                        return new CharArrayNodeDefault(edgeCharacters, value, childNodes);
+                    }
                 }
             }
         }
-//            catch (ByteArrayCharSequence.IncompatibleCharacterException e) {
-//
-//                if (childNodes.isEmpty()) {
-//                    // Leaf node...
-////                    if (value instanceof VoidValue) {
-////                        return new CharArrayNodeLeafVoidValue(edgeCharacters);
-////                    } else if (value != null) {
-//                        return new CharArrayNodeLeafWithValue(edgeCharacters, value);
-////                    } else {
-////                        return new CharArrayNodeLeafNullValue(edgeCharacters);
-////                    }
-//                } else {
-//                    // Non-leaf node...
-//                    if (value instanceof VoidValue) {
-//                        return new CharArrayNodeNonLeafVoidValue(edgeCharacters, childNodes);
-////                    }
-////                    else if (value == null) {
-////                        return new CharArrayNodeNonLeafNullValue(edgeCharacters, childNodes);
-//                    } else {
-//                        return new CharArrayNodeDefault(edgeCharacters, value, childNodes);
-//                    }
-//                }
-//            }
     }
+
 }
 
 //    final class InternedAtom extends Atomic implements Node /* implements Concept */ {

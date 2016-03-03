@@ -159,7 +159,8 @@ public abstract class TracePane extends LogPane implements ChangeListener, Consu
         //Node[] c = s.toArray(new Node[s.size()]);
         if (!s.isEmpty()) {
             //if (c != null) {
-            runLater(() -> commit(new FasterList(s)));
+            FasterList fs = new FasterList(s);
+            runLater(() -> commit(fs));
             //this.toShow = new CircularArrayList<>(maxLines);
         }
         //}

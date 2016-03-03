@@ -688,15 +688,15 @@ public enum Util {
 
     /** from boofcv: */
     static void pauseWait(long milli) {
-        if (milli == 0) return;
+        if (milli <= 0) return;
         
         Thread t = Thread.currentThread();
         long start = System.currentTimeMillis();
-
-        while(System.currentTimeMillis() - start < milli) {
+        long now;
+        while((now=System.currentTimeMillis()) - start < milli) {
             synchronized(t) {
                 try {
-                    long ignore = milli - (System.currentTimeMillis() - start);
+                    long ignore = milli - (now - start);
                     if(ignore > 0L) {
                         t.wait(ignore);
                     }

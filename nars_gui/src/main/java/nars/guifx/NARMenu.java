@@ -87,7 +87,7 @@ public class NARMenu extends HBox {
                 File f = fileChooser.showOpenDialog(null);
                 if (f!=null) {
                     try {
-                        NQuadsRDF.input(n, new FileInputStream(f));
+                        NQuadsRDF.input(n, f);
                     } catch (Exception e) {
                         n.eventError.emit(e);
                     }

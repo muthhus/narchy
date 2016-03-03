@@ -18,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiFunction;
 
@@ -31,7 +30,7 @@ public class SpaceGrapher extends Spacegraph {
 
     public static final Logger logger = LoggerFactory.getLogger(SpaceGrapher.class);
 
-    final Map<Term, TermNode> terms = new UnifiedMap();
+    final Map<Termed, TermNode> terms = new UnifiedMap();
     //new WeakValueHashMap<>();
 
     static final int defaultFramePeriodMS = 30; //~60hz/2
@@ -210,16 +209,14 @@ public class SpaceGrapher extends Spacegraph {
         return A.putEdge(b, e) == null;
     }
 
-    public final TermNode getTermNode(Term t) {
+    public final TermNode getTermNode(Termed t) {
         return terms.get(t);
     }
 
-    public final TermNode getTermNode(Termed t) {
-        return getTermNode(t.term());
-    }
-
     public final TermNode getOrNewTermNode(Termed t/*, boolean createIfMissing*/) {
-        return terms.computeIfAbsent(t.term(), k -> newNode(t));
+        TermNode tn = terms.computeIfAbsent(t.term(), k -> newNode(t));
+        tn.edge.clear(); //they will be re-calculated shortly
+        return tn;
     }
 
 
@@ -299,38 +296,6 @@ public class SpaceGrapher extends Spacegraph {
         ready.set(true);
     };
 
-    /**
-     * commit what is to be displayed
-     */
-    public final void setVertices(TermNode[] active) { //final Set<? extends V> active) {
-
-        ready.set(false);
-
-        Runnable next;
-
-        if (active.length == 0) {
-            next = clear;
-        } else {
-            TermNode[] toDisplay = active; //active.toArray(displayed);
-            if (toDisplay == null) {
-                throw new RuntimeException("null toDisplay");
-            }
-
-            next = toDisplay.length == 0 ? clear : () -> {
-                displayed = toDisplay;
-                getVertices().setAll(
-                        active
-                        //toDisplay
-                );
-                ready.set(true);
-                //System.out.println("cached: " + terms.size() + ", displayed: " + displayed.length + " , shown=" + v.size());
-            };
-        }
-
-
-        runLater(next);
-    }
-
 
     public void setVertices(Collection<Termed> v) {
 
@@ -344,7 +309,7 @@ public class SpaceGrapher extends Spacegraph {
         Iterator<Termed> cc = v.iterator();
 
 
-        Set<TermNode> active = new LinkedHashSet(v.size()); //Global.newHashSet(maxNodes);
+        Set<TermNode> active = new HashSet(v.size()); //Global.newHashSet(maxNodes);
 
 
         while (cc.hasNext()) {
@@ -361,17 +326,23 @@ public class SpaceGrapher extends Spacegraph {
             }
         }
 
-
         if (!Objects.equals(prevActive, active)) {
-            setVertices(active.toArray(new TermNode[active.size()]));
+            TermNode[] active1 = active.toArray(new TermNode[active.size()]); //final Set<? extends V> active) {
+            runLater( (active1.length == 0) ?
+                clear :
+                () -> {
+                    getVertices().setAll(this.displayed = active1);
+                    ready.set(true);
+                });
         } else {
             prevActive = active;
+            ready.set(true);
         }
 
     }
 
-    public final boolean isReady() {
-        return ready.get();
+    public final boolean getReady() {
+        return ready.compareAndSet(true, false);
     }
 
 

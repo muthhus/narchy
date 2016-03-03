@@ -5,17 +5,13 @@ import nars.guifx.graph2.source.SpaceGrapher;
 import nars.term.Termed;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
-import java.util.logging.Logger;
-
-import static javafx.application.Platform.runLater;
 
 
 public abstract class GraphSource/* W? */ {
 
-    public final AtomicBoolean refresh = new AtomicBoolean(true);
+    //public final AtomicBoolean refresh = new AtomicBoolean(true);
 
     /** current grapher after it starts this */
     protected SpaceGrapher grapher;
@@ -28,9 +24,9 @@ public abstract class GraphSource/* W? */ {
     public abstract Termed getTargetVertex(Termed edge);
 
     /** if the grapher is ready */
-    public final boolean isReady() {
+    public final boolean getReady() {
         SpaceGrapher grapher = this.grapher;
-        return grapher == null ? false : grapher.isReady();
+        return grapher == null ? false : grapher.getReady();
     }
 
     private final NodeVisitor nodeVisitor = new NodeVisitor();
@@ -93,8 +89,8 @@ public abstract class GraphSource/* W? */ {
 
             grapher = g;
 
-            setUpdateable();
-            updateGraph();
+            //setUpdateable();
+            //updateGraph();
 
         } else{
 
@@ -135,23 +131,23 @@ public abstract class GraphSource/* W? */ {
     /** called once per frame to update anything about the grapher scope */
     public final void updateGraph() {
 
-        if (isReady() && canUpdate()) {
+        if (getReady() /*&& canUpdate()*/) {
             //logger.info("updateGraph ready");
             commit();
         } else {
-            //logger.info("updateGraph not ready");
+            //logger.info("updateGraph not ready {} {}", isReady()/*, canUpdate()*/);
         }
 
     }
 
 
-    public final boolean canUpdate() {
-        return refresh.compareAndSet(true, false);
-    }
+//    public final boolean canUpdate() {
+//        return refresh.compareAndSet(true, false);
+//    }
 
-    public final void setUpdateable() {
-        runLater(() -> refresh.set(true));
-    }
+//    public final void setUpdateable() {
+//        runLater(() -> refresh.set(true));
+//    }
 
 
     /** applies updates each frame */

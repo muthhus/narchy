@@ -11,6 +11,7 @@ import nars.concept.Concept;
 import nars.guifx.graph2.impl.TLinkEdge;
 import nars.guifx.graph2.source.SpaceGrapher;
 import nars.nar.Default;
+import nars.term.Term;
 import nars.term.Termed;
 import nars.util.event.Active;
 
@@ -44,28 +45,7 @@ public class ConceptsSource extends GraphSource {
     private float _maxPri = 1f, _minPri = 0f;
     protected final List<Termed> concepts = Global.newArrayList();
     private String keywordFilter = null;
-    private final Predicate<BLink<Concept>> eachConcept = cc -> {
-
-        List<Termed> concepts1 = concepts;
-        if (concepts1.size() < maxNodes) {
-
-            float p = cc.pri();
-            if ((p >= _minPri) || (p <= _maxPri)) {
-
-                Concept c = cc.get();
-                String keywordFilter1 = keywordFilter;
-
-                if ((keywordFilter1 == null) || (!c.toString().contains(keywordFilter1))) {
-                    concepts1.add(c);
-                }
-
-            }
-            return true;
-        }
-
-        return false;
-
-    };
+    private final ConceptFilter eachConcept = new ConceptFilter();
 
     public ConceptsSource(NAR nar) {
 
@@ -73,7 +53,7 @@ public class ConceptsSource extends GraphSource {
 
         includeString.addListener((e) -> {
             //System.out.println(includeString.getValue());
-            setUpdateable();
+            //setUpdateable();
         });
     }
 
@@ -85,7 +65,7 @@ public class ConceptsSource extends GraphSource {
                 ((BLink)link).pri(), ee.pri,
                       0.1f);*/
 
-        ee.pri = ((BLink)link).pri();
+        ee.pri = ((BLink) link).pri();
     }
 
 
@@ -101,22 +81,29 @@ public class ConceptsSource extends GraphSource {
 
 
         SpaceGrapher sg = grapher;
-        if (sg == null)
-            throw new RuntimeException("grapher null");
+//        if (sg == null)
+//            throw new RuntimeException("grapher null");
 
 
-        Consumer linkUpdater = link -> {
+        Term cct = cc.term();
 
-            Termed target = ((BLink<Termed>)link).get();
 
-            if (cc.term().equals(target.term())) //self-loop
-                return;
+        final int[] count = {0};
+        final int[] max = {0};
+        Predicate linkUpdater = link -> {
+
+            Termed target = ((BLink<Termed>) link).get();
+
+            if (cct.equals(target)) //self-loop
+                return true;
 
             TermNode tn = sg.getTermNode(target);
-            if (tn == null)
-                return;
+            if (tn != null) {
+                eachTarget.accept(link); //tn.c);
+                return (count[0]++) < max[0];
+            }
 
-            eachTarget.accept(link); //tn.c);
+            return true;
 
 //            TermEdge.TLinkEdge ee = (TermEdge.TLinkEdge) getEdge(sg, sn, tn, edgeBuilder);
 //
@@ -127,8 +114,10 @@ public class ConceptsSource extends GraphSource {
 //            //missing.remove(tn.term);
         };
 
-        ((Concept)cc).termlinks().forEach(maxNodeLinks, linkUpdater);
-        ((Concept)cc).tasklinks().forEach(maxNodeLinks, linkUpdater);
+        max[0] = maxNodeLinks;
+        ((Concept) cc).termlinks().topWhile(linkUpdater);
+        max[0] = maxNodeLinks; //equal chance for both link types
+        ((Concept) cc).tasklinks().topWhile(linkUpdater);
 
         //sn.removeEdges(missing);
 
@@ -144,7 +133,7 @@ public class ConceptsSource extends GraphSource {
     @Override
     public synchronized void start(SpaceGrapher g) {
 
-        if (g!=null) {
+        if (g != null) {
 
             //.stdout()
             //.stdoutTrace()
@@ -160,7 +149,7 @@ public class ConceptsSource extends GraphSource {
                             c -> refresh.set(true)
                     ),*/
                     nar.eventFrameStart.on(h -> {
-                        refresh.set(true);
+                        //refresh.set(true);
                         updateGraph();
                     })
             );
@@ -174,7 +163,6 @@ public class ConceptsSource extends GraphSource {
             regs = null;
         }
     }
-
 
 
     @Override
@@ -191,6 +179,7 @@ public class ConceptsSource extends GraphSource {
         //final int maxNodes = this.maxNodes;
 
         //TODO use forEach witha predicate return to stop early
+        eachConcept.reset();
         x.topWhile(eachConcept);
 
 //        Iterable<Termed> _concepts = StreamSupport.stream(x.spliterator(), false).filter(cc -> {
@@ -218,6 +207,38 @@ public class ConceptsSource extends GraphSource {
         ii.clear();
     }
 
+    private class ConceptFilter implements Predicate<BLink<Concept>> {
+
+        int count;
+
+        public void reset() {
+            count = 0;
+        }
+
+        @Override
+        public boolean test(BLink<Concept> cc) {
+
+
+            float p = cc.pri();
+            if ((p < _minPri) || (p > _maxPri)) {
+                return true;
+            }
+
+            Concept c = cc.get();
+
+            String keywordFilter1 = keywordFilter;
+            if (keywordFilter1 != null) {
+                if (!c.toString().contains(keywordFilter1)) {
+                    return true;
+                }
+            }
+
+            concepts.add(c);
+            return count++ > maxNodes ? false : true;
+
+        }
+    }
+
 
 //    public static void updateConceptEdges(SpaceGrapher g, TermNode s, TLink link, DoubleSummaryReusableStatistics accumulator) {
 //
@@ -232,8 +253,6 @@ public class ConceptsSource extends GraphSource {
 //            accumulator.accept(link.getPriority());
 //        }
 //    }
-
-
 
 
 //    public final void updateNodeOLD(SpaceGrapher sg, BagBudget<Concept> cc, TermNode sn) {

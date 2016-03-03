@@ -35,7 +35,7 @@ public class TermNode extends GraphNode {
     public float priNorm = 0;
 
     public Concept c = null;
-    private TermEdge[] edges = TermEdge.empty;
+    public TermEdge[] edges = TermEdge.empty;
 
     /*
     DoubleSummaryReusableStatistics termLinkStat = new DoubleSummaryReusableStatistics();
@@ -121,6 +121,7 @@ public class TermNode extends GraphNode {
 
         return this.edges = edge.values().toArray(e);
     }
+
 
 //    /**
 //     * untested

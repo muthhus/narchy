@@ -165,7 +165,7 @@ public class NARLoop implements Runnable {
 
     long prevTime;
 
-    public void frame(@NotNull NAR nar) {
+    public final void frame(@NotNull NAR nar) {
         int periodMS = this.periodMS;
 
         if (periodMS < 0) {

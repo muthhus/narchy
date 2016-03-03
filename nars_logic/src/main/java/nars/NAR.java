@@ -643,7 +643,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
 
     private final void _frame(int frames) {
-        Memory memory = this;
 
         Topic<NAR> frameStart = eventFrameStart;
 
