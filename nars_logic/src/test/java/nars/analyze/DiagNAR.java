@@ -116,7 +116,7 @@ public class DiagNAR extends Default {
     }
 
 
-    static final FSTConfiguration serialize = FSTConfiguration.createJsonConfiguration();
+    static final FSTConfiguration serialize = FSTConfiguration.createJsonConfiguration(false, true);
     static {
         serialize.setForceSerializable(true);
         serialize.setCrossPlatform(false);

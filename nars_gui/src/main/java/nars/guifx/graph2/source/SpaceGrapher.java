@@ -525,8 +525,8 @@ public class SpaceGrapher extends Spacegraph {
 //        for (int i = 0, termListSize = termList.size(); i < termListSize; i++) {
 //            final TermNode n = termList.get(i);
 
-            for (TermEdge e : n.getEdges())
-                if (e != null) er.accept(e);
+            for (TermEdge e : n.edges)
+                /*if (e != null) */er.accept(e);
 
         }
 
