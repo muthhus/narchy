@@ -50,13 +50,7 @@ public class ExecutionContext {
     
     
     public String toString(){
-        return "         id: "+id+"\n"+
-        "     currentGoal:  "+currentGoal+"\n"+
-        "     clause:       "+clause+"\n"+
-        "     subGoalStore: "+goalsToEval+"\n"+
-        "     trailingVars: "+trailingVars+"\n"+
-        //((fatherCtx==null)?"":fatherCtx.toString());
-        "";
+        return "         id: " + id + "\n" + "     currentGoal:  " + currentGoal + "\n" + "     clause:       " + clause + "\n" + "     subGoalStore: " + goalsToEval + "\n" + "     trailingVars: " + trailingVars + "\n";
     }
     
     
@@ -89,8 +83,9 @@ public class ExecutionContext {
     }
     
     public List<List<Var>> getTrailingVars() {
-        ArrayList<List<Var>> l = new ArrayList<>();
         OneWayList<List<Var>> t = trailingVars;
+        ArrayList<List<Var>> l = new ArrayList<>();
+
         while (t != null) {
             l.add(t.getHead());
             t = t.getTail();

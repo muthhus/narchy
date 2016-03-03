@@ -1,10 +1,14 @@
 package alice.tuprolog;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * @author Matteo Iuliani
  */
 public class PrologError extends Throwable {
 	private static final long serialVersionUID = 1L;
+	private static final Pattern NEWLINE = Pattern.compile("\n", Pattern.LITERAL);
 	// termine Prolog che rappresenta l'argomento di throw/1
 	private final Term error;
 	/*Castagna 06/2011*/
@@ -152,10 +156,10 @@ public class PrologError extends Throwable {
 		String syntaxErrorDescription = message.getTerm().toString();
 
 		//Sostituzione degli eventuali caratteri di nuova linea con uno spazio
-		syntaxErrorDescription = syntaxErrorDescription.replace("\n", " ");
+		syntaxErrorDescription = NEWLINE.matcher(syntaxErrorDescription).replaceAll(Matcher.quoteReplacement(" "));
 		//Eliminazione apice di apertura e chiusura stringa
 		syntaxErrorDescription = syntaxErrorDescription.substring(1, syntaxErrorDescription.length()-1);
-		String start = 	(""+syntaxErrorDescription.charAt(0)).toLowerCase();
+		String start = 	(String.valueOf(syntaxErrorDescription.charAt(0))).toLowerCase();
 		//Resa minuscola l'iniziale
 		syntaxErrorDescription = start + syntaxErrorDescription.substring(1);
 
@@ -167,11 +171,11 @@ public class PrologError extends Throwable {
 			if(errorInformation[i] != -1)
 				if(firstSignificativeInformation)
 				{
-					descriptionError += " at " + nameInformation[i] + "#" + errorInformation[i];
+					descriptionError += " at " + nameInformation[i] + '#' + errorInformation[i];
 					firstSignificativeInformation = false;
 				}
 				else
-					descriptionError += ", " + nameInformation[i] + "#" + errorInformation[i];	
+					descriptionError += ", " + nameInformation[i] + '#' + errorInformation[i];
 		}
 		descriptionError += ": " + syntaxErrorDescription;
 

@@ -121,7 +121,7 @@ public class Var extends Term {
 		else if (id == PROGRESSIVE) { //completeName = "_"+count;
 			completeName = completeName
 					.delete(0, completeName.length())
-					.append("_").append(count);
+					.append('_').append(count);
 		}
 	}
 
@@ -538,7 +538,7 @@ public class Var extends Term {
 			 if (tt == this){
 				 return completeName.toString();
 			 } else {
-				 return (completeName.toString() + " / " + tt.toString());
+				 return (completeName + " / " + tt.toString());
 			 }
 		 } else {
 			 if (tt == this) {

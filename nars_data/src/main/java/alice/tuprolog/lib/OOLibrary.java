@@ -98,14 +98,14 @@ public class OOLibrary extends Library {
     
     public OOLibrary()
     {
-    	if (System.getProperty("java.vm.name").equals("Dalvik"))
-		{
-			dynamicLoader = new AndroidDynamicClassLoader(new URL[] {}, getClass().getClassLoader());
-		} 
-		else
-		{
+//    	if (System.getProperty("java.vm.name").equals("Dalvik"))
+//		{
+//			dynamicLoader = new AndroidDynamicClassLoader(new URL[] {}, getClass().getClassLoader());
+//		}
+//		else
+//		{
 			dynamicLoader = new JavaDynamicClassLoader(new URL[] {}, getClass().getClassLoader());
-		}
+//		}
     }
     
     @Override
@@ -295,12 +295,7 @@ public class OOLibrary extends Library {
     		Class<?> lambdaMetaFactory = alice.util.proxyGenerator.Generator.make(
                     java.lang.ClassLoader.getSystemClassLoader(),
 		        "MyLambdaFactory"+counter,
-		        "" +           
-		            "public class MyLambdaFactory"+counter+" {\n" +
-		            "  public "+target_class+" getFunction() {\n" + 
-				    " 		return "+lambda_expression+"; \n"+ 
-		            "  }\n" +
-		            "}\n"
+                    "public class MyLambdaFactory" + counter + " {\n" + "  public " + target_class + " getFunction() {\n" + " 		return " + lambda_expression + "; \n" + "  }\n" + "}\n"
     		);
 		
     		Object myLambdaFactory = lambdaMetaFactory.newInstance(); 
@@ -391,7 +386,7 @@ public class OOLibrary extends Library {
                         "(creation of " + fullClassPath + ".java fail failed)");
                 throw new JavaException(ex);
             }
-            String cmd = "javac " + cp + " " + fullClassPath + ".java";
+            String cmd = "javac " + cp + ' ' + fullClassPath + ".java";
 
             try {
                 Process jc = Runtime.getRuntime().exec(cmd);
@@ -617,11 +612,11 @@ public class OOLibrary extends Library {
 	     
 	        	for (URL url : urls) {
 	        		File file = new File(java.net.URLDecoder.decode(url.getFile(), "UTF-8"));
-	        		stringURLs = stringURLs + "'" + file.getPath() + "',";
+	        		stringURLs = stringURLs + '\'' + file.getPath() + "',";
 				}
 	        	
 	        	stringURLs = stringURLs.substring(0, stringURLs.length() - 1);
-	        	stringURLs = stringURLs + "]";
+	        	stringURLs = stringURLs + ']';
         	}
         	else
         		stringURLs = "[]";

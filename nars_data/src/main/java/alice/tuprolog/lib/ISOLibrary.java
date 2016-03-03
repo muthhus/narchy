@@ -114,7 +114,7 @@ public class ISOLibrary extends Library {
         } else if ((arg1 instanceof Int)
                 || (arg1 instanceof alice.tuprolog.Long)) {
             char c = (char) ((Number) arg1).intValue();
-            return unify(arg0, new Struct("" + c));
+            return unify(arg0, new Struct(String.valueOf(c)));
         } else
             throw PrologError.type_error(engine.getEngineManager(), 2,
                     "integer", arg1);
@@ -397,22 +397,22 @@ public class ISOLibrary extends Library {
                 //
                 ":- flag(bounded, [true,false], true, false).\n"
                 + ":- flag(max_integer, ["
-                + new Integer(Integer.MAX_VALUE).toString()
+                + Integer.valueOf(Integer.MAX_VALUE).toString()
                 + "], "
-                + new Integer(Integer.MAX_VALUE).toString()
+                + Integer.valueOf(Integer.MAX_VALUE).toString()
                 + ",false).\n"
                 + ":- flag(min_integer, ["
-                + new Integer(Integer.MIN_VALUE).toString()
+                + Integer.valueOf(Integer.MIN_VALUE).toString()
                 + "], "
-                + new Integer(Integer.MIN_VALUE).toString()
+                + Integer.valueOf(Integer.MIN_VALUE).toString()
                 + ",false).\n"
                 + ":- flag(integer_rounding_function, [up,down], down, false).\n"
                 + ":- flag(char_conversion,[on,off],off,false).\n"
                 + ":- flag(debug,[on,off],off,false).\n"
                 + ":- flag(max_arity, ["
-                + new Integer(Integer.MAX_VALUE).toString()
+                + Integer.valueOf(Integer.MAX_VALUE).toString()
                 + "], "
-                + new Integer(Integer.MAX_VALUE).toString()
+                + Integer.valueOf(Integer.MAX_VALUE).toString()
                 + ",false).\n"
                 + ":- flag(undefined_predicate, [error,fail,warning], fail, false).\n"
                 + ":- flag(double_quotes, [atom,chars,codes], atom, false).\n"

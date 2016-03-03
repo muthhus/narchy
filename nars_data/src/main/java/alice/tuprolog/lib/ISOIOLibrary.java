@@ -1110,7 +1110,7 @@ public class ISOIOLibrary extends Library{
                     throw PrologError.representation_error(engine.getEngineManager(), 2, "character_code");
                 }
                 if (stream_name.equals("stdout")) {
-                    getEngine().stdOutput(""+arg0.intValue());
+                    getEngine().stdOutput(String.valueOf(arg0.intValue()));
                 } else {
                     try {
                         stream.write(arg0.intValue());
@@ -1412,7 +1412,7 @@ public class ISOIOLibrary extends Library{
                     }
                 }
                 if (can_add){
-                    st += new Character(((char) ch)).toString();
+                    st += Character.toString(((char) ch));
                 }
             } while (true);
             
@@ -1629,18 +1629,18 @@ public class ISOIOLibrary extends Library{
                 
                 if (output_name.equals("stdout")) {
                     if(quoted == true){ 
-                         getEngine().stdOutput((alice.util.Tools.removeApices(out_term.toString())+" "));
+                         getEngine().stdOutput((alice.util.Tools.removeApices(out_term.toString())+ ' '));
                     }
                     else{
-                         getEngine().stdOutput((out_term.toString()+" "));
+                         getEngine().stdOutput((out_term.toString()+ ' '));
                     }
                 } 
                  else {
                          if(quoted == true){
-                        output.write((alice.util.Tools.removeApices(out_term.toString())+" ").getBytes());
+                        output.write((alice.util.Tools.removeApices(out_term.toString())+ ' ').getBytes());
                     }
                     else{
-                        output.write((out_term.toString()+" ").getBytes());
+                        output.write((out_term.toString()+ ' ').getBytes());
                     } 
                 }
                
@@ -1660,7 +1660,7 @@ public class ISOIOLibrary extends Library{
                 getEngine().stdOutput(result);
             }
             else{
-                output.write((result+" ").getBytes());
+                output.write((result+ ' ').getBytes());
             }
             
         }
@@ -1681,7 +1681,7 @@ public class ISOIOLibrary extends Library{
         if(term.isList()){
             list = print_list(term,options);
             if(ignore_ops==false)
-                return "[" + list +"]";
+                return '[' + list + ']';
             else
                 return list;
         }
@@ -1698,7 +1698,7 @@ public class ISOIOLibrary extends Library{
         }
         
         if(flagOp == 0){
-            result+=term.getName()+"(";
+            result+=term.getName()+ '(';
         }
         
         int arity = term.getArity();
@@ -1735,7 +1735,7 @@ public class ISOIOLibrary extends Library{
                     if(ignore_ops == false){
                         result += arg.toString();
                         if(i%2 == 0 && operator != ""){
-                            result +=" "+operator+" ";
+                            result += ' ' +operator+ ' ';
                         }
                         continue;
                     }
@@ -1750,7 +1750,7 @@ public class ISOIOLibrary extends Library{
                 if(ignore_ops == false){
                     result+= arg.toString();
                     if(i%2 == 0 && operator != ""){
-                        result +=" "+operator+" ";
+                        result += ' ' +operator+ ' ';
                     }
                     continue;
                 }
@@ -1763,7 +1763,7 @@ public class ISOIOLibrary extends Library{
                 if(ignore_ops == false){
                     result+= create_string(options,(Struct)arg);
                     if(i%2 == 0 && operator != ""){
-                        result +=" "+operator+" ";
+                        result += ' ' +operator+ ' ';
                     }
                     continue;
                 }
@@ -1777,7 +1777,7 @@ public class ISOIOLibrary extends Library{
                     if(ignore_ops == false){
                         result += arg.toString();
                         if(i%2 == 0 && operator != ""){
-                            result +=" "+operator+" ";
+                            result += ' ' +operator+ ' ';
                         }
                         continue;
                     }
@@ -1790,7 +1790,7 @@ public class ISOIOLibrary extends Library{
                     if(ignore_ops == false){
                         result += alice.util.Tools.removeApices(arg.toString());
                         if(i%2 == 0 && operator != ""){
-                            result +=" "+operator+" ";
+                            result += ' ' +operator+ ' ';
                         }
                         continue;
                     }
@@ -1817,7 +1817,7 @@ public class ISOIOLibrary extends Library{
         String result = "";
         
         if(ignore_ops == true){
-            result="'"+term.getName()+"'"+" (";
+            result= '\'' +term.getName()+ '\'' +" (";
             for(int i = 0; i<term.getArity(); i++){
                 if(i > 0){
                     result+=",";
@@ -1829,7 +1829,7 @@ public class ISOIOLibrary extends Library{
                     result += term.getArg(i);
                 }
             }
-            return result + ")";
+            return result + ')';
         }
         else{
             for(int i = 0; i<term.getArity(); i++){

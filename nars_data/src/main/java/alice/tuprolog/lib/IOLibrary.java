@@ -260,7 +260,7 @@ public class IOLibrary extends Library {
         if (ch == -1) {
             return unify(arg0, new Int(-1));
         } else {
-            return unify(arg0, new Struct(new Character((char) ch).toString()));
+            return unify(arg0, new Struct(Character.toString((char) ch)));
         }
     }
 
@@ -279,7 +279,7 @@ public class IOLibrary extends Library {
             return unify(arg0, new Int(-1));
         } else {
             return unify(arg0,
-                    new Struct(new Character(((char) ch)).toString()));
+                    new Struct(Character.toString(((char) ch))));
         }
     }
 
@@ -348,7 +348,7 @@ public class IOLibrary extends Library {
             }
 
             if (can_add) {
-                st += new Character(((char) ch)).toString();
+                st += Character.toString(((char) ch));
             }
         } while (true);
         try {

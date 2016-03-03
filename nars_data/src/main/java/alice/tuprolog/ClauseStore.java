@@ -80,12 +80,11 @@ public class ClauseStore {
      * @return unificazioni delle variabili
      */
     private List<Term> deunify(List<Var> varsToDeunify) {
-        List<Term> saveUnifications = new ArrayList<>();
+        List<Term> saveUnifications = new ArrayList<>(varsToDeunify.size());
         //List saveUnifications = new LinkedList();
         //deunifico le variabili termporaneamente
-        Iterator<Var> it = varsToDeunify.iterator();
-        while (it.hasNext()) {
-            Var v = it.next();
+        for (int i = 0, varsToDeunifySize = varsToDeunify.size(); i < varsToDeunifySize; i++) {
+            Var v = varsToDeunify.get(i);
             saveUnifications.add(v.getLink());
             v.free();
         }
@@ -131,9 +130,9 @@ public class ClauseStore {
     
     
     public String toString() {
-        return "clauses: "+clauses+"\n"+
-        "goal: "+goal+"\n"+
-        "vars: "+vars+"\n";
+        return "clauses: "+clauses+ '\n' +
+        "goal: "+goal+ '\n' +
+        "vars: "+vars+ '\n';
     }
     
     

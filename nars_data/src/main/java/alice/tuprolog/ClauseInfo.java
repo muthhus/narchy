@@ -67,7 +67,7 @@ public class ClauseInfo {
     /**
      * Gets a clause from a generic Term
      */
-    private Struct extractHead(Struct clause) {
+    private static Struct extractHead(Struct clause) {
         return (Struct)clause.getArg(0);
     }
     
@@ -175,7 +175,7 @@ public class ClauseInfo {
         bodyCopy(body,bodyCopy,v,idExecCtx);
     }
     
-    private void bodyCopy(SubGoalTree source, SubGoalTree destination, AbstractMap<Var,Var> map, int id) {
+    private static void bodyCopy(SubGoalTree source, SubGoalTree destination, AbstractMap<Var, Var> map, int id) {
         for(AbstractSubGoalTree s: source){
             if (s.isLeaf()) {
                 SubGoalElement l = (SubGoalElement)s;
@@ -262,7 +262,7 @@ public class ClauseInfo {
                sb.append(co.getArg(0).toStringAsArgX(op,prio));
                sb.append(",\n\t");
                sb.append(indentPredicatesAsArgY(co.getArg(1),op,prio));
-               if (prio >= p) sb.append(")");
+               if (prio >= p) sb.append(')');
 
                return sb.toString();
 
@@ -283,7 +283,7 @@ public class ClauseInfo {
                sb.append(co.getArg(0).toStringAsArgX(op,prio));
                sb.append(",\n\t");
                sb.append(indentPredicatesAsArgY(co.getArg(1),op,prio));
-               if (prio > p) sb.append(")");
+               if (prio > p) sb.append(')');
 
                return sb.toString();
             } else {

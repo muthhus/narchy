@@ -94,13 +94,15 @@ class ClauseDatabase extends HashMap<String,FamilyClausesList> implements Iterab
 
 		@Override
 		public boolean hasNext() {
-			if (workingList != null && workingList.hasNext())
-				return true;
-			if (values.hasNext()) {
-				workingList = values.next().iterator();
-				return hasNext(); //start again on next workingList
+			while (true) {
+				if (workingList != null && workingList.hasNext())
+					return true;
+				if (values.hasNext()) {
+					workingList = values.next().iterator();
+					continue;
+				}
+				return false;
 			}
-			return false;
 		}
 
 		@Override

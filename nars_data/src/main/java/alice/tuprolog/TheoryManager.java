@@ -78,7 +78,7 @@ public class TheoryManager implements Serializable {
 			}
 		} else
 			staticDBase.addFirst(key, d);
-		engine.spy("INSERTA: " + d.getClause() + "\n");
+		engine.spy("INSERTA: " + d.getClause() + '\n');
 	}
 
 	/**
@@ -94,7 +94,7 @@ public class TheoryManager implements Serializable {
 			}
 		} else
 			staticDBase.addLast(key, d);
-		engine.spy("INSERTZ: " + d.getClause() + "\n");
+		engine.spy("INSERTZ: " + d.getClause() + '\n');
 	}
 
 	/**
@@ -141,7 +141,7 @@ public class TheoryManager implements Serializable {
 			ClauseInfo d = i.next();
 			if (clause.match(d.getClause())) {
 				i.remove();
-				engine.spy("DELETE: " + d.getClause() + "\n");
+				engine.spy("DELETE: " + d.getClause() + '\n');
 				return new ClauseInfo(d.getClause(), null);
 			}
 		}
@@ -160,10 +160,10 @@ public class TheoryManager implements Serializable {
 		
 		String arg0 = Tools.removeApices(pi.getArg(0).toString());
 		String arg1 = Tools.removeApices(pi.getArg(1).toString());
-		String key =  arg0 + "/" + arg1;
+		String key =  arg0 + '/' + arg1;
 		List<ClauseInfo> abolished = dynamicDBase.abolish(key); /* Reviewed by Paolo Contessi: LinkedList -> List */
 		if (abolished != null)
-			engine.spy("ABOLISHED: " + key + " number of clauses=" + abolished.size() + "\n");
+			engine.spy("ABOLISHED: " + key + " number of clauses=" + abolished.size() + '\n');
 		return true;
 	}
 
@@ -340,12 +340,12 @@ public class TheoryManager implements Serializable {
 		StringBuilder buffer = new StringBuilder();
 		for (Iterator<ClauseInfo> dynamicClauses = dynamicDBase.iterator(); dynamicClauses.hasNext();) {
 			ClauseInfo d = dynamicClauses.next();
-			buffer.append(d.toString(engine.getOperatorManager())).append("\n");
+			buffer.append(d.toString(engine.getOperatorManager())).append('\n');
 		}
 		if (!onlyDynamic)
 			for (Iterator<ClauseInfo> staticClauses = staticDBase.iterator(); staticClauses.hasNext();) {
 				ClauseInfo d = staticClauses.next();
-				buffer.append(d.toString(engine.getOperatorManager())).append("\n");
+				buffer.append(d.toString(engine.getOperatorManager())).append('\n');
 			}
 		return buffer.toString();
 	}

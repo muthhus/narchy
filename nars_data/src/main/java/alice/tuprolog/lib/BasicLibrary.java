@@ -199,7 +199,7 @@ public class BasicLibrary extends Library {
         try {
             new Agent(alice.util.Tools.removeApices(theory.toString()), goal
                     .toString()
-                    + ".").spawn();
+                    + '.').spawn();
             return true;
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -787,8 +787,8 @@ public class BasicLibrary extends Library {
         arg1 = arg1.getTerm();
         /*System.out.println(arg0);
         System.out.println(arg1);*/
-        getEngine().stdOutput(arg0.toString() + 
-        "\n" + arg1.toString());
+        getEngine().stdOutput(arg0.toString() +
+                '\n' + arg1.toString());
         if (!arg0.isGround()) {
             return unify(arg0, new Struct(arg1.toString()));
         } else {
@@ -831,10 +831,10 @@ public class BasicLibrary extends Library {
             alice.tuprolog.Number n0 = (alice.tuprolog.Number) arg0;
             String st = null;
             if (n0.isInteger()) {
-                st = new java.lang.Integer(n0.intValue()).toString();
+                st = Integer.valueOf(n0.intValue()).toString();
             } 
             else {
-                st = new java.lang.Double(n0.doubleValue()).toString();
+                st = java.lang.Double.toString(n0.doubleValue());
             }
             return (unify(arg1, new Struct(st)));
         } else {
@@ -850,15 +850,15 @@ public class BasicLibrary extends Library {
             	
             	if (st.charAt(0)=='0' && st.charAt(1)==39 && st.charAt(2)==39 && st.length()==4)
             	{
-            		String sti=""+st.charAt(3);
+            		String sti= String.valueOf(st.charAt(3));
             		byte[] b= sti.getBytes();
-            		st2=""+b[0];
+            		st2= String.valueOf(b[0]);
             	}
             	if (st.charAt(0)=='0' && st.charAt(1)=='x' && st.charAt(2)>='a' && st.charAt(2)<='f' && st.length()==3)
             	{
-            		String sti=""+st.charAt(2);
+            		String sti= String.valueOf(st.charAt(2));
             		int dec=java.lang.Integer.parseInt(sti, 16);
-            		st2=""+dec;
+            		st2= String.valueOf(dec);
             	}
             }
             boolean before=true;
@@ -884,7 +884,7 @@ public class BasicLibrary extends Library {
             			{
             				k+=i+1;
             				numBetween+=2; 
-            				iBetween=""+k+j;
+            				iBetween= String.valueOf(k) + j;
             				i+=j;
             				j=st2.length();
             				between=true;
@@ -919,7 +919,7 @@ public class BasicLibrary extends Library {
             }
             for(int i=0; i<numBetween; i+=2)
             {
-            	for(int j=java.lang.Integer.parseInt(""+iBetween.charAt(i)); j<java.lang.Integer.parseInt(""+iBetween.charAt(i+1)); j++)
+            	for(int j = java.lang.Integer.parseInt(String.valueOf(iBetween.charAt(i))); j<java.lang.Integer.parseInt(String.valueOf(iBetween.charAt(i + 1))); j++)
             	{
             		if (st2.charAt(j)!='.' && (st2.charAt(i)!='E' || (st2.charAt(i)!='E' && (st2.charAt(i+1)!='+' || st2.charAt(i+1)!='-'))) && (st2.charAt(i)!='e' || (st2.charAt(i)!='e' && (st2.charAt(i+1)!='+' || st2.charAt(i+1)!='-'))))
             		{

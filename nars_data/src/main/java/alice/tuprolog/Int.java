@@ -203,7 +203,7 @@ public class Int extends Number {
      */
     @Override
     public int compareTo(Number o) {
-        return (new java.lang.Integer(value)).compareTo(o.intValue());
+        return (Integer.valueOf(value)).compareTo(o.intValue());
     }
     
 }

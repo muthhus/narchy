@@ -93,7 +93,7 @@ public class Theory implements Serializable {
         if (th.isTextual() && isTextual()) {
             theory += th.theory;
         } else if (!th.isTextual() && !isTextual()) {
-            Struct otherClauseList = th.getClauseListRepresentation();
+            Struct otherClauseList = th.clauseList;
             if (clauseList.isEmptyList())
                 clauseList = otherClauseList;
             else {
@@ -103,7 +103,7 @@ public class Theory implements Serializable {
                 p.setArg(1, otherClauseList);
             }
         } else if (!isTextual() && th.isTextual()) {
-            theory = theory.toString() + "\n" + th;
+            theory = theory + '\n' + th;
             clauseList = null;
         } else if (isTextual() && !th.isTextual()) {
             theory += th.toString();
@@ -120,10 +120,6 @@ public class Theory implements Serializable {
      */
     boolean isTextual() {
         return theory != null;
-    }
-
-    Struct getClauseListRepresentation() {
-        return clauseList;
     }
 
     public String toString() {

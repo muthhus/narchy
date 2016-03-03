@@ -337,18 +337,20 @@ public class EngineManager implements java.io.Serializable {
 			locks.remove(name);
 		}
 	}
-	
-	public boolean mutexLock(String name){
-		ReentrantLock mutex = locks.get(name);
-		if (mutex==null) {
-			createLock(name);
-			return mutexLock(name);
-		}
-		mutex.lock();
+
+	public boolean mutexLock(String name) {
+		while (true) {
+			ReentrantLock mutex = locks.get(name);
+			if (mutex == null) {
+				createLock(name);
+				continue;
+			}
+			mutex.lock();
 		/*toSPY
 		 * System.out.println("Thread id "+runnerId()+ " - mi sono impossessato del lock");
 		 */
-		return true;
+			return true;
+		}
 	}
 
 	

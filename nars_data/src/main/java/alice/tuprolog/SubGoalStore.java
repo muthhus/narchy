@@ -52,25 +52,27 @@ public class SubGoalStore {
      * Restituisce la clausola da caricare
      */
     public Term fetch() {
-        fetched=true;
-        if (index >= commaStruct.size()) {      
-            if (curSGId == null) {              
-                return null;
-            } else {                            
-                popSubGoal(curSGId);
-                return fetch();
-            }
-        } else {
+        while (true) {
+            fetched = true;
+            if (index >= commaStruct.size()) {
+                if (curSGId == null) {
+                    return null;
+                } else {
+                    popSubGoal(curSGId);
 
-            AbstractSubGoalTree s = commaStruct.getChild(index);
-            index++;
-            if (s instanceof SubGoalTree) {
-                pushSubGoal((SubGoalTree) s);
-                return fetch();
+                }
             } else {
-                return ((SubGoalElement) s).getValue();
-            }
 
+                AbstractSubGoalTree s = commaStruct.getChild(index);
+                index++;
+                if (s instanceof SubGoalTree) {
+                    pushSubGoal((SubGoalTree) s);
+
+                } else {
+                    return ((SubGoalElement) s).getValue();
+                }
+
+            }
         }
     }
 
@@ -86,7 +88,7 @@ public class SubGoalStore {
     }
 
     public String toString() {
-        return "goals: " + goals + " "
+        return "goals: " + goals + ' '
                 + "index: " + index;
     }
 

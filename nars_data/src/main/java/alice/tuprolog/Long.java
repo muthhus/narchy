@@ -202,7 +202,7 @@ public class Long extends Number {
      */
     @Override
     public int compareTo(Number o) {
-        return (new java.lang.Long(value)).compareTo(o.longValue());
+        return (java.lang.Long.valueOf(value)).compareTo(o.longValue());
     }
     
 }

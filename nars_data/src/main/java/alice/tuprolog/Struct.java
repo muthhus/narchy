@@ -173,7 +173,7 @@ public class Struct extends Term {
             for(int c = 0;c < arity;c++)
                 arg[c] = al.removeFirst();
         }
-        predicateIndicator = name + "/" + arity;
+        predicateIndicator = name + '/' + arity;
         resolved = false;
     }
     
@@ -192,7 +192,7 @@ public class Struct extends Term {
         if (arity > 0) {
             arg = new Term[arity];
         }
-        predicateIndicator = name + "/" + arity;
+        predicateIndicator = name + '/' + arity;
         resolved = false;
     }
     
@@ -651,7 +651,7 @@ public class Struct extends Term {
         if (isEmptyList()) {
             name = ".";
             arity = 2;
-                        predicateIndicator = name + "/" + arity; /* Added by Paolo Contessi */
+                        predicateIndicator = name + '/' + arity; /* Added by Paolo Contessi */
             arg = new Term[arity];
             arg[0] = t; arg[1] = new Struct();
         } else if (arg[1].isList()) {
@@ -743,24 +743,24 @@ public class Struct extends Term {
         if (isEmptyList()) return "[]";
         // list case
         if (name.equals(".") && arity == 2) {
-            return ("[" + toString0() + "]");
+            return ('[' + toString0() + ']');
         } else if (name.equals("{}")) {
-            return ("{" + toString0_bracket() + "}");
+            return ('{' + toString0_bracket() + '}');
         } else {
-            String s = (Parser.isAtom(name) ? name : "'" + name + "'");
+            String s = (Parser.isAtom(name) ? name : '\'' + name + '\'');
             if (arity > 0) {
-                s = s + "(";
+                s = s + '(';
                 for (int c = 1;c < arity;c++) {
                     if (!(arg[c - 1] instanceof Var)) {
-                        s = s + arg[c - 1].toString() + ",";
+                        s = s + arg[c - 1].toString() + ',';
                     } else {
-                        s = s + ((Var)arg[c - 1]).toStringFlattened() + ",";
+                        s = s + ((Var)arg[c - 1]).toStringFlattened() + ',';
                     }
                 }
                 if (!(arg[arity - 1] instanceof Var)) {
-                    s = s + arg[arity - 1].toString() + ")";
+                    s = s + arg[arity - 1].toString() + ')';
                 } else {
-                    s = s + ((Var)arg[arity - 1]).toStringFlattened() + ")";
+                    s = s + ((Var)arg[arity - 1]).toStringFlattened() + ')';
                 }
             }
             return s;
@@ -776,9 +776,9 @@ public class Struct extends Term {
                 return h.toString();
             }
             if (h instanceof Var) {
-                return (((Var)h).toStringFlattened() + "," + tl.toString0());
+                return (((Var)h).toStringFlattened() + ',' + tl.toString0());
             } else {
-                return (h.toString() + "," + tl.toString0());
+                return (h.toString() + ',' + tl.toString0());
             }
         } else {
             String h0;
@@ -793,7 +793,7 @@ public class Struct extends Term {
             } else {
                 t0 = t.toString();
             }
-            return (h0 + "|" + t0);
+            return (h0 + '|' + t0);
         }
     }
     
@@ -809,10 +809,10 @@ public class Struct extends Term {
             StringBuilder buf = new StringBuilder(head.toString());
             while (tail instanceof Struct && ((Struct)tail).getName().equals(",")){
                 head = ((Struct)tail).getTerm(0);
-                buf.append(","+head.toString());
+                buf.append(',').append(head.toString());
                 tail = ((Struct)tail).getTerm(1);
             }
-            buf.append(","+tail.toString());
+            buf.append(',').append(tail.toString());
             return buf.toString();
             //    return arg[0]+","+((Struct)arg[1]).toString0_bracket();
         }
@@ -826,9 +826,9 @@ public class Struct extends Term {
             if (tl.isEmptyList()){
                 return h.toStringAsArgY(op,0);
             }
-            return (h.toStringAsArgY(op,0) + "," + tl.toStringAsList(op));
+            return (h.toStringAsArgY(op,0) + ',' + tl.toStringAsList(op));
         } else {
-            return (h.toStringAsArgY(op,0) + "|" + t.toStringAsArgY(op,0));
+            return (h.toStringAsArgY(op,0) + '|' + t.toStringAsArgY(op,0));
         }
     }
     
@@ -841,10 +841,10 @@ public class Struct extends Term {
             if (arg[0].isEmptyList()) {
                 return("[]");
             } else {
-                return("[" + toStringAsList(op) + "]");
+                return('[' + toStringAsList(op) + ']');
             }
         } else if (name.equals("{}")) {
-            return("{" + toString0_bracket() + "}");
+            return('{' + toString0_bracket() + '}');
         }
         
         if (arity == 2) {
@@ -852,7 +852,7 @@ public class Struct extends Term {
                 return(
                         ((x ? p >= prio : p > prio) ? "(" : "") +
                         arg[0].toStringAsArgX(op,p) +
-                        " " + name + " "      +
+                                ' ' + name + ' ' +
                         arg[1].toStringAsArgX(op,p) +
                         ((x ? p >= prio : p > prio) ? ")" : ""));
             }
@@ -860,7 +860,7 @@ public class Struct extends Term {
                 return(
                         ((x ? p >= prio : p > prio) ? "(" : "") +
                         arg[0].toStringAsArgY(op,p) +
-                        " " + name + " "      +
+                                ' ' + name + ' ' +
                         arg[1].toStringAsArgX(op,p) +
                         ((x ? p >= prio : p > prio) ? ")" : ""));
             }
@@ -869,7 +869,7 @@ public class Struct extends Term {
                     return(
                             ((x ? p >= prio : p > prio) ? "(" : "") +
                             arg[0].toStringAsArgX(op,p) +
-                            " " + name + " "      +
+                                    ' ' + name + ' ' +
                             arg[1].toStringAsArgY(op,p) +
                             ((x ? p >= prio : p > prio) ? ")" : ""));
                 } else {
@@ -877,7 +877,7 @@ public class Struct extends Term {
                             ((x ? p >= prio : p > prio) ? "(" : "") +
                             arg[0].toStringAsArgX(op,p) +
                             //",\n\t"+
-                            ","+
+                                    ',' +
                             arg[1].toStringAsArgY(op,p) +
                             ((x ? p >= prio : p > prio) ? ")" : ""));
                 }
@@ -887,14 +887,14 @@ public class Struct extends Term {
             if ((p = op.opPrio(name,"fx")) >= OperatorManager.OP_LOW) {
                 return(
                         ((x ? p >= prio : p > prio) ? "(" : "") +
-                        name + " "            +
+                        name + ' ' +
                         arg[0].toStringAsArgX(op,p) +
                         ((x ? p >= prio : p > prio) ? ")" : ""));
             }
             if ((p = op.opPrio(name,"fy")) >= OperatorManager.OP_LOW) {
                 return(
                         ((x ? p >= prio : p > prio) ? "(" : "") +
-                        name + " "            +
+                        name + ' ' +
                         arg[0].toStringAsArgY(op,p) +
                         ((x ? p >= prio : p > prio) ? ")" : ""));
             }
@@ -902,27 +902,27 @@ public class Struct extends Term {
                 return(
                         ((x ? p >= prio : p > prio) ? "(" : "") +
                         arg[0].toStringAsArgX(op,p) +
-                        " " + name + " "      +
+                                ' ' + name + ' ' +
                         ((x ? p >= prio : p > prio) ? ")" : ""));
             }
             if ((p = op.opPrio(name,"yf")) >= OperatorManager.OP_LOW) {
                 return(
                         ((x ? p >= prio : p > prio) ? "(" : "") +
                         arg[0].toStringAsArgY(op,p) +
-                        " " + name + " "      +
+                                ' ' + name + ' ' +
                         ((x ? p >= prio : p > prio) ? ")" : ""));
             }
         }
-        v = (Parser.isAtom(name) ? name : "'" + name + "'");
+        v = (Parser.isAtom(name) ? name : '\'' + name + '\'');
         if (arity == 0) {
             return v;
         }
-        v = v + "(";
+        v = v + '(';
         for (p = 1;p < arity;p++) {
-            v = v + arg[p - 1].toStringAsArgY(op,0) + ",";
+            v = v + arg[p - 1].toStringAsArgY(op,0) + ',';
         }
         v = v + arg[arity - 1].toStringAsArgY(op,0);
-        v = v + ")";
+        v = v + ')';
         return v;
     }
     

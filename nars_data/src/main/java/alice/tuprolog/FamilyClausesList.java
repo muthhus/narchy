@@ -218,7 +218,7 @@ class FamilyClausesList extends LinkedList<ClauseInfo> {
 
 	@Override
 	public ListIterator<ClauseInfo> listIterator(){
-		return new ListItr(this,0).getIt();
+		return new ListItr(this,0);
 	}
 
 	private ListIterator<ClauseInfo> superListIterator(int index){
@@ -227,16 +227,16 @@ class FamilyClausesList extends LinkedList<ClauseInfo> {
 
 	@Override
 	public ListIterator<ClauseInfo> listIterator(int index){
-		return new ListItr(this,index).getIt();
+		return new ListItr(this,index);
 	}
 
-	private boolean isAList(Struct t) {
+	private static boolean isAList(Struct t) {
 		/*
 		 * Checks if a Struct is also a list.
 		 * A list can be an empty list, or a Struct with name equals to "."
 		 * and arity equals to 2.
 		 */
-		return t.isEmptyList() || (t.getName().equals(".") && t.getArity() == 2);
+		return t.isEmptyList() || (t.getArity() == 2 && t.getName().equals("."));
 
 	}
 
@@ -384,9 +384,9 @@ class FamilyClausesList extends LinkedList<ClauseInfo> {
 
 		}
 
-		public ListIterator<ClauseInfo> getIt(){
-			return this;
-		}    
+//		public ListIterator<ClauseInfo> getIt(){
+//			return this;
+//		}
 
 
 	}

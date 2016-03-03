@@ -351,7 +351,7 @@ public class Parser implements /*Castagna 06/2011*/IParser,/**/ Serializable
 				if (t.isNumber())
 					/*Michele Castagna 06/2011*/
 					//return new IdentifiedTerm(0, Parser.createNumber("-" + t.seq));
-					return identifyTerm(0, Parser.createNumber("-" + t.seq), tokenStart);
+					return identifyTerm(0, Parser.createNumber('-' + t.seq), tokenStart);
 					/**/
 				else
 					tokenizer.unreadToken(t);
@@ -538,7 +538,7 @@ public class Parser implements /*Castagna 06/2011*/IParser,/**/ Serializable
 		}
 		/*Castagna 06/2011*/
 		//throw new InvalidTermException("The following token could not be identified: "+t1.seq);
-		throw new InvalidTermException("Unexpected token '" + t1.seq + "'",
+		throw new InvalidTermException("Unexpected token '" + t1.seq + '\'',
 				tokenizer.offsetToRowColumn(getCurrentOffset())[0],
 	            tokenizer.offsetToRowColumn(getCurrentOffset())[1] - 1);
 		/**/

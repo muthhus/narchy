@@ -30,7 +30,7 @@ import java.util.List;
  * @author Alex Benini
  */
  
-public class BuiltIn extends Library {
+public final class BuiltIn extends Library {
 	private static final long serialVersionUID = 1L;
 	private final EngineManager engineManager;
 	private final TheoryManager theoryManager;
@@ -68,11 +68,11 @@ public class BuiltIn extends Library {
 	  * PREDICATES
 	  */
 
-	 public boolean fail_0() {
+	 public static boolean fail_0() {
 		 return false;
 	 }
 
-	 public boolean true_0() {
+	 public static boolean true_0() {
 		 return true;
 	 }
 
@@ -83,7 +83,7 @@ public class BuiltIn extends Library {
 	}
 	  */
 
-	 public boolean halt_0() {
+	 public static boolean halt_0() {
 		 System.exit(0);
 		 return true;
 	 }
