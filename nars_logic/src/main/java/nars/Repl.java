@@ -26,7 +26,7 @@ public class Repl {
         String line;
         do {
             line = reader.readLine("$ ");
-            if (!line.isEmpty())
+            if (line!=null && !line.isEmpty())
                 nar.input(line);
         }
         while (line != null && line.length() > 0);

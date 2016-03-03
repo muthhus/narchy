@@ -23,6 +23,7 @@ import nars.op.mental.*;
 import nars.op.data.complexity;
 import nars.op.data.reflect;
 import nars.op.sys.js;
+import nars.op.sys.sys;
 import nars.term.Term;
 import nars.term.TermIndex;
 import nars.term.Terms;
@@ -168,7 +169,8 @@ public abstract class AbstractNAR extends NAR {
 
     public final AbstractOperator[] defaultOperators = {
 
-            new java(),
+            new java(), //DANGER
+            new sys(), //DANGER
 
             //system control
 
@@ -226,7 +228,7 @@ public abstract class AbstractNAR extends NAR {
 
             new schizo(),     //change Memory's SELF term (default: SELF)
 
-            new js(), //javascdript evalaution
+            new js(), //javasc67ript evalaution
 
             /*new json.jsonfrom(),
             new json.jsonto()*/
