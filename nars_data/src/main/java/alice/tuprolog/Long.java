@@ -155,12 +155,13 @@ public class Long extends Number {
     }
     @Override
     public boolean isGreaterRelink(Term t, ArrayList<String> vorder) {
-        t = t.getTerm();
-        if (t instanceof Number) {
-            return value > ( (Number) t ).longValue();
-        } else if (t instanceof Struct) {
-            return false;
-        } else return t instanceof Var;
+        return isGreater(t);
+//        t = t.getTerm();
+//        if (t instanceof Number) {
+//            return value > ( (Number) t ).longValue();
+//        } else if (t instanceof Struct) {
+//            return false;
+//        } else return t instanceof Var;
     }
     
     /**
@@ -170,11 +171,7 @@ public class Long extends Number {
     @Override
     public boolean isEqual(Term t) {
         t = t.getTerm();
-        if (t instanceof Number) {
-            return value == ( (Number) t ).longValue();
-        } else {
-            return false;
-        }
+        return t instanceof Number ? value == ((Number) t).longValue() : false;
     }
     
     /**

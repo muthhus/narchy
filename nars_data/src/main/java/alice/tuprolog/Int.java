@@ -155,12 +155,13 @@ public class Int extends Number {
     }
     @Override
     public boolean isGreaterRelink(Term t, ArrayList<String> vorder) {
-        t = t.getTerm();
+        return isGreater(t);
+        /*t = t.getTerm();
         if (t instanceof Number) {
             return value>((Number)t).intValue();
         } else if (t instanceof Struct) {
             return false;
-        } else return t instanceof Var;
+        } else return t instanceof Var;*/
     }
     
     /**
@@ -173,7 +174,7 @@ public class Int extends Number {
             Number n = (Number) t;
             if (!n.isInteger())
                 return false;
-            return (long) value == n.longValue();
+            return value == n.longValue();
         } else
             return false;
     }

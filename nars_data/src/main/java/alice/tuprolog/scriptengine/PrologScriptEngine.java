@@ -185,11 +185,8 @@ public class PrologScriptEngine implements ScriptEngine, ExceptionListener, Outp
             
             if(theory != null)
                 prolog.setTheory(new Theory(theory));
-            
-            if(useSolveNext)
-                info = prolog.solveNext();
-            else
-                info = prolog.solve(script);
+
+            info = useSolveNext ? prolog.solveNext() : prolog.solve(script);
            
             previousScript = script;
             

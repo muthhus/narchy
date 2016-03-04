@@ -107,9 +107,7 @@ class ClauseDatabase extends HashMap<String,FamilyClausesList> implements Iterab
 
 		@Override
 		public synchronized ClauseInfo next() {
-			if (workingList.hasNext())
-				return workingList.next();
-			else return null;
+			return workingList.hasNext() ? workingList.next() : null;
 		}
 
 		@Override

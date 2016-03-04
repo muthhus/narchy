@@ -93,7 +93,7 @@ public class EngineRunner implements java.io.Serializable, Runnable{
     /**
      * Config this Manager
      */
-    void initialize(Prolog vm) {
+    EngineRunner initialize(Prolog vm) {
         mediator = vm;
         theoryManager    = vm.getTheoryManager();
         primitiveManager = vm.getPrimitiveManager();
@@ -109,6 +109,7 @@ public class EngineRunner implements java.io.Serializable, Runnable{
         lockVar = new ReentrantLock();  
         cond = lockVar.newCondition();
         semaphore = new Object();
+        return this;
     }
     
     void spy(String action, Engine env) {
@@ -490,9 +491,7 @@ public class EngineRunner implements java.io.Serializable, Runnable{
     		return this.engineManager;
     	}
         public String getSetOfSolution() {
-        	if(sinfo!=null)
-        		return sinfo.getSetOfSolution();
-        	else return null;
+            return sinfo != null ? sinfo.getSetOfSolution() : null;
         }
         public void setSetOfSolution(String s) {
         	if(sinfo!=null)

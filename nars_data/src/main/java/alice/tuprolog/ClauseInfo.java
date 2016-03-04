@@ -104,31 +104,19 @@ public class ClauseInfo {
         if ((p = op.opPrio(":-","xfx")) >= OperatorManager.OP_LOW) {
             String st=indentPredicatesAsArgX(clause.getArg(1),op,p);
             String head = clause.getArg(0).toStringAsArgX(op,p);
-            if (st.equals("true")) {
-                return head +".\n";
-            } else {
-                return (head + " :-\n\t" + st +".\n");
-            }
+            return st.equals("true") ? head + ".\n" : head + " :-\n\t" + st + ".\n";
         }
         
         if ((p = op.opPrio(":-","yfx")) >= OperatorManager.OP_LOW) {
             String st=indentPredicatesAsArgX(clause.getArg(1),op,p);
             String head = clause.getArg(0).toStringAsArgY(op,p);
-            if (st.equals("true")) {
-                return head +".\n";
-            } else {
-                return (head + " :-\n\t" + st +".\n");
-            }
+            return st.equals("true") ? head + ".\n" : head + " :-\n\t" + st + ".\n";
         }
         
         if ((p = op.opPrio(":-","xfy")) >= OperatorManager.OP_LOW) {
             String st=indentPredicatesAsArgY(clause.getArg(1),op,p);
             String head = clause.getArg(0).toStringAsArgX(op,p);
-            if (st.equals("true")) {
-                return head +".\n";
-            } else {
-                return (head + " :-\n\t" + st +".\n");
-            }
+            return st.equals("true") ? head + ".\n" : head + " :-\n\t" + st + ".\n";
         }
         return (clause.toString());
     }
@@ -179,7 +167,7 @@ public class ClauseInfo {
         for(AbstractSubGoalTree s: source){
             if (s.isLeaf()) {
                 SubGoalElement l = (SubGoalElement)s;
-                Term t = l.getValue().copy(map,id);
+                Term t = l.term.copy(map,id);
                 destination.addChild(t);
             } else {
                 SubGoalTree src  = (SubGoalTree)s; 
@@ -213,11 +201,7 @@ public class ClauseInfo {
     static private String indentPredicates(Term t) {
         if (t instanceof Struct) {
             Struct co=(Struct)t;
-            if (co.getName().equals(",")){
-                return co.getArg(0).toString()+",\n\t"+indentPredicates(co.getArg(1));
-            } else {
-                return t.toString();
-            }
+            return co.getName().equals(",") ? co.getArg(0).toString() + ",\n\t" + indentPredicates(co.getArg(1)) : t.toString();
         } else {
             return t.toString();
         }

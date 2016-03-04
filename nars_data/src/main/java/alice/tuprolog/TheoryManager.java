@@ -237,7 +237,7 @@ public class TheoryManager implements Serializable {
 	public void rebindPrimitives() {
 		for (ClauseInfo d:dynamicDBase){
 			for(AbstractSubGoalTree sge:d.getBody()){
-				Term t = ((SubGoalElement)sge).getValue();
+				Term t = ((SubGoalElement) sge).term;
 				primitiveManager.identifyPredicate(t);
 			}
 		}

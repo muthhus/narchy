@@ -160,11 +160,7 @@ public final class BuiltIn extends Library {
 		 // if clause to retract found -> retract + true
 		 if (c != null) {
 			 Struct clause = null;
-			 if (!sarg0.isClause()) {
-				 clause = new Struct(":-", arg0, new Struct("true"));
-			 } else {
-				 clause = sarg0;
-			 }
+			 clause = !sarg0.isClause() ? new Struct(":-", arg0, new Struct("true")) : sarg0;
 			 unify(clause, c.getClause());
 			 return true;
 		 }
@@ -368,7 +364,7 @@ public final class BuiltIn extends Library {
 	  * A callable term is an atom of a compound term. See the ISO Standard
 	  * definition in section 3.24.
 	  */
-	 private boolean isCallable(Term goal) {
+	 private static boolean isCallable(Term goal) {
 		 return (goal.isAtom() || goal.isCompound());
 	 }
 

@@ -30,7 +30,8 @@ public class SocketLibTestCase {
 	
 	@Test 
 	public void test_server_write() throws InvalidTheoryException, MalformedGoalException, NoSolutionException, UnknownVarException{
-		String theory = 
+		//THIS FAILS INTERMITTENTLY PROBABLY DUE TO A MISSING DELAY THAT ALLOWS THE SERVER TO BE READY BEFORE A CLIENT CONNECTS
+		String theory =
 		"server(Y):- thread_create(ID1, Y). \n"+
 		"doServer(S) :- tcp_socket_server_open('127.0.0.1:4444', S, []), " +
 					"tcp_socket_server_accept(S, '127.0.0.1:4444', ClientSock),  " +

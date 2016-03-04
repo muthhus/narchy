@@ -226,14 +226,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
     public String getCurrentDirectory() {
         String directory = "";
         if(absolutePathList.isEmpty()) {
-        	if(this.lastPath!=null)
-        	{
-        		directory = this.lastPath;
-        	}
-        	else
-        	{
-        		directory = System.getProperty("user.dir");
-        	}
+			directory = this.lastPath != null ? this.lastPath : System.getProperty("user.dir");
         } else {
             directory = absolutePathList.get(absolutePathList.size()-1);
         }

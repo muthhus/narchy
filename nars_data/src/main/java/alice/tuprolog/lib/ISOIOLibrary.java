@@ -68,7 +68,7 @@ public class ISOIOLibrary extends Library{
         BufferedOutputStream output = null;
         BufferedInputStream input = null;        
         
-        if(result == true){
+        if(result){
             Struct openOptions = (Struct)options;
             Struct in_out = (Struct)source_sink;
             if(openOptions.isList()){
@@ -249,7 +249,7 @@ public class ISOIOLibrary extends Library{
         BufferedInputStream input = null;
         Struct structMode = (Struct)mode;
         
-        if(result == true){
+        if(result){
             Struct in_out = (Struct)source_sink;
             Struct value = new Struct(in_out.getName());
             properties.put("file_name", value);
@@ -367,7 +367,7 @@ public class ISOIOLibrary extends Library{
                 flush_output_1(stream_or_alias);
                 out.close();
             } catch (IOException e) {
-                if(force == true){//devo forzare la chiusura 
+                if(force){//devo forzare la chiusura
                     //siccome in java non c'? modo di forzare la chiusura ho modellato il problema
                     //eliminando ogni riferimento all'oggetto stream, in modo tale che venga eliminato dal
                     //dal garabage colletor.
@@ -393,7 +393,7 @@ public class ISOIOLibrary extends Library{
             try {
                 in.close();
             } catch (IOException e) {
-                if(force == true){
+                if(force){
                     inputStreams.remove(in);
                     in = null;
                     if(in_name.equals(inputStreamName)){
@@ -803,12 +803,8 @@ public class ISOIOLibrary extends Library{
                             "input", "stream", new Struct(inputStreamName), new Struct(
                                     e.getMessage()));
                 }
-                        
-                if (value == -1) {
-                    return unify(char_code, new Int(-1));
-                } else {
-                    return unify(char_code, new Int(value));
-                }
+
+            return value == -1 ? unify(char_code, new Int(-1)) : unify(char_code, new Int(value));
         }
         
         //se invece lo stream e' un normale file, devo controllare tutte le opzioni decise in apertura.
@@ -1428,7 +1424,7 @@ public class ISOIOLibrary extends Library{
                 return unify(in_term,Term.createTerm(st));
             }
                                     
-            if(variables_bool == false && variable_names_bool == false && singletons_bool == false){
+            if(!variables_bool && !variable_names_bool && !singletons_bool){
                 return unify(in_term, getEngine().toTerm(st));
             }
             Var input_term = new Var();
@@ -1448,11 +1444,11 @@ public class ISOIOLibrary extends Library{
             LinkedHashSet<Term> set = new LinkedHashSet<>(variables_list);
             List<Var> vars = new ArrayList<>();
 
-            if(variables_bool == true){
+            if(variables_bool){
                 int num = 0;
                 for(Term t:set){
                     num++;
-                    if(variable_names_bool == true){
+                    if(variable_names_bool){
                         association_for_replace.put(t, "X"+num);
                         if(!((t.toString()).startsWith("_"))){
                             associations_table.put(t, "X"+num);
@@ -1465,7 +1461,7 @@ public class ISOIOLibrary extends Library{
             //opzione singletons
             List<Term> singl = new ArrayList<>();
             int flag = 0;
-            if(singletons_bool == true){
+            if(singletons_bool){
                 List<Term> temporanyList = new ArrayList<>(variables_list);
                 for(Term t:variables_list){
                     temporanyList.remove(t);
@@ -1603,7 +1599,7 @@ public class ISOIOLibrary extends Library{
             if(!out_term.isCompound() && !(out_term instanceof Var)){
                  
                 if (output_name.equals("stdout")) {
-                     if(quoted == true){ //per scrivere sull'output devo richiamare l'output dell'Engine nel caso di stdio,
+                     if(quoted){ //per scrivere sull'output devo richiamare l'output dell'Engine nel caso di stdio,
                                                         //altrimenti utilizzando write() il risultato lo stampa sulla console Java.
                                                         //Nel caso in cui l'output e' un file write e' corretto.
                          getEngine().stdOutput((alice.util.Tools.removeApices(out_term.toString())));
@@ -1613,7 +1609,7 @@ public class ISOIOLibrary extends Library{
                      }
                  } 
                  else {
-                         if(quoted == true){
+                         if(quoted){
                          output.write((alice.util.Tools.removeApices(out_term.toString())).getBytes());
                      }
                      else{
@@ -1628,7 +1624,7 @@ public class ISOIOLibrary extends Library{
             if(out_term instanceof Var){
                 
                 if (output_name.equals("stdout")) {
-                    if(quoted == true){ 
+                    if(quoted){
                          getEngine().stdOutput((alice.util.Tools.removeApices(out_term.toString())+ ' '));
                     }
                     else{
@@ -1636,7 +1632,7 @@ public class ISOIOLibrary extends Library{
                     }
                 } 
                  else {
-                         if(quoted == true){
+                         if(quoted){
                         output.write((alice.util.Tools.removeApices(out_term.toString())+ ' ').getBytes());
                     }
                     else{
@@ -1680,10 +1676,7 @@ public class ISOIOLibrary extends Library{
         String list = "";
         if(term.isList()){
             list = print_list(term,options);
-            if(ignore_ops==false)
-                return '[' + list + ']';
-            else
-                return list;
+            return ignore_ops == false ? '[' + list + ']' : list;
         }
                 
         List<Operator> operatorList = engine.getCurrentOperatorList();
@@ -1709,7 +1702,7 @@ public class ISOIOLibrary extends Library{
             if(arg instanceof Number){
                 if(term.getName().contains("$VAR")){
                 //sono nel tipo $VAR
-                    if(numbervars == true){
+                    if(numbervars){
                         Int argNumber = (Int)term.getArg(i);
                         int res = argNumber.intValue() % 26;
                         int div = argNumber.intValue()/26;
@@ -1721,7 +1714,7 @@ public class ISOIOLibrary extends Library{
                         }
                     }
                     else{
-                        if(quoted == true){
+                        if(quoted){
                             return term.toString();
                         }
                         else{
@@ -1732,7 +1725,7 @@ public class ISOIOLibrary extends Library{
                 }
                 else{
                 //e' un numero da solo o un operando
-                    if(ignore_ops == false){
+                    if(!ignore_ops){
                         result += arg.toString();
                         if(i%2 == 0 && operator != ""){
                             result += ' ' +operator+ ' ';
@@ -1747,7 +1740,7 @@ public class ISOIOLibrary extends Library{
             }
             else if(arg instanceof Var){
             // stampo il toString della variabile
-                if(ignore_ops == false){
+                if(!ignore_ops){
                     result+= arg.toString();
                     if(i%2 == 0 && operator != ""){
                         result += ' ' +operator+ ' ';
@@ -1760,7 +1753,7 @@ public class ISOIOLibrary extends Library{
                 continue;
             }
             else if(arg.isCompound()){
-                if(ignore_ops == false){
+                if(!ignore_ops){
                     result+= create_string(options,(Struct)arg);
                     if(i%2 == 0 && operator != ""){
                         result += ' ' +operator+ ' ';
@@ -1773,8 +1766,8 @@ public class ISOIOLibrary extends Library{
                 
             }
             else{
-                if(quoted == true){
-                    if(ignore_ops == false){
+                if(quoted){
+                    if(!ignore_ops){
                         result += arg.toString();
                         if(i%2 == 0 && operator != ""){
                             result += ' ' +operator+ ' ';
@@ -1787,7 +1780,7 @@ public class ISOIOLibrary extends Library{
                 }
                     
                 else{
-                    if(ignore_ops == false){
+                    if(!ignore_ops){
                         result += alice.util.Tools.removeApices(arg.toString());
                         if(i%2 == 0 && operator != ""){
                             result += ' ' +operator+ ' ';
@@ -1816,18 +1809,13 @@ public class ISOIOLibrary extends Library{
         
         String result = "";
         
-        if(ignore_ops == true){
+        if(ignore_ops){
             result= '\'' +term.getName()+ '\'' +" (";
             for(int i = 0; i<term.getArity(); i++){
                 if(i > 0){
                     result+=",";
                 }
-                if(term.getArg(i).isList() && !(term.getArg(i).isEmptyList())){
-                    result += print_list((Struct)term.getArg(i),options);
-                }
-                else{
-                    result += term.getArg(i);
-                }
+                result += term.getArg(i).isList() && !(term.getArg(i).isEmptyList()) ? print_list((Struct) term.getArg(i), options) : term.getArg(i);
             }
             return result + ')';
         }
@@ -1863,12 +1851,7 @@ public class ISOIOLibrary extends Library{
     }
     
     public boolean write_1(Term out_term) throws PrologError{
-        if(write_flag == 0){
-            return write_iso_1(out_term);
-        }
-        else{
-            return IOLib.write_base_1(out_term);
-        }
+        return write_flag == 0 ? write_iso_1(out_term) : IOLib.write_base_1(out_term);
     }
     
     public boolean write_iso_1(Term out_term) throws PrologError{

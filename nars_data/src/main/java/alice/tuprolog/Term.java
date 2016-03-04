@@ -87,10 +87,9 @@ public abstract class Term implements Serializable {
      * the isEqual method.
      *
      */
-    public boolean equals(Object t) {
-        if (!(t instanceof Term))
-            return false;
-        return isEqual((Term) t);
+    public boolean equals(Object t)
+    {
+        return this==t || ((t instanceof Term) && isEqual((Term) t));
     }
     
     
@@ -150,7 +149,7 @@ public abstract class Term implements Serializable {
      * gets a copy of this term for the output
      */
     public Term copyResult(Collection<Var> goalVars, List<Var> resultVars) {
-        IdentityHashMap<Var,Var> originals = new IdentityHashMap<>();
+        IdentityHashMap<Var,Var> originals = new IdentityHashMap<>(goalVars.size());
         for (Var key: goalVars) {
             Var clone = new Var();
             if (!key.isAnonymous())
@@ -192,11 +191,12 @@ public abstract class Term implements Serializable {
         if (ok) {
             ExecutionContext ec = engine.getCurrentContext();
             if (ec != null) {
-                int id = (engine.getEnv()==null)? Var.PROGRESSIVE : engine.getEnv().nDemoSteps;
+
                 // Update trailingVars
                 ec.trailingVars = new OneWayList<>(v1, ec.trailingVars);
                 // Renaming after unify because its utility regards not the engine but the user
                 int count = 0;
+                int id = (engine.getEnv()==null)? Var.PROGRESSIVE : engine.getEnv().nDemoSteps;
                 for(Var v:v1){
                     v.rename(id,count);
                     if(id>=0){

@@ -30,7 +30,7 @@ public class UserContextInputStream extends InputStream {
 
         public synchronized InputStream getInput()
         {
-                while (avalaible == false){
+                while (!avalaible){
                         try {
                                 wait();
                         } catch (InterruptedException e) {
@@ -44,7 +44,7 @@ public class UserContextInputStream extends InputStream {
         
         public synchronized void putInput(InputStream input)
         {
-                while (avalaible == true){
+                while (avalaible){
                         try {
                                 wait();
                         } catch (InterruptedException e) {

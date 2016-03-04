@@ -60,7 +60,7 @@ public class SpyFrame extends JFrame implements ActionListener, SpyListener{
         	  else
         	  {
         		  //SubGoalElement
-        		  sub.add(((SubGoalElement)sgt).getValue());
+                sub.add(((SubGoalElement) sgt).term);
         	  }
           }
           if(":-".equals(name))
@@ -87,7 +87,7 @@ public class SpyFrame extends JFrame implements ActionListener, SpyListener{
 			AbstractSubGoalTree ab = ((SubGoalTree)sgt).getChild(i);
 			if (ab.isLeaf())
 			{
-				elementi.add(((SubGoalElement)ab).getValue());
+              elementi.add(((SubGoalElement) ab).term);
 			}
 			else
 			{

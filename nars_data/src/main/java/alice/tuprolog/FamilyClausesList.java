@@ -193,17 +193,7 @@ class FamilyClausesList extends LinkedList<ClauseInfo> {
 					return new ReadOnlyLinkedList<>(constantCompClausesIndex.get(((Struct) t).getName()));
 				}
 			} else if(t instanceof Struct){
-				if(isAList((Struct) t)){
-					/* retrieves clauses which has a list  (or Var) as first argument */
-					return new ReadOnlyLinkedList<>(listCompClausesList);
-				} else {
-					/* retrieves clauses whose first argument is a struct (or Var)
-					 * and same as goal's first argument, if no clauses
-					 * are retrieved, all clauses with a variable
-					 * as first argument
-					 */
-					return new ReadOnlyLinkedList<>(structCompClausesIndex.get(((Struct) t).getPredicateIndicator()));
-				}
+				return isAList((Struct) t) ? new ReadOnlyLinkedList<>(listCompClausesList) : new ReadOnlyLinkedList<>(structCompClausesIndex.get(((Struct) t).getPredicateIndicator()));
 			}
 		}
 

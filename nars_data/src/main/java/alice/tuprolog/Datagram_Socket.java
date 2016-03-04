@@ -41,8 +41,7 @@ public class Datagram_Socket extends AbstractSocket {
 
 	@Override
 	public InetAddress getAddress() {
-		if(socket.isBound())return socket.getInetAddress();
-		else return null;
+		return socket.isBound() ? socket.getInetAddress() : null;
 	}
 
 	@Override

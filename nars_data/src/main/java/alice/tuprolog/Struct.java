@@ -468,8 +468,11 @@ public class Struct extends Term {
         t.name      = name;
         t.predicateIndicator   = predicateIndicator;
         t.primitive = null;
+        Term[] thatArg = t.arg;
+        Term[] thisArg = this.arg;
+        final int arity = this.arity;
         for (int c = 0;c < arity;c++) {
-            t.arg[c] = arg[c].copy(vMap, substMap);
+            thatArg[c] = thisArg[c].copy(vMap, substMap);
         }
         return t;
     }
@@ -480,12 +483,7 @@ public class Struct extends Term {
      */
     @Override
     long resolveTerm(long count) {
-        if (resolved) {
-            return count;
-        } else {
-            LinkedList<Var> vars = new LinkedList<>();
-            return resolveTerm(vars,count);
-        }
+        return resolved ? count : resolveTerm(new LinkedList<>(), count);
     }
     
     
@@ -497,8 +495,11 @@ public class Struct extends Term {
      */
     long resolveTerm(LinkedList<Var> vl,long count) {
         long newcount=count;
+
+        Term[] arg = this.arg;
+        int arity = this.arity;
         for (int c = 0;c < arity;c++) {
-            Term term=arg[c];
+            Term term= arg[c];
             if (term!=null) {
                 //--------------------------------
                 // we want to resolve only not linked variables:
@@ -542,7 +543,7 @@ public class Struct extends Term {
      */
     @Override
     public boolean isEmptyList() {
-        return name.equals("[]") && arity == 0;
+        return arity == 0 && name.equals("[]");
     }
     
     /**
@@ -614,6 +615,7 @@ public class Struct extends Term {
      */
     Struct toList() {
         Struct t = new Struct();
+        Term[] arg = this.arg;
         for(int c = arity - 1;c >= 0;c--) {
             t = new Struct(arg[c].getTerm(),t);
         }
@@ -688,9 +690,12 @@ public class Struct extends Term {
         t = t.getTerm();
         if (t instanceof Struct) {
             Struct ts = (Struct) t;
+            final int arity = this.arity;
             if ( arity == ts.arity && name.equals(ts.name)) {
-                for (int c = 0;c < arity;c++) {
-                    if (!arg[c].unify(vl1,vl2,ts.arg[c])) {
+                Term[] arg = this.arg;
+                Term[] tsarg = ts.arg;
+                for (int c = 0; c < arity;c++) {
+                    if (!arg[c].unify(vl1,vl2, tsarg[c])) {
                         return false;
                     }
                 }
@@ -751,17 +756,9 @@ public class Struct extends Term {
             if (arity > 0) {
                 s = s + '(';
                 for (int c = 1;c < arity;c++) {
-                    if (!(arg[c - 1] instanceof Var)) {
-                        s = s + arg[c - 1].toString() + ',';
-                    } else {
-                        s = s + ((Var)arg[c - 1]).toStringFlattened() + ',';
-                    }
+                    s = !(arg[c - 1] instanceof Var) ? s + arg[c - 1].toString() + ',' : s + ((Var) arg[c - 1]).toStringFlattened() + ',';
                 }
-                if (!(arg[arity - 1] instanceof Var)) {
-                    s = s + arg[arity - 1].toString() + ')';
-                } else {
-                    s = s + ((Var)arg[arity - 1]).toStringFlattened() + ')';
-                }
+                s = !(arg[arity - 1] instanceof Var) ? s + arg[arity - 1].toString() + ')' : s + ((Var) arg[arity - 1]).toStringFlattened() + ')';
             }
             return s;
         }
@@ -775,24 +772,12 @@ public class Struct extends Term {
             if (tl.isEmptyList()) {
                 return h.toString();
             }
-            if (h instanceof Var) {
-                return (((Var)h).toStringFlattened() + ',' + tl.toString0());
-            } else {
-                return (h.toString() + ',' + tl.toString0());
-            }
+            return h instanceof Var ? ((Var) h).toStringFlattened() + ',' + tl.toString0() : h.toString() + ',' + tl.toString0();
         } else {
             String h0;
             String t0;
-            if (h instanceof Var) {
-                h0 = ((Var)h).toStringFlattened();
-            } else {
-                h0 = h.toString();
-            }
-            if (t instanceof Var) {
-                t0 = ((Var)t).toStringFlattened();
-            } else {
-                t0 = t.toString();
-            }
+            h0 = h instanceof Var ? ((Var) h).toStringFlattened() : h.toString();
+            t0 = t instanceof Var ? ((Var) t).toStringFlattened() : t.toString();
             return (h0 + '|' + t0);
         }
     }
@@ -838,11 +823,7 @@ public class Struct extends Term {
         String   v = "";
         
         if (name.equals(".") && arity == 2) {
-            if (arg[0].isEmptyList()) {
-                return("[]");
-            } else {
-                return('[' + toStringAsList(op) + ']');
-            }
+            return arg[0].isEmptyList() ? "[]" : '[' + toStringAsList(op) + ']';
         } else if (name.equals("{}")) {
             return('{' + toString0_bracket() + '}');
         }
@@ -865,22 +846,16 @@ public class Struct extends Term {
                         ((x ? p >= prio : p > prio) ? ")" : ""));
             }
             if ((p = op.opPrio(name,"xfy")) >= OperatorManager.OP_LOW) {
-                if (!name.equals(",")) {
-                    return(
-                            ((x ? p >= prio : p > prio) ? "(" : "") +
-                            arg[0].toStringAsArgX(op,p) +
-                                    ' ' + name + ' ' +
-                            arg[1].toStringAsArgY(op,p) +
-                            ((x ? p >= prio : p > prio) ? ")" : ""));
-                } else {
-                    return(
-                            ((x ? p >= prio : p > prio) ? "(" : "") +
-                            arg[0].toStringAsArgX(op,p) +
-                            //",\n\t"+
-                                    ',' +
-                            arg[1].toStringAsArgY(op,p) +
-                            ((x ? p >= prio : p > prio) ? ")" : ""));
-                }
+                return !name.equals(",") ? ((x ? p >= prio : p > prio) ? "(" : "") +
+                        arg[0].toStringAsArgX(op, p) +
+                        ' ' + name + ' ' +
+                        arg[1].toStringAsArgY(op, p) +
+                        ((x ? p >= prio : p > prio) ? ")" : "") : ((x ? p >= prio : p > prio) ? "(" : "") +
+                        arg[0].toStringAsArgX(op, p) +
+                        //",\n\t"+
+                        ',' +
+                        arg[1].toStringAsArgY(op, p) +
+                        ((x ? p >= prio : p > prio) ? ")" : "");
             }
         }
         else if (arity == 1) {
@@ -928,11 +903,8 @@ public class Struct extends Term {
     
     @Override
     public Term iteratedGoalTerm() {
-        if (name.equals("^") && arity == 2) {
-            Term goal = getTerm(1);
-            return goal.iteratedGoalTerm();
-        } else
-            return super.iteratedGoalTerm();
+        return ((arity == 2) && name.equals("^")) ?
+                getTerm(1).iteratedGoalTerm() : super.iteratedGoalTerm();
     }
     
     /*Castagna 06/2011*/

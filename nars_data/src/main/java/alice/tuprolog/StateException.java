@@ -97,7 +97,8 @@ public class StateException extends State {
     }
 
     private void javaException(Engine e) {
-        Term exceptionTerm = e.currentContext.currentGoal.getArg(0);
+        Struct cg = e.currentContext.currentGoal;
+        Term exceptionTerm = cg.getArity() > 0 ? cg.getArg(0) : null;
         e.currentContext = e.currentContext.fatherCtx;
         if (e.currentContext == null) {
             // passo nello stato HALT se l?errore non pu? essere gestito (sono
@@ -197,7 +198,7 @@ public class StateException extends State {
 
     // verifica se c'? un catcher unificabile con l'argomento dell'eccezione
     // lanciata
-    private boolean javaMatch(Term arg1, Term exceptionTerm) {
+    private static boolean javaMatch(Term arg1, Term exceptionTerm) {
         if (!arg1.isList())
             return false;
         Struct list = (Struct) arg1;
@@ -222,7 +223,7 @@ public class StateException extends State {
 
     // unifica l'argomento di java_throw/1 con il giusto catcher e restituisce
     // l'handler corrispondente
-    private Term javaUnify(Term arg1, Term exceptionTerm, List<Var> unifiedVars) {
+    private static Term javaUnify(Term arg1, Term exceptionTerm, List<Var> unifiedVars) {
         Struct list = (Struct) arg1;
         Iterator<? extends Term> it = list.listIterator();
         while (it.hasNext()) {

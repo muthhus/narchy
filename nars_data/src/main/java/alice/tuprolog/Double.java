@@ -196,9 +196,9 @@ public class Double extends Number {
         return java.lang.Double.toString(value);
     }
     
-    public int resolveVariables(int count) {
-        return count;
-    }
+//    public int resolveVariables(int count) {
+//        return count;
+//    }
 
     /**
      * @author Paolo Contessi

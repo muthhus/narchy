@@ -257,11 +257,7 @@ public class IOLibrary extends Library {
                     "input", "stream", new Struct(inputStreamName), new Struct(
                             e.getMessage()));
         }
-        if (ch == -1) {
-            return unify(arg0, new Int(-1));
-        } else {
-            return unify(arg0, new Struct(Character.toString((char) ch)));
-        }
+        return ch == -1 ? unify(arg0, new Int(-1)) : unify(arg0, new Struct(Character.toString((char) ch)));
     }
 
     public boolean get_1(Term arg0) throws PrologError {
@@ -275,12 +271,8 @@ public class IOLibrary extends Library {
                         new Struct(e.getMessage()));
             }
         } while (ch < 0x20 && ch >= 0);
-        if (ch == -1) {
-            return unify(arg0, new Int(-1));
-        } else {
-            return unify(arg0,
-                    new Struct(Character.toString(((char) ch))));
-        }
+        return ch == -1 ? unify(arg0, new Int(-1)) : unify(arg0,
+                new Struct(Character.toString(((char) ch))));
     }
 
     public boolean tab_1(Term arg) throws PrologError {

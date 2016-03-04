@@ -340,15 +340,7 @@ public class BasicLibrary extends Library {
                     "evaluable", arg1.getTerm());
         alice.tuprolog.Number val0n = (alice.tuprolog.Number) val0;
         alice.tuprolog.Number val1n = (alice.tuprolog.Number) val1;
-        if (val0n.isInteger() && val1n.isInteger()) {
-            //return (val0n.intValue() == val1n.intValue()) ? true : false;
-            // by ED: note that this would work also with intValue, even with Long args,
-            // because in that case both values would be wrong, but 'equally wrong' :)
-            // However, it is much better to always operate consistently on long values
-            return (val0n.longValue() == val1n.longValue());
-        } else {
-            return (val0n.doubleValue() == val1n.doubleValue());
-        }
+        return val0n.isInteger() && val1n.isInteger() ? val0n.longValue() == val1n.longValue() : val0n.doubleValue() == val1n.doubleValue();
     }
 
     public boolean expression_greater_than_2(Term arg0, Term arg1)
@@ -409,12 +401,7 @@ public class BasicLibrary extends Library {
 
     private boolean expression_greater_than(alice.tuprolog.Number num0,
             alice.tuprolog.Number num1) {
-        if (num0.isInteger() && num1.isInteger()) {
-            //    return num0.intValue() > num1.intValue();
-            return num0.longValue() > num1.longValue();
-        } else {
-            return num0.doubleValue() > num1.doubleValue();
-        }
+        return num0.isInteger() && num1.isInteger() ? num0.longValue() > num1.longValue() : num0.doubleValue() > num1.doubleValue();
     }
 
     public boolean expression_less_than_2(Term arg0, Term arg1)
@@ -475,12 +462,7 @@ public class BasicLibrary extends Library {
 
     private boolean expression_less_than(alice.tuprolog.Number num0,
             alice.tuprolog.Number num1) {
-        if (num0.isInteger() && num1.isInteger()) {
-//            return num0.intValue() < num1.intValue();
-            return num0.longValue() < num1.longValue();
-        } else {
-            return num0.doubleValue() < num1.doubleValue();
-        }
+        return num0.isInteger() && num1.isInteger() ? num0.longValue() < num1.longValue() : num0.doubleValue() < num1.doubleValue();
     }
 
     public boolean term_equality_2(Term arg0, Term arg1) throws PrologError {
@@ -509,11 +491,7 @@ public class BasicLibrary extends Library {
         } catch (Throwable e) {
 
         }
-        if (val0 != null && val0 instanceof Number) {
-            return val0;
-        } else {
-            return null;
-        }
+        return val0 != null && val0 instanceof Number ? val0 : null;
     }
 
     public Term expression_minus_1(Term arg0) {
@@ -548,20 +526,11 @@ public class BasicLibrary extends Library {
         } catch (Throwable e) {
 
         }
-        if (val0 != null && val0 instanceof Number) {
-            // return new Int(~((alice.tuprolog.Number) val0).intValue());
-            // CORRECTED BY ED ON JAN 28, 2011
-            return new alice.tuprolog.Long(~((alice.tuprolog.Number) val0).longValue());
-        } else {
-            return null;
-        }
+        return val0 != null && val0 instanceof Number ? new alice.tuprolog.Long(~((Number) val0).longValue()) : null;
     }
 
     alice.tuprolog.Number getIntegerNumber(long num) {
-        if (num > Integer.MIN_VALUE && num < Integer.MAX_VALUE)
-            return new Int((int) num);
-        else
-            return new alice.tuprolog.Long(num);
+        return num > Integer.MIN_VALUE && num < Integer.MAX_VALUE ? new Int((int) num) : new alice.tuprolog.Long(num);
     }
 
     public Term expression_plus_2(Term arg0, Term arg1) {
@@ -577,11 +546,8 @@ public class BasicLibrary extends Library {
                 && (val1 instanceof Number)) {
             alice.tuprolog.Number val0n = (alice.tuprolog.Number) val0;
             alice.tuprolog.Number val1n = (alice.tuprolog.Number) val1;
-            if (val0n.isInteger() && (val1n.isInteger()))
-                return getIntegerNumber(val0n.longValue() + val1n.longValue());
-            else
-                return new alice.tuprolog.Double(val0n.doubleValue()
-                        + val1n.doubleValue());
+            return val0n.isInteger() && (val1n.isInteger()) ? getIntegerNumber(val0n.longValue() + val1n.longValue()) : new alice.tuprolog.Double(val0n.doubleValue()
+                    + val1n.doubleValue());
         } else
             return null;
     }
@@ -599,11 +565,8 @@ public class BasicLibrary extends Library {
                 && (val1 instanceof Number)) {
             alice.tuprolog.Number val0n = (alice.tuprolog.Number) val0;
             alice.tuprolog.Number val1n = (alice.tuprolog.Number) val1;
-            if (val0n.isInteger() && (val1n.isInteger()))
-                return getIntegerNumber(val0n.longValue() - val1n.longValue());
-            else
-                return new alice.tuprolog.Double(val0n.doubleValue()
-                        - val1n.doubleValue());
+            return val0n.isInteger() && (val1n.isInteger()) ? getIntegerNumber(val0n.longValue() - val1n.longValue()) : new alice.tuprolog.Double(val0n.doubleValue()
+                    - val1n.doubleValue());
         } else
             return null;
     }
@@ -621,11 +584,8 @@ public class BasicLibrary extends Library {
                 && (val1 instanceof Number)) {
             alice.tuprolog.Number val0n = (alice.tuprolog.Number) val0;
             alice.tuprolog.Number val1n = (alice.tuprolog.Number) val1;
-            if (val0n.isInteger() && (val1n.isInteger()))
-                return getIntegerNumber(val0n.longValue() * val1n.longValue());
-            else
-                return new alice.tuprolog.Double(val0n.doubleValue()
-                        * val1n.doubleValue());
+            return val0n.isInteger() && (val1n.isInteger()) ? getIntegerNumber(val0n.longValue() * val1n.longValue()) : new alice.tuprolog.Double(val0n.doubleValue()
+                    * val1n.doubleValue());
         } else
             return null;
     }
@@ -643,11 +603,8 @@ public class BasicLibrary extends Library {
                 && val1 instanceof Number) {
             Number val0n = (Number) val0;
             Number val1n = (Number) val1;
-            if (val0n.isInteger() && val1n.isInteger())
-                return getIntegerNumber(val0n.longValue() / val1n.longValue());
-            else
-                return new alice.tuprolog.Double(val0n.doubleValue()
-                        / val1n.doubleValue());
+            return val0n.isInteger() && val1n.isInteger() ? getIntegerNumber(val0n.longValue() / val1n.longValue()) : new alice.tuprolog.Double(val0n.doubleValue()
+                    / val1n.doubleValue());
         } else
             return null;
     }
@@ -830,12 +787,7 @@ public class BasicLibrary extends Library {
             }
             alice.tuprolog.Number n0 = (alice.tuprolog.Number) arg0;
             String st = null;
-            if (n0.isInteger()) {
-                st = Integer.valueOf(n0.intValue()).toString();
-            } 
-            else {
-                st = java.lang.Double.toString(n0.doubleValue());
-            }
+            st = n0.isInteger() ? Integer.valueOf(n0.intValue()).toString() : java.lang.Double.toString(n0.doubleValue());
             return (unify(arg1, new Struct(st)));
         } else {
             if (!arg1.isAtom()) {

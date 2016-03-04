@@ -594,10 +594,7 @@ public class Parser implements /*Castagna 06/2011*/IParser,/**/ Serializable
 
 	static Number parseInteger(String s) {
 		long num = java.lang.Long.parseLong(s);
-		if (num > Integer.MIN_VALUE && num < Integer.MAX_VALUE)
-			return new Int((int) num);
-		else
-			return new Long(num);
+		return num > Integer.MIN_VALUE && num < Integer.MAX_VALUE ? new Int((int) num) : new Long(num);
 	}
 
 	static Double parseFloat(String s) {

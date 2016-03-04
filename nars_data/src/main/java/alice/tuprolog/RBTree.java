@@ -68,11 +68,9 @@ class Node<K extends Comparable<? super K>,V>
     }
 
     public Node<K,V> sibling() {
-        assert parent != null; // Root node has no sibling
-        if (this == parent.left)
-            return parent.right;
-        else
-            return parent.left;
+        Node<K, V> p = this.parent;
+        assert p != null; // Root node has no sibling
+        return this == p.left ? p.right : p.left;
     }
 
     public Node<K,V> uncle() {
@@ -185,9 +183,10 @@ public class RBTree<K extends Comparable<? super K>,V>
     private void rotateLeft(Node<K,V> n) {
         Node<K,V> r = n.right;
         replaceNode(n, r);
-        n.right = r.left;
-        if (r.left != null) {
-            r.left.parent = n;
+        Node<K, V> rleft = r.left;
+        n.right = rleft;
+        if (rleft != null) {
+            rleft.parent = n;
         }
         r.left = n;
         n.parent = r;
@@ -196,25 +195,27 @@ public class RBTree<K extends Comparable<? super K>,V>
     private void rotateRight(Node<K,V> n) {
         Node<K,V> l = n.left;
         replaceNode(n, l);
-        n.left = l.right;
-        if (l.right != null) {
-            l.right.parent = n;
+        Node<K, V> lright = l.right;
+        n.left = lright;
+        if (lright != null) {
+            lright.parent = n;
         }
         l.right = n;
         n.parent = l;
     }
 
     private void replaceNode(Node<K,V> oldn, Node<K,V> newn) {
-        if (oldn.parent == null) {
+        Node<K, V> parent = oldn.parent;
+        if (parent == null) {
             root = newn;
         } else {
-            if (oldn == oldn.parent.left)
-                oldn.parent.left = newn;
+            if (oldn == parent.left)
+                parent.left = newn;
             else
-                oldn.parent.right = newn;
+                parent.right = newn;
         }
         if (newn != null) {
-            newn.parent = oldn.parent;
+            newn.parent = parent;
         }
     }
 
@@ -230,19 +231,21 @@ public class RBTree<K extends Comparable<? super K>,V>
                     n.value = value;
                     return;
                 } else if (compResult < 0) {
-                    if (n.left == null) {
+                    Node<K, V> nl = n.left;
+                    if (nl == null) {
                         n.left = insertedNode;
                         break;
                     } else {
-                        n = n.left;
+                        n = nl;
                     }
                 } else {
                     assert compResult > 0;
-                    if (n.right == null) {
+                    Node<K, V> nr = n.right;
+                    if (nr == null) {
                         n.right = insertedNode;
                         break;
                     } else {
-                        n = n.right;
+                        n = nr;
                     }
                 }
             }
@@ -309,7 +312,6 @@ public class RBTree<K extends Comparable<? super K>,V>
 		@SuppressWarnings("unchecked")
 		LinkedList<ClauseInfo> nodeClause= (LinkedList<ClauseInfo>)n.value;
         if(nodeClause.size()>1){
-        	
         	nodeClause.remove(c);
         }
         else{
@@ -367,12 +369,13 @@ public class RBTree<K extends Comparable<? super K>,V>
     }
 
     private void deleteCase3(Node<K,V> n) {
+        Node<K, V> ns = n.sibling();
         if (nodeColor(n.parent) == Color.BLACK &&
-            nodeColor(n.sibling()) == Color.BLACK &&
-            nodeColor(n.sibling().left) == Color.BLACK &&
-            nodeColor(n.sibling().right) == Color.BLACK)
+            nodeColor(ns) == Color.BLACK &&
+            nodeColor(ns.left) == Color.BLACK &&
+            nodeColor(ns.right) == Color.BLACK)
         {
-            n.sibling().color = Color.RED;
+            ns.color = Color.RED;
             deleteCase1(n.parent);
         }
         else
@@ -380,12 +383,13 @@ public class RBTree<K extends Comparable<? super K>,V>
     }
 
     private void deleteCase4(Node<K,V> n) {
+        Node<K, V> ns = n.sibling();
         if (nodeColor(n.parent) == Color.RED &&
-            nodeColor(n.sibling()) == Color.BLACK &&
-            nodeColor(n.sibling().left) == Color.BLACK &&
-            nodeColor(n.sibling().right) == Color.BLACK)
+            nodeColor(ns) == Color.BLACK &&
+            nodeColor(ns.left) == Color.BLACK &&
+            nodeColor(ns.right) == Color.BLACK)
         {
-            n.sibling().color = Color.RED;
+            ns.color = Color.RED;
             n.parent.color = Color.BLACK;
         }
         else
@@ -393,39 +397,41 @@ public class RBTree<K extends Comparable<? super K>,V>
     }
 
     private void deleteCase5(Node<K,V> n) {
+        Node<K, V> ns = n.sibling();
         if (n == n.parent.left &&
-            nodeColor(n.sibling()) == Color.BLACK &&
-            nodeColor(n.sibling().left) == Color.RED &&
-            nodeColor(n.sibling().right) == Color.BLACK)
+            nodeColor(ns) == Color.BLACK &&
+            nodeColor(ns.left) == Color.RED &&
+            nodeColor(ns.right) == Color.BLACK)
         {
-            n.sibling().color = Color.RED;
-            n.sibling().left.color = Color.BLACK;
-            rotateRight(n.sibling());
+            ns.color = Color.RED;
+            ns.left.color = Color.BLACK;
+            rotateRight(ns);
         }
         else if (n == n.parent.right &&
-                 nodeColor(n.sibling()) == Color.BLACK &&
-                 nodeColor(n.sibling().right) == Color.RED &&
-                 nodeColor(n.sibling().left) == Color.BLACK)
+                 nodeColor(ns) == Color.BLACK &&
+                 nodeColor(ns.right) == Color.RED &&
+                 nodeColor(ns.left) == Color.BLACK)
         {
-            n.sibling().color = Color.RED;
-            n.sibling().right.color = Color.BLACK;
-            rotateLeft(n.sibling());
+            ns.color = Color.RED;
+            ns.right.color = Color.BLACK;
+            rotateLeft(ns);
         }
         deleteCase6(n);
     }
 
     private void deleteCase6(Node<K,V> n) {
-        n.sibling().color = nodeColor(n.parent);
+        Node<K, V> ns = n.sibling();
+        ns.color = nodeColor(n.parent);
         n.parent.color = Color.BLACK;
         if (n == n.parent.left) {
-            assert nodeColor(n.sibling().right) == Color.RED;
-            n.sibling().right.color = Color.BLACK;
+            assert nodeColor(ns.right) == Color.RED;
+            ns.right.color = Color.BLACK;
             rotateLeft(n.parent);
         }
         else
         {
-            assert nodeColor(n.sibling().left) == Color.RED;
-            n.sibling().left.color = Color.BLACK;
+            assert nodeColor(ns.left) == Color.RED;
+            ns.left.color = Color.BLACK;
             rotateRight(n.parent);
         }
     }

@@ -20,7 +20,6 @@ package alice.tuprolog;
 import java.io.*;
 
 import alice.util.Tools;
-import alice.tuprolog.event.OutputEvent;
 import alice.tuprolog.event.OutputListener;
 
 /**

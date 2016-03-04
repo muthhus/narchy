@@ -18,17 +18,11 @@ public class JavaException extends Throwable {
         // Cause
         Term causeTerm = null;
         Throwable cause = e.getCause();
-        if (cause != null)
-            causeTerm = new Struct(cause.toString());
-        else
-            causeTerm = new Int(0);
+        causeTerm = cause != null ? new Struct(cause.toString()) : new Int(0);
         // Message
         Term messageTerm = null;
         String message = e.getMessage();
-        if (message != null)
-            messageTerm = new Struct(message);
-        else
-            messageTerm = new Int(0);
+        messageTerm = message != null ? new Struct(message) : new Int(0);
         // StackTrace
         Struct stackTraceTerm = new Struct();
         StackTraceElement[] elements = e.getStackTrace();

@@ -205,24 +205,14 @@ public class Var extends Term {
 	 * Gets the name of the variable
 	 */
 	public String getName() {
-		if (name!=null) {
-			return completeName.toString();
-		} else {
-			//return ANY+timestamp;
-			return ANY;
-		}
+		return name != null ? completeName.toString() : ANY;
 	}
 
 	/**
 	 * Gets the name of the variable
 	 */
 	public String getOriginalName() {
-		if (name!=null) {
-			return name;
-		} else {
-			//return ANY+timestamp;
-			return ANY + hashCode();
-		}
+		return name != null ? name : ANY + hashCode();
 	}
 
 
@@ -289,60 +279,37 @@ public class Var extends Term {
 	@Override
 	public boolean isEmptyList() {
 		Term t=getTerm();
-		if (t==this) {
-			return false;
-		} else {
-			return t.isEmptyList();
-		}
+		return t == this ? false : t.isEmptyList();
 	}
 
 	@Override
 	public boolean isAtomic() {
 		Term t=getTerm();
-		if (t==this) {
-			return false;
-		} else {
-			return t.isAtomic();
-		}
+		return t == this ? false : t.isAtomic();
 	}
 
 	@Override
 	public boolean isCompound() {
 		Term t=getTerm();
-		if (t==this) {
-			return false;
-		} else {
-			return t.isCompound();
-		}
+		return t == this ? false : t.isCompound();
 	}
 
 	@Override
 	public boolean isAtom() {
 		Term t=getTerm();
-		if (t==this) {
-			return false;
-		} else {
-			return t.isAtom();
-		}
+		return t == this ? false : t.isAtom();
 	}
 
 	@Override
 	public boolean isList() {
 		Term t = getTerm();
-		if (t == this)
-			return false;
-		else
-			return t.isList();
+		return t == this ? false : t.isList();
 	}
 
 	@Override
 	public boolean isGround(){
 		Term t=getTerm();
-		if (t==this) {
-			return false;
-		} else {
-			return t.isGround();
-		}
+		return t == this ? false : t.isGround();
 	}
 
 	//
@@ -444,7 +411,10 @@ public class Var extends Term {
 				 if (this == t) {
 					 try{
 						 vl1.add(this);                
-					 } catch(NullPointerException e) {/* vl1==null mean nothing intresting for the caller */}
+					 } catch(NullPointerException e) {
+						 /* vl1==null mean nothing intresting for the caller */
+						 throw new RuntimeException(e); //TODO trap this make sure stack trace not generated routinely
+					 }
 					 return true;
 				 }
 			 } else if (t instanceof Struct) {
@@ -458,7 +428,10 @@ public class Var extends Term {
 			 link = t;
 			 try {
 				 vl1.add(this);                
-			 } catch(NullPointerException e) {/* vl1==null mean nothing intresting for the caller */}
+			 } catch(NullPointerException e) {
+				 /* vl1==null mean nothing intresting for the caller */
+				 throw new RuntimeException(e); //TODO trap this make sure stack trace not generated routinely
+			 }
 			 //System.out.println("VAR "+name+" BOUND to "+link+" - time: "+time+" - mark: "+mark);
 			 return true;
 		 } else {
@@ -535,17 +508,9 @@ public class Var extends Term {
 	 public String toString() {
 		 Term tt = getTerm();
 		 if (name != null) {
-			 if (tt == this){
-				 return completeName.toString();
-			 } else {
-				 return (completeName + " / " + tt.toString());
-			 }
+			 return tt == this ? completeName.toString() : completeName + " / " + tt.toString();
 		 } else {
-			 if (tt == this) {
-				 return ANY + hashCode();
-			 } else {
-				 return tt.toString();
-			 }
+			 return tt == this ? ANY + hashCode() : tt.toString();
 		 }
 	 }
 
@@ -559,17 +524,9 @@ public class Var extends Term {
 	 public String toStringFlattened() {
 		 Term tt = getTerm();
 		 if (name != null) {
-			 if (tt == this) {
-				 return completeName.toString();
-			 } else {
-				 return tt.toString();
-			 }
+			 return tt == this ? completeName.toString() : tt.toString();
 		 } else {
-			 if (tt == this) {
-				 return ANY + hashCode();
-			 } else {
-				 return tt.toString();
-			 }
+			 return tt == this ? ANY + hashCode() : tt.toString();
 		 }
 	 }
 

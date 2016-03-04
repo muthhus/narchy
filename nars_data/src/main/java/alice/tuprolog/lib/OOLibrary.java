@@ -43,7 +43,6 @@ import alice.tuprolog.Struct;
 import alice.tuprolog.Term;
 import alice.tuprolog.Var;
 import alice.util.AbstractDynamicClassLoader;
-import alice.util.AndroidDynamicClassLoader;
 import alice.util.InspectionUtils;
 import alice.util.JavaDynamicClassLoader;
 /**
@@ -411,15 +410,8 @@ public class OOLibrary extends Library {
             	 * 
             	 * On Dalvik VM we can only use the DexClassLoader.
             	 */
-            	
-            	if (System.getProperty("java.vm.name").equals("Dalvik"))
-        		{
-            		the_class = Class.forName(fullClassName, true, dynamicLoader);
-        		}
-            	else
-            	{
-            		the_class = Class.forName(fullClassName, true, new ClassLoader());
-            	}
+
+                the_class = System.getProperty("java.vm.name").equals("Dalvik") ? Class.forName(fullClassName, true, dynamicLoader) : Class.forName(fullClassName, true, new ClassLoader());
                 
                 if (bindDynamicObject(id, the_class))
                     return true;
@@ -1145,11 +1137,7 @@ public class OOLibrary extends Library {
                         break;
                     default:
                         Object obj = currentObjects.get(name);
-                        if (obj == null) {
-                            values[i] = name;
-                        } else {
-                            values[i] = obj;
-                        }
+                        values[i] = obj == null ? name : obj;
                         types[i] = values[i].getClass();
                         break;
                 }
@@ -1177,12 +1165,8 @@ public class OOLibrary extends Library {
                 } else {
                     Object obj = currentObjects.get(alice.util.Tools
                             .removeApices(tc.toString()));
-                    if (obj == null) {
-                        values[i] = alice.util.Tools
-                                .removeApices(tc.toString());
-                    } else {
-                        values[i] = obj;
-                    }
+                    values[i] = obj == null ? alice.util.Tools
+                            .removeApices(tc.toString()) : obj;
                     types[i] = values[i].getClass();
                 }
             } else if (term instanceof Var && !((Var) term).isBound()) {
@@ -1251,7 +1235,7 @@ public class OOLibrary extends Library {
                         default:
                             castTo_name = "[L"
                                     + castTo_name.substring(0,
-                                    castTo_name.length() - 2) + ";";
+                                    castTo_name.length() - 2) + ';';
                             break;
                     }
                 }
@@ -1372,11 +1356,7 @@ public class OOLibrary extends Library {
         }
         try {
             if (Boolean.class.isInstance(obj)) {
-                if ((Boolean) obj) {
-                    return unify(id, Term.TRUE);
-                } else {
-                    return unify(id, Term.FALSE);
-                }
+                return (Boolean) obj ? unify(id, Term.TRUE) : unify(id, Term.FALSE);
             } else if (Byte.class.isInstance(obj)) {
                 return unify(id, new Int(((Byte) obj).intValue()));
             } else if (Short.class.isInstance(obj)) {
