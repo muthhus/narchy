@@ -97,6 +97,7 @@ public class PrologCore extends Agent implements Consumer<Task> {
 
         PTerm questionTerm = pterm(tt);
 
+        //TODO limit max # of inputs
         solve(questionTerm, (answer)-> {
 
             // supply input an answer to the NAR

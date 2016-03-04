@@ -352,7 +352,7 @@ public class PJLibraryNew extends OOLibrary {
             return false;
         }
         if (o == null || !(o instanceof Method)) {
-            getEngine().warn("Method not found: " + method);
+            getEngine().logger.warn("Method not found: " + method);
             return false;
         }
         else {
@@ -373,7 +373,7 @@ public class PJLibraryNew extends OOLibrary {
                     res = m.invoke(receiver, args);
                 }
             } catch (Throwable ex) {
-                getEngine().warn("Method invocation failed: " + method);
+                getEngine().logger.warn("Method invocation failed: " + method);
                 ex.printStackTrace();
                 return false;
             }
@@ -401,10 +401,10 @@ public class PJLibraryNew extends OOLibrary {
 				try {
 					cl = Class.forName(clName);
 				} catch (ClassNotFoundException ex) {
-					getEngine().warn("Java class not found: " + clName);
+					getEngine().logger.warn("Java class not found: " + clName);
 					return false;
 				} catch (Exception ex) {
-					getEngine().warn("Static field " + fieldName + " not found in class " + alice.util.Tools.removeApices(((Struct) objId).getArg(0).toString()));
+					getEngine().logger.warn("Static field " + fieldName + " not found in class " + alice.util.Tools.removeApices(((Struct) objId).getArg(0).toString()));
 					return false;
 				}
 			} else {				
@@ -444,7 +444,7 @@ public class PJLibraryNew extends OOLibrary {
 			
 			return true;
 		} catch (NoSuchFieldException ex) {
-			getEngine().warn("Field " + fieldName + " not found in class " + objId);
+			getEngine().logger.warn("Field " + fieldName + " not found in class " + objId);
 			return false;
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -527,10 +527,10 @@ public class PJLibraryNew extends OOLibrary {
 				try {
 					cl = Class.forName(clName);
 				} catch (ClassNotFoundException ex) {
-					getEngine().warn("Java class not found: " + clName);
+					getEngine().logger.warn("Java class not found: " + clName);
 					return false;
 				} catch (Exception ex) {
-					getEngine().warn("Static field " + fieldName + " not found in class " + alice.util.Tools.removeApices(((Struct) objId).getArg(0).toString()));
+					getEngine().logger.warn("Static field " + fieldName + " not found in class " + alice.util.Tools.removeApices(((Struct) objId).getArg(0).toString()));
 					return false;
 				}
 			} else {
@@ -565,14 +565,14 @@ public class PJLibraryNew extends OOLibrary {
 				return bindDynamicObject(what, res);
 			}
 			//} catch (ClassNotFoundException ex){
-			//    getEngine().warn("object of unknown class "+objId);
+			//    getEngine().logger.warn("object of unknown class "+objId);
 			//ex.printStackTrace();
 			//    return false;
 		} catch (NoSuchFieldException ex) {
-			getEngine().warn("Field " + fieldName + " not found in class " + objId);
+			getEngine().logger.warn("Field " + fieldName + " not found in class " + objId);
 			return false;
 		} catch (Exception ex) {
-			getEngine().warn("Generic error in accessing the field");
+			getEngine().logger.warn("Generic error in accessing the field");
 			//ex.printStackTrace();
 			return false;
 		}
@@ -763,7 +763,7 @@ public class PJLibraryNew extends OOLibrary {
 						try {
 							types[i] = (Class.forName(castTo_name));
 						} catch (ClassNotFoundException ex) {
-							getEngine().warn("Java class not found: " + castTo_name);
+							getEngine().logger.warn("Java class not found: " + castTo_name);
 							return false;
 						}
 					}
@@ -789,7 +789,7 @@ public class PJLibraryNew extends OOLibrary {
 						try {
 							types[i] = (Class.forName(castTo_name));
 						} catch (ClassNotFoundException ex) {
-							getEngine().warn("Java class not found: " + castTo_name);
+							getEngine().logger.warn("Java class not found: " + castTo_name);
 							return false;
 						}
 					}
@@ -820,7 +820,7 @@ public class PJLibraryNew extends OOLibrary {
 				}
 			}
 		} catch (Exception ex) {
-			getEngine().warn("Casting " + castWhat + " to " + castTo + " failed");
+			getEngine().logger.warn("Casting " + castWhat + " to " + castTo + " failed");
 			return false;
 		}
 		return true;

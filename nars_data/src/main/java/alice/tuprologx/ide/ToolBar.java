@@ -254,7 +254,7 @@ public class ToolBar extends JPanel
         libraryDialog.setFileManager(new JavaIOManager(libraryDialog));
         libraryDialog.setFileManagerType("preferences");
         this.engine.addSpyListener(debugArea);
-        this.engine.addWarningListener(debugArea);
+        //this.engine.addWarningListener(debugArea);
         this.engine.addLibraryListener(libraryDialog);
         //this.engine.addPropertyChangeListener(debugArea);
     }

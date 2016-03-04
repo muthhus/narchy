@@ -41,7 +41,7 @@ public class PrologRepl extends Automaton implements Serializable, OutputListene
         IO.setExecutionType(IOLibrary.consoleExecution);
         /***/
         stdin = new BufferedReader(new InputStreamReader(System.in));
-        engine.addWarningListener(this);
+        //engine.logaddWarningListener(this);
         engine.addOutputListener(this);
         engine.addSpyListener(this);
         /*Castagna 06/2011*/   

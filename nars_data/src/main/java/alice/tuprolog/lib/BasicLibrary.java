@@ -228,12 +228,14 @@ public class BasicLibrary extends Library {
     /**/
     
     public boolean warning_0() {
-        getEngine().setWarning(true);
+        //getEngine().logger.setWarning(true);
+        getEngine().logger.warn("warning/0 unsupported currently");
         return true;
     }
 
     public boolean nowarning_0() {
-        getEngine().setWarning(false);
+        //getEngine().logger.setWarning(false);
+        getEngine().logger.warn("nowarning/0 unsupported currently");
         return true;
     }
 

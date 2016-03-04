@@ -29,18 +29,16 @@ import java.util.*;
  */
 
 class ClauseDatabase extends HashMap<String,FamilyClausesList> implements Iterable<ClauseInfo> {
+
 	private static final long serialVersionUID = 1L;
+
 	void addFirst(String key, ClauseInfo d) {
-		FamilyClausesList family = get(key);
-		if (family == null)
-			put(key, family = new FamilyClausesList());
+		FamilyClausesList family = computeIfAbsent(key, (k) -> new FamilyClausesList());
 		family.addFirst(d);
 	}
 
 	void addLast(String key, ClauseInfo d) {
-		FamilyClausesList family = get(key);
-		if (family == null)
-			put(key, family = new FamilyClausesList());
+		FamilyClausesList family = computeIfAbsent(key, (k) -> new FamilyClausesList());
 		family.addLast(d);
 	}
 
@@ -58,10 +56,10 @@ class ClauseDatabase extends HashMap<String,FamilyClausesList> implements Iterab
 	 */
 	List<ClauseInfo> getPredicates(PTerm headt) {
 		FamilyClausesList family = get(((Struct) headt).getPredicateIndicator());
-		if (family == null){
-			return new ReadOnlyLinkedList<>();
-		}
-		return family.get(headt);
+		return family == null ?
+				//new ReadOnlyLinkedList<ClauseInfo>() :
+				ReadOnlyLinkedList.empty :
+				family.get(headt);
 	}
 
 	/**
@@ -72,10 +70,10 @@ class ClauseDatabase extends HashMap<String,FamilyClausesList> implements Iterab
 	 */
 	List<ClauseInfo> getPredicates(String key){
 		FamilyClausesList family = get(key);
-		if(family == null){
-			return new ReadOnlyLinkedList<>();
-		}
-		return new ReadOnlyLinkedList<>(family);
+		return family == null ?
+				//new ReadOnlyLinkedList<ClauseInfo>() :
+				ReadOnlyLinkedList.empty :
+				new ReadOnlyLinkedList<>(family);
 	}
 
 	@Override
@@ -94,11 +92,16 @@ class ClauseDatabase extends HashMap<String,FamilyClausesList> implements Iterab
 
 		@Override
 		public boolean hasNext() {
+			Iterator<ClauseInfo> workingList = this.workingList;
+			Iterator<FamilyClausesList> values = this.values;
+
 			while (true) {
+
 				if (workingList != null && workingList.hasNext())
 					return true;
+
 				if (values.hasNext()) {
-					workingList = values.next().iterator();
+					workingList = this.workingList = values.next().iterator();
 					continue;
 				}
 				return false;

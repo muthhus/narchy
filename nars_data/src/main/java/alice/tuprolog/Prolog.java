@@ -23,6 +23,8 @@ import java.util.function.Consumer;
 
 import alice.tuprolog.event.*;
 import alice.tuprolog.interfaces.IProlog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 //import alice.tuprologx.ide.ToolBar;
 
 
@@ -50,8 +52,10 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 
 	/*  spying activated ?  */
 	private boolean spy;  
-	/*  warning activated ?  */
-	private boolean warning;
+
+//	/*  warning activated ?  */
+//	private boolean warning;
+
 	/* listeners registrated for virtual machine output events */
 	/*Castagna 06/2011*/	
 	/* exception activated ? */
@@ -60,11 +64,14 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 	private final ArrayList<OutputListener> outputListeners;
 	/* listeners registrated for virtual machine internal events */
 	private final ArrayList<SpyListener> spyListeners;
+
 	/* listeners registrated for virtual machine state change events */
-	private final ArrayList<WarningListener> warningListeners;
+	//private final ArrayList<WarningListener> warningListeners;
+	public final static Logger logger = LoggerFactory.getLogger(Prolog.class);
+
 	/*Castagna 06/2011*/	
 	/* listeners registrated for virtual machine state exception events */
-	private final ArrayList<ExceptionListener> exceptionListeners;
+	@Deprecated private final ArrayList<ExceptionListener> exceptionListeners;
 	/**/
 
 	/* listeners to theory events */
@@ -138,12 +145,11 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 	private Prolog(boolean spy, boolean warning) {
 		outputListeners = new ArrayList<>();
 		spyListeners = new ArrayList<>();
-		warningListeners = new ArrayList<>();
-		/*Castagna 06/2011*/		
+		/*Castagna 06/2011*/
 		exceptionListeners = new ArrayList<>();
 		/**/
 		this.spy = spy;
-		this.warning = warning;
+
 		/*Castagna 06/2011*/
 		exception = true;
 		/**/
@@ -646,35 +652,20 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 		}
 	}
 
-
-	/**
-	 * Switches on/off the notification of warning information events
-	 * @param state  - true for enabling warning information notification
-	 */
-	public synchronized void setWarning(boolean state) {
-		warning = state;
-	}
-
-	/**
-	 * Checks if warning information are notified
-	 * @return  true if the engine emits warning information
-	 */
-	public synchronized boolean isWarning() {
-		return warning;
-	}
-
-	/**
-	 * Notifies a warn information event
-	 *
-	 *
-	 * @param m the warning message
-	 */
-	public void warn(String m) {
-		if (warning){
-			notifyWarning(new WarningEvent(this, m));
-			//log.warn(m);
-		}
-	}
+//
+//	/**
+//	 * Notifies a warn information event
+//	 *
+//	 *
+//	 * @param m the warning message
+//	 */
+//	public void warn(String m) {
+//		logger.warn(m);
+////		if (warning){
+////			notifyWarning(new WarningEvent(this, m));
+////			//log.warn(m);
+////		}
+//	}
 
 	/*Castagna 06/2011*/
 	/**
@@ -769,14 +760,14 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 		spyListeners.add(l);
 	}
 
-	/**
-	 * Adds a listener to warning events
-	 *
-	 * @param l the listener
-	 */
-	public synchronized void addWarningListener(WarningListener l) {
-		warningListeners.add(l);
-	}
+//	/**
+//	 * Adds a listener to warning events
+//	 *
+//	 * @param l the listener
+//	 */
+//	public synchronized void addWarningListener(WarningListener l) {
+//		warningListeners.add(l);
+//	}
 
 	/*Castagna 06/2011*/	
 	/**
@@ -854,21 +845,21 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 		spyListeners.clear();
 	}
 
-	/**
-	 * Removes a listener to warning events
-	 *
-	 * @param l the listener
-	 */
-	public synchronized void removeWarningListener(WarningListener l) {
-		warningListeners.remove(l);
-	}
-
-	/**
-	 * Removes all warning event listeners
-	 */
-	public synchronized void removeAllWarningListeners() {
-		warningListeners.clear();
-	}
+//	/**
+//	 * Removes a listener to warning events
+//	 *
+//	 * @param l the listener
+//	 */
+//	public synchronized void removeWarningListener(WarningListener l) {
+//		warningListeners.remove(l);
+//	}
+//
+//	/**
+//	 * Removes all warning event listeners
+//	 */
+//	public synchronized void removeAllWarningListeners() {
+//		warningListeners.clear();
+//	}
 
 	/* Castagna 06/2011*/	
 	/**
@@ -891,65 +882,65 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 		exceptionListeners.clear();
 	}
 	/**/
+//
+//	/**
+//	 * Gets a copy of current listener list to output events
+//	 */
+//	public synchronized List<OutputListener> getOutputListenerList() {
+//		return new ArrayList<>(outputListeners);
+//	}
 
-	/**
-	 * Gets a copy of current listener list to output events
-	 */
-	public synchronized List<OutputListener> getOutputListenerList() {
-		return new ArrayList<>(outputListeners);
-	}
-
-	/**
-	 * Gets a copy of current listener list to warning events
-	 *
-	 */
-	public synchronized List<WarningListener> getWarningListenerList() {
-		return new ArrayList<>(warningListeners);
-	}
-
-	/*Castagna 06/2011*/	
-	/**
-	 * Gets a copy of current listener list to exception events
-	 *
-	 */
-	public synchronized List<ExceptionListener> getExceptionListenerList() {
-		return new ArrayList<>(exceptionListeners);
-	}
-	/**/
-	
-	/**
-	 * Gets a copy of current listener list to spy events
-	 *
-	 */
-	public synchronized List<SpyListener> getSpyListenerList() {
-		return new ArrayList<>(spyListeners);
-	}
-
-	/**
-	 * Gets a copy of current listener list to theory events
-	 * 
-	 */
-	public synchronized List<TheoryListener> getTheoryListenerList() {
-		return new ArrayList<>(theoryListeners);
-	}
-
-	/**
-	 * Gets a copy of current listener list to library events
-	 *
-	 */
-	public synchronized List<LibraryListener> getLibraryListenerList() {
-		return new ArrayList<>(libraryListeners);
-	}
-
-	/**
-	 * Gets a copy of current listener list to query events
-	 *
-	 */
-	public synchronized List<QueryListener> getQueryListenerList() {
-		return new ArrayList<>(queryListeners);
-	}
-
-	// notification
+//	/**
+//	 * Gets a copy of current listener list to warning events
+//	 *
+//	 */
+//	public synchronized List<WarningListener> getWarningListenerList() {
+//		return new ArrayList<>(warningListeners);
+//	}
+//
+//	/*Castagna 06/2011*/
+//	/**
+//	 * Gets a copy of current listener list to exception events
+//	 *
+//	 */
+//	public synchronized List<ExceptionListener> getExceptionListenerList() {
+//		return new ArrayList<>(exceptionListeners);
+//	}
+//	/**/
+//
+//	/**
+//	 * Gets a copy of current listener list to spy events
+//	 *
+//	 */
+//	public synchronized List<SpyListener> getSpyListenerList() {
+//		return new ArrayList<>(spyListeners);
+//	}
+//
+//	/**
+//	 * Gets a copy of current listener list to theory events
+//	 *
+//	 */
+//	public synchronized List<TheoryListener> getTheoryListenerList() {
+//		return new ArrayList<>(theoryListeners);
+//	}
+//
+//	/**
+//	 * Gets a copy of current listener list to library events
+//	 *
+//	 */
+//	public synchronized List<LibraryListener> getLibraryListenerList() {
+//		return new ArrayList<>(libraryListeners);
+//	}
+//
+//	/**
+//	 * Gets a copy of current listener list to query events
+//	 *
+//	 */
+//	public synchronized List<QueryListener> getQueryListenerList() {
+//		return new ArrayList<>(queryListeners);
+//	}
+//
+//	// notification
 
 	/**
 	 * Notifies an ouput information event
@@ -973,17 +964,6 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 		}
 	}
 
-	/**
-	 * Notifies a warning information event
-	 *
-	 * @param e the event
-	 */
-	protected void notifyWarning(WarningEvent e) {
-		for(WarningListener wl:warningListeners){
-			wl.onWarning(e);
-		}
-	}
-
 	/*Castagna 06/2011*/	
 	/**
 	 * Notifies a exception information event
@@ -991,9 +971,11 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 	 * @param e the event
 	 */
 	protected void notifyException(ExceptionEvent e) {
+		//
 		for(ExceptionListener el:exceptionListeners){
 			el.onException(e);
 		}
+		logger.error("{} {}", e.getSource(), e.getMsg());
 	}
 	/**/
 	

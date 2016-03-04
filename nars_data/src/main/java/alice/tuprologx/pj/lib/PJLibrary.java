@@ -192,26 +192,26 @@ public class PJLibrary extends Library {
 				//
 				//
 				if (co==null){
-					getEngine().warn("Constructor not found: class " + clName);
+					getEngine().logger.warn("Constructor not found: class " + clName);
 					return false;
 				}
 				
 				Object obj = co.newInstance(args_value);
 				return bindDynamicObject(id, obj);
 			} catch (ClassNotFoundException ex) {
-				getEngine().warn("Java class not found: " + clName);
+				getEngine().logger.warn("Java class not found: " + clName);
 				return false;
 			} catch (InvocationTargetException ex) {
-				getEngine().warn("Invalid constructor arguments.");
+				getEngine().logger.warn("Invalid constructor arguments.");
 				return false;
 			} catch (NoSuchMethodException ex) {
-				getEngine().warn("Constructor not found: " + args.getTypes());
+				getEngine().logger.warn("Constructor not found: " + args.getTypes());
 				return false;
 			} catch (InstantiationException ex) {
-				getEngine().warn("Objects of class " + clName + " cannot be instantiated");
+				getEngine().logger.warn("Objects of class " + clName + " cannot be instantiated");
 				return false;
 			} catch (IllegalArgumentException ex) {
-				getEngine().warn("Illegal constructor arguments  " + args);
+				getEngine().logger.warn("Illegal constructor arguments  " + args);
 				return false;
 			}
 		} catch (Exception ex) {
@@ -273,8 +273,8 @@ public class PJLibrary extends Library {
 				file.write(text);
 				file.close();
 			} catch (IOException ex) {
-				getEngine().warn("Compilation of java sources failed");
-				getEngine().warn("(creation of " + fullClassPath + ".java fail failed)");
+				getEngine().logger.warn("Compilation of java sources failed");
+				getEngine().logger.warn("(creation of " + fullClassPath + ".java fail failed)");
 				return false;
 			}
 			String cmd = "javac " + cp + " " + fullClassPath + ".java";
@@ -283,21 +283,21 @@ public class PJLibrary extends Library {
 				Process jc = Runtime.getRuntime().exec(cmd);
 				int res = jc.waitFor();
 				if (res != 0) {
-					getEngine().warn("Compilation of java sources failed");
-					getEngine().warn("(java compiler (javac) has stopped with errors)");
+					getEngine().logger.warn("Compilation of java sources failed");
+					getEngine().logger.warn("(java compiler (javac) has stopped with errors)");
 					return false;
 				}
 			} catch (IOException ex) {
-				getEngine().warn("Compilation of java sources failed");
-				getEngine().warn("(java compiler (javac) invocation failed)");
+				getEngine().logger.warn("Compilation of java sources failed");
+				getEngine().logger.warn("(java compiler (javac) invocation failed)");
 				return false;
 			}
 			try {
 				Class<?> the_class = Class.forName(fullClassName, true, new ClassLoader());
 				return bindDynamicObject(id, the_class);
 			} catch (ClassNotFoundException ex) {
-				getEngine().warn("Compilation of java sources failed");
-				getEngine().warn("(Java Class compiled, but not created: " + fullClassName + " )");
+				getEngine().logger.warn("Compilation of java sources failed");
+				getEngine().logger.warn("(Java Class compiled, but not created: " + fullClassName + " )");
 				return false;
 			}
 		} catch (Exception ex) {
@@ -375,12 +375,12 @@ public class PJLibrary extends Library {
 						res = m.invoke(obj, args_values);
 						
 					} catch (IllegalAccessException ex) {
-						getEngine().warn("Method invocation failed: " + methodName+ "( signature: " + args + " )");
+						getEngine().logger.warn("Method invocation failed: " + methodName+ "( signature: " + args + " )");
 						ex.printStackTrace();
 						return false;                        
 					}                    
 				} else {
-					getEngine().warn("Method not found: " + methodName+ "( signature: " + args + " )");
+					getEngine().logger.warn("Method not found: " + methodName+ "( signature: " + args + " )");
 					return false;
 				}
 			} else {
@@ -394,7 +394,7 @@ public class PJLibrary extends Library {
 							res = m.invoke(null, args.getValues());
 						} catch (ClassNotFoundException ex) {
 							// if not found even as a class id -> consider as a String object value
-							getEngine().warn("Unknown class.");
+							getEngine().logger.warn("Unknown class.");
 							ex.printStackTrace();
 							return false;
 						}
@@ -413,22 +413,22 @@ public class PJLibrary extends Library {
 			}
 			return parseResult(idResult, res);
 		} catch (InvocationTargetException ex) {
-			getEngine().warn("Method failed: " + methodName + " - ( signature: " + args +
+			getEngine().logger.warn("Method failed: " + methodName + " - ( signature: " + args +
 					" ) - Original Exception: "+ex.getTargetException());
 			ex.printStackTrace();
 			return false;
 		} catch (NoSuchMethodException ex) {
 			ex.printStackTrace();
-			getEngine().warn("Method not found: " + methodName+ " - ( signature: " + args + " )");
+			getEngine().logger.warn("Method not found: " + methodName+ " - ( signature: " + args + " )");
 			return false;
 		} catch (IllegalArgumentException ex) {
 			ex.printStackTrace();
-			getEngine().warn("Invalid arguments " + args+ " - ( method: " + methodName + " )");
+			getEngine().logger.warn("Invalid arguments " + args+ " - ( method: " + methodName + " )");
 			//ex.printStackTrace();
 			return false;
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			getEngine().warn("Generic error in method invocation " + methodName);
+			getEngine().logger.warn("Generic error in method invocation " + methodName);
 			return false;
 		}
 	}
@@ -452,10 +452,10 @@ public class PJLibrary extends Library {
 				try {
 					cl = Class.forName(clName);
 				} catch (ClassNotFoundException ex) {
-					getEngine().warn("Java class not found: " + clName);
+					getEngine().logger.warn("Java class not found: " + clName);
 					return false;
 				} catch (Exception ex) {
-					getEngine().warn("Static field " + fieldName + " not found in class " + alice.util.Tools.removeApices(((Struct) objId).getArg(0).toString()));
+					getEngine().logger.warn("Static field " + fieldName + " not found in class " + alice.util.Tools.removeApices(((Struct) objId).getArg(0).toString()));
 					return false;
 				}
 			} else {
@@ -502,7 +502,7 @@ public class PJLibrary extends Library {
 			
 			return true;
 		} catch (NoSuchFieldException ex) {
-			getEngine().warn("Field " + fieldName + " not found in class " + objId);
+			getEngine().logger.warn("Field " + fieldName + " not found in class " + objId);
 			return false;
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -528,10 +528,10 @@ public class PJLibrary extends Library {
 				try {
 					cl = Class.forName(clName);
 				} catch (ClassNotFoundException ex) {
-					getEngine().warn("Java class not found: " + clName);
+					getEngine().logger.warn("Java class not found: " + clName);
 					return false;
 				} catch (Exception ex) {
-					getEngine().warn("Static field " + fieldName + " not found in class " + alice.util.Tools.removeApices(((Struct) objId).getArg(0).toString()));
+					getEngine().logger.warn("Static field " + fieldName + " not found in class " + alice.util.Tools.removeApices(((Struct) objId).getArg(0).toString()));
 					return false;
 				}
 			} else {
@@ -567,14 +567,14 @@ public class PJLibrary extends Library {
 				return bindDynamicObject(what, res);
 			}
 			//} catch (ClassNotFoundException ex){
-			//    getEngine().warn("object of unknown class "+objId);
+			//    getEngine().logger.warn("object of unknown class "+objId);
 			//ex.printStackTrace();
 			//    return false;
 		} catch (NoSuchFieldException ex) {
-			getEngine().warn("Field " + fieldName + " not found in class " + objId);
+			getEngine().logger.warn("Field " + fieldName + " not found in class " + objId);
 			return false;
 		} catch (Exception ex) {
-			getEngine().warn("Generic error in accessing the field");
+			getEngine().logger.warn("Generic error in accessing the field");
 			//ex.printStackTrace();
 			return false;
 		}
@@ -904,7 +904,7 @@ public class PJLibrary extends Library {
 						try {
 							types[i] = (Class.forName(castTo_name));
 						} catch (ClassNotFoundException ex) {
-							getEngine().warn("Java class not found: " + castTo_name);
+							getEngine().logger.warn("Java class not found: " + castTo_name);
 							return false;
 						}
 					}
@@ -930,7 +930,7 @@ public class PJLibrary extends Library {
 						try {
 							types[i] = (Class.forName(castTo_name));
 						} catch (ClassNotFoundException ex) {
-							getEngine().warn("Java class not found: " + castTo_name);
+							getEngine().logger.warn("Java class not found: " + castTo_name);
 							return false;
 						}
 					}
@@ -961,7 +961,7 @@ public class PJLibrary extends Library {
 				}
 			}
 		} catch (Exception ex) {
-			getEngine().warn("Casting " + castWhat + " to " + castTo + " failed");
+			getEngine().logger.warn("Casting " + castWhat + " to " + castTo + " failed");
 			return false;
 		}
 		return true;

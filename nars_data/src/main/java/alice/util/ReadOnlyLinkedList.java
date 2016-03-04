@@ -25,6 +25,8 @@ import java.util.ListIterator;
 public class ReadOnlyLinkedList<E> implements List<E>{
     protected LinkedList<E> list;
 
+    public static final ReadOnlyLinkedList empty = new ReadOnlyLinkedList();
+
     public ReadOnlyLinkedList(){
         list = new LinkedList<E>();
     }

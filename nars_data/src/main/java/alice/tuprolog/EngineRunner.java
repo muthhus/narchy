@@ -112,7 +112,7 @@ public class EngineRunner implements java.io.Serializable, Runnable{
     }
     
     void warn(String message) {
-        mediator.warn(message);
+        mediator.logger.warn(message);
     }
     
     /*Castagna 06/2011*/

@@ -74,7 +74,7 @@ public class TheoryManager implements Serializable {
 		if (dyn) {
 			dynamicDBase.addFirst(key, d);
 			if (staticDBase.containsKey(key)) {
-				engine.warn("A static predicate with signature " + key + " has been overriden.");
+				engine.logger.warn("A static predicate with signature {} has been overriden", key);
 			}
 		} else
 			staticDBase.addFirst(key, d);
@@ -90,7 +90,7 @@ public class TheoryManager implements Serializable {
 		if (dyn) {
 			dynamicDBase.addLast(key, d);
 			if (staticDBase.containsKey(key)) {
-				engine.warn("A static predicate with signature " + key + " has been overriden.");
+				engine.logger.warn("A static predicate with signature {} has been overriden", key);
 			}
 		} else
 			staticDBase.addLast(key, d);
@@ -270,13 +270,15 @@ public class TheoryManager implements Serializable {
 
 
 	private boolean runDirective(Struct c) {
-		if ("':-'".equals(c.getName()) || ":-".equals(c.getName()) && c.getArity() == 1 && c.getTerm(0) instanceof Struct) {
+		String cname = c.getName();
+		if ("':-'".equals(cname) ||
+			((c.getArity() == 1) && (c.getTerm(0) instanceof Struct) && ":-".equals(cname))) {
 			Struct dir = (Struct) c.getTerm(0);
 			try {
 				if (!primitiveManager.evalAsDirective(dir))
-					engine.warn("The directive " + dir.getPredicateIndicator() + " is unknown.");
+					engine.logger.warn("The directive " + dir.getPredicateIndicator() + " is unknown.");
 			} catch (Throwable t) {
-				engine.warn("An exception has been thrown during the execution of the " +
+				engine.logger.warn("An exception has been thrown during the execution of the " +
 						dir.getPredicateIndicator() + " directive.\n" + t.getMessage());
 			}
 			return true;
@@ -298,16 +300,17 @@ public class TheoryManager implements Serializable {
 
 	public synchronized void solveTheoryGoal() {
 		Struct s = null;
+		Stack<PTerm> startGoalStack = this.startGoalStack;
 		while (!startGoalStack.empty()) {
 			s = (s == null) ?
-					(Struct) startGoalStack.pop() :
-						new Struct(",", startGoalStack.pop(), s);
+				(Struct) startGoalStack.pop() :
+				new Struct(",", startGoalStack.pop(), s);
 		}
 		if (s != null) {
 			try {
 				engine.solve(s);
 			} catch (Exception ex) {
-				ex.printStackTrace();
+				engine.logger.error("solution exception {}", ex);
 			}
 		}
 	}
