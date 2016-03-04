@@ -74,15 +74,15 @@ public class ClauseInfo {
     /**
      * Gets a clause from a generic Term
      */
-    static SubGoalTree extractBody(Term body) {
+    static SubGoalTree extractBody(PTerm body) {
         SubGoalTree r = new SubGoalTree();
         extractBody(r, body);
         return r;
     }
     
-    private static void extractBody(SubGoalTree parent, Term body) {
+    private static void extractBody(SubGoalTree parent, PTerm body) {
         while (body instanceof Struct && ((Struct)body).getName().equals(",")) {
-            Term t = ((Struct)body).getArg(0);
+            PTerm t = ((Struct)body).getArg(0);
             if (t instanceof Struct && ((Struct)t).getName().equals(",")) {
                 extractBody(parent.addChild(),t);
             } else {
@@ -167,7 +167,7 @@ public class ClauseInfo {
         for(AbstractSubGoalTree s: source){
             if (s.isLeaf()) {
                 SubGoalElement l = (SubGoalElement)s;
-                Term t = l.term.copy(map,id);
+                PTerm t = l.term.copy(map,id);
                 destination.addChild(t);
             } else {
                 SubGoalTree src  = (SubGoalTree)s; 
@@ -198,7 +198,7 @@ public class ClauseInfo {
         return( clause.getArg(0).toString() + " :-\n\t"+st+".\n");
     }
     
-    static private String indentPredicates(Term t) {
+    static private String indentPredicates(PTerm t) {
         if (t instanceof Struct) {
             Struct co=(Struct)t;
             return co.getName().equals(",") ? co.getArg(0).toString() + ",\n\t" + indentPredicates(co.getArg(1)) : t.toString();
@@ -237,7 +237,7 @@ public class ClauseInfo {
         }
     }*/
     
-    static private String indentPredicatesAsArgX(Term t,OperatorManager op,int p) {
+    static private String indentPredicatesAsArgX(PTerm t, OperatorManager op, int p) {
         if (t instanceof Struct) {
             Struct co=(Struct)t;
             if (co.getName().equals(",")) {
@@ -258,7 +258,7 @@ public class ClauseInfo {
        }
     }
 
-    static private String indentPredicatesAsArgY(Term t,OperatorManager op,int p) {
+    static private String indentPredicatesAsArgY(PTerm t, OperatorManager op, int p) {
         if (t instanceof Struct) {
             Struct co=(Struct)t;
             if (co.getName().equals(",")) {

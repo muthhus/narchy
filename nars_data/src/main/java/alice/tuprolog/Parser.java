@@ -55,8 +55,8 @@ public class Parser implements /*Castagna 06/2011*/IParser,/**/ Serializable
 	private static final long serialVersionUID = 1L;
 	private static class IdentifiedTerm {
 		private final int priority;
-		private final Term result;
-		public IdentifiedTerm(int priority, Term result) {
+		private final PTerm result;
+		public IdentifiedTerm(int priority, PTerm result) {
 			this.priority = priority;
 			this.result = result;
 		}
@@ -67,7 +67,7 @@ public class Parser implements /*Castagna 06/2011*/IParser,/**/ Serializable
 	private final Tokenizer tokenizer;
 	private OperatorManager opManager = defaultOperatorManager;
 	/*Castagna 06/2011*/
-	private HashMap<Term, Integer> offsetsMap;		 
+	private HashMap<PTerm, Integer> offsetsMap;
 	private int tokenStart;
 	/**/    
 
@@ -86,7 +86,7 @@ public class Parser implements /*Castagna 06/2011*/IParser,/**/ Serializable
 	 * creating a Parser specifing how to handle operators
 	 * and what text to parse
 	 */	
-	public Parser(OperatorManager op, String theoryText, HashMap<Term, Integer> mapping) {		 
+	public Parser(OperatorManager op, String theoryText, HashMap<PTerm, Integer> mapping) {
 		this(theoryText, mapping);		 
 		if (op != null)		 
 			opManager = op;		 
@@ -107,7 +107,7 @@ public class Parser implements /*Castagna 06/2011*/IParser,/**/ Serializable
 	/**
 	 * creating a parser with default operator interpretation
 	 */	
-	public Parser(String theoryText, HashMap<Term, Integer> mapping) {		 
+	public Parser(String theoryText, HashMap<PTerm, Integer> mapping) {
 		tokenizer = new Tokenizer(theoryText);		 
 		offsetsMap = mapping;		 
 	}
@@ -132,7 +132,7 @@ public class Parser implements /*Castagna 06/2011*/IParser,/**/ Serializable
 
 	//  user interface
 
-	public Iterator<Term> iterator() {
+	public Iterator<PTerm> iterator() {
 		return new TermIterator(this);
 	}
 
@@ -143,14 +143,14 @@ public class Parser implements /*Castagna 06/2011*/IParser,/**/ Serializable
 	 * @throws InvalidTermException if a syntax error is found. 
 	 */
 	@Override
-	public Term nextTerm(boolean endNeeded) throws InvalidTermException {
+	public PTerm nextTerm(boolean endNeeded) throws InvalidTermException {
 		try {
 			Token t = tokenizer.readToken();
 			if (t.isEOF())
 				return null;
 
 			tokenizer.unreadToken(t);
-			Term term = expr(false);
+			PTerm term = expr(false);
 			if (term == null)
 				/*Castagna 06/2011*/
 	            //throw new InvalidTermException("The parser is unable to finish");
@@ -182,7 +182,7 @@ public class Parser implements /*Castagna 06/2011*/IParser,/**/ Serializable
 	/**
 	 * Static service to get a term from its string representation
 	 */
-	public static Term parseSingleTerm(String st) throws InvalidTermException {
+	public static PTerm parseSingleTerm(String st) throws InvalidTermException {
 		return parseSingleTerm(st, null);
 	}
 
@@ -190,7 +190,7 @@ public class Parser implements /*Castagna 06/2011*/IParser,/**/ Serializable
 	 * Static service to get a term from its string representation,
 	 * providing a specific operator manager
 	 */
-	public static Term parseSingleTerm(String st, OperatorManager op) throws InvalidTermException {
+	public static PTerm parseSingleTerm(String st, OperatorManager op) throws InvalidTermException {
 		try {
 			Parser p = new Parser(op, st);
 			Token t = p.tokenizer.readToken();
@@ -198,7 +198,7 @@ public class Parser implements /*Castagna 06/2011*/IParser,/**/ Serializable
 	            throw new InvalidTermException("Term starts with EOF");
 
 			p.tokenizer.unreadToken(t);
-			Term term = p.expr(false);
+			PTerm term = p.expr(false);
 			if (term == null)
 				throw new InvalidTermException("Term is null");
 			if (!p.tokenizer.readToken().isEOF())
@@ -212,7 +212,7 @@ public class Parser implements /*Castagna 06/2011*/IParser,/**/ Serializable
 
 	// internal parsing procedures
 
-	private Term expr(boolean commaIsEndMarker) throws InvalidTermException, IOException {
+	private PTerm expr(boolean commaIsEndMarker) throws InvalidTermException, IOException {
 		return exprA(OperatorManager.OP_HIGH, commaIsEndMarker).result;
 	}
 
@@ -408,7 +408,7 @@ public class Parser implements /*Castagna 06/2011*/IParser,/**/ Serializable
 	 *              '{' [ exprA(1200) ] '}' |
 	 *              '(' exprA(1200) ')'
 	 */
-	private Term expr0() throws InvalidTermException, IOException {
+	private PTerm expr0() throws InvalidTermException, IOException {
 		Token t1 = tokenizer.readToken();
 
 		/*Castagna 06/2011*/
@@ -426,19 +426,19 @@ public class Parser implements /*Castagna 06/2011*/IParser,/**/ Serializable
 		int tempStart = tokenizer.tokenStart();
 
         if (t1.isType(Tokenizer.INTEGER)) {
-        	Term i = Parser.parseInteger(t1.seq);
+        	PTerm i = Parser.parseInteger(t1.seq);
         	map(i, tokenizer.tokenStart());
             return i; //todo moved method to Number
         }
 
         if (t1.isType(Tokenizer.FLOAT)) {
-        	Term f = Parser.parseFloat(t1.seq);
+        	PTerm f = Parser.parseFloat(t1.seq);
         	map(f, tokenizer.tokenStart());
             return f;   //todo moved method to Number
         }
 
         if (t1.isType(Tokenizer.VARIABLE)) {
-        	Term v = new Var(t1.seq);
+        	PTerm v = new Var(t1.seq);
         	map(v, tokenizer.tokenStart());
             return v;             //todo switched to use the internal check for "_" in Var(String)
         }
@@ -449,7 +449,7 @@ public class Parser implements /*Castagna 06/2011*/IParser,/**/ Serializable
 			/*Castagna 06/2011*/
 			{
 				//return new Struct(t1.seq);
-				Term f = new Struct(t1.seq);
+				PTerm f = new Struct(t1.seq);
         		map(f, tokenizer.tokenStart());
         		return f;
 			}
@@ -459,13 +459,13 @@ public class Parser implements /*Castagna 06/2011*/IParser,/**/ Serializable
 			Token t2 = tokenizer.readToken();   //reading left par
 			if (!t2.isType(Tokenizer.LPAR))
 				throw new InvalidTermException("Something identified as functor misses its first left parenthesis");//todo check can be skipped
-			LinkedList<Term> a = expr0_arglist();     //reading arguments
+			LinkedList<PTerm> a = expr0_arglist();     //reading arguments
 			Token t3 = tokenizer.readToken();
 			if (t3.isType(Tokenizer.RPAR))      //reading right par
 			/*Castagna 06/2011*/
 			{
 				//return new Struct(functor, a);
-				Term c = new Struct(functor, a);
+				PTerm c = new Struct(functor, a);
             	map(c, tempStart);                
             	return c;
 			}
@@ -479,7 +479,7 @@ public class Parser implements /*Castagna 06/2011*/IParser,/**/ Serializable
 		}
 
 		if (t1.isType(Tokenizer.LPAR)) {
-			Term term = expr(false);
+			PTerm term = expr(false);
 			if (tokenizer.readToken().isType(Tokenizer.RPAR))
 				return term;
 			/*Castagna 06/2011*/
@@ -496,7 +496,7 @@ public class Parser implements /*Castagna 06/2011*/IParser,/**/ Serializable
 				return new Struct();
 
 			tokenizer.unreadToken(t2);
-			Term term = expr0_list();
+			PTerm term = expr0_list();
 			if (tokenizer.readToken().isType(Tokenizer.RBRA))
 				return term;
 			/*Castagna 06/2011*/
@@ -513,19 +513,19 @@ public class Parser implements /*Castagna 06/2011*/IParser,/**/ Serializable
 			/*Castagna 06/2011*/
 			{
 				//return new Struct("{}");
-				Term b = new Struct("{}");
+				PTerm b = new Struct("{}");
             	map(b, tempStart);
                 return b;
 			}
 			/**/
 			tokenizer.unreadToken(t2);
-			Term arg = expr(false);
+			PTerm arg = expr(false);
 			t2 = tokenizer.readToken();
 			if (t2.isType(Tokenizer.RBRA2))
 			/*Castagna 06/2011*/
 			{
 				//return new Struct("{}", arg);
-				Term b = new Struct("{}", arg);
+				PTerm b = new Struct("{}", arg);
 				map(b, tempStart);
 				return b;
 			}
@@ -545,8 +545,8 @@ public class Parser implements /*Castagna 06/2011*/IParser,/**/ Serializable
 	}
 
 	//todo make non-recursive?
-	private Term expr0_list() throws InvalidTermException, IOException {
-		Term head = expr(true);
+	private PTerm expr0_list() throws InvalidTermException, IOException {
+		PTerm head = expr(true);
 		Token t = tokenizer.readToken();
 		if (",".equals(t.seq))
 			return new Struct(head, expr0_list());
@@ -566,17 +566,17 @@ public class Parser implements /*Castagna 06/2011*/IParser,/**/ Serializable
 	}
 
 	//todo make non-recursive
-	private LinkedList<Term> expr0_arglist() throws InvalidTermException, IOException {
-		Term head = expr(true);
+	private LinkedList<PTerm> expr0_arglist() throws InvalidTermException, IOException {
+		PTerm head = expr(true);
 		Token t = tokenizer.readToken();
 		if (",".equals(t.seq)) {
-			LinkedList<Term> l = expr0_arglist();
+			LinkedList<PTerm> l = expr0_arglist();
 			l.addFirst(head);
 			return l;
 		}
 		if (")".equals(t.seq)) {
 			tokenizer.unreadToken(t);
-			LinkedList<Term> l = new LinkedList<>();
+			LinkedList<PTerm> l = new LinkedList<>();
 			l.add(head);
 			return l;
 		}
@@ -617,17 +617,17 @@ public class Parser implements /*Castagna 06/2011*/IParser,/**/ Serializable
      * Mapping terms on text
      */
     
-    private IdentifiedTerm identifyTerm(int priority, Term term, int offset) {
+    private IdentifiedTerm identifyTerm(int priority, PTerm term, int offset) {
     	map(term, offset);
     	return new IdentifiedTerm(priority, term);
     }
     
-    private void map(Term term, int offset) {
+    private void map(PTerm term, int offset) {
     	if (offsetsMap != null)
     		offsetsMap.put(term, offset);
     }
     
-    public HashMap<Term, Integer> getTextMapping() {
+    public HashMap<PTerm, Integer> getTextMapping() {
     	return offsetsMap;
     }
     

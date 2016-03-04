@@ -40,7 +40,7 @@ class ClausesFilter {
      *                      <code>familyClauses</code>) which more probably
      *                      match with <code>goal</code>
      */
-    public static OneWayList<ClauseInfo> filterClauses(List<ClauseInfo> familyClauses, Term goal){
+    public static OneWayList<ClauseInfo> filterClauses(List<ClauseInfo> familyClauses, PTerm goal){
         if(OPTIMIZATION_ENABLED && goal instanceof Struct){
             Struct g = (Struct) goal.getTerm();
 
@@ -50,7 +50,7 @@ class ClausesFilter {
             }
 
             /* Retrieves first argument and checks type */
-            Term t = g.getArg(1).getTerm();
+            PTerm t = g.getArg(1).getTerm();
             if(t instanceof Var){
                 /* 
                  * if first argument is an unbounded variable,
@@ -98,7 +98,7 @@ class ClausesFilter {
 
         for(Object obj : familyClauses){
             ClauseInfo clause = (ClauseInfo) obj;
-            Term arg = clause.getHead().getArg(0).getTerm();
+            PTerm arg = clause.getHead().getArg(0).getTerm();
 
             if((arg instanceof Var) ||
                     (arg instanceof Number && arg.isEqual(t))){
@@ -126,7 +126,7 @@ class ClausesFilter {
 
         for(Object obj : familyClauses){
             ClauseInfo clause = (ClauseInfo) obj;
-            Term arg = clause.getHead().getArg(0).getTerm();
+            PTerm arg = clause.getHead().getArg(0).getTerm();
 
             if(arg instanceof Var ||
                     ((Struct) arg).getPredicateIndicator().equals(predIndicator)){
@@ -144,7 +144,7 @@ class ClausesFilter {
         return result;
     }
 
-    private static boolean isAList(Term t) {
+    private static boolean isAList(PTerm t) {
         /*
          * Checks if a Struct is also a list.
          * A list can be an empty list, or a Struct with name equals to "."
@@ -169,7 +169,7 @@ class ClausesFilter {
 
         for(Object obj : familyClauses){
             ClauseInfo clause = (ClauseInfo) obj;
-            Term arg = clause.getHead().getArg(0).getTerm();
+            PTerm arg = clause.getHead().getArg(0).getTerm();
 
             if(arg instanceof Var || isAList(arg)){
                 OneWayList<ClauseInfo> l = new OneWayList<>(clause, null);
@@ -190,13 +190,13 @@ class ClausesFilter {
      * Returns only the clauses whose first argument is a constant equals
      * to the given one (from goal's first argument)
      */
-    private static OneWayList<ClauseInfo> selectConstant(List<ClauseInfo> familyClauses, Term t) {
+    private static OneWayList<ClauseInfo> selectConstant(List<ClauseInfo> familyClauses, PTerm t) {
         OneWayList<ClauseInfo> result = null;
         OneWayList<ClauseInfo> p = null;
 
         for(Object obj : familyClauses){
             ClauseInfo clause = (ClauseInfo) obj;
-            Term arg = clause.getHead().getArg(0).getTerm();
+            PTerm arg = clause.getHead().getArg(0).getTerm();
 
             if(arg instanceof Var || arg.isAtomic()){
                 OneWayList<ClauseInfo> l = new OneWayList<>(clause, null);

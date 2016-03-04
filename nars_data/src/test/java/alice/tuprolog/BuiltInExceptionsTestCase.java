@@ -210,7 +210,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 		assertTrue(validType.isEqual(new Struct("class")));
 		Struct culprit = (Struct) info.getTerm("Culprit");
 		assertTrue(culprit.isEqual(new Struct("a")));
-		Term message = info.getTerm("Message");
+		PTerm message = info.getTerm("Message");
 		assertTrue(message.isEqual(new Struct("InvalidLibraryException: a at -1:-1")));
 	}
 
@@ -257,7 +257,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 		assertTrue(validType.isEqual(new Struct("class")));
 		Struct culprit = (Struct) info.getTerm("Culprit");
 		assertTrue(culprit.isEqual(new Struct("a")));
-		Term message = info.getTerm("Message");
+		PTerm message = info.getTerm("Message");
 		assertTrue(message.isEqual(new Struct("InvalidLibraryException: null at 0:0")));
 	}
 
@@ -588,7 +588,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 		assertTrue(objectType.isEqual(new Struct("flag")));
 		Struct culprit = (Struct) info.getTerm("Culprit");
 		assertTrue(culprit.isEqual(new Struct("bounded")));
-		Term message = info.getTerm("Message");
+		PTerm message = info.getTerm("Message");
 		assertTrue(message.isEqual(new Int(0)));
 	}
 

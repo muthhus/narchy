@@ -8,7 +8,9 @@
  */
 
 package alice.tuprologx.pj.model;
-        
+
+import alice.tuprolog.PTerm;
+
 /**
  *
  * @author maurizio
@@ -20,7 +22,7 @@ public class Var<X extends Term<?>> extends Term<X> {
         
         static {
             try {
-                _setLink = alice.tuprolog.Var.class.getDeclaredMethod("setLink", alice.tuprolog.Term.class);
+                _setLink = alice.tuprolog.Var.class.getDeclaredMethod("setLink", PTerm.class);
                 _setLink.setAccessible(true);                
             }
             catch(Exception e) {
@@ -65,7 +67,7 @@ public class Var<X extends Term<?>> extends Term<X> {
         return a.isBound() ? Term.unmarshal(a.getTerm()) : new Var<Term<?>>(a.getName(), null);
     }
     
-    static boolean matches(alice.tuprolog.Term t) {
+    static boolean matches(PTerm t) {
         return (t instanceof alice.tuprolog.Var);
     }
     

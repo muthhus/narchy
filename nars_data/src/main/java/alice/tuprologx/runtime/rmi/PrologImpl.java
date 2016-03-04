@@ -41,7 +41,7 @@ public class PrologImpl extends UnicastRemoteObject
 
 
     @Override
-    public SolveInfo   solve(Term g) throws RemoteException {
+    public SolveInfo   solve(PTerm g) throws RemoteException {
         return imp.solve(g);
     }
 

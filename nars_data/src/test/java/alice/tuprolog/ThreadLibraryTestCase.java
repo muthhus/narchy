@@ -4,16 +4,6 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import alice.tuprolog.Int;
-import alice.tuprolog.InvalidTheoryException;
-import alice.tuprolog.MalformedGoalException;
-import alice.tuprolog.NoSolutionException;
-import alice.tuprolog.Prolog;
-import alice.tuprolog.SolveInfo;
-import alice.tuprolog.Struct;
-import alice.tuprolog.Term;
-import alice.tuprolog.Theory;
-
 /**
  * 
  */
@@ -38,7 +28,7 @@ public class ThreadLibraryTestCase {
 	}
 
 	/**
-	 * Test method for {@link alice.tuprolog.lib.ThreadLibrary#thread_id_1(alice.tuprolog.Term)}.
+	 * Test method for {@link alice.tuprolog.lib.ThreadLibrary#thread_id_1(PTerm)}.
 	 * @throws InvalidTheoryException 
 	 * @throws MalformedGoalException 
 	 * @throws NoSolutionException 
@@ -47,12 +37,12 @@ public class ThreadLibraryTestCase {
 	public void testThread_id_1() throws InvalidTheoryException, MalformedGoalException, NoSolutionException {
 		SolveInfo sinfo = engine.solve("thread_id(ID).");	//unifica ad ID l'identificativo del thread corrente (Root)
 		assertTrue(sinfo.isSuccess());
-		Term id = sinfo.getVarValue("ID");
+		PTerm id = sinfo.getVarValue("ID");
 		assertEquals(new Int(0), id);
 	}
 
 	/**
-	 * Test method for {@link alice.tuprolog.lib.ThreadLibrary#thread_create_2(alice.tuprolog.Term, alice.tuprolog.Term)}.
+	 * Test method for {@link alice.tuprolog.lib.ThreadLibrary#thread_create_2(PTerm, PTerm)}.
 	 * @throws MalformedGoalException 
 	 * @throws InvalidTheoryException 
 	 */
@@ -72,7 +62,7 @@ public class ThreadLibraryTestCase {
 	}
 	
 	/**
-	 * Test method for {@link alice.tuprolog.lib.ThreadLibrary#thread_next_sol_1(alice.tuprolog.Term)}.
+	 * Test method for {@link alice.tuprolog.lib.ThreadLibrary#thread_next_sol_1(PTerm)}.
 	 * @throws InvalidTheoryException 
 	 * @throws MalformedGoalException 
 	 * @throws NoSolutionException 
@@ -95,12 +85,12 @@ public class ThreadLibraryTestCase {
 		SolveInfo sinfo = engine.solve("start(X).");
 		assertTrue(sinfo.isSuccess());
 		
-		Term X = sinfo.getVarValue("X");
-		assertEquals(Term.createTerm("genitore(bob,gdh)"), X);
+		PTerm X = sinfo.getVarValue("X");
+		assertEquals(PTerm.createTerm("genitore(bob,gdh)"), X);
 	}
 
 	/**
-	 * Test method for {@link alice.tuprolog.lib.ThreadLibrary#thread_join_2(alice.tuprolog.Term, alice.tuprolog.Term)}.
+	 * Test method for {@link alice.tuprolog.lib.ThreadLibrary#thread_join_2(PTerm, PTerm)}.
 	 * @throws InvalidTheoryException 
 	 * @throws MalformedGoalException 
 	 * @throws NoSolutionException 
@@ -114,18 +104,18 @@ public class ThreadLibraryTestCase {
 		SolveInfo sinfo = engine.solve("thread_create(ID, genitore(bob,X)), thread_create(ID2, genitore(b,Y)), thread_join(ID2,Y), thread_join(ID,X).");
 		assertTrue(sinfo.isSuccess());
 		
-		Term X = sinfo.getVarValue("X");
-		assertEquals(Term.createTerm("genitore(bob,a)"), X);
+		PTerm X = sinfo.getVarValue("X");
+		assertEquals(PTerm.createTerm("genitore(bob,a)"), X);
 		
-		Term Y = sinfo.getVarValue("Y");
-		assertEquals(Term.createTerm("genitore(b,b)"), Y);
+		PTerm Y = sinfo.getVarValue("Y");
+		assertEquals(PTerm.createTerm("genitore(b,b)"), Y);
 		
 		sinfo = engine.solve("thread_create(ID, genitore(bob,X)), thread_join(ID,X), thread_next_sol(ID).");	//il thread stato rimosso
 		assertFalse(sinfo.isSuccess());
 	}
 
 	/**
-	 * Test method for {@link alice.tuprolog.lib.ThreadLibrary#thread_read_2(alice.tuprolog.Term, alice.tuprolog.Term)}.
+	 * Test method for {@link alice.tuprolog.lib.ThreadLibrary#thread_read_2(PTerm, PTerm)}.
 	 * @throws InvalidTheoryException 
 	 * @throws MalformedGoalException 
 	 * @throws NoSolutionException 
@@ -145,18 +135,18 @@ public class ThreadLibraryTestCase {
 
 		assertTrue(sinfo.isSuccess());
 		
-		Term X = sinfo.getVarValue("X");
-		assertEquals(Term.createTerm("genitore(bob,f)"), X);
+		PTerm X = sinfo.getVarValue("X");
+		assertEquals(PTerm.createTerm("genitore(bob,f)"), X);
 		
-		Term X1 = sinfo.getVarValue("X1");
-		assertEquals(Term.createTerm("genitore(bob,a)"), X1);
+		PTerm X1 = sinfo.getVarValue("X1");
+		assertEquals(PTerm.createTerm("genitore(bob,a)"), X1);
 		
 		sinfo = engine.solve("thread_create(ID, genitore(bob,X)), thread_read(ID,X), thread_next_sol(ID).");	//Il thread non stato rimosso
 		assertTrue(sinfo.isSuccess());
 	}
 
 	/**
-	 * Test method for {@link alice.tuprolog.lib.ThreadLibrary#thread_has_next_1(alice.tuprolog.Term)}.
+	 * Test method for {@link alice.tuprolog.lib.ThreadLibrary#thread_has_next_1(PTerm)}.
 	 * @throws InvalidTheoryException 
 	 * @throws MalformedGoalException 
 	 * @throws NoSolutionException 
@@ -175,14 +165,14 @@ public class ThreadLibraryTestCase {
 		SolveInfo sinfo = engine.solve("start(genitore(bob,X)).");
 		assertTrue(sinfo.isSuccess());
 		
-		Term X = sinfo.getVarValue("X");
-		assertEquals(Term.createTerm("b"), X);
+		PTerm X = sinfo.getVarValue("X");
+		assertEquals(PTerm.createTerm("b"), X);
 	}
 
 	
 
 	/**
-	 * Test method for {@link alice.tuprolog.lib.ThreadLibrary#thread_detach_1(alice.tuprolog.Term)}.
+	 * Test method for {@link alice.tuprolog.lib.ThreadLibrary#thread_detach_1(PTerm)}.
 	 * @throws InvalidTheoryException 
 	 * @throws MalformedGoalException 
 	 */
@@ -197,7 +187,7 @@ public class ThreadLibraryTestCase {
 	}
 
 	/**
-	 * Test method for {@link alice.tuprolog.lib.ThreadLibrary#thread_sleep_1(alice.tuprolog.Term)}.
+	 * Test method for {@link alice.tuprolog.lib.ThreadLibrary#thread_sleep_1(PTerm)}.
 	 * @throws InvalidTheoryException 
 	 * @throws MalformedGoalException 
 	 */
@@ -212,7 +202,7 @@ public class ThreadLibraryTestCase {
 	}
 
 	/**
-	 * Test method for {@link alice.tuprolog.lib.ThreadLibrary#thread_send_msg_2(alice.tuprolog.Term, alice.tuprolog.Term)}.
+	 * Test method for {@link alice.tuprolog.lib.ThreadLibrary#thread_send_msg_2(PTerm, PTerm)}.
 	 * @throws MalformedGoalException 
 	 * @throws NoSolutionException 
 	 * @throws InvalidTheoryException 
@@ -228,7 +218,7 @@ public class ThreadLibraryTestCase {
 		SolveInfo sinfo = engine.solve("start(X).");
 		assertTrue(sinfo.isSuccess());
 		
-		Term X = sinfo.getVarValue("X");
+		PTerm X = sinfo.getVarValue("X");
 		assertEquals(new Struct("messaggio molto importante"), X);
 		
 		theory = "start(X) :- msg_queue_create('CODA'), thread_create(ID, thread1(X)), invio(ID, 'messaggio molto importante'), lettura(ID,X), thread_get_msg('CODA', a(X)).\n" +	//Posso nuovamente prelevare, in quanto il msg non stato eliminato
@@ -240,12 +230,12 @@ public class ThreadLibraryTestCase {
 		sinfo = engine.solve("start(X).");
 		assertTrue(sinfo.isSuccess());
 		
-		Term X1 = sinfo.getVarValue("X");
+		PTerm X1 = sinfo.getVarValue("X");
 		assertEquals(new Struct("messaggio molto importante"), X1);
 	}
 
 	/**
-	 * Test method for {@link alice.tuprolog.lib.ThreadLibrary#thread_get_msg_2(alice.tuprolog.Term, alice.tuprolog.Term)}.
+	 * Test method for {@link alice.tuprolog.lib.ThreadLibrary#thread_get_msg_2(PTerm, PTerm)}.
 	 * @throws InvalidTheoryException 
 	 * @throws MalformedGoalException 
 	 * @throws NoSolutionException 
@@ -261,12 +251,12 @@ public class ThreadLibraryTestCase {
 		SolveInfo sinfo = engine.solve("start(X).");
 		assertTrue(sinfo.isSuccess());
 		
-		Term X = sinfo.getVarValue("X");
+		PTerm X = sinfo.getVarValue("X");
 		assertEquals(new Struct("messaggio molto importante"), X);
 	}
 
 	/**
-	 * Test method for {@link alice.tuprolog.lib.ThreadLibrary#thread_peek_msg_2(alice.tuprolog.Term, alice.tuprolog.Term)}.
+	 * Test method for {@link alice.tuprolog.lib.ThreadLibrary#thread_peek_msg_2(PTerm, PTerm)}.
 	 * @throws InvalidTheoryException 
 	 * @throws MalformedGoalException 
 	 * @throws NoSolutionException 
@@ -291,7 +281,7 @@ public class ThreadLibraryTestCase {
 		sinfo = engine.solve("start(X).");
 		assertTrue(sinfo.isSuccess());
 		
-		Term X = sinfo.getVarValue("X");
+		PTerm X = sinfo.getVarValue("X");
 		assertEquals(new Struct("messaggio molto importante"), X);
 		
 		theory = "start(X) :- msg_queue_create('CODA'), thread_create(ID, thread1(X)), lettura(ID,X).\n" +	
@@ -304,7 +294,7 @@ public class ThreadLibraryTestCase {
 	}
 
 	/**
-	 * Test method for {@link alice.tuprolog.lib.ThreadLibrary#thread_wait_msg_2(alice.tuprolog.Term, alice.tuprolog.Term)}.
+	 * Test method for {@link alice.tuprolog.lib.ThreadLibrary#thread_wait_msg_2(PTerm, PTerm)}.
 	 * @throws InvalidTheoryException 
 	 * @throws MalformedGoalException 
 	 * @throws NoSolutionException 
@@ -329,7 +319,7 @@ public class ThreadLibraryTestCase {
 		sinfo = engine.solve("start(X).");
 		assertTrue(sinfo.isSuccess());
 		
-		Term X = sinfo.getVarValue("X");
+		PTerm X = sinfo.getVarValue("X");
 		assertEquals(new Struct("messaggio molto importante"), X);
 		
 		//SI BLOCCA IN ATTESA DEL MESSAGGIO
@@ -345,7 +335,7 @@ public class ThreadLibraryTestCase {
 	/**
 	 * Il metodo peek non riesce a prelevare la soluzione perch il messaggio stato rimosso
 	 * 
-	 * Test method for {@link alice.tuprolog.lib.ThreadLibrary#thread_remove_msg_2(alice.tuprolog.Term, alice.tuprolog.Term)}.
+	 * Test method for {@link alice.tuprolog.lib.ThreadLibrary#thread_remove_msg_2(PTerm, PTerm)}.
 	 * @throws InvalidTheoryException 
 	 * @throws MalformedGoalException 
 	 */
@@ -364,7 +354,7 @@ public class ThreadLibraryTestCase {
 	/**
 	 * start(X) -> prelevo la soluzione, poi distruggo la coda.
 	 * start2(X) -> distruggo la coda, poi prelevo la soluzione.
-	 * Test method for {@link alice.tuprolog.lib.ThreadLibrary#message_queue_destroy_1(alice.tuprolog.Term)}.
+	 * Test method for {@link alice.tuprolog.lib.ThreadLibrary#message_queue_destroy_1(PTerm)}.
 	 * @throws InvalidTheoryException 
 	 * @throws MalformedGoalException 
 	 */
@@ -385,7 +375,7 @@ public class ThreadLibraryTestCase {
 	}
 
 	/**
-	 * Test method for {@link alice.tuprolog.lib.ThreadLibrary#msg_queue_size_2(alice.tuprolog.Term, alice.tuprolog.Term)}.
+	 * Test method for {@link alice.tuprolog.lib.ThreadLibrary#msg_queue_size_2(PTerm, PTerm)}.
 	 * @throws InvalidTheoryException 
 	 * @throws MalformedGoalException 
 	 * @throws NoSolutionException 
@@ -404,12 +394,12 @@ public class ThreadLibraryTestCase {
 		SolveInfo sinfo = engine.solve("start(X, S).");
 		assertTrue(sinfo.isSuccess());
 		
-		Term X = sinfo.getVarValue("S");
+		PTerm X = sinfo.getVarValue("S");
 		assertEquals(new Int(5), X);
 	}
 
 	/**
-	 * Test method for {@link alice.tuprolog.lib.ThreadLibrary#mutex_destroy_1(alice.tuprolog.Term)}.
+	 * Test method for {@link alice.tuprolog.lib.ThreadLibrary#mutex_destroy_1(PTerm)}.
 	 * @throws InvalidTheoryException 
 	 * @throws MalformedGoalException 
 	 */
@@ -443,7 +433,7 @@ public class ThreadLibraryTestCase {
 	}
 
 	/**
-	 * Test method for {@link alice.tuprolog.lib.ThreadLibrary#mutex_trylock_1(alice.tuprolog.Term)}.
+	 * Test method for {@link alice.tuprolog.lib.ThreadLibrary#mutex_trylock_1(PTerm)}.
 	 * @throws InvalidTheoryException 
 	 * @throws MalformedGoalException 
 	 */
@@ -485,10 +475,10 @@ public class ThreadLibraryTestCase {
             SolveInfo sinfo = engine.solve("start(7,X,8,Y).");
             assertTrue(sinfo.isSuccess());
             
-            Term X = sinfo.getVarValue("X");
+            PTerm X = sinfo.getVarValue("X");
             assertEquals(new Int(5040), X);
             
-            Term Y = sinfo.getVarValue("Y");
+            PTerm Y = sinfo.getVarValue("Y");
             assertEquals(new Int(40320), Y);
     }
 	

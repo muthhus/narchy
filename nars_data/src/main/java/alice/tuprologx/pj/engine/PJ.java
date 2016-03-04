@@ -1,5 +1,6 @@
 package alice.tuprologx.pj.engine;
 
+import alice.tuprolog.PTerm;
 import alice.tuprologx.pj.annotations.PrologMethod;
 import alice.tuprologx.pj.annotations.WithTermifiable;
 import alice.tuprologx.pj.annotations.Termifiable;
@@ -223,7 +224,7 @@ public class PJ implements MethodHandler {
         }
     }
 
-    public static void assertClause(PrologObject po, alice.tuprolog.Term clause) {
+    public static void assertClause(PrologObject po, PTerm clause) {
         try {
             pushEngine();
             engine().setTheory(po.getTheory());
@@ -239,7 +240,7 @@ public class PJ implements MethodHandler {
         }
     }
 
-    public static void retractClause(PrologObject po, alice.tuprolog.Term clause) {
+    public static void retractClause(PrologObject po, PTerm clause) {
         try {
             pushEngine();
             engine().setTheory(po.getTheory());
@@ -255,7 +256,7 @@ public class PJ implements MethodHandler {
         }
     }
 
-    public static void retractAllClauses(PrologObject po, alice.tuprolog.Term clause) {
+    public static void retractAllClauses(PrologObject po, PTerm clause) {
         try {
             pushEngine();
             engine().setTheory(po.getTheory());

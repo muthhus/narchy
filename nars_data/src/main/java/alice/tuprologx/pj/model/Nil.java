@@ -1,5 +1,7 @@
 package alice.tuprologx.pj.model;
 
+import alice.tuprolog.PTerm;
+
 public class Nil extends Compound<Nil> {
     @Override
     public int arity() {return 0;}
@@ -11,7 +13,7 @@ public class Nil extends Compound<Nil> {
     }
 
     @Override
-    public alice.tuprolog.Term marshal() {
+    public PTerm marshal() {
         throw new UnsupportedOperationException();
     }
 

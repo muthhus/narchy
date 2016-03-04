@@ -10,6 +10,8 @@
 package alice.tuprologx.pj.model;
 import java.util.Vector;
 import java.util.HashMap;
+
+import alice.tuprolog.PTerm;
 import alice.tuprologx.pj.annotations.Termifiable;
 /**
  *
@@ -23,7 +25,7 @@ public class JavaTerm<O> extends Compound<JavaTerm<O>> {
 	static class TermifiableStruct<O> extends alice.tuprolog.Struct {
         JavaTerm<O> _term;
 
-        TermifiableStruct(String name, alice.tuprolog.Term[] arr) {
+        TermifiableStruct(String name, PTerm[] arr) {
             super(name, arr);
         }
 
@@ -105,7 +107,7 @@ public class JavaTerm<O> extends Compound<JavaTerm<O>> {
     public alice.tuprolog.Struct marshal() {
         try {
             
-            alice.tuprolog.Term[] termArr = new alice.tuprolog.Term[_properties.size()];
+            PTerm[] termArr = new PTerm[_properties.size()];
             int count = 0;
             for (Term<?> term : _properties) {
                 //only read-write properties are translated into a compound
@@ -175,7 +177,7 @@ public class JavaTerm<O> extends Compound<JavaTerm<O>> {
         }            
     }
 
-    static boolean matches(alice.tuprolog.Term t) {
+    static boolean matches(PTerm t) {
 //        try {
 //            return (!(t instanceof alice.tuprolog.Var) && t.isCompound() && !t.isList() && Class.forName(((alice.tuprolog.Struct)t).getName())!=null);
 //        }

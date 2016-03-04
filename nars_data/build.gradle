@@ -1,6 +1,9 @@
 
 description = 'OpenNARS Data Model'
 dependencies {
+
+    compile project(':nars_util')
+
  //   compile group: 'com.github.0xCopy.prautobeans', name: 'prautobeans-lib', version:'1.0-pre1'
 
     compile 'com.fifesoft:rsyntaxtextarea:2.5.8'

@@ -272,8 +272,10 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 		theoryManager.consult(th, true, null);
 		theoryManager.solveTheoryGoal();
 		Theory newTh = getTheory();
-		TheoryEvent ev = new TheoryEvent(this, oldTh, newTh);    
-		this.notifyChangedTheory(ev);
+		if (!theoryListeners.isEmpty()) {
+			TheoryEvent ev = new TheoryEvent(this, oldTh, newTh);
+			this.notifyChangedTheory(ev);
+		}
 	}    
 
 	/**
@@ -429,17 +431,15 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 	 * @return the result of the demonstration
 	 * @see SolveInfo
 	 **/
-	public SolveInfo solve(Term g) {
+	public SolveInfo solve(PTerm g) {
 		//System.out.println("ENGINE SOLVE #0: "+g);
 		if (g == null) return null;
 		
 		SolveInfo sinfo = engineManager.solve(g);
-		
-		QueryEvent ev = new QueryEvent(this,sinfo);
-		notifyNewQueryResultAvailable(ev);
+
+		notifyNewQueryResultAvailable(this, sinfo);
 
 		return sinfo;
-
 	}
 
 	/**
@@ -453,7 +453,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 	public SolveInfo solve(String st) throws MalformedGoalException {
 		try {
 			Parser p = new Parser(opManager, st);
-			Term t = p.nextTerm(true);
+			PTerm t = p.nextTerm(true);
 			return solve(t);
 		} catch (InvalidTermException ex) {
 			throw new MalformedGoalException();
@@ -471,8 +471,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 	public SolveInfo solveNext() throws NoMoreSolutionException {
 		if (hasOpenAlternatives()) {
 			SolveInfo sinfo = engineManager.solveNext();
-			QueryEvent ev = new QueryEvent(this,sinfo);
-			notifyNewQueryResultAvailable(ev);
+			notifyNewQueryResultAvailable(this, sinfo);
 			return sinfo;
 		} else
 			throw new NoMoreSolutionException();
@@ -523,7 +522,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 	 * @param t1 second term to be unified
 	 * @return true if the unification was successful
 	 */
-	public boolean match(Term t0, Term t1) {	//no syn
+	public boolean match(PTerm t0, PTerm t1) {	//no syn
 		return t0.match(t1);
 	}
 
@@ -534,7 +533,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 	 * @param t1 second term to be unified
 	 * @return true if the unification was successful
 	 */
-	public boolean unify(Term t0, Term t1) {	//no syn
+	public boolean unify(PTerm t0, PTerm t1) {	//no syn
 		return t0.unify(this,t1);
 	}
 
@@ -543,7 +542,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 	 * 
 	 * @param term term to identify
 	 */
-	public void identifyFunctor(Term term) {	//no syn
+	public void identifyFunctor(PTerm term) {	//no syn
 		primitiveManager.identifyFunctor(term);
 	}
 
@@ -556,7 +555,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 	 * @return the term parsed from the string
 	 * @throws InvalidTermException if the string does not represent a valid term
 	 */
-	public Term toTerm(String st) throws InvalidTermException {	//no syn
+	public PTerm toTerm(String st) throws InvalidTermException {	//no syn
 		return Parser.parseSingleTerm(st, opManager);
 	}
 
@@ -568,7 +567,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 	 * @return the string representing the term
 	 */
 	@Override
-	public String toString(Term term) {		//no syn
+	public String toString(PTerm term) {		//no syn
 		return (term.toStringAsArgY(opManager, OperatorManager.OP_HIGH));
 	}
 
@@ -576,7 +575,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 	/**
 	 * Defines a new flag
 	 */
-	public boolean defineFlag(String name, Struct valueList, Term defValue, boolean modifiable, String libName) {
+	public boolean defineFlag(String name, Struct valueList, PTerm defValue, boolean modifiable, String libName) {
 		return flagManager.defineFlag(name,valueList,defValue,modifiable,libName);
 	}
 
@@ -1019,9 +1018,13 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 	 * 
 	 * @param e the event
 	 */
-	protected void notifyNewQueryResultAvailable(QueryEvent e) {
-		for(QueryListener ql:queryListeners){
-			ql.newQueryResultAvailable(e);
+	protected void notifyNewQueryResultAvailable(Prolog source, SolveInfo info) {
+		if (!queryListeners.isEmpty()) {
+			QueryEvent e = new QueryEvent(source, info);
+			for (int i = 0, queryListenersSize = queryListeners.size(); i < queryListenersSize; i++) {
+				QueryListener ql = queryListeners.get(i);
+				ql.newQueryResultAvailable(e);
+			}
 		}
 	}
 
@@ -1053,17 +1056,28 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
         absolutePathList.add(path);
     }
     
-    public Term termSolve(String st){
+    public PTerm termSolve(String st){
 		try{
 			Parser p = new Parser(opManager, st);
-			Term t = p.nextTerm(true);
+			PTerm t = p.nextTerm(true);
 			return t;
 		}catch(InvalidTermException e)
 		{
 			String s = "null";
-			Term t = Term.createTerm(s);
+			PTerm t = PTerm.createTerm(s);
 			return t;
 		}
 	}
 
+	public boolean isTrue(String s) throws MalformedGoalException {
+		SolveInfo r = solve(s);
+		switch (r.toString()) {
+			case PTerm.YES:
+				return true;
+			case PTerm.NO:
+				return false;
+			default:
+				throw new RuntimeException(s + " has non-boolean solution " + r);
+		}
+	}
 }

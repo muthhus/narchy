@@ -77,7 +77,7 @@ public class Proxy implements alice.tuprologx.runtime.tcp.Prolog {
     }
 
     @Override
-    public SolveInfo solve(Term term) throws Exception {
+    public SolveInfo solve(PTerm term) throws Exception {
         out.writeObject(new NetMsg("solveTerm"));
         out.writeObject(term);
         out.flush();

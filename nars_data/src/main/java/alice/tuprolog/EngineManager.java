@@ -31,7 +31,7 @@ public class EngineManager implements java.io.Serializable {
         er1.initialize(this.vm = vm);
     }
 
-    public boolean threadCreate(Term threadID, Term goal) {
+    public boolean threadCreate(PTerm threadID, PTerm goal) {
         id = id + 1;
 
         if (goal == null)
@@ -111,29 +111,29 @@ public class EngineManager implements java.io.Serializable {
             er.detach();
     }
 
-    public boolean sendMsg(int dest, Term msg) {
+    public boolean sendMsg(int dest, PTerm msg) {
         EngineRunner er = runner(dest);
         if (er == null) return false;
-        Term msgcopy = msg.copy(new LinkedHashMap<>(), 0);
+        PTerm msgcopy = msg.copy(new LinkedHashMap<>(), 0);
         er.sendMsg(msgcopy);
         return true;
     }
 
-    public boolean sendMsg(String name, Term msg) {
+    public boolean sendMsg(String name, PTerm msg) {
         TermQueue queue = queues.get(name);
         if (queue == null) return false;
-        Term msgcopy = msg.copy(new LinkedHashMap<>(), 0);
+        PTerm msgcopy = msg.copy(new LinkedHashMap<>(), 0);
         queue.store(msgcopy);
         return true;
     }
 
-    public boolean getMsg(int id, Term msg) {
+    public boolean getMsg(int id, PTerm msg) {
         EngineRunner er = runner(id);
         if (er == null) return false;
         return er.getMsg(msg);
     }
 
-    public boolean getMsg(String name, Term msg) {
+    public boolean getMsg(String name, PTerm msg) {
         EngineRunner er = runner();
         if (er == null) return false;
         TermQueue queue = queues.get(name);
@@ -141,13 +141,13 @@ public class EngineManager implements java.io.Serializable {
         return queue.get(msg, vm, er);
     }
 
-    public boolean waitMsg(int id, Term msg) {
+    public boolean waitMsg(int id, PTerm msg) {
         EngineRunner er = runner(id);
         if (er == null) return false;
         return er.waitMsg(msg);
     }
 
-    public boolean waitMsg(String name, Term msg) {
+    public boolean waitMsg(String name, PTerm msg) {
         EngineRunner er = runner();
         if (er == null) return false;
         TermQueue queue = queues.get(name);
@@ -155,25 +155,25 @@ public class EngineManager implements java.io.Serializable {
         return queue.wait(msg, vm, er);
     }
 
-    public boolean peekMsg(int id, Term msg) {
+    public boolean peekMsg(int id, PTerm msg) {
         EngineRunner er = runner(id);
         if (er == null) return false;
         return er.peekMsg(msg);
     }
 
-    public boolean peekMsg(String name, Term msg) {
+    public boolean peekMsg(String name, PTerm msg) {
         TermQueue queue = queues.get(name);
         if (queue == null) return false;
         return queue.peek(msg, vm);
     }
 
-    public boolean removeMsg(int id, Term msg) {
+    public boolean removeMsg(int id, PTerm msg) {
         EngineRunner er = runner(id);
         if (er == null) return false;
         return er.removeMsg(msg);
     }
 
-    public boolean removeMsg(String name, Term msg) {
+    public boolean removeMsg(String name, PTerm msg) {
         TermQueue queue = queues.get(name);
         if (queue == null) return false;
         return queue.remove(msg, vm);
@@ -211,7 +211,7 @@ public class EngineManager implements java.io.Serializable {
         runner().pushSubGoal(goals);
     }
 
-    public SolveInfo solve(Term query) {
+    public SolveInfo solve(PTerm query) {
         this.clearSinfoSetOf();
         synchronized (er1) {
             er1.setGoal(query);
@@ -405,7 +405,7 @@ public class EngineManager implements java.io.Serializable {
         return runner().env;
     }
 
-    public void identify(Term t) {
+    public void identify(PTerm t) {
         runner().identify(t);
     }
 
@@ -417,11 +417,11 @@ public class EngineManager implements java.io.Serializable {
         this.runner().setRelinkVar(b);
     }
 
-    public ArrayList<Term> getBagOFres() {
+    public ArrayList<PTerm> getBagOFres() {
         return this.runner().getBagOFres();
     }
 
-    public void setBagOFres(ArrayList<Term> l) {
+    public void setBagOFres(ArrayList<PTerm> l) {
         this.runner().setBagOFres(l);
     }
 
@@ -433,27 +433,27 @@ public class EngineManager implements java.io.Serializable {
         this.runner().setBagOFresString(l);
     }
 
-    public Term getBagOFvarSet() {
+    public PTerm getBagOFvarSet() {
         return this.runner().getBagOFvarSet();
     }
 
-    public void setBagOFvarSet(Term l) {
+    public void setBagOFvarSet(PTerm l) {
         this.runner().setBagOFvarSet(l);
     }
 
-    public Term getBagOFgoal() {
+    public PTerm getBagOFgoal() {
         return this.runner().getBagOFgoal();
     }
 
-    public void setBagOFgoal(Term l) {
+    public void setBagOFgoal(PTerm l) {
         this.runner().setBagOFgoal(l);
     }
 
-    public Term getBagOFbag() {
+    public PTerm getBagOFbag() {
         return this.runner().getBagOFBag();
     }
 
-    public void setBagOFbag(Term l) {
+    public void setBagOFbag(PTerm l) {
         this.runner().setBagOFBag(l);
     }
 

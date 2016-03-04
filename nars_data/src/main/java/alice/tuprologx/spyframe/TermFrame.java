@@ -1,7 +1,7 @@
 package alice.tuprologx.spyframe;
 
+import alice.tuprolog.PTerm;
 import alice.tuprolog.Struct;
-import alice.tuprolog.Term;
 import alice.tuprolog.Var;
 import java.awt.*;
 import java.awt.event.*;
@@ -21,9 +21,9 @@ public class TermFrame extends JFrame implements ActionListener{
 	private static final long serialVersionUID = 1L;
 
 /**Transforms prolog terms into trees.*/
-  public static final ToTree<Term> term2tree=new ToTree<Term>(){
+  public static final ToTree<PTerm> term2tree=new ToTree<PTerm>(){
     @Override
-    public Node makeTreeFrom(Term term){
+    public Node makeTreeFrom(PTerm term){
       Node node=new Node(""+term);
       node.textcolor=node.bordercolor=Color.BLACK;
       //make it more specific if possible
@@ -50,16 +50,16 @@ public class TermFrame extends JFrame implements ActionListener{
   };
 
   JTextField input;
-  Tree<Term> ptt;
+  Tree<PTerm> ptt;
 
   /** Constructs a new TermFrame.
    *  @param term the prolog term to be displayed.
    */
-  public TermFrame(Term term){
+  public TermFrame(PTerm term){
     super("termframe");
     setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     Container c=getContentPane();
-    ptt=new Tree<Term>(term2tree, term);
+    ptt=new Tree<PTerm>(term2tree, term);
     c.add(new JScrollPane(ptt));
     input=new JTextField();
     c.add(input, BorderLayout.SOUTH);
@@ -75,7 +75,7 @@ public class TermFrame extends JFrame implements ActionListener{
   /**Sets a new prolog term.
    * @param term to be displayed.
    */
-  public void setTerm(Term term){
+  public void setTerm(PTerm term){
     ptt.setStructure(term);
     input.setText(""+term);
     validate();
@@ -85,10 +85,10 @@ public class TermFrame extends JFrame implements ActionListener{
    * @param sterm to be displayed.
    */
   public void setTerm(String sterm){
-    Term term;
-    try{term=Term.createTerm(sterm);}
+    PTerm term;
+    try{term= PTerm.createTerm(sterm);}
     catch(Exception ex){
-      term=Term.createTerm("'>illegal prolog term<'");
+      term= PTerm.createTerm("'>illegal prolog term<'");
     }
     setTerm(term);
   }
@@ -100,7 +100,7 @@ public class TermFrame extends JFrame implements ActionListener{
     if(args.length!=1)
       System.out.println("Pass exactly one prolog term!");
     else{
-      TermFrame tf=new TermFrame(Term.createTerm(args[0]));
+      TermFrame tf=new TermFrame(PTerm.createTerm(args[0]));
       tf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
   }

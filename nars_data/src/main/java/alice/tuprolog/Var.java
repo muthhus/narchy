@@ -24,17 +24,17 @@ import java.util.*;
  * Variables are identified by a name (which must starts with
  * an upper case letter) or the anonymous ('_') name.
  *
- * @see Term
+ * @see PTerm
  *
  */
-public class Var extends Term {
+public class Var extends PTerm {
 
 	private static final long serialVersionUID = 1L;
 	final static String ANY = "_";
 	// the name identifying the var
 	private String name;
 	private StringBuilder completeName;     /* Reviewed by Paolo Contessi: String -> StringBuilder */
-	private Term   link;            /* link is used for unification process */
+	private PTerm link;            /* link is used for unification process */
 	private long   timestamp;        /* timestamp is used for fix vars order */
 	private int    id;            /* id of ExecCtx owners of this var util for renaming*/
 
@@ -135,8 +135,8 @@ public class Var extends Term {
 	 * then the variable in the list is returned.
 	 */
 	@Override
-	Term copy(AbstractMap<Var,Var> vMap, int idExecCtx) {
-		Term tt = getTerm();
+	PTerm copy(AbstractMap<Var,Var> vMap, int idExecCtx) {
+		PTerm tt = getTerm();
 		if (tt == this) {
 			Var v = vMap.get(this);
 			if (v == null) {
@@ -155,7 +155,7 @@ public class Var extends Term {
 	 * Gets a copy of this variable.
 	 */
 	@Override
-	Term copy(AbstractMap<Var,Var> vMap, AbstractMap<Term,Var> substMap) {
+	PTerm copy(AbstractMap<Var,Var> vMap, AbstractMap<PTerm,Var> substMap) {
 		Var v;
 		Object temp = vMap.get(this);
 		if (temp == null) {
@@ -164,7 +164,7 @@ public class Var extends Term {
 		} else {
 			v = (Var) temp;
 		}
-		Term t = getTerm();
+		PTerm t = getTerm();
 		if (t instanceof Var) {
 			Object tt = substMap.get(t);
 			if (tt == null) {
@@ -223,9 +223,9 @@ public class Var extends Term {
 	 *  for bound variable it is the bound term.
 	 */
 	@Override
-	public Term getTerm() {
-		Term tt = this;
-		Term t  = link;
+	public PTerm getTerm() {
+		PTerm tt = this;
+		PTerm t  = link;
 		while (t != null ) {
 			tt = t;
 			if (t instanceof Var) {
@@ -241,14 +241,14 @@ public class Var extends Term {
 	/**
 	 * Gets the term which is direct referred by the variable.
 	 */
-	public Term getLink() {
+	public PTerm getLink() {
 		return link;
 	}
 
 	/**
 	 * Set the term which is direct bound
 	 */
-	void setLink(Term l) {
+	void setLink(PTerm l) {
 		link = l;
 	}
 
@@ -278,37 +278,37 @@ public class Var extends Term {
 
 	@Override
 	public boolean isEmptyList() {
-		Term t=getTerm();
+		PTerm t=getTerm();
 		return t == this ? false : t.isEmptyList();
 	}
 
 	@Override
 	public boolean isAtomic() {
-		Term t=getTerm();
+		PTerm t=getTerm();
 		return t == this ? false : t.isAtomic();
 	}
 
 	@Override
 	public boolean isCompound() {
-		Term t=getTerm();
+		PTerm t=getTerm();
 		return t == this ? false : t.isCompound();
 	}
 
 	@Override
 	public boolean isAtom() {
-		Term t=getTerm();
+		PTerm t=getTerm();
 		return t == this ? false : t.isAtom();
 	}
 
 	@Override
 	public boolean isList() {
-		Term t = getTerm();
+		PTerm t = getTerm();
 		return t == this ? false : t.isList();
 	}
 
 	@Override
 	public boolean isGround(){
-		Term t=getTerm();
+		PTerm t=getTerm();
 		return t == this ? false : t.isGround();
 	}
 
@@ -338,7 +338,7 @@ public class Var extends Term {
 	 private boolean occurCheck(List<Var> vl, Struct t) {
 		 int arity=t.getArity();
 		 for (int c = 0;c < arity;c++) {
-			 Term at = t.getTerm(c);
+			 PTerm at = t.getTerm(c);
 			 if (at instanceof Struct) {
 				 if (occurCheck(vl, (Struct)at)) {
 					 return true;
@@ -364,7 +364,7 @@ public class Var extends Term {
 	  */
 	 @Override
 	 long resolveTerm(long count) {
-		 Term tt=getTerm();
+		 PTerm tt=getTerm();
 		 if (tt != this) {
 			 return tt.resolveTerm(count);
 		 } else {
@@ -403,8 +403,8 @@ public class Var extends Term {
 	  * then it's success and a new link is created (retractable by a code)
 	  */
 	 @Override
-	 boolean unify(List<Var> vl1, List<Var> vl2, Term t) {
-		 Term tt = getTerm();
+	 boolean unify(List<Var> vl1, List<Var> vl2, PTerm t) {
+		 PTerm tt = getTerm();
 		 if(tt == this) {
 			 t = t.getTerm();
 			 if (t instanceof Var) { 
@@ -455,8 +455,8 @@ public class Var extends Term {
 	  */
 
 	 @Override
-	 public boolean isGreater(Term t) {
-		 Term tt = getTerm();
+	 public boolean isGreater(PTerm t) {
+		 PTerm tt = getTerm();
 		 if (tt == this) {
 			 t = t.getTerm();
 			 if (!(t instanceof Var)) return false;
@@ -468,8 +468,8 @@ public class Var extends Term {
 	 }
 
 	 @Override
-	 public boolean isGreaterRelink(Term t, ArrayList<String> vorder) {
-		 Term tt = getTerm();
+	 public boolean isGreaterRelink(PTerm t, ArrayList<String> vorder) {
+		 PTerm tt = getTerm();
 		 if (tt == this) {
 			 t = t.getTerm();
 			 if (!(t instanceof Var)) return false;
@@ -485,8 +485,8 @@ public class Var extends Term {
 	 }
 	 
 	 @Override
-	 public boolean isEqual(Term t) {
-		 Term tt = getTerm();
+	 public boolean isEqual(PTerm t) {
+		 PTerm tt = getTerm();
 		 if(tt == this) {
 			 t = t.getTerm();
 			 return (t instanceof Var && timestamp == ((Var)t).timestamp);
@@ -506,7 +506,7 @@ public class Var extends Term {
 	  */
 	 @Override
 	 public String toString() {
-		 Term tt = getTerm();
+		 PTerm tt = getTerm();
 		 if (name != null) {
 			 return tt == this ? completeName.toString() : completeName + " / " + tt.toString();
 		 } else {
@@ -522,7 +522,7 @@ public class Var extends Term {
 	  *
 	  */
 	 public String toStringFlattened() {
-		 Term tt = getTerm();
+		 PTerm tt = getTerm();
 		 if (name != null) {
 			 return tt == this ? completeName.toString() : tt.toString();
 		 } else {

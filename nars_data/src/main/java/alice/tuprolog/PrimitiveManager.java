@@ -92,7 +92,7 @@ public class PrimitiveManager /*Castagna 06/2011*/implements IPrimitiveManager/*
      * @parm term the term to be identified
      * @return term with the identified built-in directive
      */
-    public Term identifyDirective(Term term) {
+    public PTerm identifyDirective(PTerm term) {
         identify(term,PrimitiveInfo.DIRECTIVE);
         return term;
     }
@@ -110,15 +110,15 @@ public class PrimitiveManager /*Castagna 06/2011*/implements IPrimitiveManager/*
             return false;
     }
     
-    public void identifyPredicate(Term term) {
+    public void identifyPredicate(PTerm term) {
         identify(term,PrimitiveInfo.PREDICATE);
     }
     
-    public void identifyFunctor(Term term) {
+    public void identifyFunctor(PTerm term) {
         identify(term,PrimitiveInfo.FUNCTOR);
     }
     
-    private void identify(Term term, int typeOfPrimitive) {
+    private void identify(PTerm term, int typeOfPrimitive) {
         if (term == null) {
             return;
         }

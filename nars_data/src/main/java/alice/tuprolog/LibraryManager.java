@@ -402,7 +402,7 @@ public class LibraryManager
 		return null;
 	}
 
-	public synchronized void onSolveBegin(Term g)
+	public synchronized void onSolveBegin(PTerm g)
 	{
 		for (Library alib : currentLibraries)
 		{

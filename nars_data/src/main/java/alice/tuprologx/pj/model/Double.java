@@ -9,6 +9,8 @@
 
 package alice.tuprologx.pj.model;
 
+import alice.tuprolog.PTerm;
+
 /**
  *
  * @author maurizio
@@ -35,7 +37,7 @@ public class Double extends Term<Double> {
             return new Double(d.doubleValue());
         }
         
-        static boolean matches(alice.tuprolog.Term t) {
+        static boolean matches(PTerm t) {
             return (t instanceof alice.tuprolog.Double);
         }
         

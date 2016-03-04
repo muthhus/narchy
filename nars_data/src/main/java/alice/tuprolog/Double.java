@@ -141,7 +141,7 @@ public class Double extends Number {
      * For number term argument, the int value is considered.
      */
     @Override
-    public boolean isGreater(Term t) {
+    public boolean isGreater(PTerm t) {
         t = t.getTerm();
         if (t instanceof Number) {
             return value>((Number)t).doubleValue();
@@ -151,7 +151,7 @@ public class Double extends Number {
     }
     
     @Override
-    public boolean isGreaterRelink(Term t, ArrayList<String> vorder) {
+    public boolean isGreaterRelink(PTerm t, ArrayList<String> vorder) {
         t = t.getTerm();
         if (t instanceof Number) {
             return value>((Number)t).doubleValue();
@@ -164,7 +164,7 @@ public class Double extends Number {
      * Returns true if this Double term is equal to the term provided.
      */
     @Override
-    public boolean isEqual(Term t) {
+    public boolean isEqual(PTerm t) {
         t = t.getTerm();
         if (t instanceof Number) {
             Number n = (Number) t;
@@ -181,7 +181,7 @@ public class Double extends Number {
      * This service is to be used in demonstration context.
      */
     @Override
-    boolean unify(List<Var> vl1, List<Var> vl2, Term t) {
+    boolean unify(List<Var> vl1, List<Var> vl2, PTerm t) {
         t = t.getTerm();
         if (t instanceof Var) {
             return t.unify(vl2, vl1, this);

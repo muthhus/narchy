@@ -32,12 +32,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
 
-import alice.tuprolog.Int;
-import alice.tuprolog.Library;
+import alice.tuprolog.*;
 import alice.tuprolog.Number;
-import alice.tuprolog.Struct;
-import alice.tuprolog.Term;
-import alice.tuprolog.Var;
+import alice.tuprolog.PTerm;
 
 import alice.tuprolog.lib.*;
 
@@ -133,7 +130,7 @@ public class PJLibrary extends Library {
 	}
 	
 	@Override
-	public   void onSolveBegin(Term goal) {
+	public   void onSolveBegin(PTerm goal) {
 		//id = 0;
 		currentObjects.clear();
 		currentObjects_inverse.clear();
@@ -166,7 +163,7 @@ public class PJLibrary extends Library {
 	/**
 	 * Creates of a java object - not backtrackable case
 	 */
-	public boolean java_object_3(Term className, Term argl, Term id) {
+	public boolean java_object_3(PTerm className, PTerm argl, PTerm id) {
 		className = className.getTerm();
 		Struct arg = (Struct) argl.getTerm();
 		id = id.getTerm();
@@ -228,7 +225,7 @@ public class PJLibrary extends Library {
 	 * Destroy the link to a java object - called not directly, but from
 	 * predicate java_object (as second choice, for backtracking)
 	 */
-	public   boolean destroy_object_1(Term id) {
+	public   boolean destroy_object_1(PTerm id) {
 		id = id.getTerm();
 		try {
 			if (id.isGround()) {
@@ -245,7 +242,7 @@ public class PJLibrary extends Library {
 	/**
 	 * Creates of a java class
 	 */
-	public   boolean java_class_4(Term clSource, Term clName, Term clPathes, Term id) {
+	public   boolean java_class_4(PTerm clSource, PTerm clName, PTerm clPathes, PTerm id) {
 		Struct classSource = (Struct) clSource.getTerm();
 		Struct className = (Struct) clName.getTerm();
 		Struct classPathes = (Struct) clPathes.getTerm();
@@ -254,7 +251,7 @@ public class PJLibrary extends Library {
 			String fullClassName = alice.util.Tools.removeApices(className.toString());
 			
 			String fullClassPath = fullClassName.replace('.', '/');
-			Iterator<? extends Term> it = classPathes.listIterator();
+			Iterator<? extends PTerm> it = classPathes.listIterator();
 			String cp = "";
 			while (it.hasNext()) {
 				if (cp.length() > 0) {
@@ -315,7 +312,7 @@ public class PJLibrary extends Library {
 	 * Calls a method of a Java object
 	 *
 	 */
-	public boolean java_call_3(Term objId, Term method_name, Term idResult) {
+	public boolean java_call_3(PTerm objId, PTerm method_name, PTerm idResult) {
 		objId = objId.getTerm();
 		idResult = idResult.getTerm();
 		Struct method = (Struct) method_name.getTerm();
@@ -440,7 +437,7 @@ public class PJLibrary extends Library {
 	/*
 	 * set the field value of an object
 	 */
-	private boolean java_set(Term objId, Term fieldTerm, Term what) {
+	private boolean java_set(PTerm objId, PTerm fieldTerm, PTerm what) {
 		//System.out.println("SET "+objId+" "+fieldTerm+" "+what);
 		what = what.getTerm();
 		if (!fieldTerm.isAtom() || what instanceof Var)
@@ -516,7 +513,7 @@ public class PJLibrary extends Library {
 	/*
 	 * get the value of the field
 	 */
-	private boolean java_get(Term objId, Term fieldTerm, Term what) {
+	private boolean java_get(PTerm objId, PTerm fieldTerm, PTerm what) {
 		//System.out.println("GET "+objId+" "+fieldTerm+" "+what);
 		if (!fieldTerm.isAtom()) {
 			return false;
@@ -583,7 +580,7 @@ public class PJLibrary extends Library {
 		}
 	}
 	
-	public boolean java_array_set_primitive_3(Term obj_id, Term i, Term what) {
+	public boolean java_array_set_primitive_3(PTerm obj_id, PTerm i, PTerm what) {
 		Struct objId = (Struct) obj_id.getTerm();
 		Number index = (Number) i.getTerm();
 		what = what.getTerm();
@@ -664,7 +661,7 @@ public class PJLibrary extends Library {
 		}
 	}
 	
-	public   boolean java_array_get_primitive_3(Term obj_id, Term i, Term what) {
+	public   boolean java_array_get_primitive_3(PTerm obj_id, PTerm i, PTerm what) {
 		Struct objId = (Struct) obj_id.getTerm();
 		Number index = (Number) i.getTerm();
 		what = what.getTerm();
@@ -688,32 +685,32 @@ public class PJLibrary extends Library {
 			}
 			String name = cl.toString();
 			if (name.equals("class [I")){
-				Term value = new alice.tuprolog.Int(Array.getInt(obj,index.intValue()));
+				PTerm value = new alice.tuprolog.Int(Array.getInt(obj,index.intValue()));
 				return unify(what,value);
 			}  else if (name.equals("class [D")){
-				Term value = new alice.tuprolog.Double(Array.getDouble(obj,index.intValue()));
+				PTerm value = new alice.tuprolog.Double(Array.getDouble(obj,index.intValue()));
 				return unify(what,value);
 			}  else if (name.equals("class [F")){
-				Term value = new alice.tuprolog.Float(Array.getFloat(obj,index.intValue()));
+				PTerm value = new alice.tuprolog.Float(Array.getFloat(obj,index.intValue()));
 				return unify(what,value);
 			}  else if (name.equals("class [L")){
-				Term value = new alice.tuprolog.Long(Array.getLong(obj,index.intValue()));
+				PTerm value = new alice.tuprolog.Long(Array.getLong(obj,index.intValue()));
 				return unify(what,value);
 			}  else if (name.equals("class [C")){
-				Term value = new alice.tuprolog.Struct(""+Array.getChar(obj,index.intValue()));
+				PTerm value = new alice.tuprolog.Struct(""+Array.getChar(obj,index.intValue()));
 				return unify(what,value);
 			}  else if (name.equals("class [Z")){
 				boolean b = Array.getBoolean(obj,index.intValue());
 				if (b) {
-					return unify(what,alice.tuprolog.Term.TRUE);
+					return unify(what, PTerm.TRUE);
 				} else {
-					return unify(what,alice.tuprolog.Term.FALSE);
+					return unify(what, PTerm.FALSE);
 				}
 			}  else if (name.equals("class [B")){
-				Term value = new alice.tuprolog.Int(Array.getByte(obj,index.intValue()));
+				PTerm value = new alice.tuprolog.Int(Array.getByte(obj,index.intValue()));
 				return unify(what,value);
 			}  else if (name.equals("class [S")){
-				Term value = new alice.tuprolog.Int(Array.getInt(obj,index.intValue()));
+				PTerm value = new alice.tuprolog.Int(Array.getInt(obj,index.intValue()));
 				return unify(what,value);
 			}  else {
 				return false;
@@ -726,7 +723,7 @@ public class PJLibrary extends Library {
 	}
 	
 	
-	private boolean java_array(String type, int nargs, Term id) {
+	private boolean java_array(String type, int nargs, PTerm id) {
 		try {
 			Object array = null;
 			String obtype = type.substring(0, type.length() - 2);
@@ -774,13 +771,13 @@ public class PJLibrary extends Library {
 		Object[] values = new Object[objs.length];
 		Class<?>[] types = new Class[objs.length];
 		for (int i = 0; i < objs.length; i++) {
-			if (!parse_arg(values, types, i, (Term) objs[i]))
+			if (!parse_arg(values, types, i, (PTerm) objs[i]))
 				return null;
 		}
 		return new Signature(values, types);
 	}
 	
-	private boolean parse_arg(Object[] values, Class<?>[] types, int i, Term term) {
+	private boolean parse_arg(Object[] values, Class<?>[] types, int i, PTerm term) {
 		try {
 			if (term == null) {
 				values[i] = null;
@@ -849,7 +846,7 @@ public class PJLibrary extends Library {
 	 * to define the specific class of an argument
 	 *
 	 */
-	private boolean parse_as(Object[] values, Class<?>[] types, int i, Term castWhat, Term castTo) {
+	private boolean parse_as(Object[] values, Class<?>[] types, int i, PTerm castWhat, PTerm castTo) {
 		try {
 			if (!(castWhat instanceof Number)) {
 				String castTo_name = alice.util.Tools.removeApices(((Struct) castTo).getName());
@@ -975,7 +972,7 @@ public class PJLibrary extends Library {
 	 *  parses return value
 	 *  of a method invokation
 	 */
-	private boolean parseResult(Term id, Object obj) {
+	private boolean parseResult(PTerm id, Object obj) {
 		if (obj == null) {
 			//return unify(id,Term.TRUE);
 			return unify(id, new Var());
@@ -983,9 +980,9 @@ public class PJLibrary extends Library {
 		try {
 			if (Boolean.class.isInstance(obj)) {
 				if (((Boolean) obj).booleanValue()) {
-					return unify(id, Term.TRUE);
+					return unify(id, PTerm.TRUE);
 				} else {
-					return unify(id, Term.FALSE);
+					return unify(id, PTerm.FALSE);
 				}
 			} else if (Byte.class.isInstance(obj)) {
 				return unify(id, new Int(((Byte) obj).intValue()));
@@ -1014,7 +1011,7 @@ public class PJLibrary extends Library {
 	
 	private Object[] getArrayFromList(Struct list) {
 		Object args[] = new Object[list.listSize()];
-		Iterator<? extends Term> it = list.listIterator();
+		Iterator<? extends PTerm> it = list.listIterator();
 		int count = 0;
 		while (it.hasNext()) {
 			args[count++] = it.next();
@@ -1210,7 +1207,7 @@ public class PJLibrary extends Library {
 	 * 
 	 * Term id can be a variable or a ground term.
 	 */
-	protected boolean bindDynamicObject(Term id, Object obj) {
+	protected boolean bindDynamicObject(PTerm id, Object obj) {
 		// null object are considered to _ variable
 		if (obj == null) {
 			return unify(id, new Var());
@@ -1226,7 +1223,7 @@ public class PJLibrary extends Library {
 				// object already referenced -> unifying terms
 				// referencing the object
 				//log("obj already registered: unify "+id+" "+aKey);
-				return unify(id, (Term) aKey);
+				return unify(id, (PTerm) aKey);
 			} else {
 				// object not previously referenced
 				if (id instanceof Var) {

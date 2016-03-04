@@ -20,8 +20,6 @@
  */
 package alice.tuprolog;
 
-import alice.tuprolog.Number;
-
 public class TestLibrary extends StringLibrary {
 	private static final long serialVersionUID = 1L;
 
@@ -29,13 +27,13 @@ public class TestLibrary extends StringLibrary {
 		return "TestLibraryName";
 	}
 
-	public Term sum_2(Number arg0, Number arg1){
+	public PTerm sum_2(Number arg0, Number arg1){
 		int a0 = arg0.intValue();
 		int a1 = arg1.intValue();
 		return new Int(a0+a1);
 	}
 	
-	public boolean println_1(Term arg0){
+	public boolean println_1(PTerm arg0){
 		getEngine().stdOutput(arg0.toString());
 		return true;
 	}

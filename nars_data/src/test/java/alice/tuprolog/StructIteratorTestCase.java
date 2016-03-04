@@ -13,7 +13,7 @@ public class StructIteratorTestCase extends TestCase {
 	
 	public void testEmptyIterator() {
 		Struct list = new Struct();
-		Iterator<? extends Term> i = list.listIterator();
+		Iterator<? extends PTerm> i = list.listIterator();
 		assertFalse(i.hasNext());
 		try {
 			i.next();
@@ -22,8 +22,8 @@ public class StructIteratorTestCase extends TestCase {
 	}
 	
 	public void testIteratorCount() {
-		Struct list = new Struct(new Term[] {new Int(1), new Int(2), new Int(3), new Int(5), new Int(7)});
-		Iterator<? extends Term> i = list.listIterator();
+		Struct list = new Struct(new PTerm[] {new Int(1), new Int(2), new Int(3), new Int(5), new Int(7)});
+		Iterator<? extends PTerm> i = list.listIterator();
 		int count = 0;
 		for (; i.hasNext(); count++)
 			i.next();
@@ -32,8 +32,8 @@ public class StructIteratorTestCase extends TestCase {
 	}
 	
 	public void testMultipleHasNext() {
-		Struct list = new Struct(new Term[] {new Struct("p"), new Struct("q"), new Struct("r")});
-		Iterator<? extends Term> i = list.listIterator();
+		Struct list = new Struct(new PTerm[] {new Struct("p"), new Struct("q"), new Struct("r")});
+		Iterator<? extends PTerm> i = list.listIterator();
 		assertTrue(i.hasNext());
 		assertTrue(i.hasNext());
 		assertTrue(i.hasNext());
@@ -41,8 +41,8 @@ public class StructIteratorTestCase extends TestCase {
 	}
 	
 	public void testMultipleNext() {
-		Struct list = new Struct(new Term[] {new Int(0), new Int(1), new Int(2), new Int(3), new Int(5), new Int(7)});
-		Iterator<? extends Term> i = list.listIterator();
+		Struct list = new Struct(new PTerm[] {new Int(0), new Int(1), new Int(2), new Int(3), new Int(5), new Int(7)});
+		Iterator<? extends PTerm> i = list.listIterator();
 		assertTrue(i.hasNext());
 		i.next(); // skip the first term
 		assertEquals(new Int(1), i.next());
@@ -60,7 +60,7 @@ public class StructIteratorTestCase extends TestCase {
 	
 	public void testRemoveOperationNotSupported() {
 		Struct list = new Struct(new Int(1), new Struct());
-		Iterator<? extends Term> i = list.listIterator();
+		Iterator<? extends PTerm> i = list.listIterator();
 		assertNotNull(i.next());
 		try {
 			i.remove();

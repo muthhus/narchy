@@ -75,7 +75,7 @@ public class Theory implements Serializable {
         this.clauseList = clauseList;
     }
     
-    public Iterator<? extends Term> iterator(Prolog engine) {
+    public Iterator<? extends PTerm> iterator(Prolog engine) {
         return isTextual() ? new Parser(engine.getOperatorManager(), theory).iterator() : clauseList.listIterator();
     }
 

@@ -16,11 +16,11 @@ public class JavaException extends Throwable {
         // java_exception
         String java_exception = e.getClass().getName();
         // Cause
-        Term causeTerm = null;
+        PTerm causeTerm = null;
         Throwable cause = e.getCause();
         causeTerm = cause != null ? new Struct(cause.toString()) : new Int(0);
         // Message
-        Term messageTerm = null;
+        PTerm messageTerm = null;
         String message = e.getMessage();
         messageTerm = message != null ? new Struct(message) : new Int(0);
         // StackTrace

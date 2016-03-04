@@ -30,11 +30,11 @@ import java.util.NoSuchElementException;
  * instead of just returning it or checking for its existence from a pool
  * of already produced terms.
  */
-class TermIterator implements Iterator<Term>, java.io.Serializable {
+class TermIterator implements Iterator<PTerm>, java.io.Serializable {
 	private static final long serialVersionUID = 1L;
     private final Parser parser;
     private boolean hasNext;
-    private Term next;
+    private PTerm next;
     
     TermIterator(Parser p) {
         parser = p;
@@ -43,7 +43,7 @@ class TermIterator implements Iterator<Term>, java.io.Serializable {
     }
     
     @Override
-    public Term next() {
+    public PTerm next() {
         if (hasNext) {
             if (next == null) {
                 next = parser.nextTerm(true);
@@ -51,13 +51,13 @@ class TermIterator implements Iterator<Term>, java.io.Serializable {
                     throw new NoSuchElementException();
             }
             hasNext = false;
-            Term temp = next;
+            PTerm temp = next;
             next = null;
             return temp;
         } else
             if (hasNext()) {
                 hasNext = false;
-                Term temp = next;
+                PTerm temp = next;
                 next = null;
                 return temp;
             }

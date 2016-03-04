@@ -53,7 +53,7 @@ public class TheoryManager implements Serializable {
 	private ClauseDatabase retractDBase;
 	private Prolog engine;
 	private PrimitiveManager primitiveManager;
-	private Stack<Term> startGoalStack;
+	private Stack<PTerm> startGoalStack;
 	Theory lastConsultedTheory;
 
 	public void initialize(Prolog vm) {
@@ -174,7 +174,7 @@ public class TheoryManager implements Serializable {
 	 * Reviewed by Paolo Contessi: modified according to new ClauseDatabase
 	 * implementation
 	 */
-	public synchronized List<ClauseInfo> find(Term headt) {
+	public synchronized List<ClauseInfo> find(PTerm headt) {
 		if (headt instanceof Struct) {
 			//String key = ((Struct) headt).getPredicateIndicator();
 			List<ClauseInfo> list = dynamicDBase.getPredicates(headt);
@@ -210,7 +210,7 @@ public class TheoryManager implements Serializable {
 		/**/
 		// iterate all clauses in theory and assert them
 		try {
-			for (Iterator<? extends Term> it = theory.iterator(engine); it.hasNext();) {
+			for (Iterator<? extends PTerm> it = theory.iterator(engine); it.hasNext();) {
 				/*Castagna 06/2011*/
 				clause++;
 				/**/	
@@ -237,7 +237,7 @@ public class TheoryManager implements Serializable {
 	public void rebindPrimitives() {
 		for (ClauseInfo d:dynamicDBase){
 			for(AbstractSubGoalTree sge:d.getBody()){
-				Term t = ((SubGoalElement) sge).term;
+				PTerm t = ((SubGoalElement) sge).term;
 				primitiveManager.identifyPredicate(t);
 			}
 		}
@@ -289,7 +289,7 @@ public class TheoryManager implements Serializable {
 	 */
 	private Struct toClause(Struct t) {		//PRIMITIVE
 		// TODO bad, slow way of cloning. requires approx twice the time necessary
-		t = (Struct) Term.createTerm(t.toString(), this.engine.getOperatorManager());
+		t = (Struct) PTerm.createTerm(t.toString(), this.engine.getOperatorManager());
 		if (!t.isClause())
 			t = new Struct(":-", t, new Struct("true"));
 		primitiveManager.identifyPredicate(t);

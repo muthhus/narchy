@@ -55,7 +55,7 @@ public class StateBacktrack extends State {
         
         //deunify variables and reload old goal
         e.currentContext = curChoice.executionContext;
-        Term curGoal = e.currentContext.goalsToEval.backTo(curChoice.indexSubGoal).getTerm();
+        PTerm curGoal = e.currentContext.goalsToEval.backTo(curChoice.indexSubGoal).getTerm();
         if (!(curGoal instanceof Struct)) {
             e.nextState = c.END_FALSE;
             return;

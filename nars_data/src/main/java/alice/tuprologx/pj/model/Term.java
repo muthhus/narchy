@@ -1,5 +1,6 @@
 package alice.tuprologx.pj.model;
 
+import alice.tuprolog.PTerm;
 import alice.tuprologx.pj.annotations.*;
 
 /**
@@ -59,11 +60,11 @@ public abstract class Term<X extends Term<?>> {
         }
 	}
         
-    public abstract alice.tuprolog.Term marshal() /*{
+    public abstract PTerm marshal() /*{
             throw new UnsupportedOperationException();
         }*/;
         
-    public static <Z extends Term<?>> Z unmarshal(alice.tuprolog.Term t) {
+    public static <Z extends Term<?>> Z unmarshal(PTerm t) {
 		if (Int.matches(t)) {
 			// return (Z)Int.unmarshal((alice.tuprolog.Int)t);
 			return uncheckedCast(Int.unmarshal((alice.tuprolog.Int)t));

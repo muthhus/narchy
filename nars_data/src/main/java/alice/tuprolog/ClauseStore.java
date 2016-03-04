@@ -12,11 +12,11 @@ public class ClauseStore {
     
     
     private OneWayList<ClauseInfo> clauses;
-    private final Term goal;
+    private final PTerm goal;
     private final List<Var> vars;
     private boolean haveAlternatives;
     
-    private ClauseStore(Term goal, List<Var> vars) {
+    private ClauseStore(PTerm goal, List<Var> vars) {
         this.goal = goal;
         this.vars = vars;
         clauses = null;
@@ -31,7 +31,7 @@ public class ClauseStore {
          * 
      * @param familyClauses
      */
-    public static ClauseStore build(Term goal, List<Var> vars, List<ClauseInfo> familyClauses) {
+    public static ClauseStore build(PTerm goal, List<Var> vars, List<ClauseInfo> familyClauses) {
         ClauseStore clauseStore = new ClauseStore(goal, vars);
                 clauseStore.clauses = OneWayList.transform2(familyClauses);
                 if (clauseStore.clauses == null || !clauseStore.existCompatibleClause())
@@ -67,7 +67,7 @@ public class ClauseStore {
      * @return true if compatible or false otherwise.
      */
     protected boolean existCompatibleClause() {
-        List<Term> saveUnifications = deunify(vars);
+        List<PTerm> saveUnifications = deunify(vars);
         boolean found = checkCompatibility(goal);
         reunify(vars, saveUnifications);
         return found;
@@ -79,8 +79,8 @@ public class ClauseStore {
      * @param varsToDeunify
      * @return unificazioni delle variabili
      */
-    private static List<Term> deunify(List<Var> varsToDeunify) {
-        List<Term> saveUnifications = new ArrayList<>(varsToDeunify.size());
+    private static List<PTerm> deunify(List<Var> varsToDeunify) {
+        List<PTerm> saveUnifications = new ArrayList<>(varsToDeunify.size());
         //List saveUnifications = new LinkedList();
         //deunifico le variabili termporaneamente
         for (int i = 0, varsToDeunifySize = varsToDeunify.size(); i < varsToDeunifySize; i++) {
@@ -97,10 +97,10 @@ public class ClauseStore {
      * @param varsToReunify
      * @param saveUnifications
      */
-    private static void reunify(List<Var> varsToReunify, List<Term> saveUnifications) {
+    private static void reunify(List<Var> varsToReunify, List<PTerm> saveUnifications) {
         int size = varsToReunify.size();
         ListIterator<Var> it1 = varsToReunify.listIterator(size);
-        ListIterator<Term> it2 = saveUnifications.listIterator(size);
+        ListIterator<PTerm> it2 = saveUnifications.listIterator(size);
         // Only the first occurrence of a variable gets its binding saved;
         // following occurrences get a null instead. So, to avoid clashes
         // between those values, and avoid random variable deunification,
@@ -117,7 +117,7 @@ public class ClauseStore {
      * discarded from the currently examined family.
      * @param goal
      */
-    private boolean checkCompatibility(Term goal) {
+    private boolean checkCompatibility(PTerm goal) {
         if (clauses == null) return false;
         ClauseInfo clause = null;
         do {
@@ -150,7 +150,7 @@ public class ClauseStore {
         return l;
     }
     
-    public Term getMatchGoal() {
+    public PTerm getMatchGoal() {
         return goal;
     }
     

@@ -26,8 +26,8 @@ class Flag implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
     private String name;
     private Struct valueList;
-    private Term   value;
-    private Term   defaultValue;
+    private PTerm value;
+    private PTerm defaultValue;
     private boolean modifiable;
     private String  libraryName;
     
@@ -40,7 +40,7 @@ class Flag implements java.io.Serializable {
      * @param modifiable states if the flag is modifiable
      * @param library is the library defining the flag
      */
-    public Flag(String name, Struct valueSet, Term defValue, boolean modifiable, String library) {
+    public Flag(String name, Struct valueSet, PTerm defValue, boolean modifiable, String library) {
         this.name = name;
         this.valueList = valueSet;
         defaultValue = defValue;
@@ -75,8 +75,8 @@ class Flag implements java.io.Serializable {
      * @param value the possible value of the flag
      * @return flag validity
      */
-    public boolean isValidValue(Term value) {
-        java.util.Iterator<? extends Term> it=valueList.listIterator();
+    public boolean isValidValue(PTerm value) {
+        java.util.Iterator<? extends PTerm> it=valueList.listIterator();
         while (it.hasNext()) {
             if (value.match(it.next())) {
                 return true;
@@ -107,7 +107,7 @@ class Flag implements java.io.Serializable {
      * @param value new value of the flag
      * @return true if the value is valid
      */
-    public boolean setValue(Term value) {
+    public boolean setValue(PTerm value) {
         if (isValidValue(value) && modifiable) {
             this.value = value;
             return true;
@@ -120,7 +120,7 @@ class Flag implements java.io.Serializable {
 	 * Gets the current value of the flag
 	 * @return  flag current value
 	 */
-    public Term getValue() {
+    public PTerm getValue() {
         return value;
     }
     

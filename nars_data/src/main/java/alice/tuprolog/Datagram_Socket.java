@@ -45,7 +45,7 @@ public class Datagram_Socket extends AbstractSocket {
 	}
 
 	@Override
-	boolean unify(List<Var> varsUnifiedArg1, List<Var> varsUnifiedArg2, Term t) {
+	boolean unify(List<Var> varsUnifiedArg1, List<Var> varsUnifiedArg2, PTerm t) {
 		t = t.getTerm();
         if (t instanceof Var) {
             return t.unify(varsUnifiedArg1, varsUnifiedArg2, this);

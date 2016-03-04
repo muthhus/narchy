@@ -3,7 +3,7 @@ import java.net.InetAddress;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 
-public abstract class AbstractSocket extends Term{
+public abstract class AbstractSocket extends PTerm {
 	private static final long serialVersionUID = 1L;
 	public abstract boolean isClientSocket();
 	
@@ -70,24 +70,24 @@ public abstract class AbstractSocket extends Term{
 	}
 
 	@Override
-	public boolean isGreater(Term t) {
+	public boolean isGreater(PTerm t) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 	@Override
-	public boolean isGreaterRelink(Term t, ArrayList<String> vorder) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean isEqual(Term t) {
+	public boolean isGreaterRelink(PTerm t, ArrayList<String> vorder) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public Term getTerm() {
+	public boolean isEqual(PTerm t) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public PTerm getTerm() {
 		return this;
 	}
 
@@ -103,12 +103,12 @@ public abstract class AbstractSocket extends Term{
 	}
 
 	@Override
-	Term copy(AbstractMap<Var, Var> vMap, int idExecCtx) {
+	PTerm copy(AbstractMap<Var, Var> vMap, int idExecCtx) {
 		return this;
 	}
 
 	@Override
-	Term copy(AbstractMap<Var, Var> vMap, AbstractMap<Term, Var> substMap) {
+	PTerm copy(AbstractMap<Var, Var> vMap, AbstractMap<PTerm, Var> substMap) {
 		return this;
 	}
 

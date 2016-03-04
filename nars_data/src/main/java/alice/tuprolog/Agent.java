@@ -103,24 +103,24 @@ public class Agent extends Prolog {
         return run();
     }
     
-    /**
-     * Adds a listener to ouput events
-     *
-     * @param l the listener
-     */
-    public synchronized void addOutputListener(OutputListener l) {
-        addOutputListener(l);
-    }
+//    /**
+//     * Adds a listener to ouput events
+//     *
+//     * @param l the listener
+//     */
+//    public synchronized void addOutputListener(OutputListener l) {
+//        super.addOutputListener(l);
+//    }
     
-    /**
-     * Removes a listener to ouput events
-     *
-     * @param l the listener
-     */
-    public synchronized void removeOutputListener(OutputListener l) {
-        removeOutputListener(l);
-    }
-    
+//    /**
+//     * Removes a listener to ouput events
+//     *
+//     * @param l the listener
+//     */
+//    public synchronized void removeOutputListener(OutputListener l) {
+//        removeOutputListener(l);
+//    }
+//
     /**
      * Removes all output event listeners
      */

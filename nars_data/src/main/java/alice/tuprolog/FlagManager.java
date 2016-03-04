@@ -48,13 +48,13 @@ class FlagManager {
     /**
      * Defines a new flag
      */
-    public synchronized boolean defineFlag(String name, Struct valueList, Term defValue,
+    public synchronized boolean defineFlag(String name, Struct valueList, PTerm defValue,
             boolean modifiable, String libName) {
         flags.add(new Flag(name, valueList, defValue, modifiable, libName));
         return true;
     }
 
-    public synchronized boolean setFlag(String name, Term value) {
+    public synchronized boolean setFlag(String name, PTerm value) {
         java.util.Iterator<Flag> it = flags.iterator();
         while (it.hasNext()) {
             Flag flag = it.next();
@@ -81,7 +81,7 @@ class FlagManager {
         return flist;
     }
 
-    public synchronized Term getFlag(String name) {
+    public synchronized PTerm getFlag(String name) {
         java.util.Iterator<Flag> it = flags.iterator();
         while (it.hasNext()) {
             Flag fl = it.next();
@@ -107,7 +107,7 @@ class FlagManager {
 
     // restituisce true se esiste un flag di nome name, e Value ? un valore
     // ammissibile per tale flag
-    public boolean isValidValue(String name, Term value) {
+    public boolean isValidValue(String name, PTerm value) {
         java.util.Iterator<Flag> it = flags.iterator();
         while (it.hasNext()) {
             Flag flag = it.next();

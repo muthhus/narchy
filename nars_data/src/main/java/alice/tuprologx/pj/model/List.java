@@ -8,6 +8,8 @@
  */
 
 package alice.tuprologx.pj.model;
+import alice.tuprolog.PTerm;
+
 import java.util.*;
 /**
  *
@@ -59,7 +61,7 @@ public class List<X extends Term<?>> extends Term<List<X>> implements Iterable<X
         
         @Override
         public alice.tuprolog.Struct marshal() {
-            alice.tuprolog.Term[] termArray = new alice.tuprolog.Term[_theList.size()];
+            PTerm[] termArray = new PTerm[_theList.size()];
             int i=0;
             for (Term<?> t : _theList) {
                 termArray[i++]=t.marshal();
@@ -70,14 +72,14 @@ public class List<X extends Term<?>> extends Term<List<X>> implements Iterable<X
         static <Z extends Term<?>> List<Z> unmarshal(alice.tuprolog.Struct s) {
             if (!matches(s))
                 throw new UnsupportedOperationException();
-            Iterator<? extends alice.tuprolog.Term> listIt = s.listIterator();
+            Iterator<? extends PTerm> listIt = s.listIterator();
             Vector<Term<?>> termList = new Vector<Term<?>>();
             while (listIt.hasNext())
                 termList.add(Term.unmarshal(listIt.next()));
             return new List<Z>(termList);
         }
         
-        static boolean matches(alice.tuprolog.Term t) {
+        static boolean matches(PTerm t) {
             return (!(t instanceof alice.tuprolog.Var) && t.isList() && t instanceof alice.tuprolog.Struct);
         }
 

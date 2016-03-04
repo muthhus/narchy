@@ -9,6 +9,8 @@
 
 package alice.tuprologx.pj.model;
 
+import alice.tuprolog.PTerm;
+
 /**
  *
  * @author maurizio
@@ -35,7 +37,7 @@ public class Int extends Term<Int> {
             return new Int(i.intValue());
         }
         
-        static boolean matches(alice.tuprolog.Term t) {
+        static boolean matches(PTerm t) {
             return (t instanceof alice.tuprolog.Int);
         }
         

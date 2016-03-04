@@ -25,24 +25,24 @@ import java.util.*;
 public class HashLibrary extends Library {
 	private static final long serialVersionUID = 1L;
 
-	private HashMap<String, Term> dict;
+	private HashMap<String, PTerm> dict;
 		
 	public boolean hashtable_0(){
-		dict = new HashMap<String, Term>();
+		dict = new HashMap<String, PTerm>();
 		return true;
 	} 
 	
-	public boolean put_data_2(Term key, Term object){
+	public boolean put_data_2(PTerm key, PTerm object){
 		dict.put(key.toString(),object);
 		return true;
 	}
 	
-	public boolean get_data_2(Term key, Term res){
-		Term result = dict.get(key.toString());
+	public boolean get_data_2(PTerm key, PTerm res){
+		PTerm result = dict.get(key.toString());
 		return unify(res,result);
 	}
 	
-	public boolean remove_data_1(Term key){
+	public boolean remove_data_1(PTerm key){
 		dict.remove(key.toString());
 		return true;
 	}

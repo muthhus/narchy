@@ -155,7 +155,7 @@ class FamilyClausesList extends LinkedList<ClauseInfo> {
 	 * @param goal  The goal to be resolved
 	 * @return      The list of goal-compatible predicates
 	 */
-	public List<ClauseInfo> get(Term goal){
+	public List<ClauseInfo> get(PTerm goal){
 		// Gets the correct list and encapsulates it in ReadOnlyLinkedList
 		if(goal instanceof Struct){
 			Struct g = (Struct) goal.getTerm();
@@ -169,7 +169,7 @@ class FamilyClausesList extends LinkedList<ClauseInfo> {
 			}
 
 			/* Retrieves first argument and checks type */
-			Term t = g.getArg(0).getTerm();
+			PTerm t = g.getArg(0).getTerm();
 			if(t instanceof Var){
 				/*
 				 * if first argument is an unbounded variable,
@@ -233,7 +233,7 @@ class FamilyClausesList extends LinkedList<ClauseInfo> {
 	// Updates indexes, storing informations about the last added clause
 	private void register(ClauseInfo ci, boolean first){
 		// See FamilyClausesList.get(Term): same concept
-		Term clause = ci.getHead();
+		PTerm clause = ci.getHead();
 		if(clause instanceof Struct){
 			Struct g = (Struct) clause.getTerm();
 
@@ -241,7 +241,7 @@ class FamilyClausesList extends LinkedList<ClauseInfo> {
 				return;
 			}
 
-			Term t = g.getArg(0).getTerm();
+			PTerm t = g.getArg(0).getTerm();
 			if(t instanceof Var){
 				numCompClausesIndex.insertAsShared(ci, first);
 				constantCompClausesIndex.insertAsShared(ci, first);
@@ -274,7 +274,7 @@ class FamilyClausesList extends LinkedList<ClauseInfo> {
 
 	// Updates indexes, deleting informations about the last removed clause
 	public void unregister(ClauseInfo ci) {
-		Term clause = ci.getHead();
+		PTerm clause = ci.getHead();
 		if(clause != null){
 			Struct g = (Struct) clause.getTerm();
 
@@ -282,7 +282,7 @@ class FamilyClausesList extends LinkedList<ClauseInfo> {
 				return;
 			}
 
-			Term t = g.getArg(0).getTerm();
+			PTerm t = g.getArg(0).getTerm();
 			if(t instanceof Var){
 				numCompClausesIndex.removeShared(ci);
 				constantCompClausesIndex.removeShared(ci);

@@ -27,7 +27,7 @@ import java.util.List;
  * Struct class represents both compound prolog term
  * and atom term (considered as 0-arity compound).
  */
-public class Struct extends Term {
+public class Struct extends PTerm {
 	private static final long serialVersionUID = 1L;
     
     /**
@@ -37,7 +37,7 @@ public class Struct extends Term {
     /**
 	 * args array
 	 */
-    private Term[] arg;
+    private PTerm[] arg;
     /**
 	 * arity
 	 */
@@ -58,63 +58,63 @@ public class Struct extends Term {
     /**
      * Builds a Struct representing an atom
      */
-    public Struct(String f) {
+    @Deprecated public Struct(String f) {
         this(f,0);
     }
     
     /**
      * Builds a compound, with one argument
      */
-    public Struct(String f, Term at0) {
-        this(f, new Term[] {at0});
+    public Struct(String f, PTerm at0) {
+        this(f, new PTerm[] {at0});
     }
     
     /**
      * Builds a compound, with two arguments
      */
-    public Struct(String f, Term at0, Term at1) {
-        this(f, new Term[] {at0, at1});
+    public Struct(String f, PTerm at0, PTerm at1) {
+        this(f, new PTerm[] {at0, at1});
     }
     
     /**
      * Builds a compound, with three arguments
      */
-    public Struct(String f, Term at0, Term at1, Term at2) {
-        this(f, new Term[] {at0, at1, at2});
+    public Struct(String f, PTerm at0, PTerm at1, PTerm at2) {
+        this(f, new PTerm[] {at0, at1, at2});
     }
     
     /**
      * Builds a compound, with four arguments
      */
-    public Struct(String f, Term at0, Term at1, Term at2, Term at3) {
-        this(f, new Term[] {at0, at1, at2, at3});
+    public Struct(String f, PTerm at0, PTerm at1, PTerm at2, PTerm at3) {
+        this(f, new PTerm[] {at0, at1, at2, at3});
     }
     
     /**
      * Builds a compound, with five arguments
      */
-    public Struct(String f, Term at0, Term at1, Term at2, Term at3, Term at4) {
-        this(f, new Term[] {at0, at1, at2, at3, at4});
+    public Struct(String f, PTerm at0, PTerm at1, PTerm at2, PTerm at3, PTerm at4) {
+        this(f, new PTerm[] {at0, at1, at2, at3, at4});
     }
     
     /**
      * Builds a compound, with six arguments
      */
-    public Struct(String f, Term at0, Term at1, Term at2, Term at3, Term at4, Term at5) {
-        this(f, new Term[] {at0, at1, at2, at3, at4, at5});
+    public Struct(String f, PTerm at0, PTerm at1, PTerm at2, PTerm at3, PTerm at4, PTerm at5) {
+        this(f, new PTerm[] {at0, at1, at2, at3, at4, at5});
     }
     
     /**
      * Builds a compound, with seven arguments
      */
-    public Struct(String f, Term at0, Term at1, Term at2, Term at3, Term at4, Term at5, Term at6) {
-        this(f, new Term[] {at0, at1, at2, at3, at4, at5, at6});
+    public Struct(String f, PTerm at0, PTerm at1, PTerm at2, PTerm at3, PTerm at4, PTerm at5, PTerm at6) {
+        this(f, new PTerm[] {at0, at1, at2, at3, at4, at5, at6});
     }
     
     /**
      * Builds a compound, with an array of arguments
      */
-    public Struct(String f, Term[] argList) {
+    public Struct(String f, PTerm[] argList) {
         this(f, argList.length);
         for (int i = 0; i < argList.length; i++)
             if (argList[i] == null)
@@ -136,7 +136,7 @@ public class Struct extends Term {
     /**
      * Builds a list providing head and tail
      */
-    public Struct(Term h,Term t) {
+    public Struct(PTerm h, PTerm t) {
         this(".",2);
         arg[0] = h;
         arg[1] = t;
@@ -145,11 +145,11 @@ public class Struct extends Term {
     /**
      * Builds a list specifying the elements
      */
-    public Struct(Term[] argList) {
+    public Struct(PTerm[] argList) {
         this(argList,0);
     }
     
-    private Struct(Term[] argList, int index) {
+    private Struct(PTerm[] argList, int index) {
         this(".",2);
         if (index<argList.length) {
             arg[0] = argList[index];
@@ -165,11 +165,11 @@ public class Struct extends Term {
     /**
      * Builds a compound, with a linked list of arguments
      */
-    Struct(String f, LinkedList<Term> al) {
+    Struct(String f, LinkedList<PTerm> al) {
         name = f;
         arity = al.size();
         if (arity > 0) {
-            arg = new Term[arity];
+            arg = new PTerm[arity];
             for(int c = 0;c < arity;c++)
                 arg[c] = al.removeFirst();
         }
@@ -179,7 +179,7 @@ public class Struct extends Term {
     
     private Struct(int arity_) {
         arity = arity_;
-        arg = new Term[arity];
+        arg = new PTerm[arity];
     }
     
     private Struct(String name_,int arity_) {
@@ -190,7 +190,7 @@ public class Struct extends Term {
         name = name_;
         arity = arity_;
         if (arity > 0) {
-            arg = new Term[arity];
+            arg = new PTerm[arity];
         }
         predicateIndicator = name + '/' + arity;
         resolved = false;
@@ -227,7 +227,7 @@ public class Struct extends Term {
      *
      * No bound check is done
      */
-    public Term getArg(int index) {
+    public PTerm getArg(int index) {
         return arg[index];
     }
     
@@ -236,7 +236,7 @@ public class Struct extends Term {
      *
      * (Only for internal service)
      */
-    void setArg(int index, Term argument) {
+    void setArg(int index, PTerm argument) {
         arg[index] = argument;
     }
     
@@ -246,7 +246,7 @@ public class Struct extends Term {
      * No bound check is done. It is equivalent to
      * <code>getArg(index).getTerm()</code>
      */
-    public Term getTerm(int index) {
+    public PTerm getTerm(int index) {
             if (!(arg[index] instanceof Var))
                 return arg[index];
             return arg[index].getTerm();
@@ -315,7 +315,7 @@ public class Struct extends Term {
     }    
     
     @Override
-    public Term getTerm() {
+    public PTerm getTerm() {
         return this;
     }
     
@@ -358,7 +358,7 @@ public class Struct extends Term {
      * Test if a term is greater than other
      */
     @Override
-    public boolean isGreater(Term t) {
+    public boolean isGreater(PTerm t) {
         t = t.getTerm();
         if (!(t instanceof Struct)) {
             return true;
@@ -385,7 +385,7 @@ public class Struct extends Term {
     }
     
     @Override
-    public boolean isGreaterRelink(Term t, ArrayList<String> vorder) {
+    public boolean isGreaterRelink(PTerm t, ArrayList<String> vorder) {
         t = t.getTerm();
         if (!(t instanceof Struct)) {
             return true;
@@ -417,7 +417,7 @@ public class Struct extends Term {
      * Test if a term is equal to other
      */
     @Override
-    public boolean isEqual(Term t) {
+    public boolean isEqual(PTerm t) {
         t = t.getTerm();
         if (t instanceof Struct) {
             Struct ts = (Struct) t;
@@ -444,15 +444,15 @@ public class Struct extends Term {
      * @param vMap is needed for register occurence of same variables
      */
     @Override
-    Term copy(AbstractMap<Var,Var> vMap, int idExecCtx) {
+    PTerm copy(AbstractMap<Var,Var> vMap, int idExecCtx) {
         Struct t = new Struct(arity);
         t.resolved  = resolved;
         t.name      = name;
         t.predicateIndicator   = predicateIndicator;
         t.primitive = primitive;
         final int arity = this.arity;
-        Term[] targ = t.arg;
-        Term[] arg = this.arg;
+        PTerm[] targ = t.arg;
+        PTerm[] arg = this.arg;
         for (int c = 0;c < arity;c++) {
             targ[c] = arg[c].copy(vMap, idExecCtx);
         }
@@ -465,14 +465,14 @@ public class Struct extends Term {
      * @param vMap is needed for register occurence of same variables
      */
     @Override
-    Term copy(AbstractMap<Var,Var> vMap, AbstractMap<Term,Var> substMap) {
+    PTerm copy(AbstractMap<Var,Var> vMap, AbstractMap<PTerm,Var> substMap) {
         Struct t = new Struct(arity);
         t.resolved  = false;
         t.name      = name;
         t.predicateIndicator   = predicateIndicator;
         t.primitive = null;
-        Term[] thatArg = t.arg;
-        Term[] thisArg = this.arg;
+        PTerm[] thatArg = t.arg;
+        PTerm[] thisArg = this.arg;
         final int arity = this.arity;
         for (int c = 0;c < arity;c++) {
             thatArg[c] = thisArg[c].copy(vMap, substMap);
@@ -499,10 +499,10 @@ public class Struct extends Term {
     long resolveTerm(LinkedList<Var> vl,long count) {
         long newcount=count;
 
-        Term[] arg = this.arg;
+        PTerm[] arg = this.arg;
         int arity = this.arity;
         for (int c = 0;c < arity;c++) {
-            Term term= arg[c];
+            PTerm term= arg[c];
             if (term!=null) {
                 //--------------------------------
                 // we want to resolve only not linked variables:
@@ -557,7 +557,7 @@ public class Struct extends Term {
      * If the callee structure is not a list, throws an <code>UnsupportedOperationException</code>
      * </p>
      */
-    public Term listHead() {
+    public PTerm listHead() {
         if (!isList())
             throw new UnsupportedOperationException("The structure " + this + " is not a list.");
         return arg[0].getTerm();
@@ -605,7 +605,7 @@ public class Struct extends Term {
      * If the callee structure is not a list, throws an <code>UnsupportedOperationException</code>
      * </p>
      */
-    public Iterator<? extends Term> listIterator() {
+    public Iterator<? extends PTerm> listIterator() {
         if (!isList())
             throw new UnsupportedOperationException("The structure " + this + " is not a list.");
         return new StructIterator(this);
@@ -618,7 +618,7 @@ public class Struct extends Term {
      */
     Struct toList() {
         Struct t = new Struct();
-        Term[] arg = this.arg;
+        PTerm[] arg = this.arg;
         for(int c = arity - 1;c >= 0;c--) {
             t = new Struct(arg[c].getTerm(),t);
         }
@@ -632,12 +632,12 @@ public class Struct extends Term {
      * If this structure is not a list, null object is returned
      */
     Struct fromList() {
-        Term ft = arg[0].getTerm();
+        PTerm ft = arg[0].getTerm();
         if (!ft.isAtom()) {
             return null;
         }
         Struct at = (Struct) arg[1].getTerm();
-        LinkedList<Term> al = new LinkedList<>();
+        LinkedList<PTerm> al = new LinkedList<>();
         while (!at.isEmptyList()) {
             if (!at.isList()) {
                 return null;
@@ -652,12 +652,12 @@ public class Struct extends Term {
     /**
      * Appends an element to this structure supposed to be a list
      */
-    public void append(Term t) {
+    public void append(PTerm t) {
         if (isEmptyList()) {
             name = ".";
             arity = 2;
                         predicateIndicator = name + '/' + arity; /* Added by Paolo Contessi */
-            arg = new Term[arity];
+            arg = new PTerm[arity];
             arg[0] = t; arg[1] = new Struct();
         } else if (arg[1].isList()) {
             ((Struct) arg[1]).append(t);
@@ -670,7 +670,7 @@ public class Struct extends Term {
     /**
      * Inserts (at the head) an element to this structure supposed to be a list
      */
-    void insert(Term t) {
+    void insert(PTerm t) {
         Struct co=new Struct();
         co.arg[0]=arg[0];
         co.arg[1]=arg[1];
@@ -688,15 +688,15 @@ public class Struct extends Term {
      * @return true if the term is unifiable with this one
      */
     @Override
-    boolean unify(List<Var> vl1,List<Var> vl2,Term t) {
+    boolean unify(List<Var> vl1,List<Var> vl2,PTerm t) {
         // In fase di unificazione bisogna annotare tutte le variabili della struct completa.
         t = t.getTerm();
         if (t instanceof Struct) {
             Struct ts = (Struct) t;
             final int arity = this.arity;
             if ( arity == ts.arity && name.equals(ts.name)) {
-                Term[] arg = this.arg;
-                Term[] tsarg = ts.arg;
+                PTerm[] arg = this.arg;
+                PTerm[] tsarg = ts.arg;
                 for (int c = 0; c < arity;c++) {
                     if (!arg[c].unify(vl1,vl2, tsarg[c])) {
                         return false;
@@ -768,8 +768,8 @@ public class Struct extends Term {
     }
     
     private String toString0() {
-        Term h = arg[0].getTerm();
-        Term t = arg[1].getTerm();
+        PTerm h = arg[0].getTerm();
+        PTerm t = arg[1].getTerm();
         if (t.isList()) {
             Struct tl = (Struct) t;
             if (tl.isEmptyList()) {
@@ -792,8 +792,8 @@ public class Struct extends Term {
             return arg[0].getTerm().toString();
         } else {
             // comma case 
-            Term head = ((Struct)arg[0]).getTerm(0);
-            Term tail = ((Struct)arg[0]).getTerm(1);
+            PTerm head = ((Struct)arg[0]).getTerm(0);
+            PTerm tail = ((Struct)arg[0]).getTerm(1);
             StringBuilder buf = new StringBuilder(head.toString());
             while (tail instanceof Struct && ((Struct)tail).getName().equals(",")){
                 head = ((Struct)tail).getTerm(0);
@@ -807,8 +807,8 @@ public class Struct extends Term {
     }
     
     private String toStringAsList(OperatorManager op) {
-        Term h = arg[0];
-        Term t = arg[1].getTerm();
+        PTerm h = arg[0];
+        PTerm t = arg[1].getTerm();
         if (t.isList()) {
             Struct tl = (Struct)t;
             if (tl.isEmptyList()){
@@ -905,7 +905,7 @@ public class Struct extends Term {
     }
     
     @Override
-    public Term iteratedGoalTerm() {
+    public PTerm iteratedGoalTerm() {
         return ((arity == 2) && name.equals("^")) ?
                 getTerm(1).iteratedGoalTerm() : super.iteratedGoalTerm();
     }

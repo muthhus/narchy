@@ -108,7 +108,7 @@ public abstract class Library implements Serializable, IPrimitives {
      * The runtime (demonstration) context currently used by the engine
      * is deployed and altered.
      */
-    protected boolean unify(Term a0,Term a1) {
+    protected boolean unify(PTerm a0, PTerm a1) {
         return engine.unify(a0,a1);
     }
     
@@ -118,7 +118,7 @@ public abstract class Library implements Serializable, IPrimitives {
      * The runtime (demonstration) context currently used by the engine
      * is deployed and altered.
      */
-    protected boolean match(Term a0,Term a1) {
+    protected boolean match(PTerm a0, PTerm a1) {
         return engine.match(a0,a1);
     }
     
@@ -131,10 +131,10 @@ public abstract class Library implements Serializable, IPrimitives {
      * is deployed and altered.
      * @throws Throwable 
      */
-    protected Term evalExpression(Term term) throws Throwable {
+    protected PTerm evalExpression(PTerm term) throws Throwable {
         if (term == null)
             return null;
-        Term val = term.getTerm();
+        PTerm val = term.getTerm();
         if (val instanceof Struct) {
             Struct t = (Struct) val;
             if (term != t)
@@ -163,7 +163,7 @@ public abstract class Library implements Serializable, IPrimitives {
      * method invoked when the engine is going
      * to demonstrate a goal
      */
-    public void onSolveBegin(Term goal) {}
+    public void onSolveBegin(PTerm goal) {}
     
     /**
      * method invoked when the engine has
@@ -217,7 +217,7 @@ public abstract class Library implements Serializable, IPrimitives {
                         if (clist.length == arity) {
                             boolean valid = true;
                             for (int j=0; j<arity; j++) {
-                                if (!(Term.class.isAssignableFrom(clist[j]))) {
+                                if (!(PTerm.class.isAssignableFrom(clist[j]))) {
                                     valid = false;
                                     break;
                                 }

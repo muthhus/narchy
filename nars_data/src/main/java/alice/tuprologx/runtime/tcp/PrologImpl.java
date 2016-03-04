@@ -60,7 +60,7 @@ public class PrologImpl implements java.io.Serializable {
     }
 
     public void solveTerm(ObjectInputStream in,ObjectOutputStream out)  throws Exception {
-        Term th=(Term)in.readObject();
+        PTerm th=(PTerm)in.readObject();
         SolveInfo info=core.solve(th);
         out.writeObject(new Boolean(true));
         out.writeObject(info);

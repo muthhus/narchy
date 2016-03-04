@@ -56,7 +56,7 @@ class ClauseDatabase extends HashMap<String,FamilyClausesList> implements Iterab
 	 * @param headt The goal
 	 * @return  The list of matching-compatible predicates
 	 */
-	List<ClauseInfo> getPredicates(Term headt) {
+	List<ClauseInfo> getPredicates(PTerm headt) {
 		FamilyClausesList family = get(((Struct) headt).getPredicateIndicator());
 		if (family == null){
 			return new ReadOnlyLinkedList<>();

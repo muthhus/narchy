@@ -30,7 +30,7 @@ import java.util.*;
  *
  * Reviewed by Paolo Contessi: implements Comparable<Number>
  */
-public abstract class Number extends Term implements Comparable<Number> {
+public abstract class Number extends PTerm implements Comparable<Number> {
 	private static final long serialVersionUID = 1L;
     
     /**
@@ -95,7 +95,7 @@ public abstract class Number extends Term implements Comparable<Number> {
     public abstract boolean isLong();
     
     public static Number createNumber(String s) {
-        Term t = Term.createTerm(s);
+        PTerm t = PTerm.createTerm(s);
         if (t instanceof Number)
             return (Number) t;
         throw new InvalidTermException("Term " + t + " is not a number.");
@@ -105,7 +105,7 @@ public abstract class Number extends Term implements Comparable<Number> {
      * Gets the actual term referred by this Term.
      */
     @Override
-    public Term getTerm() {
+    public PTerm getTerm() {
         return this;
     }
     
@@ -172,7 +172,7 @@ public abstract class Number extends Term implements Comparable<Number> {
     /**
      * gets a copy of this term.
      */
-    public Term copy(int idExecCtx) {
+    public PTerm copy(int idExecCtx) {
         return this;
     }
     
@@ -183,7 +183,7 @@ public abstract class Number extends Term implements Comparable<Number> {
      * (if empty list then no renaming)
      */
     @Override
-    Term copy(AbstractMap<Var,Var> vMap, int idExecCtx) {
+    PTerm copy(AbstractMap<Var,Var> vMap, int idExecCtx) {
         return this;
     }
     
@@ -191,7 +191,7 @@ public abstract class Number extends Term implements Comparable<Number> {
      * gets a copy of the term.
      */
     @Override
-    Term copy(AbstractMap<Var,Var> vMap, AbstractMap<Term,Var> substMap) {
+    PTerm copy(AbstractMap<Var,Var> vMap, AbstractMap<PTerm,Var> substMap) {
         return this;
     }
     

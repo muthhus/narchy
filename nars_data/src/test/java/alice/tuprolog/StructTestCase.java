@@ -6,7 +6,7 @@ public class StructTestCase extends TestCase {
 	
 	public void testStructWithNullArgument() {
 		try {
-			new Struct("p", (Term) null);
+			new Struct("p", (PTerm) null);
 			fail();
 		} catch (InvalidTermException expected) {}
 		try {
@@ -34,7 +34,7 @@ public class StructTestCase extends TestCase {
 			fail();
 		} catch (InvalidTermException expected) {}
 		try {
-			Term[] args = new Term[] {new Struct("a"), null, new Var("P")};
+			PTerm[] args = new PTerm[] {new Struct("a"), null, new Var("P")};
 			new Struct("p", args);
 			fail();
 		} catch (InvalidTermException expected) {}
@@ -94,9 +94,9 @@ public class StructTestCase extends TestCase {
 	}
 	
 	public void testListFromArgumentArray() {
-		assertEquals(new Struct(), new Struct(new Term[0]));
+		assertEquals(new Struct(), new Struct(new PTerm[0]));
 		
-		Term[] args = new Term[2];
+		PTerm[] args = new PTerm[2];
 		args[0] = new Struct("a");
 		args[1] = new Struct("b");
 		Struct list = new Struct(args);
@@ -209,7 +209,7 @@ public class StructTestCase extends TestCase {
 		assertTrue(emptyList.isAtomic());
 		Struct atom = new Struct("atom");
 		assertTrue(atom.isAtomic());
-		Struct list = new Struct(new Term[] {new Int(0), new Int(1)});
+		Struct list = new Struct(new PTerm[] {new Int(0), new Int(1)});
 		assertFalse(list.isAtomic());
 		Struct compound = new Struct("f", new Struct("a"), new Struct("b"));
 		assertFalse(compound.isAtomic());
@@ -224,7 +224,7 @@ public class StructTestCase extends TestCase {
 		assertTrue(emptyList.isAtom());
 		Struct atom = new Struct("atom");
 		assertTrue(atom.isAtom());
-		Struct list = new Struct(new Term[] {new Int(0), new Int(1)});
+		Struct list = new Struct(new PTerm[] {new Int(0), new Int(1)});
 		assertFalse(list.isAtom());
 		Struct compound = new Struct("f", new Struct("a"), new Struct("b"));
 		assertFalse(compound.isAtom());
@@ -239,7 +239,7 @@ public class StructTestCase extends TestCase {
 		assertFalse(emptyList.isCompound());
 		Struct atom = new Struct("atom");
 		assertFalse(atom.isCompound());
-		Struct list = new Struct(new Term[] {new Int(0), new Int(1)});
+		Struct list = new Struct(new PTerm[] {new Int(0), new Int(1)});
 		assertTrue(list.isCompound());
 		Struct compound = new Struct("f", new Struct("a"), new Struct("b"));
 		assertTrue(compound.isCompound());

@@ -5,7 +5,7 @@ import junit.framework.TestCase;
 public class BuiltInTestCase extends TestCase {
 	
 	public void testConvertTermToGoal() throws InvalidTermException {
-		Term t = new Var("T");
+		PTerm t = new Var("T");
 		Struct result = new Struct("call", t);
 		assertEquals(result, BuiltIn.convertTermToGoal(t));
 		assertEquals(result, BuiltIn.convertTermToGoal(new Struct("call", t)));
@@ -19,8 +19,8 @@ public class BuiltInTestCase extends TestCase {
 		
 		Var linked = new Var("X");
 		linked.setLink(new Struct("!"));
-		Term[] arguments = new Term[] { linked, new Var("Y") };
-		Term[] results = new Term[] { new Struct("!"), new Struct("call", new Var("Y")) };
+		PTerm[] arguments = new PTerm[] { linked, new Var("Y") };
+		PTerm[] results = new PTerm[] { new Struct("!"), new Struct("call", new Var("Y")) };
 		assertEquals(new Struct(";", results), BuiltIn.convertTermToGoal(new Struct(";", arguments)));
 		assertEquals(new Struct(",", results), BuiltIn.convertTermToGoal(new Struct(",", arguments)));
 		assertEquals(new Struct("->", results), BuiltIn.convertTermToGoal(new Struct("->", arguments)));

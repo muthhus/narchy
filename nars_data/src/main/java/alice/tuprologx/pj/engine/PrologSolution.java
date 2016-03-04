@@ -9,6 +9,7 @@
 
 package alice.tuprologx.pj.engine;
 
+import alice.tuprolog.PTerm;
 import alice.tuprologx.pj.model.*;
 import alice.tuprolog.UnknownVarException;
 import java.util.List;
@@ -28,13 +29,13 @@ public class PrologSolution<Q extends Term<?>, S extends Term<?>> /*implements I
     }
 
     public <Z extends Term<?>> Z getVarValue(String varName) throws alice.tuprolog.NoSolutionException {
-        alice.tuprolog.Term retValue;        
+        PTerm retValue;
         retValue = _solveInfo.getVarValue(varName);
         return Term.unmarshal(retValue);
     }
 
     public <Z extends Term<?>> Z getTerm(String varName) throws alice.tuprolog.NoSolutionException, UnknownVarException {
-        alice.tuprolog.Term retValue;                
+        PTerm retValue;
         retValue = _solveInfo.getTerm(varName);
         return Term.unmarshal(retValue);
     }
@@ -52,13 +53,13 @@ public class PrologSolution<Q extends Term<?>, S extends Term<?>> /*implements I
     }
 
     public S getSolution() throws alice.tuprolog.NoSolutionException {
-        alice.tuprolog.Term retValue;        
+        PTerm retValue;
         retValue = _solveInfo.getSolution();
         return Term.unmarshal(retValue);
     }
 
     public Q getQuery() {
-        alice.tuprolog.Term retValue;        
+        PTerm retValue;
         retValue = _solveInfo.getQuery();
         return Term.unmarshal(retValue);
     }
@@ -67,7 +68,7 @@ public class PrologSolution<Q extends Term<?>, S extends Term<?>> /*implements I
         List<alice.tuprolog.Var> retValue;        
         retValue = _solveInfo.getBindingVars();
         Vector<Term<?>> bindings = new Vector<Term<?>>();
-        for (alice.tuprolog.Term t : retValue) {
+        for (PTerm t : retValue) {
             bindings.add(Term.unmarshal(t));
         }
         return bindings;
