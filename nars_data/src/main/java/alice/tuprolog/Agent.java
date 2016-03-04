@@ -22,6 +22,8 @@ import java.io.*;
 import alice.util.Tools;
 import alice.tuprolog.event.OutputListener;
 
+import static sun.jvm.hotspot.runtime.PerfMemory.start;
+
 /**
  * Provides a prolog virtual machine embedded in a separate thread.
  * It needs a theory and optionally a goal.
@@ -30,9 +32,8 @@ import alice.tuprolog.event.OutputListener;
  * @see alice.tuprolog.Prolog
  *
  */
-public class Agent {
+public class Agent extends Prolog {
     
-    private final Prolog core;
     private String theoryText;
     private InputStream theoryInputStream;
     private String goalText;
@@ -48,18 +49,18 @@ public class Agent {
      */
     public Agent(String theory){
         theoryText=theory;
-        core=new Prolog();
-        core.addOutputListener(defaultOutputListener);
+        addOutputListener(defaultOutputListener);
     }
     
     /**
      * Builds a prolog agent providing it a theory and a goal
      */
     public Agent(String theory,String goal){
+
         theoryText=theory;
         goalText=goal;
-        core=new Prolog();
-        core.addOutputListener(defaultOutputListener);
+
+        addOutputListener(defaultOutputListener);
     }
     
     /**
@@ -68,8 +69,7 @@ public class Agent {
      */
     public Agent(InputStream is){
         theoryInputStream=is;
-        core=new Prolog();
-        core.addOutputListener(defaultOutputListener);
+        addOutputListener(defaultOutputListener);
     }
     
     /**
@@ -79,15 +79,28 @@ public class Agent {
     public Agent(InputStream is,String goal){
         theoryInputStream=is;
         goalText=goal;
-        core=new Prolog();
-        core.addOutputListener(defaultOutputListener);
+        addOutputListener(defaultOutputListener);
     }
     
     /**
-     * Starts agent execution
+     * Starts agent execution in another thread
      */
-    final  public void spawn(){
-        new Agent.AgentThread(this).start();
+    final public AgentThread spawn(){
+        AgentThread t = new AgentThread(this);
+        t.start();
+        return t;
+    }
+
+
+    /**
+     * Starts agent execution in current thread
+     */
+    public SolveInfo run() {
+        return body();
+    }
+    public SolveInfo run(String goal) {
+        this.goalText = goal;
+        return run();
     }
     
     /**
@@ -96,7 +109,7 @@ public class Agent {
      * @param l the listener
      */
     public synchronized void addOutputListener(OutputListener l) {
-        core.addOutputListener(l);
+        addOutputListener(l);
     }
     
     /**
@@ -105,31 +118,32 @@ public class Agent {
      * @param l the listener
      */
     public synchronized void removeOutputListener(OutputListener l) {
-        core.removeOutputListener(l);
+        removeOutputListener(l);
     }
     
     /**
      * Removes all output event listeners
      */
     public void removeAllOutputListener(){
-        core.removeAllOutputListeners();
+        removeAllOutputListeners();
     }
     
     
-    private void body(){
+    private SolveInfo body(){
         try {
-            if (theoryText==null){
-                core.setTheory(new Theory(theoryInputStream));
-            } else {
-                core.setTheory(new Theory(theoryText));
-            }
+
+            setTheory( (theoryText==null) ?
+                new Theory(theoryInputStream) :
+                new Theory(theoryText));
+
             if (goalText!=null){
-                core.solve(goalText);
+                return solve(goalText);
             }
         } catch (Exception ex){
             System.err.println("invalid theory or goal.");
             ex.printStackTrace();
         }
+        return null;
     }
     
     

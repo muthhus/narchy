@@ -450,8 +450,11 @@ public class Struct extends Term {
         t.name      = name;
         t.predicateIndicator   = predicateIndicator;
         t.primitive = primitive;
+        final int arity = this.arity;
+        Term[] targ = t.arg;
+        Term[] arg = this.arg;
         for (int c = 0;c < arity;c++) {
-            t.arg[c] = arg[c].copy(vMap, idExecCtx);
+            targ[c] = arg[c].copy(vMap, idExecCtx);
         }
         return t;
     }

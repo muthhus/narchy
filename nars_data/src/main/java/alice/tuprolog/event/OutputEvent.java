@@ -38,6 +38,13 @@ public class OutputEvent extends EventObject {
         msg=msg_;
     }
 
+    @Override
+    public String toString() {
+        return "OutputEvent{" +
+                msg +
+                '}';
+    }
+
     public String getMsg(){
         return msg;
     }

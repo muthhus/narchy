@@ -78,8 +78,7 @@ class Flag implements java.io.Serializable {
     public boolean isValidValue(Term value) {
         java.util.Iterator<? extends Term> it=valueList.listIterator();
         while (it.hasNext()) {
-            Term t= it.next();
-            if (value.match(t)) {
+            if (value.match(it.next())) {
                 return true;
             }
         }

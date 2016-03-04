@@ -546,6 +546,8 @@ public final class BuiltIn extends Library {
 		 if (priority < OperatorManager.OP_LOW || priority > OperatorManager.OP_HIGH)
 			 throw PrologError.domain_error(engineManager, 1, "operator_priority", arg0);
 		 String specifier = ((Struct) arg1).getName();
+
+		 //TODO replace with switch
 		 if (!specifier.equals("fx") && !specifier.equals("fy")
 				 && !specifier.equals("xf") && !specifier.equals("yf")
 				 && !specifier.equals("xfx") && !specifier.equals("yfx")

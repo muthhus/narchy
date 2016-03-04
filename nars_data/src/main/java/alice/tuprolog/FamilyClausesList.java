@@ -275,7 +275,7 @@ class FamilyClausesList extends LinkedList<ClauseInfo> {
 	// Updates indexes, deleting informations about the last removed clause
 	public void unregister(ClauseInfo ci) {
 		Term clause = ci.getHead();
-		if(clause instanceof Struct){
+		if(clause != null){
 			Struct g = (Struct) clause.getTerm();
 
 			if(g.getArity() == 0){

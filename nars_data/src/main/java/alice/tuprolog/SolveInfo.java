@@ -207,7 +207,7 @@ public class SolveInfo implements Serializable/*, ISolution<Term,Term,Term>*/  {
             return st.toString().trim();
         } else {
         	/*Castagna 06/2011*/
-            return endState == EngineRunner.HALT ? "halt." : "no.";
+            return endState == EngineRunner.HALT ? Term.HALT : Term.NO;
         }
     }
     

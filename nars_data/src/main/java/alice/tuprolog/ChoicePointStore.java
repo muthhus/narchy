@@ -42,22 +42,38 @@ public class ChoicePointStore {
         return pointer;
     }
     
+//    /**
+//     * Check if a choice point exists in the store.
+//     * As a side effect, removes choice points which have been already used and are now empty.
+//     * @return
+//     */
+//    protected boolean existChoicePoint() {
+//        ChoicePointContext pointer = this.pointer;
+//        if (pointer == null)
+//            return false;
+//        do {
+//            if (pointer.compatibleGoals.existCompatibleClause())
+//                return true;
+//        } while ((pointer = pointer.prevChoicePointContext) != null);
+//        return false;
+//    }
     /**
      * Check if a choice point exists in the store.
-     * As a side effect, removes choice points which have been already used and are now empty. 
+     * As a side effect, removes choice points which have been already used and are now empty.
      * @return
      */
     protected boolean existChoicePoint() {
+        ChoicePointContext pointer = this.pointer;
         if (pointer == null) return false;
-        ClauseStore clauses;
         do {
-            clauses = pointer.compatibleGoals;
-            if (clauses.existCompatibleClause()) return true;
-            pointer = pointer.prevChoicePointContext;
-        } while (pointer != null);            
+            if (pointer.compatibleGoals.existCompatibleClause())
+                return true;
+            this.pointer = pointer = pointer.prevChoicePointContext;
+        } while (pointer != null);
         return false;
     }
-    
+
+
     /**
      * Removes choice points which have been already used and are now empty.
      */

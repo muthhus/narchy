@@ -38,8 +38,11 @@ public abstract class Term implements Serializable {
 
     // true and false constants
     public static final Term TRUE  = new Struct("true");
-    public static final Term FALSE = new Struct("false");    
-    
+    public static final Term FALSE = new Struct("false");
+    public static final String HALT = "halt.";
+    public static final String NO = "no.";
+    public static final String YES = "yes.";
+
     // checking type and properties of the Term
     
     /**
