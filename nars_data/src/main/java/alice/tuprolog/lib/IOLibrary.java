@@ -122,7 +122,7 @@ public class IOLibrary extends Library {
     
     /************************************************************/
     
-    public boolean see_1(PTerm arg) throws PrologError {
+    public boolean see_1(Term arg) throws PrologError {
         arg = arg.getTerm();
         if (arg instanceof Var)
             throw PrologError.instantiation_error(engine.getEngineManager(), 1);
@@ -166,11 +166,11 @@ public class IOLibrary extends Library {
         return true;
     }
 
-    public boolean seeing_1(PTerm t) {
+    public boolean seeing_1(Term t) {
         return unify(t, new Struct(inputStreamName));
     }
 
-    public boolean tell_1(PTerm arg) throws PrologError {
+    public boolean tell_1(Term arg) throws PrologError {
         arg = arg.getTerm();
         if (arg instanceof Var)
             throw PrologError.instantiation_error(engine.getEngineManager(), 1);
@@ -213,11 +213,11 @@ public class IOLibrary extends Library {
         return true;
     }
 
-    public boolean telling_1(PTerm arg0) {
+    public boolean telling_1(Term arg0) {
         return unify(arg0, new Struct(outputStreamName));
     }
 
-    public boolean put_1(PTerm arg) throws PrologError {
+    public boolean put_1(Term arg) throws PrologError {
         arg = arg.getTerm();
         if (arg instanceof Var)
             throw PrologError.instantiation_error(engine.getEngineManager(), 1);
@@ -248,7 +248,7 @@ public class IOLibrary extends Library {
         }
     }
 
-    public boolean get0_1(PTerm arg0) throws PrologError {
+    public boolean get0_1(Term arg0) throws PrologError {
         int ch = -2;
         try {
             ch = inputStream.read();
@@ -260,7 +260,7 @@ public class IOLibrary extends Library {
         return ch == -1 ? unify(arg0, new Int(-1)) : unify(arg0, new Struct(Character.toString((char) ch)));
     }
 
-    public boolean get_1(PTerm arg0) throws PrologError {
+    public boolean get_1(Term arg0) throws PrologError {
         int ch = 0;
         do {
             try {
@@ -275,7 +275,7 @@ public class IOLibrary extends Library {
                 new Struct(Character.toString(((char) ch))));
     }
 
-    public boolean tab_1(PTerm arg) throws PrologError {
+    public boolean tab_1(Term arg) throws PrologError {
         arg = arg.getTerm();
         if (arg instanceof Var)
             throw PrologError.instantiation_error(engine.getEngineManager(), 1);
@@ -303,7 +303,7 @@ public class IOLibrary extends Library {
         return true;
     }
 
-    public boolean read_1(PTerm arg0) throws PrologError {
+    public boolean read_1(Term arg0) throws PrologError {
         arg0 = arg0.getTerm();
         int ch = 0;
 
@@ -354,7 +354,7 @@ public class IOLibrary extends Library {
         return true;
     }
 
-    public boolean write_1(PTerm arg0) throws PrologError {
+    public boolean write_1(Term arg0) throws PrologError {
         arg0 = arg0.getTerm();
         if (arg0 instanceof Var)
             throw PrologError.instantiation_error(engine.getEngineManager(), 1);
@@ -372,7 +372,7 @@ public class IOLibrary extends Library {
         return true;
     }
 
-    public boolean print_1(PTerm arg0) throws PrologError {
+    public boolean print_1(Term arg0) throws PrologError {
         arg0 = arg0.getTerm();
         if (arg0 instanceof Var)
             throw PrologError.instantiation_error(engine.getEngineManager(), 1);
@@ -416,7 +416,7 @@ public class IOLibrary extends Library {
      * 
      * @throws PrologError
      */
-    public boolean text_from_file_2(PTerm file_name, PTerm text)
+    public boolean text_from_file_2(Term file_name, Term text)
             throws PrologError {
         file_name = file_name.getTerm();
         if (file_name instanceof Var)
@@ -447,7 +447,7 @@ public class IOLibrary extends Library {
      * @param seed Seed to use
      * @return true if seed Term has a valid long value, false otherwise
      */
-    public boolean set_seed_1(PTerm t) throws PrologError {
+    public boolean set_seed_1(Term t) throws PrologError {
         t = t.getTerm();
         if( !(t instanceof Number) ) {
             throw PrologError.type_error(engine.getEngineManager(), 1, "Integer Number", t);
@@ -460,11 +460,11 @@ public class IOLibrary extends Library {
         return true;
     }
 
-    public boolean rand_float_1(PTerm t) {
+    public boolean rand_float_1(Term t) {
         return unify(t, new alice.tuprolog.Double(gen.nextFloat()));
     }
 
-    public boolean rand_int_2(PTerm argNum, PTerm num) {
+    public boolean rand_int_2(Term argNum, Term num) {
         alice.tuprolog.Number arg = (alice.tuprolog.Number) argNum.getTerm();
         return unify(num, new Int(gen.nextInt(arg.intValue())));
     }
@@ -479,7 +479,7 @@ public class IOLibrary extends Library {
 
     // Java guards for Prolog predicates
 
-    public boolean solve_file_goal_guard_2(PTerm arg0, PTerm arg1)
+    public boolean solve_file_goal_guard_2(Term arg0, Term arg1)
             throws PrologError {
         arg0 = arg0.getTerm();
         arg1 = arg1.getTerm();
@@ -522,7 +522,7 @@ public class IOLibrary extends Library {
     }
     
 
-    public boolean write_base_1(PTerm arg0) throws PrologError {
+    public boolean write_base_1(Term arg0) throws PrologError {
         arg0 = arg0.getTerm();
         
         if (arg0 instanceof Var)

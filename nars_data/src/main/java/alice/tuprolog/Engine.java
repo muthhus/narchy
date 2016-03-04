@@ -28,7 +28,7 @@ public class Engine /*Castagna 06/2011*/implements IEngine/**/{
 
 	//PrintStream log;
 	State  nextState;
-	PTerm query;
+	Term   query;
 	Struct startGoal;
 	Collection<Var> goalVars;
 	int    nDemoSteps;
@@ -40,7 +40,7 @@ public class Engine /*Castagna 06/2011*/implements IEngine/**/{
 	EngineRunner manager;
 
 
-	public Engine(EngineRunner manager, PTerm query) {
+	public Engine(EngineRunner manager, Term query) {
 		this.manager = manager;        
 		this.nextState = manager.INIT;
 		this.query = query;
@@ -89,7 +89,7 @@ public class Engine /*Castagna 06/2011*/implements IEngine/**/{
 	 * Methods for spyListeners
 	 */
 
-	public PTerm getQuery() {
+	public Term getQuery() {
 		return query;
 	}
 

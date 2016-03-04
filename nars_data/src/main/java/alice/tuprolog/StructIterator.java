@@ -24,7 +24,7 @@ import java.util.NoSuchElementException;
  *
  * @see Struct
  */
-class StructIterator implements java.util.Iterator<PTerm>, java.io.Serializable {
+class StructIterator implements java.util.Iterator<Term>, java.io.Serializable {
 	private static final long serialVersionUID = 1L;
     Struct list;
     
@@ -38,13 +38,13 @@ class StructIterator implements java.util.Iterator<PTerm>, java.io.Serializable 
     }
     
     @Override
-    public PTerm next() {
+    public Term next() {
         if (list.isEmptyList())
             throw new NoSuchElementException();
         // Using Struct#getTerm(int) instead of Struct#listHead and Struct#listTail
         // to avoid redundant Struct#isList calls since it is only possible to get
         // a StructIterator on a Struct instance which is already a list.
-        PTerm head = list.getTerm(0);
+        Term head = list.getTerm(0);
         list = (Struct) list.getTerm(1);
         return head;
     }

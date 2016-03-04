@@ -9,7 +9,6 @@
 
 package alice.tuprologx.pj.model;
 
-import alice.tuprolog.PTerm;
 import alice.tuprologx.pj.engine.PJ;
 
 /**
@@ -26,7 +25,7 @@ public class JavaObject<O> extends Term<JavaObject<O>> {
     }
 
     @Override
-    public PTerm marshal() {
+    public alice.tuprolog.Term marshal() {
         return PJ.registerJavaObject(_theObject);
     }
 
@@ -36,7 +35,7 @@ public class JavaObject<O> extends Term<JavaObject<O>> {
         return uncheckedCast(_theObject);
     }
     
-    static boolean matches(PTerm t) {
+    static boolean matches(alice.tuprolog.Term t) {        
         return (t instanceof alice.tuprolog.Struct && PJ.getRegisteredJavaObject((alice.tuprolog.Struct)t) != null);        
     }
     

@@ -74,7 +74,7 @@ public class JavaThrowCatchTestCase extends TestCase {
 		String goal = "java_catch(java_object('java.util.ArrayList', [], l), [(E, true)], (X is 2+3, Y is 3+5)).";
 		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
-		PTerm e = info.getTerm("E");
+		Term e = info.getTerm("E");
 		assertTrue(e instanceof Var);
 		Int x = (Int) info.getTerm("X");
 		assertTrue(x.intValue() == 5);
@@ -98,9 +98,9 @@ public class JavaThrowCatchTestCase extends TestCase {
 		String goal = "java_catch(java_object('Counter', ['MyCounter'], c), [('java.lang.Exception'(Cause, Message, StackTrace), X is 2+3), ('java.lang.ClassNotFoundException'(Cause, Message, StackTrace), Y is 3+5)], true).";
 		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
-		PTerm x = info.getTerm("X");
+		Term x = info.getTerm("X");
 		assertTrue(x instanceof Var);
-		PTerm y = info.getTerm("Y");
+		Term y = info.getTerm("Y");
 		assertTrue(y instanceof Int);
 		assertTrue(((Int) y).intValue() == 8);
 	}

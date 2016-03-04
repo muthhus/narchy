@@ -35,15 +35,16 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
 
-import alice.tuprolog.*;
+import alice.tuprolog.Int;
+import alice.tuprolog.JavaException;
+import alice.tuprolog.Library;
 import alice.tuprolog.Number;
-import alice.tuprolog.PTerm;
+import alice.tuprolog.Struct;
+import alice.tuprolog.Term;
+import alice.tuprolog.Var;
 import alice.util.AbstractDynamicClassLoader;
 import alice.util.InspectionUtils;
 import alice.util.JavaDynamicClassLoader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * 
  * This class represents a tuProlog library enabling the interaction with the
@@ -161,7 +162,7 @@ public class OOLibrary extends Library {
     }
 
     @Override
-    public void onSolveBegin(PTerm goal) {
+    public void onSolveBegin(Term goal) {
         currentObjects.clear();
         currentObjects_inverse.clear();
         Iterator<Map.Entry<Object,Struct>> it = staticObjects_inverse.entrySet().iterator();
@@ -195,7 +196,7 @@ public class OOLibrary extends Library {
      /**
      * Deprecated from tuProlog 3.0 use new_object
      */
-    public boolean java_object_3(PTerm className, PTerm argl, PTerm id) throws JavaException {
+    public boolean java_object_3(Term className, Term argl, Term id) throws JavaException {
     	return new_object_3(className, argl,id);
     }
     
@@ -207,7 +208,7 @@ public class OOLibrary extends Library {
      * @return
      * @throws JavaException
      */
-    public boolean new_object_3(PTerm className, PTerm argl, PTerm id) throws JavaException {
+    public boolean new_object_3(Term className, Term argl, Term id) throws JavaException {
         className = className.getTerm();
         Struct arg = (Struct) argl.getTerm();
         id = id.getTerm();
@@ -237,7 +238,7 @@ public class OOLibrary extends Library {
                 Object[] args_value = args.getValues();
                 Constructor<?> co = lookupConstructor(cl, args.getTypes(),args_value);
                 if (co == null) {
-                    getEngine().logger.warn("Constructor not found: class " + clName);
+                    getEngine().warn("Constructor not found: class " + clName);
                     throw new JavaException(new NoSuchMethodException(
                             "Constructor not found: class " + clName));
                 }
@@ -248,21 +249,21 @@ public class OOLibrary extends Library {
                 else
                     throw new JavaException(new Exception());
             } catch (ClassNotFoundException ex) {
-                getEngine().logger.warn("Java class not found: " + clName);
+                getEngine().warn("Java class not found: " + clName);
                 throw new JavaException(ex);
             } catch (InvocationTargetException ex) {
-                getEngine().logger.warn("Invalid constructor arguments.");
+                getEngine().warn("Invalid constructor arguments.");
                 throw new JavaException(ex);
             } catch (NoSuchMethodException ex) {
-                getEngine().logger.warn("Constructor not found: " + args.getTypes());
+                getEngine().warn("Constructor not found: " + args.getTypes());
                 throw new JavaException(ex);
             } catch (InstantiationException ex) {
-                getEngine().logger.warn(
+                getEngine().warn(
                         "Objects of class " + clName
                                 + " cannot be instantiated");
                 throw new JavaException(ex);
             } catch (IllegalArgumentException ex) {
-                getEngine().logger.warn("Illegal constructor arguments  " + args);
+                getEngine().warn("Illegal constructor arguments  " + args);
                 throw new JavaException(ex);
             }
         } catch (Exception ex) {
@@ -281,7 +282,7 @@ public class OOLibrary extends Library {
      * @throws JavaException, Exception
      */
     @SuppressWarnings("unchecked")
-	public <T> boolean new_lambda_3(PTerm interfaceName, PTerm implementation, PTerm id)throws JavaException,Exception {
+	public <T> boolean new_lambda_3(Term interfaceName, Term implementation, Term id)throws JavaException,Exception { 
     	try {
     		counter++;
     		String target_class=(interfaceName.toString()).substring(1, interfaceName.toString().length()-1);
@@ -321,7 +322,7 @@ public class OOLibrary extends Library {
      * 
      * @throws JavaException
      */
-    public boolean destroy_object_1(PTerm id) throws JavaException {
+    public boolean destroy_object_1(Term id) throws JavaException {
         id = id.getTerm();
         try {
             if (id.isGround()) {
@@ -338,7 +339,7 @@ public class OOLibrary extends Library {
      * 
      * @throws JavaException
      */
-    public boolean java_class_4(PTerm clSource, PTerm clName, PTerm clPathes, PTerm id) throws JavaException {
+    public boolean java_class_4(Term clSource, Term clName, Term clPathes,Term id) throws JavaException {
     	return new_class_4(clSource,  clName,  clPathes, id);
     }
     
@@ -351,7 +352,7 @@ public class OOLibrary extends Library {
      * @return boolean: true if created false otherwise
      * @throws JavaException
      */
-	public boolean new_class_4(PTerm clSource, PTerm clName, PTerm clPathes, PTerm id) throws JavaException {
+	public boolean new_class_4(Term clSource, Term clName, Term clPathes,Term id) throws JavaException {
 		Struct classSource = (Struct) clSource.getTerm();
 		Struct className = (Struct) clName.getTerm();
 		Struct classPathes = (Struct) clPathes.getTerm();
@@ -360,7 +361,7 @@ public class OOLibrary extends Library {
             String fullClassName = alice.util.Tools.removeApices(className.toString());
 
             String fullClassPath = fullClassName.replace('.', '/');
-            Iterator<? extends PTerm> it = classPathes.listIterator();
+            Iterator<? extends Term> it = classPathes.listIterator();
             String cp = "";
             while (it.hasNext()) {
                 if (cp.length() > 0) {
@@ -379,8 +380,8 @@ public class OOLibrary extends Library {
                 file.write(text);
                 file.close();
             } catch (IOException ex) {
-                getEngine().logger.warn("Compilation of java sources failed");
-                getEngine().logger.warn(
+                getEngine().warn("Compilation of java sources failed");
+                getEngine().warn(
                         "(creation of " + fullClassPath + ".java fail failed)");
                 throw new JavaException(ex);
             }
@@ -390,14 +391,14 @@ public class OOLibrary extends Library {
                 Process jc = Runtime.getRuntime().exec(cmd);
                 int res = jc.waitFor();
                 if (res != 0) {
-                    getEngine().logger.warn("Compilation of java sources failed");
-                    getEngine().logger.warn(
+                    getEngine().warn("Compilation of java sources failed");
+                    getEngine().warn(
                             "(java compiler (javac) has stopped with errors)");
                     throw new IOException("Compilation of java sources failed");
                 }
             } catch (IOException ex) {
-                getEngine().logger.warn("Compilation of java sources failed");
-                getEngine().logger.warn("(java compiler (javac) invocation failed)");
+                getEngine().warn("Compilation of java sources failed");
+                getEngine().warn("(java compiler (javac) invocation failed)");
                 throw new JavaException(ex);
             }
             try 
@@ -417,8 +418,8 @@ public class OOLibrary extends Library {
                 else
                     throw new JavaException(new Exception());
             } catch (ClassNotFoundException ex) {
-                getEngine().logger.warn("Compilation of java sources failed");
-                getEngine().logger.warn(
+                getEngine().warn("Compilation of java sources failed");
+                getEngine().warn(
                         "(Java Class compiled, but not created: "
                                 + fullClassName + " )");
                 throw new JavaException(ex);
@@ -435,7 +436,7 @@ public class OOLibrary extends Library {
 	 * @throws JavaException
 	 * 
 	 */
-	public boolean java_call_3(PTerm objId, PTerm method_name, PTerm idResult)
+	public boolean java_call_3(Term objId, Term method_name, Term idResult)
 			throws JavaException {
 		objId = objId.getTerm();
 		idResult = idResult.getTerm();
@@ -483,11 +484,11 @@ public class OOLibrary extends Library {
 						m.setAccessible(true);
 						res = m.invoke(obj, args_values);
 					} catch (IllegalAccessException ex) {
-						getEngine().logger.warn("Method invocation failed: " + methodName+ "( signature: " + args + " )");
+						getEngine().warn("Method invocation failed: " + methodName+ "( signature: " + args + " )");
 						throw new JavaException(ex);
 					}
 				} else {
-					getEngine().logger.warn("Method not found: " + methodName + "( signature: "+ args + " )");
+					getEngine().warn("Method not found: " + methodName + "( signature: "+ args + " )");
 					throw new JavaException(new NoSuchMethodException("Method not found: " + methodName + "( signature: "+ args + " )"));
 				}
 			} else {
@@ -506,7 +507,7 @@ public class OOLibrary extends Library {
 						} catch (ClassNotFoundException ex) {
 							// if not found even as a class id -> consider as a
 							// String object value
-							getEngine().logger.warn("Unknown class.");
+							getEngine().warn("Unknown class.");
 							throw new JavaException(ex);
 						}
 					}
@@ -529,23 +530,24 @@ public class OOLibrary extends Library {
 			else
 				throw new JavaException(new Exception());
 		} catch (InvocationTargetException ex) {
-			getEngine().logger.warn(
+			getEngine().warn(
 					"Method failed: " + methodName + " - ( signature: " + args
 					+ " ) - Original Exception: "
 					+ ex.getTargetException());
 			throw new JavaException(new IllegalArgumentException());
 		} catch (NoSuchMethodException ex) {
-			getEngine().logger.warn(
+			getEngine().warn(
 					"Method not found: " + methodName + " - ( signature: "
 							+ args + " )");
 			throw new JavaException(ex);
 		} catch (IllegalArgumentException ex) {
-			getEngine().logger.warn(
+			getEngine().warn(
 					"Invalid arguments " + args + " - ( method: " + methodName
 					+ " )");
 			throw new JavaException(ex);
 		} catch (Exception ex) {
-			getEngine().logger.warn("Generic error in method invocation " + methodName);
+			getEngine()
+			.warn("Generic error in method invocation " + methodName);
 			throw new JavaException(ex);
 		}
 	}
@@ -558,7 +560,7 @@ public class OOLibrary extends Library {
      * @throws JavaException
      * 
      */
-    public boolean set_classpath_1(PTerm paths) throws JavaException
+    public boolean set_classpath_1(Term paths) throws JavaException
     {
     	try {
     		paths = paths.getTerm();
@@ -570,7 +572,7 @@ public class OOLibrary extends Library {
         	return true;
     	}catch(IllegalArgumentException e)
         {
-        	getEngine().logger.warn("Illegal list of paths " + paths);
+        	getEngine().warn("Illegal list of paths " + paths);
             throw new JavaException(e);
         }
         catch (Exception e) {
@@ -587,7 +589,7 @@ public class OOLibrary extends Library {
      * 
      */
     
-	public boolean get_classpath_1(PTerm paths) throws JavaException
+	public boolean get_classpath_1(Term paths) throws JavaException
     {
     	try {
     		paths = paths.getTerm();
@@ -595,7 +597,7 @@ public class OOLibrary extends Library {
     			throw new IllegalArgumentException();
     		URL[] urls = dynamicLoader.getURLs();
         	String stringURLs = null;
-        	PTerm pathTerm = null;
+        	Term pathTerm = null;
         	if(urls.length > 0)
         	{
 	        	stringURLs = "[";
@@ -610,11 +612,11 @@ public class OOLibrary extends Library {
         	}
         	else
         		stringURLs = "[]";
-        	pathTerm = PTerm.createTerm(stringURLs);
+        	pathTerm = Term.createTerm(stringURLs);
         	return unify(paths, pathTerm);
     	}catch(IllegalArgumentException e)
         {
-        	getEngine().logger.warn("Illegal list of paths " + paths);
+        	getEngine().warn("Illegal list of paths " + paths);
             throw new JavaException(e);
         }
         catch (Exception e) {
@@ -625,7 +627,7 @@ public class OOLibrary extends Library {
     /**
      * set the field value of an object
      */
-    private boolean java_set(PTerm objId, PTerm fieldTerm, PTerm what) {
+    private boolean java_set(Term objId, Term fieldTerm, Term what) {
         what = what.getTerm();
         if (!fieldTerm.isAtom() || what instanceof Var)
             return false;
@@ -644,10 +646,10 @@ public class OOLibrary extends Library {
             		try {
                         cl = Class.forName(clName, true, dynamicLoader);
                     } catch (ClassNotFoundException ex) {
-                        getEngine().logger.warn("Java class not found: " + clName);
+                        getEngine().warn("Java class not found: " + clName);
                         return false;
                     } catch (Exception ex) {
-                        getEngine().logger.warn(
+                        getEngine().warn(
                                 "Static field "
                                         + fieldName
                                         + " not found in class "
@@ -697,7 +699,7 @@ public class OOLibrary extends Library {
             }
             return true;
         } catch (NoSuchFieldException ex) {
-            getEngine().logger.warn(
+            getEngine().warn(
                     "Field " + fieldName + " not found in class " + objId);
             return false;
         } catch (Exception ex) {
@@ -708,7 +710,7 @@ public class OOLibrary extends Library {
     /**
      * get the value of the field
      */
-    private boolean java_get(PTerm objId, PTerm fieldTerm, PTerm what) {
+    private boolean java_get(Term objId, Term fieldTerm, Term what) {
         if (!fieldTerm.isAtom()) {
             return false;
         }
@@ -726,10 +728,10 @@ public class OOLibrary extends Library {
             		try {
                         cl = Class.forName(clName, true, dynamicLoader);
                     } catch (ClassNotFoundException ex) {
-                        getEngine().logger.warn("Java class not found: " + clName);
+                        getEngine().warn("Java class not found: " + clName);
                         return false;
                     } catch (Exception ex) {
-                        getEngine().logger.warn(
+                        getEngine().warn(
                                 "Static field "
                                         + fieldName
                                         + " not found in class "
@@ -771,16 +773,16 @@ public class OOLibrary extends Library {
             }
             
         } catch (NoSuchFieldException ex) {
-            getEngine().logger.warn(
+            getEngine().warn(
                     "Field " + fieldName + " not found in class " + objId);
             return false;
         } catch (Exception ex) {
-            getEngine().logger.warn("Generic error in accessing the field");
+            getEngine().warn("Generic error in accessing the field");
             return false;
         }
     }
     
-    public boolean java_array_set_primitive_3(PTerm obj_id, PTerm i, PTerm what)
+    public boolean java_array_set_primitive_3(Term obj_id, Term i, Term what)
             throws JavaException {
         Struct objId = (Struct) obj_id.getTerm();
         Number index = (Number) i.getTerm();
@@ -899,7 +901,7 @@ public class OOLibrary extends Library {
      * @return
      * @throws JavaException
      */
-    public boolean java_array_get_primitive_3(PTerm obj_id, PTerm i, PTerm what) throws JavaException {
+    public boolean java_array_get_primitive_3(Term obj_id, Term i, Term what) throws JavaException {
         Struct objId = (Struct) obj_id.getTerm();
         Number index = (Number) i.getTerm();
         what = what.getTerm();
@@ -923,14 +925,14 @@ public class OOLibrary extends Library {
             String name = cl.toString();
             switch (name) {
                 case "class [I": {
-                    PTerm value = new Int(Array.getInt(obj, index.intValue()));
+                    Term value = new Int(Array.getInt(obj, index.intValue()));
                     if (unify(what, value))
                         return true;
                     else
                         throw new JavaException(new IllegalArgumentException(what.toString()));
                 }
                 case "class [D": {
-                    PTerm value = new alice.tuprolog.Double(Array.getDouble(obj, index.intValue()));
+                    Term value = new alice.tuprolog.Double(Array.getDouble(obj, index.intValue()));
                     if (unify(what, value))
                         return true;
                     else
@@ -938,7 +940,7 @@ public class OOLibrary extends Library {
                                 .toString()));
                 }
                 case "class [F": {
-                    PTerm value = new alice.tuprolog.Float(Array.getFloat(obj, index
+                    Term value = new alice.tuprolog.Float(Array.getFloat(obj, index
                             .intValue()));
                     if (unify(what, value))
                         return true;
@@ -947,7 +949,7 @@ public class OOLibrary extends Library {
                                 .toString()));
                 }
                 case "class [L": {
-                    PTerm value = new alice.tuprolog.Long(Array.getLong(obj, index
+                    Term value = new alice.tuprolog.Long(Array.getLong(obj, index
                             .intValue()));
                     if (unify(what, value))
                         return true;
@@ -956,7 +958,7 @@ public class OOLibrary extends Library {
                                 .toString()));
                 }
                 case "class [C": {
-                    PTerm value = new Struct(""
+                    Term value = new Struct(""
                             + Array.getChar(obj, index.intValue()));
                     if (unify(what, value))
                         return true;
@@ -967,20 +969,20 @@ public class OOLibrary extends Library {
                 case "class [Z":
                     boolean b = Array.getBoolean(obj, index.intValue());
                     if (b) {
-                        if (unify(what, PTerm.TRUE))
+                        if (unify(what, Term.TRUE))
                             return true;
                         else
                             throw new JavaException(new IllegalArgumentException(
                                     what.toString()));
                     } else {
-                        if (unify(what, PTerm.FALSE))
+                        if (unify(what, Term.FALSE))
                             return true;
                         else
                             throw new JavaException(new IllegalArgumentException(
                                     what.toString()));
                     }
                 case "class [B": {
-                    PTerm value = new Int(Array.getByte(obj, index
+                    Term value = new Int(Array.getByte(obj, index
                             .intValue()));
                     if (unify(what, value))
                         return true;
@@ -989,7 +991,7 @@ public class OOLibrary extends Library {
                                 .toString()));
                 }
                 case "class [S": {
-                    PTerm value = new Int(Array.getInt(obj, index
+                    Term value = new Int(Array.getInt(obj, index
                             .intValue()));
                     if (unify(what, value))
                         return true;
@@ -1007,7 +1009,7 @@ public class OOLibrary extends Library {
 
     }
 
-    private boolean java_array(String type, int nargs, PTerm id) {
+    private boolean java_array(String type, int nargs, Term id) {
         try {
             Object array = null;
             String obtype = type.substring(0, type.length() - 2);
@@ -1084,7 +1086,7 @@ public class OOLibrary extends Library {
     
     private String[] getStringArrayFromStruct(Struct list) {
         String args[] = new String[list.listSize()];
-        Iterator<? extends PTerm> it = list.listIterator();
+        Iterator<? extends Term> it = list.listIterator();
         int count = 0;
         while (it.hasNext()) {
         	String path = alice.util.Tools.removeApices(it.next().toString());
@@ -1111,13 +1113,13 @@ public class OOLibrary extends Library {
         Object[] values = new Object[objs.length];
         Class<?>[] types = new Class[objs.length];
         for (int i = 0; i < objs.length; i++) {
-            if (!parse_arg(values, types, i, (PTerm) objs[i]))
+            if (!parse_arg(values, types, i, (Term) objs[i]))
                 return null;
         }
         return new Signature(values, types);
     }
 
-    private boolean parse_arg(Object[] values, Class<?>[] types, int i, PTerm term) {
+    private boolean parse_arg(Object[] values, Class<?>[] types, int i, Term term) {
         try {
             if (term == null) {
                 values[i] = null;
@@ -1186,7 +1188,7 @@ public class OOLibrary extends Library {
      * 
      */
     private boolean parse_as(Object[] values, Class<?>[] types, int i,
-                             PTerm castWhat, PTerm castTo) {
+            Term castWhat, Term castTo) {
         try {
             if (!(castWhat instanceof Number)) {
                 String castTo_name = alice.util.Tools
@@ -1261,7 +1263,7 @@ public class OOLibrary extends Library {
                         try {
                             types[i] = Class.forName(castTo_name, true, dynamicLoader);
                         } catch (ClassNotFoundException ex) {
-                            getEngine().logger.warn(
+                            getEngine().warn(
                                     "Java class not found: " + castTo_name);
                             return false;
                         }
@@ -1282,13 +1284,13 @@ public class OOLibrary extends Library {
                             types[i] = Integer.TYPE;
                             break;
                         case "long":
-                            types[i] = java.lang.Long.TYPE;
+                            types[i] = Long.TYPE;
                             break;
                         case "float":
-                            types[i] = java.lang.Float.TYPE;
+                            types[i] = Float.TYPE;
                             break;
                         case "double":
-                            types[i] = java.lang.Double.TYPE;
+                            types[i] = Double.TYPE;
                             break;
                         case "boolean":
                             types[i] = Boolean.TYPE;
@@ -1297,7 +1299,7 @@ public class OOLibrary extends Library {
                             try {
                                 types[i] = Class.forName(castTo_name, true, dynamicLoader);
                             } catch (ClassNotFoundException ex) {
-                                getEngine().logger.warn(
+                                getEngine().warn(
                                         "Java class not found: " + castTo_name);
                                 return false;
                             }
@@ -1321,43 +1323,40 @@ public class OOLibrary extends Library {
                         types[i] = Integer.TYPE;
                         break;
                     case "long":
-                        values[i] = new java.lang.Long(num.longValue());
-                        types[i] = java.lang.Long.TYPE;
+                        values[i] = new Long(num.longValue());
+                        types[i] = Long.TYPE;
                         break;
                     case "float":
-                        values[i] = new java.lang.Float(num.floatValue());
-                        types[i] = java.lang.Float.TYPE;
+                        values[i] = new Float(num.floatValue());
+                        types[i] = Float.TYPE;
                         break;
                     case "double":
-                        values[i] = new java.lang.Double(num.doubleValue());
-                        types[i] = java.lang.Double.TYPE;
+                        values[i] = new Double(num.doubleValue());
+                        types[i] = Double.TYPE;
                         break;
                     default:
                         return false;
                 }
             }
         } catch (Exception ex) {
-            getEngine().logger.warn(
+            getEngine().warn(
                     "Casting " + castWhat + " to " + castTo + " failed");
             return false;
         }
         return true;
     }
 
-    final static Logger logger = LoggerFactory.getLogger(OOLibrary.class);
-
     /**
      * parses return value of a method invokation
      */
-    private boolean parseResult(PTerm id, Object obj) {
+    private boolean parseResult(Term id, Object obj) {
         if (obj == null) {
             // return unify(id,Term.TRUE);
             return unify(id, new Var());
         }
         try {
             if (Boolean.class.isInstance(obj)) {
-                return (boolean) obj ? unify(id, PTerm.TRUE) :
-                        unify(id, PTerm.FALSE);
+                return (Boolean) obj ? unify(id, Term.TRUE) : unify(id, Term.FALSE);
             } else if (Byte.class.isInstance(obj)) {
                 return unify(id, new Int(((Byte) obj).intValue()));
             } else if (Short.class.isInstance(obj)) {
@@ -1365,13 +1364,13 @@ public class OOLibrary extends Library {
             } else if (Integer.class.isInstance(obj)) {
                 return unify(id, new Int((Integer) obj));
             } else if (java.lang.Long.class.isInstance(obj)) {
-                return unify(id, new alice.tuprolog.Long((java.lang.Long) obj));
+                return unify(id, new alice.tuprolog.Long((Long) obj));
             } else if (java.lang.Float.class.isInstance(obj)) {
                 return unify(id, new alice.tuprolog.Float(
-                        (java.lang.Float) obj));
+                        (Float) obj));
             } else if (java.lang.Double.class.isInstance(obj)) {
                 return unify(id, new alice.tuprolog.Double(
-                        (java.lang.Double) obj));
+                        (Double) obj));
             } else if (String.class.isInstance(obj)) {
                 return unify(id, new Struct((String) obj));
             } else if (Character.class.isInstance(obj)) {
@@ -1381,14 +1380,13 @@ public class OOLibrary extends Library {
             }
         } catch (Exception ex) {
             // ex.printStackTrace();
-            logger.info("parse {}", ex);
             return false;
         }
     }
 
     private Object[] getArrayFromList(Struct list) {
         Object args[] = new Object[list.listSize()];
-        Iterator<? extends PTerm> it = list.listIterator();
+        Iterator<? extends Term> it = list.listIterator();
         int count = 0;
         while (it.hasNext()) {
             args[count++] = it.next();
@@ -1448,7 +1446,7 @@ public class OOLibrary extends Library {
      * @throws JavaException
      *             if the object id is not valid
      */
-    public boolean register_1(PTerm id) throws JavaException
+    public boolean register_1(Term id) throws JavaException
     {
     	id = id.getTerm();
     	Object obj =  null; 
@@ -1458,7 +1456,7 @@ public class OOLibrary extends Library {
         	return register((Struct)id, obj);
         }catch(InvalidObjectIdException e)
         {
-        	getEngine().logger.warn("Illegal object id " + id.toString());
+        	getEngine().warn("Illegal object id " + id.toString());
             throw new JavaException(e);
         }
     }
@@ -1475,7 +1473,7 @@ public class OOLibrary extends Library {
      * @throws JavaException
      *             if the object id is not valid
      */
-    public boolean unregister_1(PTerm id) throws JavaException
+    public boolean unregister_1(Term id) throws JavaException
     {
     	id = id.getTerm(); 
     	try
@@ -1483,7 +1481,7 @@ public class OOLibrary extends Library {
         	return unregister((Struct)id);
         }catch(InvalidObjectIdException e)
         {
-        	getEngine().logger.warn("Illegal object id " + id.toString());
+        	getEngine().warn("Illegal object id " + id.toString());
             throw new JavaException(e);
         }
     }
@@ -1645,7 +1643,7 @@ public class OOLibrary extends Library {
      * 
      * Term id can be a variable or a ground term.
      */
-    protected boolean bindDynamicObject(PTerm id, Object obj) {
+    protected boolean bindDynamicObject(Term id, Object obj) {
         // null object are considered to _ variable
         if (obj == null) {
             return unify(id, new Var());
@@ -1657,7 +1655,7 @@ public class OOLibrary extends Library {
                 // object already referenced -> unifying terms
                 // referencing the object
                 // log("obj already registered: unify "+id+" "+aKey);
-                return unify(id, (PTerm) aKey);
+                return unify(id, (Term) aKey);
             } else {
                 // object not previously referenced
                 if (id instanceof Var) {
@@ -1962,7 +1960,7 @@ public class OOLibrary extends Library {
                         && pclasses[i].equals(java.lang.Double.TYPE)) {
                     // arg required: a float, arg provided: a double
                     // so we need an explicit conversion...
-                    newvalues[i] = ((java.lang.Double) values[i]).floatValue();
+                    newvalues[i] = ((Double) values[i]).floatValue();
                 } else if (mclasses[i].equals(java.lang.Float.TYPE)
                         && pclasses[i].equals(java.lang.Integer.TYPE)) {
                     // arg required: a float, arg provided: an int

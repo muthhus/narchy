@@ -53,7 +53,7 @@ public class TheoryManager implements Serializable {
 	private ClauseDatabase retractDBase;
 	private Prolog engine;
 	private PrimitiveManager primitiveManager;
-	private Stack<PTerm> startGoalStack;
+	private Stack<Term> startGoalStack;
 	Theory lastConsultedTheory;
 
 	public void initialize(Prolog vm) {
@@ -74,7 +74,7 @@ public class TheoryManager implements Serializable {
 		if (dyn) {
 			dynamicDBase.addFirst(key, d);
 			if (staticDBase.containsKey(key)) {
-				engine.logger.warn("A static predicate with signature {} has been overriden", key);
+				engine.warn("A static predicate with signature " + key + " has been overriden.");
 			}
 		} else
 			staticDBase.addFirst(key, d);
@@ -91,7 +91,7 @@ public class TheoryManager implements Serializable {
 		if (dyn) {
 			dynamicDBase.addLast(key, d);
 			if (staticDBase.containsKey(key)) {
-				engine.logger.warn("A static predicate with signature {} has been overriden", key);
+				engine.warn("A static predicate with signature " + key + " has been overriden.");
 			}
 		} else
 			staticDBase.addLast(key, d);
@@ -177,7 +177,7 @@ public class TheoryManager implements Serializable {
 	 * Reviewed by Paolo Contessi: modified according to new ClauseDatabase
 	 * implementation
 	 */
-	public synchronized List<ClauseInfo> find(PTerm headt) {
+	public synchronized List<ClauseInfo> find(Term headt) {
 		if (headt instanceof Struct) {
 			//String key = ((Struct) headt).getPredicateIndicator();
 			List<ClauseInfo> list = dynamicDBase.getPredicates(headt);
@@ -213,7 +213,7 @@ public class TheoryManager implements Serializable {
 		/**/
 		// iterate all clauses in theory and assert them
 		try {
-			for (Iterator<? extends PTerm> it = theory.iterator(engine); it.hasNext();) {
+			for (Iterator<? extends Term> it = theory.iterator(engine); it.hasNext();) {
 				/*Castagna 06/2011*/
 				clause++;
 				/**/	
@@ -240,7 +240,7 @@ public class TheoryManager implements Serializable {
 	public void rebindPrimitives() {
 		for (ClauseInfo d:dynamicDBase){
 			for(AbstractSubGoalTree sge:d.getBody()){
-				PTerm t = ((SubGoalElement) sge).term;
+				Term t = ((SubGoalElement) sge).term;
 				primitiveManager.identifyPredicate(t);
 			}
 		}
@@ -273,15 +273,13 @@ public class TheoryManager implements Serializable {
 
 
 	private boolean runDirective(Struct c) {
-		String cname = c.getName();
-		if ("':-'".equals(cname) ||
-			((c.getArity() == 1) && (c.getTerm(0) instanceof Struct) && ":-".equals(cname))) {
+		if ("':-'".equals(c.getName()) || ":-".equals(c.getName()) && c.getArity() == 1 && c.getTerm(0) instanceof Struct) {
 			Struct dir = (Struct) c.getTerm(0);
 			try {
 				if (!primitiveManager.evalAsDirective(dir))
-					engine.logger.warn("The directive " + dir.getPredicateIndicator() + " is unknown.");
+					engine.warn("The directive " + dir.getPredicateIndicator() + " is unknown.");
 			} catch (Throwable t) {
-				engine.logger.warn("An exception has been thrown during the execution of the " +
+				engine.warn("An exception has been thrown during the execution of the " +
 						dir.getPredicateIndicator() + " directive.\n" + t.getMessage());
 			}
 			return true;
@@ -294,7 +292,7 @@ public class TheoryManager implements Serializable {
 	 */
 	private Struct toClause(Struct t) {		//PRIMITIVE
 		// TODO bad, slow way of cloning. requires approx twice the time necessary
-		t = (Struct) PTerm.createTerm(t.toString(), this.engine.getOperatorManager());
+		t = (Struct) Term.createTerm(t.toString(), this.engine.getOperatorManager());
 		if (!t.isClause())
 			t = new Struct(":-", t, new Struct("true"));
 		primitiveManager.identifyPredicate(t);
@@ -303,17 +301,16 @@ public class TheoryManager implements Serializable {
 
 	public synchronized void solveTheoryGoal() {
 		Struct s = null;
-		Stack<PTerm> startGoalStack = this.startGoalStack;
 		while (!startGoalStack.empty()) {
 			s = (s == null) ?
-				(Struct) startGoalStack.pop() :
-				new Struct(",", startGoalStack.pop(), s);
+					(Struct) startGoalStack.pop() :
+						new Struct(",", startGoalStack.pop(), s);
 		}
 		if (s != null) {
 			try {
 				engine.solve(s);
 			} catch (Exception ex) {
-				engine.logger.error("solution exception {}", ex);
+				ex.printStackTrace();
 			}
 		}
 	}

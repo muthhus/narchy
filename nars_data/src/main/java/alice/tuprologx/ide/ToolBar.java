@@ -12,7 +12,7 @@ import java.net.URL;
 
 import alice.tuprolog.InvalidTheoryException;
 import alice.tuprolog.Prolog;
-import alice.tuprolog.PTerm;
+import alice.tuprolog.Term;
 import alice.tuprolog.Theory;
 import alice.tuprologx.spyframe.SpyFrame;
 
@@ -207,7 +207,7 @@ public class ToolBar extends JPanel
             {
         		ConsoleManager consoleManager = JavaIDE.getConsoleManager();
                 Theory theory = engine.getTheory();
-                PTerm rich = engine.termSolve(consoleManager.getGoal());
+                Term rich = engine.termSolve(consoleManager.getGoal());
                 try {
 					new SpyFrame(theory, rich);
 				} catch (InvalidTheoryException e) {

@@ -15,11 +15,19 @@ import java.util.LinkedList;
 import java.util.concurrent.Semaphore;
 import java.util.regex.Pattern;
 
-import alice.tuprolog.*;
+import alice.tuprolog.AbstractSocket;
+import alice.tuprolog.Client_Socket;
+import alice.tuprolog.Datagram_Socket;
+import alice.tuprolog.Int;
+import alice.tuprolog.Library;
 //import alice.tuprolog.MalformedGoalException;
 //import alice.tuprolog.NoSolutionException;
+import alice.tuprolog.Prolog;
+import alice.tuprolog.PrologError;
+import alice.tuprolog.Server_Socket;
 //import alice.tuprolog.SolveInfo;
-import alice.tuprolog.PTerm;
+import alice.tuprolog.Struct;
+import alice.tuprolog.Term;
 import alice.tuprolog.interfaces.*;
 
 /**
@@ -56,7 +64,7 @@ public class SocketLibrary extends Library implements ISocketLib {
 	// Open an udp socket
 
 	@Override
-	public boolean udp_socket_open_2(Struct Address, PTerm Socket) throws PrologError
+	public boolean udp_socket_open_2(Struct Address, Term Socket) throws PrologError
 	{
 		if (!(Socket.getTerm() instanceof alice.tuprolog.Var)) { // Socket has to be a variable
 			throw PrologError.instantiation_error(engine.getEngineManager(), 1);
@@ -89,7 +97,7 @@ public class SocketLibrary extends Library implements ISocketLib {
 	// send an udp data
 	
 	@Override
-	public boolean udp_send_3(PTerm Socket, PTerm Data, Struct AddressTo) throws PrologError
+	public boolean udp_send_3(Term Socket, Term Data, Struct AddressTo) throws PrologError
 	{
 		if (!(Socket.getTerm() instanceof alice.tuprolog.Var)) { // Socket has to be a variable
 			throw PrologError.instantiation_error(engine.getEngineManager(), 1);
@@ -128,7 +136,7 @@ public class SocketLibrary extends Library implements ISocketLib {
 
 // udp socket close
 @Override
-public boolean udp_socket_close_1(PTerm Socket) throws PrologError {
+public boolean udp_socket_close_1(Term Socket) throws PrologError {
 	if (Socket.getTerm() instanceof alice.tuprolog.Var) { 			
 		throw PrologError.instantiation_error(engine.getEngineManager(), 1);
 	}
@@ -142,8 +150,8 @@ public boolean udp_socket_close_1(PTerm Socket) throws PrologError {
 
 //udp receive data
 @Override
-public boolean udp_receive(PTerm Socket, PTerm Data, Struct AddressFrom,
-						   Struct Options) throws PrologError {
+public boolean udp_receive(Term Socket, Term Data, Struct AddressFrom,
+		Struct Options) throws PrologError {
 	if (!(Socket.getTerm() instanceof alice.tuprolog.Var)) { 
 		throw PrologError.instantiation_error(engine.getEngineManager(), 1);
 	}
@@ -170,8 +178,8 @@ public boolean udp_receive(PTerm Socket, PTerm Data, Struct AddressFrom,
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}
-	LinkedList<PTerm> list = StructToList(Options);
-	for (PTerm t : list) { // Explore options list
+	LinkedList<Term> list = StructToList(Options);
+	for (Term t : list) { // Explore options list
 		if (((Struct) t).getName().equals("timeout")) { // If a timeout has been specified
 			int time = Integer.parseInt(((Struct) t).getArg(0).toString());
 			try {
@@ -198,7 +206,7 @@ public boolean udp_receive(PTerm Socket, PTerm Data, Struct AddressFrom,
  */
 
 @Override
-public boolean tcp_socket_server_open_3(Struct Address, PTerm Socket, Struct Options) throws PrologError {
+public boolean tcp_socket_server_open_3(Struct Address, Term Socket, Struct Options) throws PrologError {
 	int backlog=0;
 
 	if (!(Socket.getTerm() instanceof alice.tuprolog.Var)) { // Socket has to be a variable
@@ -219,8 +227,8 @@ public boolean tcp_socket_server_open_3(Struct Address, PTerm Socket, Struct Opt
 	port = Integer.parseInt(split[split.length - 1]);
 
 
-	LinkedList<PTerm> list = StructToList(Options); 			// Convert Options Struct to a LinkedList
-	for (PTerm t : list) { 									// Explore Options list
+	LinkedList<Term> list = StructToList(Options); 			// Convert Options Struct to a LinkedList
+	for (Term t : list) { 									// Explore Options list
 		if (((Struct) t).getName().equals("backlog")) { 	// If a backlog has been specified
 			backlog = Integer.parseInt(((Struct) t).getArg(0).toString());
 		}
@@ -265,7 +273,7 @@ private void addClientSocket(Socket s){
  * @throws PrologError if ServerSock is a variable or it is not a Server_Socket
  */
 @Override
-public boolean tcp_socket_server_accept_3(PTerm ServerSock, PTerm Client_Addr, PTerm Client_Slave_Socket) throws PrologError {
+public boolean tcp_socket_server_accept_3(Term ServerSock, Term Client_Addr, Term Client_Slave_Socket) throws PrologError {
 
 	if (ServerSock.getTerm() instanceof alice.tuprolog.Var) { 	// ServerSock has to be bound
 		throw PrologError.instantiation_error(engine.getEngineManager(), 1);
@@ -295,7 +303,7 @@ public boolean tcp_socket_server_accept_3(PTerm ServerSock, PTerm Client_Addr, P
  * @throws PrologError if Socket is not a variable
  */
 @Override
-public boolean tcp_socket_client_open_2(Struct Address, PTerm SocketTerm) throws PrologError {
+public boolean tcp_socket_client_open_2(Struct Address, Term SocketTerm) throws PrologError {
 	if (!(SocketTerm.getTerm() instanceof alice.tuprolog.Var)) { // Socket has to be a variable
 		throw PrologError.instantiation_error(engine.getEngineManager(), 2);
 	}
@@ -334,7 +342,7 @@ public boolean tcp_socket_client_open_2(Struct Address, PTerm SocketTerm) throws
  * @throws PrologError if serverSocket is a variable or it is not a Server_Socket
  */
 @Override
-public synchronized boolean tcp_socket_server_close_1(PTerm serverSocket) throws PrologError {
+public synchronized boolean tcp_socket_server_close_1(Term serverSocket) throws PrologError {
 	if (serverSocket.getTerm() instanceof alice.tuprolog.Var) { 			// serverSocket has to be bound
 		throw PrologError.instantiation_error(engine.getEngineManager(), 1);
 	}
@@ -363,7 +371,7 @@ public synchronized boolean tcp_socket_server_close_1(PTerm serverSocket) throws
  * @throws PrologError if Socket is a variable or it is not a Client_Socket or Msg is not bound
  */
 @Override
-public boolean write_to_socket_2(PTerm Socket, PTerm Msg) throws PrologError {
+public boolean write_to_socket_2(Term Socket, Term Msg) throws PrologError {
 	if (Socket.getTerm() instanceof alice.tuprolog.Var) { // Socket has to be bound
 		throw PrologError.instantiation_error(engine.getEngineManager(), 1);
 	}
@@ -394,7 +402,7 @@ public boolean write_to_socket_2(PTerm Socket, PTerm Msg) throws PrologError {
  * @throws PrologError if Socket is not bound or it is not a Client_Socket or Msg is bound
  */
 @Override
-public boolean read_from_socket_3(PTerm Socket, PTerm Msg, Struct Options) throws PrologError {
+public boolean read_from_socket_3(Term Socket, Term Msg, Struct Options) throws PrologError {
 	if (Socket.getTerm() instanceof alice.tuprolog.Var) { // Socket has to be bound
 		throw PrologError.instantiation_error(engine.getEngineManager(), 1);
 	}
@@ -414,8 +422,8 @@ public boolean read_from_socket_3(PTerm Socket, PTerm Msg, Struct Options) throw
 				return false;
 		}
 
-		LinkedList<PTerm> list = StructToList(Options); // Convert Options Struct to a LinkedList
-		for (PTerm t : list) { // Explore options list
+		LinkedList<Term> list = StructToList(Options); // Convert Options Struct to a LinkedList
+		for (Term t : list) { // Explore options list
 			if (((Struct) t).getName().equals("timeout")) { // If a timeout has been specified
 				int time = Integer.parseInt(((Struct) t).getArg(0).toString());
 				try {
@@ -431,7 +439,7 @@ public boolean read_from_socket_3(PTerm Socket, PTerm Msg, Struct Options) throw
 
 		try {
 			ObjectInputStream in = new ObjectInputStream(sock.getInputStream());
-			PTerm m = (PTerm) in.readObject();
+			Term m = (Term) in.readObject();
 			Msg.unify(this.getEngine(), m);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -462,7 +470,7 @@ public boolean read_from_socket_3(PTerm Socket, PTerm Msg, Struct Options) throw
  * @throws PrologError if Socket is not bound or it is not a Client_Socket
  */
 @Override
-public boolean aread_from_socket_2(PTerm Socket, Struct Options) throws PrologError {
+public boolean aread_from_socket_2(Term Socket, Struct Options) throws PrologError {
 	ThreadReader r;
 	if (Socket.getTerm() instanceof alice.tuprolog.Var) { // Socket has to be bound
 		throw PrologError.instantiation_error(engine.getEngineManager(), 1);
@@ -493,8 +501,8 @@ public boolean aread_from_socket_2(PTerm Socket, Struct Options) throws PrologEr
 			e1.printStackTrace();
 		}
 
-		LinkedList<PTerm> list = StructToList(Options); // Convert Options Struct to a LinkedList
-		for (PTerm t : list) { // Explore options list
+		LinkedList<Term> list = StructToList(Options); // Convert Options Struct to a LinkedList
+		for (Term t : list) { // Explore options list
 			if (((Struct) t).getName().equals("timeout")) { // If a timeout has been specified
 				int time = Integer.parseInt(((Struct) t).getArg(0).toString());
 				try {
@@ -520,9 +528,9 @@ public boolean aread_from_socket_2(PTerm Socket, Struct Options) throws PrologEr
 /*
  * Transform the Struct s in a LinkedList
  */
-private LinkedList<PTerm> StructToList(Struct s) {
-	LinkedList<PTerm> list = new LinkedList<>();
-	PTerm temp;
+private LinkedList<Term> StructToList(Struct s) {
+	LinkedList<Term> list = new LinkedList<>();
+	Term temp;
 	temp = s;
 	while (true) {
 		if (((Struct) temp).getName().equals(".")) {
@@ -581,7 +589,7 @@ public void onSolveHalt(){
 	onSolveEnd();
 }
 
-public boolean getAddress_2(PTerm sock, PTerm addr) throws PrologError {
+public boolean getAddress_2(Term sock, Term addr) throws PrologError {
 	if (sock.getTerm() instanceof alice.tuprolog.Var) { // Socket has to be bound
 		throw PrologError.instantiation_error(engine.getEngineManager(), 1);
 	}
@@ -671,9 +679,9 @@ private class ThreadReader extends Thread {
 			try {
 				ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 				if(this.isInterrupted())return;
-				PTerm msg = (PTerm) in.readObject();
+				Term msg = (Term) in.readObject();
 				if(this.isInterrupted())return;					
-				Struct s = (Struct) PTerm.createTerm(msg.getTerm().toString());
+				Struct s = (Struct) Term.createTerm(msg.getTerm().toString());
 				if (assertA)
 					mainEngine.getTheoryManager().assertA(s, true, "", false);
 				else

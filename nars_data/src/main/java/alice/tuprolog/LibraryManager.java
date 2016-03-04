@@ -75,7 +75,12 @@ public class LibraryManager
 			Library alib = getLibrary(name);
 			if (alib != null)
 			{
-				prolog.logger.warn("library already loaded {}", alib);
+				if (prolog.isWarning())
+				{
+					String msg = "library " + alib.getName()
+							+ " already loaded.";
+					prolog.notifyWarning(new WarningEvent(prolog, msg));
+				}
 				return alib;
 			}
 		} catch (Exception ex)
@@ -203,8 +208,14 @@ public class LibraryManager
 
 			String name = lib.getName();
 			Library alib = getLibrary(name);
-			if (alib != null) {
-				prolog.logger.warn("library already loaded {}", alib);
+			if (alib != null)
+			{
+				if (prolog.isWarning())
+				{
+					String msg = "library " + alib.getName()
+							+ " already loaded.";
+					prolog.notifyWarning(new WarningEvent(prolog, msg));
+				}
 				return alib;
 			}
 		} catch (Exception ex)
@@ -262,8 +273,13 @@ public class LibraryManager
 	{
 		String name = lib.getName();
 		Library alib = getLibrary(name);
-		if (alib != null) {
-			prolog.logger.warn("library already loaded {}", alib);
+		if (alib != null)
+		{
+			if (prolog.isWarning())
+			{
+				String msg = "library " + alib.getName() + " already loaded.";
+				prolog.notifyWarning(new WarningEvent(prolog, msg));
+			}
 			unloadLibrary(name);
 		}
 		bindLibrary(lib);
@@ -386,7 +402,7 @@ public class LibraryManager
 		return null;
 	}
 
-	public synchronized void onSolveBegin(PTerm g)
+	public synchronized void onSolveBegin(Term g)
 	{
 		for (Library alib : currentLibraries)
 		{

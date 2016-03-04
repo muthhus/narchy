@@ -145,7 +145,7 @@ public class Long extends Number {
      * For number term argument, the int value is considered.
      */
     @Override
-    public boolean isGreater(PTerm t) {
+    public boolean isGreater(Term t) {
         t = t.getTerm();
         if (t instanceof Number) {
             return value > ( (Number) t ).longValue();
@@ -154,7 +154,7 @@ public class Long extends Number {
         } else return t instanceof Var;
     }
     @Override
-    public boolean isGreaterRelink(PTerm t, ArrayList<String> vorder) {
+    public boolean isGreaterRelink(Term t, ArrayList<String> vorder) {
         return isGreater(t);
 //        t = t.getTerm();
 //        if (t instanceof Number) {
@@ -169,7 +169,7 @@ public class Long extends Number {
      * For number term argument, the int value is considered.
      */
     @Override
-    public boolean isEqual(PTerm t) {
+    public boolean isEqual(Term t) {
         t = t.getTerm();
         return t instanceof Number ? value == ((Number) t).longValue() : false;
     }
@@ -179,7 +179,7 @@ public class Long extends Number {
      * This service is to be used in demonstration context.
      */
     @Override
-    boolean unify(List<Var> vl1, List<Var> vl2, PTerm t) {
+    boolean unify(List<Var> vl1, List<Var> vl2, Term t) {
         t = t.getTerm();
         if (t instanceof Var) {
             return t.unify(vl1, vl2, this);

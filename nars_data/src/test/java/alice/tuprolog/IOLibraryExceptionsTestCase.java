@@ -250,7 +250,7 @@ public class IOLibraryExceptionsTestCase extends TestCase {
 		assertTrue(validType.isEqual(new Struct("stream")));
 		Struct culprit = (Struct) info.getTerm("Culprit");
 		assertTrue(culprit.isEqual(new Struct("text")));
-		PTerm message = info.getTerm("Message");
+		Term message = info.getTerm("Message");
 		assertTrue(message.isEqual(new Struct("File not found.")));
 	}
 
@@ -300,7 +300,7 @@ public class IOLibraryExceptionsTestCase extends TestCase {
 		assertTrue(validType.isEqual(new Struct("stream")));
 		Struct culprit = (Struct) info.getTerm("Culprit");
 		assertTrue(culprit.isEqual(new Struct("text")));
-		PTerm message = info.getTerm("Message");
+		Term message = info.getTerm("Message");
 		assertTrue(message.isEqual(new Struct("File not found.")));
 	}
 
@@ -350,7 +350,7 @@ public class IOLibraryExceptionsTestCase extends TestCase {
 		assertTrue(validType.isEqual(new Struct("stream")));
 		Struct culprit = (Struct) info.getTerm("Culprit");
 		assertTrue(culprit.isEqual(new Struct("text")));
-		PTerm message = info.getTerm("Message");
+		Term message = info.getTerm("Message");
 		assertTrue(message.isEqual(new Struct("File not found.")));
 	}
 
@@ -430,7 +430,7 @@ public class IOLibraryExceptionsTestCase extends TestCase {
 		assertTrue(validType.isEqual(new Struct("stream")));
 		Struct culprit = (Struct) info.getTerm("Culprit");
 		assertTrue(culprit.isEqual(new Struct("text")));
-		PTerm message = info.getTerm("Message");
+		Term message = info.getTerm("Message");
 		assertTrue(message.isEqual(new Struct("File not found.")));
 	}
 

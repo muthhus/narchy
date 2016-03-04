@@ -1,8 +1,8 @@
 package alice.tuprologx.spyframe;
 
 
-import alice.tuprolog.PTerm;
 import alice.tuprolog.Struct;
+import alice.tuprolog.Term;
 import alice.tuprolog.Var;
 import java.awt.*;
 import java.awt.event.*;
@@ -22,9 +22,9 @@ public class TermPanel extends JPanel implements ActionListener{
 	private static final long serialVersionUID = 1L;
 
 /**Transforms prolog terms into trees.*/
-  public static final ToTree<PTerm> term2tree=new ToTree<PTerm>(){
+  public static final ToTree<Term> term2tree=new ToTree<Term>(){
     @Override
-    public Node makeTreeFrom(PTerm term){
+    public Node makeTreeFrom(Term term){
       Node node=new Node(""+term);
       node.textcolor=node.bordercolor=Color.BLACK;
       //make it more specific if possible
@@ -51,14 +51,14 @@ public class TermPanel extends JPanel implements ActionListener{
   };
 
   JTextField input;
-  Tree<PTerm> ptt;
+  Tree<Term> ptt;
 
   /** Constructs a new TermFrame.
    *  @param term the prolog term to be displayed.
    */
-  public TermPanel(PTerm term){
+  public TermPanel(Term term){
     
-    ptt=new Tree<PTerm>(term2tree, term);
+    ptt=new Tree<Term>(term2tree, term);
     add(new JScrollPane(ptt));
     input=new JTextField();
     add(input, BorderLayout.SOUTH);
@@ -73,7 +73,7 @@ public class TermPanel extends JPanel implements ActionListener{
   /**Sets a new prolog term.
    * @param term to be displayed.
    */
-  public void setTerm(PTerm term){
+  public void setTerm(Term term){
     ptt.setStructure(term);
     input.setText(""+term);
     validate();
@@ -83,10 +83,10 @@ public class TermPanel extends JPanel implements ActionListener{
    * @param sterm to be displayed.
    */
   public void setTerm(String sterm){
-    PTerm term;
-    try{term= PTerm.createTerm(sterm);}
+    Term term;
+    try{term=Term.createTerm(sterm);}
     catch(Exception ex){
-      term= PTerm.createTerm("'>illegal prolog term<'");
+      term=Term.createTerm("'>illegal prolog term<'");
     }
     setTerm(term);
   }

@@ -9,8 +9,6 @@
 
 package alice.tuprologx.pj.model;
 
-import alice.tuprolog.PTerm;
-
 /**
  *
  * @author maurizio
@@ -41,7 +39,7 @@ public class Atom extends Term<Atom> {
             return new Atom(a.getName());            
         }
         
-        static boolean matches(PTerm t) {
+        static boolean matches(alice.tuprolog.Term t) {
             return (!(t instanceof alice.tuprolog.Var) && t.isAtom() && !t.isList() && !Bool.matches(t));
         }
         

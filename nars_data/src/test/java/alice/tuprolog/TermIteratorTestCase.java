@@ -13,7 +13,7 @@ public class TermIteratorTestCase extends TestCase {
 	
 	public void testEmptyIterator() {
 		String theory = "";
-		Iterator<PTerm> i = PTerm.getIterator(theory);
+		Iterator<Term> i = Term.getIterator(theory);
 		assertFalse(i.hasNext());
 		try {
 			i.next();
@@ -27,7 +27,7 @@ public class TermIteratorTestCase extends TestCase {
 		                "q(3)." + "\n" +
 		                "q(5)." + "\n" +
 		                "q(7).";
-		Iterator<PTerm> i = PTerm.getIterator(theory);
+		Iterator<Term> i = Term.getIterator(theory);
 		int count = 0;
 		for (; i.hasNext(); count++)
 			i.next();
@@ -37,7 +37,7 @@ public class TermIteratorTestCase extends TestCase {
 	
 	public void testMultipleHasNext() {
 		String theory = "p. q. r.";
-		Iterator<PTerm> i = PTerm.getIterator(theory);
+		Iterator<Term> i = Term.getIterator(theory);
 		assertTrue(i.hasNext());
 		assertTrue(i.hasNext());
 		assertTrue(i.hasNext());
@@ -51,7 +51,7 @@ public class TermIteratorTestCase extends TestCase {
 						"q(3)." + "\n" +
 						"q(5)." + "\n" +
 						"q(7).";
-		Iterator<PTerm> i = PTerm.getIterator(theory);
+		Iterator<Term> i = Term.getIterator(theory);
 		assertTrue(i.hasNext());
 		i.next(); // skip the first term
 		assertEquals(new Struct("q", new Int(1)), i.next());
@@ -70,7 +70,7 @@ public class TermIteratorTestCase extends TestCase {
 	public void testIteratorOnInvalidTerm() {
 		String t = "q(1)"; // missing the End-Of-Clause!
 		try {
-			PTerm.getIterator(t);
+			Term.getIterator(t);
 			fail();
 		} catch (InvalidTermException expected) {}
 	}
@@ -83,7 +83,7 @@ public class TermIteratorTestCase extends TestCase {
 						"q(7).";
 		Struct firstTerm = new Struct("q", new Int(1));
 		Struct secondTerm = new Struct("q", new Int(2));
-		Iterator<PTerm> i1 = PTerm.getIterator(theory);
+		Iterator<Term> i1 = Term.getIterator(theory);
 		assertTrue(i1.hasNext());
 		assertEquals(firstTerm, i1.next());
 		assertTrue(i1.hasNext());
@@ -92,7 +92,7 @@ public class TermIteratorTestCase extends TestCase {
 			i1.hasNext();
 			fail();
 		} catch (InvalidTermException expected) {}
-		Iterator<PTerm> i2 = PTerm.getIterator(theory);
+		Iterator<Term> i2 = Term.getIterator(theory);
 		assertEquals(firstTerm, i2.next());
 		assertEquals(secondTerm, i2.next());
 		try {
@@ -103,7 +103,7 @@ public class TermIteratorTestCase extends TestCase {
 	
 	public void testRemoveOperationNotSupported() {
 		String theory = "p(1).";
-		Iterator<PTerm> i = PTerm.getIterator(theory);
+		Iterator<Term> i = Term.getIterator(theory);
 		assertNotNull(i.next());
 		try {
 			i.remove();

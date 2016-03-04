@@ -2,9 +2,9 @@ package alice.tuprolog;
 
 public final class SubGoalElement extends AbstractSubGoalTree {
     
-    public final PTerm term;
+    public final Term term;
     
-    public SubGoalElement(PTerm t) {
+    public SubGoalElement(Term t) {
         term = t;
     }
 

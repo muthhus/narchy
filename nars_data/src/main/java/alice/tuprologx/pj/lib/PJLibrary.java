@@ -32,9 +32,12 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
 
-import alice.tuprolog.*;
+import alice.tuprolog.Int;
+import alice.tuprolog.Library;
 import alice.tuprolog.Number;
-import alice.tuprolog.PTerm;
+import alice.tuprolog.Struct;
+import alice.tuprolog.Term;
+import alice.tuprolog.Var;
 
 import alice.tuprolog.lib.*;
 
@@ -130,7 +133,7 @@ public class PJLibrary extends Library {
 	}
 	
 	@Override
-	public   void onSolveBegin(PTerm goal) {
+	public   void onSolveBegin(Term goal) {
 		//id = 0;
 		currentObjects.clear();
 		currentObjects_inverse.clear();
@@ -163,7 +166,7 @@ public class PJLibrary extends Library {
 	/**
 	 * Creates of a java object - not backtrackable case
 	 */
-	public boolean java_object_3(PTerm className, PTerm argl, PTerm id) {
+	public boolean java_object_3(Term className, Term argl, Term id) {
 		className = className.getTerm();
 		Struct arg = (Struct) argl.getTerm();
 		id = id.getTerm();
@@ -192,26 +195,26 @@ public class PJLibrary extends Library {
 				//
 				//
 				if (co==null){
-					getEngine().logger.warn("Constructor not found: class " + clName);
+					getEngine().warn("Constructor not found: class " + clName);
 					return false;
 				}
 				
 				Object obj = co.newInstance(args_value);
 				return bindDynamicObject(id, obj);
 			} catch (ClassNotFoundException ex) {
-				getEngine().logger.warn("Java class not found: " + clName);
+				getEngine().warn("Java class not found: " + clName);
 				return false;
 			} catch (InvocationTargetException ex) {
-				getEngine().logger.warn("Invalid constructor arguments.");
+				getEngine().warn("Invalid constructor arguments.");
 				return false;
 			} catch (NoSuchMethodException ex) {
-				getEngine().logger.warn("Constructor not found: " + args.getTypes());
+				getEngine().warn("Constructor not found: " + args.getTypes());
 				return false;
 			} catch (InstantiationException ex) {
-				getEngine().logger.warn("Objects of class " + clName + " cannot be instantiated");
+				getEngine().warn("Objects of class " + clName + " cannot be instantiated");
 				return false;
 			} catch (IllegalArgumentException ex) {
-				getEngine().logger.warn("Illegal constructor arguments  " + args);
+				getEngine().warn("Illegal constructor arguments  " + args);
 				return false;
 			}
 		} catch (Exception ex) {
@@ -225,7 +228,7 @@ public class PJLibrary extends Library {
 	 * Destroy the link to a java object - called not directly, but from
 	 * predicate java_object (as second choice, for backtracking)
 	 */
-	public   boolean destroy_object_1(PTerm id) {
+	public   boolean destroy_object_1(Term id) {
 		id = id.getTerm();
 		try {
 			if (id.isGround()) {
@@ -242,7 +245,7 @@ public class PJLibrary extends Library {
 	/**
 	 * Creates of a java class
 	 */
-	public   boolean java_class_4(PTerm clSource, PTerm clName, PTerm clPathes, PTerm id) {
+	public   boolean java_class_4(Term clSource, Term clName, Term clPathes, Term id) {
 		Struct classSource = (Struct) clSource.getTerm();
 		Struct className = (Struct) clName.getTerm();
 		Struct classPathes = (Struct) clPathes.getTerm();
@@ -251,7 +254,7 @@ public class PJLibrary extends Library {
 			String fullClassName = alice.util.Tools.removeApices(className.toString());
 			
 			String fullClassPath = fullClassName.replace('.', '/');
-			Iterator<? extends PTerm> it = classPathes.listIterator();
+			Iterator<? extends Term> it = classPathes.listIterator();
 			String cp = "";
 			while (it.hasNext()) {
 				if (cp.length() > 0) {
@@ -273,8 +276,8 @@ public class PJLibrary extends Library {
 				file.write(text);
 				file.close();
 			} catch (IOException ex) {
-				getEngine().logger.warn("Compilation of java sources failed");
-				getEngine().logger.warn("(creation of " + fullClassPath + ".java fail failed)");
+				getEngine().warn("Compilation of java sources failed");
+				getEngine().warn("(creation of " + fullClassPath + ".java fail failed)");
 				return false;
 			}
 			String cmd = "javac " + cp + " " + fullClassPath + ".java";
@@ -283,21 +286,21 @@ public class PJLibrary extends Library {
 				Process jc = Runtime.getRuntime().exec(cmd);
 				int res = jc.waitFor();
 				if (res != 0) {
-					getEngine().logger.warn("Compilation of java sources failed");
-					getEngine().logger.warn("(java compiler (javac) has stopped with errors)");
+					getEngine().warn("Compilation of java sources failed");
+					getEngine().warn("(java compiler (javac) has stopped with errors)");
 					return false;
 				}
 			} catch (IOException ex) {
-				getEngine().logger.warn("Compilation of java sources failed");
-				getEngine().logger.warn("(java compiler (javac) invocation failed)");
+				getEngine().warn("Compilation of java sources failed");
+				getEngine().warn("(java compiler (javac) invocation failed)");
 				return false;
 			}
 			try {
 				Class<?> the_class = Class.forName(fullClassName, true, new ClassLoader());
 				return bindDynamicObject(id, the_class);
 			} catch (ClassNotFoundException ex) {
-				getEngine().logger.warn("Compilation of java sources failed");
-				getEngine().logger.warn("(Java Class compiled, but not created: " + fullClassName + " )");
+				getEngine().warn("Compilation of java sources failed");
+				getEngine().warn("(Java Class compiled, but not created: " + fullClassName + " )");
 				return false;
 			}
 		} catch (Exception ex) {
@@ -312,7 +315,7 @@ public class PJLibrary extends Library {
 	 * Calls a method of a Java object
 	 *
 	 */
-	public boolean java_call_3(PTerm objId, PTerm method_name, PTerm idResult) {
+	public boolean java_call_3(Term objId, Term method_name, Term idResult) {
 		objId = objId.getTerm();
 		idResult = idResult.getTerm();
 		Struct method = (Struct) method_name.getTerm();
@@ -375,12 +378,12 @@ public class PJLibrary extends Library {
 						res = m.invoke(obj, args_values);
 						
 					} catch (IllegalAccessException ex) {
-						getEngine().logger.warn("Method invocation failed: " + methodName+ "( signature: " + args + " )");
+						getEngine().warn("Method invocation failed: " + methodName+ "( signature: " + args + " )");
 						ex.printStackTrace();
 						return false;                        
 					}                    
 				} else {
-					getEngine().logger.warn("Method not found: " + methodName+ "( signature: " + args + " )");
+					getEngine().warn("Method not found: " + methodName+ "( signature: " + args + " )");
 					return false;
 				}
 			} else {
@@ -394,7 +397,7 @@ public class PJLibrary extends Library {
 							res = m.invoke(null, args.getValues());
 						} catch (ClassNotFoundException ex) {
 							// if not found even as a class id -> consider as a String object value
-							getEngine().logger.warn("Unknown class.");
+							getEngine().warn("Unknown class.");
 							ex.printStackTrace();
 							return false;
 						}
@@ -413,22 +416,22 @@ public class PJLibrary extends Library {
 			}
 			return parseResult(idResult, res);
 		} catch (InvocationTargetException ex) {
-			getEngine().logger.warn("Method failed: " + methodName + " - ( signature: " + args +
+			getEngine().warn("Method failed: " + methodName + " - ( signature: " + args +
 					" ) - Original Exception: "+ex.getTargetException());
 			ex.printStackTrace();
 			return false;
 		} catch (NoSuchMethodException ex) {
 			ex.printStackTrace();
-			getEngine().logger.warn("Method not found: " + methodName+ " - ( signature: " + args + " )");
+			getEngine().warn("Method not found: " + methodName+ " - ( signature: " + args + " )");
 			return false;
 		} catch (IllegalArgumentException ex) {
 			ex.printStackTrace();
-			getEngine().logger.warn("Invalid arguments " + args+ " - ( method: " + methodName + " )");
+			getEngine().warn("Invalid arguments " + args+ " - ( method: " + methodName + " )");
 			//ex.printStackTrace();
 			return false;
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			getEngine().logger.warn("Generic error in method invocation " + methodName);
+			getEngine().warn("Generic error in method invocation " + methodName);
 			return false;
 		}
 	}
@@ -437,7 +440,7 @@ public class PJLibrary extends Library {
 	/*
 	 * set the field value of an object
 	 */
-	private boolean java_set(PTerm objId, PTerm fieldTerm, PTerm what) {
+	private boolean java_set(Term objId, Term fieldTerm, Term what) {
 		//System.out.println("SET "+objId+" "+fieldTerm+" "+what);
 		what = what.getTerm();
 		if (!fieldTerm.isAtom() || what instanceof Var)
@@ -452,10 +455,10 @@ public class PJLibrary extends Library {
 				try {
 					cl = Class.forName(clName);
 				} catch (ClassNotFoundException ex) {
-					getEngine().logger.warn("Java class not found: " + clName);
+					getEngine().warn("Java class not found: " + clName);
 					return false;
 				} catch (Exception ex) {
-					getEngine().logger.warn("Static field " + fieldName + " not found in class " + alice.util.Tools.removeApices(((Struct) objId).getArg(0).toString()));
+					getEngine().warn("Static field " + fieldName + " not found in class " + alice.util.Tools.removeApices(((Struct) objId).getArg(0).toString()));
 					return false;
 				}
 			} else {
@@ -502,7 +505,7 @@ public class PJLibrary extends Library {
 			
 			return true;
 		} catch (NoSuchFieldException ex) {
-			getEngine().logger.warn("Field " + fieldName + " not found in class " + objId);
+			getEngine().warn("Field " + fieldName + " not found in class " + objId);
 			return false;
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -513,7 +516,7 @@ public class PJLibrary extends Library {
 	/*
 	 * get the value of the field
 	 */
-	private boolean java_get(PTerm objId, PTerm fieldTerm, PTerm what) {
+	private boolean java_get(Term objId, Term fieldTerm, Term what) {
 		//System.out.println("GET "+objId+" "+fieldTerm+" "+what);
 		if (!fieldTerm.isAtom()) {
 			return false;
@@ -528,10 +531,10 @@ public class PJLibrary extends Library {
 				try {
 					cl = Class.forName(clName);
 				} catch (ClassNotFoundException ex) {
-					getEngine().logger.warn("Java class not found: " + clName);
+					getEngine().warn("Java class not found: " + clName);
 					return false;
 				} catch (Exception ex) {
-					getEngine().logger.warn("Static field " + fieldName + " not found in class " + alice.util.Tools.removeApices(((Struct) objId).getArg(0).toString()));
+					getEngine().warn("Static field " + fieldName + " not found in class " + alice.util.Tools.removeApices(((Struct) objId).getArg(0).toString()));
 					return false;
 				}
 			} else {
@@ -567,20 +570,20 @@ public class PJLibrary extends Library {
 				return bindDynamicObject(what, res);
 			}
 			//} catch (ClassNotFoundException ex){
-			//    getEngine().logger.warn("object of unknown class "+objId);
+			//    getEngine().warn("object of unknown class "+objId);
 			//ex.printStackTrace();
 			//    return false;
 		} catch (NoSuchFieldException ex) {
-			getEngine().logger.warn("Field " + fieldName + " not found in class " + objId);
+			getEngine().warn("Field " + fieldName + " not found in class " + objId);
 			return false;
 		} catch (Exception ex) {
-			getEngine().logger.warn("Generic error in accessing the field");
+			getEngine().warn("Generic error in accessing the field");
 			//ex.printStackTrace();
 			return false;
 		}
 	}
 	
-	public boolean java_array_set_primitive_3(PTerm obj_id, PTerm i, PTerm what) {
+	public boolean java_array_set_primitive_3(Term obj_id, Term i, Term what) {
 		Struct objId = (Struct) obj_id.getTerm();
 		Number index = (Number) i.getTerm();
 		what = what.getTerm();
@@ -661,7 +664,7 @@ public class PJLibrary extends Library {
 		}
 	}
 	
-	public   boolean java_array_get_primitive_3(PTerm obj_id, PTerm i, PTerm what) {
+	public   boolean java_array_get_primitive_3(Term obj_id, Term i, Term what) {
 		Struct objId = (Struct) obj_id.getTerm();
 		Number index = (Number) i.getTerm();
 		what = what.getTerm();
@@ -685,32 +688,32 @@ public class PJLibrary extends Library {
 			}
 			String name = cl.toString();
 			if (name.equals("class [I")){
-				PTerm value = new alice.tuprolog.Int(Array.getInt(obj,index.intValue()));
+				Term value = new alice.tuprolog.Int(Array.getInt(obj,index.intValue()));
 				return unify(what,value);
 			}  else if (name.equals("class [D")){
-				PTerm value = new alice.tuprolog.Double(Array.getDouble(obj,index.intValue()));
+				Term value = new alice.tuprolog.Double(Array.getDouble(obj,index.intValue()));
 				return unify(what,value);
 			}  else if (name.equals("class [F")){
-				PTerm value = new alice.tuprolog.Float(Array.getFloat(obj,index.intValue()));
+				Term value = new alice.tuprolog.Float(Array.getFloat(obj,index.intValue()));
 				return unify(what,value);
 			}  else if (name.equals("class [L")){
-				PTerm value = new alice.tuprolog.Long(Array.getLong(obj,index.intValue()));
+				Term value = new alice.tuprolog.Long(Array.getLong(obj,index.intValue()));
 				return unify(what,value);
 			}  else if (name.equals("class [C")){
-				PTerm value = new alice.tuprolog.Struct(""+Array.getChar(obj,index.intValue()));
+				Term value = new alice.tuprolog.Struct(""+Array.getChar(obj,index.intValue()));
 				return unify(what,value);
 			}  else if (name.equals("class [Z")){
 				boolean b = Array.getBoolean(obj,index.intValue());
 				if (b) {
-					return unify(what, PTerm.TRUE);
+					return unify(what,alice.tuprolog.Term.TRUE);
 				} else {
-					return unify(what, PTerm.FALSE);
+					return unify(what,alice.tuprolog.Term.FALSE);
 				}
 			}  else if (name.equals("class [B")){
-				PTerm value = new alice.tuprolog.Int(Array.getByte(obj,index.intValue()));
+				Term value = new alice.tuprolog.Int(Array.getByte(obj,index.intValue()));
 				return unify(what,value);
 			}  else if (name.equals("class [S")){
-				PTerm value = new alice.tuprolog.Int(Array.getInt(obj,index.intValue()));
+				Term value = new alice.tuprolog.Int(Array.getInt(obj,index.intValue()));
 				return unify(what,value);
 			}  else {
 				return false;
@@ -723,7 +726,7 @@ public class PJLibrary extends Library {
 	}
 	
 	
-	private boolean java_array(String type, int nargs, PTerm id) {
+	private boolean java_array(String type, int nargs, Term id) {
 		try {
 			Object array = null;
 			String obtype = type.substring(0, type.length() - 2);
@@ -771,13 +774,13 @@ public class PJLibrary extends Library {
 		Object[] values = new Object[objs.length];
 		Class<?>[] types = new Class[objs.length];
 		for (int i = 0; i < objs.length; i++) {
-			if (!parse_arg(values, types, i, (PTerm) objs[i]))
+			if (!parse_arg(values, types, i, (Term) objs[i]))
 				return null;
 		}
 		return new Signature(values, types);
 	}
 	
-	private boolean parse_arg(Object[] values, Class<?>[] types, int i, PTerm term) {
+	private boolean parse_arg(Object[] values, Class<?>[] types, int i, Term term) {
 		try {
 			if (term == null) {
 				values[i] = null;
@@ -846,7 +849,7 @@ public class PJLibrary extends Library {
 	 * to define the specific class of an argument
 	 *
 	 */
-	private boolean parse_as(Object[] values, Class<?>[] types, int i, PTerm castWhat, PTerm castTo) {
+	private boolean parse_as(Object[] values, Class<?>[] types, int i, Term castWhat, Term castTo) {
 		try {
 			if (!(castWhat instanceof Number)) {
 				String castTo_name = alice.util.Tools.removeApices(((Struct) castTo).getName());
@@ -904,7 +907,7 @@ public class PJLibrary extends Library {
 						try {
 							types[i] = (Class.forName(castTo_name));
 						} catch (ClassNotFoundException ex) {
-							getEngine().logger.warn("Java class not found: " + castTo_name);
+							getEngine().warn("Java class not found: " + castTo_name);
 							return false;
 						}
 					}
@@ -930,7 +933,7 @@ public class PJLibrary extends Library {
 						try {
 							types[i] = (Class.forName(castTo_name));
 						} catch (ClassNotFoundException ex) {
-							getEngine().logger.warn("Java class not found: " + castTo_name);
+							getEngine().warn("Java class not found: " + castTo_name);
 							return false;
 						}
 					}
@@ -961,7 +964,7 @@ public class PJLibrary extends Library {
 				}
 			}
 		} catch (Exception ex) {
-			getEngine().logger.warn("Casting " + castWhat + " to " + castTo + " failed");
+			getEngine().warn("Casting " + castWhat + " to " + castTo + " failed");
 			return false;
 		}
 		return true;
@@ -972,7 +975,7 @@ public class PJLibrary extends Library {
 	 *  parses return value
 	 *  of a method invokation
 	 */
-	private boolean parseResult(PTerm id, Object obj) {
+	private boolean parseResult(Term id, Object obj) {
 		if (obj == null) {
 			//return unify(id,Term.TRUE);
 			return unify(id, new Var());
@@ -980,9 +983,9 @@ public class PJLibrary extends Library {
 		try {
 			if (Boolean.class.isInstance(obj)) {
 				if (((Boolean) obj).booleanValue()) {
-					return unify(id, PTerm.TRUE);
+					return unify(id, Term.TRUE);
 				} else {
-					return unify(id, PTerm.FALSE);
+					return unify(id, Term.FALSE);
 				}
 			} else if (Byte.class.isInstance(obj)) {
 				return unify(id, new Int(((Byte) obj).intValue()));
@@ -1011,7 +1014,7 @@ public class PJLibrary extends Library {
 	
 	private Object[] getArrayFromList(Struct list) {
 		Object args[] = new Object[list.listSize()];
-		Iterator<? extends PTerm> it = list.listIterator();
+		Iterator<? extends Term> it = list.listIterator();
 		int count = 0;
 		while (it.hasNext()) {
 			args[count++] = it.next();
@@ -1207,7 +1210,7 @@ public class PJLibrary extends Library {
 	 * 
 	 * Term id can be a variable or a ground term.
 	 */
-	protected boolean bindDynamicObject(PTerm id, Object obj) {
+	protected boolean bindDynamicObject(Term id, Object obj) {
 		// null object are considered to _ variable
 		if (obj == null) {
 			return unify(id, new Var());
@@ -1223,7 +1226,7 @@ public class PJLibrary extends Library {
 				// object already referenced -> unifying terms
 				// referencing the object
 				//log("obj already registered: unify "+id+" "+aKey);
-				return unify(id, (PTerm) aKey);
+				return unify(id, (Term) aKey);
 			} else {
 				// object not previously referenced
 				if (id instanceof Var) {

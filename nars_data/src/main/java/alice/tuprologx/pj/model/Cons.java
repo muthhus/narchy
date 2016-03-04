@@ -1,7 +1,5 @@
 package alice.tuprologx.pj.model;
 
-import alice.tuprolog.PTerm;
-
 import java.util.*;
 
 /**
@@ -152,7 +150,7 @@ public class Cons<H extends Term<?>, R extends Compound<?>> extends Compound<Con
         return Cons.make(s.getName(),termList.toArray(new Term<?>[termList.size()]));
     }
 
-    static boolean matches(PTerm t) {
+    static boolean matches(alice.tuprolog.Term t) {
         return (!(t instanceof alice.tuprolog.Var) && t.isCompound() && !t.isList());
     }
     
@@ -174,7 +172,7 @@ public class Cons<H extends Term<?>, R extends Compound<?>> extends Compound<Con
 
     @Override
     public alice.tuprolog.Struct marshal() {
-        PTerm[] termArray = new PTerm[arity()];
+        alice.tuprolog.Term[] termArray = new alice.tuprolog.Term[arity()];
         int i = 0;
         for (Term<?> t: this) {
             termArray[i++]=t.marshal();        

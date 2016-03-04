@@ -44,7 +44,7 @@ public class BasicLibrary extends Library {
      * 
      * @throws PrologError
      */
-    public boolean set_theory_1(PTerm th) throws PrologError {
+    public boolean set_theory_1(Term th) throws PrologError {
         th = th.getTerm();
         if (th instanceof Var)
             throw PrologError.instantiation_error(engine.getEngineManager(), 1);
@@ -69,7 +69,7 @@ public class BasicLibrary extends Library {
      * 
      * @throws PrologError
      */
-    public boolean add_theory_1(PTerm th) throws PrologError {
+    public boolean add_theory_1(Term th) throws PrologError {
         th = th.getTerm();
         if (th instanceof Var)
             throw PrologError.instantiation_error(engine.getEngineManager(), 1);
@@ -90,10 +90,10 @@ public class BasicLibrary extends Library {
     }
 
     /** gets current theory text */
-    public boolean get_theory_1(PTerm arg) {
+    public boolean get_theory_1(Term arg) {
         arg = arg.getTerm();
         try {
-            PTerm theory = new Struct(getEngine().getTheory().toString());
+            Term theory = new Struct(getEngine().getTheory().toString());
             return (unify(arg, theory));
         } catch (Exception ex) {
             return false;
@@ -123,7 +123,7 @@ public class BasicLibrary extends Library {
      *            name of the library
      * @return true if the library has been succesfully loaded.
      */
-    public boolean load_library_from_theory_2(PTerm th, PTerm libName) {
+    public boolean load_library_from_theory_2(Term th, Term libName) {
         Struct theory = (Struct) th.getTerm();
         Struct libN = (Struct) libName.getTerm();
         try {
@@ -142,8 +142,8 @@ public class BasicLibrary extends Library {
         }
     }
 
-    public boolean get_operators_list_1(PTerm argument) {
-        PTerm arg = argument.getTerm();
+    public boolean get_operators_list_1(Term argument) {
+        Term arg = argument.getTerm();
         Struct list = new Struct();
         java.util.Iterator<Operator> it = getEngine().getCurrentOperatorList().iterator();
         while (it.hasNext()) {
@@ -159,7 +159,7 @@ public class BasicLibrary extends Library {
      * 
      * @throws PrologError
      */
-    public boolean agent_1(PTerm th) throws PrologError {
+    public boolean agent_1(Term th) throws PrologError {
         th = th.getTerm();
         if (th instanceof Var)
             throw PrologError.instantiation_error(engine.getEngineManager(), 1);
@@ -181,7 +181,7 @@ public class BasicLibrary extends Library {
      * 
      * @throws PrologError
      */
-    public boolean agent_2(PTerm th, PTerm g) throws PrologError {
+    public boolean agent_2(Term th, Term g) throws PrologError {
         th = th.getTerm();
         g = g.getTerm();
         if (th instanceof Var)
@@ -228,14 +228,12 @@ public class BasicLibrary extends Library {
     /**/
     
     public boolean warning_0() {
-        //getEngine().logger.setWarning(true);
-        getEngine().logger.warn("warning/0 unsupported currently");
+        getEngine().setWarning(true);
         return true;
     }
 
     public boolean nowarning_0() {
-        //getEngine().logger.setWarning(false);
-        getEngine().logger.warn("nowarning/0 unsupported currently");
+        getEngine().setWarning(false);
         return true;
     }
 
@@ -243,60 +241,60 @@ public class BasicLibrary extends Library {
     // term type inspection
     //
 
-    public boolean constant_1(PTerm t) {
+    public boolean constant_1(Term t) {
         t = t.getTerm();
         return (t.isAtomic());
     }
 
-    public boolean number_1(PTerm t) {
+    public boolean number_1(Term t) {
         return (t.getTerm() instanceof Number);
     }
 
-    public boolean integer_1(PTerm t) {
+    public boolean integer_1(Term t) {
         if (!(t.getTerm()  instanceof Number))
             return false;
         alice.tuprolog.Number n = (alice.tuprolog.Number) t.getTerm();
         return (n.isInteger());
     }
 
-    public boolean float_1(PTerm t) {
+    public boolean float_1(Term t) {
         if (!(t instanceof Number))
             return false;
         alice.tuprolog.Number n = (alice.tuprolog.Number) t.getTerm();
         return (n.isReal());
     }
 
-    public boolean atom_1(PTerm t) {
+    public boolean atom_1(Term t) {
         t = t.getTerm();
         return (t.isAtom());
     }
 
-    public boolean compound_1(PTerm t) {
+    public boolean compound_1(Term t) {
         t = t.getTerm();
         return t.isCompound();
     }
 
-    public boolean list_1(PTerm t) {
+    public boolean list_1(Term t) {
         t = t.getTerm();
         return (t.isList());
     }
 
-    public boolean var_1(PTerm t) {
+    public boolean var_1(Term t) {
         t = t.getTerm();
         return (t instanceof Var);
     }
 
-    public boolean nonvar_1(PTerm t) {
+    public boolean nonvar_1(Term t) {
         t = t.getTerm();
         return !(t instanceof Var);
     }
 
-    public boolean atomic_1(PTerm t) {
+    public boolean atomic_1(Term t) {
         t = t.getTerm();
         return t.isAtomic();
     }
 
-    public boolean ground_1(PTerm t) {
+    public boolean ground_1(Term t) {
         t = t.getTerm();
         return (t.isGround());
     }
@@ -316,14 +314,14 @@ public class BasicLibrary extends Library {
         }
     }
 
-    public boolean expression_equality_2(PTerm arg0, PTerm arg1)
+    public boolean expression_equality_2(Term arg0, Term arg1)
             throws PrologError {
         if (arg0.getTerm() instanceof Var)
             throw PrologError.instantiation_error(engine.getEngineManager(), 1);
         if (arg1.getTerm() instanceof Var)
             throw PrologError.instantiation_error(engine.getEngineManager(), 2);
-        PTerm val0 = null;
-        PTerm val1 = null;
+        Term val0 = null;
+        Term val1 = null;
         try {
             val0 = evalExpression(arg0);
         } catch (Throwable e) {
@@ -345,14 +343,14 @@ public class BasicLibrary extends Library {
         return val0n.isInteger() && val1n.isInteger() ? val0n.longValue() == val1n.longValue() : val0n.doubleValue() == val1n.doubleValue();
     }
 
-    public boolean expression_greater_than_2(PTerm arg0, PTerm arg1)
+    public boolean expression_greater_than_2(Term arg0, Term arg1)
             throws PrologError {
         if (arg0.getTerm() instanceof Var)
             throw PrologError.instantiation_error(engine.getEngineManager(), 1);
         if (arg1.getTerm() instanceof Var)
             throw PrologError.instantiation_error(engine.getEngineManager(), 2);
-        PTerm val0 = null;
-        PTerm val1 = null;
+        Term val0 = null;
+        Term val1 = null;
         try {
             val0 = evalExpression(arg0);
         } catch (Throwable e) {
@@ -373,14 +371,14 @@ public class BasicLibrary extends Library {
                 (alice.tuprolog.Number) val1);
     }
 
-    public boolean expression_less_or_equal_than_2(PTerm arg0, PTerm arg1)
+    public boolean expression_less_or_equal_than_2(Term arg0, Term arg1)
             throws PrologError {
         if (arg0.getTerm() instanceof Var)
             throw PrologError.instantiation_error(engine.getEngineManager(), 1);
         if (arg1.getTerm() instanceof Var)
             throw PrologError.instantiation_error(engine.getEngineManager(), 2);
-        PTerm val0 = null;
-        PTerm val1 = null;
+        Term val0 = null;
+        Term val1 = null;
         try {
             val0 = evalExpression(arg0);
         } catch (Throwable e) {
@@ -406,14 +404,14 @@ public class BasicLibrary extends Library {
         return num0.isInteger() && num1.isInteger() ? num0.longValue() > num1.longValue() : num0.doubleValue() > num1.doubleValue();
     }
 
-    public boolean expression_less_than_2(PTerm arg0, PTerm arg1)
+    public boolean expression_less_than_2(Term arg0, Term arg1)
             throws PrologError {
         if (arg0.getTerm() instanceof Var)
             throw PrologError.instantiation_error(engine.getEngineManager(), 1);
         if (arg1.getTerm() instanceof Var)
             throw PrologError.instantiation_error(engine.getEngineManager(), 2);
-        PTerm val0 = null;
-        PTerm val1 = null;
+        Term val0 = null;
+        Term val1 = null;
         try {
             val0 = evalExpression(arg0);
         } catch (Throwable e) {
@@ -434,14 +432,14 @@ public class BasicLibrary extends Library {
                 (alice.tuprolog.Number) val1);
     }
 
-    public boolean expression_greater_or_equal_than_2(PTerm arg0, PTerm arg1)
+    public boolean expression_greater_or_equal_than_2(Term arg0, Term arg1)
             throws PrologError {
         if (arg0.getTerm() instanceof Var)
             throw PrologError.instantiation_error(engine.getEngineManager(), 1);
         if (arg1.getTerm() instanceof Var)
             throw PrologError.instantiation_error(engine.getEngineManager(), 2);
-        PTerm val0 = null;
-        PTerm val1 = null;
+        Term val0 = null;
+        Term val1 = null;
         try {
             val0 = evalExpression(arg0);
         } catch (Throwable e) {
@@ -467,27 +465,27 @@ public class BasicLibrary extends Library {
         return num0.isInteger() && num1.isInteger() ? num0.longValue() < num1.longValue() : num0.doubleValue() < num1.doubleValue();
     }
 
-    public boolean term_equality_2(PTerm arg0, PTerm arg1) throws PrologError {
+    public boolean term_equality_2(Term arg0, Term arg1) throws PrologError {
         arg0 = arg0.getTerm();
         arg1 = arg1.getTerm();
         return arg0.isEqual(arg1);
     }
 
-    public boolean term_greater_than_2(PTerm arg0, PTerm arg1) throws PrologError {
+    public boolean term_greater_than_2(Term arg0, Term arg1) throws PrologError {
         arg0 = arg0.getTerm();
         arg1 = arg1.getTerm();
         //System.out.println("Confronto "+arg0+" con "+arg1);
         return arg0.isGreater(arg1);
     }
 
-    public boolean term_less_than_2(PTerm arg0, PTerm arg1) throws PrologError {
+    public boolean term_less_than_2(Term arg0, Term arg1) throws PrologError {
         arg0 = arg0.getTerm();
         arg1 = arg1.getTerm();
         return !(arg0.isGreater(arg1) || arg0.isEqual(arg1));
     }
 
-    public PTerm expression_plus_1(PTerm arg0) {
-        PTerm val0 = null;
+    public Term expression_plus_1(Term arg0) {
+        Term val0 = null;
         try {
             val0 = evalExpression(arg0);
         } catch (Throwable e) {
@@ -496,8 +494,8 @@ public class BasicLibrary extends Library {
         return val0 != null && val0 instanceof Number ? val0 : null;
     }
 
-    public PTerm expression_minus_1(PTerm arg0) {
-        PTerm val0 = null;
+    public Term expression_minus_1(Term arg0) {
+        Term val0 = null;
         try {
             val0 = evalExpression(arg0);
         } catch (Throwable e) {
@@ -521,8 +519,8 @@ public class BasicLibrary extends Library {
         }
     }
 
-    public PTerm expression_bitwise_not_1(PTerm arg0) {
-        PTerm val0 = null;
+    public Term expression_bitwise_not_1(Term arg0) {
+        Term val0 = null;
         try {
             val0 = evalExpression(arg0);
         } catch (Throwable e) {
@@ -535,9 +533,9 @@ public class BasicLibrary extends Library {
         return num > Integer.MIN_VALUE && num < Integer.MAX_VALUE ? new Int((int) num) : new alice.tuprolog.Long(num);
     }
 
-    public PTerm expression_plus_2(PTerm arg0, PTerm arg1) {
-        PTerm val0 = null;
-        PTerm val1 = null;
+    public Term expression_plus_2(Term arg0, Term arg1) {
+        Term val0 = null;
+        Term val1 = null;
         try {
             val0 = evalExpression(arg0);
             val1 = evalExpression(arg1);
@@ -554,9 +552,9 @@ public class BasicLibrary extends Library {
             return null;
     }
 
-    public PTerm expression_minus_2(PTerm arg0, PTerm arg1) {
-        PTerm val0 = null;
-        PTerm val1 = null;
+    public Term expression_minus_2(Term arg0, Term arg1) {
+        Term val0 = null;
+        Term val1 = null;
         try {
             val0 = evalExpression(arg0);
             val1 = evalExpression(arg1);
@@ -573,9 +571,9 @@ public class BasicLibrary extends Library {
             return null;
     }
 
-    public PTerm expression_multiply_2(PTerm arg0, PTerm arg1) {
-        PTerm val0 = null;
-        PTerm val1 = null;
+    public Term expression_multiply_2(Term arg0, Term arg1) {
+        Term val0 = null;
+        Term val1 = null;
         try {
             val0 = evalExpression(arg0);
             val1 = evalExpression(arg1);
@@ -592,9 +590,9 @@ public class BasicLibrary extends Library {
             return null;
     }
 
-    public PTerm expression_div_2(PTerm arg0, PTerm arg1) {
-        PTerm val0 = null;
-        PTerm val1 = null;
+    public Term expression_div_2(Term arg0, Term arg1) {
+        Term val0 = null;
+        Term val1 = null;
         try {
             val0 = evalExpression(arg0);
             val1 = evalExpression(arg1);
@@ -611,9 +609,9 @@ public class BasicLibrary extends Library {
             return null;
     }
 
-    public PTerm expression_integer_div_2(PTerm arg0, PTerm arg1) {
-        PTerm val0 = null;
-        PTerm val1 = null;
+    public Term expression_integer_div_2(Term arg0, Term arg1) {
+        Term val0 = null;
+        Term val1 = null;
         try {
             val0 = evalExpression(arg0);
             val1 = evalExpression(arg1);
@@ -630,9 +628,9 @@ public class BasicLibrary extends Library {
         }
     }
 
-    public PTerm expression_pow_2(PTerm arg0, PTerm arg1) {
-        PTerm val0 = null;
-        PTerm val1 = null;
+    public Term expression_pow_2(Term arg0, Term arg1) {
+        Term val0 = null;
+        Term val1 = null;
         try {
             val0 = evalExpression(arg0);
             val1 = evalExpression(arg1);
@@ -650,9 +648,9 @@ public class BasicLibrary extends Library {
         }
     }
 
-    public PTerm expression_bitwise_shift_right_2(PTerm arg0, PTerm arg1) {
-        PTerm val0 = null;
-        PTerm val1 = null;
+    public Term expression_bitwise_shift_right_2(Term arg0, Term arg1) {
+        Term val0 = null;
+        Term val1 = null;
         try {
             val0 = evalExpression(arg0);
             val1 = evalExpression(arg1);
@@ -671,9 +669,9 @@ public class BasicLibrary extends Library {
         }
     }
 
-    public PTerm expression_bitwise_shift_left_2(PTerm arg0, PTerm arg1) {
-        PTerm val0 = null;
-        PTerm val1 = null;
+    public Term expression_bitwise_shift_left_2(Term arg0, Term arg1) {
+        Term val0 = null;
+        Term val1 = null;
         try {
             val0 = evalExpression(arg0);
             val1 = evalExpression(arg1);
@@ -692,9 +690,9 @@ public class BasicLibrary extends Library {
         }
     }
 
-    public PTerm expression_bitwise_and_2(PTerm arg0, PTerm arg1) {
-        PTerm val0 = null;
-        PTerm val1 = null;
+    public Term expression_bitwise_and_2(Term arg0, Term arg1) {
+        Term val0 = null;
+        Term val1 = null;
         try {
             val0 = evalExpression(arg0);
             val1 = evalExpression(arg1);
@@ -713,9 +711,9 @@ public class BasicLibrary extends Library {
         }
     }
 
-    public PTerm expression_bitwise_or_2(PTerm arg0, PTerm arg1) {
-        PTerm val0 = null;
-        PTerm val1 = null;
+    public Term expression_bitwise_or_2(Term arg0, Term arg1) {
+        Term val0 = null;
+        Term val1 = null;
         try {
             val0 = evalExpression(arg0);
             val1 = evalExpression(arg1);
@@ -741,7 +739,7 @@ public class BasicLibrary extends Library {
     /**
      * bidirectional text/term conversion.
      */
-    public boolean text_term_2(PTerm arg0, PTerm arg1) {
+    public boolean text_term_2(Term arg0, Term arg1) {
         arg0 = arg0.getTerm();
         arg1 = arg1.getTerm();
         /*System.out.println(arg0);
@@ -760,7 +758,7 @@ public class BasicLibrary extends Library {
         }
     }
 
-    public boolean text_concat_3(PTerm source1, PTerm source2, PTerm dest)
+    public boolean text_concat_3(Term source1, Term source2, Term dest)
             throws PrologError {
         source1 = source1.getTerm();
         source2 = source2.getTerm();
@@ -779,7 +777,7 @@ public class BasicLibrary extends Library {
                 + ((Struct) source2).getName()));
     }
 
-    public boolean num_atom_2(PTerm arg0, PTerm arg1) throws PrologError {
+    public boolean num_atom_2(Term arg0, Term arg1) throws PrologError {
         arg0 = arg0.getTerm();
         arg1 = arg1.getTerm();
         if (arg1 instanceof Var) {
@@ -888,7 +886,7 @@ public class BasicLibrary extends Library {
             }
             if (st3!=null)
             	st2=st3;
-            PTerm term = null;
+            Term term = null;
             try {
                 term = new alice.tuprolog.Int(java.lang.Integer.parseInt(st2));
             } catch (Exception ex) {
@@ -909,7 +907,7 @@ public class BasicLibrary extends Library {
     }
 
     // throw/1
-    public boolean throw_1(PTerm error) throws PrologError {
+    public boolean throw_1(Term error) throws PrologError {
         throw new PrologError(error);
     }
 
@@ -1260,7 +1258,7 @@ public class BasicLibrary extends Library {
 
     // Java guards for Prolog predicates
 
-    public boolean arg_guard_3(PTerm arg0, PTerm arg1, PTerm arg2)
+    public boolean arg_guard_3(Term arg0, Term arg1, Term arg2)
             throws PrologError {
         arg0 = arg0.getTerm();
         arg1 = arg1.getTerm();
@@ -1281,14 +1279,14 @@ public class BasicLibrary extends Library {
         return true;
     }
 
-    public boolean clause_guard_2(PTerm arg0, PTerm arg1) throws PrologError {
+    public boolean clause_guard_2(Term arg0, Term arg1) throws PrologError {
         arg0 = arg0.getTerm();
         if (arg0 instanceof Var)
             throw PrologError.instantiation_error(engine.getEngineManager(), 1);
         return true;
     }
 
-    public boolean call_guard_1(PTerm arg0) throws PrologError {
+    public boolean call_guard_1(Term arg0) throws PrologError {
         arg0 = arg0.getTerm();
         if (arg0 instanceof Var)
             throw PrologError.instantiation_error(engine.getEngineManager(), 1);
@@ -1298,8 +1296,8 @@ public class BasicLibrary extends Library {
         return true;
     }
 
-    public boolean all_solutions_predicates_guard_3(PTerm arg0, PTerm arg1,
-                                                    PTerm arg2) throws PrologError {
+    public boolean all_solutions_predicates_guard_3(Term arg0, Term arg1,
+            Term arg2) throws PrologError {
     	//System.out.println("Entro qui.... ");
         arg1 = arg1.getTerm();
         //System.out.println("Arg1 "+arg1);
@@ -1315,7 +1313,7 @@ public class BasicLibrary extends Library {
         return true;
     }
 
-    public boolean retract_guard_1(PTerm arg0) throws PrologError {
+    public boolean retract_guard_1(Term arg0) throws PrologError {
         arg0 = arg0.getTerm();
         if (arg0 instanceof Var)
             throw PrologError.instantiation_error(engine.getEngineManager(), 1);
@@ -1325,7 +1323,7 @@ public class BasicLibrary extends Library {
         return true;
     }
 
-    public boolean member_guard_2(PTerm arg0, PTerm arg1) throws PrologError {
+    public boolean member_guard_2(Term arg0, Term arg1) throws PrologError {
         arg1 = arg1.getTerm();
         if (!(arg1 instanceof Var) && !(arg1.isList()))
             throw PrologError.type_error(engine.getEngineManager(), 2, "list",
@@ -1333,7 +1331,7 @@ public class BasicLibrary extends Library {
         return true;
     }
 
-    public boolean reverse_guard_2(PTerm arg0, PTerm arg1) throws PrologError {
+    public boolean reverse_guard_2(Term arg0, Term arg1) throws PrologError {
         arg0 = arg0.getTerm();
         if (!(arg0 instanceof Var) && !(arg0.isList()))
             throw PrologError.type_error(engine.getEngineManager(), 1, "list",
@@ -1341,7 +1339,7 @@ public class BasicLibrary extends Library {
         return true;
     }
 
-    public boolean delete_guard_3(PTerm arg0, PTerm arg1, PTerm arg2)
+    public boolean delete_guard_3(Term arg0, Term arg1, Term arg2)
             throws PrologError {
         arg1 = arg1.getTerm();
         if (!(arg1 instanceof Var) && !(arg1.isList()))
@@ -1350,7 +1348,7 @@ public class BasicLibrary extends Library {
         return true;
     }
 
-    public boolean element_guard_3(PTerm arg0, PTerm arg1, PTerm arg2)
+    public boolean element_guard_3(Term arg0, Term arg1, Term arg2)
             throws PrologError {
         arg1 = arg1.getTerm();
         if (!(arg1 instanceof Var) && !(arg1.isList()))
@@ -1362,20 +1360,20 @@ public class BasicLibrary extends Library {
     // Internal Java predicates which are part of the bagof/3 and setof/3
     // algorithm
 
-    public boolean $wt_unify_3(PTerm witness, PTerm wtList, PTerm tList) {
+    public boolean $wt_unify_3(Term witness, Term wtList, Term tList) {
         Struct list = (Struct) wtList.getTerm();
         Struct result = new Struct();
-        for (java.util.Iterator<? extends PTerm> it = list.listIterator(); it.hasNext();) {
+        for (java.util.Iterator<? extends Term> it = list.listIterator(); it.hasNext();) {
             Struct element = (Struct) it.next();
-            PTerm w = element.getArg(0);
-            PTerm t = element.getArg(1);
+            Term w = element.getArg(0);
+            Term t = element.getArg(1);
             if (unify(witness, w))
                 result.append(t);
         }
         return unify(tList, result);
     }
     
-    public boolean $wt_unify_6(PTerm witness, PTerm wtList, PTerm tList, PTerm varSet, PTerm temp, PTerm goal) {
+    public boolean $wt_unify_6(Term witness, Term wtList, Term tList, Term varSet,Term temp, Term goal) {
     	/*System.out.println("witness "+witness);
     	System.out.println("wtList "+wtList);
     	System.out.println("tList "+tList+" "+((Var)tList).getLink());
@@ -1384,7 +1382,7 @@ public class BasicLibrary extends Library {
     	*/
     	//se ci sono variabili libere nel goal alla fine il risultato deve essere relinked
     	Struct freeVarList = (Struct) varSet.getTerm();
-    	java.util.Iterator<? extends PTerm> it1 = freeVarList.listIterator();
+    	java.util.Iterator<? extends Term> it1 = freeVarList.listIterator();
     	if (it1.hasNext()) {
     		(engine.getEngineManager()).setRelinkVar(true);
     		//ArrayList<String> l = new ArrayList<String>(); 
@@ -1406,18 +1404,18 @@ public class BasicLibrary extends Library {
         
         //System.out.println("termini wtList "+list);
         Struct result = new Struct();
-        for (java.util.Iterator<? extends PTerm> it = list.listIterator(); it.hasNext();) {
+        for (java.util.Iterator<? extends Term> it = list.listIterator(); it.hasNext();) {
             Struct element = (Struct) it.next();
             //System.out.println("termine wtList "+element);
-            PTerm w = element.getArg(0);
-            PTerm t = element.getArg(1);
+            Term w = element.getArg(0);
+            Term t = element.getArg(1);
             //System.out.println("termine W wtList "+w);
             //System.out.println("termine T wtList "+t);
             if (unify(witness, w)){
             	//System.out.println("=====witness  "+witness+" unifica con w "+w+" metto t nel risultato "+t);
             	result.append(t);
             	//System.out.println("=====****result  "+result);
-            	ArrayList<PTerm> l = (engine.getEngineManager()).getBagOFres();
+            	ArrayList<Term> l = (engine.getEngineManager()).getBagOFres();
             	ArrayList<String> lString = (engine.getEngineManager()).getBagOFresString();
             	if(l==null){
             		l= new ArrayList<>();
@@ -1438,21 +1436,21 @@ public class BasicLibrary extends Library {
     }
 
    
-  public boolean $s_next0_3(PTerm witness, PTerm wtList, PTerm sNext) {
+  public boolean $s_next0_3(Term witness, Term wtList, Term sNext) {
         Struct list = (Struct) wtList.getTerm();
         Struct result = new Struct();
-        for (java.util.Iterator<? extends PTerm> it = list.listIterator(); it.hasNext();) {
+        for (java.util.Iterator<? extends Term> it = list.listIterator(); it.hasNext();) {
             Struct element = (Struct) it.next();
-            PTerm w = element.getArg(0);
+            Term w = element.getArg(0);
             if (!unify(witness, w))
                 result.append(element);
         }
         return unify(sNext, result);
     }
 
-    public boolean iterated_goal_term_2(PTerm term, PTerm goal) {
-        PTerm t = term.getTerm();
-        PTerm igt = t.iteratedGoalTerm();
+    public boolean iterated_goal_term_2(Term term, Term goal) {
+        Term t = term.getTerm();
+        Term igt = t.iteratedGoalTerm();
         return unify(igt, goal);
     }
     

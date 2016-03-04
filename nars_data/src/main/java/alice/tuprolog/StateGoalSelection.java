@@ -17,6 +17,9 @@
  */
 package alice.tuprolog;
 
+import alice.tuprolog.Struct;
+import alice.tuprolog.Term;
+
 /**
  * @author Alex Benini
  *
@@ -36,7 +39,7 @@ public class StateGoalSelection extends State {
      */
     @Override
     void doJob(Engine e) {
-        PTerm curGoal = null;
+        Term curGoal = null;
         while (curGoal == null) {
             curGoal = e.currentContext.goalsToEval.fetch();
             if (curGoal==null){
@@ -50,7 +53,7 @@ public class StateGoalSelection extends State {
                 e.currentContext = e.currentContext.fatherCtx;
             } else {
                 // Caso di individuazione curGoal
-                PTerm goal_app = curGoal.getTerm();
+                Term goal_app = curGoal.getTerm();
                 if (!(goal_app instanceof Struct)) {
                     e.nextState = c.END_FALSE;
                     return;

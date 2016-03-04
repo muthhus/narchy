@@ -28,7 +28,7 @@ public class SubGoalStore {
     /**
      * Ripristina ClauseStore allo stato i-esimo
      */
-    public PTerm backTo(SubGoalId identifier) {
+    public Term backTo(SubGoalId identifier) {
         popSubGoal((DefaultSubGoalId) identifier);
         index--;
         return fetch();
@@ -51,7 +51,7 @@ public class SubGoalStore {
     /**
      * Restituisce la clausola da caricare
      */
-    public PTerm fetch() {
+    public Term fetch() {
         while (true) {
             fetched = true;
             if (index >= commaStruct.size()) {

@@ -18,8 +18,6 @@ import javax.lang.model.util.*;
 import javax.lang.model.element.*;
 import javax.annotation.processing.*;
 import static javax.tools.Diagnostic.Kind.*;
-
-import alice.tuprolog.PTerm;
 import alice.tuprologx.pj.annotations.*;
 import alice.tuprologx.pj.model.*;
 import alice.tuprologx.pj.annotations.parser.PrologTree.*;
@@ -123,7 +121,7 @@ public class PJAnnotationProcessor extends ElementScanner6<Void,Void> implements
         PrologField pf = v.getAnnotation(PrologField.class);
         String init = pf.init();
         if (init != "") {
-            PTerm t = null;
+            alice.tuprolog.Term t = null;
             try {                
                 t = alice.tuprolog.Parser.parseSingleTerm(init);
             }

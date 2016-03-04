@@ -26,17 +26,17 @@ public class EngineRunner implements java.io.Serializable, Runnable{
     private EngineManager             engineManager;
     
     private boolean relinkVar;
-	private ArrayList<PTerm> bagOFres;
+	private ArrayList<Term> bagOFres;
 	private ArrayList<String> bagOFresString;
-	private PTerm bagOFvarSet;
-	private PTerm bagOfgoal;
-	private PTerm bagOfBag;
+	private Term bagOFvarSet;
+	private Term bagOfgoal;
+	private Term bagOfBag;
 
     private final int id;
     private int pid;
     private boolean detached;
     private boolean solving;
-    private PTerm query;
+    private Term query;
     private TermQueue msgs;
     private ArrayList<Boolean> next;
     private int countNext;
@@ -66,8 +66,13 @@ public class EngineRunner implements java.io.Serializable, Runnable{
     final State END_TRUE;
     final State END_TRUE_CP;
     final State END_HALT;
-
-
+    
+    public static final int HALT    = -1;
+    public static final int FALSE   =  0;
+    public static final int TRUE    =  1;
+    public static final int TRUE_CP =  2;
+    
+    
     public EngineRunner(int id) {
         /* Istanzio gli stati */
         INIT            = new StateInit(this);
@@ -76,10 +81,10 @@ public class EngineRunner implements java.io.Serializable, Runnable{
         RULE_SELECTION  = new StateRuleSelection(this);
         GOAL_SELECTION  = new StateGoalSelection(this);
         BACKTRACK       = new StateBacktrack(this);
-        END_FALSE       = new StateEnd(this, Solution.FALSE);
-        END_TRUE        = new StateEnd(this, Solution.TRUE);
-        END_TRUE_CP     = new StateEnd(this, Solution.TRUE_CP);
-        END_HALT        = new StateEnd(this, Solution.HALT);
+        END_FALSE       = new StateEnd(this,FALSE);
+        END_TRUE        = new StateEnd(this,TRUE);
+        END_TRUE_CP     = new StateEnd(this,TRUE_CP);
+        END_HALT        = new StateEnd(this,HALT);
                 
                 this.id = id;
     }
@@ -112,7 +117,7 @@ public class EngineRunner implements java.io.Serializable, Runnable{
     }
     
     void warn(String message) {
-        mediator.logger.warn(message);
+        mediator.warn(message);
     }
     
     /*Castagna 06/2011*/
@@ -294,11 +299,11 @@ public class EngineRunner implements java.io.Serializable, Runnable{
      * Utility functions for Finite State Machine
      */
     
-    List<ClauseInfo> find(PTerm t) {
+    List<ClauseInfo> find(Term t) {
         return theoryManager.find(t);
     }
     
-    void identify(PTerm t) {
+    void identify(Term t) {
         primitiveManager.identifyPredicate(t);
     }
     
@@ -374,7 +379,7 @@ public class EngineRunner implements java.io.Serializable, Runnable{
                 return sinfo;
         }
         
-        public void setGoal(PTerm goal){
+        public void setGoal(Term goal){
                 this.query = goal;
         }
 
@@ -410,28 +415,28 @@ public class EngineRunner implements java.io.Serializable, Runnable{
         }
         
         
-        public void sendMsg(PTerm t){
+        public void sendMsg(Term t){                    
                 msgs.store(t);
         }
         
         
-        public boolean getMsg(PTerm t){
+        public boolean getMsg(Term t){
                 msgs.get(t, mediator, this);
                 return true;
         }
         
         
-        public boolean peekMsg (PTerm t){
+        public boolean peekMsg (Term t){
                 return msgs.peek(t, mediator);
         }
         
         
-        public boolean removeMsg(PTerm t){
+        public boolean removeMsg(Term t){
                 return msgs.remove(t, mediator);
         }
 
         
-        public boolean waitMsg(PTerm msg) {
+        public boolean waitMsg(Term msg) {
                 msgs.wait(msg, mediator, this);
                 return true;
         }
@@ -452,10 +457,10 @@ public class EngineRunner implements java.io.Serializable, Runnable{
     		this.relinkVar=b;
     	}
         
-        public ArrayList<PTerm> getBagOFres(){
+        public ArrayList<Term> getBagOFres(){
     		return this.bagOFres;
     	}
-        public void setBagOFres(ArrayList<PTerm> l){
+        public void setBagOFres(ArrayList<Term> l){
     		this.bagOFres=l;
     	}
         public ArrayList<String> getBagOFresString(){
@@ -464,22 +469,22 @@ public class EngineRunner implements java.io.Serializable, Runnable{
         public void setBagOFresString(ArrayList<String> l){
     		this.bagOFresString=l;
     	}
-        public PTerm getBagOFvarSet(){
+        public Term getBagOFvarSet(){
     		return this.bagOFvarSet;
     	}
-        public void setBagOFvarSet(PTerm l){
+        public void setBagOFvarSet(Term l){
     		this.bagOFvarSet=l;
     	}
-        public PTerm getBagOFgoal(){
+        public Term getBagOFgoal(){
     		return this.bagOfgoal;
     	}
-        public void setBagOFgoal(PTerm l){
+        public void setBagOFgoal(Term l){
     		this.bagOfgoal=l;
     	}
-        public PTerm getBagOFBag(){
+        public Term getBagOFBag(){
     		return this.bagOfBag;
     	}
-        public void setBagOFBag(PTerm l){
+        public void setBagOFBag(Term l){
     		this.bagOfBag=l;
     	}
         public EngineManager getEngineMan(){

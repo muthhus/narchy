@@ -8,8 +8,8 @@ import java.util.List;
  */
 public class StateException extends State {
 
-    final PTerm catchTerm = PTerm.createTerm("catch(Goal, Catcher, Handler)");
-    final PTerm javaCatchTerm = PTerm
+    final Term catchTerm = Term.createTerm("catch(Goal, Catcher, Handler)");
+    final Term javaCatchTerm = Term
             .createTerm("java_catch(Goal, List, Finally)");
 
     public StateException(EngineRunner c) {
@@ -27,7 +27,7 @@ public class StateException extends State {
     }
 
     private void prologError(Engine e) {
-        PTerm errorTerm = e.currentContext.currentGoal.getArg(0);
+        Term errorTerm = e.currentContext.currentGoal.getArg(0);
         e.currentContext = e.currentContext.fatherCtx;
         if (e.currentContext == null) {
             // passo nello stato HALT se l?errore non pu? essere gestito (sono
@@ -60,8 +60,8 @@ public class StateException extends State {
                 // l?esecuzione, mantenendo le sostituzioni effettuate durante
                 // il processo di unificazione tra l?argomento di throw/1 e il
                 // secondo argomento di catch/3
-                PTerm handlerTerm = e.currentContext.currentGoal.getArg(2);
-                PTerm curHandlerTerm = handlerTerm.getTerm();
+                Term handlerTerm = e.currentContext.currentGoal.getArg(2);
+                Term curHandlerTerm = handlerTerm.getTerm();
                 if (!(curHandlerTerm instanceof Struct)) {
                     e.nextState = c.END_FALSE;
                     return;
@@ -98,7 +98,7 @@ public class StateException extends State {
 
     private void javaException(Engine e) {
         Struct cg = e.currentContext.currentGoal;
-        PTerm exceptionTerm = cg.getArity() > 0 ? cg.getArg(0) : null;
+        Term exceptionTerm = cg.getArity() > 0 ? cg.getArg(0) : null;
         e.currentContext = e.currentContext.fatherCtx;
         if (e.currentContext == null) {
             // passo nello stato HALT se l?errore non pu? essere gestito (sono
@@ -123,7 +123,7 @@ public class StateException extends State {
                 // appropriato e recupero l'handler corrispondente
                 List<Var> unifiedVars = e.currentContext.trailingVars
                         .getHead();
-                PTerm handlerTerm = javaUnify(e.currentContext.currentGoal
+                Term handlerTerm = javaUnify(e.currentContext.currentGoal
                         .getArg(1), exceptionTerm, unifiedVars);
                 if (handlerTerm == null) {
                     e.nextState = c.END_FALSE;
@@ -135,13 +135,13 @@ public class StateException extends State {
                 // essere preparati per l?esecuzione, mantenendo le sostituzioni
                 // effettuate durante il processo di unificazione tra
                 // l'eccezione e il catcher
-                PTerm curHandlerTerm = handlerTerm.getTerm();
+                Term curHandlerTerm = handlerTerm.getTerm();
                 if (!(curHandlerTerm instanceof Struct)) {
                     e.nextState = c.END_FALSE;
                     return;
                 }
-                PTerm finallyTerm = e.currentContext.currentGoal.getArg(2);
-                PTerm curFinallyTerm = finallyTerm.getTerm();
+                Term finallyTerm = e.currentContext.currentGoal.getArg(2);
+                Term curFinallyTerm = finallyTerm.getTerm();
                 // verifico se c'? il blocco finally
                 boolean isFinally = true;
                 if (curFinallyTerm instanceof Int) {
@@ -198,15 +198,15 @@ public class StateException extends State {
 
     // verifica se c'? un catcher unificabile con l'argomento dell'eccezione
     // lanciata
-    private static boolean javaMatch(PTerm arg1, PTerm exceptionTerm) {
+    private static boolean javaMatch(Term arg1, Term exceptionTerm) {
         if (!arg1.isList())
             return false;
         Struct list = (Struct) arg1;
         if (list.isEmptyList())
             return false;
-        Iterator<? extends PTerm> it = list.listIterator();
+        Iterator<? extends Term> it = list.listIterator();
         while (it.hasNext()) {
-            PTerm nextTerm = it.next();
+            Term nextTerm = it.next();
             if (!nextTerm.isCompound())
                 continue;
             Struct element = (Struct) nextTerm;
@@ -223,11 +223,11 @@ public class StateException extends State {
 
     // unifica l'argomento di java_throw/1 con il giusto catcher e restituisce
     // l'handler corrispondente
-    private static PTerm javaUnify(PTerm arg1, PTerm exceptionTerm, List<Var> unifiedVars) {
+    private static Term javaUnify(Term arg1, Term exceptionTerm, List<Var> unifiedVars) {
         Struct list = (Struct) arg1;
-        Iterator<? extends PTerm> it = list.listIterator();
+        Iterator<? extends Term> it = list.listIterator();
         while (it.hasNext()) {
-            PTerm nextTerm = it.next();
+            Term nextTerm = it.next();
             if (!nextTerm.isCompound())
                 continue;
             Struct element = (Struct) nextTerm;

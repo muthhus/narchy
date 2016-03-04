@@ -56,7 +56,7 @@ public class PrimitiveInfo {
         primitive_key = key;
         source = lib;
         method = m;
-        primitive_args=new PTerm[arity];
+        primitive_args=new Term[arity];
     }
     
     
@@ -132,12 +132,12 @@ public class PrimitiveInfo {
      * evaluates the primitive as a functor
      * @throws Throwable 
      */
-    public synchronized PTerm evalAsFunctor(Struct g) throws Throwable {
+    public synchronized Term evalAsFunctor(Struct g) throws Throwable {
         try {
             for (int i=0; i<primitive_args.length; i++) {
                 primitive_args[i] = g.getTerm(i);
             }
-            return ((PTerm)method.invoke(source,primitive_args));
+            return ((Term)method.invoke(source,primitive_args));
         } catch (Exception ex) {
             throw ex.getCause();
         }

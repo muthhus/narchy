@@ -10,8 +10,6 @@
 package alice.tuprologx.pj.model;
 
 
-import alice.tuprolog.PTerm;
-
 import java.util.Collection;
 import java.util.Vector;
 
@@ -64,7 +62,7 @@ public class Theory extends List<Clause<?,?>> {
     
     public static Theory unmarshal(alice.tuprolog.Theory t) {
         Vector<Clause<?,?>> clauses = new Vector<Clause<?,?>>();                
-        for (java.util.Iterator<? extends PTerm> it = t.iterator(engine); it.hasNext();) {
+        for (java.util.Iterator<? extends alice.tuprolog.Term> it = t.iterator(engine); it.hasNext();) {
             alice.tuprolog.Struct st = (alice.tuprolog.Struct) it.next();                        
             //Clause<?,?> clause = new Clause(Term.unmarshal(st.getArg(0)),Term.unmarshal(st.getArg(1)));
             Clause<?,?> clause = new Clause<Term<?>, Term<?>>(st);
@@ -156,7 +154,7 @@ public class Theory extends List<Clause<?,?>> {
         catch (Exception e) {
             throw new UnsupportedOperationException(e);
         }
-        for (java.util.Iterator<? extends PTerm> it = t.iterator(engine); it.hasNext();) {
+        for (java.util.Iterator<? extends alice.tuprolog.Term> it = t.iterator(engine); it.hasNext();) {
             alice.tuprolog.Struct st = (alice.tuprolog.Struct) it.next();                        
             //Clause<?,?> clause = new Clause(Term.unmarshal(st.getArg(0)),Term.unmarshal(st.getArg(1)));
             Clause<?,?> clause = new Clause<Term<?>, Term<?>>(st);
@@ -185,7 +183,7 @@ public class Theory extends List<Clause<?,?>> {
     @Override
     public alice.tuprolog.Struct marshal() {
             alice.tuprolog.Struct s = super.marshal();
-            java.util.Iterator<? extends PTerm> listIterator = s.listIterator();
+            java.util.Iterator<? extends alice.tuprolog.Term> listIterator = s.listIterator();
             while (listIterator.hasNext()) {
                 listIterator.next().resolveTerm();
             }

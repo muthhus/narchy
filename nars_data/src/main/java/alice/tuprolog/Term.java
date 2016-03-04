@@ -33,12 +33,12 @@ import alice.util.OneWayList;
  * @see Var
  * @see  Number
  */
-public abstract class PTerm implements Serializable {
+public abstract class Term implements Serializable {
 	private static final long serialVersionUID = 1L;
 
     // true and false constants
-    public static final PTerm TRUE  = new Struct("true");
-    public static final PTerm FALSE = new Struct("false");
+    public static final Term TRUE  = new Struct("true");
+    public static final Term FALSE = new Struct("false");
     public static final String HALT = "halt.";
     public static final String NO = "no.";
     public static final String YES = "yes.";
@@ -92,25 +92,25 @@ public abstract class PTerm implements Serializable {
      */
     public boolean equals(Object t)
     {
-        return this==t || ((t instanceof PTerm) && isEqual((PTerm) t));
+        return this==t || ((t instanceof Term) && isEqual((Term) t));
     }
     
     
     /**
      * is term greater than term t?
      */
-    public abstract boolean isGreater(PTerm t);
-    public abstract boolean isGreaterRelink(PTerm t, ArrayList<String> vorder);
+    public abstract boolean isGreater(Term t);
+    public abstract boolean isGreaterRelink(Term t, ArrayList<String> vorder);
     
     /**
      * Tests if this term is (logically) equal to another
      */
-    public abstract boolean isEqual(PTerm t);
+    public abstract boolean isEqual(Term t);
     
     /**
 	 * Gets the actual term referred by this Term. if the Term is a bound variable, the method gets the Term linked to the variable
 	 */
-    public abstract PTerm getTerm();
+    public abstract Term getTerm();
     
     
     /**
@@ -143,7 +143,7 @@ public abstract class PTerm implements Serializable {
      * gets a engine's copy of this term.
      * @param idExecCtx Execution Context identified
      */
-    public PTerm copyGoal(AbstractMap<Var,Var> vars, int idExecCtx) {
+    public Term copyGoal(AbstractMap<Var,Var> vars, int idExecCtx) {
         return copy(vars,idExecCtx);
     }
     
@@ -151,7 +151,7 @@ public abstract class PTerm implements Serializable {
     /**
      * gets a copy of this term for the output
      */
-    public PTerm copyResult(Collection<Var> goalVars, List<Var> resultVars) {
+    public Term copyResult(Collection<Var> goalVars, List<Var> resultVars) {
         IdentityHashMap<Var,Var> originals = new IdentityHashMap<>(goalVars.size());
         for (Var key: goalVars) {
             Var clone = new Var();
@@ -171,12 +171,12 @@ public abstract class PTerm implements Serializable {
      * (if empty list then no renaming)
      * @param idExecCtx Execution Context identifier
      */
-    abstract PTerm copy(AbstractMap<Var,Var> vMap, int idExecCtx);
+    abstract Term copy(AbstractMap<Var,Var> vMap, int idExecCtx);
     
     /**
      * gets a copy for result.
      */
-    abstract PTerm copy(AbstractMap<Var,Var> vMap, AbstractMap<PTerm,Var> substMap);
+    abstract Term copy(AbstractMap<Var,Var> vMap, AbstractMap<Term,Var> substMap);
     
     /**
      * Try to unify two terms
@@ -184,7 +184,7 @@ public abstract class PTerm implements Serializable {
      * @param t1 the term to unify
      * @return true if the term is unifiable with this one
      */
-    public boolean unify(Prolog mediator, PTerm t1) {
+    public boolean unify(Prolog mediator, Term t1) {
         EngineManager engine = mediator.getEngineManager();
         resolveTerm();
         t1.resolveTerm();
@@ -234,7 +234,7 @@ public abstract class PTerm implements Serializable {
      *
      * @return true if the term is unifiable with this one
      */
-    public boolean match(PTerm t) {
+    public boolean match(Term t) {
         resolveTerm();
         t.resolveTerm();
         List<Var> v1 = new LinkedList<>(); /* Reviewed by: Paolo Contessi (was: ArrayList()) */
@@ -254,7 +254,7 @@ public abstract class PTerm implements Serializable {
      * @param varsUnifiedArg1 Vars unified in myself
      * @param varsUnifiedArg2 Vars unified in term t
      */
-    abstract boolean unify(List<Var> varsUnifiedArg1, List<Var> varsUnifiedArg2, PTerm t);
+    abstract boolean unify(List<Var> varsUnifiedArg1, List<Var> varsUnifiedArg2, Term t);
     
     
     /**
@@ -263,15 +263,15 @@ public abstract class PTerm implements Serializable {
      * @return the term represented by the string
      * @throws InvalidTermException if the string does not represent a valid term
      */
-    public static PTerm createTerm(String st) {
+    public static Term createTerm(String st) {
         return Parser.parseSingleTerm(st);
     }
     
     /**
-     * @deprecated Use {@link PTerm#createTerm(String)} instead.
+     * @deprecated Use {@link Term#createTerm(String)} instead.
      */
-    public static PTerm parse(String st) {
-        return PTerm.createTerm(st);
+    public static Term parse(String st) {
+        return Term.createTerm(st);
     }
     
     /**
@@ -282,22 +282,22 @@ public abstract class PTerm implements Serializable {
      * @return the term represented by the string
      * @throws InvalidTermException if the string does not represent a valid term
      */
-    public static PTerm createTerm(String st, OperatorManager op) {
+    public static Term createTerm(String st, OperatorManager op) {
         return Parser.parseSingleTerm(st, op);
     }
     
     /**
-     * @deprecated Use {@link PTerm#createTerm(String, OperatorManager)} instead.
+     * @deprecated Use {@link Term#createTerm(String, OperatorManager)} instead.
      */
-    public static PTerm parse(String st, OperatorManager op) {
-        return PTerm.createTerm(st, op);
+    public static Term parse(String st, OperatorManager op) {
+        return Term.createTerm(st, op);
     }
     
     /**
      * Gets an iterator providing
      * a term stream from a source text
      */
-    public static java.util.Iterator<PTerm> getIterator(String text) {
+    public static java.util.Iterator<Term> getIterator(String text) {
         return new Parser(text).iterator();
     }
     
@@ -341,7 +341,7 @@ public abstract class PTerm implements Serializable {
      * <li>else G is T</li>
      * </ul>
      */
-    public PTerm iteratedGoalTerm() {
+    public Term iteratedGoalTerm() {
         return this;
     }
     

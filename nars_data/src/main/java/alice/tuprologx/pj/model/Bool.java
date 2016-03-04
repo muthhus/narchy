@@ -9,8 +9,6 @@
 
 package alice.tuprologx.pj.model;
 
-import alice.tuprolog.PTerm;
-
 /**
  *
  * @author maurizio
@@ -25,7 +23,7 @@ public class Bool extends Term<Bool> {
 	public Bool (Boolean b) {_theBool = b;}
         
         @Override
-        public PTerm marshal() {
+        public alice.tuprolog.Term marshal() {
             return _theBool.booleanValue() ? alice.tuprolog.Struct.TRUE : alice.tuprolog.Struct.FALSE;
         }
         
@@ -38,7 +36,7 @@ public class Bool extends Term<Bool> {
                 return new Bool(Boolean.FALSE);
         }
         
-        static boolean matches(PTerm t) {
+        static boolean matches(alice.tuprolog.Term t) {            
             return (!(t instanceof alice.tuprolog.Var) && (t.isEqual(alice.tuprolog.Struct.TRUE) || t.isEqual(alice.tuprolog.Struct.FALSE)));
         }
         
