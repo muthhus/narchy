@@ -63,13 +63,13 @@ public class Proxy implements alice.tuprologx.runtime.tcp.Prolog {
 
 
     @Override
-    public SolveInfo solve(String st) throws Exception {
+    public Solution solve(String st) throws Exception {
         out.writeObject(new NetMsg("solveString"));
         out.writeObject(st);
         out.flush();
         Boolean b=(Boolean)in.readObject();
         if (b.booleanValue()){
-            SolveInfo info=(SolveInfo)in.readObject();
+            Solution info=(Solution)in.readObject();
             return info;
         } else {
             throw new MalformedGoalException();
@@ -77,13 +77,13 @@ public class Proxy implements alice.tuprologx.runtime.tcp.Prolog {
     }
 
     @Override
-    public SolveInfo solve(PTerm term) throws Exception {
+    public Solution solve(PTerm term) throws Exception {
         out.writeObject(new NetMsg("solveTerm"));
         out.writeObject(term);
         out.flush();
         Boolean b=(Boolean)in.readObject();
         if (b.booleanValue()){
-            SolveInfo info=(SolveInfo)in.readObject();
+            Solution info=(Solution)in.readObject();
             return info;
         } else {
             throw new MalformedGoalException();
@@ -91,12 +91,12 @@ public class Proxy implements alice.tuprologx.runtime.tcp.Prolog {
     }
 
     @Override
-    public SolveInfo solveNext() throws Exception {
+    public Solution solveNext() throws Exception {
         out.writeObject(new NetMsg("solveNext"));
         out.flush();
         Boolean b=(Boolean)in.readObject();
         if (b.booleanValue()){
-            SolveInfo info=(SolveInfo)in.readObject();
+            Solution info=(Solution)in.readObject();
             return info;
         } else {
             throw new NoSolutionException();

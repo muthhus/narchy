@@ -21,7 +21,7 @@ package alice.tuprolog;
  * This exception means that other solutions are asked but
  * actually no other ones exist.
  *
- * @see SolveInfo
+ * @see Solution
  *
  *
  *

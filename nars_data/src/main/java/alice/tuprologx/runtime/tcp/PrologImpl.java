@@ -47,7 +47,7 @@ public class PrologImpl implements java.io.Serializable {
     public void solveString(ObjectInputStream in,ObjectOutputStream out)  throws Exception {
         try {
             String st=(String)in.readObject();
-            SolveInfo info=core.solve(st);
+            Solution info=core.solve(st);
             out.writeObject(new Boolean(true));
             out.writeObject(info);
         } catch (MalformedGoalException ex){
@@ -61,14 +61,14 @@ public class PrologImpl implements java.io.Serializable {
 
     public void solveTerm(ObjectInputStream in,ObjectOutputStream out)  throws Exception {
         PTerm th=(PTerm)in.readObject();
-        SolveInfo info=core.solve(th);
+        Solution info=core.solve(th);
         out.writeObject(new Boolean(true));
         out.writeObject(info);
     }
 
     public void solveNext(ObjectInputStream in,ObjectOutputStream out) throws Exception {
         try {
-            SolveInfo info=core.solveNext();
+            Solution info=core.solveNext();
             out.writeObject(new Boolean(true));
             out.writeObject(info);
         } catch (NoMoreSolutionException ex){

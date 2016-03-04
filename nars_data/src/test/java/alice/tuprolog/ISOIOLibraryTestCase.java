@@ -12,7 +12,6 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import alice.tuprolog.Prolog;
 import alice.tuprolog.event.OutputEvent;
 import alice.tuprolog.event.OutputListener;
 
@@ -22,7 +21,7 @@ public class ISOIOLibraryTestCase {
 
 	static Prolog engine = null;
 	String theory = null;
-	SolveInfo info = null;
+	Solution info = null;
 	static String writePath = null;
 	static String readPath = null;
 	static String binPath = null;

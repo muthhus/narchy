@@ -22,23 +22,24 @@ import java.util.*;
 
 /**
  *
- * SolveInfo class represents the result of a solve
+ * Solution class represents the result of a solve
  * request made to the engine, providing information
  * about the solution
  * 
  * @author Alex Benini
  */
-public class SolveInfo implements Serializable/*, ISolution<Term,Term,Term>*/  {
+public class Solution implements Serializable/*, ISolution<Term,Term,Term>*/  {
 	private static final long serialVersionUID = 1L;
+
     /*
-     * possible values returned by step functions
-     * and used as eval state flags
-     */
-    static final int HALT    = EngineRunner.HALT;
-    static final int FALSE   = EngineRunner.FALSE;
-    static final int TRUE    = EngineRunner.TRUE;
-    static final int TRUE_CP = EngineRunner.TRUE_CP;
-    
+         * possible values returned by step functions
+         * and used as eval state flags
+         */
+    public static final int HALT    = -1;
+    public static final int FALSE   =  0;
+    public static final int TRUE    =  1;
+    public static final int TRUE_CP =  2;
+
     private int     endState;
     private final boolean isSuccess;
     
@@ -51,7 +52,7 @@ public class SolveInfo implements Serializable/*, ISolution<Term,Term,Term>*/  {
     /**
      * 
      */
-    SolveInfo(PTerm initGoal){
+    Solution(PTerm initGoal){
         query = initGoal;
         isSuccess = false;
         setOfSolution=null;
@@ -64,7 +65,7 @@ public class SolveInfo implements Serializable/*, ISolution<Term,Term,Term>*/  {
      * @param resultDemo
      * @param resultVars
      */
-    SolveInfo(PTerm initGoal, Struct resultGoal, int resultDemo, List<Var> resultVars) {
+    Solution(PTerm initGoal, Struct resultGoal, int resultDemo, List<Var> resultVars) {
         query = initGoal;
         goal = resultGoal;
         bindings = resultVars;
@@ -72,6 +73,8 @@ public class SolveInfo implements Serializable/*, ISolution<Term,Term,Term>*/  {
         isSuccess = (endState > FALSE);
         setOfSolution=null;
     }
+
+    public int result() { return endState; }
     
     
     
@@ -207,9 +210,10 @@ public class SolveInfo implements Serializable/*, ISolution<Term,Term,Term>*/  {
             return st.toString().trim();
         } else {
         	/*Castagna 06/2011*/
-            return endState == EngineRunner.HALT ? PTerm.HALT : PTerm.NO;
+            return endState == HALT ? PTerm.HALT : PTerm.NO;
         }
     }
-    
+
+
     
 }

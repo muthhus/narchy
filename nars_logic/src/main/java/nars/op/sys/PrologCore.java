@@ -1,17 +1,15 @@
 package nars.op.sys;
 
 import alice.tuprolog.*;
-import com.gs.collections.api.map.primitive.ObjectBooleanMap;
-import com.gs.collections.impl.map.mutable.primitive.ObjectBooleanHashMap;
 import nars.NAR;
 import nars.Op;
 import nars.data.Range;
 import nars.task.Task;
 import nars.term.Compound;
-import nars.term.Statement;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
+import nars.term.variable.Variable;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,13 +57,22 @@ public class PrologCore extends Agent implements Consumer<Task> {
     @Override
     public void accept(Task task) {
 
-        if (task.isJudgment() && task.isEternal()) {
-            float exp = task.expectation();
-            if (exp > trueExpectationThreshold.floatValue())
-                believe(task, true);
-            else if (exp < falseExpectationThreshold.floatValue())
-                believe(task, false);
+        if (task.isJudgment() ) {
+            if (task.isEternal()) {
+                float exp = task.expectation();
+                if (exp > trueExpectationThreshold.floatValue())
+                    believe(task, true);
+                else if (exp < falseExpectationThreshold.floatValue())
+                    believe(task, false);
+                /* else: UNSURE */
+            }
+        } else if (task.isQuestion()) {
+            if (task.isEternal()) {
+                question(task);
+            }
         }
+
+
         //TODO if task is goal then wrap as goal belief
     }
 
@@ -79,6 +86,40 @@ public class PrologCore extends Agent implements Consumer<Task> {
         believe(pterm(tt), truth);
     }
 
+    //TODO async
+    protected void question(Task question) {
+        Term tt = question.term();
+        /*if (t.op() == Op.NEGATE) {
+            //unwrap negation
+            tt = ((Compound)tt).term(0);
+            truth = !truth;
+        }*/
+
+        PTerm questionTerm = pterm(tt);
+
+        solve(questionTerm, (answer)-> {
+
+            // supply input an answer to the NAR
+
+            logger.info("question {} answer {}", question, answer);
+            switch (answer.result()) {
+                case Solution.TRUE:
+                case Solution.TRUE_CP:
+                    logger.info("TRUE"); //TODO input
+                    break;
+                case Solution.FALSE:
+                    logger.info("FALSE"); //TODO input
+                    break;
+                default:
+                    //no known solution, remain silent
+                    break;
+            }
+        });
+
+    }
+
+
+    //TODO async
     protected void believe(PTerm p, boolean truth) {
         if (!truth) {
             //wrap in negate
@@ -86,7 +127,7 @@ public class PrologCore extends Agent implements Consumer<Task> {
         }
         Struct belief = assertion(p);
 
-        SolveInfo s = solve(belief);
+        Solution s = solve(belief);
         logger.info("believe {} {}", belief, s);
 
     }
@@ -94,15 +135,16 @@ public class PrologCore extends Agent implements Consumer<Task> {
     public static Struct assertion(PTerm p) {
         return new Struct("assertz", p);
     }
+
     public static Struct negate(PTerm p) {
         return new Struct("not", p); //TODO issue retraction on the opposite? ex: retract(x), assertz(not(x))
     }
 
-    public static PTerm[] pterm(final Term[] term) {
-        int l = term.length;
+    public static PTerm[] psubterms(final Compound subtermed) {
+        int l = subtermed.size();
         PTerm[] p = new PTerm[l];
         for (int i = 0; i < l; i++) {
-            p[i] = pterm(term[i]);
+            p[i] = pterm(subtermed.term(i));
         }
         return p;
     }
@@ -111,14 +153,22 @@ public class PrologCore extends Agent implements Consumer<Task> {
     public static PTerm pterm(final Term term) {
         if (term instanceof Compound) {
             Op op = term.op();
-            return new Struct(op.str, pterm( ((Compound)term).terms() ));
+            return new Struct(op.str, psubterms( ((Compound)term) ));
+        } else if (term instanceof Variable) {
+            switch (term.op()) {
+                case VAR_QUERY:
+                case VAR_PATTERN:
+                case VAR_INDEP: //??
+                    return new Var("_" + (((Variable) term).id()));
+                case VAR_DEP: //?? as if atomic
+                    return new Struct( "'#" + ((Variable)term).id() + '\'' );
+            }
         } else if (term instanceof Atomic) {
-            return new Struct( term.toString() );
-        } else if (term instanceof Var) {
-            //..
+            return new Struct(term.toString());
         }
+
         throw new UnsupportedOperationException();
-//
+
 //        //CharSequence s = termString(term);
 //        if (term instanceof Statement) {
 //            Statement i = (Statement)term;

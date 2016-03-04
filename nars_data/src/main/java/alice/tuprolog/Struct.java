@@ -421,9 +421,12 @@ public class Struct extends PTerm {
         t = t.getTerm();
         if (t instanceof Struct) {
             Struct ts = (Struct) t;
+            int arity = this.arity;
             if (arity == ts.arity && name.equals(ts.name)) {
-                for (int c = 0;c < arity;c++) {
-                    if (!arg[c].isEqual(ts.arg[c])) {
+                PTerm[] arg = this.arg;
+                PTerm[] targ = ts.arg;
+                for (int c = 0; c < arity; c++) {
+                    if (!arg[c].isEqual(targ[c])) {
                         return false;
                     }
                 }

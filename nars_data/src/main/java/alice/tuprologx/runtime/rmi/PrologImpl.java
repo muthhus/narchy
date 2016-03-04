@@ -41,12 +41,12 @@ public class PrologImpl extends UnicastRemoteObject
 
 
     @Override
-    public SolveInfo   solve(PTerm g) throws RemoteException {
+    public Solution solve(PTerm g) throws RemoteException {
         return imp.solve(g);
     }
 
     @Override
-    public SolveInfo   solve(String g) throws MalformedGoalException, RemoteException{
+    public Solution solve(String g) throws MalformedGoalException, RemoteException{
         return imp.solve(g);
     }
 
@@ -56,7 +56,7 @@ public class PrologImpl extends UnicastRemoteObject
     }
 
     @Override
-    public SolveInfo   solveNext() throws NoMoreSolutionException, RemoteException {
+    public Solution solveNext() throws NoMoreSolutionException, RemoteException {
         return imp.solveNext();
     }
 

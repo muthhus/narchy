@@ -159,7 +159,7 @@ public class SpyFrame extends JFrame implements ActionListener, SpyListener{
       @Override
       public void run(){
         PTerm sol;
-        SolveInfo sinfo=prolog.solve(goal);
+        Solution sinfo=prolog.solve(goal);
         if(sinfo!=null)
         {
         	while(sinfo.isSuccess())

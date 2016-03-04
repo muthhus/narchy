@@ -17,7 +17,7 @@ public class IOLibraryExceptionsTestCase extends TestCase {
 	public void test_see_1_1() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(see(X), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("see", new Var("X"))));
@@ -29,7 +29,7 @@ public class IOLibraryExceptionsTestCase extends TestCase {
 	public void test_see_1_2() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(see(1), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("see", new Int(1))));
@@ -46,7 +46,7 @@ public class IOLibraryExceptionsTestCase extends TestCase {
 	public void test_see_1_3() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(see(a), error(domain_error(ValidDomain, Culprit), domain_error(Goal, ArgNo, ValidDomain, Culprit)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("see", new Struct("a"))));
@@ -62,7 +62,7 @@ public class IOLibraryExceptionsTestCase extends TestCase {
 	public void test_tell_1_1() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(tell(X), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("tell", new Var("X"))));
@@ -74,7 +74,7 @@ public class IOLibraryExceptionsTestCase extends TestCase {
 	public void test_tell_1_2() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(tell(1), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("tell", new Int(1))));
@@ -90,7 +90,7 @@ public class IOLibraryExceptionsTestCase extends TestCase {
 	public void test_put_1_1() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(put(X), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("put", new Var("X"))));
@@ -102,7 +102,7 @@ public class IOLibraryExceptionsTestCase extends TestCase {
 	public void test_put_1_2() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(put(1), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("put", new Int(1))));
@@ -118,7 +118,7 @@ public class IOLibraryExceptionsTestCase extends TestCase {
 	public void test_put_1_3() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(put(aa), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("put", new Struct("aa"))));
@@ -134,7 +134,7 @@ public class IOLibraryExceptionsTestCase extends TestCase {
 	public void test_tab_1_1() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(tab(X), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("tab", new Var("X"))));
@@ -146,7 +146,7 @@ public class IOLibraryExceptionsTestCase extends TestCase {
 	public void test_tab_1_2() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(tab(a), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("tab", new Struct("a"))));
@@ -166,7 +166,7 @@ public class IOLibraryExceptionsTestCase extends TestCase {
 		pw.close();
 		Prolog engine = new Prolog();
 		String goal = "see(read), catch(read(X), error(syntax_error(Message), syntax_error(Goal, Line, Position, Message)), true), seen.";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("read", new Var("X"))));
@@ -184,7 +184,7 @@ public class IOLibraryExceptionsTestCase extends TestCase {
 	public void test_write_1_1() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(write(X), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("write", new Var("X"))));
@@ -196,7 +196,7 @@ public class IOLibraryExceptionsTestCase extends TestCase {
 	public void test_print_1_1() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(print(X), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("print", new Var("X"))));
@@ -208,7 +208,7 @@ public class IOLibraryExceptionsTestCase extends TestCase {
 	public void test_text_from_file_2_1() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(text_from_file(X, Y), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("text_from_file", new Var("X"),
@@ -221,7 +221,7 @@ public class IOLibraryExceptionsTestCase extends TestCase {
 	public void test_text_from_file_2_2() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(text_from_file(1, Y), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("text_from_file", new Int(1), new Var(
@@ -239,7 +239,7 @@ public class IOLibraryExceptionsTestCase extends TestCase {
 	public void test_text_from_file_2_3() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(text_from_file(text, Y), error(existence_error(ObjectType, Culprit), existence_error(Goal, ArgNo, ObjectType, Culprit, Message)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("text_from_file", new Struct("text"),
@@ -258,7 +258,7 @@ public class IOLibraryExceptionsTestCase extends TestCase {
 	public void test_agent_file_1_1() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(agent_file(X), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.match(new Struct("text_from_file", new Var("X"), new Var(
@@ -271,7 +271,7 @@ public class IOLibraryExceptionsTestCase extends TestCase {
 	public void test_agent_file_1_2() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(agent_file(1), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.match(new Struct("text_from_file", new Int(1),
@@ -289,7 +289,7 @@ public class IOLibraryExceptionsTestCase extends TestCase {
 	public void test_agent_file_1_3() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(agent_file(text), error(existence_error(ObjectType, Culprit), existence_error(Goal, ArgNo, ObjectType, Culprit, Message)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.match(new Struct("text_from_file", new Struct("text"),
@@ -308,7 +308,7 @@ public class IOLibraryExceptionsTestCase extends TestCase {
 	public void test_solve_file_2_1() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(solve_file(X, g), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.match(new Struct("text_from_file", new Var("X"), new Var(
@@ -321,7 +321,7 @@ public class IOLibraryExceptionsTestCase extends TestCase {
 	public void test_solve_file_2_2() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(solve_file(1, g), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.match(new Struct("text_from_file", new Int(1),
@@ -339,7 +339,7 @@ public class IOLibraryExceptionsTestCase extends TestCase {
 	public void test_solve_file_2_3() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(solve_file(text, g), error(existence_error(ObjectType, Culprit), existence_error(Goal, ArgNo, ObjectType, Culprit, Message)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.match(new Struct("text_from_file", new Struct("text"),
@@ -358,7 +358,7 @@ public class IOLibraryExceptionsTestCase extends TestCase {
 	public void test_solve_file_2_4() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(solve_file(text, X), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("solve_file_goal_guard", new Struct(
@@ -371,7 +371,7 @@ public class IOLibraryExceptionsTestCase extends TestCase {
 	public void test_solve_file_2_5() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(solve_file(text, 1), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("solve_file_goal_guard", new Struct(
@@ -388,7 +388,7 @@ public class IOLibraryExceptionsTestCase extends TestCase {
 	public void test_consult_1_1() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(consult(X), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.match(new Struct("text_from_file", new Var("X"), new Var(
@@ -401,7 +401,7 @@ public class IOLibraryExceptionsTestCase extends TestCase {
 	public void test_consult_1_2() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(consult(1), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.match(new Struct("text_from_file", new Int(1),
@@ -419,7 +419,7 @@ public class IOLibraryExceptionsTestCase extends TestCase {
 	public void test_consult_1_3() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(consult(text), error(existence_error(ObjectType, Culprit), existence_error(Goal, ArgNo, ObjectType, Culprit, Message)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.match(new Struct("text_from_file", new Struct("text"),

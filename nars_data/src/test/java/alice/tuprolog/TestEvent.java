@@ -58,7 +58,7 @@ public class TestEvent {
         
         engine.setTheory(th);
         
-        SolveInfo sinfo = engine.solve("a(X).");
+        Solution sinfo = engine.solve("a(X).");
         
         while (sinfo.isSuccess() && engine.hasOpenAlternatives()){
             sinfo = engine.solveNext();

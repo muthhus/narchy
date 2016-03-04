@@ -30,6 +30,30 @@ public class PrologCoreTest {
 
     }
 
+    @Test
+    public void testPrologCoreQuestionTruthAnswer() throws MalformedGoalException {
+        NAR n = new Default();
+        PrologCore p = new PrologCore(n);
+        n.input("a:b.");
+        n.input("a:c.");
+        n.input("(--, c:d).");
+        n.step();
+
+        n.input("a:b?");
+        //expect true
+        n.step();
+
+        n.input("c:d?");
+        //expect false
+        n.step();
+
+        n.input("a:?x?");
+        //expect true with 2 answers
+        n.step();
+
+    }
+
+
 //    boolean prologAnswered = false;
 //
 //

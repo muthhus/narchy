@@ -17,14 +17,14 @@
  */
 package alice.tuprologx.ide;
 
-import alice.tuprolog.SolveInfo;
+import alice.tuprolog.Solution;
 
 /**
  * @author <a href="mailto:simone.pellegrini@studio.unibo.it">Simone Pellegrini</a>
  */
 
 public class EngineStatus{
-    private SolveInfo info;
+    private Solution info;
     private boolean hasAlternatives;
     private String error;
     
@@ -70,13 +70,13 @@ public class EngineStatus{
     /**
 	 * @return  Returns the info.
 	 */
-    public SolveInfo getInfo() {
+    public Solution getInfo() {
         return info;
     }
     /**
 	 * @param info  The info to set.
 	 */
-    public void setInfo(SolveInfo info) {
+    public void setInfo(Solution info) {
         this.info = info;
     }
 }

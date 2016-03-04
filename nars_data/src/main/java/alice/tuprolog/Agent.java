@@ -22,8 +22,6 @@ import java.io.*;
 import alice.util.Tools;
 import alice.tuprolog.event.OutputListener;
 
-import static sun.jvm.hotspot.runtime.PerfMemory.start;
-
 /**
  * Provides a prolog virtual machine embedded in a separate thread.
  * It needs a theory and optionally a goal.
@@ -95,10 +93,10 @@ public class Agent extends Prolog {
     /**
      * Starts agent execution in current thread
      */
-    public SolveInfo run() {
+    public Solution run() {
         return body();
     }
-    public SolveInfo run(String goal) {
+    public Solution run(String goal) {
         this.goalText = goal;
         return run();
     }
@@ -129,7 +127,7 @@ public class Agent extends Prolog {
     }
     
     
-    private SolveInfo body(){
+    private Solution body(){
         try {
 
             setTheory( (theoryText==null) ?

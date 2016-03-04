@@ -11,7 +11,7 @@ class PrologThread extends Thread {
 	public void run(){
 		try {
 			System.out.println("STARTING...");
-			SolveInfo info = core.solve(goal);
+			Solution info = core.solve(goal);
 			System.out.println(info);
 			System.out.println("STOP.");
 		} catch (Exception ex){

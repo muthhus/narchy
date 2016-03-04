@@ -10,6 +10,7 @@
 package alice.tuprologx.pj.engine;
 
 
+import alice.tuprolog.Solution;
 import alice.tuprologx.pj.model.*;
 
 import java.util.*;
@@ -46,13 +47,13 @@ public class PJProlog /*extends alice.tuprolog.Prolog*/ {
         }
 
     public <G extends Term<?>, S extends Term<?>> PrologSolution<G,S> solve(G g) {
-        alice.tuprolog.SolveInfo retValue;        
+        Solution retValue;
         retValue = engine.solve(g.marshal());        
         return new PrologSolution<G,S>(retValue);
     }
     
     public <G extends Term<?>, S extends Term<?>> PrologSolution<G,S> solveNext() throws NoSolutionException {
-        alice.tuprolog.SolveInfo retValue;        
+        Solution retValue;
         try {
             retValue = engine.solveNext();
         }

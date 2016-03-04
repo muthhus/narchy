@@ -14,7 +14,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_asserta_1_1() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(asserta(X), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("asserta", new Var("X"))));
@@ -26,7 +26,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_asserta_1_2() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(asserta(1), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("asserta", new Int(1))));
@@ -42,7 +42,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_assertz_1_1() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(assertz(X), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("assertz", new Var("X"))));
@@ -54,7 +54,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_assertz_1_2() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(assertz(1), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("assertz", new Int(1))));
@@ -70,7 +70,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_$retract_1_1() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch('$retract'(X), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("$retract", new Var("X"))));
@@ -82,7 +82,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_$retract_1_2() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch('$retract'(1), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("$retract", new Int(1))));
@@ -98,7 +98,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_abolish_1_1() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(abolish(X), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("abolish", new Var("X"))));
@@ -110,7 +110,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_abolish_1_2() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(abolish(1), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("abolish", new Int(1))));
@@ -126,7 +126,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_abolish_1_3() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(abolish(p(X)), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("abolish",
@@ -143,7 +143,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_halt_1_1() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(halt(X), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("halt", new Var("X"))));
@@ -155,7 +155,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_halt_1_2() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(halt(1.5), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("halt", new Double(1.5))));
@@ -171,7 +171,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_load_library_1_1() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(load_library(X), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("load_library", new Var("X"))));
@@ -183,7 +183,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_load_library_1_2() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(load_library(1), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("load_library", new Int(1))));
@@ -200,7 +200,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_load_library_1_3() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(load_library('a'), error(existence_error(ObjectType, Culprit), existence_error(Goal, ArgNo, ObjectType, Culprit, Message)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("load_library", new Struct("a"))));
@@ -218,7 +218,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_unload_library_1_1() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(unload_library(X), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("unload_library", new Var("X"))));
@@ -230,7 +230,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_unload_library_1_2() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(unload_library(1), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("unload_library", new Int(1))));
@@ -247,7 +247,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_unload_library_1_3() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(unload_library('a'), error(existence_error(ObjectType, Culprit), existence_error(Goal, ArgNo, ObjectType, Culprit, Message)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("unload_library", new Struct("a"))));
@@ -265,7 +265,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_$call_1_1() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch('$call'(X), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("$call", new Var("X"))));
@@ -277,7 +277,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_$call_1_2() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch('$call'(1), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("$call", new Int(1))));
@@ -293,7 +293,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_is_2_1() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(is(X, Y), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("is", new Var("X"), new Var("Y"))));
@@ -305,7 +305,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_is_2_2() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(is(X, a), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("is", new Var("X"), new Struct("a"))));
@@ -321,7 +321,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_is_2_3() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(is(X, 1/0), error(evaluation_error(Error), evaluation_error(Goal, ArgNo, Error)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("is", new Var("X"), new Struct("/", new Int(1), new Int(0)))));
@@ -335,7 +335,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_is_2_4() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(is(X, 1//0), error(evaluation_error(Error), evaluation_error(Goal, ArgNo, Error)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("is", new Var("X"), new Struct("//", new Int(1), new Int(0)))));
@@ -349,7 +349,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_is_2_5() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(is(X, 1 div 0), error(evaluation_error(Error), evaluation_error(Goal, ArgNo, Error)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("is", new Var("X"), new Struct("div", new Int(1), new Int(0)))));
@@ -363,7 +363,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_$tolist_2_1() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch('$tolist'(X, List), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("$tolist", new Var("X"),
@@ -376,7 +376,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_$tolist_2_2() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch('$tolist'(1, List), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g
@@ -393,7 +393,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_$fromlist_2_1() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch('$fromlist'(Struct, X), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("$fromlist", new Var("Struct"),
@@ -406,7 +406,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_$fromlist_2_2() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch('$fromlist'(Struct, a), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("$fromlist", new Var("Struct"),
@@ -423,7 +423,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_$append_2_1() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch('$append'(a, X), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("$append", new Struct("a"),
@@ -436,7 +436,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_$append_2_2() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch('$append'(a, b), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("$append", new Struct("a"), new Struct(
@@ -453,7 +453,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_$find_2_1() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch('$find'(X, []), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("$find", new Var("X"), new Struct())));
@@ -465,7 +465,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_$find_2_2() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch('$find'(p(X), a), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("$find", new Struct("p", new Var("X")),
@@ -482,7 +482,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_set_prolog_flag_2_1() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(set_prolog_flag(X, 1), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("set_prolog_flag", new Var("X"),
@@ -495,7 +495,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_set_prolog_flag_2_2() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(set_prolog_flag(a, X), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("set_prolog_flag", new Struct("a"),
@@ -508,7 +508,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_set_prolog_flag_2_3() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(set_prolog_flag(1, 1), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("set_prolog_flag", new Int(1), new Int(
@@ -525,7 +525,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_set_prolog_flag_2_4() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(set_prolog_flag(a, p(X)), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("set_prolog_flag", new Struct("a"),
@@ -543,7 +543,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_set_prolog_flag_2_5() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(set_prolog_flag(a, 1), error(domain_error(ValidDomain, Culprit), domain_error(Goal, ArgNo, ValidDomain, Culprit)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("set_prolog_flag", new Struct("a"),
@@ -560,7 +560,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_set_prolog_flag_2_6() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(set_prolog_flag(bounded, a), error(domain_error(ValidDomain, Culprit), domain_error(Goal, ArgNo, ValidDomain, Culprit)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("set_prolog_flag",
@@ -577,7 +577,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_set_prolog_flag_2_7() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(set_prolog_flag(bounded, false), error(permission_error(Operation, ObjectType, Culprit), permission_error(Goal, Operation, ObjectType, Culprit, Message)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("set_prolog_flag",
@@ -596,7 +596,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_get_prolog_flag_2_1() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(get_prolog_flag(X, Value), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("get_prolog_flag", new Var("X"),
@@ -609,7 +609,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_get_prolog_flag_2_2() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(get_prolog_flag(1, Value), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("get_prolog_flag", new Int(1), new Var(
@@ -627,7 +627,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_get_prolog_flag_2_3() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch(get_prolog_flag(a, Value), error(domain_error(ValidDomain, Culprit), domain_error(Goal, ArgNo, ValidDomain, Culprit)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("get_prolog_flag", new Struct("a"),
@@ -644,7 +644,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_$op_3_1() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch('$op'(Priority, yfx, '+'), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("$op", new Var("Priority"), new Struct(
@@ -658,7 +658,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_$op_3_2() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch('$op'(600, Specifier, '+'), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("$op", new Int(600), new Var(
@@ -671,7 +671,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_$op_3_3() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch('$op'(600, yfx, Operator), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("$op", new Int(600), new Struct("yfx"),
@@ -684,7 +684,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_$op_3_4() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch('$op'(a, yfx, '+'), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("$op", new Struct("a"), new Struct(
@@ -701,7 +701,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_$op_3_5() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch('$op'(600, 1, '+'), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("$op", new Int(600), new Int(1),
@@ -718,7 +718,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_$op_3_6() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch('$op'(600, yfx, 1), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("$op", new Int(600), new Struct("yfx"),
@@ -735,7 +735,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_$op_3_7() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch('$op'(1300, yfx, '+'), error(domain_error(ValidDomain, Culprit), domain_error(Goal, ArgNo, ValidDomain, Culprit)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("$op", new Int(1300),
@@ -752,7 +752,7 @@ public class BuiltInExceptionsTestCase extends TestCase {
 	public void test_$op_3_8() throws Exception {
 		Prolog engine = new Prolog();
 		String goal = "catch('$op'(600, a, '+'), error(domain_error(ValidDomain, Culprit), domain_error(Goal, ArgNo, ValidDomain, Culprit)), true).";
-		SolveInfo info = engine.solve(goal);
+		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
 		assertTrue(g.isEqual(new Struct("$op", new Int(600), new Struct("a"),

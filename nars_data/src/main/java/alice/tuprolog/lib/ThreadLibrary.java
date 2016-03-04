@@ -40,7 +40,7 @@ public class ThreadLibrary extends Library {
 		if (!(id instanceof Int)) 
 			throw PrologError.type_error(engine.getEngineManager(), 1,
                     "integer", id);
-		SolveInfo res = engineManager.join(((Int)id).intValue());
+		Solution res = engineManager.join(((Int)id).intValue());
 		if (res == null) return false;
 		PTerm status;
 		try {
@@ -62,7 +62,7 @@ public class ThreadLibrary extends Library {
 		if (!(id instanceof Int)) 
 			throw PrologError.type_error(engine.getEngineManager(), 1,
                     "integer", id);
-		SolveInfo res=engineManager.read( ((Int)id).intValue());
+		Solution res=engineManager.read( ((Int)id).intValue());
 		if (res==null) return false;
 		PTerm status;
 		try {

@@ -67,25 +67,25 @@ public class EngineManager implements java.io.Serializable {
         return true;
     }
 
-    public SolveInfo join(int id) {
+    public Solution join(int id) {
         EngineRunner er = runner(id);
         if (er == null || er.isDetached()) return null;
         /*toSPY
 		 * System.out.println("Thread id "+runnerId()+" - prelevo la soluzione (join)");*/
-        SolveInfo solution = er.read();
+        Solution solution = er.read();
 		/*toSPY
 		 * System.out.println("Soluzione: "+solution);*/
         removeRunner(id);
         return solution;
     }
 
-    public SolveInfo read(int id) {
+    public Solution read(int id) {
         EngineRunner er = runner(id);
         if (er == null || er.isDetached()) return null;
 		/*toSPY
 		 * System.out.println("Thread id "+runnerId()+" - prelevo la soluzione (read) del thread di id: "+er.getId());
 		 */
-        SolveInfo solution = er.read();
+        Solution solution = er.read();
 		/*toSPY
 		 * System.out.println("Soluzione: "+solution);
 		 */
@@ -211,7 +211,7 @@ public class EngineManager implements java.io.Serializable {
         runner().pushSubGoal(goals);
     }
 
-    public SolveInfo solve(PTerm query) {
+    public Solution solve(PTerm query) {
         this.clearSinfoSetOf();
         synchronized (er1) {
             er1.setGoal(query);
@@ -250,7 +250,7 @@ public class EngineManager implements java.io.Serializable {
         }
     }
 
-    public SolveInfo solveNext() throws NoMoreSolutionException {
+    public Solution solveNext() throws NoMoreSolutionException {
         synchronized (er1) {
             return er1.solveNext();
         }

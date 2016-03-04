@@ -35,7 +35,7 @@ public class ThreadLibraryTestCase {
 	 */
 	@Test
 	public void testThread_id_1() throws InvalidTheoryException, MalformedGoalException, NoSolutionException {
-		SolveInfo sinfo = engine.solve("thread_id(ID).");	//unifica ad ID l'identificativo del thread corrente (Root)
+		Solution sinfo = engine.solve("thread_id(ID).");	//unifica ad ID l'identificativo del thread corrente (Root)
 		assertTrue(sinfo.isSuccess());
 		PTerm id = sinfo.getVarValue("ID");
 		assertEquals(new Int(0), id);
@@ -54,7 +54,7 @@ public class ThreadLibraryTestCase {
 		"genitore(bob,d).";
 		engine.setTheory(new Theory(theory));
 		
-		SolveInfo sinfo = engine.solve("thread_create(ID, genitore(bob,X)).");
+		Solution sinfo = engine.solve("thread_create(ID, genitore(bob,X)).");
 		assertTrue(sinfo.isSuccess());
 		
 		sinfo = engine.solve("thread_create(ID, genitore(bob,X)), thread_create(ID2, genitore(b,Y)).");
@@ -82,7 +82,7 @@ public class ThreadLibraryTestCase {
 		"genitore(b,f).";
 		engine.setTheory(new Theory(theory));
 		
-		SolveInfo sinfo = engine.solve("start(X).");
+		Solution sinfo = engine.solve("start(X).");
 		assertTrue(sinfo.isSuccess());
 		
 		PTerm X = sinfo.getVarValue("X");
@@ -101,7 +101,7 @@ public class ThreadLibraryTestCase {
 		"genitore(b,b).";
 		engine.setTheory(new Theory(theory));
 		
-		SolveInfo sinfo = engine.solve("thread_create(ID, genitore(bob,X)), thread_create(ID2, genitore(b,Y)), thread_join(ID2,Y), thread_join(ID,X).");
+		Solution sinfo = engine.solve("thread_create(ID, genitore(bob,X)), thread_create(ID2, genitore(b,Y)), thread_join(ID2,Y), thread_join(ID,X).");
 		assertTrue(sinfo.isSuccess());
 		
 		PTerm X = sinfo.getVarValue("X");
@@ -131,7 +131,7 @@ public class ThreadLibraryTestCase {
 		engine.setTheory(new Theory(theory));
 		
 		//SolveInfo sinfo = engine.solve("thread_create(genitore(bob,X), ID), thread_create(genitore(b,Y), ID2), thread_read(ID2,Y), thread_read(ID,X1), thread_next_sol(ID), thread_read(ID,X).");
-		SolveInfo sinfo = engine.solve("thread_create(ID, genitore(bob,X)), thread_read(ID,X1), thread_create(ID2, loop(1,10,1, thread_read(ID,X2))),  thread_create(ID3, loop(1,2,1, thread_read(ID,X2))), thread_next_sol(ID), thread_read(ID,X).");
+		Solution sinfo = engine.solve("thread_create(ID, genitore(bob,X)), thread_read(ID,X1), thread_create(ID2, loop(1,10,1, thread_read(ID,X2))),  thread_create(ID3, loop(1,2,1, thread_read(ID,X2))), thread_next_sol(ID), thread_read(ID,X).");
 
 		assertTrue(sinfo.isSuccess());
 		
@@ -162,7 +162,7 @@ public class ThreadLibraryTestCase {
 		"genitore(bob,d).";
 		engine.setTheory(new Theory(theory));
 	
-		SolveInfo sinfo = engine.solve("start(genitore(bob,X)).");
+		Solution sinfo = engine.solve("start(genitore(bob,X)).");
 		assertTrue(sinfo.isSuccess());
 		
 		PTerm X = sinfo.getVarValue("X");
@@ -182,7 +182,7 @@ public class ThreadLibraryTestCase {
 				"genitore(bob,b).";
 		engine.setTheory(new Theory(theory));
 		
-		SolveInfo sinfo = engine.solve("thread_create(ID, genitore(bob,X)), thread_detach(ID), thread_next_sol(ID).");
+		Solution sinfo = engine.solve("thread_create(ID, genitore(bob,X)), thread_detach(ID), thread_next_sol(ID).");
 		assertFalse(sinfo.isSuccess());
 	}
 
@@ -197,7 +197,7 @@ public class ThreadLibraryTestCase {
 		"genitore(bob,b).";
 		engine.setTheory(new Theory(theory));
 
-		SolveInfo sinfo = engine.solve("thread_create(ID, genitore(bob,X)), thread_sleep(500).");
+		Solution sinfo = engine.solve("thread_create(ID, genitore(bob,X)), thread_sleep(500).");
 		assertTrue(sinfo.isSuccess());
 	}
 
@@ -215,7 +215,7 @@ public class ThreadLibraryTestCase {
 		"lettura(ID, X):- thread_join(ID, thread1(X)). ";
 		engine.setTheory(new Theory(theory));
 		
-		SolveInfo sinfo = engine.solve("start(X).");
+		Solution sinfo = engine.solve("start(X).");
 		assertTrue(sinfo.isSuccess());
 		
 		PTerm X = sinfo.getVarValue("X");
@@ -248,7 +248,7 @@ public class ThreadLibraryTestCase {
 		"lettura(ID, X):- thread_join(ID, thread1(X)). ";
 		engine.setTheory(new Theory(theory));
 		
-		SolveInfo sinfo = engine.solve("start(X).");
+		Solution sinfo = engine.solve("start(X).");
 		assertTrue(sinfo.isSuccess());
 		
 		PTerm X = sinfo.getVarValue("X");
@@ -269,7 +269,7 @@ public class ThreadLibraryTestCase {
 		"lettura(ID, X):- thread_join(ID, thread1(X)). ";
 		engine.setTheory(new Theory(theory));
 		
-		SolveInfo sinfo = engine.solve("start(X).");
+		Solution sinfo = engine.solve("start(X).");
 		assertFalse(sinfo.isSuccess());
 		
 		theory = "start(X) :- msg_queue_create('CODA'), thread_create(ID, thread1(X)), invio(ID, 'messaggio molto importante'), lettura(ID,X), thread_get_msg('CODA', a(X)).\n" +	//Posso nuovamente prelevare, in quanto il msg non stato rimosso
@@ -307,7 +307,7 @@ public class ThreadLibraryTestCase {
 		"lettura(ID, X):- thread_join(ID, thread1(X)). ";
 		engine.setTheory(new Theory(theory));
 		
-		SolveInfo sinfo = engine.solve("start(X).");
+		Solution sinfo = engine.solve("start(X).");
 		assertTrue(sinfo.isSuccess());
 		
 		theory = "start(X) :- msg_queue_create('CODA'), thread_create(ID, thread1(X)), invio(ID, 'messaggio molto importante'), lettura(ID,X), thread_get_msg('CODA', a(X)).\n" +	//Posso nuovamente prelevare, in quanto il msg non stato rimosso
@@ -347,7 +347,7 @@ public class ThreadLibraryTestCase {
 		"lettura(ID, X):- thread_join(ID, thread1(X)). ";
 		engine.setTheory(new Theory(theory));
 		
-		SolveInfo sinfo = engine.solve("start(X).");
+		Solution sinfo = engine.solve("start(X).");
 		assertFalse(sinfo.isSuccess());
 	}
 
@@ -367,7 +367,7 @@ public class ThreadLibraryTestCase {
 		"lettura(ID, X):- thread_join(ID, thread1(X)). ";
 		engine.setTheory(new Theory(theory));
 		
-		SolveInfo sinfo = engine.solve("start(X).");
+		Solution sinfo = engine.solve("start(X).");
 		assertTrue(sinfo.isSuccess());
 		
 		sinfo = engine.solve("start2(X).");
@@ -391,7 +391,7 @@ public class ThreadLibraryTestCase {
 		"lettura(ID, X):- thread_join(ID, thread1(X)). ";
 		engine.setTheory(new Theory(theory));
 		
-		SolveInfo sinfo = engine.solve("start(X, S).");
+		Solution sinfo = engine.solve("start(X, S).");
 		assertTrue(sinfo.isSuccess());
 		
 		PTerm X = sinfo.getVarValue("S");
@@ -411,7 +411,7 @@ public class ThreadLibraryTestCase {
 		"lettura(ID, X):- thread_read(ID, thread1(X))."	;
 		engine.setTheory(new Theory(theory));
 		
-		SolveInfo sinfo = engine.solve("start('mutex', X).");
+		Solution sinfo = engine.solve("start('mutex', X).");
 		assertFalse(sinfo.isSuccess());
 	}
 
@@ -428,7 +428,7 @@ public class ThreadLibraryTestCase {
 		"lettura(ID, X):- thread_read(ID, thread1(X))."	;
 		engine.setTheory(new Theory(theory));
 		
-		SolveInfo sinfo = engine.solve("start(X).");
+		Solution sinfo = engine.solve("start(X).");
 		assertTrue(sinfo.isSuccess());
 	}
 
@@ -445,7 +445,7 @@ public class ThreadLibraryTestCase {
 		"lettura(ID, X):- thread_read(ID, thread1(X))."	;
 		engine.setTheory(new Theory(theory));
 		
-		SolveInfo sinfo = engine.solve("start(X).");
+		Solution sinfo = engine.solve("start(X).");
 		assertFalse(sinfo.isSuccess());
 	}
 
@@ -461,7 +461,7 @@ public class ThreadLibraryTestCase {
 		"thread1(X, M1, M2) :- mutex_lock('mutex1'), mutex_lock('mutex2'), mutex_unlock_all." ;
 		engine.setTheory(new Theory(theory));
 		
-		SolveInfo sinfo = engine.solve("start(X).");
+		Solution sinfo = engine.solve("start(X).");
 		assertTrue(sinfo.isSuccess());
 	}
 	
@@ -472,7 +472,7 @@ public class ThreadLibraryTestCase {
                             "fact1(N,X):-M is N-1,fact1(M,Y),X is Y*N.";
             engine.setTheory(new Theory(theory));
             
-            SolveInfo sinfo = engine.solve("start(7,X,8,Y).");
+            Solution sinfo = engine.solve("start(7,X,8,Y).");
             assertTrue(sinfo.isSuccess());
             
             PTerm X = sinfo.getVarValue("X");
@@ -493,7 +493,7 @@ public class ThreadLibraryTestCase {
 		"lettura(ID, X):- mutex_lock('mutex'), thread_read(ID,X), mutex_unlock('mutex').";
 		engine.setTheory(new Theory(theory));
 		
-		SolveInfo sinfo = engine.solve("start(X).");
+		Solution sinfo = engine.solve("start(X).");
 		assertTrue(sinfo.isSuccess());
 	}
 	
@@ -512,7 +512,7 @@ public class ThreadLibraryTestCase {
 				"figlio(bob,maria).";
 		engine.setTheory(new Theory(theory));
 		
-		SolveInfo sinfo = engine.solve("start.");
+		Solution sinfo = engine.solve("start.");
 		assertTrue(sinfo.isSuccess());
 		
 	}
@@ -531,7 +531,7 @@ public class ThreadLibraryTestCase {
 				"figlio(bob,maria).";
 		engine.setTheory(new Theory(theory));
 		
-		SolveInfo sinfo = engine.solve("start.");
+		Solution sinfo = engine.solve("start.");
 		assertTrue(sinfo.isSuccess());
 	}
 	
@@ -561,7 +561,7 @@ public class ThreadLibraryTestCase {
 				"occorr(T,[_|REST],ACC,N) :- occorr(T,REST,ACC,N).";
 				engine.setTheory(new Theory(theory));
 		
-				SolveInfo sinfo = engine.solve("ordina([[[2,2],2,2,1],[4,[3],2],[9,8,9,2]],3, 2).");
+				Solution sinfo = engine.solve("ordina([[[2,2],2,2,1],[4,[3],2],[9,8,9,2]],3, 2).");
 				assertTrue(sinfo.isSuccess());
 				
 	}
@@ -581,7 +581,7 @@ public class ThreadLibraryTestCase {
 				"coppieSX([_|T],X,Ts) :- coppieSX(T,X,Ts).";
 				engine.setTheory(new Theory(theory));
 
-				SolveInfo sinfo = engine.solve("coppie([[2,3],[5,2]], 2, DX,SX).");
+				Solution sinfo = engine.solve("coppie([[2,3],[5,2]], 2, DX,SX).");
 				assertTrue(sinfo.isSuccess());
 	}
 	
@@ -602,7 +602,7 @@ public class ThreadLibraryTestCase {
 		
 				engine.setTheory(new Theory(theory));
 		
-				SolveInfo sinfo = engine.solve("study([s1,s2,s3,s4,s5],[exam(s2,f1,30), exam(s1,f1,27), exam(s3,f1,25), exam(s1,f2,30),exam(s4,f1,25),exam(s3,f2,20),exam(s5,f1,20),exam(s2,f5,30), exam(s1,f5,27), exam(s3,f5,25), exam(s1,f4,30),exam(s4,f5,25),exam(s3,f8,20),exam(s5,f7,20)], 5,Num).");
+				Solution sinfo = engine.solve("study([s1,s2,s3,s4,s5],[exam(s2,f1,30), exam(s1,f1,27), exam(s3,f1,25), exam(s1,f2,30),exam(s4,f1,25),exam(s3,f2,20),exam(s5,f1,20),exam(s2,f5,30), exam(s1,f5,27), exam(s3,f5,25), exam(s1,f4,30),exam(s4,f5,25),exam(s3,f8,20),exam(s5,f7,20)], 5,Num).");
 				assertTrue(sinfo.isSuccess());			
 	}
 

@@ -50,7 +50,7 @@ public class EngineRunner implements java.io.Serializable, Runnable{
     private Engine last_env;
     /* Stack environments of nidicate solving */
     private final LinkedList<Engine> stackEnv = new LinkedList<>();
-    private SolveInfo sinfo;
+    private Solution sinfo;
     private String sinfoSetOf;
     
     /**
@@ -66,13 +66,8 @@ public class EngineRunner implements java.io.Serializable, Runnable{
     final State END_TRUE;
     final State END_TRUE_CP;
     final State END_HALT;
-    
-    public static final int HALT    = -1;
-    public static final int FALSE   =  0;
-    public static final int TRUE    =  1;
-    public static final int TRUE_CP =  2;
-    
-    
+
+
     public EngineRunner(int id) {
         /* Istanzio gli stati */
         INIT            = new StateInit(this);
@@ -81,10 +76,10 @@ public class EngineRunner implements java.io.Serializable, Runnable{
         RULE_SELECTION  = new StateRuleSelection(this);
         GOAL_SELECTION  = new StateGoalSelection(this);
         BACKTRACK       = new StateBacktrack(this);
-        END_FALSE       = new StateEnd(this,FALSE);
-        END_TRUE        = new StateEnd(this,TRUE);
-        END_TRUE_CP     = new StateEnd(this,TRUE_CP);
-        END_HALT        = new StateEnd(this,HALT);
+        END_FALSE       = new StateEnd(this, Solution.FALSE);
+        END_TRUE        = new StateEnd(this, Solution.TRUE);
+        END_TRUE_CP     = new StateEnd(this, Solution.TRUE_CP);
+        END_HALT        = new StateEnd(this, Solution.HALT);
                 
                 this.id = id;
     }
@@ -139,7 +134,7 @@ public class EngineRunner implements java.io.Serializable, Runnable{
      *
      * @param g the term representing the goal to be demonstrated
      * @return the result of the demonstration
-     * @see SolveInfo
+     * @see Solution
      **/
    private void threadSolve() {        
         sinfo = solve();
@@ -166,7 +161,7 @@ public class EngineRunner implements java.io.Serializable, Runnable{
         }
     }
     
-    public SolveInfo solve() {
+    public Solution solve() {
         try {
             query.resolveTerm();
             
@@ -179,7 +174,7 @@ public class EngineRunner implements java.io.Serializable, Runnable{
             StateEnd result = env.run();
             defreeze();
             
-            sinfo = new SolveInfo(
+            sinfo = new Solution(
                     query,
                     result.getResultGoal(),
                     result.getResultDemo(),
@@ -192,7 +187,7 @@ public class EngineRunner implements java.io.Serializable, Runnable{
            return sinfo;
         } catch (Exception ex) {
             ex.printStackTrace();
-            return new SolveInfo(query);
+            return new Solution(query);
         }
     }
     
@@ -201,7 +196,7 @@ public class EngineRunner implements java.io.Serializable, Runnable{
      *
      * @return the result of the demonstration
      * @throws NoMoreSolutionException if no more solutions are present
-     * @see SolveInfo
+     * @see Solution
      **/
     private void threadSolveNext() throws NoMoreSolutionException {
     	solving = true;
@@ -232,13 +227,13 @@ public class EngineRunner implements java.io.Serializable, Runnable{
         }
     }
     
-    public SolveInfo solveNext() throws NoMoreSolutionException {
+    public Solution solveNext() throws NoMoreSolutionException {
         if (hasOpenAlternatives()) {
             refreeze();
             env.nextState = BACKTRACK;
             StateEnd result = env.run();
             defreeze();
-            sinfo = new SolveInfo(
+            sinfo = new Solution(
                     env.query,
                     result.getResultGoal(),
                     result.getResultDemo(),
@@ -375,7 +370,7 @@ public class EngineRunner implements java.io.Serializable, Runnable{
                 return pid;
         }
         
-        public SolveInfo getSolution(){
+        public Solution getSolution(){
                 return sinfo;
         }
         
@@ -393,7 +388,7 @@ public class EngineRunner implements java.io.Serializable, Runnable{
                 return true;
         }
         
-        public SolveInfo read(){
+        public Solution read(){
                 lockVar.lock();
                 try{
                         while(solving || sinfo==null)   

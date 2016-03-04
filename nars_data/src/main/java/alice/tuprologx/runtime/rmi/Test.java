@@ -23,7 +23,7 @@ public class Test
             alice.tuprologx.runtime.rmi.Prolog engine =
                 (alice.tuprologx.runtime.rmi.Prolog)Naming.lookup(rmiName);
 
-            SolveInfo info=engine.solve(args[1]);
+            Solution info=engine.solve(args[1]);
             if (info.isSuccess())
                 System.out.println("yes: "+info.getSolution());
             else

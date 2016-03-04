@@ -2,7 +2,7 @@ package alice.tuprolog.interfaces;
 
 import alice.tuprolog.Library;
 import alice.tuprolog.PTerm;
-import alice.tuprolog.SolveInfo;
+import alice.tuprolog.Solution;
 import alice.tuprolog.Theory;
 import alice.tuprolog.event.ExceptionListener;
 import alice.tuprolog.event.OutputListener;
@@ -83,18 +83,18 @@ public interface IProlog {
 	 *
 	 * @param st the string representing the goal to be demonstrated
 	 * @return the result of the demonstration
-	 * @see SolveInfo
+	 * @see Solution
 	 **/
-	SolveInfo solve(String st) throws Exception;
+	Solution solve(String st) throws Exception;
 	
 	/**
 	 * Gets next solution
 	 *
 	 * @return the result of the demonstration
 	 * @throws NoMoreSolutionException if no more solutions are present
-	 * @see SolveInfo
+	 * @see Solution
 	 **/
-	SolveInfo solveNext() throws Exception;
+	Solution solveNext() throws Exception;
 	
 	/**
 	 * Halts current solve computation

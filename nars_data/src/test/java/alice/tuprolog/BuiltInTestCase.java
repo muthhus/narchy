@@ -30,7 +30,7 @@ public class BuiltInTestCase extends TestCase {
 	public void testGroupingConjunctions() throws InvalidTheoryException, MalformedGoalException {
 		Prolog engine = new Prolog();
 		engine.setTheory(new Theory("g1. g2."));
-		SolveInfo info = engine.solve("(g1, g2), (g3, g4).");
+		Solution info = engine.solve("(g1, g2), (g3, g4).");
 		assertFalse(info.isSuccess());
 		engine.setTheory(new Theory("g1. g2. g3. g4."));
 		info = engine.solve("(g1, g2), (g3, g4).");

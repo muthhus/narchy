@@ -106,7 +106,7 @@ public class TestVarIsEqual extends TestCase {
     
     core.setTheory(new Theory(theory));
     
-    SolveInfo info = core.solve("test. ");
+    Solution info = core.solve("test. ");
     assertTrue("Test should complete normally: " + info,
             info.isSuccess());
     String expected = ""

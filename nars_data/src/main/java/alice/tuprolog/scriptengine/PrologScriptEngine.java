@@ -24,7 +24,7 @@ import alice.tuprolog.MalformedGoalException;
 import alice.tuprolog.NoMoreSolutionException;
 import alice.tuprolog.NoSolutionException;
 import alice.tuprolog.Prolog;
-import alice.tuprolog.SolveInfo;
+import alice.tuprolog.Solution;
 import alice.tuprolog.Struct;
 import alice.tuprolog.Theory;
 import alice.tuprolog.Var;
@@ -146,7 +146,7 @@ public class PrologScriptEngine implements ScriptEngine, ExceptionListener, Outp
     @Override
     public Object eval(String script, Bindings bindings) throws ScriptException {
     	String theory = (String)bindings.get(THEORY);
-        SolveInfo info = null;
+        Solution info = null;
         
         /*
         As the jsr-223 part SCR.4.2.6 Bindings :

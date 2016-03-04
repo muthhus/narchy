@@ -43,7 +43,7 @@ public class TestBug {
 		});
 		//engine.setSpy(true);
 		engine.setTheory(new Theory(st));
-		SolveInfo info = engine.solve("test(L1,L2).");
+		Solution info = engine.solve("test(L1,L2).");
 		System.out.println(info);
 		
 	}

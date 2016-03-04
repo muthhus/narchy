@@ -20,7 +20,7 @@ package alice.tuprolog;
 /**
  * This exception means that a solution is asked, but actually none exists
  *
- * @see SolveInfo
+ * @see Solution
  */
 public class NoSolutionException extends PrologException {
 	private static final long serialVersionUID = 1L;

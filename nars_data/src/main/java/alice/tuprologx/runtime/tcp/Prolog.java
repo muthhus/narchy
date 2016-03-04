@@ -13,9 +13,9 @@ public interface Prolog {
     void setTheory(Theory theory) throws Exception;
     void addTheory(Theory theory) throws Exception;
 
-    SolveInfo   solve(String g) throws Exception;
-    SolveInfo   solve(PTerm th) throws Exception;
-    SolveInfo   solveNext() throws Exception;
+    Solution solve(String g) throws Exception;
+    Solution solve(PTerm th) throws Exception;
+    Solution solveNext() throws Exception;
     boolean     hasOpenAlternatives() throws Exception;
     void solveHalt() throws Exception;
     void solveEnd() throws Exception;

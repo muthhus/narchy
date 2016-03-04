@@ -62,7 +62,7 @@ public class StateEnd extends State {
 //        System.out.println("STATE END: STATE END "+vars+ " GOAL "+goal);  
 //        System.out.println("STATE END GOALLLLLLL: "+e.query); 
 
-        if (this.endState == EngineRunner.TRUE || this.endState == EngineRunner.TRUE_CP)
+        if (this.endState == Solution.TRUE || this.endState == Solution.TRUE_CP)
             relinkVar(e);
     }
 
@@ -748,11 +748,11 @@ public class StateEnd extends State {
 
     public String toString() {
         switch (endState) {
-            case EngineRunner.FALSE:
+            case Solution.FALSE:
                 return "FALSE";
-            case EngineRunner.TRUE:
+            case Solution.TRUE:
                 return "TRUE";
-            case EngineRunner.TRUE_CP:
+            case Solution.TRUE_CP:
                 return "TRUE_CP";
             default:
                 return "HALT";

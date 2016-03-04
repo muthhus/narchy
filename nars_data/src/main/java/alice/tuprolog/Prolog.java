@@ -19,6 +19,7 @@ package alice.tuprolog;
 
 import java.util.*;
 import java.io.*;
+import java.util.function.Consumer;
 
 import alice.tuprolog.event.*;
 import alice.tuprolog.interfaces.IProlog;
@@ -429,17 +430,35 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 	 *
 	 * @param g the term representing the goal to be demonstrated
 	 * @return the result of the demonstration
-	 * @see SolveInfo
+	 * @see Solution
 	 **/
-	public SolveInfo solve(PTerm g) {
+	public Solution solve(PTerm g) {
 		//System.out.println("ENGINE SOLVE #0: "+g);
 		if (g == null) return null;
 		
-		SolveInfo sinfo = engineManager.solve(g);
+		Solution sinfo = engineManager.solve(g);
 
 		notifyNewQueryResultAvailable(this, sinfo);
 
 		return sinfo;
+	}
+
+	public void solve(PTerm g, Consumer<Solution> eachSolution) {
+		//System.out.println("ENGINE SOLVE #0: "+g);
+
+
+		Solution sinfo = engineManager.solve(g);
+		notifyNewQueryResultAvailable(this, sinfo);
+		eachSolution.accept(sinfo);
+		while (hasOpenAlternatives()) {
+			try {
+				Solution next = engineManager.solveNext();
+				eachSolution.accept(next);
+			} catch (NoMoreSolutionException e) {
+				throw new RuntimeException(e);
+			}
+		}
+
 	}
 
 	/**
@@ -447,10 +466,10 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 	 *
 	 * @param st the string representing the goal to be demonstrated
 	 * @return the result of the demonstration
-	 * @see SolveInfo
+	 * @see Solution
 	 **/
 	@Override
-	public SolveInfo solve(String st) throws MalformedGoalException {
+	public Solution solve(String st) throws MalformedGoalException {
 		try {
 			Parser p = new Parser(opManager, st);
 			PTerm t = p.nextTerm(true);
@@ -465,12 +484,12 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 	 *
 	 * @return the result of the demonstration
 	 * @throws NoMoreSolutionException if no more solutions are present
-	 * @see SolveInfo
+	 * @see Solution
 	 **/
 	@Override
-	public SolveInfo solveNext() throws NoMoreSolutionException {
+	public Solution solveNext() throws NoMoreSolutionException {
 		if (hasOpenAlternatives()) {
-			SolveInfo sinfo = engineManager.solveNext();
+			Solution sinfo = engineManager.solveNext();
 			notifyNewQueryResultAvailable(this, sinfo);
 			return sinfo;
 		} else
@@ -1018,13 +1037,15 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 	 * 
 	 * @param e the event
 	 */
-	protected void notifyNewQueryResultAvailable(Prolog source, SolveInfo info) {
+	protected void notifyNewQueryResultAvailable(Prolog source, Solution info) {
 		if (!queryListeners.isEmpty()) {
 			QueryEvent e = new QueryEvent(source, info);
 			for (int i = 0, queryListenersSize = queryListeners.size(); i < queryListenersSize; i++) {
 				QueryListener ql = queryListeners.get(i);
 				ql.newQueryResultAvailable(e);
 			}
+		} else {
+			//throw new RuntimeException("no query listeners attached");
 		}
 	}
 
@@ -1070,7 +1091,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 	}
 
 	public boolean isTrue(String s) throws MalformedGoalException {
-		SolveInfo r = solve(s);
+		Solution r = solve(s);
 		switch (r.toString()) {
 			case PTerm.YES:
 				return true;

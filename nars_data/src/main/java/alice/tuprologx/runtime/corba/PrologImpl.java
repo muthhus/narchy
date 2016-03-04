@@ -101,7 +101,7 @@ public class PrologImpl extends _PrologImplBase {
     }
 
 
-    static alice.tuprologx.runtime.corba.SolveInfo  toSolveInfo(alice.tuprolog.SolveInfo info){
+    static alice.tuprologx.runtime.corba.SolveInfo  toSolveInfo(Solution info){
         try {
             alice.tuprologx.runtime.corba.SolveInfo cinfo=
                 new alice.tuprologx.runtime.corba.SolveInfo();

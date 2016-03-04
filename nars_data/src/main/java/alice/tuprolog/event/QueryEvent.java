@@ -18,7 +18,7 @@
 package alice.tuprolog.event;
 
 import alice.tuprolog.Prolog;
-import alice.tuprolog.SolveInfo;
+import alice.tuprolog.Solution;
 
 /**
  * This class represents events concerning query management.
@@ -28,9 +28,9 @@ import alice.tuprolog.SolveInfo;
  */
 public class QueryEvent extends PrologEvent {
 
-   private final SolveInfo info;
+   private final Solution info;
    private static final long serialVersionUID = 1L;
-    public QueryEvent(Prolog source, SolveInfo info){
+    public QueryEvent(Prolog source, Solution info){
         super(source);
         this.info=info;
     }
@@ -40,7 +40,7 @@ public class QueryEvent extends PrologEvent {
      * 
      * @return solve info
      */
-    public SolveInfo getSolveInfo(){
+    public Solution getSolveInfo(){
         return info;
     }
 }
