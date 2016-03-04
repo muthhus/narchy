@@ -95,7 +95,7 @@ public class PrologCore extends Agent implements Consumer<Task> {
             truth = !truth;
         }*/
 
-        PTerm questionTerm = pterm(tt);
+        alice.tuprolog.Term questionTerm = pterm(tt);
 
         //TODO limit max # of inputs
         solve(questionTerm, (answer)-> {
@@ -104,11 +104,11 @@ public class PrologCore extends Agent implements Consumer<Task> {
 
             logger.info("question {} answer {}", question, answer);
             switch (answer.result()) {
-                case Solution.TRUE:
-                case Solution.TRUE_CP:
+                case EngineRunner.TRUE:
+                case EngineRunner.TRUE_CP:
                     logger.info("TRUE"); //TODO input
                     break;
-                case Solution.FALSE:
+                case EngineRunner.FALSE:
                     logger.info("FALSE"); //TODO input
                     break;
                 default:
@@ -121,7 +121,7 @@ public class PrologCore extends Agent implements Consumer<Task> {
 
 
     //TODO async
-    protected void believe(PTerm p, boolean truth) {
+    protected void believe(alice.tuprolog.Term  p, boolean truth) {
         if (!truth) {
             //wrap in negate
             p = negate(p);
@@ -133,17 +133,17 @@ public class PrologCore extends Agent implements Consumer<Task> {
 
     }
 
-    public static Struct assertion(PTerm p) {
+    public static Struct assertion(alice.tuprolog.Term  p) {
         return new Struct("assertz", p);
     }
 
-    public static Struct negate(PTerm p) {
+    public static Struct negate(alice.tuprolog.Term  p) {
         return new Struct("not", p); //TODO issue retraction on the opposite? ex: retract(x), assertz(not(x))
     }
 
-    public static PTerm[] psubterms(final Compound subtermed) {
+    public static alice.tuprolog.Term [] psubterms(final Compound subtermed) {
         int l = subtermed.size();
-        PTerm[] p = new PTerm[l];
+        alice.tuprolog.Term [] p = new alice.tuprolog.Term [l];
         for (int i = 0; i < l; i++) {
             p[i] = pterm(subtermed.term(i));
         }
@@ -151,7 +151,7 @@ public class PrologCore extends Agent implements Consumer<Task> {
     }
 
     //NARS term -> Prolog term
-    public static PTerm pterm(final Term term) {
+    public static alice.tuprolog.Term  pterm(final Term term) {
         if (term instanceof Compound) {
             Op op = term.op();
             return new Struct(op.str, psubterms( ((Compound)term) ));
@@ -174,22 +174,22 @@ public class PrologCore extends Agent implements Consumer<Task> {
 //        if (term instanceof Statement) {
 //            Statement i = (Statement)term;
 //            String predicate = classPredicate(i.getClass());
-//            PTerm subj = pterm(i.getSubject());
-//            PTerm obj = pterm(i.getPredicate());
+//            alice.tuprolog.Term  subj = alice.tuprolog.Term (i.getSubject());
+//            alice.tuprolog.Term  obj = alice.tuprolog.Term (i.getPredicate());
 //            if ((subj!=null) && (obj!=null))
 //                return new Struct(predicate, subj, obj);
 //        }
 //        else if ((term instanceof SetTensional) || (term instanceof Product) /* conjunction */) {
 //            Compound s = (Compound)term;
 //            String predicate = classPredicate(s.getClass());
-//            PTerm[] args = pterms(s.term);
+//            alice.tuprolog.Term [] args = alice.tuprolog.Term s(s.term);
 //            if (args!=null)
 //                return new Struct(predicate, args);
 //        }
 //        //Image...
 //        //Conjunction...
 //        else if (term instanceof Negation) {
-//            PTerm np = pterm(((Negation)term).term[0]);
+//            alice.tuprolog.Term  np = alice.tuprolog.Term (((Negation)term).term[0]);
 //            if (np == null) return null;
 //            return new Struct("negation", np);
 //        }
@@ -227,7 +227,7 @@ public class PrologCore extends Agent implements Consumer<Task> {
 //    }
 //
 //    /** Prolog term --> NARS statement */
-//    public static Term nterm(final PTerm term) {
+//    public static Term nterm(final alice.tuprolog.Term  term) {
 //
 //        if (term instanceof Struct) {
 //            Struct s = (Struct)term;
@@ -285,7 +285,7 @@ public class PrologCore extends Agent implements Consumer<Task> {
 //        }
 //        else if (term instanceof Var) {
 //            Var v = (Var)term;
-//            PTerm t = v.getTerm();
+//            alice.tuprolog.Term  t = v.getTerm();
 //            if (t!=v) {
 //                //System.out.println("Bound: " + v + " + -> " + t + " " + nterm(t));
 //                return nterm(t);
@@ -314,7 +314,7 @@ public class PrologCore extends Agent implements Consumer<Task> {
 //    private float trueThreshold = 0.80f;
 //    private float falseThreshold = 0.20f;
 //    private float confidenceThreshold;
-//    private final Map<Sentence,PTerm> beliefs = new HashMap();
+//    private final Map<Sentence,alice.tuprolog.Term > beliefs = new HashMap();
 //
 //    private boolean eternalJudgments = true;
 //    private boolean presentJudgments = false;
@@ -361,7 +361,7 @@ public class PrologCore extends Agent implements Consumer<Task> {
 //        this.minSolveTime = maxSolveTime/2f;
 //
 //        try {
-//            PTerm[] ax = toArray(new Theory(getAxiomString()).iterator(prolog.prolog), PTerm.class);
+//            alice.tuprolog.Term [] ax = toArray(new Theory(getAxiomString()).iterator(prolog.prolog), alice.tuprolog.Term .class);
 //            axioms = new Theory(ax);
 //        } catch (InvalidTheoryException e) {
 //            e.printStackTrace();
@@ -397,7 +397,7 @@ public class PrologCore extends Agent implements Consumer<Task> {
 //        return false;
 //    }
 //
-//    public Map<Sentence, PTerm> getBeliefs() {
+//    public Map<Sentence, alice.tuprolog.Term > getBeliefs() {
 //        return beliefs;
 //    }
 //
@@ -532,12 +532,12 @@ public class PrologCore extends Agent implements Consumer<Task> {
 //
 //                    int answers = 0;
 //
-//                    PTerm lastSolution = null;
+//                    alice.tuprolog.Term  lastSolution = null;
 //
 //                    do {
 //                        if (si == null) break;
 //
-//                        PTerm solution = si.getSolution();
+//                        alice.tuprolog.Term  solution = si.getSolution();
 //                        if (solution == null)
 //                            break;
 //
@@ -588,7 +588,7 @@ public class PrologCore extends Agent implements Consumer<Task> {
 //        //System.err.println(this + " unable to express question in Prolog: " + s);
 //    }
 //
-//    protected void onUnanswerable(PTerm solution) {
+//    protected void onUnanswerable(alice.tuprolog.Term  solution) {
 //        //System.err.println(this + " unable to answer solution: " + solution);
 //
 //    }
@@ -637,13 +637,13 @@ public class PrologCore extends Agent implements Consumer<Task> {
 //    /** creates a theory from a judgment Statement */
 //    public static Struct newJudgmentTheory(final Sentence judgment) throws InvalidTheoryException {
 //
-//        PTerm s;
+//        alice.tuprolog.Term  s;
 //        /*if (judgment.truth!=null) {
-//            s = pInfer(pterm(judgment.content), judgment.truth);
+//            s = pInfer(alice.tuprolog.Term (judgment.content), judgment.truth);
 //        }
 //        else {*/
 //        try {
-//            s = pterm(judgment.term);
+//            s = alice.tuprolog.Term (judgment.term);
 //        }
 //        catch (Exception e) {
 //            e.printStackTrace();
@@ -655,16 +655,16 @@ public class PrologCore extends Agent implements Consumer<Task> {
 //    }
 //
 //    Struct newQuestion(final Sentence question) {
-//        PTerm s = pterm(question.term);
+//        alice.tuprolog.Term  s = alice.tuprolog.Term (question.term);
 //        return (Struct) s;
 //    }
 //
 //    //NOT yet working
-//    public Struct pInfer(PTerm t, Truth tv) {
+//    public Struct pInfer(alice.tuprolog.Term  t, Truth tv) {
 //        double freq = tv.getFrequency();
 //        double conf = tv.getConfidence();
-//        Struct lt = new Struct(new PTerm[] { t,
-//            new Struct( new PTerm[] {
+//        Struct lt = new Struct(new alice.tuprolog.Term [] { t,
+//            new Struct( new alice.tuprolog.Term [] {
 //                new nars.tuprolog.Double(freq),
 //                new nars.tuprolog.Double(conf)
 //            })
@@ -672,7 +672,7 @@ public class PrologCore extends Agent implements Consumer<Task> {
 //        return new Struct("infer", lt);
 //    }
 //
-//    public static Struct negation(PTerm t) {
+//    public static Struct negation(alice.tuprolog.Term  t) {
 //        return new Struct("negation", t);
 //    }
 //
@@ -743,7 +743,7 @@ public class PrologCore extends Agent implements Consumer<Task> {
 //    }
 //
 //    /** reflect a result to NARS, and remember it so that it doesn't get reprocessed here later */
-//    public Term answer(Task question, Term t, PTerm pt) {
+//    public Term answer(Task question, Term t, alice.tuprolog.Term  pt) {
 //        if (reportAnswers)
 //            System.err.println("Prolog answer: " + t);
 //
@@ -809,7 +809,7 @@ public class PrologCore extends Agent implements Consumer<Task> {
 //                    "A :- not(not(A))." + '\n';
 //    }
 //
-//    public static Theory getTheory(Map<Sentence, PTerm> beliefMap) throws InvalidTheoryException  {
+//    public static Theory getTheory(Map<Sentence, alice.tuprolog.Term > beliefMap) throws InvalidTheoryException  {
 //        return new Theory(new Struct(beliefMap.values().toArray(new Struct[beliefMap.size()])));
 //    }
 //
@@ -820,19 +820,19 @@ public class PrologCore extends Agent implements Consumer<Task> {
 //    protected void onQuestion(Sentence s) {
 //    }
 //
-//    public static PTerm[] pterms(Term[] term) {
-//        PTerm[] tt = new PTerm[term.length];
+//    public static alice.tuprolog.Term [] alice.tuprolog.Term s(Term[] term) {
+//        alice.tuprolog.Term [] tt = new alice.tuprolog.Term [term.length];
 //        int i = 0;
 //        for (Term x : term) {
-//            if ((tt[i++] = pterm(x)) == null) return null;
+//            if ((tt[i++] = alice.tuprolog.Term (x)) == null) return null;
 //        }
 //        return tt;
 //    }
 //
-//    public static Term[] nterm(final PTerm[] term) {
+//    public static Term[] nterm(final alice.tuprolog.Term [] term) {
 //        Term[] tt = new Term[term.length];
 //        int i = 0;
-//        for (PTerm x : term) {
+//        for (alice.tuprolog.Term  x : term) {
 //            if ((tt[i++] = nterm(x)) == null) return null;
 //        }
 //        return tt;

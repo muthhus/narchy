@@ -62,18 +62,18 @@ public class PrologTestCase extends TestCase {
 		}
 	}
 	
-	public void testSpyListenerManagement() {
-		Prolog engine = new Prolog();
-		SpyListener listener1 = new SpyListener() {
-			public void onSpy(SpyEvent e) {}
-		};
-		SpyListener listener2 = new SpyListener() {
-			public void onSpy(SpyEvent e) {}
-		};
-		engine.addSpyListener(listener1);
-		engine.addSpyListener(listener2);
-		assertEquals(2, engine.getSpyListenerList().size());
-	}
+//	public void testSpyListenerManagement() {
+//		Prolog engine = new Prolog();
+//		SpyListener listener1 = new SpyListener() {
+//			public void onSpy(SpyEvent e) {}
+//		};
+//		SpyListener listener2 = new SpyListener() {
+//			public void onSpy(SpyEvent e) {}
+//		};
+//		engine.addSpyListener(listener1);
+//		engine.addSpyListener(listener2);
+//		assertEquals(2, engine.getSpyListenerList().size());
+//	}
 	
 	public void testLibraryListener() throws InvalidLibraryException {
 		Prolog engine = new Prolog(new String[]{});

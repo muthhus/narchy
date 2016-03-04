@@ -21,7 +21,7 @@ public interface Prolog extends java.rmi.Remote {
     void addTheory(Theory theory) throws InvalidTheoryException, java.rmi.RemoteException;
 
 
-    Solution solve(PTerm g) throws java.rmi.RemoteException;
+    Solution solve(Term g) throws java.rmi.RemoteException;
 
     Solution solve(String g) throws MalformedGoalException, java.rmi.RemoteException;
 

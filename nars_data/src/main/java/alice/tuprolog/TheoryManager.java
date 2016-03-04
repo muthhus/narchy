@@ -78,7 +78,8 @@ public class TheoryManager implements Serializable {
 			}
 		} else
 			staticDBase.addFirst(key, d);
-		engine.spy("INSERTA: " + d.getClause() + '\n');
+		if (engine.isSpy())
+			engine.spy("INSERTA: " + d.getClause() + '\n');
 	}
 
 	/**
@@ -94,7 +95,7 @@ public class TheoryManager implements Serializable {
 			}
 		} else
 			staticDBase.addLast(key, d);
-		engine.spy("INSERTZ: " + d.getClause() + '\n');
+		if (engine.isSpy()) engine.spy("INSERTZ: " + d.getClause() + '\n');
 	}
 
 	/**
@@ -141,7 +142,8 @@ public class TheoryManager implements Serializable {
 			ClauseInfo d = i.next();
 			if (clause.match(d.getClause())) {
 				i.remove();
-				engine.spy("DELETE: " + d.getClause() + '\n');
+				if (engine.isSpy())
+					engine.spy("DELETE: " + d.getClause() + '\n');
 				return new ClauseInfo(d.getClause(), null);
 			}
 		}
@@ -163,7 +165,8 @@ public class TheoryManager implements Serializable {
 		String key =  arg0 + '/' + arg1;
 		List<ClauseInfo> abolished = dynamicDBase.abolish(key); /* Reviewed by Paolo Contessi: LinkedList -> List */
 		if (abolished != null)
-			engine.spy("ABOLISHED: " + key + " number of clauses=" + abolished.size() + '\n');
+			if (engine.isSpy())
+				engine.spy("ABOLISHED: " + key + " number of clauses=" + abolished.size() + '\n');
 		return true;
 	}
 

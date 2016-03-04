@@ -40,9 +40,9 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 	/*  manager of current theory */
 	private TheoryManager theoryManager;
 	/*  component managing primitive  */
-	private PrimitiveManager primitiveManager;    
+	private PrimitiveManager primitiveManager;
 	/* component managing operators */
-	private OperatorManager opManager;    
+	private OperatorManager opManager;
 	/* component managing flags */
 	private FlagManager flagManager;
 	/* component managing libraries */
@@ -51,13 +51,13 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 	private EngineManager engineManager;
 
 	/*  spying activated ?  */
-	private boolean spy;  
+	private boolean spy;
 
 //	/*  warning activated ?  */
 //	private boolean warning;
 
 	/* listeners registrated for virtual machine output events */
-	/*Castagna 06/2011*/	
+	/*Castagna 06/2011*/
 	/* exception activated ? */
 	private boolean exception;
 	/**/
@@ -69,7 +69,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 	//private final ArrayList<WarningListener> warningListeners;
 	public final static Logger logger = LoggerFactory.getLogger(Prolog.class);
 
-	/*Castagna 06/2011*/	
+	/*Castagna 06/2011*/
 	/* listeners registrated for virtual machine state exception events */
 	@Deprecated private final ArrayList<ExceptionListener> exceptionListeners;
 	/**/
@@ -81,9 +81,10 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 	/* listeners to query events */
 	private final ArrayList<QueryListener> queryListeners;
 
-    /* path history for including documents */
-    private ArrayList<String> absolutePathList;
-    private String lastPath;
+	/* path history for including documents */
+	private ArrayList<String> absolutePathList;
+	private String lastPath;
+	private boolean warning;
 
 
 	/**
@@ -138,7 +139,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 
 	/**
 	 * Initialize basic engine structures.
-	 * 
+	 *
 	 * @param spy spying activated
 	 * @param warning warning activated
 	 */
@@ -156,14 +157,14 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 		theoryListeners = new ArrayList<>();
 		queryListeners = new ArrayList<>();
 		libraryListeners = new ArrayList<>();
-        absolutePathList = new ArrayList<>();
+		absolutePathList = new ArrayList<>();
 		initializeManagers();
 	}
 
 
 	private void initializeManagers() {
 		flagManager      = new FlagManager();
-		libraryManager   = new LibraryManager();        
+		libraryManager   = new LibraryManager();
 		opManager        = new OperatorManager();
 		theoryManager    = new TheoryManager();
 		primitiveManager = new PrimitiveManager();
@@ -209,14 +210,14 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 	/** Gets the component managing operators */
 	@Override
 	public OperatorManager getOperatorManager() {
-		return opManager; 
+		return opManager;
 	}
 
 	/**
 	 * Gets the component managing engine
 	 */
 	public EngineManager getEngineManager() {
-		return engineManager; 
+		return engineManager;
 	}
 
 
@@ -227,30 +228,30 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 		return alice.util.VersionInfo.getEngineVersion();
 	}
 
-    /**
-     * Gets the last Element of the path list
-     */
-    public String getCurrentDirectory() {
-        String directory = "";
-        if(absolutePathList.isEmpty()) {
+	/**
+	 * Gets the last Element of the path list
+	 */
+	public String getCurrentDirectory() {
+		String directory = "";
+		if(absolutePathList.isEmpty()) {
 			directory = this.lastPath != null ? this.lastPath : System.getProperty("user.dir");
-        } else {
-            directory = absolutePathList.get(absolutePathList.size()-1);
-        }
+		} else {
+			directory = absolutePathList.get(absolutePathList.size()-1);
+		}
 
-        return directory;
-    }
+		return directory;
+	}
 
-    /**
-     * Sets the last Element of the path list
-     */
-    public void setCurrentDirectory(String s) {
-        this.lastPath=s;    
-    }
+	/**
+	 * Sets the last Element of the path list
+	 */
+	public void setCurrentDirectory(String s) {
+		this.lastPath=s;
+	}
 
-    
-    
-    
+
+
+
 	// theory management interface
 
 	/**
@@ -283,7 +284,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 			TheoryEvent ev = new TheoryEvent(this, oldTh, newTh);
 			this.notifyChangedTheory(ev);
 		}
-	}    
+	}
 
 	/**
 	 * Gets current theory
@@ -302,7 +303,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 
 	/**
 	 * Gets last consulted theory, with the original textual format
-	 *  
+	 *
 	 * @return theory
 	 */
 	public Theory getLastConsultedTheory() {	//no syn
@@ -339,7 +340,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 	public Library loadLibrary(String className) throws InvalidLibraryException {	//no syn
 		return libraryManager.loadLibrary(className);
 	}
-	
+
 	/**
 	 * Loads a library.
 	 *
@@ -360,8 +361,8 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 	 * Loads a specific instance of a library
 	 *
 	 * If a library with the same name is already present,
-	 * a warning event is notified 
-	 * 
+	 * a warning event is notified
+	 *
 	 * @param lib the (Java class) name of the library to be loaded
 	 * @throws InvalidLibraryException if name is not a valid library
 	 */
@@ -438,10 +439,10 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 	 * @return the result of the demonstration
 	 * @see Solution
 	 **/
-	public Solution solve(PTerm g) {
+	public Solution solve(Term g) {
 		//System.out.println("ENGINE SOLVE #0: "+g);
 		if (g == null) return null;
-		
+
 		Solution sinfo = engineManager.solve(g);
 
 		notifyNewQueryResultAvailable(this, sinfo);
@@ -449,7 +450,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 		return sinfo;
 	}
 
-	public void solve(PTerm g, Consumer<Solution> eachSolution) {
+	public void solve(Term g, Consumer<Solution> eachSolution) {
 		//System.out.println("ENGINE SOLVE #0: "+g);
 
 
@@ -478,13 +479,13 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 	public Solution solve(String st) throws MalformedGoalException {
 		try {
 			Parser p = new Parser(opManager, st);
-			PTerm t = p.nextTerm(true);
+			Term t = p.nextTerm(true);
 			return solve(t);
 		} catch (InvalidTermException ex) {
 			throw new MalformedGoalException();
 		}
 	}
-	
+
 	/**
 	 * Gets next solution
 	 *
@@ -533,7 +534,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 
 	/**
 	 * Checks if the demonstration process was stopped by an halt command.
-	 * 
+	 *
 	 * @return true if the demonstration was stopped
 	 */
 	public boolean isHalted() {		//no syn
@@ -547,7 +548,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 	 * @param t1 second term to be unified
 	 * @return true if the unification was successful
 	 */
-	public boolean match(PTerm t0, PTerm t1) {	//no syn
+	public boolean match(Term t0, Term t1) {	//no syn
 		return t0.match(t1);
 	}
 
@@ -558,16 +559,16 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 	 * @param t1 second term to be unified
 	 * @return true if the unification was successful
 	 */
-	public boolean unify(PTerm t0, PTerm t1) {	//no syn
+	public boolean unify(Term t0, Term t1) {	//no syn
 		return t0.unify(this,t1);
 	}
 
 	/**
 	 * Identify functors
-	 * 
+	 *
 	 * @param term term to identify
 	 */
-	public void identifyFunctor(PTerm term) {	//no syn
+	public void identifyFunctor(Term term) {	//no syn
 		primitiveManager.identifyFunctor(term);
 	}
 
@@ -580,7 +581,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 	 * @return the term parsed from the string
 	 * @throws InvalidTermException if the string does not represent a valid term
 	 */
-	public PTerm toTerm(String st) throws InvalidTermException {	//no syn
+	public Term toTerm(String st) throws InvalidTermException {	//no syn
 		return Parser.parseSingleTerm(st, opManager);
 	}
 
@@ -592,7 +593,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 	 * @return the string representing the term
 	 */
 	@Override
-	public String toString(PTerm term) {		//no syn
+	public String toString(Term term) {		//no syn
 		return (term.toStringAsArgY(opManager, OperatorManager.OP_HIGH));
 	}
 
@@ -600,7 +601,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 	/**
 	 * Defines a new flag
 	 */
-	public boolean defineFlag(String name, Struct valueList, PTerm defValue, boolean modifiable, String libName) {
+	public boolean defineFlag(String name, Struct valueList, Term defValue, boolean modifiable, String libName) {
 		return flagManager.defineFlag(name,valueList,defValue,modifiable,libName);
 	}
 
@@ -628,7 +629,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 	/**
 	 * Notifies a spy information event
 	 */
-	protected synchronized void spy(String s) {
+	protected void spy(String s) {
 		if (spy) {
 			notifySpy(new SpyEvent(this, s));
 		}
@@ -638,7 +639,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 	 * Notifies a spy information event
 	 * @param s TODO
 	 */
-	protected synchronized void spy(String s, Engine e) {
+	protected void spy(String s, Engine e) {
 		//System.out.println("spy: "+i+"  "+s+"  "+g);
 		if (spy) {
 			ExecutionContext ctx = e.currentContext;
@@ -769,7 +770,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 //		warningListeners.add(l);
 //	}
 
-	/*Castagna 06/2011*/	
+	/*Castagna 06/2011*/
 	/**
 	 * Adds a listener to exception events
 	 *
@@ -861,7 +862,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 //		warningListeners.clear();
 //	}
 
-	/* Castagna 06/2011*/	
+	/* Castagna 06/2011*/
 	/**
 	 * Removes a listener to exception events
 	 *
@@ -871,9 +872,9 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 	public synchronized void removeExceptionListener(ExceptionListener l) {
 		exceptionListeners.remove(l);
 	}
-	/**/	
+	/**/
 
-	/*Castagna 06/2011*/	
+	/*Castagna 06/2011*/
 	/**
 	 * Removes all exception event listeners
 	 */
@@ -964,7 +965,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 		}
 	}
 
-	/*Castagna 06/2011*/	
+	/*Castagna 06/2011*/
 	/**
 	 * Notifies a exception information event
 	 *
@@ -978,12 +979,12 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 		logger.error("{} {}", e.getSource(), e.getMsg());
 	}
 	/**/
-	
+
 	//
 
 	/**
 	 * Notifies a new theory set or updated event
-	 * 
+	 *
 	 * @param e the event
 	 */
 	protected void notifyChangedTheory(TheoryEvent e) {
@@ -994,7 +995,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 
 	/**
 	 * Notifies a library loaded event
-	 * 
+	 *
 	 * @param e the event
 	 */
 	protected void notifyLoadedLibrary(LibraryEvent e) {
@@ -1005,7 +1006,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 
 	/**
 	 * Notifies a library unloaded event
-	 * 
+	 *
 	 * @param e the event
 	 */
 	protected void notifyUnloadedLibrary(LibraryEvent e) {
@@ -1016,7 +1017,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 
 	/**
 	 * Notifies a library loaded event
-	 * 
+	 *
 	 * @param e the event
 	 */
 	protected void notifyNewQueryResultAvailable(Prolog source, Solution info) {
@@ -1026,48 +1027,48 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 				QueryListener ql = queryListeners.get(i);
 				ql.newQueryResultAvailable(e);
 			}
-		} else {
-			//throw new RuntimeException("no query listeners attached");
-		}
+		}// else {
+		//throw new RuntimeException("no query listeners attached");
+		//}
 	}
 
 
-    /**
-     * Append a new path to directory list
-     *
-     */
-    public void pushDirectoryToList(String path) {
-        absolutePathList.add(path);
-    }
+	/**
+	 * Append a new path to directory list
+	 *
+	 */
+	public void pushDirectoryToList(String path) {
+		absolutePathList.add(path);
+	}
 
-    /**
-     *
-     * Retract an element from directory list
-     */
-    public void popDirectoryFromList() {
-        if(!absolutePathList.isEmpty()) {
-            absolutePathList.remove(absolutePathList.size()-1);
-        }
-    }
+	/**
+	 *
+	 * Retract an element from directory list
+	 */
+	public void popDirectoryFromList() {
+		if(!absolutePathList.isEmpty()) {
+			absolutePathList.remove(absolutePathList.size()-1);
+		}
+	}
 
-     /**
-       *
-       * Reset directory list
-      */
-    public void resetDirectoryList(String path) {
-        absolutePathList = new ArrayList<>();
-        absolutePathList.add(path);
-    }
-    
-    public PTerm termSolve(String st){
+	/**
+	 *
+	 * Reset directory list
+	 */
+	public void resetDirectoryList(String path) {
+		absolutePathList = new ArrayList<>();
+		absolutePathList.add(path);
+	}
+
+	public Term termSolve(String st){
 		try{
 			Parser p = new Parser(opManager, st);
-			PTerm t = p.nextTerm(true);
+			Term t = p.nextTerm(true);
 			return t;
 		}catch(InvalidTermException e)
 		{
 			String s = "null";
-			PTerm t = PTerm.createTerm(s);
+			Term t = Term.createTerm(s);
 			return t;
 		}
 	}
@@ -1075,12 +1076,29 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 	public boolean isTrue(String s) throws MalformedGoalException {
 		Solution r = solve(s);
 		switch (r.toString()) {
-			case PTerm.YES:
+			case Term.YES:
 				return true;
-			case PTerm.NO:
+			case Term.NO:
 				return false;
 			default:
 				throw new RuntimeException(s + " has non-boolean solution " + r);
 		}
+	}
+
+	public void warn(String s) {
+		logger.warn(s);
+	}
+
+	public boolean isWarning() {
+		return warning;
+	}
+
+	public void notifyWarning(WarningEvent warningEvent) {
+		if (warning)
+			logger.warn("warning {}", warningEvent);
+	}
+
+	public void setWarning(boolean b) {
+		this.warning = b;
 	}
 }

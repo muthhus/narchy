@@ -22,7 +22,7 @@ import java.util.*;
 
 /**
  *
- * Solution class represents the result of a solve
+ * SolveInfo class represents the result of a solve
  * request made to the engine, providing information
  * about the solution
  * 
@@ -30,20 +30,19 @@ import java.util.*;
  */
 public class Solution implements Serializable/*, ISolution<Term,Term,Term>*/  {
 	private static final long serialVersionUID = 1L;
-
     /*
-         * possible values returned by step functions
-         * and used as eval state flags
-         */
-    public static final int HALT    = -1;
-    public static final int FALSE   =  0;
-    public static final int TRUE    =  1;
-    public static final int TRUE_CP =  2;
-
+     * possible values returned by step functions
+     * and used as eval state flags
+     */
+    static final int HALT    = EngineRunner.HALT;
+    static final int FALSE   = EngineRunner.FALSE;
+    static final int TRUE    = EngineRunner.TRUE;
+    static final int TRUE_CP = EngineRunner.TRUE_CP;
+    
     private int     endState;
     private final boolean isSuccess;
     
-    private final PTerm query;
+    private final Term query;
     private Struct goal;
     private List<Var>   bindings;
     private String setOfSolution;
@@ -52,7 +51,7 @@ public class Solution implements Serializable/*, ISolution<Term,Term,Term>*/  {
     /**
      * 
      */
-    Solution(PTerm initGoal){
+    Solution(Term initGoal){
         query = initGoal;
         isSuccess = false;
         setOfSolution=null;
@@ -65,7 +64,7 @@ public class Solution implements Serializable/*, ISolution<Term,Term,Term>*/  {
      * @param resultDemo
      * @param resultVars
      */
-    Solution(PTerm initGoal, Struct resultGoal, int resultDemo, List<Var> resultVars) {
+    Solution(Term initGoal, Struct resultGoal, int resultDemo, List<Var> resultVars) {
         query = initGoal;
         goal = resultGoal;
         bindings = resultVars;
@@ -73,8 +72,6 @@ public class Solution implements Serializable/*, ISolution<Term,Term,Term>*/  {
         isSuccess = (endState > FALSE);
         setOfSolution=null;
     }
-
-    public int result() { return endState; }
     
     
     
@@ -111,7 +108,7 @@ public class Solution implements Serializable/*, ISolution<Term,Term,Term>*/  {
 	 * Gets the query
 	 * @return  the query
 	 */
-    public PTerm getQuery() {
+    public Term getQuery() {
         return query;
     }
     
@@ -129,7 +126,7 @@ public class Solution implements Serializable/*, ISolution<Term,Term,Term>*/  {
      *  @exception NoSolutionException if the solve request has not
      *             solution
      */
-    public PTerm getSolution() throws NoSolutionException {
+    public Term  getSolution() throws NoSolutionException {
         if (isSuccess){
             return goal;
         } else {
@@ -158,8 +155,8 @@ public class Solution implements Serializable/*, ISolution<Term,Term,Term>*/  {
      * @throws NoSolutionException if the solve request has no solution
      * @throws UnknownVarException if the variable does not appear in the substitution.
      */
-    public PTerm getTerm(String varName) throws NoSolutionException, UnknownVarException {
-        PTerm t = getVarValue(varName);
+    public Term getTerm(String varName) throws NoSolutionException, UnknownVarException {
+        Term t = getVarValue(varName);
         if (t == null)
             throw new UnknownVarException();
         return t;
@@ -169,7 +166,7 @@ public class Solution implements Serializable/*, ISolution<Term,Term,Term>*/  {
      * Gets the value of a variable in the substitution. Returns <code>null</code>
      * if the variable does not appear in the substitution.
      */
-    public PTerm getVarValue(String varName) throws NoSolutionException {
+    public Term getVarValue(String varName) throws NoSolutionException {
         if (isSuccess) {
             Iterator<Var> it = bindings.iterator();
             while (it.hasNext()) {
@@ -210,10 +207,12 @@ public class Solution implements Serializable/*, ISolution<Term,Term,Term>*/  {
             return st.toString().trim();
         } else {
         	/*Castagna 06/2011*/
-            return endState == HALT ? PTerm.HALT : PTerm.NO;
+            return endState == EngineRunner.HALT ? Term.HALT : Term.NO;
         }
     }
 
 
-    
+    public int result() {
+        return endState;
+    }
 }

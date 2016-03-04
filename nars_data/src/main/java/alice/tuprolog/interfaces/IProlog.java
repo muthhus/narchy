@@ -1,8 +1,8 @@
 package alice.tuprolog.interfaces;
 
 import alice.tuprolog.Library;
-import alice.tuprolog.PTerm;
 import alice.tuprolog.Solution;
+import alice.tuprolog.Term;
 import alice.tuprolog.Theory;
 import alice.tuprolog.event.ExceptionListener;
 import alice.tuprolog.event.OutputListener;
@@ -121,7 +121,7 @@ public interface IProlog {
 	 * @param term      the term to be represented as a string
 	 * @return the string representing the term
 	 */
-	String toString(PTerm term);
+	String toString(Term term);
 		
 	/**
 	 * Adds a listener to ouput events

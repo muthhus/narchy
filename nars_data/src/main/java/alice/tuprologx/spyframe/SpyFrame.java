@@ -33,26 +33,26 @@ public class SpyFrame extends JFrame implements ActionListener, SpyListener{
       return TermFrame.term2tree.makeTreeFrom(makeTermFrom(eclist));
     }
 
-    private ArrayList<PTerm> elementi;
+    private ArrayList<Term> elementi;
     
-    PTerm makeTermFrom(List<ExecutionContext> eclist){
+    Term makeTermFrom(List<ExecutionContext> eclist){
       int levels=eclist.size();
       if(levels<1) return null;
-      PTerm bottom=null;
+      Term bottom=null;
       for(int i=0; i<levels; i++){
         ExecutionContext ec=eclist.get(i);
-        PTerm c=ec.getClause();
+        Term c=ec.getClause();
         if(c instanceof Struct){
           Struct s=(Struct)c;
           String name=s.getName();
-          ArrayList<PTerm> sub=new ArrayList<PTerm>();
+          ArrayList<Term> sub=new ArrayList<Term>();
           for(AbstractSubGoalTree sgt: ec.getSubGoalStore().getSubGoals())
           {
         	  if (sgt.isRoot())
         	  {
         		  //SubGoalTree
         		  cerca(sgt);
-        		  for (PTerm t : elementi)
+        		  for (Term t : elementi)
         		  {
         			  sub.add(t);
         		  }
@@ -71,7 +71,7 @@ public class SpyFrame extends JFrame implements ActionListener, SpyListener{
           if(bottom!=null) sub.set(pos, bottom);
           if(name==null) bottom=sub.get(0);
           else{
-            PTerm[] subt=new PTerm[sub.size()];
+            Term[] subt=new Term[sub.size()];
             bottom=new Struct(name, sub.toArray(subt));
           }
         } else bottom=c;
@@ -80,7 +80,7 @@ public class SpyFrame extends JFrame implements ActionListener, SpyListener{
     }
 
 	private void cerca(AbstractSubGoalTree sgt) {
-		elementi=new ArrayList<PTerm>();
+		elementi=new ArrayList<Term>();
 		int dim = ((SubGoalTree)sgt).size();
 		for (int i=0; i<dim; i++)
 		{
@@ -110,7 +110,7 @@ public class SpyFrame extends JFrame implements ActionListener, SpyListener{
    * @param goal the prolog term to be tested.
    * @throws InvalidTheoryException if we have no valid prolog theory.
    */
-  public SpyFrame(Theory theory, final PTerm goal) throws InvalidTheoryException{
+  public SpyFrame(Theory theory, final Term goal) throws InvalidTheoryException{
     //START of visible stuff
     super("SpyFrame");
     Container c=getContentPane();
@@ -158,7 +158,7 @@ public class SpyFrame extends JFrame implements ActionListener, SpyListener{
     pprocess=new Thread(){
       @Override
       public void run(){
-        PTerm sol;
+        Term sol;
         Solution sinfo=prolog.solve(goal);
         if(sinfo!=null)
         {
@@ -223,7 +223,7 @@ public class SpyFrame extends JFrame implements ActionListener, SpyListener{
    */
   public static void main(String[] args) throws Exception{
     Theory theory=new Theory(new FileInputStream(args[0]));
-    PTerm goal= PTerm.createTerm(args[1]);
+    Term goal=Term.createTerm(args[1]);
     System.out.println("goal:"+goal);
     System.out.println("in given theory\n---------------\n"+theory);
     SpyFrame tf=new SpyFrame(theory, goal);

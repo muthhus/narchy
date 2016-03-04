@@ -2,11 +2,11 @@ package alice.tuprolog;
 
 import junit.framework.TestCase;
 
-public class SolveInfoTestCase extends TestCase {
+public class SolutionTestCase extends TestCase {
 
 	public void testGetSubsequentQuery() {
 		Prolog engine = new Prolog();
-		PTerm query = new Struct("is", new Var("X"), new Struct("+", new Int(1), new Int(2)));
+		Term query = new Struct("is", new Var("X"), new Struct("+", new Int(1), new Int(2)));
 		Solution result = engine.solve(query);
 		assertTrue(result.isSuccess());
 		assertEquals(query, result.getQuery());

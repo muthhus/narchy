@@ -107,9 +107,9 @@ public class Agent extends Prolog {
 //     * @param l the listener
 //     */
 //    public synchronized void addOutputListener(OutputListener l) {
-//        super.addOutputListener(l);
+//        addOutputListener(l);
 //    }
-    
+//
 //    /**
 //     * Removes a listener to ouput events
 //     *
@@ -118,7 +118,7 @@ public class Agent extends Prolog {
 //    public synchronized void removeOutputListener(OutputListener l) {
 //        removeOutputListener(l);
 //    }
-//
+    
     /**
      * Removes all output event listeners
      */
