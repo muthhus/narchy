@@ -4,7 +4,7 @@ import java.util.LinkedList;
 
 /**
  * <code>FamilyClausesIndex</code> enables family clauses indexing
- * in {@link ClauseDatabase}.
+ * in {@link MutableClauseIndex}.
  *
  * @author Paolo Contessi
  * @since 2.2

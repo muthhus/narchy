@@ -18,7 +18,6 @@
 package alice.tuprolog;
 
 import java.util.*;
-import java.io.*;
 import java.util.function.Consumer;
 
 import alice.tuprolog.event.*;
@@ -34,21 +33,20 @@ import org.slf4j.LoggerFactory;
  * The Prolog class represents a tuProlog engine.
  *
  */
-public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
+public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 
-	private static final long serialVersionUID = 1L;
 	/*  manager of current theory */
-	private TheoryManager theoryManager;
+	private final TheoryManager theoryManager;
 	/*  component managing primitive  */
-	private PrimitiveManager primitiveManager;
+	private final PrimitiveManager primitiveManager;
 	/* component managing operators */
-	private OperatorManager opManager;
+	private final OperatorManager opManager;
 	/* component managing flags */
-	private FlagManager flagManager;
+	private final FlagManager flagManager;
 	/* component managing libraries */
-	private LibraryManager libraryManager;
+	private final LibraryManager libraryManager;
 	/* component managing engine */
-	private EngineManager engineManager;
+	private final EngineManager engineManager;
 
 	/*  spying activated ?  */
 	private boolean spy;
@@ -94,7 +92,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 	 * IOLibrary, and  JavaLibrary
 	 */
 	public Prolog() {
-		this(false,true);
+		this(false);
 		try {
 			loadLibrary("alice.tuprolog.lib.BasicLibrary");
 		} catch (Exception ex) {
@@ -128,7 +126,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 	 * @param libs the (class) name of the libraries to be loaded
 	 */
 	public Prolog(String[] libs) throws InvalidLibraryException {
-		this(false,true);
+		this(false);
 		if (libs != null) {
 			for (int i = 0; i < libs.length; i++) {
 				loadLibrary(libs[i]);
@@ -141,9 +139,8 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 	 * Initialize basic engine structures.
 	 *
 	 * @param spy spying activated
-	 * @param warning warning activated
 	 */
-	private Prolog(boolean spy, boolean warning) {
+	private Prolog(boolean spy) {
 		outputListeners = new ArrayList<>();
 		spyListeners = new ArrayList<>();
 		/*Castagna 06/2011*/
@@ -158,19 +155,13 @@ public class Prolog implements /*Castagna 06/2011*/IProlog,/**/ Serializable {
 		queryListeners = new ArrayList<>();
 		libraryListeners = new ArrayList<>();
 		absolutePathList = new ArrayList<>();
-		initializeManagers();
-	}
-
-
-	private void initializeManagers() {
 		flagManager      = new FlagManager();
 		libraryManager   = new LibraryManager();
 		opManager        = new OperatorManager();
-		theoryManager    = new TheoryManager();
 		primitiveManager = new PrimitiveManager();
 		engineManager    = new EngineManager();
 		//config managers
-		theoryManager.initialize(this);
+		theoryManager    = new TheoryManager(this);
 		libraryManager.initialize(this);
 		flagManager.initialize(this);
 		primitiveManager.initialize(this);

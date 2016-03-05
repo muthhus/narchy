@@ -28,26 +28,26 @@ import java.util.*;
  * Reviewed by Paolo Contessi
  */
 
-class ClauseDatabase extends HashMap<String,FamilyClausesList> implements Iterable<ClauseInfo> {
+public class MutableClauseIndex extends HashMap<String,FamilyClausesList> implements ClauseIndex {
+
 	private static final long serialVersionUID = 1L;
-	void addFirst(String key, ClauseInfo d) {
-		FamilyClausesList family = get(key);
-		if (family == null)
-			put(key, family = new FamilyClausesList());
-		family.addFirst(d);
+
+	public void add(String key, ClauseInfo d, boolean first) {
+		FamilyClausesList family = computeIfAbsent(key, (k)->new FamilyClausesList());
+		family.add(d, first);
 	}
 
-	void addLast(String key, ClauseInfo d) {
-		FamilyClausesList family = get(key);
-		if (family == null)
-			put(key, family = new FamilyClausesList());
-		family.addLast(d);
-	}
+//	public void addLast(String key, ClauseInfo d) {
+//		FamilyClausesList family = get(key);
+//		if (family == null)
+//			put(key, family = new FamilyClausesList());
+//		family.addLast(d);
+//	}
 
-	FamilyClausesList abolish(String key) 
+/*	FamilyClausesList abolish(String key)
 	{
 		return remove(key);
-	}
+	}*/
 
 	/**
 	 * Retrieves a list of the predicates which has the same name and arity
@@ -56,27 +56,25 @@ class ClauseDatabase extends HashMap<String,FamilyClausesList> implements Iterab
 	 * @param headt The goal
 	 * @return  The list of matching-compatible predicates
 	 */
-	List<ClauseInfo> getPredicates(Term headt) {
+	public List<ClauseInfo> getPredicates(Term headt) {
 		FamilyClausesList family = get(((Struct) headt).getPredicateIndicator());
-		if (family == null){
-			return new ReadOnlyLinkedList<>();
-		}
-		return family.get(headt);
+		//new ReadOnlyLinkedList<>();
+		return family == null ? Collections.EMPTY_LIST : family.get(headt);
 	}
 
-	/**
-	 * Retrieves the list of clauses of the requested family
-	 *
-	 * @param key   Goal's Predicate Indicator
-	 * @return      The family clauses
-	 */
-	List<ClauseInfo> getPredicates(String key){
-		FamilyClausesList family = get(key);
-		if(family == null){
-			return new ReadOnlyLinkedList<>();
-		}
-		return new ReadOnlyLinkedList<>(family);
-	}
+//	/**
+//	 * Retrieves the list of clauses of the requested family
+//	 *
+//	 * @param key   Goal's Predicate Indicator
+//	 * @return      The family clauses
+//	 */
+//	List<ClauseInfo> getPredicates(String key){
+//		FamilyClausesList family = get(key);
+//		if(family == null){
+//			return new ReadOnlyLinkedList<>();
+//		}
+//		return new ReadOnlyLinkedList<>(family);
+//	}
 
 	@Override
 	public Iterator<ClauseInfo> iterator() {
@@ -88,7 +86,7 @@ class ClauseDatabase extends HashMap<String,FamilyClausesList> implements Iterab
 		Iterator<ClauseInfo> workingList;
 		//private boolean busy = false;
 
-		public CompleteIterator(ClauseDatabase clauseDatabase) {
+		public CompleteIterator(ClauseIndex clauseDatabase) {
 			values = clauseDatabase.values().iterator();
 		}
 

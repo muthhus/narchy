@@ -20,11 +20,7 @@ package alice.tuprolog;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.Serializable;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 
 import alice.util.Tools;
@@ -46,23 +42,29 @@ import alice.util.Tools;
  *
  * @see Theory
  */
-public class TheoryManager implements Serializable {
-	private static final long serialVersionUID = 1L;
-	private ClauseDatabase dynamicDBase;
-	private ClauseDatabase staticDBase;
-	private ClauseDatabase retractDBase;
-	private Prolog engine;
-	private PrimitiveManager primitiveManager;
-	private Stack<Term> startGoalStack;
+public class TheoryManager {
+
+	public static final Struct TRUE = new Struct("true");
+	private final ClauseIndex dynamicDBase;
+	private final MutableClauseIndex staticDBase;
+	private final MutableClauseIndex retractDBase;
+	private final Prolog engine;
+	private final PrimitiveManager primitiveManager;
+	private final Deque<Term> startGoalStack;
 	Theory lastConsultedTheory;
 
-	public void initialize(Prolog vm) {
-		dynamicDBase = new ClauseDatabase();
-		staticDBase = new ClauseDatabase();
-		retractDBase = new ClauseDatabase();
-		lastConsultedTheory = new Theory();
+	public TheoryManager(Prolog vm) {
+		this(vm, new MutableClauseIndex());
+	}
+
+	public TheoryManager(Prolog vm, ClauseIndex dynamics) {
 		engine = vm;
+		dynamicDBase = dynamics;
+		staticDBase = new MutableClauseIndex();
+		retractDBase = new MutableClauseIndex();
+		lastConsultedTheory = new Theory();
 		primitiveManager = engine.getPrimitiveManager();
+		startGoalStack = new ArrayDeque<>(32);
 	}
 
 	/**
@@ -72,12 +74,12 @@ public class TheoryManager implements Serializable {
 		ClauseInfo d = new ClauseInfo(toClause(clause), libName);
 		String key = d.getHead().getPredicateIndicator();
 		if (dyn) {
-			dynamicDBase.addFirst(key, d);
+			dynamicDBase.add(key, d, true);
 			if (staticDBase.containsKey(key)) {
 				engine.warn("A static predicate with signature " + key + " has been overriden.");
 			}
 		} else
-			staticDBase.addFirst(key, d);
+			staticDBase.add(key, d, true);
 		if (engine.isSpy())
 			engine.spy("INSERTA: " + d.getClause() + '\n');
 	}
@@ -89,12 +91,12 @@ public class TheoryManager implements Serializable {
 		ClauseInfo d = new ClauseInfo(toClause(clause), libName);
 		String key = d.getHead().getPredicateIndicator();
 		if (dyn) {
-			dynamicDBase.addLast(key, d);
+			dynamicDBase.add(key, d, false);
 			if (staticDBase.containsKey(key)) {
 				engine.warn("A static predicate with signature " + key + " has been overriden.");
 			}
 		} else
-			staticDBase.addLast(key, d);
+			staticDBase.add(key, d, false);
 		if (engine.isSpy()) engine.spy("INSERTZ: " + d.getClause() + '\n');
 	}
 
@@ -163,7 +165,7 @@ public class TheoryManager implements Serializable {
 		String arg0 = Tools.removeApices(pi.getArg(0).toString());
 		String arg1 = Tools.removeApices(pi.getArg(1).toString());
 		String key =  arg0 + '/' + arg1;
-		List<ClauseInfo> abolished = dynamicDBase.abolish(key); /* Reviewed by Paolo Contessi: LinkedList -> List */
+		List<ClauseInfo> abolished = dynamicDBase.remove(key); /* Reviewed by Paolo Contessi: LinkedList -> List */
 		if (abolished != null)
 			if (engine.isSpy())
 				engine.spy("ABOLISHED: " + key + " number of clauses=" + abolished.size() + '\n');
@@ -196,7 +198,7 @@ public class TheoryManager implements Serializable {
 			//            return l;
 			throw new RuntimeException();
 		}
-		return new LinkedList<>();
+		return Collections.EMPTY_LIST; //new LinkedList<>();
 	}
 
 	/**
@@ -207,7 +209,8 @@ public class TheoryManager implements Serializable {
 	 * @param libName       if it not null, then the clauses are marked to belong to the specified library
 	 */
 	public synchronized void consult(Theory theory, boolean dynamicTheory, String libName) throws InvalidTheoryException {
-		startGoalStack = new Stack<>();
+		startGoalStack.clear();
+
 		/*Castagna 06/2011*/   	
 		int clause = 1;
 		/**/
@@ -250,7 +253,7 @@ public class TheoryManager implements Serializable {
 	 * Clears the clause dbase.
 	 */
 	public synchronized void clear() {
-		dynamicDBase = new ClauseDatabase();
+		dynamicDBase.clear();
 	}
 
 	/**
@@ -273,7 +276,8 @@ public class TheoryManager implements Serializable {
 
 
 	private boolean runDirective(Struct c) {
-		if ("':-'".equals(c.getName()) || ":-".equals(c.getName()) && c.getArity() == 1 && c.getTerm(0) instanceof Struct) {
+		if ("':-'".equals(c.getName()) ||
+				( (c.getArity() == 1) && ":-".equals(c.getName()) && (c.getTerm(0) instanceof Struct))) {
 			Struct dir = (Struct) c.getTerm(0);
 			try {
 				if (!primitiveManager.evalAsDirective(dir))
@@ -294,23 +298,27 @@ public class TheoryManager implements Serializable {
 		// TODO bad, slow way of cloning. requires approx twice the time necessary
 		t = (Struct) Term.createTerm(t.toString(), this.engine.getOperatorManager());
 		if (!t.isClause())
-			t = new Struct(":-", t, new Struct("true"));
+			t = new Struct(":-", t, TRUE);
 		primitiveManager.identifyPredicate(t);
 		return t;
 	}
 
 	public synchronized void solveTheoryGoal() {
 		Struct s = null;
-		while (!startGoalStack.empty()) {
+		Deque<Term> goals = this.startGoalStack;
+
+		while (!goals.isEmpty()) {
+			Term g = goals.pop();
 			s = (s == null) ?
-					(Struct) startGoalStack.pop() :
-						new Struct(",", startGoalStack.pop(), s);
+					(Struct) g :
+					new Struct(",", g, s);
 		}
 		if (s != null) {
 			try {
 				engine.solve(s);
 			} catch (Exception ex) {
-				ex.printStackTrace();
+				engine.logger.error("solveTheoryGoal {}", ex);
+				//ex.printStackTrace();
 			}
 		}
 	}
@@ -362,7 +370,7 @@ public class TheoryManager implements Serializable {
 	}
 	
 	public void clearRetractDB() {
-		this.retractDBase=new ClauseDatabase();
+		this.retractDBase.clear();
 	}
 
 }

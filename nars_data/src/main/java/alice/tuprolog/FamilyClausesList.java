@@ -66,7 +66,15 @@ class FamilyClausesList extends LinkedList<ClauseInfo> {
 	@Override
 	public boolean add(ClauseInfo o) {
 		addLast(o);
+		return true;
+	}
 
+
+	public final boolean add(ClauseInfo o, boolean first) {
+		if (first)
+			addFirst(o);
+		else
+			addLast(o);
 		return true;
 	}
 
