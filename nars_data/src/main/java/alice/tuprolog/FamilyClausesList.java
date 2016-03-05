@@ -14,7 +14,7 @@ import java.util.*;
  * 
  * @see LinkedList
  */
-class FamilyClausesList extends LinkedList<ClauseInfo> {
+public class FamilyClausesList extends LinkedList<ClauseInfo> {
 	private static final long serialVersionUID = 1L;
 	private final FamilyClausesIndex<Number> numCompClausesIndex;
 	private final FamilyClausesIndex<String> constantCompClausesIndex;

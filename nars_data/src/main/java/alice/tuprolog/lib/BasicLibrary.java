@@ -168,7 +168,7 @@ public class BasicLibrary extends Library {
                     th);
         Struct theory = (Struct) th;
         try {
-            new Agent(alice.util.Tools.removeApices(theory.toString())).spawn();
+            new Agent(alice.util.Tools.removeApices(theory.toString()), new MutableClauseIndex()).spawn();
             return true;
         } catch (Exception ex) {
             ex.printStackTrace();

@@ -45,7 +45,8 @@ public class Agent extends Prolog {
      *
      * @param theory the text representing the theory
      */
-    public Agent(String theory){
+    public Agent(String theory, ClauseIndex dynamics){
+        super(dynamics);
         theoryText=theory;
         addOutputListener(defaultOutputListener);
     }
@@ -65,7 +66,8 @@ public class Agent extends Prolog {
      * Constructs the Agent with a theory provided
      * by an input stream
      */
-    public Agent(InputStream is){
+    public Agent(InputStream is, ClauseIndex dynamics){
+        super(dynamics);
         theoryInputStream=is;
         addOutputListener(defaultOutputListener);
     }
@@ -156,26 +158,26 @@ public class Agent extends Prolog {
         }
     }
     
-    
-    public static void main(String args[]){
-        if (args.length==1 || args.length==2){
-            
-            //FileReader fr;
-            try {
-                String text = Tools.loadText(args[0]);
-                if (args.length==1){
-                    new Agent(text).spawn();
-                } else {
-                    new Agent(text,args[1]).spawn();
-                }
-            } catch (Exception ex){
-                System.err.println("invalid theory.");
-            }
-        } else {
-            System.err.println("args: <theory file> { goal }");
-            System.exit(-1);
-        }
-    }
+
+//    public static void main(String args[]){
+//        if (args.length==1 || args.length==2){
+//
+//            //FileReader fr;
+//            try {
+//                String text = Tools.loadText(args[0]);
+//                if (args.length==1){
+//                    new Agent(text).spawn();
+//                } else {
+//                    new Agent(text,args[1]).spawn();
+//                }
+//            } catch (Exception ex){
+//                System.err.println("invalid theory.");
+//            }
+//        } else {
+//            System.err.println("args: <theory file> { goal }");
+//            System.exit(-1);
+//        }
+//    }
     
     
 }

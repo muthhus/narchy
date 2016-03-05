@@ -14,6 +14,8 @@ import org.apache.commons.lang3.mutable.MutableFloat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Iterator;
+import java.util.List;
 import java.util.function.Consumer;
 
 /** Prolog mental coprocessor for accelerating reasoning
@@ -48,7 +50,7 @@ public class PrologCore extends Agent implements Consumer<Task> {
     }
 
     public PrologCore(NAR n, String theory) {
-        super(theory);
+        super(theory, new NARClauseIndex(n));
         this.nar = n;
 
         n.eventTaskProcess.on(this);
@@ -95,7 +97,7 @@ public class PrologCore extends Agent implements Consumer<Task> {
             truth = !truth;
         }*/
 
-        PTerm questionTerm = pterm(tt);
+        alice.tuprolog.Term questionTerm = pterm(tt);
 
         //TODO limit max # of inputs
         solve(questionTerm, (answer)-> {
@@ -121,7 +123,7 @@ public class PrologCore extends Agent implements Consumer<Task> {
 
 
     //TODO async
-    protected void believe(PTerm p, boolean truth) {
+    protected void believe(alice.tuprolog.Term p, boolean truth) {
         if (!truth) {
             //wrap in negate
             p = negate(p);
@@ -133,17 +135,17 @@ public class PrologCore extends Agent implements Consumer<Task> {
 
     }
 
-    public static Struct assertion(PTerm p) {
+    public static Struct assertion(alice.tuprolog.Term p) {
         return new Struct("assertz", p);
     }
 
-    public static Struct negate(PTerm p) {
+    public static Struct negate(alice.tuprolog.Term p) {
         return new Struct("not", p); //TODO issue retraction on the opposite? ex: retract(x), assertz(not(x))
     }
 
-    public static PTerm[] psubterms(final Compound subtermed) {
+    public static alice.tuprolog.Term[] psubterms(final Compound subtermed) {
         int l = subtermed.size();
-        PTerm[] p = new PTerm[l];
+        alice.tuprolog.Term[] p = new alice.tuprolog.Term[l];
         for (int i = 0; i < l; i++) {
             p[i] = pterm(subtermed.term(i));
         }
@@ -151,7 +153,7 @@ public class PrologCore extends Agent implements Consumer<Task> {
     }
 
     //NARS term -> Prolog term
-    public static PTerm pterm(final Term term) {
+    public static alice.tuprolog.Term pterm(final Term term) {
         if (term instanceof Compound) {
             Op op = term.op();
             return new Struct(op.str, psubterms( ((Compound)term) ));
@@ -208,6 +210,32 @@ public class PrologCore extends Agent implements Consumer<Task> {
 //        }
 //
 //        return null;
+    }
+
+    static class NARClauseIndex implements ClauseIndex {
+        public NARClauseIndex(NAR n) {
+
+        }
+
+        @Override
+        public FamilyClausesList get(String key) {
+            return null;
+        }
+
+        @Override
+        public void add(String key, ClauseInfo d, boolean first) {
+
+        }
+
+        @Override
+        public List<ClauseInfo> getPredicates(alice.tuprolog.Term headt) {
+            return null;
+        }
+
+        @Override
+        public Iterator<ClauseInfo> iterator() {
+            return null;
+        }
     }
 
 //    private static Term getVar(Var v) {

@@ -85,14 +85,17 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	private boolean warning;
 
 
+	public Prolog() {
+		this(new MutableClauseIndex());
+	}
 	/**
 	 * Builds a prolog engine with default libraries loaded.
 	 *
 	 * The default libraries are BasicLibrary, ISOLibrary,
 	 * IOLibrary, and  JavaLibrary
 	 */
-	public Prolog() {
-		this(false);
+	public Prolog(ClauseIndex dynamics) {
+		this(false, dynamics);
 		try {
 			loadLibrary("alice.tuprolog.lib.BasicLibrary");
 		} catch (Exception ex) {
@@ -126,7 +129,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	 * @param libs the (class) name of the libraries to be loaded
 	 */
 	public Prolog(String[] libs) throws InvalidLibraryException {
-		this(false);
+		this(false, new MutableClauseIndex());
 		if (libs != null) {
 			for (int i = 0; i < libs.length; i++) {
 				loadLibrary(libs[i]);
@@ -140,7 +143,8 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	 *
 	 * @param spy spying activated
 	 */
-	private Prolog(boolean spy) {
+	private Prolog(boolean spy, ClauseIndex dynamics) {
+
 		outputListeners = new ArrayList<>();
 		spyListeners = new ArrayList<>();
 		/*Castagna 06/2011*/
@@ -161,7 +165,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 		primitiveManager = new PrimitiveManager();
 		engineManager    = new EngineManager();
 		//config managers
-		theoryManager    = new TheoryManager(this);
+		theoryManager    = new TheoryManager(this, dynamics);
 		libraryManager.initialize(this);
 		flagManager.initialize(this);
 		primitiveManager.initialize(this);

@@ -27,7 +27,7 @@ import java.util.*;
  * Reviewed by Paolo Contessi
  */
 
-public class MutableClauseIndex extends HashMap<String,FamilyClausesList> implements ClauseIndex {
+public final class MutableClauseIndex extends HashMap<String,FamilyClausesList> implements ClauseIndex {
 
 	private static final long serialVersionUID = 1L;
 
@@ -47,6 +47,16 @@ public class MutableClauseIndex extends HashMap<String,FamilyClausesList> implem
 	{
 		return remove(key);
 	}*/
+
+	@Override
+	public FamilyClausesList remove(String key) {
+		return super.remove(key);
+	}
+
+	@Override
+	public FamilyClausesList get(String key) {
+		return super.get(key);
+	}
 
 	/**
 	 * Retrieves a list of the predicates which has the same name and arity
@@ -85,7 +95,8 @@ public class MutableClauseIndex extends HashMap<String,FamilyClausesList> implem
 		Iterator<ClauseInfo> workingList;
 		//private boolean busy = false;
 
-		public CompleteIterator(ClauseIndex clauseDatabase) {
+		public CompleteIterator(MutableClauseIndex clauseDatabase) {
+
 			values = clauseDatabase.values().iterator();
 		}
 
