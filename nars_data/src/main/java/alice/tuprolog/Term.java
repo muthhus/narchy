@@ -219,8 +219,8 @@ public abstract class Term implements Serializable {
             }
             return true;
         }
-        Var.free(v1);
-        Var.free(v2);
+        Var.free(v1); v1.clear();
+        Var.free(v2); v2.clear();
     	return false;
     }
     
@@ -240,8 +240,8 @@ public abstract class Term implements Serializable {
         List<Var> v1 = new LinkedList<>(); /* Reviewed by: Paolo Contessi (was: ArrayList()) */
         List<Var> v2 = new LinkedList<>(); /* Reviewed by: Paolo Contessi (was: ArrayList()) */
         boolean ok = unify(v1,v2,t);
-        Var.free(v1);
-        Var.free(v2);
+        Var.free(v1); v1.clear();
+        Var.free(v2); v2.clear();
         return ok;
     }
     

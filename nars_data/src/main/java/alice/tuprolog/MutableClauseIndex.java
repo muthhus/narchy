@@ -17,7 +17,6 @@
  */
 package alice.tuprolog;
 
-import alice.util.ReadOnlyLinkedList;
 import java.util.*;
 
 /**

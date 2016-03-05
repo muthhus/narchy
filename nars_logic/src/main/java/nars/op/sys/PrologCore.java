@@ -95,7 +95,7 @@ public class PrologCore extends Agent implements Consumer<Task> {
             truth = !truth;
         }*/
 
-        alice.tuprolog.Term questionTerm = pterm(tt);
+        PTerm questionTerm = pterm(tt);
 
         //TODO limit max # of inputs
         solve(questionTerm, (answer)-> {
@@ -121,7 +121,7 @@ public class PrologCore extends Agent implements Consumer<Task> {
 
 
     //TODO async
-    protected void believe(alice.tuprolog.Term  p, boolean truth) {
+    protected void believe(PTerm p, boolean truth) {
         if (!truth) {
             //wrap in negate
             p = negate(p);
@@ -133,17 +133,17 @@ public class PrologCore extends Agent implements Consumer<Task> {
 
     }
 
-    public static Struct assertion(alice.tuprolog.Term  p) {
+    public static Struct assertion(PTerm p) {
         return new Struct("assertz", p);
     }
 
-    public static Struct negate(alice.tuprolog.Term  p) {
+    public static Struct negate(PTerm p) {
         return new Struct("not", p); //TODO issue retraction on the opposite? ex: retract(x), assertz(not(x))
     }
 
-    public static alice.tuprolog.Term [] psubterms(final Compound subtermed) {
+    public static PTerm[] psubterms(final Compound subtermed) {
         int l = subtermed.size();
-        alice.tuprolog.Term [] p = new alice.tuprolog.Term [l];
+        PTerm[] p = new PTerm[l];
         for (int i = 0; i < l; i++) {
             p[i] = pterm(subtermed.term(i));
         }
@@ -151,7 +151,7 @@ public class PrologCore extends Agent implements Consumer<Task> {
     }
 
     //NARS term -> Prolog term
-    public static alice.tuprolog.Term  pterm(final Term term) {
+    public static PTerm pterm(final Term term) {
         if (term instanceof Compound) {
             Op op = term.op();
             return new Struct(op.str, psubterms( ((Compound)term) ));

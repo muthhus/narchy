@@ -105,22 +105,23 @@ public class Var extends Term {
 	void rename(int idExecCtx, int count) { /* Reviewed by Paolo Contessi: String -> StringBuilder */
 		id = idExecCtx;
 
+		StringBuilder completeName = this.completeName;
+		completeName.delete(0, completeName.length());
+
 		if (id > -1) {
 			//completeName = name + "_e" + idExecCtx;
-			completeName = completeName
-					.delete(0, completeName.length())
+
+			this.completeName = completeName
 					.append(name).append("_e").append(id);
 		}
 
 		else if (id == ORIGINAL) { //completeName = name;
-			completeName = completeName
-					.delete(0, completeName.length())
+			this.completeName = completeName
 					.append(name);
 		}
 
 		else if (id == PROGRESSIVE) { //completeName = "_"+count;
-			completeName = completeName
-					.delete(0, completeName.length())
+			this.completeName = completeName
 					.append('_').append(count);
 		}
 	}
@@ -198,6 +199,7 @@ public class Var extends Term {
 		for(Var v:varsUnified){
 			v.free();                
 		}
+		//varsUnified.clear();
 	}
 
 
@@ -279,37 +281,37 @@ public class Var extends Term {
 	@Override
 	public boolean isEmptyList() {
 		Term t=getTerm();
-		return t == this ? false : t.isEmptyList();
+		return t != this && t.isEmptyList();
 	}
 
 	@Override
 	public boolean isAtomic() {
 		Term t=getTerm();
-		return t == this ? false : t.isAtomic();
+		return t != this && t.isAtomic();
 	}
 
 	@Override
 	public boolean isCompound() {
 		Term t=getTerm();
-		return t == this ? false : t.isCompound();
+		return t != this && t.isCompound();
 	}
 
 	@Override
 	public boolean isAtom() {
 		Term t=getTerm();
-		return t == this ? false : t.isAtom();
+		return t != this && t.isAtom();
 	}
 
 	@Override
 	public boolean isList() {
 		Term t = getTerm();
-		return t == this ? false : t.isList();
+		return t != this && t.isList();
 	}
 
 	@Override
 	public boolean isGround(){
 		Term t=getTerm();
-		return t == this ? false : t.isGround();
+		return t != this && t.isGround();
 	}
 
 	//
@@ -409,12 +411,12 @@ public class Var extends Term {
 			 t = t.getTerm();
 			 if (t instanceof Var) { 
 				 if (this == t) {
-					 try{
+					 //try{
 						 vl1.add(this);                
-					 } catch(NullPointerException e) {
-						 /* vl1==null mean nothing intresting for the caller */
-						 throw new RuntimeException(e); //TODO trap this make sure stack trace not generated routinely
-					 }
+					 //} catch(NullPointerException e) {
+						 ///* vl1==null mean nothing intresting for the caller */
+						 //throw new RuntimeException(e); //TODO trap this make sure stack trace not generated routinely
+					 //}
 					 return true;
 				 }
 			 } else if (t instanceof Struct) {
@@ -426,12 +428,12 @@ public class Var extends Term {
 				 return false;
 			 }
 			 link = t;
-			 try {
+			 //try {
 				 vl1.add(this);                
-			 } catch(NullPointerException e) {
-				 /* vl1==null mean nothing intresting for the caller */
-				 throw new RuntimeException(e); //TODO trap this make sure stack trace not generated routinely
-			 }
+			 //} catch(NullPointerException e) {
+				 ///* vl1==null mean nothing intresting for the caller */
+				 //throw new RuntimeException(e); //TODO trap this make sure stack trace not generated routinely
+			 //}
 			 //System.out.println("VAR "+name+" BOUND to "+link+" - time: "+time+" - mark: "+mark);
 			 return true;
 		 } else {
@@ -459,8 +461,7 @@ public class Var extends Term {
 		 Term tt = getTerm();
 		 if (tt == this) {
 			 t = t.getTerm();
-			 if (!(t instanceof Var)) return false;
-			 return timestamp > ((Var)t).timestamp;
+			 return !(t instanceof Var) ? false : timestamp > ((Var) t).timestamp;
 		 }
 		 else {
 			 return tt.isGreater(t);
@@ -532,7 +533,7 @@ public class Var extends Term {
 
 	 /*Castagna 06/2011*/
 	 @Override
-	 public void accept(TermVisitor tv) {
+	 public final void accept(TermVisitor tv) {
 		 tv.visit(this);
 	 }
 	 /**/

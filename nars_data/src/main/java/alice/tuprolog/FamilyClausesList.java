@@ -1,11 +1,7 @@
 package alice.tuprolog;
 
-import alice.util.ReadOnlyLinkedList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
+
+import java.util.*;
 
 /**
  * <code>FamilyClausesList</code> is a common <code>LinkedList</code>
@@ -173,7 +169,8 @@ class FamilyClausesList extends LinkedList<ClauseInfo> {
 			 * (and probably no optimization is needed)
 			 */
 			if(g.getArity() == 0){
-				return new ReadOnlyLinkedList<>(this);
+				//return new ReadOnlyLinkedList<>(this);
+				return Collections.unmodifiableList(this);
 			}
 
 			/* Retrieves first argument and checks type */
@@ -183,7 +180,8 @@ class FamilyClausesList extends LinkedList<ClauseInfo> {
 				 * if first argument is an unbounded variable,
 				 * no reasoning is possible, all family must be returned
 				 */
-				return new ReadOnlyLinkedList<>(this);
+				//return new ReadOnlyLinkedList<>(this);
+				return Collections.unmodifiableList(this);
 			} else if(t.isAtomic()){
 				if(t instanceof Number){
 					/* retrieves clauses whose first argument is numeric (or Var)
@@ -191,22 +189,31 @@ class FamilyClausesList extends LinkedList<ClauseInfo> {
 					 * are retrieved, all clauses with a variable
 					 * as first argument
 					 */
-					return new ReadOnlyLinkedList<>(numCompClausesIndex.get((Number) t));
+					//return new ReadOnlyLinkedList<>(
+					return Collections.unmodifiableList(
+							numCompClausesIndex.get((Number) t));
 				} else if(t instanceof Struct){
 					/* retrieves clauses whose first argument is a constant (or Var)
 					 * and same as goal's first argument, if no clauses
 					 * are retrieved, all clauses with a variable
 					 * as first argument
 					 */
-					return new ReadOnlyLinkedList<>(constantCompClausesIndex.get(((Struct) t).getName()));
+					//return new ReadOnlyLinkedList<>(
+					return Collections.unmodifiableList(
+							constantCompClausesIndex.get(((Struct) t).getName()));
 				}
 			} else if(t instanceof Struct){
-				return isAList((Struct) t) ? new ReadOnlyLinkedList<>(listCompClausesList) : new ReadOnlyLinkedList<>(structCompClausesIndex.get(((Struct) t).getPredicateIndicator()));
+				return Collections.unmodifiableList(
+					isAList((Struct) t) ?
+						(listCompClausesList) :
+						(structCompClausesIndex.get(((Struct) t).getPredicateIndicator()))
+				);
 			}
 		}
 
 		/* Default behaviour: no optimization done */
-		return new ReadOnlyLinkedList<>(this);
+		return Collections.unmodifiableList(this);
+		//return new ReadOnlyLinkedList<>(this);
 	}
 
 	@Override

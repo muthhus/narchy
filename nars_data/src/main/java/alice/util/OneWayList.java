@@ -2,9 +2,9 @@ package alice.util;
 
 import java.util.*;
 
-public class OneWayList<E> {
+public final class OneWayList<E> {
     
-    private E head;
+    private final E head;
     private OneWayList<E> tail;
     
     public OneWayList(E head, OneWayList<E> tail){
@@ -13,8 +13,12 @@ public class OneWayList<E> {
     }
 
     public static <T> OneWayList<T> transform(List<T> list){
-        if(list.isEmpty()) return null;
-        return new OneWayList<T>(list.remove(0),transform(list));
+        return list.isEmpty() ?
+                null :
+                new OneWayList<>(
+                    list.remove(0),
+                    transform(list)
+                );
     }
     
     /**
@@ -48,9 +52,9 @@ public class OneWayList<E> {
         return head;
     }
     
-    public void setHead(E head) {
-        this.head = head;
-    }
+//    public void setHead(E head) {
+//        this.head = head;
+//    }
 
 
     public OneWayList<E> getTail() {
@@ -62,25 +66,25 @@ public class OneWayList<E> {
     }
 
     public void addLast(OneWayList<E> newTail){
+        OneWayList<E> tail = this.tail;
         if(tail == null){
-            tail = newTail;
+            this.tail = newTail;
             return;
         }
         tail.addLast(newTail);
     }
     
     public OneWayList<E> get(int index){
+        OneWayList<E> tail = this.tail;
         if(tail == null) throw new NoSuchElementException();
-        if(index <= 0) return this;
-        return tail.get(index-1);
+        return index <= 0 ? this : tail.get(index - 1);
     }
 
     public String toString() {
-        String elem;
-        if(head==null) elem = "null";
-            else elem = head.toString();
-        if(tail==null) return "["+elem+"]";
-        return "["+tail.toString(elem)+"]";
+        E head = this.head;
+        String elem = (head == null) ? "null" : head.toString();
+        OneWayList<E> tail = this.tail;
+        return '[' + (tail == null ? elem : tail.toString(elem)) + ']';
     }
     
     private String toString(String elems){
