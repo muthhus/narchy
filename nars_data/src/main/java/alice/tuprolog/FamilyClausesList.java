@@ -174,7 +174,7 @@ public class FamilyClausesList extends LinkedList<ClauseInfo> {
 			}
 
 			/* Retrieves first argument and checks type */
-			Term t = g.getArg(0).getTerm();
+			Term t = g.term(0).getTerm();
 			if(t instanceof Var){
 				/*
 				 * if first argument is an unbounded variable,
@@ -200,7 +200,7 @@ public class FamilyClausesList extends LinkedList<ClauseInfo> {
 					 */
 					//return new ReadOnlyLinkedList<>(
 					return Collections.unmodifiableList(
-							constantCompClausesIndex.get(((Struct) t).getName()));
+							constantCompClausesIndex.get(((Struct) t).name()));
 				}
 			} else if(t instanceof Struct){
 				return Collections.unmodifiableList(
@@ -241,7 +241,7 @@ public class FamilyClausesList extends LinkedList<ClauseInfo> {
 		 * A list can be an empty list, or a Struct with name equals to "."
 		 * and arity equals to 2.
 		 */
-		return t.isEmptyList() || (t.getArity() == 2 && t.getName().equals("."));
+		return t.isEmptyList() || (t.getArity() == 2 && t.name().equals("."));
 
 	}
 
@@ -256,7 +256,7 @@ public class FamilyClausesList extends LinkedList<ClauseInfo> {
 				return;
 			}
 
-			Term t = g.getArg(0).getTerm();
+			Term t = g.term(0).getTerm();
 			if(t instanceof Var){
 				numCompClausesIndex.insertAsShared(ci, first);
 				constantCompClausesIndex.insertAsShared(ci, first);
@@ -271,7 +271,7 @@ public class FamilyClausesList extends LinkedList<ClauseInfo> {
 				if(t instanceof Number){
 					numCompClausesIndex.insert((Number) t,ci, first);
 				} else if(t instanceof Struct){
-					constantCompClausesIndex.insert(((Struct) t).getName(), ci, first);
+					constantCompClausesIndex.insert(((Struct) t).name(), ci, first);
 				}
 			} else if(t instanceof Struct){
 				if(isAList((Struct) t)){
@@ -297,7 +297,7 @@ public class FamilyClausesList extends LinkedList<ClauseInfo> {
 				return;
 			}
 
-			Term t = g.getArg(0).getTerm();
+			Term t = g.term(0).getTerm();
 			if(t instanceof Var){
 				numCompClausesIndex.removeShared(ci);
 				constantCompClausesIndex.removeShared(ci);
@@ -308,7 +308,7 @@ public class FamilyClausesList extends LinkedList<ClauseInfo> {
 				if(t instanceof Number){
 					numCompClausesIndex.delete((Number) t,ci);
 				} else if(t instanceof Struct){
-					constantCompClausesIndex.delete(((Struct) t).getName(),ci);
+					constantCompClausesIndex.delete(((Struct) t).name(),ci);
 				}
 			} else if(t instanceof Struct){
 				if(t.isList()){

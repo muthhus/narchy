@@ -95,7 +95,7 @@ public class Theory implements Serializable {
                 clauseList = otherClauseList;
             else {
                 Struct p = clauseList, q;
-                while (!(q = (Struct) p.getArg(1)).isEmptyList())
+                while (!(q = (Struct) p.term(1)).isEmptyList())
                     p = q;
                 p.setArg(1, otherClauseList);
             }

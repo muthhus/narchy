@@ -56,21 +56,14 @@ public class ClauseInfo {
     /**
      * building a valid clause with a time stamp = original time stamp + NumVar in clause
      */
-    ClauseInfo(Struct clause_, String lib) {
+    public ClauseInfo(Struct clause_, String lib) {
         clause = clause_;
-        head = extractHead(clause);
-        body = extractBody(clause.getArg(1));
         libName = lib;
+        head = (Struct) clause_.term(0); //extractHead
+        body = extractBody(clause_.term(1));
     }
-    
-    
-    /**
-     * Gets a clause from a generic Term
-     */
-    private static Struct extractHead(Struct clause) {
-        return (Struct)clause.getArg(0);
-    }
-    
+
+
     /**
      * Gets a clause from a generic Term
      */
@@ -81,14 +74,14 @@ public class ClauseInfo {
     }
     
     private static void extractBody(SubGoalTree parent, Term body) {
-        while (body instanceof Struct && ((Struct)body).getName().equals(",")) {
-            Term t = ((Struct)body).getArg(0);
-            if (t instanceof Struct && ((Struct)t).getName().equals(",")) {
+        while (body instanceof Struct && ((Struct)body).name().equals(",")) {
+            Term t = ((Struct)body).term(0);
+            if (t instanceof Struct && ((Struct)t).name().equals(",")) {
                 extractBody(parent.addChild(),t);
             } else {
                 parent.addChild(t);
             }
-            body = ((Struct)body).getArg(1);
+            body = ((Struct)body).term(1);
         }
         parent.addChild(body);
     }
@@ -102,20 +95,20 @@ public class ClauseInfo {
     public String toString(OperatorManager op) {
         int p;
         if ((p = op.opPrio(":-","xfx")) >= OperatorManager.OP_LOW) {
-            String st=indentPredicatesAsArgX(clause.getArg(1),op,p);
-            String head = clause.getArg(0).toStringAsArgX(op,p);
+            String st=indentPredicatesAsArgX(clause.term(1),op,p);
+            String head = clause.term(0).toStringAsArgX(op,p);
             return st.equals("true") ? head + ".\n" : head + " :-\n\t" + st + ".\n";
         }
         
         if ((p = op.opPrio(":-","yfx")) >= OperatorManager.OP_LOW) {
-            String st=indentPredicatesAsArgX(clause.getArg(1),op,p);
-            String head = clause.getArg(0).toStringAsArgY(op,p);
+            String st=indentPredicatesAsArgX(clause.term(1),op,p);
+            String head = clause.term(0).toStringAsArgY(op,p);
             return st.equals("true") ? head + ".\n" : head + " :-\n\t" + st + ".\n";
         }
         
         if ((p = op.opPrio(":-","xfy")) >= OperatorManager.OP_LOW) {
-            String st=indentPredicatesAsArgY(clause.getArg(1),op,p);
-            String head = clause.getArg(0).toStringAsArgX(op,p);
+            String st=indentPredicatesAsArgY(clause.term(1),op,p);
+            String head = clause.term(0).toStringAsArgX(op,p);
             return st.equals("true") ? head + ".\n" : head + " :-\n\t" + st + ".\n";
         }
         return (clause.toString());
@@ -194,14 +187,14 @@ public class ClauseInfo {
      */
     public String toString() {
         // default prio: xfx
-        String st=indentPredicates(clause.getArg(1));
-        return( clause.getArg(0).toString() + " :-\n\t"+st+".\n");
+        String st=indentPredicates(clause.term(1));
+        return( clause.term(0).toString() + " :-\n\t"+st+".\n");
     }
     
     static private String indentPredicates(Term t) {
         if (t instanceof Struct) {
             Struct co=(Struct)t;
-            return co.getName().equals(",") ? co.getArg(0).toString() + ",\n\t" + indentPredicates(co.getArg(1)) : t.toString();
+            return co.name().equals(",") ? co.term(0).toString() + ",\n\t" + indentPredicates(co.term(1)) : t.toString();
         } else {
             return t.toString();
         }
@@ -240,12 +233,12 @@ public class ClauseInfo {
     static private String indentPredicatesAsArgX(Term t,OperatorManager op,int p) {
         if (t instanceof Struct) {
             Struct co=(Struct)t;
-            if (co.getName().equals(",")) {
+            if (co.name().equals(",")) {
                int prio = op.opPrio(",","xfy");
                StringBuilder sb = new StringBuilder(prio >= p ? "(" : "");
-               sb.append(co.getArg(0).toStringAsArgX(op,prio));
+               sb.append(co.term(0).toStringAsArgX(op,prio));
                sb.append(",\n\t");
-               sb.append(indentPredicatesAsArgY(co.getArg(1),op,prio));
+               sb.append(indentPredicatesAsArgY(co.term(1),op,prio));
                if (prio >= p) sb.append(')');
 
                return sb.toString();
@@ -261,12 +254,12 @@ public class ClauseInfo {
     static private String indentPredicatesAsArgY(Term t,OperatorManager op,int p) {
         if (t instanceof Struct) {
             Struct co=(Struct)t;
-            if (co.getName().equals(",")) {
+            if (co.name().equals(",")) {
                int prio = op.opPrio(",","xfy");
                StringBuilder sb = new StringBuilder(prio > p ? "(" : "");
-               sb.append(co.getArg(0).toStringAsArgX(op,prio));
+               sb.append(co.term(0).toStringAsArgX(op,prio));
                sb.append(",\n\t");
-               sb.append(indentPredicatesAsArgY(co.getArg(1),op,prio));
+               sb.append(indentPredicatesAsArgY(co.term(1),op,prio));
                if (prio > p) sb.append(')');
 
                return sb.toString();

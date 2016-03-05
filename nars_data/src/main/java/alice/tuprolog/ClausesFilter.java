@@ -50,7 +50,7 @@ class ClausesFilter {
             }
 
             /* Retrieves first argument and checks type */
-            Term t = g.getArg(1).getTerm();
+            Term t = g.term(1).getTerm();
             if(t instanceof Var){
                 /* 
                  * if first argument is an unbounded variable,
@@ -98,7 +98,7 @@ class ClausesFilter {
 
         for(Object obj : familyClauses){
             ClauseInfo clause = (ClauseInfo) obj;
-            Term arg = clause.getHead().getArg(0).getTerm();
+            Term arg = clause.getHead().term(0).getTerm();
 
             if((arg instanceof Var) ||
                     (arg instanceof Number && arg.isEqual(t))){
@@ -126,7 +126,7 @@ class ClausesFilter {
 
         for(Object obj : familyClauses){
             ClauseInfo clause = (ClauseInfo) obj;
-            Term arg = clause.getHead().getArg(0).getTerm();
+            Term arg = clause.getHead().term(0).getTerm();
 
             if(arg instanceof Var ||
                     ((Struct) arg).getPredicateIndicator().equals(predIndicator)){
@@ -152,7 +152,7 @@ class ClausesFilter {
          */
         if(t instanceof Struct){
             Struct s = (Struct) t;
-            return s.isEmptyList() || (s.getName().equals(".") && s.getArity() == 2);
+            return s.isEmptyList() || (s.name().equals(".") && s.getArity() == 2);
         }
 
         return false;
@@ -169,7 +169,7 @@ class ClausesFilter {
 
         for(Object obj : familyClauses){
             ClauseInfo clause = (ClauseInfo) obj;
-            Term arg = clause.getHead().getArg(0).getTerm();
+            Term arg = clause.getHead().term(0).getTerm();
 
             if(arg instanceof Var || isAList(arg)){
                 OneWayList<ClauseInfo> l = new OneWayList<>(clause, null);
@@ -196,7 +196,7 @@ class ClausesFilter {
 
         for(Object obj : familyClauses){
             ClauseInfo clause = (ClauseInfo) obj;
-            Term arg = clause.getHead().getArg(0).getTerm();
+            Term arg = clause.getHead().term(0).getTerm();
 
             if(arg instanceof Var || arg.isAtomic()){
                 OneWayList<ClauseInfo> l = new OneWayList<>(clause, null);

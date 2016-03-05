@@ -53,7 +53,7 @@ public class StructTestCase extends TestCase {
 			new Struct("", new Int(1), new Int(2));
 			fail();
 		} catch (InvalidTermException expected) {}
-		assertEquals(0, new Struct("").getName().length());
+		assertEquals(0, new Struct("").name().length());
 	}
 	
 	public void testEmptyList() {
@@ -61,7 +61,7 @@ public class StructTestCase extends TestCase {
 		assertTrue(list.isList());
 		assertTrue(list.isEmptyList());
 		assertEquals(0, list.listSize());
-		assertEquals("[]", list.getName());
+		assertEquals("[]", list.name());
 		assertEquals(0, list.getArity());
 	}
 
@@ -70,7 +70,7 @@ public class StructTestCase extends TestCase {
 		Struct emptyList = new Struct("[]");
 		assertTrue(emptyList.isList());
 		assertTrue(emptyList.isEmptyList());
-		assertEquals("[]", emptyList.getName());
+		assertEquals("[]", emptyList.name());
 		assertEquals(0, emptyList.getArity());
 		assertEquals(0, emptyList.listSize());
 	}
@@ -80,7 +80,7 @@ public class StructTestCase extends TestCase {
 		Struct notAnEmptyList = new Struct(".");
 		assertFalse(notAnEmptyList.isList());
 		assertFalse(notAnEmptyList.isEmptyList());
-		assertEquals(".", notAnEmptyList.getName());
+		assertEquals(".", notAnEmptyList.name());
 		assertEquals(0, notAnEmptyList.getArity());
 	}
 	
@@ -89,7 +89,7 @@ public class StructTestCase extends TestCase {
 		Struct notAnEmptyList = new Struct(".", new Struct("a"), new Struct(".", new Struct("b"), new Struct()));
 		assertTrue(notAnEmptyList.isList());
 		assertFalse(notAnEmptyList.isEmptyList());
-		assertEquals(".", notAnEmptyList.getName());
+		assertEquals(".", notAnEmptyList.name());
 		assertEquals(2, notAnEmptyList.getArity());
 	}
 	

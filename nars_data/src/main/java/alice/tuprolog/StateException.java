@@ -19,7 +19,7 @@ public class StateException extends State {
 
     @Override
     void doJob(Engine e) {
-        String errorType = e.currentContext.currentGoal.getName();
+        String errorType = e.currentContext.currentGoal.name();
         if (errorType.equals("throw"))
             prologError(e);
         else
@@ -27,7 +27,7 @@ public class StateException extends State {
     }
 
     private void prologError(Engine e) {
-        Term errorTerm = e.currentContext.currentGoal.getArg(0);
+        Term errorTerm = e.currentContext.currentGoal.term(0);
         e.currentContext = e.currentContext.fatherCtx;
         if (e.currentContext == null) {
             // passo nello stato HALT se l?errore non pu? essere gestito (sono
@@ -40,7 +40,7 @@ public class StateException extends State {
             // subgoal catch/3 il cui secondo argomento unifica con l?argomento
             // dell?eccezione lanciata
             if (e.currentContext.currentGoal.match(catchTerm)
-                    && e.currentContext.currentGoal.getArg(1).match(errorTerm)) {
+                    && e.currentContext.currentGoal.term(1).match(errorTerm)) {
                 // ho identificato l?ExecutionContext con il corretto subgoal
                 // catch/3
 
@@ -51,7 +51,7 @@ public class StateException extends State {
                 // catch/3
                 List<Var> unifiedVars = e.currentContext.trailingVars
                         .getHead();
-                e.currentContext.currentGoal.getArg(1).unify(unifiedVars,
+                e.currentContext.currentGoal.term(1).unify(unifiedVars,
                         unifiedVars, errorTerm);
 
                 // inserisco il gestore dell?errore in testa alla lista dei
@@ -60,7 +60,7 @@ public class StateException extends State {
                 // l?esecuzione, mantenendo le sostituzioni effettuate durante
                 // il processo di unificazione tra l?argomento di throw/1 e il
                 // secondo argomento di catch/3
-                Term handlerTerm = e.currentContext.currentGoal.getArg(2);
+                Term handlerTerm = e.currentContext.currentGoal.term(2);
                 Term curHandlerTerm = handlerTerm.getTerm();
                 if (!(curHandlerTerm instanceof Struct)) {
                     e.nextState = c.END_FALSE;
@@ -98,7 +98,7 @@ public class StateException extends State {
 
     private void javaException(Engine e) {
         Struct cg = e.currentContext.currentGoal;
-        Term exceptionTerm = cg.getArity() > 0 ? cg.getArg(0) : null;
+        Term exceptionTerm = cg.getArity() > 0 ? cg.term(0) : null;
         e.currentContext = e.currentContext.fatherCtx;
         if (e.currentContext == null) {
             // passo nello stato HALT se l?errore non pu? essere gestito (sono
@@ -111,7 +111,7 @@ public class StateException extends State {
             // subgoal java_catch/3 che abbia un catcher unificabile con
             // l'argomento dell'eccezione lanciata
             if (e.currentContext.currentGoal.match(javaCatchTerm)
-                    && javaMatch(e.currentContext.currentGoal.getArg(1),
+                    && javaMatch(e.currentContext.currentGoal.term(1),
                             exceptionTerm)) {
                 // ho identificato l?ExecutionContext con il corretto subgoal
                 // java_catch/3
@@ -124,7 +124,7 @@ public class StateException extends State {
                 List<Var> unifiedVars = e.currentContext.trailingVars
                         .getHead();
                 Term handlerTerm = javaUnify(e.currentContext.currentGoal
-                        .getArg(1), exceptionTerm, unifiedVars);
+                        .term(1), exceptionTerm, unifiedVars);
                 if (handlerTerm == null) {
                     e.nextState = c.END_FALSE;
                     return;
@@ -140,7 +140,7 @@ public class StateException extends State {
                     e.nextState = c.END_FALSE;
                     return;
                 }
-                Term finallyTerm = e.currentContext.currentGoal.getArg(2);
+                Term finallyTerm = e.currentContext.currentGoal.term(2);
                 Term curFinallyTerm = finallyTerm.getTerm();
                 // verifico se c'? il blocco finally
                 boolean isFinally = true;
@@ -210,11 +210,11 @@ public class StateException extends State {
             if (!nextTerm.isCompound())
                 continue;
             Struct element = (Struct) nextTerm;
-            if (!element.getName().equals(","))
+            if (!element.name().equals(","))
                 continue;
             if (element.getArity() != 2)
                 continue;
-            if (element.getArg(0).match(exceptionTerm)) {
+            if (element.term(0).match(exceptionTerm)) {
                 return true;
             }
         }
@@ -231,14 +231,14 @@ public class StateException extends State {
             if (!nextTerm.isCompound())
                 continue;
             Struct element = (Struct) nextTerm;
-            if (!element.getName().equals(","))
+            if (!element.name().equals(","))
                 continue;
             if (element.getArity() != 2)
                 continue;
-            if (element.getArg(0).match(exceptionTerm)) {
-                element.getArg(0)
+            if (element.term(0).match(exceptionTerm)) {
+                element.term(0)
                         .unify(unifiedVars, unifiedVars, exceptionTerm);
-                return element.getArg(1);
+                return element.term(1);
             }
         }
         return null;

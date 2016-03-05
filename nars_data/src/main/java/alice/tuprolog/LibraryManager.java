@@ -376,7 +376,7 @@ public class LibraryManager
 			throw new InvalidLibraryException(lib.getName(), ex.line, ex.pos);
 		} catch (Exception ex)
 		{
-			// ex.printStackTrace();
+			 ex.printStackTrace();
 			throw new InvalidLibraryException(lib.getName(), -1, -1);
 		}
 

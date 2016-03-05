@@ -7,6 +7,8 @@ import nars.nar.Default;
 import nars.op.sys.PrologCore;
 import org.junit.Test;
 
+import java.io.IOException;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -16,7 +18,7 @@ import static org.junit.Assert.assertTrue;
 public class PrologCoreTest {
 
     @Test
-    public void testPrologCoreBeliefAssertion() throws MalformedGoalException {
+    public void testPrologCoreBeliefAssertion() throws MalformedGoalException, IOException {
         NAR n = new Default();
         PrologCore p = new PrologCore(n);
         n.input("a:b.");
@@ -25,13 +27,13 @@ public class PrologCoreTest {
 
         assertTrue(p.isTrue("'-->'(b,a)."));
         assertFalse(p.isTrue("'-->'(a,b)."));
-        assertTrue(p.isTrue("not('-->'(d,c))."));
+        assertTrue(p.isTrue("'--'('-->'(d,c))."));
         assertFalse(p.isTrue("'-->'(d,c)."));
 
     }
 
     @Test
-    public void testPrologCoreQuestionTruthAnswer() throws MalformedGoalException {
+    public void testPrologCoreQuestionTruthAnswer() throws MalformedGoalException, IOException {
         NAR n = new Default();
         PrologCore p = new PrologCore(n);
         n.input("a:b.");
@@ -53,6 +55,42 @@ public class PrologCoreTest {
 
     }
 
+    @Test
+    public void testPrologCoreDerivedTransitive() throws MalformedGoalException, IOException {
+        NAR n = new Default();
+        PrologCore p = new PrologCore(n);
+        n.input("a:b.");
+        n.input("b:c.");
+        n.step();
+
+        n.input("a:c?");
+        //expect true
+        n.step();
+
+        n.input("a:d?");
+        //expect false
+        n.step();
+    }
+    @Test
+    public void testPrologCoreDerivedTransitive2() throws MalformedGoalException, IOException {
+        NAR n = new Default();
+        PrologCore p = new PrologCore(n);
+        n.input("a:b.");
+        n.input("b:c.");
+        n.input("c:d.");
+        n.input("d:e.");
+        n.input("e:f.");
+        n.step();
+
+        n.input("a:f?");
+        //expect true
+        n.step();
+
+        n.input("a:?x?");
+        //expect true
+        n.step();
+
+    }
 
 //    boolean prologAnswered = false;
 //

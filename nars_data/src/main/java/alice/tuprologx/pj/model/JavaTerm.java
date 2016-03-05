@@ -182,16 +182,16 @@ public class JavaTerm<O> extends Compound<JavaTerm<O>> {
 //        catch (Exception e) {
 //            return false;
 //        }
-        return (t instanceof TermifiableStruct<?>) || ((t.getTerm() instanceof alice.tuprolog.Struct) && hashtable.containsKey(((alice.tuprolog.Struct)t.getTerm()).getName()));
+        return (t instanceof TermifiableStruct<?>) || ((t.getTerm() instanceof alice.tuprolog.Struct) && hashtable.containsKey(((alice.tuprolog.Struct)t.getTerm()).name()));
     }
     
     static <Z> JavaTerm<Z> unmarshalObject(alice.tuprolog.Struct s) {
         if (!matches(s))
             throw new UnsupportedOperationException();
-        Class<?> termKlass = hashtable.get(s.getName());
+        Class<?> termKlass = hashtable.get(s.name());
         Vector<Term<?>> terms = new Vector<Term<?>>();
         for (int i = 0; i < s.getArity() ; i ++) {
-            terms.add(Term.unmarshal(s.getArg(i)));
+            terms.add(Term.unmarshal(s.term(i)));
         }
         return new JavaTerm<Z>(termKlass, terms);
     }

@@ -174,7 +174,7 @@ public class PJLibrary extends Library {
 			if (!className.isAtom()) {
 				return false;
 			}
-			String clName = ((Struct) className).getName();
+			String clName = ((Struct) className).name();
 			// check for array type
 			if (clName.endsWith("[]")) {
 				Object[] list = getArrayFromList(arg);
@@ -323,7 +323,7 @@ public class PJLibrary extends Library {
 		Signature args = null;
 		String methodName = null;
 		try {
-			methodName = method.getName();            
+			methodName = method.name();
 			// check for accessing field   Obj.Field <- set/get(X)
 			//  in that case: objId is '.'(Obj, Field)
 			
@@ -332,7 +332,7 @@ public class PJLibrary extends Library {
 					return false;
 				}
 				Struct sel = (Struct) objId;
-				if (sel.getName().equals(".") && sel.getArity() == 2 && method.getArity() == 1) {
+				if (sel.name().equals(".") && sel.getArity() == 2 && method.getArity() == 1) {
 					if (methodName.equals("set"))
 						return java_set(sel.getTerm(0), sel.getTerm(1), method.getTerm(0));
 					else if (methodName.equals("get"))
@@ -364,7 +364,7 @@ public class PJLibrary extends Library {
                     Class<?>[] newTypes = new Class<?>[args_values.length];
                     //boolean ok = true;
                     for (int i = 0; i < method.getArity();i++) {                        
-                        newValues[i] = alice.tuprologx.pj.model.Term.unmarshal(method.getArg(i));
+                        newValues[i] = alice.tuprologx.pj.model.Term.unmarshal(method.term(i));
                         newTypes[i] = newValues[i].getClass();                        
                     }                    
                     m = lookupMethod(cl, methodName, newTypes, newValues);
@@ -389,9 +389,9 @@ public class PJLibrary extends Library {
 			} else {
 				if (objId.isCompound()) {
 					Struct id = (Struct) objId;
-					if (id.getArity() == 1 && id.getName().equals("class")) {
+					if (id.getArity() == 1 && id.name().equals("class")) {
 						try {
-							Class<?> cl = Class.forName(alice.util.Tools.removeApices(id.getArg(0).toString()));
+							Class<?> cl = Class.forName(alice.util.Tools.removeApices(id.term(0).toString()));
 							Method m = cl.getMethod(methodName, args.getTypes());
 							m.setAccessible(true);
 							res = m.invoke(null, args.getValues());
@@ -445,20 +445,20 @@ public class PJLibrary extends Library {
 		what = what.getTerm();
 		if (!fieldTerm.isAtom() || what instanceof Var)
 			return false;
-		String fieldName = ((Struct) fieldTerm).getName();
+		String fieldName = ((Struct) fieldTerm).name();
 		Object obj = null;
 		try {
 			Class<?> cl = null;
 			if (objId.isCompound() &&
-					((Struct) objId).getArity() == 1 && ((Struct) objId).getName().equals("class")) {
-				String clName = alice.util.Tools.removeApices(((Struct) objId).getArg(0).toString());
+					((Struct) objId).getArity() == 1 && ((Struct) objId).name().equals("class")) {
+				String clName = alice.util.Tools.removeApices(((Struct) objId).term(0).toString());
 				try {
 					cl = Class.forName(clName);
 				} catch (ClassNotFoundException ex) {
 					getEngine().warn("Java class not found: " + clName);
 					return false;
 				} catch (Exception ex) {
-					getEngine().warn("Static field " + fieldName + " not found in class " + alice.util.Tools.removeApices(((Struct) objId).getArg(0).toString()));
+					getEngine().warn("Static field " + fieldName + " not found in class " + alice.util.Tools.removeApices(((Struct) objId).term(0).toString()));
 					return false;
 				}
 			} else {
@@ -521,20 +521,20 @@ public class PJLibrary extends Library {
 		if (!fieldTerm.isAtom()) {
 			return false;
 		}
-		String fieldName = ((Struct) fieldTerm).getName();
+		String fieldName = ((Struct) fieldTerm).name();
 		Object obj = null;
 		try {
 			Class<?> cl = null;
 			if (objId.isCompound() &&
-					((Struct) objId).getArity() == 1 && ((Struct) objId).getName().equals("class")) {
-				String clName = alice.util.Tools.removeApices(((Struct) objId).getArg(0).toString());
+					((Struct) objId).getArity() == 1 && ((Struct) objId).name().equals("class")) {
+				String clName = alice.util.Tools.removeApices(((Struct) objId).term(0).toString());
 				try {
 					cl = Class.forName(clName);
 				} catch (ClassNotFoundException ex) {
 					getEngine().warn("Java class not found: " + clName);
 					return false;
 				} catch (Exception ex) {
-					getEngine().warn("Static field " + fieldName + " not found in class " + alice.util.Tools.removeApices(((Struct) objId).getArg(0).toString()));
+					getEngine().warn("Static field " + fieldName + " not found in class " + alice.util.Tools.removeApices(((Struct) objId).term(0).toString()));
 					return false;
 				}
 			} else {
@@ -820,7 +820,7 @@ public class PJLibrary extends Library {
 			} else if (term instanceof Struct) {
 				// argument descriptors
 				Struct tc = (Struct) term;
-				if (tc.getName().equals("as")) {
+				if (tc.name().equals("as")) {
 					return parse_as(values, types, i, tc.getTerm(0), tc.getTerm(1));
 				} else {
 					Object obj = currentObjects.get(alice.util.Tools.removeApices(tc.toString()));
@@ -852,7 +852,7 @@ public class PJLibrary extends Library {
 	private boolean parse_as(Object[] values, Class<?>[] types, int i, Term castWhat, Term castTo) {
 		try {
 			if (!(castWhat instanceof Number)) {
-				String castTo_name = alice.util.Tools.removeApices(((Struct) castTo).getName());
+				String castTo_name = alice.util.Tools.removeApices(((Struct) castTo).name());
 				String castWhat_name = alice.util.Tools.removeApices(castWhat.getTerm().toString());
 				//System.out.println(castWhat_name+" "+castTo_name);
 				if (castTo_name.equals("java.lang.String") && 
@@ -940,7 +940,7 @@ public class PJLibrary extends Library {
 				}
 			} else {
 				Number num = (Number) castWhat;
-				String castTo_name = ((Struct) castTo).getName();
+				String castTo_name = ((Struct) castTo).name();
 				if (castTo_name.equals("byte")) {
 					values[i] = new Byte((byte) num.intValue());
 					types[i] = Byte.TYPE;
@@ -1080,7 +1080,7 @@ public class PJLibrary extends Library {
 				return (Struct) aKey;
 			} else {
 				Struct id = generateFreshId();
-				staticObjects.put(id.getName(), obj);
+				staticObjects.put(id.name(), obj);
 				staticObjects_inverse.put(obj, id);
 				return id;
 			}
@@ -1166,7 +1166,7 @@ public class PJLibrary extends Library {
 				return (Struct) aKey;
 			} else {
 				Struct id = generateFreshId();
-				currentObjects.put(id.getName(), obj);
+				currentObjects.put(id.name(), obj);
 				currentObjects_inverse.put(obj, id);
 				return id;
 			}

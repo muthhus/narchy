@@ -21,6 +21,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 import alice.tuprolog.interfaces.IPrimitiveManager;
+import com.gs.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 
 
 /**
@@ -35,10 +36,14 @@ public class PrimitiveManager /*Castagna 06/2011*/implements IPrimitiveManager/*
     private final Map<String,PrimitiveInfo> functorHashMap;
     
     public PrimitiveManager() {
-        libHashMap        = Collections.synchronizedMap(new IdentityHashMap<IPrimitives, List<PrimitiveInfo>>());
-        directiveHashMap  = Collections.synchronizedMap(new HashMap<String,PrimitiveInfo>());
-        predicateHashMap  = Collections.synchronizedMap(new HashMap<String,PrimitiveInfo>());
-        functorHashMap    = Collections.synchronizedMap(new HashMap<String,PrimitiveInfo>());
+        libHashMap        = //Collections.synchronizedMap(new IdentityHashMap<IPrimitives, List<PrimitiveInfo>>());
+                new IdentityHashMap();
+        directiveHashMap  = //Collections.synchronizedMap
+                new ConcurrentHashMapUnsafe();
+        predicateHashMap  = //Collections.synchronizedMap(
+                new ConcurrentHashMapUnsafe();
+        functorHashMap    = //Collections.synchronizedMap(new HashMap<String,PrimitiveInfo>());
+                new ConcurrentHashMapUnsafe();
     }
     
     /**
@@ -129,15 +134,15 @@ public class PrimitiveManager /*Castagna 06/2011*/implements IPrimitiveManager/*
         Struct t = (Struct) term;
         
         int arity = t.getArity();
-        String name = t.getName();
+        String name = t.name();
         //------------------------------------------
         if (name.equals(",") || name.equals("':-'") || name.equals(":-")) {
             for (int c = 0; c < arity; c++) {
-                identify( t.getArg(c), PrimitiveInfo.PREDICATE);
+                identify( t.term(c), PrimitiveInfo.PREDICATE);
             }
         } else {
             for (int c = 0; c < arity; c++) {
-                identify( t.getArg(c), PrimitiveInfo.FUNCTOR);
+                identify( t.term(c), PrimitiveInfo.FUNCTOR);
             }                        
         }
         //------------------------------------------

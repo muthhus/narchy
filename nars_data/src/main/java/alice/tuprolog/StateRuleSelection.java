@@ -20,8 +20,6 @@ package alice.tuprolog;
 import java.util.List;
 import java.util.ArrayList;
 
-import alice.tuprolog.ClauseInfo;
-import alice.tuprolog.Struct;
 import alice.util.OneWayList;
 
 /**
@@ -90,7 +88,7 @@ public class StateRuleSelection extends State {
             int depth = alternative.executionContext.depth;
             ec.choicePointAfterCut = choicePoint.prevChoicePointContext;
             Struct currentGoal = choicePoint.executionContext.currentGoal;
-            while (currentGoal.getName().equals(";") && currentGoal.getArity() == 2) {
+            while (currentGoal.name().equals(";") && currentGoal.getArity() == 2) {
                 if (choicePoint.prevChoicePointContext != null) {
                     int distance = depth - choicePoint.prevChoicePointContext.executionContext.depth;
                     while (distance == 0 && choicePoint.prevChoicePointContext != null) {

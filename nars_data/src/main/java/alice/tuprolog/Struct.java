@@ -218,7 +218,7 @@ public class Struct extends Term {
     /**
 	 * Gets the functor name  of this structure
 	 */
-    public String getName() {
+    public String name() {
         return name;
     }
     
@@ -227,7 +227,7 @@ public class Struct extends Term {
      *
      * No bound check is done
      */
-    public Term getArg(int index) {
+    public Term term(int index) {
         return arg[index];
     }
     
@@ -327,14 +327,14 @@ public class Struct extends Term {
      * @param name name of the structure 
      * @return the argument or null if not found
      */
-    public Struct getArg(String name) {
+    public Struct term(String name) {
         if (arity == 0) {
             return null;
         }
         for (int i=0; i<arg.length; i++) {
             if (arg[i] instanceof Struct) {
                 Struct s = (Struct) arg[i];
-                if (s.getName().equals(name)) {
+                if (s.name().equals(name)) {
                     return s;
                 }
             }
@@ -342,7 +342,7 @@ public class Struct extends Term {
         for (int i=0; i<arg.length; i++) {
             if (arg[i] instanceof Struct) {
                 Struct s = (Struct)arg[i];
-                Struct sol = s.getArg(name);
+                Struct sol = s.term(name);
                 if (sol!=null) {
                     return sol;
                 }
@@ -788,14 +788,14 @@ public class Struct extends Term {
     private String toString0_bracket() {
         if (arity == 0) {
             return "";
-        } else if (arity==1 && !((arg[0] instanceof Struct) && ((Struct)arg[0]).getName().equals(","))){
+        } else if (arity==1 && !((arg[0] instanceof Struct) && ((Struct)arg[0]).name().equals(","))){
             return arg[0].getTerm().toString();
         } else {
             // comma case 
             Term head = ((Struct)arg[0]).getTerm(0);
             Term tail = ((Struct)arg[0]).getTerm(1);
             StringBuilder buf = new StringBuilder(head.toString());
-            while (tail instanceof Struct && ((Struct)tail).getName().equals(",")){
+            while (tail instanceof Struct && ((Struct)tail).name().equals(",")){
                 head = ((Struct)tail).getTerm(0);
                 buf.append(',').append(head.toString());
                 tail = ((Struct)tail).getTerm(1);

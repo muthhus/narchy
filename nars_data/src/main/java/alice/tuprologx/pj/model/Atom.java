@@ -36,7 +36,7 @@ public class Atom extends Term<Atom> {
         static Atom unmarshal(alice.tuprolog.Struct a) {
             if (!matches(a))
                 throw new UnsupportedOperationException();
-            return new Atom(a.getName());            
+            return new Atom(a.name());
         }
         
         static boolean matches(alice.tuprolog.Term t) {

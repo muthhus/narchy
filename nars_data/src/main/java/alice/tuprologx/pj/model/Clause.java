@@ -28,7 +28,7 @@ public class Clause<H extends Term<?>, B extends Term<?>> extends Compound2<H,B>
     
     @SuppressWarnings("unchecked")
 	public Clause(Struct s) { 
-        this((H)Term.unmarshal(s.getName().equals(":-") ? s.getArg(0) : s), s.getName().equals(":-") ? (B)Term.unmarshal(s.getArg(1)) : null);
+        this((H)Term.unmarshal(s.name().equals(":-") ? s.term(0) : s), s.name().equals(":-") ? (B)Term.unmarshal(s.term(1)) : null);
     }
     /*
     public Clause(String s) {

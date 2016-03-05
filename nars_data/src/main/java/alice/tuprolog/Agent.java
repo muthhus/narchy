@@ -129,7 +129,7 @@ public class Agent extends Prolog {
     }
     
     
-    private Solution body(){
+    protected Solution body(){
         try {
 
             setTheory( (theoryText==null) ?

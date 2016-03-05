@@ -113,7 +113,7 @@ public class PJLibraryNew extends OOLibrary {
             return false;
         Class<?> clazz = null;
         try {
-             clazz = Class.forName(((Struct)classname.getTerm()).getName());
+             clazz = Class.forName(((Struct)classname.getTerm()).name());
         }
         catch (Throwable ex) {
             return false;
@@ -243,7 +243,7 @@ public class PJLibraryNew extends OOLibrary {
         for (int i = 0 ; i < methodInfo.getArity() ; i ++) {
             terms[i] = registerDynamic(alice.tuprologx.pj.model.Term.unmarshal(methodInfo.getTerm(i).getTerm()));
         }
-        return unify(unmarshalledTerm, new Struct(methodInfo.getName(), terms));
+        return unify(unmarshalledTerm, new Struct(methodInfo.name(), terms));
     }
 
     
@@ -261,7 +261,7 @@ public class PJLibraryNew extends OOLibrary {
         if (o == null)
             return false;
         else {
-            String fname = ((Struct)name.getTerm()).getName();
+            String fname = ((Struct)name.getTerm()).name();
             try {
                 return bindDynamicObject(result, o.getClass().getField(fname));
             }
@@ -285,7 +285,7 @@ public class PJLibraryNew extends OOLibrary {
             return false;
         else {
             Struct methodInfo = (Struct)method.getTerm();
-            String mname = methodInfo.getName();
+            String mname = methodInfo.name();
             Signature sig = parseArg(methodInfo);
             Method m = null;
             try {
@@ -312,7 +312,7 @@ public class PJLibraryNew extends OOLibrary {
     public boolean java_object_std_3(Term className, Term args, Term id) {
         if (!className.isAtom() && !args.isList())
             return false;
-        String clazz = ((Struct)className.getTerm()).getName();
+        String clazz = ((Struct)className.getTerm()).name();
         Signature sig = parseArg(getArrayFromList((Struct)args.getTerm()));
         Constructor<?> c = null;
         Object o = null;
@@ -334,7 +334,7 @@ public class PJLibraryNew extends OOLibrary {
         Class<?> clazz = null;
         Object o = null;
         try {
-            clazz = Class.forName(((Struct)className.getTerm()).getName());
+            clazz = Class.forName(((Struct)className.getTerm()).name());
             o = alice.tuprologx.pj.engine.PJ.newInstance(clazz);
         }
         catch (Exception e2) {
@@ -367,8 +367,8 @@ public class PJLibraryNew extends OOLibrary {
             catch (Exception e) {}
             try {
                 Object[] args = parseArg((Struct)method_info.getTerm()).getValues();
-                if (isProlog.isAtom() && ((Struct)isProlog).getName().equals("true")) {
-                    boolean reentrant = isProlog.isAtom() && ((Struct)isReentrant).getName().equals("true");
+                if (isProlog.isAtom() && ((Struct)isProlog).name().equals("true")) {
+                    boolean reentrant = isProlog.isAtom() && ((Struct)isReentrant).name().equals("true");
                     res = alice.tuprologx.pj.engine.PJ.call(receiver, m, args, reentrant);
                 }
                 else {
@@ -393,20 +393,20 @@ public class PJLibraryNew extends OOLibrary {
 			return false;
         fieldTerm = fieldTerm.getTerm();
         objId = objId.getTerm();
-		String fieldName = ((Struct) fieldTerm).getName();
+		String fieldName = ((Struct) fieldTerm).name();
 		Object obj = null;
 		try {
 			Class<?> cl = null;
 			if (objId.isCompound() &&
-					((Struct) objId).getArity() == 1 && ((Struct) objId).getName().equals("class")) {
-				String clName = alice.util.Tools.removeApices(((Struct) objId).getArg(0).toString());
+					((Struct) objId).getArity() == 1 && ((Struct) objId).name().equals("class")) {
+				String clName = alice.util.Tools.removeApices(((Struct) objId).term(0).toString());
 				try {
 					cl = Class.forName(clName);
 				} catch (ClassNotFoundException ex) {
 					getEngine().warn("Java class not found: " + clName);
 					return false;
 				} catch (Exception ex) {
-					getEngine().warn("Static field " + fieldName + " not found in class " + alice.util.Tools.removeApices(((Struct) objId).getArg(0).toString()));
+					getEngine().warn("Static field " + fieldName + " not found in class " + alice.util.Tools.removeApices(((Struct) objId).term(0).toString()));
 					return false;
 				}
 			} else {				
@@ -519,20 +519,20 @@ public class PJLibraryNew extends OOLibrary {
         fieldTerm = fieldTerm.getTerm();
         objId = objId.getTerm();
 
-		String fieldName = ((Struct) fieldTerm).getName();
+		String fieldName = ((Struct) fieldTerm).name();
 		Object obj = null;
 		try {
 			Class<?> cl = null;
 			if (objId.isCompound() &&
-					((Struct) objId).getArity() == 1 && ((Struct) objId).getName().equals("class")) {
-				String clName = alice.util.Tools.removeApices(((Struct) objId).getArg(0).toString());
+					((Struct) objId).getArity() == 1 && ((Struct) objId).name().equals("class")) {
+				String clName = alice.util.Tools.removeApices(((Struct) objId).term(0).toString());
 				try {
 					cl = Class.forName(clName);
 				} catch (ClassNotFoundException ex) {
 					getEngine().warn("Java class not found: " + clName);
 					return false;
 				} catch (Exception ex) {
-					getEngine().warn("Static field " + fieldName + " not found in class " + alice.util.Tools.removeApices(((Struct) objId).getArg(0).toString()));
+					getEngine().warn("Static field " + fieldName + " not found in class " + alice.util.Tools.removeApices(((Struct) objId).term(0).toString()));
 					return false;
 				}
 			} else {
@@ -643,7 +643,7 @@ public class PJLibraryNew extends OOLibrary {
 			} else if (term instanceof Struct) {
 				// argument descriptors
 				Struct tc = (Struct) term;
-				if (tc.getName().equals("as")) {
+				if (tc.name().equals("as")) {
 					return parse_as(values, types, i, tc.getTerm(0), tc.getTerm(1));
 				} else {
 					Object obj = getRegisteredDynamicObject((Struct)tc.getTerm());
@@ -710,7 +710,7 @@ public class PJLibraryNew extends OOLibrary {
     private boolean parse_as(Object[] values, Class<?>[] types, int i, Term castWhat, Term castTo) {
 		try {
 			if (!(castWhat instanceof Number)) {
-				String castTo_name = alice.util.Tools.removeApices(((Struct) castTo).getName());
+				String castTo_name = alice.util.Tools.removeApices(((Struct) castTo).name());
 				String castWhat_name = alice.util.Tools.removeApices(castWhat.getTerm().toString());
 				//System.out.println(castWhat_name+" "+castTo_name);
 				if (castTo_name.equals("java.lang.String") &&
@@ -798,7 +798,7 @@ public class PJLibraryNew extends OOLibrary {
 				}
 			} else {
 				Number num = (Number) castWhat;
-				String castTo_name = ((Struct) castTo).getName();
+				String castTo_name = ((Struct) castTo).name();
 				if (castTo_name.equals("byte")) {
 					values[i] = new Byte((byte) num.intValue());
 					types[i] = Byte.TYPE;

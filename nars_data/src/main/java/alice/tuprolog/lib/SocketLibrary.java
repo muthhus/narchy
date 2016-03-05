@@ -74,7 +74,7 @@ public class SocketLibrary extends Library implements ISocketLib {
 
 		// Transform IP:Port to byte[] array and port number
 		Pattern p = Pattern.compile(addrRegex);
-		String[] split = p.split(Address.getName());
+		String[] split = p.split(Address.name());
 		if (split.length != 5)
 			throw PrologError.instantiation_error(engine.getEngineManager(), 1);
 		for (int i = 0; i < split.length - 1; i++) {
@@ -107,7 +107,7 @@ public class SocketLibrary extends Library implements ISocketLib {
 
 		// Transform IP:Port to byte[] array and port number
 		Pattern p = Pattern.compile(addrRegex);
-		String[] split = p.split(AddressTo.getName());
+		String[] split = p.split(AddressTo.name());
 		if (split.length != 5)
 			throw PrologError.instantiation_error(engine.getEngineManager(), 1);
 		for (int i = 0; i < split.length - 1; i++) {
@@ -161,7 +161,7 @@ public boolean udp_receive(Term Socket, Term Data, Struct AddressFrom,
 
 	// Transform IP:Port to byte[] array and port number
 	Pattern p = Pattern.compile(addrRegex);
-	String[] split = p.split(AddressFrom.getName());
+	String[] split = p.split(AddressFrom.name());
 	if (split.length != 5)
 		throw PrologError.instantiation_error(engine.getEngineManager(), 1);
 	for (int i = 0; i < split.length - 1; i++) {
@@ -180,8 +180,8 @@ public boolean udp_receive(Term Socket, Term Data, Struct AddressFrom,
 	}
 	LinkedList<Term> list = StructToList(Options);
 	for (Term t : list) { // Explore options list
-		if (((Struct) t).getName().equals("timeout")) { // If a timeout has been specified
-			int time = Integer.parseInt(((Struct) t).getArg(0).toString());
+		if (((Struct) t).name().equals("timeout")) { // If a timeout has been specified
+			int time = Integer.parseInt(((Struct) t).term(0).toString());
 			try {
 				s.setSoTimeout(time);
 			} catch (SocketException e) {
@@ -189,8 +189,8 @@ public boolean udp_receive(Term Socket, Term Data, Struct AddressFrom,
 				
 			}
 		}
-		if(((Struct) t).getName().equals("size")){//if a datagram size has been specified
-			int size=Integer.parseInt(((Struct) t).getArg(0).toString());
+		if(((Struct) t).name().equals("size")){//if a datagram size has been specified
+			int size=Integer.parseInt(((Struct) t).term(0).toString());
 			packet.setLength(size);
 		}
 	}
@@ -218,7 +218,7 @@ public boolean tcp_socket_server_open_3(Struct Address, Term Socket, Struct Opti
 
 	// Transform IP:Port to byte[] array and port number
 	Pattern p = Pattern.compile(addrRegex);
-	String[] split = p.split(Address.getName());
+	String[] split = p.split(Address.name());
 	if (split.length != 5)
 		throw PrologError.instantiation_error(engine.getEngineManager(), 1);
 	for (int i = 0; i < split.length - 1; i++) {
@@ -229,8 +229,8 @@ public boolean tcp_socket_server_open_3(Struct Address, Term Socket, Struct Opti
 
 	LinkedList<Term> list = StructToList(Options); 			// Convert Options Struct to a LinkedList
 	for (Term t : list) { 									// Explore Options list
-		if (((Struct) t).getName().equals("backlog")) { 	// If a backlog has been specified
-			backlog = Integer.parseInt(((Struct) t).getArg(0).toString());
+		if (((Struct) t).name().equals("backlog")) { 	// If a backlog has been specified
+			backlog = Integer.parseInt(((Struct) t).term(0).toString());
 		}
 	}
 
@@ -313,7 +313,7 @@ public boolean tcp_socket_client_open_2(Struct Address, Term SocketTerm) throws 
 
 	// IP:Port --> IP in byte[] array and port number
 	Pattern p = Pattern.compile(addrRegex);
-	String[] split = p.split(Address.getName());
+	String[] split = p.split(Address.name());
 	if (split.length != 5)
 		throw PrologError.instantiation_error(engine.getEngineManager(), 1);
 	for (int i = 0; i < split.length - 1; i++) {
@@ -424,8 +424,8 @@ public boolean read_from_socket_3(Term Socket, Term Msg, Struct Options) throws 
 
 		LinkedList<Term> list = StructToList(Options); // Convert Options Struct to a LinkedList
 		for (Term t : list) { // Explore options list
-			if (((Struct) t).getName().equals("timeout")) { // If a timeout has been specified
-				int time = Integer.parseInt(((Struct) t).getArg(0).toString());
+			if (((Struct) t).name().equals("timeout")) { // If a timeout has been specified
+				int time = Integer.parseInt(((Struct) t).term(0).toString());
 				try {
 					sock.setSoTimeout(time); // Set socket timeout
 				} catch (SocketException e) {
@@ -503,8 +503,8 @@ public boolean aread_from_socket_2(Term Socket, Struct Options) throws PrologErr
 
 		LinkedList<Term> list = StructToList(Options); // Convert Options Struct to a LinkedList
 		for (Term t : list) { // Explore options list
-			if (((Struct) t).getName().equals("timeout")) { // If a timeout has been specified
-				int time = Integer.parseInt(((Struct) t).getArg(0).toString());
+			if (((Struct) t).name().equals("timeout")) { // If a timeout has been specified
+				int time = Integer.parseInt(((Struct) t).term(0).toString());
 				try {
 					sock.setSoTimeout(time); // Set socket timeout
 				} catch (SocketException e) {
@@ -514,7 +514,7 @@ public boolean aread_from_socket_2(Term Socket, Struct Options) throws PrologErr
 			}
 			// If assertZ is specified what is read is written in the theory
 			// with assertZ instead of assertA
-			if (((Struct) t).getName().equals("assertZ")) {
+			if (((Struct) t).name().equals("assertZ")) {
 				r.assertZ();
 			}
 		}
@@ -533,11 +533,11 @@ private LinkedList<Term> StructToList(Struct s) {
 	Term temp;
 	temp = s;
 	while (true) {
-		if (((Struct) temp).getName().equals(".")) {
-			list.add(((Struct) temp).getArg(0));
+		if (((Struct) temp).name().equals(".")) {
+			list.add(((Struct) temp).term(0));
 		} else
 			break;
-		temp = ((Struct) temp).getArg(1);
+		temp = ((Struct) temp).term(1);
 
 	}
 	return list;

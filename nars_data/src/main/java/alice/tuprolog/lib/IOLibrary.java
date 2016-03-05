@@ -137,18 +137,18 @@ public class IOLibrary extends Library {
             } catch (IOException e) {
                 return false;
             }
-        if (arg0.getName().equals(STDIN_NAME)) { /*No matter what is the StandardInput ("console", "graphic", etc.). The user does not know what it is*/
+        if (arg0.name().equals(STDIN_NAME)) { /*No matter what is the StandardInput ("console", "graphic", etc.). The user does not know what it is*/
         	inputStream = stdIn;
         	inputStreamName = STDIN_NAME;
         } else {
             try {
-                inputStream = new FileInputStream(arg0.getName());
+                inputStream = new FileInputStream(arg0.name());
             } catch (FileNotFoundException e) {
                 throw PrologError.domain_error(engine.getEngineManager(), 1,
                         "stream", arg0);
             }
         }
-        inputStreamName = arg0.getName();
+        inputStreamName = arg0.name();
         return true;
     }
 
@@ -185,18 +185,18 @@ public class IOLibrary extends Library {
             } catch (IOException e) {
                 return false;
             }
-        if (arg0.getName().equals(STDOUT_NAME)) { /*No matter what is the StandardOutput ("console", "graphic", etc.). The user does not know what it is*/
+        if (arg0.name().equals(STDOUT_NAME)) { /*No matter what is the StandardOutput ("console", "graphic", etc.). The user does not know what it is*/
             outputStream = stdOut;
             outputStreamName = STDOUT_NAME;
         } else {
             try {
-                outputStream = new FileOutputStream(arg0.getName());
+                outputStream = new FileOutputStream(arg0.name());
             } catch (FileNotFoundException e) {
                 throw PrologError.domain_error(engine.getEngineManager(), 1,
                         "stream", arg);
             }
         }
-        outputStreamName = arg0.getName();
+        outputStreamName = arg0.name();
         return true;
     }
 
@@ -226,7 +226,7 @@ public class IOLibrary extends Library {
                     "character", arg);
         } else {
             Struct arg0 = (Struct) arg.getTerm();
-            String ch = arg0.getName();
+            String ch = arg0.name();
             if (ch.length() > 1) {
                 throw PrologError.type_error(engine.getEngineManager(), 1,
                         "character", arg);

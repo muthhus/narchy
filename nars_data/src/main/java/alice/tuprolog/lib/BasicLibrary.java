@@ -54,7 +54,7 @@ public class BasicLibrary extends Library {
         }
         try {
             Struct theory = (Struct) th;
-            getEngine().setTheory(new Theory(theory.getName()));
+            getEngine().setTheory(new Theory(theory.name()));
             return true;
         } catch (InvalidTheoryException ex) {
             /*Castagna 06/2011*/			
@@ -79,7 +79,7 @@ public class BasicLibrary extends Library {
         }
         try {
             Struct theory = (Struct) th.getTerm();
-            getEngine().addTheory(new Theory(theory.getName()));
+            getEngine().addTheory(new Theory(theory.name()));
             return true;
         } catch (InvalidTheoryException ex) {
             /*Castagna 06/2011*/
@@ -133,8 +133,8 @@ public class BasicLibrary extends Library {
             if (!libN.isAtom()) {
                 return false;
             }
-            Theory t = new Theory(theory.getName());
-            TheoryLibrary thlib = new TheoryLibrary(libN.getName(), t);
+            Theory t = new Theory(theory.name());
+            TheoryLibrary thlib = new TheoryLibrary(libN.name(), t);
             getEngine().loadLibrary(thlib);
             return true;
         } catch (Exception ex) {
@@ -773,8 +773,8 @@ public class BasicLibrary extends Library {
         if (!source2.isAtom())
             throw PrologError.type_error(engine.getEngineManager(), 2, "atom",
                     source2);
-        return unify(dest, new Struct(((Struct) source1).getName()
-                + ((Struct) source2).getName()));
+        return unify(dest, new Struct(((Struct) source1).name()
+                + ((Struct) source2).name()));
     }
 
     public boolean num_atom_2(Term arg0, Term arg1) throws PrologError {
@@ -794,7 +794,7 @@ public class BasicLibrary extends Library {
                 throw PrologError.type_error(engine.getEngineManager(), 2,
                         "atom", arg1);
             }
-            String st = ((Struct) arg1).getName();
+            String st = ((Struct) arg1).name();
             String st2="";
             for(int i=0; i<st.length(); i++)
             {
@@ -1365,8 +1365,8 @@ public class BasicLibrary extends Library {
         Struct result = new Struct();
         for (java.util.Iterator<? extends Term> it = list.listIterator(); it.hasNext();) {
             Struct element = (Struct) it.next();
-            Term w = element.getArg(0);
-            Term t = element.getArg(1);
+            Term w = element.term(0);
+            Term t = element.term(1);
             if (unify(witness, w))
                 result.append(t);
         }
@@ -1407,8 +1407,8 @@ public class BasicLibrary extends Library {
         for (java.util.Iterator<? extends Term> it = list.listIterator(); it.hasNext();) {
             Struct element = (Struct) it.next();
             //System.out.println("termine wtList "+element);
-            Term w = element.getArg(0);
-            Term t = element.getArg(1);
+            Term w = element.term(0);
+            Term t = element.term(1);
             //System.out.println("termine W wtList "+w);
             //System.out.println("termine T wtList "+t);
             if (unify(witness, w)){
@@ -1441,7 +1441,7 @@ public class BasicLibrary extends Library {
         Struct result = new Struct();
         for (java.util.Iterator<? extends Term> it = list.listIterator(); it.hasNext();) {
             Struct element = (Struct) it.next();
-            Term w = element.getArg(0);
+            Term w = element.term(0);
             if (!unify(witness, w))
                 result.append(element);
         }

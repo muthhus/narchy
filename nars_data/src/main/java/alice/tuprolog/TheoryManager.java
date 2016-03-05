@@ -70,7 +70,7 @@ public class TheoryManager {
 	/**
 	 * inserting of a clause at the head of the dbase
 	 */
-	public synchronized void assertA(Struct clause, boolean dyn, String libName, boolean backtrackable) {
+	public /*synchronized*/ void assertA(Struct clause, boolean dyn, String libName, boolean backtrackable) {
 		ClauseInfo d = new ClauseInfo(toClause(clause), libName);
 		String key = d.getHead().getPredicateIndicator();
 		if (dyn) {
@@ -87,7 +87,7 @@ public class TheoryManager {
 	/**
 	 * inserting of a clause at the end of the dbase
 	 */
-	public synchronized void assertZ(Struct clause, boolean dyn, String libName, boolean backtrackable) {
+	public /*synchronized*/ void assertZ(Struct clause, boolean dyn, String libName, boolean backtrackable) {
 		ClauseInfo d = new ClauseInfo(toClause(clause), libName);
 		String key = d.getHead().getPredicateIndicator();
 		if (dyn) {
@@ -103,9 +103,9 @@ public class TheoryManager {
 	/**
 	 * removing from dbase the first clause with head unifying with clause
 	 */
-	public synchronized ClauseInfo retract(Struct cl) {
+	public /*synchronized*/ ClauseInfo retract(Struct cl) {
 		Struct clause = toClause(cl);
-		Struct struct = ((Struct) clause.getArg(0));
+		Struct struct = ((Struct) clause.term(0));
 		List<ClauseInfo> family = dynamicDBase.get(struct.getPredicateIndicator());
 		ExecutionContext ctx = engine.getEngineManager().getCurrentContext();
 		
@@ -156,14 +156,14 @@ public class TheoryManager {
 	 * removing from dbase all the clauses corresponding to the
 	 * predicate indicator passed as a parameter
 	 */
-	public synchronized boolean abolish(Struct pi) {		
+	public /*synchronized*/ boolean abolish(Struct pi) {
 		if (!(pi instanceof Struct) || !pi.isGround() || !(pi.getArity() == 2))
 			throw new IllegalArgumentException(pi + " is not a valid Struct");
-		if(!pi.getName().equals("/"))
-				throw new IllegalArgumentException(pi + " has not the valid predicate name. Espected '/' but was " + pi.getName());
+		if(!pi.name().equals("/"))
+				throw new IllegalArgumentException(pi + " has not the valid predicate name. Espected '/' but was " + pi.name());
 		
-		String arg0 = Tools.removeApices(pi.getArg(0).toString());
-		String arg1 = Tools.removeApices(pi.getArg(1).toString());
+		String arg0 = Tools.removeApices(pi.term(0).toString());
+		String arg1 = Tools.removeApices(pi.term(1).toString());
 		String key =  arg0 + '/' + arg1;
 		List<ClauseInfo> abolished = dynamicDBase.remove(key); /* Reviewed by Paolo Contessi: LinkedList -> List */
 		if (abolished != null)
@@ -179,7 +179,7 @@ public class TheoryManager {
 	 * Reviewed by Paolo Contessi: modified according to new ClauseDatabase
 	 * implementation
 	 */
-	public synchronized List<ClauseInfo> find(Term headt) {
+	public /*synchronized*/ List<ClauseInfo> find(Term headt) {
 		if (headt instanceof Struct) {
 			//String key = ((Struct) headt).getPredicateIndicator();
 			List<ClauseInfo> list = dynamicDBase.getPredicates(headt);
@@ -208,7 +208,7 @@ public class TheoryManager {
 	 * @param dynamicTheory if it is true, then the clauses are marked as dynamic
 	 * @param libName       if it not null, then the clauses are marked to belong to the specified library
 	 */
-	public synchronized void consult(Theory theory, boolean dynamicTheory, String libName) throws InvalidTheoryException {
+	public /*synchronized*/ void consult(Theory theory, boolean dynamicTheory, String libName) throws InvalidTheoryException {
 		startGoalStack.clear();
 
 		/*Castagna 06/2011*/   	
@@ -252,7 +252,7 @@ public class TheoryManager {
 	/**
 	 * Clears the clause dbase.
 	 */
-	public synchronized void clear() {
+	public /*synchronized*/ void clear() {
 		dynamicDBase.clear();
 	}
 
@@ -276,8 +276,8 @@ public class TheoryManager {
 
 
 	private boolean runDirective(Struct c) {
-		if ("':-'".equals(c.getName()) ||
-				( (c.getArity() == 1) && ":-".equals(c.getName()) && (c.getTerm(0) instanceof Struct))) {
+		if ("':-'".equals(c.name()) ||
+				( (c.getArity() == 1) && ":-".equals(c.name()) && (c.getTerm(0) instanceof Struct))) {
 			Struct dir = (Struct) c.getTerm(0);
 			try {
 				if (!primitiveManager.evalAsDirective(dir))
@@ -303,7 +303,7 @@ public class TheoryManager {
 		return t;
 	}
 
-	public synchronized void solveTheoryGoal() {
+	public /*synchronized*/ void solveTheoryGoal() {
 		Struct s = null;
 		Deque<Term> goals = this.startGoalStack;
 
@@ -326,7 +326,7 @@ public class TheoryManager {
 	/**
 	 * add a goal eventually defined by last parsed theory.
 	 */
-	public synchronized void addStartGoal(Struct g) {
+	public /*synchronized*/ void addStartGoal(Struct g) {
 		startGoalStack.push(g);
 	}
 
@@ -347,7 +347,7 @@ public class TheoryManager {
 	 *
 	 * @param onlyDynamic if true, fetches only dynamic clauses
 	 */
-	public synchronized String getTheory(boolean onlyDynamic) {
+	public /*synchronized*/ String getTheory(boolean onlyDynamic) {
 		StringBuilder buffer = new StringBuilder();
 		for (Iterator<ClauseInfo> dynamicClauses = dynamicDBase.iterator(); dynamicClauses.hasNext();) {
 			ClauseInfo d = dynamicClauses.next();
@@ -365,7 +365,7 @@ public class TheoryManager {
 	 * Gets last consulted theory
 	 * @return  last theory
 	 */
-	public synchronized Theory getLastConsultedTheory() {
+	public /*synchronized*/ Theory getLastConsultedTheory() {
 		return lastConsultedTheory;
 	}
 	

@@ -217,7 +217,7 @@ public class OOLibrary extends Library {
                 throw new JavaException(new ClassNotFoundException(
                         "Java class not found: " + className));
             }
-            String clName = ((Struct) className).getName();
+            String clName = ((Struct) className).name();
             // check for array type
             if (clName.endsWith("[]")) {
                 Object[] list = getArrayFromList(arg);
@@ -445,14 +445,14 @@ public class OOLibrary extends Library {
 		Signature args = null;
 		String methodName = null;
 		try {
-			methodName = method.getName();
+			methodName = method.name();
 			if (!objId.isAtom()) {
 				if (objId instanceof Var) {
 					throw new JavaException(new IllegalArgumentException(objId
 							.toString()));
 				}
 				Struct sel = (Struct) objId;
-				if (sel.getName().equals(".") && sel.getArity() == 2
+				if (sel.name().equals(".") && sel.getArity() == 2
 						&& method.getArity() == 1) {
 					if (methodName.equals("set")) {
 						return java_set(sel.getTerm(0), sel.getTerm(1), method
@@ -495,10 +495,10 @@ public class OOLibrary extends Library {
 				if (objId.isCompound()) {
 					Struct id = (Struct) objId;
 
-					if (id.getArity() == 1 && id.getName().equals("class")) {
+					if (id.getArity() == 1 && id.name().equals("class")) {
 						try {
 							String clName = alice.util.Tools
-									.removeApices(id.getArg(0).toString());
+									.removeApices(id.term(0).toString());
 							Class<?> cl = Class.forName(clName, true, dynamicLoader);
 							
 							Method m = InspectionUtils.searchForMethod(cl, methodName, args.getTypes());
@@ -631,16 +631,16 @@ public class OOLibrary extends Library {
         what = what.getTerm();
         if (!fieldTerm.isAtom() || what instanceof Var)
             return false;
-        String fieldName = ((Struct) fieldTerm).getName();
+        String fieldName = ((Struct) fieldTerm).name();
         Object obj = null;
         try {
             Class<?> cl = null;
-            if(objId.isCompound() && ((Struct) objId).getName().equals("class"))
+            if(objId.isCompound() && ((Struct) objId).name().equals("class"))
             {
             	String clName = null;
             	// Case: class(className)
             	if(((Struct) objId).getArity() == 1)         	
-            		 clName = alice.util.Tools.removeApices(((Struct) objId).getArg(0).toString());
+            		 clName = alice.util.Tools.removeApices(((Struct) objId).term(0).toString());
             	if(clName != null)
             	{
             		try {
@@ -655,7 +655,7 @@ public class OOLibrary extends Library {
                                         + " not found in class "
                                         + alice.util.Tools
                                                 .removeApices(((Struct) objId)
-                                                        .getArg(0).toString()));
+                                                        .term(0).toString()));
                         return false;
                     }
             	}
@@ -714,15 +714,15 @@ public class OOLibrary extends Library {
         if (!fieldTerm.isAtom()) {
             return false;
         }
-        String fieldName = ((Struct) fieldTerm).getName();
+        String fieldName = ((Struct) fieldTerm).name();
         Object obj = null;
         try {
             Class<?> cl = null;
-            if(objId.isCompound() && ((Struct) objId).getName().equals("class"))
+            if(objId.isCompound() && ((Struct) objId).name().equals("class"))
             {
             	String clName = null;
             	if(((Struct) objId).getArity() == 1)         	
-            		 clName = alice.util.Tools.removeApices(((Struct) objId).getArg(0).toString());
+            		 clName = alice.util.Tools.removeApices(((Struct) objId).term(0).toString());
             	if(clName != null)
             	{
             		try {
@@ -737,7 +737,7 @@ public class OOLibrary extends Library {
                                         + " not found in class "
                                         + alice.util.Tools
                                                 .removeApices(((Struct) objId)
-                                                        .getArg(0).toString()));
+                                                        .term(0).toString()));
                         return false;
                     }
             	}
@@ -1159,7 +1159,7 @@ public class OOLibrary extends Library {
             } else if (term instanceof Struct) {
                 // argument descriptors
                 Struct tc = (Struct) term;
-                if (tc.getName().equals("as")) {
+                if (tc.name().equals("as")) {
                     return parse_as(values, types, i, tc.getTerm(0), tc
                             .getTerm(1));
                 } else {
@@ -1192,7 +1192,7 @@ public class OOLibrary extends Library {
         try {
             if (!(castWhat instanceof Number)) {
                 String castTo_name = alice.util.Tools
-                        .removeApices(((Struct) castTo).getName());
+                        .removeApices(((Struct) castTo).name());
                 String castWhat_name = alice.util.Tools.removeApices(castWhat
                         .getTerm().toString());
                 // System.out.println(castWhat_name+" "+castTo_name);
@@ -1308,7 +1308,7 @@ public class OOLibrary extends Library {
                 }
             } else {
                 Number num = (Number) castWhat;
-                String castTo_name = ((Struct) castTo).getName();
+                String castTo_name = ((Struct) castTo).name();
                 switch (castTo_name) {
                     case "byte":
                         values[i] = new Byte((byte) num.intValue());
@@ -1506,7 +1506,7 @@ public class OOLibrary extends Library {
                 return (Struct) aKey;
             } else {
                 Struct id = generateFreshId();
-                staticObjects.put(id.getName(), obj);
+                staticObjects.put(id.name(), obj);
                 staticObjects_inverse.put(obj, id);
                 return id;
             }
@@ -1597,7 +1597,7 @@ public class OOLibrary extends Library {
                 return (Struct) aKey;
             } else {
                 Struct id = generateFreshId();
-                currentObjects.put(id.getName(), obj);
+                currentObjects.put(id.name(), obj);
                 currentObjects_inverse.put(obj, id);
                 return id;
             }

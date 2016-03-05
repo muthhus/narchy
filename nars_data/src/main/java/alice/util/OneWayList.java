@@ -31,18 +31,17 @@ public final class OneWayList<E> {
      * @return      An equivalent OneWayList
      */
     public static <T> OneWayList<T> transform2(List<T> list){
+        if (list.isEmpty())
+            return null;
+
         OneWayList<T> result = null;
         OneWayList<T> p = null;
 
         for(T obj : list){
             OneWayList<T> l = new OneWayList<T>(obj, null);
 
-            if(result == null){
-                result = p = l;
-            } else {
-                p.tail = l;
-                p = l;
-            }
+            p = (result == null) ? ((result = l)) : ((p.tail = l));
+
         }
 
         return result;

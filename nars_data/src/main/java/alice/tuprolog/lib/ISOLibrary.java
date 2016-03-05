@@ -42,7 +42,7 @@ public class ISOLibrary extends Library {
             throw PrologError.type_error(engine.getEngineManager(), 1, "atom",
                     arg0);
         Struct atom = (Struct) arg0;
-        return unify(len, new Int(atom.getName().length()));
+        return unify(len, new Int(atom.name().length()));
     }
 
     public boolean atom_chars_2(Term arg0, Term arg1) throws PrologError {
@@ -81,7 +81,7 @@ public class ISOLibrary extends Library {
                 throw PrologError.type_error(engine.getEngineManager(), 1,
                         "atom", arg0);
             }
-            String st = ((Struct) arg0).getName();
+            String st = ((Struct) arg0).name();
             Term[] tlist = new Term[st.length()];
             for (int i = 0; i < st.length(); i++) {
                 tlist[i] = new Struct(new String(new char[] { st.charAt(i) }));
@@ -102,7 +102,7 @@ public class ISOLibrary extends Library {
         arg1 = arg1.getTerm();
         if (arg1 instanceof Var) {
             if (arg0.isAtom()) {
-                String st = ((Struct) arg0).getName();
+                String st = ((Struct) arg0).name();
                 if (st.length() <= 1)
                     return unify(arg1, new Int(st.charAt(0)));
                 else

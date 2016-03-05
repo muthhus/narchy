@@ -144,10 +144,10 @@ public class Cons<H extends Term<?>, R extends Compound<?>> extends Compound<Con
             throw new UnsupportedOperationException();
         Vector<Term<?>> termList = new Vector<Term<?>>();
         for (int i=0;i<s.getArity();i++) {       
-            termList.add(Term.unmarshal(s.getArg(i)));
+            termList.add(Term.unmarshal(s.term(i)));
         }
         //return (Z)new Cons(s.getName(),termList);
-        return Cons.make(s.getName(),termList.toArray(new Term<?>[termList.size()]));
+        return Cons.make(s.name(),termList.toArray(new Term<?>[termList.size()]));
     }
 
     static boolean matches(alice.tuprolog.Term t) {

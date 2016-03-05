@@ -98,11 +98,11 @@ public final class BuiltIn extends Library {
 		 arg0 = arg0.getTerm();
 		 if (arg0 instanceof Struct ) {
 			
-			 if (((Struct) arg0).getName().equals(":-"))
+			 if (((Struct) arg0).name().equals(":-"))
 			 {
 				 for(int i=0; i<(((Struct) arg0).toList().listSize())-1; i++)
 				 {
-					 Term argi=((Struct) arg0).getArg(i);
+					 Term argi=((Struct) arg0).term(i);
 					 if (!(argi instanceof Struct) )
 					 {
 						 if (argi instanceof Var)
@@ -124,11 +124,11 @@ public final class BuiltIn extends Library {
 	 public boolean assertz_1(Term arg0) throws PrologError {
 		 arg0 = arg0.getTerm();
 		 if (arg0 instanceof Struct) {
-			 if (((Struct) arg0).getName().equals(":-"))
+			 if (((Struct) arg0).name().equals(":-"))
 			 {
 				 for(int i=0; i<(((Struct) arg0).toList().listSize())-1; i++)
 				 {
-					 Term argi=((Struct) arg0).getArg(i);
+					 Term argi=((Struct) arg0).term(i);
 					 if (!(argi instanceof Struct) )
 					 {
 						 if (argi instanceof Var)
@@ -174,7 +174,7 @@ public final class BuiltIn extends Library {
 		 if (!(arg0 instanceof Struct) || !arg0.isGround()) 
 			 throw PrologError.type_error(engineManager, 1, "predicate_indicator", arg0);
 		 
-		 if( ((Struct)arg0).getArg(0).toString().equals("abolish") )
+		 if( ((Struct)arg0).term(0).toString().equals("abolish") )
 			 throw PrologError.permission_error(engineManager, "modify", "static_procedure", arg0, new Struct(""));
 		 
 		 return theoryManager.abolish((Struct) arg0);
@@ -216,7 +216,7 @@ public final class BuiltIn extends Library {
 				 throw PrologError.type_error(engineManager, 1, "atom", arg0);
 		 }
 		 try {
-			 libraryManager.loadLibrary(((Struct) arg0).getName());
+			 libraryManager.loadLibrary(((Struct) arg0).name());
 			 return true;
 		 } catch (Exception ex) {
 			 throw PrologError.existence_error(engineManager, 1, "class", arg0,
@@ -245,7 +245,7 @@ public final class BuiltIn extends Library {
 			 String[] paths = getStringArrayFromStruct((Struct) arg1);
 			 if(paths == null || paths.length == 0)
 				 throw PrologError.existence_error(engineManager, 2, "paths", arg1, new Struct("Invalid paths' list."));
-			 libraryManager.loadLibrary(((Struct) arg0).getName(), paths);
+			 libraryManager.loadLibrary(((Struct) arg0).name(), paths);
 			 return true;
 			
 		 } catch (Exception ex) {
@@ -276,7 +276,7 @@ public final class BuiltIn extends Library {
 				 throw PrologError.type_error(engineManager, 1, "atom", arg0);
 		 }
 		 try {
-			 libraryManager.unloadLibrary(((Struct) arg0).getName());
+			 libraryManager.unloadLibrary(((Struct) arg0).name());
 			 return true;
 		 } catch (Exception ex) {
 			 throw PrologError.existence_error(engineManager, 1, "class", arg0,
@@ -349,7 +349,7 @@ public final class BuiltIn extends Library {
 			 String pi = s.getPredicateIndicator();
 			 if (pi.equals(";/2") || pi.equals(",/2") || pi.equals("->/2")) {
 				 for (int i = 0; i < s.getArity(); i++) {
-					 Term t = s.getArg(i);
+					 Term t = s.term(i);
 					 Term arg = convertTermToGoal(t);
 					 if (arg == null)
 						 return null;
@@ -545,7 +545,7 @@ public final class BuiltIn extends Library {
 		 int priority = ((Int) arg0).intValue();
 		 if (priority < OperatorManager.OP_LOW || priority > OperatorManager.OP_HIGH)
 			 throw PrologError.domain_error(engineManager, 1, "operator_priority", arg0);
-		 String specifier = ((Struct) arg1).getName();
+		 String specifier = ((Struct) arg1).name();
 
 		 //TODO replace with switch
 		 if (!specifier.equals("fx") && !specifier.equals("fy")
@@ -558,10 +558,10 @@ public final class BuiltIn extends Library {
 			 for (Iterator<? extends Term> operators = ((Struct) arg2).listIterator(); operators
 			 .hasNext();) {
 				 Struct operator = (Struct) operators.next();
-				 operatorManager.opNew(operator.getName(), specifier, priority);
+				 operatorManager.opNew(operator.name(), specifier, priority);
 			 }
 		 } else
-			 operatorManager.opNew(((Struct) arg2).getName(), specifier, priority);
+			 operatorManager.opNew(((Struct) arg2).name(), specifier, priority);
 		 return true;
 	 }
 
@@ -601,7 +601,7 @@ public final class BuiltIn extends Library {
 	 public void $load_library_1(Term lib) throws InvalidLibraryException {
 		 lib = lib.getTerm();
 		 if (lib.isAtom())
-			 libraryManager.loadLibrary(((Struct) lib).getName());
+			 libraryManager.loadLibrary(((Struct) lib).name());
 	 }
 
 	 public void include_1(Term theory) throws

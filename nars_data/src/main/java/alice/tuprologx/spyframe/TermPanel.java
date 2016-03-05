@@ -40,11 +40,11 @@ public class TermPanel extends JPanel implements ActionListener{
         node.textcolor=node.bordercolor=Color.MAGENTA;
       } else if(term instanceof Struct){
         Struct struct=(Struct)term;
-        node.text=struct.getName();
+        node.text=struct.name();
         int n=struct.getArity();
         node.kids=new Node[n];
         for(int i=0; i<n; i++)
-          node.kids[i]=makeTreeFrom(struct.getArg(i));
+          node.kids[i]=makeTreeFrom(struct.term(i));
       }
       return node;
     }

@@ -42,9 +42,9 @@ public class Solution implements Serializable/*, ISolution<Term,Term,Term>*/  {
     private int     endState;
     private final boolean isSuccess;
     
-    private final Term query;
-    private Struct goal;
-    private List<Var>   bindings;
+    public final Term query;
+    public final Struct goal;
+    public final List<Var>   bindings;
     private String setOfSolution;
     
     
@@ -55,6 +55,8 @@ public class Solution implements Serializable/*, ISolution<Term,Term,Term>*/  {
         query = initGoal;
         isSuccess = false;
         setOfSolution=null;
+        goal = null;
+        bindings = null;
     }
     
     /**
