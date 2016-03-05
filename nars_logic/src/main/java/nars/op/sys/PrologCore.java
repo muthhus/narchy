@@ -20,6 +20,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.function.Consumer;
 
+import static nars.term.container.TermVector.the;
+
 /** Prolog mental coprocessor for accelerating reasoning
  *  WARNING - introduces cognitive distortion
  *
@@ -62,11 +64,11 @@ public class PrologCore extends Agent implements Consumer<Task> {
 
     };*/
 
-    public PrologCore(NAR n) throws IOException {
+    public PrologCore(NAR n)  {
         this(n, AxiomTheory);
     }
 
-    public PrologCore(NAR n, String theory) throws IOException {
+    public PrologCore(NAR n, String theory)  {
         super(theory, new MutableClauseIndex()); //, new NARClauseIndex(n));
         this.nar = n;
 
@@ -132,10 +134,10 @@ public class PrologCore extends Agent implements Consumer<Task> {
                 case EngineRunner.TRUE:
                 case EngineRunner.TRUE_CP:
 
-                    logger.info("TRUE {}", answer.goal); //TODO input
 
                     try {
                         nar.believe(nterm(answer.goal));
+                        logger.info("TRUE {}", answer.goal); //TODO input
                     }
                     catch (Exception e) {
                         logger.error("answer {}", e);
@@ -153,24 +155,33 @@ public class PrologCore extends Agent implements Consumer<Task> {
 
     }
 
+    private Term nterm(Struct s, int subterm) {
+        return nterm(s.term(subterm));
+    }
+
+    //TODO use wrapper classes which link to the original terms so they can be re-used instead o reallocating fresh ones that will equals() anyway
     private Term nterm(alice.tuprolog.Term t) {
         if (t instanceof Struct) {
             Struct s = (Struct)t;
             if (s.getArity() > 0) {
                 switch (s.name()) {
+
                     case "-->":
-                        return $.the(Op.INHERIT, TermVector.the(nterm(s.term(0)), nterm(s.term(1))));
+                        return $.the(Op.INHERIT, the(nterm(s, 0), nterm(s, 1)));
+                    case "<->":
+                        return $.the(Op.SIMILAR, the(nterm(s, 0), nterm(s, 1)));
+
                     default:
-                        throw new RuntimeException(s + " not translatable");
+                        throw new RuntimeException(s + " not translated");
                 }
             } else {
                 //Atom
                 return $.the(s.name());
             }
         } else if (t instanceof Var) {
-            throw new UnsupportedOperationException();
+            throw new RuntimeException(t + " untranslated");
         } else {
-            throw new UnsupportedOperationException();
+            throw new RuntimeException(t + " untranslated");
         }
     }
 

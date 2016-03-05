@@ -2,6 +2,7 @@ package nars.guifx.demo;
 
 import nars.Global;
 import nars.nar.Default;
+import nars.op.sys.PrologCore;
 import nars.time.FrameClock;
 
 /**
@@ -20,6 +21,8 @@ public enum NARideDefault {
                 1024, 1, 3, 2);
         //new Inperience(n);
 
+        //new PrologCore(n); //TEMPORARY
+
         NARide.show(n.loop(), (i) -> {
 
             /*try {
@@ -29,6 +32,8 @@ public enum NARideDefault {
                 //e.printStackTrace();
             }*/
         });
+
+
 
     }
 
