@@ -1,5 +1,6 @@
 package nars.io;
 
+import nars.$;
 import nars.Narsese;
 import nars.Op;
 import nars.Symbols;
@@ -8,6 +9,7 @@ import nars.nar.Terminal;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.atom.Atom;
 import org.junit.Test;
 
 import static nars.io.NarseseTest.task;
@@ -46,6 +48,8 @@ public class NarseseExtendedTest {
         //normal, to test that it still works
         tensed(task("(a & b). :|: %1.0%"), Present);
     }
+
+
 
     /** compact representation combining truth and tense */
     @Test public void testTruthTense() {
@@ -107,6 +111,16 @@ public class NarseseExtendedTest {
 
         eqTask(shorter, expected);
     }
+
+    @Test public void testOptionalCommas() {
+        Term pABC1 = $.$("(a b c)");
+        Term pABC2 = $.$("(a,b,c)");
+        assertEquals(pABC1, pABC2);
+
+        Term pABC11 = $.$("(a      b c)");
+        assertEquals(pABC1, pABC11);
+    }
+
 
     static final Terminal t = new Terminal(8);
 

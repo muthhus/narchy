@@ -838,22 +838,9 @@ public class Narsese extends BaseParser<Object> {
     }
 
     Rule sepArgSep() {
-        return sequence(s(), ARGUMENT_SEPARATOR, s());
+        return sequence(s(), optional(ARGUMENT_SEPARATOR), s());
     }
 
-    Rule sepArg() {
-        return sequence(s(), ARGUMENT_SEPARATOR);
-
-        /*
-        return firstOf(
-                //check the ' , ' comma separated first, it is more complex
-                sequence(s(), String.valueOf(Symbols.ARGUMENT_SEPARATOR), s()),
-
-
-                //then allow plain whitespace to function as a term separator?
-                s()
-        );*/
-    }
 
     @Cached
     Rule MultiArgTerm(Op open, char close) {
@@ -884,7 +871,7 @@ public class Narsese extends BaseParser<Object> {
                         :
 
                         zeroOrMore(sequence(
-                                sepArg(),
+                                sepArgSep(),
                                 allowInternalOp ? AnyOperatorOrTerm() : Term()
                         )),
 
