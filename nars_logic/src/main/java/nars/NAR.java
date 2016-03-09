@@ -411,8 +411,14 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             if (execute(i, null)) {
                 u = i;
             } else {
-                m.remove(i, "Unmatched Command");
-                u = null;
+                @NotNull Compound x = i.term();
+                Term y = eval(x);
+                if (y != null) {
+                    logger.info("(eval( {} ,#x)==>(#x<-> {} )", x, y);
+                    u = i;
+                } else {
+                    u = null;
+                }
             }
         } else {
             if (!i.isDeleted()) {
