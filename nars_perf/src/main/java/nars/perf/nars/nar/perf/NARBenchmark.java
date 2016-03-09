@@ -37,8 +37,11 @@ import nars.term.Compound;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Mode;
+import org.openjdk.jmh.runner.RunnerException;
+
 
 import static nars.$.$;
+import static nars.perf.Main.perf;
 
 public class NARBenchmark {
 
@@ -67,4 +70,12 @@ public class NARBenchmark {
 		n.believe(b);
 		n.run(10000);
 	}
+
+
+
+
+	public static void main(String[] args) throws RunnerException {
+		perf(NARBenchmark.class, 4, 5);
+	}
+
 }

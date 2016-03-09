@@ -1,13 +1,22 @@
 
+
 description = 'OpenNARS Data Model'
+
+
+
+repositories {
+    mavenCentral()
+    maven { url "https://clojars.org/repo" }
+}
+
 dependencies {
  //   compile group: 'com.github.0xCopy.prautobeans', name: 'prautobeans-lib', version:'1.0-pre1'
     compile project(':nars_util')
 
-    compile 'com.fifesoft:rsyntaxtextarea:2.5.8'
-    compile 'com.fifesoft:autocomplete:2.5.8'
     compile 'org.javassist:javassist:3.20.0-GA'
     compile 'org.apache.commons:commons-lang3:3.4'
+
+    compile 'org.clojure:clojure:1.9.0-master-SNAPSHOT'
 
     testCompile 'junit:junit:4.12'
 

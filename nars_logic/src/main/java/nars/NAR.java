@@ -1,6 +1,9 @@
 package nars;
 
 
+import clojure.lang.*;
+import clojure.lang.Compiler;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
@@ -26,6 +29,7 @@ import nars.task.flow.TaskStream;
 import nars.term.*;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
+import nars.term.container.TermContainer;
 import nars.term.variable.GenericVariable;
 import nars.term.variable.Variable;
 import nars.time.Clock;
@@ -1045,10 +1049,59 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
 
 
+    final Narjure rt = new Narjure();
+
+
+    public static class Narjure extends Dynajure {
+        /** temporary translation method */
+        @Deprecated Term clojureToNars(Object o) {
+            if (o instanceof Object[])
+                System.out.println(Arrays.toString((Object[])o));
+            //System.out.println(o + " " + o.getClass());
+            return Atom.the(o.toString());
+        }
+        /** temporary translation method */
+        @Deprecated Object narsToClojure(Object o) {
+            if (o instanceof Atomic) {
+                Atomic a = (Atomic)o;
+
+                String as = a.toString();
+
+                return RT.readString(as);
+                //return Symbol.intern(as);
+            } else if ((o instanceof Compound) && (((Compound)o).op()!=Op.PRODUCT)) {
+                //Non-Product compounds
+
+                return Tuple.create(
+                        Symbol.intern((((Compound)o)).op().str),     //TODO cache these in array for fast lookup
+
+                        PersistentVector.create(narsToClojure(((Compound)o).subterms())));
+                //PersistentList.create(narsToClojure(((Compound)o).subterms())));
+
+            } else if (o instanceof TermContainer) {
+                //generic TermContainers and Product compounds
+                return narsToClojure(((TermContainer) o).terms());
+            } else if (o instanceof Object[]) {
+                Object[] a = (Object[])o;
+                int alen = a.length;
+                Object[] cc = new Object[alen];
+                for (int i = 0; i < alen; i++) {
+                    cc[i] = narsToClojure(a[i]);
+                }
+                return PersistentList.create(Lists.newArrayList(cc));
+                //return cc;
+            }
+
+            throw new RuntimeException("Untranslated: " + o);
+        }
+    }
+
     public Term eval(Termed x) {
-        return scheme.schemeToNars.apply( //HACK
+        return rt.clojureToNars(rt.eval(rt.narsToClojure(x.term())));
+
+        /*return scheme.schemeToNars.apply( //HACK
                 scheme.eval(x.term())
-        );
+        );*/
     }
 
 

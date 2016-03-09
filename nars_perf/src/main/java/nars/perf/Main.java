@@ -1,6 +1,5 @@
 package nars.perf;
 
-import nars.perf.nars.nar.perf.NARBenchmark;
 import org.openjdk.jmh.profile.*;
 import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
@@ -15,13 +14,20 @@ import org.openjdk.jmh.runner.options.TimeValue;
 public enum Main {
 	;
 
-	public static void main(String[] args) throws RunnerException {
+	public static void perf(Class c, int iterations, int batchSize) throws RunnerException {
+		perf(c.getSimpleName(), iterations, batchSize);
+	}
+
+	public static void perf(String include, int iterations, int batchSize) throws RunnerException {
 		Options opt = new OptionsBuilder()
 				// .include(".*" + YourClass.class.getSimpleName() + ".*")
 
-				.include(NARBenchmark.class.getSimpleName())
+				.include(include)
+				 //.include(//c.getName())
+				//.include(".*" + c.getSimpleName() + ".*")
 				.warmupIterations(2)
-				.measurementIterations(10)
+				.measurementIterations(iterations)
+				.measurementBatchSize(batchSize)
 				.threads(1)
 				.forks(1)
 
@@ -29,26 +35,28 @@ public enum Main {
 				// .verbosity(VerboseMode.EXTRA) //VERBOSE OUTPUT
 
 				.addProfiler(StackProfiler.class,
-						"lines=3;top=50;period=1;detailLine=true")
+						"lines=6;top=50;period=1;detailLine=true")
 
-				 //.addProfiler(HotspotRuntimeProfiler.class)
+				//.addProfiler(HotspotRuntimeProfiler.class)
 				//.addProfiler(HotspotMemoryProfiler.class)
 				// .addProfiler(HotspotThreadProfiler.class)
 
 				//.addProfiler(HotspotCompilationProfiler.class)
 				// .addProfiler(HotspotClassloadingProfiler.class)
-				.addProfiler(LinuxPerfProfiler.class)
+				//.addProfiler(LinuxPerfProfiler.class)
 				/*
 
 				 * .addProfiler(LinuxPerfAsmProfiler.class)
 				 * .addProfiler(LinuxPerfNormProfiler.class)
 				 */
-				 //.addProfiler(CompilerProfiler.class)
+				//.addProfiler(CompilerProfiler.class)
 				// .addProfiler(GCProfiler.class)
 
 				.timeout(TimeValue.seconds(15)).build();
 
 		new Runner(opt).run();
+
+
 	}
 
 }
