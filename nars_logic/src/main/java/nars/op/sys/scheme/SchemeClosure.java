@@ -95,8 +95,7 @@ public class SchemeClosure {
     }
 
     public Stream<Expression> evalStream(@NotNull String input) {
-        List<Expression> read = Reader.read(input);
-        return eval(read);
+        return eval(Reader.read(input));
 
     }
 

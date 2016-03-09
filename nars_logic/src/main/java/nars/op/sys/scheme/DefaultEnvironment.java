@@ -34,6 +34,10 @@ public enum DefaultEnvironment {
     public static final ImmutableMap<SymbolExpression, Expression> PRIMITIVES = ImmutableMap.<SymbolExpression, Expression>builder()
             .put(symbol("+"),
                     procedure(args -> longFunction(args, (a, b) -> a + b)))
+
+            .put(symbol("add"),
+                    procedure(args -> longFunction(args, (a, b) -> a + b))) //HACK temporary
+
             .put(symbol("-"),
                     procedure(args -> longFunction(args, (a, b) -> a - b)))
             .put(symbol("/"),

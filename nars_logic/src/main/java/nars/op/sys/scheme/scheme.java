@@ -62,12 +62,16 @@ public class scheme extends TermFunction {
         }
     }
 
-    //TODO make narsToScheme method
+    //TODO use termizer
 
-    public static final Function<Expression, Term> schemeToNars = new Function<Expression, Term>() {
+    @Deprecated public static final Function<Object, Term> schemeToNars = new Function<Object, Term>() {
         @NotNull
         @Override
-        public Term apply(Expression schemeObj) {
+        public Term apply(Object schemeObj) {
+
+            if (schemeObj instanceof Term)
+                return (Term)schemeObj;
+
             if (schemeObj instanceof ListExpression) {
                 return apply( ((ListExpression)schemeObj).value );
             } else if (schemeObj instanceof SymbolicProcedureExpression) {
@@ -75,11 +79,11 @@ public class scheme extends TermFunction {
                 return apply(exp);
             }
             //TODO handle other types, like Object[] etc
-            else {
+            else if (schemeObj instanceof Expression) {
                 //return Term.get("\"" + schemeObj.print() + "\"" );
                 //return Atom.the(Utf8.toUtf8(name));
 
-                return schemeObj == NONE ? null : $.the(schemeObj.print());
+                return schemeObj == NONE ? null : $.the(((Expression)schemeObj).print());
 
 //        int olen = name.length();
 //        switch (olen) {
@@ -97,7 +101,7 @@ public class scheme extends TermFunction {
 
                 //  }
             }
-            //throw new RuntimeException("Invalid expression for term: " + schemeObj);
+            throw new RuntimeException("Invalid expression for term: " + schemeObj);
 
         }
 
@@ -110,25 +114,28 @@ public class scheme extends TermFunction {
     @Override
     public Object function(@NotNull Compound o, TermIndex i) {
         Term[] x = o.terms();
-        Term code = x[0];
+        return eval(x[0]);
 
-        if (code instanceof Atomic) {
+        //return null;
+    }
+
+    public static Object eval(Term x) {
+
+        if (x instanceof Atomic) {
             //interpret as eval string
             return schemeToNars.apply(
                 Evaluator.evaluate(
-                    load(((Atomic)code).toStringUnquoted(), env), env)
+                    load(((Atomic)x).toStringUnquoted(), env), env)
             );
         }
 
         return schemeToNars.apply(
             Evaluator.evaluate(
-                new SchemeProduct(code instanceof Compound ? (Iterable) code : $.p(x)), env));
+                new SchemeProduct(x instanceof Compound ? (Iterable) x : $.p(x)), env));
         //Set = evaluate as a cond?
 //        else {
 //
 //        }
-
-        //return null;
     }
 
 

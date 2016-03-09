@@ -112,14 +112,7 @@ public class NarseseExtendedTest {
         eqTask(shorter, expected);
     }
 
-    @Test public void testOptionalCommas() {
-        Term pABC1 = $.$("(a b c)");
-        Term pABC2 = $.$("(a,b,c)");
-        assertEquals(pABC1, pABC2);
 
-        Term pABC11 = $.$("(a      b c)");
-        assertEquals(pABC1, pABC11);
-    }
 
 
     static final Terminal t = new Terminal(8);
@@ -203,5 +196,26 @@ public class NarseseExtendedTest {
 //            assertTrue(false);
 //        } catch (Exception e) {
 //        }
+    }
+
+    @Test public void testOptionalCommas() {
+        Term pABC1 = $.$("(a b c)");
+        Term pABC2 = $.$("(a,b,c)");
+        assertEquals(pABC1, pABC2);
+
+        Term pABC11 = $.$("(a      b c)");
+        assertEquals(pABC1, pABC11);
+    }
+
+
+    @Test public void testCommandDefault() {
+        Task a = t.task("(a b c)");
+        assertNotNull(a);
+        assertTrue(a.isCommand());
+        assertEquals($.$("(a b c)"), a.term());
+    }
+
+    @Test public void testEval1() {
+        assertEquals("3", t.eval("(add 1 2)").toString());
     }
 }

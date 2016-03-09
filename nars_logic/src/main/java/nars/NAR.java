@@ -15,6 +15,9 @@ import nars.nal.nal8.PatternAnswer;
 import nars.nal.nal8.operator.TermFunction;
 import nars.op.in.FileInput;
 import nars.op.in.TextInput;
+import nars.op.sys.scheme.SchemeClosure;
+import nars.op.sys.scheme.expressions.Expression;
+import nars.op.sys.scheme.scheme;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.task.flow.Input;
@@ -1030,6 +1033,18 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         });
         pw.close();
     }
+
+    public Term eval(@NotNull String x) throws NarseseException {
+        return eval((Termed)term(x));
+    }
+
+
+    public Term eval(Termed x) {
+        return scheme.schemeToNars.apply( //HACK
+                scheme.eval(x.term())
+        );
+    }
+
 
 //    public final void with(Object... values) {
 //        with(values);

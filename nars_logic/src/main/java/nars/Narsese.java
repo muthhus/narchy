@@ -398,7 +398,13 @@ public class Narsese extends BaseParser<Object> {
 //    }
 
     Rule SentencePunctuation(@NotNull Var<Character> punc) {
-        return sequence(anyOf(".?!@;"), punc.set(matchedChar()));
+        return firstOf(
+
+                sequence(anyOf(".?!@;"), punc.set(matchedChar())),
+
+                //default to command if punctuation missing
+                sequence(eof(), punc.set(';'))
+        );
     }
 
 
