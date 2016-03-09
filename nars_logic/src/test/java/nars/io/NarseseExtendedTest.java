@@ -112,9 +112,6 @@ public class NarseseExtendedTest {
         eqTask(shorter, expected);
     }
 
-
-
-
     static final Terminal t = new Terminal(8);
 
     static void eqTask(String x, String b) {
@@ -208,23 +205,5 @@ public class NarseseExtendedTest {
     }
 
 
-    @Test public void testCommandDefault() {
-        Task a = t.task("(a b c)");
-        assertNotNull(a);
-        assertTrue(a.isCommand());
-        assertEquals($.$("(a b c)"), a.term());
-    }
 
-    @Test public void testEval1() {
-        assertEquals("(1)",
-                t.eval(
-                    //"(add 1 2)"
-                    "(list 1)"
-                ).toString());
-    }
-
-    @Test public void testClojure2() {
-        assertEquals(System.getProperty("java.vm.version"),
-                t.eval("(System/getProperty \"java.vm.version\")").toString() );
-    }
 }

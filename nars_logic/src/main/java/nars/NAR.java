@@ -1,9 +1,6 @@
 package nars;
 
 
-import clojure.lang.*;
-import clojure.lang.Compiler;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
@@ -16,6 +13,7 @@ import nars.nal.Tense;
 import nars.nal.nal8.AbstractOperator;
 import nars.nal.nal8.PatternAnswer;
 import nars.nal.nal8.operator.TermFunction;
+import nars.op.Narjure;
 import nars.op.in.FileInput;
 import nars.op.in.TextInput;
 
@@ -27,8 +25,6 @@ import nars.task.flow.TaskStream;
 import nars.term.*;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
-import nars.term.container.TermContainer;
-import nars.term.variable.GenericVariable;
 import nars.term.variable.Variable;
 import nars.time.Clock;
 import nars.util.event.AnswerReaction;
@@ -105,6 +101,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * Flag for running continuously
      */
     public final AtomicBoolean running = new AtomicBoolean();
+
+    final Narjure rt = new Narjure();
 
     //TODO use this to store all handler registrations, and decide if transient or not
     public final transient List<Object> regs = Global.newArrayList();
@@ -410,18 +408,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         Task u;
         if (i.isCommand()) {
             //direct execution
-            if (execute(i, null)) {
-                u = i;
-            } else {
-                @NotNull Compound x = i.term();
-                Term y = eval(x);
-                if (y != null) {
-                    logger.info("(eval( {} ,#x)==>(#x<-> {} )", x, y);
-                    u = i;
-                } else {
-                    u = null;
-                }
-            }
+            u = execute(i, null) ? i : null;
         } else {
             if (!i.isDeleted()) {
                 //accept input if it can be normalized
@@ -456,7 +443,26 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
         Term goalTerm = inputGoal.term();
         if (!Op.isOperation(goalTerm)) {
-            return false;
+
+            @NotNull Compound x = inputGoal.term();
+            try {
+                Term y = rt.eval(x);
+                if (y != null) {
+                    logger.info("(eval( {} , {} )", x, y); //mooseboobs
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            catch (VerifyError vex) {
+                //ex: java.lang.VerifyError: (class: clojure/core$eval1, method: invokeStatic signature: ()Ljava/lang/Object;) Unable to pop operand off an empty stack
+            }
+            catch (Throwable e) {
+                //HACK
+                logger.error("{}",e);
+                return false;
+            }
+
         }
 
         Task goal = inputGoal;
@@ -1043,63 +1049,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
 
     public Term eval(@NotNull String x) throws NarseseException {
-        return eval((Termed)term(x));
-    }
-
-
-    final Narjure rt = new Narjure();
-
-
-    public static class Narjure extends Dynajure {
-        /** temporary translation method */
-        @Deprecated Term clojureToNars(Object o) {
-            if (o instanceof Object[])
-                System.out.println(Arrays.toString((Object[])o));
-            //System.out.println(o + " " + o.getClass());
-            return Atom.the(o.toString());
-        }
-        /** temporary translation method */
-        @Deprecated Object narsToClojure(Object o) {
-            if (o instanceof Atomic) {
-                Atomic a = (Atomic)o;
-
-                String as = a.toString();
-
-                return RT.readString(as);
-                //return Symbol.intern(as);
-            } else if ((o instanceof Compound) && (((Compound)o).op()!=Op.PRODUCT)) {
-                //Non-Product compounds
-
-                return Tuple.create(
-                        Symbol.intern((((Compound)o)).op().str),     //TODO cache these in array for fast lookup
-
-                        PersistentVector.create(narsToClojure(((Compound)o).subterms())));
-                //PersistentList.create(narsToClojure(((Compound)o).subterms())));
-
-            } else if (o instanceof TermContainer) {
-                //generic TermContainers and Product compounds
-                return narsToClojure(((TermContainer) o).terms());
-            } else if (o instanceof Object[]) {
-                Object[] a = (Object[])o;
-                int alen = a.length;
-                Object[] cc = new Object[alen];
-                for (int i = 0; i < alen; i++) {
-                    cc[i] = narsToClojure(a[i]);
-                }
-                return PersistentList.create(Lists.newArrayList(cc));
-                //return cc;
-            }
-
-            throw new RuntimeException("Untranslated: " + o);
-        }
-    }
-
-    public Term eval(Termed x) {
-        return rt.clojureToNars(rt.eval(rt.narsToClojure(x.term())));
-
-        /*return scheme.schemeToNars.apply( //HACK
-                scheme.eval(x.term())
-        );*/
+        Termed term = term(x);
+        return term == null ? null : rt.eval((Termed) term);
     }
 
 
