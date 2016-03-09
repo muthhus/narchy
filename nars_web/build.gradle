@@ -1,6 +1,6 @@
 //https://github.com/chiquitinxx/grooscript-gradle-plugin
 plugins {
-    id "org.grooscript.conversion" version "1.2.3"
+//    id "org.grooscript.conversion" version "1.2.3"
 //    id 'com.github.ksoichiro.web.resource' version '1.6.1'
 }
 
@@ -13,65 +13,17 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
-//Convert files, you can change options
-grooscript {
-    source = ['src/main/groovy/'] //Sources to be converted(List), default is ['src/main/groovy']
-    destination = 'src/main/resources/web' //Target directory for js files, default is 'src/main/webapp/js/app'
-    classpath = ['src/main/groovy'] //Needed classpath's to compile source files(List), default is ['src/main/groovy']
-    customization = null //Customization in files, it's a closure, as for example { -> ast(groovy.transform.TypeChecked) }
-    initialText = '//Grooscript start'
-    initialText = '//Grooscript end'
-    recursive = true //Default is false
-    mainContextScope = ['$'] //Variables available in main scope (List), default is null
-    //addGsLib = 'grooscript' //Include a grooscript js lib in the result, default is null
-    includeDependencies = false //Include conversion of dependency files, default is false
-
-}
-
-////Templates options
-//templates {
-//    templatesPath = 'src/main/webapp/templates'
-//    templates = ['main.gtpl', 'little/small.tpl']
-//    destinationFile = 'src/main/webapp/js/lib'
-//    classpath = ['src/main/groovy']
-//}
-
-////Spy files changes
-//spy {
-//    files = ['anyFolder', 'aFile']
-//    onChanges = { list ->
-//        println 'Changed: ' + list
-//    }
-//}
-
-////Require.js modules
-//requireJs {
-//    sourceFile = 'src/main/groovy/nars/web/client/Main.groovy'
-//    destinationFolder = 'src/main/resources/web'
-//}
-
-//webResource {
-//
-//    lib {
-//        // Change directories for libraries downloaded with bower
-//        dest = 'src/main/resources/lib'
-//    }
-//
-//    bower {
-//        dependencies {
-//            install name: 'jquery', version: '2.0.0'
-//
-//            //'jquery'('latest')
-//            /*"jquery-ui":"latest",
-//            "lodash":"latest",
-//            "cytoscape":"latest",
-//            "cytoscape-edgehandles": "latest",
-//            "cytoscape-cose-bilkent":"latest",
-//            "semantic": "latest",
-//            "object-editor": "latest",
-//            "grooscript": "latest"*/
-//        }
-//        copyAll true
-//    }
+////Convert files, you can change options
+//grooscript {
+//    source = ['src/main/groovy/'] //Sources to be converted(List), default is ['src/main/groovy']
+//    destination = 'src/main/resources/web' //Target directory for js files, default is 'src/main/webapp/js/app'
+//    classpath = ['src/main/groovy'] //Needed classpath's to compile source files(List), default is ['src/main/groovy']
+//    customization = null //Customization in files, it's a closure, as for example { -> ast(groovy.transform.TypeChecked) }
+//    initialText = '//Grooscript start'
+//    initialText = '//Grooscript end'
+//    recursive = true //Default is false
+//    mainContextScope = ['$'] //Variables available in main scope (List), default is null
+//    //addGsLib = 'grooscript' //Include a grooscript js lib in the result, default is null
+//    includeDependencies = false //Include conversion of dependency files, default is false
 //
 //}

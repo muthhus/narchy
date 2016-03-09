@@ -222,4 +222,9 @@ public class NarseseExtendedTest {
                     "(list 1)"
                 ).toString());
     }
+
+    @Test public void testClojure2() {
+        assertEquals(System.getProperty("java.vm.version"),
+                t.eval("(System/getProperty \"java.vm.version\")").toString() );
+    }
 }

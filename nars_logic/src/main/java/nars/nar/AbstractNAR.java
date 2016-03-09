@@ -218,9 +218,6 @@ public abstract class AbstractNAR extends NAR {
             new flat.flatProduct(),
             new similaritree(),
 
-            //TODO move Javascript to a UnsafeOperators set, because of remote execution issues
-            new nars.op.sys.scheme.scheme(),      // scheme evaluation
-
             //new NumericCertainty(),
 
             //io operations
@@ -228,7 +225,7 @@ public abstract class AbstractNAR extends NAR {
 
             new schizo(),     //change Memory's SELF term (default: SELF)
 
-            new js(), //javasc67ript evalaution
+            new js(), //javascript evalaution
 
             /*new json.jsonfrom(),
             new json.jsonto()*/

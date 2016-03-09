@@ -18,9 +18,7 @@ import nars.nal.nal8.PatternAnswer;
 import nars.nal.nal8.operator.TermFunction;
 import nars.op.in.FileInput;
 import nars.op.in.TextInput;
-import nars.op.sys.scheme.SchemeClosure;
-import nars.op.sys.scheme.expressions.Expression;
-import nars.op.sys.scheme.scheme;
+
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.task.flow.Input;
