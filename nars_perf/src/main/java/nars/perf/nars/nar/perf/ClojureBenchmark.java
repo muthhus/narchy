@@ -3,6 +3,8 @@ package nars.perf.nars.nar.perf;
 
 import clojure.lang.Dynajure;
 
+import nars.NAR;
+import nars.nar.Default;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Mode;
@@ -39,9 +41,19 @@ public class ClojureBenchmark {
         //out.println(eval("'[inh a b]") );
     }
 
+    @Benchmark
+    @BenchmarkMode(value = Mode.SingleShotTime)
+    public void testExecution() {
+        NAR n = new Default();
+        //n.log();
+        n.input("a:b!");
+        n.input("<(rand 5)==>a:b>.");
+
+        n.run(6);
+    }
 
     public static void main(String[] args) throws RunnerException {
-        perf(ClojureBenchmark.class, 6, 500);
+        perf(ClojureBenchmark.class, 6, 10);
 
     }
 }

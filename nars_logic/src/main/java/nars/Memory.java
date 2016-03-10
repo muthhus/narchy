@@ -94,10 +94,6 @@ public class Memory extends Param {
     public final transient Topic<Twin<Task>> eventAnswer = new DefaultTopic<>();
 
 
-    /** executables (incl. operators).
-     * keys in this map should be OPERATOR (^something)
-     * */
-    public final transient Map<Atomic, Topic<Task>> exe = new HashMap();
 
 
 

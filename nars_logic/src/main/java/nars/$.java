@@ -498,7 +498,7 @@ public enum $ /* TODO: implements TermIndex */ {
     }
 
 
-    public static @NotNull Atomic operator(@NotNull String name) {
+    public static @NotNull Operator operator(@NotNull String name) {
         return new Operator(name);
     }
 

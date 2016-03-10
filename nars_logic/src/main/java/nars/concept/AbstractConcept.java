@@ -1,6 +1,7 @@
 package nars.concept;
 
 import com.sun.jna.WeakIdentityHashMap;
+import javassist.scopedpool.SoftValueHashMap;
 import nars.NAR;
 import nars.bag.BLink;
 import nars.bag.Bag;
@@ -15,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.function.BiFunction;
 
 /**
@@ -88,13 +90,13 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
     }
 
 
-    @Override public Object putCompute(Object key, BiFunction value) {
+    @Override public <C> C meta(Object key, BiFunction value) {
         if (meta == null) {
             Object v;
             put(key, v = value.apply(key, null));
-            return v;
+            return (C)v;
         } else {
-            return meta.compute(key, value);
+            return (C) meta.compute(key, value);
         }
     }
 
@@ -110,7 +112,9 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
         if (value != null) {
 
             if (currMeta == null) {
-                this.meta = currMeta = new WeakIdentityHashMap();
+                this.meta = currMeta =
+                        //new WeakIdentityHashMap();
+                        new SoftValueHashMap(1);
             }
 
             return currMeta.put(key, value);

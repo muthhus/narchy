@@ -11,6 +11,7 @@ import nars.concept.Concept;
 import nars.nal.Level;
 import nars.nal.Tense;
 import nars.nal.nal8.AbstractOperator;
+import nars.nal.nal8.Execution;
 import nars.nal.nal8.PatternAnswer;
 import nars.nal.nal8.operator.TermFunction;
 import nars.op.Narjure;
@@ -444,25 +445,25 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         Term goalTerm = inputGoal.term();
         if (!Op.isOperation(goalTerm)) {
 
-            @NotNull Compound x = inputGoal.term();
-            try {
-                Term y = rt.eval(x);
-                if (y != null) {
-                    logger.info("(eval( {} , {} )", x, y); //mooseboobs
-                    return true;
-                } else {
-                    return false;
+            if (goalTerm.op()==Op.PRODUCT) {
+                @NotNull Compound x = inputGoal.term();
+                try {
+                    Term y = rt.eval(x);
+                    if (y != null) {
+                        logger.info("(eval( {} , {} )", x, y); //mooseboobs
+                        return true;
+                    }
+                }
+                /*catch (VerifyError vex) {
+                    //ex: java.lang.VerifyError: (class: clojure/core$eval1, method: invokeStatic signature: ()Ljava/lang/Object;) Unable to pop operand off an empty stack
+                }*/ catch (Throwable e) {
+                    //HACK
+                    logger.error("{}", e);
+
                 }
             }
-            catch (VerifyError vex) {
-                //ex: java.lang.VerifyError: (class: clojure/core$eval1, method: invokeStatic signature: ()Ljava/lang/Object;) Unable to pop operand off an empty stack
-            }
-            catch (Throwable e) {
-                //HACK
-                logger.error("{}",e);
-                return false;
-            }
 
+            return false;
         }
 
         Task goal = inputGoal;
@@ -557,7 +558,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     /**
      * creates a TermFunction operator from a supplied function, which can be a lambda
      */
-    public On onExecTerm(@NotNull String operator, @NotNull Function<Term[], Object> func) {
+    public final On onExecTerm(@NotNull String operator, @NotNull Function<Term[], Object> func) {
         return onExec(new TermFunction(operator) {
 
             @Override
@@ -568,25 +569,26 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         });
     }
 
-    public On onExec(@NotNull AbstractOperator r) {
+    public final On onExec(@NotNull AbstractOperator r) {
         r.init(this);
         return onExecution(r.getOperatorTerm(), r);
     }
 
 
-    public On onExec(@NotNull String op, @NotNull Consumer<Term[]> each) {
+    public final On onExec(@NotNull String op, @NotNull Consumer<Term[]> each) {
         return onExecution($.operator(op), e -> {
             each.accept(Operator.argArray(e.term()));
         });
     }
 
-    public On onExecution(@NotNull String op, @NotNull Consumer<Task> each) {
+    public final On onExecution(@NotNull String op, @NotNull Consumer<Task> each) {
         return onExecution($.operator(op), each);
     }
 
-    public On onExecution(@NotNull Atomic op, @NotNull Consumer<Task> each) {
-        return exe.computeIfAbsent(op,
-                o -> new DefaultTopic<Task>())
+    @NotNull  public final On onExecution(@NotNull Operator op, @NotNull Consumer<Task> each) {
+        return concept(op,true)
+                .<Topic<Task>>meta(Execution.class,
+                        (k, v) -> v!=null ?  v : new DefaultTopic<>())
                 .on(each);
     }
 
@@ -1049,8 +1051,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
 
     public Term eval(@NotNull String x) throws NarseseException {
-        Termed term = term(x);
-        return term == null ? null : rt.eval((Termed) term);
+        return rt.eval((Termed)term(x));
     }
 
 

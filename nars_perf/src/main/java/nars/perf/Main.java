@@ -35,7 +35,7 @@ public enum Main {
 				// .verbosity(VerboseMode.EXTRA) //VERBOSE OUTPUT
 
 				.addProfiler(StackProfiler.class,
-						"lines=6;top=50;period=1;detailLine=true")
+						"lines=12;top=50;period=1;detailLine=true")
 
 				//.addProfiler(HotspotRuntimeProfiler.class)
 				//.addProfiler(HotspotMemoryProfiler.class)

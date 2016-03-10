@@ -24,6 +24,7 @@ package nars.nal.nal8;
 import nars.$;
 import nars.NAR;
 import nars.task.Task;
+import nars.term.Operator;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -36,7 +37,7 @@ import java.util.function.Consumer;
 public abstract class AbstractOperator implements Consumer<Task> {
 
 
-    public final @NotNull Atomic atomicTerm;
+    public final @NotNull Operator atomicTerm;
 
     protected NAR nar; //TODO make private
 
@@ -112,7 +113,7 @@ public abstract class AbstractOperator implements Consumer<Task> {
      */
     public boolean async() { return false; }
 
-    public final @Nullable Atomic getOperatorTerm() {
+    public final @Nullable Operator getOperatorTerm() {
         return atomicTerm;
     }
 

@@ -104,7 +104,7 @@ public class LogicMeter extends FrameReaction {
     public void onFrame() {
         conceptMeter.reset();
         //m.getConcepts().forEach(conceptMeter);
-        conceptMeter.commit(m);
+        //conceptMeter.commit(m);
     }
 
     public static class ItemMeter<I extends BudgetedHandle> implements Consumer<I> {

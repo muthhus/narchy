@@ -18,10 +18,12 @@ import java.util.Arrays;
 public class Narjure extends Dynajure {
 
 
-//    public Narjure() {
-//        Symbol.intern("\"-->\"");
-//        eval("(defn \"-->\" [subterms] nil)");
-//    }
+    public Narjure() {
+        //Symbol.intern("\"-->\"");
+
+        //eval("(defn INHERITANCE [a b] nil)");
+
+    }
 
     /**
      * temporary translation method
@@ -31,10 +33,10 @@ public class Narjure extends Dynajure {
         //if (o instanceof Object[])
             //System.out.println(Arrays.toString((Object[]) o));
         //System.out.println(o + " " + o.getClass());
-        return o == null ? null : Atom.the(o.toString());
+        return Atom.the(o);
     }
 
-    static final IFn quote = (IFn) RT.readString("quote");
+    //static final IFn quote = (IFn) RT.readString("quote");
 
     /**
      * temporary translation method
@@ -58,7 +60,7 @@ public class Narjure extends Dynajure {
                     //quote,
                     //RT.list(
                     Tuple.create(
-                        narsToClojure("\"" + (((Compound) o)).op().str + "\""),     //TODO cache these in array for fast lookup
+                        narsToClojure("\"" + (((Compound) o)).op().toString() + "\""),     //TODO cache these in array for fast lookup
                         narsToClojure(((Compound) o).subterms())
                     )
                 //)
@@ -82,6 +84,19 @@ public class Narjure extends Dynajure {
     }
 
     public Term eval(Termed x) {
-        return clojureToNars(eval(narsToClojure(x.term())));
+        return x == null ? null : eval((Object) x.term());
+    }
+
+    @Override
+    public Term eval(Object x) {
+//        if (x instanceof Term) {
+//            return (Term)x;
+//        }
+        if ((x instanceof Number) || (x instanceof String))  {
+            return Atom.the(x);
+        }
+
+        x = narsToClojure(x);
+        return clojureToNars(super.eval(x));
     }
 }

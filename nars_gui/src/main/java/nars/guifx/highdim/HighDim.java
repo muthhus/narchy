@@ -1,7 +1,6 @@
 package nars.guifx.highdim;
 
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import nars.Global;
 import nars.bag.BLink;
 import nars.bag.Bag;
@@ -10,7 +9,6 @@ import nars.concept.Concept;
 import nars.guifx.Spacegraph;
 import nars.guifx.demo.NARide;
 import nars.guifx.graph2.TermNode;
-import nars.guifx.graph2.layout.IterativeLayout;
 import nars.guifx.util.Animate;
 import nars.guifx.util.TabX;
 import nars.nar.Default;
@@ -309,7 +307,7 @@ public class HighDim<T extends Termed> extends Spacegraph {
         items.forEach(cap, cLink -> {
             T c = cLink.get();
             //TODO find somethign more efficient
-            ((Concept) c).putCompute(this, (C, vis) -> {
+            ((Concept) c).meta(this, (C, vis) -> {
                 if (vis == null) {
                     //requires one
                     if (free.isEmpty()) {

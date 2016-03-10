@@ -15,6 +15,7 @@ package clojure.lang;
 //*
 
 import clojure.asm.*;
+import clojure.asm.ClassWriter;
 import clojure.asm.commons.GeneratorAdapter;
 import clojure.asm.commons.Method;
 import nars.util.data.list.FasterList;
@@ -25,6 +26,9 @@ import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+
+import static clojure.lang.Compiler.HostExpr.initMethod;
+
 
 //*/
 /*
@@ -1101,6 +1105,13 @@ static public abstract class HostExpr implements Expr, MaybePrimitiveExpr{
 		return c;
     }
 
+	final static IdentityHashMap<Type[], Method> initMethodCache = new IdentityHashMap<>();
+
+	public static Method initMethod(Type[] ret) {
+		return initMethodCache.computeIfAbsent(ret, t->{
+			return new Method("<init>", Type.VOID_TYPE, t);
+		});
+	}
 
 	static Class tagToClass(Object tag) {
 		Class c = null;
@@ -4346,7 +4357,8 @@ static public class ObjExpr implements Expr{
 			}
 
  		//ctor that takes closed-overs and inits base + fields
-		Method m = new Method("<init>", Type.VOID_TYPE, ctorTypes());
+		Method m = initMethod(ctorTypes());
+
 		GeneratorAdapter ctorgen = new GeneratorAdapter(ACC_PUBLIC,
 		                                                m,
 		                                                null,
@@ -7843,6 +7855,7 @@ static public class NewInstanceExpr extends ObjExpr{
 		return ret;
 		}
 
+
 	/***
 	 * Current host interop uses reflection, which requires pre-existing classes
 	 * Work around this by:
@@ -7874,7 +7887,8 @@ static public class NewInstanceExpr extends ObjExpr{
 			}
 
 		//ctor that takes closed-overs and does nothing
-		Method m = new Method("<init>", Type.VOID_TYPE, ret.ctorTypes());
+		Method m = initMethod(ret.ctorTypes());
+
 		GeneratorAdapter ctorgen = new GeneratorAdapter(ACC_PUBLIC,
 		                                                m,
 		                                                null,
@@ -7892,7 +7906,7 @@ static public class NewInstanceExpr extends ObjExpr{
 			Type[] altCtorTypes = new Type[ctorTypes.length-ret.altCtorDrops];
 			for(int i=0;i<altCtorTypes.length;i++)
 				altCtorTypes[i] = ctorTypes[i];
-			Method alt = new Method("<init>", Type.VOID_TYPE, altCtorTypes);
+			Method alt = initMethod(altCtorTypes);
 			ctorgen = new GeneratorAdapter(ACC_PUBLIC,
 															alt,
 															null,
@@ -7905,7 +7919,8 @@ static public class NewInstanceExpr extends ObjExpr{
 				ctorgen.visitInsn(Opcodes.ACONST_NULL);
 
 			ctorgen.invokeConstructor(Type.getObjectType(COMPILE_STUB_PREFIX + "/" + ret.internalName),
-			                          new Method("<init>", Type.VOID_TYPE, ctorTypes));
+					initMethod(ctorTypes)
+					);
 
 			ctorgen.returnValue();
 			ctorgen.endMethod();
@@ -7917,6 +7932,7 @@ static public class NewInstanceExpr extends ObjExpr{
 		DynamicClassLoader loader = (DynamicClassLoader) LOADER.deref();
 		return loader.defineClass(COMPILE_STUB_PREFIX + "." + ret.name, bytecode, frm);
 	}
+
 
 	static String[] interfaceNames(IPersistentVector interfaces){
 		int icnt = interfaces.count();
@@ -7941,7 +7957,8 @@ static public class NewInstanceExpr extends ObjExpr{
 												null,
 												null,
 												cv);
-			emitValue(hintedFields, gen);
+				IPersistentVector hfields = this.hintedFields;
+				emitValue(hfields, gen);
 			gen.returnValue();
 			gen.endMethod();
 
@@ -7950,12 +7967,12 @@ static public class NewInstanceExpr extends ObjExpr{
 				//create(IPersistentMap)
 				String className = name.replace('.', '/');
 				int i = 1;
-				int fieldCount = hintedFields.count();
+				int fieldCount = hfields.count();
 
 				MethodVisitor mv = cv.visitMethod(ACC_PUBLIC + ACC_STATIC, "create", "(Lclojure/lang/IPersistentMap;)L"+className+";", null, null);
 				mv.visitCode();
 
-				for(ISeq s = RT.seq(hintedFields); s!=null; s=s.next(), i++)
+				for(ISeq s = RT.seq(hfields); s!=null; s=s.next(), i++)
 					{
 					String bName = ((Symbol)s.first()).name;
 					Class k = tagClass(tagOf(s.first()));
@@ -7980,13 +7997,13 @@ static public class NewInstanceExpr extends ObjExpr{
 				mv.visitTypeInsn(Opcodes.NEW, className);
 				mv.visitInsn(DUP);
 
-				Method ctor = new Method("<init>", Type.VOID_TYPE, ctorTypes());
+				Method ctor = initMethod(ctorTypes());
 
-				if(hintedFields.count() > 0)
+				if(hfields.count() > 0)
 					for(i=1; i<=fieldCount; i++)
 						{
 						mv.visitVarInsn(ALOAD, i);
-						Class k = tagClass(tagOf(hintedFields.nth(i-1)));
+						Class k = tagClass(tagOf(hfields.nth(i-1)));
 						if(k.isPrimitive())
 							{
 							String b = Type.getType(boxClass(k)).getInternalName();

@@ -25,9 +25,7 @@ public class ShellTest {
     @Test
     public void testLobjectized()  {
 
-        System.out.println(d.exe);
-
-        assertTrue(d.exe.containsKey($.operator("sh")));
+        //assertTrue(d.exe.containsKey($.operator("sh")));
 
         d.log();
         d.input("sh(pwd,I,(),#x)!");
@@ -38,9 +36,7 @@ public class ShellTest {
     @Test
     public void testWrappedDirectoryConcept()  {
 
-        System.out.println(d.exe);
-
-        assertTrue(d.exe.containsKey($.operator("sh")));
+        //assertTrue(d.exe.containsKey($.operator("sh")));
 
         d.log();
 

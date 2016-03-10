@@ -94,13 +94,13 @@ public class NALObjectsTest  {
 
         String instance = "o";
 
-        int startSize = n.exe.size();
+        //int startSize = n.exe.size();
 
         Lobjects no = new Lobjects(n);
 
         T wrapper = no.theOrNull(instance, T.class);
 
-        assertEquals("one ClassOperator registered", 1, n.exe.size() - startSize);
+        //assertEquals("one ClassOperator registered", 1, n.exe.size() - startSize);
 
         assertNotEquals(T.class, wrapper.getClass());
         assertEquals(T.class, wrapper.getClass().getSuperclass());

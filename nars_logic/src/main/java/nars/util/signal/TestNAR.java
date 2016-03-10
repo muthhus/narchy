@@ -392,7 +392,7 @@ public class TestNAR  {
 
     @NotNull
     public TestNAR mustExecute(long start, long end, @NotNull String term, float minExpect, float maxExpect) {
-        requires.add(new ExecutionCondition(nar, start, end, $.operator(term), minExpect, maxExpect));
+        requires.add(new ExecutionCondition(nar, start, end, term, minExpect, maxExpect));
         return this;
     }
 

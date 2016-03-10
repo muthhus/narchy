@@ -551,6 +551,7 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
             O newValue = computeFunc.apply(key, searchResult);
 
 
+            List<Node> oedges = found.getOutgoingEdges();
             switch (classification) {
                 case EXACT_MATCH: {
                     // Search found an exact match for all edges leading to this node.
@@ -562,7 +563,7 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
 
                     if (newValue != foundValue) {
                         //clone and reattach
-                        cloneAndReattach(searchResult, factory, found, foundValue, found.getOutgoingEdges());
+                        cloneAndReattach(searchResult, factory, found, foundValue, oedges);
                     }
                     return newValue;
                 }
@@ -576,7 +577,7 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
 
 
                     // Create new nodes...
-                    Node newChild = factory.createNode(suffixFromExistingEdge, foundValue, found.getOutgoingEdges(), false);
+                    Node newChild = factory.createNode(suffixFromExistingEdge, foundValue, oedges, false);
 
                     Node newParent = factory.createNode(commonPrefix, newValue, Arrays.asList(newChild), false);
 
@@ -600,8 +601,8 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
                     Node newChild = factory.createNode(keySuffix, newValue, Collections.<Node>emptyList(), false);
 
                     // Clone the current node adding the new child...
-                    List<Node> edges = new ArrayList<Node>(found.getOutgoingEdges().size() + 1);
-                    edges.addAll(found.getOutgoingEdges());
+                    List<Node> edges = new ArrayList<Node>(oedges.size() + 1);
+                    edges.addAll(oedges);
                     edges.add(newChild);
                     cloneAndReattach(searchResult, factory, found, foundValue, edges);
 
@@ -628,7 +629,7 @@ public class MyConcurrentRadixTree<O> implements RadixTree<O>, PrettyPrintable, 
 
                     // Create new nodes...
                     Node n1 = factory.createNode(suffixFromKey, newValue, Collections.<Node>emptyList(), false);
-                    Node n2 = factory.createNode(suffixFromExistingEdge, foundValue, found.getOutgoingEdges(), false);
+                    Node n2 = factory.createNode(suffixFromExistingEdge, foundValue, oedges, false);
                     @SuppressWarnings({"NullableProblems"})
                     Node n3 = factory.createNode(commonPrefix, null, Arrays.asList(n1, n2), false);
 

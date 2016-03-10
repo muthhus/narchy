@@ -155,6 +155,7 @@ public class Atom extends AtomicStringConstant {
             return $.the((String)o);
         if (o instanceof Number)
             return $.the((Number)o);
+
         return null;
     }
 

@@ -86,6 +86,8 @@ public interface Concept extends Termed, Comparable {
         Map<Object, Object> m;
         return null == (m = meta()) ? null : (C) m.get(key);
     }
+    /** follows Map.compute() semantics */
+    <C> C meta(Object key, BiFunction value);
 
     /**
      * belief vs desire metric:
@@ -323,8 +325,7 @@ public interface Concept extends Termed, Comparable {
         return hasGoals() ? goals().top(now).motivation() : valueIfMissing;
     }
 
-    /** follows Map.compute() semantics */
-    Object putCompute(Object key, BiFunction value);
+
 
 
 //    public Task getTask(boolean hasQueryVar, long occTime, Truth truth, List<Task>... lists);

@@ -121,14 +121,16 @@ public final class ActionMatcher
 
         // actions need to run in the parent context
         MatcherContext parentContext = context.getParent();
-        for (ContextAware contextAware: contextAwares)
-            contextAware.setContext(parentContext);
+        List<ContextAware<?>> awares = this.contextAwares;
+        for (int i = 0, contextAwaresSize = awares.size(); i < contextAwaresSize; i++) {
+            awares.get(i).setContext(parentContext);
+        }
 
         ValueStack valueStack = context.getValueStack();
 
         Object valueStackSnapshot  = valueStack.takeSnapshot();
 
-        if (!(/*(Action<V>)*/ action).run(parentContext)) {
+        if (!/*(Action<V>)*/ action.run(parentContext)) {
             // failing actions are not allowed to change the ValueStack
             valueStack.restoreSnapshot(valueStackSnapshot);
             return false;

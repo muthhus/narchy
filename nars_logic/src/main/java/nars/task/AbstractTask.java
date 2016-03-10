@@ -6,6 +6,7 @@ import nars.NAR;
 import nars.budget.UnitBudget;
 import nars.concept.Concept;
 import nars.nal.Tense;
+import nars.nal.nal8.Execution;
 import nars.term.Operator;
 import nars.term.Compound;
 import nars.term.Termed;
@@ -258,12 +259,11 @@ public abstract class AbstractTask extends UnitBudget
 
         //DEFAULT EXECUTION PROCEDURE: trigger listener reactions
 
-        Topic<Task> tt = n.exe.get(
-            Operator.operator(term())
-        );
-
-        boolean executable = (tt != null && !tt.isEmpty());
-        if (executable) {
+//        Topic<Task> tt = n.exe.get(
+//            Operator.operator(term())
+//        );
+        Topic<Task> tt = n.concept(Operator.operator(term())).get(Execution.class);
+        if (tt!=null && !tt.isEmpty()) {
             //beforeNextFrame( //<-- enqueue after this frame, before next
 
             tt.emit(this);
@@ -272,10 +272,13 @@ public abstract class AbstractTask extends UnitBudget
 //                //execution drains temporal task's budget in proportion to durability
 //                Budget inputGoalBudget = inputGoal.budget();
 //                inputGoalBudget.priMult(1f - inputGoalBudget.dur());
+
 //            }
 
+            return true;
+
         }
-        return executable;
+        return false;
     }
 
     /** includes: evidentialset, occurrencetime, truth, term, punctuation */
