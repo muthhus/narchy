@@ -166,7 +166,7 @@ abstract public class ConceptProcess implements Premise {
                 .budget(budget) // copied in, not shared
                 .time(now, occ)
                 .parent(task(), belief /* null if single */)
-                .anticipate(derivedTemporal && d.anticipate)
+                //.anticipate(derivedTemporal && d.anticipate)
                 .log( Global.DEBUG ? d.rule : "Derived");
 
         if (!complete(derived))

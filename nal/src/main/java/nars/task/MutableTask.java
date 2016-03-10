@@ -269,15 +269,15 @@ public class MutableTask extends AbstractTask {
     }
 
 
-    /** flag used for anticipatable derivation */
-    @NotNull
-    public MutableTask anticipate(boolean a) {
-        if (state==TaskState.Executed)
-            throw new RuntimeException("can not anticipate already executed task");
-
-        if (a) state = (TaskState.Anticipated);
-        return this;
-    }
+//    /** flag used for anticipatable derivation */
+//    @NotNull
+//    public MutableTask anticipate(boolean a) {
+//        if (state==TaskState.Executed)
+//            throw new RuntimeException("can not anticipate already executed task");
+//
+//        if (a) state = (TaskState.Anticipated);
+//        return this;
+//    }
 
     @NotNull
     public MutableTask budgetCompoundForward(@NotNull ConceptProcess premise) {
@@ -287,11 +287,6 @@ public class MutableTask extends AbstractTask {
         return this;
     }
 
-    @NotNull
-    public MutableTask state(TaskState s) {
-        this.state = s;
-        return this;
-    }
 
     protected final void punc(char punctuation) {
         if (this.punctuation!=punctuation) {

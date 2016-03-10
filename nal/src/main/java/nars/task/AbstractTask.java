@@ -36,9 +36,6 @@ public abstract class AbstractTask extends UnitBudget
     /** content term of this task */
     private Termed<Compound> term;
 
-    @Nullable
-    protected TaskState state;
-
     protected char punctuation;
 
     private Truth truth;
@@ -239,11 +236,6 @@ public abstract class AbstractTask extends UnitBudget
         return this;
     }
 
-    @Nullable
-    @Override
-    public TaskState state() {
-        return state;
-    }
 
     /** if validated and entered into the system. can be overridden in subclasses to handle this event
      *  isnt called for Command tasks currently; they will be executed right away anyway
@@ -342,7 +334,8 @@ public abstract class AbstractTask extends UnitBudget
 
     @Override
     public final boolean isAnticipated() {
-        return isJudgment() && !isEternal() && (state() == TaskState.Anticipated || isInput());
+        return isJudgment() && !isEternal() &&
+                (/*state() == TaskState.Anticipated ||*/ isInput());
     }
 
     @NotNull

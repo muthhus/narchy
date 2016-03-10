@@ -226,7 +226,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
                     .time(now, solutionOcc)
                     .parent(question, this)
                     .budget(solutionBudget)
-                    .state(state())
+                    //.state(state())
                     //.setEvidence(evidence())
                     .log("Projected Solution")
                     //.log("Projected from " + this)
@@ -370,14 +370,6 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 //        //return projection(when, now).getConfidence();
 //    }
 
-
-    enum TaskState {
-        Anticipated,
-        Executed
-    }
-
-    @Nullable
-    TaskState state();
 
 //    final class Solution extends AtomicReference<Task> {
 //        Solution(Task referent) {

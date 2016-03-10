@@ -31,6 +31,7 @@ import java.util.function.Consumer;
  */
 public class DefaultBeliefTable implements BeliefTable {
 
+    public static final BudgetMerge DuplicateMerge = BudgetMerge.plusDQBlend;
     @NotNull
     final Map<Task,Task> map;
     @NotNull
@@ -221,8 +222,8 @@ public class DefaultBeliefTable implements BeliefTable {
         if (existing!=null) {
             if (existing!=input) {
                 //Average allows duplicate tasks to not explode like plus would
-                BudgetMerge.plusDQBlend.merge(existing.budget(), input.budget(), 1f);
-                ((MutableTask) existing).state(input.state()); //reset execution / anticipated state
+                DuplicateMerge.merge(existing.budget(), input.budget(), 1f);
+                //((MutableTask) existing).state(input.state()); //reset execution / anticipated state
                 nar.remove(input, "Duplicate Belief/Goal");
             }
             return true;
@@ -356,7 +357,7 @@ public class DefaultBeliefTable implements BeliefTable {
                 .truth(conclusion)
                 .parent(newBelief, oldBelief)
                 .time(now, concTime)
-                .state(newBelief.state())
+                //.state(newBelief.state())
                 .because("Insertion Revision");
                 /*.because("Insertion Revision (%+" +
                                 Texts.n2(conclusion.freq() - newBelief.freq()) +
