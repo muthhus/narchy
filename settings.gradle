@@ -1,19 +1,19 @@
-rootProject.name = 'opennars'
-include ':nars_data'
-include ':nars_util'
-include ':nars_logic'
-include ':nars_lab'
-include ':nars_web'
-include ':nars_gui'
-include ':nars_perf'
+rootProject.name = 'narchy'
+include ':logic'
+include ':util'
+include ':nal'
+include ':lab'
+include ':web'
+include ':guifx'
+include ':perf'
 
-project(':nars_data').projectDir = "$rootDir/nars_data" as File
-project(':nars_util').projectDir = "$rootDir/nars_util" as File
-project(':nars_logic').projectDir = "$rootDir/nars_logic" as File
-project(':nars_lab').projectDir = "$rootDir/nars_lab" as File
-project(':nars_web').projectDir = "$rootDir/nars_web" as File
-project(':nars_gui').projectDir = "$rootDir/nars_gui" as File
-project(':nars_perf').projectDir = "$rootDir/nars_perf" as File
+project(':logic').projectDir = "$rootDir/logic" as File
+project(':util').projectDir = "$rootDir/util" as File
+project(':nal').projectDir = "$rootDir/nal" as File
+project(':lab').projectDir = "$rootDir/lab" as File
+project(':web').projectDir = "$rootDir/web" as File
+project(':guifx').projectDir = "$rootDir/guifx" as File
+project(':perf').projectDir = "$rootDir/perf" as File
 
 
 

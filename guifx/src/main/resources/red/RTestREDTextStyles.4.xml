@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- Test incomplete style: TestStyle4 has not got a font size or super style. -->
+<REDConfig>
+	<Style id="TestReduction">
+		<Super>Default</Super>
+	</Style>
+	<Style id="TestDisplayNameAndDescription">
+		<DisplayName>Test Description</DisplayName>
+		<Description>This style is used to test the display name and description property of styles.</Description>
+		<Super>Default</Super>
+	</Style>
+	
+</REDConfig>

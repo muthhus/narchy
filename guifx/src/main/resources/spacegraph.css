@@ -1,0 +1,25 @@
+.code-area {
+    /*-fx-background-color: #262626;*/
+    -fx-font-family: monospace;
+    /*-fx-font-size: 150%;*/
+}
+
+.code-area-default {
+     -fx-fill: white;
+     /*-fx-font-weight: bold;*/
+}
+
+.dark {
+    -fx-background-color: #111;
+    -fx-fill: white;
+}
+
+.windget {
+
+ /*   -fx-background-color: linear-gradient(to top right, #555, #333);*/
+    -fx-padding: 0.5em;
+
+       /*-fx-background-color: radial-gradient(focus-distance -19%, center 50% 50% , radius 36% , #ff8c00, #dc143c, #008b8b);*/
+
+}
+

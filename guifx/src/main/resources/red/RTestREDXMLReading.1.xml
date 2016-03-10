@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<!--
+XML read test input data.
+rli@chello.at
+-->
+<REDConfig>
+aaa
+	<TopLevel id="balrog" level="16">	ccc<SubLevel hobbits="frodo|merry|pippin|sam" direction="forward"></SubLevel>
+	bbb
+	</TopLevel>
+</REDConfig>

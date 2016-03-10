@@ -1,0 +1,41 @@
+{
+  "name": "nars_web",
+  "version": "0.0.0",
+  "homepage": "https://github.com/automenta/opennars",
+  "description": "HTML/JS OpenNARS Web Client",
+  "directory": "lib/",
+  "dependencies": {
+	"jquery":"latest",
+    "jquery-ui":"latest",
+	"lodash":"latest",
+    "cytoscape":"latest",
+    "cytoscape-edgehandles": "latest",
+    "cytoscape-cose-bilkent":"latest",
+    "semantic": "latest",
+    "object-editor": "latest",
+    "grooscript": "latest"
+  },
+  "keywords": [
+    "nars",
+    "ai",
+    "logic",
+    "semantic",
+    "web",
+    "opennars",
+    "inference",
+    "machine",
+    "learning",
+    "ml",
+    "cognitive",
+    "cognition",
+    "bot"
+  ],
+  "license": "GPL",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+
+<REDConfig>
+	<Style id="Default" theme="RTestREDTextStylesTheme">
+		<FontFace>Helvetica</FontFace>
+		<FontSize>12</FontSize>
+		<FontStyle>plain</FontStyle>
+		<Lining>none</Lining>
+		<Foreground red="0" green="0" blue="0"/>
+		<Background red="255" green="255" blue="255"/>
+	</Style>
+	<Style id="TestStyle1">
+		<FontSize>20</FontSize>
+		<Super>Default</Super>
+	</Style>
+	<Style id="TestStyle2">
+		<Super>Default</Super>
+	</Style>
+	<Style id="TestStyle3">
+		<Super>TestStyle2</Super>
+	</Style>
+	<Style id="TestReduction">
+		<FontSize>99</FontSize>
+		<Super>Default</Super>
+		<Description>XXX</Description>
+		<DisplayName>YYY</DisplayName>
+	</Style>
+</REDConfig>
