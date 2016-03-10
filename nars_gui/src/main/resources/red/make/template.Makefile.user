@@ -1,7 +1,0 @@
-# Java Variables
-JAVA_GENDIR_ROOT := d:/rome_test_riverbed
-JAVA_ROME_LIBS := D:/sniff402/winTools4/JavaLibs/rome
-JAVA_ROME_ROOT := c:/usr/jdk-1.3
-
-# Java Compiler variables
-JAVAC_USER_FLAGS = 
