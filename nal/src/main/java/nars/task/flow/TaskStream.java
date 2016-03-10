@@ -9,21 +9,20 @@ import java.util.stream.Stream;
 
 public class TaskStream implements Input {
 
-    private final Iterator<Task> stream;
+    @NotNull private final Iterator<Task> stream;
 
     public TaskStream(@NotNull Stream<Task> s) {
         this(s.iterator());
     }
-    public TaskStream(Iterator<Task> s) {
+    public TaskStream(@NotNull Iterator<Task> s) {
         stream = s;
     }
 
     @Nullable
     @Override
-    public Task get() {
+    public final Task get() {
         Iterator<Task> stream = this.stream;
-        if (!stream.hasNext()) return null;
-        return stream.next();
+        return stream.hasNext() ? stream.next() : null;
     }
 
 }

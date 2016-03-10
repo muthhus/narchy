@@ -77,7 +77,7 @@ public enum DesireFunction implements TruthOperator {
         @Nullable
         @Override public Truth apply(@NotNull final Truth T, @Nullable final Truth B, Memory m, float minConf) {
             if (B == null) return null;
-            return TruthFunctions.intersection(T,B);
+            return TruthFunctions.intersection(T,B,minConf);
         }
     };
 
