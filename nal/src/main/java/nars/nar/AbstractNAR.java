@@ -1,7 +1,6 @@
 package nars.nar;
 
 import nars.Global;
-import nars.Memory;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.concept.DefaultConceptBuilder;
@@ -13,7 +12,6 @@ import nars.op.data.flat;
 import nars.op.data.intToBitSet;
 import nars.op.data.similaritree;
 import nars.op.out.echo;
-import nars.op.sys.java.java;
 import nars.op.sys.reset;
 import nars.op.out.say;
 import nars.op.mental.schizo;
@@ -23,7 +21,6 @@ import nars.op.mental.*;
 import nars.op.data.complexity;
 import nars.op.data.reflect;
 import nars.op.sys.js;
-import nars.op.sys.sys;
 import nars.term.Term;
 import nars.term.TermIndex;
 import nars.term.Terms;
@@ -32,8 +29,6 @@ import nars.term.index.MapIndex2;
 import nars.term.index.MapIndex3;
 import nars.time.Clock;
 import nars.util.data.map.UnifriedMap;
-import nars.util.data.random.XORShiftRandom;
-import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -168,9 +163,6 @@ public abstract class AbstractNAR extends NAR {
 
 
     public final AbstractOperator[] defaultOperators = {
-
-            new java(), //DANGER
-            new sys(), //DANGER
 
             //system control
 

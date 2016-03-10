@@ -4,7 +4,7 @@ apply plugin: 'application'
 
 dependencies {
     //compile project(':util')
-    compile project(':nal')
+    compile project(':app')
 
     compile group: 'org.abego.treelayout', name: 'org.abego.treelayout.core', version: '1.0.3'
 

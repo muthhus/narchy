@@ -1,4 +1,4 @@
-package prolog;
+package nars.prolog;
 
 import junit.framework.TestCase;
 import nars.tuprolog.event.OutputEvent;

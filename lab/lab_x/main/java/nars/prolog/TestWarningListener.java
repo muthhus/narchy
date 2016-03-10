@@ -1,7 +1,7 @@
 /**
  * 
  */
-package prolog;
+package nars.prolog;
 
 import nars.tuprolog.event.WarningEvent;
 import nars.tuprolog.event.WarningListener;

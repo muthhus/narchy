@@ -1,4 +1,4 @@
-package prolog;
+package nars.prolog;
 
 import nars.tuprolog.event.OutputEvent;
 import nars.tuprolog.event.OutputListener;

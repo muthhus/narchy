@@ -2,7 +2,6 @@ package nars.rover.run;
 
 import javafx.scene.layout.VBox;
 import nars.Global;
-import nars.Memory;
 import nars.NAR;
 import nars.Symbols;
 import nars.guifx.NARfx;
@@ -14,14 +13,13 @@ import nars.rover.robot.Arm;
 import nars.rover.robot.NARover;
 import nars.rover.world.FoodSpawnWorld1;
 import nars.time.SimulatedClock;
-import nars.op.sys.NarQ;
-import nars.op.sys.NarQ.BeliefReward;
-import nars.op.sys.NarQ.InputTask;
-import nars.op.sys.NarQ.NotBeliefReward;
+import nars.op.NarQ;
+import nars.op.NarQ.BeliefReward;
+import nars.op.NarQ.InputTask;
+import nars.op.NarQ.NotBeliefReward;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.World;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;

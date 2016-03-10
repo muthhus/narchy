@@ -2,8 +2,6 @@ package nars.guifx.demo;
 
 import nars.Global;
 import nars.nar.Default;
-import nars.op.sys.PrologCore;
-import nars.time.FrameClock;
 
 /**
  * Created by me on 9/7/15.

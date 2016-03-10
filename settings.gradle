@@ -2,14 +2,16 @@ rootProject.name = 'narchy'
 include ':logic'
 include ':util'
 include ':nal'
-include ':lab'
-include ':web'
+include ':app'
 include ':guifx'
+include ':web'
+include ':lab'
 include ':perf'
 
 project(':logic').projectDir = "$rootDir/logic" as File
 project(':util').projectDir = "$rootDir/util" as File
 project(':nal').projectDir = "$rootDir/nal" as File
+project(':app').projectDir = "$rootDir/app" as File
 project(':lab').projectDir = "$rootDir/lab" as File
 project(':web').projectDir = "$rootDir/web" as File
 project(':guifx').projectDir = "$rootDir/guifx" as File

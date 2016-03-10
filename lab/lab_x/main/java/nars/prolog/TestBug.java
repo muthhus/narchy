@@ -4,7 +4,7 @@
  * To change the template for this generated file go to
  * Window - Preferences - Java - Code Generation - Code and Comments
  */
-package prolog;
+package nars.prolog;
 
 import nars.tuprolog.Prolog;
 import nars.tuprolog.SolveInfo;

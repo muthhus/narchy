@@ -2,14 +2,12 @@ package nars.guifx.demo;
 
 import javassist.scopedpool.SoftValueHashMap;
 import nars.Memory;
-import nars.NAR;
 import nars.concept.Concept;
 import nars.concept.DefaultConceptBuilder;
 import nars.nar.Default;
 import nars.op.mental.Abbreviation;
 import nars.op.mental.Anticipate;
 import nars.op.mental.Inperience;
-import nars.op.sys.PrologCore;
 import nars.term.Term;
 import nars.term.index.MapIndex2;
 import nars.time.RealtimeMSClock;

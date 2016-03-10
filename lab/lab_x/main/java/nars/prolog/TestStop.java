@@ -1,4 +1,4 @@
-package prolog;
+package nars.prolog;
 
 import nars.tuprolog.Prolog;
 import nars.tuprolog.SolveInfo;

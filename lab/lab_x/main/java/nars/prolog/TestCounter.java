@@ -1,4 +1,4 @@
-package prolog;
+package nars.prolog;
 
 public class TestCounter {
 	

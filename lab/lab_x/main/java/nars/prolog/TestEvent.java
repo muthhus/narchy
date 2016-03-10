@@ -2,7 +2,7 @@
  * Created on May 23, 2005
  * 
  */
-package prolog;
+package nars.prolog;
 
 import nars.tuprolog.Prolog;
 import nars.tuprolog.SolveInfo;

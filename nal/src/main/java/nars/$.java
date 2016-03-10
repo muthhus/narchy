@@ -7,10 +7,7 @@ import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.net.SyslogAppender;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.ConsoleAppender;
-import nars.op.sys.java.ObjRef;
 import nars.nal.meta.match.VarPattern;
-import nars.op.sys.java.DefaultTermizer;
-import nars.op.sys.java.Termizer;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.*;
@@ -73,9 +70,9 @@ public enum $ /* TODO: implements TermIndex */ {
                 //.normalized();
     }
 
-    public static @NotNull <O> ObjRef<O> ref(String term, O instance) {
-        return new ObjRef(term, instance);
-    }
+//    public static @NotNull <O> ObjRef<O> ref(String term, O instance) {
+//        return new ObjRef(term, instance);
+//    }
 
     @NotNull
     public static Atom the(String id) {
@@ -277,17 +274,17 @@ public enum $ /* TODO: implements TermIndex */ {
     public static Compound sete(@NotNull Collection<? extends Term> t) {
         return (Compound) the(SET_EXT, -1, (Collection)t);
     }
-    @NotNull
-    public static Compound seteCollection(@NotNull Collection<? extends Object> c) {
-
-        Termizer z = new DefaultTermizer();
-
-        //return (Compound) builder.finish(SET_EXT, -1, TermSet.the(t));
-        return $.sete(
-                (Collection<? extends Term>) c.stream().map(
-                        z::term).collect( toCollection((Supplier<TreeSet>) TreeSet::new)));
-
-    }
+//    @NotNull
+//    public static Compound seteCollection(@NotNull Collection<? extends Object> c) {
+//
+//        Termizer z = new DefaultTermizer();
+//
+//        //return (Compound) builder.finish(SET_EXT, -1, TermSet.the(t));
+//        return $.sete(
+//                (Collection<? extends Term>) c.stream().map(
+//                        z::term).collect( toCollection((Supplier<TreeSet>) TreeSet::new)));
+//
+//    }
     /** construct set_ext of key,value pairs from a Map */
     @NotNull
     public static Compound seteMap(@NotNull Map<Term,Term> map) {
