@@ -1,4 +1,4 @@
-buildscript {
+/*buildscript {
    repositories {
        mavenCentral()
    }
@@ -7,16 +7,16 @@ buildscript {
        classpath 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.1.9'
        pitest 'org.pitest.plugins:pitest-fancy-plugin:0.0.1'
    }
-}
-plugins {
+}*/
+/*plugins {
     id "info.solidsoft.pitest" version "1.1.4" //http://gradle-pitest-plugin.solidsoft.info/
-}
+}*/
 
 description = 'App Tools'
 
 
 apply plugin: 'application'
-apply plugin: 'jacoco'
+//apply plugin: 'jacoco'
 
 dependencies {
 

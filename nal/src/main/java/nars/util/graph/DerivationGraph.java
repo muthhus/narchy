@@ -1,4 +1,4 @@
-package nars.util.signal;
+package nars.util.graph;
 
 import com.google.common.collect.Iterables;
 import com.gs.collections.impl.map.mutable.primitive.ObjectIntHashMap;
@@ -7,7 +7,6 @@ import nars.Premise;
 import nars.concept.Concept;
 import nars.concept.ConceptProcess;
 import nars.nal.nal8.AbstractOperator;
-import nars.nar.AbstractNAR;
 import nars.nar.Terminal;
 import nars.task.Task;
 import nars.term.Compound;
@@ -15,9 +14,7 @@ import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.variable.Variable;
-import nars.time.FrameClock;
 import nars.util.Texts;
-import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jgrapht.ext.*;

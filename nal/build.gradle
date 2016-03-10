@@ -14,13 +14,10 @@ plugins {
 
 description = 'Non-Axiomatic Logic'
 
-
-apply plugin: 'application'
 apply plugin: 'jacoco'
 
 dependencies {
 
-    //compile project(':util')
     compile project(':logic')
 
     compile group: 'net.openhft', name: 'affinity', version: '3.0.2'
@@ -34,7 +31,6 @@ dependencies {
 }
 
 
-mainClassName = 'nars.Repl'
 
 //run{
 //    standardInput = System.in
@@ -45,6 +41,7 @@ jacocoTestReport {
         xml.enabled false
         csv.enabled false
         html.destination "${buildDir}/coverage_html"
+
     }
 }
 

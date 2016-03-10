@@ -24,21 +24,21 @@ public class EvalTest {
         assertEquals($.$("(a b c)"), a.term());
     }
 
-    @Test public void testEval1() {
-        assertEquals("(1)",
-                t.eval(
-                        //"(add 1 2)"
-                        "(list 1)"
-                ).toString());
-    }
+//    @Test public void testEval1() {
+//        assertEquals("(1)",
+//                t.eval(
+//                        //"(add 1 2)"
+//                        "(list 1)"
+//                ).toString());
+//    }
 
     @Test public void testStaticMethodInvoke() {
         assertEquals(System.getProperty("java.vm.version"),
                 t.eval("(System/getProperty \"java.vm.version\")").toString() );
     }
-    @Test public void testClojuredCompound() {
-        assertEquals("[\"==>\" ([\"-->\" (a b)] (println x))]", t.eval("(quote <<a-->b> ==> (println x)>)").toString());
-    }
+//    @Test public void testClojuredCompound() {
+//        assertEquals("[\"==>\" ([\"-->\" (a b)] (println x))]", t.eval("(quote <<a-->b> ==> (println x)>)").toString());
+//    }
 
     @Test public void testClojure2() {
             //t.eval("(\"org.junit.Assert/assertTrue\" false)");

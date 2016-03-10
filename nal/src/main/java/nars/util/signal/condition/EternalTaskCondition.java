@@ -422,64 +422,16 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
     }
 
 
-    /** calculates the "cost" of an execution according to certain evaluated condtions
-     *  this is the soonest time at which all output conditions were successful.
-     *  if any conditions were not successful, the cost is infinity
-     * */
-    public static double cost(@NotNull Iterable<EternalTaskCondition> conditions) {
-        long lastSuccess = Tense.TIMELESS;
-        for (EternalTaskCondition e : conditions) {
-            long est = e.successTime;
-            if (est != Tense.TIMELESS) {
-                if (lastSuccess < est) {
-                    lastSuccess = est;
-                }
-            }
-        }
-        if (lastSuccess != Tense.TIMELESS) {
-            //score = 1.0 + 1.0 / (1+lastSuccess);
-            return lastSuccess;
-        }
 
-        return Double.POSITIVE_INFINITY;
-    }
-
-    /** returns a function of the cost characterizing the optimality of the conditions
-     *  monotonically increasing from -1..+1 (-1 if there were errors,
-     *  0..1.0 if all successful.  limit 0 = takes forever, limit 1.0 = instantaneous
-     */
-    public static double score(@NotNull List<EternalTaskCondition> requirements) {
-        double cost = cost(requirements);
-        return Double.isFinite(cost) ? 1.0 / (1.0 + cost) : -1;
-
-    }
 
     @Override
     public final boolean isTrue() {
         return succeeded;
     }
 
-    @Override
-    public void toString(@NotNull PrintStream out) {
-        throw new UnsupportedOperationException(); //USE THE LOGGER
-
-//        out.println(succeeded ? " OK" : "ERR" + '\t' + toString());
-//
-//        BiConsumer<String,Task> printer = (label,s) -> {
-//            out.print('\t' + label + ' ');
-//            out.println(s.explanation().replace("\n", "\n\t\t"));
-//        };
-//
-//        if (valid!=null) {
-//            valid.forEach(s -> printer.accept("VALID", s));
-//        }
-//        if (similar!=null) {
-//            similar.values().forEach(s -> printer.accept("SIMILAR", s));
-//        }
-    }
 
     @Override
-    public void toLogger(@NotNull Logger logger) {
+    public void log(@NotNull Logger logger) {
         String msg = succeeded ? " OK" : "ERR" + '\t' + toString();
         if (succeeded) {
             logger.info(msg);
@@ -508,4 +460,37 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
 
 
     }
+
+
+    /* calculates the "cost" of an execution according to certain evaluated condtions
+     //     *  this is the soonest time at which all output conditions were successful.
+     //     *  if any conditions were not successful, the cost is infinity
+     //     * */
+//    public static double cost(@NotNull Iterable<EternalTaskCondition> conditions) {
+//        long lastSuccess = Tense.TIMELESS;
+//        for (EternalTaskCondition e : conditions) {
+//            long est = e.successTime;
+//            if (est != Tense.TIMELESS) {
+//                if (lastSuccess < est) {
+//                    lastSuccess = est;
+//                }
+//            }
+//        }
+//        if (lastSuccess != Tense.TIMELESS) {
+//            //score = 1.0 + 1.0 / (1+lastSuccess);
+//            return lastSuccess;
+//        }
+//
+//        return Double.POSITIVE_INFINITY;
+//    }
+//
+//    /** returns a function of the cost characterizing the optimality of the conditions
+//     *  monotonically increasing from -1..+1 (-1 if there were errors,
+//     *  0..1.0 if all successful.  limit 0 = takes forever, limit 1.0 = instantaneous
+//     */
+//    public static double score(@NotNull List<EternalTaskCondition> requirements) {
+//        double cost = cost(requirements);
+//        return Double.isFinite(cost) ? 1.0 / (1.0 + cost) : -1;
+//
+//    }
 }

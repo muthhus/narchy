@@ -13,7 +13,7 @@ import nars.nar.Default;
 import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.util.signal.DerivationGraph;
+import nars.util.graph.DerivationGraph;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.nustaq.serialization.FSTConfiguration;

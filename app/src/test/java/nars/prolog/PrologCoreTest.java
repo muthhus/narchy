@@ -1,4 +1,4 @@
-package nars;
+package nars.prolog;
 
 import alice.tuprolog.MalformedGoalException;
 import nars.NAR;

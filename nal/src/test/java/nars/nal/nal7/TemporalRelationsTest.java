@@ -59,7 +59,8 @@ public class TemporalRelationsTest {
 
         d.step();
 
-        assertEquals(3, d.index().size() );
+        int indexSize = d.index().size();
+
 
         assertEquals(2, d.concept("(x==>y)").beliefs().size() );
 
@@ -70,7 +71,7 @@ public class TemporalRelationsTest {
 
         assertEquals(3, d.concept("(x==>y)").beliefs().size() );
 
-        assertEquals(3, d.index().size() ); //remains 3
+        assertEquals(indexSize, d.index().size() ); //remains same amount
 
         d.index().print(System.out);
         d.concept("(x==>y)").print();

@@ -532,7 +532,7 @@ public class TestNAR  {
             }
 
             requires.forEach(c ->
-                c.toLogger(logger)
+                c.log(logger)
             );
 
             if (trace !=null)
