@@ -265,11 +265,11 @@ public class ConceptPane extends BorderPane implements ChangeListener {
                 p.clear();
                 bLinks.forEach(limit, p::add);
 
-                if (!getChildren().equals(p)) {
+                //if (!getChildren().equals(p)) {
                     runLater(this);
-                } else {
+                /*} else {
                     queued.set(false);
-                }
+                }*/
             }
 
         }

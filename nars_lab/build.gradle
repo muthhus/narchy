@@ -4,8 +4,6 @@ dependencies {
   compile project(':nars_util')
   compile project(':nars_logic')
   compile project(':nars_gui')
-    compile group: 'org.boofcv', name: 'visualize', version:'0.21'
-    compile group: 'org.boofcv', name: 'WebcamCapture', version:'0.21'
     compile group: 'org.jogamp.gluegen', name: 'gluegen-rt-main', version:'2.3.2'
     compile group: 'org.jogamp.jogl', name: 'jogl-all-main', version:'2.3.2'
     compile group: 'net.sourceforge.tess4j', name: 'tess4j', version:'2.0.2-SNAPSHOT'

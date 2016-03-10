@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 import java.io.StringWriter;
 import java.util.*;
 
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertTrue;
 
 
 /**

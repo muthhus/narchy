@@ -17,6 +17,7 @@ dependencies {
     compile 'org.apache.commons:commons-lang3:3.4'
 
     compile 'org.clojure:clojure:1.9.0-master-SNAPSHOT'
+    compile 'org.clojure:core.logic:0.8.11-SNAPSHOT'
 
     testCompile 'junit:junit:4.12'
 
