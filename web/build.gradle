@@ -3,6 +3,9 @@ plugins {
 //    id "org.grooscript.conversion" version "1.2.3"
 //    id 'com.github.ksoichiro.web.resource' version '1.6.1'
 }
+apply plugin: 'application'
+
+mainClassName = 'nars.web.WebServer'
 
 description = 'Web Server'
 

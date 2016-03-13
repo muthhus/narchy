@@ -25,11 +25,12 @@ UIFiles
 /cache
 
 jmh-result.text
-nars_logic/tree.xml
-nars_logic/vis.xml
 .gradle/
 */build
 gradle/
 gradlew
 gradlew.bat
+
+nal/tree.xml
+nal/vis.xml
 

@@ -98,6 +98,7 @@ public class HighDim<T extends Termed> extends Spacegraph {
         public void project(float[] x, TermNode target) {
             target.move(x[0], x[1]);
             target.scale(x[2]);
+            target.commit();
         }
     }
 

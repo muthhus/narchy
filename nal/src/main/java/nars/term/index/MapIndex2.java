@@ -246,7 +246,7 @@ public class MapIndex2 extends AbstractMapIndex {
     @Override
     public int size() {
         /** WARNING: not accurate */
-        return data.size() + atoms.size();
+        return data.size();// + atoms.size();
     }
 
     @Override

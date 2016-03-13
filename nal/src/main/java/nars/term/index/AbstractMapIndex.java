@@ -4,7 +4,6 @@ import nars.concept.Concept;
 import nars.nal.meta.match.Ellipsis;
 import nars.term.*;
 import nars.term.atom.Atomic;
-import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,9 +22,13 @@ public abstract class AbstractMapIndex implements TermIndex {
 
 
     public AbstractMapIndex(TermBuilder termBuilder, Function<Term, Concept> conceptBuilder) {
+        this(new HashSymbolMap(), termBuilder, conceptBuilder);
+    }
+
+    public AbstractMapIndex(SymbolMap symbolMap, TermBuilder termBuilder, Function<Term, Concept> conceptBuilder) {
         super();
         this.builder = termBuilder;
-        this.atoms = new SymbolMap(conceptBuilder);
+        this.atoms = symbolMap;
         this.conceptBuilder = conceptBuilder;
     }
 
@@ -67,7 +70,7 @@ public abstract class AbstractMapIndex implements TermIndex {
 
         return key instanceof Compound ?
                 theCompound((Compound) key, createIfMissing)
-                : theAtom(key.term(), createIfMissing);
+                : theAtom((Atomic)key.term(), createIfMissing);
     }
 
 
@@ -98,11 +101,9 @@ public abstract class AbstractMapIndex implements TermIndex {
 //    default Termed getOrAdd(@NotNull Termed t) {
 //    }
 
-    final Termed theAtom(Term t, boolean createIfMissing) {
+    final Termed theAtom(Atomic t, boolean createIfMissing) {
         SymbolMap a = this.atoms;
-        return (t instanceof Atomic) ?
-                (createIfMissing ? a.resolveOrAdd((Atomic)t) : a.resolve((Atomic)t))
-                : t;
+        return (createIfMissing ? a.resolveOrAdd(t, conceptBuilder) : a.resolve(t)) ;
     }
 
     abstract protected Termed theCompound(@NotNull Compound x, boolean create);

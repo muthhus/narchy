@@ -101,7 +101,7 @@ public class MapIndex3 extends MapIndex2 {
 
     @Override
     public int size() {
-        return (int)cache.estimatedSize() + atoms.size(); //HACK
+        return (int)cache.estimatedSize();// + atoms.size(); //HACK
     }
 
     @Override

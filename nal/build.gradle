@@ -22,6 +22,8 @@ dependencies {
 
     compile group: 'net.openhft', name: 'affinity', version: '3.0.2'
 
+    compile group: 'org.fusesource.jansi', name: 'jansi', version: '1.11'
+
     compile 'junit:junit:4.12'
 
     testCompile 'org.jacoco:org.jacoco.agent:0.7.6.201602180812'

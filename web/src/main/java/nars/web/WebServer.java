@@ -8,7 +8,6 @@ import io.undertow.websockets.WebSocketConnectionCallback;
 import io.undertow.websockets.core.*;
 import io.undertow.websockets.extensions.PerMessageDeflateHandshake;
 import io.undertow.websockets.spi.WebSocketHttpExchange;
-import nars.Memory;
 import nars.NAR;
 import nars.NARLoop;
 import nars.nar.Default;
@@ -18,15 +17,13 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 
 import static io.undertow.Handlers.resource;
 import static io.undertow.Handlers.websocket;
 
 
-public class NARWebServer extends PathHandler {
+public class WebServer extends PathHandler {
 
 
     public final NAR nar;
@@ -36,7 +33,7 @@ public class NARWebServer extends PathHandler {
 
     long idleFPS = 7 /* low alpha brainwaves */;
 
-    final static Logger logger = LoggerFactory.getLogger(NARWebServer.class);
+    final static Logger logger = LoggerFactory.getLogger(WebServer.class);
 
     public class WebSocketCore extends AbstractReceiveListener implements WebSocketCallback<Void>, WebSocketConnectionCallback {
 
@@ -172,7 +169,7 @@ public class NARWebServer extends PathHandler {
     }
 
     @SuppressWarnings("HardcodedFileSeparator")
-    public NARWebServer(NAR nar, int httpPort) throws URISyntaxException {
+    public WebServer(NAR nar, int httpPort) throws URISyntaxException {
 
         this.nar = nar;
 
@@ -182,8 +179,11 @@ public class NARWebServer extends PathHandler {
         //TODO use resource path
 
 
-        //URL pc = NARWebServer.class.getResource("./public");
-        File c = new File("./nars_web/src/main/resources/");
+
+
+        //TODO use correct resource path:
+        File c = new File("./web/src/main/resources/");
+        //File c = new File(WebServer.class.getResource("/").getPath());
         logger.info("Serving resources: {}", c.getAbsolutePath());
 
 
@@ -241,7 +241,7 @@ public class NARWebServer extends PathHandler {
 
         int httpPort = args.length < 1 ? 8080 : Integer.parseInt(args[0]);
 
-        new NARWebServer(new Default(1024, 1, 1, 3), httpPort);
+        new WebServer(new Default(1024, 1, 1, 3), httpPort);
 
         /*if (nlp!=null) {
             System.out.println("  NLP enabled, using: " + nlpHost + ":" + nlpPort);
