@@ -11,6 +11,7 @@ import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.World;
 
 import java.awt.*;
+import java.util.*;
 
 /**
  * Human, Animal, Machine, Alien, Ghost
@@ -86,11 +87,15 @@ abstract public class Being {
 
 
             World w = b.m_world;
-            for (int i = 0, layersSize = layers.size(); i < layersSize; i++) {
+
+            java.util.List<LayerDraw> layers = this.layers;
+            int layersSize = layers.size();
+
+            for (int i = 0; i < layersSize; i++) {
                 layers.get(i).drawGround(d, w);
             }
             //TODO draw this after the inbetween
-            for (int i = 0, layersSize = layers.size(); i < layersSize; i++) {
+            for (int i = 0; i < layersSize; i++) {
                 layers.get(i).drawSky(d, w);
             }
             d.setFillColor(color);

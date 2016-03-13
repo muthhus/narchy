@@ -87,7 +87,7 @@ import java.awt.event.KeyListener;
 
         AbstractJoglPanel panel = new Box2DJoglPanel(world, model, controller, config);
 
-        JoglAbstractDraw joglDraw = new JoglDraw(panel);
+
         model.setPanel(panel);
         this.panel = panel;
 
@@ -115,29 +115,29 @@ import java.awt.event.KeyListener;
         
     }
     
-    class PhysPanel extends TestPanelJ2D implements KeyListener {
-
-        public PhysPanel(final TestbedState model, final PhysicsController controller) {
-            super(model,controller);
-            this.addKeyListener(this);
-        }
-        
-        @Override
-            public void keyPressed(KeyEvent e) {
-                PhysicsRun.this.keyPressed(e);
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-
-            }
-
-            @Override
-            public void keyTyped(KeyEvent e) {
-
-            }
-        
-    }
+//    class PhysPanel extends TestPanelJ2D implements KeyListener {
+//
+//        public PhysPanel(final TestbedState model, final PhysicsController controller) {
+//            super(model,controller);
+//            this.addKeyListener(this);
+//        }
+//
+//        @Override
+//            public void keyPressed(KeyEvent e) {
+//                PhysicsRun.this.keyPressed(e);
+//            }
+//
+//            @Override
+//            public void keyReleased(KeyEvent e) {
+//
+//            }
+//
+//            @Override
+//            public void keyTyped(KeyEvent e) {
+//
+//            }
+//
+//    }
 
 //    class PhysPanelGL extends JoglPanel implements KeyListener {
 //
@@ -178,9 +178,9 @@ import java.awt.event.KeyListener;
 //
 //    }
 
-    public void cycle() {
-
-        controller.cycle(1f/simulationRate);
-
-    }
+//    public void cycle() {
+//
+//        controller.cycle(1f/simulationRate);
+//
+//    }
 }

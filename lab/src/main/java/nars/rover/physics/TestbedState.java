@@ -40,7 +40,7 @@ import java.util.Vector;
  */
 public class TestbedState {
   private final DefaultComboBoxModel tests = new DefaultComboBoxModel();
-  private final TestbedSettings settings = new TestbedSettings();
+  public final TestbedSettings settings = new TestbedSettings();
   public PhysicsModel model;
   private final Vector<TestChangedListener> listeners = new Vector<>();
   private final boolean[] keys = new boolean[512];

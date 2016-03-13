@@ -115,7 +115,9 @@ public class Sim extends PhysicsModel {
         this.clock = clock;
         this.world = world;
 
+
         runner = new PhysicsRun(world, 30f, this);
+
 
         init(world);
 
@@ -126,89 +128,89 @@ public class Sim extends PhysicsModel {
 
     }
 
-    public static double normalizeAngle(final double theta) {
-        double normalized = theta % TWO_PI;
-        normalized = (normalized + TWO_PI) % TWO_PI;
-        if (normalized > Math.PI) {
-            normalized -= TWO_PI;
-        }
-        if (normalized < 0) {
-            normalized += TWO_PI;
-        }
-        return normalized;
-    }
+//    public static double normalizeAngle(final double theta) {
+//        double normalized = theta % TWO_PI;
+//        normalized = (normalized + TWO_PI) % TWO_PI;
+//        if (normalized > Math.PI) {
+//            normalized -= TWO_PI;
+//        }
+//        if (normalized < 0) {
+//            normalized += TWO_PI;
+//        }
+//        return normalized;
+//    }
 
-    public static String angleTerm(final float a) {
-        float h = (float) normalizeAngle(a);
-        h /= MathUtils.PI * 2.0f;
-        int i = (int) (h * angleResolution / 1f);
-        if (i == angleResolution) i = 0; //wraparound and eliminate i=angleResolution case
-
-        //final int ha = angleResolution;
-
-//        if (i == 0) {
-//            t = "forward";
-//        } else if (i == angleResolution / 4) {
-//            t = "left";
-//        } else if (i == -angleResolution / 4) {
-//            t = "right";
-//        } else if ((i == (angleResolution / 2 - 1)) || (i == -(angleResolution / 2 - 1))) {
-//            t = "reverse";
-//        } else {
-
-
-        if (angleTerms[i] == null) {
-            angleTerms[i] = "ang" + i;
-
-            //angleTerms[i] = intToBitSet.the(i).toString();
-
+//    public static String angleTerm(final float a) {
+//        float h = (float) normalizeAngle(a);
+//        h /= MathUtils.PI * 2.0f;
+//        int i = (int) (h * angleResolution / 1f);
+//        if (i == angleResolution) i = 0; //wraparound and eliminate i=angleResolution case
 //
-//                String s;
+//        //final int ha = angleResolution;
 //
-//                if (i == 0) s = "(forward, 0)"; //center is special
-//                else {
-//                    if (i > angleResolution/2) i = -(angleResolution/2 - i);
-//                    s = "(" + ((i < 0) ? "left" : "right") + ',' + Math.abs(i) + ")";
-//                }
+////        if (i == 0) {
+////            t = "forward";
+////        } else if (i == angleResolution / 4) {
+////            t = "left";
+////        } else if (i == -angleResolution / 4) {
+////            t = "right";
+////        } else if ((i == (angleResolution / 2 - 1)) || (i == -(angleResolution / 2 - 1))) {
+////            t = "reverse";
+////        } else {
 //
-//                angleTerms[i+ha] = s;
-        }
-
-        //}
-
-        return angleTerms[i];
-    }
-
-    /**
-     * maps a value (which must be in range 0..1.0) to a term name
-     */
-    public static String f5(double p) {
-        if (p < 0) {
-            throw new RuntimeException("Invalid value for: " + p);
-        }
-        if (p > 0.99f) {
-            p = 0.99f;
-        }
-        int i = (int) (p * 10f);
-        switch (i) {
-            case 9:
-                return "5";
-            case 8:
-            case 7:
-                return "4";
-            case 6:
-            case 5:
-                return "3";
-            case 4:
-            case 3:
-                return "2";
-            case 2:
-            case 1:
-                return "1";
-            default:
-                return "0";
-        }
-    }
+//
+//        if (angleTerms[i] == null) {
+//            angleTerms[i] = "ang" + i;
+//
+//            //angleTerms[i] = intToBitSet.the(i).toString();
+//
+////
+////                String s;
+////
+////                if (i == 0) s = "(forward, 0)"; //center is special
+////                else {
+////                    if (i > angleResolution/2) i = -(angleResolution/2 - i);
+////                    s = "(" + ((i < 0) ? "left" : "right") + ',' + Math.abs(i) + ")";
+////                }
+////
+////                angleTerms[i+ha] = s;
+//        }
+//
+//        //}
+//
+//        return angleTerms[i];
+//    }
+//
+//    /**
+//     * maps a value (which must be in range 0..1.0) to a term name
+//     */
+//    public static String f5(double p) {
+//        if (p < 0) {
+//            throw new RuntimeException("Invalid value for: " + p);
+//        }
+//        if (p > 0.99f) {
+//            p = 0.99f;
+//        }
+//        int i = (int) (p * 10f);
+//        switch (i) {
+//            case 9:
+//                return "5";
+//            case 8:
+//            case 7:
+//                return "4";
+//            case 6:
+//            case 5:
+//                return "3";
+//            case 4:
+//            case 3:
+//                return "2";
+//            case 2:
+//            case 1:
+//                return "1";
+//            default:
+//                return "0";
+//        }
+//    }
 
     public static String f(double p) {
         if (p < 0) {
@@ -224,15 +226,21 @@ public class Sim extends PhysicsModel {
 
     public void setFPS(float f) {
         this.fps = f;
+
         delayMS = (long) (1000f / fps);
     }
 
     public void run(float fps) {
         setFPS(fps);
 
+
+        float dt = 1f/fps;
+
         running = true;
         while (running) {
-            //cycle();
+
+            cycle(dt);
+
             try {
                 Thread.sleep(delayMS);
             } catch (InterruptedException e) {
@@ -264,11 +272,24 @@ public class Sim extends PhysicsModel {
         return fixture;
     }
 
-    @Override
-    public void step(float timeStep, TestbedSettings settings, Display panel) {
+//    @Deprecated @Override
+//    public void step(float timeStep, TestbedSettings settings, Display panel) {
+//
+//
+//        super.step(timeStep, settings, panel);
+//
+//        cycle();
+//
+//    }
+
+    public void cycle(float dt) {
+
+        TestbedSettings settings = runner.model.settings;
+        world.step(dt,
+                settings.getSetting(TestbedSettings.VelocityIterations).value,
+                settings.getSetting(TestbedSettings.PositionIterations).value);
 
 
-        super.step(timeStep, settings, panel);
 
         for (int i = 0, robotsSize = robots.size(); i < robotsSize; i++) {
             Being r = robots.get(i);
@@ -276,7 +297,6 @@ public class Sim extends PhysicsModel {
         }
 
         clock.add(1);
-
     }
 
     @Override

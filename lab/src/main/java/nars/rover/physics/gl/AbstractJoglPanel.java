@@ -61,7 +61,7 @@ public abstract class AbstractJoglPanel extends GLCanvas implements Display, GLE
 
     // model can be null
     // if it is null world and debugDraw can be null, because they are retrived from model
-    public AbstractJoglPanel(final World world, final PhysicsController controller, TestbedState model, GLCapabilitiesImmutable config) {
+    public AbstractJoglPanel(final World world, TestbedState model, GLCapabilitiesImmutable config) {
         super(config);
 
         this.world = world;

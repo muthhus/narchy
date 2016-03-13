@@ -63,11 +63,14 @@ public class NARover extends AbstractPolygonBot {
 
     private MotorControls motors;
     private Turret gun;
+    private BeingMaterial material;
 
     public NARover(String id, NAR nar) {
         super(id);
 
         this.nar = nar;
+
+        material = new BeingMaterial(this);
 
         objs = new Lobjects(nar);
 
@@ -281,7 +284,7 @@ public class NARover extends AbstractPolygonBot {
 
     @Override
     public BeingMaterial getMaterial() {
-        return new NARRoverMaterial(this, nar);
+        return material;
     }
 
     @Override
@@ -296,7 +299,7 @@ public class NARover extends AbstractPolygonBot {
 
 
     /** http://stackoverflow.com/questions/20904171/how-to-create-snake-like-body-in-box2d-and-cocos2dx */
-    public Arm addArm(String id, NarQ controller, float ax, float ay, float angle) {
+    public Arm addArm(Being b, String id, NarQ controller, float ax, float ay, float angle) {
 
         int segs = 4;
         float segLength = 3.7f;
@@ -304,7 +307,7 @@ public class NARover extends AbstractPolygonBot {
 
         Arm a = new Arm(id, sim, torso, ax, ay, angle, segs, segLength, thick);
 
-        addEye(id + "e", controller, a.segments.getLast(), 9, new Vec2(0.5f, 0), 1f, (float)(+Math.PI/4f), 2.5f);
+        addEye(b, id + "e", controller, a.segments.getLast(), 9, new Vec2(0.5f, 0), 1f, (float)(+Math.PI/4f), 2.5f);
 
         a.joints.forEach((Consumer<RevoluteJoint>) jj -> {
 
@@ -352,17 +355,17 @@ public class NARover extends AbstractPolygonBot {
 
 
 
-    public void addEye(String id, NarQ controller, Body base, int detail, Vec2 center, float arc, float centerAngle, float distance) {
-        addEye(id, controller, base, 1, detail, center, arc, centerAngle, distance, (v) -> {});
+    public void addEye(Being b, String id, NarQ controller, Body base, int detail, Vec2 center, float arc, float centerAngle, float distance) {
+        addEye(b, id, controller, base, 1, detail, center, arc, centerAngle, distance, (v) -> {});
     }
-    public void addEyeWithMouth(String id, NarQ controller, Body base, int pixels, int detail, Vec2 center, float arc, float centerAngle, float distance, float mouthArc) {
-        addEye(id, controller, base, pixels, detail, center, arc, centerAngle, distance, (v) -> {
+    public void addEyeWithMouth(Being b, String id, NarQ controller, Body base, int pixels, int detail, Vec2 center, float arc, float centerAngle, float distance, float mouthArc) {
+        addEye(b, id, controller, base, pixels, detail, center, arc, centerAngle, distance, (v) -> {
             float angle = v.angle;
             v.setEats(((angle < mouthArc / 2f) || (angle > (Math.PI * 2f) - mouthArc / 2f)));
         });
     }
 
-    public void addEye(String id, NarQ controller, Body base, int pixels, int detail, Vec2 center, float arc, float centerAngle, float distance, Consumer<VisionRay> each) {
+    public void addEye(Being b, String id, NarQ controller, Body base, int pixels, int detail, Vec2 center, float arc, float centerAngle, float distance, Consumer<VisionRay> each) {
 
         float aStep = (float) (Math.PI * 2f)/pixels * (arc);
 
@@ -408,7 +411,8 @@ public class NARover extends AbstractPolygonBot {
                 controller.input.add(value);
             }
 
-            //draw.addLayer(v);
+            b.getMaterial().layers.add(v);
+
             senses.add(v);
         }
 

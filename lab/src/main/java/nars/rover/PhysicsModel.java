@@ -74,7 +74,8 @@ public abstract class PhysicsModel extends Bodies implements ContactListener, Ru
     private int pointCount;
     private int stepCount;
 
-    @Deprecated private TestbedState model;
+//    @Deprecated
+//    protected TestbedState model;
     protected DestructionListener destructionListener;
 
     private String title = null;
@@ -143,41 +144,41 @@ public abstract class PhysicsModel extends Bodies implements ContactListener, Ru
     public void postSolve(Contact contact, ContactImpulse impulse) {
     }
 
-    @Deprecated public void init(TestbedState model) {
-        this.model = model;
-
-
-
-
-        mouseTracing = false;
-        mouseTracerPosition.setZero();
-        mouseTracerVelocity.setZero();
-
-        BodyDef bodyDef = new BodyDef();
-        groundBody = world.createBody(bodyDef);
-
-        pointCount = 0;
-        stepCount = 0;
-        //model.getDebugDraw().setViewportTransform(camera.getTransform());
-
-        world.setDestructionListener(destructionListener);
-
-        world.setContactListener(this);
-
-        title = getTestName();
-        initTest(false);
-
-        init(world);
-
-
-
-        //world.setDebugDraw(new JoglDraw((AbstractJoglPanel) panel));
-        world.setAllowSleep(true);
-        world.setWarmStarting(false);
-        world.setSubStepping(false); //settings.getSetting(TestbedSettings.SubStepping).enabled);
-        world.setContinuousPhysics(true); //settings.getSetting(TestbedSettings.ContinuousCollision).enabled);
-
-    }
+//    @Deprecated public void init(TestbedState model) {
+//
+//
+//
+//
+//
+//        mouseTracing = false;
+//        mouseTracerPosition.setZero();
+//        mouseTracerVelocity.setZero();
+//
+//        BodyDef bodyDef = new BodyDef();
+//        groundBody = world.createBody(bodyDef);
+//
+//        pointCount = 0;
+//        stepCount = 0;
+//        //model.getDebugDraw().setViewportTransform(camera.getTransform());
+//
+//        world.setDestructionListener(destructionListener);
+//
+//        world.setContactListener(this);
+//
+//        title = getTestName();
+//        initTest(false);
+//
+//        init(world);
+//
+//
+//
+//        //world.setDebugDraw(new JoglDraw((AbstractJoglPanel) panel));
+//        world.setAllowSleep(true);
+//        world.setWarmStarting(false);
+//        world.setSubStepping(false); //settings.getSetting(TestbedSettings.SubStepping).enabled);
+//        world.setContinuousPhysics(true); //settings.getSetting(TestbedSettings.ContinuousCollision).enabled);
+//
+//    }
 
 
     /**
@@ -187,12 +188,12 @@ public abstract class PhysicsModel extends Bodies implements ContactListener, Ru
         return world;
     }
 
-    /**
-     * Gets the testbed model
-     */
-    public TestbedState getModel() {
-        return model;
-    }
+//    /**
+//     * Gets the testbed model
+//     */
+//    public TestbedState getModel() {
+//        return model;
+//    }
 
 //    /**
 //     * Gets the contact points for the current test
@@ -314,45 +315,45 @@ public abstract class PhysicsModel extends Bodies implements ContactListener, Ru
         return time;
     }
 
-    public void step(float timeStep, TestbedSettings settings, Display panel) {
-    //float hz = settings.getSetting(TestbedSettings.Hz).value;
-
-        
-        this.timeStep = timeStep;
-        this.time += timeStep;
-
-        //camera.update(timeStep);
-
-        if (settings.singleStep && !settings.pause) {
-            settings.pause = true;
-        }
-
-        if (settings.pause) {
-            if (settings.singleStep) {
-                settings.singleStep = false;
-            } else {
-                timeStep = 0;
-            }
-
-      //debugDraw.drawString(5, m_textLine, "****PAUSED****", Color3f.WHITE);
-            //m_textLine += TEXT_LINE_SPACE;
-        }
-        
-        if (timeStep > 0f) {
-            ++stepCount;
-        }        
-
-
-    //pointCount = 0;
-        world.step(timeStep, settings.getSetting(TestbedSettings.VelocityIterations).value, settings.getSetting(TestbedSettings.PositionIterations).value);
-
-        AtomicBoolean dq = this.drawPending;
-        if (!dq.compareAndSet(false, true)) {
-            this.panel = panel;
-            SwingUtilities.invokeLater(this);
-        }
-
-    }
+//    @Deprecated public void step(float timeStep, TestbedSettings settings, Display panel) {
+//    //float hz = settings.getSetting(TestbedSettings.Hz).value;
+//
+//
+//        this.timeStep = timeStep;
+//        this.time += timeStep;
+//
+//        //camera.update(timeStep);
+//
+//        if (settings.singleStep && !settings.pause) {
+//            settings.pause = true;
+//        }
+//
+//        if (settings.pause) {
+//            if (settings.singleStep) {
+//                settings.singleStep = false;
+//            } else {
+//                timeStep = 0;
+//            }
+//
+//      //debugDraw.drawString(5, m_textLine, "****PAUSED****", Color3f.WHITE);
+//            //m_textLine += TEXT_LINE_SPACE;
+//        }
+//
+//        if (timeStep > 0f) {
+//            ++stepCount;
+//        }
+//
+//
+//    //pointCount = 0;
+//        world.step(timeStep, settings.getSetting(TestbedSettings.VelocityIterations).value, settings.getSetting(TestbedSettings.PositionIterations).value);
+//
+//        AtomicBoolean dq = this.drawPending;
+//        if (!dq.compareAndSet(false, true)) {
+//            this.panel = panel;
+//            SwingUtilities.invokeLater(this);
+//        }
+//
+//    }
 
     /** only for drawing called by SwingUtilities */
     @Override public void run() {

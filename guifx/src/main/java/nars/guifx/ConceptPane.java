@@ -3,6 +3,7 @@ package nars.guifx;
 import com.gs.collections.impl.set.mutable.UnifiedSet;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -280,8 +281,9 @@ public class ConceptPane extends BorderPane implements ChangeListener {
             if (!queued.get())
                 return;
 
-            getChildren().clear();
-            pending.stream().map(this::getNode).collect(toCollection(this::getChildren));
+            ObservableList<Node> ch = getChildren();
+            ch.clear();
+            pending.stream().map(this::getNode).collect(toCollection(()->ch));
 
 //            getChildren().forEach(n -> {
 //                if (n instanceof Runnable)

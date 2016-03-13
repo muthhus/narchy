@@ -11,7 +11,6 @@ import org.jbox2d.callbacks.RayCastCallback;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
-import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.World;
 
 /**
@@ -59,9 +58,12 @@ abstract public class VisionRay extends RayCastClosestCallback implements Abstra
         this.distance = length;
         this.resolution = resolution;
         this.rayDrawers = new RayDrawer[resolution]; /** one for each sub-pixel */
+        for (int i = 0; i < resolution; i++)
+            rayDrawers[i] = new RayDrawer(base.getWorld(), i, angle, arc);
 
         sparkColor = new Color3f(0.5f, 0.4f, 0.4f);
         normalColor = new Color3f(0.4f, 0.4f, 0.4f);
+
     }
 
 
@@ -80,14 +82,8 @@ abstract public class VisionRay extends RayCastClosestCallback implements Abstra
 //        root.set( point );
 //        root = base.getWorldPoint( root );
 
-        for (int r = 0; r < resolution; r++) {
-
-            RayDrawer rd = rayDrawers[r];
-            if (rd!=null)
-                rd.update();
-        }
-
-
+        for (RayDrawer r : rayDrawers)
+            r.update();
 
     }
 
@@ -137,14 +133,14 @@ abstract public class VisionRay extends RayCastClosestCallback implements Abstra
     }
 
 
-    public class RayDrawer extends RayCastClosestCallback implements RayCastCallback {
+    public final class RayDrawer extends RayCastClosestCallback implements RayCastCallback {
 
         /** STATE definitely exploiting mutability here */
         public final Vec2 from = new Vec2();
         public final Vec2 to = new Vec2();
         public final Color3f color = new Color3f(0.5f, 0.5f, 0.5f); //current ray color
 
-        private final float baesAngle;
+        private final float baseAngle;
         private final float dArc;
         private final World world;
         private final int id;
@@ -153,7 +149,7 @@ abstract public class VisionRay extends RayCastClosestCallback implements Abstra
 
 
         public RayDrawer(World world, int id, float baseAngle, float dArc) {
-            this.baesAngle = baseAngle;
+            this.baseAngle = baseAngle;
             this.dArc = dArc;
             this.world = world;
             this.id = id;
@@ -163,8 +159,12 @@ abstract public class VisionRay extends RayCastClosestCallback implements Abstra
 
 
         public void update() {
+            from.set(base.getWorldCenter());
+
+            float angle = targetAngle + base.getAngle();
+
             to.set(from);
-            to.addLocal(distance * (float) Math.cos(targetAngle), distance * (float) Math.sin(targetAngle));
+            to.addLocal(distance * (float) Math.cos(angle), distance * (float) Math.sin(angle));
 
 
             init();
@@ -182,7 +182,14 @@ abstract public class VisionRay extends RayCastClosestCallback implements Abstra
             float minDist = distance * 1.1f; //far enough away
 
             Vec2 endPoint;
-            float hitDist = super.m_point.euclideanDistance(from);
+            float hitDist;
+            if (super.m_point!=null)
+                hitDist = super.m_point.euclideanDistance(from);
+            else {
+                hitDist = Float.POSITIVE_INFINITY; //to.euclideanDistance(from); //TODO may not be necessary to calculate
+                m_hit = false;
+            }
+
             if (hitDist > minDist) {
                 body = null;
                 this.hitDist = minDist; //anything has to be at least this far away
@@ -257,11 +264,11 @@ abstract public class VisionRay extends RayCastClosestCallback implements Abstra
 
         }
 
-
-        @Override
-        public float reportFixture(Fixture fixture, Vec2 point, Vec2 normal, float fraction) {
-            return 0;
-        }
+//
+//        @Override
+//        public float reportFixture(Fixture fixture, Vec2 point, Vec2 normal, float fraction) {
+//            return 0;
+//        }
     }
 
     @Override

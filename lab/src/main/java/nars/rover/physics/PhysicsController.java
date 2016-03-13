@@ -150,105 +150,105 @@ public class PhysicsController {
 //        }
     }
 
-    protected void loopInit() {
-        model.getPanel().grabFocus();
-
-        if (currTest != null) {
-            currTest.init(model);
-        }
-    }
+//    protected void loopInit() {
+//        model.getPanel().grabFocus();
+//
+//        if (currTest != null) {
+//            currTest.init(model);
+//        }
+//    }
 
 //    public PhysicsCamera getCamera() {
 //        if (currTest == null) return null;
 //        return currTest.getCamera();
 //    }
+//
+//    private void initTest(PhysicsModel test) {
+//        test.init(model);
+//        //test.getCamera().setExtents(viewportHalfWidth, viewportHalfHeight);
+//        model.getPanel().grabFocus();
+//    }
 
-    private void initTest(PhysicsModel test) {
-        test.init(model);
-        //test.getCamera().setExtents(viewportHalfWidth, viewportHalfHeight);
-        model.getPanel().grabFocus();
-    }
-
-    /**
-     * Called by the main run loop. If the update behavior is set to
-     * {@link UpdateBehavior#UPDATE_IGNORED}, then this needs to be called
-     * manually to update the input and test.
-     */
-    public void updateTest(float timeStep) {
-        if (resetPending) {
-            if (currTest != null) {
-                currTest.init(model);
-            }
-            resetPending = false;
-            model.getPanel().grabFocus();
-        }
-
-        if (currTest == null) {
-
-                inputQueue.clear();
-                return;
-            
-        }
-        //IViewportTransform transform = currTest.getCamera().getTransform();
-        // process our input
-        while (!inputQueue.isEmpty()) {
-            QueueItem i = null;
-
-                if (!inputQueue.isEmpty()) {
-                    i = inputQueue.pop();
-                }
-
-            if (i == null) {
-                continue;
-            }
-
-            /*
-             boolean oldFlip = transform.isYFlip();
-             if (mouseBehavior == MouseBehavior.FORCE_Y_FLIP) {
-             transform.setYFlip(true);
-             }
-             currTest.getCamera().getTransform().getScreenToWorld(i.p, i.p);
-             if (mouseBehavior == MouseBehavior.FORCE_Y_FLIP) {
-             transform.setYFlip(oldFlip);
-             }
-             */
-            switch (i.type) {
-                case KeyPressed:
-                    if (i.c != KeyEvent.CHAR_UNDEFINED) {
-                        model.getKeys()[i.c] = true;
-                    }
-                    model.getCodedKeys()[i.code] = true;
-                    currTest.keyPressed(i.c, i.code);
-                    break;
-                case KeyReleased:
-                    if (i.c != KeyEvent.CHAR_UNDEFINED) {
-                        model.getKeys()[i.c] = false;
-                    }
-                    model.getCodedKeys()[i.code] = false;
-                    currTest.keyReleased(i.c, i.code);
-                    break;
-                case MouseDown:
-                    currTest.mouseDown(i.p, i.button);
-                    break;
-                case MouseMove:
-                    currTest.mouseMove(i.p);
-                    break;
-                case MouseUp:
-                    currTest.mouseUp(i.p, i.button);
-                    break;
-                case MouseDrag:
-                    currTest.mouseDrag(i.p, i.button);
-                    break;
-//                case Pause:
-//                    model.getSettings().pause = !model.getSettings().pause;
+//    /**
+//     * Called by the main run loop. If the update behavior is set to
+//     * {@link UpdateBehavior#UPDATE_IGNORED}, then this needs to be called
+//     * manually to update the input and test.
+//     */
+//    public void updateTest(float timeStep) {
+//        if (resetPending) {
+//            if (currTest != null) {
+//                currTest.init(model);
+//            }
+//            resetPending = false;
+//            model.getPanel().grabFocus();
+//        }
+//
+//        if (currTest == null) {
+//
+//                inputQueue.clear();
+//                return;
+//
+//        }
+//        //IViewportTransform transform = currTest.getCamera().getTransform();
+//        // process our input
+//        while (!inputQueue.isEmpty()) {
+//            QueueItem i = null;
+//
+//                if (!inputQueue.isEmpty()) {
+//                    i = inputQueue.pop();
+//                }
+//
+//            if (i == null) {
+//                continue;
+//            }
+//
+//            /*
+//             boolean oldFlip = transform.isYFlip();
+//             if (mouseBehavior == MouseBehavior.FORCE_Y_FLIP) {
+//             transform.setYFlip(true);
+//             }
+//             currTest.getCamera().getTransform().getScreenToWorld(i.p, i.p);
+//             if (mouseBehavior == MouseBehavior.FORCE_Y_FLIP) {
+//             transform.setYFlip(oldFlip);
+//             }
+//             */
+//            switch (i.type) {
+//                case KeyPressed:
+//                    if (i.c != KeyEvent.CHAR_UNDEFINED) {
+//                        model.getKeys()[i.c] = true;
+//                    }
+//                    model.getCodedKeys()[i.code] = true;
+//                    currTest.keyPressed(i.c, i.code);
 //                    break;
-            }
-        }
-
-        if (currTest != null) {
-            currTest.step(timeStep, model.getSettings(), model.getPanel());
-        }
-    }
+//                case KeyReleased:
+//                    if (i.c != KeyEvent.CHAR_UNDEFINED) {
+//                        model.getKeys()[i.c] = false;
+//                    }
+//                    model.getCodedKeys()[i.code] = false;
+//                    currTest.keyReleased(i.c, i.code);
+//                    break;
+//                case MouseDown:
+//                    currTest.mouseDown(i.p, i.button);
+//                    break;
+//                case MouseMove:
+//                    currTest.mouseMove(i.p);
+//                    break;
+//                case MouseUp:
+//                    currTest.mouseUp(i.p, i.button);
+//                    break;
+//                case MouseDrag:
+//                    currTest.mouseDrag(i.p, i.button);
+//                    break;
+////                case Pause:
+////                    model.getSettings().pause = !model.getSettings().pause;
+////                    break;
+//            }
+//        }
+//
+////        if (currTest != null) {
+////            currTest.step(timeStep, model.getSettings(), model.getPanel());
+////        }
+//    }
 
     public void nextTest() {
         int index = model.getCurrTestIndex() + 1;
@@ -340,34 +340,34 @@ public class PhysicsController {
     float timeInSecs;
     long beforeTime, afterTime, updateTime, timeDiff, sleepTime, timeSpent;
 
-    public void cycle(float timeStep) {
-        if (nextTest != null) {
-            initTest(nextTest);
-            model.setRunningTest(nextTest);
-            if (currTest != null) {
-                currTest.exit();
-            }
-            currTest = nextTest;
-            nextTest = null;
-        }
-
-        timeSpent = beforeTime - updateTime;
-        if (timeSpent > 0) {
-            timeInSecs = timeSpent * 1.0f / 1000000000.0f;
-            updateTime = System.nanoTime();
-            frameRate = (frameRate * 0.9f) + (1.0f / timeInSecs) * 0.1f;
-            model.setCalculatedFps(frameRate);
-        } else {
-            updateTime = System.nanoTime();
-        }
-        //TestbedPanel panel = model.getPanel();
-
-        if (currTest != null && updateBehavior == UpdateBehavior.UPDATE_CALLED) {
-            updateTest(timeStep);
-        }
-        frameCount++;
-
-    }
+//    public void cycle(float timeStep) {
+//        if (nextTest != null) {
+//            initTest(nextTest);
+//            model.setRunningTest(nextTest);
+//            if (currTest != null) {
+//                currTest.exit();
+//            }
+//            currTest = nextTest;
+//            nextTest = null;
+//        }
+//
+//        timeSpent = beforeTime - updateTime;
+//        if (timeSpent > 0) {
+//            timeInSecs = timeSpent * 1.0f / 1000000000.0f;
+//            updateTime = System.nanoTime();
+//            frameRate = (frameRate * 0.9f) + (1.0f / timeInSecs) * 0.1f;
+//            model.setCalculatedFps(frameRate);
+//        } else {
+//            updateTime = System.nanoTime();
+//        }
+//        //TestbedPanel panel = model.getPanel();
+//
+//        if (currTest != null && updateBehavior == UpdateBehavior.UPDATE_CALLED) {
+//            updateTest(timeStep);
+//        }
+//        frameCount++;
+//
+//    }
 
 //  public void run() {
 //   

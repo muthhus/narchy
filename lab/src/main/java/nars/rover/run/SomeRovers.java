@@ -11,6 +11,8 @@ import nars.op.mental.Inperience;
 import nars.rover.Sim;
 import nars.rover.robot.Arm;
 import nars.rover.robot.NARover;
+import nars.rover.robot.Spider;
+import nars.rover.robot.Turret;
 import nars.rover.world.FoodSpawnWorld1;
 import nars.time.SimulatedClock;
 import nars.op.NarQ;
@@ -46,7 +48,7 @@ public class SomeRovers {
     public static void main(String[] args) {
 
         Global.DEBUG = false;
-        Global.EXIT_ON_EXCEPTION = true;
+        Global.EXIT_ON_EXCEPTION = false;
 
         //RoverWorld world = new GridSpaceWorld(GridSpaceWorld.newMazePlanet());
         final Sim game = new Sim(new World(), clock);
@@ -55,10 +57,11 @@ public class SomeRovers {
         new FoodSpawnWorld1(game, 64, 48, 48, 0.5f);
 
 
-        //game.add(new Turret("turret"));
 
-//        game.add(new Spider("spider",
-//                3, 3, 0.618f, 30, 30));
+
+        /*game.add(new Spider("spider",
+                3, 3, 0.618f, 30, 30));*/
+
         boolean addNARRover = true;
         boolean addQRover = true;
 
@@ -91,14 +94,14 @@ public class SomeRovers {
     }
 
     public static Default newNAR() {
-        int conceptsFirePerCycle = 24;
+        int conceptsFirePerCycle = 8;
         Default nar = new Default(
                 //new Memory(clock, TermIndex.softMemory(64*1024)),
                 1024, conceptsFirePerCycle, 2, 3);
-        nar.with(
+        /*nar.with(
                 Anticipate.class,
                 Inperience.class
-        );
+        );*/
 
         //nar.logSummaryGT(Systenar.out, 0f);
 //        nar.log(Systenar.out, x -> {
@@ -214,10 +217,10 @@ public class SomeRovers {
         float pi = (float) Math.PI;
 
         //nearsight
-        r.addEyeWithMouth("n", nqSpine, r.torso, 11, 1, new Vec2(2.7f, 0), 0.4f, 0, 20f, pi / 6f);
+        r.addEyeWithMouth(r, "n", nqSpine, r.torso, 11, 1, new Vec2(2.7f, 0), 0.4f, 0, 20f, pi / 6f);
 
         //farsight report http://farsight.org/
-        r.addEye("f", nqSpine, r.torso, 3, 4, new Vec2(2.7f, 0), 0.6f, 0, 35f, (e) -> {
+        r.addEye(r, "f", nqSpine, r.torso, 5, 2, new Vec2(2.7f, 0), 0.6f, 0, 35f, (e) -> {
         });
 
 
@@ -229,9 +232,9 @@ public class SomeRovers {
 //        nqSpine.outs.addAll(ar.controls);
 
 
-        Arm ac = r.addArm("ac", new NarQ(n)/* ... */, 0, 0, 0); //pi * 1.5f
+        Arm ac = r.addArm(r, "ac", new NarQ(n)/* ... */, 0, 0, 0); //pi * 1.5f
         nqSpine.output.addAll(ac.controls);
-        Arm ad = r.addArm("ad", new NarQ(n)/* ... */, 0, 0, 0); //pi * 1.5f
+        Arm ad = r.addArm(r, "ad", new NarQ(n)/* ... */, 0, 0, 0); //pi * 1.5f
         nqSpine.output.addAll(ad.controls);
 
 //        Arm ad = r.addArm("ad", nqArm /* ... */, 0, 0, 0); //pi * 1.5f

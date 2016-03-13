@@ -47,7 +47,7 @@ public class ClassOperator extends TermFunction {
 
     @Override
     public boolean async() {
-        return true;
+        return false;
     }
 
     public static Term methodTerm(@NotNull Method m) {
