@@ -8,11 +8,8 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import static nars.nal.Tense.ETERNAL;
-import static nars.nal.Tense.ITERNAL;
-import static nars.nal.Tense.TIMELESS;
+import static nars.nal.Tense.*;
 
 /**
  * Strategies for solving temporal components of a derivation
@@ -115,7 +112,7 @@ public interface Temporalize {
             }
         }
 
-        return derived.dt(((int)eventDelta) * polarity);
+        return derived.dt(eventDelta * polarity);
     }
 
     /** combine any existant DT's in the premise (assumes both task and belief are present) */
@@ -255,7 +252,7 @@ public interface Temporalize {
 
                     long aTask = tp.subtermTime(ca, ITERNAL);
                     long aBelief = bp.subtermTime(ca, bd);
-                    long bTask = tp.subtermTime(cb, td);
+                    long bTask = tp.subtermTime(cb, ITERNAL);
                     long bBelief = bp.subtermTime(cb, bd);
 
                     if (belief != null) {

@@ -4,7 +4,6 @@ import nars.$;
 import nars.NAR;
 import nars.nal.Tense;
 import nars.term.Operator;
-import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 
 /**

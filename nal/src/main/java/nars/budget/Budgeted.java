@@ -1,8 +1,9 @@
 package nars.budget;
 
 import nars.Memory;
-//import nars.data.BudgetedStruct;
 import org.jetbrains.annotations.NotNull;
+
+//import nars.data.BudgetedStruct;
 
 /**
  * Created by jim on 1/6/2016.

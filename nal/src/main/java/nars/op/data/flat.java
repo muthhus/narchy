@@ -2,8 +2,11 @@ package nars.op.data;
 
 import nars.$;
 import nars.Op;
-import nars.term.*;
 import nars.nal.nal8.operator.TermFunction;
+import nars.term.Compound;
+import nars.term.Operator;
+import nars.term.Term;
+import nars.term.TermIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;

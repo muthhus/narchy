@@ -11,7 +11,6 @@ import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.index.MapIndex2;
-import nars.term.index.MapIndex3;
 import nars.time.FrameClock;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
@@ -61,12 +60,6 @@ public class TermIndexTest {
 //        testIndex(new MapIndex(new SoftValueHashMap(), new SoftValueHashMap()));
 //    }
 
-    @Test public void testCaffeine() {
-        testIndex(new MapIndex3(128, Terms.terms,
-                new DefaultConceptBuilder(
-                        new XorShift128PlusRandom(2), 32, 32
-                )));
-    }
 
     @Test public void testTermSharing5a() {
         testIndex(new MapIndex2(new HashMap<>(),

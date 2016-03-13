@@ -6,12 +6,10 @@ import nars.concept.Concept;
 import nars.task.Task;
 import nars.task.flow.FIFOTaskPerception;
 import nars.term.Term;
-import nars.term.TermIndex;
 import nars.term.Termed;
 import nars.time.Clock;
 import nars.time.FrameClock;
 import nars.util.data.random.XORShiftRandom;
-import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

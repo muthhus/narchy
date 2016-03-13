@@ -9,18 +9,21 @@ import nars.task.Tasked;
 import nars.util.event.CycleReaction;
 import nars.util.event.DefaultTopic;
 import nars.util.event.Topic;
+import nars.util.meter.event.HitMeter;
 import nars.util.signal.condition.EternalTaskCondition;
 import nars.util.signal.condition.ExecutionCondition;
 import nars.util.signal.condition.NARCondition;
 import nars.util.signal.condition.TemporalTaskCondition;
-import nars.util.meter.event.HitMeter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.StringWriter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertTrue;
 

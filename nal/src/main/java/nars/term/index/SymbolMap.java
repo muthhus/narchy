@@ -1,10 +1,10 @@
-package nars.term;
+package nars.term.index;
 
 import nars.concept.AtomConcept;
 import nars.concept.Concept;
+import nars.term.Term;
 import nars.term.atom.Atomic;
 
-import java.io.PrintStream;
 import java.util.function.Function;
 
 /**

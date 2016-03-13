@@ -2,11 +2,9 @@ package nars.concept;
 
 import nars.Global;
 import nars.NAR;
-import nars.Op;
 import nars.bag.BLink;
 import nars.bag.Bag;
 import nars.nal.Tense;
-import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;

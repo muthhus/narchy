@@ -1,14 +1,11 @@
 package nars.term.transform.subst;
 
-import nars.Global;
 import nars.nal.op.ImmediateTermTransform;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.function.BiConsumer;
 
 

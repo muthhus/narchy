@@ -1,6 +1,5 @@
 package nars.nal;
 
-import nars.Op;
 import nars.nal.meta.PremiseEval;
 import nars.nal.meta.PremiseRuleSet;
 import nars.nal.meta.TrieDeriver;

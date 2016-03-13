@@ -2,10 +2,8 @@ package nars.term.index;
 
 import com.gs.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import nars.Op;
-import nars.concept.AtomConcept;
 import nars.concept.Concept;
 import nars.term.*;
-import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -134,8 +132,8 @@ public class MapIndex2 extends AbstractMapIndex {
 
     final Function<TermContainer, SubtermNode> termContainerSubtermNodeFunction =
             k ->
-                new SubtermNode(normalize(k));
-                //new SubtermNodeWithArray(normalize(k));
+                //new SubtermNode(normalize(k));
+                new SubtermNodeWithArray(normalize(k));
 
 
     @Nullable

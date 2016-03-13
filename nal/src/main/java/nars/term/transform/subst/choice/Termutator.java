@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 public abstract class Termutator  {
 
     public final Termlike key;
-    private String asStringCached = null;
+    private String asStringCached;
 
     public Termutator(String key) {
         this($.the(key));

@@ -6,7 +6,6 @@ import nars.bag.Bag;
 import nars.concept.util.BeliefTable;
 import nars.concept.util.TaskTable;
 import nars.task.Task;
-import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;

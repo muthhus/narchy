@@ -2,9 +2,9 @@ package nars.nal.nal8.operator;
 
 
 import nars.$;
-import nars.term.Operator;
 import nars.task.Task;
 import nars.term.Compound;
+import nars.term.Operator;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;

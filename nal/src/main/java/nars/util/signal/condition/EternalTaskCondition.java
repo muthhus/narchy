@@ -1,7 +1,10 @@
 package nars.util.signal.condition;
 
 
-import nars.*;
+import nars.Global;
+import nars.NAR;
+import nars.Narsese;
+import nars.Symbols;
 import nars.nal.Tense;
 import nars.task.Task;
 import nars.task.Tasked;
@@ -17,7 +20,6 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.PrintStream;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.function.Consumer;

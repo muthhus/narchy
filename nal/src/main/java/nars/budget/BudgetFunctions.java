@@ -21,7 +21,6 @@
 package nars.budget;
 
 import nars.Memory;
-import nars.NAR;
 import nars.bag.BLink;
 import nars.concept.ConceptProcess;
 import nars.nal.UtilityFunctions;

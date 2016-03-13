@@ -1,7 +1,7 @@
 package nars.nal.meta;
 
-import nars.term.atom.AtomicStringConstant;
 import nars.term.Term;
+import nars.term.atom.AtomicStringConstant;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;

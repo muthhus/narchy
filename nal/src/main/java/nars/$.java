@@ -1,7 +1,6 @@
 package nars;
 
 import ch.qos.logback.classic.Logger;
-
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.net.SyslogAppender;
@@ -14,7 +13,9 @@ import nars.term.*;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
-import nars.term.variable.*;
+import nars.term.variable.AbstractVariable;
+import nars.term.variable.GenericVariable;
+import nars.term.variable.Variable;
 import nars.truth.Truth;
 import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
@@ -25,11 +26,8 @@ import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeSet;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
-import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 import static nars.Op.*;
 import static nars.nal.Tense.ITERNAL;

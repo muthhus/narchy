@@ -4,7 +4,6 @@ import com.gs.collections.api.set.MutableSet;
 import nars.nal.op.BinaryTermOperator;
 import nars.term.Term;
 import nars.term.TermIndex;
-import nars.term.Termed;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 

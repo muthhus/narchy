@@ -8,25 +8,18 @@ import nars.nal.Deriver;
 import nars.nal.meta.PremiseRule;
 import nars.nal.nal8.AbstractOperator;
 import nars.nal.nal8.operator.TermFunction;
-import nars.op.data.flat;
-import nars.op.data.intToBitSet;
-import nars.op.data.similaritree;
-import nars.op.out.echo;
-import nars.op.sys.reset;
-import nars.op.out.say;
-import nars.op.mental.schizo;
+import nars.op.data.*;
 import nars.op.math.add;
 import nars.op.math.length;
 import nars.op.mental.*;
-import nars.op.data.complexity;
-import nars.op.data.reflect;
+import nars.op.out.echo;
+import nars.op.out.say;
 import nars.op.sys.js;
+import nars.op.sys.reset;
 import nars.term.Term;
 import nars.term.TermIndex;
-import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.term.index.MapIndex2;
-import nars.term.index.MapIndex3;
 import nars.time.Clock;
 import nars.util.data.map.UnifriedMap;
 import org.jetbrains.annotations.NotNull;
@@ -319,6 +312,7 @@ public abstract class AbstractNAR extends NAR {
     }
 
     /** reports all active concepts or those which can be reached */
+    @Override
     @Nullable
     public abstract NAR forEachConcept(Consumer<Concept> recip);
 
@@ -332,13 +326,13 @@ public abstract class AbstractNAR extends NAR {
         }
     }
 
-    public static class DefaultTermIndex2 extends MapIndex3 {
-
-        public DefaultTermIndex2(int capacity, Random random) {
-            super(capacity, Terms.terms, new DefaultConceptBuilder(random, 32, 32));
-
-        }
-
-    }
+//    public static class DefaultTermIndex2 extends MapIndex3 {
+//
+//        public DefaultTermIndex2(int capacity, Random random) {
+//            super(capacity, Terms.terms, new DefaultConceptBuilder(random, 32, 32));
+//
+//        }
+//
+//    }
 
 }

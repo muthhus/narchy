@@ -25,12 +25,8 @@ import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
 import nars.concept.ConceptProcess;
 import nars.task.Task;
-import nars.term.Compound;
-import nars.term.Term;
 import nars.term.TermIndex;
 import nars.term.atom.Atom;
-import nars.term.atom.Atomic;
-import nars.term.transform.CompoundTransform;
 import nars.time.Clock;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.event.DefaultTopic;
@@ -41,8 +37,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 

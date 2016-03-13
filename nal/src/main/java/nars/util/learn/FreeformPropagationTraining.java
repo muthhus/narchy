@@ -2,7 +2,6 @@ package nars.util.learn;
 
 import org.encog.engine.network.activation.ActivationSigmoid;
 import org.encog.mathutil.error.ErrorCalculation;
-
 import org.encog.neural.freeform.FreeformConnection;
 import org.encog.neural.freeform.FreeformNeuron;
 import org.jetbrains.annotations.NotNull;

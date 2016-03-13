@@ -1,7 +1,6 @@
 package nars.nal.meta.match;
 
 import nars.Op;
-import nars.nal.meta.PremiseEval;
 import nars.nal.meta.PremiseRule;
 import nars.term.Compound;
 import nars.term.Term;

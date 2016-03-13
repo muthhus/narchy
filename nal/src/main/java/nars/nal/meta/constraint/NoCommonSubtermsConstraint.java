@@ -1,15 +1,9 @@
 package nars.nal.meta.constraint;
 
-import nars.Global;
-import nars.term.Compound;
 import nars.term.Term;
-import nars.term.TermBuilder;
 import nars.term.container.TermContainer;
 import nars.term.transform.subst.FindSubst;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Set;
 
 
 public final class NoCommonSubtermsConstraint implements MatchConstraint {

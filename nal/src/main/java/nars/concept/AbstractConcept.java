@@ -1,6 +1,5 @@
 package nars.concept;
 
-import com.sun.jna.WeakIdentityHashMap;
 import javassist.scopedpool.SoftValueHashMap;
 import nars.NAR;
 import nars.bag.BLink;
@@ -16,7 +15,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
-import java.util.WeakHashMap;
 import java.util.function.BiFunction;
 
 /**

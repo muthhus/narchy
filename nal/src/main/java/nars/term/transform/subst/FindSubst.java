@@ -5,7 +5,10 @@ import com.gs.collections.api.set.MutableSet;
 import nars.Global;
 import nars.Op;
 import nars.nal.meta.constraint.MatchConstraint;
-import nars.nal.meta.match.*;
+import nars.nal.meta.match.Ellipsis;
+import nars.nal.meta.match.EllipsisMatch;
+import nars.nal.meta.match.EllipsisTransform;
+import nars.nal.meta.match.ImageMatch;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termlike;
@@ -751,11 +754,7 @@ public abstract class FindSubst extends Versioning implements Subst {
      * elimination
      */
     private boolean putVarX(@NotNull Term /* var */ x, @NotNull Term y) {
-        return putXY(x, y) ?
-                ((x instanceof GenericNormalizedVariable) ?
-                        putYX(x, y) :
-                        true) :
-                false;
+        return putXY(x, y) && (!(x instanceof GenericNormalizedVariable) || putYX(x, y));
     }
 
 

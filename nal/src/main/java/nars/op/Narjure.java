@@ -1,6 +1,9 @@
 package nars.op;
 
-import clojure.lang.*;
+import clojure.lang.Dynajure;
+import clojure.lang.PersistentList;
+import clojure.lang.RT;
+import clojure.lang.Tuple;
 import com.google.common.collect.Lists;
 import nars.Op;
 import nars.term.Compound;
@@ -9,8 +12,6 @@ import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
-
-import java.util.Arrays;
 
 /**
  * Created by me on 3/9/16.

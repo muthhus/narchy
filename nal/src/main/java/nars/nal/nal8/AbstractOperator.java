@@ -25,7 +25,6 @@ import nars.$;
 import nars.NAR;
 import nars.task.Task;
 import nars.term.Operator;
-import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

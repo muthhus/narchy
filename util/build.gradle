@@ -26,13 +26,7 @@ dependencies {
 
     //compile group: 'com.github.jnorthrup', name: 'jype', version: 'LATEST'
 
-    compile group: 'com.googlecode.concurrent-trees', name: 'concurrent-trees', version: '2.5.0'
 
-    compile 'com.github.ben-manes.caffeine:caffeine:2.2.2'
-    /*compile(group: 'org.cache2k', name: 'cache2k-core', version: '0.23') {
-        exclude(module: 'cache2k-jmx-api')
-        exclude(module: 'commons-logging')
-    }*/
 
     compile(group:'de.ruedigermoeller',name:'fst', version:'2.45')
 

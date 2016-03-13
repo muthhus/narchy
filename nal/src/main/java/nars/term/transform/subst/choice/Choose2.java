@@ -5,15 +5,12 @@ import nars.nal.meta.match.EllipsisMatch;
 import nars.term.Term;
 import nars.term.container.ShuffledSubterms;
 import nars.term.container.TermContainer;
-import nars.term.container.TermVector;
 import nars.term.transform.subst.FindSubst;
-import nars.util.data.Util;
 import nars.util.data.array.IntArrays;
 import nars.util.math.Combinations;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
-import java.util.Set;
 
 /**
  * Created by me on 12/22/15.

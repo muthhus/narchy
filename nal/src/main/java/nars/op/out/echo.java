@@ -1,8 +1,8 @@
 package nars.op.out;
 
-import nars.term.Operator;
 import nars.nal.nal8.operator.ImmediateOperator;
 import nars.task.Task;
+import nars.term.Operator;
 import org.jetbrains.annotations.NotNull;
 
 /**

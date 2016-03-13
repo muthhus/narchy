@@ -17,8 +17,11 @@
 
 package nars.op.math;
 
-import nars.term.*;
 import nars.nal.nal8.operator.TermFunction;
+import nars.term.Compound;
+import nars.term.Operator;
+import nars.term.Term;
+import nars.term.TermIndex;
 import org.jetbrains.annotations.NotNull;
 
 /**

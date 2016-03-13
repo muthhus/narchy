@@ -1,16 +1,18 @@
 package nars.nal.op;
 
 import com.google.common.base.Joiner;
-import nars.*;
+import nars.$;
+import nars.Global;
+import nars.NAR;
+import nars.Op;
 import nars.budget.Budget;
 import nars.concept.ConceptProcess;
 import nars.concept.Temporalize;
 import nars.nal.meta.*;
 import nars.nal.meta.match.EllipsisMatch;
-import nars.term.atom.AtomicStringConstant;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Termed;
+import nars.term.atom.AtomicStringConstant;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

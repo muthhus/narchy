@@ -28,6 +28,15 @@ dependencies {
     compile group: 'org.semanticweb.yars', name: 'nxparser-parsers', version: '2.3.3'
     compile group: 'org.apache.commons', name: 'commons-vfs2', version: 2.0
 
+    compile group: 'com.googlecode.concurrent-trees', name: 'concurrent-trees', version: '2.5.0'
+
+    compile 'com.github.ben-manes.caffeine:caffeine:2.2.2'
+    /*compile(group: 'org.cache2k', name: 'cache2k-core', version: '0.23') {
+        exclude(module: 'cache2k-jmx-api')
+        exclude(module: 'commons-logging')
+    }*/
+
+
 //    compile(group: 'org.jacop', name: 'jacop', version: '4.4.0') {
 //        exclude(module: 'log4j')
 //        exclude(module: 'slf4j-log4j12')

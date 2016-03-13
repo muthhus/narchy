@@ -17,7 +17,6 @@ import nars.nal.nal8.operator.TermFunction;
 import nars.op.Narjure;
 import nars.op.in.FileInput;
 import nars.op.in.TextInput;
-
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.task.flow.Input;
@@ -25,7 +24,6 @@ import nars.task.flow.TaskQueue;
 import nars.task.flow.TaskStream;
 import nars.term.*;
 import nars.term.atom.Atom;
-import nars.term.atom.Atomic;
 import nars.term.variable.Variable;
 import nars.time.Clock;
 import nars.util.event.AnswerReaction;
@@ -48,6 +46,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+
 import static nars.Symbols.*;
 import static nars.nal.Tense.ETERNAL;
 import static nars.term.TermIndex.CompoundAnonymizer;

@@ -1,7 +1,5 @@
 package nars.term.atom;
 
-import nars.term.atom.AtomicString;
-
 /**
  * Created by me on 2/18/16.
  */

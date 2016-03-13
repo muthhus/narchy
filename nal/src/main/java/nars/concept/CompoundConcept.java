@@ -7,7 +7,6 @@ import nars.Symbols;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
 import nars.concept.util.*;
-import nars.nal.LocalRules;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
@@ -43,16 +42,16 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
      */
 
     @Nullable
-    private List<Termed> termLinkTemplates = null;
+    private List<Termed> termLinkTemplates;
 
     @Nullable
-    protected QuestionTaskTable questions = null;
+    protected QuestionTaskTable questions;
     @Nullable
-    protected QuestionTaskTable quests = null;
+    protected QuestionTaskTable quests;
     @Nullable
-    protected BeliefTable beliefs = null;
+    protected BeliefTable beliefs;
     @Nullable
-    protected BeliefTable goals = null;
+    protected BeliefTable goals;
 
 
 //    public DefaultConcept(Term term, Memory p) {
@@ -201,8 +200,7 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
 
         //TODO only compute updates if belief was actually added, not merged with duplicate
 
-        {
-//            if (belief!= null && hasQuestions()) {
+        //            if (belief!= null && hasQuestions()) {
 //                //TODO move this to a subclass of TaskTable which is customized for questions. then an arraylist impl of TaskTable can iterate by integer index and not this iterator/lambda
 //                final Task solution = belief;
 //                questions().forEach(question -> {
@@ -213,8 +211,6 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
 //            if (hasGoals) {
 //                updateSuccess(null, successBefore, memory);
 //            }
-
-        }
 
         return belief;
 
@@ -705,6 +701,7 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
      * --an existing one which absorbed the input and will re-fire
      * --a revised/projected task which may or may not remain in the belief table
      */
+    @Override
     @Nullable
     public final Task process(@NotNull final Task task, @NotNull NAR nar) {
 

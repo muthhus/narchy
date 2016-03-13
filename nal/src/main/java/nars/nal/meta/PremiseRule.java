@@ -15,11 +15,16 @@ import nars.nal.meta.match.EllipsisOneOrMore;
 import nars.nal.meta.match.EllipsisTransform;
 import nars.nal.meta.match.EllipsisZeroOrMore;
 import nars.nal.meta.op.*;
-import nars.nal.op.*;
+import nars.nal.op.Derive;
+import nars.nal.op.Solve;
+import nars.nal.op.substitute;
+import nars.nal.op.substituteIfUnifies;
 import nars.op.data.differ;
 import nars.op.data.intersect;
 import nars.op.data.union;
-import nars.term.*;
+import nars.term.Compound;
+import nars.term.Term;
+import nars.term.TermIndex;
 import nars.term.atom.Atomic;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermVector;
@@ -43,8 +48,6 @@ import java.util.function.BiConsumer;
 import static nars.$.*;
 import static nars.Op.VAR_PATTERN;
 import static nars.term.Terms.*;
-import static nars.term.Terms.concat;
-import static nars.term.Terms.terms;
 
 /**
  * A rule which matches a Premise and produces a Task
@@ -346,7 +349,7 @@ public class PremiseRule extends GenericCompound {
                             (Compound)terms.transform(this, UppercaseAtomsToPatternVariables),
                             new PremiseRuleVariableNormalization());
 
-            Compound premiseComponents = (Compound) index.the((Term)tt);
+            Compound premiseComponents = (Compound) index.the(tt);
 
 
             return new PremiseRule( premiseComponents );

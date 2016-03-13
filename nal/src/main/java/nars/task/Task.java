@@ -35,7 +35,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.Reference;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 import static nars.Global.dereference;

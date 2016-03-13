@@ -22,7 +22,6 @@ import static nars.$.the;
 public class PostCondition implements Serializable, Level //since there can be multiple tasks derived per rule
 {
 
-    public static final float HALF = 0.5f;
     public final Term beliefTruth;
     public final Term goalTruth;
 

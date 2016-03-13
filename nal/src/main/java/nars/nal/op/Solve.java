@@ -2,7 +2,9 @@ package nars.nal.op;
 
 import nars.Op;
 import nars.Symbols;
-import nars.nal.meta.*;
+import nars.nal.meta.AtomicBooleanCondition;
+import nars.nal.meta.PremiseEval;
+import nars.nal.meta.TruthOperator;
 import nars.truth.BeliefFunction;
 import nars.truth.DesireFunction;
 import org.jetbrains.annotations.NotNull;

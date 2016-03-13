@@ -3,9 +3,7 @@ package nars.guifx.demo;
 import nars.Global;
 import nars.nar.Default;
 
-/**
- * Created by me on 9/7/15.
- */
+
 public enum NARideDefault {
     ;
 

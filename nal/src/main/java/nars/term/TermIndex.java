@@ -17,7 +17,6 @@ import nars.term.container.TermVector;
 import nars.term.transform.CompoundTransform;
 import nars.term.transform.VariableNormalization;
 import nars.term.transform.subst.Subst;
-import nars.term.variable.GenericVariable;
 import nars.term.variable.Variable;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;

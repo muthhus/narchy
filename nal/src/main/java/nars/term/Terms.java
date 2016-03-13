@@ -1,9 +1,7 @@
 package nars.term;
 
 import com.google.common.collect.Iterators;
-import com.google.common.primitives.SignedBytes;
 import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
-import com.gs.collections.api.block.predicate.primitive.ShortIntPredicate;
 import nars.$;
 import nars.Global;
 import nars.Op;

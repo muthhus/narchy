@@ -3,7 +3,6 @@ package nars.util.signal.condition;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
-import java.io.PrintStream;
 import java.io.Serializable;
 
 /**

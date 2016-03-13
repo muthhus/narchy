@@ -20,7 +20,8 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.nal.Tense.*;
+import static nars.nal.Tense.ETERNAL;
+import static nars.nal.Tense.ITERNAL;
 import static nars.truth.TruthFunctions.eternalize;
 
 /**

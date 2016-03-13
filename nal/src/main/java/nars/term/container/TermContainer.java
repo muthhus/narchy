@@ -8,17 +8,20 @@ import com.gs.collections.impl.factory.Sets;
 import nars.$;
 import nars.Global;
 import nars.Op;
-import nars.term.*;
+import nars.term.Compound;
+import nars.term.Term;
+import nars.term.Termlike;
+import nars.term.Terms;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import static com.gs.collections.impl.factory.Sets.*;
+import static com.gs.collections.impl.factory.Sets.immutable;
+import static com.gs.collections.impl.factory.Sets.mutable;
 
 
 /**
@@ -65,7 +68,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
 
 
 
-    static Predicate2<Object,ImmutableSet> commonSubtermPredicate = (Object yy, ImmutableSet xx) -> {
+    Predicate2<Object,ImmutableSet> commonSubtermPredicate = (Object yy, ImmutableSet xx) -> {
         return xx.contains(yy);
     };
     static @NotNull boolean commonSubterms(@NotNull Term a, @NotNull Term b) {

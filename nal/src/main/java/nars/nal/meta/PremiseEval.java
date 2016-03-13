@@ -1,7 +1,9 @@
 package nars.nal.meta;
 
 import com.gs.collections.api.map.ImmutableMap;
-import nars.*;
+import nars.$;
+import nars.Global;
+import nars.Op;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.concept.ConceptProcess;
@@ -34,7 +36,7 @@ public class PremiseEval extends FindSubst {
 
 
     /** the current premise being evaluated in this context TODO make private again */
-    public transient ConceptProcess premise = null;
+    public transient ConceptProcess premise;
 
     @NotNull
     public final Versioned<Truth> truth;
@@ -50,7 +52,7 @@ public class PremiseEval extends FindSubst {
     //    /**
     //     * current "y"-term being matched against
     //     */
-    public Term term = null;
+    public Term term;
 
 
     int termutesPerMatch, termutes;

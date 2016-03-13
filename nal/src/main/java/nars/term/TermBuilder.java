@@ -11,7 +11,9 @@ import nars.term.container.TermVector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 import static java.util.Arrays.copyOfRange;
 import static nars.Op.*;
