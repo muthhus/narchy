@@ -113,10 +113,11 @@ public class Sim extends PhysicsModel {
 
     public Sim(World world, SimulatedClock clock) {
         this.clock = clock;
+        this.world = world;
 
-        runner = new PhysicsRun(30f, this);
+        runner = new PhysicsRun(world, 30f, this);
 
-        init(this.world = world);
+        init(world);
 
 //        cycle();
 //        protected final void cycle() {
@@ -358,6 +359,7 @@ public class Sim extends PhysicsModel {
 
         @Override
         public void before(Body b, JoglAbstractDraw d, float time) {
+
             d.setFillColor(wallFill);
         }
 

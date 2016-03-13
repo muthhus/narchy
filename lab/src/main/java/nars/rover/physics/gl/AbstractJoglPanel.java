@@ -63,6 +63,11 @@ public abstract class AbstractJoglPanel extends GLCanvas implements Display, GLE
     // if it is null world and debugDraw can be null, because they are retrived from model
     public AbstractJoglPanel(final World world, final PhysicsController controller, TestbedState model, GLCapabilitiesImmutable config) {
         super(config);
+
+        this.world = world;
+
+        this.model = model;
+
         setSize(INIT_WIDTH, INIT_HEIGHT);
         //(new Dimension(600, 600));
         //setAutoSwapBufferMode(true);
@@ -82,9 +87,7 @@ public abstract class AbstractJoglPanel extends GLCanvas implements Display, GLE
             }
         });
 
-        this.world = world;
 
-        this.model = model;
     }
 
     @Override
@@ -495,33 +498,33 @@ defines
 
             gl.glScalef(3, 0.05f, 1); //why is this restoring the balance of dmensions
 
-            for (int a = -8; a < 8; a++) {
-                for (int b = -8; b < 4; b++) {
-                    for (int c = -4; c < 4; c++) {
-                        gl.glPushMatrix();
-
-                        gl.glTranslatef(
-                                a * 10f, b *10f, c * 10f
-                        );
-
-                        gl.glColor4f(100f + (float) Math.sin(a * 3f) * 75f, 100 + 0.5f, ((a ^ b) + c) % 2 == 0 ? 0.9f : 0.1f, 0.7f);
-
-                        gl.glBegin(gl.GL_QUADS);
-
-                        gl.glVertex3f(1.0f, 1.0f, -1.0f);
-
-                        gl.glVertex3f(1.0f, 1.0f, 1.0f);
-
-                        gl.glVertex3f(-1.0f, 1.0f, 1.0f);
-
-                        gl.glVertex3f(-1.0f, 1.0f, -1f);
-
-                        gl.glEnd();
-
-                        gl.glPopMatrix();
-                    }
-                }
-            }
+//            for (int a = -8; a < 8; a++) {
+//                for (int b = -8; b < 4; b++) {
+//                    for (int c = -4; c < 4; c++) {
+//                        gl.glPushMatrix();
+//
+//                        gl.glTranslatef(
+//                                a * 10f, b *10f, c * 10f
+//                        );
+//
+//                        gl.glColor4f(100f + (float) Math.sin(a * 3f) * 75f, 100 + 0.5f, ((a ^ b) + c) % 2 == 0 ? 0.9f : 0.1f, 0.7f);
+//
+//                        gl.glBegin(gl.GL_QUADS);
+//
+//                        gl.glVertex3f(1.0f, 1.0f, -1.0f);
+//
+//                        gl.glVertex3f(1.0f, 1.0f, 1.0f);
+//
+//                        gl.glVertex3f(-1.0f, 1.0f, 1.0f);
+//
+//                        gl.glVertex3f(-1.0f, 1.0f, -1f);
+//
+//                        gl.glEnd();
+//
+//                        gl.glPopMatrix();
+//                    }
+//                }
+//            }
 
             draw(gl, dt);
 

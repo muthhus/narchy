@@ -58,7 +58,7 @@ import java.awt.event.KeyListener;
     private final float simulationRate;
     public final AbstractJoglPanel panel;
 
-    public PhysicsRun(float simulationRate, PhysicsModel... tests) {
+    public PhysicsRun(World world, float simulationRate, PhysicsModel... tests) {
         this.simulationRate = simulationRate;
     // try {
         // UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
@@ -83,14 +83,11 @@ import java.awt.event.KeyListener;
         config.setNumSamples(1);
         //config.setBackgroundOpaque(false);
 
-        World world = model.getWorldCreator().createWorld(model.gravity);
+        //World world = model.getWorldCreator().createWorld(model.gravity);
 
         AbstractJoglPanel panel = new Box2DJoglPanel(world, model, controller, config);
 
         JoglAbstractDraw joglDraw = new JoglDraw(panel);
-
-
-        joglDraw.setPanel(panel);
         model.setPanel(panel);
         this.panel = panel;
 

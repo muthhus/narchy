@@ -1,6 +1,7 @@
 package nars.rover.robot;
 
 import nars.Global;
+import nars.rover.physics.gl.JoglDraw;
 import nars.util.HaiQ;
 import nars.util.Hsom;
 import nars.rover.Sim;
@@ -352,6 +353,6 @@ public class Arm extends Being implements LayerDraw {
         targetColor.set( Util.clamp( -reward), 0.5f, Util.clamp( reward ) );
         draw.drawCircle(tWorld, 0.5f, targetColor);
 
-        draw.drawSegment(hWorld, tWorld, 0.5f, 0.5f, 0.5f, 0.8f, 2f);
+        ((JoglDraw)draw).drawSegment(hWorld, tWorld, 0.5f, 0.5f, 0.5f, 0.8f, 2f);
     }
 }

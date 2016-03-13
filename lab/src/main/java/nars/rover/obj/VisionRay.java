@@ -2,6 +2,7 @@ package nars.rover.obj;
 
 import nars.rover.Sim;
 import nars.rover.physics.gl.JoglAbstractDraw;
+import nars.rover.physics.gl.JoglDraw;
 import nars.rover.physics.j2d.LayerDraw;
 import nars.rover.robot.AbstractPolygonBot;
 import nars.rover.robot.Being;
@@ -265,10 +266,11 @@ abstract public class VisionRay extends RayCastClosestCallback implements Abstra
 
     @Override
     public void drawGround(JoglAbstractDraw d, World w) {
+        JoglDraw dd = (JoglDraw)d;
         for (RayDrawer r : rayDrawers) {
 
             Color3f c = r.color;
-            d.drawSegment(
+            dd.drawSegment(
                     r.from, r.to,
                     c.x, c.y, c.z,
                     0.5f, 1f * 2f);
