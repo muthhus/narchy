@@ -279,7 +279,7 @@ public class NARover extends AbstractPolygonBot {
             e.printStackTrace();
         }
 
-        gun = new Turret(sim);
+        gun = new Turret(sim, this);
     }
 
     @Override

@@ -27,11 +27,9 @@ public class Turret implements LayerDraw {
     final float fireProbability = 0.005f;
     private final Sim sim;
 
-    public Turret(Sim sim) {
+    public Turret(Sim sim, Being owner) {
         this.sim = sim;
-        ///sim.getModel().getPanel().addLayer(this); //HACKAAHACK
-
-
+        owner.getMaterial().layers.add(this);
     }
 
 

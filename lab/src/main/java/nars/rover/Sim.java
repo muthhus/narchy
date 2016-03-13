@@ -109,7 +109,7 @@ public class Sim extends PhysicsModel {
     private long delayMS;
     private float fps;
     private boolean running = false;
-    final PhysicsRun runner;
+    public final PhysicsRun runner;
 
     public Sim(World world, SimulatedClock clock) {
         this.clock = clock;

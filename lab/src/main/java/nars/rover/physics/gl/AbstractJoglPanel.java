@@ -5,13 +5,13 @@ import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.glu.GLU;
 import com.sun.prism.impl.BufferUtil;
 import nars.rover.physics.Display;
-import nars.rover.physics.PhysicsController;
 import nars.rover.physics.TestbedState;
 import org.jbox2d.dynamics.World;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.nio.FloatBuffer;
+import java.util.Arrays;
 
 import static com.jogamp.opengl.fixedfunc.GLMatrixFunc.GL_MODELVIEW;
 import static com.jogamp.opengl.fixedfunc.GLMatrixFunc.GL_PROJECTION;
@@ -288,6 +288,9 @@ axis.
 
             //amount = (float)Math.log(amount)/5f; //prefilter curve the amount actually turning
 
+            if (!mousePressed[MouseEvent.BUTTON1])
+                return;
+
             heading -= amount * angleSpeed;
 
             cosb = (float) Math.toRadians(Math.cos(heading));
@@ -313,6 +316,8 @@ axis.
 
             //amount = (float)Math.log(amount)/5f; //prefilter curve the amount actually turning
 
+            if (!mousePressed[MouseEvent.BUTTON1])
+                return;
 
             pitch -= amount * angleSpeed;
 
@@ -406,6 +411,7 @@ axis.
             float period = 1f;
 
             //lastTime=now;
+
 
             Point l = MouseInfo.getPointerInfo().getLocation();
             dx = l.x;
@@ -548,6 +554,8 @@ defines
     private int shoot = InputEvent.BUTTON1_MASK;
     private int use = InputEvent.BUTTON3_MASK;
 
+    final boolean mousePressed[] = new boolean[6];
+
     public void init(GLAutoDrawable drawable) {
 
 
@@ -629,7 +637,19 @@ defines
         this.addMouseListener(new MouseAdapter() {
 
             @Override
+            public void mousePressed(MouseEvent e) {
+                int bb = e.getButton();
+                if (bb < mousePressed.length)
+                    mousePressed[bb] = true;
+            }
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                int bb = e.getButton();
+                if (bb < mousePressed.length)
+                    mousePressed[bb] = false;
+            }
 
+            @Override
             public void mouseClicked(MouseEvent e) {
 
                 if ((e.getModifiers() & shoot) != 0)

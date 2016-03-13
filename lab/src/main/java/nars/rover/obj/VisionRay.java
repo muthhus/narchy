@@ -201,6 +201,8 @@ abstract public class VisionRay extends RayCastClosestCallback implements Abstra
             if (m_hit) {
                 float d = m_point.sub(from).length() / distance;
 
+                to.set(m_point);
+
                 /*if (drawing)*/ {
                     color.set(laserHitColor);
                     color.z = Math.min(1.0f, laserUnhitColor.x + 0.75f * (1.0f - d));
@@ -280,7 +282,7 @@ abstract public class VisionRay extends RayCastClosestCallback implements Abstra
             dd.drawSegment(
                     r.from, r.to,
                     c.x, c.y, c.z,
-                    0.5f, 1f * 2f);
+                    0.5f /* alpha */, 1f * 2f /* width */);
 
         }
     }

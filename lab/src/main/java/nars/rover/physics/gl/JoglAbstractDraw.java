@@ -216,10 +216,11 @@ public abstract class JoglAbstractDraw extends DebugDraw {
                 assert (vertexCount <= MAX_POLYGON_VERTICES);
                 Vec2[] vertices = tlvertices.get(MAX_POLYGON_VERTICES);
 
+                Vec2[] mvert = poly.m_vertices;
+                Transform xf = this.xf;
 
                 for (int i = 0; i < vertexCount; ++i) {
-                    // vertices[i] = Mul(xf, poly.m_vertices[i]);
-                    Transform.mulToOut(xf, poly.m_vertices[i], vertices[i]);
+                    Transform.mulToOut(xf, mvert[i], vertices[i]);
                 }
                 if (wireframe) {
                     drawPolygon(vertices, vertexCount, color);

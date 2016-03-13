@@ -139,7 +139,7 @@ public class SomeRovers {
         nar.shortTermMemoryHistory.set(3);
         nar.executionThreshold.setValue(0.0f);
 
-        boolean gui = false;
+        boolean gui = true;
         if (gui) {
             //NARide.loop(nar, false);
 
@@ -153,7 +153,7 @@ public class SomeRovers {
                         //new TilePane(Orientation.VERTICAL),
                         new VBox(),
                         "MotorControls(#x,motor,(),#z)",
-                        fire,
+                        //fire,
                         motorLeft,
                         motorRight,
                         motorForward,
@@ -202,7 +202,7 @@ public class SomeRovers {
         nqSpine.output.addAll(
                 Stream.of(n.terms(
                         motorStop,
-                        fire,
+                        //fire,
                         motorForward, motorBackward, motorLeft, motorRight))
                         .map(t -> new InputTask(n, t, Symbols.GOAL, false))
                         .collect(Collectors.toList())
