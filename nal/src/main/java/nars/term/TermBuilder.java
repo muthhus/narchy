@@ -64,8 +64,9 @@ public abstract class TermBuilder {
                     return image(op, u);
                 } else if ((relation == -1) || (relation > u.length)) {
                     return null;
-                } else
-                    return finish(op, relation, ITERNAL, tt); //continued below
+                } else {
+                    return finish(op, relation, ITERNAL, tt);
+                }
 
             case DIFF_EXT:
             case DIFF_INT:
@@ -74,11 +75,15 @@ public abstract class TermBuilder {
                 return newIntersectEXT(u);
             case INTERSECT_INT:
                 return newIntersectINT(u);
-            default:
-                return op.isStatement() ? statement(op, t, u) : finish(op, relation, t, tt);
+
+            case SET_EXT_OPENER:
+            case SET_INT_OPENER:
+                if (u.length == 0)
+                    return null; /* emptyset */
 
         }
 
+        return op.isStatement() ? statement(op, t, u) : finish(op, relation, t, tt);
 
     }
 

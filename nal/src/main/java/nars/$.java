@@ -33,7 +33,6 @@ import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 import static nars.Op.*;
 import static nars.nal.Tense.ITERNAL;
-import static nars.term.Terms.ZeroSetExt;
 
 /**
  * core utility class for:
@@ -314,9 +313,8 @@ public enum $ /* TODO: implements TermIndex */ {
 
     @NotNull
     public static Compound sete(Term... t) {
-        return ((t != null) && (t.length > 0)) ?
-                (Compound) the(SET_EXT, t) :
-                ZeroSetExt;
+        return (Compound) the(SET_EXT, t);
+
     }
 
     /** shorthand for extensional set */

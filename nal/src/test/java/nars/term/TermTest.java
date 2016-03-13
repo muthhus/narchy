@@ -812,11 +812,13 @@ public class TermTest {
     }
 
     @Test public void testEmptySetEquality()  {
+        assertEquals( null, $("{}"));
+        assertEquals( null, $("[]"));
+
         assertEquals( $("{}"),$("{}") );
         assertEquals( $("[]"),$("[]") );
+
         assertEquals( $("()"),$("()") );
-        assertEquals( $("{}"),Terms.ZeroSetExt);
-        assertEquals( $("[]"),Terms.ZeroSetInt);
         assertEquals( $("()"),Terms.ZeroProduct);
     }
 }

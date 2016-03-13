@@ -207,8 +207,6 @@ public interface TermIndex  {
             //?
         } else if (resultSize == 0) {
             switch (sop) {
-                case SET_EXT_OPENER: return Terms.ZeroSetExt;
-                case SET_INT_OPENER: return Terms.ZeroSetInt;
                 case PRODUCT: return Terms.ZeroProduct;
                 default:
                     return src;

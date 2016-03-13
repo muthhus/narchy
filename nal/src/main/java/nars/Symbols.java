@@ -84,7 +84,7 @@ public enum Symbols {
 
     /* special characters in argument list */
     public static final char ARGUMENT_SEPARATOR = ',';
-    public static final String ARGUMENT_SEPARATOR_PRETTY = ", ";
+    //public static final String ARGUMENT_SEPARATOR_PRETTY = ", ";
     public static final char IMAGE_PLACE_HOLDER = '_';
     
 

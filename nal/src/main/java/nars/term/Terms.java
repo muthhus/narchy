@@ -38,8 +38,6 @@ public class Terms extends TermBuilder implements TermIndex {
     public static final Term[] ZeroTermArray = new Term[0];
     public static final TermContainer ZeroSubterms = new EmptyTermContainer();
     public static final Compound ZeroProduct = $.compound(Op.PRODUCT, ZeroSubterms);
-    public static final Compound ZeroSetExt = $.compound(Op.SET_EXT, ZeroSubterms);
-    public static final Compound ZeroSetInt = $.compound(Op.SET_INT, ZeroSubterms);
     public static final IntFunction<Term[]> NewTermArray = Term[]::new;
 
 
@@ -641,10 +639,7 @@ public class Terms extends TermBuilder implements TermIndex {
 
     public static Term empty(@NotNull Op op) {
         switch (op) {
-            case SET_EXT_OPENER:
-                return ZeroSetExt;
-            case SET_INT_OPENER:
-                return ZeroSetInt;
+
             case PRODUCT:
                 return ZeroProduct;
             default:

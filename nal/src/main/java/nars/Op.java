@@ -57,9 +57,8 @@ public enum Op {
     SPACE("+", true, 7, Args.GTEOne),
 
 
-    /* CompountTerm delimiters, must use 4 different pairs */
-    SET_INT_OPENER("[", true, 2, Args.GTEZero), //OPENER also functions as the symbol for the entire compound
-    SET_EXT_OPENER("{", true, 2, Args.GTEZero), //OPENER also functions as the symbol for the entire compound
+    SET_INT_OPENER("[", true, 2, Args.GTEOne), //OPENER also functions as the symbol for the entire compound
+    SET_EXT_OPENER("{", true, 2, Args.GTEOne), //OPENER also functions as the symbol for the entire compound
 
 
     IMPLICATION("==>", 5, OpType.Relation, Args.Two),
