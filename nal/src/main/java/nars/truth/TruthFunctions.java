@@ -172,7 +172,7 @@ public final class TruthFunctions extends UtilityFunctions {
      * @return AnalyticTruth value of the conclusion, because it is structural
      */
     @Nullable
-    public static Truth deduction(@NotNull Truth a, float reliance, float minConf) {
+    public static Truth deductionR(@NotNull Truth a, float reliance, float minConf) {
         if (a == null) return null;
 
         float f = a.freq();
@@ -187,21 +187,21 @@ public final class TruthFunctions extends UtilityFunctions {
      * @return (non-Analytic) Truth value of the conclusion - normal truth because this is based on 2 premises
      */
     @NotNull
-    public static Truth deduction(@NotNull Truth a, @NotNull Truth b) {
-        return deductionB(a, b.freq(), b.conf());
+    public static Truth deduction(@NotNull Truth a, @NotNull Truth b, float minConf) {
+        return deductionB(a, b.freq(), b.conf(), minConf);
     }
 
     /** assumes belief freq=1f */
     @NotNull
-    public static Truth deduction1(@NotNull Truth a, float bC) {
-        return deductionB(a, 1f, bC);
+    public static Truth deduction1(@NotNull Truth a, float bC, float minConf) {
+        return deductionB(a, 1f, bC, minConf);
     }
 
     @NotNull
-    public static Truth deductionB(@NotNull Truth a, float bF, float bC) {
+    public static Truth deductionB(@NotNull Truth a, float bF, float bC, float minConf) {
         float f = and(a.freq(), bF);
         float c = and(f, a.conf(), bC);
-        return new DefaultTruth(f, c);
+        return c < minConf ? null : new DefaultTruth(f, c);
     }
 
     /**
@@ -429,7 +429,7 @@ public final class TruthFunctions extends UtilityFunctions {
      */
     @NotNull
     public static Truth reduceDisjunction(@NotNull Truth a, @NotNull Truth b, float minConf) {
-        return deduction(intersection(a, negation(b), minConf), 1.0f, minConf);
+        return deductionR(intersection(a, negation(b), minConf), 1.0f, minConf);
     }
 
     /**
@@ -439,7 +439,7 @@ public final class TruthFunctions extends UtilityFunctions {
     @NotNull
     public static Truth reduceConjunction(@NotNull Truth v1, @NotNull Truth v2, float minConf) {
         Truth v0 = intersection(negation(v1), v2, minConf);
-        return negation(deduction(v0, 1.0f, minConf));
+        return negation(deductionR(v0, 1.0f, minConf));
 
 //        AnalyticTruth x = deduction(
 //                intersection(negation(a), b),

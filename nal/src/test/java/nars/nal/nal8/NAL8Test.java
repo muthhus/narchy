@@ -167,15 +167,17 @@ public class NAL8Test extends AbstractNALTest {
     }
 
     @Test
-    public void goal_deductionWithVariableElmination()  {
-        TestNAR tester = test();
+    public void condition_goal_deductionWithVariableElimination()  {
+        test()
+//        .log()
+                .input("at:(SELF,{t003})!")
+                .inputAt(10, "(goto($1) ==>+5 at:(SELF,$1)).")
 
-        tester.input("at:(SELF,{t001})!");
-        tester.inputAt(10, "(goto($1) ==>+5 at:(SELF,$1)).");
-
-        tester.mustDesire(cycles, "goto({t001})", 1.0f, 0.81f);
+                .mustDesire(cycles*4, "goto({t003})", 1.0f, 0.81f);
 
     }
+
+
     @Test
     public void goal_deduction()  {
         TestNAR tester = test();
@@ -332,15 +334,24 @@ public class NAL8Test extends AbstractNALTest {
     }
 
     @Test
-    public void condition_goal_deduction_3()  {
-        TestNAR tester = test();
+    public void condition_goal_deduction_3simplerReverse()  {
+        test()
+//                .log()
+                .inputAt(1, "at:t003!")
+                .inputAt(1, "(at:$1 ==>+5 goto:$1).")
 
-        tester.input("<(SELF,{t003}) --> at>!");
-        tester.inputAt(10, "(goto($1) ==>+5 <(SELF,$1) --> at>).");
-
-        tester.mustDesire(cycles, "goto({t003})", 1.0f, 0.81f);
+                .mustDesire(cycles*2, "goto:t003", 1.0f, 0.45f);
 
     }
+    public void condition_goal_deduction_3simpler()  {
+        test()
+                .log()
+                .inputAt(1, "at:t003!")
+                .inputAt(1, "(goto:$1 ==>+5 at:$1).")
+
+                .mustDesire(cycles*2, "goto:t003", 1.0f, 0.81f);
+    }
+
 
 
 
