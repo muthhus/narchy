@@ -10,6 +10,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 /**
  * self managed set of processes which run a NAR
  * as a loop at a certain frequency.
+ * TODO extract the hft core reservation to a subclass and put that in the app module, along with the hft dependency
  */
 public class NARLoop implements Runnable {
 
@@ -74,7 +75,7 @@ public class NARLoop implements Runnable {
 
         thread = new Thread(this, n.self + ":loop");
         thread.start();
-        logger.info("startied {}", thread);
+        logger.info("started {}", thread);
     }
 
 
