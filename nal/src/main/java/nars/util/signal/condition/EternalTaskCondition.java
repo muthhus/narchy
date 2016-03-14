@@ -49,11 +49,11 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
     //@Expose
     //public  char punc;
 
-    public  float freqMin;
-    public  float freqMax;
-    public  float confMin;
-    public  float confMax;
-    public  long creationStart, creationEnd; //-1 for not compared
+    public float freqMin;
+    public float freqMax;
+    public float confMin;
+    public float confMax;
+    public long creationStart, creationEnd; //-1 for not compared
 
     /*float tenseCost = 0.35f;
     float temporalityCost = 0.75f;*/
@@ -74,7 +74,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
 
     final transient int maxSimilars = 3;
 
-    protected final TreeMap<Float,Task> similar = new TreeMap();
+    protected final TreeMap<Float, Task> similar = new TreeMap();
 
 //    @Override
 //    public final Truth getTruth() {
@@ -119,15 +119,16 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
         return "(" + Texts.n2(min) + ',' + Texts.n2(max) + ')';
     }
 
-    /** a heuristic for measuring the difference between terms
-     *  in range of 0..100%, 0 meaning equal
-     * */
+    /**
+     * a heuristic for measuring the difference between terms
+     * in range of 0..100%, 0 meaning equal
+     */
     public static float termDistance(@NotNull Term a, @NotNull Term b, float ifLessThan) {
         if (a.equals(b)) return 0;
         //TODO handle TermMetadata terms
 
         float dist = 0;
-        if (a.op()!=b.op()) {
+        if (a.op() != b.op()) {
             //50% for equal term
             dist += 0.2f;
             if (dist >= ifLessThan) return dist;
@@ -141,13 +142,13 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
         }
 
 
-        if (a.size()!=b.size()) {
+        if (a.size() != b.size()) {
             dist += 0.2f;
             if (dist >= ifLessThan) return dist;
         }
 
 
-        if (a.structure()!=b.structure()) {
+        if (a.structure() != b.structure()) {
             dist += 0.2f;
             if (dist >= ifLessThan) return dist;
         }
@@ -229,7 +230,6 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
 //    }
 
 
-
     public boolean matches(@Nullable Task task) {
         if (task == null) {
             return false;
@@ -309,7 +309,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
         float difference = 0;
         Compound tterm = task.term();
         difference +=
-                tterm.equals( term ) ? 0 : (term.volume());
+                tterm.equals(term) ? 0 : (term.volume());
         if (difference >= worstDiff)
             return;
 
@@ -346,7 +346,6 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
             similar.remove(similar.lastEntry().getKey());
         }
     }
-
 
 
 //    public String getFalseReason() {
@@ -424,8 +423,6 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
     }
 
 
-
-
     @Override
     public final boolean isTrue() {
         return succeeded;
@@ -438,19 +435,19 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
         if (succeeded) {
             logger.info(msg);
 
-            if (valid!=null && logger.isTraceEnabled())  {
-                valid.forEach( s -> {
+            if (valid != null && logger.isTraceEnabled()) {
+                valid.forEach(s -> {
                     logger.trace("\t{}", s);
                     //logger.debug("\t\t{}", s.getLog());
                     //logger.debug(s.getExplanation().replace("\n", "\n\t\t"));
                 });
             }
         } else {
-            assert(valid.isEmpty());
+            assert (valid.isEmpty());
 
             logger.error(msg);
 
-            if (similar!=null && !similar.isEmpty()) {
+            if (similar != null && !similar.isEmpty()) {
                 similar.values().forEach(s -> {
                     String pattern = "SIM\n{}";
                     logger.info(pattern, s.explanation());
@@ -458,7 +455,6 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
                 });
             }
         }
-
 
 
     }

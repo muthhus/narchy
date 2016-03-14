@@ -18,6 +18,7 @@ import static nars.nal.Tense.*;
 public interface Temporalize {
 
     nars.Premise.OccurrenceSolver latestOccurrence = (t, b) -> t >= b ? t : b;
+    nars.Premise.OccurrenceSolver earliestOccurrence = (t, b) -> t <= b ? t : b;
 
     /**
      *

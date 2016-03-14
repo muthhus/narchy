@@ -256,8 +256,9 @@
 
 
 
-    (A ==> B), B |- A, (Belief:StructuralDeduction, Desire:Deduction, Order:ForAllSame, Event:Anticipate)
-    (A ==> B), A |- B, (Belief:StructuralDeduction, Desire:Induction, Order:ForAllSame)
+//    (A ==> B), B |- A, (Belief:StructuralDeduction, Desire:Deduction, Order:ForAllSame, Event:Anticipate)
+    (A ==> B), A |- B, (Belief:StructuralDeduction, Desire:Induction, Order:ForAllSame),
+                    A, (Belief:StructuralDeduction, Desire:Deduction, Order:ForAllSame, Event:Anticipate)
 
     B, (A ==> B) |- A, (Belief:Deduction, Desire:Deduction, Order:ForAllSame, Event:Anticipate)
     A, (A ==> B) |- B, (Belief:Abduction, Desire:Abduction, Order:ForAllSame)
