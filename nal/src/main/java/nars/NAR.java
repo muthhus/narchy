@@ -457,7 +457,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
                     //ex: java.lang.VerifyError: (class: clojure/core$eval1, method: invokeStatic signature: ()Ljava/lang/Object;) Unable to pop operand off an empty stack
                 }*/ catch (Throwable e) {
                     //HACK
-                    logger.error("{}", e);
+                    logger.warn("eval {}", e);
 
                 }
             }

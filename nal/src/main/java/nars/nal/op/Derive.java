@@ -130,7 +130,7 @@ public class Derive extends AtomicStringConstant implements ProcTerm {
     private static boolean ensureValidVolume(@NotNull Term derived) {
 
         //HARD VOLUME LIMIT
-        boolean valid = derived.volume() <= Global.COMPOUND_VOLUME_MAX;
+        boolean valid = derived.volume() <= Global.compoundVolumeMax;
         if (!valid && Global.DEBUG) {
             //$.logger.error("Term volume overflow");
                 /*c.forEach(x -> {

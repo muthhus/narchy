@@ -98,87 +98,86 @@ public class Default extends AbstractNAR {
 
     }
 
-    final Activator processor = new Activator() {
 
-        final NAR nar = Default.this; //temporary
+    final void accept(@NotNull Task[] input) {
+        accept(input, 1f);
+    }
 
-        @Override
-        public final void accept(@NotNull Task[] input, float activation) {
-            for (Task t : input) {
-                if (t == null) //for null-terminated arrays
+    final void accept(@NotNull Task[] input, float activation) {
+        for (Task t : input) {
+            if (t == null) //for null-terminated arrays
+                break;
+            if (!t.isDeleted())
+                apply(t, activation);
+        }
+    }
+
+    /**
+     * execute a Task as a TaskProcess (synchronous)
+     * <p>
+     * TODO make private
+     */
+    @Nullable
+    final Concept apply(@NotNull Task input, float activation) {
+
+        Concept c = concept(input, true);
+        if (c == null) {
+            remove(input, "Inconceivable");
+            return null;
+        }
+
+        emotion.busy(input, activation);
+
+        Task t = c.process(input, this);
+
+        boolean novel = (t != null);
+
+        if (novel) {
+
+            //TaskProcess succeeded in affecting its concept's state (ex: not a duplicate belief)
+
+            //1. propagate budget
+            conceptualize(c, t.budget(), activation);
+
+            switch (t.punc()) {
+                case Symbols.GOAL:
+                    execute(t, c);
+                    //TODO check for answer to parent quest task
                     break;
-                if (!t.isDeleted())
-                    apply(t, activation);
             }
+
+            //3. signal any additional processes
+            eventTaskProcess.emit(t);
+
+        } else {
+            t = input;
         }
 
-        /**
-         * execute a Task as a TaskProcess (synchronous)
-         * <p>
-         * TODO make private
-         */
-        @Nullable
-        public final Concept apply(@NotNull Task input, float activation) {
-
-            Concept c = concept(input, true);
-            if (c == null) {
-                remove(input, "Inconceivable");
-                return null;
-            }
-
-            emotion.busy(input, activation);
-
-            Task t = c.process(input, nar);
-
-            boolean novel = (t!=null);
-
-            if (novel) {
-
-                //TaskProcess succeeded in affecting its concept's state (ex: not a duplicate belief)
-
-                //1. propagate budget
-                conceptualize(c, t.budget(), activation);
-
-                switch (t.punc()) {
-                    case Symbols.GOAL:
-                        execute(t, c);
-                        //TODO check for answer to parent quest task
-                        break;
-                }
-
-                //3. signal any additional processes
-                eventTaskProcess.emit(t);
-
-            } else {
-                t = input;
-            }
-
-            if (t.isJudgment()) {
-                //check for answer to parent question task(s) and emit an event
-                onSolution(input, novel);
-            }
-
-            return c;
+        if (t.isJudgment()) {
+            //check for answer to parent question task(s) and emit an event
+            onSolution(input, novel);
         }
 
-        void onSolution(Task t, boolean novel) {
-            Task parentTask = t.getParentTask();
-            if (parentTask!=null && parentTask.isQuestion()) {
+        return c;
+    }
 
-                if (novel || parentTask.isInput()) //filter
-                    eventAnswer.emit(Tuples.twin(parentTask, t));
+    void onSolution(Task t, boolean novel) {
+        Task parentTask = t.getParentTask();
+        if (parentTask != null && parentTask.isQuestion()) {
 
-            }
+            if (novel || parentTask.isInput()) //filter
+                eventAnswer.emit(Tuples.twin(parentTask, t));
+
         }
+    }
 
-    };
 
     @NotNull
     public TaskPerception initInput() {
 
         return new SetTaskPerception(
                 this,
-                (t) -> processor.accept(t, 1f),
+                this::accept,
                 //BudgetMerge.plusDQBlend
                 BudgetMerge.avgDQBlend
         );
@@ -282,7 +281,6 @@ public class Default extends AbstractNAR {
 //                /** recursively activate the template's task tlink */
 //
 //            }
-
 
 
 //            float toTermLinks = 0;
@@ -622,7 +620,9 @@ public class Default extends AbstractNAR {
         /**
          * re-used, not to be used outside of this
          */
-        final @NotNull PremiseEval matcher;
+        final
+        @NotNull
+        PremiseEval matcher;
 
         /**
          * derived tasks with truth confidence lower than this value are discarded.
@@ -657,7 +657,9 @@ public class Default extends AbstractNAR {
             newPremise(concept, taskLink, termLink, belief).run(matcher);
         }
 
-        protected @NotNull ConceptProcess newPremise(BLink<? extends Concept> concept, BLink<? extends Task> taskLink, BLink<? extends Termed> termLink, Task belief) {
+        protected
+        @NotNull
+        ConceptProcess newPremise(BLink<? extends Concept> concept, BLink<? extends Task> taskLink, BLink<? extends Termed> termLink, Task belief) {
             return new DefaultConceptProcess(nar, concept, taskLink, termLink, belief, sharedResultBuffer);
         }
 

@@ -94,13 +94,18 @@ abstract public class Being {
             for (int i = 0; i < layersSize; i++) {
                 layers.get(i).drawGround(d, w);
             }
-            //TODO draw this after the inbetween
-            for (int i = 0; i < layersSize; i++) {
-                layers.get(i).drawSky(d, w);
-            }
             d.setFillColor(color);
         }
 
+        @Override
+        public void after(Body b, JoglAbstractDraw d, float time) {
+            java.util.List<LayerDraw> layers = this.layers;
+            int layersSize = layers.size();
+            World w = b.m_world;
+            for (int i = 0; i < layersSize; i++) {
+                layers.get(i).drawSky(d, w);
+            }
+        }
 
         @Override
         public String toString() {

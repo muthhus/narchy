@@ -140,7 +140,7 @@ abstract public class ConceptProcess implements Premise {
     }
 
     public int getMaxMatches() {
-        final float min = Global.MIN_TERMUTATIONS_PER_MATCH, max = Global.MAX_TERMUTATIONS_PER_MATCH;
+        final float min = Global.matchTermutationsMin, max = Global.matchTermutationsMax;
         return (int) Math.ceil(task().pri() * (max - min) + min);
     }
 

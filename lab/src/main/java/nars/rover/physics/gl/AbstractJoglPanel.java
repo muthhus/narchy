@@ -184,7 +184,7 @@ public abstract class AbstractJoglPanel extends GLCanvas implements Display, GLE
                 this.mouseCenter.setLocation(center);
         }
 
-        float linSpeed = 10f;
+        float linSpeed = 50f;
         float angleSpeed = 0.0001f;
 
         public void forward(float v) {

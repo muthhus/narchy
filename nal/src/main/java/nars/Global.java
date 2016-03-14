@@ -45,22 +45,12 @@ import java.util.Set;
 public enum Global {
     ;
 
-
-
     public static final float TESTS_TRUTH_ERROR_TOLERANCE = 0.01f;
 
     //TODO use 'I' for SELf, it is 3 characters shorter
     public static final Atom DEFAULT_SELF = $.the("I");
     public static final float TRUTH_EPSILON = 0.01f;
-    /**
-     * maximum changes which are stored in stack
-     */
-    public final static int unificationStackMax = 64;
-    public final static int unificationTermutesMax = 8;
 
-
-//    public static int UNIFICATION_POWER = 400;
-//    public static int UNIFICATION_POWERmin = UNIFICATION_POWER;
 
     public static int DEFAULT_NAL_LEVEL = 8;
 
@@ -71,17 +61,22 @@ public enum Global {
     /** use this for advanced error checking, at the expense of lower performance.
         it is enabled for unit tests automatically regardless of the value here.    */
     public static boolean DEBUG;
+
+    /** extra debugging checks */
+    public static final boolean DEBUG_PARANOID = false;
+
     //public static final boolean DEBUG_BAG_MASS = false;
     //public static boolean DEBUG_TRACE_EVENTS = false; //shows all emitted events
-    public static boolean DEBUG_DERIVATION_STACKTRACES; //includes stack trace in task's derivation rule string
+    //public static boolean DEBUG_DERIVATION_STACKTRACES; //includes stack trace in task's derivation rule string
     //public static boolean DEBUG_INVALID_SENTENCES = true;
     //public static boolean DEBUG_NONETERNAL_QUESTIONS = false;
     public static boolean DEBUG_TASK_LOG = true; //false disables task history completely
     //public static boolean PRINT_DUPLICATE_DERIVATIONS = false;
     //public static final boolean DEBUG_DERIVATION_GRAPH = false;
-    public static final boolean DEBUG_REMOVED_CYCLIC_DERIVATIONS = false;
-    public static final boolean DEBUG_REMOVED_INSUFFICIENT_BUDGET_DERIVATIONS = false;
-    public static boolean DEBUG_DETECT_DUPLICATE_RULES;
+    //public static final boolean DEBUG_REMOVED_CYCLIC_DERIVATIONS = false;
+    //public static final boolean DEBUG_REMOVED_INSUFFICIENT_BUDGET_DERIVATIONS = false;
+    //public static boolean DEBUG_DETECT_DUPLICATE_RULES;
+    public static final boolean DEBUG_NON_INPUT_ANSWERED_QUESTIONS = false;
 
 
 
@@ -148,18 +143,22 @@ public enum Global {
 
 
 
-
     /** hard upper-bound limit on Compound term complexity;
      * if this is exceeded it may indicate a recursively
      * malformed term due to a serious inference bug */
-    public static final int COMPOUND_VOLUME_MAX = 256;
+    public static final int compoundVolumeMax = 256;
 
-    /** extra debugging checks */
-    public static final boolean DEBUG_PARANOID = false;
 
-    public static float MAX_TERMUTATIONS_PER_MATCH = 4;
-    public static float MIN_TERMUTATIONS_PER_MATCH = 1;
-    public static final boolean DEBUG_NON_INPUT_ANSWERED_QUESTIONS = false;
+    /**
+     * maximum changes which are stored in stack
+     */
+    public final static int unificationStackMax = 96;
+    public final static int unificationTermutesMax = 16;
+
+
+    public static float matchTermutationsMax = 4;
+    public static float matchTermutationsMin = 1;
+
 
 
 //    public static float TEMPORAL_INDUCTION_CHAIN_SAMPLE_DEPTH(float taskPriority) {

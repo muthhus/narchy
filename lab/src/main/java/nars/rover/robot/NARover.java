@@ -374,7 +374,7 @@ public class NARover extends AbstractPolygonBot {
         for (int i = 0; i < pixels; i++) {
             final float angle = aStep * (i-pixels/2) + centerAngle;
 
-            NARVisionRay v = new NARVisionRay(id + i, nar, base, center, angle, aStep,
+            NARVisionRay v = new NARVisionRay(id + i, nar, base, center, angle, arc,
                     detail, distance, 1f/pixels) {
 
 //                  @Override public float getLocalAngle () {
@@ -396,7 +396,7 @@ public class NARover extends AbstractPolygonBot {
 
                 DoubleSupplier value = () -> {
                     if (v.hit(material)) {
-                        return 1f - v.hitDist; //closer = larger number (up to 1.0)
+                        return 0.5f + 0.5f*(1f - v.seenDist); //closer = larger number (up to 1.0)
                     }
                     return 0; //nothing seen within the range
                 };

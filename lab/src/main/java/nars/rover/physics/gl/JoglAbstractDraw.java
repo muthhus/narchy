@@ -128,9 +128,10 @@ public abstract class JoglAbstractDraw extends DebugDraw {
 
 
 
-    @FunctionalInterface
     public interface DrawProperty {
         void before(Body b, JoglAbstractDraw d, float time);
+
+        default void after(Body b, JoglAbstractDraw d, float time) { }
     }
 
 
@@ -162,6 +163,11 @@ public abstract class JoglAbstractDraw extends DebugDraw {
 //            } else {
 //                drawShape(f, xf, fillColor, wireframe);
 //            }
+        }
+
+        if (o instanceof DrawProperty) {
+            DrawProperty d = (DrawProperty) o;
+            d.after(b, this, time);
         }
     }
 
@@ -401,8 +407,6 @@ public abstract class JoglAbstractDraw extends DebugDraw {
 //    gl.glPopMatrix();
 //  }
 
-    private final Vec2 temp = new Vec2();
-    private final Vec2 temp2 = new Vec2();
 
     @Override
     public void drawTransform(Transform xf) {
@@ -430,5 +434,4 @@ public abstract class JoglAbstractDraw extends DebugDraw {
     }
 
 
-    protected abstract PhysicsCamera getPhysicsCamera();
 }

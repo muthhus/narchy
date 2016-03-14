@@ -6,8 +6,10 @@ import nars.NAR;
 import nars.Symbols;
 import nars.guifx.NARfx;
 import nars.nar.Default;
+import nars.op.PrologCore;
 import nars.op.mental.Anticipate;
 import nars.op.mental.Inperience;
+import nars.rover.RoverWorld;
 import nars.rover.Sim;
 import nars.rover.robot.Arm;
 import nars.rover.robot.NARover;
@@ -94,16 +96,18 @@ public class SomeRovers {
     }
 
     public static Default newNAR() {
-        int conceptsFirePerCycle = 8;
+        int conceptsFirePerCycle = 32;
         Default nar = new Default(
                 //new Memory(clock, TermIndex.softMemory(64*1024)),
-                1024, conceptsFirePerCycle, 2, 3);
+                2048, conceptsFirePerCycle, 2, 3);
         /*nar.with(
                 Anticipate.class,
                 Inperience.class
         );*/
 
-        //nar.logSummaryGT(Systenar.out, 0f);
+        //new PrologCore(nar);
+
+        nar.logSummaryGT(System.out, 0.7f);
 //        nar.log(Systenar.out, x -> {
 //            if (x instanceof Task) {
 //                Task t = (Task)x;
@@ -114,7 +118,7 @@ public class SomeRovers {
 //        });
 
         
-        nar.DEFAULT_JUDGMENT_PRIORITY = 0.4f;
+        nar.DEFAULT_JUDGMENT_PRIORITY = 0.5f;
 //            nar.memory.DEFAULT_JUDGMENT_DURABILITY = 0.35f;
         nar.DEFAULT_GOAL_PRIORITY = 0.6f;
 //            nar.memory.DEFAULT_GOAL_DURABILITY = 0.7f;
@@ -128,18 +132,18 @@ public class SomeRovers {
 
 
         //nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
-        nar.core.activationRate.setValue(0.8f);
+        nar.core.activationRate.setValue(1f);
 
 
         nar.duration.set(2);
-        nar.conceptForgetDurations.setValue(1f);
+        nar.conceptForgetDurations.setValue(2f);
         nar.termLinkForgetDurations.setValue(3);
-        nar.taskLinkForgetDurations.setValue(8);
+        nar.taskLinkForgetDurations.setValue(2);
         nar.cyclesPerFrame.set(2);
         nar.shortTermMemoryHistory.set(3);
-        nar.executionThreshold.setValue(0.0f);
+        nar.executionThreshold.setValue(0.01f);
 
-        boolean gui = true;
+        boolean gui = false;
         if (gui) {
             //NARide.loop(nar, false);
 
@@ -183,10 +187,10 @@ public class SomeRovers {
         NAR n = r.nar;
 
 
-        NarQ nqSpine = new NarQ(n, (i, o) -> (int) Math.ceil(Math.sqrt(i * o)));
+        NarQ nqSpine = new NarQ(n, (i, o) -> (int) Math.ceil(1+Math.sqrt(i * o)));
 
 
-        nqSpine.power.setValue(0.8f);
+        nqSpine.power.setValue(0.7f);
 
 
         nqSpine.input.addAll(nqSpine.getBeliefExpectations(
@@ -217,11 +221,11 @@ public class SomeRovers {
         float pi = (float) Math.PI;
 
         //nearsight
-        r.addEyeWithMouth(r, "n", nqSpine, r.torso, 11, 1, new Vec2(2.7f, 0), 0.4f, 0, 20f, pi / 6f);
+        r.addEyeWithMouth(r, "n", nqSpine, r.torso, 5, 2, new Vec2(2.7f, 0), 0.1f, 0, 20f, pi / 6f);
 
-        //farsight report http://farsight.org/
-        r.addEye(r, "f", nqSpine, r.torso, 5, 2, new Vec2(2.7f, 0), 0.6f, 0, 35f, (e) -> {
-        });
+//        //farsight report http://farsight.org/
+//        r.addEye(r, "f", nqSpine, r.torso, 5, 5, new Vec2(2.7f, 0), 0.6f, 0, 35f, (e) -> {
+//        });
 
 
         //arms have their own controller but the two main inputs are controlled by the master Q 'nqSpine'

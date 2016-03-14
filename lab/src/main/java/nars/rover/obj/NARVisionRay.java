@@ -29,6 +29,7 @@ public class NARVisionRay extends VisionRay {
     float conceptPriority;
     float conceptDurability;
     float conceptQuality;
+    public float seenDist;
 
 
     public NARVisionRay(String id, NAR nar, Body base, Vec2 point, float angle, float arc, int resolution, float length, float pri) {
@@ -57,6 +58,12 @@ public class NARVisionRay extends VisionRay {
         rayColor.y = Math.max(rayColor.y, 0f);
         rayColor.z = Math.max(rayColor.z, 0f);
 
+    }
+
+    @Override
+    protected void perceiveDist(Body hit, float newConf, float hitDist) {
+        this.seenDist = hitDist;
+        super.perceiveDist(hit, newConf, hitDist);
     }
 
     @Override

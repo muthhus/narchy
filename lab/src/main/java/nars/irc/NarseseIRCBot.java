@@ -20,7 +20,6 @@ import java.io.File;
  */
 public class NarseseIRCBot extends IRCBot {
 
-
     private final long outputIntervalMS = 2*60000;
     int paragraphSize = 3;
 
@@ -42,15 +41,17 @@ public class NarseseIRCBot extends IRCBot {
     }
 
     public NarseseIRCBot() throws Exception {
-        super("irc.freenode.net", "NARchy", "#nars");
+        super(
+                //"irc.freenode.net",
+                "localhost",
+                "NARchy", "#chat");
 
         new Thread(()-> {
 
             while (true) {
                 try {
                     flush();
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
 
@@ -261,8 +262,8 @@ public class NarseseIRCBot extends IRCBot {
     }
 
     public void restart() {
-        if(oldnar!=null) {
-            oldnar.stop();
+        if(running !=null) {
+            running.stop();
         }
 
         nar = new Default(1024, 1, 4, 3);
@@ -272,7 +273,7 @@ public class NarseseIRCBot extends IRCBot {
         nar.duration.set(2000);
         nar.core.conceptsFiredPerCycle.set(256);
 
-        //nar.log();
+        nar.log();
 
         send("Ready: " + nar.toString());
 
@@ -287,11 +288,12 @@ public class NarseseIRCBot extends IRCBot {
 //                send(c.toString());
 //        });
 
-        oldnar = nar.loop(0.1f);
+        running = nar.loop(0.1f);
     }
 
 
-    static NARLoop oldnar = null;
+    static NARLoop running = null;
+
     @Override
     protected void onMessage(IRCBot bot, String channel, String nick, String msg) {
         if (channel.equals("unknown")) return;

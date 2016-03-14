@@ -353,6 +353,6 @@ public class Arm extends Being implements LayerDraw {
         targetColor.set( Util.clamp( -reward), 0.5f, Util.clamp( reward ) );
         draw.drawCircle(tWorld, 0.5f, targetColor);
 
-        ((JoglDraw)draw).drawSegment(hWorld, tWorld, 0.5f, 0.5f, 0.5f, 0.8f, 2f);
+        ((JoglDraw)draw).drawSegment(hWorld, tWorld, 0.5f, 0.5f, 0.5f, 0.8f, 2f, 0f);
     }
 }

@@ -21,19 +21,6 @@ public class JoglDraw extends JoglAbstractDraw {
     }
 
     @Override
-    protected PhysicsCamera getPhysicsCamera() {
-//        PhysicsCamera p = null;
-//
-//        PhysicsController controller = panel.controller;
-//        if( controller != null ) {
-//            p = controller.getCamera();
-//        }
-//
-//        return p;
-        return null;
-    }
-
-    @Override
     public void drawParticles(Vec2[] centers, float radius, ParticleColor[] colors, int count) {
 
     }
@@ -174,15 +161,15 @@ public class JoglDraw extends JoglAbstractDraw {
         gl.glEnd();
         //gl.glPopMatrix();
     }
-    public void drawSegment(Vec2 p1, Vec2 p2, float r, float g, float b, float a, float width) {
+    public void drawSegment(Vec2 p1, Vec2 p2, float r, float g, float b, float a, float width, float z) {
         GL2 gl = this.gl;
         //gl.glPushMatrix();
         //transformViewport(gl, zero);
         gl.glLineWidth(width);
         gl.glBegin(GL2.GL_LINES);
         gl.glColor4f(r, g, b, a);
-        gl.glVertex3f(p1.x, p1.y, 0);
-        gl.glVertex3f(p2.x, p2.y, 0);
+        gl.glVertex3f(p1.x, p1.y, z);
+        gl.glVertex3f(p2.x, p2.y, z);
         gl.glEnd();
         //gl.glPopMatrix();
     }
