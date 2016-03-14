@@ -193,7 +193,7 @@ public class NarQ implements Consumer<NAR> {
     }
 
     public NarQ(NAR n) {
-        this(n, (i,o)->i*o /*default */);
+        this(n, (i,o)->(1+i)*(1+o) /*default */);
     }
 
     public NarQ(NAR n, StateCompressionRatio s) {
@@ -243,7 +243,7 @@ public class NarQ implements Consumer<NAR> {
     private class HaiQImpl extends HaiQ {
 
         //Hsom...
-        final static float perceptionAlpha = 0.02f;
+        final static float perceptionAlpha = 0.1f;
         @NotNull
         final Autoencoder ae;
 
@@ -260,7 +260,7 @@ public class NarQ implements Consumer<NAR> {
 
         @Override
         protected int perceive(float[] input) {
-            ae.train(input, perceptionAlpha,  0.03f, 0.03f, false);
+            ae.train(input, perceptionAlpha,  0.03f, 0.03f, true);
             int w = ae.max();
             return w;
         }

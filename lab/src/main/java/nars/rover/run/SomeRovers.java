@@ -99,7 +99,7 @@ public class SomeRovers {
         int conceptsFirePerCycle = 32;
         Default nar = new Default(
                 //new Memory(clock, TermIndex.softMemory(64*1024)),
-                2048, conceptsFirePerCycle, 2, 3);
+                1200, conceptsFirePerCycle, 2, 3);
         /*nar.with(
                 Anticipate.class,
                 Inperience.class
@@ -190,7 +190,7 @@ public class SomeRovers {
         NarQ nqSpine = new NarQ(n, (i, o) -> (int) Math.ceil(1+Math.sqrt(i * o)));
 
 
-        nqSpine.power.setValue(0.7f);
+        nqSpine.power.setValue(0.9f);
 
 
         nqSpine.input.addAll(nqSpine.getBeliefExpectations(

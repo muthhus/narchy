@@ -92,16 +92,14 @@ public class NAL8Test extends AbstractNALTest {
 
         //TODO Narsese parser for this:
 //        tester.mustBelieve(cycles, "( &&+0 ,(t1-->at),(t2-->hold),(t1-->[opened]),open(t1))",
-//                1.0f, 0.90f,
+//                1.0f, 0.42f,
 //                0);
 
         tester.mustBelieve(cycles, "(&&, hold:t2, at:t1, open(t1)).",
-                1.0f, 0.42f,
+                1.0f, 0.81f,
                 0);
 
-//        tester.mustBelieve(cycles, "(hold:t2 &&+0 (at:t1 &&+0 open(t1))).",
-//                1.0f, 0.45f,
-//                0);
+
     }
 
 

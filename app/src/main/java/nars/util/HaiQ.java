@@ -71,8 +71,8 @@ abstract public class HaiQ {
 
 		actions = outputs;
 
-		int states = (int) Math.ceil(1+Math.sqrt(_states));
-		nStates = states*states;
+		//int states = (int) Math.ceil(1+Math.sqrt(_states)); //states*states;
+		nStates = _states;
 
 		this.inputs = inputs;
 
@@ -80,7 +80,7 @@ abstract public class HaiQ {
 
 		q = new float[nStates][outputs];
 		et = new float[nStates][outputs];
-		setQ(0.1f, 0.5f, 0.9f, 0.1f); // 0.1 0.5 0.9
+		setQ(0.05f, 0.5f, 0.9f, 0.2f); // 0.1 0.5 0.9
 	}
 
 	int learn(int state, float reward) {
