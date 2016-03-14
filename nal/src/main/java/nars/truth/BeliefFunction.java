@@ -277,6 +277,7 @@ public enum BeliefFunction implements TruthOperator {
         }
     },
 
+    @AllowOverlap
     BeliefStructuralDeduction() {
         @Nullable
         @Override public Truth apply(final Truth T, /* nullable*/ @Nullable final Truth B, @NotNull Memory m, float minConf) {
