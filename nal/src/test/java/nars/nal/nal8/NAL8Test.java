@@ -62,36 +62,24 @@ public class NAL8Test extends AbstractNALTest {
 
 
 
-    @Test
-    public void subsent_1_simpler()  {
-        TestNAR tester = test();
+    @Test public void subsent_1_simpler()  {
+        test()
 
-        //tester.nar.log();
+        //.log()
 
+        .input("hold:t2. :|:") //@ 0
+        .inputAt(5, "at:t1. :|:")
+        .inputAt(10, "(hold:t2 &&+5 (at:t1 &&+5 (open(t1) &&+5 [opened]:t1))).")
+        .inputAt(15, "[opened]:t1. :|:")
 
-        tester.input("hold:t2. :|:");
-        tester.inputAt(5, "at:t1. :|:");
-        tester.inputAt(15, "[opened]:t1. :|:");
-        tester.inputAt(10, "(hold:t2 &&+5 (at:t1 &&+5 (open(t1) &&+5 [opened]:t1))).");
+        .mustBelieve(cycles, "open(t1)",
+                //1.0f, 0.81f,
+                //-5);
+                1.0f, 0.34f,
+                5);
 
-        //opened at 0
-        //open() @ -5
-
-        tester.mustBelieve(cycles, "open(t1)",
-                1.0f, 0.81f,
-                -5);
-
-        //at @ -10
-        //hold @ -15
-
-//        tester.mustBelieve(cycles, "hold:t2",
-//                1.0f, 0.81f,
-//                -15);
-
-//        tester.mustBelieve(cycles, "(hold:t2 &&+5 (at:t1 &&+5 open(t1)))",
-//                1.0f, 0.45f,
-//                -5);
     }
+
     @Test
     public void subsent_simultaneous()  {
         TestNAR tester = test();
@@ -173,10 +161,10 @@ public class NAL8Test extends AbstractNALTest {
                 .input("at:(SELF,{t003})!")
                 .inputAt(10, "(goto($1) ==>+5 at:(SELF,$1)).")
 
-                .mustDesire(cycles*4, "goto({t003})", 1.0f, 0.81f);
+                .mustDesire(cycles*4, "goto({t003})", 1.0f, 0.81f)
+                .mustDesire(cycles, "goto({t003})", 1.0f, 0.81f, -5); //??
 
     }
-
 
     @Test
     public void goal_deduction()  {
@@ -355,16 +343,7 @@ public class NAL8Test extends AbstractNALTest {
 
 
 
-    @Test
-    public void condition_goal_deduction_3_()  {
-        TestNAR tester = test();
 
-        tester.input("<(SELF,{t003}) --> at>! :|:");
-        tester.inputAt(10, "(goto($1) ==>+5 <(SELF,$1) --> at>).");
-
-        tester.mustDesire(cycles, "goto({t003})", 1.0f, 0.81f, -5);
-
-    }
 
     @Test
     public void temporal_deduction_1()  {
