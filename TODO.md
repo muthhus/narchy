@@ -1,22 +1,23 @@
 Core
 ----
  * complete budget backpressure with accountability tools to ensure no inflation nor leak
-  * stack-instrumented budget accounting guards? (maybe overkill)
+   * stack-instrumented budget accounting guards? (maybe overkill)
  * complete Prolog plugin
  * complete Clojure / Core.Logic plugin
-  * explore Narjure integrations
+   * explore Narjure integrations
  * Bag's BLink budgets stored in unified fixed-size float[] array for improved cpu cache coherence, possibly with Unsafe management
  * ensure (via unit tests) the formation of stable, non-explosive/non-leaky/non-redundant temporal models from given input
  * fully compiled unification patterns for rules
  * scalable, distributed, and persistent memory (ex: apache ignite)
  * temporal interpolation "compression" on belief table overflow (instead of just discarding a task)
  * temporal belief table tuning
- * dynamically adjust concept size (ex: belief table sizes) according to budget and term features
+ * dynamically adjust concept size (ex: link bag and belief table sizes) according to budget and term features according to actively monitored available memory resources
  * question/quest tasks as specific subclass of task with feedback handlers
  * goal-driven self-testing framework
  * NAL9 tuning
-  * abbreviation as compression codec(s)
-  * multi-NAR architectures
+   * abbreviation as compression codec(s)
+   * multi-NAR architectures
+ * modularization of deriver rule sets
 
 Sensorimotor & Autonomics
 -------------------------
@@ -34,15 +35,15 @@ GuiFX & Web
 Narsese
 -------
  * equals character ("=") as shorthand syntax for <->
- * parse: (&&+0, a, b, ..., c )
+ * parse: (&&+0, a, b, ..., c ) == (&|, a, b, ..., c)
 
 I/O, Multimedia, & Sensors
 --------------------------
  * live webcam/microphone application
  * time-series database integration, with IoT sources
  * multi-agent dialog chatbots (ex: irc)
- * VNC
- * text synthesizer control
+ * VNC universal controller
+ * text-to-speech control
  * interactive sonification
 
 Web & P2P
@@ -54,3 +55,7 @@ Semantic Web
  * OWL/RDF inference and demos completely loading several ontologies from supplied/online ontology index
  * KIF reasoner
  * FIPA ACL https://github.com/hypergraphdb/hypergraphdb/wiki/MessageStructure
+
+Meta
+----
+  * complete 'Lobject' ("logic objects") Java reflectivity API which wraps POJO methods to produce beliefs about their state changes (essentially: termized method invocations w/ parameter values, and return value)
