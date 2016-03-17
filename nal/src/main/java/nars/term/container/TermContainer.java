@@ -106,12 +106,12 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
 
     boolean equals(Object o);
 
-    static boolean equals(TermContainer a, Object b) {
+    static boolean equals(@NotNull TermContainer a, Object b) {
         return b instanceof TermContainer && TermContainer.equals(a, (TermContainer)b);
     }
 
     /** can be called from equals() */
-    static boolean equals(TermContainer a, TermContainer b) {
+    static boolean equals(@NotNull TermContainer a, @NotNull TermContainer b) {
 
         return
                 (a == b) ||
@@ -120,7 +120,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
                  (a.equalTerms(b)));
     }
 
-    default boolean equalMeta(TermContainer b) {
+    default boolean equalMeta(@NotNull TermContainer b) {
         return (hashCode() == b.hashCode()) &&
                 (structure() == b.structure()) &&
                 (volume() == b.volume()) &&
@@ -214,7 +214,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
         forEach(action, 0, size());
     }
 
-    static void forEach(TermContainer c, Consumer action, int start, int stop) {
+    static void forEach(@NotNull TermContainer c, @NotNull Consumer action, int start, int stop) {
         for (int i = start; i < stop; i++) {
             action.accept(c.term(i));
         }
@@ -404,7 +404,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
         return compareTo(this, o);
     }
 
-    static int compareTo(TermContainer a, @NotNull Object b) {
+    static int compareTo(@NotNull TermContainer a, @NotNull Object b) {
         if (a == b) return 0;
 
         int diff;
@@ -448,7 +448,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
 
 
     /** a and b must be instances of input, and output must be of size input.length-2 */
-    static Term[] except(TermContainer input, Term a, Term b, Term[] output) {
+    static Term[] except(@NotNull TermContainer input, Term a, Term b, Term[] output) {
 //        int targetLen = input.size() - 2;
 //        if (output.length!= targetLen) {
 //            throw new RuntimeException("wrong size");
@@ -463,7 +463,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
         return output;
     }
     /** a must be in input, and output must be of size input.length-1 */
-    static Term[] except(Term[] input, Term a, Term[] output) {
+    static Term[] except(@NotNull Term[] input, Term a, Term[] output) {
 //        int targetLen = input.size() - 1;
 //        if (output.length!= targetLen) {
 //            throw new RuntimeException("wrong size");

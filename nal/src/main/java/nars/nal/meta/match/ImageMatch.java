@@ -25,7 +25,7 @@ public enum ImageMatch /*extends ArrayEllipsisMatch<Term>*/ {
      * @return
      */
     @NotNull
-    public static EllipsisMatch put(@NotNull Term[] t, Term relationTerm, @NotNull Compound y) {
+    public static EllipsisMatch put(@NotNull Term[] t, @NotNull Term relationTerm, @NotNull Compound y) {
 
         //not sure why this works
 

@@ -88,7 +88,8 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
     }
 
 
-    @Override public <C> C meta(Object key, BiFunction value) {
+    @NotNull
+    @Override public <C> C meta(@NotNull Object key, @NotNull BiFunction value) {
         if (meta == null) {
             Object v;
             put(key, v = value.apply(key, null));
@@ -176,7 +177,7 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
     @Override public boolean link(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar) {
 
         if (b instanceof Task)
-            taskLinks.put((Task)b, b.budget(), scale);
+            taskLinks.put((Task)b, b/*.budget()*/, scale);
 
         return true;
     }

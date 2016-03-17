@@ -22,7 +22,7 @@ dependencies {
 
     compile project(':nal')
 
-    compile(group:'jline', name:'jline', version:'2.13')
+    compile(group:'jline', name:'jline', version:'2.14.1')
 
     compile group: 'com.github.drapostolos', name: 'type-parser', version: '0.5.0'
     compile group: 'org.semanticweb.yars', name: 'nxparser-parsers', version: '2.3.3'

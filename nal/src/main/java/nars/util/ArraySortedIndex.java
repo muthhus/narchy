@@ -253,7 +253,7 @@ abstract public class ArraySortedIndex<E> extends SortedIndex<E> {
         return -1;
     }
 
-    private static boolean attemptEqual(List l, Object o, /*final Object oName, */ int i) {
+    private static boolean attemptEqual(@NotNull List l, Object o, /*final Object oName, */ int i) {
         return o == l.get(i);
     }
 

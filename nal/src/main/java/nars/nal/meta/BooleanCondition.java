@@ -3,6 +3,7 @@ package nars.nal.meta;
 import com.gs.collections.api.block.function.primitive.BooleanFunction;
 import nars.Op;
 import nars.term.Term;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -30,6 +31,7 @@ public interface BooleanCondition<C> extends Term, BooleanFunction<C> {
     void addConditions(List<Term> l);
 
 
+    @NotNull
     @Override
     default Op op() {
         return ATOM; //shouldnt this be a product?

@@ -307,7 +307,8 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
         return new TermVector(r);
     }
 
-    public static TermContainer the(Term... t) {
+    @NotNull
+    public static TermContainer the(@NotNull Term... t) {
         return t.length == 0 ? Terms.ZeroSubterms : new TermVector(t);
     }
 

@@ -38,6 +38,7 @@ public abstract class AbstractTask extends UnitBudget
 
     protected char punctuation;
 
+    @Nullable
     private Truth truth;
 
     @Nullable
@@ -247,7 +248,7 @@ public abstract class AbstractTask extends UnitBudget
     /** when executed; can be overridden in subclasses to handle this event;
      *  returns whether there was any activity executed
      * */
-    @Override public boolean execute(NAR n) {
+    @Override public boolean execute(@NotNull NAR n) {
 
         //DEFAULT EXECUTION PROCEDURE: trigger listener reactions
 

@@ -269,7 +269,7 @@ public class Inperience {
         }
     }
 
-    void nonInnate(@NotNull Task task, @NotNull Task belief, Atomic op) {
+    void nonInnate(@NotNull Task task, @NotNull Task belief, @NotNull Atomic op) {
         //the operators which dont have a innate belief
         //also get a chance to reveal its effects to the system this way
 

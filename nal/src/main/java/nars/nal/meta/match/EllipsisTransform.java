@@ -25,6 +25,7 @@ public class EllipsisTransform extends EllipsisOneOrMore {
         this.to = to;
     }
 
+    @NotNull
     @Override
     public String toString() {
 
@@ -40,6 +41,7 @@ public class EllipsisTransform extends EllipsisOneOrMore {
         return new GenericVariable(Op.VAR_QUERY, "Ellipsis_Transform_Clone_Unknown");
     }
 
+    @NotNull
     public static Variable make(@NotNull AbstractVariable v, Term from, Term to, VariableNormalization normalizer) {
         //normalizes any variable parameter terms of an EllipsisTransform
         PremiseRule.PremiseRuleVariableNormalization vnn = (PremiseRule.PremiseRuleVariableNormalization) normalizer;

@@ -31,6 +31,7 @@ public class Space extends GenericCompound {
         this(subterms, new FloatArrayList(f));
     }
 
+    @NotNull
     @Override public Compound anonymous() {
         if (vector == null) return super.anonymous();
         else return new Space(subterms);

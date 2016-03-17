@@ -367,7 +367,7 @@ public abstract class TermBuilder {
      * flattening junction builder, don't use with temporal relation
      */
     @Nullable
-    public Term junctionFlat(@NotNull Op op, int dt, Term[] u) {
+    public Term junctionFlat(@NotNull Op op, int dt, @NotNull Term[] u) {
 
         TermContainer tc;
         if (dt ==0 || dt == ITERNAL) {
@@ -382,7 +382,7 @@ public abstract class TermBuilder {
 
     }
 
-    static void flatten(@NotNull Op op, Term[] u, int dt, Collection<Term> s) {
+    static void flatten(@NotNull Op op, @NotNull Term[] u, int dt, @NotNull Collection<Term> s) {
         for (Term x : u) {
             if ((x.op() == op) && (((Compound) x).dt()==dt)) {
                 flatten(op, ((Compound) x).terms(), dt, s); //recurse

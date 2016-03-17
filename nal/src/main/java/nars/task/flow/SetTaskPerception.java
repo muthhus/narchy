@@ -18,6 +18,7 @@ import java.util.function.Consumer;
 public final class SetTaskPerception extends TaskPerception {
 
 
+    @NotNull
     private final BudgetedSet<Task> data;
 
     public SetTaskPerception(@NotNull Memory m, Consumer<Task[]> receiver, BudgetMerge merge) {

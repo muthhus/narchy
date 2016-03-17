@@ -21,6 +21,7 @@ public abstract class AtomicBooleanCondition<C> extends AtomicStringConstant imp
     }
 
 
+    @NotNull
     public abstract String toString();
 
     /** add this or subconditions to expand in a rule */

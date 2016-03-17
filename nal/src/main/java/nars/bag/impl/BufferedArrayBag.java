@@ -19,6 +19,7 @@ import java.util.function.Predicate;
  */
 public class BufferedArrayBag<X> extends ArrayBag<X> {
 
+    @NotNull
     final BudgetedSet<BLink<X>> pending;
 
 //    public BufferedArrayBag(int cap) {
@@ -31,10 +32,11 @@ public class BufferedArrayBag<X> extends ArrayBag<X> {
     }
 
     @Override
-    public BLink put(X i, Budgeted b, float scale) {
+    public BLink put(X i, @NotNull Budgeted b, float scale) {
         return pending.put(new BLink(i, b));
     }
 
+    @Nullable
     private final Consumer<BLink<X>[]> flushAction = (BLink<X>[] b) -> {
         for (BLink<X> c : b) {
             if (c == null) break;
@@ -51,7 +53,7 @@ public class BufferedArrayBag<X> extends ArrayBag<X> {
 
     @NotNull
     @Override
-    public Bag<X> filter(Predicate<BLink<? extends X>> forEachIfFalseThenRemove) {
+    public Bag<X> filter(@NotNull Predicate<BLink<? extends X>> forEachIfFalseThenRemove) {
         commit(false);
         return super.filter(forEachIfFalseThenRemove);
     }
@@ -86,13 +88,13 @@ public class BufferedArrayBag<X> extends ArrayBag<X> {
     }
 
     @Override
-    public void forEach(int max, Consumer<? super BLink<X>> action) {
+    public void forEach(int max, @NotNull Consumer<? super BLink<X>> action) {
         commit();
         super.forEach(max, action);
     }
 
     @Override
-    public @NotNull Bag<X> forEachThen(Consumer<BLink<? extends X>> each) {
+    public @NotNull Bag<X> forEachThen(@NotNull Consumer<BLink<? extends X>> each) {
         commit();
         return super.forEachThen(each);
     }

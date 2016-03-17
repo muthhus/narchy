@@ -101,11 +101,12 @@ public abstract class AbstractMapIndex implements TermIndex {
 //    default Termed getOrAdd(@NotNull Termed t) {
 //    }
 
-    final Termed theAtom(Atomic t, boolean createIfMissing) {
+    final Termed theAtom(@NotNull Atomic t, boolean createIfMissing) {
         SymbolMap a = this.atoms;
         return (createIfMissing ? a.resolveOrAdd(t, conceptBuilder) : a.resolve(t)) ;
     }
 
+    @Nullable
     abstract protected Termed theCompound(@NotNull Compound x, boolean create);
 
     @Nullable

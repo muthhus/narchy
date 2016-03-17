@@ -7,7 +7,7 @@ public final class CommonVariable extends GenericNormalizedVariable {
 
 
 
-    CommonVariable(Op type, int a, int b) {
+    CommonVariable(@NotNull Op type, int a, int b) {
         super(type, ((a+1) << 8) | (b+1)); //this limits # of variables to 256 per term
     }
 

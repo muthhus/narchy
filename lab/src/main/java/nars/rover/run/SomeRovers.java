@@ -221,11 +221,15 @@ public class SomeRovers {
         float pi = (float) Math.PI;
 
         //nearsight
-        r.addEyeWithMouth(r, "n", nqSpine, r.torso, 5, 2, new Vec2(2.7f, 0), 0.1f, 0, 20f, pi / 6f);
+        float dist = 20f;
+
+        r.addEyeWithMouth(r, "n", nqSpine, r.torso, 9, 4, new Vec2(2.7f, 0),
+                0.2f, pi/4, dist, pi / 6f);
 
 //        //farsight report http://farsight.org/
-//        r.addEye(r, "f", nqSpine, r.torso, 5, 5, new Vec2(2.7f, 0), 0.6f, 0, 35f, (e) -> {
-//        });
+        r.addEye(r, "f", nqSpine, r.torso, 15, 2, new Vec2(-0.5f, 0),
+                0.2f, -(pi/2f)+pi/4f, dist, (e) -> {
+        });
 
 
         //arms have their own controller but the two main inputs are controlled by the master Q 'nqSpine'

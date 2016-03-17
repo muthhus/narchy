@@ -12,7 +12,7 @@ description = 'Web Server'
 dependencies {
     compile project(':app')
 
-    compile group: 'io.undertow', name: 'undertow-core', version: '1.3.18.Final'
+    compile group: 'io.undertow', name: 'undertow-core', version: '1.3.19.Final'
     compile group: 'com.addthis', name: 'meshy', version: '3.4.0'
 
     testCompile group: 'junit', name: 'junit', version: '4.12'

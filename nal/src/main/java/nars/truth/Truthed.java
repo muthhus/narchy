@@ -1,8 +1,11 @@
 package nars.truth;
 
+import org.jetbrains.annotations.Nullable;
+
 /** indicates an implementation has, or is associated with a specific TruthValue */
 public interface Truthed {
 
+    @Nullable
     Truth truth();
 
     /** defaults to positive */

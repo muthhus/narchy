@@ -48,28 +48,28 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
      */
     @Nullable
     @Override
-    BLink<V> remove(V key);
+    BLink<V> remove(@NotNull V key);
 
 
     /**
      * put with an empty budget
      */
     @Nullable
-    BLink<V> put(V newItem);
+    BLink<V> put(@NotNull V newItem);
 
     @Nullable
-    default BLink<V> put(V i, Budget b) {
+    default BLink<V> put(@NotNull V i, @NotNull Budget b) {
         return put(i, b, 1f);
     }
 
     @Nullable
     @Override
-    default BLink<V> put(V v, BLink<V> b) {
+    default BLink<V> put(@NotNull V v, @NotNull BLink<V> b) {
         return put(v, b, 1f);
     }
 
     @Nullable
-    BLink<V> put(V i, Budgeted b, float scale);
+    BLink<V> put(@NotNull V i, @NotNull Budgeted b, float scale);
 
 
 
@@ -82,14 +82,14 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
 //        top(c -> (each.test(c) && (toFire[0]--) > 0));
 
 
-    default Bag<V> sample(float percent, Consumer<? super BLink<V>> target) {
+    @NotNull default Bag<V> sample(float percent, @NotNull Consumer<? super BLink<V>> target) {
         int n = (int)Math.ceil(percent * size());
         sample(n, target);
         return this;
     }
 
     @NotNull
-    Bag<V> sample(int n, Consumer<? super BLink<V>> target);
+    Bag<V> sample(int n, @NotNull Consumer<? super BLink<V>> target);
 //    /**
 //     * fills a collection with at-most N items, if an item passes the predicate.
 //     * returns how many items added
@@ -159,7 +159,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
      * iterates all items in (approximately) descending priority
      * forEach may be used to avoid allocation of iterator instances
      */
-    @NotNull
+    @Nullable
     @Override
     Iterator<BLink<V>> iterator();
 
@@ -193,14 +193,14 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
      * commits the next set of changes and updates any sorting
      * should return this bag
      */
-    @NotNull
+    @Nullable
     Bag<V> commit();
 
     /**
      * implements the Consumer<V> interface; invokes a put()
      */
     @Override
-    default void accept(V v) {
+    default void accept(@NotNull V v) {
         put(v);
     }
 
@@ -403,7 +403,8 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
     }
 
 
-    @Nullable Bag<V> filter(Predicate<BLink<? extends V>> forEachIfFalseThenRemove);
+    @Nullable
+    Bag<V> filter(Predicate<BLink<? extends V>> forEachIfFalseThenRemove);
 
 
     @NotNull

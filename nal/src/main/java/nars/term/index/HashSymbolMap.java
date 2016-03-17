@@ -4,6 +4,7 @@ import nars.concept.AtomConcept;
 import nars.concept.Concept;
 import nars.term.Term;
 import nars.term.atom.Atomic;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -34,20 +35,20 @@ public class HashSymbolMap implements SymbolMap {
     }
 
     @Override
-    public AtomConcept resolveOrAdd(String s, Function<Term, Concept> conceptBuilder) {
+    public AtomConcept resolveOrAdd(String s, @NotNull Function<Term, Concept> conceptBuilder) {
 
         return map.computeIfAbsent(s,
                 S -> (AtomConcept)conceptBuilder.apply($(S)));
     }
 
     @Override
-    public AtomConcept resolveOrAdd(Atomic a, Function<Term, Concept> conceptBuilder) {
+    public AtomConcept resolveOrAdd(@NotNull Atomic a, @NotNull Function<Term, Concept> conceptBuilder) {
         return map.computeIfAbsent(a.toString(),
                 S -> (AtomConcept)conceptBuilder.apply(a));
     }
 
     @Override
-    public void print(Appendable out) {
+    public void print(@NotNull Appendable out) {
         map.forEach((k,v)->{
             try {
                 out.append(v.toString());

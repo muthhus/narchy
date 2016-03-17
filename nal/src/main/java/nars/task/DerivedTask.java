@@ -6,19 +6,22 @@ import nars.term.Compound;
 import nars.term.Termed;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Created by me on 2/7/16.
  */
 public final class DerivedTask extends MutableTask {
 
+    @Nullable
     private BLink<? extends Task> premiseTaskLink;
+    @Nullable
     private BLink<? extends Termed> premiseTermLink;
 
     //avoid storing the ConceptProcess reference because it creates a garbage-collection chain of derivedtask -> premise -> derivedtask etc..
     //public final ConceptProcess premise;
 
-    public DerivedTask(@NotNull Termed<Compound> tc, char punct, ConceptProcess premise) {
+    public DerivedTask(@NotNull Termed<Compound> tc, char punct, @NotNull ConceptProcess premise) {
         super(tc, punct);
         //this.premise = premise;
         this.premiseTaskLink = premise.taskLink;

@@ -135,6 +135,7 @@ public abstract class AbstractNAR extends NAR {
 
     }
 
+    @Nullable
     abstract protected Function<Term, Concept> newConceptBuilder();
 
 
@@ -319,7 +320,7 @@ public abstract class AbstractNAR extends NAR {
 
     public static class DefaultTermIndex extends MapIndex2  {
 
-        public DefaultTermIndex(int capacity, Random random) {
+        public DefaultTermIndex(int capacity, @NotNull Random random) {
             super(new UnifriedMap(capacity),
                   new DefaultConceptBuilder(random, 32, 32));
 

@@ -26,6 +26,7 @@ public class EllipsisZeroOrMore extends Ellipsis {
         return new EllipsisZeroOrMore(newVar);
     }
 
+    @NotNull
     @Override
     public final String toString() {
         return super.toString() + "..*";

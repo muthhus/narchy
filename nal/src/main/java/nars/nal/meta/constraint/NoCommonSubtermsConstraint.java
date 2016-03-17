@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 public final class NoCommonSubtermsConstraint implements MatchConstraint {
 
+    @NotNull
     private final Term b;
 
     public NoCommonSubtermsConstraint(@NotNull Term b) {

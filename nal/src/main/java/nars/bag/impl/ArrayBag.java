@@ -59,7 +59,7 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
     }
 
     @Nullable
-    @Override public BLink<V> put(V v) {
+    @Override public BLink<V> put(@NotNull V v) {
         //TODO combine with CurveBag.put(v)
         BLink<V> existing = get(v);
         if (existing!=null) {
@@ -70,12 +70,13 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
         }
     }
 
-    protected final void merge(BLink<V> target, Budgeted incoming, float scale) {
+    protected final void merge(@NotNull BLink<V> target, Budgeted incoming, float scale) {
         float overflow = mergeFunction.merge(target, incoming, scale);
         if (overflow > 0)
             target.charge(overflow);
     }
 
+    @NotNull
     private Budget getDefaultBudget(V v) {
         return v instanceof Budgeted ?
                 ((Budgeted) v).budget() :
@@ -217,6 +218,7 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
      * @param i The Item to put in
      * @return The updated budget
      */
+    @Nullable
     @Override
     public BLink<V> put(V i, Budgeted b, float scale) {
         //    }
@@ -248,7 +250,8 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
 
     }
 
-    public BLink<V> putExists(Budgeted b, float scale, BLink<V> existing) {
+    @NotNull
+    public BLink<V> putExists(Budgeted b, float scale, @NotNull BLink<V> existing) {
 
         if (existing!=b) {
             merge(existing, b, scale);
@@ -285,6 +288,7 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
     }
 
 
+    @Nullable
     @Override
     public Bag<V> commit() {
         forEach(this::update);

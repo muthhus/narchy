@@ -35,6 +35,7 @@ public class Terms extends TermBuilder implements TermIndex {
     public static final int[] ZeroIntArray = new int[0];
     public static final Term[] ZeroTermArray = new Term[0];
     public static final TermContainer ZeroSubterms = new EmptyTermContainer();
+    @Nullable
     public static final Compound ZeroProduct = $.compound(Op.PRODUCT, ZeroSubterms);
     public static final IntFunction<Term[]> NewTermArray = Term[]::new;
 
@@ -52,7 +53,7 @@ public class Terms extends TermBuilder implements TermIndex {
     }
 
     /** computes the content hash while accumulating subterm metadata summary fields into int[] meta */
-    public static int hashSubterms(Term[] term, int[] meta) {
+    public static int hashSubterms(@NotNull Term[] term, int[] meta) {
         int h = 1;
         for (Term t : term) {
             h = 31 /*Util.PRIME1 */ * h + t.init(meta);
@@ -61,7 +62,7 @@ public class Terms extends TermBuilder implements TermIndex {
     }
 
     /** should be consistent with the other hash method(s) */
-    public static int hashSubterms(TermContainer<?> container) {
+    public static int hashSubterms(@NotNull TermContainer<?> container) {
         int h = 1;
         for (Term t : container) {
             h = 31 /*Util.PRIME1 */ * h + t.hashCode();
@@ -87,7 +88,7 @@ public class Terms extends TermBuilder implements TermIndex {
     @Override
     public
     @Nullable
-    Termed make(Op op, int relation, TermContainer subterms, int dt) {
+    Termed make(@NotNull Op op, int relation, @NotNull TermContainer subterms, int dt) {
         return new GenericCompound(op, relation, subterms).dt(dt);
     }
 
@@ -106,6 +107,7 @@ public class Terms extends TermBuilder implements TermIndex {
     }
 
 
+    @NotNull
     @Override
     public TermBuilder builder() {
         return this;
@@ -169,7 +171,7 @@ public class Terms extends TermBuilder implements TermIndex {
         }
 
         @Override
-        public int compareTo(Object o) {
+        public int compareTo(@NotNull Object o) {
             return Integer.compare(hashCode(), o.hashCode());
         }
 
@@ -205,7 +207,7 @@ public class Terms extends TermBuilder implements TermIndex {
         }
 
         @Override
-        public boolean equalTerms(TermContainer c) {
+        public boolean equalTerms(@NotNull TermContainer c) {
             return c.size() == 0;
         }
 
@@ -649,7 +651,7 @@ public class Terms extends TermBuilder implements TermIndex {
         return opOrdinal << 16 | (relation & 0xffff);
     }
 
-    public static int opRel(Op op, int relation) {
+    public static int opRel(@NotNull Op op, int relation) {
         return opRel(op.ordinal(), relation);
     }
 

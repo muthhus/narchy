@@ -4,6 +4,7 @@ import nars.Symbols;
 import nars.nal.meta.AtomicBooleanCondition;
 import nars.nal.meta.PremiseEval;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Created by me on 8/27/15.
@@ -16,6 +17,7 @@ final public class TaskPunctuation extends AtomicBooleanCondition<PremiseEval> {
 
     public static final TaskPunctuation TaskJudgment = new TaskPunctuation('.');
 
+    @Nullable
     public static final AtomicBooleanCondition<PremiseEval> TaskQuestion = new AtomicBooleanCondition<PremiseEval>() {
 
         @Override
@@ -52,6 +54,7 @@ final public class TaskPunctuation extends AtomicBooleanCondition<PremiseEval> {
         this.id = id;
     }
 
+    @NotNull
     @Override
     public final String toString() {
         return id;

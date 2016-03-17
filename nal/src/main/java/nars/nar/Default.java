@@ -161,7 +161,7 @@ public class Default extends AbstractNAR {
         return c;
     }
 
-    void onSolution(Task t, boolean novel) {
+    void onSolution(@NotNull Task t, boolean novel) {
         Task parentTask = t.getParentTask();
         if (parentTask != null && parentTask.isQuestion()) {
 
@@ -262,14 +262,15 @@ public class Default extends AbstractNAR {
     }
 
 
+    @Nullable
     @Override
-    public Concept conceptualize(Termed termed, Budgeted activation, float scale) {
+    public Concept conceptualize(Termed termed, @NotNull Budgeted activation, float scale) {
 
 
         Concept c = concept(termed, true);
         if (c != null) {
 
-            core.activate(c, activation.budget(), scale);
+            BLink<Concept> cLink = core.activate(c, activation, scale);
 
             c.link(activation, scale, Default.this);
 
@@ -360,7 +361,7 @@ public class Default extends AbstractNAR {
 
     @NotNull
     @Override
-    public NAR forEachConcept(Consumer<Concept> recip) {
+    public NAR forEachConcept(@NotNull Consumer<Concept> recip) {
         core.active.forEachKey(recip);
         return this;
     }
@@ -549,8 +550,9 @@ public class Default extends AbstractNAR {
             f.clear();
         }
 
-        final void activate(Concept c, Budget b, float scale) {
-            active.put(c, b, scale * activationRate.floatValue());
+        @Nullable
+        final BLink<Concept> activate(@NotNull Concept c, @NotNull Budgeted b, float scale) {
+            return active.put(c, b, scale * activationRate.floatValue());
         }
 
 
@@ -575,7 +577,7 @@ public class Default extends AbstractNAR {
 
 
         @NotNull
-        public static Bag<Concept> newConceptBag(Random r, int n) {
+        public static Bag<Concept> newConceptBag(@NotNull Random r, int n) {
             return new CurveBag<Concept>(n, r)
                     //.mergePlus();
                     .merge(BudgetMerge.plusDQBlend);

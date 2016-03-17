@@ -216,7 +216,7 @@ public class WebServer extends PathHandler {
             server.stop();
 
             try {
-                loop.waitForTermination();
+                loop.stop();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

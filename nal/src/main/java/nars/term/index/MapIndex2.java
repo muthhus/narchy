@@ -42,6 +42,7 @@ public class MapIndex2 extends AbstractMapIndex {
         public final TermContainer vector;
 
         final static int NUM_FAST = 16;
+        @NotNull
         private final Termed[] fast;
 
         public SubtermNodeWithArray(TermContainer normalized) {
@@ -130,6 +131,7 @@ public class MapIndex2 extends AbstractMapIndex {
 //    }
 
 
+    @Nullable
     final Function<TermContainer, SubtermNode> termContainerSubtermNodeFunction =
             k ->
                 //new SubtermNode(normalize(k));
@@ -248,7 +250,7 @@ public class MapIndex2 extends AbstractMapIndex {
     }
 
     @Override
-    public void forEach(Consumer<? super Termed> c) {
+    public void forEach(@NotNull Consumer<? super Termed> c) {
         data.values().forEach(v->v.forEach(c));
 
         //throw new UnsupportedOperationException();

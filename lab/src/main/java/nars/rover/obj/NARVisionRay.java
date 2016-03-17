@@ -5,6 +5,7 @@ import nars.NAR;
 import nars.bag.BLink;
 import nars.concept.Concept;
 import nars.nar.Default;
+import nars.rover.physics.gl.JoglDraw;
 import nars.term.atom.Atom;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.Vec2;
@@ -29,7 +30,6 @@ public class NARVisionRay extends VisionRay {
     float conceptPriority;
     float conceptDurability;
     float conceptQuality;
-    public float seenDist;
 
 
     public NARVisionRay(String id, NAR nar, Body base, Vec2 point, float angle, float arc, int resolution, float length, float pri) {
@@ -42,28 +42,17 @@ public class NARVisionRay extends VisionRay {
         //this.seenAngleTerm = //"see_" + sim.angleTerm(angle);
     }
 
-    @Override
-    protected void updateColor(Color3f rayColor) {
-        rayColor.x = conceptPriority;
-        rayColor.y = conceptDurability;
-        rayColor.z = conceptQuality;
-//        float alpha = Math.min(
-//                (0.4f * conceptPriority * conceptDurability * conceptQuality) + 0.1f,
-//                1f
-//        );
-        rayColor.x = Math.min(rayColor.x * 0.9f + 0.1f, 1f);
-        rayColor.y = Math.min(rayColor.y * 0.9f + 0.1f, 1f);
-        rayColor.z = Math.min(rayColor.z * 0.9f + 0.1f, 1f);
-        rayColor.x = Math.max(rayColor.x, 0f);
-        rayColor.y = Math.max(rayColor.y, 0f);
-        rayColor.z = Math.max(rayColor.z, 0f);
 
-    }
-
-    @Override
-    protected void perceiveDist(Body hit, float newConf, float hitDist) {
-        this.seenDist = hitDist;
-        super.perceiveDist(hit, newConf, hitDist);
+    @Override public void drawRay(JoglDraw dd, RayDrawer r, Color3f c) {
+        float cp = this.conceptPriority;
+        dd.drawSegment(
+                r.from, r.to,
+                (cp * 0.75f + 0.25f) * c.x,
+                (cp * 0.75f + 0.25f) * c.y,
+                (cp * 0.75f + 0.25f) * c.z,
+                (cp * 0.75f + 0.25f) * 1f /* alpha */,
+                conceptDurability * 2f  + 1f /* width */,
+                conceptQuality * 0.5f + 1f /* z */);
     }
 
     @Override
@@ -76,6 +65,8 @@ public class NARVisionRay extends VisionRay {
             conceptPriority = 0.5f + 0.5f * angleConcept.pri();
             conceptDurability = 0.5f + 0.5f * angleConcept.dur();
             conceptQuality = 0.5f + 0.5f * angleConcept.qua();
+
+            //System.out.println(angleConcept + " " + conceptPriority);
 
             //sight.setProbability(Math.max(minVisionInputProbability, Math.min(1.0f, maxVisionInputProbability * conceptPriority)));
             //sight.setProbability(minVisionInputProbability);

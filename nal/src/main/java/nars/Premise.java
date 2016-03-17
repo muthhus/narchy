@@ -6,6 +6,7 @@ import nars.nal.Tense;
 import nars.task.Task;
 import nars.task.Tasked;
 import nars.term.Termed;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static nars.nal.Tense.ETERNAL;
@@ -15,8 +16,10 @@ import static nars.nal.Tense.ETERNAL;
  */
 public interface Premise extends Level, Tasked {
 
+    @NotNull
     Concept concept();
 
+    @NotNull
     @Override
     Task task();
 
@@ -218,6 +221,7 @@ public interface Premise extends Level, Tasked {
     boolean cyclic();
 
 
+    @NotNull
     Termed beliefTerm();
 
 
@@ -229,7 +233,7 @@ public interface Premise extends Level, Tasked {
     /** default method of computing occurrence time of the conclusion task from the premise task and belief
      *  @param taskOrBelief if there is a choice, which event to use
      * */
-    default long occurrenceTarget(OccurrenceSolver whenBothNonEternal) {
+    default long occurrenceTarget(@NotNull OccurrenceSolver whenBothNonEternal) {
         long tOcc = task().occurrence();
         Task b = belief();
         if (b == null) return tOcc;

@@ -20,7 +20,7 @@ public class AndConstraint implements MatchConstraint {
     }
 
     @Override
-    public boolean invalid(Term assignee, Term value, FindSubst f) {
+    public boolean invalid(@NotNull Term assignee, @NotNull Term value, @NotNull FindSubst f) {
         for (MatchConstraint m : subConst) {
             if (m.invalid(assignee, value, f))
                 return true;

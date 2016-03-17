@@ -7,16 +7,18 @@ import nars.rover.physics.j2d.LayerDraw;
 import nars.rover.robot.AbstractPolygonBot;
 import nars.rover.robot.Being;
 import nars.rover.util.RayCastClosestCallback;
+import nars.util.data.Util;
 import org.jbox2d.callbacks.RayCastCallback;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.World;
 
 /**
  * Created by me on 1/31/16.
  */
-abstract public class VisionRay extends RayCastClosestCallback implements AbstractPolygonBot.Sense, LayerDraw {
+abstract public class VisionRay implements AbstractPolygonBot.Sense, LayerDraw {
 
     protected final int resolution;
     protected final float arc;
@@ -24,20 +26,21 @@ abstract public class VisionRay extends RayCastClosestCallback implements Abstra
     public final float angle;
     private final Body base;
     private final Being bot;
-    protected float conf;
 
-    final Color3f laserUnhitColor = new Color3f(0.25f, 0.25f, 0.25f);
-    final Color3f laserHitColor = new Color3f(laserUnhitColor.x, laserUnhitColor.y, laserUnhitColor.z);
+    public float seenDist;
+
+    ///final Color3f laserUnhitColor = new Color3f(0.25f, 0.25f, 0.25f);
+    final Color3f laserHitColor = new Color3f(0.25f, 0.25f, 0.25f);
 
 
-    public Color3f sparkColor = new Color3f(0.4f, 0.9f, 0.4f);
-    public Color3f normalColor = new Color3f(0.9f, 0.9f, 0.4f);
+    public Color3f sparkColor;
+    public Color3f normalColor;
     protected float distance;
 
 
     final RayDrawer[] rayDrawers;
 
-    float biteDistanceThreshold = 0.1f;
+    float biteDistanceThreshold = 0.05f;
     private boolean eats;
     protected Body hitNext;
 
@@ -62,10 +65,13 @@ abstract public class VisionRay extends RayCastClosestCallback implements Abstra
             rayDrawers[i] = new RayDrawer(base.getWorld(), i, angle, arc/resolution);
 
         sparkColor = new Color3f(0.5f, 0.4f, 0.4f);
-        normalColor = new Color3f(0.4f, 0.4f, 0.4f);
+        normalColor = new Color3f(0.2f, 0.2f, 0.2f);
 
     }
 
+
+
+    //TODO color(Body hit)
 
     public static String material(Body hit) {
         if (hit == null) return "nothing";
@@ -87,15 +93,16 @@ abstract public class VisionRay extends RayCastClosestCallback implements Abstra
 
     }
 
-    protected void perceiveDist(Body hit, float newConf, float hitDist) {
+    protected void perceiveDist(Body hit, float hitDist) {
 
         this.hitNext = hit;
         this.hitMaterial = material(hit);
+        this.seenDist = hitDist;
 
 
         //hitDist = (distMomentum * hitDist) + (1f - distMomentum) * nextHitDist;
         //conf = (confMomentum * conf) + (1f - confMomentum) * newConf;
-        conf = newConf;
+
 
         //System.out.println(angleTerm + " "+ hitDist + " " + conf);
 
@@ -103,7 +110,6 @@ abstract public class VisionRay extends RayCastClosestCallback implements Abstra
 
     }
 
-    abstract protected void updateColor(Color3f rayColor);
 
 
     public void onTouch(Body touched, float di) {
@@ -156,13 +162,27 @@ abstract public class VisionRay extends RayCastClosestCallback implements Abstra
             this.targetAngle = da + angle + baseAngle;
         }
 
+        @Override
+        public final float reportFixture(Fixture fixture, Vec2 point, Vec2 normal, float fraction) {
+            Body body = fixture.getBody();
+
+            //System.out.println(body + " " + base);
+
+            //ignore self:
+            if (body == base) return 1;
+            Object userData = body.getUserData();
+            if (userData!=null && (userData instanceof Being.BeingMaterial) && userData.toString().equals(bot.id))
+                return 1;
+
+            return super.reportFixture(fixture, point, normal, fraction);
+        }
 
         public void update() {
-            from.set(base.getWorldCenter());
+            base.getWorldPointToOut(point, from);//getWorldCenter());
 
-            float angle = targetAngle + base.getAngle();
 
             to.set(from);
+            float angle = targetAngle + base.getAngle();
             to.addLocal(distance * (float) Math.cos(angle), distance * (float) Math.sin(angle));
 
 
@@ -183,69 +203,22 @@ abstract public class VisionRay extends RayCastClosestCallback implements Abstra
 
                 to.set(m_point);
 
-                /*if (drawing)*/ {
                     color.set(laserHitColor);
-                    color.z = Math.min(1.0f, laserUnhitColor.x + 0.75f * (1.0f - d));
-                    //Vec2 pp = ccallback.m_point.clone();
-//                        toDraw.add(new Runnable() {
-//                            @Override public void run() {
-//
-//                                getDraw().drawPoint(pp, 5.0f, sparkColor);
-//
-//                            }
-//                        });
-
-                }
-
-                //pooledHead.set(ccallback.m_normal);
-                //pooledHead.mulLocal(.5f).addLocal(ccallback.m_point);
-                //draw.drawSegment(ccallback.m_point, pooledHead, normalColor, 0.25f);
+                    color.z = Math.min(1.0f, color.z + 0.75f * (1.0f - d));
 
 
-                //System.out.println(body.getUserData() + " " + hitDist + " " + distance + " " + d);
 
-                perceiveDist(body, 0.9f, d);
-
-
+                perceiveDist(body, d);
             } else {
-
-
                 hitDist = Float.POSITIVE_INFINITY; //to.euclideanDistance(from); //TODO may not be necessary to calculate
                 m_hit = false;
                 body = null;
                 color.set(normalColor);
             }
 
-
-
-
-                //final float alpha = rayColor.x *= 0.2f + 0.8f * (senseActivity + conceptPriority)/2f;
-                //rayColor.z *= alpha - 0.35f * senseActivity;
-                //rayColor.y *= alpha - 0.35f * conceptPriority;
-
-
-            updateColor(color);
-
-
-
-
-
-//            if (m_hit) {
-//                float meanDist = totalDist / resolution;
-//                float percentDiff = (float) Math.sqrt(Math.abs(meanDist - minDist));
-//                float conf = 0.8f + 0.2f * (1.0f - percentDiff);
-//                if (conf > 0.99f) {
-//                    conf = 0.99f;
-//                }
-//
-//                //perceiveDist(hit, conf, meanDist);
-//                perceiveDist(body, conf, meanDist);
-//
-//                //if (isEating())
-//                //  System.out.println(isEating() + " "  + hit + " " + meanDist + " " + biteDistanceThreshold + " eat?");
-//
-//            } else {
-//            }
+            color.x = Util.clamp(color.x);
+            color.y = Util.clamp(color.y);
+            color.z = Util.clamp(color.z);
 
         }
 
@@ -267,13 +240,17 @@ abstract public class VisionRay extends RayCastClosestCallback implements Abstra
         for (RayDrawer r : rayDrawers) {
 
             Color3f c = r.color;
-            dd.drawSegment(
-                    r.from, r.to,
-                    c.x, c.y, c.z,
-                    0.5f /* alpha */, 1f * 2f /* width */,
-                    1f /* z */);
+            drawRay(dd, r, c);
 
         }
+    }
+
+    public void drawRay(JoglDraw dd, RayDrawer r, Color3f c) {
+        dd.drawSegment(
+                r.from, r.to,
+                c.x, c.y, c.z,
+                0.75f /* alpha */, 2f /* width */,
+                1f /* z */);
     }
 
     public void setEats(boolean b) {

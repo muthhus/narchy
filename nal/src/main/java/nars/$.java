@@ -45,7 +45,7 @@ public enum $ /* TODO: implements TermIndex */ {
     public static final org.slf4j.Logger logger = LoggerFactory.getLogger($.class);
     public static final Function<Object, Term> ToStringToTerm = (x) -> $.the(x.toString());
 
-    public static <T extends Term> T $(String term) {
+    public static <T extends Term> T $(@NotNull String term) {
         Termed normalized = Narsese.the().term(term, Terms.terms);
         if (normalized!=null)
             return (T)(normalized.term());
@@ -55,7 +55,7 @@ public enum $ /* TODO: implements TermIndex */ {
         //        catch (InvalidInputException e) { }
     }
 
-    @Deprecated public static MutableTask $(String term, char punc) {
+    @Deprecated public static MutableTask $(@NotNull String term, char punc) {
         Term t = Narsese.the().term(term).term();
         //TODO normalize etc
         if (!Task.validTaskTerm(t))
@@ -90,6 +90,7 @@ public enum $ /* TODO: implements TermIndex */ {
     }
 
 
+    @NotNull
     public static Atom the(int i) {
         return the(i, 10);
     }
@@ -110,7 +111,7 @@ public enum $ /* TODO: implements TermIndex */ {
 
 
     @Nullable
-    public static Term inh(String subj, String pred) {
+    public static Term inh(@NotNull String subj, @NotNull String pred) {
         return inh((Term)$(subj), $(pred));
     }
 
@@ -235,7 +236,7 @@ public enum $ /* TODO: implements TermIndex */ {
         return Terms.terms.builder().inst(subj, pred);
     }
     @Nullable
-    public static Term instprop(Term subject, Term predicate) {
+    public static Term instprop(@NotNull Term subject, @NotNull Term predicate) {
         return Terms.terms.builder().instprop(subject, predicate);
     }
     @Nullable
@@ -340,7 +341,7 @@ public enum $ /* TODO: implements TermIndex */ {
     }
 
     /** unnormalized variable */
-    public static @NotNull Variable v(char ch, String name) {
+    public static @NotNull Variable v(char ch, @NotNull String name) {
 
 //        if (name.length() < 3) {
 //            int digit = Texts.i(name, -1);
@@ -549,6 +550,7 @@ public enum $ /* TODO: implements TermIndex */ {
     }
 
 
+    @NotNull
     public static Atom the(Number o) {
 
         if (o instanceof Byte) return the(o.intValue());
@@ -565,6 +567,7 @@ public enum $ /* TODO: implements TermIndex */ {
     private static final Term[] digits = new Term[10];
 
     /** gets the atomic term of an integer, with specific radix (up to 36) */
+    @NotNull
     public static Atom the(int i, int radix) {
         //fast lookup for single digits
         if ((i >= 0) && (i <= 9)) {
@@ -594,6 +597,7 @@ public enum $ /* TODO: implements TermIndex */ {
         //  }
     }
 
+    @NotNull
     public static Atom the(float v) {
         if (Util.equals( (float)Math.floor(v), v, Float.MIN_VALUE*2 )) {
             //close enough to be an int, so it doesnt need to be quoted

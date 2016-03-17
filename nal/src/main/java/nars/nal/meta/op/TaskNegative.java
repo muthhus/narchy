@@ -23,6 +23,7 @@ public final class TaskNegative extends AtomicBooleanCondition<PremiseEval> {
         return (task.isJudgmentOrGoal() && task.freq() < 0.5f);
     }
 
+    @NotNull
     @Override
     public String toString() {
         return getClass().getSimpleName();

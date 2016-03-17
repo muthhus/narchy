@@ -3,6 +3,7 @@ package nars.task.flow;
 import com.gs.collections.api.block.function.primitive.IntToObjectFunction;
 import nars.budget.BudgetMerge;
 import nars.budget.Budgeted;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -28,7 +29,7 @@ public class BudgetedSet<B extends Budgeted> {
         this.arrayer = tmpArrayBuilder;
     }
 
-    public B put(B t) {
+    public B put(@NotNull B t) {
         if (t.isDeleted()) {
             throw new RuntimeException("Deleted: " + t);
         }
@@ -72,7 +73,7 @@ public class BudgetedSet<B extends Budgeted> {
         return buffer;
     }
 
-    public void flush(Consumer<B> each) {
+    public void flush(@NotNull Consumer<B> each) {
         B[] x = flushArray();
         if (x != null) {
             for (B o : buffer) {
@@ -83,7 +84,7 @@ public class BudgetedSet<B extends Budgeted> {
     }
 
     /** each will be a null-terminated array */
-    public void flushAll(Consumer<B[]> each) {
+    public void flushAll(@NotNull Consumer<B[]> each) {
         B[] x = flushArray();
         if (x != null)
             each.accept(x);

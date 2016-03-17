@@ -2,12 +2,14 @@ package nars.term.transform;
 
 import nars.term.Compound;
 import nars.term.Term;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Predicate;
 
 /** I = input term type, T = transformable subterm type */
 public interface CompoundTransform<I extends Compound, T extends Term> extends Predicate<Term> {
 
+    @Nullable
     T apply(I parent, T subterm, int depth);
 
     /** enable predicate determined by the superterm, tested before processing any subterms */

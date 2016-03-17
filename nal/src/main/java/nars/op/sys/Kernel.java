@@ -14,6 +14,7 @@ import nars.task.Task;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,6 +29,7 @@ public class Kernel {
     private static final Logger logger = LoggerFactory.getLogger(Kernel.class);
 
     private final NAR nar;
+    @NotNull
     private final CurveBag<Task> schedule;
 
     /** forgetting period */
@@ -39,6 +41,7 @@ public class Kernel {
 
     /** master power control of how much influence this has on the NAR's reasoner budget*/
     final float strength = 0.1f;
+    @NotNull
     private final Forget.ForgetAndDetectDeletion schForget;
 
     public Kernel(NAR n, int capacity) {
@@ -54,7 +57,7 @@ public class Kernel {
         nar.eventFrameStart.on(x-> update());
     }
 
-    private void onInput(Task t) {
+    private void onInput(@NotNull Task t) {
         schedule.put(t, t.budget());
     }
 
@@ -76,12 +79,13 @@ public class Kernel {
         //schedule.printAll();
     }
 
-    private float strength(BLink<Task> cl) {
+    private float strength(@NotNull BLink<Task> cl) {
         return strength * cl.summary();
     }
 
 
-    public Task run(float priority, String operator, Runnable r, Term... args) {
+    @NotNull
+    public Task run(float priority, @NotNull String operator, @NotNull Runnable r, Term... args) {
         Atomic op = $.operator(operator);
 
 //        //HACK for command tasks which do not get an eventInput emission, tracked here

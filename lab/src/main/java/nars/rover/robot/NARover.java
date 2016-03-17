@@ -261,13 +261,13 @@ public class NARover extends AbstractPolygonBot {
     }
 
 
-    protected void train(long t) {
-        //float freq = 0.5f + 0.5f * (1/(1f + t/5000f)), conf = 0.85f;
-        float freq = 1f, conf = 0.9f;
-        //nar.input("MotorControls(random,motor,(),#x)! %1.0;0.1%");
-        nar.input("MotorControls(random,motor,(),#x)! %" + n2(freq) + "|" + n2(conf) + "%");
-        System.out.println("@" + t + " Curiosity Trained @ freq=" + freq);
-    }
+//    protected void train(long t) {
+//        //float freq = 0.5f + 0.5f * (1/(1f + t/5000f)), conf = 0.85f;
+//        float freq = 1f, conf = 0.9f;
+//        //nar.input("MotorControls(random,motor,(),#x)! %1.0;0.1%");
+//        nar.input("MotorControls(random,motor,(),#x)! %" + n2(freq) + "|" + n2(conf) + "%");
+//        System.out.println("@" + t + " Curiosity Trained @ freq=" + freq);
+//    }
 
     @Override
     public void init(Sim p) {
@@ -365,29 +365,30 @@ public class NARover extends AbstractPolygonBot {
         });
     }
 
-    public void addEye(Being b, String id, NarQ controller, Body base, int pixels, int detail, Vec2 center, float arc, float centerAngle, float distance, Consumer<VisionRay> each) {
+    public void addEye(Being b, String id, NarQ controller, Body base, int pixels, int detail, Vec2 center,
+                       float arc, float centerAngle, float distance, Consumer<VisionRay> each) {
 
-        float aStep = (float) (Math.PI * 2f)/pixels * (arc);
+        final float twoPi = (float)Math.PI * 2f;
+        float aStep = arc/pixels;
+
+        float startAngle = centerAngle - twoPi * arc;
 
         //final MutableFloat servo = new MutableFloat();
 
         for (int i = 0; i < pixels; i++) {
-            final float angle = aStep * (i-pixels/2) + centerAngle;
+            final float angle = startAngle + twoPi * (aStep * i);
 
             NARVisionRay v = new NARVisionRay(id + i, nar, base, center, angle, arc,
-                    detail, distance, 1f/pixels) {
+                    detail, distance, 1f/pixels);
+
 
 //                  @Override public float getLocalAngle () {
 //                      return 0.5f * (float)Math.sin(servo.floatValue()); //controller.get();
 //                  }
 
 
-                @Override
-                @Deprecated protected void updateColor(Color3f rayColor) {
-//                    float s = v.hitDist;
-//                    rayColor.set(s,1f-s,0.5f);
-                }
-            };
+
+
 
 
             each.accept(v);

@@ -545,6 +545,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         return temporary;
     }
 
+    @Nullable
     default Truth getDesire() {
         return truth();
     }
@@ -768,6 +769,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
     //projects the truth to a certain time, covering all 4 cases as discussed in
     //https://groups.google.com/forum/#!searchin/open-nars/task$20eteneral/open-nars/8KnAbKzjp4E/rBc-6V5pem8J
+    @Nullable
     default Truth projectTruth(long targetTime, long now, boolean eternalizeIfWeaklyTemporal) {
 
         Truth currentTruth = truth();

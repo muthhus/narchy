@@ -95,6 +95,7 @@ abstract public class MatchTerm extends AtomicBooleanCondition<PremiseEval> impl
     }
 
 
+    @NotNull
     @Override
     public final String toString() {
         return id.toString();

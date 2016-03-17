@@ -33,7 +33,7 @@ import java.util.Collection;
  */
 public class TextInput extends TaskQueue {
 
-	public TextInput(@NotNull NAR nar, String input) throws Narsese.NarseseException {
+	public TextInput(@NotNull NAR nar, @NotNull String input) throws Narsese.NarseseException {
 		int n = Narsese.the().tasks(input,
 				(Collection<Task>) this, nar);
 		if (n == 0)

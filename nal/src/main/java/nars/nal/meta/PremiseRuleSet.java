@@ -38,14 +38,14 @@ public class PremiseRuleSet  {
 
     final static Term rule = $.the("rule");
 
-    public void reifyTo(NAR n) {
+    public void reifyTo(@NotNull NAR n) {
         rules.forEach(r-> reifyTo(n,r));
     }
 
 
 
     //TODO abstract
-    protected static void reifyTo(NAR n, PremiseRule r) {
+    protected static void reifyTo(@NotNull NAR n, @NotNull PremiseRule r) {
 
         PatternVarReifier pr = new PatternVarReifier(r.hashCode()); //HACK todo use not hashcode this unsafe way
 
@@ -61,7 +61,8 @@ public class PremiseRuleSet  {
         );
     }
 
-    private static Term ruleComponent(Compound term, PatternVarReifier r) {
+    @Nullable
+    private static Term ruleComponent(@NotNull Compound term, @NotNull PatternVarReifier r) {
         return Terms.terms.transform(term, r);
     }
 
@@ -296,11 +297,13 @@ public class PremiseRuleSet  {
         return ur;
     }
 
+    @NotNull
     public static Set<PremiseRule> permute(PremiseRule preNorm) {
         return permute(new PatternIndex(), Global.newHashSet(1), "", preNorm);
     }
 
-    public static Set<PremiseRule> permute(@NotNull PatternIndex index, Set<PremiseRule> ur, String src, PremiseRule preNorm) {
+    @NotNull
+    public static Set<PremiseRule> permute(@NotNull PatternIndex index, @NotNull Set<PremiseRule> ur, String src, PremiseRule preNorm) {
         PremiseRule r = add(ur, preNorm, src, index);
 
 
@@ -325,7 +328,7 @@ public class PremiseRuleSet  {
         return ur;
     }
 
-    public static void permuteForward(@NotNull PatternIndex index, Set<PremiseRule> ur, String src, PremiseRule b, boolean thenBackward) {
+    public static void permuteForward(@NotNull PatternIndex index, @NotNull Set<PremiseRule> ur, String src, @NotNull PremiseRule b, boolean thenBackward) {
         PremiseRule f = add(ur, b.forwardPermutation(), src + ":forward", index);
         if (thenBackward) {
             f.backwardPermutation((s, reasonBF) -> {
@@ -335,7 +338,7 @@ public class PremiseRuleSet  {
     }
 
     /** whether a rule will be forward permuted */
-    static boolean forwardPermutes(PremiseRule r) {
+    static boolean forwardPermutes(@NotNull PremiseRule r) {
         boolean[] fwd = new boolean[] { true };
         r.recurseTerms((s,c) -> {
 
@@ -388,17 +391,19 @@ public class PremiseRuleSet  {
         }
 
         @Override
-        public boolean test(Term superterm) {
+        public boolean test(@NotNull Term superterm) {
             return (superterm.varPattern()>0);
             //return (o instanceof Compound) && ((Compound)o).varPattern() > 0;
         }
 
+        @Nullable
         @Override
-        public Term apply(Compound parent, Term subterm, int depth) {
+        public Term apply(Compound parent, @NotNull Term subterm, int depth) {
             return unpatternify(subterm);
         }
 
-        public Term unpatternify(Term subterm) {
+        @Nullable
+        public Term unpatternify(@NotNull Term subterm) {
             String ruleID = Integer.toString(id, 36);
             if (subterm.op() == Op.VAR_PATTERN) {
                 return $.quote("%" + ((Variable) subterm).id() + "_" + ruleID);

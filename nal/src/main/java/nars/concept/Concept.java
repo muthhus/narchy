@@ -105,13 +105,13 @@ public interface Concept extends Termed, Comparable {
                         goals().top(now).expectation()) : 0;
     }
 
-    @NotNull
+    @Nullable
     BeliefTable beliefs();
 
-    @NotNull
+    @Nullable
     BeliefTable goals();
 
-    @NotNull
+    @Nullable
     TaskTable questions();
 
 
@@ -121,7 +121,7 @@ public interface Concept extends Termed, Comparable {
 //            throw new RuntimeException("Deleted concept should not activate TermLinks");
 //    }
 
-    @NotNull
+    @Nullable
     TaskTable quests();
 
     @Nullable
@@ -289,8 +289,7 @@ public interface Concept extends Termed, Comparable {
 
 
     default boolean link(@NotNull Budgeted b, float initialScale, @NotNull NAR nar) {
-        if (initialScale <= 0) return false;
-        if (b.isDeleted())
+        if (initialScale <= 0 || b.isDeleted())
             throw new Budget.BudgetException();
             //return false;
 

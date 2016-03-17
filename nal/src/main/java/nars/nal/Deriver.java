@@ -4,6 +4,7 @@ import nars.nal.meta.PremiseEval;
 import nars.nal.meta.PremiseRuleSet;
 import nars.nal.meta.TrieDeriver;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +49,7 @@ public abstract class Deriver  {
     /**
      * default set of rules, statically available
      */
+    @Nullable
     public final PremiseRuleSet rules;
 
 

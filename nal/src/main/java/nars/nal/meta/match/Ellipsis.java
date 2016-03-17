@@ -42,7 +42,7 @@ public abstract class Ellipsis extends AbstractVariable {
 
         public final int minArity;
 
-        public EllipsisPrototype(Op type, @NotNull GenericVariable target, int minArity) {
+        public EllipsisPrototype(@NotNull Op type, @NotNull GenericVariable target, int minArity) {
             super(type, target.label /* exclude variable type char */
                     + ".." + (minArity == 0 ? '*' : '+'));
             this.minArity = minArity;

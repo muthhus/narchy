@@ -33,6 +33,7 @@ public class GenericVariable extends AtomicString implements Variable {
         return 0;
     }
 
+    @NotNull
     @Override
     public Op op() {
         return type;

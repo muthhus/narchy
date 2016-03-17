@@ -29,7 +29,7 @@ import java.util.Arrays;
 
 public interface Stamp {
 
-    /** "default" zipping config */
+    /** "default" zipping config: prefer newest */
     @NotNull static long[] zip(@NotNull long[] a, @NotNull long[] b) {
         return zip(a, b,
                 Global.MAXIMUM_EVIDENTAL_BASE_LENGTH,
@@ -48,10 +48,6 @@ public interface Stamp {
         int baseLength = Math.min(aLen + bLen, maxLen);
         long[] c = new long[baseLength];
 
-        //if it's an even-number of items, we want the (n-1)th's array element to come from 'b'
-        boolean parity = true;
-
-        //for (int i = baseLength-1; i >= 0; ) {  //reverse
 
         if (newToOld) {
             //"forward" starts with newes, oldest are trimmed
@@ -59,11 +55,8 @@ public interface Stamp {
             for (int i = baseLength-1; i >= 0; ) {
                 boolean ha = (ia >=0), hb = (ib >= 0);
 
-                //both, choose according to the parity decision
-                //one of them is empty, select from which is not
-
                 c[i--] = ((ha && hb) ?
-                        ((i & 1) == 1) == true : ha) ?
+                            ((i & 1) > 0) : ha) ?
                             a[ia--] : b[ib--];
             }
         } else {
@@ -71,14 +64,10 @@ public interface Stamp {
             int ib = 0, ia = 0;
             for (int i = 0; i < baseLength; ) {
 
-                //both, choose according to the parity decision
-                //one of them is empty, select from which is not
                 boolean ha = ia < aLen, hb = ib < bLen;
                 c[i++] = ((ha && hb) ?
-                            ((i & 1) == 1) == true :
-                            ha) ?
-                                a[ia++] :
-                                b[ib++];
+                            ((i & 1) > 0) : ha) ?
+                            a[ia++] : b[ib++];
             }
         }
 

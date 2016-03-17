@@ -1194,7 +1194,7 @@ public class Narsese extends BaseParser<Object> {
     }
 
     @Nullable
-    public Termed term(String s, @NotNull TermIndex index, boolean normalize) throws NarseseException  {
+    public Termed term(@NotNull String s, @NotNull TermIndex index, boolean normalize) throws NarseseException  {
         Term raw = term(s);
         if (raw == null) return null;
 
@@ -1303,6 +1303,7 @@ public class Narsese extends BaseParser<Object> {
      */
     public static class NarseseException extends RuntimeException {
 
+        @Nullable
         public final ParsingResult result;
 
         /**

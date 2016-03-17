@@ -85,6 +85,7 @@ public final class NullBag<V> implements Bag<V> {
         return null;
     }
 
+    @NotNull
     @Override
     public Bag<V> commit() {
         return this;

@@ -21,6 +21,7 @@ public abstract class GenericNormalizedVariable extends AbstractVariable {
         return type == Op.VAR_PATTERN ? 0 : 1;
     }
 
+    @NotNull
     @Override
     public final Op op() {
         return type;

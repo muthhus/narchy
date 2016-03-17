@@ -19,6 +19,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import jdk.internal.misc.Unsafe;
 import nars.*;
 import nars.budget.Budget;
 import nars.budget.BudgetedHandle;
@@ -606,7 +607,11 @@ public class NARide extends StackPane {
         new Thread(() -> {
             NARide.show(tmp, x -> {
                 if (!start)
-                    tmp.stop();
+                    try {
+                        tmp.stop();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
             });
         }).start();
     }

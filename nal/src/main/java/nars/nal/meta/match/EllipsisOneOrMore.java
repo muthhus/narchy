@@ -33,6 +33,7 @@ public class EllipsisOneOrMore extends Ellipsis {
         return collectable > 0;
     }
 
+    @NotNull
     @Override
     public String toString() {
         return super.toString() + "..+";

@@ -45,6 +45,7 @@ abstract public class Solve extends AtomicBooleanCondition<PremiseEval> {
 //            throw new RuntimeException(e);
 //        }
 
+    @NotNull
     @Override
     public String toString() {
         return id;

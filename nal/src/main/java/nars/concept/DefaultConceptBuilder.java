@@ -45,6 +45,7 @@ public class DefaultConceptBuilder implements Function<Term,Concept> {
               .merge(mergeDefault());
     }
 
+    @NotNull
     private BudgetMerge mergeDefault() {
         return BudgetMerge.plusDQBlend;
     }
@@ -69,6 +70,7 @@ public class DefaultConceptBuilder implements Function<Term,Concept> {
     public final MutableInt termLinkBagSize = new MutableInt(16);
 
 
+    @NotNull
     public final Random rng;
 
 

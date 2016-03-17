@@ -42,7 +42,7 @@ import static java.util.Arrays.stream;
  *
  */
 public enum Util {
-    ;
+    Util;
 
 
     public static final int PRIME3 = 524287;

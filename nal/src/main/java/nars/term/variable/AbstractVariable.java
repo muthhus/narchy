@@ -34,6 +34,7 @@ public abstract class AbstractVariable implements Variable {
 
     public final int id;
     protected final int hash;
+    @NotNull
     private transient final String str;
 
     protected AbstractVariable(@NotNull Op type, int id) {
@@ -50,7 +51,7 @@ public abstract class AbstractVariable implements Variable {
     //@Override abstract public boolean equals(Object other);
 
     @Override
-    public final boolean equals(Object obj) {
+    public final boolean equals(@NotNull Object obj) {
         return obj==this ||
                 (obj.hashCode() == hash && (obj instanceof Variable)); //hash first, it is more likely to differ
                 //((obj instanceof Variable) && ((Variable)obj).hash == hash);
@@ -68,6 +69,7 @@ public abstract class AbstractVariable implements Variable {
         return o instanceof Variable ? Integer.compare(hash, o.hashCode()) : 1;
     }
 
+    @NotNull
     @Override
     public String toString() {
         return str;
@@ -123,7 +125,7 @@ public abstract class AbstractVariable implements Variable {
 //    @Override
 //    abstract public int volume();
 
-    public static AbstractVariable cached(Op type, int counter) {
+    public static AbstractVariable cached(@NotNull Op type, int counter) {
         if (counter >= AbstractVariable.MAX_VARIABLE_CACHED_PER_TYPE) {
             return vNew(type, counter);
             //throw new RuntimeException("variable cache overflow");
@@ -139,6 +141,7 @@ public abstract class AbstractVariable implements Variable {
     }
 
     /** TODO move this to TermBuilder */
+    @NotNull
     static AbstractVariable vNew(@NotNull Op type, int counter) {
         switch (type) {
             case VAR_PATTERN: return new VarPattern(counter);

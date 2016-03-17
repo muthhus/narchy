@@ -24,6 +24,7 @@ public class reflect extends TermFunction {
     */
 
     
+    @Nullable
     @Override
     public Object function(@NotNull Compound x, TermIndex i) {
 

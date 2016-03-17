@@ -12,11 +12,12 @@ import org.jetbrains.annotations.NotNull;
 public final class SubTermOps2 extends AtomicBooleanCondition<PremiseEval> {
 
 
+    @NotNull
     private final transient String id;
     @NotNull private final Op left, right;
 
 
-    public SubTermOps2(Op left, Op right) {
+    public SubTermOps2(@NotNull Op left, @NotNull Op right) {
         this.left = left;
         this.right = right;
         this.id = "SubTermOps:(\"" + left + "\",\"" + right + '"' + "\")";

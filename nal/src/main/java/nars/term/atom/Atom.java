@@ -10,10 +10,11 @@ import org.jetbrains.annotations.Nullable;
 /** default Atom implementation */
 public class Atom extends AtomicStringConstant {
 
+    @Nullable
     public final String id;
     public final int hash;
 
-    public Atom(String id) {
+    public Atom(@Nullable String id) {
 
         if ((id == null) || (id.isEmpty()))
             throw new UnsupportedOperationException("Empty Atom ID");
@@ -28,6 +29,7 @@ public class Atom extends AtomicStringConstant {
     }
 
 
+    @NotNull
     @Override public final String toString() {
         return id;
     }

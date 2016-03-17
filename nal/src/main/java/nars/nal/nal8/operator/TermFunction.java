@@ -68,6 +68,7 @@ public abstract class TermFunction<O> extends SyncOperator {
      * @param arguments - the product subject of an Operation
      * @param i
      */
+    @Nullable
     public abstract O function(Compound arguments, TermIndex i);
 
 

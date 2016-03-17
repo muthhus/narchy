@@ -38,7 +38,9 @@ public class CurveBag<V> implements Bag<V> {
     public static final BagCurve power6BagCurve = new Power6BagCurve();
 
     //TODO move sampler features to subclass of CurveBag which specifically provides sampling
+    @NotNull
     public final BagCurve curve;
+    @NotNull
     private final Random random;
 
     public CurveBag(int capacity, @NotNull Random rng) {
@@ -49,7 +51,7 @@ public class CurveBag<V> implements Bag<V> {
     }
 
 
-    public CurveBag(BagCurve curve, int capacity, @NotNull Random rng) {
+    public CurveBag(@NotNull BagCurve curve, int capacity, @NotNull Random rng) {
         this(new ArrayBag.BudgetedArraySortedIndex<>(capacity), curve, rng);
 
 

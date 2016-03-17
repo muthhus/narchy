@@ -8,6 +8,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import static nars.nal.Tense.*;
 
@@ -28,6 +29,7 @@ public interface Temporalize {
      * @param occReturn holds the occurrence time as a return value for the callee to use in building the task
      * @return
      */
+    @NotNull
     Compound compute(@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn);
 
 
@@ -68,7 +70,7 @@ public interface Temporalize {
 //    };
 
     @NotNull
-    static Compound dtBeliefMinTask(Compound derived, PremiseEval p, long[] occReturn, int polarity) {
+    static Compound dtBeliefMinTask(@NotNull Compound derived, @NotNull PremiseEval p, long[] occReturn, int polarity) {
         ConceptProcess premise = p.premise;
 
         occReturn[0] = premise.occurrenceTarget(latestOccurrence);
@@ -105,7 +107,7 @@ public interface Temporalize {
     }
 
     @NotNull
-    static Compound deriveDT(Compound derived, int polarity, ConceptProcess premise, int eventDelta) {
+    static Compound deriveDT(@NotNull Compound derived, int polarity, @NotNull ConceptProcess premise, int eventDelta) {
         if (eventDelta!=0 && derived.op().isCommutative()) {
             //flip temporal polarity if reversed
             if (!derived.term(0).equals(premise.task().term())) {
@@ -117,6 +119,7 @@ public interface Temporalize {
     }
 
     /** combine any existant DT's in the premise (assumes both task and belief are present) */
+    @Nullable
     Temporalize dtCombine = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn) -> {
         ConceptProcess premise = p.premise;
 
@@ -169,6 +172,7 @@ public interface Temporalize {
      * "automatic" implementation of Temporalize, used by default. slow and wrong about 25..30% of the time sux needs rewritten or replaced
      * apply temporal characteristics to a newly derived term according to the premise's
      */
+    @Nullable
     Temporalize Auto = (derived, p, d, occReturn) -> {
 
 

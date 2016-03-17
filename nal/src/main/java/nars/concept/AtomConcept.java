@@ -24,7 +24,7 @@ public class AtomConcept<E extends Atomic> extends AbstractConcept<E> implements
 //        this(atom, budget, new NullBag(), new NullBag());
 //    }
 
-    public AtomConcept(E atom, Bag<Termed> termLinks, Bag<Task> taskLinks) {
+    public AtomConcept(@NotNull E atom, Bag<Termed> termLinks, Bag<Task> taskLinks) {
         super(atom, taskLinks, termLinks);
     }
 

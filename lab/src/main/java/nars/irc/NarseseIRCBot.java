@@ -263,7 +263,11 @@ public class NarseseIRCBot extends IRCBot {
 
     public void restart() {
         if(running !=null) {
-            running.stop();
+            try {
+                running.stop();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
 
         nar = new Default(1024, 1, 4, 3);

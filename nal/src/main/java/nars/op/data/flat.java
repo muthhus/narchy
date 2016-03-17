@@ -23,6 +23,7 @@ import java.util.List;
  */
 public abstract class flat extends TermFunction {
 
+    @NotNull
     @Override
     public Object function(@NotNull Compound op, TermIndex i) {
         List<Term> l = new ArrayList();

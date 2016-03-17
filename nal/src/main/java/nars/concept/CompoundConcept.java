@@ -64,7 +64,7 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
      * @param termLinks
      * @param taskLinks
      */
-    public CompoundConcept(Compound term, Bag<Termed> termLinks, Bag<Task> taskLinks) {
+    public CompoundConcept(@NotNull Compound term, Bag<Termed> termLinks, Bag<Task> taskLinks) {
         super(term, taskLinks, termLinks);
     }
 
@@ -83,10 +83,10 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
         return tableOrEmpty(questions);
     }
 
-    @NotNull private static QuestionTaskTable tableOrEmpty(QuestionTaskTable q) {
+    @NotNull private static QuestionTaskTable tableOrEmpty(@Nullable QuestionTaskTable q) {
         return q == null ? TaskTable.EMPTY : q;
     }
-    @NotNull private static BeliefTable tableOrEmpty(BeliefTable q) {
+    @NotNull private static BeliefTable tableOrEmpty(@Nullable BeliefTable q) {
         return q == null ? BeliefTable.EMPTY : q;
     }
 
@@ -113,7 +113,7 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
     @Override
     public
     @Nullable
-    Task processQuest(Task task, NAR nar) {
+    Task processQuest(@NotNull Task task, @NotNull NAR nar) {
         return processQuestion(task, nar);
     }
 
@@ -826,7 +826,7 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
     }
 
     @Override
-    public void addAllTo(Collection set) {
+    public void addAllTo(@NotNull Collection set) {
         Collections.addAll(set, term);
     }
 

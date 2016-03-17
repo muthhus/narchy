@@ -21,6 +21,7 @@ public class substitute extends ImmediateTermTransform implements PremiseAware {
     public static final Atom QUERY_VAR = $.the("?", true);
     public static final Atom DEP_VAR = $.the("#", true);
 
+    @NotNull
     @Override
     public Term function(Compound x, TermIndex i) {
         throw new RuntimeException("n/a");
@@ -131,6 +132,7 @@ public class substitute extends ImmediateTermTransform implements PremiseAware {
 //    }
 
 
+    @Nullable
     public static Op getOp(@NotNull Term type) {
         Op o;
 

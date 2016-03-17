@@ -31,7 +31,7 @@ public class NARLoop implements Runnable {
 
     public volatile int cyclesPerFrame = 1;
     volatile int periodMS = 1000;
-    private volatile boolean stopped;
+    private volatile boolean stopping = false,  stopped = false;
     //private boolean running;
 
     //TODO make this into a SimpleIntegerProperty also
@@ -114,18 +114,21 @@ public class NARLoop implements Runnable {
         return true;
     }
 
-    public void stop() {
-        logger.info("stopping {}", this);
-        stopped = true;
+    public void stop() throws InterruptedException  {
+
+        synchronized (thread) {
+            if (stopping || stopped)
+                throw new RuntimeException("already waiting for stop");
+
+            logger.info("stopping {}", this);
+            stopping = true;
+            thread.join();
+        }
     }
 
-    public void waitForTermination() throws InterruptedException {
-        stop();
-        thread.join();
-    }
 
-    @Override
-    public final void run() {
+    /** dont call this directly */
+    @Override public final void run() {
 
         AffinityLock al;
         if (cpuCoreReserve) {
@@ -148,13 +151,20 @@ public class NARLoop implements Runnable {
 
             do {
                 try {
-                    while (!stopped)
+                    while (!stopping)
                         frame(nar);
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     nar.eventError.emit(e);
-                    if (Global.DEBUG) stopped = true;
+                    if (Global.DEBUG) {
+                        try {
+                            stop();
+                        } catch (InterruptedException e1) {
+                            e1.printStackTrace();
+                        }
+                        break;
+                    }
                 }
-            } while (!stopped);
+            } while (!stopping);
 
         } finally {
             if (al!=null)
@@ -162,6 +172,8 @@ public class NARLoop implements Runnable {
         }
 
         logger.info("stopped");
+        stopped = true;
+        stopping = false;
     }
 
     long prevTime;

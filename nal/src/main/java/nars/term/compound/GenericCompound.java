@@ -70,7 +70,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     }
 
     @Override
-    public final boolean term(int i, Op o) {
+    public final boolean term(int i, @NotNull Op o) {
         return subterms.term(i, o);
     }
 
@@ -108,6 +108,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
         TermPrinter.append(this, p);
     }
 
+    @NotNull
     @Override
     public String toString() {
         return TermPrinter.stringify(this).toString();
@@ -141,6 +142,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
     }
 
+    @NotNull
     @Override
     public Compound anonymous() {
         return this.dt(ITERNAL);
@@ -244,6 +246,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
         subterms.forEach(c);
     }
 
+    @NotNull
     @Override @Deprecated
     public T[] terms() {
         return subterms.terms();

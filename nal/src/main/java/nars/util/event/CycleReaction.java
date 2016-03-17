@@ -8,6 +8,7 @@ import java.util.function.Consumer;
 /** default cycle reaction, called at end of cycle */
 public abstract class CycleReaction implements Consumer<Memory> {
 
+    @NotNull
     private final On cycleReg;
 
 

@@ -6,10 +6,12 @@ import nars.term.Term;
 import nars.term.TermIndex;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class intersect extends BinaryTermOperator {
 
-    @Override public Term apply(@NotNull Term a, Term b, TermIndex i) {
+    @Nullable
+    @Override public Term apply(@NotNull Term a, Term b, @NotNull TermIndex i) {
         MutableSet<Term> s = TermContainer.intersect(
                 (TermContainer) a, (TermContainer) b
         );

@@ -18,6 +18,7 @@ abstract public class PatternCompound extends GenericCompound {
     public final int sizeCached;
     public final int volCached;
     public final int structureCached;
+    @NotNull
     public final Term[] termsCached;
 
 
@@ -154,6 +155,7 @@ abstract public class PatternCompound extends GenericCompound {
 
 
 
+    @NotNull
     @Override
     public Term[] terms() {
         return termsCached;

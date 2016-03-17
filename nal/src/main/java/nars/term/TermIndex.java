@@ -54,12 +54,12 @@ public interface TermIndex  {
 //        return newCompound(op, relation, subterms, ITERNAL);
 //    }
     @Nullable
-    default Termed the(Op op, TermContainer subterms) {
+    default Termed the(@NotNull Op op, @NotNull TermContainer subterms) {
         //DEFAULT IMPL to be moved to a concrete class: BUILDS ON THE HEAP:
         return builder().the(op, -1, ITERNAL, subterms);
     }
     @Nullable
-    default Termed the(Op op, Collection<Term> subterms) {
+    default Termed the(@NotNull Op op, @NotNull Collection<Term> subterms) {
         //DEFAULT IMPL to be moved to a concrete class: BUILDS ON THE HEAP:
         return the(op, TermContainer.the(op, subterms));
     }
@@ -104,7 +104,7 @@ public interface TermIndex  {
     }
 
 
-    @NotNull
+    @Nullable
     TermContainer theSubterms(TermContainer s);
 
     @Nullable default TermContainer normalize(TermContainer s) {
@@ -118,7 +118,7 @@ public interface TermIndex  {
     }
 
     /** should be called after a new entry needed to be created for the novel termcontainer */
-    @Nullable default TermContainer normalize(TermVector s) {
+    @Nullable default TermContainer normalize(@NotNull TermVector s) {
         Term[] x = s.terms();
         int l = x.length;
         for (int i = 0; i < l; i++) {

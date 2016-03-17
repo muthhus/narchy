@@ -163,7 +163,7 @@ public interface Execution  {
     //feedback(Task[] t)
     //feedback(Object o)
 
-    static void feedback(Task cause, Task feedback, NAR n) {
+    static void feedback(@NotNull Task cause, Task feedback, @NotNull NAR n) {
         n.input(
             noticeExecuted(n, cause),
             feedback

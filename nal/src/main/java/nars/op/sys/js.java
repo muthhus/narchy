@@ -10,6 +10,7 @@ import nars.term.Term;
 import nars.term.TermIndex;
 import nars.term.atom.Atom;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
@@ -186,6 +187,7 @@ public class js extends TermFunction {
     }
 
 
+    @Nullable
     @Override public Object function(@NotNull Compound o, TermIndex i) {
         Term[] args = Operator.argArray(o);
         if (args.length < 1) {

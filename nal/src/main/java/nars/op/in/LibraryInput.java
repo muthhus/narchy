@@ -174,7 +174,7 @@ public class LibraryInput extends TextInput {
 //    }
 
     @NotNull
-    public static List<Object[]> rawTasks(String script) {
+    public static List<Object[]> rawTasks(@NotNull String script) {
 
         List<Object[]> rr = Global.newArrayList();
 

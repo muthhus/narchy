@@ -152,6 +152,7 @@ public class TestNAR  {
         nar.believe(t, tense, f, c);
     }
 
+    @NotNull
     public TestNAR log() {
         nar.log();
         return this;
@@ -200,7 +201,7 @@ public class TestNAR  {
     final Topic<Tasked>[] outputEvents;
 
     @NotNull
-    public TestNAR mustOutput(long cycleStart, long cycleEnd, String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax, long occTimeAbsolute)  {
+    public TestNAR mustOutput(long cycleStart, long cycleEnd, @NotNull String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax, long occTimeAbsolute)  {
         mustEmit(outputEvents, cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax, occTimeAbsolute);
         return this;
     }
@@ -232,17 +233,17 @@ public class TestNAR  {
 //    }
 
     @NotNull
-    public TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long cycleStart, long cycleEnd, String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax)  {
+    public TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long cycleStart, long cycleEnd, @NotNull String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax)  {
         return mustEmit(c, cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax, Tense.ETERNAL );
     }
 
     @NotNull
-    public TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long cycleStart, long cycleEnd, String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax, @NotNull Tense t)  {
+    public TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long cycleStart, long cycleEnd, @NotNull String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax, @NotNull Tense t)  {
         return mustEmit(c, cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax, nar.time(t));
     }
 
     @NotNull
-    public TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long cycleStart, long cycleEnd, String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax, long occTimeAbsolute)  {
+    public TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long cycleStart, long cycleEnd, @NotNull String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax, long occTimeAbsolute)  {
 
 
 
@@ -323,17 +324,17 @@ public class TestNAR  {
     }
 
     @NotNull
-    public TestNAR mustOutput(long withinCycles, String term, char punc, float freq, float conf)  {
+    public TestNAR mustOutput(long withinCycles, @NotNull String term, char punc, float freq, float conf)  {
         long now = time();
         return mustOutput(now, now + withinCycles, term, punc, freq, freq, conf, conf, nar.time(Tense.Eternal));
     }
 
     @NotNull
-    public TestNAR mustBelieve(long withinCycles, String term, float freqMin, float freqMax, float confMin, float confMax)  {
+    public TestNAR mustBelieve(long withinCycles, @NotNull String term, float freqMin, float freqMax, float confMin, float confMax)  {
         return mustBelieve(withinCycles, term, freqMin, freqMax, confMin, confMax, Tense.ETERNAL);
     }
     @NotNull
-    public TestNAR mustBelieve(long withinCycles, String term, float freqMin, float freqMax, float confMin, float confMax, long tense)  {
+    public TestNAR mustBelieve(long withinCycles, @NotNull String term, float freqMin, float freqMax, float confMin, float confMax, long tense)  {
         long now = time();
         return mustOutput(now, now + withinCycles, term, '.', freqMin, freqMax, confMin, confMax, tense);
     }
@@ -346,43 +347,43 @@ public class TestNAR  {
 //        return mustOutput(now + cycleStart, now + cycleStop, term, '.', freq, freq, confidence, confidence);
 //    }
     @NotNull
-    public TestNAR mustBelieve(long withinCycles, String term, float freq, float confidence, @NotNull Tense t)  {
+    public TestNAR mustBelieve(long withinCycles, @NotNull String term, float freq, float confidence, @NotNull Tense t)  {
         long ttt = nar.time();
         return mustOutput(ttt, ttt + withinCycles, term, '.', freq, freq, confidence, confidence, nar.time(t));
     }
     @NotNull
-    public TestNAR mustAnswer(long withinCycles, String term, float freq, float confidence, @NotNull Tense t)  {
+    public TestNAR mustAnswer(long withinCycles, @NotNull String term, float freq, float confidence, @NotNull Tense t)  {
         return mustAnswer(withinCycles, term, freq, confidence, nar.time(t));
     }
 
     @NotNull
-    public TestNAR mustAnswer(long withinCycles, String term, float freq, float confidence, long when)  {
+    public TestNAR mustAnswer(long withinCycles, @NotNull String term, float freq, float confidence, long when)  {
         long ttt = nar.time();
         return mustEmit(new Topic[] { answerReceiver },
                 ttt, ttt + withinCycles, term, '.', freq, freq, confidence, confidence, when);
     }
     @NotNull
-    public TestNAR mustBelieve(long withinCycles, String term, float freq, float confidence, long occTimeAbsolute)  {
+    public TestNAR mustBelieve(long withinCycles, @NotNull String term, float freq, float confidence, long occTimeAbsolute)  {
         long t = nar.time();
         return mustOutput(t, t + withinCycles, term, '.', freq, freq, confidence, confidence,occTimeAbsolute);
     }
 
     @NotNull
-    public TestNAR mustBelieve(long withinCycles, String term, float freq, float confidence)  {
+    public TestNAR mustBelieve(long withinCycles, @NotNull String term, float freq, float confidence)  {
         return mustBelieve(withinCycles, term, freq, confidence, Tense.Eternal);
     }
     @NotNull
-    public TestNAR mustBelieve(long withinCycles, String term, float confidence)  {
+    public TestNAR mustBelieve(long withinCycles, @NotNull String term, float confidence)  {
         return mustBelieve(withinCycles, term, 1.0f, confidence);
     }
 
     @NotNull
-    public TestNAR mustDesire(long withinCycles, String goalTerm, float freq, float conf) {
+    public TestNAR mustDesire(long withinCycles, @NotNull String goalTerm, float freq, float conf) {
         return mustOutput(withinCycles, goalTerm, '!', freq, conf);
     }
 
     @NotNull
-    public TestNAR mustDesire(long withinCycles, String goalTerm, float freq, float conf, long occ) {
+    public TestNAR mustDesire(long withinCycles, @NotNull String goalTerm, float freq, float conf, long occ) {
         long t = nar.time();
         return mustOutput(t, t + withinCycles, goalTerm, '!', freq, freq, conf, conf, occ);
     }

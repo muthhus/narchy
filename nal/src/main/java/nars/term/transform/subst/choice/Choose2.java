@@ -21,7 +21,9 @@ public class Choose2 extends Termutator {
     final Combinations comb;
     @NotNull
     private final Term[] yFree;
+    @NotNull
     private final Term[] x;
+    @NotNull
     private final Ellipsis xEllipsis;
     @NotNull
     private final FindSubst f;

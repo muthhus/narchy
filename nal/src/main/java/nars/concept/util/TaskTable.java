@@ -61,6 +61,7 @@ public interface TaskTable extends Iterable<Task> {
 
     //boolean contains(Task t);
 
+    @Nullable
     QuestionTaskTable EMPTY = new QuestionTaskTable() {
 
         @Override

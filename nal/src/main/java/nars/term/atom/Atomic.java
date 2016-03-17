@@ -4,6 +4,7 @@ import nars.term.Compound;
 import nars.term.SubtermVisitor;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.function.Predicate;
@@ -13,7 +14,7 @@ import static nars.term.atom.Atom.toUnquoted;
 /** Base class for Atomic types. */
 public interface Atomic extends Term {
 
-    @NotNull
+    @Nullable
     @Override
     String toString();
 

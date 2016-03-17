@@ -42,7 +42,7 @@ public interface Term extends Termed, Comparable, Termlike {
         return this;
     }
 
-    @NotNull
+    @Nullable
     @Override
     Op op();
 
@@ -66,7 +66,7 @@ public interface Term extends Termed, Comparable, Termlike {
     @Override boolean equals(Object o);
     @Override int hashCode();
 
-    default void recurseTerms(SubtermVisitor v) {
+    default void recurseTerms(@NotNull SubtermVisitor v) {
         recurseTerms(v, null);
     }
 

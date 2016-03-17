@@ -12,6 +12,7 @@ import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Created by me on 3/9/16.
@@ -29,6 +30,7 @@ public class Narjure extends Dynajure {
     /**
      * temporary translation method
      */
+    @Nullable
     @Deprecated
     public Term clojureToNars(Object o) {
         //if (o instanceof Object[])
@@ -84,10 +86,12 @@ public class Narjure extends Dynajure {
         throw new RuntimeException("Untranslated: " + o);
     }
 
-    public Term eval(Termed x) {
+    @Nullable
+    public Term eval(@Nullable Termed x) {
         return x == null ? null : eval((Object) x.term());
     }
 
+    @Nullable
     @Override
     public Term eval(Object x) {
 //        if (x instanceof Term) {

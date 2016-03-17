@@ -102,14 +102,16 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      */
     public final AtomicBoolean running = new AtomicBoolean();
 
-    final Narjure rt = new Narjure();
+    //final Narjure rt = new Narjure();
 
     //TODO use this to store all handler registrations, and decide if transient or not
     public final transient List<Object> regs = Global.newArrayList();
 
     private final transient Collection<Runnable> nextTasks = new CopyOnWriteArrayList(); //ConcurrentLinkedDeque();
 
-    public NAR(Clock clock, TermIndex index, Random rng, @NotNull Atom self) {
+    private NARLoop loop = null;
+
+    public NAR(@NotNull Clock clock, TermIndex index, Random rng, @NotNull Atom self) {
         super(clock, rng, index);
 
         the(NAR.class, this);
@@ -444,23 +446,23 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         Term goalTerm = inputGoal.term();
         if (!Op.isOperation(goalTerm)) {
 
-            if (goalTerm.op()==Op.PRODUCT) {
-                @NotNull Compound x = inputGoal.term();
-                try {
-                    Term y = rt.eval(x);
-                    if (y != null) {
-                        logger.info("(eval( {} , {} )", x, y); //mooseboobs
-                        return true;
-                    }
-                }
-                /*catch (VerifyError vex) {
-                    //ex: java.lang.VerifyError: (class: clojure/core$eval1, method: invokeStatic signature: ()Ljava/lang/Object;) Unable to pop operand off an empty stack
-                }*/ catch (Throwable e) {
-                    //HACK
-                    logger.warn("eval {}", e);
-
-                }
-            }
+//            if (goalTerm.op()==Op.PRODUCT) {
+//                @NotNull Compound x = inputGoal.term();
+//                try {
+//                    Term y = rt.eval(x);
+//                    if (y != null) {
+//                        logger.info("(eval( {} , {} )", x, y); //mooseboobs
+//                        return true;
+//                    }
+//                }
+//                /*catch (VerifyError vex) {
+//                    //ex: java.lang.VerifyError: (class: clojure/core$eval1, method: invokeStatic signature: ()Ljava/lang/Object;) Unable to pop operand off an empty stack
+//                }*/ catch (Throwable e) {
+//                    //HACK
+//                    logger.warn("eval {}", e);
+//
+//                }
+//            }
 
             return false;
         }
@@ -791,10 +793,14 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * @param initialFramePeriodMS in milliseconds
      */
     @NotNull
-    NARLoop loop(int initialFramePeriodMS) {
+    final NARLoop loop(int initialFramePeriodMS) {
 //        //TODO use DescriptiveStatistics to track history of frametimes to slow down (to decrease speed rate away from desired) or speed up (to reach desired framerate).  current method is too nervous, it should use a rolling average
 
-        return new NARLoop(this, initialFramePeriodMS);
+        if (this.loop!=null) {
+            throw new RuntimeException("Already running: " + this.loop);
+        }
+
+        return this.loop = new NARLoop(this, initialFramePeriodMS);
     }
 
 
@@ -834,6 +840,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * queues a task to (hopefully) be executed at an unknown time in the future,
      * in its own thread in a thread pool
      */
+    @Nullable
     public Future runAsync(@NotNull Runnable t) {
 
         logger.info("runAsyncs run {}", t);
@@ -914,12 +921,13 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
 
 
-    public final Concept concept(Termed t) {
+    @Nullable
+    public final Concept concept(@NotNull Termed t) {
         return concept(t, false);
     }
 
     @Nullable
-    public final Concept concept(Termed t, boolean createIfMissing) {
+    public final Concept concept(@NotNull Termed t, boolean createIfMissing) {
 
         //optimization: assume a concept instance is the concept of this NAR
         if (t instanceof Concept) return (Concept)t;
@@ -935,10 +943,12 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     public abstract NAR forEachConcept(@NotNull Consumer<Concept> recip);
 
     /** activate the concept and other features (termlinks, etc) */
-    public abstract Concept conceptualize(Termed termed, Budgeted activation, float scale);
+    @Nullable
+    public abstract Concept conceptualize(@NotNull Termed termed, @NotNull Budgeted activation, float scale);
 
 
-    final public Concept conceptualize(@NotNull Termed termed, Budgeted activation) {
+    @Nullable
+    final public Concept conceptualize(@NotNull Termed termed, @NotNull Budgeted activation) {
         return conceptualize(termed, activation, 1f);
     }
 
@@ -951,14 +961,14 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
 
     /** reasoning cycles occurr zero or more times per frame */
-    @NotNull public NAR onCycle(Consumer<Memory> receiver) {
+    @NotNull public NAR onCycle(@NotNull Consumer<Memory> receiver) {
         regs.add(eventCycleEnd.on(receiver));
         return this;
     }
 
     /** a frame batches a burst of multiple cycles, for coordinating with external systems in which multiple cycles
      * must be run per control frame. */
-    @NotNull public NAR onFrame(Consumer<NAR> receiver) {
+    @NotNull public NAR onFrame(@NotNull Consumer<NAR> receiver) {
         regs.add(eventFrameStart.on(receiver));
         return this;
     }
@@ -978,7 +988,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
 
     /** applies normalization and anonymization to resolve the term of the concept the input term maps t */
-    Term validConceptTerm(Termed input) {
+    @Nullable
+    Term validConceptTerm(@NotNull Termed input) {
 
         Term term = input.term();
 
@@ -1007,6 +1018,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
 
 
+    @NotNull
     public On onQuestion(@NotNull PatternAnswer p) {
         return eventTaskProcess.on(question -> {
             if (question.punc() == Symbols.QUESTION) {
@@ -1049,9 +1061,10 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         pw.close();
     }
 
-    public Term eval(@NotNull String x) throws NarseseException {
-        return rt.eval((Termed)term(x));
-    }
+//    @Nullable
+//    public Term eval(@NotNull String x) throws NarseseException {
+//        return rt.eval((Termed)term(x));
+//    }
 
 
 //    public final void with(Object... values) {

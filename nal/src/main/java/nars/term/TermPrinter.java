@@ -224,7 +224,8 @@ public interface TermPrinter {
 
     }
 
-    static StringBuilder stringify(Compound c) {
+    @NotNull
+    static StringBuilder stringify(@NotNull Compound c) {
         StringBuilder sb = new StringBuilder(/* conservative estimate */ c.volume()*2 );
         try {
             c.append(sb);
