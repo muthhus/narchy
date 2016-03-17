@@ -15,6 +15,9 @@ import nars.Op;
 import nars.bag.BLink;
 import nars.budget.Budgeted;
 import nars.guifx.TaskPane;
+import nars.guifx.graph2.TermNode;
+import nars.guifx.graph2.scene.DefaultNodeVis;
+import nars.guifx.util.ColorMatrix;
 import nars.guifx.util.NSlider;
 import nars.task.Task;
 import nars.term.Termed;
@@ -61,7 +64,7 @@ public class TaskButton<X> extends Label implements Runnable {
         setText(s);
 
 
-        getStyleClass().clear();
+        //getStyleClass().clear();
         getStyleClass().add("taskbutton");
 
         //setTextAlignment(TextAlignment.LEFT);
@@ -137,10 +140,13 @@ public class TaskButton<X> extends Label implements Runnable {
             }
 
 
-            Scale scale1 = this.scale;
-            scale1.setX(scale);
-            scale1.setY(scale);
-            //setNeedsLayout(true);
+            if (scalesText()) {
+                Scale scale1 = this.scale;
+                scale1.setX(scale);
+                scale1.setY(scale);
+                //setNeedsLayout(true);
+            }
+
 
             Object item = this.item;
             if (item instanceof BLink) item = ((BLink)item).get(); //get what it refers to
@@ -153,10 +159,14 @@ public class TaskButton<X> extends Label implements Runnable {
             //                        Insets.EMPTY)));
 
             if (item instanceof Termed)
-                setTextFill(getColor( ((Termed)item).op(), pri));
+                setTextFill(getColor(pri));
 
             this.lastPri = pri;
         }
+    }
+
+    public boolean scalesText() {
+        return true;
     }
 
     public float getScale(float pri) {
@@ -164,11 +174,21 @@ public class TaskButton<X> extends Label implements Runnable {
     }
 
     @NotNull
-    private Color getColor(Op o, float pri) {
-        return hsb(
-                (o.ordinal() / 64f) * 360.0,
-                0.4, 0.7, 0.75f + pri * 0.25f
-        );
+    private Color getColor(float pri) {
+//        return hsb(
+//                (o.ordinal() / 64f) * 360.0,
+//                0.4, 0.7, 0.75f + pri * 0.25f
+//        );
+
+        Termed tt;
+        if (item instanceof Termed) {
+            tt = (Termed)item;
+        } else if (item instanceof BLink) {
+            tt = ((BLink<? extends Termed>)item).get();
+        } else {
+            throw new UnsupportedOperationException();
+        }
+        return TermNode.getTermColor(tt, DefaultNodeVis.colors, pri);
     }
 
 }

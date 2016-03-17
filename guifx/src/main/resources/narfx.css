@@ -123,13 +123,18 @@
    -fx-background-color: radial-gradient(focus-angle 45deg , focus-distance 20% , center 25% 25% , radius 50% , reflect, #808080, #a9a9a9 75% , #696969);
 }
 
-.nar_main_menu {
-    -fx-font-size: 150%
-}
-.nar_main_menu .menu {
-    -fx-fill: white;
+.menu-item, .menu {
     -fx-text-fill: white;
 }
+.menu-item:focused {
+    -fx-background-color: rgb(20, 50, 10);
+}
+
+.menu {
+    padding: 1px;
+    background: transparent;
+}
+
 
 /*
 .selected {
@@ -475,14 +480,6 @@
 }
 */
 
-.menu-item:focused {
-    -fx-background-color: rgb(20, 50, 10);
-}
-
-.menu {
-    padding: 1px;
-    background: transparent;
-}
 
 /*******************************************************************************
  *                                                                             *
@@ -661,9 +658,9 @@
     -fx-text-fill: white;
 }
 
-.taskbutton:hover {
+/*.taskbutton:hover {
     -fx-text-fill: white !important;
-}
+}*/
 
 .taskBar {
     -fx-border-color: #C4C4C4;

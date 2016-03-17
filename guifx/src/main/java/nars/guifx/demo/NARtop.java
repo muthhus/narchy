@@ -1,8 +1,14 @@
 package nars.guifx.demo;
 
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.TilePane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.TextFlow;
 import nars.Memory;
 import nars.NAR;
@@ -10,6 +16,7 @@ import nars.budget.BudgetMerge;
 import nars.guifx.NARfx;
 import nars.guifx.nars.SubButton;
 import nars.guifx.nars.TaskButton;
+import nars.guifx.util.NSlider;
 import nars.nar.Default;
 import nars.task.Task;
 import nars.task.flow.SetTaskPerception;
@@ -73,6 +80,48 @@ public class NARtop<N extends Node> implements Supplier<Pane> {
         });
     }
 
+    public static class TaskControlButton extends BorderPane {
+
+        private final TaskButton label;
+        private final NSlider priSlider;
+
+        public TaskControlButton(NAR n, Task t) {
+            super();
+
+            setCenter(this.label = new TaskButton<Task>(n, t) {
+                @Override
+                public void run() {
+                    super.run();
+                    update();
+                }
+
+                @Override
+                public boolean scalesText() {
+                    return false;
+                }
+
+            });
+
+            label.setAlignment(Pos.CENTER_LEFT);
+            setAlignment(label, Pos.CENTER_LEFT);
+
+            setLeft(this.priSlider = new NSlider(100f, 20f, 0.5f));
+
+            SimpleDoubleProperty v = priSlider.value[0];
+            v.addListener(new ChangeListener<Number>() {
+                @Override
+                public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                    t.budget().setPriority(v.floatValue());
+                    runLater( label ); //trigger update
+                }
+            });
+        }
+
+        protected void update() {
+            layout();
+        }
+    }
+
     public static void main(String[] args) {
 
         Default n = new Default(1000, 1, 1, 3);
@@ -80,14 +129,16 @@ public class NARtop<N extends Node> implements Supplier<Pane> {
         NARide.show(n.loop(), (i) -> {
             Function<Task, Node>
                 subbuttonBuilder = t -> SubButton.make(n, t),
-                taskbuttonBuilder = t -> new TaskButton(n, t);
+                taskbuttonBuilder = t -> new TaskControlButton(n, t);
 
-            NARfx.newWindow("x",
-                new NARtop(n,
-                    new TextFlow(), subbuttonBuilder).get()
-            );
+//            NARfx.newWindow("x",
+//                new NARtop(n,
+//                    new TextFlow(), subbuttonBuilder).get()
+//            );
             NARfx.newWindow("y",
-                    new NARtop(n, new TilePane(),
+                    new NARtop(n,
+                            //new TilePane(),
+                            new VBox(),
                             taskbuttonBuilder).get()
             );
 
