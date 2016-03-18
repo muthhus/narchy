@@ -1,9 +1,12 @@
 package nars.op;
 
 import alice.tuprolog.*;
+import com.gs.collections.api.tuple.Pair;
+import com.gs.collections.impl.tuple.Tuples;
 import nars.$;
 import nars.NAR;
 import nars.Op;
+import nars.concept.Concept;
 import nars.data.Range;
 import nars.task.Task;
 import nars.term.Compound;
@@ -24,9 +27,10 @@ import java.util.function.Consumer;
 import static nars.nal.Tense.ITERNAL;
 import static nars.term.container.TermVector.the;
 
-/** Prolog mental coprocessor for accelerating reasoning
- *  WARNING - introduces cognitive distortion
- *
+/**
+ * Prolog mental coprocessor for accelerating reasoning
+ * WARNING - introduces cognitive distortion
+ * <p>
  * Causes a NARProlog to mirror certain activity of a NAR.  It generates
  * prolog terms from NARS beliefs, and answers NARS questions with the results
  * of a prolog solution (converted to NARS terms), which are input to NARS memory
@@ -37,14 +41,16 @@ public class PrologCore extends Agent implements Consumer<Task> {
     final static Logger logger = LoggerFactory.getLogger(PrologCore.class);
 
     public static final String AxiomTheory;
+
     static {
         String a;
         try {
             a = Util.inputToString(
-                    PrologCore.class.getClassLoader().getResourceAsStream("nars/prolog/default.prolog")
+                    PrologCore.class.getClassLoader()
+                            .getResourceAsStream("nars/prolog/default.prolog")
             );
         } catch (IOException e) {
-            logger.error("default.prolog {}" , e);
+            logger.error("default.prolog {}", e);
             a = "";
         }
         AxiomTheory = a;
@@ -52,30 +58,36 @@ public class PrologCore extends Agent implements Consumer<Task> {
 
     private final NAR nar;
 
-    final Map<Term, Struct> beliefs = new HashMap();
+    final Map<Concept, Pair<Boolean,Struct>> beliefs = new HashMap();
 
-    /** beliefs above this expectation will be asserted as prolog beliefs */
-    @Range(min=0.5, max=1.0)
+    /**
+     * beliefs above this expectation will be asserted as prolog beliefs
+     */
+    @Range(min = 0.5, max = 1.0)
     public final MutableFloat trueFreqThreshold = new MutableFloat(0.9f);
 
-    /** beliefs below this expectation will be asserted as negated prolog beliefs */
-    @Range(min=0, max=0.5)
+    /**
+     * beliefs below this expectation will be asserted as negated prolog beliefs
+     */
+    @Range(min = 0, max = 0.5)
     public final MutableFloat falseFreqThreshold = new MutableFloat(0.1f);
 
-    /** beliefs above this expectation will be asserted as prolog beliefs */
-    @Range(min=0.5, max=1.0)
-    public final MutableFloat confThreshold = new MutableFloat(0.9f);
+    /**
+     * beliefs above this expectation will be asserted as prolog beliefs
+     */
+    @Range(min = 0, max = 1.0)
+    public final MutableFloat confThreshold = new MutableFloat(0.75f);
 
     /*final ObjectBooleanHashMap<Term> beliefs = new ObjectBooleanHashMap() {
 
 
     };*/
 
-    public PrologCore(NAR n)  {
+    public PrologCore(NAR n) {
         this(n, AxiomTheory);
     }
 
-    public PrologCore(NAR n, String theory)  {
+    public PrologCore(NAR n, String theory) {
         super(theory, new MutableClauseIndex()); //, new NARClauseIndex(n));
         this.nar = n;
 
@@ -87,25 +99,25 @@ public class PrologCore extends Agent implements Consumer<Task> {
     @Override
     public void accept(Task task) {
 
-        if (task.isJudgment() ) {
-            if (task.isEternal()) {
+        if (task.isJudgment()) {
+            //if task is the current highest one, otherwise ignore because we will already be using something more confident or relevant
+            Concept cc = task.concept(nar);
+            if (task.isEternal() && (task == cc.beliefs().topEternal())) {
                 int dt = task.term().dt();
-                if (dt == 0 || dt ==ITERNAL) { //only nontemporal or instant for now
+                if (dt == 0 || dt == ITERNAL) { //only nontemporal or instant for now
                     float c = task.conf();
-                    if (c > confThreshold.floatValue()) {
+                    if (c >= confThreshold.floatValue()) {
                         float f = task.freq();
                         if (f > trueFreqThreshold.floatValue())
-                            believe(task, true);
+                            believe(cc, task, true);
                         else if (f < falseFreqThreshold.floatValue())
-                            believe(task, false);
+                            believe(cc, task, false);
                     }
                 }
                 /* else: UNSURE */
             }
-        } else
-
-        if (task.isQuestion()) {
-            if (task.isEternal()) {
+        } else if (task.isQuestion()) {
+            if (task.isEternal() || task.occurrence() == nar.time()) {
                 question(task);
             }
         }
@@ -114,14 +126,45 @@ public class PrologCore extends Agent implements Consumer<Task> {
         //TODO if task is goal then wrap as goal belief
     }
 
-    protected void believe(Termed t, boolean truth) {
-        Term tt = t.term();
+    protected void believe(Concept c, Task t, boolean truth) {
+        //Term tt = t.term();
         if (t.op() == Op.NEGATE) {
             //unwrap negation
-            tt = ((Compound)tt).term(0);
+            //tt = ((Compound) tt).term(0);
             truth = !truth;
         }
-        believeStruct(tt, truth);
+
+        boolean _truth = truth;
+        beliefs.compute(c, (pp, prev) -> {
+
+            if (prev != null) {
+                if (!prev.getOne().equals(_truth)) {
+                    //retract previous
+                    solve(retraction(prev.getTwo()));
+                } else {
+                    //unchanged
+                    return prev;
+                }
+
+            }
+
+            Struct next;
+            alice.tuprolog.Term np = pterm(t.term());
+            if (!_truth) {
+                //wrap in negate
+                next = negate(np);
+            } else {
+                next = (Struct) np;
+            }
+
+            Struct belief = assertion(next);
+            Solution s = solve(belief);
+            logger.info("believe {} {}", belief, s);
+
+            return Tuples.pair(_truth, next);
+        });
+
+
     }
 
     //TODO async
@@ -135,14 +178,13 @@ public class PrologCore extends Agent implements Consumer<Task> {
 
         alice.tuprolog.Term questionTerm =
                 pterm(tt);
-                //new WrappedTerm(tt);
+        //new WrappedTerm(tt);
 
         //TODO limit max # of inputs
-        solve(questionTerm, (answer)-> {
+        solve(questionTerm, (answer) -> {
 
             // supply input an answer to the NAR
 
-            logger.info("question {} answer {}", question, answer);
             switch (answer.result()) {
                 case EngineRunner.TRUE:
                 case EngineRunner.TRUE_CP:
@@ -168,11 +210,10 @@ public class PrologCore extends Agent implements Consumer<Task> {
             if (!truth)
                 nterm = $.neg(nterm);
 
-            logger.info("{} {}", answer.goal, nterm); //TODO input
+            logger.info("{}\t{}\t{}", answer.goal, truth, nterm); //TODO input
 
             nar.believe(nterm);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             logger.error("answer {}", e);
         }
     }
@@ -180,6 +221,7 @@ public class PrologCore extends Agent implements Consumer<Task> {
     private Term nterm(Struct s, int subterm) {
         return nterm(s.term(subterm));
     }
+
     private Term[] nterms(Struct s) {
         int len = s.getArity();
         Term[] n = new Term[len];
@@ -192,7 +234,7 @@ public class PrologCore extends Agent implements Consumer<Task> {
     //TODO use wrapper classes which link to the original terms so they can be re-used instead o reallocating fresh ones that will equals() anyway
     private Term nterm(alice.tuprolog.Term t) {
         if (t instanceof Struct) {
-            Struct s = (Struct)t;
+            Struct s = (Struct) t;
             if (s.getArity() > 0) {
                 switch (s.name()) {
 
@@ -201,6 +243,25 @@ public class PrologCore extends Agent implements Consumer<Task> {
                     case "<->":
                         return $.the(Op.SIMILAR, the(nterm(s, 0), nterm(s, 1)));
 
+                    case "~":
+                        return $.the(Op.DIFF_INT, the(nterm(s, 0), nterm(s, 1)));
+                    case "-":
+                        return $.the(Op.DIFF_EXT, the(nterm(s, 0), nterm(s, 1)));
+
+
+                    case "==>":
+                        return $.the(Op.IMPLICATION, the(nterms(s)));
+
+                    case "[":
+                        return $.the(Op.SET_INT, the(nterms(s)));
+                    case "{":
+                        return $.the(Op.SET_EXT, the(nterms(s)));
+
+                    case "&":
+                        return $.the(Op.INTERSECT_EXT, the(nterms(s)));
+                    case "|":
+                        return $.the(Op.INTERSECT_INT, the(nterms(s)));
+
                     case "*":
                         return $.the(Op.PRODUCT, the(nterms(s)));
                     case "&&":
@@ -208,7 +269,7 @@ public class PrologCore extends Agent implements Consumer<Task> {
                     case "||":
                         return $.the(Op.DISJUNCTION, the(nterms(s)));
                     case "not":
-                        return $.neg(nterm(s,0));
+                        return $.neg(nterm(s, 0));
 
 
                     default:
@@ -228,49 +289,11 @@ public class PrologCore extends Agent implements Consumer<Task> {
 
 
 
-    //TODO async
-    protected void believeStruct(Term p, boolean truth) {
-
-
-        beliefs.compute(p, (pp, prev) -> {
-
-            if (prev!=null) {
-
-//                boolean wasNegative = ((Struct)prev.getTerm(0)) //unwrap assert
-//                        .name().equals("not");
-//
-//                if ((truth && wasNegative) || (!truth && !wasNegative)) {
-//                    //TODO unassert previous
-//                    throw new RuntimeException("inconsistent");
-//                } else {
-//                    //same value, keep it and do nothing
-//                    return prev;
-//                }
-                return prev;
-            }
-
-            Struct next;
-            alice.tuprolog.Term np = pterm(pp);
-            if (!truth) {
-                //wrap in negate
-                next = negate(np);
-            } else {
-                next = (Struct)np;
-            }
-
-            Struct belief = assertion(next);
-            Solution s = solve(belief);
-            logger.info("believe {} {}", belief, s);
-
-            return belief;
-        });
-
-
-
-    }
-
     public static Struct assertion(alice.tuprolog.Term p) {
         return new Struct("assertz", p);
+    }
+    public static Struct retraction(alice.tuprolog.Term p) {
+        return new Struct("retract", p);
     }
 
     public static Struct negate(alice.tuprolog.Term p) {
@@ -292,9 +315,9 @@ public class PrologCore extends Agent implements Consumer<Task> {
             Op op = term.op();
             switch (op) {
                 case NEGATE:
-                    return new Struct("not", psubterms( ((Compound)term) ));
+                    return new Struct("not", psubterms(((Compound) term)));
                 default:
-                    return new Struct(op.str, psubterms( ((Compound)term) ));
+                    return new Struct(op.str, psubterms(((Compound) term)));
             }
 
         } else if (term instanceof Variable) {
@@ -304,7 +327,7 @@ public class PrologCore extends Agent implements Consumer<Task> {
                 case VAR_INDEP: //??
                     return new Var("_" + (((Variable) term).id()));
                 case VAR_DEP: //?? as if atomic
-                    return new Struct( "'#" + ((Variable)term).id() + '\'' );
+                    return new Struct("'#" + ((Variable) term).id() + '\'');
             }
         } else if (term instanceof Atomic) {
             return new Struct(term.toString());
@@ -538,7 +561,6 @@ public class PrologCore extends Agent implements Consumer<Task> {
     //
     //        return null;
     //    }
-
 
 
     //    public final NAR nar;

@@ -56,7 +56,7 @@ public class SomeRovers {
         final Sim game = new Sim(new World(), clock);
 
         //RoverWorld world = new ReactorWorld(32, 48, 32);
-        new FoodSpawnWorld1(game, 64, 48, 48, 0.5f);
+        new FoodSpawnWorld1(game, 128, 48, 48, 0.5f);
 
 
 
@@ -106,7 +106,12 @@ public class SomeRovers {
         );*/
 
         PrologCore p = new PrologCore(nar);
-        p.confThreshold.setValue(0.25f);
+        p.confThreshold.setValue(0.6f);
+
+        nar.input("$0.9$ <(?y --> ^MotorControls) ==> ?x>?");
+        nar.input("$0.9$ <?x ==> [food]>?");
+        nar.input("$0.9$ <food <-> poison>?");
+        nar.input("$0.9$ <[food] <-> [poison]>?");
 
         nar.logSummaryGT(System.out, 0.7f);
 //        nar.log(Systenar.out, x -> {

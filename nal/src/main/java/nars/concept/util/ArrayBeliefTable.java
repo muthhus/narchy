@@ -325,11 +325,12 @@ public class ArrayBeliefTable implements BeliefTable {
 
             //float ffreqMatch = 1f/(1f + Math.abs(newBeliefFreq - x.freq()));
 
+            float cconf = c.conf();
+            float rank = BeliefTable.rankEternalByOriginality(cconf, totalEvidence);
 
-            float rank = BeliefTable.rankEternalByOriginality(c.conf(), totalEvidence);
-            if (rank > bestRank) {
+            if ((cconf > 0) && (rank > bestRank)) {
                 bestRank = rank;
-                bestConf = c.conf();
+                bestConf = cconf;
                 oldBelief = x;
                 conclusion = c;
                 concTime = t;
@@ -362,6 +363,7 @@ public class ArrayBeliefTable implements BeliefTable {
                 /*.because("Insertion Revision (%+" +
                                 Texts.n2(conclusion.freq() - newBelief.freq()) +
                         ";+" + Texts.n2(conclusion.conf() - newBelief.conf()) + "%");*/
+
 
         BudgetFunctions.budgetRevision(t, newBelief, oldBelief);
 
