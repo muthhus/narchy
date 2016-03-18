@@ -87,11 +87,24 @@ public interface Truth extends MetaTruth<Float> {
 
     /**
      * Check if the truth value is negative
+     * Note that values of 0.5 are not considered positive, being an unbiased
+     * midpoint value
      *
      * @return True if the frequence is less than 1/2
      */
     default boolean isNegative() {
         return freq() < 0.5f;
+    }
+
+    /**
+     * Check if the truth value is negative.
+     * Note that values of 0.5 are not considered positive, being an unbiased
+     * midpoint value
+     *
+     * @return True if the frequence is greater than 1/2
+     */
+    default boolean isPositive() {
+        return freq() > 0.5f;
     }
 
 

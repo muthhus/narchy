@@ -3,6 +3,7 @@ package nars.task;
 import nars.*;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
+import nars.budget.BudgetMerge;
 import nars.concept.ConceptProcess;
 import nars.nal.Tense;
 import nars.term.Compound;
@@ -26,6 +27,7 @@ public class MutableTask extends AbstractTask {
     public MutableTask(@NotNull NAR nar, @NotNull String termString) throws Narsese.NarseseException {
         this(nar.term(termString));
     }
+
 
     public MutableTask(@NotNull Termed<Compound> term) {
         /** budget triple - to be valid, at least the first 2 of these must be non-NaN (unless it is a question)  */
@@ -54,13 +56,25 @@ public class MutableTask extends AbstractTask {
         return new MutableTask(t, newTruth, now, occ);
     }
 
-    MutableTask(@NotNull Task taskToClone, @NotNull Truth newTruth, long now, long occ) {
+    public MutableTask(@NotNull Task taskToClone, @NotNull Truth newTruth, long now, long occ) {
         this(taskToClone);
         punctuation(taskToClone.punc());
         setEvidence(taskToClone.evidence());
         truth(newTruth);
-        MutableTask.this.time(now, occ);
+        time(now, occ);
         parent(taskToClone);
+    }
+
+    public MutableTask(@NotNull Task taskToClone, @NotNull Task otherTask, long now, long occ, long[] newEvidence, BudgetMerge budgetMerge) {
+        this(taskToClone);
+        punctuation(taskToClone.punc());
+        this.parentBelief = Global.reference(otherTask);
+        setEvidence(newEvidence);
+        truth(taskToClone.truth());
+        time(now, occ);
+
+        budget(taskToClone.budget());
+        budgetMerge.merge(this, otherTask.budget());
     }
 
     public MutableTask(@NotNull Termed<Compound> content, char punc) {

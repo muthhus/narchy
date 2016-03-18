@@ -3,10 +3,13 @@ package nars.concept.util;
 import nars.Global;
 import nars.Memory;
 import nars.budget.BudgetMerge;
+import nars.task.MutableTask;
 import nars.task.Task;
+import nars.truth.Stamp;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
@@ -16,15 +19,16 @@ import java.util.function.Consumer;
  * uses a List and assumes that it is an ArrayList that can be
  * accessed by index.
  *
+ * TODO use a ring-buffer deque slightly faster than basic ArrayList modification
  */
-public class ArrayListTaskTable implements QuestionTaskTable {
+public class ArrayQuestionTable implements QuestionTable {
 
     protected int capacity;
 
     @NotNull
     private final List<Task> list;
 
-    public ArrayListTaskTable(int capacity) {
+    public ArrayQuestionTable(int capacity) {
         super();
         this.list = Global.newArrayList(capacity);
         setCapacity(capacity);
@@ -89,28 +93,37 @@ public class ArrayListTaskTable implements QuestionTaskTable {
     public Task add(@NotNull Task t, @NotNull Memory m) {
 
 
-        if (filterDuplicate(t, m))
+        t = tryMerge(t, m);
+        if (t == null)
             return null;
 
-        //Memory m = c.getMemory();
         int siz = size();
         if (siz + 1 > capacity) {
             // FIFO, remove oldest question (last)
-            Task removed = list.remove(siz - 1);
-
-            m.remove(removed, "TaskTable FIFO Out");
-
-            //m.emit(Events.ConceptQuestionRemove.class, c, removed /*, t*/);
+            remove(siz-1, m, "FIFO Forgot");
         }
 
-        list.add(0, t);
-
-        //m.emit(Events.ConceptQuestionAdd.class, c, t);
+        insert(t);
 
         return t;
     }
 
-    private boolean filterDuplicate(@NotNull Task t, @NotNull Memory m) {
+    public void insert(@NotNull Task t) {
+        list.add(0, t);
+    }
+
+    public void remove(int n, @NotNull Memory m, String reason) {
+        Task removed = list.remove(n);
+        m.remove(removed, reason);
+    }
+
+    /** returns the original, "revised", or null question to input
+     * @param t incoming question which may be unique, overlapping, or equivalent to an existing question in the table
+     * */
+    private Task tryMerge(@NotNull Task t, @NotNull Memory m) {
+        if (isEmpty())
+            return t;
+
         Task existing = contains(t);
         if (existing != null) {
 
@@ -119,10 +132,41 @@ public class ArrayListTaskTable implements QuestionTaskTable {
                 m.remove(t, "Duplicate Question");
             }
 
-            return true;
+            return null;
         }
-        return false;
+
+        List<Task> list1 = this.list;
+        long[] tEvidence = t.evidence();
+        long occ = t.occurrence();
+        for (int i = 0, list1Size = list1.size(); i < list1Size; i++) {
+            Task e = list1.get(i);
+
+            //TODO merge occurrence time if within memory's duration period
+
+            if (occ != e.occurrence())
+                continue;
+
+            long[] eEvidence = e.evidence();
+
+            long[] zipped = Stamp.zip(tEvidence, eEvidence);
+
+            //construct before removing so the budgets arent deleted
+            MutableTask te = new MutableTask(
+                    t, e,
+                    m.time(), occ,
+                    zipped, BudgetMerge.plusDQBlend);
+
+            remove(i, m, "Merged");
+            m.remove(t, "Merged");
+
+            //insert quietly, pretending as if already existed
+            insert(te);
+            return null;
+
+        }
+        return t;
     }
+
 
     @NotNull
     @Override

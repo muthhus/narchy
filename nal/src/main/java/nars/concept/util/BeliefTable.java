@@ -4,6 +4,7 @@ import com.google.common.collect.Iterators;
 import nars.NAR;
 import nars.nal.Tense;
 import nars.task.Task;
+import nars.truth.Truth;
 import nars.truth.TruthWave;
 import nars.truth.Truthed;
 import org.jetbrains.annotations.NotNull;
@@ -185,6 +186,11 @@ public interface BeliefTable extends TaskTable {
 
     /** get the top-ranking eternal belief/goal; null if no eternal beliefs known */
     @Nullable Task topEternal();
+
+    @NotNull default Truth topEternalTruth(@NotNull Truth ifNone) {
+        Task t = topEternal();
+        return t == null ? ifNone : t.truth();
+    }
 
     /** finds the most relevant temporal belief for the given time; ; null if no temporal beliefs known */
     @Nullable Task topTemporal(long when, long now);

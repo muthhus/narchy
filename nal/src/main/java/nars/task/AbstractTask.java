@@ -478,23 +478,14 @@ public abstract class AbstractTask extends UnitBudget
      */
     @Override
     public final boolean equals(@NotNull Object that) {
-        if (this == that) return true;
-        //if (that instanceof Task) {
 
-            //hash test has probably already occurred, coming from a HashMap
-            if (hashCode() != that.hashCode()) return false;
+        return this == that ||
+                (hashCode() == that.hashCode() && equivalentTo((Task) that, true, true, true, true, false));
 
-            return equivalentTo((Task) that, true, true, true, true, false);
-        //}
-        //return false;
     }
 
     @Override
     public final boolean equivalentTo(@NotNull Task that, boolean punctuation, boolean term, boolean truth, boolean stamp, boolean creationTime) {
-
-        if (this == that) return true;
-
-        char thisPunc = punc();
 
         if (stamp) {
             //uniqueness includes every aspect of stamp except creation time
@@ -518,6 +509,7 @@ public abstract class AbstractTask extends UnitBudget
         }
 
         if (punctuation) {
+            char thisPunc = punc();
             if (thisPunc != that.punc()) return false;
         }
 

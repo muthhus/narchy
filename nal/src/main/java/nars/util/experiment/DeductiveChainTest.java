@@ -1,4 +1,4 @@
-package nars.util.signal.experiment;
+package nars.util.experiment;
 
 import nars.$;
 import nars.Global;

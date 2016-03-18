@@ -45,9 +45,9 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
     private List<Termed> termLinkTemplates;
 
     @Nullable
-    protected QuestionTaskTable questions;
+    protected QuestionTable questions;
     @Nullable
-    protected QuestionTaskTable quests;
+    protected QuestionTable quests;
     @Nullable
     protected BeliefTable beliefs;
     @Nullable
@@ -73,17 +73,17 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
      */
     @Nullable
     @Override
-    public final QuestionTaskTable quests() {
+    public final QuestionTable quests() {
         return tableOrEmpty(quests);
     }
 
     @NotNull
     @Override
-    public final QuestionTaskTable questions() {
+    public final QuestionTable questions() {
         return tableOrEmpty(questions);
     }
 
-    @NotNull private static QuestionTaskTable tableOrEmpty(@Nullable QuestionTaskTable q) {
+    @NotNull private static QuestionTable tableOrEmpty(@Nullable QuestionTable q) {
         return q == null ? TaskTable.EMPTY : q;
     }
     @NotNull private static BeliefTable tableOrEmpty(@Nullable BeliefTable q) {
@@ -194,7 +194,7 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
 
         BeliefTable beliefs = this.beliefs;
         if (beliefs == null)
-            beliefs = this.beliefs = new DefaultBeliefTable(nar.conceptBeliefsMax.intValue(), nar);
+            beliefs = this.beliefs = new ArrayBeliefTable(nar.conceptBeliefsMax.intValue(), nar);
 
         belief = beliefs.add(belief, nar);
 
@@ -249,7 +249,7 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
 
         BeliefTable g = goals();
         if (goals == null) {
-            g = this.goals = new DefaultBeliefTable(
+            g = this.goals = new ArrayBeliefTable(
                 nar.conceptGoalsMax.intValue(), nar);
         }
 
@@ -355,12 +355,12 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
     @Override
     public Task processQuestion(@NotNull Task q, @NotNull NAR nar) {
 
-        final QuestionTaskTable questionTable;
+        final QuestionTable questionTable;
         if (q.isQuestion()) {
-            if (questions == null) questions = new ArrayListTaskTable(nar.conceptQuestionsMax.intValue());
+            if (questions == null) questions = new ArrayQuestionTable(nar.conceptQuestionsMax.intValue());
             questionTable = questions();
         } else { // else if (q.isQuest())
-            if (quests == null) quests = new ArrayListTaskTable(nar.conceptQuestionsMax.intValue());
+            if (quests == null) quests = new ArrayQuestionTable(nar.conceptQuestionsMax.intValue());
             questionTable = quests();
         }
 

@@ -29,7 +29,7 @@ import java.util.function.Consumer;
 /**
  * Stores beliefs ranked in a sorted ArrayList, with strongest beliefs at lowest indexes (first iterated)
  */
-public class DefaultBeliefTable implements BeliefTable {
+public class ArrayBeliefTable implements BeliefTable {
 
     public static final BudgetMerge DuplicateMerge = BudgetMerge.plusDQBlend;
     @NotNull
@@ -44,7 +44,7 @@ public class DefaultBeliefTable implements BeliefTable {
 
     float ageFactor;
 
-    public DefaultBeliefTable(int cap, @NotNull Memory memory) {
+    public ArrayBeliefTable(int cap, @NotNull Memory memory) {
         super();
 
         if (cap == 1) cap = 2;

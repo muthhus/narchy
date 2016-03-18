@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Nullable;
 /** task table used for storing Questions and Quests.
  *  simpler than Belief/Goal tables
  * */
-public interface QuestionTaskTable extends TaskTable {
+public interface QuestionTable extends TaskTable {
 
     /**
      * attempt to insert a task.
