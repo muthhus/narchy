@@ -18,6 +18,9 @@ import javafx.stage.StageStyle;
 import nars.Global;
 import nars.NAR;
 import nars.concept.Concept;
+import nars.guifx.concept.AbstractConceptPane;
+import nars.guifx.concept.DetailedConceptPane;
+import nars.guifx.concept.SimpleConceptPane;
 import nars.guifx.demo.NARide;
 import nars.guifx.util.ColorMatrix;
 import nars.task.Task;
@@ -310,7 +313,7 @@ public enum NARfx  {
 
     public static void newWindow(NAR nar, Termed c) {
         //TODO //ConceptPane wn = new ConceptPane(nar, c);
-        ConceptPane wn = new ConceptPane(nar, c);
+        AbstractConceptPane wn = new DetailedConceptPane(nar, c);
 
         Stage st;
         Stage removed = window.put(c, st = newWindow(c.toString(), wn));
@@ -439,7 +442,9 @@ public enum NARfx  {
     private static void newConceptWindow(NAR nar, Pane v, List<? extends Termed> cc) {
 
         for (Termed c : cc) {
-            ConceptPane wn = new ConceptPane(nar, c);
+            AbstractConceptPane wn =
+                    //new DetailedConceptPane(nar, c);
+                    new SimpleConceptPane(nar, c);
             wn.setMaxWidth(250);
             wn.setPrefWidth(250);
             v.getChildren().add(wn);

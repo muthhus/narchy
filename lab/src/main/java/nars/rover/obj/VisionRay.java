@@ -40,7 +40,7 @@ abstract public class VisionRay implements AbstractPolygonBot.Sense, LayerDraw {
 
     final RayDrawer[] rayDrawers;
 
-    float biteDistanceThreshold = 0.05f;
+    float biteDistanceThreshold = 0.025f;
     private boolean eats;
     protected Body hitNext;
 
@@ -95,9 +95,14 @@ abstract public class VisionRay implements AbstractPolygonBot.Sense, LayerDraw {
 
     protected void perceiveDist(Body hit, float hitDist) {
 
-        this.hitNext = hit;
-        this.hitMaterial = material(hit);
-        this.seenDist = hitDist;
+        if ((this.hitNext = hit)!=null) {
+            this.hitMaterial = material(hit);
+            this.seenDist = hitDist;
+        } else {
+            this.hitMaterial = null;
+            this.seenDist = Float.POSITIVE_INFINITY;
+        }
+
 
 
         //hitDist = (distMomentum * hitDist) + (1f - distMomentum) * nextHitDist;
@@ -206,13 +211,11 @@ abstract public class VisionRay implements AbstractPolygonBot.Sense, LayerDraw {
                     color.set(laserHitColor);
                     color.z = Math.min(1.0f, color.z + 0.75f * (1.0f - d));
 
-
-
                 perceiveDist(body, d);
             } else {
-                hitDist = Float.POSITIVE_INFINITY; //to.euclideanDistance(from); //TODO may not be necessary to calculate
                 m_hit = false;
                 body = null;
+                perceiveDist(null, Float.POSITIVE_INFINITY);
                 color.set(normalColor);
             }
 

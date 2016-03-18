@@ -149,7 +149,7 @@ public class SomeRovers {
         nar.shortTermMemoryHistory.set(3);
         nar.executionThreshold.setValue(0.01f);
 
-        boolean gui = false;
+        boolean gui = true;
         if (gui) {
             //NARide.loop(nar, false);
 

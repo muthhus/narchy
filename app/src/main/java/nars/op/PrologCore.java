@@ -78,6 +78,10 @@ public class PrologCore extends Agent implements Consumer<Task> {
     @Range(min = 0, max = 1.0)
     public final MutableFloat confThreshold = new MutableFloat(0.75f);
 
+
+    @Range(min = 0, max = 1.0)
+    public final MutableFloat answerConf = new MutableFloat(confThreshold.floatValue()*0.9f);
+
     /*final ObjectBooleanHashMap<Term> beliefs = new ObjectBooleanHashMap() {
 
 
@@ -207,12 +211,10 @@ public class PrologCore extends Agent implements Consumer<Task> {
     private void answer(Solution answer, boolean truth) {
         try {
             Term nterm = nterm(answer.goal);
-            if (!truth)
-                nterm = $.neg(nterm);
 
             logger.info("{}\t{}\t{}", answer.goal, truth, nterm); //TODO input
 
-            nar.believe(nterm);
+            nar.believe(nterm, truth, answerConf.floatValue());
         } catch (Exception e) {
             logger.error("answer {}", e);
         }

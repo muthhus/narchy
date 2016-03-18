@@ -393,7 +393,7 @@ public class NARover extends AbstractPolygonBot {
 
             each.accept(v);
 
-            for (String material : new String[]{"food", "poison"}) {
+            for (String material : new String[]{"food", "poison", "wall"}) {
 
                 DoubleSupplier value = () -> {
                     if (v.hit(material)) {
@@ -407,7 +407,7 @@ public class NARover extends AbstractPolygonBot {
                         x == 0 ? 0 :
                             (0.5f + 0.5f * x)
                 );
-                visionSensor.setFreqResolution(0.1f);
+                visionSensor.setFreqResolution(0.05f);
 
                 controller.input.add(value);
             }
@@ -546,8 +546,7 @@ public class NARover extends AbstractPolygonBot {
 
         public Truth stop() {
             Task c = MethodOperator.invokingTask();
-            rover.thrustRelative(0);
-            rover.rotateRelative(0);
+            rover.stop();
             return c.truth(); //TODO use feedback discounting how much actually was stopped already
         }
 

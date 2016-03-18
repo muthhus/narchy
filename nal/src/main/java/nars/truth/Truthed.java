@@ -1,9 +1,12 @@
 package nars.truth;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /** indicates an implementation has, or is associated with a specific TruthValue */
 public interface Truthed {
+
+
 
     @Nullable
     Truth truth();
@@ -34,4 +37,24 @@ public interface Truthed {
         Truth t = truth();
         return t == null ? Float.NaN : t.freq();
     }
+
+    static float confSum(@NotNull Iterable<? extends Truthed> beliefs) {
+        float t = 0;
+        for (Truthed s : beliefs)
+            t += s.truth().conf();
+        return t;
+    }
+
+    static float freqMean(@NotNull Iterable<? extends Truthed> beliefs) {
+
+        float t = 0;
+        int count = 0;
+        for (Truthed s : beliefs) {
+            t += s.freq();
+            count++;
+        }
+
+        return count == 0 ? 0.5f : t / count;
+    }
+
 }

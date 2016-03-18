@@ -328,7 +328,11 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
     @NotNull
     public NAR believe(@NotNull Termed term, boolean trueOrFalse) throws NarseseException {
-        return believe(term, trueOrFalse ? 1.0f : 0f, getDefaultConfidence(BELIEF));
+        return believe(term, trueOrFalse, getDefaultConfidence(BELIEF));
+    }
+    @NotNull
+    public NAR believe(@NotNull Termed term, boolean trueOrFalse, float conf) throws NarseseException {
+        return believe(term, trueOrFalse ? 1.0f : 0f, conf);
     }
 
     @Nullable

@@ -32,14 +32,14 @@ public abstract class AbstractPolygonBot extends Being {
 
 
 
-    static float linearDamping = 0.8f;
-    static float angularDamping = 0.6f;
+    static float linearDamping = 0.4f;
+    static float angularDamping = 0.3f;
     static float restitution = 0.9f; //bounciness
     static float friction = 0.5f;
 
     //final Deque<Vec2> positions = new ArrayDeque();
     protected final List<Sense> senses = new ArrayList();
-    public float linearThrustPerCycle = 15*5f;
+    public float linearThrustPerCycle = 10*5f;
     public float angularSpeedPerCycle = 3*0.7f;
     int mission = 0;
     //public float curiosity = 0.1f;
@@ -119,13 +119,13 @@ public abstract class AbstractPolygonBot extends Being {
     }
 
 
-    public void taste(Body eatable, float distance) {
-//        Rover2.Material m = (Rover2.Material)eatable.getUserData();
-//        if (m instanceof Rover2.FoodMaterial) {
-//            float c = 1.0f / (1.0f + (distance - biteDistanceThreshold) / (tasteDistanceThreshold - biteDistanceThreshold));
-//            mouthInput.set("<goal --> food>. :|: %0." + (0.5f + c / 2f) + ";0." + (c / 2f) + "%");
-//        }
-    }
+//    public void taste(Body eatable, float distance) {
+////        Rover2.Material m = (Rover2.Material)eatable.getUserData();
+////        if (m instanceof Rover2.FoodMaterial) {
+////            float c = 1.0f / (1.0f + (distance - biteDistanceThreshold) / (tasteDistanceThreshold - biteDistanceThreshold));
+////            mouthInput.set("<goal --> food>. :|: %0." + (0.5f + c / 2f) + ";0." + (c / 2f) + "%");
+////        }
+//    }
 
     protected void onEat(Body eaten, Material m) {
 
@@ -185,8 +185,8 @@ public abstract class AbstractPolygonBot extends Being {
 
     public void rotate(float v) {
         //torso.setAngularVelocity(v);
-        torso.applyAngularImpulse(v);
-        //torso.applyTorque(torque);
+        //torso.applyAngularImpulse(v);
+        torso.applyTorque(v);
     }
 
     protected abstract void feelMotion();

@@ -31,13 +31,11 @@ import java.util.function.Consumer;
  */
 public class ArrayBeliefTable implements BeliefTable {
 
+    @NotNull final ArrayTable<Task,Task> eternal;
+    @NotNull final ArrayTable<Task,Task> temporal;
+    @NotNull final Map<Task,Task> map;
+
     public static final BudgetMerge DuplicateMerge = BudgetMerge.plusDQBlend;
-    @NotNull
-    final Map<Task,Task> map;
-    @NotNull
-    final ArrayTable<Task,Task> eternal;
-    @NotNull
-    final ArrayTable<Task,Task> temporal;
 
     private long lastUpdate; //cached value, updated before temporal operations begin
     private long minT, maxT;
@@ -299,7 +297,7 @@ public class ArrayBeliefTable implements BeliefTable {
 //                continue;
 //            }
 
-            int totalEvidence = 0; //newBelief.evidence().length + x.evidence().length;
+            final int totalEvidence = 1; //newBelief.evidence().length + x.evidence().length;
             float minValidConf = Math.min(newBelief.conf(), x.conf());
             if (minValidConf < bestConf) continue;
             float minValidRank = BeliefTable.rankEternalByOriginality(minValidConf, totalEvidence);

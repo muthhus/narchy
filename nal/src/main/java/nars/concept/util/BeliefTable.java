@@ -24,22 +24,7 @@ import static nars.nal.UtilityFunctions.or;
  */
 public interface BeliefTable extends TaskTable {
 
-    /** main method */
 
-    @Nullable Task add(@NotNull Task input, NAR nar);
-
-    /* when does projecting to now not play a role? I guess there is no case,
-    //wo we use just one ranker anymore, the normal solution ranker which takes
-    //occurence time, originality and confidence into account,
-    //and in case of question var, the truth expectation and complexity instead of confidence
-    Ranker BeliefConfidenceOrOriginality = (belief, bestToBeat) -> {
-        final float confidence = belief.getTruth().getConfidence();
-        final float originality = belief.getOriginality();
-        return or(confidence, originality);
-    };*/
-
-
-    @Nullable
     BeliefTable EMPTY = new BeliefTable() {
 
         @Override
@@ -104,6 +89,68 @@ public interface BeliefTable extends TaskTable {
         return project(t, Stamp.TIMELESS);
     }*/
 
+    static float rankEternalByOriginality(@NotNull Task b) {
+
+        return or(b.conf(), b.originality());
+    }
+
+    static float rankEternalByOriginality(float conf, int evidenceLength /* > 0 */) {
+        return or(conf, 1.0f /
+                evidenceLength
+                //(evidenceLength + 1)
+        );
+    }
+
+    static float relevance(@NotNull Task t, long time, float ageFactor) {
+        return relevance(t.occurrence(), time, ageFactor);
+    }
+
+//    default Task top(Task query, long now) {
+//
+//        switch (size()) {
+//            case 0: return null;
+//            case 1: return top();
+//            default:
+//                //TODO re-use the Ranker
+//                return top(new SolutionQualityMatchingOrderRanker(query, now));
+//        }
+//
+//    }
+
+    /** temporal relevance */
+    static float relevance(long from, long to, float ageFactor) {
+        if (from == Tense.ETERNAL)
+            return Float.NaN;
+            //return 0.5f; //weight eternal half as much as temporal; similar to a horizon heuristic
+
+        return relevance(Math.abs(from - to), ageFactor);
+    }
+
+    /** ageFactor < 1 (ex: 1/dur) */
+    static float relevance(long delta /* positive only */, float ageFactor /* <1, divides usually */) {
+        return 1f / (1f + delta*ageFactor);
+    }
+
+    @NotNull
+    static Task stronger(@NotNull Task a, @NotNull Task b) {
+        return a.conf() > b.conf() ? a : b;
+    }
+
+    /**
+     *
+     * @param t
+     * @param time
+     * @param ageFactor effectively a ratio for trading off confidence against time
+     * @return
+     */
+    static float rankTemporalByConfidence(@NotNull Task t, long time, float ageFactor) {
+        return
+            t.conf() * BeliefTable.relevance(t, time, ageFactor)
+        ;
+    }
+
+    /** attempt to insert a task; returns what was input or null if nothing changed (rejected) */
+    @Nullable Task add(@NotNull Task input, NAR nar);
 
     /**
      * get a random belief, weighted by their sentences confidences
@@ -126,110 +173,46 @@ public interface BeliefTable extends TaskTable {
         return null;
     }
 
-
     default float getConfidenceSum() {
-        return getConfidenceSum(this);
+        return Truthed.confSum(this);
     }
 
-    static float getConfidenceSum(@NotNull Iterable<? extends Truthed> beliefs) {
-        float t = 0;
-        for (Truthed s : beliefs)
-            t += s.truth().conf();
-        return t;
+    default float getConfidenceMax() {
+        return getConfidenceMax(0f, 1f);
     }
 
-    static float getMeanFrequency(@NotNull Collection<? extends Truthed> beliefs) {
-        if (beliefs.isEmpty()) return 0.5f;
-
-        float t = 0;
-        for (Truthed s : beliefs)
-            t += s.truth().freq();
-        return t / beliefs.size();
-    }
-
-//    default Task top(Task query, long now) {
-//
-//        switch (size()) {
-//            case 0: return null;
-//            case 1: return top();
-//            default:
-//                //TODO re-use the Ranker
-//                return top(new SolutionQualityMatchingOrderRanker(query, now));
-//        }
-//
-//    }
-
+    /** calculates the max confidence of a belief within the given frequency range */
     default float getConfidenceMax(float minFreq, float maxFreq) {
         float max = Float.NEGATIVE_INFINITY;
 
         for (Task t : this) {
-            float f = t.truth().freq();
-
+            float f = t.freq();
             if ((f >= minFreq) && (f <= maxFreq)) {
-                float c = t.truth().conf();
+                float c = t.conf();
                 if (c > max)
                     max = c;
             }
         }
 
-        if (max == -1) return Float.NaN;
-        return max;
+        return !Float.isFinite(max) ? Float.NaN : max;
     }
-
-
-    static float rankEternalByOriginality(@NotNull Task b) {
-        return or(b.conf(), b.originality());
-    }
-    static float rankEternalByOriginality(float conf, int evidenceLength) {
-        return or(conf, 1.0f / (evidenceLength + 1));
-    }
-
-    /** get the top-ranking eternal belief/goal; null if no eternal beliefs known */
-    @Nullable Task topEternal();
-
-    @NotNull default Truth topEternalTruth(@NotNull Truth ifNone) {
-        Task t = topEternal();
-        return t == null ? ifNone : t.truth();
-    }
-
-    /** finds the most relevant temporal belief for the given time; ; null if no temporal beliefs known */
-    @Nullable Task topTemporal(long when, long now);
-
-//    default Truth best(long when) {
-//        return best(when, when);
-//    }
-//
-//    /** projects, if necessary, the top belief result, and returns the estimated Truth for the target time */
-//    default Truth best(long when, long now) {
-//        Task top = top(when);
-//        Truth topTruth;
-//        if (when != Tense.ETERNAL) {
-//            topTruth = projectAggregate...
-//        } else {
-//            topTruth = top.truth();
-//        }
-//
-//        return topTruth;
-//    }
 
     @Nullable
     default Task top(long now) {
         return top(now, now);
     }
 
-    /** get the most relevant belief/goal with respect to a specific time.
-     *
-     * */
+    /** get the most relevant belief/goal with respect to a specific time. */
     @Nullable
     default Task top(long t, long now) {
 
         Task ete = topEternal();
         if (t == Tense.ETERNAL) {
-            if (ete != null)
+            if (ete != null) {
                 return ete;
-            else {
-                //eternalize the topTemporal
-            }
+            } /*else {
+                //eternalize the topTemporal?
+            } */
         }
 
         Task tmp = topTemporal(t, now);
@@ -244,18 +227,23 @@ public interface BeliefTable extends TaskTable {
         }
     }
 
+    /** get the top-ranking eternal belief/goal; null if no eternal beliefs known */
+    @Nullable Task topEternal();
+
+    /** finds the most relevant temporal belief for the given time; ; null if no temporal beliefs known */
+    @Nullable Task topTemporal(long when, long now);
 
 
-    default void print(@NotNull PrintStream out) {
-        this.forEach(t -> {
-            out.println(t + " " + Arrays.toString(t.evidence()) + ' ' + t.log());
-        });
-    }
 
-    @NotNull
-    default TruthWave getWave() {
-        return new TruthWave(this);
-    }
+    /* when does projecting to now not play a role? I guess there is no case,
+    //wo we use just one ranker anymore, the normal solution ranker which takes
+    //occurence time, originality and confidence into account,
+    //and in case of question var, the truth expectation and complexity instead of confidence
+    Ranker BeliefConfidenceOrOriginality = (belief, bestToBeat) -> {
+        final float confidence = belief.getTruth().getConfidence();
+        final float originality = belief.getOriginality();
+        return or(confidence, originality);
+    };*/
 
 
 //    /** computes the truth/desire as an aggregate of projections of all
@@ -278,23 +266,12 @@ public interface BeliefTable extends TaskTable {
 //
 //    }
 
-    static float relevance(@NotNull Task t, long time, float ageFactor) {
-        return relevance(t.occurrence(), time, ageFactor);
+    @NotNull default Truth topEternalTruth(@NotNull Truth ifNone) {
+        Task t = topEternal();
+        return t == null ? ifNone : t.truth();
     }
 
-    /** temporal relevance */
-    static float relevance(long from, long to, float ageFactor) {
-        if (from == Tense.ETERNAL)
-            return Float.NaN;
-            //return 0.5f; //weight eternal half as much as temporal; similar to a horizon heuristic
 
-        return relevance(Math.abs(from - to), ageFactor);
-    }
-
-    /** ageFactor < 1 (ex: 1/dur) */
-    static float relevance(long delta /* positive only */, float ageFactor /* <1, divides usually */) {
-        return 1f / (1f + delta*ageFactor);
-    }
 
 
 //    static float projectionQuality(float freq, float conf, @NotNull Task t, long targetTime, long currentTime, boolean problemHasQueryVar) {
@@ -318,23 +295,15 @@ public interface BeliefTable extends TaskTable {
 //
 //    }
 
-    @NotNull
-    static Task stronger(@NotNull Task a, @NotNull Task b) {
-        return a.conf() > b.conf() ? a : b;
+    default void print(@NotNull PrintStream out) {
+        this.forEach(t -> {
+            out.println(t + " " + Arrays.toString(t.evidence()) + ' ' + t.log());
+        });
     }
 
-
-    /**
-     *
-     * @param t
-     * @param time
-     * @param ageFactor effectively a ratio for trading off confidence against time
-     * @return
-     */
-    static float rankTemporalByConfidence(@NotNull Task t, long time, float ageFactor) {
-        return
-            t.conf() * BeliefTable.relevance(t, time, ageFactor)
-        ;
+    @NotNull
+    default TruthWave getWave() {
+        return new TruthWave(this);
     }
 
     @Nullable
