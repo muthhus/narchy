@@ -1,7 +1,6 @@
 package nars.op;
 
 import alice.tuprolog.*;
-import com.gs.collections.impl.map.mutable.primitive.ObjectBooleanHashMap;
 import nars.$;
 import nars.NAR;
 import nars.Op;
@@ -19,10 +18,10 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import static nars.nal.Tense.ITERNAL;
 import static nars.term.container.TermVector.the;
 
 /** Prolog mental coprocessor for accelerating reasoning
@@ -57,11 +56,15 @@ public class PrologCore extends Agent implements Consumer<Task> {
 
     /** beliefs above this expectation will be asserted as prolog beliefs */
     @Range(min=0.5, max=1.0)
-    public final MutableFloat trueExpectationThreshold = new MutableFloat(0.9f);
+    public final MutableFloat trueFreqThreshold = new MutableFloat(0.9f);
 
     /** beliefs below this expectation will be asserted as negated prolog beliefs */
     @Range(min=0, max=0.5)
-    public final MutableFloat falseExpectationThreshold = new MutableFloat(0.1f);
+    public final MutableFloat falseFreqThreshold = new MutableFloat(0.1f);
+
+    /** beliefs above this expectation will be asserted as prolog beliefs */
+    @Range(min=0.5, max=1.0)
+    public final MutableFloat confThreshold = new MutableFloat(0.9f);
 
     /*final ObjectBooleanHashMap<Term> beliefs = new ObjectBooleanHashMap() {
 
@@ -86,11 +89,17 @@ public class PrologCore extends Agent implements Consumer<Task> {
 
         if (task.isJudgment() ) {
             if (task.isEternal()) {
-                float exp = task.expectation();
-                if (exp > trueExpectationThreshold.floatValue())
-                    believe(task, true);
-                else if (exp < falseExpectationThreshold.floatValue())
-                    believe(task, false);
+                int dt = task.term().dt();
+                if (dt == 0 || dt ==ITERNAL) { //only nontemporal or instant for now
+                    float c = task.conf();
+                    if (c > confThreshold.floatValue()) {
+                        float f = task.freq();
+                        if (f > trueFreqThreshold.floatValue())
+                            believe(task, true);
+                        else if (f < falseFreqThreshold.floatValue())
+                            believe(task, false);
+                    }
+                }
                 /* else: UNSURE */
             }
         } else

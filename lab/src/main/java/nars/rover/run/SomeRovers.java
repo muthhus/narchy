@@ -105,7 +105,8 @@ public class SomeRovers {
                 Inperience.class
         );*/
 
-        //new PrologCore(nar);
+        PrologCore p = new PrologCore(nar);
+        p.confThreshold.setValue(0.25f);
 
         nar.logSummaryGT(System.out, 0.7f);
 //        nar.log(Systenar.out, x -> {
