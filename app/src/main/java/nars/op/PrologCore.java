@@ -1,6 +1,7 @@
 package nars.op;
 
 import alice.tuprolog.*;
+import com.gs.collections.impl.map.mutable.primitive.ObjectBooleanHashMap;
 import nars.$;
 import nars.NAR;
 import nars.Op;
@@ -17,6 +18,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import static nars.term.container.TermVector.the;
@@ -49,6 +53,7 @@ public class PrologCore extends Agent implements Consumer<Task> {
 
     private final NAR nar;
 
+    final Map<Term, Struct> beliefs = new HashMap();
 
     /** beliefs above this expectation will be asserted as prolog beliefs */
     @Range(min=0.5, max=1.0)
@@ -107,7 +112,7 @@ public class PrologCore extends Agent implements Consumer<Task> {
             tt = ((Compound)tt).term(0);
             truth = !truth;
         }
-        believe(pterm(tt), truth);
+        believeStruct(tt, truth);
     }
 
     //TODO async
@@ -134,17 +139,11 @@ public class PrologCore extends Agent implements Consumer<Task> {
                 case EngineRunner.TRUE_CP:
 
 
-                    try {
-                        nar.believe(nterm(answer.goal));
-                        logger.info("TRUE {}", answer.goal); //TODO input
-                    }
-                    catch (Exception e) {
-                        logger.error("answer {}", e);
-                    }
+                    answer(answer, true);
 
                     break;
                 case EngineRunner.FALSE:
-                    logger.info("FALSE"); //TODO input
+                    answer(answer, false);
                     break;
                 default:
                     //no known solution, remain silent
@@ -154,8 +153,31 @@ public class PrologCore extends Agent implements Consumer<Task> {
 
     }
 
+    private void answer(Solution answer, boolean truth) {
+        try {
+            Term nterm = nterm(answer.goal);
+            if (!truth)
+                nterm = $.neg(nterm);
+
+            logger.info("{} {}", answer.goal, nterm); //TODO input
+
+            nar.believe(nterm);
+        }
+        catch (Exception e) {
+            logger.error("answer {}", e);
+        }
+    }
+
     private Term nterm(Struct s, int subterm) {
         return nterm(s.term(subterm));
+    }
+    private Term[] nterms(Struct s) {
+        int len = s.getArity();
+        Term[] n = new Term[len];
+        for (int ni = 0; ni < len; ni++) {
+            n[ni] = nterm(s.getTerm(ni));
+        }
+        return n;
     }
 
     //TODO use wrapper classes which link to the original terms so they can be re-used instead o reallocating fresh ones that will equals() anyway
@@ -170,6 +192,16 @@ public class PrologCore extends Agent implements Consumer<Task> {
                     case "<->":
                         return $.the(Op.SIMILAR, the(nterm(s, 0), nterm(s, 1)));
 
+                    case "*":
+                        return $.the(Op.PRODUCT, the(nterms(s)));
+                    case "&&":
+                        return $.the(Op.CONJUNCTION, the(nterms(s)));
+                    case "||":
+                        return $.the(Op.DISJUNCTION, the(nterms(s)));
+                    case "not":
+                        return $.neg(nterm(s,0));
+
+
                     default:
                         throw new RuntimeException(s + " not translated");
                 }
@@ -178,23 +210,53 @@ public class PrologCore extends Agent implements Consumer<Task> {
                 return $.the(s.name());
             }
         } else if (t instanceof Var) {
-            throw new RuntimeException(t + " untranslated");
+            return $.varDep(((Var) t).getName());
+            //throw new RuntimeException(t + " untranslated");
         } else {
             throw new RuntimeException(t + " untranslated");
         }
     }
 
 
-    //TODO async
-    protected void believe(alice.tuprolog.Term p, boolean truth) {
-        if (!truth) {
-            //wrap in negate
-            p = negate(p);
-        }
-        Struct belief = assertion(p);
 
-        Solution s = solve(belief);
-        logger.info("believe {} {}", belief, s);
+    //TODO async
+    protected void believeStruct(Term p, boolean truth) {
+
+
+        beliefs.compute(p, (pp, prev) -> {
+
+            if (prev!=null) {
+
+//                boolean wasNegative = ((Struct)prev.getTerm(0)) //unwrap assert
+//                        .name().equals("not");
+//
+//                if ((truth && wasNegative) || (!truth && !wasNegative)) {
+//                    //TODO unassert previous
+//                    throw new RuntimeException("inconsistent");
+//                } else {
+//                    //same value, keep it and do nothing
+//                    return prev;
+//                }
+                return prev;
+            }
+
+            Struct next;
+            alice.tuprolog.Term np = pterm(pp);
+            if (!truth) {
+                //wrap in negate
+                next = negate(np);
+            } else {
+                next = (Struct)np;
+            }
+
+            Struct belief = assertion(next);
+            Solution s = solve(belief);
+            logger.info("believe {} {}", belief, s);
+
+            return belief;
+        });
+
+
 
     }
 
@@ -203,7 +265,7 @@ public class PrologCore extends Agent implements Consumer<Task> {
     }
 
     public static Struct negate(alice.tuprolog.Term p) {
-        return new Struct("--", p); //TODO issue retraction on the opposite? ex: retract(x), assertz(not(x))
+        return new Struct("not", p); //TODO issue retraction on the opposite? ex: retract(x), assertz(not(x))
     }
 
     public static alice.tuprolog.Term[] psubterms(final Compound subtermed) {
@@ -219,7 +281,13 @@ public class PrologCore extends Agent implements Consumer<Task> {
     public static alice.tuprolog.Term pterm(final Term term) {
         if (term instanceof Compound) {
             Op op = term.op();
-            return new Struct(op.str, psubterms( ((Compound)term) ));
+            switch (op) {
+                case NEGATE:
+                    return new Struct("not", psubterms( ((Compound)term) ));
+                default:
+                    return new Struct(op.str, psubterms( ((Compound)term) ));
+            }
+
         } else if (term instanceof Variable) {
             switch (term.op()) {
                 case VAR_QUERY:

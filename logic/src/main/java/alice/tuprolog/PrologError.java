@@ -47,6 +47,10 @@ public class PrologError extends Throwable {
 		return error;
 	}
 
+	public static PrologError instantiation_error(Prolog engine, int argNo) {
+		return instantiation_error(engine.getEngineManager(), argNo);
+	}
+
 	public static PrologError instantiation_error(EngineManager engineManager, int argNo) {
 		Term errorTerm = new Struct("instantiation_error");
 		Term tuPrologTerm = new Struct("instantiation_error", engineManager.getEnv().currentContext.currentGoal, new Int(argNo));
@@ -57,6 +61,10 @@ public class PrologError extends Throwable {
 		" of " + engineManager.getEnv().currentContext.currentGoal.toString();
 		return new PrologError(new Struct("error", errorTerm, tuPrologTerm), descriptionError);
 		/**/	
+	}
+
+	public static PrologError type_error(Prolog engine, int argNo, String validType, Term culprit) {
+		return type_error(engine.getEngineManager(), argNo, validType, culprit);
 	}
 
 	public static PrologError type_error(EngineManager e, int argNo, String validType, Term culprit) {

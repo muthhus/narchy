@@ -53,9 +53,9 @@ public class TheoryManager {
 	private final Deque<Term> startGoalStack;
 	Theory lastConsultedTheory;
 
-	public TheoryManager(Prolog vm) {
-		this(vm, new MutableClauseIndex());
-	}
+//	public TheoryManager(Prolog vm) {
+//		this(vm, new MutableClauseIndex());
+//	}
 
 	public TheoryManager(Prolog vm, ClauseIndex dynamics) {
 		engine = vm;
@@ -92,7 +92,7 @@ public class TheoryManager {
 		String key = d.getHead().getPredicateIndicator();
 		if (dyn) {
 			dynamicDBase.add(key, d, false);
-			if (staticDBase.containsKey(key)) {
+			if (engine.isSpy() && staticDBase.containsKey(key)) {
 				engine.warn("A static predicate with signature " + key + " has been overriden.");
 			}
 		} else

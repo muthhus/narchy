@@ -424,7 +424,7 @@ public class ArrayBeliefTable implements BeliefTable {
 //        if (displaced!=null && inserted) {
 //
 //        }
-        if (displaced!=null) {
+        if (displaced!=null && !displaced.isDeleted()) {
             onBeliefRemoved(displaced,
                     "Displaced",
                     //"Displaced by " + incoming,

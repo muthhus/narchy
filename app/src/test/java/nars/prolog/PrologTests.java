@@ -16,7 +16,33 @@ public class PrologTests {
                   ":-solve(go).").run();
     }
 
+    @Test public void testAnd() {
+        assertEquals(
+                "yes.",
+                new Agent("t(a).\nt(b).\nt(c).\n",
+                "t(a), t(b), t(c).").run().toString());
+    }
+    @Test public void testAnd2() {
+        assertEquals(
+                "yes.",
+                new Agent("a.\nb.\nc.\n",
+                        "a, b, c.").run().toString());
+    }
 
+    @Test public void testInequality() {
+        assertEquals(
+                "no.",
+                new Agent("a.\nb.",
+                        "a=b.").run().toString());
+        assertEquals(
+                "yes.",
+                new Agent("a.\nb.",
+                        "a=a.").run().toString());
+        assertEquals(
+                "yes.",
+                new Agent("a.\nb.",
+                        "not(a=b).").run().toString());
+    }
     @Test public void maze2() {
 
         String theory =

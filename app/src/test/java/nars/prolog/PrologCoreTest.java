@@ -26,7 +26,7 @@ public class PrologCoreTest {
 
         assertTrue(p.isTrue("'-->'(b,a)."));
         assertFalse(p.isTrue("'-->'(a,b)."));
-        assertTrue(p.isTrue("'--'('-->'(d,c))."));
+        assertTrue(p.isTrue("'not'('-->'(d,c))."));
         assertFalse(p.isTrue("'-->'(d,c)."));
 
     }
@@ -70,6 +70,32 @@ public class PrologCoreTest {
         //expect false
         n.step();
     }
+
+    @Test
+    public void testConjunction3() throws MalformedGoalException, IOException {
+        NAR n = new Default();
+        PrologCore p = new PrologCore(n);
+        n.input("(&&,a,b,c).");
+        n.step();
+
+        assertTrue(p.isTrue("'&&'(a,b,c)."));
+        //assertTrue(p.isTrue("','(a,','(b,c))."));
+    }
+    @Test
+    public void testConjunction3b() throws MalformedGoalException, IOException {
+        NAR n = new Default();
+        PrologCore p = new PrologCore(n);
+        n.believe("x:a");
+        n.believe("y:b");
+        n.believe("z:c", false);
+        n.step();
+
+        assertTrue(p.isTrue("'&&'('-->'(a,x), '-->'(b,y), not('-->'(c,z)))."));
+        assertFalse(p.isTrue("'&&'('-->'(a,x), '-->'(b,y), '-->'(c,z))."));
+        //assertTrue(p.isTrue("','(a,','(b,c))."));
+
+    }
+
     @Test
     public void testPrologCoreDerivedTransitive2() throws MalformedGoalException, IOException {
         NAR n = new Default();
