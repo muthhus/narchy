@@ -20,7 +20,7 @@ public class SimpleConceptPane extends AbstractConceptPane {
         setCenter(
             new VBox(
                 new ConceptMenu(nar, concept),
-                budgetGraph = new BudgetGraph(nar, Plot2D.BarWave, 96, 192f, 32d, concept),
+                budgetGraph = new BudgetGraph(nar, Plot2D.BarWave, 96, 0, 32d, concept),
                 beliefTable = new BeliefTablePane(nar)
             )
         );

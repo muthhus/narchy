@@ -40,7 +40,7 @@ public class MaxBeliefConfidence extends CycleReaction implements Signals {
         if (c == null) conf = -1;
         else {
             float lastConf = conf;
-            conf = c.beliefs().getConfidenceMax(
+            conf = c.beliefs().confMax(
                     freq - Global.TRUTH_EPSILON / 2.0f,
                     freq + Global.TRUTH_EPSILON / 2.0f
             );

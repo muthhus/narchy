@@ -32,15 +32,15 @@ public abstract class AbstractPolygonBot extends Being {
 
 
 
-    static float linearDamping = 0.4f;
-    static float angularDamping = 0.3f;
+    static float linearDamping = 0.2f;
+    static float angularDamping = 0.5f;
     static float restitution = 0.9f; //bounciness
-    static float friction = 0.5f;
+    static float friction = 0.75f;
 
     //final Deque<Vec2> positions = new ArrayDeque();
     protected final List<Sense> senses = new ArrayList();
-    public float linearThrustPerCycle = 10*5f;
-    public float angularSpeedPerCycle = 3*0.7f;
+    public float linearThrustPerCycle = 5*5f;
+    public float angularSpeedPerCycle = 5*0.7f;
     int mission = 0;
     //public float curiosity = 0.1f;
 
@@ -145,9 +145,12 @@ public abstract class AbstractPolygonBot extends Being {
 
 
 
+    /** being's subjective time */
+    abstract long time();
+
     @Override
-    public void step(int time) {
-        long now = sim.clock.time();
+    public void step(int dt) {
+        long now = time();
         if (now % sim.missionPeriod == 0) {
             inputMission();
         }

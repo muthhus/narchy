@@ -212,9 +212,13 @@ public class PrologCore extends Agent implements Consumer<Task> {
         try {
             Term nterm = nterm(answer.goal);
 
-            logger.info("{}\t{}\t{}", answer.goal, truth, nterm); //TODO input
+            if (nterm instanceof Compound) {
+                logger.info("{}\t{}\t{}", answer.goal, truth, nterm); //TODO input
 
-            nar.believe(nterm, truth, answerConf.floatValue());
+                nar.believe(nterm, truth, answerConf.floatValue());
+            } else {
+                logger.error("{}\t{}\t{} (not a compound)", answer.goal, truth, nterm); //TODO input
+            }
         } catch (Exception e) {
             logger.error("answer {}", e);
         }
@@ -228,7 +232,8 @@ public class PrologCore extends Agent implements Consumer<Task> {
         int len = s.getArity();
         Term[] n = new Term[len];
         for (int ni = 0; ni < len; ni++) {
-            n[ni] = nterm(s.getTerm(ni));
+            if ((n[ni] = nterm(s.getTerm(ni))) == null)
+                return null; //abort
         }
         return n;
     }
@@ -278,13 +283,19 @@ public class PrologCore extends Agent implements Consumer<Task> {
                         throw new RuntimeException(s + " not translated");
                 }
             } else {
+                String n = s.name();
+                if (n.startsWith("'#")) {
+                    //VarDep which exists as an Atom (not Var) in Prolog
+                    return $.varDep(n.substring(2, n.length()-1));
+                }
                 //Atom
-                return $.the(s.name());
+                return $.the(n);
             }
         } else if (t instanceof Var) {
             return $.varDep(((Var) t).getName());
             //throw new RuntimeException(t + " untranslated");
         } else {
+
             throw new RuntimeException(t + " untranslated");
         }
     }

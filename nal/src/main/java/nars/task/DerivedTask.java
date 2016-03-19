@@ -37,7 +37,7 @@ public final class DerivedTask extends MutableTask {
 
 
     @Override
-    public boolean onRevision(@NotNull Task t) {
+    public void onRevision(@NotNull Task t) {
         Truth conclusion = t.truth();
 
         BLink<? extends Task> tLink = premiseTaskLink;
@@ -59,7 +59,6 @@ public final class DerivedTask extends MutableTask {
             bLink.andDurability(oneMinusDifB);
         }
 
-        return true;
     }
 
 }

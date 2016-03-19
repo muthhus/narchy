@@ -2,6 +2,7 @@ package nars.concept.util;
 
 import com.google.common.collect.Iterators;
 import nars.NAR;
+import nars.budget.Budgeted;
 import nars.nal.Tense;
 import nars.task.Task;
 import nars.truth.Truth;
@@ -12,10 +13,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.Random;
 
+import static java.util.stream.StreamSupport.stream;
 import static nars.nal.UtilityFunctions.or;
 
 /**
@@ -90,15 +91,11 @@ public interface BeliefTable extends TaskTable {
     }*/
 
     static float rankEternalByOriginality(@NotNull Task b) {
-
         return or(b.conf(), b.originality());
     }
 
-    static float rankEternalByOriginality(float conf, int evidenceLength /* > 0 */) {
-        return or(conf, 1.0f /
-                evidenceLength
-                //(evidenceLength + 1)
-        );
+    static float rankEternalByOriginality(float conf, int hypotheticalEvidenceLength /* > 0 */) {
+        return or(conf, 1.0f / (hypotheticalEvidenceLength + 1));
     }
 
     static float relevance(@NotNull Task t, long time, float ageFactor) {
@@ -152,50 +149,6 @@ public interface BeliefTable extends TaskTable {
     /** attempt to insert a task; returns what was input or null if nothing changed (rejected) */
     @Nullable Task add(@NotNull Task input, NAR nar);
 
-    /**
-     * get a random belief, weighted by their sentences confidences
-     */
-    @Nullable
-    default Task getBeliefRandomByConfidence(boolean eternal, @NotNull Random rng) {
-
-        if (isEmpty()) return null;
-
-        float totalConfidence = getConfidenceSum();
-        float r = rng.nextFloat() * totalConfidence;
-
-
-        for (Task x : this) {
-            r -= x.truth().conf();
-            if (r < 0)
-                return x;
-        }
-
-        return null;
-    }
-
-    default float getConfidenceSum() {
-        return Truthed.confSum(this);
-    }
-
-    default float getConfidenceMax() {
-        return getConfidenceMax(0f, 1f);
-    }
-
-    /** calculates the max confidence of a belief within the given frequency range */
-    default float getConfidenceMax(float minFreq, float maxFreq) {
-        float max = Float.NEGATIVE_INFINITY;
-
-        for (Task t : this) {
-            float f = t.freq();
-            if ((f >= minFreq) && (f <= maxFreq)) {
-                float c = t.conf();
-                if (c > max)
-                    max = c;
-            }
-        }
-
-        return !Float.isFinite(max) ? Float.NaN : max;
-    }
 
     @Nullable
     default Task top(long now) {
@@ -235,6 +188,7 @@ public interface BeliefTable extends TaskTable {
 
 
 
+
     /* when does projecting to now not play a role? I guess there is no case,
     //wo we use just one ranker anymore, the normal solution ranker which takes
     //occurence time, originality and confidence into account,
@@ -266,7 +220,7 @@ public interface BeliefTable extends TaskTable {
 //
 //    }
 
-    @NotNull default Truth topEternalTruth(@NotNull Truth ifNone) {
+    @Nullable default Truth topEternalTruth(@Nullable Truth ifNone) {
         Task t = topEternal();
         return t == null ? ifNone : t.truth();
     }
@@ -317,6 +271,57 @@ public interface BeliefTable extends TaskTable {
         //TODO
         return 0;
     }
+
+    default float priSum() {
+        return (float) stream(spliterator(), false)
+                .mapToDouble(Budgeted::pri).sum();
+    }
+
+    /**
+     * get a random belief, weighted by their sentences confidences
+     */
+    @Nullable
+    default Task randomByConf(boolean eternal, @NotNull Random rng) {
+
+        if (isEmpty()) return null;
+
+        float totalConfidence = confSum();
+        float r = rng.nextFloat() * totalConfidence;
+
+
+        for (Task x : this) {
+            r -= x.truth().conf();
+            if (r < 0)
+                return x;
+        }
+
+        return null;
+    }
+
+    default float confSum() {
+        return Truthed.confSum(this);
+    }
+
+    default float confMax() {
+        return confMax(0f, 1f);
+    }
+
+    /** calculates the max confidence of a belief within the given frequency range */
+    default float confMax(float minFreq, float maxFreq) {
+        float max = Float.NEGATIVE_INFINITY;
+
+        for (Task t : this) {
+            float f = t.freq();
+            if ((f >= minFreq) && (f <= maxFreq)) {
+                float c = t.conf();
+                if (c > max)
+                    max = c;
+            }
+        }
+
+        return !Float.isFinite(max) ? Float.NaN : max;
+    }
+
 
     /** simple metric that guages the level of inconsistency between two differnt tables, used in measuring graph intercoherency */
     /*default float coherenceAgainst(BeliefTable other) {

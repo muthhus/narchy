@@ -9,6 +9,16 @@ import org.jetbrains.annotations.NotNull;
 @FunctionalInterface
 public interface BudgetMerge {
 
+    /** merge 'incoming' budget (scaled by incomingScale) into 'existing'
+     * @return any resultng overflow priority which was not absorbed by the target, >=0
+     * */
+    float merge(Budget existing, Budgeted incoming, float incomingScale);
+
+    default float merge(Budget existing, Budget incoming) {
+        return merge(existing, incoming, 1f);
+    }
+
+
     static float dqBlendByPri(@NotNull Budget tgt, @NotNull Budgeted src, float srcScale, boolean addOrAvgPri) {
         float incomingPri = src.priIfFiniteElseZero() * srcScale;
 
@@ -69,14 +79,6 @@ public interface BudgetMerge {
         //dqBlendBySummary(tgt, src, srcScale, false);
     };
 
-    /** merge 'incoming' budget (scaled by incomingScale) into 'existing'
-     * @return any resultng overflow priority which was not absorbed by the target, >=0
-     * */
-    float merge(Budget existing, Budgeted incoming, float incomingScale);
-
-    default float merge(Budget existing, Budget incoming) {
-        return merge(existing, incoming, 1f);
-    }
 
     BudgetMerge plusDQDominant = (tgt, src, srcScale) -> {
         float nextPriority = src.pri() * srcScale;

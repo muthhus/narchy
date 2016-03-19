@@ -13,11 +13,13 @@ public interface Budgeted extends BudgetedStruct {
     static float getPrioritySum(@NotNull Iterable<? extends Budgeted> c) {
         float totalPriority = 0;
         for (Budgeted i : c)
-            totalPriority+=i.pri();
+            totalPriority += i.pri();
         return totalPriority;
     }
 
-    /** randomly selects an item from a collection, weighted by priority */
+    /**
+     * randomly selects an item from a collection, weighted by priority
+     */
     static <E extends Budgeted> E selectRandomByPriority(@NotNull Memory memory, @NotNull Iterable<E> c) {
         float totalPriority = getPrioritySum(c);
 
@@ -38,28 +40,29 @@ public interface Budgeted extends BudgetedStruct {
     }
 
     @NotNull
-	Budget budget();
+    Budget budget();
 
-	default float summary() {
-		return budget().summary();
-	}
-        
-        default float pri() {
-            return getPriority();
-        }
+    default float summary() {
+        return budget().summary();
+    }
 
-        default float qua() {
-            return getQuality();
-        }
+    default float pri() {
+        return getPriority();
+    }
 
-        default float dur() {
-            return getDurability();
-        }
-        
-//        default long lastForgetTime() { return getLastForgetTime(); }
+    default float qua() {
+        return getQuality();
+    }
+
+    default float dur() {
+        return getDurability();
+    }
+
+    //        default long lastForgetTime() { return getLastForgetTime(); }
 //
-        default boolean isDeleted() { return getDeleted(); }
-
+    default boolean isDeleted() {
+        return getDeleted();
+    }
 
 
     default float priIfFiniteElseZero() {

@@ -1,16 +1,11 @@
 package nars.rover.run;
 
 import nars.Global;
-import nars.nar.Default;
-import nars.rover.RoverWorld;
 import nars.rover.Sim;
-import nars.rover.physics.WorldCreator;
-import nars.rover.physics.j2d.LayerDraw;
 import nars.rover.robot.NARover;
 import nars.rover.world.FoodSpawnWorld1;
 import org.jbox2d.dynamics.World;
 
-import static nars.rover.run.SomeRovers.clock;
 import static nars.rover.run.SomeRovers.q;
 
 /**
@@ -25,7 +20,7 @@ public class PhenoLab {
 
 
         //RoverWorld world = new GridSpaceWorld(GridSpaceWorld.newMazePlanet());
-        final Sim game = new Sim(new World(), clock);
+        final Sim game = new Sim(new World());
 
         new FoodSpawnWorld1(game, 0, 48, 48, 0.5f);
 

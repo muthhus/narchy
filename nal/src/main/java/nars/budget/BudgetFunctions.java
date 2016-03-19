@@ -21,6 +21,7 @@
 package nars.budget;
 
 import nars.Memory;
+import nars.NAR;
 import nars.bag.BLink;
 import nars.concept.ConceptProcess;
 import nars.nal.UtilityFunctions;
@@ -53,71 +54,6 @@ public final class BudgetFunctions extends UtilityFunctions {
         return Math.max(exp, (1.0f - exp) * 0.75f);
 
         //return Math.max(exp, (1.0f - exp)); //balanced, allows negative frequency equal opportunity
-    }
-
-    /**
-     * Evaluate the quality of a revision, then de-prioritize the premises
-     * <p>
-     * The truth value of the judgment in the task of the premise
-     * The truth value of the previously existing belief
-     * The truth value of the conclusion of revision
-     *
-     * @return The budget for the new task
-     */
-    @NotNull
-    public static void budgetRevision(@NotNull Task conclusion, @NotNull Task newBelief, @NotNull Task oldBelief) {
-
-        Truth nTruth = newBelief.truth();
-        final Budget nBudget = newBelief.budget();
-
-        Truth concTruth = conclusion.truth();
-        Truth bTruth = oldBelief.truth();
-        float difT = concTruth.getExpDifAbs(nTruth);
-
-        nBudget.andPriority(1.0f - difT);
-        nBudget.andDurability(1.0f - difT);
-
-        float cc = concTruth.conf();
-        float proportion = cc
-                / (cc + Math.min(nTruth.conf(), bTruth.conf()));
-
-//		float dif = concTruth.conf()
-//				- Math.max(nTruth.conf(), bTruth.conf());
-//		if (dif < 0) {
-//			String msg = ("Revision fault: previous belief " + oldBelief
-//					+ " more confident than revised: " + conclusion);
-////			if (Global.DEBUG) {
-//				throw new RuntimeException(msg);
-////			} else {
-////				System.err.println(msg);
-////			}
-////			dif = 0;
-//		}
-
-        float priority =
-                proportion * nBudget.pri();
-        //or(dif, nBudget.pri());
-        float durability =
-                //aveAri(dif, nBudget.dur());
-                proportion * nBudget.dur();
-        float quality = truthToQuality(concTruth);
-
-		/*
-         * if (priority < 0) { memory.nar.output(ERR.class, new
-		 * RuntimeException(
-		 * "BudgetValue.revise resulted in negative priority; set to 0"));
-		 * priority = 0; } if (durability < 0) { memory.nar.output(ERR.class,
-		 * new RuntimeException(
-		 * "BudgetValue.revise resulted in negative durability; set to 0; aveAri(dif="
-		 * + dif + ", task.getDurability=" + task.getDurability() +") = " +
-		 * durability)); durability = 0; } if (quality < 0) {
-		 * memory.nar.output(ERR.class, new RuntimeException(
-		 * "BudgetValue.revise resulted in negative quality; set to 0"));
-		 * quality = 0; }
-		 */
-
-        conclusion.budget().budget(priority, durability, quality);
-
     }
 
     // /**

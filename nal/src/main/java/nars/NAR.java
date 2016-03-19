@@ -247,7 +247,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * ask question
      */
     @NotNull
-    public Task ask(@NotNull Compound c) {
+    public Task ask(@NotNull Termed<Compound> c) {
         //TODO remove '?' if it is attached at end
         return ask(c, QUESTION);
     }
@@ -275,7 +275,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * desire goal
      */
     @Nullable
-    public Task goal(@NotNull Compound goalTerm, @NotNull Tense tense, float freq, float conf) throws NarseseException {
+    public Task goal(@NotNull Termed<Compound> goalTerm, @NotNull Tense tense, float freq, float conf) throws NarseseException {
         return goal(
                 getDefaultPriority(GOAL),
                 getDefaultDurability(GOAL),
@@ -323,20 +323,20 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
 
     @NotNull
-    public NAR believe(@NotNull Termed term) throws NarseseException {
+    public NAR believe(@NotNull Termed<Compound> term) throws NarseseException {
         return believe(term, true);
     }
     @NotNull
-    public NAR believe(@NotNull Termed term, boolean trueOrFalse) throws NarseseException {
+    public NAR believe(@NotNull Termed<Compound> term, boolean trueOrFalse) throws NarseseException {
         return believe(term, trueOrFalse, getDefaultConfidence(BELIEF));
     }
     @NotNull
-    public NAR believe(@NotNull Termed term, boolean trueOrFalse, float conf) throws NarseseException {
+    public NAR believe(@NotNull Termed<Compound> term, boolean trueOrFalse, float conf) throws NarseseException {
         return believe(term, trueOrFalse ? 1.0f : 0f, conf);
     }
 
     @Nullable
-    public Task believe(float pri, float dur, @NotNull Termed term, long occurrenceTime, float freq, float conf) throws NarseseException {
+    public Task believe(float pri, float dur, @NotNull Termed<Compound> term, long occurrenceTime, float freq, float conf) throws NarseseException {
         return input(pri, dur, term, BELIEF, occurrenceTime, freq, conf);
     }
 
@@ -344,12 +344,12 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * TODO add parameter for Tense control. until then, default is Now
      */
     @Nullable
-    public Task goal(float pri, float dur, @NotNull Termed goal, long occurrence, float freq, float conf) throws NarseseException {
+    public Task goal(float pri, float dur, @NotNull Termed<Compound> goal, long occurrence, float freq, float conf) throws NarseseException {
         return input(pri, dur, goal, GOAL, occurrence, freq, conf);
     }
 
     @Nullable
-    public Task input(float pri, float dur, @NotNull Termed term, char punc, long occurrenceTime, float freq, float conf) {
+    public Task input(float pri, float dur, @NotNull Termed<Compound> term, char punc, long occurrenceTime, float freq, float conf) {
 
         if (term == null) {
             return null;
@@ -366,7 +366,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
 
     @NotNull
-    public <T extends Compound> Task ask(@NotNull T term, char questionOrQuest) throws NarseseException {
+    public Task ask(@NotNull Termed<Compound> term, char questionOrQuest) throws NarseseException {
 
 
         //TODO use input method like believe uses which avoids creation of redundant Budget instance

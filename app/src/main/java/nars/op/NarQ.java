@@ -154,9 +154,10 @@ public class NarQ implements Consumer<NAR> {
 
             int dt = 0;
             //TODO solve for strength/additional desire so expectation is correct
+            long now = nar.time();
             final Task t = new MutableTask(term, punct).truth(invert ? 0f : 1f, additionalExp)
                     //.time(Tense.Future, nar.memory)                   
-                    .time(nar.time(), nar.time()  + dt )
+                    .time(now, now + dt )
                     .log("Q Action");
             //logger.info("q act: {}", t );
             nar.input(t);

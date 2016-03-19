@@ -325,8 +325,8 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     }
 
     /** allows for budget feedback that occurrs on revision */
-    default boolean onRevision(Task conclusion) {
-        return true;
+    default void onRevision(Task conclusion) {
+
     }
 
 

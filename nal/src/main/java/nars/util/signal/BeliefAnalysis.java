@@ -1,6 +1,7 @@
 package nars.util.signal;
 
 import nars.NAR;
+import nars.budget.Budget;
 import nars.concept.Concept;
 import nars.concept.util.BeliefTable;
 import nars.nal.Tense;
@@ -76,4 +77,8 @@ public class BeliefAnalysis extends EnergyAnalysis {
 	}
 
 
+	/** sum of priorities of the belief table */
+	public float priSum() {
+		return beliefs().priSum();
+	}
 }

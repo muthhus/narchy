@@ -29,8 +29,8 @@ public abstract class TermBuilder {
     @Nullable
     public Term the(@NotNull Op op, int relation, int t, @NotNull TermContainer tt) throws InvalidTerm {
 
-//        if (tt == null)
-//            return null;
+        if (tt == null)
+            return null;
 
         Term[] u = tt.terms();
 

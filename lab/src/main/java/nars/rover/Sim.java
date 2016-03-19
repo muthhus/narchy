@@ -32,10 +32,10 @@ public class Sim extends PhysicsModel {
 
     private static final double TWO_PI = 2 * Math.PI;
     static String[] angleTerms = new String[angleResolution];
-    public final SimulatedClock clock;
+    //public final SimulatedClock clock;
     public final List<Being> robots = Global.newArrayList();
     /* how often to input mission, in frames */
-    public int missionPeriod = 32;
+    public final int missionPeriod = 128;
     public World world;
     //PhysicsRun phy = new PhysicsRun(10, this);
 
@@ -111,8 +111,8 @@ public class Sim extends PhysicsModel {
     private boolean running = false;
     public final PhysicsRun runner;
 
-    public Sim(World world, SimulatedClock clock) {
-        this.clock = clock;
+    public Sim(World world) {
+        //this.clock = clock;
         this.world = world;
 
 
@@ -296,7 +296,7 @@ public class Sim extends PhysicsModel {
             r.step(1);
         }
 
-        clock.add(1);
+        //clock.add(1);
     }
 
     @Override

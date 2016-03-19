@@ -7,14 +7,9 @@ import nars.Symbols;
 import nars.guifx.NARfx;
 import nars.nar.Default;
 import nars.op.PrologCore;
-import nars.op.mental.Anticipate;
-import nars.op.mental.Inperience;
-import nars.rover.RoverWorld;
 import nars.rover.Sim;
 import nars.rover.robot.Arm;
 import nars.rover.robot.NARover;
-import nars.rover.robot.Spider;
-import nars.rover.robot.Turret;
 import nars.rover.world.FoodSpawnWorld1;
 import nars.time.SimulatedClock;
 import nars.op.NarQ;
@@ -53,7 +48,7 @@ public class SomeRovers {
         Global.EXIT_ON_EXCEPTION = false;
 
         //RoverWorld world = new GridSpaceWorld(GridSpaceWorld.newMazePlanet());
-        final Sim game = new Sim(new World(), clock);
+        final Sim game = new Sim(new World());
 
         //RoverWorld world = new ReactorWorld(32, 48, 32);
         new FoodSpawnWorld1(game, 128, 48, 48, 0.5f);
@@ -96,7 +91,7 @@ public class SomeRovers {
     }
 
     public static Default newNAR() {
-        int conceptsFirePerCycle = 32;
+        int conceptsFirePerCycle = 48;
         Default nar = new Default(
                 //new Memory(clock, TermIndex.softMemory(64*1024)),
                 1200, conceptsFirePerCycle, 2, 3);
@@ -106,14 +101,14 @@ public class SomeRovers {
         );*/
 
         PrologCore p = new PrologCore(nar);
-        p.confThreshold.setValue(0.6f);
+        p.confThreshold.setValue(0.75f);
 
         nar.input("$0.9$ <(?y --> ^MotorControls) ==> ?x>?");
         nar.input("$0.9$ <?x ==> [food]>?");
         nar.input("$0.9$ <food <-> poison>?");
         nar.input("$0.9$ <[food] <-> [poison]>?");
 
-        nar.logSummaryGT(System.out, 0.7f);
+        nar.logSummaryGT(System.out, 0.65f);
 //        nar.log(Systenar.out, x -> {
 //            if (x instanceof Task) {
 //                Task t = (Task)x;
@@ -138,7 +133,7 @@ public class SomeRovers {
 
 
         //nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
-        nar.core.activationRate.setValue(1f);
+        nar.core.activationRate.setValue(0.5f);
 
 
         nar.duration.set(2);
@@ -147,7 +142,7 @@ public class SomeRovers {
         nar.taskLinkForgetDurations.setValue(2);
         nar.cyclesPerFrame.set(2);
         nar.shortTermMemoryHistory.set(3);
-        nar.executionThreshold.setValue(0.01f);
+        nar.executionThreshold.setValue(0.02f);
 
         boolean gui = true;
         if (gui) {
@@ -196,7 +191,7 @@ public class SomeRovers {
         NarQ nqSpine = new NarQ(n, (i, o) -> (int) Math.ceil(1+Math.sqrt(i * o)));
 
 
-        nqSpine.power.setValue(0.9f);
+        nqSpine.power.setValue(0.8f);
 
 
         nqSpine.input.addAll(nqSpine.getBeliefExpectations(
@@ -204,8 +199,8 @@ public class SomeRovers {
         ));
 
 
-        nqSpine.goal.put(new BeliefReward(n, "eat:food"), new MutableFloat(1f));
-        nqSpine.goal.put(new NotBeliefReward(n, "eat:poison"), new MutableFloat(0.9f));
+        nqSpine.goal.put(new BeliefReward(n, eatFood), new MutableFloat(1f));
+        nqSpine.goal.put(new NotBeliefReward(n, eatPoison), new MutableFloat(0.9f));
         //nq.reward.put(new BeliefReward(n, "speed:forward"), new MutableFloat(0.1f));
 
 

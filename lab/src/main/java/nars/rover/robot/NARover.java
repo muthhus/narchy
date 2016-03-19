@@ -156,10 +156,15 @@ public class NARover extends AbstractPolygonBot {
     }
 
     @Override
-    public void step(int time) {
-        super.step(time);
+    long time() {
+        return nar.time();
+    }
 
-        gun.step(time);
+    @Override
+    public void step(int dt) {
+        super.step(dt);
+
+        gun.step(dt);
 
         try {
             nar.step();

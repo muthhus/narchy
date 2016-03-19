@@ -166,8 +166,9 @@ public interface Stamp {
     @NotNull
     Stamp setCreationTime(long t);
 
+    /** originality monotonically decreases with evidence length increase. it must always be < 1 (never equal to one) due to its use in the or(conf, originality) ranking */
     default float originality() {
-        return 1.0f / (evidence().length);
+        return 1.0f / (evidence().length + 1);
     }
 
     /**
