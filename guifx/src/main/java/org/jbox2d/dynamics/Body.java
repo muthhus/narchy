@@ -745,8 +745,9 @@ public class Body {
     return v;
   }
 
-  public final void getWorldPointToOut(Vec2 localPoint, Vec2 out) {
+  public final Vec2 getWorldPointToOut(Vec2 localPoint, Vec2 out) {
     Transform.mulToOut(m_xf, localPoint, out);
+    return out;
   }
 
   /**
@@ -836,9 +837,10 @@ public class Body {
     return out;
   }
 
-  public final void getLinearVelocityFromLocalPointToOut(Vec2 localPoint, Vec2 out) {
+  public final Vec2 getLinearVelocityFromLocalPointToOut(Vec2 localPoint, Vec2 out) {
     getWorldPointToOut(localPoint, out);
     getLinearVelocityFromWorldPointToOut(out, out);
+    return out;
   }
 
   /** Get the linear damping of the body. */

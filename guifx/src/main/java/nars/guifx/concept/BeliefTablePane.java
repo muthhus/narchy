@@ -23,20 +23,20 @@ public class BeliefTablePane extends HBox implements Runnable {
     final TruthWave beliefs = new TruthWave(0), goals = new TruthWave(0);
 
     final static ColorMatrix beliefColors = new ColorMatrix(8, 8, (f, c) ->
-            new Color(0.6f + 0.38f * c, 0.2f, 1f, 0.15f + 0.8f * c)
+            new Color(0.6f + 0.38f * c, 0.2f, 1f, 0.29f + 0.7f * c)
     );
     final static ColorMatrix goalColors = new ColorMatrix(8, 8, (f, c) ->
-            new Color(0.2f + 0.4f * c, 1f, 0f, 0.15f + 0.8f * c)
+            new Color(0.2f + 0.4f * c, 1f, 0f, 0.29f + 0.7f * c)
     );
 
     //horizontal block
-    final static TaskRenderer beliefRenderer = (ge, f, c, w, h, x, y) -> {
-        ge.setFill(beliefColors.get(f, c));
+    final static TaskRenderer beliefRenderer = (ge, pri, c, w, h, x, y) -> {
+        ge.setFill(beliefColors.get(c, pri));
         ge.fillRect(x - w / 2, y - h / 4, w, h / 2);
     };
     //vertical block
-    final static TaskRenderer goalRenderer = (ge, f, c, w, h, x, y) -> {
-        ge.setFill(goalColors.get(f, c));
+    final static TaskRenderer goalRenderer = (ge, pri, c, w, h, x, y) -> {
+        ge.setFill(goalColors.get(c, pri));
         ge.fillRect(x - w / 4, y - h / 2, w / 2, h);
     };
 
@@ -112,8 +112,8 @@ public class BeliefTablePane extends HBox implements Runnable {
 
         //borders
         {
-            ge.setStroke(Color.WHITE);
-            te.setStroke(Color.WHITE);
+            ge.setStroke(Color.GRAY);
+            te.setStroke(Color.GRAY);
             ge.strokeRect(0, 0, gew, geh);
             te.strokeRect(0, 0, tew, teh);
             ge.setStroke(null);
@@ -152,7 +152,7 @@ public class BeliefTablePane extends HBox implements Runnable {
 
         float w = 10;
         float h = 10;
-        table.forEach((f, cc, o) -> {
+        table.forEach((f, cc, o, pri) -> {
 
             boolean eternal = !Float.isFinite(o);
             float eh, x;
@@ -167,14 +167,14 @@ public class BeliefTablePane extends HBox implements Runnable {
                 g = te;
             }
             float y = b + (eh - b - h) * (1 - f);
-            r.renderTask(g, f, cc, w, h, x, y);
+            r.renderTask(g, pri, cc, w, h, x, y);
 
         });
     }
 
     @FunctionalInterface
     interface TaskRenderer {
-        void renderTask(GraphicsContext ge, float f, float c, float w, float h, float x, float y);
+        void renderTask(GraphicsContext ge, float pri, float c, float w, float h, float x, float y);
     }
 
 

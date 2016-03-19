@@ -177,7 +177,7 @@ abstract public class VisionRay implements AbstractPolygonBot.Sense, LayerDraw {
             if (body == base) return 1;
             Object userData = body.getUserData();
             if (userData!=null && (userData instanceof Being.BeingMaterial) && userData.toString().equals(bot.id))
-                return 1;
+                return -1;
 
             return super.reportFixture(fixture, point, normal, fraction);
         }

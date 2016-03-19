@@ -74,7 +74,7 @@ public class NARover extends AbstractPolygonBot {
 
         objs = new Lobjects(nar);
 
-        int maxUpdateTime = 32;
+        int maxUpdateTime = 6;
 
 
         hungry = 1f;
@@ -90,28 +90,26 @@ public class NARover extends AbstractPolygonBot {
         Term speedForward = nar.term("speed:forward");
         //Term speedBackward = nar.term("speed:backward");
         Vec2 forwardVec = new Vec2(1,0f);
-        Vec2 tmp = new Vec2();
-        FloatFunction<Term> linearSpeed = (t) -> {
-            torso.getWorldPointToOut(forwardVec, tmp);
-            return Vec2.dot(torso.getLinearVelocity(), tmp) / 2f /* sensitivity */;
-            //float v = tmp.length()/ linearThrustPerCycle / 1.25f;
-            //if (v >= 0 && t == speedForward) return v;
-            //else if (v <= 0 && t == speedBackward) return -v;
-            //return 0;
-        };
+        Vec2 tmp = new Vec2(), tmp2 = new Vec2();
+        FloatFunction<Term> linearSpeed =
+                (t) -> {
+
+                    Vec2 lv = torso.getLinearVelocityFromLocalPointToOut(Vec2.ZERO, tmp2);
+                    Vec2 worldForward = torso.getWorldPointToOut(forwardVec, tmp).subLocal(torso.getWorldCenter());
+                    float dot = Vec2.dot(
+                            lv,
+                            worldForward
+                    );
+                    //System.out.println(lv + " " + worldForward + " = " + dot);
+                    return dot * (1f / 3f /* sensitivity */);
+                };
         this.linearSpeedFwd = new Sensor(nar, speedForward,
                 linearSpeed, sigmoid).maxTimeBetweenUpdates(maxUpdateTime);
         /*this.linearSpeedBack = new Sensor(nar, speedBackward,
                 linearSpeed, speedThresholdToFreq).maxTimeBetweenUpdates(maxUpdateTime);*/
 
         Term speedLeft = nar.term("speed:angular");
-        FloatFunction<Term> angleSpeed = (t) -> {
-            float a = torso.getAngularVelocity();
-//            if (a <= 0 && t == speedLeft) return -a;
-//            else if (a >= 0 && t == speedRight) return a;
-            //return 0;
-            return a;
-        };
+        FloatFunction<Term> angleSpeed = (t) -> torso.getAngularVelocity() / 2f;
         leftSpeed = new Sensor(nar, speedLeft, angleSpeed, sigmoid).maxTimeBetweenUpdates(maxUpdateTime);
 
 
@@ -120,10 +118,10 @@ public class NARover extends AbstractPolygonBot {
 
         hungrySensor = new Sensor(nar, nar.term("eat:food"), (t) -> {
             return 1f-hungry;
-        }, speedThresholdToFreq);
+        }).maxTimeBetweenUpdates(maxUpdateTime);
         sickSensor = new Sensor(nar, nar.term("eat:poison"), (t) -> {
             return sick;
-        }, speedThresholdToFreq);
+        }).maxTimeBetweenUpdates(maxUpdateTime);
 
 //
 //        linearVelocity = new SimpleAutoRangeTruthFrequency(nar, nar.term("<motion-->[linear]>"), new AutoRangeTruthFrequency(0.0f));
@@ -139,7 +137,7 @@ public class NARover extends AbstractPolygonBot {
         if (m instanceof Sim.FoodMaterial) {
             logger.warn("food");
             //nar.input("eat:food. :|: %1.0;0.9%");
-            hungry = Util.clamp(hungry - 0.85f);
+            hungry = 0;
 
             //nar.input("goal:{food}. :|: %1.00;0.75%");
             //nar.input("goal:{health}. :|: %1.00;0.75%");
@@ -147,7 +145,7 @@ public class NARover extends AbstractPolygonBot {
         else if (m instanceof Sim.PoisonMaterial) {
             logger.warn("poison");
             //nar.input("eat:poison. :|:");
-            sick = Util.clamp(sick + 0.85f);
+            sick = Util.clamp(sick + 1f);
 
             //nar.input("goal:{food}. :|: %0.00;0.90%");
             //nar.input("goal:{health}. :|: %0.00;0.90%");
@@ -173,8 +171,8 @@ public class NARover extends AbstractPolygonBot {
             nar.stop();
         }
 
-        sick *= 0.97f;
-        hungry = Util.clamp(hungry + 0.05f);
+        sick = Util.clamp(sick - 0.01f);
+        hungry = Util.clamp(hungry + 0.01f);
     }
 
     public void inputMission() {

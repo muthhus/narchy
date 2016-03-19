@@ -13,6 +13,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
+import nars.term.container.TermContainer;
 import nars.term.variable.Variable;
 import nars.util.data.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -246,18 +247,20 @@ public class PrologCore extends Agent implements Consumer<Task> {
                 switch (s.name()) {
 
                     case "-->":
-                        return $.the(Op.INHERIT, the(nterm(s, 0), nterm(s, 1)));
+                        return theTwoArity(Op.INHERIT, s);
                     case "<->":
-                        return $.the(Op.SIMILAR, the(nterm(s, 0), nterm(s, 1)));
+                        return theTwoArity(Op.SIMILAR, s);
+                    case "<=>":
+                        return theTwoArity(Op.EQUIV, s);
+                    case "==>":
+                        return theTwoArity(Op.IMPLICATION, s);
 
                     case "~":
-                        return $.the(Op.DIFF_INT, the(nterm(s, 0), nterm(s, 1)));
+                        return theTwoArity(Op.DIFF_INT, s);
                     case "-":
-                        return $.the(Op.DIFF_EXT, the(nterm(s, 0), nterm(s, 1)));
+                        return theTwoArity(Op.DIFF_EXT, s);
 
 
-                    case "==>":
-                        return $.the(Op.IMPLICATION, the(nterms(s)));
 
                     case "[":
                         return $.the(Op.SET_INT, the(nterms(s)));
@@ -300,6 +303,9 @@ public class PrologCore extends Agent implements Consumer<Task> {
         }
     }
 
+    private Term theTwoArity(Op inherit, Struct s) {
+        return $.the(inherit, the(nterm(s, 0), nterm(s, 1)));
+    }
 
 
     public static Struct assertion(alice.tuprolog.Term p) {

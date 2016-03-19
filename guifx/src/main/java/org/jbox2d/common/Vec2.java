@@ -29,6 +29,9 @@ import java.io.Serializable;
  * A 2D column vector
  */
 public class Vec2 implements Serializable {
+
+    public static final Vec2 ZERO = new Vec2(); //TODO make read-only by disabling setters
+
     private static final long serialVersionUID = 1L;
 
     public float x, y;

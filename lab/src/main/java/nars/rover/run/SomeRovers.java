@@ -100,13 +100,13 @@ public class SomeRovers {
                 Inperience.class
         );*/
 
-        PrologCore p = new PrologCore(nar);
-        p.confThreshold.setValue(0.75f);
+        /*PrologCore p = new PrologCore(nar);
+        p.confThreshold.setValue(0.7f);*/
 
-        nar.input("$0.9$ <(?y --> ^MotorControls) ==> ?x>?");
-        nar.input("$0.9$ <?x ==> [food]>?");
-        nar.input("$0.9$ <food <-> poison>?");
-        nar.input("$0.9$ <[food] <-> [poison]>?");
+        nar.input("$0.8$ ((?y <-> ^MotorControls) && ( ?y ==> ?x ))?");
+        nar.input("$0.8$ <?x ==> [food]>?");
+        nar.input("$0.8$ <food <-> poison>?");
+        nar.input("$0.8$ <[food] <-> [poison]>?");
 
         nar.logSummaryGT(System.out, 0.65f);
 //        nar.log(Systenar.out, x -> {
@@ -133,11 +133,11 @@ public class SomeRovers {
 
 
         //nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
-        nar.core.activationRate.setValue(0.5f);
+        nar.core.activationRate.setValue(0.95f);
 
 
         nar.duration.set(2);
-        nar.conceptForgetDurations.setValue(2f);
+        nar.conceptForgetDurations.setValue(3f);
         nar.termLinkForgetDurations.setValue(3);
         nar.taskLinkForgetDurations.setValue(2);
         nar.cyclesPerFrame.set(2);
@@ -191,7 +191,7 @@ public class SomeRovers {
         NarQ nqSpine = new NarQ(n, (i, o) -> (int) Math.ceil(1+Math.sqrt(i * o)));
 
 
-        nqSpine.power.setValue(0.8f);
+        nqSpine.power.setValue(0.9f);
 
 
         nqSpine.input.addAll(nqSpine.getBeliefExpectations(

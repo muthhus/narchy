@@ -33,11 +33,17 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
     private float conf;
     private float prevF;
 
-    boolean inputIfSame;
+    boolean inputIfSame = true;
     int maxTimeBetweenUpdates;
     //TODO int minTimeBetweenUpdates..
 
     private long lastInput;
+
+    final static FloatToFloatFunction direct = n -> n;
+
+    public Sensor(@NotNull NAR n, Term t, FloatFunction<Term> value) {
+        this(n, t, value, direct);
+    }
 
     public Sensor(@NotNull NAR n, Term t, FloatFunction<Term> value, FloatToFloatFunction valueToFreq) {
         this(n, t, value, valueToFreq, n.getDefaultConfidence(Symbols.BELIEF),
