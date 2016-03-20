@@ -38,6 +38,9 @@ public final class DerivedTask extends MutableTask {
 
     @Override
     public void onRevision(@NotNull Task t) {
+        if (isDeleted())
+            return;
+
         Truth conclusion = t.truth();
 
         BLink<? extends Task> tLink = premiseTaskLink;

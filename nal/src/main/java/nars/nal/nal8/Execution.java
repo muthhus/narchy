@@ -4,6 +4,7 @@ import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.budget.Budget;
+import nars.budget.Budgeted;
 import nars.budget.UnitBudget;
 import nars.nal.Tense;
 import nars.task.MutableTask;
@@ -177,7 +178,7 @@ public interface Execution  {
      */
     static Task noticeExecuted(@NotNull NAR nar, @NotNull Task operation) {
 
-        Budget b = !operation.isDeleted() ? operation.budget() : UnitBudget.Zero;
+        Budgeted b = !operation.isDeleted() ? operation : UnitBudget.Zero;
 
 
         return $.belief(operation.term(),

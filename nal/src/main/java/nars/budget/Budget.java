@@ -36,12 +36,6 @@ public abstract class Budget extends BudgetedHandle {
     
 
 
-
-    @Override
-    public final boolean getDeleted() {
-        return !Float.isFinite(pri());
-    }   
-
     public static String toString(@NotNull Budget b) {
 
         return toStringBuilder(new StringBuilder(), Texts.n4(b.pri()), Texts.n4(b.dur()), Texts.n4(b.qua())).toString();
@@ -173,15 +167,7 @@ public abstract class Budget extends BudgetedHandle {
 
 
 
-    /**
-     * To summarize a BudgetValue into a single number in [0, 1]
-     *
-     * @return The summary value
-     */
-    @Override
-    public float summary() {
-        return aveGeo(pri(), dur(), qua());
-    }
+
 
     @NotNull
     @Override
@@ -255,7 +241,7 @@ public abstract class Budget extends BudgetedHandle {
      * copies a budget into this; if source is null, it deletes the budget
      */
     @NotNull
-    public BudgetedStruct budget(@Nullable Budget source) {
+    public Budget budget(@Nullable Budgeted source) {
         if (source == null) {
             zero();
         } else {
@@ -302,7 +288,7 @@ public abstract class Budget extends BudgetedHandle {
         return toString(this);
     }
 
-    public void set(@NotNull Budget b) {
+    public void set(@NotNull Budgeted b) {
         budget(b.pri(), b.dur(), b.qua());
     }
 

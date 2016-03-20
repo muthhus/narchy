@@ -25,7 +25,6 @@ import nars.truth.Truth;
 import nars.util.data.Util;
 import nars.op.NarQ;
 import nars.util.learn.Sensor;
-import org.jbox2d.common.Color3f;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.joints.RevoluteJoint;
@@ -74,7 +73,7 @@ public class NARover extends AbstractPolygonBot {
 
         objs = new Lobjects(nar);
 
-        int maxUpdateTime = 6;
+        int maxUpdateTime = 16;
 
 
         hungry = 1f;
@@ -103,14 +102,15 @@ public class NARover extends AbstractPolygonBot {
                     //System.out.println(lv + " " + worldForward + " = " + dot);
                     return dot * (1f / 3f /* sensitivity */);
                 };
-        this.linearSpeedFwd = new Sensor(nar, speedForward,
-                linearSpeed, sigmoid).maxTimeBetweenUpdates(maxUpdateTime);
-        /*this.linearSpeedBack = new Sensor(nar, speedBackward,
-                linearSpeed, speedThresholdToFreq).maxTimeBetweenUpdates(maxUpdateTime);*/
+        this.linearSpeedFwd = new Sensor(nar, speedForward, linearSpeed, sigmoid)
+                .maxTimeBetweenUpdates(maxUpdateTime)
+                .pri(0.25f);
 
         Term speedLeft = nar.term("speed:angular");
         FloatFunction<Term> angleSpeed = (t) -> torso.getAngularVelocity() / 2f;
-        leftSpeed = new Sensor(nar, speedLeft, angleSpeed, sigmoid).maxTimeBetweenUpdates(maxUpdateTime);
+        leftSpeed = new Sensor(nar, speedLeft, angleSpeed, sigmoid)
+                .maxTimeBetweenUpdates(maxUpdateTime)
+                .pri(0.25f);
 
 
         //TODO torso angle
@@ -119,6 +119,7 @@ public class NARover extends AbstractPolygonBot {
         hungrySensor = new Sensor(nar, nar.term("eat:food"), (t) -> {
             return 1f-hungry;
         }).maxTimeBetweenUpdates(maxUpdateTime);
+
         sickSensor = new Sensor(nar, nar.term("eat:poison"), (t) -> {
             return sick;
         }).maxTimeBetweenUpdates(maxUpdateTime);
@@ -171,8 +172,8 @@ public class NARover extends AbstractPolygonBot {
             nar.stop();
         }
 
-        sick = Util.clamp(sick - 0.01f);
-        hungry = Util.clamp(hungry + 0.01f);
+        sick = Util.clamp(sick - 0.002f);
+        hungry = Util.clamp(hungry + 0.002f);
     }
 
     public void inputMission() {
@@ -549,8 +550,9 @@ public class NARover extends AbstractPolygonBot {
 
         public Truth stop() {
             Task c = MethodOperator.invokingTask();
-            rover.stop();
-            return c.truth(); //TODO use feedback discounting how much actually was stopped already
+            float strength = (proportional && c!=null) ? c.motivation() : 1;
+
+            return c.truth().confMult(rover.stop(strength)); //TODO use feedback discounting how much actually was stopped already
         }
 
         private Truth forward(boolean forward) {

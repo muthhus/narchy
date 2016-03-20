@@ -104,7 +104,7 @@ public enum Global {
     public static float DERIVATION_DURABILITY_THRESHOLD = 0.01f;
 
     /** minimum difference necessary to indicate a significant modification in budget float number components */
-    public static final float BUDGET_PROPAGATION_EPSILON = 0.001f;
+    public static final float BUDGET_PROPAGATION_EPSILON = 0.005f;
 
 
 //    /* ---------- default input values ---------- */
@@ -133,13 +133,6 @@ public enum Global {
 
 
 
-
-//    /** how many maximum cycles difference in ocurrence time
-//     * are two non-eternal sentences considered equal, if all
-//     * other features (term, punctuation, truth, ..) are equal.
-//     * this is similar to Duration parameter
-//     */
-//    public static final int SentenceOcurrenceTimeCyclesEqualityThreshold = 1;
 
 
 

@@ -219,7 +219,7 @@ public interface Truth extends MetaTruth<Float> {
 
 
     /** clones a copy with confidence multiplied */
-    @NotNull Truth withConfMult(float f);
+    @NotNull Truth confMult(float f);
     @NotNull Truth withConf(float f);
 
 

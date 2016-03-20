@@ -137,7 +137,7 @@ public class Default extends AbstractNAR {
             //TaskProcess succeeded in affecting its concept's state (ex: not a duplicate belief)
 
             //1. propagate budget
-            conceptualize(c, t.budget(), activation);
+            conceptualize(c, t, activation);
 
             switch (t.punc()) {
                 case Symbols.GOAL:

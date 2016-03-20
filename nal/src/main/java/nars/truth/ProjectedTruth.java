@@ -14,7 +14,7 @@ public final class ProjectedTruth extends DefaultTruth {
 
 	@NotNull
 	@Override
-	public Truth withConfMult(float factor) {
+	public Truth confMult(float factor) {
 		return factor == 1 ? this : new ProjectedTruth(freq, conf() * factor, when);
 	}
 

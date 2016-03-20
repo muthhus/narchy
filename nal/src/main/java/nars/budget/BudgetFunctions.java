@@ -392,8 +392,8 @@ public final class BudgetFunctions extends UtilityFunctions {
      */
     public static void balancePri(@Nullable Budget a, @Nullable Budget b, float resultPri, float aStrength) {
 
-        boolean aExist = a!=null && a.isNotDeleted();
-        boolean bExist = b!=null && b.isNotDeleted();
+        boolean aExist = a!=null && !a.isDeleted();
+        boolean bExist = b!=null && !b.isDeleted();
         if (aExist && bExist) {
 
             float bPriNext = b.pri() - resultPri * aStrength;

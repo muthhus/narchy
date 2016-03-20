@@ -35,7 +35,7 @@ public class BudgetedSet<B extends Budgeted> {
         }
         B existing = table.put(t, t);
         if ((existing != null) && (existing != t) && (!existing.isDeleted())) {
-            merge.merge(t.budget(), existing.budget(), 1f);
+            merge.merge(t.budget(), existing, 1f);
         }
         return existing;
     }

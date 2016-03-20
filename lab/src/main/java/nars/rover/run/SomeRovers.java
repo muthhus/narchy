@@ -85,13 +85,13 @@ public class SomeRovers {
 //
 //            game.add(new CarefulRover("r2", nar));
 //        }
-        float fps = 40;
+        float fps = 50;
         game.run(fps);
 
     }
 
     public static Default newNAR() {
-        int conceptsFirePerCycle = 48;
+        int conceptsFirePerCycle = 4;
         Default nar = new Default(
                 //new Memory(clock, TermIndex.softMemory(64*1024)),
                 1200, conceptsFirePerCycle, 2, 3);
@@ -108,7 +108,7 @@ public class SomeRovers {
         nar.input("$0.8$ <food <-> poison>?");
         nar.input("$0.8$ <[food] <-> [poison]>?");
 
-        nar.logSummaryGT(System.out, 0.65f);
+        nar.logSummaryGT(System.out, 0.7f);
 //        nar.log(Systenar.out, x -> {
 //            if (x instanceof Task) {
 //                Task t = (Task)x;
@@ -133,16 +133,16 @@ public class SomeRovers {
 
 
         //nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
-        nar.core.activationRate.setValue(0.95f);
+        nar.core.activationRate.setValue(0.25f);
 
 
-        nar.duration.set(2);
-        nar.conceptForgetDurations.setValue(3f);
-        nar.termLinkForgetDurations.setValue(3);
-        nar.taskLinkForgetDurations.setValue(2);
-        nar.cyclesPerFrame.set(2);
+        nar.duration.set(5);
+        nar.conceptForgetDurations.setValue(4f);
+        nar.termLinkForgetDurations.setValue(16);
+        nar.taskLinkForgetDurations.setValue(12);
+        nar.cyclesPerFrame.set(4);
         nar.shortTermMemoryHistory.set(3);
-        nar.executionThreshold.setValue(0.02f);
+        nar.executionThreshold.setValue(0.01f);
 
         boolean gui = true;
         if (gui) {
@@ -191,7 +191,7 @@ public class SomeRovers {
         NarQ nqSpine = new NarQ(n, (i, o) -> (int) Math.ceil(1+Math.sqrt(i * o)));
 
 
-        nqSpine.power.setValue(0.9f);
+        nqSpine.power.setValue(0.75f);
 
 
         nqSpine.input.addAll(nqSpine.getBeliefExpectations(
@@ -224,12 +224,19 @@ public class SomeRovers {
         //nearsight
         float dist = 20f;
 
-        r.addEyeWithMouth(r, "n", nqSpine, r.torso, 9, 4, new Vec2(2.7f, 0),
+        Vec2 front = new Vec2(2.7f, 0);
+        r.addEyeWithMouth(r, "n", nqSpine, r.torso, 7, 3, front,
                 0.2f, pi/4, dist, pi / 6f);
 
-//        //farsight report http://farsight.org/
-        r.addEye(r, "f", nqSpine, r.torso, 15, 2, new Vec2(-0.5f, 0),
-                0.2f, -(pi/2f)+pi/4f, dist, (e) -> {
+
+        //nearsight
+        r.addEye(r, "f", nqSpine, r.torso, 3, 5, front,
+                0.2f, pi/4f, dist/3f, (e) -> {
+                });
+
+        //farsight report http://farsight.org/
+        r.addEye(r, "f", nqSpine, r.torso, 5, 6, new Vec2(-0.5f, 0),
+                0.2f, -(pi/2f)+pi/4f, dist/2f, (e) -> {
         });
 
 

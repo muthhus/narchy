@@ -41,7 +41,7 @@ public class Revision {
 
         for (int i = 0; i < bsize; i++) {
             Task x = beliefs.get(i);
-            if (x.isDeleted() || !LocalRules.isRevisible(newBelief, x)) continue;
+            if (/*x.isDeleted() ||*/ !LocalRules.isRevisible(newBelief, x)) continue;
 
             float matchFactor = Terms.termRelevance(newBeliefTerm, x.term());
             if (matchFactor <= 0) continue;

@@ -22,17 +22,17 @@ public abstract class RawBudgetInArray extends Budget {
     }
 
     @Override
-    public final float getPriority() {
+    public final float pri() {
         return array[i];
     }
 
     @Override
-    public final float getDurability() {
+    public final float dur() {
         return array[i+1];
     }
 
     @Override
-    public final float getQuality() {
+    public final float qua() {
         return array[i+2];
     }
 

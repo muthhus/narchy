@@ -179,7 +179,7 @@ public abstract class TermFunction<O> extends SyncOperator {
             Task ty = (Task)y;
             if (ty.pri() == 0) {
                 //set a resulting zero budget to the input task's
-                ty.budget().set(cause.budget());
+                ty.budget().set(cause);
             }
             Execution.feedback( cause, (Task)y, nar );
             return;

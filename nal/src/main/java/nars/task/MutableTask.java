@@ -4,6 +4,7 @@ import nars.*;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.budget.BudgetMerge;
+import nars.budget.Budgeted;
 import nars.concept.ConceptProcess;
 import nars.nal.Tense;
 import nars.term.Compound;
@@ -52,7 +53,7 @@ public class MutableTask extends AbstractTask {
 
 
     @NotNull
-    public static /* TODO ProjectedTask? */ MutableTask project(@NotNull Task t, @NotNull Truth newTruth, long now, long occ) {
+    public static /* TODO ProjectedTask */ MutableTask project(@NotNull Task t, @NotNull Truth newTruth, long now, long occ) {
         return new MutableTask(t, newTruth, now, occ);
     }
 
@@ -104,7 +105,7 @@ public class MutableTask extends AbstractTask {
 
     @NotNull
     @Override
-    public final MutableTask budget(@Nullable Budget source) {
+    public final MutableTask budget(@Nullable Budgeted source) {
         super.budget(source);
         return this;
     }

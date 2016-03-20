@@ -32,15 +32,15 @@ public abstract class AbstractPolygonBot extends Being {
 
 
 
-    static float linearDamping = 0.2f;
-    static float angularDamping = 0.5f;
+    static float linearDamping = 0.1f;
+    static float angularDamping = 0.1f;
     static float restitution = 0.9f; //bounciness
     static float friction = 0.75f;
 
     //final Deque<Vec2> positions = new ArrayDeque();
     protected final List<Sense> senses = new ArrayList();
-    public float linearThrustPerCycle = 5*5f;
-    public float angularSpeedPerCycle = 5*0.7f;
+    public float linearThrustPerCycle = 50*5f;
+    public float angularSpeedPerCycle = 15*0.7f;
     int mission = 0;
     //public float curiosity = 0.1f;
 
@@ -183,20 +183,32 @@ public abstract class AbstractPolygonBot extends Being {
         //torso.applyForceToCenter(new Vec2((float) Math.cos(angle) * force, (float) Math.sin(angle) * force));
         Vec2 v = new Vec2((float) Math.cos(angle) * force, (float) Math.sin(angle) * force);
         //torso.setLinearVelocity(v);
-        torso.applyLinearImpulse(v, torso.getWorldCenter(), true);
+        torso.applyForceToCenter(v);
+        //torso.applyLinearImpulse(v, torso.getWorldCenter(), true);
     }
 
     public void rotate(float v) {
         //torso.setAngularVelocity(v);
-        //torso.applyAngularImpulse(v);
-        torso.applyTorque(v);
+        torso.applyAngularImpulse(v);
+        //torso.applyTorque(v);
     }
 
     protected abstract void feelMotion();
 
-    public void stop() {
-        torso.setAngularVelocity(0);
-        torso.setLinearVelocity(new Vec2());
+    public float stop(float strength) {
+        final float thresh = 0.05f;
+
+        float speedBefore = torso.getAngularVelocity() + torso.getLinearVelocity().length();
+        if (speedBefore < thresh)
+            return 0f; //already stopped, did nothing
+
+        float brakes = (1f - strength);
+        torso.setAngularVelocity(torso.getAngularVelocity() * brakes);
+        torso.setLinearVelocity( torso.getLinearVelocity().mul(brakes));
+
+        float speedAfter = torso.getAngularVelocity() + torso.getLinearVelocity().length();
+
+        return 1f - (speedAfter / (speedAfter + speedBefore));
     }
 
     @FunctionalInterface

@@ -24,6 +24,7 @@ import nars.task.flow.TaskQueue;
 import nars.task.flow.TaskStream;
 import nars.term.*;
 import nars.term.atom.Atom;
+import nars.term.atom.Atomic;
 import nars.term.variable.Variable;
 import nars.time.Clock;
 import nars.util.event.AnswerReaction;
@@ -941,13 +942,18 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     public final Concept concept(@NotNull Termed t, boolean createIfMissing) {
 
         //optimization: assume a concept instance is the concept of this NAR
-        if (t instanceof Concept) return (Concept)t;
+        if (t instanceof Concept)
+            return (Concept)t;
+        Term tt = t.term();
+        if (tt instanceof Concept)
+            return (Concept)tt;
 
-        Term tt = validConceptTerm(t);
-        TermIndex ii = this.index;
-        return (tt != null) ?
-                (Concept)(createIfMissing ? ii.the(tt) : ii.get(tt)) :
-                null;
+
+        if ((tt = validConceptTerm(tt))!=null) {
+           return (Concept)(createIfMissing ?  index.the(tt) : index.get(tt) );
+        } else {
+            return null;
+        }
     }
 
     @Nullable
@@ -1000,13 +1006,14 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     /** applies normalization and anonymization to resolve the term of the concept the input term maps t */
     @Nullable
-    Term validConceptTerm(@NotNull Termed input) {
-
-        Term term = input.term();
+    Term validConceptTerm(@NotNull Term term) {
 
         //PREFILTER
         if (term instanceof Variable)
             return null;
+
+        if (term instanceof Atomic)
+            return term;
 
 
         //NORMALIZATION

@@ -3,12 +3,14 @@ package nars.budget;
 import nars.Memory;
 import org.jetbrains.annotations.NotNull;
 
+import static nars.budget.Budget.aveGeo;
+
 //import nars.data.BudgetedStruct;
 
 /**
  * Created by jim on 1/6/2016.
  */
-public interface Budgeted extends BudgetedStruct {
+public interface Budgeted  {
 
     static float getPrioritySum(@NotNull Iterable<? extends Budgeted> c) {
         float totalPriority = 0;
@@ -42,29 +44,28 @@ public interface Budgeted extends BudgetedStruct {
     @NotNull
     Budget budget();
 
+    /**
+     * To summarize a BudgetValue into a single number in [0, 1]
+     *
+     * @return The summary value
+     */
     default float summary() {
-        return budget().summary();
+        return aveGeo(pri(), dur(), qua());
     }
 
-    default float pri() {
-        return getPriority();
-    }
+    float pri();
 
-    default float qua() {
-        return getQuality();
-    }
+    float qua();
 
-    default float dur() {
-        return getDurability();
-    }
+    float dur();
+
+    long getLastForgetTime();
+
 
     //        default long lastForgetTime() { return getLastForgetTime(); }
 //
-    default boolean isDeleted() {
-        return getDeleted();
-    }
-    default boolean isNotDeleted() {
-        return !getDeleted();
+    default boolean	isDeleted() {
+        return !Float.isFinite(pri());
     }
 
     default float priIfFiniteElseZero() {

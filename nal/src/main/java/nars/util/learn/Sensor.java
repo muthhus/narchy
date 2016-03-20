@@ -28,12 +28,12 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
     private final FloatToFloatFunction freq;
     @NotNull
     private final NAR nar;
-    private final float pri;
+    private float pri;
     private final float dur;
     private float conf;
     private float prevF;
 
-    boolean inputIfSame = true;
+    boolean inputIfSame = false;
     int maxTimeBetweenUpdates;
     //TODO int minTimeBetweenUpdates..
 
@@ -63,6 +63,11 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
         this.lastInput = n.time() - 1;
 
         this.prevF = Float.NaN;
+    }
+
+    public Sensor pri(float defaultPri) {
+        this.pri = defaultPri;
+        return this;
     }
 
     @Override

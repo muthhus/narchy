@@ -206,7 +206,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
         if (solTruth.conf() < conf()) return this;
 
-        solTruth = solTruth.withConfMult(termRelevance);
+        solTruth = solTruth.confMult(termRelevance);
                 //* BeliefTable.relevance(this, solutionOcc, memory.duration()));
                 //solTruth.withConf( w2c(solTruth.conf())* termRelevance );
 

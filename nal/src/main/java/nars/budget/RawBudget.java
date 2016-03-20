@@ -48,17 +48,8 @@ public class RawBudget extends Budget {
      * @return The current priority
      */
     @Override
-    @Deprecated public final float getPriority() {
+    @Deprecated public final float pri() {
         return priority;
-    }
-
-
-
-    @Override
-    public void delete() {
-        if (isDeleted())
-            throw new RuntimeException("Already Deleted");
-        this.priority = Float.NaN;
     }
 
     /**
@@ -67,7 +58,7 @@ public class RawBudget extends Budget {
      * @return The current durability
      */
     @Override
-    @Deprecated public final float getDurability() {
+    @Deprecated public final float dur() {
         return durability;
     }
 
@@ -79,9 +70,19 @@ public class RawBudget extends Budget {
      * @return The current quality
      */
     @Override
-    @Deprecated public final float getQuality() {
+    @Deprecated public final float qua() {
         return quality;
     }
+
+
+    @Override
+    public void delete() {
+        if (isDeleted())
+            throw new RuntimeException("Already Deleted");
+        this.priority = Float.NaN;
+    }
+
+
 
 
     public boolean equals(Object that) {

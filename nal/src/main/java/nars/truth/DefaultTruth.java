@@ -49,7 +49,7 @@ public class DefaultTruth extends AbstractScalarTruth {
 
     @NotNull
     @Override
-    public Truth withConfMult(float factor) {
+    public Truth confMult(float factor) {
         return factor == 1 ? this : new DefaultTruth(freq, conf() * factor);
     }
 

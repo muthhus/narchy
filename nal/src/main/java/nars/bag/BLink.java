@@ -106,7 +106,7 @@ public final class BLink<X> extends Budget implements Link<X> {
     }
 
     @Override
-    public final float getPriority() {
+    public final float pri() {
         return b[0];
     }
 
@@ -123,7 +123,7 @@ public final class BLink<X> extends Budget implements Link<X> {
     }
 
     @Override
-    public final float getDurability() {
+    public final float dur() {
         return b[2];
     }
 
@@ -133,7 +133,7 @@ public final class BLink<X> extends Budget implements Link<X> {
     }
 
     @Override
-    public final float getQuality() {
+    public final float qua() {
         return b[4];
     }
 

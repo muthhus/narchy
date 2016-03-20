@@ -20,7 +20,6 @@ package nars.op.mental;
 import com.google.common.collect.Lists;
 import nars.NAR;
 import nars.Symbols;
-import nars.budget.Budget;
 import nars.concept.Concept;
 import nars.concept.util.BeliefTable;
 import nars.nal.nal8.operator.SyncOperator;
@@ -47,9 +46,8 @@ public class doubt extends SyncOperator {
         nar.runLater(()->{
             Task operation = execution;
             Term term = Operator.argArray(execution.term())[0];
-            Budget b = operation.budget();
 
-            Concept concept = nar.conceptualize(term, b);
+            Concept concept = nar.conceptualize(term, operation);
             if (concept!=null) {
                 discountBeliefConfidence(concept, operation.punc(),
                         //TODO use min/max parameters somehow
@@ -75,7 +73,7 @@ public class doubt extends SyncOperator {
         List<Task> tt = Lists.newArrayList(table);
         table.clear();
         tt.forEach(t-> {
-            t.setTruth(t.truth().withConfMult(confMultiplied));
+            t.setTruth(t.truth().confMult(confMultiplied));
             table.add(t, nar);
         });
 

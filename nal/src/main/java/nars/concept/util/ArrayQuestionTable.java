@@ -128,7 +128,7 @@ public class ArrayQuestionTable implements QuestionTable {
         if (existing != null) {
 
             if (existing != t) {
-                BudgetMerge.plusDQBlend.merge(existing.budget(), t.budget(), 1f);
+                BudgetMerge.plusDQBlend.merge(existing.budget(), t, 1f);
                 m.remove(t, "Duplicate Question");
             }
 

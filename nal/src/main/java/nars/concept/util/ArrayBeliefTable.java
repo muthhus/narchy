@@ -221,7 +221,7 @@ public class ArrayBeliefTable implements BeliefTable {
         if (existing!=null) {
             if (existing!=input) {
                 //Average allows duplicate tasks to not explode like plus would
-                DuplicateMerge.merge(existing.budget(), input.budget(), 1f);
+                DuplicateMerge.merge(existing.budget(), input, 1f);
                 //((MutableTask) existing).state(input.state()); //reset execution / anticipated state
                 nar.remove(input, "Duplicate Belief/Goal");
             }
