@@ -371,4 +371,57 @@ public final class BudgetFunctions extends UtilityFunctions {
         return //!budget.isDeleted() &&
                 d >= m.derivationDurabilityThreshold.floatValue();
     }
+
+    /**
+     * balance the priorities of 2 existing budgets ('a' and 'b')
+     * which transfer some of their budget to the resulting new budget.
+     * This new budget will have already been created with a priority (resultPri)
+     * of a value less than the existing priority sum.
+     * a strength parameter (0 < s < 1) indicates the proportional balance
+     * to source the necessary budget from each respective parent. ex: 0.5 is
+     * equally balanced, while 0.75f means that the budget discount to 'b' will
+     * be 3x higher than that which is subtracted from 'a'.
+     *
+     * if either input budget is null or deleted (non-exists), the burden will shift
+     * to the other budget (if exists). if neither exists, no effect results.
+     *
+     * @param a
+     * @param b
+     * @param resultPri
+     * @param aStrength
+     */
+    public static void balancePri(@Nullable Budget a, @Nullable Budget b, float resultPri, float aStrength) {
+
+        boolean aExist = a!=null && a.isNotDeleted();
+        boolean bExist = b!=null && b.isNotDeleted();
+        if (aExist && bExist) {
+
+            float bPriNext = b.pri() - resultPri * aStrength;
+            float aPriNext = a.pri() - resultPri * (1f - aStrength);
+
+            if (aPriNext < 0) {
+                bPriNext -= -aPriNext; //subtract remainder from the other
+                aPriNext = 0;
+            }
+            if (bPriNext < 0) {
+                aPriNext -= -bPriNext; //subtract remainder from the other
+                bPriNext = 0;
+            }
+
+            //assert (!((aPriNext < 0) || (bPriNext < 0))); //throw new RuntimeException("revision budget underflow");
+
+            //apply the changes
+            a.setPriority(aPriNext);
+            b.setPriority(bPriNext);
+        } else if (aExist && !bExist) {
+            //take from 'a' only
+            a.priSub(resultPri);
+        } else if (!aExist && bExist) {
+            //take from 'b' only
+            b.priSub(resultPri);
+        } else {
+            //do nothing, the sources are non-existant
+        }
+    }
+
 }

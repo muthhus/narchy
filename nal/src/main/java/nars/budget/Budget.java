@@ -34,10 +34,8 @@ public abstract class Budget extends BudgetedHandle {
 //        return !Float.isFinite(pri);
 //    }
     
-    @Override
-    public final boolean isDeleted() {
-        return getDeleted();
-    }
+
+
 
     @Override
     public final boolean getDeleted() {
@@ -82,6 +80,10 @@ public abstract class Budget extends BudgetedHandle {
     @Override
     public final Budget budget() {
         return this;
+    }
+
+    public final void priSub(float toSubtract) {
+        setPriority(pri() - toSubtract);
     }
 
 

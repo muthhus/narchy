@@ -1,7 +1,9 @@
 package nars.task;
 
-import nars.Memory;
+import nars.bag.BLink;
+import nars.bag.Bag;
 import nars.budget.Budget;
+import nars.budget.BudgetFunctions;
 import nars.concept.Concept;
 import nars.term.Compound;
 import nars.term.Termed;
@@ -38,38 +40,36 @@ public class RevisionTask extends MutableTask {
         Task newBelief = getParentTask();
         Task oldBelief = getParentBelief();
 
+
+        //Decrease the budget of the parent tasks and tasklinks,
+        // so that their priority sum and the child remains the same (balanced)
+        {
+            //TODO maybe consider rank (incl. evidence) not just conf()
+            float newBeliefConf = newBelief.conf();
+            float newBeliefContribution = newBeliefConf / (newBeliefConf + oldBelief.conf());
+            //oldBeliefContribution = 1 - newBeliefContribution, summing to 1
+
+
+            float resultPri = pri();
+
+            //Balance Tasks
+            BudgetFunctions.balancePri(
+                    newBelief.budget(), oldBelief.budget(),
+                    resultPri,
+                    newBeliefContribution);
+
+            //Balance Tasklinks
+            Bag<Task> tasklinks = c.tasklinks();
+            BudgetFunctions.balancePri(
+                    tasklinks.get(newBelief), tasklinks.get(oldBelief),
+                    resultPri,
+                    newBeliefContribution);
+
+        }
+
+
         oldBelief.onRevision(this);
         newBelief.onRevision(this);
-
-        float newBeliefConf = newBelief.conf();
-
-        //decrease the budget of the parents so the priority sum among the 2 parents and the child remains the same (balanced)
-        //TODO maybe consider rank (incl. evidence) not just conf()
-        float newBeliefContribution = newBeliefConf / (newBeliefConf + oldBelief.conf());
-        float oldBeliefContribution = 1f - newBeliefContribution;
-        float revisionPri = pri();
-        float newDiscount = revisionPri * oldBeliefContribution;
-        float oldDiscount = revisionPri * newBeliefContribution;
-
-
-        float nextNewPri = newBelief.pri() - newDiscount;
-        float nextOldPri = oldBelief.pri() - oldDiscount;
-
-        if (nextNewPri < 0) {
-            nextOldPri -= -nextNewPri; //subtract remainder from the other
-            nextNewPri = 0;
-        }
-        if (nextOldPri < 0) {
-            nextNewPri -= -nextOldPri; //subtract remainder from the other
-            nextOldPri = 0;
-        }
-
-        assert(!((nextNewPri < 0) || (nextOldPri < 0))); //throw new RuntimeException("revision budget underflow");
-
-
-        //apply the changes
-        newBelief.budget().setPriority(nextNewPri);
-        oldBelief.budget().setPriority(nextOldPri);
 
     }
 

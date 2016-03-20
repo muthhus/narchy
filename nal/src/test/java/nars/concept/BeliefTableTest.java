@@ -137,26 +137,29 @@ public class BeliefTableTest  {
 
         b.believe(1.0f, 0.5f); n.step();
         b.print();
-        assertEquals(0.5, b.concept().beliefs().topEternal().conf(), 0.001);
-        assertEquals(0.5, b.concept().beliefs().top(n.time()).conf(), 0.001);
-        assertEquals(1, b.concept().beliefs().size());
+
+        BeliefTable beliefs = b.concept().beliefs();
+
+        assertEquals(0.5, beliefs.topEternal().conf(), 0.001);
+        assertEquals(0.5, beliefs.top(n.time()).conf(), 0.001);
+        assertEquals(1, beliefs.size());
 
         b.believe(1.0f, 0.5f); n.step();
         b.print();
-        assertEquals(2 + 1 /* revision */, b.concept().beliefs().size());
-        assertEquals(0.67, b.concept().beliefs().topEternal().conf(), 0.001);
+        assertEquals(2 /* revision */, beliefs.size());
+        assertEquals(0.5, beliefs.topEternal().conf(), 0.001);
 
         b.believe(1.0f, 0.5f); n.step();
         b.print();
-        assertEquals(5, b.concept().beliefs().size());
-        @NotNull BeliefTable bb = b.concept().beliefs();
-        assertEquals(0.75, bb.topEternal().conf(), 0.001);
-        assertEquals(0.75, bb.top(n.time()).conf(), 0.001);
+        assertEquals(4, beliefs.size());
+        @NotNull BeliefTable bb = beliefs;
+        assertEquals(0.67, bb.topEternal().conf(), 0.001);
+        assertEquals(0.67, bb.top(n.time()).conf(), 0.001);
 
         b.believe(1.0f, 0.5f); n.step();
         b.print();
-        assertEquals(0.799, b.concept().beliefs().topEternal().conf(), 0.001);
-        assertEquals(7, b.concept().beliefs().size());
+        assertEquals(0.75, beliefs.topEternal().conf(), 0.001);
+        assertEquals(6, beliefs.size());
 
         //n.step();
         //b.print();

@@ -63,7 +63,9 @@ public interface Budgeted extends BudgetedStruct {
     default boolean isDeleted() {
         return getDeleted();
     }
-
+    default boolean isNotDeleted() {
+        return !getDeleted();
+    }
 
     default float priIfFiniteElseZero() {
         return priIfFiniteElse(0);

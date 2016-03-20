@@ -52,7 +52,7 @@ public class MutableTask extends AbstractTask {
 
 
     @NotNull
-    public static MutableTask clone(@NotNull Task t, @NotNull Truth newTruth, long now, long occ) {
+    public static /* TODO ProjectedTask? */ MutableTask project(@NotNull Task t, @NotNull Truth newTruth, long now, long occ) {
         return new MutableTask(t, newTruth, now, occ);
     }
 

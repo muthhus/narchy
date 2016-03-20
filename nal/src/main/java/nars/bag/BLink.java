@@ -89,24 +89,16 @@ public final class BLink<X> extends Budget implements Link<X> {
 
     @Override
     public void delete() {
-        clearDelta();
         b[0] = Float.NaN;
-    }
-
-    private void clearDelta() {
-        float[] b = this.b;
-        b[1] = b[3] = b[5] = 0;
-        changed = false;
     }
 
     /** TODO return false to signal to the bag to remove this item */
     public void commit() {
         float[] b = this.b;
-        b[0] = clamp(b[0] + b[1]);
-        b[2] = clamp(b[2] + b[3]);
-        b[4] = clamp(b[4] + b[5]);
-        clearDelta();
-        //return true;
+        b[0] = clamp(b[0] + b[1]); b[1] = 0;
+        b[2] = clamp(b[2] + b[3]); b[3] = 0;
+        b[4] = clamp(b[4] + b[5]); b[5] = 0;
+        changed = false;
     }
 
     @Override public final float getScore() {
@@ -118,7 +110,7 @@ public final class BLink<X> extends Budget implements Link<X> {
         return b[0];
     }
 
-    protected void setValue(int x, float v) {
+    protected final void setValue(int x, float v) {
         float[] b = this.b;
         int twoX = 2 * x;
         b[twoX + 1] += v - b[twoX];
@@ -126,22 +118,22 @@ public final class BLink<X> extends Budget implements Link<X> {
     }
 
     @Override
-    public void _setPriority(float p) {
+    public final void _setPriority(float p) {
         setValue(0, p);
     }
 
     @Override
-    public float getDurability() {
+    public final float getDurability() {
         return b[2];
     }
 
     @Override
-    public void _setDurability(float d) {
+    public final void _setDurability(float d) {
         setValue(1, d);
     }
 
     @Override
-    public float getQuality() {
+    public final float getQuality() {
         return b[4];
     }
 
@@ -151,7 +143,7 @@ public final class BLink<X> extends Budget implements Link<X> {
     }
 
     @Override
-    public long setLastForgetTime(long currentTime) {
+    public final long setLastForgetTime(long currentTime) {
         long lastForget = this.lastForget;
         long diff;
         if (lastForget == Tense.TIMELESS) {

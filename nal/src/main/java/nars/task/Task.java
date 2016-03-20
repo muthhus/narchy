@@ -336,7 +336,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         long occ = occurrence();
         long projOcc = (adjustedTruth instanceof ProjectedTruth) ? ((ProjectedTruth)adjustedTruth).when : occ;
         return /*occ == projOcc &&*/ adjustedTruth.equals(truth()) ? this :
-                MutableTask.clone(this, adjustedTruth, now, projOcc);
+                MutableTask.project(this, adjustedTruth, now, projOcc);
 
     }
 
