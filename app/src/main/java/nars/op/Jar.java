@@ -161,9 +161,19 @@ public class Jar extends JarClassLoader {
     private Object invoke(String className, String staticMethodWithZeroArgs) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         return invoke(className, staticMethodWithZeroArgs, new Class[0], new Object[0]);
     }
-
-
     public static void main(String[] args) throws Exception {
+
+        Jar j = new Jar(
+                //"/home/me/jake2/lib/",
+                "/home/me/jake2/target",
+                "/home/me/jake2/target/jake2.jar"
+        );
+
+
+        j.invokeMain("jake2.Jake2", "/home/me/jake2" /*, "-homedir=/tmp"*/);
+    }
+
+    public static void main0(String[] args) throws Exception {
 
         Jar j = new Jar(
             "/home/me/terasology/libs/",
