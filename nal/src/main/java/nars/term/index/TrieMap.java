@@ -7,7 +7,7 @@
 // * Implements very fast dictionary storage and retrieval. Only depends upon the
 // * core String class.
 // *
-// * @author Melinda Green - © 2010 Superliminal Software. Free for all uses with
+// * @author Melinda Green - (C) 2010 Superliminal Software. Free for all uses with
 // *         attribution.
 // */
 //public class TrieMap {
