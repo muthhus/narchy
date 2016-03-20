@@ -2,6 +2,7 @@ package nars.op;
 
 import ch.qos.logback.classic.Level;
 import com.google.common.base.Joiner;
+import ognl.*;
 import org.reflections.Reflections;
 import org.reflections.ReflectionsException;
 import org.reflections.scanners.SubTypesScanner;
@@ -22,12 +23,13 @@ import java.nio.file.FileSystems;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Map;
 import java.util.function.Consumer;
 
 /**
  * https://github.com/kamranzafar/JCL/
  */
-public class Jar extends JarClassLoader {
+public class Jar extends JarClassLoader implements ClassResolver {
 
     private static final Logger logger = LoggerFactory.getLogger(Jar.class);
     static {
@@ -36,6 +38,7 @@ public class Jar extends JarClassLoader {
     }
 
     final static JclObjectFactory factory = JclObjectFactory.getInstance();
+    private final OgnlContext nav;
 
 
     @Override
@@ -57,6 +60,9 @@ public class Jar extends JarClassLoader {
 
         logger.info("loading {}", Arrays.toString(sources));
         addAll(sources);
+
+        this.nav = new OgnlContext(this, null, new DefaultMemberAccess(true));
+
 
         //addDefaultLoader();
 
@@ -83,8 +89,9 @@ public class Jar extends JarClassLoader {
 
             //make all fields, methods, and constructors accessible
             AccessibleObject.setAccessible(c.getDeclaredFields(), true);
-            AccessibleObject.setAccessible(c.getMethods(), true);
+            AccessibleObject.setAccessible(c.getDeclaredMethods(), true);
             AccessibleObject.setAccessible(c.getConstructors(), true);
+
 
             return c;
         } catch (ClassNotFoundException e) {
@@ -137,10 +144,36 @@ public class Jar extends JarClassLoader {
 
     }
 
+    public Object invoke(String className, String staticMethod, Object... args) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+
+        return getClass(className).getDeclaredMethod(staticMethod).invoke(null, args);
+    }
 
     public Object invoke(String className, String staticMethod, Class<?>[] params, Object... args) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
 
-        return getClass(className).getMethod(staticMethod, params).invoke(null, args);
+        Class<?> clzz = getClass(className);
+
+        try {
+            return clzz.getDeclaredMethod(staticMethod, params).invoke(null, args);
+        }
+        catch (NoSuchMethodException e) {
+            logger.error("{} has no such method {};\n\tavailable: {}", clzz, staticMethod,
+                    clzz.getDeclaredMethods()
+            );
+            return null;
+        }
+    }
+
+    public Thread spawnMain(String className, String cwd, String... args)  {
+        Thread t = new Thread(()->{
+            try {
+                invokeMain(className, cwd, args);
+            } catch (Exception e) {
+                logger.error("spawnMain exception {}", e);
+            }
+        });
+        t.start();
+        return t;
     }
 
     public Object invokeMain(String className, String cwd, String... args) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
@@ -161,16 +194,34 @@ public class Jar extends JarClassLoader {
     private Object invoke(String className, String staticMethodWithZeroArgs) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         return invoke(className, staticMethodWithZeroArgs, new Class[0], new Object[0]);
     }
+
+    public Object eval(String ognlExpression)  {
+        try {
+            return Ognl.getValue(ognlExpression, nav, (Object)null);
+        } catch (OgnlException e) {
+            logger.error("{}", e);
+            return e;
+        }
+    }
+
     public static void main(String[] args) throws Exception {
 
         Jar j = new Jar(
-                //"/home/me/jake2/lib/",
-                "/home/me/jake2/target",
-                "/home/me/jake2/target/jake2.jar"
+            "/home/me/jake2/target" //where all the .jar files are
         );
 
+        Thread game = j.spawnMain("jake2.Jake2", "/home/me/jake2",
+            "+map neighborhood" //selects level and begins game
+        );
 
-        j.invokeMain("jake2.Jake2", "/home/me/jake2" /*, "-homedir=/tmp"*/);
+        Thread.sleep(5000); //wait for game to load, TODO: poll a state variable to know when loaded
+
+        String clientInput = "@jake2.client.CL_input";
+        for (int i = 0; i < 10; i++) {
+            j.eval(clientInput + "@IN_ForwardDown()"); Thread.sleep(100);
+            j.eval(clientInput + "@IN_ForwardUp()"); Thread.sleep(100);
+        }
+
     }
 
     public static void main0(String[] args) throws Exception {
@@ -208,5 +259,8 @@ public class Jar extends JarClassLoader {
     }
 
 
-
+    @Override
+    public Class classForName(String className, Map context) throws ClassNotFoundException {
+        return getClass(className);
+    }
 }
