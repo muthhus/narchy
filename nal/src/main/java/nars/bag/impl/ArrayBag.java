@@ -337,12 +337,12 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
 
 
     @Override
-    public float getPriorityMax() {
+    public float priMax() {
         return isEmpty() ? 0 : items.getFirst().pri();
     }
 
     @Override
-    public float getPriorityMin() {
+    public float priMin() {
         return isEmpty() ? 0 : items.getLast().pri();
     }
 

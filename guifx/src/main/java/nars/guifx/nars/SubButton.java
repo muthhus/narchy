@@ -1,7 +1,6 @@
 package nars.guifx.nars;
 
 import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.beans.property.ReadOnlyProperty;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -115,7 +114,7 @@ public class SubButton extends HBox {
 
         Bag<Task> tl = c.tasklinks();
         if (!tl.isEmpty()) {
-            s.shade(tl.getPriorityMax());
+            s.shade(tl.priMax());
         }
         return s;
     }

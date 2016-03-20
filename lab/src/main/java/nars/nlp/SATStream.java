@@ -1,7 +1,5 @@
 package nars.nlp;
 
-import nars.Memory;
-import nars.NAR;
 import nars.nar.Default;
 
 import java.io.FileNotFoundException;
@@ -37,7 +35,7 @@ public class SATStream {
 
         d.run(10360);
 
-        d.core.active.printAll();
+        d.core.active.print();
 
         //d.dumpConcepts("/tmp/x.txt");
 

@@ -2,9 +2,11 @@ package nars.concept;
 
 import nars.Global;
 import nars.NAR;
+import nars.bag.Bag;
 import nars.nal.Tense;
 import nars.nar.AbstractNAR;
 import nars.nar.Default;
+import nars.task.Task;
 import nars.util.signal.BeliefAnalysis;
 import nars.util.signal.MemoryBudget;
 import org.junit.Test;
@@ -196,8 +198,10 @@ public class RevisionTest {
      * the input tasks and the result */
     @Test public void testRevisionBudgetConserved() {
         AbstractNAR n = newNAR(6);
+        n.taskLinkForgetDurations.setValue(1E6); //nearly zero tasklink forget rate so that it wont influence this test
 
         BeliefAnalysis b = new BeliefAnalysis(n, "<a-->b>");
+        Bag<Task> tasklinks = b.concept().tasklinks();
 
         assertEquals(0, b.priSum(), 0.01f);
 
@@ -207,19 +211,27 @@ public class RevisionTest {
 
         b.believe(1.0f, 0.6f).run(1);
         b.print();
+        tasklinks.print();
 
-        float after2;
-        assertEquals(0.97, after2 = b.priSum(), 0.01f);
+        float linksBeforeRevisionLink = tasklinks.priSum();
+
+        System.out.println("--------");
+        b.run(1); //process revision after being input
+
+        float beliefAfter2;
+        assertEquals(0.97, beliefAfter2 = b.priSum(), 0.01f);
         assertEquals(0.71f, b.beliefs().topEternalTruth(null).conf(), 0.01f); //the revised task on top
 
-        b.run(1);
         b.print();
+        tasklinks.print();
 
         //revised:
         assertEquals(3, b.size());
-        assertEquals(after2, b.priSum(), 0.01f); //CONSERVED
+        assertEquals(3, tasklinks.size());
 
+        assertEquals(beliefAfter2, b.priSum(), 0.01f); //CONSERVED BELIEF BUDGET
 
+        assertEquals(linksBeforeRevisionLink, tasklinks.priSum(), 0.01f); //CONSERVED LINK BUDGET
 
     }
 }

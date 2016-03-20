@@ -364,6 +364,11 @@ public final class BudgetFunctions extends UtilityFunctions {
      */
     public static boolean valid(@NotNull Budget budget, @NotNull Memory m) {
         return //!budget.isDeleted() &&
-            budget.dur() >= m.derivationDurabilityThreshold.floatValue();
+            valid(budget.dur(), m);
+    }
+
+    public static boolean valid(/*float p,*/ float d, @NotNull Memory m) {
+        return //!budget.isDeleted() &&
+                d >= m.derivationDurabilityThreshold.floatValue();
     }
 }

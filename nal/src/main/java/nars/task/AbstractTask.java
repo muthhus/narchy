@@ -305,7 +305,7 @@ public abstract class AbstractTask extends UnitBudget
     }
 
     @Override
-    public final void onConcept(Concept c) {
+    public void onConcept(Concept c) {
 
         //intermval generally contains unique information that should not be replaced
         //if (term instanceof TermMetadata)

@@ -1,13 +1,13 @@
-package nars.budget;
+package nars.task;
 
 import nars.NAR;
+import nars.budget.Budget;
+import nars.budget.BudgetFunctions;
+import nars.budget.UnitBudget;
 import nars.concept.util.BeliefTable;
 import nars.nal.LocalRules;
 import nars.nal.Tense;
-import nars.task.MutableTask;
-import nars.task.Task;
 import nars.term.Compound;
-import nars.term.Termed;
 import nars.term.Terms;
 import nars.truth.Truth;
 import nars.truth.TruthFunctions;
@@ -23,7 +23,7 @@ public class Revision {
 
 
     @Nullable
-    public static Task tryRevision(@NotNull Task newBelief, @NotNull NAR nar, List<Task> beliefs) {
+    public static /*Revision*/Task tryRevision(@NotNull Task newBelief, @NotNull NAR nar, List<Task> beliefs) {
         int bsize = beliefs.size();
         if (bsize == 0)
             return null; //nothing to revise with
@@ -95,22 +95,18 @@ public class Revision {
              /* equivalent */       (conclusion.equals(newBeliefTruth) && concTime == newBelief.occurrence()))
             return null;
 
-
-        Termed<Compound> term = LocalRules.intermpolate(newBelief, oldBelief, newBeliefConf, oldBelief.conf());
-
-        MutableTask revision = new MutableTask(term, newBelief.punc())
-                .truth(conclusion)
-                .parent(newBelief, oldBelief)
-                .time(now, concTime)
-                //.state(newBelief.state())
-                .because("Insertion Revision");
-                /*.because("Insertion Revision (%+" +
-                                Texts.n2(conclusion.freq() - newBelief.freq()) +
-                        ";+" + Texts.n2(conclusion.conf() - newBelief.conf()) + "%");*/
-
-        return budgetRevision(
-                revision, newBelief, oldBelief, nar) ?
-                    revision : null;
+        Budget revisionBudget = budgetRevision(conclusion, newBelief, oldBelief, nar);
+        if (revisionBudget != null) {
+            return new RevisionTask(
+                    LocalRules.intermpolate(
+                        newBelief, oldBelief,
+                        newBeliefConf, oldBelief.conf()),
+                    revisionBudget,
+                    newBelief, oldBelief,
+                    conclusion,
+                    now, concTime);
+        }
+        return null;
     }
 
 
@@ -124,19 +120,19 @@ public class Revision {
      * @return The budget for the new task
      */
     @NotNull
-    public static boolean budgetRevision(@NotNull Task revision, @NotNull Task newBelief, @NotNull Task oldBelief, NAR nar) {
+    public static Budget budgetRevision(Truth revised, @NotNull Task newBelief, @NotNull Task oldBelief, NAR nar) {
 
         Truth nTruth = newBelief.truth();
         final Budget nBudget = newBelief.budget();
 
-        Truth concTruth = revision.truth();
+
         Truth bTruth = oldBelief.truth();
-        float difT = concTruth.getExpDifAbs(nTruth);
+        float difT = revised.getExpDifAbs(nTruth);
 
         nBudget.andPriority(1.0f - difT);
         nBudget.andDurability(1.0f - difT);
 
-        float cc = concTruth.conf();
+        float cc = revised.conf();
         float proportion = cc
                 / (cc + Math.min(nTruth.conf(), bTruth.conf()));
 
@@ -155,11 +151,11 @@ public class Revision {
 
         float priority =
                 proportion * nBudget.pri();
-        //or(dif, nBudget.pri());
+                //or(dif, nBudget.pri());
         float durability =
                 //aveAri(dif, nBudget.dur());
                 proportion * nBudget.dur();
-        float quality = BudgetFunctions.truthToQuality(concTruth);
+        float quality = BudgetFunctions.truthToQuality(revised);
 
 		/*
          * if (priority < 0) { memory.nar.output(ERR.class, new
@@ -175,43 +171,10 @@ public class Revision {
 		 * quality = 0; }
 		 */
 
-        if (BudgetFunctions.valid(revision.budget().budget(priority, durability, quality), nar)) {
-
-            oldBelief.onRevision(revision);
-            newBelief.onRevision(revision);
-
-            float newBeliefConf = newBelief.conf();
-
-            //decrease the budget of the parents so the priority sum among the 2 parents and the child remains the same (balanced)
-            //TODO maybe consider rank (incl. evidence) not just conf()
-            float newBeliefContribution = newBeliefConf / (newBeliefConf + oldBelief.conf());
-            float oldBeliefContribution = 1f - newBeliefContribution;
-            float revisionPri = revision.pri();
-            float newDiscount = revisionPri * oldBeliefContribution;
-            float oldDiscount = revisionPri * newBeliefContribution;
-            float nextNewPri = newBelief.pri() - newDiscount;
-            float nextOldPri = oldBelief.pri() - oldDiscount;
-
-            if (nextNewPri < 0) {
-                nextOldPri -= -nextNewPri; //subtract remainder from the other
-                nextNewPri = 0;
-            }
-            if (nextOldPri < 0) {
-                nextNewPri -= -nextOldPri; //subtract remainder from the other
-                nextOldPri = 0;
-            }
-
-            if ((nextNewPri < 0) || (nextOldPri < 0))
-                throw new RuntimeException("revision budget underflow");
-
-            //apply the changes
-            newBelief.budget().setPriority(nextNewPri);
-            oldBelief.budget().setPriority(nextOldPri);
-
-            return true;
-        } else {
-            return false;
+        if (BudgetFunctions.valid(durability, nar)) {
+            return new UnitBudget(priority, durability, quality);
         }
+        return null;
     }
 
 }

@@ -6,7 +6,7 @@ import nars.Memory;
 import nars.NAR;
 import nars.bag.impl.ArrayTable;
 import nars.budget.BudgetMerge;
-import nars.budget.Revision;
+import nars.task.Revision;
 import nars.task.Task;
 import nars.util.ArraySortedIndex;
 import org.jetbrains.annotations.NotNull;
@@ -191,7 +191,7 @@ public class ArrayBeliefTable implements BeliefTable {
             return null;
 
         //Try forming a revision and if successful, inputs to NAR for subsequent cycle
-        Task revised = tryRevision(input, nar);
+        Task revised = Revision.tryRevision(input, nar, tableFor(input).items.list());
         if (revised!=null)  {
             if(Global.DEBUG) {
                 if (revised.isDeleted())
@@ -202,11 +202,11 @@ public class ArrayBeliefTable implements BeliefTable {
 
 
             //SLOW REVISION:
-            //nar.input(revised); //will be processed on subsequent cycle
+            nar.input(revised); //will be processed on subsequent cycle
 
             //FAST REVISION: return the revision, but also attempt to insert the incoming task which caused it:
-            tryInsert(input, nar);
-            input = revised;
+//            tryInsert(input, nar);
+//            input = revised;
         }
 
 
@@ -247,18 +247,6 @@ public class ArrayBeliefTable implements BeliefTable {
 //
 //        return t == displaced ? null: t;
 //    }
-
-    /**
-     * creates a revision task (but does not input it)
-     * if failed, returns null
-     */
-    @Nullable
-    public Task tryRevision(@NotNull final Task newBelief, @NotNull NAR nar) {
-
-        List<Task> beliefs = tableFor(newBelief).items.list();
-
-        return Revision.tryRevision(newBelief, nar, beliefs);
-    }
 
     private Task contains(Task incoming) {
 

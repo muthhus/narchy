@@ -207,16 +207,16 @@ public class Jar extends JarClassLoader implements ClassResolver {
     public static void main(String[] args) throws Exception {
 
         Jar j = new Jar(
-            "/home/me/jake2/target" //where all the .jar files are
+            "/home/me/jake2/target" //path of folder where all the Jake2 (java quake) .jar files are
         );
 
         Thread game = j.spawnMain("jake2.Jake2", "/home/me/jake2",
-            "+map neighborhood" //selects level and begins game
+            "+map neighborhood" //selects level and begins game, get more: http://aq2maps.quadaver.org/
         );
 
         Thread.sleep(5000); //wait for game to load, TODO: poll a state variable to know when loaded
 
-        String clientInput = "@jake2.client.CL_input";
+        String clientInput = "@jake2.client.CL_input"; //client input interface class
         for (int i = 0; i < 10; i++) {
             j.eval(clientInput + "@IN_ForwardDown()"); Thread.sleep(100);
             j.eval(clientInput + "@IN_ForwardUp()"); Thread.sleep(100);
@@ -224,6 +224,7 @@ public class Jar extends JarClassLoader implements ClassResolver {
 
     }
 
+    /** not working yet */
     public static void main0(String[] args) throws Exception {
 
         Jar j = new Jar(

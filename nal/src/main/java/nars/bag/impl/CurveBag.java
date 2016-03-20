@@ -469,12 +469,12 @@ public class CurveBag<V> implements Bag<V> {
 //    }
 
     @Override
-    public float getPriorityMin() {
-        return arrayBag.getPriorityMin();
+    public float priMin() {
+        return arrayBag.priMin();
     }
     @Override
-    public float getPriorityMax() {
-        return arrayBag.getPriorityMax();
+    public float priMax() {
+        return arrayBag.priMax();
     }
 
     public final int sampleIndex() {
@@ -503,7 +503,7 @@ public class CurveBag<V> implements Bag<V> {
     public final float sampleNormalized(int s) {
         if (s <= 1) return 0;
 
-        float dynamicRange = (getPriorityMax() - getPriorityMin());
+        float dynamicRange = (priMax() - priMin());
         float uniform = random.nextFloat();
         float curved = this.curve.valueOf(uniform);
 

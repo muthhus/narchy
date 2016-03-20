@@ -54,7 +54,7 @@ public class CurveBagTest  {
         //insert an item with zero budget
         c.put("x"); assertEquals(c.size(), 1);
 
-        assertEquals(0, c.getPriorityMin(), 0.001f);
+        assertEquals(0, c.priMin(), 0.001f);
 
         assertTrue(UnitBudget.Zero.equalsByPrecision( c.get("x"), 0.01f) );
 
@@ -167,7 +167,7 @@ public class CurveBagTest  {
         Bag<Concept> bag = n.core.active;
 
         bag.forEach(System.out::println);
-        System.out.println(bag.size() + " " + bag.getPriorityMax() + ' ' + bag.getPriorityMin());
+        System.out.println(bag.size() + " " + bag.priMax() + ' ' + bag.priMin());
 
         //TODO verify the histogram resulting from the above execution is relatively flat:
         //ex: [0.21649484536082475, 0.2268041237113402, 0.28865979381443296, 0.26804123711340205]
@@ -286,8 +286,8 @@ public class CurveBagTest  {
             a.put("x" + i, new UnitBudget(level, 0.5f, 0.5f));
         }
 
-        assertEquals(a.getPriorityMin(), level, 0.01f);
-        assertEquals(a.getPriorityMin(),a.getPriorityMax(),0.01f);
+        assertEquals(a.priMin(), level, 0.01f);
+        assertEquals(a.priMin(),a.priMax(),0.01f);
 
         int rrr = 100;
         EmpiricalDistribution d = getSamplingDistribution(a, n * rrr, n-1);

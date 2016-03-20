@@ -138,16 +138,16 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
 
 
 
-    default float getPriorityMean() {
+    default float priAvg() {
         int s = size();
         if (s == 0) return 0;
-        return getPrioritySum() / s;
+        return priSum() / s;
     }
 
-    default float getSummaryMean() {
+    default float summaryAvg() {
         int s = size();
         if (s == 0) return 0;
-        return getSummarySum() / s;
+        return summarySum() / s;
     }
 
 //    /** not used currently in Bag classes, but from CacheBag interface */
@@ -215,11 +215,11 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
 
 
 
-    default void printAll() {
-        printAll(System.out);
+    default void print() {
+        print(System.out);
     }
 
-    default void printAll(@NotNull PrintStream p) {
+    default void print(@NotNull PrintStream p) {
         forEach(b -> p.println(b.toBudgetString() + ' ' + b.get()));
     }
 
@@ -229,13 +229,13 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
      */
     //by default this will use iterator().forEach() but this can be used to make sure each implementation offers its best
     //@Override abstract public void forEach(final Consumer<? super V> action);
-    default float getPrioritySum() {
+    default float priSum() {
         float[] total = {0};
         forEach(v -> total[0] += v.pri());
         return total[0];
     }
 
-    default float getSummarySum() {
+    default float summarySum() {
         float[] total = {0};
         forEach(v -> total[0] += v.summary());
         return total[0];
@@ -259,7 +259,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
     /**
      * slow, probably want to override in subclasses
      */
-    default float getPriorityMin() {
+    default float priMin() {
         float[] min = {Float.POSITIVE_INFINITY};
         forEach(b -> {
             float p = b.pri();
@@ -271,7 +271,7 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
     /**
      * slow, probably want to override in subclasses
      */
-    default float getPriorityMax() {
+    default float priMax() {
         float[] max = {Float.NEGATIVE_INFINITY};
         forEach(b -> {
             float p = b.pri();
