@@ -14,6 +14,7 @@ import nars.truth.Truth;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 import static org.junit.Assert.*;
 
@@ -25,7 +26,7 @@ public class NarseseTest {
 
     static <T extends Term> T term(String s) throws Narsese.NarseseException {
         //TODO n.term(s) when the parser is replaced
-        return p.termRaw(s);
+        return (T) p.term(s);
     }
 
     static List<Task> tasks(String s) throws Narsese.NarseseException {
@@ -162,19 +163,10 @@ public class NarseseTest {
         assertEquals("c", p.term(2).toString());
     }
 
+
     @Test
     public void testFailureOfMultipleDistinctInfixOperators() {
-
-        assertEquals(null, term("(a * b & c)"));
-
-//        try {
-//
-//            assertTrue(invalid.toString() + " exception should have been thrown", false);
-//        } catch (Narsese.NarseseException e) {
-//            String s = e.toString();
-//            assertTrue(s.contains("&"));
-//            assertTrue(s.contains("*"));
-//        }
+        assertParseException("(a * b & c)");
     }
 
     @Test
@@ -571,18 +563,21 @@ public class NarseseTest {
                 Operator.operator(op).toString());
     }
 
-    @Test public void testEmptySetExt() {
-        Compound e = term("{}");
-        assertNull(e);
-        assertEquals(term("{}"),   term("{ }"));
-        assertEquals(term("{}"), term(" {   }"));
+    @Test public void testEmptySets() {
+        assertParseException("{}", "[]");
     }
-    @Test public void testEmptySetInt() {
-        Compound e = term("[]");
-        assertNull(e);
-        assertEquals(term("[]"),   term("[ ]"));
-        assertEquals(term("[]"), term(" [   ]"));
+
+    public static void assertParseException(String... inputs) {
+        for (String s : inputs ) {
+            try {
+                Term e = term(s);
+                assertTrue(s + " should not be parseable", false); //must throw exception
+            } catch (Narsese.NarseseException e) {
+                assertTrue(true);
+            }
+        }
     }
+
 
     @Test public void testEmptyProduct() {
         Compound e = term("()");

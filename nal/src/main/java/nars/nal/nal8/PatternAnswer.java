@@ -20,8 +20,7 @@ public abstract class PatternAnswer implements Function<Task, List<Task>> {
     public final Term pattern;
 
     protected PatternAnswer(String pattern) {
-        Term p = this.pattern = Narsese.the().termRaw(pattern);
-
+        this.pattern = Narsese.the().term(pattern);
     }
 
     @NotNull

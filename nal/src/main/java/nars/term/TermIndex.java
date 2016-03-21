@@ -501,8 +501,8 @@ public interface TermIndex  {
         return (T)get(parse(termToParse));
     }
 
-    @Nullable
-    default Termed parse(@NotNull String termToParse) {
+    @NotNull
+    default Termed parse(@NotNull String termToParse) throws Narsese.NarseseException {
         return Narsese.the().term(termToParse, this);
     }
 

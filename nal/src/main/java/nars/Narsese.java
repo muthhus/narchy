@@ -1154,50 +1154,32 @@ public class Narsese extends BaseParser<Object> {
     /**
      * parse one term NOT NORMALIZED
      */
-    @Nullable public Term term(@NotNull CharSequence s) throws NarseseException {
+    @NotNull public Term term(@NotNull CharSequence s) throws NarseseException {
 
         ParsingResult r = singleTermParser.run(s);
 
-        DefaultValueStack stack = (DefaultValueStack) r.getValueStack();
-        FasterList sstack = stack.stack;
+        FasterList stack = ((DefaultValueStack) r.getValueStack()).stack;
 
-        switch (sstack.size()) {
-            case 1:
+        if (stack.size() == 1) {
+            Object x = stack.get(0);
 
-
-                Object x = sstack.get(0);
-
-                if (x instanceof String)
-                    x = $.$((String) x);
-
-                if (x != null) {
-
-                    try {
-                        return (Term) x;
-                    } catch (ClassCastException cce) {
-                        throw new NarseseException("Term mismatch: " + x.getClass(), cce);
-                    }
-                }
-                break;
-            case 0:
-                return null;
-            default:
-                throw new NarseseException("Invalid parse: " + s + " " + sstack);
+            if (x instanceof String)
+                return $.the((String) x);
+            else if (x instanceof Term)
+                return (Term)x;
         }
 
-        return null;
+        throw new NarseseException(s.toString(), r, null); //+ sstack);
     }
 
 
-    @Nullable public Termed term(@NotNull String s, @NotNull TermIndex t) throws NarseseException  {
+    @NotNull public Termed term(@NotNull String s, @NotNull TermIndex t) throws NarseseException  {
         return term(s, t, true);
     }
 
-    @Nullable
+    @NotNull
     public Termed term(@NotNull String s, @NotNull TermIndex index, boolean normalize) throws NarseseException  {
         Term raw = term(s);
-        if (raw == null) return null;
-
         return (normalize && !raw.isNormalized()) ?
                 index.normalized(raw) : raw;
     }
@@ -1210,40 +1192,40 @@ public class Narsese extends BaseParser<Object> {
 //    }
 
 
-    @Nullable
-    public <T extends Term> T termRaw(CharSequence input) throws NarseseException {
-
-        ParsingResult r = singleTermParser.run(input);
-
-        DefaultValueStack stack = (DefaultValueStack) r.getValueStack();
-        FasterList sstack = stack.stack;
-
-        switch (sstack.size()) {
-            case 1:
-
-
-                Object x = sstack.get(0);
-
-                if (x instanceof String)
-                    x = $.$((String) x);
-
-                if (x != null) {
-
-                    try {
-                        return (T) x;
-                    } catch (ClassCastException cce) {
-                        throw new NarseseException("Term mismatch: " + x.getClass(), cce);
-                    }
-                }
-                break;
-            case 0:
-                return null;
-            default:
-                throw new RuntimeException("Invalid parse stack: " + sstack);
-        }
-
-        return null;
-    }
+//    @Nullable
+//    public <T extends Term> T termRaw(CharSequence input) throws NarseseException {
+//
+//        ParsingResult r = singleTermParser.run(input);
+//
+//        DefaultValueStack stack = (DefaultValueStack) r.getValueStack();
+//        FasterList sstack = stack.stack;
+//
+//        switch (sstack.size()) {
+//            case 1:
+//
+//
+//                Object x = sstack.get(0);
+//
+//                if (x instanceof String)
+//                    x = $.$((String) x);
+//
+//                if (x != null) {
+//
+//                    try {
+//                        return (T) x;
+//                    } catch (ClassCastException cce) {
+//                        throw new NarseseException("Term mismatch: " + x.getClass(), cce);
+//                    }
+//                }
+//                break;
+//            case 0:
+//                return null;
+//            default:
+//                throw new RuntimeException("Invalid parse stack: " + sstack);
+//        }
+//
+//        return null;
+//    }
 
 
     //    /**

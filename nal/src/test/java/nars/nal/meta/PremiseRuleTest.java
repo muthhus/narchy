@@ -38,7 +38,7 @@ public class PremiseRuleTest {
 
         //NAR p = new NAR(new Default());
 
-        assertNotNull("metaparser can is a superset of narsese", p.termRaw("<A --> b>"));
+        assertNotNull("metaparser can is a superset of narsese", p.term("<A --> b>"));
 
         //
 
@@ -51,7 +51,7 @@ public class PremiseRuleTest {
         assertEquals(1, p.term("<%A --> %B>").complexity());
 
         {
-            PremiseRule x = p.termRaw("<A, A |- A, (Belief:Revision, Desire:Weak)>");
+            PremiseRule x = (PremiseRule) p.term("<A, A |- A, (Belief:Revision, Desire:Weak)>");
             assertNotNull(x);
             assertEquals("((A,A),(A,((Revision-->Belief),(Weak-->Desire))))", x.toString());
             // assertEquals(12, x.getVolume());
