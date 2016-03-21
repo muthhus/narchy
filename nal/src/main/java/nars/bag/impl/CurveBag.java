@@ -6,6 +6,7 @@ import nars.bag.Bag;
 import nars.budget.BudgetMerge;
 import nars.budget.Budgeted;
 import nars.util.data.sorted.SortedIndex;
+import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -184,30 +185,18 @@ public class CurveBag<V> implements Bag<V> {
     }
 
     @Override
-    public BLink<V> remove(@NotNull V key) {
-        return arrayBag.remove(key);
+    public BLink<V> remove(@NotNull V x) {
+        return arrayBag.remove(x);
     }
 
 
     @Nullable
     @Override
-    public final BLink<V> put(@NotNull V v, @NotNull Budgeted vBagBudget, float scale) {
-        return arrayBag.put(v, vBagBudget, scale);
+    public final BLink<V> put(@NotNull V v, @NotNull Budgeted vBagBudget, float scale, @Nullable MutableFloat overflow) {
+        return arrayBag.put(v, vBagBudget, scale, overflow);
     }
 
 
-    @Nullable
-    @Override public BLink<V> put(@NotNull V v) {
-        BLink<V> existing = get(v);
-        return (existing != null) ?
-                existing :
-                put(v, getDefaultBudget(v));
-    }
-
-    @NotNull
-    protected BLink<V> getDefaultBudget(@NotNull V v) {
-        return new BLink(v, 0,0,0);
-    }
 
     @Override
     public final int capacity() {

@@ -89,9 +89,9 @@ public abstract class CollectorMap<K, V>  {
     }
 
     @Nullable
-    public V remove(K key) {
+    public V remove(K x) {
 
-        V e = removeKey(key);
+        V e = removeKey(x);
         if (e != null) {
             V removed = removeItem(e);
 //            if (removed == null) {
@@ -100,7 +100,7 @@ public abstract class CollectorMap<K, V>  {
 //                //return null;
 //            }
             if (removed != e)
-                throw new RuntimeException(key + " removed " + e + " but item removed was " + removed);
+                throw new RuntimeException(x + " removed " + e + " but item removed was " + removed);
             return removed;
         }
 

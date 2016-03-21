@@ -1,8 +1,9 @@
 package nars.bag;
 
-import nars.budget.Budget;
 import nars.budget.Budgeted;
+import nars.budget.UnitBudget;
 import nars.util.data.Util;
+import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -48,28 +49,63 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
      */
     @Nullable
     @Override
-    BLink<V> remove(@NotNull V key);
+    BLink<V> remove(@NotNull V x);
 
 
     /**
-     * put with an empty budget
+     * insert/merge with an initial / default budget
      */
     @Nullable
-    BLink<V> put(@NotNull V newItem);
+    default BLink<V> put(@NotNull V x) {
+        return put(x, initialBudget(x), null);
+    }
+//        @Nullable
+//        @Override public BLink<V> put(@NotNull V v) {
+//            //TODO combine with CurveBag.put(v)
+//            BLink<V> existing = get(v);
+//            if (existing!=null) {
+//                merge(existing, getDefaultBudget(v), 1f);
+//                return existing;
+//            } else {
+//            }
+//        }
+//        @Nullable
+//        @Override public BLink<V> put(@NotNull V v) {
+//            BLink<V> existing = get(v);
+//            return (existing != null) ?
+//                    existing :
+//                    put(v, getDefaultBudget(v));
+//        }
+
+
+    @NotNull
+    default Budgeted initialBudget(@NotNull V v) {
+        if (v instanceof Budgeted)
+            return ((Budgeted)v);
+        return UnitBudget.Zero;
+//
+//        return new BLink(v, 0,0,0);
+    }
+
+    @Override @Nullable
+    default BLink<V> put(@NotNull V i, @NotNull BLink<V> b) {
+        return put(i, b, 1f, null);
+    }
+
 
     @Nullable
-    default BLink<V> put(@NotNull V i, @NotNull Budget b) {
-        return put(i, b, 1f);
+    default BLink<V> put(@NotNull V i, @NotNull Budgeted b, @Nullable MutableFloat overflowing) {
+        return put(i, b, 1f, overflowing);
     }
 
     @Nullable
-    @Override
-    default BLink<V> put(@NotNull V v, @NotNull BLink<V> b) {
-        return put(v, b, 1f);
+    default BLink<V> put(@NotNull V v, @NotNull BLink<V> b, @Nullable MutableFloat overflowing) {
+        return put(v, b, 1f, overflowing);
     }
 
+
     @Nullable
-    BLink<V> put(@NotNull V i, @NotNull Budgeted b, float scale);
+    BLink<V> put(@NotNull V i, @NotNull Budgeted b, float scale, @Nullable MutableFloat overflowing);
 
 
 

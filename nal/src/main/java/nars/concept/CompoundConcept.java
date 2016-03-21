@@ -4,6 +4,7 @@ import nars.Memory;
 import nars.NAR;
 import nars.Op;
 import nars.Symbols;
+import nars.bag.BLink;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
 import nars.concept.util.*;
@@ -12,6 +13,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.container.TermContainer;
+import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -620,10 +622,10 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
 
 
     @Override
-    public boolean link(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar) {
+    public boolean link(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, @Nullable MutableFloat conceptOverflow) {
         //1. Link the Task
 
-        if (super.link(b, scale, minScale, nar)) {
+        if (super.link(b, scale, minScale, nar, conceptOverflow)) {
 
             //3. Link the termlink templates
             List<Termed> templates = termlinkTemplates();
@@ -641,32 +643,67 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
             }
 
             if (subScale >= minScale) {
-                float sumOver = 0;
-                int numUnder = 0;
+                MutableFloat subConceptOverflow = new MutableFloat(/*0*/);
+
+                //int numUnder = 0;
+
                 for (int i = 0; i < numTemplates; i++) {
-                    float overflow = linkTemplate(b, templates.get(i), subScale, nar);
-                    if (overflow == 0) {
+                    Concept target = nar.conceptualize(templates.get(i), b, subScale, subConceptOverflow);
+                    assert(target!=null);
+
+                    //Link the peer termlink bidirectionally
+                    //float overBefore = overflow.floatValue();
+                    BLink<Termed> link = linkTerm(this, target, b, subScale, false, null);
+                    //float overAfter = overflow.floatValue();
+                    //if (overAfter )
+                    /*if (overflow == 0) {
                         numUnder++;
                     } else {
                         sumOver += overflow;
-                    }
+                    }*/
                 }
 
+
+                float scOver = subConceptOverflow.floatValue();
+                if (scOver > 0) {
+
+                    //Simple method: just dispense a proportion of the overflow to all template concepts equally
+                    float overScale = scOver / (b.pri() * scale) / numTemplates;
+                    for (int n = 0; n < numTemplates; n++) {
+                        nar.conceptualize(templates.get(n), b, overScale, conceptOverflow /* recursive overflow accumulated to callee's overflow */);
+                    }
+
+                    //TODO More fair method:
+//                    //iterate over templates, psuedorandomly by choosing a random start index and visiting each modulo N
+//                    int i = nar.random.nextInt(numTemplates);
+//                    for (int n = 0; n < numTemplates; n++) {
+//                        Termed nt = templates.get((i + n) % numTemplates);
+//
+//                    }
+
+                }
                 //logger.debug("{} link: {} budget overflow {}", this, b, overflow);
 
-                //redistribute overflow to termlink templates:
-                if ((sumOver > 0) && (numUnder > 0)) {
 
-                    /** the last visited termlink will have the opportunity to receive the biggest bonus,
-                     *  so ordering the templates by volume could allow the most complex ones to receive the most bonus */
-                    for (int i = 0; i < numTemplates; i++) {
-                        sumOver += linkTemplate(b, templates.get(i),
-                                sumOver / (numUnder--), nar);
-
-                        if (numUnder == 0) break; //finished
-                    }
-
-                }
+//                //redistribute overflow to termlink templates:
+//                if ((sumOver > 0) && (numUnder > 0)) {
+//
+//                    /** the last visited termlink will have the opportunity to receive the biggest bonus,
+//                     *  so ordering the templates by volume could allow the most complex ones to receive the most bonus */
+//                    for (int i = 0; i < numTemplates; i++) {
+//                        float subScale1 = sumOver / (numUnder--);
+//                        Concept target = nar.conceptualize(templates.get(i), b, subScale1);
+//                        assert(target!=null);
+//
+//                        //2. Link the peer termlink bidirectionally
+//                        linkTerm(this, target, b, subScale1, true, true, null);
+//                        sumOver += linkTemplate(b, templates.get(i),
+//                                sumOver / (numUnder--), nar);
+//
+//                        if (numUnder == 0) break; //finished
+//                    }
+//
+//                }
             }
 
             return true;
@@ -675,14 +712,6 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
         return false;
     }
 
-    /** returns overflow amount of the outward template only */
-    float linkTemplate(@NotNull Budgeted task, Termed template, float subScale, @NotNull NAR nar) {
-        Concept target = nar.conceptualize(template, task, subScale);
-        assert(target!=null);
-
-        //2. Link the peer termlink bidirectionally
-        return linkTerm(this, target, task, subScale, true, true);
-    }
 
     @Nullable @Override
     public List<Termed> termlinkTemplates() {

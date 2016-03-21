@@ -29,15 +29,20 @@ public class BudgetedSet<B extends Budgeted> {
         this.arrayer = tmpArrayBuilder;
     }
 
-    public B put(@NotNull B t) {
-        if (t.isDeleted()) {
-            throw new RuntimeException("Deleted: " + t);
-        }
+    /** returns any overflow priority */
+    public float put(@NotNull B t) {
+        assert(!t.isDeleted()); //throw new RuntimeException("Deleted: " + t);
+
         B existing = table.put(t, t);
+        float overflow;
         if ((existing != null) && (existing != t) && (!existing.isDeleted())) {
-            merge.merge(t.budget(), existing, 1f);
+            //merge the existing budget into the new entry that was inserted
+            overflow = merge.merge(t.budget(), existing, 1f);
+        } else {
+            overflow = 0;
         }
-        return existing;
+
+        return overflow;
     }
 
     public boolean contains(B b) {

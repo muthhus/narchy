@@ -32,6 +32,7 @@ import nars.util.event.DefaultTopic;
 import nars.util.event.On;
 import nars.util.event.Topic;
 import net.openhft.affinity.AffinityLock;
+import org.apache.commons.lang3.mutable.MutableFloat;
 import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -961,12 +962,12 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     /** activate the concept and other features (termlinks, etc) */
     @Nullable
-    public abstract Concept conceptualize(@NotNull Termed termed, @NotNull Budgeted activation, float scale);
+    public abstract Concept conceptualize(@NotNull Termed termed, @NotNull Budgeted activation, float scale, @Nullable MutableFloat conceptOverflow);
 
 
     @Nullable
     final public Concept conceptualize(@NotNull Termed termed, @NotNull Budgeted activation) {
-        return conceptualize(termed, activation, 1f);
+        return conceptualize(termed, activation, 1f, null);
     }
 
     @NotNull

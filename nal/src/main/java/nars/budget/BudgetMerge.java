@@ -10,13 +10,12 @@ import org.jetbrains.annotations.NotNull;
 public interface BudgetMerge {
 
     /** merge 'incoming' budget (scaled by incomingScale) into 'existing'
+     *  incomingScale is a factor (0 < s <= 1) by which the incoming budget's effect is multiplied,
+     *  1.0 being complete merge and 0 being no effect at all.
+     *
      * @return any resultng overflow priority which was not absorbed by the target, >=0
      * */
     float merge(Budget existing, Budgeted incoming, float incomingScale);
-
-    default float merge(Budget existing, Budget incoming) {
-        return merge(existing, incoming, 1f);
-    }
 
 
     static float dqBlendByPri(@NotNull Budget tgt, @NotNull Budgeted src, float srcScale, boolean addOrAvgPri) {

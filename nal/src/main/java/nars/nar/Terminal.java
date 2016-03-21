@@ -10,6 +10,7 @@ import nars.term.Termed;
 import nars.time.Clock;
 import nars.time.FrameClock;
 import nars.util.data.random.XORShiftRandom;
+import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -47,7 +48,7 @@ public class Terminal extends AbstractNAR {
     }
 
     @Override
-    public Concept conceptualize(Termed termed, Budgeted activation, float scale) {
+    public Concept conceptualize(Termed termed, Budgeted activation, float scale, MutableFloat overflow) {
         return concept(termed); //ignore activation
     }
 

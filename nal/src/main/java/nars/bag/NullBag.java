@@ -1,6 +1,7 @@
 package nars.bag;
 
 import nars.budget.Budgeted;
+import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -42,21 +43,28 @@ public final class NullBag<V> implements Bag<V> {
 
     @Nullable
     @Override
-    public BLink<V> remove(V key) {
+    public BLink<V> remove(V x) {
         return null;
     }
 
     @Nullable
     @Override
-    public BLink<V> put(Object newItem) {
+    public BLink<V> put(@NotNull V v, @NotNull BLink<V> vbLink) {
         return null;
     }
 
     @Nullable
     @Override
-    public BLink<V> put(Object i, Budgeted b, float scale) {
+    public BLink<V> put(@NotNull V i, @NotNull Budgeted b, float scale, @Nullable MutableFloat overflowing) {
         return null;
     }
+
+    @Nullable
+    @Override
+    public BLink<V> put(Object x) {
+        return null;
+    }
+
 
 
     @NotNull

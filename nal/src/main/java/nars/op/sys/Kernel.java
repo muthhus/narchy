@@ -58,7 +58,7 @@ public class Kernel {
     }
 
     private void onInput(@NotNull Task t) {
-        schedule.put(t, t.budget());
+        schedule.put(t, t.budget(), null);
     }
 
     protected void update() {
@@ -71,7 +71,7 @@ public class Kernel {
         schedule.sample(updateRate.floatValue(), cl -> {
             Task t = cl.get();
             if (t.isGoal())
-                n.conceptualize(t, UnitBudget.One, strength(cl));
+                n.conceptualize(t, UnitBudget.One, strength(cl), null);
             else /* t.isCommand */
                 n.input(t); //re-input
         });

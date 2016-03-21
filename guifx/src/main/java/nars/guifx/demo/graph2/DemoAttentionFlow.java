@@ -17,6 +17,7 @@ import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import org.apache.commons.lang3.mutable.MutableFloat;
 
 import java.io.IOException;
 import java.util.List;
@@ -31,6 +32,8 @@ public class DemoAttentionFlow extends AbstractNARGraphDemo {
 
         Concept prev = null;
 
+        MutableFloat overflowing = new MutableFloat();
+
         for (int i = 0; i < n; i++) {
             Termed x = each.valueOf(i);
             if (i == 0) first = x;
@@ -42,22 +45,12 @@ public class DemoAttentionFlow extends AbstractNARGraphDemo {
             if (prev!= null) {
 
                 if (reverse) {
-                    //the reverse
-                    List<Termed> ct = c.termlinkTemplates();
-                    if (ct!=null) {
-                        if (!ct.contains(prev))
-                            ct.add(prev);
-                    }
-                    AbstractConcept.linkTerm(c, prev, UnitBudget.Mid, 1f, true, false);
+                    linkHalf(prev, overflowing, c);
+
                 }
 
                 if (forward) {
-                    List<Termed> pt = prev.termlinkTemplates();
-                    if (pt!=null) {
-                        if (!pt.contains(c))
-                            pt.add(c);
-                    }
-                    AbstractConcept.linkTerm(prev, c, UnitBudget.Mid, 1f, true, false);
+                    linkHalf(c, overflowing, prev);
                 }
 
 
@@ -70,6 +63,16 @@ public class DemoAttentionFlow extends AbstractNARGraphDemo {
 
 
         return Tuples.twin(first,last);
+    }
+
+    private static void linkHalf(Concept prev, MutableFloat overflowing, Concept c) {
+        //the reverse
+        List<Termed> ct = c.termlinkTemplates();
+        if (ct!=null) {
+            if (!ct.contains(prev))
+                ct.add(prev);
+        }
+        AbstractConcept.linkTerm(c, prev, UnitBudget.Mid, 1f, false, overflowing);
     }
 
     public static void main(String[] args)  {

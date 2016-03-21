@@ -9,6 +9,7 @@ import nars.budget.Budgeted;
 import nars.budget.UnitBudget;
 import nars.util.ArraySortedIndex;
 import nars.util.data.sorted.SortedIndex;
+import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -58,29 +59,13 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
         return l.get();
     }
 
-    @Nullable
-    @Override public BLink<V> put(@NotNull V v) {
-        //TODO combine with CurveBag.put(v)
-        BLink<V> existing = get(v);
-        if (existing!=null) {
-            merge(existing, getDefaultBudget(v), 1f);
-            return existing;
-        } else {
-            return put(v, getDefaultBudget(v));
-        }
-    }
 
-    protected final void merge(@NotNull BLink<V> target, Budgeted incoming, float scale) {
-        float overflow = mergeFunction.merge(target, incoming, scale);
-        if (overflow > 0)
-            target.charge(overflow);
-    }
 
-    @NotNull
-    private Budget getDefaultBudget(V v) {
-        return v instanceof Budgeted ?
-                ((Budgeted) v).budget() :
-                UnitBudget.Zero;
+    /** returns amount overflowed */
+    protected final float merge(@NotNull BLink<V> target, Budgeted incoming, float scale) {
+        return mergeFunction.merge(target, incoming, scale);
+        /*if (overflow > 0)
+            target.charge(overflow);*/
     }
 
 
@@ -220,7 +205,7 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
      */
     @Nullable
     @Override
-    public BLink<V> put(V i, Budgeted b, float scale) {
+    public BLink<V> put(V i, Budgeted b, float scale, @Nullable MutableFloat overflow) {
         //    }
         //
         //    public BLink<V> putFast(V i, Budgeted b, float scale) {
@@ -233,7 +218,7 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
         BLink<V> existing = get(i);
 
         return (existing != null) ?
-                putExists(b, scale, existing) :
+                putExists(b, scale, existing, overflow) :
                 putNew(i, b, scale);
 
 //        //TODO optional displacement until next update, allowing sub-threshold to grow beyond threshold
@@ -251,10 +236,14 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
     }
 
     @NotNull
-    public BLink<V> putExists(Budgeted b, float scale, @NotNull BLink<V> existing) {
+    private BLink<V> putExists(Budgeted b, float scale, @NotNull BLink<V> existing, @Nullable MutableFloat overflow) {
 
         if (existing!=b) {
-            merge(existing, b, scale);
+
+            float o = merge(existing, b, scale);
+            if (overflow!=null)
+                overflow.add(o);
+
             update(existing); //<- delaying/buffering this is the whole reason of the buffering
         }
 
@@ -262,7 +251,7 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
     }
 
     @Nullable
-    protected BLink<V> putNew(V i, Budgeted b, float scale) {
+    private BLink<V> putNew(V i, Budgeted b, float scale) {
         BLink<V> newBudget;
         if (!(b instanceof BLink)) {
             newBudget = new BLink<>(i, b, scale);

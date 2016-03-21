@@ -8,6 +8,7 @@ import nars.budget.Budgeted;
 import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
+import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -39,9 +40,10 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
 
     public static final Logger logger = LoggerFactory.getLogger(AbstractConcept.class);
 
-    /** returns overflow of the outgoing component only; the incoming component will accumulate in its buffer until it is drained by a similar operation by its concept */
-    public static final float linkTerm(@NotNull Concept source, @NotNull Concept target,
-                                      @NotNull Budgeted b, float subScale, boolean out, boolean in) {
+    /** returns the outgoing component only */
+    public static final BLink<Termed> linkTerm(@NotNull Concept source, @NotNull Concept target,
+                                               @NotNull Budgeted b, float subScale, boolean alsoReverse,
+                                               @Nullable MutableFloat overflowing) {
 
         /*if (logger.isDebugEnabled())
             logger.debug("TermLink: {} <//> {} ", source, target); */
@@ -49,27 +51,22 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
         if (source == target)
             throw new RuntimeException("termlink self-loop");
 
-        if (in && out) {
+        if (alsoReverse) {
             subScale /= 2; //divide among both directions
         }
 
-        float overflow = 0;
-
         /** activate local's termlink to template */
-        if (out) {
-            BLink<Termed> ol = source.termlinks().put(target, b, subScale);
-            if (ol!=null)
-                overflow += ol.drain();
-        }
+
+        BLink<Termed> ol = source.termlinks().put(target, b, subScale, overflowing);
+
 
         /** activate (reverse) template's termlink to local */
-        if (in) {
-            BLink<Termed> il = target.termlinks().put(source, b, subScale);
-            /*if (il!=null)
-                overflow += il.drain();*/
+        if (alsoReverse) {
+            /*BLink<Termed> il = */target.termlinks().put(source, b, subScale, overflowing);
         }
 
-        return overflow;
+        return ol;
+
     }
 
 
@@ -174,10 +171,10 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
      * when a task is processed, a tasklink
      * can be created at the concept of its term
      */
-    @Override public boolean link(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar) {
+    @Override public boolean link(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, @Nullable MutableFloat conceptOverflow) {
 
         if (b instanceof Task)
-            taskLinks.put((Task)b, b/*.budget()*/, scale);
+            taskLinks.put((Task)b, b/*.budget()*/, scale, null);
 
         return true;
     }

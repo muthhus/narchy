@@ -27,7 +27,7 @@ public class ConceptMenu extends FlowPane {
 
         Menu conceptMenu = new Menu(t.toString());
 
-        Button activateButton = new NARActionButton(nar, "+", (n) -> n.conceptualize(t, new UnitBudget(1f, 0.75f, 0.75f), 1f));
+        Button activateButton = new NARActionButton(nar, "+", (n) -> n.conceptualize(t, new UnitBudget(1f, 0.75f, 0.75f), 1f, null));
         Button yesGoalButton = new NARActionButton(nar, "+!", (n) -> n.input(new MutableTask(t, '!').present(nar).log("GUI Goal")));
         Button noGoalButton = new NARActionButton(nar, "-!", (n) -> n.input(new MutableTask(t, '!').truth(0f, (nar).getDefaultConfidence('!')).present(nar).log("GUI Goal")));
         Button trueButton = new NARActionButton(nar, "T", (n) -> n.input(new MutableTask(t, '.').present(nar).log("GUI True")));

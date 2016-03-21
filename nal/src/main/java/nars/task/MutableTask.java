@@ -66,6 +66,7 @@ public class MutableTask extends AbstractTask {
         parent(taskToClone);
     }
 
+    /** used by QuestionTable */
     public MutableTask(@NotNull Task taskToClone, @NotNull Task otherTask, long now, long occ, long[] newEvidence, BudgetMerge budgetMerge) {
         this(taskToClone);
         punctuation(taskToClone.punc());
@@ -75,7 +76,7 @@ public class MutableTask extends AbstractTask {
         time(now, occ);
 
         budget(taskToClone.budget());
-        budgetMerge.merge(this, otherTask.budget());
+        budgetMerge.merge(this, otherTask.budget(), 1f);
     }
 
     public MutableTask(@NotNull Termed<Compound> content, char punc) {

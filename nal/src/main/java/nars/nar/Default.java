@@ -25,6 +25,8 @@ import nars.util.event.Active;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.List;
@@ -36,6 +38,8 @@ import java.util.function.Function;
  * Various extensions enabled
  */
 public class Default extends AbstractNAR {
+
+    private static final Logger logger = LoggerFactory.getLogger(Default.class);
 
     @NotNull
     public final DefaultCycle core;
@@ -108,17 +112,15 @@ public class Default extends AbstractNAR {
             if (t == null) //for null-terminated arrays
                 break;
             if (!t.isDeleted())
-                apply(t, activation);
+                process(t, activation);
         }
     }
 
     /**
-     * execute a Task as a TaskProcess (synchronous)
-     * <p>
-     * TODO make private
+     * process a Task as a TaskProcess (synchronous)
      */
     @Nullable
-    final Concept apply(@NotNull Task input, float activation) {
+    private final Concept process(@NotNull Task input, float activation) {
 
         Concept c = concept(input, true);
         if (c == null) {
@@ -137,7 +139,11 @@ public class Default extends AbstractNAR {
             //TaskProcess succeeded in affecting its concept's state (ex: not a duplicate belief)
 
             //1. propagate budget
-            conceptualize(c, t, activation);
+            MutableFloat overflow = new MutableFloat();
+            conceptualize(c, t, activation, overflow);
+            if (overflow.floatValue() > 0) {
+                logger.warn("{} overflowed concept priority {}", input, overflow);
+            }
 
             switch (t.punc()) {
                 case Symbols.GOAL:
@@ -264,15 +270,14 @@ public class Default extends AbstractNAR {
 
     @Nullable
     @Override
-    public Concept conceptualize(Termed termed, @NotNull Budgeted activation, float scale) {
-
+    public Concept conceptualize(Termed termed, @NotNull Budgeted activation, float scale, @Nullable MutableFloat conceptOverflow) {
 
         Concept c = concept(termed, true);
         if (c != null) {
 
-            BLink<Concept> cLink = core.activate(c, activation, scale);
+            core.activate(c, activation, scale, conceptOverflow);
 
-            c.link(activation, scale, Default.this);
+            c.link(activation, scale, Default.this, conceptOverflow);
 
 //            if (templateConcept != null) {
 //                templateConcept.linkTask(task, subScale, minScale, nar);
@@ -551,8 +556,8 @@ public class Default extends AbstractNAR {
         }
 
         @Nullable
-        final BLink<Concept> activate(@NotNull Concept c, @NotNull Budgeted b, float scale) {
-            return active.put(c, b, scale * activationRate.floatValue());
+        final void activate(@NotNull Concept c, @NotNull Budgeted b, float scale, @Nullable MutableFloat overflowing) {
+            active.put(c, b, scale * activationRate.floatValue(), overflowing);
         }
 
 
