@@ -25,7 +25,7 @@ public class VariableTransformationTest {
         String t = "<$x --> y>";
         String n = "($1-->y)";
         NAR nar = new Terminal(32);
-        Term x = nar.term(t);
+        Termed x = nar.term(t);
         assertEquals(n, x.toString());
         //assertTrue("immediate construction of a term from a string should automatically be normalized", x.isNormalized());
 
@@ -54,7 +54,7 @@ public class VariableTransformationTest {
 
         String t = "<<($1, $2) --> bigger> ==> <($2, $1) --> smaller>>";
 
-        Term term = n.term(t);
+        Termed term = n.term(t);
         Task task = n.task(t + '.');
         //n.input("<<($1, $2) --> bigger> ==> <($2, $1) --> smaller>>.");
 

@@ -214,9 +214,14 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return (TextInput) input((Input)new TextInput(this, text));
     }
 
-    @Nullable
-    public <T extends Termed> T term(@NotNull String t) throws NarseseException {
-        return index().the(t);
+    @NotNull
+    public <T extends Term> Termed<T> term(@NotNull String t) throws NarseseException {
+        Termed x = index.the(t);
+        if (x == null) {
+            //if a NarseseException was not already thrown, this indicates that it parsed but the index failed to provide its output
+            throw new NarseseException("Unindexed: " + t);
+        }
+        return (T) x;
     }
 
     /**
@@ -224,17 +229,16 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      */
     @Nullable
     public final Concept concept(@NotNull String conceptTerm) throws NarseseException {
-
-        return concept(termOrException(conceptTerm));
+        return concept(term(conceptTerm));
     }
 
-    /** parses a term, returning it, or throws an exception (but will not return null) */
-    @NotNull public final Termed termOrException(@NotNull String conceptTerm) {
-        Termed t = term(conceptTerm);
-        if (t == null)
-            throw new NarseseException(conceptTerm);
-        return t;
-    }
+//    /** parses a term, returning it, or throws an exception (but will not return null) */
+//    @NotNull public final Termed termOrException(@NotNull String conceptTerm) {
+//        Termed t = term(conceptTerm);
+//        if (t == null)
+//            throw new NarseseException(conceptTerm);
+//        return t;
+//    }
 
     /**
      * ask question
@@ -242,7 +246,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     @NotNull
     public Task ask(@NotNull String termString) throws NarseseException {
         //TODO remove '?' if it is attached at end
-        return ask((Compound)termOrException(termString));
+        return ask(term(termString));
     }
 
     /**
@@ -321,7 +325,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
     @NotNull
     public NAR believe(@NotNull String termString, boolean isTrue) throws NarseseException {
-        return believe(termOrException(termString), isTrue);
+        return believe(term(termString), isTrue);
     }
 
     @NotNull

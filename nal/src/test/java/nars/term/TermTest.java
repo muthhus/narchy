@@ -56,12 +56,12 @@ public class TermTest {
     protected void assertEquivalentTerm(String term1String, String term2String) {
         try {
 
-            Term term1 = n.term(term1String);
-            Term term2 = n.term(term2String);
+            Termed term1 = n.term(term1String);
+            Termed term2 = n.term(term2String);
 
             assertNotEquals(term1String, term2String);
 
-            assertEquivalentTerm(term1, term2);
+            assertEquivalentTerm(term1.term(), term2.term());
 
         } catch (Exception e) {
             assertFalse(e.toString(), true);
@@ -119,9 +119,9 @@ public class TermTest {
     @Test
     public void testTermSort() throws Exception {
 
-        Term a = n.term("a");
-        Term b = n.term("b");
-        Term c = n.term("c");
+        Term a = n.term("a").term();
+        Term b = n.term("b").term();
+        Term c = n.term("c").term();
 
         assertEquals(3, Terms.toSortedSetArray(a, b, c).length);
         assertEquals(2, Terms.toSortedSetArray(a, b, b).length);
@@ -135,13 +135,13 @@ public class TermTest {
 
         //these 2 representations are equal, after natural ordering
         String term1String = "<#1 --> (&,boy,(/,taller_than,{Tom},_))>";
-        Term term1 = n.term(term1String);
+        Term term1 = n.term(term1String).term();
         String term1Alternate = "<#1 --> (&,(/,taller_than,{Tom},_),boy)>";
-        Term term1a = n.term(term1Alternate);
+        Term term1a = n.term(term1Alternate).term();
 
 
         // <#1 --> (|,boy,(/,taller_than,{Tom},_))>
-        Term term2 = n.term("<#1 --> (|,boy,(/,taller_than,{Tom},_))>");
+        Term term2 = n.term("<#1 --> (|,boy,(/,taller_than,{Tom},_))>").term();
 
         assertEquals(term1a.toString(), term1.toString());
         assertTrue(term1.complexity() > 1);
@@ -183,8 +183,8 @@ public class TermTest {
         NAR n = new Terminal(7);
 
         String term1String = "<a --> b>";
-        Term term1 = n.term(term1String);
-        Term term2 = n.term(term1String);
+        Term term1 = n.term(term1String).term();
+        Term term2 = n.term(term1String).term();
 
         assertTrue(term1.equals(term2));
         assertTrue(term1.hashCode() == term2.hashCode());
@@ -203,9 +203,9 @@ public class TermTest {
 
         String statement1 = "<a --> b>.";
 
-        Term a = n.term("a");
+        Termed a = n.term("a");
         assertTrue(a != null);
-        Term a1 = n.term("a");
+        Termed a1 = n.term("a");
         assertTrue(a.equals(a1));
 
         n.input(statement1);
@@ -277,8 +277,8 @@ public class TermTest {
 
         Term subj = null, pred = null;
         try {
-            subj = n.term("$1");
-            pred = n.term("(~,{place4},$1)");
+            subj = n.term("$1").term();
+            pred = n.term("(~,{place4},$1)").term();
 
             assertTrue(true);
 
@@ -296,11 +296,11 @@ public class TermTest {
 
 
 //        try {
-        Compound forced = n.term("<a --> b>");
+        Termed<Compound> forced = n.term("<a --> b>");
         assertNotNull(forced);
 
-        forced.terms()[0] = subj;
-        forced.terms()[1] = pred;
+        forced.term().terms()[0] = subj;
+        forced.term().terms()[1] = pred;
 
         assertEquals(t, forced.toString());
 
@@ -316,11 +316,11 @@ public class TermTest {
 
         NAR n = new Terminal(8);
 
-        assertFalse(Op.isOperation(n.term("(a,b)")));
-        assertFalse(Op.isOperation(n.term("^wonder")));
+        assertFalse(Op.isOperation(n.term("(a,b)").term()));
+        assertFalse(Op.isOperation(n.term("^wonder").term()));
 
         try {
-            Term x = n.term("wonder(a,b)");
+            Term x = n.term("wonder(a,b)").term();
             assertEquals(Op.INHERIT, x.op());
             assertTrue(Op.isOperation(x));
             assertEquals("wonder(a,b)", x.toString());
@@ -380,10 +380,10 @@ public class TermTest {
     }
     protected void testTermEquality(String s, boolean normalize) {
 
-        Term a = n.term(s);
+        Term a = n.term(s).term();
 
         NAR n2 = new Default();
-        Term b = n.term(s);
+        Term b = n.term(s).term();
 
         //assertTrue(a != b);
 
@@ -455,10 +455,10 @@ public class TermTest {
     public void termEqualityWithMixedVariables() {
 
         String s = "(&&, <<$1 --> key> ==> <#2 --> (/, open, $1, _)>>, <#2 --> lock>)";
-        Term a = n.term(s);
+        Termed a = n.term(s);
 
         NAR n2 = new Default();
-        Term b = n2.term(s);
+        Termed b = n2.term(s);
 
         assertTrue(a != b);
         assertEquals(a, b);
@@ -548,7 +548,7 @@ public class TermTest {
     }
 
     private void testTermComplexityMass(NAR n, String x, int complexity, int mass, int varIndep, int varDep, int varQuery) {
-        Term t = n.term(x);
+        Term t = n.term(x).term();
 
         assertNotNull(t);
         assertEquals(complexity, t.complexity());
@@ -568,7 +568,7 @@ public class TermTest {
     }
 
     public <C extends Compound> C testStructure(String term, String bits) {
-        C a = n.term(term);
+        C a = (C) n.term(term).term();
         assertEquals(bits, toBinaryString(a.structure()));
         assertEquals(term, a.toString());
         return a;
@@ -699,9 +699,12 @@ public class TermTest {
 
     void testImageOrdering(char v) {
 
-        Compound a = n.term("(" + v + ",x, y, _)");
-        Compound b = n.term("(" + v + ",x, _, y)");
-        Compound c = n.term("(" + v + ",_, x, y)");
+        Termed<Compound> aa = n.term("(" + v + ",x, y, _)");
+        Compound a = aa.term();
+        Termed<Compound> bb = n.term("(" + v + ",x, _, y)");
+        Compound b = bb.term();
+        Termed<Compound> cc = n.term("(" + v + ",_, x, y)");
+        Compound c = cc.term();
         assertNotEquals(a.relation(), b.relation());
         assertNotEquals(b.relation(), c.relation());
 
@@ -740,13 +743,13 @@ public class TermTest {
                 b.hashCode(), a.hashCode());
 
         NAR n = new Terminal(8);
-        Compound x3 = n.term('<' + i1 + " --> z>");
-        Compound x4 = n.term('<' + i1 + " --> z>");
+        Termed<Compound> x3 = n.term('<' + i1 + " --> z>");
+        Termed<Compound> x4 = n.term('<' + i1 + " --> z>");
 
         assertFalse("i2 is a possible subterm of x3, structurally, even if the upper bits differ",
-                x3.impossibleSubTermOrEquality(n.term(i2)));
+                x3.term().impossibleSubTermOrEquality(n.term(i2).term()));
         assertFalse(
-                x4.impossibleSubTermOrEquality(n.term(i1)));
+                x4.term().impossibleSubTermOrEquality(n.term(i1).term()));
 
 
     }
@@ -757,7 +760,7 @@ public class TermTest {
 
         assertTrue(
                 n.term("<a --> b>").term().impossibleSubterm(
-                        n.term("<a-->b>")
+                        n.term("<a-->b>").term()
                 )
         );
         assertTrue(
@@ -770,16 +773,16 @@ public class TermTest {
 
     @Test
     public void testCommutativeWithVariableEquality() {
-        Term a = n.term("<(&&, <#1 --> M>, <#2 --> M>) ==> <#2 --> nonsense>>");
-        Term b = n.term("<(&&, <#2 --> M>, <#1 --> M>) ==> <#2 --> nonsense>>");
+        Termed a = n.term("<(&&, <#1 --> M>, <#2 --> M>) ==> <#2 --> nonsense>>");
+        Termed b = n.term("<(&&, <#2 --> M>, <#1 --> M>) ==> <#2 --> nonsense>>");
         assertEquals(a, b);
 
-        Term c = n.term("<(&&, <#1 --> M>, <#2 --> M>) ==> <#1 --> nonsense>>");
+        Termed c = n.term("<(&&, <#1 --> M>, <#2 --> M>) ==> <#1 --> nonsense>>");
         assertNotEquals(a, c);
 
-        Compound x = n.term("(&&, <#1 --> M>, <#2 --> M>)");
-        Term xa = x.term(0);
-        Term xb = x.term(1);
+        Termed<Compound> x = n.term("(&&, <#1 --> M>, <#2 --> M>)");
+        Term xa = x.term().term(0);
+        Term xb = x.term().term(1);
         int o1 = xa.compareTo(xb);
         int o2 = xb.compareTo(xa);
         assertEquals(o1, -o2);

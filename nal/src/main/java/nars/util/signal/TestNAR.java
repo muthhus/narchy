@@ -421,12 +421,8 @@ public class TestNAR  {
         return this;
     }
 
-
-
-
     @NotNull
     public TestNAR believe(@NotNull String termString, float freq, float conf)  {
-
         nar.believe(termString, freq, conf);
         return this;
     }

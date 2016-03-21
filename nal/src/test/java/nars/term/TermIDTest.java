@@ -92,7 +92,7 @@ public class TermIDTest {
 
     public Term testBytesRepresentation(String expectedCompactOutput, String expectedPrettyOutput, int expectedLength) {
         //UTF8Identifier b = new UTF8Identifier(expectedPrettyOutput);
-        Term i = nar.term(expectedPrettyOutput);
+        Termed i = nar.term(expectedPrettyOutput);
         //byte[] b = i.bytes();
         //byte[] b = i.bytes();
 
@@ -103,7 +103,7 @@ public class TermIDTest {
 
 
         //assertEquals(expectedCompactOutput + " ---> " + Arrays.toString(b), expectedLength, b.length);
-        return i;
+        return i.term();
     }
 
     public void areEqualAndIfNotWhy(String a, String b) {

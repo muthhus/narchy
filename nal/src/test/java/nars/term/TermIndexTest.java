@@ -113,8 +113,8 @@ public class TermIndexTest {
 //    }
 
     private void testNotShared(NAR n, String s) {
-        Term t1 = n.term(s); //create by parsing
-        Term t2 = n.term(s); //create by parsing again
+        Termed t1 = n.term(s); //create by parsing
+        Termed t2 = n.term(s); //create by parsing again
         assertEquals(t1, t2);
         assertTrue(t1 != t2);
     }

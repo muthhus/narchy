@@ -43,7 +43,7 @@ public class PatrickNLP extends AbstractNALTest {
          */
         test()
             .log()
-            .believe("<(<$1 --> (/,REPRESENT,_,$3)> && <$2 --> (/,REPRESENT,_,$4)>) ==> REPRESENT:(($1,$2),($3,$4)))") ////the word fish represents the concept FOOD
+            .believe("((<$1 --> (/,REPRESENT,_,$3)> && <$2 --> (/,REPRESENT,_,$4)>) ==> REPRESENT:(($1,$2),($3,$4)))") ////the word fish represents the concept FOOD
             .believe("<cat --> (/,REPRESENT,_,ANIMAL)>")
             .believe("<eats --> (/,REPRESENT,_,EATING)>")
             .ask("REPRESENT:((cat,eats),?what)")

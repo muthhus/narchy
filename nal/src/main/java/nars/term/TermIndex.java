@@ -502,7 +502,7 @@ public interface TermIndex  {
     }
 
     @NotNull
-    default Termed parse(@NotNull String termToParse) throws Narsese.NarseseException {
+    default Term parse(@NotNull String termToParse) throws Narsese.NarseseException {
         return Narsese.the().term(termToParse, this);
     }
 

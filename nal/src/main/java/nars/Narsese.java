@@ -1173,15 +1173,20 @@ public class Narsese extends BaseParser<Object> {
     }
 
 
-    @NotNull public Termed term(@NotNull String s, @NotNull TermIndex t) throws NarseseException  {
+    @NotNull public Term term(@NotNull String s, @NotNull TermIndex t) throws NarseseException  {
         return term(s, t, true);
     }
 
     @NotNull
-    public Termed term(@NotNull String s, @NotNull TermIndex index, boolean normalize) throws NarseseException  {
-        Term raw = term(s);
-        return (normalize && !raw.isNormalized()) ?
-                index.normalized(raw) : raw;
+    public Term term(@NotNull String s, @NotNull TermIndex index, boolean normalize) throws NarseseException  {
+        Term y = term(s);
+        if (normalize) {
+            Term x = index.normalized(y);
+            if (x == null)
+                throw new NarseseException("Un-normalizable: " + y);
+            y = x;
+        }
+        return y;
     }
 
 //    public TaskRule taskRule(String input) {
@@ -1302,7 +1307,7 @@ public class Narsese extends BaseParser<Object> {
             this(input, null, cause);
         }
         public NarseseException(String input, ParsingResult result, Throwable cause) {
-            super(input, cause);
+            super(input + "\n" + result.toString(), cause);
             this.result = result;
         }
     }

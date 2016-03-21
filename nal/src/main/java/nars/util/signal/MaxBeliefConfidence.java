@@ -5,6 +5,7 @@ import nars.Global;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.util.event.CycleReaction;
 import nars.util.meter.Signal;
 import nars.util.meter.Signals;
@@ -19,7 +20,7 @@ import java.util.List;
 public class MaxBeliefConfidence extends CycleReaction implements Signals {
 
     @NotNull
-    public final Term term;
+    public final Termed term;
     @NotNull
     private final NAR nar;
     private final float freq;
