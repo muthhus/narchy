@@ -92,6 +92,11 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
         return put(i, b, 1f, null);
     }
 
+    @Nullable
+    default BLink<V> put(@NotNull V i, @NotNull Budgeted b) {
+        return put(i, b, 1f, null);
+    }
+
 
     @Nullable
     default BLink<V> put(@NotNull V i, @NotNull Budgeted b, @Nullable MutableFloat overflowing) {

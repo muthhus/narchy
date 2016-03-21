@@ -141,9 +141,9 @@ public class Default extends AbstractNAR {
             //1. propagate budget
             MutableFloat overflow = new MutableFloat();
             conceptualize(c, t, activation, overflow);
-            if (overflow.floatValue() > 0) {
+            /*if (overflow.floatValue() > 0) {
                 logger.warn("{} overflowed concept priority {}", input, overflow);
-            }
+            }*/
 
             switch (t.punc()) {
                 case Symbols.GOAL:

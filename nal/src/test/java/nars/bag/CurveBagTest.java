@@ -140,14 +140,14 @@ public class CurveBagTest  {
         a.merge(BudgetMerge.plusDQDominant);
 
         a.put("x", new UnitBudget(0.1f, 0.5f, 0.5f));
-        a.put("x", new UnitBudget(0.1f, 0.5f, 0.5f), 0.5f);
+        a.put("x", new UnitBudget(0.1f, 0.5f, 0.5f), 0.5f, null);
         a.commit();
 
         assertEquals(0.15, a.get("x").pri(), 0.001f);
 
         a.put("y", new UnitBudget(0.1f, 0.5f, 0.5f));
-        a.put("y", new UnitBudget(0.1f, 0.5f, 0.5f), 0.5f);
-        a.put("y", new UnitBudget(0.1f, 0.5f, 0.5f), 0.25f);
+        a.put("y", new UnitBudget(0.1f, 0.5f, 0.5f), 0.5f, null);
+        a.put("y", new UnitBudget(0.1f, 0.5f, 0.5f), 0.25f, null);
         a.commit();
 
         assertEquals(0.175, a.get("y").pri(), 0.001f);

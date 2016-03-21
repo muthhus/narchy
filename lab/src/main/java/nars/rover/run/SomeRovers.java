@@ -133,10 +133,10 @@ public class SomeRovers {
 
 
         //nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
-        nar.core.activationRate.setValue(0.25f);
+        nar.core.activationRate.setValue(0.75f);
 
 
-        nar.duration.set(5);
+        nar.duration.set(4);
         nar.conceptForgetDurations.setValue(4f);
         nar.termLinkForgetDurations.setValue(16);
         nar.taskLinkForgetDurations.setValue(12);
@@ -188,10 +188,11 @@ public class SomeRovers {
         NAR n = r.nar;
 
 
+
         NarQ nqSpine = new NarQ(n, (i, o) -> (int) Math.ceil(1+Math.sqrt(i * o)));
 
 
-        nqSpine.power.setValue(0.75f);
+        nqSpine.power.setValue(0.25f);
 
 
         nqSpine.input.addAll(nqSpine.getBeliefExpectations(

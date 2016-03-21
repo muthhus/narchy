@@ -652,8 +652,9 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
                     assert(target!=null);
 
                     //Link the peer termlink bidirectionally
-                    //float overBefore = overflow.floatValue();
-                    BLink<Termed> link = linkTerm(this, target, b, subScale, false, null);
+                    BLink<Termed> link = linkTerm(this, target, b, subScale, true, null);
+
+
                     //float overAfter = overflow.floatValue();
                     //if (overAfter )
                     /*if (overflow == 0) {
@@ -669,8 +670,15 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
 
                     //Simple method: just dispense a proportion of the overflow to all template concepts equally
                     float overScale = scOver / (b.pri() * scale) / numTemplates;
+
                     for (int n = 0; n < numTemplates; n++) {
                         nar.conceptualize(templates.get(n), b, overScale, conceptOverflow /* recursive overflow accumulated to callee's overflow */);
+
+                        Concept target = nar.conceptualize(templates.get(n), b, overScale, conceptOverflow);
+                        assert(target!=null);
+
+                        //Link the peer termlink bidirectionally
+                        BLink<Termed> link = linkTerm(this, target, b, overScale, true, null);
                     }
 
                     //TODO More fair method:

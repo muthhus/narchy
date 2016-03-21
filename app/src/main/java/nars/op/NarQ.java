@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Q-Learning Coprocessor (NAR Operator/Plugin)
+ * Q-Learning Autonomic Coprocessor (NAR Operator/Plugin)
  */
 public class NarQ implements Consumer<NAR> {
 
@@ -244,7 +244,7 @@ public class NarQ implements Consumer<NAR> {
     private class HaiQImpl extends HaiQ {
 
         //Hsom...
-        final static float perceptionAlpha = 0.1f;
+        final static float perceptionAlpha = 0.04f;
         @NotNull
         final Autoencoder ae;
 
@@ -261,7 +261,7 @@ public class NarQ implements Consumer<NAR> {
 
         @Override
         protected int perceive(float[] input) {
-            ae.train(input, perceptionAlpha,  0.03f, 0.03f, true);
+            ae.train(input, perceptionAlpha,  0.05f, 0.02f, true);
             int w = ae.max();
             return w;
         }
