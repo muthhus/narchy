@@ -130,6 +130,8 @@ public class Default extends AbstractNAR {
 
         emotion.busy(input, activation);
 
+        input.budget().priMult( activationRate.floatValue() );
+
         Task t = c.process(input, this);
 
         boolean novel = (t != null);
@@ -557,7 +559,7 @@ public class Default extends AbstractNAR {
 
         @Nullable
         final void activate(@NotNull Concept c, @NotNull Budgeted b, float scale, @Nullable MutableFloat overflowing) {
-            active.put(c, b, scale * activationRate.floatValue(), overflowing);
+            active.put(c, b, scale, overflowing);
         }
 
 

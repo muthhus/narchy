@@ -22,7 +22,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
     /**
      * resolution of the output freq value
      */
-    float freqResolution = 0.05f;
+    float freqResolution = 0.1f;
 
     private final Term term;
     private final FloatFunction<Term> value;
@@ -36,7 +36,8 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
 
     boolean inputIfSame = false;
     int maxTimeBetweenUpdates;
-    //TODO int minTimeBetweenUpdates..
+    int minTimeBetweenUpdates;
+
 
     private long lastInput;
 
@@ -44,6 +45,14 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
 
     public Sensor(@NotNull NAR n, Termed  t, FloatFunction<Term> value) {
         this(n, t, value, direct);
+    }
+
+    public Sensor(@NotNull NAR n, String tt, FloatFunction<Term> value) {
+        this(n, tt, value, direct);
+    }
+
+    public Sensor(@NotNull NAR n, String tt, FloatFunction<Term> value, FloatToFloatFunction valueToFreq) {
+        this(n, n.term(tt), value, valueToFreq);
     }
 
     public Sensor(@NotNull NAR n, Termed  t, FloatFunction<Term> value, FloatToFloatFunction valueToFreq) {
@@ -90,8 +99,10 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
 
         float f = Util.round(fRaw, freqResolution);
         if (inputIfSame || (f != prevF) || (maxTimeBetweenUpdates !=0 && timeSinceLastInput>= maxTimeBetweenUpdates)) {
-            Task t = input(f);
-            this.lastInput = t.creation();
+            if (minTimeBetweenUpdates!=0 && timeSinceLastInput >= minTimeBetweenUpdates) {
+                Task t = input(f);
+                this.lastInput = t.creation();
+            }
         }
 
         this.prevF = f;
@@ -125,8 +136,13 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
 
     /** sets minimum time between updates, even if nothing changed. zero to disable this */
     @NotNull
-    public Sensor maxTimeBetweenUpdates(int minTimeBetweenUpdates) {
-        this.maxTimeBetweenUpdates = minTimeBetweenUpdates;
+    public Sensor maxTimeBetweenUpdates(int dt) {
+        this.maxTimeBetweenUpdates = dt;
+        return this;
+    }
+    @NotNull
+    public Sensor minTimeBetweenUpdates(int dt) {
+        this.minTimeBetweenUpdates = dt;
         return this;
     }
 

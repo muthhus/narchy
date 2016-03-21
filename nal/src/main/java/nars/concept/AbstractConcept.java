@@ -126,7 +126,7 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
     }
 
     @Override
-    public final boolean equals(Object obj) {
+    public final boolean equals(@NotNull Object obj) {
         return (this == obj) || term.equals(obj);
     }
 

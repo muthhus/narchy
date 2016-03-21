@@ -47,8 +47,7 @@ public class NARover extends AbstractPolygonBot {
     final Lobjects objs;
 
     float hungry, sick;
-    final Sensor linearSpeedFwd, leftSpeed,
-            //rightSpeed,
+    final Sensor speedFore, speedBack, leftSpeed, rightSpeed,
             hungrySensor, sickSensor;
 
 
@@ -73,7 +72,8 @@ public class NARover extends AbstractPolygonBot {
 
         objs = new Lobjects(nar);
 
-        int maxUpdateTime = 16;
+        int maxUpdateTime = 64;
+        int minUpdateTime = 8;
 
 
         hungry = 1f;
@@ -82,53 +82,80 @@ public class NARover extends AbstractPolygonBot {
         FloatToFloatFunction speedThresholdToFreq = (speed) -> {
             return speed < 0.01 ? 0 : Util.clamp(0.5f + speed);
         };
-        FloatToFloatFunction sigmoid = (speed) -> {
-            return Util.sigmoid(speed);
+        FloatToFloatFunction sigmoid = (n) -> {
+            return Util.sigmoid(n);
+        };
+        FloatToFloatFunction sigmoidIfPositive = (n) -> {
+            return n > 0 ? Util.sigmoid(n) : 0; //Float.NaN;
+        };
+        FloatToFloatFunction sigmoidIfNegative = (n) -> {
+            return n < 0 ? Util.sigmoid(-n) : 0; //Float.NaN;
         };
 
-        Termed speedForward = nar.term("speed:forward");
-        //Term speedBackward = nar.term("speed:backward");
         Vec2 forwardVec = new Vec2(1,0f);
         Vec2 tmp = new Vec2(), tmp2 = new Vec2();
         FloatFunction<Term> linearSpeed =
                 (t) -> {
 
+                    float thresh = 0.01f;
+
                     Vec2 lv = torso.getLinearVelocityFromLocalPointToOut(Vec2.ZERO, tmp2);
                     Vec2 worldForward = torso.getWorldPointToOut(forwardVec, tmp).subLocal(torso.getWorldCenter());
-                    float dot = Vec2.dot(
+                    float v = Vec2.dot(
                             lv,
                             worldForward
                     );
-                    //System.out.println(lv + " " + worldForward + " = " + dot);
-                    return dot * (1f / 3f /* sensitivity */);
+
+                    //System.out.println("linear vel=" + v);
+
+                    v *= 0.35f;
+
+                    if (Math.abs(v) < thresh)
+                        v = 0;
+                    return v;
                 };
-        this.linearSpeedFwd = new Sensor(nar, speedForward, linearSpeed, sigmoid)
+
+
+        this.speedFore = new Sensor(nar, "speed:forward", linearSpeed, sigmoidIfPositive)
                 .maxTimeBetweenUpdates(maxUpdateTime)
-                .pri(0.25f);
+                .minTimeBetweenUpdates(minUpdateTime);
 
-        Termed speedLeft = nar.term("speed:angular");
-        FloatFunction<Term> angleSpeed = (t) -> torso.getAngularVelocity() / 2f;
-        leftSpeed = new Sensor(nar, speedLeft, angleSpeed, sigmoid)
+        //.pri(0.75f);
+
+        this.speedBack = new Sensor(nar, "speed:backward", linearSpeed, sigmoidIfNegative)
                 .maxTimeBetweenUpdates(maxUpdateTime)
-                .pri(0.25f);
+                .minTimeBetweenUpdates(minUpdateTime);
+
+                //.pri(f);
 
 
-        //TODO torso angle
+        FloatFunction<Term> angleSpeed = (t) -> {
+            float v = torso.getAngularVelocity();
+
+            //System.out.println("angle vel=" + angularVelocity);
+
+            v *= 1f; //sensitivity
+
+            return v < 0.01f ? 0 : v;
+        };
+        this.leftSpeed = new Sensor(nar, "speed:leftAngle", angleSpeed, sigmoidIfNegative)
+            .maxTimeBetweenUpdates(maxUpdateTime)
+            .minTimeBetweenUpdates(minUpdateTime)
+            ;
+
+        this.rightSpeed = new Sensor(nar, "speed:rightAngle", angleSpeed, sigmoidIfPositive)
+            .maxTimeBetweenUpdates(maxUpdateTime)
+            .minTimeBetweenUpdates(minUpdateTime)
+            ;
 
 
-        hungrySensor = new Sensor(nar, nar.term("eat:food"), (t) -> {
-            return 1f-hungry;
-        }).maxTimeBetweenUpdates(maxUpdateTime);
+        hungrySensor = new Sensor(nar, "eat:food", t -> 1f-hungry)
+            .maxTimeBetweenUpdates(maxUpdateTime)
+            .minTimeBetweenUpdates(minUpdateTime);
 
-        sickSensor = new Sensor(nar, nar.term("eat:poison"), (t) -> {
-            return sick;
-        }).maxTimeBetweenUpdates(maxUpdateTime);
-
-//
-//        linearVelocity = new SimpleAutoRangeTruthFrequency(nar, nar.term("<motion-->[linear]>"), new AutoRangeTruthFrequency(0.0f));
-//        motionAngle = new SimpleAutoRangeTruthFrequency(nar, nar.term("<motion-->[angle]>"), new BipolarAutoRangeTruthFrequency());
-//        facingAngle = new SimpleAutoRangeTruthFrequency(nar, nar.term("<motion-->[facing]>"), new BipolarAutoRangeTruthFrequency());
-
+        sickSensor = new Sensor(nar, "eat:poison", t -> sick)
+            .maxTimeBetweenUpdates(maxUpdateTime)
+            .minTimeBetweenUpdates(minUpdateTime);
 
 
     }

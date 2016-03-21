@@ -11,6 +11,7 @@ import nars.budget.UnitBudget;
 import nars.concept.AbstractConcept;
 import nars.concept.AtomConcept;
 import nars.concept.Concept;
+import nars.concept.TermTemplate;
 import nars.guifx.demo.AbstractNARGraphDemo;
 import nars.nar.Default;
 import nars.task.MutableTask;
@@ -45,12 +46,12 @@ public class DemoAttentionFlow extends AbstractNARGraphDemo {
             if (prev!= null) {
 
                 if (reverse) {
-                    linkHalf(prev, overflowing, c);
+                    linkHalf(prev, overflowing, c, nar);
 
                 }
 
                 if (forward) {
-                    linkHalf(c, overflowing, prev);
+                    linkHalf(c, overflowing, prev, nar);
                 }
 
 
@@ -65,14 +66,14 @@ public class DemoAttentionFlow extends AbstractNARGraphDemo {
         return Tuples.twin(first,last);
     }
 
-    private static void linkHalf(Concept prev, MutableFloat overflowing, Concept c) {
+    private static void linkHalf(Concept prev, MutableFloat overflowing, Concept c, NAR nar) {
         //the reverse
-        List<Termed> ct = c.termlinkTemplates();
+        List<TermTemplate> ct = c.termlinkTemplates();
         if (ct!=null) {
             if (!ct.contains(prev))
-                ct.add(prev);
+                ct.add(new TermTemplate(prev, 1f));
         }
-        AbstractConcept.linkTerm(c, prev, UnitBudget.Mid, 1f, false, overflowing);
+        AbstractConcept.linkTerm(c, prev, UnitBudget.Mid, 1f, false, overflowing, null, nar);
     }
 
     public static void main(String[] args)  {

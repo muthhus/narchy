@@ -128,7 +128,7 @@ public abstract class CollectorMap<K, V>  {
         map.clear();
     }
 
-    public final V get(K key) {
+    public final V get(@NotNull Object key) {
         return map.get(key);
     }
 

@@ -6,7 +6,6 @@ import nars.NAR;
 import nars.Symbols;
 import nars.guifx.NARfx;
 import nars.nar.Default;
-import nars.op.PrologCore;
 import nars.rover.Sim;
 import nars.rover.robot.Arm;
 import nars.rover.robot.NARover;
@@ -37,10 +36,12 @@ public class SomeRovers {
 
     public static final String eatFood = "eat:food";
     public static final String eatPoison = "eat:poison";
-    public static final String speedAngular = "speed:angular";
-    public static final String speedLinear = "speed:forward";
+    public static final String speedLeft = "speed:leftAngle";
+    public static final String speedRight = "speed:rightAngle";
+    public static final String speedFore = "speed:forward";
+    public static final String speedBack = "speed:backward";
 
-    public static final SimulatedClock clock = new SimulatedClock();
+    //public static final SimulatedClock clock = new SimulatedClock();
 
     public static void main(String[] args) {
 
@@ -91,7 +92,7 @@ public class SomeRovers {
     }
 
     public static Default newNAR() {
-        int conceptsFirePerCycle = 4;
+        int conceptsFirePerCycle = 32;
         Default nar = new Default(
                 //new Memory(clock, TermIndex.softMemory(64*1024)),
                 1200, conceptsFirePerCycle, 2, 3);
@@ -103,10 +104,10 @@ public class SomeRovers {
         /*PrologCore p = new PrologCore(nar);
         p.confThreshold.setValue(0.7f);*/
 
-        nar.input("$0.8$ ((?y <-> ^MotorControls) && ( ?y ==> ?x ))?");
-        nar.input("$0.8$ <?x ==> [food]>?");
-        nar.input("$0.8$ <food <-> poison>?");
-        nar.input("$0.8$ <[food] <-> [poison]>?");
+//        nar.input("$0.8$ ((?y <-> ^MotorControls) && ( ?y ==> ?x ))?");
+//        nar.input("$0.8$ <?x ==> [food]>?");
+//        nar.input("$0.8$ <food <-> poison>?");
+//        nar.input("$0.8$ <[food] <-> [poison]>?");
 
         nar.logSummaryGT(System.out, 0.7f);
 //        nar.log(Systenar.out, x -> {
@@ -121,7 +122,7 @@ public class SomeRovers {
         
         nar.DEFAULT_JUDGMENT_PRIORITY = 0.5f;
 //            nar.memory.DEFAULT_JUDGMENT_DURABILITY = 0.35f;
-        nar.DEFAULT_GOAL_PRIORITY = 0.6f;
+        nar.DEFAULT_GOAL_PRIORITY = 0.5f;
 //            nar.memory.DEFAULT_GOAL_DURABILITY = 0.7f;
         nar.DEFAULT_QUESTION_PRIORITY = 0.4f;
 
@@ -133,14 +134,14 @@ public class SomeRovers {
 
 
         //nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
-        nar.core.activationRate.setValue(0.75f);
+        nar.core.activationRate.setValue(0.15f);
 
 
         nar.duration.set(4);
         nar.conceptForgetDurations.setValue(4f);
-        nar.termLinkForgetDurations.setValue(16);
-        nar.taskLinkForgetDurations.setValue(12);
-        nar.cyclesPerFrame.set(4);
+        nar.termLinkForgetDurations.setValue(12);
+        nar.taskLinkForgetDurations.setValue(8);
+        nar.cyclesPerFrame.set(3);
         nar.shortTermMemoryHistory.set(3);
         nar.executionThreshold.setValue(0.01f);
 
@@ -171,8 +172,8 @@ public class SomeRovers {
                         new VBox(),
                         eatFood,
                         eatPoison,
-                        speedAngular,
-                        speedLinear
+                        speedLeft, speedRight,
+                        speedFore, speedBack
                 );
             });
         }
@@ -195,8 +196,8 @@ public class SomeRovers {
         nqSpine.power.setValue(0.25f);
 
 
-        nqSpine.input.addAll(nqSpine.getBeliefExpectations(
-                eatFood, eatPoison, speedAngular, speedLinear
+        nqSpine.input.addAll(nqSpine.getBeliefMotivations(
+                eatFood, eatPoison, speedLeft, speedRight, speedFore, speedBack
         ));
 
 

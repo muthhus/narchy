@@ -174,7 +174,7 @@ public class CurveBag<V> implements Bag<V> {
     }
 
     @Override
-    public BLink<V> get(@NotNull V key) {
+    public final BLink<V> get(@NotNull Object key) {
         return arrayBag.get(key);
     }
 
@@ -185,7 +185,7 @@ public class CurveBag<V> implements Bag<V> {
     }
 
     @Override
-    public BLink<V> remove(@NotNull V x) {
+    public final BLink<V> remove(@NotNull V x) {
         return arrayBag.remove(x);
     }
 

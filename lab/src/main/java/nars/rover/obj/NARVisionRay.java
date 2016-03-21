@@ -58,8 +58,9 @@ public class NARVisionRay extends VisionRay {
     @Override
     public void step(boolean feel, boolean drawing) {
 
-        if (angleConcept == null)
-            angleConcept = ((Default)nar).core.active.get(nar.concept(visionTerm));
+        if (angleConcept == null) {
+            angleConcept = ((Default) nar).core.active.get(visionTerm);
+        }
 
         if (angleConcept != null) {
             conceptPriority = 0.5f + 0.5f * angleConcept.pri();

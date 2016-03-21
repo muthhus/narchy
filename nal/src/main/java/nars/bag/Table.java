@@ -12,7 +12,7 @@ public interface Table<K,V> extends Iterable<V> {
     void clear();
 
     @Nullable
-    V get(@NotNull K key);
+    V get(@NotNull Object key);
 
     @Nullable
     Object remove(@NotNull K key);

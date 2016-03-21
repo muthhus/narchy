@@ -233,7 +233,7 @@ public class NarQ implements Consumer<NAR> {
         return true;
     }
 
-    public List<? extends DoubleSupplier> getBeliefExpectations(String... terms) {
+    public List<? extends DoubleSupplier> getBeliefMotivations(String... terms) {
         return Stream.of(nar.terms(terms)).map(t -> new BeliefMotivation(nar, t)).collect(Collectors.toList());
     }
 

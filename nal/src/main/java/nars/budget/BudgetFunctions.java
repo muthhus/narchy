@@ -26,6 +26,7 @@ import nars.bag.BLink;
 import nars.concept.ConceptProcess;
 import nars.nal.UtilityFunctions;
 import nars.task.Task;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Termlike;
@@ -251,12 +252,9 @@ public final class BudgetFunctions extends UtilityFunctions {
 
         BLink<? extends Task> taskLink = nal.taskLink;
 
-
-        Budgeted task = taskLink;
+        Task task = nal.task();
         if (task.isDeleted()) {
-            task = taskLink.get(); //if tasklink deleted, use the task
-            if (task.isDeleted()) //if the task is deleted, fail
-                return null;
+            return null;
         }
 
         //(taskLink !=null) ? taskLink :  nal.task().budget();
@@ -267,28 +265,23 @@ public final class BudgetFunctions extends UtilityFunctions {
         float durability = task.dur();
         float quality  = qualRaw;
 
-        float tasktermVol = nal.task().term().volume();
-        float derivedVol = derived.volume();
-        float volRatio = Math.min(1f, tasktermVol / derivedVol);
+        final Compound taskTerm = task.term();
+        int tasktermVol = taskTerm.volume();
+        int derivedVol = derived.volume();
+        float volRatio = tasktermVol / ( tasktermVol + derivedVol );
         durability *= volRatio;
         quality *= volRatio;
 
-        Term taskTerm = taskLink.get().term();
 
         BLink<? extends Termed> termLink = nal.termLink;
         if (!termLink.isDeleted()) {
-            priority = and(priority, termLink.pri()); //originally was OR, but this can explode because the result of OR can exceed the inputs
-            durability = or(durability, termLink.dur()); //originaly was 'AND'
-
-            //BudgetMerge.avgDQBlend.merge(target, termLink);
-            //priority *= complexityFactor;
 
 
             final float targetActivation = nal.conceptLink.pri();
             if (targetActivation >= 0) {
 
                 float sourceActivation =
-                        nal.nar.conceptPriority(taskTerm, 0);
+                        nal.nar.conceptPriority(task, 0);
                 //taskLink != null ? nar.conceptPriority(taskLink.get().concept(), 0) : 1f;
 
                 //https://groups.google.com/forum/#!topic/open-nars/KnUA43B6iYs
@@ -297,6 +290,15 @@ public final class BudgetFunctions extends UtilityFunctions {
                 //termLink.orPriority(or(quality, targetActivation));
                 termLink.orDurability(quality);
             }
+
+            priority = and(priority, termLink.pri()); //originally was OR, but this can explode because the result of OR can exceed the inputs
+
+            durability = or(durability, termLink.dur()); //originaly was 'AND'
+
+            //BudgetMerge.avgDQBlend.merge(target, termLink);
+
+        } else {
+            priority = 0;
         }
 
         return target.budget(priority, durability, quality);

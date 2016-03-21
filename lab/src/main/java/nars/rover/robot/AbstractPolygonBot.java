@@ -32,14 +32,14 @@ public abstract class AbstractPolygonBot extends Being {
 
 
 
-    static float linearDamping = 0.1f;
-    static float angularDamping = 0.1f;
+    static float linearDamping = 0.5f;
+    static float angularDamping = 0.5f;
     static float restitution = 0.9f; //bounciness
     static float friction = 0.75f;
 
     //final Deque<Vec2> positions = new ArrayDeque();
     protected final List<Sense> senses = new ArrayList();
-    public float linearThrustPerCycle = 50*5f;
+    public float linearThrustPerCycle = 15*5f;
     public float angularSpeedPerCycle = 15*0.7f;
     int mission = 0;
     //public float curiosity = 0.1f;
@@ -183,8 +183,8 @@ public abstract class AbstractPolygonBot extends Being {
         //torso.applyForceToCenter(new Vec2((float) Math.cos(angle) * force, (float) Math.sin(angle) * force));
         Vec2 v = new Vec2((float) Math.cos(angle) * force, (float) Math.sin(angle) * force);
         //torso.setLinearVelocity(v);
-        torso.applyForceToCenter(v);
-        //torso.applyLinearImpulse(v, torso.getWorldCenter(), true);
+        //torso.applyForceToCenter(v);
+        torso.applyLinearImpulse(v, torso.getWorldCenter(), true);
     }
 
     public void rotate(float v) {
