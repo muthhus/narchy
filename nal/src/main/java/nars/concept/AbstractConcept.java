@@ -41,9 +41,13 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
     public static final Logger logger = LoggerFactory.getLogger(AbstractConcept.class);
 
     /** returns the outgoing component only */
-    public static final BLink<Termed> linkTerm(@NotNull Concept source, @NotNull Concept target,
+    public static final BLink<Termed> linkTerm(@NotNull Concept source, @NotNull Termed targetTerm,
                                                @NotNull Budgeted b, float subScale, boolean alsoReverse,
-                                               @Nullable MutableFloat overflowing) {
+                                               @Nullable MutableFloat conceptOverflow,
+                                               @Nullable MutableFloat termlinkOverflow, NAR nar) {
+
+        Concept target = nar.conceptualize(targetTerm, b, subScale, conceptOverflow);
+        assert (target != null);
 
         /*if (logger.isDebugEnabled())
             logger.debug("TermLink: {} <//> {} ", source, target); */
@@ -57,12 +61,12 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
 
         /** activate local's termlink to template */
 
-        BLink<Termed> ol = source.termlinks().put(target, b, subScale, overflowing);
+        BLink<Termed> ol = source.termlinks().put(target, b, subScale, termlinkOverflow);
 
 
         /** activate (reverse) template's termlink to local */
         if (alsoReverse) {
-            /*BLink<Termed> il = */target.termlinks().put(source, b, subScale, overflowing);
+            /*BLink<Termed> il = */target.termlinks().put(source, b, subScale, termlinkOverflow);
         }
 
         return ol;
@@ -165,7 +169,7 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
     }
 
     /** atoms have no termlink templates, they are irreducible */
-    @Nullable @Override public abstract List<Termed> termlinkTemplates();
+    @Nullable @Override public abstract List<TermTemplate> termlinkTemplates();
 
     /**
      * when a task is processed, a tasklink

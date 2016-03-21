@@ -89,7 +89,7 @@ public class AtomConcept<E extends Atomic> extends AbstractConcept<E> implements
     }
 
     @Nullable @Override
-    public List<Termed> termlinkTemplates() {
+    public List<TermTemplate> termlinkTemplates() {
         return null;
     }
 

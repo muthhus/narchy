@@ -167,52 +167,52 @@ public final class BudgetFunctions extends UtilityFunctions {
 	 * (a - b); return (c >= 0) ? c : -c; }
 	 */
 
-	/* ----- Task derivation in LocalRules and SyllogisticRules ----- */
+//	/* ----- Task derivation in LocalRules and SyllogisticRules ----- */
+//
+//    /**
+//     * Forward logic result and adjustment
+//     *
+//     * @param truth The truth value of the conclusion
+//     * @return The budget value of the conclusion
+//     */
+//    @Nullable
+//    public static Budget forward(@NotNull Truth truth, @NotNull ConceptProcess nal) {
+//        return budgetInference(truthToQuality(truth), 1, nal);
+//    }
 
-    /**
-     * Forward logic result and adjustment
-     *
-     * @param truth The truth value of the conclusion
-     * @return The budget value of the conclusion
-     */
-    @Nullable
-    public static Budget forward(@NotNull Truth truth, @NotNull ConceptProcess nal) {
-        return budgetInference(truthToQuality(truth), 1, nal);
-    }
+//    /**
+//     * Backward logic result and adjustment, stronger case
+//     *
+//     * @param truth The truth value of the belief deriving the conclusion
+//     * @param nal   Reference to the memory
+//     * @return The budget value of the conclusion
+//     */
+//    @Nullable
+//    public static Budget backward(@NotNull Truth truth, @NotNull ConceptProcess nal) {
+//        return budgetInference(truthToQuality(truth), 1, nal);
+//    }
 
-    /**
-     * Backward logic result and adjustment, stronger case
-     *
-     * @param truth The truth value of the belief deriving the conclusion
-     * @param nal   Reference to the memory
-     * @return The budget value of the conclusion
-     */
-    @Nullable
-    public static Budget backward(@NotNull Truth truth, @NotNull ConceptProcess nal) {
-        return budgetInference(truthToQuality(truth), 1, nal);
-    }
-
-    /**
-     * Backward logic result and adjustment, weaker case
-     *
-     * @param truth The truth value of the belief deriving the conclusion
-     * @param nal   Reference to the memory
-     * @return The budget value of the conclusion
-     */
-    @Nullable
-    public static Budget backwardWeak(@NotNull Truth truth, @NotNull ConceptProcess nal) {
-        return budgetInference(w2c(1) * truthToQuality(truth), 1, nal);
-    }
+//    /**
+//     * Backward logic result and adjustment, weaker case
+//     *
+//     * @param truth The truth value of the belief deriving the conclusion
+//     * @param nal   Reference to the memory
+//     * @return The budget value of the conclusion
+//     */
+//    @Nullable
+//    public static Budget backwardWeak(@NotNull Truth truth, @NotNull ConceptProcess nal) {
+//        return budgetInference(w2c(1) * truthToQuality(truth), 1, nal);
+//    }
 
 	/* ----- Task derivation in CompositionalRules and StructuralRules ----- */
 
     @Nullable
     public static Budget compoundForward(@NotNull Budget target, @NotNull Truth truth,
-                                         @NotNull Termed content, @NotNull ConceptProcess nal) {
+                                         @NotNull Term content, @NotNull ConceptProcess nal) {
         return budgetInference(
                 target,
                 truthToQuality(truth),
-                content.term().complexity(),
+                content,
                 nal);
     }
 
@@ -223,58 +223,34 @@ public final class BudgetFunctions extends UtilityFunctions {
      * @return The budget of the conclusion
      */
     @Nullable
-    public static Budget compoundBackward(@NotNull Termed content, @NotNull ConceptProcess nal) {
-        return budgetInference(1.0f, content.term().complexity(), nal);
+    public static Budget compoundBackward(@NotNull Term content, @NotNull ConceptProcess nal) {
+        return budgetInference(1.0f, content, nal);
     }
 
-    /**
-     * Backward logic with CompoundTerm conclusion, weaker case
-     *
-     * @param content The content of the conclusion
-     * @param nal     Reference to the memory
-     * @return The budget of the conclusion
-     */
+//    /**
+//     * Backward logic with CompoundTerm conclusion, weaker case
+//     *
+//     * @param content The content of the conclusion
+//     * @param nal     Reference to the memory
+//     * @return The budget of the conclusion
+//     */
+//    @Nullable
+//    public static Budget compoundBackwardWeak(@NotNull Termlike content,
+//                                              @NotNull ConceptProcess nal) {
+//        return budgetInference(w2c(1), content.volume(), nal);
+//    }
+
     @Nullable
-    public static Budget compoundBackwardWeak(@NotNull Termlike content,
-                                              @NotNull ConceptProcess nal) {
-        return budgetInference(w2c(1), content.complexity(), nal);
+    static Budget budgetInference(float qual, Term derived, @NotNull ConceptProcess nal) {
+        return budgetInference(new UnitBudget(), qual, derived, nal);
     }
 
-    @Nullable
-    static Budget budgetInference(float qual, int complexity, @NotNull ConceptProcess nal) {
-        return budgetInference(new UnitBudget(), qual, complexity, nal);
-    }
-
-    /**
-     * Common processing for all logic step
-     *
-     * @param qual       Quality of the logic
-     * @param complexity Syntactic complexity of the conclusion
-     * @param nal        Reference to the memory
-     * @return Budget of the conclusion task
-     */
-    @Nullable
-    static Budget budgetInference(@NotNull Budget target, float qual, int complexity,
-                                  @NotNull ConceptProcess nal) {
-        //float complexityFactor = complexity > 1 ?
-
-        // sqrt factor (experimental)
-        // (float) (1f / Math.sqrt(Math.max(1, complexity))) //experimental,
-        // reduces dur and qua by sqrt of complexity (more slowly)
-
-        // linear factor (original)
-        //(1.0f / Math.max(1, complexity))
-
-        //: 1.0f;
-        float complexityFactor = 1f / Math.max(1, complexity);
-
-        return budgetInference(target, qual, complexityFactor, nal);
-    }
 
     @Nullable
-    static Budget budgetInference(@NotNull Budget target, float qualRaw, float complexityFactor, @NotNull ConceptProcess nal) {
+    static Budget budgetInference(@NotNull Budget target, float qualRaw, Term derived, @NotNull ConceptProcess nal) {
 
         BLink<? extends Task> taskLink = nal.taskLink;
+
 
         Budgeted task = taskLink;
         if (task.isDeleted()) {
@@ -291,17 +267,22 @@ public final class BudgetFunctions extends UtilityFunctions {
         float durability = task.dur();
         float quality  = qualRaw;
 
+        float tasktermVol = nal.task().term().volume();
+        float derivedVol = derived.volume();
+        float volRatio = Math.min(1f, tasktermVol / derivedVol);
+        durability *= volRatio;
+        quality *= volRatio;
+
         Term taskTerm = taskLink.get().term();
 
         BLink<? extends Termed> termLink = nal.termLink;
-        if (/*(termLink != null) && */(!termLink.isDeleted())) {
-            priority = or(priority, termLink.pri()); //originally was OR, but this can explode because the result of OR can exceed the inputs
-            durability = and(durability, termLink.dur()); //originaly was 'AND'
+        if (!termLink.isDeleted()) {
+            priority = and(priority, termLink.pri()); //originally was OR, but this can explode because the result of OR can exceed the inputs
+            durability = or(durability, termLink.dur()); //originaly was 'AND'
 
             //BudgetMerge.avgDQBlend.merge(target, termLink);
             //priority *= complexityFactor;
-            durability *= complexityFactor;
-            quality *= complexityFactor;
+
 
             final float targetActivation = nal.conceptLink.pri();
             if (targetActivation >= 0) {
@@ -355,7 +336,7 @@ public final class BudgetFunctions extends UtilityFunctions {
      * @return The budget of the conclusion
      */
     @Nullable
-    public static Budget compoundForward(@NotNull Truth truth, @NotNull Termed content, @NotNull ConceptProcess nal) {
+    public static Budget compoundForward(@NotNull Truth truth, @NotNull Term content, @NotNull ConceptProcess nal) {
         return compoundForward(new UnitBudget(), truth, content, nal);
     }
 

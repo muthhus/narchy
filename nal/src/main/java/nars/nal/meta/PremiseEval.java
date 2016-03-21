@@ -190,7 +190,7 @@ public class PremiseEval extends FindSubst {
 
     /** calculates Budget used in a derived task,
      *  returns null if invalid / insufficient */
-    public final Budget getBudget(@Nullable Truth truth, @NotNull Termed c) {
+    public final Budget getBudget(@Nullable Truth truth, @NotNull Term c) {
 
         ConceptProcess p = this.premise;
 

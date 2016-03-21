@@ -1,0 +1,32 @@
+package nars.concept;
+
+import nars.NAR;
+import nars.budget.UnitBudget;
+import nars.nar.Default;
+import nars.task.Task;
+import org.junit.Test;
+
+import java.util.List;
+
+import static org.junit.Assert.*;
+
+/**
+ * Created by me on 3/21/16.
+ */
+public class TermTemplateTest {
+
+    @Test
+    public void testTemplate1() {
+        NAR n = new Default();
+        Task t = n.inputTask("((($3-->(/,REPR,_,$4))&&($1-->(/,REPR,_,$2)))==>({($1,$2),($3,$4)}-->REPR)).");
+        n.step();
+        Concept c = t.concept(n);
+        List<TermTemplate> templates = c.termlinkTemplates();
+        assertEquals(7, templates.size());
+        assertEquals("REPR", templates.get(0).term.toString());
+        assertEquals(0.25f, templates.get(0).strength, 0.01f);
+        assertEquals(0.08f, templates.get(1).strength, 0.01f);
+
+    }
+
+}

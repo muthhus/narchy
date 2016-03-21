@@ -132,6 +132,11 @@ public abstract class AbstractTask extends UnitBudget
         updateEvidence();
     }
 
+    /** direct implementation, hopefully faster since it is frequently invoked */
+    @Override public final boolean isDeleted() {
+        return !Float.isFinite(priority);
+    }
+
     @Override
     public final Task normalize(@NotNull Memory memory) {
 

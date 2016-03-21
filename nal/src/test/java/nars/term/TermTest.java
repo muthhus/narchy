@@ -19,6 +19,7 @@ package nars.term;
 import nars.*;
 import nars.budget.UnitBudget;
 import nars.concept.Concept;
+import nars.io.NarseseTest;
 import nars.nar.Default;
 import nars.nar.Terminal;
 import nars.task.Task;
@@ -479,8 +480,7 @@ public class TermTest {
     }
 
     @Test public void invalidStatement() {
-        assertNull($("<b-->(&,a,b)>"));
-        assertNull($("<(&,a,b)-->b>"));
+        NarseseTest.assertParseException("<b-->(&,a,b)>","<(&,a,b)-->b>");
         assertNotNull($("<c-->(&,a,b)>"));
     }
 
@@ -814,13 +814,7 @@ public class TermTest {
         assertFalse( $("a:b").op().isSet() );
     }
 
-    @Test public void testEmptySetEquality()  {
-        assertEquals( null, $("{}"));
-        assertEquals( null, $("[]"));
-
-        assertEquals( $("{}"),$("{}") );
-        assertEquals( $("[]"),$("[]") );
-
+    @Test public void testEmptyProductEquality()  {
         assertEquals( $("()"),$("()") );
         assertEquals( $("()"),Terms.ZeroProduct);
     }

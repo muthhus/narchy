@@ -86,7 +86,7 @@ public class NARover extends AbstractPolygonBot {
             return Util.sigmoid(speed);
         };
 
-        Term speedForward = nar.term("speed:forward");
+        Termed speedForward = nar.term("speed:forward");
         //Term speedBackward = nar.term("speed:backward");
         Vec2 forwardVec = new Vec2(1,0f);
         Vec2 tmp = new Vec2(), tmp2 = new Vec2();
@@ -106,7 +106,7 @@ public class NARover extends AbstractPolygonBot {
                 .maxTimeBetweenUpdates(maxUpdateTime)
                 .pri(0.25f);
 
-        Term speedLeft = nar.term("speed:angular");
+        Termed speedLeft = nar.term("speed:angular");
         FloatFunction<Term> angleSpeed = (t) -> torso.getAngularVelocity() / 2f;
         leftSpeed = new Sensor(nar, speedLeft, angleSpeed, sigmoid)
                 .maxTimeBetweenUpdates(maxUpdateTime)

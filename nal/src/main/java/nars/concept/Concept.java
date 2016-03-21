@@ -253,7 +253,8 @@ public interface Concept extends Termed, Comparable {
         out.println('\n');
     }
 
-    @Nullable List<Termed> termlinkTemplates();
+    @Nullable
+    List<TermTemplate> termlinkTemplates();
 
     @NotNull
     default Iterator<Task> iterateTasks(boolean onbeliefs, boolean ongoals, boolean onquestions, boolean onquests) {

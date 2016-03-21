@@ -138,7 +138,7 @@ public enum Forget { ;
 
     /** exponential decay in proportion to time since last forget.
      *  provided by TonyLo as used in the ALANN system. */
-    public static class ExpForget<X> extends AbstractForget<X> {
+    public final static class ExpForget<X> extends AbstractForget<X> {
 
         public ExpForget(@NotNull NAR nar, @NotNull MutableFloat forgetTime, @NotNull MutableFloat perfection) {
             super(nar, forgetTime, perfection);
@@ -152,22 +152,24 @@ public enum Forget { ;
             final long currentTime = now;
 
             long dt = budget.setLastForgetTime(currentTime);
-            if (dt == 0) return ; //too soon to update
+            if (dt > 0) { //dt=0 means too soon to update
+                forget(budget, dt);
+            }
 
-            float currentPriority = budget.priIfFiniteElseZero();
+        }
 
-            float relativeThreshold = perfectionCached;
+        private void forget(@NotNull BLink<? extends X> budget, long dt) {
+            float p = budget.priIfFiniteElseZero();
 
-            float expDecayed = currentPriority * (float) Math.exp(
-                    -((1.0f - budget.dur()) / forgetCyclesCached) * dt
-            );
-            float threshold = budget.qua() * relativeThreshold;
+            float threshold = budget.qua() * perfectionCached;
+            if (p > threshold) {
+                //Exponential decay
+                p *= (float) Math.exp(
+                        -((1.0f - budget.dur()) / forgetCyclesCached) * dt
+                );
+            }
 
-            float nextPriority = expDecayed;
-            if (nextPriority < threshold) nextPriority = threshold;
-
-            budget.setPriority(nextPriority);
-
+            budget.setPriority(Math.max(threshold, p));
         }
 
     }

@@ -409,8 +409,9 @@ public class TestNAR  {
         //explainable(t);
         return this;
     }
-    public void askAt(int i, String term) {
+    public TestNAR askAt(int i, String term) {
         nar.inputAt(i, term + "?");
+        return this;
     }
 
 

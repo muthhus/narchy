@@ -7,6 +7,7 @@ import nars.Symbols;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
 
@@ -41,18 +42,18 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
 
     final static FloatToFloatFunction direct = n -> n;
 
-    public Sensor(@NotNull NAR n, Term t, FloatFunction<Term> value) {
+    public Sensor(@NotNull NAR n, Termed  t, FloatFunction<Term> value) {
         this(n, t, value, direct);
     }
 
-    public Sensor(@NotNull NAR n, Term t, FloatFunction<Term> value, FloatToFloatFunction valueToFreq) {
+    public Sensor(@NotNull NAR n, Termed  t, FloatFunction<Term> value, FloatToFloatFunction valueToFreq) {
         this(n, t, value, valueToFreq, n.getDefaultConfidence(Symbols.BELIEF),
                 n.DEFAULT_JUDGMENT_PRIORITY, n.DEFAULT_JUDGMENT_DURABILITY);
     }
 
-    public Sensor(@NotNull NAR n, Term t, FloatFunction<Term> value, FloatToFloatFunction valueToFreq, float conf, float pri, float dur) {
+    public Sensor(@NotNull NAR n, Termed t, FloatFunction<Term> value, FloatToFloatFunction valueToFreq, float conf, float pri, float dur) {
         this.nar = n;
-        this.term = t;
+        this.term = t.term();
         n.onFrame(this);
         this.value = value;
         this.freq = valueToFreq;

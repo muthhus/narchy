@@ -4,7 +4,6 @@ import nars.Memory;
 import nars.NAR;
 import nars.Op;
 import nars.Symbols;
-import nars.bag.BLink;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
 import nars.concept.util.*;
@@ -44,7 +43,7 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
      */
 
     @Nullable
-    private List<Termed> termLinkTemplates;
+    private List<TermTemplate> termLinkTemplates;
 
     @Nullable
     protected QuestionTable questions;
@@ -628,57 +627,46 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
         if (super.link(b, scale, minScale, nar, conceptOverflow)) {
 
             //3. Link the termlink templates
-            List<Termed> templates = termlinkTemplates();
+            List<TermTemplate> templates = termlinkTemplates();
             if (templates == null) {
-                templates = this.termLinkTemplates = TermLinkBuilder.build(this, nar);
+                templates = this.termLinkTemplates = TermLinkBuilder.build(term, nar);
             }
 
-            float subScale;
-            int numTemplates = templates.size();
-            switch (numTemplates) {
-                case 0: return true;
-                //case 1: subScale = 0.5f; break; //HACK
-                default:
-                    subScale = scale / numTemplates;
-            }
+//            float subScale;
+//            int numTemplates = templates.size();
+//            switch (numTemplates) {
+//                case 0: return true;
+//                //case 1: subScale = 0.5f; break; //HACK
+//                default:
+//                    subScale = scale / numTemplates;
+//            }
 
-            if (subScale >= minScale) {
+            /*if (subScale >= minScale)*/ {
                 MutableFloat subConceptOverflow = new MutableFloat(/*0*/);
 
                 //int numUnder = 0;
 
-                for (int i = 0; i < numTemplates; i++) {
-                    Concept target = nar.conceptualize(templates.get(i), b, subScale, subConceptOverflow);
-                    assert(target!=null);
+                for (int i = 0, templatesSize = templates.size(); i < templatesSize; i++) {
+                    TermTemplate tt = templates.get(i);
+                    float subScale = scale * tt.strength;
 
                     //Link the peer termlink bidirectionally
-                    BLink<Termed> link = linkTerm(this, target, b, subScale, true, null);
-
-
-                    //float overAfter = overflow.floatValue();
-                    //if (overAfter )
-                    /*if (overflow == 0) {
-                        numUnder++;
-                    } else {
-                        sumOver += overflow;
-                    }*/
+                    if (subScale > minScale) //TODO use a min bound to prevent the iteration ahead of time
+                        linkTerm(this, tt.term, b, subScale, true, subConceptOverflow, null, nar);
                 }
 
 
                 float scOver = subConceptOverflow.floatValue();
-                if (scOver > 0) {
+                if (scOver > minScale) {
+                    // recursive overflow accumulated to callee's overflow
 
-                    //Simple method: just dispense a proportion of the overflow to all template concepts equally
-                    float overScale = scOver / (b.pri() * scale) / numTemplates;
 
-                    for (int n = 0; n < numTemplates; n++) {
-                        nar.conceptualize(templates.get(n), b, overScale, conceptOverflow /* recursive overflow accumulated to callee's overflow */);
-
-                        Concept target = nar.conceptualize(templates.get(n), b, overScale, conceptOverflow);
-                        assert(target!=null);
-
-                        //Link the peer termlink bidirectionally
-                        BLink<Termed> link = linkTerm(this, target, b, overScale, true, null);
+                    //Simple method: just dispense equal proportion of the overflow to all template concepts equally
+                    for (int i = 0, templatesSize = templates.size(); i < templatesSize; i++) {
+                        TermTemplate tt = templates.get(i);
+                        float subScale = scOver * tt.strength;
+                        if (subScale > minScale)
+                            linkTerm(this, tt.term, b, subScale, true, conceptOverflow, null, nar);
                     }
 
                     //TODO More fair method:
@@ -722,7 +710,7 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
 
 
     @Nullable @Override
-    public List<Termed> termlinkTemplates() {
+    public final List<TermTemplate> termlinkTemplates() {
         return termLinkTemplates;
     }
 

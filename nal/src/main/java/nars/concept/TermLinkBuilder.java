@@ -1,5 +1,6 @@
 package nars.concept;
 
+import com.gs.collections.impl.bag.mutable.HashBag;
 import nars.Global;
 import nars.NAR;
 import nars.Op;
@@ -7,12 +8,10 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.variable.Variable;
-import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 
 public enum TermLinkBuilder {
@@ -28,11 +27,21 @@ public enum TermLinkBuilder {
 //    protected float forgetCycles;
 //    protected long now;
 
-    public static @NotNull List<Termed> build(@NotNull Termed<Compound> host, @NotNull NAR nar) {
-        Set<Termed> components = Global.newHashSet(0);
-        prepareComponentLinks(host.term(), components, nar);
+    public static @NotNull List<TermTemplate> build(@NotNull Compound host, @NotNull NAR nar) {
+        //TODO use a MultiSet or Bag to count # of occurrences of components, in case there are repeats,
+        //these should be weighted stronger. requires a new termlink template class like Pair<Term,Float> to include a weight
 
-        return new FasterList(components);
+        HashBag<Termed> components = new HashBag(host.complexity());
+        //List<Termed> components = Global.newArrayList(0);
+
+        visitComponents(host, components, nar);
+
+        int num = components.sizeDistinct();
+        float total = components.size();
+
+        List<TermTemplate> x = Global.newArrayList(num);
+        components.forEachWithOccurrences((t,n) -> x.add(new TermTemplate(t,n/total)));
+        return x;
     }
 
     static final int NegationOrConjunction = Op.or(Op.CONJUNCTION, Op.NEGATE);
@@ -45,7 +54,7 @@ public enum TermLinkBuilder {
      * @param t          The CompoundTerm for which to build links
      * @param components set of components being accumulated, to avoid duplicates
      */
-    static void prepareComponentLinks(@NotNull Compound t, @NotNull Collection<Termed> components, @NotNull NAR nar) {
+    private static void visitComponents(@NotNull Compound t, @NotNull Collection<Termed> components, @NotNull NAR nar) {
 
         ///** add self link for structural transform: */
         //components.add(t);
@@ -67,7 +76,7 @@ public enum TermLinkBuilder {
             if ((tEquivalence || (tImplication && (i == 0))) &&
                 (ti.isAnyOf(NegationOrConjunction))) {
 
-                prepareComponentLinks((Compound) ti, components, nar);
+                visitComponents((Compound) ti, components, nar);
 
             } else if (ti instanceof Compound) {
                 Compound cti = (Compound) ti;

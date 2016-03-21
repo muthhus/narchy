@@ -325,81 +325,81 @@ public abstract class AbstractPolygonBot extends Being {
 //            //System.out.println(t);
 //        }
 //    }
-
-    public abstract static class CycleDesire extends FrameReaction {
-
-        private final ConceptDesire desireFunction;
-        private final Term term;
-        private final NAR nar;
-        transient private Concept concept;
-        boolean feedbackEnabled = true;
-        float threshold = 0f;
-
-        /** budget to apply if the concept is not active */
-        //private final Budget remember = new UnitBudget(0.5f, Symbols.GOAL, new DefaultTruth(1.0f, 0.9f));
-
-        public CycleDesire(String term, ConceptDesire desireFunction, NAR nar) {
-            this(desireFunction, nar.term(term), nar);
-        }
-
-        public CycleDesire(ConceptDesire desireFunction, Term term, NAR nar) {
-            super(nar);
-            this.desireFunction = desireFunction;
-            this.nar = nar;
-            this.term = term;
-        }
-
-        @Override
-        public String toString() {
-            return getClass().getSimpleName() + '[' + concept + ']';
-        }
-
-//        public void setFeedback(boolean feedback) {
-//            this.feedbackEnabled = feedback;
+//
+//    public abstract static class CycleDesire extends FrameReaction {
+//
+//        private final ConceptDesire desireFunction;
+//        private final Term term;
+//        private final NAR nar;
+//        transient private Concept concept;
+//        boolean feedbackEnabled = true;
+//        float threshold = 0f;
+//
+//        /** budget to apply if the concept is not active */
+//        //private final Budget remember = new UnitBudget(0.5f, Symbols.GOAL, new DefaultTruth(1.0f, 0.9f));
+//
+//        public CycleDesire(String term, ConceptDesire desireFunction, NAR nar) {
+//            this(desireFunction, nar.term(term), nar);
 //        }
-
-        public float getDesireIfConceptMissing() { return 0; }
-
-        /** @return feedback belief value, or Float.NaN to not apply it */
-        abstract float onFrame(float desire);
-
-        @Override
-        public void onFrame() {
-
-            Concept c = getConcept();
-
-            if (c != null) {
-                float d = desireFunction.getDesire(c);
-
-                if (d > threshold) {
-                    float feedback = onFrame(d);
-
-                    if (feedbackEnabled && Float.isFinite(feedback))
-                        nar.input(getFeedback(feedback));
-                }
-            }
-            else {
-                onFrame(getDesireIfConceptMissing());
-            }
-
-        }
-
-        public Task getFeedback(float feedback) {
-            //since it's expectation, using 0.99 conf is like preserving the necessary truth as was desired, if feedback = desire
-            return new MutableTask(term).present(nar).belief().truth(feedback, 0.9f);
-        }
-
-        public Concept getConcept() {
-
-            if (concept == null) {
-                concept = nar.concept(term);
-            }
-
-
-            return concept;
-        }
-    }
-
+//
+//        public CycleDesire(ConceptDesire desireFunction, Term term, NAR nar) {
+//            super(nar);
+//            this.desireFunction = desireFunction;
+//            this.nar = nar;
+//            this.term = term;
+//        }
+//
+//        @Override
+//        public String toString() {
+//            return getClass().getSimpleName() + '[' + concept + ']';
+//        }
+//
+////        public void setFeedback(boolean feedback) {
+////            this.feedbackEnabled = feedback;
+////        }
+//
+//        public float getDesireIfConceptMissing() { return 0; }
+//
+//        /** @return feedback belief value, or Float.NaN to not apply it */
+//        abstract float onFrame(float desire);
+//
+//        @Override
+//        public void onFrame() {
+//
+//            Concept c = getConcept();
+//
+//            if (c != null) {
+//                float d = desireFunction.getDesire(c);
+//
+//                if (d > threshold) {
+//                    float feedback = onFrame(d);
+//
+//                    if (feedbackEnabled && Float.isFinite(feedback))
+//                        nar.input(getFeedback(feedback));
+//                }
+//            }
+//            else {
+//                onFrame(getDesireIfConceptMissing());
+//            }
+//
+//        }
+//
+//        public Task getFeedback(float feedback) {
+//            //since it's expectation, using 0.99 conf is like preserving the necessary truth as was desired, if feedback = desire
+//            return new MutableTask(term).present(nar).belief().truth(feedback, 0.9f);
+//        }
+//
+//        public Concept getConcept() {
+//
+//            if (concept == null) {
+//                concept = nar.concept(term);
+//            }
+//
+//
+//            return concept;
+//        }
+//    }
+//
 
 
     @FunctionalInterface

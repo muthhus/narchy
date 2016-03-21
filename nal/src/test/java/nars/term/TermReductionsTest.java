@@ -2,6 +2,7 @@ package nars.term;
 
 import nars.$;
 import nars.Op;
+import nars.io.NarseseTest;
 import nars.term.container.TermContainer;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -66,7 +67,7 @@ public class TermReductionsTest {
 
     }
     @Test public void testIntersectIntReductionToZero() {
-        assertEquals(null /* emptyset*/, $("(|,{P,Q},{R,S})"));
+        NarseseTest.assertParseException("(|,{P,Q},{R,S})");
     }
 
     @Test public void testIntersectIntReduction_to_one() {
@@ -80,23 +81,23 @@ public class TermReductionsTest {
 
         assertNull(equiv( impl(p, q), r) );
         assertNull(equiv( equiv(p, q), r) );
-        assertNull($("<<a <=> b> <=> c>"));
+        NarseseTest.assertParseException("<<a <=> b> <=> c>");
     }
 
     @Test public void testReducedAndInvalidImplications1() {
-        assertNull($("<<P<=>Q> ==> R>"));
+        NarseseTest.assertParseException("<<P<=>Q> ==> R>");
     }
     @Test public void testReducedAndInvalidImplications5() {
-        assertNull($("<<P==>Q> ==> R>"));
+        NarseseTest.assertParseException("<<P==>Q> ==> R>");
     }
     @Test public void testReducedAndInvalidImplications6() {
-        assertNull($("<R ==> <P<=>Q>>"));
+        NarseseTest.assertParseException("<R ==> <P<=>Q>>");
     }
     @Test public void testReducedAndInvalidImplications2() {
         assertEquals("((P&&R)==>Q)", $("<R==><P==>Q>>").toString());
     }
     @Test public void testReducedAndInvalidImplications3() {
-        assertNull($("<R==><P==>R>>"));
+        NarseseTest.assertParseException("<R==><P==>R>>");
     }
     @Test public void testReducedAndInvalidImplications4() {
         assertEquals("(R==>P)", $("<R==><R==>P>>").toString());

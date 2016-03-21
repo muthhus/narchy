@@ -175,7 +175,7 @@ abstract public class ConceptProcess implements Premise {
         if (!complete(derived))
             return;
 
-        //--------- TASK WAS DERIVED if it reaches here
+        //ETERNALIZE:
 
         if (derivedTemporal && (truth != null) && d.eternalize) {
 
