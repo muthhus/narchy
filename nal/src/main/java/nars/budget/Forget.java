@@ -146,27 +146,23 @@ public enum Forget { ;
 
         @Override
         public void accept(@NotNull BLink<? extends X> budget) {
-            // priority * e^(-lambda*t)
-            //     lambda is (1 - durabilty) / forgetPeriod
-            //     dt is the delta
-            final long currentTime = now;
-
-            long dt = budget.setLastForgetTime(currentTime);
-            if (dt > 0) { //dt=0 means too soon to update
-                forget(budget, dt);
-            }
-
+            forget(budget, budget.setLastForgetTime(now));
         }
 
         private void forget(@NotNull BLink<? extends X> budget, long dt) {
-            float p = budget.priIfFiniteElseZero();
 
+            float p = budget.priIfFiniteElseZero();
             float threshold = budget.qua() * perfectionCached;
+
             if (p > threshold) {
-                //Exponential decay
-                p *= (float) Math.exp(
-                        -((1.0f - budget.dur()) / forgetCyclesCached) * dt
-                );
+                if (dt > 0) {
+                    //Exponential decay
+                    p *= (float) Math.exp(
+                            -((1.0f - budget.dur()) / forgetCyclesCached) * dt
+                    );
+                } else {
+                    return; //no change necessary
+                }
             }
 
             budget.setPriority(Math.max(threshold, p));

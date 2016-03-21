@@ -50,7 +50,7 @@ public final class ShuffledSubterms extends ShuffledPermutations implements Term
         return srcsubs.size();
     }
 
-    @Nullable
+    @NotNull
     @Override
     public Term term(int i) {
         return srcsubs.term(super.get(i));

@@ -66,7 +66,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
         this.relation = relation;
 
-        this.hash = Util.hashCombine(this.subterms.hashCode(), opRel(), dt);
+        this.hash = Util.hashCombine(subterms.hashCode(), opRel(), dt);
     }
 
     @Override

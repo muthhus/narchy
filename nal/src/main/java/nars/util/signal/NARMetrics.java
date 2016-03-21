@@ -33,7 +33,7 @@ public class NARMetrics extends FrameReaction {
 //        if (n.memory.resource!=null)
 //            metrics.add(new FirstOrderDifference(metrics, n.memory.resource.CYCLE_RAM_USED.id()));
 
-        metrics.addViaReflection(n.logic);
+        metrics.addViaReflection(n.emotion);
     }
 
     @Override

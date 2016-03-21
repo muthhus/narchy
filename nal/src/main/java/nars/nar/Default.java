@@ -437,7 +437,7 @@ public class Default extends AbstractNAR {
 
 
         @NotNull
-        @Range(min = 0, max = 1f, unit = "Perfection")
+        @Deprecated @Range(min = 0, max = 1f, unit = "Perfection")
         public final MutableFloat perfection;
 
         final List<BLink<Concept>> firing = Global.newArrayList(1);

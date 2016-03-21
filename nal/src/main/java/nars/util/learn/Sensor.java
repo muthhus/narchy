@@ -22,7 +22,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
     /**
      * resolution of the output freq value
      */
-    float freqResolution = 0.1f;
+    float resolution = 0.1f;
 
     private final Term term;
     private final FloatFunction<Term> value;
@@ -97,7 +97,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
 
 
 
-        float f = Util.round(fRaw, freqResolution);
+        float f = Util.round(fRaw, resolution);
         if (inputIfSame || (f != prevF) || (maxTimeBetweenUpdates !=0 && timeSinceLastInput>= maxTimeBetweenUpdates)) {
             if (minTimeBetweenUpdates!=0 && timeSinceLastInput >= minTimeBetweenUpdates) {
                 Task t = input(f);
@@ -110,13 +110,27 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
         //this.prevValue = next;
     }
 
-    public void setFreqResolution(float freqResolution) {
-        this.freqResolution = freqResolution;
+    public Sensor resolution(float r) {
+        this.resolution = r;
+        return this;
     }
 
     @NotNull
-    private Task input(float f) {
-        Task t = new MutableTask(term).belief().truth(f, conf).present(nar.time()).budget(pri, dur);
+    private Task input(float v) {
+        float f, c;
+        if (v < 0.5f) {
+            f = 0f;
+            c = (0.5f - v)*(2f * conf);
+        } else {
+            f = 1f;
+            c = (v - 0.5f)*(2f * conf);
+        }
+
+
+        Task t = new MutableTask(term).belief()
+                //.truth(v, conf)
+                .truth(f, c)
+                .present(nar.time()).budget(pri, dur);
         nar.input(t);
         return t;
     }

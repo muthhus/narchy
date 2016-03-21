@@ -40,7 +40,7 @@ abstract public class VisionRay implements AbstractPolygonBot.Sense, LayerDraw {
 
     final RayDrawer[] rayDrawers;
 
-    float biteDistanceThreshold = 0.025f;
+    float biteDistanceThreshold = 0.03f;
     private boolean eats;
     protected Body hitNext;
 
@@ -62,7 +62,7 @@ abstract public class VisionRay implements AbstractPolygonBot.Sense, LayerDraw {
         this.resolution = resolution;
         this.rayDrawers = new RayDrawer[resolution]; /** one for each sub-pixel */
         for (int i = 0; i < resolution; i++)
-            rayDrawers[i] = new RayDrawer(base.getWorld(), i, angle, arc/resolution);
+            rayDrawers[i] = new RayDrawer(base.getWorld(), i, angle, arc);
 
         sparkColor = new Color3f(0.5f, 0.4f, 0.4f);
         normalColor = new Color3f(0.2f, 0.2f, 0.2f);
@@ -163,7 +163,7 @@ abstract public class VisionRay implements AbstractPolygonBot.Sense, LayerDraw {
             this.dArc = dArc;
             this.world = world;
             this.id = id;
-            float da = (-arc / 2f) + dArc * id;
+            float da = /*(-arc / 2f) +*/ dArc * id;
             this.targetAngle = da + angle + baseAngle;
         }
 

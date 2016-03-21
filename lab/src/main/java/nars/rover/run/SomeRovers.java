@@ -92,7 +92,7 @@ public class SomeRovers {
     }
 
     public static Default newNAR() {
-        int conceptsFirePerCycle = 32;
+        int conceptsFirePerCycle = 16;
         Default nar = new Default(
                 //new Memory(clock, TermIndex.softMemory(64*1024)),
                 1200, conceptsFirePerCycle, 2, 3);
@@ -109,7 +109,7 @@ public class SomeRovers {
 //        nar.input("$0.8$ <food <-> poison>?");
 //        nar.input("$0.8$ <[food] <-> [poison]>?");
 
-        nar.logSummaryGT(System.out, 0.7f);
+        nar.logSummaryGT(System.out, 0.6f);
 //        nar.log(Systenar.out, x -> {
 //            if (x instanceof Task) {
 //                Task t = (Task)x;
@@ -134,7 +134,7 @@ public class SomeRovers {
 
 
         //nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
-        nar.core.activationRate.setValue(0.15f);
+        nar.core.activationRate.setValue(0.65f);
 
 
         nar.duration.set(4);
@@ -228,17 +228,17 @@ public class SomeRovers {
 
         Vec2 front = new Vec2(2.7f, 0);
         r.addEyeWithMouth(r, "n", nqSpine, r.torso, 7, 3, front,
-                0.2f, pi/4, dist, pi / 6f);
+                0.5f, 0, dist, 0.2f);
 
 
         //nearsight
-        r.addEye(r, "f", nqSpine, r.torso, 3, 5, front,
-                0.2f, pi/4f, dist/3f, (e) -> {
+        r.addEye(r, "f", nqSpine, r.torso, 5, 3, front,
+                1.25f, 0, dist/2f, (e) -> {
                 });
 
-        //farsight report http://farsight.org/
-        r.addEye(r, "f", nqSpine, r.torso, 5, 6, new Vec2(-0.5f, 0),
-                0.2f, -(pi/2f)+pi/4f, dist/2f, (e) -> {
+        //reverse
+        r.addEye(r, "f", nqSpine, r.torso, 5, 3, new Vec2(-0.5f, 0),
+                1.25f, pi/2f, dist/2f, (e) -> {
         });
 
 

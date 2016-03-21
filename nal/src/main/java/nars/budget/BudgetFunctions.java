@@ -250,12 +250,14 @@ public final class BudgetFunctions extends UtilityFunctions {
     @Nullable
     static Budget budgetInference(@NotNull Budget target, float qualRaw, Term derived, @NotNull ConceptProcess nal) {
 
-        BLink<? extends Task> taskLink = nal.taskLink;
+        //BLink<? extends Task> taskLink = nal.taskLink;
 
+
+        Budgeted taskLink = nal.taskLink;
+        assert(!taskLink.isDeleted());
+        //if (task.isDeleted()) return null;
         Task task = nal.task();
-        if (task.isDeleted()) {
-            return null;
-        }
+
 
         //(taskLink !=null) ? taskLink :  nal.task().budget();
 
@@ -265,40 +267,36 @@ public final class BudgetFunctions extends UtilityFunctions {
         float durability = task.dur();
         float quality  = qualRaw;
 
+
         final Compound taskTerm = task.term();
         int tasktermVol = taskTerm.volume();
         int derivedVol = derived.volume();
-        float volRatio = tasktermVol / ( tasktermVol + derivedVol );
+        float volRatio = tasktermVol / ((float)( tasktermVol + derivedVol ));
         durability *= volRatio;
         quality *= volRatio;
 
 
         BLink<? extends Termed> termLink = nal.termLink;
-        if (!termLink.isDeleted()) {
+        assert(!termLink.isDeleted());
+        {
+            priority = and(priority, termLink.pri()); //originally was OR, but this can explode because the result of OR can exceed the inputs
+            durability = and(durability, termLink.dur()); //originaly was 'AND'
 
 
-            final float targetActivation = nal.conceptLink.pri();
-            if (targetActivation >= 0) {
-
-                float sourceActivation =
-                        nal.nar.conceptPriority(task, 0);
-                //taskLink != null ? nar.conceptPriority(taskLink.get().concept(), 0) : 1f;
+            //Strengthen the termlink by the quality and termlink's & tasklink's concepts
+            {
+                final float targetActivation = nal.nar.conceptPriority(nal.termLink.get(), 0f);
+                final float sourceActivation = nal.nar.conceptPriority(nal.taskLink.get(), 0f);
 
                 //https://groups.google.com/forum/#!topic/open-nars/KnUA43B6iYs
-                termLink.orPriority(or(quality, and(sourceActivation, targetActivation)));
-                //was
-                //termLink.orPriority(or(quality, targetActivation));
+                termLink.orPriority(or(quality, and(sourceActivation, targetActivation))); //was: termLink.orPriority(or(quality, targetActivation));
                 termLink.orDurability(quality);
             }
 
-            priority = and(priority, termLink.pri()); //originally was OR, but this can explode because the result of OR can exceed the inputs
 
-            durability = or(durability, termLink.dur()); //originaly was 'AND'
 
             //BudgetMerge.avgDQBlend.merge(target, termLink);
 
-        } else {
-            priority = 0;
         }
 
         return target.budget(priority, durability, quality);

@@ -391,36 +391,34 @@ public class NARover extends AbstractPolygonBot {
     }
     public void addEyeWithMouth(Being b, String id, NarQ controller, Body base, int pixels, int detail, Vec2 center, float arc, float centerAngle, float distance, float mouthArc) {
         addEye(b, id, controller, base, pixels, detail, center, arc, centerAngle, distance, (v) -> {
-            float angle = v.angle;
-            v.setEats(((angle < mouthArc / 2f) || (angle > (Math.PI * 2f) - mouthArc / 2f)));
+            //float angle = v.angle;
+            v.setEats(true);
+                    //((angle < mouthArc / 2f) || (angle > (Math.PI * 2f) - mouthArc / 2f)));
         });
     }
 
     public void addEye(Being b, String id, NarQ controller, Body base, int pixels, int detail, Vec2 center,
                        float arc, float centerAngle, float distance, Consumer<VisionRay> each) {
 
-        final float twoPi = (float)Math.PI * 2f;
+        //final float twoPi = (float)Math.PI * 2f;
         float aStep = arc/pixels;
 
-        float startAngle = centerAngle - twoPi * arc;
+        float startAngle = centerAngle - arc/2;
 
         //final MutableFloat servo = new MutableFloat();
 
-        for (int i = 0; i < pixels; i++) {
-            final float angle = startAngle + twoPi * (aStep * i);
 
-            NARVisionRay v = new NARVisionRay(id + i, nar, base, center, angle, arc,
-                    detail, distance, 1f/pixels);
+
+        for (int i = 0; i < pixels; i++) {
+            final float angle = (startAngle + (aStep * i));
+
+            NARVisionRay v = new NARVisionRay(id + i, nar, base, center, angle, aStep,
+                    detail, distance);
 
 
 //                  @Override public float getLocalAngle () {
 //                      return 0.5f * (float)Math.sin(servo.floatValue()); //controller.get();
 //                  }
-
-
-
-
-
 
             each.accept(v);
 
@@ -428,17 +426,21 @@ public class NARover extends AbstractPolygonBot {
 
                 DoubleSupplier value = () -> {
                     if (v.hit(material)) {
-                        return 0.5f + 0.5f*(1f - v.seenDist); //closer = larger number (up to 1.0)
+                        float x = 0.5f + 0.45f * (1f - v.seenDist); //closer = larger number (up to 1.0)
+                        return x;
                     }
                     return 0; //nothing seen within the range
                 };
 
-                Sensor visionSensor = new Sensor(nar, $.prop(v.visionTerm, $.the(material)),
-                        (t) -> (float) value.getAsDouble(), (x) ->
-                        x == 0 ? 0 :
-                            (0.5f + 0.5f * x)
-                );
-                visionSensor.setFreqResolution(0.05f);
+                Sensor visionSensor = new Sensor(nar,
+
+                        //$.prop(v.visionTerm, $.the(material)),
+                        //$.p(v.visionTerm, $.the(material)),
+                        $.imageInt(1, v.visionTerm, $.the(material)),
+
+                        (t) -> (float) value.getAsDouble()
+
+                ).resolution(0.05f).minTimeBetweenUpdates(1).maxTimeBetweenUpdates(8).pri(0.25f);
 
                 controller.input.add(value);
             }

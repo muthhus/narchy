@@ -45,8 +45,8 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
 
     /** tests if subterm i is op o */
     default boolean term(int i, @NotNull Op o) {
-        @Nullable T ti = term(i);
-        return ti!=null && (ti.op() == o);
+        T ti = term(i);
+        return /*ti!=null && */(ti.op() == o);
     }
 
     @Nullable

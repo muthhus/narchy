@@ -150,7 +150,7 @@ public final class BLink<X> extends Budget implements Link<X> {
             diff = 0;
         } else {
             diff = currentTime - lastForget;
-            if (diff == 0) return 0;
+            if (diff == 0) return 0; //return but dont set lastForget
         }
         this.lastForget = currentTime;
         return diff;

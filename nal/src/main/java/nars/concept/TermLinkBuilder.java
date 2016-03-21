@@ -31,15 +31,13 @@ public enum TermLinkBuilder {
         //TODO use a MultiSet or Bag to count # of occurrences of components, in case there are repeats,
         //these should be weighted stronger. requires a new termlink template class like Pair<Term,Float> to include a weight
 
-        HashBag<Termed> components = new HashBag(host.complexity());
         //List<Termed> components = Global.newArrayList(0);
+        HashBag<Termed> components = new HashBag(host.volume());
 
         visitComponents(host, components, nar);
 
-        int num = components.sizeDistinct();
         float total = components.size();
-
-        List<TermTemplate> x = Global.newArrayList(num);
+        List<TermTemplate> x = Global.newArrayList(components.sizeDistinct());
         components.forEachWithOccurrences((t,n) -> x.add(new TermTemplate(t,n/total)));
         return x;
     }

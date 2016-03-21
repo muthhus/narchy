@@ -45,10 +45,11 @@ public class PatrickNLP extends AbstractNALTest {
             .believe("(((/,REPRESENT,_,$3):$1 && (/,REPRESENT,_,$4):$2) ==> REPRESENT:(($1,$2),($3,$4)))")
             .believe("(/,REPRESENT,_,ANIMAL):cat")
             .believe("(/,REPRESENT,_,EATING):eats")
-            .askAt(50,"REPRESENT:((eats,cat),?what)")
+            .askAt(450,"REPRESENT:((eats,cat),?what)")
             .mustBelieve(500, "REPRESENT:((cat,eats),(ANIMAL,EATING))", 1f, 0.73f);
 
     }
+
     @Test public void testExample1a() {
         /*
         ////Example 1, REPRESENT relation with lifting
@@ -65,13 +66,13 @@ public class PatrickNLP extends AbstractNALTest {
         //RESULT: <(*,(*,cat,eats),(*,ANIMAL,EATING)) --> REPRESENT>. %1.00;0.73%
          */
         TestNAR t = test();
-        //t.nar.DEFAULT_JUDGMENT_PRIORITY = 0.1f;
-        //t.nar.DEFAULT_QUESTION_PRIORITY = 0.1f;
+        t.nar.DEFAULT_JUDGMENT_PRIORITY = 0.1f;
+        t.nar.DEFAULT_QUESTION_PRIORITY = 0.1f;
         t        .log()
                 .believe("(((/,REPR,_,$3):$1 && (/,REPR,_,$4):$2) ==> REPR:{($1,$3),($2,$4)})")
                 .believe("(/,REPR,_,ANIMATING):cat")
                 .believe("(/,REPR,_,EATING):eats")
-                .askAt(5,"REPR:{(cat,eats),?what}")
+                .askAt(75,"REPR:{(cat,eats),?what}")
                 .mustBelieve(100, "REPR:{(eats,EATING),(cat,ANIMATING)}", 1f, 0.81f);
         
 

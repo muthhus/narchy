@@ -1,5 +1,6 @@
 package nars.concept;
 
+import com.google.common.base.Joiner;
 import nars.NAR;
 import nars.budget.UnitBudget;
 import nars.nar.Default;
@@ -22,10 +23,11 @@ public class TermTemplateTest {
         n.step();
         Concept c = t.concept(n);
         List<TermTemplate> templates = c.termlinkTemplates();
+        System.out.println(Joiner.on('\n').join(templates));
         assertEquals(7, templates.size());
-        assertEquals("REPR", templates.get(0).term.toString());
-        assertEquals(0.25f, templates.get(0).strength, 0.01f);
-        assertEquals(0.08f, templates.get(1).strength, 0.01f);
+        assertEquals("({($1,$2),($3,$4)}-->REPR)", templates.get(0).term.toString());
+        assertEquals(0.08f, templates.get(0).strength, 0.01f);
+        assertEquals(0.16f, templates.get(1).strength, 0.01f);
 
     }
 

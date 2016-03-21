@@ -32,6 +32,8 @@ public class IOPane extends BorderPane /*implements FXIconPaneBuilder*/ {
 
     public class DefaultTracePane extends TracePane {
 
+        private boolean showTime = false;
+
         public DefaultTracePane(NAR nar, DoubleProperty volume) {
             super(nar, volume);
         }
@@ -59,12 +61,16 @@ public class IOPane extends BorderPane /*implements FXIconPaneBuilder*/ {
 
                     return !newn ? null : activationSet;*/
                 case "eventCycleEnd":
-                    if ((prev instanceof CycleActivationBar)) {
-                        ((CycleActivationBar) prev).setTo(nar.time());
-                        return null;
-                    } else {
-                        return new CycleActivationBar(nar.time());
+                    if (showTime) {
+                        if ((prev instanceof CycleActivationBar)) {
+                            ((CycleActivationBar) prev).setTo(nar.time());
+                            return null;
+                        } else {
+                            return new CycleActivationBar(nar.time());
+                        }
                     }
+
+
 //            if (activationSet!=null) {
 //                activationSet.commit();
 //                activationSet = null; //force a new one

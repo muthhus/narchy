@@ -639,6 +639,20 @@ public class TermTest {
 
     }
 
+    @Test
+    public void testImageInhConstruction() {
+        Compound p = $.p("a", "b", "c");
+        assertEquals("(a-->(/,_,b,c))", $.image(0, p).toString());
+        assertEquals("(a-->(/,_,b,c))", $.image(0, p.terms()).toString());
+        assertEquals("(b-->(/,a,_,c))", $.image(1, p).toString());
+        assertEquals("(c-->(/,a,b,_))", $.image(2, p).toString());
+
+        assertEquals("((\\,_,b,c)-->a)", $.imageInt(0, p).toString());
+        assertEquals("((\\,_,b,c)-->a)", $.imageInt(0, p.terms()).toString());
+        assertEquals("((\\,a,_,c)-->b)", $.imageInt(1, p).toString());
+        assertEquals("((\\,a,b,_)-->c)", $.imageInt(2, p).toString());
+
+    }
 
     @Test public void testStatemntString() {
         assertTrue( inh("a", "b").op().isStatement() );

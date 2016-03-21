@@ -758,84 +758,84 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
     }
 
     @Override
-    public int relation() {
+    public final int relation() {
         return term.relation();
     }
 
     @Override @NotNull
-    public Op op() {
+    public final Op op() {
         return term.op();
     }
 
     @Override
-    public int volume() {
+    public final int volume() {
         return term.volume();
     }
 
     @Override
-    public int complexity() {
+    public final int complexity() {
         return term.complexity();
     }
 
     @Override
-    public int structure() {
+    public final int structure() {
         return term.structure();
     }
 
     @Override
-    public int size() {
+    public final int size() {
         return term.size();
     }
 
     @Override
-    public boolean containsTerm(Term t) {
+    public final boolean containsTerm(Term t) {
         return term.containsTerm(t);
     }
 
     @Override
-    public boolean isCommutative() {
+    public final boolean isCommutative() {
         return term.isCommutative();
     }
 
     @Override
-    public int varIndep() {
+    public final int varIndep() {
         return term.varIndep();
     }
 
     @Override
-    public int varDep() {
+    public final int varDep() {
         return term.varDep();
     }
 
     @Override
-    public int varQuery() {
+    public final int varQuery() {
         return term.varQuery();
     }
 
     @Override
-    public int varPattern() {
+    public final int varPattern() {
         return term.varPattern();
     }
 
     @Override
-    public int vars() {
+    public final int vars() {
         return term.vars();
     }
 
     @Nullable
     @Override
-    public Term term(int i) {
+    public final Term term(int i) {
         return term.term(i);
     }
 
     @Override
-    public boolean equalTerms(TermContainer c) {
+    public final boolean equalTerms(TermContainer c) {
         return term.equalTerms(c);
     }
 
     @NotNull
     @Override
-    public Term[] terms() {
+    public final Term[] terms() {
         return term.terms();
     }
 

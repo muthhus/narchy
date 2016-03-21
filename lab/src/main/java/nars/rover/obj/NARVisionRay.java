@@ -25,19 +25,17 @@ public class NARVisionRay extends VisionRay {
     public final Atom visionTerm;
 
     public BLink<Concept> angleConcept;
-    float pri;
 
     float conceptPriority;
     float conceptDurability;
     float conceptQuality;
 
 
-    public NARVisionRay(String id, NAR nar, Body base, Vec2 point, float angle, float arc, int resolution, float length, float pri) {
+    public NARVisionRay(String id, NAR nar, Body base, Vec2 point, float angle, float arc, int resolution, float length) {
         super(point, angle, arc, base, length, resolution);
 
 
         this.nar = nar;
-        this.pri = pri;
         this.visionTerm = $.the(id);
         //this.seenAngleTerm = //"see_" + sim.angleTerm(angle);
     }

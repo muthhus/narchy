@@ -18,6 +18,7 @@ import nars.term.variable.GenericVariable;
 import nars.term.variable.Variable;
 import nars.truth.Truth;
 import nars.util.data.Util;
+import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.LoggerFactory;
@@ -690,7 +691,28 @@ public enum $ /* TODO: implements TermIndex */ {
         return the(IMAGE_EXT, index + 1, argument);
     }
 
+    public static Compound image(int relation, Term... elements) {
+        return image(relation, true, elements);
+    }
+    public static Compound imageInt(int relation, Term... elements) {
+        return image(relation, false, elements);
+    }
 
+    public static Compound image(int relation, boolean ext, Term... elements) {
+        Term[] elementsMasked = ArrayUtils.remove(elements, relation);
+        Term related = elements[relation];
+        Term img = the(ext ? IMAGE_EXT : IMAGE_INT, relation, elementsMasked);
+
+        return (Compound) ( ext ? $.inh(related, img) : $.inh(img, related));
+    }
+    public static Compound image(int relation, Compound product) {
+        assert(product.op() == Op.PRODUCT);
+        return image(relation, true, product.terms());
+    }
+    public static Compound imageInt(int relation, Compound product) {
+        assert(product.op() == Op.PRODUCT);
+        return image(relation, false, product.terms());
+    }
 
     //TODO add this to a '$.printree' command
 

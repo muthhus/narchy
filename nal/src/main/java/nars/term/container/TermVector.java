@@ -140,7 +140,7 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
     }
 
     @Override
-    public final T term(int i) {
+    @NotNull public final T term(int i) {
         return term[i];
     }
 
