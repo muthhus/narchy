@@ -22,7 +22,7 @@ import java.util.function.Predicate;
 /**
  * A bag implemented as a combination of a Map and a SortedArrayList
  */
-public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
+public class ArrayBag<V> extends ArrayTable<V, BLink<V>> implements Bag<V> {
 
     //public static final Procedure2<Budget, Budget> DEFAULT_MERGE_METHOD = UnitBudget.average;
 
@@ -35,8 +35,8 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
 
     public ArrayBag(@NotNull SortedIndex<BLink<V>> items) {
         this(items,
-            Global.newHashMap(0) //start zero to minimize cost of creating temporary bags
-            //new HashMap(items.capacity()/2)
+                Global.newHashMap(0) //start zero to minimize cost of creating temporary bags
+                //new HashMap(items.capacity()/2)
         );
     }
 
@@ -60,8 +60,9 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
     }
 
 
-
-    /** returns amount overflowed */
+    /**
+     * returns amount overflowed
+     */
     protected final float merge(@NotNull BLink<V> target, Budgeted incoming, float scale) {
         return mergeFunction.merge(target, incoming, scale);
         /*if (overflow > 0)
@@ -196,7 +197,6 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
     }
 
 
-
     /**
      * Insert an item into the itemTable
      *
@@ -205,16 +205,8 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
      */
     @Nullable
     @Override
-    public BLink<V> put(V i, Budgeted b, float scale, @Nullable MutableFloat overflow) {
-        //    }
-        //
-        //    public BLink<V> putFast(V i, Budgeted b, float scale) {
-        //        BLink<V> existing = get(i);
-        //
-        //    }
+    public final BLink<V> put(V i, Budgeted b, float scale, @Nullable MutableFloat overflow) {
 
-            ///** updates an item, merging and re-inserting inserting */
-            //public BLink<V> putSync(V i, Budgeted b, float scale) {
         BLink<V> existing = get(i);
 
         return (existing != null) ?
@@ -235,43 +227,35 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
 
     }
 
+    /**
+     * the applied budget will not become effective until commit()
+     */
     @NotNull
-    private BLink<V> putExists(Budgeted b, float scale, @NotNull BLink<V> existing, @Nullable MutableFloat overflow) {
+    private final BLink<V> putExists(Budgeted b, float scale, @NotNull BLink<V> existing, @Nullable MutableFloat overflow) {
 
-        if (existing!=b) {
+        if (existing != b) {
 
             float o = merge(existing, b, scale);
-            if (overflow!=null)
+            if (overflow != null)
                 overflow.add(o);
 
-            update(existing); //<- delaying/buffering this is the whole reason of the buffering
         }
 
         return existing;
     }
 
     @Nullable
-    private BLink<V> putNew(V i, Budgeted b, float scale) {
+    private final BLink<V> putNew(V i, Budgeted b, float scale) {
         BLink<V> newBudget;
         if (!(b instanceof BLink)) {
             newBudget = new BLink<>(i, b, scale);
         } else {
             //use provided
-            newBudget = (BLink)b;
+            newBudget = (BLink) b;
             newBudget.commit();
         }
 
-
-            BLink<V> displaced = put(i, newBudget);
-            if (displaced != null) {
-                if (displaced == newBudget) {
-                    return null;
-                }
-                /*else {
-                    //remove what was been removed from the items list
-                    removeKey(displaced.get());
-                }*/
-            }
+        put(i, newBudget);
 
         return newBudget;
     }
@@ -363,7 +347,8 @@ public class ArrayBag<V> extends ArrayTable<V,BLink<V>> implements Bag<V> {
             super(capacity / 4, capacity);
         }
 
-        @Override public float score(@NotNull X v) {
+        @Override
+        public float score(@NotNull X v) {
             return v.pri();
         }
     }

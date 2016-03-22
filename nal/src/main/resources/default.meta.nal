@@ -462,7 +462,6 @@
 
 ////composition on both sides of a statement:
 
-
     ((&,B,A..+) --> (&,X,A..+)), (B --> X), task("?") |- ((&,B,A..+) --> (&,X,A..+)), (Belief:BeliefStructuralDeduction, Punctuation:Judgment)
     ((|,B,A..+) --> (|,X,A..+)), (B --> X), task("?") |- ((|,B,A..+) --> (|,X,A..+)), (Belief:BeliefStructuralDeduction, Punctuation:Judgment)
 
@@ -479,6 +478,19 @@
 
 ////// NAL4 - Transformations between products and images: ////////////////////////////////////////////////////////////////////////////////////
 //Relations and transforming them into different representations so that arguments and the relation itself can become the subject or predicate
+
+    ((A..B=_..+) --> M), B |- (B --> (/, M, A..B=_..+, _ )), (Belief:Identity, Desire:Identity)
+
+    (M --> (A..B=_..+)), B |- ((\, M, A..B=_..+, _ ) --> B), (Belief:Identity, Desire:Identity)
+
+    (B --> (/,M, A.._=B..+, _)), M |- ((A.._=B..+) --> M), (Belief:Identity, Desire:Identity)
+
+    ((\, M, A.._=B..+, _ ) --> B), M |- (M --> (A.._=B..+)), (Belief:Identity, Desire:Identity)
+
+//Recursion Force
+    ((X,Z) --> Y), X |- ((X,Z)-->((/,Y,_,Z), Z)), (Belief:StructuralDeduction, Desire:StructuralDeduction)
+    ((X,Z) --> Y), Z |- ((X,Z)-->(X, (/,Y,X,_))), (Belief:StructuralDeduction, Desire:StructuralDeduction)
+
 ////composition on both sides of a statement:
 
     ((B,P) <-> Z) ,(B <-> A), task("?") |- ((B,P) <-> (A,P)), (Belief:BeliefStructuralDeduction, Punctuation:Judgment)
@@ -487,31 +499,24 @@
     ((B,P) --> Z) ,(B --> A), task("?") |- ((B,P) --> (A,P)), (Belief:BeliefStructuralDeduction, Punctuation:Judgment)
     ((P,B) --> Z) ,(B --> A), task("?") |- ((P,B) --> (P,A)), (Belief:BeliefStructuralDeduction, Punctuation:Judgment)
 
+
+
     ((/,N,_,A) --> Z), (B --> A), task("?") |- ((/,N,_,A) --> (/,N,_,B)), (Belief:BeliefStructuralDeduction, Punctuation:Judgment)
     ((\,N,A,_) --> Z), (N --> R), task("?") |- ((\,N,A,_) --> (\,R,A,_)), (Belief:BeliefStructuralDeduction, Punctuation:Judgment)
 
 
 
-    ((A..B=_..+) --> M), B |- (B --> (/, M, A..B=_..+, _ )), (Belief:Identity, Desire:Identity)
-//    ((A..+) --> M), M |- (M --> (/,_, A..+)), (Belief:Identity, Desire:Identity)
-
-    (M --> (A..B=_..+)), B |- ((\, M, A..B=_..+, _ ) --> B), (Belief:Identity, Desire:Identity)
-//    (M --> (A..+)), M |- ((\,_, A..+) --> M), (Belief:Identity, Desire:Identity)
-
-    (B --> (/,M, A.._=B..+, _)), M |- ((A.._=B..+) --> M), (Belief:Identity, Desire:Identity)
-//    (M --> (/, _, A..+ )), M |- ((A..+) --> M), (Belief:Identity, Desire:Identity)
-
-    ((\, M, A.._=B..+, _ ) --> B), M |- (M --> (A.._=B..+)), (Belief:Identity, Desire:Identity)
-//    ((\, _, A..+ ) --> M), M |- (M --> (A..+)), (Belief:Identity, Desire:Identity)
 
 
+//Relation introduction (wastepaper experimental)
+//    (A --> C), (B --> D) |- ((A,B) --> (C,D)), (Belief:Intersection)
 
 
 
 //compound composition one premise
 
     (||,B,A..+), B, task("?") |- (||,B,A..+), (Belief:BeliefStructuralDeduction, Punctuation:Judgment)
-
+//TODO for desire
 
 //query-variable queston answering
     A, B, task("?") |- substituteIfUnifies(B, "?", A, B), (Belief:BeliefIdentity, Punctuation:Judgment)

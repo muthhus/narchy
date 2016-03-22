@@ -7,6 +7,7 @@ package nars.concept;
 import nars.Global;
 import nars.NAR;
 import nars.Premise;
+import nars.Symbols;
 import nars.bag.BLink;
 import nars.budget.Budget;
 import nars.nal.meta.PremiseEval;
@@ -164,11 +165,29 @@ abstract public class ConceptProcess implements Premise {
 
         boolean derivedTemporal = occ != ETERNAL;
 
+        boolean single;
+        if (belief != null) {
+            switch (punct) {
+                case Symbols.BELIEF:
+                    single = d.beliefSingle;
+                    break;
+                case Symbols.GOAL:
+                    single = d.desireSingle;
+                    break;
+                default:
+                    single = false;
+                    break;
+            }
+        } else {
+            single = true;
+        }
+
+
         Task derived = newDerivedTask(c, punct)
                 .truth(truth)
-                .budget(budget) // copied in, not shared
                 .time(now, occ)
-                .parent(task(), belief /* null if single */)
+                .parent(task(), single ? null : belief /* null if single */)
+                .budget(budget) // copied in, not shared
                 //.anticipate(derivedTemporal && d.anticipate)
                 .log( Global.DEBUG ? d.rule : "Derived");
 
@@ -181,16 +200,15 @@ abstract public class ConceptProcess implements Premise {
 
             complete(newDerivedTask(c, punct)
                     .truth(
-                            truth.freq(),
-                            eternalize(truth.conf())
+                        truth.freq(),
+                        eternalize(truth.conf())
                     )
 
                     .time(now, ETERNAL)
 
-                    .budget(budget) // copied in, not shared
-                    .budgetCompoundForward(this)
-
                     .parent(derived)  //this is lighter weight and potentially easier on GC than: parent(task, belief)
+
+                    .budgetCompoundForward(budget, this)
 
                     .log("Immediaternalized") //Immediate Eternalization
 

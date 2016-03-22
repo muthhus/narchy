@@ -227,13 +227,15 @@ public class SomeRovers {
         float dist = 20f;
 
         Vec2 front = new Vec2(2.7f, 0);
-        r.addEyeWithMouth(r, "n", nqSpine, r.torso, 7, 3, front,
-                0.5f, 0, dist, 0.2f);
+
+        //nearsight & mouth
+        r.addEyeWithMouth(r, "n", nqSpine, r.torso, 7, 2, front,
+                0.5f, 0, dist/2f, 0.2f);
 
 
-        //nearsight
-        r.addEye(r, "f", nqSpine, r.torso, 5, 3, front,
-                1.25f, 0, dist/2f, (e) -> {
+        //farsight
+        r.addEye(r, "f", nqSpine, r.torso, 5, 5, front,
+                1.25f, 0, dist, (e) -> {
                 });
 
         //reverse

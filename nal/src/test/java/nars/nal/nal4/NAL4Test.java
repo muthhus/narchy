@@ -193,30 +193,16 @@ public class NAL4Test extends AbstractNALTest {
 
     }
 
-    /* NAL6
-    @Test public void recursionSmall2() throws InvalidInputException {
-        long time;
-        final float finalConf = 0.73f;
 
-        if (seed instanceof Solid) {
-            time = 50;
-        }
-        else {
-            if (n.nal() <= 6) {
-                time = 400; //less time for the nal6 config
-            } else {
-                time = 800;
-            }
-        }
+    @Test public void testRecursionForce1() {
+        //    ((X,Z) --> Y), X |- ((X,Z)-->((/,Y,_,Z),Z)), (Belief:StructuralDeduction, Desire:StructuralDeduction)
+        test()
+            .believe("(x-->(/,y,_,z))")
+            .mustBelieve(16, "((x,z)-->((/,y,_,z),z))", 1f, 0.81f)
+            .mustBelieve(16, "((x,z)-->(x,(/,y,x,_)))", 1f, 0.81f);
 
-        n.believe(" <0 --> n>", 1.0f, 0.9f);
-        n.believe("<<$1 --> n> ==> <(/,next,$1,_) --> n>>", 1.0f, 0.9f);
-        n.ask("<(/,next,(/,next,0,_),_) --> n>");
-        n.mustBelieve(time, "<(/,next,0,_) --> n>", 1.0f, 1.0f, 0.81f, 1.0f);
-        n.mustBelieve(time, "<(/,next,(/,next,0,_),_) --> n>", 1.0f, 1.0f, finalConf, 1.0f);
-        n.run();
     }
-    */
+
 
 //    @Test public void missingEdgeCase() {
 //        //((<%1 --> %2>, <(|, %1, %3) --> %2>), (<%3 --> %2>,

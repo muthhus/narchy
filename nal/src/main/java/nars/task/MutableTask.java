@@ -296,7 +296,8 @@ public class MutableTask extends AbstractTask {
 //    }
 
     @NotNull
-    public MutableTask budgetCompoundForward(@NotNull ConceptProcess premise) {
+    public MutableTask budgetCompoundForward(@NotNull Budget input, @NotNull ConceptProcess premise) {
+        budget(input);
         BudgetFunctions.compoundForward(
                 budget(), truth(),
                 term(), premise);

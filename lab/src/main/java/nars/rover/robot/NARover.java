@@ -426,7 +426,7 @@ public class NARover extends AbstractPolygonBot {
 
                 DoubleSupplier value = () -> {
                     if (v.hit(material)) {
-                        float x = 0.5f + 0.45f * (1f - v.seenDist); //closer = larger number (up to 1.0)
+                        float x = 0.5f + 0.4f * (1f - v.seenDist); //closer = larger number (up to 1.0)
                         return x;
                     }
                     return 0; //nothing seen within the range
@@ -440,7 +440,7 @@ public class NARover extends AbstractPolygonBot {
 
                         (t) -> (float) value.getAsDouble()
 
-                ).resolution(0.05f).minTimeBetweenUpdates(1).maxTimeBetweenUpdates(8).pri(0.25f);
+                ).resolution(0.05f).minTimeBetweenUpdates(0).maxTimeBetweenUpdates(32).pri(0.5f);
 
                 controller.input.add(value);
             }

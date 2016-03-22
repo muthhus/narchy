@@ -43,12 +43,10 @@ public final class TruthFunctions extends UtilityFunctions {
      * @return Truth value of the conclusion
      */
     @NotNull
-    public static Truth conversion(@NotNull Truth t) {
-        float f1 = t.freq();
-        float c1 = t.conf();
-        float w = and(f1, c1);
+    public static Truth conversion(@NotNull Truth t, float minConf) {
+        float w = and(t.freq(), t.conf());
         float c = w2c(w);
-        return new DefaultTruth(1, c);
+        return (c < minConf) ? null : new DefaultTruth(1, c);
     }
 
     /* ----- Single argument functions, called in StructuralRules ----- */
@@ -57,8 +55,11 @@ public final class TruthFunctions extends UtilityFunctions {
      * @return Truth value of the conclusion
      */
     @NotNull
-    public static Truth negation(@NotNull Truth v1) {
+    public static Truth negation(@Nullable Truth v1, float minConf) {
         if (v1 == null) return null;
+
+        float c = v1.conf();
+        if (c < minConf) return null;
 
         float fPos = v1.freq();
 
@@ -66,9 +67,7 @@ public final class TruthFunctions extends UtilityFunctions {
         if (Util.equals(fPos, 0.5f, Global.TRUTH_EPSILON))
             return v1;
 
-        float f = 1.0f - fPos;
-        float c = v1.conf();
-        return new DefaultTruth(f, c);
+        return new DefaultTruth(1.0f - fPos, c);
 
         /*
 
@@ -91,11 +90,9 @@ public final class TruthFunctions extends UtilityFunctions {
      */
     @Nullable
     public static Truth contraposition(@NotNull Truth v1, float minConf) {
-        float f1 = v1.freq();
-        float c1 = v1.conf();
-        float w = and(1 - f1, c1);
+        float w = and(1 - v1.freq(), v1.conf());
         float c = w2c(w);
-        return c < minConf ? null : new DefaultTruth(0, c);
+        return (c < minConf) ? null : new DefaultTruth(0, c);
     }
 
     /* ----- double argument functions, called in MatchingRules ----- */
@@ -106,20 +103,20 @@ public final class TruthFunctions extends UtilityFunctions {
      * @return Truth value of the conclusion
      */
     @Nullable
-    public static Truth revision(@NotNull Truth a, @NotNull Truth b, float match, float confThreshold) {
+    public static Truth revision(@NotNull Truth a, @NotNull Truth b, float match, float minConf) {
         float w1 = c2w(a.conf());
         float w2 = c2w(b.conf());
         float w = (w1 + w2);
-        float newConf = w2c(w)* match;
-        if (newConf < confThreshold + Global.TRUTH_EPSILON/2f)
+        float newConf = w2c(w) * match;
+        if (newConf < minConf)
             return null;
 
         float f1 = a.freq();
         float f2 = b.freq();
 
         return new DefaultTruth(
-                (w1 * f1 + w2 * f2) / w,
-                newConf
+            (w1 * f1 + w2 * f2) / w,
+            newConf
         );
     }
 
@@ -144,7 +141,8 @@ public final class TruthFunctions extends UtilityFunctions {
                 * temporalProjection(now, at, bt)
                 //* TruthFunctions.temporalProjectionOld(at, bt, now)
                 * match;
-        if (newConf < confThreshold + Global.TRUTH_EPSILON/2f) return null;
+        if (newConf < confThreshold)
+            return null;
 
 
         float f1 = a.freq();
@@ -177,7 +175,7 @@ public final class TruthFunctions extends UtilityFunctions {
 
         float f = a.freq();
         float c = and(f, a.conf(), reliance);
-        return c < minConf ? null : new DefaultTruth(f, c);
+        return (c < minConf) ? null : new DefaultTruth(f, c);
     }
         /* ----- double argument functions, called in SyllogisticRules ----- */
     /**
@@ -186,18 +184,18 @@ public final class TruthFunctions extends UtilityFunctions {
      * @param b Truth value of the second premise
      * @return (non-Analytic) Truth value of the conclusion - normal truth because this is based on 2 premises
      */
-    @NotNull
+    @Nullable
     public static Truth deduction(@NotNull Truth a, @NotNull Truth b, float minConf) {
         return deductionB(a, b.freq(), b.conf(), minConf);
     }
 
     /** assumes belief freq=1f */
-    @NotNull
+    @Nullable
     public static Truth deduction1(@NotNull Truth a, float bC, float minConf) {
         return deductionB(a, 1f, bC, minConf);
     }
 
-    @NotNull
+    @Nullable
     public static Truth deductionB(@NotNull Truth a, float bF, float bC, float minConf) {
         float f = and(a.freq(), bF);
         float c = and(f, a.conf(), bC);
@@ -212,13 +210,10 @@ public final class TruthFunctions extends UtilityFunctions {
      */
     @Nullable
     public static Truth analogy(@NotNull Truth a, @NotNull Truth b, float minConf) {
-        float f2 = b.freq();
-        float c1 = a.conf();
-        float c2 = b.conf();
-        float c = and(c1, c2, f2);
+        float fB = b.freq();
+        float c = and(a.conf(), b.conf(), fB);
         if (c < minConf) return null;
-        float f1 = a.freq();
-        float f = and(f1, f2);
+        float f = and(a.freq(), fB);
         return new DefaultTruth(f, c);
     }
 
@@ -229,14 +224,12 @@ public final class TruthFunctions extends UtilityFunctions {
      * @return Truth value of the conclusion
      */
     @NotNull
-    public static Truth resemblance(@NotNull Truth a, @NotNull Truth b) {
+    public static Truth resemblance(@NotNull Truth a, @NotNull Truth b, float minConf) {
         float f1 = a.freq();
         float f2 = b.freq();
-        float c1 = a.conf();
-        float c2 = b.conf();
-        float f = and(f1, f2);
-        float c = and(c1, c2, or(f1, f2));
-        return new DefaultTruth(f, c);
+        float c = and(a.conf(), b.conf(), or(f1, f2));
+        return (c < minConf) ? null : new DefaultTruth(and(f1, f2), c);
+
     }
 
     /**
@@ -251,20 +244,20 @@ public final class TruthFunctions extends UtilityFunctions {
         return (c < minConf) ? null : new DefaultTruth(a.freq(), c);
     }
 
-    /**
-     * {M, <P ==> M>} |- P
-     * @param t Truth value of the first premise
-     * @param reliance Confidence of the second (analytical) premise
-     * @return Truth value of the conclusion
-     */
-    @NotNull
-    public static Truth abduction(@NotNull Truth t, float reliance) {
-        float f1 = t.freq();
-        float c1 = t.conf();
-        float w = and(c1, reliance);
-        float c = w2c(w);
-        return new DefaultTruth(f1, c);
-    }
+//    /**
+//     * {M, <P ==> M>} |- P
+//     * @param t Truth value of the first premise
+//     * @param reliance Confidence of the second (analytical) premise
+//     * @return Truth value of the conclusion
+//     */
+//    @NotNull
+//    public static Truth abduction(@NotNull Truth t, float reliance) {
+//        float f1 = t.freq();
+//        float c1 = t.conf();
+//        float w = and(c1, reliance);
+//        float c = w2c(w);
+//        return new DefaultTruth(f1, c);
+//    }
 
     /**
      * {<M ==> S>, <M ==> P>} |- <S ==> P>
@@ -285,12 +278,7 @@ public final class TruthFunctions extends UtilityFunctions {
      */
     @NotNull
     public static Truth exemplification(@NotNull Truth a, @NotNull Truth b, float minConf) {
-        float f1 = a.freq();
-        float f2 = b.freq();
-        float c1 = a.conf();
-        float c2 = b.conf();
-        float w = and(f1, f2, c1, c2);
-        float c = w2c(w);
+        float c = w2c(and(a.freq(), b.freq(), a.conf(), b.conf()));
         return c < minConf ? null : new DefaultTruth(1, c);
     }
 
@@ -301,15 +289,15 @@ public final class TruthFunctions extends UtilityFunctions {
      * @return Truth value of the conclusion
      */
     @NotNull
-    public static Truth comparison(@NotNull Truth a, @NotNull Truth b) {
+    public static Truth comparison(@NotNull Truth a, @NotNull Truth b, float minConf) {
         float f1 = a.freq();
         float f2 = b.freq();
-        float c1 = a.conf();
-        float c2 = b.conf();
         float f0 = or(f1, f2);
-        float f = (f0 == 0) ? 0 : (and(f1, f2) / f0);
-        float w = and(f0, c1, c2);
-        float c = w2c(w);
+        float c = w2c(and(f0, a.conf(), b.conf()));
+        if (c < minConf)
+            return null;
+
+        float f = (Util.equals(f0, 0, Global.TRUTH_EPSILON)) ? 0 : (and(f1, f2) / f0);
         return new DefaultTruth(f, c);
     }
 
@@ -355,14 +343,9 @@ public final class TruthFunctions extends UtilityFunctions {
      * @return Truth value of the conclusion
      */
     @NotNull
-    public static Truth desireDed(@NotNull Truth v1, @NotNull Truth v2) {
-        float f1 = v1.freq();
-        float f2 = v2.freq();
-        float c1 = v1.conf();
-        float c2 = v2.conf();
-        float f = and(f1, f2);
-        float c = and(c1, c2);
-        return new DefaultTruth(f, c);
+    public static Truth desireDed(@NotNull Truth v1, @NotNull Truth v2, float minConf) {
+        float c = and(v1.conf(), v2.conf());
+        return c < minConf ? null : new DefaultTruth(and(v1.freq(), v2.freq()), c);
     }
 
     /**
@@ -372,14 +355,9 @@ public final class TruthFunctions extends UtilityFunctions {
      * @return Truth value of the conclusion
      */
     @NotNull
-    public static Truth desireInd(@NotNull Truth v1, @NotNull Truth v2) {
-        float f1 = v1.freq();
-        float f2 = v2.freq();
-        float c1 = v1.conf();
-        float c2 = v2.conf();
-        float w = and(f2, c1, c2);
-        float c = w2c(w);
-        return new DefaultTruth(f1, c);
+    public static Truth desireInd(@NotNull Truth v1, @NotNull Truth v2, float minConf) {
+        float c = w2c(and(v2.freq(), v1.conf(), v2.conf()));
+        return c < minConf ? null : new DefaultTruth(v1.freq(), c);
     }
 
     /* ----- double argument functions, called in CompositionalRules ----- */
@@ -406,7 +384,7 @@ public final class TruthFunctions extends UtilityFunctions {
      */
     @Nullable
     public static Truth intersection(@Nullable Truth v1, @NotNull Truth v2, float minConf) {
-        if (v1 == null) return null;
+        if ((v1 == null) || (v2 == null)) return null;
 
         float c1 = v1.conf();
         float c2 = v2.conf();
@@ -429,7 +407,7 @@ public final class TruthFunctions extends UtilityFunctions {
      */
     @NotNull
     public static Truth reduceDisjunction(@NotNull Truth a, @NotNull Truth b, float minConf) {
-        return deductionR(intersection(a, negation(b), minConf), 1.0f, minConf);
+        return deductionR(intersection(a, negation(b, minConf), minConf), 1.0f, minConf);
     }
 
     /**
@@ -438,8 +416,19 @@ public final class TruthFunctions extends UtilityFunctions {
      */
     @NotNull
     public static Truth reduceConjunction(@NotNull Truth v1, @NotNull Truth v2, float minConf) {
-        Truth v0 = intersection(negation(v1), v2, minConf);
-        return negation(deductionR(v0, 1.0f, minConf));
+        if (v2 == null) return null;
+
+        Truth n1 = negation(v1, minConf);
+        if (n1 == null) return null;
+
+        Truth i12 = intersection(n1, v2, minConf);
+        if (i12 == null) return null;
+
+        Truth v11 = deductionR(i12, 1.0f, minConf);
+        if (v11 == null) return null;
+
+        return negation(v11, minConf);
+
 
 //        AnalyticTruth x = deduction(
 //                intersection(negation(a), b),
@@ -459,7 +448,7 @@ public final class TruthFunctions extends UtilityFunctions {
      */
     @NotNull
     public static Truth reduceConjunctionNeg(@NotNull Truth a, @NotNull Truth b,float minConf) {
-        return reduceConjunction(a, negation(b),minConf);
+        return reduceConjunction(a, negation(b, minConf), minConf);
     }
 
     /**
@@ -523,13 +512,10 @@ public final class TruthFunctions extends UtilityFunctions {
     }
 
     @NotNull
-    public static Truth difference(@NotNull Truth a, @NotNull Truth b) {
-        float f1 = a.freq();
-        float c1 = a.conf();
-        float f2 = b.freq();
-        float c2 = b.conf();
+    public static Truth difference(@NotNull Truth a, @NotNull Truth b, float minConf) {
+        float c = and(a.conf(), b.conf());
+        return (c < minConf) ? null : new DefaultTruth(and(a.freq(), (1 - b.freq())), c);
 
-        return new DefaultTruth(and(f1,(1-f2)), and(c1,c2));
     }
 
     @NotNull

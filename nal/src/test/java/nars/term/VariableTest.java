@@ -93,4 +93,6 @@ public class VariableTest {
         assertEquals(vc0, vp0); //reverse
         assertEquals(vp0, vc0.term());
     }
+
+
 }
