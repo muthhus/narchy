@@ -104,7 +104,7 @@ public class Kernel {
 
 
             @Override
-            public boolean execute(NAR m) {
+            public void execute(float belief, float desire, NAR m) {
                 //super.onInput(m);
                 //logger.info("exec: {} {}", toBudgetString(), this);
                 r.run();

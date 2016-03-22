@@ -136,34 +136,20 @@ public class Default extends AbstractNAR {
         emotion.busy(input.pri() * activation);
 
         Task t = c.process(input, this);
-
-        boolean novel = (t != null);
-
-        if (novel) {
+        if (t != null) {
 
             //TaskProcess succeeded in affecting its concept's state (ex: not a duplicate belief)
 
             //propagate budget
             MutableFloat overflow = new MutableFloat();
+
             conceptualize(c, t, activation, overflow);
+
             if (overflow.floatValue() > 0) {
                 emotion.stress(overflow.floatValue());
-                //logger.warn("{} overflowed concept priority {}", input, overflow);
             }
 
-
-            //signal any additional processes
-            eventTaskProcess.emit(t);
-
-            switch (t.punc()) {
-                case Symbols.GOAL:
-                    execute(t, c);
-                    break;
-                case Symbols.BELIEF:
-                    onSolution(t);
-                    break;
-            }
-
+            eventTaskProcess.emit(t); //signal any additional processes
 
         } else {
             t = input;
@@ -171,16 +157,6 @@ public class Default extends AbstractNAR {
         }
 
         return c;
-    }
-
-    void onSolution(@NotNull Task t) {
-        Task parentTask = t.getParentTask();
-        if (parentTask != null && parentTask.isQuestion()) {
-
-            if (parentTask.isInput()) //filter
-                eventAnswer.emit(Tuples.twin(parentTask, t));
-
-        }
     }
 
 

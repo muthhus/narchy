@@ -341,7 +341,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     }
 
     /** performs the procedure that should happen when this task is invoked due to goal desire */
-    boolean execute(NAR nar);
+    void execute(float belief, float desire, NAR nar);
 
     void delete();
 
@@ -832,6 +832,10 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
             return true;
         }
         return false;
+    }
+
+    default Term term(int i) {
+        return term().term(i);
     }
 
 }

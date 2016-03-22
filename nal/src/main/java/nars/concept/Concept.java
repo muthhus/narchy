@@ -29,6 +29,7 @@ import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.concept.util.BeliefTable;
 import nars.concept.util.TaskTable;
+import nars.nar.Default;
 import nars.task.Task;
 import nars.term.Termed;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -325,6 +326,7 @@ public interface Concept extends Termed, Comparable {
     default float motivationElse(long now, float valueIfMissing) {
         return hasGoals() ? goals().top(now).motivation() : valueIfMissing;
     }
+
 
 
 

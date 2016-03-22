@@ -10,7 +10,6 @@ import nars.nal.Tense;
 import nars.nal.nal8.Execution;
 import nars.term.Compound;
 import nars.term.Operator;
-import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Stamp;
 import nars.truth.Truth;
@@ -239,36 +238,13 @@ public abstract class AbstractTask extends UnitBudget
 
     }
 
-    /** when executed; can be overridden in subclasses to handle this event;
-     *  returns whether there was any activity executed
+    /**
+     *
+     * when executed; can be overridden in subclasses to handle this event;
+     * (for Operation and negation of Operation ONLY)
      * */
-    @Override public boolean execute(@NotNull NAR n) {
+    @Override public void execute(float belief, float desire, @NotNull NAR n) {
 
-        //DEFAULT EXECUTION PROCEDURE: trigger listener reactions
-
-//        Topic<Task> tt = n.exe.get(
-//            Operator.operator(term())
-//        );
-        Concept cc = n.concept(Operator.operator(term()));
-        if (cc!=null) {
-            Topic<Task> tt = cc.get(Execution.class);
-            if (tt != null && !tt.isEmpty()) {
-                //beforeNextFrame( //<-- enqueue after this frame, before next
-
-                tt.emit(this);
-
-                //            if (!inputGoal.isEternal()) {
-                //                //execution drains temporal task's budget in proportion to durability
-                //                Budget inputGoalBudget = inputGoal.budget();
-                //                inputGoalBudget.priMult(1f - inputGoalBudget.dur());
-
-                //            }
-
-                return true;
-
-            }
-        }
-        return false;
     }
 
     /** includes: evidentialset, occurrencetime, truth, term, punctuation */

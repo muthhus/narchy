@@ -1,5 +1,6 @@
 package nars.concept;
 
+import com.gs.collections.impl.tuple.Tuples;
 import nars.Memory;
 import nars.NAR;
 import nars.Op;
@@ -7,6 +8,7 @@ import nars.Symbols;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
 import nars.concept.util.*;
+import nars.nal.Tense;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
@@ -54,10 +56,7 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
     @Nullable
     protected BeliefTable goals;
 
-    /** cache for motivation calculation; set to NaN to invalidate */
-    protected transient final float _motivation = Float.NaN;
-
-//    public DefaultConcept(Term term, Memory p) {
+    //    public DefaultConcept(Term term, Memory p) {
 //        this(term, new NullBag(), new NullBag(), p);
 //    }
 
@@ -215,6 +214,19 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
 //                updateSuccess(null, successBefore, memory);
 //            }
 
+        if (belief!=null) {
+
+
+            Task parentTask = belief.getParentTask();
+            if (parentTask != null && parentTask.isQuestion()) {
+
+                if (parentTask.isInput()) //filter
+                    nar.eventAnswer.emit(Tuples.twin(parentTask, belief));
+
+            }
+
+        }
+
         return belief;
 
 //        if (belief.isInput() && !belief.isEternal()) {
@@ -246,12 +258,10 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
      */
     @Nullable
     @Override
-    public final Task processGoal(@NotNull Task inputGoal, @NotNull NAR nar) {
+    public Task processGoal(@NotNull Task inputGoal, @NotNull NAR nar) {
 
-
-
-        BeliefTable g = goals();
-        if (goals == null) {
+        BeliefTable g = this.goals;
+        if (g == null) {
             g = this.goals = new ArrayBeliefTable(
                 nar.conceptGoalsMax.intValue(), nar);
         }
@@ -731,6 +741,7 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
     @Override
     @Nullable
     public final Task process(@NotNull final Task task, @NotNull NAR nar) {
+
 
         task.onConcept(this);
 

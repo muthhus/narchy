@@ -14,7 +14,6 @@ import nars.nal.nal8.AbstractOperator;
 import nars.nal.nal8.Execution;
 import nars.nal.nal8.PatternAnswer;
 import nars.nal.nal8.operator.TermFunction;
-import nars.op.Narjure;
 import nars.op.in.FileInput;
 import nars.op.in.TextInput;
 import nars.task.MutableTask;
@@ -24,8 +23,6 @@ import nars.task.flow.TaskQueue;
 import nars.task.flow.TaskStream;
 import nars.term.*;
 import nars.term.atom.Atom;
-import nars.term.atom.Atomic;
-import nars.term.variable.Variable;
 import nars.time.Clock;
 import nars.util.event.AnswerReaction;
 import nars.util.event.DefaultTopic;
@@ -51,7 +48,6 @@ import java.util.stream.Stream;
 
 import static nars.Symbols.*;
 import static nars.nal.Tense.ETERNAL;
-import static nars.term.TermIndex.CompoundAnonymizer;
 import static org.fusesource.jansi.Ansi.ansi;
 
 
@@ -421,128 +417,16 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * if the task was a command, it will return false even if executed
      */
     public final void input(@NotNull Task t) {
-
-        Memory m = this;
-
-        Task u;
         if (t.isCommand()) {
-            //direct execution
-            u = execute(t, null) ? t : null;
+            t.execute(, , this, ); //direct execution
         } else {
-            //if (!t.isDeleted()) {
-                //accept input if it can be normalized
-                u = t.normalize(m);
-//                if (() != null) {
-//                    //ACCEPT TASK FOR INPUT
-                    m.eventInput.emit(u);
-                /*} else {
-                    m.remove(t, "Unnormalizable");
-                    throw new InvalidTaskException(t);
-                }*/
-            /*} else {
-                m.remove(t, "Pre-Deleted");
-                u = null;
-            }*/
+            eventInput.emit(t.normalize(this)); //accept into input buffer for eventual processing
         }
-
-        /*if (null == u)
-            throw new InvalidTaskException(t);*/
     }
 
     @Override
     public final void accept(@NotNull Task task) {
         input(task);
-    }
-
-    /**
-     * Entry point for all potentially executable tasks.
-     * Enters a task and determine if there is a decision to execute.
-     *
-     * @return number of invoked handlers
-     */
-    protected final boolean execute(@NotNull Task inputGoal, @Nullable Concept goalConcept) {
-
-        Term goalTerm = inputGoal.term();
-        if (!Op.isOperation(goalTerm))
-            return false;
-//            if (goalTerm.op()==Op.PRODUCT) {
-//                @NotNull Compound x = inputGoal.term();
-//                try {
-//                    Term y = rt.eval(x);
-//                    if (y != null) {
-//                        logger.info("(eval( {} , {} )", x, y); //mooseboobs
-//                        return true;
-//                    }
-//                }
-//                /*catch (VerifyError vex) {
-//                    //ex: java.lang.VerifyError: (class: clojure/core$eval1, method: invokeStatic signature: ()Ljava/lang/Object;) Unable to pop operand off an empty stack
-//                }*/ catch (Throwable e) {
-//                    //HACK
-//                    logger.warn("eval {}", e);
-//
-//                }
-//            }
-
-
-        Task goal = inputGoal;
-
-        if (goalConcept != null) {
-            //Normal Goal
-            long now = time();
-            Task projectedGoal = goalConcept.goals().top(now);
-            float motivation = projectedGoal.motivation();
-
-            //counteract with content from any (--, concept
-            Term antiTerm = $.neg(projectedGoal.term());
-            Concept antiConcept = concept(antiTerm);
-            if (antiConcept!=null)
-                motivation -= antiConcept.motivationElse(now, 0);
-
-            if (motivation < executionThreshold.floatValue())
-                return false;
-
-            long occ = projectedGoal.occurrence();
-            if ((!((occ == ETERNAL) || (Math.abs(occ-now) < duration()*2)))//right timing
-                    ) { //sufficient motivation
-                return false;
-            }
-
-            goal = projectedGoal;
-        } else {
-            //a Command to directly execute, unmodified
-        }
-
-
-        return goal.execute(this);
-
-        /*else {
-            System.err.println("Unexecutable: " + goal);
-        }*/
-
-
-        //float delta = updateSuccess(goal, successBefore, memory);
-
-        //&& (goal.state() != Task.TaskState.Executed)) {
-
-            /*if (delta >= Global.EXECUTION_SATISFACTION_TRESHOLD)*/
-
-        //Truth projected = goal.projection(now, now);
-
-
-//                        LongHashSet ev = this.lastevidence;
-//
-//                        //if all evidence of the new one is also part of the old one
-//                        //then there is no need to execute
-//                        //which means only execute if there is new evidence which suggests doing so1
-//                        if (ev.addAll(input.getEvidence())) {
-
-//                            //TODO more efficient size limiting
-//                            //lastevidence.toSortedList()
-//                            while(ev.size() > max_last_execution_evidence_len) {
-//                                ev.remove( ev.min() );
-//                            }
-//                        }
-
     }
 
 

@@ -148,7 +148,7 @@ public enum LocalRules {
 
                 //System.out.println("\twith: " + validSolution);
 
-                nal.accept(validSolution);
+                nal.input(validSolution);
                 //System.out.println(question + " " + ss + " " + ss.getExplanation());
 
             }
