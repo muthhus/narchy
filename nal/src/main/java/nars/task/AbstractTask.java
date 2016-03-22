@@ -260,21 +260,24 @@ public abstract class AbstractTask extends UnitBudget
 //        Topic<Task> tt = n.exe.get(
 //            Operator.operator(term())
 //        );
-        Topic<Task> tt = n.concept(Operator.operator(term())).get(Execution.class);
-        if (tt!=null && !tt.isEmpty()) {
-            //beforeNextFrame( //<-- enqueue after this frame, before next
+        Concept cc = n.concept(Operator.operator(term()));
+        if (cc!=null) {
+            Topic<Task> tt = cc.get(Execution.class);
+            if (tt != null && !tt.isEmpty()) {
+                //beforeNextFrame( //<-- enqueue after this frame, before next
 
-            tt.emit(this);
+                tt.emit(this);
 
-//            if (!inputGoal.isEternal()) {
-//                //execution drains temporal task's budget in proportion to durability
-//                Budget inputGoalBudget = inputGoal.budget();
-//                inputGoalBudget.priMult(1f - inputGoalBudget.dur());
+                //            if (!inputGoal.isEternal()) {
+                //                //execution drains temporal task's budget in proportion to durability
+                //                Budget inputGoalBudget = inputGoal.budget();
+                //                inputGoalBudget.priMult(1f - inputGoalBudget.dur());
 
-//            }
+                //            }
 
-            return true;
+                return true;
 
+            }
         }
         return false;
     }

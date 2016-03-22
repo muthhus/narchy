@@ -134,8 +134,8 @@ public class MapIndex2 extends AbstractMapIndex {
     @Nullable
     final Function<TermContainer, SubtermNode> termContainerSubtermNodeFunction =
             k ->
-                //new SubtermNode(normalize(k));
-                new SubtermNodeWithArray(normalize(k));
+                new SubtermNode(normalize(k));
+                //new SubtermNodeWithArray(normalize(k));
 
 
     @Nullable
@@ -147,15 +147,18 @@ public class MapIndex2 extends AbstractMapIndex {
                 getOrAddNode(subsBefore) :
                 getNode(subsBefore);
 
-        return node!=null ? get(t, node, subsBefore, create) : null;
+        return node!=null ? theCompound(t, node, subsBefore, create) : null;
     }
 
-    @Nullable private Termed get(@NotNull Compound t, @NotNull SubtermNode node, @NotNull TermContainer subsBefore, boolean create) {
+    @Nullable private Termed theCompound(@NotNull Compound t, @NotNull SubtermNode node, @NotNull TermContainer subsBefore, boolean create) {
 
         int oprel = t.opRel();
 
         Termed interned = node.get(oprel);
-        if (create && (interned == null)) {
+        if (interned!=null)
+            return interned;
+
+        if (create) {
 
             TermContainer subsAfter = node.vector;
             if (subsAfter!=subsBefore) { //rebuild if necessary
@@ -172,18 +175,18 @@ public class MapIndex2 extends AbstractMapIndex {
 
             Termed preExisting = node.put(oprel, interned);
             assert(preExisting == null);
-        }
 
-        return interned;
+            return interned;
+        } else {
+            return null;
+        }
     }
 
 
-    @Nullable
-    private Termed internCompound(@NotNull TermContainer subs, @NotNull Op op, int rel, int dt) {
-        Termed interned;
-        interned = builder.make(op, rel, subs, dt);
+    @NotNull
+    private final Termed internCompound(@NotNull TermContainer subs, @NotNull Op op, int rel, int dt) {
+        Termed interned = termBuilder.make(op, rel, subs, dt);
         assert(interned!=null); //should not fail unless the input was invalid to begin with
-
         return interned;
     }
 

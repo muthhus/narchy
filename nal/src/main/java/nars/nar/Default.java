@@ -17,6 +17,7 @@ import nars.task.Task;
 import nars.task.flow.SetTaskPerception;
 import nars.task.flow.TaskPerception;
 import nars.term.Term;
+import nars.term.TermIndex;
 import nars.term.Termed;
 import nars.time.FrameClock;
 import nars.util.data.MutableInteger;
@@ -74,8 +75,12 @@ public class Default extends AbstractNAR {
     }
 
     public Default(int activeConcepts, int conceptsFirePerCycle, int taskLinksPerConcept, int termLinksPerConcept, Random random) {
+        this(activeConcepts, conceptsFirePerCycle, taskLinksPerConcept, termLinksPerConcept, random, new DefaultTermIndex(256, random));
+    }
+
+    public Default(int activeConcepts, int conceptsFirePerCycle, int taskLinksPerConcept, int termLinksPerConcept, Random random, TermIndex index) {
         super(new FrameClock(),
-                new DefaultTermIndex(256, random),
+                index,
                 random,
                 Global.DEFAULT_SELF);
 
@@ -103,11 +108,11 @@ public class Default extends AbstractNAR {
     }
 
 
-    final void accept(@NotNull Task[] input) {
-        accept(input, 1f);
-    }
 
-    final void accept(@NotNull Task[] input, float activation) {
+
+    /** accepts null-terminated array */
+    final void accept(@NotNull Task[] input) {
+        float activation = activationRate.floatValue();
         for (Task t : input) {
             if (t == null) //for null-terminated arrays
                 break;
@@ -128,9 +133,7 @@ public class Default extends AbstractNAR {
             return null;
         }
 
-        input.budget().priMult( activationRate.floatValue() );
-
-        emotion.busy(input.pri());
+        emotion.busy(input.pri() * activation);
 
         Task t = c.process(input, this);
 
@@ -164,10 +167,8 @@ public class Default extends AbstractNAR {
 
         } else {
             t = input;
-            emotion.frustration(input.pri());
+            emotion.frustration(input.pri() * activation);
         }
-
-
 
         return c;
     }

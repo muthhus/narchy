@@ -307,7 +307,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
      */
     @NotNull
     @Override
-    public Compound dt(int cycles) {
+    public final Compound dt(int cycles) {
         if (cycles == dt) return this;
         GenericCompound g = new GenericCompound(op, relation, cycles, subterms);
         if (normalized) g.setNormalized();

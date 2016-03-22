@@ -59,7 +59,7 @@ abstract public class ConceptProcess implements Premise {
         this.belief = belief;
     }
 
-    @Override public boolean cyclic() {
+    @Override public final boolean cyclic() {
         int cc = this.cyclic;
         if (cc != -1) {
             return cc > 0;

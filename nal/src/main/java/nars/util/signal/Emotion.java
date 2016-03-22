@@ -1,14 +1,19 @@
 package nars.util.signal;
 
-import com.codahale.metrics.Meter;
-import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.*;
+import com.codahale.metrics.ConsoleReporter.Builder;
 import nars.Memory;
 import nars.task.Task;
 import nars.util.event.FrameReaction;
 import nars.util.meter.event.DoubleMeter;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.Serializable;
+import java.io.*;
+import java.util.Date;
+import java.util.Map;
+import java.util.SortedMap;
 
 /**
  * emotion state: self-felt internal mental states; variables used to record emotional values
@@ -27,10 +32,14 @@ public final class Emotion extends MetricRegistry {
     /** happiness rate */
     public final Meter happy;
 
+    public final Logger logger;
+
 
 
     public Emotion() {
         super();
+
+        logger = LoggerFactory.getLogger(Emotion.class);
 
         this.busy = meter("busy");
         this.happy = meter("happy");
@@ -40,7 +49,26 @@ public final class Emotion extends MetricRegistry {
     }
 
 
-//    @Override
+    public void print(PrintStream output) {
+
+        ConsoleReporter.forRegistry(this).outputTo(output).build()
+            .report(getGauges(), getCounters(), getHistograms(), getMeters(), getTimers());
+
+    }
+
+    @Override
+    public String toString() {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        PrintStream ps = new PrintStream(os);
+        print(ps);
+        try {
+            return os.toString("UTF8");
+        } catch (UnsupportedEncodingException e) {
+            return e.toString();
+        }
+    }
+
+    //    @Override
 //    public final void onFrame() {
 //        commitHappy();
 //

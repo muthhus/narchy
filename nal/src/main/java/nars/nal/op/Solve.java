@@ -1,13 +1,18 @@
 package nars.nal.op;
 
 import nars.Op;
+import nars.Premise;
 import nars.Symbols;
+import nars.concept.ConceptProcess;
 import nars.nal.meta.AtomicBooleanCondition;
 import nars.nal.meta.PremiseEval;
 import nars.nal.meta.TruthOperator;
+import nars.task.Task;
 import nars.truth.BeliefFunction;
 import nars.truth.DesireFunction;
+import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Evaluates the truth of a premise
@@ -101,7 +106,7 @@ abstract public class Solve extends AtomicBooleanCondition<PremiseEval> {
             case Symbols.BELIEF:
             case Symbols.GOAL:
                 TruthOperator tf = (punct == Symbols.BELIEF) ? belief : desire;
-                r = (tf != null) && (tf.allowOverlap() || !m.premise.cyclic()) && (tf.apply(m));
+                r = (tf != null) && (Solve.measure(tf, m));
                 break;
             case Symbols.QUESTION:
             case Symbols.QUEST:
@@ -112,9 +117,48 @@ abstract public class Solve extends AtomicBooleanCondition<PremiseEval> {
                 throw new Op.InvalidPunctuationException(punct);
         }
 
-        m.punct.set(punct);
+        if (r)
+            m.punct.set(punct);
+
         return r;
     }
+
+    private static boolean measure(TruthOperator tf, PremiseEval m) {
+
+        ConceptProcess p = m.premise;
+
+        if (!tf.allowOverlap() && p.cyclic())
+            return false;
+
+        Premise premise = p;
+
+        @Nullable Task belief = premise.belief();
+
+        float minConf = m.getMinConfidence();
+
+        Truth truth = tf.apply(
+                premise.task().truth(),
+                belief != null ? belief.truth() : null,
+                premise.nar(),
+                minConf
+        );
+
+        //pre-filter insufficient confidence level
+
+        if (truth != null) {
+            if ( truth.conf() > minConf) {
+                m.truth.set(truth);
+                return true;
+            }
+            //use this to find truth functions which do not utilize minConf before allocating a result Truth instance
+            /*else {
+                throw new RuntimeException(this + " did not filter minConf");
+            }*/
+        }
+
+        return false;
+    }
+
 
     public Derive getDerive() {
         return derive;

@@ -336,15 +336,14 @@ public class ArrayBag<V> extends ArrayTable<V, BLink<V>> implements Bag<V> {
     }
 
 
-    public float priAt(int cap) {
-        if (size() <= cap) return 1f;
-        return item(cap).pri();
+    public final float priAt(int cap) {
+        return size() <= cap ? 1f : item(cap).pri();
     }
 
 
     public final static class BudgetedArraySortedIndex<X extends Budgeted> extends ArraySortedIndex<X> {
         public BudgetedArraySortedIndex(int capacity) {
-            super(capacity / 4, capacity);
+            super(1, capacity);
         }
 
         @Override

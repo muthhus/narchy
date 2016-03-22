@@ -71,18 +71,18 @@ abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements Tabl
      * @param k An item
      * @return Whether the Item is in the Bag
      */
-    public boolean contains(V k) {
+    public final boolean contains(V k) {
         return this.containsKey(k);
     }
 
 
     @Override
-    public boolean isEmpty() {
+    public final boolean isEmpty() {
         return items.isEmpty();
     }
 
     @Override
-    public int size() {
+    public final int size() {
         return items.size(); //eternal.size() + temporal.size();
     }
 

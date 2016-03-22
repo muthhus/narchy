@@ -170,7 +170,7 @@ public abstract class TermBuilder {
 
 
     @Nullable
-    public Term newCompound(@NotNull Compound csrc, @NotNull TermContainer subs) {
+    public Term transformedCompound(@NotNull Compound csrc, @NotNull TermContainer subs) {
         if (csrc.subterms().equals(subs))
             return csrc;
         return the(csrc.op(), csrc.relation(), csrc.dt(), subs);

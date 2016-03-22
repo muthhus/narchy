@@ -5,20 +5,24 @@ import nars.Global;
 import nars.NAR;
 import nars.Symbols;
 import nars.guifx.NARfx;
+import nars.nar.AbstractNAR;
 import nars.nar.Default;
 import nars.rover.Sim;
 import nars.rover.robot.Arm;
 import nars.rover.robot.NARover;
 import nars.rover.world.FoodSpawnWorld1;
+import nars.term.TermIndex;
 import nars.time.SimulatedClock;
 import nars.op.NarQ;
 import nars.op.NarQ.BeliefReward;
 import nars.op.NarQ.InputTask;
 import nars.op.NarQ.NotBeliefReward;
+import nars.util.data.random.XorShift128PlusRandom;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.World;
 
+import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -93,9 +97,12 @@ public class SomeRovers {
 
     public static Default newNAR() {
         int conceptsFirePerCycle = 16;
+
+        Random rng = new XorShift128PlusRandom(1);
+        TermIndex index = new AbstractNAR.WeakTermIndex(64*1024,rng);
         Default nar = new Default(
                 //new Memory(clock, TermIndex.softMemory(64*1024)),
-                1200, conceptsFirePerCycle, 2, 3);
+                1200, conceptsFirePerCycle, 2, 3, rng, index);
         /*nar.with(
                 Anticipate.class,
                 Inperience.class

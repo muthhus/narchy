@@ -34,7 +34,7 @@ public abstract class TaskPerception implements Consumer<Task> {
     protected TaskPerception(@NotNull Memory m, Consumer<Task[]> eachFrameSupplyTo) {
         this(m);
         //active.add(
-            m.eventFrameStart.on((M) -> nextFrame(eachFrameSupplyTo));
+            m.eventFrameStart.on(M -> nextFrame(eachFrameSupplyTo));
         //);
     }
 

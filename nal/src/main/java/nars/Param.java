@@ -39,18 +39,7 @@ public abstract class Param extends Container implements Level {
      */
     @NotNull
     @Range(min=0, max=1f)
-    public MutableFloat perfection = new MutableFloat(0.1f) {
-
-        @Override
-        public void setValue(float value) {
-            super.setValue(value);
-        }
-
-        @Override
-        public void setValue(Number value) {
-            super.setValue(value);
-        }
-    };
+    public final MutableFloat perfection = new MutableFloat(0.1f);
 
 
 

@@ -16,9 +16,11 @@ import nars.op.out.echo;
 import nars.op.out.say;
 import nars.op.sys.js;
 import nars.op.sys.reset;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.TermIndex;
 import nars.term.atom.Atom;
+import nars.term.container.TermContainer;
 import nars.term.index.MapIndex2;
 import nars.time.Clock;
 import nars.util.data.map.UnifriedMap;
@@ -26,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
+import java.util.WeakHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -190,6 +193,7 @@ public abstract class AbstractNAR extends NAR {
             //new feelHappy(),
             //new feelBusy(),
 
+
             // math operations
             new length(),
             new add(),
@@ -323,6 +327,14 @@ public abstract class AbstractNAR extends NAR {
         public DefaultTermIndex(int capacity, @NotNull Random random) {
             super(new UnifriedMap(capacity),
                   new DefaultConceptBuilder(random, 32, 32));
+
+        }
+    }
+    public static class WeakTermIndex extends MapIndex2  {
+
+        public WeakTermIndex(int capacity, @NotNull Random random) {
+            super(new WeakHashMap<TermContainer, SubtermNode>(capacity),
+                    new DefaultConceptBuilder(random, 32, 32));
 
         }
     }

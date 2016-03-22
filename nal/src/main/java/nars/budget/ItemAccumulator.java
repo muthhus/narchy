@@ -16,20 +16,14 @@ import java.io.PrintStream;
  *      --next(n, consumer(n)) - visit N highest items
  *
  * */
-public class ItemAccumulator<V extends Budgeted > {
+public class ItemAccumulator<V extends Budgeted> {
 
 
     @NotNull
     private final MyArrayBag arrayBag;
 
     public ItemAccumulator(int capacity, BudgetMerge merge) {
-        arrayBag = new MyArrayBag(new ArraySortedIndex<BLink<V>>(capacity) {
-
-            @Override
-            public float score(@NotNull BLink<V> v) {
-                return v.pri();
-            }
-        });
+        arrayBag = new MyArrayBag(new BLinkArraySortedIndex<>(capacity));
         arrayBag.merge(merge);
     }
 
@@ -41,6 +35,18 @@ public class ItemAccumulator<V extends Budgeted > {
     @NotNull
     public ArrayBag<V> bag() {
         return arrayBag;
+    }
+
+    private static class BLinkArraySortedIndex<V extends Budgeted> extends ArraySortedIndex<BLink<V>> {
+
+        public BLinkArraySortedIndex(int capacity) {
+            super(capacity);
+        }
+
+        @Override
+        public float score(@NotNull BLink<V> v) {
+            return v.pri();
+        }
     }
 
     final class MyArrayBag extends ArrayBag<V> {
@@ -65,10 +71,10 @@ public class ItemAccumulator<V extends Budgeted > {
             v.get().budget().set(v); //TODO replace instance's budget on insert so this copy isnt necessary
         }
 
-        @Override
-        public final boolean contains(V t) {
-            return containsKey(t);
-        }
+//        @Override
+//        public final boolean contains(V t) {
+//            return containsKey(t);
+//        }
     }
 
 

@@ -21,38 +21,6 @@ public interface TruthOperator {
      */
     @Nullable Truth apply(@Nullable Truth task, @Nullable Truth belief, @NotNull Memory m, float minConf);
 
-    default boolean apply(@NotNull PremiseEval m) {
-
-        Premise premise = m.premise;
-
-        @Nullable Truth taskTruth = premise.task().truth();
-
-        @Nullable Task belief = premise.belief();
-
-        float minConf = m.getMinConfidence();
-
-        Truth truth = apply(
-                taskTruth,
-                belief != null ? belief.truth() : null,
-                premise.nar(),
-                minConf
-        );
-
-        //pre-filter insufficient confidence level
-
-        if (truth != null) {
-            if ( truth.conf() > minConf) {
-                m.truth.set(truth);
-                return true;
-            }
-            //use this to find truth functions which do not utilize minConf before allocating a result Truth instance
-            /*else {
-                throw new RuntimeException("minConf did not prevent calculation");
-            }*/
-        }
-
-        return false;
-    }
 
     boolean allowOverlap();
     boolean single();

@@ -178,7 +178,7 @@ public interface TermIndex  {
                 EllipsisMatch m = (EllipsisMatch) u;
 
                 if (maxArity != -1 && m.size() + sub.size() > maxArity) {
-                    return src; //invalid transformation, violates arity constraint
+                    return src; //invalid transformation, violated arity constraint
                 }
 
                 Collections.addAll(sub, m.term);
@@ -213,7 +213,7 @@ public interface TermIndex  {
         }
 
 
-        Term result = this.builder().newCompound(src, TermContainer.the(sop, sub));
+        Term result = this.builder().transformedCompound(src, TermContainer.the(sop, sub));
 
 
         //apply any known immediate transform operators
@@ -428,7 +428,7 @@ public interface TermIndex  {
         if (mods == -1) {
             return null;
         } else if ((mods > 0)) {
-            return builder().newCompound(src, TermContainer.the(src.op(), newSubterms));
+            return builder().transformedCompound(src, TermContainer.the(src.op(), newSubterms));
         }
         return src; //nothing changed
     }

@@ -36,13 +36,16 @@ import nars.guifx.nars.SubButton;
 import nars.guifx.remote.VncClientApp;
 import nars.guifx.terminal.LocalTerminal;
 import nars.guifx.util.*;
+import nars.nal.nal8.operator.TermFunction;
 import nars.nar.Default;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.TermIndex;
 import nars.time.FrameClock;
 import nars.time.RealtimeMSClock;
 import nars.util.data.Util;
 import nars.video.WebcamFX;
+import org.jetbrains.annotations.Nullable;
 import org.jewelsea.willow.browser.WebBrowser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -248,13 +251,15 @@ public class NARide extends StackPane {
 
         nar.onExec("memstat", (c) -> {
             String report = "";
-            report += "Busy: " + nar.emotion.busy() + "<br/>";
+            //report += "Busy: " + nar.emotion.busy() + "<br/>";
             report += "Index Size (Terms): " + nar.index.size() + "<br/>";
             report += "Active Concept Bag Histogram: " +
                     Arrays.toString(((Default)nar).core.active.getPriorityHistogram(10)) + "<br/>";
             nar.input("html(\"" + report + "\");");
         });
-
+        nar.onExec("feel", (c) -> {
+            nar.emotion.logger.info("{}", nar.emotion);
+        });
 
 
 
