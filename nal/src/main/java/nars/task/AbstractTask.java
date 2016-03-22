@@ -3,6 +3,7 @@ package nars.task;
 import nars.Global;
 import nars.Memory;
 import nars.NAR;
+import nars.Symbols;
 import nars.budget.UnitBudget;
 import nars.concept.Concept;
 import nars.nal.Tense;
@@ -10,7 +11,6 @@ import nars.nal.nal8.Execution;
 import nars.term.Compound;
 import nars.term.Operator;
 import nars.term.Termed;
-import nars.truth.DefaultTruth;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import nars.util.data.Util;
@@ -163,29 +163,28 @@ public abstract class AbstractTask extends UnitBudget
         }*/
 
         //noinspection IfStatementWithTooManyBranches
-        if (isJudgmentOrGoal()) {
+        switch (punc()) {
+            case Symbols.BELIEF:
+            case Symbols.GOAL:
+                if (truth == null) {
+                    //apply the default truth value for specified punctuation
+                    truth = memory.getTruthDefault(punc);
+                }
+                break;
+            case Symbols.QUEST:
+            case Symbols.QUESTION:
+                if (truth!=null)
+                    throw new RuntimeException("quests and questions must have null truth");
+                break;
+            case Symbols.COMMAND:
+                break;
 
-        } else if (isQuestOrQuestion()) {
-            if (truth!=null)
-                throw new RuntimeException("quests and questions must have null truth");
-        } else if (isCommand()) {
-            //..
-        } else {
-            throw new RuntimeException("invalid punctuation: " + punc);
+            default:
+                throw new UnsupportedOperationException("invalid punctuation: " + punc);
+
         }
 
-        //normalize term
-        Termed<Compound> normalizedTerm = memory.index.normalized(t);
-        if ((normalizedTerm == null) || (!Task.validTaskTerm(normalizedTerm.term()))) {
-            return null;
-        }
-        setTerm(normalizedTerm);
-
-
-        if (truth == null && isJudgmentOrGoal()) {
-            //apply the default truth value for specified punctuation
-            truth = new DefaultTruth(punc, memory);
-        }
+        setTerm(Task.normalizeTaskTerm(t, memory));
 
 
         // if a task has an unperceived creationTime,
@@ -203,9 +202,6 @@ public abstract class AbstractTask extends UnitBudget
 
 
 
-
-
-
         //---- VALID TASK BEYOND THIS POINT
 
         /** NaN quality is a signal that a budget's values need initialized */
@@ -218,24 +214,20 @@ public abstract class AbstractTask extends UnitBudget
 
         //finally, assign a unique stamp if none specified (input)
         if (evidence() == null) {
-            if (!isInput()) {
-                throw new RuntimeException("derived task without evidence: " + this);
-            } else {
 
-                setEvidence(memory.newStampSerial());
+            assert(isInput()); //throw new RuntimeException("derived task without evidence: " + this);
 
-                //this actually means it arrived from unknown origin.
-                //we'll clarify what null evidence means later.
-                //if data arrives via a hardware device, can a virtual
-                //task be used as the parent when it generates it?
-                //doesnt everything originate from something else?
-                if (log == null)
-                    log("Input");
-            }
+            setEvidence(memory.newStampSerial());
+
+            //this actually means it arrived from unknown origin.
+            //we'll clarify what null evidence means later.
+            //if data arrives via a hardware device, can a virtual
+            //task be used as the parent when it generates it?
+            //doesnt everything originate from something else?
+            if (Global.DEBUG && (log == null))
+                log("Input");
+
         }
-
-
-        //hash = rehash();
 
         onInput(memory);
 

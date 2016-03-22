@@ -569,4 +569,23 @@ public interface TermIndex  {
             return "InvalidConceptTerm: " + term;
         }
     }
+
+    final class InvalidTaskTerm extends RuntimeException {
+
+        public final Termed term;
+
+        public InvalidTaskTerm(Termed term) {
+            this(term, "InvalidTaskTerm");
+        }
+        public InvalidTaskTerm(Termed term, String message) {
+            super(message);
+            this.term = term;
+        }
+
+        @Override
+        public String toString() {
+            return getMessage() + ": " + term;
+        }
+    }
+
 }

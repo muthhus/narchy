@@ -102,28 +102,30 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
      * returns the compound valid for a Task if so,
      * otherwise returns null
      * */
-    static boolean validTaskTerm(Term t) {
+    @NotNull static Termed<Compound> normalizeTaskTerm(@NotNull Termed t, @NotNull Memory memory) {
 
-        if (!(t instanceof Compound))//(t instanceof CyclesInterval) || (t instanceof Variable)
-            return false;
+        Termed normalizedTerm = memory.index.normalized(t);
+        if ((normalizedTerm == null) || (!(t instanceof Compound)))
+            throw new TermIndex.InvalidTaskTerm(normalizedTerm, "Task Term Does Not Normalize to Compound");
 
-        Compound st = (Compound) t;
-        if (t.op().isStatement()) {
+        if (normalizedTerm.op().isStatement()) {
+            Compound cc = (Compound)normalizedTerm;
 
             /* A statement sentence is not allowed to have a independent variable as subj or pred"); */
-            if (subjectOrPredicateIsIndependentVar(st))
-                return false;
+            if (subjectOrPredicateIsIndependentVar(cc))
+                throw new TermIndex.InvalidTaskTerm(normalizedTerm, "Statement Task's subject or predicate is VAR_INDEP");
 
             if (Global.DEBUG_PARANOID) {
                 //should be checked on statement construction
                 //if it occurrs here, that did not happen somewhere prior
-                if (Statement.invalidStatement(st.term(0), st.term(1)))
-                    throw new RuntimeException("statement invalidity should be tested before created: " + st);
+                if (Statement.invalidStatement(cc.term(0), cc.term(1)))
+                    throw new RuntimeException("statement invalidity should be tested before created: " +
+                            cc);
             }
 
         }
 
-        return true;
+        return normalizedTerm;
     }
 
 //    static float prioritySum(@NotNull Iterable<? extends Budgeted > dd) {
@@ -134,9 +136,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 //    }
 
     static boolean subjectOrPredicateIsIndependentVar(@NotNull Compound t) {
-        if (!t.hasVarIndep()) return false;
-
-        return (t.term(0).op() == Op.VAR_INDEP) || (t.term(1).op() == Op.VAR_INDEP);
+        return t.hasVarIndep() && ((t.term(0, Op.VAR_INDEP) || t.term(1, Op.VAR_INDEP)));
     }
 
 

@@ -57,16 +57,9 @@ public enum $ /* TODO: implements TermIndex */ {
     }
 
     @Deprecated public static MutableTask $(@NotNull String term, char punc) {
-        Term t = Narsese.the().term(term).term();
-        //TODO normalize etc
-        if (!Task.validTaskTerm(t))
-            return null;
-
-        return new MutableTask(t)
-                .punctuation(punc)
-                .eternal();
-                //.normalized();
+        return new MutableTask($.$(term), punc);
     }
+
 
 //    public static @NotNull <O> ObjRef<O> ref(String term, O instance) {
 //        return new ObjRef(term, instance);

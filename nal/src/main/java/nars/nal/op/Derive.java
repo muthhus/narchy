@@ -161,6 +161,13 @@ public class Derive extends AtomicStringConstant implements ProcTerm {
         ConceptProcess premise = p.premise;
         NAR nar = premise.nar();
 
+        //pre-filter invalid statements
+        if (t.op().isStatement()) {
+            Compound ct = (Compound)t;
+            if (ct.term(0, Op.VAR_INDEP) || ct.term(1, Op.VAR_INDEP))
+                return;
+        }
+
         //get the normalized term to determine the budget (via it's complexity)
         //this way we can determine if the budget is insufficient
         //before conceptualizating in mem.taskConcept

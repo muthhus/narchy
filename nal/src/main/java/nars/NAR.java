@@ -420,31 +420,31 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * return true if the task was processed
      * if the task was a command, it will return false even if executed
      */
-    public final void input(@NotNull Task i) {
+    public final void input(@NotNull Task t) {
 
         Memory m = this;
 
         Task u;
-        if (i.isCommand()) {
+        if (t.isCommand()) {
             //direct execution
-            u = execute(i, null) ? i : null;
+            u = execute(t, null) ? t : null;
         } else {
-            if (!i.isDeleted()) {
+            if (!t.isDeleted()) {
                 //accept input if it can be normalized
-                if ((u = i.normalize(m)) != null) {
+                if ((u = t.normalize(m)) != null) {
                     //ACCEPT TASK FOR INPUT
                     m.eventInput.emit(u);
                 } else {
-                    m.remove(i, "Unnormalizable");
+                    m.remove(t, "Unnormalizable");
                 }
             } else {
-                m.remove(i, "Pre-Deleted");
+                m.remove(t, "Pre-Deleted");
                 u = null;
             }
         }
 
         if (null == u)
-            throw new InvalidTaskException(i);
+            throw new InvalidTaskException(t);
     }
 
     @Override
