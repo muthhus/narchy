@@ -142,11 +142,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
     }
 
-    @NotNull
-    @Override
-    public Compound anonymous() {
-        return this.dt(ITERNAL);
-    }
+
 
     @Override
     public final void addAllTo(@NotNull Collection<Term> set) {

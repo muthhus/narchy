@@ -11,6 +11,7 @@ import nars.nal.meta.match.EllipsisMatch;
 import nars.nal.op.ImmediateTermTransform;
 import nars.task.MutableTask;
 import nars.task.Task;
+import nars.term.atom.Atomic;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
@@ -386,8 +387,8 @@ public interface TermIndex  {
 
 
     @Nullable
-    default Term normalized(@NotNull Term t) {
-        if (t instanceof Compound && !t.isNormalized()) {
+    default Termed normalized(@NotNull Termed t) {
+        if (/*t instanceof Compound &&*/ !t.isNormalized()) {
             Compound ct = (Compound)t;
             t = transform(ct,
                     (ct.vars() == 1) ?
@@ -409,7 +410,7 @@ public interface TermIndex  {
             return true;
         }
 
-        @Override public Term apply(Compound parent, @NotNull Term subterm, int depth) {
+        @Override public Termed apply(Compound parent, @NotNull Term subterm, int depth) {
             return subterm.anonymous();
         }
     };
@@ -445,17 +446,17 @@ public interface TermIndex  {
         for (int i = 0; i < n; i++) {
             Term x = src.term(i);
             if (x == null)
-                throw new InvalidTerm();
+                throw new InvalidTerm(src);
 
             if (trans.test(x)) {
 
-                Term x2 = trans.apply((Compound<T>) src, (T) x, level);
+                Termed x2 = trans.apply((Compound<T>) src, (T) x, level);
                 if (x2 == null)
                     return -1;
 
                 if (x!=x2) { //REFERENCE EQUALTY
                     modifications++;
-                    x = x2;
+                    x = x2.term();
                 }
 
             } else if (x instanceof Compound) {
@@ -520,4 +521,52 @@ public interface TermIndex  {
 //            .weakValues();
 //        return new GuavaIndex(builder);
 //    }
+
+    /** applies normalization and anonymization to resolve the term of the concept the input term maps t */
+    @NotNull
+    default Termed validConceptTerm(@NotNull Termed term) {
+
+        if (term instanceof Atomic) {
+
+            if (term instanceof Variable)
+                throw new InvalidConceptTerm(term);
+
+            return term;
+
+        } else {
+            //COMPOUND -------
+
+            //NORMALIZATION
+            if ((term = normalized(term)) == null)
+                throw new InvalidTerm((Compound) term);
+
+            //ANONYMIZATION
+            //TODO ? put the unnormalized term for cached future normalizations?
+            Termed anonymizedTerm = term.anonymous();
+            if (anonymizedTerm != term) {
+                //complete anonymization process
+                if (null == (anonymizedTerm = transform((Compound) anonymizedTerm, CompoundAnonymizer)))
+                    throw new InvalidTerm((Compound) term);
+
+                term = anonymizedTerm;
+            }
+
+            return term;
+        }
+
+    }
+
+    final class InvalidConceptTerm extends RuntimeException {
+
+        public final Termed term;
+
+        public InvalidConceptTerm(Termed term) {
+            this.term = term;
+        }
+
+        @Override
+        public String toString() {
+            return "InvalidConceptTerm: " + term;
+        }
+    }
 }

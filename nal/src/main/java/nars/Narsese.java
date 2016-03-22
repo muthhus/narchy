@@ -1181,10 +1181,10 @@ public class Narsese extends BaseParser<Object> {
     public Term term(@NotNull String s, @NotNull TermIndex index, boolean normalize) throws NarseseException  {
         Term y = term(s);
         if (normalize) {
-            Term x = index.normalized(y);
+            Termed x = index.normalized(y);
             if (x == null)
                 throw new NarseseException("Un-normalizable: " + y);
-            y = x;
+            y = x.term();
         }
         return y;
     }

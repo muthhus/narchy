@@ -37,6 +37,8 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.Set;
 
+import static nars.nal.Tense.ITERNAL;
+
 /**
  * a compound term
  * TODO make this an interface extending Subterms
@@ -221,6 +223,12 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 
     @Override
     boolean isNormalized();
+
+    @NotNull
+    @Override
+    default Compound anonymous() {
+        return dt() == ITERNAL ? this : this.dt(ITERNAL);
+    }
 
     /** sets temporal relation value (TEMPORARY). returns new value */
     @NotNull

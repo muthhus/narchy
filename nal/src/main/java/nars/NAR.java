@@ -945,18 +945,22 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     public final Concept concept(@NotNull Termed t, boolean createIfMissing) {
 
         //optimization: assume a concept instance is the concept of this NAR
-        if (t instanceof Concept)
-            return (Concept)t;
-        Term tt = t.term();
-        if (tt instanceof Concept)
-            return (Concept)tt;
 
-
-        if ((tt = validConceptTerm(tt))!=null) {
-           return (Concept)(createIfMissing ?  index.the(tt) : index.get(tt) );
-        } else {
-            return null;
+        if (t instanceof Concept) {
+            //TODO check the concept hasnt been deleted, if not, then it is ok to accept the Concept as-is
+            return (Concept) t;
         }
+
+        Termed tt = t.term();
+        if (tt instanceof Concept) {
+            //TODO check the concept hasnt been deleted, if not, then it is ok to accept the Concept as-is
+            return (Concept) tt;
+        }
+
+        tt = index.validConceptTerm(tt);
+
+        return (Concept)(createIfMissing ?  index.the(tt) : index.get(tt) );
+
     }
 
     @Nullable
@@ -1003,39 +1007,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         input(new TaskStream(taskStream));
     }
 
-
-
-
-
-    /** applies normalization and anonymization to resolve the term of the concept the input term maps t */
-    @Nullable
-    Term validConceptTerm(@NotNull Term term) {
-
-        //PREFILTER
-        if (term instanceof Variable)
-            return null;
-
-        if (term instanceof Atomic)
-            return term;
-
-
-        //NORMALIZATION
-        if ((term = index.normalized(term)) == null)
-            return null;
-
-        //ANONYMIZATION
-        //TODO ? put the unnormalized term for cached future normalizations?
-        Termed at = term.anonymous();
-        if (at!= term) {
-            //complete anonymization process
-            if (null == (at = index.transform((Compound) at, CompoundAnonymizer)))
-                throw new InvalidTerm((Compound) term);
-
-            term = at.term();
-        }
-
-        return term;
-    }
 
 
 

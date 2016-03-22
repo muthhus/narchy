@@ -398,7 +398,7 @@ public class PremiseRuleSet  {
 
         @Nullable
         @Override
-        public Term apply(Compound parent, @NotNull Term subterm, int depth) {
+        public Termed apply(Compound parent, @NotNull Term subterm, int depth) {
             return unpatternify(subterm);
         }
 

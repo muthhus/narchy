@@ -25,6 +25,7 @@ import nars.op.data.union;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.TermIndex;
+import nars.term.Termed;
 import nars.term.atom.Atomic;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermVector;
@@ -325,7 +326,7 @@ public class PremiseRule extends GenericCompound {
 
         @NotNull
         @Override
-        public Term apply(@NotNull Compound containingCompound, @NotNull Term v, int depth) {
+        public Termed apply(@NotNull Compound containingCompound, @NotNull Term v, int depth) {
 
             //do not alter postconditions
             if ((containingCompound.op() == Op.INHERIT)
@@ -843,7 +844,7 @@ public class PremiseRule extends GenericCompound {
             return true;
         }
 
-        public Term applyAfter(Variable secondary) {
+        public Termed applyAfter(Variable secondary) {
             offset++;
             return apply(null, secondary, -1);
         }

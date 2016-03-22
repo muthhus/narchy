@@ -96,13 +96,13 @@ public class SomeRovers {
     }
 
     public static Default newNAR() {
-        int conceptsFirePerCycle = 16;
+        int conceptsFirePerCycle = 64;
 
         Random rng = new XorShift128PlusRandom(1);
         TermIndex index = new AbstractNAR.WeakTermIndex(64*1024,rng);
         Default nar = new Default(
                 //new Memory(clock, TermIndex.softMemory(64*1024)),
-                1200, conceptsFirePerCycle, 2, 3, rng, index);
+                1200, conceptsFirePerCycle, 2, 2, rng, index);
         /*nar.with(
                 Anticipate.class,
                 Inperience.class
@@ -141,16 +141,19 @@ public class SomeRovers {
 
 
         //nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
-        nar.core.activationRate.setValue(0.65f);
+        nar.core.activationRate.setValue(0.45f);
 
 
-        nar.duration.set(4);
-        nar.conceptForgetDurations.setValue(4f);
-        nar.termLinkForgetDurations.setValue(12);
-        nar.taskLinkForgetDurations.setValue(8);
+        nar.duration.set(2);
+        nar.conceptForgetDurations.setValue(2f);
+        nar.termLinkForgetDurations.setValue(4);
+        nar.taskLinkForgetDurations.setValue(3);
+
         nar.cyclesPerFrame.set(3);
-        nar.shortTermMemoryHistory.set(3);
-        nar.executionThreshold.setValue(0.01f);
+        nar.shortTermMemoryHistory.set(4);
+
+        nar.executionThreshold.setValue(0.02f);
+        nar.derivationDurabilityThreshold.setValue(0.1f);
 
         boolean gui = true;
         if (gui) {

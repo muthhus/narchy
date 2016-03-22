@@ -858,21 +858,28 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
     }
 
     @Override
-    public boolean isNormalized() {
+    public final boolean isNormalized() {
         return true; //must be normalized to create the concept
     }
 
     @NotNull
     @Override
-    public Compound dt(int cycles) {
+    public final Compound dt(int cycles) {
         //the concept will not hold any particular temporality in its ID term. however its tasks may utliize them
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public int dt() {
+    public final int dt() {
         //concept itself is eternal
         return ITERNAL;
+    }
+
+    @NotNull
+    @Override
+    public final Compound anonymous() {
+        //concept itself is eternal
+        return this;
     }
 
     @Override

@@ -12,6 +12,7 @@ import nars.nal.meta.*;
 import nars.nal.meta.match.EllipsisMatch;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.term.atom.AtomicStringConstant;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -163,7 +164,7 @@ public class Derive extends AtomicStringConstant implements ProcTerm {
         //get the normalized term to determine the budget (via it's complexity)
         //this way we can determine if the budget is insufficient
         //before conceptualizating in mem.taskConcept
-        Term tNorm = nar.index.normalized(t);
+        Termed tNorm = nar.index.normalized(t);
 
         //HACK why?
         if ((tNorm == null) || !(tNorm instanceof Compound))
@@ -171,7 +172,7 @@ public class Derive extends AtomicStringConstant implements ProcTerm {
 
         Truth truth = p.truth.get();
 
-        Budget budget = p.getBudget(truth, tNorm);
+        Budget budget = p.getBudget(truth, tNorm.term());
         if (budget == null)
             return;
 

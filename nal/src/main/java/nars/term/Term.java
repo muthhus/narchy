@@ -87,10 +87,7 @@ public interface Term extends Termed, Comparable, Termlike {
      */
     boolean isCommutative();
 
-    /** provides the "anonymized" form of the compound which is used to reference the concept it would be associated with */
-    @NotNull default Term anonymous() {
-        return this;
-    }
+
 
 
     //boolean hasVar(final Op type);

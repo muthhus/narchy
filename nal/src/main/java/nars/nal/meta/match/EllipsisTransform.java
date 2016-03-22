@@ -4,6 +4,7 @@ import nars.Op;
 import nars.nal.meta.PremiseRule;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.term.transform.VariableNormalization;
 import nars.term.transform.subst.FindSubst;
 import nars.term.variable.AbstractVariable;
@@ -17,12 +18,12 @@ public class EllipsisTransform extends EllipsisOneOrMore {
     public final Term from;
     public final Term to;
 
-    public EllipsisTransform(@NotNull AbstractVariable name, Term from, Term to) {
+    public EllipsisTransform(@NotNull AbstractVariable name, Termed from, Termed to) {
         super(name);
 
 
-        this.from = from;
-        this.to = to;
+        this.from = from.term();
+        this.to = to.term();
     }
 
     @NotNull

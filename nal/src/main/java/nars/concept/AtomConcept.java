@@ -125,7 +125,7 @@ public class AtomConcept<E extends Atomic> extends AbstractConcept<E> implements
     }
 
     @Override
-    public int vars() {
+    public final int vars() {
         return term.vars();
     }
 

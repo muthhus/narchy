@@ -1,6 +1,7 @@
 package nars.util;
 
 import nars.Global;
+import nars.util.data.list.FasterList;
 import nars.util.data.sorted.SortedIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -122,18 +123,25 @@ abstract public class ArraySortedIndex<E> extends SortedIndex<E> {
         int upperBound = 0;
         int lowerBound = size()-1;
 
+        E[] ll = (E[]) ((FasterList) list).array();
+
         while (upperBound <= lowerBound) {
             int mid = (upperBound + lowerBound) /2; // >>> 1;
-            float mp = score(get(mid));
+
+            //float mp = score(get(mid));
+            float mp = score(ll[mid]);
 
 
-            if (mp < score) //midpoint is new lowerBound, so we need to go to the upper half
-                lowerBound = mid - 1;
-            else if (mp > score) //midpoint is new upperBound so go to lowerBound half
+            if (mp <= score) { //midpoint is new upperBound so go to lowerBound half
+
+                lowerBound = mid;
+
+                if (mp < score) //midpoint is new lowerBound, so we need to go to the upper half
+                    lowerBound--;  //mid - 1
+                else
+                    break; // key found
+            } else {
                 upperBound = mid + 1;
-            else {
-                lowerBound = mid; // key found
-                break;
             }
         }
         return lowerBound;

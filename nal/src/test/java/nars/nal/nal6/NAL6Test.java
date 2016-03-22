@@ -401,46 +401,31 @@ public class NAL6Test extends AbstractNALTest {
         long time = 400;
         final float finalConf = 0.73f;
 
-
-        TestNAR n = test();
-        n.believe(" <0 --> n>", 1.0f, 0.9f);
-        n.believe("<<$1 --> n> ==> <(/,next,$1,_) --> n>>", 1.0f, 0.9f);
-        n.ask("<(/,next,(/,next,0,_),_) --> n>");
-        n.mustBelieve(time, "<(/,next,0,_) --> n>", 1.0f, 1.0f, 0.81f, 1.0f);
-        n.mustBelieve(time, "<(/,next,(/,next,0,_),_) --> n>", 1.0f, 1.0f, finalConf, 1.0f);
+        test()
+        .believe(" <0 --> n>", 1.0f, 0.9f)
+        .believe("<<$1 --> n> ==> <(/,next,$1,_) --> n>>", 1.0f, 0.9f)
+        .ask("<(/,next,(/,next,0,_),_) --> n>")
+        .mustBelieve(time, "<(/,next,0,_) --> n>", 1.0f, 1.0f, 0.81f, 1.0f)
+        .mustBelieve(time, "<(/,next,(/,next,0,_),_) --> n>", 1.0f, 1.0f, finalConf, 1.0f);
     }
 
     @Test
     public void recursionSmall()  {
-        //
-        //<0 --> num>. %1.00;0.90% {0 : 1}
 
-       // <<$1 --> num> ==> <($1) --> num>>. %1.00;0.90% {0 : 2}
+        //<patham9> this is the only rule which is needed in this example
+        //B (A ==> C) |- C :post (:t/deduction :order-for-all-same) :pre ((:substitute-if-unifies "$" A B) (:shift-occurrence-forward ==>))
 
-      //  <(((0))) --> num>?  {0 : 3}
-
-      //  1200
-
-      //  ''outputMustContain('<(0) --> num>.')
-      //  ''outputMustContain('<((0)) --> num>.')
-        //''outputMustContain('<(((0))) --> num>.')
-       // ''outputMustContain('<(((0))) --> num>. %1.00;0.26%')
-       //
-
-        //TextOutput.out(nar);
-
-
-        long time =  500; //seed instanceof Solid ? 100 : 500
+        long time =  500; //originally: 1200
 
         float minConf = 0.66f;
-        TestNAR tester = test();
-        tester.believe("<0 --> num>", 1.0f, 0.9f);
-        tester.believe("<<?1 --> num> ==> <(?1) --> num>>", 1.0f, 0.9f);
-        tester.ask("<(((0))) --> num>");
-        tester.mustBelieve(time, "<(0) --> num>", 1.0f, 1.0f, 0.81f, 1.0f);
-        tester.mustBelieve(time, "<((0)) --> num>", 1.0f, 1.0f, 0.73f, 1.0f);
-        tester.mustBelieve(time, "<(((0))) --> num>", 1.0f, 1.0f, minConf, 1.0f);
-
+        test()
+        .believe("<0 --> num>", 1.0f, 0.9f)
+        .believe("<<?1 --> num> ==> <(?1) --> num>>", 1.0f, 0.9f)
+        .ask("<(((0))) --> num>")
+        .mustBelieve(time, "<(0) --> num>", 1.0f, 1.0f, 0.81f, 1.0f)
+        .mustBelieve(time, "<((0)) --> num>", 1.0f, 1.0f, 0.73f, 1.0f)
+        .mustBelieve(time, "<(((0))) --> num>", 1.0f, 1.0f, minConf, 1.0f);
+        // ''outputMustContain('<(((0))) --> num>. %1.00;0.26%')
 
     }
 

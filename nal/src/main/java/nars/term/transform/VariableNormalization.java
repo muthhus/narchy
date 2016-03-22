@@ -5,6 +5,7 @@ import nars.Global;
 import nars.nal.meta.match.Ellipsis;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.term.variable.GenericVariable;
 import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
@@ -62,7 +63,7 @@ public class VariableNormalization extends VariableTransform implements Function
     public static final VariableTransform singleVariableNormalization = new VariableTransform() {
 
         @Override
-        public Variable apply(Compound containing, @NotNull Term current, int depth) {
+        public Termed apply(Compound containing, @NotNull Term current, int depth) {
 
 
             if (current instanceof Ellipsis)
@@ -91,7 +92,7 @@ public class VariableNormalization extends VariableTransform implements Function
     }
 
     @Override
-    public final Variable apply(Compound ct, Term v, int depth) {
+    public final Termed apply(Compound ct, Term v, int depth) {
         return rename.computeIfAbsent(v, this);
     }
 

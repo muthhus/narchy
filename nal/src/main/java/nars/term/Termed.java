@@ -24,6 +24,11 @@ public interface Termed<T extends Term>  {
     default boolean isNormalized() {
         return term().isNormalized();
     }
-    
+
+
+    /** provides the "anonymized" form of the compound which is used to reference the concept it would be associated with */
+    @NotNull default Termed<T> anonymous() {
+        return this;
+    }
 
 }
