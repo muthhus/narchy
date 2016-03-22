@@ -1,5 +1,6 @@
 package nars.util.version;
 
+import com.gs.collections.impl.set.sorted.mutable.UnmodifiableSortedSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jgrapht.util.ArrayUnenforcedSet;
@@ -87,8 +88,7 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
     @Override public Set<Entry<X, Y>> entrySet() {
         ArrayUnenforcedSet<Entry<X,Y>> e = new ArrayUnenforcedSet<>(size());
         map.forEach( (k, v) -> {
-            Y vv = v.get();
-            e.add(new AbstractMap.SimpleEntry<>(k, vv));
+            e.add(new AbstractMap.SimpleEntry<>(k, v.get()));
         });
         return e;
     }

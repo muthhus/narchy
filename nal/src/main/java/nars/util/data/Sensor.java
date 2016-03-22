@@ -1,4 +1,4 @@
-package nars.util.learn;
+package nars.util.data;
 
 import com.gs.collections.api.block.function.primitive.FloatFunction;
 import com.gs.collections.api.block.function.primitive.FloatToFloatFunction;
@@ -8,7 +8,6 @@ import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;

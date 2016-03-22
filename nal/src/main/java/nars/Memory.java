@@ -31,7 +31,7 @@ import nars.time.Clock;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.event.DefaultTopic;
 import nars.util.event.Topic;
-import nars.util.signal.EmotionMeter;
+import nars.util.signal.Emotion;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -93,7 +93,7 @@ public class Memory extends Param {
 
     //TODO move these to separate components, not part of Memory:
     @NotNull
-    public final transient EmotionMeter emotion;
+    public final transient Emotion emotion;
 
     @NotNull
     public final Clock clock;
@@ -130,7 +130,7 @@ public class Memory extends Param {
         self = Global.DEFAULT_SELF; //default value
 
 
-        emotion = new EmotionMeter(this);
+        emotion = new Emotion();
 
 
     }
@@ -185,7 +185,7 @@ public class Memory extends Param {
 
         index.clear();
 
-        emotion.clear();
+        //emotion.clear();
 
     }
 

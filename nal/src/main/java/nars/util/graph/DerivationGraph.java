@@ -17,7 +17,6 @@ import nars.term.variable.Variable;
 import nars.util.Texts;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jgrapht.ext.*;
 import org.jgrapht.graph.DirectedMaskSubgraph;
 import org.jgrapht.graph.DirectedPseudograph;
 import org.jgrapht.graph.MaskFunctor;
@@ -540,75 +539,75 @@ public class DerivationGraph extends DirectedPseudograph<DerivationGraph.Keyed,O
         return premiseResult.toString();
     }
 
-    public void print(@NotNull Writer out) {
-
-//        for (PremiseKey premise : premiseResult.keySet()) {
-//            resultGroups = premiseResult.get(premise);
-//            //int g = 0;
+//    public void print(@NotNull Writer out) {
 //
+////        for (PremiseKey premise : premiseResult.keySet()) {
+////            resultGroups = premiseResult.get(premise);
+////            //int g = 0;
+////
+////
+////            if (resultGroups.isEmpty()) {
+////                p.println(premise + ";\t DERIVE; " +  "; null");
+////            }
+////
+////            for (Set<TaskResult> result : resultGroups) {
+////
+////                if (result.isEmpty()) {
+////                    p.println(premise + ";\t DERIVE; " +  "; null");
+////                }
+////                else {
+////                    for (TaskResult task : result) {
+////                        p.println(premise + ";\t DERIVE; " +  "; " + task);
+////                    }
+////                }
+////                //g++;
+////            }
+////        }
+////
+////        p.println(vertexSet().size() + " " + edgeSet().size());
+////
+////
+////        SummaryStatistics s = new SummaryStatistics();
+////        for (Double d : edgeWeights.values())
+////            s.addValue(d);
+////        //System.out.println("weights: " + s);
 //
-//            if (resultGroups.isEmpty()) {
-//                p.println(premise + ";\t DERIVE; " +  "; null");
+//        GmlExporter gme = new GmlExporter(new IntegerNameProvider(), new StringNameProvider() {
+//            @Override
+//            public String getVertexName(@NotNull Object vertex) {
+//                return super.getVertexName(vertex);
 //            }
-//
-//            for (Set<TaskResult> result : resultGroups) {
-//
-//                if (result.isEmpty()) {
-//                    p.println(premise + ";\t DERIVE; " +  "; null");
-//                }
-//                else {
-//                    for (TaskResult task : result) {
-//                        p.println(premise + ";\t DERIVE; " +  "; " + task);
-//                    }
-//                }
-//                //g++;
+//        }, new IntegerEdgeNameProvider(), new StringEdgeNameProvider() {
+//            @NotNull
+//            @Override
+//            public String getEdgeName(@NotNull Object edge) {
+//                return super.getEdgeName(edge) + "\"\n\tweight \"" + getEdgeWeight(edge) ;
 //            }
+//        });
+//        gme.setPrintLabels(GmlExporter.PRINT_EDGE_VERTEX_LABELS);
+//        try {
+//            gme.export(out, this);
+//
+//            //ex: filter:
+//                    //weightAtleast(0.5 * (s.getMean() + s.getGeometricMean())));
+//        } catch (Exception e) {
+//            e.printStackTrace();
 //        }
+//    }
+
+//    @NotNull
+//    private DirectedMaskSubgraph weightAtleast(double v) {
+//        MaskFunctor e = new MaskFunctor() {
+//            @Override
+//            public boolean isEdgeMasked(@NotNull Object edge) {
+//                return getEdgeWeight(edge) < v;
+//            }
 //
-//        p.println(vertexSet().size() + " " + edgeSet().size());
-//
-//
-//        SummaryStatistics s = new SummaryStatistics();
-//        for (Double d : edgeWeights.values())
-//            s.addValue(d);
-//        //System.out.println("weights: " + s);
-
-        GmlExporter gme = new GmlExporter(new IntegerNameProvider(), new StringNameProvider() {
-            @Override
-            public String getVertexName(@NotNull Object vertex) {
-                return super.getVertexName(vertex);
-            }
-        }, new IntegerEdgeNameProvider(), new StringEdgeNameProvider() {
-            @NotNull
-            @Override
-            public String getEdgeName(@NotNull Object edge) {
-                return super.getEdgeName(edge) + "\"\n\tweight \"" + getEdgeWeight(edge) ;
-            }
-        });
-        gme.setPrintLabels(GmlExporter.PRINT_EDGE_VERTEX_LABELS);
-        try {
-            gme.export(out, this);
-
-            //ex: filter:
-                    //weightAtleast(0.5 * (s.getMean() + s.getGeometricMean())));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @NotNull
-    private DirectedMaskSubgraph weightAtleast(double v) {
-        MaskFunctor e = new MaskFunctor() {
-            @Override
-            public boolean isEdgeMasked(@NotNull Object edge) {
-                return getEdgeWeight(edge) < v;
-            }
-
-            @Override
-            public boolean isVertexMasked(Object vertex) {
-                return false;
-            }
-        };
-        return new DirectedMaskSubgraph(this, e);
-    }
+//            @Override
+//            public boolean isVertexMasked(Object vertex) {
+//                return false;
+//            }
+//        };
+//        return new DirectedMaskSubgraph(this, e);
+//    }
 }

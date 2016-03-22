@@ -54,6 +54,8 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
     @Nullable
     protected BeliefTable goals;
 
+    /** cache for motivation calculation; set to NaN to invalidate */
+    protected transient final float _motivation = Float.NaN;
 
 //    public DefaultConcept(Term term, Memory p) {
 //        this(term, new NullBag(), new NullBag(), p);
@@ -220,18 +222,18 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
 //        }
     }
 
-    private float updateSuccess(@Nullable Task inputGoal, float successBefore, @NotNull Memory memory) {
-        /** update happiness meter on solution  TODO revise */
-        float successAfter = getSuccess(memory.time());
-
-        if (inputGoal != null)
-            successAfter = Math.max(inputGoal.expectation(), successAfter);
-
-        float delta = successAfter - successBefore;
-        if (delta != 0) //more satisfaction of a goal due to belief, more happiness
-            memory.emotion.happyPlus(delta);
-        return delta;
-    }
+//    private float updateSuccess(@Nullable Task inputGoal, float successBefore, @NotNull Memory memory) {
+//        /** update happiness meter on solution  TODO revise */
+//        float successAfter = getSuccess(memory.time());
+//
+//        if (inputGoal != null)
+//            successAfter = Math.max(inputGoal.expectation(), successAfter);
+//
+//        float delta = successAfter - successBefore;
+//        if (delta != 0) //more satisfaction of a goal due to belief, more happiness
+//            memory.emotion.happyPlus(delta);
+//        return delta;
+//    }
 
 
     /**

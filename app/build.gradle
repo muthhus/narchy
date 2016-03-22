@@ -34,6 +34,8 @@ dependencies {
         exclude(module:'objenesis')
     }
 
+    compile(group:'org.encog', name:'encog-core',version:'3.3.0')
+
 
     compile group: 'com.googlecode.concurrent-trees', name: 'concurrent-trees', version: '2.5.0'
 

@@ -187,8 +187,8 @@ public abstract class AbstractNAR extends NAR {
             //new jclass(),
 
             // feeling operations
-            new feelHappy(),
-            new feelBusy(),
+            //new feelHappy(),
+            //new feelBusy(),
 
             // math operations
             new length(),

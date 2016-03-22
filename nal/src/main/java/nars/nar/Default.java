@@ -128,9 +128,9 @@ public class Default extends AbstractNAR {
             return null;
         }
 
-        emotion.busy(input, activation);
-
         input.budget().priMult( activationRate.floatValue() );
+
+        emotion.busy(input.pri());
 
         Task t = c.process(input, this);
 
@@ -140,40 +140,43 @@ public class Default extends AbstractNAR {
 
             //TaskProcess succeeded in affecting its concept's state (ex: not a duplicate belief)
 
-            //1. propagate budget
+            //propagate budget
             MutableFloat overflow = new MutableFloat();
             conceptualize(c, t, activation, overflow);
-            /*if (overflow.floatValue() > 0) {
-                logger.warn("{} overflowed concept priority {}", input, overflow);
-            }*/
+            if (overflow.floatValue() > 0) {
+                emotion.stress(overflow.floatValue());
+                //logger.warn("{} overflowed concept priority {}", input, overflow);
+            }
+
+
+            //signal any additional processes
+            eventTaskProcess.emit(t);
 
             switch (t.punc()) {
                 case Symbols.GOAL:
                     execute(t, c);
-                    //TODO check for answer to parent quest task
+                    break;
+                case Symbols.BELIEF:
+                    onSolution(t);
                     break;
             }
 
-            //3. signal any additional processes
-            eventTaskProcess.emit(t);
 
         } else {
             t = input;
+            emotion.frustration(input.pri());
         }
 
-        if (t.isJudgment()) {
-            //check for answer to parent question task(s) and emit an event
-            onSolution(input, novel);
-        }
+
 
         return c;
     }
 
-    void onSolution(@NotNull Task t, boolean novel) {
+    void onSolution(@NotNull Task t) {
         Task parentTask = t.getParentTask();
         if (parentTask != null && parentTask.isQuestion()) {
 
-            if (novel || parentTask.isInput()) //filter
+            if (parentTask.isInput()) //filter
                 eventAnswer.emit(Tuples.twin(parentTask, t));
 
         }

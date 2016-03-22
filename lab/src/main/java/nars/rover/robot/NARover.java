@@ -24,7 +24,7 @@ import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import nars.util.data.Util;
 import nars.op.NarQ;
-import nars.util.learn.Sensor;
+import nars.util.data.Sensor;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.joints.RevoluteJoint;

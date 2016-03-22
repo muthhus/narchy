@@ -172,13 +172,13 @@ public enum Op {
     }
 
     public static boolean isOperation(@NotNull Term t) {
-        if (!(t instanceof Compound)) return false;
-        Compound c = (Compound)t;
-        return  c.size() == 2 &&
-                (!c.impossibleStructureMatch(OperationBits)) &&
-                c.op() == Op.INHERIT &&
-                c.term(1, Op.OPERATOR) &&
-                c.term(0, Op.PRODUCT);
+        if (t.op() == Op.INHERIT) {
+            Compound c = (Compound) t;
+            return c.term(1, Op.OPERATOR) &&
+                   c.term(0, Op.PRODUCT);
+        }
+        return false;
+                //(!c.impossibleStructureMatch(OperationBits)) &&
     }
 
 

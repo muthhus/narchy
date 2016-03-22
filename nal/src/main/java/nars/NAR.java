@@ -461,8 +461,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     protected final boolean execute(@NotNull Task inputGoal, @Nullable Concept goalConcept) {
 
         Term goalTerm = inputGoal.term();
-        if (!Op.isOperation(goalTerm)) {
-
+        if (!Op.isOperation(goalTerm))
+            return false;
 //            if (goalTerm.op()==Op.PRODUCT) {
 //                @NotNull Compound x = inputGoal.term();
 //                try {
@@ -481,8 +481,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 //                }
 //            }
 
-            return false;
-        }
 
         Task goal = inputGoal;
 
