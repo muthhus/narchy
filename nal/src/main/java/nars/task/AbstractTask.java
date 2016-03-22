@@ -10,6 +10,7 @@ import nars.nal.Tense;
 import nars.nal.nal8.Execution;
 import nars.term.Compound;
 import nars.term.Operator;
+import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Stamp;
 import nars.truth.Truth;
@@ -137,25 +138,21 @@ public abstract class AbstractTask extends UnitBudget
         return !Float.isFinite(priority);
     }
 
-    @Override
+
+
+    @Override @NotNull
     public final Task normalize(@NotNull Memory memory) {
 
-//        if (hash != 0) {
-//            /* already validated */
-//            return this;
-//        }
-
         if (isDeleted())
-            return null;
+            throw new NAR.InvalidTaskException(this, "Deleted");
 
         Compound t = term();
         if (!t.levelValid( memory.nal() ))
-            return null;
-
+            throw new NAR.InvalidTaskException(this, "Unsupported NAL level");
 
         char punc = punc();
         if (punc == 0)
-            throw new RuntimeException("Punctuation must be specified before generating a default budget");
+            throw new NAR.InvalidTaskException(this, "Unspecified punctuation");
 
         //this conflicts with weakref's
         /*if (!isCommand()) {

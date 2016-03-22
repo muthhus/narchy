@@ -594,8 +594,8 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     /** if unnormalized, returns a normalized version of the task,
      *  null if not normalizable
      */
-    @Nullable
-    Task normalize(Memory memory);
+    @NotNull
+    Task normalize(@NotNull Memory memory);
 
 
 //    default void ensureValidParentTaskRef() {
@@ -604,7 +604,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 //    }
 
 
-    void setTruth(Truth t);
+    void setTruth(@NotNull Truth t);
 
 
 //
@@ -819,4 +819,19 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 //            return Float.compare(a.conf(), b.conf());
 //        }
 //    }
+
+    /** pre-verify tests to early disqualify terms that are not acceptable as Task content */
+    static boolean preNormalize(Term t, Memory memory) {
+        if (t.levelValid( memory.nal() )) {
+            if (t.op().isStatement()) {
+                Compound ct = (Compound)t;
+                if (ct.term(0, Op.VAR_INDEP) || ct.term(1, Op.VAR_INDEP))
+                    return false;
+            }
+
+            return true;
+        }
+        return false;
+    }
+
 }

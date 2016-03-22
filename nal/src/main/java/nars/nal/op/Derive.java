@@ -10,6 +10,7 @@ import nars.concept.ConceptProcess;
 import nars.concept.Temporalize;
 import nars.nal.meta.*;
 import nars.nal.meta.match.EllipsisMatch;
+import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -162,11 +163,8 @@ public class Derive extends AtomicStringConstant implements ProcTerm {
         NAR nar = premise.nar();
 
         //pre-filter invalid statements
-        if (t.op().isStatement()) {
-            Compound ct = (Compound)t;
-            if (ct.term(0, Op.VAR_INDEP) || ct.term(1, Op.VAR_INDEP))
-                return;
-        }
+        if (!Task.preNormalize(t, nar))
+            return;
 
         //get the normalized term to determine the budget (via it's complexity)
         //this way we can determine if the budget is insufficient

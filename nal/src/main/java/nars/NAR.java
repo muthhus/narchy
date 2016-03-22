@@ -429,22 +429,24 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             //direct execution
             u = execute(t, null) ? t : null;
         } else {
-            if (!t.isDeleted()) {
+            //if (!t.isDeleted()) {
                 //accept input if it can be normalized
-                if ((u = t.normalize(m)) != null) {
-                    //ACCEPT TASK FOR INPUT
+                u = t.normalize(m);
+//                if (() != null) {
+//                    //ACCEPT TASK FOR INPUT
                     m.eventInput.emit(u);
-                } else {
+                /*} else {
                     m.remove(t, "Unnormalizable");
-                }
-            } else {
+                    throw new InvalidTaskException(t);
+                }*/
+            /*} else {
                 m.remove(t, "Pre-Deleted");
                 u = null;
-            }
+            }*/
         }
 
-        if (null == u)
-            throw new InvalidTaskException(t);
+        /*if (null == u)
+            throw new InvalidTaskException(t);*/
     }
 
     @Override
@@ -1069,14 +1071,18 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         public final Task task;
 
         public InvalidTaskException(Task t) {
-            super();
+            this(t, "Invalid Task");
+        }
+
+        public InvalidTaskException(Task t, String message) {
+            super(message);
             this.task = t;
         }
 
         @NotNull
         @Override
         public String getMessage() {
-            return "Invalid Task: " + task.explanation();
+            return super.getMessage() + ": " + task.explanation();
         }
 
     }

@@ -225,23 +225,24 @@ abstract public class ConceptProcess implements Premise {
 
     private final boolean complete(Task derived) {
 
-        //pre-normalize to avoid discovering invalidity after having consumed space while in the input queue
-        derived = derived.normalize(nar());
-        if (derived != null) {
-
-            //if (Global.DEBUG) {
-            if (task().equals(derived))
-                return false;
-                //throw new RuntimeException("derivation same as task");
-            if (belief() != null && belief().equals(derived))
-                return false;
-                //throw new RuntimeException("derivation same as belief");
-            //}
+//        //pre-normalize to avoid discovering invalidity after having consumed space while in the input queue
+//        derived = derived.normalize(nar());
+//        if (derived != null) {
+//
+//            //if (Global.DEBUG) {
+//            if (task().equals(derived))
+//                return false;
+//                //throw new RuntimeException("derivation same as task");
+//            if (belief() != null && belief().equals(derived))
+//                return false;
+//                //throw new RuntimeException("derivation same as belief");
+//            //}
 
             accept(derived);
-            return true;
-        }
-        return false;
+        return true;
+//            return true;
+//        }
+//        return false;
     }
 
 

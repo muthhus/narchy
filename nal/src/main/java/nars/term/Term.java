@@ -21,6 +21,7 @@
 package nars.term;
 
 
+import nars.NAR;
 import nars.Op;
 import nars.nal.meta.match.Ellipsis;
 import org.jetbrains.annotations.NotNull;
@@ -168,6 +169,7 @@ public interface Term extends Termed, Comparable, Termlike {
 //    default public String toString(boolean pretty) {
 //        return toStringBuilder(pretty).toString();
 //    }
+
 
 
     @Override
