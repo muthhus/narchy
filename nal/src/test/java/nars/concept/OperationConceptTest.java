@@ -34,17 +34,14 @@ public class OperationConceptTest {
         List<String> history = Global.newArrayList();
 
         NAR n = new Default();
-        n.onExec(new SyncOperator("f") {
 
-            @Override public void execute(Task execution) {
-                float b = nar.concept(execution.term()).beliefMotivation(nar.time());
-                float g = nar.concept(execution.term()).goalMotivation(nar.time());
-                history.add(nar.time() + ":(" + n2(b) + "," + n2(g) + ")");
+        Termed op = new OperationConcept("f(x)", n) {
+            @Override protected void update(float belief, float desire, long now) {
+                super.update(belief, desire, now);
+                history.add(now + ":(" + n2(belief) + "," + n2(desire) + ")");
             }
+        };
 
-        });
-
-        Term op = $.$("f(x)");
 
         n.goal(op, 1f, 0.9f).step();
         assertMotive(n, op, 0, 0.9f);

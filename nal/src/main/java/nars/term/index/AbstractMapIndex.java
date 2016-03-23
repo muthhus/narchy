@@ -1,6 +1,7 @@
 package nars.term.index;
 
 import nars.concept.Concept;
+import nars.concept.ConceptBuilder;
 import nars.nal.meta.match.Ellipsis;
 import nars.term.*;
 import nars.term.atom.Atomic;
@@ -11,21 +12,19 @@ import java.io.PrintStream;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-/**
- * Created by me on 12/31/15.
- */
+
 public abstract class AbstractMapIndex implements TermIndex {
 
     public final SymbolMap atoms;
     protected final TermBuilder termBuilder;
-    protected final Function<Term, Concept> conceptBuilder;
+    protected final ConceptBuilder conceptBuilder;
 
 
-    public AbstractMapIndex(TermBuilder termBuilder, Function<Term, Concept> conceptBuilder) {
+    public AbstractMapIndex(TermBuilder termBuilder, ConceptBuilder conceptBuilder) {
         this(new HashSymbolMap(), termBuilder, conceptBuilder);
     }
 
-    public AbstractMapIndex(SymbolMap symbolMap, TermBuilder termBuilder, Function<Term, Concept> conceptBuilder) {
+    public AbstractMapIndex(SymbolMap symbolMap, TermBuilder termBuilder, ConceptBuilder conceptBuilder) {
         super();
         this.termBuilder = termBuilder;
         this.atoms = symbolMap;

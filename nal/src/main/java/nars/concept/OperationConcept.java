@@ -1,8 +1,6 @@
 package nars.concept;
 
-import nars.$;
-import nars.Global;
-import nars.NAR;
+import nars.*;
 import nars.bag.Bag;
 import nars.nal.Tense;
 import nars.nal.nal8.Execution;
@@ -44,6 +42,22 @@ public class OperationConcept extends CompoundConcept implements Runnable {
     transient private NAR nar;
 
 
+    public OperationConcept(@NotNull String compoundTermString, NAR n) throws Narsese.NarseseException {
+        this((Compound)$.$(compoundTermString), n);
+    }
+
+    /** used for setting an explicit OperationConcept instance via java */
+    public OperationConcept(@NotNull Compound term, NAR n) {
+        this(term, n.index.conceptBuilder());
+        assert(Op.isOperation(term));
+        n.on(this);
+    }
+
+    /** default construction by a NAR on conceptualization */
+    public OperationConcept(@NotNull Compound term, ConceptBuilder b) {
+        this(term, b.termbag(), b.taskbag());
+    }
+
     public OperationConcept(@NotNull Compound term, Bag<Termed> termLinks, Bag<Task> taskLinks) {
         super(term, termLinks, taskLinks);
     }
@@ -63,10 +77,10 @@ public class OperationConcept extends CompoundConcept implements Runnable {
     private final Task executeLater(Task t, NAR nar) {
         if (op()!=NEGATE) {
             pending.add(t);
-            nar.runLater(this);
+            nar.runOnceLater(this);
             this.nar = nar;
         } else {
-            nar.runLater(positive(nar)); //queue an update on the positive concept but dont queue the negation task
+            nar.runOnceLater(positive(nar)); //queue an update on the positive concept but dont queue the negation task
         }
         return t;
     }
@@ -147,7 +161,8 @@ public class OperationConcept extends CompoundConcept implements Runnable {
 //        return (last == ETERNAL) || ((now - last) > 0);
 //    }
 //
-    private final void update(float b, float d, long now) {
+    /** set the belief/desire state */
+    protected void update(float b, float d, long now) {
         this.believed = b;
         this.desired = d;
         this.lastMotivationUpdate = now;

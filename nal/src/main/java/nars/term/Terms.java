@@ -5,6 +5,7 @@ import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
 import nars.$;
 import nars.Global;
 import nars.Op;
+import nars.concept.ConceptBuilder;
 import nars.nal.meta.match.Ellipsis;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
@@ -106,6 +107,12 @@ public class Terms extends TermBuilder implements TermIndex {
         return null;
     }
 
+    @Nullable
+    @Override
+    public Termed set(@NotNull Termed t) {
+        throw new UnsupportedOperationException();
+    }
+
 
     @NotNull
     @Override
@@ -113,7 +120,10 @@ public class Terms extends TermBuilder implements TermIndex {
         return this;
     }
 
-
+    @Override
+    public ConceptBuilder conceptBuilder() {
+        return null;
+    }
 
 
     static final class EmptyTermContainer implements TermContainer {

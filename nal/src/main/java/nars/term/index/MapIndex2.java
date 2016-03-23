@@ -3,6 +3,7 @@ package nars.term.index;
 import com.gs.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import nars.Op;
 import nars.concept.Concept;
+import nars.concept.ConceptBuilder;
 import nars.term.*;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
@@ -88,14 +89,12 @@ public class MapIndex2 extends AbstractMapIndex {
     public final Map<TermContainer, SubtermNode> data;
     int count;
 
-    public MapIndex2(Map<TermContainer, SubtermNode> data, Function<Term, Concept> conceptBuilder) {
+    public MapIndex2(Map<TermContainer, SubtermNode> data, ConceptBuilder conceptBuilder) {
         this(data, Terms.terms, conceptBuilder);
     }
 
-    public MapIndex2(Map<TermContainer, SubtermNode> data, TermBuilder termBuilder, Function<Term, Concept> conceptBuilder) {
-
+    public MapIndex2(Map<TermContainer, SubtermNode> data, TermBuilder termBuilder, ConceptBuilder conceptBuilder) {
         super(termBuilder, conceptBuilder);
-
         this.data = data;
     }
 
@@ -232,7 +231,16 @@ public class MapIndex2 extends AbstractMapIndex {
 //    }
 
 
+    @Nullable
+    @Override
+    public Termed set(@NotNull Termed t) {
+        //TODO support Atomic insertion
 
+        SubtermNode node = getOrAddNode(((Compound) t.term()).subterms());
+        Termed existing = node.put(t.opRel(), t);
+        assert(existing==null);
+        return t;
+    }
 
     @Override
     public void clear() {
@@ -250,6 +258,11 @@ public class MapIndex2 extends AbstractMapIndex {
     public int size() {
         /** WARNING: not accurate */
         return data.size();// + atoms.size();
+    }
+
+    @Override
+    public final ConceptBuilder conceptBuilder() {
+        return conceptBuilder;
     }
 
     @Override

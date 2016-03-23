@@ -5,6 +5,8 @@ import nars.Global;
 import nars.Narsese;
 import nars.Op;
 import nars.budget.Budget;
+import nars.concept.Concept;
+import nars.concept.ConceptBuilder;
 import nars.nal.meta.PremiseAware;
 import nars.nal.meta.PremiseEval;
 import nars.nal.meta.match.EllipsisMatch;
@@ -28,6 +30,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static nars.Op.*;
 import static nars.nal.Tense.ITERNAL;
@@ -44,6 +47,8 @@ public interface TermIndex  {
     /** get if not absent */
     @Nullable Termed get(@NotNull Termed t);
 
+    /** set if not absent */
+    @Nullable Termed set(@NotNull Termed t);
 
         //DEFAULT IMPL to be moved to a concrete class: BUILDS ON THE HEAP:
         //return builder().make(op, relation, subterms, dt);
@@ -87,6 +92,7 @@ public interface TermIndex  {
 
 
     TermBuilder builder();
+    ConceptBuilder conceptBuilder();
 
 
 

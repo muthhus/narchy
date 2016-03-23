@@ -22,7 +22,7 @@ import java.util.function.Function;
 /**
  * Created by me on 2/24/16.
  */
-public class DefaultConceptBuilder implements Function<Term, Concept> {
+public class DefaultConceptBuilder implements ConceptBuilder {
 
     final Function<Atomic, AtomConcept> atomBuilder =
             (Atomic a) -> new AtomConcept(a, taskbag(), termbag());
@@ -57,7 +57,7 @@ public class DefaultConceptBuilder implements Function<Term, Concept> {
     //return (!(t instanceof Space)) ?
     //new SpaceConcept((Space) t, taskLinks, termLinks);
 
-    private Bag<Task> taskbag() {
+    @Override public Bag<Task> taskbag() {
         return new CurveBag<Task>(taskLinkBagSize.intValue(), rng)
                 .merge(mergeDefault());
     }
@@ -67,7 +67,7 @@ public class DefaultConceptBuilder implements Function<Term, Concept> {
         return BudgetMerge.plusDQBlend;
     }
 
-    private Bag<Termed> termbag() {
+    @Override public Bag<Termed> termbag() {
         return new CurveBag<Termed>(termLinkBagSize.intValue(), rng)
                 .merge(mergeDefault());
 

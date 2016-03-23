@@ -930,9 +930,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         input(new TaskStream(taskStream));
     }
 
-
-
-
     @NotNull
     public On onQuestion(@NotNull PatternAnswer p) {
         return eventTaskProcess.on(question -> {
@@ -976,6 +973,10 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         pw.close();
     }
 
+    /** inserts an explicitly specified concept instance */
+    public void on(Termed t) {
+        index.set(t);
+    }
 
 
 //    @Nullable
