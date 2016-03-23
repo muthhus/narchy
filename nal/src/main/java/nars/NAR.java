@@ -8,6 +8,7 @@ import nars.Narsese.NarseseException;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.concept.Concept;
+import nars.concept.OperationConcept;
 import nars.nal.Level;
 import nars.nal.Tense;
 import nars.nal.nal8.AbstractOperator;
@@ -105,7 +106,9 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     //TODO use this to store all handler registrations, and decide if transient or not
     public final transient List<Object> regs = Global.newArrayList();
 
-    private final transient Collection<Runnable> nextTasks = new CopyOnWriteArrayList(); //ConcurrentLinkedDeque();
+    private final transient List<Runnable> nextTasks = new CopyOnWriteArrayList(); //ConcurrentLinkedDeque();
+
+    private final transient Set<Runnable> nextUniqueTasks = new LinkedHashSet();
 
     private NARLoop loop = null;
 
@@ -153,6 +156,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     public synchronized NAR reset() {
 
         nextTasks.clear();
+        nextUniqueTasks.clear();
 
         if (asyncs!=null)
             asyncs.shutdown();
@@ -277,7 +281,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * desire goal
      */
     @Nullable
-    public Task goal(@NotNull Termed<Compound> goalTerm, @NotNull Tense tense, float freq, float conf) throws NarseseException {
+    public NAR goal(@NotNull Termed<Compound> goalTerm, @NotNull Tense tense, float freq, float conf) throws NarseseException {
         return goal(
                 getDefaultPriority(GOAL),
                 getDefaultDurability(GOAL),
@@ -299,7 +303,10 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     public NAR believe(@NotNull Termed term, float freq, float conf) throws NarseseException {
         return believe(term, Tense.Eternal, freq, conf);
     }
-
+    @NotNull
+    public NAR goal(@NotNull Termed term, float freq, float conf) throws NarseseException {
+        return goal(term, Tense.Eternal, freq, conf);
+    }
     @NotNull
     public NAR believe(@NotNull String term, @NotNull Tense tense, float freq, float conf) throws NarseseException {
         believe(getDefaultPriority(BELIEF), term(term), time(tense), freq, conf);
@@ -315,6 +322,10 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return believe((Termed) term(termString), freq, conf);
     }
 
+    public NAR goal(@NotNull String termString) throws NarseseException {
+        return goal((Termed)term(termString), true);
+    }
+
     @NotNull
     public NAR believe(@NotNull String termString) throws NarseseException {
         return believe(termString, true);
@@ -323,7 +334,10 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     public NAR believe(@NotNull String termString, boolean isTrue) throws NarseseException {
         return believe(term(termString), isTrue);
     }
-
+    @NotNull
+    public NAR goal(@NotNull String termString, boolean isTrue) throws NarseseException {
+        return goal(term(termString), isTrue);
+    }
     @NotNull
     public NAR believe(@NotNull Termed<Compound> term) throws NarseseException {
         return believe(term, true);
@@ -333,8 +347,16 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return believe(term, trueOrFalse, getDefaultConfidence(BELIEF));
     }
     @NotNull
+    public NAR goal(@NotNull Termed<Compound> term, boolean trueOrFalse) throws NarseseException {
+        return goal(term, trueOrFalse, getDefaultConfidence(BELIEF));
+    }
+    @NotNull
     public NAR believe(@NotNull Termed<Compound> term, boolean trueOrFalse, float conf) throws NarseseException {
         return believe(term, trueOrFalse ? 1.0f : 0f, conf);
+    }
+    @NotNull
+    public NAR goal(@NotNull Termed<Compound> term, boolean trueOrFalse, float conf) throws NarseseException {
+        return goal(term, trueOrFalse ? 1.0f : 0f, conf);
     }
 
     @Nullable
@@ -346,8 +368,9 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * TODO add parameter for Tense control. until then, default is Now
      */
     @Nullable
-    public Task goal(float pri, float dur, @NotNull Termed<Compound> goal, long occurrence, float freq, float conf) throws NarseseException {
-        return input(pri, dur, goal, GOAL, occurrence, freq, conf);
+    public NAR goal(float pri, float dur, @NotNull Termed<Compound> goal, long occurrence, float freq, float conf) throws NarseseException {
+        input(pri, dur, goal, GOAL, occurrence, freq, conf);
+        return this;
     }
 
     @Nullable
@@ -418,7 +441,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      */
     public final void input(@NotNull Task t) {
         if (t.isCommand()) {
-            t.execute(, , this, ); //direct execution
+            t.execute(1, 0, this); //direct execution
         } else {
             eventInput.emit(t.normalize(this)); //accept into input buffer for eventual processing
         }
@@ -709,7 +732,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * adds a task to the queue of task which will be executed in batch
      * after the end of the current frame before the next frame.
      */
-    public void runLater(@NotNull Runnable t) {
+    public final void runLater(@NotNull Runnable t) {
         if (running.get()) {
             //in a frame, so schedule for after it
             nextTasks.add(t);
@@ -719,11 +742,25 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         }
     }
 
+    /** runs between the next frame the specified runnable only once
+     *   (it is unique by its being stored in a HashSet).
+     *   order is not guaranteed */
+    public final boolean runOnceLater(@NotNull Runnable t) {
+        return nextUniqueTasks.add(t);
+    }
+
     /**
      * runs all the tasks in the 'Next' queue
      */
-    private void runNextTasks() {
-        Collection<Runnable> n = this.nextTasks;
+    private final void runNextTasks() {
+
+        Set<Runnable> u = this.nextUniqueTasks;
+        if (!u.isEmpty()) {
+            u.forEach(Runnable::run);
+            u.clear();
+        }
+
+        List<Runnable> n = this.nextTasks;
         if (!n.isEmpty()) {
             n.forEach(Runnable::run);
             n.clear();
@@ -938,6 +975,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         });
         pw.close();
     }
+
+
 
 //    @Nullable
 //    public Term eval(@NotNull String x) throws NarseseException {

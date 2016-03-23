@@ -190,9 +190,10 @@ abstract public class PremiseGenerator /*extends UnifySubst */implements Functio
                     now, //taskTime,
                     now);
 
-            if (belief == null || belief.isDeleted()) {
-                throw new RuntimeException("Deleted belief: " + belief + " " + beliefConcept.hasBeliefs());
-            }
+            assert(belief != null && !belief.isDeleted());
+//            if (belief == null || belief.isDeleted())
+//                throw new RuntimeException("Deleted belief: " + belief + " " + beliefConcept.hasBeliefs());
+
 
         }
 

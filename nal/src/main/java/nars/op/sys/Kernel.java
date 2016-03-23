@@ -108,7 +108,6 @@ public class Kernel {
                 //super.onInput(m);
                 //logger.info("exec: {} {}", toBudgetString(), this);
                 r.run();
-                return true;
             }
         }.budget(0f, 1f, priority);
 

@@ -100,8 +100,7 @@ abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements Tabl
 //    }
 
     public final L top() {
-        if (isEmpty()) return null;
-        return item(0);
+        return isEmpty() ? null : item(0);
     }
 
     public final L bottom() {

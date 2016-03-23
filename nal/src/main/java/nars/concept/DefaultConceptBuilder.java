@@ -1,12 +1,13 @@
 package nars.concept;
 
+import nars.$;
+import nars.Op;
 import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
 import nars.budget.BudgetMerge;
+import nars.nal.nal8.Execution;
 import nars.task.Task;
-import nars.term.Compound;
-import nars.term.Term;
-import nars.term.Termed;
+import nars.term.*;
 import nars.term.atom.Atomic;
 import nars.term.variable.Variable;
 import org.apache.commons.lang3.mutable.MutableInt;
@@ -21,7 +22,7 @@ import java.util.function.Function;
 /**
  * Created by me on 2/24/16.
  */
-public class DefaultConceptBuilder implements Function<Term,Concept> {
+public class DefaultConceptBuilder implements Function<Term, Concept> {
 
     final Function<Atomic, AtomConcept> atomBuilder =
             (Atomic a) -> new AtomConcept(a, taskbag(), termbag());
@@ -32,17 +33,33 @@ public class DefaultConceptBuilder implements Function<Term,Concept> {
     final Function<Variable, VariableConcept> varBuilder =
             (Variable v) -> new VariableConcept(v, termbag(), taskbag());
 
-    final Function<Compound, CompoundConcept> compoundBuilder =
-            (Compound t) -> new CompoundConcept(t, termbag(), taskbag());
+    final Function<Compound, CompoundConcept> compoundBuilder = (Compound t) -> {
 
+        Bag<Termed> termbag = termbag();
+        Bag<Task> taskbag = taskbag();
+        switch (t.op()) {
+            case NEGATE:
+                Term unwrapped = t.term(0);
+                if (Op.isOperation(unwrapped))
+                    return new OperationConcept(t, termbag, taskbag);
+                break;
+            case INHERIT:
+                if (Op.isOperation(t))
+                    return new OperationConcept(t, termbag, taskbag);
+                break;
+        }
+
+        //default:
+        return new CompoundConcept(t, termbag, taskbag);
+    };
 
 
     //return (!(t instanceof Space)) ?
     //new SpaceConcept((Space) t, taskLinks, termLinks);
 
     private Bag<Task> taskbag() {
-          return new CurveBag<Task>(taskLinkBagSize.intValue(), rng)
-              .merge(mergeDefault());
+        return new CurveBag<Task>(taskLinkBagSize.intValue(), rng)
+                .merge(mergeDefault());
     }
 
     @NotNull
@@ -74,7 +91,6 @@ public class DefaultConceptBuilder implements Function<Term,Concept> {
     public final Random rng;
 
 
-
     public DefaultConceptBuilder(@NotNull Random r, int tasklinkBagSize, int termlinkBagSize) {
 
         this.rng = r;
@@ -89,7 +105,7 @@ public class DefaultConceptBuilder implements Function<Term,Concept> {
 
         //already a concept, assume it is from here
         if (term instanceof Concept) {
-            return (Concept)term;
+            return (Concept) term;
         }
 
         Concept result = null;

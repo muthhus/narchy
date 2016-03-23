@@ -323,6 +323,8 @@ public interface BeliefTable extends TaskTable {
     }
 
 
+
+
     /** simple metric that guages the level of inconsistency between two differnt tables, used in measuring graph intercoherency */
     /*default float coherenceAgainst(BeliefTable other) {
         //TODO

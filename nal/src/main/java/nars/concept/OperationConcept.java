@@ -8,23 +8,24 @@ import nars.nal.Tense;
 import nars.nal.nal8.Execution;
 import nars.task.Task;
 import nars.term.Compound;
-import nars.term.Term;
+import nars.term.Operator;
 import nars.term.Termed;
 import nars.util.event.Topic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
 import static nars.Op.NEGATE;
-import static nars.nal.Tense.ETERNAL;
 
 /**
  * Has ability to measure (and cache) belief and desire state in order to execute Operations
  * and negations of Operations
- *
+ * <p>
  * motivation = desire - belief
  * motivation = (desirePositive - desireNegative) - (beliefPositive - beliefNegative)
  */
-public class OperationConcept extends CompoundConcept {
+public class OperationConcept extends CompoundConcept implements Runnable {
 
     /**
      * cache for motivation calculation; set to NaN to invalidate
@@ -37,6 +38,11 @@ public class OperationConcept extends CompoundConcept {
      */
     protected long lastMotivationUpdate = Tense.ETERNAL;
 
+    //TODO allocate this only for Operation (not negations)
+    transient private final List<Task> pending = Global.newArrayList(0);
+
+    transient private NAR nar;
+
 
     public OperationConcept(@NotNull Compound term, Bag<Termed> termLinks, Bag<Task> taskLinks) {
         super(term, termLinks, taskLinks);
@@ -44,17 +50,64 @@ public class OperationConcept extends CompoundConcept {
 
     @Nullable
     @Override
-    public final Task processGoal(@NotNull Task inputGoal, @NotNull NAR nar) {
-        Task g = super.processGoal(inputGoal, nar);
-        if (g!=null) {
-            if ((op() != NEGATE)) { //negated operation TODO term it as 'opposite' field
-                execute(g, this, negative(nar), true, nar);
-            } else { //unwrapped operation TODO term it as 'opposite' field
-                execute(g, positive(nar), this, false, nar);
-            }
-        }
-        return g;
+    public final Task processGoal(@NotNull Task goal, @NotNull NAR nar) {
+        return executeLater(super.processGoal(goal, nar), nar);
     }
+
+    @Nullable
+    @Override
+    public Task processBelief(@NotNull Task belief, @NotNull NAR nar) {
+        return executeLater(super.processBelief(belief, nar), nar);
+    }
+
+    private final Task executeLater(Task t, NAR nar) {
+        if (op()!=NEGATE) {
+            pending.add(t);
+            nar.runLater(this);
+            this.nar = nar;
+        } else {
+            nar.runLater(positive(nar)); //queue an update on the positive concept but dont queue the negation task
+        }
+        return t;
+    }
+
+    @Override
+    public void run() {
+        final NAR nar = this.nar;
+
+        OperationConcept p = positive(nar);
+        Concept n = negative(nar);
+
+        update(p, n, nar);
+
+        List<Task> pending = this.pending;
+        for (int i = 0, pendingSize = pending.size(); i < pendingSize; i++) {
+            execute(pending.get(i), nar);
+        }
+
+        pending.clear();
+    }
+
+    protected void update(OperationConcept positive, Concept negative, NAR nar) {
+
+        long now = nar.time();
+
+        float b = 0, d = 0;
+
+        if (positive != null) { //measure contributed positive state
+            d += positive.goalMotivation(now);
+            b += positive.beliefMotivation(now);
+        }
+
+        if (negative != null) {  //measure contributed negative state
+            d -= negative.goalMotivation(now);
+            b -= negative.beliefMotivation(now);
+        }
+
+        positive.update(b, d, now); //only necessary to update the state in the positive only
+
+    }
+
 
     /**
      * Entry point for all potentially executable tasks.
@@ -62,53 +115,38 @@ public class OperationConcept extends CompoundConcept {
      * The goal has already successfully been inserted to belief table.
      * the job here is to update the resulting motivation state
      */
-    static final void execute(Task goal, OperationConcept positive, Concept negative, boolean polarity, NAR nar) {
-
-        float b, d;
-
-        long now = nar.time();
-        if (positive.updateNecessary(now)) {
-
-            b = d = 0;
-
-            if (positive != null) {
-                //measure contributed positive state
-            }
-
-            if (negative != null) {
-                //measure contributed negative state
-            }
-
-            positive.update(b, d, now); //only necessary to update the state in the positive only
-        } else {
-            //use cached value
-            b = positive.believed;
-            d = positive.desired;
-        }
-
-        if (Global.DEBUG)
-            goal.log("execute(b=" + b + ",d=" + d + ')');
+    final void execute(Task task, NAR nar) {
 
 
         //        if (motivation < executionThreshold.floatValue())
 //            return false;
 
-        if (positive!=null) {
-            Topic<Task> tt = positive.get(Execution.class);
+        if (task.op() != NEGATE) {
+
+            //emit for both beliefs and goals
+            Topic<Task> tt = nar.concept(Operator.operator(this)).get(Execution.class);
             if (tt != null && !tt.isEmpty()) {
                 //beforeNextFrame( //<-- enqueue after this frame, before next
-                tt.emit(goal);
+                tt.emit(task);
+            }
+
+
+            //call Task.execute only for goals
+            if (task.isGoal()) {
+                float b = believed;
+                float d = desired;
+                if (Global.DEBUG)
+                    task.log("execute(b=" + b + ",d=" + d + ')');
+                task.execute(b, d, nar); //call the task's custom event handler
             }
         }
-
-        goal.execute(b, d, nar); //call the task's custom event handler
     }
 
-    private final boolean updateNecessary(long now) {
-        long last = this.lastMotivationUpdate;
-        return (last == ETERNAL) || ((now - last) > 0);
-    }
-
+    //    private final boolean updateNecessary(long now) {
+//        long last = this.lastMotivationUpdate;
+//        return (last == ETERNAL) || ((now - last) > 0);
+//    }
+//
     private final void update(float b, float d, long now) {
         this.believed = b;
         this.desired = d;
@@ -116,19 +154,21 @@ public class OperationConcept extends CompoundConcept {
     }
 
     public OperationConcept positive(NAR n) {
-        return op() == NEGATE ? (OperationConcept) n.concept(term(0)) : this;
+        return op() != NEGATE ? this : (OperationConcept) n.concept(term(0));
     }
+
     public Concept negative(NAR n) {
+        //TODO cache the opposite term
         return op() != NEGATE ? n.concept($.neg(this)) : this;
     }
 
     public float believed(NAR n) {
         return positive(n).believed;
     }
+
     public float desired(NAR n) {
         return positive(n).desired;
     }
-
 
 
     //        if (!Op.isOperation(goalTerm))
@@ -150,7 +190,6 @@ public class OperationConcept extends CompoundConcept {
 //
 //                }
 //            }
-
 
 
 //
@@ -184,11 +223,11 @@ public class OperationConcept extends CompoundConcept {
 
     //float delta = updateSuccess(goal, successBefore, memory);
 
-        //&& (goal.state() != Task.TaskState.Executed)) {
+    //&& (goal.state() != Task.TaskState.Executed)) {
 
             /*if (delta >= Global.EXECUTION_SATISFACTION_TRESHOLD)*/
 
-        //Truth projected = goal.projection(now, now);
+    //Truth projected = goal.projection(now, now);
 
 
 //                        LongHashSet ev = this.lastevidence;

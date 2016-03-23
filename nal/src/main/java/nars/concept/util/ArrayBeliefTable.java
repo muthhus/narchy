@@ -79,14 +79,16 @@ public class ArrayBeliefTable implements BeliefTable {
         if (temporal.isEmpty()) {
             minT = maxT = lastUpdate;
         } else {
-            minT = Long.MAX_VALUE;
-            maxT = Long.MIN_VALUE;
+            long minT = this.minT = Long.MAX_VALUE;
+            long maxT = this.maxT = Long.MIN_VALUE;
             List<Task> list = temporal.items.list();
             for (int i = 0, listSize = list.size(); i < listSize; i++) {
                 long o = list.get(i).occurrence();
                 if (o > maxT) maxT = o;
                 if (o < minT) minT = o;
             }
+            this.minT = minT;
+            this.maxT = maxT;
         }
 
         //ageFactor = (minT!=maxT)? 1f/(maxT-minT) : 0;
