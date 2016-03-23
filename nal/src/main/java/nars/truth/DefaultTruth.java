@@ -8,15 +8,24 @@ import org.jetbrains.annotations.NotNull;
 import static nars.util.data.Util.round;
 
 
-public class DefaultTruth extends AbstractScalarTruth {
+public class DefaultTruth implements Truth  {
 
-
-    private final int hash;
+    public final float freq, conf;
+    public final int hash;
 
     /** unspecified confidence, will be invalid unless updated later */
     @Deprecated public DefaultTruth(float f) {
-        super(f, Float.NaN);
-        this.hash = 0;
+        this(f, Float.NaN);
+    }
+
+    @Override
+    public final float freq() {
+        return freq;
+    }
+
+    @Override
+    public final float conf() {
+        return conf;
     }
 
     public DefaultTruth(float f, float c) {
@@ -28,20 +37,20 @@ public class DefaultTruth extends AbstractScalarTruth {
     }
 
     public DefaultTruth(float f, float c, float epsilon, int discreteness) {
-        super(
-            round(f, epsilon),
-            round(c, epsilon)
-        );
-        this.hash = Truth.hash(this, discreteness);
+        this.freq = round(f, epsilon);
+        if (Float.isFinite(c)) {
+            this.conf = round(c, epsilon);
+            this.hash = Truth.hash(this, discreteness);
+        } else {
+            this.conf = c;
+            this.hash = 0;
+        }
     }
 
     public DefaultTruth(char punctuation, @NotNull Memory m) {
         this(1.0f, m.getDefaultConfidence(punctuation));
     }
 
-    public DefaultTruth(@NotNull AbstractScalarTruth toClone) {
-        this(toClone.freq(), toClone.conf());
-    }
 
     public DefaultTruth(@NotNull Truth truth) {
         this(truth.freq(), truth.conf());
@@ -50,7 +59,7 @@ public class DefaultTruth extends AbstractScalarTruth {
     @NotNull
     @Override
     public Truth confMult(float factor) {
-        return factor == 1 ? this : new DefaultTruth(freq, conf() * factor);
+        return (factor == 1) ? this : withConf(conf() * factor);
     }
 
     @NotNull
@@ -59,14 +68,23 @@ public class DefaultTruth extends AbstractScalarTruth {
         return (conf != newConf) ? new DefaultTruth(freq, newConf) : this;
     }
 
+    @NotNull
     @Override
-    public boolean equals(Object that) {
-        if (that instanceof DefaultTruth) {
+    public String toString() {
+        //return DELIMITER + frequency.toString() + SEPARATOR + confidence.toString() + DELIMITER;
+
+        //1 + 6 + 1 + 6 + 1
+        return toCharSequence().toString();
+    }
+
+    @Override
+    public final boolean equals(Object that) {
+        //if (that instanceof DefaultTruth) {
             return ((DefaultTruth)that).hash == hash; //shortcut, since perfect hash for this instance
-        } else if (that instanceof Truth) {
+        /*} else if (that instanceof Truth) {
             return equalsTruth((Truth)that);
         }
-        return false;
+        return false;*/
     }
 
     @Override
@@ -74,7 +92,6 @@ public class DefaultTruth extends AbstractScalarTruth {
         return hash;
     }
 
-    @Override
     protected boolean equalsFrequency(@NotNull Truth t) {
         return (Util.equals(freq, t.freq(), Global.TRUTH_EPSILON));
     }

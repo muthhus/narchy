@@ -9,6 +9,7 @@ import nars.data.Range;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Termed;
+import nars.truth.Truth;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.HaiQ;
 import nars.util.signal.Autoencoder;
@@ -335,7 +336,7 @@ public class NarQ implements Consumer<NAR> {
         if (cx != null) {
             long now = n.time();
             BeliefTable table = beliefOrDesire ? cx.beliefs() : cx.goals();
-            Task t = table.top(now + dt, now);
+            Truth t = table.truth(now + dt, now, n.duration());
             if (t != null) {
                 v = t.motivation();
             }

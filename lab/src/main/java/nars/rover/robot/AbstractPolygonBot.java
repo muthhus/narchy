@@ -32,10 +32,10 @@ public abstract class AbstractPolygonBot extends Being {
 
 
 
-    static float linearDamping = 0.5f;
-    static float angularDamping = 0.5f;
+    static float linearDamping = 0.9f;
+    static float angularDamping = 0.9f;
     static float restitution = 0.9f; //bounciness
-    static float friction = 0.75f;
+    static float friction = 0.95f;
 
     //final Deque<Vec2> positions = new ArrayDeque();
     protected final List<Sense> senses = new ArrayList();
@@ -95,7 +95,7 @@ public abstract class AbstractPolygonBot extends Being {
         return torso;
     }
 
-    public void thrustRelative(float f) {
+    public void linear(float f) {
         //float velBefore = torso.getLinearVelocity().length();
         if (f == 0) {
             torso.setLinearVelocity(new Vec2());

@@ -22,6 +22,7 @@ package nars.truth;
 
 import nars.$;
 import nars.Symbols;
+import nars.nal.Tense;
 import nars.term.Term;
 import nars.util.Texts;
 import nars.util.data.Util;
@@ -29,8 +30,11 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static nars.truth.TruthFunctions.temporalProjection;
+import static nars.truth.TruthFunctions.truthProjection;
+
 /** scalar (1D) truth value "frequency", stored as a floating point value */
-public interface Truth extends MetaTruth<Float> {
+public interface Truth extends Truthed {
 
 
 
@@ -46,6 +50,10 @@ public interface Truth extends MetaTruth<Float> {
      */
     float freq();
 
+
+    @Nullable
+    @Override
+    default Truth truth() { return this; }
 
     /**
      * Calculate the expectation value of the truth value
@@ -131,7 +139,6 @@ public interface Truth extends MetaTruth<Float> {
 
 
     @NotNull
-    @Override
     default StringBuilder appendString(@NotNull StringBuilder sb) {
         return appendString(sb, 2);
     }
@@ -162,7 +169,11 @@ public interface Truth extends MetaTruth<Float> {
 
 
 
-
+    @NotNull
+    default CharSequence toCharSequence() {
+        StringBuilder sb =  new StringBuilder();
+        return appendString(sb);
+    }
     
     /** displays the truth value as a short string indicating degree of true/false */
     @Nullable
@@ -223,6 +234,12 @@ public interface Truth extends MetaTruth<Float> {
     @NotNull Truth withConf(float f);
 
 
+    default Truth project(long when, long occ, long now, float dur) {
+        if (occ == when || occ == Tense.ETERNAL)
+            return this;
+        return withConf(conf() * temporalProjection( when, occ, now, dur ));
+    }
+
 
     enum TruthComponent {
         Frequency, Confidence, Expectation
@@ -250,10 +267,6 @@ public interface Truth extends MetaTruth<Float> {
     }
 
 
-
-    /** use getFrequency() when possible because this may box the result as a non-primitive */
-    @Override
-    default Float value() { return freq(); }
 
 
 

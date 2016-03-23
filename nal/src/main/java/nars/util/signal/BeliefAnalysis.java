@@ -1,7 +1,6 @@
 package nars.util.signal;
 
 import nars.NAR;
-import nars.budget.Budget;
 import nars.concept.Concept;
 import nars.concept.util.BeliefTable;
 import nars.nal.Tense;
@@ -56,7 +55,7 @@ public class BeliefAnalysis extends EnergyAnalysis {
 
 	@NotNull
 	public TruthWave wave() {
-		return beliefs().getWave();
+		return beliefs().wave();
 	}
 
 	@NotNull

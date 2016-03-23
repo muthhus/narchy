@@ -156,7 +156,10 @@ public final class TruthFunctions extends UtilityFunctions {
     public static float temporalProjection(long now, long at, long bt) {
         return BeliefTable.relevance(Math.abs(now-at) + Math.abs(now-bt), Math.abs(at-bt));
     }
-    public static float temporalProjectionOld(long sourceTime, long targetTime, long currentTime) {
+    public static float temporalProjection(long now, long at, long bt, float dur) {
+        return BeliefTable.relevance(Math.abs(now-at) + Math.abs(now-bt), Math.abs(at-bt)/dur);
+    }
+    public static float truthProjection(long sourceTime, long targetTime, long currentTime) {
         long den = (abs(sourceTime - currentTime) + abs(targetTime - currentTime));
         if (den == 0) return 1f;
         return abs(sourceTime - targetTime) / (float)den;

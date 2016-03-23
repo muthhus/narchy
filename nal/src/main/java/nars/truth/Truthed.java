@@ -1,10 +1,13 @@
 package nars.truth;
 
+import nars.Symbols;
+import nars.util.Texts;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /** indicates an implementation has, or is associated with a specific TruthValue */
-public interface Truthed {
+public interface Truthed  {
+
 
 
 
@@ -56,5 +59,17 @@ public interface Truthed {
 
         return count == 0 ? 0.5f : t / count;
     }
+
+    //void setValue(T v); //move to MutableMetaTruth interface
+
+
+
+
+
+
+//    /** TODO move this to a MutableTruth interface to separate a read-only impl */
+//    void setConfidence(float c);
+
+
 
 }

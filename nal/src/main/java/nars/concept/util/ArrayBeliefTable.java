@@ -39,7 +39,7 @@ public class ArrayBeliefTable implements BeliefTable {
 
 
         this.minT = this.maxT = this.lastUpdate = memory.time();
-        this.ageFactor = 1f/(memory.duration()*2f);
+        this.ageFactor = 1f/(memory.duration()*1f);
 
         Map<Task, Task> mp;
         this.map = mp =
@@ -164,6 +164,8 @@ public class ArrayBeliefTable implements BeliefTable {
         float bestRank = -1;
         List<? extends Task> l = temporal.items.list();
 
+        //find the best balance of temporal proximity and confidence:
+        float ageFactor = this.ageFactor;
         int ls = l.size();
         for (int i = 0; i < ls; i++) {
             Task x = l.get(i);
@@ -174,9 +176,9 @@ public class ArrayBeliefTable implements BeliefTable {
             }
         }
 
-        if (best!=null) {//if (project) {
-            best = best.projectTask(when, now);
-        }
+//        if (best!=null) {//if (project) {
+//            best = best.projectTask(when, now);
+//        }
 
         return best;
     }

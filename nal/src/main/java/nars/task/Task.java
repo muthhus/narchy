@@ -41,7 +41,7 @@ import static nars.Global.dereference;
 import static nars.nal.LocalRules.solutionBudget;
 import static nars.nal.Tense.TIMELESS;
 import static nars.truth.TruthFunctions.eternalize;
-import static nars.truth.TruthFunctions.temporalProjectionOld;
+import static nars.truth.TruthFunctions.truthProjection;
 
 /**
  * A task to be processed, consists of a Sentence and a BudgetValue.
@@ -330,15 +330,15 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     }
 
 
-    @NotNull
-    default Task projectTask(long when, long now) {
-        Truth adjustedTruth = projectTruth(when, now, false);
-        long occ = occurrence();
-        long projOcc = (adjustedTruth instanceof ProjectedTruth) ? ((ProjectedTruth)adjustedTruth).when : occ;
-        return /*occ == projOcc &&*/ adjustedTruth.equals(truth()) ? this :
-                MutableTask.project(this, adjustedTruth, now, projOcc);
-
-    }
+//    @NotNull
+//    default Task projectTask(long when, long now) {
+//        Truth adjustedTruth = projectTruth(when, now, false);
+//        long occ = occurrence();
+//        long projOcc = (adjustedTruth instanceof ProjectedTruth) ? ((ProjectedTruth)adjustedTruth).when : occ;
+//        return /*occ == projOcc &&*/ adjustedTruth.equals(truth()) ? this :
+//                MutableTask.project(this, adjustedTruth, now, projOcc);
+//
+//    }
 
     /** performs the procedure that should happen when this task is invoked due to goal desire */
     void execute(float belief, float desire, NAR nar);
@@ -769,7 +769,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
     //projects the truth to a certain time, covering all 4 cases as discussed in
     //https://groups.google.com/forum/#!searchin/open-nars/task$20eteneral/open-nars/8KnAbKzjp4E/rBc-6V5pem8J
-    @Nullable
+    @Deprecated @Nullable
     default Truth projectTruth(long targetTime, long now, boolean eternalizeIfWeaklyTemporal) {
 
         Truth currentTruth = truth();
@@ -791,7 +791,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
             long nextOcc = targetTime;
 
             float projConf = nextConf =
-                    conf * temporalProjectionOld( targetTime, occ, now);
+                    conf * truthProjection( targetTime, occ, now);
 
             if (eternalizeIfWeaklyTemporal) {
                 float eternConf = eternalize(conf);

@@ -30,7 +30,6 @@ public class OperationConceptTest {
     @Test
     public void testMotivationBalanceEternal() {
 
-
         List<String> history = Global.newArrayList();
 
         NAR n = new Default();
@@ -61,7 +60,7 @@ public class OperationConceptTest {
     }
 
     public static void assertMotive(NAR n, Termed operation, float b, float g) {
-        assertEquals(b, n.concept(operation).beliefMotivation(n.time()), 0.01f);
-        assertEquals(g, n.concept(operation).goalMotivation(n.time()), 0.01f);
+        assertEquals(b, n.concept(operation).beliefMotivation(n.time(), n.duration()), 0.01f);
+        assertEquals(g, n.concept(operation).goalMotivation(n.time(), n.duration()), 0.01f);
     }
 }

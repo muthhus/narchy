@@ -4,6 +4,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.CacheLoader;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import nars.concept.Concept;
+import nars.concept.ConceptBuilder;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.TermBuilder;
@@ -30,7 +31,7 @@ public class MapIndex3 extends MapIndex2 {
 
     final Cache<TermContainer, MapIndex2.SubtermNode> cache;
 
-    public MapIndex3(int capacity, TermBuilder termBuilder, Function<Term, Concept> conceptBuilder) {
+    public MapIndex3(int capacity, TermBuilder termBuilder, ConceptBuilder conceptBuilder) {
         super(
                 Collections.unmodifiableMap(new HashMap()) /* dummy */,
                 termBuilder, conceptBuilder);

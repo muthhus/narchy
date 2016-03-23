@@ -31,12 +31,12 @@ import java.util.stream.Stream;
  */
 public class SomeRovers {
 
-    public static final String motorLeft = "MotorControls(left,motor,(),#z)";
-    public static final String motorRight = "MotorControls(right,motor,(),#z)";
-    public static final String motorForward = "MotorControls(forward,motor,(),#z)";
-    public static final String motorBackward = "MotorControls(backward,motor,(),#z)";
-    public static final String motorStop = "MotorControls(stop,motor,(),#z)";
-    public static final String fire = "MotorControls(fire,motor,(),#z)";
+    public static final String motorLeft = "motor(left)";
+    public static final String motorRight = "motor(right)";
+    public static final String motorForward = "motor(fore)";
+    public static final String motorBackward = "motor(back)";
+    public static final String motorStop = "motor(stop)";
+    public static final String fire = "turret(fire)";
 
     public static final String eatFood = "eat:food";
     public static final String eatPoison = "eat:poison";
@@ -96,7 +96,7 @@ public class SomeRovers {
     }
 
     public static Default newNAR() {
-        int conceptsFirePerCycle = 64;
+        int conceptsFirePerCycle = 24;
 
         Random rng = new XorShift128PlusRandom(1);
         TermIndex index = new AbstractNAR.WeakTermIndex(64*1024,rng);
@@ -141,7 +141,7 @@ public class SomeRovers {
 
 
         //nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
-        nar.core.activationRate.setValue(0.45f);
+        nar.core.activationRate.setValue(0.25f);
 
 
         nar.duration.set(2);
@@ -149,11 +149,11 @@ public class SomeRovers {
         nar.termLinkForgetDurations.setValue(4);
         nar.taskLinkForgetDurations.setValue(3);
 
-        nar.cyclesPerFrame.set(3);
+        nar.cyclesPerFrame.set(4);
         nar.shortTermMemoryHistory.set(4);
 
-        nar.executionThreshold.setValue(0.02f);
-        nar.derivationDurabilityThreshold.setValue(0.1f);
+        nar.executionThreshold.setValue(0.01f);
+        //nar.derivationDurabilityThreshold.setValue(0.1f);
 
         boolean gui = true;
         if (gui) {

@@ -28,8 +28,8 @@ public class OperationConcept extends CompoundConcept implements Runnable {
     /**
      * cache for motivation calculation; set to NaN to invalidate
      */
-    protected transient float believed = Float.NaN;
-    protected transient float desired = Float.NaN;
+    protected transient float believed = 0;
+    protected transient float desired = 0;
 
     /**
      * set to Tense.ETERNAL to invalidate
@@ -75,6 +75,8 @@ public class OperationConcept extends CompoundConcept implements Runnable {
     }
 
     private final Task executeLater(Task t, NAR nar) {
+        if (t == null) return null;
+
         if (op()!=NEGATE) {
             pending.add(t);
             nar.runOnceLater(this);
@@ -89,10 +91,7 @@ public class OperationConcept extends CompoundConcept implements Runnable {
     public void run() {
         final NAR nar = this.nar;
 
-        OperationConcept p = positive(nar);
-        Concept n = negative(nar);
-
-        update(p, n, nar);
+        update(nar);
 
         List<Task> pending = this.pending;
         for (int i = 0, pendingSize = pending.size(); i < pendingSize; i++) {
@@ -102,23 +101,29 @@ public class OperationConcept extends CompoundConcept implements Runnable {
         pending.clear();
     }
 
-    protected void update(OperationConcept positive, Concept negative, NAR nar) {
-
+    public void update(NAR nar) {
         long now = nar.time();
+        if (now == lastMotivationUpdate) //update once per cycle TODO parameter for this limitation min/max
+            return;
+
+        int dur = nar.duration();
+
+        OperationConcept p = positive(nar);
+        Concept n = negative(nar);
 
         float b = 0, d = 0;
 
-        if (positive != null) { //measure contributed positive state
-            d += positive.goalMotivation(now);
-            b += positive.beliefMotivation(now);
+        if (p != null) { //measure contributed positive state
+            d += p.goalMotivation(now, dur);
+            b += p.beliefMotivation(now, dur);
         }
 
-        if (negative != null) {  //measure contributed negative state
-            d -= negative.goalMotivation(now);
-            b -= negative.beliefMotivation(now);
+        if (n != null) {  //measure contributed negative state
+            d -= n.goalMotivation(now, dur);
+            b -= n.beliefMotivation(now, dur);
         }
 
-        positive.update(b, d, now); //only necessary to update the state in the positive only
+        p.update(b, d, now); //only necessary to update the state in the positive only
 
     }
 
@@ -177,12 +182,26 @@ public class OperationConcept extends CompoundConcept implements Runnable {
         return op() != NEGATE ? n.concept($.neg(this)) : this;
     }
 
-    public float believed(NAR n) {
+    public final float believed(NAR n) {
         return positive(n).believed;
     }
 
-    public float desired(NAR n) {
+    public final float desired(NAR n) {
         return positive(n).desired;
+    }
+
+    public final float motivation() {
+        float m = desired - believed;
+        //if (!Float.isFinite(m)) return 0;
+        return m;
+    }
+
+    /** provide motivation value after triggering an update */
+    public final float motivation(NAR nar) {
+        update(nar);
+        float m = desired - believed;
+        //if (!Float.isFinite(m)) return 0;
+        return m;
     }
 
 

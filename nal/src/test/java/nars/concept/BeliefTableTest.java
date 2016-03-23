@@ -72,7 +72,7 @@ public class BeliefTableTest  {
         n.step();
         b.print();
 
-        assertEquals(0.859f, b.beliefs().top(n).expectation(true), 0.1f);
+        assertEquals(0.859f, b.beliefs().top(n.time()).expectation(true), 0.1f);
         //assertEquals(0.2f, b.beliefs().top(n).expectation(false), 0.01f);
 
         n.input("a:b. %0.2|0.7%");

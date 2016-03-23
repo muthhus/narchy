@@ -619,6 +619,17 @@ public enum Util {
     }
 
     /**
+     * clamps a value to -1..1 range
+     */
+    public static float clampBi(float p) {
+        if (p > 1f)
+            return 1f;
+        if (p < -1f)
+            return -1f;
+        return p;
+    }
+
+    /**
      * discretizes values to nearest finite resolution real number determined by epsilon spacing
      */
     public static float round(float value, float epsilon) {

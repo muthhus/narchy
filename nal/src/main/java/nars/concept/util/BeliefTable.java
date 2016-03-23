@@ -116,9 +116,9 @@ public interface BeliefTable extends TaskTable {
 
     /** temporal relevance */
     static float relevance(long from, long to, float ageFactor) {
-        if (from == Tense.ETERNAL)
-            return Float.NaN;
-            //return 0.5f; //weight eternal half as much as temporal; similar to a horizon heuristic
+        assert(from!=Tense.ETERNAL);
+        /*if (from == Tense.ETERNAL)
+            return Float.NaN;*/
 
         return relevance(Math.abs(from - to), ageFactor);
     }
@@ -142,7 +142,7 @@ public interface BeliefTable extends TaskTable {
      */
     static float rankTemporalByConfidence(@NotNull Task t, long time, float ageFactor) {
         return
-            t.conf() * BeliefTable.relevance(t, time, ageFactor)
+            t.conf() * relevance(t, time, ageFactor)
         ;
     }
 
@@ -256,14 +256,11 @@ public interface BeliefTable extends TaskTable {
     }
 
     @NotNull
-    default TruthWave getWave() {
+    default TruthWave wave() {
         return new TruthWave(this);
     }
 
-    @Nullable
-    default Task top(@NotNull NAR n) {
-        return top(n.time());
-    }
+
 
     /** simple metric that guages the level of inconsistency (ex: variance) aggregated by contained belief states.
      *  returns 0 if no tasks exist */
@@ -322,7 +319,16 @@ public interface BeliefTable extends TaskTable {
         return !Float.isFinite(max) ? Float.NaN : max;
     }
 
+    /** estimates the current truth value from the top task, projected to the specified 'when' time;
+     * returns null if no evidence is available */
+    @Nullable default Truth truth(long when, long now, float dur) {
+        Task top = top(when, now);
+        return (top == null) ? null : top.truth().project(when, top.occurrence(), now, dur);
+    }
 
+    @Nullable default Truth truth(long now, float dur) {
+        return truth(now, now, dur);
+    }
 
 
     /** simple metric that guages the level of inconsistency between two differnt tables, used in measuring graph intercoherency */

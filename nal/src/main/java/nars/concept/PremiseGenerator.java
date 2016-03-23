@@ -174,30 +174,22 @@ abstract public class PremiseGenerator /*extends UnifySubst */implements Functio
 
     abstract protected void premise(BLink<? extends Concept> concept, BLink<? extends Task> taskLink, BLink<? extends Termed> termLink, Task belief);
 
-    /** resolves the most relevant task for a given term/concept */
+    /** resolves the most relevant belief of a given term/concept */
     @Nullable
     @Override public final Task apply(Term beliefTerm) {
 
         Concept beliefConcept = nar.concept(beliefTerm);
-
-        Task belief = null;
         if ((beliefConcept != null) && (beliefConcept.hasBeliefs())) {
 
-            //long taskTime = taskLink.get().occurrence();
-            long now = nar.time();
-
-            belief = beliefConcept.beliefs().top(
-                    now, //taskTime,
-                    now);
+            Task belief = beliefConcept.beliefs().top(nar.time());
 
             assert(belief != null && !belief.isDeleted());
-//            if (belief == null || belief.isDeleted())
-//                throw new RuntimeException("Deleted belief: " + belief + " " + beliefConcept.hasBeliefs());
+            //  if (belief == null || belief.isDeleted())  throw new RuntimeException("Deleted belief: " + belief + " " + beliefConcept.hasBeliefs());
 
-
+            return belief;
         }
 
-        return belief;
+        return null;
     }
 
 }

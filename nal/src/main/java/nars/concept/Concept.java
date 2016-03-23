@@ -91,21 +91,21 @@ public interface Concept extends Termed, Comparable {
     /** follows Map.compute() semantics */
     <C> C meta(Object key, BiFunction value);
 
-    /**
-     * belief vs desire metric:
-     * positive = satisfied
-     * negative = desired
-     */
-    default float getSuccess(long now) {
-        //        return hasBeliefs() ?
-//                getBeliefs().getMeanProjectedExpectation(now) : 0;
-        //        return hasGoals() ?
-//            getGoals().getMeanProjectedExpectation(now) : 0;
-        return (hasBeliefs() && hasGoals())
-                ?
-                (beliefs().top(now).expectation() -
-                        goals().top(now).expectation()) : 0;
-    }
+//    /**
+//     * belief vs desire metric:
+//     * positive = satisfied
+//     * negative = desired
+//     */
+//    default float getSuccess(long now) {
+//        //        return hasBeliefs() ?
+////                getBeliefs().getMeanProjectedExpectation(now) : 0;
+//        //        return hasGoals() ?
+////            getGoals().getMeanProjectedExpectation(now) : 0;
+//        return (hasBeliefs() && hasGoals())
+//                ?
+//                (beliefs().top(now).expectation() -
+//                        goals().top(now).expectation()) : 0;
+//    }
 
     @Nullable
     BeliefTable beliefs();
@@ -319,12 +319,12 @@ public interface Concept extends Termed, Comparable {
         }
     }
 
-    default float beliefMotivation(long now) {
-        return hasBeliefs() ? beliefs().top(now).motivation() : 0;
+    default float beliefMotivation(long now, int duration) {
+        return hasBeliefs() ? beliefs().truth(now, duration).motivation() : 0;
     }
 
-    default float goalMotivation(long now) {
-        return hasGoals() ? goals().top(now).motivation() : 0;
+    default float goalMotivation(long now, int duration) {
+        return hasGoals() ? goals().truth(now, duration).motivation() : 0;
     }
 
 

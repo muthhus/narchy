@@ -9,8 +9,9 @@ import com.gs.collections.api.block.function.primitive.FloatToFloatFunction;
 import nars.$;
 import nars.NAR;
 import nars.Symbols;
+import nars.concept.OperationConcept;
+import nars.nal.Tense;
 import nars.op.java.MethodOperator;
-import nars.op.java.Lobjects;
 import nars.rover.Material;
 import nars.rover.Sim;
 import nars.rover.obj.NARVisionRay;
@@ -44,7 +45,7 @@ public class NARover extends AbstractPolygonBot {
 
     public final NAR nar;
 
-    final Lobjects objs;
+    //final Lobjects objs;
 
     float hungry, sick;
     final Sensor speedFore, speedBack, leftSpeed, rightSpeed,
@@ -70,7 +71,7 @@ public class NARover extends AbstractPolygonBot {
 
         material = new BeingMaterial(this);
 
-        objs = new Lobjects(nar);
+
 
         int maxUpdateTime = 64;
         int minUpdateTime = 8;
@@ -136,7 +137,7 @@ public class NARover extends AbstractPolygonBot {
 
             v *= 1f; //sensitivity
 
-            return v < 0.01f ? 0 : v;
+            return v;
         };
         this.leftSpeed = new Sensor(nar, "speed:leftAngle", angleSpeed, sigmoidIfNegative)
             .maxTimeBetweenUpdates(maxUpdateTime)
@@ -157,6 +158,43 @@ public class NARover extends AbstractPolygonBot {
             .maxTimeBetweenUpdates(maxUpdateTime)
             .minTimeBetweenUpdates(minUpdateTime);
 
+        OperationConcept motorLeft = new OperationConcept("motor(left)", nar);
+        OperationConcept motorRight = new OperationConcept("motor(right)", nar);
+        OperationConcept motorFore = new OperationConcept("motor(fore)", nar);
+        OperationConcept motorBack = new OperationConcept("motor(back)", nar);
+        OperationConcept motorStop = new OperationConcept("motor(stop)", nar);
+
+        nar.onFrame(n -> {
+            float ang = (motorLeft.motivation(nar) - motorRight.motivation(nar));
+            float lin = (motorFore.motivation(nar) - motorBack.motivation(nar));
+            float stop = 0; // motorStop.motivation(nar);
+
+            float thresh = 0.001f;
+            float cc = 0.5f;
+
+            if (Math.abs(ang) > thresh) {
+                rotateRelative(Util.clampBi(ang) * (1f-stop));
+
+                if (ang > 0)
+                    nar.believe("motor(left)", Tense.Present, ang, cc);
+                else
+                    nar.believe("motor(right)", Tense.Present, -ang, cc);
+
+            }
+
+            if (Math.abs(lin) > thresh) {
+                linear(Util.clampBi(lin)* (1f-stop));
+
+                if (lin > 0)
+                    nar.believe("motor(fore)", Tense.Present, lin, cc);
+                else
+                    nar.believe("motor(back)", Tense.Present, -lin, cc);
+            }
+
+            //System.out.println("(" + lin + " " + ang + ") -> (" + linF + " " + angF + ")");
+
+            //System.out.println("(" + lin + " " + ang + ")");
+        });
 
     }
 
@@ -303,12 +341,6 @@ public class NARover extends AbstractPolygonBot {
     @Override
     public void init(Sim p) {
         super.init(p);
-
-        try {
-            addMotorController();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
         gun = new Turret(sim, this);
     }
@@ -475,17 +507,14 @@ public class NARover extends AbstractPolygonBot {
     }
 
 
-    protected void addMotorController() throws Exception {
-
-        motors = objs.the("motor", MotorControls.class, this);
-
-
-    }
+    //protected void addMotorController() throws Exception {
+        //motors = objs.the("motor", MotorControls.class, this);
+    //}
 
     //public static final ConceptDesire strongestTask = (c ->  c.getGoals().topEternal().getExpectation() );
 
 
-    @Override
+    @Deprecated @Override
     protected void feelMotion() {
 
 //        if (angVelocity < 0.1) {
@@ -588,7 +617,7 @@ public class NARover extends AbstractPolygonBot {
             Task c = MethodOperator.invokingTask();
             float thrust = (proportional && c!=null) ? c.motivation() : 1;
             if (!forward) thrust = -thrust;
-            rover.thrustRelative(thrust);
+            rover.linear(thrust);
             return c.truth();
         }
 
