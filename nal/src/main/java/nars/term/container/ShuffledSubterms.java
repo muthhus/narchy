@@ -72,10 +72,10 @@ public final class ShuffledSubterms extends ShuffledPermutations implements Term
         return srcsubs.impossibleSubTermVolume(otherTermVolume);
     }
 
-    @Override
-    public Ellipsis firstEllipsis() {
-        return srcsubs.firstEllipsis();
-    }
+//    @Override
+//    public Ellipsis firstEllipsis() {
+//        return srcsubs.firstEllipsis();
+//    }
 
     @Override
     public boolean containsTerm(Term term) {

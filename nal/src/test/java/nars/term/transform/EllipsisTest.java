@@ -12,6 +12,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.TermIndex;
 import nars.term.atom.Atom;
+import nars.term.atom.Atomic;
 import nars.term.index.MapIndex2;
 import nars.term.index.PatternIndex;
 import nars.term.transform.subst.FindSubst;
@@ -171,7 +172,9 @@ public class EllipsisTest {
             this.prefix = prefix;
             this.suffix = suffix;
             this.ellipsisTerm = ellipsisTerm;
-            p = getPattern(prefix, suffix);
+            p = (Compound) new PatternIndex().the(
+                    getPattern(prefix, suffix)
+                ).term();
         }
 
 
@@ -188,12 +191,10 @@ public class EllipsisTest {
         protected abstract Compound getPattern(String prefix, String suffix);
 
 
-
         @Override
         public Compound getPattern() {
             return p;
         }
-
 
         @Override
         public Compound getMatchable(int arity) {
@@ -228,7 +229,7 @@ public class EllipsisTest {
             assertEquals(2, f.xy.size());
             Term fixedTermValue = f.term(fixedTerm);
             assertNotNull(f.toString(), fixedTermValue);
-            assertEquals(Atom.class, fixedTermValue.getClass());
+            assertTrue(fixedTermValue instanceof Atomic);
             assertFalse(varArgTerms.contains(fixedTermValue));
         }
 
@@ -319,27 +320,11 @@ public class EllipsisTest {
         //assertEquals("%prefix", t.target.toString());
         assertEquals(EllipsisZeroOrMore.class, t.normalize(0).getClass());
     }
-    @Test public void testEllipsisTransform() {
-        String s = "%A..%B=_..+";
-        Ellipsis.EllipsisTransformPrototype t = $(s);
 
-        assertNotNull(t);
-        assertEquals($("%B"), t.from);
-        assertEquals(Imdex, t.to);
 
-        TermIndex i = new PatternIndex();
-
-        Term u = i.transform(
-                $.p(t), new PremiseRule.PremiseRuleVariableNormalization());
-        EllipsisTransform tt = (EllipsisTransform)((Compound)u).term(0);
-        assertEquals("(%769..%2=_..+)", u.toString());
-        assertEquals($("%2"), tt.from);
-        assertEquals(Imdex, tt.to);
-    }
-
-    @Test public void testEllipsisExpression() {
-        //TODO
-    }
+//    @Test public void testEllipsisExpression() {
+//        //TODO
+//    }
 
     public static String[] p(String a, String b) { return new String[] { a, b}; }
 
@@ -397,6 +382,8 @@ public class EllipsisTest {
     }
 
     static void testCombinations(Compound X, Compound Y, int expect) {
+        X = (Compound) new PatternIndex().the(X).term();
+        //Y = (Compound) new PatternIndex().the(Y).term();
 
         for (int seed = 0; seed < 1 /*expect*5*/; seed++) {
 

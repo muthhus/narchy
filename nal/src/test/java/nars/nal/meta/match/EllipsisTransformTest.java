@@ -2,9 +2,15 @@ package nars.nal.meta.match;
 
 import nars.$;
 import nars.Op;
+import nars.nal.meta.PremiseRule;
+import nars.term.Compound;
+import nars.term.Term;
+import nars.term.TermIndex;
+import nars.term.index.PatternIndex;
 import nars.term.variable.AbstractVariable;
 import org.junit.Test;
 
+import static nars.Op.Imdex;
 import static org.junit.Assert.*;
 
 /**
@@ -26,5 +32,23 @@ public class EllipsisTransformTest {
 
         assertEquals(a, a);
         assertEquals(0, a.compareTo(a));
+    }
+
+    @Test public void testEllipsisTransform() {
+        String s = "%A..%B=_..+";
+        Ellipsis.EllipsisTransformPrototype t = $.$(s);
+
+        assertNotNull(t);
+        assertEquals($.$("%B"), t.from);
+        assertEquals(Imdex, t.to);
+
+        TermIndex i = new PatternIndex();
+
+        Term u = i.transform(
+                $.p(t), new PremiseRule.PremiseRuleVariableNormalization());
+        EllipsisTransform tt = (EllipsisTransform)((Compound)u).term(0);
+        assertEquals("(%386007808..%2=_..+)", u.toString());
+        assertEquals($.$("%2"), tt.from);
+        assertEquals(Imdex, tt.to);
     }
 }

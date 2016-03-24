@@ -221,11 +221,11 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
 
 
 
-    @Nullable
-    @Override
-    public final Ellipsis firstEllipsis() {
-        return Ellipsis.firstEllipsis(term);
-    }
+//    @Nullable
+//    @Override
+//    public final Ellipsis firstEllipsis() {
+//        return Ellipsis.firstEllipsis(term);
+//    }
 
 
     @Override

@@ -10,6 +10,8 @@ import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static nars.$.$;
+
 /**
  * Index which specifically holds the components of a deriver ruleset
  */
@@ -18,6 +20,8 @@ public class PatternIndex extends AbstractNAR.DefaultTermIndex {
     public PatternIndex() {
         super(512, new XorShift128PlusRandom(1));
     }
+
+
 
     @Override
     protected
@@ -46,7 +50,7 @@ public class PatternIndex extends AbstractNAR.DefaultTermIndex {
 ////            if (!x.isCommutative()) {
 
         return PatternCompound.make(t,
-            (TermVector) theSubterms(t.subterms())
+            theSubterms(t.subterms())
         );
 
 //                    return new LinearCompoundPattern(x, (TermVector) subs);

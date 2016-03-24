@@ -57,7 +57,7 @@ public class UnificationTest {
             final PatternIndex pi = new PatternIndex();
             Termed ts1 = Narsese.the().term(s1, pi);
             //nar.believe(ts1);
-            t1 = PatternCompound.make((Compound) ts1.term());
+            t1 = new PatternIndex().the((Compound) ts1.term()).term();
 
         } else {
             nar.believe(s1);

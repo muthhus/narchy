@@ -39,7 +39,7 @@ public abstract class AbstractPolygonBot extends Being {
 
     //final Deque<Vec2> positions = new ArrayDeque();
     protected final List<Sense> senses = new ArrayList();
-    public float linearThrustPerCycle = 5*5f;
+    public float linearThrustPerCycle = 25*5f;
     public float angularSpeedPerCycle = 15*0.7f;
     int mission = 0;
     //public float curiosity = 0.1f;

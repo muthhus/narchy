@@ -169,11 +169,7 @@ public class Terms extends TermBuilder implements TermIndex {
             return false;
         }
 
-        @Override
-        public @Nullable
-        Ellipsis firstEllipsis() {
-            return null;
-        }
+
 
         @Override
         public Iterator iterator() {

@@ -287,10 +287,11 @@ public abstract class FindSubst extends Versioning implements Subst {
 
     private final boolean nextVarX(@NotNull Term /* var */ xVar, @NotNull Term /* var */ y) {
         Op xOp = xVar.op();
-        return (y.op() == xOp) ? putCommon((Variable)xVar, (Variable)y) :
+        return (y.op() == xOp) ?
+                putCommon((Variable)xVar, (Variable)y) :
                 (xOp == type) //<-- this condition may not be correct but doesnt seem to make much difference. better if it is more restrictive in what is inserted
-                        &&
-                        putVarX(xVar, y);
+                    &&
+                    putVarX(xVar, y);
 
         //            if ((y.op() == Op.VAR_QUERY && xVar.op() != Op.VAR_QUERY) ||
         //                    (y.op() != Op.VAR_QUERY && xVar.op() == Op.VAR_QUERY)) {
@@ -302,27 +303,17 @@ public abstract class FindSubst extends Versioning implements Subst {
 
     private final boolean matchXvar(@NotNull Term /* var */ x, @NotNull Term y) {
         Term t = term(x);
-
         return (t != null) ?
                 match(t, y) :
                 nextVarX(x, y);
-
-
     }
+
     private final boolean matchYvar(@NotNull Term x, @NotNull Term /* var */ y) {
         Term t = yx.term(y);
-
-        if (t != null) {
-            return match(x, t); //loop
-        } else {
-            if (putYX(/*(Variable)*/ y, x)) {
-                if (y instanceof GenericNormalizedVariable) {
-                    return putXY(y, /*(Variable)*/ x);
-                }
-                return true;
-            }
-        }
-        return false;
+        return (t != null) ?
+                match(x, t) :
+                (putYX(/*(Variable)*/ y, x) &&
+                        (!(y instanceof GenericNormalizedVariable) || putXY(y, /*(Variable)*/ x)));
     }
 
 
@@ -761,7 +752,7 @@ public abstract class FindSubst extends Versioning implements Subst {
     private boolean putCommon(@NotNull Variable /* var */ x, @NotNull Variable y) {
         Variable commonVar = CommonVariable.make(x, y);
         return putXY(x, commonVar) && putYX(y, commonVar);
-        //TODO restore displaced values if putYX fails but putXY succeeded?
+        //TODO restore changed values if putYX fails but putXY succeeded?
     }
 
     /**

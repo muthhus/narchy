@@ -28,18 +28,18 @@ abstract public class PatternCompound extends GenericCompound {
         protected final Ellipsis ellipsis;
         private final boolean ellipsisTransform;
 
-        PatternCompoundContainingEllipsis(@NotNull Compound seed, @NotNull TermVector subterms) {
+        PatternCompoundContainingEllipsis(@NotNull Compound seed, Ellipsis ellipsis, @NotNull TermContainer subterms) {
             super(seed, subterms);
 
-            this.ellipsis = Ellipsis.firstEllipsis(this);
+            this.ellipsis = ellipsis;
             if (ellipsis == null)
                 throw new RuntimeException("no ellipsis");
 
             this.ellipsisTransform = hasEllipsisTransform(this);
+
         }
 
         @Nullable
-        @Override
         public Ellipsis firstEllipsis() {
             return ellipsis;
         }
@@ -85,14 +85,11 @@ abstract public class PatternCompound extends GenericCompound {
 
     protected static final class PatternCompoundSimple extends PatternCompound {
 
-        PatternCompoundSimple(@NotNull Compound seed, @NotNull TermVector subterms) {
+        PatternCompoundSimple(@NotNull Compound seed, @NotNull TermContainer subterms) {
             super(seed, subterms);
         }
 
-        @Override
-        public Ellipsis firstEllipsis() {
-            return null;
-        }
+
 
         @Override
         public boolean match(@NotNull Compound y, @NotNull FindSubst subst) {
@@ -117,13 +114,15 @@ abstract public class PatternCompound extends GenericCompound {
 
     @NotNull
     public static PatternCompound make(@NotNull Compound seed) {
-        return make(seed, (TermVector)seed.subterms());
+        return make(seed, seed.subterms());
     }
 
     @NotNull
-    public static PatternCompound make(@NotNull Compound seed, @NotNull TermVector v) {
-        if (seed.firstEllipsis()!=null) {
-            return new PatternCompoundContainingEllipsis(seed, v);
+    public static PatternCompound make(@NotNull Compound seed, @NotNull TermContainer v) {
+
+        Ellipsis e = Ellipsis.firstEllipsis(v);
+        if (e!=null) {
+            return new PatternCompoundContainingEllipsis(seed, e, v);
         } else {
             return new PatternCompoundSimple(seed, v);
         }
@@ -134,8 +133,11 @@ abstract public class PatternCompound extends GenericCompound {
 //        this(seed, (TermVector) seed.subterms());
 //    }
 
-    PatternCompound(@NotNull Compound seed, @NotNull TermVector subterms) {
+    PatternCompound(@NotNull Compound seed, @NotNull TermContainer subterms) {
         super(seed.op(), seed.relation(), subterms);
+
+        if (seed.isNormalized())
+            this.setNormalized();
 
         sizeCached = seed.size();
         structureCached =

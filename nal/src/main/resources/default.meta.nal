@@ -488,8 +488,8 @@
     ((\, M, A.._=B..+, _ ) --> B), M |- (M --> (A.._=B..+)), (Belief:Identity)
 
 //Recursion Force
-    ((X,Z) --> Y), X |- ((X,Z)-->((/,Y,_,Z), Z)), (Belief:StructuralDeduction, Desire:StructuralDeduction)
-    ((X,Z) --> Y), Z |- ((X,Z)-->(X, (/,Y,X,_))), (Belief:StructuralDeduction, Desire:StructuralDeduction)
+    ((X,Z) --> Y), X |- ((X,Z)-->((/,Y,_,Z), Z)), (Belief:StructuralDeduction)
+    ((X,Z) --> Y), Z |- ((X,Z)-->(X, (/,Y,X,_))), (Belief:StructuralDeduction)
 
 ////composition on both sides of a statement:
 

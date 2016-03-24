@@ -194,17 +194,18 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
         //and since it doesnt equal, there is no match to test
 
 
-        return (firstEllipsis() != null) ?
-                subst.matchCompoundWithEllipsis(this, y) :
+        return /*(firstEllipsis() != null) ?
+                subst.matchCompoundWithEllipsis(this, y) :*/
                 subst.matchCompound(this, y);
     }
 
 
-    @Nullable
-    @Override
-    default Ellipsis firstEllipsis() {
-        return subterms().firstEllipsis();
-    }
+//    @Nullable
+//    @Override
+//    default Ellipsis firstEllipsis() {
+//        //return subterms().firstEllipsis();
+//        return null;
+//    }
 
 
     @Override default int opRel() {

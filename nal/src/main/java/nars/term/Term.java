@@ -134,11 +134,11 @@ public interface Term extends Termed, Comparable, Termlike {
         return varIndep()!=0;
     }
 
-    /** returns the first ellipsis subterm or null if not present */
-    @Nullable
-    @Override default Ellipsis firstEllipsis() {
-        return null;
-    }
+//    /** returns the first ellipsis subterm or null if not present */
+//    @Nullable
+//    @Override default Ellipsis firstEllipsis() {
+//        return null;
+//    }
 
     default boolean hasVarDep() {
         return varDep()!=0;
