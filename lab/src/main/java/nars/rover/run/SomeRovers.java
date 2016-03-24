@@ -26,6 +26,8 @@ import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static nars.rover.robot.NARover.*;
+
 /**
  * Created by me on 6/20/15.
  */
@@ -38,12 +40,6 @@ public class SomeRovers {
     public static final String motorStop = "motor(stop)";
     public static final String fire = "turret(fire)";
 
-    public static final String eatFood = "eat:food";
-    public static final String eatPoison = "eat:poison";
-    public static final String speedLeft = "speed:leftAngle";
-    public static final String speedRight = "speed:rightAngle";
-    public static final String speedFore = "speed:forward";
-    public static final String speedBack = "speed:backward";
 
     //public static final SimulatedClock clock = new SimulatedClock();
 
@@ -96,7 +92,7 @@ public class SomeRovers {
     }
 
     public static Default newNAR() {
-        int conceptsFirePerCycle = 24;
+        int conceptsFirePerCycle = 16;
 
         Random rng = new XorShift128PlusRandom(1);
         TermIndex index = new AbstractNAR.WeakTermIndex(64*1024,rng);
@@ -116,7 +112,7 @@ public class SomeRovers {
 //        nar.input("$0.8$ <food <-> poison>?");
 //        nar.input("$0.8$ <[food] <-> [poison]>?");
 
-        nar.logSummaryGT(System.out, 0.6f);
+        nar.logSummaryGT(System.out, 0.4f);
 //        nar.log(Systenar.out, x -> {
 //            if (x instanceof Task) {
 //                Task t = (Task)x;
@@ -141,16 +137,16 @@ public class SomeRovers {
 
 
         //nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
-        nar.core.activationRate.setValue(0.25f);
+        nar.core.activationRate.setValue(0.1f);
 
 
-        nar.duration.set(2);
+        nar.duration.set(5);
         nar.conceptForgetDurations.setValue(2f);
         nar.termLinkForgetDurations.setValue(4);
         nar.taskLinkForgetDurations.setValue(3);
 
-        nar.cyclesPerFrame.set(4);
-        nar.shortTermMemoryHistory.set(4);
+        nar.cyclesPerFrame.set(8);
+        nar.shortTermMemoryHistory.set(3);
 
         nar.executionThreshold.setValue(0.01f);
         //nar.derivationDurabilityThreshold.setValue(0.1f);
@@ -180,10 +176,12 @@ public class SomeRovers {
                 NARfx.newConceptWindow(nar,
                         //new TilePane(Orientation.VERTICAL),
                         new VBox(),
-                        eatFood,
-                        eatPoison,
-                        speedLeft, speedRight,
-                        speedFore, speedBack
+                        EAT_FOOD.toString(),
+                        EAT_POISON.toString(),
+                        SPEED_LEFT.toString(),
+                        SPEED_RIGHT.toString(),
+                        SPEED_FORE.toString(),
+                        SPEED_BACK.toString()
                 );
             });
         }
@@ -203,16 +201,13 @@ public class SomeRovers {
         NarQ nqSpine = new NarQ(n, (i, o) -> (int) Math.ceil(1+Math.sqrt(i * o)));
 
 
-        nqSpine.power.setValue(0.25f);
+        nqSpine.power.setValue(0.5f);
+
+        nqSpine.input.addAll(nqSpine.getBeliefMotivations(SPEED_LEFT, SPEED_RIGHT, SPEED_FORE, SPEED_BACK, EAT_FOOD, EAT_POISON));
 
 
-        nqSpine.input.addAll(nqSpine.getBeliefMotivations(
-                eatFood, eatPoison, speedLeft, speedRight, speedFore, speedBack
-        ));
-
-
-        nqSpine.goal.put(new BeliefReward(n, eatFood), new MutableFloat(1f));
-        nqSpine.goal.put(new NotBeliefReward(n, eatPoison), new MutableFloat(0.9f));
+        nqSpine.goal.put(new BeliefReward(n, EAT_FOOD), new MutableFloat(1f));
+        nqSpine.goal.put(new NotBeliefReward(n, EAT_POISON), new MutableFloat(0.9f));
         //nq.reward.put(new BeliefReward(n, "speed:forward"), new MutableFloat(0.1f));
 
 

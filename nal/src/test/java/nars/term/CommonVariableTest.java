@@ -68,6 +68,8 @@ public class CommonVariableTest {
                 p1);
 
         assertEquals(ca, cb);
+        assertEquals(0, ca.compareTo(cb));
+        assertEquals(0, cb.compareTo(ca));
         Assert.assertTrue(ca != cb);
     }
 }

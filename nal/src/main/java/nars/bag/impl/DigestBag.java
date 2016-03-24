@@ -21,9 +21,8 @@ public class DigestBag implements Consumer<Task> {
     public DigestBag(int capacity) {
         list = new ArraySortedIndex<BLink<Task>>(capacity) {
             @Override public float score(@NotNull BLink<Task> v) {
-
-                //return v.getPriority() * v.get().getConfidenceIfTruthOr(1f);
-                return v.pri();
+                Task task = v.get();
+                return v.pri() * (task.isQuestOrQuestion() ? 0.5f : task.conf()) / task.term().volume();
             }
         };
     }

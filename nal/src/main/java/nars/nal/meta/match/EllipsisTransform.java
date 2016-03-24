@@ -8,6 +8,7 @@ import nars.term.Termed;
 import nars.term.transform.VariableNormalization;
 import nars.term.transform.subst.FindSubst;
 import nars.term.variable.AbstractVariable;
+import nars.term.variable.GenericNormalizedVariable;
 import nars.term.variable.GenericVariable;
 import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
@@ -18,12 +19,13 @@ public class EllipsisTransform extends EllipsisOneOrMore {
     public final Term from;
     public final Term to;
 
-    public EllipsisTransform(@NotNull AbstractVariable name, Termed from, Termed to) {
-        super(name);
-
-
-        this.from = from.term();
-        this.to = to.term();
+    public EllipsisTransform(@NotNull AbstractVariable name, Term from, Term to) {
+        super(name, GenericNormalizedVariable.multiVariable(name.hashCode(),
+                from==Op.Imdex ? 0 : from.hashCode(),
+                to==Op.Imdex ? 0 : to.hashCode()
+        ));
+        this.from = from;
+        this.to = to;
     }
 
     @NotNull
@@ -47,8 +49,8 @@ public class EllipsisTransform extends EllipsisOneOrMore {
         //normalizes any variable parameter terms of an EllipsisTransform
         PremiseRule.PremiseRuleVariableNormalization vnn = (PremiseRule.PremiseRuleVariableNormalization) normalizer;
         return new EllipsisTransform(v,
-                from instanceof Variable ? vnn.applyAfter((Variable)from) : from,
-                to instanceof Variable ? vnn.applyAfter((Variable)to) : to);
+                from instanceof Variable ? vnn.applyAfter((Variable)from).term() : from,
+                to instanceof Variable ? vnn.applyAfter((Variable)to).term() : to);
     }
 
     @NotNull

@@ -14,6 +14,9 @@ public class EllipsisOneOrMore extends Ellipsis {
         super(name); //TODO decide if EllipsisTransform, a subclass, needs its own uniqueness hashmask
     }
 
+    protected EllipsisOneOrMore(@NotNull AbstractVariable name, int id) {
+        super(name, id);
+    }
 
     @Override
     public @NotNull Variable clone(@NotNull AbstractVariable newVar, VariableNormalization normalizer) {

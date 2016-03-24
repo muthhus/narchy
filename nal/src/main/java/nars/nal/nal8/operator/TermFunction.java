@@ -73,14 +73,15 @@ public abstract class TermFunction<O> extends SyncOperator {
 
 
     @Nullable
-    protected MutableTask result(@NotNull Task e, Term y/*, Term[] x0, Term lastTerm*/) {
-        return Execution.result(nar, e, y, getResultTense());
+    protected MutableTask result(@NotNull Task goal, Term y/*, Term[] x0, Term lastTerm*/) {
+        return Execution.result(nar, goal, y, getResultTense(goal));
     }
 
     /** default tense applied to result tasks */
     @NotNull
-    public Tense getResultTense() {
-        return Tense.Present;
+    public Tense getResultTense(Task goal) {
+        return goal.isEternal() ? Tense.Eternal : Tense.Present;
+        //return Tense.Present;
     }
 
 //    /** default confidence applied to result tasks */

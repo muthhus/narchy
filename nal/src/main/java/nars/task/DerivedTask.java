@@ -1,5 +1,6 @@
 package nars.task;
 
+import nars.Global;
 import nars.bag.BLink;
 import nars.concept.ConceptProcess;
 import nars.term.Compound;
@@ -8,11 +9,14 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.ref.Reference;
+
 /**
  * Created by me on 2/7/16.
  */
 public final class DerivedTask extends MutableTask {
 
+    private final Reference<ConceptProcess> premise;
     @Nullable
     private BLink<? extends Task> premiseTaskLink;
     @Nullable
@@ -23,16 +27,14 @@ public final class DerivedTask extends MutableTask {
 
     public DerivedTask(@NotNull Termed<Compound> tc, char punct, @NotNull ConceptProcess premise) {
         super(tc, punct);
-        //this.premise = premise;
-        this.premiseTaskLink = premise.taskLink;
-        this.premiseTermLink = premise.termLink;
+        this.premise = Global.reference(premise);
+
 
     }
 
     @Override public void delete() {
         super.delete();
-        premiseTaskLink = null; //clear GC paths
-        premiseTermLink = null; //clear GC paths
+        premise.clear();
     }
 
 
@@ -41,9 +43,11 @@ public final class DerivedTask extends MutableTask {
         if (isDeleted())
             return;
 
+        ConceptProcess premise = this.premise.get();
+
         Truth conclusion = t.truth();
 
-        BLink<? extends Task> tLink = premiseTaskLink;
+        BLink<? extends Task> tLink = premise.taskLink;
         if (!tLink.isDeleted()) {
             //TODO check this Question case is right
             Truth tLinkTruth = tLink.get().truth();
@@ -56,10 +60,12 @@ public final class DerivedTask extends MutableTask {
 
         Task belief = t.getParentBelief();
         if (belief != null) {
-            BLink<? extends Termed> bLink = premiseTermLink;
-            float oneMinusDifB = 1f - conclusion.getExpDifAbs(belief.truth());
-            bLink.andPriority(oneMinusDifB);
-            bLink.andDurability(oneMinusDifB);
+            BLink<? extends Termed> bLink = premise.termLink;
+            if (!bLink.isDeleted()) {
+                float oneMinusDifB = 1f - conclusion.getExpDifAbs(belief.truth());
+                bLink.andPriority(oneMinusDifB);
+                bLink.andDurability(oneMinusDifB);
+            }
         }
 
     }

@@ -232,9 +232,9 @@ public class PremiseRule extends GenericCompound {
         char puncOverride = p.puncOverride;
 
         BeliefFunction belief = BeliefFunction.get(p.beliefTruth);
-        String beliefLabel = belief != null ? p.beliefTruth.toString() : "_";
+        String beliefLabel = belief != null ? p.beliefTruth.toString() : "x";
         DesireFunction desire = DesireFunction.get(p.goalTruth);
-        String desireLabel = desire != null ? p.goalTruth.toString() : "_";
+        String desireLabel = desire != null ? p.goalTruth.toString() : "x";
 
         String sn = "Truth:(";
         String i = puncOverride == 0 ?

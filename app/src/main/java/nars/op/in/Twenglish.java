@@ -21,6 +21,7 @@ import nars.$;
 import nars.Global;
 import nars.NAR;
 import nars.Narsese;
+import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Term;
 import nars.term.atom.Atom;
@@ -103,7 +104,7 @@ public class Twenglish {
 
 
     @NotNull
-    protected Collection<Task> parseSentence(String source, @NotNull NAR n, @NotNull List<Span> s) {
+    protected Collection<MutableTask> parseSentence(String source, @NotNull NAR n, @NotNull List<Span> s) {
 
         LinkedList<Term> t = new LinkedList();
         Span last = null;
@@ -122,23 +123,30 @@ public class Twenglish {
                 case "!": sentenceType = GOAL; break;
             }
         }
-        if (!"fragment".equals(sentenceType.toString()))
+        if (!"words".equals(sentenceType.toString()))
             t.removeLast(); //remove the punctuation, it will be redundant
 
-        List<Task> tt = new ArrayList();
+
+        if (t.isEmpty())
+            return null;
+
+
+        List<MutableTask> tt = new ArrayList();
 
         //1. add the logical structure of the sequence of terms
         if (inputProduct) {
+
             Term p =
                 $.p(t.toArray(new Term[t.size()]));
             Term q =
-                    $.inh(
-                            p,
-                            $.seti(sentenceType, $.the(source))
+                    $.image(2,
+                            $.the(source),
+                            sentenceType,
+                            p
                     )
             ;
             if (q != null) {
-                Task newtask = n.task(q + ". %0.95|0.95%");
+                MutableTask newtask = new MutableTask(q,'.').present(n); //n.task(q + ". %0.95|0.95%");
                 if (newtask!=null)
                     tt.add(newtask); //TODO non-string construct
             }
@@ -222,10 +230,10 @@ public class Twenglish {
     
     /** returns a list of all tasks that it was able to parse for the input */
     @NotNull
-    public List<Task> parse(String source, @NotNull NAR n, String s) throws Narsese.NarseseException {
+    public List<MutableTask> parse(String source, @NotNull NAR n, String s) throws Narsese.NarseseException {
 
         
-        List<Task> results = Global.newArrayList();
+        List<MutableTask> results = Global.newArrayList();
 
         List<Span> tokens = Twokenize.twokenize(s);
         
@@ -254,7 +262,9 @@ public class Twenglish {
             sentences.add(currentSentence);
         
         for (List<Span> x : sentences) {
-            results.addAll( parseSentence(source, n, x) );
+            Collection<MutableTask> ss = parseSentence(source, n, x);
+            if (ss!=null)
+                results.addAll(ss);
         }
                 
         if (!results.isEmpty()) {

@@ -14,6 +14,15 @@ public abstract class GenericNormalizedVariable extends AbstractVariable {
         this.type = type;
     }
 
+    /** to combine multiple variables into a unique hash;
+     *  this limits # of variables to 256 per term */
+    public static int multiVariable(int a, int b) {
+        return ((a+1) << 8) | (b+1);
+    }
+    public static int multiVariable(int a, int b, int c) {
+        return ((a+1) << 16) | ((b+1) << 8) | c;
+    }
+
 
     @Override
     public final int vars() {

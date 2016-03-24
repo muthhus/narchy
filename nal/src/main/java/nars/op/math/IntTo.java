@@ -2,6 +2,7 @@ package nars.op.math;
 
 import nars.nal.Tense;
 import nars.nal.nal8.operator.TermFunction;
+import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.TermIndex;
@@ -35,7 +36,7 @@ public abstract class IntTo<Y> extends TermFunction<Y> {
 
     @NotNull
     @Override
-    public Tense getResultTense() {
+    public Tense getResultTense(Task t) {
         return Tense.Eternal;
     }
 }

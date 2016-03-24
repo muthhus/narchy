@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-import static nars.Op.NEGATE;
+
 
 /**
  * Has ability to measure (and cache) belief and desire state in order to execute Operations
@@ -77,13 +77,13 @@ public class OperationConcept extends CompoundConcept implements Runnable {
     private final Task executeLater(Task t, NAR nar) {
         if (t == null) return null;
 
-        if (op()!=NEGATE) {
+        //if (op()!=NEGATE) {
             pending.add(t);
             nar.runOnceLater(this);
             this.nar = nar;
-        } else {
+        /*} else {
             nar.runOnceLater(positive(nar)); //queue an update on the positive concept but dont queue the negation task
-        }
+        }*/
         return t;
     }
 
@@ -91,40 +91,47 @@ public class OperationConcept extends CompoundConcept implements Runnable {
     public void run() {
         final NAR nar = this.nar;
 
-        update(nar);
-
-        List<Task> pending = this.pending;
-        for (int i = 0, pendingSize = pending.size(); i < pendingSize; i++) {
-            execute(pending.get(i), nar);
+        if (update(nar)) {
+            List<Task> pending = this.pending;
+            for (int i = 0, pendingSize = pending.size(); i < pendingSize; i++) {
+                execute(pending.get(i), nar);
+            }
         }
 
         pending.clear();
     }
 
-    public void update(NAR nar) {
+    public boolean update(NAR nar) {
         long now = nar.time();
-        if (now == lastMotivationUpdate) //update once per cycle TODO parameter for this limitation min/max
-            return;
-
-        int dur = nar.duration();
-
-        OperationConcept p = positive(nar);
-        Concept n = negative(nar);
 
         float b = 0, d = 0;
 
-        if (p != null) { //measure contributed positive state
-            d += p.goalMotivation(now, dur);
-            b += p.beliefMotivation(now, dur);
+        if (now != lastMotivationUpdate) { //update once per cycle TODO parameter for this limitation min/max
+
+
+            int dur = nar.duration();
+
+            //OperationConcept p = positive(nar);
+            //Concept n = negative(nar);
+
+
+            //if (p != null) { //measure contributed positive state
+                d += goalMotivation(now, dur);
+                b += beliefMotivation(now, dur);
+            //}
+
+//            if (n != null) {  //measure contributed negative state
+//                d -= n.goalMotivation(now, dur);
+//                b -= n.beliefMotivation(now, dur);
+//            }
+
+            update(b, d, now); //only necessary to update the state in the positive only
+        } else {
+            d = desired;
+            b = believed;
         }
 
-        if (n != null) {  //measure contributed negative state
-            d -= n.goalMotivation(now, dur);
-            b -= n.beliefMotivation(now, dur);
-        }
-
-        p.update(b, d, now); //only necessary to update the state in the positive only
-
+        return (d - b) > nar.executionThreshold.floatValue();
     }
 
 
@@ -140,7 +147,7 @@ public class OperationConcept extends CompoundConcept implements Runnable {
         //        if (motivation < executionThreshold.floatValue())
 //            return false;
 
-        if (task.op() != NEGATE) {
+        //if (task.op() != NEGATE) {
 
             //emit for both beliefs and goals
             Topic<Task> tt = nar.concept(Operator.operator(this)).get(Execution.class);
@@ -158,7 +165,7 @@ public class OperationConcept extends CompoundConcept implements Runnable {
                     task.log("execute(b=" + b + ",d=" + d + ')');
                 task.execute(b, d, nar); //call the task's custom event handler
             }
-        }
+        //}
     }
 
     //    private final boolean updateNecessary(long now) {
@@ -173,25 +180,25 @@ public class OperationConcept extends CompoundConcept implements Runnable {
         this.lastMotivationUpdate = now;
     }
 
-    public OperationConcept positive(NAR n) {
-        return op() != NEGATE ? this : (OperationConcept) n.concept(term(0));
-    }
-
-    public Concept negative(NAR n) {
-        //TODO cache the opposite term
-        return op() != NEGATE ? n.concept($.neg(this)) : this;
-    }
+//    public OperationConcept positive(NAR n) {
+//        return op() != NEGATE ? this : (OperationConcept) n.concept(term(0));
+//    }
+//
+//    public Concept negative(NAR n) {
+//        //TODO cache the opposite term
+//        return op() != NEGATE ? n.concept($.neg(this)) : this;
+//    }
 
     public final float believed(NAR n) {
-        return positive(n).believed;
+        return believed;
     }
 
     public final float desired(NAR n) {
-        return positive(n).desired;
+        return desired;
     }
 
     public final float motivation() {
-        float m = desired - believed;
+        float m = (desired - believed);
         //if (!Float.isFinite(m)) return 0;
         return m;
     }
@@ -199,9 +206,7 @@ public class OperationConcept extends CompoundConcept implements Runnable {
     /** provide motivation value after triggering an update */
     public final float motivation(NAR nar) {
         update(nar);
-        float m = desired - believed;
-        //if (!Float.isFinite(m)) return 0;
-        return m;
+        return motivation();
     }
 
 

@@ -8,6 +8,7 @@ import nars.concept.util.BeliefTable;
 import nars.data.Range;
 import nars.task.MutableTask;
 import nars.task.Task;
+import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Truth;
 import nars.util.data.random.XorShift128PlusRandom;
@@ -234,8 +235,11 @@ public class NarQ implements Consumer<NAR> {
         return true;
     }
 
+    public List<? extends DoubleSupplier> getBeliefMotivations(Termed... terms) {
+        return Stream.of(terms).map(t -> new BeliefMotivation(nar, t)).collect(Collectors.toList());
+    }
     public List<? extends DoubleSupplier> getBeliefMotivations(String... terms) {
-        return Stream.of(nar.terms(terms)).map(t -> new BeliefMotivation(nar, t)).collect(Collectors.toList());
+        return getBeliefMotivations(nar.terms(terms));
     }
 
     public List<? extends DoubleSupplier> getBeliefRewards(String... terms) {
@@ -381,6 +385,10 @@ public class NarQ implements Consumer<NAR> {
 
     /** negative motivation mapped to a -1,+1 range */
     public static class NotBeliefReward extends BeliefReward {
+
+        public NotBeliefReward(@NotNull NAR nar, @NotNull Termed term) {
+            super(nar, term);
+        }
 
         public NotBeliefReward(@NotNull NAR nar, @NotNull String term) {
             super(nar, term);

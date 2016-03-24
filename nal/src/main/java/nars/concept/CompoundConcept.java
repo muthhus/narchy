@@ -886,12 +886,12 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
         return ITERNAL;
     }
 
-    @NotNull
-    @Override
-    public final Compound anonymous() {
-        //concept itself is eternal
-        return this;
-    }
+//    @NotNull
+//    @Override
+//    public final Compound anonymous() {
+//        //concept itself is eternal
+//        return this;
+//    }
 
     @Override
     public Iterator iterator() {

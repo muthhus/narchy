@@ -51,6 +51,13 @@ public class NARover extends AbstractPolygonBot {
     final Sensor speedFore, speedBack, leftSpeed, rightSpeed,
             hungrySensor, sickSensor;
 
+    public static final Term EAT_FOOD = $.image(1, $.the("eat"), $.the("food") );
+    public static final Term EAT_POISON = $.image(1, $.the("eat"), $.the("poison") );
+    public static final Term SPEED_LEFT = $.image(1, $.the("speed"), $.the("left") );
+    public static final Term SPEED_RIGHT = $.image(1, $.the("speed"), $.the("right") );
+    public static final Term SPEED_FORE = $.image(1, $.the("speed"), $.the("fore") );
+    public static final Term SPEED_BACK = $.image(1, $.the("speed"), $.the("back") );
+
 
 //    final SimpleAutoRangeTruthFrequency linearVelocity;
 //    final SimpleAutoRangeTruthFrequency motionAngle;
@@ -92,6 +99,12 @@ public class NARover extends AbstractPolygonBot {
         FloatToFloatFunction sigmoidIfNegative = (n) -> {
             return n < 0 ? Util.sigmoid(-n) : 0; //Float.NaN;
         };
+        FloatToFloatFunction linearPositive = (n) -> {
+            return n > 0 ? Util.clamp(n) : 0; //Float.NaN;
+        };
+        FloatToFloatFunction linearNegative = (n) -> {
+            return n < 0 ? Util.clamp(-n) : 0; //Float.NaN;
+        };
 
         Vec2 forwardVec = new Vec2(1,0f);
         Vec2 tmp = new Vec2(), tmp2 = new Vec2();
@@ -117,13 +130,13 @@ public class NARover extends AbstractPolygonBot {
                 };
 
 
-        this.speedFore = new Sensor(nar, "speed:forward", linearSpeed, sigmoidIfPositive)
+        this.speedFore = new Sensor(nar, SPEED_FORE, linearSpeed, linearPositive)
                 .maxTimeBetweenUpdates(maxUpdateTime)
                 .minTimeBetweenUpdates(minUpdateTime);
 
         //.pri(0.75f);
 
-        this.speedBack = new Sensor(nar, "speed:backward", linearSpeed, sigmoidIfNegative)
+        this.speedBack = new Sensor(nar, SPEED_BACK, linearSpeed, linearNegative)
                 .maxTimeBetweenUpdates(maxUpdateTime)
                 .minTimeBetweenUpdates(minUpdateTime);
 
@@ -139,22 +152,22 @@ public class NARover extends AbstractPolygonBot {
 
             return v;
         };
-        this.leftSpeed = new Sensor(nar, "speed:leftAngle", angleSpeed, sigmoidIfNegative)
+        this.leftSpeed = new Sensor(nar, SPEED_LEFT, angleSpeed, linearNegative)
             .maxTimeBetweenUpdates(maxUpdateTime)
             .minTimeBetweenUpdates(minUpdateTime)
             ;
 
-        this.rightSpeed = new Sensor(nar, "speed:rightAngle", angleSpeed, sigmoidIfPositive)
+        this.rightSpeed = new Sensor(nar, SPEED_RIGHT, angleSpeed, linearPositive)
             .maxTimeBetweenUpdates(maxUpdateTime)
             .minTimeBetweenUpdates(minUpdateTime)
             ;
 
 
-        hungrySensor = new Sensor(nar, "eat:food", t -> 1f-hungry)
+        hungrySensor = new Sensor(nar, EAT_FOOD, t -> 1f-hungry)
             .maxTimeBetweenUpdates(maxUpdateTime)
             .minTimeBetweenUpdates(minUpdateTime);
 
-        sickSensor = new Sensor(nar, "eat:poison", t -> sick)
+        sickSensor = new Sensor(nar, EAT_POISON, t -> sick)
             .maxTimeBetweenUpdates(maxUpdateTime)
             .minTimeBetweenUpdates(minUpdateTime);
 
@@ -165,35 +178,38 @@ public class NARover extends AbstractPolygonBot {
         OperationConcept motorStop = new OperationConcept("motor(stop)", nar);
 
         nar.onFrame(n -> {
-            float ang = (motorLeft.motivation(nar) - motorRight.motivation(nar));
-            float lin = (motorFore.motivation(nar) - motorBack.motivation(nar));
-            float stop = 0; // motorStop.motivation(nar);
+            float thresh = 0.01f;
+            float cc = 0.75f;
 
-            float thresh = 0.001f;
-            float cc = 0.5f;
-
-            if (Math.abs(ang) > thresh) {
-                rotateRelative(Util.clampBi(ang) * (1f-stop));
-
-                if (ang > 0)
-                    nar.believe("motor(left)", Tense.Present, ang, cc);
-                else
-                    nar.believe("motor(right)", Tense.Present, -ang, cc);
-
+            {
+                float a = motorLeft.motivation(nar);
+                if (a > thresh) {
+                    rotateRelative(a);
+                    nar.believe("motor(left)", Tense.Present, 0.5f + a/2f, cc);
+                }
+            }
+            {
+                float a = motorRight.motivation(nar);
+                if (a > thresh) {
+                    rotateRelative(-a);
+                    nar.believe("motor(right)", Tense.Present, 0.5f + a/2f, cc);
+                }
+            }
+            {
+                float l = motorFore.motivation(nar);
+                if (l > thresh) {
+                    linear(l);
+                    nar.believe("motor(fore)", Tense.Present, 0.5f + l/2f, cc);
+                }
+            }
+            {
+                float l = motorBack.motivation(nar);
+                if (l > thresh) {
+                    linear(-l);
+                    nar.believe("motor(back)", Tense.Present, 0.5f + l/2f, cc);
+                }
             }
 
-            if (Math.abs(lin) > thresh) {
-                linear(Util.clampBi(lin)* (1f-stop));
-
-                if (lin > 0)
-                    nar.believe("motor(fore)", Tense.Present, lin, cc);
-                else
-                    nar.believe("motor(back)", Tense.Present, -lin, cc);
-            }
-
-            //System.out.println("(" + lin + " " + ang + ") -> (" + linF + " " + angF + ")");
-
-            //System.out.println("(" + lin + " " + ang + ")");
         });
 
     }
@@ -298,10 +314,11 @@ public class NARover extends AbstractPolygonBot {
                 //nar.input("eat:food. :|: %0.00;0.75%");
                 //nar.input("eat:poison. :|: %0.00;0.75%");
 
-                nar.input("eat:food! %1.00|0.95%");
+                nar.goal(EAT_FOOD, Tense.Present, 1f, 0.9f);//"eat:food! %1.00|0.95%");
+                nar.goal(EAT_POISON, Tense.Present, 0f, 0.9f);
 
-                nar.input("speed:forward! %1.00;0.7%");
-                nar.input("eat:poison! %0.0|0.9%");
+                //nar.input("speed:forward! %1.00;0.7%");
+                //nar.input("eat:poison! %0.0|0.9%");
                 //nar.input("(--, <eat:food <-> eat:poison>). %1.00;0.95%");
                 //nar.input("(?x ==> eat:#y)?");
                 //nar.input("(?x && eat:#y)?");

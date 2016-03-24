@@ -20,11 +20,12 @@ import java.io.File;
  */
 public class NarseseIRCBot extends IRCBot {
 
-    private final long outputIntervalMS = 2*60000;
+    private final long outputIntervalMS = 10000;
     int paragraphSize = 3;
 
     private Default nar;
     private DigestBag.OutputBuffer output;
+    private float INPUT_SENTENCE_PRIORITY = 0.25f;
 
     public String toString(Object t) {
         if (t instanceof Task) {
@@ -42,11 +43,14 @@ public class NarseseIRCBot extends IRCBot {
 
     public NarseseIRCBot() throws Exception {
         super(
-                //"irc.freenode.net",
-                "localhost",
-                "NARchy", "#chat");
+                "irc.freenode.net",
+                //"localhost",
+                "NARchy", "#nars");
+
+
 
         new Thread(()-> {
+
 
             while (true) {
                 try {
@@ -261,6 +265,15 @@ public class NarseseIRCBot extends IRCBot {
 
     }
 
+    protected void axioms() {
+
+//        nar.input("(($x, \"is\", $y) ==> ($x <-> $y)).");
+//        nar.input("(($x, \"isnt\", $y) ==> (--,($x <-> $y))).");
+//        nar.input("(($x, \"and\", $y) ==> ($x && $y)).");
+//        nar.input("(($x, \"or\", $y) ==> ($x || $y)).");
+
+    }
+
     public void restart() {
         if(running !=null) {
             try {
@@ -272,27 +285,30 @@ public class NarseseIRCBot extends IRCBot {
 
         nar = new Default(1024, 1, 4, 3);
 
+        axioms();
+
         output = new DigestBag.OutputBuffer(nar, 128);
 
-        nar.duration.set(2000);
-        nar.core.conceptsFiredPerCycle.set(256);
+        //nar.duration.set(2000);
+        nar.core.conceptsFiredPerCycle.set(32);
 
         nar.log();
 
         send("Ready: " + nar.toString());
 
 
-//        nar.memory.eventTaskProcess.on(c -> {
-//            if (!c.isInput() && c.getPriority() > 0.25f)
-//                send(c.toString());
-//        });
+        nar.eventTaskProcess.on(c -> {
+            if (!c.isInput())
+                output.buffer.accept(c);
+                //say(c.toString());
+        });
 //
 //        nar.memory.eventAnswer.on(c -> {
 //            if (c.getOne().isInput())
 //                send(c.toString());
 //        });
 
-        running = nar.loop(0.1f);
+        running = nar.loop(100f);
     }
 
 
@@ -313,6 +329,7 @@ public class NarseseIRCBot extends IRCBot {
             TextInput ii;
             try {
                 ii = nar.input(msg);
+                return;
             } catch (Exception e) {
                 ii = null;
             }
@@ -320,8 +337,9 @@ public class NarseseIRCBot extends IRCBot {
             if (ii == null || ii.size() == 0) {
                 try {
                     new Twenglish().parse(nick, nar, msg).forEach(t -> {
-                        //t.getBudget().setPriority((float) sentenceBudget);
-                        nar.input(t);
+                        //t.setPriority(INPUT_SENTENCE_PRIORITY);
+                        if (t!=null)
+                            nar.input(t);
                     });
                 } catch (Exception f) {
                     System.err.println(msg + ' ' + f);

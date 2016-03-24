@@ -90,9 +90,11 @@ public abstract class Ellipsis extends AbstractVariable {
 
 
     protected Ellipsis(@NotNull AbstractVariable target) {
-        super(
-            target.op(), target.id
-        );
+        this(target, target.id);
+    }
+
+    protected Ellipsis(@NotNull AbstractVariable target, int id) {
+        super(target.op(), id);
     }
 
     @Override

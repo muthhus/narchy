@@ -415,6 +415,15 @@ public abstract class AbstractTask extends UnitBudget
 
     }
 
+    @Override
+    public void delete() {
+        super.delete();
+        Reference<Task> p = this.parentTask;
+        if (p !=null) p.clear();
+        Reference<Task> b = this.parentBelief;
+        if (b !=null) b.clear();
+    }
+
     public final void invalidate() {
         hash = 0;
     }

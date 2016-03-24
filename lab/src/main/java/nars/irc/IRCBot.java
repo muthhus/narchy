@@ -12,7 +12,7 @@ public abstract class IRCBot {
     public final String nick;
     private final String login;
     protected final String channel;
-    boolean outputting = false;
+    boolean outputting = true;
 
     static final String pingHead = "PING ";
 

@@ -187,7 +187,7 @@ public interface Execution  {
                 //1f, DEFAULT_EXECUTION_CONFIDENCE).
 
                         budget(b).
-                        present(nar).
+                        occurr(operation.isEternal() ? Tense.ETERNAL : nar.time()).
                 //parent(operation). //https://github.com/opennars/opennars/commit/23d34d5ddaf7c71348d0a70a88e2805ec659ed1c#diff-abb6b480847c96e2dbf488d303fb4962L235
                         because("Executed")
                 ;

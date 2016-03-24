@@ -38,11 +38,6 @@ public class DefaultConceptBuilder implements ConceptBuilder {
         Bag<Termed> termbag = termbag();
         Bag<Task> taskbag = taskbag();
         switch (t.op()) {
-            case NEGATE:
-                Term unwrapped = t.term(0);
-                if (Op.isOperation(unwrapped))
-                    return new OperationConcept(t, termbag, taskbag);
-                break;
             case INHERIT:
                 if (Op.isOperation(t))
                     return new OperationConcept(t, termbag, taskbag);
