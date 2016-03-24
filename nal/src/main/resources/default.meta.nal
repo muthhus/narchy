@@ -352,17 +352,18 @@
 
 //// 2nd variable introduction ////////////////////////////////////////////////////////////////////////////////////
 //, not_equal(A, (M --> S))
-    (A ==> (M --> P)), (M --> S) |- ((&&,A,($X --> S)) ==> ($X --> P)), (Belief:Induction),
-                                    (&&,(A ==> (#Y --> P)), (#Y --> S)), (Belief:Intersection)
+    (A ==> (M --> P)), (M --> S), time(dtTask) |- ((&&,A,($X --> S)) ==> ($X --> P)), (Belief:Induction),
+                                                  (&&,(A ==> (#Y --> P)), (#Y --> S)), (Belief:Intersection)
 
-    (&&,(M --> P), A..+), (M --> S), neq(S,P) |- (($Y --> S) ==> (&&,($Y --> P), A..+)), (Belief:Induction),
-                                                 (&&,(#Y --> S), (#Y --> P), A..+), (Belief:Intersection)
+    (&&,(M --> P), A..+), (M --> S), neq(S,P), time(dtTask) |- (($Y --> S) ==> (&&,($Y --> P), A..+)), (Belief:Induction),
+                                                               (&&,(#Y --> S), (#Y --> P), A..+), (Belief:Intersection)
 
-    (A ==> (P --> M)), (S --> M), neq(S,P), not_equal(A, (S --> M)) |- ((&&,A,(P --> $X)) ==> (S --> $X)), (Belief:Abduction),
-                                                                       (&&,(A ==> (P --> #Y)), (S --> #Y)), (Belief:Intersection)
+//TODO test that this not_equal with a compound parameter works correctly
+    (A ==> (P --> M)), (S --> M), neq(S,P), not_equal(A, (S --> M)), time(dtTask) |- ((&&,A,(P --> $X)) ==> (S --> $X)), (Belief:Abduction),
+                                                                                     (&&,(A ==> (P --> #Y)), (S --> #Y)), (Belief:Intersection)
 
-    (&&,(P --> M), A..+), (S --> M), neq(S,P) |- ((S --> $Y) ==> (&&,(P --> $Y), A..+)), (Belief:Abduction),
-                                                 (&&, (S --> #Y), (P --> #Y), A..+), (Belief:Intersection)
+    (&&,(P --> M), A..+), (S --> M), neq(S,P), time(dtTask) |- ((S --> $Y) ==> (&&,(P --> $Y), A..+)), (Belief:Abduction),
+                                                               (&&, (S --> #Y), (P --> #Y), A..+), (Belief:Intersection)
 
 
 //conditional abduction by dependent variable

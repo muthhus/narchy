@@ -400,7 +400,7 @@ public class NAL7Test extends AbstractNALTest {
         tester.mustBelieve((t+dt)+dt+1 /** approx */,
                 "(" + component + " ==>+" + dt + " enter:(John,room))",
                 1.00f, 0.45f,
-                t+dt);
+                t);
 
 
     }

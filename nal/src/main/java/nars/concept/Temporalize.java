@@ -102,17 +102,17 @@ public interface Temporalize {
      * dt is supplied by Task
      */
     Temporalize dtTask = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn) ->
-            dtTaskOrBelief(derived, p, occReturn, latestOccurrence, true, false);
+            dtTaskOrBelief(derived, p, occReturn, earliestOccurrence, true, false);
     Temporalize dtTaskEnd = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn) ->
-            dtTaskOrBelief(derived, p, occReturn, latestOccurrence, true, true);
+            dtTaskOrBelief(derived, p, occReturn, earliestOccurrence, true, true);
 
     /**
      * dt is supplied by Belief
      */
     Temporalize dtBelief = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn) ->
-            dtTaskOrBelief(derived, p, occReturn, latestOccurrence, false, false);
+            dtTaskOrBelief(derived, p, occReturn, earliestOccurrence, false, false);
     Temporalize dtBeliefEnd = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn) ->
-            dtTaskOrBelief(derived, p, occReturn, latestOccurrence, false, true);
+            dtTaskOrBelief(derived, p, occReturn, earliestOccurrence, false, true);
 
     @NotNull
     static Compound dtTaskOrBelief(@NotNull Compound derived, @NotNull PremiseEval p, long[] occReturn, Premise.OccurrenceSolver s, boolean taskOrBelief/*, boolean shiftToPredicate*/, boolean end) {
@@ -120,10 +120,15 @@ public interface Temporalize {
 
         long o = premise.occurrenceTarget(s);
         if (o != ETERNAL) {
-            if (end) {
-                long taskDT = (taskOrBelief ? premise.task() : premise.belief()).term().dt();
+            if (taskOrBelief && end) {
+                //long taskDT = (taskOrBelief ? premise.task() : premise.belief()).term().dt();
+                long taskDT = premise.task().term().dt();
                 if (taskDT != ITERNAL)
                     o += taskDT;
+            } else if (!taskOrBelief && !end) {
+                long taskDT = premise.belief().term().dt();
+                if (taskDT != ITERNAL)
+                    o -= taskDT;
             }
         }
 //        if (shiftToPredicate)
