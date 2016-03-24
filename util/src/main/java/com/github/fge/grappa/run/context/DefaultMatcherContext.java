@@ -335,7 +335,7 @@ public final class DefaultMatcherContext<V>
         if (path != null)
             return path;
 
-        List<String> list = new FasterList();
+        List<String> list = new FasterList(getLevel()+1);
 
         MatcherContext<V> ctx;
         Matcher matcher;

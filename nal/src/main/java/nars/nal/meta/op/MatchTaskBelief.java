@@ -80,12 +80,12 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseEval> {
 
     }
 
-    public void addPreConditions(@NotNull Collection<Term> l) {
+    public void addPreConditionsTo(@NotNull Collection<Term> l) {
         Collections.addAll(l, pre);
     }
 
     @Override
-    public void addConditions(@NotNull List<Term> l) {
+    public void addTo(@NotNull List<Term> l) {
         Collections.addAll(l, code);
     }
 

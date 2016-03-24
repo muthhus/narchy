@@ -41,9 +41,7 @@ import nars.truth.DesireFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiConsumer;
 
 import static nars.$.*;
@@ -183,17 +181,13 @@ public class PremiseRule extends GenericCompound {
 
         List<Term> beforeMatch = Global.newArrayList();
         for (BooleanCondition p : prePreconditions)
-            p.addConditions(l);
+            p.addTo(l);
 
 
 
-        Solve truth = solver(post,
-                this, anticipate, immediate_eternalize, postPreconditions, temporalize
-        );
 
 
-        beforeMatch.add(truth);
-        match.addPreConditions(beforeMatch); //pre-conditions
+        match.addPreConditionsTo(beforeMatch); //pre-conditions
 
         //TODO sort beforeMatch because the order can determine performance HACK
         if (beforeMatch.size() > 1) {
@@ -207,15 +201,20 @@ public class PremiseRule extends GenericCompound {
             }
         }
 
+
 //        Collections.sort(beforeMatch, (a,b)-> {
 //
 //        });
 
-
-
         l.addAll(beforeMatch);
 
-        match.addConditions(l); //the match itself
+        Solve truth = solver(post,
+                this, anticipate, immediate_eternalize, postPreconditions, temporalize
+        );
+        //beforeMatch.add(truth);
+        l.add(truth);
+
+        match.addTo(l); //the match itself
 
         l.add(truth.getDerive()); //will be linked to and invoked by match callbacks
 
@@ -377,7 +376,10 @@ public class PremiseRule extends GenericCompound {
         Term[] postcons = ((Compound) term(1)).terms();
 
 
-        List<BooleanCondition> pres = Global.newArrayList(precon.length);
+        Collection<BooleanCondition> pres =
+                //Global.newArrayList(precon.length);
+                new TreeSet(); //for consistent ordering to maximize folding
+
         List<BooleanCondition> posts = Global.newArrayList(precon.length);
 
 

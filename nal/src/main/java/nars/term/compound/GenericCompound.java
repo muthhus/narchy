@@ -156,16 +156,16 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     }
 
     @Override
-    public boolean equals(@NotNull Object that) {
+    public final boolean equals(@NotNull Object that) {
         return this == that ||( hash == that.hashCode() && equalsFurther((Termed) that) );
     }
 
     @Override
-    public boolean equalTerms(TermContainer c) {
+    public final boolean equalTerms(TermContainer c) {
         return subterms.equalTerms(c);
     }
 
-    private boolean equalsFurther(@NotNull Termed thatTerm) {
+    private final boolean equalsFurther(@NotNull Termed thatTerm) {
 
         boolean r = false;
         Term u = thatTerm.term();

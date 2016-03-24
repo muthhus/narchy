@@ -37,7 +37,7 @@ public class Vec2 implements Serializable {
     public float x, y;
 
     public Vec2() {
-        this(0, 0);
+
     }
 
     public Vec2(float x, float y) {

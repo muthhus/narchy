@@ -32,9 +32,7 @@ import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.function.Consumer;
 
 import static nars.Op.*;
@@ -53,6 +51,7 @@ public class Narsese extends BaseParser<Object> {
     private final ParseRunner singleTermParser = new ListeningParseRunner3(Term());
     //private final ParseRunner singleTaskRuleParser = new ListeningParseRunner3(TaskRule());
 
+    //private final Map<String,Term> termCache = new HashMap();
 
     static final ThreadLocal<Narsese> parsers = ThreadLocal.withInitial(() -> Grappa.createParser(Narsese.class));
 

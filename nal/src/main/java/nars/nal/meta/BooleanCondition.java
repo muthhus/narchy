@@ -28,7 +28,7 @@ public interface BooleanCondition<C> extends Term, BooleanFunction<C> {
         }
     };
 
-    void addConditions(List<Term> l);
+    void addTo(List<Term> l);
 
 
     @NotNull

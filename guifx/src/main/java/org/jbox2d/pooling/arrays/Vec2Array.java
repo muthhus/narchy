@@ -31,22 +31,20 @@ import org.jbox2d.common.Vec2;
  * @author dmurph
  *
  */
-public class Vec2Array extends IntObjectHashMap<Vec2[]> {
+public final class Vec2Array extends IntObjectHashMap<Vec2[]> {
 	
 	public Vec2[] get( int argLength){
 		//assert(argLength > 0);
 
 
-		return getIfAbsentPutWithKey(argLength, a->{
-			return getInitializedArray(a);
-		});
+		return getIfAbsentPutWithKey(argLength, this::getInitializedArray);
 
 		//assert(get(argLength).length == argLength) : "Array not built of correct length";
 	}
 	
 	protected Vec2[] getInitializedArray(int argLength){
 		final Vec2[] ray = new Vec2[argLength];
-		for (int i = 0; i < ray.length; i++) {
+		for (int i = 0; i < argLength; i++) {
 			ray[i] = new Vec2();
 		}
 		return ray;

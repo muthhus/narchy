@@ -474,10 +474,12 @@ public class NAL7Test extends AbstractNALTest {
     @Test
     public void temporalOrder()  {
         TestNAR tester = test();
+        tester.log();
         tester.input("(<m --> M> ==>+5 <p --> P>).");
         tester.inputAt(10, "(<s --> S> <=>+0 <m --> M>). %0.9;0.9%");
         tester.mustBelieve(cycles, "(<s --> S> ==>+5 <p --> P>)", 0.90f, 0.73f);
-
+        tester.mustNotOutput(cycles, "<m-->M>", '.', ETERNAL);
+        tester.mustNotOutput(cycles, "<p-->P>", '.', ETERNAL);
 
         //(M =/> P), (S <|> M), not_equal(S,P) |- (S =/> P), (Truth:Analogy, Derive:AllowBackward)
     }

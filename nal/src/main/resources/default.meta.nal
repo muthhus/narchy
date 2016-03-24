@@ -42,21 +42,15 @@
 //Set Definition Similarity to Inheritance
 
     ({S} <-> {P}), {S} |- ({S} --> {P}), (Belief:Identity, Desire:Identity, Derive:AllowBackward)
-    ({S} <-> {P}), {P} |- ({S} --> {P}), (Belief:Identity, Desire:Identity, Derive:AllowBackward)
     ([S] <-> [P]), [S] |- ([S] --> [P]), (Belief:Identity, Desire:Identity, Derive:AllowBackward)
-    ([S] <-> [P]), [P] |- ([S] --> [P]), (Belief:Identity, Desire:Identity, Derive:AllowBackward)
 
     ({S} <-> {P}), {S} |- ({P} --> {S}), (Belief:Identity, Desire:Identity, Derive:AllowBackward)
-    ({S} <-> {P}), {P} |- ({P} --> {S}), (Belief:Identity, Desire:Identity, Derive:AllowBackward)
     ([S] <-> [P]), [S] |- ([P] --> [S]), (Belief:Identity, Desire:Identity, Derive:AllowBackward)
-    ([S] <-> [P]), [P] |- ([P] --> [S]), (Belief:Identity, Desire:Identity, Derive:AllowBackward)
 
 //Set Definition Unwrap
 
     ({S} <-> {P}), {S} |- (S <-> P), (Belief:Identity, Desire:Identity, Derive:AllowBackward)
-    ({S} <-> {P}), {P} |- (S <-> P), (Belief:Identity, Desire:Identity, Derive:AllowBackward)
     ([S] <-> [P]), [S] |- (S <-> P), (Belief:Identity, Desire:Identity, Derive:AllowBackward)
-    ([S] <-> [P]), [P] |- (S <-> P), (Belief:Identity, Desire:Identity, Derive:AllowBackward)
 
 //Nothing is more specific than a instance, so its similar
 

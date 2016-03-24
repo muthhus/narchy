@@ -26,7 +26,7 @@ public abstract class AtomicBooleanCondition<C> extends AtomicStringConstant imp
 
     /** add this or subconditions to expand in a rule */
     @Override
-    public void addConditions(@NotNull List<Term> l) {
+    public void addTo(@NotNull List<Term> l) {
         //default: just add this
         l.add(this);
     }
