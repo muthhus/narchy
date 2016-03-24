@@ -230,23 +230,21 @@ public interface Premise extends Level, Tasked {
         long compute(long taskOcc, long beliefOcc);
     }
 
-    /** default method of computing occurrence time of the conclusion task from the premise task and belief
-     *  @param taskOrBelief if there is a choice, which event to use
-     * */
-    default long occurrenceTarget(@NotNull OccurrenceSolver whenBothNonEternal) {
+    default long occurrenceTarget(@NotNull OccurrenceSolver s) {
         long tOcc = task().occurrence();
         Task b = belief();
         if (b == null) return tOcc;
         else {
             long bOcc = b.occurrence();
+            return s.compute(tOcc, bOcc);
 
-            //if (bOcc == ETERNAL) {
-            return (tOcc != ETERNAL) ?
-                        whenBothNonEternal.compute(tOcc, bOcc) :
-                        ((bOcc != ETERNAL) ?
-                            bOcc :
-                            ETERNAL
-            );
+//            //if (bOcc == ETERNAL) {
+//            return (tOcc != ETERNAL) ?
+//                        whenBothNonEternal.compute(tOcc, bOcc) :
+//                        ((bOcc != ETERNAL) ?
+//                            bOcc :
+//                            ETERNAL
+//            );
         }
     }
 

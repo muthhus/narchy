@@ -51,10 +51,10 @@ public class NAL7Test extends AbstractNALTest {
         t
         .input("x:before. :|:")
         .inputAt(10, "x:after. :|:")
-        .mustBelieve(cycles, "(x:before ==>+10 x:after)", 1.00f, abductionConf, 10)
-        .mustBelieve(cycles, "(x:after ==>-10 x:before)", 1.00f, inductionConf, 10)
-        .mustBelieve(cycles, "(x:after <=>-10 x:before)", 1.00f, comparisonConf, 10)
-        .mustBelieve(cycles, "(x:after &&-10 x:before)", 1.00f, intersectionConf, 10)
+        .mustBelieve(cycles, "(x:before ==>+10 x:after)", 1.00f, abductionConf, 0)
+        .mustBelieve(cycles, "(x:after ==>-10 x:before)", 1.00f, inductionConf, 0)
+        .mustBelieve(cycles, "(x:after <=>-10 x:before)", 1.00f, comparisonConf, 0)
+        .mustBelieve(cycles, "(x:after &&-10 x:before)", 1.00f, intersectionConf, 0)
         ;
 
 //        tester.mustBelieve(cycles, "<<(John, room) --> enter> =\\> (&/, <(John, door) --> open>, /6)>",
@@ -265,7 +265,7 @@ public class NAL7Test extends AbstractNALTest {
         tester.inputAt(4, "<(John,room) --> enter>. :|:");
 
         tester.mustBelieve(cycles, "(((John, room) --> enter) ==>-4 ((John, door) --> open))",
-                1.00f, 0.45f, 4);
+                1.00f, 0.45f, 0);
     }
 
 
@@ -279,7 +279,7 @@ public class NAL7Test extends AbstractNALTest {
         tester.inputAt(4, "<(John,room) --> enter>. :|:");
 
         tester.mustBelieve(cycles, "(((John, door) --> open) ==>+4 ((John, room) --> enter))",
-                1.00f, 0.45f, 4);
+                1.00f, 0.45f, 0);
 
     }
 
@@ -292,7 +292,7 @@ public class NAL7Test extends AbstractNALTest {
 
         tester.mustBelieve(cycles, "(open:(John, door) <=>+4 enter:(John, room))",
                 1.00f, 0.45f,
-                4);
+                0);
 
     }
 
@@ -305,17 +305,17 @@ public class NAL7Test extends AbstractNALTest {
 
         tester.mustBelieve(cycles, "(<door --> open> <=>+4 <room --> enter>)",
                 1.00f, 0.45f,
-                4);
+                0);
     }
     @Test public void induction_on_events3_simple_reversed()  {
-        //TO TEST COMMUTIVITY
+        //TESTS COMMUTIVITY
         TestNAR tester = test();
         tester.input("<room --> enter>. :|:");
         tester.inputAt(4, "<door --> open>. :|:");
 
         tester.mustBelieve(cycles, "(<door --> open> <=>-4 <room --> enter>)",
                 1.00f, 0.45f,
-                4);
+                0);
     }
 
     @Test
@@ -330,7 +330,7 @@ public class NAL7Test extends AbstractNALTest {
         tester.mustBelieve(cycles,
                 "(<$1 --> (/, enter, _, room)> <=>-2 <$1 --> (/, open, _, door)>)",
                 1.00f, 0.81f, //0.45f,
-                2
+                0
         );
 
     }
@@ -349,7 +349,7 @@ public class NAL7Test extends AbstractNALTest {
                 "(<$1 --> (/, open, _, door)> ==>+2 <$1 --> (/, enter, _, room)>)",
                 1.00f,
                 0.81f, //0.45f,
-                2
+                0
         );
 
         //REVERSE:
@@ -446,7 +446,7 @@ public class NAL7Test extends AbstractNALTest {
 
         tester.mustBelieve(cycles, "(<#1 --> (/,at,SELF,_)> &&+10 <#1 --> (/,on,{t002},_)>)",
                 1.0f, 0.81f,
-                10);
+                0);
 
     }
 

@@ -34,8 +34,6 @@ public class MutableTask extends AbstractTask {
         /** budget triple - to be valid, at least the first 2 of these must be non-NaN (unless it is a question)  */
         super(term.term(), (char) 0, null,
             /* budget: */ 0, Float.NaN, Float.NaN);
-
-        setEternal();
     }
 
 //    @NotNull
@@ -205,7 +203,7 @@ public class MutableTask extends AbstractTask {
     @NotNull
     public MutableTask time(long creationTime, long occurrenceTime) {
         setCreationTime(creationTime);
-        occurr(occurrenceTime);
+        setOccurrenceTime(occurrenceTime);
         return this;
     }
 

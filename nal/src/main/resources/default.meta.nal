@@ -246,24 +246,23 @@
 //// conditional syllogism ////////////////////////////////////////////////////////////////////////////////////
 //If after M, P usually happens, and M happens, it means P is expected to happen
 
-    B, (A ==> C) |- substituteIfUnifies(C,"$",A,B), (Belief:Deduction, Desire:Induction, Order:ForAllSame, Event:Anticipate)
-    B, (C ==> A) |- substituteIfUnifies(C,"$",A,B), (Belief:Abduction, Desire:Abduction, Order:ForAllSame)
+//    B, (A ==> C) |- substituteIfUnifies(C,"$",A,B), (Belief:Deduction, Desire:Induction, Order:ForAllSame, Event:Anticipate)
+//    B, (C ==> A) |- substituteIfUnifies(C,"$",A,B), (Belief:Abduction, Desire:Abduction, Order:ForAllSame)
 
     B, (A <=> C) |- substituteIfUnifies(C,"$",A,B), (Belief:Deduction, Desire:Induction, Order:ForAllSame)
 
-    (A ==> C), B, time(dtTask) |-  substituteIfUnifies( C, "$",A,B), (Belief:BeliefStructuralDeduction, Desire:Induction, Order:ForAllSame, Event:Anticipate)
-
-
-//    (C ==> A), B |-  substituteIfUnifies( C, "$",A,B), (Belief:StructuralAbduction, Desire:Deduction, Order:ForAllSame)
+    (A ==> C), B, time(dtTaskEnd) |-  substituteIfUnifies( C, "$",A,B), (Belief:BeliefStructuralDeduction, Desire:Induction, Order:ForAllSame, Event:Anticipate)
+//    (C ==> A), B, time(dtTask) |-  substituteIfUnifies( C, "$",A,B), (Belief:StructuralAbduction, Desire:Deduction, Order:ForAllSame)
 
 
 
 //    (A ==> B), B |- A, (Belief:StructuralDeduction, Desire:Deduction, Order:ForAllSame, Event:Anticipate)
-    (A ==> B), A, time(dtTaskEnd) |- B, (Belief:StructuralDeduction, Desire:Induction, Order:ForAllSame)
     (A ==> B), B, time(dtTask) |- A, (Belief:StructuralDeduction, Desire:Deduction, Order:ForAllSame, Event:Anticipate)
+    (A ==> B), A, time(dtTaskEnd) |- B, (Belief:StructuralDeduction, Desire:Induction, Order:ForAllSame)
 
-    B, (A ==> B) |- A, (Belief:Deduction, Desire:Deduction, Order:ForAllSame, Event:Anticipate)
-    A, (A ==> B) |- B, (Belief:Abduction, Desire:Abduction, Order:ForAllSame)
+    C, (A ==> B), time(dtBelief) |- substituteIfUnifies( A, "$", B, C), (Belief:Abduction, Desire:Deduction, Order:ForAllSame)
+//    A, (A ==> B) |- B, (Belief:Abduction, Desire:Abduction, Order:ForAllSame)
+    C, (A ==> B), time(dtBeliefEnd) |- substituteIfUnifies( B, "$", A, C), (Belief:Deduction, Desire:Induction, Order:ForAllSame, Event:Anticipate)
 
 ////NAL7 specific inference ////////////////////////////////////////////////////////////////////////////////////
 //Reasoning about temporal statements. those are using the ==> relation because relation in time is a relation of the truth between statements.

@@ -98,15 +98,7 @@ public abstract class AbstractTask extends UnitBudget
 
     void setTime(long creation, long occurrence) {
         this.creationTime = creation;
-
-        boolean changed = this.occurrenceTime!=occurrence;
-        if (changed) {
-            this.occurrenceTime = occurrence;
-            invalidate();
-        }
-
-        /*setCreationTime(creation);
-        setOccurrenceTime(occurrence);*/
+        setOccurrenceTime(occurrence);
     }
 
 
@@ -429,7 +421,7 @@ public abstract class AbstractTask extends UnitBudget
     }
 
     @Override
-    public void setOccurrenceTime(long o) {
+    public final void setOccurrenceTime(long o) {
         if (o != occurrenceTime) {
             this.occurrenceTime = o;
             invalidate();

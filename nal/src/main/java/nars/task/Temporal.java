@@ -50,11 +50,11 @@ public interface Temporal extends Tasked {
 //        setOccurrenceTime(creation(), tense, duration);
 //    }
 
-    default void setOccurrenceTime(long creation, @NotNull Tense tense, int duration) {
-        setOccurrenceTime(
-            Tense.getRelativeOccurrence(
-                    creation,
-                    tense,
-                    duration));
-    }
+//    default void setOccurrenceTime(long creation, @NotNull Tense tense, int duration) {
+//        setOccurrenceTime(
+//            Tense.getRelativeOccurrence(
+//                    creation,
+//                    tense,
+//                    duration));
+//    }
 }
