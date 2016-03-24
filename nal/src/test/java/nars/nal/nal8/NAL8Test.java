@@ -9,6 +9,8 @@ import org.junit.runners.Parameterized;
 
 import java.util.function.Supplier;
 
+import static nars.nal.Tense.ETERNAL;
+
 @RunWith(Parameterized.class)
 public class NAL8Test extends AbstractNALTest {
 
@@ -415,8 +417,23 @@ public class NAL8Test extends AbstractNALTest {
         tester.input("<({t002},{t003}) --> on>. :|:");
         tester.inputAt(10, "(<({t002},#1) --> on> &&+0 <(SELF,#1) --> at>)!");
 
-        tester.mustDesire(cycles, "<(SELF,{t003}) --> at>", 1.0f, 0.81f, 0);
+        String selfAtT3 = "<(SELF,{t003}) --> at>";
+        long time = cycles / 2;
+        tester.mustDesire(time, selfAtT3, 1.0f, 0.81f, 0);
+        tester.mustNotOutput(time, selfAtT3, '!', 0, 1f, 0, 1f, ETERNAL);
+    }
+    @Test
+    public void condition_belief_deduction_2()  {
+        TestNAR tester = test();
 
+        tester.input("<({t002},{t003}) --> on>. :|:");
+        tester.inputAt(10, "(<({t002},#1) --> on> &&+0 <(SELF,#1) --> at>).");
+
+        String selfAtT3 = "<(SELF,{t003}) --> at>";
+        int time = 24;
+        tester.mustBelieve(time, selfAtT3, 1.0f, 0.42f, 0);
+        tester.mustNotOutput(time, selfAtT3, '.', 0, 1f, 0, 1f, ETERNAL);
+        //tester.mustNotBelieve(...eternal)
     }
 
     @Test

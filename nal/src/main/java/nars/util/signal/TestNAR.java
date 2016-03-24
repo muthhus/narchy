@@ -48,17 +48,22 @@ public class TestNAR  {
 //    boolean showSuccess;
 //    boolean showExplanations;
     final boolean showOutput = false;
-    final List<NARCondition> requires = new ArrayList();
+
+    /** holds must (positive) conditions */
+    final List<NARCondition> requires = Global.newArrayList();
+
+    /** holds mustNot (negative) conditions which are tested at the end */
+    final List<NARCondition> disqualifies = Global.newArrayList();
 
     //public final List<ExplainableTask> explanations = new ArrayList();
     @Nullable
     private Object result;
-    private static final transient boolean exitOnAllSuccess = true;
-    @NotNull
-    public List<Task> inputs = new ArrayList();
+    private boolean exitOnAllSuccess = true;
+
+    public final List<Task> inputs = new ArrayList();
     private static final int temporalTolerance = 0;
     protected static final float truthTolerance = Global.TESTS_TRUTH_ERROR_TOLERANCE;
-    //private StringWriter trace;
+
 
     /** enable this to print reports even if the test was successful.
      * it can cause a lot of output that can be noisy and slow down
@@ -159,6 +164,7 @@ public class TestNAR  {
     }
 
 
+
     final class EarlyExit extends CycleReaction {
 
         final int checkResolution; //every # cycles to check for completion
@@ -237,14 +243,18 @@ public class TestNAR  {
         return mustEmit(c, cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax, Tense.ETERNAL );
     }
 
+//    @NotNull
+//    public TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long cycleStart, long cycleEnd, @NotNull String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax, @NotNull Tense t)  {
+//        return mustEmit(c, cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax, nar.time(t));
+//    }
+
     @NotNull
-    public TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long cycleStart, long cycleEnd, @NotNull String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax, @NotNull Tense t)  {
-        return mustEmit(c, cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax, nar.time(t));
+    TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long cycleStart, long cycleEnd, @NotNull String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax, long occTimeAbsolute)  {
+        return mustEmit(c, cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax, occTimeAbsolute, true);
     }
 
     @NotNull
-    public TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long cycleStart, long cycleEnd, @NotNull String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax, long occTimeAbsolute)  {
-
+    TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long cycleStart, long cycleEnd, @NotNull String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax, long occTimeAbsolute, boolean must)  {
 
 
         float h = (freqMin!=-1) ? truthTolerance / 2.0f : 0;
@@ -252,7 +262,6 @@ public class TestNAR  {
         if (freqMin == -1) freqMin = freqMax;
 
         int tt = temporalTolerance;
-
         cycleStart -= tt;
         cycleEnd += tt;
 
@@ -270,7 +279,13 @@ public class TestNAR  {
         }
 
         finished = false;
-        requires.add(tc);
+
+        if (must) {
+            requires.add(tc);
+        } else {
+            exitOnAllSuccess = false; //require entire execution, not just finish early
+            disqualifies.add(tc);
+        }
 
         return this;
 //
@@ -281,11 +296,13 @@ public class TestNAR  {
 //        return et;
     }
 
-    /** padding to add to specified time limitations to allow correct answers;
-     *  default=0 having no effect  */
-    public static int getTemporalTolerance() {
-        return temporalTolerance;
-    }
+
+
+//    /** padding to add to specified time limitations to allow correct answers;
+//     *  default=0 having no effect  */
+//    public static int getTemporalTolerance() {
+//        return temporalTolerance;
+//    }
 
 //    public void setTemporalTolerance(int temporalTolerance) {
 //        this.temporalTolerance = temporalTolerance;
@@ -351,6 +368,15 @@ public class TestNAR  {
         long ttt = nar.time();
         return mustOutput(ttt, ttt + withinCycles, term, '.', freq, freq, confidence, confidence, nar.time(t));
     }
+
+    public TestNAR mustNotOutput(long withinCycles, String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax, long occ) {
+        return mustEmit(outputEvents,
+                nar.time(), nar.time() + withinCycles,
+                sentenceTerm, punc, freqMin, freqMax, confMin,
+                confMax, occ, false);
+
+    }
+
     @NotNull
     public TestNAR mustAnswer(long withinCycles, @NotNull String term, float freq, float confidence, @NotNull Tense t)  {
         return mustAnswer(withinCycles, term, freq, confidence, nar.time(t));
@@ -503,6 +529,13 @@ public class TestNAR  {
         boolean success = true;
         for (NARCondition t : requires) {
             if (!t.isTrue()) {
+                success = false;
+                break;
+            }
+        }
+        for (NARCondition t : disqualifies) {
+            if (t.isTrue()) {
+                logger.error("mustNot: " + t.toString());
                 success = false;
                 break;
             }

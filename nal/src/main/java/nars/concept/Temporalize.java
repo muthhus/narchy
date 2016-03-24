@@ -98,11 +98,37 @@ public interface Temporalize {
     }
 
 
+    /** copiesthe 'dt' and the occurence of the task term directly */
+    Temporalize dtTaskExact = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn) -> {
+        ConceptProcess prem = p.premise;
+        return dtExact(derived, occReturn, prem, prem.task());
+    };
+    Temporalize dtBeliefExact = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn) -> {
+        ConceptProcess prem = p.premise;
+        Task src = prem.belief();
+        if (src == null) {
+            return derived;
+        } else {
+            return dtExact(derived, occReturn, prem, src);
+        }
+    };
+
+    @NotNull
+    static Compound dtExact(@NotNull Compound derived, long[] occReturn, ConceptProcess prem, @NotNull Task src) {
+        occReturn[0] = src.occurrence();
+        if (derived.op().isTemporal())
+            return deriveDT(derived, +1, prem, src.term().dt());
+        else
+            return derived;
+    }
+
+
     /**
      * dt is supplied by Task
      */
     Temporalize dtTask = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn) ->
             dtTaskOrBelief(derived, p, occReturn, earliestOccurrence, true, false);
+
     Temporalize dtTaskEnd = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn) ->
             dtTaskOrBelief(derived, p, occReturn, earliestOccurrence, true, true);
 
@@ -134,11 +160,10 @@ public interface Temporalize {
 //        if (shiftToPredicate)
 //            o += eventDelta;
 
-
         occReturn[0] = o;
 
         if (!derived.op().isTemporal()) {
-            //TODO decide something
+            //TODO decide if this is an error
             return derived;
         } else {
             int eventDelta =
