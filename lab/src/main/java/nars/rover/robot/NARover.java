@@ -81,7 +81,7 @@ public class NARover extends AbstractPolygonBot {
 
 
         int maxUpdateTime = 64;
-        int minUpdateTime = 8;
+        int minUpdateTime = 1;
 
 
         hungry = 1f;

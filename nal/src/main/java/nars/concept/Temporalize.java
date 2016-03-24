@@ -95,15 +95,19 @@ public interface Temporalize {
     static Compound dtTaskOrBelief(@NotNull Compound derived, @NotNull PremiseEval p, long[] occReturn, Premise.OccurrenceSolver latestOccurrence, boolean taskOrBelief/*, boolean shiftToPredicate*/) {
         ConceptProcess premise = p.premise;
 
-        int eventDelta =
-                (taskOrBelief ? premise.task() : premise.belief()).term().dt();
-
         long o = premise.occurrenceTarget(latestOccurrence);
 //        if (shiftToPredicate)
 //            o += eventDelta;
         occReturn[0] = o;
 
-        return deriveDT(derived, 1, premise, eventDelta);
+        if (!derived.op().isTemporal()) {
+            //TODO decide something
+            return derived;
+        } else {
+            int eventDelta =
+                    (taskOrBelief ? premise.task() : premise.belief()).term().dt();
+            return deriveDT(derived, 1, premise, eventDelta);
+        }
     }
 
     @NotNull

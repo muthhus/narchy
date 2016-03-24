@@ -126,14 +126,19 @@ public class IntervalTree<K extends Comparable<? super K>, V> {
 	}
 
 	public void put(Between<K> key, V value) {
-		root = root == null ? new IntervalTreeLeaf<>(key, value) : root.put(key, value);
+		root = (root == null) ? new IntervalTreeLeaf<>(key, value) : root.put(key, value);
 	}
 	
 	public void put(K low, K high, V value) {
 		put(new Between<>(low, high),value);
 	}
-	
-	
+
+	public void put(K at, V value) {
+		//TODO: put(new At<>(low, high),value);
+		put(at, at, value);
+	}
+
+
 	public int size() {
 		return values().size();
 	}
@@ -149,11 +154,24 @@ public class IntervalTree<K extends Comparable<? super K>, V> {
 
 	@NotNull
 	public Set<Between<K>> keySet() {
-		Set<Between<K>> s = Global.newHashSet(1);
 		if(root != null){
+			Set<Between<K>> s = Global.newHashSet(1);
 			root.keySet(s);
+			return s;
+		} else {
+			return Collections.emptySet();
 		}
-		return s;
+	}
+
+	@NotNull
+	public Set<Between<K>> keySetSorted() {
+		if(root != null){
+			Set<Between<K>> s = new TreeSet();
+			root.keySet(s);
+			return s;
+		} else {
+			return Collections.emptySet();
+		}
 	}
 
 	public void putAll(@NotNull Map<Between<K>, V> m) {

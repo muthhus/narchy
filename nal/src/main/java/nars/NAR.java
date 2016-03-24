@@ -852,6 +852,18 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return this;
     }
 
+    public NAR forEachConceptTask(boolean includeConceptBeliefs, boolean includeConceptQuestions, boolean includeConceptGoals, boolean includeConceptQuests,
+                                  @NotNull Consumer<Task> recip) {
+        forEachConcept(c -> {
+            if (includeConceptBeliefs && c.hasBeliefs()) c.beliefs().forEach(recip);
+            if (includeConceptQuestions && c.hasQuestions()) c.questions().forEach(recip);
+            if (includeConceptGoals && c.hasBeliefs()) c.goals().forEach(recip);
+            if (includeConceptQuests && c.hasQuests()) c.quests().forEach(recip);
+        });
+
+        return this;
+    }
+
     @NotNull
     public NAR forEachConceptTask(boolean includeConceptBeliefs, boolean includeConceptQuestions, boolean includeConceptGoals, boolean includeConceptQuests,
                                   boolean includeTaskLinks, int maxPerConcept,

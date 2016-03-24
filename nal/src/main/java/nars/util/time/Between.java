@@ -3,9 +3,9 @@ package nars.util.time;
 import org.jetbrains.annotations.NotNull;
 
 /** defines an interval between two comparable values */
-public class Between<K extends Comparable<? super K>> {
+public class Between<K extends Comparable<? super K>> implements Comparable<Between<K>> {
 	
-	private final K low, high;
+	@NotNull public final K low, high;
 	
 	public Between(K low, K high){
         this.low = low;
@@ -54,4 +54,29 @@ public class Between<K extends Comparable<? super K>> {
 		return String.format("[%s..%s]", low, high);
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof Between)) return false;
+
+		Between<?> between = (Between<?>) o;
+
+		return low.equals(between.low) && high.equals(between.high);
+
+	}
+
+	@Override
+	public int hashCode() {
+		int result = low.hashCode();
+		result = 31 * result + high.hashCode();
+		return result;
+	}
+
+	@Override
+	public int compareTo(Between<K> x) {
+		int leftC = low.compareTo(x.low);
+		if (leftC != 0) return leftC;
+		int rightC = high.compareTo(x.high);
+		return rightC;
+	}
 }
