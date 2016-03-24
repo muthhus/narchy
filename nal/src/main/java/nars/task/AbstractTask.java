@@ -25,6 +25,7 @@ import java.util.Objects;
 
 import static nars.Global.dereference;
 import static nars.Global.reference;
+import static nars.nal.Tense.DTERNAL;
 
 /**
  * Default Task implementation
@@ -174,7 +175,6 @@ public abstract class AbstractTask extends UnitBudget
 
         setTerm(Task.normalizeTaskTerm(t, memory));
 
-
         // if a task has an unperceived creationTime,
         // set it to the memory's current time here,
         // and adjust occurenceTime if it's not eternal
@@ -188,9 +188,14 @@ public abstract class AbstractTask extends UnitBudget
             setTime(now, oc);
         }
 
+//        //shift the occurrence time if dt < 0
+//        int termDur = term.term().dt();
+//        if (termDur!=DTERNAL && termDur < 0) {
+//            setOccurrenceTime(occurrence() - termDur);
+//        }
 
 
-        //---- VALID TASK BEYOND THIS POINT
+
 
         /** NaN quality is a signal that a budget's values need initialized */
         if (!Float.isFinite(qua())) {

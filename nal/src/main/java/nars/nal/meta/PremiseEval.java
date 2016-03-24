@@ -99,7 +99,7 @@ public class PremiseEval extends FindSubst {
 
         boolean finished = callback != null;
 
-        if (finished)
+        //if (finished)
             this.pattern.set(callback); //to notify of matches
 
         this.constraints.set( constraints );

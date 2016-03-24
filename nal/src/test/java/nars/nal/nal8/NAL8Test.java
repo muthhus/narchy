@@ -284,17 +284,22 @@ public class NAL8Test extends AbstractNALTest {
         TestNAR tester = test();
         tester
                 .input("(reachable:(SELF,{t002}) &&+5 pick({t002}))!")
-                .mustDesire(cycles, "reachable:(SELF,{t002})", 1.0f, 0.81f)
-                .mustDesire(cycles, "pick({t002})", 1.0f, 0.81f)
+                //.mustDesire(cycles, "reachable:(SELF,{t002})", 1.0f, 0.81f)
+                //.mustDesire(cycles, "pick({t002})", 1.0f, 0.81f)
+
+                //There is no temporal evidence given to place the components anywhere in time, and the goal only refers to the condition of their relation
+                .mustNotOutput(cycles, "reachable:(SELF,{t002})", '!', ETERNAL)
+                .mustNotOutput(cycles, "pick({t002})", '!', ETERNAL)
         ;
     }
     @Test
     public void detaching_single_premise_temporal()  {
         TestNAR tester = test();
         tester
+                .log()
                 .input("(reachable:(SELF,{t002}) &&+5 pick({t002}))! :|:")
-                .mustDesire(cycles, "reachable:(SELF,{t002})", 1.0f, 0.81f, 0)
-                .mustDesire(cycles, "pick({t002})", 1.0f, 0.81f, 5)
+                .mustDesire(2, "reachable:(SELF,{t002})", 1.0f, 0.81f, 0)
+                .mustDesire(2, "pick({t002})", 1.0f, 0.81f, 5)
         ;
     }
     @Test
@@ -497,11 +502,11 @@ public class NAL8Test extends AbstractNALTest {
 
     @Test public void arbitraryConjunction() {
         TestNAR tester = test();
-        tester.believe("believe(x)."); //psuedo operators since operation is > nal6
-        tester.believe("want(x)."); //psuedo operators since operation is > nal6
-        tester.believe("((believe($1) && want($1)) ==> grateful($1))");
-        tester.mustBelieve(cycles*3, "(believe(x) && want(x)).", 1.00f, 0.81f); //en("there is a lock which is opened by key1");
-        tester.mustBelieve(cycles*3, "grateful(x).", 1.00f, 0.42f); //en("there is a lock which is opened by key1");
+        tester.believe("believe:(x)."); //psuedo operators since operation is > nal6
+        tester.believe("want:(x)."); //psuedo operators since operation is > nal6
+        tester.believe("((believe:($1) && want:($1)) ==> grateful:($1))");
+        tester.mustBelieve(cycles*3, "(believe:(x) && want:(x)).", 1.00f, 0.81f);
+        tester.mustBelieve(cycles*3, "grateful:(x).", 1.00f, 0.39f);
 
 
     }

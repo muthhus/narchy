@@ -21,7 +21,7 @@ public class PatrickNLP extends AbstractNALTest {
 
     @Parameterized.Parameters(name = "{index}:{0}")
     public static Iterable<Supplier<NAR>> configurations() {
-        return AbstractNALTest.nars(8, true);
+        return AbstractNALTest.nars(6, true);
     }
 
 
@@ -41,7 +41,7 @@ public class PatrickNLP extends AbstractNALTest {
         //RESULT: <(*,(*,cat,eats),(*,ANIMAL,EATING)) --> REPRESENT>. %1.00;0.73%
          */
         test()
-            .log()
+            //.log()
             .believe("(((/,REPRESENT,_,$3):$1 && (/,REPRESENT,_,$4):$2) ==> REPRESENT:(($1,$2),($3,$4)))")
             .believe("(/,REPRESENT,_,ANIMAL):cat")
             .believe("(/,REPRESENT,_,EATING):eats")

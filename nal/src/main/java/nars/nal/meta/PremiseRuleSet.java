@@ -122,6 +122,7 @@ public class PremiseRuleSet  {
         boolean single_rule_test = false;
 
         for (String s : lines) {
+            s = s.trim(); //HACK write a better file loader
             if (s.startsWith("try:")) {
                 single_rule_test = true;
                 break;
@@ -130,6 +131,8 @@ public class PremiseRuleSet  {
 
         for (String s : lines) {
             boolean currentRuleEmpty = current_rule.length() == 0;
+
+            s = s.trim(); //HACK write a better file loader
 
             if (s.startsWith("//") || spacePattern.matcher(s).replaceAll(Matcher.quoteReplacement("")).isEmpty()) {
 

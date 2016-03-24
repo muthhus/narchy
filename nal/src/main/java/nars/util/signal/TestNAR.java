@@ -369,6 +369,10 @@ public class TestNAR  {
         return mustOutput(ttt, ttt + withinCycles, term, '.', freq, freq, confidence, confidence, nar.time(t));
     }
 
+    public TestNAR mustNotOutput(long withinCycles, String sentenceTerm, char punc, long occ) {
+        return mustNotOutput(withinCycles, sentenceTerm, punc, 0, 1, 0, 1, occ);
+    }
+
     public TestNAR mustNotOutput(long withinCycles, String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax, long occ) {
         return mustEmit(outputEvents,
                 nar.time(), nar.time() + withinCycles,
@@ -505,7 +509,7 @@ public class TestNAR  {
     public TestNAR run(boolean testAndPrintReport /* for use with JUnit */) {
 
         if (requireConditions())
-            assertTrue("No conditions tested", !requires.isEmpty());
+            assertTrue("No conditions tested", !requires.isEmpty() || !disqualifies.isEmpty());
 
 
         //TODO cache requires & logger, it wont change often
@@ -514,8 +518,11 @@ public class TestNAR  {
         long finalCycle = 0;
         for (NARCondition oc : requires) {
             long oce = oc.getFinalCycle();
-            if (oce > finalCycle)
-                finalCycle = oce + 1;
+            if (oce > finalCycle)finalCycle = oce + 1;
+        }
+        for (NARCondition oc : disqualifies) {
+            long oce = oc.getFinalCycle();
+            if (oce > finalCycle) finalCycle = oce + 1;
         }
 
         StringWriter trace;

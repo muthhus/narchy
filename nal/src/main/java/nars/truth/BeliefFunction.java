@@ -54,10 +54,13 @@ public enum BeliefFunction implements TruthOperator {
         }
     },
 
+    @AllowOverlap
     Deduction() {
         @Nullable
-        @Override public Truth apply(final Truth T, final Truth B, @NotNull Memory m, float minConf) {
-            return ((B == null) || (T == null)) ? null : TruthFunctions.deduction(T, B, minConf);
+        @Override public Truth apply(Truth T, Truth B, @NotNull Memory m, float minConf) {
+            //return ((B == null) || (T == null)) ? null : TruthFunctions.deduction(T, B, minConf);
+            if (B == null) return null;
+            return TruthFunctions.deduction(T, B, minConf);
         }
     },
 

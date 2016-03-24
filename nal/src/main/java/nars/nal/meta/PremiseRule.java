@@ -471,7 +471,7 @@ public class PremiseRule extends GenericCompound {
                             preNext = events.taskPredicate;
                             break;*/
                         case "dt":
-                            temporalize = Temporalize.dt;
+                            temporalize = Temporalize.occForward;
                             break;
 
 
@@ -498,23 +498,37 @@ public class PremiseRule extends GenericCompound {
                             temporalize = Temporalize.dtCombine;
                             break;
                         case "dtReverse":
-                            temporalize = Temporalize.dtReverse;
+                            temporalize = Temporalize.occReverse;
                             break;
                         case "dtIfEvent":
                             temporalize = Temporalize.dtIfEvent;
                             break;
                         case "dtAfter":
-                            temporalize = Temporalize.dt;
+                            temporalize = Temporalize.occForward;
                             preNext = events.after;
                             break;
                         case "dtReverseAfter":
-                            temporalize = Temporalize.dtReverse;
+                            temporalize = Temporalize.occReverse;
                             preNext = events.after;
                             break;
                         case "dtAfterOrEternal":
-                            temporalize = Temporalize.dt;
+                            temporalize = Temporalize.occForward;
                             preNext = events.afterOrEternal;
                             break;
+
+                        case "dtTminB":
+                            temporalize = Temporalize.dtTminB;
+                            break;
+                        case "dtBminT":
+                            temporalize = Temporalize.dtBminT;
+                            break;
+                        case "dtIntersect":
+                            temporalize = Temporalize.dtIntersect;
+                            break;
+                        case "dtUnion":
+                            temporalize = Temporalize.dtUnion;
+                            break;
+
                         default:
                             throw new RuntimeException("invalid events parameters");
                     }

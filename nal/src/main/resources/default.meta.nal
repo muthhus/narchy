@@ -191,17 +191,17 @@
 //                (A ==> C)
 //If after S M happens, and after M P happens, so P happens after S
 
-    (M ==> P), (S ==> M), neq(S,P) |- (S ==> P), (Belief:Deduction, Order:ForAllSame, Derive:AllowBackward)
+    (M ==> P), (S ==> M), neq(S,P), time(dtIntersect) |- (S ==> P), (Belief:Deduction, Order:ForAllSame, Derive:AllowBackward)
 
 //"Please note that the temporal order in the conclusion of a weak rule is
 //not necessarily the same as the order in the premises, given the hypothetical
 //nature of such a rule."
 
-    (P ==> M), (S ==> M), neq(S,P) |- (S ==> P), (Belief:Induction, Derive:AllowBackward)
+    (P ==> M), (S ==> M), neq(S,P), time(dtBminT) |- (S ==> P), (Belief:Induction, Derive:AllowBackward)
 
-    (M ==> P), (M ==> S), neq(S,P) |- (S ==> P), (Belief:Abduction, Derive:AllowBackward)
+    (M ==> P), (M ==> S), neq(S,P), time(dtTminB) |- (S ==> P), (Belief:Abduction, Derive:AllowBackward)
 
-    (P ==> M), (M ==> S), neq(S,P) |- (S ==> P), (Belief:Exemplification, Derive:AllowBackward)
+    (P ==> M), (M ==> S), neq(S,P), time(dtUnion) |- (S ==> P), (Belief:Exemplification, Derive:AllowBackward)
 
 //// implication to equivalence ////////////////////////////////////////////////////////////////////////////////////
 //If when S happens, P happens, and before P happens, S has happened, then they are truth-related equivalent
@@ -216,11 +216,11 @@
     (M ==> P), (M ==> S), neq(S,P) |- (S <=> P), (Belief:Comparison, Derive:AllowBackward)
 
 
-    (M ==> P), (S <=> M), neq(S,P) |- (S ==> P), (Belief:Analogy, Derive:AllowBackward)
+    (M ==> P), (S <=> M), neq(S,P), time(dtCombine) |- (S ==> P), (Belief:Analogy, Derive:AllowBackward)
 
-    (P ==> M), (S <=> M), neq(S,P) |- (P ==> S), (Belief:Analogy, Derive:AllowBackward)
+    (P ==> M), (S <=> M), neq(S,P), time(dtCombine) |- (P ==> S), (Belief:Analogy, Derive:AllowBackward)
 
-    (M <=> P), (S <=> M), neq(S,P) |- (S <=> P), (Belief:Resemblance, Order:ForAllSame, Derive:AllowBackward)
+    (M <=> P), (S <=> M), neq(S,P), time(dtCombine) |- (S <=> P), (Belief:Resemblance, Order:ForAllSame, Derive:AllowBackward)
 
 //// implication-based composition ////////////////////////////////////////////////////////////////////////////////////
 //Same as for inheritance again
@@ -251,16 +251,19 @@
 
     B, (A <=> C) |- substituteIfUnifies(C,"$",A,B), (Belief:Deduction, Desire:Induction, Order:ForAllSame)
 
-    (A ==> C), B, time(dtTaskEnd) |-  substituteIfUnifies( C, "$",A,B), (Belief:BeliefStructuralDeduction, Desire:Induction, Order:ForAllSame, Event:Anticipate)
+    (A ==> C), B, time(dtTaskEnd) |-  substituteIfUnifies( C, "$",A,B), (Belief:StructuralDeduction, Desire:Induction, Order:ForAllSame)
+    (C ==> A), B, time(dtTask) |- substituteIfUnifies( C, "$",A,B), (Belief:StructuralDeduction, Desire:Deduction, Order:ForAllSame)
 
-    (A ==> B), A, time(dtTaskEnd) |- B, (Belief:StructuralDeduction, Desire:Induction, Order:ForAllSame)
-    (A ==> B), B, time(dtTask) |- A, (Belief:StructuralDeduction, Desire:Deduction, Order:ForAllSame, Event:Anticipate)
+    B, (C ==> A), time(dtBelief) |- substituteIfUnifies( C, "$", A, B), (Belief:Abduction, Desire:Deduction, Order:ForAllSame)
+    B, (A ==> C), time(dtBelief) |- substituteIfUnifies( C, "$", A, B), (Belief:Deduction, Desire:Induction, Order:ForAllSame, Event:Anticipate)
+
+
+//    (A ==> B), A, time(dtTaskEnd) |- B, (Belief:StructuralDeduction, Desire:Induction, Order:ForAllSame)
+//    (A ==> B), B, time(dtTask) |- A, (Belief:StructuralDeduction, Desire:Deduction, Order:ForAllSame, Event:Anticipate)
 
 //    (C ==> A), B, time(dtTask) |-  substituteIfUnifies( C, "$",A,B), (Belief:StructuralAbduction, Desire:Deduction, Order:ForAllSame)
 //    (A ==> B), B |- A, (Belief:StructuralDeduction, Desire:Deduction, Order:ForAllSame, Event:Anticipate)
 
-    C, (B ==> A), time(dtBelief) |- substituteIfUnifies( B, "$", A, C), (Belief:Abduction, Desire:Deduction, Order:ForAllSame)
-    C, (A ==> B), time(dtBelief) |- substituteIfUnifies( B, "$", A, C), (Belief:Deduction, Desire:Induction, Order:ForAllSame, Event:Anticipate)
 //    A, (A ==> B) |- B, (Belief:Abduction, Desire:Abduction, Order:ForAllSame)
 
 ////NAL7 specific inference ////////////////////////////////////////////////////////////////////////////////////
@@ -388,10 +391,10 @@
 
 //precondition combiner inference rule (variable_unification6):
 
-    ((&&,C,A..+) ==> Z), ((&&,C,B..+) ==> Z) |- ((&&,A..+) ==> (&&,B..+)), (Belief:Induction, Desire:Induction),
-                                                ((&&,B..+) ==> (&&,A..+)), (Belief:Induction, Desire:Induction)
-    (Z ==> (&&,C,A..+)), (Z ==> (&&,C,B..+)) |- ((&&,A..+) ==> (&&,B..+)), (Belief:Abduction),
-                                                ((&&,B..+) ==> (&&,A..+)), (Belief:Abduction)
+    ((&&,C,A..+) ==> Z), ((&&,C,B..+) ==> Z), time(dtCombine) |- ((&&,A..+) ==> (&&,B..+)), (Belief:Induction, Desire:Induction),
+                                                                 ((&&,B..+) ==> (&&,A..+)), (Belief:Induction, Desire:Induction)
+    (Z ==> (&&,C,A..+)), (Z ==> (&&,C,B..+)), time(dtCombine) |- ((&&,A..+) ==> (&&,B..+)), (Belief:Abduction),
+                                                                 ((&&,B..+) ==> (&&,A..+)), (Belief:Abduction)
 
 
 //second level variable introduction

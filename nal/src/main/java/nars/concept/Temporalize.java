@@ -6,6 +6,7 @@ import nars.nal.op.Derive;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,6 +18,8 @@ import static nars.nal.Tense.*;
  */
 @FunctionalInterface
 public interface Temporalize {
+
+
 
 
     static long earlyOrLate(long t, long b, boolean early) {
@@ -48,6 +51,62 @@ public interface Temporalize {
     @NotNull
     Compound compute(@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn);
 
+    /** early-aligned, difference in dt */
+    Temporalize dtTminB = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn) -> {
+        return dtDiff(derived, p, occReturn, +1);
+    };
+    /** early-aligned, difference in dt */
+    Temporalize dtBminT = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn) -> {
+        return dtDiff(derived, p, occReturn, -1);
+    };
+    /** early-aligned, difference in dt */
+    Temporalize dtIntersect = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn) -> {
+        return dtDiff(derived, p, occReturn, 0);
+    };
+    /** early-aligned, difference in dt */
+    Temporalize dtUnion = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn) -> {
+        //TODO
+        return dtDiff(derived, p, occReturn, 2);
+    };
+
+    @NotNull
+    static Compound dtDiff(@NotNull Compound derived, @NotNull PremiseEval p, @NotNull long[] occReturn, int polarity) {
+        ConceptProcess prem = p.premise;
+        Task task = prem.task();
+        Compound taskTerm = task.term();
+        Compound beliefTerm = (Compound)prem.beliefTerm();
+
+        int dt;
+        int ttd = taskTerm.dt();
+        int btd = beliefTerm.dt();
+        if (ttd !=DTERNAL && btd !=DTERNAL) {
+            if (polarity == 0) { //intersect: 0
+                dt = (ttd + btd)/2; //TODO calculate by interval of each task
+            } else if (polarity == 2) { //union
+                dt = -(ttd + btd);
+            } else {  //difference: -1 or +1
+                dt = (ttd - btd);
+            }
+        } else if (ttd != DTERNAL) {
+            dt = ttd;
+        } else if (btd != DTERNAL) {
+            dt = btd;
+        } else {
+            dt = DTERNAL;
+        }
+
+        if ((polarity == 0) || (polarity == 2)) {
+            occReturn[0] = prem.occurrenceTarget(earliestOccurrence); //TODO CALCULATE
+
+            //restore forward polarity for function call at the end
+            polarity = 1;
+        } else {
+            //diff
+            occReturn[0] = prem.occurrenceTarget(earliestOccurrence);
+        }
+
+        return deriveDT(derived, polarity, prem, dt);
+    }
 
     /**
      * simple delta-time between task and belief resulting in the dt of the temporal compound.
@@ -55,12 +114,13 @@ public interface Temporalize {
      * no occurence shift
      * should be used in combination with a "premise Event" precondition
      */
-    Temporalize dt = (derived, p, d, occReturn) -> {
-        return dtBeliefMinTask(derived, p, occReturn, +1);
+    Temporalize occForward = (derived, p, d, occReturn) -> {
+        return occBeliefMinTask(derived, p, occReturn, +1);
     };
-    Temporalize dtReverse = (derived, p, d, occReturn) -> {
-        return dtBeliefMinTask(derived, p, occReturn, -1);
+    Temporalize occReverse = (derived, p, d, occReturn) -> {
+        return occBeliefMinTask(derived, p, occReturn, -1);
     };
+
 
     /**
      * if the premise is an event (and it is allowed to not be) then the dt is the difference
@@ -70,7 +130,7 @@ public interface Temporalize {
         if (!p.premise.isEvent()) {
             return derived;
         } else {
-            return dtBeliefMinTask(derived, p, occReturn, +1);
+            return occBeliefMinTask(derived, p, occReturn, +1);
         }
     };
 
@@ -85,16 +145,25 @@ public interface Temporalize {
 //    };
 
     @NotNull
-    static Compound dtBeliefMinTask(@NotNull Compound derived, @NotNull PremiseEval p, long[] occReturn, int polarity) {
-        ConceptProcess premise = p.premise;
+    static Compound occBeliefMinTask(@NotNull Compound derived, @NotNull PremiseEval p, long[] occReturn, int polarity) {
+        ConceptProcess prem = p.premise;
 
-        occReturn[0] = premise.occurrenceTarget(earliestOccurrence);
+        int eventDelta = DTERNAL;
 
-        //TODO check valid int/long conversion
-        int eventDelta = (int) (premise.belief().occurrence() -
-                premise.task().occurrence());
+        if (!prem.belief().isEternal() && !prem.task().isEternal()) {
+            long occ = prem.occurrenceTarget(earliestOccurrence);
 
-        return deriveDT(derived, polarity, premise, eventDelta);
+            //TODO check valid int/long conversion
+            eventDelta = (int) (prem.belief().occurrence() -
+                    prem.task().occurrence());
+
+            //if (polarity < 0) //early align
+            //    occ -= eventDelta;
+
+            occReturn[0] = occ;
+        }
+
+        return deriveDT(derived, polarity, prem, eventDelta);
     }
 
 
@@ -122,10 +191,16 @@ public interface Temporalize {
                 } else {
                     //TODO find the matching subterm, it's either the first or the second
                     //Term tl = prem.termLink.get().term();
-                    if (tt.term(1).equals(derived)) {
-                        //its the right hand side of the temporal relation; shift by the dt
-                        occ += dt;
-                    }
+
+                    //shift by the dt if the right-hand side (later)
+                    //if (dt > 0) {
+                        if (tt.term(1).equals(derived))
+                            occ += dt;
+                    /*} else if (dt < 0) {
+                        if (tt.term(1).equals(derived))
+                            occ -= dt;
+                    }*/
+
 
                     occReturn[0] = occ;
                     return derived;
@@ -175,20 +250,43 @@ public interface Temporalize {
         ConceptProcess premise = p.premise;
 
         long o = premise.occurrenceTarget(s);
+//        if (o != ETERNAL) {
+//            long taskDT;
+//            if (taskOrBelief) {
+//                taskDT = premise.task().term().dt();
+//            } else {
+//                taskDT = premise.belief().term().dt();
+//            }
+//            if (taskDT != DTERNAL) {
+//                if (end && taskDT > 0) {
+//                    o += taskDT;
+//                } else if (!end && taskDT < 0) {
+//                    o -= taskDT;
+//                }
+//            }
+//        }
         if (o != ETERNAL) {
             if (taskOrBelief && end) {
                 //long taskDT = (taskOrBelief ? premise.task() : premise.belief()).term().dt();
-                long taskDT = premise.task().term().dt();
-                if (taskDT != DTERNAL)
-                    o += taskDT;
+                long ddt = premise.task().term().dt();
+                if (ddt != DTERNAL)
+                    o += ddt;
+            } else if (taskOrBelief && !end) {
+                //NOTHING NECESSARY
+                /*long ddt = premise.task().term().dt();
+                if (ddt != DTERNAL)
+                    o -= ddt;*/
             } else if (!taskOrBelief && !end) {
-                long taskDT = premise.belief().term().dt();
-                if (taskDT != DTERNAL)
-                    o -= taskDT;
+                long ddt = premise.belief().term().dt();
+                if (ddt != DTERNAL)
+                    o -= ddt;
+            } else if (!taskOrBelief && end) {
+                long ddt = premise.belief().term().dt();
+                if (ddt != DTERNAL)
+                    o += ddt;
             }
+
         }
-//        if (shiftToPredicate)
-//            o += eventDelta;
 
         occReturn[0] = o;
 
@@ -207,12 +305,12 @@ public interface Temporalize {
         if (eventDelta == DTERNAL)
             return derived; //no change
 
-        if (eventDelta != 0 && derived.op().isCommutative()) {
-            //flip temporal polarity if reversed
-            if (!derived.term(0).equals(premise.task().term())) {
-                eventDelta = -eventDelta;
-            }
-        }
+//        if (eventDelta != 0 && derived.op().isCommutative()) {
+//            //flip temporal polarity if reversed
+//            if (!derived.term(0).equals(premise.task().term())) {
+//                eventDelta = -eventDelta;
+//            }
+//        }
 
         return derived.dt(eventDelta * polarity);
     }
@@ -253,7 +351,7 @@ public interface Temporalize {
             eventDelta = taskDT;
         }
 
-        occReturn[0] = premise.occurrenceTarget((t, b) -> t >= b ? t : b); //latest occurring one
+        occReturn[0] = premise.occurrenceTarget(earliestOccurrence); //(t, b) -> t >= b ? t : b); //latest occurring one
 
         return deriveDT(derived, 1, premise, eventDelta);
     };

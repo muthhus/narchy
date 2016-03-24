@@ -1,10 +1,13 @@
 package nars.nal.nal7;
 
+import nars.NAR;
 import nars.nar.Default;
+import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import org.junit.Test;
 
+import static java.lang.System.out;
 import static nars.$.$;
 import static org.junit.Assert.*;
 
@@ -23,6 +26,7 @@ public class TemporalRelationsTest {
 
         assertEquals("((before-->x) ==>+5 (after-->x))", $("(x:before ==>+5 x:after)").toString());
     }
+
     @Test public void temporalEqualityAndCompare() {
         assertNotEquals( $("(x ==>+5 y)"), $("(x ==>+0 y)") );
         assertNotEquals( $("(x ==>+5 y)").hashCode(), $("(x ==>+0 y)").hashCode() );
@@ -73,7 +77,7 @@ public class TemporalRelationsTest {
 
         assertEquals(indexSize, d.index().size() ); //remains same amount
 
-        d.index().print(System.out);
+        d.index().print(out);
         d.concept("(x==>y)").print();
     }
 
@@ -112,4 +116,26 @@ public class TemporalRelationsTest {
 
     }
 
+    @Test public void testRelationTaskNormalization() {
+        String a = "pick({t002})";
+        String b = "reachable:(SELF,{t002})";
+
+        String x = "(" + a + " &&+5 " + b + ")";
+        String y = "(" + b + " &&+5 " + a + ")";
+
+        NAR n = new Default();
+        Task xt = n.inputTask(x + ". :|:");
+        Task yt = n.inputTask(y + ". :|:");
+        out.println(xt);
+        out.println(yt);
+        assertEquals(5, xt.term().dt());
+        assertEquals(0, xt.occurrence());
+
+        //should have been shifted to place the earliest component at
+        // the occurrence time expected by the semantics of the input
+        assertEquals(-5, yt.term().dt());
+        assertEquals(5, yt.occurrence());
+
+
+    }
 }

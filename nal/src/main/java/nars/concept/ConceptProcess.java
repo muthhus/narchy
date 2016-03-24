@@ -162,31 +162,12 @@ abstract public class ConceptProcess implements Premise {
 
         Task belief = belief();
 
-
         boolean derivedTemporal = occ != ETERNAL;
-
-        boolean single;
-        if (belief != null) {
-            switch (punct) {
-                case Symbols.BELIEF:
-                    single = d.beliefSingle;
-                    break;
-                case Symbols.GOAL:
-                    single = d.desireSingle;
-                    break;
-                default:
-                    single = false;
-                    break;
-            }
-        } else {
-            single = true;
-        }
-
 
         Task derived = newDerivedTask(c, punct)
                 .truth(truth)
                 .time(now, occ)
-                .parent(task(), single ? null : belief /* null if single */)
+                .parent(task(), belief /* will be null if single */)
                 .budget(budget) // copied in, not shared
                 //.anticipate(derivedTemporal && d.anticipate)
                 .log( Global.DEBUG ? d.rule : "Derived");
