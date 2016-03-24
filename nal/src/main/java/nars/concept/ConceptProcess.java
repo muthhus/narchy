@@ -22,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static nars.nal.Tense.ETERNAL;
-import static nars.nal.Tense.ITERNAL;
+import static nars.nal.Tense.DTERNAL;
 import static nars.truth.TruthFunctions.eternalize;
 
 /**
@@ -258,10 +258,10 @@ abstract public class ConceptProcess implements Premise {
     }
 
     public boolean hasTemporality() {
-        if (task().term().dt()!=ITERNAL) return true;
+        if (task().term().dt()!= DTERNAL) return true;
         @Nullable Task b = belief();
         if (b == null) return false;
-        return b.term().dt()!=ITERNAL;
+        return b.term().dt()!= DTERNAL;
     }
 
 }

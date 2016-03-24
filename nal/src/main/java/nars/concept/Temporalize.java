@@ -103,18 +103,48 @@ public interface Temporalize {
         ConceptProcess prem = p.premise;
         return dtExact(derived, occReturn, prem, prem.task());
     };
-    Temporalize dtBeliefExact = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn) -> {
+
+    /** special handling for dealing with conjunctions which involve a potential mix of eternal and non-eternal premise components */
+    Temporalize dtBeliefExact = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn) -> {
         ConceptProcess prem = p.premise;
         Task src = prem.belief();
-        if (src == null) {
-            return derived;
+        if ((src == null) || (src.isEternal())) {
+            //shift the occurrence by the position of the matching termlink in the 2-ary temporal relation, or N-ary temporal relation if ITERNAL or zero
+            Task task = prem.task();
+            long occ = task.occurrence();
+
+            Compound tt = task.term();
+            long dt = tt.dt();
+            if (occ!=ETERNAL) {
+                if (dt == DTERNAL || dt == 0) {
+                    occReturn[0] = occ;
+                    return derived;
+                } else {
+                    //TODO find the matching subterm, it's either the first or the second
+                    //Term tl = prem.termLink.get().term();
+                    if (tt.term(1).equals(derived)) {
+                        //its the right hand side of the temporal relation; shift by the dt
+                        occ += dt;
+                    }
+
+                    occReturn[0] = occ;
+                    return derived;
+                }
+            } else {
+                //nothing conclusive can be derived since the task is eternal and 'src' contributes no temporal information
+                return null;
+            }
+
+
+            //occReturn[0] = occ;
+            //return derived;
         } else {
             return dtExact(derived, occReturn, prem, src);
         }
     };
 
     @NotNull
-    static Compound dtExact(@NotNull Compound derived, long[] occReturn, ConceptProcess prem, @NotNull Task src) {
+    static Compound dtExact(@NotNull Compound derived, @NotNull long[] occReturn, ConceptProcess prem, @NotNull Task src) {
         occReturn[0] = src.occurrence();
         if (derived.op().isTemporal())
             return deriveDT(derived, +1, prem, src.term().dt());
@@ -149,11 +179,11 @@ public interface Temporalize {
             if (taskOrBelief && end) {
                 //long taskDT = (taskOrBelief ? premise.task() : premise.belief()).term().dt();
                 long taskDT = premise.task().term().dt();
-                if (taskDT != ITERNAL)
+                if (taskDT != DTERNAL)
                     o += taskDT;
             } else if (!taskOrBelief && !end) {
                 long taskDT = premise.belief().term().dt();
-                if (taskDT != ITERNAL)
+                if (taskDT != DTERNAL)
                     o -= taskDT;
             }
         }
@@ -174,7 +204,7 @@ public interface Temporalize {
 
     @NotNull
     static Compound deriveDT(@NotNull Compound derived, int polarity, @NotNull ConceptProcess premise, int eventDelta) {
-        if (eventDelta == ITERNAL)
+        if (eventDelta == DTERNAL)
             return derived; //no change
 
         if (eventDelta != 0 && derived.op().isCommutative()) {
@@ -199,9 +229,9 @@ public interface Temporalize {
         int beliefDT = ((Compound) premise.beliefTerm().term()).dt();
 
         int eventDelta;
-        if (taskDT == ITERNAL && beliefDT == ITERNAL) {
-            eventDelta = ITERNAL;
-        } else if (taskDT != ITERNAL && beliefDT != ITERNAL) {
+        if (taskDT == DTERNAL && beliefDT == DTERNAL) {
+            eventDelta = DTERNAL;
+        } else if (taskDT != DTERNAL && beliefDT != DTERNAL) {
 
             Task belief = premise.belief();
 
@@ -217,7 +247,7 @@ public interface Temporalize {
                 eventDelta = taskDT;
             }
 
-        } else if (taskDT == ITERNAL) {
+        } else if (taskDT == DTERNAL) {
             eventDelta = beliefDT;
         } else /*if (beliefDT == ITERNAL)*/ {
             eventDelta = taskDT;
@@ -261,9 +291,9 @@ public interface Temporalize {
         Term bb = premise.beliefTerm().term(); // belief() != null ? belief().term() : null;
 
         int td = tt.dt();
-        int bd = bb instanceof Compound ? ((Compound) bb).dt() : ITERNAL;
+        int bd = bb instanceof Compound ? ((Compound) bb).dt() : DTERNAL;
 
-        int t = ITERNAL;
+        int t = DTERNAL;
 
         Term cp = d.conclusionPattern; //TODO this may be a wrapped immediatefunction?
 
@@ -291,7 +321,7 @@ public interface Temporalize {
                 Term cb = ccc.term(1);
 
                 //chained relations
-                if (td != ITERNAL && bd != ITERNAL && (tp.size() == 2) && (bp.size() == 2)) {
+                if (td != DTERNAL && bd != DTERNAL && (tp.size() == 2) && (bp.size() == 2)) {
                     Compound tpp = (Compound) tp;
                     Compound bpp = (Compound) bp;
 
@@ -323,11 +353,11 @@ public interface Temporalize {
 
                 int occDiff = (to != ETERNAL && bo != ETERNAL) ? (int) (bo - to) : 0;
 
-                if (td == ITERNAL && bd == ITERNAL) {
+                if (td == DTERNAL && bd == DTERNAL) {
 
-                    long aTask = tp.subtermTime(ca, ITERNAL);
+                    long aTask = tp.subtermTime(ca, DTERNAL);
                     long aBelief = bp.subtermTime(ca, bd);
-                    long bTask = tp.subtermTime(cb, ITERNAL);
+                    long bTask = tp.subtermTime(cb, DTERNAL);
                     long bBelief = bp.subtermTime(cb, bd);
 
                     if (belief != null) {
@@ -377,11 +407,11 @@ public interface Temporalize {
                         }
                     }
 
-                } else if (td == ITERNAL && bd != ITERNAL) {
+                } else if (td == DTERNAL && bd != DTERNAL) {
                     //belief has dt
                     t = bd;// + occDiff;
                     //TODO align
-                } else if (td != ITERNAL && bd == ITERNAL) {
+                } else if (td != DTERNAL && bd == DTERNAL) {
                     //task has dt
                     t = td + occDiff;
                     //occ += t; //TODO check this alignment
@@ -496,7 +526,7 @@ public interface Temporalize {
         //}
         //}
 
-        if (t != ITERNAL) {
+        if (t != DTERNAL) {
         /*derived = (Compound) p.premise.nar.memory.index.newTerm(derived.op(), derived.relation(),
                 t, derived.subterms());*/
 

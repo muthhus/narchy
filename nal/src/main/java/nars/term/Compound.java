@@ -25,7 +25,6 @@ import nars.Global;
 import nars.Op;
 import nars.Symbols;
 import nars.nal.Tense;
-import nars.nal.meta.match.Ellipsis;
 import nars.term.container.TermContainer;
 import nars.term.transform.subst.FindSubst;
 import nars.util.data.Util;
@@ -37,7 +36,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.Set;
 
-import static nars.nal.Tense.ITERNAL;
+import static nars.nal.Tense.DTERNAL;
 
 /**
  * a compound term
@@ -228,7 +227,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
     @NotNull
     @Override
     default Compound anonymous() {
-        return dt() == ITERNAL ? this : this.dt(ITERNAL);
+        return dt() == DTERNAL ? this : this.dt(DTERNAL);
     }
 
     /** sets temporal relation value (TEMPORARY). returns new value */
@@ -239,7 +238,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
     int dt();
 
     default boolean temporal() {
-        return dt()!= Tense.ITERNAL;
+        return dt()!= Tense.DTERNAL;
     }
 
 

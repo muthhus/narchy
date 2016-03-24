@@ -8,7 +8,6 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.ConsoleAppender;
 import nars.nal.meta.match.VarPattern;
 import nars.task.MutableTask;
-import nars.task.Task;
 import nars.term.*;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
@@ -31,7 +30,7 @@ import java.util.function.Function;
 
 import static java.util.stream.Collectors.toList;
 import static nars.Op.*;
-import static nars.nal.Tense.ITERNAL;
+import static nars.nal.Tense.DTERNAL;
 
 /**
  * core utility class for:
@@ -511,7 +510,7 @@ public enum $ /* TODO: implements TermIndex */ {
 
     @Nullable
     public static Term the(@NotNull Op op, int relation, @NotNull TermContainer subterms) {
-        return the(op, relation, ITERNAL, subterms);
+        return the(op, relation, DTERNAL, subterms);
     }
     @Nullable
     public static Term the(@NotNull Op op, @NotNull TermContainer subterms) {

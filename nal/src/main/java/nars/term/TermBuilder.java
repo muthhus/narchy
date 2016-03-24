@@ -17,7 +17,7 @@ import java.util.List;
 
 import static java.util.Arrays.copyOfRange;
 import static nars.Op.*;
-import static nars.nal.Tense.ITERNAL;
+import static nars.nal.Tense.DTERNAL;
 import static nars.term.Statement.pred;
 import static nars.term.Statement.subj;
 
@@ -43,13 +43,13 @@ public abstract class TermBuilder {
 
 
             case INSTANCE:
-                if (u.length != 2 || t != ITERNAL) throw new InvalidTerm(INSTANCE);
+                if (u.length != 2 || t != DTERNAL) throw new InvalidTerm(INSTANCE);
                 return inst(u[0], u[1]);
             case PROPERTY:
-                if (u.length != 2 || t != ITERNAL) throw new InvalidTerm(PROPERTY);
+                if (u.length != 2 || t != DTERNAL) throw new InvalidTerm(PROPERTY);
                 return prop(u[0], u[1]);
             case INSTANCE_PROPERTY:
-                if (u.length != 2 || t != ITERNAL) throw new InvalidTerm(INSTANCE_PROPERTY);
+                if (u.length != 2 || t != DTERNAL) throw new InvalidTerm(INSTANCE_PROPERTY);
                 return instprop(u[0], u[1]);
 
             case CONJUNCTION:
@@ -67,7 +67,7 @@ public abstract class TermBuilder {
                 } else if ((relation == -1) || (relation > u.length)) {
                     return null;
                 } else {
-                    return finish(op, relation, ITERNAL, tt);
+                    return finish(op, relation, DTERNAL, tt);
                 }
 
             case DIFF_EXT:
@@ -112,7 +112,7 @@ public abstract class TermBuilder {
 
     @Nullable
     public Termed make(Op op, int relation, TermContainer subterms) {
-        return make(op, relation, subterms, Tense.ITERNAL);
+        return make(op, relation, subterms, Tense.DTERNAL);
     }
 
     @Nullable
@@ -184,7 +184,7 @@ public abstract class TermBuilder {
 
     @Nullable
     public Term newCompound(@NotNull Op op, int relation, @NotNull TermContainer tt) {
-        return the(op, relation, ITERNAL, tt);
+        return the(op, relation, DTERNAL, tt);
     }
 
 
@@ -219,7 +219,7 @@ public abstract class TermBuilder {
 
     @Nullable
     public Term finish(@NotNull Op op, int relation, @NotNull TermContainer tt) {
-        return finish(op, relation, Tense.ITERNAL, tt);
+        return finish(op, relation, Tense.DTERNAL, tt);
     }
 
     /**
@@ -317,7 +317,7 @@ public abstract class TermBuilder {
             }
         }
 
-        if (t != ITERNAL) {
+        if (t != DTERNAL) {
             if (op == DISJUNCTION) {
                 throw new RuntimeException("invalid temporal disjunction");
             }
@@ -370,7 +370,7 @@ public abstract class TermBuilder {
     public Term junctionFlat(@NotNull Op op, int dt, @NotNull Term[] u) {
 
         TermContainer tc;
-        if (dt ==0 || dt == ITERNAL) {
+        if (dt ==0 || dt == DTERNAL) {
             List<Term> s = Global.newArrayList(u.length);
             flatten(op, u, dt, s);
             tc = TermSet.the(s);
@@ -451,7 +451,7 @@ public abstract class TermBuilder {
             Termed xx = make(op, -1, cc);
             if (xx != null) {
                 Compound x = (Compound) (xx.term());
-                if (dt != ITERNAL) {
+                if (dt != DTERNAL) {
                     boolean reversed = cc.term(0) == predicate;
                     x = x.dt(reversed ? -dt : dt);
                 }

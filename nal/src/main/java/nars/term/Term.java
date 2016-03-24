@@ -21,16 +21,14 @@
 package nars.term;
 
 
-import nars.NAR;
 import nars.Op;
-import nars.nal.meta.match.Ellipsis;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 
 import static nars.nal.Tense.ETERNAL;
-import static nars.nal.Tense.ITERNAL;
+import static nars.nal.Tense.DTERNAL;
 
 
 public interface Term extends Termed, Comparable, Termlike {
@@ -200,7 +198,7 @@ public interface Term extends Termed, Comparable, Termlike {
     }
 
     default long subtermTime(Term x) {
-        return subtermTime(x, this instanceof Compound ? ((Compound)this).dt() : ITERNAL);
+        return subtermTime(x, this instanceof Compound ? ((Compound)this).dt() : DTERNAL);
     }
 
     /** matches the first occuring event's time relative to this temporal relation, with parameter for a hypothetical dt */
@@ -209,7 +207,7 @@ public interface Term extends Termed, Comparable, Termlike {
         if (this.equals(x))
             return 0;
 
-        if (!this.op().isTemporal() || dt == ITERNAL)
+        if (!this.op().isTemporal() || dt == DTERNAL)
             return ETERNAL;
 
         Compound c = ((Compound) this);

@@ -1,14 +1,12 @@
 package nars.concept;
 
 import com.gs.collections.impl.tuple.Tuples;
-import nars.Memory;
 import nars.NAR;
 import nars.Op;
 import nars.Symbols;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
 import nars.concept.util.*;
-import nars.nal.Tense;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
@@ -24,7 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static nars.nal.Tense.ITERNAL;
+import static nars.nal.Tense.DTERNAL;
 
 
 public class CompoundConcept extends AbstractConcept<Compound> implements Compound {
@@ -883,7 +881,7 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
     @Override
     public final int dt() {
         //concept itself is eternal
-        return ITERNAL;
+        return DTERNAL;
     }
 
 //    @NotNull

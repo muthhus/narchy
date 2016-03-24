@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 
-import static nars.nal.Tense.ITERNAL;
+import static nars.nal.Tense.DTERNAL;
 
 /**
  * Created by me on 2/26/16.
@@ -24,11 +24,11 @@ public final class InvalidTerm extends RuntimeException {
     }
 
     public InvalidTerm(Term[] args) {
-        this(null, -1, ITERNAL, args);
+        this(null, -1, DTERNAL, args);
     }
 
     public InvalidTerm(Op op) {
-        this(op, -1, ITERNAL, null);
+        this(op, -1, DTERNAL, null);
     }
 
     public InvalidTerm(Op op, int rel, int dt, Term[] args) {

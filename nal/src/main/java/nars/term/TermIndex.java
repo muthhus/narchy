@@ -5,7 +5,6 @@ import nars.Global;
 import nars.Narsese;
 import nars.Op;
 import nars.budget.Budget;
-import nars.concept.Concept;
 import nars.concept.ConceptBuilder;
 import nars.nal.meta.PremiseAware;
 import nars.nal.meta.PremiseEval;
@@ -30,10 +29,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import static nars.Op.*;
-import static nars.nal.Tense.ITERNAL;
+import static nars.nal.Tense.DTERNAL;
 
 /**
  *
@@ -62,7 +60,7 @@ public interface TermIndex  {
     @Nullable
     default Termed the(@NotNull Op op, @NotNull TermContainer subterms) {
         //DEFAULT IMPL to be moved to a concrete class: BUILDS ON THE HEAP:
-        return builder().the(op, -1, ITERNAL, subterms);
+        return builder().the(op, -1, DTERNAL, subterms);
     }
     @Nullable
     default Termed the(@NotNull Op op, @NotNull Collection<Term> subterms) {

@@ -1,14 +1,9 @@
 package nars.nal.meta.op;
 
 import nars.concept.ConceptProcess;
-import nars.nal.Tense;
 import nars.nal.meta.AtomicBooleanCondition;
 import nars.nal.meta.PremiseEval;
-import nars.task.Task;
-import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
-
-import static nars.nal.Tense.ITERNAL;
 
 /**
  * True if the premise task and belief are both non-eternal events
@@ -49,13 +44,13 @@ abstract public class events extends AtomicBooleanCondition<PremiseEval> {
     public static final events dtBeliefSimultaneous = new events() {
         @Override
         public boolean booleanValueOf(PremiseEval m) {
-            Task belief = m.premise.belief();
+            //Task belief = m.premise.belief();
 
-            if (belief == null) {
+            /*if (belief == null) {
                 return (m.premise.task().term().dt() == ITERNAL);
-            } else {
+            } else {*/
                 return true;
-            }
+            //}
 
             //int tdt = belief.term().dt();
             //return (tdt == Tense.ITERNAL) || (tdt == 0);

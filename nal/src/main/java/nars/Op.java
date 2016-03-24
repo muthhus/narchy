@@ -199,7 +199,7 @@ public enum Op {
     public final String toString(@NotNull Compound c)  {
         int t = c.dt();
 
-        return !(t != Tense.ITERNAL) ?
+        return !(t != Tense.DTERNAL) ?
                     str :
                     str + ((t >= 0) ? "+" : "") + (Integer.toString(t));
     }
@@ -209,7 +209,7 @@ public enum Op {
      */
     public final void append(@NotNull Compound c, @NotNull Appendable w) throws IOException {
         int t = c.dt();
-        boolean hasTime = t != Tense.ITERNAL;
+        boolean hasTime = t != Tense.DTERNAL;
 
         if (hasTime)
             w.append(' ');

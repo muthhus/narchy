@@ -10,6 +10,8 @@ import org.junit.runners.Parameterized;
 
 import java.util.function.Supplier;
 
+import static nars.nal.Tense.ETERNAL;
+
 /**
  * Created by me on 1/9/16.
  */
@@ -168,9 +170,11 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test public void intervalPreserve_and_shift_occurence_corner_case()  {
         TestNAR tester = test();
-        tester.input("<s --> S>.");
-        tester.inputAt(3, "(<s --> S> &&+3 <z --> Z>). :|:");
-        tester.mustBelieve(cycles, "<z --> Z>.", 1.00f, 0.81f /* 0.42? */ , 6);
+        tester.input("S:s.");
+        tester.inputAt(3, "(S:s &&+3 Z:z). :|:");
+        tester.mustBelieve(cycles, "S:s.", 1.00f, 0.81f /* 0.42? */ , 3);
+        tester.mustBelieve(cycles, "Z:z.", 1.00f, 0.81f /* 0.42? */ , 6);
+        tester.mustNotOutput(cycles, "Z:z", '.', 0, 1, 0.47f, 1, ETERNAL); //nothing higher conf than the eternalized belief
     }
 
     @Test

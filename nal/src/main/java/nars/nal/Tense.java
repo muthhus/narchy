@@ -24,7 +24,7 @@ public enum Tense  {
 
 
     /** integer version of long ETERNAL */
-    @Deprecated public static final int ITERNAL = Integer.MIN_VALUE;
+    @Deprecated public static final int DTERNAL = Integer.MIN_VALUE;
 
 
     /**

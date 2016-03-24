@@ -6,7 +6,6 @@ import nars.$;
 import nars.Global;
 import nars.Op;
 import nars.concept.ConceptBuilder;
-import nars.nal.meta.match.Ellipsis;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.util.Texts;
@@ -21,7 +20,7 @@ import java.util.function.IntPredicate;
 import java.util.function.Predicate;
 
 import static nars.Op.*;
-import static nars.nal.Tense.ITERNAL;
+import static nars.nal.Tense.DTERNAL;
 
 /**
  * Static utility class for static methods related to Terms
@@ -618,7 +617,7 @@ public class Terms extends TermBuilder implements TermIndex {
             int at = a.dt();
             int bt = b.dt();
             if (at != bt) {
-                if ((at == ITERNAL) || (bt == ITERNAL)) {
+                if ((at == DTERNAL) || (bt == DTERNAL)) {
                     //either is atemporal but not both
                     return 0.5f;
                 }

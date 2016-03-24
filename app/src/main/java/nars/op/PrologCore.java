@@ -11,9 +11,7 @@ import nars.data.Range;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Termed;
 import nars.term.atom.Atomic;
-import nars.term.container.TermContainer;
 import nars.term.variable.Variable;
 import nars.util.data.Util;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -25,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import static nars.nal.Tense.ITERNAL;
+import static nars.nal.Tense.DTERNAL;
 import static nars.term.container.TermVector.the;
 
 /**
@@ -109,7 +107,7 @@ public class PrologCore extends Agent implements Consumer<Task> {
             Concept cc = task.concept(nar);
             if (task.isEternal() && (task == cc.beliefs().topEternal())) {
                 int dt = task.term().dt();
-                if (dt == 0 || dt == ITERNAL) { //only nontemporal or instant for now
+                if (dt == 0 || dt == DTERNAL) { //only nontemporal or instant for now
                     float c = task.conf();
                     if (c >= confThreshold.floatValue()) {
                         float f = task.freq();

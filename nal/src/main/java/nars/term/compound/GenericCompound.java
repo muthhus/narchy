@@ -16,7 +16,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.function.Consumer;
 
-import static nars.nal.Tense.ITERNAL;
+import static nars.nal.Tense.DTERNAL;
 
 
 public class GenericCompound<T extends Term> implements Compound<T> {
@@ -50,7 +50,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     }
 
     public GenericCompound(@NotNull Op op, int relation, @NotNull TermContainer subterms) {
-        this(op, relation, Tense.ITERNAL, subterms);
+        this(op, relation, Tense.DTERNAL, subterms);
     }
 
     public GenericCompound(@NotNull Op op, int relation, int dt, @NotNull TermContainer subterms) {
@@ -58,7 +58,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
         this.normalized = (subterms.vars() == 0) && (subterms.varPattern() == 0) /* not included in the count */;
         this.op = op;
 
-        if (!op.isTemporal() && dt != ITERNAL)
+        if (!op.isTemporal() && dt != DTERNAL)
             throw new RuntimeException("invalid temporal relation for " + op);
 
         //t = op.isTemporal() ? t : ITERNAL;
@@ -93,7 +93,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     public final boolean isCommutative() {
         if (op.isCommutative() && size() > 1) {
             int t = dt();
-            return (t == ITERNAL || ((op == Op.CONJUNCTION && t == 0)));
+            return (t == DTERNAL || ((op == Op.CONJUNCTION && t == 0)));
         }
         return false;
     }
