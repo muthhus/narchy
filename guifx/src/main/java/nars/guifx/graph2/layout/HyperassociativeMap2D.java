@@ -12,9 +12,9 @@ import nars.term.Termed;
 /**
  * Created by me on 9/6/15.
  */
-public class HyperassociativeMap2D extends HyperassociativeMap<Termed,TermNode> implements IterativeLayout {
+public class HyperassociativeMap2D extends HyperassociativeMap<Termed,TermNode<Termed>> implements IterativeLayout {
     double scaleFactor = 1;
-    private TermNode[] termList = null;
+    private TermNode<Termed>[] termList = null;
 
 
     //TODO equilibrum distance, speed, etc
@@ -134,10 +134,10 @@ public class HyperassociativeMap2D extends HyperassociativeMap<Termed,TermNode> 
     }
 
     @Override
-    protected void edges(TermNode t, ObjectDoubleHashMap<TermNode> neighbors) {
+    protected void edges(TermNode<Termed> t, ObjectDoubleHashMap<TermNode<Termed>> neighbors) {
 
         for (TermEdge e : t.getEdges())
-            neighbors.put(graph.getTermNode(e.bSrc.getTerm()), e.getWeight());
+            neighbors.put(graph.getTermNode(e.bSrc.term), e.getWeight());
     }
 
 //    @Override

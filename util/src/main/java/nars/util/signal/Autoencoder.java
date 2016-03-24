@@ -21,7 +21,7 @@ public class Autoencoder {
 	private final float[] vbias;
 	private final Random rng;
 	private float[] tilde_x;
-	private float[] y;
+	public float[] y;
 	private float[] z;
 	private float[] L_vbias;
 	private float[] L_hbias;

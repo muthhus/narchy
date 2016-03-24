@@ -189,7 +189,7 @@ public class SpaceGrapher extends Spacegraph {
      * @param t
      * @param edgeBuilder
      */
-    public final TermEdge getConceptEdgeOrdered(TermNode s, TermNode t, BiFunction<TermNode, TermNode, TermEdge> edgeBuilder) {
+    public final TermEdge getConceptEdgeOrdered(TermNode s, TermNode<Termed> t, BiFunction<TermNode, TermNode, TermEdge> edgeBuilder) {
         return getEdge(s, t.term, edgeBuilder);
     }
 

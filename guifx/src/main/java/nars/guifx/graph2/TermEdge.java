@@ -4,6 +4,7 @@ package nars.guifx.graph2;
 //import scala.tools.nsc.doc.model.Object;
 
 
+import nars.term.Termed;
 import nars.util.data.Util;
 
 /**
@@ -13,8 +14,10 @@ public abstract class TermEdge /*implements ChangeListener*/ {
 
 
     public static final TermEdge[] empty = new TermEdge[0];
-    public final TermNode aSrc, //source
-                    bSrc; //target
+    public final TermNode<Termed>
+        aSrc, //source
+        bSrc; //target
+
     private final int hash;
 
 //    //public double len = 0.0;

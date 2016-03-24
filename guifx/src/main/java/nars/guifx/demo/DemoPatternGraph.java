@@ -2,6 +2,7 @@ package nars.guifx.demo;
 
 
 import nars.Global;
+import nars.bag.BLink;
 import nars.concept.Concept;
 import nars.guifx.highdim.AEConcept1;
 import nars.guifx.highdim.HighDim;
@@ -25,7 +26,10 @@ public class DemoPatternGraph {
 
         NARide.show(n.loop(), ide -> {
 
-                    HighDim<Concept> dim = new HighDim<>(64, new AEConcept1());
+                    HighDim<BLink<Concept>> dim = new HighDim<>(64,
+                            new AEConcept1()
+                            //new HighDim.ScatterPlot1()
+                    );
 
                     n.onFrame(N -> {
                         dim.commit(((Default) N).core.active);

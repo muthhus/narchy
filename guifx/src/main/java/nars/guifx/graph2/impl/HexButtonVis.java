@@ -153,7 +153,7 @@ public class HexButtonVis extends DefaultNodeVis {
 
 
     @Deprecated //TODO pass the HexButton builder as a Supplier lambda and remove the class
-    private static class HexNode extends TermNode  {
+    private static class HexNode extends TermNode<Termed>  {
 
         private final HexButton<Termed> button;
 
@@ -165,7 +165,7 @@ public class HexButtonVis extends DefaultNodeVis {
             ((Polygon)h.base).setFill(
                 TermNode.getTermColor(this.term,
                     CanvasEdgeRenderer.colors,
-                    1.0 / (double) this.term.term().volume()
+                    1.0 / this.term.term().volume()
                 )
             );
             h.base.setUserData(Tuples.pair(nar, term));

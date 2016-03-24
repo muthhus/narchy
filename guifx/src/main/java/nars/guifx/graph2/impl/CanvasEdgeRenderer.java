@@ -12,6 +12,7 @@ import nars.guifx.graph2.TermNode;
 import nars.guifx.graph2.scene.DefaultNodeVis;
 import nars.guifx.graph2.source.SpaceGrapher;
 import nars.guifx.util.ColorMatrix;
+import nars.term.Termed;
 
 /**
  * Created by me on 9/6/15.
@@ -77,7 +78,7 @@ public abstract class CanvasEdgeRenderer implements EdgeRenderer<TermEdge> {
 
     }
 
-    public abstract void draw(TermEdge i, TermNode aSrc, TermNode bSrc, double x1, double y1, double x2, double y2);
+    public abstract void draw(TermEdge i, TermNode<Termed> aSrc, TermNode<Termed> bSrc, double x1, double y1, double x2, double y2);
 
 
 

@@ -7,6 +7,7 @@ import javafx.scene.transform.Translate;
 import nars.guifx.graph2.TermEdge;
 import nars.guifx.graph2.TermNode;
 import nars.guifx.graph2.source.SpaceGrapher;
+import nars.term.Termed;
 
 /** (slower, nicer rendering) half edges are drawn as overlapping polygons */
 public class HalfHalfIsoTriangleCanvasEdgeRenderer extends CanvasEdgeRenderer {
@@ -50,7 +51,7 @@ public class HalfHalfIsoTriangleCanvasEdgeRenderer extends CanvasEdgeRenderer {
     //final static Translate identity = Affine.translate(0,0);
 
     @Override
-    public void draw(TermEdge e, TermNode aSrc, TermNode bSrc, double x1, double y1, double x2, double y2) {
+    public void draw(TermEdge e, TermNode<Termed> aSrc, TermNode<Termed> bSrc, double x1, double y1, double x2, double y2) {
 
 
         double dx = (x1 - x2);

@@ -10,14 +10,14 @@ import nars.util.data.Util;
 /**
  * Created by me on 2/29/16.
  */
-public class AEConcept1 extends HighDim.AutoEnc2Projection {
+public class AEConcept1 extends HighDim.AutoEnc2Projection<BLink<? extends Concept>> {
 
     public AEConcept1() {
         super(20, 8, 4);
     }
 
     @Override
-    protected void vectorizeIt(BLink<? extends Concept> clink, float[] x) {
+    public float[] vectorize(BLink<? extends Concept> clink, float[] x) {
         //x[0] = c.op().ordinal() / 16f; //approx;
         //x[1] = clink.pri();
         Concept c = clink.get();
@@ -34,6 +34,8 @@ public class AEConcept1 extends HighDim.AutoEnc2Projection {
 
         //System.out.println(Arrays.toString(x));
 
+        return x;
+
     }
 
     @Override
@@ -42,7 +44,9 @@ public class AEConcept1 extends HighDim.AutoEnc2Projection {
         float pri = x[2]; /* use original value directly */
         //target.move( (y[0]-y[1]) *250, pri*250);
         //target.move( (y[0]-y[2]) * 500, (y[1]-y[3]) * 500);
-        target.move((2 * y1[0] + y1[1]) * 100, (2 * y1[2] + y1[3]) * 100);
+        float px = (2 * y1[0] + y1[1]) * 100;
+        float py = (2 * y1[2] + y1[3]) * 100;
+        target.move(px, py);
         target.scale(1f + pri);
     }
 }

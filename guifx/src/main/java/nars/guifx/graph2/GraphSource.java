@@ -51,7 +51,7 @@ public abstract class GraphSource/* W? */ {
     getEdge(SpaceGrapher g, TermNode s, TermNode t, BiFunction<TermNode, TermNode, TermEdge> edgeBuilder) {
 
         //re-order
-        int i = s.getTerm().compareTo(t.getTerm());
+        int i = Integer.compare(s.hashCode(), t.hashCode()); //((Comparable)s.term).compareTo(t.term);
         if (i == 0) return null;
             /*throw new RuntimeException(
                 "order=0 but must be non-equal: " + s.term + " =?= " + t.term + ", equal:"

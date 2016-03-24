@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Set;
 
 
-public class TermNode extends GraphNode {
+public class TermNode<T> extends GraphNode {
 
 
     public static final TermNode[] empty = new TermNode[0];
@@ -29,7 +29,7 @@ public class TermNode extends GraphNode {
      */
     boolean modified = false;
 
-    public Termed term;
+    public T term;
 
     /** priority normalized to visual context */
     public float priNorm = 0;
@@ -50,7 +50,7 @@ public class TermNode extends GraphNode {
         this(null, maxEdges);
     }
 
-    public TermNode(Termed t, int maxEdges) {
+    public TermNode(T t, int maxEdges) {
 
         if (t instanceof Concept) c = (Concept)t; //HACK
 
@@ -172,9 +172,9 @@ public class TermNode extends GraphNode {
 //
 //    }
 
-    public final Term getTerm() {
-        return term.term();
-    }
+//    public final Term getTerm() {
+//        return term.term();
+//    }
 
     public void commitEdges() {
         if (modified) {

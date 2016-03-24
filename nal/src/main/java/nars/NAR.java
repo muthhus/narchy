@@ -833,12 +833,22 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     public NAR inputAt(long time, @NotNull String... tt) {
         //LongPredicate timeCondition = t -> t == time;
 
-        onFrame(m -> {
-            //if (timeCondition.test(m.time())) {
-            if (m.time() == time) {
-                m.input(tt);
-            }
-        });
+        long now = time();
+        if (time < now) {
+            //past
+            throw new RuntimeException("can not input at a past time");
+        } else if (time == now) {
+            //current cycle
+            input(tt);
+        } else {
+            //future
+            onFrame(m -> {
+                //if (timeCondition.test(m.time())) {
+                if (m.time() == time) {
+                    m.input(tt);
+                }
+            });
+        }
         return this;
     }
 

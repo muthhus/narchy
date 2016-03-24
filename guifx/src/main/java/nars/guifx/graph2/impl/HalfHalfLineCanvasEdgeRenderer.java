@@ -19,7 +19,7 @@ public class HalfHalfLineCanvasEdgeRenderer extends CanvasEdgeRenderer {
     }
 
 
-    public void drawHalf(TermEdge i, TermNode t, double x1, double y1, double x2, double y2) {
+    public void drawHalf(TermEdge i, TermNode<Termed> t, double x1, double y1, double x2, double y2) {
 
         double p = i.getWeight();
 

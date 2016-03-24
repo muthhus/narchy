@@ -279,7 +279,7 @@ public class DefaultNodeVis implements NodeVis {
         }
     };
 
-    public static class LabeledCanvasNode<N extends Termed> extends TermNode {
+    public static class LabeledCanvasNode<N extends Termed> extends TermNode<N> {
 
 
         protected final Node base;

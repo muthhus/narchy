@@ -1,31 +1,65 @@
-//package nars.guifx.demo;
-//
-//import javafx.scene.Node;
-//import javafx.scene.Scene;
-//import nars.Global;
-//import nars.NAR;
-//import nars.guifx.AutoLabel;
-//import nars.guifx.NARfx;
-//import nars.guifx.graph2.ConceptsSource;
-//import nars.guifx.graph2.DefaultVis;
-//import nars.guifx.graph2.SpaceGrapher;
-//import nars.guifx.graph2.layout.CanvasEdgeRenderer;
-//import nars.nal.nal7.Temporal;
-//import nars.nar.Default;
-//import nars.task.Task;
-//import nars.util.time.IntervalTree;
-//
-//import java.util.ArrayList;
-//import java.util.List;
-//import java.util.Map;
-//import java.util.function.Consumer;
-//
-//import static javafx.application.Platform.runLater;
-//
-///**
-// * Created by me on 9/2/15.
-// */
-//public class DemoTimeline  {
+package nars.guifx.demo;
+
+import nars.Global;
+import nars.guifx.highdim.HighDim;
+import nars.guifx.highdim.TaskAxis;
+import nars.guifx.util.Animate;
+import nars.guifx.util.TabX;
+import nars.nar.Default;
+import nars.task.Task;
+
+public class DemoTimeline {
+    public static void main(String[] args) {
+        Global.DEBUG = true;
+
+        Default n = new Default(1024, 2, 3, 3);
+        //n.core.activationRate.setValue(0.75f);
+
+        n.inputAt(1, "a:b. :|:");
+        n.inputAt(5, "b:c. :|:");
+        n.inputAt(7, "c:d. :|:");
+
+
+        //n.logSummaryGT(System.out,0.25f);
+
+        NARide.show(n.loop(), ide -> {
+
+                    TaskAxis model = new TaskAxis();
+                    HighDim<Task> dim = new HighDim<>(32, model);
+
+                    n.onFrame(N -> {
+                        dim.clear();
+                        N.forEachConceptTask(true, false, false, false, false, 3, (t) -> {
+                            if (!t.isEternal() && dim.hasCapacity())
+                                dim.visualize(t);
+                        });
+                        dim.commit();
+
+                        //System.out.println(dim.node + " free=" + dim.free.size());
+                    });
+            dim.ground.getChildren().add(model.axes);
+
+                    new Animate(30, (a) -> dim.update()).start();
+
+
+                    //ide.addView(new IOPane(n));
+                    ide.content.getTabs().setAll(
+                            new TabX("Graph",
+                                    //newGraph(n)
+                                    dim
+                            ));
+
+
+                    //ide.setSpeed(25);
+                    //n.frame(5);
+
+                }
+
+
+        );
+    }
+}
+
 //
 //
 //    abstract public static class TaskTimeline<W> {
