@@ -1,5 +1,6 @@
 package nars.nal.nal7;
 
+import nars.Global;
 import nars.NAR;
 import nars.nar.Default;
 import nars.task.Task;
@@ -7,6 +8,7 @@ import nars.util.time.IntervalTree;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Set;
 import java.util.function.Consumer;
 
 import static java.lang.System.out;
@@ -52,8 +54,8 @@ public class TemporalTest {
 
     @Test public void testTemporalStability() {
 
-        Default n = new Default(1024, 2, 3, 3);
-        //n.core.activationRate.setValue(0.75f);
+        Global.DEBUG = true;
+        Default n = new Default(1024, 8, 4, 3);
 
         n.inputAt(1, "a:b. :|:");
         n.inputAt(2, "b:c. :|:");
@@ -61,11 +63,34 @@ public class TemporalTest {
 
         n.run(10);
 
-        TimeMap m = new TimeMap(n);
-        out.println("Total tasks: " + m.size() + ", Total Times: " + m.keySet().size());
-        assertEquals("[[1..1], [2..2], [5..5]]", m.keySetSorted().toString());
+        {
+            TimeMap m = new TimeMap(n);
+            print(n, m);
+            assertEquals("[[1..1], [2..2], [5..5]]", m.keySetSorted().toString());
+        }
 
+        Set<Task> bad = Global.newHashSet(1);
 
+        for (int i = 0; i < 15; i++) {
+
+            n.step();
+            TimeMap m = new TimeMap(n);
+            print(n, m);
+            for (Task tt : m.values()) {
+                if (bad.contains(tt)) continue; //already detected
+
+                long o = tt.occurrence();
+                if ((o!=1) && (o!=2) && (o!=5)) {
+                    System.err.println("Temporal Instability: " + tt + "\n" + tt.explanation() + "\n");
+                    bad.add(tt);
+                }
+            }
+            assertEquals("[[1..1], [2..2], [5..5]]", m.keySetSorted().toString());
+        }
+    }
+
+    static void print(Default n, TimeMap m) {
+        out.println(n.time() + ": " + "Total tasks: " + m.size() + ", Total Times: " + m.keySet().size());
     }
 
 

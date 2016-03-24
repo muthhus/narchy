@@ -85,17 +85,24 @@ public interface Temporalize {
 
     /** dt is supplied by Task */
     Temporalize dtTask = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn) ->
-            dtTaskOrBelief(derived, p, occReturn, latestOccurrence, true);
+            dtTaskOrBelief(derived, p, occReturn, latestOccurrence, true, false);
+    Temporalize dtTaskEnd = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn) ->
+            dtTaskOrBelief(derived, p, occReturn, latestOccurrence, true, true);
 
     /** dt is supplied by Belief */
     Temporalize dtBelief = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn) ->
-            dtTaskOrBelief(derived, p, occReturn, latestOccurrence, false);
+            dtTaskOrBelief(derived, p, occReturn, latestOccurrence, false, false);
 
     @NotNull
-    static Compound dtTaskOrBelief(@NotNull Compound derived, @NotNull PremiseEval p, long[] occReturn, Premise.OccurrenceSolver latestOccurrence, boolean taskOrBelief/*, boolean shiftToPredicate*/) {
+    static Compound dtTaskOrBelief(@NotNull Compound derived, @NotNull PremiseEval p, long[] occReturn, Premise.OccurrenceSolver latestOccurrence, boolean taskOrBelief/*, boolean shiftToPredicate*/, boolean end) {
         ConceptProcess premise = p.premise;
 
         long o = premise.occurrenceTarget(latestOccurrence);
+        if (end) {
+            long taskDT = premise.task().term().dt();
+            if (taskDT!=ITERNAL)
+                o += taskDT;
+        }
 //        if (shiftToPredicate)
 //            o += eventDelta;
         occReturn[0] = o;

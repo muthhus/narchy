@@ -479,6 +479,9 @@ public class PremiseRule extends GenericCompound {
                         case "dtTask":
                             temporalize = Temporalize.dtTask;
                             break;
+                        case "dtTaskEnd":
+                            temporalize = Temporalize.dtTaskEnd;
+                            break;
                         case "dtCombine":
                             temporalize = Temporalize.dtCombine;
                             break;

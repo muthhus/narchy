@@ -251,14 +251,16 @@
 
     B, (A <=> C) |- substituteIfUnifies(C,"$",A,B), (Belief:Deduction, Desire:Induction, Order:ForAllSame)
 
-    (A ==> C), B |-  substituteIfUnifies( C, "$",A,B), (Belief:BeliefStructuralDeduction, Desire:Induction, Order:ForAllSame, Event:Anticipate)
+    (A ==> C), B, time(dtTask) |-  substituteIfUnifies( C, "$",A,B), (Belief:BeliefStructuralDeduction, Desire:Induction, Order:ForAllSame, Event:Anticipate)
+
+
 //    (C ==> A), B |-  substituteIfUnifies( C, "$",A,B), (Belief:StructuralAbduction, Desire:Deduction, Order:ForAllSame)
 
 
 
 //    (A ==> B), B |- A, (Belief:StructuralDeduction, Desire:Deduction, Order:ForAllSame, Event:Anticipate)
-    (A ==> B), A |- B, (Belief:StructuralDeduction, Desire:Induction, Order:ForAllSame),
-                    A, (Belief:StructuralDeduction, Desire:Deduction, Order:ForAllSame, Event:Anticipate)
+    (A ==> B), A, time(dtTaskEnd) |- B, (Belief:StructuralDeduction, Desire:Induction, Order:ForAllSame)
+    (A ==> B), B, time(dtTask) |- A, (Belief:StructuralDeduction, Desire:Deduction, Order:ForAllSame, Event:Anticipate)
 
     B, (A ==> B) |- A, (Belief:Deduction, Desire:Deduction, Order:ForAllSame, Event:Anticipate)
     A, (A ==> B) |- B, (Belief:Abduction, Desire:Abduction, Order:ForAllSame)
