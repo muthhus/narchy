@@ -58,9 +58,7 @@ public enum BeliefFunction implements TruthOperator {
     Deduction() {
         @Nullable
         @Override public Truth apply(Truth T, Truth B, @NotNull Memory m, float minConf) {
-            //return ((B == null) || (T == null)) ? null : TruthFunctions.deduction(T, B, minConf);
-            if (B == null) return null;
-            return TruthFunctions.deduction(T, B, minConf);
+            return ((B == null) || (T == null)) ? null : TruthFunctions.deduction(T, B, minConf);
         }
     },
 

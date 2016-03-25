@@ -28,8 +28,6 @@ public interface BooleanCondition<C> extends Term, BooleanFunction<C> {
         }
     };
 
-    void addTo(List<Term> l);
-
 
     @NotNull
     @Override

@@ -42,10 +42,11 @@
 //Set Definition Similarity to Inheritance
 
     ({S} <-> {P}), {S} |- ({S} --> {P}), (Belief:Identity, Desire:Identity, Derive:AllowBackward)
-    ([S] <-> [P]), [S] |- ([S] --> [P]), (Belief:Identity, Desire:Identity, Derive:AllowBackward)
+//    ({S} <-> {P}), {S} |- ({P} --> {S}), (Belief:Identity, Desire:Identity, Derive:AllowBackward)
 
-    ({S} <-> {P}), {S} |- ({P} --> {S}), (Belief:Identity, Desire:Identity, Derive:AllowBackward)
-    ([S] <-> [P]), [S] |- ([P] --> [S]), (Belief:Identity, Desire:Identity, Derive:AllowBackward)
+    ([S] <-> [P]), [S] |- ([S] --> [P]), (Belief:Identity, Desire:Identity, Derive:AllowBackward)
+//    ([S] <-> [P]), [S] |- ([P] --> [S]), (Belief:Identity, Desire:Identity, Derive:AllowBackward)
+
 
 //Set Definition Unwrap
 
@@ -171,10 +172,8 @@
     ((|,X,A..+) --> M), (|,X,A..+) |- (X --> M), (Belief:StructuralDeduction)
     (M --> (&,X,A..+)), (&,X,A..+) |- (M --> X), (Belief:StructuralDeduction)
 
-//    ((B ~ G) --> S), S |- (B --> S), (Belief:StructuralDeduction)
-    ((B ~ G) --> S), (B ~ G) |- (B --> S), (Belief:StructuralDeduction)
-//    (R --> (B - S)), R |- (R --> B), (Belief:StructuralDeduction)
-    (R --> (B - S)), (B - S) |- (R --> B), (Belief:StructuralDeduction)
+    ((B ~ G) --> S), S |- (B --> S), (Belief:StructuralDeduction)
+    (R --> (B - S)), R |- (R --> B), (Belief:StructuralDeduction)
 
 //// implication-based syllogism ////////////////////////////////////////////////////////////////////////////////////
 //       (A ==> B) ------- (B ==> C)
@@ -240,8 +239,6 @@
 //// conditional syllogism ////////////////////////////////////////////////////////////////////////////////////
 //If after M, P usually happens, and M happens, it means P is expected to happen
 
-//    B, (A ==> C) |- substituteIfUnifies(C,"$",A,B), (Belief:Deduction, Desire:Induction, Order:ForAllSame, Event:Anticipate)
-//    B, (C ==> A) |- substituteIfUnifies(C,"$",A,B), (Belief:Abduction, Desire:Abduction, Order:ForAllSame)
 
     B, (A <=> C) |- substituteIfUnifies(C,"$",A,B), (Belief:Deduction, Desire:Induction, Order:ForAllSame)
 
@@ -250,6 +247,8 @@
 
     B, (C ==> A), time(dtBelief) |- substituteIfUnifies( C, "$", A, B), (Belief:Abduction, Desire:Deduction, Order:ForAllSame)
     B, (A ==> C), time(dtBelief) |- substituteIfUnifies( C, "$", A, B), (Belief:Deduction, Desire:Induction, Order:ForAllSame, Event:Anticipate)
+//    B, (C ==> A) |- substituteIfUnifies(C,"$",A,B), (Belief:Abduction, Desire:Abduction, Order:ForAllSame)
+//    B, (A ==> C) |- substituteIfUnifies(C,"$",A,B), (Belief:Deduction, Desire:Induction, Order:ForAllSame, Event:Anticipate)
 
 
 //    (A ==> B), A, time(dtTaskEnd) |- B, (Belief:StructuralDeduction, Desire:Induction, Order:ForAllSame)
@@ -327,8 +326,8 @@
     ((&&,A..+) ==> C), M, notImplicationOrEquivalence(M) |- ((&&,M,A..+) ==> C), (Belief:Induction)
 
     ((&&,M,A..+) ==> C), (B ==> M) |- ((&&,B,A..+) ==> C), (Belief:Deduction, Order:ForAllSame)
-    ((&&,M,A..+) ==> C), ((&&,B,A..+) ==> C) |- (B ==> M), (Belief:Induction, Order:ForAllSame)
     ((&&,B,A..+) ==> C), (B ==> M) |- ((&&,M,A..+) ==> C), (Belief:Abduction, Order:ForAllSame)
+    ((&&,M,A..+) ==> C), ((&&,B,A..+) ==> C) |- (B ==> M), (Belief:Induction, Order:ForAllSame)
 
 //// variable introduction ////////////////////////////////////////////////////////////////////////////////////
 //Introduce variables by common subject or predicate

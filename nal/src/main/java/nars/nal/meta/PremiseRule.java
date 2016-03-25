@@ -44,6 +44,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.BiConsumer;
 
+import static java.util.Collections.addAll;
 import static nars.$.*;
 import static nars.Op.VAR_PATTERN;
 import static nars.term.Terms.*;
@@ -179,42 +180,16 @@ public class PremiseRule extends GenericCompound {
 
         List<Term> l = Global.newArrayList(prePreconditions.length + postPreconditions.length + 4 /* estimate */);
 
-        List<Term> beforeMatch = Global.newArrayList();
-        for (BooleanCondition p : prePreconditions)
-            p.addTo(l);
+        addAll(l, prePreconditions);
 
-
-
-
-
-        match.addPreConditionsTo(beforeMatch); //pre-conditions
-
-        //TODO sort beforeMatch because the order can determine performance HACK
-        if (beforeMatch.size() > 1) {
-            Term second = beforeMatch.get(1);
-
-            //pull these Task comparisons to the front
-            if ((second instanceof TaskPunctuation) ||
-                (second instanceof TaskNegative)) {
-                beforeMatch.remove(1);
-                beforeMatch.add(0, second);
-            }
-        }
-
-
-//        Collections.sort(beforeMatch, (a,b)-> {
-//
-//        });
-
-        l.addAll(beforeMatch);
+        addAll(l, match.pre);
 
         Solve truth = solver(post,
                 this, anticipate, immediate_eternalize, postPreconditions, temporalize
         );
-        //beforeMatch.add(truth);
         l.add(truth);
 
-        match.addTo(l); //the match itself
+        addAll(l, match.code);
 
         l.add(truth.getDerive()); //will be linked to and invoked by match callbacks
 
@@ -231,9 +206,9 @@ public class PremiseRule extends GenericCompound {
         char puncOverride = p.puncOverride;
 
         BeliefFunction belief = BeliefFunction.get(p.beliefTruth);
-        String beliefLabel = belief != null ? p.beliefTruth.toString() : "x";
+        String beliefLabel = belief != null ? p.beliefTruth.toString() : "_";
         DesireFunction desire = DesireFunction.get(p.goalTruth);
-        String desireLabel = desire != null ? p.goalTruth.toString() : "x";
+        String desireLabel = desire != null ? p.goalTruth.toString() : "_";
 
         String sn = "Truth:(";
         String i = puncOverride == 0 ?

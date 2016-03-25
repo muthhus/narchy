@@ -47,8 +47,4 @@ public final class AndCondition<C> extends GenericCompound<BooleanCondition<C>> 
 //        );
     }
 
-    @Override
-    public void addTo(@NotNull List<Term> l) {
-        l.add(this);
-    }
 }

@@ -67,7 +67,7 @@ public class NARover extends AbstractPolygonBot {
 
     final static Logger logger = LoggerFactory.getLogger(NARover.class);
 
-    private MotorControls motors;
+    //private MotorControls motors;
     private Turret gun;
     private BeingMaterial material;
 
@@ -175,38 +175,55 @@ public class NARover extends AbstractPolygonBot {
         OperationConcept motorRight = new OperationConcept("motor(right)", nar);
         OperationConcept motorFore = new OperationConcept("motor(fore)", nar);
         OperationConcept motorBack = new OperationConcept("motor(back)", nar);
-        OperationConcept motorStop = new OperationConcept("motor(stop)", nar);
+        OperationConcept motorStop = new OperationConcept("motor(stop)", nar) {
+
+            /** inserts an affirmative belief about the action taken */
+            protected void feedback(float str) {
+                nar.believe(term, Tense.Present, 1f, str);
+            }
+
+            @Override
+            protected void update(float b, float d, long now) {
+                super.update(b, d, now);
+
+                float strength = d-b;
+                if (d - b > 0.1f) {
+                    stop(strength);
+                    feedback(strength);
+                }
+            }
+        };
 
         nar.onFrame(n -> {
             float thresh = 0.01f;
-            float cc = 0.75f;
+            float cc = 0.85f;
 
             {
                 float a = motorLeft.motivation(nar);
                 if (a > thresh) {
                     rotateRelative(a);
-                    nar.believe("motor(left)", Tense.Present, 0.5f + a/2f, cc);
+                    nar.believe("motor(left)", Tense.Present, 1f, a);
                 }
             }
             {
                 float a = motorRight.motivation(nar);
                 if (a > thresh) {
                     rotateRelative(-a);
-                    nar.believe("motor(right)", Tense.Present, 0.5f + a/2f, cc);
+                    nar.believe("motor(right)", Tense.Present, 1f, a);
                 }
             }
             {
                 float l = motorFore.motivation(nar);
                 if (l > thresh) {
                     linear(l);
-                    nar.believe("motor(fore)", Tense.Present, 0.5f + l/2f, cc);
+                    nar.believe("motor(fore)", Tense.Present, 1f, l);
                 }
             }
             {
                 float l = motorBack.motivation(nar);
                 if (l > thresh) {
                     linear(-l);
-                    nar.believe("motor(back)", Tense.Present, 0.5f + l/2f, cc);
+                    nar.believe("motor(back)", Tense.Present, 1f, l);
                 }
             }
 
@@ -606,90 +623,90 @@ public class NARover extends AbstractPolygonBot {
 
     }
 
-    public static class MotorControls {
-
-        public final NARover rover;
-        private final Termed left, right, stop, forward;
-        private final Termed backward;
-        final boolean proportional = true; //thrust proportional to expectation of desire
-
-        public MotorControls(NARover rover) {
-            this.rover = rover;
-
-            forward = rover.nar.term(SomeRovers.motorForward);
-            backward = rover.nar.term(SomeRovers.motorBackward);
-            left = rover.nar.term(SomeRovers.motorLeft);
-            right = rover.nar.term(SomeRovers.motorRight);
-            stop = rover.nar.term(SomeRovers.motorStop);
-        }
-
-        public Truth stop() {
-            Task c = MethodOperator.invokingTask();
-            float strength = (proportional && c!=null) ? c.motivation() : 1;
-
-            return c.truth().confMult(rover.stop(strength)); //TODO use feedback discounting how much actually was stopped already
-        }
-
-        private Truth forward(boolean forward) {
-            Task c = MethodOperator.invokingTask();
-            float thrust = (proportional && c!=null) ? c.motivation() : 1;
-            if (!forward) thrust = -thrust;
-            rover.linear(thrust);
-            return c.truth();
-        }
-
-        private Truth rotate(boolean right) {
-            Task c = MethodOperator.invokingTask();
-            float thrust = (proportional && c!=null) ? c.motivation() : 1;
-            if (right) thrust = -thrust;
-            rover.rotateRelative(thrust);
-            return c.truth();
-        }
-
-        public Truth left() {  return rotate(false); }
-        public Truth right() {  return rotate(true); }
-        public Truth forward() {  return forward(true); }
-        public Truth backward() {  return forward(false); }
-
-
-        final static Truth unfired = new DefaultTruth(0.5f, 1f);
-
-        public Truth fire() {
-
-            Task c = MethodOperator.invokingTask();
-            if (rover.gun.fire(rover.torso, c.motivation())) {
-                return c.truth();
-            }
-            return unfired;
-        }
-
-        @Deprecated public Task random() {
-            Task c = MethodOperator.invokingTask();
-
-            Termed term;
-
-            switch ((int)(5 * Math.random())) {
-                case 0:
-                    term = stop; break;
-                case 1:
-                    term = forward; break;
-                case 2:
-                    term = backward; break;
-                case 3:
-                    term = left; break;
-                case 4:
-                    term = right; break;
-                default:
-                    term = null;
-            }
-
-            return new MutableTask(term, Symbols.GOAL)
-                    .budget(c.budget())
-                    .truth( c.truth() )
-                    .present(rover.nar)
-                    .log("Curiosity");
-        }
-    }
+//    public static class MotorControls {
+//
+//        public final NARover rover;
+//        private final Termed left, right, stop, forward;
+//        private final Termed backward;
+//        final boolean proportional = true; //thrust proportional to expectation of desire
+//
+//        public MotorControls(NARover rover) {
+//            this.rover = rover;
+//
+//            forward = rover.nar.term(SomeRovers.motorForward);
+//            backward = rover.nar.term(SomeRovers.motorBackward);
+//            left = rover.nar.term(SomeRovers.motorLeft);
+//            right = rover.nar.term(SomeRovers.motorRight);
+//            stop = rover.nar.term(SomeRovers.motorStop);
+//        }
+//
+//        public Truth stop() {
+//            Task c = MethodOperator.invokingTask();
+//            float strength = (proportional && c!=null) ? c.motivation() : 1;
+//
+//            return c.truth().confMult(rover.stop(strength)); //TODO use feedback discounting how much actually was stopped already
+//        }
+//
+//        private Truth forward(boolean forward) {
+//            Task c = MethodOperator.invokingTask();
+//            float thrust = (proportional && c!=null) ? c.motivation() : 1;
+//            if (!forward) thrust = -thrust;
+//            rover.linear(thrust);
+//            return c.truth();
+//        }
+//
+//        private Truth rotate(boolean right) {
+//            Task c = MethodOperator.invokingTask();
+//            float thrust = (proportional && c!=null) ? c.motivation() : 1;
+//            if (right) thrust = -thrust;
+//            rover.rotateRelative(thrust);
+//            return c.truth();
+//        }
+//
+//        public Truth left() {  return rotate(false); }
+//        public Truth right() {  return rotate(true); }
+//        public Truth forward() {  return forward(true); }
+//        public Truth backward() {  return forward(false); }
+//
+//
+//        final static Truth unfired = new DefaultTruth(0.5f, 1f);
+//
+//        public Truth fire() {
+//
+//            Task c = MethodOperator.invokingTask();
+//            if (rover.gun.fire(rover.torso, c.motivation())) {
+//                return c.truth();
+//            }
+//            return unfired;
+//        }
+//
+//        @Deprecated public Task random() {
+//            Task c = MethodOperator.invokingTask();
+//
+//            Termed term;
+//
+//            switch ((int)(5 * Math.random())) {
+//                case 0:
+//                    term = stop; break;
+//                case 1:
+//                    term = forward; break;
+//                case 2:
+//                    term = backward; break;
+//                case 3:
+//                    term = left; break;
+//                case 4:
+//                    term = right; break;
+//                default:
+//                    term = null;
+//            }
+//
+//            return new MutableTask(term, Symbols.GOAL)
+//                    .budget(c.budget())
+//                    .truth( c.truth() )
+//                    .present(rover.nar)
+//                    .log("Curiosity");
+//        }
+//    }
 
 
 

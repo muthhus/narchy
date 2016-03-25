@@ -116,26 +116,26 @@ public class TemporalRelationsTest {
 
     }
 
-    @Test public void testRelationTaskNormalization() {
-        String a = "pick({t002})";
-        String b = "reachable:(SELF,{t002})";
-
-        String x = "(" + a + " &&+5 " + b + ")";
-        String y = "(" + b + " &&+5 " + a + ")";
-
-        NAR n = new Default();
-        Task xt = n.inputTask(x + ". :|:");
-        Task yt = n.inputTask(y + ". :|:");
-        out.println(xt);
-        out.println(yt);
-        assertEquals(5, xt.term().dt());
-        assertEquals(0, xt.occurrence());
-
-        //should have been shifted to place the earliest component at
-        // the occurrence time expected by the semantics of the input
-        assertEquals(-5, yt.term().dt());
-        assertEquals(5, yt.occurrence());
-
-
-    }
+//    @Test public void testRelationTaskNormalization() {
+//        String a = "pick({t002})";
+//        String b = "reachable:(SELF,{t002})";
+//
+//        String x = "(" + a + " &&+5 " + b + ")";
+//        String y = "(" + b + " &&+5 " + a + ")";
+//
+//        NAR n = new Default();
+//        Task xt = n.inputTask(x + ". :|:");
+//        Task yt = n.inputTask(y + ". :|:");
+//        out.println(xt);
+//        out.println(yt);
+//        assertEquals(5, xt.term().dt());
+//        assertEquals(0, xt.occurrence());
+//
+//        //should have been shifted to place the earliest component at
+//        // the occurrence time expected by the semantics of the input
+//        assertEquals(-5, yt.term().dt());
+//        assertEquals(5, yt.occurrence());
+//
+//
+//    }
 }

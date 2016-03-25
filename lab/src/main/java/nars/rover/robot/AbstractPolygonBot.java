@@ -32,17 +32,20 @@ public abstract class AbstractPolygonBot extends Being {
 
 
 
-    static float linearDamping = 0.9f;
-    static float angularDamping = 0.9f;
+    static float linearDamping = 0.95f;
+    static float angularDamping = 0.95f;
     static float restitution = 0.9f; //bounciness
-    static float friction = 0.95f;
-
-    //final Deque<Vec2> positions = new ArrayDeque();
-    protected final List<Sense> senses = new ArrayList();
-    public float linearThrustPerCycle = 25*5f;
+    static float friction = 0.8f;
+    static float density = 2;
+    public float linearThrustPerCycle = 15*5f;
     public float angularSpeedPerCycle = 15*0.7f;
+
+
+
+    protected final List<Sense> senses = new ArrayList();
+
+
     int mission = 0;
-    //public float curiosity = 0.1f;
 
     boolean feel_motion = true, feel_senses = true; //todo add option in gui
     int motionPeriod = 1, sensePeriod = 1;
@@ -68,6 +71,7 @@ public abstract class AbstractPolygonBot extends Being {
         Fixture f = torso.createFixture(shape, mass);
         f.setRestitution(restitution);
         f.setFriction(friction);
+        f.setDensity(density);
         return torso;
     }
     @NotNull
@@ -97,11 +101,11 @@ public abstract class AbstractPolygonBot extends Being {
 
     public void linear(float f) {
         //float velBefore = torso.getLinearVelocity().length();
-        if (f == 0) {
-            torso.setLinearVelocity(new Vec2());
-        } else {
+//        if (f == 0) {
+//            torso.setLinearVelocity(new Vec2());
+//        } else {
             thrust(0, f * linearThrustPerCycle);
-        }
+        //}
         //float velAfter = torso.getLinearVelocity().length();
         //return new DefaultTruth(Util.sigmoidDiffAbs(velAfter, velBefore), 0.9f);
     }
