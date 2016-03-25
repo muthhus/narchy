@@ -8,24 +8,19 @@ import com.gs.collections.api.block.function.primitive.FloatFunction;
 import com.gs.collections.api.block.function.primitive.FloatToFloatFunction;
 import nars.$;
 import nars.NAR;
-import nars.Symbols;
-import nars.concept.OperationConcept;
 import nars.nal.Tense;
-import nars.op.java.MethodOperator;
 import nars.rover.Material;
 import nars.rover.Sim;
 import nars.rover.obj.NARVisionRay;
 import nars.rover.obj.VisionRay;
-import nars.rover.run.SomeRovers;
-import nars.task.MutableTask;
-import nars.task.Task;
+import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Termed;
-import nars.truth.DefaultTruth;
-import nars.truth.Truth;
+import nars.util.FloatSupplier;
 import nars.util.data.Util;
 import nars.op.NarQ;
 import nars.util.data.Sensor;
+import nars.util.signal.MotorConcept;
+import nars.util.signal.SensorConcept;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.joints.RevoluteJoint;
@@ -48,15 +43,15 @@ public class NARover extends AbstractPolygonBot {
     //final Lobjects objs;
 
     float hungry, sick;
-    final Sensor speedFore, speedBack, leftSpeed, rightSpeed,
+    final SensorConcept speedFore, speedBack, leftSpeed, rightSpeed,
             hungrySensor, sickSensor;
 
-    public static final Term EAT_FOOD = $.image(1, $.the("eat"), $.the("food") );
-    public static final Term EAT_POISON = $.image(1, $.the("eat"), $.the("poison") );
-    public static final Term SPEED_LEFT = $.image(1, $.the("speed"), $.the("left") );
-    public static final Term SPEED_RIGHT = $.image(1, $.the("speed"), $.the("right") );
-    public static final Term SPEED_FORE = $.image(1, $.the("speed"), $.the("fore") );
-    public static final Term SPEED_BACK = $.image(1, $.the("speed"), $.the("back") );
+    public static final Compound EAT_FOOD = $.image(1, $.the("eat"), $.the("food") );
+    public static final Compound EAT_POISON = $.image(1, $.the("eat"), $.the("poison") );
+    public static final Compound SPEED_LEFT = $.image(1, $.the("speed"), $.the("left") );
+    public static final Compound SPEED_RIGHT = $.image(1, $.the("speed"), $.the("right") );
+    public static final Compound SPEED_FORE = $.image(1, $.the("speed"), $.the("fore") );
+    public static final Compound SPEED_BACK = $.image(1, $.the("speed"), $.the("back") );
 
 
 //    final SimpleAutoRangeTruthFrequency linearVelocity;
@@ -108,8 +103,8 @@ public class NARover extends AbstractPolygonBot {
 
         Vec2 forwardVec = new Vec2(1,0f);
         Vec2 tmp = new Vec2(), tmp2 = new Vec2();
-        FloatFunction<Term> linearSpeed =
-                (t) -> {
+        FloatSupplier linearSpeed =
+                () -> {
 
                     float thresh = 0.01f;
 
@@ -130,20 +125,16 @@ public class NARover extends AbstractPolygonBot {
                 };
 
 
-        this.speedFore = new Sensor(nar, SPEED_FORE, linearSpeed, linearPositive)
-                .maxTimeBetweenUpdates(maxUpdateTime)
-                .minTimeBetweenUpdates(minUpdateTime);
+        this.speedFore = new SensorConcept(SPEED_FORE, nar, linearSpeed, linearPositive)
+                .timing(maxUpdateTime, minUpdateTime);
 
-        //.pri(0.75f);
-
-        this.speedBack = new Sensor(nar, SPEED_BACK, linearSpeed, linearNegative)
-                .maxTimeBetweenUpdates(maxUpdateTime)
-                .minTimeBetweenUpdates(minUpdateTime);
-
-                //.pri(f);
+        this.speedBack = new SensorConcept(SPEED_BACK, nar, linearSpeed, linearNegative)
+                .timing(maxUpdateTime, minUpdateTime);
 
 
-        FloatFunction<Term> angleSpeed = (t) -> {
+
+
+        FloatSupplier angleSpeed = () -> {
             float v = torso.getAngularVelocity();
 
             //System.out.println("angle vel=" + angularVelocity);
@@ -152,82 +143,46 @@ public class NARover extends AbstractPolygonBot {
 
             return v;
         };
-        this.leftSpeed = new Sensor(nar, SPEED_LEFT, angleSpeed, linearNegative)
-            .maxTimeBetweenUpdates(maxUpdateTime)
-            .minTimeBetweenUpdates(minUpdateTime)
-            ;
 
-        this.rightSpeed = new Sensor(nar, SPEED_RIGHT, angleSpeed, linearPositive)
-            .maxTimeBetweenUpdates(maxUpdateTime)
-            .minTimeBetweenUpdates(minUpdateTime)
-            ;
+        this.leftSpeed = new SensorConcept(SPEED_LEFT, nar, angleSpeed, linearNegative)
+            .timing(maxUpdateTime, minUpdateTime);
 
 
-        hungrySensor = new Sensor(nar, EAT_FOOD, t -> 1f-hungry)
-            .maxTimeBetweenUpdates(maxUpdateTime)
-            .minTimeBetweenUpdates(minUpdateTime);
+        this.rightSpeed = new SensorConcept(SPEED_RIGHT, nar, angleSpeed, linearPositive)
+            .timing(maxUpdateTime, minUpdateTime);
 
-        sickSensor = new Sensor(nar, EAT_POISON, t -> sick)
-            .maxTimeBetweenUpdates(maxUpdateTime)
-            .minTimeBetweenUpdates(minUpdateTime);
+        hungrySensor = new SensorConcept(EAT_FOOD, nar, () -> 1f-hungry)
+            .timing(maxUpdateTime, minUpdateTime);
 
-        OperationConcept motorLeft = new OperationConcept("motor(left)", nar);
-        OperationConcept motorRight = new OperationConcept("motor(right)", nar);
-        OperationConcept motorFore = new OperationConcept("motor(fore)", nar);
-        OperationConcept motorBack = new OperationConcept("motor(back)", nar);
-        OperationConcept motorStop = new OperationConcept("motor(stop)", nar) {
+        sickSensor = new SensorConcept(EAT_POISON, nar, () -> sick)
+            .timing(maxUpdateTime, minUpdateTime);
 
-            /** inserts an affirmative belief about the action taken */
-            protected void feedback(float str) {
-                nar.believe(term, Tense.Present, 1f, str);
-            }
+        float motorThresh = 0.1f;
 
-            @Override
-            protected void update(float b, float d, long now) {
-                super.update(b, d, now);
+        MotorConcept motorLeft = new MotorConcept("motor(left)", nar, (a) -> {
+            if (a < motorThresh) return 0;
+            return angularThrust(a);
+        });
 
-                float strength = d-b;
-                if (d - b > 0.1f) {
-                    stop(strength);
-                    feedback(strength);
-                }
-            }
-        };
+        MotorConcept motorRight = new MotorConcept("motor(right)", nar, (a) -> {
+            if (a < motorThresh) return 0;
+            return angularThrust(-a);
+        });
 
-        nar.onFrame(n -> {
-            float thresh = 0.05f;
-            //float cc = 0.85f;
+        MotorConcept motorFore = new MotorConcept("motor(fore)", nar, (l) -> {
+            if (l < motorThresh) return 0;
+            return linearThrust(l);
+        });
 
-            float freq = 0.95f;
-            {
-                float a = motorLeft.motivation(nar);
-                if (a > thresh) {
-                    rotateRelative(a);
-                    nar.believe("motor(left)", Tense.Present, freq, a);
-                }
-            }
-            {
-                float a = motorRight.motivation(nar);
-                if (a > thresh) {
-                    rotateRelative(-a);
-                    nar.believe("motor(right)", Tense.Present, freq, a);
-                }
-            }
-            {
-                float l = motorFore.motivation(nar);
-                if (l > thresh) {
-                    linear(l);
-                    nar.believe("motor(fore)", Tense.Present, freq, l);
-                }
-            }
-            {
-                float l = motorBack.motivation(nar);
-                if (l > thresh) {
-                    linear(-l);
-                    nar.believe("motor(back)", Tense.Present, freq, l);
-                }
-            }
+        MotorConcept motorBack = new MotorConcept("motor(back)", nar, (l) -> {
+            if (l < motorThresh) return 0;
+            return linearThrust(-l);
+        });
 
+        MotorConcept motorStop = new MotorConcept("motor(stop)", nar, (s) -> {
+            if (s < motorThresh) return 0;
+            stop(s);
+            return s;
         });
 
     }

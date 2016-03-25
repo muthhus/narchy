@@ -110,7 +110,7 @@ public class RevisionTest {
         //b.printEnergy();
 
         b.print();
-        assertEquals(2, b.size());
+        assertEquals(3, b.size());
 
         b.believe(1.0f, 0.9f, Tense.Present).run(offCycles)
                 .believe(0.0f, 0.9f, Tense.Present);

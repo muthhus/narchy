@@ -42,24 +42,13 @@ public class OperationConcept extends CompoundConcept implements Runnable {
     transient private NAR nar;
 
 
-    public OperationConcept(@NotNull String compoundTermString, NAR n) throws Narsese.NarseseException {
-        this((Compound)$.$(compoundTermString), n);
-    }
-
-    /** used for setting an explicit OperationConcept instance via java */
-    public OperationConcept(@NotNull Compound term, NAR n) {
-        this(term, n.index.conceptBuilder());
-        assert(Op.isOperation(term));
-        n.on(this);
-    }
-
-    /** default construction by a NAR on conceptualization */
-    public OperationConcept(@NotNull Compound term, ConceptBuilder b) {
-        this(term, b.termbag(), b.taskbag());
-    }
-
     public OperationConcept(@NotNull Compound term, Bag<Termed> termLinks, Bag<Task> taskLinks) {
         super(term, termLinks, taskLinks);
+    }
+
+    public OperationConcept(@NotNull String compoundTermString, NAR n) throws Narsese.NarseseException {
+        super(compoundTermString, n);
+        assert(Op.isOperation(term));
     }
 
     @Nullable
@@ -189,11 +178,11 @@ public class OperationConcept extends CompoundConcept implements Runnable {
 //        return op() != NEGATE ? n.concept($.neg(this)) : this;
 //    }
 
-    public final float believed(NAR n) {
+    public final float believed() {
         return believed;
     }
 
-    public final float desired(NAR n) {
+    public final float desired() {
         return desired;
     }
 

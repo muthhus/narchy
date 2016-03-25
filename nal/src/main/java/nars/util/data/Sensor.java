@@ -21,16 +21,16 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
     /**
      * resolution of the output freq value
      */
-    float resolution = 0.1f;
+    float resolution = 0.05f;
 
     private final Term term;
     private final FloatFunction<Term> value;
     private final FloatToFloatFunction freq;
     @NotNull
-    private final NAR nar;
+    public final NAR nar;
     private float pri;
     private final float dur;
-    private float conf;
+    private float confFactor;
     private float prevF;
 
     boolean inputIfSame = false;
@@ -40,7 +40,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
 
     private long lastInput;
 
-    final static FloatToFloatFunction direct = n -> n;
+    public final static FloatToFloatFunction direct = n -> n;
 
     public Sensor(@NotNull NAR n, Termed  t, FloatFunction<Term> value) {
         this(n, t, value, direct);
@@ -62,16 +62,21 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
     public Sensor(@NotNull NAR n, Termed t, FloatFunction<Term> value, FloatToFloatFunction valueToFreq, float conf, float pri, float dur) {
         this.nar = n;
         this.term = t.term();
-        n.onFrame(this);
         this.value = value;
         this.freq = valueToFreq;
-        this.conf = conf;
+        this.confFactor = conf;
 
         this.pri = pri;
         this.dur = dur;
         this.lastInput = n.time() - 1;
 
         this.prevF = Float.NaN;
+        init();
+    }
+
+    protected void init() {
+        //auto-start
+        nar.onFrame(this);
     }
 
     public Sensor pri(float defaultPri) {
@@ -97,10 +102,19 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
 
 
         float f = Util.round(fRaw, resolution);
-        if (inputIfSame || (f != prevF) || (maxTimeBetweenUpdates !=0 && timeSinceLastInput>= maxTimeBetweenUpdates)) {
-            if (minTimeBetweenUpdates!=0 && timeSinceLastInput >= minTimeBetweenUpdates) {
-                Task t = input(f);
-                this.lastInput = t.creation();
+
+        if (inputIfSame || (f != prevF)) {
+
+            int maxT = this.maxTimeBetweenUpdates;
+            boolean limitsMaxTime = maxT != 0;
+            int minT = this.minTimeBetweenUpdates;
+            boolean limitsMinTime =  minT != 0;
+
+            if (!limitsMaxTime || (timeSinceLastInput >= maxT)) {
+                if (!limitsMinTime || (timeSinceLastInput >= minT)) {
+                    Task t = input(f);
+                    this.lastInput = t.creation();
+                }
             }
         }
 
@@ -119,19 +133,26 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
         float f, c;
         if (v < 0.5f) {
             f = 0f;
-            c = (0.5f - v)*(2f * conf);
+            c = (0.5f - v)*(2f * confFactor);
         } else {
             f = 1f;
-            c = (v - 0.5f)*(2f * conf);
+            c = (v - 0.5f)*(2f * confFactor);
         }
 
 
+        long now = nar.time();
         Task t = new MutableTask(term).belief()
                 //.truth(v, conf)
                 .truth(f, c)
-                .present(nar.time()).budget(pri, dur);
+                .time(now, now + dt())
+                .budget(pri, dur);
         nar.input(t);
         return t;
+    }
+
+    /** time shift input tasks, relative to NAR's current time */
+    protected int dt() {
+        return 0;
     }
 
     @Override
@@ -143,7 +164,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
     /** sets default confidence */
     @NotNull
     public Sensor conf(float conf) {
-        this.conf = conf;
+        this.confFactor = conf;
         return this;
     }
 

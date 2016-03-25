@@ -79,7 +79,7 @@ public class Revision {
                 continue;
 
             //avoid a duplicate truth at the same time
-            assert(t!=oldBelief.occurrence() || !c.equals(oldBeliefTruth));
+            assert(t!=x.occurrence() || !c.equals(oldBeliefTruth));
             assert(t!=newBelief.occurrence() || !c.equals(newBeliefTruth));
 
             float cconf = c.conf();

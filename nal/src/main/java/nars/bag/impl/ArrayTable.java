@@ -16,7 +16,7 @@ import java.util.function.Predicate;
 /**
  * Created by me on 1/15/16.
  */
-abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements Table<V,L> {
+abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements ListTable<V,L> {
     /**
      * array of lists of items, for items on different level
      */
@@ -49,7 +49,12 @@ abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements Tabl
         items.clear();
     }
 
-//    /**
+    @Override
+    public final List<L> list() {
+        return items.list();
+    }
+
+    //    /**
 //     * The number of items in the bag
 //     *
 //     * @return The number of items

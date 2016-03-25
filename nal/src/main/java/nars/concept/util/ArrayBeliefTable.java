@@ -4,7 +4,9 @@ import com.google.common.collect.Iterators;
 import nars.Global;
 import nars.Memory;
 import nars.NAR;
+import nars.bag.Table;
 import nars.bag.impl.ArrayTable;
+import nars.bag.impl.ListTable;
 import nars.budget.BudgetMerge;
 import nars.task.Revision;
 import nars.task.Task;
@@ -27,8 +29,8 @@ import static nars.truth.TruthFunctions.temporalProjection;
  */
 public class ArrayBeliefTable implements BeliefTable {
 
-    @NotNull final ArrayTable<Task,Task> eternal;
-    @NotNull final ArrayTable<Task,Task> temporal;
+    @NotNull final ListTable<Task,Task> eternal;
+    @NotNull final ListTable<Task,Task> temporal;
     @NotNull final Map<Task,Task> map;
 
     public static final BudgetMerge DuplicateMerge = BudgetMerge.plusDQBlend;
@@ -38,22 +40,29 @@ public class ArrayBeliefTable implements BeliefTable {
 
     //float ageFactor;
 
-    public ArrayBeliefTable(int cap) {
-        super();
+    @Deprecated public ArrayBeliefTable(int capacity) {
+        this( Math.max(2, capacity), Math.max(2, capacity) );
+    }
 
-//        this.minT = this.maxT = this.lastUpdate = memory.time();
-//        this.ageFactor = 1f/(memory.duration()*1f);
+    public ArrayBeliefTable(int eternalCapacity, int temporalCapacity) {
+        super();
 
         Map<Task, Task> mp;
         this.map = mp =
-            Global.newHashMap(1);
-            //new HashMap(cap);
-
-        if (cap < 2) cap = 2; //since there are 2 tables, allow min one belief in each
+            Global.newHashMap(eternalCapacity + temporalCapacity);
+            //new HashMap(eternalCapacity + temporalCapacity);
 
         /** Ranking by originality is a metric used to conserve original information in balance with confidence */
-        eternal = new SetTable<>(mp, new EternalTaskIndex(cap));
-        temporal = new SetTable<>(mp, new TemporalTaskIndex(cap, this));
+        if (eternalCapacity > 0)
+            eternal = new SetTable<>(mp, new EternalTaskIndex(eternalCapacity));
+        else
+            eternal = ListTable.Empty;
+
+
+        if (temporalCapacity > 0)
+            temporal = new SetTable<>(mp, new TemporalTaskIndex(temporalCapacity, this));
+        else
+            temporal = ListTable.Empty;
 
     }
 
@@ -79,7 +88,7 @@ public class ArrayBeliefTable implements BeliefTable {
             n++;
         }
 
-        List<Task> temp = temporal.items.list();
+        List<Task> temp = temporal.list();
         int numTemporal = temp.size();
 
         if (numTemporal == 1) //optimization: just return the only temporal truth value if it's the only one
@@ -149,7 +158,7 @@ public class ArrayBeliefTable implements BeliefTable {
     @NotNull
     @Override
     public Iterator<Task> iterator() {
-        return Iterators.concat(eternal.items.iterator(), temporal.items.iterator());
+        return Iterators.concat(eternal.list().iterator(), temporal.list().iterator());
     }
 
     @Override
@@ -158,11 +167,15 @@ public class ArrayBeliefTable implements BeliefTable {
         temporal.forEach(action);
     }
 
+    //TODO public void setCapacity(int eternal, int temporal) { ... }
+
     @Override
     public void setCapacity(int newCapacity) {
-        if (newCapacity == 1) newCapacity = 2; //prevent 0 by accident
-        eternal.setCapacity(newCapacity/2);
-        temporal.setCapacity(newCapacity/2);
+        throw new UnsupportedOperationException();
+
+//        if (newCapacity == 1) newCapacity = 2; //prevent 0 by accident
+//        eternal.setCapacity(newCapacity/2);
+//        temporal.setCapacity(newCapacity/2);
     }
 
     @Override
@@ -187,9 +200,8 @@ public class ArrayBeliefTable implements BeliefTable {
 
     @Override
     public void clear() {
-        eternal.items.clear();
-        temporal.items.clear();
-        map.clear();
+        eternal.clear();
+        temporal.clear();
     }
 
     @Nullable
@@ -203,7 +215,7 @@ public class ArrayBeliefTable implements BeliefTable {
     public final Task topTemporal(long when, long now) {
         Task best = null;
         float bestRank = -1;
-        List<? extends Task> l = temporal.items.list();
+        List<? extends Task> l = temporal.list();
 
         //find the best balance of temporal proximity and confidence:
         //float ageFactor = this.ageFactor;
@@ -236,7 +248,7 @@ public class ArrayBeliefTable implements BeliefTable {
             return null;
 
         //Try forming a revision and if successful, inputs to NAR for subsequent cycle
-        Task revised = Revision.tryRevision(input, nar, tableFor(input).items.list());
+        Task revised = Revision.tryRevision(input, nar, tableFor(input).list());
         if (revised!=null)  {
             if(Global.DEBUG) {
                 if (revised.isDeleted())
@@ -317,7 +329,7 @@ public class ArrayBeliefTable implements BeliefTable {
 
         this.lastUpdate = nar.time();
 
-        ArrayTable<Task, Task> table = tableFor(incoming);
+        ListTable<Task, Task> table = tableFor(incoming);
 
 
         //AXIOMATIC/CONSTANT BELIEF/GOAL
@@ -358,7 +370,7 @@ public class ArrayBeliefTable implements BeliefTable {
     }
 
     @NotNull
-    private ArrayTable<Task, Task> tableFor(@NotNull Task t) {
+    private ListTable<Task, Task> tableFor(@NotNull Task t) {
         return t.isEternal() ? this.eternal : this.temporal;
     }
 

@@ -1,9 +1,7 @@
 package nars.concept;
 
 import com.gs.collections.impl.tuple.Tuples;
-import nars.NAR;
-import nars.Op;
-import nars.Symbols;
+import nars.*;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
 import nars.concept.util.*;
@@ -67,6 +65,23 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
     public CompoundConcept(@NotNull Compound term, Bag<Termed> termLinks, Bag<Task> taskLinks) {
         super(term, taskLinks, termLinks);
     }
+
+    public CompoundConcept(@NotNull String compoundTermString, NAR n) throws Narsese.NarseseException {
+        this((Compound) $.$(compoundTermString), n);
+    }
+
+    /** used for setting an explicit OperationConcept instance via java; activates it on initialization */
+    public CompoundConcept(@NotNull Compound term, NAR n) {
+        this(term, n.index.conceptBuilder());
+        n.on(this);
+    }
+
+    /** default construction by a NAR on conceptualization */
+    public CompoundConcept(@NotNull Compound term, ConceptBuilder b) {
+        this(term, b.termbag(), b.taskbag());
+    }
+
+
 
     /**
      * Pending Quests to be answered by new desire values
@@ -194,7 +209,7 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
 
         BeliefTable beliefs = this.beliefs;
         if (beliefs == null)
-            beliefs = this.beliefs = new ArrayBeliefTable(nar.conceptBeliefsMax.intValue());
+            beliefs = this.beliefs = newBeliefTable(nar.conceptBeliefsMax.intValue());
 
         belief = beliefs.add(belief, nar);
 
@@ -232,6 +247,19 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
 //        }
     }
 
+    protected int capacity(int maxBeliefs, boolean beliefOrGoal, boolean eternalOrTemporal) {
+        return Math.max(maxBeliefs/2, 2);
+    }
+
+    @NotNull
+    protected ArrayBeliefTable newBeliefTable(int cap) {
+        return new ArrayBeliefTable(capacity(cap, true, true), capacity(cap, true, false));
+    }
+    @NotNull
+    protected ArrayBeliefTable newGoalTable(int cap) {
+        return new ArrayBeliefTable(capacity(cap, false, true), capacity(cap, false, false));
+    }
+
 //    private float updateSuccess(@Nullable Task inputGoal, float successBefore, @NotNull Memory memory) {
 //        /** update happiness meter on solution  TODO revise */
 //        float successAfter = getSuccess(memory.time());
@@ -260,8 +288,7 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
 
         BeliefTable g = this.goals;
         if (g == null) {
-            g = this.goals = new ArrayBeliefTable(
-                nar.conceptGoalsMax.intValue());
+            g = this.goals = newGoalTable(nar.conceptGoalsMax.intValue());
         }
 
         return g.add(inputGoal, nar);

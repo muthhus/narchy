@@ -201,22 +201,29 @@ public class TaskTablePane extends HBox implements Runnable {
         float pw = 10;
         float ph = 10;
 
-        table.forEach((f, cc, o, pri) -> {
+        table.forEach((freq, conf, o, pri) -> {
 
             boolean eternal = !Float.isFinite(o);
             float eh, x;
             GraphicsContext g;
+            float padding = this.padding;
             if (eternal) {
                 eh = geh;
-                x = eternalX(gew, padding, pw, cc);
+
+                x = eternalX(gew, padding, pw, conf);
                 g = ge;
             } else {
                 eh = teh;
                 x = xTime(tew, padding, minT, maxT, o, pw);
                 g = te;
             }
-            float y = yPos(eh, padding, ph, f);
-            r.renderTask(g, pri, cc, pw, ph, x, y);
+            float y = yPos(eh, padding, ph, eternal ?
+                //ETERNAL y = frequency
+                freq :
+                //TIMELINE y = expectation
+                (freq * conf)
+            );
+            r.renderTask(g, pri, conf, pw, ph, x, y);
 
         });
 

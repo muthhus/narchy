@@ -99,23 +99,26 @@ public abstract class AbstractPolygonBot extends Being {
         return torso;
     }
 
-    public void linear(float f) {
+    public float linearThrust(float f) {
         //float velBefore = torso.getLinearVelocity().length();
 //        if (f == 0) {
 //            torso.setLinearVelocity(new Vec2());
 //        } else {
             thrust(0, f * linearThrustPerCycle);
+        return f;
         //}
         //float velAfter = torso.getLinearVelocity().length();
         //return new DefaultTruth(Util.sigmoidDiffAbs(velAfter, velBefore), 0.9f);
     }
 
-    public void rotateRelative(float f) {
+    public float angularThrust(float f) {
+
         //float vBefore = torso.getAngularVelocity();
         rotate(f * angularSpeedPerCycle);
         //float vAfter = torso.getAngularVelocity();
 
         //return new DefaultTruth(Util.sigmoidDiffAbs(vAfter, vBefore), 0.9f);
+        return f;
     }
 
     public void inputMission() {
@@ -199,12 +202,9 @@ public abstract class AbstractPolygonBot extends Being {
 
     protected abstract void feelMotion();
 
-    public float stop(float strength) {
-        final float thresh = 0.05f;
+    public void stop(float strength) {
 
         float speedBefore = torso.getAngularVelocity() + torso.getLinearVelocity().length();
-        if (speedBefore < thresh)
-            return 0f; //already stopped, did nothing
 
         float brakes = (1f - strength);
         torso.setAngularVelocity(torso.getAngularVelocity() * brakes);
@@ -212,7 +212,7 @@ public abstract class AbstractPolygonBot extends Being {
 
         float speedAfter = torso.getAngularVelocity() + torso.getLinearVelocity().length();
 
-        return 1f - (speedAfter / (speedAfter + speedBefore));
+        //return strength * (speedAfter / (speedAfter + speedBefore));
     }
 
     @FunctionalInterface
