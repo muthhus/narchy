@@ -34,16 +34,15 @@ public class ArrayBeliefTable implements BeliefTable {
     public static final BudgetMerge DuplicateMerge = BudgetMerge.plusDQBlend;
 
     private long lastUpdate; //cached value, updated before temporal operations begin
-    private long minT, maxT;
+    //private long minT, maxT;
 
-    float ageFactor;
+    //float ageFactor;
 
-    public ArrayBeliefTable(int cap, @NotNull Memory memory) {
+    public ArrayBeliefTable(int cap) {
         super();
 
-
-        this.minT = this.maxT = this.lastUpdate = memory.time();
-        this.ageFactor = 1f/(memory.duration()*1f);
+//        this.minT = this.maxT = this.lastUpdate = memory.time();
+//        this.ageFactor = 1f/(memory.duration()*1f);
 
         Map<Task, Task> mp;
         this.map = mp =
@@ -69,6 +68,10 @@ public class ArrayBeliefTable implements BeliefTable {
         float sumFreq = 0, sumConf = 0;
         float n = 0;
         Task eternal = topEternal();
+
+        if (temporal.isEmpty()) //optimization: just return the top eternal truth if no temporal to adjust with
+            return eternal.truth();
+
         if (eternal!=null) {
             //include with strength of 1
             sumFreq += eternal.freq();
@@ -76,12 +79,17 @@ public class ArrayBeliefTable implements BeliefTable {
             n++;
         }
 
-        List<Task> list = temporal.items.list();
-        for (int i = 0, listSize = list.size(); i < listSize; i++) {
-            Task x = list.get(i);
+        List<Task> temp = temporal.items.list();
+        int numTemporal = temp.size();
+
+        if (numTemporal == 1) //optimization: just return the only temporal truth value if it's the only one
+            return temp.get(0).truth();
+
+        for (int i = 0, listSize = numTemporal; i < listSize; i++) {
+            Task x = temp.get(i);
 
             //strength decreases with distance in time
-            float strength = x.conf() * temporalProjection(when, x.occurrence(), now, dur);
+            float strength = temporalProjection(when, x.occurrence(), now, dur);
 
             sumConf += x.conf() * strength;
             sumFreq += x.freq() * strength;
@@ -89,18 +97,11 @@ public class ArrayBeliefTable implements BeliefTable {
             n+=strength;
         }
 
-        if (n == 0) return null;
+        return n == 0 ? Truth.Zero :
+                new DefaultTruth(sumFreq / n, sumConf / n);
 
-        return new DefaultTruth(sumFreq/n, sumConf/n);
     }
 
-    public long getMinT() {
-        return minT;
-    }
-
-    public long getMaxT() {
-        return maxT;
-    }
 
 //    @Override
 //    public boolean remove(@NotNull Task w) {
@@ -114,25 +115,25 @@ public class ArrayBeliefTable implements BeliefTable {
 //            return false;
 //        }
 //    }
-
-    void updateTimeRange() {
-        if (temporal.isEmpty()) {
-            minT = maxT = lastUpdate;
-        } else {
-            long minT = this.minT = Long.MAX_VALUE;
-            long maxT = this.maxT = Long.MIN_VALUE;
-            List<Task> list = temporal.items.list();
-            for (int i = 0, listSize = list.size(); i < listSize; i++) {
-                long o = list.get(i).occurrence();
-                if (o > maxT) maxT = o;
-                if (o < minT) minT = o;
-            }
-            this.minT = minT;
-            this.maxT = maxT;
-        }
-
-        //ageFactor = (minT!=maxT)? 1f/(maxT-minT) : 0;
-    }
+//
+//    void updateTimeRange() {
+//        if (temporal.isEmpty()) {
+//            minT = maxT = lastUpdate;
+//        } else {
+//            long minT = this.minT = Long.MAX_VALUE;
+//            long maxT = this.maxT = Long.MIN_VALUE;
+//            List<Task> list = temporal.items.list();
+//            for (int i = 0, listSize = list.size(); i < listSize; i++) {
+//                long o = list.get(i).occurrence();
+//                if (o > maxT) maxT = o;
+//                if (o < minT) minT = o;
+//            }
+//            this.minT = minT;
+//            this.maxT = maxT;
+//        }
+//
+//        //ageFactor = (minT!=maxT)? 1f/(maxT-minT) : 0;
+//    }
 
 
     public float rankTemporalByOriginality(@NotNull Task b) {
@@ -140,7 +141,7 @@ public class ArrayBeliefTable implements BeliefTable {
     }
     public float rankTemporalByOriginality(@NotNull Task b, long when) {
         return BeliefTable.rankEternalByOriginality(b) *
-                BeliefTable.relevance(b, when, ageFactor);
+                BeliefTable.relevance(b, when, 1);
 
     }
 
@@ -205,11 +206,11 @@ public class ArrayBeliefTable implements BeliefTable {
         List<? extends Task> l = temporal.items.list();
 
         //find the best balance of temporal proximity and confidence:
-        float ageFactor = this.ageFactor;
+        //float ageFactor = this.ageFactor;
         int ls = l.size();
         for (int i = 0; i < ls; i++) {
             Task x = l.get(i);
-            float r = BeliefTable.rankTemporalByConfidence(x, when, ageFactor);
+            float r = BeliefTable.rankTemporalByConfidence(x, when, 1);
             if (r > bestRank) {
                 best = x;
                 bestRank = r;
@@ -350,8 +351,8 @@ public class ArrayBeliefTable implements BeliefTable {
                     nar);
         }
 
-        if (inserted && !incoming.isEternal())
-            updateTimeRange();
+//        if (inserted && !incoming.isEternal())
+//            updateTimeRange();
 
         return inserted;
     }

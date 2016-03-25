@@ -41,10 +41,13 @@ public class Revision {
 
         for (int i = 0; i < bsize; i++) {
             Task x = beliefs.get(i);
-            if (/*x.isDeleted() ||*/ !LocalRules.isRevisible(newBelief, x)) continue;
+
+            if (!LocalRules.isRevisible(newBelief, x))
+                continue;
 
             float matchFactor = Terms.termRelevance(newBeliefTerm, x.term());
-            if (matchFactor <= 0) continue;
+            if (matchFactor <= 0)
+                continue;
 
 //
 //            float factor = tRel * freqMatch;
@@ -54,35 +57,35 @@ public class Revision {
 //            }
 
             final int totalEvidence = 1; //newBelief.evidence().length + x.evidence().length;
-            float minValidConf = Math.min(newBeliefConf, x.conf());
-            if (minValidConf < bestConf) continue;
-            float minValidRank = BeliefTable.rankEternalByOriginality(minValidConf, totalEvidence);
-            if (minValidRank < bestRank) continue;
+//            float minValidConf = Math.min(newBeliefConf, x.conf());
+//            if (minValidConf < bestConf) continue;
+//            float minValidRank = BeliefTable.rankEternalByOriginality(minValidConf, totalEvidence);
+//            if (minValidRank < bestRank) continue;
+
+            Truth oldBeliefTruth = x.truth();
 
             Truth c;
             long t;
             if (newBelief.isEternal()) {
-                c = TruthFunctions.revision(newBeliefTruth, x.truth(), matchFactor, minValidConf);
-                if (c == null)
-                    continue;
+                c = TruthFunctions.revision(newBeliefTruth, oldBeliefTruth, matchFactor, bestConf);
                 t = Tense.ETERNAL;
             } else {
-                c = TruthFunctions.revision(
-                        newBelief,
-                        x, now, matchFactor, minValidConf);
-                if (c == null)
-                    continue;
-                t = now; //Math.max(newBelief.occurrence(), x.occurrence());
+                c = TruthFunctions.revision(newBelief,
+                        x, now, matchFactor, bestConf);
+                t = now;
             }
 
-            //TODO avoid allocating Truth's here
+            if (c == null)
+                continue;
 
-            //float ffreqMatch = 1f/(1f + Math.abs(newBeliefFreq - x.freq()));
+            //avoid a duplicate truth at the same time
+            assert(t!=oldBelief.occurrence() || !c.equals(oldBeliefTruth));
+            assert(t!=newBelief.occurrence() || !c.equals(newBeliefTruth));
 
             float cconf = c.conf();
             float rank = BeliefTable.rankEternalByOriginality(cconf, totalEvidence);
 
-            if ((cconf > 0) && (rank > bestRank)) {
+            if (rank > bestRank)  {
                 bestRank = rank;
                 bestConf = cconf;
                 oldBelief = x;
@@ -91,20 +94,18 @@ public class Revision {
             }
         }
 
-        if ( /* nothing matches */  (oldBelief == null) ||
-             /* equivalent */       (conclusion.equals(newBeliefTruth) && concTime == newBelief.occurrence()))
-            return null;
-
-        Budget revisionBudget = budgetRevision(conclusion, newBelief, oldBelief, nar);
-        if (revisionBudget != null) {
-            return new RevisionTask(
-                    LocalRules.intermpolate(
+        if (oldBelief != null) {
+            Budget revisionBudget = budgetRevision(conclusion, newBelief, oldBelief, nar);
+            if (revisionBudget != null) {
+                return new RevisionTask(
+                        LocalRules.intermpolate(
+                                newBelief, oldBelief,
+                                newBeliefConf, oldBelief.conf()),
+                        revisionBudget,
                         newBelief, oldBelief,
-                        newBeliefConf, oldBelief.conf()),
-                    revisionBudget,
-                    newBelief, oldBelief,
-                    conclusion,
-                    now, concTime);
+                        conclusion,
+                        now, concTime);
+            }
         }
         return null;
     }

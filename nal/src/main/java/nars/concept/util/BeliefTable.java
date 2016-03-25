@@ -79,7 +79,7 @@ public interface BeliefTable extends TaskTable {
         @Nullable
         @Override
         public Truth truth(long when, long now, float dur) {
-            return null;
+            return Truth.Zero;
         }
 
 

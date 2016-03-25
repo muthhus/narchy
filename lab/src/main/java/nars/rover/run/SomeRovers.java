@@ -1,5 +1,6 @@
 package nars.rover.run;
 
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import nars.Global;
 import nars.NAR;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static nars.guifx.NARfx.newWindow;
+import static nars.guifx.NARfx.scrolled;
 import static nars.rover.robot.NARover.*;
 
 /**
@@ -64,17 +66,43 @@ public class SomeRovers {
 
         boolean addNARRover = true;
         boolean addQRover = true;
+        boolean gui = true;
 
         if (addNARRover) {
-            game.add(new NARover("r1", newNAR()) {
+            Default n;
+            game.add(new NARover("r1", n = newNAR()) {
                 @Override
                 public void init(Sim p) {
                     super.init(p);
 
                     q(this);
+
+                    if (gui) {
+                        NARfx.run(() -> {
+                            newWindow("Motors",
+                                new HBox(
+                                        scrolled(new NARtop(n).addAll(
+                                                    "MotorControls(#x,motor,(),#z)",
+                                                    motorLeft, motorRight,
+                                                    motorForward, motorBackward,
+                                                    motorStop /*, turretFire */)),
+                                        scrolled(new NARtop(n).addAll(
+                                                    EAT_FOOD.toString(),
+                                                    EAT_POISON.toString(),
+                                                    SPEED_LEFT.toString(),
+                                                    SPEED_RIGHT.toString(),
+                                                    SPEED_FORE.toString(),
+                                                    SPEED_BACK.toString()
+
+                                        ))
+                                )
+                            );
+                        });
+                    }
                 }
 
             });
+
         }
 
 //        if (addQRover) {
@@ -88,7 +116,7 @@ public class SomeRovers {
 //
 //            game.add(new CarefulRover("r2", nar));
 //        }
-        float fps = 50;
+        float fps = 70;
         game.run(fps);
 
     }
@@ -97,7 +125,7 @@ public class SomeRovers {
         int conceptsFirePerCycle = 16;
 
         Random rng = new XorShift128PlusRandom(1);
-        TermIndex index = new AbstractNAR.WeakTermIndex(64*1024,rng);
+        TermIndex index = new AbstractNAR.WeakTermIndex(64 * 1024, rng);
         Default nar = new Default(
                 //new Memory(clock, TermIndex.softMemory(64*1024)),
                 1200, conceptsFirePerCycle, 2, 2, rng, index);
@@ -124,7 +152,7 @@ public class SomeRovers {
 //            return false;
 //        });
 
-        
+
         nar.DEFAULT_JUDGMENT_PRIORITY = 0.5f;
 //            nar.memory.DEFAULT_JUDGMENT_DURABILITY = 0.35f;
         nar.DEFAULT_GOAL_PRIORITY = 0.5f;
@@ -139,7 +167,7 @@ public class SomeRovers {
 
 
         //nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
-        nar.core.activationRate.setValue(0.1f);
+        nar.core.activationRate.setValue(0.25f);
 
 
         nar.duration.set(10);
@@ -153,49 +181,6 @@ public class SomeRovers {
         nar.executionThreshold.setValue(0.01f);
         //nar.derivationDurabilityThreshold.setValue(0.1f);
 
-        boolean gui = true;
-        if (gui) {
-            //NARide.loop(nar, false);
-
-            NARfx.run(() -> {
-//                    NARide.newIDE(nar.loop(), (i) -> {
-//
-//                    }, new Stage());
-
-//
-                newWindow("Motors",
-                    new NARtop(nar).addAll(
-                        "MotorControls(#x,motor,(),#z)",
-                        motorLeft, motorRight,
-                        motorForward, motorBackward,
-                        motorStop /*, turretFire */)
-                );
-
-//                NARfx.newConceptWindow(nar,
-//                        //new TilePane(Orientation.VERTICAL),
-//                        new VBox(),
-//                        "MotorControls(#x,motor,(),#z)",
-//                        //fire,
-//                        motorLeft,
-//                        motorRight,
-//                        motorForward,
-//                        motorBackward,
-//                        motorStop
-//                );
-
-                NARfx.newConceptWindow(nar,
-                        //new TilePane(Orientation.VERTICAL),
-                        new VBox(),
-                        EAT_FOOD.toString(),
-                        EAT_POISON.toString(),
-                        SPEED_LEFT.toString(),
-                        SPEED_RIGHT.toString(),
-                        SPEED_FORE.toString(),
-                        SPEED_BACK.toString()
-                );
-            });
-        }
-
         return nar;
     }
 
@@ -207,8 +192,7 @@ public class SomeRovers {
         NAR n = r.nar;
 
 
-
-        NarQ nqSpine = new NarQ(n, (i, o) -> (int) Math.ceil(1+Math.sqrt(i * o)));
+        NarQ nqSpine = new NarQ(n, (i, o) -> (int) Math.ceil(1 + Math.sqrt(i * o)));
 
 
         nqSpine.power.setValue(0.5f);
@@ -245,7 +229,7 @@ public class SomeRovers {
 
         //nearsight & mouth
         r.addEyeWithMouth(r, "n", nqSpine, r.torso, 7, 2, front,
-                0.5f, 0, dist/2f, 0.2f);
+                0.5f, 0, dist / 2f, 0.2f);
 
 
         //farsight
@@ -255,8 +239,8 @@ public class SomeRovers {
 
         //reverse
         r.addEye(r, "f", nqSpine, r.torso, 5, 3, new Vec2(-0.5f, 0),
-                1.25f, pi/2f, dist/2f, (e) -> {
-        });
+                1.25f, pi / 2f, dist / 2f, (e) -> {
+                });
 
 
         //arms have their own controller but the two main inputs are controlled by the master Q 'nqSpine'

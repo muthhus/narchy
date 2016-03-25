@@ -41,6 +41,7 @@ public interface Truth extends Truthed {
     Term Truth_TRUE = $.the("TRUE");
     Term Truth_FALSE = $.the("FALSE");
     Term Truth_UNSURE = $.the("UNSURE");
+    Truth Zero = new DefaultTruth(0.5f, 0);
 
 
     /**

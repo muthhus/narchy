@@ -194,7 +194,7 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
 
         BeliefTable beliefs = this.beliefs;
         if (beliefs == null)
-            beliefs = this.beliefs = new ArrayBeliefTable(nar.conceptBeliefsMax.intValue(), nar);
+            beliefs = this.beliefs = new ArrayBeliefTable(nar.conceptBeliefsMax.intValue());
 
         belief = beliefs.add(belief, nar);
 
@@ -261,7 +261,7 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
         BeliefTable g = this.goals;
         if (g == null) {
             g = this.goals = new ArrayBeliefTable(
-                nar.conceptGoalsMax.intValue(), nar);
+                nar.conceptGoalsMax.intValue());
         }
 
         return g.add(inputGoal, nar);

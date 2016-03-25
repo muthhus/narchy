@@ -442,32 +442,32 @@ public enum NARfx  {
 
     }
 
-    public static void newConceptWindow(NAR nar, Pane container, String... concepts) {
-        newConceptWindow(nar, container, (List<Concept>) of(concepts).map(
-                nar::concept).collect(toList())
-        );
-    }
-
-    private static void newConceptWindow(NAR nar, Pane v, List<? extends Termed> cc) {
-
-        for (Termed c : cc) {
-            AbstractConceptPane wn =
-                    //new DetailedConceptPane(nar, c);
-                    new SimpleConceptPane(nar, c);
-            wn.setMaxWidth(250);
-            wn.setPrefWidth(250);
-            v.getChildren().add(wn);
-        }
-
-        v.layout();
-
-        Stage st;
-        Stage removed = window.put(cc, st = newWindow("Concepts", scrolled(v)));
-
-        if (removed!=null)
-            removed.close();
-
-    }
+//    public static void newConceptWindow(NAR nar, Pane container, String... concepts) {
+//        newConceptWindow(nar, container, (List<Concept>) of(concepts).map(
+//                nar::concept).collect(toList())
+//        );
+//    }
+//
+//    private static void newConceptWindow(NAR nar, Pane v, List<? extends Termed> cc) {
+//
+//        for (Termed c : cc) {
+//            AbstractConceptPane wn =
+//                    //new DetailedConceptPane(nar, c);
+//                    new SimpleConceptPane(nar, c);
+//            wn.setMaxWidth(250);
+//            wn.setPrefWidth(250);
+//            v.getChildren().add(wn);
+//        }
+//
+//        v.layout();
+//
+//        Stage st;
+//        Stage removed = window.put(cc, st = newWindow("Concepts", scrolled(v)));
+//
+//        if (removed!=null)
+//            removed.close();
+//
+//    }
 
     static NARide.FXCSSUpdater updater;
     static {
