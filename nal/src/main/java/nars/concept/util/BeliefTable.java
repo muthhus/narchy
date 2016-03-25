@@ -76,6 +76,11 @@ public interface BeliefTable extends TaskTable {
             return null;
         }
 
+        @Nullable
+        @Override
+        public Truth truth(long when, long now, float dur) {
+            return null;
+        }
 
 
     };
@@ -255,13 +260,6 @@ public interface BeliefTable extends TaskTable {
         });
     }
 
-    @NotNull
-    default TruthWave wave() {
-        return new TruthWave(this);
-    }
-
-
-
     /** simple metric that guages the level of inconsistency (ex: variance) aggregated by contained belief states.
      *  returns 0 if no tasks exist */
     default float coherence() {
@@ -321,10 +319,8 @@ public interface BeliefTable extends TaskTable {
 
     /** estimates the current truth value from the top task, projected to the specified 'when' time;
      * returns null if no evidence is available */
-    @Nullable default Truth truth(long when, long now, float dur) {
-        Task top = top(when, now);
-        return (top == null) ? null : top.truth().project(when, top.occurrence(), now, dur);
-    }
+    @Nullable Truth truth(long when, long now, float dur);
+
 
     @Nullable default Truth truth(long now, float dur) {
         return truth(now, now, dur);

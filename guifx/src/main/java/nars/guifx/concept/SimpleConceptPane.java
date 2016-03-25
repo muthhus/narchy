@@ -1,5 +1,7 @@
 package nars.guifx.concept;
 
+import javafx.scene.effect.BlendMode;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import nars.NAR;
 import nars.concept.Concept;
@@ -12,18 +14,25 @@ import nars.term.Termed;
 public class SimpleConceptPane extends AbstractConceptPane {
 
     private final BudgetGraph budgetGraph;
-    private final BeliefTablePane beliefTable;
+    private final TaskTablePane beliefTable;
+    final ConceptMenu menu;
 
     public SimpleConceptPane(NAR nar, Termed concept) {
         super(nar, concept);
 
         setCenter(
             new VBox(
-                new ConceptMenu(nar, concept),
-                budgetGraph = new BudgetGraph(nar, Plot2D.BarWave, 96, 0, 32d, concept),
-                beliefTable = new BeliefTablePane(nar)
+                new StackPane(
+                    budgetGraph = new BudgetGraph(nar,
+                        Plot2D.BarWave, 96, 0, 32d, concept
+                    ),
+                    menu = new ConceptMenu(nar, concept)
+                ),
+                beliefTable = new TaskTablePane(nar)
             )
         );
+
+        menu.setBlendMode(BlendMode.EXCLUSION);
     }
 
     @Override

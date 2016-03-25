@@ -55,7 +55,7 @@ public class BeliefAnalysis extends EnergyAnalysis {
 
 	@NotNull
 	public TruthWave wave() {
-		return beliefs().wave();
+		return new TruthWave(beliefs(), nar);
 	}
 
 	@NotNull

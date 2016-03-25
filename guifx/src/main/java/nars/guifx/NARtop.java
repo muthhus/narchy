@@ -18,6 +18,8 @@ import java.util.function.Function;
  * Panel for displaying a set of concepts for a user perspective.
  * Concepts depicting beliefs represent sensors for the system to be made aware of
  * Concepts depicting goals represent user commands
+ *      "top", like unix 'top' command
+ *      a set of active processes with controls
  */
 public class NARtop extends BorderPane {
 

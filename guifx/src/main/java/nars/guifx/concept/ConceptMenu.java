@@ -2,17 +2,21 @@ package nars.guifx.concept;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.FlowPane;
 import nars.NAR;
 import nars.budget.UnitBudget;
+import nars.guifx.NARfx;
 import nars.guifx.nars.NARActionButton;
 import nars.guifx.util.SimpleMenuItem;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Termed;
 
+import static javafx.application.Platform.runLater;
 import static nars.$.neg;
 
 /**
@@ -25,7 +29,14 @@ public class ConceptMenu extends FlowPane {
 
         setAlignment(Pos.TOP_LEFT);
 
-        Menu conceptMenu = new Menu(t.toString());
+        Button button = new Button(t.toString());
+
+        ContextMenu menu = new ContextMenu();
+        button.setOnMouseClicked(e->{
+            if (e.getButton() == MouseButton.PRIMARY) {
+                menu.show(button, e.getScreenX(), e.getScreenY());
+            }
+        });
 
         Button activateButton = new NARActionButton(nar, "+", (n) -> n.conceptualize(t, new UnitBudget(1f, 0.75f, 0.75f), 1f, null));
         Button yesGoalButton = new NARActionButton(nar, "+!", (n) -> n.input(new MutableTask(t, '!').present(nar).log("GUI Goal")));
@@ -43,14 +54,22 @@ public class ConceptMenu extends FlowPane {
         }
 
 
-        conceptMenu.getItems().add(new SimpleMenuItem("Dump", () -> nar.runLater(() -> {
+        menu.getItems().add(new SimpleMenuItem("Expand", () -> nar.runLater(() -> {
+
+            //System.out.println(term + ": " + nar.conceptPriority(term, Float.NaN));
+            runLater(()-> {
+                NARfx.newWindow(nar, t);
+            });
+
+        })));
+        menu.getItems().add(new SimpleMenuItem("Dump", () -> nar.runLater(() -> {
 
             //System.out.println(term + ": " + nar.conceptPriority(term, Float.NaN));
             nar.concept(t).print();
 
         })));
 
-        getChildren().addAll(new MenuBar(conceptMenu), activateButton, trueButton, falseButton, yesGoalButton, noGoalButton, isTrueButton);
+        getChildren().addAll(button, activateButton, trueButton, falseButton, yesGoalButton, noGoalButton, isTrueButton);
 
     }
 

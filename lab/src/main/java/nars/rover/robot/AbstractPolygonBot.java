@@ -38,7 +38,7 @@ public abstract class AbstractPolygonBot extends Being {
     static float friction = 0.8f;
     static float density = 2;
     public float linearThrustPerCycle = 15*5f;
-    public float angularSpeedPerCycle = 15*0.7f;
+    public float angularSpeedPerCycle = 25*0.7f;
 
 
 

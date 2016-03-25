@@ -52,21 +52,19 @@ public class DefaultGrapher extends SpaceGrapher {
 
         this.nar = nar;
 
-        InvalidationListener layoutChange = e -> {
-            IterativeLayout il = layoutType.getInstance();
-
-            setLayout(il!=null ? il : nullLayout);
-
-        };
-
-        layoutType.addListener(layoutChange);
-
 
 
         pojo = new POJOPane(this);
         pojo.layout();
         pojo.autosize();
         getChildren().add(pojo);
+
+        layoutType.addListener(e -> {
+            IterativeLayout il = layoutType.getInstance();
+            runLater(()->{
+                setLayout(il!=null ? il : nullLayout);
+            });
+        });
 
 
 

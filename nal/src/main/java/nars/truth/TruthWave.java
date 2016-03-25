@@ -1,5 +1,6 @@
 package nars.truth;
 
+import nars.NAR;
 import nars.concept.util.BeliefTable;
 import nars.nal.Tense;
 import org.jetbrains.annotations.NotNull;
@@ -23,6 +24,7 @@ public class TruthWave {
     /** sequence of triples (freq, conf, occurr) for each task; NaN for eternal */
     float[] truth;
     int size;
+    public Truth current;
 
     public TruthWave(int initialCapacity) {
         resize(initialCapacity);
@@ -38,13 +40,13 @@ public class TruthWave {
         truth = new float[4*cap];
     }
 
-    public TruthWave(@NotNull BeliefTable b) {
+    public TruthWave(@NotNull BeliefTable b, NAR n) {
         this(b.size());
-        set(b);
+        set(b, n.time(), n.duration());
     }
 
     /** clears and fills this wave with the data from a table */
-    public void set(@NotNull BeliefTable b) {
+    public void set(@NotNull BeliefTable b, long now,int dur) {
         if (b.isEmpty()) {
             clear();
             return;
@@ -84,6 +86,8 @@ public class TruthWave {
         }
         this.start = (long)start;
         this.end = (long)end;
+
+        this.current = b.truth(now, dur);
     }
 
     public boolean isEmpty() { return size == 0; }

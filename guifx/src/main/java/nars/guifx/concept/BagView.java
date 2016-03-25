@@ -7,6 +7,7 @@ import nars.Global;
 import nars.bag.BLink;
 import nars.bag.Bag;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -25,7 +26,7 @@ public class BagView<X> extends VBox /* FlowPane */ implements Runnable {
     final Map<BLink<X>, Node> componentCache = new WeakHashMap<>();
     private final Supplier<Bag<X>> bag;
     private final Function<BLink<X>, Node> builder;
-    final List<BLink<X>> pending = Global.newArrayList();
+    final Collection<BLink<X>> pending = Global.newHashSet(1); //Global.newArrayList();
     final AtomicBoolean queued = new AtomicBoolean();
     private final int limit;
 
@@ -61,7 +62,7 @@ public class BagView<X> extends VBox /* FlowPane */ implements Runnable {
         }
 
         if (!queued.compareAndSet(false, true)) {
-            List<BLink<X>> p = this.pending;
+            Collection<BLink<X>> p = this.pending;
             p.clear();
             bLinks.forEach(limit, p::add);
 

@@ -8,6 +8,8 @@ import nars.bag.impl.ArrayTable;
 import nars.budget.BudgetMerge;
 import nars.task.Revision;
 import nars.task.Task;
+import nars.truth.DefaultTruth;
+import nars.truth.Truth;
 import nars.util.ArraySortedIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -16,6 +18,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+
+import static nars.truth.TruthFunctions.temporalProjection;
 
 
 /**
@@ -52,6 +56,42 @@ public class ArrayBeliefTable implements BeliefTable {
         eternal = new SetTable<>(mp, new EternalTaskIndex(cap));
         temporal = new SetTable<>(mp, new TemporalTaskIndex(cap, this));
 
+    }
+
+    @Nullable public Truth truth(long when, long now, float dur) {
+
+        //old method: project the top task
+        //Task top = top(when, now);
+        //return (top == null) ? null : top.truth().project(when, top.occurrence(), now, dur);
+
+
+        //compute weighted average:
+        float sumFreq = 0, sumConf = 0;
+        float n = 0;
+        Task eternal = topEternal();
+        if (eternal!=null) {
+            //include with strength of 1
+            sumFreq += eternal.freq();
+            sumConf += eternal.conf();
+            n++;
+        }
+
+        List<Task> list = temporal.items.list();
+        for (int i = 0, listSize = list.size(); i < listSize; i++) {
+            Task x = list.get(i);
+
+            //strength decreases with distance in time
+            float strength = x.conf() * temporalProjection(when, x.occurrence(), now, dur);
+
+            sumConf += x.conf() * strength;
+            sumFreq += x.freq() * strength;
+
+            n+=strength;
+        }
+
+        if (n == 0) return null;
+
+        return new DefaultTruth(sumFreq/n, sumConf/n);
     }
 
     public long getMinT() {

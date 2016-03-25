@@ -130,10 +130,9 @@
     -fx-background-color: rgb(20, 50, 10);
 }
 
-.menu {
-    padding: 1px;
-    background: transparent;
-}
+/*.menu {*/
+    /*background: transparent;*/
+/*}*/
 
 
 /*
@@ -705,4 +704,13 @@
 }
 
 .mdiCanvasContainer{
+}
+
+.ConceptPane {
+    -fx-padding-bottom: 5;
+    -fx-border-width: 1;
+    -fx-border-color: transparent;
+}
+.ConceptPane:hover {
+    -fx-border-color: orange;
 }

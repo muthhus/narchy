@@ -33,6 +33,7 @@ public abstract class AbstractConceptPane extends BorderPane implements ChangeLi
             changed(null,null,null);
         });
 
+        getStyleClass().add("ConceptPane");
     }
 
     protected abstract void update(Concept c, long now);

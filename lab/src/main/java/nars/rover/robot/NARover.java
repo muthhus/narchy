@@ -195,35 +195,36 @@ public class NARover extends AbstractPolygonBot {
         };
 
         nar.onFrame(n -> {
-            float thresh = 0.01f;
-            float cc = 0.85f;
+            float thresh = 0.05f;
+            //float cc = 0.85f;
 
+            float freq = 0.95f;
             {
                 float a = motorLeft.motivation(nar);
                 if (a > thresh) {
                     rotateRelative(a);
-                    nar.believe("motor(left)", Tense.Present, 1f, a);
+                    nar.believe("motor(left)", Tense.Present, freq, a);
                 }
             }
             {
                 float a = motorRight.motivation(nar);
                 if (a > thresh) {
                     rotateRelative(-a);
-                    nar.believe("motor(right)", Tense.Present, 1f, a);
+                    nar.believe("motor(right)", Tense.Present, freq, a);
                 }
             }
             {
                 float l = motorFore.motivation(nar);
                 if (l > thresh) {
                     linear(l);
-                    nar.believe("motor(fore)", Tense.Present, 1f, l);
+                    nar.believe("motor(fore)", Tense.Present, freq, l);
                 }
             }
             {
                 float l = motorBack.motivation(nar);
                 if (l > thresh) {
                     linear(-l);
-                    nar.believe("motor(back)", Tense.Present, 1f, l);
+                    nar.believe("motor(back)", Tense.Present, freq, l);
                 }
             }
 

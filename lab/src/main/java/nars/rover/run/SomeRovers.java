@@ -142,7 +142,7 @@ public class SomeRovers {
         nar.core.activationRate.setValue(0.1f);
 
 
-        nar.duration.set(5);
+        nar.duration.set(10);
         nar.conceptForgetDurations.setValue(2f);
         nar.termLinkForgetDurations.setValue(4);
         nar.taskLinkForgetDurations.setValue(3);

@@ -23,7 +23,7 @@ import nars.term.Termed;
  */
 public class DetailedConceptPane extends AbstractConceptPane {
 
-    private final BeliefTablePane beliefChart;
+    private final TaskTablePane beliefChart;
     private final Plot2D budgetGraph;
     private final BagView<Termed> termlinkView;
     private final BagView<Task> tasklinkView;
@@ -32,7 +32,7 @@ public class DetailedConceptPane extends AbstractConceptPane {
         super(nar, conceptTerm);
 
 
-        beliefChart = new BeliefTablePane(nar);
+        beliefChart = new TaskTablePane(nar);
 
         int budgetGraphWidth = 0;
         int budgetGraphHeight = 32;
