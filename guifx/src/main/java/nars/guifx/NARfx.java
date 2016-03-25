@@ -1,15 +1,22 @@
 package nars.guifx;
 
 import com.gs.collections.impl.map.mutable.primitive.IntObjectHashMap;
+import com.sun.javafx.scene.control.inputmap.InputMap;
+import impl.org.controlsfx.table.MappedList;
 import javafx.application.Application;
+import javafx.beans.InvalidationListener;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.ListBinding;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Modality;
@@ -26,7 +33,9 @@ import nars.guifx.util.ColorMatrix;
 import nars.task.Task;
 import nars.term.Termed;
 import nars.util.data.Util;
+import org.reactfx.collection.LiveArrayList;
 
+import java.awt.*;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;

@@ -5,6 +5,7 @@ import nars.Global;
 import nars.NAR;
 import nars.Symbols;
 import nars.guifx.NARfx;
+import nars.guifx.NARtop;
 import nars.nar.AbstractNAR;
 import nars.nar.Default;
 import nars.rover.Sim;
@@ -26,6 +27,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static nars.guifx.NARfx.newWindow;
 import static nars.rover.robot.NARover.*;
 
 /**
@@ -161,17 +163,25 @@ public class SomeRovers {
 //                    }, new Stage());
 
 //
-                NARfx.newConceptWindow(nar,
-                        //new TilePane(Orientation.VERTICAL),
-                        new VBox(),
+                newWindow("Motors",
+                    new NARtop(nar).addAll(
                         "MotorControls(#x,motor,(),#z)",
-                        //fire,
-                        motorLeft,
-                        motorRight,
-                        motorForward,
-                        motorBackward,
-                        motorStop
+                        motorLeft, motorRight,
+                        motorForward, motorBackward,
+                        motorStop /*, turretFire */)
                 );
+
+//                NARfx.newConceptWindow(nar,
+//                        //new TilePane(Orientation.VERTICAL),
+//                        new VBox(),
+//                        "MotorControls(#x,motor,(),#z)",
+//                        //fire,
+//                        motorLeft,
+//                        motorRight,
+//                        motorForward,
+//                        motorBackward,
+//                        motorStop
+//                );
 
                 NARfx.newConceptWindow(nar,
                         //new TilePane(Orientation.VERTICAL),

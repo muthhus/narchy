@@ -7,10 +7,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.TextFlow;
-import nars.Memory;
 import nars.NAR;
 import nars.budget.BudgetMerge;
 import nars.guifx.NARfx;
@@ -28,10 +25,8 @@ import java.util.function.Supplier;
 
 import static javafx.application.Platform.runLater;
 
-/**
- * Created by me on 12/12/15.
- */
-public class NARtop<N extends Node> implements Supplier<Pane> {
+
+public class CommandPane<N extends Node> implements Supplier<Pane> {
 
     final SetTaskPerception active;
     final Map<Task,N> taskNodes = new HashMap();
@@ -39,7 +34,7 @@ public class NARtop<N extends Node> implements Supplier<Pane> {
     private final Pane base;
     private final Function<Task, N> newNode;
 
-    public NARtop(NAR n, Pane base, Function<Task,N> builder) {
+    public CommandPane(NAR n, Pane base, Function<Task,N> builder) {
         super();
 
         this.nar = n;
@@ -136,7 +131,7 @@ public class NARtop<N extends Node> implements Supplier<Pane> {
 //                    new TextFlow(), subbuttonBuilder).get()
 //            );
             NARfx.newWindow("y",
-                    new NARtop(n,
+                    new CommandPane(n,
                             //new TilePane(),
                             new VBox(),
                             taskbuttonBuilder).get()
