@@ -110,9 +110,9 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     private final transient Set<Runnable> nextUniqueTasks = new LinkedHashSet();
 
-    private NARLoop loop = null;
+    private NARLoop loop;
 
-    public NAR(@NotNull Clock clock, TermIndex index, Random rng, @NotNull Atom self) {
+    public NAR(@NotNull Clock clock, TermIndex index, @NotNull Random rng, @NotNull Atom self) {
         super(clock, rng, index);
 
         the(NAR.class, this);
@@ -322,6 +322,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return believe((Termed) term(termString), freq, conf);
     }
 
+    @NotNull
     public NAR goal(@NotNull String termString) throws NarseseException {
         return goal((Termed)term(termString), true);
     }
@@ -856,6 +857,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return this;
     }
 
+    @NotNull
     public NAR forEachConceptTask(boolean includeConceptBeliefs, boolean includeConceptQuestions, boolean includeConceptGoals, boolean includeConceptQuests,
                                   @NotNull Consumer<Task> recip) {
         forEachConcept(c -> {
@@ -1001,7 +1003,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
 
     /** inserts an explicitly specified concept instance */
-    public void on(Termed t) {
+    public void on(@NotNull Termed t) {
         index.set(t);
     }
 

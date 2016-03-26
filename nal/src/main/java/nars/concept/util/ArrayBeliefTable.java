@@ -67,6 +67,7 @@ public class ArrayBeliefTable implements BeliefTable {
     }
 
     /** TODO this value can be cached per cycle (when,now) etc */
+    @Override
     @Nullable public Truth truth(long when, long now, float dur) {
 
         //old method: project the top task
@@ -115,7 +116,7 @@ public class ArrayBeliefTable implements BeliefTable {
                     now,
                     dur);
 
-            strength *= 2; /* square */
+            //strength *= 2; /* square */
 
             sumConf += x.conf() * strength;
             sumFreq += x.freq() * strength;
@@ -325,6 +326,7 @@ public class ArrayBeliefTable implements BeliefTable {
 //        return t == displaced ? null: t;
 //    }
 
+    @Nullable
     public Task contains(Task incoming) {
 
         Task existing = map.get(incoming);
@@ -369,7 +371,7 @@ public class ArrayBeliefTable implements BeliefTable {
             table.forEach(overridden);
             table.clear();
             table.setCapacity(0);
-            nar.logger.info("axiom: {}", incoming);
+            NAR.logger.info("axiom: {}", incoming);
             return true;
         }
 

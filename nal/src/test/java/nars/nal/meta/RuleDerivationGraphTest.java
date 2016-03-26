@@ -1,14 +1,21 @@
 package nars.nal.meta;
 
 import com.google.common.collect.Sets;
+import nars.concept.Concept;
 import nars.nal.Deriver;
 import nars.term.Term;
+import nars.term.Termed;
+import nars.term.index.PatternIndex;
 import org.apache.commons.math3.stat.Frequency;
 import org.junit.Test;
+import org.nustaq.serialization.FSTConfiguration;
 
 import java.util.*;
 
+import static java.lang.System.out;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Created by me on 8/15/15.
@@ -21,16 +28,13 @@ public class RuleDerivationGraphTest {
 
 
         for (Term p : x.roots) {
-            System.out.println();
-            System.out.println(p);
+            out.println();
+            out.println(p);
         }
     }
 
     @Test
     public void testRuleStatistics() {
-        //SimpleDeriver d = new SimpleDeriver(Deriver.standard);
-
-        //return Collections.unmodifiableList(premiseRules);
         List<PremiseRule> R = Deriver.getDefaultDeriver().rules.rules;
         int registeredRules = R.size();
 
@@ -44,7 +48,7 @@ public class RuleDerivationGraphTest {
                 System.err.println("duplicate: " + e);
             }
         }
-        System.out.println("total: " + f.getSumFreq() + ", unique=" + f.getUniqueCount());
+        out.println("total: " + f.getSumFreq() + ", unique=" + f.getUniqueCount());
 
         HashSet<PremiseRule> setRules = Sets.newHashSet(R);
 
@@ -58,7 +62,7 @@ public class RuleDerivationGraphTest {
                 preconds.add(p);
             }
         }
-        System.out.println("total precondtions = " + totalPrecond + ", unique=" + preconds.size());
+        out.println("total precondtions = " + totalPrecond + ", unique=" + preconds.size());
 
         //preconds.forEach(p -> System.out.println(p));
 
@@ -82,6 +86,47 @@ public class RuleDerivationGraphTest {
 //        }
 
     }
+
+    @Test public void testPatternIndexContainsNoConcepts() {
+        TrieDeriver d = Deriver.getDefaultDeriver();
+        List<PremiseRule> R = d.rules.rules;
+        PatternIndex p = d.rules.patterns;
+        //out.println(p.data);
+        //out.println(p.atoms);
+        p.forEach(t -> {
+
+            assertFalse( t instanceof Concept );
+
+            //test all subterms are in the pattern index too
+            t.term().recurseTerms((s, parent)->{
+                Termed sub = p.get(s, false);
+                if (sub == null) {
+                    System.out.println("subterm " + s + " of " + parent + " not in PatternIndex");
+                }
+                assertNotNull(sub);
+            });
+
+            //out.println(t);
+        });
+        //System.out.println("compounds: "+ p.internings + " internings, " + p.size() + " unique");
+
+    }
+
+
+//    @Test public void testRuleSerialization() {
+//
+//        FSTConfiguration conf = FSTConfiguration.createDefaultConfiguration();
+//        conf.setForceSerializable(true);
+//
+//        List<PremiseRule> R = Deriver.getDefaultDeriver().rules.rules;
+//        for (PremiseRule r : R) {
+//            byte barray[] = conf.asByteArray(r);
+//            System.out.println(r + " "+ barray.length + " bytes");
+//
+//            Object decoded = conf.asObject(barray);
+//            System.out.println("\t " + decoded);
+//        }
+//    }
 
 //    @Test
 //    public void testDerivationComparator() {

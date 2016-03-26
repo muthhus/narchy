@@ -90,6 +90,7 @@ public interface TermIndex  {
 
 
     TermBuilder builder();
+    @Nullable
     ConceptBuilder conceptBuilder();
 
 
@@ -568,6 +569,7 @@ public interface TermIndex  {
             this.term = term;
         }
 
+        @NotNull
         @Override
         public String toString() {
             return "InvalidConceptTerm: " + term;
@@ -586,6 +588,7 @@ public interface TermIndex  {
             this.term = term;
         }
 
+        @NotNull
         @Override
         public String toString() {
             return getMessage() + ": " + term;

@@ -1,5 +1,6 @@
 package nars.rover.robot;
 
+import nars.Global;
 import nars.Memory;
 import nars.NAR;
 import nars.concept.Concept;
@@ -32,17 +33,17 @@ public abstract class AbstractPolygonBot extends Being {
 
 
 
-    static float linearDamping = 0.95f;
-    static float angularDamping = 0.95f;
+    static float linearDamping = 1.2f;
+    static float angularDamping = 1.2f;
     static float restitution = 0.9f; //bounciness
     static float friction = 0.8f;
     static float density = 2;
-    public float linearThrustPerCycle = 15*5f;
-    public float angularSpeedPerCycle = 25*0.7f;
+    public float linearThrustPerCycle = 5*5f;
+    public float angularSpeedPerCycle = 15*0.7f;
 
 
 
-    protected final List<Sense> senses = new ArrayList();
+    protected final List<Sense> senses = Global.newArrayList();
 
 
     int mission = 0;

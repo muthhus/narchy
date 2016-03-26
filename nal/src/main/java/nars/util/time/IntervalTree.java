@@ -22,7 +22,7 @@ public class IntervalTree<K extends Comparable<? super K>, V> {
 	}
 
 	@Nullable
-	public final V getEqual(K low, K high){
+	public final V getEqual(@NotNull K low, @NotNull K high){
 		return getEqual(new Between<>(low, high));
 	}
 
@@ -35,7 +35,7 @@ public class IntervalTree<K extends Comparable<? super K>, V> {
 	}
 	
 	@NotNull
-	public List<V> searchOverlapping(K low, K high){
+	public List<V> searchOverlapping(@NotNull K low, @NotNull K high){
 		return searchOverlapping(new Between<>(low, high));
 	}
 	
@@ -55,7 +55,7 @@ public class IntervalTree<K extends Comparable<? super K>, V> {
 	 * Returns a collection of values that wholly contain the range specified.
 	 */
 	@NotNull
-	public List<V> searchContaining(K low, K high){
+	public List<V> searchContaining(@NotNull K low, @NotNull K high){
 		return searchContaining(new Between<>(low, high));
 	}
 	
@@ -75,7 +75,7 @@ public class IntervalTree<K extends Comparable<? super K>, V> {
 	 * Returns a collection of values that are wholly contained by the range specified.
 	 */
 	@NotNull
-	public List<V> searchContainedBy(K low, K high){
+	public List<V> searchContainedBy(@NotNull K low, @NotNull K high){
 		return searchContainedBy(new Between<>(low, high));
 	}
 	
@@ -85,7 +85,7 @@ public class IntervalTree<K extends Comparable<? super K>, V> {
 		}
 	}
 	
-	public void removeOverlapping(K low, K high){
+	public void removeOverlapping(@NotNull K low, @NotNull K high){
 		removeOverlapping(new Between<>(low, high));
 	}
 	
@@ -101,7 +101,7 @@ public class IntervalTree<K extends Comparable<? super K>, V> {
 	/**
 	 * Returns a collection of values that wholly contain the range specified.
 	 */
-	public void removeContaining(K low, K high){
+	public void removeContaining(@NotNull K low, @NotNull K high){
 		removeContaining(new Between<>(low, high));
 	}
 	
@@ -117,7 +117,7 @@ public class IntervalTree<K extends Comparable<? super K>, V> {
 	/**
 	 * Returns a collection of values that are wholly contained by the range specified.
 	 */
-	public void removeContainedBy(K low, K high){
+	public void removeContainedBy(@NotNull K low, @NotNull K high){
 		removeContainedBy(new Between<>(low, high));
 	}
 	
@@ -129,11 +129,11 @@ public class IntervalTree<K extends Comparable<? super K>, V> {
 		root = (root == null) ? new IntervalTreeLeaf<>(key, value) : root.put(key, value);
 	}
 	
-	public void put(K low, K high, V value) {
+	public void put(@NotNull K low, @NotNull K high, V value) {
 		put(new Between<>(low, high),value);
 	}
 
-	public void put(K at, V value) {
+	public void put(@NotNull K at, V value) {
 		//TODO: put(new At<>(low, high),value);
 		put(at, at, value);
 	}

@@ -90,6 +90,7 @@ public interface Concept extends Termed, Comparable {
         return null == (m = meta()) ? null : (C) m.get(key);
     }
     /** follows Map.compute() semantics */
+    @NotNull
     <C> C meta(Object key, BiFunction value);
 
 //    /**

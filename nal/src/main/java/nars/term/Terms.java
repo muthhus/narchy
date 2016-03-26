@@ -119,6 +119,7 @@ public class Terms extends TermBuilder implements TermIndex {
         return this;
     }
 
+    @Nullable
     @Override
     public ConceptBuilder conceptBuilder() {
         return null;

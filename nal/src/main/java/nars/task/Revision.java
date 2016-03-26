@@ -23,7 +23,7 @@ public class Revision {
 
 
     @Nullable
-    public static /*Revision*/Task tryRevision(@NotNull Task newBelief, @NotNull NAR nar, List<Task> beliefs) {
+    public static /*Revision*/Task tryRevision(@NotNull Task newBelief, @NotNull NAR nar, @NotNull List<Task> beliefs) {
         int bsize = beliefs.size();
         if (bsize == 0)
             return null; //nothing to revise with
@@ -123,7 +123,7 @@ public class Revision {
      * @return The budget for the new task
      */
     @NotNull
-    public static Budget budgetRevision(Truth revised, @NotNull Task newBelief, @NotNull Task oldBelief, NAR nar) {
+    public static Budget budgetRevision(@NotNull Truth revised, @NotNull Task newBelief, @NotNull Task oldBelief, @NotNull NAR nar) {
 
         Truth nTruth = newBelief.truth();
         final Budget nBudget = newBelief.budget();

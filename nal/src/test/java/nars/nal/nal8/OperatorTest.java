@@ -228,7 +228,7 @@ public class OperatorTest {
                             .eternal()
                             .truth(1.0f, 0.99f)
                             .parent(question)
-                            .budget((Budget)question)
+                            .budget(question)
                             .because("Addition")
                 );
             }

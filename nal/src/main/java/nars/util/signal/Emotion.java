@@ -23,15 +23,19 @@ import java.util.SortedMap;
 public final class Emotion  {
 
     /** priority rate of Task processing attempted */
+    @NotNull
     public final FloatGuage busy;
 
     /** priority rate of Task processing which had no effect */
+    @NotNull
     public final FloatGuage frustration;
 
     /** task priority overflow rate */
+    @NotNull
     public final FloatGuage stress;
 
     /** happiness rate */
+    @NotNull
     public final FloatGuage happy;
 
     public final Logger logger;
@@ -52,7 +56,7 @@ public final class Emotion  {
 
     final FSTConfiguration conf = FSTConfiguration.createJsonConfiguration(true,false);
 
-    public void print(OutputStream output) {
+    public void print(@NotNull OutputStream output) {
         try {
             conf.encodeToStream(output, this);
         } catch (IOException e) {

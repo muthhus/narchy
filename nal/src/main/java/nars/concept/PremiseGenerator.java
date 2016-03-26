@@ -176,7 +176,7 @@ abstract public class PremiseGenerator /*extends UnifySubst */implements Functio
 
     /** resolves the most relevant belief of a given term/concept */
     @Nullable
-    @Override public final Task apply(Term beliefTerm) {
+    @Override public final Task apply(@NotNull Term beliefTerm) {
 
         Concept beliefConcept = nar.concept(beliefTerm);
         if ((beliefConcept != null) && (beliefConcept.hasBeliefs())) {

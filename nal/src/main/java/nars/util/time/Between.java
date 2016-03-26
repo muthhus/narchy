@@ -7,18 +7,20 @@ public class Between<K extends Comparable<? super K>> implements Comparable<Betw
 	
 	@NotNull public final K low, high;
 	
-	public Between(K low, K high){
+	public Between(@NotNull K low, @NotNull K high){
         this.low = low;
         this.high = high;
 	}
 
+	@NotNull
 	final K getHigh() {
 		return high;
 	}
 
 
 
-    final K getLow() {
+    @NotNull
+	final K getLow() {
 		return low;
 	}
 
@@ -73,7 +75,7 @@ public class Between<K extends Comparable<? super K>> implements Comparable<Betw
 	}
 
 	@Override
-	public int compareTo(Between<K> x) {
+	public int compareTo(@NotNull Between<K> x) {
 		int leftC = low.compareTo(x.low);
 		if (leftC != 0) return leftC;
 		int rightC = high.compareTo(x.high);

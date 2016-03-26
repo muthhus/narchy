@@ -49,6 +49,7 @@ public interface Truth extends Truthed {
      *
      * @return The frequency value
      */
+    @Override
     float freq();
 
 
@@ -61,9 +62,11 @@ public interface Truth extends Truthed {
      *
      * @return The expectation value
      */
+    @Override
     default float expectation() {
         return expectationPositive();
     }
+    @Override
     default float expectation(boolean positive) {
         return positive ? expectationPositive() : expectationNegative();
     }
@@ -235,6 +238,7 @@ public interface Truth extends Truthed {
     @NotNull Truth withConf(float f);
 
 
+    @NotNull
     default Truth project(long when, long occ, long now, float dur) {
         if (occ == when || occ == Tense.ETERNAL)
             return this;

@@ -4,6 +4,7 @@ import nars.NAR;
 import nars.concept.util.BeliefTable;
 import nars.nal.Tense;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 
@@ -24,6 +25,7 @@ public class TruthWave {
     /** sequence of triples (freq, conf, occurr) for each task; NaN for eternal */
     float[] truth;
     int size;
+    @Nullable
     public Truth current;
 
     public TruthWave(int initialCapacity) {
@@ -40,7 +42,7 @@ public class TruthWave {
         truth = new float[4*cap];
     }
 
-    public TruthWave(@NotNull BeliefTable b, NAR n) {
+    public TruthWave(@NotNull BeliefTable b, @NotNull NAR n) {
         this(b.size());
         set(b, n.time(), n.duration());
     }

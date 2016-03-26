@@ -74,7 +74,6 @@ public class SomeRovers {
                 3, 3, 0.618f, 30, 30));*/
 
         boolean addNARRover = true;
-        boolean addQRover = true;
         boolean gui = true;
 
         if (addNARRover) {
@@ -257,19 +256,20 @@ public class SomeRovers {
         NAR n = r.nar;
 
 
-        NarQ nqSpine = new NarQ(n, (i, o) -> (int) Math.ceil(1 + Math.sqrt(i * o)));
+        //NarQ nqSpine = new NarQ(n, (i, o) -> (int) Math.ceil(1 + Math.sqrt(i * o)));
 
 
-        nqSpine.power.setValue(0.05f);
+        //nqSpine.power.setValue(0.05f);
 
-        nqSpine.input.addAll(nqSpine.getBeliefMotivations(SPEED_LEFT, SPEED_RIGHT, SPEED_FORE, SPEED_BACK, EAT_FOOD, EAT_POISON));
+        //nqSpine.input.addAll(nqSpine.getBeliefMotivations(SPEED_LEFT, SPEED_RIGHT, SPEED_FORE, SPEED_BACK, EAT_FOOD, EAT_POISON));
 
 
-        nqSpine.goal.put(new BeliefReward(n, EAT_FOOD), new MutableFloat(1f));
-        nqSpine.goal.put(new NotBeliefReward(n, EAT_POISON), new MutableFloat(0.9f));
+        //nqSpine.goal.put(new BeliefReward(n, EAT_FOOD), new MutableFloat(1f));
+        //nqSpine.goal.put(new NotBeliefReward(n, EAT_POISON), new MutableFloat(0.9f));
         //nq.reward.put(new BeliefReward(n, "speed:forward"), new MutableFloat(0.1f));
 
 
+        /*
         nqSpine.output.addAll(
                 Stream.of(n.terms(
                         motorStop,
@@ -278,6 +278,7 @@ public class SomeRovers {
                         .map(t -> new InputTask(n, t, Symbols.GOAL, false))
                         .collect(Collectors.toList())
         );
+        */
 
 
 //        r.addEye(nq, r.torso, 8, new Vec2(3f, 0f), 0.2f, 0f, 2.5f);
@@ -293,22 +294,22 @@ public class SomeRovers {
         Vec2 front = new Vec2(2.7f, 0);
 
         //feeler
-        List<SensorConcept> whisker = r.addEyeWithMouth(r, "t", nqSpine, r.torso, 3, 4, front,
+        List<SensorConcept> whisker = r.addEyeWithMouth(r, "t",  r.torso, 3, 4, front,
                 0.5f, 0, dist / 6f, 0.2f);
 
 
         //nearsight & mouth
-        List<SensorConcept> nearSight = r.addEyeWithMouth(r, "n", nqSpine, r.torso, 7, 2, front,
+        List<SensorConcept> nearSight = r.addEyeWithMouth(r, "n",  r.torso, 7, 2, front,
                 0.5f, 0, dist / 2f, 0.2f);
 
 
         //farsight
-        List<SensorConcept> farSight = r.addEye(r, "f", nqSpine, r.torso, 5, 5, front,
+        List<SensorConcept> farSight = r.addEye(r, "f",  r.torso, 5, 5, front,
                 1.25f, 0, dist, (e) -> {
                 });
 
         //reverse
-        List<SensorConcept> backSight = r.addEye(r, "b", nqSpine, r.torso, 3, 9, new Vec2(-0.5f, 0),
+        List<SensorConcept> backSight = r.addEye(r, "b",  r.torso, 3, 9, new Vec2(-0.5f, 0),
                 1.25f, pi / 2f, dist / 2f, (e) -> {
                 });
 
@@ -321,15 +322,11 @@ public class SomeRovers {
 //        nqSpine.outs.addAll(ar.controls);
 
 
-        Arm ac = r.addArm(r, "ac", new NarQ(n)/* ... */, 0, 0, 0); //pi * 1.5f
-        nqSpine.output.addAll(ac.controls);
-        Arm ad = r.addArm(r, "ad", new NarQ(n)/* ... */, 0, 0, 0); //pi * 1.5f
-        nqSpine.output.addAll(ad.controls);
+        //Arm ac = r.addArm(r, "ac", new NarQ(n)/* ... */, 0, 0, 0); //pi * 1.5f
+        //nqSpine.output.addAll(ac.controls);
+        //Arm ad = r.addArm(r, "ad", new NarQ(n)/* ... */, 0, 0, 0); //pi * 1.5f
+        //nqSpine.output.addAll(ad.controls);
 
-//        Arm ad = r.addArm("ad", nqArm /* ... */, 0, 0, 0); //pi * 1.5f
-//        nqSpine.output.addAll(ad.controls);
-//        Arm ae = r.addArm("ae", nqArm /* ... */, 0, 0, 0); //pi * 1.5f
-//        nqSpine.output.addAll(ae.controls);
 
         return new List[] {
                 farSight, nearSight, whisker, backSight

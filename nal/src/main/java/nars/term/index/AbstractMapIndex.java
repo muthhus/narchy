@@ -39,68 +39,13 @@ public abstract class AbstractMapIndex implements TermIndex {
 
     public final Termed get(@NotNull Termed key, boolean createIfMissing) {
 
-        if (key instanceof Ellipsis)
-            ///throw new RuntimeException("ellipsis not allowed in this index");
-            return null;
-
-//        if (!key.isNormalized()) {
-//            Termed u = normalized(key.term());
-//            if (u==null) {
-//                return null; //this one component could not be conceptualized, this is somewhat normal depending on variable rules
-//            } else {
-//                key = u.term();
-//            }
-//        }
-
-
-//        if (!isInternable(x)) {
-//            //TODO intern any subterms which can be
-//            return x;
-//        }
-
-//        Termed y = the(x);
-//        if (y == null) {
-//            if ((y = the(x)) !=null) {
-//                put(y);
-//                if (!y.equals(x))
-//                    return x; //return original non-anonymized
-//            }
-//        }
-
         return key instanceof Compound ?
                 theCompound((Compound) key, createIfMissing)
                 : theAtom((Atomic)key.term(), createIfMissing);
     }
 
 
-//    /** get the instance that will be internalized */
-//    @NotNull
-//    public static Termed intern(@NotNull Op op, int relation, @NotNull TermContainer t) {
-//        //return (TermMetadata.hasMetadata(t) || op.isA(TermMetadata.metadataBits)) ?
-//                //newMetadataCompound(op, relation, t) :
-//        return newInternCompound(op, t, relation);
-//    }
-
-
-
-//    @Nullable
-//    public static Term newMetadataCompound(@NotNull Op op, int relation, @NotNull TermContainer t) {
-//        //create unique
-//        return $.the(op, relation, t);
-//    }
-
-//    @NotNull
-//    static Termed newInternCompound(@NotNull Op op, @NotNull TermContainer subterms, int relation) {
-//        return new GenericCompound(
-//            op, relation, (TermVector) subterms
-//        );
-//    }
-
-//    @Nullable
-//    default Termed getOrAdd(@NotNull Termed t) {
-//    }
-
-    final Termed theAtom(@NotNull Atomic t, boolean createIfMissing) {
+    Termed theAtom(@NotNull Atomic t, boolean createIfMissing) {
         SymbolMap a = this.atoms;
         return (createIfMissing ? a.resolveOrAdd(t, conceptBuilder) : a.resolve(t)) ;
     }
@@ -119,19 +64,6 @@ public abstract class AbstractMapIndex implements TermIndex {
     }
 
 
-//    @Override
-//    public abstract Termed getTermIfPresent(Termed t);
-
-//    @Override
-//    public abstract void clear();
-
-//    @Override
-//    public abstract int subtermsCount();
-
-//    @Override
-//    public abstract int size();
-
-
     @Override
     public void print(@NotNull PrintStream out) {
 
@@ -140,20 +72,8 @@ public abstract class AbstractMapIndex implements TermIndex {
 
     }
 
-//    @Nullable
-//    abstract protected TermContainer get(TermContainer subterms);
-//
-//
-//    @Override
-//    public void print(PrintStream out) {
-//        BiConsumer itemPrinter = (k, v) -> System.out.println(v.getClass().getSimpleName() + ": " + v);
-//        forEach(d -> itemPrinter);
-//        System.out.println("--");
-//        subterms.forEach(itemPrinter);
-//    }
 
     @Override
     public abstract void forEach(Consumer<? super Termed> c);
-
 
 }

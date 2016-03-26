@@ -18,20 +18,21 @@ import static nars.util.data.Sensor.direct;
 /** primarily a collector for believing time-changing input signals */
 public class SensorConcept extends CompoundConcept implements FloatFunction<Term> {
 
+    @NotNull
     private final Sensor sensor;
     private FloatSupplier input;
     private float current;
 
 
-    public SensorConcept(@NotNull String compoundTermString, NAR n, FloatSupplier input) throws Narsese.NarseseException {
-        this((Compound) $.$(compoundTermString), n, input, direct);
+    public SensorConcept(@NotNull String compoundTermString, @NotNull NAR n, FloatSupplier input) throws Narsese.NarseseException {
+        this($.$(compoundTermString), n, input, direct);
     }
 
-    public SensorConcept(@NotNull Compound term, NAR n, FloatSupplier input)  {
+    public SensorConcept(@NotNull Compound term, @NotNull NAR n, FloatSupplier input)  {
         this(term, n, input, direct);
     }
 
-    public SensorConcept(@NotNull Compound term, NAR n, FloatSupplier input, FloatToFloatFunction toFreq)  {
+    public SensorConcept(@NotNull Compound term, @NotNull NAR n, FloatSupplier input, FloatToFloatFunction toFreq)  {
         super(term, n);
 
         this.sensor = new Sensor(n, this, this, toFreq);
@@ -44,6 +45,7 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
     /**
      * adjust min/max temporal resolution of feedback input
      */
+    @NotNull
     public SensorConcept timing(int minCycles, int maxCycles) {
 
         sensor.minTimeBetweenUpdates(minCycles);
@@ -69,11 +71,13 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
         return this.current = input.asFloat();
     }
 
+    @NotNull
     public SensorConcept resolution(float v) {
         sensor.resolution(v);
         return this;
     }
 
+    @NotNull
     public SensorConcept pri(float v) {
         sensor.pri(v);
         return this;

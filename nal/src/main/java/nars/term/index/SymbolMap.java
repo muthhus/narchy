@@ -3,9 +3,11 @@ package nars.term.index;
 import nars.concept.AtomConcept;
 import nars.concept.Concept;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -13,18 +15,19 @@ import java.util.function.Function;
  */
 public interface SymbolMap {
 
-    AtomConcept resolve(String id);
+    Termed resolve(String id);
 
-    default AtomConcept resolve(@NotNull Atomic a) {
+    default Termed resolve(@NotNull Atomic a) {
         return resolve(a.toString());
     }
 
-    AtomConcept resolveOrAdd(String s,Function<Term, Concept> conceptBuilder);
+    Termed resolveOrAdd(String s, Function<Term, ? extends Termed> conceptBuilder);
 
-    default AtomConcept resolveOrAdd(@NotNull Atomic a, Function<Term, Concept> conceptBuilder) {
+    default Termed resolveOrAdd(@NotNull Atomic a, Function<Term, ? extends Termed> conceptBuilder) {
         return resolveOrAdd(a.toString(), conceptBuilder);
     }
 
     void print(Appendable out);
 
+    void forEach(Consumer<? super Termed> c);
 }

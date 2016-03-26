@@ -154,33 +154,34 @@ public class NARover extends AbstractPolygonBot {
         sickSensor = new SensorConcept(EAT_POISON, nar, () -> sick, linearPositive)
             .timing(minUpdateTime, maxUpdateTime);
 
-        float motorThresh = 0.1f;
+        float motorThresh = 0.5f;
 
         MotorConcept motorLeft = new MotorConcept("motor(left)", nar, (a) -> {
             if (a < motorThresh) return 0;
             return angularThrust(a);
         });
 
+        int minMotorFeedbackCycles = nar.duration() / 2;
+        int maxMotorFeedbackCycles = nar.duration() * 3;
         MotorConcept motorRight = new MotorConcept("motor(right)", nar, (a) -> {
             if (a < motorThresh) return 0;
             return angularThrust(-a);
-        });
+        }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
 
         MotorConcept motorFore = new MotorConcept("motor(fore)", nar, (l) -> {
-            if (l < motorThresh) return 0;
-            return linearThrust(l);
-        });
+            return l < motorThresh ? 0 : linearThrust(l);
+        }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);;
 
         MotorConcept motorBack = new MotorConcept("motor(back)", nar, (l) -> {
             if (l < motorThresh) return 0;
             return linearThrust(-l);
-        });
+        }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);;
 
         MotorConcept motorStop = new MotorConcept("motor(stop)", nar, (s) -> {
             if (s < motorThresh) return 0;
             stop(s);
             return s;
-        });
+        }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);;
 
         MotorConcept turretFire = new MotorConcept("turret(fire)", nar, (s) -> {
 
@@ -191,7 +192,7 @@ public class NARover extends AbstractPolygonBot {
             }
             return 0; //unfired;
 
-        });
+        }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);;
 
 
     }
@@ -417,18 +418,18 @@ public class NARover extends AbstractPolygonBot {
 
 
 
-    public List<SensorConcept> addEye(Being b, String id, NarQ controller, Body base, int detail, Vec2 center, float arc, float centerAngle, float distance) {
-        return addEye(b, id, controller, base, 1, detail, center, arc, centerAngle, distance, (v) -> {});
+    public List<SensorConcept> addEye(Being b, String id, Body base, int detail, Vec2 center, float arc, float centerAngle, float distance) {
+        return addEye(b, id, base, 1, detail, center, arc, centerAngle, distance, (v) -> {});
     }
-    public List<SensorConcept> addEyeWithMouth(Being b, String id, NarQ controller, Body base, int pixels, int detail, Vec2 center, float arc, float centerAngle, float distance, float mouthArc) {
-        return addEye(b, id, controller, base, pixels, detail, center, arc, centerAngle, distance, (v) -> {
+    public List<SensorConcept> addEyeWithMouth(Being b, String id, Body base, int pixels, int detail, Vec2 center, float arc, float centerAngle, float distance, float mouthArc) {
+        return addEye(b, id, base, pixels, detail, center, arc, centerAngle, distance, (v) -> {
             //float angle = v.angle;
             v.setEats(true);
                     //((angle < mouthArc / 2f) || (angle > (Math.PI * 2f) - mouthArc / 2f)));
         });
     }
 
-    public List<SensorConcept> addEye(Being b, String id, NarQ controller, Body base, int pixels, int resolution, Vec2 center,
+    public List<SensorConcept> addEye(Being b, String id, Body base, int pixels, int resolution, Vec2 center,
                                       float arc, float centerAngle, float distance, Consumer<VisionRay> each) {
 
         //final float twoPi = (float)Math.PI * 2f;
@@ -486,7 +487,6 @@ public class NARover extends AbstractPolygonBot {
                         pri(pixelPri);
                 sensorConcepts.add(visionSensor);
 
-                controller.input.add(value);
             }
 
             b.getMaterial().layers.add(v);

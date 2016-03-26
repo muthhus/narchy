@@ -17,6 +17,7 @@ import java.util.function.Predicate;
  */
 public interface ListTable<V, L> extends Table<V, L> {
 
+    @Nullable
     ListTable<Task, Task> Empty = new ListTable() {
 
         @Override
@@ -89,9 +90,11 @@ public interface ListTable<V, L> extends Table<V, L> {
     };
 
     /** first (0th) item */
+    @Nullable
     L top();
 
     /** last item */
+    @Nullable
     L bottom();
 
 

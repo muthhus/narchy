@@ -33,7 +33,7 @@ public class Terminal extends AbstractNAR {
     public Terminal(int capacity) {
         this(capacity, new XORShiftRandom(1), new FrameClock());
     }
-    public Terminal(int capacity, Random random, Clock c) {
+    public Terminal(int capacity, @NotNull Random random, Clock c) {
         super(c, new AbstractNAR.DefaultTermIndex(capacity, random), random);
         the("input", initInput());
     }
@@ -48,7 +48,7 @@ public class Terminal extends AbstractNAR {
     }
 
     @Override
-    public Concept conceptualize(Termed termed, Budgeted activation, float scale, MutableFloat overflow) {
+    public Concept conceptualize(@NotNull Termed termed, Budgeted activation, float scale, MutableFloat overflow) {
         return concept(termed); //ignore activation
     }
 

@@ -26,6 +26,7 @@ import static nars.nal.UtilityFunctions.or;
 public interface BeliefTable extends TaskTable {
 
 
+    @Nullable
     BeliefTable EMPTY = new BeliefTable() {
 
         @Override

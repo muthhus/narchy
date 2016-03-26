@@ -33,6 +33,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
     final Function<Variable, VariableConcept> varBuilder =
             (Variable v) -> new VariableConcept(v, termbag(), taskbag());
 
+    @Nullable
     final Function<Compound, CompoundConcept> compoundBuilder = (Compound t) -> {
 
         Bag<Termed> termbag = termbag();
@@ -52,6 +53,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
     //return (!(t instanceof Space)) ?
     //new SpaceConcept((Space) t, taskLinks, termLinks);
 
+    @NotNull
     @Override public Bag<Task> taskbag() {
         return new CurveBag<Task>(taskLinkBagSize.intValue(), rng)
                 .merge(mergeDefault());
@@ -62,6 +64,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
         return BudgetMerge.plusDQBlend;
     }
 
+    @NotNull
     @Override public Bag<Termed> termbag() {
         return new CurveBag<Termed>(termLinkBagSize.intValue(), rng)
                 .merge(mergeDefault());

@@ -21,6 +21,7 @@ public final class TermTemplate implements Termed {
         return term.term();
     }
 
+    @NotNull
     @Override
     public String toString() {
         return "(" + term + "," + strength + ')';

@@ -44,10 +44,11 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
     public static final Logger logger = LoggerFactory.getLogger(AbstractConcept.class);
 
     /** returns the outgoing component only */
+    @Nullable
     public static final BLink<Termed> linkTerm(@NotNull Concept source, @NotNull Termed targetTerm,
                                                @NotNull Budgeted b, float subScale, boolean alsoReverse,
                                                @Nullable MutableFloat conceptOverflow,
-                                               @Nullable MutableFloat termlinkOverflow, NAR nar) {
+                                               @Nullable MutableFloat termlinkOverflow, @NotNull NAR nar) {
 
         Concept target = nar.conceptualize(targetTerm, b, subScale, conceptOverflow);
         assert (target != null);

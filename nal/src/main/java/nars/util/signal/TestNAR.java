@@ -369,11 +369,13 @@ public class TestNAR  {
         return mustOutput(ttt, ttt + withinCycles, term, '.', freq, freq, confidence, confidence, nar.time(t));
     }
 
-    public TestNAR mustNotOutput(long withinCycles, String sentenceTerm, char punc, long occ) {
+    @NotNull
+    public TestNAR mustNotOutput(long withinCycles, @NotNull String sentenceTerm, char punc, long occ) {
         return mustNotOutput(withinCycles, sentenceTerm, punc, 0, 1, 0, 1, occ);
     }
 
-    public TestNAR mustNotOutput(long withinCycles, String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax, long occ) {
+    @NotNull
+    public TestNAR mustNotOutput(long withinCycles, @NotNull String sentenceTerm, char punc, float freqMin, float freqMax, float confMin, float confMax, long occ) {
         return mustEmit(outputEvents,
                 nar.time(), nar.time() + withinCycles,
                 sentenceTerm, punc, freqMin, freqMax, confMin,
@@ -439,6 +441,7 @@ public class TestNAR  {
         //explainable(t);
         return this;
     }
+    @NotNull
     public TestNAR askAt(int i, String term) {
         nar.inputAt(i, term + "?");
         return this;

@@ -55,6 +55,7 @@ public enum $ /* TODO: implements TermIndex */ {
         //        catch (InvalidInputException e) { }
     }
 
+    @Nullable
     @Deprecated public static MutableTask $(@NotNull String term, char punc) {
         return new MutableTask($.$(term), punc);
     }
@@ -280,7 +281,7 @@ public enum $ /* TODO: implements TermIndex */ {
     @NotNull
     public static Compound seteMap(@NotNull Map<Term,Term> map) {
         return $.sete(
-                (Collection<? extends Term>) map.entrySet().stream().map(
+                map.entrySet().stream().map(
                         e -> $.p(e.getKey(),e.getValue()))
                         .collect( toList())
         );
@@ -288,7 +289,7 @@ public enum $ /* TODO: implements TermIndex */ {
     @NotNull
     public static <X> Compound seteMap(@NotNull Map<Term,? extends X> map, @NotNull Function<X, Term> toTerm) {
         return $.sete(
-                (Collection<? extends Term>) map.entrySet().stream().map(
+                map.entrySet().stream().map(
                         e -> $.p(e.getKey(), toTerm.apply(e.getValue())))
                         .collect( toList())
         );
@@ -683,25 +684,30 @@ public enum $ /* TODO: implements TermIndex */ {
         return the(IMAGE_EXT, index + 1, argument);
     }
 
+    @Nullable
     public static Compound image(int relation, Term... elements) {
         return image(relation, true, elements);
     }
+    @Nullable
     public static Compound imageInt(int relation, Term... elements) {
         return image(relation, false, elements);
     }
 
-    public static Compound image(int relation, boolean ext, Term... elements) {
+    @Nullable
+    public static Compound image(int relation, boolean ext, @NotNull Term... elements) {
         Term[] elementsMasked = ArrayUtils.remove(elements, relation);
         Term related = elements[relation];
         Term img = the(ext ? IMAGE_EXT : IMAGE_INT, relation, elementsMasked);
 
         return (Compound) ( ext ? $.inh(related, img) : $.inh(img, related));
     }
-    public static Compound image(int relation, Compound product) {
+    @Nullable
+    public static Compound image(int relation, @NotNull Compound product) {
         assert(product.op() == Op.PRODUCT);
         return image(relation, true, product.terms());
     }
-    public static Compound imageInt(int relation, Compound product) {
+    @Nullable
+    public static Compound imageInt(int relation, @NotNull Compound product) {
         assert(product.op() == Op.PRODUCT);
         return image(relation, false, product.terms());
     }

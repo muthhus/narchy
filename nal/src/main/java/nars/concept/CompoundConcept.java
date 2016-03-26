@@ -66,17 +66,17 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
         super(term, taskLinks, termLinks);
     }
 
-    public CompoundConcept(@NotNull String compoundTermString, NAR n) throws Narsese.NarseseException {
+    public CompoundConcept(@NotNull String compoundTermString, @NotNull NAR n) throws Narsese.NarseseException {
         this((Compound) $.$(compoundTermString), n);
     }
 
     /** used for setting an explicit OperationConcept instance via java; activates it on initialization */
-    public CompoundConcept(@NotNull Compound term, NAR n) {
+    public CompoundConcept(@NotNull Compound term, @NotNull NAR n) {
         this(term, n.index.conceptBuilder());
     }
 
     /** default construction by a NAR on conceptualization */
-    public CompoundConcept(@NotNull Compound term, ConceptBuilder b) {
+    public CompoundConcept(@NotNull Compound term, @NotNull ConceptBuilder b) {
         this(term, b.termbag(), b.taskbag());
     }
 
@@ -677,35 +677,35 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
 //                    subScale = scale / numTemplates;
 //            }
 
-            /*if (subScale >= minScale)*/ {
-                MutableFloat subConceptOverflow = new MutableFloat(/*0*/);
+            /*if (subScale >= minScale)*/
+            MutableFloat subConceptOverflow = new MutableFloat(/*0*/);
 
-                //int numUnder = 0;
+            //int numUnder = 0;
 
+            for (int i = 0, templatesSize = templates.size(); i < templatesSize; i++) {
+                TermTemplate tt = templates.get(i);
+                float subScale = scale * tt.strength;
+
+                //Link the peer termlink bidirectionally
+                if (subScale > minScale) //TODO use a min bound to prevent the iteration ahead of time
+                    linkTerm(this, tt.term, b, subScale, true, subConceptOverflow, null, nar);
+            }
+
+
+            float scOver = subConceptOverflow.floatValue();
+            if (scOver > minScale) {
+                // recursive overflow accumulated to callee's overflow
+
+
+                //Simple method: just dispense equal proportion of the overflow to all template concepts equally
                 for (int i = 0, templatesSize = templates.size(); i < templatesSize; i++) {
                     TermTemplate tt = templates.get(i);
-                    float subScale = scale * tt.strength;
-
-                    //Link the peer termlink bidirectionally
-                    if (subScale > minScale) //TODO use a min bound to prevent the iteration ahead of time
-                        linkTerm(this, tt.term, b, subScale, true, subConceptOverflow, null, nar);
+                    float subScale = scOver * tt.strength;
+                    if (subScale > minScale)
+                        linkTerm(this, tt.term, b, subScale, true, conceptOverflow, null, nar);
                 }
 
-
-                float scOver = subConceptOverflow.floatValue();
-                if (scOver > minScale) {
-                    // recursive overflow accumulated to callee's overflow
-
-
-                    //Simple method: just dispense equal proportion of the overflow to all template concepts equally
-                    for (int i = 0, templatesSize = templates.size(); i < templatesSize; i++) {
-                        TermTemplate tt = templates.get(i);
-                        float subScale = scOver * tt.strength;
-                        if (subScale > minScale)
-                            linkTerm(this, tt.term, b, subScale, true, conceptOverflow, null, nar);
-                    }
-
-                    //TODO More fair method:
+                //TODO More fair method:
 //                    //iterate over templates, psuedorandomly by choosing a random start index and visiting each modulo N
 //                    int i = nar.random.nextInt(numTemplates);
 //                    for (int n = 0; n < numTemplates; n++) {
@@ -713,8 +713,8 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
 //
 //                    }
 
-                }
-                //logger.debug("{} link: {} budget overflow {}", this, b, overflow);
+            }
+            //logger.debug("{} link: {} budget overflow {}", this, b, overflow);
 
 
 //                //redistribute overflow to termlink templates:
@@ -736,7 +736,6 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
 //                    }
 //
 //                }
-            }
 
             return true;
         }

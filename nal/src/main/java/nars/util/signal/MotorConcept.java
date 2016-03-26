@@ -25,17 +25,18 @@ import java.util.function.Consumer;
 
 public class MotorConcept extends OperationConcept implements Consumer<NAR>, FloatFunction<Term> {
 
+    @NotNull
     private final Sensor feedback;
     private final Logger logger;
     private FloatToFloatFunction motor;
     float nextFeedback;
 
-    public MotorConcept(@NotNull String compoundTermString, NAR n, FloatToFloatFunction motor) throws Narsese.NarseseException {
+    public MotorConcept(@NotNull String compoundTermString, @NotNull NAR n, FloatToFloatFunction motor) throws Narsese.NarseseException {
         this(compoundTermString, n);
         this.motor = motor;
     }
 
-    public MotorConcept(@NotNull String compoundTermString, NAR n) throws Narsese.NarseseException {
+    public MotorConcept(@NotNull String compoundTermString, @NotNull NAR n) throws Narsese.NarseseException {
         super(compoundTermString, n);
         this.logger = LoggerFactory.getLogger(getClass() + ":" + term);
 
@@ -55,7 +56,7 @@ public class MotorConcept extends OperationConcept implements Consumer<NAR>, Flo
                 //Nothing, dont auto-start
             }
 
-        }.minTimeBetweenUpdates(n.duration()/2);
+        };
 
         n.onFrame(this);
     }
@@ -79,6 +80,7 @@ public class MotorConcept extends OperationConcept implements Consumer<NAR>, Flo
         return motor;
     }
 
+    @NotNull
     public final Sensor getFeedback() {
         return feedback;
     }
@@ -86,8 +88,10 @@ public class MotorConcept extends OperationConcept implements Consumer<NAR>, Flo
     /**
      * adjust min/max temporal resolution of feedback input
      */
-    public MotorConcept setFeedbackTiming(int minCycles) {
+    @NotNull
+    public MotorConcept setFeedbackTiming(int minCycles, int maxCycles) {
         feedback.minTimeBetweenUpdates(minCycles);
+        feedback.maxTimeBetweenUpdates(maxCycles);
         return this;
     }
 
@@ -113,7 +117,7 @@ public class MotorConcept extends OperationConcept implements Consumer<NAR>, Flo
     }
 
     @Override
-    public final void accept(NAR nar) {
+    public final void accept(@NotNull NAR nar) {
 
         FloatToFloatFunction m = getMotor();
         if (m != null) {

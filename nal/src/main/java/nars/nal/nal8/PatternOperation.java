@@ -19,7 +19,7 @@ public abstract class PatternOperation implements Function<Task, List<Task>> {
     @Nullable
     public final Term pattern;
 
-    protected PatternOperation(String pattern) {
+    protected PatternOperation(@NotNull String pattern) {
         this.pattern = Narsese.the().term(pattern);
     }
 

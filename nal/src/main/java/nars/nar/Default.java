@@ -74,7 +74,7 @@ public class Default extends AbstractNAR {
         this(activeConcepts, conceptsFirePerCycle, taskLinksPerConcept, termLinksPerConcept, new XorShift128PlusRandom(1));
     }
 
-    public Default(int activeConcepts, int conceptsFirePerCycle, int taskLinksPerConcept, int termLinksPerConcept, Random random) {
+    public Default(int activeConcepts, int conceptsFirePerCycle, int taskLinksPerConcept, int termLinksPerConcept, @NotNull Random random) {
         this(activeConcepts, conceptsFirePerCycle, taskLinksPerConcept, termLinksPerConcept, random, new DefaultTermIndex(256, random));
     }
 
@@ -239,7 +239,7 @@ public class Default extends AbstractNAR {
 
 
     @Override
-    public final float conceptPriority(Termed termed, float priIfNonExistent) {
+    public final float conceptPriority(@NotNull Termed termed, float priIfNonExistent) {
         Concept cc = concept(termed);
         if (cc != null) {
             BLink<Concept> c = core.active.get(cc);
@@ -252,7 +252,7 @@ public class Default extends AbstractNAR {
 
     @Nullable
     @Override
-    public Concept conceptualize(Termed termed, @NotNull Budgeted activation, float scale, @Nullable MutableFloat conceptOverflow) {
+    public Concept conceptualize(@NotNull Termed termed, @NotNull Budgeted activation, float scale, @Nullable MutableFloat conceptOverflow) {
 
         Concept c = concept(termed, true);
         if (c != null) {
@@ -353,6 +353,7 @@ public class Default extends AbstractNAR {
         return this;
     }
 
+    @Nullable
     @Override
     public Function<Term, Concept> newConceptBuilder() {
         return new DefaultConceptBuilder(random,

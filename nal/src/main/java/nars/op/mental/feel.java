@@ -37,7 +37,7 @@ public abstract class feel extends SyncOperator {
      * @param value The value to be checked, in [0, 1]
      * @return Immediate results as Tasks
      */
-    protected static Task feeling(float value, @NotNull NAR nar, Term feeling) {
+    protected static Task feeling(float value, @NotNull NAR nar, @NotNull Term feeling) {
 
         Term content = $.instprop(nar.self, feeling);
 

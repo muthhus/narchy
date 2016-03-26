@@ -107,7 +107,7 @@ public enum TermLinkBuilder {
     /**
      * determines whether to grow a 1st-level termlink to a subterm
      */
-    protected static Term growComponent(Term t, int level, @NotNull NAR nar, @NotNull Collection<Termed> target) {
+    protected static Term growComponent(@NotNull Term t, int level, @NotNull NAR nar, @NotNull Collection<Termed> target) {
         Concept ct = nar.concept(t, true);
         if ((ct == null) || (ct instanceof Variable)) {
             return null;

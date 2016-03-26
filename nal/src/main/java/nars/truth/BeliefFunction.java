@@ -33,7 +33,7 @@ public enum BeliefFunction implements TruthOperator {
 
     StructuralIntersection() {
         @Nullable
-        @Override public Truth apply(final Truth T, final Truth B, @NotNull Memory m, float minConf) {
+        @Override public Truth apply(final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
             if (B == null) return null;
             return TruthFunctions.intersection(B, defaultTruth(m), minConf);
         }
@@ -42,14 +42,14 @@ public enum BeliefFunction implements TruthOperator {
     @SinglePremise @AllowOverlap
     StructuralDeduction() {
         @NotNull
-        @Override public Truth apply(final Truth T, final Truth B, @NotNull Memory m, float minConf) {
+        @Override public Truth apply(@Nullable final Truth T, final Truth B, @NotNull Memory m, float minConf) {
             return (T == null) ? null : TruthFunctions.deduction1(T, defaultConfidence(m), minConf);
         }
     },
 
     StructuralAbduction() {
         @Nullable
-        @Override public Truth apply(final Truth T, final Truth B, @NotNull Memory m, float minConf) {
+        @Override public Truth apply(final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
             return (B != null) ? TruthFunctions.abduction(B, defaultTruth(m), minConf) : null;
         }
     },
@@ -57,14 +57,14 @@ public enum BeliefFunction implements TruthOperator {
     @AllowOverlap
     Deduction() {
         @Nullable
-        @Override public Truth apply(Truth T, Truth B, @NotNull Memory m, float minConf) {
+        @Override public Truth apply(@Nullable Truth T, @Nullable Truth B, @NotNull Memory m, float minConf) {
             return ((B == null) || (T == null)) ? null : TruthFunctions.deduction(T, B, minConf);
         }
     },
 
     Induction() {
         @Nullable
-        @Override public Truth apply(final Truth T, final Truth B, @NotNull Memory m, float minConf) {
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
             return ((B == null) || (T == null)) ? null : TruthFunctions.induction(T, B, minConf);
         }
     },
@@ -72,28 +72,28 @@ public enum BeliefFunction implements TruthOperator {
     @AllowOverlap
     InductionOverlappable() {
         @Nullable
-        @Override public Truth apply(final Truth T, final Truth B, @NotNull Memory m, float minConf) {
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
             return ((B == null) || (T == null)) ? null : TruthFunctions.induction(T, B, minConf);
         }
     },
 
     Abduction() {
         @Nullable
-        @Override public Truth apply(final Truth T, final Truth B, @NotNull Memory m, float minConf) {
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
             return ((B == null) || (T == null)) ? null : TruthFunctions.abduction(T, B, minConf);
         }
     },
 
     Comparison() {
         @Nullable
-        @Override public Truth apply(final Truth T, final Truth B, @NotNull Memory m, float minConf) {
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
             return ((B == null) || (T == null)) ? null : TruthFunctions.comparison(T, B, minConf);
         }
     },
 
     Conversion() {
         @Nullable
-        @Override public Truth apply(final Truth T, final Truth B, @NotNull Memory m, float minConf) {
+        @Override public Truth apply(final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
             return (B == null) ? null : TruthFunctions.conversion(B, minConf);
         }
     },
@@ -101,7 +101,7 @@ public enum BeliefFunction implements TruthOperator {
     @SinglePremise
     Negation() {
         @NotNull
-        @Override public Truth apply(final Truth T, /* nullable */ final Truth B, @NotNull Memory m, float minConf) {
+        @Override public Truth apply(@Nullable final Truth T, /* nullable */ final Truth B, @NotNull Memory m, float minConf) {
             return (T == null) ? null : TruthFunctions.negation(T, minConf);
         }
     },
@@ -109,7 +109,7 @@ public enum BeliefFunction implements TruthOperator {
     @SinglePremise
     Contraposition() {
         @Nullable
-        @Override public Truth apply(final Truth T, /* nullable */ final Truth B, @NotNull Memory m, float minConf) {
+        @Override public Truth apply(@Nullable final Truth T, /* nullable */ final Truth B, @NotNull Memory m, float minConf) {
             return (T == null) ? null : TruthFunctions.contraposition(T, minConf);
         }
     },
@@ -117,14 +117,14 @@ public enum BeliefFunction implements TruthOperator {
     @AllowOverlap
     Resemblance() {
         @Nullable
-        @Override public Truth apply(final Truth T, final Truth B, @NotNull Memory m, float minConf) {
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
             return ((B == null) || (T == null)) ? null : TruthFunctions.resemblance(T, B, minConf);
         }
     },
 
     Union() {
         @Nullable
-        @Override public Truth apply(final Truth T, final Truth B, @NotNull Memory m, float minConf) {
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
             if (B == null || T == null) return null;
             return TruthFunctions.union(T,B,minConf);
         }
@@ -133,7 +133,7 @@ public enum BeliefFunction implements TruthOperator {
     //@AllowOverlap
     Intersection() {
         @Nullable
-        @Override public Truth apply(@Nullable final Truth T, final Truth B, @NotNull Memory m, float minConf) {
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
             if (B == null || T == null) return null;
             return TruthFunctions.intersection(T,B,minConf);
         }
@@ -142,7 +142,7 @@ public enum BeliefFunction implements TruthOperator {
     @AllowOverlap
     Difference() {
         @Nullable
-        @Override public Truth apply(@Nullable final Truth T, final Truth B, @NotNull Memory m, float minConf) {
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
             return ((B == null) || (T == null)) ? null : TruthFunctions.difference(T, B, minConf);
         }
     },
@@ -150,70 +150,70 @@ public enum BeliefFunction implements TruthOperator {
     @AllowOverlap
     Analogy() {
         @Nullable
-        @Override public Truth apply(final Truth T, final Truth B, @NotNull Memory m, float minConf) {
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
             if (B == null || T == null) return null;
             return TruthFunctions.analogy(T,B,minConf);
         }
     },
     ReduceConjunction() {
         @Nullable
-        @Override public Truth apply(final Truth T, final Truth B, @NotNull Memory m, float minConf) {
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
             if (B == null || T == null) return null;
             return TruthFunctions.reduceConjunction(T,B,minConf);
         }
     },
     ReduceDisjunction() {
         @Nullable
-        @Override public Truth apply(final Truth T, final Truth B, @NotNull Memory m, float minConf) {
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
             if (B == null || T == null) return null;
             return TruthFunctions.reduceDisjunction(T, B,minConf);
         }
     },
     ReduceConjunctionNeg() {
         @Nullable
-        @Override public Truth apply(final Truth T, final Truth B, @NotNull Memory m, float minConf) {
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
             if (B == null || T == null) return null;
             return TruthFunctions.reduceConjunctionNeg(T, B,minConf);
         }
     },
     AnonymousAnalogy() {
         @Nullable
-        @Override public Truth apply(final Truth T, final Truth B, @NotNull Memory m, float minConf) {
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
             if (B == null || T == null) return null;
             return TruthFunctions.anonymousAnalogy(T,B,minConf);
         }
     },
     Exemplification() {
         @Nullable
-        @Override public Truth apply(final Truth T, final Truth B, @NotNull Memory m, float minConf) {
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
             if (B == null || T == null) return null;
             return TruthFunctions.exemplification(T, B, minConf);
         }
     },
     DecomposeNegativeNegativeNegative() {
         @Nullable
-        @Override public Truth apply(final Truth T, final Truth B, @NotNull Memory m, float minConf) {
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
             if (B == null || T == null) return null;
             return TruthFunctions.decomposeNegativeNegativeNegative(T, B, minConf);
         }
     },
     DecomposePositiveNegativePositive() {
         @Nullable
-        @Override public Truth apply(final Truth T, final Truth B, @NotNull Memory m, float minConf) {
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
             if (B == null || T == null) return null;
             return TruthFunctions.decomposePositiveNegativePositive(T,B);
         }
     },
     DecomposeNegativePositivePositive() {
         @Nullable
-        @Override public Truth apply(final Truth T, final Truth B, @NotNull Memory m, float minConf) {
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
             if (B == null || T == null) return null;
             return TruthFunctions.decomposeNegativePositivePositive(T,B);
         }
     },
     DecomposePositivePositivePositive() {
         @Nullable
-        @Override public Truth apply(final Truth T, final Truth B, @NotNull Memory m, float minConf) {
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
             if (B == null || T == null) return null;
             Truth Tn = TruthFunctions.negation(T, minConf);
             return (Tn == null) ? null : TruthFunctions.decomposeNegativePositivePositive(Tn, B);
@@ -221,7 +221,7 @@ public enum BeliefFunction implements TruthOperator {
     },
     DecomposePositiveNegativeNegative() {
         @Nullable
-        @Override public Truth apply(final Truth T, final Truth B, @NotNull Memory m, float minConf) {
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
             if (B == null || T == null) return null;
             return TruthFunctions.decomposePositiveNegativeNegative(T,B);
         }
@@ -230,7 +230,7 @@ public enum BeliefFunction implements TruthOperator {
     @SinglePremise
     Identity() {
         @NotNull
-        @Override public Truth apply(final Truth T,  final Truth B, @NotNull Memory m, float minConf) {
+        @Override public Truth apply(@Nullable final Truth T, final Truth B, @NotNull Memory m, float minConf) {
             return (T==null || (T.conf() < minConf)) ? null : T;
             //return new DefaultTruth(T.freq(), T.conf());
         }
@@ -238,7 +238,7 @@ public enum BeliefFunction implements TruthOperator {
 
     BeliefIdentity() {
         @Nullable
-        @Override public Truth apply(final Truth T,  final Truth B, @NotNull Memory m, float minConf) {
+        @Override public Truth apply(final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
             //if (B == null) return null;
             //return new DefaultTruth(B.freq(), B.conf());
             return (B == null || (B.conf() < minConf)) ? null : B;
@@ -248,7 +248,7 @@ public enum BeliefFunction implements TruthOperator {
     @AllowOverlap
     BeliefStructuralDeduction() {
         @Nullable
-        @Override public Truth apply(final Truth T,  final Truth B, @NotNull Memory m, float minConf) {
+        @Override public Truth apply(final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
             if (B == null) return null;
             return TruthFunctions.deduction1(B, defaultConfidence(m), minConf);
         }
@@ -257,7 +257,7 @@ public enum BeliefFunction implements TruthOperator {
     @AllowOverlap
     BeliefStructuralDifference() {
         @Nullable
-        @Override public Truth apply(final Truth T,  final Truth B, @NotNull Memory m, float minConf) {
+        @Override public Truth apply(final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
             if (B == null) return null;
             Truth res =  TruthFunctions.deduction1(B, defaultConfidence(m), minConf);
             return (res != null) ? new DefaultTruth(1.0f - res.freq(), res.conf()) : null;
@@ -265,7 +265,7 @@ public enum BeliefFunction implements TruthOperator {
     },
     BeliefNegation() {
         @Nullable
-        @Override public Truth apply(final Truth T,  final Truth B, @NotNull Memory m, float minConf) {
+        @Override public Truth apply(final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
             return (B == null) ? null : TruthFunctions.negation(B, minConf);
         }
     };

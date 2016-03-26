@@ -242,13 +242,13 @@ public final class BudgetFunctions extends UtilityFunctions {
 //    }
 
     @Nullable
-    static Budget budgetInference(float qual, Term derived, @NotNull ConceptProcess nal) {
+    static Budget budgetInference(float qual, @NotNull Term derived, @NotNull ConceptProcess nal) {
         return budgetInference(new UnitBudget(), qual, derived, nal);
     }
 
 
     @Nullable
-    static Budget budgetInference(@NotNull Budget target, float qualRaw, Term derived, @NotNull ConceptProcess nal) {
+    static Budget budgetInference(@NotNull Budget target, float qualRaw, @NotNull Term derived, @NotNull ConceptProcess nal) {
 
         //BLink<? extends Task> taskLink = nal.taskLink;
 
@@ -278,26 +278,20 @@ public final class BudgetFunctions extends UtilityFunctions {
 
         BLink<? extends Termed> termLink = nal.termLink;
         assert(!termLink.isDeleted());
-        {
-            priority = and(priority, termLink.pri()); //originally was OR, but this can explode because the result of OR can exceed the inputs
-            durability = and(durability, termLink.dur()); //originaly was 'AND'
+        priority = and(priority, termLink.pri()); //originally was OR, but this can explode because the result of OR can exceed the inputs
+        durability = and(durability, termLink.dur()); //originaly was 'AND'
 
 
-            //Strengthen the termlink by the quality and termlink's & tasklink's concepts
-            {
-                final float targetActivation = nal.nar.conceptPriority(nal.termLink.get(), 0f);
-                final float sourceActivation = nal.nar.conceptPriority(nal.taskLink.get(), 0f);
+        //Strengthen the termlink by the quality and termlink's & tasklink's concepts
+        final float targetActivation = nal.nar.conceptPriority(nal.termLink.get(), 0f);
+        final float sourceActivation = nal.nar.conceptPriority(nal.taskLink.get(), 0f);
 
-                //https://groups.google.com/forum/#!topic/open-nars/KnUA43B6iYs
-                termLink.orPriority(or(quality, and(sourceActivation, targetActivation))); //was: termLink.orPriority(or(quality, targetActivation));
-                termLink.orDurability(quality);
-            }
+        //https://groups.google.com/forum/#!topic/open-nars/KnUA43B6iYs
+        termLink.orPriority(or(quality, and(sourceActivation, targetActivation))); //was: termLink.orPriority(or(quality, targetActivation));
+        termLink.orDurability(quality);
 
 
-
-            //BudgetMerge.avgDQBlend.merge(target, termLink);
-
-        }
+        //BudgetMerge.avgDQBlend.merge(target, termLink);
 
         return target.budget(priority, durability, quality);
 

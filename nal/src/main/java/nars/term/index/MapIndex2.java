@@ -2,7 +2,6 @@ package nars.term.index;
 
 import com.gs.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import nars.Op;
-import nars.concept.Concept;
 import nars.concept.ConceptBuilder;
 import nars.term.*;
 import nars.term.container.TermContainer;
@@ -26,15 +25,6 @@ public class MapIndex2 extends AbstractMapIndex {
             super(4);
             this.vector = normalized;
         }
-
-//        @Override
-//        public Termed put(int key, Termed value) {
-//            return super.put(key, value);
-//        }
-
-        /*
-            g.compact();
-        */
 
     }
 
@@ -99,35 +89,6 @@ public class MapIndex2 extends AbstractMapIndex {
     }
 
 
-    //TODO this needs to go somewhere:
-    /*@Override
-    public
-    @Nullable
-    Termed the(Op op, int relation, TermContainer subsBefore, int dt) {
-        SubtermNode node = getOrAddNode(subsBefore);
-        int oprel = Terms.opRel(op, relation);
-        Termed interned = node.get(oprel);
-        if (interned == null) {
-            interned = internCompound(node.vector, op, relation, dt);
-            if (interned == null)
-                return null;
-            node.put(oprel, interned);
-        }
-        return interned;
-    }*/
-
-
-//    @NotNull
-//    static TermContainer vector(@NotNull Term t) {
-//        return ((Compound)t).subterms();
-//    }
-//
-//
-//    /** returns previous value */
-//    private Object putItem(TermContainer vv, int index, Termed value) {
-//        SubtermNode g = getOrAddNode(vv);
-//        return value != null ? g.put(index, value) : null;
-//    }
 
 
     @Nullable
@@ -161,29 +122,33 @@ public class MapIndex2 extends AbstractMapIndex {
 
             TermContainer subsAfter = node.vector;
             if (subsAfter!=subsBefore) { //rebuild if necessary
-                if ((interned = internCompound(subsAfter, t.op(), t.relation(), t.dt())) == null)
+                if ((interned = internSubterms(subsAfter, t.op(), t.relation(), t.dt())) == null)
                     throw new InvalidTerm(t);
                     //return null;
             } else {
                 interned = t; //use original parameter itself; for more isolation, this could be replaced with a clone creator
             }
 
-            interned = conceptBuilder.apply(interned.term());
-            if (interned == null)
-                throw new InvalidTerm(t);
+            interned = internCompound(interned);
 
-            Termed preExisting = node.put(oprel, interned);
+            //insert into node
+            Termed preExisting = node.put(t.opRel(), interned);
             assert(preExisting == null);
-
             return interned;
+
         } else {
             return null;
         }
     }
 
+    @NotNull
+    protected Termed internCompound(Termed interned) {
+        return conceptBuilder.apply(interned.term());
+    }
+
 
     @NotNull
-    private final Termed internCompound(@NotNull TermContainer subs, @NotNull Op op, int rel, int dt) {
+    private final Termed internSubterms(@NotNull TermContainer subs, @NotNull Op op, int rel, int dt) {
         Termed interned = termBuilder.make(op, rel, subs, dt);
         assert(interned!=null); //should not fail unless the input was invalid to begin with
         return interned;
@@ -206,29 +171,6 @@ public class MapIndex2 extends AbstractMapIndex {
     @Nullable public SubtermNode getNode(TermContainer s) {
         return data.get(s);
     }
-
-//    @Nullable
-//    @Override
-//    protected TermContainer get(TermContainer subterms) {
-//        SubtermNode g = data.get(subterms);
-//        return g != null ? g.vector : null;
-//    }
-//    @Nullable
-//    public Termed get(TermContainer vv, int index) {
-//        SubtermNode n = data.get(vv);
-//        return n != null ? n.get(index) : null;
-//    }
-//    @Override
-//    @Deprecated public void put(@NotNull Termed t) {
-//        Term u = t.term();
-//        if (u instanceof Atomic) {
-//            atoms.putIfAbsent(t.toString(), ()->(AtomConcept)t);
-//        } else {
-//            Object replaced = putItem(vector(u), t.opRel(), t);
-//            if (replaced == null)
-//                count++;
-//        }
-//    }
 
 
     @Nullable
@@ -269,9 +211,7 @@ public class MapIndex2 extends AbstractMapIndex {
 
     @Override
     public void forEach(@NotNull Consumer<? super Termed> c) {
+        atoms.forEach(c);
         data.values().forEach(v->v.forEach(c));
-
-        //throw new UnsupportedOperationException();
-        //atoms.getKeyValuePairsForKeysStartingWith()
     }
 }

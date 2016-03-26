@@ -115,6 +115,7 @@ public class PremiseRule extends GenericCompound {
 
     public @Nullable MatchTaskBelief match;
 
+    @Nullable
     private Temporalize temporalize = Temporalize.Auto;
 
     @NotNull
@@ -850,6 +851,7 @@ public class PremiseRule extends GenericCompound {
             return true;
         }
 
+        @Nullable
         public Termed applyAfter(Variable secondary) {
             offset++;
             return apply(null, secondary, -1);

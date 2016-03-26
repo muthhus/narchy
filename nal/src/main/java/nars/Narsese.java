@@ -1305,7 +1305,7 @@ public class Narsese extends BaseParser<Object> {
         public NarseseException(String input, Throwable cause) {
             this(input, null, cause);
         }
-        public NarseseException(String input, ParsingResult result, Throwable cause) {
+        public NarseseException(String input, @NotNull ParsingResult result, Throwable cause) {
             super(input + "\n" + result.toString(), cause);
             this.result = result;
         }

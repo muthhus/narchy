@@ -821,7 +821,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 //    }
 
     /** pre-verify tests to early disqualify terms that are not acceptable as Task content */
-    static boolean preNormalize(Term t, Memory memory) {
+    static boolean preNormalize(@NotNull Term t, @NotNull Memory memory) {
         if (t.levelValid( memory.nal() )) {
             if (t.op().isStatement()) {
                 Compound ct = (Compound)t;
@@ -834,6 +834,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         return false;
     }
 
+    @Nullable
     default Term term(int i) {
         return term().term(i);
     }

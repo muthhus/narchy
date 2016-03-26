@@ -29,8 +29,8 @@ public class OperationConcept extends CompoundConcept implements Runnable {
     /**
      * cache for motivation calculation; set to NaN to invalidate
      */
-    protected transient float believed = 0;
-    protected transient float desired = 0;
+    protected transient float believed;
+    protected transient float desired;
 
     /**
      * set to Tense.ETERNAL to invalidate
@@ -47,7 +47,7 @@ public class OperationConcept extends CompoundConcept implements Runnable {
         super(term, termLinks, taskLinks);
     }
 
-    public OperationConcept(@NotNull String compoundTermString, NAR n) throws Narsese.NarseseException {
+    public OperationConcept(@NotNull String compoundTermString, @NotNull NAR n) throws Narsese.NarseseException {
         super(compoundTermString, n);
         assert(Op.isOperation(term));
         n.on(this);
@@ -65,7 +65,8 @@ public class OperationConcept extends CompoundConcept implements Runnable {
         return executeLater(super.processBelief(belief, nar), nar);
     }
 
-    private final Task executeLater(Task t, NAR nar) {
+    @Nullable
+    private final Task executeLater(@Nullable Task t, @NotNull NAR nar) {
         if (t == null) return null;
 
         //if (op()!=NEGATE) {
@@ -92,7 +93,7 @@ public class OperationConcept extends CompoundConcept implements Runnable {
         pending.clear();
     }
 
-    public boolean update(NAR nar) {
+    public boolean update(@NotNull NAR nar) {
         long now = nar.time();
 
         float b = 0, d = 0;
@@ -132,7 +133,7 @@ public class OperationConcept extends CompoundConcept implements Runnable {
      * The goal has already successfully been inserted to belief table.
      * the job here is to update the resulting motivation state
      */
-    final void execute(Task task, NAR nar) {
+    final void execute(@NotNull Task task, @NotNull NAR nar) {
 
 
         //        if (motivation < executionThreshold.floatValue())
@@ -195,7 +196,7 @@ public class OperationConcept extends CompoundConcept implements Runnable {
     }
 
     /** provide motivation value after triggering an update */
-    public final float motivation(NAR nar) {
+    public final float motivation(@NotNull NAR nar) {
         update(nar);
         return motivation();
     }

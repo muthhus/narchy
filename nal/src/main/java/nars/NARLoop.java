@@ -31,7 +31,7 @@ public class NARLoop implements Runnable {
 
     public volatile int cyclesPerFrame = 1;
     volatile int periodMS = 1000;
-    private volatile boolean stopping = false,  stopped = false;
+    private volatile boolean stopping,  stopped;
     //private boolean running;
 
     //TODO make this into a SimpleIntegerProperty also

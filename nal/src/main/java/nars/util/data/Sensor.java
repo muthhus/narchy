@@ -24,6 +24,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
      */
     float resolution = 0.05f;
 
+    @NotNull
     private final Term term;
     private final FloatFunction<Term> value;
     private final FloatToFloatFunction freq;
@@ -34,7 +35,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
     private float confFactor;
     private float prevF = Float.NaN;
 
-    boolean inputIfSame = false;
+    boolean inputIfSame;
     int maxTimeBetweenUpdates;
     int minTimeBetweenUpdates;
 
@@ -43,19 +44,19 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
 
     public final static FloatToFloatFunction direct = n -> n;
 
-    public Sensor(@NotNull NAR n, Termed  t, FloatFunction<Term> value) {
+    public Sensor(@NotNull NAR n, @NotNull Termed  t, FloatFunction<Term> value) {
         this(n, t, value, direct);
     }
 
-    public Sensor(@NotNull NAR n, String tt, FloatFunction<Term> value) {
+    public Sensor(@NotNull NAR n, @NotNull String tt, FloatFunction<Term> value) {
         this(n, tt, value, direct);
     }
 
-    public Sensor(@NotNull NAR n, String tt, FloatFunction<Term> value, FloatToFloatFunction valueToFreq) {
+    public Sensor(@NotNull NAR n, @NotNull String tt, FloatFunction<Term> value, FloatToFloatFunction valueToFreq) {
         this(n, n.term(tt), value, valueToFreq);
     }
 
-    public Sensor(@NotNull NAR n, Termed  t, FloatFunction<Term> value, FloatToFloatFunction valueToFreq) {
+    public Sensor(@NotNull NAR n, @NotNull Termed  t, FloatFunction<Term> value, FloatToFloatFunction valueToFreq) {
         this(n, t, value, valueToFreq,
 
                 n.getDefaultConfidence(Symbols.BELIEF),
@@ -63,7 +64,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
                 n.DEFAULT_JUDGMENT_PRIORITY, n.DEFAULT_JUDGMENT_DURABILITY);
     }
 
-    public Sensor(@NotNull NAR n, Termed t, FloatFunction<Term> value, FloatToFloatFunction valueToFreq, float conf, float pri, float dur) {
+    public Sensor(@NotNull NAR n, @NotNull Termed t, FloatFunction<Term> value, FloatToFloatFunction valueToFreq, float conf, float pri, float dur) {
         this.nar = n;
         this.term = t.term();
         this.value = value;
@@ -83,6 +84,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
         nar.onFrame(this);
     }
 
+    @NotNull
     public Sensor pri(float defaultPri) {
         this.pri = defaultPri;
         return this;
@@ -131,6 +133,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
         //this.prevValue = next;
     }
 
+    @NotNull
     public Sensor resolution(float r) {
         this.resolution = r;
         return this;

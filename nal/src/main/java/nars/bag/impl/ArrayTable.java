@@ -66,6 +66,7 @@ abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements List
 //        return items.size();
 //    }
 
+    @Override
     public final void setCapacity(int capacity) {
         items.setCapacity(capacity);
     }
@@ -104,10 +105,12 @@ abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements List
 //        return removeItem(size() - 1);
 //    }
 
+    @Override
     public final L top() {
         return isEmpty() ? null : item(0);
     }
 
+    @Override
     public final L bottom() {
         int s = size();
         return s == 0 ? null : item(s - 1);
@@ -147,6 +150,7 @@ abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements List
 //        return index.get(key);
 //    }
 
+    @Override
     public final int capacity() {
         return items.capacity();
     }

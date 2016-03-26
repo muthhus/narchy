@@ -8,6 +8,7 @@ import nars.concept.Concept;
 import nars.term.Compound;
 import nars.term.Termed;
 import nars.truth.Truth;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * The result of belief/goal revision. Also responsible for balancing
@@ -20,7 +21,7 @@ import nars.truth.Truth;
  */
 public class RevisionTask extends MutableTask {
 
-    public RevisionTask(Termed<Compound> term, Budget revisionBudget, Task newBelief, Task oldBelief, Truth conclusion, long now, long concTime) {
+    public RevisionTask(@NotNull Termed<Compound> term, Budget revisionBudget, @NotNull Task newBelief, Task oldBelief, Truth conclusion, long now, long concTime) {
         super(term, newBelief.punc());
 
         budget(revisionBudget);
@@ -34,7 +35,7 @@ public class RevisionTask extends MutableTask {
     }
 
     @Override
-    public void onConcept(Concept c) {
+    public void onConcept(@NotNull Concept c) {
         super.onConcept(c);
 
         Task newBelief = getParentTask();
@@ -45,29 +46,26 @@ public class RevisionTask extends MutableTask {
 
         //Decrease the budget of the parent tasks and tasklinks,
         // so that their priority sum and the child remains the same (balanced)
-        {
-            //TODO maybe consider rank (incl. evidence) not just conf()
-            float newBeliefConf = newBelief.conf();
-            float newBeliefContribution = newBeliefConf / (newBeliefConf + oldBelief.conf());
-            //oldBeliefContribution = 1 - newBeliefContribution, summing to 1
+        //TODO maybe consider rank (incl. evidence) not just conf()
+        float newBeliefConf = newBelief.conf();
+        float newBeliefContribution = newBeliefConf / (newBeliefConf + oldBelief.conf());
+        //oldBeliefContribution = 1 - newBeliefContribution, summing to 1
 
 
-            float resultPri = pri();
+        float resultPri = pri();
 
-            //Balance Tasks
-            BudgetFunctions.balancePri(
-                    newBelief.budget(), oldBelief.budget(),
-                    resultPri,
-                    newBeliefContribution);
+        //Balance Tasks
+        BudgetFunctions.balancePri(
+                newBelief.budget(), oldBelief.budget(),
+                resultPri,
+                newBeliefContribution);
 
-            //Balance Tasklinks
-            Bag<Task> tasklinks = c.tasklinks();
-            BudgetFunctions.balancePri(
-                    tasklinks.get(newBelief), tasklinks.get(oldBelief),
-                    resultPri,
-                    newBeliefContribution);
-
-        }
+        //Balance Tasklinks
+        Bag<Task> tasklinks = c.tasklinks();
+        BudgetFunctions.balancePri(
+                tasklinks.get(newBelief), tasklinks.get(oldBelief),
+                resultPri,
+                newBeliefContribution);
 
 
         oldBelief.onRevision(this);

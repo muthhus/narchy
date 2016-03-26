@@ -28,7 +28,7 @@ abstract public class PatternCompound extends GenericCompound {
         protected final Ellipsis ellipsis;
         private final boolean ellipsisTransform;
 
-        PatternCompoundContainingEllipsis(@NotNull Compound seed, Ellipsis ellipsis, @NotNull TermContainer subterms) {
+        PatternCompoundContainingEllipsis(@NotNull Compound seed, @Nullable Ellipsis ellipsis, @NotNull TermContainer subterms) {
             super(seed, subterms);
 
             this.ellipsis = ellipsis;
@@ -38,12 +38,6 @@ abstract public class PatternCompound extends GenericCompound {
             this.ellipsisTransform = hasEllipsisTransform(this);
 
         }
-
-        @Nullable
-        public Ellipsis firstEllipsis() {
-            return ellipsis;
-        }
-
 
         @Override
         public boolean match(@NotNull Compound y, @NotNull FindSubst subst) {

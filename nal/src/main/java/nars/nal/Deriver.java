@@ -21,7 +21,7 @@ public abstract class Deriver  {
 
     private static TrieDeriver defaultDeriver;
 
-    private static PremiseRuleSet defaultRules;
+    public static PremiseRuleSet defaultRules;
 
     final static Logger logger = LoggerFactory.getLogger(Deriver.class);
 

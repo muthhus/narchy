@@ -16,10 +16,12 @@ import org.jetbrains.annotations.NotNull;
 /** ellipsis that transforms one of its elements, which it is required to match within */
 public class EllipsisTransform extends EllipsisOneOrMore {
 
+    @NotNull
     public final Term from;
+    @NotNull
     public final Term to;
 
-    public EllipsisTransform(@NotNull AbstractVariable name, Term from, Term to) {
+    public EllipsisTransform(@NotNull AbstractVariable name, @NotNull Term from, @NotNull Term to) {
         super(name, GenericNormalizedVariable.multiVariable(name.hashCode(),
                 from==Op.Imdex ? 0 : from.hashCode(),
                 to==Op.Imdex ? 0 : to.hashCode()

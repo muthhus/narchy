@@ -174,6 +174,7 @@ public interface Temporalize {
     };
 
     /** special handling for dealing with conjunctions which involve a potential mix of eternal and non-eternal premise components */
+    @Nullable
     Temporalize dtBeliefExact = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn) -> {
         ConceptProcess prem = p.premise;
         Task src = prem.belief();
@@ -219,7 +220,7 @@ public interface Temporalize {
     };
 
     @NotNull
-    static Compound dtExact(@NotNull Compound derived, @NotNull long[] occReturn, ConceptProcess prem, @NotNull Task src) {
+    static Compound dtExact(@NotNull Compound derived, @NotNull long[] occReturn, @NotNull ConceptProcess prem, @NotNull Task src) {
         occReturn[0] = src.occurrence();
         if (derived.op().isTemporal())
             return deriveDT(derived, +1, prem, src.term().dt());
@@ -246,7 +247,7 @@ public interface Temporalize {
             dtTaskOrBelief(derived, p, occReturn, earliestOccurrence, false, true);
 
     @NotNull
-    static Compound dtTaskOrBelief(@NotNull Compound derived, @NotNull PremiseEval p, long[] occReturn, Premise.OccurrenceSolver s, boolean taskOrBelief/*, boolean shiftToPredicate*/, boolean end) {
+    static Compound dtTaskOrBelief(@NotNull Compound derived, @NotNull PremiseEval p, long[] occReturn, @NotNull Premise.OccurrenceSolver s, boolean taskOrBelief/*, boolean shiftToPredicate*/, boolean end) {
         ConceptProcess premise = p.premise;
 
         long o = premise.occurrenceTarget(s);
@@ -454,7 +455,7 @@ public interface Temporalize {
                 if (td == DTERNAL && bd == DTERNAL) {
 
                     long aTask = tp.subtermTime(ca, DTERNAL);
-                    long aBelief = bp.subtermTime(ca, bd);
+                    long aBelief = bp.subtermTime(ca, DTERNAL);
                     long bTask = tp.subtermTime(cb, DTERNAL);
                     long bBelief = bp.subtermTime(cb, bd);
 

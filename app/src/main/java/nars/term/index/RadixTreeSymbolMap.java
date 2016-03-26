@@ -12,6 +12,7 @@ import nars.$;
 import nars.concept.AtomConcept;
 import nars.concept.Concept;
 import nars.term.Term;
+import nars.term.Termed;
 
 import java.util.List;
 import java.util.function.Function;
@@ -33,7 +34,7 @@ public class RadixTreeSymbolMap extends MyConcurrentRadixTree<AtomConcept> imple
     }*/
 
     @Override
-    public final AtomConcept resolve(String id) {
+    public final Termed resolve(String id) {
         return getValueForExactKey(id);
     }
 

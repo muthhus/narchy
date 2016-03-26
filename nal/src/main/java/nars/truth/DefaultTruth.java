@@ -78,7 +78,7 @@ public class DefaultTruth implements Truth  {
     }
 
     @Override
-    public final boolean equals(Object that) {
+    public final boolean equals(@NotNull Object that) {
         //if (that instanceof DefaultTruth) {
             return ((DefaultTruth)that).hash == hash; //shortcut, since perfect hash for this instance
         /*} else if (that instanceof Truth) {

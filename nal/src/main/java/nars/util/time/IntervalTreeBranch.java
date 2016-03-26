@@ -74,11 +74,13 @@ public class IntervalTreeBranch<K extends Comparable<? super K>, V> implements
         return key.overlaps(interval);
     }
 
+    @NotNull
     @Override
     public K getLow() {
         return key.getLow();
     }
 
+    @NotNull
     @Override
     public K getHigh() {
         return key.getHigh();

@@ -151,7 +151,7 @@ abstract public class ConceptProcess implements Premise {
 
 
     /** part 2 */
-    public void derive(@NotNull Termed<Compound> c, @Nullable Truth truth, Budget budget, long now, long occ, @NotNull PremiseEval p, @NotNull Derive d) {
+    public void derive(@NotNull Termed<Compound> c, @Nullable Truth truth, @NotNull Budget budget, long now, long occ, @NotNull PremiseEval p, @NotNull Derive d) {
 
         char punct = p.punct.get();
 //        Character _punct = p.punct.get();

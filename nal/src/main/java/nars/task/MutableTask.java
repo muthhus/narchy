@@ -65,7 +65,7 @@ public class MutableTask extends AbstractTask {
     }
 
     /** used by QuestionTable */
-    public MutableTask(@NotNull Task taskToClone, @NotNull Task otherTask, long now, long occ, long[] newEvidence, BudgetMerge budgetMerge) {
+    public MutableTask(@NotNull Task taskToClone, @NotNull Task otherTask, long now, long occ, long[] newEvidence, @NotNull BudgetMerge budgetMerge) {
         this(taskToClone);
         punctuation(taskToClone.punc());
         this.parentBelief = Global.reference(otherTask);

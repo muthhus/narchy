@@ -16,6 +16,7 @@ import java.lang.ref.Reference;
  */
 public final class DerivedTask extends MutableTask {
 
+    @Nullable
     private final Reference<ConceptProcess> premise;
     @Nullable
     private BLink<? extends Task> premiseTaskLink;

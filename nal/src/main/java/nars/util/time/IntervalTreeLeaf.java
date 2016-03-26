@@ -13,7 +13,7 @@ class IntervalTreeLeaf<K extends Comparable<? super K>,V> implements IntervalTre
 	private final Between<K> key;
 	private V value;
 	
-	IntervalTreeLeaf(K min, K max, V value) {
+	IntervalTreeLeaf(@NotNull K min, @NotNull K max, V value) {
 		this(new Between<>(min, max),value);
 	}
 
@@ -65,11 +65,13 @@ class IntervalTreeLeaf<K extends Comparable<? super K>,V> implements IntervalTre
 		return key.overlaps(interval);
 	}
 
+	@NotNull
 	@Override
 	public final K getLow() {
 		return key.getLow();
 	}
 
+	@NotNull
 	@Override
 	public final K getHigh() {
 		return key.getHigh();

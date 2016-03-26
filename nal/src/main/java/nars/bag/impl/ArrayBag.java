@@ -205,7 +205,7 @@ public class ArrayBag<V> extends ArrayTable<V, BLink<V>> implements Bag<V> {
      */
     @Nullable
     @Override
-    public final BLink<V> put(V i, Budgeted b, float scale, @Nullable MutableFloat overflow) {
+    public final BLink<V> put(@NotNull V i, Budgeted b, float scale, @Nullable MutableFloat overflow) {
 
         BLink<V> existing = get(i);
 

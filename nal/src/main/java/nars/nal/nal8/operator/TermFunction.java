@@ -79,7 +79,7 @@ public abstract class TermFunction<O> extends SyncOperator {
 
     /** default tense applied to result tasks */
     @NotNull
-    public Tense getResultTense(Task goal) {
+    public Tense getResultTense(@NotNull Task goal) {
         return goal.isEternal() ? Tense.Eternal : Tense.Present;
         //return Tense.Present;
     }

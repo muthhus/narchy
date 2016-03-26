@@ -123,7 +123,7 @@ abstract public class Solve extends AtomicBooleanCondition<PremiseEval> {
         return r;
     }
 
-    private static boolean measure(TruthOperator tf, PremiseEval m) {
+    private static boolean measure(@NotNull TruthOperator tf, @NotNull PremiseEval m) {
 
         ConceptProcess p = m.premise;
 

@@ -19,7 +19,7 @@ public abstract class PatternAnswer implements Function<Task, List<Task>> {
     @Nullable
     public final Term pattern;
 
-    protected PatternAnswer(String pattern) {
+    protected PatternAnswer(@NotNull String pattern) {
         this.pattern = Narsese.the().term(pattern);
     }
 
