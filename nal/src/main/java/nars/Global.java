@@ -30,6 +30,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
+import java.lang.ref.WeakReference;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -170,7 +171,7 @@ public enum Global {
     @NotNull
     public static <K, V> Map<K,V> newHashMap(int capacity) {
         //return new UnifiedMap(capacity);
-        return new UnifriedMap(capacity);
+        return new UnifriedMap(capacity /*, loadFactor */);
 
         //return new FasterHashMap(capacity);
         //return new FastMap<>(); //javolution http://javolution.org/apidocs/javolution/util/FastMap.html
@@ -192,7 +193,6 @@ public enum Global {
 
     @NotNull
     public static <X> List<X> newArrayList(int capacity) {
-
         return new FasterList(capacity);
         //return new ArrayList(capacity);
     }
@@ -215,15 +215,13 @@ public enum Global {
 
     @Nullable
     public static <C> Reference<C> reference(@Nullable C s) {
-        if (s == null) return null;
-        return
-            new SoftReference(s);
-            //new WeakReference<>(s);
+        return s == null ? null :
+                //new SoftReference<C>(s)
+                new WeakReference<>(s);
     }
     @Nullable
     public static <C> C dereference(@Nullable Reference<C> s) {
-        if (s == null) return null;
-        return s.get();
+        return s == null ? null : s.get();
     }
 
 

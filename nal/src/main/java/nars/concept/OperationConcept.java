@@ -8,6 +8,7 @@ import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Operator;
 import nars.term.Termed;
+import nars.util.data.MutableInteger;
 import nars.util.event.Topic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -179,18 +180,18 @@ public class OperationConcept extends CompoundConcept implements Runnable {
 //        return op() != NEGATE ? n.concept($.neg(this)) : this;
 //    }
 
-    public final float believed() {
-        return believed;
-    }
-
-    public final float desired() {
-        return desired;
-    }
+//    public final float believed() {
+//        return believed;
+//    }
+//
+//    public final float desired() {
+//        return desired;
+//    }
 
     public final float motivation() {
-        float m = (desired - believed);
-        //if (!Float.isFinite(m)) return 0;
-        return m;
+        float b = this.believed;
+        float d = this.desired;
+        return (d - b); // / (Math.abs(d) + Math.abs(b));
     }
 
     /** provide motivation value after triggering an update */
@@ -198,6 +199,8 @@ public class OperationConcept extends CompoundConcept implements Runnable {
         update(nar);
         return motivation();
     }
+
+
 
 
     //        if (!Op.isOperation(goalTerm))

@@ -40,6 +40,8 @@ public class RevisionTask extends MutableTask {
         Task newBelief = getParentTask();
         Task oldBelief = getParentBelief();
 
+        if ((newBelief == null) || (oldBelief == null))
+            return; //weakref may cause these to become null
 
         //Decrease the budget of the parent tasks and tasklinks,
         // so that their priority sum and the child remains the same (balanced)

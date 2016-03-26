@@ -73,7 +73,8 @@ public class NARover extends AbstractPolygonBot {
         material = new BeingMaterial(this);
 
 
-        int minUpdateTime = 4;
+        int minUpdateTime = 2;
+        int maxUpdateTime = 16;
 
 
         hungry = 1f;
@@ -123,10 +124,10 @@ public class NARover extends AbstractPolygonBot {
 
 
         this.speedFore = new SensorConcept(SPEED_FORE, nar, linearSpeed, linearPositive)
-                .timing(minUpdateTime, 0);
+                .timing(minUpdateTime, maxUpdateTime);
 
         this.speedBack = new SensorConcept(SPEED_BACK, nar, linearSpeed, linearNegative)
-                .timing(minUpdateTime, 0);
+                .timing(minUpdateTime, maxUpdateTime);
 
 
 
@@ -142,16 +143,16 @@ public class NARover extends AbstractPolygonBot {
         };
 
         this.leftSpeed = new SensorConcept(SPEED_LEFT, nar, angleSpeed, linearNegative)
-            .timing(minUpdateTime, 0);
+            .timing(minUpdateTime, maxUpdateTime);
 
         this.rightSpeed = new SensorConcept(SPEED_RIGHT, nar, angleSpeed, linearPositive)
-            .timing(minUpdateTime, 0);
+            .timing(minUpdateTime, maxUpdateTime);
 
         hungrySensor = new SensorConcept(EAT_FOOD, nar, () -> 1f-hungry, linearPositive)
             .timing(minUpdateTime, 0);
 
         sickSensor = new SensorConcept(EAT_POISON, nar, () -> sick, linearPositive)
-            .timing(minUpdateTime, 0);
+            .timing(minUpdateTime, maxUpdateTime);
 
         float motorThresh = 0.1f;
 

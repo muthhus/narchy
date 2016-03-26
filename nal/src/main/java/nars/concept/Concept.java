@@ -32,6 +32,7 @@ import nars.concept.util.TaskTable;
 import nars.nar.Default;
 import nars.task.Task;
 import nars.term.Termed;
+import nars.util.data.MutableInteger;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

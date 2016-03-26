@@ -112,20 +112,18 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
 
         int maxT = this.maxTimeBetweenUpdates;
         boolean limitsMaxTime = maxT != 0;
+        int minT = this.minTimeBetweenUpdates;
+        boolean limitsMinTime =  minT != 0;
 
         if (inputIfSame || !Util.equals(f, prevF, Global.TRUTH_EPSILON) ||
-                (limitsMaxTime && timeSinceLastInput > maxTimeBetweenUpdates)
+                (limitsMaxTime && timeSinceLastInput > maxTimeBetweenUpdates) ||
+                (!limitsMinTime || (timeSinceLastInput >= minT))
                 ) {
 
-            int minT = this.minTimeBetweenUpdates;
-            boolean limitsMinTime =  minT != 0;
+            Task t = input(f);
+            this.lastInput = t.creation();
+            this.prevF = f;
 
-
-            if (!limitsMinTime || (timeSinceLastInput >= minT)) {
-                Task t = input(f);
-                this.lastInput = t.creation();
-                this.prevF = f;
-            }
 
         }
 

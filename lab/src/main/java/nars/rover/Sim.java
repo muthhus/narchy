@@ -284,17 +284,19 @@ public class Sim extends PhysicsModel {
 
     public void cycle(float dt) {
 
-        TestbedSettings settings = runner.model.settings;
-        world.step(dt,
-                settings.getSetting(TestbedSettings.VelocityIterations).value,
-                settings.getSetting(TestbedSettings.PositionIterations).value);
-
 
 
         for (int i = 0, robotsSize = robots.size(); i < robotsSize; i++) {
             Being r = robots.get(i);
             r.step(1);
         }
+
+        TestbedSettings settings = runner.model.settings;
+        world.step(dt,
+                settings.getSetting(TestbedSettings.VelocityIterations).value,
+                settings.getSetting(TestbedSettings.PositionIterations).value);
+
+
 
         //clock.add(1);
     }

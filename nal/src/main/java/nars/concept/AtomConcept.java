@@ -24,10 +24,10 @@ public class AtomConcept<E extends Atomic> extends AbstractConcept<E> implements
 //        this(atom, budget, new NullBag(), new NullBag());
 //    }
 
+
     public AtomConcept(@NotNull E atom, Bag<Termed> termLinks, Bag<Task> taskLinks) {
         super(atom, taskLinks, termLinks);
     }
-
 
     /** the atom in this case is the concept itself, exposing this and not the internal 'term' field */
     @Override @NotNull public final AtomConcept term() {
@@ -36,25 +36,25 @@ public class AtomConcept<E extends Atomic> extends AbstractConcept<E> implements
 
     @Nullable
     @Override
-    public BeliefTable beliefs() {
+    public final BeliefTable beliefs() {
         return BeliefTable.EMPTY;
     }
 
     @Nullable
     @Override
-    public BeliefTable goals() {
+    public final BeliefTable goals() {
         return BeliefTable.EMPTY;
     }
 
     @Nullable
     @Override
-    public TaskTable questions() {
+    public final TaskTable questions() {
         return BeliefTable.EMPTY;
     }
 
     @Nullable
     @Override
-    public TaskTable quests() {
+    public final TaskTable quests() {
         return BeliefTable.EMPTY;
     }
 
@@ -94,8 +94,7 @@ public class AtomConcept<E extends Atomic> extends AbstractConcept<E> implements
     }
 
     @Override
-    public @Nullable
-    Op op() {
+    public final @Nullable Op op() {
         return term.op();
     }
 

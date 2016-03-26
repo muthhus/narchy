@@ -44,6 +44,8 @@ public final class DerivedTask extends MutableTask {
             return;
 
         ConceptProcess premise = this.premise.get();
+        if (premise == null)
+            return; //weakref may cause these to become null
 
         Truth conclusion = t.truth();
 

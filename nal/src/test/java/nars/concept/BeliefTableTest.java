@@ -6,7 +6,6 @@ import nars.concept.util.BeliefTable;
 import nars.task.Task;
 import nars.truth.DefaultTruth;
 import nars.util.signal.BeliefAnalysis;
-import nars.util.signal.MemoryBudget;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
@@ -96,7 +95,7 @@ public class BeliefTableTest  {
 
         BeliefAnalysis b = new BeliefAnalysis(n, "<a-->b>");
 
-        assertEquals(0.0, (Double) b.energy().get(MemoryBudget.Budgeted.ActiveConceptPrioritySum), 0.001);
+        //assertEquals(0.0, (Double) b.energy().get(MemoryBudget.Budgeted.ActiveConceptPrioritySum), 0.001);
 
 
         b.believe(0.5f, 1.0f, 0.85f, 5);

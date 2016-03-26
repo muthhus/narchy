@@ -189,7 +189,7 @@ public class SomeRovers {
     }
 
     public static Default newNAR() {
-        int conceptsFirePerCycle = 24;
+        int conceptsFirePerCycle = 16;
 
         Random rng = new XorShift128PlusRandom(1);
         TermIndex index = new AbstractNAR.WeakTermIndex(32 * 1024, rng);
@@ -234,19 +234,19 @@ public class SomeRovers {
 
 
         //nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
-        nar.core.activationRate.setValue(0.18f);
+        nar.core.activationRate.setValue(0.2f);
 
 
-        nar.duration.set(4);
+        nar.duration.set(2);
         nar.conceptForgetDurations.setValue(2f);
         nar.termLinkForgetDurations.setValue(4);
         nar.taskLinkForgetDurations.setValue(3);
 
-        nar.cyclesPerFrame.set(12);
+        nar.cyclesPerFrame.set(6);
         nar.shortTermMemoryHistory.set(3);
 
-        nar.executionThreshold.setValue(0.01f);
-        //nar.derivationDurabilityThreshold.setValue(0.1f);
+        nar.executionThreshold.setValue(0.02f);
+        nar.derivationDurabilityThreshold.setValue(0.03f);
 
         return nar;
     }
@@ -262,7 +262,7 @@ public class SomeRovers {
         NarQ nqSpine = new NarQ(n, (i, o) -> (int) Math.ceil(1 + Math.sqrt(i * o)));
 
 
-        nqSpine.power.setValue(0.5f);
+        nqSpine.power.setValue(0.01f);
 
         nqSpine.input.addAll(nqSpine.getBeliefMotivations(SPEED_LEFT, SPEED_RIGHT, SPEED_FORE, SPEED_BACK, EAT_FOOD, EAT_POISON));
 

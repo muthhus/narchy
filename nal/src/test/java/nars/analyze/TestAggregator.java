@@ -2,7 +2,6 @@ package nars.analyze;
 
 import nars.NAR;
 import nars.nar.Default;
-import nars.util.signal.MemoryBudget;
 import org.junit.runner.Description;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
@@ -137,7 +136,7 @@ public class TestAggregator extends RunListener {
 
         for (int i = 0; i < 100; i++) {
             nar.run(100);
-            System.out.println(new MemoryBudget(nar));
+            //System.out.println(new MemoryBudget(nar));
         }
 
 

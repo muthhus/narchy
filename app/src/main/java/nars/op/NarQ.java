@@ -3,7 +3,9 @@ package nars.op;
 import nars.Global;
 import nars.NAR;
 import nars.Symbols;
+import nars.concept.CompoundConcept;
 import nars.concept.Concept;
+import nars.concept.OperationConcept;
 import nars.concept.util.BeliefTable;
 import nars.data.Range;
 import nars.task.MutableTask;
@@ -212,6 +214,9 @@ public class NarQ implements Consumer<NAR> {
      */
     @Override
     public void accept(NAR t) {
+        if (power.floatValue() == 0)
+            return; //do nothing
+
         float[] ii = inputs();
         if (ii != null) {
             if (validDimensionality(ii.length)) {
@@ -331,23 +336,26 @@ public class NarQ implements Consumer<NAR> {
 //    }
 
     public static float motivation(@NotNull NAR nar, Termed x, float ifNonExists, boolean beliefOrDesire, int dt) {
-        return NarQ.motivation(nar, nar.concept(x), ifNonExists, beliefOrDesire, dt);
+        //TODO
+        return nar.concept(x).beliefMotivation(nar.time(), nar.duration());
+        //return ((OperationConcept)nar.concept(x)).motivation(nar);
+        //return NarQ.motivation(nar, nar.concept(x), ifNonExists, beliefOrDesire, dt);
     }
 
-    public static float motivation(@NotNull NAR n, @Nullable Concept cx, float ifNonExists, boolean beliefOrDesire, int dt) {
-        //TODO this an be optimized
-
-        float v = ifNonExists;
-        if (cx != null) {
-            long now = n.time();
-            BeliefTable table = beliefOrDesire ? cx.beliefs() : cx.goals();
-            Truth t = table.truth(now + dt, now, n.duration());
-            if (t != null) {
-                v = t.motivation();
-            }
-        }
-        return v;
-    }
+//    public static float motivation(@NotNull NAR n, @Nullable Concept cx, float ifNonExists, boolean beliefOrDesire, int dt) {
+//        //TODO this an be optimized
+//
+//        float v = ifNonExists;
+//        if (cx != null) {
+//            long now = n.time();
+//            BeliefTable table = beliefOrDesire ? cx.beliefs() : cx.goals();
+//            Truth t = table.truth(now + dt, now, n.duration());
+//            if (t != null) {
+//                v = t.motivation();
+//            }
+//        }
+//        return v;
+//    }
 
     abstract public static class BeliefSensor implements DoubleSupplier {
 
