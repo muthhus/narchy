@@ -117,6 +117,7 @@ public class World {
   }
   public World() {
     this(new Vec2(0,0), new DefaultWorldPool(WORLD_POOL_SIZE, WORLD_POOL_CONTAINER_SIZE));
+
   }
 
   /**

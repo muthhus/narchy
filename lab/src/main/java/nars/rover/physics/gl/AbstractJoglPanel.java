@@ -108,12 +108,14 @@ public abstract class AbstractJoglPanel extends GLWindow implements Display, GLE
 
         // Clear the draw and depth buffers
 
-        gl.glClearColor(0f, 0f, 0f, 0f);
-        gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
+        //gl.glClearAccum(0,0,0,-1f);
+        gl.glClearColor(0f, 0f, 0f, 1f);
+        gl.glClear(/*GL2.GL_ACCUM_BUFFER_BIT | */GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
 
-
-
-
+        //gl.glClearAccum(0.0f, 0.0f, 0.0f, 1.0f);
+        //gl.glClear(GL2.GL_ACCUM_BUFFER_BIT);
+        //gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+        //gl.glEnable(GL.GL_ALPHA);
 
 
         float time = 0.0f; // what does this?
@@ -131,18 +133,13 @@ public abstract class AbstractJoglPanel extends GLWindow implements Display, GLE
 
         //https://www.opengl.org/sdk/docs/man2/xhtml/glAccum.xml
 
-        //if(i == 0)
-            //gl.glAccum(GL2.GL_LOAD, 1.0 / n);
-        //else
-//            gl.glAccum(GL2.GL_ACCUM, 0.25f);
 
-        gl.glFlush();
+        //gl.glFlush();
 
-        //gl.glAccum(GL2.GL_LOAD, 0.5f);
-        gl.glAccum( GL2.GL_MULT, 0.95f );
+        gl.glAccum( GL2.GL_MULT, 0.5f );
         gl.glAccum( GL2.GL_ACCUM, 0.5f );
         gl.glAccum(GL2.GL_RETURN, 1f);
-        swapBuffers();
+        //swapBuffers();
 
         //i++;
 
@@ -583,7 +580,8 @@ defines
         gl.glShadeModel(gl.GL_SMOOTH);
 
         //gl.glClearColor(0.0f, 0.0f, 0.0f, 0.9f);
-        //gl.glClearAccum(0,0,0,0.9f);
+        gl.glClearAccum(0,0,0,0.9f);
+        gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_ACCUM_BUFFER_BIT);
 
         gl.glClearDepth(1.0f);
 
@@ -684,9 +682,9 @@ defines
 
     public void initEffects(GL2 gl) {
 
-        //gl.glLineWidth(2f);
+        gl.glLineWidth(2f);
 
-        //gl.glEnable(GL.GL_LINE_SMOOTH);
+        gl.glEnable(GL.GL_LINE_SMOOTH);
         gl.glEnable(GL.GL_LINE_WIDTH);
 
 
@@ -696,8 +694,7 @@ defines
 
 
 
-        //gl.glClearAccum(0.0f, 0.0f, 0.0f, 1.0f);
-        //gl.glClear(GL2.GL_ACCUM_BUFFER_BIT);
+
     }
 
 

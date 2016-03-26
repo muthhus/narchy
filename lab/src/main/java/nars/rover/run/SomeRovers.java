@@ -11,8 +11,6 @@ import nars.guifx.NARfx;
 import nars.guifx.NARtop;
 import nars.guifx.chart.MatrixImage;
 import nars.guifx.chart.Plot2D;
-import nars.guifx.chart.PlotBox;
-import nars.guifx.nars.LoopPane;
 import nars.guifx.nars.NARPlot;
 import nars.guifx.util.ColorArray;
 import nars.nar.AbstractNAR;
@@ -52,7 +50,7 @@ public class SomeRovers {
     public static final String motorForward = "motor(fore)";
     public static final String motorBackward = "motor(back)";
     public static final String motorStop = "motor(stop)";
-    public static final String fire = "turret(fire)";
+    public static final String turretFire = "turret(fire)";
 
 
 
@@ -112,7 +110,7 @@ public class SomeRovers {
                                                         "MotorControls(#x,motor,(),#z)",
                                                         motorLeft, motorRight,
                                                         motorForward, motorBackward,
-                                                        motorStop /*, turretFire */)),
+                                                        motorStop, turretFire)),
                                             scrolled(new NARtop(n).addAll(
                                                         EAT_FOOD.toString(),
                                                         EAT_POISON.toString(),
@@ -275,7 +273,7 @@ public class SomeRovers {
         nqSpine.output.addAll(
                 Stream.of(n.terms(
                         motorStop,
-                        //fire,
+                        turretFire,
                         motorForward, motorBackward, motorLeft, motorRight))
                         .map(t -> new InputTask(n, t, Symbols.GOAL, false))
                         .collect(Collectors.toList())

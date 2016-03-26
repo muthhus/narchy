@@ -66,6 +66,9 @@ public class Turret implements LayerDraw {
 //
 //        }
 
+        if (rng.nextFloat() > power/20f) {
+            return false;
+        }
 
         if (bullets.size() >= maxBullets) {
             sim.remove( bullets.removeFirst() );
@@ -84,7 +87,10 @@ public class Turret implements LayerDraw {
 
 
         //float diesAt = now + ttl;
-        b.setUserData(new BulletData(b, power));
+        BulletData bd;
+        b.setUserData(bd = new BulletData(b, power));
+        b.getFixtureList().setUserData(bd);
+
         bullets.add(b);
 
 
@@ -121,13 +127,14 @@ public class Turret implements LayerDraw {
     }
 
     @Override
-    public void drawGround(JoglAbstractDraw draw, World w) {
+    public void drawSky(JoglAbstractDraw draw, World w) {
 
     }
 
     @Override
-    public void drawSky(JoglAbstractDraw draw, World w) {
+    public void drawGround(JoglAbstractDraw draw, World w) {
         if (!explosions.isEmpty()) {
+
             Iterator<BulletData> ii = explosions.iterator();
             while (ii.hasNext()) {
                 BulletData bd = ii.next();

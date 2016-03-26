@@ -224,6 +224,7 @@ public class DefaultBroadPhaseBuffer implements TreeCallback, BroadPhase {
   }
 
   protected final void unbufferMove(int proxyId) {
+    int[] m_moveBuffer = this.m_moveBuffer;
     for (int i = 0; i < m_moveCount; i++) {
       if (m_moveBuffer[i] == proxyId) {
         m_moveBuffer[i] = NULL_PROXY;

@@ -309,7 +309,7 @@ public abstract class PhysicsModel extends Bodies implements ContactListener, Ru
 //
 //    private final AABB paabb = new AABB();
     
-    final AtomicBoolean drawPending = new AtomicBoolean(false);
+    //final AtomicBoolean drawPending = new AtomicBoolean(false);
 
     public float getTime() {
         return time;

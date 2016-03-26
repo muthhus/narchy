@@ -115,8 +115,9 @@ public class Sim extends PhysicsModel {
         //this.clock = clock;
         this.world = world;
 
-
         runner = new PhysicsRun(world, 30f, this);
+
+        world.setContactListener(this);
 
 
         init(world);

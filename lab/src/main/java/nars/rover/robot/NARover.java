@@ -182,6 +182,18 @@ public class NARover extends AbstractPolygonBot {
             return s;
         });
 
+        MotorConcept turretFire = new MotorConcept("turret(fire)", nar, (s) -> {
+
+            if (s > motorThresh) {
+                if (gun.fire(torso, s)) {
+                    return s;
+                }
+            }
+            return 0; //unfired;
+
+        });
+
+
     }
 
     @Override

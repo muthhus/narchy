@@ -49,7 +49,6 @@ public class ContactManager implements PairCallback {
     m_contactList = null;
     m_contactCount = 0;
     m_contactFilter = new ContactFilter();
-    m_contactListener = null;
     m_broadPhase = broadPhase;
     pool = argPool;
   }

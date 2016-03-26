@@ -78,7 +78,7 @@ import java.awt.event.KeyListener;
 
 //        config.setBackgroundOpaque(false);
 
-        config.setDoubleBuffered(true);
+
 
         config.setAlphaBits(8);
         config.setAccumAlphaBits(8);
