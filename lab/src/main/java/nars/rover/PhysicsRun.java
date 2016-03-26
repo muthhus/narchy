@@ -72,16 +72,22 @@ import java.awt.event.KeyListener;
                         JOptionPane.ERROR_MESSAGE));
 
         //PhysPanel panel = new PhysPanel(model, controller);
-        GLCapabilities config = new GLCapabilities(GLProfile.getDefault());
+        GLCapabilities config = new GLCapabilities(GLProfile.getMaximum(true)); //getDefault());
+
         config.setHardwareAccelerated(true);
+
+//        config.setBackgroundOpaque(false);
+
+        config.setDoubleBuffered(true);
+
         config.setAlphaBits(8);
         config.setAccumAlphaBits(8);
         config.setAccumRedBits(8);
         config.setAccumGreenBits(8);
         config.setAccumBlueBits(8);
 
-        config.setNumSamples(1);
-        //config.setBackgroundOpaque(false);
+
+        //config.setNumSamples(1);
 
         //World world = model.getWorldCreator().createWorld(model.gravity);
 
@@ -98,16 +104,17 @@ import java.awt.event.KeyListener;
             model.addTest(test);
         }
 
-        JFrame window = new JFrame();
-        window.setTitle("NAR Physics");
-        window.setLayout(new BorderLayout());
-        //TestbedSidePanel side = new TestbedSidePanel(model, controller);
-        window.add(panel, "Center");
-        //window.add(new JScrollPane(side), "East");
-        window.pack();
-        window.setVisible(true);
-        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//        JFrame window = new JFrame();
+//        window.setTitle("NAR Physics");
+//        window.setLayout(new BorderLayout());
+//        //TestbedSidePanel side = new TestbedSidePanel(model, controller);
+//        //window.add(panel, "Center");
+//        //window.add(new JScrollPane(side), "East");
+//        window.pack();
+//        window.setVisible(true);
+//        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
+
         controller.ready();
     }
     

@@ -210,10 +210,11 @@ public class JoglDraw extends JoglAbstractDraw {
 
     @Override
     public void drawString(float x, float y, String s, Color3f color) {
-        text.beginRendering(panel.getWidth(), panel.getHeight());
-        text.setColor(color.x, color.y, color.z, 1);
-        text.draw(s, (int) x, panel.getHeight() - (int) y);
-        text.endRendering();
+        throw new UnsupportedOperationException();
+//        text.beginRendering(panel.getWidth(), panel.getHeight());
+//        text.setColor(color.x, color.y, color.z, 1);
+//        text.draw(s, (int) x, panel.getHeight() - (int) y);
+//        text.endRendering();
     }
 }
 

@@ -24,7 +24,6 @@
 package nars.rover.physics.gl;
 
 import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.util.awt.TextRenderer;
 import nars.Video;
 import nars.rover.physics.PhysicsCamera;
 import nars.rover.physics.j2d.LayerDraw;
@@ -49,7 +48,7 @@ import static nars.rover.Sim.poisonFill;
 public abstract class JoglAbstractDraw extends DebugDraw {
 
     public static final int MAX_POLYGON_VERTICES = Settings.maxPolygonVertices;
-    protected final TextRenderer text;
+    //protected final TextRenderer text;
     public static final int NUM_CIRCLE_POINTS = 11;
 
     final Transform xf = new Transform();
@@ -57,7 +56,7 @@ public abstract class JoglAbstractDraw extends DebugDraw {
 
     public JoglAbstractDraw() {
         super(new OBBViewportTransform());
-        text = new TextRenderer(Video.monofont);
+        //text = new TextRenderer(Video.monofont);
 
         //viewportTransform.setCamera(0, 0, 50.0f);
     }

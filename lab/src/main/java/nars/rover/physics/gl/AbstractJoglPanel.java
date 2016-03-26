@@ -1,15 +1,20 @@
 package nars.rover.physics.gl;
 
+import com.jogamp.newt.NewtFactory;
+import com.jogamp.newt.event.*;
+import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.*;
-import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.glu.GLU;
-import com.sun.prism.impl.BufferUtil;
+import com.jogamp.opengl.glu.gl2.GLUgl2;
+import com.jogamp.opengl.util.Animator;
+import com.sun.deploy.util.BufferUtil;
 import nars.rover.physics.Display;
 import nars.rover.physics.TestbedState;
+import org.jbox2d.common.BufferUtils;
 import org.jbox2d.dynamics.World;
 
+
 import java.awt.*;
-import java.awt.event.*;
 import java.nio.FloatBuffer;
 import java.util.Arrays;
 
@@ -43,7 +48,7 @@ import static com.jogamp.opengl.fixedfunc.GLMatrixFunc.GL_PROJECTION;
 /**
  *
  */
-public abstract class AbstractJoglPanel extends GLCanvas implements Display, GLEventListener {
+public abstract class AbstractJoglPanel extends GLWindow implements Display, GLEventListener {
     private static final long serialVersionUID = 1L;
 
     //public static final int SCREEN_DRAG_BUTTON = 3;
@@ -62,30 +67,21 @@ public abstract class AbstractJoglPanel extends GLCanvas implements Display, GLE
     // model can be null
     // if it is null world and debugDraw can be null, because they are retrived from model
     public AbstractJoglPanel(final World world, TestbedState model, GLCapabilitiesImmutable config) {
-        super(config);
+        //super(GLWindow.create(config));
+        super(NewtFactory.createWindow(config));
 
         this.world = world;
 
         this.model = model;
 
-        setSize(INIT_WIDTH, INIT_HEIGHT);
-        //(new Dimension(600, 600));
-        //setAutoSwapBufferMode(true);
         addGLEventListener(this);
-        enableInputMethods(true);
 
-//        if (model != null && controller != null) {
-//            //AWTPanelHelper.addHelpAndPanelListeners(this, model, controller, SCREEN_DRAG_BUTTON);
-//            AWTPanelHelper.addHelpAndPanelListeners(this, model, controller, SCREEN_DRAG_BUTTON);
-//        }
+        Animator a = new Animator();
+        a.add(this);
+        a.start();
 
-        addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentResized(ComponentEvent e) {
-                //setsSize(getWidth(), getHeight());
-                //dbImage = null;
-            }
-        });
+        setSize(INIT_WIDTH, INIT_HEIGHT);
+        setVisible(true);
 
 
     }
@@ -102,33 +98,22 @@ public abstract class AbstractJoglPanel extends GLCanvas implements Display, GLE
 
     @Override
     public void paintScreen() {
-        display();
-
+        //display();
     }
 
     @Override
     public void display(GLAutoDrawable arg0) {
-        repainter();
-    }
-
-    protected void repainter() {
 
         GL2 gl = getGL().getGL2();
 
-        //gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+        // Clear the draw and depth buffers
+
+        gl.glClearColor(0f, 0f, 0f, 0f);
+        gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
 
 
-        //getGL().getGL2().glBlendFunc(GL2.GL_SRC_ALPHA, GL2.GL_ONE_MINUS_SRC_ALPHA);
-
-        gl.glClearColor(0.0f, 0.0f, 0.0f, 0.8f);
-        gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT | GL2.GL_STENCIL_BUFFER_BIT);
 
 
-        gl.glClearAccum(0, 0, 0, 1f);
-        gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
-
-
-        //gl.glAccum(GL2.GL_RETURN, 0.9f); //adding the current frame to the buffer
 
 
         float time = 0.0f; // what does this?
@@ -139,19 +124,37 @@ public abstract class AbstractJoglPanel extends GLCanvas implements Display, GLE
         game.render(gl, time);
 
 
+        //gl.glAccum( GL2.GL_MULT, 0.95f );
+        //gl.glAccum( GL2.GL_ACCUM, 0.05f );
+        //gl.glAccum( GL2.GL_RETURN, 1.0f );
+
+
         //https://www.opengl.org/sdk/docs/man2/xhtml/glAccum.xml
 
-        //light.render(gl, drawer.getViewportTranform());
-
-
-        //gl.glAccum(GL2.GL_LOAD, 0.95f); //Drawing last frame, saved in buffer
-        //gl.glAccum(GL2.GL_MULT, 0.95f ); //make current frame in buffer dim
-
+        //if(i == 0)
+            //gl.glAccum(GL2.GL_LOAD, 1.0 / n);
+        //else
+//            gl.glAccum(GL2.GL_ACCUM, 0.25f);
 
         gl.glFlush();
 
+        //gl.glAccum(GL2.GL_LOAD, 0.5f);
+        gl.glAccum( GL2.GL_MULT, 0.95f );
+        gl.glAccum( GL2.GL_ACCUM, 0.5f );
+        gl.glAccum(GL2.GL_RETURN, 1f);
+        swapBuffers();
 
-        repaint();
+        //i++;
+
+        //if(i >= n) {
+            //i = 0;
+            //gl.glAccum(GL2.GL_RETURN, 0.75f);
+            //swapBuffers();
+
+
+        //swapBuffers();
+
+        //repaint();
 
 
     }
@@ -259,7 +262,7 @@ axis.
 
                 0, 0, 0, 1};
 
-        private FloatBuffer matrix = BufferUtil.newFloatBuffer(mat.length);
+        private FloatBuffer matrix = FloatBuffer.allocate(mat.length);
 
         {
             matrix.put(mat);
@@ -559,7 +562,7 @@ defines
     public void init(GLAutoDrawable drawable) {
 
 
-        GL2 gl = (GL2) drawable.getGL();
+        GL2 gl = drawable.getGL().getGL2();
 
         initEffects(gl);
 
@@ -567,7 +570,7 @@ defines
 
         game.setMouseCenter(new Point());
 
-        GLU glu = new GLU();
+        GLU glu = new GLUgl2();
 
         gl.glViewport(0, 0, w, h);
 
@@ -579,7 +582,8 @@ defines
 
         gl.glShadeModel(gl.GL_SMOOTH);
 
-        //gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        //gl.glClearColor(0.0f, 0.0f, 0.0f, 0.9f);
+        //gl.glClearAccum(0,0,0,0.9f);
 
         gl.glClearDepth(1.0f);
 
@@ -587,7 +591,8 @@ defines
 
         gl.glDepthFunc(gl.GL_LEQUAL);
 
-        gl.glHint(gl.GL_PERSPECTIVE_CORRECTION_HINT, gl.GL_NICEST);
+        gl.glHint(gl.GL_PERSPECTIVE_CORRECTION_HINT, gl.GL_FASTEST);
+
 
 
         this.addKeyListener(new KeyAdapter() {
@@ -677,12 +682,22 @@ defines
 //        new FPSAnimator(this, 25);
 //    }
 
-    public void initEffects(GL gl2) {
-        gl2.glLineWidth(2f);
+    public void initEffects(GL2 gl) {
 
-        gl2.glEnable(GL.GL_LINE_SMOOTH);
-        gl2.glEnable(GL.GL_LINE_WIDTH);
-        gl2.glEnable(GL2.GL_BLEND);
+        //gl.glLineWidth(2f);
+
+        //gl.glEnable(GL.GL_LINE_SMOOTH);
+        gl.glEnable(GL.GL_LINE_WIDTH);
+
+
+        //gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+        //gl.glEnable(GL.GL_ALPHA);
+        //gl.glAlphaFunc(GL.GL_GREATER, .01f);
+
+
+
+        //gl.glClearAccum(0.0f, 0.0f, 0.0f, 1.0f);
+        //gl.glClear(GL2.GL_ACCUM_BUFFER_BIT);
     }
 
 
@@ -717,25 +732,25 @@ defines
 
     }
 
-
-    public void reshape2D(GLAutoDrawable arg0, int arg1, int arg2, int arg3, int arg4) {
-        float width = getWidth();
-        float height = getHeight();
-
-        GL2 gl2 = arg0.getGL().getGL2();
-
-        gl2.glMatrixMode(GL_PROJECTION);
-        gl2.glLoadIdentity();
-
-        // coordinate system origin at lower left with width and height same as the window
-        GLU glu = new GLU();
-        glu.gluOrtho2D(0.0f, width, 0.0f, height);
-
-
-        gl2.glMatrixMode(GL_MODELVIEW);
-        gl2.glLoadIdentity();
-
-        gl2.glViewport(0, 0, getWidth(), getHeight());
-
-    }
+//
+//    public void reshape2D(GLAutoDrawable arg0, int arg1, int arg2, int arg3, int arg4) {
+//        float width = getWidth();
+//        float height = getHeight();
+//
+//        GL2 gl2 = arg0.getGL().getGL2();
+//
+//        gl2.glMatrixMode(GL_PROJECTION);
+//        gl2.glLoadIdentity();
+//
+//        // coordinate system origin at lower left with width and height same as the window
+//        GLU glu = new GLU();
+//        glu.gluOrtho2D(0.0f, width, 0.0f, height);
+//
+//
+//        gl2.glMatrixMode(GL_MODELVIEW);
+//        gl2.glLoadIdentity();
+//
+//        gl2.glViewport(0, 0, getWidth(), getHeight());
+//
+//    }
 }
