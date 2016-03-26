@@ -589,6 +589,10 @@ public abstract class PhysicsModel extends Bodies implements ContactListener, Ru
             ++pointCount;
         }
     }
+
+    public void dt(float dt) {
+        time += dt;
+    }
 }
 
 class TestQueryCallback implements QueryCallback {

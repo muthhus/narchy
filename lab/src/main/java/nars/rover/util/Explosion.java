@@ -28,6 +28,8 @@ public class Explosion {
 
         final float m_blastRadiusSq = blastRadius*blastRadius;
 
+        world.heatAdd(blastRadius);
+
         //find all bodies with fixtures in blast radius AABB
         QueryCallback queryCallback = fixture -> {
             Body body = fixture.getBody();

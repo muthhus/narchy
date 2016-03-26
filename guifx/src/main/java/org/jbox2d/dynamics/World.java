@@ -107,6 +107,9 @@ public class World {
   private final ContactRegister[][] contactStacks =
           new ContactRegister[ShapeType.values().length][ShapeType.values().length];
 
+  /** ambient "heat" for visualizing explosions, etc */
+  private float heat;
+
   /**
    * Construct a world object.
    *
@@ -569,6 +572,7 @@ public class World {
    * @param positionIterations for the position constraint solver.
    */
   public void step(float dt, int velocityIterations, int positionIterations) {
+
     stepTimer.reset();
     tempTimer.reset();
     // log.debug("Starting step");
@@ -994,46 +998,50 @@ public class World {
     return (m_flags & LOCKED) == LOCKED;
   }
 
-  /**
-   * Set flag to control automatic clearing of forces after each time step.
-   *
-   * @param flag
-   */
-  public void setAutoClearForces(boolean flag) {
-    if (flag) {
-      m_flags |= CLEAR_FORCES;
-    } else {
-      m_flags &= ~CLEAR_FORCES;
-    }
-  }
+//  /**
+//   * Set flag to control automatic clearing of forces after each time step.
+//   *
+//   * @param flag
+//   */
+//  public void setAutoClearForces(boolean flag) {
+//    if (flag) {
+//      m_flags |= CLEAR_FORCES;
+//    } else {
+//      m_flags &= ~CLEAR_FORCES;
+//    }
+//  }
 
-  /**
-   * Get the flag that controls automatic clearing of forces after each time step.
-   *
-   * @return
-   */
-  public boolean getAutoClearForces() {
-    return (m_flags & CLEAR_FORCES) == CLEAR_FORCES;
-  }
-
-  /**
-   * Get the contact manager for testing purposes
-   *
-   * @return
-   */
-  public ContactManager getContactManager() {
-    return m_contactManager;
-  }
-
-  public Profile getProfile() {
-    return m_profile;
-  }
+//  /**
+//   * Get the flag that controls automatic clearing of forces after each time step.
+//   *
+//   * @return
+//   */
+//  public boolean getAutoClearForces() {
+//    return (m_flags & CLEAR_FORCES) == CLEAR_FORCES;
+//  }
+//
+//  /**
+//   * Get the contact manager for testing purposes
+//   *
+//   * @return
+//   */
+//  public ContactManager getContactManager() {
+//    return m_contactManager;
+//  }
+//
+//  public Profile getProfile() {
+//    return m_profile;
+//  }
 
   private final Island island = new Island();
   private Body[] stack = new Body[10]; // TODO djm find a good initial stack number;
   private final Timer broadphaseTimer = new Timer();
 
   private void solve(TimeStep step) {
+
+    heatUpdate();
+
+
     m_profile.solveInit.startAccum();
     m_profile.solveVelocity.startAccum();
     m_profile.solvePosition.startAccum();
@@ -1194,6 +1202,11 @@ public class World {
     // Look for new contacts.
     m_contactManager.findNewContacts();
     m_profile.broadphase.record(broadphaseTimer.getMilliseconds());
+  }
+
+  private void heatUpdate() {
+    heat *= 0.75f;
+    if (heat > 1f) heat = 1f;
   }
 
   private final Island toiIsland = new Island();
@@ -1483,6 +1496,14 @@ public class World {
         break;
       }
     }
+  }
+
+  public void heatAdd(float blastRadius) {
+      this.heat += blastRadius;
+  }
+
+  public float getHeat() {
+      return heat;
   }
 
 //  private void drawJoint(Joint joint) {

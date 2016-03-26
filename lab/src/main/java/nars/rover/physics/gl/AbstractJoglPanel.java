@@ -7,19 +7,17 @@ import com.jogamp.opengl.*;
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.glu.gl2.GLUgl2;
 import com.jogamp.opengl.util.Animator;
-import com.sun.deploy.util.BufferUtil;
 import nars.rover.physics.Display;
 import nars.rover.physics.TestbedState;
-import org.jbox2d.common.BufferUtils;
 import org.jbox2d.dynamics.World;
 
 
 import java.awt.*;
 import java.nio.FloatBuffer;
-import java.util.Arrays;
 
 import static com.jogamp.opengl.fixedfunc.GLMatrixFunc.GL_MODELVIEW;
 import static com.jogamp.opengl.fixedfunc.GLMatrixFunc.GL_PROJECTION;
+import static nars.rover.physics.external.Jetpack.rng;
 
 /*******************************************************************************
  * Copyright (c) 2013, Daniel Murphy
@@ -109,7 +107,8 @@ public abstract class AbstractJoglPanel extends GLWindow implements Display, GLE
         // Clear the draw and depth buffers
 
         //gl.glClearAccum(0,0,0,-1f);
-        gl.glClearColor(0f, 0f, 0f, 1f);
+        float currentHeat = world.getHeat();
+        gl.glClearColor(0f + currentHeat /0.25f, 0f, 0f, 1f);
         gl.glClear(/*GL2.GL_ACCUM_BUFFER_BIT | */GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
 
         //gl.glClearAccum(0.0f, 0.0f, 0.0f, 1.0f);
@@ -123,7 +122,21 @@ public abstract class AbstractJoglPanel extends GLWindow implements Display, GLE
             time = model.model.getTime();
         }
 
-        game.render(gl, time);
+
+        game.camera(gl, time);
+
+        {
+            //shake camera by heat
+            float rx = rng.nextFloat() * currentHeat * 5;
+            float ry = rng.nextFloat() * currentHeat * 5;
+            float rz = rng.nextFloat() * currentHeat * 5;
+            gl.glTranslatef(rx, ry, rz);
+        }
+
+
+        draw(gl, time);
+
+        game.matrix.rewind();
 
 
         //gl.glAccum( GL2.GL_MULT, 0.95f );
@@ -136,10 +149,11 @@ public abstract class AbstractJoglPanel extends GLWindow implements Display, GLE
 
         //gl.glFlush();
 
-        gl.glAccum( GL2.GL_MULT, 0.5f );
-        gl.glAccum( GL2.GL_ACCUM, 0.5f );
+        gl.glAccum( GL2.GL_MULT, 0.5f   );
+        gl.glAccum( GL2.GL_ACCUM, 0.5f + currentHeat /4f);
         gl.glAccum(GL2.GL_RETURN, 1f);
         //swapBuffers();
+
 
         //i++;
 
@@ -184,8 +198,8 @@ public abstract class AbstractJoglPanel extends GLWindow implements Display, GLE
                 this.mouseCenter.setLocation(center);
         }
 
-        float linSpeed = 50f;
-        float angleSpeed = 0.0001f;
+        float linSpeed = 75f;
+        float angleSpeed = 0.00005f;
 
         public void forward(float v) {
             ford = v;
@@ -379,7 +393,7 @@ axis.
  */
 
 
-        public void render(GL2 gl, float dt) {
+        public void camera(GL2 gl, float dt) {
 
             /*
 
@@ -532,9 +546,6 @@ defines
 //                }
 //            }
 
-            draw(gl, dt);
-
-            matrix.rewind();
 
 
         }

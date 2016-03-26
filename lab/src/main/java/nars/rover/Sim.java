@@ -297,9 +297,7 @@ public class Sim extends PhysicsModel {
                 settings.getSetting(TestbedSettings.VelocityIterations).value,
                 settings.getSetting(TestbedSettings.PositionIterations).value);
 
-
-
-        //clock.add(1);
+        runner.model.model.dt(dt);
     }
 
     @Override
