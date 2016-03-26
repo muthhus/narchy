@@ -159,7 +159,7 @@ public class BeliefTableTest  {
         b.believe(1.0f, 0.5f); n.step();
         b.print();
         assertEquals(0.75, beliefs.topEternal().conf(), 0.001);
-        assertEquals(6, beliefs.size());
+        assertEquals(5, beliefs.size());
 
         //n.step();
         //b.print();

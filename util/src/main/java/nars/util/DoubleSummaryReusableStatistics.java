@@ -27,11 +27,10 @@ public class DoubleSummaryReusableStatistics implements DoubleConsumer {
         clear();
     }
 
-    public void clear() {
+    public final void clear() {
         count = 0;
         sum = 0;
-        min = Double.MAX_VALUE;
-        max = Double.MIN_VALUE;
+        min = max = Double.MAX_VALUE;
     }
     /**
      * Records another value into the summary information.

@@ -101,6 +101,10 @@ public class Plot2D extends NControl/*Canvas */  {
     private final SimpleObjectProperty<PlotVis> plotVis = new SimpleObjectProperty<>();
 
 
+    public Plot2D(PlotVis p, int history) {
+        this(p, history, 0);
+    }
+
     public Plot2D(PlotVis p, int history, double h) {
         this(p, history, 0, h);
     }
@@ -232,7 +236,7 @@ public class Plot2D extends NControl/*Canvas */  {
             double h = H - m * 2;
 
             g.setGlobalBlendMode(BlendMode.DIFFERENCE);
-            g.setFill(Color.BLACK);
+            g.setFill(Color.GRAY);
             g.setStroke(Color.GRAY);
             g.fillText(String.valueOf(maxValue), 0, m + g.getFont().getSize());
             g.strokeLine(0, m, w, m);

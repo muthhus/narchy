@@ -79,7 +79,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
                     "               IRC:  http://webchat.freenode.net/?channels=nars \n";
 
 
-    private static final Logger logger = LoggerFactory.getLogger(NAR.class);
+    public static final Logger logger = LoggerFactory.getLogger(NAR.class);
 
     private static final ExecutorService asyncs = //shared
             (ThreadPoolExecutor) Executors.newCachedThreadPool();
@@ -588,6 +588,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     private final void _frame(int frames) {
 
+        emotion.frame();
+
         Topic<NAR> frameStart = eventFrameStart;
 
         Topic<Memory> cycleStart = eventCycleEnd;
@@ -601,6 +603,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             cycles(cycleStart, cpf);
             runNextTasks();
         }
+
+
     }
 
     @NotNull
@@ -937,9 +941,10 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     /** a frame batches a burst of multiple cycles, for coordinating with external systems in which multiple cycles
      * must be run per control frame. */
-    @NotNull public NAR onFrame(@NotNull Consumer<NAR> receiver) {
-        regs.add(eventFrameStart.on(receiver));
-        return this;
+    @NotNull public On onFrame(@NotNull Consumer<NAR> receiver) {
+        On r;
+        regs.add(r = eventFrameStart.on(receiver));
+        return r;
     }
 
     @NotNull

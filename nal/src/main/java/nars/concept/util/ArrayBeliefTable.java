@@ -4,7 +4,6 @@ import com.google.common.collect.Iterators;
 import nars.Global;
 import nars.Memory;
 import nars.NAR;
-import nars.bag.Table;
 import nars.bag.impl.ArrayTable;
 import nars.bag.impl.ListTable;
 import nars.budget.BudgetMerge;
@@ -12,6 +11,7 @@ import nars.task.Revision;
 import nars.task.Task;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
+import nars.truth.TruthFunctions;
 import nars.util.ArraySortedIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import static nars.truth.TruthFunctions.temporalProjection;
+
 
 
 /**
@@ -66,6 +66,7 @@ public class ArrayBeliefTable implements BeliefTable {
 
     }
 
+    /** TODO this value can be cached per cycle (when,now) etc */
     @Nullable public Truth truth(long when, long now, float dur) {
 
         //old method: project the top task
@@ -94,11 +95,27 @@ public class ArrayBeliefTable implements BeliefTable {
         if (numTemporal == 1) //optimization: just return the only temporal truth value if it's the only one
             return temp.get(0).truth();
 
+
+
+//        long maxtime = Long.MIN_VALUE;
+//        for (int i = 0, listSize = numTemporal; i < listSize; i++) {
+//            long t = temp.get(i).occurrence();
+//            if (t > maxtime)
+//                maxtime = t;
+//        }
+
+
+
         for (int i = 0, listSize = numTemporal; i < listSize; i++) {
             Task x = temp.get(i);
 
             //strength decreases with distance in time
-            float strength = temporalProjection(when, x.occurrence(), now, dur);
+            float strength = TruthFunctions.temporalIntersection(when, x.occurrence(),
+                    //maxtime);
+                    now,
+                    dur);
+
+            strength *= 2; /* square */
 
             sumConf += x.conf() * strength;
             sumFreq += x.freq() * strength;
@@ -158,7 +175,10 @@ public class ArrayBeliefTable implements BeliefTable {
     @NotNull
     @Override
     public Iterator<Task> iterator() {
-        return Iterators.concat(eternal.list().iterator(), temporal.list().iterator());
+        return Iterators.concat(
+            eternal.list().iterator(),
+            temporal.list().iterator()
+        );
     }
 
     @Override
@@ -305,7 +325,7 @@ public class ArrayBeliefTable implements BeliefTable {
 //        return t == displaced ? null: t;
 //    }
 
-    private Task contains(Task incoming) {
+    public Task contains(Task incoming) {
 
         Task existing = map.get(incoming);
         if (existing!=null)  {
@@ -349,6 +369,7 @@ public class ArrayBeliefTable implements BeliefTable {
             table.forEach(overridden);
             table.clear();
             table.setCapacity(0);
+            nar.logger.info("axiom: {}", incoming);
             return true;
         }
 

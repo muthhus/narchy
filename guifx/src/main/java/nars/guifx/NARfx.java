@@ -281,11 +281,19 @@ public enum NARfx  {
 //
 //    }
 
-
     public static Stage newWindow(String title, Region n) {
+        return newWindow(title, n, 0, 0);
+    }
 
-        n.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        n.autosize();
+    public static Stage newWindow(String title, Region n, double w, double h) {
+
+        if (w == 0) {
+            n.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+            n.autosize();
+        } else {
+            n.prefWidth(w);
+            n.prefHeight(h);
+        }
 
         Scene scene = new Scene(n);
         NARfx.theme(scene);

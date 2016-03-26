@@ -13,8 +13,8 @@ public abstract class FrameReaction implements Consumer<NAR> {
     @Nullable
     private On reg;
 
-    protected FrameReaction(@NotNull Memory m) {
-        reg = m.eventFrameStart.on(this);
+    protected FrameReaction(@NotNull NAR n) {
+        reg = n.onFrame(this);
     }
 
     public void off() {

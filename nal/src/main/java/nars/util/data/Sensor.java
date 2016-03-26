@@ -2,6 +2,7 @@ package nars.util.data;
 
 import com.gs.collections.api.block.function.primitive.FloatFunction;
 import com.gs.collections.api.block.function.primitive.FloatToFloatFunction;
+import nars.Global;
 import nars.NAR;
 import nars.Symbols;
 import nars.task.MutableTask;
@@ -31,7 +32,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
     private float pri;
     private final float dur;
     private float confFactor;
-    private float prevF;
+    private float prevF = Float.NaN;
 
     boolean inputIfSame = false;
     int maxTimeBetweenUpdates;
@@ -55,7 +56,10 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
     }
 
     public Sensor(@NotNull NAR n, Termed  t, FloatFunction<Term> value, FloatToFloatFunction valueToFreq) {
-        this(n, t, value, valueToFreq, n.getDefaultConfidence(Symbols.BELIEF),
+        this(n, t, value, valueToFreq,
+
+                n.getDefaultConfidence(Symbols.BELIEF),
+
                 n.DEFAULT_JUDGMENT_PRIORITY, n.DEFAULT_JUDGMENT_DURABILITY);
     }
 
@@ -84,6 +88,10 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
         return this;
     }
 
+    public void ready() {
+        this.lastInput = nar.time()-minTimeBetweenUpdates;
+    }
+
     @Override
     public void accept(@NotNull NAR nar) {
 
@@ -100,25 +108,27 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
             return; //allow the frequency function to prevent input by returning NaN
 
 
-
         float f = Util.round(fRaw, resolution);
 
-        if (inputIfSame || (f != prevF)) {
+        int maxT = this.maxTimeBetweenUpdates;
+        boolean limitsMaxTime = maxT != 0;
 
-            int maxT = this.maxTimeBetweenUpdates;
-            boolean limitsMaxTime = maxT != 0;
+        if (inputIfSame || !Util.equals(f, prevF, Global.TRUTH_EPSILON) ||
+                (limitsMaxTime && timeSinceLastInput > maxTimeBetweenUpdates)
+                ) {
+
             int minT = this.minTimeBetweenUpdates;
             boolean limitsMinTime =  minT != 0;
 
-            if (!limitsMaxTime || (timeSinceLastInput >= maxT)) {
-                if (!limitsMinTime || (timeSinceLastInput >= minT)) {
-                    Task t = input(f);
-                    this.lastInput = t.creation();
-                }
+
+            if (!limitsMinTime || (timeSinceLastInput >= minT)) {
+                Task t = input(f);
+                this.lastInput = t.creation();
+                this.prevF = f;
             }
+
         }
 
-        this.prevF = f;
 
         //this.prevValue = next;
     }
@@ -140,8 +150,11 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
         }
 
 
+//        float f = v;
+//        float c = confFactor;
+
         long now = nar.time();
-        Task t = new MutableTask(term).belief()
+        Task t = new MutableTask(term, '.')
                 //.truth(v, conf)
                 .truth(f, c)
                 .time(now, now + dt())
@@ -168,18 +181,23 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
         return this;
     }
 
-    /** sets minimum time between updates, even if nothing changed. zero to disable this */
-    @NotNull
-    public Sensor maxTimeBetweenUpdates(int dt) {
-        this.maxTimeBetweenUpdates = dt;
-        return this;
-    }
+//    /** sets minimum time between updates, even if nothing changed. zero to disable this */
+//    @NotNull
+//    public Sensor maxTimeBetweenUpdates(int dt) {
+//        this.maxTimeBetweenUpdates = dt;
+//        return this;
+//    }
+
     @NotNull
     public Sensor minTimeBetweenUpdates(int dt) {
         this.minTimeBetweenUpdates = dt;
         return this;
     }
-
+    @NotNull
+    public Sensor maxTimeBetweenUpdates(int dt) {
+        this.maxTimeBetweenUpdates = dt;
+        return this;
+    }
     //        public void on() {
 //
 //        }

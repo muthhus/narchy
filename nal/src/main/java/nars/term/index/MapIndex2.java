@@ -238,7 +238,9 @@ public class MapIndex2 extends AbstractMapIndex {
 
         SubtermNode node = getOrAddNode(((Compound) t.term()).subterms());
         Termed existing = node.put(t.opRel(), t);
-        assert(existing==null);
+        if (existing!=null && existing!=t)
+            throw new RuntimeException(t + " can not be set because " + existing + " already exists");
+        //assert(existing==null || existing == t);
         return t;
     }
 

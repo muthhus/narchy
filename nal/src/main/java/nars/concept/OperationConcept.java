@@ -39,7 +39,7 @@ public class OperationConcept extends CompoundConcept implements Runnable {
     //TODO allocate this only for Operation (not negations)
     transient private final List<Task> pending = Global.newArrayList(0);
 
-    transient private NAR nar;
+    public transient NAR nar;
 
 
     public OperationConcept(@NotNull Compound term, Bag<Termed> termLinks, Bag<Task> taskLinks) {
@@ -49,6 +49,7 @@ public class OperationConcept extends CompoundConcept implements Runnable {
     public OperationConcept(@NotNull String compoundTermString, NAR n) throws Narsese.NarseseException {
         super(compoundTermString, n);
         assert(Op.isOperation(term));
+        n.on(this);
     }
 
     @Nullable

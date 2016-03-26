@@ -6,6 +6,7 @@ import nars.bag.BLink;
 import nars.concept.Concept;
 import nars.nar.Default;
 import nars.rover.physics.gl.JoglDraw;
+import nars.term.Term;
 import nars.term.atom.Atom;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.Vec2;
@@ -22,7 +23,7 @@ public class NARVisionRay extends VisionRay {
 
     //private final String seenAngleTerm;
 
-    public final Atom visionTerm;
+    public final Term visionTerm;
 
     public BLink<Concept> angleConcept;
 
@@ -31,12 +32,15 @@ public class NARVisionRay extends VisionRay {
     float conceptQuality;
 
 
-    public NARVisionRay(String id, NAR nar, Body base, Vec2 point, float angle, float arc, int resolution, float length) {
+    public NARVisionRay(String id, int num, NAR nar, Body base, Vec2 point, float angle, float arc, int resolution, float length) {
         super(point, angle, arc, base, length, resolution);
 
 
         this.nar = nar;
-        this.visionTerm = $.the(id);
+        this.visionTerm =
+            //$.p(id, Integer.toString(num));
+            $.the(id + num);
+
         //this.seenAngleTerm = //"see_" + sim.angleTerm(angle);
     }
 

@@ -73,7 +73,6 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
     /** used for setting an explicit OperationConcept instance via java; activates it on initialization */
     public CompoundConcept(@NotNull Compound term, NAR n) {
         this(term, n.index.conceptBuilder());
-        n.on(this);
     }
 
     /** default construction by a NAR on conceptualization */

@@ -20,6 +20,7 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
 
     private final Sensor sensor;
     private FloatSupplier input;
+    private float current;
 
 
     public SensorConcept(@NotNull String compoundTermString, NAR n, FloatSupplier input) throws Narsese.NarseseException {
@@ -33,24 +34,27 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
     public SensorConcept(@NotNull Compound term, NAR n, FloatSupplier input, FloatToFloatFunction toFreq)  {
         super(term, n);
 
-        this.sensor = new Sensor(n, term, this, toFreq);
+        this.sensor = new Sensor(n, this, this, toFreq);
+        n.on(this);
 
         this.input = input;
+
     }
 
     /**
      * adjust min/max temporal resolution of feedback input
      */
     public SensorConcept timing(int minCycles, int maxCycles) {
+
         sensor.minTimeBetweenUpdates(minCycles);
         sensor.maxTimeBetweenUpdates(maxCycles);
         return this;
     }
 
-    @Override
-    protected int capacity(int maxBeliefs, boolean beliefOrGoal, boolean eternalOrTemporal) {
-        return eternalOrTemporal ? 0 : maxBeliefs; //no eternal
-    }
+//    @Override
+//    protected int capacity(int maxBeliefs, boolean beliefOrGoal, boolean eternalOrTemporal) {
+//        return eternalOrTemporal ? 0 : maxBeliefs; //no eternal
+//    }
 
     public void setInput(FloatSupplier input) {
         this.input = input;
@@ -62,6 +66,21 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
 
     @Override
     public final float floatValueOf(Term anObject) {
-        return input.asFloat();
+        return this.current = input.asFloat();
     }
+
+    public SensorConcept resolution(float v) {
+        sensor.resolution(v);
+        return this;
+    }
+
+    public SensorConcept pri(float v) {
+        sensor.pri(v);
+        return this;
+    }
+
+    public final float get() {
+        return current;
+    }
+
 }

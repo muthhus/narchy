@@ -30,8 +30,8 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.truth.TruthFunctions.temporalProjection;
-import static nars.truth.TruthFunctions.truthProjection;
+import static nars.truth.TruthFunctions.temporalIntersection;
+
 
 /** scalar (1D) truth value "frequency", stored as a floating point value */
 public interface Truth extends Truthed {
@@ -238,7 +238,7 @@ public interface Truth extends Truthed {
     default Truth project(long when, long occ, long now, float dur) {
         if (occ == when || occ == Tense.ETERNAL)
             return this;
-        return withConf(conf() * temporalProjection( when, occ, now, dur ));
+        return withConf(conf() * temporalIntersection( when, occ, now, dur ));
     }
 
 

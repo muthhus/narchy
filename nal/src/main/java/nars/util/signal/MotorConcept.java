@@ -14,7 +14,9 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.util.FloatSupplier;
 import nars.util.data.Sensor;
+import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,11 +40,11 @@ public class MotorConcept extends OperationConcept implements Consumer<NAR>, Flo
         this.logger = LoggerFactory.getLogger(getClass() + ":" + term);
 
 
-        FloatToFloatFunction feedbackFuntion = (f) -> {
-            if (f == 0) return 0f;
-            return 0.5f + (f / 2f);
-        };
-        feedback = new Sensor(n, term, this, feedbackFuntion) {
+//        FloatToFloatFunction feedbackFuntion = (f) -> {
+//            if (f == 0) return 0f;
+//            return 0.5f + (f / 2f);
+//        };
+        feedback = new Sensor(n, this, this) {
             @Override
             protected int dt() {
                 return nar.duration(); //future tense
@@ -53,15 +55,16 @@ public class MotorConcept extends OperationConcept implements Consumer<NAR>, Flo
                 //Nothing, dont auto-start
             }
 
-        };
+        }.minTimeBetweenUpdates(n.duration()/2);
 
         n.onFrame(this);
     }
 
     @Override
-    protected int capacity(int maxBeliefs, boolean beliefOrGoal, boolean eternalOrTemporal) {
-        return eternalOrTemporal ? 0 : maxBeliefs; //no eternal
+    protected int capacity(int cap, boolean beliefOrGoal, boolean eternalOrTemporal) {
+        return eternalOrTemporal ? 0 : cap; //no eternal
     }
+
 
     /**
      * called each frame with the current motivation measurement (0 <= m <= 1).
@@ -83,9 +86,8 @@ public class MotorConcept extends OperationConcept implements Consumer<NAR>, Flo
     /**
      * adjust min/max temporal resolution of feedback input
      */
-    public MotorConcept setFeedbackTiming(int minCycles, int maxCycles) {
+    public MotorConcept setFeedbackTiming(int minCycles) {
         feedback.minTimeBetweenUpdates(minCycles);
-        feedback.maxTimeBetweenUpdates(maxCycles);
         return this;
     }
 
@@ -105,15 +107,32 @@ public class MotorConcept extends OperationConcept implements Consumer<NAR>, Flo
     }
 
     @Override
+    protected void update(float b, float d, long now) {
+        feedback.ready();
+        super.update(b, d, now);
+    }
+
+    @Override
     public final void accept(NAR nar) {
+
         FloatToFloatFunction m = getMotor();
         if (m != null) {
-            nextFeedback = motor.valueOf(motivation(nar));
+            float activation = motivation(nar);
+
+            float response = motor.valueOf(activation);
+            nextFeedback = Util.clamp(response);
+
             feedback.accept(nar);
+
         } else {
             logger.info("null motor function");
         }
     }
 
 
+    @Nullable
+    @Override
+    public Task processBelief(@NotNull Task belief, @NotNull NAR nar) {
+        return super.processBelief(belief, nar);
+    }
 }

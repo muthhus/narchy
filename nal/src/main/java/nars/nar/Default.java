@@ -133,7 +133,8 @@ public class Default extends AbstractNAR {
             return null;
         }
 
-        emotion.busy(input.pri() * activation);
+        float business = input.pri() * activation;
+        emotion.busy(business);
 
         Task t = c.process(input, this);
         if (t != null) {
@@ -152,8 +153,7 @@ public class Default extends AbstractNAR {
             eventTaskProcess.emit(t); //signal any additional processes
 
         } else {
-            t = input;
-            emotion.frustration(input.pri() * activation);
+            emotion.frustration(business);
         }
 
         return c;

@@ -4,9 +4,9 @@
  */
 package nars.rover.robot;
 
-import com.gs.collections.api.block.function.primitive.FloatFunction;
 import com.gs.collections.api.block.function.primitive.FloatToFloatFunction;
 import nars.$;
+import nars.Global;
 import nars.NAR;
 import nars.nal.Tense;
 import nars.rover.Material;
@@ -14,11 +14,9 @@ import nars.rover.Sim;
 import nars.rover.obj.NARVisionRay;
 import nars.rover.obj.VisionRay;
 import nars.term.Compound;
-import nars.term.Term;
 import nars.util.FloatSupplier;
 import nars.util.data.Util;
 import nars.op.NarQ;
-import nars.util.data.Sensor;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
 import org.jbox2d.common.Vec2;
@@ -27,6 +25,7 @@ import org.jbox2d.dynamics.joints.RevoluteJoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
 
@@ -74,9 +73,7 @@ public class NARover extends AbstractPolygonBot {
         material = new BeingMaterial(this);
 
 
-
-        int maxUpdateTime = 64;
-        int minUpdateTime = 1;
+        int minUpdateTime = 4;
 
 
         hungry = 1f;
@@ -89,16 +86,16 @@ public class NARover extends AbstractPolygonBot {
             return Util.sigmoid(n);
         };
         FloatToFloatFunction sigmoidIfPositive = (n) -> {
-            return n > 0 ? Util.sigmoid(n) : 0; //Float.NaN;
+            return n > 0 ? Util.sigmoid(n) : -1; //Float.NaN;
         };
         FloatToFloatFunction sigmoidIfNegative = (n) -> {
-            return n < 0 ? Util.sigmoid(-n) : 0; //Float.NaN;
+            return n < 0 ? Util.sigmoid(-n) : -1; //Float.NaN;
         };
         FloatToFloatFunction linearPositive = (n) -> {
-            return n > 0 ? Util.clamp(n) : 0; //Float.NaN;
+            return n > 0 ? Util.clamp(n) : -1; //Float.NaN;
         };
         FloatToFloatFunction linearNegative = (n) -> {
-            return n < 0 ? Util.clamp(-n) : 0; //Float.NaN;
+            return n < 0 ? Util.clamp(-n) : -1; //Float.NaN;
         };
 
         Vec2 forwardVec = new Vec2(1,0f);
@@ -106,7 +103,7 @@ public class NARover extends AbstractPolygonBot {
         FloatSupplier linearSpeed =
                 () -> {
 
-                    float thresh = 0.01f;
+                    //float thresh = 0.01f;
 
                     Vec2 lv = torso.getLinearVelocityFromLocalPointToOut(Vec2.ZERO, tmp2);
                     Vec2 worldForward = torso.getWorldPointToOut(forwardVec, tmp).subLocal(torso.getWorldCenter());
@@ -119,17 +116,17 @@ public class NARover extends AbstractPolygonBot {
 
                     v *= 0.35f;
 
-                    if (Math.abs(v) < thresh)
-                        v = 0;
+                    /*if (Math.abs(v) < thresh)
+                        v = 0;*/
                     return v;
                 };
 
 
         this.speedFore = new SensorConcept(SPEED_FORE, nar, linearSpeed, linearPositive)
-                .timing(maxUpdateTime, minUpdateTime);
+                .timing(minUpdateTime, 0);
 
         this.speedBack = new SensorConcept(SPEED_BACK, nar, linearSpeed, linearNegative)
-                .timing(maxUpdateTime, minUpdateTime);
+                .timing(minUpdateTime, 0);
 
 
 
@@ -145,17 +142,16 @@ public class NARover extends AbstractPolygonBot {
         };
 
         this.leftSpeed = new SensorConcept(SPEED_LEFT, nar, angleSpeed, linearNegative)
-            .timing(maxUpdateTime, minUpdateTime);
-
+            .timing(minUpdateTime, 0);
 
         this.rightSpeed = new SensorConcept(SPEED_RIGHT, nar, angleSpeed, linearPositive)
-            .timing(maxUpdateTime, minUpdateTime);
+            .timing(minUpdateTime, 0);
 
-        hungrySensor = new SensorConcept(EAT_FOOD, nar, () -> 1f-hungry)
-            .timing(maxUpdateTime, minUpdateTime);
+        hungrySensor = new SensorConcept(EAT_FOOD, nar, () -> 1f-hungry, linearPositive)
+            .timing(minUpdateTime, 0);
 
-        sickSensor = new SensorConcept(EAT_POISON, nar, () -> sick)
-            .timing(maxUpdateTime, minUpdateTime);
+        sickSensor = new SensorConcept(EAT_POISON, nar, () -> sick, linearPositive)
+            .timing(minUpdateTime, 0);
 
         float motorThresh = 0.1f;
 
@@ -360,7 +356,7 @@ public class NARover extends AbstractPolygonBot {
 
         Arm a = new Arm(id, sim, torso, ax, ay, angle, segs, segLength, thick);
 
-        addEye(b, id + "e", controller, a.segments.getLast(), 9, new Vec2(0.5f, 0), 1f, (float)(+Math.PI/4f), 2.5f);
+        //addEye(b, id + "e", controller, a.segments.getLast(), 9, new Vec2(0.5f, 0), 1f, (float)(+Math.PI/4f), 2.5f);
 
         a.joints.forEach((Consumer<RevoluteJoint>) jj -> {
 
@@ -408,19 +404,19 @@ public class NARover extends AbstractPolygonBot {
 
 
 
-    public void addEye(Being b, String id, NarQ controller, Body base, int detail, Vec2 center, float arc, float centerAngle, float distance) {
-        addEye(b, id, controller, base, 1, detail, center, arc, centerAngle, distance, (v) -> {});
+    public List<SensorConcept> addEye(Being b, String id, NarQ controller, Body base, int detail, Vec2 center, float arc, float centerAngle, float distance) {
+        return addEye(b, id, controller, base, 1, detail, center, arc, centerAngle, distance, (v) -> {});
     }
-    public void addEyeWithMouth(Being b, String id, NarQ controller, Body base, int pixels, int detail, Vec2 center, float arc, float centerAngle, float distance, float mouthArc) {
-        addEye(b, id, controller, base, pixels, detail, center, arc, centerAngle, distance, (v) -> {
+    public List<SensorConcept> addEyeWithMouth(Being b, String id, NarQ controller, Body base, int pixels, int detail, Vec2 center, float arc, float centerAngle, float distance, float mouthArc) {
+        return addEye(b, id, controller, base, pixels, detail, center, arc, centerAngle, distance, (v) -> {
             //float angle = v.angle;
             v.setEats(true);
                     //((angle < mouthArc / 2f) || (angle > (Math.PI * 2f) - mouthArc / 2f)));
         });
     }
 
-    public void addEye(Being b, String id, NarQ controller, Body base, int pixels, int detail, Vec2 center,
-                       float arc, float centerAngle, float distance, Consumer<VisionRay> each) {
+    public List<SensorConcept> addEye(Being b, String id, NarQ controller, Body base, int pixels, int resolution, Vec2 center,
+                                      float arc, float centerAngle, float distance, Consumer<VisionRay> each) {
 
         //final float twoPi = (float)Math.PI * 2f;
         float aStep = arc/pixels;
@@ -430,12 +426,17 @@ public class NARover extends AbstractPolygonBot {
         //final MutableFloat servo = new MutableFloat();
 
 
+        List<SensorConcept> sensorConcepts = Global.newArrayList(pixels * resolution);
+
+        String[] materials = {"food", "poison", "wall"};
+        float pixelPri = 1f/(materials.length * pixels);
+
 
         for (int i = 0; i < pixels; i++) {
             final float angle = (startAngle + (aStep * i));
 
-            NARVisionRay v = new NARVisionRay(id + i, nar, base, center, angle, aStep,
-                    detail, distance);
+            NARVisionRay v = new NARVisionRay(id, i, nar, base, center, angle, aStep,
+                    resolution, distance);
 
 
 //                  @Override public float getLocalAngle () {
@@ -444,25 +445,33 @@ public class NARover extends AbstractPolygonBot {
 
             each.accept(v);
 
-            for (String material : new String[]{"food", "poison", "wall"}) {
+            for (String material : materials) {
 
                 DoubleSupplier value = () -> {
                     if (v.hit(material)) {
-                        float x = 0.5f + 0.4f * (1f - v.seenDist); //closer = larger number (up to 1.0)
-                        return x;
+                        float x = (1f - v.seenDist); //closer = larger number (up to 1.0)
+                        if (x < 0.1f) return 0;
+                        else return 0.5f + 0.45f * x;
                     }
                     return 0; //nothing seen within the range
                 };
 
-                Sensor visionSensor = new Sensor(nar,
+
+                Compound term = $.imageInt(1, v.visionTerm, $.the(material));
+
+                SensorConcept visionSensor = new SensorConcept(
 
                         //$.prop(v.visionTerm, $.the(material)),
                         //$.p(v.visionTerm, $.the(material)),
-                        $.imageInt(1, v.visionTerm, $.the(material)),
+                        term,
 
-                        (t) -> (float) value.getAsDouble()
+                        nar,
 
-                ).resolution(0.05f).minTimeBetweenUpdates(0).maxTimeBetweenUpdates(32).pri(0.5f);
+                        () -> (float) value.getAsDouble()
+
+                ).resolution(0.08f).timing(1, 8).
+                        pri(pixelPri);
+                sensorConcepts.add(visionSensor);
 
                 controller.input.add(value);
             }
@@ -472,6 +481,7 @@ public class NARover extends AbstractPolygonBot {
             senses.add(v);
         }
 
+        return sensorConcepts;
 
 
 //        for (float servoSpeed : new float[] { -0.5f, 0.5f } ) {

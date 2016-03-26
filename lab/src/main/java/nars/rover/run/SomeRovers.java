@@ -1,12 +1,20 @@
 package nars.rover.run;
 
+import javafx.scene.Node;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import nars.Global;
 import nars.NAR;
 import nars.Symbols;
+import nars.guifx.NARMenu;
 import nars.guifx.NARfx;
 import nars.guifx.NARtop;
+import nars.guifx.chart.MatrixImage;
+import nars.guifx.chart.Plot2D;
+import nars.guifx.chart.PlotBox;
+import nars.guifx.nars.LoopPane;
+import nars.guifx.nars.NARPlot;
+import nars.guifx.util.ColorArray;
 import nars.nar.AbstractNAR;
 import nars.nar.Default;
 import nars.rover.Sim;
@@ -14,22 +22,24 @@ import nars.rover.robot.Arm;
 import nars.rover.robot.NARover;
 import nars.rover.world.FoodSpawnWorld1;
 import nars.term.TermIndex;
-import nars.time.SimulatedClock;
 import nars.op.NarQ;
 import nars.op.NarQ.BeliefReward;
 import nars.op.NarQ.InputTask;
 import nars.op.NarQ.NotBeliefReward;
 import nars.util.data.random.XorShift128PlusRandom;
+import nars.util.signal.SensorConcept;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.World;
 
+import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static nars.guifx.NARfx.newWindow;
 import static nars.guifx.NARfx.scrolled;
+import static nars.guifx.chart.Plot2D.Line;
 import static nars.rover.robot.NARover.*;
 
 /**
@@ -43,6 +53,7 @@ public class SomeRovers {
     public static final String motorBackward = "motor(back)";
     public static final String motorStop = "motor(stop)";
     public static final String fire = "turret(fire)";
+
 
 
     //public static final SimulatedClock clock = new SimulatedClock();
@@ -75,26 +86,43 @@ public class SomeRovers {
                 public void init(Sim p) {
                     super.init(p);
 
-                    q(this);
+                    List<SensorConcept>[] sensors = q(this);
 
                     if (gui) {
                         NARfx.run(() -> {
-                            newWindow("Motors",
-                                new HBox(
-                                        scrolled(new NARtop(n).addAll(
-                                                    "MotorControls(#x,motor,(),#z)",
-                                                    motorLeft, motorRight,
-                                                    motorForward, motorBackward,
-                                                    motorStop /*, turretFire */)),
-                                        scrolled(new NARtop(n).addAll(
-                                                    EAT_FOOD.toString(),
-                                                    EAT_POISON.toString(),
-                                                    SPEED_LEFT.toString(),
-                                                    SPEED_RIGHT.toString(),
-                                                    SPEED_FORE.toString(),
-                                                    SPEED_BACK.toString()
 
-                                        ))
+                            newWindow("NAR",
+                                new VBox(
+                                    new NARMenu(n),
+                                    new NARPlot(n,
+                                        new Plot2D(Line, 64, 256, 256)
+                                            .add("busy", ()->n.emotion.busy.getSum())
+                                            .add("stress", ()->n.emotion.stress.getSum())
+                                            .add("frustration", ()->n.emotion.frustration.getSum())
+                                    )
+                                    //new LoopPane(n)
+                                ),
+                            400,200);
+
+                            newWindow("Motors",
+                                new VBox(
+                                    updateMatrices(sensors, n),
+                                    new HBox(
+                                            scrolled(new NARtop(n).addAll(
+                                                        "MotorControls(#x,motor,(),#z)",
+                                                        motorLeft, motorRight,
+                                                        motorForward, motorBackward,
+                                                        motorStop /*, turretFire */)),
+                                            scrolled(new NARtop(n).addAll(
+                                                        EAT_FOOD.toString(),
+                                                        EAT_POISON.toString(),
+                                                        SPEED_LEFT.toString(),
+                                                        SPEED_RIGHT.toString(),
+                                                        SPEED_FORE.toString(),
+                                                        SPEED_BACK.toString()
+
+                                            ))
+                                    )
                                 )
                             );
                         });
@@ -116,16 +144,55 @@ public class SomeRovers {
 //
 //            game.add(new CarefulRover("r2", nar));
 //        }
-        float fps = 70;
+        float fps = 20;
         game.run(fps);
 
     }
 
+    private static Node updateMatrices(List<SensorConcept>[] sensors, Default n) {
+        VBox v = new VBox();
+        for (List<SensorConcept> l : sensors) {
+            v.getChildren().add(updateMatrix(l, n));
+        }
+        return v;
+    }
+
+    private static MatrixImage updateMatrix(List<SensorConcept> sensor, NAR n) {
+        MatrixImage mp = new MatrixImage();
+
+        long now = n.time();
+        int dur = n.duration();
+        n.onFrame(nn->{
+            mp.set(sensor.size(), 2,
+                (x,y) -> {
+                    SensorConcept s = sensor.get(x);
+                    //float exp = s.beliefs().truth(now,dur).expectation();
+                    //float value = s.get();
+
+                    switch (y) {
+                        case 0:
+                            float b = s.beliefs().truth(now, dur).expectation();
+                            return ColorArray.rgba(b, 1-b, 0, 1f);
+                        case 1:
+                            float g = s.goals().truth(now, dur).expectation();
+                            return ColorArray.rgba(0, g, 1-g, 1f);
+                    }
+
+                    return 0;
+                }
+            );
+        });
+        mp.setFitHeight(60);
+        mp.setFitWidth(sensor.size()*20);
+
+        return mp;
+    }
+
     public static Default newNAR() {
-        int conceptsFirePerCycle = 16;
+        int conceptsFirePerCycle = 24;
 
         Random rng = new XorShift128PlusRandom(1);
-        TermIndex index = new AbstractNAR.WeakTermIndex(64 * 1024, rng);
+        TermIndex index = new AbstractNAR.WeakTermIndex(32 * 1024, rng);
         Default nar = new Default(
                 //new Memory(clock, TermIndex.softMemory(64*1024)),
                 1200, conceptsFirePerCycle, 2, 2, rng, index);
@@ -142,7 +209,7 @@ public class SomeRovers {
 //        nar.input("$0.8$ <food <-> poison>?");
 //        nar.input("$0.8$ <[food] <-> [poison]>?");
 
-        nar.logSummaryGT(System.out, 0.4f);
+        nar.logSummaryGT(System.out, 0.7f);
 //        nar.log(Systenar.out, x -> {
 //            if (x instanceof Task) {
 //                Task t = (Task)x;
@@ -167,15 +234,15 @@ public class SomeRovers {
 
 
         //nar.core.activationRate.setValue(1f / conceptsFirePerCycle /* approxmimate */);
-        nar.core.activationRate.setValue(0.25f);
+        nar.core.activationRate.setValue(0.18f);
 
 
-        nar.duration.set(10);
+        nar.duration.set(4);
         nar.conceptForgetDurations.setValue(2f);
         nar.termLinkForgetDurations.setValue(4);
         nar.taskLinkForgetDurations.setValue(3);
 
-        nar.cyclesPerFrame.set(8);
+        nar.cyclesPerFrame.set(12);
         nar.shortTermMemoryHistory.set(3);
 
         nar.executionThreshold.setValue(0.01f);
@@ -188,7 +255,7 @@ public class SomeRovers {
     /**
      * attaches a prosthetic q-controller to a NAR
      */
-    public static void q(NARover r) {
+    public static List<SensorConcept>[] q(NARover r) {
         NAR n = r.nar;
 
 
@@ -227,18 +294,23 @@ public class SomeRovers {
 
         Vec2 front = new Vec2(2.7f, 0);
 
+        //feeler
+        List<SensorConcept> whisker = r.addEyeWithMouth(r, "t", nqSpine, r.torso, 3, 4, front,
+                0.5f, 0, dist / 6f, 0.2f);
+
+
         //nearsight & mouth
-        r.addEyeWithMouth(r, "n", nqSpine, r.torso, 7, 2, front,
+        List<SensorConcept> nearSight = r.addEyeWithMouth(r, "n", nqSpine, r.torso, 7, 2, front,
                 0.5f, 0, dist / 2f, 0.2f);
 
 
         //farsight
-        r.addEye(r, "f", nqSpine, r.torso, 5, 5, front,
+        List<SensorConcept> farSight = r.addEye(r, "f", nqSpine, r.torso, 5, 5, front,
                 1.25f, 0, dist, (e) -> {
                 });
 
         //reverse
-        r.addEye(r, "f", nqSpine, r.torso, 5, 3, new Vec2(-0.5f, 0),
+        List<SensorConcept> backSight = r.addEye(r, "b", nqSpine, r.torso, 3, 9, new Vec2(-0.5f, 0),
                 1.25f, pi / 2f, dist / 2f, (e) -> {
                 });
 
@@ -260,6 +332,10 @@ public class SomeRovers {
 //        nqSpine.output.addAll(ad.controls);
 //        Arm ae = r.addArm("ae", nqArm /* ... */, 0, 0, 0); //pi * 1.5f
 //        nqSpine.output.addAll(ae.controls);
+
+        return new List[] {
+                farSight, nearSight, whisker, backSight
+        };
 
 
     }

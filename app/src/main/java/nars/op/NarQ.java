@@ -149,15 +149,16 @@ public class NarQ implements Consumer<NAR> {
 
             float existingExp = NarQ.motivation(nar, term, 0f, false, 0); //range 0..1.0 if >0.5, 0 otherwise
             float additionalExp = strength - existingExp;
-
             if (additionalExp < 0) //already desired at least at this level
                 return;
-            
+
+            float conf = strength;
 
             int dt = 0;
             //TODO solve for strength/additional desire so expectation is correct
             long now = nar.time();
-            final Task t = new MutableTask(term, punct).truth(invert ? 0f : 1f, additionalExp)
+            final Task t = new MutableTask(term, punct).
+                    truth(invert ? 0f : 1f, conf)
                     //.time(Tense.Future, nar.memory)                   
                     .time(now, now + dt )
                     .log("Q Action");

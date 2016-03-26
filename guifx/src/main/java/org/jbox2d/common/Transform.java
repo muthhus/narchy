@@ -93,7 +93,7 @@ public class Transform implements Serializable {
 //  }
 
   public final static void mulToOut(final Transform T, final Vec2 v, final Vec2 out) {
-    assert (v != out);
+    //assert (v != out);
     float vx = v.x;
     float vy = v.y;
     float tqc = T.q.c;

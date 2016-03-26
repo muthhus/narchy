@@ -79,8 +79,10 @@ public class Revision {
                 continue;
 
             //avoid a duplicate truth at the same time
-            assert(t!=x.occurrence() || !c.equals(oldBeliefTruth));
-            assert(t!=newBelief.occurrence() || !c.equals(newBeliefTruth));
+            if (t==x.occurrence() && c.equals(oldBeliefTruth))
+                continue;
+            if (t==newBelief.occurrence() && c.equals(newBeliefTruth))
+                continue;
 
             float cconf = c.conf();
             float rank = BeliefTable.rankEternalByOriginality(cconf, totalEvidence);

@@ -44,7 +44,7 @@ abstract public class ArraySortedIndex<E> extends SortedIndex<E> {
     }
 
     public ArraySortedIndex(int capacity) {
-        this(capacity, capacity);
+        this(1, capacity);
     }
 
     public ArraySortedIndex(int initialCapacity, int maxCapacity) {

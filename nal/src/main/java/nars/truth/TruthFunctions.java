@@ -138,7 +138,7 @@ public final class TruthFunctions extends UtilityFunctions {
 
         final float w = (w1 + w2);
         float newConf = w2c(w)
-                * temporalProjection(now, at, bt)
+                * temporalIntersection(now, at, bt)
                 //* TruthFunctions.temporalProjectionOld(at, bt, now)
                 * match;
         if (newConf < confThreshold)
@@ -153,16 +153,23 @@ public final class TruthFunctions extends UtilityFunctions {
         );
     }
 
-    public static float temporalProjection(long now, long at, long bt) {
+    public static float temporalIntersection(long now, long at, long bt) {
         return BeliefTable.relevance(Math.abs(now-at) + Math.abs(now-bt), Math.abs(at-bt));
     }
-    public static float temporalProjection(long now, long at, long bt, float dur) {
+    public static float temporalIntersection(long now, long at, long bt, float dur) {
         return BeliefTable.relevance(Math.abs(now-at) + Math.abs(now-bt), Math.abs(at-bt)/dur);
     }
     public static float truthProjection(long sourceTime, long targetTime, long currentTime) {
-        long den = (abs(sourceTime - currentTime) + abs(targetTime - currentTime));
-        if (den == 0) return 1f;
-        return abs(sourceTime - targetTime) / (float)den;
+        if (sourceTime == targetTime) {
+            return 0;
+        } else {
+            long den = (abs(sourceTime - currentTime) + abs(targetTime - currentTime));
+            if (den == 0) {
+                return 1f;
+            } else {
+                return abs(sourceTime - targetTime) / (float) den;
+            }
+        }
     }
 
 

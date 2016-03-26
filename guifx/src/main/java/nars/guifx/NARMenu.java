@@ -206,7 +206,7 @@ public class NARMenu extends HBox {
 
 
             busyPlot = new Plot2D(Plot2D.Line, WINDOW_SIZE, 192);
-            busyPlot.add("Busy", ()-> nar.emotion.busy.getMeanRate());
+            busyPlot.add("Busy", ()-> nar.emotion.busy.getSum());
             //busyPlot.add("avg short", ()->rollingAverage(busyAvgShort, (double) nar.emotion.busy()));
             //busyPlot.add("avg long", ()->rollingAverage(busyAvgLong, (double) nar.emotion.busy.()));
 

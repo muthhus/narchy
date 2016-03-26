@@ -1,12 +1,14 @@
 package nars.util.signal;
 
-import com.codahale.metrics.*;
-import com.codahale.metrics.ConsoleReporter.Builder;
 import nars.Memory;
 import nars.task.Task;
 import nars.util.event.FrameReaction;
 import nars.util.meter.event.DoubleMeter;
+import nars.util.meter.event.FloatGuage;
 import org.jetbrains.annotations.NotNull;
+import org.nustaq.serialization.FSTConfiguration;
+import org.nustaq.serialization.coders.FSTJsonEncoder;
+import org.nustaq.serialization.serializers.FSTJSonSerializers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,19 +20,19 @@ import java.util.SortedMap;
 /**
  * emotion state: self-felt internal mental states; variables used to record emotional values
  */
-public final class Emotion extends MetricRegistry {
+public final class Emotion  {
 
     /** priority rate of Task processing attempted */
-    public final Meter busy;
+    public final FloatGuage busy;
 
     /** priority rate of Task processing which had no effect */
-    public final Meter frustration;
+    public final FloatGuage frustration;
 
     /** task priority overflow rate */
-    public final Meter stress;
+    public final FloatGuage stress;
 
     /** happiness rate */
-    public final Meter happy;
+    public final FloatGuage happy;
 
     public final Logger logger;
 
@@ -41,19 +43,23 @@ public final class Emotion extends MetricRegistry {
 
         logger = LoggerFactory.getLogger(Emotion.class);
 
-        this.busy = meter("busy");
-        this.happy = meter("happy");
-        this.stress = meter("stress");
-        this.frustration = meter("frustration");
+        this.busy = new FloatGuage("busy");
+        this.happy = new FloatGuage("happy");
+        this.stress = new FloatGuage("stress");
+        this.frustration = new FloatGuage("frustration");
 
     }
 
+    final FSTConfiguration conf = FSTConfiguration.createJsonConfiguration(true,false);
 
-    public void print(PrintStream output) {
-
-        ConsoleReporter.forRegistry(this).outputTo(output).build()
-            .report(getGauges(), getCounters(), getHistograms(), getMeters(), getTimers());
-
+    public void print(OutputStream output) {
+        try {
+            conf.encodeToStream(output, this);
+        } catch (IOException e) {
+            try {
+                output.write(e.toString().getBytes());
+            } catch (IOException e1) {            }
+        }
     }
 
     @Override
@@ -87,17 +93,26 @@ public final class Emotion extends MetricRegistry {
     //TODO use Meter subclass that will accept and transform these float parameters
 
     @Deprecated public void happy(float delta) {
-        happy.mark( f2l(delta) );
+        happy.accept( f2l(delta) );
     }
     @Deprecated public void busy(float pri) {
-        busy.mark( f2l(pri) );
+        busy.accept( f2l(pri) );
     }
     @Deprecated public void stress(float pri) {
-        stress.mark( f2l(pri) );
+        stress.accept( f2l(pri) );
     }
     @Deprecated public void frustration(float pri) {
-        frustration.mark( f2l(pri) );
+        frustration.accept( f2l(pri) );
     }
+
+    /** new frame started */
+    public void frame() {
+        happy.clear();
+        busy.clear();
+        stress.clear();
+        frustration.clear();
+    }
+
 
 /*    public void busy(@NotNull Task cause, float activation) {
         busy += cause.pri() * activation;
@@ -112,6 +127,8 @@ public final class Emotion extends MetricRegistry {
     private static float l2f(long l) {
         return l / 1000f; //0.001 precision
     }
+
+
 
 //    public void happy(float solution, @NotNull Task task) {
 //        happy += ( task.getBudget().summary() * solution );

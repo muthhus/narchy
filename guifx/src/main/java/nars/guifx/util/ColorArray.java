@@ -1,6 +1,8 @@
 package nars.guifx.util;
 
 import javafx.scene.paint.Color;
+import nars.util.data.Util;
+
 
 /**
  * generates a gradient of colors, stored in an array. useful for re-usable
@@ -59,4 +61,16 @@ public class ColorArray {
 		return new Color(c.getRed(), c.getGreen(), c.getBlue(), opacity);
 	}
 
+
+	public static int rgba(float red, float green, float blue, float opacity) {
+
+		int i = (int)(Util.clamp(opacity) * 255.0f);
+		i = i << 8;
+		i = i | (int)(Util.clamp(red) * 255.0f);
+		i = i << 8;
+		i = i | (int)(Util.clamp(green) * 255.0f);
+		i = i << 8;
+		i = i | (int)(Util.clamp(blue) * 255.0f);
+		return i;
+	}
 }

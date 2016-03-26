@@ -1,12 +1,13 @@
 package nars.guifx.chart;
 
 import javafx.scene.Node;
+import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 
 /**
  * Created by me on 10/11/15.
  */
-public class PlotBox extends VBox {
+public class PlotBox extends TilePane {
 
     public PlotBox(Plot2D... plots) {
         super((Node[])plots);
