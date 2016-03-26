@@ -268,10 +268,10 @@ public final class BudgetFunctions extends UtilityFunctions {
         float quality  = qualRaw;
 
 
-        final Compound taskTerm = task.term();
+        //final Compound taskTerm = task.term();
         float volRatio =
                 //tasktermVol / ((float)( taskTerm.volume() + derived.volume() ));
-                1 / derived.volume();
+                1f / derived.volume();
         durability *= volRatio;
         quality *= volRatio;
 

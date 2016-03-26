@@ -55,7 +55,7 @@ public class TemporalTest {
 
     @Test public void testTemporalStability() {
 
-        int cycles = 100; //increase for more thorough testing
+        int cycles = 300; //increase for more thorough testing
 
         Global.DEBUG = true;
         Default n = new Default(1024, 8, 4, 3);
@@ -63,6 +63,7 @@ public class TemporalTest {
         n.inputAt(1, "a:b. :|:");
         n.inputAt(2, "b:c. :|:");
         n.inputAt(5, "c:d. :|:");
+        //n.log();
 
         Set<Task> irregular = Global.newHashSet(1);
 
@@ -70,19 +71,20 @@ public class TemporalTest {
 
             n.step();
             TimeMap m = new TimeMap(n);
-            Set<Between<Long>> times = m.keySetSorted();
+            //Set<Between<Long>> times = m.keySetSorted();
             /*if (times.size() < 3)
                 continue; //wait until the initial temporal model is fully constructed*/
 
             print(n, m);
 
             for (Task tt : m.values()) {
-                if (irregular.contains(tt)) continue; //already detected
 
                 long o = tt.occurrence();
                 if ((o!=1) && (o!=2) && (o!=5)) {
-                    System.err.println("Temporal Instability: " + tt + "\n" + tt.explanation() + "\n");
-                    irregular.add(tt);
+                    if (irregular.add(tt)) { //already detected?
+                        System.err.println("Temporal Instability: " + tt + "\n" + tt.explanation() + "\n");
+                        irregular.add(tt);
+                    }
                 }
             }
 
