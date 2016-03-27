@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import static nars.concept.util.BeliefTable.rankEternalByOriginality;
 import static nars.nal.UtilityFunctions.or;
 
+
 /** tense modes, and various Temporal utility functions and constants */
 public enum Tense  {
 

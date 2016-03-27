@@ -27,35 +27,33 @@ public enum DesireFunction implements TruthOperator {
     Strong() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
-            if (B == null) return null;
-            return TruthFunctions.desireStrong(T, B, minConf);
+            return B == null ? null : TruthFunctions.desireStrong(T, B, minConf);
         }
     },
 
     Weak() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
-            if (B == null) return null;
-            return TruthFunctions.desireWeak(T, B);
+            return B == null ? null : TruthFunctions.desireWeak(T, B, minConf);
         }
     },
 
     Induction() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
-            if (B == null) return null;
-            return TruthFunctions.desireInd(T,B,minConf);
+            return B == null ? null : TruthFunctions.desireInd(T, B, minConf);
         }
     },
 
-    @AllowOverlap
+    //@AllowOverlap
     Deduction() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
-            if (B==null) return null;
-            return TruthFunctions.desireDed(T,B,minConf);
+            return B == null ? null : TruthFunctions.desireDed(T, B, minConf);
         }
     },
+
+
 
     @SinglePremise
     Identity() {
@@ -69,7 +67,7 @@ public enum DesireFunction implements TruthOperator {
     StructuralStrong() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
-            return TruthFunctions.desireStrong(T, newDefaultTruth(m), minConf);
+            return TruthFunctions.desireStrong(T, defaultTruth(m), minConf);
         }
     },
 
@@ -82,7 +80,7 @@ public enum DesireFunction implements TruthOperator {
     };
 
     @Nullable
-    private static Truth newDefaultTruth(@NotNull Memory m) {
+    private static Truth defaultTruth(@NotNull Memory m) {
         return m.getTruthDefault(Symbols.GOAL /* goal? */);
     }
 

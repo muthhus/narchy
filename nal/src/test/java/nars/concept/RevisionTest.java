@@ -65,33 +65,23 @@ public class RevisionTest {
 
 
         //arbitrary time delays in which to observe that certain behavior does not happen
-        int delay2 = delay1;
 
-        //n.stdout();
+        BeliefAnalysis b = new BeliefAnalysis(n, "<a-->b>")
+            .input(beliefOrGoal, 1f, 0.9f).run(1);
 
+        assertEquals(1, b.size(beliefOrGoal));
 
-        BeliefAnalysis b = new BeliefAnalysis(n, "<a-->b>");
-        if (beliefOrGoal)
-            b.believe(1.0f, 0.9f);
-        else
-            b.goal(1.0f, 0.9f);
-
-        b.run(1);
-
-        assertEquals(1, b.size());
-
-        b.believe(0.0f, 0.9f).run(1);
+        b.input(beliefOrGoal, 0.0f, 0.9f).run(1);
 
         b.run(delay1);
 
-        b.print();
-        //List<Task> bb = Lists.newArrayList( b.beliefs() );
+        b.print(beliefOrGoal);
 
-        assertEquals("revised", 3, b.size());
+        assertEquals("revised", 3, b.size(beliefOrGoal));
 
-        n.run(delay2);
+        n.run(delay1);
 
-        assertEquals("no additional revisions", 3, b.size());
+        assertEquals("no additional revisions", 3, b.size(beliefOrGoal));
 
 
     }

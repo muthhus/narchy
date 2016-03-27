@@ -58,6 +58,13 @@ public class BeliefAnalysis extends EnergyAnalysis {
 			return BeliefTable.EMPTY;
 		return c.beliefs();
 	}
+	@Nullable
+	public BeliefTable goals() {
+		Concept c = concept();
+		if (c == null)
+			return BeliefTable.EMPTY;
+		return c.goals();
+	}
 
 	@NotNull
 	public TruthWave wave() {
@@ -71,19 +78,39 @@ public class BeliefAnalysis extends EnergyAnalysis {
 	}
 
 	public void print() {
-		System.out.println("Beliefs[@" + nar.time() + "] " + beliefs().size()
-				+ '/' + beliefs().getCapacity());
-		beliefs().print(System.out);
+		print(true);
+	}
+	public void print(boolean beliefOrGoal) {
+		BeliefTable table = table(beliefOrGoal);
+		System.out.println((beliefOrGoal ? "Beliefs" : "Goals") + "[@" + nar.time() + "] " + table.size()
+				+ '/' + table.getCapacity());
+		table.print(System.out);
 		System.out.println();
 	}
 
+	public int size(boolean beliefOrGoal) {
+		return table(beliefOrGoal).size();
+	}
+
+	public BeliefTable table(boolean beliefOrGoal) {
+		return beliefOrGoal ? beliefs() : goals();
+	}
+
 	public int size() {
-		return beliefs().size();
+		return size(true);
 	}
 
 
 	/** sum of priorities of the belief table */
 	public float priSum() {
 		return beliefs().priSum();
+	}
+
+	public BeliefAnalysis input(boolean beliefOrGoal, float v, float v1) {
+		if (beliefOrGoal)
+			believe(1.0f, 0.9f);
+		else
+			goal(1.0f, 0.9f);
+		return this;
 	}
 }

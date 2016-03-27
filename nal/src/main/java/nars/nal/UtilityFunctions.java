@@ -34,20 +34,19 @@ public class UtilityFunctions   {
     protected UtilityFunctions() {
     }
 
-    /**
-     * A function where the output is conjunctively determined by the inputs
-     * @param arr The inputs, each in [0, 1]
-     * @return The output that is no larger than each input
-     */
-    public static float and(@NotNull float... arr) {
-        float product = 1;
-        for (float f : arr) {
-            product *= f;
-        }
-        return product;
-    }
+//    /**
+//     * A function where the output is conjunctively determined by the inputs
+//     * @param arr The inputs, each in [0, 1]
+//     * @return The output that is no larger than each input
+//     */
+//    public static float and(@NotNull float... arr) {
+//        float product = 1;
+//        for (float f : arr) {
+//            product *= f;
+//        }
+//        return product;
+//    }
     
-    //may be more efficient than the for-loop version above, for 2 params
     public static float and(float a, float b) {
         return a*b;
     }
@@ -56,22 +55,26 @@ public class UtilityFunctions   {
         return a*b*c;
     }
 
+    public static float and(float a, float b, float c, float d) {
+        return a*b*c*d;
+    }
+
     
     /**
      * A function where the output is disjunctively determined by the inputs
      * @param arr The inputs, each in [0, 1]
      * @return The output that is no smaller than each input
      */
-    public static float or(@NotNull float... arr) {
-        float product = 1;
-        for (float f : arr) {
-            product *= (1 - f);
-        }
-        return 1.0f - product;
-    }
+//    public static float or(@NotNull float... arr) {
+//        float product = 1;
+//        for (float f : arr) {
+//            product *= (1 - f);
+//        }
+//        return 1.0f - product;
+//    }
     
     public static float or(float a, float b) {
-        return 1.0f -((1.0f -a)*(1.0f -b));
+        return 1.0f -((1.0f - a) * (1.0f - b));
     }
     
     /**

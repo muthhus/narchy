@@ -170,9 +170,8 @@ public class NAL7Test extends AbstractNALTest {
         TestNAR tester = test();
         tester.input("S:s.");
         tester.inputAt(3, "(S:s &&+3 Z:z). :|:");
-        tester.mustBelieve(cycles, "S:s.", 1.00f, 0.81f /* 0.42? */, 3);
+        tester.mustBelieve(cycles, "S:s.", 1.00f, 0.43f /* 0.42? */, 3);
         tester.mustBelieve(cycles, "Z:z.", 1.00f, 0.81f /* 0.42? */, 6);
-        tester.mustNotOutput(cycles, "Z:z", '.', 0, 1, 0.47f, 1, ETERNAL); //nothing higher conf than the eternalized belief
     }
 
     @Test

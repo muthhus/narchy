@@ -471,7 +471,7 @@ public class PremiseRule extends GenericCompound {
                             temporalize = Temporalize.decomposeTask;
                             break;
                         case "decomposeBelief":
-                            temporalize = Temporalize.decomposeTask;
+                            temporalize = Temporalize.decomposeBelief;
                             break;
 
                         case "dtCombine":

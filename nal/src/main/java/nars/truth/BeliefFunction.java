@@ -39,13 +39,6 @@ public enum BeliefFunction implements TruthOperator {
         }
     },
 
-    @SinglePremise @AllowOverlap
-    StructuralDeduction() {
-        @NotNull
-        @Override public Truth apply(@Nullable final Truth T, final Truth B, @NotNull Memory m, float minConf) {
-            return (T == null) ? null : TruthFunctions.deduction1(T, defaultConfidence(m), minConf);
-        }
-    },
 
     StructuralAbduction() {
         @Nullable
@@ -54,13 +47,21 @@ public enum BeliefFunction implements TruthOperator {
         }
     },
 
-    @AllowOverlap
+    //@AllowOverlap
     Deduction() {
         @Nullable
         @Override public Truth apply(@Nullable Truth T, @Nullable Truth B, @NotNull Memory m, float minConf) {
-            return ((B == null) || (T == null)) ? null : TruthFunctions.deduction(T, B, minConf);
+            return (T == null || B == null) ? null : TruthFunctions.deduction(T, B, minConf);
         }
     },
+    @SinglePremise @AllowOverlap
+    StructuralDeduction() {
+        @NotNull
+        @Override public Truth apply(@Nullable final Truth T, final Truth B, @NotNull Memory m, float minConf) {
+            return /*(T == null) ? null : */TruthFunctions.deduction1(T, defaultConfidence(m), minConf);
+        }
+    },
+
 
     Induction() {
         @Nullable
@@ -201,7 +202,7 @@ public enum BeliefFunction implements TruthOperator {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
             if (B == null || T == null) return null;
-            return TruthFunctions.decomposePositiveNegativePositive(T,B);
+            return TruthFunctions.decomposePositiveNegativePositive(T,B,minConf);
         }
     },
     DecomposeNegativePositivePositive() {
@@ -272,12 +273,12 @@ public enum BeliefFunction implements TruthOperator {
 
 
     @NotNull
-    public static Truth defaultTruth(@NotNull Memory m) {
+    private static Truth defaultTruth(@NotNull Memory m) {
         return m.getTruthDefault(Symbols.BELIEF);
     }
 
     @NotNull
-    public static float defaultConfidence(@NotNull Memory m) {
+    private static float defaultConfidence(@NotNull Memory m) {
         return m.getDefaultConfidence(Symbols.BELIEF);
     }
 
