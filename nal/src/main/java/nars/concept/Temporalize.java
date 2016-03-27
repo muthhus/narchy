@@ -68,6 +68,10 @@ public interface Temporalize {
         //TODO
         return dtDiff(derived, p, occReturn, 2);
     };
+    Temporalize dtUnionReverse = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn) -> {
+        //TODO
+        return dtDiff(derived, p, occReturn, -2);
+    };
 
     @NotNull
     static Compound dtDiff(@NotNull Compound derived, @NotNull PremiseEval p, @NotNull long[] occReturn, int polarity) {
@@ -80,12 +84,22 @@ public interface Temporalize {
         int ttd = taskTerm.dt();
         int btd = beliefTerm.dt();
         if (ttd !=DTERNAL && btd !=DTERNAL) {
-            if (polarity == 0) { //intersect: 0
-                dt = (ttd + btd)/2; //TODO calculate by interval of each task
-            } else if (polarity == 2) { //union
-                dt = -(ttd + btd);
-            } else {  //difference: -1 or +1
-                dt = (ttd - btd);
+            switch (polarity) {
+                case 0:
+                    dt = (ttd + btd)/2; //intersect: 0
+                    break;
+                case 2:  //union
+                    dt = -(ttd + btd);
+                    break;
+                case -2:  //unionReverse
+                    dt = (ttd + btd);
+                    break;
+                case -1:
+                case +1: //difference: -1 or +1
+                    dt = (ttd - btd);
+                    break;
+                default:
+                    throw new UnsupportedOperationException();
             }
         } else if (ttd != DTERNAL) {
             dt = ttd;
@@ -95,7 +109,7 @@ public interface Temporalize {
             dt = DTERNAL;
         }
 
-        if ((polarity == 0) || (polarity == 2)) {
+        if ((polarity == 0) || (polarity == 2) || (polarity == -2)) {
             occReturn[0] = prem.occurrenceTarget(earliestOccurrence); //TODO CALCULATE
 
             //restore forward polarity for function call at the end
@@ -151,16 +165,20 @@ public interface Temporalize {
         int eventDelta = DTERNAL;
 
         if (!prem.belief().isEternal() && !prem.task().isEternal()) {
-            long occ = prem.occurrenceTarget(earliestOccurrence);
+            long earliest = prem.occurrenceTarget(earliestOccurrence);
 
             //TODO check valid int/long conversion
             eventDelta = (int) (prem.belief().occurrence() -
                     prem.task().occurrence());
 
-            //if (polarity < 0) //early align
-            //    occ -= eventDelta;
 
-            occReturn[0] = occ;
+            occReturn[0] = earliest;
+        }
+
+        //HACK to handle commutive switching so that the dt is relative to the effective subject
+        if (derived.op().isCommutative()) {
+            if (derived.term(0).equals(prem.belief().term()))
+                eventDelta *=-1;
         }
 
         return deriveDT(derived, polarity, prem, eventDelta);

@@ -279,7 +279,7 @@ public final class BudgetFunctions extends UtilityFunctions {
         BLink<? extends Termed> termLink = nal.termLink;
         assert(!termLink.isDeleted());
         priority = and(priority, termLink.pri()); //originally was OR, but this can explode because the result of OR can exceed the inputs
-        durability = and(durability, termLink.dur()); //originaly was 'AND'
+        durability = or(durability, termLink.dur()); //originaly was 'AND'
 
 
         //Strengthen the termlink by the quality and termlink's & tasklink's concepts

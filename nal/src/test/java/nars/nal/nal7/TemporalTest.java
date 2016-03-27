@@ -15,21 +15,9 @@ import java.util.function.Consumer;
 import static java.lang.System.out;
 import static org.junit.Assert.assertEquals;
 
-/**
- * Created by me on 6/5/15.
- */
+
 public class TemporalTest {
 
-//    @Test
-//    public void testAfter() {
-//
-//        assertTrue("after", Tense.after(1, 4, 1));
-//
-//        assertFalse("concurrent (equivalent)", Tense.after(4, 4, 1));
-//        assertFalse("before", Tense.after(6, 4, 1));
-//        assertFalse("concurrent (by duration range)", Tense.after(3, 4, 3));
-//
-//    }
 
     @Test public void parsedCorrectOccurrenceTime() {
         NAR n = new Default(); //for cycle/frame clock, not realtime like Terminal
@@ -98,4 +86,15 @@ public class TemporalTest {
     }
 
 
+
+//    @Test
+//    public void testAfter() {
+//
+//        assertTrue("after", Tense.after(1, 4, 1));
+//
+//        assertFalse("concurrent (equivalent)", Tense.after(4, 4, 1));
+//        assertFalse("before", Tense.after(6, 4, 1));
+//        assertFalse("concurrent (by duration range)", Tense.after(3, 4, 3));
+//
+//    }
 }

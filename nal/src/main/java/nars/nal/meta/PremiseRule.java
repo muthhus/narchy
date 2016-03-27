@@ -485,7 +485,7 @@ public class PremiseRule extends GenericCompound {
                             temporalize = Temporalize.occForward;
                             preNext = events.after;
                             break;
-                        case "dtReverseAfter":
+                        case "dtAfterReverse":
                             temporalize = Temporalize.occReverse;
                             preNext = events.after;
                             break;
@@ -505,6 +505,9 @@ public class PremiseRule extends GenericCompound {
                             break;
                         case "dtUnion":
                             temporalize = Temporalize.dtUnion;
+                            break;
+                        case "dtUnionReverse":
+                            temporalize = Temporalize.dtUnionReverse;
                             break;
 
                         default:

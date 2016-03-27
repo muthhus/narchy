@@ -42,14 +42,17 @@ public class TemporalRelationsTest {
 
 
     @Test public void testReversibilityOfCommutive() {
-        assertEquals("(a <=>+5 b)", $("(a <=>+5 b)").toString());
-        assertEquals("(a <=>-5 b)", $("(b <=>+5 a)").toString());
-        assertEquals("(a <=>-5 b)", $("(a <=>-5 b)").toString());
+        for (String c : new String[] { "&&", "<=>" }) {
+            assertEquals("(a "+c+"+5 b)", $("(a "+c+"+5 b)").toString());
+            assertEquals("(a "+c+"-5 b)", $("(b "+c+"+5 a)").toString());
+            assertEquals("(a "+c+"+5 b)", $("(b "+c+"-5 a)").toString());
+            assertEquals("(a "+c+"-5 b)", $("(a "+c+"-5 b)").toString());
 
-        assertEquals("(a &&+5 b)", $("(a &&+5 b)").toString());
-        assertEquals("(a &&-5 b)", $("(b &&+5 a)").toString());
-
-
+            assertEquals($("(b "+c+"-5 a)"), $("(a "+c+"+5 b)"));
+            assertEquals($("(b "+c+"+5 a)"), $("(a "+c+"-5 b)"));
+            assertEquals($("(a "+c+"-5 b)"), $("(b "+c+"+5 a)"));
+            assertEquals($("(a "+c+"+5 b)"), $("(b "+c+"-5 a)"));
+        }
     }
 
     @Test public void testConceptualization() {
@@ -73,7 +76,7 @@ public class TemporalRelationsTest {
 
         //d.concept("(x==>y)").print();
 
-        assertEquals(3, d.concept("(x==>y)").beliefs().size() );
+        assertEquals(4, d.concept("(x==>y)").beliefs().size() );
 
         assertEquals(indexSize, d.index().size() ); //remains same amount
 
@@ -113,6 +116,8 @@ public class TemporalRelationsTest {
         Term abc = $("((a &&+0 b) &&+0 c)");
         assertEquals( "( &&+0 ,a,b,c)", abc.toString() );
         assertTrue( abc.isCommutative() );
+
+
 
     }
 

@@ -1,9 +1,13 @@
 package nars.nal.meta.op;
 
 import nars.concept.ConceptProcess;
+import nars.nal.Tense;
 import nars.nal.meta.AtomicBooleanCondition;
 import nars.nal.meta.PremiseEval;
+import nars.task.Task;
 import org.jetbrains.annotations.NotNull;
+
+import static nars.nal.Tense.ETERNAL;
 
 /**
  * True if the premise task and belief are both non-eternal events
@@ -36,7 +40,20 @@ abstract public class events extends AtomicBooleanCondition<PremiseEval> {
         @Override
         public boolean booleanValueOf(@NotNull PremiseEval m) {
             ConceptProcess p = m.premise;
-            return p.isEternal() || beliefBeforeOrDuringTask(p);
+
+            /* true if belief is present and both task and belief are eternal */
+            Task b = p.belief();
+            if (b == null) return false;
+
+            long tOcc = p.task().occurrence();
+            long bOcc = b.occurrence();
+            boolean tEternal = (tOcc == ETERNAL);
+            boolean bEternal = (bOcc == ETERNAL);
+            if (tEternal) {
+                return bEternal;
+            } else {
+                return (!bEternal && bOcc <= tOcc);
+            }
         }
     };
 
@@ -62,11 +79,14 @@ abstract public class events extends AtomicBooleanCondition<PremiseEval> {
         }
     };
 
-    private static boolean beliefBeforeOrDuringTask(@NotNull ConceptProcess p) {
-
-        return p.isEvent()
-               &&
-               (p.belief().occurrence() - p.task().occurrence()) >= 0;
+    public static boolean beliefBeforeOrDuringTask(@NotNull ConceptProcess p) {
+        Task b = p.belief();
+        if (b == null) return false;
+        long tOcc = p.task().occurrence();
+        long bOcc = b.occurrence();
+        return !Tense.isEternal(bOcc) &&
+                !Tense.isEternal(tOcc) &&
+                ((bOcc - tOcc) >= 0);
     }
 
 

@@ -15,13 +15,14 @@ import nars.term.Term;
 import nars.term.Termed;
 
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
  * String interner that maps strings to integers and resolves them
  * bidirectionally with a globally shared Atomic concept
  */
-public class RadixTreeSymbolMap extends MyConcurrentRadixTree<AtomConcept> implements SymbolMap {
+public class RadixTreeSymbolMap extends MyConcurrentRadixTree<Termed> implements SymbolMap {
 
 
     public RadixTreeSymbolMap() {
@@ -29,21 +30,16 @@ public class RadixTreeSymbolMap extends MyConcurrentRadixTree<AtomConcept> imple
     }
 
 
-    /*public static int getLastSerial() {
-        return serial;
-    }*/
-
     @Override
     public final Termed resolve(String id) {
         return getValueForExactKey(id);
     }
 
 
+
     @Override
-    public final AtomConcept resolveOrAdd(String s, Function<Term, Concept> conceptBuilder) {
-        return putIfAbsent(s,
-                () -> (AtomConcept) conceptBuilder.apply($.the(s))
-        );
+    public final Termed resolveOrAdd(String s, Function<Term, ? extends Termed> conceptBuilder) {
+        return putIfAbsent(s, () -> conceptBuilder.apply($.the(s)) );
     }
 
 
@@ -52,6 +48,11 @@ public class RadixTreeSymbolMap extends MyConcurrentRadixTree<AtomConcept> imple
      */
     @Override public void print(Appendable out) {
         PrettyPrinter.prettyPrint(this, out);
+    }
+
+    @Override
+    public void forEach(Consumer<? super Termed> c) {
+        throw new UnsupportedOperationException(); //TODO
     }
 
 

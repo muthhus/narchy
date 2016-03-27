@@ -188,7 +188,7 @@ public class Derive extends AtomicStringConstant implements ProcTerm {
 
         Compound ct = (Compound) tNorm.term();
 
-        if (p7 && (!premise.isEternal() || premise.hasTemporality())) {
+        if (p7 && (!premise.eternal() || premise.hasTemporality())) {
             //Term cp = this.conclusionPattern;
 
             //if (Op.isOperation(cp) && p.transforms.containsKey( Operator.operator((Compound) cp) ) ) {

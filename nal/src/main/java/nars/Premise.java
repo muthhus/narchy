@@ -210,13 +210,14 @@ public interface Premise extends Level, Tasked {
     }
 
     /** true if task and belief (if not null) are eternal */
-    default boolean isEternal() {
+    default boolean eternal() {
         if (task().isEternal()) {
             Task b = belief();
             return (b == null) || (b.isEternal());
         }
         return false;
     }
+
 
     boolean cyclic();
 

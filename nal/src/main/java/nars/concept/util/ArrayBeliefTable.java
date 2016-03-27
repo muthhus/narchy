@@ -29,6 +29,7 @@ import java.util.function.Consumer;
  */
 public class ArrayBeliefTable implements BeliefTable {
 
+    public static final String DUPLICATE_BELIEF_GOAL = "Duplicate Belief/Goal";
     @NotNull final ListTable<Task,Task> eternal;
     @NotNull final ListTable<Task,Task> temporal;
     @NotNull final Map<Task,Task> map;
@@ -301,7 +302,11 @@ public class ArrayBeliefTable implements BeliefTable {
                 //Average allows duplicate tasks to not explode like plus would
                 DuplicateMerge.merge(existing.budget(), input, 1f);
                 //((MutableTask) existing).state(input.state()); //reset execution / anticipated state
-                nar.remove(input, "Duplicate Belief/Goal");
+                nar.remove(input,
+                    Global.DEBUG ?
+                        input.lastLogged().toString() + DUPLICATE_BELIEF_GOAL :
+                        DUPLICATE_BELIEF_GOAL
+                );
             }
             return true;
         }

@@ -17,20 +17,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
-/**
- * Created by me on 8/15/15.
- */
 public class RuleDerivationGraphTest {
 
     @Test public void testRuleTrie() {
         TrieDeriver x = Deriver.getDefaultDeriver();
         x.trie.printSummary();
-
-
-        for (Term p : x.roots) {
+        /*for (Term p : x.roots) {
             out.println();
             out.println(p);
-        }
+        }*/
+        assert(x.roots.length > 1);
     }
 
     @Test
@@ -77,19 +73,16 @@ public class RuleDerivationGraphTest {
 
     }
 
-
-
-    @Test public void testPostconditionSingletons() {
-//        System.out.println(PostCondition.postconditions.size() + " unique postconditions " + PostCondition.totalPostconditionsRequested);
-//        for (PostCondition p : PostCondition.postconditions.values()) {
-//            System.out.println(p);
-//        }
-
-    }
+//    @Test public void testPostconditionSingletons() {
+////        System.out.println(PostCondition.postconditions.size() + " unique postconditions " + PostCondition.totalPostconditionsRequested);
+////        for (PostCondition p : PostCondition.postconditions.values()) {
+////            System.out.println(p);
+////        }
+//
+//    }
 
     @Test public void testPatternIndexContainsNoConcepts() {
         TrieDeriver d = Deriver.getDefaultDeriver();
-        List<PremiseRule> R = d.rules.rules;
         PatternIndex p = d.rules.patterns;
         //out.println(p.data);
         //out.println(p.atoms);
