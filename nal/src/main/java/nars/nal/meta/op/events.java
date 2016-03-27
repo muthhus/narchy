@@ -57,27 +57,27 @@ abstract public class events extends AtomicBooleanCondition<PremiseEval> {
         }
     };
 
-    /** ITERNAL or 0, used in combination with a Temporalize that uses the same dt as the task */
-    public static final events dtBeliefSimultaneous = new events() {
-        @Override
-        public boolean booleanValueOf(PremiseEval m) {
-            //Task belief = m.premise.belief();
-
-            /*if (belief == null) {
-                return (m.premise.task().term().dt() == ITERNAL);
-            } else {*/
-                return true;
-            //}
-
-            //int tdt = belief.term().dt();
-            //return (tdt == Tense.ITERNAL) || (tdt == 0);
-        }
-
-        @Override
-        public String toString() {
-            return "dtBeliefSimultaneous";
-        }
-    };
+//    /** ITERNAL or 0, used in combination with a Temporalize that uses the same dt as the task */
+//    public static final events dtBeliefSimultaneous = new events() {
+//        @Override
+//        public boolean booleanValueOf(PremiseEval m) {
+//            //Task belief = m.premise.belief();
+//
+//            /*if (belief == null) {
+//                return (m.premise.task().term().dt() == ITERNAL);
+//            } else {*/
+//                return true;
+//            //}
+//
+//            //int tdt = belief.term().dt();
+//            //return (tdt == Tense.ITERNAL) || (tdt == 0);
+//        }
+//
+//        @Override
+//        public String toString() {
+//            return "dtBeliefSimultaneous";
+//        }
+//    };
 
     public static boolean beliefBeforeOrDuringTask(@NotNull ConceptProcess p) {
         Task b = p.belief();

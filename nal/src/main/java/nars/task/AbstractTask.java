@@ -188,7 +188,7 @@ public abstract class AbstractTask extends UnitBudget
             setTime(now, oc);
         }
 
-//        //shift the occurrence time if dt < 0
+////        //shift the occurrence time if dt < 0
 //        int termDur = term.term().dt();
 //        if (termDur!=DTERNAL && termDur < 0) {
 //            setOccurrenceTime(occurrence() - termDur);

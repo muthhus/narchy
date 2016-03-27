@@ -468,7 +468,7 @@ public class PremiseRule extends GenericCompound {
                             break;
 
                         case "dtBeliefSimultaneous":
-                            preNext = events.dtBeliefSimultaneous;
+                            //preNext = events.dtBeliefSimultaneous;
                             temporalize = Temporalize.dtBeliefExact;
                             break;
 

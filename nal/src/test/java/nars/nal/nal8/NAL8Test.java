@@ -257,10 +257,10 @@ public class NAL8Test extends AbstractNALTest {
     }
 
     @Test public void testExecutionResult()  {
-        TestNAR tester = test();
-
-        tester.input("<#y --> (/,^exe,x,_)>! :|:");
-        tester.mustDesire(4, "exe(x, #1)", 1.0f, 0.9f, 0);
+        test()
+            .log()
+            .input("<#y --> (/,^exe,x,_)>! :|:")
+            .mustDesire(16, "exe(x, #1)", 1.0f, 0.9f, 0);
 
         //if (!(tester.nar instanceof SingleStepNAR)) {
         //tester.nar.log();
@@ -298,8 +298,8 @@ public class NAL8Test extends AbstractNALTest {
         tester
                 .log()
                 .input("(reachable:(SELF,{t002}) &&+5 pick({t002}))! :|:")
-                .mustDesire(2, "reachable:(SELF,{t002})", 1.0f, 0.81f, 0)
-                .mustDesire(2, "pick({t002})", 1.0f, 0.81f, 5)
+                .mustDesire(6, "reachable:(SELF,{t002})", 1.0f, 0.81f, 0)
+                .mustDesire(6, "pick({t002})", 1.0f, 0.81f, 5)
         ;
     }
     @Test
@@ -459,9 +459,8 @@ public class NAL8Test extends AbstractNALTest {
         TestNAR tester = test();
 
         tester.input("(at:(SELF,{t001}) &&+5 open({t001}) )!");
-
-
         tester.mustDesire(cycles, "at:(SELF,{t001})", 1.0f, 0.81f);
+        tester.mustDesire(cycles, "open({t001})", 1.0f, 0.81f);
 
     }
 

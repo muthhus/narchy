@@ -191,7 +191,7 @@ public interface Temporalize {
         return dtExact(derived, occReturn, prem, prem.task());
     };
 
-    /** special handling for dealing with conjunctions which involve a potential mix of eternal and non-eternal premise components */
+    /** special handling for dealing with detaching, esp. conjunctions which involve a potential mix of eternal and non-eternal premise components */
     @Nullable
     Temporalize dtBeliefExact = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn) -> {
         ConceptProcess prem = p.premise;
@@ -199,42 +199,40 @@ public interface Temporalize {
         if ((src == null) || (src.isEternal())) {
             //shift the occurrence by the position of the matching termlink in the 2-ary temporal relation, or N-ary temporal relation if ITERNAL or zero
             Task task = prem.task();
-            long occ = task.occurrence();
+            long tOcc = task.occurrence();
 
             Compound tt = task.term();
             long dt = tt.dt();
-            if (occ!=ETERNAL) {
+            if (tOcc != ETERNAL) {
                 if (dt == DTERNAL || dt == 0) {
-                    occReturn[0] = occ;
+                    occReturn[0] = tOcc;
                     return derived;
                 } else {
                     //TODO find the matching subterm, it's either the first or the second
                     //Term tl = prem.termLink.get().term();
 
+
                     //shift by the dt if the right-hand side (later)
                     //if (dt > 0) {
-                        if (tt.term(1).equals(derived))
-                            occ += dt;
+                    //if (tt.term(1).equals(derived))
+                        //tOcc += dt;
                     /*} else if (dt < 0) {
                         if (tt.term(1).equals(derived))
                             occ -= dt;
                     }*/
 
 
-                    occReturn[0] = occ;
+                    occReturn[0] = tOcc + tt.subtermTime(derived);
                     return derived;
                 }
-            } else {
-                //nothing conclusive can be derived since the task is eternal and 'src' contributes no temporal information
-                return null;
             }
-
-
+            return derived;
+        }
             //occReturn[0] = occ;
             //return derived;
-        } else {
+        ///} else {
             return dtExact(derived, occReturn, prem, src);
-        }
+        //}
     };
 
     @NotNull
