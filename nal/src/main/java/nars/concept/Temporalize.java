@@ -20,8 +20,6 @@ import static nars.nal.Tense.*;
 public interface Temporalize {
 
 
-
-
     static long earlyOrLate(long t, long b, boolean early) {
         boolean tEternal = t == ETERNAL;
         boolean bEternal = b == ETERNAL;
@@ -51,19 +49,27 @@ public interface Temporalize {
     @NotNull
     Compound compute(@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn);
 
-    /** early-aligned, difference in dt */
+    /**
+     * early-aligned, difference in dt
+     */
     Temporalize dtTminB = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn) -> {
         return dtDiff(derived, p, occReturn, +1);
     };
-    /** early-aligned, difference in dt */
+    /**
+     * early-aligned, difference in dt
+     */
     Temporalize dtBminT = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn) -> {
         return dtDiff(derived, p, occReturn, -1);
     };
-    /** early-aligned, difference in dt */
+    /**
+     * early-aligned, difference in dt
+     */
     Temporalize dtIntersect = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn) -> {
         return dtDiff(derived, p, occReturn, 0);
     };
-    /** early-aligned, difference in dt */
+    /**
+     * early-aligned, difference in dt
+     */
     Temporalize dtUnion = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn) -> {
         //TODO
         return dtDiff(derived, p, occReturn, 2);
@@ -78,15 +84,15 @@ public interface Temporalize {
         ConceptProcess prem = p.premise;
         Task task = prem.task();
         Compound taskTerm = task.term();
-        Compound beliefTerm = (Compound)prem.beliefTerm();
+        Compound beliefTerm = (Compound) prem.beliefTerm();
 
         int dt;
         int ttd = taskTerm.dt();
         int btd = beliefTerm.dt();
-        if (ttd !=DTERNAL && btd !=DTERNAL) {
+        if (ttd != DTERNAL && btd != DTERNAL) {
             switch (polarity) {
                 case 0:
-                    dt = (ttd + btd)/2; //intersect: 0
+                    dt = (ttd + btd) / 2; //intersect: 0
                     break;
                 case 2:  //union
                     dt = -(ttd + btd);
@@ -178,31 +184,53 @@ public interface Temporalize {
         //HACK to handle commutive switching so that the dt is relative to the effective subject
         if (derived.op().isCommutative()) {
             if (derived.term(0).equals(prem.belief().term()))
-                eventDelta *=-1;
+                eventDelta *= -1;
         }
 
         return deriveDT(derived, polarity, prem, eventDelta);
     }
 
 
-    /** copiesthe 'dt' and the occurence of the task term directly */
+    /**
+     * copiesthe 'dt' and the occurence of the task term directly
+     */
     Temporalize dtTaskExact = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn) -> {
         ConceptProcess prem = p.premise;
         return dtExact(derived, occReturn, prem, prem.task());
     };
 
-    /** special handling for dealing with detaching, esp. conjunctions which involve a potential mix of eternal and non-eternal premise components */
+    /**
+     * special handling for dealing with detaching, esp. conjunctions which involve a potential mix of eternal and non-eternal premise components
+     */
     @Nullable
-    Temporalize dtBeliefExact = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn) -> {
-        ConceptProcess prem = p.premise;
-        Task src = prem.belief();
-        //if ((src == null) || (src.isEternal())) {
-            //shift the occurrence by the position of the matching termlink in the 2-ary temporal relation, or N-ary temporal relation if ITERNAL or zero
-            Task task = prem.task();
-            long tOcc = task.occurrence();
+    Temporalize decomposeTask = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn) -> {
+        return decompose(derived, p, occReturn, true);
+    };
+    @Nullable
+    Temporalize decomposeBelief = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn) -> {
+        return decompose(derived, p, occReturn, false);
+    };
 
-            Compound tt = task.term();
+    @NotNull
+    static Compound decompose(@NotNull Compound derived, @NotNull PremiseEval p, @NotNull long[] occReturn, boolean targetIsTask) {
+        ConceptProcess prem = p.premise;
+
+        Task target = targetIsTask ? prem.task() : prem.belief();
+        Task other = targetIsTask ? prem.belief() : prem.task();
+        long tOcc = target.occurrence();
+        long uOcc = other!=null ? other.occurrence() : ETERNAL;
+        if (tOcc == ETERNAL) {
+            tOcc = uOcc; //try the belief's occurrence
+        } if (uOcc!=ETERNAL) {
+            //conflict; prefer the specified target's (already set)
+        }
+
+        if (tOcc!=ETERNAL) {
+            //shift the occurrence
+
+            Compound tt = target.term();
             long dt = tt.dt();
+
             if (tOcc != ETERNAL) {
                 if (dt == DTERNAL || dt == 0) {
                     occReturn[0] = tOcc;
@@ -215,7 +243,7 @@ public interface Temporalize {
                     //shift by the dt if the right-hand side (later)
                     //if (dt > 0) {
                     //if (tt.term(1).equals(derived))
-                        //tOcc += dt;
+                    //tOcc += dt;
                     /*} else if (dt < 0) {
                         if (tt.term(1).equals(derived))
                             occ -= dt;
@@ -226,14 +254,11 @@ public interface Temporalize {
                     return derived;
                 }
             }
-            return derived;
-//        }
-            //occReturn[0] = occ;
-            //return derived;
-        ///} else {
-            //return dtExact(derived, occReturn, prem, src);
-        //}
-    };
+        }
+
+        //else just return the component as an eternal belief
+        return derived;
+    }
 
     @NotNull
     static Compound dtExact(@NotNull Compound derived, @NotNull long[] occReturn, @NotNull ConceptProcess prem, @NotNull Task src) {
@@ -307,14 +332,7 @@ public interface Temporalize {
 
         occReturn[0] = o;
 
-        if (!derived.op().isTemporal()) {
-            //TODO decide if this is an error
-            return derived;
-        } else {
-            int eventDelta =
-                    (taskOrBelief ? premise.task() : premise.belief()).term().dt();
-            return deriveDT(derived, 1, premise, eventDelta);
-        }
+        return derived;
     }
 
     @NotNull

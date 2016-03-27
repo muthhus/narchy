@@ -209,12 +209,11 @@ public class NAL8Test extends AbstractNALTest {
     }
     @Test
     public void condition_goal_deduction2()  {
-        TestNAR tester = test();
-
-        tester.input("a:b!");
-        tester.inputAt(10, "(( c:d &&+5 e:f ) ==>+0 a:b).");
-
-        tester.mustDesire(cycles, "( c:d &&+5 e:f)", 1.0f, 0.81f);
+        test()
+            .log()
+            .input("a:b!")
+            .inputAt(10, "(( c:d &&+5 e:f ) ==>+0 a:b).")
+            .mustDesire(cycles, "( c:d &&+5 e:f)", 1.0f, 0.81f);
     }
 
     @Test
@@ -316,7 +315,7 @@ public class NAL8Test extends AbstractNALTest {
         tester.input("at:(SELF,{t001}). :|:");
         tester.inputAt(10, "(at:(SELF,{t001}) &&+5 open({t001}))!");
 
-        tester.mustDesire(cycles, "open({t001})", 1.0f, 0.81f);
+        tester.mustDesire(cycles, "open({t001})", 1.0f, 0.81f, 5);
 
     }
 
@@ -430,7 +429,7 @@ public class NAL8Test extends AbstractNALTest {
             .log()
             .input(       "on:({t002},{t003}). :|:")
             .inputAt(10, "(on:({t002},#1) &&+0 at:(SELF,#1)).")
-            .mustBelieve(time, selfAtT3, 1.0f, 0.42f, 0)
+            .mustBelieve(time, selfAtT3, 1.0f, 0.66f /*0.42f*/, 0)
             .mustNotOutput(time, selfAtT3, '.', 0, 1f, 0, 1f, ETERNAL);
 
     }

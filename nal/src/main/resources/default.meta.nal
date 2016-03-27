@@ -284,15 +284,15 @@
 
 //// conjunction decompose AND dependent variable elimination - decomposition with elimination of a variable
 
-     (&&,X,A..+), B, time(dtBeliefSimultaneous) |- substituteIfUnifies((&&,A..+),"#",X,B), (Belief:StructuralDeduction, Desire:StructuralStrong, Order:ForAllSame)
+     (&&,X,A..+), B, time(decomposeTask) |- substituteIfUnifies((&&,A..+),"#",X,B), (Belief:StructuralDeduction, Desire:StructuralStrong, Order:ForAllSame)
 
 // Original: dependent variable elimination - decomposition with elimination of a variable
-//     (&&,X,A..+), B, time(dtBeliefSimultaneous) |- substituteIfUnifies((&&,A..+),"#",X,B), (Belief:AnonymousAnalogy, Desire:Strong, Order:ForAllSame)
+//     (&&,X,A..+), B, time(decomposeTask) |- substituteIfUnifies((&&,A..+),"#",X,B), (Belief:AnonymousAnalogy, Desire:Strong, Order:ForAllSame)
 //    (&/,B,A..+), B, task("!") |- (&/,A..+), (Desire:Strong)
 //     (&&,A,B), A |- A, (Belief:StructuralDeduction, Desire:StructuralStrong),
 //                    B, (Belief:StructuralDeduction, Desire:StructuralStrong)
 //// conjunction decompose
-//     (&&,X,A..+), X, time(dtBeliefSimultaneous)  |- (&&,A..+), (Belief:StructuralDeduction, Desire:StructuralStrong),
+//     (&&,X,A..+), X, time(decomposeTask)  |- (&&,A..+), (Belief:StructuralDeduction, Desire:StructuralStrong),
 //                                                    X, (Belief:StructuralDeduction, Desire:StructuralStrong)
 //     X, (&&,X,A..+)  |- (&&,A..+), (Belief:Deduction, Desire:Induction),
 //                        X, (Belief:Deduction, Desire:Induction)
