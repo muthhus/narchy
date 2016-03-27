@@ -280,23 +280,23 @@
 //   P, S, no_common_subterm(S,P) |- (P && S), (Belief:Intersection)
 //   P, S, no_common_subterm(S,P) |- (P || S), (Belief:Union)
 
-//// conjunction decompose
-     (&&,X,A..+), X, time(dtBeliefSimultaneous)  |- (&&,A..+), (Belief:StructuralDeduction, Desire:StructuralStrong),
-                                                    X, (Belief:StructuralDeduction, Desire:StructuralStrong)
-
-//     X, (&&,X,A..+)  |- (&&,A..+), (Belief:Deduction, Desire:Induction),
-//                        X, (Belief:Deduction, Desire:Induction)
 
 
+//// conjunction decompose AND dependent variable elimination - decomposition with elimination of a variable
 
-//// dependent variable elimination - decomposition with elimination of a variable
-//TODO add a precondition that only allows this if B is not a subterm of the conjunction, which is the case above and produces different truth
-     (&&,X,A..+), B, time(dtBeliefSimultaneous) |- substituteIfUnifies((&&,A..+),"#",X,B), (Belief:AnonymousAnalogy, Desire:Strong, Order:ForAllSame)
+     (&&,X,A..+), B, time(dtBeliefSimultaneous) |- substituteIfUnifies((&&,A..+),"#",X,B), (Belief:StructuralDeduction, Desire:StructuralStrong, Order:ForAllSame)
 
-
+// Original: dependent variable elimination - decomposition with elimination of a variable
+//     (&&,X,A..+), B, time(dtBeliefSimultaneous) |- substituteIfUnifies((&&,A..+),"#",X,B), (Belief:AnonymousAnalogy, Desire:Strong, Order:ForAllSame)
 //    (&/,B,A..+), B, task("!") |- (&/,A..+), (Desire:Strong)
 //     (&&,A,B), A |- A, (Belief:StructuralDeduction, Desire:StructuralStrong),
 //                    B, (Belief:StructuralDeduction, Desire:StructuralStrong)
+//// conjunction decompose
+//     (&&,X,A..+), X, time(dtBeliefSimultaneous)  |- (&&,A..+), (Belief:StructuralDeduction, Desire:StructuralStrong),
+//                                                    X, (Belief:StructuralDeduction, Desire:StructuralStrong)
+//     X, (&&,X,A..+)  |- (&&,A..+), (Belief:Deduction, Desire:Induction),
+//                        X, (Belief:Deduction, Desire:Induction)
+
 
 //// propositional decomposition ////////////////////////////////////////////////////////////////////////////////////
 //If S is the case, and (&&,S,A..+) is not the case, it can't be that (&&,A..+) is the case

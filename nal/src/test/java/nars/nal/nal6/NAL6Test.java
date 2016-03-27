@@ -140,7 +140,7 @@ public class NAL6Test extends AbstractNALTest {
         TestNAR tester = test();
         tester.believe("(&&,<#x --> bird>,<#x --> swimmer>)"); //en("Some bird can swim.");
         tester.believe("<swan --> bird>", 0.90f, 0.9f); //en("Swan is a type of bird.");
-        tester.mustBelieve(cycles, "<swan --> swimmer>", 0.90f, 0.42f); //en("I guess swan can swim.");
+        tester.mustBelieve(cycles, "<swan --> swimmer>", 0.90f, 0.53f /* 0.42f */); //en("I guess swan can swim.");
 
     }
 
@@ -190,7 +190,7 @@ public class NAL6Test extends AbstractNALTest {
         TestNAR tester = test();
         tester.believe("(&&,<#x --> lock>,<<$y --> key> ==> <#x --> (/,open,$y,_)>>)"); //en("There is a lock that can be opened by every key.");
         tester.believe("<{lock1} --> lock>"); //en("Lock-1 is a lock.");
-        tester.mustBelieve(cycles, "<<$1 --> key> ==> <{lock1} --> (/,open,$1,_)>>", 1.00f, 0.42f); //en("I guess Lock-1 can be opened by every key.");
+        tester.mustBelieve(cycles, "<<$1 --> key> ==> <{lock1} --> (/,open,$1,_)>>", 1.00f, 0.66f /*0.42f*/); //en("I guess Lock-1 can be opened by every key.");
 
     }
 
@@ -200,7 +200,7 @@ public class NAL6Test extends AbstractNALTest {
         TestNAR tester = test();
         tester.believe("(&&,<#x --> (/,open,#y,_)>,<#x --> lock>,<#y --> key>)"); //en("There is a key that can open some lock.");
         tester.believe("<{lock1} --> lock>"); //en("Lock-1 is a lock.");
-        tester.mustBelieve(cycles, "(&&,<#1 --> key>,<{lock1} --> (/,open,#1,_)>)", 1.00f, 0.42f); //en("I guess there is a key that can open Lock-1.");
+        tester.mustBelieve(cycles, "(&&,<#1 --> key>,<{lock1} --> (/,open,#1,_)>)", 1.00f, 0.81f /*0.42f*/); //en("I guess there is a key that can open Lock-1.");
 
     }
 

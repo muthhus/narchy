@@ -157,12 +157,11 @@ public class NAL8Test extends AbstractNALTest {
     @Test
     public void condition_goal_deductionWithVariableElimination()  {
         test()
-//        .log()
                 .input("at:(SELF,{t003})!")
                 .inputAt(10, "(goto($1) ==>+5 at:(SELF,$1)).")
 
-                .mustDesire(cycles*4, "goto({t003})", 1.0f, 0.81f)
-                .mustDesire(cycles, "goto({t003})", 1.0f, 0.81f, -5); //??
+                .mustDesire(cycles, "goto({t003})", 1.0f, 0.81f)
+                .mustNotOutput(cycles, "goto({t003})", '!', -5); //??
 
     }
 
@@ -284,13 +283,8 @@ public class NAL8Test extends AbstractNALTest {
         TestNAR tester = test();
         tester
                 .input("(reachable:(SELF,{t002}) &&+5 pick({t002}))!")
-                //.mustDesire(cycles, "reachable:(SELF,{t002})", 1.0f, 0.81f)
-                //.mustDesire(cycles, "pick({t002})", 1.0f, 0.81f)
-
-                //There is no temporal evidence given to place the components anywhere in time, and the goal only refers to the condition of their relation
-                .mustNotOutput(cycles, "reachable:(SELF,{t002})", '!', ETERNAL)
-                .mustNotOutput(cycles, "pick({t002})", '!', ETERNAL)
-        ;
+                .mustDesire(cycles, "reachable:(SELF,{t002})", 1.0f, 0.81f)
+                .mustDesire(cycles, "pick({t002})", 1.0f, 0.81f);
     }
     @Test
     public void detaching_single_premise_temporal()  {
@@ -429,16 +423,16 @@ public class NAL8Test extends AbstractNALTest {
     }
     @Test
     public void condition_belief_deduction_2()  {
-        TestNAR tester = test();
+        String selfAtT3 = "at:(SELF,{t003})";
+        int time = 124;
 
-        tester.input("<({t002},{t003}) --> on>. :|:");
-        tester.inputAt(10, "(<({t002},#1) --> on> &&+0 <(SELF,#1) --> at>).");
+        test()
+            .log()
+            .input(       "on:({t002},{t003}). :|:")
+            .inputAt(10, "(on:({t002},#1) &&+0 at:(SELF,#1)).")
+            .mustBelieve(time, selfAtT3, 1.0f, 0.42f, 0)
+            .mustNotOutput(time, selfAtT3, '.', 0, 1f, 0, 1f, ETERNAL);
 
-        String selfAtT3 = "<(SELF,{t003}) --> at>";
-        int time = 24;
-        tester.mustBelieve(time, selfAtT3, 1.0f, 0.42f, 0);
-        tester.mustNotOutput(time, selfAtT3, '.', 0, 1f, 0, 1f, ETERNAL);
-        //tester.mustNotBelieve(...eternal)
     }
 
     @Test
@@ -500,12 +494,12 @@ public class NAL8Test extends AbstractNALTest {
     }
 
     @Test public void arbitraryConjunction() {
-        TestNAR tester = test();
-        tester.believe("believe:(x)."); //psuedo operators since operation is > nal6
-        tester.believe("want:(x)."); //psuedo operators since operation is > nal6
-        tester.believe("((believe:($1) && want:($1)) ==> grateful:($1))");
-        tester.mustBelieve(cycles*3, "(believe:(x) && want:(x)).", 1.00f, 0.81f);
-        tester.mustBelieve(cycles*3, "grateful:(x).", 1.00f, 0.39f);
+        test()
+            .believe("believe:(x).") //psuedo operators since operation is > nal6
+            .believe("want:(x).") //psuedo operators since operation is > nal6
+            .believe("((believe:($1) && want:($1)) ==> grateful:($1))")
+            //.mustBelieve(cycles*3, "(believe:(x) && want:(x)).", 1.00f, 0.81f)
+            .mustBelieve(cycles*3, "grateful:(x).", 1.00f, 0.39f);
 
 
     }

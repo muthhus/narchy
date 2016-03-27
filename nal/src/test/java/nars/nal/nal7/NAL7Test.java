@@ -177,11 +177,12 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void intervalPreserve_and_shift_occurence() {
-        TestNAR tester = test();
-        tester.input("S:s.");
-        tester.inputAt(10, "(S:s &&+50 (Y:y &&+3 Z:z)). :|:");
-        tester.mustBelieve(cycles, "S:s.", 1.00f, 0.81f /* 0.42? */, 10);
-        tester.mustBelieve(cycles, "(Y:y &&+3 Z:z).", 1.00f, 0.81f /* 0.42? */, 60);
+        test()
+            //.log()
+            .input("S:s.")
+            .inputAt(10, "(S:s &&+50 (Y:y &&+3 Z:z)). :|:")
+            .mustBelieve(cycles, "S:s.", 1.00f, 0.81f, 10)
+            .mustBelieve(cycles, "(Y:y &&+3 Z:z).", 1.00f, 0.81f, 60);
     }
 
 

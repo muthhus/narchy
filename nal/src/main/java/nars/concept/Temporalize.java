@@ -196,7 +196,7 @@ public interface Temporalize {
     Temporalize dtBeliefExact = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, @NotNull long[] occReturn) -> {
         ConceptProcess prem = p.premise;
         Task src = prem.belief();
-        if ((src == null) || (src.isEternal())) {
+        //if ((src == null) || (src.isEternal())) {
             //shift the occurrence by the position of the matching termlink in the 2-ary temporal relation, or N-ary temporal relation if ITERNAL or zero
             Task task = prem.task();
             long tOcc = task.occurrence();
@@ -227,11 +227,11 @@ public interface Temporalize {
                 }
             }
             return derived;
-        }
+//        }
             //occReturn[0] = occ;
             //return derived;
         ///} else {
-            return dtExact(derived, occReturn, prem, src);
+            //return dtExact(derived, occReturn, prem, src);
         //}
     };
 
