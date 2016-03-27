@@ -37,18 +37,27 @@ public class RevisionTest {
     }
 
     @Test
-    public void testRevision1() {
-        //short term immediate test for correct revisionb ehavior
-        testRevision(1);
+    public void testBeliefRevision1() {
+        testRevision(1, true); //short term immediate test for correct revisionb ehavior
     }
 
     @Test
-    public void testRevision32() {
-        //longer term test
-        testRevision(32);
+    public void testGoalRevision1() {
+        testRevision(32, false); //longer term test
     }
 
-    void testRevision(int delay1) {
+    @Test
+    public void testBeliefRevision32() {
+        testRevision(32, true); //longer term test
+    }
+
+    @Test
+    public void testGoalRevision32() {
+        testRevision(32, false); //longer term test
+    }
+
+
+    void testRevision(int delay1, boolean beliefOrGoal) {
         Global.DEBUG = true;
 
         AbstractNAR n = newNAR(6);
@@ -61,8 +70,13 @@ public class RevisionTest {
         //n.stdout();
 
 
-        BeliefAnalysis b = new BeliefAnalysis(n, "<a-->b>")
-                .believe(1.0f, 0.9f).run(1);
+        BeliefAnalysis b = new BeliefAnalysis(n, "<a-->b>");
+        if (beliefOrGoal)
+            b.believe(1.0f, 0.9f);
+        else
+            b.goal(1.0f, 0.9f);
+
+        b.run(1);
 
         assertEquals(1, b.size());
 

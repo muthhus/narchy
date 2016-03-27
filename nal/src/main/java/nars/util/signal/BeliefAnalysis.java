@@ -24,6 +24,12 @@ public class BeliefAnalysis extends EnergyAnalysis {
 	}
 
 	@NotNull
+	public BeliefAnalysis goal(float freq, float conf) {
+		nar.goal(term, freq, conf);
+		return this;
+	}
+
+	@NotNull
 	public BeliefAnalysis believe(float freq, float conf) {
 		nar.believe(term, freq, conf);
 		return this;
