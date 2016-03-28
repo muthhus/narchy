@@ -498,7 +498,7 @@ public class NAL7Test extends AbstractNALTest {
 
     }
 
-    //
+
     @Test
     public void temporalOrder() {
         test()
@@ -506,12 +506,12 @@ public class NAL7Test extends AbstractNALTest {
                 .input("(<m --> M> ==>+5 <p --> P>).")
                 .inputAt(10, "(<s --> S> <=>+0 <m --> M>). %0.9;0.9%")
                 .mustBelieve(cycles, "(<s --> S> ==>+5 <p --> P>)", 0.90f, 0.73f)
-                .mustBelieve(cycles, "<m-->M>", 1f, 0.81f)
-                .mustBelieve(cycles, "<p-->P>", 1f, 0.81f);
+                .mustBelieve(cycles, "<m-->M>", 1f, 0.81f);
+                //.mustBelieve(cycles, "<p-->P>", 1f, 0.81f);
 
         //(M =/> P), (S <|> M), not_equal(S,P) |- (S =/> P), (Truth:Analogy, Derive:AllowBackward)
     }
-//
+
 
 
 }

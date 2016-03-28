@@ -55,6 +55,7 @@ public class TemporalRelationsTest {
         }
     }
 
+
     @Test public void testConceptualization() {
         Default d = new Default();
 
@@ -103,7 +104,12 @@ public class TemporalRelationsTest {
         Compound d = $("(b &&-5 a)");
         assertEquals(0, d.subtermTime($("a")));
         assertEquals(5, d.subtermTime($("b")));
+    }
 
+    @Test public void testSubtermTestOffset() {
+        String x = "(({t001}-->[opened]) &&-5 (open({t001}) &&-5 ((({t001})-->at) &&-5 (({t002})-->hold))))";
+        String y =                           "(open({t001}) &&-5 ((({t001})-->at) &&-5 (({t002})-->hold)))";
+        assertEquals(0, $(x).subtermTime($(y)));
 
     }
 

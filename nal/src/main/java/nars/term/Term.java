@@ -220,20 +220,25 @@ public interface Term extends Termed, Comparable, Termlike {
 
             //use the normalized order of the terms so that the first is always @ 0
             int firstIndex, lastIndex;
+
             if (dt < 0) {
                 dt = -dt;
+
                 firstIndex = 1;
                 lastIndex = 0;
             } else {
+
                 firstIndex = 0;
                 lastIndex = 1;
             }
 
             Term first = c.term(firstIndex);
-            if (first.equals(x)) return 0;
+            if (first.equals(x))
+                return 0;
 
             Term last = c.term(lastIndex);
-            if (last.equals(x)) return dt;
+            if (last.equals(x))
+                return dt;
 
             long withinSubj = first.subtermTime(x);
             if (withinSubj!=ETERNAL)
