@@ -25,6 +25,7 @@ import nars.task.flow.TaskStream;
 import nars.term.*;
 import nars.term.atom.Atom;
 import nars.time.Clock;
+import nars.util.TermCodec;
 import nars.util.event.AnswerReaction;
 import nars.util.event.DefaultTopic;
 import nars.util.event.On;
@@ -34,6 +35,7 @@ import org.apache.commons.lang3.mutable.MutableFloat;
 import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.nustaq.serialization.FSTDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1054,5 +1056,43 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 //
 //    }
 //
+
+    /** byte codec output of matching concept tasks (blocking) */
+    public NAR output(OutputStream o, Predicate<Task> each) {
+
+        forEachConceptTask(true, true, true, true, t-> {
+            if (each.test(t)) {
+                try {
+                    TermCodec.the.encodeToStream(o, t);
+                } catch (IOException e) {
+                    logger.error("{} when trying to output to {}", t, e);
+                    throw new RuntimeException(e);
+                    //e.printStackTrace();
+                }
+            }
+        });
+
+        try {
+            o.flush();
+        } catch (IOException e) {
+            logger.error("{}", e);
+        }
+
+        return this;
+    }
+
+
+    public NAR output(OutputStream o) {
+        return output(o, x -> true);
+    }
+
+    /** byte codec input stream of tasks, to be input after decode */
+    public NAR input(InputStream tasks) throws Exception {
+        while (tasks.available() > 0) {
+            Task t = (Task)TermCodec.the.decodeFromStream(tasks);
+            input(t);
+        }
+        return this;
+    }
 
 }

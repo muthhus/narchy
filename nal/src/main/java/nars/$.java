@@ -41,12 +41,11 @@ import static nars.nal.Tense.DTERNAL;
 public enum $ /* TODO: implements TermIndex */ {
     ;
 
-
     public static final org.slf4j.Logger logger = LoggerFactory.getLogger($.class);
     public static final Function<Object, Term> ToStringToTerm = (x) -> $.the(x.toString());
 
     public static <T extends Term> T $(@NotNull String term) {
-        Termed normalized = Narsese.the().term(term, Terms.terms);
+        Termed normalized = Narsese.the().term(term, Terms.terms, true);
         if (normalized!=null)
             return (T)(normalized.term());
         return null;

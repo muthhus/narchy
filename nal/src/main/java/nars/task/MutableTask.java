@@ -303,10 +303,16 @@ public class MutableTask extends AbstractTask {
     }
 
 
-    protected final void punc(char punctuation) {
+    protected final MutableTask punc(char punctuation) {
         if (this.punctuation!=punctuation) {
             this.punctuation = punctuation;
             invalidate();
         }
+        return this;
+    }
+
+    public final MutableTask evidence(long[] evi) {
+        setEvidence(evi);
+        return this;
     }
 }

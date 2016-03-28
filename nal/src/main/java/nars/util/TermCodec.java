@@ -1,68 +1,63 @@
-package nars.task;
+package nars.util;
 
+import com.sun.tools.classfile.ConstantPool;
 import nars.$;
-import nars.NAR;
 import nars.Narsese;
 import nars.Symbols;
-import nars.nar.Default;
-import nars.nar.Terminal;
+import nars.task.MutableTask;
+import nars.task.Task;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.term.compound.GenericCompound;
-import nars.term.index.PatternIndex;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
-import org.junit.Test;
 import org.nustaq.serialization.*;
 
 import java.io.IOException;
-import java.util.Arrays;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
-/**
- * Created by me on 3/28/16.
- */
-public class TaskSerializationTest {
+/** serialization and deserialization of terms, tasks, etc. */
+public class TermCodec extends FSTConfiguration {
 
-    static final FSTConfiguration conf =
-            //FSTConfiguration.createUnsafeBinaryConfiguration()
-            FSTConfiguration.createDefaultConfiguration()
-            //.setForceSerializable(true)
-            ;
+    public static final TermCodec the = new TermCodec();
 
-    static {
+    TermCodec() {
+        super(null);
 
-        conf.registerSerializer(DefaultTruth.class, new FSTBasicObjectSerializer() {
+        createDefaultConfiguration();
+        //setStreamCoderFactory(new FBinaryStreamCoderFactory(this));
 
+
+
+//        registerSerializer(DefaultTruth.class, new FSTBasicObjectSerializer() {
+//
+////            @Override
+////            public boolean willHandleClass(Class cl) {
+////                return Task.class.isAssignableFrom(cl);
+////            }
+//
 //            @Override
-//            public boolean willHandleClass(Class cl) {
-//                return Task.class.isAssignableFrom(cl);
+//            public void readObject(FSTObjectInput in, Object toRead, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy) throws Exception {
 //            }
-
-            @Override
-            public void readObject(FSTObjectInput in, Object toRead, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy) throws Exception {
-            }
-
-            @Override
-            public Object instantiate(Class objectClass, FSTObjectInput in, FSTClazzInfo serializationInfo, FSTClazzInfo.FSTFieldInfo referencee, int streamPosition) throws Exception {
-                //return new Atom(in.readStringUTF());
-                float f = in.readFloat();
-                float c = in.readFloat();
-                return new DefaultTruth(f, c);
-            }
-
-            @Override
-            public void writeObject(FSTObjectOutput out, Object toWrite, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy, int streamPosition) throws IOException {
-                Truth t = (Truth) toWrite;
-                out.writeFloat(t.freq());
-                out.writeFloat(t.conf());
-            }
-        }, false);
+//
+//            @Override
+//            public Object instantiate(Class objectClass, FSTObjectInput in, FSTClazzInfo serializationInfo, FSTClazzInfo.FSTFieldInfo referencee, int streamPosition) throws Exception {
+//                //return new Atom(in.readStringUTF());
+//                float f = in.readFloat();
+//                float c = in.readFloat();
+//                return new DefaultTruth(f, c);
+//            }
+//
+//            @Override
+//            public void writeObject(FSTObjectOutput out, Object toWrite, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy, int streamPosition) throws IOException {
+//                Truth t = (Truth) toWrite;
+//                out.writeFloat(t.freq());
+//                out.writeFloat(t.conf());
+//            }
+//        }, false);
 
 
-        conf.registerSerializer(MutableTask.class, new FSTBasicObjectSerializer() {
+        registerSerializer(MutableTask.class, new FSTBasicObjectSerializer() {
 
 //            @Override
 //            public boolean willHandleClass(Class cl) {
@@ -101,8 +96,10 @@ public class TaskSerializationTest {
                 float qua = in.readFloat();
 
                 MutableTask mm = new MutableTask(term, punc).truth(truth).time(cre, occ);
-                mm.setEvidence(evi);
+                mm.evidence(evi);
                 mm.budget(pri, dur, qua);
+
+
                 return mm;
             }
 
@@ -133,9 +130,9 @@ public class TaskSerializationTest {
                 out.writeFloat(t.dur());
                 out.writeFloat(t.qua());
             }
-        }, false);
+        }, true);
 
-        conf.registerSerializer(Atomic.class, new FSTBasicObjectSerializer() {
+        registerSerializer(Atomic.class, new FSTBasicObjectSerializer() {
 
             @Override
             public boolean willHandleClass(Class cl) {
@@ -162,9 +159,9 @@ public class TaskSerializationTest {
                 Atomic a = (Atomic) toWrite;
                 out.writeStringUTF(a.toString());
             }
-        }, false);
+        }, true);
 
-        conf.registerSerializer(GenericCompound.class, new FSTBasicObjectSerializer() {
+        registerSerializer(GenericCompound.class, new FSTBasicObjectSerializer() {
 
 //            @Override
 //            public boolean willHandleClass(Class cl) {
@@ -189,34 +186,8 @@ public class TaskSerializationTest {
             }
         }, true);
 
-
-    }
-
-    public static void testSerialize(Object orig) {
-        byte barray[] = conf.asByteArray(orig);
-        System.out.println(orig + "\n\tserialized: " + barray.length + " bytes");
-
-        Object copy = conf.asObject(barray);
-        //System.out.println("\tbytes: " + Arrays.toString(barray));
-        System.out.println("\tcopy: " + copy);
-
-        assertTrue(copy != orig);
-        assertEquals(copy, orig);
-        assertEquals(copy.getClass(), orig.getClass());
-    }
-
-    //    /* https://github.com/RuedigerMoeller/fast-serialization/wiki/Serialization*/
-    @Test
-    public void testRuleSerialization() {
-
-
-        NAR nar = new Terminal(1024);
-
-        testSerialize(nar.term("<a-->b>").term() /* term, not the concept */);
-        testSerialize(nar.inputTask("<a-->b>."));
-        testSerialize(nar.inputTask("<a-->(b==>c)>!"));
+        //setForceSerializable(true);
 
 
     }
-
 }
