@@ -154,20 +154,19 @@ abstract public class ConceptProcess implements Premise {
     public void derive(@NotNull Termed<Compound> c, @Nullable Truth truth, @NotNull Budget budget, long now, long occ, @NotNull PremiseEval p, @NotNull Derive d) {
 
         char punct = p.punct.get();
-//        Character _punct = p.punct.get();
-//        if (_punct == null) {
-//            throw new RuntimeException("punct is null");
-//        }
-//        char punct = _punct;
 
-        Task belief = belief();
-
-        boolean derivedTemporal = occ != ETERNAL;
+        boolean single;
+        switch (punct) {
+            case Symbols.BELIEF: single = d.beliefSingle; break;
+            case Symbols.GOAL: single = d.goalSingle; break;
+            default:
+                single = true;
+        }
 
         Task derived = newDerivedTask(c, punct)
                 .truth(truth)
                 .time(now, occ)
-                .parent(task(), belief /* will be null if single */)
+                .parent(task(), single ? belief() : null)
                 .budget(budget) // copied in, not shared
                 //.anticipate(derivedTemporal && d.anticipate)
                 .log( Global.DEBUG ? d.rule : "Derived");
@@ -177,7 +176,7 @@ abstract public class ConceptProcess implements Premise {
 
         //ETERNALIZE:
 
-        if (derivedTemporal && (truth != null) && d.eternalize) {
+        if ((occ != ETERNAL) && (truth != null) && d.eternalize) {
 
             complete(newDerivedTask(c, punct)
                     .truth(

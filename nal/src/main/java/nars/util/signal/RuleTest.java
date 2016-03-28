@@ -54,7 +54,7 @@ public interface RuleTest {
 
 		test.nar.input(task);
 		test.nar.input(belief);
-
+		//test.log();
 		test.mustBelieve(25, result, minFreq, maxFreq, minConf, maxConf);
 
 	}

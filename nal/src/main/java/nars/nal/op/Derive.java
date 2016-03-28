@@ -51,17 +51,17 @@ public class Derive extends AtomicStringConstant implements ProcTerm {
      * whether this a single or double premise derivation; necessary in case premise
      * does have a belief but it was not involved in determining Truth
      */
-    public final boolean beliefSingle, desireSingle;
+    public final boolean beliefSingle, goalSingle;
 
 
     public Derive(@NotNull PremiseRule rule, @NotNull Term term, @NotNull BooleanCondition[] postMatch,
-                  boolean beliefSingle, boolean desireSingle, boolean anticipate, boolean eternalize, Temporalize temporalizer) {
+                  boolean beliefSingle, boolean goalSingle, boolean anticipate, boolean eternalize, Temporalize temporalizer) {
         this.rule = rule;
         this.temporalizer = temporalizer;
         this.postMatch = (postMatch.length > 0) ? new AndCondition(postMatch) : BooleanCondition.TRUE;
         this.conclusionPattern = term;
         this.beliefSingle = beliefSingle;
-        this.desireSingle = desireSingle;
+        this.goalSingle = goalSingle;
         this.anticipate = anticipate;
         this.eternalize = eternalize;
 

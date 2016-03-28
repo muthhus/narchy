@@ -130,22 +130,17 @@ abstract public class Solve extends AtomicBooleanCondition<PremiseEval> {
 
         Premise premise = p;
 
-        @Nullable Task belief = premise.belief();
-        Truth btruth = belief!=null ? belief.truth() : null;
-
-        if (tf.single() && btruth!=null)
-            return false; //single premise function accepts only if belief truth is not present
-
         if (!tf.allowOverlap() && p.cyclic())
             return false;
+
+        @Nullable Task belief = premise.belief();
 
 
         float minConf = m.getMinConfidence();
 
-
         Truth truth = tf.apply(
                 premise.task().truth(),
-                btruth,
+                belief!=null ? belief.truth() : null,
                 premise.nar(),
                 minConf
         );

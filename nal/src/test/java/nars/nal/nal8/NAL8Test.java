@@ -65,19 +65,29 @@ public class NAL8Test extends AbstractNALTest {
     @Test public void subsent_1_simpler()  {
         test()
 
-        //.log()
+        .log()
 
         .input("hold:t2. :|:") //@ 0
-        .inputAt(5, "at:t1. :|:")
+        //.inputAt(5, "at:t1. :|:")
         .inputAt(10, "(hold:t2 &&+5 (at:t1 &&+5 (open(t1) &&+5 [opened]:t1))).")
-        .inputAt(15, "[opened]:t1. :|:")
+        //.inputAt(15, "[opened]:t1. :|:")
 
-        .mustBelieve(cycles, "open(t1)",
+        .mustBelieve(cycles*6, "open(t1)",
                 //1.0f, 0.81f,
                 //-5);
                 1.0f, 0.34f,
-                5);
+                10);
 
+    }
+
+    @Test public void subsent_1_even_simpler()  {
+        test()
+                .log()
+                .input("at:t1. :|:") //@ 0
+                .inputAt(10, "(at:t1 &&+5 (open(t1) &&+5 [opened]:t1)).")
+                .mustBelieve(cycles, "open(t1)",
+                        1.0f, 0.39f,
+                        5);
     }
 
     @Test

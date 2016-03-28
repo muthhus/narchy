@@ -122,11 +122,7 @@ public interface Stamp {
     }
 
     static boolean overlapping(@NotNull Stamp a, @Nullable Stamp b) {
-//        assert(a!=null);
-//        return (b != null) &&
-//                    ((a == b) ||
-//                    overlapping(a.evidence(), b.evidence()));
-        return a == b || (b != null && overlapping(a.evidence(), b.evidence()));
+        return (b != null && ((a == b) || overlapping(a.evidence(), b.evidence())));
     }
 
     /**

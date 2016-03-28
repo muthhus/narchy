@@ -170,18 +170,22 @@ public class NAL7Test extends AbstractNALTest {
         TestNAR tester = test();
         tester.input("S:s.");
         tester.inputAt(3, "(S:s &&+3 Z:z). :|:");
-        tester.mustBelieve(cycles, "S:s.", 1.00f, 0.43f /* 0.42? */, 3);
+        tester.mustBelieve(cycles, "S:s.", 1.00f, 0.81f /* 0.42? */, 3);
         tester.mustBelieve(cycles, "Z:z.", 1.00f, 0.81f /* 0.42? */, 6);
     }
 
     @Test
     public void intervalPreserve_and_shift_occurence() {
+        int time = cycles * 8;
         test()
-            //.log()
+            .log()
             .input("S:s.")
-            .inputAt(10, "(S:s &&+50 (Y:y &&+3 Z:z)). :|:")
-            .mustBelieve(cycles, "S:s.", 1.00f, 0.81f, 10)
-            .mustBelieve(cycles, "(Y:y &&+3 Z:z).", 1.00f, 0.81f, 60);
+            .inputAt(1, "(S:s &&+1 (Y:y &&+1 Z:z)). :|:")
+            .mustBelieve(time, "S:s.", 1.00f, 0.81f, 1)
+            .mustBelieve(time, "(Y:y &&+1 Z:z).", 1.00f, 0.43f, 2)
+            .mustBelieve(time, "(Y:y &&+1 Z:z).", 1.00f, 0.81f, 2)
+            .mustBelieve(time, "Y:y.", 1.00f, 0.39f, 2)
+            .mustBelieve(time, "Z:z.", 1.00f, 0.39f, 3);
     }
 
 

@@ -230,6 +230,8 @@ public interface Temporalize {
                 Task other = decomposeTask ? prem.belief() : prem.task();
                 if (other != null && !other.isEternal()) {
 
+                    //compute the relative offset of the original unresolved other term and the derived term
+
                     Term otherTerm = other.term();
                     long baseOcc = ETERNAL;
                     for (int i = 0; i < decTerm.size(); i++) {
@@ -249,36 +251,6 @@ public interface Temporalize {
                         }
                     }
                 }
-
-
-
-
-
-//                //HACK maybe unsafe:
-//                //assume that both the derived and the other are both components of the decomposed;
-//                //then if other.term() == derived, return occ, otherwise return the alternate time
-//
-//                Task other = decomposeTask ? prem.belief() : prem.task();
-//                if (other != null && !other.isEternal()) {
-//                    long foundDerived = dtt.subtermTime(derived);
-//                    long otherOcc = other.occurrence();
-//
-//                    if ((foundDerived != ETERNAL) && other.term().equals(derived)) {
-//                            occReturn[0] = otherOcc + foundDerived;
-//                    }
-//
-//                    //HACK assume it's the "other" other term
-//                        if (ddt == foundDerived) {
-//                            occReturn[0] = otherOcc + ddt; //right side
-//                        } else if (ddt == -foundDerived) {
-//                            occReturn[0] = otherOcc + ddt; //right side
-//                        } else {
-//                            occReturn[0] = otherOcc - ddt; //left side
-//                        }
-//
-//
-//                }
-
             }
         }
 
