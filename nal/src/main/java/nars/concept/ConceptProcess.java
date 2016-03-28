@@ -42,10 +42,16 @@ abstract public class ConceptProcess implements Premise {
 
     /** lazily cached value :=
      *      -1: unknown
+     *      0: parents have no evidential overlap
+     *      1: parents have overlapping evidence
+     */
+    private transient byte overlap = -1;
+    /** lazily cached value :=
+     *      -1: unknown
      *      0: not cyclic
      *      1: cyclic
      */
-    private transient int cyclic = -1;
+    private transient byte cyclic = -1;
 
     public ConceptProcess(NAR nar, BLink<? extends Concept> conceptLink,
                           BLink<? extends Task> taskLink,
@@ -59,14 +65,29 @@ abstract public class ConceptProcess implements Premise {
         this.belief = belief;
     }
 
-    @Override public final boolean cyclic() {
+
+
+    @Override public final boolean overlap() {
+        int cc = this.overlap;
+        if (cc != -1) {
+            return cc > 0; //cached value
+        } else {
+            Task b = this.belief;
+            boolean o = (b != null) && Stamp.overlapping(task(), b);
+            this.overlap = (byte)(o ? 1 : 0);
+            return o;
+        }
+    }
+
+    @Override public boolean cyclic() {
         int cc = this.cyclic;
         if (cc != -1) {
-            return cc > 0;
+            return cc > 0; //cached value
         } else {
-            boolean isCyclic = Stamp.overlapping(task(), belief);
-            this.cyclic = (isCyclic ? 1 : 0);
-            return isCyclic;
+            //Task b = this.belief;
+            boolean o = task().cyclic();
+            this.overlap = (byte)(o ? 1 : 0);
+            return o;
         }
     }
 
@@ -166,7 +187,7 @@ abstract public class ConceptProcess implements Premise {
         Task derived = newDerivedTask(c, punct)
                 .truth(truth)
                 .time(now, occ)
-                .parent(task(), single ? belief() : null)
+                .parent(task(), !single ? belief() : null)
                 .budget(budget) // copied in, not shared
                 //.anticipate(derivedTemporal && d.anticipate)
                 .log( Global.DEBUG ? d.rule : "Derived");
@@ -243,5 +264,6 @@ abstract public class ConceptProcess implements Premise {
         if (b == null) return false;
         return b.term().dt()!= DTERNAL;
     }
+
 
 }

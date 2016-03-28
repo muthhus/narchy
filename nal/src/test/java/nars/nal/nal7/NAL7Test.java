@@ -506,7 +506,7 @@ public class NAL7Test extends AbstractNALTest {
     @Test
     public void temporalOrder() {
         test()
-                .log()
+                //.log()
                 .input("(<m --> M> ==>+5 <p --> P>).")
                 .inputAt(10, "(<s --> S> <=>+0 <m --> M>). %0.9;0.9%")
                 .mustBelieve(cycles, "(<s --> S> ==>+5 <p --> P>)", 0.90f, 0.73f)
@@ -517,5 +517,21 @@ public class NAL7Test extends AbstractNALTest {
     }
 
 
+    @Test public void testDTTaskEnd() {
+        /*
+        $.06;.01;.23$ (c-->b). 220-221 %1.0;.40% {220-221: 2;3} (((%1==>%2),%3,time(dtTaskEnd)),(substituteIfUnifies(%2,"$",%1,%3),((StructuralDeduction-->Belief),(Induction-->Desire),(ForAllSame-->Order))))
+            $1.0;.07;.10$ ((d-->c) ==>-3 (c-->b)). 6-4 %1.0;.45% {6-4: 2;3} ((%1,%2,time(dtAfterReverse),neq(%1,%2),notImplicationOrEquivalence(%1),notImplicationOrEquivalence(%2)),((%2==>%1),((Abduction-->Belief))))
+                $.50;.50;.95$ (c-->b). 2+0 %1.0;.90% {2+0: 2} Input
+                $.50;.50;.95$ (d-->c). 5+0 %1.0;.90% {5+0: 3} Input*/
+        test()
+                .log()
+                .inputAt(2, "(c-->b). :|:")
+                .inputAt(5, "(d-->c). :|:")
+                .mustBelieve(cycles, "((d-->c) ==>-3 (c-->b))", 1f, 0.45f, 2)
+                .mustNotOutput(cycles, "<c-->b>", '.', -1)
+                .mustNotOutput(cycles, "<d-->c>", '.', 2)
+                .mustNotOutput(cycles, "<d-->c>", '.', 1f, 1f, 0f, 0.80f, 5)
+        ;
+    }
 
 }

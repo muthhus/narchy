@@ -34,6 +34,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.Reference;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -839,4 +840,9 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         return term().term(i);
     }
 
+    default boolean cyclic() {
+        Task parent = getParentTask();
+        if (parent == null) return false;
+        return Arrays.equals(evidence(), parent.evidence());
+    }
 }

@@ -121,8 +121,8 @@ public interface Stamp {
         return dedupAndTrimmed;
     }
 
-    static boolean overlapping(@NotNull Stamp a, @Nullable Stamp b) {
-        return (b != null && ((a == b) || overlapping(a.evidence(), b.evidence())));
+    static boolean overlapping(@NotNull Stamp a, @NotNull Stamp b) {
+        return ((a == b) || overlapping(a.evidence(), b.evidence()));
     }
 
     /**
@@ -172,7 +172,7 @@ public interface Stamp {
      * this can always be calculated deterministically from the evidentialBAse
      * since it is the deduplicated and sorted form of it.
      */
-    @Nullable
+    @NotNull
     long[] evidence();
 
     //Stamp setEvidence(long... evidentialSet);

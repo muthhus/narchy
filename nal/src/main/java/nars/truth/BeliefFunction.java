@@ -54,10 +54,12 @@ public enum BeliefFunction implements TruthOperator {
             return (T == null || B == null) ? null : TruthFunctions.deduction(T, B, minConf);
         }
     },
+
+    @SinglePremise
     StructuralDeduction() {
         @NotNull
         @Override public Truth apply(@Nullable final Truth T, final Truth B, @NotNull Memory m, float minConf) {
-            return /*(T == null) ? null : */TruthFunctions.deduction1(T, defaultConfidence(m), minConf);
+            return (T == null) ? null : TruthFunctions.deduction1(T, defaultConfidence(m), minConf);
         }
     },
 

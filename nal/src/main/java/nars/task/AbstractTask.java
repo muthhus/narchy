@@ -337,7 +337,7 @@ public abstract class AbstractTask extends UnitBudget
         return punctuation;
     }
 
-    @Nullable
+    @NotNull
     @Override
     public final long[] evidence() {
         long[] e = this.evidentialSet;

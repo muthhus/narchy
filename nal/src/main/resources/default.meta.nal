@@ -242,8 +242,8 @@
 
     B, (A <=> C), time(dtBelief) |- substituteIfUnifies(C,"$",A,B), (Belief:Deduction, Desire:Induction, Order:ForAllSame)
 
-    (A ==> C), B, time(dtTaskEnd) |-  substituteIfUnifies( C, "$",A,B), (Belief:StructuralDeduction, Desire:Induction, Order:ForAllSame)
-    (C ==> A), B, time(dtTask) |- substituteIfUnifies( C, "$",A,B), (Belief:StructuralDeduction, Desire:Deduction, Order:ForAllSame)
+    (A ==> C), B, time(decomposeTask) |-  substituteIfUnifies( C, "$",A,B), (Belief:StructuralDeduction, Desire:Induction, Order:ForAllSame)
+    (C ==> A), B, time(decomposeTask) |- substituteIfUnifies( C, "$",A,B), (Belief:StructuralDeduction, Desire:Deduction, Order:ForAllSame)
 
     B, (C ==> A), time(dtBelief) |- substituteIfUnifies( C, "$", A, B), (Belief:Abduction, Desire:Deduction, Order:ForAllSame)
     B, (A ==> C), time(dtBeliefEnd) |- substituteIfUnifies( C, "$", A, B), (Belief:Deduction, Desire:Induction, Order:ForAllSame, Event:Anticipate)

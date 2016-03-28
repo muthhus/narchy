@@ -1,5 +1,6 @@
 package nars.nal.op;
 
+import nars.Global;
 import nars.Op;
 import nars.Premise;
 import nars.Symbols;
@@ -130,16 +131,30 @@ abstract public class Solve extends AtomicBooleanCondition<PremiseEval> {
 
         Premise premise = p;
 
-        if (!tf.allowOverlap() && p.cyclic())
-            return false;
+        Task task = premise.task();
 
         @Nullable Task belief = premise.belief();
 
 
+
+        if (!tf.allowOverlap()) {
+            if (tf.single()) {
+                if (p.cyclic())
+                    return false;
+
+            } else {
+                if (p.overlap())
+                    return false;
+            }
+        }
+
+
+
         float minConf = m.getMinConfidence();
 
+
         Truth truth = tf.apply(
-                premise.task().truth(),
+                task.truth(),
                 belief!=null ? belief.truth() : null,
                 premise.nar(),
                 minConf
@@ -148,6 +163,13 @@ abstract public class Solve extends AtomicBooleanCondition<PremiseEval> {
         //pre-filter insufficient confidence level
 
         if (truth != null) {
+
+            if (Global.DEBUG) {
+                if (!tf.single() && belief == null) {
+                    System.err.println("null belief but non-single truth function");
+                }
+            }
+
             if ( truth.conf() > minConf) {
                 m.truth.set(truth);
                 return true;

@@ -219,6 +219,10 @@ public interface Premise extends Level, Tasked {
     }
 
 
+    /** whether overlap exists between the "task" and "belief" tasks. if belief==null, returns false */
+    boolean overlap();
+
+    /** whether parent task overlaps with its parent */
     boolean cyclic();
 
 

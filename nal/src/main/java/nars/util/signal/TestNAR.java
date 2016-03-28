@@ -549,7 +549,6 @@ public class TestNAR  {
             if (t.isTrue()) {
                 logger.error("mustNot: " + t.toString());
                 success = false;
-                break;
             }
         }
 
