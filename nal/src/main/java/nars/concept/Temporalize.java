@@ -216,7 +216,8 @@ public interface Temporalize {
         ConceptProcess prem = p.premise;
 
         Task decomposed = decomposeTask ? prem.task() : prem.belief();
-        Compound dtt = decomposed.term();
+        Compound decTerm = decomposed.term();
+        Compound dtt = decTerm;
         long ddt = dtt.dt();
 
         long tOcc = decomposed.occurrence();
@@ -226,42 +227,58 @@ public interface Temporalize {
             return derived;
         } else {
             if (ddt != DTERNAL) {
-                //HACK maybe unsafe:
-                //assume that both the derived and the other are both components of the decomposed;
-                //then if other.term() == derived, return occ, otherwise return the alternate time
-
                 Task other = decomposeTask ? prem.belief() : prem.task();
                 if (other != null && !other.isEternal()) {
-                    long foundDerived = dtt.subtermTime(derived);
-                    if ((foundDerived != ETERNAL) && other.term().equals(derived)) {
-                            occReturn[0] = other.occurrence() + foundDerived;
-                    }
 
-                    //HACK assume it's the "other" other term
-                    if (ddt == foundDerived) {
-                        occReturn[0] = other.occurrence() + ddt; //right side
-                    } else {
-                        occReturn[0] = other.occurrence() - ddt; //left side
+                    Term otherTerm = other.term();
+                    long baseOcc = ETERNAL;
+                    for (int i = 0; i < decTerm.size(); i++) {
+                        Term dct = decTerm.term(i);
+                        if (p.resolve(dct).equals(otherTerm)) {
+                            baseOcc = other.occurrence() - decTerm.subtermTime(dct);
+                            break;
+                        }
                     }
-
+                    if (baseOcc!=ETERNAL) {
+                        for (int i = 0; i < decTerm.size(); i++) {
+                            Term dct = decTerm.term(i);
+                            if (p.resolve(dct).equals(derived)) {
+                                occReturn[0] = baseOcc + decTerm.subtermTime(dct);
+                                break;
+                            }
+                        }
+                    }
                 }
-//                    /*if (ddt == 0) {
-//                        occResult[0] =
-//                    }*/
-//                    //the belief is non-eternal
-//                    //calculate the time of the other if a component of the temporally-related decomposed
-//                    long beliefRelative = dtt.subtermTime(other.term());
-//                    if (beliefRelative!=ETERNAL) {
-//                        //other was found
-//                        long derivedRelative = dtt.subtermTime(derived);
-//                        if (derivedRelative!=ETERNAL) {
-//                            //both are known so compute the time of the derived term:
-//                            occReturn[0] =
-//                                (other.occurrence() - beliefRelative) //virtual start occurrence of the decomposed eternal
-//                                + derivedRelative;
-//                        }
+
+
+
+
+
+//                //HACK maybe unsafe:
+//                //assume that both the derived and the other are both components of the decomposed;
+//                //then if other.term() == derived, return occ, otherwise return the alternate time
+//
+//                Task other = decomposeTask ? prem.belief() : prem.task();
+//                if (other != null && !other.isEternal()) {
+//                    long foundDerived = dtt.subtermTime(derived);
+//                    long otherOcc = other.occurrence();
+//
+//                    if ((foundDerived != ETERNAL) && other.term().equals(derived)) {
+//                            occReturn[0] = otherOcc + foundDerived;
 //                    }
+//
+//                    //HACK assume it's the "other" other term
+//                        if (ddt == foundDerived) {
+//                            occReturn[0] = otherOcc + ddt; //right side
+//                        } else if (ddt == -foundDerived) {
+//                            occReturn[0] = otherOcc + ddt; //right side
+//                        } else {
+//                            occReturn[0] = otherOcc - ddt; //left side
+//                        }
+//
+//
 //                }
+
             }
         }
 
