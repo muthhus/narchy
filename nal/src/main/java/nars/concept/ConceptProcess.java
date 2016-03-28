@@ -181,7 +181,7 @@ abstract public class ConceptProcess implements Premise {
             case Symbols.BELIEF: single = d.beliefSingle; break;
             case Symbols.GOAL: single = d.goalSingle; break;
             default:
-                single = true;
+                single = false;
         }
 
         Task derived = newDerivedTask(c, punct)
@@ -208,6 +208,7 @@ abstract public class ConceptProcess implements Premise {
                     .time(now, ETERNAL)
 
                     .parent(derived)  //this is lighter weight and potentially easier on GC than: parent(task, belief)
+                    //.parent(task(), !single ? belief() : null)
 
                     .budgetCompoundForward(budget, this)
 
