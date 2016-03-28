@@ -141,7 +141,7 @@ public class Terms extends TermBuilder implements TermIndex {
 
         @Override
         public boolean equals(Object obj) {
-            return TermContainer.equals(this, obj);
+            return TermContainer.equals(this, (TermContainer) obj);
         }
 
         @Override

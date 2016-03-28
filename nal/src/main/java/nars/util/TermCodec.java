@@ -3,10 +3,13 @@ package nars.util;
 import com.sun.tools.classfile.ConstantPool;
 import nars.$;
 import nars.Narsese;
+import nars.Op;
 import nars.Symbols;
+import nars.concept.AtomConcept;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Term;
+import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.compound.GenericCompound;
 import nars.truth.DefaultTruth;
@@ -26,7 +29,14 @@ public class TermCodec extends FSTConfiguration {
 
         createDefaultConfiguration();
         //setStreamCoderFactory(new FBinaryStreamCoderFactory(this));
+        setForceSerializable(true);
 
+        //setCrossPlatform(false);
+        setShareReferences(true);
+
+
+
+        registerClass(Atom.class, GenericCompound.class, MutableTask.class);
 
 
 //        registerSerializer(DefaultTruth.class, new FSTBasicObjectSerializer() {
@@ -76,7 +86,7 @@ public class TermCodec extends FSTConfiguration {
                 char punc = in.readChar();
 
                 Truth truth;
-                if (punc != Symbols.QUESTION && punc != Symbols.QUEST) {
+                if (punc == Symbols.BELIEF || punc == Symbols.GOAL) {
                     truth = new DefaultTruth(in.readFloat() /* f */, in.readFloat() /* c */);
                 } else {
                     truth = null;
@@ -86,7 +96,7 @@ public class TermCodec extends FSTConfiguration {
                 long cre = in.readLong();
 
 
-                int eviLength = in.readInt(); //in.readByte(); //UnsignedByte();
+                int eviLength = in.readByte(); //in.readByte(); //UnsignedByte();
                 long[] evi = new long[eviLength];
                 for (int i = 0; i < eviLength; i++)
                     evi[i] = in.readLong();
@@ -121,7 +131,7 @@ public class TermCodec extends FSTConfiguration {
                 int evil;
                 evil = evi == null ? 0 : evi.length;
 
-                out.writeInt(evil); //out.writeByte((byte) evil);
+                out.writeByte(evil); //out.writeByte((byte) evil);
                 for (int i = 0; i < evil; i++)
                     out.writeLong(evi[i]);
 
@@ -132,34 +142,11 @@ public class TermCodec extends FSTConfiguration {
             }
         }, true);
 
-        registerSerializer(Atomic.class, new FSTBasicObjectSerializer() {
 
-            @Override
-            public boolean willHandleClass(Class cl) {
-                return Atomic.class.isAssignableFrom(cl);
-            }
+        registerSerializer(Atom.class, AtomicTermSerializer.the, true);
+        registerSerializer(Atomic.class, AtomicTermSerializer.the, true);
+        registerSerializer(AtomConcept.class, AtomicTermSerializer.the, true);
 
-            @Override
-            public void readObject(FSTObjectInput in, Object toRead, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy) throws Exception {
-            }
-
-            @Override
-            public Object instantiate(Class objectClass, FSTObjectInput in, FSTClazzInfo serializationInfo, FSTClazzInfo.FSTFieldInfo referencee, int streamPosition) throws Exception {
-                //return new Atom(in.readStringUTF());
-                String s = in.readStringUTF();
-//                if (s.startsWith("%")) {
-//                    //special case: pattern variables
-//                    System.out.println(s + " " + $.$(s));
-//                }
-                return $.$(s);
-            }
-
-            @Override
-            public void writeObject(FSTObjectOutput out, Object toWrite, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy, int streamPosition) throws IOException {
-                Atomic a = (Atomic) toWrite;
-                out.writeStringUTF(a.toString());
-            }
-        }, true);
 
         registerSerializer(GenericCompound.class, new FSTBasicObjectSerializer() {
 
@@ -174,20 +161,72 @@ public class TermCodec extends FSTConfiguration {
 
             @Override
             public Object instantiate(Class objectClass, FSTObjectInput in, FSTClazzInfo serializationInfo, FSTClazzInfo.FSTFieldInfo referencee, int streamPosition) throws Exception {
-                //GenericCompound c = $.$(in.readUTF());
-                GenericCompound c = (GenericCompound) Narsese.the().term(in.readUTF(), null /* raw, unnormalized */);
-                return c;
+                //GenericCompound c = (GenericCompound) Narsese.the().term(in.readUTF(), null /* raw, unnormalized */);
+
+                Op o = Op.values()[in.readByte()];
+                int subs = in.readByte();
+                Term[] s = new Term[subs];
+                for (int i = 0; i < subs; i++) {
+                    s[i] = (Term) in.readObject();
+                }
+
+                return $.the(o, s);
             }
 
             @Override
             public void writeObject(FSTObjectOutput out, Object toWrite, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy, int streamPosition) throws IOException {
                 GenericCompound a = (GenericCompound) toWrite;
-                out.writeStringUTF(a.toString());
+                //out.writeStringUTF(a.toString());
+
+                out.writeByte(a.op().ordinal());
+                int subs = a.size();
+                out.writeByte(subs); //how many subterms to follow
+
+                //TODO include relation and dt if:
+                //      --image
+                //      --temporal (conj, equiv, impl)
+                //  ...
+                for (int i = 0; i < subs; i++) {
+                    out.writeObject(a.term(i).term());
+                }
             }
         }, true);
 
-        //setForceSerializable(true);
 
+    }
 
+    private static class AtomicTermSerializer extends FSTBasicObjectSerializer {
+        public static final AtomicTermSerializer the = new AtomicTermSerializer();
+
+        private AtomicTermSerializer() {
+
+        }
+
+        @Override
+        public boolean willHandleClass(Class cl) {
+
+            return Atomic.class.isAssignableFrom(cl);
+        }
+
+        @Override
+        public void readObject(FSTObjectInput in, Object toRead, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy) throws Exception {
+        }
+
+        @Override
+        public Object instantiate(Class objectClass, FSTObjectInput in, FSTClazzInfo serializationInfo, FSTClazzInfo.FSTFieldInfo referencee, int streamPosition) throws Exception {
+            //return new Atom(in.readStringUTF());
+            String s = in.readStringUTF();
+//                if (s.startsWith("%")) {
+//                    //special case: pattern variables
+//                    System.out.println(s + " " + $.$(s));
+//                }
+            return $.$(s);
+        }
+
+        @Override
+        public void writeObject(FSTObjectOutput out, Object toWrite, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy, int streamPosition) throws IOException {
+            Atomic a = (Atomic) toWrite;
+            out.writeStringUTF(a.toString());
+        }
     }
 }

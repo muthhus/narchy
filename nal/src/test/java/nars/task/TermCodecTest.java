@@ -1,21 +1,17 @@
 package nars.task;
 
-import nars.$;
 import nars.NAR;
-import nars.Symbols;
 import nars.nar.Default;
-import nars.term.Term;
-import nars.term.atom.Atomic;
-import nars.truth.DefaultTruth;
-import nars.truth.Truth;
 import nars.util.TermCodec;
 import org.junit.Test;
 import org.nustaq.serialization.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.util.Set;
+import java.util.TreeSet;
 
+import static java.lang.System.out;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -32,14 +28,21 @@ public class TermCodecTest {
 
     void assertEqualSerialize(Object orig) {
         byte barray[] = conf.asByteArray(orig);
-        System.out.println(orig + "\n\tserialized: " + barray.length + " bytes");
+        out.println(orig + "\n\tserialized: " + barray.length + " bytes");
 
         Object copy = conf.asObject(barray);
+        //if (copy instanceof Task) {
+            //((MutableTask)copy).invalidate();
+            //((Task)copy).normalize(nar);
+            //out.println("\t\t" +((Task)orig).explanation());
+            //out.println("\t\t" +((Task)copy).explanation());
+        //}
         //System.out.println("\tbytes: " + Arrays.toString(barray));
-        System.out.println("\tcopy: " + copy);
+        out.println("\tcopy: " + copy);
 
         assertTrue(copy != orig);
         assertEquals(copy, orig);
+        assertEquals(copy.hashCode(), orig.hashCode());
         assertEquals(copy.getClass(), orig.getClass());
     }
 
@@ -48,6 +51,8 @@ public class TermCodecTest {
     public void testTermSerialization() {
         final NAR nar = new Default();
         assertEqualSerialize(nar.term("<a-->b>").term() /* term, not the concept */);
+        assertEqualSerialize(nar.term("<aa-->b>").term() /* term, not the concept */);
+        assertEqualSerialize(nar.term("<aa--><b<->c>>").term() /* term, not the concept */);
     }
 
     @Test
@@ -67,15 +72,21 @@ public class TermCodecTest {
                         .output(baos);
 
         byte[] x = baos.toByteArray();
-        System.out.println("NAR tasks serialized: " + x.length + " bytes");
+        out.println("NAR tasks serialized: " + x.length + " bytes");
 
         NAR b = new Default()
                         .input(new ByteArrayInputStream(x))
                         .step()
-                        .forEachConceptTask(true,true,true,true,System.out::println)
+                        //.forEachConceptTask(true,true,true,true, out::println)
                         //.forEachConcept(System.out::println)
                         ;
 
+        //dump all tasks to a set of sorted strings and compare their equality:
+        Set<String> ab = new TreeSet();
+        Set<String> bb = new TreeSet();
+        a.forEachConceptTask(true,true,true,true, t->ab.add(t.toString()));
+        b.forEachConceptTask(true,true,true,true, t->bb.add(t.toString()));
+        assertEquals(ab, bb);
     }
 
 }

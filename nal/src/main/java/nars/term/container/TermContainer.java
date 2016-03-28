@@ -106,9 +106,9 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
 
     boolean equals(Object o);
 
-    static boolean equals(@NotNull TermContainer a, Object b) {
-        return b instanceof TermContainer && TermContainer.equals(a, (TermContainer)b);
-    }
+//    static boolean equals(@NotNull TermContainer a, Object b) {
+//        return b instanceof TermContainer && TermContainer.equals(a, (TermContainer)b);
+//    }
 
     /** can be called from equals() */
     static boolean equals(@NotNull TermContainer a, @NotNull TermContainer b) {

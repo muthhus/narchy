@@ -114,7 +114,7 @@ public final class ShuffledSubterms extends ShuffledPermutations implements Term
 
     @Override
     public boolean equals(Object obj) {
-        return TermContainer.equals(this, obj);
+        return TermContainer.equals(this, (TermContainer) obj);
     }
 
     @Override
