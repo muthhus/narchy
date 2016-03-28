@@ -65,7 +65,8 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void temporal_analogy() {
-        test().log()
+        test()
+                //.log()
 
         .believe("( open:($x, door) ==>+5 enter:($x, room) )",  0.95f, 0.9f)
         .believe("( enter:($x, room) <=>+0 leave:($x, corridor_100) )", 1.0f, 0.9f)
@@ -106,7 +107,7 @@ public class NAL7Test extends AbstractNALTest {
     @Test
     public void testSum() {
         test()
-                .log()
+                //.log()
                 .believe("(x ==>+2 y)")
                 .believe("(y ==>+3 z)")
                 .mustBelieve(8, "(x ==>+5 z)", 1.00f, 0.81f);
@@ -217,7 +218,7 @@ public class NAL7Test extends AbstractNALTest {
     public void inference_on_tense() {
         TestNAR tester = test();
 
-        tester.log();
+        //tester.log();
 
         tester.input("((($x, key) --> hold) ==>+7 (($x, room) --> enter)).");
         tester.input("<(John, key) --> hold>. :|:");
@@ -260,7 +261,7 @@ public class NAL7Test extends AbstractNALTest {
     @Test
     public void inference_on_tense_4() {
         TestNAR tester = test();
-        tester.log();
+        //tester.log();
         tester.believe("(((John,key) --> hold) ==>+3 ((John,room) --> enter))");
         tester.input("<(John,room) --> enter>. :|:");
 
@@ -270,7 +271,8 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void induction_on_events_0() {
-        test().log()
+        test()
+                //.log()
             .input("open:(John,door). :|:")
             .inputAt(4, "enter:(John,room). :|:")
             .mustBelieve(cycles, "( enter:(John, room) ==>-4 open:(John, door) )",
@@ -524,13 +526,12 @@ public class NAL7Test extends AbstractNALTest {
                 $.50;.50;.95$ (c-->b). 2+0 %1.0;.90% {2+0: 2} Input
                 $.50;.50;.95$ (d-->c). 5+0 %1.0;.90% {5+0: 3} Input*/
         test()
-                .log()
+                //.log()
                 .inputAt(2, "(c-->b). :|:")
                 .inputAt(5, "(d-->c). :|:")
                 .mustBelieve(cycles, "((d-->c) ==>-3 (c-->b))", 1f, 0.45f, 2)
                 .mustNotOutput(cycles, "<c-->b>", '.', -1)
                 .mustNotOutput(cycles, "<d-->c>", '.', 2)
-                .mustNotOutput(cycles, "<d-->c>", '.', 1f, 1f, 0f, 0.80f, 5)
         ;
     }
 

@@ -55,7 +55,7 @@ public enum BeliefFunction implements TruthOperator {
         }
     },
 
-    @SinglePremise
+    @SinglePremise @AllowOverlap
     StructuralDeduction() {
         @NotNull
         @Override public Truth apply(@Nullable final Truth T, final Truth B, @NotNull Memory m, float minConf) {
@@ -318,7 +318,6 @@ public enum BeliefFunction implements TruthOperator {
             Field enumField = getClass().getField(name());
             this.single = enumField.isAnnotationPresent(SinglePremise.class);
             this.overlap = enumField.isAnnotationPresent(AllowOverlap.class);
-            assert(!(this.single && this.overlap) ); //must not be both
         } catch (NoSuchFieldException e) {
             throw new RuntimeException(e);
         }

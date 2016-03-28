@@ -137,12 +137,16 @@ abstract public class Solve extends AtomicBooleanCondition<PremiseEval> {
 
 
 
-        if (tf.single()) {
-            if (p.cyclic())
-                return false;
-        } else if (!tf.allowOverlap()) {
-            if (p.overlap())
-                return false;
+        if (!tf.allowOverlap()) {
+            if (tf.single()) {
+                //single premise
+                if (p.cyclic())
+                    return false;
+            } else {
+                //double premise
+                if (p.overlap())
+                    return false;
+            }
         }
 
 

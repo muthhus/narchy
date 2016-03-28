@@ -107,7 +107,6 @@ public enum DesireFunction implements TruthOperator {
             Field enumField = getClass().getField(name());
             this.single = enumField.isAnnotationPresent(SinglePremise.class);
             this.overlap = enumField.isAnnotationPresent(AllowOverlap.class);
-            assert(!(this.single && this.overlap) ); //must not be both
         } catch (NoSuchFieldException e) {
             throw new RuntimeException(e);
         }
