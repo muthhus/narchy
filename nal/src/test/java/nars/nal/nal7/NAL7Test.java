@@ -223,7 +223,7 @@ public class NAL7Test extends AbstractNALTest {
         tester.input("((($x, key) --> hold) ==>+7 (($x, room) --> enter)).");
         tester.input("<(John, key) --> hold>. :|:");
 
-        tester.mustBelieve(8, "<(John,room) --> enter>", 1.00f, 0.81f, 7);
+        tester.mustBelieve(16, "<(John,room) --> enter>", 1.00f, 0.81f, 7);
     }
 
     @Test

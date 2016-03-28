@@ -422,7 +422,7 @@ public class NAL6Test extends AbstractNALTest {
         float minConf = 0.66f;
         test()
         .believe("num:0", 1.0f, 0.9f)
-        .believe("( num:?1 ==> num:(?1) )", 1.0f, 0.9f)
+        .believe("( num:$1 ==> num:($1) )", 1.0f, 0.9f)
         .ask("num:(((0)))")
         //.mustBelieve(time, "num:(0)", 1.0f, 1.0f, 0.81f * easy, 1.0f)
         //.mustBelieve(time, "num:((0))", 1.0f, 1.0f, 0.73f * easy, 1.0f)

@@ -1,45 +1,40 @@
 package nars.rover.run;
 
 import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import nars.$;
 import nars.Global;
 import nars.NAR;
-import nars.Symbols;
-import nars.guifx.NARMenu;
 import nars.guifx.NARfx;
 import nars.guifx.NARtop;
 import nars.guifx.chart.MatrixImage;
-import nars.guifx.chart.Plot2D;
-import nars.guifx.nars.NARPlot;
 import nars.guifx.util.ColorArray;
+import nars.nal.Tense;
 import nars.nar.AbstractNAR;
 import nars.nar.Default;
-import nars.rover.RoverWorld;
 import nars.rover.Sim;
-import nars.rover.robot.Arm;
 import nars.rover.robot.NARover;
+import nars.rover.run.SomeRovers.ManualControl.ManualOverride;
 import nars.rover.world.FoodSpawnWorld1;
 import nars.term.TermIndex;
-import nars.op.NarQ;
-import nars.op.NarQ.BeliefReward;
-import nars.op.NarQ.InputTask;
-import nars.op.NarQ.NotBeliefReward;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.signal.SensorConcept;
-import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.World;
 
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
+import static javafx.application.Platform.runLater;
 import static nars.guifx.NARfx.newWindow;
 import static nars.guifx.NARfx.scrolled;
-import static nars.guifx.chart.Plot2D.Line;
-import static nars.rover.robot.NARover.*;
 
 /**
  * Created by me on 6/20/15.
@@ -48,12 +43,94 @@ public class SomeRovers {
 
     public static final String motorLeft = "motor(left)";
     public static final String motorRight = "motor(right)";
-    public static final String motorForward = "motor(fore)";
-    public static final String motorBackward = "motor(back)";
+    public static final String motorFore = "motor(fore)";
+    public static final String motorBack = "motor(back)";
     public static final String motorStop = "motor(stop)";
     public static final String turretFire = "turret(fire)";
 
 
+    public static class ManualControl<R> extends HBox {
+        private final R r;
+        private final ToggleButton manualToggle;
+        private final Button freezeButton;
+        private final ToggleButton trainToggle;
+        private final ManualOverride<R>[] actions;
+
+        public static class ManualOverride<R> {
+
+            private final KeyCode key;
+            private final Consumer<R> onPress, onRelease;
+            private final Function<R, Node> guiBuilder;
+
+            public ManualOverride(KeyCode key, Consumer<R> onPress, Consumer<R> onRelease, Function<R, Node> guiMaker) {
+                this.key = key;
+                this.onPress = onPress;
+                this.onRelease = onRelease;
+                this.guiBuilder = guiMaker;
+            }
+
+            public void freeze() {
+
+            }
+        }
+
+        final EnumMap<KeyCode, ManualOverride> keyActions = new EnumMap(KeyCode.class);
+
+        public ManualControl(R r, ManualOverride<R>... mm) {
+            super();
+
+            this.r = r;
+            this.actions = mm;
+
+            getChildren().add(new VBox(
+                    manualToggle = new ToggleButton("MANUAL"),
+                    freezeButton = new Button("FREEZE"),
+                    trainToggle = new ToggleButton("TRAIN..")
+            ));
+
+            //manualToggle.selectedProperty().bind()
+
+            freezeButton.setOnAction(e -> {
+                for (ManualOverride<R> m : actions) {
+                    m.freeze();
+                }
+            });
+
+            for (ManualOverride<R> m : mm) {
+                keyActions.put(m.key, m);
+                Node n = m.guiBuilder.apply(r);
+                getChildren().add(n);
+            }
+
+            runLater(() -> {
+
+//                setOnKeyTyped(e->{
+//                    System.out.println("typed: " + e);
+//                });
+//                setOnKeyPressed(pressed -> {
+//                    //if (!isManualable())
+//                        //return;
+//                    System.out.println("pressed: " + pressed);
+//                    ManualOverride ma = keyActions.get(pressed.getCode());
+//                    if (ma != null)
+//                        ma.onPress.accept(r);
+//                });
+                getScene().setOnKeyPressed(e -> {
+                    System.out.println("pressd: " + e);
+                    //if (!isManualable())
+                    //return;
+                    ManualOverride ma = keyActions.get(e.getCode());
+                    if (ma != null)
+                        ma.onPress.accept(r);
+                });
+            });
+
+        }
+
+        public boolean isManualable() {
+            return manualToggle.isPressed();
+        }
+    }
 
     //public static final SimulatedClock clock = new SimulatedClock();
 
@@ -89,39 +166,90 @@ public class SomeRovers {
                     if (gui) {
                         NARfx.run(() -> {
 
-                            newWindow("NAR",
-                                new VBox(
-                                    new NARMenu(n),
-                                    new NARPlot(n,
-                                        new Plot2D(Line, 64, 256, 256)
-                                            .add("busy", ()->n.emotion.busy.getSum())
-                                            .add("stress", ()->n.emotion.stress.getSum())
-                                            .add("frustration", ()->n.emotion.frustration.getSum())
-                                    )
-                                    //new LoopPane(n)
-                                ),
-                            400,200);
+//                            newWindow("NAR",
+//                                new VBox(
+//                                    new NARMenu(n),
+//                                    new NARPlot(n,
+//                                        new Plot2D(Line, 64, 256, 256)
+//                                            .add("busy", ()->n.emotion.busy.getSum())
+//                                            .add("stress", ()->n.emotion.stress.getSum())
+//                                            .add("frustration", ()->n.emotion.frustration.getSum())
+//                                    )
+//                                    //new LoopPane(n)
+//                                ),
+//                            400,200);
 
                             newWindow("Motors",
-                                new VBox(
-                                    updateMatrices(sensors, n),
+                                    new VBox(
+                                            new ManualControl<NARover>(this,
+                                                    new ManualOverride<NARover>(KeyCode.NUMPAD8,
+                                                            (r) -> {
+                                                                System.out.println("forward");
+                                                                nar.goal($.$(motorFore), Tense.Present, 0.9f, 0.65f);
+                                                                nar.goal($.$(motorBack), Tense.Present, 0f, 0.65f);
+                                                            },
+                                                            (r) -> {
+                                                                //System.out.println("up -");
+                                                            },
+                                                            (r) -> {
+                                                                return new Button("FWD");
+                                                            }
+                                                    ),
+                                                    new ManualOverride<NARover>(KeyCode.NUMPAD2,
+                                                            (r) -> {
+                                                                System.out.println("back");
+                                                                nar.goal($.$(motorFore), Tense.Present, 0f, 0.65f);
+                                                                nar.goal($.$(motorBack), Tense.Present, 0.9f, 0.65f);
+                                                            },
+                                                            (r) -> {
+                                                            },
+                                                            (r) -> {
+                                                                return new Button("BACK");
+                                                            }
+                                                    ),
+                            new ManualOverride<NARover>(KeyCode.NUMPAD4,
+                                    (r) -> {
+                                        System.out.println("left");
+                                        nar.goal($.$(motorLeft), Tense.Present, 0.9f, 0.65f);
+                                        nar.goal($.$(motorRight), Tense.Present, 0f, 0.65f);
+                                    },
+                                    (r) -> {
+                                        //System.out.println("up -");
+                                    },
+                                    (r) -> {
+                                        return new Button("LEFT");
+                                    }
+                            ),
+                                    new ManualOverride<NARover>(KeyCode.NUMPAD6,
+                                            (r) -> {
+                                                System.out.println("right");
+                                                nar.goal($.$(motorLeft), Tense.Present, 0f, 0.65f);
+                                                nar.goal($.$(motorRight), Tense.Present, 0.9f, 0.65f);
+                                            },
+                                            (r) -> {
+                                            },
+                                            (r) -> {
+                                                return new Button("RIGHT");
+                                            }
+                                    )
+                            ),
+                            updateMatrices(sensors, n),
                                     new HBox(
                                             scrolled(new NARtop(n).addAll(
-                                                        "MotorControls(#x,motor,(),#z)",
-                                                        motorLeft, motorRight,
-                                                        motorForward, motorBackward,
-                                                        motorStop, turretFire)),
+                                                    "MotorControls(#x,motor,(),#z)",
+                                                    motorLeft, motorRight,
+                                                    motorFore, motorBack,
+                                                    motorStop, turretFire)),
                                             scrolled(new NARtop(n).addAll(
-                                                        EAT_FOOD.toString(),
-                                                        EAT_POISON.toString(),
-                                                        SPEED_LEFT.toString(),
-                                                        SPEED_RIGHT.toString(),
-                                                        SPEED_FORE.toString(),
-                                                        SPEED_BACK.toString()
-
+                                                    EAT_FOOD.toString(),
+                                                    EAT_POISON.toString(),
+                                                    SPEED_LEFT.toString(),
+                                                    SPEED_RIGHT.toString(),
+                                                    SPEED_FORE.toString(),
+                                                    SPEED_BACK.toString()
                                             ))
                                     )
-                                )
+                            )
                             );
                         });
                     }
@@ -160,28 +288,28 @@ public class SomeRovers {
 
         long now = n.time();
         int dur = n.duration();
-        n.onFrame(nn->{
+        n.onFrame(nn -> {
             mp.set(sensor.size(), 2,
-                (x,y) -> {
-                    SensorConcept s = sensor.get(x);
-                    //float exp = s.beliefs().truth(now,dur).expectation();
-                    //float value = s.get();
+                    (x, y) -> {
+                        SensorConcept s = sensor.get(x);
+                        //float exp = s.beliefs().truth(now,dur).expectation();
+                        //float value = s.get();
 
-                    switch (y) {
-                        case 0:
-                            float b = s.beliefs().truth(now, dur).expectation();
-                            return ColorArray.rgba(b, 1-b, 0, 1f);
-                        case 1:
-                            float g = s.goals().truth(now, dur).expectation();
-                            return ColorArray.rgba(0, g, 1-g, 1f);
+                        switch (y) {
+                            case 0:
+                                float b = s.beliefs().truth(now, dur).expectation();
+                                return ColorArray.rgba(b, 1 - b, 0, 1f);
+                            case 1:
+                                float g = s.goals().truth(now, dur).expectation();
+                                return ColorArray.rgba(0, g, 1 - g, 1f);
+                        }
+
+                        return 0;
                     }
-
-                    return 0;
-                }
             );
         });
         mp.setFitHeight(60);
-        mp.setFitWidth(sensor.size()*20);
+        mp.setFitWidth(sensor.size() * 20);
 
         return mp;
     }
@@ -295,22 +423,22 @@ public class SomeRovers {
         Vec2 front = new Vec2(2.7f, 0);
 
         //feeler
-        List<SensorConcept> whisker = r.addEyeWithMouth(r, "t",  r.torso, 3, 4, front,
+        List<SensorConcept> whisker = r.addEyeWithMouth(r, "t", r.torso, 3, 4, front,
                 0.5f, 0, dist / 6f, 0.2f);
 
 
         //nearsight & mouth
-        List<SensorConcept> nearSight = r.addEyeWithMouth(r, "n",  r.torso, 7, 2, front,
+        List<SensorConcept> nearSight = r.addEyeWithMouth(r, "n", r.torso, 7, 2, front,
                 0.5f, 0, dist / 2f, 0.2f);
 
 
         //farsight
-        List<SensorConcept> farSight = r.addEye(r, "f",  r.torso, 5, 5, front,
+        List<SensorConcept> farSight = r.addEye(r, "f", r.torso, 5, 5, front,
                 1.25f, 0, dist, (e) -> {
                 });
 
         //reverse
-        List<SensorConcept> backSight = r.addEye(r, "b",  r.torso, 3, 9, new Vec2(-0.5f, 0),
+        List<SensorConcept> backSight = r.addEye(r, "b", r.torso, 3, 9, new Vec2(-0.5f, 0),
                 1.25f, pi / 2f, dist / 2f, (e) -> {
                 });
 
@@ -329,7 +457,7 @@ public class SomeRovers {
         //nqSpine.output.addAll(ad.controls);
 
 
-        return new List[] {
+        return new List[]{
                 farSight, nearSight, whisker, backSight
         };
 

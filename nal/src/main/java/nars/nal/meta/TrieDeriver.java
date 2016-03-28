@@ -161,10 +161,6 @@ public class TrieDeriver extends Deriver {
         if (t.isEmpty())
             return null;
 
-        System.out.println(t);
-        for (ProcTerm x : t)
-            System.out.println(x);
-        System.out.println();
         
         //optimization: find expression prefix types common to all, and see if a switch can be formed
 
