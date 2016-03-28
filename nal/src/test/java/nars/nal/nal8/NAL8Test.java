@@ -72,7 +72,7 @@ public class NAL8Test extends AbstractNALTest {
         .inputAt(10, "(hold:t2 &&+5 (at:t1 &&+5 (open(t1) &&+5 [opened]:t1))).")
         //.inputAt(15, "[opened]:t1. :|:")
 
-        .mustBelieve(cycles*6, "open(t1)",
+        .mustBelieve(cycles, "open(t1)",
                 //1.0f, 0.81f,
                 //-5);
                 1.0f, 0.34f,
@@ -82,12 +82,13 @@ public class NAL8Test extends AbstractNALTest {
 
     @Test public void subsent_1_even_simpler()  {
         test()
-                .log()
+                //.log()
                 .input("at:t1. :|:") //@ 0
                 .inputAt(10, "(at:t1 &&+5 (open(t1) &&+5 [opened]:t1)).")
-                .mustBelieve(cycles, "open(t1)",
-                        1.0f, 0.39f,
-                        5);
+                .mustBelieve(cycles, "open(t1)", 1.0f, 0.73f, 5)
+                .mustNotOutput(cycles, "open(t1)", '.', 1f, 1f, 0.59f, 0.59f, 5) //detect cyclic decomposition
+                .mustNotOutput(cycles, "open(t1)", '.', 1f, 1f, 0.32f, 0.32f, 5) //detect cyclic decomposition
+        ;
     }
 
     @Test

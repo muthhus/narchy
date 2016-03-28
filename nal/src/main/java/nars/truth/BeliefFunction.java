@@ -54,7 +54,6 @@ public enum BeliefFunction implements TruthOperator {
             return (T == null || B == null) ? null : TruthFunctions.deduction(T, B, minConf);
         }
     },
-    @SinglePremise @AllowOverlap
     StructuralDeduction() {
         @NotNull
         @Override public Truth apply(@Nullable final Truth T, final Truth B, @NotNull Memory m, float minConf) {

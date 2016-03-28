@@ -100,9 +100,7 @@ public class TestNAR  {
             answerReceiver.emit(t);
         });
 
-        if (exitOnAllSuccess) {
-            new EarlyExit(3);
-        }
+
 
         eventMeters = new EventCount(nar).eventMeters;
 
@@ -533,6 +531,10 @@ public class TestNAR  {
             nar.trace(trace = new StringWriter());
         else
             trace = null;
+
+        if (exitOnAllSuccess) {
+            new EarlyExit(3);
+        }
 
         runUntil(finalCycle);
 
