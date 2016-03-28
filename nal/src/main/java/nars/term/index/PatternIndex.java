@@ -1,13 +1,18 @@
 package nars.term.index;
 
+import com.gs.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
+import nars.concept.ConceptBuilder;
 import nars.nal.meta.PatternCompound;
 import nars.nal.meta.PremiseRule;
 import nars.term.Compound;
 import nars.term.Termed;
+import nars.term.Terms;
 import nars.term.atom.Atomic;
 import nars.util.data.map.UnifriedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 import static nars.$.$;
 
@@ -17,7 +22,9 @@ import static nars.$.$;
 public class PatternIndex extends MapIndex2 {
 
     public PatternIndex() {
-        super(new UnifriedMap(512), null);
+        super(new HashSymbolMap(
+              new ConcurrentHashMapUnsafe(512)),
+              new ConcurrentHashMapUnsafe(2048), Terms.terms, null);
     }
 
     @Override Termed theAtom(@NotNull Atomic t, boolean createIfMissing) {

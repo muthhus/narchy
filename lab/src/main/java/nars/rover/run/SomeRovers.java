@@ -15,6 +15,7 @@ import nars.guifx.nars.NARPlot;
 import nars.guifx.util.ColorArray;
 import nars.nar.AbstractNAR;
 import nars.nar.Default;
+import nars.rover.RoverWorld;
 import nars.rover.Sim;
 import nars.rover.robot.Arm;
 import nars.rover.robot.NARover;

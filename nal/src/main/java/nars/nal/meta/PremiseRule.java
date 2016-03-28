@@ -43,6 +43,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.function.IntFunction;
+import java.util.function.ToIntFunction;
 
 import static java.util.Collections.addAll;
 import static nars.$.*;
@@ -113,7 +116,9 @@ public class PremiseRule extends GenericCompound {
 
     protected String source;
 
-    public @Nullable MatchTaskBelief match;
+    public
+    @Nullable
+    MatchTaskBelief match;
 
     @Nullable
     private Temporalize temporalize = Temporalize.Auto;
@@ -190,6 +195,10 @@ public class PremiseRule extends GenericCompound {
         );
         l.add(truth);
 
+        sortPreconditions(l);
+
+        //---
+
         addAll(l, match.code);
 
         l.add(truth.getDerive()); //will be linked to and invoked by match callbacks
@@ -198,6 +207,53 @@ public class PremiseRule extends GenericCompound {
 
         return l;
     }
+
+    static final HashMap<Object, Integer> preconditionScore = new HashMap() {{
+        put(TaskPunctuation.class, 10);
+        put(TaskNegative.class, 9);
+
+        put(SubTermOp.class, 7);
+        put(SubTermStructure.class, 3);
+        put(Solve.class, 1);
+
+//        put(SubTermOp.class, 10);
+//        put(TaskPunctuation.class, 9);
+//        put(TaskNegative.class, 8);
+//        put(SubTermStructure.class, 7);
+//        put(Solve.class, 1);
+    }};
+
+    private Class<? extends Term> preconditionClass(Term b) {
+        if (b == TaskPunctuation.TaskGoal) return TaskPunctuation.class;
+        if (b == TaskPunctuation.TaskJudgment) return TaskPunctuation.class;
+        if (b == TaskPunctuation.TaskQuestion) return TaskPunctuation.class;
+
+        if (b instanceof Solve)  return Solve.class;
+
+        return b.getClass();
+    }
+    /**
+     * apply deterministic and uniform sort to the current preconditions.
+     * the goal of this is to maximally fold subexpressions while also
+     * pulling the cheapest and most discriminating tests to the beginning.
+     */
+    private void sortPreconditions(List<Term> l) {
+        Collections.sort(l, (a, b) -> {
+            //higher is earlier
+            Object bc = preconditionClass(b);
+            Object ac = preconditionClass(a);
+
+            int i = Integer.compare(
+                        preconditionScore.getOrDefault(bc,0),
+                        preconditionScore.getOrDefault(ac, 0));
+            if (i!=0) return i;
+            return b.compareTo(a);
+        });
+
+
+    }
+
+
 
     @NotNull
     public static Solve solver(@NotNull PostCondition p, @NotNull PremiseRule rule, boolean anticipate, boolean eternalize,
@@ -231,7 +287,6 @@ public class PremiseRule extends GenericCompound {
 
 
     }
-
 
 
     public void setSource(String source) {
@@ -322,13 +377,13 @@ public class PremiseRule extends GenericCompound {
 
             //HACK
             Term tt = terms.transform(
-                            (Compound)terms.transform(this, UppercaseAtomsToPatternVariables),
-                            new PremiseRuleVariableNormalization());
+                    (Compound) terms.transform(this, UppercaseAtomsToPatternVariables),
+                    new PremiseRuleVariableNormalization());
 
             Compound premiseComponents = (Compound) index.the(tt);
 
 
-            return new PremiseRule( premiseComponents );
+            return new PremiseRule(premiseComponents);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -669,15 +724,14 @@ public class PremiseRule extends GenericCompound {
     /**
      * for each calculable "question reverse" rule,
      * supply to the consumer
-     *
+     * <p>
      * ex:
      * (A --> B), (B --> C), not_equal(A,C) |- (A --> C), (Truth:Deduction, Desire:Strong, Derive:AllowBackward)
      * 1. Deriving of backward inference rules, since Derive:AllowBackward it allows deriving:
-     (A --> B), (A --> C), not_equal(A,C), task("?") |- (B --> C), (Truth:Deduction, Desire:Strong, Derive:AllowBackward)
-     (A --> C), (B --> C), not_equal(A,C), task("?") |- (A --> B), (Truth:Deduction, Desire:Strong, Derive:AllowBackward)
-     so each premise gets exchanged with the conclusion in order to form a own rule,
-     additionally task("?") is added to ensure that the derived rule is only used in backward inference.
-
+     * (A --> B), (A --> C), not_equal(A,C), task("?") |- (B --> C), (Truth:Deduction, Desire:Strong, Derive:AllowBackward)
+     * (A --> C), (B --> C), not_equal(A,C), task("?") |- (A --> B), (Truth:Deduction, Desire:Strong, Derive:AllowBackward)
+     * so each premise gets exchanged with the conclusion in order to form a own rule,
+     * additionally task("?") is added to ensure that the derived rule is only used in backward inference.
      */
     public final void backwardPermutation(@NotNull BiConsumer<PremiseRule, String> w) {
 
@@ -710,10 +764,10 @@ public class PremiseRule extends GenericCompound {
     /**
      * for each calculable "question reverse" rule,
      * supply to the consumer
-     *
-     2. Deriving of forward inference rule by swapping the premises since !s.contains("task(") && !s.contains("after(") && !s.contains("measure_time(") && !s.contains("Structural") && !s.contains("Identity") && !s.contains("Negation"):
-     (B --> C), (A --> B), not_equal(A,C) |- (A --> C), (Truth:Deduction, Desire:Strong, Derive:AllowBackward)
-     *
+     * <p>
+     * 2. Deriving of forward inference rule by swapping the premises since !s.contains("task(") && !s.contains("after(") && !s.contains("measure_time(") && !s.contains("Structural") && !s.contains("Identity") && !s.contains("Negation"):
+     * (B --> C), (A --> B), not_equal(A,C) |- (A --> C), (Truth:Deduction, Desire:Strong, Derive:AllowBackward)
+     * <p>
      * after generating, these are then backward permuted
      */
     @NotNull

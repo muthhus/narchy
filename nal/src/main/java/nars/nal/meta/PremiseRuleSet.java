@@ -29,10 +29,15 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
+import static java.util.stream.Collectors.toList;
 
 
 /**
- * Holds an array of derivation rules
+ * Holds an set of derivation rules and a pattern index of their components
  */
 public class PremiseRuleSet  {
 
@@ -71,7 +76,7 @@ public class PremiseRuleSet  {
     private static final Pattern equivOperatorPattern = Pattern.compile("<=>", Pattern.LITERAL);
     private static final Pattern implOperatorPattern = Pattern.compile("==>", Pattern.LITERAL);
     private static final Pattern conjOperatorPattern = Pattern.compile("&&", Pattern.LITERAL);
-    public final List<PremiseRule> rules = new FasterList<>();
+    public final List<PremiseRule> rules;
 
 
     public PremiseRuleSet() throws IOException, URISyntaxException {
@@ -93,6 +98,7 @@ public class PremiseRuleSet  {
 
 
     public PremiseRuleSet(boolean normalize, @NotNull PremiseRule... rules) {
+        this.rules = Global.newArrayList();
         for (PremiseRule p : rules) {
             if (normalize)
                 p = p.normalizeRule(patterns);
@@ -100,10 +106,10 @@ public class PremiseRuleSet  {
         }
     }
 
-    public PremiseRuleSet(@NotNull Collection<String> ruleStrings) {
+    public PremiseRuleSet(@NotNull List<String> ruleStrings) {
         int[] errors = {0};
 
-        parse(load(ruleStrings), patterns).forEach(rules::add);
+        this.rules = parse(load(ruleStrings), patterns).distinct().collect(toList());
 
 
         logger.info("indexed " + rules.size() + " total rules, consisting of " + patterns.size() + " unique pattern components terms");
@@ -114,9 +120,9 @@ public class PremiseRuleSet  {
 
 
     @NotNull
-    static List<String> load(@NotNull Iterable<String> lines) {
+    static Stream<CharSequence> load(@NotNull List<String> lines) {
 
-        List<String> unparsed_rules = Global.newArrayList(1024);
+        List<CharSequence> unparsed_rules = Global.newArrayList(1024);
 
         StringBuilder current_rule = new StringBuilder();
         boolean single_rule_test = false;
@@ -165,17 +171,16 @@ public class PremiseRuleSet  {
             }
         }
 
-        return unparsed_rules;
+        return unparsed_rules.parallelStream();
     }
 
-    @Deprecated /* soon */ static String preprocess(String rule) //minor things like Truth.Comparison -> Truth_Comparison
+    @Deprecated /* soon */ static String preprocess(CharSequence rule) //minor things like Truth.Comparison -> Truth_Comparison
     {
+        String ret = '<' + rule.toString() + '>';
 
-        String ret = '<' + rule + '>';
-
-        while (ret.contains("  ")) {
+        //while (ret.contains("  ")) {
             ret = twoSpacePattern.matcher(ret).replaceAll(Matcher.quoteReplacement(" "));
-        }
+        //}
 
         ret = ret.replace("A..", "%A.."); //add var pattern manually to ellipsis
         ret = ret.replace("%A..B=_", "%A..%B=_"); //add var pattern manually to ellipsis
@@ -251,35 +256,13 @@ public class PremiseRuleSet  {
 
 
     @NotNull
-    static Set<PremiseRule> parse(@NotNull Collection<String> rawRules, @NotNull PatternIndex index) {
+    static Stream<PremiseRule> parse(@NotNull Stream<CharSequence> rawRules, @NotNull PatternIndex index) {
+        return rawRules/*.parallelStream()*/
+                .distinct()
+                .map(PremiseRuleSet::preprocess)
+                .map(src-> {
 
-
-        Set<String> expanded = new HashSet(rawRules.size() * 4); //Global.newHashSet(1); //new ConcurrentSkipListSet<>();
-
-
-        rawRules/*.parallelStream()*/.forEach(rule -> {
-
-            String p = preprocess(rule);
-            expanded.add(p);
-
-
-            //there might be now be A_1..maxVarArgsToMatch in it, if this is the case we have to add up to maxVarArgsToMatch ur
-            /*if (p.contains("A_1..n") || p.contains("A_1..A_i.substitute(_)..A_n")) {
-                addUnrolledVarArgs(expanded, p, maxVarArgsToMatch);
-            } else {*/
-            //permuteTenses(expanded, p);
-
-
-
-        });//.forEachOrdered(s -> expanded.addAll(s));
-
-
-        Set<PremiseRule> ur = Global.newHashSet(rawRules.size()*4);
-        //ListMultimap<TaskRule, TaskRule> ur = MultimapBuilder.linkedHashKeys().arrayListValues().build();
-
-
-        //accumulate these in a set to eliminate duplicates
-        expanded.forEach(src -> {
+            List<PremiseRule> ur = Global.newArrayList(4);
             try {
 
 
@@ -291,22 +274,23 @@ public class PremiseRuleSet  {
 
                 permute(index, ur, src, preNorm);
 
-
             } catch (Exception ex) {
                 logger.error("Invalid TaskRule: {}", ex);
             }
-        });
 
-        return ur;
+            return ur;
+        }).flatMap( u -> u.stream() );
     }
 
     @NotNull
     public static Set<PremiseRule> permute(PremiseRule preNorm) {
-        return permute(new PatternIndex(), Global.newHashSet(1), "", preNorm);
+        Set<PremiseRule> ur;
+        permute(new PatternIndex(), ur = Global.newHashSet(1), "", preNorm);
+        return ur;
     }
 
     @NotNull
-    public static Set<PremiseRule> permute(@NotNull PatternIndex index, @NotNull Set<PremiseRule> ur, String src, PremiseRule preNorm) {
+    public static void permute(@NotNull PatternIndex index, @NotNull Collection<PremiseRule> ur, String src, PremiseRule preNorm) {
         PremiseRule r = add(ur, preNorm, src, index);
 
 
@@ -328,10 +312,9 @@ public class PremiseRuleSet  {
                 }
             });
         }
-        return ur;
     }
 
-    public static void permuteForward(@NotNull PatternIndex index, @NotNull Set<PremiseRule> ur, String src, @NotNull PremiseRule b, boolean thenBackward) {
+    public static void permuteForward(@NotNull PatternIndex index, @NotNull Collection<PremiseRule> ur, String src, @NotNull PremiseRule b, boolean thenBackward) {
         PremiseRule f = add(ur, b.forwardPermutation(), src + ":forward", index);
         if (thenBackward) {
             f.backwardPermutation((s, reasonBF) -> {

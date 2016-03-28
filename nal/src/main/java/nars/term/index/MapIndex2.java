@@ -83,9 +83,13 @@ public class MapIndex2 extends AbstractMapIndex {
         this(data, Terms.terms, conceptBuilder);
     }
 
-    public MapIndex2(Map<TermContainer, SubtermNode> data, TermBuilder termBuilder, ConceptBuilder conceptBuilder) {
-        super(termBuilder, conceptBuilder);
+    public MapIndex2(SymbolMap symbolMap, Map<TermContainer, SubtermNode> data, TermBuilder termBuilder, ConceptBuilder conceptBuilder) {
+        super(symbolMap, termBuilder, conceptBuilder);
         this.data = data;
+    }
+
+    public MapIndex2(Map<TermContainer, SubtermNode> data, TermBuilder termBuilder, ConceptBuilder conceptBuilder) {
+        this(new HashSymbolMap(), data, termBuilder, conceptBuilder);
     }
 
 
@@ -132,9 +136,7 @@ public class MapIndex2 extends AbstractMapIndex {
             interned = internCompound(interned);
 
             //insert into node
-            Termed preExisting = node.put(t.opRel(), interned);
-            assert(preExisting == null);
-            return interned;
+            return node.getIfAbsentPut(t.opRel(), interned);
 
         } else {
             return null;

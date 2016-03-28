@@ -6,6 +6,7 @@ import nars.term.container.TermVector;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
 
@@ -14,26 +15,45 @@ import java.util.Collection;
  */
 public final class PremiseBranch extends GenericCompound implements ProcTerm {
 
+//    public static class PremiseIf extends GenericCompound implements ProcTerm {
+//        public PremiseIf(@NotNull BooleanCondition<PremiseEval> cond, ProcTerm conseq) {
+//            super(Op.IMPLICATION,
+//                    TermVector.the(cond, conseq));
+//        }
+//        @Override public void accept(@NotNull PremiseEval m) {
+//            int r = m.now();
+//            if (cond.booleanValueOf(m)) {
+//                conseq.accept(m);
+//            }
+//            m.revert(r);
+//        }
+//    }
+
     @NotNull
-    public final transient AndCondition<PremiseEval> cond;
+    public final transient BooleanCondition<PremiseEval> cond;
     @NotNull
     public final transient ProcTerm conseq;
 
 
-    @Override
-    public void appendJavaProcedure(@NotNull StringBuilder s) {
-        s.append("if (");
-        cond.appendJavaCondition(s);
-        s.append(") {\n");
-        s.append("\t ");
-        conseq.appendJavaProcedure(s);
-        s.append("\n}");
-    }
+//    @Override
+//    public void appendJavaProcedure(@NotNull StringBuilder s) {
+//        s.append("if (");
+//        cond.appendJavaCondition(s);
+//        s.append(") {\n");
+//        s.append("\t ");
+//        conseq.appendJavaProcedure(s);
+//        s.append("\n}");
+//    }
 
-    public PremiseBranch(@NotNull Collection<BooleanCondition<PremiseEval>> cond, ProcTerm conseq) {
+
+    public PremiseBranch(@NotNull List<BooleanCondition<PremiseEval>> cond, ProcTerm conseq) {
         super(Op.IMPLICATION,
-                TermVector.the(new AndCondition(cond), conseq));
-        this.cond = (AndCondition<PremiseEval>) term(0);
+            TermVector.the(
+                        cond.size() == 1 ? cond.get(0) : new AndCondition(cond),
+                        conseq)
+        );
+
+        this.cond = (BooleanCondition<PremiseEval>) term(0);
         this.conseq = (ProcTerm) term(1);
     }
 

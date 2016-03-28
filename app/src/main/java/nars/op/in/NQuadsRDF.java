@@ -18,6 +18,8 @@ import org.slf4j.LoggerFactory;
 import javax.xml.namespace.QName;
 import java.io.*;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -269,7 +271,7 @@ public abstract class NQuadsRDF {
     static final Atom sameAs = the("sameAs");
     static final Atom differentFrom = the("differentFrom");
     static final Atom dataTypeProperty = the("DatatypeProperty");
-    static final Atom COMMENT = the("comment");
+
 
     @Nullable
     static Term subjObjInst(Term subject, char subjType, char objType, boolean reverse) {
@@ -281,6 +283,11 @@ public abstract class NQuadsRDF {
     }
 
 
+    public static final Set<Atom> predicatesIgnored = new HashSet() {{
+        add(the("comment"));
+        add(the("isDefinedBy"));
+    }};
+
     public static Task input(@NotNull NAR nar,
                               @Nullable Atom subject,
                               @NotNull Atom predicate, @NotNull Term object) {
@@ -288,7 +295,7 @@ public abstract class NQuadsRDF {
         if ((subject == null) || (predicate == null) || (object == null))
             return null;
 
-        if (predicate == COMMENT)
+        if (predicatesIgnored.contains(predicate))
             return null;
 
         try {

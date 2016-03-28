@@ -7,14 +7,11 @@
 //import nars.rover.PhysicsModel;
 //import nars.rover.RoverWorld;
 //import nars.rover.physics.gl.JoglAbstractDraw;
-//import nars.rover.physics.j2d.SwingDraw;
-//import nars.rover.physics.j2d.SwingDraw.LayerDraw;
-//import nars.testchamber.Cell;
-//import nars.testchamber.Hauto;
+//
+//import nars.rover.physics.j2d.LayerDraw;
 //import nars.testchamber.map.Maze;
 //import nars.util.data.random.XorShift128PlusRandom;
-//import Body;
-//import World;
+//
 //
 //import java.util.Random;
 //

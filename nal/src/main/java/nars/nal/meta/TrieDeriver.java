@@ -1,5 +1,6 @@
 package nars.nal.meta;
 
+import alice.tuprologx.pj.model.Bool;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import javassist.*;
@@ -101,16 +102,27 @@ public class TrieDeriver extends Deriver {
             int to = n.getEnd();
 
 
+            List<BooleanCondition<PremiseEval>> condition = compileConditions(seq.subList(from, to), matchParent);
+//            if (condition.size() == 1) {
+//                System.out.println(condition);
+//                for (BooleanCondition b : condition) {
+//                    System.out.println("\t" + b);
+//                }
+//                System.out.println();
+//            }
+
             bb.add(branch(
-                    compileConditions(seq.subList(from, to), matchParent),
-                    new PremiseFork(compileActions(TrieDeriver.this.getBranches(n)))));
+                    condition,
+                    compileActions(TrieDeriver.this.getBranches(n))));
         });
+
+
 
         return bb;
     }
 
 
-    @NotNull private Collection<BooleanCondition<PremiseEval>> compileConditions(@NotNull Collection<Term> t, @NotNull AtomicReference<MatchTerm> matchParent) {
+    @NotNull private List<BooleanCondition<PremiseEval>> compileConditions(@NotNull Collection<Term> t, @NotNull AtomicReference<MatchTerm> matchParent) {
 
         return t.stream().filter(x -> {
             if (x instanceof BooleanCondition) {
@@ -144,21 +156,39 @@ public class TrieDeriver extends Deriver {
 
 
     @NotNull
-    private static ProcTerm[] compileActions(@NotNull List<ProcTerm> t) {
+    private static PremiseFork compileActions(@NotNull List<ProcTerm> t) {
+
+        if (t.isEmpty())
+            return null;
+
+        System.out.println(t);
+        for (ProcTerm x : t)
+            System.out.println(x);
+        System.out.println();
+        
+        //optimization: find expression prefix types common to all, and see if a switch can be formed
+
+
         //t.forEach(x -> System.out.println(x.getClass() + " " + x));
-        return t.toArray(new ProcTerm[t.size()]);
+        return new PremiseFork(t.toArray(new ProcTerm[t.size()]));
     }
 
 
     @NotNull
     public static ProcTerm branch(
-            @NotNull Collection<BooleanCondition<PremiseEval>> condition,
+            @NotNull List<BooleanCondition<PremiseEval>> condition,
             @Nullable ThenFork conseq) {
 
-        if ((conseq != null) && (conseq.size() > 0)) {
+
+        if (condition.size() == 0) {
+            return conseq;
+        }
+
+        if (conseq != null) {
+            //assert(condition.size()!=0);
             return new PremiseBranch(condition, conseq);
         } else {
-            return new PremiseBranch(condition, Return.the);
+            return new PremiseBranch(condition, Return.the); //END
         }
     }
 
