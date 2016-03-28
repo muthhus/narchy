@@ -1,5 +1,10 @@
 package nars.term.atom;
 
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.Serializable;
+
 /**
  * Created by me on 2/18/16.
  */
@@ -29,4 +34,6 @@ public abstract class AtomicStringConstant extends AtomicString {
     public final int vars() {
         return 0;
     }
+
+
 }

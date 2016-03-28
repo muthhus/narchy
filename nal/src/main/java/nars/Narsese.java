@@ -1173,11 +1173,11 @@ public class Narsese extends BaseParser<Object> {
 
 
     @NotNull public Term term(@NotNull String s, @NotNull TermIndex t) throws NarseseException  {
-        return term(s, t, true);
+        return term(s, t, t!=null);
     }
 
     @NotNull
-    public Term term(@NotNull String s, @NotNull TermIndex index, boolean normalize) throws NarseseException  {
+    public Term term(@NotNull String s, @Nullable TermIndex index, boolean normalize) throws NarseseException  {
         Term y = term(s);
         if (normalize) {
             Termed x = index.normalized(y);

@@ -106,8 +106,10 @@ public class PremiseRuleSet  {
         }
     }
 
+    final int[] errors = {0};
+
+
     public PremiseRuleSet(@NotNull List<String> ruleStrings) {
-        int[] errors = {0};
 
         this.rules = parse(load(ruleStrings), patterns).distinct().collect(toList());
 
@@ -171,7 +173,9 @@ public class PremiseRuleSet  {
             }
         }
 
-        return unparsed_rules.parallelStream();
+        return unparsed_rules
+                //.parallelStream();
+                .stream();
     }
 
     @Deprecated /* soon */ static String preprocess(CharSequence rule) //minor things like Truth.Comparison -> Truth_Comparison

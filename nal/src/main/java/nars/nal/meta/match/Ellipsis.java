@@ -83,7 +83,8 @@ public abstract class Ellipsis extends AbstractVariable {
         }
 
         @Override public @NotNull Variable normalize(int serial) {
-            throw new RuntimeException("n/a");
+            //throw new RuntimeException("n/a");
+            return this; //ignore
         }
 
     }

@@ -33,7 +33,7 @@ import org.jetbrains.annotations.NotNull;
 public abstract class AbstractVariable implements Variable {
 
     public final int id;
-    protected final int hash;
+    protected transient final int hash;
     @NotNull
     private transient final String str;
 

@@ -30,4 +30,6 @@ public interface SymbolMap {
     void print(Appendable out);
 
     void forEach(Consumer<? super Termed> c);
+
+
 }

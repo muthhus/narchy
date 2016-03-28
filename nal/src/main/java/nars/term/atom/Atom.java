@@ -12,7 +12,7 @@ public class Atom extends AtomicStringConstant {
 
     @Nullable
     public final String id;
-    public final int hash;
+    public transient final int hash;
 
     public Atom(@Nullable String id) {
 

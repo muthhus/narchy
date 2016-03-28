@@ -83,8 +83,6 @@ abstract public class PatternCompound extends GenericCompound {
             super(seed, subterms);
         }
 
-
-
         @Override
         public boolean match(@NotNull Compound y, @NotNull FindSubst subst) {
             return canMatch(y) &&

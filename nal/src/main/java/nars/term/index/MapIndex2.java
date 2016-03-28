@@ -96,7 +96,7 @@ public class MapIndex2 extends AbstractMapIndex {
 
 
     @Nullable
-    final Function<TermContainer, SubtermNode> termContainerSubtermNodeFunction =
+    transient final Function<TermContainer, SubtermNode> termContainerSubtermNodeFunction =
             k ->
                 new SubtermNode(normalize(k));
                 //new SubtermNodeWithArray(normalize(k));
@@ -184,7 +184,7 @@ public class MapIndex2 extends AbstractMapIndex {
         Termed existing = node.put(t.opRel(), t);
         if (existing!=null && existing!=t)
             throw new RuntimeException(t + " can not be set because " + existing + " already exists");
-        //assert(existing==null || existing == t);
+        assert(existing==null || existing == t);
         return t;
     }
 

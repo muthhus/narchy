@@ -1,15 +1,23 @@
 package nars.nal.meta;
 
 import com.google.common.collect.Sets;
+import nars.$;
+import nars.Narsese;
 import nars.concept.Concept;
 import nars.nal.Deriver;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.atom.Atom;
+import nars.term.atom.Atomic;
+import nars.term.compound.GenericCompound;
+import nars.term.index.HashSymbolMap;
+import nars.term.index.MapIndex2;
 import nars.term.index.PatternIndex;
 import org.apache.commons.math3.stat.Frequency;
 import org.junit.Test;
-import org.nustaq.serialization.FSTConfiguration;
+import org.nustaq.serialization.*;
 
+import java.io.IOException;
 import java.util.*;
 
 import static java.lang.System.out;
@@ -106,10 +114,11 @@ public class RuleDerivationGraphTest {
     }
 
 
-//    @Test public void testRuleSerialization() {
+
+
 //
 //        FSTConfiguration conf = FSTConfiguration.createDefaultConfiguration();
-//        conf.setForceSerializable(true);
+
 //
 //        List<PremiseRule> R = Deriver.getDefaultDeriver().rules.rules;
 //        for (PremiseRule r : R) {
