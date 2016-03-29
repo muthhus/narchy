@@ -7,14 +7,11 @@ import nars.Symbols;
 import nars.budget.UnitBudget;
 import nars.concept.Concept;
 import nars.nal.Tense;
-import nars.nal.nal8.Execution;
 import nars.term.Compound;
-import nars.term.Operator;
 import nars.term.Termed;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import nars.util.data.Util;
-import nars.util.event.Topic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,7 +22,6 @@ import java.util.Objects;
 
 import static nars.Global.dereference;
 import static nars.Global.reference;
-import static nars.nal.Tense.DTERNAL;
 
 /**
  * Default Task implementation
@@ -107,7 +103,7 @@ public abstract class AbstractTask extends UnitBudget
         if (t == null)
             throw new RuntimeException("null term");
 
-        if (term!=t) {
+        if (!term.equals(t)) {
             term = t;
             invalidate();
         }
@@ -245,7 +241,7 @@ public abstract class AbstractTask extends UnitBudget
     }
 
     /** includes: evidentialset, occurrencetime, truth, term, punctuation */
-    private int rehash() {
+    private final int rehash() {
 
         int h = Util.hashCombine( Util.hashCombine(
                 term().hashCode(),
@@ -291,7 +287,7 @@ public abstract class AbstractTask extends UnitBudget
     }
 
     @Override
-    public Truth truth() {
+    public final Truth truth() {
         return truth;
     }
 
@@ -303,9 +299,34 @@ public abstract class AbstractTask extends UnitBudget
         }
     }
 
+    /**
+     * Recognize a Question
+     * @return Whether the object is a Question
+     */
+    @Override public final boolean isQuestion() {
+        return (punctuation == Symbols.QUESTION);
+    }
+
+    /**
+     * Recognize a Belief (aka Judgment)
+     * @return Whether the object is a Judgment
+     */
+    @Override public final boolean isBelief() {
+        return (punctuation  == Symbols.BELIEF);
+    }
+
+    @Override public final boolean isGoal() {
+        return (punctuation  == Symbols.GOAL);
+    }
+
+    @Override public final boolean isQuest() {
+        return (punctuation  == Symbols.QUEST);
+    }
+
+
     @Override
     public final boolean isAnticipated() {
-        return isJudgment() && !isEternal() &&
+        return isBelief() && !isEternal() &&
                 (/*state() == TaskState.Anticipated ||*/ isInput());
     }
 

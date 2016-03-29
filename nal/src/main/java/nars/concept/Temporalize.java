@@ -6,7 +6,6 @@ import nars.nal.op.Derive;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Termed;
 import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -366,7 +365,7 @@ public interface Temporalize {
 
             Task belief = premise.belief();
 
-            if (belief != null && task.isJudgmentOrGoal() && belief.task().isJudgmentOrGoal()) {
+            if (belief != null && task.isBeliefOrGoal() && belief.task().isBeliefOrGoal()) {
                 //blend task and belief's DT's weighted by their relative confidence
                 float taskConf = task.conf();
                 eventDelta = Math.round(Util.lerp(

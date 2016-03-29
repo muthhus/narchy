@@ -7,6 +7,7 @@ import nars.NAR;
 import nars.Symbols;
 import nars.task.MutableTask;
 import nars.task.Task;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
@@ -155,13 +156,17 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
 //        float c = confFactor;
 
         long now = nar.time();
-        Task t = new MutableTask(term, '.')
+        Task t = new MutableTask(term(), '.')
                 //.truth(v, conf)
                 .truth(f, c)
                 .time(now, now + dt())
                 .budget(pri, dur);
         nar.input(t);
         return t;
+    }
+
+    public Termed<Compound> term() {
+        return term;
     }
 
     /** time shift input tasks, relative to NAR's current time */

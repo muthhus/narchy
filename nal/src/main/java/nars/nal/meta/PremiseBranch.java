@@ -58,11 +58,11 @@ public final class PremiseBranch extends GenericCompound implements ProcTerm {
     }
 
     @Override public void accept(@NotNull PremiseEval m) {
-        int r = m.now();
+        final int stack = m.now();
         if (cond.booleanValueOf(m)) {
             conseq.accept(m);
         }
-        m.revert(r);
+        m.revert(stack);
     }
 
 

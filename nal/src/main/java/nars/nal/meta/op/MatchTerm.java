@@ -24,7 +24,7 @@ import static nars.$.seteMap;
  *
  * < (|, match [, constraints]) ==> (&|, derivation1, ... derivationN)>
  */
-abstract public class MatchTerm extends AtomicBooleanCondition<PremiseEval> implements ProcTerm {
+abstract public class MatchTerm extends AtomicBooleanCondition<PremiseEval>  {
 
     @Nullable
     public final ImmutableMap<Term, MatchConstraint> constraints;
@@ -36,7 +36,7 @@ abstract public class MatchTerm extends AtomicBooleanCondition<PremiseEval> impl
     private final Set<Derive> derive = Global.newHashSet(1);
     public final Term x;
 
-    private @Nullable PremiseFork onMatch;
+    private @Nullable ProcTerm onMatch;
 
     public MatchTerm(@NotNull Term id, Term pattern, @Nullable ImmutableMap<Term, MatchConstraint> constraints) {
         this.id = id;
@@ -112,7 +112,7 @@ abstract public class MatchTerm extends AtomicBooleanCondition<PremiseEval> impl
 //            throw new RuntimeException("invalid MatchTerm with no derivation handlers:" + this);
 
         //TODO HACK dont lazily instantiate this but do it after the TrieDeriver has finished building the rule trie by iterating all known MatchTerm's (in the LinkGraph)
-        PremiseFork o = this.onMatch;
+        ProcTerm o = this.onMatch;
         if (o == null) {
             o = this.onMatch = init();
         }
@@ -121,13 +121,18 @@ abstract public class MatchTerm extends AtomicBooleanCondition<PremiseEval> impl
         return true;
     }
 
-    private @NotNull PremiseFork init() {
-        return new PremiseFork(derive.toArray(new Derive[derive.size()]));
+    private final @NotNull ProcTerm init() {
+        switch (derive.size()) {
+            case 0: throw new RuntimeException("empty result procedure");
+            case 1: return derive.iterator().next();
+            default:
+                return new PremiseFork(derive.toArray(new Derive[derive.size()]));
+        }
     }
 
-    @Override
-    public final void accept(PremiseEval p) {
-        throw new RuntimeException("n/a");
-    }
+//    @Override
+//    public final void accept(PremiseEval p) {
+//        throw new RuntimeException("n/a");
+//    }
 
 }

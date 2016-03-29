@@ -102,7 +102,7 @@ public class PrologCore extends Agent implements Consumer<Task> {
     @Override
     public void accept(Task task) {
 
-        if (task.isJudgment()) {
+        if (task.isBelief()) {
             //if task is the current highest one, otherwise ignore because we will already be using something more confident or relevant
             Concept cc = task.concept(nar);
             if (task.isEternal() && (task == cc.beliefs().topEternal())) {

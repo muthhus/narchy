@@ -404,6 +404,14 @@ public interface TermIndex  {
             if (t != null) {
                 ((GenericCompound) t).setNormalized();
             }
+        } else {
+
+            //fast access to concept:
+            if (!t.op().isTemporal()) {
+                Termed existing = get(t);
+                if (existing != null)
+                    return existing;
+            }
         }
         return t;
     }

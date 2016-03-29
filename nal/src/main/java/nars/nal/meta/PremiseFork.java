@@ -11,15 +11,17 @@ public final class PremiseFork extends ThenFork {
 
     public PremiseFork(ProcTerm[] n) {
         super(n);
+        if (n.length == 1)
+            throw new RuntimeException("unnecessary use of fork");
         this.termCache = n;
     }
 
     @Override
     public final void accept(@NotNull PremiseEval m) {
-        int revertTime = m.now();
+        final int stack = m.now();
         for (ProcTerm s : termCache) {
             s.accept(m);
-            m.revert(revertTime);
+            m.revert(stack);
         }
     }
 }

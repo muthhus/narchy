@@ -34,7 +34,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.Reference;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -257,31 +256,13 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     @Override
     Task setCreationTime(long c);
 
-    /**
-     * Recognize a Question
-     *
-     * @return Whether the object is a Question
-     */
-    default boolean isQuestion() {
-        return (punc() == Symbols.QUESTION);
-    }
+    boolean isQuestion();
 
-    /**
-     * Recognize a Judgment
-     *
-     * @return Whether the object is a Judgment
-     */
-    default boolean isJudgment() {
-        return (punc() == Symbols.BELIEF);
-    }
+    boolean isQuest();
 
-    default boolean isGoal() {
-        return (punc() == Symbols.GOAL);
-    }
+    boolean isBelief();
 
-    default boolean isQuest() {
-        return (punc() == Symbols.QUEST);
-    }
+    boolean isGoal();
 
     default boolean isCommand()  {
         return (punc() == Symbols.COMMAND);
@@ -321,8 +302,8 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         return isQuestion() || isQuest();
     }
 
-    default boolean isJudgmentOrGoal() {
-        return isJudgment() || isGoal();
+    default boolean isBeliefOrGoal() {
+        return isBelief() || isGoal();
     }
 
     /** allows for budget feedback that occurrs on revision */

@@ -26,7 +26,7 @@ import static nars.nal.Tense.ETERNAL;
  * Handles matched derivation results
  * < (&&, postMatch1, postMatch2) ==> derive(term) >
  */
-public class Derive extends AtomicStringConstant implements ProcTerm {
+public final class Derive extends AtomicStringConstant implements ProcTerm {
 
     @NotNull
     public final String id;

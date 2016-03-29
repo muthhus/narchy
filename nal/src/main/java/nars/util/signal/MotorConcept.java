@@ -56,6 +56,10 @@ public class MotorConcept extends OperationConcept implements Consumer<NAR>, Flo
                 //Nothing, dont auto-start
             }
 
+            @Override
+            public Termed<Compound> term() {
+                return MotorConcept.this; //allow access to this concept directly
+            }
         };
 
         n.onFrame(this);

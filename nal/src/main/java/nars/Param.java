@@ -158,7 +158,7 @@ public abstract class Param extends Container implements Level {
         t.setPriority(getDefaultPriority(punc));
         t.setDurability(getDefaultDurability(punc));
 
-        if (t.isJudgmentOrGoal()) {
+        if (t.isBeliefOrGoal()) {
 
             /** if q was not specified, and truth is, then we can calculate q from truthToQuality */
             if (!Float.isFinite(t.qua())) {

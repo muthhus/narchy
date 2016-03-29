@@ -22,7 +22,6 @@ package nars.nal;
 
 import nars.Memory;
 import nars.NAR;
-import nars.Op;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.budget.UnitBudget;
@@ -285,7 +284,7 @@ public enum LocalRules {
         }*/
 
 
-        boolean judgmentTask = question.isJudgment();
+        boolean judgmentTask = question.isBelief();
         //float om = orderMatch(problem.term(), solution.term(), duration);
         //if (om == 0) return 0f;
         float quality = Tense.solutionQuality(question, solution, projectedTruth, m.time());

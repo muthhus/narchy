@@ -60,7 +60,7 @@ public class TaskSummaryIcon extends SummaryIcon implements Runnable {
             //immediate?
         }
         else {
-            if (task.isJudgment()) {
+            if (task.isBelief()) {
                 g.setFill(getBeliefColor(task.freq(), task.conf()) );
             }
             else if (task.isGoal()) {

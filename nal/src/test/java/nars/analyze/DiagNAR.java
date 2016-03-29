@@ -159,10 +159,10 @@ public class DiagNAR extends Default {
             dSumm = (c!= null ? c.summary() : 0) -
                             (task.summary() + (belief!=null ? belief.summary() : 0));
 
-            float pConfNum = (c!=null && c.isJudgmentOrGoal()) ? c.conf() : 0;
+            float pConfNum = (c!=null && c.isBeliefOrGoal()) ? c.conf() : 0;
             float pConfDen =
-                    Math.max((task.isJudgmentOrGoal() ? task.conf() : 0),
-                        (belief!=null && belief.isJudgmentOrGoal() ? belief.conf() : 0));
+                    Math.max((task.isBeliefOrGoal() ? task.conf() : 0),
+                        (belief!=null && belief.isBeliefOrGoal() ? belief.conf() : 0));
             this.pConf = (pConfDen != 0) ? pConfNum/pConfDen : 0;
 
 

@@ -335,7 +335,7 @@ public class SomeRovers {
     }
 
     public static Default newNAR() {
-        int conceptsFirePerCycle = 32;
+        int conceptsFirePerCycle = 64;
 
         Random rng = new XorShift128PlusRandom(1);
         TermIndex index = new AbstractNAR.WeakTermIndex(32 * 1024, rng);
