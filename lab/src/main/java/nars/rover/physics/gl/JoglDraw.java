@@ -1,12 +1,10 @@
 package nars.rover.physics.gl;
 
 import com.jogamp.opengl.GL2;
-import nars.rover.physics.PhysicsCamera;
-import nars.rover.physics.PhysicsController;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.dynamics.World;
+import org.jbox2d.dynamics.World2D;
 import org.jbox2d.particle.ParticleColor;
 
 /**
@@ -175,7 +173,7 @@ public class JoglDraw extends JoglAbstractDraw {
     }
 
     @Override
-    public void draw(World w, float time) {
+    public void draw(World2D w, float time) {
         this.gl = panel.getGL().getGL2();
         super.draw(w, time);
     }

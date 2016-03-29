@@ -35,7 +35,7 @@ import org.jbox2d.common.Vec3;
 import org.jbox2d.dynamics.contacts.Contact;
 
 /**
- * World pool interface
+ * World2D pool interface
  * @author Daniel
  *
  */

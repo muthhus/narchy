@@ -8,8 +8,7 @@ import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.glu.gl2.GLUgl2;
 import com.jogamp.opengl.util.Animator;
 import nars.rover.physics.Display;
-import nars.rover.physics.TestbedState;
-import org.jbox2d.dynamics.World;
+import org.jbox2d.dynamics.World2D;
 
 
 import java.awt.*;
@@ -17,7 +16,6 @@ import java.nio.FloatBuffer;
 
 import static com.jogamp.opengl.fixedfunc.GLMatrixFunc.GL_MODELVIEW;
 import static com.jogamp.opengl.fixedfunc.GLMatrixFunc.GL_PROJECTION;
-import static nars.rover.physics.external.Jetpack.rng;
 
 /*******************************************************************************
  * Copyright (c) 2013, Daniel Murphy
@@ -46,7 +44,7 @@ import static nars.rover.physics.external.Jetpack.rng;
 /**
  *
  */
-public abstract class AbstractJoglPanel extends GLWindow implements Display, GLEventListener {
+public abstract class AbstractJoglPanel extends GLWindow implements Display, GLEventListener, WindowListener {
     private static final long serialVersionUID = 1L;
 
     //public static final int SCREEN_DRAG_BUTTON = 3;
@@ -54,25 +52,23 @@ public abstract class AbstractJoglPanel extends GLWindow implements Display, GLE
     public static final int INIT_WIDTH = 1200;
     public static final int INIT_HEIGHT = 900;
 
-    public final World world;
+    public final World2D world;
     //private Timer timer;
     //LightEngine light = new LightEngine();
 
-    public final TestbedState model;
     private Point center;
 
 
     // model can be null
     // if it is null world and debugDraw can be null, because they are retrived from model
-    public AbstractJoglPanel(final World world, TestbedState model, GLCapabilitiesImmutable config) {
+    public AbstractJoglPanel(final World2D world, GLCapabilitiesImmutable config) {
         //super(GLWindow.create(config));
         super(NewtFactory.createWindow(config));
 
         this.world = world;
 
-        this.model = model;
-
         addGLEventListener(this);
+        addWindowListener(this);
 
         Animator a = new Animator();
         a.add(this);
@@ -117,21 +113,18 @@ public abstract class AbstractJoglPanel extends GLWindow implements Display, GLE
         //gl.glEnable(GL.GL_ALPHA);
 
 
-        float time = 0.0f; // what does this?
-        if (model != null) {
-            time = model.model.getTime();
-        }
+        float time = world.time();//0.0f; // what does this?
 
 
         game.camera(gl, time);
 
-        {
-            //shake camera by heat
-            float rx = rng.nextFloat() * currentHeat * 5;
-            float ry = rng.nextFloat() * currentHeat * 5;
-            float rz = rng.nextFloat() * currentHeat * 5;
-            gl.glTranslatef(rx, ry, rz);
-        }
+//        {
+//            //shake camera by heat
+//            float rx = rng.nextFloat() * currentHeat * 5;
+//            float ry = rng.nextFloat() * currentHeat * 5;
+//            float rz = rng.nextFloat() * currentHeat * 5;
+//            gl.glTranslatef(rx, ry, rz);
+//        }
 
 
         draw(gl, time);
@@ -170,13 +163,48 @@ public abstract class AbstractJoglPanel extends GLWindow implements Display, GLE
 
     }
 
-//    protected World getWorld() {
+//    protected World2D getWorld() {
 //        return model != null ? model.getCurrTest().getWorld() : world;
 //    }
 
 
     @Override
     public void dispose(GLAutoDrawable arg0) {
+    }
+
+    @Override
+    public void windowResized(WindowEvent windowEvent) {
+
+    }
+
+    @Override
+    public void windowMoved(WindowEvent windowEvent) {
+
+    }
+
+    @Override
+    public void windowDestroyNotify(WindowEvent windowEvent) {
+
+    }
+
+    @Override
+    public void windowDestroyed(WindowEvent windowEvent) {
+
+    }
+
+    @Override
+    public void windowGainedFocus(WindowEvent windowEvent) {
+
+    }
+
+    @Override
+    public void windowLostFocus(WindowEvent windowEvent) {
+
+    }
+
+    @Override
+    public void windowRepaint(WindowUpdateEvent windowUpdateEvent) {
+
     }
 
 

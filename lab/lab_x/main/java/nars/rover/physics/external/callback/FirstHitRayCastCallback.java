@@ -1,7 +1,7 @@
-package nars.rover.physics.external.callback;
+package nars.rover.obj.util.external.callback;
 
 
-import nars.rover.physics.external.DynamicEntity;
+import nars.rover.obj.util.external.DynamicEntity;
 import org.jbox2d.callbacks.RayCastCallback;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Fixture;

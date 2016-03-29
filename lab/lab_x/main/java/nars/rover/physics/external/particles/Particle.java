@@ -1,7 +1,7 @@
-package nars.rover.physics.external.particles;
+package nars.rover.obj.util.external.particles;
 
 
-import nars.rover.physics.external.BoxEntity;
+import nars.rover.obj.util.external.BoxEntity;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.FixtureDef;
 

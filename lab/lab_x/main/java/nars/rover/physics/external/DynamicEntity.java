@@ -1,4 +1,4 @@
- 	package nars.rover.physics.external;
+ 	package nars.rover.obj.util.external;
 
 	import org.jbox2d.collision.shapes.Shape;
 	import org.jbox2d.common.Vec2;

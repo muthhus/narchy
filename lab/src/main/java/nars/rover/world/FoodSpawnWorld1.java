@@ -4,10 +4,8 @@
  */
 package nars.rover.world;
 
-import nars.rover.Material;
-import nars.rover.RoverWorld;
+import nars.rover.obj.Material;
 import nars.rover.Sim;
-import org.jbox2d.dynamics.World;
 
 /**
  *

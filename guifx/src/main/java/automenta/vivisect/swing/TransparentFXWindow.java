@@ -44,7 +44,7 @@ public class TransparentFXWindow extends Application {
 
                 Scene scene = new Scene(p);
                 stage.setScene(scene);
-                stage.setTitle("Hello World");
+                stage.setTitle("Hello World2D");
                 stage.initStyle(StageStyle.TRANSPARENT);
 
                 ResizeHelper.addResizeListener(stage);

@@ -1,11 +1,10 @@
 package nars.rover.obj;
 
-import nars.rover.Sim;
+import com.artemis.Component;
 import nars.rover.physics.gl.JoglAbstractDraw;
 import nars.rover.physics.gl.JoglDraw;
+
 import nars.rover.physics.j2d.LayerDraw;
-import nars.rover.robot.AbstractPolygonBot;
-import nars.rover.robot.Being;
 import nars.rover.util.RayCastClosestCallback;
 import nars.util.data.Util;
 import org.jbox2d.callbacks.RayCastCallback;
@@ -13,19 +12,18 @@ import org.jbox2d.common.Color3f;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.Fixture;
-import org.jbox2d.dynamics.World;
+import org.jbox2d.dynamics.World2D;
 
 /**
  * Created by me on 1/31/16.
  */
-abstract public class VisionRay implements AbstractPolygonBot.Sense, LayerDraw {
+public class VisionRay extends Component implements LayerDraw {
 
     protected final int resolution;
     protected final float arc;
     final Vec2 point; //where the retina receives vision at
     public final float angle;
     private final Body base;
-    private final Being bot;
 
     public float seenDist;
 
@@ -38,7 +36,7 @@ abstract public class VisionRay implements AbstractPolygonBot.Sense, LayerDraw {
     protected float distance;
 
 
-    final RayDrawer[] rayDrawers;
+    public final RayDrawer[] rayDrawers;
 
     float biteDistanceThreshold = 0.03f;
     private boolean eats;
@@ -52,8 +50,6 @@ abstract public class VisionRay implements AbstractPolygonBot.Sense, LayerDraw {
     public VisionRay(Vec2 point, float angle, float arc, Body base, float length, int resolution) {
         this.base = base;
 
-        bot = ((Being.BeingMaterial)base.getUserData()).robot;
-        //this.sensor = new Sensor();
 
         this.point = point;
         this.angle = angle;
@@ -62,7 +58,7 @@ abstract public class VisionRay implements AbstractPolygonBot.Sense, LayerDraw {
         this.resolution = resolution;
         this.rayDrawers = new RayDrawer[resolution]; /** one for each sub-pixel */
         for (int i = 0; i < resolution; i++)
-            rayDrawers[i] = new RayDrawer(base.getWorld(), i, angle, arc);
+            rayDrawers[i] = new RayDrawer(i, angle, arc);
 
         sparkColor = new Color3f(0.5f, 0.4f, 0.4f);
         normalColor = new Color3f(0.2f, 0.2f, 0.2f);
@@ -80,18 +76,7 @@ abstract public class VisionRay implements AbstractPolygonBot.Sense, LayerDraw {
     }
 
 
-    public void step(boolean feel, boolean drawing) {
 
-        //final Robotic ap = this.bot;
-
-
-//        root.set( point );
-//        root = base.getWorldPoint( root );
-
-        for (RayDrawer r : rayDrawers)
-            r.update();
-
-    }
 
     protected void perceiveDist(Body hit, float hitDist) {
 
@@ -120,22 +105,22 @@ abstract public class VisionRay implements AbstractPolygonBot.Sense, LayerDraw {
     public void onTouch(Body touched, float di) {
         if (touched == null) return;
 
-        if (isEating() && touched.getUserData() instanceof Sim.Edible) {
-
-            //System.out.println(di + " " + isEating() + " " + touched);
-
-            //if (eats) {
-
-
-            if (di <= biteDistanceThreshold) {
-                bot.eat(touched);
-            }
-
-                            /*} else if (di <= tasteDistanceThreshold) {
-                                //taste(touched, di );
-                            }*/
-            //}
-        }
+//        if (isEating() && touched.getUserData() instanceof Sim.Edible) {
+//
+//            //System.out.println(di + " " + isEating() + " " + touched);
+//
+//            //if (eats) {
+//
+//
+//            if (di <= biteDistanceThreshold) {
+//                bot.eat(touched);
+//            }
+//
+//                            /*} else if (di <= tasteDistanceThreshold) {
+//                                //taste(touched, di );
+//                            }*/
+//            //}
+//        }
     }
 
     protected boolean isEating() {
@@ -150,18 +135,12 @@ abstract public class VisionRay implements AbstractPolygonBot.Sense, LayerDraw {
         public final Vec2 to = new Vec2();
         public final Color3f color = new Color3f(0.5f, 0.5f, 0.5f); //current ray color
 
-        private final float baseAngle;
-        private final float dArc;
-        private final World world;
         private final int id;
         private final float targetAngle;
         private float hitDist;
 
 
-        public RayDrawer(World world, int id, float baseAngle, float dArc) {
-            this.baseAngle = baseAngle;
-            this.dArc = dArc;
-            this.world = world;
+        public RayDrawer(int id, float baseAngle, float dArc) {
             this.id = id;
             float da = /*(-arc / 2f) +*/ dArc * id;
             this.targetAngle = da + angle + baseAngle;
@@ -176,13 +155,14 @@ abstract public class VisionRay implements AbstractPolygonBot.Sense, LayerDraw {
             //ignore self:
             if (body == base) return 1;
             Object userData = body.getUserData();
-            if (userData!=null && (userData instanceof Being.BeingMaterial) && userData.toString().equals(bot.id))
-                return -1;
+
+//            if (userData!=null && (userData instanceof Being.BeingMaterial) && userData.toString().equals(bot.id))
+//                return -1;
 
             return super.reportFixture(fixture, point, normal, fraction);
         }
 
-        public void update() {
+        public void update(World2D world) {
             base.getWorldPointToOut(point, from);//getWorldCenter());
 
 
@@ -233,12 +213,12 @@ abstract public class VisionRay implements AbstractPolygonBot.Sense, LayerDraw {
     }
 
     @Override
-    public void drawGround(JoglAbstractDraw d, World w) {
+    public void drawGround(JoglAbstractDraw d, World2D w) {
 
     }
 
     @Override
-    public void drawSky(JoglAbstractDraw d, World w) {
+    public void drawSky(JoglAbstractDraw d, World2D w) {
         JoglDraw dd = (JoglDraw)d;
         for (RayDrawer r : rayDrawers) {
 

@@ -35,7 +35,7 @@
 //import Body;
 //import BodyType;
 //import Fixture;
-//import World;
+//import World2D;
 //import Joint;
 //import PulleyJoint;
 //import IntArray;
@@ -85,7 +85,7 @@
 //    }
 //
 //
-//    public void draw(World w) {
+//    public void draw(World2D w) {
 //
 //        graphics = panel.getDBGraphics();
 //

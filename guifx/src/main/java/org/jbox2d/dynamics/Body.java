@@ -36,7 +36,7 @@ import org.jbox2d.dynamics.contacts.ContactEdge;
 import org.jbox2d.dynamics.joints.JointEdge;
 
 /**
- * A rigid body. These are created via World.createBody.
+ * A rigid body. These are created via World2D.createBody.
  * 
  * @author Daniel Murphy
  */
@@ -75,7 +75,7 @@ public class Body {
   public final Vec2 m_force = new Vec2();
   public float m_torque;
 
-  public World m_world;
+  public World2D m_world;
   public Body m_prev;
   public Body m_next;
 
@@ -99,7 +99,7 @@ public class Body {
   public Object m_userData;
 
 
-  public Body(final BodyDef bd, World world) {
+  public Body(final BodyDef bd, World2D world) {
     assert (bd.position.isValid());
     assert (bd.linearVelocity.isValid());
     assert (bd.gravityScale >= 0.0f);
@@ -182,11 +182,11 @@ public class Body {
    * @warning This function is locked during callbacks.
    */
   public final Fixture createFixture(FixtureDef def) {
-    assert (m_world.isLocked() == false);
+    assert (!m_world.isLocked());
 
-    if (m_world.isLocked() == true) {
-      return null;
-    }
+//    if (m_world.isLocked() == true) {
+//      return null;
+//    }
 
     Fixture fixture = new Fixture();
     fixture.create(this, def);
@@ -209,7 +209,7 @@ public class Body {
 
     // Let the world know we have a new fixture. This will cause new contacts
     // to be created at the beginning of the next time step.
-    m_world.m_flags |= World.NEW_FIXTURE;
+    m_world.m_flags |= World2D.NEW_FIXTURE;
 
     return fixture;
   }
@@ -309,7 +309,7 @@ public class Body {
   /**
    * Set the position of the body's origin and rotation. This breaks any contacts and wakes the
    * other bodies. Manipulating a body's transform may cause non-physical behavior. Note: contacts
-   * are updated on the next call to World.step().
+   * are updated on the next call to World2D.step().
    * 
    * @param position the world position of the body's local origin.
    * @param angle the world rotation in radians.
@@ -993,7 +993,7 @@ public class Body {
    * be destroyed. Fixtures and joints are otherwise unaffected. You may continue to create/destroy
    * fixtures and joints on inactive bodies. Fixtures on an inactive body are implicitly inactive
    * and will not participate in collisions, ray-casts, or queries. Joints connected to an inactive
-   * body are implicitly inactive. An inactive body is still owned by a World object and remains in
+   * body are implicitly inactive. An inactive body is still owned by a World2D object and remains in
    * the body list.
    * 
    * @param flag
@@ -1108,7 +1108,7 @@ public class Body {
   /**
    * Get the parent world of this body.
    */
-  public final World getWorld() {
+  public final World2D getWorld() {
     return m_world;
   }
 

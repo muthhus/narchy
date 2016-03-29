@@ -1,6 +1,5 @@
 package nars.rover.util;
 
-import nars.rover.PhysicsRun;
 import org.jbox2d.callbacks.ContactImpulse;
 import org.jbox2d.collision.Manifold;
 import org.jbox2d.collision.shapes.CircleShape;
@@ -13,7 +12,7 @@ import org.jbox2d.dynamics.contacts.Contact;
 
 public abstract class Bodies implements BodyDefCallback, FixtureDefCallback {
 
-	protected World world;
+	protected World2D world;
 	public float standard_friction;
 	public float standard_density;
 	public float standard_restitution = 0;
@@ -44,7 +43,7 @@ public abstract class Bodies implements BodyDefCallback, FixtureDefCallback {
 	 * return ret;
 	 */
 
-	public void init(World world) {
+	public void init(World2D world) {
 		this.world = world;
 
 	}

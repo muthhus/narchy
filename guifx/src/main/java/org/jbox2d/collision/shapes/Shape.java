@@ -31,7 +31,7 @@ import org.jbox2d.common.Vec2;
 
 /**
  * A shape is used for collision detection. You can create a shape however you like. Shapes used for
- * simulation in World are created automatically when a Fixture is created. Shapes may encapsulate a
+ * simulation in World2D are created automatically when a Fixture is created. Shapes may encapsulate a
  * one or more child shapes.
  */
 public abstract class Shape {

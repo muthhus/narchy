@@ -28,6 +28,11 @@ public class DefaultTruth implements Truth  {
         return conf;
     }
 
+    /** use with caution */
+    public DefaultTruth(float... fc) {
+        this(fc[0], fc[1]);
+    }
+
     public DefaultTruth(float f, float c) {
         this(f, c, Global.TRUTH_EPSILON, hashDiscreteness);
     }

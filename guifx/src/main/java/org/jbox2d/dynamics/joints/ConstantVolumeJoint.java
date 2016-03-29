@@ -28,7 +28,7 @@ import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.SolverData;
-import org.jbox2d.dynamics.World;
+import org.jbox2d.dynamics.World2D;
 import org.jbox2d.dynamics.contacts.Position;
 import org.jbox2d.dynamics.contacts.Velocity;
 
@@ -41,7 +41,7 @@ public class ConstantVolumeJoint extends Joint {
   private final Vec2[] normals;
   private float m_impulse;
 
-  private final World world;
+  private final World2D world;
 
   private final DistanceJoint[] distanceJoints;
 
@@ -57,7 +57,7 @@ public class ConstantVolumeJoint extends Joint {
     targetVolume *= factor;
   }
 
-  public ConstantVolumeJoint(World argWorld, ConstantVolumeJointDef def) {
+  public ConstantVolumeJoint(World2D argWorld, ConstantVolumeJointDef def) {
     super(argWorld.getPool(), def);
     world = argWorld;
     if (def.bodies.size() <= 2) {

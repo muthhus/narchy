@@ -10,7 +10,7 @@
 //
 //public class Curiousbot extends JComponent implements RLEnvironment {
 //
-//    private World world;
+//    private World2D world;
 //    double[] inputs;
 //    int drawEvery = 5; //milliseconds
 //    long lastFrameTime = -1;
@@ -20,7 +20,7 @@
 //        //setDoubleBuffered(false);
 //        setIgnoreRepaint(true);
 //
-//        world = new World();
+//        world = new World2D();
 //        inputs = world.getPlayer().perception.updateInputValues(null);
 //        /*addMouseListener(new MouseListener() {
 //         public void mouseExited(MouseEvent e) {}
@@ -73,8 +73,8 @@
 //    }
 //
 //    public static final int CHART_HEIGHT = 100;
-//    public static final int WINDOW_W = World.SIZE * 2;
-//    public static final int WINDOW_H = World.SIZE * 2 + CHART_HEIGHT;
+//    public static final int WINDOW_W = World2D.SIZE * 2;
+//    public static final int WINDOW_H = World2D.SIZE * 2 + CHART_HEIGHT;
 //    static int[] x = new int[4];
 //    static int[] y = new int[4];
 //    static int[] x2 = new int[4];
@@ -232,8 +232,8 @@
 //
 //
 //    private void makeBufferedImage() {
-//        width = World.SIZE * 2;
-//        height = World.SIZE * 2;
+//        width = World2D.SIZE * 2;
+//        height = World2D.SIZE * 2;
 //        setSize(WINDOW_W, WINDOW_H);
 //        bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 //        biChart = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);

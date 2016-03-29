@@ -12,7 +12,7 @@ import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.FixtureDef;
-import org.jbox2d.dynamics.World;
+import org.jbox2d.dynamics.World2D;
 
 /**
  *
@@ -21,7 +21,7 @@ import org.jbox2d.dynamics.World;
 public enum Utils {
     ;
     //Create a JBox2D world. 
-    public static final World world = new World(
+    public static final World2D world = new World2D(
         new Vec2(0.0f, 25.0f)
     );
     

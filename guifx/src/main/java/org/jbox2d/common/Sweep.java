@@ -37,7 +37,7 @@ public class Sweep implements Serializable {
   public final Vec2 localCenter;
   /** Center world positions */
   public final Vec2 c0, c;
-  /** World angles */
+  /** World2D angles */
   public float a0, a;
 
   /** Fraction of the current time step in the range [0,1] c0 and a0 are the positions at alpha0. */

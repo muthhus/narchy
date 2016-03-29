@@ -1,8 +1,8 @@
-package nars.rover.physics.external.particles;
+package nars.rover.obj.util.external.particles;
 
 
-import nars.rover.physics.external.DynamicEntity;
-import nars.rover.physics.external.Entity;
+import nars.rover.obj.util.external.DynamicEntity;
+import nars.rover.obj.util.external.Entity;
 import org.jbox2d.common.Vec2;
 
 /**

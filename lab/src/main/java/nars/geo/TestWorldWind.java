@@ -131,7 +131,7 @@
 //                this.getContentPane().add(this.statsPanel, BorderLayout.EAST);
 //            }
 //
-//            // Create and install the view controls layer and register a controller for it with the World Window.
+//            // Create and install the view controls layer and register a controller for it with the World2D Window.
 //            ViewControlsLayer viewControlsLayer = new ViewControlsLayer();
 //            insertBeforeCompass(getWwd(), viewControlsLayer);
 //            this.getWwd().addSelectListener(new ViewControlsSelectListener(this.getWwd(), viewControlsLayer));
@@ -155,7 +155,7 @@
 //                }
 //            });
 //
-//            // Search the layer list for layers that are also select listeners and register them with the World
+//            // Search the layer list for layers that are also select listeners and register them with the World2D
 //            // Window. This enables interactive layers to be included without specific knowledge of them here.
 //            for (Layer layer : this.wwjPanel.getWwd().getModel().getLayers())
 //            {
@@ -285,7 +285,7 @@
 //        if (Configuration.isMacOS())
 //        {
 //            System.setProperty("apple.laf.useScreenMenuBar", "true");
-//            System.setProperty("com.apple.mrj.application.apple.menu.about.name", "World Wind Application");
+//            System.setProperty("com.apple.mrj.application.apple.menu.about.name", "World2D Wind Application");
 //            System.setProperty("com.apple.mrj.application.growbox.intrudes", "false");
 //            System.setProperty("apple.awt.brushMetalLook", "true");
 //        }
@@ -328,6 +328,6 @@
 //    {
 //        // Call the static start method like this from the main method of your derived class.
 //        // Substitute your application's name for the first argument.
-//        TestWorldWind.start("World Wind Application", AppFrame.class);
+//        TestWorldWind.start("World2D Wind Application", AppFrame.class);
 //    }
 // }

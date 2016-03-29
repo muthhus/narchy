@@ -61,7 +61,7 @@ public abstract class Contact {
 
   public int m_flags;
 
-  // World pool and list pointers.
+  // World2D pool and list pointers.
   public Contact m_prev;
   public Contact m_next;
 

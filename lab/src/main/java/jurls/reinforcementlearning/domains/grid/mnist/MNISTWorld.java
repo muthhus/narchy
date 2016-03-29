@@ -135,7 +135,7 @@ public class MNISTWorld extends MNIST implements World {
 //            }            
 //
 //            @Override
-//            public void init(World world) {
+//            public void init(World2D world) {
 //                super.init(world); //To change body of generated methods, choose Tools | Templates.
 //                pretrain(m.getImageVectors(), 50, 2, 0.1, noise);
 //            }

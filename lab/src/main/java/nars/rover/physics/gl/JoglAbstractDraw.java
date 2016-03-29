@@ -23,11 +23,6 @@
  ******************************************************************************/
 package nars.rover.physics.gl;
 
-import com.jogamp.opengl.GL2;
-import nars.Video;
-import nars.rover.physics.PhysicsCamera;
-import nars.rover.physics.j2d.LayerDraw;
-import nars.util.data.list.FasterList;
 import org.jbox2d.callbacks.DebugDraw;
 import org.jbox2d.collision.shapes.ChainShape;
 import org.jbox2d.collision.shapes.CircleShape;
@@ -36,13 +31,11 @@ import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.*;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.Fixture;
-import org.jbox2d.dynamics.World;
+import org.jbox2d.dynamics.World2D;
 import org.jbox2d.pooling.arrays.Vec2Array;
 
 import java.awt.*;
-import java.util.List;
 
-import static nars.rover.Sim.poisonFill;
 
 /** effectively one drawable layer of physics activity of the scene */
 public abstract class JoglAbstractDraw extends DebugDraw {
@@ -64,7 +57,7 @@ public abstract class JoglAbstractDraw extends DebugDraw {
 
 
 
-    public void draw(World w, float time) {
+    public void draw(World2D w, float time) {
 
 //        PhysicsCamera p = getPhysicsCamera();
 //
@@ -79,7 +72,7 @@ public abstract class JoglAbstractDraw extends DebugDraw {
         //int flags = getFlags();
         //boolean wireframe = (flags & DebugDraw.e_wireframeDrawingBit) != 0;
 
-        animateColors(time);
+        //animateColors(time);
 
         //if ((flags & DebugDraw.e_shapeBit) != 0) {
         for (Body b = w.getBodyList(); b != null; b = b.getNext()) {
@@ -100,9 +93,10 @@ public abstract class JoglAbstractDraw extends DebugDraw {
 
     }
 
-    private void animateColors(float t) {
-        poisonFill.x = (float) (0.35 + 0.25f * (Math.sin(t) + 1f));
-    }
+//    private void animateColors(float t) {
+//
+//        poisonFill.x = (float) (0.35 + 0.25f * (Math.sin(t) + 1f));
+//    }
 
 
     Color3f defaultFillColor = new Color3f(0.75f, 0.75f, 0.75f);

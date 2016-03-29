@@ -1,25 +1,39 @@
 package nars.rover.physics.gl;
 
-import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.GLAutoDrawable;
-import com.jogamp.opengl.GLCapabilitiesImmutable;
-import nars.rover.physics.PhysicsController;
-import nars.rover.physics.TestbedState;
-import org.jbox2d.dynamics.World;
+import com.jogamp.opengl.*;
+import nars.rover.Sim;
+
+import org.jbox2d.dynamics.World2D;
 
 /* generic box2d physics-executing panel */
 public class Box2DJoglPanel extends AbstractJoglPanel {
-	public final PhysicsController controller;
+
 
 	//final Space2D sg = new DemoTextButton().getSpace();
 	public final JoglDraw draw;
 
-	public Box2DJoglPanel(final World world, final TestbedState model,
-                          final PhysicsController controller, GLCapabilitiesImmutable config) {
-		super(world, model, config);
-		this.controller = controller;
-		this.draw = new JoglDraw(this);
+	public Box2DJoglPanel(final Sim sim) {
+		this(sim.world);
+	}
 
+	public Box2DJoglPanel(final World2D world) {
+		super(world, newDefaultConfig());
+		this.draw = new JoglDraw(this);
+	}
+
+	private static GLCapabilitiesImmutable newDefaultConfig() {
+
+		GLCapabilities config = new GLCapabilities(GLProfile.getMaximum(true)); //getDefault());
+
+		config.setHardwareAccelerated(true);
+//        config.setBackgroundOpaque(false);
+
+		config.setAlphaBits(8);
+		config.setAccumAlphaBits(8);
+		config.setAccumRedBits(8);
+		config.setAccumGreenBits(8);
+		config.setAccumBlueBits(8);
+		return config;
 	}
 
 	@Override
@@ -36,13 +50,9 @@ public class Box2DJoglPanel extends AbstractJoglPanel {
 //		gl.glPopMatrix();
 	}
 
-	@Override
-	public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
-		super.reshape(drawable, x, y, width, height);
-
-		if (controller != null) {
-			controller.updateExtents(width / 2f, height / 2f);
-		}
-	}
+//	@Override
+//	public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
+//		super.reshape(drawable, x, y, width, height);
+//	}
 
 }

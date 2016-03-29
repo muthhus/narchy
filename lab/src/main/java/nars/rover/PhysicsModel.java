@@ -25,8 +25,8 @@
  */
 package nars.rover;
 
+import nars.rover.obj.Collidable;
 import nars.rover.physics.*;
-import nars.rover.robot.Collidable;
 import nars.rover.util.Bodies;
 import org.jbox2d.callbacks.*;
 import org.jbox2d.collision.Collision;
@@ -39,14 +39,12 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.*;
 import org.jbox2d.dynamics.contacts.Contact;
 
-import javax.swing.*;
 import java.util.LinkedList;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Runnable is for Swing invokeLater to call this
  */
-public abstract class PhysicsModel extends Bodies implements ContactListener, Runnable {
+public class PhysicsModel extends Bodies implements ContactListener, Runnable {
 
     public static final int MAX_CONTACT_POINTS = 4048;
     public static final float ZOOM_SCALE_DIFF = .05f;
@@ -184,7 +182,7 @@ public abstract class PhysicsModel extends Bodies implements ContactListener, Ru
     /**
      * Gets the current world
      */
-    public World getWorld() {
+    public World2D getWorld() {
         return world;
     }
 
@@ -245,14 +243,6 @@ public abstract class PhysicsModel extends Bodies implements ContactListener, Ru
 //        return mouseTracerVelocity;
 //    }
 
-    /**
-     * Gets the filename of the current test. Default implementation uses the
-     * test name with no spaces".
-     */
-    public String getFilename() {
-        return getTestName().toLowerCase().replaceAll(" ", "_") + ".box2d";
-    }
-
 //    /**
 //     * @deprecated use {@link #getCamera()}
 //     */
@@ -267,18 +257,6 @@ public abstract class PhysicsModel extends Bodies implements ContactListener, Ru
 //        camera.setCamera(argPos, scale);
 //    }
 
-    /**
-     * Initializes the current test.
-     *
-     * @param deserialized if the test was deserialized from a file. If so, all
-     * physics objects are already added.
-     */
-    public abstract void initTest(boolean deserialized);
-
-    /**
-     * The name of the test
-     */
-    public abstract String getTestName();
 
 //    /**
 //     * Adds a text line to the reporting area
@@ -403,7 +381,7 @@ public abstract class PhysicsModel extends Bodies implements ContactListener, Ru
 ////
 ////            m_textLine += TEXT_LINE_SPACE;
 ////
-////            debugDraw.drawString(5, m_textLine, "World mouse position: " + mouseWorld.toString(),
+////            debugDraw.drawString(5, m_textLine, "World2D mouse position: " + mouseWorld.toString(),
 ////                    Color3f.WHITE);
 ////            m_textLine += TEXT_LINE_SPACE;
 ////
@@ -593,6 +571,16 @@ public abstract class PhysicsModel extends Bodies implements ContactListener, Ru
     public void dt(float dt) {
         time += dt;
     }
+
+    @Override
+    public BodyDef bodyDefCallback(BodyDef body) {
+        return body;
+    }
+
+    @Override
+    public FixtureDef fixDefCallback(FixtureDef fixture) {
+        return fixture;
+    }
 }
 
 class TestQueryCallback implements QueryCallback {
@@ -628,7 +616,7 @@ class TestQueryCallback implements QueryCallback {
 //    delegate = argDelegate;
 //  }
 //
-//  public Long getTag(World argWorld) {
+//  public Long getTag(World2D argWorld) {
 //    return delegate.getTag(argWorld);
 //  }
 //
@@ -657,7 +645,7 @@ class TestQueryCallback implements QueryCallback {
 //    listener = argListener;
 //  }
 //
-//  public void processWorld(World argWorld, Long argTag) {
+//  public void processWorld(World2D argWorld, Long argTag) {
 //    listener.processWorld(argWorld, argTag);
 //  }
 //

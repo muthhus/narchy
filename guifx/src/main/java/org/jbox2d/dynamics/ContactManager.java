@@ -31,7 +31,7 @@ import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.dynamics.contacts.ContactEdge;
 
 /**
- * Delegate of World.
+ * Delegate of World2D.
  * 
  * @author Daniel Murphy
  */
@@ -43,9 +43,9 @@ public class ContactManager implements PairCallback {
   public ContactFilter m_contactFilter;
   public ContactListener m_contactListener;
 
-  private final World pool;
+  private final World2D pool;
 
-  public ContactManager(World argPool, BroadPhase broadPhase) {
+  public ContactManager(World2D argPool, BroadPhase broadPhase) {
     m_contactList = null;
     m_contactCount = 0;
     m_contactFilter = new ContactFilter();

@@ -160,7 +160,7 @@ public class Fixture {
             edge = edge.next;
         }
 
-        World world = m_body.getWorld();
+        World2D world = m_body.getWorld();
 
         if (world == null) {
             return;

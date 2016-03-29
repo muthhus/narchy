@@ -26,7 +26,7 @@ package org.jbox2d.dynamics.joints;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.SolverData;
-import org.jbox2d.dynamics.World;
+import org.jbox2d.dynamics.World2D;
 import org.jbox2d.pooling.IWorldPool;
 
 // updated to rev 100
@@ -38,7 +38,7 @@ import org.jbox2d.pooling.IWorldPool;
  */
 public abstract class Joint {
 
-  public static Joint create(World world, JointDef def) {
+  public static Joint create(World2D world, JointDef def) {
     // Joint joint = null;
     switch (def.type) {
       case MOUSE:

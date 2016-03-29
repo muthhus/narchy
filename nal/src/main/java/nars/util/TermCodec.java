@@ -6,6 +6,7 @@ import nars.Narsese;
 import nars.Op;
 import nars.Symbols;
 import nars.concept.AtomConcept;
+import nars.task.DerivedTask;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Term;
@@ -36,7 +37,11 @@ public class TermCodec extends FSTConfiguration {
 
 
 
-        registerClass(Atom.class, GenericCompound.class, MutableTask.class);
+        registerClass(Atom.class, GenericCompound.class,
+                MutableTask.class, DerivedTask.class,
+                Term[].class,
+                //long[].class, char.class,
+                Op.class);
 
 
 //        registerSerializer(DefaultTruth.class, new FSTBasicObjectSerializer() {
@@ -83,11 +88,13 @@ public class TermCodec extends FSTConfiguration {
                 //return new Atom(in.readStringUTF());
 
                 Term term = (Term) in.readObject();
-                char punc = in.readChar();
+                char punc = (char) in.readByte();
 
                 Truth truth;
-                if (punc == Symbols.BELIEF || punc == Symbols.GOAL) {
-                    truth = new DefaultTruth(in.readFloat() /* f */, in.readFloat() /* c */);
+                if (hasTruth(punc)) {
+                    float[] fc = new float[2];
+                    in.getCodec().readFPrimitiveArray(fc, float.class, 2);
+                    truth = new DefaultTruth(fc);
                 } else {
                     truth = null;
                 }
@@ -98,8 +105,9 @@ public class TermCodec extends FSTConfiguration {
 
                 int eviLength = in.readByte(); //in.readByte(); //UnsignedByte();
                 long[] evi = new long[eviLength];
-                for (int i = 0; i < eviLength; i++)
-                    evi[i] = in.readLong();
+                //for (int i = 0; i < eviLength; i++)
+                    //evi[i] = in.readLong();
+                in.getCodec().readFPrimitiveArray(evi, long.class, eviLength);
 
                 float pri = in.readFloat();
                 float dur = in.readFloat();
@@ -113,15 +121,19 @@ public class TermCodec extends FSTConfiguration {
                 return mm;
             }
 
+            public boolean hasTruth(char punc) {
+                return punc == Symbols.BELIEF || punc == Symbols.GOAL;
+            }
+
             @Override
             public void writeObject(FSTObjectOutput out, Object toWrite, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy, int streamPosition) throws IOException {
                 Task t = (Task) toWrite;
                 out.writeObject(t.term());
-                out.writeChar(t.punc());
-                if (!t.isQuestOrQuestion()) {
-                    //out.writeObject(t.truth());
-                    out.writeFloat(t.freq());
-                    out.writeFloat(t.conf());
+                char p = t.punc();
+                out.writeByte(p);
+                if (hasTruth(p)) {
+                    out.getCodec().writePrimitiveArray(new float[] { t.freq(), t.conf() }, 0, 2);
+                    //out.writeFloat(t.freq()); out.writeFloat(t.conf());
                 }
                 out.writeLong(t.occurrence());
                 out.writeLong(t.creation());
@@ -132,9 +144,9 @@ public class TermCodec extends FSTConfiguration {
                 evil = evi == null ? 0 : evi.length;
 
                 out.writeByte(evil); //out.writeByte((byte) evil);
-                for (int i = 0; i < evil; i++)
-                    out.writeLong(evi[i]);
-
+                //for (int i = 0; i < evil; i++)
+                    //out.writeLong(evi[i]);
+                out.getCodec().writePrimitiveArray(evi, 0, evil);
 
                 out.writeFloat(t.pri());
                 out.writeFloat(t.dur());
@@ -164,11 +176,13 @@ public class TermCodec extends FSTConfiguration {
                 //GenericCompound c = (GenericCompound) Narsese.the().term(in.readUTF(), null /* raw, unnormalized */);
 
                 Op o = Op.values()[in.readByte()];
-                int subs = in.readByte();
-                Term[] s = new Term[subs];
-                for (int i = 0; i < subs; i++) {
-                    s[i] = (Term) in.readObject();
-                }
+                //int subs = in.readByte();
+                Term[] s = (Term[]) in.readObject();
+//                Term[] s = new Term[subs];
+//
+//                for (int i = 0; i < subs; i++) {
+//                    s[i] = (Term) in.readObject();
+//                }
 
                 return $.the(o, s);
             }
@@ -179,16 +193,17 @@ public class TermCodec extends FSTConfiguration {
                 //out.writeStringUTF(a.toString());
 
                 out.writeByte(a.op().ordinal());
-                int subs = a.size();
-                out.writeByte(subs); //how many subterms to follow
+                //int subs = a.size();
+                //out.writeByte(subs); //how many subterms to follow
 
                 //TODO include relation and dt if:
                 //      --image
                 //      --temporal (conj, equiv, impl)
                 //  ...
-                for (int i = 0; i < subs; i++) {
+                out.writeObject(a.terms());
+                /*for (int i = 0; i < subs; i++) {
                     out.writeObject(a.term(i).term());
-                }
+                }*/
             }
         }, true);
 

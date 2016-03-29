@@ -36,12 +36,12 @@ import org.jbox2d.common.Vec2;
  */
 public class WorldManifold {
   /**
-   * World vector pointing from A to B
+   * World2D vector pointing from A to B
    */
   public final Vec2 normal;
 
   /**
-   * World contact point (point of intersection)
+   * World2D contact point (point of intersection)
    */
   public final Vec2[] points;
 

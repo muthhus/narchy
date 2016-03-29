@@ -1,10 +1,10 @@
-package nars.rover.physics.external;
+package nars.rover.obj.util.external;
 
 
-import nars.rover.physics.external.particles.EmitterSettings;
+import nars.rover.obj.util.external.particles.EmitterSettings;
 import org.jbox2d.common.Vec2;
 
-import static nars.rover.physics.external.Jetpack.rng;
+import static nars.rover.obj.util.external.Jetpack.rng;
 
 public class JetpackEmitterSettings extends EmitterSettings {
 

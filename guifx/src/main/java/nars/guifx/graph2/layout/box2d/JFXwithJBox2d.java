@@ -35,7 +35,7 @@ public class JFXwithJBox2d extends Application {
     @Override
     public void start(Stage primaryStage) {
         
-        primaryStage.setTitle("Hello JBox2d World!");
+        primaryStage.setTitle("Hello JBox2d World2D!");
         primaryStage.setFullScreen(false);
         primaryStage.setResizable(false);
         

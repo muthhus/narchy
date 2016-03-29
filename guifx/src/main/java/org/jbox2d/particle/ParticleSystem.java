@@ -20,7 +20,7 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.TimeStep;
-import org.jbox2d.dynamics.World;
+import org.jbox2d.dynamics.World2D;
 import org.jbox2d.particle.VoronoiDiagram.VoronoiDiagramCallback;
 
 public class ParticleSystem {
@@ -112,9 +112,9 @@ public class ParticleSystem {
   final float m_ejectionStrength;
   final float m_colorMixingStrength;
 
-  final World m_world;
+  final World2D m_world;
 
-  public ParticleSystem(World world) {
+  public ParticleSystem(World2D world) {
     m_world = world;
     m_timestamp = 0;
     m_allParticleFlags = 0;

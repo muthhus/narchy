@@ -4,7 +4,7 @@ import org.jbox2d.callbacks.QueryCallback;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
-import org.jbox2d.dynamics.World;
+import org.jbox2d.dynamics.World2D;
 
 /**
  * http://www.iforce2d.net/b2dtut/explosions
@@ -24,7 +24,7 @@ public class Explosion {
 		body.applyLinearImpulse(blastDir.mul(impulseMag), applyPoint, true);
 	}
 
-	public static void explodeBlastRadius(World world, Vec2 center, float blastRadius, float blastPower) {
+	public static void explodeBlastRadius(World2D world, Vec2 center, float blastRadius, float blastPower) {
 
         final float m_blastRadiusSq = blastRadius*blastRadius;
 

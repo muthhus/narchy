@@ -159,14 +159,14 @@
 //    };
 //
 //    @Override
-//    public void drawGround(JoglAbstractDraw draw, World w) {
+//    public void drawGround(JoglAbstractDraw draw, World2D w) {
 //        this.draw = draw;
 //        //this.graphics = draw.getGraphics();
 //        cells(groundDrawer, true);
 //    }
 //
 //    @Override
-//    public void drawSky(JoglAbstractDraw draw, World w) {
+//    public void drawSky(JoglAbstractDraw draw, World2D w) {
 //
 //    }
 //

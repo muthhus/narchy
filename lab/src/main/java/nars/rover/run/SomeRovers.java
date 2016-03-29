@@ -1,11 +1,15 @@
 package nars.rover.run;
 
+import com.artemis.Entity;
+import com.jogamp.newt.event.WindowEvent;
+import com.jogamp.opengl.GL2;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import nars.$;
 import nars.Global;
 import nars.NAR;
@@ -17,14 +21,16 @@ import nars.nal.Tense;
 import nars.nar.AbstractNAR;
 import nars.nar.Default;
 import nars.rover.Sim;
-import nars.rover.robot.NARover;
+import nars.rover.obj.*;
+import nars.rover.physics.gl.Box2DJoglPanel;
 import nars.rover.run.SomeRovers.ManualControl.ManualOverride;
 import nars.rover.world.FoodSpawnWorld1;
 import nars.term.TermIndex;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.signal.SensorConcept;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.dynamics.World;
+import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.World2D;
 
 import java.util.EnumMap;
 import java.util.List;
@@ -33,8 +39,11 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static javafx.application.Platform.runLater;
+import static jurls.core.utils.Utils.q;
 import static nars.guifx.NARfx.newWindow;
 import static nars.guifx.NARfx.scrolled;
+import static nars.rover.obj.AbstractPolygonBot.newTriangle;
+import static nars.rover.obj.NARover.*;
 
 /**
  * Created by me on 6/20/15.
@@ -132,18 +141,29 @@ public class SomeRovers {
         }
     }
 
-    //public static final SimulatedClock clock = new SimulatedClock();
 
     public static void main(String[] args) {
 
         Global.DEBUG = false;
         Global.EXIT_ON_EXCEPTION = false;
 
-        //RoverWorld world = new GridSpaceWorld(GridSpaceWorld.newMazePlanet());
-        final Sim game = new Sim(new World());
+        final Sim sim = new Sim(new World2D());
 
+
+
+        //RoverWorld world = new GridSpaceWorld(GridSpaceWorld.newMazePlanet());
         //RoverWorld world = new ReactorWorld(32, 48, 32);
-        new FoodSpawnWorld1(game, 128, 48, 48, 0.5f);
+        new FoodSpawnWorld1(sim, 128, 48, 48, 0.5f);
+
+
+        //.add(new RespawnOnDeath())
+        //.add(new Gravity())
+        //.add(new WallSensor())
+        //.add(new PlayerControlled())
+        //.add(new Bounds(G.CELL_SIZE, G.CELL_SIZE)).getEntity();
+
+
+
 
 
 
@@ -154,17 +174,30 @@ public class SomeRovers {
         boolean addNARRover = true;
         boolean gui = true;
 
-        if (addNARRover) {
-            Default n;
-            game.add(new NARover("r1", n = newNAR()) {
-                @Override
-                public void init(Sim p) {
-                    super.init(p);
 
-                    List<SensorConcept>[] sensors = q(this);
 
-                    if (gui) {
-                        NARfx.run(() -> {
+
+
+        Default nar = newNAR();
+
+        Entity rover = sim.game.createEntity().edit()
+                .add(new Physical(
+                        AbstractPolygonBot.newDynamic(0, 0),
+                        AbstractPolygonBot.newTriangle()))
+                .add(new Health(10))
+                .add(new Motorized())
+                .add(new RunNAR(nar))
+                .getEntity();
+
+        sim.game.process(); //initialize
+
+
+        NARover nr = new NARover("r1", rover, nar);
+
+        List<SensorConcept>[] sensors = q(nr);
+
+        if (gui) {
+            NARfx.run(() -> {
 
 //                            newWindow("NAR",
 //                                new VBox(
@@ -179,99 +212,86 @@ public class SomeRovers {
 //                                ),
 //                            400,200);
 
-                            newWindow("Motors",
-                                    new VBox(
-                                            new ManualControl<NARover>(this,
-                                                    new ManualOverride<NARover>(KeyCode.NUMPAD8,
-                                                            (r) -> {
-                                                                System.out.println("forward");
-                                                                nar.goal($.$(motorFore), Tense.Present, 0.9f, 0.65f);
-                                                                nar.goal($.$(motorBack), Tense.Present, 0f, 0.65f);
-                                                            },
-                                                            (r) -> {
-                                                                //System.out.println("up -");
-                                                            },
-                                                            (r) -> {
-                                                                return new Button("FWD");
-                                                            }
-                                                    ),
-                                                    new ManualOverride<NARover>(KeyCode.NUMPAD2,
-                                                            (r) -> {
-                                                                System.out.println("back");
-                                                                nar.goal($.$(motorFore), Tense.Present, 0f, 0.65f);
-                                                                nar.goal($.$(motorBack), Tense.Present, 0.9f, 0.65f);
-                                                            },
-                                                            (r) -> {
-                                                            },
-                                                            (r) -> {
-                                                                return new Button("BACK");
-                                                            }
-                                                    ),
-                            new ManualOverride<NARover>(KeyCode.NUMPAD4,
-                                    (r) -> {
-                                        System.out.println("left");
-                                        nar.goal($.$(motorLeft), Tense.Present, 0.9f, 0.65f);
-                                        nar.goal($.$(motorRight), Tense.Present, 0f, 0.65f);
-                                    },
-                                    (r) -> {
-                                        //System.out.println("up -");
-                                    },
-                                    (r) -> {
-                                        return new Button("LEFT");
-                                    }
-                            ),
-                                    new ManualOverride<NARover>(KeyCode.NUMPAD6,
-                                            (r) -> {
-                                                System.out.println("right");
-                                                nar.goal($.$(motorLeft), Tense.Present, 0f, 0.65f);
-                                                nar.goal($.$(motorRight), Tense.Present, 0.9f, 0.65f);
-                                            },
-                                            (r) -> {
-                                            },
-                                            (r) -> {
-                                                return new Button("RIGHT");
-                                            }
-                                    )
-                            ),
-                            updateMatrices(sensors, n),
-                                    new HBox(
-                                            scrolled(new NARtop(n).addAll(
-                                                    "MotorControls(#x,motor,(),#z)",
-                                                    motorLeft, motorRight,
-                                                    motorFore, motorBack,
-                                                    motorStop, turretFire)),
-                                            scrolled(new NARtop(n).addAll(
-                                                    EAT_FOOD.toString(),
-                                                    EAT_POISON.toString(),
-                                                    SPEED_LEFT.toString(),
-                                                    SPEED_RIGHT.toString(),
-                                                    SPEED_FORE.toString(),
-                                                    SPEED_BACK.toString()
-                                            ))
-                                    )
-                            )
-                            );
-                        });
-                    }
-                }
-
+                Stage stage = newWindow("Motors",
+                        new VBox(
+                                new ManualControl<NARover>(nr,
+                                        new ManualOverride<NARover>(KeyCode.NUMPAD8,
+                                                (r) -> {
+                                                    System.out.println("forward");
+                                                    nar.goal($.$(motorFore), Tense.Present, 0.9f, 0.65f);
+                                                    nar.goal($.$(motorBack), Tense.Present, 0f, 0.65f);
+                                                },
+                                                (r) -> {
+                                                    //System.out.println("up -");
+                                                },
+                                                (r) -> {
+                                                    return new Button("FWD");
+                                                }
+                                        ),
+                                        new ManualOverride<NARover>(KeyCode.NUMPAD2,
+                                                (r) -> {
+                                                    System.out.println("back");
+                                                    nar.goal($.$(motorFore), Tense.Present, 0f, 0.65f);
+                                                    nar.goal($.$(motorBack), Tense.Present, 0.9f, 0.65f);
+                                                },
+                                                (r) -> {
+                                                },
+                                                (r) -> {
+                                                    return new Button("BACK");
+                                                }
+                                        ),
+                                        new ManualOverride<NARover>(KeyCode.NUMPAD4,
+                                                (r) -> {
+                                                    System.out.println("left");
+                                                    nar.goal($.$(motorLeft), Tense.Present, 0.9f, 0.65f);
+                                                    nar.goal($.$(motorRight), Tense.Present, 0f, 0.65f);
+                                                },
+                                                (r) -> {
+                                                    //System.out.println("up -");
+                                                },
+                                                (r) -> {
+                                                    return new Button("LEFT");
+                                                }
+                                        ),
+                                        new ManualOverride<NARover>(KeyCode.NUMPAD6,
+                                                (r) -> {
+                                                    System.out.println("right");
+                                                    nar.goal($.$(motorLeft), Tense.Present, 0f, 0.65f);
+                                                    nar.goal($.$(motorRight), Tense.Present, 0.9f, 0.65f);
+                                                },
+                                                (r) -> {
+                                                },
+                                                (r) -> {
+                                                    return new Button("RIGHT");
+                                                }
+                                        )
+                                ),
+                                updateMatrices(sensors, nar),
+                                new HBox(
+                                        scrolled(new NARtop(nar).addAll(
+                                                "MotorControls(#x,motor,(),#z)",
+                                                motorLeft, motorRight,
+                                                motorFore, motorBack,
+                                                motorStop, turretFire)),
+                                        scrolled(new NARtop(nar).addAll(
+                                                EAT_FOOD.toString(),
+                                                EAT_POISON.toString(),
+                                                SPEED_LEFT.toString(),
+                                                SPEED_RIGHT.toString(),
+                                                SPEED_FORE.toString(),
+                                                SPEED_BACK.toString()
+                                        ))
+                                )
+                        )
+                );
             });
 
+
         }
+        ;
 
-//        if (addQRover) {
-//            game.add(new QRover("r2"));
-//        }
-
-//        {
-//            NAR nar = new Default();
-//
-//            //nar.paranar.outputVolume.set(0);
-//
-//            game.add(new CarefulRover("r2", nar));
-//        }
         float fps = 30;
-        game.run(fps);
+        sim.run(fps);
 
     }
 
@@ -382,8 +402,6 @@ public class SomeRovers {
      * attaches a prosthetic q-controller to a NAR
      */
     public static List<SensorConcept>[] q(NARover r) {
-        NAR n = r.nar;
-
 
         //NarQ nqSpine = new NarQ(n, (i, o) -> (int) Math.ceil(1 + Math.sqrt(i * o)));
 
@@ -422,23 +440,26 @@ public class SomeRovers {
 
         Vec2 front = new Vec2(2.7f, 0);
 
+        Body torso = r.entity.getComponent(Physical.class).body;
+        assert(torso!=null);
+
         //feeler
-        List<SensorConcept> whisker = r.addEyeWithMouth(r, "t", r.torso, 3, 4, front,
+        List<SensorConcept> whisker = r.addEyeWithMouth("t", torso, 3, 4, front,
                 0.5f, 0, dist / 6f, 0.2f);
 
 
         //nearsight & mouth
-        List<SensorConcept> nearSight = r.addEyeWithMouth(r, "n", r.torso, 7, 2, front,
+        List<SensorConcept> nearSight = r.addEyeWithMouth("n", torso, 7, 2, front,
                 0.5f, 0, dist / 2f, 0.2f);
 
 
         //farsight
-        List<SensorConcept> farSight = r.addEye(r, "f", r.torso, 5, 5, front,
+        List<SensorConcept> farSight = r.addEye("f", torso, 5, 5, front,
                 1.25f, 0, dist, (e) -> {
                 });
 
         //reverse
-        List<SensorConcept> backSight = r.addEye(r, "b", r.torso, 3, 9, new Vec2(-0.5f, 0),
+        List<SensorConcept> backSight = r.addEye("b", torso, 3, 9, new Vec2(-0.5f, 0),
                 1.25f, pi / 2f, dist / 2f, (e) -> {
                 });
 

@@ -92,8 +92,8 @@ public class DistanceJointDef extends JointDef {
    * 
    * @param b1 First body
    * @param b2 Second body
-   * @param anchor1 World anchor on first body
-   * @param anchor2 World anchor on second body
+   * @param anchor1 World2D anchor on first body
+   * @param anchor2 World2D anchor on second body
    */
   public void initialize(final Body b1, final Body b2, final Vec2 anchor1, final Vec2 anchor2) {
     bodyA = b1;
