@@ -1,6 +1,7 @@
 package nars.task.flow;
 
 import com.gs.collections.api.block.function.primitive.IntToObjectFunction;
+import com.gs.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 import nars.budget.BudgetMerge;
 import nars.budget.Budgeted;
 import org.jetbrains.annotations.NotNull;
@@ -20,7 +21,7 @@ public class BudgetedSet<B extends Budgeted> {
     B[] buffer;
 
     public BudgetedSet(BudgetMerge merge, IntToObjectFunction<B[]> tmpArrayBuilder) {
-        this(merge, new LinkedHashMap<>(), tmpArrayBuilder);
+        this(merge, new ConcurrentHashMapUnsafe<>(), tmpArrayBuilder);
     }
 
     public BudgetedSet(BudgetMerge merge, Map<B, B> table, IntToObjectFunction<B[]> tmpArrayBuilder) {

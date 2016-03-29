@@ -4,11 +4,14 @@ import com.artemis.Aspect;
 import com.artemis.Entity;
 import com.artemis.EntitySystem;
 import com.artemis.utils.Bag;
+import com.gs.collections.api.block.procedure.Procedure;
 import com.jogamp.newt.event.WindowEvent;
 import com.jogamp.opengl.GL2;
 import nars.rover.Sim;
 import nars.rover.obj.DrawAbove;
 import nars.rover.physics.gl.Box2DJoglPanel;
+import nars.rover.physics.j2d.LayerDraw;
+import nars.util.data.list.FasterList;
 import org.jbox2d.dynamics.World2D;
 
 /**
@@ -17,7 +20,7 @@ import org.jbox2d.dynamics.World2D;
 public class RendererSystem extends EntitySystem {
 
     private Sim sim;
-    private Bag<Entity> toDraw;
+    private FasterList<LayerDraw> toDraw = new FasterList();
 
     /**
      * Creates a new EntityProcessingSystem.
@@ -29,20 +32,17 @@ public class RendererSystem extends EntitySystem {
         this.sim = sim;
 
         new Box2DJoglPanel(sim) {
+
+            final Procedure<LayerDraw> drawProc = (LayerDraw l) -> l.drawSky(draw, world);
+
             @Override
             protected void draw(GL2 gl, float dt) {
 
                 super.draw(gl, dt);
 
-                World2D ww = this.world;
-
                 //Draw "above" layer
-                if (toDraw != null) {
-                    for (Entity e : toDraw) {
-                        DrawAbove a = e.getComponent(DrawAbove.class);
-                        a.drawSky(draw, ww);
-                    }
-                }
+                toDraw.forEach(drawProc);
+
             }
 
             @Override
@@ -55,7 +55,14 @@ public class RendererSystem extends EntitySystem {
 
     @Override
     protected void processSystem() {
-        toDraw = getEntities();
+
+        toDraw.clear();
+        Bag<Entity> ee = getEntities();
+        if (ee!=null) {
+            ee.forEach(e -> {
+                toDraw.add(e.getComponent(DrawAbove.class).drawer);
+            });
+        }
 
     }
 }

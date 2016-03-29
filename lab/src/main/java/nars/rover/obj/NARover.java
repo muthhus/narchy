@@ -11,6 +11,7 @@ import nars.Global;
 import nars.NAR;
 import nars.nal.Tense;
 import nars.rover.Sim;
+import nars.rover.physics.gl.JoglAbstractDraw;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.util.FloatSupplier;
@@ -20,6 +21,7 @@ import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.World2D;
 import org.jbox2d.dynamics.joints.RevoluteJoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -459,7 +461,10 @@ public class NARover extends AbstractPolygonBot {
 
             }
 
-            entity.getWorld().createEntity().edit().add(v);
+            entity.getWorld().createEntity().edit()
+                .add(v)
+                .add(new DrawAbove(v));
+
 
             //entity.edit().add(v);
             //senses.add(v);
