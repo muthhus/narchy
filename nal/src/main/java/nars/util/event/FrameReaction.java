@@ -1,6 +1,5 @@
 package nars.util.event;
 
-import nars.Memory;
 import nars.NAR;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

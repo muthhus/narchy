@@ -4,30 +4,7 @@
  */
 package alice.tuprolog.scriptengine;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-import java.util.List;
-import java.util.Map;
-
-import javax.script.Bindings;
-import javax.script.ScriptContext;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineFactory;
-import javax.script.ScriptException;
-import javax.script.SimpleBindings;
-import javax.script.SimpleScriptContext;
-
-import alice.tuprolog.InvalidTheoryException;
-import alice.tuprolog.MalformedGoalException;
-import alice.tuprolog.NoMoreSolutionException;
-import alice.tuprolog.NoSolutionException;
-import alice.tuprolog.Prolog;
-import alice.tuprolog.Solution;
-import alice.tuprolog.Struct;
-import alice.tuprolog.Theory;
-import alice.tuprolog.Var;
+import alice.tuprolog.*;
 import alice.tuprolog.event.ExceptionEvent;
 import alice.tuprolog.event.ExceptionListener;
 import alice.tuprolog.event.OutputEvent;
@@ -36,6 +13,14 @@ import alice.tuprolog.lib.IOLibrary;
 import alice.tuprolog.lib.InvalidObjectIdException;
 import alice.tuprolog.lib.OOLibrary;
 import alice.util.InputStreamAdapter;
+
+import javax.script.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.util.List;
+import java.util.Map;
 
 
 /**

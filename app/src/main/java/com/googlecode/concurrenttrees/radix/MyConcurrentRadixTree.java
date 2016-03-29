@@ -6,8 +6,6 @@ import com.googlecode.concurrenttrees.common.LazyIterator;
 import com.googlecode.concurrenttrees.radix.node.Node;
 import com.googlecode.concurrenttrees.radix.node.NodeFactory;
 import com.googlecode.concurrenttrees.radix.node.util.PrettyPrintable;
-import com.gs.collections.api.block.function.Function2;
-import com.gs.collections.api.block.function.Function3;
 
 import java.io.Serializable;
 import java.util.*;
@@ -15,10 +13,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.function.Supplier;
-
-import static com.googlecode.concurrenttrees.radix.ConcurrentRadixTree.SearchResult.*;
 
 /**
  * seh's modifications to radix tree

@@ -1,21 +1,12 @@
 package nars.util.signal;
 
-import nars.Memory;
-import nars.task.Task;
-import nars.util.event.FrameReaction;
-import nars.util.meter.event.DoubleMeter;
 import nars.util.meter.event.FloatGuage;
 import org.jetbrains.annotations.NotNull;
 import org.nustaq.serialization.FSTConfiguration;
-import org.nustaq.serialization.coders.FSTJsonEncoder;
-import org.nustaq.serialization.serializers.FSTJSonSerializers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.util.Date;
-import java.util.Map;
-import java.util.SortedMap;
 
 /**
  * emotion state: self-felt internal mental states; variables used to record emotional values

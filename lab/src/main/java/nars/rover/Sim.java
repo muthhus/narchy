@@ -1,6 +1,7 @@
 package nars.rover;
 
-import com.artemis.*;
+import com.artemis.World;
+import com.artemis.WorldConfiguration;
 import nars.rover.system.*;
 import nars.util.data.Util;
 import org.jbox2d.common.Vec2;

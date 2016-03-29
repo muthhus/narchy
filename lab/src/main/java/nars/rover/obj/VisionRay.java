@@ -3,7 +3,6 @@ package nars.rover.obj;
 import com.artemis.Component;
 import nars.rover.physics.gl.JoglAbstractDraw;
 import nars.rover.physics.gl.JoglDraw;
-
 import nars.rover.physics.j2d.LayerDraw;
 import nars.rover.util.RayCastClosestCallback;
 import nars.util.data.Util;

@@ -6,7 +6,6 @@ import com.addthis.meshy.MeshyServer;
 import com.addthis.meshy.service.file.FileReference;
 import com.addthis.meshy.service.file.FileSource;
 import com.addthis.meshy.service.message.MessageFileProvider;
-import org.junit.Test;
 
 import java.io.IOException;
 import java.util.Map;

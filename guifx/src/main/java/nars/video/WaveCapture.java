@@ -4,7 +4,6 @@ import com.gs.collections.impl.list.mutable.primitive.FloatArrayList;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.Scene;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import nars.guifx.NARfx;
 import nars.guifx.chart.Plot2D;

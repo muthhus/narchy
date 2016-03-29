@@ -8,8 +8,10 @@
  */
 
 package alice.tuprologx.pj.annotations.parser;
-import java.util.Vector;
+
 import java.util.List;
+import java.util.Vector;
+
 import static alice.tuprologx.pj.annotations.parser.PrologTree.*;
 import static alice.tuprologx.pj.annotations.parser.Tokenizer.*;
 /**

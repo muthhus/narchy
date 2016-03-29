@@ -1,12 +1,8 @@
 package nars;
 
-import nars.Global;
-import nars.NAR;
 import nars.nar.Default;
 import nars.op.shell;
 import org.junit.Test;
-
-import static org.junit.Assert.assertTrue;
 
 /**
  * Created by me on 2/24/16.

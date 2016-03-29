@@ -9,8 +9,6 @@ import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.nal.Tense.ETERNAL;
-
 /**
  * Defines the conditions used in an instance of a derivation
  */

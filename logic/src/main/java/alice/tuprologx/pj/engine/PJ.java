@@ -1,15 +1,16 @@
 package alice.tuprologx.pj.engine;
 
 import alice.tuprologx.pj.annotations.PrologMethod;
-import alice.tuprologx.pj.annotations.WithTermifiable;
 import alice.tuprologx.pj.annotations.Termifiable;
+import alice.tuprologx.pj.annotations.WithTermifiable;
+import alice.tuprologx.pj.meta.PrologMetaClass;
+import alice.tuprologx.pj.meta.PrologMetaField;
+import alice.tuprologx.pj.meta.PrologMetaMethod;
 import alice.tuprologx.pj.model.*;
-import alice.tuprologx.pj.meta.*;
-import alice.tuprologx.pj.model.Theory;
-import alice.tuprologx.pj.model.Clause;
+import javassist.util.proxy.MethodHandler;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import javassist.util.proxy.*;
 
 public class PJ implements MethodHandler {
     static int reentrant = 0;

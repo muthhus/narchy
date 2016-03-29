@@ -1,19 +1,14 @@
 package alice.tuprolog;
 
-import static org.junit.Assert.*;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.IOException;
-
+import alice.tuprolog.event.OutputEvent;
+import alice.tuprolog.event.OutputListener;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import alice.tuprolog.event.OutputEvent;
-import alice.tuprolog.event.OutputListener;
+import java.io.*;
+
+import static org.junit.Assert.*;
 
 // Based on the work of Sara Sabioni
 @Ignore

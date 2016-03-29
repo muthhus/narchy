@@ -1,26 +1,15 @@
 package nars.term.index;
 
 import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.CacheLoader;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import nars.concept.Concept;
 import nars.concept.ConceptBuilder;
-import nars.term.Compound;
-import nars.term.Term;
 import nars.term.TermBuilder;
-import nars.term.Termed;
 import nars.term.container.TermContainer;
-import nars.util.data.map.RUCache;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * see: https://github.com/ben-manes/caffeine/wiki

@@ -1,9 +1,9 @@
 package alice.tuprolog;
 
+import junit.framework.TestCase;
+
 import java.io.File;
 import java.io.PrintWriter;
-
-import junit.framework.TestCase;
 
 /**
  * @author Matteo Iuliani

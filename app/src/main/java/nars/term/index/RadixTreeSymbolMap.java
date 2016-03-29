@@ -1,6 +1,7 @@
 package nars.term.index;
 
-import com.googlecode.concurrenttrees.common.*;
+import com.googlecode.concurrenttrees.common.CharSequences;
+import com.googlecode.concurrenttrees.common.PrettyPrinter;
 import com.googlecode.concurrenttrees.radix.MyConcurrentRadixTree;
 import com.googlecode.concurrenttrees.radix.node.Node;
 import com.googlecode.concurrenttrees.radix.node.NodeFactory;
@@ -9,8 +10,6 @@ import com.googlecode.concurrenttrees.radix.node.concrete.chararray.*;
 import com.googlecode.concurrenttrees.radix.node.concrete.voidvalue.VoidValue;
 import com.googlecode.concurrenttrees.radix.node.util.NodeUtil;
 import nars.$;
-import nars.concept.AtomConcept;
-import nars.concept.Concept;
 import nars.term.Term;
 import nars.term.Termed;
 

@@ -14,7 +14,6 @@ import javafx.stage.Stage;
 import nars.guifx.NARfx;
 
 import static br.com.supremeforever.mdi.MDICanvas.resourceURL;
-import static nars.guifx.NARfx.scrolled;
 
 /**
  * Created by brisatc171.minto on 12/11/2015.

@@ -17,11 +17,8 @@ import nars.term.variable.Variable;
 import nars.util.Texts;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jgrapht.graph.DirectedMaskSubgraph;
 import org.jgrapht.graph.DirectedPseudograph;
-import org.jgrapht.graph.MaskFunctor;
 
-import java.io.Writer;
 import java.util.*;
 
 /**

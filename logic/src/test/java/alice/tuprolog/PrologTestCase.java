@@ -1,13 +1,6 @@
 package alice.tuprolog;
 
-import alice.tuprolog.InvalidLibraryException;
-import alice.tuprolog.Library;
-import alice.tuprolog.Prolog;
-import alice.tuprolog.event.SpyEvent;
-import alice.tuprolog.event.SpyListener;
-
 import junit.framework.TestCase;
-import org.junit.Ignore;
 
 public class PrologTestCase extends TestCase {
 	

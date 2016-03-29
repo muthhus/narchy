@@ -7,7 +7,6 @@ import javafx.beans.value.ObservableValue;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import nars.$;
-import nars.Memory;
 import nars.NAR;
 import nars.util.data.list.CircularArrayList;
 import nars.util.data.list.FasterList;

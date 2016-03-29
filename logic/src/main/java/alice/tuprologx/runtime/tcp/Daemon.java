@@ -1,7 +1,11 @@
 package alice.tuprologx.runtime.tcp;
-import java.net.*;
-import java.io.*;
-import java.lang.reflect.*;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.lang.reflect.Method;
+import java.net.ServerSocket;
+import java.net.Socket;
 
 class Acceptor implements Runnable {
     ObjectOutputStream outStream;

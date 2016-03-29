@@ -1,7 +1,11 @@
 package alice.tuprologx.runtime.tcp;
+
 import alice.tuprolog.*;
-import  java.io.*;
-import  java.net.*;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
 
 public class Proxy implements alice.tuprologx.runtime.tcp.Prolog {
 

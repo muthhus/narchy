@@ -1,7 +1,6 @@
 package nars.nlp;
 
 import nars.$;
-import nars.Memory;
 import nars.NAR;
 import nars.guifx.demo.NARide;
 import nars.nar.Default;

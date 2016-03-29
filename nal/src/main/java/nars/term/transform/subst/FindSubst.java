@@ -62,6 +62,7 @@ public abstract class FindSubst extends Versioning implements Subst {
      */
     @NotNull
     public final Versioned<ImmutableMap<Term, MatchConstraint>> constraints;
+    public final VersionMap.Reassigner<Term,Term> reassigner;
 
     //public abstract Term resolve(Term t, Substitution s);
 
@@ -149,6 +150,10 @@ public abstract class FindSubst extends Versioning implements Subst {
 
         xy = new VarCachedVersionMap(this);
         yx = new VarCachedVersionMap(this);
+        reassigner = new VersionMap.Reassigner<Term,Term>(
+            //() -> new Versioned(toSharePool)
+            () -> new Versioned(FindSubst.this)
+        );
         //term = new Versioned(this);
         parent = new Versioned(this);
         constraints = new Versioned(this, new int[2], new FasterList(0, new ImmutableMap[2]));
@@ -767,7 +772,7 @@ public abstract class FindSubst extends Versioning implements Subst {
                 return matchSub(X, Y, 0);
             case 2:
                 //match the target variable first, if exists
-                return matchLinear2(X, Y, X.term(1, type) ? 1 : 0);
+                return matchLinear2(X, Y, X.isTerm(1, type) ? 1 : 0);
             default:
                 return matchLinearN(X, Y);
         }
@@ -845,26 +850,7 @@ public abstract class FindSubst extends Versioning implements Subst {
      * returns true if the assignment was allowed, false otherwise
      */
     public final boolean putXY(@NotNull Term x /* usually a Variable */, @NotNull Term y) {
-
-//        if (x.equals(y))
-//            throw new RuntimeException("x==y");
-
-        VarCachedVersionMap xy = this.xy;
-
-        Versioned<Term> v = xy.map.get(x);
-        Term vv = (v != null) ? v.get() : null;
-        if (vv != null) {
-            return y.equals(vv);
-        }
-        if (!assignable(x, y))
-            return false;
-
-        if (v == null) {
-            v = xy.getOrCreateIfAbsent(x);
-        }
-
-        v.set(y);
-        return true;
+        return xy.computeAssignable(x, reassigner.set(this::assignable, y));
     }
 
     /**

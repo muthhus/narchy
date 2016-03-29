@@ -1,8 +1,6 @@
 package clojure.lang;
 
-import static clojure.lang.RT.CLOJURE_NS;
-import static clojure.lang.RT.T;
-import static clojure.lang.RT.baseLoader;
+import static clojure.lang.RT.*;
 
 /**
  * Created by me on 3/9/16.

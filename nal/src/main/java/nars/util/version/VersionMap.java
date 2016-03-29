@@ -1,6 +1,5 @@
 package nars.util.version;
 
-import com.gs.collections.impl.set.sorted.mutable.UnmodifiableSortedSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jgrapht.util.ArrayUnenforcedSet;
@@ -9,6 +8,8 @@ import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 import java.util.function.Supplier;
 
 
@@ -21,7 +22,7 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
         this(context,
             //new LinkedHashMap<>()
             //Global.newHashMap(16)
-            new HashMap(16)
+            new HashMap(64)
         );
     }
 
@@ -152,6 +153,11 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
             new RemovingVersionedEntry(k);
     }
 
+    public final boolean computeAssignable(X x, Reassigner<X,Y> r) {
+        return map.compute(x, r)!=null;
+    }
+
+
     /** this implementation removes itself from the map when it is reverted to
      *  times prior to its appearance in the map */
     final class RemovingVersionedEntry extends Versioned<Y> {
@@ -209,5 +215,38 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
                 return null;
             return v;
         });
+    }
+
+    public static final class Reassigner<X, Y> implements BiFunction<X, Versioned<Y>, Versioned<Y>> {
+        private BiPredicate<X, Y> assigner = null;
+        private Y y = null;
+        final Supplier<Versioned<Y>> pool;
+
+        public Reassigner(Supplier<Versioned<Y>> pool) {
+            this.pool = pool;
+        }
+
+        public Reassigner<X,Y> set(BiPredicate<X, Y> assigner, Y y) {
+            this.assigner = assigner;
+            this.y = y;
+            return this;
+        }
+
+        @Override
+        public Versioned<Y> apply(X X, Versioned<Y> py) {
+            if (py == null) {
+                return assigner.test(X, y) ? pool.get().set(y) : null;
+            } else {
+                Y yy = py.get();
+                if (yy == null) {
+                    py.set(this.y);
+                } else if (!yy.equals(this.y)) {
+                    return null; //conflict
+                }
+                return py;
+            }
+        }
+
+
     }
 }

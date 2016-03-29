@@ -1,10 +1,7 @@
 package nars.util.signal;
 
 import nars.util.data.Util;
-import nars.util.data.random.XorShift128PlusRandom;
-import org.apache.commons.math3.util.MathArrays;
 
-import java.util.Arrays;
 import java.util.Random;
 
 /**

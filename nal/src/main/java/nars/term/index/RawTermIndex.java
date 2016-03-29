@@ -1,15 +1,11 @@
 package nars.term.index;
 
 import nars.concept.ConceptBuilder;
-import nars.nal.meta.PatternCompound;
-import nars.nal.meta.PremiseRule;
-import nars.term.Compound;
 import nars.term.TermBuilder;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
 import java.util.Map;

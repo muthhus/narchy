@@ -1,10 +1,10 @@
 package alice.tuprolog.interfaces;
 
-import java.util.HashMap;
-
 import alice.tuprolog.OperatorManager;
 import alice.tuprolog.Parser;
 import alice.tuprolog.Term;
+
+import java.util.HashMap;
 
 public class ParserFactory {
 	

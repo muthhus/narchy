@@ -10,8 +10,9 @@
 package alice.tuprologx.pj.engine;
 
 import alice.tuprolog.Solution;
-import alice.tuprologx.pj.model.*;
 import alice.tuprolog.UnknownVarException;
+import alice.tuprologx.pj.model.Term;
+
 import java.util.List;
 import java.util.Vector;
 

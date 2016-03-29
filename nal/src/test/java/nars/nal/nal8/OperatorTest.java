@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import nars.$;
 import nars.NAR;
 import nars.Op;
-import nars.budget.Budget;
 import nars.nar.Default;
 import nars.nar.Terminal;
 import nars.task.Task;

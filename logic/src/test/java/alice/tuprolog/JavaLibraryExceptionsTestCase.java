@@ -1,8 +1,8 @@
 package alice.tuprolog;
 
-import java.io.File;
-
 import junit.framework.TestCase;
+
+import java.io.File;
 
 /**
  * @author Matteo Iuliani

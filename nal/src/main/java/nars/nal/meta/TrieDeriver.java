@@ -1,6 +1,5 @@
 package nars.nal.meta;
 
-import alice.tuprologx.pj.model.Bool;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import javassist.*;

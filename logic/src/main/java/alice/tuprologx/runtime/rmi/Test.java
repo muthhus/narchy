@@ -1,9 +1,10 @@
 package alice.tuprologx.runtime.rmi;
 
-import alice.tuprolog.*;
+import alice.tuprolog.Solution;
 
-import java.rmi.*;
-import java.rmi.registry.*;
+import java.rmi.Naming;
+import java.rmi.RMISecurityManager;
+import java.rmi.registry.LocateRegistry;
 
 public class Test
 {

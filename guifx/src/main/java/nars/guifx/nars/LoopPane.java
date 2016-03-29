@@ -8,7 +8,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.VBox;
 import nars.NAR;
 import nars.NARLoop;
 import nars.guifx.JFX;

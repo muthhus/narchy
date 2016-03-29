@@ -174,8 +174,8 @@ public enum Op {
     public static boolean isOperation(@NotNull Term t) {
         if (t.op() == Op.INHERIT) {
             Compound c = (Compound) t;
-            return c.term(1, Op.OPERATOR) &&
-                   c.term(0, Op.PRODUCT);
+            return c.isTerm(1, Op.OPERATOR) &&
+                   c.isTerm(0, Op.PRODUCT);
         }
         return false;
                 //(!c.impossibleStructureMatch(OperationBits)) &&

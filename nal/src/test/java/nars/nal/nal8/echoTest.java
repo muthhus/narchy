@@ -1,10 +1,7 @@
 package nars.nal.nal8;
 
-import nars.$;
 import nars.nar.Default;
 import org.junit.Test;
-
-import static org.junit.Assert.assertTrue;
 
 /**
  * Test for command tasks, specifically 'echo'

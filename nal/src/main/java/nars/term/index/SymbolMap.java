@@ -1,7 +1,5 @@
 package nars.term.index;
 
-import nars.concept.AtomConcept;
-import nars.concept.Concept;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atomic;

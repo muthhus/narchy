@@ -1,6 +1,5 @@
 package nars;
 
-import nars.NAR;
 import nars.nar.Default;
 import nars.op.in.NQuadsRDF;
 import org.junit.Test;

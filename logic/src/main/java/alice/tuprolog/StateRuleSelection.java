@@ -17,10 +17,10 @@
  */
 package alice.tuprolog;
 
-import java.util.List;
-import java.util.ArrayList;
-
 import alice.util.OneWayList;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Alex Benini

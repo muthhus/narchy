@@ -1,12 +1,21 @@
 package alice.tuprologx.pj.engine;
 
-import alice.tuprologx.pj.annotations.*;
-import alice.tuprologx.pj.annotations.parser.*;
-import alice.tuprologx.pj.annotations.parser.PrologTree.*;
-import alice.tuprologx.pj.model.*;
+import alice.tuprologx.pj.annotations.PrologMethod;
+import alice.tuprologx.pj.annotations.TRACE;
+import alice.tuprologx.pj.annotations.parser.Parser;
+import alice.tuprologx.pj.annotations.parser.PrologTree.SignatureExpr;
+import alice.tuprologx.pj.annotations.parser.PrologTree.VariableExpr;
+import alice.tuprologx.pj.model.Cons;
+import alice.tuprologx.pj.model.Nil;
+import alice.tuprologx.pj.model.Term;
+import alice.tuprologx.pj.model.Var;
 
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
+import java.util.Iterator;
+import java.util.Vector;
 
 
 /**

@@ -136,7 +136,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 //    }
 
     static boolean subjectOrPredicateIsIndependentVar(@NotNull Compound t) {
-        return t.hasVarIndep() && ((t.term(0, Op.VAR_INDEP) || t.term(1, Op.VAR_INDEP)));
+        return t.hasVarIndep() && ((t.isTerm(0, Op.VAR_INDEP) || t.isTerm(1, Op.VAR_INDEP)));
     }
 
 
@@ -807,7 +807,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
         if (t.levelValid( memory.nal() )) {
             if (t.op().isStatement()) {
                 Compound ct = (Compound)t;
-                if (ct.term(0, Op.VAR_INDEP) || ct.term(1, Op.VAR_INDEP))
+                if (ct.isTerm(0, Op.VAR_INDEP) || ct.isTerm(1, Op.VAR_INDEP))
                     return false;
             }
 

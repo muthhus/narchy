@@ -11,13 +11,11 @@ import javafx.scene.paint.Color;
 import javafx.scene.transform.Scale;
 import javafx.stage.Popup;
 import nars.NAR;
-import nars.Op;
 import nars.bag.BLink;
 import nars.budget.Budgeted;
 import nars.guifx.TaskPane;
 import nars.guifx.graph2.TermNode;
 import nars.guifx.graph2.scene.DefaultNodeVis;
-import nars.guifx.util.ColorMatrix;
 import nars.guifx.util.NSlider;
 import nars.task.Task;
 import nars.term.Termed;
@@ -26,8 +24,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static javafx.scene.paint.Color.hsb;
 
 /**
  * Created by me on 12/13/15.

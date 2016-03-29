@@ -5,8 +5,6 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.Random;
 
-import static org.junit.Assert.*;
-
 /**
  * Created by me on 2/18/16.
  */

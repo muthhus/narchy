@@ -1,8 +1,6 @@
 package nars.util;
 
-import com.sun.tools.classfile.ConstantPool;
 import nars.$;
-import nars.Narsese;
 import nars.Op;
 import nars.Symbols;
 import nars.concept.AtomConcept;

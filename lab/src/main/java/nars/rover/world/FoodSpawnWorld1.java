@@ -4,8 +4,8 @@
  */
 package nars.rover.world;
 
-import nars.rover.obj.Material;
 import nars.rover.Sim;
+import nars.rover.obj.Material;
 
 /**
  *

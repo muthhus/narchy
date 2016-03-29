@@ -4,7 +4,6 @@ import nars.concept.AtomConcept;
 import nars.concept.Concept;
 import nars.term.Term;
 import nars.term.atom.Atomic;
-import nars.term.index.RadixTreeSymbolMap;
 import org.junit.Test;
 
 import java.util.function.Function;

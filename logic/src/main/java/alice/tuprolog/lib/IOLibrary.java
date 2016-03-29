@@ -20,8 +20,8 @@ package alice.tuprolog.lib;
 import alice.tuprolog.*;
 import alice.tuprolog.Number;
 
-import java.util.*;
 import java.io.*;
+import java.util.Random;
 
 /**
  * This class provides basic I/O predicates.

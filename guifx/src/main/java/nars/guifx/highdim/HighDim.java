@@ -2,12 +2,7 @@ package nars.guifx.highdim;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.google.common.base.Joiner;
-import com.google.common.cache.CacheBuilder;
-import com.thoughtworks.xstream.core.util.WeakCache;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
-import nars.Global;
 import nars.bag.BLink;
 import nars.bag.Table;
 import nars.concept.Concept;
@@ -22,13 +17,8 @@ import nars.util.data.list.FasterList;
 import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.signal.Autoencoder;
 import org.jetbrains.annotations.NotNull;
-import org.reactfx.collection.LiveArrayList;
 
-import java.lang.reflect.Array;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import java.util.List;
 
 import static javafx.application.Platform.runLater;
 

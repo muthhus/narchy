@@ -8,7 +8,9 @@
  */
 package alice.util.jedit;
 
-import javax.swing.text.*;
+import javax.swing.text.Segment;
+import javax.swing.text.TabExpander;
+import javax.swing.text.Utilities;
 import java.awt.*;
 
 /**

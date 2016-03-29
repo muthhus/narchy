@@ -9,7 +9,6 @@ import nars.nar.Terminal;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.atom.Atom;
 import org.junit.Test;
 
 import static nars.io.NarseseTest.task;

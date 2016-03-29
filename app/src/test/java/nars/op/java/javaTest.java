@@ -8,7 +8,7 @@ import org.junit.Test;
 
 import java.lang.reflect.InvocationTargetException;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 
 public class javaTest  {

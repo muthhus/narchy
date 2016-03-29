@@ -1,10 +1,7 @@
 package org.jewelsea.willow.logger;
 
-import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
-
-import java.io.IOException;
 
 abstract public class FXConsoleAppender extends AppenderBase<ILoggingEvent> {
   static int DEFAULT_LIMIT = 10;

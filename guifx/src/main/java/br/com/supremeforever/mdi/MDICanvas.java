@@ -1,19 +1,18 @@
 package br.com.supremeforever.mdi;
 
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
+import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.layout.AnchorPane;
+import org.jetbrains.annotations.NotNull;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-
-import javafx.beans.value.ChangeListener;
-import javafx.geometry.Point2D;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by brisatc171.minto on 12/11/2015.

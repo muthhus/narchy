@@ -2,7 +2,6 @@ package nars.guifx;
 
 import javafx.scene.Node;
 import nars.Global;
-import nars.Memory;
 import nars.NAR;
 import nars.concept.Concept;
 

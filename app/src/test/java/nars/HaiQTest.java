@@ -1,9 +1,8 @@
 package nars;
 
-import nars.NAR;
-import nars.op.java.Lobjects;
 import nars.nar.Default;
 import nars.op.NarQ;
+import nars.op.java.Lobjects;
 import org.junit.Ignore;
 import org.junit.Test;
 

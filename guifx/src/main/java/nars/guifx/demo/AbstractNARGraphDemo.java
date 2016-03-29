@@ -3,20 +3,13 @@ package nars.guifx.demo;
 import nars.guifx.graph2.ConceptsSource;
 import nars.guifx.graph2.TermEdge;
 import nars.guifx.graph2.impl.HalfHalfIsoTriangleCanvasEdgeRenderer;
-import nars.guifx.graph2.impl.HalfHalfLineCanvasEdgeRenderer;
 import nars.guifx.graph2.impl.HexButtonVis;
-import nars.guifx.graph2.impl.SubButtonVis;
-import nars.guifx.graph2.layout.Grid;
-import nars.guifx.graph2.layout.Spiral;
-import nars.guifx.graph2.scene.DefaultNodeVis;
 import nars.guifx.graph2.source.DefaultGrapher;
 import nars.guifx.graph2.source.SpaceGrapher;
 import nars.guifx.util.TabX;
 import nars.nar.Default;
 
 import java.util.function.Consumer;
-
-import static javafx.application.Platform.runLater;
 
 /**
  * Created by me on 8/15/15.

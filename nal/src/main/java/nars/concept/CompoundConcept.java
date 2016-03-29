@@ -9,6 +9,7 @@ import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +24,7 @@ import java.util.function.Consumer;
 import static nars.nal.Tense.DTERNAL;
 
 
-public class CompoundConcept extends AbstractConcept<Compound> implements Compound {
+public class CompoundConcept extends AbstractConcept<GenericCompound> implements Compound {
 
 //    public static final BiPredicate<Task, Task> questionEquivalence = new BiPredicate<Task, Task>() {
 //
@@ -62,21 +63,21 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
      * @param termLinks
      * @param taskLinks
      */
-    public CompoundConcept(@NotNull Compound term, Bag<Termed> termLinks, Bag<Task> taskLinks) {
+    public CompoundConcept(@NotNull GenericCompound term, Bag<Termed> termLinks, Bag<Task> taskLinks) {
         super(term, taskLinks, termLinks);
     }
 
     public CompoundConcept(@NotNull String compoundTermString, @NotNull NAR n) throws Narsese.NarseseException {
-        this((Compound) $.$(compoundTermString), n);
+        this((GenericCompound) $.$(compoundTermString), n);
     }
 
     /** used for setting an explicit OperationConcept instance via java; activates it on initialization */
-    public CompoundConcept(@NotNull Compound term, @NotNull NAR n) {
+    public CompoundConcept(@NotNull GenericCompound term, @NotNull NAR n) {
         this(term, n.index.conceptBuilder());
     }
 
     /** default construction by a NAR on conceptualization */
-    public CompoundConcept(@NotNull Compound term, @NotNull ConceptBuilder b) {
+    public CompoundConcept(@NotNull GenericCompound term, @NotNull ConceptBuilder b) {
         this(term, b.termbag(), b.taskbag());
     }
 
@@ -789,18 +790,23 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
 
 
     @Override
-    public @NotNull TermContainer subterms() {
-        return term.subterms();
+    public final @NotNull TermContainer subterms() {
+        return term.subterms;
+    }
+
+    @Override
+    public final int opRel() {
+        return term.opRel();
     }
 
     @Override
     public final int relation() {
-        return term.relation();
+        return term.relation;
     }
 
     @Override @NotNull
     public final Op op() {
-        return term.op();
+        return term.op;
     }
 
     @Override
@@ -862,6 +868,11 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
     @Override
     public final Term term(int i) {
         return term.term(i);
+    }
+
+    @Override
+    public boolean isTerm(int i, @NotNull Op o) {
+        return false;
     }
 
     @Override

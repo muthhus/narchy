@@ -1,21 +1,14 @@
 package nars.term.index;
 
-import com.gs.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
-import nars.concept.ConceptBuilder;
 import nars.nal.meta.PatternCompound;
 import nars.nal.meta.PremiseRule;
 import nars.term.Compound;
 import nars.term.Termed;
 import nars.term.Terms;
-import nars.term.atom.Atomic;
-import nars.util.data.map.UnifriedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
-import java.util.concurrent.ConcurrentHashMap;
-
-import static nars.$.$;
 
 /**
  * Index which specifically holds the term components of a deriver ruleset.

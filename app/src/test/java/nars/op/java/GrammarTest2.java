@@ -8,7 +8,6 @@ import nars.nar.Default;
 import nars.op.NarQ;
 import nars.task.Task;
 import nars.util.data.Util;
-
 import org.apache.commons.lang3.mutable.MutableFloat;
 
 import java.util.ArrayList;

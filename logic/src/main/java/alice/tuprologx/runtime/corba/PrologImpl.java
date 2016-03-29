@@ -1,8 +1,10 @@
 package alice.tuprologx.runtime.corba;
 
-import alice.tuprolog.*;
+import alice.tuprolog.InvalidLibraryException;
+import alice.tuprolog.Solution;
+import alice.tuprolog.Theory;
 
-import  java.io.*;
+import java.io.ByteArrayInputStream;
 
 
 @SuppressWarnings("serial")

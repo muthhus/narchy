@@ -2,7 +2,7 @@ package nars.guifx.concept;
 
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.layout.*;
+import javafx.scene.layout.StackPane;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.guifx.NARfx;

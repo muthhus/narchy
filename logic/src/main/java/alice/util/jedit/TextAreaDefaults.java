@@ -8,8 +8,8 @@
  */
 package alice.util.jedit;
 
-import javax.swing.JPopupMenu;
-import java.awt.Color;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * Encapsulates default settings for a text area. This can be passed

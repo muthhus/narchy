@@ -6,7 +6,6 @@ import nars.budget.Budgeted;
 import nars.nal.Tense;
 import nars.task.Task;
 import nars.truth.Truth;
-import nars.truth.TruthWave;
 import nars.truth.Truthed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

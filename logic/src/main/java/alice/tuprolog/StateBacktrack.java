@@ -17,9 +17,9 @@
  */
 package alice.tuprolog;
 
-import java.util.*;
-
 import alice.util.OneWayList;
+
+import java.util.List;
 
 
 /**

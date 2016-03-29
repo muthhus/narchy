@@ -1,8 +1,9 @@
 package alice.tuprologx.runtime.rmi;
-import alice.tuprolog.*;
-import  java.io.*;
 
-import java.rmi.*;
+import alice.tuprolog.*;
+
+import java.io.Serializable;
+import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
 @SuppressWarnings("serial")

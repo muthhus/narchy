@@ -26,9 +26,13 @@
 package nars.rover;
 
 import nars.rover.obj.Collidable;
-import nars.rover.physics.*;
+import nars.rover.physics.ContactPoint;
+import nars.rover.physics.Display;
 import nars.rover.util.Bodies;
-import org.jbox2d.callbacks.*;
+import org.jbox2d.callbacks.ContactImpulse;
+import org.jbox2d.callbacks.ContactListener;
+import org.jbox2d.callbacks.DestructionListener;
+import org.jbox2d.callbacks.QueryCallback;
 import org.jbox2d.collision.Collision;
 import org.jbox2d.collision.Collision.PointState;
 import org.jbox2d.collision.Manifold;

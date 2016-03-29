@@ -17,11 +17,11 @@
  */
 package alice.tuprolog;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.*;
-
 import alice.tuprolog.interfaces.IPrimitiveManager;
 import com.gs.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
 
 
 /**

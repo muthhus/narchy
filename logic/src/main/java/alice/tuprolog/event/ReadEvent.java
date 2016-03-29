@@ -1,8 +1,8 @@
 package alice.tuprolog.event;
 
-import java.util.EventObject;
-
 import alice.tuprolog.lib.UserContextInputStream;
+
+import java.util.EventObject;
 
 public class ReadEvent extends EventObject {
 

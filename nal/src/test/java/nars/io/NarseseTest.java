@@ -1,11 +1,11 @@
 package nars.io;
 
 import nars.*;
-import nars.term.Operator;
 import nars.nar.Terminal;
 import nars.op.out.echo;
 import nars.task.Task;
 import nars.term.Compound;
+import nars.term.Operator;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
@@ -14,7 +14,6 @@ import nars.truth.Truth;
 import org.junit.Test;
 
 import java.util.List;
-import java.util.function.Supplier;
 
 import static org.junit.Assert.*;
 

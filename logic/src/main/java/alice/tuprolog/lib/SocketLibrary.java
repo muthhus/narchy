@@ -1,34 +1,20 @@
 package alice.tuprolog.lib;
 
+import alice.tuprolog.*;
+import alice.tuprolog.interfaces.ISocketLib;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.SocketException;
-import java.net.UnknownHostException;
+import java.net.*;
 import java.util.LinkedList;
 import java.util.concurrent.Semaphore;
 import java.util.regex.Pattern;
 
-import alice.tuprolog.AbstractSocket;
-import alice.tuprolog.Client_Socket;
-import alice.tuprolog.Datagram_Socket;
-import alice.tuprolog.Int;
-import alice.tuprolog.Library;
 //import alice.tuprolog.MalformedGoalException;
 //import alice.tuprolog.NoSolutionException;
-import alice.tuprolog.Prolog;
-import alice.tuprolog.PrologError;
-import alice.tuprolog.Server_Socket;
 //import alice.tuprolog.SolveInfo;
-import alice.tuprolog.Struct;
-import alice.tuprolog.Term;
-import alice.tuprolog.interfaces.*;
 
 /**
  * 

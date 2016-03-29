@@ -18,8 +18,8 @@
 package alice.tuprolog;
 
 import java.io.*;
-import java.util.LinkedList;
 import java.util.Arrays;
+import java.util.LinkedList;
 
 /**
  * BNF for tuProlog

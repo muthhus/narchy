@@ -1,8 +1,6 @@
 package nars.util.data.sorted;
 
 
-import org.jetbrains.annotations.NotNull;
-
 import java.io.PrintStream;
 import java.util.Collection;
 import java.util.List;

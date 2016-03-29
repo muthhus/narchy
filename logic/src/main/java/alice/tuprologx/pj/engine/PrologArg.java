@@ -1,6 +1,6 @@
 package alice.tuprologx.pj.engine;
 
-import alice.tuprologx.pj.model.*;
+import alice.tuprologx.pj.model.Term;
 /**
  *
  * @author maurizio

@@ -413,7 +413,7 @@ public abstract class TermBuilder {
         Term predicate = u[1];
 
         if (subject.equals(predicate))
-            return subject;
+            return null; //subject;
 
         //DEBUG:
         //if (subject == null || predicate == null)

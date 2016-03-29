@@ -3,8 +3,6 @@ package nars.guifx.concept;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.FlowPane;
 import nars.NAR;

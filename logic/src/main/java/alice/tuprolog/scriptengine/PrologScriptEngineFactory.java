@@ -4,14 +4,14 @@
  */
 package alice.tuprolog.scriptengine;
 
+import alice.util.VersionInfo;
+
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineFactory;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineFactory;
-
-import alice.util.VersionInfo;
 
 /**
 * Implementation of the ScriptEngineFactory interface

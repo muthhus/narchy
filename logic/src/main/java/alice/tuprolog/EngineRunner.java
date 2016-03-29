@@ -4,8 +4,8 @@
  */
 package alice.tuprolog;
 
-import java.util.LinkedList;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.locks.Condition;

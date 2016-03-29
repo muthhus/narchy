@@ -1,8 +1,6 @@
 package nars.rover.run;
 
 import com.artemis.Entity;
-import com.jogamp.newt.event.WindowEvent;
-import com.jogamp.opengl.GL2;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ToggleButton;
@@ -22,7 +20,6 @@ import nars.nar.AbstractNAR;
 import nars.nar.Default;
 import nars.rover.Sim;
 import nars.rover.obj.*;
-import nars.rover.physics.gl.Box2DJoglPanel;
 import nars.rover.run.SomeRovers.ManualControl.ManualOverride;
 import nars.rover.world.FoodSpawnWorld1;
 import nars.term.TermIndex;
@@ -39,10 +36,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static javafx.application.Platform.runLater;
-import static jurls.core.utils.Utils.q;
 import static nars.guifx.NARfx.newWindow;
 import static nars.guifx.NARfx.scrolled;
-import static nars.rover.obj.AbstractPolygonBot.newTriangle;
 import static nars.rover.obj.NARover.*;
 
 /**

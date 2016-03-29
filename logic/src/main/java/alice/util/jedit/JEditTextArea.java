@@ -8,13 +8,21 @@
  */
 package alice.util.jedit;
 
-import javax.swing.event.*;
-import javax.swing.text.*;
-import javax.swing.undo.*;
 import javax.swing.*;
-import java.awt.datatransfer.*;
-import java.awt.event.*;
+import javax.swing.event.*;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Element;
+import javax.swing.text.Segment;
+import javax.swing.text.Utilities;
+import javax.swing.undo.AbstractUndoableEdit;
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
+import javax.swing.undo.UndoableEdit;
 import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.*;
 import java.util.Enumeration;
 import java.util.Vector;
 

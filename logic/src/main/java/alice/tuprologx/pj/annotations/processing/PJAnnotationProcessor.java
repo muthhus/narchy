@@ -9,22 +9,32 @@
 
 package alice.tuprologx.pj.annotations.processing;
 
-import static alice.tuprologx.pj.annotations.processing.ProcessorMessages.*;
-import javax.lang.model.SourceVersion;
-
-
-import javax.lang.model.type.*;
-import javax.lang.model.util.*;
-import javax.lang.model.element.*;
-import javax.annotation.processing.*;
-import static javax.tools.Diagnostic.Kind.*;
-import alice.tuprologx.pj.annotations.*;
-import alice.tuprologx.pj.model.*;
-import alice.tuprologx.pj.annotations.parser.PrologTree.*;
+import alice.tuprologx.pj.annotations.PrologClass;
+import alice.tuprologx.pj.annotations.PrologField;
+import alice.tuprologx.pj.annotations.PrologMethod;
 import alice.tuprologx.pj.annotations.parser.Parser;
+import alice.tuprologx.pj.annotations.parser.PrologTree.PredicateExpr;
+import alice.tuprologx.pj.annotations.parser.PrologTree.SignatureExpr;
+import alice.tuprologx.pj.annotations.parser.PrologTree.VariableExpr;
+import alice.tuprologx.pj.model.Term;
+import alice.tuprologx.pj.model.Theory;
 
-
+import javax.annotation.processing.Completion;
+import javax.annotation.processing.ProcessingEnvironment;
+import javax.annotation.processing.Processor;
+import javax.annotation.processing.RoundEnvironment;
+import javax.lang.model.SourceVersion;
+import javax.lang.model.element.*;
+import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeMirror;
+import javax.lang.model.type.WildcardType;
+import javax.lang.model.util.ElementScanner6;
+import javax.lang.model.util.Types;
 import java.util.*;
+
+import static alice.tuprologx.pj.annotations.processing.ProcessorMessages.*;
+import static javax.tools.Diagnostic.Kind.ERROR;
+import static javax.tools.Diagnostic.Kind.WARNING;
 
 /**
  *

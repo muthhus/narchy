@@ -3,9 +3,9 @@ package nars.guifx;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
-import nars.Memory;
 import nars.NAR;
 import nars.guifx.chart.Plot2D;
 import nars.guifx.util.NSlider;
@@ -16,7 +16,6 @@ import nars.util.event.Active;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import java.io.File;
-import java.io.FileInputStream;
 
 import static javafx.application.Platform.runLater;
 

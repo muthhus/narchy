@@ -3,11 +3,9 @@ package nars.term.compound;
 import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
 import nars.Op;
 import nars.nal.Tense;
-import nars.term.Compound;
-import nars.term.Term;
-import nars.term.TermPrinter;
-import nars.term.Termed;
+import nars.term.*;
 import nars.term.container.TermContainer;
+import nars.term.container.TermVector;
 import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,14 +19,12 @@ import static nars.nal.Tense.DTERNAL;
 
 public class GenericCompound<T extends Term> implements Compound<T> {
 
-    @NotNull
-    public final Op op;
 
     /**
      * subterm vector
      */
     @NotNull
-    public final TermContainer<T> subterms;
+    public final TermVector<T> subterms;
 
     /**
      * subterm relation, resolves to unique concept
@@ -40,8 +36,12 @@ public class GenericCompound<T extends Term> implements Compound<T> {
      */
     public final int dt;
 
+    /** content hash */
+    public final int hash;
 
-    private final transient int hash;
+    public final Op op;
+
+
     public transient boolean normalized;
 
 
@@ -50,16 +50,17 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     }
 
     public GenericCompound(@NotNull Op op, int relation, @NotNull TermContainer subterms) {
-        this(op, relation, Tense.DTERNAL, subterms);
+        this(op, relation, Tense.DTERNAL, (TermVector<T>) subterms);
     }
 
-    public GenericCompound(@NotNull Op op, int relation, int dt, @NotNull TermContainer subterms) {
+    public GenericCompound(@NotNull Op op, int relation, int dt, @NotNull TermVector subterms) {
         if (!op.isTemporal() && dt != DTERNAL)
             throw new RuntimeException("invalid temporal relation for " + op);
 
 
         this.subterms = subterms;
-        this.normalized = (subterms.vars() == 0) && (subterms.varPattern() == 0) /* not included in the count */;
+
+        this.normalized = (subterms.vars == 0) && (subterms.varPatterns == 0) /* not included in the count */;
         this.op = op;
 
 
@@ -68,12 +69,18 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
         this.relation = relation;
 
-        this.hash = Util.hashCombine(subterms.hashCode(), opRel(), dt);
+        this.hash = Util.hashCombine(subterms.hash, opRel(), dt);
     }
 
     @Override
-    public final boolean term(int i, @NotNull Op o) {
-        return subterms.term(i, o);
+    public final int opRel() {
+        return Terms.opRel(op, relation);
+    }
+
+    @Override
+    public final boolean isTerm(int i, @NotNull Op o) {
+        //return subterms.isTerm(i, o);
+        return subterms.term[i].op() == o;
     }
 
 //    protected GenericCompound(GenericCompound copy, int newT) {
@@ -95,7 +102,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     public final boolean isCommutative() {
         if (op.isCommutative() && size() > 1) {
             int t = dt();
-            return (t == DTERNAL || ((op == Op.CONJUNCTION && t == 0)));
+            return (t == DTERNAL || ((t == 0 && op == Op.CONJUNCTION)));
         }
         return false;
     }
@@ -171,7 +178,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
         boolean r = false;
         Term u = thatTerm.term();
-        if ((u.op() == op) /*&& (((t instanceof Compound))*/) {
+        if (op == u.op() /*&& (((t instanceof Compound))*/) {
             Compound c = (Compound) u;
             r = subterms.equals(c.subterms())
                     && (relation == c.relation())
@@ -189,38 +196,34 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
     @Override
     public final int varDep() {
-        return subterms.varDep();
+        return subterms.varDeps;
     }
 
     @Override
     public final int varIndep() {
-        return subterms.varIndep();
+        return subterms.varIndeps;
     }
 
     @Override
     public final int varQuery() {
-        return subterms.varQuery();
+        return subterms.varQueries;
     }
 
     @Override
     public final int varPattern() {
-        return subterms.varPattern();
+        return subterms.varPatterns;
     }
 
 
     @Override
     public final int vars() {
-        return subterms.vars();
+        return subterms.vars;
     }
 
 //    public final Term[] cloneTermsReplacing(int index, Term replaced) {
 //        return terms.cloneTermsReplacing(index, replaced);
 //    }
 
-    @Override
-    public final boolean isEmpty() {
-        return subterms.isEmpty();
-    }
 
     @Override
     public final boolean contains(Object o) {

@@ -17,9 +17,9 @@
  */
 package alice.tuprolog.event;
 
-import java.util.*;
-
 import alice.tuprolog.Engine;
+
+import java.util.EventObject;
 
 /**
  *  This class defines an internal event

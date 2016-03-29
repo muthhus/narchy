@@ -1,10 +1,7 @@
 package nars.nal.meta;
 
-import nars.term.Term;
 import nars.term.atom.AtomicStringConstant;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
 
 /**
  * each precondition is testesd for equality by its toString() method reprsenting an immutable key.

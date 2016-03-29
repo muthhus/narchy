@@ -1,9 +1,11 @@
 package alice.tuprolog;
 
-import java.util.*;
-
 import alice.util.OneWayList;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
 
 /**
  * A list of clauses belonging to the same family as a goal. A family is

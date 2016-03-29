@@ -1,16 +1,16 @@
 package nars.term.index;
 
-import nars.concept.Concept;
 import nars.concept.ConceptBuilder;
-import nars.nal.meta.match.Ellipsis;
-import nars.term.*;
+import nars.term.Compound;
+import nars.term.TermBuilder;
+import nars.term.TermIndex;
+import nars.term.Termed;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 
 public abstract class AbstractMapIndex implements TermIndex {

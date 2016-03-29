@@ -1,7 +1,6 @@
 package nars.util.signal;
 
 import nars.NAR;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Utility class for Thermodynamic analysis of system Budgets

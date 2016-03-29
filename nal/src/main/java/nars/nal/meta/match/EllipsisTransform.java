@@ -4,7 +4,6 @@ import nars.Op;
 import nars.nal.meta.PremiseRule;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Termed;
 import nars.term.transform.VariableNormalization;
 import nars.term.transform.subst.FindSubst;
 import nars.term.variable.AbstractVariable;

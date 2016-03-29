@@ -2,7 +2,6 @@ package nars.perf.nars.nar.perf;
 
 
 import clojure.lang.Dynajure;
-
 import nars.NAR;
 import nars.nar.Default;
 import org.openjdk.jmh.annotations.Benchmark;
@@ -10,8 +9,6 @@ import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.runner.RunnerException;
 
-import static clojure.lang.Compiler.eval;
-import static nars.$.$;
 import static nars.perf.Main.perf;
 
 public class ClojureBenchmark {

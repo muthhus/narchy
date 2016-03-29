@@ -1,6 +1,6 @@
 package alice.tuprologx.spyframe;
 
-import java.awt.Color;
+import java.awt.*;
 
 /**Nodes are the constituing element of a tree.
  * @author franz.beslmeisl at googlemail.com

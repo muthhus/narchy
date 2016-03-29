@@ -1,7 +1,9 @@
 package alice.tuprologx.runtime.tcp;
 
 import alice.tuprolog.*;
-import  java.io.*;
+
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 @SuppressWarnings("serial")
 public class PrologImpl implements java.io.Serializable {

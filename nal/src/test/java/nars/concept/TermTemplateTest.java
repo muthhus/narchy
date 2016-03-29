@@ -2,14 +2,13 @@ package nars.concept;
 
 import com.google.common.base.Joiner;
 import nars.NAR;
-import nars.budget.UnitBudget;
 import nars.nar.Default;
 import nars.task.Task;
 import org.junit.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by me on 3/21/16.

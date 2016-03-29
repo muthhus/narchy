@@ -1,8 +1,9 @@
 package alice.tuprologx.runtime.rmi;
 
-import java.rmi.*;
-import java.rmi.registry.*;
 import java.net.InetAddress;
+import java.rmi.Naming;
+import java.rmi.RMISecurityManager;
+import java.rmi.registry.LocateRegistry;
 
 public class Daemon {
 

@@ -4,9 +4,7 @@ import nars.Global;
 import nars.NAR;
 import nars.nar.Default;
 import nars.task.Task;
-import nars.util.time.Between;
 import nars.util.time.IntervalTree;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Set;

@@ -1,6 +1,8 @@
 package alice.tuprologx.runtime.tcp;
 
-import alice.tuprolog.*;
+import alice.tuprolog.Solution;
+import alice.tuprolog.Term;
+import alice.tuprolog.Theory;
 
 public interface Prolog {
 

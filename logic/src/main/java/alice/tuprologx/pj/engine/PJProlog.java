@@ -11,9 +11,11 @@ package alice.tuprologx.pj.engine;
 
 
 import alice.tuprolog.Solution;
-import alice.tuprologx.pj.model.*;
+import alice.tuprologx.pj.model.Term;
+import alice.tuprologx.pj.model.Theory;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  *

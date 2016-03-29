@@ -1,13 +1,10 @@
 package nars.rover.obj;
 
-import nars.Global;
 import nars.concept.Concept;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.*;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
 
 /**
  * Created by me on 8/3/15.

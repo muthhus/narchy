@@ -21,7 +21,6 @@
  */
 package objenome.solver.evolve.selection;
 
-import nars.util.data.random.XORShiftRandom;
 import nars.util.data.random.XorShift128PlusRandom;
 import objenome.goal.DoubleFitness;
 import objenome.solver.evolve.*;

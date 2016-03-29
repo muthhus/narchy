@@ -1,12 +1,11 @@
 package alice.tuprologx.spyframe;
 
 
+import javax.swing.*;
 import java.awt.*;
-import java.awt.Color;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
-import javax.swing.JComponent;
 
 /** Representation of a tree with spacing. Every node is centered above its
  * children nodes. To assure this the spacing can only be changed by remeasuring

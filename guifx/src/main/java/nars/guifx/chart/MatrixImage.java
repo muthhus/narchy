@@ -17,14 +17,9 @@
  */
 package nars.guifx.chart;
 
-import com.gs.collections.api.block.function.primitive.IntToFloatFunction;
-import com.gs.collections.api.block.function.primitive.IntToIntFunction;
-import javafx.scene.effect.Effect;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
-import javafx.scene.paint.Color;
 
 
 /**

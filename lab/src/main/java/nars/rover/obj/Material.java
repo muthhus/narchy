@@ -1,10 +1,8 @@
 package nars.rover.obj;
 
 import com.artemis.Component;
-import nars.rover.Sim;
 import nars.rover.physics.gl.JoglAbstractDraw;
 import org.jbox2d.common.Color3f;
-import org.jbox2d.dynamics.Body;
 
 /**
  * Created by me on 7/18/15.

@@ -1,17 +1,15 @@
 package nars.op;
 
 
-import java.io.*;
-import java.text.DateFormat;
-import java.util.*;
-
-import com.google.common.collect.Lists;
-import nars.$;
 import nars.NAR;
 import nars.nar.Default;
 import nars.op.java.Lobjects;
 import org.apache.commons.vfs2.*;
 import org.apache.commons.vfs2.operations.FileOperationProvider;
+
+import java.io.*;
+import java.text.DateFormat;
+import java.util.*;
 
 /**
  * Created by me on 2/24/16.

@@ -1,25 +1,16 @@
 package nars.nal.nal6;
 
-import nars.Global;
 import nars.NAR;
 import nars.nal.AbstractNALTest;
 import nars.nal.Tense;
 import nars.nar.Default;
-import nars.task.Task;
-import nars.util.data.Util;
-import nars.util.signal.TestNAR;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.function.Supplier;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 
 @RunWith(Parameterized.class)

@@ -1,9 +1,9 @@
 package alice.util.proxyGenerator;
+
 import javax.tools.*;
-
-
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.Arrays;
 
 /* This class uses the private static "defineClass0" method found in Proxy to add the class into the ClassLoader: 
  * an exception is raised if the class already exists in that class loader. 

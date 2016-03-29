@@ -5,8 +5,6 @@ import nars.Op;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-
 import static nars.Op.ATOM;
 
 /**

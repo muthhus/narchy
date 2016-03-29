@@ -17,7 +17,10 @@
  */
 package alice.tuprolog;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Customized HashMap for storing clauses in the TheoryManager

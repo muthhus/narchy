@@ -21,15 +21,12 @@
 package nars.budget;
 
 import nars.Memory;
-import nars.NAR;
 import nars.bag.BLink;
 import nars.concept.ConceptProcess;
 import nars.nal.UtilityFunctions;
 import nars.task.Task;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.Termlike;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

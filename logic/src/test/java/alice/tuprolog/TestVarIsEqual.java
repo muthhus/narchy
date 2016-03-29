@@ -1,8 +1,8 @@
 package alice.tuprolog;
 
-import junit.framework.TestCase;
 import alice.tuprolog.event.OutputEvent;
 import alice.tuprolog.event.OutputListener;
+import junit.framework.TestCase;
 
 
 

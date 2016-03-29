@@ -121,7 +121,7 @@ public final class TruthFunctions extends UtilityFunctions {
     }
 
     @Nullable
-    public static Truth revision(@NotNull Task ta, @NotNull Task tb, long now, float match, float confThreshold) {
+    public static Truth revision(@NotNull Task ta, @NotNull Task tb, long target, float match, float confThreshold) {
         Truth a = ta.truth();
         Truth b = tb.truth();
 
@@ -129,8 +129,8 @@ public final class TruthFunctions extends UtilityFunctions {
         long bt = tb.occurrence();
 
         //temporal proximity balancing metric (similar to projection)
-        long adt = Math.abs(at-now);
-        long bdt = Math.abs(bt-now);
+        long adt = Math.abs(at-target);
+        long bdt = Math.abs(bt-target);
         float closeness = (adt!=bdt) ? (bdt/(float)(adt+bdt)) : 0.5f;
 
         float w1 = c2w(a.conf()) * closeness;
@@ -138,7 +138,7 @@ public final class TruthFunctions extends UtilityFunctions {
 
         final float w = (w1 + w2);
         float newConf = w2c(w)
-                * temporalIntersection(now, at, bt)
+                * temporalIntersection(target, at, bt)
                 //* TruthFunctions.temporalProjectionOld(at, bt, now)
                 * match;
         if (newConf < confThreshold)
@@ -528,10 +528,17 @@ public final class TruthFunctions extends UtilityFunctions {
     }
 
     @NotNull
-    public static ProjectedTruth eternalize(@NotNull Truth t) {
+    public static Truth eternalize(@NotNull Truth t) {
+        float oldConf = t.conf();
+        float newConf = eternalize(oldConf);
+
+        if (Util.equals(oldConf, newConf, Global.TRUTH_EPSILON ))
+            return t; /* no change */
+
         return new ProjectedTruth(
                 t.freq(),
-                eternalize(t.conf()), Tense.ETERNAL
+                newConf,
+                Tense.ETERNAL
         );
     }
 

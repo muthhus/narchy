@@ -8,7 +8,7 @@ import nars.Narsese;
 import nars.concept.CompoundConcept;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Termed;
+import nars.term.compound.GenericCompound;
 import nars.util.FloatSupplier;
 import nars.util.data.Sensor;
 import org.jetbrains.annotations.NotNull;
@@ -28,11 +28,11 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
         this($.$(compoundTermString), n, input, direct);
     }
 
-    public SensorConcept(@NotNull Compound term, @NotNull NAR n, FloatSupplier input)  {
+    public SensorConcept(@NotNull GenericCompound term, @NotNull NAR n, FloatSupplier input)  {
         this(term, n, input, direct);
     }
 
-    public SensorConcept(@NotNull Compound term, @NotNull NAR n, FloatSupplier input, FloatToFloatFunction toFreq)  {
+    public SensorConcept(@NotNull GenericCompound term, @NotNull NAR n, FloatSupplier input, FloatToFloatFunction toFreq)  {
         super(term, n);
 
         this.sensor = new Sensor(n, this, this, toFreq);

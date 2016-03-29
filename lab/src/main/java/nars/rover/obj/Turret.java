@@ -1,7 +1,6 @@
 package nars.rover.obj;
 
 
-import nars.rover.Sim;
 import nars.rover.physics.gl.JoglAbstractDraw;
 import nars.rover.physics.j2d.LayerDraw;
 import nars.rover.util.Explosion;

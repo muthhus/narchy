@@ -8,7 +8,6 @@ import nars.term.container.TermVector;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Created by me on 12/31/15.

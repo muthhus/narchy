@@ -10,9 +10,6 @@ import org.junit.runners.Parameterized;
 
 import java.util.function.Supplier;
 
-import static nars.nal.Tense.ETERNAL;
-import static nars.nal.Tense.Present;
-
 /**
  * Created by me on 1/9/16.
  */
@@ -100,7 +97,7 @@ public class NAL7Test extends AbstractNALTest {
         test()
                 .believe("(x ==>+2 y)")
                 .believe("(y ==>+3 z)")
-                .mustBelieve(2, "(z ==>-5 x)", 1.00f, 0.45f);
+                .mustBelieve(5, "(z ==>-5 x)", 1.00f, 0.45f);
 
     }
 

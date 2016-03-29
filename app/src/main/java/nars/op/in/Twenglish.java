@@ -22,7 +22,6 @@ import nars.Global;
 import nars.NAR;
 import nars.Narsese;
 import nars.task.MutableTask;
-import nars.task.Task;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.util.io.Twokenize;

@@ -8,9 +8,11 @@
  */
 
 package alice.tuprologx.pj.model;
-import java.util.Vector;
-import java.util.HashMap;
+
 import alice.tuprologx.pj.annotations.Termifiable;
+
+import java.util.HashMap;
+import java.util.Vector;
 /**
  *
  * @author maurizio

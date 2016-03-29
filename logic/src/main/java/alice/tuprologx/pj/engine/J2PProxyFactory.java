@@ -16,23 +16,14 @@
 
 package alice.tuprologx.pj.engine;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Member;
-import java.lang.reflect.Modifier;
-import java.security.ProtectionDomain;
-import java.util.HashMap;
-import java.util.WeakHashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.lang.ref.WeakReference;
-
 import javassist.CannotCompileException;
 import javassist.bytecode.*;
 import javassist.util.proxy.*;
+
+import java.lang.ref.WeakReference;
+import java.lang.reflect.*;
+import java.security.ProtectionDomain;
+import java.util.*;
 
 /*
  * This class is impleme

@@ -21,8 +21,8 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.nal.Tense.ETERNAL;
 import static nars.nal.Tense.DTERNAL;
+import static nars.nal.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.eternalize;
 
 /**

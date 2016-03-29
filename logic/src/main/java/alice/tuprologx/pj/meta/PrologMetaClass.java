@@ -9,9 +9,13 @@
 
 package alice.tuprologx.pj.meta;
 
-import alice.tuprologx.pj.annotations.*;
-import alice.tuprologx.pj.model.*;
-import java.lang.reflect.*;
+import alice.tuprologx.pj.annotations.PrologClass;
+import alice.tuprologx.pj.annotations.PrologField;
+import alice.tuprologx.pj.annotations.PrologMethod;
+import alice.tuprologx.pj.model.Theory;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Vector;
 /**
  *

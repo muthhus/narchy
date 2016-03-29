@@ -5,11 +5,11 @@ package alice.tuprolog.lib;
  */
 
 import alice.tuprolog.*;
-import alice.tuprolog.Number;
 import alice.tuprolog.Long;
+import alice.tuprolog.Number;
 
-import java.util.*;
 import java.io.*;
+import java.util.*;
 
 /**
  * This class provides basic ISO I/O predicates.

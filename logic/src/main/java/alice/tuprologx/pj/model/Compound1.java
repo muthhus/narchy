@@ -1,6 +1,7 @@
 package alice.tuprologx.pj.model;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Vector;
 
 /**
  *

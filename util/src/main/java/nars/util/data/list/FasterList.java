@@ -1,7 +1,5 @@
 package nars.util.data.list;
 
-import com.gs.collections.api.list.MutableList;
-import com.gs.collections.api.tuple.Pair;
 import com.gs.collections.impl.list.mutable.FastList;
 import org.jetbrains.annotations.Nullable;
 

@@ -2,8 +2,6 @@ package nars.guifx.graph2.impl;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.transform.Affine;
-import javafx.scene.transform.Transform;
-import javafx.scene.transform.Translate;
 import nars.guifx.graph2.TermEdge;
 import nars.guifx.graph2.TermNode;
 import nars.guifx.graph2.source.SpaceGrapher;

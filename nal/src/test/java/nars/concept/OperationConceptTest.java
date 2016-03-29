@@ -1,26 +1,16 @@
 package nars.concept;
 
 import com.google.common.base.Joiner;
-import com.gs.collections.api.tuple.primitive.FloatFloatPair;
-import com.gs.collections.impl.tuple.primitive.PrimitiveTuples;
-import nars.$;
 import nars.Global;
 import nars.NAR;
-import nars.nal.nal8.operator.SyncOperator;
-import nars.nal.nal8.operator.TermFunction;
 import nars.nar.Default;
-import nars.task.Task;
-import nars.term.Compound;
-import nars.term.Term;
-import nars.term.TermIndex;
 import nars.term.Termed;
-import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
 import java.util.List;
 
 import static nars.util.Texts.n2;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by me on 3/22/16.

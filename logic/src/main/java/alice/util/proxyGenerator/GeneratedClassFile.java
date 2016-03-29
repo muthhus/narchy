@@ -1,7 +1,9 @@
 package alice.util.proxyGenerator;
-import javax.tools.*;
-import java.io.*;
-import java.net.*;
+
+import javax.tools.SimpleJavaFileObject;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
+import java.net.URI;
 
 class GeneratedClassFile extends SimpleJavaFileObject {
   

@@ -1,13 +1,14 @@
 package nars.term.transform;
 
 import com.gs.collections.impl.factory.Sets;
-import nars.*;
+import nars.Global;
+import nars.NAR;
+import nars.Narsese;
+import nars.Op;
 import nars.concept.Concept;
-import nars.nal.meta.PatternCompound;
 import nars.nar.Default;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.TermIndex;
 import nars.term.Termed;
 import nars.term.index.PatternIndex;
 import nars.term.transform.subst.FindSubst;

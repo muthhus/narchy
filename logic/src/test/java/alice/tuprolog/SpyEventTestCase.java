@@ -1,7 +1,7 @@
 package alice.tuprolog;
 
+import alice.tuprolog.event.SpyEvent;
 import junit.framework.TestCase;
-import alice.tuprolog.event.*;
 
 public class SpyEventTestCase extends TestCase {
 	

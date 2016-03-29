@@ -15,17 +15,19 @@ package clojure.lang;
 //*
 
 import clojure.asm.*;
-import clojure.asm.ClassWriter;
 import clojure.asm.commons.GeneratorAdapter;
 import clojure.asm.commons.Method;
 import nars.util.data.list.FasterList;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.Reader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.util.*;
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static clojure.lang.Compiler.HostExpr.initMethod;
 

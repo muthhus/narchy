@@ -185,4 +185,11 @@ public interface Stamp {
                 Stamp.zip(bb, aa) :
                 Stamp.zip(aa, bb);
     }
+
+    static int evidenceLength(int aLen, int bLen) {
+        return Math.max(Global.MAXIMUM_EVIDENTAL_BASE_LENGTH, aLen + bLen);
+    }
+    static int evidenceLength(Task a, Task b) {
+        return evidenceLength(a.evidence().length, b.evidence().length);
+    }
 }

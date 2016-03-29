@@ -3,9 +3,9 @@ package nars.nar;
 import nars.NAR;
 import nars.Symbols;
 import nars.concept.Concept;
-import nars.term.Operator;
 import nars.nal.nal8.operator.NullOperator;
 import nars.task.Task;
+import nars.term.Operator;
 import nars.term.Term;
 import org.junit.Test;
 

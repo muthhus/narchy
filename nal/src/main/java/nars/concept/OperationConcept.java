@@ -1,6 +1,9 @@
 package nars.concept;
 
-import nars.*;
+import nars.Global;
+import nars.NAR;
+import nars.Narsese;
+import nars.Op;
 import nars.bag.Bag;
 import nars.nal.Tense;
 import nars.nal.nal8.Execution;
@@ -8,7 +11,7 @@ import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Operator;
 import nars.term.Termed;
-import nars.util.data.MutableInteger;
+import nars.term.compound.GenericCompound;
 import nars.util.event.Topic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -43,7 +46,7 @@ public class OperationConcept extends CompoundConcept implements Runnable {
     public transient NAR nar;
 
 
-    public OperationConcept(@NotNull Compound term, Bag<Termed> termLinks, Bag<Task> taskLinks) {
+    public OperationConcept(@NotNull GenericCompound term, Bag<Termed> termLinks, Bag<Task> taskLinks) {
         super(term, termLinks, taskLinks);
     }
 

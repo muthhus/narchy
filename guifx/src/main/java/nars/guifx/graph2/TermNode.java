@@ -1,19 +1,14 @@
 package nars.guifx.graph2;
 
 import javafx.scene.paint.Color;
-import nars.Global;
 import nars.Op;
-import nars.bag.BLink;
 import nars.concept.Concept;
 import nars.guifx.graph2.layout.GraphNode;
 import nars.guifx.util.ColorMatrix;
-import nars.term.Term;
 import nars.term.Termed;
 
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 
 
 public class TermNode<T> extends GraphNode {

@@ -8,6 +8,7 @@ import nars.Op;
 import nars.concept.ConceptBuilder;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
+import nars.term.container.TermVector;
 import nars.util.Texts;
 import nars.util.data.sorted.SortedList;
 import org.jetbrains.annotations.NotNull;
@@ -31,13 +32,12 @@ import static nars.nal.Tense.DTERNAL;
  */
 public class Terms extends TermBuilder implements TermIndex {
 
-    public static final Terms terms = new Terms();
-    public static final int[] ZeroIntArray = new int[0];
-    public static final Term[] ZeroTermArray = new Term[0];
-    public static final TermContainer ZeroSubterms = new EmptyTermContainer();
-    @Nullable
-    public static final Compound ZeroProduct = $.compound(Op.PRODUCT, ZeroSubterms);
-    public static final IntFunction<Term[]> NewTermArray = Term[]::new;
+    @NotNull public static final Terms terms = new Terms();
+    @NotNull public static final int[] ZeroIntArray = new int[0];
+    @NotNull public static final Term[] ZeroTermArray = new Term[0];
+    @NotNull public static final TermVector<?> ZeroSubterms = new TermVector<>((Term[])new Term[] { });
+    @NotNull public static final Compound ZeroProduct = $.compound(Op.PRODUCT, ZeroSubterms);
+    @NotNull public static final IntFunction<Term[]> NewTermArray = Term[]::new;
 
 
     Terms() {
@@ -126,119 +126,6 @@ public class Terms extends TermBuilder implements TermIndex {
     }
 
 
-    static final class EmptyTermContainer implements TermContainer {
-
-        private final int hash;
-
-        EmptyTermContainer() {
-            this.hash = hashSubterms(Terms.ZeroTermArray, Terms.ZeroIntArray /* dummy */);
-        }
-
-        @Override
-        public int hashCode() {
-            return hash;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            return TermContainer.equals(this, (TermContainer) obj);
-        }
-
-        @Override
-        public int volume() {
-            return 0;
-        }
-
-        @Override
-        public int complexity() {
-            return 0;
-        }
-
-        @Override
-        public int structure() {
-            return 0;
-        }
-
-        @Override
-        public int size() {
-            return 0;
-        }
-
-        @Override
-        public boolean containsTerm(Term t) {
-            return false;
-        }
-
-
-
-        @Override
-        public Iterator iterator() {
-            return Iterators.emptyIterator();
-        }
-
-        @Override
-        public int compareTo(@NotNull Object o) {
-            return Integer.compare(hashCode(), o.hashCode());
-        }
-
-        @Override
-        public int varDep() {
-            return 0;
-        }
-
-        @Override
-        public int varIndep() {
-            return 0;
-        }
-
-        @Override
-        public int varQuery() {
-            return 0;
-        }
-
-        @Override
-        public int varPattern() {
-            return 0;
-        }
-
-        @Override
-        public int vars() {
-            return 0;
-        }
-
-        @Nullable
-        @Override
-        public Term term(int i) {
-            return null;
-        }
-
-        @Override
-        public boolean equalTerms(@NotNull TermContainer c) {
-            return c.size() == 0;
-        }
-
-        @NotNull
-        @Override
-        public Term[] terms() {
-            return Terms.ZeroTermArray;
-        }
-
-        @Override
-        public void forEach(Consumer action, int start, int stop) {
-
-        }
-
-        @Nullable
-        @Override
-        public TermContainer replacing(int subterm, Term replacement) {
-            return null;
-        }
-
-        @Override
-        public void addAllTo(Collection set) {
-
-        }
-    }
 
     public static boolean equalSubTermsInRespectToImageAndProduct(@Nullable Term a, @Nullable Term b) {
 
@@ -617,27 +504,28 @@ public class Terms extends TermBuilder implements TermIndex {
         if (aop.isTemporal()) {
             int at = a.dt();
             int bt = b.dt();
-            if (at != bt) {
-                if ((at == DTERNAL) || (bt == DTERNAL)) {
-                    //either is atemporal but not both
-                    return 0.5f;
-                }
-                boolean symmetric = aop.isCommutative();
+            if ((at != bt) && (at!=DTERNAL) && (bt!=DTERNAL)) {
+//                if ((at == DTERNAL) || (bt == DTERNAL)) {
+//                    //either is atemporal but not both
+//                    return 0.5f;
+//                }
 
-                if (symmetric) {
-                    int ata = Math.abs(at);
-                    int bta = Math.abs(bt);
-                    return 1f - (ata / ((float) (ata + bta)));
-                } else {
-                    boolean ap = at >= 0;
-                    boolean bp = bt >= 0;
-                    if (ap ^ bp) {
-                        return 0; //opposite direction
-                    } else {
-                        //same direction
+//                boolean symmetric = aop.isCommutative();
+//
+//                if (symmetric) {
+//                    int ata = Math.abs(at);
+//                    int bta = Math.abs(bt);
+//                    return 1f - (ata / ((float) (ata + bta)));
+//                } else {
+//                    boolean ap = at >= 0;
+//                    boolean bp = bt >= 0;
+//                    if (ap ^ bp) {
+//                        return 0; //opposite direction
+//                    } else {
+//                        //same direction
                         return 1f - (Math.abs(at - bt) / (1f + Math.abs(at + bt)));
-                    }
-                }
+//                    }
+//                }
             }
         }
         return 1f;

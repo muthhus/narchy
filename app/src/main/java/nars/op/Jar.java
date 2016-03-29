@@ -1,7 +1,6 @@
 package nars.op;
 
 import ch.qos.logback.classic.Level;
-import com.google.common.base.Joiner;
 import ognl.*;
 import org.reflections.Reflections;
 import org.reflections.ReflectionsException;
@@ -10,17 +9,13 @@ import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xeustechnologies.jcl.DelegateProxyClassLoader;
 import org.xeustechnologies.jcl.JarClassLoader;
 import org.xeustechnologies.jcl.JclObjectFactory;
 
 import java.io.File;
 import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
-import java.nio.file.FileSystems;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;

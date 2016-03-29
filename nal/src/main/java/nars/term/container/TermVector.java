@@ -3,14 +3,12 @@ package nars.term.container;
 import com.google.common.base.Joiner;
 import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
 import nars.Op;
-import nars.nal.meta.match.Ellipsis;
 import nars.term.Compound;
 import nars.term.SubtermVisitor;
 import nars.term.Term;
 import nars.term.Terms;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
 import java.lang.reflect.Array;
@@ -38,23 +36,28 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
 
 
 
+    /** normal high-entropy "content" hash */
+    public  final int hash;
+
     /**
      * bitvector of subterm types, indexed by NALOperator's .ordinal() and OR'd into by each subterm
+     * low-entropy, use 'hash' for normal hash operations.
      */
-    protected final int structureHash;
-    protected final int contentHash;
-    protected final short volume;
-    protected final short complexity;
+    public  final int structureHash;
+
+
+    public  final short volume;
+    public  final short complexity;
 
     /**
      * # variables contained, of each type & total
      * this means maximum of 127 variables per compound
      */
-    protected final byte varTotal;
-    protected final byte varQueries;
-    protected final byte varIndeps;
-    protected final byte varPattern;
-    protected final byte varDeps;
+    public final byte vars;
+    public final byte varQueries;
+    public final byte varIndeps;
+    public final byte varPatterns;
+    public final byte varDeps;
 
     //    public TermVector() {
 //        this(null);
@@ -78,8 +81,8 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
 
 
 
-    @SafeVarargs
-     protected TermVector(T... terms) {
+     @SafeVarargs
+     public TermVector(T... terms) {
         this.term = terms;
 
         /**
@@ -91,15 +94,15 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
          5: struct
          */
         int[] meta = new int[6];
-        this.contentHash = Terms.hashSubterms(term, meta);
+        this.hash = Terms.hashSubterms(term, meta);
 
 
         int varTot = 0;
         final int vD = meta[0]; this.varDeps = (byte)vD; varTot+=vD;
         final int vI = meta[1]; this.varIndeps = (byte)vI; varTot+=vI;
         final int vQ = meta[2]; this.varQueries = (byte)vQ; varTot+=vQ;
-        final int vP = meta[3]; this.varPattern = (byte)vP; //varTot+=vP;
-        this.varTotal = (byte)(varTot);
+        final int vP = meta[3]; this.varPatterns = (byte)vP; //varTot+=vP;
+        this.vars = (byte)(varTot);
 
 
         final int vol = meta[4]  + 1 /* for the compound wrapping it */;
@@ -118,7 +121,7 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
 
 
     @Override
-    public final boolean term(int i, Op o) {
+    public final boolean isTerm(int i, Op o) {
         return term[i].op() == o;
     }
 
@@ -205,12 +208,12 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
 
     @Override
     public final int varPattern() {
-        return varPattern;
+        return varPatterns;
     }
 
     @Override
     public final int vars() {
-        return varTotal;
+        return vars;
     }
 
 //    public Term[] cloneTermsReplacing(int index, Term replaced) {
@@ -267,7 +270,7 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
 
     @Override
     public final int hashCode() {
-        return contentHash;
+        return hash;
     }
 
     @Override

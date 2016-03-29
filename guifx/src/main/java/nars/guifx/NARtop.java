@@ -5,7 +5,6 @@ import javafx.beans.binding.Bindings;
 import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import nars.$;
 import nars.NAR;

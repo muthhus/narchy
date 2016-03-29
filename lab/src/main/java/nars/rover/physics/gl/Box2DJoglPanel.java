@@ -1,8 +1,10 @@
 package nars.rover.physics.gl;
 
-import com.jogamp.opengl.*;
+import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GLCapabilities;
+import com.jogamp.opengl.GLCapabilitiesImmutable;
+import com.jogamp.opengl.GLProfile;
 import nars.rover.Sim;
-
 import org.jbox2d.dynamics.World2D;
 
 /* generic box2d physics-executing panel */

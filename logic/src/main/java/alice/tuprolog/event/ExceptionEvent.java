@@ -1,7 +1,7 @@
 /*Castagna 06/2011*/
 package alice.tuprolog.event;
 
-import java.util.*;
+import java.util.EventObject;
 
 public class ExceptionEvent extends EventObject{
 	private static final long serialVersionUID = 1L;

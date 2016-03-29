@@ -7,9 +7,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Region;
 import nars.Global;
-import nars.Memory;
 import nars.NAR;
 import nars.guifx.demo.NARide;
 

@@ -1,14 +1,14 @@
 package nars.nar;
 
-import com.gs.collections.impl.tuple.Tuples;
 import nars.Global;
 import nars.Memory;
 import nars.NAR;
-import nars.Symbols;
 import nars.bag.BLink;
 import nars.bag.Bag;
 import nars.bag.impl.CurveBag;
-import nars.budget.*;
+import nars.budget.BudgetMerge;
+import nars.budget.Budgeted;
+import nars.budget.Forget;
 import nars.concept.*;
 import nars.data.Range;
 import nars.nal.Deriver;

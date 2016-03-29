@@ -3,12 +3,10 @@ package nars.guifx.graph2;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import nars.Global;
-import nars.Memory;
 import nars.NAR;
 import nars.bag.BLink;
 import nars.bag.Bag;
 import nars.concept.Concept;
-import nars.guifx.graph2.impl.TLinkEdge;
 import nars.guifx.graph2.source.SpaceGrapher;
 import nars.nar.Default;
 import nars.term.Term;
@@ -17,11 +15,8 @@ import nars.util.event.Active;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-
-import static nars.util.data.Util.lerp;
 
 /**
  * Example Concept supplier with some filters

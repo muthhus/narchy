@@ -14,6 +14,7 @@ import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.atom.Atomic;
 import nars.term.compound.GenericCompound;
+import nars.term.container.ShuffledSubterms;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.transform.CompoundTransform;
@@ -116,8 +117,7 @@ public interface TermIndex  {
     @Nullable default TermContainer normalize(TermContainer s) {
         if (s instanceof TermVector)
             return normalize((TermVector)s);
-        else if (s instanceof Terms.EmptyTermContainer)
-            return s;
+
 
         //TODO implement normalization for any non-container types
         throw new UnsupportedOperationException();
@@ -130,7 +130,9 @@ public interface TermIndex  {
         for (int i = 0; i < l; i++) {
             Term a = x[i];
             Termed b = the(a);
-            if ((a!=b) && b!=null/* && a.equals(b)*/) {
+            if (b == null)
+                return null;
+            if (a!=b) {
                 //different instance but still equal so replace it in the origin array, otherwise leave as-is
                 x[i] = b.term();
             }

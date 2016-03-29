@@ -1,6 +1,5 @@
 package nars.task;
 
-import nars.bag.BLink;
 import nars.bag.Bag;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;

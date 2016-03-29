@@ -1,6 +1,6 @@
 package alice.tuprologx.pj.model;
 
-import alice.tuprologx.pj.annotations.*;
+import alice.tuprologx.pj.annotations.Termifiable;
 
 /**
  *

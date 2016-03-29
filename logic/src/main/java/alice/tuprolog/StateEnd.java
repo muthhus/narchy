@@ -17,7 +17,9 @@
  */
 package alice.tuprolog;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * @author Alex Benini

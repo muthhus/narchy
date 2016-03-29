@@ -1,9 +1,11 @@
 package alice.tuprologx.pj.meta;
 
-import java.lang.reflect.*;
-import alice.tuprologx.pj.model.*;
-import alice.tuprologx.pj.annotations.*;
-import alice.tuprologx.pj.engine.*;
+import alice.tuprologx.pj.annotations.PrologField;
+import alice.tuprologx.pj.engine.PrologObject;
+import alice.tuprologx.pj.model.Term;
+import alice.tuprologx.pj.model.Theory;
+
+import java.lang.reflect.Field;
 
 /**
  *

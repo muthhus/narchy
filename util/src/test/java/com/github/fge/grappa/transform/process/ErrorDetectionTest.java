@@ -21,7 +21,6 @@ import com.github.fge.grappa.parsers.BaseParser;
 import com.github.fge.grappa.rules.Rule;
 import com.github.fge.grappa.transform.generate.ActionClassGenerator;
 import com.google.common.collect.ImmutableList;
-import org.junit.Ignore;
 import org.testng.annotations.Test;
 
 import java.util.List;

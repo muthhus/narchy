@@ -1,6 +1,6 @@
 package alice.tuprologx.runtime.tcp;
 
-import alice.tuprolog.*;
+import alice.tuprolog.Solution;
 
 public class Test
 {

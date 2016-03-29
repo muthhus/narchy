@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import nars.Global;
 import nars.NAR;
 import nars.concept.Concept;
-import nars.term.Term;
 import nars.term.Termed;
 import nars.util.event.CycleReaction;
 import nars.util.meter.Signal;

@@ -1,7 +1,6 @@
 package nars.guifx.annotation;
 
 import javafx.beans.property.SimpleObjectProperty;
-import nars.guifx.graph2.layout.Grid;
 
 /**
  * Annotate with @Implementation

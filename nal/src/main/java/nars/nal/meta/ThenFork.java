@@ -4,7 +4,6 @@ import nars.Op;
 import nars.term.Term;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermSet;
-import nars.term.container.TermVector;
 import org.jetbrains.annotations.NotNull;
 
 /**

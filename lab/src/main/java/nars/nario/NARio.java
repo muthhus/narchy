@@ -6,11 +6,11 @@ import nars.Global;
 import nars.NAR;
 import nars.Video;
 import nars.guifx.demo.NARide;
-import nars.op.java.Lobjects;
 import nars.nar.Default;
 import nars.nario.level.Level;
 import nars.nario.level.LevelGenerator;
 import nars.nario.sprites.*;
+import nars.op.java.Lobjects;
 import nars.util.data.Util;
 
 import java.awt.*;

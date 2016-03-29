@@ -1,16 +1,9 @@
 package alice.tuprologx;
 
-import alice.util.*;
 import alice.tuprolog.*;
-import alice.tuprolog.event.ExceptionEvent;
-import alice.tuprolog.event.ExceptionListener;
-import alice.tuprolog.event.OutputEvent;
-import alice.tuprolog.event.OutputListener;
-import alice.tuprolog.event.SpyEvent;
-import alice.tuprolog.event.SpyListener;
-import alice.tuprolog.event.WarningEvent;
-import alice.tuprolog.event.WarningListener;
+import alice.tuprolog.event.*;
 import alice.tuprolog.lib.IOLibrary;
+import alice.util.Automaton;
 
 import java.io.*;
 

@@ -17,34 +17,23 @@
  */
 package alice.tuprolog.lib;
 
+import alice.tuprolog.*;
+import alice.tuprolog.Number;
+import alice.util.AbstractDynamicClassLoader;
+import alice.util.InspectionUtils;
+import alice.util.JavaDynamicClassLoader;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Serializable;
-import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.lang.reflect.*;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.EventListener;
-import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Vector;
-
-import alice.tuprolog.Int;
-import alice.tuprolog.JavaException;
-import alice.tuprolog.Library;
-import alice.tuprolog.Number;
-import alice.tuprolog.Struct;
-import alice.tuprolog.Term;
-import alice.tuprolog.Var;
-import alice.util.AbstractDynamicClassLoader;
-import alice.util.InspectionUtils;
-import alice.util.JavaDynamicClassLoader;
+import java.util.*;
+import java.lang.Float;
+import java.lang.Long;
+import java.lang.Double;
 /**
  * 
  * This class represents a tuProlog library enabling the interaction with the

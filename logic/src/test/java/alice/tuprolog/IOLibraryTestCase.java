@@ -1,10 +1,10 @@
 package alice.tuprolog;
 
-import java.util.List;
-import java.util.Map;
-
 import alice.tuprolog.lib.IOLibrary;
 import junit.framework.TestCase;
+
+import java.util.List;
+import java.util.Map;
 
 public class IOLibraryTestCase extends TestCase {
 	

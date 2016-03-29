@@ -13,25 +13,25 @@ package nars.analyze;
  *
  *******************************************************************************/
 
-        import java.io.*;
-        import java.util.HashMap;
-        import java.util.Map;
-        import java.util.function.Predicate;
+import nars.nal.nal1.NAL1Test;
+import org.jacoco.core.analysis.Analyzer;
+import org.jacoco.core.analysis.CoverageBuilder;
+import org.jacoco.core.analysis.IClassCoverage;
+import org.jacoco.core.analysis.ICounter;
+import org.jacoco.core.data.ExecutionDataStore;
+import org.jacoco.core.data.SessionInfoStore;
+import org.jacoco.core.instr.Instrumenter;
+import org.jacoco.core.runtime.IRuntime;
+import org.jacoco.core.runtime.LoggerRuntime;
+import org.jacoco.core.runtime.RuntimeData;
+import org.junit.runner.JUnitCore;
+import org.junit.runner.Result;
+import org.junit.runner.notification.Failure;
 
-        import nars.nal.nal1.NAL1Test;
-        import org.jacoco.core.analysis.Analyzer;
-        import org.jacoco.core.analysis.CoverageBuilder;
-        import org.jacoco.core.analysis.IClassCoverage;
-        import org.jacoco.core.analysis.ICounter;
-        import org.jacoco.core.data.ExecutionDataStore;
-        import org.jacoco.core.data.SessionInfoStore;
-        import org.jacoco.core.instr.Instrumenter;
-        import org.jacoco.core.runtime.IRuntime;
-        import org.jacoco.core.runtime.LoggerRuntime;
-        import org.jacoco.core.runtime.RuntimeData;
-        import org.junit.runner.JUnitCore;
-        import org.junit.runner.Result;
-        import org.junit.runner.notification.Failure;
+import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Predicate;
 
 /**
  * TODO generates NAL input from instrumented class's stack trace and derivatives

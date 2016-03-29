@@ -2,7 +2,6 @@ package nars.sonification;
 
 import nars.Audio;
 import nars.Global;
-import nars.Memory;
 import nars.NAR;
 import nars.audio.SoundProducer;
 import nars.audio.granular.Granulize;

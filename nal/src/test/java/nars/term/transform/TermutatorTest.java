@@ -19,9 +19,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import static nars.$.$;
-import static nars.$.p;
-import static nars.$.v;
+import static nars.$.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 

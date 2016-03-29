@@ -16,7 +16,6 @@ import nars.op.out.echo;
 import nars.op.out.say;
 import nars.op.sys.js;
 import nars.op.sys.reset;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.term.TermIndex;
 import nars.term.atom.Atom;

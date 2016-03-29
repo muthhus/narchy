@@ -4,7 +4,7 @@ import nars.NAR;
 import nars.nar.Default;
 import nars.util.TermCodec;
 import org.junit.Test;
-import org.nustaq.serialization.*;
+import org.nustaq.serialization.FSTConfiguration;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

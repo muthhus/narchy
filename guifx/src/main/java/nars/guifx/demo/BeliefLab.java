@@ -1,6 +1,5 @@
 package nars.guifx.demo;
 
-import nars.Memory;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.guifx.NARfx;
@@ -17,7 +16,7 @@ public class BeliefLab {
 	// }
 	public static final int beliefCapacity = 80;
 	static float waveFreq = 0.08715f;
-	static float conf = 0.6f;
+	static float conf = 0.9f;
 	static float predictionProbability = 0.1f; // how often to ask for a
 												// prediction
 	static float pastProbability = 0.1f; // how often to ask for a prediction

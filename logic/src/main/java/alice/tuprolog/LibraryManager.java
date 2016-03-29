@@ -4,14 +4,16 @@
  */
 package alice.tuprolog;
 
+import alice.tuprolog.event.LibraryEvent;
+import alice.tuprolog.event.WarningEvent;
+
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.*;
-
-import alice.tuprolog.event.LibraryEvent;
-import alice.tuprolog.event.WarningEvent;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.Iterator;
 
 /**
  * @author Alex Benini

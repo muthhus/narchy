@@ -17,13 +17,13 @@
  */
 package alice.tuprolog;
 
+import alice.tuprolog.interfaces.IParser;
+
 import java.io.*;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.regex.Pattern;
-
-import alice.tuprolog.interfaces.IParser;
 
 /**
  * This class defines a parser of prolog terms and sentences.

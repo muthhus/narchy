@@ -41,16 +41,17 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
     int vars();
 
     /** gets subterm at index i */
-    @Nullable T term(int i);
+    @NotNull T term(int i);
 
     /** tests if subterm i is op o */
-    default boolean term(int i, @NotNull Op o) {
+    boolean isTerm(int i, @NotNull Op o);
+    /*default boolean isTerm(int i, @NotNull Op o) {
         T ti = term(i);
-        return /*ti!=null && */(ti.op() == o);
-    }
+        return (ti.op() == o);
+    }*/
 
     @Nullable
-    default Term termOr(int i, Term ifOutOfBounds) {
+    default Term termOr(int i, @Nullable Term ifOutOfBounds) {
         return size() <= i ? ifOutOfBounds : term(i);
     }
 
@@ -93,9 +94,6 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
 
 
 
-    default boolean isEmpty() {
-        return size() != 0;
-    }
 
     /**
      * scans first level only, not recursive

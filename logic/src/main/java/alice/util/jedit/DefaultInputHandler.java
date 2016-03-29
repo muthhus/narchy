@@ -8,9 +8,11 @@
  */
 package alice.util.jedit;
 
-import javax.swing.KeyStroke;
-import java.awt.event.*;
-import java.awt.Toolkit;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.util.Hashtable;
 import java.util.StringTokenizer;
 

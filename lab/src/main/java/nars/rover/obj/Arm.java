@@ -1,15 +1,15 @@
 package nars.rover.obj;
 
 import nars.Global;
-import nars.rover.physics.gl.JoglDraw;
-import nars.util.HaiQ;
-import nars.util.Hsom;
+import nars.op.NarQ;
 import nars.rover.Sim;
 import nars.rover.physics.gl.JoglAbstractDraw;
+import nars.rover.physics.gl.JoglDraw;
 import nars.rover.physics.j2d.LayerDraw;
+import nars.util.HaiQ;
+import nars.util.Hsom;
 import nars.util.data.Util;
 import nars.util.data.list.FasterList;
-import nars.op.NarQ;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jbox2d.common.Color3f;

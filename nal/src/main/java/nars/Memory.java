@@ -32,7 +32,6 @@ import nars.util.data.random.XorShift128PlusRandom;
 import nars.util.event.DefaultTopic;
 import nars.util.event.Topic;
 import nars.util.signal.Emotion;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

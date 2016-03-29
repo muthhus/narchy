@@ -17,10 +17,10 @@
  */
 package alice.tuprolog.lib;
 
-import java.util.ArrayList;
-
 import alice.tuprolog.*;
 import alice.tuprolog.Number;
+
+import java.util.ArrayList;
 
 /**
  * This class defines a set of basic built-in predicates for the tuProlog engine

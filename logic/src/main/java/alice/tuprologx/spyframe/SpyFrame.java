@@ -1,13 +1,16 @@
 package alice.tuprologx.spyframe;
 
 import alice.tuprolog.*;
-import alice.tuprolog.event.*;
+import alice.tuprolog.event.SpyEvent;
+import alice.tuprolog.event.SpyListener;
+
+import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
-import java.util.List;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.FileInputStream;
 import java.util.ArrayList;
-import javax.swing.*;
+import java.util.List;
 
 /** GUI-Window for tracing the solving process of a prolog goal.
  * This Frame runs its own prolog process and is its only SpyListener.

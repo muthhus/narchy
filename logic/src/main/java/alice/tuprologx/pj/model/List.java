@@ -8,7 +8,10 @@
  */
 
 package alice.tuprologx.pj.model;
-import java.util.*;
+
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Vector;
 /**
  *
  * @author maurizio

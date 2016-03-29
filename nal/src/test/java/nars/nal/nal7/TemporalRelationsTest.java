@@ -1,8 +1,6 @@
 package nars.nal.nal7;
 
-import nars.NAR;
 import nars.nar.Default;
-import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import org.junit.Test;

@@ -3,8 +3,6 @@ package nars.guifx.graph2.source;
 
 import com.gs.collections.impl.map.mutable.UnifiedMap;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.ObservableList;
-import javafx.scene.Node;
 import nars.NAR;
 import nars.guifx.Spacegraph;
 import nars.guifx.graph2.*;
@@ -12,14 +10,12 @@ import nars.guifx.graph2.impl.CanvasEdgeRenderer;
 import nars.guifx.graph2.layout.IterativeLayout;
 import nars.guifx.graph2.layout.None;
 import nars.guifx.util.Animate;
-import nars.term.Term;
 import nars.term.Termed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiFunction;

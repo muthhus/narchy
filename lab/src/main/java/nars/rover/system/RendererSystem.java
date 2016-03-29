@@ -12,7 +12,6 @@ import nars.rover.obj.DrawAbove;
 import nars.rover.physics.gl.Box2DJoglPanel;
 import nars.rover.physics.j2d.LayerDraw;
 import nars.util.data.list.FasterList;
-import org.jbox2d.dynamics.World2D;
 
 /**
  * Created by me on 3/29/16.

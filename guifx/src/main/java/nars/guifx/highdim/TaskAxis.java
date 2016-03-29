@@ -2,15 +2,10 @@ package nars.guifx.highdim;
 
 import javafx.scene.Group;
 import javafx.scene.control.Label;
-import nars.bag.BLink;
-import nars.concept.Concept;
 import nars.guifx.graph2.TermNode;
 import nars.task.Task;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.util.data.Util;
-
-import java.util.Arrays;
 
 /**
  * TODO multiple modes:

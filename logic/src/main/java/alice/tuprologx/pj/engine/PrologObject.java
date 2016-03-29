@@ -9,8 +9,8 @@
 
 package alice.tuprologx.pj.engine;
 
-import alice.tuprologx.pj.meta.*;
-import alice.tuprologx.pj.model.*;
+import alice.tuprologx.pj.meta.PrologMetaClass;
+import alice.tuprologx.pj.model.Theory;
 /**
  * @author  maurizio
  */

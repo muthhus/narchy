@@ -1,6 +1,5 @@
 package nars.guifx.graph2.source;
 
-import javafx.beans.InvalidationListener;
 import nars.NAR;
 import nars.guifx.annotation.Implementation;
 import nars.guifx.annotation.ImplementationProperty;

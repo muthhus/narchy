@@ -8,7 +8,6 @@ import nars.Narsese.NarseseException;
 import nars.budget.Budget;
 import nars.budget.Budgeted;
 import nars.concept.Concept;
-import nars.concept.OperationConcept;
 import nars.nal.Level;
 import nars.nal.Tense;
 import nars.nal.nal8.AbstractOperator;
@@ -35,7 +34,6 @@ import org.apache.commons.lang3.mutable.MutableFloat;
 import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.nustaq.serialization.FSTDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

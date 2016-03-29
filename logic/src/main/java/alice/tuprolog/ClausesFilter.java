@@ -6,6 +6,7 @@
 package alice.tuprolog;
 
 import alice.util.OneWayList;
+
 import java.util.List;
 
 /**

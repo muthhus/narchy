@@ -5,15 +5,12 @@ import nars.NAR;
 import nars.concept.AtomConcept;
 import nars.concept.DefaultConceptBuilder;
 import nars.nar.Default;
-import nars.nar.Terminal;
 import nars.task.Task;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.index.MapIndex2;
-import nars.time.FrameClock;
 import nars.util.data.random.XorShift128PlusRandom;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -23,9 +20,7 @@ import java.util.TreeSet;
 
 import static nars.$.$;
 import static nars.$.operator;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 public class TermIndexTest {

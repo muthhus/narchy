@@ -10,7 +10,6 @@ import com.jogamp.opengl.util.Animator;
 import nars.rover.physics.Display;
 import org.jbox2d.dynamics.World2D;
 
-
 import java.awt.*;
 import java.nio.FloatBuffer;
 

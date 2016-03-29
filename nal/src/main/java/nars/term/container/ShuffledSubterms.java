@@ -1,11 +1,10 @@
 package nars.term.container;
 
-import nars.nal.meta.match.Ellipsis;
+import nars.Op;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.util.math.ShuffledPermutations;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -54,6 +53,11 @@ public final class ShuffledSubterms extends ShuffledPermutations implements Term
     @Override
     public Term term(int i) {
         return srcsubs.term(super.get(i));
+    }
+
+    @Override
+    public boolean isTerm(int i, @NotNull Op o) {
+        return term(i).op() == o;
     }
 
     @Override

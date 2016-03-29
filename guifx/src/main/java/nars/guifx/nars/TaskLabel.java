@@ -3,7 +3,6 @@ package nars.guifx.nars;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
-import nars.Memory;
 import nars.NAR;
 import nars.guifx.AutoLabel;
 import nars.guifx.NARfx;

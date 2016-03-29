@@ -4,11 +4,10 @@ import nars.$;
 import nars.Narsese;
 import nars.concept.VariableConcept;
 import nars.nal.meta.match.VarPattern;
-import nars.nar.Terminal;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by me on 8/28/15.

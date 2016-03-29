@@ -1,13 +1,15 @@
 package nars.term.transform;
 
-import junit.framework.TestCase;
 import nars.$;
 import nars.Global;
 import nars.Narsese;
 import nars.Op;
 import nars.concept.DefaultConceptBuilder;
 import nars.nal.meta.PremiseRule;
-import nars.nal.meta.match.*;
+import nars.nal.meta.match.Ellipsis;
+import nars.nal.meta.match.EllipsisMatch;
+import nars.nal.meta.match.EllipsisOneOrMore;
+import nars.nal.meta.match.EllipsisZeroOrMore;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.TermIndex;
@@ -28,7 +30,6 @@ import java.util.Random;
 import java.util.Set;
 
 import static nars.$.$;
-import static nars.Op.Imdex;
 import static nars.Op.VAR_DEP;
 import static nars.Op.VAR_PATTERN;
 import static nars.nal.meta.match.Ellipsis.firstEllipsis;

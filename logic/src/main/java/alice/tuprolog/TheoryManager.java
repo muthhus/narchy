@@ -17,13 +17,12 @@
  */
 package alice.tuprolog;
 
+import alice.util.Tools;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.*;
-
-
-import alice.util.Tools;
 
 /**
  * This class defines the Theory Manager who manages the clauses/theory often referred to as the Prolog database.

@@ -1,8 +1,6 @@
 package nars.nal.meta;
 
 import nars.Memory;
-import nars.Premise;
-import nars.task.Task;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
