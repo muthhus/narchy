@@ -29,25 +29,23 @@
 
 //A belief b <f,c> is equal to --b <1-f,c>, which is the negation rule:
 
-    (A --> B), A, task(negative) |- --(A --> B), (Belief:Negation, Desire:Negation, Derive:AllowBackward)
-    (A --> B), B, task(negative) |- --(A --> B), (Belief:Negation, Desire:Negation, Derive:AllowBackward)
-
+    A, A, task(negative) |- --A, (Belief:Negation, Desire:Negation)
     --A, A |- A, (Belief:Negation, Desire:Negation)
+
+//    (A --> B), A, task(negative) |- --(A --> B), (Belief:Negation, Desire:Negation, Derive:AllowBackward)
+//    (A --> B), B, task(negative) |- --(A --> B), (Belief:Negation, Desire:Negation, Derive:AllowBackward)
+
 //  --(A --> B), A                 |-   (A --> B), (Belief:Negation, Desire:Negation, Derive:AllowBackward)
 //  --(A --> B), B                 |-   (A --> B), (Belief:Negation, Desire:Negation, Derive:AllowBackward)
 
-
-    (A <-> B), A, task(negative) |- --(A <-> B), (Belief:Negation, Desire:Negation, Derive:AllowBackward)
-  --(A <-> B), A                 |-   (A <-> B), (Belief:Negation, Desire:Negation, Derive:AllowBackward)
+//    (A <-> B), A, task(negative) |- --(A <-> B), (Belief:Negation, Desire:Negation, Derive:AllowBackward)
+//  --(A <-> B), A                 |-   (A <-> B), (Belief:Negation, Desire:Negation, Derive:AllowBackward)
 
 
 //Set Definition Similarity to Inheritance
 
     ({S} <-> {P}), {S} |- ({S} --> {P}), (Belief:Identity, Desire:Identity, Derive:AllowBackward)
-//    ({S} <-> {P}), {S} |- ({P} --> {S}), (Belief:Identity, Desire:Identity, Derive:AllowBackward)
-
     ([S] <-> [P]), [S] |- ([S] --> [P]), (Belief:Identity, Desire:Identity, Derive:AllowBackward)
-//    ([S] <-> [P]), [S] |- ([P] --> [S]), (Belief:Identity, Desire:Identity, Derive:AllowBackward)
 
 
 //Set Definition Unwrap

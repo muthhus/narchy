@@ -32,7 +32,9 @@ public class RendererSystem extends EntitySystem {
 
         new Box2DJoglPanel(sim) {
 
-            final Procedure<LayerDraw> drawProc = (LayerDraw l) -> l.drawSky(draw, world);
+            final Procedure<LayerDraw> drawProc = (LayerDraw l) -> {
+                if (l != null) l.drawSky(draw, world);
+            };
 
             @Override
             protected void draw(GL2 gl, float dt) {
@@ -57,9 +59,11 @@ public class RendererSystem extends EntitySystem {
 
         toDraw.clear();
         Bag<Entity> ee = getEntities();
-        if (ee!=null) {
+        if (ee != null) {
             ee.forEach(e -> {
-                toDraw.add(e.getComponent(DrawAbove.class).drawer);
+                LayerDraw drawer = e.getComponent(DrawAbove.class).drawer;
+                if (drawer != null)
+                    toDraw.add(drawer);
             });
         }
 

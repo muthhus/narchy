@@ -5,6 +5,7 @@ import com.gs.collections.api.tuple.primitive.IntIntPair;
 import nars.nal.Tense;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.term.atom.Atom;
 import org.jetbrains.annotations.NotNull;
 
@@ -171,7 +172,7 @@ public enum Op {
 
     }
 
-    public static boolean isOperation(@NotNull Term t) {
+    public static boolean isOperation(@NotNull Termed t) {
         if (t.op() == Op.INHERIT) {
             Compound c = (Compound) t;
             return c.isTerm(1, Op.OPERATOR) &&

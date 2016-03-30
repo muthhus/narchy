@@ -44,13 +44,20 @@ public interface TermIndex {
      * getOrAdd the term
      */
     @Nullable
-    Termed the(@NotNull Termed t);
+    default Termed the(@NotNull Termed t) {
+        return get(t, true);
+    }
 
     /**
      * get if not absent
      */
     @Nullable
-    Termed get(@NotNull Termed t);
+    default Termed get(@NotNull Termed t) {
+        return get(t, false);
+    }
+
+    Termed get(@NotNull Termed key, boolean createIfMissing);
+
 
     /**
      * set if not absent
@@ -70,7 +77,8 @@ public interface TermIndex {
     @Nullable
     default Termed the(@NotNull Op op, @NotNull TermContainer subterms) {
         //DEFAULT IMPL to be moved to a concrete class: BUILDS ON THE HEAP:
-        return builder().the(op, -1, DTERNAL, subterms);
+        Term b = builder().the(op, -1, DTERNAL, subterms);
+        return b == null ? null : the(b);
     }
 
     @Nullable
@@ -166,7 +174,7 @@ public interface TermIndex {
      * returns the resolved term according to the substitution
      */
     @Nullable
-    default Term transform(@Nullable Compound trc, @NotNull Subst f) {
+    default Termed transform(@Nullable Compound trc, @NotNull Subst f) {
 
         if (trc == null)
             return null; //pass-through
@@ -216,24 +224,19 @@ public interface TermIndex {
 
         TermContainer transformedSubterms = TermContainer.the(sop, sub);
 
-        Term result;
+        Termed result;
         if (transformedSubterms.equals(trc.subterms())) {
             result = trc;
         } else {
 
-
-            result = this.builder().transformedCompound(src, transformedSubterms);
+            result = transformedCompound(src, transformedSubterms);
 
             //Filtering of transformed result:
-
             if (result == null)
                 return src;
 
-
-
             //apply any known immediate transform operators
             //TODO decide if this is evaluated incorrectly somehow in reverse
-
 
             if (sop.isImage()) {
                 int resultSize = sub.size();
@@ -253,12 +256,19 @@ public interface TermIndex {
         if (isOperation(result)) {
             ImmediateTermTransform tf = f.getTransform(Operator.operator((Compound) result));
             if (tf != null) {
-                result = applyImmediateTransform(f, result, tf);
+                result = applyImmediateTransform(f, result.term(), tf);
             }
         }
 
-        return result;
+        return result!=null ? the(result.term()) : null;
     }
+
+    default Termed transformedCompound(Compound src, TermContainer transformedSubterms) {
+        return /*Termed t = */builder().transformedCompound(src, transformedSubterms);
+        //return t != null ? the(t) : null;
+    }
+
+
 
 
     @Nullable
@@ -279,7 +289,10 @@ public interface TermIndex {
 
         if (src instanceof Compound) {
             //if f is empty there will be no changes to apply anyway
-            return f.isEmpty() ? src : transform((Compound) src, f);
+            Termed x = f.isEmpty() ? src : transform((Compound) src, f);
+            if (x==null)
+                return null;
+            return x.term();
 
         } else if (src instanceof Variable) {
             Term x = f.term(src);
@@ -458,11 +471,10 @@ public interface TermIndex {
         Term[] newSubterms = new Term[src.size()];
 
         int mods = transform(src, t, newSubterms, 0);
-
         if (mods == -1) {
             return null;
         } else if ((mods > 0)) {
-            return builder().transformedCompound(src, TermContainer.the(src.op(), newSubterms));
+            return builder().transformedCompound(src, newSubterms);
         }
         return src; //nothing changed
     }
@@ -476,10 +488,12 @@ public interface TermIndex {
 
         int modifications = 0;
 
+        TermBuilder builder = builder();
+
         for (int i = 0; i < n; i++) {
             Term x = src.term(i);
-            if (x == null)
-                throw new InvalidTerm(src);
+            //if (x == null)
+            //    throw new InvalidTerm(src);
 
             if (trans.test(x)) {
 
@@ -503,23 +517,10 @@ public interface TermIndex {
                     if (submods == -1) return -1;
                     if (submods > 0) {
 
-                        //method 1: using termindex
-//                        x = newTerm(cx.op(), cx.relation(), cx.t(),
-//                            TermContainer.the(cx.op(), yy)
-//                        );
-
-                        //method 2: on heap
-                        Op op = cx.op();
-                        int dt = cx.dt();
-
-                        //this constructs the new term on the heap, not in this index.
-                        //TODO make this configurable
-                        x = $.the(op, cx.relation(), dt,
-                                TermContainer.the(op, yy)
-                        );
-
+                        x = builder.transformedCompound(cx, yy);
                         if (x == null)
                             return -1;
+
                         modifications += (x != cx) ? 1 : 0; //REFERENCE EQUALTY
                     }
                 }

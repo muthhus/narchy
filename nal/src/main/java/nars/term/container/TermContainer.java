@@ -128,6 +128,17 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
     /** test for exhaustive equality */
     boolean equalTerms(TermContainer c);
 
+    default boolean equalTerms(Term[] c) {
+        int cl = c.length;
+        if (cl != size())
+            return false;
+
+        for (int i = 0; i < cl; i++) {
+            if (!term(i).equals(c[i]))
+                return false;
+        }
+        return true;
+    }
 
 //    static TermSet differ(TermSet a, TermSet b) {
 //        if (a.size() == 1 && b.size() == 1) {

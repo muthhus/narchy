@@ -104,7 +104,7 @@ public enum BeliefFunction implements TruthOperator {
     Negation() {
         @NotNull
         @Override public Truth apply(@Nullable final Truth T, /* nullable */ final Truth B, @NotNull Memory m, float minConf) {
-            return (T == null) ? null : TruthFunctions.negation(T, minConf);
+            return TruthFunctions.negation(T, minConf);
         }
     },
 

@@ -55,15 +55,6 @@ public abstract class AbstractMapIndex implements TermIndex {
     @Nullable
     abstract protected Termed theCompound(@NotNull Compound x, boolean create);
 
-    @Nullable
-    @Override public Termed the(@NotNull Termed t) {
-        return get(t, true);
-    }
-
-    @Nullable
-    @Override public Termed get(@NotNull Termed t) {
-        return get(t, false);
-    }
 
     @NotNull
     protected Termed<Compound> internCompound(Termed interned) {

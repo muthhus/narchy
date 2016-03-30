@@ -23,7 +23,7 @@ public class MotorSystem extends EntityProcessingSystem {
         Body b = e.getComponent(Physical.class).body;
         Motorized p = e.getComponent(Motorized.class);
         thrust(b, 0, (p.fore - p.back) * p.linearSpeed);
-        rotate(b, (p.left - p.right) * p.angularSpeed);
+        rotate(b, (p.right - p.left) * p.angularSpeed);
     }
 
     public void thrust(Body base, float angle, float force) {

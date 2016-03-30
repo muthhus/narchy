@@ -8,8 +8,8 @@ public class Motorized extends Component {
 
     public float left, right, fore, back;
 
-    public float linearSpeed = 25;
-    public float angularSpeed = 15;
+    public float linearSpeed = 35;
+    public float angularSpeed = 25;
 
     public float stop(float s) {
         left *= (1f - s);

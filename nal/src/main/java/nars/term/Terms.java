@@ -91,18 +91,11 @@ public class Terms extends TermBuilder implements TermIndex {
         return new GenericCompound(op, relation, subterms).dt(dt);
     }
 
-
     @Override
     public
     @Nullable
-    Termed the(Termed t) {
-        return t;
-    }
-    @Override
-    public
-    @Nullable
-    Termed get(Termed t) {
-        return null;
+    Termed get(Termed t, boolean createIfMissing) {
+        return createIfMissing ? t : null;
     }
 
     @Nullable

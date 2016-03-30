@@ -13,6 +13,7 @@ import nars.nal.meta.match.EllipsisZeroOrMore;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.TermIndex;
+import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.index.MapIndex2;
@@ -124,14 +125,15 @@ public class EllipsisTest {
 
 
                         //2. test substitution
-                        Term s = index.transform(r, this);
+                        Termed s = index.transform(r, this);
                         if (s!=null) {
                             //System.out.println(s);
 
-                            if (s.varPattern()==0)
-                                selectedFixed.add(s);
+                            Term ss = s.term();
+                            if (ss.varPattern()==0)
+                                selectedFixed.add(ss);
 
-                            assertEquals(s.toString() + " should be all subbed by " + this.xy.toString(), 0, s.varPattern());
+                            assertEquals(s.toString() + " should be all subbed by " + this.xy.toString(), 0, ss.varPattern());
                         }
 
                         return true;
