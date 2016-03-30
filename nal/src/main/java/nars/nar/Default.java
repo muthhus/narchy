@@ -29,8 +29,6 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -51,6 +49,13 @@ public class Default extends AbstractNAR {
 
     @NotNull
     public final DefaultPremiseGenerator premiser;
+
+//    @Range(min = 0.01f, max = 8, unit = "Duration")
+//    public final MutableFloat termLinkRemembering;
+//
+//    @Range(min = 0.01f, max = 8, unit = "Duration")
+//    public final MutableFloat taskLinkRemembering;
+
 
 
     @Deprecated
@@ -109,24 +114,11 @@ public class Default extends AbstractNAR {
     }
 
 
-
-
-    /** accepts null-terminated array */
-    final void accept(@NotNull Task[] input) {
-        float activation = activationRate.floatValue();
-        for (Task t : input) {
-            if (t == null) //for null-terminated arrays
-                break;
-            if (!t.isDeleted())
-                process(t, activation);
-        }
-    }
-
     /**
-     * process a Task as a TaskProcess (synchronous)
+     * process a Task through its Concept
      */
-    @Nullable
-    private final Concept process(@NotNull Task input, float activation) {
+    @Nullable @Override
+    public final Concept process(@NotNull Task input, float activation) {
 
         Concept c = concept(input, true);
         if (c == null) {
@@ -166,7 +158,7 @@ public class Default extends AbstractNAR {
 
         return new SetTaskPerception(
                 this,
-                this::accept,
+                this::process,
                 //BudgetMerge.plusDQBlend
                 BudgetMerge.avgDQBlend
         );
@@ -190,8 +182,8 @@ public class Default extends AbstractNAR {
         DefaultCycle c = new DefaultCycle(this, newDeriver(), pg, activeConcepts);
 
         //TODO move these to a PremiseGenerator which supplies
-        c.termlinksFiredPerFiredConcept.set(termLinksPerConcept);
-        c.tasklinksFiredPerFiredConcept.set(taskLinksPerConcept);
+        c.premiser.termlinksFiredPerFiredConcept.set(termLinksPerConcept);
+        c.premiser.tasklinksFiredPerFiredConcept.set(taskLinksPerConcept);
 
         c.conceptsFiredPerCycle.set(conceptsFirePerCycle);
 
@@ -201,7 +193,10 @@ public class Default extends AbstractNAR {
 
     @NotNull
     public DefaultPremiseGenerator newPremiseGenerator() {
-        return new DefaultPremiseGenerator(this, Deriver.getDefaultDeriver());
+        return new DefaultPremiseGenerator(this, Deriver.getDefaultDeriver(),
+            new Forget.ExpForget<>(taskLinkForgetDurations, perfection).withDeletedItemFiltering(),
+            new Forget.ExpForget<>(termLinkForgetDurations, perfection)
+        );
     }
 
 
@@ -380,11 +375,6 @@ public class Default extends AbstractNAR {
         @Range(min = 0, max = 64, unit = "Concept")
         public final MutableInteger conceptsFiredPerCycle;
 
-        @Range(min = 0, max = 16, unit = "TaskLink") //TODO use float percentage
-        public final MutableInteger tasklinksFiredPerFiredConcept = new MutableInteger(1);
-
-        @Range(min = 0, max = 16, unit = "TermLink")
-        public final MutableInteger termlinksFiredPerFiredConcept = new MutableInteger(1);
 
         @Range(min = 0.0f, max = 1.0, unit = "Percent")
         public final MutableFloat activationRate;
@@ -392,11 +382,7 @@ public class Default extends AbstractNAR {
         @Range(min = 0.01f, max = 8, unit = "Duration")
         public final MutableFloat conceptRemembering;
 
-        @Range(min = 0.01f, max = 8, unit = "Duration")
-        public final MutableFloat termLinkRemembering;
 
-        @Range(min = 0.01f, max = 8, unit = "Duration")
-        public final MutableFloat taskLinkRemembering;
 
         //public final MutableFloat activationFactor = new MutableFloat(1.0f);
 
@@ -422,14 +408,9 @@ public class Default extends AbstractNAR {
         @Deprecated @Range(min = 0, max = 1f, unit = "Perfection")
         public final MutableFloat perfection;
 
-        final List<BLink<Concept>> firing = Global.newArrayList(1);
 
         @NotNull
-        private final Forget.ForgetAndDetectDeletion<Task> taskLinkForget;
-        @NotNull
-        private final Forget.AbstractForget<Termed> termLinkForget;
-        @NotNull
-        private final Forget.AbstractForget<Concept> conceptForget;
+        public final Forget.AbstractForget<Concept> conceptForget;
 
 
         final PremiseGenerator premiser;
@@ -452,23 +433,25 @@ public class Default extends AbstractNAR {
 
             this.activationRate = nar.activationRate;
             this.conceptRemembering = nar.conceptForgetDurations;
-            this.termLinkRemembering = nar.termLinkForgetDurations;
-            this.taskLinkRemembering = nar.taskLinkForgetDurations;
             this.perfection = nar.perfection;
 
             conceptsFiredPerCycle = new MutableInteger(1);
             active = concepts;
 
             this.handlers = new Active(
+                    nar.eventFrameStart.on(this::frame),
                     nar.eventCycleEnd.on(this::cycle),
                     nar.eventReset.on(this::reset)
             );
 
-            conceptForget = new Forget.ExpForget(nar, conceptRemembering, perfection);
-            termLinkForget = new Forget.ExpForget(nar, termLinkRemembering, perfection);
-            taskLinkForget = new Forget.ExpForget(nar, taskLinkRemembering, perfection)
-                    .withDeletedItemFiltering();
+            conceptForget = new Forget.ExpForget(conceptRemembering, perfection);
 
+
+        }
+
+        protected final void frame(NAR nar) {
+            conceptForget.accept(nar);
+            premiser.frame(nar);
         }
 
         protected final void cycle(Memory memory) {
@@ -513,30 +496,8 @@ public class Default extends AbstractNAR {
 
             if (conceptsToFire == 0 || b.isEmpty()) return;
 
-            List<BLink<Concept>> f = this.firing;
-            b.sample(conceptsToFire, f::add);
+            b.sample(conceptsToFire, this.premiser);
 
-            int tasklinksToFire = tasklinksFiredPerFiredConcept.intValue();
-            int termlnksToFire = termlinksFiredPerFiredConcept.intValue();
-            Forget.AbstractForget<Termed> termLinkForget = this.termLinkForget;
-            Forget.ForgetAndDetectDeletion<Task> taskLinkForget = this.taskLinkForget;
-
-            PremiseGenerator pg = this.premiser;
-
-            for (int i = 0, fSize = f.size(); i < fSize; i++) {
-                BLink<Concept> nextConcept = f.get(i);
-                if (nextConcept == null)
-                    throw new NullPointerException();
-                pg.firePremiseSquared(
-                        nextConcept,
-                        tasklinksToFire,
-                        termlnksToFire,
-                        termLinkForget,
-                        taskLinkForget
-                );
-            }
-
-            f.clear();
         }
 
         @Nullable
@@ -606,7 +567,6 @@ public class Default extends AbstractNAR {
      */
     public static class DefaultPremiseGenerator extends PremiseGenerator {
 
-        protected final Collection<Task> sharedResultBuffer;
 
         /**
          * re-used, not to be used outside of this
@@ -622,36 +582,35 @@ public class Default extends AbstractNAR {
         @Range(min = 0, max = 1f)
         public final MutableFloat confMin;
 
-        public DefaultPremiseGenerator(@NotNull NAR nar, Deriver deriver) {
-            /** the resutls buffer should probably be a Set because the derivations may duplicate */
-            this(nar, deriver, Global.newHashSet(64));
-        }
+//        public DefaultPremiseGenerator(@NotNull NAR nar, Deriver deriver) {
+//            /** the resutls buffer should probably be a Set because the derivations may duplicate */
+//            this(nar, deriver, Global.newHashSet(64));
+//        }
 
-        public DefaultPremiseGenerator(@NotNull NAR nar, Deriver deriver, Collection<Task> resultsBuffer) {
-            super(nar);
+        public DefaultPremiseGenerator(@NotNull NAR nar, @NotNull Deriver deriver, @NotNull Forget.BudgetForgetFilter<Task> taskLinkForget, @NotNull Forget.BudgetForget<Termed> termLinkForget) {
+            super(nar, taskLinkForget, termLinkForget);
             this.matcher = new PremiseEval(nar.random, deriver);
-            this.sharedResultBuffer = resultsBuffer;
             this.confMin = new MutableFloat(Global.TRUTH_EPSILON);
 
-            nar.onFrame(this::updateDerivationParameters);
         }
 
         /**
          * update derivation parameters (each frame)
          */
-        private void updateDerivationParameters(NAR nar) {
+        @Override public final void frame(NAR nar) {
             matcher.setMinConfidence(confMin.floatValue());
+            taskLinkForget.accept(nar);
+            termLinkForget.accept(nar);
         }
 
         @Override
         protected void premise(BLink<? extends Concept> concept, BLink<? extends Task> taskLink, BLink<? extends Termed> termLink, Task belief) {
-            newPremise(concept, taskLink, termLink, belief).run(matcher);
+            matcher.run(newPremise(concept, taskLink, termLink, belief));
         }
 
-        protected
         @NotNull
-        ConceptProcess newPremise(BLink<? extends Concept> concept, BLink<? extends Task> taskLink, BLink<? extends Termed> termLink, Task belief) {
-            return new DefaultConceptProcess(nar, concept, taskLink, termLink, belief, sharedResultBuffer);
+        protected ConceptProcess newPremise(BLink<? extends Concept> concept, BLink<? extends Task> taskLink, BLink<? extends Termed> termLink, Task belief) {
+            return new DefaultConceptProcess(nar, concept, taskLink, termLink, belief, nar::process);
         }
 
     }

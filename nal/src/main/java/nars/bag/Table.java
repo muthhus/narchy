@@ -1,5 +1,6 @@
 package nars.bag;
 
+import com.google.common.base.Joiner;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -51,5 +52,8 @@ public interface Table<K,V> extends Iterable<V> {
     void topWhile(@NotNull Predicate<V> each);
 
 
+    default String toStringDetailed() {
+        return Joiner.on(",").join(this);
+    }
 
 }

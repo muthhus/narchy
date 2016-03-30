@@ -144,7 +144,7 @@ public class PremiseEval extends FindSubst {
     /**
      * set the next premise
      */
-    public final void start(@NotNull ConceptProcess p) {
+    public final void run(@NotNull ConceptProcess p) {
 
         this.premise = p;
 

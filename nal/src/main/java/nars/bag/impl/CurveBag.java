@@ -138,6 +138,9 @@ public class CurveBag<V> implements Bag<V> {
     @Override
     public CurveBag<V> sample(int n, @NotNull Consumer<? super BLink<V>> target) {
 
+        assert(!isEmpty());
+        assert(n > 0);
+
         int ss = size();
         final int begin, end;
         if (ss <= n) {
@@ -400,6 +403,11 @@ public class CurveBag<V> implements Bag<V> {
     public final float priAt(int cap) {
         return arrayBag.priAt(cap);
     }
+
+//    //TODO
+//    public int sizeQueue() {
+//        return 0;
+//    }
 
 
 //    public BLink<V> get(int i) {

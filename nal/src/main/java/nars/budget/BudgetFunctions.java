@@ -253,15 +253,15 @@ public final class BudgetFunctions extends UtilityFunctions {
         Budgeted taskLink = nal.taskLink;
         assert(!taskLink.isDeleted());
         //if (task.isDeleted()) return null;
-        Task task = nal.task();
+        //Task task = nal.task();
 
 
         //(taskLink !=null) ? taskLink :  nal.task().budget();
 
         //Task task = taskLink.get();
 
-        float priority = task.pri();
-        float durability = task.dur();
+        float priority = taskLink.pri();
+        float durability = taskLink.dur();
         float quality  = qualRaw;
 
 

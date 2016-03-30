@@ -1,5 +1,6 @@
 package nars.bag;
 
+import com.google.common.base.Joiner;
 import com.gs.collections.impl.list.mutable.primitive.DoubleArrayList;
 import nars.Global;
 import nars.bag.impl.ArrayBag;
@@ -298,6 +299,47 @@ public class CurveBagTest  {
         }
     }
 
+//    /** maybe should be in ArrayBagTest */
+//    @Test public void inQueueTest() {
+//
+//        CurveBag<String> s = newBag(2);
+//
+//        //1. fill bag
+//        s.put("a0", new UnitBudget(0.25f, 0, 0));
+//        s.put("a1", new UnitBudget(0.25f, 0, 0));
+//
+//        //2. attempt to insert new under-budgeted item while bag is full
+//        s.put("b", new UnitBudget(0.2f, 0, 0));
+//        assertEquals(2, s.size());
+//
+//        assertEquals(1, s.sizeQueue()); //b should be in the queue
+//
+//        s.commit(); //apply pending changes. try inserting items in the queue. if an item is not able to be inserted it remains buffering
+//
+//        //3. insert again, bringing "b" effective budget to 0.4
+//        s.put("b", new UnitBudget(0.2f, 0, 0));
+//        assertEquals(2, s.size()); //still not actually in the bag
+//        assertEquals("a0=$0.2500;0.0000;0.0000$,a1=$0.2500;0.0000;0.0000$", s.toStringDetailed());
+//
+//        assertEquals(1, s.sizeQueue()); //b should remain in the queue, accumulating the 2nd dose
+//
+//        s.commit(); //apply pending changes, while sorting. then try inserting items in the queue. if an item is
+//
+//        //4. if "b" has been successfully backlogged in the time prior to the commit,
+//        //its accumulated budget is enough to displace a previous entry
+//
+//        assertEquals(2, s.size()); //still not actually in the bag
+//        assertEquals(0, s.sizeQueue()); //commit has cleared queue
+//        assertEquals("b=$0.4000;0.0000;0.0000$,a1=$0.2500;0.0000;0.0000$", s.toStringDetailed());
+//
+//        //TODO test queue finite size and
+//
+//    }
+
+    public static CurveBag<String> newBag(int n) {
+        Random rng = new XorShift128PlusRandom(1);
+        return new CurveBag(n, rng);
+    }
 
 
 //

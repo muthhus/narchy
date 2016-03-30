@@ -12,6 +12,7 @@ import java.util.function.Consumer;
 
 import static java.lang.System.out;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 public class TemporalTest {
@@ -39,6 +40,7 @@ public class TemporalTest {
 
     }
 
+    //TODO make more of these tests with different niputs
     @Test public void testTemporalStability() {
 
         int cycles = 300; //increase for more thorough testing
@@ -77,6 +79,8 @@ public class TemporalTest {
 
             //assertEquals("[[1..1], [2..2], [5..5]]", times.toString());
         }
+
+        assertTrue(irregular.isEmpty());
     }
 
     static void print(Default n, TimeMap m) {

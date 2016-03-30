@@ -59,6 +59,8 @@ abstract public class ConceptProcess implements Premise {
         this.nar = nar;
 
         this.taskLink = taskLink;
+        //assert(!task().isDeleted());
+
         this.conceptLink = conceptLink;
         this.termLink = termLink;
 
@@ -191,14 +193,13 @@ abstract public class ConceptProcess implements Premise {
                 //.anticipate(derivedTemporal && d.anticipate)
                 .log( Global.DEBUG ? d.rule : "Derived");
 
-        if (!complete(derived))
-            return;
+        accept(derived);
 
         //ETERNALIZE:
 
         if ((occ != ETERNAL) && (truth != null) && d.eternalize) {
 
-            complete(newDerivedTask(c, punct)
+            accept(newDerivedTask(c, punct)
                     .truth(
                         truth.freq(),
                         eternalize(truth.conf())
@@ -224,41 +225,14 @@ abstract public class ConceptProcess implements Premise {
         return new DerivedTask(c, punct, this);
     }
 
-    private final boolean complete(Task derived) {
-
-//        //pre-normalize to avoid discovering invalidity after having consumed space while in the input queue
-//        derived = derived.normalize(nar());
-//        if (derived != null) {
-//
-//            //if (Global.DEBUG) {
-//            if (task().equals(derived))
-//                return false;
-//                //throw new RuntimeException("derivation same as task");
-//            if (belief() != null && belief().equals(derived))
-//                return false;
-//                //throw new RuntimeException("derivation same as belief");
-//            //}
-
-            accept(derived);
-        return true;
-//            return true;
-//        }
-//        return false;
-    }
 
 
     /** when a derivation is accepted, this is called  */
     abstract protected void accept(Task derivation);
 
-    /** after a derivation has completed, commit is called allowing it to process anything collected */
-    abstract protected void commit();
 
-    public final void run(@NotNull PremiseEval matcher) {
-        matcher.start(this);
-        commit();
-    }
 
-    public boolean hasTemporality() {
+    public final boolean hasTemporality() {
         if (task().term().dt()!= DTERNAL) return true;
         @Nullable Task b = belief();
         if (b == null) return false;

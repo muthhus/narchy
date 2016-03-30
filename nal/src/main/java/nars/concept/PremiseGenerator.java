@@ -4,12 +4,16 @@ import nars.Global;
 import nars.NAR;
 import nars.bag.BLink;
 import nars.bag.Bag;
+import nars.budget.Forget;
+import nars.data.Range;
 import nars.nal.Tense;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Terms;
+import nars.term.container.TermContainer;
+import nars.util.data.MutableInteger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,21 +23,36 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 /** not thread safe; call from only one thread at a time */
-abstract public class PremiseGenerator /*extends UnifySubst */implements Function<Term, Task> {
+abstract public class PremiseGenerator /*extends UnifySubst */implements Function<Term, Task>, Consumer<BLink<? extends Concept>> {
 
     @NotNull
     public final NAR nar;
-    private BLink<? extends Termed> termLink;
-    private BLink<? extends Concept> concept;
-    @Nullable
-    private BLink<? extends Task> taskLink;
+//    private BLink<? extends Termed> termLink;
+//    private BLink<? extends Concept> concept;
+//    @Nullable
+//    private BLink<? extends Task> taskLink;
+//
     //private final Map<Term, Task> beliefCache = Global.newHashMap();
     long lastMatch = Tense.TIMELESS;
 
-    public PremiseGenerator(@NotNull NAR nar) {
+    @NotNull
+    public final Forget.BudgetForgetFilter<Task> taskLinkForget;
+    @NotNull
+    public final Forget.BudgetForget<Termed> termLinkForget;
+
+    @Range(min = 0, max = 16, unit = "TaskLink") //TODO use float percentage
+    public final MutableInteger tasklinksFiredPerFiredConcept = new MutableInteger(1);
+
+    @Range(min = 0, max = 16, unit = "TermLink")
+    public final MutableInteger termlinksFiredPerFiredConcept = new MutableInteger(1);
+
+
+
+    public PremiseGenerator(@NotNull NAR nar, @NotNull Forget.BudgetForgetFilter<Task> taskLinkForget, @NotNull Forget.BudgetForget<Termed> termLinkForget) {
         //super(Op.VAR_QUERY, nar, true);
         this.nar = nar;
-        this.lastMatch = nar.time();
+        this.taskLinkForget = taskLinkForget;
+        this.termLinkForget = termLinkForget;
     }
 
     /**
@@ -55,48 +74,58 @@ abstract public class PremiseGenerator /*extends UnifySubst */implements Functio
     @NotNull
     private BLink[] tasksArray = new BLink[0];
 
+    @Override
+    public final void accept(BLink<? extends Concept> c) {
+        firePremiseSquared(
+            c,
+            tasklinksFiredPerFiredConcept.intValue(),
+            termlinksFiredPerFiredConcept.intValue()
+        );
+    }
+
+    /** to be overridden by subclasses, called on each frame to update parameters */
+    public void frame(NAR nar) {
+
+    }
 
     /**
      * main entry point:
      * iteratively supplies a matrix of premises from the next N tasklinks and M termlinks
      * (recycles buffers, non-thread safe, one thread use this at a time)
      */
-    public void firePremiseSquared(
+    final void firePremiseSquared(
             @NotNull BLink<? extends Concept> conceptLink,
-            int tasklinks, int termlinks,
-            @NotNull Consumer<BLink<? extends Termed>> eachTermLink /* forget/update func */,
-            @NotNull Predicate<BLink<? extends Task>> eachTaskLink /* forget/update func */
-    ) {
-
-        long now = nar.time();
-        if (lastMatch!= now) {
-            lastMatch = now;
-            //beliefCache.clear();
-        }
+            int tasklinks, int termlinks) {
 
         Concept concept = conceptLink.get();
 
-
-        Collection<BLink<Task>> tasksBuffer;
-        Collection<BLink<? extends Termed>> termsBuffer;
-        termsBuffer = this.terms;
+        Bag<Task> taskLinks = concept.tasklinks();
+        if (taskLinks.filter(taskLinkForget).commit().isEmpty())
+            return; //no tasklinks
 
         Bag<Termed> termLinks = concept.termlinks();
-        boolean tlEmpty = termLinks.isEmpty();
-        if (!tlEmpty) {
+        if (termLinks.forEachThen(termLinkForget).commit().isEmpty())
+            return; //no termlinks
+
+        Collection<BLink<? extends Termed>> termsBuffer;
+        {
+            termsBuffer = this.terms;
             termsBuffer.clear();
-            termLinks.forEachThen(eachTermLink).commit().sample(termlinks, termsBuffer::add);
+            termLinks.sample(termlinks, termsBuffer::add);
+            //if (termsBuffer.isEmpty()) return; //no termlinks sampled
+            assert (!termsBuffer.isEmpty());
         }
 
-        if (termsBuffer.isEmpty())
-            return; //no termlink available
 
+        Collection<BLink<Task>> tasksBuffer;
+        {
+            tasksBuffer = this.tasks;
+            tasksBuffer.clear();
+            taskLinks.sample(tasklinks, tasksBuffer::add);
+            //if (tasksBuffer.isEmpty()) return; //no tasklink available
+            assert (!tasksBuffer.isEmpty());
+        }
 
-        tasksBuffer = this.tasks;
-        tasksBuffer.clear();
-        //concept.getTaskLinks().sample(tasklinks, eachTaskLink, tasksBuffer).commit();
-        concept.tasklinks().filter(eachTaskLink).commit().sample(tasklinks, tasksBuffer::add);
-        if (tasksBuffer.isEmpty()) return;
 
         //convert to array for fast for-within-for iterations
         BLink[] tasksArray = this.tasksArray = tasksBuffer.toArray(this.tasksArray);
@@ -113,26 +142,20 @@ abstract public class PremiseGenerator /*extends UnifySubst */implements Functio
 
     }
 
-
-
-    void match(BLink<? extends Concept> concept, @NotNull BLink<? extends Task>[] taskLinks, @NotNull BLink<? extends Termed> termLink) {
-
-
-        this.concept = concept;
-        this.termLink = termLink;
+    final void match(BLink<? extends Concept> concept, @NotNull BLink<? extends Task>[] taskLinks, @NotNull BLink<? extends Termed> termLink) {
 
         for (BLink<? extends Task> taskLink : taskLinks) {
 
-            if (taskLink == null) break; //null-terminated array, ends
+            if (taskLink == null)
+                break; //null-terminated array, ends
 
-            Compound taskLinkTerm = taskLink.get().term();
-            Term termLinkTerm  = termLink.get().term();
-
-            if (Terms.equalSubTermsInRespectToImageAndProduct(taskLinkTerm, termLinkTerm )) {
+            Task task = taskLink.get();
+            if (task.isDeleted())
                 continue;
-            }
 
-            this.taskLink = taskLink;
+            Term termLinkTerm  = termLink.get().term();
+            if (Terms.equalSubTermsInRespectToImageAndProduct(task.term(), termLinkTerm ))
+                continue;
 
             //matchAll(taskLinkTerm, termLinkTerm );
             premise(concept, taskLink, termLink, apply(termLinkTerm));

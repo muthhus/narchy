@@ -48,7 +48,7 @@ public class Kernel {
         this.nar = n;
         this.schedule = new CurveBag(capacity, nar.random);
         schedule.merge(BudgetMerge.avgDQBlend);
-        this.schForget = new Forget.ExpForget(nar, rememberTime, new MutableFloat(1) /* TODO use immutablefloat*/)
+        this.schForget = new Forget.ExpForget(rememberTime, new MutableFloat(1) /* TODO use immutablefloat*/)
             .withDeletedItemFiltering();
         nar.eventInput.on(t->{
            if (t.isInput() && (t.isGoal() || t.isCommand()))

@@ -17,12 +17,14 @@ public enum Forget { ;
 
     /** processes a BLink, usually affecting its budget somehow */
     public interface BudgetForget<X> extends Consumer<BLink<? extends X>> {
-
+        /** called each frame to update parameters */
+        void accept(@NotNull NAR nar);
     }
 
     /** acts as a filter to decide if an element should remain in a bag, otherwise some forgetting modification an be applied to a retained item */
     public interface BudgetForgetFilter<X> extends Predicate<BLink<? extends X>> {
-
+        /** called each frame to update parameters */
+        void accept(@NotNull NAR nar);
     }
 
     /** for BLinked budgeted items: if that item becomes Deleted, then the enclosing BLink is removed during a Bag.filter operation that applies this Predicate */
@@ -41,6 +43,11 @@ public enum Forget { ;
             forget.accept(b);
             return true;
         }
+
+        @Override
+        public final void accept(@NotNull NAR nar) {
+            forget.accept(nar);
+        }
     }
 
     public abstract static class AbstractForget<X> implements BudgetForget<X> {
@@ -57,16 +64,14 @@ public enum Forget { ;
         protected transient float perfectionCached = Float.NaN;
         protected transient long now = Tense.TIMELESS;
 
-        public AbstractForget(@NotNull NAR nar, @NotNull MutableFloat forgetDurations, @NotNull MutableFloat perfection) {
+        public AbstractForget(@NotNull MutableFloat forgetDurations, @NotNull MutableFloat perfection) {
             this.forgetDurations = forgetDurations;
             this.perfection = perfection;
-            nar.onFrame(this::accept);
         }
 
-        @Override
-        public abstract void accept(@NotNull BLink<? extends X> budget);
+        @Override public abstract void accept(@NotNull BLink<? extends X> budget);
 
-        final void accept(@NotNull NAR nar) {
+        @Override public final void accept(@NotNull NAR nar) {
             //same for duration of the cycle
             forgetCyclesCached = forgetDurations.floatValue() * nar.duration();
             perfectionCached = perfection.floatValue();
@@ -85,7 +90,7 @@ public enum Forget { ;
     public static class LinearForget<X> extends AbstractForget<X> {
 
         public LinearForget(@NotNull NAR nar, @NotNull MutableFloat forgetTime, @NotNull MutableFloat perfection) {
-            super(nar, forgetTime, perfection);
+            super(forgetTime, perfection);
         }
 
         @Override
@@ -140,8 +145,8 @@ public enum Forget { ;
      *  provided by TonyLo as used in the ALANN system. */
     public final static class ExpForget<X> extends AbstractForget<X> {
 
-        public ExpForget(@NotNull NAR nar, @NotNull MutableFloat forgetTime, @NotNull MutableFloat perfection) {
-            super(nar, forgetTime, perfection);
+        public ExpForget(@NotNull MutableFloat forgetTime, @NotNull MutableFloat perfection) {
+            super(forgetTime, perfection);
         }
 
         @Override

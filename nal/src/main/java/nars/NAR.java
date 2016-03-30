@@ -834,6 +834,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return this;
     }
 
+
     @NotNull
     public NAR inputAt(long time, @NotNull String... tt) {
         //LongPredicate timeCondition = t -> t == time;
@@ -1093,4 +1094,20 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return this;
     }
 
+    abstract public Concept process(@NotNull Task input, float activation);
+
+    public final Concept process(Task input) {
+        return process(input, activationRate.floatValue());
+    }
+
+    /** accepts null-terminated array */
+    public final void process(@NotNull Task... input) {
+        float activation = activationRate.floatValue();
+        for (Task t : input) {
+            if (t == null) //for null-terminated arrays
+                break;
+            if (!t.isDeleted())
+                process(t, activation);
+        }
+    }
 }

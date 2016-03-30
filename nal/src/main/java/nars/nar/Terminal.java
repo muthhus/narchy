@@ -73,6 +73,11 @@ public class Terminal extends AbstractNAR {
 //    }
 
 
+    @Override
+    public Concept process(@NotNull Task input, float activation) {
+        return null;
+    }
+
     @Nullable
     @Override
     public NAR forEachConcept(Consumer<Concept> recip) {
