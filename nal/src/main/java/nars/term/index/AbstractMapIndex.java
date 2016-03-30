@@ -39,6 +39,7 @@ public abstract class AbstractMapIndex implements TermIndex {
     }
 
 
+    @Override
     public final Termed get(@NotNull Termed key, boolean createIfMissing) {
 
         return key instanceof Compound ?

@@ -362,7 +362,7 @@ public interface Temporalize {
 
         Task task = premise.task();
         int taskDT = task.term().dt();
-        int beliefDT = ((Compound) premise.beliefTerm().term()).dt();
+        int beliefDT = premise.beliefTerm().term().dt();
 
         int eventDelta;
         if (taskDT == DTERNAL && beliefDT == DTERNAL) {
@@ -494,7 +494,7 @@ public interface Temporalize {
                     long aTask = tp.subtermTime(ca, DTERNAL);
                     long aBelief = bp.subtermTime(ca, DTERNAL);
                     long bTask = tp.subtermTime(cb, DTERNAL);
-                    long bBelief = bp.subtermTime(cb, bd);
+                    long bBelief = bp.subtermTime(cb, DTERNAL);
 
                     if (belief != null) {
 

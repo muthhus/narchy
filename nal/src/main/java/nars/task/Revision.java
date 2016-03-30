@@ -9,7 +9,6 @@ import nars.nal.LocalRules;
 import nars.nal.Tense;
 import nars.term.Compound;
 import nars.term.Terms;
-import nars.truth.Stamp;
 import nars.truth.Truth;
 import nars.truth.TruthFunctions;
 import org.jetbrains.annotations.NotNull;

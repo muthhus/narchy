@@ -56,7 +56,7 @@ public abstract class FindSubst extends Versioning implements Subst {
     public final Op type;
 
     @Nullable
-    public TermIndex index = null;
+    public TermIndex index;
 
     /**
      * variables whose contents are disallowed to equal each other
@@ -82,27 +82,7 @@ public abstract class FindSubst extends Versioning implements Subst {
     public final Versioned<Compound> parent;
 
 
-    public final List<Termutator> termutes = new FasterList(Global.unificationTermutesMax) {
-
-        final void ensureLimit() {
-            if (size()+1 > Global.unificationTermutesMax) {
-                throw new RuntimeException("Termute limit exceeded");
-                        //+ this + " while trying to add " + x);
-            }
-        }
-
-        @Override
-        public boolean add(Object newItem) {
-            ensureLimit();
-            return super.add(newItem);
-        }
-
-        @Override
-        public void add(int index, Object element) {
-            ensureLimit();
-            super.add(index, element);
-        }
-    };
+    public final List<Termutator> termutes = new LimitedFasterList();
 
 //    public static Ellipsis getFirstEllipsis(@NotNull Compound X) {
 //        int xsize = X.size();
@@ -936,6 +916,32 @@ public abstract class FindSubst extends Versioning implements Subst {
                 if (x.get() != null) return false;
             }
             return true;
+        }
+    }
+
+    private final class LimitedFasterList extends FasterList {
+
+        public LimitedFasterList() {
+            super(Global.unificationTermutesMax);
+        }
+
+        final void ensureLimit() {
+            if (size()+1 > Global.unificationTermutesMax) {
+                throw new RuntimeException("Termute limit exceeded");
+                        //+ this + " while trying to add " + x);
+            }
+        }
+
+        @Override
+        public boolean add(Object newItem) {
+            ensureLimit();
+            return super.add(newItem);
+        }
+
+        @Override
+        public void add(int index, Object element) {
+            ensureLimit();
+            super.add(index, element);
         }
     }
 }

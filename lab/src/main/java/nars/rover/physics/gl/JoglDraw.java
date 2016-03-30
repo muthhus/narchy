@@ -4,6 +4,7 @@ import com.jogamp.opengl.GL2;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Vec2;
+import org.jbox2d.common.Vec3;
 import org.jbox2d.dynamics.World2D;
 import org.jbox2d.particle.ParticleColor;
 
@@ -26,6 +27,20 @@ public class JoglDraw extends JoglAbstractDraw {
     @Override
     public void drawParticlesWireframe(Vec2[] centers, float radius, ParticleColor[] colors, int count) {
 
+    }
+
+    @Override
+    public void drawSolidPolygon(Vec3[] vertices, int vertexCount, Color3f color) {
+        GL2 gl = this.gl;
+        //gl.glPushMatrix();
+        //transformViewport(gl, zero);
+        gl.glBegin(GL2.GL_TRIANGLE_FAN);
+        gl.glColor3f(color.x, color.y, color.z);
+        for (int i = 0; i < vertexCount; i++) {
+            Vec3 v = vertices[i];
+            gl.glVertex3f(v.x, v.y, v.z);
+        }
+        gl.glEnd();
     }
 
     @Override

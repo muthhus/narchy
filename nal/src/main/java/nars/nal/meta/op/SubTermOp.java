@@ -3,7 +3,6 @@ package nars.nal.meta.op;
 import nars.Op;
 import nars.nal.meta.AtomicBooleanCondition;
 import nars.nal.meta.PremiseEval;
-import nars.term.Compound;
 import org.jetbrains.annotations.NotNull;
 
 /**

@@ -192,8 +192,8 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
     }
 
     public static final class Reassigner<X, Y> implements BiFunction<X, Versioned<Y>, Versioned<Y>> {
-        private BiPredicate<X, Y> assigner = null;
-        private Y y = null;
+        private BiPredicate<X, Y> assigner;
+        private Y y;
         final Supplier<Versioned<Y>> pool;
 
         public Reassigner(Supplier<Versioned<Y>> pool) {

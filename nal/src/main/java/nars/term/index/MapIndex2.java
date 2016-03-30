@@ -1,7 +1,6 @@
 package nars.term.index;
 
 import com.gs.collections.impl.map.mutable.primitive.IntObjectHashMap;
-import nars.Op;
 import nars.concept.ConceptBuilder;
 import nars.term.*;
 import nars.term.container.TermContainer;

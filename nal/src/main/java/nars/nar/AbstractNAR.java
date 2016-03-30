@@ -1,7 +1,5 @@
 package nars.nar;
 
-import com.gs.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
-import javassist.scopedpool.SoftValueHashMap;
 import nars.Global;
 import nars.NAR;
 import nars.concept.Concept;
@@ -22,7 +20,6 @@ import nars.term.Term;
 import nars.term.TermIndex;
 import nars.term.Terms;
 import nars.term.atom.Atom;
-import nars.term.container.TermContainer;
 import nars.term.index.MapIndex1;
 import nars.term.index.MapIndex2;
 import nars.time.Clock;

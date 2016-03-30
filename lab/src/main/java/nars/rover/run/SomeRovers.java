@@ -150,6 +150,13 @@ public class SomeRovers {
         //RoverWorld world = new ReactorWorld(32, 48, 32);
         new FoodSpawnWorld1(sim, 128, 48, 48, 0.5f);
 
+        {
+            Grid2D g = Grid2D.newMazePlanet(50, 30, 3);
+            sim.game.createEntity().edit()
+                    .add(g)
+                    .add(new DrawAbove(g)); //HACK
+        }
+
 
         //.add(new RespawnOnDeath())
         //.add(new Gravity())

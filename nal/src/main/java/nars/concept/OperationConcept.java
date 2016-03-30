@@ -8,7 +8,6 @@ import nars.bag.Bag;
 import nars.nal.Tense;
 import nars.nal.nal8.Execution;
 import nars.task.Task;
-import nars.term.Compound;
 import nars.term.Operator;
 import nars.term.Termed;
 import nars.term.compound.GenericCompound;

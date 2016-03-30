@@ -51,7 +51,7 @@ abstract public class ConceptProcess implements Premise {
      *      0: not cyclic
      *      1: cyclic
      */
-    private transient byte cyclic = -1;
+    private final transient byte cyclic = -1;
 
     public ConceptProcess(NAR nar, BLink<? extends Concept> conceptLink,
                           BLink<? extends Task> taskLink,

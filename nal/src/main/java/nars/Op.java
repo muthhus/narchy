@@ -4,7 +4,6 @@ package nars;
 import com.gs.collections.api.tuple.primitive.IntIntPair;
 import nars.nal.Tense;
 import nars.term.Compound;
-import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
 import org.jetbrains.annotations.NotNull;

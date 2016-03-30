@@ -14,8 +14,6 @@ import nars.nal.op.ImmediateTermTransform;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.TermIndex;
-import nars.term.Termed;
 import nars.term.atom.Atomic;
 import nars.term.transform.subst.FindSubst;
 import nars.truth.Truth;

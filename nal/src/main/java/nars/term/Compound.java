@@ -206,6 +206,7 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 //        return null;
 //    }
 
+    @Override
     int opRel();
     /*@Override default int opRel() {
         return Terms.opRel(op().ordinal(), relation());

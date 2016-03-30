@@ -1,6 +1,5 @@
 package nars.bag;
 
-import com.google.common.base.Joiner;
 import com.gs.collections.impl.list.mutable.primitive.DoubleArrayList;
 import nars.Global;
 import nars.bag.impl.ArrayBag;

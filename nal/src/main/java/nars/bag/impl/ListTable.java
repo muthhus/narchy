@@ -17,7 +17,7 @@ import java.util.function.Predicate;
  */
 public interface ListTable<V, L> extends Table<V, L> {
 
-    @Nullable
+    @NotNull
     ListTable<Task, Task> Empty = new ListTable() {
 
         @Override

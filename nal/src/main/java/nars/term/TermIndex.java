@@ -1,6 +1,5 @@
 package nars.term;
 
-import nars.$;
 import nars.Global;
 import nars.Narsese;
 import nars.Op;
@@ -14,7 +13,6 @@ import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.atom.Atomic;
 import nars.term.compound.GenericCompound;
-import nars.term.container.ShuffledSubterms;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.transform.CompoundTransform;

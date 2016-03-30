@@ -307,37 +307,46 @@ public abstract class JoglAbstractDraw extends DebugDraw {
 //    }
 
 
-//    public void drawSolidRect(float px, float py, float w, float h, float r, float G, float b) {
-//        //saveState(g);
+    static final Vec3[] rectv = new Vec3[4];
+    static {
+        for (int i = 0;i<4; i++)
+            rectv[i] = new Vec3();
+    }
+
+    public void drawSolidRect(float px, float py, float w, float h, float z, float r, float G, float b) {
+        //saveState(g);
+
+//        getWorldToScreenToOut(px, py, temp);
+//        int ipx = (int)temp.x;  int ipy = (int)temp.y;
+//        getWorldToScreenToOut(px+w, py+h, temp);
 //
-////        getWorldToScreenToOut(px, py, temp);
-////        int ipx = (int)temp.x;  int ipy = (int)temp.y;
-////        getWorldToScreenToOut(px+w, py+h, temp);
-////
-////        int jpx = (int)temp.x;  int jpy = (int)temp.y;
-////        int iw = Math.abs(jpx - ipx);
-////        int ih = Math.abs(jpy - ipy);
-//
-////        if ((ipy/2 > g.getDeviceConfiguration().getBounds().getHeight()) ||
-////                (ipx/2 > g.getDeviceConfiguration().getBounds().getWidth()))
-////                    return;
-//
-////        g.setColor(new Color(r, G, b));
-////        g.fillRect(ipx-iw/2, ipy-ih/2, iw, ih);
-//
-//        //if (g.getDeviceConfiguration().getBounds().intersects(ipx-iw/2, ipy-ih/2, iw, ih)) {
-//        //}
-//
-//        //float ulx = ipx-iw/2, uly = ipy-ih/2;
-//        w/=2;
-//        h/=2;
-//        Vec2[] vert = new Vec2[4];
-//        vert[0] = new Vec2(px - w, py - h);
-//        vert[1] = new Vec2(px + w, py - h);
-//        vert[2] = new Vec2(px + w, py + h);
-//        vert[3] = new Vec2(px - w, py + h);
-//        drawSolidPolygon(vert, 4, new Color3f(r, G, b));
-//    }
+//        int jpx = (int)temp.x;  int jpy = (int)temp.y;
+//        int iw = Math.abs(jpx - ipx);
+//        int ih = Math.abs(jpy - ipy);
+
+//        if ((ipy/2 > g.getDeviceConfiguration().getBounds().getHeight()) ||
+//                (ipx/2 > g.getDeviceConfiguration().getBounds().getWidth()))
+//                    return;
+
+//        g.setColor(new Color(r, G, b));
+//        g.fillRect(ipx-iw/2, ipy-ih/2, iw, ih);
+
+        //if (g.getDeviceConfiguration().getBounds().intersects(ipx-iw/2, ipy-ih/2, iw, ih)) {
+        //}
+
+        //float ulx = ipx-iw/2, uly = ipy-ih/2;
+        w/=2;
+        h/=2;
+
+        rectv[0].set(px - w, py - h, z);
+        rectv[1].set(px + w, py - h, z);
+        rectv[2].set(px + w, py + h, z);
+        rectv[3].set(px - w, py + h, z);
+
+
+        fillColor.set(r, G, b);
+        drawSolidPolygon(rectv, 4, fillColor);
+    }
 
 
 //  @Override

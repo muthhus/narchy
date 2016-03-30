@@ -11,7 +11,6 @@ import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.index.AbstractMapIndex;
-import nars.term.index.MapIndex1;
 import nars.term.index.MapIndex2;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.junit.Ignore;
@@ -21,9 +20,7 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static nars.$.$;
-import static nars.$.operator;
-import static nars.$.p;
+import static nars.$.*;
 import static org.junit.Assert.*;
 
 

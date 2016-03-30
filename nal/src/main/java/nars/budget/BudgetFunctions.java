@@ -24,7 +24,6 @@ import nars.Memory;
 import nars.bag.BLink;
 import nars.concept.ConceptProcess;
 import nars.nal.UtilityFunctions;
-import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Truth;

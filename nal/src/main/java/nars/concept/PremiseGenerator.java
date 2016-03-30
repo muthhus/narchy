@@ -8,11 +8,9 @@ import nars.budget.Forget;
 import nars.data.Range;
 import nars.nal.Tense;
 import nars.task.Task;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Terms;
-import nars.term.container.TermContainer;
 import nars.util.data.MutableInteger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,7 +18,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 /** not thread safe; call from only one thread at a time */
 abstract public class PremiseGenerator /*extends UnifySubst */implements Function<Term, Task>, Consumer<BLink<? extends Concept>> {
@@ -108,23 +105,19 @@ abstract public class PremiseGenerator /*extends UnifySubst */implements Functio
             return; //no termlinks
 
         Collection<BLink<? extends Termed>> termsBuffer;
-        {
-            termsBuffer = this.terms;
-            termsBuffer.clear();
-            termLinks.sample(termlinks, termsBuffer::add);
-            //if (termsBuffer.isEmpty()) return; //no termlinks sampled
-            assert (!termsBuffer.isEmpty());
-        }
+        termsBuffer = this.terms;
+        termsBuffer.clear();
+        termLinks.sample(termlinks, termsBuffer::add);
+        //if (termsBuffer.isEmpty()) return; //no termlinks sampled
+        assert (!termsBuffer.isEmpty());
 
 
         Collection<BLink<Task>> tasksBuffer;
-        {
-            tasksBuffer = this.tasks;
-            tasksBuffer.clear();
-            taskLinks.sample(tasklinks, tasksBuffer::add);
-            //if (tasksBuffer.isEmpty()) return; //no tasklink available
-            assert (!tasksBuffer.isEmpty());
-        }
+        tasksBuffer = this.tasks;
+        tasksBuffer.clear();
+        taskLinks.sample(tasklinks, tasksBuffer::add);
+        //if (tasksBuffer.isEmpty()) return; //no tasklink available
+        assert (!tasksBuffer.isEmpty());
 
 
         //convert to array for fast for-within-for iterations

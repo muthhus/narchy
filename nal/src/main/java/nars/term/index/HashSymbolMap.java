@@ -39,7 +39,7 @@ public class HashSymbolMap implements SymbolMap {
     public Termed resolveOrAdd(String s, @NotNull Function<Term, ? extends Termed> conceptBuilder) {
 
         return map.computeIfAbsent(s,
-                S -> (AtomConcept)conceptBuilder.apply($(S)));
+                S -> conceptBuilder.apply($(S)));
     }
 
     @Override

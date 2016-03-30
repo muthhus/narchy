@@ -27,10 +27,7 @@
 package org.jbox2d.callbacks;
 
 
-import org.jbox2d.common.Color3f;
-import org.jbox2d.common.IViewportTransform;
-import org.jbox2d.common.Transform;
-import org.jbox2d.common.Vec2;
+import org.jbox2d.common.*;
 import org.jbox2d.particle.ParticleColor;
 
 /**
@@ -122,6 +119,7 @@ public abstract class DebugDraw {
    * @param color
    */
   public abstract void drawSolidPolygon(Vec2[] vertices, int vertexCount, Color3f color);
+  public abstract void drawSolidPolygon(Vec3[] vertices, int vertexCount, Color3f color);
 
   /**
    * Draw a circle.

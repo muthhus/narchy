@@ -207,7 +207,7 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseEval> {
 
     @Nullable
     public static ImmutableMap<Term, MatchConstraint> initConstraints(@NotNull ListMultimap<Term, MatchConstraint> c) {
-        if ((c == null) | (c.isEmpty())) return null;
+        if (c.isEmpty()) return null;
 
         Map<Term, MatchConstraint> con = Global.newHashMap(c.size());
         c.asMap().forEach((t, cc) -> {
@@ -233,7 +233,7 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseEval> {
 
         @Override
         public boolean booleanValueOf(@NotNull PremiseEval m) {
-            Term[] x =  ((Compound)m.term).terms();
+            Term[] x =  m.term.terms();
             return x[0].equals(x[1]);
         }
 
@@ -266,7 +266,7 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseEval> {
 
         @Override
         public boolean booleanValueOf(@NotNull PremiseEval m) {
-            Term[] x =  ((Compound)m.term).terms();
+            Term[] x =  m.term.terms();
             Term maybeContainer = x[this.container];
             if (!(maybeContainer instanceof Compound))
                 return false;
