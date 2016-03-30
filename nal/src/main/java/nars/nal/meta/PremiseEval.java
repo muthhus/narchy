@@ -15,6 +15,7 @@ import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.TermIndex;
+import nars.term.Termed;
 import nars.term.atom.Atomic;
 import nars.term.transform.subst.FindSubst;
 import nars.truth.Truth;
@@ -62,7 +63,6 @@ public class PremiseEval extends FindSubst {
 
 
     /** cached value */
-    private TermIndex index;
     private int termSub1Op, termSub2Op;
 
     public PremiseEval(Random r, Deriver deriver) {
@@ -217,11 +217,7 @@ public class PremiseEval extends FindSubst {
 //        }
     }
 
-    @Nullable
-    @Override public final Term resolve(@NotNull Term t) {
-        //TODO make a half resolve that only does xy?
-        return index.apply(this, t);
-    }
+
 
     public final void setMinConfidence(float minConfidence) {
         this.minConfidence = minConfidence;

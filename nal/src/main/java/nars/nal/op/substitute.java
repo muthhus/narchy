@@ -7,6 +7,7 @@ import nars.nal.meta.PremiseEval;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.TermIndex;
+import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.term.transform.subst.MapSubst;
 import nars.term.transform.subst.Subst;
@@ -99,7 +100,7 @@ public class substitute extends ImmediateTermTransform implements PremiseAware {
 //            throw new RuntimeException("do these need copied too?");
 //        }
 
-        return r.premise.nar().index.apply(m, term);
+        return Termed.termOrNull(r.premise.nar().index.apply(m, term));
     }
 
     //    protected boolean substitute(Compound p, MapSubst m, Term a, Term b) {

@@ -25,7 +25,7 @@ public enum ImageMatch /*extends ArrayEllipsisMatch<Term>*/ {
      * @return
      */
     @NotNull
-    public static EllipsisMatch put(@NotNull Term raw, @NotNull Term relationTerm, @NotNull Compound y) {
+    public static Term put(@NotNull Term raw, @NotNull Term relationTerm, @NotNull Compound y) {
 
         Term[] t = EllipsisMatch.expand(raw);
 
@@ -59,16 +59,13 @@ public enum ImageMatch /*extends ArrayEllipsisMatch<Term>*/ {
         }
 
 
-        return new EllipsisMatch(t2);
+        return EllipsisMatch.match(t2);
     }
 
 
 
     @NotNull
     public static Term take(@NotNull Term m, int imageIndex) {
-
-        //this.imageIndex = imageIndex;
-
         //mask the relation term
         Term[] t = EllipsisMatch.expand(m);
         t[imageIndex] = Imdex;

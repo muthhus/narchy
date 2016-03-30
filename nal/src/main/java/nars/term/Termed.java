@@ -31,4 +31,9 @@ public interface Termed<T extends Term>  {
         return this;
     }
 
+    static Term termOrNull(Termed x) {
+        if (x == null) return null;
+        return x.term();
+    }
+
 }

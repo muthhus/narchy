@@ -174,25 +174,29 @@ public interface TermIndex {
      * returns the resolved term according to the substitution
      */
     @Nullable
-    default Termed transform(@Nullable Compound trc, @NotNull Subst f) {
+    default Termed transform(@Nullable Compound input, @NotNull Subst f) {
 
-        if (trc == null)
+        if (input == null)
             return null; //pass-through
 
-        Term y = f.term(trc);
+        //if f is empty there will be no changes to apply anyway
+        if (f.isEmpty())
+            return input;
+
+        Term y = f.term(input);
         if (y != null)
             return y;
 
-        int len = trc.size();
+        int len = input.size();
         if (len == 0)
-            return trc; //atomic or zero size ( ex: () ), proceed no further
+            return input; //atomic or zero size ( ex: () ), proceed no further
 
-        Compound src = trc;
+        Compound src = input;
 
         List<Term> sub = Global.newArrayList(len /* estimate */);
         for (int i = 0; i < len; i++) {
             Term t = src.term(i);
-            Term u = apply(f, t);
+            Term u = Termed.termOrNull(apply(f, t));
 
             if (u instanceof EllipsisMatch) {
 
@@ -225,8 +229,8 @@ public interface TermIndex {
         TermContainer transformedSubterms = TermContainer.the(sop, sub);
 
         Termed result;
-        if (transformedSubterms.equals(trc.subterms())) {
-            result = trc;
+        if (transformedSubterms.equals(input.subterms())) {
+            result = input;
         } else {
 
             result = transformedCompound(src, transformedSubterms);
@@ -284,24 +288,15 @@ public interface TermIndex {
 
 
     @Nullable
-    default Term apply(@NotNull Subst f, @NotNull Term src) {
-
+    default Termed apply(@NotNull Subst f, @NotNull Term src) {
 
         if (src instanceof Compound) {
-            //if f is empty there will be no changes to apply anyway
-            Termed x = f.isEmpty() ? src : transform((Compound) src, f);
-            if (x==null)
-                return null;
-            return x.term();
-
+            return transform((Compound) src, f);
         } else if (src instanceof Variable) {
-            Term x = f.term(src);
-            if (x != null)
-                return x;
+            return f.term(src);
         }
 
         return src;
-
     }
 
 

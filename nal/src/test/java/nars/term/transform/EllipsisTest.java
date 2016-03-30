@@ -96,7 +96,7 @@ public class EllipsisTest {
                             assertEquals(getExpectedUniqueTerms(arity), varArgs.size());
 
                             Set<Term> varArgTerms = Global.newHashSet(1);
-                            Term u = index.apply(this, varArgs);
+                            Term u = Termed.termOrNull(index.apply(this, varArgs));
                             if (u == null) {
                                 u = varArgs;
                             }
@@ -125,21 +125,20 @@ public class EllipsisTest {
 
 
                         //2. test substitution
-                        Termed s = index.transform(r, this);
+                        Term s = Termed.termOrNull(index.transform(r, this));
                         if (s!=null) {
                             //System.out.println(s);
+                            if (s.varPattern()==0)
+                                selectedFixed.add(s);
 
-                            Term ss = s.term();
-                            if (ss.varPattern()==0)
-                                selectedFixed.add(ss);
-
-                            assertEquals(s.toString() + " should be all subbed by " + this.xy.toString(), 0, ss.varPattern());
+                            assertEquals(s.toString() + " should be all subbed by " + this.xy.toString(), 0, s.varPattern());
                         }
 
                         return true;
                     }
                 };
 
+                f.index = index;
                 f.matchAll(x, y);
 
 //                assertTrue(f.toString() + " " + matched,

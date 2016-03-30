@@ -3,6 +3,7 @@ package nars.concept;
 import nars.Memory;
 import nars.Op;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.term.transform.subst.FindSubst;
 import nars.term.transform.subst.MapSubst;
 import org.jetbrains.annotations.NotNull;
@@ -57,7 +58,7 @@ public abstract class UnifySubst extends FindSubst  {
 
         //TODO combine these two blocks to use the same sub-method
 
-        Term aa = applySubstituteAndRenameVariables(a, xy);
+        Termed aa = applySubstituteAndRenameVariables(a, xy);
 //        if ((aa == null) ||
 //        //Op aaop = aa.op();
 //        //only set the values if it will return true, otherwise if it returns false the callee can expect its original values untouched
@@ -79,10 +80,10 @@ public abstract class UnifySubst extends FindSubst  {
         return true; //determines how many
     }
 
-    abstract protected boolean accept(Term beliefTerm, Term unifiedBeliefTerm);
+    abstract protected boolean accept(Term beliefTerm, Termed unifiedBeliefTerm);
 
     @Nullable
-    Term applySubstituteAndRenameVariables(@NotNull Term t, @Nullable Map<Term,Term> subs) {
+    Termed applySubstituteAndRenameVariables(@NotNull Term t, @Nullable Map<Term,Term> subs) {
         return (subs == null) || (subs.isEmpty()) ?
                 t /* no change necessary */ :
                 memory.index.apply(new MapSubst(subs), t);

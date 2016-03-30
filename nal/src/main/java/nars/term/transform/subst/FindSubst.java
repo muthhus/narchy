@@ -9,9 +9,7 @@ import nars.nal.meta.match.Ellipsis;
 import nars.nal.meta.match.EllipsisMatch;
 import nars.nal.meta.match.EllipsisTransform;
 import nars.nal.meta.match.ImageMatch;
-import nars.term.Compound;
-import nars.term.Term;
-import nars.term.Termlike;
+import nars.term.*;
 import nars.term.container.TermContainer;
 import nars.term.transform.subst.choice.Choose1;
 import nars.term.transform.subst.choice.Choose2;
@@ -57,6 +55,9 @@ public abstract class FindSubst extends Versioning implements Subst {
 
     public final Op type;
 
+    @Nullable
+    public TermIndex index = null;
+
     /**
      * variables whose contents are disallowed to equal each other
      */
@@ -64,7 +65,6 @@ public abstract class FindSubst extends Versioning implements Subst {
     public final Versioned<ImmutableMap<Term, MatchConstraint>> constraints;
     public final VersionMap.Reassigner<Term,Term> reassigner;
 
-    //public abstract Term resolve(Term t, Substitution s);
 
     @NotNull
     public final VarCachedVersionMap xy;
@@ -385,19 +385,21 @@ public abstract class FindSubst extends Versioning implements Subst {
 
     }
 
+    @Nullable
+    public final Term resolve(@NotNull Term t) {
+        //TODO make a half resolve that only does xy?
+        return Termed.termOrNull(index.apply(this, t));
+    }
+
     public boolean matchCompoundWithEllipsisLinear(@NotNull Compound X, @NotNull Compound Y, Ellipsis e) {
-        int xsize = X.size();
-        int ysize = Y.size();
+
 
         if (e instanceof EllipsisTransform) {
             //this involves a special "image ellipsis transform"
 
             EllipsisTransform et = (EllipsisTransform) e;
             if (et.from.equals(Op.Imdex)) {
-
                 Term n = resolve(et.to);
-
-
                 if (n != Y) {
 
                     //the indicated term should be inserted
@@ -410,21 +412,12 @@ public abstract class FindSubst extends Versioning implements Subst {
                 }
             } else {
                 Term n = resolve(et.from);
-                int imageIndex;
-                if (n.op() == type) {
-
-                    return false;
-
-                } //else {
-
-
-                imageIndex = Y.indexOf(n);
-                if (imageIndex!=-1)
-
-                    //}
-                    return (matchEllipsedLinear(X, e, Y)) &&
-                            replaceXY(e, ImageMatch.take(term(e), imageIndex));
-
+                if (n.op() != type) {
+                    int imageIndex = Y.indexOf(n);
+                    if (imageIndex != -1)
+                        return (matchEllipsedLinear(X, e, Y)) &&
+                                replaceXY(e, ImageMatch.take(term(e), imageIndex));
+                }
             }
             return false;
         }
@@ -448,7 +441,7 @@ public abstract class FindSubst extends Versioning implements Subst {
                         return false;
                 } else {
                     //compare relation from end
-                    if ((xsize - xRelationIndex) != (ysize - yRelationIndex))
+                    if ((X.size() - xRelationIndex) != (Y.size() - yRelationIndex))
                         return false;
                 }
             } else {
@@ -880,10 +873,6 @@ public abstract class FindSubst extends Versioning implements Subst {
         //TODO yx also?
     }
 
-    @Nullable
-    public Term resolve(Term t) {
-        throw new RuntimeException("unimpl");
-    }
 
 
     /**
