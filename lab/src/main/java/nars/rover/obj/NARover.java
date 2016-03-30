@@ -117,7 +117,7 @@ public class NARover extends AbstractPolygonBot {
 
                     //System.out.println("linear vel=" + v);
 
-                    v *= 0.35f;
+                    v *= 0.75f;
 
                     /*if (Math.abs(v) < thresh)
                         v = 0;*/
@@ -137,7 +137,7 @@ public class NARover extends AbstractPolygonBot {
 
             //System.out.println("angle vel=" + angularVelocity);
 
-            v *= 1f; //sensitivity
+            v *= 1.5f; //sensitivity
 
             return v;
         };

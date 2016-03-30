@@ -241,7 +241,7 @@ public interface Temporalize {
                             break;
                         }
                     }
-                    if (baseOcc!=ETERNAL) {
+                    if (baseOcc != ETERNAL) {
                         for (int i = 0; i < decTerm.size(); i++) {
                             Term dct = decTerm.term(i);
                             if (p.resolve(dct).equals(derived)) {
@@ -316,14 +316,19 @@ public interface Temporalize {
                 /*long ddt = premise.task().term().dt();
                 if (ddt != DTERNAL)
                     o -= ddt;*/
-            } else if (!taskOrBelief && !end) {
-                long ddt = premise.belief().term().dt();
-                if (ddt != DTERNAL)
-                    o -= ddt;
-            } else if (!taskOrBelief && end) {
-                long ddt = premise.belief().term().dt();
-                if (ddt != DTERNAL)
-                    o += ddt;
+            } else {
+
+                Task belief = premise.belief();
+                if (belief != null) {
+                    long ddt = belief.term().dt();
+                    if (ddt != DTERNAL) {
+                        if (!taskOrBelief && !end) {
+                            o -= ddt;
+                        } else if (!taskOrBelief && end) {
+                            o += ddt;
+                        }
+                    }
+                }
             }
 
         }

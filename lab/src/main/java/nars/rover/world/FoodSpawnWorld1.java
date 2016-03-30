@@ -41,7 +41,7 @@ public class FoodSpawnWorld1 extends RoverWorld {
             if (Math.random() < foodToPoisonRatio) {
                 ff.add(new Edible(0.7f, 0f)).add(new MaterialColor(0.1f, 0.9f, 0.1f));
             } else {
-                ff.add(new Edible(0f, 0.7f)).add(new MaterialColor(0.9f, 0.1f, 0.1f));
+                ff.add(new Edible(0f, 0.7f)).add(new MaterialColor(0.9f, 0.1f, 0.1f).strobe(0.1f,0));
             }
 
         }
