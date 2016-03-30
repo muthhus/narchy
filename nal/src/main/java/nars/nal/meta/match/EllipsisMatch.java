@@ -29,16 +29,37 @@ public final class EllipsisMatch extends TermVector<Term> implements Term {
 //    }
 
 
-    public EllipsisMatch(Term[] t) {
+    final static EllipsisMatch empty = new EllipsisMatch(Terms.empty);
+
+    protected EllipsisMatch(Term[] t) {
         super(t);
     }
 
-    public EllipsisMatch(@NotNull Compound y, int from, int to) {
-        this(Terms.subRange(y, from, to));
+    public static Term match(Term[] matched) {
+        switch (matched.length) {
+            case 0: return empty;
+            case 1: return matched[0]; //if length==1 it should not be an ellipsismatch, just the raw term
+            default: return new EllipsisMatch(matched);
+        }
     }
 
-    public EllipsisMatch(@NotNull Collection<Term> term) {
-        this(term.toArray(new Term[term.size()]));
+    public static Term match(@NotNull Compound y, int from, int to) {
+        return match(Terms.subRange(y, from, to));
+    }
+
+    public static Term match(@NotNull Collection<Term> term) {
+        switch (term.size()) {
+            case 0: return empty;
+            case 1: return term.iterator().next();
+            default: return new EllipsisMatch(term.toArray(new Term[term.size()]));
+        }
+    }
+
+    /** HACK */
+    static Term[] expand(Term raw) {
+        return raw instanceof EllipsisMatch ?
+                ((EllipsisMatch)raw).term :
+                new Term[] { raw };
     }
 
 //    public EllipsisMatch(@NotNull Collection<Term> term, Term except) {

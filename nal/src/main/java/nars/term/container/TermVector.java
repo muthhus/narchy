@@ -275,7 +275,7 @@ public class TermVector<T extends Term> implements TermContainer<T>, Serializabl
 
     @Override
     public boolean equals(Object obj) {
-        return TermContainer.equals(this, (TermContainer) obj);
+        return obj instanceof TermContainer && TermContainer.equals(this, (TermContainer) obj);
     }
 
     @Override public boolean equalTerms(@NotNull TermContainer c) {

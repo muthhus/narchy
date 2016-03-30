@@ -1,6 +1,5 @@
 package nars.term;
 
-import com.google.common.collect.Iterators;
 import com.gs.collections.api.block.predicate.primitive.IntObjectPredicate;
 import nars.$;
 import nars.Global;
@@ -34,7 +33,7 @@ public class Terms extends TermBuilder implements TermIndex {
 
     @NotNull public static final Terms terms = new Terms();
     @NotNull public static final int[] ZeroIntArray = new int[0];
-    @NotNull public static final Term[] ZeroTermArray = new Term[0];
+    @NotNull public static final Term[] empty = new Term[0];
     @NotNull public static final TermVector<?> ZeroSubterms = new TermVector<>((Term[])new Term[] { });
     @NotNull public static final Compound ZeroProduct = $.compound(Op.PRODUCT, ZeroSubterms);
     @NotNull public static final IntFunction<Term[]> NewTermArray = Term[]::new;
@@ -295,7 +294,7 @@ public class Terms extends TermBuilder implements TermIndex {
         switch (arg.length) {
 
             case 0:
-                return Terms.ZeroTermArray;
+                return Terms.empty;
 
             case 1:
                 return arg; //new Term[] { arg[0] };
@@ -449,7 +448,7 @@ public class Terms extends TermBuilder implements TermIndex {
             if (filter.accept(i, t))
                 l.add(t);
         }
-        if (l.isEmpty()) return Terms.ZeroTermArray;
+        if (l.isEmpty()) return Terms.empty;
         return l.toArray(new Term[l.size()]);
     }
 
@@ -467,7 +466,7 @@ public class Terms extends TermBuilder implements TermIndex {
     public static Term[] toArray(@NotNull Collection<Term> l) {
         int s = l.size();
         if (s == 0)
-            return Terms.ZeroTermArray;
+            return Terms.empty;
         return l.toArray(new Term[s]);
     }
 

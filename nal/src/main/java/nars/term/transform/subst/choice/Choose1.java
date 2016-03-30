@@ -74,7 +74,7 @@ public class Choose1 extends Termutator {
 
             Term y = next(shuffle, l);
             if (f.match(x, y) &&
-                    f.putXY(xEllipsis, new EllipsisMatch(TermContainer.except(yy, y, m)))) {
+                    f.putXY(xEllipsis, EllipsisMatch.match(TermContainer.except(yy, y, m)))) {
                 next(f, chain, current);
             }
 

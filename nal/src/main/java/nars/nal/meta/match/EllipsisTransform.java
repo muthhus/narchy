@@ -55,7 +55,7 @@ public class EllipsisTransform extends EllipsisOneOrMore {
     }
 
     @NotNull
-    public EllipsisMatch collect(@NotNull Compound y, int a, int b, @NotNull FindSubst subst) {
+    public Term match(@NotNull Compound y, int a, int b, @NotNull FindSubst subst) {
         if (from == Op.Imdex && (y.op().isImage())) {
 
             int rel = y.relation();
@@ -68,12 +68,10 @@ public class EllipsisTransform extends EllipsisOneOrMore {
                 t[i++] = ((i == rel) ? subst.resolve(to) : y.term(ab));
                 ab++;
             }
-            return new EllipsisMatch(t);
+            return EllipsisMatch.match(t);
 
         } else {
-            return new EllipsisMatch(
-                    y, a, b
-            );
+            return EllipsisMatch.match(y, a, b);
         }
     }
 }

@@ -91,7 +91,7 @@ public class Choose2 extends Termutator {
                 Term y2 = yy.term(c1);
 
                 if (f.match(x[1], y2) &&
-                        f.putXY(xEllipsis, new EllipsisMatch(TermContainer.except(yy, y1, y2, m)))) {
+                        f.putXY(xEllipsis, EllipsisMatch.match(TermContainer.except(yy, y1, y2, m)))) {
 
                     next(f, chain, current);
                 }

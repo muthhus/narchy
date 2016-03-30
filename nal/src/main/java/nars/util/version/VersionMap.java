@@ -116,41 +116,15 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
         return null;
     }
 
-//    public void compute(X key, Y value, Predicate<Y> allow) {
-//
-//        map.compute(key, (k, v) -> {
-//            if (v == null)
-//                v = newEntry(k);
-//            Y exists = v.get();
-//            if (exists!=null && exists.equals(value)) {
-//                //if the value hasnt changed,
-//                // only set it if the test allows
-//                return v;
-//            }
-//            if (allow.test(value))
-//                v.set(value);
-//            else
-//                v.set(null);
-//
-//            return v;
-//        });
-//
-//    }
-
-//    /** follows semantics of thenSet() */
-//    public Versioning thenPut(X key, Y value) {
-//        getOrCreateIfAbsent(key).thenSet(value);
-//        return context;
-//    }
 
     public final Versioned getOrCreateIfAbsent(X key) {
         return map.computeIfAbsent(key, this::newEntry);
     }
 
     @NotNull
-    public Versioned<Y> newEntry(X k) {
-        return cache(k) ? new Versioned(context) :
-            new RemovingVersionedEntry(k);
+    public final Versioned<Y> newEntry(X k) {
+        //return cache(k) ? new Versioned(context) :
+        return new RemovingVersionedEntry(k);
     }
 
     public final boolean computeAssignable(X x, Reassigner<X,Y> r) {
@@ -187,9 +161,9 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
         }
     }
 
-    public boolean cache(X key) {
-        return false;
-    }
+//    public boolean cache(X key) {
+//        return false;
+//    }
 
     @Override
     public final Y get(/*X*/Object key) {

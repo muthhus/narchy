@@ -25,7 +25,9 @@ public enum ImageMatch /*extends ArrayEllipsisMatch<Term>*/ {
      * @return
      */
     @NotNull
-    public static EllipsisMatch put(@NotNull Term[] t, @NotNull Term relationTerm, @NotNull Compound y) {
+    public static EllipsisMatch put(@NotNull Term raw, @NotNull Term relationTerm, @NotNull Compound y) {
+
+        Term[] t = EllipsisMatch.expand(raw);
 
         //not sure why this works
 
@@ -60,15 +62,17 @@ public enum ImageMatch /*extends ArrayEllipsisMatch<Term>*/ {
         return new EllipsisMatch(t2);
     }
 
+
+
     @NotNull
-    public static EllipsisMatch take(@NotNull EllipsisMatch m, int imageIndex) {
+    public static Term take(@NotNull Term m, int imageIndex) {
 
         //this.imageIndex = imageIndex;
 
         //mask the relation term
-        Term[] t = m.term;
+        Term[] t = EllipsisMatch.expand(m);
         t[imageIndex] = Imdex;
-        return new EllipsisMatch(t); //needs rehashed; this will be redone with a visitor that applies the Imdex mask on first and only needed construction
+        return EllipsisMatch.match(t); //needs rehashed; this will be redone with a visitor that applies the Imdex mask on first and only needed construction
     }
 
 //    @Override

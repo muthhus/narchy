@@ -31,8 +31,10 @@
 
     (A --> B), A, task(negative) |- --(A --> B), (Belief:Negation, Desire:Negation, Derive:AllowBackward)
     (A --> B), B, task(negative) |- --(A --> B), (Belief:Negation, Desire:Negation, Derive:AllowBackward)
-  --(A --> B), A                 |-   (A --> B), (Belief:Negation, Desire:Negation, Derive:AllowBackward)
-  --(A --> B), B                 |-   (A --> B), (Belief:Negation, Desire:Negation, Derive:AllowBackward)
+
+    --A, A |- A, (Belief:Negation, Desire:Negation)
+//  --(A --> B), A                 |-   (A --> B), (Belief:Negation, Desire:Negation, Derive:AllowBackward)
+//  --(A --> B), B                 |-   (A --> B), (Belief:Negation, Desire:Negation, Derive:AllowBackward)
 
 
     (A <-> B), A, task(negative) |- --(A <-> B), (Belief:Negation, Desire:Negation, Derive:AllowBackward)

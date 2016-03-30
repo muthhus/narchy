@@ -436,6 +436,20 @@ public class EllipsisTest {
                 $("((|,bird,swimmer)-->(|,animal,swimmer))"),
                 1 /* weird */);
     }
+    @Test public void testRepeatEllipsisA2() {
+
+        testCombinations(
+                $("((%X,%A..+) --> (%Y,%A..+))"),
+                $("((bird,swimmer)-->(animal,swimmer))"),
+                1);
+    }
+
+    @Test public void testRepeatEllipsisA0() {
+        testCombinations(
+                $("((%A, %X) --> (%B, %X))"),
+                $("((bird,swimmer)-->(animal,swimmer))"),
+                1);
+    }
 
     @Test public void testRepeatEllipsisB() {
 

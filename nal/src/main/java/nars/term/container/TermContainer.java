@@ -200,7 +200,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
                 added++;
             }
         }
-        return added > 0 ? Terms.ZeroTermArray : l.toArray(new Term[added]);
+        return added > 0 ? Terms.empty : l.toArray(new Term[added]);
     }
 
 

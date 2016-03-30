@@ -405,8 +405,7 @@ public abstract class FindSubst extends Versioning implements Subst {
                     //being processed. (this is the opposite
                     //of the other condition of this if { })
                     if (matchEllipsedLinear(X, e, Y)) {
-                        EllipsisMatch raw = (EllipsisMatch) term(e);
-                        return replaceXY(e, ImageMatch.put(raw.term, n, Y));
+                        return replaceXY(e, ImageMatch.put(term(e), n, Y));
                     }
                 }
             } else {
@@ -424,7 +423,7 @@ public abstract class FindSubst extends Versioning implements Subst {
 
                     //}
                     return (matchEllipsedLinear(X, e, Y)) &&
-                            replaceXY(e, ImageMatch.take((EllipsisMatch) term(e), imageIndex));
+                            replaceXY(e, ImageMatch.take(term(e), imageIndex));
 
             }
             return false;
@@ -615,7 +614,7 @@ public abstract class FindSubst extends Versioning implements Subst {
         switch (xs) {
             case 0:
                 //match everything
-                return putXY(xEllipsis, new EllipsisMatch(yFree));
+                return putXY(xEllipsis, EllipsisMatch.match(yFree));
             case 1:
                 return addTermutator(new Choose1(
                         xEllipsis, xFree.iterator().next(), yFree));
@@ -708,7 +707,7 @@ public abstract class FindSubst extends Versioning implements Subst {
                         //TODO special handling to extract intermvals from Sequence terms here
 
                         if (!putXY(Xellipsis,
-                                new EllipsisMatch(
+                                EllipsisMatch.match(
                                         Y, j, j + available
                                 ))) {
                             return false;
@@ -842,17 +841,20 @@ public abstract class FindSubst extends Versioning implements Subst {
     }
 
 
-    public final boolean replaceXY(Term x /* usually a Variable */, @NotNull Term y) {
-        Versioned<Term> v = xy.getOrCreateIfAbsent(x);
-        v.set(y);
-        return true;
-    }
 
     /**
      * returns true if the assignment was allowed, false otherwise
      */
     public final boolean putXY(@NotNull Term x /* usually a Variable */, @NotNull Term y) {
+        assert(y!=null);
         return xy.computeAssignable(x, reassigner.set(this::assignable, y));
+    }
+
+
+    public final boolean replaceXY(Term x /* usually a Variable */, @NotNull Term y) {
+        assert(y!=null);
+        xy.put(x, y);
+        return true;
     }
 
     /**
@@ -922,12 +924,6 @@ public abstract class FindSubst extends Versioning implements Subst {
             }
         }
 
-        @Override
-        public boolean cache(Term key) {
-            //since these should always be normalized variables, they will not exceed a predictable range of entries (ex: $1, $2, .. $n)
-            //return key instanceof Variable;
-            return false;
-        }
 
         @Override
         public final Term term(Term t) {
