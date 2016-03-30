@@ -132,10 +132,9 @@ abstract public class ConceptProcess implements Premise {
 
     @NotNull
     @Override
-    public final Termed beliefTerm() {
+    public final Termed<Compound> beliefTerm() {
         Task x = belief();
-        return x == null ? termLink.get() :
-                x.term();
+        return x == null ? termLink.get() : x;
     }
 
     @Nullable

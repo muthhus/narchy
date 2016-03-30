@@ -10,6 +10,7 @@ import nars.budget.UnitBudget;
 import nars.guifx.NARfx;
 import nars.guifx.nars.NARActionButton;
 import nars.guifx.util.SimpleMenuItem;
+import nars.nal.Tense;
 import nars.task.MutableTask;
 import nars.term.Compound;
 import nars.term.Termed;
@@ -41,7 +42,9 @@ public class ConceptMenu extends FlowPane {
         Button noGoalButton = new NARActionButton(nar, "-!", (n) -> n.input(new MutableTask(t, '!').truth(0f, (nar).getDefaultConfidence('!')).present(nar).log("GUI Goal")));
         Button trueButton = new NARActionButton(nar, "T", (n) -> n.input(new MutableTask(t, '.').present(nar).log("GUI True")));
         Button falseButton = new NARActionButton(nar, "F", (n) -> n.input(new MutableTask(neg(t.term()), '.').present(nar).log("GUI False")));
-        Button isTrueButton = new NARActionButton(nar, "?", (n) -> n.input(new MutableTask(t, '?').present(nar).log("GUI Question")));
+
+        Button isTrueButton = new NARActionButton(nar, "?", (n) -> n.input(new MutableTask(t, '?').time(Tense.Future, nar).log("GUI Question")));
+        Button shouldIButton = new NARActionButton(nar, "@", (n) -> n.input(new MutableTask(t, '@').time(Tense.Future, nar).log("GUI Quest")));
 
         if (!(t instanceof Compound)) {
             trueButton.setVisible(false); //TODO dont create these task buttons in the first place
@@ -49,6 +52,7 @@ public class ConceptMenu extends FlowPane {
             yesGoalButton.setVisible(false);
             noGoalButton.setVisible(false);
             isTrueButton.setVisible(false);
+            shouldIButton.setVisible(false);
         }
 
 
@@ -67,7 +71,7 @@ public class ConceptMenu extends FlowPane {
 
         })));
 
-        getChildren().addAll(button, activateButton, trueButton, falseButton, yesGoalButton, noGoalButton, isTrueButton);
+        getChildren().addAll(button, activateButton, trueButton, falseButton, yesGoalButton, noGoalButton, isTrueButton, shouldIButton);
 
     }
 

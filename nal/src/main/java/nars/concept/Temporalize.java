@@ -6,6 +6,7 @@ import nars.nal.op.Derive;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -83,11 +84,11 @@ public interface Temporalize {
         ConceptProcess prem = p.premise;
         Task task = prem.task();
         Compound taskTerm = task.term();
-        Compound beliefTerm = (Compound) prem.beliefTerm();
+        Termed<Compound> beliefTerm = prem.beliefTerm();
 
         int dt;
         int ttd = taskTerm.dt();
-        int btd = beliefTerm.dt();
+        int btd = beliefTerm.term().dt();
         if (ttd != DTERNAL && btd != DTERNAL) {
             switch (polarity) {
                 case 0:

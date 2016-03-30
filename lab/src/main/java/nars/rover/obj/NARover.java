@@ -9,8 +9,10 @@ import com.gs.collections.api.block.function.primitive.FloatToFloatFunction;
 import nars.$;
 import nars.Global;
 import nars.NAR;
+import nars.budget.UnitBudget;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.util.FloatSupplier;
 import nars.util.data.Util;
 import nars.util.signal.MotorConcept;
@@ -411,17 +413,27 @@ public class NARover extends AbstractPolygonBot {
         List<SensorConcept> sensorConcepts = Global.newArrayList(pixels * resolution);
 
         String[] materials = {"food", "poison", "wall"};
-        float pixelPri = 1f / (materials.length * pixels);
+        float pixelPri = 0.5f * 1f / (materials.length * pixels);
 
 
         for (int i = 0; i < pixels; i++) {
             final float angle = (startAngle + (aStep * i));
 
+            Termed visionTerm = nar.conceptualize($.the(id + i), UnitBudget.Zero);
 
-            VisionRay v = new VisionRay(center, angle, aStep, base, distance, resolution);
+            VisionRay v = new VisionRay(center, angle, aStep, base, distance, resolution, (dist, c) -> {
+                float p = nar.conceptPriority(visionTerm, 0);
+                //if (Float.isFinite(dist)) {
+                float closeness = 1f - dist;
+                c.x = p/2f * (0.5f + 0.5f * closeness); c.y = 0;
+                c.z = closeness;
+                //} else {
+                  //  c.x = 0; c.y = p; c.z = 0;
+                //}
+            });
+
             each.accept(v);
 
-            Term visionTerm = $.the(id + i);
 
             for (String material : materials) {
 
@@ -435,7 +447,7 @@ public class NARover extends AbstractPolygonBot {
                 };
 
 
-                Compound term = $.imageInt(1, visionTerm, $.the(material));
+                Compound term = $.imageInt(1, visionTerm.term(), $.the(material));
 
                 SensorConcept visionSensor = new SensorConcept(
 
@@ -447,7 +459,7 @@ public class NARover extends AbstractPolygonBot {
 
                         () -> (float) value.getAsDouble()
 
-                ).resolution(0.08f).timing(1, 8).
+                ).resolution(0.06f).timing(1, 4).
                         pri(pixelPri);
                 sensorConcepts.add(visionSensor);
 

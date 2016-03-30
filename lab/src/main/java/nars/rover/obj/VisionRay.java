@@ -1,6 +1,7 @@
 package nars.rover.obj;
 
 import com.artemis.Component;
+import com.gs.collections.api.block.procedure.primitive.FloatObjectProcedure;
 import nars.rover.physics.gl.JoglAbstractDraw;
 import nars.rover.physics.gl.JoglDraw;
 import nars.rover.physics.j2d.LayerDraw;
@@ -9,6 +10,7 @@ import nars.util.data.Util;
 import org.jbox2d.callbacks.RayCastCallback;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.Vec2;
+import org.jbox2d.common.Vec3;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.World2D;
@@ -23,15 +25,10 @@ public class VisionRay extends Component implements LayerDraw {
     final Vec2 point; //where the retina receives vision at
     public final float angle;
     private final Body base;
+    private final FloatObjectProcedure<Color3f> colorizer;
 
     public float seenDist;
 
-    ///final Color3f laserUnhitColor = new Color3f(0.25f, 0.25f, 0.25f);
-    final Color3f laserHitColor = new Color3f(0.25f, 0.25f, 0.25f);
-
-
-    public Color3f sparkColor;
-    public Color3f normalColor;
     protected float distance;
 
 
@@ -46,7 +43,7 @@ public class VisionRay extends Component implements LayerDraw {
 
     //final Sensor sensor;
 
-    public VisionRay(Vec2 point, float angle, float arc, Body base, float length, int resolution) {
+    public VisionRay(Vec2 point, float angle, float arc, Body base, float length, int resolution, FloatObjectProcedure<Color3f> colorizer) {
         this.base = base;
 
 
@@ -59,9 +56,8 @@ public class VisionRay extends Component implements LayerDraw {
         for (int i = 0; i < resolution; i++)
             rayDrawers[i] = new RayDrawer(i, angle, arc);
 
-        sparkColor = new Color3f(0.5f, 0.4f, 0.4f);
-        normalColor = new Color3f(0.2f, 0.2f, 0.2f);
 
+        this.colorizer = colorizer;
     }
 
 
@@ -86,8 +82,6 @@ public class VisionRay extends Component implements LayerDraw {
             this.hitMaterial = null;
             this.seenDist = Float.POSITIVE_INFINITY;
         }
-
-
 
         //hitDist = (distMomentum * hitDist) + (1f - distMomentum) * nextHitDist;
         //conf = (confMomentum * conf) + (1f - confMomentum) * newConf;
@@ -187,17 +181,16 @@ public class VisionRay extends Component implements LayerDraw {
 
                 to.set(m_point);
 
-                    color.set(laserHitColor);
-                    color.z = Math.min(1.0f, color.z + 0.75f * (1.0f - d));
-
                 perceiveDist(body, d);
             } else {
                 m_hit = false;
                 body = null;
                 perceiveDist(null, Float.POSITIVE_INFINITY);
-                color.set(normalColor);
+
             }
 
+
+            colorizer.value(seenDist, color);
             color.x = Util.clamp(color.x);
             color.y = Util.clamp(color.y);
             color.z = Util.clamp(color.z);
@@ -231,8 +224,8 @@ public class VisionRay extends Component implements LayerDraw {
         dd.drawSegment(
                 r.from, r.to,
                 c.x, c.y, c.z,
-                0.75f /* alpha */, 2f /* width */,
-                1f /* z */);
+                0.85f /* alpha */, 2f /* width */,
+                2f /* z */);
     }
 
     public void setEats(boolean b) {

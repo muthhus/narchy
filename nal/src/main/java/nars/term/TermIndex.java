@@ -37,23 +37,32 @@ import static nars.nal.Tense.DTERNAL;
 /**
  *
  */
-public interface TermIndex  {
+public interface TermIndex {
 
 
-    /** getOrAdd the term */
-    @Nullable Termed the(@NotNull Termed t);
+    /**
+     * getOrAdd the term
+     */
+    @Nullable
+    Termed the(@NotNull Termed t);
 
-    /** get if not absent */
-    @Nullable Termed get(@NotNull Termed t);
+    /**
+     * get if not absent
+     */
+    @Nullable
+    Termed get(@NotNull Termed t);
 
-    /** set if not absent */
-    @Nullable Termed set(@NotNull Termed t);
+    /**
+     * set if not absent
+     */
+    @Nullable
+    Termed set(@NotNull Termed t);
 
-        //DEFAULT IMPL to be moved to a concrete class: BUILDS ON THE HEAP:
-        //return builder().make(op, relation, subterms, dt);
+    //DEFAULT IMPL to be moved to a concrete class: BUILDS ON THE HEAP:
+    //return builder().make(op, relation, subterms, dt);
     //}
 
-//    @Nullable
+    //    @Nullable
 //    default Termed newCompound(Op op, int relation, TermContainer subterms) {
 //        //DEFAULT IMPL to be moved to a concrete class: BUILDS ON THE HEAP:
 //        return newCompound(op, relation, subterms, ITERNAL);
@@ -63,6 +72,7 @@ public interface TermIndex  {
         //DEFAULT IMPL to be moved to a concrete class: BUILDS ON THE HEAP:
         return builder().the(op, -1, DTERNAL, subterms);
     }
+
     @Nullable
     default Termed the(@NotNull Op op, @NotNull Collection<Term> subterms) {
         //DEFAULT IMPL to be moved to a concrete class: BUILDS ON THE HEAP:
@@ -70,14 +80,14 @@ public interface TermIndex  {
     }
 
 
-
     void clear();
 
     void forEach(Consumer<? super Termed> c);
 
 
-
-    /** # of contained terms */
+    /**
+     * # of contained terms
+     */
     int size();
 
     /**
@@ -91,9 +101,9 @@ public interface TermIndex  {
 
 
     TermBuilder builder();
+
     @Nullable
     ConceptBuilder conceptBuilder();
-
 
 
     @NotNull
@@ -114,17 +124,21 @@ public interface TermIndex  {
     @Nullable
     TermContainer theSubterms(TermContainer s);
 
-    @Nullable default TermContainer normalize(TermContainer s) {
+    @Nullable
+    default TermContainer normalize(TermContainer s) {
         if (s instanceof TermVector)
-            return normalize((TermVector)s);
+            return normalize((TermVector) s);
 
 
         //TODO implement normalization for any non-container types
         throw new UnsupportedOperationException();
     }
 
-    /** should be called after a new entry needed to be created for the novel termcontainer */
-    @Nullable default TermContainer normalize(@NotNull TermVector s) {
+    /**
+     * should be called after a new entry needed to be created for the novel termcontainer
+     */
+    @Nullable
+    default TermContainer normalize(@NotNull TermVector s) {
         Term[] x = s.terms();
         int l = x.length;
         for (int i = 0; i < l; i++) {
@@ -132,16 +146,13 @@ public interface TermIndex  {
             Termed b = the(a);
             if (b == null)
                 return null;
-            if (a!=b) {
+            if (a != b) {
                 //different instance but still equal so replace it in the origin array, otherwise leave as-is
                 x[i] = b.term();
             }
         }
         return s;
     }
-
-
-
 
 
     int subtermsCount();
@@ -151,15 +162,11 @@ public interface TermIndex  {
 //    }
 
 
-
-
-
-
     /**
      * returns the resolved term according to the substitution
      */
     @Nullable
-    default Term transform(@Nullable Term trc, @NotNull Subst f) {
+    default Term transform(@Nullable Compound trc, @NotNull Subst f) {
 
         if (trc == null)
             return null; //pass-through
@@ -170,11 +177,9 @@ public interface TermIndex  {
 
         int len = trc.size();
         if (len == 0)
-            return trc; //atomic, proceed no further
+            return trc; //atomic or zero size ( ex: () ), proceed no further
 
-        Compound src = (Compound)trc;
-        Op sop = src.op();
-        final int maxArity = sop.maxSize;
+        Compound src = trc;
 
         List<Term> sub = Global.newArrayList(len /* estimate */);
         for (int i = 0; i < len; i++) {
@@ -185,56 +190,71 @@ public interface TermIndex  {
 
                 EllipsisMatch m = (EllipsisMatch) u;
 
-                if (maxArity != -1 && m.size() + sub.size() > maxArity) {
-                    return src; //invalid transformation, violated arity constraint
-                }
+//                if (maxArity != -1 && m.size() + sub.size() > maxArity) {
+//                    return src; //invalid transformation, violated arity constraint
+//                }
 
                 Collections.addAll(sub, m.term);
 
             } else {
 
-                if (maxArity != -1 && 1 + sub.size() > maxArity) {
-                    return src; //invalid transformation, violates arity constraint
-                }
+//                if (maxArity != -1 && 1 + sub.size() > maxArity) {
+//                    return src; //invalid transformation, violates arity constraint
+//                }
 
                 sub.add(u != null ? u : t);
             }
         }
 
-        final int minArity = sop.minSize;
-        int resultSize = sub.size();
 
-        //early filter for invalid image
-        if (sop.isImage()) {
-            if (sub.isEmpty() || (resultSize==1 && sub.get(0).equals( Imdex)) )
+
+        //Prefilters
+        Op sop = src.op();
+
+        if (sop.isStatement() && sub.size()!=2)
+            return src;
+
+        TermContainer transformedSubterms = TermContainer.the(sop, sub);
+
+        Term result;
+        if (transformedSubterms.equals(trc.subterms())) {
+            result = trc;
+        } else {
+
+
+            result = this.builder().transformedCompound(src, transformedSubterms);
+
+            //Filtering of transformed result:
+
+            if (result == null)
                 return src;
-        }
 
-        if ((minArity!=-1) && (resultSize < minArity)) {
-            //?
-        } else if (resultSize == 0) {
-            switch (sop) {
-                case PRODUCT: return Terms.ZeroProduct;
-                default:
+
+
+            //apply any known immediate transform operators
+            //TODO decide if this is evaluated incorrectly somehow in reverse
+
+
+            if (sop.isImage()) {
+                int resultSize = sub.size();
+                if (sub.isEmpty() || (resultSize == 1 && sub.get(0).equals(Imdex)))
                     return src;
             }
+
+            //        if ((minArity!=-1) && (resultSize < minArity)) {
+            //            //?
+            //        }
+
         }
 
 
-        Term result = this.builder().transformedCompound(src, TermContainer.the(sop, sub));
+        //Post-Processnig of result:
 
-
-        //apply any known immediate transform operators
-        //TODO decide if this is evaluated incorrectly somehow in reverse
-        if (result != null) {
-            if (isOperation(result)) {
-                ImmediateTermTransform tf = f.getTransform(Operator.operator((Compound) result));
-                if (tf != null) {
-                    result = applyImmediateTransform(f, result, tf);
-                }
+        if (isOperation(result)) {
+            ImmediateTermTransform tf = f.getTransform(Operator.operator((Compound) result));
+            if (tf != null) {
+                result = applyImmediateTransform(f, result, tf);
             }
-        } else {
-            result = src;
         }
 
         return result;
@@ -259,7 +279,7 @@ public interface TermIndex  {
 
         if (src instanceof Compound) {
             //if f is empty there will be no changes to apply anyway
-            return f.isEmpty() ? src : transform(src, f);
+            return f.isEmpty() ? src : transform((Compound) src, f);
 
         } else if (src instanceof Variable) {
             Term x = f.term(src);
@@ -270,10 +290,6 @@ public interface TermIndex  {
         return src;
 
     }
-
-
-
-
 
 
 //    class ImmediateTermIndex implements TermIndex {
@@ -396,11 +412,11 @@ public interface TermIndex  {
     @Nullable
     default Termed normalized(@NotNull Termed t) {
         if (/*t instanceof Compound &&*/ !t.isNormalized()) {
-            Compound ct = (Compound)t;
+            Compound ct = (Compound) t;
             t = transform(ct,
                     (ct.vars() == 1) ?
-                        VariableNormalization.singleVariableNormalization :
-                        new VariableNormalization()
+                            VariableNormalization.singleVariableNormalization :
+                            new VariableNormalization()
             );
 
             if (t != null) {
@@ -419,13 +435,15 @@ public interface TermIndex  {
     }
 
 
-    CompoundTransform CompoundAnonymizer = new CompoundTransform<Compound,Term>() {
+    CompoundTransform CompoundAnonymizer = new CompoundTransform<Compound, Term>() {
 
-        @Override public boolean test(Term term) {
+        @Override
+        public boolean test(Term term) {
             return true;
         }
 
-        @Override public Termed apply(Compound parent, @NotNull Term subterm, int depth) {
+        @Override
+        public Termed apply(Compound parent, @NotNull Term subterm, int depth) {
             return subterm.anonymous();
         }
     };
@@ -469,7 +487,7 @@ public interface TermIndex  {
                 if (x2 == null)
                     return -1;
 
-                if (x!=x2) { //REFERENCE EQUALTY
+                if (x != x2) { //REFERENCE EQUALTY
                     modifications++;
                     x = x2.term();
                 }
@@ -502,7 +520,7 @@ public interface TermIndex  {
 
                         if (x == null)
                             return -1;
-                        modifications += (x!=cx) ? 1 : 0; //REFERENCE EQUALTY
+                        modifications += (x != cx) ? 1 : 0; //REFERENCE EQUALTY
                     }
                 }
             }
@@ -512,9 +530,12 @@ public interface TermIndex  {
         return modifications;
     }
 
-    /** return null if nothing matched */
-    @Nullable default <T extends Termed> T get(@NotNull String termToParse) throws Narsese.NarseseException {
-        return (T)get(parse(termToParse));
+    /**
+     * return null if nothing matched
+     */
+    @Nullable
+    default <T extends Termed> T get(@NotNull String termToParse) throws Narsese.NarseseException {
+        return (T) get(parse(termToParse));
     }
 
     @NotNull
@@ -522,8 +543,9 @@ public interface TermIndex  {
         return Narsese.the().term(termToParse, this);
     }
 
-    @Nullable default <T extends Termed> T the(@NotNull String termToParse) throws Narsese.NarseseException {
-        return (T)the(parse(termToParse));
+    @Nullable
+    default <T extends Termed> T the(@NotNull String termToParse) throws Narsese.NarseseException {
+        return (T) the(parse(termToParse));
     }
 
 
@@ -537,7 +559,9 @@ public interface TermIndex  {
 //        return new GuavaIndex(builder);
 //    }
 
-    /** applies normalization and anonymization to resolve the term of the concept the input term maps t */
+    /**
+     * applies normalization and anonymization to resolve the term of the concept the input term maps t
+     */
     @NotNull
     default Termed validConceptTerm(@NotNull Termed term) {
 
@@ -593,6 +617,7 @@ public interface TermIndex  {
         public InvalidTaskTerm(Termed term) {
             this(term, "InvalidTaskTerm");
         }
+
         public InvalidTaskTerm(Termed term, String message) {
             super(message);
             this.term = term;

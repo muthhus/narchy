@@ -220,8 +220,9 @@ public class TaskTablePane extends HBox implements Runnable {
             float y = yPos(eh, padding, ph, eternal ?
                 //ETERNAL y = frequency
                 freq :
-                //TIMELINE y = expectation
-                (freq * conf)
+                //TIMELINE y = expectation                 (freq * conf)
+                //TIMELINE y = freq
+                freq
             );
             r.renderTask(g, pri, conf, pw, ph, x, y);
 

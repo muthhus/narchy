@@ -276,8 +276,9 @@ public enum Op {
         return !(max != -1 && length > max);
     }
 
-    public boolean isImage() {
-        return in(ImageBits);
+    public final boolean isImage() {
+        return this == Op.IMAGE_EXT || this == Op.IMAGE_INT;
+        //return in(ImageBits);
     }
 
     public boolean isConjunctive() {

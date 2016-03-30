@@ -18,6 +18,11 @@ public interface Subst  {
     @Nullable
     Term term(Term t);
 
+    default Term termOrOriginal(@NotNull Term t) {
+        Term x = term(t);
+        return x == null ? t : x;
+    }
+
     void clear();
 
     void forEach(@NotNull BiConsumer<? super Term, ? super Term> each);

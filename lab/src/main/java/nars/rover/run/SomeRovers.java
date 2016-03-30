@@ -166,7 +166,6 @@ public class SomeRovers {
         /*game.add(new Spider("spider",
                 3, 3, 0.618f, 30, 30));*/
 
-        boolean addNARRover = true;
         boolean gui = true;
 
 
@@ -330,7 +329,7 @@ public class SomeRovers {
     }
 
     public static Default newNAR() {
-        int conceptsFirePerCycle = 64;
+        int conceptsFirePerCycle = 32;
 
         Random rng = new XorShift128PlusRandom(1);
         TermIndex index = new AbstractNAR.WeakTermIndex(32 * 1024, rng);
@@ -378,12 +377,12 @@ public class SomeRovers {
         nar.core.activationRate.setValue(0.2f);
 
 
-        nar.duration.set(2);
+        nar.duration.set(3);
         nar.conceptForgetDurations.setValue(2f);
-        nar.termLinkForgetDurations.setValue(4);
-        nar.taskLinkForgetDurations.setValue(3);
+        nar.termLinkForgetDurations.setValue(8);
+        nar.taskLinkForgetDurations.setValue(6);
 
-        nar.cyclesPerFrame.set(3);
+        nar.cyclesPerFrame.set(2);
         nar.shortTermMemoryHistory.set(3);
 
         nar.executionThreshold.setValue(0.01f);
