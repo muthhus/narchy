@@ -28,12 +28,12 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
         this($.$(compoundTermString), n, input, direct);
     }
 
-    public SensorConcept(@NotNull GenericCompound term, @NotNull NAR n, FloatSupplier input)  {
+    public SensorConcept(@NotNull Compound term, @NotNull NAR n, FloatSupplier input)  {
         this(term, n, input, direct);
     }
 
-    public SensorConcept(@NotNull GenericCompound term, @NotNull NAR n, FloatSupplier input, FloatToFloatFunction toFreq)  {
-        super(term, n);
+    public SensorConcept(@NotNull Compound term, @NotNull NAR n, FloatSupplier input, FloatToFloatFunction toFreq)  {
+        super((GenericCompound)term, n);
 
         this.sensor = new Sensor(n, this, this, toFreq);
         n.on(this);

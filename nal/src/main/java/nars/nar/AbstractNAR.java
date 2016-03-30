@@ -1,5 +1,7 @@
 package nars.nar;
 
+import com.gs.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
+import javassist.scopedpool.SoftValueHashMap;
 import nars.Global;
 import nars.NAR;
 import nars.concept.Concept;
@@ -18,14 +20,17 @@ import nars.op.sys.js;
 import nars.op.sys.reset;
 import nars.term.Term;
 import nars.term.TermIndex;
+import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.term.container.TermContainer;
+import nars.term.index.MapIndex1;
 import nars.term.index.MapIndex2;
 import nars.time.Clock;
 import nars.util.data.map.UnifriedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
 import java.util.Random;
 import java.util.WeakHashMap;
 import java.util.function.Consumer;
@@ -321,20 +326,41 @@ public abstract class AbstractNAR extends NAR {
     public abstract NAR forEachConcept(Consumer<Concept> recip);
 
 
-    public static class DefaultTermIndex extends MapIndex2  {
+    public static class DefaultTermIndex2 extends MapIndex2  {
 
-        public DefaultTermIndex(int capacity, @NotNull Random random) {
+        public DefaultTermIndex2(int capacity, @NotNull Random random) {
             super(new UnifriedMap(capacity),
                   new DefaultConceptBuilder(random, 32, 32));
 
         }
     }
+    public static class DefaultTermIndex extends MapIndex1  {
 
-    public static class WeakTermIndex extends MapIndex2  {
+        public DefaultTermIndex(int capacity, @NotNull Random random) {
+            super(Terms.terms,
+                    new DefaultConceptBuilder(random, 32, 32),
+                    new HashMap(capacity)
+                    //new ConcurrentHashMapUnsafe(capacity)
+            );
+        }
+    }
+
+    public static class WeakTermIndex2 extends MapIndex2  {
+
+        public WeakTermIndex2(int capacity, @NotNull Random random) {
+            super(new WeakHashMap<>(capacity),
+                    new DefaultConceptBuilder(random, 32, 32));
+
+        }
+    }
+    public static class WeakTermIndex extends MapIndex1 {
 
         public WeakTermIndex(int capacity, @NotNull Random random) {
-            super(new WeakHashMap<TermContainer, SubtermNode>(capacity),
-                    new DefaultConceptBuilder(random, 32, 32));
+            super(Terms.terms,
+                    new DefaultConceptBuilder(random, 32, 32),
+                    //new SoftValueHashMap(capacity)
+                    new WeakHashMap<>(capacity)
+                    );
 
         }
     }

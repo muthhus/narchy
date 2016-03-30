@@ -143,18 +143,8 @@ public class MapIndex2 extends AbstractMapIndex {
         }
     }
 
-    @NotNull
-    protected Termed internCompound(Termed interned) {
-        return conceptBuilder.apply(interned.term());
-    }
 
 
-    @NotNull
-    private final Termed internSubterms(@NotNull TermContainer subs, @NotNull Op op, int rel, int dt) {
-        Termed interned = termBuilder.make(op, rel, subs, dt);
-        assert(interned!=null); //should not fail unless the input was invalid to begin with
-        return interned;
-    }
 
 
     @NotNull
@@ -206,10 +196,7 @@ public class MapIndex2 extends AbstractMapIndex {
         return data.size();// + atoms.size();
     }
 
-    @Override
-    public final ConceptBuilder conceptBuilder() {
-        return conceptBuilder;
-    }
+
 
     @Override
     public void forEach(@NotNull Consumer<? super Termed> c) {

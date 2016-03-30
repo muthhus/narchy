@@ -8,6 +8,7 @@ import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -165,8 +166,8 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     }
 
     @Override
-    public final boolean equals(@NotNull Object that) {
-        return this == that ||( hash == that.hashCode() && equalsFurther((Termed) that) );
+    public final boolean equals(@Nullable Object that) {
+        return this == that ||( that!=null && hash == that.hashCode() && equalsFurther((Termed) that) );
     }
 
     @Override

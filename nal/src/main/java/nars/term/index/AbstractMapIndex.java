@@ -1,11 +1,13 @@
 package nars.term.index;
 
+import nars.Op;
 import nars.concept.ConceptBuilder;
 import nars.term.Compound;
 import nars.term.TermBuilder;
 import nars.term.TermIndex;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
+import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -63,6 +65,17 @@ public abstract class AbstractMapIndex implements TermIndex {
         return get(t, false);
     }
 
+    @NotNull
+    protected Termed<Compound> internCompound(Termed interned) {
+        return conceptBuilder.apply(interned.term());
+    }
+
+    @NotNull
+    protected final Termed internSubterms(@NotNull TermContainer subs, @NotNull Op op, int rel, int dt) {
+        Termed interned = termBuilder.make(op, rel, subs, dt);
+        assert(interned!=null); //should not fail unless the input was invalid to begin with
+        return interned;
+    }
 
     @Override
     public void print(@NotNull PrintStream out) {
@@ -71,7 +84,10 @@ public abstract class AbstractMapIndex implements TermIndex {
         forEach(out::println);
 
     }
-
+    @Override
+    public final ConceptBuilder conceptBuilder() {
+        return conceptBuilder;
+    }
 
     @Override
     public abstract void forEach(Consumer<? super Termed> c);

@@ -12,6 +12,7 @@ import nars.term.*;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
+import nars.term.container.TermVector;
 import nars.term.variable.AbstractVariable;
 import nars.term.variable.GenericVariable;
 import nars.term.variable.Variable;
@@ -157,9 +158,13 @@ public enum $ /* TODO: implements TermIndex */ {
         return $.p(t.toArray(new Term[t.size()]));
     }
 
-    @Nullable
-    public static Compound p(@Nullable Term... t) {
-        return (t == null) || (t.length == 0) ? Terms.ZeroProduct : (Compound) the(PRODUCT, t);
+    @NotNull
+    public static Compound p(@NotNull Term... t) {
+        return (t.length == 0) ? Terms.ZeroProduct : (Compound) the(PRODUCT, t);
+    }
+    @NotNull
+    public static Compound p(@NotNull TermVector t) {
+        return p((Term[])t.terms());
     }
 
     /** creates from a sublist of a list */
