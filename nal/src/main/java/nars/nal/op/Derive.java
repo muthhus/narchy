@@ -58,7 +58,13 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
                   boolean beliefSingle, boolean goalSingle, boolean anticipate, boolean eternalize, Temporalize temporalizer) {
         this.rule = rule;
         this.temporalizer = temporalizer;
-        this.postMatch = (postMatch.length > 0) ? new AndCondition(postMatch) : BooleanCondition.TRUE;
+
+        switch (postMatch.length) {
+            case 0: this.postMatch = BooleanCondition.TRUE;  break;
+            case 1: this.postMatch = postMatch[0]; break;
+            default: this.postMatch = new AndCondition(postMatch);
+        }
+
         this.conclusionPattern = term;
         this.beliefSingle = beliefSingle;
         this.goalSingle = goalSingle;

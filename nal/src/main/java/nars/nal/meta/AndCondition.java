@@ -27,6 +27,8 @@ public final class AndCondition<C> extends GenericCompound<BooleanCondition<C>> 
     public AndCondition(@NotNull TermContainer conds) {
         super(Op.CONJUNCTION, conds);
         this.termCache = (BooleanCondition[]) conds.terms();
+        if (termCache.length < 2)
+            throw new RuntimeException("unnecessary use of AndCondition");
     }
 
 

@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 public final class SubTermOp extends AtomicBooleanCondition<PremiseEval> {
 
     public final int subterm;
-    public final Op op;
+    public final int op;
 
     @NotNull
     private final transient String id;
@@ -20,7 +20,7 @@ public final class SubTermOp extends AtomicBooleanCondition<PremiseEval> {
 
     public SubTermOp(int subterm, Op op) {
         this.subterm = subterm;
-        this.op = op;
+        this.op = op.ordinal();
         id = subterm + ":\"" + op + '"';
     }
 
@@ -32,6 +32,6 @@ public final class SubTermOp extends AtomicBooleanCondition<PremiseEval> {
 
     @Override
     public boolean booleanValueOf(@NotNull PremiseEval ff) {
-        return ((Compound)ff.term).isTerm(subterm, op);
+        return ff.subTermIs(subterm, op);
     }
 }

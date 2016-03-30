@@ -46,12 +46,12 @@ public class PremiseEval extends FindSubst {
     @Deprecated public final Versioned<MatchTerm> pattern;
 
     @NotNull
-    private final TaskBeliefPair termPattern = new TaskBeliefPair();
+    public final TaskBeliefPair term = new TaskBeliefPair();
 
     //    /**
     //     * current "y"-term being matched against
     //     */
-    public Term term;
+    //public Term term;
 
 
     int termutesPerMatch, termutes;
@@ -63,6 +63,7 @@ public class PremiseEval extends FindSubst {
 
     /** cached value */
     private TermIndex index;
+    private int termSub1Op, termSub2Op;
 
     public PremiseEval(Random r, Deriver deriver) {
         super(Op.VAR_PATTERN, r );
@@ -157,8 +158,10 @@ public class PremiseEval extends FindSubst {
 
         this.termutesPerMatch = p.getMaxMatches();
 
-        termPattern.set( taskTerm, beliefTerm );
-        this.term = termPattern;
+        term.set( taskTerm, beliefTerm );
+        this.termSub1Op = taskTerm.op().ordinal();
+        this.termSub2Op = beliefTerm.op().ordinal();
+
         //term.set( termPattern );
 
 //        //set initial power which will be divided by branch
@@ -220,12 +223,21 @@ public class PremiseEval extends FindSubst {
         return index.apply(this, t);
     }
 
-    public void setMinConfidence(float minConfidence) {
+    public final void setMinConfidence(float minConfidence) {
         this.minConfidence = minConfidence;
     }
 
-    public float getMinConfidence() {
+    public final float getMinConfidence() {
         return minConfidence;
+    }
+
+    /** gets the op of the (top-level) pattern being compared */
+    public final boolean subTermIs(int subterm, int op) {
+        switch(subterm) {
+            case 0: return termSub1Op == op;
+            case 1: return termSub2Op == op;
+        }
+        throw new UnsupportedOperationException();
     }
 
 }
