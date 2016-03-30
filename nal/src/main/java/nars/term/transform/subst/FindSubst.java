@@ -757,7 +757,7 @@ public abstract class FindSubst extends Versioning implements Subst {
     /**
      * a branch for comparing a particular permutation, called from the main next()
      */
-    public boolean matchLinear(@NotNull TermContainer X, @NotNull TermContainer Y) {
+    public final boolean matchLinear(@NotNull TermContainer X, @NotNull TermContainer Y) {
         int s = X.size();
         switch (s) {
             case 0:
@@ -765,7 +765,7 @@ public abstract class FindSubst extends Versioning implements Subst {
             case 1:
                 return matchSub(X, Y, 0);
             case 2:
-                //match the target variable first, if exists
+                //match the target variable first, if exists:
                 return matchLinear2(X, Y, X.isTerm(1, type) ? 1 : 0);
             default:
                 return matchLinearN(X, Y);
@@ -773,7 +773,7 @@ public abstract class FindSubst extends Versioning implements Subst {
     }
 
 
-    public boolean matchLinearN(@NotNull TermContainer X, @NotNull TermContainer Y) {
+    public final boolean matchLinearN(@NotNull TermContainer X, @NotNull TermContainer Y) {
         final int s = X.size();
         for (int i = 0; i < s; i++) {
             if (!matchSub(X, Y, i)) return false;
@@ -781,11 +781,11 @@ public abstract class FindSubst extends Versioning implements Subst {
         return true;
     }
 
-    public boolean matchSub(@NotNull TermContainer X, @NotNull TermContainer Y, int i) {
+    public final boolean matchSub(@NotNull TermContainer X, @NotNull TermContainer Y, int i) {
         return match(X.term(i), Y.term(i));
     }
     /** special match for size=2 compounds, with order reversal ability */
-    public boolean matchLinear2(@NotNull TermContainer X, @NotNull TermContainer Y, int first) {
+    public final boolean matchLinear2(@NotNull TermContainer X, @NotNull TermContainer Y, int first) {
         int other = 1-first;
         return match(X.term(first), Y.term(first)) && match(X.term(other), Y.term(other));
     }

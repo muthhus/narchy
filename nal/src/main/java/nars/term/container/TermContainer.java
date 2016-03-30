@@ -267,12 +267,12 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
 
     /** follows normal indexOf() semantics; -1 if not found */
     default int indexOf(@NotNull Term t) {
-        int s = size();
-        if (impossibleSubterm(t))
-            return -1;
-        for (int i = 0; i < s; i++) {
-            if (t.equals(term(i)))
-                return i;
+        if (!impossibleSubterm(t)) {
+            int s = size();
+            for (int i = 0; i < s; i++) {
+                if (t.equals(term(i)))
+                    return i;
+            }
         }
         return -1;
     }

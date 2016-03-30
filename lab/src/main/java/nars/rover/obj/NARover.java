@@ -142,10 +142,10 @@ public class NARover extends AbstractPolygonBot {
             return v;
         };
 
-        this.leftSpeed = new SensorConcept(SPEED_LEFT, nar, angleSpeed, linearNegative)
+        this.leftSpeed = new SensorConcept(SPEED_LEFT, nar, angleSpeed, linearPositive)
                 .timing(minUpdateTime, maxUpdateTime);
 
-        this.rightSpeed = new SensorConcept(SPEED_RIGHT, nar, angleSpeed, linearPositive)
+        this.rightSpeed = new SensorConcept(SPEED_RIGHT, nar, angleSpeed, linearNegative)
                 .timing(minUpdateTime, maxUpdateTime);
 
         hungrySensor = new SensorConcept(EAT_FOOD, nar, () -> 1f - hungry, linearPositive)
