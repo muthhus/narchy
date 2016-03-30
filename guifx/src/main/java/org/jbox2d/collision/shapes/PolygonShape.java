@@ -237,7 +237,7 @@ public class PolygonShape extends Shape {
    * @param hx the half-width.
    * @param hy the half-height.
    */
-  public final void setAsBox(final float hx, final float hy) {
+  public final PolygonShape setAsBox(final float hx, final float hy) {
     m_count = 4;
     m_vertices[0].set(-hx, -hy);
     m_vertices[1].set(hx, -hy);
@@ -248,6 +248,7 @@ public class PolygonShape extends Shape {
     m_normals[2].set(0.0f, 1.0f);
     m_normals[3].set(-1.0f, 0.0f);
     m_centroid.setZero();
+    return this;
   }
 
   /**

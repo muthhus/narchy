@@ -23,6 +23,8 @@
  ******************************************************************************/
 package nars.rover.physics.gl;
 
+import com.artemis.Entity;
+import nars.rover.obj.MaterialColor;
 import org.jbox2d.callbacks.DebugDraw;
 import org.jbox2d.collision.shapes.ChainShape;
 import org.jbox2d.collision.shapes.CircleShape;
@@ -104,8 +106,8 @@ public abstract class JoglAbstractDraw extends DebugDraw {
     Stroke defaultStroke = new BasicStroke(2);
 
     Stroke stroke = defaultStroke;
-    Color3f fillColor = defaultFillColor;
-    Color3f strokeColor = defaultStrokeColor;
+    Color3f fillColor = new Color3f();
+    Color3f strokeColor = new Color3f();
 
     public void setStrokeColor(Color3f strokeColor) {
         this.strokeColor = strokeColor;
@@ -131,13 +133,22 @@ public abstract class JoglAbstractDraw extends DebugDraw {
     void drawBody(Body b, float time) {
 
         Object o = b.getUserData();
+
+        strokeColor.set( defaultStrokeColor );
+        fillColor.set( defaultFillColor );
+        stroke = defaultStroke;
+
+        if (o instanceof Entity) {
+            Entity e = (Entity)o;
+            MaterialColor matCol = e.getComponent(MaterialColor.class);
+            if (matCol!=null) {
+                matCol.set(fillColor, time);
+            }
+        }
         if (o instanceof DrawProperty) {
             DrawProperty d = (DrawProperty) o;
             d.before(b, this, time);
         } else {
-            strokeColor = defaultStrokeColor;
-            fillColor = defaultFillColor;
-            stroke = defaultStroke;
         }
 
 
