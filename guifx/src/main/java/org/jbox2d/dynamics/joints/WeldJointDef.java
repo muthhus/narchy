@@ -37,12 +37,12 @@ public class WeldJointDef extends JointDef {
   /**
    * The local anchor point relative to body1's origin.
    */
-  public final Vec2 localAnchorA;
+  public Vec2 localAnchorA;
 
   /**
    * The local anchor point relative to body2's origin.
    */
-  public final Vec2 localAnchorB;
+  public Vec2 localAnchorB;
 
   /**
    * The body2 angle minus body1 angle in the reference state (radians).
