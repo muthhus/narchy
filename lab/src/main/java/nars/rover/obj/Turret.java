@@ -1,6 +1,7 @@
 package nars.rover.obj;
 
 
+import nars.$;
 import nars.rover.physics.gl.JoglAbstractDraw;
 import nars.rover.physics.j2d.LayerDraw;
 import nars.rover.util.Explosion;
@@ -16,6 +17,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Turret implements LayerDraw {
 
+    public static final nars.term.Term BULLET = $.the("bullet");
     final static Random rng = new XorShift128PlusRandom(1);
 
     final float fireProbability = 0.005f;
@@ -154,6 +156,9 @@ public class Turret implements LayerDraw {
 
 
         public BulletData(Body b, float power) {
+            super(BULLET);
+
+
             this.bullet = b;
             this.power = power;
             //this.diesAt = diesAt;

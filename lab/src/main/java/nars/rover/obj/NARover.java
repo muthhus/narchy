@@ -412,8 +412,9 @@ public class NARover extends AbstractPolygonBot {
 
         List<SensorConcept> sensorConcepts = Global.newArrayList(pixels * resolution);
 
-        String[] materials = {"food", "poison", "wall"};
-        float pixelPri = 0.5f * 1f / (materials.length * pixels);
+        Term[] materials = {$.the("food"), $.the("poison"), $.the("wall")};
+
+        float pixelPri = 1f / (float)Math.sqrt(materials.length * pixels);
 
 
         for (int i = 0; i < pixels; i++) {
@@ -435,19 +436,19 @@ public class NARover extends AbstractPolygonBot {
             each.accept(v);
 
 
-            for (String material : materials) {
+            for (Term material : materials) {
 
                 DoubleSupplier value = () -> {
                     if (v.hit(material)) {
                         float x = (1f - v.seenDist); //closer = larger number (up to 1.0)
-                        if (x < 0.1f) return 0;
+                        if (x < 0.01f) return 0;
                         else return 0.5f + 0.45f * x;
                     }
                     return 0; //nothing seen within the range
                 };
 
 
-                Compound term = $.imageInt(1, visionTerm.term(), $.the(material));
+                Compound term = $.imageInt(1, visionTerm.term(), material);
 
                 SensorConcept visionSensor = new SensorConcept(
 

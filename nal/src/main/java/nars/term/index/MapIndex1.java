@@ -45,7 +45,8 @@ public class MapIndex1 extends AbstractMapIndex {
     @Nullable
     @Override
     public final Termed set(@NotNull Termed t) {
-        if (data.putIfAbsent(t, t)!=null)
+        Termed existing = data.putIfAbsent(t, t);
+        if ((existing !=null) && (existing!=t))
             throw new RuntimeException("pre-existing value");
         return t;
     }

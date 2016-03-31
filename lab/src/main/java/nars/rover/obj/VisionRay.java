@@ -1,11 +1,14 @@
 package nars.rover.obj;
 
 import com.artemis.Component;
+import com.artemis.Entity;
 import com.gs.collections.api.block.procedure.primitive.FloatObjectProcedure;
+import nars.$;
 import nars.rover.physics.gl.JoglAbstractDraw;
 import nars.rover.physics.gl.JoglDraw;
 import nars.rover.physics.j2d.LayerDraw;
 import nars.rover.util.RayCastClosestCallback;
+import nars.term.Term;
 import nars.util.data.Util;
 import org.jbox2d.callbacks.RayCastCallback;
 import org.jbox2d.common.Color3f;
@@ -38,7 +41,7 @@ public class VisionRay extends Component implements LayerDraw {
     private boolean eats;
     protected Body hitNext;
 
-    private String hitMaterial;
+    private Term hitMaterial = null;
     //public float hitDist;
 
     //final Sensor sensor;
@@ -64,13 +67,17 @@ public class VisionRay extends Component implements LayerDraw {
 
     //TODO color(Body hit)
 
-    public static String material(Body hit) {
-        if (hit == null) return "nothing";
-        Object d = hit.getUserData();
-        return d != null ? d.toString() : "something";
+    public static Term material(Body hit) {
+        if (hit == null) return VisionRay.nothing;
+        Entity d = (Entity)hit.getUserData();
+        Material m = d.getComponent(Material.class);
+        if (m!=null)
+            return m.term();
+        return something;
     }
 
-
+    public final static Term something = $.the("something");
+    public final static Term nothing = $.the("nothing");
 
 
     protected void perceiveDist(Body hit, float hitDist) {
@@ -232,8 +239,8 @@ public class VisionRay extends Component implements LayerDraw {
         this.eats = b;
     }
 
-    public boolean hit(String material) {
-        String m = hitMaterial;       
+    public final boolean hit(Term material) {
+        Term m = hitMaterial;
         return m!=null && material.equals(m);
     }
 

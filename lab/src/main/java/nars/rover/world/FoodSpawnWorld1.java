@@ -5,6 +5,7 @@
 package nars.rover.world;
 
 import com.artemis.EntityEdit;
+import nars.$;
 import nars.rover.Sim;
 import nars.rover.obj.Edible;
 import nars.rover.obj.Material;
@@ -39,9 +40,15 @@ public class FoodSpawnWorld1 extends RoverWorld {
 
             EntityEdit ff = newFood(sim, foodSpawnR, foodSpawnR, minSize, maxSize, mass);
             if (Math.random() < foodToPoisonRatio) {
-                ff.add(new Edible(0.7f, 0f)).add(new MaterialColor(0.6f, 0.8f, 0.1f));
+                ff.add(new Edible(0.7f, 0f))
+                        .add(new MaterialColor(0.6f, 0.8f, 0.1f))
+                        .add(new Material($.the("food"))
+                );
             } else {
-                ff.add(new Edible(0f, 0.7f)).add(new MaterialColor(0.9f, 0.1f, 0.1f).strobe(0.2f,(float)Math.random()));
+                ff.add(new Edible(0f, 0.7f))
+                        .add(new MaterialColor(0.9f, 0.1f, 0.1f).strobe(0.2f,(float)Math.random()))
+                        .add(new Material($.the("poison"))
+                );
             }
 
         }

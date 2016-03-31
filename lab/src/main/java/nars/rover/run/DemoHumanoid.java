@@ -3,6 +3,7 @@ package nars.rover.run;
 import com.artemis.Entity;
 import nars.rover.Sim;
 import nars.rover.obj.*;
+import nars.rover.world.FoodSpawnWorld1;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.*;
@@ -20,10 +21,10 @@ import java.util.List;
 public class DemoHumanoid {
 
     static float torsoUpperWidth = 0.25f;
-    static float torsoUpperHeight = 0.3f; //0.2..0.45
+    static float torsoUpperHeight = 0.45f; //0.2..0.45
 
     static float torsoLowerWidth = 0.25f;
-    static float torsoLowerHeight = 0.3f; //0.2..0.45
+    static float torsoLowerHeight = 0.2f; //0.2..0.45
 
     static float femur_width = 0.18f;
     static float femur_length = 0.45f;
@@ -50,6 +51,7 @@ public class DemoHumanoid {
     public static void main(String[] args) {
 
         final Sim sim = new Sim(new World2D());
+        new FoodSpawnWorld1(sim, 128, 48, 48, 0.5f);
 
 
         float density = 106.2f; // common for all fixtures, no reason to be too specific
@@ -75,6 +77,8 @@ public class DemoHumanoid {
         Body[] right_arm = createArm( sim.world);
         Body[] head = createHead( sim.world);
         connectParts(sim.world, head[0], torso, left_arm, right_arm, left_leg, right_leg);
+
+        //sim.world.setGravity(new Vec2(0,0.1f));
 
         /*Entity mrnars = sim.game.createEntity().edit()
                 .add(new Physical(

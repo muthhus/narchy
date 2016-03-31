@@ -18,10 +18,7 @@ public final class DerivedTask extends MutableTask {
 
     @Nullable
     private final Reference<ConceptProcess> premise;
-    @Nullable
-    private BLink<? extends Task> premiseTaskLink;
-    @Nullable
-    private BLink<? extends Termed> premiseTermLink;
+
 
     //avoid storing the ConceptProcess reference because it creates a garbage-collection chain of derivedtask -> premise -> derivedtask etc..
     //public final ConceptProcess premise;
@@ -40,18 +37,23 @@ public final class DerivedTask extends MutableTask {
 
 
     @Override
-    public void onRevision(@NotNull Task t) {
+    public boolean onRevision(@NotNull Task t) {
+
         if (isDeleted())
-            return;
+            return false;
 
         ConceptProcess premise = this.premise.get();
         if (premise == null)
-            return; //weakref may cause these to become null
+            return true; //weakref may cause these to become null
 
         Truth conclusion = t.truth();
 
         BLink<? extends Task> tLink = premise.taskLink;
-        if (!tLink.isDeleted()) {
+        if (tLink.isDeleted()) {
+            //System.out.println(premise.taskLink + " should delete " + this + "?");
+            delete();
+            return false;
+        } else {
             //TODO check this Question case is right
             Truth tLinkTruth = tLink.get().truth();
             if (tLinkTruth != null) {
@@ -71,6 +73,7 @@ public final class DerivedTask extends MutableTask {
             }
         }
 
+        return true;
     }
 
 }

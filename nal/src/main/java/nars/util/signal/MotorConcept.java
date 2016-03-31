@@ -4,6 +4,7 @@ import com.gs.collections.api.block.function.primitive.FloatFunction;
 import com.gs.collections.api.block.function.primitive.FloatToFloatFunction;
 import nars.NAR;
 import nars.Narsese;
+import nars.Op;
 import nars.concept.OperationConcept;
 import nars.task.Task;
 import nars.term.Compound;
@@ -34,6 +35,9 @@ public class MotorConcept extends OperationConcept implements Consumer<NAR>, Flo
 
     public MotorConcept(@NotNull String compoundTermString, @NotNull NAR n) throws Narsese.NarseseException {
         super(compoundTermString, n);
+
+        assert(Op.isOperation(term()));
+
         this.logger = LoggerFactory.getLogger(getClass() + ":" + term);
 
 

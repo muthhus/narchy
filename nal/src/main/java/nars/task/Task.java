@@ -178,8 +178,8 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
      */
     boolean equivalentTo(Task that, boolean punctuation, boolean term, boolean truth, boolean stamp, boolean creationTime);
 
-    /** called when a Concept processes this Task */
-    void onConcept(Concept c);
+    /** called when a Concept processes this Task; return false to cancel pocessing */
+    boolean onConcept(Concept c);
 
     @Nullable
     default Task answer(@NotNull Compound newTerm, @NotNull Task question, @NotNull Memory memory) {
@@ -307,8 +307,8 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     }
 
     /** allows for budget feedback that occurrs on revision */
-    default void onRevision(Task conclusion) {
-
+    default boolean onRevision(Task conclusion) {
+        return true;
     }
 
 

@@ -72,8 +72,8 @@ public class CompoundConcept extends AbstractConcept<GenericCompound> implements
     }
 
     /** used for setting an explicit OperationConcept instance via java; activates it on initialization */
-    public CompoundConcept(@NotNull GenericCompound term, @NotNull NAR n) {
-        this(term, n.index.conceptBuilder());
+    public CompoundConcept(@NotNull Compound term, @NotNull NAR n) {
+        this((GenericCompound)term, n.index.conceptBuilder());
     }
 
     /** default construction by a NAR on conceptualization */
@@ -766,8 +766,8 @@ public class CompoundConcept extends AbstractConcept<GenericCompound> implements
     @Nullable
     public final Task process(@NotNull final Task task, @NotNull NAR nar) {
 
-
-        task.onConcept(this);
+        if (!task.onConcept(this))
+            return null;
 
         switch (task.punc()) {
             case Symbols.BELIEF:

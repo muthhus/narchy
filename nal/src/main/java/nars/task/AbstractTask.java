@@ -271,14 +271,8 @@ public abstract class AbstractTask extends UnitBudget
     }
 
     @Override
-    public void onConcept(Concept c) {
-
-        //intermval generally contains unique information that should not be replaced
-        //if (term instanceof TermMetadata)
-            //return;
-
-        //if debug, check that they are equal..
-        //term = (Compound) c.getTerm(); //HACK the cast
+    public boolean onConcept(Concept c) {
+        return true;
     }
 
     @Override

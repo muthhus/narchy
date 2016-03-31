@@ -2,6 +2,7 @@ package nars.rover.obj;
 
 import com.artemis.Component;
 import nars.rover.physics.gl.JoglAbstractDraw;
+import nars.term.Term;
 import org.jbox2d.common.Color3f;
 
 /**
@@ -9,58 +10,76 @@ import org.jbox2d.common.Color3f;
  */
 public class Material extends Component {
 
-	public static final Material wall = new WallMaterial();
-	public static final Material food = new FoodMaterial();
-	public static final Material poison = new PoisonMaterial();
+
+	public final Term term;
 
 	JoglAbstractDraw.DrawProperty renderer = null;
 
+	public Material(Term term) {
+		this.term = term;
+	}
 
-	public static class FoodMaterial extends Material /*implements Edible*/ {
+	public Term term() {
+		return term;
+	}
 
-		static final Color3f foodFill = new Color3f(0.15f, 0.15f, 0.6f);
 
-//		@Override
-//		public void before(Body b, JoglAbstractDraw d, float time) {
+//	public static class FoodMaterial extends Material /*implements Edible*/ {
 //
-//			d.setFillColor(foodFill);
-//		}
-
-		@Override
-		public String toString() {
-			return "food";
-		}
-	}
-
-	public static class WallMaterial extends Material {
-		static final Color3f wallFill = new Color3f(0.5f, 0.5f, 0.5f);
-
-//		@Override
-//		public void before(Body b, JoglAbstractDraw d, float time) {
+//		static final Color3f foodFill = new Color3f(0.15f, 0.15f, 0.6f);
 //
-//			d.setFillColor(wallFill);
+//		public FoodMaterial() {
+//			super(term);
 //		}
-
-		@Override
-		public String toString() {
-			return "wall";
-		}
-	}
-
-	public static final Color3f poisonFill = new Color3f(0.45f, 0.15f, 0.15f);
-
-	public static class PoisonMaterial extends Material /*implements Edible*/ {
-
-
+//
+////		@Override
+////		public void before(Body b, JoglAbstractDraw d, float time) {
+////
+////			d.setFillColor(foodFill);
+////		}
+//
 //		@Override
-//		public void before(Body b, JoglAbstractDraw d, float time) {
-//			d.setFillColor(poisonFill);
+//		public String toString() {
+//			return "food";
 //		}
-
-		@Override
-		public String toString() {
-			return "poison";
-		}
-	}
+//	}
+//
+//	public static class WallMaterial extends Material {
+//		static final Color3f wallFill = new Color3f(0.5f, 0.5f, 0.5f);
+//
+//		public WallMaterial() {
+//			super(term);
+//		}
+//
+////		@Override
+////		public void before(Body b, JoglAbstractDraw d, float time) {
+////
+////			d.setFillColor(wallFill);
+////		}
+//
+//		@Override
+//		public String toString() {
+//			return "wall";
+//		}
+//	}
+//
+//	public static final Color3f poisonFill = new Color3f(0.45f, 0.15f, 0.15f);
+//
+//	public static class PoisonMaterial extends Material /*implements Edible*/ {
+//		public PoisonMaterial() {
+//			super(term);
+//		}
+//
+//
+////		@Override
+////		public void before(Body b, JoglAbstractDraw d, float time) {
+////			d.setFillColor(poisonFill);
+////		}
+//
+//		@Override
+//		public String toString() {
+//			return "poison";
+//		}
+//	}
 
 }

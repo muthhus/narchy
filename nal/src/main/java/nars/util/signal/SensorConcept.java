@@ -33,7 +33,7 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
     }
 
     public SensorConcept(@NotNull Compound term, @NotNull NAR n, FloatSupplier input, FloatToFloatFunction toFreq)  {
-        super((GenericCompound)term, n);
+        super(term, n);
 
         this.sensor = new Sensor(n, this, this, toFreq);
         n.on(this);

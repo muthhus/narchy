@@ -34,14 +34,16 @@ public class RevisionTask extends MutableTask {
     }
 
     @Override
-    public void onConcept(@NotNull Concept c) {
+    public boolean onConcept(@NotNull Concept c) {
         super.onConcept(c);
 
         Task newBelief = getParentTask();
         Task oldBelief = getParentBelief();
 
         if ((newBelief == null) || (oldBelief == null))
-            return; //weakref may cause these to become null
+            return true; //weakref may cause these to become null; so just continue processing
+
+
 
         //Decrease the budget of the parent tasks and tasklinks,
         // so that their priority sum and the child remains the same (balanced)
@@ -67,8 +69,7 @@ public class RevisionTask extends MutableTask {
                 newBeliefContribution);
 
 
-        oldBelief.onRevision(this);
-        newBelief.onRevision(this);
+        return oldBelief.onRevision(this) && newBelief.onRevision(this);
 
     }
 
