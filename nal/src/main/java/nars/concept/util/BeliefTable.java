@@ -322,6 +322,7 @@ public interface BeliefTable extends TaskTable {
     @Nullable Truth truth(long when, long now, float dur);
 
 
+
     @Nullable default Truth truth(long now, float dur) {
         return truth(now, now, dur);
     }

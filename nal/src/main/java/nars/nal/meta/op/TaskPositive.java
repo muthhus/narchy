@@ -6,18 +6,18 @@ import nars.task.Task;
 import org.jetbrains.annotations.NotNull;
 
 
-public final class TaskNegative extends AtomicBooleanCondition<PremiseEval> {
+public final class TaskPositive extends AtomicBooleanCondition<PremiseEval> {
 
-    public static final TaskNegative the = new TaskNegative();
+    public static final TaskPositive the = new TaskPositive();
 
-    private TaskNegative() {
+    private TaskPositive() {
         super();
     }
 
     @Override
     public boolean booleanValueOf(@NotNull PremiseEval m) {
         Task task = m.premise.task();
-        return (task.isBeliefOrGoal() && task.freq() < 0.5f);
+        return (task.isBeliefOrGoal() && task.freq() > 0.5f);
     }
 
     @NotNull

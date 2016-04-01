@@ -25,18 +25,18 @@ import static java.lang.System.out;
 public class Thermostat5 {
 
     public static final float basePeriod = 32;
-    public static final float tolerance = 0.15f;
-    public static float targetPeriod = 2f;
+    public static final float tolerance = 0.1f;
+    public static float targetPeriod = 3f;
     public static final float speed = 0.01f;
     static boolean print = true, debugError = false;
 
     public static void main(String[] args) {
-        Default d = new Default(1024, 32, 2, 3);
+        Default d = new Default(1024, 32, 2, 4);
         d.duration.set(Math.round(2.5f * basePeriod));
         d.activationRate.setValue(0.05f);
-        d.premiser.confMin.setValue(0.1f);
+        d.premiser.confMin.setValue(0.03f);
 
-        float score = eval(d, 15000);
+        float score = eval(d, 5000);
         System.out.println("score=" + score);
     }
     public static void main2(String[] args) {
@@ -107,13 +107,13 @@ public class Thermostat5 {
         );*/
 
 
-        n.on(aboveness = new SensorConcept("diffx:above", n, () -> {
+        n.on(aboveness = new SensorConcept("<diff-->[above]>", n, () -> {
             float diff = yHidden.floatValue() - yEst.floatValue();
             if (diff > tolerance) return 0.5f + 0.5f * Util.clamp(diff);
             return 0;
         }).resolution(0.05f));
 
-        n.on(belowness = new SensorConcept("diffy:below", n, () -> {
+        n.on(belowness = new SensorConcept("<diff-->[below]>", n, () -> {
             float diff = -(yHidden.floatValue() - yEst.floatValue());
             if (diff > tolerance) return 0.5f + 0.5f * Util.clamp(diff);
             return 0;
@@ -125,7 +125,7 @@ public class Thermostat5 {
             //float switchPeriod = 20;
             //float highPeriod = 5f;
 
-            double y = 0.5f + 0.5f * Math.sin(t / (targetPeriod * basePeriod));
+            double y = 0.5f + 0.45f * Math.sin(t / (targetPeriod * basePeriod));
             //y = Math.round(y);
 
             //x0.setValue(y); //high frequency phase
@@ -164,12 +164,15 @@ public class Thermostat5 {
         });
 
         /** difference in order to diagnose an error */
-        final float errorThresh = 0.07f;
+        final float errorThresh = 0.15f;
 
         n.on(new DebugMotorConcept(n, "t(up)", yEst, yHidden,
                 (v) -> {
-                    yEst.setValue(Util.clamp(+speed * v + yEst.floatValue()));
-                    return v;
+                    if (v > 0) {
+                        yEst.setValue(Util.clamp(+speed * v + yEst.floatValue()));
+                        return v;
+                    }
+                    return Float.NaN;
                 },
                 (v) -> {
                     //if already above the target value
@@ -178,8 +181,11 @@ public class Thermostat5 {
         ));
         n.on(new DebugMotorConcept(n, "t(down)", yEst, yHidden,
                 (v) -> {
-                    yEst.setValue(Util.clamp(-speed * v + yEst.floatValue()));
-                    return v;
+                    if (v > 0) {
+                        yEst.setValue(Util.clamp(-speed * v + yEst.floatValue()));
+                        return v;
+                    }
+                    return Float.NaN;
                 },
                 (v) -> {
                     //if already above the target value
@@ -193,7 +199,7 @@ public class Thermostat5 {
 
         t = 0;
 
-        int trainMotionCycles = 32;
+        int trainMotionCycles = 64;
         float str = 0.1f;
         System.out.println("training up");
 
@@ -209,8 +215,8 @@ public class Thermostat5 {
             n.step();
         }
         System.out.println("training oscillation");
-        n.goal($.$("t(up)"), Tense.Present, 0.75f, str);
-        n.goal($.$("t(down)"), Tense.Present, 0.75f, str);
+        n.goal($.$("t(up)"), Tense.Present, 1f, str);
+        n.goal($.$("t(down)"), Tense.Present, 1f, str);
         for (int i = 0; i < trainMotionCycles; i++) {
             n.step();
         }
@@ -219,14 +225,15 @@ public class Thermostat5 {
 
         //n.goal($.$("t(up)"), Tense.Present, 0f, 0.1f);
         //n.goal($.$("t(down)"), Tense.Present, 1f, 0.1f);
-        n.goal($.$("diffx:above"), 0f, 0.99f); //not above
-        n.goal($.$("diffy:below"), 0f, 0.99f); //not below
+
+        n.goal($.$("<diff-->[above]>"), 0f, 0.99f); //not above
+        n.goal($.$("<diff-->[below]>"), 0f, 0.99f); //not below
         //n.ask($.$("(a:#x ==> diff:#y)"), '?'); //not above
 
         for (int i = 0; i < cycles; i++) {
             t++;
             //n.goal($.$("((--,diff:above) && (--,diff:below))"), Tense.Present, 1f, 0.99f); //not above or below
-
+            //n.goal($.$("((--,<diff-->[above]>) && (--,<diff-->[above]>))"), Tense.Present, 1f, 0.99f); //not above
             n.step();
             //Util.pause(1);
         }

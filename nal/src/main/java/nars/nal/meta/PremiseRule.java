@@ -208,6 +208,7 @@ public class PremiseRule extends GenericCompound {
     static final HashMap<Object, Integer> preconditionScore = new HashMap() {{
         put(TaskPunctuation.class, 10);
         put(TaskNegative.class, 9);
+        put(TaskPositive.class, 9);
 
         put(SubTermOp.class, 7);
         put(SubTermStructure.class, 3);
@@ -623,20 +624,12 @@ public class PremiseRule extends GenericCompound {
 
                 case "task":
                     switch (arg1.toString()) {
-                        case "negative":
-                            preNext = TaskNegative.the;
-                            break;
-                        case "\"?\"":
-                            preNext = TaskPunctuation.TaskQuestion;
-                            break;
-                        case "\".\"":
-                            preNext = TaskPunctuation.TaskJudgment;
-                            break;
-                        case "\"!\"":
-                            preNext = TaskPunctuation.TaskGoal;
-                            break;
-                        default:
-                            throw new RuntimeException("Unknown task punctuation type: " + predicate.term(0));
+                        case "negative":  preNext = TaskNegative.the; break;
+                        case "positive":  preNext = TaskPositive.the; break;
+                        case "\"?\"":     preNext = TaskPunctuation.TaskQuestion; break;
+                        case "\".\"":     preNext = TaskPunctuation.TaskJudgment; break;
+                        case "\"!\"":     preNext = TaskPunctuation.TaskGoal;break;
+                        default: throw new RuntimeException("Unknown task punctuation type: " + predicate.term(0));
                     }
                     break;
 

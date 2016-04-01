@@ -20,7 +20,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 /** not thread safe; call from only one thread at a time */
-abstract public class PremiseGenerator /*extends UnifySubst */implements Function<Term, Task>, Consumer<BLink<? extends Concept>> {
+abstract public class PremiseGenerator /*extends UnifySubst */implements Consumer<BLink<? extends Concept>> {
 
     @NotNull
     public final NAR nar;
@@ -151,7 +151,7 @@ abstract public class PremiseGenerator /*extends UnifySubst */implements Functio
                 continue;
 
             //matchAll(taskLinkTerm, termLinkTerm );
-            premise(concept, taskLink, termLink, apply(termLinkTerm));
+            premise(concept, taskLink, termLink, match(termLinkTerm, task));
         }
     }
 
@@ -192,12 +192,15 @@ abstract public class PremiseGenerator /*extends UnifySubst */implements Functio
 
     /** resolves the most relevant belief of a given term/concept */
     @Nullable
-    @Override public final Task apply(@NotNull Term beliefTerm) {
+    public final Task match(@NotNull Term beliefTerm, @NotNull Task task) {
 
         Concept beliefConcept = nar.concept(beliefTerm);
         if ((beliefConcept != null) && (beliefConcept.hasBeliefs())) {
 
-            Task belief = beliefConcept.beliefs().top(nar.time());
+            Task belief = beliefConcept.beliefs().top(
+                //nar.time()
+                task.occurrence()
+            );
 
             assert(belief != null && !belief.isDeleted());
             //  if (belief == null || belief.isDeleted())  throw new RuntimeException("Deleted belief: " + belief + " " + beliefConcept.hasBeliefs());

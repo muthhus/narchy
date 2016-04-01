@@ -51,7 +51,7 @@ abstract public class ConceptProcess implements Premise {
      *      0: not cyclic
      *      1: cyclic
      */
-    private final transient byte cyclic = -1;
+    private transient byte cyclic = -1;
 
     public ConceptProcess(NAR nar, BLink<? extends Concept> conceptLink,
                           BLink<? extends Task> taskLink,
@@ -88,7 +88,7 @@ abstract public class ConceptProcess implements Premise {
         } else {
             //Task b = this.belief;
             boolean o = task().cyclic();
-            this.overlap = (byte)(o ? 1 : 0);
+            this.cyclic = (byte)(o ? 1 : 0);
             return o;
         }
     }
