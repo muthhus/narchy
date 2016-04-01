@@ -21,7 +21,14 @@ import java.util.List;
 
 import static java.lang.System.out;
 
-
+/**
+ *  this is trying to guess how to react to a hidden variable, its only given clues when its above or below
+  and its goal is to avoid both those states
+  anything below a score of 0.5 should be better than random
+  it gets these above/below hints but it has to process these among all the other processing its thinking about
+  then to really guess right it has to learn the timing of the sine wave
+  and imagine at what rate it will travel and when it will change direction etc
+ */
 public class Thermostat5 {
 
     public static final float basePeriod = 32;
@@ -172,7 +179,7 @@ public class Thermostat5 {
                         yEst.setValue(Util.clamp(+speed * v + yEst.floatValue()));
                         return v;
                     }
-                    return Float.NaN;
+                    return -1;
                 },
                 (v) -> {
                     //if already above the target value
@@ -185,7 +192,7 @@ public class Thermostat5 {
                         yEst.setValue(Util.clamp(-speed * v + yEst.floatValue()));
                         return v;
                     }
-                    return Float.NaN;
+                    return -1;
                 },
                 (v) -> {
                     //if already above the target value

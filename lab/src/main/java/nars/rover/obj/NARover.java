@@ -156,28 +156,34 @@ public class NARover extends AbstractPolygonBot {
 
         float motorThresh = 0.5f;
 
-        MotorConcept motorLeft = new MotorConcept("motor(left)", nar, (a) -> {
-            return a < motorThresh ? 0 : motor.left(a);
-        });
-
         int minMotorFeedbackCycles = nar.duration() / 2;
         int maxMotorFeedbackCycles = nar.duration() * 3;
+
+        MotorConcept motorLeft = new MotorConcept("motor(left)", nar, (a) -> {
+            //if (a < 0) return Float.NaN;
+            return a < motorThresh ? -1 : motor.left(a);
+        }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
+
         MotorConcept motorRight = new MotorConcept("motor(right)", nar, (a) -> {
-            return a < motorThresh ? 0 : motor.right(a);
+            //if (a < 0) return Float.NaN;
+            return a < motorThresh ? -1 : motor.right(a);
         }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
 
         MotorConcept motorFore = new MotorConcept("motor(fore)", nar, (l) -> {
-            return l < motorThresh ? 0 : motor.forward(l);
+            //if (l < 0) return Float.NaN;
+            return l < motorThresh ? -1 : motor.forward(l);
         }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
         ;
 
         MotorConcept motorBack = new MotorConcept("motor(back)", nar, (l) -> {
-            return l < motorThresh ? 0 : motor.backward(l);
+            //if (l < 0) return Float.NaN;
+            return l < motorThresh ? -1: motor.backward(l);
         }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
         ;
 
         MotorConcept motorStop = new MotorConcept("motor(stop)", nar, (s) -> {
-            if (s < motorThresh) return 0;
+            //if (s < 0) return Float.NaN;
+            if (s < motorThresh) return -1;
             return motor.stop(s);
         }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
         ;
@@ -189,7 +195,7 @@ public class NARover extends AbstractPolygonBot {
                     return s;
                 }
             }
-            return 0; //unfired;
+            return -1; //unfired;
 
         }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
         ;
