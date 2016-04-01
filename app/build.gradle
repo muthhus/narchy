@@ -39,7 +39,7 @@ dependencies {
 
     compile group: 'com.googlecode.concurrent-trees', name: 'concurrent-trees', version: '2.5.0'
 
-    compile 'com.github.ben-manes.caffeine:caffeine:2.2.2'
+    compile 'com.github.ben-manes.caffeine:caffeine:2.2.3'
     /*compile(group: 'org.cache2k', name: 'cache2k-core', version: '0.23') {
         exclude(module: 'cache2k-jmx-api')
         exclude(module: 'commons-logging')

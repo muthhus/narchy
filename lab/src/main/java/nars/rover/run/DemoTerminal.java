@@ -3,6 +3,7 @@ package nars.rover.run;
 import com.artemis.Component;
 import com.googlecode.lanterna.*;
 import com.googlecode.lanterna.graphics.TextGraphics;
+import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.io.WriteInput;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
@@ -22,6 +23,9 @@ import org.codehaus.plexus.util.StringOutputStream;
 import org.jbox2d.dynamics.World2D;
 
 import java.awt.*;
+import java.awt.Button;
+import java.awt.GridLayout;
+import java.awt.Panel;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -41,7 +45,6 @@ public class DemoTerminal {
         //new FoodSpawnWorld1(sim, 128, 48, 48, 0.5f);
 
 
-
         Terminal terminal = new Terminal(50, 20, 1f);
         sim.game.createEntity().edit()
                 .add(terminal)
@@ -53,27 +56,89 @@ public class DemoTerminal {
             Screen screen = null;
             try {
                 screen = new TerminalScreen(terminal.term);
-                TextGraphics tGraphics = screen.newTextGraphics();
-
                 screen.startScreen();
-                screen.clear();
 
-                tGraphics.drawRectangle(
-                        new TerminalPosition(3,3), new TerminalSize(10,10), '*');
-                screen.refresh();
+                MultiWindowTextGUI gui = new MultiWindowTextGUI(new SeparateTextGUIThread.Factory(), screen);
+
+
+                {
+                    final BasicWindow window = new BasicWindow("Grid layout test");
+
+
+                    com.googlecode.lanterna.gui2.Panel leftGridPanel = new com.googlecode.lanterna.gui2.Panel();
+                    leftGridPanel.setLayoutManager(new com.googlecode.lanterna.gui2.GridLayout(4));
+                    leftGridPanel.addComponent(new EmptySpace(TextColor.ANSI.BLACK, new TerminalSize(4, 2)));
+                    leftGridPanel.addComponent(new EmptySpace(TextColor.ANSI.BLUE, new TerminalSize(4, 2)));
+                    leftGridPanel.addComponent(new EmptySpace(TextColor.ANSI.CYAN, new TerminalSize(4, 2)));
+                    leftGridPanel.addComponent(new EmptySpace(TextColor.ANSI.GREEN, new TerminalSize(4, 2)));
+
+                    leftGridPanel.addComponent(new EmptySpace(TextColor.ANSI.MAGENTA, new TerminalSize(4, 2))
+                            .setLayoutData(com.googlecode.lanterna.gui2.GridLayout.createLayoutData(com.googlecode.lanterna.gui2.GridLayout.Alignment.BEGINNING, com.googlecode.lanterna.gui2.GridLayout.Alignment.CENTER, true, false, 4, 1)));
+                    leftGridPanel.addComponent(new EmptySpace(TextColor.ANSI.RED, new TerminalSize(4, 2))
+                            .setLayoutData(com.googlecode.lanterna.gui2.GridLayout.createLayoutData(com.googlecode.lanterna.gui2.GridLayout.Alignment.CENTER, com.googlecode.lanterna.gui2.GridLayout.Alignment.CENTER, true, false, 4, 1)));
+                    leftGridPanel.addComponent(new EmptySpace(TextColor.ANSI.YELLOW, new TerminalSize(4, 2))
+                            .setLayoutData(com.googlecode.lanterna.gui2.GridLayout.createLayoutData(com.googlecode.lanterna.gui2.GridLayout.Alignment.END, com.googlecode.lanterna.gui2.GridLayout.Alignment.CENTER, true, false, 4, 1)));
+                    leftGridPanel.addComponent(new EmptySpace(TextColor.ANSI.BLACK, new TerminalSize(4, 2))
+                            .setLayoutData(com.googlecode.lanterna.gui2.GridLayout.createLayoutData(com.googlecode.lanterna.gui2.GridLayout.Alignment.FILL, com.googlecode.lanterna.gui2.GridLayout.Alignment.CENTER, true, false, 4, 1)));
+
+                    com.googlecode.lanterna.gui2.Panel rightGridPanel = new com.googlecode.lanterna.gui2.Panel();
+                    rightGridPanel.setLayoutManager(new com.googlecode.lanterna.gui2.GridLayout(5));
+                    rightGridPanel.addComponent(new EmptySpace(TextColor.ANSI.BLACK, new TerminalSize(4, 2)));
+                    rightGridPanel.addComponent(new EmptySpace(TextColor.ANSI.MAGENTA, new TerminalSize(4, 2))
+                            .setLayoutData(com.googlecode.lanterna.gui2.GridLayout.createLayoutData(com.googlecode.lanterna.gui2.GridLayout.Alignment.CENTER, com.googlecode.lanterna.gui2.GridLayout.Alignment.BEGINNING, false, true, 1, 4)));
+                    rightGridPanel.addComponent(new EmptySpace(TextColor.ANSI.RED, new TerminalSize(4, 2))
+                            .setLayoutData(com.googlecode.lanterna.gui2.GridLayout.createLayoutData(com.googlecode.lanterna.gui2.GridLayout.Alignment.CENTER, com.googlecode.lanterna.gui2.GridLayout.Alignment.CENTER, false, true, 1, 4)));
+                    rightGridPanel.addComponent(new EmptySpace(TextColor.ANSI.YELLOW, new TerminalSize(4, 2))
+                            .setLayoutData(com.googlecode.lanterna.gui2.GridLayout.createLayoutData(com.googlecode.lanterna.gui2.GridLayout.Alignment.CENTER, com.googlecode.lanterna.gui2.GridLayout.Alignment.END, false, true, 1, 4)));
+                    rightGridPanel.addComponent(new EmptySpace(TextColor.ANSI.BLACK, new TerminalSize(4, 2))
+                            .setLayoutData(com.googlecode.lanterna.gui2.GridLayout.createLayoutData(com.googlecode.lanterna.gui2.GridLayout.Alignment.CENTER, com.googlecode.lanterna.gui2.GridLayout.Alignment.FILL, false, true, 1, 4)));
+                    rightGridPanel.addComponent(new EmptySpace(TextColor.ANSI.BLUE, new TerminalSize(4, 2)));
+                    rightGridPanel.addComponent(new EmptySpace(TextColor.ANSI.CYAN, new TerminalSize(4, 2)));
+                    rightGridPanel.addComponent(new EmptySpace(TextColor.ANSI.GREEN, new TerminalSize(4, 2)));
+
+                    com.googlecode.lanterna.gui2.Panel contentPanel = new com.googlecode.lanterna.gui2.Panel();
+                    contentPanel.setLayoutManager(new LinearLayout(Direction.VERTICAL));
+                    contentPanel.addComponent(Panels.horizontal(leftGridPanel, new EmptySpace(TerminalSize.ONE), rightGridPanel));
+                    contentPanel.addComponent(new EmptySpace(TerminalSize.ONE));
+                    contentPanel.addComponent(new com.googlecode.lanterna.gui2.Button("Close", new Runnable() {
+                        @Override
+                        public void run() {
+                            window.close();
+                        }
+                    }));
+                    window.setComponent(contentPanel);
+                    gui.addWindow(window);
+
+                }
+
+                //TextGraphics tGraphics = screen.newTextGraphics();
+                //screen.startScreen();
+                //screen.clear();
+                /*tGraphics.drawRectangle(
+                        new TerminalPosition(3,3), new TerminalSize(10,10), '*');*/
+                //screen.refresh();
 
                 //PrintStream ps = new PrintStream(new ByteArrayOutputStream());
                 //new WriteInput(ps, terminal.term).start();
 
 
-                terminal.term.putString("abcd\nsjdfhkjsd\n\ndsfjsdflksdjf");
+                /*terminal.term.putString("abcd\nsjdfhkjsd\n\ndsfjsdflksdjf");
                 terminal.term.putCharacter('\n');
                 terminal.term.putCharacter('x');
-                terminal.term.putCharacter('y');
+                terminal.term.putCharacter('y');*/
 
                 //screen.readInput();
                 //screen.stopScreen();
-            } catch (IOException e) {
+
+
+                AsynchronousTextGUIThread guiThread = (AsynchronousTextGUIThread) gui.getGUIThread();
+                guiThread.start();
+                guiThread.waitForStop();
+
+
+                screen.stopScreen();
+
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 
@@ -82,7 +147,9 @@ public class DemoTerminal {
         sim.run(25);
     }
 
-    /** http://www.java-tips.org/other-api-tips-100035/112-jogl/1689-outline-fonts-nehe-tutorial-jogl-port.html */
+    /**
+     * http://www.java-tips.org/other-api-tips-100035/112-jogl/1689-outline-fonts-nehe-tutorial-jogl-port.html
+     */
     public static class Terminal extends Component implements LayerDraw {
         final TerminalVirtual term;
         private final float scale;
@@ -90,11 +157,14 @@ public class DemoTerminal {
         final static int font = GLUT.STROKE_MONO_ROMAN;
         private final float fontWidth;
         final float fontScale;
+        private final float fontHeight;
 
         public Terminal(int w, int h, float scale) {
             this.scale = scale;
             term = new TerminalVirtual();
-            fontWidth = glut.glutStrokeLength(font, "x");
+            fontWidth = glut.glutStrokeWidthf(font, 'X');
+            fontHeight = glut.glutStrokeLengthf(font, "X");
+
             fontScale = 1 / fontWidth;
             //term = new TerminalANSI(w, h, 1) {
                 /*@Override
@@ -111,7 +181,7 @@ public class DemoTerminal {
 
         }
 
-        void renderText(GL2 gl, float x, float y, float scale, char c) {
+        void renderText(GL2 gl, float x, float y, float cw, float ch, char c) {
             // Center Our Text On The Screen
             //float width = glut.glutStrokeLength(font, string);
             //gl.glTranslatef(-width / 2f, 0, 0);
@@ -122,9 +192,9 @@ public class DemoTerminal {
 
             float hw = 0.5f;
 
-            gl.glTranslatef(x-hw, y-hw, 0);
+            gl.glTranslatef(x - hw, y - hw, 0);
 
-            gl.glScalef(fontScale, fontScale, fontScale);
+            gl.glScalef(fontScale / (ch/cw), fontScale, 1);
             glut.glutStrokeCharacter(GLUT.STROKE_MONO_ROMAN, c);
             gl.glPopMatrix();
 
@@ -144,31 +214,44 @@ public class DemoTerminal {
 
         @Override
         public void drawSky(JoglAbstractDraw draw, World2D w) {
-            TerminalSize ts = null;
-            ts = term.getTerminalSize();
+            TerminalSize ts = term.getTerminalSize();
 
-            float cw = scale;
+            float cw = scale /2f ;
             float ch = scale;
 
             GL2 gl = draw.gl();
 
-            for (int i = 0; i < ts.getColumns(); i++) {
-                for (int j = 0; j < ts.getRows(); j++) {
+            int rows = ts.getRows();
+            for (int j = 0; j < rows; j++) {
+                for (int i = 0; i < ts.getColumns(); i++) {
 
-                    TextCharacter c = term.getCharacter(i, j);
-                    char cc = c.getCharacter();
 
 
                     float x = i * cw;
+                    int r = rows - 1 - j;
                     float y = j * ch;
 
-                    float r = c.getCharacter() / 256.0f;
+                    TextCharacter c = term.getCharacter(i, r);
+                    char cc = c.getCharacter();
 
-                    draw.drawSolidRect(x, y, cw, ch, -0.1f, r, r, r);
+                    Color bg = c.getBackgroundColor().toColor();
+                    Color fg = c.getForegroundColor().toColor();
 
-                    if ((cc != 0) && (cc!=' ')) {
-                        gl.glColor3f(1.0f, 1.0f, 1.0f);
-                        renderText(gl, i, j, scale, cc);
+                    draw.drawSolidRect(x, y, cw, ch, -0.1f, bg.getRed()/256f, bg.getGreen()/256f, bg.getBlue()/256f);
+
+
+                    //un-ANSIfy
+                    switch (cc) {
+                        case 9474: cc = '|'; break;
+                        case 9472: cc = '-'; break;
+                        case 9492:
+                        //..
+                        case 9496: cc = '*'; break;
+                    }
+
+                    if ((cc != 0) && (cc != ' ')) {
+                        gl.glColor3f(fg.getRed()/256f, fg.getGreen()/256f, fg.getBlue()/256f);
+                        renderText(gl, x, y, cw, ch, cc);
                     }
                 }
             }
