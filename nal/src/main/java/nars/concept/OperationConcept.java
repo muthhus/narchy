@@ -57,7 +57,7 @@ public class OperationConcept extends CompoundConcept implements Runnable {
 
     @Nullable
     @Override
-    public final Task processGoal(@NotNull Task goal, @NotNull NAR nar) {
+    public Task processGoal(@NotNull Task goal, @NotNull NAR nar) {
         return executeLater(super.processGoal(goal, nar), nar);
     }
 

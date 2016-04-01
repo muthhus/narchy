@@ -30,7 +30,7 @@ public class MotorConcept extends OperationConcept implements Consumer<NAR>, Flo
 
     public MotorConcept(@NotNull String compoundTermString, @NotNull NAR n, FloatToFloatFunction motor) throws Narsese.NarseseException {
         this(compoundTermString, n);
-        this.motor = motor;
+        setMotor(motor);
     }
 
     public MotorConcept(@NotNull String compoundTermString, @NotNull NAR n) throws Narsese.NarseseException {

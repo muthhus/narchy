@@ -920,8 +920,8 @@ public class UnificationTest {
     @Test
     public void varIndep2() {
         FindSubst f = test(Op.VAR_INDEP,
-                "t:($x | (--,$y))",
-                "t:(x | (--,y))",
+                "t:($x | {$y})",
+                "t:(x | {y})",
                 true);
     }
 

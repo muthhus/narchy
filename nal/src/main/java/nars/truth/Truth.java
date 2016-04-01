@@ -30,6 +30,10 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+import static nars.nal.UtilityFunctions.and;
+import static nars.nal.UtilityFunctions.or;
 import static nars.truth.TruthFunctions.temporalIntersection;
 
 
@@ -244,6 +248,20 @@ public interface Truth extends Truthed {
             return this;
         return withConf(conf() * temporalIntersection( when, occ, now, dur ));
     }
+
+    default Truth interpolate(Truth y) {
+        float xc = conf();
+        float yc = y.conf();
+        return new DefaultTruth(
+                //lerp by proportion of confidence contributed
+                Util.lerp(freq(), y.freq(), xc / (xc+yc)),
+
+                //difference in freq means closer to the AND conf, otherwise if they are the same then closer to max
+                Util.lerp(and(xc, yc), max(xc, yc), Math.abs(freq()-y.freq()))
+
+        );
+    }
+
 
 
     enum TruthComponent {

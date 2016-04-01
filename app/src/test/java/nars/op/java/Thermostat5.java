@@ -1,34 +1,23 @@
 package nars.op.java;
 
-import com.google.common.base.Joiner;
-import com.google.common.primitives.Doubles;
-import com.google.common.primitives.Primitives;
-import com.gs.collections.api.block.function.primitive.FloatFunction;
-import com.gs.collections.api.block.function.primitive.FloatObjectToFloatFunction;
-import com.gs.collections.api.block.procedure.primitive.FloatObjectProcedure;
+import com.gs.collections.api.block.function.primitive.FloatToFloatFunction;
+import com.gs.collections.api.block.predicate.primitive.FloatPredicate;
 import nars.$;
+import nars.Global;
 import nars.NAR;
+import nars.Narsese;
 import nars.nal.Tense;
 import nars.nar.Default;
+import nars.task.Task;
+import nars.util.Optimization;
 import nars.util.data.Util;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
 import org.apache.commons.lang3.mutable.MutableFloat;
-import org.apache.commons.math3.analysis.MultivariateFunction;
-import org.apache.commons.math3.optim.InitialGuess;
-import org.apache.commons.math3.optim.MaxEval;
-import org.apache.commons.math3.optim.PointValuePair;
-import org.apache.commons.math3.optim.SimpleBounds;
-import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
-import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
-import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.CMAESOptimizer;
-import org.apache.commons.math3.random.MersenneTwister;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.PrimitiveIterator;
-import java.util.function.Supplier;
 
 import static java.lang.System.out;
 
@@ -37,152 +26,20 @@ public class Thermostat5 {
 
     public static final float basePeriod = 32;
     public static final float tolerance = 0.15f;
-    public static float targetPeriod = 1f;
-    public static final float speed = 0.25f;
-
-    public static class Optimization<X> {
-        public final Supplier<X> subject;
-
-        final List<Tweak> tweaks = new ArrayList();
-
-        public Optimization(Supplier<X> subject) {
-            this.subject = subject;
-        }
-
-//        public Optimization<X> with(FloatParameterSweep<X> f) {
-//            this.tweaks.add(f);
-//            return this;
-//        }
-
-        public Optimization<X> with(String parameter, float min, float max, float inc, FloatObjectProcedure<X> apply) {
-            tweaks.add(new FloatParameterSweep(parameter, min, max, inc, apply));
-            return this;
-        }
-
-        public Result<X> run(FloatFunction<X> eval) {
-            double stopValue = Double.POSITIVE_INFINITY;
-            int maxIterations = 30000;
-            CMAESOptimizer optim = new CMAESOptimizer(maxIterations, stopValue, true, 0,
-                    0, new MersenneTwister(3), true, null);
-
-            int i = 0;
-            int n = tweaks.size();
-
-            double[] start = new double[n];
-            double[] sigma = new double[n];
-            double[] min = new double[n];
-            double[] max = new double[n];
-
-            for (Tweak w : tweaks) {
-                //w.apply.value((float) point[i++], x);
-                FloatParameterSweep s = (FloatParameterSweep) w;
-                start[i] = (s.getMax() + s.getMin()) / 2f;
-                min[i] = (s.getMin());
-                max[i] = (s.getMax());
-                sigma[i] = Math.abs(max[i] - min[i]) * 0.75f; //(s.getInc());
-                i++;
-            }
-
-            int maxEvaluations = 1000;
-            int pop = 64;
-
-            System.out.println( Joiner.on(",").join(tweaks) + ",       Loss");
-
-            PointValuePair r = optim.optimize(new MaxEval(maxEvaluations),
-                    new ObjectiveFunction(point -> {
-                        X x = subject.get();
-                        int i1 = 0;
-                        for (Tweak w : tweaks) {
-                            w.apply.value((float) point[i1++], x);
-                        }
-                        float loss = eval.floatValueOf(x);
-                        //System.out.println(Arrays.toString(point) + " = " + loss);
-                        System.out.println( Joiner.on(",").join(Doubles.asList(point)) + ",      " + loss);
-                        return loss;
-                    }),
-                    GoalType.MINIMIZE,
-                    new SimpleBounds(min, max),
-                    new InitialGuess(start),
-                    new CMAESOptimizer.Sigma(sigma),
-                    new CMAESOptimizer.PopulationSize(pop));
-
-
-            return new Result(r);
-
-        }
-
-        public class Result<X> {
-
-            private final PointValuePair optimal;
-
-            public Result(PointValuePair p) {
-                this.optimal = p;
-            }
-
-            public void print() {
-                System.out.println("optimal: " + optimal);
-                double[] p = optimal.getPoint();
-                for (int i = 0; i < p.length; i++) {
-                    System.out.println(tweaks.get(i).id + " " + p[i]);
-                }
-
-            }
-        }
-
-        /**
-         * a knob but cooler
-         */
-        public class Tweak {
-            public final FloatObjectProcedure<X> apply;
-            private final String id;
-
-            public Tweak(String id, FloatObjectProcedure<X> apply) {
-                this.id = id;
-                this.apply = apply;
-            }
-
-            @Override
-            public String toString() {
-                return id;
-            }
-        }
-
-        private class FloatParameterSweep extends Tweak {
-            private final String parameter;
-            private final float min;
-            private final float max;
-            private final float inc;
-
-            private FloatParameterSweep(String parameter, float min, float max, float inc, FloatObjectProcedure<X> apply) {
-                super(parameter, apply);
-                this.parameter = parameter;
-                this.min = min;
-                this.max = max;
-                this.inc = inc;
-            }
-
-            public String getParameter() {
-                return parameter;
-            }
-
-            public float getMin() {
-                return min;
-            }
-
-            public float getMax() {
-                return max;
-            }
-
-            public float getInc() {
-                return inc;
-            }
-
-
-        }
-    }
+    public static float targetPeriod = 2f;
+    public static final float speed = 0.01f;
+    static boolean print = true, debugError = false;
 
     public static void main(String[] args) {
+        Default d = new Default(1024, 32, 2, 3);
+        d.duration.set(Math.round(2.5f * basePeriod));
+        d.activationRate.setValue(0.05f);
+        d.premiser.confMin.setValue(0.1f);
 
+        float score = eval(d, 15000);
+        System.out.println("score=" + score);
+    }
+    public static void main2(String[] args) {
         int cycles = 2000;
 
         new Optimization<Default>(() -> {
@@ -224,9 +81,12 @@ public class Thermostat5 {
         //System.out.println(eval(n, 1000));
     }
 
+    static int t = 0;
+
     public static float eval(NAR n, int cycles) {
 
-        boolean print = false;
+
+        Global.DEBUG = true;
 
         //MutableFloat x0 = new MutableFloat();
         //MutableFloat x1 = new MutableFloat();
@@ -236,13 +96,37 @@ public class Thermostat5 {
         MutableFloat loss = new MutableFloat(0);
 
 
+        SensorConcept aboveness, belowness;
+
+
+        //n.on(new SensorConcept((Compound)$.$("a:x0"), n, ()-> x0.floatValue())
+        //        .resolution(0.01f)/*.pri(0.2f)*/
+        //);
+        /*n.on(new SensorConcept((Compound)$.$("a:x1"), n, ()-> x1.floatValue())
+                .resolution(0.01f).pri(0.2f)
+        );*/
+
+
+        n.on(aboveness = new SensorConcept("diffx:above", n, () -> {
+            float diff = yHidden.floatValue() - yEst.floatValue();
+            if (diff > tolerance) return 0.5f + 0.5f * Util.clamp(diff);
+            return 0;
+        }).resolution(0.05f));
+
+        n.on(belowness = new SensorConcept("diffy:below", n, () -> {
+            float diff = -(yHidden.floatValue() - yEst.floatValue());
+            if (diff > tolerance) return 0.5f + 0.5f * Util.clamp(diff);
+            return 0;
+        }).resolution(0.05f));
+
+
         n.onFrame(nn -> {
 
             //float switchPeriod = 20;
             //float highPeriod = 5f;
 
-            double y = 0.5f + 0.5f * Math.sin(n.time() / (targetPeriod * basePeriod));
-            y = Math.round(y);
+            double y = 0.5f + 0.5f * Math.sin(t / (targetPeriod * basePeriod));
+            //y = Math.round(y);
 
             //x0.setValue(y); //high frequency phase
             //x1.setValue( 0.5f + 0.3f * Math.sin(n.time()/(highPeriod * period)) ); //low frequency phase
@@ -274,47 +158,73 @@ public class Thermostat5 {
                     out.print(c);
                 }
 
+                out.print(" <:" + belowness.get() + " >:" + aboveness.get());
                 out.println();
             }
         });
-        //n.on(new SensorConcept((Compound)$.$("a:x0"), n, ()-> x0.floatValue())
-        //        .resolution(0.01f)/*.pri(0.2f)*/
-        //);
-        /*n.on(new SensorConcept((Compound)$.$("a:x1"), n, ()-> x1.floatValue())
-                .resolution(0.01f).pri(0.2f)
-        );*/
-        n.on(new SensorConcept("diff:above", n, () -> {
-            float diff = yHidden.floatValue() - yEst.floatValue();
-            if (diff > tolerance) return 0.5f + 0.5f * Util.clamp(diff);
-            return 0;
-        }).resolution(0.03f).pri(0.5f));
-        n.on(new SensorConcept("diff:below", n, () -> {
-            float diff = -(yHidden.floatValue() - yEst.floatValue());
-            if (diff > tolerance) return 0.5f + 0.5f * Util.clamp(diff);
-            return 0;
-        }).resolution(0.03f).pri(0.5f));
 
-        n.on(new MotorConcept("t(up)", n, (v) -> {
-            yEst.setValue(Util.clamp(+speed * v + yEst.floatValue()));
-            return v;
-        }));
-        n.on(new MotorConcept("t(down)", n, (v) -> {
-            yEst.setValue(Util.clamp(-speed * v + yEst.floatValue()));
-            return v;
-        }));
+        /** difference in order to diagnose an error */
+        final float errorThresh = 0.07f;
+
+        n.on(new DebugMotorConcept(n, "t(up)", yEst, yHidden,
+                (v) -> {
+                    yEst.setValue(Util.clamp(+speed * v + yEst.floatValue()));
+                    return v;
+                },
+                (v) -> {
+                    //if already above the target value
+                    return yHidden.floatValue() - yEst.floatValue() > errorThresh;
+                }
+        ));
+        n.on(new DebugMotorConcept(n, "t(down)", yEst, yHidden,
+                (v) -> {
+                    yEst.setValue(Util.clamp(-speed * v + yEst.floatValue()));
+                    return v;
+                },
+                (v) -> {
+                    //if already above the target value
+                    return -(yHidden.floatValue() - yEst.floatValue()) > errorThresh;
+                }
+        ));
 
 
-        //n.logSummaryGT(System.out, 0.6f);
-        n.goal($.$("t(up)"), 1f, 0.25f);
-        n.goal($.$("t(up)"), 0f, 0.25f);
-        n.goal($.$("t(down)"), 1f, 0.25f);
-        n.goal($.$("t(down)"), 0f, 0.25f);
-        n.goal($.$("diff:above"), 0f, 0.99f); //not above
-        n.goal($.$("diff:below"), 0f, 0.99f); //not below
+
+        //n.logSummaryGT(System.out, 0.0f);
+
+        t = 0;
+
+        int trainMotionCycles = 32;
+        float str = 0.1f;
+        System.out.println("training up");
+
+        n.goal($.$("t(up)"), Tense.Present, 1f, str);
+        n.goal($.$("t(down)"), Tense.Present, 0f, str);
+        for (int i = 0; i < trainMotionCycles; i++) {
+            n.step();
+        }
+        System.out.println("training down");
+        n.goal($.$("t(up)"), Tense.Present, 0f, str);
+        n.goal($.$("t(down)"), Tense.Present, 1f, str);
+        for (int i = 0; i < trainMotionCycles; i++) {
+            n.step();
+        }
+        System.out.println("training oscillation");
+        n.goal($.$("t(up)"), Tense.Present, 0.75f, str);
+        n.goal($.$("t(down)"), Tense.Present, 0.75f, str);
+        for (int i = 0; i < trainMotionCycles; i++) {
+            n.step();
+        }
+
+        System.out.println("training finished");
+
+        //n.goal($.$("t(up)"), Tense.Present, 0f, 0.1f);
+        //n.goal($.$("t(down)"), Tense.Present, 1f, 0.1f);
+        n.goal($.$("diffx:above"), 0f, 0.99f); //not above
+        n.goal($.$("diffy:below"), 0f, 0.99f); //not below
         //n.ask($.$("(a:#x ==> diff:#y)"), '?'); //not above
 
         for (int i = 0; i < cycles; i++) {
-
+            t++;
             //n.goal($.$("((--,diff:above) && (--,diff:below))"), Tense.Present, 1f, 0.99f); //not above or below
 
             n.step();
@@ -323,5 +233,45 @@ public class Thermostat5 {
 
         return loss.floatValue()/n.time();
 
+    }
+
+    private static class DebugMotorConcept extends MotorConcept {
+
+
+
+        long lastTime;
+
+        /** tasks collected from last cycle in which goals were received */
+        final List<Task> current = Global.newArrayList();
+
+        public DebugMotorConcept(NAR n, String term, MutableFloat yEst, MutableFloat yHidden, FloatToFloatFunction motor, FloatPredicate errorful) throws Narsese.NarseseException {
+            super(term, n);
+            setMotor( (v) -> {
+                float next = motor.valueOf(v);
+                if (debugError) {
+                    if (errorful.accept(v)) {
+                        for (Task t : current) {
+                            if (!t.isInput())
+                                System.err.println(t.explanation());
+                        }
+                    }
+                }
+                return next;
+            });
+            lastTime = -1;
+        }
+
+        @Nullable
+        @Override
+        public Task processGoal(@NotNull Task goal, @NotNull NAR nar) {
+            long now = nar.time();
+            if (now !=lastTime) {
+                current.clear();
+            }
+            Task g = super.processGoal(goal, nar);
+            if (g!=null)
+                current.add(g);
+            return g;
+        }
     }
 }
