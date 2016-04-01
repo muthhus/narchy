@@ -30,12 +30,12 @@ public class Revision {
 
         Compound newBeliefTerm = newBelief.term();
 
+        final long newTime = newBelief.occurrence(); //nar.time();
+
         //Try to select a best revision partner from existing beliefs:
         Task oldBelief = null;
         float bestRank = 0, bestConf = 0;
         Truth conclusion = null;
-        long concTime = Tense.ETERNAL;
-        final long now = nar.time();
         final float newBeliefConf = newBelief.conf();
         Truth newBeliefTruth = newBelief.truth();
 
@@ -65,23 +65,22 @@ public class Revision {
             Truth oldBeliefTruth = x.truth();
 
             Truth c;
-            long t;
+
             if (newBelief.isEternal()) {
                 c = TruthFunctions.revision(newBeliefTruth, oldBeliefTruth, matchFactor, bestConf);
-                t = Tense.ETERNAL;
+
             } else {
                 c = TruthFunctions.revision(newBelief,
-                        x, now, matchFactor, bestConf);
-                t = now;
+                        x, newTime, matchFactor, bestConf);
             }
 
             if (c == null)
                 continue;
 
             //avoid a duplicate truth at the same time
-            if (t==x.occurrence() && c.equals(oldBeliefTruth))
+            if (newTime==x.occurrence() && c.equals(oldBeliefTruth))
                 continue;
-            if (t==newBelief.occurrence() && c.equals(newBeliefTruth))
+            if (newTime==newBelief.occurrence() && c.equals(newBeliefTruth))
                 continue;
 
             float cconf = c.conf();
@@ -92,7 +91,6 @@ public class Revision {
                 bestConf = cconf;
                 oldBelief = x;
                 conclusion = c;
-                concTime = t;
             }
         }
 
@@ -106,7 +104,7 @@ public class Revision {
                         revisionBudget,
                         newBelief, oldBelief,
                         conclusion,
-                        now, concTime);
+                        nar.time(), newTime);
             }
         }
         return null;

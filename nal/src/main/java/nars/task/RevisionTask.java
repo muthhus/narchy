@@ -20,13 +20,13 @@ import org.jetbrains.annotations.NotNull;
  */
 public class RevisionTask extends MutableTask {
 
-    public RevisionTask(@NotNull Termed<Compound> term, Budget revisionBudget, @NotNull Task newBelief, Task oldBelief, Truth conclusion, long now, long concTime) {
+    public RevisionTask(@NotNull Termed<Compound> term, Budget revisionBudget, @NotNull Task newBelief, Task oldBelief, Truth conclusion, long creationTime, long occTime) {
         super(term, newBelief.punc());
 
         budget(revisionBudget);
         truth(conclusion);
         parent(newBelief, oldBelief);
-        time(now, concTime);
+        time(creationTime, occTime);
         because("Insertion Revision");
         /*.because("Insertion Revision (%+" +
                         Texts.n2(conclusion.freq() - newBelief.freq()) +
@@ -42,6 +42,8 @@ public class RevisionTask extends MutableTask {
 
         if ((newBelief == null) || (oldBelief == null))
             return true; //weakref may cause these to become null; so just continue processing
+
+
 
 
 
@@ -69,7 +71,11 @@ public class RevisionTask extends MutableTask {
                 newBeliefContribution);
 
 
-        return oldBelief.onRevision(this) && newBelief.onRevision(this);
+        boolean oldExists = oldBelief.onRevision(this);
+        boolean newExists = newBelief.onRevision(this);
+        return oldExists || newExists;
+
+        //return oldBelief.onRevision(this) && newBelief.onRevision(this)
 
     }
 
