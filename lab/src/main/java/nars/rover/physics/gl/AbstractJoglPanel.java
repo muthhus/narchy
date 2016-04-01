@@ -77,6 +77,8 @@ public abstract class AbstractJoglPanel extends GLWindow implements Display, GLE
         setVisible(true);
 
 
+
+
     }
 
     @Override
@@ -115,7 +117,7 @@ public abstract class AbstractJoglPanel extends GLWindow implements Display, GLE
         float time = world.time();//0.0f; // what does this?
 
 
-        game.camera(gl, time);
+        game.camera(gl);
 
 //        {
 //            //shake camera by heat
@@ -210,14 +212,15 @@ public abstract class AbstractJoglPanel extends GLWindow implements Display, GLE
     //TODO rename this as 'Camera'
     public class Game {
 
-        private GL gl;
+
         private int dx, dy;
-        private long lastTime;
+
         private Point mouseCenter = new Point();
         private float ford, strafe;
 
-        public Game(GL gl) {
-            this.gl = gl;
+        public Game() {
+            matrix.put(mat);
+
         }
 
         public void setMouseCenter(Point center) {
@@ -273,7 +276,9 @@ public abstract class AbstractJoglPanel extends GLWindow implements Display, GLE
 
         private float sinc = 0.0f;
 
-        private float x, y, z;//player position
+        private float x;
+        private float y;
+        public float z;//player position
 
  /*
 
@@ -302,16 +307,7 @@ axis.
 
         private FloatBuffer matrix = FloatBuffer.allocate(mat.length);
 
-        {
-            matrix.put(mat);
 
-            x = -5f;
-            z = 0f;
-
-            //there is no floor collider so we set a static y value
-            y = 0f;
-
-        }
 
  /*
 
@@ -329,10 +325,8 @@ axis.
 
             //amount = (float)Math.log(amount)/5f; //prefilter curve the amount actually turning
 
-            if (!mousePressed[MouseEvent.BUTTON1])
-                return;
-
-            heading -= amount * angleSpeed;
+            if (mousePressed[MouseEvent.BUTTON1])
+                heading -= amount * angleSpeed;
 
             cosb = (float) Math.toRadians(Math.cos(heading));
 
@@ -357,10 +351,8 @@ axis.
 
             //amount = (float)Math.log(amount)/5f; //prefilter curve the amount actually turning
 
-            if (!mousePressed[MouseEvent.BUTTON1])
-                return;
-
-            pitch -= amount * angleSpeed;
+            if (mousePressed[MouseEvent.BUTTON1])
+                pitch -= amount * angleSpeed;
 
             if (pitch > _maxPitch) pitch = _maxPitch;
 
@@ -420,7 +412,7 @@ axis.
  */
 
 
-        public void camera(GL2 gl, float dt) {
+        public void camera(GL2 gl) {
 
             /*
 
@@ -601,7 +593,7 @@ defines
 
         initEffects(gl);
 
-        game = new Game(gl);
+        game = new Game();
 
         game.setMouseCenter(new Point());
 
@@ -725,6 +717,16 @@ defines
         gl.glEnable(GL.GL_LINE_SMOOTH);
         gl.glEnable(GL.GL_LINE_WIDTH);
 
+        // Enables Clearing Of The Depth Buffer
+        gl.glClearDepth(1.0);
+
+        gl.glEnable(GL.GL_DEPTH_TEST);                 // Enables Depth Testing
+        //gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE);    // Select The Type Of Blending
+        //gl.glDepthFunc(GL.GL_LEQUAL);                  // The Type Of Depth Test To Do
+
+        // Really Nice Perspective Calculations
+        //gl.glHint(GL2.GL_PERSPECTIVE_CORRECTION_HINT, GL.GL_NICEST);
+        //gl.glEnable(GL.GL_TEXTURE_2D);      // Enable 2D Texture Mapping
 
         //gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
         //gl.glEnable(GL.GL_ALPHA);

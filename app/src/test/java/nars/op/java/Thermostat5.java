@@ -35,10 +35,10 @@ import static java.lang.System.out;
 
 public class Thermostat5 {
 
-    public static final float basePeriod = 8;
+    public static final float basePeriod = 32;
     public static final float tolerance = 0.15f;
     public static float targetPeriod = 1f;
-    public static final float speed = 0.1f;
+    public static final float speed = 0.25f;
 
     public static class Optimization<X> {
         public final Supplier<X> subject;
@@ -187,9 +187,9 @@ public class Thermostat5 {
 
         new Optimization<Default>(() -> {
             Default d = new Default(1024, 5, 2, 4);
-            d.perfection.setValue(0.1);
+            //d.perfection.setValue(0.1);
             d.premiser.confMin.setValue(0.1f);
-            d.duration.set(Math.round(2.5f * basePeriod));
+            d.duration.set(Math.round(1.5f * basePeriod));
             d.core.conceptsFiredPerCycle.set(5);
             return d;
         })
@@ -226,7 +226,7 @@ public class Thermostat5 {
 
     public static float eval(NAR n, int cycles) {
 
-        boolean print = true;
+        boolean print = false;
 
         //MutableFloat x0 = new MutableFloat();
         //MutableFloat x1 = new MutableFloat();

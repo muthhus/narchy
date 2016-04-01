@@ -24,6 +24,8 @@
 package nars.rover.physics.gl;
 
 import com.artemis.Entity;
+import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GL2;
 import nars.rover.obj.MaterialColor;
 import org.jbox2d.callbacks.DebugDraw;
 import org.jbox2d.collision.shapes.ChainShape;
@@ -121,7 +123,7 @@ public abstract class JoglAbstractDraw extends DebugDraw {
         this.stroke = stroke;
     }
 
-
+    abstract public GL2 gl();
 
     public interface DrawProperty {
         void before(Body b, JoglAbstractDraw d, float time);

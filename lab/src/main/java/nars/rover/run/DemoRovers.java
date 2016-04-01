@@ -20,7 +20,7 @@ import nars.nar.AbstractNAR;
 import nars.nar.Default;
 import nars.rover.Sim;
 import nars.rover.obj.*;
-import nars.rover.run.SomeRovers.ManualControl.ManualOverride;
+import nars.rover.run.DemoRovers.ManualControl.ManualOverride;
 import nars.rover.world.FoodSpawnWorld1;
 import nars.term.TermIndex;
 import nars.util.data.random.XorShift128PlusRandom;
@@ -43,7 +43,7 @@ import static nars.rover.obj.NARover.*;
 /**
  * Created by me on 6/20/15.
  */
-public class SomeRovers {
+public class DemoRovers {
 
     public static final String motorLeft = "motor(left)";
     public static final String motorRight = "motor(right)";

@@ -1,9 +1,6 @@
 package nars.rover.physics.gl;
 
-import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.GLCapabilities;
-import com.jogamp.opengl.GLCapabilitiesImmutable;
-import com.jogamp.opengl.GLProfile;
+import com.jogamp.opengl.*;
 import nars.rover.Sim;
 import org.jbox2d.dynamics.World2D;
 
@@ -21,9 +18,16 @@ public class Box2DJoglPanel extends AbstractJoglPanel {
 	public Box2DJoglPanel(final World2D world) {
 		super(world, newDefaultConfig());
 		this.draw = new JoglDraw(this);
+
 	}
 
-	private static GLCapabilitiesImmutable newDefaultConfig() {
+	@Override
+	public void init(GLAutoDrawable drawable) {
+		super.init(drawable);
+		game.z = -300;
+	}
+
+	public static GLCapabilitiesImmutable newDefaultConfig() {
 
 		GLCapabilities config = new GLCapabilities(GLProfile.getMaximum(true)); //getDefault());
 
@@ -40,9 +44,11 @@ public class Box2DJoglPanel extends AbstractJoglPanel {
 
 	@Override
 	protected void draw(GL2 gl, float dt) {
-		if (world!=null) {
-			//ex: layer #1
+
+		if ((world!=null) && (draw!=null)) {
+			gl.glPushMatrix();
 			draw.draw(world, dt);
+			gl.glPopMatrix();
 		}
 
 //        //ex. layer #2

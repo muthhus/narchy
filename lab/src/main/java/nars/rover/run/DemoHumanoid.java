@@ -1,8 +1,6 @@
 package nars.rover.run;
 
-import com.artemis.Entity;
 import nars.rover.Sim;
-import nars.rover.obj.*;
 import nars.rover.world.FoodSpawnWorld1;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
@@ -20,28 +18,29 @@ import java.util.List;
  */
 public class DemoHumanoid {
 
-    static float torsoUpperWidth = 0.25f;
-    static float torsoUpperHeight = 0.45f; //0.2..0.45
+    static float scale = 12;
+    static float torsoUpperWidth = 0.25f * scale;
+    static float torsoUpperHeight = 0.45f * scale;
 
-    static float torsoLowerWidth = 0.25f;
-    static float torsoLowerHeight = 0.2f; //0.2..0.45
+    static float torsoLowerWidth = 0.25f * scale;
+    static float torsoLowerHeight = 0.2f * scale;
 
-    static float femur_width = 0.18f;
-    static float femur_length = 0.45f;
-    static float tibia_width = 0.13f;
-    static float tibia_length = 0.38f;
-    static float foot_height = 0.08f;
-    static float foot_length = 0.28f;
+    static float femur_width = 0.18f * scale;
+    static float femur_length = 0.45f * scale;
+    static float tibia_width = 0.13f * scale;
+    static float tibia_length = 0.38f * scale;
+    static float foot_height = 0.08f * scale;
+    static float foot_length = 0.28f * scale;
 
-    static float arm_width = 0.12f;
-    static float arm_length = 0.37f;
-    static float forearm_width = 0.1f;
-    static float fore_arm_length = 0.42f;
+    static float arm_width = 0.12f * scale;
+    static float arm_length = 0.37f * scale;
+    static float forearm_width = 0.1f * scale;
+    static float fore_arm_length = 0.42f * scale;
 
-    static float head_width = 0.22f;
-    static float head_height = 0.22f;
-    static float neck_width = 0.1f;
-    static float neck_height = 0.08f;
+    static float head_width = 0.22f * scale;
+    static float head_height = 0.22f * scale;
+    static float neck_width = 0.1f * scale;
+    static float neck_height = 0.08f * scale;
 
     static BodyDef bd = new BodyDef();
     static FixtureDef fd = new FixtureDef();
@@ -78,7 +77,7 @@ public class DemoHumanoid {
         Body[] head = createHead( sim.world);
         connectParts(sim.world, head[0], torso, left_arm, right_arm, left_leg, right_leg);
 
-        //sim.world.setGravity(new Vec2(0,0.1f));
+        sim.world.setGravity(new Vec2(0,-5.5f));
 
         /*Entity mrnars = sim.game.createEntity().edit()
                 .add(new Physical(

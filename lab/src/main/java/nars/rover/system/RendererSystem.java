@@ -7,11 +7,15 @@ import com.artemis.utils.Bag;
 import com.gs.collections.api.block.procedure.Procedure;
 import com.jogamp.newt.event.WindowEvent;
 import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GLAutoDrawable;
 import nars.rover.Sim;
 import nars.rover.obj.DrawAbove;
 import nars.rover.physics.gl.Box2DJoglPanel;
 import nars.rover.physics.j2d.LayerDraw;
+import nars.rover.run.NEHEBitmapFont;
 import nars.util.data.list.FasterList;
+
+import java.io.IOException;
 
 /**
  * Created by me on 3/29/16.
@@ -35,6 +39,16 @@ public class RendererSystem extends EntitySystem {
             final Procedure<LayerDraw> drawProc = (LayerDraw l) -> {
                 if (l != null) l.drawSky(draw, world);
             };
+
+            @Override
+            public void init(GLAutoDrawable drawable) {
+                super.init(drawable);
+                try {
+                    NEHEBitmapFont.loadGLTextures(drawable.getGL().getGL2());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
 
             @Override
             protected void draw(GL2 gl, float dt) {

@@ -20,6 +20,11 @@ public class JoglDraw extends JoglAbstractDraw {
     }
 
     @Override
+    public GL2 gl() {
+        return gl;
+    }
+
+    @Override
     public void drawParticles(Vec2[] centers, float radius, ParticleColor[] colors, int count) {
 
     }

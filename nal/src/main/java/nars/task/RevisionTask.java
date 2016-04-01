@@ -44,9 +44,6 @@ public class RevisionTask extends MutableTask {
             return true; //weakref may cause these to become null; so just continue processing
 
 
-
-
-
         //Decrease the budget of the parent tasks and tasklinks,
         // so that their priority sum and the child remains the same (balanced)
         //TODO maybe consider rank (incl. evidence) not just conf()
@@ -73,8 +70,10 @@ public class RevisionTask extends MutableTask {
 
         boolean oldExists = oldBelief.onRevision(this);
         boolean newExists = newBelief.onRevision(this);
-        return oldExists || newExists;
 
+        return true;
+
+        //return oldExists || newExists;
         //return oldBelief.onRevision(this) && newBelief.onRevision(this)
 
     }

@@ -51,7 +51,7 @@ public final class DerivedTask extends MutableTask {
         BLink<? extends Task> tLink = premise.taskLink;
         if (tLink.isDeleted()) {
             //System.out.println(premise.taskLink + " should delete " + this + "?");
-            delete();
+            premise.nar().remove(this, "Premise TaskLink Deleted");
             return false;
         } else {
             //TODO check this Question case is right
