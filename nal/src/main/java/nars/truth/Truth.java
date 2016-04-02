@@ -30,6 +30,9 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
+import java.util.Comparator;
+
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static nars.nal.UtilityFunctions.and;
@@ -46,6 +49,7 @@ public interface Truth extends Truthed {
     Term Truth_FALSE = $.the("FALSE");
     Term Truth_UNSURE = $.the("UNSURE");
     Truth Zero = new DefaultTruth(0.5f, 0);
+    Comparator<Truthed> compareConfidence = (o1, o2) -> Float.compare(o2.truth().conf(), o1.truth().conf());
 
 
     /**
@@ -226,7 +230,7 @@ public interface Truth extends Truthed {
         if (a == b) return 0;
 
         //see how Truth hash() is calculated to know why this works
-        return Integer.compare(a.hashCode(), b.hashCode());
+        return Integer.compare(b.hashCode(), a.hashCode());
 
 //        tc = Float.compare(truth.getFrequency(), otruth.getFrequency());
 //        if (tc!=0) return tc;

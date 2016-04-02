@@ -18,13 +18,13 @@ public enum Forget { ;
     /** processes a BLink, usually affecting its budget somehow */
     public interface BudgetForget<X> extends Consumer<BLink<? extends X>> {
         /** called each frame to update parameters */
-        void accept(@NotNull NAR nar);
+        void update(@NotNull NAR nar);
     }
 
     /** acts as a filter to decide if an element should remain in a bag, otherwise some forgetting modification an be applied to a retained item */
     public interface BudgetForgetFilter<X> extends Predicate<BLink<? extends X>> {
         /** called each frame to update parameters */
-        void accept(@NotNull NAR nar);
+        void update(@NotNull NAR nar);
     }
 
     /** for BLinked budgeted items: if that item becomes Deleted, then the enclosing BLink is removed during a Bag.filter operation that applies this Predicate */
@@ -38,15 +38,16 @@ public enum Forget { ;
 
         @Override
         public boolean test(@NotNull BLink<? extends X> b) {
-            if (b.get().isDeleted() || b.isDeleted())
+            //assert(!b.isDeleted());
+            if (b.get().isDeleted())
                 return false;
             forget.accept(b);
             return true;
         }
 
         @Override
-        public final void accept(@NotNull NAR nar) {
-            forget.accept(nar);
+        public final void update(@NotNull NAR nar) {
+            forget.update(nar);
         }
     }
 
@@ -71,7 +72,7 @@ public enum Forget { ;
 
         @Override public abstract void accept(@NotNull BLink<? extends X> budget);
 
-        @Override public final void accept(@NotNull NAR nar) {
+        @Override public final void update(@NotNull NAR nar) {
             //same for duration of the cycle
             forgetCyclesCached = forgetDurations.floatValue() * nar.duration();
             perfectionCached = perfection.floatValue();

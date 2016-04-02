@@ -308,15 +308,15 @@ public interface Concept extends Termed, Comparable {
      * @return number of links created (0, 1, or 2)
      */
     default void crossLink(@NotNull Task thisTask, @NotNull Task otherTask, float scale, @NotNull NAR nar) {
-        if (!otherTask.term().equals(term())) {
+        assert(!otherTask.term().equals(term()));
 
-            link(otherTask, scale, nar, null);
+        link(otherTask, scale, nar, null);
 
-            Concept other = nar.concept(otherTask);
-                            //nar.conceptualize(otherTask, thisTask.budget(), scale);
-            if (other != null)
-                other.link(thisTask, scale, nar, null);
-        }
+        Concept other = nar.concept(otherTask);
+                        //nar.conceptualize(otherTask, thisTask.budget(), scale);
+        if (other != null)
+            other.link(thisTask, scale, nar, null);
+
     }
 
     default float beliefMotivation(long now, int duration) {

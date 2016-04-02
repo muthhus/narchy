@@ -450,7 +450,7 @@ public class Default extends AbstractNAR {
         }
 
         protected final void frame(NAR nar) {
-            conceptForget.accept(nar);
+            conceptForget.update(nar);
             premiser.frame(nar);
         }
 
@@ -599,8 +599,8 @@ public class Default extends AbstractNAR {
          */
         @Override public final void frame(NAR nar) {
             matcher.setMinConfidence(confMin.floatValue());
-            taskLinkForget.accept(nar);
-            termLinkForget.accept(nar);
+            taskLinkForget.update(nar);
+            termLinkForget.update(nar);
         }
 
         @Override

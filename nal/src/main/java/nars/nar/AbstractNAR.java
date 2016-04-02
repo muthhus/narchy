@@ -67,13 +67,15 @@ public abstract class AbstractNAR extends NAR {
         }
     }
 
+    /** NAL7 plugins */
     public void initNAL7() {
-        //NAL7 plugins
+
         the(new STMTemporalLinkage(this));
     }
 
+    /* NAL8 plugins */
     public void initNAL8() {
-        /** derivation operators available at runtime */
+        /* derivation operators available at runtime */
         for (Class<? extends TermFunction> c : PremiseRule.Operators) {
             try {
                 onExec(c.newInstance());

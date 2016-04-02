@@ -317,7 +317,7 @@ public class NAL7Test extends AbstractNALTest {
     public void induction_on_events3_simple_reversed() {
         //TESTS COMMUTIVITY
         test()
-                //.log()
+                .log()
                 .input("<room --> enter>. :|:")
                 .inputAt(4, "<door --> open>. :|:")
                 .mustBelieve(cycles, "(open:door <=>-4 enter:room)",

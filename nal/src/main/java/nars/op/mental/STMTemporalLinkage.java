@@ -5,64 +5,52 @@ import nars.NAR;
 import nars.concept.Concept;
 import nars.task.Task;
 import nars.term.Compound;
+import nars.term.Terms;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.function.Consumer;
 
 /**
- * Short-term memory Event Induction.  Empties task buffer when plugin is (re)started.
+ * Short-term memory Event Induction.
+ * Creates links between sequences of perceived events
+ * Empties task buffer when plugin is (re)started.
  */
-public class STMTemporalLinkage {
+public final class STMTemporalLinkage implements Consumer<Task> {
 
-    @NotNull
-    public final Deque<Task> stm;
-    //private final Deriver deriver;
-    //int stmSize;
-    //public static STMTemporalLinkage I=null;
+    @NotNull public final Deque<Task> stm;
 
-    private static final String id = STMTemporalLinkage.class.getSimpleName();
-    @NotNull
-    private final NAR nar;
-
-    @NotNull
-    @Override
-    public final String toString() {
-        return id;
-    }
+    @NotNull private final NAR nar;
 
     public STMTemporalLinkage(@NotNull NAR nar) {
 
         this.nar = nar;
 
-        //this.deriver = deriver;
-        //this.stmSize = 1;
         stm = Global.THREADS == 1 ? new ArrayDeque() : new ConcurrentLinkedDeque<>();
-        //I=this; //hm there needs to be a way to query plugins from the NAR/NAL object like in 1.6.x, TODO find out
 
-
-        nar.eventTaskProcess.on(n -> {
-            if (!n.task().isDeleted())
-                inductionOnSucceedingEvents(n, false);
-        });
+        nar.eventTaskProcess.on(this);
         nar.eventReset.on(n -> stm.clear());
 
     }
 
-    public static boolean isInputOrTriggeredOperation(@NotNull Task newEvent) {
+    @Override
+    public final void accept(Task task) {
+        if (!task.isDeleted())
+            inductNext(task);
+    }
+
+    public static boolean temporallyInductable(@NotNull Task newEvent) {
         if (newEvent.isInput()) return true;
         //if (Tense.containsMentalOperator(newEvent)) return true;
         return false;
     }
 
-//    public int getStmSize() {
-//        return stmSize;
-//    }
 
 
-    public boolean inductionOnSucceedingEvents(@NotNull Task currentTask, boolean anticipation) {
+    public boolean inductNext(@NotNull Task t) {
 
 
         int stmSize = nar.shortTermMemoryHistory.intValue();
@@ -72,7 +60,7 @@ public class STMTemporalLinkage {
 //            return false;
 //        }
 
-        if (currentTask.isEternal() || (!isInputOrTriggeredOperation(currentTask) && !anticipation)) {
+        if (t.isEternal() || (!temporallyInductable(t))) {
             return false;
         }
 
@@ -83,13 +71,10 @@ public class STMTemporalLinkage {
 
 
 
-        int numToRemoveFromBeginning = Math.max(0, stm.size() - stmSize);
+        int numExtra = Math.max(0, stm.size() - stmSize);
 
         /** current task's... */
-        Compound term = currentTask.term();
-        Concept concept = nar.concept(term);
-        if (concept == null)
-            return false;
+        Concept concept = t.concept(nar);
 
         Iterator<Task> ss = stm.iterator();
 
@@ -97,99 +82,28 @@ public class STMTemporalLinkage {
 
             Task previousTask = ss.next();
 
-            /*if (!equalSubTermsInRespectToImageAndProduct(term, t.getTerm())) {
-                continue;
-            }*/
+            if ((numExtra > 0) || (previousTask.isDeleted())) {
+                numExtra--;
+                ss.remove();
+            } else {
 
-            if (numToRemoveFromBeginning > 0) {
-                numToRemoveFromBeginning--;
-            }
-            else {
-                if (!previousTask.isDeleted()) {
-                    concept.crossLink(currentTask, previousTask, 1f, nar);
+                if (Terms.equalSubTermsInRespectToImageAndProduct(previousTask.term(), t.term())) {
+                    //the premise would be invalid anyway
+                    continue;
                 }
+
+                concept.crossLink(t, previousTask, 1f, nar);
+
             }
 
-            ss.remove();
-
-           /* continue;
-            //nal.setBelief(previousTask);
-
-            //if(currentTask.getPriority()>Parameters.TEMPORAL_INDUCTION_MIN_PRIORITY)
-            //TemporalRules.temporalInduction(currentTask, previousTask,
-                    //nal.newStamp(currentTask.sentence, previousTask.sentence),
-            //        nal);
-            final Premise premise = new STMPremise(nal, previousTask);
-            ///final Task task, final Sentence belief, Term beliefterm,
-            //tLink.getTask(), belief, bLink.getTerm(),
-
-
-
-
-            m.start(premise);
-
-            final Task task = premise.getTask();
-
-            if (task.isJudgment() || task.isGoal()) {
-
-                deriver.forEachRule(m);
-
-                //TODO also allow backward inference by traversing
-            }
-
-            m.clear();*/
 
         }
 
-        ////for this heuristic, only use input events & task effects of operations
-        ////if(currentTask.getPriority()>Parameters.TEMPORAL_INDUCTION_MIN_PRIORITY) {
-        //stmLast = currentTask;
-        ////}
-//        while (stm.size() > stmSize) {
-//            stm.removeFirst();
-//        }
-        stm.add(currentTask);
+        stm.add(t);
 
         return true;
     }
 
 
-//    public static class STMPremise extends AbstractPremise {
-//
-//        private final Task previousTask;
-//        private final NAL parent;
-//
-//        //deriver.reason(new STMPremise(currentTask, previousTask.getSentence(), previousTask.getTerm())
-//        public STMPremise(NAL parent, Task previousTask) {
-//            super(parent.nar());
-//            this.parent = parent;
-//            this.previousTask = previousTask;
-//        }
-//
-//
-//        @Override
-//        public Concept getConcept() {
-//            return nar().concept(getTask().getTerm());
-//        }
-//
-//        @Override
-//        public Task getBelief() {
-//            return previousTask;
-//        }
-//
-//        @Override
-//        public TermLink getTermLink() {
-//            return parent.getTermLink();
-//        }
-//
-//        @Override
-//        public TaskLink getTaskLink() {
-//            return parent.getTaskLink();
-//        }
-//
-//        @Override
-//        public Task getTask() {
-//            return parent.getTask();
-//        }
-//    }
+
 }

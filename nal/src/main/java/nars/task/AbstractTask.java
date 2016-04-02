@@ -387,7 +387,7 @@ public abstract class AbstractTask extends UnitBudget
 
         Truth tr = this.truth();
         if (tr !=null) {
-            int tu = Truth.compare(o.truth(), tr);
+            int tu = Truth.compare(tr, o.truth());
             if (tu!=0) return tu;
         }
 
