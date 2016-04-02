@@ -202,9 +202,7 @@ public interface Premise extends Level, Tasked {
     default boolean isEvent() {
         /* TODO This part is used commonly, extract into its own precondition */
         Task b = belief();
-        if (b == null) return false;
-        return (!Tense.isEternal(task().occurrence()) &&
-                (!Tense.isEternal(b.occurrence())));
+        return (b!=null) && (!task().isEternal()) && (!b.isEternal());
     }
 
     /** true if task and belief (if not null) are eternal */

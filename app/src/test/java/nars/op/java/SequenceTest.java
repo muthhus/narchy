@@ -3,13 +3,17 @@ package nars.op.java;
 import nars.$;
 import nars.Global;
 import nars.nal.Tense;
+import nars.nal.nal8.operator.TermFunction;
 import nars.nar.Default;
 import nars.op.in.Twenglish;
 import nars.task.Task;
+import nars.term.Compound;
 import nars.term.Term;
+import nars.term.TermIndex;
 import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.truth.Truth;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,37 +27,53 @@ import static nars.Op.ATOM;
 public class SequenceTest {
 
     final static Atom hear = $.the("hear");
+    final static Atom heard = $.the("heard");
 
     public static void main(String[] args) {
         Global.DEBUG = true;
 
-        Default n = new Default(1000, 32, 2, 2);
-        n.cyclesPerFrame.set(8);
-        n.conceptForgetDurations.setValue(2);
+
+
+        Default n = new Default(1000, 8, 2, 2);
+        //n.DEFAULT_QUESTION_PRIORITY = 0.1f;
+        n.cyclesPerFrame.set(4);
+        n.conceptForgetDurations.setValue(1);
         n.activationRate.setValue(0.05f);
-        n.shortTermMemoryHistory.set(3);
+        n.shortTermMemoryHistory.set(4);
+
+        n.onExec(new TermFunction("vocalize") {
+
+            @Nullable
+            @Override
+            public Object function(Compound arguments, TermIndex i) {
+                System.out.println("VOCALIZE: " + arguments);
+                return true;
+            }
+        });
 
         n.logSummaryGT(System.out, 0.1f);
 
         int repeats = 7;
         int w = 0;
 
+        n.input("(hear:{#current} ==>+0 vocalize(#current)). :|: %1.00;0.99%");
+
         int words = 2;
         Term last = null;
         List<Term> s =
                 //Twenglish.tokenize("this is a sentence.");
-                Twenglish.tokenize("a b c d");
+                Twenglish.tokenize("a b c d e f g");
         int wordTime = 5;
         for (int r = 0; r < repeats; r++) {
             for (int i = 0; i < s.size(); i++) {
 
-                /*if (last != null)
-                    n.believe(hear(last), Tense.Present, 0f, 0.99f);//.step();*/
+                if (last != null)
+                    n.believe(hear(heard, last), Tense.Present, 0f, 0.9f);//.step();
 
                 w = (w + 1) % words;
 
                 last = s.get(i);
-                n.believe(hear(last), Tense.Present, 1f, 0.99f).run(wordTime);
+                n.believe(hear(hear, last), Tense.Present, 1f, 0.99f).run(wordTime);
 
             }
         }
@@ -61,7 +81,7 @@ public class SequenceTest {
         n.run(wordTime*4);
 
         {
-            //hallucinate(n, s, wordTime);
+            hallucinate(n, s, wordTime);
         }
 
         TreeSet<Task> beliefs = new TreeSet(Truth.compareConfidence);
@@ -71,6 +91,7 @@ public class SequenceTest {
             if (t!=null)
                 beliefs.add(t);
 
+
         });
 
         beliefs.forEach(System.out::println);
@@ -78,13 +99,16 @@ public class SequenceTest {
     }
 
     public static void hallucinate(Default n, List<Term> s, int wordTime) {
+
+
+
         Termed next = s.get(0);
         List<Termed> spoken = new ArrayList();
 
         for (int i = 0; i < 10; i++) {
 
             spoken.add(next);
-            n.input(hear(next) + ". :|: %1.0;0.5%"); //subvocalization, thinking to self
+            n.input(hear(hear, next) + ". :|: %1.0;0.9%"); //subvocalization, thinking to self
 
 
             n.run(wordTime / 2);
@@ -121,8 +145,9 @@ public class SequenceTest {
         System.out.println(spoken);
     }
 
-    public static Term hear(Termed word) {
-        //return $.$("hear:{" + word + "}");
-        return $.image(1, hear, $.sete(word.term()) );
+    public static Term hear(Term pred, Termed word) {
+
+        return $.$(pred + ":{" + word + "}");
+        //return $.image(1, hear, $.sete(word.term()) );
     }
 }

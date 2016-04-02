@@ -31,19 +31,19 @@ import static java.lang.System.out;
  */
 public class Thermostat5 {
 
-    public static final float basePeriod = 32;
+    public static final float basePeriod = 8;
     public static final float tolerance = 0.1f;
-    public static float targetPeriod = 3f;
-    public static final float speed = 0.01f;
+    public static float targetPeriod = 1f;
+    public static final float speed = 0.05f;
     static boolean print = true, debugError = false;
 
     public static void main(String[] args) {
-        Default d = new Default(1024, 32, 2, 4);
-        d.duration.set(Math.round(2.5f * basePeriod));
+        Default d = new Default(1024, 32, 2, 2);
+        d.duration.set(Math.round(1.5f * basePeriod));
         d.activationRate.setValue(0.05f);
-        d.premiser.confMin.setValue(0.03f);
+        d.premiser.confMin.setValue(0.02f);
 
-        float score = eval(d, 5000);
+        float score = eval(d, 10000);
         System.out.println("score=" + score);
     }
     public static void main2(String[] args) {
@@ -52,6 +52,7 @@ public class Thermostat5 {
         new Optimization<Default>(() -> {
             Default d = new Default(1024, 5, 2, 4);
             //d.perfection.setValue(0.1);
+            d.shortTermMemoryHistory.setValue(4);
             d.premiser.confMin.setValue(0.1f);
             d.duration.set(Math.round(1.5f * basePeriod));
             d.core.conceptsFiredPerCycle.set(5);
@@ -133,7 +134,7 @@ public class Thermostat5 {
             //float highPeriod = 5f;
 
             double y = 0.5f + 0.45f * Math.sin(t / (targetPeriod * basePeriod));
-            //y = Math.round(y);
+            //y = y > 0.5f ? 0.95f : 0.05f;
 
             //x0.setValue(y); //high frequency phase
             //x1.setValue( 0.5f + 0.3f * Math.sin(n.time()/(highPeriod * period)) ); //low frequency phase
@@ -156,7 +157,7 @@ public class Thermostat5 {
 
                     char c;
                     if (i == colActual)
-                        c = '*';
+                        c = '#';
                     else if (i == colEst)
                         c = '|';
                     else

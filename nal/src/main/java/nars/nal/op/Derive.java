@@ -187,14 +187,11 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
         if (budget == null)
             return;
 
-        boolean p7 = nar.nal() >= 7;
-
-        long now = nar.time();
         long occ;
 
         Compound ct = (Compound) tNorm.term();
 
-        if (p7 && (!premise.eternal() || premise.hasTemporality())) {
+        if ((nar.nal() >= 7) && (!premise.eternal() || premise.hasTemporality())) {
             //Term cp = this.conclusionPattern;
 
             //if (Op.isOperation(cp) && p.transforms.containsKey( Operator.operator((Compound) cp) ) ) {
@@ -219,7 +216,7 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
             occ = ETERNAL;
         }
 
-        premise.derive(ct, truth, budget, now, occ, p, this);
+        premise.derive(ct, truth, budget, nar.time(), occ, p, this);
 
     }
 

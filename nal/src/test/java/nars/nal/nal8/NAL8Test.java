@@ -14,7 +14,7 @@ import static nars.nal.Tense.ETERNAL;
 @RunWith(Parameterized.class)
 public class NAL8Test extends AbstractNALTest {
 
-    final int cycles = 256; //150 worked for most of the initial NAL8 tests converted
+    final int cycles = 96; //150 worked for most of the initial NAL8 tests converted
 
     public NAL8Test(Supplier<NAR> b) { super(b); }
 
@@ -82,7 +82,7 @@ public class NAL8Test extends AbstractNALTest {
 
     @Test public void subsent_1_even_simpler()  {
         test()
-                //.log()
+                .log()
                 .input("at:t1. :|:") //@ 0
                 .inputAt(10, "(at:t1 &&+5 (open(t1) &&+5 [opened]:t1)).")
                 .mustBelieve(cycles, "open(t1)", 1.0f, 0.73f, 5)
@@ -307,13 +307,11 @@ public class NAL8Test extends AbstractNALTest {
     }
     @Test
     public void detaching_condition_2()  {
-        TestNAR tester = test();
-
-        tester.input("at:(SELF,{t001}). :|: ");
-        tester.inputAt(10, "((at:(SELF,{t001}) &&+5 open({t001})) ==>+5 [opened]:{t001}). :|:");
-
-        tester.mustBelieve(cycles, "(open({t001}) ==>+5 [opened]:{t001})", 1.0f, 0.81f, 0);
-
+        test()
+            .input("at:(SELF,{t001}). :|: ")
+            //.inputAt(10, "((at:(SELF,{t001}) &&+5 open({t001})) ==>+5 [opened]:{t001}). :|:")
+            .inputAt(10, "(at:(SELF,{t001}) &&+5 (open({t001}) ==>+5 [opened]:{t001})). :|:")
+            .mustBelieve(cycles, "(open({t001}) ==>+5 [opened]:{t001})", 1.0f, 0.81f, 15);
     }
 
 
@@ -420,14 +418,12 @@ public class NAL8Test extends AbstractNALTest {
 
     @Test
     public void condition_goal_deduction_2()  {
-        TestNAR tester = test();
+        test()
+            .log()
+            .input("<({t002},{t003}) --> on>. :|:")
+            .inputAt(10, "(<({t002},#1) --> on> &&+0 <(SELF,#1) --> at>)!")
+            .mustDesire(cycles, "<(SELF,{t003}) --> at>", 1.0f, 0.81f, 0);
 
-        tester.input("<({t002},{t003}) --> on>. :|:");
-        tester.inputAt(10, "(<({t002},#1) --> on> &&+0 <(SELF,#1) --> at>)!");
-
-        String selfAtT3 = "<(SELF,{t003}) --> at>";
-        long time = cycles / 2;
-        tester.mustDesire(time, selfAtT3, 1.0f, 0.81f, 0);
         //tester.mustNotOutput(time, selfAtT3, '!', 0, 1f, 0, 1f, ETERNAL);
     }
     @Test

@@ -196,8 +196,14 @@ public interface Temporalize {
      */
     Temporalize dtTaskExact = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn) -> {
         ConceptProcess prem = p.premise;
-        return dtExact(derived, occReturn, prem, prem.task());
+        Task t = prem.task();
+        return dtExact(derived, occReturn, prem, t, t.term());
     };
+    Temporalize dtBeliefExact = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn) -> {
+        ConceptProcess prem = p.premise;
+        return dtExact(derived, occReturn, prem, prem.task(), prem.beliefTerm());
+    };
+
 
     /**
      * special handling for dealing with detaching, esp. conjunctions which involve a potential mix of eternal and non-eternal premise components
@@ -246,6 +252,11 @@ public interface Temporalize {
                             Term dct = decTerm.term(i);
                             if (p.resolve(dct).equals(derived)) {
                                 occReturn[0] = baseOcc + decTerm.subtermTime(dct);
+
+                                if (occReturn[0] < -922337203685477580L) {
+                                    System.err.println(derived);
+                                }
+
                                 break;
                             }
                         }
@@ -259,10 +270,10 @@ public interface Temporalize {
     }
 
     @NotNull
-    static Compound dtExact(@NotNull Compound derived, @NotNull long[] occReturn, @NotNull ConceptProcess prem, @NotNull Task src) {
+    static Compound dtExact(@NotNull Compound derived, @NotNull long[] occReturn, @NotNull ConceptProcess prem, @NotNull Task src, Termed<Compound> dtTerm) {
         occReturn[0] = src.occurrence();
         if (derived.op().isTemporal())
-            return deriveDT(derived, +1, prem, src.term().dt());
+            return deriveDT(derived, +1, prem, dtTerm.term().dt());
         else
             return derived;
     }
@@ -318,9 +329,10 @@ public interface Temporalize {
                     o -= ddt;*/
             } else {
 
-                Task belief = premise.belief();
-                if (belief != null) {
-                    long ddt = belief.term().dt();
+                //Task belief = premise.belief();
+                Termed<Compound> beliefTerm = premise.beliefTerm();
+                //if (belief != null) {
+                    long ddt = beliefTerm.term().dt();
                     if (ddt != DTERNAL) {
                         if (!taskOrBelief && !end) {
                             o -= ddt;
@@ -328,7 +340,7 @@ public interface Temporalize {
                             o += ddt;
                         }
                     }
-                }
+                //}
             }
 
         }

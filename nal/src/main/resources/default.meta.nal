@@ -285,8 +285,12 @@
 //// conjunction decompose AND dependent variable elimination - decomposition with elimination of a variable
      (&&,X,A..+), B, time(decomposeTask) |- substituteIfUnifies((&&,A..+),"#",X,B), (Belief:AnonymousAnalogy, Desire:Strong, Order:ForAllSame)
 
-     (&&,X,A..+), X, time(decomposeTask) |- (&&,A..+), (Belief:StructuralDeduction, Desire:StructuralStrong),
+//the key behind executing learned sequences in the right sequence to the system and the key to respect learned preconditions properly
+     (&&,X,A..+), X, time(decomposeTask) |- (&&,A..+), (Belief:StructuralDeduction),
                                             X, (Belief:StructuralDeduction, Desire:StructuralStrong)
+
+     (A && B), B, task("!"), time(decomposeTask) |- A, (Desire:Strong)
+
 
 // Original: dependent variable elimination - decomposition with elimination of a variable
 //     (&&,X,A..+), B, time(decomposeTask) |- substituteIfUnifies((&&,A..+),"#",X,B), (Belief:AnonymousAnalogy, Desire:Strong, Order:ForAllSame)
@@ -314,7 +318,7 @@
 //// multi-conditional syllogism ////////////////////////////////////////////////////////////////////////////////////
 //Inference about the pre/postconditions
 
-    Y, ((&&,X,A..+) ==> B) |- substituteIfUnifies(((&&,A..+) ==> B),"$",X,Y), (Belief:Deduction, Order:ForAllSame)
+    Y, ((&&,X,A..+) ==> B), time(dtBeliefExact) |- substituteIfUnifies(((&&,A..+) ==> B),"$",X,Y), (Belief:Deduction, Order:ForAllSame)
 
 //conditional abduction
     ((&&,M,A..+) ==> C), ((&&,A..+) ==> C) |- M, (Belief:Abduction, Order:ForAllSame)
@@ -346,20 +350,32 @@
                                       (($X --> S) <=> ($X --> P)), (Belief:Comparison),
                                       (&&,(#Y --> S),(#Y --> P)), (Belief:Intersection)
 
+////Temporal induction: ////////////////////////////////////////////////////////////////////////////////////
+//When P and then S happened according to an observation, by induction (weak) it may be that alyways after P, usually S happens.
+
+    A, B, time(dtAfter), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A ==> B), (Belief:Induction, Eternalize:Immediate)
+
+    A, B, time(dtAfter), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A <=> B), (Belief:Comparison)
+
+    A, B, time(dtAfterReverse), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (B ==> A), (Belief:Abduction)
+
+    A, B, time(dtAfter), neq(A,B), notImplicationEquivalenceOrConjunction(A), notImplicationEquivalenceOrConjunction(B) |- (A && B), (Belief:Intersection, Desire:Intersection)
+
+
 
 //// 2nd variable introduction ////////////////////////////////////////////////////////////////////////////////////
 //, not_equal(A, (M --> S))
-    (A ==> (M --> P)), (M --> S), time(dtTask) |- ((&&,A,($X --> S)) ==> ($X --> P)), (Belief:Induction),
+    (A ==> (M --> P)), (M --> S), neq(S,P), not_equal(A, (M --> S)), time(dtTaskExact) |- ((&&,A,($X --> S)) ==> ($X --> P)), (Belief:Induction),
                                                   (&&,(A ==> (#Y --> P)), (#Y --> S)), (Belief:Intersection)
 
-    (&&,(M --> P), A..+), (M --> S), neq(S,P), time(dtTask) |- (($Y --> S) ==> (&&,($Y --> P), A..+)), (Belief:Induction),
+    (&&,(M --> P), A..+), (M --> S), neq(S,P), time(dtTaskExact) |- (($Y --> S) ==> (&&,($Y --> P), A..+)), (Belief:Induction),
                                                                (&&,(#Y --> S), (#Y --> P), A..+), (Belief:Intersection)
 
 //TODO test that this not_equal with a compound parameter works correctly
-    (A ==> (P --> M)), (S --> M), neq(S,P), not_equal(A, (S --> M)), time(dtTask) |- ((&&,A,(P --> $X)) ==> (S --> $X)), (Belief:Abduction),
+    (A ==> (P --> M)), (S --> M), neq(S,P), not_equal(A, (S --> M)), time(dtTaskExact) |- ((&&,A,(P --> $X)) ==> (S --> $X)), (Belief:Abduction),
                                                                                      (&&,(A ==> (P --> #Y)), (S --> #Y)), (Belief:Intersection)
 
-    (&&,(P --> M), A..+), (S --> M), neq(S,P), time(dtTask) |- ((S --> $Y) ==> (&&,(P --> $Y), A..+)), (Belief:Abduction),
+    (&&,(P --> M), A..+), (S --> M), neq(S,P), time(dtTaskExact) |- ((S --> $Y) ==> (&&,(P --> $Y), A..+)), (Belief:Abduction),
                                                                (&&, (S --> #Y), (P --> #Y), A..+), (Belief:Intersection)
 
 
@@ -369,18 +385,18 @@
 
 // conditional deduction "An inverse inference has been implemented as a form of deduction" https://code.google.com/p/open-nars/issues/detail?id=40&can=1
 
-    (U --> L), ((&&,A..*,(#X --> L),(#X --> R)) ==> Z) |- substitute(((&&,A..*,(U --> R)) ==> Z),#X,U), (Belief:Deduction)
+    (U --> L), ((&&,A..*,(#X --> L),(#X --> R)) ==> Z), time(dtBeliefExact) |- substitute(((&&,A..*,(U --> R)) ==> Z),#X,U), (Belief:Deduction)
 
 
 
 //// second level variable handling rules ////////////////////////////////////////////////////////////////////////////////////
 //second level variable elimination (termlink level2 growth needed in order for these rules to work)
 
-    (B --> K), (&&,(#X --> L),(($Y --> K) ==> A)), time(dtBelief) |- substitute((&&, (#X --> L), A), $Y,B), (Belief:Deduction)
-    (B --> K), (&&,(#X --> L),(($Y --> K) ==> (&&,A..+))), time(dtBelief) |- substitute((&&,(#X --> L),A..+),$Y,B), (Belief:Deduction)
+    (B --> K), (&&,(#X --> L),(($Y --> K) ==> A)), time(dtBeliefExact) |- substitute((&&, (#X --> L), A), $Y,B), (Belief:Deduction)
+    (B --> K), (&&,(#X --> L),(($Y --> K) ==> (&&,A..+))), time(dtBeliefExact) |- substitute((&&,(#X --> L),A..+),$Y,B), (Belief:Deduction)
 
-    (B --> K), (($X --> L) ==> (&&,(#Y --> K),A..+)), time(dtBelief) |- substitute((($X --> L) ==> (&&,A..+)),#Y,B), (Belief:AnonymousAnalogy)
-    (B --> K), (($X --> L) ==> (&&,(#Y --> K),A)), time(dtBelief) |- substitute((($X --> L) ==> A),#Y,B), (Belief:AnonymousAnalogy)
+    (B --> K), (($X --> L) ==> (&&,(#Y --> K),A..+)), time(dtBeliefExact) |- substitute((($X --> L) ==> (&&,A..+)),#Y,B), (Belief:AnonymousAnalogy)
+    (B --> K), (($X --> L) ==> (&&,(#Y --> K),A)), time(dtBeliefExact) |- substitute((($X --> L) ==> A),#Y,B), (Belief:AnonymousAnalogy)
 
 
 
@@ -399,17 +415,6 @@
 
 
 
-
-////Temporal induction: ////////////////////////////////////////////////////////////////////////////////////
-//When P and then S happened according to an observation, by induction (weak) it may be that alyways after P, usually S happens.
-
-    A, B, time(dtAfter), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A ==> B), (Belief:Induction, Eternalize:Immediate)
-
-    A, B, time(dtAfter), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A <=> B), (Belief:Comparison)
-
-    A, B, time(dtAfterReverse), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (B ==> A), (Belief:Abduction)
-
-    A, B, time(dtAfter), neq(A,B), notImplicationEquivalenceOrConjunction(A), notImplicationEquivalenceOrConjunction(B) |- (A && B), (Belief:Intersection, Desire:Intersection)
 
 
 

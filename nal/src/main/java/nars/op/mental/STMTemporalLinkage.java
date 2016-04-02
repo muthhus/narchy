@@ -36,22 +36,19 @@ public final class STMTemporalLinkage implements Consumer<Task> {
 
     }
 
-    @Override
-    public final void accept(Task task) {
-        if (!task.isDeleted())
-            inductNext(task);
-    }
 
     public static boolean temporallyInductable(@NotNull Task newEvent) {
-        if (newEvent.isInput()) return true;
+        return (!newEvent.isDeleted() && newEvent.isInput() && !newEvent.isEternal() && newEvent.isBeliefOrGoal());
         //if (Tense.containsMentalOperator(newEvent)) return true;
-        return false;
     }
 
 
+    @Override
+    public final void accept(Task t) {
 
-    public boolean inductNext(@NotNull Task t) {
-
+        if (!temporallyInductable(t)) {
+            return;
+        }
 
         int stmSize = nar.shortTermMemoryHistory.intValue();
 
@@ -59,10 +56,6 @@ public final class STMTemporalLinkage implements Consumer<Task> {
 //        if (!currentTask.isTemporalInductable() && !anticipation) { //todo refine, add directbool in task
 //            return false;
 //        }
-
-        if (t.isEternal() || (!temporallyInductable(t))) {
-            return false;
-        }
 
         //new one happened and duration is already over, so add as negative task
         //nal.emit(Events.EventBasedReasoningEvent.class, currentTask, nal);
@@ -92,7 +85,12 @@ public final class STMTemporalLinkage implements Consumer<Task> {
                     continue;
                 }
 
-                concept.crossLink(t, previousTask, 1f, nar);
+                float strength =
+                        //1f;
+                        t.conf() * previousTask.conf(); //scale strength of the tasklink by the confidence intersection
+
+                if (strength > 0)
+                    concept.crossLink(t, previousTask, strength, nar);
 
             }
 
@@ -101,7 +99,7 @@ public final class STMTemporalLinkage implements Consumer<Task> {
 
         stm.add(t);
 
-        return true;
+        return;
     }
 
 

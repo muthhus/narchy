@@ -1,5 +1,6 @@
 package nars.nal.nal7;
 
+import nars.NAR;
 import nars.nar.Default;
 import nars.term.Compound;
 import nars.term.Term;
@@ -32,6 +33,9 @@ public class TemporalRelationsTest {
         assertNotEquals( $("(x ==> y)").hashCode(), $("(x ==>+0 y)").hashCode() );
 
         assertEquals( $("(x ==>+0 y)"), $("(x ==>-0 y)") );
+        assertNotEquals( $("(x ==>+5 y)"), $("(y ==>-5 x)") );
+
+
 
         assertEquals(0,   $("(x ==>+0 y)").compareTo( $("(x ==>+0 y)") ) );
         assertEquals(-1,  $("(x ==>+0 y)").compareTo( $("(x ==>+1 y)") ) );
@@ -109,6 +113,19 @@ public class TemporalRelationsTest {
         String y =                           "(open({t001}) &&-5 ((({t001})-->at) &&-5 (({t002})-->hold)))";
         assertEquals(0, $(x).subtermTime($(y)));
 
+    }
+
+    @Test public void testNonCommutivityImplConcept() {
+        NAR n = new Default();
+        n.input("(x ==>+5 y).");
+        n.input("(y ==>-5 x).");
+        n.step();
+
+        StringBuilder cc = new StringBuilder();
+        n.forEachConcept(c -> { cc.append(c.toString()).append(' '); });
+
+        //2 unique impl concepts created
+        assertEquals("(x==>y) (y==>x) y x ", cc.toString());
     }
 
     @Test public void testCommutivity() {
