@@ -7,8 +7,13 @@ import nars.audio.SoundProducer;
 import nars.audio.granular.Granulize;
 import nars.audio.sample.SampleLoader;
 import nars.audio.sample.SonarSample;
+import nars.bag.BLink;
+import nars.budget.Budgeted;
 import nars.concept.Concept;
 import nars.nar.Default;
+import nars.task.Task;
+import nars.term.Term;
+import nars.term.Termed;
 import nars.util.event.FrameReaction;
 
 import javax.sound.sampled.LineUnavailableException;
@@ -27,10 +32,10 @@ public class ConceptSonification extends FrameReaction {
 
     public final Audio sound;
     //TODO use bag
-    public Map<Concept, SoundProducer> playing;
+    public Map<Task, SoundProducer> playing;
     private final int polyphony;
 
-    static class PlayingMap extends LinkedHashMap<Concept, SoundProducer> {
+    static class PlayingMap extends LinkedHashMap<Task, SoundProducer> {
         private final int maxSize;
 
         public PlayingMap(int maxSize) {
@@ -39,7 +44,7 @@ public class ConceptSonification extends FrameReaction {
         }
 
         @Override
-        protected boolean removeEldestEntry(Map.Entry<Concept, SoundProducer> eldest) {
+        protected boolean removeEldestEntry(Map.Entry<Task, SoundProducer> eldest) {
             return size() > maxSize;
         }
     }
@@ -65,7 +70,7 @@ public class ConceptSonification extends FrameReaction {
 
         updateSamples();
 
-        nar.eventConceptProcess.on(c -> update(c.concept()));
+        nar.eventTaskProcess.on(c -> update(c));
         //TODO update all existing concepts on start?
     }
 
@@ -143,7 +148,7 @@ public class ConceptSonification extends FrameReaction {
     /**
      * returns file path to load sample
      */
-    final SonarSample getSample(Concept c) {
+    final SonarSample getSample(Task c) {
         List<SonarSample> samples = this.samples;
         int s = samples.size();
         if (s == 1)
@@ -151,10 +156,10 @@ public class ConceptSonification extends FrameReaction {
         else if (s == 2)
             throw new RuntimeException("no samples to granulize");
         else
-            return samples.get(Math.abs(c.term().hashCode() % s));
+            return samples.get(Math.abs(c.get().term().hashCode() % s));
     }
 
-    public void update(Concept c) {
+    public void update(Task c) {
         boolean audible = audible(c);
         if (!audible) return;
 
@@ -175,18 +180,19 @@ public class ConceptSonification extends FrameReaction {
 
     }
 
-    private SoundProducer sound(Concept c) {
+    private SoundProducer sound(Task c) {
         //do {
         //try {
         SonarSample sp = getSample(c);
 
+        Term ct = c.get().term();
         Granulize g = new Granulize(sp,
                 /* grain size */
-                0.3f * (1 + c.term().volume()/ 2.0f),
+                0.3f * (1 + ct.volume()/ 2.0f),
                 1.0f
             ).at(
                 //terms get positoined according to their hash
-                c.term().hashCode()
+                ct.hashCode()
             );
         return g;
 
@@ -195,14 +201,14 @@ public class ConceptSonification extends FrameReaction {
 
     }
 
-    protected final boolean audible(Concept c) {
-        return 1f /*c.getPriority()*/ > audiblePriorityThreshold;
+    protected final boolean audible(Budgeted c) {
+        return c.pri() > audiblePriorityThreshold;
     }
 
     static final double twoTo12 = Math.pow((2),1/ 12.0);
 
     /** return if it should continue */
-    private boolean update(Concept c, SoundProducer g) {
+    private boolean update(Budgeted c, SoundProducer g) {
 
         if (audible(c)) {
             //TODO autmatic gain control
@@ -242,11 +248,11 @@ public class ConceptSonification extends FrameReaction {
     }
 
     protected void updateConceptsPlaying() {
-        Iterator<Map.Entry<Concept, SoundProducer>> ie = playing.entrySet().iterator();
+        Iterator<Map.Entry<Task, SoundProducer>> ie = playing.entrySet().iterator();
         while (ie.hasNext()) {
-            Map.Entry<Concept, SoundProducer> e = ie.next();
+            Map.Entry<Task, SoundProducer> e = ie.next();
 
-            Concept c = e.getKey();
+            Task c = e.getKey();
             boolean cont = update(c, e.getValue());
             if (!cont) {
                 ie.remove();

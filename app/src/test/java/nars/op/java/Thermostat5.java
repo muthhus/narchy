@@ -10,9 +10,11 @@ import nars.nal.Tense;
 import nars.nar.Default;
 import nars.task.Task;
 import nars.util.Optimization;
+import nars.util.data.MutableInteger;
 import nars.util.data.Util;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
+import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,18 +34,18 @@ import static java.lang.System.out;
 public class Thermostat5 {
 
     public static final float basePeriod = 8;
-    public static final float tolerance = 0.1f;
-    public static float targetPeriod = 1f;
+    public static final float tolerance = 0.05f;
+    public static float targetPeriod = 2f;
     public static final float speed = 0.05f;
     static boolean print = true, debugError = false;
 
     public static void main(String[] args) {
-        Default d = new Default(1024, 32, 2, 2);
-        d.duration.set(Math.round(1.5f * basePeriod));
-        d.activationRate.setValue(0.05f);
-        d.premiser.confMin.setValue(0.02f);
+        Default d = new Default(1024, 1, 1, 1);
+        d.duration.set(Math.round(1f * basePeriod));
+        d.activationRate.setValue(0.5f);
+        //d.premiser.confMin.setValue(0.02f);
 
-        float score = eval(d, 10000);
+        float score = eval(d, 100);
         System.out.println("score=" + score);
     }
     public static void main2(String[] args) {
@@ -89,17 +91,20 @@ public class Thermostat5 {
         //System.out.println(eval(n, 1000));
     }
 
-    static int t = 0;
+
 
     public static float eval(NAR n, int cycles) {
 
+        final MutableInteger t = new MutableInteger();
+
+        MutableBoolean training = new MutableBoolean();
 
         Global.DEBUG = true;
 
         //MutableFloat x0 = new MutableFloat();
         //MutableFloat x1 = new MutableFloat();
         MutableFloat yEst = new MutableFloat(0.5f); //NAR estimate of Y
-        MutableFloat yHidden = new MutableFloat(); //actual best Y used by loss function
+        MutableFloat yHidden = new MutableFloat(0.5f); //actual best Y used by loss function
 
         MutableFloat loss = new MutableFloat(0);
 
@@ -119,13 +124,13 @@ public class Thermostat5 {
             float diff = yHidden.floatValue() - yEst.floatValue();
             if (diff > tolerance) return 0.5f + 0.5f * Util.clamp(diff);
             return 0;
-        }).resolution(0.05f));
+        }).resolution(0.01f));
 
         n.on(belowness = new SensorConcept("<diff-->[below]>", n, () -> {
             float diff = -(yHidden.floatValue() - yEst.floatValue());
             if (diff > tolerance) return 0.5f + 0.5f * Util.clamp(diff);
             return 0;
-        }).resolution(0.05f));
+        }).resolution(0.01f));
 
 
         n.onFrame(nn -> {
@@ -133,20 +138,28 @@ public class Thermostat5 {
             //float switchPeriod = 20;
             //float highPeriod = 5f;
 
-            double y = 0.5f + 0.45f * Math.sin(t / (targetPeriod * basePeriod));
-            //y = y > 0.5f ? 0.95f : 0.05f;
-
-            //x0.setValue(y); //high frequency phase
-            //x1.setValue( 0.5f + 0.3f * Math.sin(n.time()/(highPeriod * period)) ); //low frequency phase
-
-            //yHidden.setValue((n.time() / (switchPeriod * period)) % 2 == 0 ? x0.floatValue() : x1.floatValue());
-            yHidden.setValue(y);
-
-            float actual = yHidden.floatValue();
             float estimated = yEst.floatValue();
-            //out.println( actual + "," + estimated );
 
-            loss.add(Math.abs(actual - estimated));
+            int tt = t.intValue();
+            float actual;
+            if (tt > 0) {
+
+                double y = 0.5f + 0.45f * Math.sin(tt / (targetPeriod * basePeriod));
+                //y = y > 0.5f ? 0.95f : 0.05f;
+
+                //x0.setValue(y); //high frequency phase
+                //x1.setValue( 0.5f + 0.3f * Math.sin(n.time()/(highPeriod * period)) ); //low frequency phase
+
+                //yHidden.setValue((n.time() / (switchPeriod * period)) % 2 == 0 ? x0.floatValue() : x1.floatValue());
+                yHidden.setValue(y);
+
+                actual = yHidden.floatValue();
+                //out.println( actual + "," + estimated );
+
+                loss.add(Math.abs(actual - estimated));
+            } else {
+                actual = 0.5f;
+            }
 
             if (print) {
 
@@ -183,6 +196,7 @@ public class Thermostat5 {
                     return -1;
                 },
                 (v) -> {
+                    if (t.intValue()==0) return false; //training
                     //if already above the target value
                     return yHidden.floatValue() - yEst.floatValue() > errorThresh;
                 }
@@ -196,6 +210,7 @@ public class Thermostat5 {
                     return -1;
                 },
                 (v) -> {
+                    if (t.intValue()==0) return false; //training
                     //if already above the target value
                     return -(yHidden.floatValue() - yEst.floatValue()) > errorThresh;
                 }
@@ -205,48 +220,45 @@ public class Thermostat5 {
 
         //n.logSummaryGT(System.out, 0.0f);
 
-        t = 0;
+        int trainMotionCycles = (int)(basePeriod * 8f);
+        float str = 0.5f;
 
-        int trainMotionCycles = 64;
-        float str = 0.1f;
         System.out.println("training up");
-
+        yEst.setValue(0.3f);
         n.goal($.$("t(up)"), Tense.Present, 1f, str);
         n.goal($.$("t(down)"), Tense.Present, 0f, str);
         for (int i = 0; i < trainMotionCycles; i++) {
             n.step();
         }
+
         System.out.println("training down");
+        yEst.setValue(0.7f);
         n.goal($.$("t(up)"), Tense.Present, 0f, str);
         n.goal($.$("t(down)"), Tense.Present, 1f, str);
         for (int i = 0; i < trainMotionCycles; i++) {
             n.step();
         }
-        System.out.println("training oscillation");
-        n.goal($.$("t(up)"), Tense.Present, 1f, str);
-        n.goal($.$("t(down)"), Tense.Present, 1f, str);
+
+        System.out.println("training balance oscillation");
+        yEst.setValue(0.5f);
+        n.goal($.$("t(up)"), Tense.Present, 0.5f, str);
+        n.goal($.$("t(down)"), Tense.Present, 0.5f, str);
         for (int i = 0; i < trainMotionCycles; i++) {
             n.step();
         }
 
         System.out.println("training finished");
 
-        //n.goal($.$("t(up)"), Tense.Present, 0f, 0.1f);
-        //n.goal($.$("t(down)"), Tense.Present, 1f, 0.1f);
-
         n.goal($.$("<diff-->[above]>"), 0f, 0.99f); //not above
         n.goal($.$("<diff-->[below]>"), 0f, 0.99f); //not below
-        //n.ask($.$("(a:#x ==> diff:#y)"), '?'); //not above
+        yEst.setValue(0.5f);
 
         for (int i = 0; i < cycles; i++) {
-            t++;
-            //n.goal($.$("((--,diff:above) && (--,diff:below))"), Tense.Present, 1f, 0.99f); //not above or below
-            //n.goal($.$("((--,<diff-->[above]>) && (--,<diff-->[above]>))"), Tense.Present, 1f, 0.99f); //not above
             n.step();
-            //Util.pause(1);
+            t.add(1);
         }
 
-        return loss.floatValue()/n.time();
+        return loss.floatValue()/t.intValue();
 
     }
 

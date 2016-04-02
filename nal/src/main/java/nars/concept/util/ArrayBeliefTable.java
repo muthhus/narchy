@@ -271,9 +271,6 @@ public class ArrayBeliefTable implements BeliefTable {
             }
         }
 
-//        if (best!=null) {//if (project) {
-//            best = best.projectTask(when, now);
-//        }
 
         return best;
     }

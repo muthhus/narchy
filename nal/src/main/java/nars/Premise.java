@@ -14,8 +14,8 @@ import org.jetbrains.annotations.Nullable;
  */
 public interface Premise extends Level, Tasked {
 
-    @NotNull
-    Concept concept();
+    /*@NotNull
+    Concept concept();*/
 
     @NotNull
     @Override

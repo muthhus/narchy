@@ -51,7 +51,10 @@ public class MutableTask extends AbstractTask {
 
 
     @NotNull
-    public static /* TODO ProjectedTask */ MutableTask project(@NotNull Task t, @NotNull Truth newTruth, long now, long occ) {
+    public static /* TODO ProjectedTask */ Task project(@NotNull Task t, long now, long occ) {
+        Truth newTruth = t.projectTruth(occ, now, false);
+        if (t.truth().equals(newTruth) && t.occurrence()==occ)
+            return t;
         return new MutableTask(t, newTruth, now, occ);
     }
 

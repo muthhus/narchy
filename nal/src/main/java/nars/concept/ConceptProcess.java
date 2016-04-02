@@ -36,7 +36,7 @@ abstract public class ConceptProcess implements Premise {
 
     public final NAR nar;
     public final BLink<? extends Task> taskLink;
-    public final BLink<? extends Concept> conceptLink;
+    //public final BLink<? extends Concept> conceptLink;
     public final BLink<? extends Termed> termLink;
     @Nullable private final Task belief;
 
@@ -53,7 +53,7 @@ abstract public class ConceptProcess implements Premise {
      */
     private transient byte cyclic = -1;
 
-    public ConceptProcess(NAR nar, BLink<? extends Concept> conceptLink,
+    public ConceptProcess(NAR nar,
                           BLink<? extends Task> taskLink,
                           BLink<? extends Termed> termLink, @Nullable Task belief) {
         this.nar = nar;
@@ -61,7 +61,7 @@ abstract public class ConceptProcess implements Premise {
         this.taskLink = taskLink;
         //assert(!task().isDeleted());
 
-        this.conceptLink = conceptLink;
+        //this.conceptLink = conceptLink;
         this.termLink = termLink;
 
         this.belief = belief;
@@ -107,12 +107,6 @@ abstract public class ConceptProcess implements Premise {
 //        return termLink;
 //    }
 
-    @NotNull
-    @Override
-    public Concept concept() {
-        return conceptLink.get();
-    }
-
 
 //    protected void beforeFinish(final long now) {
 //
@@ -151,7 +145,8 @@ abstract public class ConceptProcess implements Premise {
     public String toString() {
         return new StringBuilder().append(
                 getClass().getSimpleName())
-                .append('[').append(conceptLink).append(',')
+                .append('[')
+                //.append(conceptLink).append(',')
                 .append(taskLink).append(',')
                 .append(termLink).append(',')
                 .append(belief())

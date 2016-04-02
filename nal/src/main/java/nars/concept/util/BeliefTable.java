@@ -4,6 +4,7 @@ import com.google.common.collect.Iterators;
 import nars.NAR;
 import nars.budget.Budgeted;
 import nars.nal.Tense;
+import nars.task.MutableTask;
 import nars.task.Task;
 import nars.truth.Truth;
 import nars.truth.Truthed;
@@ -177,11 +178,17 @@ public interface BeliefTable extends TaskTable {
 
         if (tmp == null) {
             return ete;
-        } else if (ete == null) {
-            return tmp;
         } else {
-            return ( ete.conf() > tmp.conf()) ?
-                    ete : tmp;
+
+
+            //tmp = MutableTask.project(tmp, t, now);
+
+            if (ete == null) {
+                return tmp;
+            } else {
+                return ( ete.conf() > tmp.conf()) ?
+                        ete : tmp;
+            }
         }
     }
 

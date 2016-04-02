@@ -4,6 +4,7 @@ import nars.Op;
 import nars.nal.meta.AtomicBooleanCondition;
 import nars.nal.meta.PremiseEval;
 import nars.term.Compound;
+import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -37,7 +38,7 @@ public final class SubTermStructure extends AtomicBooleanCondition<PremiseEval> 
 
     @Override
     public boolean booleanValueOf(@NotNull PremiseEval ff) {
-        Compound t = ff.term;
-        return !t.term(subterm).impossibleStructureMatch(bits);
+        Term t = subterm == 0 ? ff.taskTerm : ff.beliefTerm;
+        return !t.impossibleStructureMatch(bits);
     }
 }

@@ -568,12 +568,6 @@ public class Default extends AbstractNAR {
     public static class DefaultPremiseGenerator extends PremiseGenerator {
 
 
-        /**
-         * re-used, not to be used outside of this
-         */
-        final
-        @NotNull
-        PremiseEval matcher;
 
         /**
          * derived tasks with truth confidence lower than this value are discarded.
@@ -588,8 +582,8 @@ public class Default extends AbstractNAR {
 //        }
 
         public DefaultPremiseGenerator(@NotNull NAR nar, @NotNull Deriver deriver, @NotNull Forget.BudgetForgetFilter<Task> taskLinkForget, @NotNull Forget.BudgetForget<Termed> termLinkForget) {
-            super(nar, taskLinkForget, termLinkForget);
-            this.matcher = new PremiseEval(nar.random, deriver);
+            super(nar, new PremiseEval(nar.random, deriver), taskLinkForget, termLinkForget);
+
             this.confMin = new MutableFloat(Global.TRUTH_EPSILON);
 
         }
@@ -598,20 +592,13 @@ public class Default extends AbstractNAR {
          * update derivation parameters (each frame)
          */
         @Override public final void frame(NAR nar) {
+            super.frame(nar);
             matcher.setMinConfidence(confMin.floatValue());
             taskLinkForget.update(nar);
             termLinkForget.update(nar);
         }
 
-        @Override
-        protected void premise(BLink<? extends Concept> concept, BLink<? extends Task> taskLink, BLink<? extends Termed> termLink, Task belief) {
-            matcher.run(newPremise(concept, taskLink, termLink, belief));
-        }
 
-        @NotNull
-        protected ConceptProcess newPremise(BLink<? extends Concept> concept, BLink<? extends Task> taskLink, BLink<? extends Termed> termLink, Task belief) {
-            return new DefaultConceptProcess(nar, concept, taskLink, termLink, belief, nar::process);
-        }
 
     }
 

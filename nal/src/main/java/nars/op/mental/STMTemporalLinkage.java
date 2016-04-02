@@ -80,10 +80,14 @@ public final class STMTemporalLinkage implements Consumer<Task> {
                 ss.remove();
             } else {
 
-                if (Terms.equalSubTermsInRespectToImageAndProduct(previousTask.term(), t.term())) {
-                    //the premise would be invalid anyway
+                //is this valid ?
+//                if (Terms.equalSubTermsInRespectToImageAndProduct(previousTask.term(), t.term())) {
+//                    //the premise would be invalid anyway
+//                    continue;
+//                }
+
+                if (previousTask.term().equals(t.term()))
                     continue;
-                }
 
                 float strength =
                         //1f;

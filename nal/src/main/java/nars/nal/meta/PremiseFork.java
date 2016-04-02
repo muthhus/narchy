@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * reverting fork for use during premise matching
  */
-public final class PremiseFork extends ThenFork {
+public class PremiseFork extends ThenFork {
 
     private final ProcTerm[] termCache;
 
@@ -17,7 +17,7 @@ public final class PremiseFork extends ThenFork {
     }
 
     @Override
-    public final void accept(@NotNull PremiseEval m) {
+    public void accept(@NotNull PremiseEval m) {
         final int stack = m.now();
         for (ProcTerm s : termCache) {
             s.accept(m);

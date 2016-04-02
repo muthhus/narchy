@@ -16,10 +16,10 @@ public class DefaultConceptProcess extends ConceptProcess {
 
     public final @NotNull Consumer<Task> results;
 
-    public DefaultConceptProcess(NAR nar, BLink<? extends Concept> conceptLink,
+    public DefaultConceptProcess(NAR nar,
                                  BLink<? extends Task> taskLink,
                                  BLink<? extends Termed> termLink, @Nullable Task belief, @NotNull Consumer<Task> results) {
-        super(nar, conceptLink, taskLink, termLink, belief);
+        super(nar, taskLink, termLink, belief);
 
         this.results = results;
     }

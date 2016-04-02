@@ -79,12 +79,6 @@ public enum DesireFunction implements TruthOperator {
         }
     },
 
-    Comparison() {
-        @Nullable
-        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
-            return ((B == null) || (T == null)) ? null : TruthFunctions.comparison(T, B, minConf);
-        }
-    }
 
     ;
 

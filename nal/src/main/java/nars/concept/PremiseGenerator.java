@@ -6,7 +6,7 @@ import nars.bag.BLink;
 import nars.bag.Bag;
 import nars.budget.Forget;
 import nars.data.Range;
-import nars.nal.Tense;
+import nars.nal.meta.PremiseEval;
 import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
@@ -17,20 +17,28 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 /** not thread safe; call from only one thread at a time */
 abstract public class PremiseGenerator /*extends UnifySubst */implements Consumer<BLink<? extends Concept>> {
 
     @NotNull
     public final NAR nar;
+
+
+    /**
+     * re-used, not to be used outside of this
+     */
+    protected final
+    @NotNull
+    PremiseEval matcher;
+
 //    private BLink<? extends Termed> termLink;
 //    private BLink<? extends Concept> concept;
 //    @Nullable
 //    private BLink<? extends Task> taskLink;
 //
     //private final Map<Term, Task> beliefCache = Global.newHashMap();
-    long lastMatch = Tense.TIMELESS;
+    //long lastMatch = Tense.TIMELESS;
 
     @NotNull
     public final Forget.BudgetForgetFilter<Task> taskLinkForget;
@@ -45,9 +53,10 @@ abstract public class PremiseGenerator /*extends UnifySubst */implements Consume
 
 
 
-    public PremiseGenerator(@NotNull NAR nar, @NotNull Forget.BudgetForgetFilter<Task> taskLinkForget, @NotNull Forget.BudgetForget<Termed> termLinkForget) {
-        //super(Op.VAR_QUERY, nar, true);
+    public PremiseGenerator(@NotNull NAR nar, PremiseEval matcher, @NotNull Forget.BudgetForgetFilter<Task> taskLinkForget, @NotNull Forget.BudgetForget<Termed> termLinkForget) {
+
         this.nar = nar;
+        this.matcher = matcher;
         this.taskLinkForget = taskLinkForget;
         this.termLinkForget = termLinkForget;
     }
@@ -82,7 +91,6 @@ abstract public class PremiseGenerator /*extends UnifySubst */implements Consume
 
     /** to be overridden by subclasses, called on each frame to update parameters */
     public void frame(NAR nar) {
-
     }
 
     /**
@@ -108,7 +116,6 @@ abstract public class PremiseGenerator /*extends UnifySubst */implements Consume
         termsBuffer = this.terms;
         termsBuffer.clear();
         termLinks.sample(termlinks, termsBuffer::add);
-        //if (termsBuffer.isEmpty()) return; //no termlinks sampled
         assert (!termsBuffer.isEmpty());
 
 
@@ -116,46 +123,80 @@ abstract public class PremiseGenerator /*extends UnifySubst */implements Consume
         tasksBuffer = this.tasks;
         tasksBuffer.clear();
         taskLinks.sample(tasklinks, tasksBuffer::add);
-        //if (tasksBuffer.isEmpty()) return; //no tasklink available
         assert (!tasksBuffer.isEmpty());
 
 
         //convert to array for fast for-within-for iterations
-        BLink[] tasksArray = this.tasksArray = tasksBuffer.toArray(this.tasksArray);
+        BLink<Task>[] tasksArray = this.tasksArray = tasksBuffer.toArray(this.tasksArray);
 
-        BLink[] termsArray = this.termsArray = termsBuffer.toArray(this.termsArray);
+        BLink<Termed>[] termsArray = this.termsArray = termsBuffer.toArray(this.termsArray);
 
-        for (BLink<? extends Termed> termLink : (BLink<? extends Termed>[]) termsArray) {
-
-            if (termLink == null) break;
-
-            match(conceptLink, tasksArray, termLink);
-
-        }
-
-    }
-
-    final void match(BLink<? extends Concept> concept, @NotNull BLink<? extends Task>[] taskLinks, @NotNull BLink<? extends Termed> termLink) {
-
-        for (BLink<? extends Task> taskLink : taskLinks) {
-
-            if (taskLink == null)
-                break; //null-terminated array, ends
-
+        for (BLink<Task> taskLink : tasksArray) {
+            if (taskLink == null) break; //null-terminated array, ends
             Task task = taskLink.get();
             if (task.isDeleted())
                 continue;
 
-            Term termLinkTerm  = termLink.get().term();
+            premiseTask(termsArray, taskLink, task);
+
+        }
+
+    }
+
+    /** begin matching the task half of a premise */
+    private void premiseTask(BLink<Termed>[] termLinks, BLink<Task> taskLink, Task task) {
+
+        int cp = 0;
+        long occ = task.occurrence();
+        ConceptProcess[] premises = new ConceptProcess[termLinks.length];
+        for (BLink<Termed> termLink : termLinks) {
+            if (termLink == null) break; //null-terminated array, ends
+            Concept beliefConcept = nar.concept(termLink.get());
+            Term termLinkTerm  = beliefConcept.term();
+
             if (Terms.equalSubTermsInRespectToImageAndProduct(task.term(), termLinkTerm ))
                 continue;
 
-            //matchAll(taskLinkTerm, termLinkTerm );
-            premise(concept, taskLink, termLink, match(termLinkTerm, task));
+
+            /*premise(conceptLink, taskLink, termLink,
+                    match(beliefConcept, occ) //TODO cache this, if occ is same then the belief probably is also, in same cycle
+            );*/
+
+            //    abstract protected void premise(BLink<? extends Concept> concept, BLink<? extends Task> taskLink, BLink<? extends Termed> termLink, Task belief);
+
+            //newPremise...match(beliefConcept, occ)
+            premises[cp++] = newPremise(taskLink, termLink, match(beliefConcept, occ));
         }
+
+        matcher.run(taskLink, premises, nar);
+
     }
 
 
+    @NotNull
+    protected ConceptProcess newPremise(BLink<? extends Task> taskLink, BLink<? extends Termed> termLink, Task belief) {
+        return new DefaultConceptProcess(nar, taskLink, termLink, belief, nar::process);
+    }
+
+    /** resolves the most relevant belief of a given term/concept */
+    @Nullable
+    public final Task match(@NotNull Concept beliefConcept, long taskOcc) {
+
+        if ((beliefConcept != null) && (beliefConcept.hasBeliefs())) {
+
+            Task belief = beliefConcept.beliefs().top(
+                    //nar.time()
+                    taskOcc
+            );
+
+            assert(belief != null && !belief.isDeleted());
+            //  if (belief == null || belief.isDeleted())  throw new RuntimeException("Deleted belief: " + belief + " " + beliefConcept.hasBeliefs());
+
+            return belief;
+        }
+
+        return null;
+    }
 
 //    /** uses the query-unified term to complete a premise */
 //    @Override public final boolean accept(@NotNull Term beliefTerm, Term unifiedBeliefTerm) {
@@ -188,27 +229,6 @@ abstract public class PremiseGenerator /*extends UnifySubst */implements Consume
 //        return true;
 //    }
 
-    abstract protected void premise(BLink<? extends Concept> concept, BLink<? extends Task> taskLink, BLink<? extends Termed> termLink, Task belief);
 
-    /** resolves the most relevant belief of a given term/concept */
-    @Nullable
-    public final Task match(@NotNull Term beliefTerm, @NotNull Task task) {
-
-        Concept beliefConcept = nar.concept(beliefTerm);
-        if ((beliefConcept != null) && (beliefConcept.hasBeliefs())) {
-
-            Task belief = beliefConcept.beliefs().top(
-                //nar.time()
-                task.occurrence()
-            );
-
-            assert(belief != null && !belief.isDeleted());
-            //  if (belief == null || belief.isDeleted())  throw new RuntimeException("Deleted belief: " + belief + " " + beliefConcept.hasBeliefs());
-
-            return belief;
-        }
-
-        return null;
-    }
 
 }
