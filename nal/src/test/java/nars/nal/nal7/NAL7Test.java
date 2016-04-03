@@ -214,14 +214,10 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void inference_on_tense() {
-        TestNAR tester = test();
-
-        //tester.log();
-
-        tester.input("((($x, key) --> hold) ==>+7 (($x, room) --> enter)).");
-        tester.input("<(John, key) --> hold>. :|:");
-
-        tester.mustBelieve(16, "<(John,room) --> enter>", 1.00f, 0.81f, 7);
+        test()
+            .input("((($x, key) --> hold) ==>+7 (($x, room) --> enter)).")
+            .input("<(John, key) --> hold>. :|:")
+            .mustBelieve(cycles, "<(John,room) --> enter>", 1.00f, 0.81f, 7);
     }
 
     @Test
@@ -396,52 +392,46 @@ public class NAL7Test extends AbstractNALTest {
     public void induction_on_events_composition_pre() {
         TestNAR tester = test();
 
-        //tester.nar.log();
-
+        tester.input("hold:(John,key). :|:");
         tester.input("(open:(John,door) ==>+5 enter:(John,room)). :|:");
 
-
-        tester.mustBelieve(cycles, "open:(John,door)",
+        tester.mustBelieve(cycles, "(((John,key)-->hold) &&+0 (((John,door)-->open) ==>+5 ((John,room)-->enter)))",
                 1.00f, 0.81f,
                 0);
-
-        tester.mustBelieve(cycles, "enter:(John,room)",
-                1.00f, 0.81f,
-                5);
     }
 
-    @Test
-    public void induction_on_events_composition1() {
-        compositionTest(1, 5);
-    }
-
-    @Test
-    public void induction_on_events_composition2() {
-        compositionTest(1, 7);
-    }
-
-    @Test
-    public void induction_on_events_composition3() {
-        compositionTest(4, 3);
-    }
-
-    @Test
-    public void induction_on_events_composition_post() {
-        TestNAR tester = test();
-
-        int t = 1;
-        int dt = 7;
-        String component = "(open:(John,door) &&+0 hold:(John,key))";
-        tester.inputAt(t, component + ". :|:");
-        tester.inputAt(t + dt, "enter:(John,room). :|:");
-
-        tester.mustBelieve((t + dt) + dt + 1 /** approx */,
-                "(" + component + " ==>+" + dt + " enter:(John,room))",
-                1.00f, 0.45f,
-                t);
-
-
-    }
+//    @Test
+//    public void induction_on_events_composition1() {
+//        compositionTest(1, 5);
+//    }
+//
+//    @Test
+//    public void induction_on_events_composition2() {
+//        compositionTest(1, 7);
+//    }
+//
+//    @Test
+//    public void induction_on_events_composition3() {
+//        compositionTest(4, 3);
+//    }
+//
+//    @Test
+//    public void induction_on_events_composition_post() {
+//        TestNAR tester = test();
+//
+//        int t = 1;
+//        int dt = 7;
+//        String component = "(open:(John,door) &&+0 hold:(John,key))";
+//        tester.inputAt(t, component + ". :|:");
+//        tester.inputAt(t + dt, "enter:(John,room). :|:");
+//
+//        tester.mustBelieve((t + dt) + dt + 1 /** approx */,
+//                "(" + component + " ==>+" + dt + " enter:(John,room))",
+//                1.00f, 0.45f,
+//                t);
+//
+//
+//    }
 
     private void compositionTest(int t, int dt) {
         TestNAR tester = test();
