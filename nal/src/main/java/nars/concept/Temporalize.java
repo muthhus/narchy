@@ -221,12 +221,19 @@ public interface Temporalize {
     static Compound decompose(@NotNull Compound derived, @NotNull PremiseEval p, @NotNull long[] occReturn, boolean decomposeTask) {
         ConceptProcess prem = p.premise;
 
-        Task decomposed = decomposeTask ? prem.task() : prem.belief();
+        Termed<Compound> decomposed = decomposeTask ? prem.task() : prem.belief();
+        long tOcc;
+        if (decomposed == null) {
+            decomposed = prem.beliefTerm();
+            tOcc = ETERNAL;
+        } else {
+            tOcc = ((Task)decomposed).occurrence();
+        }
+
         Compound decTerm = decomposed.term();
         Compound dtt = decTerm;
         long ddt = dtt.dt();
 
-        long tOcc = decomposed.occurrence();
 
         if (tOcc != ETERNAL) {
             occReturn[0] = ((ddt == DTERNAL) || (ddt == 0)) ? tOcc : (dtt.subtermTimeOrZero(derived, tOcc));

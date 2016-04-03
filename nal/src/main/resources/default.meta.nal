@@ -238,15 +238,15 @@
 
 //// conditional syllogism ////////////////////////////////////////////////////////////////////////////////////
 //If after M, P usually happens, and M happens, it means P is expected to happen
-    M, (M ==> P), time(dtBeliefEnd) |- P, (Belief:Deduction, Desire:Induction)
-    M, (P ==> M), time(dtBelief) |- P, (Belief:Abduction, Desire:Deduction)
-    M, (S <=> M), time(dtBelief) |- S, (Belief:Analogy, Desire:Strong)
+    M, (M ==> P), time(decomposeBelief) |- P, (Belief:Deduction, Desire:Induction)
+    M, (P ==> M), time(decomposeBelief) |- P, (Belief:Abduction, Desire:Deduction)
+    M, (S <=> M), time(decomposeBelief) |- S, (Belief:Analogy, Desire:Strong)
 
 
 //Indep variable elimination
-    B, (A ==> C), time(dtBelief) |- substituteIfUnifies(C,"$",A,B), (Belief:Deduction)
-    B, (C ==> A), time(dtBelief) |- substituteIfUnifies(C,"$",A,B), (Belief:Abduction)
-    B, (A <=> C), time(dtBelief) |- substituteIfUnifies(C,"$",A,B), (Belief:Deduction)
+    B, (A ==> C), time(decomposeBelief) |- substituteIfUnifies(C,"$",A,B), (Belief:Deduction)
+    B, (C ==> A), time(decomposeBelief) |- substituteIfUnifies(C,"$",A,B), (Belief:Abduction)
+    B, (A <=> C), time(decomposeBelief) |- substituteIfUnifies(C,"$",A,B), (Belief:Deduction)
 
 
 
