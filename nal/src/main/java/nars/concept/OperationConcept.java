@@ -47,13 +47,22 @@ public class OperationConcept extends CompoundConcept implements Runnable {
 
     public OperationConcept(@NotNull GenericCompound term, Bag<Termed> termLinks, Bag<Task> taskLinks) {
         super(term, termLinks, taskLinks);
+        ensureOperation(term);
+
     }
+
 
     public OperationConcept(@NotNull String compoundTermString, @NotNull NAR n) throws Narsese.NarseseException {
         super(compoundTermString, n);
-        assert(Op.isOperation(term));
+        ensureOperation(term);
         n.on(this);
     }
+
+    static void ensureOperation(@NotNull GenericCompound term) {
+        if (!Op.isOperation(term))
+            throw new RuntimeException(term + " is not an Operation");
+    }
+
 
     @Nullable
     @Override

@@ -920,5 +920,8 @@ public enum Util {
     }
 
 
+    public static double normalize(double x, double min, double max) {
+        return (x - min) / (max - min);
+    }
 
 }

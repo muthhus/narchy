@@ -21,7 +21,7 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
     @NotNull
     private final Sensor sensor;
     private FloatSupplier input;
-    private float current;
+    private float current = Float.NaN;
 
 
     public SensorConcept(@NotNull String compoundTermString, @NotNull NAR n, FloatSupplier input) throws Narsese.NarseseException {
