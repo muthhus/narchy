@@ -201,8 +201,8 @@ public class NAL4Test extends AbstractNALTest {
         //    ((X,Z) --> Y), X |- ((X,Z)-->((/,Y,_,Z),Z)), (Belief:StructuralDeduction, Desire:StructuralDeduction)
         test()
             .believe("(x-->(/,y,_,z))")
-            .mustBelieve(16, "((x,z)-->((/,y,_,z),z))", 1f, 0.81f)
-            .mustBelieve(16, "((x,z)-->(x,(/,y,x,_)))", 1f, 0.81f);
+            .mustBelieve(32, "((x,z)-->((/,y,_,z),z))", 1f, 0.81f)
+            .mustBelieve(32, "((x,z)-->(x,(/,y,x,_)))", 1f, 0.81f);
 
     }
 

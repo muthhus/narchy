@@ -252,10 +252,10 @@ public interface Temporalize {
                             Term dct = decTerm.term(i);
                             if (p.resolve(dct).equals(derived)) {
                                 occReturn[0] = baseOcc + decTerm.subtermTime(dct);
-
-                                if (occReturn[0] < -922337203685477580L) {
-                                    System.err.println(derived);
-                                }
+//
+//                                if (occReturn[0] < -922337203685477580L) {
+//                                    System.err.println(derived);
+//                                }
 
                                 break;
                             }

@@ -184,7 +184,7 @@
 //                (A ==> C)
 //If after S M happens, and after M P happens, so P happens after S
 
-    (M ==> P), (S ==> M), neq(S,P), time(dtUnionReverse) |- (S ==> P), (Belief:Deduction, Order:ForAllSame, Derive:AllowBackward)
+    (M ==> P), (S ==> M), neq(S,P), time(dtUnionReverse) |- (S ==> P), (Belief:Deduction, Derive:AllowBackward)
 
 //"Please note that the temporal order in the conclusion of a weak rule is
 //not necessarily the same as the order in the premises, given the hypothetical
@@ -213,7 +213,7 @@
 
     (P ==> M), (S <=> M), neq(S,P), time(dtTminB) |- (P ==> S), (Belief:Analogy, Derive:AllowBackward)
 
-    (M <=> P), (S <=> M), neq(S,P), time(dtCombine) |- (S <=> P), (Belief:Resemblance, Order:ForAllSame, Derive:AllowBackward)
+    (M <=> P), (S <=> M), neq(S,P), time(dtCombine) |- (S <=> P), (Belief:Resemblance, Derive:AllowBackward)
 
 //// implication-based composition ////////////////////////////////////////////////////////////////////////////////////
 //Same as for inheritance again
@@ -231,41 +231,41 @@
 //// implication-based decomposition ////////////////////////////////////////////////////////////////////////////////////
 //Same as for inheritance again
 
-    (S ==> M), ((||,S,A..+) ==> M), time(dtCombine) |- ((||,A..+) ==> M), (Belief:DecomposePositiveNegativeNegative, Order:ForAllSame)
-    (S ==> M), ((&&,S,A..+) ==> M), time(dtCombine) |- ((&&,A..+) ==> M), (Belief:DecomposeNegativePositivePositive, Order:ForAllSame)
-    (M ==> S), (M ==> (&&,S,A..+)), time(dtCombine) |- (M ==> (&&,A..+)), (Belief:DecomposePositiveNegativeNegative, Order:ForAllSame)
-    (M ==> S), (M ==> (||,S,A..+)), time(dtCombine) |- (M ==> (||,A..+)), (Belief:DecomposeNegativePositivePositive, Order:ForAllSame)
+    (S ==> M), ((||,S,A..+) ==> M), time(dtCombine) |- ((||,A..+) ==> M), (Belief:DecomposePositiveNegativeNegative)
+    (S ==> M), ((&&,S,A..+) ==> M), time(dtCombine) |- ((&&,A..+) ==> M), (Belief:DecomposeNegativePositivePositive)
+    (M ==> S), (M ==> (&&,S,A..+)), time(dtCombine) |- (M ==> (&&,A..+)), (Belief:DecomposePositiveNegativeNegative)
+    (M ==> S), (M ==> (||,S,A..+)), time(dtCombine) |- (M ==> (||,A..+)), (Belief:DecomposeNegativePositivePositive)
 
 //// conditional syllogism ////////////////////////////////////////////////////////////////////////////////////
 //If after M, P usually happens, and M happens, it means P is expected to happen
 
 
-    B, (A <=> C), time(dtBelief) |- substituteIfUnifies(C,"$",A,B), (Belief:Deduction, Desire:Induction, Order:ForAllSame)
+    B, (A <=> C), time(dtBelief) |- substituteIfUnifies(C,"$",A,B), (Belief:Deduction, Desire:Induction)
 
-    (A ==> C), B, time(decomposeTask) |-  substituteIfUnifies( C, "$",A,B), (Belief:StructuralDeduction, Desire:Deduction, Order:ForAllSame)
-    (C ==> A), B, time(decomposeTask) |- substituteIfUnifies( C, "$",A,B), (Belief:StructuralDeduction, Desire:Deduction, Order:ForAllSame)
+    (A ==> C), B, time(decomposeTask) |-  substituteIfUnifies( C, "$",A,B), (Belief:StructuralDeduction, Desire:Deduction)
+    (C ==> A), B, time(decomposeTask) |- substituteIfUnifies( C, "$",A,B), (Belief:StructuralDeduction, Desire:Deduction)
 
-    B, (C ==> A), time(dtBelief) |- substituteIfUnifies( C, "$", A, B), (Belief:Abduction, Desire:Deduction, Order:ForAllSame)
-    B, (A ==> C), time(dtBeliefEnd) |- substituteIfUnifies( C, "$", A, B), (Belief:Deduction, Desire:Induction, Order:ForAllSame, Event:Anticipate)
-//    B, (C ==> A) |- substituteIfUnifies(C,"$",A,B), (Belief:Abduction, Desire:Abduction, Order:ForAllSame)
-//    B, (A ==> C) |- substituteIfUnifies(C,"$",A,B), (Belief:Deduction, Desire:Induction, Order:ForAllSame, Event:Anticipate)
+    B, (C ==> A), time(dtBelief) |- substituteIfUnifies( C, "$", A, B), (Belief:Abduction, Desire:Deduction)
+    B, (A ==> C), time(dtBeliefEnd) |- substituteIfUnifies( C, "$", A, B), (Belief:Deduction, Desire:Induction, Event:Anticipate)
+//    B, (C ==> A) |- substituteIfUnifies(C,"$",A,B), (Belief:Abduction, Desire:Abduction)
+//    B, (A ==> C) |- substituteIfUnifies(C,"$",A,B), (Belief:Deduction, Desire:Induction, Event:Anticipate)
 
 
-//    (A ==> B), A, time(dtTaskEnd) |- B, (Belief:StructuralDeduction, Desire:Induction, Order:ForAllSame)
-//    (A ==> B), B, time(dtTask) |- A, (Belief:StructuralDeduction, Desire:Deduction, Order:ForAllSame, Event:Anticipate)
+//    (A ==> B), A, time(dtTaskEnd) |- B, (Belief:StructuralDeduction, Desire:Induction)
+//    (A ==> B), B, time(dtTask) |- A, (Belief:StructuralDeduction, Desire:Deduction, Event:Anticipate)
 
-//    (C ==> A), B, time(dtTask) |-  substituteIfUnifies( C, "$",A,B), (Belief:StructuralAbduction, Desire:Deduction, Order:ForAllSame)
-//    (A ==> B), B |- A, (Belief:StructuralDeduction, Desire:Deduction, Order:ForAllSame, Event:Anticipate)
+//    (C ==> A), B, time(dtTask) |-  substituteIfUnifies( C, "$",A,B), (Belief:StructuralAbduction, Desire:Deduction)
+//    (A ==> B), B |- A, (Belief:StructuralDeduction, Desire:Deduction, Event:Anticipate)
 
-//    A, (A ==> B) |- B, (Belief:Abduction, Desire:Abduction, Order:ForAllSame)
+//    A, (A ==> B) |- B, (Belief:Abduction, Desire:Abduction)
 
 ////NAL7 specific inference ////////////////////////////////////////////////////////////////////////////////////
 //Reasoning about temporal statements. those are using the ==> relation because relation in time is a relation of the truth between statements.
 
-////    X, (XI ==> B) |- occurrsForward( substituteIfUnifies( B, "$", XI, (&/,X,/1)), XI, "==>"), (Belief:Deduction, Desire:Induction, Order:ForAllSame, Event:Anticipate)
-//    X, (BI ==> Y) |- occurrsBackward( substituteIfUnifies( BI, "$", Y, X), BI, "==>"), (Belief:Abduction, Desire:Deduction, Order:ForAllSame)
-//    C, (A ==> B) |- substituteIfUnifies( B, "$", A, C), (Belief:Deduction, Desire:Induction, Order:ForAllSame, Event:Anticipate),
-//                    substituteIfUnifies( A, "$", B, C), (Belief:Abduction, Desire:Deduction, Order:ForAllSame)
+////    X, (XI ==> B) |- occurrsForward( substituteIfUnifies( B, "$", XI, (&/,X,/1)), XI, "==>"), (Belief:Deduction, Desire:Induction, Event:Anticipate)
+//    X, (BI ==> Y) |- occurrsBackward( substituteIfUnifies( BI, "$", Y, X), BI, "==>"), (Belief:Abduction, Desire:Deduction)
+//    C, (A ==> B) |- substituteIfUnifies( B, "$", A, C), (Belief:Deduction, Desire:Induction, Event:Anticipate),
+//                    substituteIfUnifies( A, "$", B, C), (Belief:Abduction, Desire:Deduction)
 
 
 
@@ -284,18 +284,19 @@
 
 //// conjunction decompose AND dependent variable elimination - decomposition with elimination of a variable
      (&&,X,A..+), X, time(decomposeTask) |- X, (Belief:StructuralDeduction, Desire:StructuralStrong)
-     (&&,X,A..+), B, time(decomposeTask), task(".") |- substituteIfUnifies((&&,A..+),"#",X,B), (Belief:AnonymousAnalogy, Order:ForAllSame)
+
+     (&&,X,A..+), B, time(decomposeTask), task(".") |- substituteIfUnifies((&&,A..+),"#",X,B), (Belief:AnonymousAnalogy)
 
 //the key behind executing learned sequences in the right sequence to the system and the key to respect learned preconditions properly
     // Original NAL7:
     //      (&/,A_1..n), A_1 |- A_1, (Truth:StructuralDeduction, Desire:StructuralStrong)
     //      (&/,B,A_1..n), B, task("!") |- (&/,A_1..n), (Desire:Strong, SequenceIntervals:FromPremises)
-     (&&,B,A..+), B, time(decomposeTaskIfBefore), task("!") |- (&&,A..+), (Desire:Strong)
-     (&&,B,A..+), B, time(decomposeTask) |- B, (Belief:StructuralDeduction, Desire:StructuralStrong)
+     (&&,X,A..+), B, time(decomposeTaskIfBefore), task("!") |- substituteIfUnifies((&&,A..+),"#",X,B), (Desire:Strong)
+     (&&,B,A..+), B, time(decomposeTaskIfBefore) |- B, (Belief:StructuralDeduction, Desire:StructuralStrong)
 
 
 // Original: dependent variable elimination - decomposition with elimination of a variable
-//     (&&,X,A..+), B, time(decomposeTask) |- substituteIfUnifies((&&,A..+),"#",X,B), (Belief:AnonymousAnalogy, Desire:Strong, Order:ForAllSame)
+//     (&&,X,A..+), B, time(decomposeTask) |- substituteIfUnifies((&&,A..+),"#",X,B), (Belief:AnonymousAnalogy, Desire:Strong)
 //    (&/,B,A..+), B, task("!") |- (&/,A..+), (Desire:Strong)
 //     (&&,A,B), A |- A, (Belief:StructuralDeduction, Desire:StructuralStrong),
 //                    B, (Belief:StructuralDeduction, Desire:StructuralStrong)
@@ -309,23 +310,23 @@
 //// propositional decomposition ////////////////////////////////////////////////////////////////////////////////////
 //If S is the case, and (&&,S,A..+) is not the case, it can't be that (&&,A..+) is the case
 
-    S, (&&,S,A..+), time(decomposeBelief) |- (&&,A..+), (Belief:DecomposePositiveNegativeNegative, Order:ForAllSame)
+    S, (&&,S,A..+), time(decomposeBelief) |- (&&,A..+), (Belief:DecomposePositiveNegativeNegative)
     S, (||,S,A..+)                        |- (||,A..+), (Belief:DecomposeNegativePositivePositive)
 
 //Additional for negation: https://groups.google.com/forum/#!topic/open-nars/g-7r0jjq2Vc
 
-    S, (&&,(--,S),A..+), time(decomposeBelief) |- (&&,A..+), (Belief:DecomposeNegativeNegativeNegative, Order:ForAllSame)
+    S, (&&,(--,S),A..+), time(decomposeBelief) |- (&&,A..+), (Belief:DecomposeNegativeNegativeNegative)
     S, (||,(--,S),A..+)                        |- (||,A..+), (Belief:DecomposePositivePositivePositive)
 
 //// multi-conditional syllogism ////////////////////////////////////////////////////////////////////////////////////
 //Inference about the pre/postconditions
 
-    Y, ((&&,X,A..+) ==> B), time(dtBeliefExact) |- substituteIfUnifies(((&&,A..+) ==> B),"$",X,Y), (Belief:Deduction, Order:ForAllSame)
+    Y, ((&&,X,A..+) ==> B), time(dtBeliefExact) |- substituteIfUnifies(((&&,A..+) ==> B),"$",X,Y), (Belief:Deduction)
 
 //conditional abduction
-    ((&&,M,A..+) ==> C), ((&&,A..+) ==> C) |- M, (Belief:Abduction, Order:ForAllSame)
+    ((&&,M,A..+) ==> C), ((&&,A..+) ==> C) |- M, (Belief:Abduction)
 //not sure why this also appears necessary
-    ((&&,M,N) ==> C), (N ==> C) |- M, (Belief:Abduction, Order:ForAllSame)
+    ((&&,M,N) ==> C), (N ==> C) |- M, (Belief:Abduction)
 
 
 //Can be derived by NAL7 rules so this won't be necessary there (Order:ForAllSame left out here)
@@ -333,9 +334,9 @@
 //the first rule does not have Order:ForAllSame because it would be invalid, see: https://groups.google.com/forum/#!topic/open-nars/r5UJo64Qhrk
     ((&&,A..+) ==> C), M, time(dtTask) notImplicationOrEquivalence(M) |- ((&&,M,A..+) ==> C), (Belief:Induction)
 
-    ((&&,M,A..+) ==> C), (B ==> M), time(dtUnion) |- ((&&,B,A..+) ==> C), (Belief:Deduction, Order:ForAllSame)
-    ((&&,B,A..+) ==> C), (B ==> M), time(dtTminB) |- ((&&,M,A..+) ==> C), (Belief:Abduction, Order:ForAllSame)
-    ((&&,M,A..+) ==> C), ((&&,B,A..+) ==> C), time(dtBminT) |- (B ==> M), (Belief:Induction, Order:ForAllSame)
+    ((&&,M,A..+) ==> C), (B ==> M), time(dtUnion) |- ((&&,B,A..+) ==> C), (Belief:Deduction)
+    ((&&,B,A..+) ==> C), (B ==> M), time(dtTminB) |- ((&&,M,A..+) ==> C), (Belief:Abduction)
+    ((&&,M,A..+) ==> C), ((&&,B,A..+) ==> C), time(dtBminT) |- (B ==> M), (Belief:Induction)
 
 //// variable introduction ////////////////////////////////////////////////////////////////////////////////////
 //Introduce variables by common subject or predicate

@@ -173,6 +173,7 @@ public class PremiseEval extends FindSubst {
 
         p.nar.eventConceptProcess.emit(p);
 
+
         deriver.run(this);
 
         clear();

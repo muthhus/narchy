@@ -71,14 +71,6 @@ public enum BeliefFunction implements TruthOperator {
         }
     },
 
-    @AllowOverlap
-    InductionOverlappable() {
-        @Nullable
-        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
-            return ((B == null) || (T == null)) ? null : TruthFunctions.induction(T, B, minConf);
-        }
-    },
-
     Abduction() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {

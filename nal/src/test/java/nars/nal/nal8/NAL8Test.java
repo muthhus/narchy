@@ -62,44 +62,6 @@ public class NAL8Test extends AbstractNALTest {
 
 
 
-    @Test public void subsent_1_simpler()  {
-        test()
-
-        .log()
-
-        .input("hold:t2. :|:") //@ 0
-        //.inputAt(5, "at:t1. :|:")
-        .inputAt(10, "(hold:t2 &&+5 (at:t1 &&+5 (open(t1) &&+5 [opened]:t1))).")
-        //.inputAt(15, "[opened]:t1. :|:")
-
-        .mustBelieve(cycles, "open(t1)",
-                //1.0f, 0.81f,
-                //-5);
-                1.0f, 0.34f,
-                10);
-
-    }
-
-    @Test public void subsent_1_even_simpler()  {
-        int time = cycles * 16;
-        test()
-                .log()
-                .input("at:t1. :|:") //@ 0
-                .inputAt(10, "(at:t1 &&+5 (open(t1) &&+5 [opened]:t1)).")
-                .mustBelieve(time, "open(t1)", 1.0f, 0.73f, 5)
-                .mustNotOutput(time, "open(t1)", '.', 1f, 1f, 0.59f, 0.59f, 5) //detect cyclic decomposition
-                .mustNotOutput(time, "open(t1)", '.', 1f, 1f, 0.32f, 0.32f, 5) //detect cyclic decomposition
-        ;
-    }
-    @Test public void subsent_1_even_simplerGoal()  {
-        int time = cycles * 16;
-        test()
-                .log()
-                .input("at:t1. :|:") //@ 0
-                .inputAt(10, "(at:t1 &&+5 (open(t1) &&+5 [opened]:t1))!")
-                .mustDesire(time, "open(t1)", 1.0f, 0.73f, 5)
-        ;
-    }
     @Test public void subsent_1_even_simpler_simplerBeliefEternal()  {
         test()
                 .log()
@@ -124,28 +86,7 @@ public class NAL8Test extends AbstractNALTest {
                 .mustDesire(cycles, "[opened]:t1", 1.0f, 0.81f, 5) //temporal
         ;
     }
-    @Test
-    public void subsent_simultaneous()  {
-        TestNAR tester = test();
 
-        //TODO decide correct parentheses ordering
-
-        //tester.nar.log();
-        tester.input("[opened]:t1. :|:");
-        tester.inputAt(10, "(hold:t2 &&+0 (at:t1 &&+0 (open(t1) &&+0 [opened]:t1))).");
-
-        //TODO Narsese parser for this:
-        //tester.mustBelieve(cycles, "( &&+0 ,(t1-->at),(t2-->hold),(t1-->[opened]),open(t1))",
-        tester.mustBelieve(cycles, "( && ,(t1-->at),(t2-->hold),(t1-->[opened]),open(t1))",
-                1.0f, 0.43f,
-                0);
-
-        tester.mustBelieve(cycles, "(&&, hold:t2, at:t1, open(t1)).",
-                1.0f, 0.81f,
-                ETERNAL);
-
-
-    }
 
 
 
@@ -253,7 +194,7 @@ public class NAL8Test extends AbstractNALTest {
     @Test
     public void condition_goal_deduction2()  {
         test()
-            .log()
+            //.log()
             .input("a:b!")
             .inputAt(10, "(( c:d &&+5 e:f ) ==>+0 a:b).")
             .mustDesire(cycles, "( c:d &&+5 e:f)", 1.0f, 0.81f);
@@ -299,7 +240,7 @@ public class NAL8Test extends AbstractNALTest {
 
     @Test public void testExecutionResult()  {
         test()
-            .log()
+            //.log()
             .input("<#y --> (/,^exe,x,_)>! :|:")
             .mustDesire(16, "exe(x, #1)", 1.0f, 0.9f, 0);
 
@@ -324,7 +265,7 @@ public class NAL8Test extends AbstractNALTest {
     public void detaching_single_premise()  {
         TestNAR tester = test();
         tester
-                .log()
+                //.log()
                 .input("(reachable:(SELF,{t002}) &&+5 pick({t002}))!")
                 .mustDesire(cycles, "reachable:(SELF,{t002})", 1.0f, 0.81f)
                 .mustDesire(cycles, "pick({t002})", 1.0f, 0.81f);
@@ -333,7 +274,7 @@ public class NAL8Test extends AbstractNALTest {
     public void detaching_single_premise_temporal()  {
         TestNAR tester = test();
         tester
-                .log()
+                //.log()
                 .input("(reachable:(SELF,{t002}) &&+5 pick({t002}))! :|:")
                 .mustDesire(6, "reachable:(SELF,{t002})", 1.0f, 0.81f, 0)
                 .mustDesire(6, "pick({t002})", 1.0f, 0.81f, 5)
@@ -373,7 +314,7 @@ public class NAL8Test extends AbstractNALTest {
     }
     public void condition_goal_deduction_3simpler()  {
         test()
-                .log()
+                //.log()
                 .inputAt(1, "at:t003!")
                 .inputAt(1, "(goto:$1 ==>+5 at:$1).")
 
@@ -532,16 +473,6 @@ public class NAL8Test extends AbstractNALTest {
 
     }
 
-    @Test public void arbitraryConjunction() {
-        test()
-            .believe("believe:(x).") //psuedo operators since operation is > nal6
-            .believe("want:(x).") //psuedo operators since operation is > nal6
-            .believe("((believe:($1) && want:($1)) ==> grateful:($1))")
-            //.mustBelieve(cycles*3, "(believe:(x) && want:(x)).", 1.00f, 0.81f)
-            .mustBelieve(cycles*3, "grateful:(x).", 1.00f, 0.73f);
-
-
-    }
 
     @Test
     public void goalInferredFromSimilarity()  {
