@@ -529,6 +529,8 @@ public class PremiseRule extends GenericCompound {
                         case "decomposeTask":
                             temporalize = Temporalize.decomposeTask;
                             break;
+
+                        //
                         case "decomposeTaskIfBefore":
                             temporalize = Temporalize.decomposeTask;
                             preNext = events.ifTermLinkIsBefore;

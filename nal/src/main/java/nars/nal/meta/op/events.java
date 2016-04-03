@@ -34,6 +34,18 @@ abstract public class events extends AtomicBooleanCondition<PremiseEval> {
 
     };
 
+    public static boolean beliefBeforeOrDuringTask(@NotNull ConceptProcess p) {
+        Task b = p.belief();
+        if (b == null) return false;
+        long tOcc = p.task().occurrence();
+        long bOcc = b.occurrence();
+        return !Tense.isEternal(bOcc) &&
+                !Tense.isEternal(tOcc) &&
+                ((bOcc - tOcc) >= 0);
+    }
+
+
+
     /** task is before or simultaneous with belief which follows (T ... B) */
     public static final events afterOrEternal = new events() {
 
@@ -76,7 +88,6 @@ abstract public class events extends AtomicBooleanCondition<PremiseEval> {
             if ((ttdt == DTERNAL) || (ttdt == 0)) {
                 return true;
             } else {
-                Term bt = m.premise.beliefTerm().term();
 
                 final int targetMatch;  //must match term
                 if (ttdt < 0) { //time reversed
@@ -84,7 +95,7 @@ abstract public class events extends AtomicBooleanCondition<PremiseEval> {
                 } else /*if (ttdt > 0) */{ //time forward
                     targetMatch = 0;
                 }
-                return tt.term(targetMatch).equals(bt);
+                return tt.term(targetMatch).equals(m.premise.beliefTerm().term());
             }
         }
 
@@ -111,16 +122,6 @@ abstract public class events extends AtomicBooleanCondition<PremiseEval> {
 //            return "dtBeliefSimultaneous";
 //        }
 //    };
-
-    public static boolean beliefBeforeOrDuringTask(@NotNull ConceptProcess p) {
-        Task b = p.belief();
-        if (b == null) return false;
-        long tOcc = p.task().occurrence();
-        long bOcc = b.occurrence();
-        return !Tense.isEternal(bOcc) &&
-                !Tense.isEternal(tOcc) &&
-                ((bOcc - tOcc) >= 0);
-    }
 
 
 

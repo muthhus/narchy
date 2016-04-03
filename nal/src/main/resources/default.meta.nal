@@ -242,7 +242,7 @@
 
     B, (A <=> C), time(dtBelief) |- substituteIfUnifies(C,"$",A,B), (Belief:Deduction, Desire:Induction, Order:ForAllSame)
 
-    (A ==> C), B, time(decomposeTask) |-  substituteIfUnifies( C, "$",A,B), (Belief:StructuralDeduction, Desire:Induction, Order:ForAllSame)
+    (A ==> C), B, time(decomposeTask) |-  substituteIfUnifies( C, "$",A,B), (Belief:StructuralDeduction, Desire:Deduction, Order:ForAllSame)
     (C ==> A), B, time(decomposeTask) |- substituteIfUnifies( C, "$",A,B), (Belief:StructuralDeduction, Desire:Deduction, Order:ForAllSame)
 
     B, (C ==> A), time(dtBelief) |- substituteIfUnifies( C, "$", A, B), (Belief:Abduction, Desire:Deduction, Order:ForAllSame)
@@ -283,13 +283,14 @@
 
 
 //// conjunction decompose AND dependent variable elimination - decomposition with elimination of a variable
-     (&&,X,A..+), B, time(decomposeTask) |- substituteIfUnifies((&&,A..+),"#",X,B), (Belief:AnonymousAnalogy, Order:ForAllSame)
+     (&&,X,A..+), B, time(decomposeTask), task(".") |- substituteIfUnifies((&&,A..+),"#",X,B), (Belief:AnonymousAnalogy, Order:ForAllSame)
 
 //the key behind executing learned sequences in the right sequence to the system and the key to respect learned preconditions properly
-     (&&,X,A..+), X, time(decomposeTask), task(".") |- (&&,A..+), (Belief:StructuralDeduction, Desire:StructuralStrong),
-                                                        X, (Belief:StructuralDeduction, Desire:StructuralStrong)
-
-     (A && B), A, task("!"), time(decomposeTaskIfBefore) |- B, (Desire:Strong)
+    // Original NAL7:
+    //      (&/,A_1..n), A_1 |- A_1, (Truth:StructuralDeduction, Desire:StructuralStrong)
+    //      (&/,B,A_1..n), B, task("!") |- (&/,A_1..n), (Desire:Strong, SequenceIntervals:FromPremises)
+     (&&,B,A..+), B, time(decomposeTaskIfBefore), task("!") |- (&&,A..+), (Desire:Strong)
+     (&&,B,A..+), B, time(decomposeTask) |- B, (Belief:StructuralDeduction, Desire:StructuralStrong)
 
 
 // Original: dependent variable elimination - decomposition with elimination of a variable
@@ -307,13 +308,13 @@
 //// propositional decomposition ////////////////////////////////////////////////////////////////////////////////////
 //If S is the case, and (&&,S,A..+) is not the case, it can't be that (&&,A..+) is the case
 
-    S, (&&,S,A..+) |- (&&,A..+), (Belief:DecomposePositiveNegativeNegative, Order:ForAllSame)
-    S, (||,S,A..+) |- (||,A..+), (Belief:DecomposeNegativePositivePositive)
+    S, (&&,S,A..+), time(decomposeBelief) |- (&&,A..+), (Belief:DecomposePositiveNegativeNegative, Order:ForAllSame)
+    S, (||,S,A..+)                        |- (||,A..+), (Belief:DecomposeNegativePositivePositive)
 
 //Additional for negation: https://groups.google.com/forum/#!topic/open-nars/g-7r0jjq2Vc
 
-    S, (&&,(--,S),A..+) |- (&&,A..+), (Belief:DecomposeNegativeNegativeNegative, Order:ForAllSame)
-    S, (||,(--,S),A..+) |- (||,A..+), (Belief:DecomposePositivePositivePositive)
+    S, (&&,(--,S),A..+), time(decomposeBelief) |- (&&,A..+), (Belief:DecomposeNegativeNegativeNegative, Order:ForAllSame)
+    S, (||,(--,S),A..+)                        |- (||,A..+), (Belief:DecomposePositivePositivePositive)
 
 //// multi-conditional syllogism ////////////////////////////////////////////////////////////////////////////////////
 //Inference about the pre/postconditions

@@ -130,6 +130,9 @@ public class PostCondition implements Serializable, Level //since there can be m
                     }
                     break;
 
+                case "Truth":
+                    throw new UnsupportedOperationException("Use Belief:.. or Desire:..");
+
                 case "Belief":
                     beliefTruth = which;
                     break;
