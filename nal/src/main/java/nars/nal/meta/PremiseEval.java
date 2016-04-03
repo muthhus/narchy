@@ -3,14 +3,10 @@ package nars.nal.meta;
 import com.gs.collections.api.map.ImmutableMap;
 import nars.$;
 import nars.Global;
-import nars.NAR;
 import nars.Op;
-import nars.bag.BLink;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
-import nars.concept.Concept;
 import nars.concept.ConceptProcess;
-import nars.concept.DefaultConceptProcess;
 import nars.nal.Deriver;
 import nars.nal.meta.constraint.MatchConstraint;
 import nars.nal.meta.op.MatchTerm;
@@ -18,17 +14,13 @@ import nars.nal.op.ImmediateTermTransform;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Termed;
-import nars.term.Terms;
 import nars.term.atom.Atomic;
-import nars.term.atom.AtomicStringConstant;
 import nars.term.transform.subst.FindSubst;
 import nars.truth.Truth;
 import nars.util.version.Versioned;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -52,9 +44,8 @@ public class PremiseEval extends FindSubst {
     @NotNull
     @Deprecated public final Versioned<MatchTerm> pattern;
 
-//    @NotNull
-//    public final TaskBeliefPair term = new TaskBeliefPair();
-    public Term taskTerm, beliefTerm;
+    @NotNull
+    public final TaskBeliefPair term = new TaskBeliefPair();
 
     //    /**
     //     * current "y"-term being matched against
@@ -71,7 +62,6 @@ public class PremiseEval extends FindSubst {
 
     /** cached value */
     private int termSub1Op, termSub2Op;
-    private ConceptProcess[] premises;
 
     public PremiseEval(Random r, Deriver deriver) {
         super(Op.VAR_PATTERN, r );
@@ -149,78 +139,26 @@ public class PremiseEval extends FindSubst {
 
     }
 
-
-    public static class TermLinkFork extends AtomicStringConstant implements BooleanCondition<PremiseEval> {
-
-        //public final static TermLinkFork the = new TermLinkFork();
-
-        ProcTerm next = null;
-
-        public TermLinkFork() {
-            super();
-        }
-
-        public void setNext(ProcTerm next) {
-            this.next = next;
-        }
-
-
-        @Override
-        public String toString() {
-            return "TermLinkFork";
-        }
-
-
-        @Nullable
-        @Override
-        public Op op() {
-            return Op.ATOM;
-        }
-
-        @Override
-        public boolean booleanValueOf(PremiseEval c) {
-
-            int start = c.now();
-            for (ConceptProcess p : c.premises) {
-
-                c.premise = p;
-
-                Term beliefTerm;
-                c.beliefTerm = beliefTerm = p.beliefTerm().term();  //experimental, prefer to use the belief term's Term in case it has more relevant TermMetadata (intermvals)
-
-                c.termutesPerMatch = p.getMaxMatches();
-
-                c.termSub2Op = beliefTerm.op().ordinal();
-
-                next.accept(c);
-
-                c.revert(start);
-            }
-            return false;
-        }
-    }
-
-
     /**
      * set the next premise
      */
-    public final void run(@NotNull BLink<Task> taskLink, ConceptProcess[] premises, NAR nar) {
+    public final void run(@NotNull ConceptProcess p) {
 
-        this.index = nar.index; //HACK
+        this.premise = p;
 
-        //1. match tasklink
+        this.index = premise.nar().index;
 
-        Task task = taskLink.get();
-        taskTerm = task.term();
+        Task task = p.task();
+        Compound taskTerm = task.term();
         punct.set(task.punc());
+
+        Term beliefTerm = p.beliefTerm().term();  //experimental, prefer to use the belief term's Term in case it has more relevant TermMetadata (intermvals)
+
+        this.termutesPerMatch = p.getMaxMatches();
+
+        term.set( taskTerm, beliefTerm );
         this.termSub1Op = taskTerm.op().ordinal();
-
-        this.premises = premises;
-
-
-        deriver.run(this);
-
-        clear();
+        this.termSub2Op = beliefTerm.op().ordinal();
 
         //term.set( termPattern );
 
@@ -233,11 +171,13 @@ public class PremiseEval extends FindSubst {
 
         //setPower(branchPower.get()); //HACK is this where it should be assigned?
 
-        //nar.eventConceptProcess.emit(p);
+        p.nar.eventConceptProcess.emit(p);
 
+        deriver.run(this);
+
+        clear();
 
     }
-
 
 //    public final void occurrenceAdd(long durationsDelta) {
 //        //TODO move to post

@@ -34,11 +34,8 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseEval> {
 
     @NotNull
     public final Term[] pre;
-
-    /** task and belief match codes, separate */
     @NotNull
-    public final Term[] codeT, codeB;
-
+    public final Term[] code;
     @NotNull
     public final Term term;
 
@@ -51,13 +48,13 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseEval> {
         this.term = pattern;
 
         List<BooleanCondition<PremiseEval>> pre = Global.newArrayList();
-        List<BooleanCondition<PremiseEval>> codeT = Global.newArrayList();
-        List<BooleanCondition<PremiseEval>> codeB = Global.newArrayList();
-        compile(pattern, pre, codeT, codeB, constraints);
+        List<BooleanCondition<PremiseEval>> code = Global.newArrayList();
+
+        compile(pattern, pre, code, constraints);
 
         this.pre = pre.toArray(new BooleanCondition[pre.size()]);
-        this.codeT = codeT.toArray(new BooleanCondition[codeT.size()]);
-        this.codeB = codeB.toArray(new BooleanCondition[codeB.size()]);
+        this.code = code.toArray(new BooleanCondition[code.size()]);
+
 
         //Term beliefPattern = pattern.term(1);
 
@@ -96,8 +93,7 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseEval> {
 
     private static void compile(@NotNull TaskBeliefPair pattern,
                                 @NotNull List<BooleanCondition<PremiseEval>> pre,
-                                @NotNull List<BooleanCondition<PremiseEval>> codeT,
-                                @NotNull List<BooleanCondition<PremiseEval>> codeB,
+                                @NotNull List<BooleanCondition<PremiseEval>> code,
                                 @NotNull ListMultimap<Term, MatchConstraint> constraints) {
 
 
@@ -111,40 +107,39 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseEval> {
         if (task.equals(belief)) {
             //add precondition constraint that task and belief must be equal.
             // assuming this succeeds, only need to test the task half
-            //addToEndOfPreGuards = new TaskBeliefEqualCondition();
-            codeB.add(new TaskBeliefEqualCondition());
+            addToEndOfPreGuards = new TaskBeliefEqualCondition();
             belief = null;
         }
 
-//        else if (task instanceof Compound && belief instanceof Compound && !task.isCommutative()
-//                && null==Ellipsis.firstEllipsis((Compound)task)
-//                && null==Ellipsis.firstEllipsis((Compound)belief)
-//                ) {
-//            int[] beliefInTask = ((Compound)task).isSubterm(belief);
-//            if (beliefInTask != null) {
-//                //add precondition for this constraint that is checked between the premise's terms
-//                //assuming this succeeds, only need to test the task half
-//                addToEndOfPreGuards = new ComponentCondition(0, beliefInTask, 1);
-//                belief = null;
-//            }
-//        }
-//
-//        else if (belief instanceof Compound && task instanceof Compound && !belief.isCommutative()
-//                && null==Ellipsis.firstEllipsis((Compound)belief)
-//                && null==Ellipsis.firstEllipsis((Compound)task)
-//         ) {
-//            int[] taskInBelief = ((Compound)belief).isSubterm(task);
-//            if (taskInBelief != null) {
-//                //add precondition for this constraint that is checked between the premise's terms
-//                //assuming this succeeds, only need to test the belief half
-//                addToEndOfPreGuards = new ComponentCondition(1, taskInBelief, 0);
-//                task = null;
-//            }
-//        }
+        else if (task instanceof Compound && belief instanceof Compound && !task.isCommutative()
+                && null==Ellipsis.firstEllipsis((Compound)task)
+                && null==Ellipsis.firstEllipsis((Compound)belief)
+                ) {
+            int[] beliefInTask = ((Compound)task).isSubterm(belief);
+            if (beliefInTask != null) {
+                //add precondition for this constraint that is checked between the premise's terms
+                //assuming this succeeds, only need to test the task half
+                addToEndOfPreGuards = new ComponentCondition(0, beliefInTask, 1);
+                belief = null;
+            }
+        }
+
+        else if (belief instanceof Compound && task instanceof Compound && !belief.isCommutative()
+                && null==Ellipsis.firstEllipsis((Compound)belief)
+                && null==Ellipsis.firstEllipsis((Compound)task)
+         ) {
+            int[] taskInBelief = ((Compound)belief).isSubterm(task);
+            if (taskInBelief != null) {
+                //add precondition for this constraint that is checked between the premise's terms
+                //assuming this succeeds, only need to test the belief half
+                addToEndOfPreGuards = new ComponentCondition(1, taskInBelief, 0);
+                task = null;
+            }
+        }
 
 
         //default case: exhaustively match both, with appropriate pruning guard preconditions
-        compileTaskBelief(pre, codeT, codeB, task, belief, pattern, constraints);
+        compileTaskBelief(pre, code, task, belief, pattern, constraints);
 
         //put this one after the guards added in the compileTaskBelief like checking for op, subterm vector etc which will be less expensive
         if (addToEndOfPreGuards!=null)
@@ -153,10 +148,7 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseEval> {
 
     private static void compileTaskBelief(
             @NotNull List<BooleanCondition<PremiseEval>> pre,
-            @NotNull List<BooleanCondition<PremiseEval>> codeT,
-            @NotNull List<BooleanCondition<PremiseEval>> codeB,
-
-            @Nullable Term task, @Nullable Term belief, TaskBeliefPair pattern, @NotNull ListMultimap<Term, MatchConstraint> constraints) {
+            @NotNull List<BooleanCondition<PremiseEval>> code, @Nullable Term task, @Nullable Term belief, TaskBeliefPair pattern, @NotNull ListMultimap<Term, MatchConstraint> constraints) {
 
         boolean taskIsPatVar = task!=null && task.op() == Op.VAR_PATTERN;
 
@@ -189,20 +181,20 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseEval> {
 
             if (task.volume() <= belief.volume()) {
                 //task first
-                codeT.add(new MatchTerm.MatchOneSubterm(task, cc, 0, false));
-                codeB.add(new MatchTerm.MatchOneSubterm(belief, cc, 1, true));
+                code.add(new MatchTerm.MatchOneSubterm(task, cc, 0, false));
+                code.add(new MatchTerm.MatchOneSubterm(belief, cc, 1, true));
             } else {
                 //belief first
-                codeB.add(new MatchTerm.MatchOneSubterm(belief, cc, 1, false));
-                codeT.add(new MatchTerm.MatchOneSubterm(task, cc, 0, true));
+                code.add(new MatchTerm.MatchOneSubterm(belief, cc, 1, false));
+                code.add(new MatchTerm.MatchOneSubterm(task, cc, 0, true));
             }
 
         } else if (belief!=null) {
             //match belief only
-            codeB.add(new MatchTerm.MatchOneSubterm(belief, cc, 1, true));
+            code.add(new MatchTerm.MatchOneSubterm(belief, cc, 1, true));
         } else if (task!=null) {
             //match task only
-            codeT.add(new MatchTerm.MatchOneSubterm(task, cc, 0, true));
+            code.add(new MatchTerm.MatchOneSubterm(task, cc, 0, true));
         } else {
             throw new RuntimeException("invalid");
         }
@@ -241,7 +233,8 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseEval> {
 
         @Override
         public boolean booleanValueOf(@NotNull PremiseEval m) {
-            return m.taskTerm.equals(m.beliefTerm);
+            Term[] x =  m.term.terms();
+            return x[0].equals(x[1]);
         }
 
         @Override
@@ -250,50 +243,50 @@ public class MatchTaskBelief extends AtomicBooleanCondition<PremiseEval> {
         }
     }
 
-//    /** matches the possibility that one half of the premise must be contained within the other.
-//     * this would in theory be more efficient than performing a complete match for the redundancies
-//     * which we can determine as a precondition of the particular task/belief pair
-//     * before even beginning the match. */
-//    static final class ComponentCondition extends AtomicBooleanCondition<PremiseEval> {
-//
-//        @NotNull
-//        private final String id;
-//        private final int container, contained;
-//        private final int[] path;
-//
-//        public ComponentCondition(int container, int[] path, int contained) {
-//            this.id = "component(" + container + ",(" + Joiner.on(",").join(
-//                    Ints.asList(path)
-//            ) + ")," + contained + ')';
-//
-//            this.container = container;
-//            this.contained = contained;
-//            this.path = path;
-//        }
-//
-//        @Override
-//        public boolean booleanValueOf(@NotNull PremiseEval m) {
-//            Term[] x =  m.taskTerm.terms();
-//            Term maybeContainer = x[this.container];
-//            if (!(maybeContainer instanceof Compound))
-//                return false;
-//            Compound container = (Compound)maybeContainer;
-//            Term contained = x[this.contained];
-//            if (!container.impossibleSubterm(contained)) {
-//                Term whatsThere = container.subterm(path);
-//                if ((whatsThere != null) && contained.equals(whatsThere))
-//                    return true;
-//            }
-//            return false;
-//        }
-//
-//
-//        @NotNull
-//        @Override
-//        public String toString() {
-//            return id;
-//        }
-//    }
+    /** matches the possibility that one half of the premise must be contained within the other.
+     * this would in theory be more efficient than performing a complete match for the redundancies
+     * which we can determine as a precondition of the particular task/belief pair
+     * before even beginning the match. */
+    static final class ComponentCondition extends AtomicBooleanCondition<PremiseEval> {
+
+        @NotNull
+        private final String id;
+        private final int container, contained;
+        private final int[] path;
+
+        public ComponentCondition(int container, int[] path, int contained) {
+            this.id = "component(" + container + ",(" + Joiner.on(",").join(
+                    Ints.asList(path)
+            ) + ")," + contained + ')';
+
+            this.container = container;
+            this.contained = contained;
+            this.path = path;
+        }
+
+        @Override
+        public boolean booleanValueOf(@NotNull PremiseEval m) {
+            Term[] x =  m.term.terms();
+            Term maybeContainer = x[this.container];
+            if (!(maybeContainer instanceof Compound))
+                return false;
+            Compound container = (Compound)maybeContainer;
+            Term contained = x[this.contained];
+            if (!container.impossibleSubterm(contained)) {
+                Term whatsThere = container.subterm(path);
+                if ((whatsThere != null) && contained.equals(whatsThere))
+                    return true;
+            }
+            return false;
+        }
+
+
+        @NotNull
+        @Override
+        public String toString() {
+            return id;
+        }
+    }
 
 //    private void compile(Term x, List<BooleanCondition<PremiseMatch>> code) {
 //        //??

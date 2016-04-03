@@ -3,7 +3,6 @@ package nars.nal.meta;
 import com.google.common.collect.Sets;
 import nars.concept.Concept;
 import nars.nal.Deriver;
-import nars.term.Term;
 import nars.term.Termed;
 import nars.term.index.PatternIndex;
 import org.apache.commons.math3.stat.Frequency;
@@ -19,10 +18,10 @@ public class RuleDerivationGraphTest {
     @Test public void testRuleTrie() {
         TrieDeriver x = Deriver.getDefaultDeriver();
         x.trie.printSummary();
-        for (Term p : x.roots) {
+        /*for (Term p : x.roots) {
             out.println();
             out.println(p);
-        }
+        }*/
         assert(x.roots.length > 1);
     }
 

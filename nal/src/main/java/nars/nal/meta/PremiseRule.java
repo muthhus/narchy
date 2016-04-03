@@ -187,21 +187,16 @@ public class PremiseRule extends GenericCompound {
 
         addAll(l, match.pre);
 
-        addAll(l, match.codeT);
-
-        l.add(new PremiseEval.TermLinkFork()); //fork on termlinks
-
         Solve truth = solver(post,
                 this, anticipate, immediate_eternalize, postPreconditions, temporalize
         );
         l.add(truth);
 
-        addAll(l, match.codeB);
-
-        //sortPreconditions(l);
+        sortPreconditions(l);
 
         //---
 
+        addAll(l, match.code);
 
         l.add(truth.getDerive()); //will be linked to and invoked by match callbacks
 

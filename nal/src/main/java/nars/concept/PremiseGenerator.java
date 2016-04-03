@@ -6,6 +6,7 @@ import nars.bag.BLink;
 import nars.bag.Bag;
 import nars.budget.Forget;
 import nars.data.Range;
+import nars.nal.Tense;
 import nars.nal.meta.PremiseEval;
 import nars.task.Task;
 import nars.term.Term;
@@ -137,19 +138,18 @@ abstract public class PremiseGenerator /*extends UnifySubst */implements Consume
             if (task.isDeleted())
                 continue;
 
-            premiseTask(termsArray, taskLink, task);
+            long occ = task.occurrence();
+
+            premiseTask(conceptLink, termsArray, taskLink, task, occ);
 
         }
 
     }
 
     /** begin matching the task half of a premise */
-    private void premiseTask(BLink<Termed>[] termLinks, BLink<Task> taskLink, Task task) {
+    private void premiseTask(@NotNull BLink<? extends Concept> concept, BLink<Termed>[] termsArray, BLink<Task> taskLink, Task task, long occ) {
 
-        int cp = 0;
-        long occ = task.occurrence();
-        ConceptProcess[] premises = new ConceptProcess[termLinks.length];
-        for (BLink<Termed> termLink : termLinks) {
+        for (BLink<Termed> termLink : termsArray) {
             if (termLink == null) break; //null-terminated array, ends
             Concept beliefConcept = nar.concept(termLink.get());
             Term termLinkTerm  = beliefConcept.term();
@@ -164,18 +164,14 @@ abstract public class PremiseGenerator /*extends UnifySubst */implements Consume
 
             //    abstract protected void premise(BLink<? extends Concept> concept, BLink<? extends Task> taskLink, BLink<? extends Termed> termLink, Task belief);
 
-            //newPremise...match(beliefConcept, occ)
-            premises[cp++] = newPremise(taskLink, termLink, match(beliefConcept, occ));
+            matcher.run(newPremise(concept, taskLink, termLink, match(beliefConcept, occ)));
+
         }
-
-        matcher.run(taskLink, premises, nar);
-
     }
 
-
     @NotNull
-    protected ConceptProcess newPremise(BLink<? extends Task> taskLink, BLink<? extends Termed> termLink, Task belief) {
-        return new DefaultConceptProcess(nar, taskLink, termLink, belief, nar::process);
+    protected ConceptProcess newPremise(BLink<? extends Concept> concept, BLink<? extends Task> taskLink, BLink<? extends Termed> termLink, Task belief) {
+        return new DefaultConceptProcess(nar, concept, taskLink, termLink, belief, nar::process);
     }
 
     /** resolves the most relevant belief of a given term/concept */
