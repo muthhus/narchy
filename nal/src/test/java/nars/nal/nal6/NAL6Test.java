@@ -402,11 +402,12 @@ public class NAL6Test extends AbstractNALTest {
         final float finalConf = 0.73f;
 
         test()
-        .believe(" <0 --> n>", 1.0f, 0.9f)
+        .believe("<0 --> n>", 1.0f, 0.9f)
         .believe("<<$1 --> n> ==> <(/,next,$1,_) --> n>>", 1.0f, 0.9f)
         .ask("<(/,next,(/,next,0,_),_) --> n>")
         .mustBelieve(time, "<(/,next,0,_) --> n>", 1.0f, 1.0f, 0.81f, 1.0f)
-        .mustBelieve(time, "<(/,next,(/,next,0,_),_) --> n>", 1.0f, 1.0f, finalConf, 1.0f);
+        //.mustBelieve(time, "<(/,next,(/,next,0,_),_) --> n>", 1.0f, 1.0f, finalConf, 1.0f);
+        .mustBelieve(time, "((/,next,(/,next,(/,next,0,_),_),_)-->n).", 1.0f, 1.0f, finalConf, 1.0f);
     }
 
     @Test
@@ -425,9 +426,11 @@ public class NAL6Test extends AbstractNALTest {
         .believe("( num:$1 ==> num:($1) )", 1.0f, 0.9f)
         .ask("num:(((0)))")
         //.mustBelieve(time, "num:(0)", 1.0f, 1.0f, 0.81f * easy, 1.0f)
-        //.mustBelieve(time, "num:((0))", 1.0f, 1.0f, 0.73f * easy, 1.0f)
-        .mustBelieve(time, "num:(((0)))", 1.0f, 1.0f, minConf * easy, 1.0f);
+        .mustBelieve(time, "num:((0))", 1.0f, 1.0f, 0.81f, 1.0f)
+        .mustBelieve(time, "num:((((0))))", 1.0f, 1.0f, 0.81f, 1.0f)
+        //.mustBelieve(time, "num:(((0)))", 1.0f, 1.0f, minConf * easy, 1.0f)
         // ''outputMustContain('<(((0))) --> num>. %1.00;0.26%')
+        ;
     }
 
 //    @Test public void missingEdgeCase1() {

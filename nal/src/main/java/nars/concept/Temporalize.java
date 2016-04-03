@@ -229,7 +229,11 @@ public interface Temporalize {
         long tOcc = decomposed.occurrence();
 
         if (tOcc != ETERNAL) {
-            occReturn[0] = ((ddt == DTERNAL) || (ddt == 0)) ? tOcc : (tOcc + dtt.subtermTime(derived));
+            occReturn[0] = ((ddt == DTERNAL) || (ddt == 0)) ? tOcc : (dtt.subtermTimeOrZero(derived, tOcc));
+
+//            if (occReturn[0] < -902337203685477580L) {
+//                System.err.println(derived + " " + dtt.subtermTimeOrZero(derived, tOcc) + " ");
+//            }
             return derived;
         } else {
             if (ddt != DTERNAL) {
@@ -252,10 +256,7 @@ public interface Temporalize {
                             Term dct = decTerm.term(i);
                             if (p.resolve(dct).equals(derived)) {
                                 occReturn[0] = baseOcc + decTerm.subtermTime(dct);
-//
-//                                if (occReturn[0] < -922337203685477580L) {
-//                                    System.err.println(derived);
-//                                }
+
 
                                 break;
                             }
@@ -264,6 +265,7 @@ public interface Temporalize {
                 }
             }
         }
+//
 
         //both are eternal, just return the component as an eternal belief
         return derived;

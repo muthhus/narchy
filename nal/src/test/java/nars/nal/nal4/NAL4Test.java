@@ -200,9 +200,11 @@ public class NAL4Test extends AbstractNALTest {
     @Test public void testRecursionForce1() {
         //    ((X,Z) --> Y), X |- ((X,Z)-->((/,Y,_,Z),Z)), (Belief:StructuralDeduction, Desire:StructuralDeduction)
         test()
+            .log()
             .believe("(x-->(/,y,_,z))")
-            .mustBelieve(32, "((x,z)-->((/,y,_,z),z))", 1f, 0.81f)
-            .mustBelieve(32, "((x,z)-->(x,(/,y,x,_)))", 1f, 0.81f);
+            .ask("((x,z)-->?a)")
+            .mustBelieve(164, "((x,z)-->((/,y,_,z),z))", 1f, 0.81f)
+            .mustBelieve(164, "((x,z)-->(x,(/,y,x,_)))", 1f, 0.81f);
 
     }
 

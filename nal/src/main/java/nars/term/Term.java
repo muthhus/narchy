@@ -200,6 +200,10 @@ public interface Term extends Termed, Comparable, Termlike {
     default long subtermTime(Term x) {
         return subtermTime(x, this instanceof Compound ? ((Compound)this).dt() : DTERNAL);
     }
+    default long subtermTimeOrZero(Term x, long offset) {
+        long e = subtermTime(x, this instanceof Compound ? ((Compound)this).dt() : DTERNAL);
+        return e == ETERNAL ? ETERNAL : e + offset;
+    }
 
     /** matches the first occuring event's time relative to this temporal relation, with parameter for a hypothetical dt */
     default long subtermTime(Term x, int dt) {
