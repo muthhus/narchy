@@ -191,7 +191,7 @@ public class OperationConcept extends CompoundConcept implements Runnable {
 //        return desired;
 //    }
 
-    public final float motivation() {
+    public  float motivation() {
         float b = this.believed;
         float d = this.desired;
         return (d - b); // / (Math.abs(d) + Math.abs(b));

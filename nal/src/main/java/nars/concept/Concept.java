@@ -320,11 +320,15 @@ public interface Concept extends Termed, Comparable {
     }
 
     default float beliefMotivation(long now, int duration) {
-        return hasBeliefs() ? beliefs().truth(now, duration).motivation() : 0;
+        return hasBeliefs() ? beliefs().truth(now, duration)
+                //.expectation() : 0;
+                .motivation() : 0;
     }
 
     default float goalMotivation(long now, int duration) {
-        return hasGoals() ? goals().truth(now, duration).motivation() : 0;
+        return hasGoals() ? goals().truth(now, duration)
+                //.expectation() : 0;
+                .motivation() : 0;
     }
 
 

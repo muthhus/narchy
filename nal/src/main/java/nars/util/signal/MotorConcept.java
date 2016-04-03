@@ -25,6 +25,8 @@ public class MotorConcept extends OperationConcept implements Consumer<NAR>, Flo
     @NotNull
     private final Sensor feedback;
     private final Logger logger;
+
+    /** input: +1, -1   output feedback: 0..1 */
     private FloatToFloatFunction motor;
     float nextFeedback;
 

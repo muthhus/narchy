@@ -569,6 +569,7 @@ public interface TermIndex {
         } else {
             //COMPOUND -------
             Compound tc = (Compound)term.term();
+
             if (tc.op() == NEGATE && tc.term(0) instanceof Atomic) {
                 //negations of atoms are invalid
                 throw new InvalidConceptTerm(term);

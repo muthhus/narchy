@@ -283,6 +283,7 @@
 
 
 //// conjunction decompose AND dependent variable elimination - decomposition with elimination of a variable
+     (&&,X,A..+), X, time(decomposeTask) |- X, (Belief:StructuralDeduction, Desire:StructuralStrong)
      (&&,X,A..+), B, time(decomposeTask), task(".") |- substituteIfUnifies((&&,A..+),"#",X,B), (Belief:AnonymousAnalogy, Order:ForAllSame)
 
 //the key behind executing learned sequences in the right sequence to the system and the key to respect learned preconditions properly

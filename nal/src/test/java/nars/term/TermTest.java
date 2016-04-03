@@ -132,6 +132,15 @@ public class TermTest {
     }
 
     @Test
+    public void testConjunction1Term() throws Narsese.NarseseException {
+        assertEquals("a", n.term("(&&,a)").toString());
+        assertEquals("x(a)", n.term("(&&,x(a))").toString());
+        assertEquals("a", n.term("(&&,a, a)").toString());
+        //assertEquals("a", n.term("(&&+0,a)").toString());
+        //assertEquals("a", n.term("(&&+3,a)").toString());
+    }
+
+    @Test
     public void testConjunctionTreeSet() throws Narsese.NarseseException {
 
         //these 2 representations are equal, after natural ordering

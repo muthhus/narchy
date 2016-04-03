@@ -202,8 +202,8 @@ abstract public class ConceptProcess implements Premise {
 
                     .time(now, ETERNAL)
 
-                    .parent(derived)  //this is lighter weight and potentially easier on GC than: parent(task, belief)
-                    //.parent(task(), !single ? belief() : null)
+                    //.parent(derived)  //this is lighter weight and potentially easier on GC than: parent(task, belief) MAYBE WRONG wrt cyclicity
+                    .parent(task(), !single ? belief() : null)
 
                     .budgetCompoundForward(budget, this)
 

@@ -81,16 +81,49 @@ public class NAL8Test extends AbstractNALTest {
     }
 
     @Test public void subsent_1_even_simpler()  {
+        int time = cycles * 16;
         test()
                 .log()
                 .input("at:t1. :|:") //@ 0
                 .inputAt(10, "(at:t1 &&+5 (open(t1) &&+5 [opened]:t1)).")
-                .mustBelieve(cycles, "open(t1)", 1.0f, 0.73f, 5)
-                .mustNotOutput(cycles, "open(t1)", '.', 1f, 1f, 0.59f, 0.59f, 5) //detect cyclic decomposition
-                .mustNotOutput(cycles, "open(t1)", '.', 1f, 1f, 0.32f, 0.32f, 5) //detect cyclic decomposition
+                .mustBelieve(time, "open(t1)", 1.0f, 0.73f, 5)
+                .mustNotOutput(time, "open(t1)", '.', 1f, 1f, 0.59f, 0.59f, 5) //detect cyclic decomposition
+                .mustNotOutput(time, "open(t1)", '.', 1f, 1f, 0.32f, 0.32f, 5) //detect cyclic decomposition
         ;
     }
-
+    @Test public void subsent_1_even_simplerGoal()  {
+        int time = cycles * 16;
+        test()
+                .log()
+                .input("at:t1. :|:") //@ 0
+                .inputAt(10, "(at:t1 &&+5 (open(t1) &&+5 [opened]:t1))!")
+                .mustDesire(time, "open(t1)", 1.0f, 0.73f, 5)
+        ;
+    }
+    @Test public void subsent_1_even_simpler_simplerBeliefEternal()  {
+        test()
+                .log()
+                .input("(open(t1) &&+5 [opened]:t1).")
+                .mustBelieve(cycles, "open(t1)", 1.0f, 0.81f) //only eternal
+                .mustNotOutput(cycles, "open(t1)", '.',  0) //no temporal
+        ;
+    }
+    @Test public void subsent_1_even_simpler_simplerGoalEternal()  {
+        test()
+                .log()
+                .input("(open(t1) &&+5 [opened]:t1)!")
+                .mustDesire(cycles, "open(t1)", 1.0f, 0.81f) //only eternal
+                .mustNotOutput(cycles, "open(t1)", '!',  0) //no temporal
+        ;
+    }
+    @Test public void subsent_1_even_simpler_simplerGoalTemporal()  {
+        test()
+                .log()
+                .input("(open(t1) &&+5 [opened]:t1)! :|:")
+                .mustDesire(cycles, "open(t1)", 1.0f, 0.81f, 0) //temporal
+                .mustDesire(cycles, "[opened]:t1", 1.0f, 0.81f, 5) //temporal
+        ;
+    }
     @Test
     public void subsent_simultaneous()  {
         TestNAR tester = test();
@@ -291,6 +324,7 @@ public class NAL8Test extends AbstractNALTest {
     public void detaching_single_premise()  {
         TestNAR tester = test();
         tester
+                .log()
                 .input("(reachable:(SELF,{t002}) &&+5 pick({t002}))!")
                 .mustDesire(cycles, "reachable:(SELF,{t002})", 1.0f, 0.81f)
                 .mustDesire(cycles, "pick({t002})", 1.0f, 0.81f);
