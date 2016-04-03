@@ -374,7 +374,9 @@ public interface Temporalize {
 
         Task task = premise.task();
         int taskDT = task.term().dt();
-        int beliefDT = premise.beliefTerm().term().dt();
+        Term bt = premise.beliefTerm().term();
+
+        int beliefDT = (bt instanceof Compound) ? ((Compound) bt).dt() : DTERNAL;
 
         int eventDelta;
         if (taskDT == DTERNAL && beliefDT == DTERNAL) {

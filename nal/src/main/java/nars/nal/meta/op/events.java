@@ -3,10 +3,15 @@ package nars.nal.meta.op;
 import nars.concept.ConceptProcess;
 import nars.nal.Tense;
 import nars.nal.meta.AtomicBooleanCondition;
+import nars.nal.meta.BooleanCondition;
 import nars.nal.meta.PremiseEval;
 import nars.task.Task;
+import nars.term.Compound;
+import nars.term.Term;
+import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 
+import static nars.nal.Tense.DTERNAL;
 import static nars.nal.Tense.ETERNAL;
 
 /**
@@ -55,6 +60,34 @@ abstract public class events extends AtomicBooleanCondition<PremiseEval> {
                 return (!bEternal && bOcc <= tOcc);
             }
         }
+    };
+    public static final BooleanCondition ifTermLinkIsBefore = new events() {
+        @Override
+        public String toString() {
+            return "ifTermLinkIsBefore";
+        }
+
+        @Override
+        public boolean booleanValueOf(@NotNull PremiseEval m) {
+
+            Compound tt = m.premise.task().term();
+            int ttdt = tt.dt();
+
+            if ((ttdt == DTERNAL) || (ttdt == 0)) {
+                return true;
+            } else {
+                Term bt = m.premise.beliefTerm().term();
+
+                final int targetMatch;  //must match term
+                if (ttdt < 0) { //time reversed
+                    targetMatch = 1;
+                } else /*if (ttdt > 0) */{ //time forward
+                    targetMatch = 0;
+                }
+                return tt.term(targetMatch).equals(bt);
+            }
+        }
+
     };
 
 //    /** ITERNAL or 0, used in combination with a Temporalize that uses the same dt as the task */

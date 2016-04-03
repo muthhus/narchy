@@ -30,7 +30,7 @@ public class TrieDeriver extends Deriver {
     public final TermTrie<Term, PremiseRule> trie;
 
     /** derivation term graph, gathered for analysis */
-    public final HashMultimap<MatchTerm,Derive> derivationLinks = HashMultimap.create();
+    //public final HashMultimap<MatchTerm,Derive> derivationLinks = HashMultimap.create();
 
     public TrieDeriver(String... rule) {
         this(new PremiseRuleSet(Lists.newArrayList(rule)));
@@ -141,7 +141,7 @@ public class TrieDeriver extends Deriver {
                     //HACK
                     Derive dx = (Derive) x;
                     mt.derive(dx);
-                    derivationLinks.put(mt, dx);
+                    //derivationLinks.put(mt, dx);
                 }
                 return false;
             } else {
