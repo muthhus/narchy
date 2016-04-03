@@ -147,6 +147,9 @@ public enum $ /* TODO: implements TermIndex */ {
     public static Term impl(@NotNull Term a, @NotNull Term b) {
         return the(IMPLICATION, a, b);
     }
+    public static Term impl(@NotNull Term a, @NotNull Term b, int dt) {
+        return the(IMPLICATION, -1, dt, TermVector.the(a, b));
+    }
 
     @Nullable
     public static Term neg(@NotNull Term x) {

@@ -11,6 +11,7 @@ import nars.term.Term;
 import nars.term.compound.GenericCompound;
 import nars.util.FloatSupplier;
 import nars.util.data.Sensor;
+import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.util.data.Sensor.direct;
@@ -23,6 +24,9 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
     private FloatSupplier input;
     private float current = Float.NaN;
 
+    public SensorConcept(@NotNull String compoundTermString, @NotNull NAR n, MutableFloat v) throws Narsese.NarseseException {
+        this(compoundTermString, n, v::floatValue);
+    }
 
     public SensorConcept(@NotNull String compoundTermString, @NotNull NAR n, FloatSupplier input) throws Narsese.NarseseException {
         this($.$(compoundTermString), n, input, direct);

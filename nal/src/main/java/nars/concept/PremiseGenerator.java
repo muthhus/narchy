@@ -151,8 +151,9 @@ abstract public class PremiseGenerator /*extends UnifySubst */implements Consume
 
         for (BLink<Termed> termLink : termsArray) {
             if (termLink == null) break; //null-terminated array, ends
-            Concept beliefConcept = nar.concept(termLink.get());
-            Term termLinkTerm  = beliefConcept.term();
+            Termed tl = termLink.get();
+            Concept beliefConcept = nar.concept(tl);
+            Term termLinkTerm  = tl.term();
 
             if (Terms.equalSubTermsInRespectToImageAndProduct(task.term(), termLinkTerm ))
                 continue;
@@ -178,7 +179,7 @@ abstract public class PremiseGenerator /*extends UnifySubst */implements Consume
     @Nullable
     public final Task match(@NotNull Concept beliefConcept, long taskOcc) {
 
-        if ((beliefConcept != null) && (beliefConcept.hasBeliefs())) {
+        if (beliefConcept.hasBeliefs()) {
 
             Task belief = beliefConcept.beliefs().top(
                     //nar.time()

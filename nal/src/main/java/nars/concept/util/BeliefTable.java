@@ -156,6 +156,10 @@ public interface BeliefTable extends TaskTable {
     @Nullable Task add(@NotNull Task input, NAR nar);
 
 
+    default Task top(NAR nar) {
+        return top(nar.time());
+    }
+
     @Nullable
     default Task top(long now) {
         return top(now, now);

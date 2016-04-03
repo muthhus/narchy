@@ -238,26 +238,17 @@
 
 //// conditional syllogism ////////////////////////////////////////////////////////////////////////////////////
 //If after M, P usually happens, and M happens, it means P is expected to happen
+    M, (M ==> P), time(dtBeliefEnd) |- P, (Belief:Deduction, Desire:Induction)
+    M, (P ==> M), time(dtBelief) |- P, (Belief:Abduction, Desire:Deduction)
+    M, (S <=> M), time(dtBelief) |- S, (Belief:Analogy, Desire:Strong)
 
 
-    B, (A <=> C), time(dtBelief) |- substituteIfUnifies(C,"$",A,B), (Belief:Deduction, Desire:Induction)
-
-    (A ==> C), B, time(decomposeTask) |-  substituteIfUnifies( C, "$",A,B), (Belief:StructuralDeduction, Desire:Deduction)
-    (C ==> A), B, time(decomposeTask) |- substituteIfUnifies( C, "$",A,B), (Belief:StructuralDeduction, Desire:Deduction)
-
-    B, (C ==> A), time(dtBelief) |- substituteIfUnifies( C, "$", A, B), (Belief:Abduction, Desire:Deduction)
-    B, (A ==> C), time(dtBeliefEnd) |- substituteIfUnifies( C, "$", A, B), (Belief:Deduction, Desire:Induction, Event:Anticipate)
-//    B, (C ==> A) |- substituteIfUnifies(C,"$",A,B), (Belief:Abduction, Desire:Abduction)
-//    B, (A ==> C) |- substituteIfUnifies(C,"$",A,B), (Belief:Deduction, Desire:Induction, Event:Anticipate)
+//Indep variable elimination
+    B, (A ==> C), time(dtBelief) |- substituteIfUnifies(C,"$",A,B), (Belief:Deduction)
+    B, (C ==> A), time(dtBelief) |- substituteIfUnifies(C,"$",A,B), (Belief:Abduction)
+    B, (A <=> C), time(dtBelief) |- substituteIfUnifies(C,"$",A,B), (Belief:Deduction)
 
 
-//    (A ==> B), A, time(dtTaskEnd) |- B, (Belief:StructuralDeduction, Desire:Induction)
-//    (A ==> B), B, time(dtTask) |- A, (Belief:StructuralDeduction, Desire:Deduction, Event:Anticipate)
-
-//    (C ==> A), B, time(dtTask) |-  substituteIfUnifies( C, "$",A,B), (Belief:StructuralAbduction, Desire:Deduction)
-//    (A ==> B), B |- A, (Belief:StructuralDeduction, Desire:Deduction, Event:Anticipate)
-
-//    A, (A ==> B) |- B, (Belief:Abduction, Desire:Abduction)
 
 ////NAL7 specific inference ////////////////////////////////////////////////////////////////////////////////////
 //Reasoning about temporal statements. those are using the ==> relation because relation in time is a relation of the truth between statements.
