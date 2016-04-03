@@ -274,7 +274,8 @@
 
 
 //// conjunction decompose AND dependent variable elimination - decomposition with elimination of a variable
-     (&&,X,A..+), X, time(decomposeTask) |- X, (Belief:StructuralDeduction, Desire:StructuralStrong)
+     (&&,X,A..+), X, time(decomposeTask) |- X, (Belief:StructuralDeduction, Desire:StructuralStrong),
+                                            (&&,A..+), (Belief:StructuralDeduction, Desire:StructuralStrong)
 
      (&&,X,A..+), B, time(decomposeTask), task(".") |- substituteIfUnifies((&&,A..+),"#",X,B), (Belief:AnonymousAnalogy)
 
