@@ -4,9 +4,11 @@ import com.google.common.base.Joiner;
 import nars.$;
 import nars.Global;
 import nars.NAR;
+import nars.concept.JunctionConcept;
 import nars.concept.OperationConcept;
 import nars.nal.Tense;
 import nars.nar.Default;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.util.signal.SensorConcept;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -109,8 +111,16 @@ public class MotivationTest {
         OperationConcept y = new OperationConcept("do(that)", n);
 
 
-        Term ab = $.conj(0, A, B); //AND
-        //Term ab = $.isect(A, B); //AND?
+        Compound ab = (Compound) $.conj(A, B); //AND
+        JunctionConcept.ConjunctionConcept abc = new JunctionConcept.ConjunctionConcept(ab, n);
+        /*n.onFrame(nn->{
+            if (abc.hasBeliefs())
+                System.out.println(abc.beliefs().top(nn.time()));
+            if (abc.hasGoals())
+                System.out.println(abc.goals().top(nn.time()));
+        });*/
+
+        //Term ab = $.esect(A, B); //AND?
         //Term ab = $.disj(A, B); //OR
         //Term ab = $.disj( $.conj($.negate(A), B), $.conj($.negate(B), A) ) ; //XOR
         //$.negate($.intersect(A, B)) //XOR
@@ -122,7 +132,16 @@ public class MotivationTest {
         //n.believe($.impl( $.conj(A,B), y), Tense.Present, 1f, 0.95f);
         //n.believe($.impl(y, 0, B), Tense.Present, 1f, 0.95f);
         //n.goal(antilink, Tense.Eternal, 0f, 0.95f);
-        n.believe($.impl( A, 0, y), Tense.Present, 1f, 0.95f);
+
+        {
+            //OR
+            //n.believe($.impl( A, /*0,*/ y), Tense.Present, 0.75f, 0.75f);
+            //n.believe($.impl( B, /*0,*/ y), Tense.Present, 0.75f, 0.75f);
+        }
+
+        //n.input(abc + "?");
+        n.believe($.impl( abc, 0, y/*0,*/), Tense.Present, 1f, 0.95f);
+
 
         //a.setValue(0f); b.setValue(0f); //start OFF
         a.setValue(1f); b.setValue(1f);
@@ -142,6 +161,12 @@ public class MotivationTest {
         int t2 = timeUntil("switch off", n, nn -> {
             System.out.println(Joiner.on(',').join(y.goals()) + " " +  y.motivation());
             return y.motivation() <= -0.1f;
+        }, 150);
+
+        b.setValue(1f);
+        int t3 = timeUntil("switch half", n, nn -> {
+            System.out.println(Joiner.on(',').join(y.goals()) + " " +  y.motivation());
+            return y.motivation() >= 0.01f;
         }, 150);
 
     }

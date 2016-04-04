@@ -68,17 +68,17 @@ public class CompoundConcept extends AbstractConcept<GenericCompound> implements
     }
 
     public CompoundConcept(@NotNull String compoundTermString, @NotNull NAR n) throws Narsese.NarseseException {
-        this((GenericCompound) $.$(compoundTermString), n);
+        this((Compound) $.$(compoundTermString), n);
     }
 
     /** used for setting an explicit OperationConcept instance via java; activates it on initialization */
     public CompoundConcept(@NotNull Compound term, @NotNull NAR n) {
-        this((GenericCompound)term, n.index.conceptBuilder());
+        this(term, n.index.conceptBuilder());
     }
 
     /** default construction by a NAR on conceptualization */
-    public CompoundConcept(@NotNull GenericCompound term, @NotNull ConceptBuilder b) {
-        this(term, b.termbag(), b.taskbag());
+    public CompoundConcept(@NotNull Compound term, @NotNull ConceptBuilder b) {
+        this((GenericCompound) term, b.termbag(), b.taskbag());
     }
 
 
@@ -112,7 +112,7 @@ public class CompoundConcept extends AbstractConcept<GenericCompound> implements
      */
     @NotNull
     @Override
-    public final BeliefTable beliefs() {
+    public BeliefTable beliefs() {
         return tableOrEmpty(beliefs);
     }
 
@@ -121,7 +121,7 @@ public class CompoundConcept extends AbstractConcept<GenericCompound> implements
      */
     @NotNull
     @Override
-    public final BeliefTable goals() {
+    public BeliefTable goals() {
         return tableOrEmpty(goals);
     }
 
@@ -252,11 +252,11 @@ public class CompoundConcept extends AbstractConcept<GenericCompound> implements
     }
 
     @NotNull
-    protected ArrayBeliefTable newBeliefTable(int cap) {
+    protected BeliefTable newBeliefTable(int cap) {
         return new ArrayBeliefTable(capacity(cap, true, true), capacity(cap, true, false));
     }
     @NotNull
-    protected ArrayBeliefTable newGoalTable(int cap) {
+    protected BeliefTable newGoalTable(int cap) {
         return new ArrayBeliefTable(capacity(cap, false, true), capacity(cap, false, false));
     }
 
