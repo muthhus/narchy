@@ -8,9 +8,9 @@ import nars.bag.Bag;
 import nars.nal.Tense;
 import nars.nal.nal8.Execution;
 import nars.task.Task;
+import nars.term.Compound;
 import nars.term.Operator;
 import nars.term.Termed;
-import nars.term.compound.GenericCompound;
 import nars.util.event.Topic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -45,7 +45,7 @@ public class OperationConcept extends CompoundConcept implements Runnable {
     public transient NAR nar;
 
 
-    public OperationConcept(@NotNull GenericCompound term, Bag<Termed> termLinks, Bag<Task> taskLinks) {
+    public OperationConcept(@NotNull Compound term, Bag<Termed> termLinks, Bag<Task> taskLinks) {
         super(term, termLinks, taskLinks);
         ensureOperation(term);
 
@@ -58,7 +58,7 @@ public class OperationConcept extends CompoundConcept implements Runnable {
         n.on(this);
     }
 
-    static void ensureOperation(@NotNull GenericCompound term) {
+    static void ensureOperation(@NotNull Compound term) {
         if (!Op.isOperation(term))
             throw new RuntimeException(term + " is not an Operation");
     }

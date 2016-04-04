@@ -114,6 +114,11 @@ public class TemporalRelationsTest {
         assertEquals(0, $(x).subtermTime($(y)));
 
     }
+    @Test public void testSubtermNonCommutivePosNeg() {
+        Term ct = $("((d-->c) ==>-3 (c-->b))");
+        assertEquals(-3, ct.subtermTime($("(c-->b)")));
+        assertEquals(0, ct.subtermTime($("(d-->c)")));
+    }
 
     @Test public void testNonCommutivityImplConcept() {
         NAR n = new Default();
@@ -131,7 +136,7 @@ public class TemporalRelationsTest {
     @Test public void testCommutivity() {
 
         assertTrue( $("(b && a)").isCommutative() );
-        assertFalse( $("(b &&+1 a)").isCommutative() );
+        assertTrue( $("(b &&+1 a)").isCommutative() );
 
 
         Term abc = $("((a &&+0 b) &&+0 c)");

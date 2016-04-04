@@ -9,7 +9,6 @@ import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -24,7 +23,7 @@ import java.util.function.Consumer;
 import static nars.nal.Tense.DTERNAL;
 
 
-public class CompoundConcept extends AbstractConcept<GenericCompound> implements Compound {
+public class CompoundConcept extends AbstractConcept<Compound> implements Compound {
 
 //    public static final BiPredicate<Task, Task> questionEquivalence = new BiPredicate<Task, Task>() {
 //
@@ -63,7 +62,7 @@ public class CompoundConcept extends AbstractConcept<GenericCompound> implements
      * @param termLinks
      * @param taskLinks
      */
-    public CompoundConcept(@NotNull GenericCompound term, Bag<Termed> termLinks, Bag<Task> taskLinks) {
+    public CompoundConcept(@NotNull Compound term, Bag<Termed> termLinks, Bag<Task> taskLinks) {
         super(term, taskLinks, termLinks);
     }
 
@@ -78,7 +77,7 @@ public class CompoundConcept extends AbstractConcept<GenericCompound> implements
 
     /** default construction by a NAR on conceptualization */
     public CompoundConcept(@NotNull Compound term, @NotNull ConceptBuilder b) {
-        this((GenericCompound) term, b.termbag(), b.taskbag());
+        this(term, b.termbag(), b.taskbag());
     }
 
 
@@ -790,7 +789,7 @@ public class CompoundConcept extends AbstractConcept<GenericCompound> implements
 
     @Override
     public final @NotNull TermContainer subterms() {
-        return term.subterms;
+        return term.subterms();
     }
 
     @Override
@@ -800,12 +799,12 @@ public class CompoundConcept extends AbstractConcept<GenericCompound> implements
 
     @Override
     public final int relation() {
-        return term.relation;
+        return term.relation();
     }
 
     @Override @NotNull
     public final Op op() {
-        return term.op;
+        return term.op();
     }
 
     @Override

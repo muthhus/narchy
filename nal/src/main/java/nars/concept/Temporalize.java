@@ -221,13 +221,14 @@ public interface Temporalize {
     static Compound decompose(@NotNull Compound derived, @NotNull PremiseEval p, @NotNull long[] occReturn, boolean decomposeTask) {
         ConceptProcess prem = p.premise;
 
-        Termed<Compound> decomposed = decomposeTask ? prem.task() : prem.belief();
+        Termed<Compound> decomposed = decomposeTask ? prem.task() : prem.beliefTerm();
         long tOcc = prem.task().occurrence();
 
         //if ((tOcc == ETERNAL) && (prem.belief()!=null))
         //    tOcc = prem.belief().occurrence(); //use occurrence from belief
 
-        assert (decomposed != null);
+
+        //assert (decomposed != null);
         //decomposed = prem.beliefTerm();
         //tOcc = ETERNAL;
         //} else {
@@ -247,7 +248,7 @@ public interface Temporalize {
         }
 
         if (tOcc != ETERNAL) {
-            if (other!=null && ddt != DTERNAL) {
+            if (other != null && ddt != DTERNAL) {
 
 
                 //compute the relative offset of the original unresolved other term and the derived term
@@ -265,6 +266,8 @@ public interface Temporalize {
                         }
                     }
                 }
+
+
                 if (newShift != DTERNAL) {
                     for (int i = 0; i < decTerm.size(); i++) {
                         Term dct = decTerm.term(i);
@@ -277,14 +280,17 @@ public interface Temporalize {
                         }
                     }
                 }
+
                 if (newShift != DTERNAL)
                     tOcc += newShift;
             }
+
 
             occReturn[0] = tOcc;
         }
 
         //occReturn[0] = ((ddt == DTERNAL) || (ddt == 0)) ? tOcc : (dtt.subtermTimeOrZero(derived, tOcc));
+        //tmp
 
 
 //            if (occReturn[0] < -902337203685477580L) {

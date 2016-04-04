@@ -221,16 +221,22 @@ public interface Term extends Termed, Comparable, Termlike {
                 return 0; //also handles &| multi-arg case
         } else if (this.size() == 2) {
 
-            //use the normalized order of the terms so that the first is always @ 0
             int firstIndex, lastIndex;
 
-            if (dt < 0) {
-                dt = -dt;
+            if (isCommutative()) {
+                //use the normalized order of the terms so that the first is always @ 0
 
-                firstIndex = 1;
-                lastIndex = 0;
+                if (dt < 0) {
+                    dt = -dt;
+
+                    firstIndex = 1;
+                    lastIndex = 0;
+                } else {
+
+                    firstIndex = 0;
+                    lastIndex = 1;
+                }
             } else {
-
                 firstIndex = 0;
                 lastIndex = 1;
             }

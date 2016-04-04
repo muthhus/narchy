@@ -99,15 +99,20 @@ public class GenericCompound<T extends Term> implements Compound<T> {
         return op;
     }
 
-
     @Override
     public final boolean isCommutative() {
-        if (op.isCommutative() && size() > 1) {
-            int t = dt();
-            return (t == DTERNAL || ((t == 0 && op == Op.CONJUNCTION)));
-        }
-        return false;
+        return op.isCommutative() && size() > 1;
     }
+
+
+    //    @Override
+//    public final boolean isCommutative() {
+//        if (op.isCommutative() && size() > 1) {
+//            int t = dt();
+//            return (t == DTERNAL || ((t == 0 && op == Op.CONJUNCTION)));
+//        }
+//        return false;
+//    }
 
 //    /** true if this compound does not involve temporal relation between its terms */
 //    public boolean atemporal() {
