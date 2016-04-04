@@ -223,12 +223,11 @@ public class NAL8Test extends AbstractNALTest {
 
     @Test
     public void condition_goal_deduction()  {
-        TestNAR tester = test();
-
-        tester.input("<(SELF,{t002}) --> reachable>! ");
-        tester.inputAt(10, "((<($1,#2) --> on> &&+0 <(SELF,#2) --> at>) ==>+0 <(SELF,$1) --> reachable>).");
-
-        tester.mustDesire(cycles, "(<(SELF,#1) --> at> &&+0 <({t002},#1) --> on>)", 1.0f, 0.81f);
+        test()
+            .log()
+            .input("<(SELF,{t002}) --> reachable>!")
+            .inputAt(10, "((<($1,#2) --> on> &&+0 <(SELF,#2) --> at>) ==>+0 <(SELF,$1) --> reachable>).")
+            .mustDesire(cycles, "(<(SELF,#1) --> at> &&+0 <({t002},#1) --> on>)", 1.0f, 0.81f);
 
     }
 
