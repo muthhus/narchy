@@ -224,63 +224,74 @@ public interface Temporalize {
         Termed<Compound> decomposed = decomposeTask ? prem.task() : prem.belief();
         long tOcc = prem.task().occurrence();
 
-        if ((tOcc == ETERNAL) && (prem.belief()!=null))
-            tOcc = prem.belief().occurrence(); //use occurrence from belief
+        //if ((tOcc == ETERNAL) && (prem.belief()!=null))
+        //    tOcc = prem.belief().occurrence(); //use occurrence from belief
 
-        if (decomposed == null) {
-            decomposed = prem.beliefTerm();
-            //tOcc = ETERNAL;
-        } else {
-            //tOcc = ((Task)decomposed).occurrence();
-        }
+        assert (decomposed != null);
+        //decomposed = prem.beliefTerm();
+        //tOcc = ETERNAL;
+        //} else {
+        //tOcc = ((Task)decomposed).occurrence();
+        //}
 
         Compound decTerm = decomposed.term();
         Compound dtt = decTerm;
         long ddt = dtt.dt();
 
+        Task other = decomposeTask ? prem.belief() : prem.task();
+
+        if (tOcc == ETERNAL) {
+            if (other != null && !other.isEternal()) {
+                tOcc = other.occurrence();
+            }
+        }
 
         if (tOcc != ETERNAL) {
-            int shift = 0;
-            if (ddt != DTERNAL) {
-                Task other = decomposeTask ? prem.belief() : prem.task();
-                if (other != null && !other.isEternal()) {
+            if (other!=null && ddt != DTERNAL) {
 
-                    //compute the relative offset of the original unresolved other term and the derived term
 
-                    Term otherTerm = other.term();
-                    int newShift = DTERNAL;
-                    for (int i = 0; i < decTerm.size(); i++) {
-                        Term dct = decTerm.term(i);
-                        if (p.resolve(dct).equals(otherTerm)) {
-                            //baseOcc = other.occurrence() - decTerm.subtermTime(dct);
-                            newShift = -decTerm.subtermTime(dct);
+                //compute the relative offset of the original unresolved other term and the derived term
+
+                Term otherTerm = other.term();
+                int newShift = DTERNAL;
+                for (int i = 0; i < decTerm.size(); i++) {
+                    Term dct = decTerm.term(i);
+                    if (p.resolve(dct).equals(otherTerm)) {
+                        //baseOcc = other.occurrence() - decTerm.subtermTime(dct);
+                        int st = decTerm.subtermTime(dct);
+                        if (st != DTERNAL) {
+                            newShift = -st;
                             break;
                         }
                     }
-                    if (newShift != DTERNAL) {
-                        for (int i = 0; i < decTerm.size(); i++) {
-                            Term dct = decTerm.term(i);
-                            if (p.resolve(dct).equals(derived)) {
-                                newShift += decTerm.subtermTime(dct);
+                }
+                if (newShift != DTERNAL) {
+                    for (int i = 0; i < decTerm.size(); i++) {
+                        Term dct = decTerm.term(i);
+                        if (p.resolve(dct).equals(derived)) {
+                            int st = decTerm.subtermTime(dct);
+                            if (st != DTERNAL) {
+                                newShift += st;
                                 break;
                             }
                         }
                     }
-                    if (newShift != DTERNAL)
-                        shift = newShift;
                 }
+                if (newShift != DTERNAL)
+                    tOcc += newShift;
             }
 
-            //occReturn[0] = ((ddt == DTERNAL) || (ddt == 0)) ? tOcc : (dtt.subtermTimeOrZero(derived, tOcc));
+            occReturn[0] = tOcc;
+        }
 
-            occReturn[0] = tOcc + shift;
+        //occReturn[0] = ((ddt == DTERNAL) || (ddt == 0)) ? tOcc : (dtt.subtermTimeOrZero(derived, tOcc));
+
 
 //            if (occReturn[0] < -902337203685477580L) {
 //                System.err.println(derived + " " + dtt.subtermTimeOrZero(derived, tOcc) + " ");
 //            }
         //} else {
-        }
-//
+
 
         //both are eternal, just return the component as an eternal belief
         return derived;
@@ -349,14 +360,14 @@ public interface Temporalize {
                 //Task belief = premise.belief();
                 Termed<Compound> beliefTerm = premise.beliefTerm();
                 //if (belief != null) {
-                    long ddt = beliefTerm.term().dt();
-                    if (ddt != DTERNAL) {
-                        if (!taskOrBelief && !end) {
-                            o -= ddt;
-                        } else if (!taskOrBelief && end) {
-                            o += ddt;
-                        }
+                long ddt = beliefTerm.term().dt();
+                if (ddt != DTERNAL) {
+                    if (!taskOrBelief && !end) {
+                        o -= ddt;
+                    } else if (!taskOrBelief && end) {
+                        o += ddt;
                     }
+                }
                 //}
             }
 
@@ -522,10 +533,10 @@ public interface Temporalize {
 
                 if (td == DTERNAL && bd == DTERNAL) {
 
-                    long aTask = tp.subtermTime(ca, DTERNAL);
-                    long aBelief = bp.subtermTime(ca, DTERNAL);
-                    long bTask = tp.subtermTime(cb, DTERNAL);
-                    long bBelief = bp.subtermTime(cb, DTERNAL);
+                    int aTask = tp.subtermTime(ca, DTERNAL);
+                    int aBelief = bp.subtermTime(ca, DTERNAL);
+                    int bTask = tp.subtermTime(cb, DTERNAL);
+                    int bBelief = bp.subtermTime(cb, DTERNAL);
 
                     if (belief != null) {
 
@@ -539,16 +550,16 @@ public interface Temporalize {
                         }
 
 
-                        if (aTask != ETERNAL && aBelief == ETERNAL &&
-                                bBelief != ETERNAL && bTask == ETERNAL) {
+                        if (aTask != DTERNAL && aBelief == DTERNAL &&
+                                bBelief != DTERNAL && bTask == DTERNAL) {
                             //forward: task -> belief
                             //t = (int) (task.occurrence() - belief().occurrence());
                             t = occDiff;
                             if (reversed) occ -= t;
                             else occ += t;
 
-                        } else if (aTask == ETERNAL && aBelief != ETERNAL &&
-                                bBelief == ETERNAL && bTask != ETERNAL) {
+                        } else if (aTask == DTERNAL && aBelief != DTERNAL &&
+                                bBelief == DTERNAL && bTask != DTERNAL) {
                             //reverse: belief -> task
                             t = -occDiff;
                             //t = (int) (belief().occurrence() - task.occurrence());
@@ -621,21 +632,21 @@ public interface Temporalize {
                     //the occ (=belief time's)
                     long timeOfBeliefInTask = T.subtermTime(B, td);
                     long timeOfDerivedInTask = T.subtermTime(C, td);
-                    if (timeOfDerivedInTask != ETERNAL && timeOfBeliefInTask != ETERNAL)
+                    if (timeOfDerivedInTask != DTERNAL && timeOfBeliefInTask != DTERNAL)
                         occ += (timeOfDerivedInTask - timeOfBeliefInTask);
-                    else if (timeOfDerivedInTask != ETERNAL)
+                    else if (timeOfDerivedInTask != DTERNAL)
                         occ += timeOfDerivedInTask;
                 } else if (!task.isEternal() && belief.isEternal()) {
                     long timeOfTaskInBelief = B.subtermTime(T, bd);
                     long timeOfDerivedInBelief = B.subtermTime(C, bd);
 
-                    if (timeOfTaskInBelief != ETERNAL && timeOfDerivedInBelief != ETERNAL)
+                    if (timeOfTaskInBelief != DTERNAL && timeOfDerivedInBelief != DTERNAL)
                         occ += (timeOfDerivedInBelief - timeOfTaskInBelief);
-                    else if (timeOfDerivedInBelief != ETERNAL)
+                    else if (timeOfDerivedInBelief != DTERNAL)
                         occ += timeOfDerivedInBelief;
                     else {
                         long timeOfDerivedInTask = T.subtermTime(C, td);
-                        if (timeOfDerivedInTask != ETERNAL) {
+                        if (timeOfDerivedInTask != DTERNAL) {
                             occ += timeOfDerivedInTask;
                         } else {
                             //??
@@ -653,14 +664,14 @@ public interface Temporalize {
 
                 if (!task.isEternal()) {
                     long timeOfDerivedInTask = T.subtermTime(C, td);
-                    if (timeOfDerivedInTask != ETERNAL)
+                    if (timeOfDerivedInTask != DTERNAL)
                         occ += timeOfDerivedInTask;
                 } else {
 
-                    long ot = tp.subtermTime(cp, td);
-                    long ob = bp.subtermTime(cp, bd);
+                    int ot = tp.subtermTime(cp, td);
+                    int ob = bp.subtermTime(cp, bd);
 
-                    if (ot != ETERNAL) {
+                    if (ot != DTERNAL) {
                         if (tp instanceof Compound) {
                             Compound ctp = (Compound) tp;
                             if (ctp.term(0).equals(cp)) {
@@ -668,7 +679,7 @@ public interface Temporalize {
                             }
                         }
                         occ += ot; //occ + ot;
-                    } else if (ob != ETERNAL) {
+                    } else if (ob != DTERNAL) {
 
                         if (belief.occurrence() != task.occurrence()) { //why?
                             if (bp instanceof Compound) {

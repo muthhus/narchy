@@ -200,20 +200,19 @@ public interface Term extends Termed, Comparable, Termlike {
     default int subtermTime(Term x) {
         return subtermTime(x, this instanceof Compound ? ((Compound)this).dt() : DTERNAL);
     }
-    default long subtermTimeOrZero(Term x, long offset) {
-        int e = subtermTime(x, this instanceof Compound ? ((Compound)this).dt() : DTERNAL);
-        return e == DTERNAL ? DTERNAL : e + offset;
-    }
+//    default long subtermTimeOrZero(Term x, long offset) {
+//        int e = subtermTime(x, this instanceof Compound ? ((Compound)this).dt() : DTERNAL);
+//        return e == DTERNAL ? DTERNAL : e + offset;
+//    }
 
     /** matches the first occuring event's time relative to this temporal relation, with parameter for a hypothetical dt */
     default int subtermTime(Term x, int dt) {
 
-        if (!this.op().isTemporal() || dt == DTERNAL)
-            return DTERNAL;
-
         if (this.equals(x))
             return 0;
 
+        if (!this.op().isTemporal() || dt == DTERNAL)
+            return DTERNAL;
 
         Compound c = ((Compound) this);
 
@@ -246,10 +245,10 @@ public interface Term extends Termed, Comparable, Termlike {
                 return dt;
 
             int withinSubj = first.subtermTime(x);
-            if (withinSubj!=ETERNAL)
+            if (withinSubj!=DTERNAL)
                 return withinSubj;
             int withinPred = last.subtermTime(x);
-            if (withinPred!=ETERNAL)
+            if (withinPred!=DTERNAL)
                 return dt + withinPred;
 
         } else {
