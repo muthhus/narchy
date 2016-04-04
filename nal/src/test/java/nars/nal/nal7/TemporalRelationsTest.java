@@ -15,6 +15,9 @@ import static org.junit.Assert.*;
  */
 public class TemporalRelationsTest {
 
+    static final Term A = $("a");
+    static final Term B = $("b");
+
     @Test
     public void parseTemporalRelation() {
         //TODO move to NarseseTest
@@ -94,18 +97,33 @@ public class TemporalRelationsTest {
         assertEquals(4, c.subtermTime($("[opened]:t1")));
         assertEquals(9, c.subtermTime($("open(t1)")));
     }
+
+
     @Test public void testSubtermTimeRecursiveWithNegativeCommutive() {
         Compound b = $("(a &&+5 b)");
-        assertEquals(0, b.subtermTime($("a")));
-        assertEquals(5, b.subtermTime($("b")));
+        assertEquals(0, b.subtermTime(A));
+        assertEquals(5, b.subtermTime(B));
 
         Compound c = $("(a &&-5 b)");
-        assertEquals(5, c.subtermTime($("a")));
-        assertEquals(0, c.subtermTime($("b")));
+        assertEquals(5, c.subtermTime(A));
+        assertEquals(0, c.subtermTime(B));
 
         Compound d = $("(b &&-5 a)");
-        assertEquals(0, d.subtermTime($("a")));
-        assertEquals(5, d.subtermTime($("b")));
+        assertEquals(0, d.subtermTime(A));
+        assertEquals(5, d.subtermTime(B));
+
+        Compound e = $("(a <=>+1 b)");
+        assertEquals(0, e.subtermTime(A));
+        assertEquals(1, e.subtermTime(B));
+
+        Compound f = $("(a <=>-1 b)");
+        assertEquals(1, f.subtermTime(A));
+        assertEquals(0, f.subtermTime(B));
+
+        Compound g = $("(b <=>+1 a)");
+        assertEquals(1, g.subtermTime(A));
+        assertEquals(0, g.subtermTime(B));
+
     }
 
     @Test public void testSubtermTestOffset() {
@@ -142,8 +160,6 @@ public class TemporalRelationsTest {
         Term abc = $("((a &&+0 b) &&+0 c)");
         assertEquals( "( &&+0 ,a,b,c)", abc.toString() );
         assertTrue( abc.isCommutative() );
-
-
 
     }
 

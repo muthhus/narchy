@@ -241,65 +241,84 @@ public interface Temporalize {
 
         Task other = decomposeTask ? prem.belief() : prem.task();
 
+        long otherOcc = ETERNAL;
+        if (other != null && !other.isEternal()) {
+            otherOcc = other.occurrence();
+        }
+
+        boolean swap = false;
         if (tOcc == ETERNAL) {
-            if (other != null && !other.isEternal()) {
-                tOcc = other.occurrence();
-            }
+            tOcc = otherOcc;
+            swap = true;
         }
 
         if (tOcc != ETERNAL) {
-            if (other != null && ddt != DTERNAL) {
 
+            if (ddt != ETERNAL) {
+                int relative = 0;
 
-                //compute the relative offset of the original unresolved other term and the derived term
+                if (other != null && swap) {
+                    //compute the relative offset of the original unresolved other term and the derived term
 
-                Term otherTerm = other.term();
-                int newShift = DTERNAL;
-                for (int i = 0; i < decTerm.size(); i++) {
-                    Term dct = decTerm.term(i);
-                    if (p.resolve(dct).equals(otherTerm)) {
-                        //baseOcc = other.occurrence() - decTerm.subtermTime(dct);
-                        int st = decTerm.subtermTime(dct);
-                        if (st != DTERNAL) {
-                            newShift = -st;
-                            break;
+                    Term otherTerm = other.term();
+                    for (int i = 0; i < decTerm.size(); i++) {
+                        Term dct = decTerm.term(i);
+                        if (p.resolve(dct).equals(otherTerm)) {
+                            int st = decTerm.subtermTime(dct);
+                            if (st != DTERNAL) {
+                                relative -= st;
+                                break;
+                            }
                         }
                     }
-                }
 
 
-                if (newShift != DTERNAL) {
+                    //if (newShift != DTERNAL) {
                     for (int i = 0; i < decTerm.size(); i++) {
                         Term dct = decTerm.term(i);
                         if (p.resolve(dct).equals(derived)) {
                             int st = decTerm.subtermTime(dct);
                             if (st != DTERNAL) {
-                                newShift += st;
+                                relative += st;
                                 break;
                             }
                         }
                     }
+                    //}
+
+                    //if (newShift != DTERNAL)
+
+                } else {
+
+                    //shift to occurrence time of the subterm within the decomposed term's task
+
+                    for (int i = 0; i < decTerm.size(); i++) {
+                        Term dct = decTerm.term(i);
+                        Term rdt = p.resolve(dct);
+                        if (rdt.equals(derived)) {
+                            int st = decTerm.subtermTime(dct);
+                            if (st != DTERNAL) {
+                                relative += st;
+                            }
+                        }
+                        if (other!=null && rdt.equals(other.term())) {
+                            int st = decTerm.subtermTime(dct);
+                            if (st != DTERNAL) {
+                                relative -= st;
+                            }
+                        }
+                    }
+
+
+
                 }
 
-                if (newShift != DTERNAL)
-                    tOcc += newShift;
+                tOcc += relative;
             }
-
 
             occReturn[0] = tOcc;
         }
 
-        //occReturn[0] = ((ddt == DTERNAL) || (ddt == 0)) ? tOcc : (dtt.subtermTimeOrZero(derived, tOcc));
-        //tmp
-
-
-//            if (occReturn[0] < -902337203685477580L) {
-//                System.err.println(derived + " " + dtt.subtermTimeOrZero(derived, tOcc) + " ");
-//            }
-        //} else {
-
-
-        //both are eternal, just return the component as an eternal belief
         return derived;
     }
 

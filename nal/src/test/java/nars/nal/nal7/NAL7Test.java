@@ -17,7 +17,7 @@ import java.util.function.Supplier;
 @RunWith(Parameterized.class)
 public class NAL7Test extends AbstractNALTest {
 
-    final int cycles = 160;
+    final int cycles = 25;
 
     public NAL7Test(Supplier<NAR> b) {
         super(b);
@@ -216,9 +216,9 @@ public class NAL7Test extends AbstractNALTest {
     @Test
     public void inference_on_tense() {
         test()
-            .input("((($x, key) --> hold) ==>+7 (($x, room) --> enter)).")
+            .input("((($x, key) --> hold) ==>+3 (($x, room) --> enter)).")
             .input("<(John, key) --> hold>. :|:")
-            .mustBelieve(cycles, "<(John,room) --> enter>", 1.00f, 0.81f, 7);
+            .mustBelieve(cycles, "<(John,room) --> enter>", 1.00f, 0.81f, 3);
     }
 
     @Test
