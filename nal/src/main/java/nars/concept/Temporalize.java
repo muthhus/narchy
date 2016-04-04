@@ -246,77 +246,52 @@ public interface Temporalize {
             otherOcc = other.occurrence();
         }
 
-        boolean swap = false;
-        if (tOcc == ETERNAL) {
-            tOcc = otherOcc;
-            swap = true;
-        }
 
-        if (tOcc != ETERNAL) {
+        if ((tOcc != ETERNAL) || (otherOcc != ETERNAL)) {
+
+            int shift = 0;
 
             if (ddt != ETERNAL) {
-                int relative = 0;
+                Term otherTerm = other != null ? other.term() : null;
 
-                if (other != null && swap) {
-                    //compute the relative offset of the original unresolved other term and the derived term
 
-                    Term otherTerm = other.term();
-                    for (int i = 0; i < decTerm.size(); i++) {
-                        Term dct = decTerm.term(i);
-                        if (p.resolve(dct).equals(otherTerm)) {
-                            int st = decTerm.subtermTime(dct);
-                            if (st != DTERNAL) {
-                                relative -= st;
-                                break;
+                //shift to occurrence time of the subterm within the decomposed term's task
+
+                for (int i = 0; i < decTerm.size(); i++) {
+                    Term dct = decTerm.term(i);
+                    Term rdt = p.resolve(dct);
+                    if (rdt.equals(derived)) {
+                        int st = decTerm.subtermTime(dct);
+                        if (st != DTERNAL) {
+
+                            shift += st;
+                        }
+                    } else if (otherTerm != null && rdt.equals(otherTerm)) {
+                        int st = decTerm.subtermTime(dct);
+                        if (st != DTERNAL) {
+
+                            if (tOcc!=ETERNAL && otherOcc!=ETERNAL) {
+                                st += (tOcc - otherOcc);
                             }
+
+                            shift -= st;
                         }
                     }
-
-
-                    //if (newShift != DTERNAL) {
-                    for (int i = 0; i < decTerm.size(); i++) {
-                        Term dct = decTerm.term(i);
-                        if (p.resolve(dct).equals(derived)) {
-                            int st = decTerm.subtermTime(dct);
-                            if (st != DTERNAL) {
-                                relative += st;
-                                break;
-                            }
-                        }
-                    }
-                    //}
-
-                    //if (newShift != DTERNAL)
-
-                } else {
-
-                    //shift to occurrence time of the subterm within the decomposed term's task
-
-                    for (int i = 0; i < decTerm.size(); i++) {
-                        Term dct = decTerm.term(i);
-                        Term rdt = p.resolve(dct);
-                        if (rdt.equals(derived)) {
-                            int st = decTerm.subtermTime(dct);
-                            if (st != DTERNAL) {
-                                relative += st;
-                            }
-                        }
-                        if (other!=null && rdt.equals(other.term())) {
-                            int st = decTerm.subtermTime(dct);
-                            if (st != DTERNAL) {
-                                relative -= st;
-                            }
-                        }
-                    }
-
-
-
                 }
 
-                tOcc += relative;
+
             }
 
-            occReturn[0] = tOcc;
+            long rOcc = ETERNAL;
+
+            if (tOcc == ETERNAL)
+                rOcc = otherOcc;
+            else if (otherOcc == ETERNAL)
+                rOcc = tOcc;
+
+            if (rOcc!=ETERNAL) {
+                occReturn[0] = rOcc + shift;
+            }
         }
 
         return derived;
