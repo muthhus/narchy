@@ -5,7 +5,9 @@ import nars.term.Term;
 import nars.term.Terms;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Set;
 import java.util.TreeSet;
 
 public class TermSet<X extends Term> extends TermVector<X> {
@@ -15,15 +17,6 @@ public class TermSet<X extends Term> extends TermVector<X> {
         return new TermSet(Terms.toSortedSetArray(x));
     }
 
-
-    @NotNull
-    public static TermSet the(TermContainer possiblyUnsorted) {
-        if (possiblyUnsorted instanceof TermSet) {
-            return (TermSet) possiblyUnsorted;
-        } else {
-            return new TermSet(possiblyUnsorted.terms());
-        }
-    }
 
 
     @NotNull
@@ -43,18 +36,37 @@ public class TermSet<X extends Term> extends TermVector<X> {
 //        return new TermSet(presorted);
 //    }
 
-    /** empty */
-    public TermSet() {
-        super();
-    }
+
 
     private TermSet(X[] x) {
         super(x);
     }
 
     public static Term[] toSortedSetArray(Collection<? extends Term> c) {
-        TreeSet<Term> t = c instanceof TreeSet ? (TreeSet<Term>) c : new TreeSet<>(c);
-        return t.toArray(new Term[t.size()]);
+
+        int n = c.size();
+
+        if (n == 0)
+            return Terms.empty;
+
+        Term[] a = c.toArray(new Term[n]);
+
+        if (c instanceof Set) {
+            if (c instanceof TreeSet) {
+                //already sorted
+                return a;
+            } else {
+
+                //already unique but not necessarily sorted
+                if (n > 1)
+                    Arrays.sort(a);
+
+                return a;
+            }
+        }
+
+        //potentially is unsorted and has duplicates
+        return n > 1 ? Terms.toSortedSetArray(a) : a;
     }
 
     @Override public final boolean isSorted() {
