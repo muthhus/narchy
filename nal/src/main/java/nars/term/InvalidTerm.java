@@ -31,6 +31,10 @@ public final class InvalidTerm extends RuntimeException {
         this(op, -1, DTERNAL, null);
     }
 
+    public InvalidTerm(Op op, Term[] args) {
+        this(op, -1, -1, args);
+    }
+
     public InvalidTerm(Op op, int rel, int dt, Term[] args) {
 
         this.op = op;

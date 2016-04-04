@@ -63,15 +63,9 @@ public class Revision {
 
             Truth oldBeliefTruth = x.truth();
 
-            Truth c;
-
-            if (newBelief.isEternal()) {
-                c = TruthFunctions.revision(newBeliefTruth, oldBeliefTruth, matchFactor, bestConf);
-
-            } else {
-                c = TruthFunctions.revision(newBelief,
-                        x, newTime, matchFactor, bestConf);
-            }
+            Truth c = newBelief.isEternal() ?
+                    TruthFunctions.revision(newBeliefTruth, oldBeliefTruth, matchFactor, bestConf) :
+                    TruthFunctions.revision(newBelief, x, newTime, matchFactor, bestConf);
 
             if (c == null)
                 continue;

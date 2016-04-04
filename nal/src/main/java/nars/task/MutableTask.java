@@ -77,7 +77,7 @@ public class MutableTask extends AbstractTask {
         time(now, occ);
 
         budget(taskToClone.budget());
-        budgetMerge.merge(this, otherTask.budget(), 1f);
+        budgetMerge.merge(budget(), otherTask.budget(), 1f);
     }
 
     public MutableTask(@NotNull Termed<Compound> content, char punc) {

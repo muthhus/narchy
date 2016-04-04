@@ -29,9 +29,6 @@ public abstract class TermBuilder {
     @Nullable
     public Term the(@NotNull Op op, int relation, int t, @NotNull TermContainer tt) throws InvalidTerm {
 
-        if (tt == null)
-            return null;
-
         Term[] u = tt.terms();
 
         /* special handling */
@@ -65,7 +62,7 @@ public abstract class TermBuilder {
                     //TODO use result of hasImdex in image construction to avoid repeat iteration to find it
                     return image(op, u);
                 } else if ((relation == -1) || (relation > u.length)) {
-                    return null;
+                    throw new InvalidTerm(op,u);
                 } else {
                     return finish(op, relation, DTERNAL, tt);
                 }
@@ -81,7 +78,8 @@ public abstract class TermBuilder {
             case SET_EXT_OPENER:
             case SET_INT_OPENER:
                 if (u.length == 0)
-                    return null; /* emptyset */
+                    throw new InvalidTerm(op,u);
+                    //return null; /* emptyset */
 
         }
 
@@ -115,7 +113,7 @@ public abstract class TermBuilder {
         return make(op, relation, subterms, Tense.DTERNAL);
     }
 
-    @Nullable
+    @NotNull
     public abstract Termed make(Op op, int relation, TermContainer subterms, int dt);
 
 //    @Nullable
@@ -244,14 +242,11 @@ public abstract class TermBuilder {
             //throw new RuntimeException(Arrays.toString(t) + " invalid size for " + op);
             if (Global.DEBUG)
                 throw new InvalidTerm(op, relation, dt, args.terms());
-            else
-                return null;
+            //else
+                //return null;
         }
 
-        Termed m = make(op, relation, TermContainer.the(op, args), dt);
-        if (m == null)
-            return null;
-        return m.term();
+        return make(op, relation, TermContainer.the(op, args), dt).term();
     }
 
 
@@ -304,7 +299,7 @@ public abstract class TermBuilder {
                 index, TermVector.the(res));
     }
 
-    @Nullable
+    @NotNull
     public Term junction(@NotNull Op op, int t, @NotNull Term... u) {
 //        if (u.length == 1)
 
@@ -341,10 +336,10 @@ public abstract class TermBuilder {
                 if (u[0].equals(u[1]))
                     return u[0];
             } else {
-                if (Global.DEBUG)
+                //if (Global.DEBUG)
                     throw new InvalidTerm(op, -1, t, u);
-                else
-                    return null;
+                //else
+                    //return null;
             }
 
             Term x = make(op, -1, TermContainer.the(op, u)).term();
@@ -366,7 +361,7 @@ public abstract class TermBuilder {
     /**
      * flattening junction builder, don't use with temporal relation
      */
-    @Nullable
+    @NotNull
     public Term junctionFlat(@NotNull Op op, int dt, @NotNull Term[] u) {
 
         TermContainer tc;
@@ -543,6 +538,8 @@ public abstract class TermBuilder {
         if ((o1 == setIntersection) && (o2 == setIntersection)) {
             //the set type which is intersected
             MutableSet<Term> i = TermContainer.intersect((Compound) term1, (Compound) term2);
+            if (i.isEmpty())
+                return null; //empty set
             return newCompound(setIntersection, i);
         }
 

@@ -199,7 +199,7 @@ public enum Op {
     public final String toString(@NotNull Compound c)  {
         int t = c.dt();
 
-        return !(t != Tense.DTERNAL) ?
+        return t == Tense.DTERNAL ?
                     str :
                     str + ((t >= 0) ? "+" : "") + (Integer.toString(t));
     }

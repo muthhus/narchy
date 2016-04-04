@@ -84,10 +84,8 @@ public class Terms extends TermBuilder implements TermIndex {
         return l;
     }
 
-    @Override
-    public
-    @Nullable
-    Termed make(@NotNull Op op, int relation, @NotNull TermContainer subterms, int dt) {
+    @NotNull @Override
+    public Termed make(@NotNull Op op, int relation, @NotNull TermContainer subterms, int dt) {
         return new GenericCompound(op, relation, subterms).dt(dt);
     }
 

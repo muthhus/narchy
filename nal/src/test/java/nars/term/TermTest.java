@@ -28,6 +28,7 @@ import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
 import java.util.TreeSet;
+import java.util.function.Supplier;
 
 import static java.lang.Long.toBinaryString;
 import static junit.framework.TestCase.assertFalse;
@@ -643,8 +644,8 @@ public class TermTest {
         assertTrue( $("(/,_,X,Y)").op().isImage() );
         assertFalse( $("(X,Y)").op().isImage() );
 
-        assertEquals(null, imageExt($("X"), $("Y")));
-        assertEquals(null, imageInt($("X"), $("Y")));
+        assertInvalidTerm(()->imageExt($("X"), $("Y")));
+        assertInvalidTerm(()->imageInt($("X"), $("Y")));
 
         assertEquals("(/,X,_)", $("(/,X,_)").toString());
         assertEquals("(/,X,_)", imageExt($("X"), $("_")).toString());
@@ -657,6 +658,15 @@ public class TermTest {
         assertEquals("(\\,X,_,Y)", imageInt($("X"), $("_"), $("Y")).toString());
         assertEquals("(\\,_,X,Y)", imageInt($("_"), $("X"), $("Y")).toString());
 
+    }
+
+    public static void assertInvalidTerm(Supplier<Term> o) {
+        try {
+            o.get();
+            assertTrue(false);
+        } catch (InvalidTerm e) {
+            //correct if happens here
+        }
     }
 
     @Test
