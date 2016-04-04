@@ -35,7 +35,7 @@ public final class EllipsisMatch extends TermVector<Term> implements Term {
         super(t);
     }
 
-    public static Term match(Term[] matched) {
+    public static Term match(@NotNull Term[] matched) {
         switch (matched.length) {
             case 0: return empty;
             case 1: return matched[0]; //if length==1 it should not be an ellipsismatch, just the raw term
@@ -56,6 +56,7 @@ public final class EllipsisMatch extends TermVector<Term> implements Term {
     }
 
     /** HACK */
+    @NotNull
     static Term[] expand(Term raw) {
         return raw instanceof EllipsisMatch ?
                 ((EllipsisMatch)raw).term :

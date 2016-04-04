@@ -12,6 +12,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.util.signal.SensorConcept;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.function.Predicate;
@@ -54,7 +55,7 @@ public class MotivationTest {
     }
 
 
-    public void testOscillate(NAR n, MutableFloat v, SensorConcept x, OperationConcept y, Term impl, float positiveThreshold, float negationThreshold, Tense tense) {
+    public void testOscillate(@NotNull NAR n, @NotNull MutableFloat v, @NotNull SensorConcept x, @NotNull OperationConcept y, @NotNull Term impl, float positiveThreshold, float negationThreshold, @NotNull Tense tense) {
         n.step().step();
 
         assertEquals(0, y.motivation(), 0.01f);
@@ -85,7 +86,7 @@ public class MotivationTest {
         int t2 = timeUntil("switch off", n, nn -> y.motivation() <=  negationThreshold, 150);
     }
 
-    static int timeUntil(String name, NAR n, Predicate<NAR> test, int max) {
+    static int timeUntil(String name, @NotNull NAR n, @NotNull Predicate<NAR> test, int max) {
         int t = 0;
         while (!test.test(n)) {
             n.step();
@@ -133,11 +134,9 @@ public class MotivationTest {
         //n.believe($.impl(y, 0, B), Tense.Present, 1f, 0.95f);
         //n.goal(antilink, Tense.Eternal, 0f, 0.95f);
 
-        {
-            //OR
-            //n.believe($.impl( A, /*0,*/ y), Tense.Present, 0.75f, 0.75f);
-            //n.believe($.impl( B, /*0,*/ y), Tense.Present, 0.75f, 0.75f);
-        }
+        //OR
+        //n.believe($.impl( A, /*0,*/ y), Tense.Present, 0.75f, 0.75f);
+        //n.believe($.impl( B, /*0,*/ y), Tense.Present, 0.75f, 0.75f);
 
         //n.input(abc + "?");
         n.believe($.impl( abc, 0, y/*0,*/), Tense.Present, 1f, 0.95f);

@@ -24,6 +24,8 @@ import org.jacoco.core.instr.Instrumenter;
 import org.jacoco.core.runtime.IRuntime;
 import org.jacoco.core.runtime.LoggerRuntime;
 import org.jacoco.core.runtime.RuntimeData;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
@@ -78,7 +80,7 @@ public final class MetaTrace {
         this.out = out;
     }
 
-    public static int analyzeAll(Analyzer a, final File file, Predicate<File> include) throws IOException {
+    public static int analyzeAll(@NotNull Analyzer a, @Nullable final File file, @NotNull Predicate<File> include) throws IOException {
         int count = 0;
         if (file == null) {
             throw new NullPointerException();
@@ -211,12 +213,12 @@ public final class MetaTrace {
         }
     }
 
-    private InputStream getTargetClass(final String name) {
+    private InputStream getTargetClass(@NotNull final String name) {
         final String resource = '/' + name.replace('.', '/') + ".class";
         return getClass().getResourceAsStream(resource);
     }
 
-    private void printCounter(final String unit, final ICounter counter) {
+    private void printCounter(final String unit, @NotNull final ICounter counter) {
         final Integer missed = counter.getMissedCount();
         final Integer total = counter.getTotalCount();
         out.printf("%s of %s %s missed%n", missed, total, unit);

@@ -172,7 +172,7 @@ public interface Stamp {
      * this can always be calculated deterministically from the evidentialBAse
      * since it is the deduplicated and sorted form of it.
      */
-    @NotNull
+    @Nullable
     long[] evidence();
 
     //Stamp setEvidence(long... evidentialSet);
@@ -189,7 +189,7 @@ public interface Stamp {
     static int evidenceLength(int aLen, int bLen) {
         return Math.max(Global.MAXIMUM_EVIDENTAL_BASE_LENGTH, aLen + bLen);
     }
-    static int evidenceLength(Task a, Task b) {
+    static int evidenceLength(@NotNull Task a, @NotNull Task b) {
         return evidenceLength(a.evidence().length, b.evidence().length);
     }
 }

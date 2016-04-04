@@ -89,10 +89,8 @@ public class TruthTest {
             Truth b = new DefaultTruth(0.5f, 0.5f);
             assertEquals(new DefaultTruth(0.52f, 0.48f), a.interpolate(b));
         }
-        {
-            Truth a = new DefaultTruth(0.95f, 0.5f);
-            Truth b = new DefaultTruth(0.5f, 0.01f);
-            assertEquals(new DefaultTruth(0.94f, 0.28f), a.interpolate(b));
-        }
+        Truth a = new DefaultTruth(0.95f, 0.5f);
+        Truth b = new DefaultTruth(0.5f, 0.01f);
+        assertEquals(new DefaultTruth(0.94f, 0.28f), a.interpolate(b));
     }
 }

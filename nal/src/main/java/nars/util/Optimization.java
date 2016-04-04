@@ -12,6 +12,7 @@ import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
 import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.CMAESOptimizer;
 import org.apache.commons.math3.random.MersenneTwister;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,12 +35,14 @@ public class Optimization<X> {
 //            return this;
 //        }
 
+    @NotNull
     public Optimization<X> with(String parameter, float min, float max, float inc, FloatObjectProcedure<X> apply) {
         tweaks.add(new FloatParameterSweep(parameter, min, max, inc, apply));
         return this;
     }
 
-    public Result<X> run(FloatFunction<X> eval) {
+    @NotNull
+    public Result<X> run(@NotNull FloatFunction<X> eval) {
         double stopValue = Double.POSITIVE_INFINITY;
         int maxIterations = 30000;
         CMAESOptimizer optim = new CMAESOptimizer(maxIterations, stopValue, true, 0,

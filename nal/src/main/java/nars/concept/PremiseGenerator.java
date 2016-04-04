@@ -6,7 +6,6 @@ import nars.bag.BLink;
 import nars.bag.Bag;
 import nars.budget.Forget;
 import nars.data.Range;
-import nars.nal.Tense;
 import nars.nal.meta.PremiseEval;
 import nars.task.Task;
 import nars.term.Term;
@@ -54,7 +53,7 @@ abstract public class PremiseGenerator /*extends UnifySubst */implements Consume
 
 
 
-    public PremiseGenerator(@NotNull NAR nar, PremiseEval matcher, @NotNull Forget.BudgetForgetFilter<Task> taskLinkForget, @NotNull Forget.BudgetForget<Termed> termLinkForget) {
+    public PremiseGenerator(@NotNull NAR nar, @NotNull PremiseEval matcher, @NotNull Forget.BudgetForgetFilter<Task> taskLinkForget, @NotNull Forget.BudgetForget<Termed> termLinkForget) {
 
         this.nar = nar;
         this.matcher = matcher;
@@ -82,7 +81,7 @@ abstract public class PremiseGenerator /*extends UnifySubst */implements Consume
     private BLink[] tasksArray = new BLink[0];
 
     @Override
-    public final void accept(BLink<? extends Concept> c) {
+    public final void accept(@NotNull BLink<? extends Concept> c) {
         firePremiseSquared(
             c,
             tasklinksFiredPerFiredConcept.intValue(),
@@ -147,7 +146,7 @@ abstract public class PremiseGenerator /*extends UnifySubst */implements Consume
     }
 
     /** begin matching the task half of a premise */
-    private void premiseTask(@NotNull BLink<? extends Concept> concept, BLink<Termed>[] termsArray, BLink<Task> taskLink, Task task, long occ) {
+    private void premiseTask(@NotNull BLink<? extends Concept> concept, @NotNull BLink<Termed>[] termsArray, BLink<Task> taskLink, @NotNull Task task, long occ) {
 
         for (BLink<Termed> termLink : termsArray) {
             if (termLink == null) break; //null-terminated array, ends
@@ -177,7 +176,7 @@ abstract public class PremiseGenerator /*extends UnifySubst */implements Consume
 
     /** resolves the most relevant belief of a given term/concept */
     @Nullable
-    public final Task match(@NotNull Concept beliefConcept, long taskOcc) {
+    public static Task match(@NotNull Concept beliefConcept, long taskOcc) {
 
         if (beliefConcept.hasBeliefs()) {
 

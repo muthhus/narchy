@@ -1,5 +1,6 @@
 package nars.util.time;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.Collection;
@@ -51,6 +52,7 @@ public class IntervalTreeTest {
             assertFalse(t.searchOverlapping(20.0,40.0).isEmpty());
         }
 
+        @NotNull
         private IntervalTree<Integer, String> makeIntervalTree(){
             IntervalTree<Integer,String> t = new IntervalTree<>();
             t.put(0, 10, "0-10");

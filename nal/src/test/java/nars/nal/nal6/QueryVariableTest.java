@@ -4,6 +4,7 @@ import nars.NAR;
 import nars.nal.AbstractNALTest;
 import nars.nal.Tense;
 import nars.nar.Default;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -39,7 +40,7 @@ public class QueryVariableTest extends AbstractNALTest {
         testQueryVariableAnswer("<c --> (a&b)>", "<?x --> (a&b)>");
     }
 
-    void testQueryVariableAnswer(String belief, String question) {
+    void testQueryVariableAnswer(@NotNull String belief, @NotNull String question) {
 
         int time = 32;
 

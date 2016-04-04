@@ -30,13 +30,10 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
 import java.util.Comparator;
 
 import static java.lang.Math.max;
-import static java.lang.Math.min;
 import static nars.nal.UtilityFunctions.and;
-import static nars.nal.UtilityFunctions.or;
 import static nars.truth.TruthFunctions.temporalIntersection;
 
 
@@ -141,10 +138,13 @@ public interface Truth extends Truthed {
      * but deterministic compareTo() ordering.
      */
     static int hash(@NotNull Truth t, int hashDiscreteness) {
+        return hash(t.freq(), t.conf(), hashDiscreteness);
+    }
 
+    static int hash(float freq, float conf, int hashDiscreteness) {
         //assuming epsilon is large enough such that: 0 <= h < 2^15:
-        int freqHash = Util.hash(t.freq(), hashDiscreteness);
-        int confHash = Util.hash(t.conf(), hashDiscreteness);
+        int freqHash = Util.hash(freq, hashDiscreteness);
+        int confHash = Util.hash(conf, hashDiscreteness);
 
         return (freqHash << 16) | confHash;
     }
@@ -253,7 +253,8 @@ public interface Truth extends Truthed {
         return withConf(conf() * temporalIntersection( when, occ, now, dur ));
     }
 
-    default Truth interpolate(Truth y) {
+    @NotNull
+    default Truth interpolate(@NotNull Truth y) {
         float xc = conf();
         float yc = y.conf();
         return new DefaultTruth(

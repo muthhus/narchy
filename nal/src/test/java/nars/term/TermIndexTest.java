@@ -13,6 +13,7 @@ import nars.term.container.TermVector;
 import nars.term.index.AbstractMapIndex;
 import nars.term.index.MapIndex2;
 import nars.util.data.random.XorShift128PlusRandom;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -45,7 +46,7 @@ public class TermIndexTest {
 
     }
 
-    void testIndex(TermIndex i) {
+    void testIndex(@NotNull TermIndex i) {
         testTermSharing(i);
         //testSequenceNotShared(i);
     }
@@ -95,7 +96,7 @@ public class TermIndexTest {
 //    }
 
 
-    void testTermSharing(TermIndex tt) {
+    void testTermSharing(@NotNull TermIndex tt) {
 
         testShared(tt, "<<x-->w> --> <y-->z>>");
         testShared(tt, "<a --> b>");
@@ -122,14 +123,14 @@ public class TermIndexTest {
 //
 //    }
 
-    private void testNotShared(NAR n, String s) {
+    private void testNotShared(@NotNull NAR n, @NotNull String s) {
         Termed t1 = n.term(s); //create by parsing
         Termed t2 = n.term(s); //create by parsing again
         assertEquals(t1, t2);
         assertTrue(t1 != t2);
     }
 
-    private void testShared(TermIndex i, String s) {
+    private void testShared(@NotNull TermIndex i, @NotNull String s) {
 
         int t0 = i.size();
         int s0 = i.subtermsCount();
@@ -167,7 +168,7 @@ public class TermIndexTest {
         //testShared(a, n.term(..).substMap(..
     }
 
-    static void testShared(Termed t1, Termed t2) {
+    static void testShared(@NotNull Termed t1, @NotNull Termed t2) {
         //t.memory.terms.forEachTerm(System.out::println);
 
         assertEquals(t1.term(), t2.term());

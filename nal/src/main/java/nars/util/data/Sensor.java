@@ -93,6 +93,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
         return this;
     }
 
+    @NotNull
     public Sensor punc(char c) {
         this.punc = c;
         return this;

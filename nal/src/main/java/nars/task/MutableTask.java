@@ -306,6 +306,7 @@ public class MutableTask extends AbstractTask {
     }
 
 
+    @NotNull
     protected final MutableTask punc(char punctuation) {
         if (this.punctuation!=punctuation) {
             this.punctuation = punctuation;
@@ -314,6 +315,7 @@ public class MutableTask extends AbstractTask {
         return this;
     }
 
+    @NotNull
     public final MutableTask evidence(long[] evi) {
         setEvidence(evi);
         return this;

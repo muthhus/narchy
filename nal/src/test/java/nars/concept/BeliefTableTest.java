@@ -2,7 +2,7 @@ package nars.concept;
 
 import nars.Global;
 import nars.NAR;
-import nars.concept.util.BeliefTable;
+import nars.concept.table.BeliefTable;
 import nars.task.Task;
 import nars.truth.DefaultTruth;
 import nars.util.signal.BeliefAnalysis;

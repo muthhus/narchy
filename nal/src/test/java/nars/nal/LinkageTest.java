@@ -13,6 +13,7 @@ import nars.term.Termed;
 import nars.util.graph.TermLinkGraph;
 import nars.util.signal.TestNAR;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jgrapht.alg.ConnectivityInspector;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -56,7 +57,7 @@ public class LinkageTest extends AbstractNALTest {
         };
     }
 
-    public void ProperlyLinkedTest(String premise1, String premise2) throws Exception {
+    public void ProperlyLinkedTest(@NotNull String premise1, @NotNull String premise2) throws Exception {
         TestNAR tester = test();
         tester.believe(premise1); //.en("If robin is a type of bird then robin can fly.");
         tester.believe(premise2); //.en("Robin is a type of bird.");
@@ -79,7 +80,7 @@ public class LinkageTest extends AbstractNALTest {
 //        tester.mustBelieve(10,"<a --> b>",0.9f);
     }
 
-    public boolean isPassed2(String premise1, Concept ret2, boolean passed2) {
+    public boolean isPassed2(String premise1, @Nullable Concept ret2, boolean passed2) {
         if(ret2!=null){// && ret2.getTermLinks()!=null) {
             for (BLink<Termed> entry : ret2.termlinks()) {
                 Term w = entry.get().term();
@@ -91,12 +92,12 @@ public class LinkageTest extends AbstractNALTest {
         return passed2;
     }
 
-    public void ProperlyLinkedIndirectlyTest(String spremise1, String spremise2) throws Exception {
+    public void ProperlyLinkedIndirectlyTest(@NotNull String spremise1, @NotNull String spremise2) throws Exception {
         ProperlyLinkedIndirectlyTest(spremise1, '.',  spremise2);
     }
 
     //interlinked with an intermediate concept, this is needed in order to select one as task and the other as belief
-    public void ProperlyLinkedIndirectlyTest(String spremise1, char punc, String spremise2) throws Exception {
+    public void ProperlyLinkedIndirectlyTest(@NotNull String spremise1, char punc, @NotNull String spremise2) throws Exception {
 
 
         NAR nar = test().nar;
@@ -145,7 +146,7 @@ public class LinkageTest extends AbstractNALTest {
                 .forEach( s -> System.out.println("\t" + s));
 
             ((Default)nar).core.active.print();
-            nar.forEachConcept(c->c.print());
+            nar.forEachConcept(Concept::print);
 
         }
         assertTrue(g.isConnected());
@@ -156,7 +157,7 @@ public class LinkageTest extends AbstractNALTest {
     }
 
     @NotNull
-    public String getTask(char punc, Termed premise1) {
+    public String getTask(char punc, @NotNull Termed premise1) {
         if (punc=='?') {
             return premise1.toString() + String.valueOf('?');
         } else {
@@ -164,7 +165,7 @@ public class LinkageTest extends AbstractNALTest {
         }
     }
 
-    public boolean linksIndirectly(NAR nar, Termed premise2, Concept ret) {
+    public boolean linksIndirectly(@NotNull NAR nar, @NotNull Termed premise2, @NotNull Concept ret) {
         boolean passed = false;
         if (ret.termlinks()!=null) {
             for (BLink<Termed> entry : ret.termlinks()) {
@@ -191,7 +192,7 @@ public class LinkageTest extends AbstractNALTest {
 
 
     //interlinked with an intermediate concept, this is needed in order to select one as task and the other as belief
-    public void ProperlyLinkedIndirectlyLayer2Test(String premise1, String premise2) throws Exception {
+    public void ProperlyLinkedIndirectlyLayer2Test(@NotNull String premise1, @NotNull String premise2) throws Exception {
         TestNAR tester = test();
         tester.believe(premise1); //.en("If robin is a type of bird then robin can fly.");
         tester.believe(premise2); //.en("Robin is a type of bird.");
@@ -208,7 +209,7 @@ public class LinkageTest extends AbstractNALTest {
         tester.mustBelieve(1,"<a --> b>",0.9f);
     }
 
-    public boolean links(String premise1, String premise2, TestNAR tester) {
+    public boolean links(@NotNull String premise1, String premise2, @NotNull TestNAR tester) {
         Concept ret = tester.nar.concept(premise1);
         boolean passed = false;
         if(ret!=null && ret.termlinks()!=null) {
@@ -356,7 +357,7 @@ public class LinkageTest extends AbstractNALTest {
         ProperlyLinkedIndirectlyTest("<a --> <b --> <#1 --> x>>>", '?', "<k --> x>");
     }
 
-    public void testConceptFormed(String s) throws Exception {
+    public void testConceptFormed(@NotNull String s) throws Exception {
         TestNAR tester = test();
         tester.believe(s,1.0f,0.9f);
         tester.nar.run(1);

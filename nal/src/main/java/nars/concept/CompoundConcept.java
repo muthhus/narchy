@@ -4,7 +4,7 @@ import com.gs.collections.impl.tuple.Tuples;
 import nars.*;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
-import nars.concept.util.*;
+import nars.concept.table.*;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
@@ -683,14 +683,7 @@ public class CompoundConcept extends AbstractConcept<GenericCompound> implements
 
             //int numUnder = 0;
 
-            for (int i = 0, templatesSize = templates.size(); i < templatesSize; i++) {
-                TermTemplate tt = templates.get(i);
-                float subScale = scale * tt.strength;
-
-                //Link the peer termlink bidirectionally
-                if (subScale > minScale) //TODO use a min bound to prevent the iteration ahead of time
-                    linkTerm(this, tt.term, b, subScale, true, subConceptOverflow, null, nar);
-            }
+            linkDistribute(b, scale, minScale, nar, templates, subConceptOverflow);
 
 
             float scOver = subConceptOverflow.floatValue();
@@ -699,12 +692,7 @@ public class CompoundConcept extends AbstractConcept<GenericCompound> implements
 
 
                 //Simple method: just dispense equal proportion of the overflow to all template concepts equally
-                for (int i = 0, templatesSize = templates.size(); i < templatesSize; i++) {
-                    TermTemplate tt = templates.get(i);
-                    float subScale = scOver * tt.strength;
-                    if (subScale > minScale)
-                        linkTerm(this, tt.term, b, subScale, true, conceptOverflow, null, nar);
-                }
+                linkDistribute(b, scOver, minScale, nar, templates, conceptOverflow);
 
                 //TODO More fair method:
 //                    //iterate over templates, psuedorandomly by choosing a random start index and visiting each modulo N
@@ -742,6 +730,17 @@ public class CompoundConcept extends AbstractConcept<GenericCompound> implements
         }
 
         return false;
+    }
+
+    public void linkDistribute(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, List<TermTemplate> templates, MutableFloat subConceptOverflow) {
+        for (int i = 0, templatesSize = templates.size(); i < templatesSize; i++) {
+            TermTemplate tt = templates.get(i);
+            float subScale = scale * tt.strength;
+
+            //Link the peer termlink bidirectionally
+            if (subScale > minScale) //TODO use a min bound to prevent the iteration ahead of time
+                linkTerm(this, tt.term, b, subScale, true, subConceptOverflow, null, nar);
+        }
     }
 
 
@@ -830,7 +829,7 @@ public class CompoundConcept extends AbstractConcept<GenericCompound> implements
     }
 
     @Override
-    public final boolean containsTerm(Term t) {
+    public final boolean containsTerm(@NotNull Term t) {
         return term.containsTerm(t);
     }
 
@@ -876,7 +875,7 @@ public class CompoundConcept extends AbstractConcept<GenericCompound> implements
     }
 
     @Override
-    public final boolean equalTerms(TermContainer c) {
+    public final boolean equalTerms(@NotNull TermContainer c) {
         return term.equalTerms(c);
     }
 
@@ -887,7 +886,7 @@ public class CompoundConcept extends AbstractConcept<GenericCompound> implements
     }
 
     @Override
-    public void forEach(Consumer action, int start, int end) {
+    public void forEach(@NotNull Consumer action, int start, int end) {
         term.forEach(action, start, end);
     }
 

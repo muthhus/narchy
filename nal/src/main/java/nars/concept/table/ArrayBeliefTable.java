@@ -1,6 +1,7 @@
-package nars.concept.util;
+package nars.concept.table;
 
 import com.google.common.collect.Iterators;
+import com.gs.collections.api.block.function.primitive.FloatFunction;
 import nars.Global;
 import nars.Memory;
 import nars.NAR;
@@ -61,7 +62,7 @@ public class ArrayBeliefTable implements BeliefTable {
 
 
         if (temporalCapacity > 0)
-            temporal = new SetTable<>(mp, new TemporalTaskIndex(temporalCapacity, this));
+            temporal = new SetTable<>(mp, new TemporalTaskIndex(temporalCapacity, this::rankTemporalByOriginality));
         else
             temporal = ListTable.Empty;
 
@@ -88,7 +89,8 @@ public class ArrayBeliefTable implements BeliefTable {
         //return topTemporalWeighted(when, now, dur, eternal);
     }
 
-    public Truth topTemporalCurrent(long when, long now, float dur, Task topEternal) {
+    @Nullable
+    public Truth topTemporalCurrent(long when, long now, float dur, @Nullable Task topEternal) {
         //find the temporal with the best rank
         Task t = topTemporal(when, now);
         if (t == null) {
@@ -100,7 +102,8 @@ public class ArrayBeliefTable implements BeliefTable {
         }
     }
 
-    public Truth topTemporalWeighted(long when, long now, float dur, Task topEternal) {
+    @Nullable
+    public Truth topTemporalWeighted(long when, long now, float dur, @Nullable Task topEternal) {
 
         float sumFreq = 0, sumConf = 0;
         float n = 0;
@@ -185,7 +188,7 @@ public class ArrayBeliefTable implements BeliefTable {
     public float rankTemporalByOriginality(@NotNull Task b) {
         return rankTemporalByOriginality(b, lastUpdate);
     }
-    public float rankTemporalByOriginality(@NotNull Task b, long when) {
+    public static float rankTemporalByOriginality(@NotNull Task b, long when) {
         return BeliefTable.rankEternalByOriginality(b) *
                 BeliefTable.relevance(b, when, 1);
 
@@ -466,16 +469,17 @@ public class ArrayBeliefTable implements BeliefTable {
     }
 
     private static final class TemporalTaskIndex extends ArraySortedIndex<Task> {
-        private final ArrayBeliefTable table;
 
-        public TemporalTaskIndex(int cap, ArrayBeliefTable table) {
+        private final FloatFunction<Task> rank;
+
+        public TemporalTaskIndex(int cap, FloatFunction<Task> rank) {
             super(cap);
-            this.table = table;
+            this.rank = rank;
         }
 
         @Override
         public float score(@NotNull Task v) {
-            return table.rankTemporalByOriginality(v);
+            return rank.floatValueOf(v);
         }
     }
 

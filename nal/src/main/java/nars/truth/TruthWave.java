@@ -1,7 +1,7 @@
 package nars.truth;
 
 import nars.NAR;
-import nars.concept.util.BeliefTable;
+import nars.concept.table.BeliefTable;
 import nars.nal.Tense;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

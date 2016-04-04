@@ -17,6 +17,8 @@
 
 package nars.analyze.experimental;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.text.DecimalFormat;
 
 public abstract class Performance {
@@ -62,12 +64,14 @@ public abstract class Performance {
 		}
 	}
 
+	@NotNull
 	public Performance print() {
 		System.out.print(": " + df.format(getCycleTimeMS()) + "ms/test, ");
 		System.out
 				.print(df.format(totalMemory / repeats / 1024.0) + " kb/test");
 		return this;
 	}
+	@NotNull
 	public Performance printCSV(boolean finalComma) {
 		System.out.print(name + ", " + df.format(getCycleTimeMS()) + ", ");
 		System.out.print(df.format(totalMemory / repeats / 1024.0));

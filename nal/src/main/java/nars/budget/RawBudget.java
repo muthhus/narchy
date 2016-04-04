@@ -1,6 +1,5 @@
 package nars.budget;
 
-import nars.nal.Tense;
 import org.jetbrains.annotations.NotNull;
 
 /**

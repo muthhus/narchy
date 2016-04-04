@@ -23,6 +23,8 @@ import nars.io.NarseseTest;
 import nars.nar.Default;
 import nars.nar.Terminal;
 import nars.task.Task;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
 import java.util.TreeSet;
@@ -43,18 +45,21 @@ public class TermTest {
         Global.DEBUG = true;
     }
 
+    @NotNull
     NAR n = new Terminal(16);
 
+    @Nullable
     public static Term imageInt(Term... x) {
         return the(IMAGE_INT, x);
     }
 
+    @Nullable
     public static Term imageExt(Term... x) {
         return the(IMAGE_EXT, x);
     }
 
 
-    protected void assertEquivalentTerm(String term1String, String term2String) {
+    protected void assertEquivalentTerm(@NotNull String term1String, @NotNull String term2String) {
         try {
 
             Termed term1 = n.term(term1String);
@@ -387,13 +392,13 @@ public class TermTest {
         assertEquals(n.term(b), n.term(b));
     }
 
-    protected void testTermEqualityNonNormalizing(String s) {
+    protected void testTermEqualityNonNormalizing(@NotNull String s) {
         testTermEquality(s, false);
     }
-    protected void testTermEquality(String s) {
+    protected void testTermEquality(@NotNull String s) {
         testTermEquality(s, true);
     }
-    protected void testTermEquality(String s, boolean normalize) {
+    protected void testTermEquality(@NotNull String s, boolean normalize) {
 
         Term a = n.term(s).term();
 
@@ -527,7 +532,7 @@ public class TermTest {
         statementHash("<<{i10} --> r> ==> A(1)>", "<<{i11} --> r> ==> A(0)>");
     }
 
-    public void statementHash(String a, String b) {
+    public void statementHash(@NotNull String a, @NotNull String b) {
 
 
         Term ta = $(a);
@@ -557,11 +562,11 @@ public class TermTest {
         testTermComplexityMass(n, "<$a --> (c & #d)>", 3, 5, 1, 1, 0);
     }
 
-    private void testTermComplexityMass(NAR n, String x, int complexity, int mass) {
+    private void testTermComplexityMass(@NotNull NAR n, @NotNull String x, int complexity, int mass) {
         testTermComplexityMass(n, x, complexity, mass, 0, 0, 0);
     }
 
-    private void testTermComplexityMass(NAR n, String x, int complexity, int mass, int varIndep, int varDep, int varQuery) {
+    private void testTermComplexityMass(@NotNull NAR n, @NotNull String x, int complexity, int mass, int varIndep, int varDep, int varQuery) {
         Term t = n.term(x).term();
 
         assertNotNull(t);
@@ -581,7 +586,8 @@ public class TermTest {
         assertEquals((varDep + varIndep + varQuery) != 0, t.vars() > 0);
     }
 
-    public <C extends Compound> C testStructure(String term, String bits) {
+    @NotNull
+    public <C extends Compound> C testStructure(@NotNull String term, String bits) {
         C a = (C) n.term(term).term();
         assertEquals(bits, toBinaryString(a.structure()));
         assertEquals(term, a.toString());
@@ -829,7 +835,7 @@ public class TermTest {
         testUniqueHash("$1", "#1");
     }
 
-    public void testUniqueHash(String a, String b) {
+    public void testUniqueHash(@NotNull String a, @NotNull String b) {
         int h1 = n.term(a).hashCode();
         int h2 = n.term(b).hashCode();
         assertNotEquals(h1, h2);

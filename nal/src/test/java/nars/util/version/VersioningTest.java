@@ -1,5 +1,6 @@
 package nars.util.version;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.function.Supplier;
@@ -12,8 +13,11 @@ import static org.junit.Assert.assertNull;
  */
 public class VersioningTest {
 
+    @NotNull
     Versioning v = new Versioning(10);
+    @NotNull
     Versioned a = new Versioned(v);
+    @NotNull
     Versioned b = new Versioned(v);
 
     @Test

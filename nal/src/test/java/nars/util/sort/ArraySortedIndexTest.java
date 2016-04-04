@@ -3,6 +3,7 @@ package nars.util.sort;
 import nars.bag.impl.ArrayBag;
 import nars.util.ArraySortedIndex;
 import nars.util.signal.bag.NullItem;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
@@ -36,7 +37,7 @@ public class ArraySortedIndexTest {
 
     }
 
-    private void ensureSorted(ArraySortedIndex<NullItem> x, int i) {
+    private void ensureSorted(@NotNull ArraySortedIndex<NullItem> x, int i) {
         boolean s = x.isSorted();
         if (!s) {
             System.err.println("improper sorting detected on cycle " + i);

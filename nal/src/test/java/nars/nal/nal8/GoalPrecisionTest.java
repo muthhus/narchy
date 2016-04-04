@@ -7,6 +7,7 @@ import nars.nar.Default;
 import nars.task.Task;
 import nars.term.Operator;
 import nars.term.Term;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -40,7 +41,7 @@ public class GoalPrecisionTest {
         });
     }
 
-    protected void run(NAR n, int end) {
+    protected void run(@NotNull NAR n, int end) {
 
         Global.DEBUG = true;
         n.onExecution($.operator("x"), (Task a) -> {

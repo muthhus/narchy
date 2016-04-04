@@ -62,9 +62,8 @@ public class VariableNormalization extends VariableTransform implements Function
     /** for use with compounds that have exactly one variable */
     public static final VariableTransform singleVariableNormalization = new VariableTransform() {
 
-        @Override
-        public Termed apply(Compound containing, @NotNull Term current, int depth) {
-
+        @NotNull @Override
+        public Termed apply(Compound containing, @NotNull Term current) {
 
             if (current instanceof Ellipsis)
                 throw new RuntimeException("not allowed");
@@ -91,8 +90,8 @@ public class VariableNormalization extends VariableTransform implements Function
         return rvv;
     }
 
-    @Override
-    public final Termed apply(Compound ct, Term v, int depth) {
+    @NotNull @Override
+    public final Termed apply(Compound ct, Term v) {
         return rename.computeIfAbsent(v, this);
     }
 

@@ -1,6 +1,5 @@
 package nars.term.index;
 
-import nars.concept.AtomConcept;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
@@ -60,7 +59,7 @@ public class HashSymbolMap implements SymbolMap {
     }
 
     @Override
-    public void forEach(Consumer<? super Termed> c) {
+    public void forEach(@NotNull Consumer<? super Termed> c) {
         map.forEach((k,v)->c.accept(v));
     }
 

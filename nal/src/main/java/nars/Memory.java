@@ -121,7 +121,7 @@ public class Memory extends Param {
         level = 8;
 
         this.clock = clock;
-        clock.clear(this);
+        clock.clear();
 
         this.index = index;
 
@@ -180,7 +180,7 @@ public class Memory extends Param {
 
         eventReset.emit(this);
 
-        clock.clear(this);
+        clock.clear();
 
         index.clear();
 

@@ -27,6 +27,7 @@ import nars.util.data.rope.impl.ConcatenationRope;
 import nars.util.data.rope.impl.FlatCharSequenceRope;
 import nars.util.data.rope.impl.ReverseRope;
 import nars.util.data.rope.impl.SubstringRope;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -40,7 +41,7 @@ import static org.junit.Assert.*;
 @Ignore
 public class RopeTest  {
 	
-	private String fromRope(Rope rope, int start, int end) {
+	private String fromRope(@NotNull Rope rope, int start, int end) {
 		try {
 			Writer out = new StringWriter(end - start);
 			rope.write(out, start, end - start);

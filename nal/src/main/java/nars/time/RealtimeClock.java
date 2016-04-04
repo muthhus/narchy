@@ -1,6 +1,5 @@
 package nars.time;
 
-import nars.Memory;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
@@ -15,7 +14,7 @@ public abstract class RealtimeClock implements Clock {
 
 
     @Override
-    public void clear(Memory m) {
+    public void clear() {
         tick();
         t = t0 = getRealTime();
 

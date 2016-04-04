@@ -1,4 +1,4 @@
-package nars.concept.util;
+package nars.concept.table;
 
 import com.google.common.collect.Iterators;
 import nars.Memory;

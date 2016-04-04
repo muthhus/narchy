@@ -1,10 +1,9 @@
-package nars.concept.util;
+package nars.concept.table;
 
 import com.google.common.collect.Iterators;
 import nars.NAR;
 import nars.budget.Budgeted;
 import nars.nal.Tense;
-import nars.task.MutableTask;
 import nars.task.Task;
 import nars.truth.Truth;
 import nars.truth.Truthed;
@@ -156,7 +155,8 @@ public interface BeliefTable extends TaskTable {
     @Nullable Task add(@NotNull Task input, NAR nar);
 
 
-    default Task top(NAR nar) {
+    @Nullable
+    default Task top(@NotNull NAR nar) {
         return top(nar.time());
     }
 

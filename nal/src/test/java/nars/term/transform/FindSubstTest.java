@@ -6,6 +6,7 @@ import nars.term.Term;
 import nars.term.transform.subst.FindSubst;
 import nars.term.transform.subst.Subst;
 import nars.util.data.random.XORShiftRandom;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -24,7 +25,8 @@ public class FindSubstTest {
     }
 
 
-    public Subst testFindSubst(Term a, Term b, boolean matches) {
+    @NotNull
+    public Subst testFindSubst(@NotNull Term a, @NotNull Term b, boolean matches) {
 
         AtomicBoolean matched = new AtomicBoolean(false);
 

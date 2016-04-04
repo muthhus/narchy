@@ -221,7 +221,7 @@ public class PremiseRule extends GenericCompound {
 //        put(Solve.class, 1);
     }};
 
-    private Class<? extends Term> preconditionClass(Term b) {
+    private static Class<? extends Term> preconditionClass(Term b) {
         if (b == TaskPunctuation.TaskGoal) return TaskPunctuation.class;
         if (b == TaskPunctuation.TaskJudgment) return TaskPunctuation.class;
         if (b == TaskPunctuation.TaskQuestion) return TaskPunctuation.class;
@@ -235,7 +235,7 @@ public class PremiseRule extends GenericCompound {
      * the goal of this is to maximally fold subexpressions while also
      * pulling the cheapest and most discriminating tests to the beginning.
      */
-    private void sortPreconditions(List<Term> l) {
+    private static void sortPreconditions(@NotNull List<Term> l) {
         Collections.sort(l, (a, b) -> {
             //higher is earlier
             Object bc = preconditionClass(b);
@@ -354,7 +354,7 @@ public class PremiseRule extends GenericCompound {
 
         @NotNull
         @Override
-        public Termed apply(@NotNull Compound containingCompound, @NotNull Term v, int depth) {
+        public Termed apply(@NotNull Compound containingCompound, @NotNull Term v) {
 
             //do not alter postconditions
             if ((containingCompound.op() == Op.INHERIT)
@@ -916,7 +916,7 @@ public class PremiseRule extends GenericCompound {
         @Nullable
         public Termed applyAfter(Variable secondary) {
             offset++;
-            return apply(null, secondary, -1);
+            return apply(null, secondary);
         }
     }
 }

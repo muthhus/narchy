@@ -1,4 +1,4 @@
-package nars.concept.util;
+package nars.concept.table;
 
 import nars.Memory;
 import nars.task.Task;

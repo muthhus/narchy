@@ -3,6 +3,7 @@ package nars.task;
 import nars.NAR;
 import nars.nar.Default;
 import nars.util.TermCodec;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.nustaq.serialization.FSTConfiguration;
 
@@ -26,7 +27,7 @@ public class TermCodecTest {
     final static FSTConfiguration conf = TermCodec.the;
 
 
-    void assertEqualSerialize(Object orig) {
+    void assertEqualSerialize(@NotNull Object orig) {
         byte barray[] = conf.asByteArray(orig);
         out.println(orig + "\n\tserialized: " + barray.length + " bytes");
 

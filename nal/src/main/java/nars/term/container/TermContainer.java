@@ -41,7 +41,8 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
     int vars();
 
     /** gets subterm at index i */
-    @NotNull T term(int i);
+    @Nullable
+    T term(int i);
 
     /** tests if subterm i is op o */
     boolean isTerm(int i, @NotNull Op o);
@@ -128,7 +129,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
     /** test for exhaustive equality */
     boolean equalTerms(TermContainer c);
 
-    default boolean equalTerms(Term[] c) {
+    default boolean equalTerms(@NotNull Term[] c) {
         int cl = c.length;
         if (cl != size())
             return false;

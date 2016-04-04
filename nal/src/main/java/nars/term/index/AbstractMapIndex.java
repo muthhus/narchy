@@ -39,6 +39,7 @@ public abstract class AbstractMapIndex implements TermIndex {
     }
 
 
+    @Nullable
     @Override
     public final Termed get(@NotNull Termed key, boolean createIfMissing) {
 
@@ -58,7 +59,7 @@ public abstract class AbstractMapIndex implements TermIndex {
 
 
     @NotNull
-    protected Termed<Compound> internCompound(Termed interned) {
+    protected Termed<Compound> internCompound(@NotNull Termed interned) {
         return conceptBuilder.apply(interned.term());
     }
 

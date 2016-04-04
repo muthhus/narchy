@@ -40,6 +40,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     /** content hash */
     public final int hash;
 
+    @NotNull
     public final Op op;
 
 
@@ -171,7 +172,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     }
 
     @Override
-    public final boolean equalTerms(TermContainer c) {
+    public final boolean equalTerms(@NotNull TermContainer c) {
         return subterms.equalTerms(c);
     }
 

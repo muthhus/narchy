@@ -67,7 +67,7 @@ public enum $ /* TODO: implements TermIndex */ {
 //    }
 
     @NotNull
-    public static Atom the(String id) {
+    public static Atom the(@NotNull String id) {
         return new Atom(id);
     }
     @NotNull
@@ -148,6 +148,7 @@ public enum $ /* TODO: implements TermIndex */ {
     public static Term impl(@NotNull Term a, @NotNull Term b) {
         return the(IMPLICATION, a, b);
     }
+    @Nullable
     public static Term impl(@NotNull Term a, int dt, @NotNull Term b) {
         return the(IMPLICATION, -1, dt, TermVector.the(a, b));
     }

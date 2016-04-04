@@ -22,6 +22,7 @@ import nars.term.transform.subst.FindSubst;
 import nars.term.variable.Variable;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -43,8 +44,11 @@ public class EllipsisTest {
 
 
     public interface EllipsisTestCase {
+        @NotNull
         Compound getPattern();
+        @Nullable
         Compound getResult();
+        @Nullable
         Compound getMatchable(int arity);
 
         default Set<Term> test(int arity, int repeats) {
@@ -167,6 +171,7 @@ public class EllipsisTest {
     public abstract static class CommutiveEllipsisTest implements EllipsisTestCase {
         protected final String prefix;
         protected final String suffix;
+        @NotNull
         protected final Compound p;
         public final String ellipsisTerm;
 
@@ -190,14 +195,17 @@ public class EllipsisTest {
             return sb.toString();
         }
 
+        @Nullable
         protected abstract Compound getPattern(String prefix, String suffix);
 
 
+        @NotNull
         @Override
         public Compound getPattern() {
             return p;
         }
 
+        @Nullable
         @Override
         public Compound getMatchable(int arity) {
             return $(prefix + termSequence(arity) + suffix);
@@ -227,7 +235,7 @@ public class EllipsisTest {
             return arity-1;
         }
 
-        @Override public void testFurther(Set<Term> selectedFixed, FindSubst f, Set<Term> varArgTerms) {
+        @Override public void testFurther(Set<Term> selectedFixed, @NotNull FindSubst f, @NotNull Set<Term> varArgTerms) {
             assertEquals(2, f.xy.size());
             Term fixedTermValue = f.term(fixedTerm);
             assertNotNull(f.toString(), fixedTermValue);
@@ -236,6 +244,7 @@ public class EllipsisTest {
         }
 
 
+        @NotNull
         @Override
         public Compound getPattern(String prefix, String suffix) {
             PatternIndex pi = new PatternIndex();
@@ -245,6 +254,7 @@ public class EllipsisTest {
 
 
 
+        @NotNull
         @Override
         public Compound getResult() {
             final PatternIndex pi = new PatternIndex();
@@ -269,6 +279,7 @@ public class EllipsisTest {
             return s;
         }
 
+        @Nullable
         @Override
         public Compound getPattern(String prefix, String suffix) {
             return $(prefix + ellipsisTerm + suffix);
@@ -276,11 +287,12 @@ public class EllipsisTest {
 
 
 
+        @Nullable
         @Override
         public Compound getResult() {
             String s = prefix + "Z, " + ellipsisTerm + suffix;
             Compound c = $(s);
-            assertNotNull(s.toString() + " produced null compound", c);
+            assertNotNull(s + " produced null compound", c);
             return c;
         }
 
@@ -328,6 +340,7 @@ public class EllipsisTest {
 //        //TODO
 //    }
 
+    @NotNull
     public static String[] p(String a, String b) { return new String[] { a, b}; }
 
     @Ignore
@@ -383,7 +396,7 @@ public class EllipsisTest {
         }
     }
 
-    static void testCombinations(Compound X, Compound Y, int expect) {
+    static void testCombinations(Compound X, @NotNull Compound Y, int expect) {
         X = (Compound) new PatternIndex().the(X).term();
         //Y = (Compound) new PatternIndex().the(Y).term();
 

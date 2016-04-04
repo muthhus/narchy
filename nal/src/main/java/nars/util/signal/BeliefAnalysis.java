@@ -2,7 +2,7 @@ package nars.util.signal;
 
 import nars.NAR;
 import nars.concept.Concept;
-import nars.concept.util.BeliefTable;
+import nars.concept.table.BeliefTable;
 import nars.nal.Tense;
 import nars.term.Compound;
 import nars.truth.TruthWave;
@@ -92,6 +92,7 @@ public class BeliefAnalysis extends EnergyAnalysis {
 		return table(beliefOrGoal).size();
 	}
 
+	@Nullable
 	public BeliefTable table(boolean beliefOrGoal) {
 		return beliefOrGoal ? beliefs() : goals();
 	}
@@ -106,6 +107,7 @@ public class BeliefAnalysis extends EnergyAnalysis {
 		return beliefs().priSum();
 	}
 
+	@NotNull
 	public BeliefAnalysis input(boolean beliefOrGoal, float v, float v1) {
 		if (beliefOrGoal)
 			believe(1.0f, 0.9f);

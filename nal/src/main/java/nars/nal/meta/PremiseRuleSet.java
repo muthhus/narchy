@@ -174,7 +174,7 @@ public class PremiseRuleSet  {
                 .stream();
     }
 
-    @Deprecated /* soon */ static String preprocess(CharSequence rule) //minor things like Truth.Comparison -> Truth_Comparison
+    @Deprecated /* soon */ static String preprocess(@NotNull CharSequence rule) //minor things like Truth.Comparison -> Truth_Comparison
     {
         String ret = '<' + rule.toString() + '>';
 
@@ -279,7 +279,7 @@ public class PremiseRuleSet  {
             }
 
             return ur;
-        }).flatMap( u -> u.stream() );
+        }).flatMap(Collection::stream);
     }
 
     @NotNull
@@ -384,7 +384,7 @@ public class PremiseRuleSet  {
 
         @Nullable
         @Override
-        public Termed apply(Compound parent, @NotNull Term subterm, int depth) {
+        public Termed apply(Compound parent, @NotNull Term subterm) {
             return unpatternify(subterm);
         }
 

@@ -2,9 +2,6 @@ package nars.nal.meta;
 
 import com.google.common.base.Joiner;
 import nars.Narsese;
-import nars.Op;
-import nars.nal.Deriver;
-import nars.nar.Default;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
@@ -27,7 +24,7 @@ public class PremiseRuleTest {
     /**
      * for printing complex terms as a recursive tree
      */
-    public static void printRecursive(Term x) {
+    public static void printRecursive(@NotNull Term x) {
         Terms.printRecursive(x, 0);
     }
 
@@ -98,7 +95,7 @@ public class PremiseRuleTest {
         return new PremiseRuleSet(true, onlyRule).rules.get(0);
     }
 
-    @NotNull static PremiseRule rule(String onlyRule) {
+    @NotNull static PremiseRule rule(@NotNull String onlyRule) {
         return rule(
             (PremiseRule) p.term(onlyRule)
         );

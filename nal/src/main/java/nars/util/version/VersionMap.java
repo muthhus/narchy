@@ -127,7 +127,7 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
         return new RemovingVersionedEntry(k);
     }
 
-    public final boolean computeAssignable(X x, Reassigner<X,Y> r) {
+    public final boolean computeAssignable(X x, @NotNull Reassigner<X,Y> r) {
         return map.compute(x, r)!=null;
     }
 
@@ -200,6 +200,7 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
             this.pool = pool;
         }
 
+        @NotNull
         public Reassigner<X,Y> set(BiPredicate<X, Y> assigner, Y y) {
             this.assigner = assigner;
             this.y = y;
@@ -207,7 +208,7 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
         }
 
         @Override
-        public Versioned<Y> apply(X X, Versioned<Y> py) {
+        public Versioned<Y> apply(X X, @Nullable Versioned<Y> py) {
             if (py == null) {
                 return assigner.test(X, y) ? pool.get().set(y) : null;
             } else {

@@ -6,6 +6,7 @@ import nars.NAR;
 import nars.nar.Default;
 import nars.nar.Terminal;
 import nars.util.signal.TestNAR;
+import org.jetbrains.annotations.NotNull;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -64,10 +65,12 @@ public abstract class AbstractNALTest {
         tester.test();
     }
 
+    @NotNull
     @Deprecated public static Iterable<Supplier<NAR>> nars(int level, boolean requireMultistep) {
         return nars(level, !requireMultistep, true);
     }
 
+    @NotNull
     public static Iterable<Supplier<NAR>> nars(int level, boolean single, boolean multi) {
 
         List<Supplier<NAR>> l = Global.newArrayList(2);

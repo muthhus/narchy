@@ -11,6 +11,7 @@ import nars.nar.Default;
 import nars.util.data.random.XorShift128PlusRandom;
 import org.apache.commons.math3.random.EmpiricalDistribution;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -187,7 +188,7 @@ public class CurveBagTest  {
         assertTrue(l.get(0).getN() < l.get(l.size() - 1).getN());
 
     }
-    static void printDist(EmpiricalDistribution f) {
+    static void printDist(@NotNull EmpiricalDistribution f) {
         System.out.println(f.getSampleStats().toString().replace("\n"," "));
         f.getBinStats().forEach(
                 s -> {
@@ -197,10 +198,12 @@ public class CurveBagTest  {
         );
     }
 
-    private EmpiricalDistribution getSamplingDistribution(CurveBag b, int n) {
+    @NotNull
+    private EmpiricalDistribution getSamplingDistribution(@NotNull CurveBag b, int n) {
         return getSamplingDistribution(b, n, 10);
     }
-    private EmpiricalDistribution getSamplingDistribution(CurveBag b, int n, int bins) {
+    @NotNull
+    private EmpiricalDistribution getSamplingDistribution(@NotNull CurveBag b, int n, int bins) {
         DoubleArrayList f = new DoubleArrayList(n);
         for (int i = 0; i < n; i++)
             f.add( b.sampleIndex() );
@@ -209,11 +212,13 @@ public class CurveBagTest  {
         return e;
     }
 
-    private EmpiricalDistribution getSamplingPriorityDistribution(Bag b, int n) {
+    @NotNull
+    private EmpiricalDistribution getSamplingPriorityDistribution(@NotNull Bag b, int n) {
         return getSamplingPriorityDistribution(b, n, 10);
     }
 
-    private EmpiricalDistribution getSamplingPriorityDistribution(Bag b, int n, int bins) {
+    @NotNull
+    private EmpiricalDistribution getSamplingPriorityDistribution(@NotNull Bag b, int n, int bins) {
         DoubleArrayList f = new DoubleArrayList(n);
         if (!b.isEmpty()) {
             for (int i = 0; i < n; i++)
@@ -230,7 +235,7 @@ public class CurveBagTest  {
         int bins = 5;
         int samples = n * 32;
 
-        CurveBag fullDynamicRange = populated(n, () -> Math.random());
+        CurveBag fullDynamicRange = populated(n, Math::random);
         EmpiricalDistribution unifDistr = getSamplingPriorityDistribution(fullDynamicRange, samples, bins);
         printDist(unifDistr);
 
@@ -250,12 +255,13 @@ public class CurveBagTest  {
 
     }
 
-    private float maxMinRatio(EmpiricalDistribution d) {
+    private float maxMinRatio(@NotNull EmpiricalDistribution d) {
         List<SummaryStatistics> bins = d.getBinStats();
         return  ((float)bins.get(bins.size()-1).getN() / ((float)bins.get(0).getN()));
     }
 
-    private CurveBag<String> populated(int n , DoubleSupplier random) {
+    @NotNull
+    private CurveBag<String> populated(int n , @NotNull DoubleSupplier random) {
         Random rng = new XorShift128PlusRandom(1);
 
         CurveBag<String> a = new CurveBag(n, rng);
@@ -335,6 +341,7 @@ public class CurveBagTest  {
 //
 //    }
 
+    @NotNull
     public static CurveBag<String> newBag(int n) {
         Random rng = new XorShift128PlusRandom(1);
         return new CurveBag(n, rng);

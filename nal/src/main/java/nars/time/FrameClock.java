@@ -1,6 +1,5 @@
 package nars.time;
 
-import nars.Memory;
 import org.jetbrains.annotations.NotNull;
 
 /** increments time on each frame */
@@ -10,7 +9,7 @@ public class FrameClock implements Clock {
     long t;
 
     @Override
-    public void clear(Memory m) {
+    public void clear() {
         t = 0;
     }
 

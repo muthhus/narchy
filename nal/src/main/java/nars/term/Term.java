@@ -28,7 +28,6 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 
 import static nars.nal.Tense.DTERNAL;
-import static nars.nal.Tense.ETERNAL;
 
 
 public interface Term extends Termed, Comparable, Termlike {

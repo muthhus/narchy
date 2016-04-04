@@ -21,7 +21,7 @@ import com.google.common.collect.Lists;
 import nars.NAR;
 import nars.Symbols;
 import nars.concept.Concept;
-import nars.concept.util.BeliefTable;
+import nars.concept.table.BeliefTable;
 import nars.nal.nal8.operator.SyncOperator;
 import nars.task.Task;
 import nars.term.Operator;

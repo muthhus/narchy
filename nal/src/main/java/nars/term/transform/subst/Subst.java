@@ -18,6 +18,7 @@ public interface Subst  {
     @Nullable
     Term term(Term t);
 
+    @NotNull
     default Term termOrOriginal(@NotNull Term t) {
         Term x = term(t);
         return x == null ? t : x;

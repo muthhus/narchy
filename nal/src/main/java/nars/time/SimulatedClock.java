@@ -1,6 +1,5 @@
 package nars.time;
 
-import nars.Memory;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -12,7 +11,7 @@ public class SimulatedClock implements Clock {
 
 
     @Override
-    public void clear(Memory m) {
+    public void clear() {
         t = t0 = 0;
     }
 

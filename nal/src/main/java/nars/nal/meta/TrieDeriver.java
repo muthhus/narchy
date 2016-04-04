@@ -1,6 +1,5 @@
 package nars.nal.meta;
 
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import javassist.*;
 import nars.Global;
@@ -121,7 +120,7 @@ public class TrieDeriver extends Deriver {
     }
 
 
-    @NotNull private List<BooleanCondition<PremiseEval>> compileConditions(@NotNull Collection<Term> t, @NotNull AtomicReference<MatchTerm> matchParent) {
+    @NotNull private static List<BooleanCondition<PremiseEval>> compileConditions(@NotNull Collection<Term> t, @NotNull AtomicReference<MatchTerm> matchParent) {
 
         return t.stream().filter(x -> {
             if (x instanceof BooleanCondition) {

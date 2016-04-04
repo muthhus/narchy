@@ -320,7 +320,7 @@ public enum LocalRules {
      * WARNING: this assumes the task's terms are already
      * known to be equal.
      */
-    public static boolean isRevisible(@NotNull Task newBelief, Task oldBelief) {
+    public static boolean isRevisible(@NotNull Task newBelief, @NotNull Task oldBelief) {
         Term t = newBelief.term();
         return
             newBelief!=oldBelief &&

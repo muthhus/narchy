@@ -17,7 +17,7 @@ public final class SubTermOp extends AtomicBooleanCondition<PremiseEval> {
     private final transient String id;
 
 
-    public SubTermOp(int subterm, Op op) {
+    public SubTermOp(int subterm, @NotNull Op op) {
         this.subterm = subterm;
         this.op = op.ordinal();
         id = subterm + ":\"" + op + '"';

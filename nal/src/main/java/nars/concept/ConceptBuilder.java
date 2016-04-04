@@ -4,6 +4,7 @@ import nars.bag.Bag;
 import nars.task.Task;
 import nars.term.Term;
 import nars.term.Termed;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
 
@@ -12,7 +13,9 @@ import java.util.function.Function;
  */
 public interface ConceptBuilder extends Function<Term, Concept> {
 
+    @NotNull
     Bag<Task> taskbag();
+    @NotNull
     Bag<Termed> termbag();
 
 }

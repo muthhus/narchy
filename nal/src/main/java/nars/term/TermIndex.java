@@ -54,6 +54,7 @@ public interface TermIndex {
         return get(t, false);
     }
 
+    @Nullable
     Termed get(@NotNull Termed key, boolean createIfMissing);
 
 
@@ -265,8 +266,9 @@ public interface TermIndex {
         return result!=null ? the(result.term()) : null;
     }
 
-    default Termed transformedCompound(Compound src, TermContainer transformedSubterms) {
-        return /*Termed t = */builder().transformedCompound(src, transformedSubterms);
+    @Nullable
+    default Termed transformedCompound(@NotNull Compound src, @NotNull TermContainer transformedSubterms) {
+        return /*Termed t = */builder().theTransformed(src, transformedSubterms);
         //return t != null ? the(t) : null;
     }
 
@@ -448,80 +450,63 @@ public interface TermIndex {
             return true;
         }
 
-        @Override
-        public Termed apply(Compound parent, @NotNull Term subterm, int depth) {
+        @NotNull @Override
+        public Termed apply(Compound parent, @NotNull Term subterm) {
             return subterm.anonymous();
         }
     };
+
+
+
+    @Nullable
+    default Term theTransformed(@NotNull Compound src, @Nullable Term[] newSubs) {
+        return ((newSubs == null) || (newSubs == src.terms())) ?
+                src :
+                builder().theTransformed(src, TermContainer.the(src.op(), newSubs));
+    }
 
 
     @Nullable
     default Term transform(@NotNull Compound src, @NotNull CompoundTransform t) {
         if (!t.testSuperTerm(src)) {
             return src; //nothing changed
+        } else {
+            return theTransformed(src, _transform(src, t));
         }
-
-        Term[] newSubterms = new Term[src.size()];
-
-        int mods = transform(src, t, newSubterms, 0);
-        if (mods == -1) {
-            return null;
-        } else if ((mods > 0)) {
-            return builder().transformedCompound(src, newSubterms);
-        }
-        return src; //nothing changed
     }
 
 
     /**
      * returns how many subterms were modified, or -1 if failure (ex: results in invalid term)
      */
-    default <T extends Term> int transform(@NotNull Compound src, @NotNull CompoundTransform<Compound<T>, T> trans, Term[] target, int level) {
+    default Term[] _transform(@NotNull Compound src, @NotNull CompoundTransform<Compound, Term> trans) {
+
         int n = src.size();
 
         int modifications = 0;
 
-        TermBuilder builder = builder();
+        Term[] target = new Term[n];
 
         for (int i = 0; i < n; i++) {
             Term x = src.term(i);
-            //if (x == null)
-            //    throw new InvalidTerm(src);
+
+            Term cx = x;
 
             if (trans.test(x)) {
-
-                Termed x2 = trans.apply((Compound<T>) src, (T) x, level);
-                if (x2 == null)
-                    return -1;
-
-                if (x != x2) { //REFERENCE EQUALTY
-                    modifications++;
-                    x = x2.term();
-                }
-
+                cx = trans.apply(src, x).term();
             } else if (x instanceof Compound) {
-                //recurse
-                Compound cx = (Compound) x;
-                if (trans.testSuperTerm(cx)) {
-
-                    Term[] yy = new Term[cx.size()];
-                    int submods = transform(cx, trans, yy, level + 1);
-
-                    if (submods == -1) return -1;
-                    if (submods > 0) {
-
-                        x = builder.transformedCompound(cx, yy);
-                        if (x == null)
-                            return -1;
-
-                        modifications += (x != cx) ? 1 : 0; //REFERENCE EQUALTY
-                    }
-                }
+                cx = transform((Compound) x, trans); //recurse
             }
+
+            if (x!=cx) { //REFERENCE EQUALTY
+                modifications++;
+                x = cx;
+            }
+
             target[i] = x;
         }
 
-        return modifications;
+        return modifications > 0 ? target : src.terms();
     }
 
     /**
@@ -576,8 +561,9 @@ public interface TermIndex {
             }
 
             //NORMALIZATION
+            Compound prenormalized = tc;
             if ((term = normalized(term)) == null)
-                throw new InvalidTerm((Compound) term);
+                throw new InvalidTerm(prenormalized);
 
             //ANONYMIZATION
             //TODO ? put the unnormalized term for cached future normalizations?

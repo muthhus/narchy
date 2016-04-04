@@ -14,6 +14,7 @@ import nars.term.index.PatternIndex;
 import nars.term.transform.subst.FindSubst;
 import nars.util.signal.RuleTest;
 import nars.util.signal.TestNAR;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -43,7 +44,8 @@ public class UnificationTest {
     }
 
 
-    FindSubst test(Op type, String s1, String s2, boolean shouldSub) {
+    @NotNull
+    FindSubst test(@NotNull Op type, @NotNull String s1, @NotNull String s2, boolean shouldSub) {
 
         Global.DEBUG = true;
         TestNAR test = test();
@@ -858,7 +860,7 @@ public class UnificationTest {
     }
 
 
-    void testIntroduction(String subj, Op relation, String pred, String belief, String concl) {
+    void testIntroduction(String subj, Op relation, String pred, String belief, @NotNull String concl) {
 
         NAR n = new Default();
         n.nal(6);

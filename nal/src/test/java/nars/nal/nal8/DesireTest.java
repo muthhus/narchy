@@ -4,6 +4,7 @@ import nars.Global;
 import nars.NAR;
 import nars.nar.Default;
 import nars.task.Task;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 /**
@@ -29,7 +30,7 @@ public class DesireTest {
                 "a:b! :|:");
         //n.input("c:d! :|:");
     }
-    public void testDesireEnvelope(int t1, String... inputs) {
+    public void testDesireEnvelope(int t1, @NotNull String... inputs) {
         Global.DEBUG = true;
 
         NAR n = new Default();
@@ -50,7 +51,7 @@ public class DesireTest {
         //n.concept("c:d").print();
     }
 
-    private float print(NAR n, String concept, long now) {
+    private float print(@NotNull NAR n, @NotNull String concept, long now) {
         Task tt = n.concept(concept).goals().top(now);
         System.out.println(now + ": " + "\t" + tt);
             /*if (tt!=null)

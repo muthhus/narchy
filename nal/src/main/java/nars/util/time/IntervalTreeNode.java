@@ -25,7 +25,9 @@ public interface IntervalTreeNode<K extends Comparable<? super K>,V> {
 	
 	boolean containsValue(V value);
 	
+	@NotNull
 	K getLow();
+	@NotNull
 	K getHigh();
 	V getValue();
 	

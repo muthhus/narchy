@@ -12,6 +12,8 @@ import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.term.transform.subst.Subst;
 import nars.util.signal.TestNAR;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -180,7 +182,7 @@ public class OperatorTest {
 
         PatternAnswer f = new PatternAnswer("add(%a,%b,#x)") {
             @Override
-            public List<Task> run(Task t, Subst s) {
+            public List<Task> run(Task t, @NotNull Subst s) {
                 System.out.println(t + " " + s);
                 assertEquals($("x"), s.term($("%a")));
                 assertEquals($("y"), s.term($("%b")));
@@ -216,8 +218,9 @@ public class OperatorTest {
         NAR n = new Default(100,1,1,1);
 
         PatternAnswer addition = new PatternAnswer("add(%a,%b,#x)") {
+            @Nullable
             final Term A = $("%a"), B = $("%b");
-            @Override public List<Task> run(Task question, Subst s) {
+            @Override public List<Task> run(@NotNull Task question, @NotNull Subst s) {
                 int a = i(s.term(A).toString());
                 int b = i(s.term(B).toString());
 

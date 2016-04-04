@@ -1057,7 +1057,8 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 //
 
     /** byte codec output of matching concept tasks (blocking) */
-    public NAR output(OutputStream o, Predicate<Task> each) {
+    @NotNull
+    public NAR output(@NotNull OutputStream o, @NotNull Predicate<Task> each) {
 
         forEachConceptTask(true, true, true, true, t-> {
             if (each.test(t)) {
@@ -1081,12 +1082,14 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     }
 
 
-    public NAR output(OutputStream o) {
+    @NotNull
+    public NAR output(@NotNull OutputStream o) {
         return output(o, x -> true);
     }
 
     /** byte codec input stream of tasks, to be input after decode */
-    public NAR input(InputStream tasks) throws Exception {
+    @NotNull
+    public NAR input(@NotNull InputStream tasks) throws Exception {
         while (tasks.available() > 0) {
             Task t = (Task)TermCodec.the.decodeFromStream(tasks);
             input(t);
@@ -1094,9 +1097,11 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return this;
     }
 
+    @Nullable
     abstract public Concept process(@NotNull Task input, float activation);
 
-    public final Concept process(Task input) {
+    @Nullable
+    public final Concept process(@NotNull Task input) {
         return process(input, activationRate.floatValue());
     }
 

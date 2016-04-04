@@ -21,7 +21,7 @@
 package nars.truth;
 
 import nars.Global;
-import nars.concept.util.BeliefTable;
+import nars.concept.table.BeliefTable;
 import nars.nal.Tense;
 import nars.nal.UtilityFunctions;
 import nars.task.Task;
@@ -193,7 +193,8 @@ public final class TruthFunctions extends UtilityFunctions {
         return deductionB(a, 1f, bC, minConf);
     }
 
-    public static Truth deduction(@NotNull Truth a, Truth b, float minConf) {
+    @Nullable
+    public static Truth deduction(@NotNull Truth a, @NotNull Truth b, float minConf) {
         return deductionB(a, b.freq(), b.conf(), minConf);
     }
 
@@ -215,6 +216,7 @@ public final class TruthFunctions extends UtilityFunctions {
         float c = and(a.conf(), bc, bf);
         return c < minConf ? null : new DefaultTruth(and(a.freq(), bf), c);
     }
+    @Nullable
     public static Truth analogy(@NotNull Truth a, @NotNull Truth b, float minConf) {
         return analogy(a, b.freq(), b.conf(), minConf);
     }

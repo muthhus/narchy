@@ -3,6 +3,7 @@ package nars.nal;
 import nars.NAR;
 import nars.nal.meta.TrieDeriver;
 import nars.nar.Default;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static junit.framework.TestCase.assertTrue;
@@ -50,11 +51,13 @@ public class TrieDeriverTest {
 //            out.println(p);
     }
 
+    @NotNull
     public Default testRuleInputs(String rule, String... inputs) {
         return testRuleInputs(new TrieDeriver(rule), inputs);
     }
 
-    public Default testRuleInputs(TrieDeriver d, String... inputs) {
+    @NotNull
+    public Default testRuleInputs(@NotNull TrieDeriver d, String... inputs) {
         return (Default) new Default() {
             @Override
             protected Deriver newDeriver() {
@@ -63,6 +66,7 @@ public class TrieDeriverTest {
         }.input(inputs);
     }
 
+    @NotNull
     public TrieDeriver testRule(String... rules) {
         TrieDeriver d = new TrieDeriver(rules);
         new Default() {

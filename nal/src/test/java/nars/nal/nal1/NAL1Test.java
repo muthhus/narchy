@@ -4,6 +4,7 @@ import nars.NAR;
 import nars.Narsese;
 import nars.nal.AbstractNALTest;
 import nars.util.signal.TestNAR;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -142,7 +143,7 @@ public class NAL1Test extends AbstractNALTest {
     }
 
     /** question to answer matching */
-    public void testQuestionAnswer(int cycles, String belief, String question, String expectedSolution) {
+    public void testQuestionAnswer(int cycles, @NotNull String belief, @NotNull String question, String expectedSolution) {
         //AtomicBoolean solved = new AtomicBoolean(false);
 
         TestNAR test = test();

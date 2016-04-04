@@ -5,6 +5,7 @@ import nars.Global;
 import nars.NAR;
 import nars.nar.Default;
 import nars.term.Termed;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.List;
@@ -49,7 +50,7 @@ public class OperationConceptTest {
         assertEquals(4, history.size());
     }
 
-    public static void assertMotive(NAR n, Termed operation, float b, float g) {
+    public static void assertMotive(@NotNull NAR n, @NotNull Termed operation, float b, float g) {
         assertEquals(b, n.concept(operation).beliefMotivation(n.time(), n.duration()), 0.01f);
         assertEquals(g, n.concept(operation).goalMotivation(n.time(), n.duration()), 0.01f);
     }

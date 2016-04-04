@@ -298,7 +298,7 @@ public interface Temporalize {
     }
 
     @NotNull
-    static Compound dtExact(@NotNull Compound derived, @NotNull long[] occReturn, @NotNull ConceptProcess prem, @NotNull Task src, Termed<Compound> dtTerm) {
+    static Compound dtExact(@NotNull Compound derived, @NotNull long[] occReturn, @NotNull ConceptProcess prem, @NotNull Task src, @NotNull Termed<Compound> dtTerm) {
         occReturn[0] = src.occurrence();
         if (derived.op().isTemporal())
             return deriveDT(derived, +1, prem, dtTerm.term().dt());

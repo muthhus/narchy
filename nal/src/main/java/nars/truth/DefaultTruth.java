@@ -45,7 +45,7 @@ public class DefaultTruth implements Truth  {
         this.freq = round(f, epsilon);
         if (Float.isFinite(c)) {
             this.conf = round(c, epsilon);
-            this.hash = Truth.hash(this, discreteness);
+            this.hash = Truth.hash(f, c, discreteness);
         } else {
             this.conf = c;
             this.hash = 0;

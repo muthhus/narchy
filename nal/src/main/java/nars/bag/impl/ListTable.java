@@ -75,7 +75,7 @@ public interface ListTable<V, L> extends Table<V, L> {
 
         @Override
         public List list() {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
 
         @Override

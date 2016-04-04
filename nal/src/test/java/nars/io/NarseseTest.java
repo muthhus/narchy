@@ -11,6 +11,7 @@ import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.variable.Variable;
 import nars.truth.Truth;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.List;
@@ -23,12 +24,14 @@ public class NarseseTest {
     static final NAR n = new Terminal(16);
     static final Narsese p = Narsese.the();
 
-    static <T extends Term> T term(String s) throws Narsese.NarseseException {
+    @NotNull
+    static <T extends Term> T term(@NotNull String s) throws Narsese.NarseseException {
         //TODO n.term(s) when the parser is replaced
         return (T) p.term(s);
     }
 
-    static List<Task> tasks(String s) throws Narsese.NarseseException {
+    @NotNull
+    static List<Task> tasks(@NotNull String s) throws Narsese.NarseseException {
         //TODO n.task(s) when the parser is replaced
         //return p.parseTask(s, true);
         List<Task> l = Global.newArrayList(1);
@@ -37,7 +40,7 @@ public class NarseseTest {
     }
 
 
-    static Task task(String s) throws Narsese.NarseseException {
+    static Task task(@NotNull String s) throws Narsese.NarseseException {
         List<Task> l = tasks(s);
         if (l.size() != 1)
             throw new RuntimeException("Expected 1 task, got: " + l);
@@ -155,7 +158,7 @@ public class NarseseTest {
         assertEquals(7, t.term().complexity());
     }
 
-    protected void testProductABC(Compound p) throws Narsese.NarseseException {
+    protected void testProductABC(@NotNull Compound p) throws Narsese.NarseseException {
         assertEquals(p.toString() + " should have 3 sub-terms", 3, p.size());
         assertEquals("a", p.term(0).toString());
         assertEquals("b", p.term(1).toString());
@@ -253,7 +256,7 @@ public class NarseseTest {
 
 
 
-    protected void testBelieveAB(Compound t) {
+    protected void testBelieveAB(@NotNull Compound t) {
         Term[] aa = Operator.argArray(t);
         assertEquals(2, aa.length);
         assertEquals("^believe", t.term(1).toString());
@@ -319,6 +322,7 @@ public class NarseseTest {
         assertEquals(abcd + " != " + ABCD, abcd, ABCD);
     }
 
+    @NotNull
     protected Variable testVar(char prefix) {
         Term x = term(prefix + "x");
         assertNotNull(x);
@@ -466,19 +470,19 @@ public class NarseseTest {
     @Test
     public void testImageIntRel2() { testImageIntRel("((\\,x,y,_)-->a)", 2); }
 
-    private void testImageIntRel(String imageTerm, int relationIndexExpected) {
+    private void testImageIntRel(@NotNull String imageTerm, int relationIndexExpected) {
         Compound ti = term(imageTerm);
         assertEquals(relationIndexExpected, ((Compound)ti.term(0)).relation()  );
         assertEquals(imageTerm, ti.toString());
     }
 
-    private void testImageExtRel(String imageTerm, int relationIndexExpected) {
+    private void testImageExtRel(@NotNull String imageTerm, int relationIndexExpected) {
         Compound ti = term(imageTerm);
         assertEquals(relationIndexExpected, ((Compound)ti.term(1)).relation() );
         assertEquals(imageTerm, ti.toString());
     }
 
-    private void taskParses(String s) {
+    private void taskParses(@NotNull String s) {
         Task t = task(s);
         assertNotNull(t);
 //        Task u = oldParser.parseTaskOld(s, true);
@@ -540,7 +544,7 @@ public class NarseseTest {
         assertEquals("echo(\"comment1234\")", op.toString());
     }
 
-    protected void ensureIsEcho(Compound op) {
+    protected void ensureIsEcho(@NotNull Compound op) {
         //return Atom.the(Utf8.toUtf8(name));
 
         //        int olen = name.length();
@@ -566,7 +570,7 @@ public class NarseseTest {
         assertParseException("{}", "[]");
     }
 
-    public static void assertParseException(String... inputs) {
+    public static void assertParseException(@NotNull String... inputs) {
         for (String s : inputs ) {
             try {
                 Term e = term(s);

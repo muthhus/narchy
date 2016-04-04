@@ -2,6 +2,7 @@ package nars.analyze;
 
 import nars.NAR;
 import nars.nar.Default;
+import org.jetbrains.annotations.NotNull;
 import org.junit.runner.Description;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
@@ -20,6 +21,7 @@ public class TestAggregator extends RunListener {
     private final NAR nar;
 
     String testName;
+    @NotNull
     Set<Description> success = new HashSet();
 
     @Override
@@ -35,7 +37,7 @@ public class TestAggregator extends RunListener {
     }
 
     @Override
-    public void testStarted(Description d) throws Exception {
+    public void testStarted(@NotNull Description d) throws Exception {
 
         String si = '<' + getDescriptionTerm(d) + " --> " + testName + ">.";
         nar.input(si);
@@ -53,7 +55,8 @@ public class TestAggregator extends RunListener {
         //System.out.println(JSON.stringFrom(failure));
     }
 
-    public String getDescriptionTerm(Description d) {
+    @NotNull
+    public String getDescriptionTerm(@NotNull Description d) {
         String[] meth = d.getMethodName().split("[\\[\\]]");
         String m = String.join(",", meth);
 
@@ -61,7 +64,7 @@ public class TestAggregator extends RunListener {
                 + ',' + m + '}';
     }
 
-    protected void describe(Description d, boolean success) {
+    protected void describe(@NotNull Description d, boolean success) {
 
 
         String si = '<' + getDescriptionTerm(d) + " --> [" +
@@ -71,7 +74,7 @@ public class TestAggregator extends RunListener {
     }
 
     @Override
-    public void testFailure(Failure failure) throws Exception {
+    public void testFailure(@NotNull Failure failure) throws Exception {
 
         Description d = failure.getDescription();
 
@@ -91,7 +94,7 @@ public class TestAggregator extends RunListener {
     public void testIgnored(Description description) throws Exception {
     }
 
-    public TestAggregator(NAR nar, String... classnames) {
+    public TestAggregator(NAR nar, @NotNull String... classnames) {
 
         this.nar = nar;
 

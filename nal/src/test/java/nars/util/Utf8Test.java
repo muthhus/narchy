@@ -5,6 +5,7 @@
 package nars.util;
 
 import nars.util.utf8.Utf8;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -18,7 +19,8 @@ import static org.junit.Assert.assertTrue;
  * @author me
  */
 public class Utf8Test {
-    public static byte[] charsToBytes(char[] s) {
+    @NotNull
+    public static byte[] charsToBytes(@NotNull char[] s) {
         int slen = s.length;
         byte[] b = new byte[slen *2];
         int j = 0;

@@ -13,6 +13,8 @@ import nars.term.atom.Atomic;
 import nars.term.compound.GenericCompound;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.nustaq.serialization.*;
 
 import java.io.IOException;
@@ -81,8 +83,9 @@ public class TermCodec extends FSTConfiguration {
             public void readObject(FSTObjectInput in, Object toRead, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy) throws Exception {
             }
 
+            @NotNull
             @Override
-            public Object instantiate(Class objectClass, FSTObjectInput in, FSTClazzInfo serializationInfo, FSTClazzInfo.FSTFieldInfo referencee, int streamPosition) throws Exception {
+            public Object instantiate(Class objectClass, @NotNull FSTObjectInput in, FSTClazzInfo serializationInfo, FSTClazzInfo.FSTFieldInfo referencee, int streamPosition) throws Exception {
                 //return new Atom(in.readStringUTF());
 
                 Term term = (Term) in.readObject();
@@ -124,7 +127,7 @@ public class TermCodec extends FSTConfiguration {
             }
 
             @Override
-            public void writeObject(FSTObjectOutput out, Object toWrite, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy, int streamPosition) throws IOException {
+            public void writeObject(@NotNull FSTObjectOutput out, Object toWrite, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy, int streamPosition) throws IOException {
                 Task t = (Task) toWrite;
                 out.writeObject(t.term());
                 char p = t.punc();
@@ -169,8 +172,9 @@ public class TermCodec extends FSTConfiguration {
             public void readObject(FSTObjectInput in, Object toRead, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy) throws Exception {
             }
 
+            @Nullable
             @Override
-            public Object instantiate(Class objectClass, FSTObjectInput in, FSTClazzInfo serializationInfo, FSTClazzInfo.FSTFieldInfo referencee, int streamPosition) throws Exception {
+            public Object instantiate(Class objectClass, @NotNull FSTObjectInput in, FSTClazzInfo serializationInfo, FSTClazzInfo.FSTFieldInfo referencee, int streamPosition) throws Exception {
                 //GenericCompound c = (GenericCompound) Narsese.the().term(in.readUTF(), null /* raw, unnormalized */);
 
                 Op o = Op.values()[in.readByte()];
@@ -186,7 +190,7 @@ public class TermCodec extends FSTConfiguration {
             }
 
             @Override
-            public void writeObject(FSTObjectOutput out, Object toWrite, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy, int streamPosition) throws IOException {
+            public void writeObject(@NotNull FSTObjectOutput out, Object toWrite, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy, int streamPosition) throws IOException {
                 GenericCompound a = (GenericCompound) toWrite;
                 //out.writeStringUTF(a.toString());
 
@@ -216,7 +220,7 @@ public class TermCodec extends FSTConfiguration {
         }
 
         @Override
-        public boolean willHandleClass(Class cl) {
+        public boolean willHandleClass(@NotNull Class cl) {
 
             return Atomic.class.isAssignableFrom(cl);
         }
@@ -225,8 +229,9 @@ public class TermCodec extends FSTConfiguration {
         public void readObject(FSTObjectInput in, Object toRead, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy) throws Exception {
         }
 
+        @Nullable
         @Override
-        public Object instantiate(Class objectClass, FSTObjectInput in, FSTClazzInfo serializationInfo, FSTClazzInfo.FSTFieldInfo referencee, int streamPosition) throws Exception {
+        public Object instantiate(Class objectClass, @NotNull FSTObjectInput in, FSTClazzInfo serializationInfo, FSTClazzInfo.FSTFieldInfo referencee, int streamPosition) throws Exception {
             //return new Atom(in.readStringUTF());
             String s = in.readStringUTF();
 //                if (s.startsWith("%")) {
@@ -237,7 +242,7 @@ public class TermCodec extends FSTConfiguration {
         }
 
         @Override
-        public void writeObject(FSTObjectOutput out, Object toWrite, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy, int streamPosition) throws IOException {
+        public void writeObject(@NotNull FSTObjectOutput out, Object toWrite, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy, int streamPosition) throws IOException {
             Atomic a = (Atomic) toWrite;
             out.writeStringUTF(a.toString());
         }

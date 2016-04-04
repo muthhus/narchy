@@ -5,6 +5,7 @@ import nars.NAR;
 import nars.nar.Default;
 import nars.task.Task;
 import nars.util.time.IntervalTree;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.Set;
@@ -27,12 +28,12 @@ public class TemporalTest {
 
     public static class TimeMap extends IntervalTree<Long,Task> implements Consumer<Task> {
 
-        public TimeMap(NAR n) {
+        public TimeMap(@NotNull NAR n) {
             n.forEachConceptTask(true,true,false,false,this);
         }
 
         @Override
-        public void accept(Task task) {
+        public void accept(@NotNull Task task) {
             if (!task.isEternal()) {
                 put(task.occurrence(), task);
             }
@@ -83,7 +84,7 @@ public class TemporalTest {
         assertTrue(irregular.isEmpty());
     }
 
-    static void print(Default n, TimeMap m) {
+    static void print(@NotNull Default n, @NotNull TimeMap m) {
         out.println(n.time() + ": " + "Total tasks: " + m.size() + "\t" + m.keySetSorted().toString());
     }
 

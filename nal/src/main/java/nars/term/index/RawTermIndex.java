@@ -27,7 +27,7 @@ public abstract class RawTermIndex extends MapIndex2 implements Serializable {
 
     @NotNull
     @Override
-    protected Termed internCompound(Termed interned) {
+    protected Termed internCompound(@NotNull Termed interned) {
         return interned; //dont conceptualize, pass-through raw term
     }
 

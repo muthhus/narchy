@@ -7,9 +7,10 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class PremiseFork extends ThenFork {
 
+    @NotNull
     private final ProcTerm[] termCache;
 
-    public PremiseFork(ProcTerm[] n) {
+    public PremiseFork(@NotNull ProcTerm[] n) {
         super(n);
         if (n.length == 1)
             throw new RuntimeException("unnecessary use of fork");

@@ -63,6 +63,7 @@ public abstract class FindSubst extends Versioning implements Subst {
      */
     @NotNull
     public final Versioned<ImmutableMap<Term, MatchConstraint>> constraints;
+    @NotNull
     public final VersionMap.Reassigner<Term,Term> reassigner;
 
 
@@ -130,9 +131,9 @@ public abstract class FindSubst extends Versioning implements Subst {
 
         xy = new VarCachedVersionMap(this);
         yx = new VarCachedVersionMap(this);
-        reassigner = new VersionMap.Reassigner<Term,Term>(
-            //() -> new Versioned(toSharePool)
-            () -> new Versioned(FindSubst.this)
+        reassigner = new VersionMap.Reassigner<>(
+                //() -> new Versioned(toSharePool)
+                () -> new Versioned(FindSubst.this)
         );
         //term = new Versioned(this);
         parent = new Versioned(this);
@@ -919,7 +920,7 @@ public abstract class FindSubst extends Versioning implements Subst {
         }
     }
 
-    private final class LimitedFasterList extends FasterList {
+    private static final class LimitedFasterList extends FasterList {
 
         public LimitedFasterList() {
             super(Global.unificationTermutesMax);

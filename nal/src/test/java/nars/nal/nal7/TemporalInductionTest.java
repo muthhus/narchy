@@ -3,6 +3,7 @@ package nars.nal.nal7;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.nar.Default;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -116,7 +117,7 @@ public class TemporalInductionTest {
 
     }
 
-    private static int getBeliefCount(NAR n) {
+    private static int getBeliefCount(@NotNull NAR n) {
         AtomicInteger a = new AtomicInteger(0);
         n.forEachConceptTask(true,false,false,false,false,1000,t->{
            a.addAndGet(1);

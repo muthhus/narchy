@@ -10,7 +10,7 @@ import java.io.Serializable;
 public interface Clock extends Serializable {
 
 	/** called when memory reset */
-	void clear(Memory m);
+	void clear();
 
 	/** returns the current time, as measured in units determined by this clock */
 	long time();

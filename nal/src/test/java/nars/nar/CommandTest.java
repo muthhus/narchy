@@ -7,6 +7,7 @@ import nars.nal.nal8.operator.NullOperator;
 import nars.task.Task;
 import nars.term.Operator;
 import nars.term.Term;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -26,7 +27,7 @@ public class CommandTest {
         n.onExec(new NullOperator("c") {
 
             @Override
-            public void execute(Task t) {
+            public void execute(@NotNull Task t) {
 
                 invoked.set(true);
                 Term[] a = Operator.argArray(t.term());

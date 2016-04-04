@@ -6,6 +6,7 @@ import nars.bag.BLink;
 import nars.nar.Default;
 import nars.task.Task;
 import nars.util.data.MutableDouble;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ import static org.junit.Assert.assertTrue;
 
 public class ItemAccumulatorTest {
 
+    @NotNull
     NAR n = new Default();
 
     @Test
@@ -39,7 +41,7 @@ public class ItemAccumulatorTest {
 
         ii.bag().commit();
 
-        ii.bag().forEach(c -> System.out.println(c));
+        ii.bag().forEach(System.out::println);
 
         //mergePlus:
         assertEquals(0.1f+0.1f, ii.bag().sample().pri(), 0.001f);
@@ -79,7 +81,7 @@ public class ItemAccumulatorTest {
         assertTrue(ii.bag().isSorted());
 
         //System.out.println(ii);
-        ii.bag().forEach(x -> System.out.println(x));
+        ii.bag().forEach(System.out::println);
 
         BLink<Task> oneLink = ii.bag().pop();
         Task one = oneLink.get();

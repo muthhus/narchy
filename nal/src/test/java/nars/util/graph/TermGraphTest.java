@@ -6,6 +6,8 @@ import nars.$;
 import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphMapping;
 import org.jgrapht.experimental.equivalence.EquivalenceComparator;
@@ -99,7 +101,7 @@ public class TermGraphTest {
         //testIsomorphism( "<%a<->%b>", "<a<->b>" );
     }
 
-    public void testIsomorphism(String _pattern, String _term) {
+    public void testIsomorphism(@NotNull String _pattern, @NotNull String _term) {
 
         TermGraph pattern = new TermGraph($(_pattern));
         TermGraph term = new TermGraph($(_term));
@@ -118,7 +120,7 @@ public class TermGraphTest {
             }
 
             @Override
-            public boolean equivalenceCompare(Term s1, Term s2, Graph<Term, ObjectIntPair<Compound>> g1, Graph<Term, ObjectIntPair<Compound>> g2) {
+            public boolean equivalenceCompare(@NotNull Term s1, @NotNull Term s2, Graph<Term, ObjectIntPair<Compound>> g1, Graph<Term, ObjectIntPair<Compound>> g2) {
                 System.out.println("compare " + s1 + ' ' + s2);
                 if ( areRoots(s1, s2) ||
                         s1.op() == Op.VAR_PATTERN || (s2.op() == Op.VAR_PATTERN))
@@ -141,15 +143,15 @@ public class TermGraphTest {
         EquivalenceComparator<ObjectIntPair<Compound>, Graph<Term, ObjectIntPair<Compound>>> edgeCompare =
                 new EquivalenceComparator<ObjectIntPair<Compound>, Graph<Term, ObjectIntPair<Compound>>>() {
                     @Override
-                    public boolean equivalenceCompare(ObjectIntPair<Compound> e1,
-                                                      ObjectIntPair<Compound> e2,
+                    public boolean equivalenceCompare(@NotNull ObjectIntPair<Compound> e1,
+                                                      @NotNull ObjectIntPair<Compound> e2,
                                                       Graph<Term, ObjectIntPair<Compound>> g1,
                                                       Graph<Term, ObjectIntPair<Compound>> g2) {
                         return e1.getOne().isCommutative() || e1.getTwo() == e2.getTwo();
                     }
 
                     @Override
-                    public int equivalenceHashcode(ObjectIntPair<Compound> e, Graph<Term, ObjectIntPair<Compound>> context) {
+                    public int equivalenceHashcode(@NotNull ObjectIntPair<Compound> e, Graph<Term, ObjectIntPair<Compound>> context) {
                         return e.getOne().isCommutative() ? 0 : e.getTwo();
                     }
                 }
@@ -221,9 +223,10 @@ public class TermGraphTest {
 
     private class TermGraph extends SimpleDirectedGraph<Term, ObjectIntPair<Compound>> {
 
+        @NotNull
         private final Compound root;
 
-        public TermGraph(Compound t) {
+        public TermGraph(@NotNull Compound t) {
             super((Class)null);
 
             this.root = t;
@@ -231,7 +234,7 @@ public class TermGraphTest {
             addCompound(t);
         }
 
-        private void addCompound(Compound t) {
+        private void addCompound(@NotNull Compound t) {
             addVertex(t);
 
             int n = 0;
@@ -298,10 +301,11 @@ public class TermGraphTest {
          *
          * @return the permutation iterator
          */
+        @NotNull
         @Override
         protected CollectionPermutationIter<V> createPermutationIterator(
                 Set<V> vertexSet1,
-                Set<V> vertexSet2)
+                @NotNull Set<V> vertexSet2)
         {
             return new CollectionPermutationIter<>(vertexSet2);
         }
@@ -316,8 +320,8 @@ public class TermGraphTest {
          */
         @Override
         protected boolean areVertexSetsOfTheSameEqualityGroup(
-                Set<V> vertexSet1,
-                Set<V> vertexSet2)
+                @NotNull Set<V> vertexSet1,
+                @NotNull Set<V> vertexSet2)
         {
             if (vertexSet1.size() != vertexSet2.size()) {
                 return false;
@@ -355,17 +359,21 @@ public class TermGraphTest {
     {
 
 
+        @NotNull
         public static EquivalenceComparator<Object, Object>
                 edgeDefaultIsomorphismComparator =
                 new UniformEquivalenceComparator<>();
+        @NotNull
         public static EquivalenceComparator<Object, Object>
                 vertexDefaultIsomorphismComparator =
                 new UniformEquivalenceComparator<>();
 
 
 
+        @Nullable
         protected EquivalenceComparator<? super E, ? super Graph<V, ? super E>>
                 edgeComparator;
+        @Nullable
         protected EquivalenceComparator<? super V, ? super Graph<? super V, E>>
                 vertexComparator;
 
@@ -399,8 +407,8 @@ public class TermGraphTest {
 
                 // XXX hb 060128: FOllowing parameter may need Graph<? super V,? super
                 // E>
-                EquivalenceComparator<? super V, ? super Graph<? super V, ? super E>> vertexChecker,
-                EquivalenceComparator<? super E, ? super Graph<? super V, ? super E>> edgeChecker)
+                @Nullable EquivalenceComparator<? super V, ? super Graph<? super V, ? super E>> vertexChecker,
+                @Nullable EquivalenceComparator<? super E, ? super Graph<? super V, ? super E>> edgeChecker)
         {
             this.graph1 = graph1;
             this.graph2 = graph2;
@@ -487,6 +495,7 @@ public class TermGraphTest {
          *
          * @return permutation iterator
          */
+        @NotNull
         protected abstract CollectionPermutationIter<V> createPermutationIterator(
                 Set<V> vertexSet1,
                 Set<V> vertexSet2);
@@ -605,8 +614,8 @@ public class TermGraphTest {
          * @param edgeComparator if null, always return true.
          */
         protected boolean areAllEdgesEquivalent(
-                IsomorphismRelation<V, E> resultRelation,
-                EquivalenceComparator<? super E, ? super Graph<V, E>> edgeComparator)
+                @NotNull IsomorphismRelation<V, E> resultRelation,
+                @Nullable EquivalenceComparator<? super E, ? super Graph<V, E>> edgeComparator)
         {
             boolean checkResult = true;
 
@@ -697,6 +706,7 @@ public class TermGraphTest {
         private class NextFunctor
                 implements PrefetchIterator.NextElementFunctor<IsomorphismRelation>
         {
+            @Nullable
             @Override
             public IsomorphismRelation nextElement()
                     throws NoSuchElementException

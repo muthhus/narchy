@@ -8,6 +8,7 @@ import nars.nar.AbstractNAR;
 import nars.nar.Default;
 import nars.task.Task;
 import nars.util.signal.BeliefAnalysis;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -17,6 +18,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class RevisionTest {
 
+    @NotNull
     public static AbstractNAR newNAR(int maxBeliefs) {
         AbstractNAR d = new Default(256, 1, 2, 3);
         d.nal(7);// {

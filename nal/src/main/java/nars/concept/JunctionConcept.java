@@ -1,22 +1,18 @@
 package nars.concept;
 
-import com.google.common.collect.Iterators;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;
 import nars.Op;
-import nars.concept.util.BeliefTable;
+import nars.concept.table.BeliefTable;
+import nars.concept.table.DynamicBeliefTable;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Termed;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Iterator;
 
 /**
  * Accelerated Conjunction/Disjunction for full or partial Boolean Logic emulation
@@ -24,78 +20,7 @@ import java.util.Iterator;
 abstract public class JunctionConcept extends CompoundConcept {
 
 
-    abstract public class EvalBeliefTable implements BeliefTable {
-
-        Task current = null;
-
-        public EvalBeliefTable() {
-
-        }
-
-        @Nullable
-        @Override
-        public Task add(@NotNull Task input, NAR nar) {
-            return current;
-        }
-
-        @Nullable
-        @Override
-        public Task topEternal() {
-            return null;
-        }
-
-        @Nullable
-        @Override
-        public Task topTemporal(long when, long now) {
-            return updateTask(now);
-        }
-
-        public Task updateTask(long now) {
-            if (current == null || current.occurrence()!=now) {
-                current = update(now);
-            }
-            return current;
-        }
-
-        abstract protected Task update(long now);
-
-        @Nullable
-        @Override
-        public Truth truth(long when, long now, float dur) {
-            return topTemporal(when, now).projectTruth(when, now, false);
-        }
-
-        @Override
-        public int getCapacity() {
-            return 0;
-        }
-
-        @Override
-        public void setCapacity(int newCapacity) {
-
-        }
-
-        @Override
-        public int size() {
-            return isEmpty() ? 0 : 1;
-        }
-
-        @Override
-        public void clear() {
-            current = null;
-        }
-
-        @Override
-        public boolean isEmpty() {
-            return updateTask(nar.time())==null;
-        }
-
-        @Override
-        public Iterator<Task> iterator() {
-            return !isEmpty() ? Iterators.singletonIterator(current) : Iterators.emptyIterator();
-        }
-    }
-
+    @NotNull
     public final NAR nar;
 
     public JunctionConcept(@NotNull String compoundTermString, @NotNull NAR n) throws Narsese.NarseseException {
@@ -128,13 +53,15 @@ abstract public class JunctionConcept extends CompoundConcept {
 
     @NotNull
     private BeliefTable newTable(boolean beliefOrGoal) {
-        return new EvalBeliefTable() {
+        return new DynamicBeliefTable(this) {
+            @NotNull
             @Override protected Task update(long now) {
                 return new MutableTask(term, '.').truth(solve(beliefOrGoal, now, now)).present(now).normalize(nar);
             }
         };
     }
 
+    @NotNull
     abstract public Truth solve(boolean beliefOrGoal, long when, long now);
 
     public static class ConjunctionConcept extends JunctionConcept {
@@ -145,6 +72,7 @@ abstract public class JunctionConcept extends CompoundConcept {
         }
 
 
+        @NotNull
         @Override
         public Truth solve(boolean beliefOrGoal, long when, long now) {
             //HACK todo use a real truth aggregation formula

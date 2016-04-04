@@ -112,7 +112,7 @@ public class NAL3Test extends AbstractNALTest {
         TestNAR tester = test();
         tester.believe("<planetX --> [marsy,earthly,venusy]>",1.0f,0.9f); //.en("PlanetX is Mars, Pluto, or Venus.");
         tester.believe("<planetX --> [earthly,saturny]>", 0.1f, 0.9f); //.en("PlanetX is probably neither Pluto nor Saturn.");
-        tester.mustBelieve(cycles*2, "<planetX --> [marsy,venusy]>", 0.90f , 0.73f /*0.81f*/); //.en("PlanetX is either Mars or Venus.");
+        tester.mustBelieve(cycles*2, "<planetX --> [marsy,venusy]>", 0.90f , 0.81f); //.en("PlanetX is either Mars or Venus.");
     }
 
     @Test

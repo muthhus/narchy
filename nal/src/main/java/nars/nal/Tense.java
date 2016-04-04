@@ -5,7 +5,7 @@ import nars.task.Task;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 
-import static nars.concept.util.BeliefTable.rankEternalByOriginality;
+import static nars.concept.table.BeliefTable.rankEternalByOriginality;
 import static nars.nal.UtilityFunctions.or;
 
 

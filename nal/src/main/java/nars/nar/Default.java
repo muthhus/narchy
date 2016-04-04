@@ -9,7 +9,9 @@ import nars.bag.impl.CurveBag;
 import nars.budget.BudgetMerge;
 import nars.budget.Budgeted;
 import nars.budget.Forget;
-import nars.concept.*;
+import nars.concept.Concept;
+import nars.concept.DefaultConceptBuilder;
+import nars.concept.PremiseGenerator;
 import nars.data.Range;
 import nars.nal.Deriver;
 import nars.nal.meta.PremiseEval;
@@ -449,7 +451,7 @@ public class Default extends AbstractNAR {
 
         }
 
-        protected final void frame(NAR nar) {
+        protected final void frame(@NotNull NAR nar) {
             conceptForget.update(nar);
             premiser.frame(nar);
         }
@@ -591,7 +593,7 @@ public class Default extends AbstractNAR {
         /**
          * update derivation parameters (each frame)
          */
-        @Override public final void frame(NAR nar) {
+        @Override public final void frame(@NotNull NAR nar) {
             super.frame(nar);
             matcher.setMinConfidence(confMin.floatValue());
             taskLinkForget.update(nar);

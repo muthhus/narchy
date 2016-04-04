@@ -97,10 +97,10 @@ public class StampTest {
         }
     }
 
-    @NotNull public static long[] zipReverse(long[] a, long[] b, int i) {
+    @NotNull public static long[] zipReverse(@NotNull long[] a, @NotNull long[] b, int i) {
         return zip(a, b, i, false);
     }
-    @NotNull public static long[] zipForward(long[] a, long[] b, int i) {
+    @NotNull public static long[] zipForward(@NotNull long[] a, @NotNull long[] b, int i) {
         return zip(a, b, i, true);
     }
 

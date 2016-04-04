@@ -2,6 +2,8 @@ package nars.term;
 
 import nars.NAR;
 import nars.nar.Terminal;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -83,14 +85,16 @@ public class TermIDTest {
     //@Test public void testInternalRepresentation2() { testInternalRepresentation("<a && b>", 5); }
 
 
-    public Term testBytesRepresentation(String expectedCompactOutput, int expectedLength) {
+    @NotNull
+    public Term testBytesRepresentation(@NotNull String expectedCompactOutput, int expectedLength) {
         return testBytesRepresentation(
             null,
             expectedCompactOutput,
             expectedLength);
     }
 
-    public Term testBytesRepresentation(String expectedCompactOutput, String expectedPrettyOutput, int expectedLength) {
+    @NotNull
+    public Term testBytesRepresentation(@Nullable String expectedCompactOutput, @NotNull String expectedPrettyOutput, int expectedLength) {
         //UTF8Identifier b = new UTF8Identifier(expectedPrettyOutput);
         Termed i = nar.term(expectedPrettyOutput);
         //byte[] b = i.bytes();
@@ -106,11 +110,12 @@ public class TermIDTest {
         return i.term();
     }
 
-    public void areEqualAndIfNotWhy(String a, String b) {
+    public void areEqualAndIfNotWhy(@NotNull String a, @NotNull String b) {
         assertEquals(charComparison(a, b), a, b);
     }
 
-    public static String charComparison(String a, String b) {
+    @NotNull
+    public static String charComparison(@NotNull String a, @NotNull String b) {
         return Arrays.toString(a.toCharArray()) + " != " + Arrays.toString(b.toCharArray());
     }
 

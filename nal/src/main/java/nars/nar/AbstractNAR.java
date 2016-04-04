@@ -44,11 +44,11 @@ import java.util.function.Function;
 public abstract class AbstractNAR extends NAR {
 
 
-    public AbstractNAR(@NotNull Clock clock, TermIndex index, Random random) {
+    public AbstractNAR(@NotNull Clock clock, TermIndex index, @NotNull Random random) {
         this(clock, index, random, Global.DEFAULT_SELF);
     }
 
-    public AbstractNAR(@NotNull Clock clock, TermIndex index, Random rng, @NotNull Atom self) {
+    public AbstractNAR(@NotNull Clock clock, TermIndex index, @NotNull Random rng, @NotNull Atom self) {
         super(clock, index, rng, self);
 
         initDefaults();

@@ -4,6 +4,7 @@ import nars.$;
 import nars.Op;
 import nars.io.NarseseTest;
 import nars.term.container.TermContainer;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -16,6 +17,7 @@ import static org.junit.Assert.*;
  */
 public class TermReductionsTest {
 
+    @Nullable
     final Term p = $("P"), q = $("Q"), r = $("R"), s = $("S");
 
 

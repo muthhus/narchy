@@ -7,9 +7,8 @@ import nars.nal.meta.BooleanCondition;
 import nars.nal.meta.PremiseEval;
 import nars.task.Task;
 import nars.term.Compound;
-import nars.term.Term;
-import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import static nars.nal.Tense.DTERNAL;
 import static nars.nal.Tense.ETERNAL;
@@ -47,6 +46,7 @@ abstract public class events extends AtomicBooleanCondition<PremiseEval> {
 
 
     /** task is before or simultaneous with belief which follows (T ... B) */
+    @Nullable
     public static final events afterOrEternal = new events() {
 
         @Override

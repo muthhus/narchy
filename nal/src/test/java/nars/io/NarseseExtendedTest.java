@@ -9,6 +9,7 @@ import nars.nar.Terminal;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static nars.io.NarseseTest.task;
@@ -23,13 +24,13 @@ public class NarseseExtendedTest {
 
 
 
-    void eternal(Task t) {
+    void eternal(@NotNull Task t) {
         tensed(t, true, null);
     }
-    void tensed(Task t, Tense w) {
+    void tensed(@NotNull Task t, @NotNull Tense w) {
         tensed(t, false, w);
     }
-    void tensed(Task t, boolean eternal, Tense w) {
+    void tensed(@NotNull Task t, boolean eternal, @NotNull Tense w) {
         assertEquals(eternal, isEternal(t.occurrence()));
         if (!eternal) {
             switch (w) {
@@ -101,7 +102,7 @@ public class NarseseExtendedTest {
 //    }
 
 
-    static void eqTerm(String shorter, String expected) {
+    static void eqTerm(@NotNull String shorter, String expected) {
         Narsese p = Narsese.the();
 
         Term a = p.term(shorter);

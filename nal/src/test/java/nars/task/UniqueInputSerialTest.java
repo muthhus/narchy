@@ -5,6 +5,7 @@ import nars.NAR;
 import nars.nar.AbstractNAR;
 import nars.nar.Default;
 import nars.task.flow.TaskQueue;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -30,7 +31,7 @@ public class UniqueInputSerialTest {
         inputTwoUniqueTasks(new Default());
     }*/
 
-    public void inputTwoUniqueTasks(NAR n) {
+    public void inputTwoUniqueTasks(@NotNull NAR n) {
 
         Global.DEBUG = true;
 

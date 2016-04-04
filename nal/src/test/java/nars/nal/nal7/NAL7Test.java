@@ -4,6 +4,7 @@ import nars.NAR;
 import nars.nal.AbstractNALTest;
 import nars.nal.Tense;
 import nars.util.signal.TestNAR;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -82,7 +83,7 @@ public class NAL7Test extends AbstractNALTest {
         testTemporalRevision(1, 0.5f, 0.7f, "<(John,key) --> hold>");
     }
 
-    void testTemporalRevision(int delay, float freq, float conf, String belief) {
+    void testTemporalRevision(int delay, float freq, float conf, @NotNull String belief) {
         TestNAR tester = test();
         //tester.nar.log();
         tester.input(belief + ". :|: %1.00;0.65%");

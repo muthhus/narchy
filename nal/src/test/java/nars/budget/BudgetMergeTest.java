@@ -61,10 +61,11 @@ public class BudgetMergeTest {
         return new UnitBudget(0,0,0);
     }
 
-    private static UnitBudget testMerge(float scale, BudgetMerge m,
-          float exPri, float exDur, float exQua, //start value
-          float inPri, float inDur, float inQua, //incoming merge
-          float ouPri, float ouDur, float ouQua  //expected result
+    @NotNull
+    private static UnitBudget testMerge(float scale, @NotNull BudgetMerge m,
+                                        float exPri, float exDur, float exQua, //start value
+                                        float inPri, float inDur, float inQua, //incoming merge
+                                        float ouPri, float ouDur, float ouQua  //expected result
     )    {
         UnitBudget x = new UnitBudget(exPri, exDur, exQua);
         testMerge(scale, m, x, inPri, inDur, inQua, ouPri, ouDur, ouQua);
@@ -72,16 +73,16 @@ public class BudgetMergeTest {
     }
 
     @NotNull
-    private static Budget testMerge(float scale, BudgetMerge m, Budget x, float inPri, float inDur, float inQua, float ouPri, float ouDur, float ouQua) {
+    private static Budget testMerge(float scale, @NotNull BudgetMerge m, Budget x, float inPri, float inDur, float inQua, float ouPri, float ouDur, float ouQua) {
         UnitBudget y = new UnitBudget(inPri, inDur, inQua);
         return testMerge(scale, m, x, y, ouPri, ouDur, ouQua);
     }
     @NotNull
-    private static Budget testMerge(float scale, BudgetMerge m, Budget x, Budget y, float ouPri, float ouDur, float ouQua) {
+    private static Budget testMerge(float scale, @NotNull BudgetMerge m, Budget x, Budget y, float ouPri, float ouDur, float ouQua) {
         return testMerge(scale, m, x, y, ouPri, ouDur, ouQua, -1f);
     }
     @NotNull
-    private static Budget testMerge(float scale, BudgetMerge m, Budget x, Budget y, float ouPri, float ouDur, float ouQua, float expectedOverflow) {
+    private static Budget testMerge(float scale, @NotNull BudgetMerge m, Budget x, Budget y, float ouPri, float ouDur, float ouQua, float expectedOverflow) {
         x = x.clone();
         float overflow = m.merge(x, y, scale);
         assertEquals(ouPri, x.pri(), tol);

@@ -3,6 +3,7 @@ package nars.io;
 import nars.util.Texts;
 import nars.util.data.rope.Rope;
 import nars.util.data.rope.impl.FastConcatenationRope;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -22,7 +23,7 @@ public class TextsTest {
      * <p>
      * TODO do not allow a StringBuilder to appear in output, instead wrap in CharArrayRope
      */
-    public static CharSequence yarn(int maxLen, CharSequence... components) {
+    public static CharSequence yarn(int maxLen, @NotNull CharSequence... components) {
         int totalLen = 0;
         int total = 0;
         CharSequence lastNonNull = null;

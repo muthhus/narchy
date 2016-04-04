@@ -4,8 +4,6 @@ import nars.Global;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.task.Task;
-import nars.term.Compound;
-import nars.term.Terms;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayDeque;
@@ -44,7 +42,7 @@ public final class STMTemporalLinkage implements Consumer<Task> {
 
 
     @Override
-    public final void accept(Task t) {
+    public final void accept(@NotNull Task t) {
 
         if (!temporallyInductable(t)) {
             return;

@@ -4,7 +4,6 @@ import com.google.common.collect.Iterables;
 import com.gs.collections.impl.map.mutable.primitive.ObjectIntHashMap;
 import com.gs.collections.impl.tuple.Tuples;
 import nars.Premise;
-import nars.concept.Concept;
 import nars.concept.ConceptProcess;
 import nars.nal.nal8.AbstractOperator;
 import nars.nar.Terminal;

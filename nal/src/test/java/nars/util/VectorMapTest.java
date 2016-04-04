@@ -6,6 +6,7 @@ import nars.util.data.UniformVector;
 import nars.util.data.VectorMap;
 import nars.util.event.CycleReaction;
 import nars.util.signal.Autoencoder;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 /**
@@ -16,6 +17,7 @@ import org.junit.Test;
 
 public class VectorMapTest {
 
+    @NotNull
     NAR n = new Default(100, 1, 1, 1);
 
     @Test 
@@ -50,7 +52,7 @@ public class VectorMapTest {
         
             Autoencoder d;
             
-            @Override protected void map(float[] in, float[] out) {
+            @Override protected void map(@NotNull float[] in, @NotNull float[] out) {
                 if (d == null)
                     d = new Autoencoder(in.length, out.length, n.random);
 
