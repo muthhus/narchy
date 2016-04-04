@@ -42,7 +42,7 @@ public class Optimization<X> {
     }
 
     @NotNull
-    public Result<X> run(@NotNull FloatFunction<X> eval) {
+    public Result run(@NotNull FloatFunction<X> eval) {
         double stopValue = Double.POSITIVE_INFINITY;
         int maxIterations = 30000;
         CMAESOptimizer optim = new CMAESOptimizer(maxIterations, stopValue, true, 0,
@@ -94,7 +94,7 @@ public class Optimization<X> {
 
     }
 
-    public class Result<X> {
+    public class Result {
 
         private final PointValuePair optimal;
 
