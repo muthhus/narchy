@@ -222,7 +222,8 @@ public interface Temporalize {
         ConceptProcess prem = p.premise;
 
         Termed<Compound> decomposed = decomposeTask ? prem.task() : prem.beliefTerm();
-        long tOcc = prem.task().occurrence();
+        Task premBelief = prem.belief();
+        long dOcc = decomposeTask ? prem.task().occurrence() : (premBelief !=null ? premBelief.occurrence() : ETERNAL);
 
         //if ((tOcc == ETERNAL) && (prem.belief()!=null))
         //    tOcc = prem.belief().occurrence(); //use occurrence from belief
@@ -237,25 +238,28 @@ public interface Temporalize {
 
         Compound decTerm = decomposed.term();
         Compound dtt = decTerm;
-        long ddt = dtt.dt();
+        int ddt = dtt.dt();
 
-        Task other = decomposeTask ? prem.belief() : prem.task();
+        Task other = decomposeTask ? premBelief : prem.task();
+        Term otherTerm = decomposeTask ? prem.beliefTerm().term() : prem.task().term();
 
-        long otherOcc = ETERNAL;
+        long oOcc = ETERNAL;
         if (other != null && !other.isEternal()) {
-            otherOcc = other.occurrence();
+            oOcc = other.occurrence();
         }
 
 
-        if ((tOcc != ETERNAL) || (otherOcc != ETERNAL)) {
+        if ((dOcc != ETERNAL) || (oOcc != ETERNAL)) {
 
             int shift = 0;
 
-            if (ddt != ETERNAL) {
-                Term otherTerm = other != null ? other.term() : null;
+            int matchedDerived = -1, matchedOther = -1;
+
+            if (ddt != DTERNAL) {
 
 
                 //shift to occurrence time of the subterm within the decomposed term's task
+
 
                 for (int i = 0; i < decTerm.size(); i++) {
                     Term dct = decTerm.term(i);
@@ -263,33 +267,46 @@ public interface Temporalize {
                     if (rdt.equals(derived)) {
                         int st = decTerm.subtermTime(dct);
                         if (st != DTERNAL) {
-
                             shift += st;
+                            matchedDerived = i;
                         }
-                    } else if (otherTerm != null && rdt.equals(otherTerm)) {
+                    }
+
+                    if (otherTerm != null && rdt.equals(otherTerm)) {
                         int st = decTerm.subtermTime(dct);
                         if (st != DTERNAL) {
-
-                            if (tOcc!=ETERNAL && otherOcc!=ETERNAL) {
-                                st += (tOcc - otherOcc);
-                            }
-
                             shift -= st;
+                            matchedOther = i;
                         }
                     }
                 }
-
 
             }
 
             long rOcc = ETERNAL;
 
-            if (tOcc == ETERNAL)
-                rOcc = otherOcc;
-            else if (otherOcc == ETERNAL)
-                rOcc = tOcc;
+            if (dOcc == ETERNAL) {
+                rOcc = oOcc;
+            }
+            else if (oOcc == ETERNAL) {
+
+
+                if ((shift < 0) && (ddt > 0) && (matchedDerived < matchedOther)) {
+                    shift *= -1;
+                } else if ((shift < 0) && (ddt < 0) && (matchedDerived > matchedOther)) {
+                    shift *= -1;
+                }
+
+                rOcc = dOcc;
+            }
 
             if (rOcc!=ETERNAL) {
+
+
+
+                if (rOcc + shift == 7)
+                    System.out.println(ddt + ":: " + rOcc + " " + shift + " , " + matchedDerived + " " + matchedOther);
+
                 occReturn[0] = rOcc + shift;
             }
         }
