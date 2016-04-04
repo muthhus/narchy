@@ -20,6 +20,7 @@ import java.util.function.DoubleSupplier;
  */
 public class Sensor implements Consumer<NAR>, DoubleSupplier {
 
+
     /**
      * resolution of the output freq value
      */
@@ -40,6 +41,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
     int maxTimeBetweenUpdates;
     int minTimeBetweenUpdates;
 
+    char punc = '.';
 
     private long lastInput;
 
@@ -91,6 +93,11 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
         return this;
     }
 
+    public Sensor punc(char c) {
+        this.punc = c;
+        return this;
+    }
+
     public void ready() {
         this.lastInput = nar.time()-minTimeBetweenUpdates;
     }
@@ -114,19 +121,19 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
         float f = Util.round(fRaw, resolution);
 
         int maxT = this.maxTimeBetweenUpdates;
-        boolean limitsMaxTime = maxT != 0;
+        boolean limitsMaxTime = maxT > 0;
         int minT = this.minTimeBetweenUpdates;
-        boolean limitsMinTime =  minT != 0;
+        boolean limitsMinTime =  minT > 0;
 
-        if (inputIfSame || !Util.equals(f, prevF, Global.TRUTH_EPSILON) ||
-                (limitsMaxTime && timeSinceLastInput > maxTimeBetweenUpdates) ||
-                (!limitsMinTime || (timeSinceLastInput >= minT))
-                ) {
+        boolean tooSoon = (limitsMinTime && (timeSinceLastInput < minT));
+        boolean lateEnough = (limitsMaxTime && (timeSinceLastInput >= maxT));
+        boolean different = !Util.equals(f, prevF, Global.TRUTH_EPSILON);
+
+        if ((inputIfSame || different || lateEnough) && (!tooSoon)) {
 
             Task t = input(f);
             this.lastInput = t.creation();
             this.prevF = f;
-
 
         }
 
@@ -156,7 +163,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
 //        float c = confFactor;
 
         long now = nar.time();
-        Task t = new MutableTask(term(), '.')
+        Task t = new MutableTask(term(), punc)
                 //.truth(v, conf)
                 .truth(f, c)
                 .time(now, now + dt())

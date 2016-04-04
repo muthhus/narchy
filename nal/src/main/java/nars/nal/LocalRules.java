@@ -36,6 +36,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 
+import static nars.nal.Tense.DTERNAL;
+
 
 /**
  * Directly process a task by a oldBelief, with only two Terms in both. In
@@ -335,10 +337,16 @@ public enum LocalRules {
     public static Termed<Compound> intermpolate(@NotNull Termed<Compound> a, @NotNull Termed<Compound> b, float aConf, float bConf) {
         if (a.equals(b)) return a;
 
+        int dt = DTERNAL;
         int at = a.term().dt();
-        int bt = b.term().dt();
+        if (at != DTERNAL) {
+            int bt = b.term().dt();
+            if (bt!= DTERNAL) {
+                dt = Math.round(Util.lerp(at, bt, aConf/(aConf+bConf)));
+            }
+        }
 
-        return a.term().dt( Math.round(Util.lerp(at, bt, aConf/(aConf+bConf))) );
+        return a.term().dt( dt );
     }
 
 

@@ -222,12 +222,16 @@ public interface Temporalize {
         ConceptProcess prem = p.premise;
 
         Termed<Compound> decomposed = decomposeTask ? prem.task() : prem.belief();
-        long tOcc;
+        long tOcc = prem.task().occurrence();
+
+        if ((tOcc == ETERNAL) && (prem.belief()!=null))
+            tOcc = prem.belief().occurrence(); //use occurrence from belief
+
         if (decomposed == null) {
             decomposed = prem.beliefTerm();
-            tOcc = ETERNAL;
+            //tOcc = ETERNAL;
         } else {
-            tOcc = ((Task)decomposed).occurrence();
+            //tOcc = ((Task)decomposed).occurrence();
         }
 
         Compound decTerm = decomposed.term();
@@ -236,13 +240,7 @@ public interface Temporalize {
 
 
         if (tOcc != ETERNAL) {
-            occReturn[0] = ((ddt == DTERNAL) || (ddt == 0)) ? tOcc : (dtt.subtermTimeOrZero(derived, tOcc));
-
-//            if (occReturn[0] < -902337203685477580L) {
-//                System.err.println(derived + " " + dtt.subtermTimeOrZero(derived, tOcc) + " ");
-//            }
-            return derived;
-        } else {
+            int shift = 0;
             if (ddt != DTERNAL) {
                 Task other = decomposeTask ? prem.belief() : prem.task();
                 if (other != null && !other.isEternal()) {
@@ -250,27 +248,37 @@ public interface Temporalize {
                     //compute the relative offset of the original unresolved other term and the derived term
 
                     Term otherTerm = other.term();
-                    long baseOcc = ETERNAL;
+                    int newShift = DTERNAL;
                     for (int i = 0; i < decTerm.size(); i++) {
                         Term dct = decTerm.term(i);
                         if (p.resolve(dct).equals(otherTerm)) {
-                            baseOcc = other.occurrence() - decTerm.subtermTime(dct);
+                            //baseOcc = other.occurrence() - decTerm.subtermTime(dct);
+                            newShift = -decTerm.subtermTime(dct);
                             break;
                         }
                     }
-                    if (baseOcc != ETERNAL) {
+                    if (newShift != DTERNAL) {
                         for (int i = 0; i < decTerm.size(); i++) {
                             Term dct = decTerm.term(i);
                             if (p.resolve(dct).equals(derived)) {
-                                occReturn[0] = baseOcc + decTerm.subtermTime(dct);
-
-
+                                newShift += decTerm.subtermTime(dct);
                                 break;
                             }
                         }
                     }
+                    if (newShift != DTERNAL)
+                        shift = newShift;
                 }
             }
+
+            //occReturn[0] = ((ddt == DTERNAL) || (ddt == 0)) ? tOcc : (dtt.subtermTimeOrZero(derived, tOcc));
+
+            occReturn[0] = tOcc + shift;
+
+//            if (occReturn[0] < -902337203685477580L) {
+//                System.err.println(derived + " " + dtt.subtermTimeOrZero(derived, tOcc) + " ");
+//            }
+        //} else {
         }
 //
 

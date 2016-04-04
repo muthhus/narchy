@@ -343,6 +343,11 @@ public class TermTest {
 
     }
 
+    @Test public void testParseOperationInFunctionalForm2() {
+        assertEquals("(do(that) &&+0 ((a)&&(b)))", n.term("(do(that) &&+0 ((a)&&(b)))").toString());
+        assertEquals("(do(that) &&+0 ((a)&&(b)))", n.term("(((that)-->^do) &&+0 ((a)&&(b)))").toString());
+        assertEquals("(do(that) &&+0 ((a)&&(b)))", n.conceptualize(n.term("(((that)-->^do) &&+0 ((a)&&(b)))"), UnitBudget.One).toString());
+    }
 
 //    public void nullCachedName(String term) {
 //        NAR n = new Terminal();

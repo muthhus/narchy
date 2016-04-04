@@ -156,13 +156,7 @@ public class NAL8Test extends AbstractNALTest {
         tester.input("(goto(z) ==>+5 x:y).");
         tester.mustDesire(cycles, "goto(z)", 1.0f, 0.81f);
     }
-    @Test
-    public void goal_deduction_alt()  {
-        TestNAR tester = test();
-        tester.input("x:y!");
-        tester.input("(goto(x) ==>+5 x:y).");
-        tester.mustDesire(cycles, "goto(x)", 1.0f, 0.81f);
-    }
+
     @Test
     public void goal_deduction_delayed()  {
         TestNAR tester = test();
@@ -358,6 +352,7 @@ public class NAL8Test extends AbstractNALTest {
     public void subgoal_2()  {
         TestNAR tester = test();
 
+        //tester.log();
         tester.input("(<(SELF,{t002}) --> hold> &&+5 (at:(SELF,{t001}) &&+5 open({t001})))!");
 
         tester.mustDesire(cycles, "<(SELF,{t002}) --> hold>",

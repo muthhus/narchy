@@ -12,6 +12,7 @@ import nars.term.*;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
+import nars.term.container.TermSet;
 import nars.term.container.TermVector;
 import nars.term.variable.AbstractVariable;
 import nars.term.variable.GenericVariable;
@@ -147,7 +148,7 @@ public enum $ /* TODO: implements TermIndex */ {
     public static Term impl(@NotNull Term a, @NotNull Term b) {
         return the(IMPLICATION, a, b);
     }
-    public static Term impl(@NotNull Term a, @NotNull Term b, int dt) {
+    public static Term impl(@NotNull Term a, int dt, @NotNull Term b) {
         return the(IMPLICATION, -1, dt, TermVector.the(a, b));
     }
 
@@ -364,6 +365,10 @@ public enum $ /* TODO: implements TermIndex */ {
     public static Term conj(Term... a) {
         return the(CONJUNCTION, a);
     }
+    @Nullable
+    public static Term conj(int dt, Term... a) {
+        return the(CONJUNCTION, -1, dt, TermSet.the(a));
+    }
 
     @Nullable
     public static Term disj(Term... a) {
@@ -483,14 +488,13 @@ public enum $ /* TODO: implements TermIndex */ {
     public static Term imageInt(Term... x) {
         return the(IMAGE_INT, x);
     }
+
     @Nullable
-    public static Term sect(Term... x) {
+    public static Term esect(Term... x) {
         return the(INTERSECT_EXT, x);
     }
     @Nullable
-    public static Term sectInt(Term... x) {
-        return the(INTERSECT_INT, x);
-    }
+    public static Term isect(Term... x) { return the(INTERSECT_INT, x); }
 
 
     public static @NotNull Operator operator(@NotNull String name) {

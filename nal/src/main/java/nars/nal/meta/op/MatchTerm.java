@@ -51,7 +51,7 @@ abstract public class MatchTerm extends AtomicBooleanCondition<PremiseEval>  {
                 //no constraints
                 pattern :
                 //constraints stored in atomic string
-                (Compound) ($.sect(pattern, seteMap(constraints.castToMap(), $.ToStringToTerm)));
+                (Compound) ($.esect(pattern, seteMap(constraints.castToMap(), $.ToStringToTerm)));
     }
 
 

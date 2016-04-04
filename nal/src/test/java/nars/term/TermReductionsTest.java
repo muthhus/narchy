@@ -22,12 +22,12 @@ public class TermReductionsTest {
     @Test
     public void testIntersectExtReduction1() {
         // (&,R,(&,P,Q)) = (&,P,Q,R)
-        assertEquals("(&,P,Q,R)", sect(r, sect(p, q)).toString());
+        assertEquals("(&,P,Q,R)", esect(r, esect(p, q)).toString());
         assertEquals("(&,P,Q,R)", $("(&,R,(&,P,Q))").toString());
     }
     @Test public void testIntersectExtReduction2() {
         // (&,(&,P,Q),(&,R,S)) = (&,P,Q,R,S)
-        assertEquals("(&,P,Q,R,S)", sect(sect(p, q), sect(r, s)).toString());
+        assertEquals("(&,P,Q,R,S)", esect(esect(p, q), esect(r, s)).toString());
         assertEquals("(&,P,Q,R,S)", $("(&,(&,P,Q),(&,R,S))").toString());
     }
     @Test public void testIntersectExtReduction3() {
@@ -40,20 +40,20 @@ public class TermReductionsTest {
     }
     @Test public void testIntersectExtReduction4() {
         //UNION if (term1.op(Op.SET_INT) && term2.op(Op.SET_INT)) {
-        assertEquals("{P,Q,R,S}", sect(sete(p, q), sete(r, s)).toString());
+        assertEquals("{P,Q,R,S}", esect(sete(p, q), sete(r, s)).toString());
         assertEquals("{P,Q,R,S}", $("(&,{P,Q},{R,S})").toString());
-        assertEquals(null /* emptyset */, sect(seti(p, q), seti(r, s)));
+        assertEquals(null /* emptyset */, esect(seti(p, q), seti(r, s)));
 
     }
 
     @Test public void testIntersectIntReduction1() {
         // (|,R,(|,P,Q)) = (|,P,Q,R)
-        assertEquals("(|,P,Q,R)", sectInt(r, sectInt(p, q)).toString());
+        assertEquals("(|,P,Q,R)", isect(r, isect(p, q)).toString());
         assertEquals("(|,P,Q,R)", $("(|,R,(|,P,Q))").toString());
     }
     @Test public void testIntersectIntReduction2() {
         // (|,(|,P,Q),(|,R,S)) = (|,P,Q,R,S)
-        assertEquals("(|,P,Q,R,S)", sectInt(sectInt(p, q), sectInt(r, s)).toString());
+        assertEquals("(|,P,Q,R,S)", isect(isect(p, q), isect(r, s)).toString());
         assertEquals("(|,P,Q,R,S)", $("(|,(|,P,Q),(|,R,S))").toString());
     }
     @Test public void testIntersectIntReduction3() {
@@ -62,7 +62,7 @@ public class TermReductionsTest {
     }
     @Test public void testIntersectIntReduction4() {
         //UNION if (term1.op(Op.SET_INT) || term2.op(Op.SET_INT)) {
-        assertEquals("[P,Q,R,S]", sectInt(seti(p, q), seti(r, s)).toString());
+        assertEquals("[P,Q,R,S]", isect(seti(p, q), seti(r, s)).toString());
         assertEquals("[P,Q,R,S]", $("(|,[P,Q],[R,S])").toString());
 
     }
@@ -148,8 +148,8 @@ public class TermReductionsTest {
     }
 
     @Test public void testIntExtEqual() {
-        assertEquals(p, $.sect(p, p));
-        assertEquals(p, sectInt(p, p));
+        assertEquals(p, $.esect(p, p));
+        assertEquals(p, isect(p, p));
     }
 
     @Test public void testDiffIntEqual() {

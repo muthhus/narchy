@@ -310,12 +310,12 @@ public interface Concept extends Termed, Comparable {
     default void crossLink(@NotNull Task thisTask, @NotNull Task otherTask, float scale, @NotNull NAR nar) {
         assert(!otherTask.term().equals(term()));
 
-        link(otherTask, scale, nar, null);
+        link(otherTask, scale/2f, nar, null);
 
         Concept other = nar.concept(otherTask);
                         //nar.conceptualize(otherTask, thisTask.budget(), scale);
         if (other != null)
-            other.link(thisTask, scale, nar, null);
+            other.link(thisTask, scale/2f, nar, null);
 
     }
 

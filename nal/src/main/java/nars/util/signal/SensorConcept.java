@@ -48,6 +48,10 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
 
     /**
      * adjust min/max temporal resolution of feedback input
+     * ex:
+     *          min=0, max=2 : update every 2 cycles, or immediately if changed
+     *          max=2, min=0 : update no sooner than 2 cycles
+     *          max=2, min=4 : update no sooner than 2 cycles, and no later than 4
      */
     @NotNull
     public SensorConcept timing(int minCycles, int maxCycles) {
@@ -89,6 +93,11 @@ public class SensorConcept extends CompoundConcept implements FloatFunction<Term
 
     public final float get() {
         return current;
+    }
+
+    public SensorConcept punc(char c) {
+        sensor.punc(c);
+        return this;
     }
 
 }

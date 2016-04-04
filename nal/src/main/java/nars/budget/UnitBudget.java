@@ -33,12 +33,17 @@ import org.jetbrains.annotations.Nullable;
  */
 public class UnitBudget extends RawBudget {
 
-    //common instance for a 'Deleted budget'.  TODO use a wrapper class to make it unmodifiable
-    public static final Budget Deleted = new UnitBudget();  static {  Deleted.delete(); }
-    public static final Budget One = new UnitBudget(1f,1f,1f);
-    public static final Budget Mid = new UnitBudget(0.5f, 0.5f, 0.5f);
-    //common instance for a 'zero budget'.  TODO use a wrapper class to make it unmodifiable
-    public static final Budget Zero = new UnitBudget();     static {  Zero.zero(); }
+    /**common instance for a 'Deleted budget'.*/
+    public static final Budget Deleted = new ROBudget(Float.NaN, 0, 0);
+
+    /** common instance for a 'full budget'.*/
+    public static final Budget One = new ROBudget(1f,1f,1f);
+
+    /** common instance for a 'half budget'.*/
+    public static final Budget Mid = new ROBudget(0.5f, 0.5f, 0.5f);
+
+    /** common instance for a 'zero budget'.*/
+    public static final Budget Zero = new ROBudget(0,0,0);
 
 
     /**
