@@ -94,11 +94,10 @@ public class ArrayBeliefTable implements BeliefTable {
         //find the temporal with the best rank
         Task t = topTemporal(when, now);
         if (t == null) {
-            if (topEternal!=null) return topEternal.truth();
-            else return Truth.Zero;
+            return (topEternal != null) ? topEternal.truth() : Truth.Zero;
         } else {
             Truth tt = t.truth();
-            return topEternal() != null ? tt.interpolate(topEternal.truth()) : tt;
+            return (topEternal() != null) ? tt.interpolate(topEternal.truth()) : tt;
         }
     }
 

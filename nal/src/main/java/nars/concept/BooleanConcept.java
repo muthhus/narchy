@@ -1,0 +1,199 @@
+package nars.concept;
+
+import com.gs.collections.impl.list.mutable.primitive.LongArrayList;
+import nars.*;
+import nars.budget.Budgeted;
+import nars.concept.table.BeliefTable;
+import nars.concept.table.DynamicBeliefTable;
+import nars.task.MutableTask;
+import nars.task.Task;
+import nars.term.Operator;
+import nars.term.Term;
+import nars.term.Termed;
+import nars.truth.Truth;
+import org.apache.commons.lang3.mutable.MutableFloat;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+/**
+ * Dynamically updates a truth value based on truth aggregation of the concepts referred by parameters
+ */
+public class BooleanConcept extends OperationConcept {
+    public final NAR nar;
+
+    public static final Operator AND_OP = $.operator("and");
+    public static final Operator OR_OP = $.operator("or");
+
+    public interface BooleanModel {
+        @NotNull Operator op();
+
+        /** set the truth and evidence on the task before returning */
+        @NotNull MutableTask update(@NotNull NAR nar, long now, @NotNull MutableTask result, @NotNull Termed[] args);
+    }
+
+    static final BooleanModel AND = new DefaultBooleanModel(true);
+    static final BooleanModel OR = new DefaultBooleanModel(false);
+
+    static final class DefaultBooleanModel implements BooleanModel {
+
+        private final boolean mode;
+
+        public DefaultBooleanModel(boolean andOrOr) {
+            this.mode = andOrOr;
+        }
+
+        @Override public Operator op() {  return mode ? AND_OP : OR_OP; }
+
+        @Override public MutableTask update(NAR nar, long now, MutableTask task, Termed[] args) {
+            float f = 1f, c = 1f;
+
+            boolean beliefOrGoal = task.punc() == Symbols.BELIEF;
+
+            LongArrayList ev = new LongArrayList(Global.STAMP_MAX_EVIDENCE);
+            int evidencePerArg = Math.max(Global.STAMP_MAX_EVIDENCE / args.length, 1);
+
+            boolean mode = this.mode;
+
+            for (Termed t : args) {
+
+                Concept subtermConcept = nar.concept(t);
+                if (subtermConcept != null) {
+                    BeliefTable b = beliefOrGoal ? subtermConcept.beliefs() : subtermConcept.goals();
+                    Task at = b.top(now);
+                    if (at != null) {
+
+                        Truth ct = at.truth();
+                        //Truth ct = b.truth(now, nar.duration());
+
+                        if (mode) {
+                            f *= ct.freq();
+                        } else {
+                            f = Math.max(f, ct.freq());
+                        }
+
+                        c *= ct.conf();
+
+                        long[] ae = at.evidence();
+                        int aen = ae.length - 1;
+                        for (int i = 0; i < Math.min(ae.length, evidencePerArg); i++) {
+                            ev.add(ae[aen - i]);
+                        }
+
+                    }
+                }
+            }
+
+            if (!ev.isEmpty()) {
+                return task.evidence(ev.toArray()).truth(f, c);
+            } else {
+                return task.truth(Truth.Zero);
+            }
+
+        }
+    };
+
+    protected BooleanModel model;
+
+    public static BooleanConcept And(NAR nar, Term... args) {
+        return new BooleanConcept(nar, AND, args);
+    }
+    public static BooleanConcept Or(NAR nar, Term... args) {
+        return new BooleanConcept(nar, OR, args);
+    }
+
+    public BooleanConcept(NAR nar, BooleanModel model, Term... args)  {
+        super($.exec(model.op(), args), nar);
+
+        if (args.length < 2)
+            throw new RuntimeException("too few args");
+        if (args.length > Global.STAMP_MAX_EVIDENCE)
+            throw new RuntimeException("too many args");
+
+        this.model = model;
+        this.nar = nar;
+    }
+
+    @Override
+    public boolean link(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, @Nullable MutableFloat conceptOverflow) {
+        if (super.link(b, scale, minScale, nar, conceptOverflow)) {
+
+            //intercept activated tasklinks with compounds present in the subterms
+            if (b instanceof Task) {
+                Task t = (Task) b;
+
+                //TODO defer the update to one run at the end of the cycle like Sensor and Motor
+                if (t.isBeliefOrGoal() && parameters().containsTerm(t.term())) {
+                    executeLater(nar);
+                    //char punc = t.punc();
+                    //long now = nar.time();
+                    /*if (punc == '.')
+                         ((DynamicBeliefTable) beliefs()).updateTask(now);
+                    else if (punc == '!')
+                        ((DynamicBeliefTable) goals()).updateTask(now);*/
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    @NotNull
+    @Override
+    public BeliefTable beliefs() {
+        if (beliefs == null) {
+            beliefs = newBeliefTable(0);
+        }
+        executeLater(nar);
+        return beliefs;
+    }
+
+    @NotNull
+    @Override
+    public BeliefTable goals() {
+        if (goals == null) {
+            goals = newGoalTable(0);
+        }
+        executeLater(nar);
+        return goals;
+    }
+
+    @Override
+    public void run() {
+        super.run();
+
+        //TODO only update belief or goal if changed, not both
+        ((DynamicBeliefTable) beliefs).updateTask(nar.time());
+        ((DynamicBeliefTable) goals).updateTask(nar.time());
+    }
+
+    @NotNull
+    @Override
+    protected BeliefTable newBeliefTable(int cap) {
+        return new BooleanConceptTable(true);
+    }
+
+    @NotNull
+    @Override
+    protected BeliefTable newGoalTable(int cap) {
+        return new BooleanConceptTable(false);
+    }
+
+    private class BooleanConceptTable extends DynamicBeliefTable {
+        private final boolean beliefOrGoal; //or goals
+
+        public BooleanConceptTable(boolean beliefOrGoal) {
+            super(BooleanConcept.this, nar);
+            this.beliefOrGoal = beliefOrGoal;
+        }
+
+        @Nullable @Override
+        protected Task update(long now) {
+
+            Term[] args = parameters().terms();
+            MutableTask result = model.update(nar, now, new MutableTask(term, beliefOrGoal ? '.' : '!'), args);
+
+            return result != null ? result.present(now).normalize(nar) : null;
+        }
+
+    }
+}

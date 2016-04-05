@@ -14,7 +14,7 @@ public enum NARideDefault {
         Default n = new Default(
                 //TermIndex.memoryGuava(clock, 100)),
 //                        memoryWeak(1024 * 128)),
-                1024, 1, 3, 2);
+                1024, 1, 2, 3);
         //new Inperience(n);
 
         //new PrologCore(n); //TEMPORARY

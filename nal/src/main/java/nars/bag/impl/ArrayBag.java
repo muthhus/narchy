@@ -271,15 +271,15 @@ public class ArrayBag<V> extends ArrayTable<V, BLink<V>> implements Bag<V> {
             return;
         }
 
+//
+//        int size = ii.size();
+//        if (size == 1) {
+//            //its the only item
+//            v.commit();
+//            return;
+//        }
+
         SortedIndex ii = this.items;
-
-        int size = ii.size();
-        if (size == 1) {
-            //its the only item
-            v.commit();
-            return;
-        }
-
 
         int currentIndex = ii.locate(v);
 
@@ -288,7 +288,7 @@ public class ArrayBag<V> extends ArrayTable<V, BLink<V>> implements Bag<V> {
         if (currentIndex == -1) {
             //an update for an item which has been removed already. must be re-inserted
             put(v.get(), v);
-        } else if (ii.scoreBetween(currentIndex, size, v)) { //has position changed?
+        } else if (ii.scoreBetween(currentIndex, ii.size(), v)) { //has position changed?
             ii.reinsert(currentIndex, v);
         }
         /*} else {

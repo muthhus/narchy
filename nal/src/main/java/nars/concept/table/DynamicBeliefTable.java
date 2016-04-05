@@ -50,7 +50,8 @@ abstract public class DynamicBeliefTable implements BeliefTable {
     @Nullable
     @Override
     public Task topTemporal(long when, long now) {
-        return updateTask(now);
+        return current;
+        //return updateTask(now);
     }
 
     @Nullable
@@ -58,7 +59,7 @@ abstract public class DynamicBeliefTable implements BeliefTable {
         if (current == null || current.occurrence() != now) {
             Task prev = current;
             next = update(now);
-            if (prev==null || ( !prev.truth().equals(next.truth()))) {
+            if (next!=null && (prev==null || ( !prev.truth().equals(next.truth())))) {
                 if (prev!=null)
                     prev.delete();
                 nar.process(next);

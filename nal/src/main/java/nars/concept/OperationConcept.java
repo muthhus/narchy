@@ -1,9 +1,6 @@
 package nars.concept;
 
-import nars.Global;
-import nars.NAR;
-import nars.Narsese;
-import nars.Op;
+import nars.*;
 import nars.bag.Bag;
 import nars.nal.Tense;
 import nars.nal.UtilityFunctions;
@@ -56,12 +53,15 @@ public class OperationConcept extends CompoundConcept implements Runnable {
     }
 
 
-    public OperationConcept(@NotNull String compoundTermString, @NotNull NAR n) throws Narsese.NarseseException {
-        super(compoundTermString, n);
+    public OperationConcept(@NotNull Compound term, @NotNull NAR n) throws Narsese.NarseseException {
+        super(term, n);
         this.nar = n;
         ensureOperation(term);
         n.on(this);
+    }
 
+    public OperationConcept(@NotNull String compoundTermString, @NotNull NAR n) throws Narsese.NarseseException {
+        this((Compound) $.$(compoundTermString), n);
     }
 
     static void ensureOperation(@NotNull Compound term) {
@@ -69,6 +69,7 @@ public class OperationConcept extends CompoundConcept implements Runnable {
             throw new RuntimeException(term + " is not an Operation");
     }
 
+    /* subj contains the parameter product */
     public final TermContainer parameters() {
         return ((Compound)term(0)).subterms();
     }
@@ -91,12 +92,16 @@ public class OperationConcept extends CompoundConcept implements Runnable {
 
         //if (op()!=NEGATE) {
             pending.add(t);
-            nar.runOnceLater(this);
-            this.nar = nar;
+        executeLater(nar);
         /*} else {
             nar.runOnceLater(positive(nar)); //queue an update on the positive concept but dont queue the negation task
         }*/
         return t;
+    }
+
+    protected void executeLater(@NotNull NAR nar) {
+        this.nar = nar;
+        nar.runOnceLater(this);
     }
 
     @Override

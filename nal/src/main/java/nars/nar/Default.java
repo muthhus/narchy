@@ -476,6 +476,9 @@ public class Default extends AbstractNAR {
 
             active.commit();
 
+//            if (!((CurveBag)active).isSorted()) {
+//                throw new RuntimeException(active + " not sorted");
+//            }
         }
 
         /**

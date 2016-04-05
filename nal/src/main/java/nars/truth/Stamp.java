@@ -32,7 +32,7 @@ public interface Stamp {
     /** "default" zipping config: prefer newest */
     @NotNull static long[] zip(@NotNull long[] a, @NotNull long[] b) {
         return zip(a, b,
-                Global.MAXIMUM_EVIDENTAL_BASE_LENGTH,
+                Global.STAMP_MAX_EVIDENCE,
                 true);
     }
 
@@ -187,7 +187,7 @@ public interface Stamp {
     }
 
     static int evidenceLength(int aLen, int bLen) {
-        return Math.max(Global.MAXIMUM_EVIDENTAL_BASE_LENGTH, aLen + bLen);
+        return Math.max(Global.STAMP_MAX_EVIDENCE, aLen + bLen);
     }
     static int evidenceLength(@NotNull Task a, @NotNull Task b) {
         return evidenceLength(a.evidence().length, b.evidence().length);
