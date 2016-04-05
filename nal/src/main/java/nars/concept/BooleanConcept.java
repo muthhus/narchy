@@ -94,14 +94,14 @@ public class BooleanConcept extends OperationConcept {
 
     protected BooleanModel model;
 
-    public static BooleanConcept And(NAR nar, Term... args) {
+    @NotNull public static BooleanConcept And(NAR nar, Term... args) {
         return new BooleanConcept(nar, AND, args);
     }
-    public static BooleanConcept Or(NAR nar, Term... args) {
+    @NotNull public static BooleanConcept Or(NAR nar, Term... args) {
         return new BooleanConcept(nar, OR, args);
     }
 
-    public BooleanConcept(NAR nar, BooleanModel model, Term... args)  {
+    public BooleanConcept(@NotNull NAR nar, @NotNull BooleanModel model, @NotNull Term... args)  {
         super($.exec(model.op(), args), nar);
 
         if (args.length < 2)
