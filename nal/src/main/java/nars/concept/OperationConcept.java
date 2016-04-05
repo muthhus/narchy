@@ -6,11 +6,14 @@ import nars.Narsese;
 import nars.Op;
 import nars.bag.Bag;
 import nars.nal.Tense;
+import nars.nal.UtilityFunctions;
 import nars.nal.nal8.Execution;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Operator;
 import nars.term.Termed;
+import nars.truth.Truth;
+import nars.util.data.Util;
 import nars.util.event.Topic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,10 +32,10 @@ import java.util.List;
 public class OperationConcept extends CompoundConcept implements Runnable {
 
     /**
-     * cache for motivation calculation; set to NaN to invalidate
+     * cache for expectation measurement; set to NaN to invalidate
      */
-    protected transient float believed;
-    protected transient float desired;
+    protected transient Truth believed;
+    protected transient Truth desired;
 
     /**
      * set to Tense.ETERNAL to invalidate
@@ -94,7 +97,9 @@ public class OperationConcept extends CompoundConcept implements Runnable {
     public void run() {
         final NAR nar = this.nar;
 
-        if (update(nar)) {
+        update(nar);
+        {
+            //TODO only execute pending tasks if the operator has a handler for it, which may be null in which case this is useless
             List<Task> pending = this.pending;
             for (int i = 0, pendingSize = pending.size(); i < pendingSize; i++) {
                 execute(pending.get(i), nar);
@@ -104,10 +109,9 @@ public class OperationConcept extends CompoundConcept implements Runnable {
         pending.clear();
     }
 
-    public boolean update(@NotNull NAR nar) {
+    public void update(@NotNull NAR nar) {
         long now = nar.time();
 
-        float b = 0, d = 0;
 
         if (now != lastMotivationUpdate) { //update once per cycle TODO parameter for this limitation min/max
 
@@ -119,8 +123,8 @@ public class OperationConcept extends CompoundConcept implements Runnable {
 
 
             //if (p != null) { //measure contributed positive state
-                d += goalMotivation(now, dur);
-                b += beliefMotivation(now, dur);
+                desired = desire(now, dur);
+                believed = belief(now, dur);
             //}
 
 //            if (n != null) {  //measure contributed negative state
@@ -128,13 +132,9 @@ public class OperationConcept extends CompoundConcept implements Runnable {
 //                b -= n.beliefMotivation(now, dur);
 //            }
 
-            update(b, d, now); //only necessary to update the state in the positive only
-        } else {
-            d = desired;
-            b = believed;
+            this.lastMotivationUpdate = now;
         }
 
-        return (d - b) > nar.executionThreshold.floatValue();
     }
 
 
@@ -162,11 +162,9 @@ public class OperationConcept extends CompoundConcept implements Runnable {
 
             //call Task.execute only for goals
             if (task.isGoal()) {
-                float b = believed;
-                float d = desired;
                 if (Global.DEBUG)
-                    task.log("execute(b=" + b + ",d=" + d + ')');
-                task.execute(b, d, nar); //call the task's custom event handler
+                    task.log("execute(b=" + believed + ",d=" + desired + ')');
+                task.execute(this, nar); //call the task's custom event handler
             }
         //}
     }
@@ -176,12 +174,7 @@ public class OperationConcept extends CompoundConcept implements Runnable {
 //        return (last == ETERNAL) || ((now - last) > 0);
 //    }
 //
-    /** set the belief/desire state */
-    protected void update(float b, float d, long now) {
-        this.believed = b;
-        this.desired = d;
-        this.lastMotivationUpdate = now;
-    }
+
 
 //    public OperationConcept positive(NAR n) {
 //        return op() != NEGATE ? this : (OperationConcept) n.concept(term(0));
@@ -200,16 +193,27 @@ public class OperationConcept extends CompoundConcept implements Runnable {
 //        return desired;
 //    }
 
-    public  float motivation() {
-        float b = this.believed;
-        float d = this.desired;
-        return (d - b); // / (Math.abs(d) + Math.abs(b));
-    }
 
     /** provide motivation value after triggering an update */
     public final float motivation(@NotNull NAR nar) {
         update(nar);
-        return motivation();
+
+//        float bf = believed.freq();
+//        float bc = believed.conf();
+//        float df = desired.freq();
+//        float dc = desired.conf();
+
+        //expectation = (confidence * (frequency - 0.5f) + 0.5f);
+
+        return UtilityFunctions.or(desired.conf(), believed.conf()) *
+                ((UtilityFunctions.aveAri(desired.freq(), (1f - believed.freq())) - 0.5f)
+                ) + 0.5f;
+
+        /*return
+                 UtilityFunctions.or(
+                    ((desired.conf() * (desired.freq()-0.5f)) + 0.5f),
+                    1f - ((believed.conf() * ((believed.freq())-0.5f ))  + 0.5f)
+                 );*/
     }
 
 

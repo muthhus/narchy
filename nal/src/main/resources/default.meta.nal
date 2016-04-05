@@ -243,7 +243,7 @@
 //      //NAL7 specific inference ////////////////////////////////////////////////////////////////////////////////////
 //      Reasoning about temporal statements. those are using the ==> relation because relation in time is a relation of the truth between statements.
 
-    B, (A ==> C), time(decomposeBelief) |- substituteIfUnifies(C,"$",A,B), (Belief:Deduction, Desire:Induction)
+    B, (A ==> C), time(decomposeBelief) |- substituteIfUnifies(C,"$",A,B), (Belief:Deduction, Desire:Induction, Event:Anticipate)
 //    M, (M ==> P), time(decomposeBelief) |- P, (Belief:Deduction, Desire:Induction)
 //          C, (A ==> B) |- substituteIfUnifies( B, "$", A, C), (Belief:Deduction, Desire:Induction, Event:Anticipate),
 //          X, (XI ==> B) |- occurrsForward( substituteIfUnifies( B, "$", XI, (&/,X,/1)), XI, "==>"), (Belief:Deduction, Desire:Induction, Event:Anticipate)

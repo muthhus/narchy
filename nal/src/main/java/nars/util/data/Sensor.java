@@ -24,7 +24,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
     /**
      * resolution of the output freq value
      */
-    float resolution = 0.05f;
+    float resolution = 0.01f;
 
     @NotNull
     private final Term term;
@@ -150,27 +150,32 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
 
     @NotNull
     private Task input(float v) {
-        float f, c;
-        if (v < 0.5f) {
-            f = 0f;
-            c = (0.5f - v)*(2f * confFactor);
-        } else {
-            f = 1f;
-            c = (v - 0.5f)*(2f * confFactor);
-        }
+//        float f, c;
+//        if (v < 0.5f) {
+//            f = 0f;
+//            c = (0.5f - v)*(2f * confFactor);
+//        } else {
+//            f = 1f;
+//            c = (v - 0.5f)*(2f * confFactor);
+//        }
 
 
-//        float f = v;
-//        float c = confFactor;
+        float f = v;
+        float c = confFactor;
 
         long now = nar.time();
-        Task t = new MutableTask(term(), punc)
-                //.truth(v, conf)
-                .truth(f, c)
-                .time(now, now + dt())
-                .budget(pri, dur);
+        Task t = newInputTask(f, c, now);
         nar.input(t);
         return t;
+    }
+
+    @NotNull
+    protected Task newInputTask(float f, float c, long now) {
+        return new MutableTask(term(), punc)
+                    //.truth(v, conf)
+                    .truth(f, c)
+                    .time(now, now + dt())
+                    .budget(pri, dur);
     }
 
     public Termed<Compound> term() {

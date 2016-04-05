@@ -22,20 +22,26 @@ import java.util.function.Consumer;
 
 public class MotorConcept extends OperationConcept implements Consumer<NAR>, FloatFunction<Term> {
 
+    /** all effected motor actuation relative to the differential of current desire and current belief */
+    public static final FloatToFloatFunction relative = m -> m;
+
+    /** motor feedback attenuated by half of motor input */
+    public static final FloatToFloatFunction leaky = m -> m/2;
+
+    /** motor actuation directly controlled by desire value d*/
+    public static final FloatToFloatFunction absolute = m -> Float.NaN;
+
     @NotNull
     private final Sensor feedback;
     private final Logger logger;
 
-    /** input: +1, -1   output feedback: 0..1 */
+    /** input: 0..+1 (expectation)   output feedback: 0..+1 or NaN */
     private FloatToFloatFunction motor;
+
+    /** belief feedback expectation */
     float nextFeedback;
 
     public MotorConcept(@NotNull String compoundTermString, @NotNull NAR n, FloatToFloatFunction motor) throws Narsese.NarseseException {
-        this(compoundTermString, n);
-        setMotor(motor);
-    }
-
-    public MotorConcept(@NotNull String compoundTermString, @NotNull NAR n) throws Narsese.NarseseException {
         super(compoundTermString, n);
 
         assert(Op.isOperation(term()));
@@ -50,7 +56,16 @@ public class MotorConcept extends OperationConcept implements Consumer<NAR>, Flo
         feedback = new Sensor(n, this, this) {
             @Override
             protected int dt() {
-                return nar.duration(); //future tense
+                return 0; //now
+                //return nar.duration(); //future tense
+            }
+
+            @NotNull
+            @Override
+            protected Task newInputTask(float f, float c, long now) {
+                Task t = super.newInputTask(f, c, now);
+                t.log("Motor Feedback");
+                return t;
             }
 
             @Override
@@ -65,13 +80,20 @@ public class MotorConcept extends OperationConcept implements Consumer<NAR>, Flo
             }
         };
 
+        setMotor(motor);
+
+
         n.onFrame(this);
+
+        nextFeedback = 0.5f; //initialize belief
+        feedback.accept(n);
     }
 
-    @Override
-    protected int capacity(int cap, boolean beliefOrGoal, boolean eternalOrTemporal) {
-        return eternalOrTemporal ? 0 : cap; //no eternal
-    }
+
+//    @Override
+//    protected int capacity(int cap, boolean beliefOrGoal, boolean eternalOrTemporal) {
+//        return eternalOrTemporal ? 0 : cap; //no eternal
+//    }
 
 
     /**
@@ -117,23 +139,28 @@ public class MotorConcept extends OperationConcept implements Consumer<NAR>, Flo
         return nextFeedback;
     }
 
+
     @Override
-    protected void update(float b, float d, long now) {
+    public void update(@NotNull NAR nar) {
         feedback.ready();
-        super.update(b, d, now);
+        super.update(nar);
     }
 
     @Override
     public final void accept(@NotNull NAR nar) {
+
+        if (!hasGoals())
+            return;
 
         FloatToFloatFunction m = getMotor();
         if (m != null) {
             float activation = motivation(nar);
 
             float response = motor.valueOf(activation);
-            nextFeedback = Util.clamp(response);
-
-            feedback.accept(nar);
+            if (Float.isFinite(response)) {
+                nextFeedback = Util.clamp(response);
+                feedback.accept(nar);
+            }
 
         } else {
             logger.info("null motor function");

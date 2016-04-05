@@ -152,19 +152,19 @@ public class PostCondition implements Serializable, Level //since there can be m
 
                 case "Event":
                     if (which.equals(PostCondition.anticipate)) {
-                        rule.anticipate = true;
+                        //IGNORED
+                        //rule.anticipate = true;
                     }
-                    //ignore, because this only affects at TaskRule construction
                     break;
 
                 case "Eternalize":
                     if (which.equals(PostCondition.immediate)) {
                         rule.immediate_eternalize = true;
                     }
-                    //ignore, because this only affects at TaskRule construction
                     break;
 
                 case "SequenceIntervals":
+                    //IGNORED
 //                    if (which.equals(PostCondition.fromBelief)) {
 //                        rule.sequenceIntervalsFromBelief = true;
 //                    } else if (which.equals(PostCondition.fromTask)) {

@@ -417,7 +417,7 @@ public class NAL6Test extends AbstractNALTest {
         //<patham9> this is the only rule which is needed in this example
         //B (A ==> C) |- C :post (:t/deduction :order-for-all-same) :pre ((:substitute-if-unifies "$" A B) (:shift-occurrence-forward ==>))
 
-        long time =  200; //originally: 1200
+        long time =  500; //originally: 1200
 
         test()
         .believe("num:0", 1.0f, 0.9f)

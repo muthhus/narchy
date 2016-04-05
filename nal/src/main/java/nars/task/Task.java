@@ -323,7 +323,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 //    }
 
     /** performs the procedure that should happen when this task is invoked due to goal desire */
-    void execute(float belief, float desire, NAR nar);
+    void execute(Concept c, NAR nar);
 
     void delete();
 

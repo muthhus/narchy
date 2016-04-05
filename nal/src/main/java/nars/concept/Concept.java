@@ -31,6 +31,7 @@ import nars.concept.table.BeliefTable;
 import nars.concept.table.TaskTable;
 import nars.task.Task;
 import nars.term.Termed;
+import nars.truth.Truth;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -319,16 +320,13 @@ public interface Concept extends Termed, Comparable {
 
     }
 
-    default float beliefMotivation(long now, int duration) {
-        return hasBeliefs() ? beliefs().truth(now, duration)
-                //.expectation() : 0;
-                .motivation() : 0;
+    default Truth belief(long now, int duration) {
+        return hasBeliefs() ? beliefs().truth(now, duration) : Truth.Zero;
+
     }
 
-    default float goalMotivation(long now, int duration) {
-        return hasGoals() ? goals().truth(now, duration)
-                //.expectation() : 0;
-                .motivation() : 0;
+    default Truth desire(long now, int duration) {
+        return hasGoals() ? goals().truth(now, duration) : Truth.Zero;
     }
 
 

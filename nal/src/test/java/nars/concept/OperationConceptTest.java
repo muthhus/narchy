@@ -26,21 +26,21 @@ public class OperationConceptTest {
         NAR n = new Default();
 
         Termed op = new OperationConcept("f(x)", n) {
-            @Override protected void update(float belief, float desire, long now) {
-                super.update(belief, desire, now);
-                history.add(now + ":(" + n2(belief) + "," + n2(desire) + ")");
+            @Override public void update(NAR nar) {
+                super.update(nar);
+                history.add(nar.time() + ":(" + n2(believed.expectation()) + "," + n2(desired.expectation()) + ")");
             }
         };
 
 
-        n.goal(op, 1f, 0.9f).step();
-        assertMotive(n, op, 0, 0.9f);
+        n.goal(op, 1f, 0.9f).step().step();
+        assertMotive(n, op, 0.5f, 0.95f);
 
         n.believe(op, 0f, 0.5f).step();
-        assertMotive(n, op, -0.5f, 0.9f);
+        assertMotive(n, op, 0.25f, 0.95f);
 
         n.believe(op, 1f, 0.6f).step().step(); //cause revision
-        assertMotive(n, op, 0.14f, 0.9f);
+        assertMotive(n, op, 0.571f, 0.95f);
 
         //n.concept(op).print();
 
@@ -51,7 +51,7 @@ public class OperationConceptTest {
     }
 
     public static void assertMotive(@NotNull NAR n, @NotNull Termed operation, float b, float g) {
-        assertEquals(b, n.concept(operation).beliefMotivation(n.time(), n.duration()), 0.01f);
-        assertEquals(g, n.concept(operation).goalMotivation(n.time(), n.duration()), 0.01f);
+        assertEquals(b, n.concept(operation).belief(n.time(), n.duration()).expectation(), 0.01f);
+        assertEquals(g, n.concept(operation).desire(n.time(), n.duration()).expectation(), 0.01f);
     }
 }

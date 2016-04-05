@@ -259,7 +259,7 @@ public class Thermostat5 {
                 }
 
                 out.print(" \t<:" + n2(diffness.get())  +
-                        " \t:" + n2(move.motivation()));
+                        " \t:" + n2(move.motivation(n)));
                 out.println();
             }
         });
@@ -378,12 +378,6 @@ public class Thermostat5 {
             lastTime = -1;
         }
 
-
-        @Override
-        public float motivation() {
-            return desired;
-            //return super.motivation();
-        }
 
         @Nullable
         @Override

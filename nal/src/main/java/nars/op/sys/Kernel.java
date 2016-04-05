@@ -9,6 +9,7 @@ import nars.bag.impl.CurveBag;
 import nars.budget.BudgetMerge;
 import nars.budget.Forget;
 import nars.budget.UnitBudget;
+import nars.concept.Concept;
 import nars.task.MutableTask;
 import nars.task.Task;
 import nars.term.Term;
@@ -104,7 +105,7 @@ public class Kernel {
 
 
             @Override
-            public void execute(float belief, float desire, NAR m) {
+            public void execute(Concept c, NAR m) {
                 //super.onInput(m);
                 //logger.info("exec: {} {}", toBudgetString(), this);
                 r.run();

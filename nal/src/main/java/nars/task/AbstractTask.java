@@ -236,7 +236,7 @@ public abstract class AbstractTask extends UnitBudget
      * when executed; can be overridden in subclasses to handle this event;
      * (for Operation and negation of Operation ONLY)
      * */
-    @Override public void execute(float belief, float desire, @NotNull NAR n) {
+    @Override public void execute(Concept c, @NotNull NAR n) {
 
     }
 

@@ -10,6 +10,7 @@ import nars.nal.Tense;
 import nars.nar.Default;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -37,19 +38,19 @@ public class MotivationTest {
 
         Global.DEBUG = true;
 
-        for (Tense t : new Tense[] { Tense.Present, Tense.Eternal }) {
+        for (Tense t : new Tense[] { Tense.Eternal/*, Tense.Present*/ }) {
             System.out.println("\n" + t + " test:");
             NAR n = new Default();
             n.log();
 
-            MutableFloat v = new MutableFloat(0);
-            SensorConcept x = new SensorConcept("(x)", n, v);
-            OperationConcept y = new OperationConcept("do(that)", n);
-            Term link = $.conj(0, x, y);
-            //Term link = $.impl(y, 0, x);
+            MutableFloat v = new MutableFloat(0.5f); //midway, metastable
+            SensorConcept x = new SensorConcept("(x)", n, v).punc('!');
+            OperationConcept y = new MotorConcept("do(that)", n, MotorConcept.relative);
+            //Term link = $.conj(0, x, y);
+            Term link = $.impl(x, 0, y);
 
-            testOscillate(n, v, x, y, link, 0.80f,
-                    t == Tense.Eternal ? 0f : -0.80f,  //eternal has a higher negative threshold due to revision with the positive that precedes it
+            testOscillate(n, v, x, y, link, 0.6f,
+                    t == Tense.Eternal ? 0.4f : 0.4f,  //eternal has a higher negative threshold due to revision with the positive that precedes it
                     t);
         }
     }
@@ -58,41 +59,52 @@ public class MotivationTest {
     public void testOscillate(@NotNull NAR n, @NotNull MutableFloat v, @NotNull SensorConcept x, @NotNull OperationConcept y, @NotNull Term impl, float positiveThreshold, float negationThreshold, @NotNull Tense tense) {
         n.step().step();
 
-        assertEquals(0, y.motivation(), 0.01f);
-        assertEquals(-0.9f, x.beliefs().top(n).motivation(), 0.01f);
-        assertEquals(0.05, x.beliefs().top(n).expectation(), 0.01f);
+        assertEquals(0.5f, y.motivation(n), 0.01f);
+        assertEquals(0f, x.goals().top(n).motivation(), 0.01f);
+        assertEquals(0.5, x.goals().top(n).expectation(), 0.01f);
+
+
 
         v.setValue(1f);
         n.step().step();
 
-        assertEquals(0.9f, x.beliefs().top(n).motivation(), 0.01f);
-        assertEquals(0.95f, x.beliefs().top(n).expectation(), 0.01f);
+        assertEquals(0.9f, x.goals().top(n).motivation(), 0.01f);
+        assertEquals(0.95f, x.goals().top(n).expectation(), 0.01f);
 
 
         //link the sensor to the motor
-        n.goal(impl, tense, 1f, 0.9f); //TODO why didnt eternal work
+        n.believe(impl, tense, 1f, 0.99f);
 
+        //n.run(2);
 
         //motor should begin to run
-        int t1 = timeUntil("switch on", n, nn -> y.motivation() >= positiveThreshold, 20);
+        int t1 = timeUntil("switch on", n, nn-> {
+            //System.out.println(y.motivation(nn));
+            return y.motivation(nn) >= positiveThreshold;
+        }, 60);
 
-
-        n.goal(impl, tense, 0f, 0.9f); //should not be necessary to repeat this if eternal was working
+        n.run(2);
 
         //change sensor and watch motor stop
         v.setValue(0);
 
+        int t2 = timeUntil("switch off", n, nn -> {
+            //System.out.println(y.motivation(nn));
+            return y.motivation(nn) <=  negationThreshold; }, 150
+        );
 
-        int t2 = timeUntil("switch off", n, nn -> y.motivation() <=  negationThreshold, 150);
+        n.run(2);
     }
 
+    /** will return >=1 cycles */
     static int timeUntil(String name, @NotNull NAR n, @NotNull Predicate<NAR> test, int max) {
         int t = 0;
-        while (!test.test(n)) {
+        System.out.println(name + "...");
+        do {
             n.step();
             if (t++ >= max)
                 assertTrue(name + ": time limit exceeded", false);
-        }
+        } while (!test.test(n));
         System.out.println(name + ": time=" + t);
         return t;
     }
@@ -149,8 +161,8 @@ public class MotivationTest {
 
 
         int t1 = timeUntil("switch on", n, nn -> {
-            System.out.println(y.goals().top(nn) + " " +  y.motivation());
-            return y.motivation() >= 0.1f;
+            System.out.println(y.goals().top(nn) + " " +  y.motivation(nn));
+            return y.motivation(nn) >= 0.1f;
         }, 150);
 
         n.run(2);
@@ -158,14 +170,14 @@ public class MotivationTest {
         a.setValue(0f);
         b.setValue(0f);
         int t2 = timeUntil("switch off", n, nn -> {
-            System.out.println(Joiner.on(',').join(y.goals()) + " " +  y.motivation());
-            return y.motivation() <= -0.1f;
+            System.out.println(Joiner.on(',').join(y.goals()) + " " +  y.motivation(nn));
+            return y.motivation(nn) <= -0.1f;
         }, 150);
 
         b.setValue(1f);
         int t3 = timeUntil("switch half", n, nn -> {
-            System.out.println(Joiner.on(',').join(y.goals()) + " " +  y.motivation());
-            return y.motivation() >= 0.01f;
+            System.out.println(Joiner.on(',').join(y.goals()) + " " +  y.motivation(nn));
+            return y.motivation(nn) >= 0.01f;
         }, 150);
 
     }

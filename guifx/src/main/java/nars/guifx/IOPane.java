@@ -100,7 +100,23 @@ public class IOPane extends BorderPane /*implements FXIconPaneBuilder*/ {
 
         @NotNull
         public Node getTaskNode(Task t) {
-            return IOPane.this.newTaskNode(t);
+            //        Term tt = t.term();
+//        if (Op.isOperation(tt)) {
+//            Compound ct = (Compound) tt;
+//            Term[] a = Operator.opArgsArray(ct);
+//            switch (Operator.operatorName(ct).toString()) {
+//                case "html":
+//                    WebView w = new WebView();
+//                    //w.resize(400,200);
+//                    w.getEngine().loadContent(
+//                        ((Atom)a[0]).toStringUnquoted()
+//                    );
+//                    return w;
+//
+//            }
+//        }
+            return new TaskButton(IOPane.this.nar, t);
+            //return SubButton.make(nar, t);
         }
 
         @Override
@@ -131,26 +147,6 @@ public class IOPane extends BorderPane /*implements FXIconPaneBuilder*/ {
             super.disappear();
             //TODO unregister
         }
-    }
-
-    public Node newTaskNode(Task t) {
-//        Term tt = t.term();
-//        if (Op.isOperation(tt)) {
-//            Compound ct = (Compound) tt;
-//            Term[] a = Operator.opArgsArray(ct);
-//            switch (Operator.operatorName(ct).toString()) {
-//                case "html":
-//                    WebView w = new WebView();
-//                    //w.resize(400,200);
-//                    w.getEngine().loadContent(
-//                        ((Atom)a[0]).toStringUnquoted()
-//                    );
-//                    return w;
-//
-//            }
-//        }
-        return new TaskButton(nar, t);
-        //return SubButton.make(nar, t);
     }
 
     public class OutputPane extends BorderPane {

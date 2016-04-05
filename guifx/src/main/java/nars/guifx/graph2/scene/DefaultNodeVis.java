@@ -106,7 +106,7 @@ public class DefaultNodeVis implements NodeVis {
     private static Color termcolor(double op, double activation) {
         return Color.hsb(op * 360.0,
                 0.75,
-                Math.min(1f, 0.15 + activation * 0.84));
+                Math.min(1f, 0.5 + activation * 0.49));
     }
 
     public static final ColorMatrix colorsTransparent = new ColorMatrix(17 /* op hashcode color, hopefully prime */, 17 /* activation  */,

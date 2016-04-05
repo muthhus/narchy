@@ -302,11 +302,6 @@ public interface Temporalize {
 
             if (rOcc!=ETERNAL) {
 
-
-
-                if (rOcc + shift == 7)
-                    System.out.println(ddt + ":: " + rOcc + " " + shift + " , " + matchedDerived + " " + matchedOther);
-
                 occReturn[0] = rOcc + shift;
             }
         }

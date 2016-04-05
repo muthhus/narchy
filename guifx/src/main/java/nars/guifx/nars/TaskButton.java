@@ -136,10 +136,11 @@ public class TaskButton<X> extends Label implements Runnable {
             }
 
 
+            float minScale = 0.5f;
             if (scalesText()) {
                 Scale scale1 = this.scale;
-                scale1.setX(scale);
-                scale1.setY(scale);
+                scale1.setX(scale + minScale);
+                scale1.setY(scale + minScale);
                 //setNeedsLayout(true);
             }
 

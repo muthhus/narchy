@@ -442,7 +442,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      */
     public final void input(@NotNull Task t) {
         if (t.isCommand()) {
-            t.execute(1, 0, this); //direct execution
+            t.execute(null, this); //direct execution
         } else {
             eventInput.emit(t.normalize(this)); //accept into input buffer for eventual processing
         }
