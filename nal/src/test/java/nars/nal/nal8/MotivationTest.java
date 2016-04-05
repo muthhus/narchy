@@ -109,11 +109,11 @@ public class MotivationTest {
     }
 
     @Test
-    public void testMotivationBoolean() {
+    public void testAndConcept() {
 
         Global.DEBUG = true;
 
-        NAR n = new Default();
+        NAR n = new Default(1024, 2, 2, 2);
         n.log();
 
         FloatConcept A = new FloatConcept("(a)", n).punc('!');
@@ -130,23 +130,29 @@ public class MotivationTest {
             1f, 0.95f
         );
 
-        A.set(1f); B.set(1f);
 
-        n.run(2);
+        int loops = 2;
+        int cyclesBetweenPhases = 2;
+        for (int i = 0; i < loops; i++) {
+            
+            A.set(1f); B.set(1f);
 
-        timeUntil("switch on", n, nn -> {
-            //System.out.println(y.goals().top(nn) + " " +  y.motivation(nn));
-            return y.motivation(nn) >= 0.6f;
-        }, 150);
+            n.run(cyclesBetweenPhases);
 
-        n.run(2);
+            timeUntil("switch on", n, nn -> {
+                //System.out.println(y.goals().top(nn) + " " +  y.motivation(nn));
+                return y.motivation(nn) >= 0.6f;
+            }, 150);
 
-        A.set(0f);
+            n.run(cyclesBetweenPhases);
 
-        timeUntil("switch off", n, nn -> {
-            //System.out.println(Joiner.on(',').join(y.goals()) + " " +  y.motivation(nn));
-            return y.motivation(nn) <= 0.4f;
-        }, 150);
+            A.set(0f);
+
+            timeUntil("switch off", n, nn -> {
+                //System.out.println(Joiner.on(',').join(y.goals()) + " " +  y.motivation(nn));
+                return y.motivation(nn) <= 0.4f;
+            }, 150);
+        }
 
     }
 

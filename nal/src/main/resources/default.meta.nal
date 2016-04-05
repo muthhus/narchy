@@ -97,7 +97,7 @@
 
     (S --> P), (P --> S) |- (S <-> P), (Belief:Intersection, Desire:Strong, Derive:AllowBackward)
 
-//// inheritance from similarty <- TODO check why this one was missing ////////////////////////////////////////////////////////////////////////////////////
+//// inheritance from similarty <- todo check why this one was missing ////////////////////////////////////////////////////////////////////////////////////
 
     (S <-> P), (P --> S) |- (S --> P), (Belief:ReduceConjunction, Desire:Strong, Derive:AllowBackward)
 
@@ -357,7 +357,7 @@
 
     A, B, time(dtAfterReverse), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (B ==> A), (Belief:Abduction)
 
-    A, B, time(dtAfter), neq(A,B), notImplicationEquivalenceOrConjunction(A), notImplicationEquivalenceOrConjunction(B) |- (A && B), (Belief:Intersection, Desire:Intersection)
+    A, B, time(dtAfter), neq(A,B), notImplicationEquivalenceOrConjunction(A), notImplicationEquivalenceOrConjunction(B) |- (A && B), (Belief:Intersection)
 
 
 
@@ -400,15 +400,15 @@
 
 //precondition combiner inference rule (variable_unification6):
 
-    ((&&,C,A..+) ==> Z), ((&&,C,B..+) ==> Z), time(dtCombine) |- ((&&,A..+) ==> (&&,B..+)), (Belief:Induction, Desire:Induction),
-                                                                 ((&&,B..+) ==> (&&,A..+)), (Belief:Induction, Desire:Induction)
+    ((&&,C,A..+) ==> Z), ((&&,C,B..+) ==> Z), time(dtCombine) |- ((&&,A..+) ==> (&&,B..+)), (Belief:Induction),
+                                                                 ((&&,B..+) ==> (&&,A..+)), (Belief:Induction)
     (Z ==> (&&,C,A..+)), (Z ==> (&&,C,B..+)), time(dtCombine) |- ((&&,A..+) ==> (&&,B..+)), (Belief:Abduction),
                                                                  ((&&,B..+) ==> (&&,A..+)), (Belief:Abduction)
 
 
 //second level variable introduction
 
-    (Y --> L), ((Y --> S) ==> R), neq(L,S) |- substitute(((&&,(#X --> L),(#X --> S)) ==> R),Y,#X), (Belief:Induction, Desire:Induction)
+    (Y --> L), ((Y --> S) ==> R), neq(L,S) |- substitute(((&&,(#X --> L),(#X --> S)) ==> R),Y,#X), (Belief:Induction)
     (Y --> L), ((&&,(Y --> S),A..+) ==> R), neq(L,S) |- substitute(((&&,(#X --> L),(#X --> S),A..+) ==> R),Y,#X), (Belief:Intersection)
 
 

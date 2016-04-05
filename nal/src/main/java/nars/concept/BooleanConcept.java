@@ -28,7 +28,7 @@ public class BooleanConcept extends OperationConcept {
         @NotNull Operator op();
 
         /** set the truth and evidence on the task before returning */
-        @NotNull MutableTask update(@NotNull NAR nar, long now, @NotNull MutableTask result, @NotNull Termed[] args);
+        @Nullable MutableTask update(@NotNull NAR nar, long now, @NotNull MutableTask result, @NotNull Termed[] args);
     }
 
     static final BooleanModel AND = new DefaultBooleanModel(true);
@@ -62,7 +62,7 @@ public class BooleanConcept extends OperationConcept {
                     Task at = b.top(now);
                     if (at != null) {
 
-                        Truth ct = at.truth();
+                        Truth ct = at.projectTruth(now, now, /* eternalize if weak */ false);
                         //Truth ct = b.truth(now, nar.duration());
 
                         if (mode) {
@@ -86,7 +86,7 @@ public class BooleanConcept extends OperationConcept {
             if (!ev.isEmpty()) {
                 return task.evidence(ev.toArray()).truth(f, c);
             } else {
-                return task.truth(Truth.Zero);
+                return null; //task.truth(Truth.Zero);
             }
 
         }

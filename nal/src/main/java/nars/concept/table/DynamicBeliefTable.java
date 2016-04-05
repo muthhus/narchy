@@ -8,6 +8,7 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.Iterator;
 
 /**
@@ -18,7 +19,7 @@ abstract public class DynamicBeliefTable implements BeliefTable {
     private final Concept concept;
     private final NAR nar;
     @Nullable
-    Task current, next;
+    Task current;
 
     public DynamicBeliefTable(Concept concept, NAR nar) {
         this.concept = concept;
@@ -28,17 +29,13 @@ abstract public class DynamicBeliefTable implements BeliefTable {
     @Nullable
     @Override
     public Task add(@NotNull Task input, NAR nar) {
-        if (input == next || current == null) {
-            current = input;
-            return input; //first time processing the calculated new one
-        } else if (input == current) {
-            return null;  //duplicate
+        if (input == current) {
+            return input;
         } else {
-            //TODO discrepency detector
-            return null;
+            //TODO trigger update?
+            //TODO measure discrepency?
+            return null; //exclude other beliefs/goals
         }
-
-        //return updateTask(nar.time());
     }
 
     @Nullable
@@ -51,21 +48,24 @@ abstract public class DynamicBeliefTable implements BeliefTable {
     @Override
     public Task topTemporal(long when, long now) {
         return current;
-        //return updateTask(now);
     }
 
     @Nullable
-    public Task updateTask(long now) {
+    public void updateTask(long now) {
         if (current == null || current.occurrence() != now) {
             Task prev = current;
-            next = update(now);
-            if (next!=null && (prev==null || ( !prev.truth().equals(next.truth())))) {
+            Task next = update(now);
+            if (next!=null && (prev==null || (
+                    !prev.truth().equals(next.truth() ) ||
+                    !Arrays.equals(prev.evidence(), next.evidence())
+            ))) {
+                this.current = next;
                 if (prev!=null)
                     prev.delete();
                 nar.process(next);
             }
         }
-        return current;
+
     }
 
     abstract protected Task update(long now);
