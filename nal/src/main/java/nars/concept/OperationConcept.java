@@ -12,6 +12,7 @@ import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Operator;
 import nars.term.Termed;
+import nars.term.container.TermContainer;
 import nars.truth.Truth;
 import nars.util.data.Util;
 import nars.util.event.Topic;
@@ -57,8 +58,10 @@ public class OperationConcept extends CompoundConcept implements Runnable {
 
     public OperationConcept(@NotNull String compoundTermString, @NotNull NAR n) throws Narsese.NarseseException {
         super(compoundTermString, n);
+        this.nar = n;
         ensureOperation(term);
         n.on(this);
+
     }
 
     static void ensureOperation(@NotNull Compound term) {
@@ -66,6 +69,9 @@ public class OperationConcept extends CompoundConcept implements Runnable {
             throw new RuntimeException(term + " is not an Operation");
     }
 
+    public final TermContainer parameters() {
+        return ((Compound)term(0)).subterms();
+    }
 
     @Nullable
     @Override

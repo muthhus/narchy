@@ -53,7 +53,7 @@ abstract public class JunctionConcept extends CompoundConcept {
 
     @NotNull
     private BeliefTable newTable(boolean beliefOrGoal) {
-        return new DynamicBeliefTable(this) {
+        return new DynamicBeliefTable(this, nar) {
             @NotNull
             @Override protected Task update(long now) {
                 return new MutableTask(term, '.').truth(solve(beliefOrGoal, now, now)).present(now).normalize(nar);

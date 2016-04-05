@@ -870,7 +870,8 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
 
     @Override
     public boolean isTerm(int i, @NotNull Op o) {
-        return false;
+        Term ti = term(i);
+        return (ti.op() == o);
     }
 
     @Override

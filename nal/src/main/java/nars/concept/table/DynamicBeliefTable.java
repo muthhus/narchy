@@ -2,7 +2,7 @@ package nars.concept.table;
 
 import com.google.common.collect.Iterators;
 import nars.NAR;
-import nars.concept.JunctionConcept;
+import nars.concept.Concept;
 import nars.task.Task;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -15,19 +15,30 @@ import java.util.Iterator;
  */
 abstract public class DynamicBeliefTable implements BeliefTable {
 
-    private final JunctionConcept junctionConcept;
+    private final Concept concept;
+    private final NAR nar;
     @Nullable
-    Task current;
+    Task current, next;
 
-    public DynamicBeliefTable(JunctionConcept junctionConcept) {
-        this.junctionConcept = junctionConcept;
-
+    public DynamicBeliefTable(Concept concept, NAR nar) {
+        this.concept = concept;
+        this.nar = nar;
     }
 
     @Nullable
     @Override
     public Task add(@NotNull Task input, NAR nar) {
-        return current;
+        if (input == next || current == null) {
+            current = input;
+            return input; //first time processing the calculated new one
+        } else if (input == current) {
+            return null;  //duplicate
+        } else {
+            //TODO discrepency detector
+            return null;
+        }
+
+        //return updateTask(nar.time());
     }
 
     @Nullable
@@ -45,7 +56,13 @@ abstract public class DynamicBeliefTable implements BeliefTable {
     @Nullable
     public Task updateTask(long now) {
         if (current == null || current.occurrence() != now) {
-            current = update(now);
+            Task prev = current;
+            next = update(now);
+            if (prev==null || ( !prev.truth().equals(next.truth()))) {
+                if (prev!=null)
+                    prev.delete();
+                nar.process(next);
+            }
         }
         return current;
     }
@@ -80,7 +97,7 @@ abstract public class DynamicBeliefTable implements BeliefTable {
 
     @Override
     public boolean isEmpty() {
-        return updateTask(junctionConcept.nar.time()) == null;
+        return current==null;
     }
 
     @NotNull

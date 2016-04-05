@@ -1,19 +1,28 @@
 package nars.nal.nal8;
 
-import com.google.common.base.Joiner;
 import nars.$;
 import nars.Global;
 import nars.NAR;
-import nars.concept.JunctionConcept;
+import nars.Narsese;
+import nars.budget.Budgeted;
+import nars.concept.Concept;
 import nars.concept.OperationConcept;
+import nars.concept.table.BeliefTable;
+import nars.concept.table.DynamicBeliefTable;
 import nars.nal.Tense;
 import nars.nar.Default;
+import nars.task.MutableTask;
+import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.container.TermContainer;
+import nars.truth.DefaultTruth;
+import nars.truth.Truth;
 import nars.util.signal.MotorConcept;
 import nars.util.signal.SensorConcept;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
 import java.util.function.Predicate;
@@ -116,22 +125,28 @@ public class MotivationTest {
 
         NAR n = new Default();
 
-        MutableFloat a = new MutableFloat(0);
-        SensorConcept A = new SensorConcept("(a)", n, a).timing(0, 8).punc('!');
-        MutableFloat b = new MutableFloat(0);
-        SensorConcept B = new SensorConcept("(b)", n, b).timing(0, 8).punc('!');
+        MutableFloat a = new MutableFloat(0.5f);
+        SensorConcept A = new SensorConcept("(a)", n, a).punc('!');
+        MutableFloat b = new MutableFloat(0.5f);
+        SensorConcept B = new SensorConcept("(b)", n, b).punc('!');
+
+
+        AndConcept AandB = new AndConcept(n);
+        //n.step().input(AandB.beliefs().top(n.time()));
+        //n.step().input(AandB.goals().top(n.time()));
 
         OperationConcept y = new OperationConcept("do(that)", n);
 
 
-        Compound ab = (Compound) $.conj(A, B); //AND
-        JunctionConcept.ConjunctionConcept abc = new JunctionConcept.ConjunctionConcept(ab, n);
+        //Compound ab = (Compound) $.conj(A, B); //AND
+        //JunctionConcept.ConjunctionConcept abc = new JunctionConcept.ConjunctionConcept(ab, n);
         /*n.onFrame(nn->{
             if (abc.hasBeliefs())
                 System.out.println(abc.beliefs().top(nn.time()));
             if (abc.hasGoals())
                 System.out.println(abc.goals().top(nn.time()));
         });*/
+
 
         //Term ab = $.esect(A, B); //AND?
         //Term ab = $.disj(A, B); //OR
@@ -147,22 +162,23 @@ public class MotivationTest {
         //n.goal(antilink, Tense.Eternal, 0f, 0.95f);
 
         //OR
-        //n.believe($.impl( A, /*0,*/ y), Tense.Present, 0.75f, 0.75f);
-        //n.believe($.impl( B, /*0,*/ y), Tense.Present, 0.75f, 0.75f);
+        //n.believe($.impl( A, /*0,*/ y), Tense.Eternal, 0.75f, 0.75f);
+        //n.believe($.impl( B, /*0,*/ y), Tense.Eternal, 0.75f, 0.75f);
 
         //n.input(abc + "?");
-        n.believe($.impl( abc, 0, y/*0,*/), Tense.Present, 1f, 0.95f);
+        n.believe($.impl( AandB, 0, y/*0,*/), Tense.Eternal, 1f, 0.95f);
 
 
         //a.setValue(0f); b.setValue(0f); //start OFF
         a.setValue(1f); b.setValue(1f);
+        //n.step().input(AandB.goals().top(n.time()));
 
         n.run(2);
 
 
         int t1 = timeUntil("switch on", n, nn -> {
-            System.out.println(y.goals().top(nn) + " " +  y.motivation(nn));
-            return y.motivation(nn) >= 0.1f;
+            //System.out.println(y.goals().top(nn) + " " +  y.motivation(nn));
+            return y.motivation(nn) >= 0.6f;
         }, 150);
 
         n.run(2);
@@ -170,15 +186,115 @@ public class MotivationTest {
         a.setValue(0f);
         b.setValue(0f);
         int t2 = timeUntil("switch off", n, nn -> {
-            System.out.println(Joiner.on(',').join(y.goals()) + " " +  y.motivation(nn));
-            return y.motivation(nn) <= -0.1f;
+            //System.out.println(Joiner.on(',').join(y.goals()) + " " +  y.motivation(nn));
+            return y.motivation(nn) <= 0.4f;
         }, 150);
 
         b.setValue(1f);
         int t3 = timeUntil("switch half", n, nn -> {
-            System.out.println(Joiner.on(',').join(y.goals()) + " " +  y.motivation(nn));
+            //System.out.println(Joiner.on(',').join(y.goals()) + " " +  y.motivation(nn));
             return y.motivation(nn) >= 0.01f;
         }, 150);
 
+    }
+
+
+
+    private static class AndConcept extends OperationConcept {
+        public final NAR nar;
+
+        public AndConcept(NAR nar) throws Narsese.NarseseException {
+            super("and((a), (b))", nar);
+            this.nar = nar;
+        }
+
+
+
+        @Override
+        public boolean link(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, @Nullable MutableFloat conceptOverflow) {
+            if (super.link(b, scale, minScale, nar, conceptOverflow)) {
+
+               //intercept activated tasklinks with compounds present in the subterms
+                if (b instanceof Task) {
+                    Task t = (Task)b;
+
+                    //TODO defer the update to one run at the end of the cycle like Sensor and Motor
+                    if (t.isBeliefOrGoal() && parameters().containsTerm(t.term())) {
+                        char punc = t.punc();
+                        long now = nar.time();
+                        if (punc == '.')
+                            ((DynamicBeliefTable)beliefs()).updateTask(now);
+                        else if (punc == '!')
+                            ((DynamicBeliefTable)goals()).updateTask(now);
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+
+        @NotNull
+        @Override
+        public BeliefTable beliefs() {
+            if (beliefs == null) {
+                beliefs = newBeliefTable(0);
+            }
+            ((DynamicBeliefTable)beliefs).updateTask(nar.time());
+            return beliefs;
+        }
+
+        @NotNull
+        @Override
+        public BeliefTable goals() {
+            if (goals == null) {
+                goals = newGoalTable(0);
+            }
+            ((DynamicBeliefTable)goals).updateTask(nar.time());
+            return goals;
+        }
+
+        @NotNull
+        @Override
+        protected BeliefTable newBeliefTable(int cap) {
+            return new AndTable(true);
+        }
+        @NotNull
+        @Override
+        protected BeliefTable newGoalTable(int cap) {
+            return new AndTable(false);
+        }
+
+        private class AndTable extends DynamicBeliefTable {
+            private final boolean beliefOrGoal; //or goals
+
+            public AndTable(boolean beliefOrGoal) {
+                super(AndConcept.this, nar);
+                this.beliefOrGoal = beliefOrGoal;
+            }
+
+            @Override
+            protected Task update(long now) {
+                //HACK todo use a real truth aggregation formula
+
+
+                float f = 1f, c = 1f;
+                for (Term t : parameters().terms() /* subj is the parameter product */) {
+
+                    Concept subtermConcept = nar.concept(t);
+                    if (subtermConcept == null) {
+                        f = c = 0;break;
+                        //continue;
+                    }
+
+                    BeliefTable b = beliefOrGoal ? subtermConcept.beliefs() : subtermConcept.goals();
+                    Truth ct = b.truth(now, nar.duration());
+                    f *= ct.freq();
+                    c *= ct.conf();
+                }
+                Truth t = new DefaultTruth(f, c);
+                return new MutableTask(term, beliefOrGoal ? '.' : '!').truth(t).present(now).normalize(nar);
+            }
+
+        }
     }
 }
