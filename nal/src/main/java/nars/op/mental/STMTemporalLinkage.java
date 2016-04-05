@@ -2,6 +2,7 @@ package nars.op.mental;
 
 import nars.Global;
 import nars.NAR;
+import nars.Symbols;
 import nars.concept.Concept;
 import nars.task.Task;
 import org.jetbrains.annotations.NotNull;
@@ -23,6 +24,9 @@ public final class STMTemporalLinkage implements Consumer<Task> {
 
     @NotNull private final NAR nar;
 
+    final boolean beliefs = true;
+    final boolean goals = false;
+
     public STMTemporalLinkage(@NotNull NAR nar) {
 
         this.nar = nar;
@@ -35,8 +39,15 @@ public final class STMTemporalLinkage implements Consumer<Task> {
     }
 
 
-    public static boolean temporallyInductable(@NotNull Task newEvent) {
-        return (!newEvent.isDeleted() && newEvent.isInput() && !newEvent.isEternal() && newEvent.isBeliefOrGoal());
+    public boolean temporallyInductable(@NotNull Task newEvent) {
+        if ((!newEvent.isDeleted() && newEvent.isInput() && !newEvent.isEternal())) {
+            switch (newEvent.punc()) {
+                case Symbols.BELIEF: return beliefs;
+                case Symbols.GOAL: return goals;
+            }
+        }
+        return false;
+
         //if (Tense.containsMentalOperator(newEvent)) return true;
     }
 

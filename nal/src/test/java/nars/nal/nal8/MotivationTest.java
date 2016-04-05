@@ -18,6 +18,7 @@ import org.junit.Test;
 import java.util.function.Predicate;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -42,29 +43,30 @@ public class MotivationTest {
             NAR n = new Default();
             n.log();
 
-            MutableFloat v = new MutableFloat(0.5f); //midway, metastable
-            SensorConcept x = new SensorConcept("(x)", n, v).punc('!');
+
+            FloatConcept x = new FloatConcept("(x)", n).punc('!');
             OperationConcept y = new MotorConcept("do(that)", n, MotorConcept.relative);
             //Term link = $.conj(0, x, y);
             Term link = $.impl(x, 0, y);
 
-            testOscillate(n, v, x, y, link, 0.6f,
+            testOscillate(n, x, y, link, 0.6f,
                     t == Tense.Eternal ? 0.4f : 0.4f,  //eternal has a higher negative threshold due to revision with the positive that precedes it
                     t);
         }
     }
 
 
-    public void testOscillate(@NotNull NAR n, @NotNull MutableFloat v, @NotNull SensorConcept x, @NotNull OperationConcept y, @NotNull Term impl, float positiveThreshold, float negationThreshold, @NotNull Tense tense) {
+    public void testOscillate(@NotNull NAR n, @NotNull FloatConcept x, @NotNull OperationConcept y, @NotNull Term impl, float positiveThreshold, float negationThreshold, @NotNull Tense tense) {
         n.step().step();
 
         assertEquals(0.5f, y.motivation(n), 0.01f);
-        assertEquals(0f, x.goals().top(n).motivation(), 0.01f);
-        assertEquals(0.5, x.goals().top(n).expectation(), 0.01f);
+        assertFalse(x.hasGoals());
+//        assertEquals(0f, x.goals().top(n).motivation(), 0.01f);
+//        assertEquals(0.5, x.goals().top(n).expectation(), 0.01f);
 
 
 
-        v.setValue(1f);
+        x.set(1f);
         n.step().step();
 
         assertEquals(0.9f, x.goals().top(n).motivation(), 0.01f);
@@ -85,7 +87,7 @@ public class MotivationTest {
         n.run(2);
 
         //change sensor and watch motor stop
-        v.setValue(0);
+        x.set(0);
 
         int t2 = timeUntil("switch off", n, nn -> {
             //System.out.println(y.motivation(nn));
@@ -113,8 +115,7 @@ public class MotivationTest {
 
         Global.DEBUG = true;
 
-        NAR n = new Default(1024, 2, 2, 2);
-        n.log();
+        NAR n = new Default(1024, 2, 2, 2).log();
 
         FloatConcept A = new FloatConcept("(a)", n).punc('!');
 
@@ -131,13 +132,13 @@ public class MotivationTest {
         );
 
 
-        int loops = 2;
+        int loops = 12;
         int cyclesBetweenPhases = 2;
         for (int i = 0; i < loops; i++) {
-            
-            A.set(1f); B.set(1f);
 
             n.run(cyclesBetweenPhases);
+
+            A.set(1f); B.set(1f);
 
             timeUntil("switch on", n, nn -> {
                 //System.out.println(y.goals().top(nn) + " " +  y.motivation(nn));
@@ -152,6 +153,66 @@ public class MotivationTest {
                 //System.out.println(Joiner.on(',').join(y.goals()) + " " +  y.motivation(nn));
                 return y.motivation(nn) <= 0.4f;
             }, 150);
+        }
+
+    }
+
+    @Test
+    public void testOrConcept() {
+
+        Global.DEBUG = true;
+
+        NAR n = new Default(1024, 3, 2, 2).log();
+
+        FloatConcept A = new FloatConcept("(a)", n).punc('!');
+
+        FloatConcept B = new FloatConcept("(b)", n).punc('!');
+
+        OperationConcept y = new OperationConcept("do(that)", n);
+
+        n.believe(
+                $.impl(
+                        BooleanConcept.Or(n, A, B), 0 /*concurrent =|>*/, y
+                ),
+                Tense.Eternal,
+                1f, 0.95f
+        );
+
+
+        int loops = 12;
+        int cyclesBetweenPhases = 4;
+        for (int i = 0; i < loops; i++) {
+
+            n.run(cyclesBetweenPhases);
+
+            A.set(1f); B.set(1f);
+
+            timeUntil("switch (on,on)", n, nn -> {
+                //System.out.println(y.goals().top(nn) + " " +  y.motivation(nn));
+                return y.motivation(nn) >= 0.6f;
+            }, 150);
+
+            n.run(cyclesBetweenPhases);
+
+            A.set(0f);
+
+            timeUntil("switch (on,off)", n, nn -> {
+                //System.out.println(Joiner.on(',').join(y.goals()) + " " +  y.motivation(nn));
+                float m = y.motivation(nn);
+                return m >= 0.6f;
+                //return m <= 0.55f && m >= 0.45f; //~=0.5
+            }, 150);
+
+            n.run(cyclesBetweenPhases);
+
+            B.set(0f);
+
+            timeUntil("switch (off,off)", n, nn -> {
+                //System.out.println(Joiner.on(',').join(y.goals()) + " " +  y.motivation(nn));
+                float m = y.motivation(nn);
+                return m <= 0.4f;
+            }, 350);
+
         }
 
     }

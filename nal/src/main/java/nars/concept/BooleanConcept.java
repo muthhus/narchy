@@ -45,14 +45,16 @@ public class BooleanConcept extends OperationConcept {
         @Override public Operator op() {  return mode ? AND_OP : OR_OP; }
 
         @Override public MutableTask update(NAR nar, long now, MutableTask task, Termed[] args) {
-            float f = 1f, c = 1f;
+
+            boolean mode = this.mode;
+
+            float f = mode ? 1f : 0f;
+            float c = mode ? 1f : 0f;
 
             boolean beliefOrGoal = task.punc() == Symbols.BELIEF;
 
             LongArrayList ev = new LongArrayList(Global.STAMP_MAX_EVIDENCE);
             int evidencePerArg = Math.max(Global.STAMP_MAX_EVIDENCE / args.length, 1);
-
-            boolean mode = this.mode;
 
             for (Termed t : args) {
 
@@ -67,16 +69,21 @@ public class BooleanConcept extends OperationConcept {
 
                         if (mode) {
                             f *= ct.freq();
+                            c *= ct.conf();
                         } else {
-                            f = Math.max(f, ct.freq());
+                            float cf = ct.freq();
+                            if (cf > f)
+                                f = cf;
+                            float cc = ct.conf();
+                            if (cc > c)
+                                c = cc;
                         }
 
-                        c *= ct.conf();
 
                         long[] ae = at.evidence();
                         int aen = ae.length - 1;
                         for (int i = 0; i < Math.min(ae.length, evidencePerArg); i++) {
-                            ev.add(ae[aen - i]);
+                            ev.add(ae[aen - i]); //most recent
                         }
 
                     }
