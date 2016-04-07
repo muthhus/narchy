@@ -214,7 +214,10 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
             } else {
                 Y yy = py.get();
                 if (yy == null) {
-                    py.set(this.y);
+                    if (assigner.test(X, y))
+                        py.set(this.y);
+                    else
+                        return null;
                 } else if (!yy.equals(this.y)) {
                     return null; //conflict
                 }

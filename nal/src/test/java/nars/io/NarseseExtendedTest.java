@@ -43,10 +43,10 @@ public class NarseseExtendedTest {
 
     @Test public void testOriginalTruth() {
         //singular form, normal, to test that it still works
-        eternal(task("(a & b). %1.0%"));
+        eternal(task("(a & b). %1.0;0.9%"));
 
         //normal, to test that it still works
-        tensed(task("(a & b). :|: %1.0%"), Present);
+        tensed(task("(a & b). :|: %1.0;0.9%"), Present);
     }
 
 
@@ -64,7 +64,7 @@ public class NarseseExtendedTest {
         /*tensed(task("(a & b). %1.0|"), Present);
         tensed(task("(a & b). %1.0/"), Future);
         tensed(task("(a & b). %1.0\\"), Past);*/
-        eternal(task("(a & b). %1.0%"));
+        eternal(task("(a & b). %1.0;0.9%"));
 
 
 

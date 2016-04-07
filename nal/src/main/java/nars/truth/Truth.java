@@ -183,8 +183,7 @@ public interface Truth extends Truthed {
 
     @NotNull
     default CharSequence toCharSequence() {
-        StringBuilder sb =  new StringBuilder();
-        return appendString(sb);
+        return appendString(new StringBuilder());
     }
     
     /** displays the truth value as a short string indicating degree of true/false */

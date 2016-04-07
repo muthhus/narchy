@@ -131,7 +131,7 @@ public abstract class FindSubst extends Versioning implements Subst {
 
         xy = new VarCachedVersionMap(this);
         yx = new VarCachedVersionMap(this);
-        reassigner = new VersionMap.Reassigner<>(
+        reassigner = new VersionMap.Reassigner<Term,Term>(
                 //() -> new Versioned(toSharePool)
                 () -> new Versioned(FindSubst.this)
         );

@@ -13,10 +13,7 @@ public class DefaultTruth implements Truth  {
     public final float freq, conf;
     public final int hash;
 
-    /** unspecified confidence, will be invalid unless updated later */
-    @Deprecated public DefaultTruth(float f) {
-        this(f, Float.NaN);
-    }
+
 
     @Override
     public final float freq() {
@@ -42,14 +39,10 @@ public class DefaultTruth implements Truth  {
     }
 
     public DefaultTruth(float f, float c, float epsilon, int discreteness) {
-        this.freq = round(f, epsilon);
-        if (Float.isFinite(c)) {
-            this.conf = round(c, epsilon);
-            this.hash = Truth.hash(f, c, discreteness);
-        } else {
-            this.conf = c;
-            this.hash = 0;
-        }
+        //assert(Float.isFinite(f) && Float.isFinite(c));
+        this.freq = f = round(f, epsilon);
+        this.conf = c = round(c, epsilon);
+        this.hash = Truth.hash(f, c, discreteness);
     }
 
     public DefaultTruth(char punctuation, @NotNull Memory m) {

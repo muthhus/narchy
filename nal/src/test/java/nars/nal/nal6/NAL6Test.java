@@ -93,6 +93,36 @@ public class NAL6Test extends AbstractNALTest {
         tester.mustBelieve(cycles, "<<$1 --> [withWings]> ==> (&&,<$1 --> flyer>,<($1,worms) --> food>)>", 1.00f, 0.45f); //en("I guess if something has wings, then it can fly and eats worms.");
 
 
+        /*
+        <patham9> 
+        first result:
+            (&&,<$1 --> flyer>,<($1,worms) --> food>) ==> <$1 --> [withWings]>>
+        it comes from the rule
+            ((&&,C,A_1..n) ==> Z), ((&&,C,B_1..m) ==> Z) |- ((&&,A_1..n) ==> (&&,B_1..m)), (Truth:Induction)
+        which basically says: if two different precondition conjunctions, with a common element lead to the same conclusion,
+        it might be that these different preconditions in the specific conjunctions imply each other
+        (each other because the premises can be swapped for this rule and it is still valid)
+
+        second result:
+            <<$1 --> [withWings]> ==> (&&,<$1 --> flyer>,<($1,worms) --> food>)>
+        by the same rule:
+            ((&&,C,A_1..n) ==> Z), ((&&,C,B_1..m) ==> Z) |- ((&&,B_1..m) ==> (&&,A_1..n)), (Truth:Induction)
+        where this time the diffierent preconditions of the second conjunction imply the different preconditions of the first
+        no, no additionally info needed
+        now I will show you what I think went wrong in your system:
+        you got:
+            ((&&,(($1,worms)-->food),($1-->flyer),($1-->[chirping]))==>(($1-->[withWings])&&($1-->[chirping]))).
+        abduction in progress ^^
+        your result is coming from the induction rule
+            (P ==> M), (S ==> M), not_equal(S,P) |- (S ==> P), (Truth:Induction, Derive:AllowBackward)
+        there are two possibilities, either restrict not_equal further to no_common_subter,
+        or make the constructor of ==> make sure that the elements which occur in predicate and subject as well are removed
+        its less fatal than in the inheritance composition, the derivation isnt wrong fundamentally, but if you can do so efficiently, let it avoid it
+        additionally make sure that the two
+            ((&&,C,A_1..n) ==> Z), ((&&,C,B_1..m) ==> Z) |- ((&&,A_1..n) ==> (&&,B_1..m)), (Truth:Induction)
+        rules work, they are demanded by this reasoning about preconditions
+        *hypothetical reasoning about preconditions to be exact
+         */
     }
 
 
@@ -401,13 +431,12 @@ public class NAL6Test extends AbstractNALTest {
     @Test public void recursionSmall2()  {
         long time = 1500;
 
-
         test()
         .believe("<0 --> n>", 1.0f, 0.9f)
         .believe("<<$1 --> n> ==> <(/,next,$1,_) --> n>>", 1.0f, 0.9f)
         .ask("<(/,next,(/,next,0,_),_) --> n>")
         .mustBelieve(time, "<(/,next,0,_) --> n>", 1.0f, 1.0f, 0.81f, 1.0f)
-        //.mustBelieve(time, "<(/,next,(/,next,0,_),_) --> n>", 1.0f, 1.0f, 0.73f, 1.0f)
+        .mustBelieve(time, "<(/,next,(/,next,0,_),_) --> n>", 1.0f, 1.0f, 0.73f, 1.0f) //should work
         //.mustBelieve(time, "((/,next,(/,next,(/,next,0,_),_),_)-->n).", 1.0f, 1.0f, finalConf, 1.0f)
         ;
     }

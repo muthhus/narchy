@@ -86,12 +86,12 @@ public class NarseseTest {
         testTruth("%1;.9%", 1f, 0.9f);
         testTruth("%0;0.90%", 0f, 0.9f);
     }
-    @Test public void testTruthFreqOnly() {
-        testTruth("%0.0%", 0f, 0.9f);
-        testTruth("%1.0%", 1f, 0.9f);
-    }
+//    @Test public void testTruthFreqOnly() {
+//        testTruth("%0.0%", 0f, 0.9f);
+//        testTruth("%1.0%", 1f, 0.9f);
+//    }
 
-    public void testTruth(String t, float freq, float conf) {
+    public static void testTruth(String t, float freq, float conf) {
         String s = "a:b. " + t;
 
         Truth truth = task(s).truth();
@@ -238,11 +238,11 @@ public class NarseseTest {
     @Test
     public void testShortFloat() {
 
-        taskParses("<{a} --> [b]>. %0%");
-        taskParses("<a --> b>. %0.95%");
-        taskParses("<a --> b>. %0.9%");
-        taskParses("<a --> b>. %1%");
-        taskParses("<a --> b>. %1.0%");
+        taskParses("<{a} --> [b]>. %0;0.9%");
+        taskParses("<a --> b>. %0.95;0.9%");
+        taskParses("<a --> b>. %0.9;0.9%");
+        taskParses("<a --> b>. %1;0.9%");
+        taskParses("<a --> b>. %1.0;0.9%");
     }
 
     @Test

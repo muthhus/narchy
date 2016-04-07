@@ -23,7 +23,7 @@ public class TaskTest {
         //for TRUTH EPSILON 0.01:
 
         DefaultTruth dt = new DefaultTruth(0, 0.1f);
-        assertEquals(10, dt.hashCode());
+        assertEquals(9, dt.hashCode());
 
         DefaultTruth du = new DefaultTruth(1, 1.0f);
         assertEquals(6553700, du.hashCode());

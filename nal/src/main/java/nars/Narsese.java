@@ -337,7 +337,7 @@ public class Narsese extends BaseParser<Object> {
 
                 ShortFloat(), //Frequency
 
-                firstOf(
+                //firstOf(
 
                         sequence(
 
@@ -348,14 +348,15 @@ public class Narsese extends BaseParser<Object> {
                                 optional(TRUTH_VALUE_MARK), //tailing '%' is optional
 
                                 swap() && truth.set(new DefaultTruth((float) pop(), (float) pop()))
-                        ),
+                        )
+                        /*,
 
                         sequence(
                                 TRUTH_VALUE_MARK, //tailing '%'
 
                                 truth.set(new DefaultTruth((float) pop() ))
-                        )
-                )
+                        )*/
+                //)
         );
     }
 

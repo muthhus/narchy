@@ -1,4 +1,4 @@
-package nars.bag;
+package nars.budget;
 
 import nars.util.data.Util;
 import org.junit.Test;

@@ -240,10 +240,10 @@ public abstract class TermBuilder {
 
         if (!op.validSize(currentSize)) {
             //throw new RuntimeException(Arrays.toString(t) + " invalid size for " + op);
-            if (Global.DEBUG)
-                throw new InvalidTerm(op, relation, dt, args.terms());
+            //if (Global.DEBUG)
+                //throw new InvalidTerm(op, relation, dt, args.terms());
             //else
-                //return null;
+                return null;
         }
 
         return make(op, relation, TermContainer.the(op, args), dt).term();
@@ -434,6 +434,22 @@ public abstract class TermBuilder {
 
                     return impl2Conj(dt, subject, predicate, oldCondition);
                 }
+
+                if ((subject.op() == CONJUNCTION) && (predicate.op() == CONJUNCTION)) {
+                    //filter (factor out) any common subterms
+                    TermContainer subjs = ((Compound) subject).subterms();
+                    TermContainer preds = ((Compound) predicate).subterms();
+                    MutableSet<Term> common = TermContainer.intersect(subjs, preds);
+                    if (!common.isEmpty()) {
+                        subject = theTransformed((Compound)subject, TermContainer.except(subjs, common));
+                        if (subject == null)
+                            return null;
+                        predicate = theTransformed((Compound)predicate, TermContainer.except(preds, common));
+                        if (predicate == null)
+                            return null;
+                    }
+                }
+
                 break;
 
         }
@@ -442,7 +458,7 @@ public abstract class TermBuilder {
 
         //already tested equality, so go to invalidStatement2:
         if (!Statement.invalidStatement2(subject, predicate)) {
-            TermContainer cc = TermContainer.the(op, u);
+            TermContainer cc = TermContainer.the(op, subject, predicate);
             Termed xx = make(op, -1, cc);
             if (xx != null) {
                 Compound x = (Compound) (xx.term());
