@@ -324,8 +324,8 @@ public abstract class AbstractTask extends UnitBudget
                 (/*state() == TaskState.Anticipated ||*/ isInput());
     }
 
-    @NotNull
-    protected Task setEvidence(long... evidentialSet) {
+    /** the evidence should be sorted and de-duplicaed prior to calling this */
+    @NotNull protected Task setEvidence(long... evidentialSet) {
         if (this.evidentialSet!=evidentialSet) {
             this.evidentialSet = evidentialSet;
             invalidate();

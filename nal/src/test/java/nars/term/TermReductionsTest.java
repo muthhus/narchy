@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import static nars.$.*;
 import static nars.Op.CONJUNCTION;
+import static nars.io.NarseseTest.assertParseException;
 import static org.junit.Assert.*;
 
 /**
@@ -69,7 +70,7 @@ public class TermReductionsTest {
 
     }
     @Test public void testIntersectIntReductionToZero() {
-        NarseseTest.assertParseException("(|,{P,Q},{R,S})");
+        assertParseException("(|,{P,Q},{R,S})");
     }
 
     @Test public void testIntersectIntReduction_to_one() {
@@ -83,23 +84,23 @@ public class TermReductionsTest {
 
         assertNull(equiv( impl(p, q), r) );
         assertNull(equiv( equiv(p, q), r) );
-        NarseseTest.assertParseException("<<a <=> b> <=> c>");
+        assertParseException("<<a <=> b> <=> c>");
     }
 
     @Test public void testReducedAndInvalidImplications1() {
-        NarseseTest.assertParseException("<<P<=>Q> ==> R>");
+        assertParseException("<<P<=>Q> ==> R>");
     }
     @Test public void testReducedAndInvalidImplications5() {
-        NarseseTest.assertParseException("<<P==>Q> ==> R>");
+        assertParseException("<<P==>Q> ==> R>");
     }
     @Test public void testReducedAndInvalidImplications6() {
-        NarseseTest.assertParseException("<R ==> <P<=>Q>>");
+        assertParseException("<R ==> <P<=>Q>>");
     }
     @Test public void testReducedAndInvalidImplications2() {
         assertEquals("((P&&R)==>Q)", $("<R==><P==>Q>>").toString());
     }
     @Test public void testReducedAndInvalidImplications3() {
-        NarseseTest.assertParseException("<R==><P==>R>>");
+        assertParseException("<R==><P==>R>>");
     }
     @Test public void testReducedAndInvalidImplications4() {
         assertEquals("(R==>P)", $("<R==><R==>P>>").toString());
@@ -365,4 +366,14 @@ public class TermReductionsTest {
 
     }
 
+    @Test public void testImplicationConjCommonSubterms() {
+        assertEquals("((b&&c)==>d)",
+                $("((&&, a, b, c) ==> (&&, a, d))").toString());
+        assertEquals("(d==>(b&&c))",
+                $("((&&, a, d) ==> (&&, a, b, c))").toString());
+        assertParseException("((&&, a, b, c) ==> (&&, a, b))");
+        assertParseException("((&&, a, b) ==> (&&, a, b, c))");
+        assertParseException("((&&, a, b, c) ==> a)");
+        assertParseException("(a ==> (&&, a, b, c))");
+    }
 }

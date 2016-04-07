@@ -10,6 +10,7 @@ import nars.task.Task;
 import nars.term.Operator;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -91,7 +92,7 @@ public class BooleanConcept extends OperationConcept {
             }
 
             if (!ev.isEmpty()) {
-                return task.evidence(ev.toArray()).truth(f, c);
+                return task.evidence(Stamp.toSetArray(ev)).truth(f, c);
             } else {
                 return null; //task.truth(Truth.Zero);
             }

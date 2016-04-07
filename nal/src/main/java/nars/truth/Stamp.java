@@ -20,6 +20,7 @@
  */
 package nars.truth;
 
+import com.gs.collections.impl.list.mutable.primitive.LongArrayList;
 import nars.Global;
 import nars.task.Task;
 import org.jetbrains.annotations.NotNull;
@@ -88,6 +89,21 @@ public interface Stamp {
 
         //1. copy evidentialBase and sort it
         long[] sorted = Arrays.copyOf(x, l);
+        return _toSetArray(outputLen, sorted);
+    }
+    @NotNull
+    static long[] toSetArray(@NotNull LongArrayList x) {
+        int l = x.size();
+
+        if (l < 2)
+            return x.toArray();
+
+        //1. copy evidentialBase and sort it
+        long[] sorted = x.toArray();
+        return _toSetArray(l, sorted);
+    }
+
+    static long[] _toSetArray(int outputLen, long[] sorted) {
         Arrays.sort(sorted);
 
         //2. count unique elements
