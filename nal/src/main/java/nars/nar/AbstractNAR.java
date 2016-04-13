@@ -115,8 +115,6 @@ public abstract class AbstractNAR extends NAR {
     protected void initDefaults() {
 
 
-        this.duration.set(5);
-
         this.conceptBeliefsMax.set(16);
         this.conceptGoalsMax.set(12);
         this.conceptQuestionsMax.set(3);

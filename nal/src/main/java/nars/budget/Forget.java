@@ -74,7 +74,7 @@ public enum Forget { ;
 
         @Override public final void update(@NotNull NAR nar) {
             //same for duration of the cycle
-            forgetCyclesCached = forgetDurations.floatValue() * nar.duration();
+            forgetCyclesCached = forgetDurations.floatValue();
             perfectionCached = perfection.floatValue();
             now = nar.time();
         }

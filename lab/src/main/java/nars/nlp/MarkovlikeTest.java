@@ -86,7 +86,6 @@ public class MarkovlikeTest {
         int sentenceDelay = 500;
         int speakTime = wordDelay * 16;
         int silenceTime = 1000;
-        n.duration.set(wordDelay/2);
 
         for (int i = 0; i < repeats; i++) {
 

@@ -111,12 +111,9 @@ public enum Tense  {
     }
 
     public static long getRelativeOccurrence(@NotNull Tense tense, @NotNull Memory m) {
-        return getRelativeOccurrence(m.time(), tense, m.duration());
+        return getRelativeOccurrence(m.time(), tense, 1 /*m.duration()*/);
     }
 
-    public static long getRelativeOccurrence(long creationTime, @NotNull Tense tense, @NotNull Memory m) {
-        return getRelativeOccurrence(creationTime, tense, m.duration());
-    }
 
     public static long getRelativeOccurrence(long creationTime, @NotNull Tense tense, int duration) {
         switch (tense) {

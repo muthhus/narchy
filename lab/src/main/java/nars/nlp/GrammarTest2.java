@@ -108,7 +108,6 @@ public class GrammarTest2 {
         n.DEFAULT_JUDGMENT_PRIORITY = 0.5f;
         n.DEFAULT_GOAL_PRIORITY = 0.5f;
 
-        n.duration.set(Math.ceil(charRate.floatValue()/4f));
         n.shortTermMemoryHistory.set(2);
         n.cyclesPerFrame.set(2);
         

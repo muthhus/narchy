@@ -169,7 +169,7 @@ public class MutableTask extends AbstractTask {
 
     @NotNull
     public MutableTask time(@NotNull Tense t, @NotNull Memory memory) {
-        occurr(Tense.getRelativeOccurrence(memory.time(), t, memory));
+        occurr(Tense.getRelativeOccurrence(t, memory));
         return this;
     }
 

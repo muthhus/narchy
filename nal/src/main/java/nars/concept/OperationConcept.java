@@ -11,7 +11,6 @@ import nars.term.Operator;
 import nars.term.Termed;
 import nars.term.container.TermContainer;
 import nars.truth.Truth;
-import nars.util.data.Util;
 import nars.util.event.Topic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -127,15 +126,15 @@ public class OperationConcept extends CompoundConcept implements Runnable {
         if (now != lastMotivationUpdate) { //update once per cycle TODO parameter for this limitation min/max
 
 
-            int dur = nar.duration();
+            //int dur = nar.duration();
 
             //OperationConcept p = positive(nar);
             //Concept n = negative(nar);
 
 
             //if (p != null) { //measure contributed positive state
-                desired = desire(now, dur);
-                believed = belief(now, dur);
+                desired = desire(now);
+                believed = belief(now);
             //}
 
 //            if (n != null) {  //measure contributed negative state

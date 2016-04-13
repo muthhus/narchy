@@ -78,7 +78,7 @@ public interface BeliefTable extends TaskTable {
 
         @Nullable
         @Override
-        public Truth truth(long when, long now, float dur) {
+        public Truth truth(long when, long now) {
             return Truth.Zero;
         }
 
@@ -330,12 +330,12 @@ public interface BeliefTable extends TaskTable {
 
     /** estimates the current truth value from the top task, projected to the specified 'when' time;
      * returns null if no evidence is available */
-    @Nullable Truth truth(long when, long now, float dur);
+    @Nullable Truth truth(long when, long now);
 
 
 
-    @Nullable default Truth truth(long now, float dur) {
-        return truth(now, now, dur);
+    @Nullable default Truth truth(long now) {
+        return truth(now, now);
     }
 
 

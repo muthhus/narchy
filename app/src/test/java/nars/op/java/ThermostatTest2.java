@@ -89,7 +89,6 @@ public enum ThermostatTest2 {
         int dur = 5;
 
         Default n = new Default(1024, 1, 2, 3);
-        n.duration.set(dur);
 
         //n.getInput().inputPerCycle.set(2);
 

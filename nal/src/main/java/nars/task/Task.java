@@ -410,7 +410,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
         CharSequence tenseString;
         if (memory!=null) {
-            tenseString = getTense(memory.time(), memory.duration());
+            tenseString = getTense(memory.time(), 1);
         }
         else {
             //TODO dont bother craeting new StringBuilder and calculating the entire length etc.. just append it to a reusable StringReader?

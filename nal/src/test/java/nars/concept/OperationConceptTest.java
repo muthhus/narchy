@@ -51,7 +51,7 @@ public class OperationConceptTest {
     }
 
     public static void assertMotive(@NotNull NAR n, @NotNull Termed operation, float b, float g) {
-        assertEquals(b, n.concept(operation).belief(n.time(), n.duration()).expectation(), 0.01f);
-        assertEquals(g, n.concept(operation).desire(n.time(), n.duration()).expectation(), 0.01f);
+        assertEquals(b, n.concept(operation).belief(n.time()).expectation(), 0.01f);
+        assertEquals(g, n.concept(operation).desire(n.time()).expectation(), 0.01f);
     }
 }

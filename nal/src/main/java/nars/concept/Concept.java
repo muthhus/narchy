@@ -320,13 +320,13 @@ public interface Concept extends Termed, Comparable {
 
     }
 
-    default Truth belief(long now, int duration) {
-        return hasBeliefs() ? beliefs().truth(now, duration) : Truth.Zero;
+    default Truth belief(long now) {
+        return hasBeliefs() ? beliefs().truth(now) : Truth.Zero;
 
     }
 
-    default Truth desire(long now, int duration) {
-        return hasGoals() ? goals().truth(now, duration) : Truth.Zero;
+    default Truth desire(long now) {
+        return hasGoals() ? goals().truth(now) : Truth.Zero;
     }
 
 

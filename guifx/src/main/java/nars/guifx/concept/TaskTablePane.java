@@ -177,9 +177,8 @@ public class TaskTablePane extends HBox implements Runnable {
         if (concept == null) return;
 
         this.now = nar.time();
-        int dur = nar.duration();
-        beliefs.set(concept.beliefs(), now, dur);
-        goals.set(concept.goals(), now, dur);
+        beliefs.set(concept.beliefs(), now);
+        goals.set(concept.goals(), now);
 
         if (redraw.compareAndSet(true, false)) {
             runLater(this);

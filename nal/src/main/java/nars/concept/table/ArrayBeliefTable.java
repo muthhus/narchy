@@ -70,7 +70,7 @@ public class ArrayBeliefTable implements BeliefTable {
 
     /** TODO this value can be cached per cycle (when,now) etc */
     @Override
-    @Nullable public Truth truth(long when, long now, float dur) {
+    @Nullable public Truth truth(long when, long now) {
 
         //old method: project the top task
         //Task top = top(when, now);
@@ -85,12 +85,12 @@ public class ArrayBeliefTable implements BeliefTable {
             return eternal.truth();
 
 
-        return topTemporalCurrent(when, now, dur, eternal);
+        return topTemporalCurrent(when, now, eternal);
         //return topTemporalWeighted(when, now, dur, eternal);
     }
 
     @Nullable
-    public Truth topTemporalCurrent(long when, long now, float dur, @Nullable Task topEternal) {
+    public Truth topTemporalCurrent(long when, long now, @Nullable Task topEternal) {
         //find the temporal with the best rank
         Task t = topTemporal(when, now);
         if (t == null) {

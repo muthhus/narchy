@@ -156,8 +156,8 @@ public class NARover extends AbstractPolygonBot {
 
         float motorThresh = 0.5f;
 
-        int minMotorFeedbackCycles = nar.duration() / 2;
-        int maxMotorFeedbackCycles = nar.duration() * 3;
+        int minMotorFeedbackCycles = 1; ////nar.duration() / 2;
+        int maxMotorFeedbackCycles = 3; //nar.duration() * 3;
 
         MotorConcept motorLeft = new MotorConcept("motor(left)", nar, (a) -> {
             //if (a < 0) return Float.NaN;

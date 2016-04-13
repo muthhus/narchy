@@ -30,7 +30,7 @@ public class BeliefLab {
         NAR nar = new Default();
         //nar.input("y:x.");
         //nar.input("y:x. %0%");
-        nar.duration.set(duration);
+
 
         nar.shortTermMemoryHistory.set(stmInduction);
         nar.conceptBeliefsMax.set(beliefCapacity);

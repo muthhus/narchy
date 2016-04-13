@@ -38,7 +38,6 @@ public class GrammarTest {
         n.DEFAULT_GOAL_PRIORITY = 0.6f;
         n.activationRate.setValue(0.1f);
 
-        n.duration.set(1);
         n.shortTermMemoryHistory.set(3);
         n.cyclesPerFrame.set(8);
         //n.initNAL9();

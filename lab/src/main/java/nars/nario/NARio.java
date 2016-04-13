@@ -508,7 +508,6 @@ public class NARio extends Run implements RLEnvironment {
 
         //new TextOutput(nar, System.out).setShowInput(true);
 
-        nar.duration.set(memoryCyclesPerFrame * 3);
         nar.cyclesPerFrame.set(memoryCyclesPerFrame);
 
         //nar.memory.outputVolume.set(0);

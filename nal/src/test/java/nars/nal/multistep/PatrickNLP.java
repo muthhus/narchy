@@ -42,7 +42,8 @@ public class PatrickNLP extends AbstractNALTest {
             .believe("(((/,REPRESENT,_,$3):$1 && (/,REPRESENT,_,$4):$2) ==> REPRESENT:(($1,$2),($3,$4)))")
             .believe("(/,REPRESENT,_,ANIMAL):cat")
             .believe("(/,REPRESENT,_,EATING):eats")
-            .askAt(140,"REPRESENT:((eats,cat),?what)")
+            .askAt(40,"REPRESENT:((eats,cat),?what)")
+            //.askAt(40,"REPRESENT:((eats,cat),(?x, ?y))")
             .mustBelieve(150, "REPRESENT:((eats,cat),(EATING,ANIMAL))", 1f, 0.73f);
 
     }

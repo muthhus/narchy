@@ -100,7 +100,6 @@ public class DemoAttentionFlow extends AbstractNARGraphDemo {
 
         };
 
-        n.duration.set(10);
         n.perfection.setValue(0);
 
 

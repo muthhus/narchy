@@ -67,7 +67,7 @@ public class Commander implements Consumer<NAR>, Supplier<Concept> {
         commandIterator = Iterators.cycle(commands.bag());
 
 
-        maxTemporalBeliefAge = nar.duration() * maxTemporalBeliefDurations;
+        maxTemporalBeliefAge = maxTemporalBeliefDurations;
 
 
         nar.eventInput.on((tp) -> {

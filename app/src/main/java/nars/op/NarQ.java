@@ -331,7 +331,7 @@ public class NarQ implements Consumer<NAR> {
 
     public static float motivation(@NotNull NAR nar, Termed x, float ifNonExists, boolean beliefOrDesire, int dt) {
         //TODO
-        return nar.concept(x).belief(nar.time(), nar.duration()).expectation();
+        return nar.concept(x).belief(nar.time()).expectation();
         //return ((OperationConcept)nar.concept(x)).motivation(nar);
         //return NarQ.motivation(nar, nar.concept(x), ifNonExists, beliefOrDesire, dt);
     }

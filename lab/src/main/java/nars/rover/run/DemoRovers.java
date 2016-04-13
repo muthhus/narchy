@@ -308,7 +308,6 @@ public class DemoRovers {
         MatrixImage mp = new MatrixImage();
 
         long now = n.time();
-        int dur = n.duration();
         n.onFrame(nn -> {
             mp.set(sensor.size(), 2,
                     (x, y) -> {
@@ -318,10 +317,10 @@ public class DemoRovers {
 
                         switch (y) {
                             case 0:
-                                float b = s.beliefs().truth(now, dur).expectation();
+                                float b = s.beliefs().truth(now).expectation();
                                 return ColorArray.rgba(b, 1 - b, 0, 1f);
                             case 1:
-                                float g = s.goals().truth(now, dur).expectation();
+                                float g = s.goals().truth(now).expectation();
                                 return ColorArray.rgba(0, g, 1 - g, 1f);
                         }
 
@@ -384,7 +383,6 @@ public class DemoRovers {
         nar.core.activationRate.setValue(0.1f);
 
 
-        nar.duration.set(3);
         nar.conceptForgetDurations.setValue(2f);
         nar.termLinkForgetDurations.setValue(8);
         nar.taskLinkForgetDurations.setValue(6);

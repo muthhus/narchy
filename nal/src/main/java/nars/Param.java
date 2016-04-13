@@ -48,12 +48,7 @@ public abstract class Param extends Container implements Level {
 //     */
 //    public final AtomicInteger outputVolume = new AtomicInteger();
 
-    /** 
-       Cycles per duration.
-       Past/future tense usage convention;
-       How far away "past" and "future" is from "now", in cycles.         
-       The range of "now" is [-DURATION/2, +DURATION/2];      */
-    public final MutableInteger duration = new MutableInteger();
+
 
     public final MutableInteger shortTermMemoryHistory = new MutableInteger();
 

@@ -60,7 +60,6 @@ public class BeliefTableTest  {
 
         NAR n = newNAR(12);
 
-        n.duration.set(5);
 
         BeliefAnalysis b = new BeliefAnalysis(n, "a:b");
 
@@ -91,7 +90,6 @@ public class BeliefTableTest  {
         int maxBeliefs = 12;
         NAR n = newNAR(maxBeliefs);
 
-        n.duration.set(5);
 
         BeliefAnalysis b = new BeliefAnalysis(n, "<a-->b>");
 

@@ -92,7 +92,7 @@ public class RevisionTest {
     public void testTruthOscillation() {
 
         NAR n = newNAR(8);
-        n.duration.set(1);
+
 
         int offCycles = 2;
 
@@ -139,7 +139,6 @@ public class RevisionTest {
         int maxBeliefs = 16;
         NAR n = newNAR(maxBeliefs);
 
-        n.duration.set(1);
 
 
         BeliefAnalysis b = new BeliefAnalysis(n, "<a-->b>");

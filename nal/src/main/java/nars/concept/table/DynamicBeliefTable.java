@@ -72,7 +72,7 @@ abstract public class DynamicBeliefTable implements BeliefTable {
 
     @Nullable
     @Override
-    public Truth truth(long when, long now, float dur) {
+    public Truth truth(long when, long now) {
         return topTemporal(when, now).projectTruth(when, now, false);
     }
 

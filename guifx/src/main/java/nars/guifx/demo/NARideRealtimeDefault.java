@@ -60,7 +60,7 @@ public enum NARideRealtimeDefault {
         /*nar.memory.conceptForgetDurations.set(10);
         nar.memory.termLinkForgetDurations.set(100);*/
 
-        nar.duration.set(750 /* ie, milliseconds */);
+        //nar.duration.set(750 /* ie, milliseconds */);
         //nar.spawnThread(1000/60);
 
 

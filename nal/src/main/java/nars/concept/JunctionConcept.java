@@ -87,7 +87,7 @@ abstract public class JunctionConcept extends CompoundConcept {
                 }
 
                 BeliefTable b = beliefOrGoal ? subtermConcept.beliefs() : subtermConcept.goals();
-                Truth ct = b.truth(now, nar.duration());
+                Truth ct = b.truth(now);
                 f *= ct.freq();
                 c *= ct.conf();
             }

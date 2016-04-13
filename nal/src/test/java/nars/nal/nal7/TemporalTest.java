@@ -23,7 +23,7 @@ public class TemporalTest {
         NAR n = new Default(); //for cycle/frame clock, not realtime like Terminal
         Task t = n.inputTask("<a --> b>. :\\:");
         assertEquals(0, t.creation());
-        assertEquals(-(n.duration()), t.occurrence());
+        assertEquals(-(1 /*n.duration()*/), t.occurrence());
     }
 
     public static class TimeMap extends IntervalTree<Long,Task> implements Consumer<Task> {

@@ -148,7 +148,7 @@ public final class Anticipate {
 
         final List<Task> toRemove = this.toRemove;
 
-        int tolerance = nar.duration();
+        int tolerance = 1;
 
         Multimap<Compound, Task> a = this.anticipations;
         Compound ct = c.term();
@@ -171,7 +171,7 @@ public final class Anticipate {
 
         Iterator<Map.Entry<Compound, Task>> it = anticipations.entries().iterator();
 
-        int halfDur = nar.duration();
+        int halfDur = 1;
         while (it.hasNext()) {
 
             Map.Entry<Compound, Task> t = it.next();

@@ -44,11 +44,11 @@ public class TruthWave {
 
     public TruthWave(@NotNull BeliefTable b, @NotNull NAR n) {
         this(b.size());
-        set(b, n.time(), n.duration());
+        set(b, n.time());
     }
 
     /** clears and fills this wave with the data from a table */
-    public void set(@NotNull BeliefTable b, long now,int dur) {
+    public void set(@NotNull BeliefTable b, long now) {
         if (b.isEmpty()) {
             clear();
             return;
@@ -89,7 +89,7 @@ public class TruthWave {
         this.start = (long)start;
         this.end = (long)end;
 
-        this.current = b.truth(now, dur);
+        this.current = b.truth(now);
     }
 
     public boolean isEmpty() { return size == 0; }

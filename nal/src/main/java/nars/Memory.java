@@ -190,15 +190,6 @@ public class Memory extends Param {
 
 
 
-//    public void add(final Iterable<Task> source) {
-//        for (final Task t : source)
-//            add((Task) t);
-//    }
-
-    /** current temporal perception duration of the reasoner */
-    public final int duration() {
-        return duration.intValue();
-    }
 
 
     /* ---------- new task entries ---------- */
