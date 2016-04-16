@@ -15,10 +15,8 @@ import nars.nal.meta.match.EllipsisOneOrMore;
 import nars.nal.meta.match.EllipsisTransform;
 import nars.nal.meta.match.EllipsisZeroOrMore;
 import nars.nal.meta.op.*;
-import nars.nal.op.Derive;
-import nars.nal.op.Solve;
-import nars.nal.op.substitute;
-import nars.nal.op.substituteIfUnifies;
+import nars.nal.nal8.operator.TermFunction;
+import nars.nal.op.*;
 import nars.op.data.differ;
 import nars.op.data.intersect;
 import nars.op.data.union;
@@ -56,7 +54,7 @@ import static nars.term.Terms.*;
 public class PremiseRule extends GenericCompound {
 
 
-    public static final Class[] Operators = new Class[]{
+    public static final Class<? extends ImmediateTermTransform>[] Operators = new Class[]{
             intersect.class,
             differ.class,
             union.class,

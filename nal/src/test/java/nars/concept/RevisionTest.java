@@ -203,7 +203,7 @@ public class RevisionTest {
      * the input tasks and the result */
     @Test public void testRevisionBudgetConserved() {
         AbstractNAR n = newNAR(6);
-        n.taskLinkForgetDurations.setValue(1E6); //nearly zero tasklink forget rate so that it wont influence this test
+        n.taskLinkRemembering.setValue(1E6); //nearly zero tasklink forget rate so that it wont influence this test
 
         BeliefAnalysis b = new BeliefAnalysis(n, "<a-->b>");
         Bag<Task> tasklinks = b.concept().tasklinks();

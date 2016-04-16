@@ -8,6 +8,7 @@ import nars.nal.Deriver;
 import nars.nal.meta.PremiseRule;
 import nars.nal.nal8.AbstractOperator;
 import nars.nal.nal8.operator.TermFunction;
+import nars.nal.op.ImmediateTermTransform;
 import nars.op.data.*;
 import nars.op.math.add;
 import nars.op.math.length;
@@ -76,7 +77,7 @@ public abstract class AbstractNAR extends NAR {
     /* NAL8 plugins */
     public void initNAL8() {
         /* derivation operators available at runtime */
-        for (Class<? extends TermFunction> c : PremiseRule.Operators) {
+        for (Class<? extends ImmediateTermTransform> c : PremiseRule.Operators) {
             try {
                 onExec(c.newInstance());
             } catch (Exception e) {
@@ -119,9 +120,9 @@ public abstract class AbstractNAR extends NAR {
         this.conceptGoalsMax.set(12);
         this.conceptQuestionsMax.set(3);
 
-        this.conceptForgetDurations.setValue(2.0);
-        this.termLinkForgetDurations.setValue(5.0);
-        this.taskLinkForgetDurations.setValue(3.0);
+        this.conceptRemembering.setValue(5 * 2.0);
+        this.termLinkRemembering.setValue(5 * 5.0);
+        this.taskLinkRemembering.setValue(5 * 3.0);
 
         this.derivationDurabilityThreshold.setValue(Global.DERIVATION_DURABILITY_THRESHOLD);
 

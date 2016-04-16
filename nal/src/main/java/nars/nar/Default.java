@@ -196,8 +196,8 @@ public class Default extends AbstractNAR {
     @NotNull
     public DefaultPremiseGenerator newPremiseGenerator() {
         return new DefaultPremiseGenerator(this, Deriver.getDefaultDeriver(),
-            new Forget.ExpForget<>(taskLinkForgetDurations, perfection).withDeletedItemFiltering(),
-            new Forget.ExpForget<>(termLinkForgetDurations, perfection)
+            new Forget.ExpForget<>(taskLinkRemembering, perfection).withDeletedItemFiltering(),
+            new Forget.ExpForget<>(termLinkRemembering, perfection)
         );
     }
 
@@ -434,7 +434,7 @@ public class Default extends AbstractNAR {
             this.premiser = premiseGenerator;
 
             this.activationRate = nar.activationRate;
-            this.conceptRemembering = nar.conceptForgetDurations;
+            this.conceptRemembering = nar.conceptRemembering;
             this.perfection = nar.perfection;
 
             conceptsFiredPerCycle = new MutableInteger(1);

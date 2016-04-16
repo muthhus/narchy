@@ -50,7 +50,8 @@ public abstract class Param extends Container implements Level {
 
 
 
-    public final MutableInteger shortTermMemoryHistory = new MutableInteger();
+    //TODO move this to STMTemporalLinkage
+    @Deprecated public final MutableInteger shortTermMemoryHistory = new MutableInteger();
 
 
 
@@ -80,11 +81,11 @@ public abstract class Param extends Container implements Level {
     //@Deprecated public final MutableFloat termLinkForgetDurations = new MutableFloat();
     
     /** TaskLink decay rate in TaskLinkBag, in [1, 99]. originally: TASK_LINK_FORGETTING_CYCLE */
-    public final MutableFloat termLinkForgetDurations = new MutableFloat();
+    public final MutableFloat termLinkRemembering = new MutableFloat();
 
-    public final MutableFloat taskLinkForgetDurations = new MutableFloat();
+    public final MutableFloat taskLinkRemembering = new MutableFloat();
 
-    public final MutableFloat conceptForgetDurations = new MutableFloat();
+    public final MutableFloat conceptRemembering = new MutableFloat();
 
     /** base activation factor */
     public final MutableFloat activationRate = new MutableFloat(1f);

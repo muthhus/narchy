@@ -383,9 +383,9 @@ public class DemoRovers {
         nar.core.activationRate.setValue(0.1f);
 
 
-        nar.conceptForgetDurations.setValue(2f);
-        nar.termLinkForgetDurations.setValue(8);
-        nar.taskLinkForgetDurations.setValue(6);
+        nar.conceptRemembering.setValue(2f);
+        nar.termLinkRemembering.setValue(8);
+        nar.taskLinkRemembering.setValue(6);
 
         nar.cyclesPerFrame.set(2);
         nar.shortTermMemoryHistory.set(3);
