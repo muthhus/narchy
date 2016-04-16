@@ -34,7 +34,7 @@ public enum JFX {
     }
 
     static {
-        Toolkit.getToolkit().init();
+        //Toolkit.getToolkit().init();
     }
 
     static final ColorArray grayscale = new ColorArray(

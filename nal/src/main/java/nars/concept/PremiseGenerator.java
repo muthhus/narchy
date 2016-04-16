@@ -18,8 +18,22 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.function.Consumer;
 
-/** not thread safe; call from only one thread at a time */
-abstract public class PremiseGenerator /*extends UnifySubst */implements Consumer<BLink<? extends Concept>> {
+/**
+ * TODO abstraction for dynamic link iterator / generator allowing a concept to
+ *      programmatically supply the tasklinks/termlinks it fires.  bag selection being
+ *      the default but overridable on a per-concept basis.
+ *      ex:
+ *         --ranges of values (numbers, strings, etc..)
+ *         --without and/or with memory of prior iterations from which to continue
+ *              (ex: database cursors)
+ *
+ *  may determine the iteration "power" according to
+ *       some budgeting feature (ex: Concept BLink)
+ */
+abstract public class PremiseGenerator implements Consumer<BLink<? extends Concept>> {
+
+    // Note:  this implementation is not thread safe; call from only one thread at a time */
+
 
     @NotNull
     public final NAR nar;

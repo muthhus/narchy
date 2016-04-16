@@ -21,7 +21,7 @@ dependencies {
 
     compile project(':logic')
 
-    compile group: 'net.openhft', name: 'affinity', version: '3.0.5'
+    compile group: 'net.openhft', name: 'affinity', version: '3.0.6' //TODO move to /app
 
     compile group: 'org.fusesource.jansi', name: 'jansi', version: '1.11'
 
