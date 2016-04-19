@@ -76,6 +76,11 @@ public class TemporalStabilityIndependentEvents {
         char d = (char) ('a' + (j+1)); //next
         return "(" + c + "-->" + d + ")";
     };
+    static final IntToObjectFunction<String> linkedimpl= (j) -> {
+        char c = (char) ('a' + j);
+        char d = (char) ('a' + (j+1)); //next
+        return "(" + c + "==>" + d + ")";
+    };
 
     @Test public void testTemporalStabilityInh3() {
         new T1(inheritencer, 1, 2, 5).test(300, new Default(1024, 8, 4, 3));
@@ -95,6 +100,12 @@ public class TemporalStabilityIndependentEvents {
     }
     @Test public void testTemporalStabilityLinkedInh() {
         new T1(linkedinh, 1, 2, 5).test(600, new Default(1024, 8, 4, 3));
+    }
+    @Test public void testTemporalStabilityLinkedImpl() {
+        new T1(linkedimpl, 1, 2, 5).test(600, new Default(1024, 12, 4, 3));
+    }
+    @Test public void testTemporalStabilityLinkedImplExt() {
+        new T1(linkedimpl, 1, 2, 5, 10).test(600, new Default(1024, 12, 4, 3));
     }
 
 }

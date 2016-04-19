@@ -390,9 +390,13 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
         return t;
     }
+    @NotNull
+    public Task ask(@NotNull Termed<Compound> term, char questionOrQuest)  {
+        return ask(term, questionOrQuest, ETERNAL);
+    }
 
     @NotNull
-    public Task ask(@NotNull Termed<Compound> term, char questionOrQuest) throws NarseseException {
+    public Task ask(@NotNull Termed<Compound> term, char questionOrQuest, long when)  {
 
 
         //TODO use input method like believe uses which avoids creation of redundant Budget instance
@@ -406,7 +410,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
             throw new RuntimeException("invalid punctuation");
 
 
-        t.time(time(), ETERNAL);
+        t.time(time(), when);
 
         input(t);
 
