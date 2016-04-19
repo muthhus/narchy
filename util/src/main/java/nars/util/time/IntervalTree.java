@@ -1,6 +1,6 @@
 package nars.util.time;
 
-import nars.Global;
+import nars.util.data.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,7 +14,7 @@ public class IntervalTree<K extends Comparable<? super K>, V> {
 
 	@NotNull
 	public List<V> searchOverlapping(Between<K> range){
-		List<V> c = Global.newArrayList();
+		List<V> c = new FasterList();
 		if(root != null){
 			root.getOverlap(range, c);
 		}
@@ -44,7 +44,7 @@ public class IntervalTree<K extends Comparable<? super K>, V> {
 	 */
 	@NotNull
 	public List<V> searchContaining(Between<K> range){
-		List<V> c = Global.newArrayList();
+		List<V> c = new FasterList();
 		if(root != null){
 			root.getContain(range, c);
 		}
@@ -64,7 +64,7 @@ public class IntervalTree<K extends Comparable<? super K>, V> {
 	 */
 	@NotNull
 	public List<V> searchContainedBy(Between<K> range){
-		List<V> c = Global.newArrayList();
+		List<V> c = new FasterList();
 		if(root != null){
 			root.searchContainedBy(range, c);
 		}
@@ -145,7 +145,7 @@ public class IntervalTree<K extends Comparable<? super K>, V> {
 
 	@NotNull
 	public Collection<V> values() {
-		Collection<V> c = Global.newArrayList();
+		Collection<V> c = new FasterList();
 		if(root != null){
 			root.values(c);
 		}
@@ -155,7 +155,7 @@ public class IntervalTree<K extends Comparable<? super K>, V> {
 	@NotNull
 	public Set<Between<K>> keySet() {
 		if(root != null){
-			Set<Between<K>> s = Global.newHashSet(1);
+			Set<Between<K>> s = new HashSet(1);
 			root.keySet(s);
 			return s;
 		} else {
@@ -190,7 +190,7 @@ public class IntervalTree<K extends Comparable<? super K>, V> {
 
 	@NotNull
 	public Set<Entry<Between<K>, V>> entrySet() {
-		Set<Entry<Between<K>, V>> s = Global.newHashSet(size());
+		Set<Entry<Between<K>, V>> s = new HashSet(size());
 		if(root != null){
 			root.entrySet(s);
 		}
