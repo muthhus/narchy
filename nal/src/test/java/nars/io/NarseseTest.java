@@ -268,6 +268,9 @@ public class NarseseTest {
     @Test
     public void testOperationNoArgs() {
         taskParses("believe()!");
+    }
+    @Test
+    public void testOperationNoArgsWithSpace() {
         taskParses("believe( )!");
     }
 

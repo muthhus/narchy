@@ -172,7 +172,7 @@ public class Narsese extends BaseParser<Object> {
             r.add((Term) popped);
         }
 
-        while ((popped = pop()) != PremiseRule.class) {
+        while (!getContext().getValueStack().isEmpty() && (popped = pop()) != PremiseRule.class) {
             l.add((Term) popped);
         }
 
@@ -441,27 +441,23 @@ public class Narsese extends BaseParser<Object> {
 
                         seq(meta, TaskRule()),
 
-                        seq(oper, ColonReverseInheritance()),
 
                         TemporalRelation(),
 
                         //Functional form of an Operation, ex: operate(p1,p2), TODO move to FunctionalOperationTerm() rule
-                        seq(/*oper,*/
+                        seq(oper,
 
                                 //Term(false, false), //<-- allows non-atom terms for operator names
                                 Atom(), push($.operator((String)pop())), // <-- allows only atoms for operator names, normal
 
+                                COMPOUND_TERM_OPENER, s(),
+                                firstOf(
+                                    seq(COMPOUND_TERM_CLOSER, push( $.exec((Operator)pop()))),
+                                    MultiArgTerm(null, COMPOUND_TERM_CLOSER, false, false, false, true)
+                                )
 
-                                COMPOUND_TERM_OPENER,
-
-                                //firstOf(
-
-                                        //empty operator parens
-                                        //sequence(s(), COMPOUND_TERM_CLOSER, push(popTerm(OPERATOR, false))),
-
-                                        MultiArgTerm(OPERATOR, COMPOUND_TERM_CLOSER, false, false, false, true)
-                                //)
                         ),
+                        seq(oper, ColonReverseInheritance()),
 
                         seq(STATEMENT_OPENER,
                                 MultiArgTerm(null, STATEMENT_CLOSER, false, true, true, false)
@@ -530,7 +526,7 @@ public class Narsese extends BaseParser<Object> {
 //    public Rule ConjunctionParallel() {
 //    }
 
-    public Rule TemporalRelation() {
+    @Deprecated public Rule TemporalRelation() {
         return seq(
 
                 COMPOUND_TERM_OPENER,
@@ -571,8 +567,10 @@ public class Narsese extends BaseParser<Object> {
     }
 
     public Rule Operator() {
-        return sequence(OPERATOR.ch, Term(false, false),
-                push($.operator(pop().toString())));
+        return sequence(OPERATOR.ch,
+                Atom(), push($.operator((String)pop())));
+                //Term(false, false),
+                //push($.operator(pop().toString())));
     }
 
     //final static String invalidAtomCharacters = " ,.!?" + INTERVAL_PREFIX_OLD + "<>-=*|&()<>[]{}%#$@\'\"\t\n";
@@ -873,7 +871,11 @@ public class Narsese extends BaseParser<Object> {
 
                 /*operatorPrecedes ? *OperationPrefixTerm()* true :*/
 
-                operatorPrecedes ? EMPTY : seq(push(Compound.class), (initialOp ? Op() : Term())),
+                operatorPrecedes ?
+                        push(new Object[]{pop(), (Operator.class)})
+                         : push(Compound.class),
+
+                initialOp ? Op() : Term(),
 
                 spaceSeparates ?
 
@@ -886,7 +888,7 @@ public class Narsese extends BaseParser<Object> {
                                 allowInternalOp ? AnyOperatorOrTerm() : Term()
                         )),
 
-                sequence(s(), close),
+                s(), close,
 
                 push(popTerm(defaultOp, allowInternalOp))
         );
@@ -911,12 +913,6 @@ public class Narsese extends BaseParser<Object> {
     }
 
 
-    /**
-     * pass-through; the object is potentially a term but don't create it yet
-     */
-    static Object termable(Object o) {
-        return o;
-    }
 
     @Nullable
     static Object the(@Nullable Object o) {
@@ -994,8 +990,8 @@ public class Narsese extends BaseParser<Object> {
             } else if (p instanceof Op) {
 
                 if (op != null) {
-                    //if ((!allowInternalOp) && (!p.equals(op)))
-                    //    throw new RuntimeException("Internal operator " + p + " not allowed here; default op=" + op);
+                    if ((!allowInternalOp) && (!p.equals(op)))
+                        throw new RuntimeException("Internal operator " + p + " not allowed here; default op=" + op);
 
                     throw new NarseseException("Too many operators involved: " + op + ',' + p + " in " + stack + ':' + vectorterms);
                 }
