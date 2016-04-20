@@ -352,7 +352,7 @@ public class ArrayBeliefTable implements BeliefTable {
 
     private Task addTemporal(@NotNull Task input, @NotNull NAR nar) {
 
-        if (temporal.isFull()) {
+        if (temporal.isFull() /*&& temporal.capacity() > 1*/) {
             //Try forming a revision and if successful, inputs to NAR for subsequent cycle
 
             //TODO cache start, stop

@@ -34,11 +34,14 @@ public class Revection {
     /**
      * returns true if the full table has been compacted allowing a free space for the new input task
      */
-    public static boolean revect(@NotNull Task input, ArrayBeliefTable table, @NotNull NAR nar) {
+    public static boolean revect(@NotNull Task input, @NotNull ArrayBeliefTable table, @NotNull NAR nar) {
 
         @NotNull ListTable<Task, Task> temporal = table.temporal;
         List<Task> tl = temporal.list();
         int n = tl.size();
+
+        if (tl.size() <= 1)
+            return false; //may be due to axiomatic belief locking the table to size=cap=1
 
         //find a potential pair of beliefs such that they are more similar than the most similar task to the input
 
@@ -61,7 +64,7 @@ public class Revection {
 
                 Task jj = tl.get(j);
                 if (i == j) {
-                    d = Float.POSITIVE_INFINITY;
+                    continue;
                 } else {
                     d = distance(ii, jj, now, bestDist);
                 }
@@ -78,12 +81,15 @@ public class Revection {
         return revect(input, nar, temporal, now, a, b);
     }
 
-    public static boolean revect(@NotNull Task input, @NotNull NAR nar, ListTable<Task, Task> temporal, long now, Task p1, Task p2) {
-        Task recombined = combine(p1, p2, now);
+    public static boolean revect(@NotNull Task input, @NotNull NAR nar, @NotNull ListTable<Task, Task> temporal, long now, @NotNull Task a, @NotNull Task b) {
+
+
+        Task recombined = combine(a, b, now);
+
         if (recombined == null) {
 
-            float r1 = BeliefTable.rankEternalByOriginality(p1);
-            float r2 = BeliefTable.rankEternalByOriginality(p2);
+            float r1 = BeliefTable.rankEternalByOriginality(a);
+            float r2 = BeliefTable.rankEternalByOriginality(b);
             float rin = BeliefTable.rankEternalByOriginality(input);
 
             if ((rin < r1) && (rin < r2)) {
@@ -96,13 +102,13 @@ public class Revection {
                         ///* the weakest */ (p.best1.conf() < p.best2.conf()) ?
                         ///* the oldest */ (p.best1.occurrence() < p.best2.occurrence()) ?
                         (r1 < r2) ?
-                                p1 : p2, nar);
+                                a : b, nar);
             }
 
         } else {
 
-            remove(temporal, p1, nar);
-            remove(temporal, p2, nar);
+            remove(temporal, a, nar);
+            remove(temporal, b, nar);
 
             nar.process(recombined);
             //temporal.put(recombined, recombined);

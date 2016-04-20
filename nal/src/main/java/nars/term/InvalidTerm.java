@@ -54,7 +54,7 @@ public final class InvalidTerm extends RuntimeException {
     public String toString() {
         if (op!=null)
             return getClass().getSimpleName() + "{" +
-                    "op=" + op +
+                    op +
                     ", rel=" + rel +
                     ", dt=" + dt +
                     ", args=" + Arrays.toString(args) +
