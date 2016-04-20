@@ -155,11 +155,15 @@ public class MotorConcept extends OperationConcept implements Consumer<NAR>, Flo
         FloatToFloatFunction m = getMotor();
         if (m != null) {
             float activation = motivation(nar);
+            if (activation > 0) {
 
-            float response = motor.valueOf(activation);
-            if (Float.isFinite(response)) {
-                nextFeedback = Util.clamp(response);
-                feedback.accept(nar);
+                if (activation > 1f) activation = 1f;
+
+                float response = motor.valueOf(activation);
+                if (Float.isFinite(response)) {
+                    nextFeedback = Util.clamp(response);
+                    feedback.accept(nar);
+                }
             }
 
         } else {

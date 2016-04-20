@@ -162,6 +162,8 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
 
         float f = v;
         float c = confFactor;
+        //float f = 1f;
+        //float c = v;
 
         long now = nar.time();
         Task t = newInputTask(f, c, now);

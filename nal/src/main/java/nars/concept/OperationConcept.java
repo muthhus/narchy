@@ -204,6 +204,11 @@ public class OperationConcept extends CompoundConcept implements Runnable {
 //    }
 
 
+    public final float expectation(@NotNull NAR nar) {
+        update(nar);
+        return desired.expectation();
+    }
+
     /** provide motivation value after triggering an update */
     public final float motivation(@NotNull NAR nar) {
         update(nar);
@@ -215,15 +220,20 @@ public class OperationConcept extends CompoundConcept implements Runnable {
 
         //expectation = (confidence * (frequency - 0.5f) + 0.5f);
 
-        return UtilityFunctions.or(desired.conf(), believed.conf()) *
-                ((UtilityFunctions.aveAri(desired.freq(), (1f - believed.freq())) - 0.5f)
-                ) + 0.5f;
 
         /*return
                  UtilityFunctions.or(
                     ((desired.conf() * (desired.freq()-0.5f)) + 0.5f),
                     1f - ((believed.conf() * ((believed.freq())-0.5f ))  + 0.5f)
                  );*/
+
+//        return UtilityFunctions.or(desired.conf(), believed.conf()) *
+//                ((UtilityFunctions.aveAri(desired.freq(), (1f - believed.freq())) - 0.5f)
+//                ) + 0.5f;
+
+        float des = desired.expectation();
+        float bel = believed.expectation();
+        return des-bel;
     }
 
 
