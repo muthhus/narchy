@@ -1,13 +1,14 @@
 package nars.task;
 
+import nars.Global;
 import nars.NAR;
 import nars.bag.impl.ListTable;
 import nars.budget.BudgetMerge;
 import nars.concept.table.ArrayBeliefTable;
-import nars.nal.UtilityFunctions;
-import nars.truth.DefaultTruth;
+import nars.concept.table.BeliefTable;
 import nars.truth.Stamp;
 import nars.truth.Truth;
+import nars.truth.TruthFunctions;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -24,15 +25,19 @@ import java.util.List;
 public class Revection {
 
     /** returns true if the full table has been compacted allowing a free space for the new input task */
-    public static boolean revect(@NotNull Task input, ArrayBeliefTable table, @NotNull NAR nar, float window) {
+    public static boolean revect(@NotNull Task input, ArrayBeliefTable table, @NotNull NAR nar) {
 
         @NotNull ListTable<Task, Task> temporal = table.temporal;
         List<Task> tl = temporal.list();
 
         //find a potential pair of beliefs such that they are more similar than the most similar task to the input
 
-        ClosestPair p = new ClosestPair(tl, window);
-        Task cc = closest(input, tl, window);
+        long now = nar.time();
+
+        ClosestPair p = new ClosestPair(tl, now);
+
+
+        //assert(p.best1 != null);
 
 
         /*(if (cc.equals(p.best1)) {
@@ -41,32 +46,80 @@ public class Revection {
             replaced =
             remove(temporal, p.best2, nar);
         } else */
-        if ((p.bestDistance/2f < distance(input, cc, window)) ) {
+        /*Task cc = closest(input, tl, window, now);
+        if ((p.bestDistance/2f < distance(input, cc, window, now)) )*/ {
             //remove the two closest ones
             //project them to one, add it, and return true (empty space for input to be added by callee)
 
-            Task recombined = combine(p.best1, p.best2, nar.time());
+            Task recombined = combine(p.best1, p.best2, now);
+            if (recombined == null) {
 
-            remove(temporal, p.best1, nar);
-            remove(temporal, p.best2, nar);
+                float r1 = BeliefTable.rankEternalByOriginality(p.best1);
+                float r2 = BeliefTable.rankEternalByOriginality(p.best2);
+                float rin = BeliefTable.rankEternalByOriginality(input);
 
-            temporal.put(recombined, recombined);
+                if ((rin < r1) && (rin < r2)) {
+                    //reject the input, it is worse
+                    return false;
+                } else {
+
+                    //only remove the "worst" existing task
+                    remove(temporal,
+                            ///* the weakest */ (p.best1.conf() < p.best2.conf()) ?
+                            ///* the oldest */ (p.best1.occurrence() < p.best2.occurrence()) ?
+                            (r1 < r2) ?
+                                    p.best1 : p.best2, nar);
+                }
+
+            } else {
+
+                remove(temporal, p.best1, nar);
+                remove(temporal, p.best2, nar);
+
+                nar.process(recombined);
+                //temporal.put(recombined, recombined);
+            }
 
             return true;
         }
 
-        return false;
+        //return false;
     }
 
     private static Task combine(Task a, Task b, long now) {
         //TODO proper iterpolate: truth, time, dt
         long newOcc = (a.occurrence() + b.occurrence())/2;
         long[] newEv = Stamp.zip(a, b);
-        Truth newTruth = new DefaultTruth(
-                UtilityFunctions.aveAri(a.freq(), b.freq()),
-                UtilityFunctions.aveAri(a.conf(), b.conf()) );
 
-        return new MutableTask(a, b, now, newOcc, newEv, newTruth, BudgetMerge.avgDQBlend).log("Revection Revision");
+        float matchFactor = 1f;
+        Truth newTruth = TruthFunctions.revision(a, b, newOcc, matchFactor, Global.TRUTH_EPSILON);
+        if (newTruth == null) {
+            return null;
+        } else {
+            return new MutableTask(a, b, now, newOcc, newEv, newTruth, BudgetMerge.avgDQBlend).log("Revection Revision");
+        }
+    }
+
+    public static float distance(@NotNull Task a, @NotNull Task b, long now) {
+        float fDist = 1f + Math.abs(a.freq() - b.freq());
+        long ao = a.occurrence();
+        long bo = b.occurrence();
+        float tDist =  1f + Math.abs(ao - bo);
+        float ageFactor = /*Math.max*/(Math.abs(now - ao) + Math.abs(now-bo)); //more age factor will cause them to seem closer together than they actually are, like a perspective collapsing to a point at the horizon
+        return fDist * tDist / (1f + ageFactor); // * window);
+    }
+    private static Task closest(@NotNull Task input, @NotNull List<Task> list, long now) {
+        float lowest = Float.POSITIVE_INFINITY;
+        Task low = null;
+        for (Task t : list) {
+            float d = distance(input, t, now);
+            if (d < lowest) {
+                low = t;
+                lowest = d;
+            }
+        }
+
+        return low;
     }
 
     static void remove(ListTable<Task, Task> temporal, Task t, @NotNull NAR nar) {
@@ -106,7 +159,7 @@ public class Revection {
          * @throws NullPointerException if <tt>points</tt> is <tt>null</tt> or if any
          *         entry in <tt>points[]</tt> is <tt>null</tt>
          */
-        public ClosestPair(List<Task> points, float window) {
+        public ClosestPair(List<Task> points, long now) {
             int N = points.size();
             if (N <= 1) return;
 
@@ -117,14 +170,14 @@ public class Revection {
             Arrays.sort(pointsByX, (a, b) -> Long.compare(a.occurrence(), b.occurrence()));
 
             // check for coincident points
-            for (int i = 0; i < N-1; i++) {
+            /*for (int i = 0; i < N-1; i++) {
                 if (pointsByX[i].equals(pointsByX[i+1])) {
                     bestDistance = 0.0;
                     best1 = pointsByX[i];
                     best2 = pointsByX[i+1];
                     return;
                 }
-            }
+            }*/
 
             // sort by y-coordinate (but not yet sorted)
             Task[] pointsByY = new Task[N];
@@ -134,22 +187,22 @@ public class Revection {
             // auxiliary array
             Task[] aux = new Task[N];
 
-            closest(pointsByX, pointsByY, aux, 0, N-1, window);
+            closest(pointsByX, pointsByY, aux, 0, N-1, now);
         }
 
         // find closest pair of points in pointsByX[lo..hi]
         // precondition:  pointsByX[lo..hi] and pointsByY[lo..hi] are the same sequence of points
         // precondition:  pointsByX[lo..hi] sorted by x-coordinate
         // postcondition: pointsByY[lo..hi] sorted by y-coordinate
-        private double closest(Task[] pointsByX, Task[] pointsByY, Task[] aux, int lo, int hi, float window) {
+        private double closest(Task[] pointsByX, Task[] pointsByY, Task[] aux, int lo, int hi, long now) {
             if (hi <= lo) return Double.POSITIVE_INFINITY;
 
             int mid = lo + (hi - lo) / 2;
             Task median = pointsByX[mid];
 
             // compute closest pair with both endpoints in left subarray or both in right subarray
-            double delta1 = closest(pointsByX, pointsByY, aux, lo, mid, window);
-            double delta2 = closest(pointsByX, pointsByY, aux, mid+1, hi, window);
+            double delta1 = closest(pointsByX, pointsByY, aux, lo, mid, now);
+            double delta2 = closest(pointsByX, pointsByY, aux, mid+1, hi, now);
             double delta = Math.min(delta1, delta2);
 
             // merge back so that pointsByY[lo..hi] are sorted by y-coordinate
@@ -166,7 +219,7 @@ public class Revection {
             for (int i = 0; i < M; i++) {
                 // a geometric packing argument shows that this loop iterates at most 7 times
                 for (int j = i+1; (j < M) && (aux[j].freq() - aux[i].freq() < delta); j++) {
-                    double distance = Revection.distance(aux[i], aux[j], window);
+                    double distance = Revection.distance(aux[i], aux[j], now);
                     if (distance < delta) {
                         delta = distance;
                         if (distance < bestDistance) {
@@ -258,22 +311,5 @@ public class Revection {
 
     }
 
-    public static float distance(@NotNull Task a, @NotNull Task b, float window) {
-        float fDist = Math.abs(a.freq() - b.freq());
-        float tDist = Math.abs(a.occurrence() - b.occurrence());
-        return (fDist+1) * tDist/window;
-    }
-    private static Task closest(@NotNull Task input, @NotNull List<Task> list, float window) {
-        float lowest = Float.POSITIVE_INFINITY;
-        Task low = null;
-        for (Task t : list) {
-            float d = distance(input, t, window);
-            if (d < lowest) {
-                low = t;
-                lowest = d;
-            }
-        }
 
-        return low;
-    }
 }

@@ -11,9 +11,7 @@ import nars.budget.BudgetMerge;
 import nars.task.Revection;
 import nars.task.Revision;
 import nars.task.Task;
-import nars.truth.DefaultTruth;
 import nars.truth.Truth;
-import nars.truth.TruthFunctions;
 import nars.util.ArraySortedIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -22,8 +20,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-
-
 
 
 /**
@@ -104,54 +100,54 @@ public class ArrayBeliefTable implements BeliefTable {
         }
     }
 
-    @Nullable
-    public Truth topTemporalWeighted(long when, long now, float dur, @Nullable Task topEternal) {
-
-        float sumFreq = 0, sumConf = 0;
-        float n = 0;
-
-        if (topEternal!=null) {
-            //include with strength of 1
-            sumFreq += topEternal.freq();
-            sumConf += topEternal.conf();
-            n++;
-        }
-
-        List<Task> temp = temporal.list();
-        int numTemporal = temp.size();
-
-        if (numTemporal == 1) //optimization: just return the only temporal truth value if it's the only one
-            return temp.get(0).truth();
-
-
-//        long maxtime = Long.MIN_VALUE;
-//        for (int i = 0, listSize = numTemporal; i < listSize; i++) {
-//            long t = temp.get(i).occurrence();
-//            if (t > maxtime)
-//                maxtime = t;
+//    @Nullable
+//    public Truth topTemporalWeighted(long when, long now, float dur, @Nullable Task topEternal) {
+//
+//        float sumFreq = 0, sumConf = 0;
+//        float n = 0;
+//
+//        if (topEternal!=null) {
+//            //include with strength of 1
+//            sumFreq += topEternal.freq();
+//            sumConf += topEternal.conf();
+//            n++;
 //        }
-
-
-        for (int i = 0, listSize = numTemporal; i < listSize; i++) {
-            Task x = temp.get(i);
-
-            //strength decreases with distance in time
-            float strength = TruthFunctions.temporalIntersection(when, x.occurrence(),
-                    //maxtime);
-                    now,
-                    dur);
-
-            //strength *= 2; /* square */
-
-            sumConf += x.conf() * strength;
-            sumFreq += x.freq() * strength;
-
-            n+=strength;
-        }
-
-        return n == 0 ? Truth.Zero :
-                new DefaultTruth(sumFreq / n, sumConf / n);
-    }
+//
+//        List<Task> temp = temporal.list();
+//        int numTemporal = temp.size();
+//
+//        if (numTemporal == 1) //optimization: just return the only temporal truth value if it's the only one
+//            return temp.get(0).truth();
+//
+//
+////        long maxtime = Long.MIN_VALUE;
+////        for (int i = 0, listSize = numTemporal; i < listSize; i++) {
+////            long t = temp.get(i).occurrence();
+////            if (t > maxtime)
+////                maxtime = t;
+////        }
+//
+//
+//        for (int i = 0, listSize = numTemporal; i < listSize; i++) {
+//            Task x = temp.get(i);
+//
+//            //strength decreases with distance in time
+//            float strength = TruthFunctions.temporalIntersection(when, x.occurrence(),
+//                    //maxtime);
+//                    now,
+//                    dur);
+//
+//            //strength *= 2; /* square */
+//
+//            sumConf += x.conf() * strength;
+//            sumFreq += x.freq() * strength;
+//
+//            n+=strength;
+//        }
+//
+//        return n == 0 ? Truth.Zero :
+//                new DefaultTruth(sumFreq / n, sumConf / n);
+//    }
 
 
 //    @Override
@@ -329,7 +325,12 @@ public class ArrayBeliefTable implements BeliefTable {
 
         if (temporal.isFull()) {
             //Try forming a revision and if successful, inputs to NAR for subsequent cycle
-            if (!Revection.revect(input, this, nar, 1 /* TODO window parameter */)) {
+
+            //TODO cache start, stop
+            //long start = temporal.list().stream().mapToLong(t -> t.occurrence()).min().getAsLong();
+            //long end = temporal.list().stream().mapToLong(t -> t.occurrence()).max().getAsLong();
+
+            if (!Revection.revect(input, this, nar)) {
                 return null; //rejected
             }
 

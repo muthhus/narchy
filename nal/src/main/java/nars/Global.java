@@ -92,7 +92,6 @@ public enum Global {
 
 //    public static final int METRICS_HISTORY_LENGTH = 256;
 
-    /* ---------- logical parameters ---------- */
     /** Evidential Horizon, the amount of future evidence to be considered (during revision).
      * Must be >=1.0, usually 1 .. 2
      */
@@ -101,10 +100,10 @@ public enum Global {
 
 
     /** minimum durability and quality necessary for a derivation to form */
-    public static float DERIVATION_DURABILITY_THRESHOLD = 0.01f;
+    public static float DERIVATION_DURABILITY_THRESHOLD = 0.005f;
 
     /** minimum difference necessary to indicate a significant modification in budget float number components */
-    public static final float BUDGET_PROPAGATION_EPSILON = 0.005f;
+    public static final float BUDGET_PROPAGATION_EPSILON = 0.003f;
 
 
 //    /* ---------- default input values ---------- */

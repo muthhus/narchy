@@ -286,7 +286,11 @@ public abstract class AbstractTask extends UnitBudget
     }
 
     @Override
-    public void setTruth(Truth t) {
+    public final void setTruth(@NotNull Truth t) {
+
+        if (t == null && isBeliefOrGoal())
+            throw new NullPointerException();
+
         if (!Objects.equals(truth, t)) {
             truth = t;
             invalidate();
@@ -387,7 +391,10 @@ public abstract class AbstractTask extends UnitBudget
 
         Truth tr = this.truth();
         if (tr !=null) {
-            int tu = Truth.compare(tr, o.truth());
+            @Nullable Truth otruth = o.truth();
+            if (otruth == null)
+                return 1;
+            int tu = Truth.compare(tr, otruth);
             if (tu!=0) return tu;
         }
 

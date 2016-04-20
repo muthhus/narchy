@@ -164,10 +164,13 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
     }
 
     /** begin matching the task half of a premise */
-    private void premiseTask(@NotNull BLink<? extends Concept> concept, @NotNull BLink<Termed>[] termsArray, BLink<Task> taskLink, @NotNull Task task, long occ) {
+    private void premiseTask(@NotNull BLink<? extends Concept> concept, @Nullable BLink<Termed>[] termsArray, BLink<Task> taskLink, @NotNull Task task, long occ) {
 
         for (BLink<Termed> termLink : termsArray) {
             if (termLink == null) break; //null-terminated array, ends
+
+            if (task.isDeleted()) break; //task has become deleted, cancel
+
             Termed tl = termLink.get();
             Concept beliefConcept = nar.concept(tl);
             Term termLinkTerm  = tl.term();
@@ -194,7 +197,13 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
 
     /** resolves the most relevant belief of a given term/concept */
     @Nullable
-    public Task match(Task task, @NotNull Concept beliefConcept, long taskOcc) {
+    public Task match(@NotNull Task task, @NotNull Concept beliefConcept, long taskOcc) {
+
+        //DEBUG---
+        if (task.isDeleted())
+            throw new RuntimeException("Deleted task: " + task + " " + beliefConcept.hasBeliefs());
+        //----
+
 
         //atomic concepts will have no beliefs to match
         if (!(beliefConcept instanceof Compound))
@@ -209,8 +218,11 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
                     taskOcc
             );
 
-            assert(belief != null && !belief.isDeleted());
-            //  if (belief == null || belief.isDeleted())  throw new RuntimeException("Deleted belief: " + belief + " " + beliefConcept.hasBeliefs());
+            //DEBUG---
+            //assert(belief != null && !belief.isDeleted());
+            if (belief == null || belief.isDeleted())
+                throw new RuntimeException("Deleted belief: " + belief + " " + beliefConcept.hasBeliefs());
+            //---
 
             if (task.isQuestOrQuestion() && taskOcc!=ETERNAL) {
                 //project the belief to the question's time

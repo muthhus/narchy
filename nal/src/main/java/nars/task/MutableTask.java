@@ -12,8 +12,8 @@ import nars.term.Termed;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.lang.ref.Reference;
 import java.util.Objects;
 
@@ -74,6 +74,7 @@ public class MutableTask extends AbstractTask {
     /** used by QuestionTable */
     public MutableTask(@NotNull Task taskToClone, @NotNull Task otherTask, long now, long occ, long[] newEvidence, Truth newTruth, @NotNull BudgetMerge budgetMerge) {
         this(taskToClone);
+
         punctuation(taskToClone.punc());
         this.parentBelief = Global.reference(otherTask);
         setEvidence(newEvidence);
@@ -91,7 +92,7 @@ public class MutableTask extends AbstractTask {
 
 
     @NotNull
-    public MutableTask truth(@org.jetbrains.annotations.Nullable Truth tv) {
+    public MutableTask truth(@Nullable Truth tv) {
 //        if (tv == null)
 //            setTruth(null);
 //        else

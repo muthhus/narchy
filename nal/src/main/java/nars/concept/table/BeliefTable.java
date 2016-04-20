@@ -129,15 +129,15 @@ public interface BeliefTable extends TaskTable {
         return relevance(Math.abs(from - to), ageFactor);
     }
 
-    /** returns a value <= 1.0;  ageFactor < 1 (ex: 1/dur) */
+    /** returns a value <= 1.0 */
     static float relevance(long delta /* positive only */, float ageFactor /* <1, divides usually */) {
         return 1f / (1f + delta*ageFactor);
     }
 
-    @NotNull
-    static Task stronger(@NotNull Task a, @NotNull Task b) {
-        return a.conf() > b.conf() ? a : b;
-    }
+//    @NotNull
+//    static Task stronger(@NotNull Task a, @NotNull Task b) {
+//        return a.conf() > b.conf() ? a : b;
+//    }
 
     /**
      *

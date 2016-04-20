@@ -34,7 +34,6 @@ import java.util.Comparator;
 
 import static java.lang.Math.max;
 import static nars.nal.UtilityFunctions.and;
-import static nars.truth.TruthFunctions.temporalIntersection;
 
 
 /** scalar (1D) truth value "frequency", stored as a floating point value */
@@ -245,12 +244,12 @@ public interface Truth extends Truthed {
     @NotNull Truth withConf(float f);
 
 
-    @NotNull
-    default Truth project(long when, long occ, long now, float dur) {
-        if (occ == when || occ == Tense.ETERNAL)
-            return this;
-        return withConf(conf() * temporalIntersection( when, occ, now, dur ));
-    }
+//    @NotNull
+//    default Truth project(long when, long occ, long now, float dur) {
+//        if (occ == when || occ == Tense.ETERNAL)
+//            return this;
+//        return withConf(conf() * temporalIntersection( when, occ, now, dur ));
+//    }
 
     @NotNull
     default Truth interpolate(@NotNull Truth y) {
