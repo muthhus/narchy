@@ -39,7 +39,7 @@ public class ShellTest {
         d.input("(go($w) <=> sh($w,I,(),#z)). %1.0;0.95%");
         d.input("go(ls)! :|:");
 
-        d.run(145);
+        d.run(16);
         //expect: ("file:///home/me/opennars/nars_logic"-->(/,^sh,pwd,I,(),_)). :|: %1.0;.90%
     }
 }

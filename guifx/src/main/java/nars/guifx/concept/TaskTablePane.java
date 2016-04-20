@@ -50,8 +50,8 @@ public class TaskTablePane extends HBox implements Runnable {
         this.nar = nar;
 
         getChildren().addAll(
-                eternal = new Canvas(75, 75),
-                temporal = new Canvas(200, 75)
+                eternal = new Canvas(100, 100),
+                temporal = new Canvas(250, 100)
         );
 
     }

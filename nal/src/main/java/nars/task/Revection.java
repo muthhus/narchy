@@ -6,6 +6,7 @@ import nars.bag.impl.ListTable;
 import nars.budget.BudgetMerge;
 import nars.concept.table.ArrayBeliefTable;
 import nars.concept.table.BeliefTable;
+import nars.concept.table.TaskTable;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import nars.truth.TruthFunctions;
@@ -106,7 +107,7 @@ public class Revection {
         long bo = b.occurrence();
         float tDist =  1f + Math.abs(ao - bo);
         float ageFactor = /*Math.max*/(Math.abs(now - ao) + Math.abs(now-bo)); //more age factor will cause them to seem closer together than they actually are, like a perspective collapsing to a point at the horizon
-        return fDist * tDist / (1f + ageFactor); // * window);
+        return fDist * tDist / (1f + (float)Math.sqrt(ageFactor)); // * window);
     }
     private static Task closest(@NotNull Task input, @NotNull List<Task> list, long now) {
         float lowest = Float.POSITIVE_INFINITY;
@@ -124,7 +125,7 @@ public class Revection {
 
     static void remove(ListTable<Task, Task> temporal, Task t, @NotNull NAR nar) {
         temporal.remove(t);
-        ArrayBeliefTable.onBeliefRemoved(t, "Revection Remove", nar);
+        TaskTable.removeTask(t, "Revection Remove", nar);
     }
 
 

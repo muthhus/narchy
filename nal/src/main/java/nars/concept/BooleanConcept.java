@@ -203,5 +203,9 @@ public class BooleanConcept extends OperationConcept {
             return result != null ? result.present(now).normalize(nar) : null;
         }
 
+        @Override
+        public void remove(@NotNull Task belief, @NotNull NAR nar) {
+            //nothing, maybe force update
+        }
     }
 }

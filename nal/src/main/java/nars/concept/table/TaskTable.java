@@ -2,6 +2,7 @@ package nars.concept.table;
 
 import com.google.common.collect.Iterators;
 import nars.Memory;
+import nars.NAR;
 import nars.task.Task;
 import org.apache.commons.math3.analysis.interpolation.BivariateGridInterpolator;
 import org.apache.commons.math3.analysis.interpolation.UnivariateInterpolator;
@@ -16,6 +17,11 @@ import java.util.function.Consumer;
  * top ranking items are stored in the lower indexes so they will be first iterated
  */
 public interface TaskTable extends Iterable<Task> {
+
+    static void removeTask(@NotNull Task t, @Nullable String reason, @NotNull Memory memory) {
+        if (!t.isDeleted())
+            memory.remove(t, reason);
+    }
 
     int getCapacity();
 
@@ -107,5 +113,13 @@ public interface TaskTable extends Iterable<Task> {
         public boolean isEmpty() {
             return true;
         }
+
+        @Override
+        public void remove(@NotNull Task belief, @NotNull NAR nar) {
+            throw new UnsupportedOperationException();
+        }
     };
+
+    /** forcibly remove a held Task */
+    void remove(@NotNull Task belief, @NotNull NAR nar);
 }

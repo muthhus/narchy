@@ -213,16 +213,27 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
 
         if (!table.isEmpty()) {
 
-            Task belief = table.top(
+            Task belief;
+            do {
+                belief = table.top(
                     //nar.time()
                     taskOcc
-            );
+                );
 
-            //DEBUG---
-            //assert(belief != null && !belief.isDeleted());
-            if (belief == null || belief.isDeleted())
-                throw new RuntimeException("Deleted belief: " + belief + " " + beliefConcept.hasBeliefs());
-            //---
+                if (belief == null)
+                    return null;
+
+                if (belief.isDeleted()) {
+                    table.remove(belief, nar);
+                }
+
+            } while (belief.isDeleted());
+
+//            //DEBUG---
+//            //assert(belief != null && !belief.isDeleted());
+//            if (belief.isDeleted())
+//                throw new RuntimeException("Deleted belief: " + belief + " " + belief.explanation());
+//            //---
 
             if (task.isQuestOrQuestion() && taskOcc!=ETERNAL) {
                 //project the belief to the question's time

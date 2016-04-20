@@ -31,6 +31,12 @@ public class TaskQueue extends ArrayDeque<Task> implements Input , Consumer<Task
         Collections.addAll(this, x);
     }
 
+    @Override
+    public final boolean add(Task task) {
+        if (task == null) return true;
+        return super.add(task);
+    }
+
     /*protected int accept(Iterator<Task> tasks) {
         if (tasks == null) return 0;
         int count = 0;

@@ -3,7 +3,6 @@ package nars.concept.table;
 import com.google.common.collect.Iterators;
 import com.gs.collections.api.block.function.primitive.FloatFunction;
 import nars.Global;
-import nars.Memory;
 import nars.NAR;
 import nars.bag.impl.ArrayTable;
 import nars.bag.impl.ListTable;
@@ -240,6 +239,13 @@ public class ArrayBeliefTable implements BeliefTable {
 
 
     @Override
+    public void remove(@NotNull Task belief, @NotNull NAR nar) {
+        Object removed = ((belief.isEternal()) ? eternal : temporal).remove(belief);
+        assert(removed == belief);
+        TaskTable.removeTask(belief, null, nar);
+    }
+
+    @Override
     public void clear() {
         eternal.clear();
         temporal.clear();
@@ -415,7 +421,7 @@ public class ArrayBeliefTable implements BeliefTable {
             //lock incoming 100% confidence belief/goal into a 1-item capacity table by itself, preventing further insertions or changes
             //1. clear the corresponding table, set capacity to one, and insert this task
             Consumer<Task> overridden = t -> {
-                onBeliefRemoved(t, "Overridden", nar);
+                TaskTable.removeTask(t, "Overridden", nar);
             };
             table.forEach(overridden);
             table.clear();
@@ -436,7 +442,7 @@ public class ArrayBeliefTable implements BeliefTable {
         boolean inserted = (displaced == null) || (displaced != incoming);//!displaced.equals(t);
 
         if (displaced!=null && !displaced.isDeleted()) {
-            onBeliefRemoved(displaced,
+            TaskTable.removeTask(displaced,
                     "Displaced",
                     //"Displaced by " + incoming,
                     nar);
@@ -453,11 +459,7 @@ public class ArrayBeliefTable implements BeliefTable {
         return t.isEternal() ? this.eternal : this.temporal;
     }
 
-    public static void onBeliefRemoved(@NotNull Task t, @Nullable String reason, @NotNull Memory memory) {
-        memory.remove(t, reason);
-    }
-
-//    static void checkForDeleted(@NotNull Task input, @NotNull ArrayTable<Task,Task> table) {
+    //    static void checkForDeleted(@NotNull Task input, @NotNull ArrayTable<Task,Task> table) {
 //        if (input.getDeleted())
 //            throw new RuntimeException("Deleted task being added");
 //

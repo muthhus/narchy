@@ -2,6 +2,7 @@ package nars.concept.table;
 
 import nars.Global;
 import nars.Memory;
+import nars.NAR;
 import nars.budget.BudgetMerge;
 import nars.task.MutableTask;
 import nars.task.Task;
@@ -65,6 +66,13 @@ public class ArrayQuestionTable implements QuestionTable {
     @Override
     public boolean isEmpty() {
         return list.isEmpty();
+    }
+
+    @Override
+    public void remove(@NotNull Task belief, @NotNull NAR nar) {
+        if (list.remove(belief)) {
+            TaskTable.removeTask(belief, null, nar);
+        }
     }
 
 

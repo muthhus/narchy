@@ -59,6 +59,11 @@ public interface BeliefTable extends TaskTable {
             return true;
         }
 
+        @Override
+        public void remove(@NotNull Task belief, @NotNull NAR nar) {
+            throw new UnsupportedOperationException();
+        }
+
         @NotNull
         @Override
         public Task add(@NotNull Task input, NAR nar) {
@@ -188,10 +193,6 @@ public interface BeliefTable extends TaskTable {
         if (tmp == null) {
             return ete;
         } else {
-
-
-            //tmp = MutableTask.project(tmp, t, now);
-
             if (ete == null) {
                 return tmp;
             } else {
@@ -342,6 +343,10 @@ public interface BeliefTable extends TaskTable {
     @Nullable default Truth truth(long now) {
         return truth(now, now);
     }
+
+
+    //void remove(Task belief, @NotNull NAR nar);
+
 
 
     /** simple metric that guages the level of inconsistency between two differnt tables, used in measuring graph intercoherency */

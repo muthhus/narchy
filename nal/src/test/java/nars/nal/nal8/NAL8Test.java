@@ -132,10 +132,10 @@ public class NAL8Test extends AbstractNALTest {
     @Test public void goal_deduction_tensed_conseq()  {
         TestNAR tester = test();
 
-        tester.input("goto(x). :\\:");
+        tester.input("goto(x). :|:");
         tester.inputAt(10, "(goto($1) ==>+5 at:(SELF,$1)).");
 
-        tester.mustBelieve(cycles, "at:(SELF,x)", 1.0f, 0.81f, 0);
+        tester.mustBelieve(cycles, "at:(SELF,x)", 1.0f, 0.81f, 5);
     }
 
     @Test
@@ -169,10 +169,10 @@ public class NAL8Test extends AbstractNALTest {
     @Test public void goal_deduction_tensed_conseq_noVar()  {
         TestNAR tester = test();
 
-        tester.input("goto(x). :\\:");
+        tester.inputAt(1, "goto(x). :|:");
         tester.inputAt(10, "(goto(x) ==>+5 at:(SELF,x)).");
 
-        tester.mustBelieve(cycles, "at:(SELF,x)", 1.0f, 0.81f, 0);
+        tester.mustBelieve(cycles, "at:(SELF,x)", 1.0f, 0.81f, 6);
     }
 
     @Test
@@ -329,10 +329,9 @@ public class NAL8Test extends AbstractNALTest {
 //
 //        tester.mustBelieve(cycles, "hold:({t002})", 1.0f, 0.81f, 0);
 
-        tester.input("pick:t2. :\\:");
+        tester.input("pick:t2. :|:");
         tester.inputAt(10, "(pick:t2 ==>+5 hold:t2).");
-
-        tester.mustBelieve(cycles, "hold:t2", 1.0f, 0.81f, 0); //-5 +5 = 0
+        tester.mustBelieve(cycles, "hold:t2", 1.0f, 0.81f, 5);
 
     }
 
@@ -378,10 +377,10 @@ public class NAL8Test extends AbstractNALTest {
     public void goal_deduction_2()  {
         TestNAR tester = test();
 
-        tester.input("goto({t001}). :\\: "); //-5
+        tester.input("goto({t001}). :|: ");
         tester.inputAt(7, "(goto($1) ==>+2 at:(SELF,$1)). ");
 
-        tester.mustBelieve(cycles, "at:(SELF,{t001})", 1.0f, 0.81f, -3);
+        tester.mustBelieve(cycles, "at:(SELF,{t001})", 1.0f, 0.81f, 2);
 
     }
 
