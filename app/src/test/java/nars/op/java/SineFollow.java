@@ -21,13 +21,13 @@ import static java.lang.System.out;
  */
 public class SineFollow {
 
-    public float freq = 0.05f;
-    public int resolution = 5; //pixels seen
+    public float freq = 0.04f;
+    public int resolution = 6; //pixels seen
 
     float fadeFactor = 0;
 
     //final Termed[] pixelTerm;
-    int lookahead = (int)Math.round(Math.PI * 2f + (1f / freq) * 0.8f  /* phase */);
+    int lookahead = (int)Math.round(Math.PI * 2f + (1f / freq) * 0.6f  /* phase */);
 
     private final NAR nar;
 
@@ -88,13 +88,13 @@ public class SineFollow {
             //float f = i == hp ? 1 : 0;
 
 
-            float c = 0.9f;
+            float c = 0.95f;
 
             nar.believe(pixel(i, i == hp), Tense.Present, 1f, c);
             //nar.believe(pixel(i, i != hp), Tense.Present, 0f, c);
 
 
-            nar.ask(pixel(i, true), '?', now + lookahead);
+            //nar.ask(pixel(i, true), '?', now + lookahead);
             //nar.ask(pixel(i, false), '?', time() + lookahead);
         }
     }
@@ -120,30 +120,31 @@ public class SineFollow {
     void evaluate() {
         //String e = "";
 
-        //long now = time();
+        long now = time();
         long future = future();
         //int hp = hiddenPixel(lookahead);
 
 
         int best = -1;
-        float bestVal = -1;
+        float bestVal = Float.NEGATIVE_INFINITY;
 
         //float estimated = 0;
         //float estDen = 0;
 
         for (int i = 0; i < resolution; i++) {
-            Concept off = nar.concept(pixel(i, false));
+            //Concept off = nar.concept(pixel(i, false));
             Concept on = nar.concept(pixel(i, true));
 
             //float eNow = c.belief(now).expectation();
-            float onNext = on!=null && on.hasBeliefs() ? on.belief(future, future).expectation() : 0;
+            float onNext = on!=null && on.hasBeliefs() ? on.belief(future, now).expectation() : 0;
+            if (onNext < 0.5f) continue;
 
-            float offNext = off!=null && off.hasBeliefs() ? off.belief(future, future).expectation() : 0;
+            //float offNext = off!=null && off.hasBeliefs() ? off.belief(future, now).expectation() : 0;
             //float offNext = 0;
 
             //float denom = (offNext + onNext);
             /*if (denom > 0)*/ {
-                float delta = (onNext - offNext);// / denom;
+                float delta = (onNext);// - offNext);// / denom;
                 //float delta = eNext - eNow;
                 //e += Texts.n2(eNow) + "+-" + Texts.n4(delta) + "\t";
             /*e += (hp == i ? "*":"_") +
@@ -219,10 +220,9 @@ public class SineFollow {
     public static void main(String[] args) {
         Global.DEBUG = true;
 
-        Default d = new Default();
-        d.core.conceptsFiredPerCycle.set(4);
-        d.cyclesPerFrame.set(16);
-        d.shortTermMemoryHistory.set(4);
+        Default d = new Default(1024, 8, 3, 2);
+        d.cyclesPerFrame.set(8);
+        d.shortTermMemoryHistory.set(2);
 //        d.log();
 //        d.eventTaskProcess.on(tt -> {
 //            if (tt.lastLogged().toString().equals("Immediaternalized"))
@@ -234,7 +234,7 @@ public class SineFollow {
 //           }
 //        });
 
-        new SineFollow(d, 560);
+        new SineFollow(d, 1560);
 
 
     }

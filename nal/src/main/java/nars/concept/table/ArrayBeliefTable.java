@@ -10,7 +10,9 @@ import nars.budget.BudgetMerge;
 import nars.task.Revection;
 import nars.task.Revision;
 import nars.task.Task;
+import nars.truth.DefaultTruth;
 import nars.truth.Truth;
+import nars.truth.TruthFunctions;
 import nars.util.ArraySortedIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,6 +21,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+
+import static nars.nal.UtilityFunctions.w2c;
+import static nars.truth.TruthFunctions.c2w;
 
 
 /**
@@ -81,8 +86,8 @@ public class ArrayBeliefTable implements BeliefTable {
             return eternal.truth();
 
 
-        return topTemporalCurrent(when, now, eternal);
-        //return topTemporalWeighted(when, now, dur, eternal);
+        //return topTemporalCurrent(when, now, eternal);
+        return topTemporalWeighted(when, now, eternal);
     }
 
     @Nullable
@@ -99,54 +104,71 @@ public class ArrayBeliefTable implements BeliefTable {
         }
     }
 
-//    @Nullable
-//    public Truth topTemporalWeighted(long when, long now, float dur, @Nullable Task topEternal) {
-//
-//        float sumFreq = 0, sumConf = 0;
-//        float n = 0;
-//
-//        if (topEternal!=null) {
-//            //include with strength of 1
-//            sumFreq += topEternal.freq();
-//            sumConf += topEternal.conf();
-//            n++;
-//        }
-//
-//        List<Task> temp = temporal.list();
-//        int numTemporal = temp.size();
-//
-//        if (numTemporal == 1) //optimization: just return the only temporal truth value if it's the only one
-//            return temp.get(0).truth();
-//
-//
-////        long maxtime = Long.MIN_VALUE;
-////        for (int i = 0, listSize = numTemporal; i < listSize; i++) {
-////            long t = temp.get(i).occurrence();
-////            if (t > maxtime)
-////                maxtime = t;
-////        }
-//
-//
+    @Nullable
+    public Truth topTemporalWeighted(long when, long now, @Nullable Task topEternal) {
+
+        float sumFreq = 0, sumConf = 0;
+        float nF = 0, nC = 0;
+
+        if (topEternal!=null) {
+            //include with strength of 1
+
+            float ec = topEternal.conf();
+
+            sumFreq += topEternal.freq() * ec;
+            sumConf += ec;
+            nF+= ec;
+            nC+= ec;
+        }
+
+        List<Task> temp = temporal.list();
+        int numTemporal = temp.size();
+
+        if (numTemporal == 1) //optimization: just return the only temporal truth value if it's the only one
+            return temp.get(0).truth();
+
+
+//        long maxtime = Long.MIN_VALUE;
+//        long mintime = Long.MAX_VALUE;
 //        for (int i = 0, listSize = numTemporal; i < listSize; i++) {
-//            Task x = temp.get(i);
-//
-//            //strength decreases with distance in time
-//            float strength = TruthFunctions.temporalIntersection(when, x.occurrence(),
-//                    //maxtime);
-//                    now,
-//                    dur);
-//
-//            //strength *= 2; /* square */
-//
-//            sumConf += x.conf() * strength;
-//            sumFreq += x.freq() * strength;
-//
-//            n+=strength;
+//            long t = temp.get(i).occurrence();
+//            if (t > maxtime)
+//                maxtime = t;
+//            if (t < mintime)
+//                mintime = t;
 //        }
-//
-//        return n == 0 ? Truth.Zero :
-//                new DefaultTruth(sumFreq / n, sumConf / n);
-//    }
+//        float dur = 1f/(1f + (maxtime - mintime));
+
+
+        long mdt = Long.MAX_VALUE;
+        for (int i = 0; i < numTemporal; i++) {
+            long t = temp.get(i).occurrence();
+            mdt = Math.min(mdt, Math.abs(now - t));
+        }
+        float window = 1f / (1f + mdt/2);
+
+
+        for (int i = 0, listSize = numTemporal; i < listSize; i++) {
+            Task x = temp.get(i);
+
+            float tc = x.conf();
+
+            float w = TruthFunctions.temporalIntersection(
+                    when, x.occurrence(), now, window);
+
+            //strength decreases with distance in time
+            float strength = w * w * tc;
+
+            sumConf += tc * w;
+            nC+=tc;
+
+            sumFreq += x.freq() * strength;
+            nF+=strength;
+        }
+
+        return nC == 0 ? Truth.Zero :
+                new DefaultTruth(sumFreq / nF, (sumConf/nC));
+    }
 
 
 //    @Override
@@ -268,17 +290,18 @@ public class ArrayBeliefTable implements BeliefTable {
         if (ls == 1)
             return l.get(0); //the only task
 
-        float ageFactor = 1f/(1 + Math.abs(when - now) * 1f);
+        float ageFactor = 1f;///(1 + Math.abs(when - now) * 1f);
         float bestRank = -1;
 
         for (int i = 0; i < ls; i++) {
             Task x = l.get(i);
-            float r = BeliefTable.rankTemporalByConfidence(x, when, ageFactor, bestRank);
+            float r = BeliefTable.rankTemporalByConfidence(x, when, now, ageFactor, bestRank);
             if (r > bestRank) {
                 best = x;
                 bestRank = r;
             }
         }
+        //System.out.println("\t " + best);
 
 
         return best;

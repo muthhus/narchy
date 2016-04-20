@@ -133,15 +133,22 @@ public final class TruthFunctions extends UtilityFunctions {
         long bdt = 1 + Math.abs(bt-target);
         float closeness = (adt!=bdt) ? (bdt/(float)(adt+bdt)) : 0.5f;
 
-        float w1 = c2w(a.conf()) * closeness;
-        float w2 = c2w(b.conf()) * (1-closeness);
+        //float w1 = c2w(a.conf()) * closeness;
+        //float w2 = c2w(b.conf()) * (1-closeness);
+        float w1 = a.conf() * closeness;
+        float w2 = b.conf() * (1-closeness);
 
         final float w = (w1 + w2);
-        float newConf = w2c(w) * match *
+//        float newConf = w2c(w) * match *
+//                temporalIntersection(target, at, bt,
+//                    Math.abs(a.freq()-b.freq()) //the closer the freq are the less that difference in occurrence will attenuate the confidence
+//                );
+//                //* TruthFunctions.temporalProjectionOld(at, bt, now)
+
+        float newConf = or(w1,w2) * match *
                 temporalIntersection(target, at, bt,
-                    Math.abs(a.freq()-b.freq()) //the closer the freq are the less that difference in occurrence will attenuate the confidence
+                        Math.abs(a.freq()-b.freq()) //the closer the freq are the less that difference in occurrence will attenuate the confidence
                 );
-                //* TruthFunctions.temporalProjectionOld(at, bt, now)
 
         if (newConf < confThreshold)
             return null;
@@ -160,8 +167,8 @@ public final class TruthFunctions extends UtilityFunctions {
 //        return temporalIntersection(now, at, bt, 1f);
 //    }
 
-    public static float temporalIntersection(long now, long at, long bt, float dur) {
-        return dur == 0 ? 1f : BeliefTable.relevance(Math.abs(now-at) + Math.abs(now-bt), dur);
+    public static float temporalIntersection(long now, long at, long bt, float window) {
+        return window == 0 ? 1f : BeliefTable.relevance(Math.abs(now-at) + Math.abs(now-bt), window);
     }
 
     public static float truthProjection(long sourceTime, long targetTime, long currentTime) {

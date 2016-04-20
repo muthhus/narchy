@@ -90,6 +90,12 @@ public class UtilityFunctions   {
         return sum / arr.length;
     }
 
+    /** more efficient version */
+    public static float aveAri(float a, float b) {
+        return (a + b) / 2.0f;
+    }
+
+
     /**
      * A function where the output is the geometric average the inputs
      * @param arr The inputs, each in [0, 1]

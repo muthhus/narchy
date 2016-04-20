@@ -127,7 +127,7 @@ public interface BeliefTable extends TaskTable {
 
     /** temporal relevance; returns a value <= 1.0f; */
     static float relevance(long from, long to, float ageFactor) {
-        assert(from!=Tense.ETERNAL);
+        //assert(from!=Tense.ETERNAL);
         /*if (from == Tense.ETERNAL)
             return Float.NaN;*/
 
@@ -147,18 +147,23 @@ public interface BeliefTable extends TaskTable {
     /**
      *
      * @param t
-     * @param time
+     * @param when target time that is being evaluated (may be 'now' or some other time projected to)
      * @param ageFactor effectively a ratio for trading off confidence against time
      * @return
      */
-    static float rankTemporalByConfidence(@NotNull Task t, long time, float ageFactor, float bestSoFar) {
+    static float rankTemporalByConfidence(@NotNull Task t, long when, long now, float ageFactor, float bestSoFar) {
         float c = t.conf();
         if (c < bestSoFar)
             return -1; //give up early since anything multiplied by relevance (<=1f) wont exceed the current best
-        else
-            return
-                c * relevance(t, time, ageFactor)
-                ;
+        else {
+            //long dt = Math.abs(t.occurrence() - when) + Math.abs(now - when);
+            long dt = Math.abs(t.occurrence() - now) + Math.abs(when - now);
+            float relevance = relevance(dt, ageFactor);
+            float rank = c * relevance;
+            //System.out.println(now + ": " + t + " for " + when + " dt="+ dt + " rele=" + relevance + " rank=" + rank);
+            return rank;
+        }
+
     }
 
     /** attempt to insert a task; returns what was input or null if nothing changed (rejected) */

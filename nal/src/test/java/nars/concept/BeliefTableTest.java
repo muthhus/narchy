@@ -160,6 +160,44 @@ public class BeliefTableTest  {
 
     }
 
+    @Test
+    public void testTemporalQueries() {
+
+        Global.DEBUG = true;
+
+        int maxBeliefs = 6; //includes 3 eternal beliefs we arent using:
+        NAR n = newNAR(maxBeliefs*2);
+
+
+        BeliefAnalysis b = new BeliefAnalysis(n, "<a-->b>");
+
+        //assertEquals(0.0, (Double) b.energy().get(MemoryBudget.Budgeted.ActiveConceptPrioritySum), 0.001);
+
+        int spacing = 2;
+
+        //create linear gradient of belief across time, freq beginning at 0 and increasing to 1
+        for (int i = 0; i < maxBeliefs; i++) {
+            b.believe(0.5f, i/(float)maxBeliefs, 0.85f, i * spacing).run(spacing);
+        }
+
+        b.print();
+        assertEquals(maxBeliefs, b.size());
+
+
+        int margin = spacing * (maxBeliefs/2);
+        for (int i = -margin; i < spacing * maxBeliefs + margin; i++) {
+            System.out.println(i + "\t" + b.concept().beliefs().truth(i));
+        }
+        System.out.println();
+        for (int i = -margin; i < spacing * maxBeliefs + margin; i++) {
+            System.out.println(i + "\t" + b.concept().beliefs().truth(i, 0 /* relative to zero */));
+        }
+
+        /* first */ assertEquals(0, b.concept().beliefs().truth(0).freq(), 0.05f);
+        /* last */ assertEquals((maxBeliefs-1)/(float)maxBeliefs, b.concept().beliefs().truth(spacing * (maxBeliefs-1)).freq(), 0.05f);
+
+    }
+
 
     @Test
     public void testEternalBeliefRanking() {
