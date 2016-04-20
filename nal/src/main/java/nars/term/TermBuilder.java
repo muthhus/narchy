@@ -339,9 +339,9 @@ public abstract class TermBuilder {
                     return u[0];
             } else {
                 //if (Global.DEBUG)
-                    throw new InvalidTerm(op, -1, t, u);
+                    //throw new InvalidTerm(op, -1, t, u);
                 //else
-                    //return null;
+                    return null;
             }
 
             Term x = make(op, -1, TermContainer.the(op, u)).term();

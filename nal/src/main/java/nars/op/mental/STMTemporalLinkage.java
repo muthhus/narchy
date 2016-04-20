@@ -59,6 +59,11 @@ public final class STMTemporalLinkage implements Consumer<Task> {
             return;
         }
 
+        /** current task's... */
+        Concept concept = t.concept(nar);
+        if (concept == null)
+            return;
+
         int stmSize = nar.shortTermMemoryHistory.intValue();
 
 
@@ -75,8 +80,6 @@ public final class STMTemporalLinkage implements Consumer<Task> {
 
         int numExtra = Math.max(0, stm.size() - stmSize);
 
-        /** current task's... */
-        Concept concept = t.concept(nar);
 
         Iterator<Task> ss = stm.iterator();
 

@@ -33,23 +33,26 @@ import static nars.util.Texts.n2;
 public class Thermostat5 {
 
     public static final float basePeriod = 500;
-    public static final float tolerance = 0.05f;
-    public static float targetPeriod = 16;
-    public static final float speed = 0.1f;
+    public static final float tolerance = 0.03f;
+    public static float targetPeriod = 8;
+    public static final float speed = 0.05f;
     static boolean print = true;
     static boolean printMotors = false;
     static boolean debugError = false;
     static int sensorPeriod = 16; //frames per max sensor silence
-    static int commandPeriod = 128;
+    static int commandPeriod = 1024;
 
     public static void main(String[] args) {
-        Default d = new Default(1024, 8, 2, 3);
-        d.cyclesPerFrame.set(8);
-        d.activationRate.setValue(0.1f);
+        Default d = new Default(1024, 12, 2, 3);
+        d.conceptRemembering.setValue(3);
+        d.cyclesPerFrame.set(2);
+        d.activationRate.setValue(0.06f);
         d.shortTermMemoryHistory.set(2);
+        d.derivationDurabilityThreshold.setValue(0.03f);
+        //d.perfection.setValue(0.9f);
         //d.premiser.confMin.setValue(0.02f);
 
-        float score = eval(d, 100000);
+        float score = eval(d, 120000);
         System.out.println("score=" + score);
     }
 
@@ -129,13 +132,13 @@ public class Thermostat5 {
             float diff = yHidden.floatValue() - yEst.floatValue();
             if (diff < tolerance) return 0;
             else return (Util.clamp( diff )/2f + 0.5f);
-        }).resolution(0.01f).timing(-1, sensorPeriod);
+        }).resolution(0.02f).timing(-1, sensorPeriod);
 
         below = new SensorConcept("(below)", n, () -> {
             float diff = yHidden.floatValue() - yEst.floatValue();
             if (-diff < tolerance) return 0;
             else return (Util.clamp( -diff )/2f + 0.5f);
-        }).resolution(0.01f).timing(-1, sensorPeriod);
+        }).resolution(0.02f).timing(-1, sensorPeriod);
 
         OperationConcept up = new Motor1D(n, true, yEst);
         OperationConcept down = new Motor1D(n, false, yEst);
@@ -239,7 +242,7 @@ public class Thermostat5 {
 
         //n.logSummaryGT(System.out, 0.0f);
 
-        float str = 0.6f;
+        float str = 0.55f;
 
         //n.log();
         mission(n);
@@ -258,7 +261,7 @@ public class Thermostat5 {
                 //n.goal($.$("down()"), Tense.Present, 0f, str);
                 n.step();
                 //System.out.println(diffness.get());
-            } while (below.get() < 0.25f);
+            } while (below.get() < 0.7f);
 
             System.out.println("training down");
             yEst.setValue(0.5f + dd);
@@ -270,7 +273,7 @@ public class Thermostat5 {
                 n.goal($.$("down()"), Tense.Present, 1f, str);
                 n.step();
                 //System.out.println(diffness.get());
-            } while (above.get() < 0.25f);
+            } while (above.get() < 0.7f);
         }
 
         System.out.println("training finished");
@@ -294,7 +297,6 @@ public class Thermostat5 {
         //n.run(16); //pause before beginning
 
 
-        command(n);
 
         for (int i = 0; i < cycles; i++) {
             n.step();
@@ -339,8 +341,8 @@ public class Thermostat5 {
         //CHEATS:
         n.input("<(above) ==> up()>. :|:"); //TODO parse these with up()/down() Exception in thread "$" com.github.fge.grappa.exceptions.GrappaException: exception thrown when parsing action 'Input/zeroOrMore/sequence/firstOf/Task/Term/firstOf/seq/ColonReverseInheritance/Term/firstOf/seq/firstOf/MultiArgTerm/sequence/Term/firstOf/seq/firstOf/sequence/Term_Action5' at input position Position{line=1, column=18}
         n.input("<(below) ==> down()>. :|:");
-        n.input("<(above) ==> (--,(()-->^down))>. :|:");
-        n.input("<(below) ==> (--,(()-->^up))>. :|:");
+        n.input("<(above) ==> (--,down())>. :|:");
+        n.input("<(below) ==> (--,up())>. :|:");
         //n.input("up()@");
         //n.input("down()@");
     }
