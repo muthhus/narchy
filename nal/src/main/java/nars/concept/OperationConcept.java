@@ -231,9 +231,14 @@ public class OperationConcept extends CompoundConcept implements Runnable {
 //                ((UtilityFunctions.aveAri(desired.freq(), (1f - believed.freq())) - 0.5f)
 //                ) + 0.5f;
 
-        float des = desired.expectation();
-        float bel = believed.expectation();
-        return des-bel;
+
+        float d = (desired.expectation()-0.5f);
+        if (d < 0) return d;
+        float b = (believed.expectation()-0.5f);
+        /*if (b > 0)*/ d-=b;
+        //float beliefAttenuation = 1f - Math.max(0, ((believed.expectation()) - 0.5f) * 2f);
+        //d *= beliefAttenuation;
+        return d*2;
     }
 
 

@@ -446,19 +446,21 @@ public class Narsese extends BaseParser<Object> {
                         TemporalRelation(),
 
                         //Functional form of an Operation, ex: operate(p1,p2), TODO move to FunctionalOperationTerm() rule
-                        seq(oper,
+                        seq(/*oper,*/
 
-                                Term(false, false),
+                                //Term(false, false), //<-- allows non-atom terms for operator names
+                                Atom(), push($.operator((String)pop())), // <-- allows only atoms for operator names, normal
+
 
                                 COMPOUND_TERM_OPENER,
 
-                                firstOf(
+                                //firstOf(
 
                                         //empty operator parens
-                                        sequence(s(), COMPOUND_TERM_CLOSER, push(popTerm(OPERATOR, false))),
+                                        //sequence(s(), COMPOUND_TERM_CLOSER, push(popTerm(OPERATOR, false))),
 
                                         MultiArgTerm(OPERATOR, COMPOUND_TERM_CLOSER, false, false, false, true)
-                                )
+                                //)
                         ),
 
                         seq(STATEMENT_OPENER,
@@ -856,9 +858,9 @@ public class Narsese extends BaseParser<Object> {
         return MultiArgTerm(open, /*open, */close, false, false, false, false);
     }
 
-    boolean OperationPrefixTerm() {
-        return push(new Object[]{termable(pop()), (Operator.class)});
-    }
+//    boolean OperationPrefixTerm() {
+//        return push(new Object[]{termable(pop()), (Operator.class)});
+//    }
 
     /**
      * list of terms prefixed by a particular compound term operate
@@ -869,9 +871,9 @@ public class Narsese extends BaseParser<Object> {
 
         return sequence(
 
-                operatorPrecedes ? OperationPrefixTerm() : push(Compound.class),
+                /*operatorPrecedes ? *OperationPrefixTerm()* true :*/
 
-                initialOp ? Op() : Term(),
+                operatorPrecedes ? EMPTY : seq(push(Compound.class), (initialOp ? Op() : Term())),
 
                 spaceSeparates ?
 
@@ -890,19 +892,19 @@ public class Narsese extends BaseParser<Object> {
         );
     }
 
-    /**
-     * operation()
-     */
-    Rule EmptyOperationParens() {
-        return sequence(
-
-                OperationPrefixTerm(),
-
-                /*s(),*/ COMPOUND_TERM_OPENER, s(), COMPOUND_TERM_CLOSER,
-
-                push(popTerm(OPERATOR, false))
-        );
-    }
+//    /**
+//     * operation()
+//     */
+//    Rule EmptyOperationParens() {
+//        return sequence(
+//
+//                OperationPrefixTerm(),
+//
+//                /*s(),*/ COMPOUND_TERM_OPENER, s(), COMPOUND_TERM_CLOSER,
+//
+//                push(popTerm(OPERATOR, false))
+//        );
+//    }
 
     Rule AnyOperatorOrTerm() {
         return firstOf(Op(), Term());
@@ -992,8 +994,8 @@ public class Narsese extends BaseParser<Object> {
             } else if (p instanceof Op) {
 
                 if (op != null) {
-                    if ((!allowInternalOp) && (!p.equals(op)))
-                        throw new RuntimeException("Internal operator " + p + " not allowed here; default op=" + op);
+                    //if ((!allowInternalOp) && (!p.equals(op)))
+                    //    throw new RuntimeException("Internal operator " + p + " not allowed here; default op=" + op);
 
                     throw new NarseseException("Too many operators involved: " + op + ',' + p + " in " + stack + ':' + vectorterms);
                 }

@@ -319,10 +319,10 @@ public final class DefaultMatcherContext<V>
         } catch (GrappaException e) {
             throw e; // don't wrap, just bubble up
         } catch (Throwable e) { // TODO: Throwable? What the...
-            String msg = String.format(
-                "exception thrown when parsing %s '%s' at input position %s",
-                matcher instanceof ActionMatcher ? "action" : "rule", getPath(),
-                inputBuffer.getPosition(currentIndex));
+            String msg = //String.format(
+                "exception thrown when parsing %s '%s' at input position %s" +
+                (matcher instanceof ActionMatcher ? "action" : "rule") + " " + getPath() + " " +
+                inputBuffer.getPosition(currentIndex);
             e.printStackTrace();
             if (e.getCause()!=null)
                 e.getCause().printStackTrace();

@@ -617,9 +617,10 @@ public class NarseseTest {
 
     @Test
     public void testOperatorWithNoParams() {
-        Compound t = term("op()");
+        Term t = term("op()");
         assertNotNull(t);
-        assertEquals(0, Operator.opArgs(t).size());
+        assertEquals(t.toString(), Op.INHERIT, t.op());
+        assertEquals(0, Operator.opArgs((Compound)t).size());
     }
 
 }

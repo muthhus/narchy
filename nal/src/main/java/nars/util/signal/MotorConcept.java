@@ -2,6 +2,7 @@ package nars.util.signal;
 
 import com.gs.collections.api.block.function.primitive.FloatFunction;
 import com.gs.collections.api.block.function.primitive.FloatToFloatFunction;
+import nars.Global;
 import nars.NAR;
 import nars.Narsese;
 import nars.Op;
@@ -31,6 +32,7 @@ public class MotorConcept extends OperationConcept implements Consumer<NAR>, Flo
     /** motor actuation directly controlled by desire value d*/
     public static final FloatToFloatFunction absolute = m -> Float.NaN;
 
+
     @NotNull
     private final Sensor feedback;
     private final Logger logger;
@@ -49,15 +51,14 @@ public class MotorConcept extends OperationConcept implements Consumer<NAR>, Flo
         this.logger = LoggerFactory.getLogger(getClass() + ":" + term);
 
 
-//        FloatToFloatFunction feedbackFuntion = (f) -> {
-//            if (f == 0) return 0f;
-//            return 0.5f + (f / 2f);
-//        };
-        feedback = new Sensor(n, this, this) {
+
+        FloatToFloatFunction motivationToFeedback = (f) -> {
+            return 0.5f + (f/2f);
+        };
+        feedback = new Sensor(n, this, this, motivationToFeedback) {
             @Override
             protected int dt() {
-                return 0; //now
-                //return nar.duration(); //future tense
+                return 0; //0=now/immediate, +=future tense
             }
 
             @NotNull
@@ -79,13 +80,18 @@ public class MotorConcept extends OperationConcept implements Consumer<NAR>, Flo
                 return MotorConcept.this; //allow access to this concept directly
             }
         };
+        //this value is chosen so that the expectation of feedback will
+        //  equal the expectation of activation, by default. this creates a balanced self-cancelling feedback
+        //  loop when a motor function returns a feedback equal to the activation it received
+        //ex: activation
+        feedback.conf(0.75f);
+        //feedback.maxTimeBetweenUpdates(1);
 
         setMotor(motor);
 
-
         n.onFrame(this);
 
-        nextFeedback = 0.5f; //initialize belief
+        nextFeedback = 0f; //initialize belief
         feedback.accept(n);
     }
 
@@ -154,17 +160,22 @@ public class MotorConcept extends OperationConcept implements Consumer<NAR>, Flo
 
         FloatToFloatFunction m = getMotor();
         if (m != null) {
-            float activation = motivation(nar);
+            float activation =
+                    //motivation(nar);
+                    expectation(nar);
+
             if (activation > 0) {
+                float response = motor.valueOf(Util.clamp(activation));
 
-                if (activation > 1f) activation = 1f;
-
-                float response = motor.valueOf(activation);
                 if (Float.isFinite(response)) {
-                    nextFeedback = Util.clamp(response);
+                    nextFeedback = response;
                     feedback.accept(nar);
                 }
+            } else {
+                //response = -1f;
             }
+
+
 
         } else {
             logger.info("null motor function");

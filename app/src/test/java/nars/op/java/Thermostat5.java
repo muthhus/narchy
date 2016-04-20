@@ -6,6 +6,7 @@ import nars.Global;
 import nars.NAR;
 import nars.Narsese;
 import nars.concept.OperationConcept;
+import nars.concept.table.BeliefTable;
 import nars.nal.Tense;
 import nars.nar.Default;
 import nars.task.Task;
@@ -31,22 +32,24 @@ import static nars.util.Texts.n2;
  */
 public class Thermostat5 {
 
-    public static final float basePeriod = 15;
+    public static final float basePeriod = 500;
     public static final float tolerance = 0.05f;
     public static float targetPeriod = 16;
-    public static final float speed = 0.05f;
+    public static final float speed = 0.1f;
     static boolean print = true;
     static boolean printMotors = false;
     static boolean debugError = false;
+    static int sensorPeriod = 16; //frames per max sensor silence
+    static int commandPeriod = 128;
 
     public static void main(String[] args) {
         Default d = new Default(1024, 8, 2, 3);
-        d.cyclesPerFrame.set(16);
-        d.activationRate.setValue(0.05f);
+        d.cyclesPerFrame.set(8);
+        d.activationRate.setValue(0.1f);
         d.shortTermMemoryHistory.set(2);
         //d.premiser.confMin.setValue(0.02f);
 
-        float score = eval(d, 5000);
+        float score = eval(d, 100000);
         System.out.println("score=" + score);
     }
 
@@ -118,24 +121,27 @@ public class Thermostat5 {
                 .resolution(0.01f).pri(0.2f)
         );*/
 
+        //FloatToFloatFunction invert = (i) -> 1f-i;
+
+
 
         above = new SensorConcept("(above)", n, () -> {
             float diff = yHidden.floatValue() - yEst.floatValue();
-            if (diff < 0) return 0;
-            else return Util.clamp( diff )/2f + 0.5f;
-        }).resolution(0.01f);
+            if (diff < tolerance) return 0;
+            else return (Util.clamp( diff )/2f + 0.5f);
+        }).resolution(0.01f).timing(-1, sensorPeriod);
 
         below = new SensorConcept("(below)", n, () -> {
             float diff = yHidden.floatValue() - yEst.floatValue();
-            if (diff > 0) return 0;
-            else return Util.clamp( -diff )/2f + 0.5f;
-        }).resolution(0.01f);
+            if (-diff < tolerance) return 0;
+            else return (Util.clamp( -diff )/2f + 0.5f);
+        }).resolution(0.01f).timing(-1, sensorPeriod);
 
         OperationConcept up = new Motor1D(n, true, yEst);
         OperationConcept down = new Motor1D(n, false, yEst);
 
 //        DebugMotorConcept up, down;
-//        n.on(up = new DebugMotorConcept(n, "t(up)", yEst, yHidden,
+//        n.on(up = new DebugMotorConcept(n, "up()", yEst, yHidden,
 //                (v) -> {
 //                    if (v > 0) {
 //                        yEst.setValue(Util.clamp(+speed * v + yEst.floatValue()));
@@ -150,7 +156,7 @@ public class Thermostat5 {
 //                    return yHidden.floatValue() - yEst.floatValue() > errorThresh;
 //                }
 //        ));
-//        n.on(down = new DebugMotorConcept(n, "t(down)", yEst, yHidden,
+//        n.on(down = new DebugMotorConcept(n, "down()", yEst, yHidden,
 //                (v) -> {
 //                    if (v > 0) {
 //                        yEst.setValue(Util.clamp(-speed * v + yEst.floatValue()));
@@ -177,7 +183,12 @@ public class Thermostat5 {
             float actual;
             if (tt > 0) {
 
-                double y = 0.5f + 0.45f * Math.sin(tt / (targetPeriod * basePeriod));
+                //double y = 0.5f + 0.45f * Math.sin(tt / (targetPeriod * basePeriod));
+
+                //float nnn = 3; //steps
+                //double y = 0.5f + 0.5f * Math.round(nnn * Math.sin(tt / (targetPeriod * basePeriod)))/nnn;
+
+                double y = 0.5f + 0.5f * Math.sin(tt / (targetPeriod * basePeriod));
                 //y = y > 0.5f ? 0.95f : 0.05f;
 
                 //x0.setValue(y); //high frequency phase
@@ -228,9 +239,11 @@ public class Thermostat5 {
 
         //n.logSummaryGT(System.out, 0.0f);
 
-        float str = 0.25f;
+        float str = 0.6f;
 
         //n.log();
+        mission(n);
+
 
         int trainingRounds = 3;
         for (int i = 0; i < trainingRounds; i++) {
@@ -241,69 +254,103 @@ public class Thermostat5 {
             //move.beliefs().clear();
             //move.goals().clear();
             do {
-                n.goal($.$("t(up)"), Tense.Present, 1f, str);
+                n.goal($.$("up()"), Tense.Present, 1f, str);
+                //n.goal($.$("down()"), Tense.Present, 0f, str);
                 n.step();
                 //System.out.println(diffness.get());
-            } while (below.get() < 0.1f);
+            } while (below.get() < 0.25f);
 
             System.out.println("training down");
             yEst.setValue(0.5f + dd);
-            //n.goal($.$("t(up)"), Tense.Present, 0f, str);
+            //n.goal($.$("up()"), Tense.Present, 0f, str);
             //move.beliefs().clear();
             //move.goals().clear();
             do {
-                n.goal($.$("t(down)"), Tense.Present, 1f, str);
+                //n.goal($.$("up()"), Tense.Present, 0f, str);
+                n.goal($.$("down()"), Tense.Present, 1f, str);
                 n.step();
                 //System.out.println(diffness.get());
-            } while (above.get() < 0.1f);
+            } while (above.get() < 0.25f);
         }
 
         System.out.println("training finished");
 
-        System.out.println("beliefs formed during training:");
-        printBeliefs(n);
+        /*System.out.println("beliefs formed during training:");
+        printBeliefs(n, true);
+        printBeliefs(n, false);*/
 
 
 
 
         //move.beliefs().clear();
         //move.goals().clear();
-        //n.goal($.$("t(up)"), 0.5f, str);
-        //n.goal($.$("t(up)"), 0f, str);
-        //n.goal($.$("t(up)"), Tense.Present, 0, str);
-//        n.input("t(up)@");
+        //n.goal($.$("up()"), 0.5f, str);
+        //n.goal($.$("up()"), 0f, str);
+        //n.goal($.$("up()"), Tense.Present, 0, str);
+
 
 
         yEst.setValue(0.5f);
+        //n.run(16); //pause before beginning
+
 
         command(n);
 
         for (int i = 0; i < cycles; i++) {
             n.step();
-            t.add(1);
 
-//            if (i % commandPeriod == 0)
-//                command(n);
+            t.add(1); //cause delays in the sine wave
+
+
+            if (i % commandPeriod == 0) {
+                mission(n);
+                command(n);
+            }
         }
 
-        printBeliefs(n);
+        printBeliefs(n, true);
+        printBeliefs(n, false);
 
         return loss.floatValue() / t.intValue();
 
     }
 
-    public static void command(NAR n) {
+    public static void mission(NAR n) {
         n.goal($.$("(above)"), Tense.Present, 0f, 0.99f); //not above nor below
         n.goal($.$("(below)"), Tense.Present, 0f, 0.99f); //not above nor below
-        n.goal($.$("t(up)"), Tense.Present, 1f, 0.6f);
-        n.goal($.$("t(down)"), Tense.Present, 1f, 0.6f);
+
+        n.goal($.$("((above) || (below))"), Tense.Present, 0f, 0.99f); //not above nor below
+
     }
 
-    public static void printBeliefs(NAR n) {
+    public static void command(NAR n) {
+
+        //n.goal($.$("up()"), Tense.Present, 1f, 0.35f);
+        //n.goal($.$("down()"), Tense.Present, 1f, 0.35f);
+
+        //n.goal($.$("up()"), Tense.Present, 0f, 0.25f);
+        //n.goal($.$("down()"), Tense.Present, 0f, 0.25f);
+
+//        n.input("<(above) ==> (()-->^up)>?"); //TODO parse these with up()/down() Exception in thread "$" com.github.fge.grappa.exceptions.GrappaException: exception thrown when parsing action 'Input/zeroOrMore/sequence/firstOf/Task/Term/firstOf/seq/ColonReverseInheritance/Term/firstOf/seq/firstOf/MultiArgTerm/sequence/Term/firstOf/seq/firstOf/sequence/Term_Action5' at input position Position{line=1, column=18}
+//        n.input("<(above) ==> (()-->^down)>?");
+//        n.input("<(below) ==> (()-->^up)>?");
+//        n.input("<(below) ==> (()-->^down)>?");
+
+        //CHEATS:
+        n.input("<(above) ==> up()>. :|:"); //TODO parse these with up()/down() Exception in thread "$" com.github.fge.grappa.exceptions.GrappaException: exception thrown when parsing action 'Input/zeroOrMore/sequence/firstOf/Task/Term/firstOf/seq/ColonReverseInheritance/Term/firstOf/seq/firstOf/MultiArgTerm/sequence/Term/firstOf/seq/firstOf/sequence/Term_Action5' at input position Position{line=1, column=18}
+        n.input("<(below) ==> down()>. :|:");
+        n.input("<(above) ==> (--,(()-->^down))>. :|:");
+        n.input("<(below) ==> (--,(()-->^up))>. :|:");
+        //n.input("up()@");
+        //n.input("down()@");
+    }
+
+    public static void printBeliefs(NAR n, boolean beliefsOrGoals) {
         TreeSet<Task> bt = new TreeSet<>((a, b) -> { return a.term().toString().compareTo(b.term().toString()); });
         n.forEachConcept(c -> {
-            if (c.hasBeliefs()) {
-                bt.add(c.beliefs().top(n.time()));
+            BeliefTable table = beliefsOrGoals ? c.beliefs() : c.goals();
+            if (!table.isEmpty()) {
+                bt.add(table.top(n.time()));
                 //System.out.println("\t" + c.beliefs().top(n.time()));
             }
         });
@@ -361,7 +408,7 @@ public class Thermostat5 {
         private final MutableFloat yEst;
 
         public Motor1D(NAR n, boolean up, MutableFloat yEst) throws Narsese.NarseseException {
-            super("t(" + (up ? "up" : "down") + ")", n, null);
+            super((up ? "up" : "down") + "()", n, null);
             this.up = up;
             this.yEst = yEst;
 
@@ -383,9 +430,15 @@ public class Thermostat5 {
 //                    }
 //                }
 
-            yEst.setValue(Util.clamp(speed * (up ? 1 : -1) * power + yEst.floatValue()));
+            float current = Util.clamp(yEst.floatValue());
+            float delta = speed * (up ? 1 : -1) * power;
+            float next = Util.clamp(delta + current);
+            yEst.setValue(next);
 
-            return power;
+            //float effect =  Math.abs(current-next) / Math.abs(delta);
+            float waste = Math.abs(delta) - Math.abs(current-next);
+
+            return power + (waste/speed); //increase the feedback if waste to increase the belief to decrease future effective motivation
         }
 
 //        @Nullable

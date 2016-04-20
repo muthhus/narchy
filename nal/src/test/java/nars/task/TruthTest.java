@@ -93,4 +93,11 @@ public class TruthTest {
         Truth b = new DefaultTruth(0.5f, 0.01f);
         assertEquals(new DefaultTruth(0.94f, 0.28f), a.interpolate(b));
     }
+
+    @Test
+    public void testExpectation() {
+        assertEquals(0.75f, new DefaultTruth(1f, 0.5f).expectation(), 0.01f);
+        assertEquals(0.95f, new DefaultTruth(1f, 0.9f).expectation(), 0.01f);
+        assertEquals(0.05f, new DefaultTruth(0f, 0.9f).expectation(), 0.01f);
+    }
 }
