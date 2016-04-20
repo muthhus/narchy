@@ -5,9 +5,11 @@ import nars.NAR;
 import nars.bag.BLink;
 import nars.bag.Bag;
 import nars.budget.Forget;
+import nars.concept.table.BeliefTable;
 import nars.data.Range;
 import nars.nal.meta.PremiseEval;
 import nars.task.Task;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Terms;
@@ -17,6 +19,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.function.Consumer;
+
+import static nars.nal.Tense.ETERNAL;
 
 /**
  * TODO abstraction for dynamic link iterator / generator allowing a concept to
@@ -178,7 +182,7 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
 
             //    abstract protected void premise(BLink<? extends Concept> concept, BLink<? extends Task> taskLink, BLink<? extends Termed> termLink, Task belief);
 
-            matcher.run(newPremise(concept, taskLink, termLink, match(beliefConcept, occ)));
+            matcher.run(newPremise(concept, taskLink, termLink, match(task, beliefConcept, occ)));
 
         }
     }
@@ -190,11 +194,17 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
 
     /** resolves the most relevant belief of a given term/concept */
     @Nullable
-    public static Task match(@NotNull Concept beliefConcept, long taskOcc) {
+    public Task match(Task task, @NotNull Concept beliefConcept, long taskOcc) {
 
-        if (beliefConcept.hasBeliefs()) {
+        //atomic concepts will have no beliefs to match
+        if (!(beliefConcept instanceof Compound))
+            return null;
 
-            Task belief = beliefConcept.beliefs().top(
+        @Nullable BeliefTable table = task.isQuest() ? beliefConcept.goals() : beliefConcept.beliefs();
+
+        if (!table.isEmpty()) {
+
+            Task belief = table.top(
                     //nar.time()
                     taskOcc
             );
@@ -202,7 +212,12 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
             assert(belief != null && !belief.isDeleted());
             //  if (belief == null || belief.isDeleted())  throw new RuntimeException("Deleted belief: " + belief + " " + beliefConcept.hasBeliefs());
 
-            return belief;
+            if (task.isQuestOrQuestion() && taskOcc!=ETERNAL) {
+                //project the belief to the question's time
+                return belief.answerMatchedBelief(task /*question*/, nar, Global.TRUTH_EPSILON );
+            } else {
+                return belief;
+            }
         }
 
         return null;

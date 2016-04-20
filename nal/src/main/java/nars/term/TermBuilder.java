@@ -320,6 +320,8 @@ public abstract class TermBuilder {
             if (t == 0) {
                 //special case: 0
                 Compound x = (Compound) junctionFlat(op, 0, u);
+                if (x == null)
+                    return null;
                 if (x.size() == 1) {
                     return x.term(0);
                 }
@@ -435,10 +437,13 @@ public abstract class TermBuilder {
                     return impl2Conj(dt, subject, predicate, oldCondition);
                 }
 
-                if ((subject.op() == CONJUNCTION) && (predicate.op() == CONJUNCTION)) {
-                    //filter (factor out) any common subterms
+                //filter (factor out) any common subterms iff equal 'dt'
+                if ((subject.op() == CONJUNCTION) && (predicate.op() == CONJUNCTION) &&
+                    ((Compound)subject).dt() == ((Compound)predicate).dt()) {
+
                     TermContainer subjs = ((Compound) subject).subterms();
                     TermContainer preds = ((Compound) predicate).subterms();
+
                     MutableSet<Term> common = TermContainer.intersect(subjs, preds);
                     if (!common.isEmpty()) {
                         subject = theTransformed((Compound)subject, TermContainer.except(subjs, common));

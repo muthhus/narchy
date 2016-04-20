@@ -33,6 +33,7 @@ import java.util.function.Function;
 import static java.util.stream.Collectors.toList;
 import static nars.Op.*;
 import static nars.nal.Tense.DTERNAL;
+import static nars.term.Terms.terms;
 
 /**
  * core utility class for:
@@ -47,7 +48,7 @@ public enum $ /* TODO: implements TermIndex */ {
     public static final Function<Object, Term> ToStringToTerm = (x) -> $.the(x.toString());
 
     public static <T extends Term> T $(@NotNull String term) {
-        Termed normalized = Narsese.the().term(term, Terms.terms, true);
+        Termed normalized = Narsese.the().term(term, terms, true);
         if (normalized!=null)
             return (T)(normalized.term());
         return null;
@@ -236,15 +237,15 @@ public enum $ /* TODO: implements TermIndex */ {
      */
     @Nullable
     public static Term inst(@NotNull Term subj, Term pred) {
-        return Terms.terms.builder().inst(subj, pred);
+        return terms.builder().inst(subj, pred);
     }
     @Nullable
     public static Term instprop(@NotNull Term subject, @NotNull Term predicate) {
-        return Terms.terms.builder().instprop(subject, predicate);
+        return terms.builder().instprop(subject, predicate);
     }
     @Nullable
     public static Term prop(Term subject, Term predicate) {
-        return Terms.terms.prop(subject, predicate);
+        return terms.prop(subject, predicate);
     }
 
 //    public static Term term(final Op op, final Term... args) {
@@ -330,18 +331,18 @@ public enum $ /* TODO: implements TermIndex */ {
         return (Compound) the(SET_INT, t);
     }
 
-    /**
-     * Try to make a new compound from two components. Called by the logic rules.
-     * <p>
-     *  A --] B becomes A --> [B]
-     * @param subject The first component
-     * @param predicate The second component
-     * @return A compound generated or null
-     */
-    @Nullable
-    public static Term property(Term subject, Term predicate) {
-        return inh(subject, $.seti(predicate));
-    }
+//    /**
+//     * Try to make a new compound from two components. Called by the logic rules.
+//     * <p>
+//     *  A --] B becomes A --> [B]
+//     * @param subject The first component
+//     * @param predicate The second component
+//     * @return A compound generated or null
+//     */
+//    @Nullable
+//    public static Term property(Term subject, Term predicate) {
+//        return inh(subject, $.seti(predicate));
+//    }
 
     /** unnormalized variable */
     public static @NotNull Variable v(char ch, @NotNull String name) {
@@ -542,7 +543,7 @@ public enum $ /* TODO: implements TermIndex */ {
 
     @Nullable
     public static Term the(@NotNull Op op, int relation, int t, @NotNull TermContainer subterms) {
-        return Terms.terms.the(op, relation, t, subterms);
+        return terms.the(op, relation, t, subterms);
     }
 
 

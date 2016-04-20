@@ -283,12 +283,12 @@ public interface Temporalize {
 
             }
 
-            long rOcc = ETERNAL;
+            //long rOcc = ETERNAL;
 
-            if (dOcc == ETERNAL) {
-                rOcc = oOcc;
+            /*if (dOcc == ETERNAL) {
+                //rOcc = oOcc;
             }
-            else if (oOcc == ETERNAL) {
+            else*/ if (dOcc!=ETERNAL && oOcc == ETERNAL) {
 
 
                 if ((shift < 0) && (ddt > 0) && (matchedDerived < matchedOther)) {
@@ -297,12 +297,19 @@ public interface Temporalize {
                     shift *= -1;
                 }
 
-                rOcc = dOcc;
-            }
+                oOcc = dOcc;
+            } /*else if (dOcc!=ETERNAL && oOcc!=ETERNAL && dOcc!=oOcc) {
+                //both specify a possible occurrence time to use; base occurrence time according to the most confident
+                //float dConf = decomposeTask ? prem.task().conf() : (premBelief !=null ? premBelief.conf() : 0);
+                //if (dConf > other.conf())
+                    oOcc = (oOcc + dOcc)/2; //TODO interpolate?
+            }*/
 
-            if (rOcc!=ETERNAL) {
 
-                occReturn[0] = rOcc + shift;
+
+            if (oOcc!=ETERNAL) {
+                occReturn[0] = oOcc + shift;
+
             }
         }
 

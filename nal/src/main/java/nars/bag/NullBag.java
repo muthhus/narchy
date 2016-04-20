@@ -105,6 +105,11 @@ public final class NullBag<V> implements Bag<V> {
 
     }
 
+    @Override
+    public boolean isFull() {
+        return false;
+    }
+
 
     @Override
     public void setCapacity(int c) {

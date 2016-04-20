@@ -189,11 +189,12 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     @Nullable
     default Task answerProjected(@NotNull Compound newTerm, @NotNull Task question, @NotNull Memory memory) {
 
-        long now = memory.time();
 
         float termRelevance = Terms.termRelevance(newTerm, question.term());
         if (termRelevance == 0)
             return null;
+
+        long now = memory.time();
 
         //TODO avoid creating new Truth instances
         Truth solTruth = projectTruth(question.occurrence(), now, true);
@@ -227,7 +228,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
                     .budget(solutionBudget)
                     //.state(state())
                     //.setEvidence(evidence())
-                    .log("Projected Solution")
+                    .log("Projected Answer")
                     //.log("Projected from " + this)
                     ;
 
@@ -242,6 +243,54 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
 
         return solution;
     }
+
+    /** projects a belief task to match a question */
+    @Nullable default Task answerMatchedBelief(@NotNull Task question, @NotNull Memory memory, float minConf) {
+
+        assert(!question.isEternal());
+        if (question.occurrence() == occurrence())
+            return this; //exact time already
+
+        long now = memory.time();
+
+
+        @NotNull Compound theTerm = term();
+
+
+        //TODO avoid creating new Truth instances
+        Truth solTruth = projectTruth(question.occurrence(), now, false);
+        /*if (solTruth == null)
+            return null;*/
+
+        if (solTruth.conf() < minConf)
+            return null;
+
+        //if truth instanceof ProjectedTruth, use its attached occ time (possibly eternal or temporal), otherwise assume it is this task's occurence time
+        long solutionOcc = solTruth instanceof ProjectedTruth ?
+                ((ProjectedTruth)solTruth).when : occurrence();
+
+
+
+        Budget solutionBudget = solutionBudget(question, this, solTruth, memory);
+        /*if (solutionBudget == null)
+            return null;*/
+
+        Task solution;
+        //if ((!truth().equals(solTruth)) || (!newTerm.equals(term())) || (solutionOcc!= occCurrent)) {
+        solution = new MutableTask(theTerm, punc())
+                .truth(solTruth)
+                .time(now, solutionOcc)
+                .parent(this)
+                .budget(solutionBudget)
+                //.state(state())
+                //.setEvidence(evidence())
+                .log("Projected Belief")
+                //.log("Projected from " + this)
+        ;
+
+        return solution;
+    }
+
 
     char punc();
 
@@ -773,7 +822,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
             long nextOcc = targetTime;
 
             float projConf = nextConf =
-                    conf * truthProjection( targetTime, occ, now );
+                    conf * truthProjection(  occ, targetTime, now );
 
             if (eternalizeIfWeaklyTemporal) {
                 float eternConf = eternalize(conf);

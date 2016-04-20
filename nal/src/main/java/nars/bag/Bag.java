@@ -161,6 +161,11 @@ public interface Bag<V> extends Table<V, BLink<V>>, Consumer<V>, Supplier<BLink<
 
     int capacity();
 
+    @Override
+    default boolean isFull() {
+        return size() >= capacity();
+    }
+
     /**
      * Choose an Item according to distribution policy and take it out of the Bag
      * TODO rename removeNext()

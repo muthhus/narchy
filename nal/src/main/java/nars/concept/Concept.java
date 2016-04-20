@@ -311,22 +311,31 @@ public interface Concept extends Termed, Comparable {
     default void crossLink(@NotNull Task thisTask, @NotNull Task otherTask, float scale, @NotNull NAR nar) {
         assert(!otherTask.term().equals(term()));
 
-        link(otherTask, scale/2f, nar, null);
+        float halfScale = scale / 2f;
 
-        Concept other = nar.concept(otherTask);
-                        //nar.conceptualize(otherTask, thisTask.budget(), scale);
+        link(otherTask, halfScale, nar, null);
+
+        Concept other = //nar.concept(otherTask);
+                        nar.conceptualize(otherTask, thisTask.budget(), scale, null);
         if (other != null)
-            other.link(thisTask, scale/2f, nar, null);
+            other.link(thisTask, halfScale, nar, null);
 
+    }
+
+    default Truth belief(long when, long now) {
+        return hasBeliefs() ? beliefs().truth(when, now) : Truth.Zero;
+    }
+
+    default Truth desire(long when, long now) {
+        return hasGoals() ? goals().truth(when, now) : Truth.Zero;
     }
 
     default Truth belief(long now) {
-        return hasBeliefs() ? beliefs().truth(now) : Truth.Zero;
-
+        return belief(now, now);
     }
 
     default Truth desire(long now) {
-        return hasGoals() ? goals().truth(now) : Truth.Zero;
+        return desire(now, now);
     }
 
 

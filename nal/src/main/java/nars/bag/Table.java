@@ -22,7 +22,6 @@ public interface Table<K,V> extends Iterable<V> {
     @Nullable
     V put(@NotNull K k, @NotNull V v);
 
-
     int size();
 
     default boolean isEmpty() {
@@ -57,4 +56,5 @@ public interface Table<K,V> extends Iterable<V> {
         return Joiner.on(",").join(this);
     }
 
+    boolean isFull();
 }

@@ -52,7 +52,7 @@ public class MutableTask extends AbstractTask {
 
     @NotNull
     public static /* TODO ProjectedTask */ Task project(@NotNull Task t, long now, long occ) {
-        Truth newTruth = t.projectTruth(occ, now, false);
+        Truth newTruth = t.projectTruth(now, occ, false);
         if (t.truth().equals(newTruth) && t.occurrence()==occ)
             return t;
         return new MutableTask(t, newTruth, now, occ);
@@ -67,13 +67,17 @@ public class MutableTask extends AbstractTask {
         parent(taskToClone);
     }
 
-    /** used by QuestionTable */
     public MutableTask(@NotNull Task taskToClone, @NotNull Task otherTask, long now, long occ, long[] newEvidence, @NotNull BudgetMerge budgetMerge) {
+        this(taskToClone, otherTask, now, occ, newEvidence, taskToClone.truth(), budgetMerge);
+    }
+
+    /** used by QuestionTable */
+    public MutableTask(@NotNull Task taskToClone, @NotNull Task otherTask, long now, long occ, long[] newEvidence, Truth newTruth, @NotNull BudgetMerge budgetMerge) {
         this(taskToClone);
         punctuation(taskToClone.punc());
         this.parentBelief = Global.reference(otherTask);
         setEvidence(newEvidence);
-        truth(taskToClone.truth());
+        truth(newTruth);
         time(now, occ);
 
         budget(taskToClone.budget());

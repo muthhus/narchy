@@ -188,12 +188,12 @@ public class Twenglish {
             else {
                 String pos = POS.get(c.content.toLowerCase());
                 if (pos != null) {
-                    return $.property(lexToTerm(c.content), tagToTerm(pos));
+                    return $.prop(lexToTerm(c.content), tagToTerm(pos));
                 }
             }
         }
             
-        return $.property( lexToTerm(c.content), tagToTerm(c.pattern) );
+        return $.prop( lexToTerm(c.content), tagToTerm(c.pattern) );
     }
     
     public static Term lexToTerm(String c) {

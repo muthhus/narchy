@@ -104,4 +104,9 @@ public interface ListTable<V, L> extends Table<V, L> {
     int capacity();
 
     void setCapacity(int i);
+
+    default boolean isFull() {
+        return size() == capacity();
+    }
+
 }

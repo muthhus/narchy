@@ -123,6 +123,45 @@ public class BeliefTableTest  {
     }
 
     @Test
+    public void testTemporalRevection() {
+
+        Global.DEBUG = true;
+
+        int maxBeliefs = 6; //includes 3 eternal beliefs we arent using:
+        NAR n = newNAR(maxBeliefs);
+
+
+        BeliefAnalysis b = new BeliefAnalysis(n, "<a-->b>");
+
+        //assertEquals(0.0, (Double) b.energy().get(MemoryBudget.Budgeted.ActiveConceptPrioritySum), 0.001);
+
+
+        b.believe(0.5f, 0.0f, 0.85f, 5);
+        n.step();
+        b.believe(0.5f, 0.95f, 0.85f, 10);
+        n.step();
+        b.believe(0.5f, 1.0f, 0.85f, 11); //this and the previous one should get combined when inserting the 4th
+        n.step();
+
+        b.print();
+        assertEquals(3, b.size());
+        assertEquals(5, b.wave().start());
+        assertEquals(11, b.wave().end());
+
+        b.believe(0.5f, 1.0f, 0.99f, 15); //this should cause the cycle=10 and cycle=11 beliefs to get revected into one and allow this belief to be inserted
+        //the cycle=5 belief should remain since it is more unique
+
+        n.step().step().step();
+        b.print();
+        assertEquals(3, b.size());
+
+        assertEquals(5, b.wave().start());
+        assertEquals(15, b.wave().end());
+
+    }
+
+
+    @Test
     public void testEternalBeliefRanking() {
 
         Global.DEBUG = true;

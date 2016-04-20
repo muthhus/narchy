@@ -99,8 +99,8 @@ public final class STMTemporalLinkage implements Consumer<Task> {
                     continue;
 
                 float strength =
-                        //1f;
-                        t.conf() * previousTask.conf(); //scale strength of the tasklink by the confidence intersection
+                        1f;
+                        //t.conf() * previousTask.conf(); //scale strength of the tasklink by the confidence intersection
 
                 if (strength > 0)
                     concept.crossLink(t, previousTask, strength, nar);

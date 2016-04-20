@@ -95,7 +95,7 @@ abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements List
      * TODO make this work for the original condition: (size() >= capacity)
      * all comparisons like this should use this same condition
      */
-    final boolean isFull() {
+    @Override public final boolean isFull() {
         return (size() >= capacity());
     }
 

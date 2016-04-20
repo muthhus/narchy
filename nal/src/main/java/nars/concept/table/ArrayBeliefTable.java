@@ -8,6 +8,7 @@ import nars.NAR;
 import nars.bag.impl.ArrayTable;
 import nars.bag.impl.ListTable;
 import nars.budget.BudgetMerge;
+import nars.task.Revection;
 import nars.task.Revision;
 import nars.task.Task;
 import nars.truth.DefaultTruth;
@@ -31,8 +32,8 @@ import java.util.function.Consumer;
 public class ArrayBeliefTable implements BeliefTable {
 
     public static final String DUPLICATE_BELIEF_GOAL = "Duplicate Belief/Goal";
-    @NotNull final ListTable<Task,Task> eternal;
-    @NotNull final ListTable<Task,Task> temporal;
+    @NotNull public final ListTable<Task,Task> eternal;
+    @NotNull public final ListTable<Task,Task> temporal;
     @NotNull final Map<Task,Task> map;
 
     public static final BudgetMerge DuplicateMerge = BudgetMerge.plusDQBlend;
@@ -98,6 +99,8 @@ public class ArrayBeliefTable implements BeliefTable {
         } else {
             Truth tt = t.truth();
             return (topEternal() != null) ? tt.interpolate(topEternal.truth()) : tt;
+
+            //return t.truth();
         }
     }
 
@@ -256,7 +259,6 @@ public class ArrayBeliefTable implements BeliefTable {
     @Override
     public final Task topTemporal(long when, long now) {
         Task best = null;
-        float bestRank = -1;
         List<? extends Task> l = temporal.list();
 
         //find the best balance of temporal proximity and confidence
@@ -264,9 +266,12 @@ public class ArrayBeliefTable implements BeliefTable {
         if (ls == 1)
             return l.get(0); //the only task
 
+        float ageFactor = 1f/(1 + Math.abs(when - now) * 1f);
+        float bestRank = -1;
+
         for (int i = 0; i < ls; i++) {
             Task x = l.get(i);
-            float r = BeliefTable.rankTemporalByConfidence(x, when, 1);
+            float r = BeliefTable.rankTemporalByConfidence(x, when, ageFactor, bestRank);
             if (r > bestRank) {
                 best = x;
                 bestRank = r;
@@ -288,8 +293,16 @@ public class ArrayBeliefTable implements BeliefTable {
         if (filterDuplicate(input, nar))
             return null;
 
+        if (input.isEternal())
+            return addEternal(input, nar);
+        else
+            return addTemporal(input, nar);
+    }
+
+    private Task addEternal(@NotNull Task input, @NotNull NAR nar) {
+
         //Try forming a revision and if successful, inputs to NAR for subsequent cycle
-        Task revised = Revision.tryRevision(input, nar, tableFor(input).list());
+        Task revised = Revision.tryRevision(input, nar, eternal.list());
         if (revised!=null)  {
             if(Global.DEBUG) {
                 if (revised.isDeleted())
@@ -311,6 +324,24 @@ public class ArrayBeliefTable implements BeliefTable {
         //Finally try inserting this task.  If successful, it will be returned for link activation etc
         return tryInsert(input, nar) ? input : null;
     }
+
+    private Task addTemporal(@NotNull Task input, @NotNull NAR nar) {
+
+        if (temporal.isFull()) {
+            //Try forming a revision and if successful, inputs to NAR for subsequent cycle
+            if (!Revection.revect(input, this, nar, 1 /* TODO window parameter */)) {
+                return null; //rejected
+            }
+
+        }
+
+        //inserting this task.  should be successful
+        boolean ii = tryInsert(input, nar);
+        assert(ii);
+        return input;
+
+    }
+
 
     /** if a duplicate exists, it will merge the incoming task and return true.
      * otherwise false */
@@ -421,7 +452,7 @@ public class ArrayBeliefTable implements BeliefTable {
         return t.isEternal() ? this.eternal : this.temporal;
     }
 
-    private static void onBeliefRemoved(@NotNull Task t, @Nullable String reason, @NotNull Memory memory) {
+    public static void onBeliefRemoved(@NotNull Task t, @Nullable String reason, @NotNull Memory memory) {
         memory.remove(t, reason);
     }
 

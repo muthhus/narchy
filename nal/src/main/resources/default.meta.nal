@@ -42,6 +42,11 @@
 // --(A <-> B), A |-   (A <-> B), (Belief:Negation, Desire:Negation, Derive:AllowBackward)
 
 
+//Product negation TODO use var arg:
+    (A), A, task(negative) |- --(A), (Belief:Negation, Desire:Negation, Derive:AllowBackward)
+
+
+
 //Set Definition Similarity to Inheritance
 
     ({S} <-> {P}), {S} |- ({S} --> {P}), (Belief:Identity, Desire:Identity, Derive:AllowBackward)

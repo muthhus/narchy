@@ -12,7 +12,7 @@ import org.junit.Test;
 /**
  * N independent events
  */
-public class TemporalStabilityIndependentEvents {
+public class TemporalStabilityTests {
 
     static class T1 extends TemporalStabilityTest {
 

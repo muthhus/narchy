@@ -1,12 +1,18 @@
 package nars.op.java;
 
 import nars.$;
+import nars.Global;
 import nars.NAR;
+import nars.Op;
 import nars.concept.Concept;
 import nars.nal.Tense;
 import nars.nar.Default;
+import nars.term.Compound;
+import nars.term.Term;
 import nars.term.Termed;
+import nars.truth.TruthWave;
 import nars.util.Texts;
+import org.jetbrains.annotations.NotNull;
 
 import static java.lang.System.out;
 
@@ -15,10 +21,13 @@ import static java.lang.System.out;
  */
 public class SineFollow {
 
-    public float freq = 0.1f;
-    public int resolution = 6; //pixels seen
+    public float freq = 0.05f;
+    public int resolution = 5; //pixels seen
+
+    float fadeFactor = 0;
+
     //final Termed[] pixelTerm;
-    int lookahead = 2;
+    int lookahead = (int)Math.round(Math.PI * 2f + (1f / freq) * 0.8f  /* phase */);
 
     private final NAR nar;
 
@@ -28,7 +37,15 @@ public class SineFollow {
     /** which pixel the hidden value activates currently [0..resolution-1] */
     public int hiddenPixel(int dt) {
         float h = hidden(dt);
-        return Math.round(h * (resolution-1));
+        return pixel(h);
+    }
+
+    public int pixel(float v /* 0..1.0 */) {
+        return Math.round(v * (resolution-1));
+    }
+
+    public float unpixel(float v /* 0..1.0 */) {
+        return v / (resolution-1f);
     }
 
     long time() { return nar.time(); }
@@ -43,6 +60,15 @@ public class SineFollow {
             n.step();
             evaluate();
         }
+
+        //report beliefs
+        for (int i = 0; i < resolution; i++) {
+            Concept c = n.concept( pixel(i, true ) );
+            c.print();
+            TruthWave tw = new TruthWave(c.beliefs(), n);
+            System.out.println(tw);
+
+        }
     }
 
     public Termed term(int i) {
@@ -52,92 +78,126 @@ public class SineFollow {
         int hp = hiddenPixel(0);
 
         long now = time();
-        long future = future();
+
+        if (!inputs(now)) {
+            ///System.out.println("--");
+            return;
+        }
 
         for (int i = 0; i < resolution; i++) {
             //float f = i == hp ? 1 : 0;
 
+
             float c = 0.9f;
 
-            nar.believe(pixel(i, i == hp ? true : false), Tense.Present, 1f, c);
-            nar.believe(pixel(i, i != hp ? true : false), Tense.Present, 0f, c);
+            nar.believe(pixel(i, i == hp), Tense.Present, 1f, c);
+            //nar.believe(pixel(i, i != hp), Tense.Present, 0f, c);
 
-            //nar.ask(p, '?', future);
+
+            nar.ask(pixel(i, true), '?', now + lookahead);
+            //nar.ask(pixel(i, false), '?', time() + lookahead);
         }
     }
 
+    boolean inputs(long time) {
+        if (fadeFactor == 0) return true;
+        else
+            return Math.random() < 1f / (1f + (time / fadeFactor));
+    }
+
     private Termed pixel(int i, boolean on) {
-        return $.p("p" + i, on ? "1" : "0");
+        //return $.p("p" + i, on ? "1" : "0");
+
+        Compound oo = $.p("p" + i);
+        return on ? oo : $.neg(oo);
+
+        /*return
+                $.inh
+                //$.prop
+                    ($.the(i),$.the(on ? "Y" : "N"));*/
     }
 
     void evaluate() {
-        String e = "";
+        //String e = "";
 
-        long now = time();
+        //long now = time();
         long future = future();
-        int hp = hiddenPixel(lookahead);
+        //int hp = hiddenPixel(lookahead);
 
 
-        float best = -1;
-        float bestVal = 0;
+        int best = -1;
+        float bestVal = -1;
 
-        float estimated = 0;
-        float estDen = 0;
+        //float estimated = 0;
+        //float estDen = 0;
 
         for (int i = 0; i < resolution; i++) {
             Concept off = nar.concept(pixel(i, false));
             Concept on = nar.concept(pixel(i, true));
 
             //float eNow = c.belief(now).expectation();
-            float onNext = on!=null && on.hasBeliefs() ? on.belief(future).expectation() : 0;
-            float offNext = off!=null && off.hasBeliefs() ? off.belief(future).expectation() : 0;
-            float delta = (onNext) / (offNext + onNext);
-            //float delta = eNext - eNow;
-            //e += Texts.n2(eNow) + "+-" + Texts.n4(delta) + "\t";
-            e += (hp == i ? "*":"_") +
+            float onNext = on!=null && on.hasBeliefs() ? on.belief(future, future).expectation() : 0;
+
+            float offNext = off!=null && off.hasBeliefs() ? off.belief(future, future).expectation() : 0;
+            //float offNext = 0;
+
+            //float denom = (offNext + onNext);
+            /*if (denom > 0)*/ {
+                float delta = (onNext - offNext);// / denom;
+                //float delta = eNext - eNow;
+                //e += Texts.n2(eNow) + "+-" + Texts.n4(delta) + "\t";
+            /*e += (hp == i ? "*":"_") +
                     //Texts.n1(onNext) + ":" + Texts.n1(offNext) +
                     Texts.n1(delta)
-                    + "\t\t";
+                    + "\t\t";*/
 
-            estimated += delta * i;
-            estDen += delta;
-            if (delta > bestVal) {
-                bestVal = delta;
-                best = i;
+
+                //estimated += delta * i;
+                //estDen += delta;
+
+                if (delta > bestVal) {
+                    bestVal = delta;
+                    best = i;
+                }
+
             }
         }
 
-        if (estDen > 0) {
+        /*if (estDen > 0) {
             estimated /= estDen;
         } else {
             estimated = -1;
-        }
+        }*/
 
 
-        boolean print = true, printData = false;
+        boolean print = true, printData = false , extra = true;
 
         if (printData) {
-            out.println(now + ":\t\t" + e + " " + estimated);
+            //out.println(now + ":\t\t" + e + " " + estimated);
         }
 
         if ( print) {
 
 
-                int cols = 50;
-                int colActual = (int) Math.round(cols * hidden(lookahead));
-                int colEst = (int) Math.round(
-                        //cols * estimated
-                        cols * best / resolution
-                );
-                for (int i = 0; i <= cols; i++) {
+                int cols = 80;
+                int colNow = Math.round(cols * hidden(0));
+                int colFuture = Math.round(cols * hidden(lookahead));
 
+                //int colWeightEst = Math.round(cols * unpixel(estimated) );
+                int colBestEst = Math.round(cols * unpixel(best) );
+
+                for (int i = 0; i <= cols; i++) {
                     char c;
-                    if (i == colActual && colActual == colEst) {
+                    if (i == colFuture && colFuture == colBestEst) {
                         c = '@'; //win
-                    } else if (i == colActual) {
+                    } else if (i == colFuture) {
                         c = '#';
-                    } else if (i == colEst) {
+                    } else if (i == colBestEst) {
                         c = '|';
+                    /*} else if (extra && i == colWeightEst) {
+                        c = ':';
+                    }*/ } else if (extra && i == colNow) {
+                        c = '+';
                     } else {
                         c = '.';
                     }
@@ -157,10 +217,25 @@ public class SineFollow {
     }
 
     public static void main(String[] args) {
-        Default d = new Default();
-        d.cyclesPerFrame.set(128);
-        //d.log();
+        Global.DEBUG = true;
 
-        new SineFollow(d, 128);
+        Default d = new Default();
+        d.core.conceptsFiredPerCycle.set(4);
+        d.cyclesPerFrame.set(16);
+        d.shortTermMemoryHistory.set(4);
+//        d.log();
+//        d.eventTaskProcess.on(tt -> {
+//            if (tt.lastLogged().toString().equals("Immediaternalized"))
+//                return; //skip immediaternalize
+//
+//           if (tt.isEternal() && tt.op()!= Op.IMPLICATION) {
+//               System.err.println(tt.explanation());
+//               System.err.println();
+//           }
+//        });
+
+        new SineFollow(d, 560);
+
+
     }
 }

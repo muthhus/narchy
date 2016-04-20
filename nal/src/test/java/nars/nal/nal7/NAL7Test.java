@@ -11,6 +11,8 @@ import org.junit.runners.Parameterized;
 
 import java.util.function.Supplier;
 
+import static nars.nal.Tense.ETERNAL;
+
 /**
  * Created by me on 1/9/16.
  */
@@ -494,6 +496,59 @@ public class NAL7Test extends AbstractNALTest {
 
     }
 
+    @Test public void testTemporalImplicationDecompositionIsntEternal() {
+
+        /*
+        Test that this eternal derivation does not happen, and that it is temporal with the right occ time
+
+        $.08;.01;.23$ (--,(p3)). :1: %1.0;.40% {1: 5;7} ((%1,(%2==>%3),time(decomposeBelief)),(substituteIfUnifies(%3,"$",%2,%1),((Deduction-->Belief),(Induction-->Desire),(Anticipate-->Event))))
+            $.50;.50;.95$ (p2). 0+0 %1.0;.90% {0+0: 5} Input
+            $.75;.06;.12$ ((p2) ==>+0 (--,(p3))). 1-1 %1.0;.45% {1-1: 5;7} ((%1,%2,time(dtAfterReverse),neq(%1,%2),notImplicationOrEquivalence(%1),notImplicationOrEquivalence(%2)),((%2==>%1),((Abduction-->Belief)))) */
+
+        test()
+                //.log()
+                .inputAt(0, "(a). :|:")
+                .inputAt(0, "((a) ==>+1 (b)). :|:")
+                .mustNotOutput(cycles, "(b)", '.', ETERNAL)
+                .mustBelieve(cycles, "(b)", 1f, 0.81f, 1 /* occ */);
+
+    }
+//    //TODO
+//    @Test public void testTemporalImplicationDecompositionIsntEternalAttenuatedConf() {
+//
+//        /*
+//        since there is a conflict in the occurrence of the implication and the event it relates,
+//        the resulting confidence should be reduced by some amount since another more relevantly ranked
+//        temporal implication could disagree and that should be preferred.
+//         */
+//
+//        test()
+//                //.log()
+//                .inputAt(0, "(a). :|:")
+//                .inputAt(10, "((a) ==>+1 (b)). :|:")
+//                .mustNotOutput(cycles, "(b)", '.', ETERNAL)
+//                .mustBelieve(cycles, "(b)", 1f, 0.81f, 1 /* occ */);
+//
+//    }
+
+    @Test public void testEternalImplicationDecompositionIsntEternal() {
+        test()
+            //.log()
+            .inputAt(0, "(a). :|:")
+            .inputAt(0, "((a) ==>+1 (b)).") //ETERNAL impl
+            .mustNotOutput(cycles, "(b)", '.', ETERNAL)
+            .mustBelieve(cycles, "(b)", 1f, 0.81f, 1 /* occ */);
+    }
+
+    @Test public void testImplicationDecompositionIsntEternalSwap() {
+        //same as the other impl decomp test, except the predicate is matched
+        test()
+                .inputAt(0, "(b). :|:")
+                .inputAt(0, "((a) ==>+1 (b)). :|:")
+                .mustNotOutput(cycles, "(a)", '.', ETERNAL)
+                .mustNotOutput(cycles, "(a)", '.', 0)
+                .mustBelieve(cycles, "(a)", 1f, 0.45f, -1 /* occ */);
+    }
 
     @Test
     public void temporalOrder() {
@@ -502,6 +557,23 @@ public class NAL7Test extends AbstractNALTest {
                 .input("(<m --> M> ==>+5 <p --> P>).")
                 .inputAt(10, "(<s --> S> <=>+0 <m --> M>). %0.9;0.9%")
                 .mustBelieve(cycles, "(<s --> S> ==>+5 <p --> P>)", 0.90f, 0.73f);
+    }
+
+    @Test public void testProjectedQuestion() {
+        /*
+        Since the question asks about a future time, the belief should
+        be projected to it, unlike this:
+
+        $.16;.09;.36$ (p4). 2+20 %0.0;.90% {2+20: a;j} ((%1,(--,%1),task("?")),(%1,((BeliefNegation-->Belief),(Judgment-->Punctuation))))
+            $0.0;.50;.50$ (p4)? 0+22 {0+22: a} FIFO Forgot
+            $.26;.39;.95$ (--,(p4)). 1+0 %1.0;.90% {1+0: j} Input
+        */
+        test()
+                //.log()
+                .inputAt(0, "(--, (x)). :|:")
+                .inputAt(4, "(x)? :|:")
+                .mustNotOutput(cycles, "(x)", '.', 0f, 0.89f, 0f, 0.91f, 10)
+                .mustBelieve(cycles, "(x)", 0f, 0.3f /* some smaller conf since it is a prediction */, 4);
     }
 
 

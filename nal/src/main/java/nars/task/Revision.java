@@ -20,7 +20,6 @@ import java.util.List;
  */
 public class Revision {
 
-
     @Nullable
     public static /*Revision*/Task tryRevision(@NotNull Task newBelief, @NotNull NAR nar, @NotNull List<Task> beliefs) {
         int bsize = beliefs.size();

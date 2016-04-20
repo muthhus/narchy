@@ -299,7 +299,10 @@ public enum LocalRules {
         } else {
             float taskPriority = question.pri();
 
-            budget = new UnitBudget(UtilityFunctions.or(taskPriority, quality), question.dur(), BudgetFunctions.truthToQuality(solution.truth()));
+            budget = new UnitBudget(
+                    UtilityFunctions.and(taskPriority, quality),
+                        //UtilityFunctions.or(taskPriority, quality),
+                    question.dur(), BudgetFunctions.truthToQuality(solution.truth()));
             question.budget().setPriority(Math.min(1 - quality, taskPriority));
         }
         /*

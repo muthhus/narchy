@@ -103,6 +103,7 @@ public interface BeliefTable extends TaskTable {
         return or(conf, 1.0f / (hypotheticalEvidenceLength + 1));
     }
 
+    /** returns value <= 1f */
     static float relevance(@NotNull Task t, long time, float ageFactor) {
         return relevance(t.occurrence(), time, ageFactor);
     }
@@ -119,7 +120,7 @@ public interface BeliefTable extends TaskTable {
 //
 //    }
 
-    /** temporal relevance */
+    /** temporal relevance; returns a value <= 1.0f; */
     static float relevance(long from, long to, float ageFactor) {
         assert(from!=Tense.ETERNAL);
         /*if (from == Tense.ETERNAL)
@@ -128,7 +129,7 @@ public interface BeliefTable extends TaskTable {
         return relevance(Math.abs(from - to), ageFactor);
     }
 
-    /** ageFactor < 1 (ex: 1/dur) */
+    /** returns a value <= 1.0;  ageFactor < 1 (ex: 1/dur) */
     static float relevance(long delta /* positive only */, float ageFactor /* <1, divides usually */) {
         return 1f / (1f + delta*ageFactor);
     }
@@ -145,10 +146,14 @@ public interface BeliefTable extends TaskTable {
      * @param ageFactor effectively a ratio for trading off confidence against time
      * @return
      */
-    static float rankTemporalByConfidence(@NotNull Task t, long time, float ageFactor) {
-        return
-            t.conf() * relevance(t, time, ageFactor)
-        ;
+    static float rankTemporalByConfidence(@NotNull Task t, long time, float ageFactor, float bestSoFar) {
+        float c = t.conf();
+        if (c < bestSoFar)
+            return -1; //give up early since anything multiplied by relevance (<=1f) wont exceed the current best
+        else
+            return
+                c * relevance(t, time, ageFactor)
+                ;
     }
 
     /** attempt to insert a task; returns what was input or null if nothing changed (rejected) */
