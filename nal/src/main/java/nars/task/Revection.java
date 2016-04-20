@@ -54,31 +54,62 @@ public class Revection {
 
         //naive O(N*N) search for closest pair
         Task a = null, b = null;
+
+        Task w = null;
+        float wr = Float.POSITIVE_INFINITY;
+
         float bestDist = Float.POSITIVE_INFINITY;
         for (int i = 0; i < n; i++) {
 
             Task ii = tl.get(i);
 
-            for (int j = 0; j < n; j++) {
-                float d;
+            for (int j = i+1; j < n; j++) {
+
+                if (i == j)
+                    continue;
 
                 Task jj = tl.get(j);
-                if (i == j) {
+                if ((i == j) || (Stamp.overlapping(ii, jj))) {
                     continue;
                 } else {
-                    d = distance(ii, jj, now, bestDist);
-                }
-
-                if (d < bestDist) {
-                    bestDist = d;
-                    a = ii;
-                    b = jj;
+                    float d = distance(ii, jj, now, bestDist);
+                    if (d < bestDist) {
+                        bestDist = d;
+                        a = ii;
+                        b = jj;
+                        continue;
+                    }
                 }
 
             }
+
+            if (a == null) {
+                //consider ii for being the weakest ranked task to remove
+                float r = BeliefTable.rankTemporalByConfidence(ii, now, now, 1f, -1);
+                if (r < wr) {
+                    wr = r;
+                    w = ii;
+                }
+            }
         }
 
-        return revect(input, nar, temporal, now, a, b);
+        if (a!=null) {
+
+            //merge the selected closest pair
+            return revect(input, nar, temporal, now, a, b);
+
+        } else if (w!=null) {
+
+            //remove the weakest found
+            //TODO compare with input like below?
+            remove(temporal, w, nar);
+
+            return true;
+        } else {
+
+            return true;
+        }
+
     }
 
     public static boolean revect(@NotNull Task input, @NotNull NAR nar, @NotNull ListTable<Task, Task> temporal, long now, @NotNull Task a, @NotNull Task b) {

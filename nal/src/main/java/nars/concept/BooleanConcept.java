@@ -65,8 +65,8 @@ public class BooleanConcept extends OperationConcept {
                     Task at = b.top(now);
                     if (at != null) {
 
-                        Truth ct = at.projectTruth(now, now, /* eternalize if weak */ false);
-                        //Truth ct = b.truth(now, nar.duration());
+                        //Truth ct = at.projectTruth(now, now, /* eternalize if weak */ false);
+                        Truth ct = b.truth(now);
 
                         if (mode) {
                             f *= ct.freq();

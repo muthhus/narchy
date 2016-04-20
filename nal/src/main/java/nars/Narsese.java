@@ -420,7 +420,7 @@ public class Narsese extends BaseParser<Object> {
 //    }
 
 
-    @Cached
+    //@Cached
     Rule Term(boolean oper, boolean meta) {
         /*
                  <term> ::= <word>                             // an atomic constant term
@@ -851,7 +851,7 @@ public class Narsese extends BaseParser<Object> {
     }
 
 
-    @Cached
+    //@Cached
     Rule MultiArgTerm(Op open, char close) {
         return MultiArgTerm(open, /*open, */close, false, false, false, false);
     }
@@ -863,7 +863,7 @@ public class Narsese extends BaseParser<Object> {
     /**
      * list of terms prefixed by a particular compound term operate
      */
-    @Cached
+    //@Cached
     Rule MultiArgTerm(Op defaultOp, char close, boolean initialOp, boolean allowInternalOp, @Deprecated boolean spaceSeparates, boolean operatorPrecedes) {
 
 
