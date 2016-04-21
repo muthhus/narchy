@@ -19,17 +19,17 @@
 
 package com.googlecode.lanterna;
 
-import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.screen.Screen;
+import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.MouseCaptureMode;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
 import com.googlecode.lanterna.terminal.swing.TerminalEmulatorAutoCloseTrigger;
 
+import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
-import javax.swing.JFrame;
 
 /**
  * This class provides a unified way for the test program to get their terminal

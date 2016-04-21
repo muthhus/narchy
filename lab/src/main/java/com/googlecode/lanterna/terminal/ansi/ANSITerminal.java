@@ -20,9 +20,9 @@ package com.googlecode.lanterna.terminal.ansi;
 
 import com.googlecode.lanterna.SGR;
 import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.input.*;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
+import com.googlecode.lanterna.input.*;
 import com.googlecode.lanterna.terminal.ExtendedTerminal;
 import com.googlecode.lanterna.terminal.MouseCaptureMode;
 

@@ -18,8 +18,8 @@
  */
 package com.googlecode.lanterna.gui2.dialogs;
 
-import com.googlecode.lanterna.TerminalTextUtils;
 import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TerminalTextUtils;
 import com.googlecode.lanterna.gui2.*;
 
 import java.util.List;

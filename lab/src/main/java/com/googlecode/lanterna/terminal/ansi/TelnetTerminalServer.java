@@ -18,11 +18,11 @@
  */
 package com.googlecode.lanterna.terminal.ansi;
 
+import javax.net.ServerSocketFactory;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.Charset;
-import javax.net.ServerSocketFactory;
 
 /**
  * This class implements a Telnet server, capable of accepting multiple clients and presenting each one as their own

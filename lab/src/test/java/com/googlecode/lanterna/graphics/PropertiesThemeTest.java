@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Properties;
+
 import static org.junit.Assert.*;
 
 public class PropertiesThemeTest {

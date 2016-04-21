@@ -23,7 +23,6 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.terminal.IOSafeTerminal;
-import com.googlecode.lanterna.terminal.Terminal;
 
 /**
  * A virtual terminal is a kind of terminal emulator implemented inside of Lanterna that exposes the Terminal interface

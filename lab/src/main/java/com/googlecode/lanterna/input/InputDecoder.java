@@ -23,7 +23,9 @@ import com.googlecode.lanterna.input.CharacterPattern.Matching;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Used to read the input stream character by character and generate {@code Key} objects to be put in the input queue.

@@ -20,7 +20,9 @@
  */
 package nars.term;
 
+import com.gs.collections.api.set.ImmutableSet;
 import com.gs.collections.impl.list.mutable.primitive.IntArrayList;
+import com.gs.collections.impl.set.mutable.UnifiedSet;
 import nars.Global;
 import nars.Op;
 import nars.Symbols;
@@ -56,13 +58,19 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
      * TODO generalize to a provided lambda predicate selector
      * */
     @NotNull
-    default Set<Term> uniqueSubtermSet(@NotNull Op type) {
-        Set<Term> t = Global.newHashSet(size());
+    default Set<Term> recurseTermsToSet(@NotNull Op onlyType) {
+        Set<Term> t = Global.newHashSet(volume());
         recurseTerms((t1, superterm) -> {
-            if (t1.op() == type)
+            if (t1.op() == onlyType)
                 t.add(t1);
         });
         return t;
+    }
+
+    default ImmutableSet<Term> recurseTermsToSet() {
+        UnifiedSet<Term> t = Global.newHashSet(volume());
+        recurseTerms((t1, superterm) -> t.add(t1));
+        return t.toImmutable();
     }
 
     @Override
@@ -275,6 +283,8 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 
         return false;
     }
+
+
 
 
 

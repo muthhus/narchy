@@ -37,7 +37,7 @@ public class NAL8Test extends AbstractNALTest {
 
         // hold .. at .. open
         tester.mustBelieve(cycles, "((hold:({t002}) &&+5 at:({t001})) &&+5 open({t001}))",
-                1.0f, 0.43f,
+                1.0f, 0.81f,
                 -5);
 
 

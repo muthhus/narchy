@@ -19,6 +19,7 @@
 package com.googlecode.lanterna.gui2;
 
 import com.googlecode.lanterna.input.KeyStroke;
+
 import java.util.Collection;
 
 /**

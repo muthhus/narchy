@@ -21,8 +21,9 @@ package com.googlecode.lanterna.issue;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.*;
-import com.googlecode.lanterna.screen.*;
-import com.googlecode.lanterna.terminal.*;
+import com.googlecode.lanterna.screen.TerminalScreen;
+import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
+import com.googlecode.lanterna.terminal.Terminal;
 
 import java.io.IOException;
 import java.util.Arrays;

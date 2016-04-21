@@ -13,7 +13,6 @@ import nars.util.data.Util;
 import org.jbox2d.callbacks.RayCastCallback;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.common.Vec3;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.World2D;

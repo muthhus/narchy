@@ -1,5 +1,6 @@
 package nars.nal.meta.constraint;
 
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.container.TermContainer;
 import nars.term.transform.subst.FindSubst;
@@ -17,12 +18,12 @@ public final class NoCommonSubtermsConstraint implements MatchConstraint {
 
     @Override
     public boolean invalid(@NotNull Term x, @NotNull Term y, @NotNull FindSubst f) {
-        Term B = f.term(b);
-
-        //Set<Term> tmpSet = Global.newHashSet(0);
-        //return  commonSubterms(y, B, tmpSet);
-
-        return B != null && TermContainer.commonSubterms(y, B);
+        if (y instanceof Compound) {
+            Term B = f.term(b);
+            return (B instanceof Compound) //includes null test
+                    && TermContainer.commonSubterms((Compound) B, (Compound)y);
+        }
+        return false;
     }
 
     @NotNull

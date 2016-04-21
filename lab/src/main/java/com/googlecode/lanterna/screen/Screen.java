@@ -18,12 +18,13 @@
  */
 package com.googlecode.lanterna.screen;
 
+import com.googlecode.lanterna.TerminalPosition;
+import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.graphics.Scrollable;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.input.InputProvider;
-import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.TerminalSize;
+
 import java.io.IOException;
 
 /**

@@ -3,16 +3,12 @@ package nars.op.java;
 import nars.$;
 import nars.Global;
 import nars.NAR;
-import nars.Op;
 import nars.concept.Concept;
 import nars.nal.Tense;
 import nars.nar.Default;
 import nars.term.Compound;
-import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.TruthWave;
-import nars.util.Texts;
-import org.jetbrains.annotations.NotNull;
 
 import static java.lang.System.out;
 

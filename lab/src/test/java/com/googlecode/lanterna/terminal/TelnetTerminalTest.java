@@ -24,6 +24,7 @@ import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.terminal.ansi.TelnetTerminal;
 import com.googlecode.lanterna.terminal.ansi.TelnetTerminalServer;
+
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Random;

@@ -18,7 +18,9 @@
  */
 package com.googlecode.lanterna.gui2;
 
-import com.googlecode.lanterna.gui2.dialogs.*;
+import com.googlecode.lanterna.gui2.dialogs.ActionListDialogBuilder;
+import com.googlecode.lanterna.gui2.dialogs.ListSelectDialogBuilder;
+import com.googlecode.lanterna.gui2.dialogs.TextInputDialogBuilder;
 import com.googlecode.lanterna.gui2.table.DefaultTableRenderer;
 import com.googlecode.lanterna.gui2.table.Table;
 import com.googlecode.lanterna.gui2.table.TableCellBorderStyle;

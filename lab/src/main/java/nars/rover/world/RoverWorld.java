@@ -9,15 +9,15 @@ import com.artemis.Entity;
 import com.artemis.EntityEdit;
 import nars.Global;
 import nars.rover.Sim;
-import nars.rover.obj.Edible;
-import nars.rover.obj.Material;
 import nars.rover.obj.MaterialColor;
 import nars.rover.obj.Physical;
 import nars.rover.physics.gl.JoglAbstractDraw;
 import nars.rover.physics.j2d.LayerDraw;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.dynamics.*;
+import org.jbox2d.dynamics.BodyDef;
+import org.jbox2d.dynamics.BodyType;
+import org.jbox2d.dynamics.World2D;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;

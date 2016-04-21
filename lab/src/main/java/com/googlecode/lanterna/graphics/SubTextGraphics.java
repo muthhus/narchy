@@ -18,9 +18,9 @@
  */
 package com.googlecode.lanterna.graphics;
 
-import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TextCharacter;
 
 /**
  * This implementation of TextGraphics will take a 'proper' object and composite a view on top of it, by using a

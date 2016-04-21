@@ -15,7 +15,6 @@ import nars.concept.PremiseGenerator;
 import nars.data.Range;
 import nars.nal.Deriver;
 import nars.nal.meta.PremiseEval;
-import nars.nal.meta.TrieDeriver;
 import nars.task.Task;
 import nars.task.flow.SetTaskPerception;
 import nars.task.flow.TaskPerception;

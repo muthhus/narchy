@@ -17,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -71,21 +72,19 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
 
 
     Predicate2<Object,ImmutableSet> commonSubtermPredicate = (Object yy, ImmutableSet xx) -> {
+        //if (yy instanceof Variable) {
+            //??
+        //}
         return xx.contains(yy);
     };
-    static @NotNull boolean commonSubterms(@NotNull Term a, @NotNull Term b) {
 
-        boolean aCompound = a instanceof Compound;
-        boolean bCompound = b instanceof Compound;
-        if (!aCompound && !bCompound) {
-            return a.equals(b); //shortcut
-        }
+    /** recursively */
+    @NotNull static boolean commonSubterms(@NotNull Compound a, @NotNull Compound b) {
 
-        ImmutableSet x = aCompound ? ((Compound)a).toSetImmutable() : immutable.of(a);
-        ImmutableSet y = bCompound ? ((Compound)b).toSetImmutable() : immutable.of(b);
-        if (x.size() < y.size()) {
-            //swap so that y is smaller
-            ImmutableSet tmp = x;
+        ImmutableSet<Term> x = a.recurseTermsToSet();
+        ImmutableSet<Term> y = b.recurseTermsToSet();
+        if (x.size() < y.size()) { //swap so that y is smaller
+            ImmutableSet<Term> tmp = x;
             x = y;
             y = tmp;
         }
@@ -93,6 +92,25 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
         return y.anySatisfyWith(commonSubtermPredicate, (ImmutableSet<?>)x);
     }
 
+    /** recursively */
+    @NotNull static boolean commonSubtermOrContainment(@NotNull Term a, @NotNull Term b) {
+
+        boolean aCompound = a instanceof Compound;
+        boolean bCompound = b instanceof Compound;
+        if (aCompound && bCompound) {
+            return commonSubterms((Compound)a, ((Compound)b));
+        } else {
+            if (aCompound && !bCompound) {
+                return ((Compound)a).containsTerm(b);
+            } else if (bCompound && !aCompound) {
+                return ((Compound)b).containsTerm(a);
+            } else {
+                //neither are compounds
+                return a.equals(b);
+            }
+        }
+
+    }
 
 
 

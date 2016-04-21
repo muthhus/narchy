@@ -19,7 +19,8 @@
 package com.googlecode.lanterna.terminal.swing;
 
 import com.googlecode.lanterna.TextColor;
-import java.awt.Color;
+
+import java.awt.*;
 
 /**
  * Color configuration settings to be using with SwingTerminal. This class contains color-related settings that is used

@@ -24,6 +24,7 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.input.InputProvider;
+
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 

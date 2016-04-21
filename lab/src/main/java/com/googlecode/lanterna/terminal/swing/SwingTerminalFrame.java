@@ -20,21 +20,21 @@ package com.googlecode.lanterna.terminal.swing;
 
 import com.googlecode.lanterna.SGR;
 import com.googlecode.lanterna.TerminalPosition;
+import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.terminal.IOSafeTerminal;
-import com.googlecode.lanterna.TerminalSize;
-import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.terminal.TerminalResizeListener;
 
+import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import javax.swing.*;
 
 /**
  * This class is similar to what SwingTerminal used to be before Lanterna 3.0; a JFrame that contains a terminal

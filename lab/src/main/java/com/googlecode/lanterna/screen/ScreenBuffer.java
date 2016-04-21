@@ -19,8 +19,8 @@
 package com.googlecode.lanterna.screen;
 
 import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.graphics.BasicTextImage;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.graphics.TextImage;

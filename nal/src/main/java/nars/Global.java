@@ -196,7 +196,7 @@ public enum Global {
     }
 
     @NotNull
-    public static <X> Set<X> newHashSet(int capacity) {
+    public static <X> UnifiedSet<X> newHashSet(int capacity) {
         return new UnifiedSet(capacity);
         //return new SimpleHashSet(capacity);
         //return new HashSet(capacity);

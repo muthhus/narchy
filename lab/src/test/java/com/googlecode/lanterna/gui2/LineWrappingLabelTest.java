@@ -24,7 +24,6 @@ import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.screen.Screen;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  * Created by martin on 16/01/16.

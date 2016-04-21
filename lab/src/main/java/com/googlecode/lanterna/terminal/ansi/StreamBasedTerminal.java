@@ -18,24 +18,14 @@
  */
 package com.googlecode.lanterna.terminal.ansi;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.nio.charset.Charset;
-
 import com.googlecode.lanterna.Symbols;
-import com.googlecode.lanterna.TerminalTextUtils;
-import com.googlecode.lanterna.input.InputDecoder;
-import com.googlecode.lanterna.input.KeyDecodingProfile;
-import com.googlecode.lanterna.input.KeyStroke;
-import com.googlecode.lanterna.input.ScreenInfoAction;
-import com.googlecode.lanterna.input.ScreenInfoCharacterPattern;
-import com.googlecode.lanterna.terminal.AbstractTerminal;
 import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.terminal.Terminal;
+import com.googlecode.lanterna.TerminalTextUtils;
+import com.googlecode.lanterna.input.*;
+import com.googlecode.lanterna.terminal.AbstractTerminal;
 
-import java.io.ByteArrayOutputStream;
+import java.io.*;
+import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.TimeUnit;

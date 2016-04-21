@@ -1,13 +1,11 @@
 package nars.nal;
 
-import nars.NAR;
 import nars.nal.meta.TrieDeriver;
 import nars.nar.Default;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertEquals;
 
 /**
  * Created by me on 12/12/15.

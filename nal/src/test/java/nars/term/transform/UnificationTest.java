@@ -72,8 +72,8 @@ public class UnificationTest {
 
         Term t2 = nar.concept(s2).term();
 
-        Set<Term> t1u = ((Compound) t1).uniqueSubtermSet(type);
-        Set<Term> t2u = ((Compound) t2).uniqueSubtermSet(type);
+        Set<Term> t1u = ((Compound) t1).recurseTermsToSet(type);
+        Set<Term> t2u = ((Compound) t2).recurseTermsToSet(type);
 
         int n1 = Sets.difference(t1u, t2u).size();
         int n2 = Sets.difference(t2u, t1u).size();

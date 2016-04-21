@@ -20,12 +20,13 @@ package com.googlecode.lanterna.terminal;
 
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.terminal.swing.ScrollingSwingTerminal;
+import com.googlecode.lanterna.terminal.swing.SwingTerminalFontConfiguration;
 import com.googlecode.lanterna.terminal.swing.TerminalEmulatorColorConfiguration;
 import com.googlecode.lanterna.terminal.swing.TerminalEmulatorDeviceConfiguration;
-import com.googlecode.lanterna.terminal.swing.SwingTerminalFontConfiguration;
-import java.awt.BorderLayout;
+
+import javax.swing.*;
+import java.awt.*;
 import java.util.Random;
-import javax.swing.UIManager;
 
 /**
  *

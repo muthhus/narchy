@@ -18,12 +18,12 @@
  */
 package com.googlecode.lanterna.graphics;
 
-import java.util.Arrays;
-
 import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.TextColor;
+
+import java.util.Arrays;
 
 /**
  * Simple implementation of TextImage that keeps the content as a two-dimensional TextCharacter array. Copy operations

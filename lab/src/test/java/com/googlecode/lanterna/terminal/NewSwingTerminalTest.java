@@ -21,10 +21,11 @@ package com.googlecode.lanterna.terminal;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.terminal.swing.SwingTerminal;
+
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Random;
-import javax.swing.Timer;
 
 /**
  *

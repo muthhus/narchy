@@ -18,13 +18,13 @@
  */
 package com.googlecode.lanterna.issue;
 
-import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.screen.Screen;
+import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.swing.SwingTerminalFrame;
 import com.googlecode.lanterna.terminal.swing.TerminalEmulatorAutoCloseTrigger;
 
+import javax.swing.*;
 import java.io.IOException;
-import javax.swing.WindowConstants;
 
 /**
  *

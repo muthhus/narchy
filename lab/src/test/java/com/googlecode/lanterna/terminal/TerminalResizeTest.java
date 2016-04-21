@@ -19,8 +19,9 @@
 package com.googlecode.lanterna.terminal;
 
 import com.googlecode.lanterna.TerminalSize;
-import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.TestTerminalFactory;
+import com.googlecode.lanterna.input.KeyStroke;
+
 import java.io.IOException;
 
 /**

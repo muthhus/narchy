@@ -18,7 +18,10 @@
  */
 package com.googlecode.lanterna.gui2.table;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * A {@code TableModel} contains the data model behind a table, here is where all the action cell values and header

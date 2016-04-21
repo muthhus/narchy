@@ -1,22 +1,16 @@
 package nars.rover.run;
- 
 
- 
+
 import com.jogamp.newt.NewtFactory;
-import com.jogamp.newt.Window;
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.Animator;
-import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureData;
 import com.jogamp.opengl.util.texture.TextureIO;
-import nars.rover.util.TextureReader;
 
-import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 
 import static nars.rover.physics.gl.Box2DJoglPanel.newDefaultConfig;

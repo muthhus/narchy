@@ -19,6 +19,7 @@
 package com.googlecode.lanterna.terminal;
 
 import com.googlecode.lanterna.TestTerminalFactory;
+
 import java.io.IOException;
 
 /**

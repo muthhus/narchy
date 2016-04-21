@@ -18,7 +18,9 @@
  */
 package com.googlecode.lanterna.gui2.table;
 
-import com.googlecode.lanterna.*;
+import com.googlecode.lanterna.Symbols;
+import com.googlecode.lanterna.TerminalPosition;
+import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.Direction;
 import com.googlecode.lanterna.gui2.ScrollBar;
 import com.googlecode.lanterna.gui2.TextGUIGraphics;

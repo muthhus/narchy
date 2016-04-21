@@ -18,7 +18,8 @@
  */
 package com.googlecode.lanterna.gui2.dialogs;
 
-import com.googlecode.lanterna.gui2.*;
+import com.googlecode.lanterna.gui2.AbstractWindow;
+import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 
 import java.util.Collections;
 import java.util.HashSet;

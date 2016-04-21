@@ -18,8 +18,8 @@
  */
 package com.googlecode.lanterna.graphics;
 
-import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TextCharacter;
 
 /**
  * This TextGraphics implementation wraps another TextGraphics and forwards all operations to it, but with a few

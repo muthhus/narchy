@@ -20,6 +20,7 @@ package com.googlecode.lanterna.graphics;
 
 import com.googlecode.lanterna.*;
 import com.googlecode.lanterna.screen.TabBehaviour;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;

@@ -18,7 +18,6 @@
  */
 package com.googlecode.lanterna.terminal.ansi;
 
-import static com.googlecode.lanterna.terminal.ansi.TelnetProtocol.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,9 +25,11 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
+import static com.googlecode.lanterna.terminal.ansi.TelnetProtocol.*;
 
 /**
  * This class is used by the {@code TelnetTerminalServer} class when a client has connected in; this class will be the

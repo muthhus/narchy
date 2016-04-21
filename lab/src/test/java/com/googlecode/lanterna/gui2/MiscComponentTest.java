@@ -21,7 +21,7 @@ package com.googlecode.lanterna.gui2;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TestUtils;
 
-import java.io.*;
+import java.io.IOException;
 
 /**
  * Created by martin on 19/10/14.

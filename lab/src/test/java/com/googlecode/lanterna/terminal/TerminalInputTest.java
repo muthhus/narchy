@@ -18,10 +18,11 @@
  */
 package com.googlecode.lanterna.terminal;
 
+import com.googlecode.lanterna.TestTerminalFactory;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.terminal.ansi.StreamBasedTerminal;
-import com.googlecode.lanterna.TestTerminalFactory;
+
 import java.io.IOException;
 
 /**

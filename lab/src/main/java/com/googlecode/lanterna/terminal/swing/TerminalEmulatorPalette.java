@@ -20,7 +20,8 @@
 package com.googlecode.lanterna.terminal.swing;
 
 import com.googlecode.lanterna.TextColor;
-import java.awt.Color;
+
+import java.awt.*;
 
 /**
  * This class specifies the palette of colors the terminal will use for the normally available 8 + 1 ANSI colors but

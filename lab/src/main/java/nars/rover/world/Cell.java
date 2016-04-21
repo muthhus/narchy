@@ -1,7 +1,5 @@
 package nars.rover.world;
 
-import nars.rover.obj.Grid2D;
-
 /**
  * Created by me on 3/30/16.
  */

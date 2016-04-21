@@ -24,7 +24,6 @@
 package nars.rover.physics.gl;
 
 import com.artemis.Entity;
-import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import nars.rover.obj.MaterialColor;
 import org.jbox2d.callbacks.DebugDraw;

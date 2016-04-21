@@ -3,7 +3,6 @@ package nars.rover.obj;
 import com.artemis.Component;
 import nars.rover.physics.gl.JoglAbstractDraw;
 import nars.term.Term;
-import org.jbox2d.common.Color3f;
 
 /**
  * Created by me on 7/18/15.

@@ -20,19 +20,19 @@ package com.googlecode.lanterna.terminal.swing;
 
 import com.googlecode.lanterna.SGR;
 import com.googlecode.lanterna.TerminalPosition;
+import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.terminal.IOSafeTerminal;
-import com.googlecode.lanterna.TerminalSize;
-import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.terminal.TerminalResizeListener;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
-import javax.swing.*;
 
 /**
  * This is a Swing JComponent that carries a {@link SwingTerminal} with a scrollbar, effectively implementing a

@@ -1,10 +1,10 @@
 package nars.rover.run;
 
 import com.artemis.Component;
-import com.googlecode.lanterna.*;
-import com.googlecode.lanterna.graphics.TextGraphics;
+import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TextCharacter;
+import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.*;
-import com.googlecode.lanterna.io.WriteInput;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.swing.GraphicalTerminalImplementation;
@@ -12,27 +12,17 @@ import com.googlecode.lanterna.terminal.swing.TerminalEmulatorColorConfiguration
 import com.googlecode.lanterna.terminal.swing.TerminalEmulatorDeviceConfiguration;
 import com.googlecode.lanterna.terminal.swing.TerminalScrollController;
 import com.googlecode.lanterna.terminal.virtual.DefaultVirtualTerminal;
-import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.gl2.GLUT;
 import nars.rover.Sim;
 import nars.rover.obj.DrawAbove;
 import nars.rover.physics.gl.JoglAbstractDraw;
 import nars.rover.physics.j2d.LayerDraw;
-import org.codehaus.plexus.util.StringOutputStream;
 import org.jbox2d.dynamics.World2D;
 
 import java.awt.*;
-import java.awt.Button;
-import java.awt.GridLayout;
-import java.awt.Panel;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
 
-import static nars.rover.run.DemoTerminal.TerminalSwing.font;
-import static nars.rover.run.NEHEBitmapFont.glPrint;
+import com.artemis.Component;
 
 /**
  * Created by me on 4/1/16.

@@ -19,10 +19,13 @@
 package com.googlecode.lanterna.terminal.ansi;
 
 
-import java.io.*;
-import java.nio.charset.Charset;
-
 import com.googlecode.lanterna.TerminalSize;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.charset.Charset;
 
 /**
  * This class extends UnixLikeTerminal and implements the Unix-specific parts.

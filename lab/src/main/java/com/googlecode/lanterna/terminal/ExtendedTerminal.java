@@ -18,9 +18,9 @@
  */
 package com.googlecode.lanterna.terminal;
 
-import java.io.IOException;
-
 import com.googlecode.lanterna.graphics.Scrollable;
+
+import java.io.IOException;
 
 /**
  * This class extends the normal Terminal interface and adds a few more methods that are considered rare and shouldn't

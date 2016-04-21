@@ -18,11 +18,11 @@
  */
 package com.googlecode.lanterna.input;
 
-import static com.googlecode.lanterna.input.KeyDecodingProfile.ESC_CODE;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.googlecode.lanterna.input.KeyDecodingProfile.ESC_CODE;
 
 /**
  * This implementation of CharacterPattern matches two similar patterns

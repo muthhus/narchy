@@ -18,10 +18,11 @@
  */
 package com.googlecode.lanterna;
 
-import static org.junit.Assert.*;
 import org.junit.Test;
 
 import java.util.Arrays;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by martin on 02/11/15.

@@ -20,7 +20,6 @@ package com.googlecode.lanterna.terminal.virtual;
 
 import com.googlecode.lanterna.*;
 import com.googlecode.lanterna.input.KeyStroke;
-import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.terminal.Terminal;
 import org.junit.Test;
 

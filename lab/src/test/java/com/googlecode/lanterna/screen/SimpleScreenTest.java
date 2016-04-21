@@ -18,13 +18,11 @@
  */
 package com.googlecode.lanterna.screen;
 
-import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TestTerminalFactory;
 import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.input.KeyStroke;
-import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.terminal.Terminal;
 
 import java.io.IOException;

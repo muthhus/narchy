@@ -19,9 +19,10 @@
 package com.googlecode.lanterna.screen;
 
 import com.googlecode.lanterna.SGR;
-import com.googlecode.lanterna.graphics.TextGraphics;
-import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.TestTerminalFactory;
+import com.googlecode.lanterna.TextColor;
+import com.googlecode.lanterna.graphics.TextGraphics;
+
 import java.io.IOException;
 
 /**

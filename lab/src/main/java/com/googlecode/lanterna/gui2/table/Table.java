@@ -18,7 +18,7 @@
  */
 package com.googlecode.lanterna.gui2.table;
 
-import com.googlecode.lanterna.gui2.*;
+import com.googlecode.lanterna.gui2.AbstractInteractableComponent;
 import com.googlecode.lanterna.input.KeyStroke;
 
 import java.util.List;

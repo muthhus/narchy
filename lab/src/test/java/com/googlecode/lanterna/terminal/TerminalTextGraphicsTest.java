@@ -23,7 +23,6 @@ import com.googlecode.lanterna.graphics.AbstractTextGraphics;
 import com.googlecode.lanterna.graphics.DoublePrintingTextGraphics;
 import com.googlecode.lanterna.graphics.TextGraphics;
 
-import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
 
