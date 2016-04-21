@@ -1,4 +1,4 @@
-package nars.util.signal.condition;
+package nars.util.condition;
 
 import nars.$;
 import nars.NAR;

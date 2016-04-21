@@ -2,7 +2,7 @@ package nars.util.sort;
 
 import nars.bag.impl.ArrayBag;
 import nars.util.ArraySortedIndex;
-import nars.util.signal.bag.NullItem;
+import nars.util.analyze.bag.NullItem;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 

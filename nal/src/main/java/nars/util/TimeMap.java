@@ -1,7 +1,6 @@
 package nars.util;
 
 import nars.NAR;
-import nars.nar.Default;
 import nars.task.Task;
 import nars.util.time.IntervalTree;
 import org.jetbrains.annotations.NotNull;
@@ -13,6 +12,7 @@ import static java.lang.System.out;
 
 public class TimeMap extends IntervalTree<Long, Task> implements Consumer<Task> {
 
+    @NotNull
     private final NAR nar;
 
     public TimeMap(@NotNull NAR n) {

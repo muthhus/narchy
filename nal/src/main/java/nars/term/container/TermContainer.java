@@ -488,7 +488,8 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
     }
 
     /** for use with commutive (TermSet's) */
-    static TermContainer except(TermContainer c, MutableSet<Term> toRemove) {
+    @NotNull
+    static TermContainer except(@NotNull TermContainer c, @NotNull MutableSet<Term> toRemove) {
         MutableSet<Term> s = c.toSet();
         if (s.removeAll(toRemove)) {
             return TermSet.the(s);

@@ -5,7 +5,7 @@ import nars.Global;
 import nars.NAR;
 import nars.nar.Default;
 import nars.term.Term;
-import nars.util.signal.EventCount;
+import nars.util.analyze.EventCount;
 import org.junit.Ignore;
 import org.junit.Test;
 

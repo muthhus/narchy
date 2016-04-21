@@ -11,6 +11,7 @@ import nars.truth.Stamp;
 import nars.truth.Truth;
 import nars.truth.TruthFunctions;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,8 +19,6 @@ import java.util.List;
 import static java.lang.Math.abs;
 import static java.lang.Math.sqrt;
 import static nars.nal.Tense.DTERNAL;
-import static nars.nal.UtilityFunctions.aveAri;
-import static nars.nal.UtilityFunctions.aveGeo;
 
 /**
  * Revection: revision, projection, rejection
@@ -151,7 +150,7 @@ public class Revection {
     //return false;
 
 
-    private static Task combine(Task a, Task b, long now) {
+    private static Task combine(@NotNull Task a, @NotNull Task b, long now) {
         //TODO proper iterpolate: truth, time, dt
         float ac = a.conf();
         float bc = b.conf();
@@ -198,6 +197,7 @@ public class Revection {
         //return fDist * (float)(Math.sqrt(tDist / (1f + ageFactor))); // * window);
     }
 
+    @Nullable
     private static Task closest(@NotNull Task input, @NotNull List<Task> list, long now) {
         float lowest = Float.POSITIVE_INFINITY;
         Task low = null;
@@ -212,7 +212,7 @@ public class Revection {
         return low;
     }
 
-    static void remove(ListTable<Task, Task> temporal, Task t, @NotNull NAR nar) {
+    static void remove(@NotNull ListTable<Task, Task> temporal, @NotNull Task t, @NotNull NAR nar) {
         temporal.remove(t);
         TaskTable.removeTask(t, "Revection Remove", nar);
     }
@@ -249,7 +249,7 @@ public static class ClosestPair {
      * @throws NullPointerException if <tt>points</tt> is <tt>null</tt> or if any
      *                              entry in <tt>points[]</tt> is <tt>null</tt>
      */
-    public ClosestPair(List<Task> points, long now) {
+    public ClosestPair(@NotNull List<Task> points, long now) {
         int N = points.size();
         if (N <= 1) return;
 
@@ -356,7 +356,7 @@ public static class ClosestPair {
     }
 
     // is v < w ?
-    private static boolean less(Comparable v, Comparable w) {
+    private static boolean less(@NotNull Comparable v, @NotNull Comparable w) {
         return v.compareTo(w) < 0;
     }
 

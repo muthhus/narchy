@@ -86,7 +86,7 @@ public class Default extends AbstractNAR {
                 new DefaultTermIndex(activeConcepts * 8, random));
     }
 
-    public Default(int activeConcepts, int conceptsFirePerCycle, int taskLinksPerConcept, int termLinksPerConcept, Random random, TermIndex index) {
+    public Default(int activeConcepts, int conceptsFirePerCycle, int taskLinksPerConcept, int termLinksPerConcept, @NotNull Random random, TermIndex index) {
         super(new FrameClock(),
                 index,
                 random,

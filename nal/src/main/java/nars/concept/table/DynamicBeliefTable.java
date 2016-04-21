@@ -68,6 +68,7 @@ abstract public class DynamicBeliefTable implements BeliefTable {
 
     }
 
+    @Nullable
     abstract protected Task update(long now);
 
     @Nullable

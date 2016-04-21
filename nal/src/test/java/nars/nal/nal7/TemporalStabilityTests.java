@@ -1,10 +1,8 @@
 package nars.nal.nal7;
 
 import com.gs.collections.api.block.function.primitive.IntToObjectFunction;
-import com.gs.collections.api.set.primitive.IntSet;
 import com.gs.collections.impl.set.mutable.primitive.IntHashSet;
 import nars.NAR;
-import nars.Op;
 import nars.nar.Default;
 import org.junit.Test;
 

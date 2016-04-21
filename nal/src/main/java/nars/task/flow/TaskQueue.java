@@ -32,7 +32,7 @@ public class TaskQueue extends ArrayDeque<Task> implements Input , Consumer<Task
     }
 
     @Override
-    public final boolean add(Task task) {
+    public final boolean add(@Nullable Task task) {
         if (task == null) return true;
         return super.add(task);
     }

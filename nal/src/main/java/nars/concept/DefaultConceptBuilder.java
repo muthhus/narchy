@@ -9,7 +9,6 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
-import nars.term.compound.GenericCompound;
 import nars.term.variable.Variable;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.jetbrains.annotations.NotNull;
@@ -42,12 +41,12 @@ public class DefaultConceptBuilder implements ConceptBuilder {
         switch (t.op()) {
             case INHERIT:
                 if (Op.isOperation(t))
-                    return new OperationConcept((GenericCompound) t, termbag, taskbag);
+                    return new OperationConcept(t, termbag, taskbag);
                 break;
         }
 
         //default:
-        return new CompoundConcept((GenericCompound) t, termbag, taskbag);
+        return new CompoundConcept(t, termbag, taskbag);
     };
 
 

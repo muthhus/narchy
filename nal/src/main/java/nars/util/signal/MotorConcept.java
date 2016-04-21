@@ -2,7 +2,6 @@ package nars.util.signal;
 
 import com.gs.collections.api.block.function.primitive.FloatFunction;
 import com.gs.collections.api.block.function.primitive.FloatToFloatFunction;
-import nars.Global;
 import nars.NAR;
 import nars.Narsese;
 import nars.Op;

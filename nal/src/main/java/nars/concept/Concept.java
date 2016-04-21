@@ -322,18 +322,22 @@ public interface Concept extends Termed, Comparable {
 
     }
 
+    @Nullable
     default Truth belief(long when, long now) {
         return hasBeliefs() ? beliefs().truth(when, now) : Truth.Zero;
     }
 
+    @Nullable
     default Truth desire(long when, long now) {
         return hasGoals() ? goals().truth(when, now) : Truth.Zero;
     }
 
+    @Nullable
     default Truth belief(long now) {
         return belief(now, now);
     }
 
+    @Nullable
     default Truth desire(long now) {
         return desire(now, now);
     }

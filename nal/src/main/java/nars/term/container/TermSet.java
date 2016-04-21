@@ -20,7 +20,7 @@ public class TermSet<X extends Term> extends TermVector<X> {
 
 
     @NotNull
-    public static TermSet the(Collection<? extends Term> x) {
+    public static TermSet the(@NotNull Collection<? extends Term> x) {
         return new TermSet(toSortedSetArray(x));
     }
 
@@ -42,7 +42,8 @@ public class TermSet<X extends Term> extends TermVector<X> {
         super(x);
     }
 
-    public static Term[] toSortedSetArray(Collection<? extends Term> c) {
+    @NotNull
+    public static Term[] toSortedSetArray(@NotNull Collection<? extends Term> c) {
 
         int n = c.size();
 

@@ -22,9 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import static nars.nal.UtilityFunctions.w2c;
-import static nars.truth.TruthFunctions.c2w;
-
 
 /**
  * Stores beliefs ranked in a sorted ArrayList, with strongest beliefs at lowest indexes (first iterated)

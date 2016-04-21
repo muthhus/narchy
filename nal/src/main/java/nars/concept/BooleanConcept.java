@@ -1,7 +1,10 @@
 package nars.concept;
 
 import com.gs.collections.impl.list.mutable.primitive.LongArrayList;
-import nars.*;
+import nars.$;
+import nars.Global;
+import nars.NAR;
+import nars.Symbols;
 import nars.budget.Budgeted;
 import nars.concept.table.BeliefTable;
 import nars.concept.table.DynamicBeliefTable;
@@ -20,6 +23,7 @@ import org.jetbrains.annotations.Nullable;
  * Dynamically updates a truth value based on truth aggregation of the concepts referred by parameters
  */
 public class BooleanConcept extends OperationConcept {
+    @NotNull
     public final NAR nar;
 
     public static final Operator AND_OP = $.operator("and");
@@ -43,9 +47,10 @@ public class BooleanConcept extends OperationConcept {
             this.mode = andOrOr;
         }
 
+        @NotNull
         @Override public Operator op() {  return mode ? AND_OP : OR_OP; }
 
-        @Override public MutableTask update(NAR nar, long now, MutableTask task, Termed[] args) {
+        @Override public MutableTask update(@NotNull NAR nar, long now, @NotNull MutableTask task, @NotNull Termed[] args) {
 
             boolean mode = this.mode;
 
@@ -98,14 +103,14 @@ public class BooleanConcept extends OperationConcept {
             }
 
         }
-    };
+    }
 
     protected BooleanModel model;
 
-    @NotNull public static BooleanConcept And(NAR nar, Term... args) {
+    @NotNull public static BooleanConcept And(@NotNull NAR nar, Term... args) {
         return new BooleanConcept(nar, AND, args);
     }
-    @NotNull public static BooleanConcept Or(NAR nar, Term... args) {
+    @NotNull public static BooleanConcept Or(@NotNull NAR nar, Term... args) {
         return new BooleanConcept(nar, OR, args);
     }
 

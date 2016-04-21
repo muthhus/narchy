@@ -1,4 +1,4 @@
-package nars.util.signal;
+package nars.util.analyze;
 
 import nars.NAR;
 import nars.concept.Concept;

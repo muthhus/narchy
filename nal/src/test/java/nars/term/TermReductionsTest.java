@@ -2,7 +2,6 @@ package nars.term;
 
 import nars.$;
 import nars.Op;
-import nars.io.NarseseTest;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Ignore;

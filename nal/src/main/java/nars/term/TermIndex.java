@@ -479,6 +479,7 @@ public interface TermIndex {
     /**
      * returns how many subterms were modified, or -1 if failure (ex: results in invalid term)
      */
+    @NotNull
     default Term[] _transform(@NotNull Compound src, @NotNull CompoundTransform<Compound, Term> trans) {
 
         int n = src.size();

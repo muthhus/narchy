@@ -11,8 +11,7 @@ import java.util.function.Predicate;
 /** I = input term type, T = transformable subterm type */
 public interface CompoundTransform<I extends Compound, T extends Term> extends Predicate<Term> {
 
-    @NotNull
-    Termed<?> apply(I parent, T subterm);
+    @Nullable Termed<?> apply(I parent, T subterm);
 
     /** enable predicate determined by the superterm, tested before processing any subterms */
     default boolean testSuperTerm(@NotNull I terms) {

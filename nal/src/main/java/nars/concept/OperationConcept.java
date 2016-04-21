@@ -3,7 +3,6 @@ package nars.concept;
 import nars.*;
 import nars.bag.Bag;
 import nars.nal.Tense;
-import nars.nal.UtilityFunctions;
 import nars.nal.nal8.Execution;
 import nars.task.Task;
 import nars.term.Compound;
@@ -31,7 +30,9 @@ public class OperationConcept extends CompoundConcept implements Runnable {
     /**
      * cache for expectation measurement; set to NaN to invalidate
      */
+    @Nullable
     protected transient Truth believed;
+    @Nullable
     protected transient Truth desired;
 
     /**
@@ -108,12 +109,10 @@ public class OperationConcept extends CompoundConcept implements Runnable {
         final NAR nar = this.nar;
 
         update(nar);
-        {
-            //TODO only execute pending tasks if the operator has a handler for it, which may be null in which case this is useless
-            List<Task> pending = this.pending;
-            for (int i = 0, pendingSize = pending.size(); i < pendingSize; i++) {
-                execute(pending.get(i), nar);
-            }
+        //TODO only execute pending tasks if the operator has a handler for it, which may be null in which case this is useless
+        List<Task> pending = this.pending;
+        for (int i = 0, pendingSize = pending.size(); i < pendingSize; i++) {
+            execute(pending.get(i), nar);
         }
 
         pending.clear();

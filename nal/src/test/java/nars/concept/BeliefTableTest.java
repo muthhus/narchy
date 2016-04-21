@@ -5,7 +5,7 @@ import nars.NAR;
 import nars.concept.table.BeliefTable;
 import nars.task.Task;
 import nars.truth.DefaultTruth;
-import nars.util.signal.BeliefAnalysis;
+import nars.util.analyze.BeliefAnalysis;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 

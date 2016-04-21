@@ -103,7 +103,8 @@ public interface Stamp {
         return _toSetArray(l, sorted);
     }
 
-    static long[] _toSetArray(int outputLen, long[] sorted) {
+    @NotNull
+    static long[] _toSetArray(int outputLen, @NotNull long[] sorted) {
         Arrays.sort(sorted);
 
         //2. count unique elements

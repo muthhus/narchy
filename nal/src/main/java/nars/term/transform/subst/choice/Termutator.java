@@ -13,7 +13,7 @@ public abstract class Termutator  {
     public final Termlike key;
     private String asStringCached;
 
-    public Termutator(String key) {
+    public Termutator(@NotNull String key) {
         this($.the(key));
     }
 

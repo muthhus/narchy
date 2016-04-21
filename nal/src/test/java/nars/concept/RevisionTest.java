@@ -7,7 +7,7 @@ import nars.nal.Tense;
 import nars.nar.AbstractNAR;
 import nars.nar.Default;
 import nars.task.Task;
-import nars.util.signal.BeliefAnalysis;
+import nars.util.analyze.BeliefAnalysis;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 

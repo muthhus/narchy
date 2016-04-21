@@ -196,6 +196,7 @@ public class TruthWave {
 //    }
 
 
+    @NotNull
     @Override
     public String toString() {
         return start() + ".." + end() + ": " + Arrays.toString(truth);

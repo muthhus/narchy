@@ -1,4 +1,4 @@
-package nars.util.signal.bag;
+package nars.util.analyze.bag;
 
 import nars.budget.UnitBudget;
 import nars.util.data.random.XorShift128PlusRandom;

@@ -1,7 +1,5 @@
 package nars.time;
 
-import nars.Memory;
-
 import java.io.Serializable;
 
 /**

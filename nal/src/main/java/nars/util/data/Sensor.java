@@ -180,6 +180,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
                     .budget(pri, dur);
     }
 
+    @NotNull
     public Termed<Compound> term() {
         return term;
     }

@@ -731,7 +731,7 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
         return false;
     }
 
-    public void linkDistribute(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, List<TermTemplate> templates, MutableFloat subConceptOverflow) {
+    public void linkDistribute(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, @NotNull List<TermTemplate> templates, MutableFloat subConceptOverflow) {
         for (int i = 0, templatesSize = templates.size(); i < templatesSize; i++) {
             TermTemplate tt = templates.get(i);
             float subScale = scale * tt.strength;

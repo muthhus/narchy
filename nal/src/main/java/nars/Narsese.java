@@ -1,7 +1,6 @@
 package nars;
 
 import com.github.fge.grappa.Grappa;
-import com.github.fge.grappa.annotations.Cached;
 import com.github.fge.grappa.matchers.MatcherType;
 import com.github.fge.grappa.matchers.base.AbstractMatcher;
 import com.github.fge.grappa.parsers.BaseParser;

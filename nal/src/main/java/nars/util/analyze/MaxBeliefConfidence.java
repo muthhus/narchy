@@ -1,4 +1,4 @@
-package nars.util.signal;
+package nars.util.analyze;
 
 import com.google.common.collect.Lists;
 import nars.Global;

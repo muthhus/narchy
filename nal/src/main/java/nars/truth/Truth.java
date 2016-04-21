@@ -22,7 +22,6 @@ package nars.truth;
 
 import nars.$;
 import nars.Symbols;
-import nars.nal.Tense;
 import nars.term.Term;
 import nars.util.Texts;
 import nars.util.data.Util;

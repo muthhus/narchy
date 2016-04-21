@@ -7,7 +7,6 @@ import nars.concept.DefaultConceptBuilder;
 import nars.nal.Deriver;
 import nars.nal.meta.PremiseRule;
 import nars.nal.nal8.AbstractOperator;
-import nars.nal.nal8.operator.TermFunction;
 import nars.nal.op.ImmediateTermTransform;
 import nars.op.data.*;
 import nars.op.math.add;

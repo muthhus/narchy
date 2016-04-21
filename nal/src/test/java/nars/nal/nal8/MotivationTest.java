@@ -3,23 +3,18 @@ package nars.nal.nal8;
 import nars.$;
 import nars.Global;
 import nars.NAR;
-import nars.concept.BooleanConcept;
 import nars.concept.OperationConcept;
 import nars.nal.Tense;
 import nars.nar.Default;
 import nars.term.Term;
 import nars.util.signal.FloatConcept;
 import nars.util.signal.MotorConcept;
-import nars.util.signal.SensorConcept;
-import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.function.Predicate;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * tests sensor/motor activation patterns:
