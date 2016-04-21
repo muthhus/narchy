@@ -57,6 +57,9 @@
     } else if (typeof protocols == "string") {
       protocols = [protocols];
     }
+
+    self.url = url;
+
     // Uses setTimeout() to make sure __createFlash() runs after the caller sets ws.onopen etc.
     // Otherwise, when onopen fires immediately, onopen is called before it is set.
     self.__createTask = setTimeout(function() {
@@ -385,5 +388,14 @@
       WebSocket.__initialize();
     });
   }
-  
+
+
 })();
+
+  /** creates a websocket connection to a path on the server that hosts the currently visible webpage */
+  window.socket = function(path) {
+    return new WebSocket('ws://' +
+        window.location.hostname + ':' +
+        window.location.port + '/' +
+        path);
+  }

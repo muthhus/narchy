@@ -11,7 +11,7 @@ import java.io.*;
 /**
  * emotion state: self-felt internal mental states; variables used to record emotional values
  */
-public final class Emotion  {
+public final class Emotion implements Serializable {
 
     /** priority rate of Task processing attempted */
     @NotNull
@@ -29,9 +29,7 @@ public final class Emotion  {
     @NotNull
     public final FloatGuage happy;
 
-    public final Logger logger;
-
-
+    private transient final Logger logger;
 
     public Emotion() {
         super();
@@ -45,9 +43,10 @@ public final class Emotion  {
 
     }
 
-    final FSTConfiguration conf = FSTConfiguration.createJsonConfiguration(true,false);
+
 
     public void print(@NotNull OutputStream output) {
+        final FSTConfiguration conf = FSTConfiguration.createJsonConfiguration(true,false);
         try {
             conf.encodeToStream(output, this);
         } catch (IOException e) {

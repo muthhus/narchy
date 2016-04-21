@@ -1,5 +1,6 @@
 package nars.util;
 
+import java.io.Serializable;
 import java.util.function.DoubleConsumer;
 
 /**
@@ -10,13 +11,13 @@ import java.util.function.DoubleConsumer;
  * Commons Math SummaryStatistics which also is undesirable
  *
  */
-public class DoubleSummaryReusableStatistics implements DoubleConsumer {
-    private long count = 0L;
-    private double sum = 0.0;
+public class DoubleSummaryReusableStatistics implements DoubleConsumer, Serializable {
+    protected long count = 0L;
+    protected double sum = 0.0;
     //private double sumCompensation; // Low order bits of sum
 //    private double simpleSum; // Used to compute right sum for non-finite inputs
-    private double min = Double.POSITIVE_INFINITY;
-    private double max = Double.NEGATIVE_INFINITY;
+    protected double min = Double.POSITIVE_INFINITY;
+    protected double max = Double.NEGATIVE_INFINITY;
 
     /**
      * Construct an empty instance with zero count, zero sum,

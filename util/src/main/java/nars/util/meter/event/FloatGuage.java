@@ -7,8 +7,7 @@ import nars.util.DoubleSummaryReusableStatistics;
  */
 public class FloatGuage extends DoubleSummaryReusableStatistics {
 
-
-    private final String id;
+    public final String id;
 
     public FloatGuage(String id) {
         super();

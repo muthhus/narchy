@@ -3,18 +3,10 @@
     <head>
         <script type="text/javascript" src="web_socket.js"></script>
         <script type="text/javascript" src="lib/jquery/dist/jquery.min.js"></script>
-        <!--<script type="text/javascript" src="lib/jquery-ui/ui/minified/jquery-ui.min.js"></script>
-        <script type="text/javascript" src="lib/jquery.terminal/js/jquery.terminal-min.js"></script>-->
         <script type="text/javascript" src="lib/lodash/dist/lodash.min.js"></script>
         <style type="text/css">
-            /*@import url("lib/jquery-ui/themes/dot-luv/jquery-ui.min.css");
-            @import url("lib/jquery-ui/themes/dot-luv/jquery.ui.theme.css");
-            @import url("lib/jquery.terminal/css/jquery.terminal.css");*/
             @import url("terminal.css");
         </style>
-        <style>
-        </style>
-
     </head>
     <body>
         <!--<div id="menu">
@@ -32,9 +24,7 @@
         <script type="text/javascript">
 
             var nlp = 0;
-            var path = 'ws';
-            var wsPath = 'ws://' + window.location.hostname + ':' + window.location.port + '/' + path;
-            var ws = new WebSocket(wsPath);
+            var ws;
 
             var prevOutput = null, currentOutput = null;
 
@@ -106,6 +96,7 @@
 
             $(document).ready(function() {
 
+                ws = window.socket('ws');
 
                 var ia = $('#inputArea');
                 ia.keydown(function(e) {
@@ -118,7 +109,7 @@
                 });
 
                 ws.onopen = function() {
-                    addIO("connect " + wsPath + "<br/>");
+                    addIO("connect " + ws.url + "<br/>");
                     addIO();
                 };
                 ws.onmessage = function(e) {
