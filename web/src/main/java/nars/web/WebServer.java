@@ -4,6 +4,7 @@ import io.undertow.Undertow;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.handlers.PathHandler;
 import io.undertow.server.handlers.resource.FileResourceManager;
+import io.undertow.server.handlers.resource.PathResourceManager;
 import io.undertow.websockets.WebSocketConnectionCallback;
 import io.undertow.websockets.core.*;
 import io.undertow.websockets.extensions.PerMessageDeflateHandshake;
@@ -18,12 +19,15 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
+import static io.undertow.Handlers.path;
 import static io.undertow.Handlers.resource;
 import static io.undertow.Handlers.websocket;
 
 
-public class WebServer extends PathHandler {
+public class WebServer /*extends PathHandler*/ {
 
 
     public final NAR nar;
@@ -169,43 +173,47 @@ public class WebServer extends PathHandler {
     }
 
     @SuppressWarnings("HardcodedFileSeparator")
-    public WebServer(NAR nar, int httpPort) throws URISyntaxException {
+    public WebServer(NAR nar, int httpPort) {
 
         this.nar = nar;
 
         //websockets = new NARSWebSocketServer(new InetSocketAddress(webSocketsPort));
         //websockets.start();
 
-        //TODO use resource path
+        //TODO use ClassPathHandler and store the resources in the .jar
 
-
-
-
-        //TODO use correct resource path:
         File c = new File("./web/src/main/resources/");
         //File c = new File(WebServer.class.getResource("/").getPath());
-        logger.info("Serving resources: {}", c.getAbsolutePath());
+        String cp = c.getAbsolutePath().replace("./", "");
+        Path p = Paths.get(
+                //System.getProperty("user.home")
+                cp
+        );//.toAbsolutePath();
+        logger.info("Serving resources: {}", p);
+
 
 
         //https://github.com/undertow-io/undertow/blob/master/examples/src/main/java/io/undertow/examples/sessionhandling/SessionServer.java
-        addPrefixPath("/", resource(
-                new FileResourceManager(c, 100)).
-                setDirectoryListingEnabled(false));
-        addPrefixPath("/ws", new WebSocketCore().get());
 
         server = Undertow.builder()
                 .addHttpListener(httpPort, "localhost")
                 .setIoThreads(2)
-                .setHandler(this)
+                .setHandler(
+                    path()
+                        .addPrefixPath("/",
+                            resource(
+                                new PathResourceManager(p, 0, true, true))
+                                .setDirectoryListingEnabled(true)
+                                .addWelcomeFiles("index.html")
+                        )
+                        .addPrefixPath("/ws", new WebSocketCore().get())
+                )
                 .build();
 
-        logger.info("NARS Web Server starting, port={}", httpPort);
-
-        //narThread.start();
-        //TextOutput.out(nar).setShowInput(false);
 
         loop = nar.loop(idleFPS);
 
+        logger.info("HTTP+Websocket server starting: port={}", httpPort);
         server.start();
 
     }

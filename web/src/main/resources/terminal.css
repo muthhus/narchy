@@ -98,3 +98,6 @@ pre {
     margin-top: 0.5em;
 }
 
+a, a:visited {
+    color: orange;
+}
