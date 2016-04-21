@@ -3,6 +3,7 @@ package nars.term.transform.subst;
 import nars.nal.op.ImmediateTermTransform;
 import nars.term.Term;
 import nars.term.atom.Atomic;
+import nars.util.version.Versioned;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

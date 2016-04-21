@@ -235,6 +235,15 @@ public class PremiseEval extends FindSubst {
         throw new UnsupportedOperationException();
     }
 
+    public final void putXY(Term k, Versioned<Term> vv) {
+        Term v = vv.get();
+        if (v != null) {
+            if (!putXY(k, v)) {
+                throw new RuntimeException("what does this mean");
+            }
+        }
+    }
+
 }
 
 

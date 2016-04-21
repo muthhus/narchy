@@ -9,6 +9,7 @@ import nars.term.Term;
 import nars.term.TermIndex;
 import nars.term.Termed;
 import nars.term.atom.Atom;
+import nars.term.transform.subst.FindSubst;
 import nars.term.transform.subst.MapSubst;
 import nars.term.transform.subst.Subst;
 import org.jetbrains.annotations.NotNull;
@@ -90,12 +91,13 @@ public class substitute extends ImmediateTermTransform implements PremiseAware {
     @Nullable
     public static Term subst(@NotNull PremiseEval r, @NotNull Subst m, @NotNull Term term) {
         //copy the new mappings to the match
-        m.forEach( (k,v) -> {
-            if (!r.putXY(k, v)) {
-                //throw new RuntimeException("what does this mean");
-                //r.xy.put(k, v); //HACK
-            }
-        });
+
+        if (m instanceof FindSubst) {
+            ((FindSubst) m).forEachVersioned(r::putXY);
+        } else {
+            m.forEach(r::putXY);
+        }
+
 //        if (!m.yx.isEmpty()) {
 //            throw new RuntimeException("do these need copied too?");
 //        }

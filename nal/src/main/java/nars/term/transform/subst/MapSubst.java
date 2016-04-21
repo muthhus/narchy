@@ -1,6 +1,7 @@
 package nars.term.transform.subst;
 
 import nars.term.Term;
+import nars.util.version.Versioned;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -9,7 +10,7 @@ import java.util.function.BiConsumer;
 /**
  * Created by me on 12/3/15.
  */
-public class MapSubst implements Subst {
+public final class MapSubst implements Subst {
 
     public final Map<Term, Term> xy;
 
@@ -48,6 +49,7 @@ public class MapSubst implements Subst {
         if (xy.isEmpty()) return;
         xy.forEach(each);
     }
+
 
     @NotNull
     @Override

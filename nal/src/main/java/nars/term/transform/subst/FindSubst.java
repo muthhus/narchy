@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 
 
 /* recurses a pair of compound term tree's subterms
@@ -48,7 +49,7 @@ So it can be useful for a more easy to understand rewrite of this class TODO
 
 
 */
-public abstract class FindSubst extends Versioning implements Subst {
+public abstract class FindSubst extends Versioning implements Subst, Supplier<Versioned<Term>> {
 
 
     public final Random random;
@@ -131,14 +132,16 @@ public abstract class FindSubst extends Versioning implements Subst {
 
         xy = new VarCachedVersionMap(this);
         yx = new VarCachedVersionMap(this);
-        reassigner = new VersionMap.Reassigner<Term,Term>(
-                //() -> new Versioned(toSharePool)
-                () -> new Versioned(FindSubst.this)
-        );
+        reassigner = new VersionMap.Reassigner<>( this );
         //term = new Versioned(this);
         parent = new Versioned(this);
         constraints = new Versioned(this, new int[2], new FasterList(0, new ImmutableMap[2]));
 
+    }
+
+    @Override
+    public Versioned<Term> get() {
+        return new Versioned(this);
     }
 
     /**
@@ -854,6 +857,10 @@ public abstract class FindSubst extends Versioning implements Subst {
         //TODO yx also?
     }
 
+    public void forEachVersioned(@NotNull BiConsumer<? super Term, ? super Versioned<Term>> each) {
+        xy.forEachVersioned(each);
+        //TODO yx also?
+    }
 
 
     /**
@@ -878,9 +885,9 @@ public abstract class FindSubst extends Versioning implements Subst {
             super(context);
         }
 
-        public VarCachedVersionMap(Versioning context, Map<Term, Versioned<Term>> map) {
-            super(context, map);
-        }
+//        public VarCachedVersionMap(Versioning context, Map<Term, Versioned<Term>> map) {
+//            super(context, map);
+//        }
 
         @Override
         public void forEach(@NotNull BiConsumer<? super Term, ? super Term> each) {
@@ -894,12 +901,16 @@ public abstract class FindSubst extends Versioning implements Subst {
             }
         }
 
+        public void forEachVersioned(@NotNull BiConsumer<? super Term, ? super Versioned<Term>> each) {
+            Map<Term, Versioned<Term>> m = this.map;
+            if (!m.isEmpty())
+                m.forEach(each);
+        }
 
         @Override
         public final Term term(Term t) {
 
-            if (t instanceof GenericVariable)
-                throw new RuntimeException("variables must be normalized");
+            assert(!(t instanceof GenericVariable)); //throw new RuntimeException("variables must be normalized");
 
             Versioned<Term> v = map.get(t);
             return v == null ? null : v.get();
