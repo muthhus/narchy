@@ -205,10 +205,10 @@ public final class Derive extends AtomicStringConstant implements ProcTerm {
                     p, this, occReturn
             );
 
-            if (ct == null) {
-                //aborted by temporalization
-                return;
-            }
+//            if (ct == null) {
+//                //aborted by temporalization
+//                return;
+//            }
 
             occ = occReturn[0];
 

@@ -601,8 +601,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     /** is double-premise */
     boolean isDouble();
 
-    /** is single premise */
-    boolean isSingle();
+
 
     /**
      * Check if a Task is a direct input,

@@ -20,7 +20,6 @@ public class DemoPatternGraph {
         Default n = new Default(1024, 2, 3, 3);
         //n.core.activationRate.setValue(0.75f);
 
-
         Deriver.getDefaultDeriver().rules.reifyTo(n);
         n.logSummaryGT(System.out,0.25f);
 

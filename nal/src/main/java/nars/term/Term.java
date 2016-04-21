@@ -40,7 +40,7 @@ public interface Term extends Termed, Comparable, Termlike {
         return this;
     }
 
-    @Nullable
+    @NotNull
     @Override
     Op op();
 
@@ -275,7 +275,7 @@ public interface Term extends Termed, Comparable, Termlike {
 
      subclasses can override this for more efficient aggregation if certain features are sure to be absent
      */
-    default int init(int[] meta) {
+    default int init(@NotNull int[] meta) {
 
         if (vars() > 0) {
             meta[0] += varDep();

@@ -73,7 +73,7 @@ public abstract class AbstractOperator implements Consumer<Task> {
     public void accept(@NotNull Task execution) {
         if (async()) {
             //asynch
-            nar.runAsync(() -> execute(execution));
+            NAR.runAsync(() -> execute(execution));
         } else {
             //synchronous
             execute(execution);

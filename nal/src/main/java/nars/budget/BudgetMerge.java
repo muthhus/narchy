@@ -66,6 +66,10 @@ public interface BudgetMerge {
         return overflow;
     }
 
+    BudgetMerge nullMerge = (x, y, z) -> {
+        throw new UnsupportedOperationException();
+    };
+
     /** sum priority, LERP other components in proportion to the priorities */
     BudgetMerge plusDQBlend = (tgt, src, srcScale) -> {
         return dqBlendByPri(tgt, src, srcScale, true);

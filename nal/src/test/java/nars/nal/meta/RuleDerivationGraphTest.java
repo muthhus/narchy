@@ -15,19 +15,21 @@ import static org.junit.Assert.*;
 
 public class RuleDerivationGraphTest {
 
+    final static TrieDeriver d = Deriver.getDefaultDeriver();
+
     @Test public void testRuleTrie() {
-        TrieDeriver x = Deriver.getDefaultDeriver();
-        x.trie.printSummary();
+
+        d.trie.printSummary();
         /*for (Term p : x.roots) {
             out.println();
             out.println(p);
         }*/
-        assert(x.roots.length > 1);
+        assert(d.roots.length > 1);
     }
 
     @Test
     public void testRuleStatistics() {
-        List<PremiseRule> R = Deriver.getDefaultDeriver().rules.rules;
+        List<PremiseRule> R = d.rules.rules;
         int registeredRules = R.size();
 
 
@@ -78,7 +80,6 @@ public class RuleDerivationGraphTest {
 //    }
 
     @Test public void testPatternIndexContainsNoConcepts() {
-        TrieDeriver d = Deriver.getDefaultDeriver();
         PatternIndex p = d.rules.patterns;
         //out.println(p.data);
         //out.println(p.atoms);

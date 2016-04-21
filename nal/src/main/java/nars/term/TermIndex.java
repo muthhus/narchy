@@ -294,9 +294,9 @@ public interface TermIndex {
             return transform((Compound) src, f);
         } else if (src instanceof Variable) {
             return f.term(src);
+        } else {
+            return src;
         }
-
-        return src;
     }
 
 

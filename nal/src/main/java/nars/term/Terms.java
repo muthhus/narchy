@@ -121,40 +121,51 @@ public class Terms extends TermBuilder implements TermIndex {
 
         if (a == null || b == null) {
             return false;
-        }
+        } else {
+            Op o = a.op();
+            boolean equalOps = (o == b.op());
 
-        //if one is not a compound, then return their equality
-        if (!(a instanceof Compound && b instanceof Compound)) {
-            return a.equals(b);
-        }
+            if (equalOps) {
+                if (a.equals(b))
+                    return false; //inequal because the operator was inequal
 
-        Op o = a.op();
-        boolean equalOps = (o == b.op());
+                switch (o) {
+                    case INHERIT:
+                        return equalSubjectPredicateInRespectToImageAndProduct((Compound) a, (Compound) b);
 
-        if (equalOps) {
-            switch (o) {
-                case INHERIT:
-                    return equalSubjectPredicateInRespectToImageAndProduct((Compound) a, (Compound) b);
-
-                case SIMILAR:
-                    //only half seems necessary:
-                    //boolean y = equalSubjectPredicateInRespectToImageAndProduct((Compound) b, (Compound) a);
-                    return equalSubjectPredicateInRespectToImageAndProduct((Compound) a, (Compound) b);
+                    case SIMILAR:
+                        //only half seems necessary:
+                        //boolean y = equalSubjectPredicateInRespectToImageAndProduct((Compound) b, (Compound) a);
+                        return equalSubjectPredicateInRespectToImageAndProduct((Compound) a, (Compound) b);
+                }
             }
-        }
 
-        Compound A = ((Compound) a);
-        Compound B = ((Compound) b);
-        int aLen = A.size();
-        if (aLen != B.size())
+
+            if ((a instanceof Compound) && (b instanceof Compound)) {
+                //both are compounds
+
+
+                Compound A = ((Compound) a);
+                Compound B = ((Compound) b);
+                int aLen = A.size();
+                if (aLen != B.size()) {
+                    return false;
+                } else {
+
+                    //match all subterms
+                    for (int i = 0; i < aLen; i++) {
+                        if (!equalSubTermsInRespectToImageAndProduct(A.term(i), B.term(i)))
+                            return false;
+                    }
+                    return true;
+                }
+            }
+
             return false;
 
-        //match all subterms
-        for (int i = 0; i < aLen; i++) {
-            if (!equalSubTermsInRespectToImageAndProduct(A.term(i), B.term(i)))
-                return false;
         }
-        return true;
+
+
     }
 
 
@@ -162,10 +173,9 @@ public class Terms extends TermBuilder implements TermIndex {
 
         if (A.equals(B)) {
             return true;
-        }
-
-        if (!A.hasAny(Op.ProductOrImageBits) || !B.hasAny(Op.ProductOrImageBits))
+        } else if (!A.hasAny(Op.ProductOrImageBits) || !B.hasAny(Op.ProductOrImageBits)) {
             return false; //the remaining comparisons are unnecessary
+        }
 
         Term subjA = Statement.subj(A);
         Term predA = Statement.pred(A);
@@ -223,21 +233,18 @@ public class Terms extends TermBuilder implements TermIndex {
             sb = predB;
         }
 
-        if (ta == null)
-            return false;
+        if (ta != null) {
+            //original code did not check relation index equality
+            //https://code.google.com/p/open-nars/source/browse/trunk/nars_core_java/nars/language/CompoundTerm.java
+            //if (requireEqualImageRelation) {
+            //if (sa.op().isImage() && sb.op().isImage()) {
+            Compound csa = (Compound) sa;
+            Compound csb = (Compound) sb;
 
-
-        //original code did not check relation index equality
-        //https://code.google.com/p/open-nars/source/browse/trunk/nars_core_java/nars/language/CompoundTerm.java
-        //if (requireEqualImageRelation) {
-        //if (sa.op().isImage() && sb.op().isImage()) {
-        if (((Compound) sa).relation() != ((Compound) sb).relation()) {
+            return csa.relation() == csb.relation() && containsAll(csa, ta, csb, tb);
+        } else {
             return false;
         }
-        //}
-        //}
-
-        return containsAll((Compound) sa, ta, (Compound) sb, tb);
 
     }
 

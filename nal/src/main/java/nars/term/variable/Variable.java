@@ -25,7 +25,10 @@ public interface Variable extends Atomic {
     @Override
     int compareTo(Object o);
 
-//    @Override
+    @Override
+    boolean equals(Object o);
+
+    //    @Override
 //    default int volume() {
 //        //TODO decide if this is the case for zero-or-more ellipsis
 //        return 1;

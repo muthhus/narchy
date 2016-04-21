@@ -104,17 +104,18 @@ abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements List
 //        return removeItem(size() - 1);
 //    }
 
-    @Override
+    @Nullable @Override
     public final L top() {
         return isEmpty() ? null : item(0);
     }
 
-    @Override
+    @Nullable @Override
     public final L bottom() {
         int s = size();
         return s == 0 ? null : item(s - 1);
     }
 
+    @NotNull
     final L item(int index) {
         return items.get(index);
     }
@@ -124,7 +125,7 @@ abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements List
      *
      * @return The first Item
      */
-    @Nullable
+    @NotNull
     final L removeItem(int index) {
 
         L ii = item(index);
@@ -141,7 +142,7 @@ abstract public class ArrayTable<V, L> extends CollectorMap<V,L> implements List
     }
 
     /** gets the key associated with a value */
-    @Override
+    @Nullable @Override
     abstract public V key(L l);
 
 //    @Override

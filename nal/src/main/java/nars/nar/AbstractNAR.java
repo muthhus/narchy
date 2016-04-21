@@ -4,7 +4,6 @@ import nars.Global;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.concept.DefaultConceptBuilder;
-import nars.nal.Deriver;
 import nars.nal.meta.PremiseRule;
 import nars.nal.nal8.AbstractOperator;
 import nars.nal.op.ImmediateTermTransform;
@@ -312,15 +311,10 @@ public abstract class AbstractNAR extends NAR {
         return getClass().getSimpleName() + '[' + nal() + ']';
     }
 
-    @Nullable
-    protected Deriver newDeriver() {
-        return Deriver.getDefaultDeriver();
-    }
-
     /** reports all active concepts or those which can be reached */
     @Override
     @Nullable
-    public abstract NAR forEachConcept(Consumer<Concept> recip);
+    public abstract NAR forEachConcept(@NotNull Consumer<Concept> recip);
 
 
     public static class DefaultTermIndex2 extends MapIndex2  {

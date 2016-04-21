@@ -118,6 +118,7 @@ public class CurveBag<V> implements Bag<V> {
             if (!remove)
                 remove(i.get());
 
+
         }
         return null; // empty bag
     }
@@ -176,25 +177,23 @@ public class CurveBag<V> implements Bag<V> {
         arrayBag.clear();
     }
 
-    @Override
+    @Nullable @Override
     public final BLink<V> get(@NotNull Object key) {
         return arrayBag.get(key);
     }
 
-    @Nullable
-    @Override
+    @Nullable @Override
     public final BLink<V> sample() {
         return peekNext(false);
     }
 
-    @Override
+    @Nullable @Override
     public final BLink<V> remove(@NotNull V x) {
         return arrayBag.remove(x);
     }
 
 
-    @Nullable
-    @Override
+    @Nullable @Override
     public final BLink<V> put(@NotNull V v, @NotNull Budgeted vBagBudget, float scale, @Nullable MutableFloat overflow) {
         return arrayBag.put(v, vBagBudget, scale, overflow);
     }

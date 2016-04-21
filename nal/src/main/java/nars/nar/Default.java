@@ -15,6 +15,7 @@ import nars.concept.PremiseGenerator;
 import nars.data.Range;
 import nars.nal.Deriver;
 import nars.nal.meta.PremiseEval;
+import nars.nal.meta.TrieDeriver;
 import nars.task.Task;
 import nars.task.flow.SetTaskPerception;
 import nars.task.flow.TaskPerception;
@@ -181,7 +182,7 @@ public class Default extends AbstractNAR {
     protected DefaultCycle initCore(int activeConcepts, int conceptsFirePerCycle, int termLinksPerConcept, int taskLinksPerConcept, PremiseGenerator pg) {
 
 
-        DefaultCycle c = new DefaultCycle(this, newDeriver(), pg, activeConcepts);
+        DefaultCycle c = new DefaultCycle(this, pg, activeConcepts);
 
         //TODO move these to a PremiseGenerator which supplies
         c.premiser.termlinksFiredPerFiredConcept.set(termLinksPerConcept);
@@ -195,10 +196,14 @@ public class Default extends AbstractNAR {
 
     @NotNull
     public DefaultPremiseGenerator newPremiseGenerator() {
-        return new DefaultPremiseGenerator(this, Deriver.getDefaultDeriver(),
+        return new DefaultPremiseGenerator(this, newDeriver(),
             new Forget.ExpForget<>(taskLinkRemembering, perfection).withDeletedItemFiltering(),
             new Forget.ExpForget<>(termLinkRemembering, perfection)
         );
+    }
+
+    protected Deriver newDeriver() {
+        return Deriver.getDefaultDeriver();
     }
 
 
@@ -368,7 +373,6 @@ public class Default extends AbstractNAR {
         @NotNull
         final Active handlers;
 
-        public final Deriver der;
 
         /**
          * How many concepts to fire each cycle; measures degree of parallelism in each cycle
@@ -424,12 +428,9 @@ public class Default extends AbstractNAR {
 
         /* ---------- Short-term workspace for a single cycle ------- */
 
-        protected AbstractCycle(@NotNull NAR nar, Deriver deriver, Bag<Concept> concepts, PremiseGenerator premiseGenerator) {
+        protected AbstractCycle(@NotNull NAR nar, Bag<Concept> concepts, PremiseGenerator premiseGenerator) {
 
             this.nar = nar;
-
-            this.der = deriver;
-
 
             this.premiser = premiseGenerator;
 
@@ -526,8 +527,8 @@ public class Default extends AbstractNAR {
     public static class DefaultCycle extends AbstractCycle {
 
 
-        public DefaultCycle(@NotNull NAR nar, Deriver deriver, PremiseGenerator premiseGenerator, int activeConcepts) {
-            super(nar, deriver, newConceptBag(nar.random, activeConcepts), premiseGenerator);
+        public DefaultCycle(@NotNull NAR nar, PremiseGenerator premiseGenerator, int activeConcepts) {
+            super(nar, newConceptBag(nar.random, activeConcepts), premiseGenerator);
         }
 
 

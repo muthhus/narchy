@@ -291,10 +291,11 @@ public interface Temporalize {
             else*/ if (dOcc!=ETERNAL && oOcc == ETERNAL) {
 
 
-                if ((shift < 0) && (ddt > 0) && (matchedDerived < matchedOther)) {
-                    shift *= -1;
-                } else if ((shift < 0) && (ddt < 0) && (matchedDerived > matchedOther)) {
-                    shift *= -1;
+                if (shift < 0) {
+                    if (((ddt > 0) && (matchedDerived < matchedOther))||
+                            ((ddt < 0) && (matchedDerived > matchedOther))){
+                        shift *= -1;
+                    }
                 }
 
                 oOcc = dOcc;

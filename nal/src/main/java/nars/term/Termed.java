@@ -10,7 +10,7 @@ public interface Termed<T extends Term>  {
 
     @NotNull T term();
 
-    @Nullable
+    @NotNull
     default Op op() { return term().op(); }
 
     default int opRel() {
@@ -33,8 +33,7 @@ public interface Termed<T extends Term>  {
 
     @Nullable
     static Term termOrNull(@Nullable Termed x) {
-        if (x == null) return null;
-        return x.term();
+        return x == null ? null : x.term();
     }
 
 }

@@ -676,7 +676,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
                     .append(chan)
                     //.append(ANSI.COLOR_RESET )
                     .append(": ");
-            previou = chan;
+            //previou = chan;
         } else {
             //indent
             for (int i = 0; i < chan.length() + 2; i++)
@@ -788,7 +788,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * in its own thread in a thread pool
      */
     @Nullable
-    public Future runAsync(@NotNull Runnable t) {
+    public static Future runAsync(@NotNull Runnable t) {
 
         logger.info("runAsyncs run {}", t);
 
@@ -811,7 +811,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
     @NotNull
     public NAR onAnswer(@NotNull String question, @NotNull Consumer<Task> recvSolution) {
         //question punctuation optional
-        if (!(question.length() > 0 && question.charAt(question.length() - 1) == '?')) question = question + '?';
+        if (!(!question.isEmpty() && question.charAt(question.length() - 1) == '?')) question = question + '?';
         Task qt = task(question);
         return onAnswer(qt, recvSolution);
     }
@@ -994,7 +994,7 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         return Stream.of(terms).map(this::term).toArray(Termed[]::new);
     }
 
-    public synchronized void dumpConcepts(@NotNull String path) throws FileNotFoundException {
+    public void dumpConcepts(@NotNull String path) throws FileNotFoundException {
         PrintStream pw = new PrintStream(new FileOutputStream(new File(path)));
         index().forEach(t -> {
             if (t instanceof Concept) {

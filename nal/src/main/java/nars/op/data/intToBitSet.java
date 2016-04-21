@@ -25,7 +25,7 @@ public class intToBitSet extends IntTo<Compound> {
     @NotNull
     @Override protected Compound function(int a) {
 
-        return the(a, this::bit);
+        return the(a, intToBitSet::bit);
     }
 
     @NotNull
@@ -44,7 +44,7 @@ public class intToBitSet extends IntTo<Compound> {
         return the(a, $::the);
     }
 
-    private Term bit(int i) {
+    private static Term bit(int i) {
         return $.the(i);
     }
 }

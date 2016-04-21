@@ -22,10 +22,8 @@ import java.util.function.Predicate;
  */
 public class ArrayBag<V> extends ArrayTable<V, BLink<V>> implements Bag<V> {
 
-    //public static final Procedure2<Budget, Budget> DEFAULT_MERGE_METHOD = UnitBudget.average;
-
-    @Nullable
-    protected BudgetMerge mergeFunction;
+    /** this default value must be changed */
+    @NotNull protected BudgetMerge mergeFunction = BudgetMerge.nullMerge;
 
     public ArrayBag(int cap) {
         this(new BudgetedArraySortedIndex<>(cap));
@@ -61,7 +59,7 @@ public class ArrayBag<V> extends ArrayTable<V, BLink<V>> implements Bag<V> {
     /**
      * returns amount overflowed
      */
-    protected final float merge(@NotNull BLink<V> target, Budgeted incoming, float scale) {
+    protected final float merge(@NotNull BLink<V> target, @NotNull Budgeted incoming, float scale) {
         return mergeFunction.merge(target, incoming, scale);
         /*if (overflow > 0)
             target.charge(overflow);*/
@@ -100,7 +98,7 @@ public class ArrayBag<V> extends ArrayTable<V, BLink<V>> implements Bag<V> {
 
     @NotNull
     @Override
-    public Bag<V> sample(int n, Consumer<? super BLink<V>> target) {
+    public Bag<V> sample(int n, @NotNull Consumer<? super BLink<V>> target) {
         throw new RuntimeException("unimpl");
     }
 
@@ -203,7 +201,7 @@ public class ArrayBag<V> extends ArrayTable<V, BLink<V>> implements Bag<V> {
      */
     @Nullable
     @Override
-    public final BLink<V> put(@NotNull V i, Budgeted b, float scale, @Nullable MutableFloat overflow) {
+    public final BLink<V> put(@NotNull V i, @NotNull Budgeted b, float scale, @Nullable MutableFloat overflow) {
 
         BLink<V> existing = get(i);
 

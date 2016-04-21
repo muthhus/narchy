@@ -377,7 +377,7 @@ public enum $ /* TODO: implements TermIndex */ {
         return the(DISJUNCTION, a);
     }
 
-    static {
+    //static {
 //        // assume SLF4J is bound to logback in the current environment
 //        LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
 //
@@ -408,7 +408,7 @@ public enum $ /* TODO: implements TermIndex */ {
 //        LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
 //        loggerContext.start();
 //        //loggerContext.stop();
-    }
+    //}
 
     @NotNull
     public static Logger logRoot;

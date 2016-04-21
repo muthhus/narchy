@@ -174,7 +174,7 @@ public class TrieDeriver extends Deriver {
             @Nullable ThenFork conseq) {
 
 
-        if (condition.size() == 0) {
+        if (condition.isEmpty()) {
             return conseq;
         }
 

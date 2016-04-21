@@ -27,8 +27,7 @@ import static nars.Global.reference;
  * Default Task implementation
  * TODO move all mutable methods to MutableTask and call this ImmutableTask
  */
-public abstract class AbstractTask extends UnitBudget
-        implements Task, Temporal {
+public abstract class AbstractTask extends UnitBudget implements Task, Temporal {
 
     /** content term of this task */
     private Termed<Compound> term;
@@ -100,9 +99,6 @@ public abstract class AbstractTask extends UnitBudget
 
 
     protected final void setTerm(@NotNull Termed<Compound> t) {
-        if (t == null)
-            throw new RuntimeException("null term");
-
         if (!term.equals(t)) {
             term = t;
             invalidate();
@@ -227,7 +223,7 @@ public abstract class AbstractTask extends UnitBudget
     /** if validated and entered into the system. can be overridden in subclasses to handle this event
      *  isnt called for Command tasks currently; they will be executed right away anyway
      * */
-    protected void onInput(Memory m) {
+    protected void onInput(@NotNull Memory m) {
 
     }
 
@@ -236,7 +232,7 @@ public abstract class AbstractTask extends UnitBudget
      * when executed; can be overridden in subclasses to handle this event;
      * (for Operation and negation of Operation ONLY)
      * */
-    @Override public void execute(Concept c, @NotNull NAR n) {
+    @Override public void execute(@NotNull Concept c, @NotNull NAR n) {
 
     }
 
@@ -271,22 +267,22 @@ public abstract class AbstractTask extends UnitBudget
     }
 
     @Override
-    public boolean onConcept(Concept c) {
+    public boolean onConcept(@NotNull Concept c) {
         return true;
     }
 
-    @Override
+    @NotNull @Override
     public final Compound term() {
         return term.term();
     }
 
-    @Override
+    @Nullable @Override
     public final Truth truth() {
         return truth;
     }
 
     @Override
-    public final void setTruth(@NotNull Truth t) {
+    public final void setTruth(@Nullable Truth t) {
 
         if (t == null && isBeliefOrGoal())
             throw new NullPointerException();
@@ -329,7 +325,7 @@ public abstract class AbstractTask extends UnitBudget
     }
 
     /** the evidence should be sorted and de-duplicaed prior to calling this */
-    @NotNull protected Task setEvidence(long... evidentialSet) {
+    @NotNull protected Task setEvidence(@Nullable long... evidentialSet) {
         if (this.evidentialSet!=evidentialSet) {
             this.evidentialSet = evidentialSet;
             invalidate();
@@ -343,20 +339,11 @@ public abstract class AbstractTask extends UnitBudget
     }
 
     @Override
-    public final boolean isSingle() {
-        return getParentBelief()==null;
-    }
-
-
-
-
-
-    @Override
     public final char punc() {
         return punctuation;
     }
 
-    @NotNull
+    @Nullable
     @Override
     public final long[] evidence() {
         long[] e = this.evidentialSet;
@@ -423,11 +410,13 @@ public abstract class AbstractTask extends UnitBudget
         //supplying no evidence will be assigned a new serial
         //but this should only happen for input tasks (with no parent)
 
-        if (getParentTask()!=null) {
-            if (isDouble())
-                setEvidence( Stamp.zip(getParentTask(), getParentBelief() ));
-            else if ( isSingle() )
-                setEvidence(getParentTask().evidence());
+        Task pt = getParentTask();
+        if (pt !=null) {
+            Task pb = getParentBelief();
+            if (pb!=null)
+                setEvidence( Stamp.zip(pt, pb ));
+            else
+                setEvidence(pt.evidence());
         } else {
             setEvidence((long[])null);
         }

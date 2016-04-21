@@ -1,6 +1,7 @@
 package nars.op;
 
 import nars.$;
+import nars.NAR;
 import nars.nal.Tense;
 import nars.nal.nal8.operator.TermFunction;
 import nars.term.Compound;
@@ -32,7 +33,7 @@ public class sys extends TermFunction {
 //                    final long pidCopy = pid =
 //                            p.hashCode(); //HACK temporary
 //                            //p.getPid();
-                    nar.runAsync(()-> {
+                    NAR.runAsync(()-> {
                         try {
 
                             Scanner s = new Scanner(p.getInputStream());
