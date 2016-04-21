@@ -9,11 +9,12 @@ import nars.term.Term;
 import nars.term.TermIndex;
 import nars.term.Termed;
 import nars.term.atom.Atom;
-import nars.term.transform.subst.FindSubst;
 import nars.term.transform.subst.MapSubst;
 import nars.term.transform.subst.Subst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.HashMap;
 
 
 /** TODO is this better named "substituteAny" */
@@ -82,27 +83,18 @@ public class substitute extends ImmediateTermTransform implements PremiseAware {
         x = resolve(r, x);
         y = resolve(r, y);
 
-        MapSubst m = new MapSubst(r.yx);
-        m.xy.put(x, y);
-
-        return subst(r, m, term);
+        return resolve(r,
+                new MapSubst.MapSubstWithOverride(r.yx, x, y),
+                term);
     }
 
+
+
+    public
     @Nullable
-    public static Term subst(@NotNull PremiseEval r, @NotNull Subst m, @NotNull Term term) {
-        //copy the new mappings to the match
-
-        if (m instanceof FindSubst) {
-            ((FindSubst) m).forEachVersioned(r::putXY);
-        } else {
-            m.forEach(r::putXY);
-        }
-
-//        if (!m.yx.isEmpty()) {
-//            throw new RuntimeException("do these need copied too?");
-//        }
-
-        return Termed.termOrNull(r.premise.nar().index.apply(m, term));
+    static Term resolve(@NotNull PremiseEval r, @NotNull Subst m, @NotNull Term term) {
+        Termed resolved = r.premise.nar().index.apply(m, term);
+        return Termed.termOrNull(resolved);
     }
 
     //    protected boolean substitute(Compound p, MapSubst m, Term a, Term b) {

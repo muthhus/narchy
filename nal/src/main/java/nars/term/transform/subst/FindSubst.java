@@ -921,11 +921,10 @@ public abstract class FindSubst extends Versioning implements Subst, Supplier<Ve
          */
         @Override
         public boolean isEmpty() {
-            if (super.isEmpty())
-                return true;
-
-            for (Versioned x : map.values()) {
-                if (x.get() != null) return false;
+            if (!super.isEmpty()) {
+                for (Versioned x : map.values()) {
+                    if (x.get() != null) return false;
+                }
             }
             return true;
         }

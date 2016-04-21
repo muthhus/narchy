@@ -74,9 +74,11 @@ public abstract class AbstractMapIndex implements TermIndex {
     public void print(@NotNull PrintStream out) {
 
         atoms.print(System.out);
+        out.println();
         forEach(out::println);
-
+        out.println();
     }
+
     @Override
     public final ConceptBuilder conceptBuilder() {
         return conceptBuilder;

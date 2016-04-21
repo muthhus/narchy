@@ -263,7 +263,7 @@ public interface TermIndex {
             }
         }
 
-        return result!=null ? the(result.term()) : null;
+        return result!=null ? result.term() : null;
     }
 
     @Nullable
@@ -414,6 +414,7 @@ public interface TermIndex {
 
     default void print(@NotNull PrintStream out) {
         forEach(out::println);
+        out.println();
     }
 
 

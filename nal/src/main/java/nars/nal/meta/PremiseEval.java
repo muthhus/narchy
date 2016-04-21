@@ -16,6 +16,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.term.transform.subst.FindSubst;
+import nars.term.transform.subst.Subst;
 import nars.truth.Truth;
 import nars.util.version.Versioned;
 import org.jetbrains.annotations.NotNull;
@@ -241,6 +242,16 @@ public class PremiseEval extends FindSubst {
             if (!putXY(k, v)) {
                 throw new RuntimeException("what does this mean");
             }
+        }
+    }
+
+    /** copy the new mappings to the match */
+    public final void putAllXY(Subst m) {
+        if (m instanceof FindSubst) {
+            ((FindSubst) m).forEachVersioned(this::putXY);
+        } else {
+            if (!m.isEmpty())
+                m.forEach(this::putXY);
         }
     }
 

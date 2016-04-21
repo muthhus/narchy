@@ -37,21 +37,22 @@ public final class substituteIfUnifies extends substitute {
 
     private final static class OneMatchFindSubst extends FindSubst {
 
-        private final Term xterm;
+        private final @NotNull Term xterm;
         private final @NotNull PremiseEval r;
-        @Nullable
-        private Term result;
+        @Nullable private Term result;
 
-        public OneMatchFindSubst(@NotNull Op op, @NotNull PremiseEval r, Term xterm) {
+        public OneMatchFindSubst(@NotNull Op op, @NotNull PremiseEval r, @NotNull Term xterm) {
             super(op, r.premise.nar().random, r);
             this.xterm = xterm;
             this.r = r;
         }
 
+
         /** terminates after the first match */
         @Override public boolean onMatch() {
             //apply the match before the xy/yx mapping gets reverted after leaving the termutator
-            result = subst(r, this, xterm);
+            r.putAllXY(this);
+            result = substitute.resolve(r, r, xterm);
             return false;
         }
 

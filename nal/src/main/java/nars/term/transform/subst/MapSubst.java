@@ -10,7 +10,7 @@ import java.util.function.BiConsumer;
 /**
  * Created by me on 12/3/15.
  */
-public final class MapSubst implements Subst {
+public class MapSubst implements Subst {
 
     public final Map<Term, Term> xy;
 
@@ -41,7 +41,7 @@ public final class MapSubst implements Subst {
      * @param t
      */
     @Override
-    public final Term term(Term t) {
+    public Term term(Term t) {
         return xy.get(t);
     }
 
@@ -57,6 +57,46 @@ public final class MapSubst implements Subst {
         return "Substitution{" +
                 "subs=" + xy +
                 '}';
+    }
+
+    /** wrapper which parameterized by an additional mapping pair that acts as an overriding overlay prior to accessing the MapSubst internal map */
+    public final static class MapSubstWithOverride extends MapSubst {
+        final Term ox, oy;
+
+        public MapSubstWithOverride(@NotNull Map<Term, Term> xy, @NotNull Term ox, @NotNull Term oy) {
+            super(xy);
+            this.ox = ox;
+            this.oy = oy;
+        }
+
+        @Override
+        public Term term(Term t) {
+            return t.equals(ox) ? oy : super.term(t);
+        }
+
+        @Override
+        public void forEach(@NotNull BiConsumer<? super Term, ? super Term> each) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return false;
+        }
+
+        @Override
+        public void clear() {
+            throw new UnsupportedOperationException();
+        }
+
+        @NotNull
+        @Override
+        public String toString() {
+            return "Substitution{(" + ox +"," + oy + ") && " +
+                    "inherited subs=" + xy +
+                    '}';
+        }
+
     }
 
 
