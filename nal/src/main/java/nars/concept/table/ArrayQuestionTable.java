@@ -23,6 +23,8 @@ import java.util.function.Consumer;
  */
 public class ArrayQuestionTable implements QuestionTable {
 
+    final BudgetMerge merge = BudgetMerge.plusDQDominant;
+
     protected int capacity;
 
     @NotNull
@@ -135,7 +137,7 @@ public class ArrayQuestionTable implements QuestionTable {
         if (existing != null) {
 
             if (existing != t) {
-                BudgetMerge.plusDQBlend.merge(existing.budget(), t, 1f);
+                merge.merge(existing.budget(), t, 1f);
                 m.remove(t, "Duplicate Question");
             }
 
@@ -161,7 +163,7 @@ public class ArrayQuestionTable implements QuestionTable {
             MutableTask te = new MutableTask(
                     t, e,
                     m.time(), occ,
-                    zipped, BudgetMerge.plusDQBlend);
+                    zipped, merge);
 
             remove(i, m, "Merged");
             m.remove(t, "Merged");

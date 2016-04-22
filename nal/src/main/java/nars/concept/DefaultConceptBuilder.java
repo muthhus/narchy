@@ -59,17 +59,19 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                 .merge(mergeDefault());
     }
 
-    @NotNull
-    private BudgetMerge mergeDefault() {
-        return BudgetMerge.plusDQBlend;
-    }
 
     @NotNull
     @Override public Bag<Termed> termbag() {
         return new CurveBag<Termed>(termLinkBagSize.intValue(), rng)
                 .merge(mergeDefault());
-
     }
+
+    @NotNull
+    private BudgetMerge mergeDefault() {
+        //return BudgetMerge.plusDQBlend;
+        return BudgetMerge.plusDQDominant;
+    }
+
 
     final static Logger logger = LoggerFactory.getLogger(DefaultConceptBuilder.class);
 

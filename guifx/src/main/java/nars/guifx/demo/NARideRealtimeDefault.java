@@ -42,7 +42,7 @@ public enum NARideRealtimeDefault {
             //)
         );
 
-        Default nar = new Default(1024, 1, 2, 2) {
+        Default nar = new Default(1024, 3, 2, 2) {
             @Override
             public Function<Term, Concept> newConceptBuilder() {
                 return new DefaultConceptBuilder(random, 32, 128);
@@ -53,7 +53,9 @@ public enum NARideRealtimeDefault {
                 Inperience.class
         );
         nar.with(new Abbreviation(nar,"is"));
-
+        nar.conceptRemembering.setValue(1000 * 10);
+        nar.termLinkRemembering.setValue(1000 * 25);
+        nar.taskLinkRemembering.setValue(1000 * 15);
 
 
 

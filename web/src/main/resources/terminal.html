@@ -109,7 +109,7 @@
                 });
 
                 ws.onopen = function() {
-                    addIO("connect " + ws.url + "<br/>");
+                    addIO("connect " + ws.url);
                     addIO();
                 };
                 ws.onmessage = function(e) {

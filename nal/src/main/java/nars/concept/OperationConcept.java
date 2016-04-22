@@ -48,7 +48,7 @@ public class OperationConcept extends CompoundConcept implements Runnable {
 
     public OperationConcept(@NotNull Compound term, Bag<Termed> termLinks, Bag<Task> taskLinks) {
         super(term, termLinks, taskLinks);
-        ensureOperation(term);
+        //ensureOperation(term);
 
     }
 
@@ -56,7 +56,7 @@ public class OperationConcept extends CompoundConcept implements Runnable {
     public OperationConcept(@NotNull Compound term, @NotNull NAR n) throws Narsese.NarseseException {
         super(term, n);
         this.nar = n;
-        ensureOperation(term);
+        //ensureOperation(term);
         n.on(this);
     }
 
@@ -64,10 +64,10 @@ public class OperationConcept extends CompoundConcept implements Runnable {
         this((Compound) $.$(compoundTermString), n);
     }
 
-    static void ensureOperation(@NotNull Compound term) {
-        if (!Op.isOperation(term))
-            throw new RuntimeException(term + " is not an Operation");
-    }
+//    static void ensureOperation(@NotNull Compound term) {
+//        if (!Op.isOperation(term))
+//            throw new RuntimeException(term + " is not an Operation");
+//    }
 
     /* subj contains the parameter product */
     public final TermContainer parameters() {
@@ -162,11 +162,14 @@ public class OperationConcept extends CompoundConcept implements Runnable {
         //if (task.op() != NEGATE) {
 
             //emit for both beliefs and goals
+        boolean isOperation = Op.isOperation(this); //TODO cache in field
+        if (isOperation) {
             Topic<Task> tt = nar.concept(Operator.operator(this)).get(Execution.class);
             if (tt != null && !tt.isEmpty()) {
                 //beforeNextFrame( //<-- enqueue after this frame, before next
                 tt.emit(task);
             }
+        }
 
 
             //call Task.execute only for goals
@@ -205,7 +208,10 @@ public class OperationConcept extends CompoundConcept implements Runnable {
 
     public final float expectation(@NotNull NAR nar) {
         update(nar);
-        return desired.expectation();
+        float d = desired.expectation();
+        return d;
+        //float b = believed.expectation();
+
     }
 
     /** provide motivation value after triggering an update */

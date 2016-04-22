@@ -18,6 +18,7 @@ import java.util.List;
 
 import static java.lang.Math.abs;
 import static java.lang.Math.sqrt;
+import static nars.concept.table.BeliefTable.rankTemporalByConfidence;
 import static nars.nal.Tense.DTERNAL;
 
 /**
@@ -82,14 +83,18 @@ public class Revection {
 
             }
 
-            if (a == null) {
                 //consider ii for being the weakest ranked task to remove
-                float r = BeliefTable.rankTemporalByConfidence(ii, now, now, 1f, -1);
+                float r = rankTemporalByConfidence(ii, now, now, 1f, -1);
                 if (r < wr) {
                     wr = r;
                     w = ii;
                 }
-            }
+        }
+
+        float ir = rankTemporalByConfidence(input, now, now, 1f, -1);
+        if (ir < wr) {
+            //input ranks lower than all existing
+            return false;
         }
 
         if (a!=null) {
@@ -189,9 +194,11 @@ public class Revection {
             dtDist = tDist; //use tDist again
         }
 
+        float originality = a.originality() + b.originality();
+
         //more time distance to now factor will cause them to seem closer together than they actually are, like a perspective collapsing to a point at the horizon
         float timeFade = (abs(now - ao) + abs(now - bo));
-        return (1f + truthDist) * (1f + dtDist) * (1f + tDist / (float) sqrt(timeFade) );
+        return (1f + truthDist) * (1f + dtDist) * (1f + tDist / (float) sqrt(timeFade) ) / (originality);
 
         //return (fDist*fDist) * tDist / (1f + (float)Math.sqrt(ageFactor)); // * window);
         //return fDist * (float)(Math.sqrt(tDist / (1f + ageFactor))); // * window);

@@ -49,9 +49,10 @@ public abstract class WebsocketService extends AbstractReceiveListener implement
     public void send(WebSocketChannel socket, Object object) {
         //System.out.println("send: " + object);
 
-        //WebSockets.sendText(ByteBuffer.wrap(jsonizer.asByteArray(object)), socket, this);
-        WebSockets.sendText(jsonizer.asJsonString(object), socket, this);
-        //asJsonString(object)
+
+        WebSockets.sendText(ByteBuffer.wrap(jsonizer.asByteArray(object)), socket, this);
+        //WebSockets.sendText(jsonizer.asJsonString(object), socket, this);
+
 
 
 //            try {

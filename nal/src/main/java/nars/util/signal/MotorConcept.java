@@ -22,13 +22,19 @@ import java.util.function.Consumer;
 
 public class MotorConcept extends OperationConcept implements Consumer<NAR>, FloatFunction<Term> {
 
-    /** all effected motor actuation relative to the differential of current desire and current belief */
-    public static final FloatToFloatFunction relative = m -> m;
+    /**
+     * all effected motor actuation relative to the differential of current desire and current belief
+     */
+    public static final MotorFunction relative = (d,b) -> d;
 
-    /** motor feedback attenuated by half of motor input */
-    public static final FloatToFloatFunction leaky = m -> m/2;
+    /**
+     * motor feedback attenuated by half of motor input
+     */
+    public static final FloatToFloatFunction leaky = m -> m / 2;
 
-    /** motor actuation directly controlled by desire value d*/
+    /**
+     * motor actuation directly controlled by desire value d
+     */
     public static final FloatToFloatFunction absolute = m -> Float.NaN;
 
 
@@ -36,23 +42,31 @@ public class MotorConcept extends OperationConcept implements Consumer<NAR>, Flo
     private final Sensor feedback;
     private final Logger logger;
 
-    /** input: 0..+1 (expectation)   output feedback: 0..+1 or NaN */
-    private FloatToFloatFunction motor;
+    @FunctionalInterface  public interface MotorFunction {
+        public float motor(float believed, float desired);
+    }
 
-    /** belief feedback expectation */
+    /**
+     * input: 0..+1 (expectation)   output feedback: 0..+1 or NaN
+     */
+    @NotNull
+    private MotorFunction motor;
+
+    /**
+     * belief feedback expectation
+     */
     float nextFeedback;
 
-    public MotorConcept(@NotNull String compoundTermString, @NotNull NAR n, FloatToFloatFunction motor) throws Narsese.NarseseException {
+    public MotorConcept(@NotNull String compoundTermString, @NotNull NAR n, MotorFunction motor) throws Narsese.NarseseException {
         super(compoundTermString, n);
 
-        assert(Op.isOperation(term()));
+        assert (Op.isOperation(term()));
 
         this.logger = LoggerFactory.getLogger(getClass() + ":" + term);
 
 
-
         FloatToFloatFunction motivationToFeedback = (f) -> {
-            return 0.5f + (f/2f);
+            return 0.5f + (f / 2f);
         };
         feedback = new Sensor(n, this, this, motivationToFeedback) {
             @Override
@@ -83,14 +97,14 @@ public class MotorConcept extends OperationConcept implements Consumer<NAR>, Flo
         //  equal the expectation of activation, by default. this creates a balanced self-cancelling feedback
         //  loop when a motor function returns a feedback equal to the activation it received
         //ex: activation
-        feedback.conf(0.75f);
+        feedback.conf(0.9f);
         //feedback.maxTimeBetweenUpdates(1);
 
         setMotor(motor);
 
         n.onFrame(this);
 
-        nextFeedback = 0f; //initialize belief
+        nextFeedback = 0.5f; //initialize belief
         feedback.accept(n);
     }
 
@@ -110,7 +124,8 @@ public class MotorConcept extends OperationConcept implements Consumer<NAR>, Flo
      * if a motor experienced resistance to being driven, then the return value
      * would be less than the input motivation.
      */
-    public FloatToFloatFunction getMotor() {
+    @NotNull
+    public MotorFunction getMotor() {
         return motor;
     }
 
@@ -132,7 +147,7 @@ public class MotorConcept extends OperationConcept implements Consumer<NAR>, Flo
     /**
      * change the motor function
      */
-    public void setMotor(FloatToFloatFunction motor) {
+    public void setMotor(MotorFunction motor) {
         this.motor = motor;
     }
 
@@ -157,28 +172,23 @@ public class MotorConcept extends OperationConcept implements Consumer<NAR>, Flo
         if (!hasGoals())
             return;
 
-        FloatToFloatFunction m = getMotor();
-        if (m != null) {
-            float activation =
-                    //motivation(nar);
-                    expectation(nar);
+        //if (m != null) {
+        float desired =
+                //motivation(nar);
+                expectation(nar);
+        float believed = this.believed.expectation();
 
-            if (activation > 0) {
-                float response = motor.valueOf(Util.clamp(activation));
+        float response = motor.motor(believed, desired);
 
-                if (Float.isFinite(response)) {
-                    nextFeedback = response;
-                    feedback.accept(nar);
-                }
-            } else {
-                //response = -1f;
-            }
-
-
-
-        } else {
-            logger.info("null motor function");
+        if (Float.isFinite(response)) {
+            nextFeedback = response;
+            feedback.accept(nar);
         }
+
+
+        /*} else {
+            logger.info("null motor function");
+        }*/
     }
 
 

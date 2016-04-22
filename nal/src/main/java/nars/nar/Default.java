@@ -16,6 +16,7 @@ import nars.data.Range;
 import nars.nal.Deriver;
 import nars.nal.meta.PremiseEval;
 import nars.task.Task;
+import nars.task.flow.FIFOTaskPerception;
 import nars.task.flow.SetTaskPerception;
 import nars.task.flow.TaskPerception;
 import nars.term.Term;
@@ -40,14 +41,10 @@ import java.util.function.Function;
  */
 public class Default extends AbstractNAR {
 
-    private static final Logger logger = LoggerFactory.getLogger(Default.class);
+    //private static final Logger logger = LoggerFactory.getLogger(Default.class);
 
     @NotNull
     public final DefaultCycle core;
-
-
-    @NotNull
-    public final TaskPerception input;
 
     @NotNull
     public final DefaultPremiseGenerator premiser;
@@ -92,7 +89,7 @@ public class Default extends AbstractNAR {
                 random,
                 Global.DEFAULT_SELF);
 
-        the("input", input = initInput());
+        the("input", initInput());
 
         the("premiser", premiser = newPremiseGenerator());
         premiser.confMin.setValue(Global.TRUTH_EPSILON);
@@ -158,11 +155,13 @@ public class Default extends AbstractNAR {
     @NotNull
     public TaskPerception initInput() {
 
+        //return new FIFOTaskPerception(this, null, this::process);
+
         return new SetTaskPerception(
                 this,
                 this::process,
                 //BudgetMerge.plusDQBlend
-                BudgetMerge.avgDQBlend
+                BudgetMerge.plusDQDominant
         );
 
 
@@ -534,8 +533,8 @@ public class Default extends AbstractNAR {
         @NotNull
         public static Bag<Concept> newConceptBag(@NotNull Random r, int n) {
             return new CurveBag<Concept>(n, r)
-                    //.mergePlus();
-                    .merge(BudgetMerge.plusDQBlend);
+                    //.merge(BudgetMerge.plusDQBlend);
+                    .merge(BudgetMerge.plusDQDominant);
         }
 
 

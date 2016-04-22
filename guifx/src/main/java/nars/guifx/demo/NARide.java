@@ -256,9 +256,9 @@ public class NARide extends StackPane {
                     Arrays.toString(((Default)nar).core.active.getPriorityHistogram(10)) + "<br/>";
             nar.input("html(\"" + report + "\");");
         });
-        nar.onExec("feel", (c) -> {
-            nar.emotion.logger.info("{}", nar.emotion);
-        });
+//        nar.onExec("feel", (c) -> {
+//            nar.emotion.logger.info("{}", nar.emotion);
+//        });
 
 
 

@@ -133,6 +133,7 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     @Override
     public int compareTo(@NotNull Object o) {
         if (this == o) return 0;
+        //if (o == null) return -1;
 
         Termed t = (Termed) o;
         //int diff = op().compareTo(t.op());

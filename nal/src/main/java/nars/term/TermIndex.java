@@ -500,6 +500,9 @@ public interface TermIndex {
                 cx = transform((Compound) x, trans); //recurse
             }
 
+            if (cx == null)
+                return null;
+
             if (x!=cx) { //REFERENCE EQUALTY
                 modifications++;
                 x = cx;

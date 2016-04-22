@@ -33,7 +33,7 @@ public class ArrayBeliefTable implements BeliefTable {
     @NotNull public final ListTable<Task,Task> temporal;
     @NotNull final Map<Task,Task> map;
 
-    public static final BudgetMerge DuplicateMerge = BudgetMerge.plusDQBlend;
+    public static final BudgetMerge DuplicateMerge = BudgetMerge.plusDQDominant;
 
     private long lastUpdate; //cached value, updated before temporal operations begin
     //private long minT, maxT;
