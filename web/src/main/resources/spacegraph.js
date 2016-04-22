@@ -28,7 +28,7 @@ var DEFAULT_MAX_LISTENERS = 12;
 //TODO use ES6 Map for better performance: http://jsperf.com/map-vs-object-as-hashes/2
 class EventEmitter {
     constructor(){
-        this._maxListeners = DEFAULT_MAX_LISTENERS
+        this._maxListeners = DEFAULT_MAX_LISTENERS;
         this._events = {}
     }
     on(type, listener) {
@@ -44,11 +44,11 @@ class EventEmitter {
         if(typeof listener != "function") {
             throw new TypeError()
         }
-        var listeners = this._events[type] ||(this._events[type] = [])
+        var listeners = this._events[type] ||(this._events[type] = []);
         if(listeners.indexOf(listener) != -1) {
             return this
         }
-        listeners.push(listener)
+        listeners.push(listener);
         if(listeners.length > this._maxListeners) {
             error(
                 "possible memory leak, added %i %s listeners, "+
@@ -62,9 +62,9 @@ class EventEmitter {
         return this
     }
     once(type, listener) {
-        var eventsInstance = this
+        var eventsInstance = this;
         function onceCallback(){
-            eventsInstance.off(type, onceCallback)
+            eventsInstance.off(type, onceCallback);
             listener.apply(null, arguments)
         }
         return this.on(type, onceCallback)
@@ -83,19 +83,19 @@ class EventEmitter {
         if(typeof listener != "function") {
             throw new TypeError()
         }
-        var listeners = this._events[type]
+        var listeners = this._events[type];
         if(!listeners || !listeners.length) {
             return this
         }
-        var indexOfListener = listeners.indexOf(listener)
+        var indexOfListener = listeners.indexOf(listener);
         if(indexOfListener == -1) {
             return this
         }
-        listeners.splice(indexOfListener, 1)
+        listeners.splice(indexOfListener, 1);
         return this
     }
     emit(type, args){
-        var listeners = this._events[type]
+        var listeners = this._events[type];
         if(!listeners || !listeners.length) {
             return false
         }
@@ -215,10 +215,10 @@ function spacegraph(targetWrapper, opt) {
     targetWrapper.addClass("spacegraph");
 
     //<div id="overlay"></div>
-    var overlaylayer = $('<div class="overlay"/>').prependTo(targetWrapper);
+    var overlaylayer = $('<div class="overlay"></div>').prependTo(targetWrapper);
 
     //<div id="graph"><!-- cytoscape render here --></div>
-    var target = $('<div class="graph"/>').appendTo(targetWrapper);
+    var target = $('<div class="graph"></div>').appendTo(targetWrapper);
 
     target.attr('oncontextmenu', "return false;");
 
@@ -230,7 +230,6 @@ function spacegraph(targetWrapper, opt) {
 
     var ready = function() {
 
-        var that = this;
 
         //opt.start.apply(this);
 
@@ -555,26 +554,25 @@ function spacegraph(targetWrapper, opt) {
 
         var transformPrecision = 3;
 
-        var matb, matc, px, py;
+        var matb = 0, matc = 0;
         wx = wx.toPrecision(transformPrecision);
-        matb = 0;
-        matc = 0;
         wy = wy.toPrecision(transformPrecision);
 
         //parseInt here to reduce precision of numbers for constructing the matrix string
         //TODO replace this with direct matrix object construction involving no string ops        
 
-        px = (pos.x - (scale*pw) / 2.0).toPrecision(transformPrecision);
-        py = (pos.y - (scale*ph) / 2.0).toPrecision(transformPrecision);
+        var halfScale = scale/2.0;
+        var px = (pos.x - (halfScale*pw)).toPrecision(transformPrecision);
+        var py = (pos.y - (halfScale*ph)).toPrecision(transformPrecision);
 
         //px = parseInt(pos.x - pw / 2.0 + pw * paddingScale / 2.0); //'e' matrix element
         //py = parseInt(pos.y - ph / 2.0 + ph * paddingScale / 2.0); //'f' matrix element
         //px = pos.x;
         //py = pos.y;
-        var tt = 'matrix(' + wx+ ',' + matb + ',' + matc + ',' + wy + ',' + px + ',' + py + ')';
+
         //nextCSS['transform'] = tt;
         //html.css(nextCSS);        
-        h.style.transform = tt;
+        h.style.transform = 'matrix(' + wx+ ',' + matb + ',' + matc + ',' + wy + ',' + px + ',' + py + ')';;
     };
 
     s.nodeProcessor = [];
@@ -597,8 +595,6 @@ function spacegraph(targetWrapper, opt) {
 
         var that = this;
         this.batch(function() {
-
-            suppressCommit = true;
 
             if (c.data.style) {
                 var s = [       ];
@@ -741,29 +737,21 @@ function spacegraph(targetWrapper, opt) {
     };
 
     s.commit = _.throttle(function() {
-        for (i in this.channels) {
-            var c = this.channels[i];
-            c.commit();
-        }
+        var cc = this.channels;
+        for (var i in cc)
+            cc[i].commit();
     }, commitPeriodMS);
 
     // ----------------------
 
     s.on('cxttapstart', function(e) {
         var target = e.cyTarget;
-
-        if (!target) {
-            this.zoomTo();
-        }
-        else {
-            this.zoomTo(target);
-        }
+        this.zoomTo(!target ? undefined : target)
     });
 
     s.on('add', function(e) {
 
         var node = e.cyTarget;
-
         var data = node.data();
         var widget = data.widget; //html string
         if (!widget) return;
@@ -901,11 +889,11 @@ function spacegraph(targetWrapper, opt) {
 
 
     s.zoomTo = function(ele) {
-        var pos;
-        if (!ele || !ele.position)
-            pos = { x: 0, y: 0 };
-        else
-            pos = ele.position();
+        // var pos;
+        // if (!ele || !ele.position)
+        //     pos = { x: 0, y: 0 };
+        // else
+        //     pos = ele.position();
 
 
         s.animate({
@@ -922,4 +910,4 @@ function spacegraph(targetWrapper, opt) {
     };
 
     return s;
-};
+}

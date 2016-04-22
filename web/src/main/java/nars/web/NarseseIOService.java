@@ -14,10 +14,12 @@ import java.io.IOException;
 public class NarseseIOService extends WebsocketService {
 
 
+    private final NAR nar;
     private Active active;
 
     public NarseseIOService(NAR n) {
-        super(n);
+        super();
+        this.nar =  n;
     }
 
     @Override

@@ -83,9 +83,10 @@ function NodeFrame(spacegraph) {
 
         f.hoverUpdate = function () {
 
+            var that = this;
             if (frameVisible) {
-                if (!this.currentlyVisible) {
-                    this.currentlyVisible = true;
+                if (!that.currentlyVisible) {
+                    that.currentlyVisible = true;
                     frameEle[0].style.width = undefined; //reset width
                     frameEle.fadeIn();
                 }
@@ -101,7 +102,7 @@ function NodeFrame(spacegraph) {
                                 frameEleNode = null;
                                 frameHiding = -1;
                             });
-                            this.currentlyVisible = false;
+                            that.currentlyVisible = false;
                         }
                     }, frameTimeToFade);
                 }
@@ -379,7 +380,6 @@ function newSpacePopupMenu(s) {
         };
 
 
-        var that = this;
 
         //http://codepen.io/MarcMalignan/full/xlAgJ/
 

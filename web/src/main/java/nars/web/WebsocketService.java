@@ -18,7 +18,6 @@ import java.util.Set;
  */
 public abstract class WebsocketService extends AbstractReceiveListener implements WebSocketCallback<Void>, WebSocketConnectionCallback {
 
-    public final NAR nar;
     protected final Set<WebSocketChannel> connections = new LinkedHashSet();
     final static FSTConfiguration jsonizer = FSTConfiguration
             .createJsonConfiguration(true, false)
@@ -26,8 +25,8 @@ public abstract class WebsocketService extends AbstractReceiveListener implement
             //.setForceClzInit(true)
             ;
 
-    public WebsocketService(NAR n) {
-        this.nar = n;
+    public WebsocketService() {
+
     }
 
     @Override

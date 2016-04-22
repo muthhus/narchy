@@ -398,4 +398,4 @@
         window.location.hostname + ':' +
         window.location.port + '/' +
         path);
-  }
+  };

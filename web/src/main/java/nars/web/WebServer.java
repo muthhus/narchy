@@ -8,6 +8,7 @@ import io.undertow.websockets.extensions.PerMessageDeflateHandshake;
 import nars.NAR;
 import nars.NARLoop;
 import nars.nar.Default;
+import ognl.OgnlException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +40,7 @@ public class WebServer /*extends PathHandler*/ {
 
 
     @SuppressWarnings("HardcodedFileSeparator")
-    public WebServer(NAR nar, int httpPort) {
+    public WebServer(NAR nar, int httpPort) throws OgnlException {
 
 
 
@@ -60,7 +61,7 @@ public class WebServer /*extends PathHandler*/ {
 
         server = Undertow.builder()
                 .addHttpListener(httpPort, "localhost")
-                .setIoThreads(2)
+                .setIoThreads(4)
                 .setHandler(
                     path()
                         .addPrefixPath("/", resource( new PathResourceManager(p, 0, true, true))
@@ -68,7 +69,7 @@ public class WebServer /*extends PathHandler*/ {
                             .addWelcomeFiles("index.html")
                         )
                         .addPrefixPath("/ws", socket(new NarseseIOService(nar)))
-                        .addPrefixPath("/summary", socket(new SummaryService(nar, 500)))
+                        .addPrefixPath("/summary", socket(new EvalService(nar, "emotion", 500)))
                 )
                 .build();
 
