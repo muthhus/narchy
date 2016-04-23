@@ -1,3 +1,4 @@
+
 "use strict";
 
 function uuid() {
@@ -119,7 +120,6 @@ class Channel extends EventEmitter {
 
     constructor(initialData) {
         super();
-
 
         this.ui = null;
 
@@ -467,7 +467,7 @@ function spacegraph(targetWrapper, opt) {
 
     s.updateNodeWidget = function(node, nodeOverride) {
 
-        if (nodeOverride) node = nodeOverride;
+        node = nodeOverride || node;
 
         var data = node.data();
 
@@ -476,17 +476,20 @@ function spacegraph(targetWrapper, opt) {
         data.updating = null;
 
         var wEle = s.widgets.get(node.id());
-        if (!wEle) return;
-
-        var widget = data.widget; //html string
-
-        s.positionNodeHTML(node, $(wEle), widget.pixelScale, widget.scale, widget.minPixels);
+        if (wEle) {
+            s.positionNodeHTML(node, wEle, data.widget);
+        }
 
     };
 
 
     /** html=html dom element */
-    s.positionNodeHTML = function(node, html, pixelScale, scale, minPixels) {
+    s.positionNodeHTML = function(node, html, widget) {
+
+
+        var pixelScale=widget.pixelScale,
+            scale=widget.scale,
+            minPixels= widget.minPixels;
 
         pixelScale = parseFloat(pixelScale) || 128.0; //# pixels wide
 
@@ -505,16 +508,17 @@ function spacegraph(targetWrapper, opt) {
             cw = parseInt(pixelScale*(pw/ph));
         }
 
-        var h = html[0];
+        var h = html[0]; // $(html)[0];
 
 
         //get the effective clientwidth/height if it has been resized
-        if (( (cw+'px') !== h.style.width ) || ((ch + 'px') !== h.style.height)) {
+        var hs = h.style;
+        if (( (cw+'px') !== hs.width ) || ((ch + 'px') !== hs.height)) {
             var hcw = h.clientWidth;
             var hch = h.clientHeight;
 
-            h.style.width = cw;
-            h.style.height = ch;
+            hs.width = cw;
+            hs.height = ch;
 
             cw = hcw;
             ch = hch;
@@ -535,17 +539,17 @@ function spacegraph(targetWrapper, opt) {
         //for possible improved performance
 
         if (minPixels) {
-            var hidden = ('none' === h.style.display);
+            var hidden = ('none' === hs.display);
 
             if ( Math.min(wy,wx) < minPixels/pixelScale ) {
                 if (!hidden) {
-                    h.style.display = 'none';
+                    hs.display = 'none';
                     return;
                 }
             }
             else {
                 if (hidden) {
-                    h.style.display = 'block';
+                    hs.display = 'block';
                 }
             }
         }
@@ -572,7 +576,7 @@ function spacegraph(targetWrapper, opt) {
 
         //nextCSS['transform'] = tt;
         //html.css(nextCSS);        
-        h.style.transform = 'matrix(' + wx+ ',' + matb + ',' + matc + ',' + wy + ',' + px + ',' + py + ')';;
+        hs.transform = 'matrix(' + wx+ ',' + matb + ',' + matc + ',' + wy + ',' + px + ',' + py + ')';;
     };
 
     s.nodeProcessor = [];
@@ -798,7 +802,7 @@ function spacegraph(targetWrapper, opt) {
 //            if (widget.live)
 //                w.bind("DOMSubtreeModified DOMAttrModified", commitWidgetChange); // Listen DOM changes
 
-        s.widgets.set(node.id(), w[0]);
+        s.widgets.set(node.id(), w);
     });
 
     s.on('remove', function(e) {

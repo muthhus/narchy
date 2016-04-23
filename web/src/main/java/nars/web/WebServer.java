@@ -2,6 +2,8 @@ package nars.web;
 
 import io.undertow.Undertow;
 import io.undertow.server.HttpHandler;
+import io.undertow.server.handlers.cache.DirectBufferCache;
+import io.undertow.server.handlers.resource.CachingResourceManager;
 import io.undertow.server.handlers.resource.PathResourceManager;
 import io.undertow.websockets.WebSocketConnectionCallback;
 import io.undertow.websockets.extensions.PerMessageDeflateHandshake;
@@ -64,9 +66,17 @@ public class WebServer /*extends PathHandler*/ {
                 .setIoThreads(4)
                 .setHandler(
                     path()
-                        .addPrefixPath("/", resource( new PathResourceManager(p, 0, true, true))
-                            .setDirectoryListingEnabled(true)
-                            .addWelcomeFiles("index.html")
+                        .addPrefixPath("/", resource(
+                                new CachingResourceManager(
+                                        16384,
+                                        16*1024*1024,
+                                        new DirectBufferCache(100, 10, 1000),
+                                        new PathResourceManager(p, 0, true, true),
+                                        0 //7 * 24 * 60 * 60 * 1000
+                                )
+                            )
+                                .setDirectoryListingEnabled(true)
+                                .addWelcomeFiles("index.html")
                         )
                         .addPrefixPath("/ws", socket(new NarseseIOService(nar)))
                         .addPrefixPath("/summary", socket(new EvalService(nar, "emotion", 500)))

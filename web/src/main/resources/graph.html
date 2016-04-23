@@ -16,11 +16,10 @@
     <!--<link type="text/css" rel="stylesheet" href="view.wikipedia.css"/>-->
 
 
-    <link rel="stylesheet" href="lib/semantic/dist/semantic.min.css"/>
 
     <!--<script src="object.js"></script>-->
 
-    <script src="spacegraph.demo.js"></script>
+    <!--<script src="unused/spacegraph.demo.js"></script>-->
 
     <!--<script src="view.js"></script>-->
 
@@ -34,7 +33,10 @@
 
 
     <link rel="import" href="head.html">
+
     <!--<link rel="import" href="head.leaflet.html">-->
+
+    <link rel="stylesheet" href="lib/semantic/dist/semantic.min.css"/>
 
 
 </head>
@@ -48,15 +50,15 @@
 <!--<script src="index.js" onload="ready()" ></script>-->
 
 <script>
+    $(document).ready(function() {
 
-    var s = spacegraph($('#view'), { } );
-    //s.ready();
+        var s = spacegraph($('#view'), {});
+        //s.ready();
 
-    newSpacePopupMenu(s);
+        newSpacePopupMenu(s);
 
 
-
-    s.addChannel(new Channel({
+        s.addChannel(new Channel({
             nodes: [{
                 width: 32,
                 height: 32,
@@ -65,14 +67,14 @@
                 },
                 widget: {
                     html: '<div style="width: 100%;"><div contenteditable="true" class="editable">...</div><br/></div>',
-                    style: { },
+                    style: {},
                     scale: 0.9,
                     minPixels: 8,
                     pixelScale: 100
                 }
             }]
         }));
-    s.addChannel(new Channel({
+        s.addChannel(new Channel({
             nodes: [{
                 width: 128,
                 height: 128,
@@ -85,7 +87,9 @@
                 }
             }]
         }));
+        s.addChannel(newExampleChannel1());
 
+    });
 
 
 
@@ -226,7 +230,9 @@ function newExampleChannel1() {
         ]
     });
 }
-s.addChannel(newExampleChannel1());
 
 </script>
+
+
+
 </html>

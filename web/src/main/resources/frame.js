@@ -20,7 +20,17 @@ function NodeFrame(spacegraph) {
     var frameEleResizing = false;
 
 
-    $.get('frame.html', {"_": $.now() /* overrides cache */}, function (x) {
+    // $.ajax({
+    //     url: "frame.html",
+    //     //data: 'foo',
+    //     success: function(){
+    //         alert('bar');
+    //     },
+    //     cache: false
+    // });
+    $.get('frame.html',
+        //{ "_": $.now() /* overrides cache */},
+        function (x) {
 
         spacegraph.overlay.append(x);
 
@@ -74,7 +84,7 @@ function NodeFrame(spacegraph) {
         f.hide = function () {
             frameVisible = false;
             this.hovered = null;
-            setTimeout(this.hoverUpdate, 0);
+            setTimeout(f.hoverUpdate, 0);
 
 
             //TODO fadeOut almost works, but not completely. so hide() for now
@@ -122,7 +132,7 @@ function NodeFrame(spacegraph) {
         var frameEle = $('#nodeframe');
 
 
-        var close = $('#nodeframe #close');
+        var close = $('#nodeframe').find('#close');
         close.click(function () {
             var node = frameEleNode;
             if (node) {
