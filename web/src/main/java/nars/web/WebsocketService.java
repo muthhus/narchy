@@ -74,7 +74,7 @@ public abstract class WebsocketService extends AbstractReceiveListener implement
     @Override
     public void onError(WebSocketChannel wsc, Void t, Throwable thrwbl) {
         //System.out.println("Error: " + thrwbl);
-        WebServer.logger.error("{}", thrwbl);
+        //WebServer.logger.error("{}", thrwbl);
     }
 
     @Override

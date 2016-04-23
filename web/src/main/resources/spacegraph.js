@@ -30,7 +30,7 @@ var DEFAULT_MAX_LISTENERS = 12;
 class EventEmitter {
     constructor(){
         this._maxListeners = DEFAULT_MAX_LISTENERS;
-        this._events = {}
+        this._events = {} //TODO use ES6 Map
     }
     on(type, listener) {
 
@@ -73,18 +73,37 @@ class EventEmitter {
     off(type, listener) {
 
         var that = this;
-        if (Array.isArray(type)) {
+
+        if (type === undefined) {
+            //disable everythign
+            for (var k in this._events) {
+                this.off(k);
+            }
+            return;
+        } else if (Array.isArray(type)) {
             _.each(type, function(t) {
                 that.off(t, listener);
             });
             return;
         }
 
+        var listeners = this._events[type];
 
-        if(typeof listener != "function") {
+        if (listener === undefined) {
+            //remove any existing
+            if (listeners) {
+                this.off(type, listeners);
+            }
+            return;
+
+        } else if (Array.isArray(listener)) {
+            _.each(listener, function(l) {
+                that.off(type, l);
+            });
+        } else if(typeof listener != "function") {
             throw new TypeError()
         }
-        var listeners = this._events[type];
+
         if(!listeners || !listeners.length) {
             return this
         }
@@ -129,6 +148,7 @@ class Channel extends EventEmitter {
         //set channel name
         if (typeof(initialData)==="string")
             initialData = { id: initialData };
+
         this.data = initialData || { };
         if (!this.data.id) {
             //assign random uuid
@@ -214,15 +234,15 @@ function spacegraph(targetWrapper, opt) {
 
     targetWrapper.addClass("spacegraph");
 
-    //<div id="overlay"></div>
+
     var overlaylayer = $('<div class="overlay"></div>').prependTo(targetWrapper);
 
-    //<div id="graph"><!-- cytoscape render here --></div>
+    //where cytoscape renders to:
     var target = $('<div class="graph"></div>').appendTo(targetWrapper);
 
     target.attr('oncontextmenu', "return false;");
 
-    var commitPeriodMS = 300;
+    var commitPeriodMS = 100;
     var widgetUpdatePeriodMS = 10;
     var suppressCommit = false;
     var zoomDuration = 64; //ms
@@ -234,6 +254,20 @@ function spacegraph(targetWrapper, opt) {
         //opt.start.apply(this);
 
         //http://js.cytoscape.org/#events/collection-events
+
+        //overlay framenode --------------
+        var frame = NodeFrame(this);
+        var that = this;
+
+
+
+        var updateAllWidgets = this.updateAllWidgets = _.throttle(function() {
+
+            if (suppressCommit) return;
+
+            that.nodes().each(refresh);
+
+        }, widgetUpdatePeriodMS);
 
 
         this.on('data position select unselect add remove grab drag style', function (e) {
@@ -256,8 +290,7 @@ function spacegraph(targetWrapper, opt) {
         });
 
 
-        //overlay framenode --------------        
-        var frame = NodeFrame(this);
+
 
 
         /*
@@ -280,16 +313,6 @@ function spacegraph(targetWrapper, opt) {
 
 
 
-        var that = this;
-
-        var updateAllWidgets = this.updateAllWidgets = _.throttle(function() {
-
-            if (suppressCommit) return;
-
-            that.nodes().each(refresh);
-
-        }, widgetUpdatePeriodMS);
-
         this.on('layoutready layoutstop pan zoom', updateAllWidgets);
 
 //            function scaleAndTranslate( _element , _x , _y, wx, wy )  {
@@ -302,17 +325,16 @@ function spacegraph(targetWrapper, opt) {
     };
 
     function widget(node) {
-        if (node.data)
-            return node.data().widget;
-        return undefined;
+        return node.data ? node.data().widget : undefined;
     }
 
     function refresh(target, target2) {
         if (target2) target = target2; //extra parameter to match the callee's list
 
         if (widget(target)) {
-            if (!target.data().updating) {
-                target.data().updating = setTimeout(s.updateNodeWidget, widgetUpdatePeriodMS, target); //that.updateNodeWidget(target);
+            var data = target.data();
+            if (!data.updating) {
+                data.updating = setTimeout(s.updateNodeWidget, widgetUpdatePeriodMS, target); //that.updateNodeWidget(target);
             }
         }
     }
@@ -363,8 +385,6 @@ function spacegraph(targetWrapper, opt) {
 
 
     var s = cytoscape(opt);
-    s.overlay = overlaylayer;
-
 
     // EdgeHandler: the default values of each option are outlined below:
     s.edgehandles({
@@ -436,9 +456,10 @@ function spacegraph(targetWrapper, opt) {
 //    });
 
     s.channels = { };
-    s.listeners = { };
     s.widgets = new Map(); //node -> widget DOM element
-    s.currentLayout = {
+    s.overlay = overlaylayer;
+
+    /*s.currentLayout = {
         //name: 'cosefast'
         name: 'grid' //cose implementation is slow as fuck becaause it has all these log debug statements and string generation that serves no purpose but at least its pretty
         //name: 'arbor'
@@ -446,14 +467,16 @@ function spacegraph(targetWrapper, opt) {
         //name: 'breadthfirst',
         //circle:true,
         //directed:true
-    };
+    };*/
 
-    function wrapInData(d) {
+    /** adapts spacegraph node to cytoscape node */
+    function nodeSpacegraphToCytoscape(d) {
         var w = { data: d };
-        if (d.style)
-            w.css = d.style;
-        else {
-            //style defaults?
+
+        var css = w.css = d.style ? d.style : {};
+
+        if (d.shape) {
+            css.shape = d.shape;
         }
 
         return w;
@@ -488,7 +511,6 @@ function spacegraph(targetWrapper, opt) {
 
 
         var pixelScale=widget.pixelScale,
-            scale=widget.scale,
             minPixels= widget.minPixels;
 
         pixelScale = parseFloat(pixelScale) || 128.0; //# pixels wide
@@ -496,15 +518,16 @@ function spacegraph(targetWrapper, opt) {
         var pw = parseFloat(node.renderedWidth());
         var ph = parseFloat(node.renderedHeight());
 
-        scale = parseFloat(scale) || 1.0;
+        var scale = parseFloat(widget.scale) || 1.0;
 
         var cw, ch;
+        var narrower = parseInt(pixelScale);
         if (pw < ph) {
-            cw = parseInt(pixelScale);
+            cw = narrower;
             ch = parseInt(pixelScale*(ph/pw));
         }
         else {
-            ch = parseInt(pixelScale);
+            ch = narrower;
             cw = parseInt(pixelScale*(pw/ph));
         }
 
@@ -513,12 +536,12 @@ function spacegraph(targetWrapper, opt) {
 
         //get the effective clientwidth/height if it has been resized
         var hs = h.style;
-        if (( (cw+'px') !== hs.width ) || ((ch + 'px') !== hs.height)) {
+        if (( html.specWidth  !== hs.width ) || (html.specHeight !== hs.height)) {
             var hcw = h.clientWidth;
             var hch = h.clientHeight;
 
-            hs.width = cw;
-            hs.height = ch;
+            html.specWidth = hs.width = cw;
+            html.specHeight = hs.height = ch;
 
             cw = hcw;
             ch = hch;
@@ -575,7 +598,9 @@ function spacegraph(targetWrapper, opt) {
         //py = pos.y;
 
         //nextCSS['transform'] = tt;
-        //html.css(nextCSS);        
+        //html.css(nextCSS);
+
+        //TODO non-String way to do this
         hs.transform = 'matrix(' + wx+ ',' + matb + ',' + matc + ',' + wy + ',' + px + ',' + py + ')';;
     };
 
@@ -587,18 +612,38 @@ function spacegraph(targetWrapper, opt) {
             vp[i].apply(n);
     };
 
-    s.updateChannel = function(c) {
+    s.addNode = function(n) {
+        this.addNodes([n]);
+    };
+    s.addNodes = function(nn) {
+        //HACK create a temporary channel and run through addChannel
+        this.addChannel(new Channel({
+            nodes: nn
+        }));
+    };
 
+    s.addEdge = function(e) {
+        this.addEdges([e]);
+    };
+    s.addEdges = function(ee) {
+        //HACK create a temporary channel and run through addChannel
+        this.addChannel(new Channel({
+            edges: ee
+        }));
+    };
+
+    s.updateChannel = function(c) {
 
         //TODO assign channel reference to each edge as done above with nodes
 
-        var e = {
-            nodes: c.data.nodes ? c.data.nodes.map(wrapInData) : [], // c.data.nodes,
-            edges: c.data.edges ? c.data.edges.map(wrapInData) : [] //c.data.edges
-        };
-
         var that = this;
+
         this.batch(function() {
+
+            var e = {
+                nodes: c.data.nodes ? c.data.nodes.map(nodeSpacegraphToCytoscape) : [], // c.data.nodes,
+                edges: c.data.edges ? c.data.edges.map(nodeSpacegraphToCytoscape) : [] //c.data.edges
+            };
 
             if (c.data.style) {
                 var s = [       ];
@@ -612,10 +657,11 @@ function spacegraph(targetWrapper, opt) {
                 if (s.length > 0) {
                     //TODO merge style; this will replace it with c's        
 
-                    that.style().clear();
+                    var style = that.style();
+                    style.clear();
 
-                    that.style().fromJson(s);
-                    that.style().update();
+                    style.fromJson(s);
+                    style.update();
                 }
             }
 
@@ -634,8 +680,9 @@ function spacegraph(targetWrapper, opt) {
             //add position if none exist
             for (var i = 0; i < e.nodes.length; i++) {
                 var n = e.nodes[i];
-                if (n.data && n.data.id) {
-                    var nn = that.nodes('#' + n.data.id);
+                var ndata = n.data;
+                if (ndata && ndata.id) {
+                    var nn = that.nodes('#' + ndata.id);
 
                     nn.addClass(channelID);
 
@@ -657,7 +704,7 @@ function spacegraph(targetWrapper, opt) {
 
             that.resize();
 
-            suppressCommit = false;
+            //suppressCommit = false;
 
         });
 
@@ -696,47 +743,57 @@ function spacegraph(targetWrapper, opt) {
 
     s.addChannel = function(c) {
 
-        //var nodesBefore = this.nodes().size();
+        var cid = c.id();
 
-        this.channels[c.id] = c;
+        //var nodesBefore = this.nodes().size();
+        var existing = this.channels[cid];
+        if (existing) {
+            if (existing == c) {
+                this.updateChannel(c);
+                return;
+            } else {
+                this.removeChannel(existing);
+            }
+        }
+
+
+        this.channels[cid] = c;
 
 
         this.updateChannel(c);
 
         var that = this;
         var l;
-        c.on('graphChange', l = function(graph, nodesAdded, edgesAdded, nodesRemoved, edgesRemoved) {
+        c.on('graphChange', function(graph, nodesAdded, edgesAdded, nodesRemoved, edgesRemoved) {
             "use strict";
 
             that.updateChannel(c);
         });
-        this.listeners[c.id] = l;
 
-        if (s.currentLayout)
-            this.setLayout(s.currentLayout);
+        /*if (s.currentLayout)
+            this.setLayout(s.currentLayout);*/
 
     };
 
     s.clear = function() {
         for (var c in this.channels) {
             var chan = s.channels[c];
-            s.removeChannel(chan);
+            this.removeChannel(chan);
         }
     };
 
     s.removeChannel = function(c) {
 
-        c.off("graphChange", this.listeners[c.id()]);
+        c.off();
 
-        s.nodes('.' + c.id()).remove();
+        this.nodes('.' + c.id()).remove();
 
         //TODO remove style
 
-        delete s.channels[c.id()];
-        delete s.listeners[c.id()];
+        delete this.channels[c.id()];
         //c.destroy();
 
-        s.layout();
+        //s.layout();
 
     };
 
@@ -760,7 +817,7 @@ function spacegraph(targetWrapper, opt) {
         var widget = data.widget; //html string
         if (!widget) return;
 
-        var wEle = s.widgets.get(node.id());
+        var wEle = this.widgets.get(node.id());
         if (wEle) return; //widget already exists?
 
         /*if (w) {
@@ -802,93 +859,93 @@ function spacegraph(targetWrapper, opt) {
 //            if (widget.live)
 //                w.bind("DOMSubtreeModified DOMAttrModified", commitWidgetChange); // Listen DOM changes
 
-        s.widgets.set(node.id(), w);
+        this.widgets.set(node.id(), w);
     });
 
     s.on('remove', function(e) {
         var node = e.cyTarget;
 
         //attempt to remove an associated widget (html div in overlay)
-        s.removeNodeWidget(node);
+        this.removeNodeWidget(node);
     });
 
-    //DEPRECATED, move to a channel
-    s.newNode = function(c, type, pos, param) {
-
-        //notify('Adding: ' + type);
-
-        var n = null;
-        if (type === 'text') {
-            n = {
-                id: 'txt' + parseInt(Math.random() * 1000),
-                style: {
-                    width: 64,
-                    height: 32
-                },
-                widget: {
-                    html: "<div contenteditable='true' class='editable' style='width: 100%; height: 100%; overflow:auto'></div>",
-                    scale: 0.85,
-                    style: {}
-                }
-            };
-        }
-        else if (type === 'www') {
-            var uurrll = param;
-            if (!uurrll.indexOf('http://') === 0)
-                uurrll = 'http://' + uurrll;
-
-            n = {
-                id: 'www' + parseInt(Math.random() * 1000),
-                style: {
-                    width: 64,
-                    height: 64
-                },
-                widget: {
-                    html: '<iframe width="100%" height="100%" src="' + uurrll + '"></iframe>',
-                    scale: 0.85,
-                    pixelScale: 600,
-                    style: {},
-                }
-            };
-        }
-
-        //            
-
-        if (n) {
-
-            c.addNode(n);
-
-            this.updateChannel(c);
-
-            /*
-             if (!pos) {
-             var ex = this.extent();
-             var cx = 0.5 * (ex.x1 + ex.x2);
-             var cy = 0.5 * (ex.y1 + ex.y2);
-             pos = {x: cx, y: cy};
-             }
-             */
-            if (pos)
-                this.getElementById(n.id).position(pos);
-
-            c.commit();
-
-        }
-
-    };
-
-    //DEPRECATED, move to a channel
-    s.removeNode = function(n) {
-        for (var ch in this.channels) {
-            var c = this.channels[ch];
-
-            if (c.removeNode(n)) {
-                c.commit();
-            }
-        }
-
-        n.remove();
-    };
+    // //DEPRECATED, move to a channel
+    // s.newNode = function(c, type, pos, param) {
+    //
+    //     //notify('Adding: ' + type);
+    //
+    //     var n = null;
+    //     if (type === 'text') {
+    //         n = {
+    //             id: 'txt' + parseInt(Math.random() * 1000),
+    //             style: {
+    //                 width: 64,
+    //                 height: 32
+    //             },
+    //             widget: {
+    //                 html: "<div contenteditable='true' class='editable' style='width: 100%; height: 100%; overflow:auto'></div>",
+    //                 scale: 0.85,
+    //                 style: {}
+    //             }
+    //         };
+    //     }
+    //     else if (type === 'www') {
+    //         var uurrll = param;
+    //         if (!uurrll.indexOf('http://') === 0)
+    //             uurrll = 'http://' + uurrll;
+    //
+    //         n = {
+    //             id: 'www' + parseInt(Math.random() * 1000),
+    //             style: {
+    //                 width: 64,
+    //                 height: 64
+    //             },
+    //             widget: {
+    //                 html: '<iframe width="100%" height="100%" src="' + uurrll + '"></iframe>',
+    //                 scale: 0.85,
+    //                 pixelScale: 600,
+    //                 style: {},
+    //             }
+    //         };
+    //     }
+    //
+    //     //
+    //
+    //     if (n) {
+    //
+    //         c.addNode(n);
+    //
+    //         this.updateChannel(c);
+    //
+    //         /*
+    //          if (!pos) {
+    //          var ex = this.extent();
+    //          var cx = 0.5 * (ex.x1 + ex.x2);
+    //          var cy = 0.5 * (ex.y1 + ex.y2);
+    //          pos = {x: cx, y: cy};
+    //          }
+    //          */
+    //         if (pos)
+    //             this.getElementById(n.id).position(pos);
+    //
+    //         c.commit();
+    //
+    //     }
+    //
+    // };
+    //
+    // //DEPRECATED, move to a channel
+    // s.removeNode = function(n) {
+    //     for (var ch in this.channels) {
+    //         var c = this.channels[ch];
+    //
+    //         if (c.removeNode(n)) {
+    //             c.commit();
+    //         }
+    //     }
+    //
+    //     n.remove();
+    // };
 
 
 
@@ -900,7 +957,7 @@ function spacegraph(targetWrapper, opt) {
         //     pos = ele.position();
 
 
-        s.animate({
+        this.animate({
             fit: {
                 eles: ele,
                 padding: 120
@@ -912,6 +969,11 @@ function spacegraph(targetWrapper, opt) {
              }*/
         });
     };
+
+
+    //enable popup menu
+    newSpacePopupMenu(s);
+
 
     return s;
 }

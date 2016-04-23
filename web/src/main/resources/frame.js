@@ -354,7 +354,7 @@ function newSpacePopupMenu(s) {
     var handler = {
 
         addText: function (position) {
-            s.newNode(s.defaultChannel, 'text', position);
+            //s.newNode(s.defaultChannel, 'text', position);
         },
 
         addURL: function (position) {
