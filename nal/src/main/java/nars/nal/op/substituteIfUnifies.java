@@ -51,8 +51,9 @@ public final class substituteIfUnifies extends substitute {
         /** terminates after the first match */
         @Override public boolean onMatch() {
             //apply the match before the xy/yx mapping gets reverted after leaving the termutator
-            r.putAllXY(this);
-            result = substitute.resolve(r, r, xterm);
+            if (r.putAllXY(this)) {
+                result = substitute.resolve(r, r, xterm);
+            }
             return false;
         }
 

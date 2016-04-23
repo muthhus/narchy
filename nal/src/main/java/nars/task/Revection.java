@@ -19,7 +19,9 @@ import java.util.List;
 import static java.lang.Math.abs;
 import static java.lang.Math.sqrt;
 import static nars.concept.table.BeliefTable.rankTemporalByConfidence;
+import static nars.concept.table.BeliefTable.rankTemporalByConfidenceAndOriginality;
 import static nars.nal.Tense.DTERNAL;
+import static nars.nal.UtilityFunctions.or;
 
 /**
  * Revection: revision, projection, rejection
@@ -63,6 +65,14 @@ public class Revection {
 
             Task ii = tl.get(i);
 
+
+            //consider ii for being the weakest ranked task to remove
+            float r = rankTemporalByConfidenceAndOriginality(ii, now, now, 1f, -1);
+            if (r < wr) {
+                wr = r;
+                w = ii;
+            }
+
             for (int j = i+1; j < n; j++) {
 
                 if (i == j)
@@ -83,15 +93,9 @@ public class Revection {
 
             }
 
-                //consider ii for being the weakest ranked task to remove
-                float r = rankTemporalByConfidence(ii, now, now, 1f, -1);
-                if (r < wr) {
-                    wr = r;
-                    w = ii;
-                }
         }
 
-        float ir = rankTemporalByConfidence(input, now, now, 1f, -1);
+        float ir = rankTemporalByConfidenceAndOriginality(input, now, now, 1f, -1);
         if (ir < wr) {
             //input ranks lower than all existing
             return false;
@@ -119,13 +123,13 @@ public class Revection {
     public static boolean revect(@NotNull Task input, @NotNull NAR nar, @NotNull ListTable<Task, Task> temporal, long now, @NotNull Task a, @NotNull Task b) {
 
 
-        Task recombined = combine(a, b, now);
+        Task recombined = combine(a, b, now, input.conf());
 
         if (recombined == null) {
 
-            float r1 = BeliefTable.rankEternalByOriginality(a);
-            float r2 = BeliefTable.rankEternalByOriginality(b);
-            float rin = BeliefTable.rankEternalByOriginality(input);
+            float r1 = BeliefTable.rankTemporalByConfidenceAndOriginality(a, now, now, 1, -1);
+            float r2 = BeliefTable.rankTemporalByConfidenceAndOriginality(b, now, now, 1, -1);
+            float rin = BeliefTable.rankTemporalByConfidenceAndOriginality(input, now, now, 1, -1);
 
             if ((rin < r1) && (rin < r2)) {
                 //reject the input, it is worse
@@ -155,14 +159,14 @@ public class Revection {
     //return false;
 
 
-    private static Task combine(@NotNull Task a, @NotNull Task b, long now) {
+    private static Task combine(@NotNull Task a, @NotNull Task b, long now, float minConf) {
         //TODO proper iterpolate: truth, time, dt
         float ac = a.conf();
         float bc = b.conf();
         long newOcc = Math.round((a.occurrence() * ac + b.occurrence() * bc) / (ac + bc));
 
         float matchFactor = 1f;
-        Truth newTruth = TruthFunctions.revision(a, b, newOcc, matchFactor, Global.TRUTH_EPSILON);
+        Truth newTruth = TruthFunctions.revision(a, b, newOcc, matchFactor, minConf);
         if (newTruth == null) {
             return null;
         } else {
@@ -175,8 +179,9 @@ public class Revection {
 
         //float freqWeight = 2f;
         //float confWeight = 1f;
-        float truthDist = abs(a.freq() - b.freq());//*freqWeight + Math.abs(a.conf() - b.conf()) * confWeight;
+        float freqDist = abs(a.freq() - b.freq());//*freqWeight + Math.abs(a.conf() - b.conf()) * confWeight;
 
+        float avgConf = or(a.conf(), b.conf());
 
 
         long ao = a.occurrence();
@@ -194,11 +199,18 @@ public class Revection {
             dtDist = tDist; //use tDist again
         }
 
-        float originality = a.originality() + b.originality();
+        float originality = Math.min(a.originality(), b.originality());
 
         //more time distance to now factor will cause them to seem closer together than they actually are, like a perspective collapsing to a point at the horizon
-        float timeFade = (abs(now - ao) + abs(now - bo));
-        return (1f + truthDist) * (1f + dtDist) * (1f + tDist / (float) sqrt(timeFade) ) / (originality);
+        float timeliness = 1f / (1f + abs(now - ao) + abs(now - bo)); //similar to BeliefTable.relevance
+
+        return (1f + freqDist ) *
+               (1f + tDist  ) *
+               (1f + dtDist) *
+               (originality) *
+               (avgConf) *
+               ((float)(timeliness))
+               ;
 
         //return (fDist*fDist) * tDist / (1f + (float)Math.sqrt(ageFactor)); // * window);
         //return fDist * (float)(Math.sqrt(tDist / (1f + ageFactor))); // * window);

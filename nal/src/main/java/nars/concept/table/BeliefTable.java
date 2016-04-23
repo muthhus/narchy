@@ -145,6 +145,10 @@ public interface BeliefTable extends TaskTable {
 //        return a.conf() > b.conf() ? a : b;
 //    }
 
+    static float rankTemporalByConfidenceAndOriginality(@NotNull Task t, long when, long now, float ageFactor, float bestSoFar) {
+        return rankTemporalByConfidence(t, when, now, ageFactor, bestSoFar) * t.originality();
+    }
+
     /**
      *
      * @param t

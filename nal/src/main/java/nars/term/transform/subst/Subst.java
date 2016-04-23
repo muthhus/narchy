@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiConsumer;
+import java.util.function.BiPredicate;
 
 
 public interface Subst  {
@@ -19,15 +20,28 @@ public interface Subst  {
     @Nullable
     Term term(Term t);
 
-    @NotNull
-    default Term termOrOriginal(@NotNull Term t) {
-        Term x = term(t);
-        return x == null ? t : x;
-    }
+//    @NotNull
+//    default Term termOrOriginal(@NotNull Term t) {
+//        Term x = term(t);
+//        return x == null ? t : x;
+//    }
 
     void clear();
 
     void forEach(@NotNull BiConsumer<? super Term, ? super Term> each);
+
+    /** returns true only if each evaluates true; if empty, returns true also */
+    default boolean forEach(@NotNull BiPredicate<? super Term, ? super Term> each) {
+        final boolean[] b = {true};
+        forEach((k,v)-> {
+            if (b[0]) { //HACK should be able to terminate early using an entryset
+                if (!each.test(k, v)) {
+                    b[0] = false;
+                }
+            }
+        });
+        return b[0];
+    }
 
     @Nullable
     default ImmediateTermTransform getTransform(@NotNull Atomic t) {

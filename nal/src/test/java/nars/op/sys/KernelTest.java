@@ -4,11 +4,13 @@ import nars.$;
 import nars.NAR;
 import nars.nar.Default;
 import org.apache.commons.math3.stat.Frequency;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
- * Created by me on 2/19/16.
+ * experimental , not complete
  */
+@Ignore
 public class KernelTest {
 
 

@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.function.BiPredicate;
 import java.util.function.Supplier;
 
 
@@ -863,6 +864,10 @@ public abstract class FindSubst extends Versioning implements Subst, Supplier<Ve
         xy.forEachVersioned(each);
         //TODO yx also?
     }
+    public boolean forEachVersioned(@NotNull BiPredicate<? super Term, ? super Versioned<Term>> each) {
+        return xy.forEachVersioned(each);
+        //TODO yx also?
+    }
 
 
     /**
@@ -908,6 +913,26 @@ public abstract class FindSubst extends Versioning implements Subst, Supplier<Ve
             if (!m.isEmpty())
                 m.forEach(each);
         }
+
+        /** returns true only if each evaluates true; if empty, returns true also */
+        public boolean forEachVersioned(@NotNull BiPredicate<? super Term, ? super Versioned<Term>> each) {
+            Map<Term, Versioned<Term>> m = this.map;
+            if (!m.isEmpty()) {
+                final boolean[] b = {true};
+
+                m.forEach((k,v)->{
+                    if (b[0]) { //HACK should be able to terminate early using an entryset
+                        if (!each.test(k, v)) {
+                            b[0] = false;
+                        }
+                    }
+                });
+
+                return b[0];
+            }
+            return true;
+        }
+
 
         @Override
         public final Term term(Term t) {

@@ -37,14 +37,15 @@ public class PatrickNLP extends AbstractNALTest {
         <(*,(*,cat,eats),?what) --> REPRESENT>?
         //RESULT: <(*,(*,cat,eats),(*,ANIMAL,EATING)) --> REPRESENT>. %1.00;0.73%
          */
-        test()
-            //.log()
+        TestNAR tt = test();
+        tt
+            .log()
             .believe("(((/,REPRESENT,_,$3):$1 && (/,REPRESENT,_,$4):$2) ==> REPRESENT:(($1,$2),($3,$4)))")
             .believe("(/,REPRESENT,_,ANIMAL):cat")
             .believe("(/,REPRESENT,_,EATING):eats")
-            .askAt(40,"REPRESENT:((eats,cat),?what)")
-            //.askAt(40,"REPRESENT:((eats,cat),(?x, ?y))")
-            .mustBelieve(150, "REPRESENT:((eats,cat),(EATING,ANIMAL))", 1f, 0.73f);
+            //.askAt(1,"REPRESENT:((eats,cat),?what)")
+            //.askAt(50,"REPRESENT:((eats,cat),(?x, ?y))")
+            .mustBelieve(1500, "REPRESENT:((eats,cat),(EATING,ANIMAL))", 1f, 0.73f);
 
     }
 
@@ -71,8 +72,8 @@ public class PatrickNLP extends AbstractNALTest {
                 .believe("(((/,REPR,_,$3):$1 && (/,REPR,_,$4):$2) ==> REPR:(($1,$3)<->($2,$4)))")
                 .believe("(/,REPR,_,ANIMATING):cat")
                 .believe("(/,REPR,_,EATING):eats")
-                .askAt(30,"REPR:((cat,ANIMATING)<->?what)")
-                .mustBelieve(200, "REPR:((eats,EATING)<->(cat,ANIMATING))", 1f, 0.73f);
+                //.askAt(30,"REPR:((cat,ANIMATING)<->?what)")
+                .mustBelieve(500, "REPR:((eats,EATING)<->(cat,ANIMATING))", 1f, 0.73f);
         
 
     }

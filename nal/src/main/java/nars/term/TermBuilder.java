@@ -409,12 +409,11 @@ public abstract class TermBuilder {
         Term subject = u[0];
         Term predicate = u[1];
 
-        if (subject.equals(predicate))
-            return null; //subject;
+//        if (subject.equals(predicate))
+//            return null; //subject;
 
-        //DEBUG:
-        //if (subject == null || predicate == null)
-        //    throw new RuntimeException("invalid statement terms");
+        if (Terms.equalsAnonymous(subject, predicate))
+            return null;
 
         //special statement filters
         switch (op) {
@@ -437,21 +436,26 @@ public abstract class TermBuilder {
                     return impl2Conj(dt, subject, predicate, oldCondition);
                 }
 
+
+
                 //filter (factor out) any common subterms iff equal 'dt'
-                if ((subject.op() == CONJUNCTION) && (predicate.op() == CONJUNCTION) &&
-                    ((Compound)subject).dt() == ((Compound)predicate).dt()) {
+                if ((subject.op() == CONJUNCTION) && (predicate.op() == CONJUNCTION)) {
+                    Compound csub = (Compound) subject;
+                    Compound cpred = (Compound) predicate;
+                    if(csub.dt() == cpred.dt()) {
 
-                    TermContainer subjs = ((Compound) subject).subterms();
-                    TermContainer preds = ((Compound) predicate).subterms();
+                        TermContainer subjs = csub.subterms();
+                        TermContainer preds = cpred.subterms();
 
-                    MutableSet<Term> common = TermContainer.intersect(subjs, preds);
-                    if (!common.isEmpty()) {
-                        subject = theTransformed((Compound)subject, TermContainer.except(subjs, common));
-                        if (subject == null)
-                            return null;
-                        predicate = theTransformed((Compound)predicate, TermContainer.except(preds, common));
-                        if (predicate == null)
-                            return null;
+                        MutableSet<Term> common = TermContainer.intersect(subjs, preds);
+                        if (!common.isEmpty()) {
+                            subject = theTransformed(csub, TermContainer.except(subjs, common));
+                            if (subject == null)
+                                return null;
+                            predicate = theTransformed(cpred, TermContainer.except(preds, common));
+                            if (predicate == null)
+                                return null;
+                        }
                     }
                 }
 

@@ -80,9 +80,13 @@ public class BagView<X> extends VBox /* FlowPane */ implements Runnable {
         if (!queued.get())
             return;
 
-        ObservableList<Node> ch = getChildren();
-        ch.clear();
-        pending.stream().map(this::getNode).collect(toCollection(() -> ch));
+        try {
+            ObservableList<Node> ch = getChildren();
+            ch.clear();
+            pending.stream().map(this::getNode).collect(toCollection(() -> ch));
+        } catch (Exception e) {
+            System.err.println("BagView: " + e);
+        }
 
 //            getChildren().forEach(n -> {
 //                if (n instanceof Runnable)

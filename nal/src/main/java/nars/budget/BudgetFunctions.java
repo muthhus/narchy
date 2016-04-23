@@ -264,12 +264,14 @@ public final class BudgetFunctions extends UtilityFunctions {
         float quality  = qualRaw;
 
 
-        //final Compound taskTerm = task.term();
-        float volRatio =
-                //tasktermVol / ((float)( taskTerm.volume() + derived.volume() ));
-                1f / derived.volume();
-        durability *= volRatio;
-        quality *= volRatio;
+
+        int tasktermVol = nal.task().term().volume();
+        float volRatioScale =
+                Math.min(1f, tasktermVol / ((float)( tasktermVol + derived.volume() )));
+                //1f / derived.volume();
+
+        durability *= volRatioScale;
+        quality *= volRatioScale;
 
 
         BLink<? extends Termed> termLink = nal.termLink;

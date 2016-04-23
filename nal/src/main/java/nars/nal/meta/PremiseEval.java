@@ -24,6 +24,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.Random;
+import java.util.function.BiPredicate;
 
 
 /**
@@ -236,23 +237,25 @@ public class PremiseEval extends FindSubst {
         throw new UnsupportedOperationException();
     }
 
-    public final void putXY(Term k, Versioned<Term> vv) {
+    /** returns whether the put operation was successful */
+    public final boolean putXY(Term k, Versioned<Term> vv) {
         Term v = vv.get();
         if (v != null) {
-            if (!putXY(k, v)) {
-                throw new RuntimeException("what does this mean");
-            }
+            return putXY(k, v);
         }
+        return false;
     }
 
-    /** copy the new mappings to the match */
-    public final void putAllXY(Subst m) {
+    /** copy the new mappings to the match; returns false if there was an error, true if successful or if it was empty */
+    public final boolean putAllXY(Subst m) {
         if (m instanceof FindSubst) {
-            ((FindSubst) m).forEachVersioned(this::putXY);
+            return ((FindSubst) m).forEachVersioned((BiPredicate<Term,Versioned>)this::putXY);
         } else {
-            if (!m.isEmpty())
-                m.forEach(this::putXY);
+            if (!m.isEmpty()) {
+                return m.forEach((BiPredicate<Term,Term>)this::putXY);
+            }
         }
+        return true;
     }
 
 }

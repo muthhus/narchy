@@ -581,4 +581,40 @@ public class Terms extends TermBuilder implements TermIndex {
 
     }
 
+
+    public static boolean equalsAnonymous(Compound a, Compound b) {
+        if (a.op().isTemporal() && (a.opRel() == b.opRel()) && (a.volume() == b.volume())) {
+
+            return equalsAnonymous(a.subterms(), b.subterms());
+
+        } else {
+            return a.equals(b);
+        }
+    }
+
+    public static boolean equalsAnonymous(TermContainer a, TermContainer b) {
+        int n = a.size();
+        if (n == b.size()) {
+            for (int i = 0; i < n; i++) {
+                Term as = a.term(i);
+                Term bs = b.term(i);
+                if (!equalsAnonymous(as, bs))
+                    return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean equalsAnonymous(Term as, Term bs) {
+        if (as.op() == bs.op()) {
+            if (as instanceof Compound && bs instanceof Compound) {
+                return equalsAnonymous((Compound) as, (Compound) bs);
+            } else {
+                return as.equals(bs);
+            }
+        } else {
+            return false;
+        }
+    }
 }
