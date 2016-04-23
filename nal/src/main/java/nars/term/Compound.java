@@ -242,7 +242,6 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
 
     /** whether the anonymized form of this term equals x */
     @Override default boolean equalsAnonymously(Term x) {
-        Term a;
 
         if ((opRel()==x.opRel()) && (structure()==x.structure()) && (volume()==x.volume())) { //some simple pre-tests to hopefully avoid needing to anonymize
 

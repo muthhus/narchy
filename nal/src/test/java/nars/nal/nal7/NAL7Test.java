@@ -572,7 +572,7 @@ public class NAL7Test extends AbstractNALTest {
                 .inputAt(0, "(--, (x)). :|:")
                 .inputAt(4, "(x)? :|:")
                 .mustNotOutput(cycles, "(x)", '.', 0f, 0.89f, 0f, 0.91f, 10)
-                .mustBelieve(cycles, "(x)", 0f, 0.3f /* some smaller conf since it is a prediction */, 4);
+                .mustBelieve(cycles, "(x)", 0f, 0.6f /* some smaller conf since it is a prediction */, 4);
     }
 
 

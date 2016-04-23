@@ -306,14 +306,15 @@ public interface Concept extends Termed, Comparable {
      * @return number of links created (0, 1, or 2)
      */
     default void crossLink(@NotNull Task thisTask, @NotNull Task otherTask, float scale, @NotNull NAR nar) {
-        assert(!otherTask.term().equals(term()));
+
+        Concept other = nar.concept(otherTask);
+        if (other.equals(this))
+            return; //same concept
 
         float halfScale = scale / 2f;
 
         link(otherTask, halfScale, nar, null);
 
-        Concept other = //nar.concept(otherTask);
-                        nar.conceptualize(otherTask, thisTask.budget(), scale, null);
         if (other != null)
             other.link(thisTask, halfScale, nar, null);
 

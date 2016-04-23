@@ -526,5 +526,5 @@
 //TODO for desire
 
 //query-variable queston answering HACK currently this is done better in PremiseGeneration, not here. but this sort of works
-//    A, B, task("?") |- substituteIfUnifies(B, "?", A, B), (Belief:BeliefIdentity, Punctuation:Judgment)
+//  A, B, task("?") |- substituteIfUnifies(B, "?", A, B), (Belief:BeliefIdentity, Punctuation:Judgment)
 

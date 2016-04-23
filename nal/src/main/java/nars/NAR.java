@@ -903,8 +903,6 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         BudgetFunctions.transferPri(question.budget(), solution.budget(), (1f - question.qua()) * solutionConf);
 
 
-
-
         //TODO use an Answer class which is Runnable, combining that with the Twin info
         if (Global.DEBUG_NON_INPUT_ANSWERED_QUESTIONS || question.isInput()) {
             if (!eventAnswer.isEmpty())

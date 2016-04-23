@@ -62,18 +62,14 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
         if (target == source)
             throw new RuntimeException("termlink self-loop");
 
-//        if (alsoReverse) {
-//            subScale /= 2; //divide among both directions
-//        }
+        /** insert termlink target to source */
+        if (alsoReverse) {
+            subScale /= 2; //divide among both directions
+            target.termlinks().put(source, b, subScale, termlinkOverflow);
+        }
 
         /** insert termlink source to target */
         source.termlinks().put(target, b, subScale, termlinkOverflow);
-
-
-        /** insert termlink target to source */
-        if (alsoReverse)
-            target.termlinks().put(source, b, subScale, termlinkOverflow);
-
 
     }
 

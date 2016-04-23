@@ -233,6 +233,8 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
                 //attempt to Unify any Query variables; answer if unifies
                 if (task.term().hasVarQuery()) {
                     matchQueryQuestion(task, belief);
+                } else if (task.term().equalsAnonymously(beliefConcept.term())) {
+                    nar.answer(task, belief);
                 }
 
             }

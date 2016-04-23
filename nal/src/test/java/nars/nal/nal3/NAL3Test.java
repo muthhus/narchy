@@ -77,7 +77,8 @@ public class NAL3Test extends AbstractNALTest {
         TestNAR tester = test();
         tester.believe("<planetX --> {Mars,Pluto,Venus}>",0.9f,0.9f); //.en("PlanetX is Mars, Pluto, or Venus.");
         tester.believe("<planetX --> {Pluto,Saturn}>", 0.1f, 0.9f); //.en("PlanetX is probably neither Pluto nor Saturn.");
-        tester.mustBelieve(cycles, "<planetX --> {Mars,Pluto,Saturn,Venus}>", 0.91f ,0.81f); //.en("PlanetX is Mars, Pluto, Saturn, or Venus.");
+        tester.mustBelieve(cycles, "<planetX --> {Mars,Pluto,Saturn,Venus}>", 0.91f, 0.81f); //.en("PlanetX is Mars, Pluto, Saturn, or Venus.");
+
 
     }
     @Test
@@ -149,7 +150,7 @@ public class NAL3Test extends AbstractNALTest {
         TestNAR tester = test();
         tester.believe("<bird --> animal>",0.9f,0.9f); //.en("Bird is a type of animal.");
         tester.ask("<(|,bird,swimmer) --> (|,animal,swimmer)>"); //.en("Is a swimming bird a type of swimming animal?");
-        tester.mustBelieve(cycles, "<(|,bird,swimmer) --> (|,animal,swimmer)>", 0.90f ,0.73f); //.en("A swimming bird is probably a type of swimming animal.");
+        tester.mustBelieve(cycles*2, "<(|,bird,swimmer) --> (|,animal,swimmer)>", 0.90f ,0.73f); //.en("A swimming bird is probably a type of swimming animal.");
 
         /*<bird --> animal>. %0.9;0.9%
                 <(|,bird,swimmer) --> (|,animal,swimmer)>?*/

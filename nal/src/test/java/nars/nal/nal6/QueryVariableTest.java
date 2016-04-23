@@ -30,17 +30,19 @@ public class QueryVariableTest extends AbstractNALTest {
 
 
 
-    @Test public void testQueryVariableAnswer() {
-        testQueryVariableAnswer("<a --> b>", "<a --> b>");
+    @Test public void testNoVariableAnswer() {
+        testQuestionAnswer("<a --> b>", "<a --> b>");
     }
     @Test public void testQueryVariableAnswerUnified() {
-        testQueryVariableAnswer("<a --> b>", "<?x --> b>");
+
+        testQuestionAnswer("<a --> b>", "<?x --> b>");
     }
     @Test public void testQueryVariableAnswerUnified2() {
-        testQueryVariableAnswer("<c --> (a&b)>", "<?x --> (a&b)>");
+
+        testQuestionAnswer("<c --> (a&b)>", "<?x --> (a&b)>");
     }
 
-    void testQueryVariableAnswer(@NotNull String belief, @NotNull String question) {
+    void testQuestionAnswer(@NotNull String belief, @NotNull String question) {
 
         int time = 32;
 
