@@ -23,6 +23,7 @@ package nars;
 
 import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
+import nars.concept.Concept;
 import nars.concept.ConceptProcess;
 import nars.task.Task;
 import nars.term.TermIndex;
@@ -429,16 +430,6 @@ public class Memory extends Param {
 //    }
 
 
-    /** called when a solution is found */
-    public void onSolve(@NotNull Task question, Task solution) {
-
-        //TODO use an Answer class which is Runnable, combining that with the Twin info
-        if (Global.DEBUG_NON_INPUT_ANSWERED_QUESTIONS || question.isInput()) {
-            if (!eventAnswer.isEmpty())
-                eventAnswer.emit(Tuples.twin(question, solution));
-        }
-
-    }
 
 
     //    public byte[] toBytes() throws IOException, InterruptedException {

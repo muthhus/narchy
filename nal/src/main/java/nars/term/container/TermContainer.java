@@ -12,12 +12,12 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termlike;
 import nars.term.Terms;
+import nars.term.variable.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -71,15 +71,19 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
 
 
 
-    Predicate2<Object,ImmutableSet> commonSubtermPredicate = (Object yy, ImmutableSet xx) -> {
-        //if (yy instanceof Variable) {
-            //??
-        //}
+    Predicate2<Object,ImmutableSet> subtermIsCommon = (Object yy, ImmutableSet xx) -> {
         return xx.contains(yy);
     };
+    Predicate2<Object,ImmutableSet> nonVarSubtermIsCommon = (Object yy, ImmutableSet xx) -> {
+        return yy instanceof Variable ? false : xx.contains(yy);
+    };
+
+    @NotNull static boolean commonSubterms(@NotNull Compound a, @NotNull Compound b) {
+        return commonSubterms(a, b, subtermIsCommon);
+    }
 
     /** recursively */
-    @NotNull static boolean commonSubterms(@NotNull Compound a, @NotNull Compound b) {
+    @NotNull static boolean commonSubterms(@NotNull Compound a, @NotNull Compound b, Predicate2<Object,ImmutableSet> isCommonPredicate) {
 
         ImmutableSet<Term> x = a.recurseTermsToSet();
         ImmutableSet<Term> y = b.recurseTermsToSet();
@@ -89,7 +93,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
             y = tmp;
         }
 
-        return y.anySatisfyWith(commonSubtermPredicate, (ImmutableSet<?>)x);
+        return y.anySatisfyWith(isCommonPredicate, (ImmutableSet<?>)x);
     }
 
     /** recursively */
@@ -98,7 +102,7 @@ public interface TermContainer<T extends Term> extends Termlike, Comparable, Ite
         boolean aCompound = a instanceof Compound;
         boolean bCompound = b instanceof Compound;
         if (aCompound && bCompound) {
-            return commonSubterms((Compound)a, ((Compound)b));
+            return commonSubterms((Compound)a, ((Compound)b), subtermIsCommon);
         } else {
             if (aCompound && !bCompound) {
                 return ((Compound)a).containsTerm(b);

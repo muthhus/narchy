@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.util.Set;
 
 import static nars.nal.Tense.DTERNAL;
+import static nars.nal.Tense.ETERNAL;
 
 /**
  * a compound term
@@ -236,7 +237,19 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
     @NotNull
     @Override
     default Compound anonymous() {
-        return dt() == DTERNAL ? this : this.dt(DTERNAL);
+        return this.dt(DTERNAL);
+    }
+
+    /** whether the anonymized form of this term equals x */
+    @Override default boolean equalsAnonymously(Term x) {
+        Term a;
+
+        if ((opRel()==x.opRel()) && (structure()==x.structure()) && (volume()==x.volume())) { //some simple pre-tests to hopefully avoid needing to anonymize
+
+            return anonymous().equals(x);
+        }
+
+        return false;
     }
 
     /** sets temporal relation value (TEMPORARY). returns new value */

@@ -43,35 +43,37 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
 
     /** returns the outgoing component only */
     @Nullable
-    public static final BLink<Termed> linkTerm(@NotNull Concept source, @NotNull Termed targetTerm,
-                                               @NotNull Budgeted b, float subScale, boolean alsoReverse,
-                                               @Nullable MutableFloat conceptOverflow,
-                                               @Nullable MutableFloat termlinkOverflow, @NotNull NAR nar) {
+    static final void linkSub(@NotNull Concept source, @NotNull Termed targetTerm,
+                                              @NotNull Budgeted b, float subScale, boolean alsoReverse,
+                                              @Nullable MutableFloat conceptOverflow,
+                                              @Nullable MutableFloat termlinkOverflow, @NotNull NAR nar) {
 
+        /*
+        if (!(task.isStructual() && (cLink0.getType() == TermLink.TRANSFORM))) {
+
+        }*/
+
+
+        /** activate concept and insert tasklink */
         Concept target = nar.conceptualize(targetTerm, b, subScale, conceptOverflow);
-        assert (target != null);
+        if (target == null)
+            throw new RuntimeException("termlink to null concept");
 
-        /*if (logger.isDebugEnabled())
-            logger.debug("TermLink: {} <//> {} ", source, target); */
-
-        if (source == target)
+        if (target == source)
             throw new RuntimeException("termlink self-loop");
 
-        if (alsoReverse) {
-            subScale /= 2; //divide among both directions
-        }
+//        if (alsoReverse) {
+//            subScale /= 2; //divide among both directions
+//        }
 
-        /** activate local's termlink to template */
+        /** insert termlink source to target */
+        source.termlinks().put(target, b, subScale, termlinkOverflow);
 
-        BLink<Termed> ol = source.termlinks().put(target, b, subScale, termlinkOverflow);
 
+        /** insert termlink target to source */
+        if (alsoReverse)
+            target.termlinks().put(source, b, subScale, termlinkOverflow);
 
-        /** activate (reverse) template's termlink to local */
-        if (alsoReverse) {
-            /*BLink<Termed> il = */target.termlinks().put(source, b, subScale, termlinkOverflow);
-        }
-
-        return ol;
 
     }
 
@@ -170,8 +172,10 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
         return termLinks;
     }
 
-    /** atoms have no termlink templates, they are irreducible */
-    @Nullable @Override public abstract List<TermTemplate> termlinkTemplates();
+
+    public final boolean isConceptOf(Termed t) {
+        return t == this ? true : t.equalsAnonymously(term());
+    }
 
     /**
      * when a task is processed, a tasklink
@@ -179,8 +183,12 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
      */
     @Override public boolean link(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, @Nullable MutableFloat conceptOverflow) {
 
-        if (b instanceof Task)
-            taskLinks.put((Task)b, b/*.budget()*/, scale, null);
+        if (b instanceof Task) {
+            Task t = (Task) b;
+            if (term.vars()==0 || !isConceptOf(t)) { //insert tasklink to its terms own concept only if no variables
+                taskLinks.put(t, b/*.budget()*/, scale, null);
+            }
+        }
 
         return true;
     }

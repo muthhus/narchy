@@ -88,10 +88,6 @@ public class AtomConcept<E extends Atomic> extends AbstractConcept<E> implements
         throw new UnsupportedOperationException();
     }
 
-    @Nullable @Override
-    public List<TermTemplate> termlinkTemplates() {
-        return null;
-    }
 
     @Override
     public final @Nullable Op op() {

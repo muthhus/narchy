@@ -170,8 +170,8 @@ public abstract class FindSubst extends Versioning implements Subst, Supplier<Ve
 
 
 
-    public final void matchAll(@NotNull Term x, @NotNull Term y) {
-        matchAll(x, y, true);
+    public final boolean matchAll(@NotNull Term x, @NotNull Term y) {
+        return matchAll(x, y, true);
     }
 
 
@@ -214,13 +214,15 @@ public abstract class FindSubst extends Versioning implements Subst, Supplier<Ve
     /**
      * setting finish=false allows matching in pieces before finishing
      */
-    public void matchAll(@NotNull Term x, @NotNull Term y, boolean finish) {
+    public boolean matchAll(@NotNull Term x, @NotNull Term y, boolean finish) {
 
         if (match(x, y) && finish) {
 
             termunator.run(this, null, -1);
+            return true;
         }
 
+        return false;
     }
 
 

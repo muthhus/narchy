@@ -2,9 +2,10 @@ package nars.nal.meta.constraint;
 
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.container.TermContainer;
 import nars.term.transform.subst.FindSubst;
 import org.jetbrains.annotations.NotNull;
+
+import static nars.term.container.TermContainer.*;
 
 
 public final class NoCommonSubtermsConstraint implements MatchConstraint {
@@ -20,8 +21,9 @@ public final class NoCommonSubtermsConstraint implements MatchConstraint {
     public boolean invalid(@NotNull Term x, @NotNull Term y, @NotNull FindSubst f) {
         if (y instanceof Compound) {
             Term B = f.term(b);
-            return (B instanceof Compound) //includes null test
-                    && TermContainer.commonSubterms((Compound) B, (Compound)y);
+            return (B instanceof Compound) && //includes null test
+                   commonSubterms((Compound) B, (Compound)y,
+                           nonVarSubtermIsCommon);
         }
         return false;
     }

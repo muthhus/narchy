@@ -232,8 +232,8 @@ public interface Concept extends Termed, Comparable {
         }
 
         if (showtermlinks) {
-            out.print("TermLinkTemplates: ");
-            out.println(termlinkTemplates());
+            //out.print("TermLinkTemplates: ");
+            //out.println(termlinkTemplates());
 
             out.println("\n TermLinks:");
             termlinks().forEach(b -> {
@@ -254,9 +254,6 @@ public interface Concept extends Termed, Comparable {
 
         out.println('\n');
     }
-
-    @Nullable
-    List<TermTemplate> termlinkTemplates();
 
     @NotNull
     default Iterator<Task> iterateTasks(boolean onbeliefs, boolean ongoals, boolean onquestions, boolean onquests) {

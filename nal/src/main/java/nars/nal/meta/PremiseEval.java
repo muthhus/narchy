@@ -112,9 +112,9 @@ public class PremiseEval extends FindSubst {
     }
 
     @Override
-    public void matchAll(@NotNull Term x, @NotNull Term y, boolean finish) {
+    public boolean matchAll(@NotNull Term x, @NotNull Term y, boolean finish) {
         this.termutes = termutesPerMatch;
-        super.matchAll(x, y, finish);
+        return super.matchAll(x, y, finish);
     }
 
     @Override

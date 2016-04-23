@@ -108,68 +108,68 @@ public enum LocalRules {
 
 
 
-    /**
-     * Check if a Sentence provide a better answer to a Question or Goal
-     *
-     * @param proposedBelief       The proposed answer
-     * @param question     The question to be processed
-     * @return the projected Task, or the original Task
-     */
-    public static void forEachSolution(@NotNull Task question, @NotNull Task sol, @NotNull NAR nal) {
-
-
-        if (Stamp.overlapping(question, sol)) {
-            //System.out.println(question.getExplanation());
-            //System.out.println(sol.getExplanation());
-            return;
-        }
-
-//        float om = Tense.orderMatch(question, solution, nal.memory.duration());
+//    /**
+//     * Check if a Sentence provide a better answer to a Question or Goal
+//     *
+//     * @param proposedBelief       The proposed answer
+//     * @param question     The question to be processed
+//     * @return the projected Task, or the original Task
+//     */
+//    public static void forEachSolution(@NotNull Task question, @NotNull Task sol, @NotNull NAR nal) {
 //
-//        if (!Tense.matchingOrder(question, solution)) {
-//            //System.out.println("Unsolved: Temporal order not matching");
-//            //memory.emit(Unsolved.class, task, belief, "Non-matching temporal Order");
+//
+//        if (Stamp.overlapping(question, sol)) {
+//            //System.out.println(question.getExplanation());
+//            //System.out.println(sol.getExplanation());
 //            return;
 //        }
-
-
-        /** temporary for comparing the result before unification and after */
-        //float newQ0 = TemporalRules.solutionQuality(question, belief, projectedTruth, now);
-
-        //System.out.println(nal.time() + " solve: " + question);
-
-        Consumer<Term> proc = (st) -> {
-
-
-            Task validSolution = sol.answer((Compound)st, question, nal);
-
-            if (validSolution!=null) {
-
-                nal.onSolve(question, validSolution);
-
-                //System.out.println("\twith: " + validSolution);
-
-                nal.input(validSolution);
-                //System.out.println(question + " " + ss + " " + ss.getExplanation());
-
-            }
-
-        };
-
-
-        //Compound quesTerm = question.term();
-        Compound solTerm = sol.term();
-
-        //if (solTerm.hasVarIndep() && !solTerm.equals(quesTerm)) {
-
-            //Premise.unify(Op.VAR_INDEP, quesTerm, solTerm, nal.memory, proc);
-
-        //} else {
-            proc.accept(solTerm);
-        //}
-
-
-    }
+//
+////        float om = Tense.orderMatch(question, solution, nal.memory.duration());
+////
+////        if (!Tense.matchingOrder(question, solution)) {
+////            //System.out.println("Unsolved: Temporal order not matching");
+////            //memory.emit(Unsolved.class, task, belief, "Non-matching temporal Order");
+////            return;
+////        }
+//
+//
+//        /** temporary for comparing the result before unification and after */
+//        //float newQ0 = TemporalRules.solutionQuality(question, belief, projectedTruth, now);
+//
+//        //System.out.println(nal.time() + " solve: " + question);
+//
+//        Consumer<Term> proc = (st) -> {
+//
+//
+//            Task validSolution = sol.answer((Compound)st, question, nal);
+//
+//            if (validSolution!=null) {
+//
+//                nal.onSolve(question, validSolution);
+//
+//                //System.out.println("\twith: " + validSolution);
+//
+//                nal.input(validSolution);
+//                //System.out.println(question + " " + ss + " " + ss.getExplanation());
+//
+//            }
+//
+//        };
+//
+//
+//        //Compound quesTerm = question.term();
+//        Compound solTerm = sol.term();
+//
+//        //if (solTerm.hasVarIndep() && !solTerm.equals(quesTerm)) {
+//
+//            //Premise.unify(Op.VAR_INDEP, quesTerm, solTerm, nal.memory, proc);
+//
+//        //} else {
+//            proc.accept(solTerm);
+//        //}
+//
+//
+//    }
 
 //    /** refines a solution for a question.
 //     *  returns true if the solution is valid for the question */

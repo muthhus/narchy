@@ -525,6 +525,6 @@
     (||,B,A..+), B, task("?") |- (||,B,A..+), (Belief:BeliefStructuralDeduction, Punctuation:Judgment)
 //TODO for desire
 
-//query-variable queston answering
-    A, B, task("?") |- substituteIfUnifies(B, "?", A, B), (Belief:BeliefIdentity, Punctuation:Judgment)
+//query-variable queston answering HACK currently this is done better in PremiseGeneration, not here. but this sort of works
+//    A, B, task("?") |- substituteIfUnifies(B, "?", A, B), (Belief:BeliefIdentity, Punctuation:Judgment)
 

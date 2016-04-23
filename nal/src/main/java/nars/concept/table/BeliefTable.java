@@ -5,6 +5,7 @@ import nars.NAR;
 import nars.budget.Budgeted;
 import nars.nal.Tense;
 import nars.task.Task;
+import nars.term.Compound;
 import nars.truth.Truth;
 import nars.truth.Truthed;
 import org.jetbrains.annotations.NotNull;
@@ -348,6 +349,34 @@ public interface BeliefTable extends TaskTable {
     @Nullable default Truth truth(long now) {
         return truth(now, now);
     }
+
+    /** finds the strongest matching belief for the given term (and its possible 'dt' value) and the given occurrence time.
+     *
+     *  HACK also removes deleted entries that it finds in the process
+     *
+     *  TODO apply term's 'dt' in ranking if present
+     * */
+    default Task match(Compound term, long taskOcc, NAR nar) {
+
+        Task belief;
+        do {
+            belief = top(
+                    //nar.time()
+                    taskOcc
+            );
+
+            if (belief == null)
+                return null;
+
+            if (belief.isDeleted()) {
+                remove(belief, nar);
+            }
+
+        } while (belief.isDeleted());
+
+        return belief;
+    }
+
 
 
     //void remove(Task belief, @NotNull NAR nar);

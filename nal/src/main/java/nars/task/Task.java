@@ -245,7 +245,7 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
     }
 
     /** projects a belief task to match a question */
-    @Nullable default Task answerMatchedBelief(@NotNull Task question, @NotNull Memory memory, float minConf) {
+    @Nullable default Task projectMatched(@NotNull Task question, @NotNull Memory memory, float minConf) {
 
         assert(!question.isEternal());
         if (question.occurrence() == occurrence())
@@ -820,8 +820,9 @@ public interface Task extends Budgeted, Truthed, Comparable, Stamp, Termed, Task
             float nextConf;
             long nextOcc = targetTime;
 
+
             float projConf = nextConf =
-                    conf * truthProjection(  occ, targetTime, now );
+                    conf * truthProjection(  targetTime, occ, now );
 
             if (eternalizeIfWeaklyTemporal) {
                 float eternConf = eternalize(conf);

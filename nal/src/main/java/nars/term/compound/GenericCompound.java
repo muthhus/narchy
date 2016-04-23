@@ -318,6 +318,10 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     @Override
     public final Compound dt(int cycles) {
         if (cycles == dt) return this;
+
+        if (!op().isTemporal())
+            throw new InvalidTerm(op(), relation, cycles, terms());
+
         GenericCompound g = new GenericCompound(op, relation, cycles, subterms);
         if (normalized) g.setNormalized();
         return g;

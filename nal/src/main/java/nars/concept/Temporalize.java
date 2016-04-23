@@ -1,5 +1,6 @@
 package nars.concept;
 
+import nars.Op;
 import nars.Premise;
 import nars.nal.meta.PremiseEval;
 import nars.nal.op.Derive;
@@ -403,12 +404,9 @@ public interface Temporalize {
         if (eventDelta == DTERNAL)
             return derived; //no change
 
-//        if (eventDelta != 0 && derived.op().isCommutative()) {
-//            //flip temporal polarity if reversed
-//            if (!derived.term(0).equals(premise.task().term())) {
-//                eventDelta = -eventDelta;
-//            }
-//        }
+        //exception: if reduction results in || which is non-temporal
+        if (derived.op() == Op.DISJUNCTION)
+            return derived;
 
         return derived.dt(eventDelta * polarity);
     }

@@ -64,26 +64,26 @@ public class TermLinkGraph extends DirectedPseudograph<Termed, Termed> {
 
     }
 
-    public static class TermLinkTemplateGraph extends TermLinkGraph {
-
-        public TermLinkTemplateGraph(@NotNull NAR n) {
-            super(n);
-        }
-
-        /** add the termlink templates instead of termlinks */
-        @Override protected void addTermLinks(@NotNull Concept c) {
-            Term sourceTerm = c.term();
-
-            for (Termed t : c.termlinkTemplates()) {
-                Term targetTerm = t.term();
-                if (!containsVertex(targetTerm)) {
-                    addVertex(targetTerm);
-                }
-
-                addEdge(sourceTerm, targetTerm );
-            }
-        }
-    }
+//    public static class TermLinkTemplateGraph extends TermLinkGraph {
+//
+//        public TermLinkTemplateGraph(@NotNull NAR n) {
+//            super(n);
+//        }
+//
+//        /** add the termlink templates instead of termlinks */
+//        @Override protected void addTermLinks(@NotNull Concept c) {
+//            Term sourceTerm = c.term();
+//
+//            for (Termed t : c.termlinkTemplates()) {
+//                Term targetTerm = t.term();
+//                if (!containsVertex(targetTerm)) {
+//                    addVertex(targetTerm);
+//                }
+//
+//                addEdge(sourceTerm, targetTerm );
+//            }
+//        }
+//    }
 
     @NotNull
     public TermLinkGraph add(@NotNull Concept c, boolean includeTermLinks/*, boolean includeTaskLinks, boolean includeOtherReferencedConcepts*/) {

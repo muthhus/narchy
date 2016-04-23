@@ -6,6 +6,7 @@ import com.gs.collections.api.tuple.Twin;
 import com.gs.collections.impl.tuple.Tuples;
 import nars.Narsese.NarseseException;
 import nars.budget.Budget;
+import nars.budget.BudgetFunctions;
 import nars.budget.Budgeted;
 import nars.concept.Concept;
 import nars.nal.Level;
@@ -889,6 +890,27 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
         });
 
         return this;
+    }
+
+    /** called when a solution is found */
+    public void answer(@NotNull Task question, Task solution) {
+
+        float solutionConf = solution.conf();
+
+        question.concept(this).crossLink(question, solution, solutionConf, this);
+
+        //amount boosted will be in proportion to the lack of quality, so that a high quality question will survive longer by not being drained so quickly
+        BudgetFunctions.transferPri(question.budget(), solution.budget(), (1f - question.qua()) * solutionConf);
+
+
+
+
+        //TODO use an Answer class which is Runnable, combining that with the Twin info
+        if (Global.DEBUG_NON_INPUT_ANSWERED_QUESTIONS || question.isInput()) {
+            if (!eventAnswer.isEmpty())
+                eventAnswer.emit(Tuples.twin(question, solution));
+        }
+
     }
 
 

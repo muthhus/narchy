@@ -153,9 +153,9 @@ public class NAL7Test extends AbstractNALTest {
         test()
                 //.log()
                 .input("(y ==>+3 x). :\\:")
-                .inputAt(25, "(y ==>+3 ?z)? :/:")
+                .inputAt(1, "(y ==>+3 ?z)? :/:")
                 //.mustAnswer(50, "(y ==>+3 x)", 1.00f, 0.74f, 15);
-                .mustAnswer(50, "(y ==>+3 x)", 1.00f, 0.9f, 25 + 5);
+                .mustAnswer(cycles, "(y ==>+3 x)", 1.00f, 0.9f, 2);
     }
 
 //    @Test public void testImplQuery2() {
@@ -394,14 +394,13 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void induction_on_events_composition_pre() {
-        TestNAR tester = test();
-
-        tester.input("hold:(John,key). :|:");
-        tester.input("(open:(John,door) ==>+5 enter:(John,room)). :|:");
-
-        tester.mustBelieve(cycles, "(((John,key)-->hold) &&+0 (((John,door)-->open) ==>+5 ((John,room)-->enter)))",
-                1.00f, 0.81f,
-                0);
+        test()
+            //.log()
+            .input("hold:(John,key). :|:")
+            .input("(open:(John,door) <-> enter:(John,room)). :|:")
+            .mustBelieve(cycles, "(hold:(John,key) &&+0 (open:(John,door) <-> enter:(John,room)))",
+                    1.00f, 0.81f,
+                    0);
     }
 
 //    @Test

@@ -36,4 +36,9 @@ public interface Termed<T extends Term>  {
         return x == null ? null : x.term();
     }
 
+    /** whether the anonymized form of this term equals x */
+    default boolean equalsAnonymously(Term x) {
+        return x.equals(this);
+    }
+
 }

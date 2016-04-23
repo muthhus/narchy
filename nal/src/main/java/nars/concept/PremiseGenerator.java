@@ -2,6 +2,7 @@ package nars.concept;
 
 import nars.Global;
 import nars.NAR;
+import nars.Op;
 import nars.bag.BLink;
 import nars.bag.Bag;
 import nars.budget.Forget;
@@ -18,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.function.Consumer;
 
 import static nars.nal.Tense.ETERNAL;
@@ -68,6 +70,7 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
 
     @Range(min = 0, max = 16, unit = "TermLink")
     public final MutableInteger termlinksFiredPerFiredConcept = new MutableInteger(1);
+
 
 
 
@@ -166,27 +169,25 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
     /** begin matching the task half of a premise */
     private void premiseTask(@NotNull BLink<? extends Concept> concept, @Nullable BLink<Termed>[] termsArray, BLink<Task> taskLink, @NotNull Task task, long occ) {
 
-        for (BLink<Termed> termLink : termsArray) {
-            if (termLink == null) break; //null-terminated array, ends
+        Compound taskTerm = task.term();
 
-            if (task.isDeleted()) break; //task has become deleted, cancel
+        for (BLink<Termed> termLink : termsArray) {
+
+            if (termLink == null || task.isDeleted())
+                break; //end of termsArray, or task has become deleted in the previous iteration, cancel
 
             Termed tl = termLink.get();
-            Concept beliefConcept = nar.concept(tl);
             Term termLinkTerm  = tl.term();
 
-            if (Terms.equalSubTermsInRespectToImageAndProduct(task.term(), termLinkTerm ))
-                continue;
 
+            if (!Terms.equalSubTermsInRespectToImageAndProduct( taskTerm, termLinkTerm )) {
 
-            /*premise(conceptLink, taskLink, termLink,
-                    match(beliefConcept, occ) //TODO cache this, if occ is same then the belief probably is also, in same cycle
-            );*/
-
-            //    abstract protected void premise(BLink<? extends Concept> concept, BLink<? extends Task> taskLink, BLink<? extends Termed> termLink, Task belief);
-
-            matcher.run(newPremise(concept, taskLink, termLink, match(task, beliefConcept, occ)));
-
+                matcher.run(
+                    newPremise(concept, taskLink, termLink,
+                            match(task, tl, occ) //TODO cache this, if occ is same then the belief probably is also, in same cycle
+                    )
+                );
+            }
         }
     }
 
@@ -197,54 +198,63 @@ abstract public class PremiseGenerator implements Consumer<BLink<? extends Conce
 
     /** resolves the most relevant belief of a given term/concept */
     @Nullable
-    public Task match(@NotNull Task task, @NotNull Concept beliefConcept, long taskOcc) {
+    public Task match(@NotNull Task task, @NotNull Termed beliefConceptTerm, long taskOcc) {
+
+        //atomic concepts will have no beliefs to match
+        if (!(beliefConceptTerm instanceof Compound))
+            return null;
 
         //DEBUG---
         if (task.isDeleted())
-            throw new RuntimeException("Deleted task: " + task + " " + beliefConcept.hasBeliefs());
+            throw new RuntimeException("Deleted task: " + task);
         //----
 
-
-        //atomic concepts will have no beliefs to match
-        if (!(beliefConcept instanceof Compound))
-            return null;
+        Concept beliefConcept = nar.concept(beliefConceptTerm);
 
         @Nullable BeliefTable table = task.isQuest() ? beliefConcept.goals() : beliefConcept.beliefs();
 
-        if (!table.isEmpty()) {
-
-            Task belief;
-            do {
-                belief = table.top(
-                    //nar.time()
-                    taskOcc
-                );
-
-                if (belief == null)
-                    return null;
-
-                if (belief.isDeleted()) {
-                    table.remove(belief, nar);
-                }
-
-            } while (belief.isDeleted());
-
-//            //DEBUG---
-//            //assert(belief != null && !belief.isDeleted());
-//            if (belief.isDeleted())
-//                throw new RuntimeException("Deleted belief: " + belief + " " + belief.explanation());
-//            //---
-
-            if (task.isQuestOrQuestion() && taskOcc!=ETERNAL) {
-                //project the belief to the question's time
-                return belief.answerMatchedBelief(task /*question*/, nar, Global.TRUTH_EPSILON );
-            } else {
-                return belief;
-            }
+        if (table.isEmpty()) {
+            return null;
         }
 
-        return null;
+        Task belief = table.match(task.term(), taskOcc, nar);
+        if (belief == null)
+            return null;
+
+        if (task.isQuestOrQuestion()) {
+
+            //project the belief to the question's time
+            if (taskOcc!=ETERNAL) {
+                belief = belief.projectMatched(task /*question*/, nar, Global.TRUTH_EPSILON);
+            }
+
+            if (belief!=null) { //may have become null as a result of projection
+
+                //attempt to Unify any Query variables; answer if unifies
+                if (task.term().hasVarQuery()) {
+                    matchQueryQuestion(task, belief);
+                }
+
+            }
+
+
+        }
+
+        return belief;
+
+
     }
+
+    public void matchQueryQuestion(@NotNull Task task, Task belief) {
+        List<Termed> result = Global.newArrayList(1);
+        new UnifySubst(Op.VAR_QUERY, nar, result, 1).matchAll(
+                task.term(), belief.term()
+        );
+        if (!result.isEmpty()) {
+            nar.answer(task, belief);
+        }
+    }
+
 
 //    /** uses the query-unified term to complete a premise */
 //    @Override public final boolean accept(@NotNull Term beliefTerm, Term unifiedBeliefTerm) {

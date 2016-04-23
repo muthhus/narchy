@@ -339,6 +339,18 @@ public final class BudgetFunctions extends UtilityFunctions {
                 d >= m.derivationDurabilityThreshold.floatValue();
     }
 
+    /** from a to b, LERP of priority according to strength 's' [0 <= s <= 1] */
+    public static void transferPri(@Nullable Budget a, @Nullable Budget b, float s) {
+        float priToTransfer = a.pri() * s;
+        float nextB = b.pri() + priToTransfer;
+
+        //cap at 1, and only transfer what is necessary to reach it
+        priToTransfer += Math.min(0, 1f - nextB);
+
+        b.setPriority(Math.min(nextB, 1f));
+        a.priSub(priToTransfer);
+    }
+
     /**
      * balance the priorities of 2 existing budgets ('a' and 'b')
      * which transfer some of their budget to the resulting new budget.

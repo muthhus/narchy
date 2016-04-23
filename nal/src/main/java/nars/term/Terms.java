@@ -119,15 +119,15 @@ public class Terms extends TermBuilder implements TermIndex {
 
     public static boolean equalSubTermsInRespectToImageAndProduct(@Nullable Term a, @Nullable Term b) {
 
-        if (a == null || b == null) {
+        /*if (a == null || b == null) {
             return false;
-        } else {
+        } else {*/
             Op o = a.op();
             boolean equalOps = (o == b.op());
 
             if (equalOps) {
                 if (a.equals(b))
-                    return false; //inequal because the operator was inequal
+                    return false;
 
                 switch (o) {
                     case INHERIT:
@@ -163,7 +163,7 @@ public class Terms extends TermBuilder implements TermIndex {
 
             return false;
 
-        }
+
 
 
     }

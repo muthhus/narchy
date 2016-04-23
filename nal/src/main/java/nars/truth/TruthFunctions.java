@@ -176,13 +176,11 @@ public final class TruthFunctions extends UtilityFunctions {
             return 1f;
         } else {
             long den = (abs(sourceTime - currentTime) + abs(targetTime - currentTime));
-            if (den == 0) {
-                return 1f;
-            } else {
-                return 1f - ((abs(sourceTime - targetTime)) / (float) den);
-            }
+            return den == 0 ? 1f : (abs(sourceTime - targetTime)) / (float) den;
         }
     }
+
+
 
 
     /**

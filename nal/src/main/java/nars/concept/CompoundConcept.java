@@ -40,8 +40,7 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
      * how incoming budget is merged into its existing duplicate quest/question
      */
 
-    @Nullable
-    private List<TermTemplate> termLinkTemplates;
+    @Nullable List<TermTemplate> termLinkTemplates;
 
     @Nullable
     protected QuestionTable questions;
@@ -66,9 +65,9 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
         super(term, taskLinks, termLinks);
     }
 
-    public CompoundConcept(@NotNull String compoundTermString, @NotNull NAR n) throws Narsese.NarseseException {
-        this((Compound) $.$(compoundTermString), n);
-    }
+//    public CompoundConcept(@NotNull String compoundTermString, @NotNull NAR n) throws Narsese.NarseseException {
+//        this((Compound) $.$(compoundTermString), n);
+//    }
 
     /** used for setting an explicit OperationConcept instance via java; activates it on initialization */
     public CompoundConcept(@NotNull Compound term, @NotNull NAR n) {
@@ -663,7 +662,7 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
         if (super.link(b, scale, minScale, nar, conceptOverflow)) {
 
             //3. Link the termlink templates
-            List<TermTemplate> templates = termlinkTemplates();
+            List<TermTemplate> templates = this.termLinkTemplates;
             if (templates == null) {
                 templates = this.termLinkTemplates = TermLinkBuilder.build(term, nar);
             }
@@ -731,22 +730,18 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
         return false;
     }
 
-    public void linkDistribute(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, @NotNull List<TermTemplate> templates, MutableFloat subConceptOverflow) {
+    void linkDistribute(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, @NotNull List<TermTemplate> templates, MutableFloat subConceptOverflow) {
         for (int i = 0, templatesSize = templates.size(); i < templatesSize; i++) {
             TermTemplate tt = templates.get(i);
             float subScale = scale * tt.strength;
 
             //Link the peer termlink bidirectionally
-            if (subScale > minScale) //TODO use a min bound to prevent the iteration ahead of time
-                linkTerm(this, tt.term, b, subScale, true, subConceptOverflow, null, nar);
+            if (subScale > minScale) { //TODO use a min bound to prevent the iteration ahead of time
+                linkSub(this, tt.term, b, subScale, true, subConceptOverflow, null, nar);
+            }
         }
     }
 
-
-    @Nullable @Override
-    public final List<TermTemplate> termlinkTemplates() {
-        return termLinkTemplates;
-    }
 
     /**
      * Directly process a new task. Called exactly once on each task. Using
@@ -910,6 +905,9 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
     @Override
     public final Compound dt(int cycles) {
         //the concept will not hold any particular temporality in its ID term. however its tasks may utliize them
+        if (cycles == DTERNAL)
+            return this;
+
         throw new UnsupportedOperationException();
     }
 

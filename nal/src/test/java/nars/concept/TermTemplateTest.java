@@ -21,7 +21,7 @@ public class TermTemplateTest {
         Task t = n.inputTask("((($3-->(/,REPR,_,$4))&&($1-->(/,REPR,_,$2)))==>({($1,$2),($3,$4)}-->REPR)).");
         n.step();
         Concept c = t.concept(n);
-        List<TermTemplate> templates = c.termlinkTemplates();
+        List<TermTemplate> templates = ((CompoundConcept)c).termLinkTemplates;
         System.out.println(Joiner.on('\n').join(templates));
         assertEquals(7, templates.size());
         assertEquals("({($1,$2),($3,$4)}-->REPR)", templates.get(0).term.toString());

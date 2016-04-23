@@ -257,95 +257,13 @@ public class Default extends AbstractNAR {
 
         Concept c = concept(termed, true);
         if (c != null) {
-
             core.activate(c, activation, scale, conceptOverflow);
-
             c.link(activation, scale, Default.this, conceptOverflow);
-
-//            if (templateConcept != null) {
-//                templateConcept.linkTask(task, subScale, minScale, nar);
-//
-//                linkTerm(templateConcept, taskBudget, subScale);
-//
-//                /** recursively activate the template's task tlink */
-//
-//            }
-
-
-//            float toTermLinks = 0;
-//            if (toTermLinks != 0) {
-//                int numTermLinks = c.termlinks().size();
-//                if (numTermLinks > 0) {
-//                    float baseScale = toTermLinks * scale / numTermLinks; //minimum wage termlinks can receive
-//
-//                    List<Termed> l = c.termlinkTemplates();
-//                    for (Termed bt : l) {
-//
-//                    }
-//
-//                    /*c.termlinks().forEach(bt -> {
-//                        conceptualizeLink(activation, c, bt, baseScale);
-//                    });*/
-//
-//                }
-////                    float basePriIncrease = baseScale * activation.pri();
-////                    //if (baseScale > Global.BUDGET_PROPAGATION_EPSILON) {
-////
-////
-////                        final float[] priDemand = {0}, priSurplus = {0};
-////                        c.termlinks().forEach(t -> {
-////                            float p = t.pri();
-////
-////                            if (1f - p > 0)
-////                                priDemand[0] += 1f-p;
-////
-////                            float pot = (p + basePriIncrease);
-////                            float potentialSurplus = pot - 1f;
-////                            if (potentialSurplus > 0)
-////                                priSurplus[0] += potentialSurplus;
-////                        });
-////
-////
-////                        //float tlScale = toTermLinks * scale / numTLToActivate;
-////
-////                        System.out.println(c + " " + priDemand[0] + " " + priSurplus[0]);
-////
-////                                //numTermLinks - priPotential[0];
-////                        //float tlScale = toTermLinks * scale * (1f + surplus * (1f - bt.pri())/priPotential[0])/numTLToActivate;
-////                        //if (tlScale >= Global.BUDGET_PROPAGATION_EPSILON) {
-////                        c.termlinks().forEach(bt -> {
-////
-////                            float s = baseScale +
-////                                    (priSurplus[0] *
-////                                        (1f - bt.pri()) / priDemand[0]); //share of the total demand
-////                            System.out.println("  " + c + " " + s);
-////                            conceptualizeLink(activation, toTermLinks, c, bt, s);
-////                        });
-////
-////
-////                }
-////
-////
-//
-//            }
-
-
         }
         return c;
 
     }
-//
-//    public void conceptualizeLink(Budget activation, Concept c, BLink<? extends Termed> bt, float s) {
-//
-//        if (s * activation.pri() > Global.BUDGET_PROPAGATION_EPSILON) {
-//
-//            Concept tc = conceptualize(bt.get(), activation, s);
-//
-//            if (tc != null) {
-//                AbstractConcept.linkTerm(c, tc, activation, s, true, false);
-//            }
-//        }
-//    }
+
 
     @NotNull
     @Override
