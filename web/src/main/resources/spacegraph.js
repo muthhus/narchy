@@ -380,7 +380,38 @@ function spacegraph(targetWrapper, opt) {
             name: 'canvas',
             showFps: false
         },
-        container: target[0]
+        container: target[0],
+
+        style: [
+            {
+                selector: 'node',
+                style: {
+                    'background-color': '#888',
+                    'label': 'data(label)',
+                    'text-valign': 'center',
+                    'text-halign': 'center',
+                    'color': '#fff'
+                    /*'text-background-opacity': 1,
+                    'text-background-color': '#ccc',
+                    'text-background-shape': 'roundrectangle',*/
+                    /*'text-border-color': '#000',
+                    'text-border-width': 1,
+                    'text-border-opacity': 1*/
+                }
+            }
+            /*,
+            {
+                selector: '.background',
+                style: {
+                    'text-background-opacity': 1,
+                    'text-background-color': '#ccc',
+                    'text-background-shape': 'roundrectangle',
+                    'text-border-color': '#000',
+                    'text-border-width': 1,
+                    'text-border-opacity': 1
+                }
+            }*/
+        ]
     });
 
 
@@ -485,7 +516,7 @@ function spacegraph(targetWrapper, opt) {
     s.removeNodeWidget = function(node) {
         var nodeID = node.id();
         s.widgets.delete(nodeID);
-        $('#widget_' + nodeID).remove();
+        this.getNode('widget_' + nodeID).remove();
     };
 
     s.updateNodeWidget = function(node, nodeOverride) {
@@ -682,7 +713,7 @@ function spacegraph(targetWrapper, opt) {
                 var n = e.nodes[i];
                 var ndata = n.data;
                 if (ndata && ndata.id) {
-                    var nn = that.nodes('#' + ndata.id);
+                    var nn = that.nodes('[id="' + ndata.id + '"]');
 
                     nn.addClass(channelID);
 
@@ -710,36 +741,36 @@ function spacegraph(targetWrapper, opt) {
 
     };
 
-    /** set and force layout update */
-    s.setLayout = function(l){
-
-        if (this.currentLayout)
-            if (this.currentLayout.stop)
-                this.currentLayout.stop();
-
-        var layout;
-        if (l.name) {
-            layout = this.makeLayout(l);
-        }
-        else {
-            layout = l;
-        }
-
-        this.currentLayout = layout;
-
-        if (layout)
-            layout.run();
-
-
-        //this.layout(this.currentLayout);
-
-        /*if (this.currentLayout.eles)
-            delete this.currentLayout.eles;*/
-
-        //http://js.cytoscape.org/#layouts
-
-
-    };
+    // /** set and force layout update */
+    // s.setLayout = function(l){
+    //
+    //     if (this.currentLayout)
+    //         if (this.currentLayout.stop)
+    //             this.currentLayout.stop();
+    //
+    //     var layout;
+    //     if (l.name) {
+    //         layout = this.makeLayout(l);
+    //     }
+    //     else {
+    //         layout = l;
+    //     }
+    //
+    //     this.currentLayout = layout;
+    //
+    //     if (layout)
+    //         layout.run();
+    //
+    //
+    //     //this.layout(this.currentLayout);
+    //
+    //     /*if (this.currentLayout.eles)
+    //         delete this.currentLayout.eles;*/
+    //
+    //     //http://js.cytoscape.org/#layouts
+    //
+    //
+    // };
 
     s.addChannel = function(c) {
 
@@ -782,11 +813,29 @@ function spacegraph(targetWrapper, opt) {
         }
     };
 
+    s.getNode = function(id) {
+        return this.nodes('[id="' + id + '"]');
+    };
+
+    s.removeNode = function(id) {
+        this.getNode(id).remove();
+    };
+
+    s.removeNodes = function(ids) {
+        //TODO use the right multi selector
+        var that = this;
+        that.batch(function() {
+            _.each(ids, function(id) {
+                that.removeNode(id);
+            });
+        });
+    };
+
     s.removeChannel = function(c) {
 
         c.off();
 
-        this.nodes('.' + c.id()).remove();
+        this.removeNode(c.id());
 
         //TODO remove style
 

@@ -3,6 +3,8 @@ package nars.web;
 import io.undertow.websockets.WebSocketConnectionCallback;
 import nars.Global;
 import nars.NAR;
+import nars.bag.BLink;
+import nars.concept.Concept;
 import nars.nar.Default;
 import nars.util.data.MutableInteger;
 
@@ -12,13 +14,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Created by me on 4/24/16.
  */
-public class TopConceptService extends SynchWebsocketService {
+abstract public class TopConceptService<O> extends SynchWebsocketService {
 
     private final NAR nar;
     private final MutableInteger maxConcepts;
 
     final AtomicBoolean ready = new AtomicBoolean(true);
-    private List<String> lPrev = null;
+    private List<O> lPrev = null;
 
     public TopConceptService(NAR nar, int updatePeriodMS, int maxConcepts) {
         super(updatePeriodMS);
@@ -34,9 +36,9 @@ public class TopConceptService extends SynchWebsocketService {
 
                 int n = maxConcepts.intValue();
 
-                List<String /*ConceptSummary*/> l = Global.newArrayList(n);
+                List<O /*ConceptSummary*/> l = Global.newArrayList(n);
                 ((Default)nar).core.active.forEach(n, c -> {
-                    l.add( c.toString() );
+                    l.add( summarize(c) );
                 });
 
                 if (lPrev!=null && lPrev.equals(l)) {
@@ -47,11 +49,13 @@ public class TopConceptService extends SynchWebsocketService {
                     lPrev = l;
 
                     nar.runAsync(() -> {
-                        send(l.toArray(new String[l.size()]));
+                        send(l.toArray(new Object[l.size()]));
                         ready.set(true);
                     });
                 }
             });
         }
     }
+
+    abstract O summarize(BLink<? extends Concept> c);
 }

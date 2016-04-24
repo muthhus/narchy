@@ -9,7 +9,12 @@ import io.undertow.websockets.WebSocketConnectionCallback;
 import io.undertow.websockets.extensions.PerMessageDeflateHandshake;
 import nars.NAR;
 import nars.NARLoop;
+import nars.bag.BLink;
+import nars.concept.Concept;
 import nars.nar.Default;
+import nars.term.Term;
+import nars.term.Termed;
+import nars.util.data.Util;
 import ognl.OgnlException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,7 +82,21 @@ public class WebServer /*extends PathHandler*/ {
                         )
                         .addPrefixPath("/ws", socket(new NarseseIOService(nar)))
                         .addPrefixPath("/emotion", socket(new EvalService(nar, "emotion", 500)))
-                        .addPrefixPath("/active", socket(new TopConceptService(nar, 500, 16)))
+                        .addPrefixPath("/active", socket(new TopConceptService<Object[]>(nar, 500, 16) {
+
+                            @Override
+                            Object[] summarize(BLink<? extends Concept> c) {
+                                Termed t = c.get();
+                                return new Object[] {
+                                    t.toString(), n(c.pri()), n(c.dur()), n(c.qua())
+                                    //TODO tasklinks, termlinks, beliefs
+                                };
+                            }
+
+                            private float n(float v) {
+                                return Util.round(v, 0.0001f);
+                            }
+                        }))
                 )
                 .build();
 

@@ -6,7 +6,7 @@
     </style>
     <style>
         body {
-            font-size: 120%;
+
         }
     </style>
 
@@ -18,13 +18,26 @@
 
     <a href="graph.html">GRAPH</a>
     <a href="terminal.html">TERMINAL</a>
-    <hr/>
 
-    <h1>Emotion</h1>
-    <div id="emotion"></div>
 
-    <h1>Active Concepts</h1>
-    <div id="active"></div>
+    <div class="ui grid">
+
+        <div class="four wide column">
+            <div class="ui-segment">
+                <h1>Emotion</h1>
+                <div id="emotion"></div>
+            </div>
+        </div>
+
+        <div class="twelve wide column">
+            <div class="ui-segment">
+                <div id="active" style="height: 700px"></div>
+            </div>
+        </div>
+
+    </div>
+
+
 
 </body>
 <script>
@@ -32,8 +45,8 @@
 
     $(document).ready(function() {
 
-        var s = SocketView("emotion", $("#emotion"));
-        var s = SocketView("active", $("#active"));
+        $("#active").append(SocketSpaceGraph("active"));
+        $("#emotion").append(SocketMetaWidget("emotion"));
 
     });
 
