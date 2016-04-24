@@ -409,8 +409,8 @@ public abstract class TermBuilder {
         Term subject = u[0];
         Term predicate = u[1];
 
-//        if (subject.equals(predicate))
-//            return null; //subject;
+        //if (subject.equals(predicate))
+        //    return null; //subject;
 
         if (Terms.equalsAnonymous(subject, predicate))
             return null;
@@ -454,6 +454,9 @@ public abstract class TermBuilder {
                                 return null;
                             predicate = theTransformed(cpred, TermContainer.except(preds, common));
                             if (predicate == null)
+                                return null;
+
+                            if (Terms.equalsAnonymous(subject, predicate))
                                 return null;
                         }
                     }

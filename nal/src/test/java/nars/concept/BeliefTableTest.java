@@ -148,7 +148,7 @@ public class BeliefTableTest  {
         assertEquals(5, b.wave().start());
         assertEquals(11, b.wave().end());
 
-        b.believe(0.5f, 1.0f, 0.99f, 15); //this should cause the cycle=10 and cycle=11 beliefs to get revected into one and allow this belief to be inserted
+        b.believe(0.5f, 1.0f, 0.99f, 12); //this should cause the cycle=10 and cycle=11 beliefs to get revected into one and allow this belief to be inserted
         //the cycle=5 belief should remain since it is more unique
 
         n.step().step().step();
@@ -156,7 +156,7 @@ public class BeliefTableTest  {
         assertEquals(3, b.size());
 
         assertEquals(5, b.wave().start());
-        assertEquals(15, b.wave().end());
+        assertEquals(12, b.wave().end());
 
     }
 

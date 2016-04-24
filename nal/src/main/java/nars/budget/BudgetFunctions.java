@@ -267,8 +267,8 @@ public final class BudgetFunctions extends UtilityFunctions {
 
         int tasktermVol = nal.task().term().volume();
         float volRatioScale =
-                Math.min(1f, tasktermVol / ((float)( tasktermVol + derived.volume() )));
-                //1f / derived.volume();
+                //Math.min(1f, tasktermVol / ((float)( tasktermVol + derived.volume() )));
+                1f / derived.volume();
 
         durability *= volRatioScale;
         quality *= volRatioScale;

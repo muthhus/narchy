@@ -21,10 +21,11 @@ abstract public class TemporalStabilityTest {
 
         Set<Task> irregular = Global.newHashSet(1);
 
+        TimeMap m = null;
         for (int i = 0; i < cycles; i++) {
 
             n.step();
-            TimeMap m = new TimeMap(n);
+            m = new TimeMap(n);
             //Set<Between<Long>> times = m.keySetSorted();
         /*if (times.size() < 3)
             continue; //wait until the initial temporal model is fully constructed*/
@@ -44,9 +45,17 @@ abstract public class TemporalStabilityTest {
 
 
             //assertEquals("[[1..1], [2..2], [5..5]]", times.toString());
+
+
+        }
+
+        if (!irregular.isEmpty()) {
+            irregular.forEach(i -> System.out.println(i));
+            m.print();
         }
 
         assertTrue(irregular.isEmpty());
+
     }
 
 

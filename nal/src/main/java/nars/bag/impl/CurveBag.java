@@ -1,6 +1,7 @@
 package nars.bag.impl;
 
 import com.gs.collections.api.block.function.primitive.FloatToFloatFunction;
+import com.gs.collections.api.block.function.primitive.IntToFloatFunction;
 import nars.bag.BLink;
 import nars.bag.Bag;
 import nars.budget.BudgetMerge;
@@ -31,18 +32,9 @@ import java.util.function.Predicate;
  */
 public class CurveBag<V> implements Bag<V> {
 
-    @NotNull
-    final ArrayBag<V> arrayBag;
+    @NotNull final ArrayBag<V> arrayBag;
 
-    public static final BagCurve power2BagCurve = new Power2BagCurve();
-    public static final BagCurve power4BagCurve = new Power4BagCurve();
-    public static final BagCurve power6BagCurve = new Power6BagCurve();
-
-    //TODO move sampler features to subclass of CurveBag which specifically provides sampling
-    @NotNull
-    public final BagCurve curve;
-    @NotNull
-    private final Random random;
+    @NotNull final CurveSampler sampler;
 
     public CurveBag(int capacity, @NotNull Random rng) {
         this(
@@ -51,6 +43,10 @@ public class CurveBag<V> implements Bag<V> {
             capacity, rng);
     }
 
+
+    public CurveBag(int capacity, @NotNull CurveSampler sampler) {
+        this(new ArrayBag.BudgetedArraySortedIndex<>(capacity), sampler);
+    }
 
     public CurveBag(@NotNull BagCurve curve, int capacity, @NotNull Random rng) {
         this(new ArrayBag.BudgetedArraySortedIndex<>(capacity), curve, rng);
@@ -65,16 +61,13 @@ public class CurveBag<V> implements Bag<V> {
 
     }
 
+    public CurveBag(@NotNull SortedIndex<BLink<V>> items, @NotNull CurveSampler sampler) {
+        this.arrayBag = new ArrayBag(items);
+        this.sampler = sampler;
+    }
+
     public CurveBag(@NotNull SortedIndex<BLink<V>> items, @NotNull BagCurve curve, @NotNull Random rng) {
-        super();
-        this.arrayBag
-                = new ArrayBag(items);
-
-                //HACK heuristic to choose Buffered bag when # of items is large, attempting to help avoid sorting costs by batching them
-                //= items.capacity() > 100 ? new BufferedArrayBag(items) : new ArrayBag(items);
-
-        this.curve = curve;
-        this.random = rng;
+        this(items, new DirectSampler(curve, rng));
     }
 
 
@@ -94,6 +87,7 @@ public class CurveBag<V> implements Bag<V> {
     @Override
     public Bag<V> commit() {
         arrayBag.commit();
+        sampler.commit(this);
         return this;
     }
 
@@ -473,15 +467,14 @@ public class CurveBag<V> implements Bag<V> {
         return arrayBag.priMax();
     }
 
+
+
     public final int sampleIndex() {
         int s = size();
-        return index( sampleNormalized(s), s );
+        if (s <= 1) return 0;
+        return index( sampler.sample(s), s );
     }
 
-//    public final int sampleIndex(int size, int window) {
-//        return index( sampleNormalized(size), size, window );
-//
-//    }
 
 //    /** provides a next index to sample from */
 //    public final int sampleIndexUnnormalized(int s) {
@@ -493,23 +486,73 @@ public class CurveBag<V> implements Bag<V> {
 //            );
 //    }
 
+
+    public static final BagCurve power2BagCurve = new Power2BagCurve();
+    public static final BagCurve power4BagCurve = new Power4BagCurve();
+    public static final BagCurve power6BagCurve = new Power6BagCurve();
+
+
+
     /** LERPs between the curve and a flat line (y=x) in proportion to the amount the dynamic range falls short of 1.0;
      *  this is probably equivalent to a naive 1st-order approximation of a way
      *  to convert percentile to probability but it should suffice for now */
-    public final float sampleNormalized(int s) {
-        if (s <= 1) return 0;
+    public static final class NormalizedSampler extends CurveSampler {
 
-        float dynamicRange = (priMax() - priMin());
-        float uniform = random.nextFloat();
-        float curved = this.curve.valueOf(uniform);
+        private float range;
 
-        return ((1f-dynamicRange) * uniform) +
-               (dynamicRange * curved);
+        public NormalizedSampler(CurveBag.BagCurve curve, Random random) {
+            super(curve, random);
+            this.range = 1f;
+        }
+
+        @Override
+        protected void commit(CurveBag bag) {
+            float max = bag.priMax();
+            float min = bag.priMin();
+            this.range = max - min;
+        }
+
+        @Override
+        float sample(int size) {
+            float dynamicRange = (range);
+            float uniform = random.nextFloat();
+            float curved = curve.valueOf(uniform);
+
+            return ((1f-dynamicRange) * uniform) +
+                    (dynamicRange * curved);
+        }
     }
 
+    public static final class DirectSampler extends CurveSampler {
 
+        public DirectSampler(CurveBag.BagCurve curve, Random random) {
+            super(curve, random);
+        }
 
-    public static class CubicBagCurve implements BagCurve {
+        @Override
+        float sample(int size) {
+            return this.curve.valueOf( random.nextFloat() );
+        }
+    }
+
+    public static abstract class CurveSampler  {
+        public final CurveBag.BagCurve curve;
+        public final Random random;
+
+        protected CurveSampler(CurveBag.BagCurve curve, Random random) {
+            this.curve = curve;
+            this.random = random;
+        }
+
+        /** called at the end of each commit */
+        protected void commit(CurveBag bag) {
+
+        }
+
+        abstract float sample(int size);
+    }
+
+    public static class CubicBagCurve implements CurveBag.BagCurve {
 
         @Override
         public final float valueOf(float x) {

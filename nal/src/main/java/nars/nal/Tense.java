@@ -25,7 +25,7 @@ public enum Tense  {
 
 
     /** integer version of long ETERNAL */
-    @Deprecated public static final int DTERNAL = Integer.MIN_VALUE;
+    public static final int DTERNAL = Integer.MIN_VALUE;
 
 
     /**
@@ -33,7 +33,7 @@ public enum Tense  {
      * signalling a missing value to set to some default
      * if eventually perceived or derived
      */
-    public static final long TIMELESS = Long.MIN_VALUE + 1;
+    @Deprecated public static final long TIMELESS = Long.MIN_VALUE + 1;
 
 
     public final String symbol;

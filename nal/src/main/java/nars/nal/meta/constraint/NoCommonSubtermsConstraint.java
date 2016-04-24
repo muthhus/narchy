@@ -23,7 +23,9 @@ public final class NoCommonSubtermsConstraint implements MatchConstraint {
             Term B = f.term(b);
             return (B instanceof Compound) && //includes null test
                    commonSubterms((Compound) B, (Compound)y,
-                           nonVarSubtermIsCommon);
+                           //subtermIsCommon
+                           nonVarSubtermIsCommon
+                   );
         }
         return false;
     }

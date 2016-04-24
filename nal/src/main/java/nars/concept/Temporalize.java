@@ -197,12 +197,11 @@ public interface Temporalize {
      */
     Temporalize dtTaskExact = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn) -> {
         ConceptProcess prem = p.premise;
-        Task t = prem.task();
-        return dtExact(derived, occReturn, prem, t, t.term());
+        return dtExact(derived, occReturn, prem, true);
     };
     Temporalize dtBeliefExact = (@NotNull Compound derived, @NotNull PremiseEval p, @NotNull Derive d, long[] occReturn) -> {
         ConceptProcess prem = p.premise;
-        return dtExact(derived, occReturn, prem, prem.task(), prem.beliefTerm());
+        return dtExact(derived, occReturn, prem, false);
     };
 
 
@@ -319,11 +318,27 @@ public interface Temporalize {
     }
 
     @NotNull
-    static Compound dtExact(@NotNull Compound derived, @NotNull long[] occReturn, @NotNull ConceptProcess prem, @NotNull Task src, @NotNull Termed<Compound> dtTerm) {
-        occReturn[0] = src.occurrence();
-        if (derived.op().isTemporal())
-            return deriveDT(derived, +1, prem, dtTerm.term().dt());
-        else
+    static Compound dtExact(@NotNull Compound derived, @NotNull long[] occReturn, @NotNull ConceptProcess prem, boolean taskOrBelief) {
+        Term dtTerm = taskOrBelief ? prem.task().term() : prem.beliefTerm().term();
+
+        Task t = prem.task();
+        Task b = prem.belief();
+        if (!taskOrBelief && b.occurrence()!=ETERNAL) {
+            int derivedInT = dtTerm.subtermTime(derived);
+            if (derivedInT == DTERNAL && derived.op() == Op.IMPLICATION) {
+                //try to find the subtermTime of the implication's subject
+                derivedInT = dtTerm.subtermTime( derived.term(0) );
+            }
+            occReturn[0] = t.occurrence() + derivedInT;
+        } else {
+            occReturn[0] = t.occurrence(); //the original behavior, but may not be right
+        }
+
+
+        if (derived.op().isTemporal()) {
+            int dtdt = dtTerm instanceof Compound ? ((Compound)dtTerm).dt() : DTERNAL;
+            return deriveDT(derived, +1, prem, dtdt);
+        } else
             return derived;
     }
 

@@ -262,9 +262,9 @@ public class CurveBagTest  {
 
     @NotNull
     private CurveBag<String> populated(int n , @NotNull DoubleSupplier random) {
-        Random rng = new XorShift128PlusRandom(1);
 
-        CurveBag<String> a = new CurveBag(n, rng);
+
+        CurveBag<String> a = newNormalizedSamplingBag(rng, n);
         a.merge(BudgetMerge.plusDQDominant);
 
 
@@ -273,24 +273,26 @@ public class CurveBagTest  {
             a.put("x" + i, new UnitBudget((float)random.getAsDouble(), 0.5f, 0.5f));
         }
 
-        //a.commit();
+        a.commit();
         //a.printAll();
 
         return a;
 
     }
 
-    @Test public void testFlatBagRemainsRandom() {
+    @Test public void testFlatBagRemainsRandomInNormalizedSampler() {
         Random rng = new XorShift128PlusRandom(1);
         int n = 8;
 
         float level = 0.04f;
 
-        CurveBag<String> a = new CurveBag(n, rng);
+        CurveBag<String> a = newNormalizedSamplingBag(rng, n);
 
         for (int i = 0; i < n; i++) {
             a.put("x" + i, new UnitBudget(level, 0.5f, 0.5f));
         }
+
+        a.commit(); //commit necessary to set sampler's dynamic range
 
         assertEquals(a.priMin(), level, 0.01f);
         assertEquals(a.priMin(),a.priMax(),0.01f);
@@ -302,6 +304,11 @@ public class CurveBagTest  {
             long bi = d.getBinStats().get(i).getN();
             assertTrue("bin " + i + " sampled x " + bi, bi > (rrr/2)); //received enough samples
         }
+    }
+
+    @NotNull
+    public CurveBag<String> newNormalizedSamplingBag(Random rng, int n) {
+        return new CurveBag(n, new CurveBag.NormalizedSampler(CurveBag.power6BagCurve,rng));
     }
 
 //    /** maybe should be in ArrayBagTest */

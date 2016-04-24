@@ -34,10 +34,8 @@ public interface Subst  {
     default boolean forEach(@NotNull BiPredicate<? super Term, ? super Term> each) {
         final boolean[] b = {true};
         forEach((k,v)-> {
-            if (b[0]) { //HACK should be able to terminate early using an entryset
-                if (!each.test(k, v)) {
-                    b[0] = false;
-                }
+            if (!each.test(k, v)) {
+                b[0] = false;
             }
         });
         return b[0];

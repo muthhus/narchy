@@ -278,8 +278,8 @@ public class NAL8Test extends AbstractNALTest {
         test()
             .log()
             .input("at:(SELF,{t001}). :|: ")
-            .inputAt(10, "(at:(SELF,{t001}) &&+5 (open({t001}) ==>+5 [opened]:{t001})). :|:")
-            .mustBelieve(cycles, "(open({t001}) ==>+5 [opened]:{t001})", 1.0f, 0.81f, 15);
+            .inputAt(10, "(at:(SELF,{t001}) &&+5 (open({t001}) ==>+5 [opened]:{t001})). :|:") //the occurrence time of this event is ignored; what matter is the task
+            .mustBelieve(cycles, "(open({t001}) ==>+5 [opened]:{t001})", 1.0f, 0.81f, 5);
     }
 
 

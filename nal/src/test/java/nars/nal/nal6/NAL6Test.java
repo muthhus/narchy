@@ -13,7 +13,7 @@ import java.util.function.Supplier;
 public class NAL6Test extends AbstractNALTest {
 
 
-    final int cycles = 100;
+    final int cycles = 500;
 
     public NAL6Test(Supplier<NAR> b) {
         super(b);
@@ -429,7 +429,7 @@ public class NAL6Test extends AbstractNALTest {
 
 
     @Test public void recursionSmall2()  {
-        long time = 1500;
+        long time = 500;
 
         test()
         .believe("<0 --> n>", 1.0f, 0.9f)

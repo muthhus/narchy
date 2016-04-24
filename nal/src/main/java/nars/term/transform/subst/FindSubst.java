@@ -921,11 +921,11 @@ public abstract class FindSubst extends Versioning implements Subst, Supplier<Ve
                 final boolean[] b = {true};
 
                 m.forEach((k,v)->{
-                    if (b[0]) { //HACK should be able to terminate early using an entryset
-                        if (!each.test(k, v)) {
-                            b[0] = false;
-                        }
+
+                    if (!each.test(k, v)) {
+                        b[0] = false;
                     }
+
                 });
 
                 return b[0];

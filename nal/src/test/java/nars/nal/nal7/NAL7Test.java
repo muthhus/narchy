@@ -558,6 +558,21 @@ public class NAL7Test extends AbstractNALTest {
                 .mustBelieve(cycles, "(<s --> S> ==>+5 <p --> P>)", 0.90f, 0.73f);
     }
 
+    @Test public void testTemporalConjunctionWithDepVarIntroduction() {
+        /* WRONG:
+        $1.0;.05;.10$ ((#1-->a) &&-3 (#1-->d)). 7-5 %1.0;.40% {7-5: 1;2;3} (((%1-->%2),(%1-->%3),neq(%2,%3),time(dtIfEvent)),((($4-->%2)==>($4-->%3)),((Induction-->Belief)),(($4-->%3)==>($4-->%2)),((Abduction-->Belief)),(($4-->%2)<=>($4-->%3)),((Comparison-->Belief)),((#5-->%2)&&(#5-->%3)),((Intersection-->Belief))))
+            $.50;.50;.95$ (c-->d). 5+0 %1.0;.90% {5+0: 3} Input
+            $1.0;.13;.24$ (c-->a). 3-1 %1.0;.45% {3-1: 1;2} (((%1-->%2),(%3-->%1),neq(%2,%3)),((%2-->%3),((Exemplification-->Belief),(Weak-->Desire),(AllowBackward-->Derive))))
+        */
+        test()
+                .log()
+                .inputAt(2,"a:x. :|: %1.0;0.45%")
+                .inputAt(5, "b:x. :|: %1.0;0.90%")
+                .mustBelieve(cycles, "(b:#1 &&-3 a:#1)", 1f, 0.40f, 2)
+                .mustNotOutput(cycles*2, "(a:#1 &&-3 b:#1)", '.', 0f, 1, 0f, 1, 2);
+
+    }
+
     @Test public void testProjectedQuestion() {
         /*
         Since the question asks about a future time, the belief should
