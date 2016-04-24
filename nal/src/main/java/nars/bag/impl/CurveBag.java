@@ -1,7 +1,6 @@
 package nars.bag.impl;
 
 import com.gs.collections.api.block.function.primitive.FloatToFloatFunction;
-import com.gs.collections.api.block.function.primitive.IntToFloatFunction;
 import nars.bag.BLink;
 import nars.bag.Bag;
 import nars.budget.BudgetMerge;

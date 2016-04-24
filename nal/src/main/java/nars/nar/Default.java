@@ -16,7 +16,6 @@ import nars.data.Range;
 import nars.nal.Deriver;
 import nars.nal.meta.PremiseEval;
 import nars.task.Task;
-import nars.task.flow.FIFOTaskPerception;
 import nars.task.flow.SetTaskPerception;
 import nars.task.flow.TaskPerception;
 import nars.term.Term;
@@ -29,8 +28,6 @@ import nars.util.event.Active;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Random;
 import java.util.function.Consumer;

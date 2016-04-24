@@ -5,7 +5,8 @@ import nars.term.Term;
 import nars.term.transform.subst.FindSubst;
 import org.jetbrains.annotations.NotNull;
 
-import static nars.term.container.TermContainer.*;
+import static nars.term.container.TermContainer.commonSubterms;
+import static nars.term.container.TermContainer.nonVarSubtermIsCommon;
 
 
 public final class NoCommonSubtermsConstraint implements MatchConstraint {

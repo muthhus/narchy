@@ -21,7 +21,6 @@
 package nars.nal;
 
 import nars.Memory;
-import nars.NAR;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.budget.UnitBudget;
@@ -33,8 +32,6 @@ import nars.truth.Stamp;
 import nars.truth.Truth;
 import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.function.Consumer;
 
 import static nars.nal.Tense.DTERNAL;
 

@@ -1,7 +1,6 @@
 package nars.term.transform.subst;
 
 import nars.term.Term;
-import nars.util.version.Versioned;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;

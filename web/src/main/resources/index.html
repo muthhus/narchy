@@ -1,51 +1,40 @@
 <html>
 <head>
-    <script type="text/javascript" src="web_socket.js"></script>
-    <script type="text/javascript" src="lib/jquery/dist/jquery.min.js"></script>
-    <script type="text/javascript" src="lib/lodash/dist/lodash.min.js"></script>
+
     <style type="text/css">
         @import url("terminal.css");
     </style>
     <style>
         body {
-            font-size: 150%;
+            font-size: 120%;
         }
     </style>
+
+    <link rel="import" href="init.html">
+
     <title>NARchy</title>
 </head>
 <body>
-    <div id="state">
 
-    </div>
-
-    <hr/>
     <a href="graph.html">GRAPH</a>
     <a href="terminal.html">TERMINAL</a>
     <hr/>
 
-    <div id="summary">
+    <h1>Emotion</h1>
+    <div id="emotion"></div>
 
-    </div>
+    <h1>Active Concepts</h1>
+    <div id="active"></div>
+
 </body>
 <script>
 
 
     $(document).ready(function() {
 
-        var ws = window.socket('summary');
+        var s = SocketView("emotion", $("#emotion"));
+        var s = SocketView("active", $("#active"));
 
-        var summary = $('#summary');
-        var state = $('#state');
-
-        ws.onopen = function() {
-            state.html("Connected");
-        };
-        ws.onmessage = function(e) {
-            summary.text(e.data);
-        };
-        ws.onclose = function() {
-            state.html("Disconnected");
-        };
     });
 
 </script>

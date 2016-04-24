@@ -12,12 +12,12 @@ import java.util.function.DoubleConsumer;
  *
  */
 public class DoubleSummaryReusableStatistics implements DoubleConsumer, Serializable {
-    protected long count = 0L;
-    protected double sum = 0.0;
+    protected long count;
+    protected double sum;
     //private double sumCompensation; // Low order bits of sum
 //    private double simpleSum; // Used to compute right sum for non-finite inputs
-    protected double min = Double.POSITIVE_INFINITY;
-    protected double max = Double.NEGATIVE_INFINITY;
+    protected double min;
+    protected double max;
 
     /**
      * Construct an empty instance with zero count, zero sum,
@@ -31,7 +31,8 @@ public class DoubleSummaryReusableStatistics implements DoubleConsumer, Serializ
     public final void clear() {
         count = 0;
         sum = 0;
-        min = max = Double.MAX_VALUE;
+        min = Double.POSITIVE_INFINITY;
+        max = Double.NEGATIVE_INFINITY;
     }
     /**
      * Records another value into the summary information.

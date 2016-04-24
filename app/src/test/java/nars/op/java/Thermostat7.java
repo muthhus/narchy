@@ -7,7 +7,6 @@ import nars.concept.table.BeliefTable;
 import nars.nal.Tense;
 import nars.nar.Default;
 import nars.task.Task;
-import nars.util.Optimization;
 import nars.util.data.MutableInteger;
 import nars.util.data.Util;
 import nars.util.signal.MotorConcept;

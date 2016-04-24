@@ -11,7 +11,6 @@ import nars.nal.Deriver;
 import nars.nal.meta.constraint.MatchConstraint;
 import nars.nal.meta.op.MatchTerm;
 import nars.nal.op.ImmediateTermTransform;
-import nars.nal.op.substituteIfUnifies;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;

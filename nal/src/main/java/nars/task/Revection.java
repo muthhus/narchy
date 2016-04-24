@@ -1,6 +1,5 @@
 package nars.task;
 
-import nars.Global;
 import nars.NAR;
 import nars.bag.impl.ListTable;
 import nars.budget.BudgetMerge;
@@ -17,8 +16,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static java.lang.Math.abs;
-import static java.lang.Math.sqrt;
-import static nars.concept.table.BeliefTable.rankTemporalByConfidence;
 import static nars.concept.table.BeliefTable.rankTemporalByConfidenceAndOriginality;
 import static nars.nal.Tense.DTERNAL;
 import static nars.nal.UtilityFunctions.or;

@@ -39,7 +39,6 @@ import java.io.IOException;
 import java.util.Set;
 
 import static nars.nal.Tense.DTERNAL;
-import static nars.nal.Tense.ETERNAL;
 
 /**
  * a compound term

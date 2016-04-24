@@ -1,11 +1,8 @@
 package nars.op.java;
 
-import com.gs.collections.api.block.function.primitive.FloatToFloatFunction;
 import nars.$;
-import nars.Global;
 import nars.NAR;
 import nars.Narsese;
-import nars.concept.OperationConcept;
 import nars.concept.table.BeliefTable;
 import nars.nal.Tense;
 import nars.nar.Default;

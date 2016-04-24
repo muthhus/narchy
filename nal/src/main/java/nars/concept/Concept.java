@@ -38,7 +38,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -308,8 +307,8 @@ public interface Concept extends Termed, Comparable {
     default void crossLink(@NotNull Task thisTask, @NotNull Task otherTask, float scale, @NotNull NAR nar) {
 
         Concept other = nar.concept(otherTask);
-        if (other.equals(this))
-            return; //same concept
+        if (other == null || other.equals(this))
+            return; //null or same concept
 
         float halfScale = scale / 2f;
 

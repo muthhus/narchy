@@ -1,13 +1,10 @@
 package nars.nal.nal8;
 
-import nars.$;
 import nars.Global;
 import nars.NAR;
 import nars.Narsese;
 import nars.nal.Tense;
 import nars.nar.Default;
-import nars.term.Term;
-import nars.util.event.On;
 import org.junit.Test;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -26,30 +23,24 @@ public class QuestTest {
 
         Global.DEBUG = true;
 
-        String term = "<a --> b>";
 
         NAR nar = new Default(1, 1, 1, 1);
 
-        On exeFunc = nar.onExecTerm("exe", (Term[] t) -> {
-            exeCount++;
-            return $.the("a");
-        });
-
         //nar.log();
 
-        nar.goal(nar.term(term), Tense.Eternal, 1.0f, 0.9f);
+        nar.goal(nar.term("a:b"), Tense.Eternal, 1.0f, 0.9f);
         nar.step();
 
         AtomicBoolean valid = new AtomicBoolean(false);
 
-        nar.onAnswer(nar.task(term + '@'), a -> {
+        nar.onAnswer(nar.task("a:?b@"), a -> {
             //System.out.println("answer: " + a);
             //System.out.println(" " + a.getLog());
-            if (a.toString().contains("(a-->b)!"))
+            if (a.toString().contains("(b-->a)!"))
                 valid.set(true);
         });
 
-        nar.run(1);
+        nar.run(100);
 
         assertTrue(valid.get());
     }

@@ -18,9 +18,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static io.undertow.Handlers.path;
-import static io.undertow.Handlers.resource;
-import static io.undertow.Handlers.websocket;
+import static io.undertow.Handlers.*;
 
 
 public class WebServer /*extends PathHandler*/ {
@@ -31,7 +29,6 @@ public class WebServer /*extends PathHandler*/ {
     public final Undertow server;
     public NARLoop loop;
 
-    long idleFPS = 7 /* low alpha brainwaves */;
 
     final static Logger logger = LoggerFactory.getLogger(WebServer.class);
 
@@ -42,7 +39,7 @@ public class WebServer /*extends PathHandler*/ {
 
 
     @SuppressWarnings("HardcodedFileSeparator")
-    public WebServer(NAR nar, int httpPort) throws OgnlException {
+    public WebServer(NAR nar, float initialFPS, int httpPort) throws OgnlException {
 
 
 
@@ -79,13 +76,14 @@ public class WebServer /*extends PathHandler*/ {
                                 .addWelcomeFiles("index.html")
                         )
                         .addPrefixPath("/ws", socket(new NarseseIOService(nar)))
-                        .addPrefixPath("/summary", socket(new EvalService(nar, "emotion", 500)))
+                        .addPrefixPath("/emotion", socket(new EvalService(nar, "emotion", 500)))
+                        .addPrefixPath("/active", socket(new TopConceptService(nar, 500, 16)))
                 )
                 .build();
 
 
         this.nar = nar;
-        this.loop = nar.loop(idleFPS);
+        this.loop = nar.loop(initialFPS);
 
         logger.info("HTTP+Websocket server starting: port={}", httpPort);
         server.start();
@@ -123,7 +121,10 @@ public class WebServer /*extends PathHandler*/ {
 
         int httpPort = args.length < 1 ? 8080 : Integer.parseInt(args[0]);
 
-        new WebServer(new Default(1024, 1, 1, 3), httpPort);
+        Default nar = new Default(1024, 1, 1, 3);
+        nar.input("a:b. b:c. c:d.");
+
+        new WebServer(nar, 10, httpPort);
 
         /*if (nlp!=null) {
             System.out.println("  NLP enabled, using: " + nlpHost + ":" + nlpPort);

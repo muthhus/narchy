@@ -22,8 +22,6 @@ package nars;
 
 
 import com.gs.collections.api.tuple.Twin;
-import com.gs.collections.impl.tuple.Tuples;
-import nars.concept.Concept;
 import nars.concept.ConceptProcess;
 import nars.task.Task;
 import nars.term.TermIndex;

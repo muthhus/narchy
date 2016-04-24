@@ -159,36 +159,36 @@ public class NARover extends AbstractPolygonBot {
         int minMotorFeedbackCycles = 1; ////nar.duration() / 2;
         int maxMotorFeedbackCycles = 3; //nar.duration() * 3;
 
-        MotorConcept motorLeft = new MotorConcept("motor(left)", nar, (a) -> {
+        MotorConcept motorLeft = new MotorConcept("motor(left)", nar, (b,a) -> {
             //if (a < 0) return Float.NaN;
             return a < motorThresh ? -1 : motor.left(a);
         }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
 
-        MotorConcept motorRight = new MotorConcept("motor(right)", nar, (a) -> {
+        MotorConcept motorRight = new MotorConcept("motor(right)", nar, (b,a) -> {
             //if (a < 0) return Float.NaN;
             return a < motorThresh ? -1 : motor.right(a);
         }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
 
-        MotorConcept motorFore = new MotorConcept("motor(fore)", nar, (l) -> {
+        MotorConcept motorFore = new MotorConcept("motor(fore)", nar, (b,l) -> {
             //if (l < 0) return Float.NaN;
             return l < motorThresh ? -1 : motor.forward(l);
         }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
         ;
 
-        MotorConcept motorBack = new MotorConcept("motor(back)", nar, (l) -> {
+        MotorConcept motorBack = new MotorConcept("motor(back)", nar, (b,l) -> {
             //if (l < 0) return Float.NaN;
             return l < motorThresh ? -1: motor.backward(l);
         }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
         ;
 
-        MotorConcept motorStop = new MotorConcept("motor(stop)", nar, (s) -> {
+        MotorConcept motorStop = new MotorConcept("motor(stop)", nar, (b,s) -> {
             //if (s < 0) return Float.NaN;
             if (s < motorThresh) return -1;
             return motor.stop(s);
         }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
         ;
 
-        MotorConcept turretFire = new MotorConcept("turret(fire)", nar, (s) -> {
+        MotorConcept turretFire = new MotorConcept("turret(fire)", nar, (b,s) -> {
 
             if (s > motorThresh) {
                 if (gun.fire(torso, s)) {

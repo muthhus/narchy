@@ -1,7 +1,8 @@
 package nars.concept;
 
-import com.gs.collections.impl.tuple.Tuples;
-import nars.*;
+import nars.NAR;
+import nars.Op;
+import nars.Symbols;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
 import nars.concept.table.*;
@@ -225,18 +226,18 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
 //                updateSuccess(null, successBefore, memory);
 //            }
 
-        if (belief!=null) {
-
-
-            Task parentTask = belief.getParentTask();
-            if (parentTask != null && parentTask.isQuestion()) {
-
-                if (parentTask.isInput()) //filter
-                    nar.eventAnswer.emit(Tuples.twin(parentTask, belief));
-
-            }
-
-        }
+//        if (belief!=null) {
+//
+//
+//            Task parentTask = belief.getParentTask();
+//            if (parentTask != null && parentTask.isQuestion()) {
+//
+//                if (parentTask.isInput()) //filter
+//                    nar.eventAnswer.emit(Tuples.twin(parentTask, belief));
+//
+//            }
+//
+//        }
 
         return belief;
 

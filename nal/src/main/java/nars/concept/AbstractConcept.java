@@ -2,7 +2,6 @@ package nars.concept;
 
 import javassist.scopedpool.SoftValueHashMap;
 import nars.NAR;
-import nars.bag.BLink;
 import nars.bag.Bag;
 import nars.budget.Budgeted;
 import nars.task.Task;
@@ -14,7 +13,6 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 

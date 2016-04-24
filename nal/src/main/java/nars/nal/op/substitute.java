@@ -14,8 +14,6 @@ import nars.term.transform.subst.Subst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-
 
 /** TODO is this better named "substituteAny" */
 public class substitute extends ImmediateTermTransform implements PremiseAware {

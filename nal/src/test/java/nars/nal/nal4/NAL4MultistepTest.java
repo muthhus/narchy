@@ -21,18 +21,19 @@ public class NAL4MultistepTest extends AbstractNALTest {
 
     @Parameterized.Parameters(name = "{index}:{0}")
     public static Iterable<Supplier<NAR>> configurations() {
-        return AbstractNALTest.nars(4, true);
+        return AbstractNALTest.nars(6, true);
     }
 
     //this test only works because the confidence matches, but the related task has insufficient budget
     @Test
     public void nal4_everyday_reasoning() throws Narsese.NarseseException {
-        int time = 150;
+        int time = 250;
 
         //Global.DEBUG = true;
 
         TestNAR tester = test();
 
+        tester.log();
         //tester.nar.logSummaryGT(System.out, 0.5f);
 
         //(({tom},{sky})-->likes).  <{tom} --> cat>. <({tom},{sky}) --> likes>. <(cat,[blue]) --> likes>?
@@ -41,13 +42,13 @@ public class NAL4MultistepTest extends AbstractNALTest {
         tester.believe("<{tom} --> cat>",1.0f,0.9f); //en("tom is a cat");
         tester.believe("<({tom},{sky}) --> likes>",1.0f,0.9f); //en("tom likes the sky");
 
-        tester.ask("<(cat,[blue]) --> likes>"); //cats like blue?
+        tester.askAt(0, "<(cat,[blue]) --> likes>"); //cats like blue?
 
         tester.mustBelieve(time, "<(cat,[blue]) --> likes>", 1.0f, 0.42f); //en("A base is something that has a reaction with an acid.");
 
     }
 
-    @Ignore @Test
+    @Test
     public void nal4_everyday_reasoning_easiest() throws Narsese.NarseseException {
         int time = 150;
 
@@ -80,6 +81,7 @@ public class NAL4MultistepTest extends AbstractNALTest {
         tester.believe("<sky --> blue>",1.0f,0.9f); //en("the sky is blue");
         tester.believe("<tom --> cat>",1.0f,0.9f); //en("tom is a cat");
         tester.believe("<(tom,sky) --> likes>",1.0f,0.9f); //en("tom likes the sky");
+
 
 
         tester.ask("<(cat,blue) --> likes>"); //cats like blue?

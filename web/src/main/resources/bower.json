@@ -12,7 +12,8 @@
     "cytoscape-edgehandles": "latest",
     "cytoscape-cose-bilkent":"latest",
     "semantic": "latest",
-    "object-editor": "latest"
+    "object-editor": "latest",
+    "metawidget": "latest"
   },
   "keywords": [
     "nars",

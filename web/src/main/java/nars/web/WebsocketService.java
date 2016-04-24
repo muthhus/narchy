@@ -1,16 +1,24 @@
 package nars.web;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 import io.undertow.websockets.WebSocketConnectionCallback;
 import io.undertow.websockets.core.*;
 import io.undertow.websockets.spi.WebSocketHttpExchange;
-import nars.NAR;
+import nars.util.data.list.FasterList;
+import nars.util.data.map.UnifriedMap;
+import nars.util.meter.event.FloatGuage;
 import org.nustaq.serialization.FSTConfiguration;
 
-import javax.annotation.concurrent.ThreadSafe;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.text.DecimalFormat;
+import java.util.*;
 
 /**
  * Websocket handler that interfaces with a NAR.
@@ -20,7 +28,28 @@ public abstract class WebsocketService extends AbstractReceiveListener implement
 
     protected final Set<WebSocketChannel> connections = new LinkedHashSet();
     final static FSTConfiguration jsonizer = FSTConfiguration
-            .createJsonConfiguration(true, false)
+            .createJsonConfiguration(false, false);
+    static {
+        jsonizer.setCrossPlatform(false);
+        jsonizer.registerCrossPlatformClassMappingUseSimpleName(
+                Object.class,
+                Object[].class,
+                String[].class,
+                ArrayList.class,
+                FasterList.class,
+                HashMap.class,
+                UnifriedMap.class,
+
+                FloatGuage.class
+
+        );
+    }
+
+//    static {
+//        ((JsonFactory)jsonizer.getCoderSpecific()).
+//    }
+
+
             //.setForceSerializable(true)
             //.setForceClzInit(true)
             ;
@@ -172,4 +201,6 @@ public abstract class WebsocketService extends AbstractReceiveListener implement
      * called when # connections becomes zero
      */
     abstract public void onStop();
+
+
 }
