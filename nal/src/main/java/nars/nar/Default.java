@@ -133,7 +133,7 @@ public class Default extends AbstractNAR {
             //propagate budget
             MutableFloat overflow = new MutableFloat();
 
-            conceptualize(c, t, activation, overflow, true);
+            conceptualize(c, t, activation, 1f, overflow);
 
             if (overflow.floatValue() > 0) {
                 emotion.stress(overflow.floatValue());
@@ -250,13 +250,13 @@ public class Default extends AbstractNAR {
 
     @Nullable
     @Override
-    public Concept conceptualize(@NotNull Termed termed, @NotNull Budgeted activation, float scale, @Nullable MutableFloat conceptOverflow, boolean link) {
+    public Concept conceptualize(@NotNull Termed termed, @NotNull Budgeted b, float conceptActivation, float linkActivation, @Nullable MutableFloat conceptOverflow) {
 
         Concept c = concept(termed, true);
         if (c != null) {
-            core.activate(c, activation, scale, conceptOverflow);
-            if (link)
-                c.link(activation, 1f, Default.this, conceptOverflow);
+            core.activate(c, b, conceptActivation, conceptOverflow);
+            if (linkActivation > 0)
+                c.link(b, linkActivation, Default.this, conceptOverflow);
         }
         return c;
 

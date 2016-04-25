@@ -53,7 +53,7 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
 
 
         /** activate concept */
-        Concept target = nar.conceptualize(targetTerm, b, subScale, conceptOverflow, false);
+        Concept target = nar.conceptualize(targetTerm, b, subScale, 0f, conceptOverflow);
         if (target == null)
             throw new RuntimeException("termlink to null concept");
 

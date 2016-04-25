@@ -946,12 +946,12 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
      * @param link whether to activate termlinks recursively
      * */
     @Nullable
-    public abstract Concept conceptualize(@NotNull Termed termed, @NotNull Budgeted activation, float scale, @Nullable MutableFloat conceptOverflow, boolean link);
+    public abstract Concept conceptualize(@NotNull Termed termed, @NotNull Budgeted b, float conceptActivation, float linkActivation, @Nullable MutableFloat conceptOverflow);
 
 
     @Nullable
-    final public Concept conceptualize(@NotNull Termed termed, @NotNull Budgeted activation) {
-        return conceptualize(termed, activation, 1f, null, false);
+    final public Concept conceptualize(@NotNull Termed termed, @NotNull Budgeted b) {
+        return conceptualize(termed, b, 1f, 0f, null);
     }
 
     @NotNull

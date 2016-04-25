@@ -72,7 +72,7 @@ public class Kernel {
         schedule.sample(updateRate.floatValue(), cl -> {
             Task t = cl.get();
             if (t.isGoal())
-                n.conceptualize(t, UnitBudget.One, strength(cl), null, false);
+                n.conceptualize(t, UnitBudget.One, strength(cl), 0f, null);
             else /* t.isCommand */
                 n.input(t); //re-input
         });
