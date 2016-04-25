@@ -340,11 +340,6 @@ function spacegraph(targetWrapper, opt) {
     }
 
     opt = _.defaults(opt, {
-        layout: {
-            //name: 'cose',
-            name: 'breadthfirst',
-            padding: 5
-        },
         ready: ready,
         // initial viewport state:
         zoom: 1,
@@ -361,6 +356,8 @@ function spacegraph(targetWrapper, opt) {
         autolock: false,
         autoungrabify: false,
         autounselectify: true,
+        layout: {
+        },
         // rendering options:
         headless: false,
         styleEnabled: true,
@@ -390,7 +387,8 @@ function spacegraph(targetWrapper, opt) {
                     'label': 'data(label)',
                     'text-valign': 'center',
                     'text-halign': 'center',
-                    'color': '#fff'
+                    'color': '#fff',
+                    'shadow-blur': 0
                     /*'text-background-opacity': 1,
                     'text-background-color': '#ccc',
                     'text-background-shape': 'roundrectangle',*/
@@ -516,7 +514,9 @@ function spacegraph(targetWrapper, opt) {
     s.removeNodeWidget = function(node) {
         var nodeID = node.id();
         s.widgets.delete(nodeID);
-        this.getNode('widget_' + nodeID).remove();
+        var nn = this.getNode('widget_' + nodeID);
+        if (nn)
+            nn.remove();
     };
 
     s.updateNodeWidget = function(node, nodeOverride) {
@@ -644,23 +644,70 @@ function spacegraph(targetWrapper, opt) {
     };
 
     s.addNode = function(n) {
-        this.addNodes([n]);
+        var existing = this.getNode(n.id);
+        if (!existing) {
+            this.addNodes([n]);
+        } else {
+            var pp = existing.position();
+
+            existing.data(nodeSpacegraphToCytoscape(n));
+
+            ///var next = this.getNode(n.id);
+
+            if (pp) {
+                existing.position({x: pp.x, y: pp.y});
+                //next.width(existing.width());
+                //next.height(existing.height());
+            }
+        }
+
+
     };
     s.addNodes = function(nn) {
         //HACK create a temporary channel and run through addChannel
-        this.addChannel(new Channel({
+        var cc = new Channel({
             nodes: nn
-        }));
+        });
+        this.addChannel(cc);
+        return cc;
     };
 
-    s.addEdge = function(e) {
-        this.addEdges([e]);
+    s.getEdge = function(e) {
+        var ee = this.edges("[id=\"" + e + "\"]");
+        if (ee.length == 0)
+            return undefined;
+
+        return ee;
+    }
+
+    s.removeEdge= function(e) {
+        var ee = s.getEdge(e);
+
+        if (ee) {
+            ee.remove();
+            return true;
+        }
+        return false;
     };
+
+
+    s.addEdge = function(e) {
+        var ee = e.id ? undefined : s.getEdge(e.id);
+        if (!ee) {
+            s.addEdges([e]);
+        } else {
+            ee.data(nodeSpacegraphToCytoscape(e));
+        }
+    };
+
     s.addEdges = function(ee) {
+        _.each(ee, s.addEdge);
+
+        //HACK avoid this
         //HACK create a temporary channel and run through addChannel
-        this.addChannel(new Channel({
+        /*this.addChannel(new Channel({
             edges: ee
-        }));
+        }));*/
     };
 
     s.updateChannel = function(c) {
@@ -814,7 +861,10 @@ function spacegraph(targetWrapper, opt) {
     };
 
     s.getNode = function(id) {
-        return this.nodes('[id="' + id + '"]');
+        var nn = this.nodes('[id="' + id + '"]');
+        if (nn.length == 0)
+            return undefined;
+        return nn;
     };
 
     s.removeNode = function(id) {

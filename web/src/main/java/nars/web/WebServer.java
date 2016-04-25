@@ -7,21 +7,33 @@ import io.undertow.server.handlers.resource.CachingResourceManager;
 import io.undertow.server.handlers.resource.PathResourceManager;
 import io.undertow.websockets.WebSocketConnectionCallback;
 import io.undertow.websockets.extensions.PerMessageDeflateHandshake;
+import javassist.scopedpool.SoftValueHashMap;
+import nars.Memory;
 import nars.NAR;
 import nars.NARLoop;
 import nars.bag.BLink;
+import nars.bag.Bag;
 import nars.concept.Concept;
+import nars.concept.DefaultConceptBuilder;
 import nars.nar.Default;
+import nars.op.mental.Abbreviation;
+import nars.op.mental.Anticipate;
+import nars.op.mental.Inperience;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.index.MapIndex2;
+import nars.time.RealtimeMSClock;
 import nars.util.data.Util;
+import nars.util.data.random.XORShiftRandom;
 import ognl.OgnlException;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.function.Function;
 
 import static io.undertow.Handlers.*;
 
@@ -82,19 +94,36 @@ public class WebServer /*extends PathHandler*/ {
                         )
                         .addPrefixPath("/ws", socket(new NarseseIOService(nar)))
                         .addPrefixPath("/emotion", socket(new EvalService(nar, "emotion", 500)))
-                        .addPrefixPath("/active", socket(new TopConceptService<Object[]>(nar, 500, 16) {
+                        .addPrefixPath("/active", socket(new TopConceptService<Object[]>(nar, 1000, 64) {
 
                             @Override
-                            Object[] summarize(BLink<? extends Concept> c) {
-                                Termed t = c.get();
+                            Object[] summarize(BLink<? extends Concept> bc) {
+                                Concept c = bc.get();
                                 return new Object[] {
-                                    t.toString(), n(c.pri()), n(c.dur()), n(c.qua())
-                                    //TODO tasklinks, termlinks, beliefs
+                                    c.toString(), //ID
+                                    n(bc.pri()), n(bc.dur()), n(bc.qua()),
+                                    termLinks(c)
+                                    //TODO tasklinks, beliefs
                                 };
                             }
 
+                            final int maxTermLinks = 4;
+
+                            private Object[] termLinks(Concept c) {
+                                Bag<Termed> b = c.termlinks();
+                                Object[] tl = new Object[ Math.min(maxTermLinks, b.size() )];
+                                final int[] n = {0};
+                                b.forEach(maxTermLinks, t -> {
+                                    tl[n[0]++] = new Object[] {
+                                       t.get().toString(), //ID
+                                       n(t.pri()), n(t.dur()), n(t.qua())
+                                    };
+                                });
+                                return tl;
+                            }
+
                             private float n(float v) {
-                                return Util.round(v, 0.0001f);
+                                return Util.round(v, 0.001f);
                             }
                         }))
                 )
@@ -140,8 +169,11 @@ public class WebServer /*extends PathHandler*/ {
 
         int httpPort = args.length < 1 ? 8080 : Integer.parseInt(args[0]);
 
-        Default nar = new Default(1024, 1, 1, 3);
+        NAR nar = newRealtimeNAR();
         nar.input("a:b. b:c. c:d.");
+        nar.conceptRemembering.setValue(200);
+        nar.termLinkRemembering.setValue(1000);
+        nar.taskLinkRemembering.setValue(600);
 
         new WebServer(nar, 10, httpPort);
 
@@ -166,6 +198,37 @@ public class WebServer /*extends PathHandler*/ {
             }
         }
     }*/
+    @NotNull
+    public static Default newRealtimeNAR() {
+        Memory mem = new Memory(new RealtimeMSClock(),
+                new MapIndex2(
+                        new SoftValueHashMap(128*1024), new DefaultConceptBuilder(new XORShiftRandom(), 32, 32)
+                )
+                //new MapCacheBag(
+                //new WeakValueHashMap<>()
 
+                //GuavaCacheBag.make(1024*1024)
+                /*new InfiniCacheBag(
+                    InfiniPeer.tmp().getCache()
+                )*/
+                //)
+        );
+
+        Default nar = new Default(1024, 3, 2, 2) {
+            @Override
+            public Function<Term, Concept> newConceptBuilder() {
+                return new DefaultConceptBuilder(random, 32, 128);
+            }
+        };
+        nar.with(
+                Anticipate.class,
+                Inperience.class
+        );
+        nar.with(new Abbreviation(nar,"is"));
+        nar.conceptRemembering.setValue(1000 * 10);
+        nar.termLinkRemembering.setValue(1000 * 25);
+        nar.taskLinkRemembering.setValue(1000 * 15);
+        return nar;
+    }
 
 }

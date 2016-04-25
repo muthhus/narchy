@@ -12,6 +12,7 @@ import nars.term.Term;
 import nars.term.index.MapIndex2;
 import nars.time.RealtimeMSClock;
 import nars.util.data.random.XORShiftRandom;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
 
@@ -28,6 +29,31 @@ public enum NARideRealtimeDefault {
         //Global.DEBUG = true;
 
 
+        Default nar = newRealtimeNAR();
+
+
+
+        /*nar.memory.conceptForgetDurations.set(10);
+        nar.memory.termLinkForgetDurations.set(100);*/
+
+        //nar.duration.set(750 /* ie, milliseconds */);
+        //nar.spawnThread(1000/60);
+
+
+
+        NARide.show(nar.loop(), (i) -> {
+            /*try {
+                i.nar.input(new File("/tmp/h.nal"));
+            } catch (Throwable e) {
+                i.nar.memory().eventError.emit(e);
+                //e.printStackTrace();
+            }*/
+        });
+
+    }
+
+    @NotNull
+    public static Default newRealtimeNAR() {
         Memory mem = new Memory(new RealtimeMSClock(),
                 new MapIndex2(
                         new SoftValueHashMap(128*1024), new DefaultConceptBuilder(new XORShiftRandom(), 32, 32)
@@ -56,25 +82,6 @@ public enum NARideRealtimeDefault {
         nar.conceptRemembering.setValue(1000 * 10);
         nar.termLinkRemembering.setValue(1000 * 25);
         nar.taskLinkRemembering.setValue(1000 * 15);
-
-
-
-        /*nar.memory.conceptForgetDurations.set(10);
-        nar.memory.termLinkForgetDurations.set(100);*/
-
-        //nar.duration.set(750 /* ie, milliseconds */);
-        //nar.spawnThread(1000/60);
-
-
-
-        NARide.show(nar.loop(), (i) -> {
-            /*try {
-                i.nar.input(new File("/tmp/h.nal"));
-            } catch (Throwable e) {
-                i.nar.memory().eventError.emit(e);
-                //e.printStackTrace();
-            }*/
-        });
-
+        return nar;
     }
 }

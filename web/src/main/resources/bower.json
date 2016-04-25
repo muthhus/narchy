@@ -11,6 +11,7 @@
     "cytoscape":"latest",
     "cytoscape-edgehandles": "latest",
     "cytoscape-cose-bilkent":"latest",
+    "cytoscape-cola":"latest",
     "semantic": "latest",
     "object-editor": "latest",
     "metawidget": "latest"
