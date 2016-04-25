@@ -388,7 +388,8 @@ function spacegraph(targetWrapper, opt) {
                     'text-valign': 'center',
                     'text-halign': 'center',
                     'color': '#fff',
-                    'shadow-blur': 0
+                    //'shadow-blur': 0
+                    'min-zoomed-font-size': 10,
                     /*'text-background-opacity': 1,
                     'text-background-color': '#ccc',
                     'text-background-shape': 'roundrectangle',*/
@@ -485,39 +486,21 @@ function spacegraph(targetWrapper, opt) {
 //    });
 
     s.channels = { };
-    s.widgets = new Map(); //node -> widget DOM element
     s.overlay = overlaylayer;
 
-    /*s.currentLayout = {
-        //name: 'cosefast'
-        name: 'grid' //cose implementation is slow as fuck becaause it has all these log debug statements and string generation that serves no purpose but at least its pretty
-        //name: 'arbor'
-
-        //name: 'breadthfirst',
-        //circle:true,
-        //directed:true
-    };*/
 
     /** adapts spacegraph node to cytoscape node */
     function nodeSpacegraphToCytoscape(d) {
         var w = { data: d };
 
-        var css = w.css = d.style ? d.style : {};
+        var css = w.css = d.style || {};
 
-        if (d.shape) {
+        //if (d.shape) {
             css.shape = d.shape;
-        }
+        //}
 
         return w;
     }
-
-    s.removeNodeWidget = function(node) {
-        var nodeID = node.id();
-        s.widgets.delete(nodeID);
-        var nn = this.getNode('widget_' + nodeID);
-        if (nn)
-            nn.remove();
-    };
 
     s.updateNodeWidget = function(node, nodeOverride) {
 
@@ -529,10 +512,7 @@ function spacegraph(targetWrapper, opt) {
 
         data.updating = null;
 
-        var wEle = s.widgets.get(node.id());
-        if (wEle) {
-            s.positionNodeHTML(node, wEle, data.widget);
-        }
+        s.positionNodeHTML(node, node.data('widget_element'), data.widget);
 
     };
 
@@ -649,18 +629,16 @@ function spacegraph(targetWrapper, opt) {
             this.addNodes([n]);
         } else {
 
-            var pp = existing.position();
+            //var pp = existing.position();
 
 
             existing.data(nodeSpacegraphToCytoscape(n));
 
             ///var next = this.getNode(n.id);
 
-            if (pp) {
-                existing.position({x: pp.x, y: pp.y});
-                //next.width(existing.width());
-                //next.height(existing.height());
-            }
+            //if (pp) {
+                //existing.position({x: pp.x, y: pp.y});
+            //}
         }
 
 
@@ -920,138 +898,100 @@ function spacegraph(targetWrapper, opt) {
 
         var node = e.cyTarget;
         var data = node.data();
-        var widget = data.widget; //html string
-        if (!widget) return;
 
-        var wEle = this.widgets.get(node.id());
-        if (wEle) return; //widget already exists?
+        if (data.widget) {
 
-        /*if (w) {
-         var whenLastModified = w.data('when');
-         if (whenLastModified < Date.now()) {
-         }
-         }*/
+            var widget = data.widget;
 
-        var style = widget.style || {};
-        style.position = 'fixed';
-        style.transformOrigin = '0 0';
+            var nid = node.id();
 
-        var wid = 'widget_' + node.id();
-        var w = $('<div></div>').
-            attr('id', wid).
-            addClass('widget').
-            css(style).
-            appendTo(overlaylayer);
+            var wEle = node.data('widget_element');
+            if (!wEle) { //if widget doesnt already exists
 
-        w.html(widget.html).data('when', Date.now());
+                var style = widget.style || {};
+                style.position = 'fixed';
+                style.transformOrigin = '0 0';
 
-//            var commitWidgetChange = function (e) {
-//                "use strict";
-//
-//                var oh = w[0].innerHTML;
-//
-//                //this is probably less efficient than going from DOM to JSON directly
-//                var html = html2json(oh);
-//
-//                if (html !== widget.html) {
-//                    widget.html = html;
-//
-//                    //TODO only commit the channel this node belongs to
-//                    that.commit();
-//                }
-//            };
-//
-//            //TODO use MutationObservers
-//            if (widget.live)
-//                w.bind("DOMSubtreeModified DOMAttrModified", commitWidgetChange); // Listen DOM changes
+                var wid = 'widget_' + nid;
+                var w = $(document.createElement('div')).attr('id', wid).addClass('widget').css(style).appendTo(overlaylayer);
 
-        this.widgets.set(node.id(), w);
+                w.html(widget.html).data('when', Date.now());
+
+                node.data('widget_element', w);
+            }
+        }
+
+        //OTHER content handlers
+
+        //     var n = null;
+        //     if (type === 'text') {
+        //         n = {
+        //             id: 'txt' + parseInt(Math.random() * 1000),
+        //             style: {
+        //                 width: 64,
+        //                 height: 32
+        //             },
+        //             widget: {
+        //                 html: "<div contenteditable='true' class='editable' style='width: 100%; height: 100%; overflow:auto'></div>",
+        //                 scale: 0.85,
+        //                 style: {}
+        //             }
+        //         };
+        //     }
+        //     else if (type === 'www') {
+        //         var uurrll = param;
+        //         if (!uurrll.indexOf('http://') === 0)
+        //             uurrll = 'http://' + uurrll;
+        //
+        //         n = {
+        //             id: 'www' + parseInt(Math.random() * 1000),
+        //             style: {
+        //                 width: 64,
+        //                 height: 64
+        //             },
+        //             widget: {
+        //                 html: '<iframe width="100%" height="100%" src="' + uurrll + '"></iframe>',
+        //                 scale: 0.85,
+        //                 pixelScale: 600,
+        //                 style: {},
+        //             }
+        //         };
+        //     }
+        //
+        //     //
+        //
+        //     if (n) {
+        //
+        //         c.addNode(n);
+        //
+        //         this.updateChannel(c);
+        //
+        //         /*
+        //          if (!pos) {
+        //          var ex = this.extent();
+        //          var cx = 0.5 * (ex.x1 + ex.x2);
+        //          var cy = 0.5 * (ex.y1 + ex.y2);
+        //          pos = {x: cx, y: cy};
+        //          }
+        //          */
+        //         if (pos)
+        //             this.getElementById(n.id).position(pos);
+        //
+        //         c.commit();
+        //
+        //     }
+
     });
 
     s.on('remove', function(e) {
         var node = e.cyTarget;
 
-        //attempt to remove an associated widget (html div in overlay)
-        this.removeNodeWidget(node);
+        var data = node.data();
+        if (data.widget) {
+            //remove an associated widget (html div in overlay)
+            node.data('widget_element').remove();
+        }
     });
-
-    // //DEPRECATED, move to a channel
-    // s.newNode = function(c, type, pos, param) {
-    //
-    //     //notify('Adding: ' + type);
-    //
-    //     var n = null;
-    //     if (type === 'text') {
-    //         n = {
-    //             id: 'txt' + parseInt(Math.random() * 1000),
-    //             style: {
-    //                 width: 64,
-    //                 height: 32
-    //             },
-    //             widget: {
-    //                 html: "<div contenteditable='true' class='editable' style='width: 100%; height: 100%; overflow:auto'></div>",
-    //                 scale: 0.85,
-    //                 style: {}
-    //             }
-    //         };
-    //     }
-    //     else if (type === 'www') {
-    //         var uurrll = param;
-    //         if (!uurrll.indexOf('http://') === 0)
-    //             uurrll = 'http://' + uurrll;
-    //
-    //         n = {
-    //             id: 'www' + parseInt(Math.random() * 1000),
-    //             style: {
-    //                 width: 64,
-    //                 height: 64
-    //             },
-    //             widget: {
-    //                 html: '<iframe width="100%" height="100%" src="' + uurrll + '"></iframe>',
-    //                 scale: 0.85,
-    //                 pixelScale: 600,
-    //                 style: {},
-    //             }
-    //         };
-    //     }
-    //
-    //     //
-    //
-    //     if (n) {
-    //
-    //         c.addNode(n);
-    //
-    //         this.updateChannel(c);
-    //
-    //         /*
-    //          if (!pos) {
-    //          var ex = this.extent();
-    //          var cx = 0.5 * (ex.x1 + ex.x2);
-    //          var cy = 0.5 * (ex.y1 + ex.y2);
-    //          pos = {x: cx, y: cy};
-    //          }
-    //          */
-    //         if (pos)
-    //             this.getElementById(n.id).position(pos);
-    //
-    //         c.commit();
-    //
-    //     }
-    //
-    // };
-    //
-    // //DEPRECATED, move to a channel
-    // s.removeNode = function(n) {
-    //     for (var ch in this.channels) {
-    //         var c = this.channels[ch];
-    //
-    //         if (c.removeNode(n)) {
-    //             c.commit();
-    //         }
-    //     }
-    //
-    //     n.remove();
-    // };
 
 
 
@@ -1062,7 +1002,6 @@ function spacegraph(targetWrapper, opt) {
         // else
         //     pos = ele.position();
 
-
         this.animate({
             fit: {
                 eles: ele,
@@ -1071,8 +1010,7 @@ function spacegraph(targetWrapper, opt) {
         }, {
             duration: zoomDuration
             /*step: function() {
-
-             }*/
+            }*/
         });
     };
 

@@ -23,7 +23,6 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.index.MapIndex2;
 import nars.time.RealtimeMSClock;
-import nars.util.data.Util;
 import nars.util.data.random.XORShiftRandom;
 import ognl.OgnlException;
 import org.jetbrains.annotations.NotNull;
@@ -216,20 +215,23 @@ public class WebServer /*extends PathHandler*/ {
                 //)
         );
 
-        Default nar = new Default(1024, 3, 2, 2) {
+        int numConceptsPerCycle = 5;
+        Default nar = new Default(1024, numConceptsPerCycle, 3, 3) {
             @Override
             public Function<Term, Concept> newConceptBuilder() {
                 return new DefaultConceptBuilder(random, 32, 128);
             }
         };
+        nar.conceptActivation.setValue(1f/numConceptsPerCycle);
+        //nar.log();
         nar.with(
                 Anticipate.class,
                 Inperience.class
         );
         nar.with(new Abbreviation(nar,"is"));
-        nar.conceptRemembering.setValue(1000 * 10);
-        nar.termLinkRemembering.setValue(1000 * 25);
-        nar.taskLinkRemembering.setValue(1000 * 15);
+        nar.conceptRemembering.setValue(1000 * 50);
+        nar.termLinkRemembering.setValue(1000 * 150);
+        nar.taskLinkRemembering.setValue(1000 * 100);
         return nar;
     }
 

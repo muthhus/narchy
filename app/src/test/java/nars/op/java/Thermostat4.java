@@ -31,7 +31,7 @@ public class Thermostat4 {
 
         n = new Default(1000, 1, 2, 3);
         //n.log();
-        n.activationRate.setValue(0.05f);
+        n.conceptActivation.setValue(0.05f);
         n.premiser.confMin.setValue(0.01f);
         n.shortTermMemoryHistory.set(3);
         n.cyclesPerFrame.set(4);

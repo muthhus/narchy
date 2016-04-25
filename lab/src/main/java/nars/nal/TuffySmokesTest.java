@@ -112,7 +112,7 @@ public class TuffySmokesTest {
 		Global.DEBUG = true;
 
 		NAR n = new Default(1000, 1, 2, 3);
-		n.activationRate.setValue(0.75f);
+		n.conceptActivation.setValue(0.75f);
 		n.conceptRemembering.setValue(2);
 
 		n.logSummaryGT(System.out, 0.75f);

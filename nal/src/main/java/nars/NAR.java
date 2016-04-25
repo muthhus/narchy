@@ -1128,12 +1128,12 @@ public abstract class NAR extends Memory implements Level, Consumer<Task> {
 
     @Nullable
     public final Concept process(@NotNull Task input) {
-        return process(input, activationRate.floatValue());
+        return process(input, conceptActivation.floatValue());
     }
 
     /** accepts null-terminated array */
     public final void process(@NotNull Task... input) {
-        float activation = activationRate.floatValue();
+        float activation = conceptActivation.floatValue();
         for (Task t : input) {
             if (t == null) //for null-terminated arrays
                 break;

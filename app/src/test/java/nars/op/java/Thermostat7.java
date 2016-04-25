@@ -42,7 +42,7 @@ public class Thermostat7 {
         Default d = new Default(1024, 15, 3, 3);
         d.conceptRemembering.setValue(50);
         d.cyclesPerFrame.set(3);
-        d.activationRate.setValue(0.05f);
+        d.conceptActivation.setValue(0.05f);
         //d.conceptBeliefsMax.set(32);
         d.shortTermMemoryHistory.set(2);
         //d.derivationDurabilityThreshold.setValue(0.03f);

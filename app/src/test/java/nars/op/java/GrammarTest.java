@@ -36,7 +36,7 @@ public class GrammarTest {
 
         n.DEFAULT_JUDGMENT_PRIORITY = 0.5f;
         n.DEFAULT_GOAL_PRIORITY = 0.6f;
-        n.activationRate.setValue(0.1f);
+        n.conceptActivation.setValue(0.1f);
 
         n.shortTermMemoryHistory.set(3);
         n.cyclesPerFrame.set(8);

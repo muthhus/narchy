@@ -38,7 +38,7 @@ public class SequenceTest {
         //n.DEFAULT_QUESTION_PRIORITY = 0.1f;
         n.cyclesPerFrame.set(4);
         n.conceptRemembering.setValue(1);
-        n.activationRate.setValue(0.05f);
+        n.conceptActivation.setValue(0.05f);
         n.shortTermMemoryHistory.set(4);
 
         n.onExec(new TermFunction("vocalize") {

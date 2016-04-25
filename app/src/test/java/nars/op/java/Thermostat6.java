@@ -43,7 +43,7 @@ public class Thermostat6 {
         Default d = new Default(1024, 24, 2, 3);
         d.conceptRemembering.setValue(3);
         d.cyclesPerFrame.set(5);
-        d.activationRate.setValue(0.1f);
+        d.conceptActivation.setValue(0.1f);
         //d.conceptBeliefsMax.set(32);
         d.shortTermMemoryHistory.set(3);
         //d.derivationDurabilityThreshold.setValue(0.03f);
@@ -66,7 +66,7 @@ public class Thermostat6 {
             return d;
         })
                 .with("activationRate", 0.1f, 0.3f, 0.1f, (a, x) -> {
-                    x.activationRate.setValue(a);
+                    x.conceptActivation.setValue(a);
                 })
                 .with("conceptDurations", 0.1f, 5f, 0.1f, (a, x) -> {
                     x.conceptRemembering.setValue(a);

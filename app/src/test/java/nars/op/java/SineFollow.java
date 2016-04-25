@@ -232,7 +232,7 @@ public class SineFollow {
         Global.DEBUG = true;
 
         Default d = new Default(1024, 16, 3, 3);
-        d.activationRate.setValue(0.05f);
+        d.conceptActivation.setValue(0.05f);
         d.cyclesPerFrame.set(16);
         d.shortTermMemoryHistory.set(2);
 //        d.log();

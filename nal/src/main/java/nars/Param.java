@@ -42,53 +42,17 @@ public abstract class Param extends Container implements Level {
     public final MutableFloat perfection = new MutableFloat(0.1f);
 
 
-
-    //    /** Silent threshold for task reporting, in [0, 100].
-//     *  Noise level = 100 - silence level; noise 0 = always silent, noise 100 = never silent
-//     */
-//    public final AtomicInteger outputVolume = new AtomicInteger();
-
-
-
     //TODO move this to STMTemporalLinkage
     @Deprecated public final MutableInteger shortTermMemoryHistory = new MutableInteger();
 
-
-
-//    /** converts durations to cycles */
-//    public final float durationToCycles(MutableFloat durations) {
-//        return durationToCycles(durations.floatValue());
-//    }
-//
-//    public final float durationToCycles(float durations) {
-//        return duration.floatValue() * durations;
-//    }
-
-
-
-
-
-
-
-//    /** Concept decay rate in ConceptBag, in [1, 99].  originally: CONCEPT_FORGETTING_CYCLE
-//     *  How many cycles it takes an item to decay completely to a threshold value (ex: 0.1).
-//     *  Lower means faster rate of decay.
-//     */
-//    @Deprecated public final MutableFloat conceptForgetDurations = new MutableFloat();
-    
-    /** TermLink decay rate in TermLinkBag, in [1, 99]. originally: TERM_LINK_FORGETTING_CYCLE */
-    //TODO use separate termlink forget rates whether the termlink was actually selected for firing or not.
-    //@Deprecated public final MutableFloat termLinkForgetDurations = new MutableFloat();
-    
-    /** TaskLink decay rate in TaskLinkBag, in [1, 99]. originally: TASK_LINK_FORGETTING_CYCLE */
     public final MutableFloat termLinkRemembering = new MutableFloat();
 
     public final MutableFloat taskLinkRemembering = new MutableFloat();
 
     public final MutableFloat conceptRemembering = new MutableFloat();
 
-    /** base activation factor */
-    public final MutableFloat activationRate = new MutableFloat(1f);
+    /** factor for concept activation [0 <= c <= 1] */
+    public final MutableFloat conceptActivation = new MutableFloat(1f);
 
 
      /*

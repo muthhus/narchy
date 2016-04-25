@@ -99,7 +99,7 @@ public class GrammarTest2 {
         //n.logSummaryGT(System.out, 0.5f);
 
         q.power.setValue(0.3f);
-        n.activationRate.setValue(0.9f);
+        n.conceptActivation.setValue(0.9f);
 
         //n.memory.executionThreshold.setValue(0.55f);
         n.premiser.confMin.setValue(0.01f);

@@ -67,7 +67,6 @@ function SocketSpaceGraph(path, idFunc, nodeFunc) {
     var sg = spacegraph(view, {
         //options
     });
-    window.s = sg; //TEMPORARY
 
     //var layoutUpdateMaxPeriodMS = 1000;
 
@@ -76,7 +75,7 @@ function SocketSpaceGraph(path, idFunc, nodeFunc) {
         name: 'spread',
         minDist: 125,
         speed: 0.05,
-        animate: true,
+        animate: false,
         randomize: false, // uses random initial node positions on true
         fit: false,
         maxFruchtermanReingoldIterations: 2, // Maximum number of initial force-directed iterations
@@ -250,32 +249,35 @@ function SocketNARGraph(path) {
     return SocketSpaceGraph(path, function(x) { return x[1]; },
         function(id, x, newNodes, newEdges) {
             var pri = x[2];
-            var baseSize = 64, extraSize = 132;
+            var qua = x[4];
+            var baseSize = 32, extraSize = 132;
             newNodes.push({
                  id: id,
                  label: id,
                  style: {
                      width: baseSize + extraSize * pri,
                      height: baseSize + extraSize * pri,
-                     'background-opacity': 0.5 + pri * 0.5
+                     'background-color': //'HSL(' + parseInt( (0.1 * qua + 0.4) * 100) + '%, 60%, 60%)',
+                            "rgb(" + ((0.5 + 0.5 * qua) * 255) + ", 128, 128)",
+                     'background-opacity': 0.25 + pri * 0.75
                  }
              });
 
             var termlinks = x[5];
             _.each(termlinks.seq, function(e) {
-                if (!e.seq)
+                if (!(e = e.seq))
                     return;
 
-                e = e.seq;
                 var target = e[1];
                 var tlpri = e[2];
+
                 newEdges.push({
-                    id: 'tl' + id + '_' + target, source: id, target: target,
+                    id: 'tl' + '_' + id + '_' + target, source: id, target: target,
                     style: {
                         'line-color': 'orange',
-                        'curve-style': 'segments',
+                        'curve-style': 'segments', //(tlpri > 0.5) ? 'segments' : 'haystack',
                         'opacity': 0.25 + tlpri * 0.75,
-                        'width': 4 + 10 * tlpri,
+                        'width': 2 + 6 * tlpri,
                         'mid-target-arrow-shape': 'triangle'
                     }
                 });

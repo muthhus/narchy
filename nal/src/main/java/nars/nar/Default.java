@@ -256,7 +256,7 @@ public class Default extends AbstractNAR {
         if (c != null) {
             core.activate(c, activation, scale, conceptOverflow);
             if (link)
-                c.link(activation, scale, Default.this, conceptOverflow);
+                c.link(activation, 1f, Default.this, conceptOverflow);
         }
         return c;
 
@@ -296,8 +296,6 @@ public class Default extends AbstractNAR {
         public final MutableInteger conceptsFiredPerCycle;
 
 
-        @Range(min = 0.0f, max = 1.0, unit = "Percent")
-        public final MutableFloat activationRate;
 
         @Range(min = 0.01f, max = 8, unit = "Duration")
         public final MutableFloat conceptRemembering;
@@ -348,7 +346,6 @@ public class Default extends AbstractNAR {
 
             this.premiser = premiseGenerator;
 
-            this.activationRate = nar.activationRate;
             this.conceptRemembering = nar.conceptRemembering;
             this.perfection = nar.perfection;
 
