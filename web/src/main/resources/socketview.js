@@ -78,18 +78,35 @@ function SocketSpaceGraph(path, idFunc, nodeFunc) {
             if (currentLayout) {
                 currentLayout.stop();
             } else {
+                // currentLayout = sg.makeLayout({
+                //     name: 'cola',
+                //     animate: true,
+                //     fit: false,
+                //     randomize: false,
+                //     maxSimulationTime: 700, // max length in ms to run the layout
+                //     speed: 1,
+                //     refresh: 2,
+                //     //infinite: true,
+                //     nodeSpacing: function (node) {
+                //         return 70;
+                //     }, // extra spacing around nodes
+                //
+                //     ready: function () {
+                //         //console.log('starting cola', Date.now());
+                //     },
+                //     stop: function () {
+                //         //console.log('stop cola', Date.now());
+                //     }
+                // });
+
                 currentLayout = sg.makeLayout({
-                    name: 'cola',
-                    animate: true,
+                    /* https://github.com/cytoscape/cytoscape.js-spread */
+                    name: 'spread',
+                    minDist: 125,
+                    randomize: false, // uses random initial node positions on true
                     fit: false,
-                    randomize: false,
-                    maxSimulationTime: 700, // max length in ms to run the layout
-                    speed: 1,
-                    refresh: 1,
-                    //infinite: true,
-                    nodeSpacing: function (node) {
-                        return 70;
-                    }, // extra spacing around nodes
+                    maxFruchtermanReingoldIterations: 1, // Maximum number of initial force-directed iterations
+                    maxExpandIterations: 1, // Maximum number of expanding iterations
 
                     ready: function () {
                         //console.log('starting cola', Date.now());
@@ -100,9 +117,7 @@ function SocketSpaceGraph(path, idFunc, nodeFunc) {
                 });
             }
 
-            setTimeout(function () {
-                currentLayout.run();
-            }, 0);
+            currentLayout.run();
 
 
         // sg.layout({ name: 'cose',

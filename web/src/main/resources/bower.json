@@ -10,6 +10,7 @@
 	"lodash":"latest",
     "cytoscape":"latest",
     "cytoscape-edgehandles": "latest",
+    "cytoscape-spread":"latest",
     "cytoscape-cose-bilkent":"latest",
     "cytoscape-cola":"latest",
     "semantic": "latest",

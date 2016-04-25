@@ -36,6 +36,7 @@ import java.nio.file.Paths;
 import java.util.function.Function;
 
 import static io.undertow.Handlers.*;
+import static java.util.zip.Deflater.BEST_SPEED;
 
 
 public class WebServer /*extends PathHandler*/ {
@@ -51,7 +52,7 @@ public class WebServer /*extends PathHandler*/ {
 
 
     public static HttpHandler socket(WebSocketConnectionCallback w) {
-        return websocket(w).addExtension(new PerMessageDeflateHandshake());
+        return websocket(w).addExtension(new PerMessageDeflateHandshake(false, BEST_SPEED));
     }
 
 
@@ -123,7 +124,8 @@ public class WebServer /*extends PathHandler*/ {
                             }
 
                             private float n(float v) {
-                                return Util.round(v, 0.001f);
+                                return v;
+                                //return Util.round(v, 0.001f);
                             }
                         }))
                 )

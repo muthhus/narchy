@@ -648,7 +648,9 @@ function spacegraph(targetWrapper, opt) {
         if (!existing) {
             this.addNodes([n]);
         } else {
+
             var pp = existing.position();
+
 
             existing.data(nodeSpacegraphToCytoscape(n));
 
@@ -701,13 +703,13 @@ function spacegraph(targetWrapper, opt) {
     };
 
     s.addEdges = function(ee) {
-        _.each(ee, s.addEdge);
+        //_.each(ee, s.addEdge);
 
         //HACK avoid this
         //HACK create a temporary channel and run through addChannel
-        /*this.addChannel(new Channel({
+        this.addChannel(new Channel({
             edges: ee
-        }));*/
+        }));
     };
 
     s.updateChannel = function(c) {
