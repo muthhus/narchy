@@ -41,7 +41,7 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
 
     /** returns the outgoing component only */
     @Nullable
-    static final void linkSub(@NotNull Concept source, @NotNull Termed targetTerm,
+    static final Concept linkSub(@NotNull Concept source, @NotNull Termed targetTerm,
                                               @NotNull Budgeted b, float subScale, boolean alsoReverse,
                                               @Nullable MutableFloat conceptOverflow,
                                               @Nullable MutableFloat termlinkOverflow, @NotNull NAR nar) {
@@ -53,12 +53,13 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
 
 
         /** activate concept and insert tasklink */
-        Concept target = nar.conceptualize(targetTerm, b, subScale, conceptOverflow);
+        Concept target = nar.conceptualize(targetTerm, b, subScale, conceptOverflow, false);
         if (target == null)
             throw new RuntimeException("termlink to null concept");
 
         if (target == source)
             throw new RuntimeException("termlink self-loop");
+
 
         /** insert termlink target to source */
         if (alsoReverse) {
@@ -69,6 +70,7 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
         /** insert termlink source to target */
         source.termlinks().put(target, b, subScale, termlinkOverflow);
 
+        return target;
     }
 
 
@@ -178,15 +180,17 @@ public abstract class AbstractConcept<T extends Term> implements Concept {
     @Override public boolean link(@NotNull Budgeted b, float scale, float minScale, @NotNull NAR nar, @Nullable MutableFloat conceptOverflow) {
 
         if (b instanceof Task) {
-            Task t = (Task) b;
-            if (term.vars()==0 || !isConceptOf(t)) { //insert tasklink to its terms own concept only if no variables
-                taskLinks.put(t, b/*.budget()*/, scale, null);
-            }
+            linkTask((Task)b, scale);
         }
 
         return true;
     }
 
+    public void linkTask(@NotNull Task t, float scale) {
+        if (term.vars()==0 || !isConceptOf(t)) { //insert tasklink to its terms own concept only if no variables
+            taskLinks.put(t, t/*.budget()*/, scale, null);
+        }
+    }
 
 
 //    /**

@@ -738,7 +738,12 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
 
             //Link the peer termlink bidirectionally
             if (subScale > minScale) { //TODO use a min bound to prevent the iteration ahead of time
-                linkSub(this, tt.term, b, subScale, true, subConceptOverflow, null, nar);
+                Concept target = linkSub(this, tt.term, b, subScale, true, subConceptOverflow, null, nar);
+
+                if (target!=null && b instanceof Task) {
+                    //insert 2nd-order tasklink
+                    ((AbstractConcept)target).linkTask((Task)b, subScale);
+                }
             }
         }
     }
