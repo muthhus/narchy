@@ -6,9 +6,11 @@ import nars.nar.Default;
 import nars.task.Task;
 import org.junit.Test;
 
+import java.util.DoubleSummaryStatistics;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by me on 3/21/16.
@@ -22,11 +24,15 @@ public class TermTemplateTest {
         n.step();
         Concept c = t.concept(n);
         List<TermTemplate> templates = ((CompoundConcept)c).termLinkTemplates;
-        System.out.println(Joiner.on('\n').join(templates));
         assertEquals(7, templates.size());
-        assertEquals("({($1,$2),($3,$4)}-->REPR)", templates.get(0).term.toString());
-        assertEquals(0.08f, templates.get(0).strength, 0.01f);
-        assertEquals(0.16f, templates.get(1).strength, 0.01f);
+
+        String s = Joiner.on('\n').join(templates);
+        System.out.println(s);
+        assertTrue(s.contains("({($1,$2),($3,$4)}-->REPR)"));
+        DoubleSummaryStatistics ss = templates.stream().mapToDouble(l -> l.strength).summaryStatistics();
+        System.out.println(ss);
+        assertEquals(1f, ss.getSum(), 0.01f);
+        assertTrue(ss.getMax() - ss.getAverage() > 0.05); //some variation due to repeat subterms
 
     }
 
