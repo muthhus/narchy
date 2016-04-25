@@ -674,13 +674,6 @@ function spacegraph(targetWrapper, opt) {
         return cc;
     };
 
-    s.getEdge = function(e) {
-        var ee = this.edges("[id=\"" + e + "\"]");
-        if (ee.length == 0)
-            return undefined;
-
-        return ee;
-    }
 
     s.removeEdge= function(e) {
         var ee = s.getEdge(e);
@@ -863,11 +856,23 @@ function spacegraph(targetWrapper, opt) {
     };
 
     s.getNode = function(id) {
-        var nn = this.nodes('[id="' + id + '"]');
-        if (nn.length == 0)
-            return undefined;
-        return nn;
+        //return s.nodes()._private.ids[id];
+        var nowpublic = s._private;
+        var index = nowpublic.id2index[id];
+        if (index!==undefined) {
+            return nowpublic.elements[index];
+        }
     };
+
+    //deprecated, combine into unified get(id) method for any type of element
+    s.getEdge = function(e) {
+        // var ee = this.edges("[id=\"" + e + "\"]");
+        // if (ee.length == 0)
+        //     return undefined;
+        //
+        // return ee;
+        return this.getNode(e);
+    }
 
     s.removeNode = function(id) {
         this.getNode(id).remove();

@@ -59,6 +59,7 @@ function SocketMetaWidget(path) {
     );
 }
 
+
 function SocketSpaceGraph(path, idFunc, nodeFunc) {
 
 
@@ -66,58 +67,67 @@ function SocketSpaceGraph(path, idFunc, nodeFunc) {
     var sg = spacegraph(view, {
         //options
     });
+    window.s = sg; //TEMPORARY
 
     //var layoutUpdateMaxPeriodMS = 1000;
 
-    var currentLayout = undefined;
+    var currentLayout = sg.makeLayout({
+        /* https://github.com/cytoscape/cytoscape.js-spread */
+        name: 'spread',
+        minDist: 125,
+        speed: 0.05,
+        animate: true,
+        randomize: false, // uses random initial node positions on true
+        fit: false,
+        maxFruchtermanReingoldIterations: 2, // Maximum number of initial force-directed iterations
+        maxExpandIterations: 1, // Maximum number of expanding iterations
+
+        ready: function () {
+            //console.log('starting cola', Date.now());
+        },
+        stop: function () {
+            //console.log('stop cola', Date.now());
+        }
+    });
+    var layoutUpdatePeriodMS = 200;
+    currentLayout.run();
+    setInterval(function() {
+        currentLayout.stop();
+        currentLayout.run();
+    }, layoutUpdatePeriodMS);
 
     var layout = function () {
         /* https://github.com/cytoscape/cytoscape.js-cola#api */
 
 
-            if (currentLayout) {
-                currentLayout.stop();
-            } else {
-                // currentLayout = sg.makeLayout({
-                //     name: 'cola',
-                //     animate: true,
-                //     fit: false,
-                //     randomize: false,
-                //     maxSimulationTime: 700, // max length in ms to run the layout
-                //     speed: 1,
-                //     refresh: 2,
-                //     //infinite: true,
-                //     nodeSpacing: function (node) {
-                //         return 70;
-                //     }, // extra spacing around nodes
-                //
-                //     ready: function () {
-                //         //console.log('starting cola', Date.now());
-                //     },
-                //     stop: function () {
-                //         //console.log('stop cola', Date.now());
-                //     }
-                // });
-
-                currentLayout = sg.makeLayout({
-                    /* https://github.com/cytoscape/cytoscape.js-spread */
-                    name: 'spread',
-                    minDist: 125,
-                    randomize: false, // uses random initial node positions on true
-                    fit: false,
-                    maxFruchtermanReingoldIterations: 1, // Maximum number of initial force-directed iterations
-                    maxExpandIterations: 1, // Maximum number of expanding iterations
-
-                    ready: function () {
-                        //console.log('starting cola', Date.now());
-                    },
-                    stop: function () {
-                        //console.log('stop cola', Date.now());
-                    }
-                });
-            }
-
-            currentLayout.run();
+            // if (currentLayout) {
+            //     currentLayout.stop();
+            // } else {
+            //     // currentLayout = sg.makeLayout({
+            //     //     name: 'cola',
+            //     //     animate: true,
+            //     //     fit: false,
+            //     //     randomize: false,
+            //     //     maxSimulationTime: 700, // max length in ms to run the layout
+            //     //     speed: 1,
+            //     //     refresh: 2,
+            //     //     //infinite: true,
+            //     //     nodeSpacing: function (node) {
+            //     //         return 70;
+            //     //     }, // extra spacing around nodes
+            //     //
+            //     //     ready: function () {
+            //     //         //console.log('starting cola', Date.now());
+            //     //     },
+            //     //     stop: function () {
+            //     //         //console.log('stop cola', Date.now());
+            //     //     }
+            //     // });
+            //
+            //
+            // }
+            //
+            // currentLayout.run();
 
 
         // sg.layout({ name: 'cose',
