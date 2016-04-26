@@ -14,6 +14,9 @@ public class MaterialColor extends Component {
     private float freq;
     private float phase;
 
+    public MaterialColor() {
+        this(0,0,0);
+    }
     public MaterialColor(float r, float g, float b) {
         this.fillColor = new Color3f(r, g, b);
         //this.a = 1f;
@@ -26,7 +29,8 @@ public class MaterialColor extends Component {
         return this;
     }
 
-    public void set(Color3f target, float t) {
+    /** called by the renderer to set the current palette color */
+    public void use(Color3f target, float t) {
         target.set(fillColor);
         if (freq!=0) {
             float amp = 0.5f * ((float)Math.cos(t) + 1.0f);
@@ -36,4 +40,9 @@ public class MaterialColor extends Component {
         }
 
     }
+
+    public void set(float r, float g, float b) {
+        fillColor.set(r, g, b);
+    }
+
 }

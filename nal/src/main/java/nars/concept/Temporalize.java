@@ -1,5 +1,6 @@
 package nars.concept;
 
+import nars.Global;
 import nars.Op;
 import nars.Premise;
 import nars.nal.meta.PremiseEval;
@@ -421,6 +422,9 @@ public interface Temporalize {
 
         //exception: if reduction results in || which is non-temporal
         if (derived.op() == Op.DISJUNCTION)
+            return derived;
+
+        if (!Global.DEBUG && !derived.op().isTemporal())
             return derived;
 
         return derived.dt(eventDelta * polarity);

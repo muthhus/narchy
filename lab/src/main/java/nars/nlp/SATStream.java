@@ -12,7 +12,7 @@ public class SATStream {
     public static void main(String[] args) throws FileNotFoundException {
         Default d = new Default(1000, 1, 1, 3);
 
-        d.core.activationRate.setValue(0.2f);
+        d.conceptActivation.setValue(0.2f);
         d.perfection.setValue(0.5f);
         d.premiser.confMin.setValue(0.1f);
 

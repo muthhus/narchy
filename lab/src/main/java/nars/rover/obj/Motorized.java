@@ -8,14 +8,15 @@ public class Motorized extends Component {
 
     public float left, right, fore, back;
 
-    public float linearSpeed = 35;
-    public float angularSpeed = 25;
+    public float linearSpeed = 55;
+    public float angularSpeed = 35;
 
     public float stop(float s) {
-        left *= (1f - s);
+        //TODO these need to be balanced because this method naively affects one polarity more than another
+        /*left *= (1f - s);
         right *= (1f - s);
         fore *= (1f - s);
-        back *= (1f - s);
+        back *= (1f - s);*/
         return s;
     }
 
@@ -39,4 +40,7 @@ public class Motorized extends Component {
         return l;
     }
 
+    public void clear() {
+        left = right = fore = back = 0;
+    }
 }

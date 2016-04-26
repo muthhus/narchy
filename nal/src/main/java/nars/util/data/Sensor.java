@@ -160,8 +160,8 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
 //        }
 
 
-        float f = v;
-        float c = confFactor;
+        float f = freq(v);
+        float c = conf(v);
         //float f = 1f;
         //float c = v;
 
@@ -169,6 +169,13 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
         Task t = newInputTask(f, c, now);
         nar.input(t);
         return t;
+    }
+
+    protected float conf(float v) {
+        return confFactor;
+    }
+    protected float freq(float v) {
+        return v;
     }
 
     @NotNull
@@ -198,7 +205,7 @@ public class Sensor implements Consumer<NAR>, DoubleSupplier {
     
     /** sets default confidence */
     @NotNull
-    public Sensor conf(float conf) {
+    public Sensor confDefault(float conf) {
         this.confFactor = conf;
         return this;
     }

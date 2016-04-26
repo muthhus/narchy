@@ -102,7 +102,7 @@ public class VisionRay extends Component implements LayerDraw {
 
 
     public void onTouch(Body touched, float di) {
-        if (touched == null) return;
+        if (touched == null || !eats) return;
 
 //        if (isEating() && touched.getUserData() instanceof Sim.Edible) {
 //
@@ -111,9 +111,17 @@ public class VisionRay extends Component implements LayerDraw {
 //            //if (eats) {
 //
 //
-//            if (di <= biteDistanceThreshold) {
-//                bot.eat(touched);
-//            }
+            if (di <= biteDistanceThreshold) {
+                //bot.eat(touched);
+                Entity eaten = (Entity)(touched.getUserData());
+                Edible e = eaten.getComponent(Edible.class);
+                if (e!=null) {
+                    Entity eater = (Entity) (base.getUserData());
+                    Health h = eater.getComponent(Health.class);
+                    h.ingest(e);
+                }
+
+            }
 //
 //                            /*} else if (di <= tasteDistanceThreshold) {
 //                                //taste(touched, di );
@@ -122,9 +130,6 @@ public class VisionRay extends Component implements LayerDraw {
 //        }
     }
 
-    protected boolean isEating() {
-        return eats;
-    }
 
 
     public final class RayDrawer extends RayCastClosestCallback implements RayCastCallback {
@@ -153,7 +158,7 @@ public class VisionRay extends Component implements LayerDraw {
 
             //ignore self:
             if (body == base) return 1;
-            Object userData = body.getUserData();
+            //Object userData = body.getUserData();
 
 //            if (userData!=null && (userData instanceof Being.BeingMaterial) && userData.toString().equals(bot.id))
 //                return -1;

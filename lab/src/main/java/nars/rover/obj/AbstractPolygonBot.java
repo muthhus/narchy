@@ -17,9 +17,6 @@ public abstract class AbstractPolygonBot {
 //        super(id);
 //    }
 
-
-
-
     static float linearDamping = 1.2f;
     static float angularDamping = 1.2f;
     static float restitution = 0.9f; //bounciness
@@ -130,21 +127,6 @@ public abstract class AbstractPolygonBot {
 ////        }
 //    }
 
-    protected void onEat(Body eaten, Material m) {
-
-    }
-
-    public void eat(Body eaten) {
-        Material m = (Material)eaten.getUserData();
-
-        onEat(eaten, m);
-
-        @Deprecated int sz = 48;
-        float x = (float) Math.random() * sz - sz / 2f;
-        float y = (float) Math.random() * sz - sz / 2f;
-        //random new position
-        eaten.setTransform(new Vec2(x * 2.0f, y * 2.0f), eaten.getAngle());
-    }
 
 
 
@@ -179,15 +161,10 @@ public abstract class AbstractPolygonBot {
 //
 //    }
 
-
-
-
-
-
-    @FunctionalInterface
-    public interface ConceptDesire {
-        float getDesire(Concept c);
-    }
+//    @FunctionalInterface
+//    public interface ConceptDesire {
+//        float getDesire(Concept c);
+//    }
 
 
 //    /** maps a scalar changing quality to a frequency value, with autoranging

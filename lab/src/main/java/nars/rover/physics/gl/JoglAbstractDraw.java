@@ -143,7 +143,7 @@ public abstract class JoglAbstractDraw extends DebugDraw {
             Entity e = (Entity)o;
             MaterialColor matCol = e.getComponent(MaterialColor.class);
             if (matCol!=null) {
-                matCol.set(fillColor, time);
+                matCol.use(fillColor, time);
             }
         }
         if (o instanceof DrawProperty) {

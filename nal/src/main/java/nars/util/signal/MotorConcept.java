@@ -65,7 +65,7 @@ public class MotorConcept extends OperationConcept implements Consumer<NAR>, Flo
 
 
         FloatToFloatFunction motivationToFeedback = (f) -> {
-            return 0.5f + (f / 2f);
+            return f;//0.5f + f; //(f / 2f);
         };
         feedback = new Sensor(n, this, this, motivationToFeedback) {
             @Override
@@ -79,6 +79,16 @@ public class MotorConcept extends OperationConcept implements Consumer<NAR>, Flo
                 Task t = super.newInputTask(f, c, now);
                 t.log("Motor Feedback");
                 return t;
+            }
+
+            @Override
+            protected float freq(float v) {
+                return v < 0.5f ? 0 : 1;
+            }
+
+            @Override
+            protected float conf(float v) {
+                return 0.99f* (v < 0.5f ? (1f - v) : v);
             }
 
             @Override
@@ -96,7 +106,7 @@ public class MotorConcept extends OperationConcept implements Consumer<NAR>, Flo
         //  equal the expectation of activation, by default. this creates a balanced self-cancelling feedback
         //  loop when a motor function returns a feedback equal to the activation it received
         //ex: activation
-        feedback.conf(0.9f);
+        feedback.confDefault(0.99f);
         //feedback.maxTimeBetweenUpdates(1);
 
         setMotor(motor);

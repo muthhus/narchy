@@ -10,6 +10,7 @@ import nars.$;
 import nars.Global;
 import nars.NAR;
 import nars.budget.UnitBudget;
+import nars.nal.Tense;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -38,7 +39,7 @@ public class NARover extends AbstractPolygonBot {
 
     //final Lobjects objs;
 
-    float hungry, sick;
+    final Health health;
     final SensorConcept speedFore, speedBack, leftSpeed, rightSpeed,
             hungrySensor, sickSensor;
 
@@ -71,16 +72,17 @@ public class NARover extends AbstractPolygonBot {
         @Deprecated Body torso = e.getComponent(Physical.class).body;
         @Deprecated Motorized motor = e.getComponent(Motorized.class);
 
+        health = e.getComponent(Health.class);
+        nar.onFrame((nn)->{
+            health.update();
+        });
+
         gun = new Turret();
 
 
         int minUpdateTime = 2;
         int maxUpdateTime = 16;
 
-
-
-        hungry = 1f;
-        sick = 0f;
 
         FloatToFloatFunction speedThresholdToFreq = (speed) -> {
             return speed < 0.01 ? 0 : Util.clamp(0.5f + speed);
@@ -95,10 +97,10 @@ public class NARover extends AbstractPolygonBot {
             return n < 0 ? Util.sigmoid(-n) : -1; //Float.NaN;
         };
         FloatToFloatFunction linearPositive = (n) -> {
-            return n > 0 ? Util.clamp(n) : -1; //Float.NaN;
+            return n > 0 ? Util.clamp(0.5f + n/2f) : -1; //Float.NaN;
         };
         FloatToFloatFunction linearNegative = (n) -> {
-            return n < 0 ? Util.clamp(-n) : -1; //Float.NaN;
+            return n < 0 ? Util.clamp(0.5f + (-n)/2f) : -1; //Float.NaN;
         };
 
         Vec2 forwardVec = new Vec2(1, 0f);
@@ -148,43 +150,47 @@ public class NARover extends AbstractPolygonBot {
         this.rightSpeed = new SensorConcept(SPEED_RIGHT, nar, angleSpeed, linearNegative)
                 .timing(minUpdateTime, maxUpdateTime);
 
-        hungrySensor = new SensorConcept(EAT_FOOD, nar, () -> 1f - hungry, linearPositive)
+        hungrySensor = new SensorConcept(EAT_FOOD, nar, () -> 1f - health.nutrition, linearPositive)
                 .timing(minUpdateTime, 0);
 
-        sickSensor = new SensorConcept(EAT_POISON, nar, () -> sick, linearPositive)
+        sickSensor = new SensorConcept(EAT_POISON, nar, () -> health.damage, linearPositive)
                 .timing(minUpdateTime, maxUpdateTime);
 
         float motorThresh = 0.5f;
 
         int minMotorFeedbackCycles = 1; ////nar.duration() / 2;
-        int maxMotorFeedbackCycles = 3; //nar.duration() * 3;
+        int maxMotorFeedbackCycles = 1; //nar.duration() * 3;
 
-        MotorConcept motorLeft = new MotorConcept("motor(left)", nar, (b,a) -> {
+        MotorConcept motorLeft = new MotorConcept("motor(left)", nar, (b,l) -> {
             //if (a < 0) return Float.NaN;
-            return a < motorThresh ? -1 : motor.left(a);
+            if (b > l-0.05) l = 0;
+            return motor.left(l = (l < motorThresh) ? 0 : l);
         }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
 
-        MotorConcept motorRight = new MotorConcept("motor(right)", nar, (b,a) -> {
+        MotorConcept motorRight = new MotorConcept("motor(right)", nar, (b,l) -> {
             //if (a < 0) return Float.NaN;
-            return a < motorThresh ? -1 : motor.right(a);
+            if (b > l-0.05) l = 0;
+            return motor.right(l = (l < motorThresh) ? 0 : l);
         }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
 
         MotorConcept motorFore = new MotorConcept("motor(fore)", nar, (b,l) -> {
             //if (l < 0) return Float.NaN;
-            return l < motorThresh ? -1 : motor.forward(l);
+            if (b > l-0.05) l = 0;
+            return motor.forward(l = (l < motorThresh) ? 0 : l);
         }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
         ;
 
         MotorConcept motorBack = new MotorConcept("motor(back)", nar, (b,l) -> {
             //if (l < 0) return Float.NaN;
-            return l < motorThresh ? -1: motor.backward(l);
+            if (b > l-0.05) l = 0;
+            return motor.backward(l = (l < motorThresh) ? 0 : l);
         }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
         ;
 
         MotorConcept motorStop = new MotorConcept("motor(stop)", nar, (b,s) -> {
             //if (s < 0) return Float.NaN;
-            if (s < motorThresh) return -1;
-            return motor.stop(s);
+            if (s < motorThresh) return 0;
+            return motor.stop(1);
         }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
         ;
 
@@ -195,7 +201,7 @@ public class NARover extends AbstractPolygonBot {
                     return s;
                 }
             }
-            return -1; //unfired;
+            return Float.NaN; //unfired;
 
         }).setFeedbackTiming(minMotorFeedbackCycles, maxMotorFeedbackCycles);
         ;
@@ -301,8 +307,7 @@ public class NARover extends AbstractPolygonBot {
 //                //nar.input("eat:food. :|: %0.00;0.75%");
 //                //nar.input("eat:poison. :|: %0.00;0.75%");
 //
-//                nar.goal(EAT_FOOD, Tense.Present, 1f, 0.9f);//"eat:food! %1.00|0.95%");
-//                nar.goal(EAT_POISON, Tense.Present, 0f, 0.9f);
+
 //
 //                //nar.input("speed:forward! %1.00;0.7%");
 //                //nar.input("eat:poison! %0.0|0.9%");

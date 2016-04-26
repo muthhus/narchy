@@ -174,9 +174,9 @@ public class WebServer /*extends PathHandler*/ {
         NAR nar = newRealtimeNAR();
 
         nar.input("a:b. b:c. c:d! ");
-        nar.conceptRemembering.setValue(500);
-        nar.termLinkRemembering.setValue(2000);
-        nar.taskLinkRemembering.setValue(1000);
+        nar.conceptRemembering.setValue(5 * 1000);
+        nar.termLinkRemembering.setValue(20 * 1000);
+        nar.taskLinkRemembering.setValue(10 * 1000);
 
         new WebServer(nar, 10, httpPort);
 
