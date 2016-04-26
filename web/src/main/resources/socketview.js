@@ -78,8 +78,8 @@ function SocketSpaceGraph(path, idFunc, nodeFunc) {
         animate: false,
         randomize: false, // uses random initial node positions on true
         fit: false,
-        maxFruchtermanReingoldIterations: 2, // Maximum number of initial force-directed iterations
-        maxExpandIterations: 1, // Maximum number of expanding iterations
+        maxFruchtermanReingoldIterations: 25, // Maximum number of initial force-directed iterations
+        maxExpandIterations: 5, // Maximum number of expanding iterations
 
         ready: function () {
             //console.log('starting cola', Date.now());
@@ -88,7 +88,7 @@ function SocketSpaceGraph(path, idFunc, nodeFunc) {
             //console.log('stop cola', Date.now());
         }
     });
-    var layoutUpdatePeriodMS = 200;
+    var layoutUpdatePeriodMS = 300;
     currentLayout.run();
     setInterval(function() {
         currentLayout.stop();
@@ -165,8 +165,8 @@ function SocketSpaceGraph(path, idFunc, nodeFunc) {
 
             var newNodeSet = new Set();
 
-            var newNodes = [];
-            var newEdges = [];
+            var nodesToShow = [];
+            var edgesToShow = [];
 
             //console.log(prev.size, 'previously');
             _.each(v.seq, function(x) {
@@ -176,7 +176,7 @@ function SocketSpaceGraph(path, idFunc, nodeFunc) {
                 //if (!toRemove.delete(id)) {
 
                 /** nodeFunc can return false to cause any previous node to be removed */
-                if (nodeFunc(id, x, newNodes, newEdges)!==false) {
+                if (nodeFunc(id, x, nodesToShow, edgesToShow)!==false) {
                     nodesToRemove.delete(id);
                 }
                 newNodeSet.add(id);
@@ -188,7 +188,7 @@ function SocketSpaceGraph(path, idFunc, nodeFunc) {
 
             var edgesToRemove = view.edgesShown || new Set() /* empty */;
 
-            _.each(newEdges, function(e) { edgesToRemove.delete(e.id); });
+            _.each(edgesToShow, function(e) { edgesToRemove.delete(e.id); });
 
             //console.log(prev.size, 'to delete');
 
@@ -200,32 +200,29 @@ function SocketSpaceGraph(path, idFunc, nodeFunc) {
                     sg.removeNodes(Array.from(nodesToRemove));
                     changed = true;
                 }
-                if (newNodes.length > 0) {
+                if (nodesToShow.length > 0) {
                     //sg.addNodes(newNodes);
-                    _.each(newNodes, function (n) {
-                        sg.addNode(n);
-                    });
+                    _.each(nodesToShow, sg.addNode);
+
                     changed = true;
                 }
             });
 
-            var newEdgeSet = new Set();
+            var shownEdgeSet = new Set();
 
             sg.batch(function() {
 
                 if (edgesToRemove.length > 0) {
-                    _.each(edgesToRemove, function (e) {
-                        sg.removeEdge(e);
-                    });
+                    _.each(edgesToRemove, sg.removeEdge);
                     changed = true;
                 }
 
-                if (newEdges.length > 0) {
-                    _.each(newEdges, function (e) {
-                        var tt = e.target;
-                        if (sg.get(tt)) {
+                if (edgesToShow.length > 0) {
+                    _.each(edgesToShow, function (e) {
+                        var target = e.target;
+                        if (sg.get(target)) { //if target exists
                             sg.addEdge(e);
-                            newEdgeSet.add(e.id)
+                            shownEdgeSet.add(e.id);
                         }
                     });
                     changed = true;
@@ -240,52 +237,8 @@ function SocketSpaceGraph(path, idFunc, nodeFunc) {
 
 
             view.nodesShown = newNodeSet;
-            view.edgesShown = newEdgeSet;
+            view.edgesShown = shownEdgeSet;
         }
     );
 }
 
-function SocketNARGraph(path) {
-    return SocketSpaceGraph(path, function(x) { return x[1]; },
-        function(id, x, newNodes, newEdges) {
-            var pri = x[2];
-            var qua = x[4];
-            var baseSize = 32, extraSize = 132;
-            newNodes.push({
-                 id: id,
-                 label: id,
-                 style: {
-                     width: baseSize + extraSize * pri,
-                     height: baseSize + extraSize * pri,
-                     'background-color': //'HSL(' + parseInt( (0.1 * qua + 0.4) * 100) + '%, 60%, 60%)',
-                            "rgb(" + ((0.5 + 0.5 * qua) * 255) + ", 128, 128)",
-                     'background-opacity': 0.25 + pri * 0.75
-                 }
-             });
-
-            var termlinks = x[5];
-            _.each(termlinks.seq, function(e) {
-                if (!(e = e.seq))
-                    return;
-
-                var target = e[1];
-                var tlpri = e[2];
-                var tlqua = e[4];
-
-                newEdges.push({
-                    id: 'tl' + '_' + id + '_' + target, source: id, target: target,
-                    style: {
-                        'line-color':
-                            "rgb(128,128," + ((0.5 + 0.5 * qua) * 255) + ")",
-                            //'orange',
-                        'curve-style': 'segments', //(tlpri > 0.5) ? 'segments' : 'haystack',
-                        'opacity': 0.25 + tlpri * 0.75,
-                        'width': 2 + 6 * tlpri,
-                        'mid-target-arrow-shape': 'triangle'
-                    }
-                });
-            });
-
-        }
-    );
-}

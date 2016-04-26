@@ -286,7 +286,8 @@ function spacegraph(targetWrapper, opt) {
              console.log( 'tapped ' + node.id() );*/
 
             var target = e.cyTarget;
-            if (target) {
+            var widget = target.data('widget');
+            if (widget) {
                 setTimeout(updateWidget, 0, target);
                 //console.log(this, that, target);
                 //that.commit();
@@ -503,6 +504,8 @@ function spacegraph(targetWrapper, opt) {
             css.shape = d.shape;
         //}
 
+
+
         return w;
     }
 
@@ -638,13 +641,19 @@ function spacegraph(targetWrapper, opt) {
     };
 
     s.addNode = function(n) {
-        var ee = this.get(n.id);
+        var ee = s.get(n.id);
         var se = spacegraphToCytoscape(n);
+
         if (!ee) {
-            //s.addEdges([e]);
             s.add(se);
         } else {
             ee.data(se);
+
+            if (n.style) {
+                _.each(n.style, function(v, k) {
+                    ee.css(k, v);
+                });
+            }
         }
     };
 
@@ -672,14 +681,17 @@ function spacegraph(targetWrapper, opt) {
 
 
     s.addEdge = function(e) {
-        var ee = s.get(e.id);
-        var se = spacegraphToCytoscape(e);
-        if (!ee) {
-            //s.addEdges([e]);
-            s.add(se);
-        } else {
-            ee.data(se);
-        }
+        return s.addNode(e);
+        // var ee = s.get(e.id);
+        // var se = spacegraphToCytoscape(e);
+        // if (!ee) {
+        //     //s.addEdges([e]);
+        //     s.add(se);
+        //     return true;
+        // } else {
+        //     ee.data(se);
+        //     return false;
+        // }
     };
 
     s.addEdges = function(ee) {
@@ -698,7 +710,7 @@ function spacegraph(targetWrapper, opt) {
 
         var that = this;
 
-        this.batch(function() {
+        s.batch(function() {
 
             var e = {
                 nodes: c.data.nodes ? c.data.nodes.map(spacegraphToCytoscape) : [], // c.data.nodes,
@@ -807,7 +819,7 @@ function spacegraph(targetWrapper, opt) {
         var cid = c.id();
 
         //var nodesBefore = this.nodes().size();
-        var existing = this.channels[cid];
+        var existing = s.channels[cid];
         if (existing) {
             if (existing == c) {
                 this.updateChannel(c);
@@ -856,7 +868,7 @@ function spacegraph(targetWrapper, opt) {
 
 
     s.removeNode = function(id) {
-        this.get(id).remove();
+        s.get(id).remove();
     };
 
     s.removeNodes = function(ids) {
@@ -873,11 +885,11 @@ function spacegraph(targetWrapper, opt) {
 
         c.off();
 
-        this.removeNode(c.id());
+        s.removeNode(c.id());
 
         //TODO remove style
 
-        delete this.channels[c.id()];
+        delete s.channels[c.id()];
         //c.destroy();
 
         //s.layout();
@@ -885,7 +897,7 @@ function spacegraph(targetWrapper, opt) {
     };
 
     s.commit = _.throttle(function() {
-        var cc = this.channels;
+        var cc = s.channels;
         for (var i in cc)
             cc[i].commit();
     }, commitPeriodMS);

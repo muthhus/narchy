@@ -1111,8 +1111,9 @@
                         var p1, p2, f;
 
                         for (var i = 0; i < hes.length; ++i) {
-                            p1 = hes[i].getEndpoint();
-                            p2 = hes[i].getStartpoint();
+                            var hh = hes[i];
+                            p1 = hh.getEndpoint();
+                            p2 = hh.getStartpoint();
 
                             area += p1.x * p2.y;
                             area -= p1.y * p2.x;
@@ -1156,10 +1157,11 @@
 
                         pData['vertices'] = [];
                         for (var i = 0; i < fv.length; ++i) {
+                            var ff = fv[i];
                             pData['vertices'].push({
-                                id: fv[i].label,
-                                x: fv[i].x,
-                                y: fv[i].y
+                                id: ff.label,
+                                x: ff.x,
+                                y: ff.y
                             });
                         }
                     };
