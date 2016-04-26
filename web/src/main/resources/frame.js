@@ -74,7 +74,7 @@ function NodeFrame(spacegraph) {
                     frameEle.hide();
                     frameVisible = true;
                     frameEle[0].style.width = undefined; //reset width
-                    frameEle.fadeIn();
+                    frameEle.show();
                     f.hovered = target;
 
                     //f.hovered.lock();
@@ -104,18 +104,17 @@ function NodeFrame(spacegraph) {
 
             var that = this;
             if (frameVisible) {
-                if (!that.currentlyVisible) {
-                    that.currentlyVisible = true;
+                if (!this.currentlyVisible) {
+                    this.currentlyVisible = true;
                     frameEle[0].style.width = undefined; //reset width
-                    frameEle.fadeIn();
+                    frameEle.show();
                 }
             }
             else {
                 if ((frameHiding === -1) && (this.currentlyVisible) && !frameEleResizing) {
                     frameHiding = setTimeout(function () {
                         //if still set for hiding, actually hide it
-                        if (frameEleResizing) return;
-                        if (!frameVisible) {
+                        if (!frameEleResizing && !frameVisible) {
                             frameEle.fadeOut(function () {
                                 f.hovered = null;
                                 frameEleNode = null;
@@ -195,9 +194,9 @@ function NodeFrame(spacegraph) {
 
                             event.stopPropagation();
 
-                            var node = frameEleNode;
-                            if (node !== this.originalNode)
-                                return;
+                            var node = this.originalNode; //frameEleNode;
+                            /*if (node !== this.originalNode)
+                                return;*/
 
                             var oos = this.originalOffset;
                             var dx = parseFloat(ui.offset.left - oos[0]);
@@ -225,7 +224,14 @@ function NodeFrame(spacegraph) {
                             });
                             ncy.endBatch();
 
-                            setTimeout(nodeFrame.hoverUpdate, 0);
+
+                            frameVisible = true;
+                            nodeFrame.currentlyVisible = true;
+                            f.hovered = node;
+                            
+                            nodeFrame.hoverUpdate();
+                            //setTimeout(nodeFrame.hoverUpdate, 0);
+
                         },
                         stop: function (event, ui) {
                             frameEle[0].style.width = undefined; //reset width

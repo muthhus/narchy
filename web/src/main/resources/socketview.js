@@ -270,11 +270,14 @@ function SocketNARGraph(path) {
 
                 var target = e[1];
                 var tlpri = e[2];
+                var tlqua = e[4];
 
                 newEdges.push({
                     id: 'tl' + '_' + id + '_' + target, source: id, target: target,
                     style: {
-                        'line-color': 'orange',
+                        'line-color':
+                            "rgb(128,128," + ((0.5 + 0.5 * qua) * 255) + ")",
+                            //'orange',
                         'curve-style': 'segments', //(tlpri > 0.5) ? 'segments' : 'haystack',
                         'opacity': 0.25 + tlpri * 0.75,
                         'width': 2 + 6 * tlpri,

@@ -533,7 +533,7 @@ function spacegraph(targetWrapper, opt) {
             ph = parseFloat(node.renderedHeight());
         }
         catch (e) {
-            console.error(e);
+            
             return;
 
         }
