@@ -27,6 +27,16 @@ import static nars.nal.UtilityFunctions.or;
  * https://en.wikipedia.org/wiki/Closest_pair_of_points_problem
  * http://rosettacode.org/wiki/Closest-pair_problem#Java
  * http://algs4.cs.princeton.edu/99hull/ClosestPair.java.html
+ *
+ * <sseehh__> the space it forms wouldnt be representable geometrically
+ <sseehh__> necessarily
+ <sseehh__> because the distance is a function of the two points only and these arent consistnt in the vector space
+ <sseehh__> it only wants to find the closest pair
+ <sseehh__> so i shrink the apparent distance as time is farther from now
+ <sseehh__> like a perspective drawing
+ <sseehh__> allowing the least timely tasks to get paired and combined
+ <sseehh__> or, least timely in conjunction with other qualities like inconfidence etc
+ <sseehh__> so its a blend of these that produces the effect i wanted
  */
 public class Revection {
 
@@ -62,7 +72,6 @@ public class Revection {
 
             Task ii = tl.get(i);
 
-
             //consider ii for being the weakest ranked task to remove
             float r = rankTemporalByConfidenceAndOriginality(ii, now, now, 1f, -1);
             if (r < wr) {
@@ -71,20 +80,16 @@ public class Revection {
             }
 
             for (int j = i+1; j < n; j++) {
-
-                if (i == j)
-                    continue;
-
-                Task jj = tl.get(j);
-                if ((i == j) || (Stamp.overlapping(ii, jj))) {
-                    continue;
-                } else {
-                    float d = distance(ii, jj, now, bestDist);
-                    if (d < bestDist) {
-                        bestDist = d;
-                        a = ii;
-                        b = jj;
-                        continue;
+                if (i != j) {
+                    Task jj = tl.get(j);
+                    if (!Stamp.overlapping(ii, jj)) {
+                        float d = distance(ii, jj, now, bestDist);
+                        if (d < bestDist) {
+                            bestDist = d;
+                            a = ii;
+                            b = jj;
+                            continue;
+                        }
                     }
                 }
 
