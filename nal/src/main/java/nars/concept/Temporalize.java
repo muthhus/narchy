@@ -425,7 +425,7 @@ public interface Temporalize {
             return derived;
 
         if (!Global.DEBUG && !derived.op().isTemporal())
-            return derived;
+            return derived; //disregard dt if not in debug mode
 
         return derived.dt(eventDelta * polarity);
     }

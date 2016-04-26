@@ -15,6 +15,7 @@
     "cytoscape-cola":"latest",
     "semantic": "latest",
     "object-editor": "latest",
+    "ace-builds": "latest",
     "metawidget": "latest"
   },
   "keywords": [
