@@ -223,7 +223,7 @@ function SocketSpaceGraph(path, idFunc, nodeFunc) {
                 if (newEdges.length > 0) {
                     _.each(newEdges, function (e) {
                         var tt = e.target;
-                        if (sg.getNode(tt)) {
+                        if (sg.get(tt)) {
                             sg.addEdge(e);
                             newEdgeSet.add(e.id)
                         }

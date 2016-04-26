@@ -92,28 +92,29 @@ public class WebServer /*extends PathHandler*/ {
                                 .setDirectoryListingEnabled(true)
                                 .addWelcomeFiles("index.html")
                         )
-                        .addPrefixPath("/ws", socket(new NarseseIOService(nar)))
+                        .addPrefixPath("/terminal", socket(new NarseseIOService(nar)))
                         .addPrefixPath("/emotion", socket(new EvalService(nar, "emotion", 500)))
-                        .addPrefixPath("/active", socket(new TopConceptService<Object[]>(nar, 1000, 64) {
+                        .addPrefixPath("/active", socket(new TopConceptService<Object[]>(nar, 1000, 32) {
 
                             @Override
-                            Object[] summarize(BLink<? extends Concept> bc) {
+                            Object[] summarize(BLink<? extends Concept> bc, int n) {
                                 Concept c = bc.get();
                                 return new Object[] {
                                     c.toString(), //ID
                                     n(bc.pri()), n(bc.dur()), n(bc.qua()),
-                                    termLinks(c)
+                                    termLinks(c, (int)Math.ceil(((float)n/maxConcepts.intValue())*(maxTermLinks-minTermLinks)+minTermLinks) )
                                     //TODO tasklinks, beliefs
                                 };
                             }
 
                             final int maxTermLinks = 4;
+                            final int minTermLinks = 1;
 
-                            private Object[] termLinks(Concept c) {
+                            private Object[] termLinks(Concept c, int num) {
                                 Bag<Termed> b = c.termlinks();
-                                Object[] tl = new Object[ Math.min(maxTermLinks, b.size() )];
+                                Object[] tl = new Object[ Math.min(num, b.size() )];
                                 final int[] n = {0};
-                                b.forEach(maxTermLinks, t -> {
+                                b.forEach(num, t -> {
                                     tl[n[0]++] = new Object[] {
                                        t.get().toString(), //ID
                                        n(t.pri()), n(t.dur()), n(t.qua())
@@ -171,10 +172,11 @@ public class WebServer /*extends PathHandler*/ {
         int httpPort = args.length < 1 ? 8080 : Integer.parseInt(args[0]);
 
         NAR nar = newRealtimeNAR();
-        nar.input("a:b. b:c. c:d.");
+
+        nar.input("a:b. b:c. c:d! ");
         nar.conceptRemembering.setValue(500);
-        nar.termLinkRemembering.setValue(10000);
-        nar.taskLinkRemembering.setValue(5000);
+        nar.termLinkRemembering.setValue(2000);
+        nar.taskLinkRemembering.setValue(1000);
 
         new WebServer(nar, 10, httpPort);
 

@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 abstract public class TopConceptService<O> extends SynchWebsocketService {
 
     private final NAR nar;
-    private final MutableInteger maxConcepts;
+    protected final MutableInteger maxConcepts;
 
     final AtomicBoolean ready = new AtomicBoolean(true);
     private List<O> lPrev = null;
@@ -37,8 +37,9 @@ abstract public class TopConceptService<O> extends SynchWebsocketService {
                 int n = maxConcepts.intValue();
 
                 List<O /*ConceptSummary*/> l = Global.newArrayList(n);
+                final int[] i = {0};
                 ((Default)nar).core.active.forEach(n, c -> {
-                    l.add( summarize(c) );
+                    l.add( summarize(c, i[0]++) );
                 });
 
                 if (lPrev!=null && lPrev.equals(l)) {
@@ -57,5 +58,5 @@ abstract public class TopConceptService<O> extends SynchWebsocketService {
         }
     }
 
-    abstract O summarize(BLink<? extends Concept> c);
+    abstract O summarize(BLink<? extends Concept> c, int n);
 }

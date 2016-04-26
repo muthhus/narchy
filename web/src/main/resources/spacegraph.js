@@ -243,9 +243,9 @@ function spacegraph(targetWrapper, opt) {
     target.attr('oncontextmenu', "return false;");
 
     var commitPeriodMS = 100;
-    var widgetUpdatePeriodMS = 10;
+    var widgetUpdatePeriodMS = 5;
     var suppressCommit = false;
-    var zoomDuration = 64; //ms
+    var zoomDuration = 128; //ms
 
 
     var ready = function() {
@@ -261,13 +261,18 @@ function spacegraph(targetWrapper, opt) {
 
 
 
-        var updateAllWidgets = this.updateAllWidgets = _.throttle(function() {
+        var updateAllWidgets = this.updateAllWidgets = (/*_.throttle(*/function() {
 
-            if (suppressCommit) return;
+            if (suppressCommit)
+                return;
 
-            that.nodes().each(refresh);
+            that.nodes().filterFn(function( ele ){
+                if (ele.data('widget') !== undefined)
+                    updateWidget(ele);
+            });
+            //that.each(refresh);
 
-        }, widgetUpdatePeriodMS);
+        }); //, widgetUpdatePeriodMS);
 
 
         this.on('data position select unselect add remove grab drag style', function (e) {
@@ -282,7 +287,7 @@ function spacegraph(targetWrapper, opt) {
 
             var target = e.cyTarget;
             if (target) {
-                refresh(target);
+                setTimeout(updateWidget, 0, target);
                 //console.log(this, that, target);
                 //that.commit();
             }
@@ -324,19 +329,17 @@ function spacegraph(targetWrapper, opt) {
 //            }        
     };
 
-    function widget(node) {
-        return node.data ? node.data().widget : undefined;
-    }
+    function updateWidget(target, target2) {
+        if (target2)
+            target = target2; //extra parameter to match the callee's list
 
-    function refresh(target, target2) {
-        if (target2) target = target2; //extra parameter to match the callee's list
-
-        if (widget(target)) {
-            var data = target.data();
-            if (!data.updating) {
-                data.updating = setTimeout(s.updateNodeWidget, widgetUpdatePeriodMS, target); //that.updateNodeWidget(target);
-            }
-        }
+        //if (widget(target)) {
+            //var data = target.data();
+            s.updateNodeWidget(target); //that.updateNodeWidget(target);
+            //if (!data.updating) {
+                //data.updating = setTimeout(s.updateNodeWidget, widgetUpdatePeriodMS, target); //that.updateNodeWidget(target);
+            //}
+        //}
     }
 
     opt = _.defaults(opt, {
@@ -388,7 +391,8 @@ function spacegraph(targetWrapper, opt) {
                     'text-valign': 'center',
                     'text-halign': 'center',
                     'color': '#fff',
-                    //'shadow-blur': 0
+                    'shadow-blur': 0,
+                    'shadow-opacity': 0,
                     'min-zoomed-font-size': 10,
                     /*'text-background-opacity': 1,
                     'text-background-color': '#ccc',
@@ -424,7 +428,7 @@ function spacegraph(targetWrapper, opt) {
         handleLineType: 'ghost', // can be 'ghost' for real edge, 'straight' for a straight line, or 'draw' for a draw-as-you-go line
         handleLineWidth: 1, // width of handle line in pixels
         handleNodes: 'node', // selector/filter function for whether edges can be made from a given node
-        hoverDelay: 150, // time spend over a target node before it is considered a target selection
+        hoverDelay: 75, // time spend over a target node before it is considered a target selection
         cxt: true, // whether cxt events trigger edgehandles (useful on touch)
         enabled: true, // whether to start the plugin in the enabled state
         toggleOffOnLeave: true, // whether an edge is cancelled by leaving a node (true), or whether you need to go over again to cancel (false; allows multiple edges in one pass)
@@ -490,7 +494,7 @@ function spacegraph(targetWrapper, opt) {
 
 
     /** adapts spacegraph node to cytoscape node */
-    function nodeSpacegraphToCytoscape(d) {
+    function spacegraphToCytoscape(d) {
         var w = { data: d };
 
         var css = w.css = d.style || {};
@@ -506,28 +510,35 @@ function spacegraph(targetWrapper, opt) {
 
         node = nodeOverride || node;
 
-        var data = node.data();
-
-        //if (!widget) return;
-
-        data.updating = null;
-
-        s.positionNodeHTML(node, node.data('widget_element'), data.widget);
+        var widget = node.data('widget');
+        if (widget)
+            s.positionNodeHTML(node, widget);
 
     };
 
 
     /** html=html dom element */
-    s.positionNodeHTML = function(node, html, widget) {
-
+    s.positionNodeHTML = function(node, widget) {
+        var h = widget.element || widget;
 
         var pixelScale=widget.pixelScale,
             minPixels= widget.minPixels;
 
         pixelScale = parseFloat(pixelScale) || 128.0; //# pixels wide
 
-        var pw = parseFloat(node.renderedWidth());
-        var ph = parseFloat(node.renderedHeight());
+        var pw, ph;
+
+        try {
+            pw = parseFloat(node.renderedWidth());
+            ph = parseFloat(node.renderedHeight());
+        }
+        catch (e) {
+            console.error(e);
+            return;
+
+        }
+
+
 
         var scale = parseFloat(widget.scale) || 1.0;
 
@@ -542,12 +553,13 @@ function spacegraph(targetWrapper, opt) {
             cw = parseInt(pixelScale*(pw/ph));
         }
 
-        var h = html[0]; // $(html)[0];
+
 
 
         //get the effective clientwidth/height if it has been resized
+        var html = widget; //HACK
         var hs = h.style;
-        if (( html.specWidth  !== hs.width ) || (html.specHeight !== hs.height)) {
+        if ((( html.specWidth !== hs.width ) || (html.specHeight !== hs.height))) {
             var hcw = h.clientWidth;
             var hch = h.clientHeight;
 
@@ -557,6 +569,22 @@ function spacegraph(targetWrapper, opt) {
             cw = hcw;
             ch = hch;
         }
+        if (minPixels) {
+            var hidden = ('none' === hs.display);
+
+            if (Math.min(wy, wx) < minPixels / pixelScale) {
+                if (!hidden) {
+                    hs.display = 'none';
+                    return;
+                }
+            }
+            else {
+                if (hidden) {
+                    hs.display = 'block';
+                }
+            }
+        }
+
 
         //console.log(html[0].clientWidth, cw, html[0].clientHeight, ch);
 
@@ -572,21 +600,7 @@ function spacegraph(targetWrapper, opt) {
         //TODO check extents to determine node visibility for hiding off-screen HTML
         //for possible improved performance
 
-        if (minPixels) {
-            var hidden = ('none' === hs.display);
 
-            if ( Math.min(wy,wx) < minPixels/pixelScale ) {
-                if (!hidden) {
-                    hs.display = 'none';
-                    return;
-                }
-            }
-            else {
-                if (hidden) {
-                    hs.display = 'block';
-                }
-            }
-        }
 
         //console.log(html, pos.x, pos.y, minPixels, pixelScale);
 
@@ -624,37 +638,30 @@ function spacegraph(targetWrapper, opt) {
     };
 
     s.addNode = function(n) {
-        var existing = this.getNode(n.id);
-        if (!existing) {
-            this.addNodes([n]);
+        var ee = this.get(n.id);
+        var se = spacegraphToCytoscape(n);
+        if (!ee) {
+            //s.addEdges([e]);
+            s.add(se);
         } else {
-
-            //var pp = existing.position();
-
-
-            existing.data(nodeSpacegraphToCytoscape(n));
-
-            ///var next = this.getNode(n.id);
-
-            //if (pp) {
-                //existing.position({x: pp.x, y: pp.y});
-            //}
+            ee.data(se);
         }
-
-
     };
+
     s.addNodes = function(nn) {
         //HACK create a temporary channel and run through addChannel
-        var cc = new Channel({
-            nodes: nn
-        });
-        this.addChannel(cc);
-        return cc;
+        // var cc = new Channel({
+        //     nodes: nn
+        // });
+        // this.addChannel(cc);
+        // return cc;
+
+        _.each(nn, s.addNode);
     };
 
 
     s.removeEdge= function(e) {
-        var ee = s.getEdge(e);
+        var ee = s.get(e);
 
         if (ee) {
             ee.remove();
@@ -665,22 +672,24 @@ function spacegraph(targetWrapper, opt) {
 
 
     s.addEdge = function(e) {
-        var ee = e.id ? undefined : s.getEdge(e.id);
+        var ee = s.get(e.id);
+        var se = spacegraphToCytoscape(e);
         if (!ee) {
-            s.addEdges([e]);
+            //s.addEdges([e]);
+            s.add(se);
         } else {
-            ee.data(nodeSpacegraphToCytoscape(e));
+            ee.data(se);
         }
     };
 
     s.addEdges = function(ee) {
-        //_.each(ee, s.addEdge);
+        _.each(ee, s.addEdge);
 
         //HACK avoid this
         //HACK create a temporary channel and run through addChannel
-        this.addChannel(new Channel({
+        /*this.addChannel(new Channel({
             edges: ee
-        }));
+        }));*/
     };
 
     s.updateChannel = function(c) {
@@ -692,8 +701,8 @@ function spacegraph(targetWrapper, opt) {
         this.batch(function() {
 
             var e = {
-                nodes: c.data.nodes ? c.data.nodes.map(nodeSpacegraphToCytoscape) : [], // c.data.nodes,
-                edges: c.data.edges ? c.data.edges.map(nodeSpacegraphToCytoscape) : [] //c.data.edges
+                nodes: c.data.nodes ? c.data.nodes.map(spacegraphToCytoscape) : [], // c.data.nodes,
+                edges: c.data.edges ? c.data.edges.map(spacegraphToCytoscape) : [] //c.data.edges
             };
 
             if (c.data.style) {
@@ -792,6 +801,7 @@ function spacegraph(targetWrapper, opt) {
     //
     // };
 
+    /** depreated */
     s.addChannel = function(c) {
 
         var cid = c.id();
@@ -833,7 +843,8 @@ function spacegraph(targetWrapper, opt) {
         }
     };
 
-    s.getNode = function(id) {
+    /** get an element (node or edge) */
+    s.get = function(id) {
         //return s.nodes()._private.ids[id];
         var nowpublic = s._private;
         var index = nowpublic.id2index[id];
@@ -842,18 +853,10 @@ function spacegraph(targetWrapper, opt) {
         }
     };
 
-    //deprecated, combine into unified get(id) method for any type of element
-    s.getEdge = function(e) {
-        // var ee = this.edges("[id=\"" + e + "\"]");
-        // if (ee.length == 0)
-        //     return undefined;
-        //
-        // return ee;
-        return this.getNode(e);
-    }
+
 
     s.removeNode = function(id) {
-        this.getNode(id).remove();
+        this.get(id).remove();
     };
 
     s.removeNodes = function(ids) {
@@ -897,15 +900,13 @@ function spacegraph(targetWrapper, opt) {
     s.on('add', function(e) {
 
         var node = e.cyTarget;
-        var data = node.data();
 
-        if (data.widget) {
-
-            var widget = data.widget;
+        var widget = node.data('widget');
+        if (widget) {
 
             var nid = node.id();
 
-            var wEle = node.data('widget_element');
+            var wEle = widget.element;
             if (!wEle) { //if widget doesnt already exists
 
                 var style = widget.style || {};
@@ -917,7 +918,9 @@ function spacegraph(targetWrapper, opt) {
 
                 w.html(widget.html).data('when', Date.now());
 
-                node.data('widget_element', w);
+                widget.element = w[0];
+
+                updateWidget(node);
             }
         }
 
@@ -986,10 +989,10 @@ function spacegraph(targetWrapper, opt) {
     s.on('remove', function(e) {
         var node = e.cyTarget;
 
-        var data = node.data();
-        if (data.widget) {
+        var widget = node.data('widget');
+        if (widget) {
             //remove an associated widget (html div in overlay)
-            node.data('widget_element').remove();
+            widget.element.remove();
         }
     });
 

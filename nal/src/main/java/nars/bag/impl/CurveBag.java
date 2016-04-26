@@ -66,7 +66,10 @@ public class CurveBag<V> implements Bag<V> {
     }
 
     public CurveBag(@NotNull SortedIndex<BLink<V>> items, @NotNull BagCurve curve, @NotNull Random rng) {
-        this(items, new DirectSampler(curve, rng));
+        this(items,
+            //new DirectSampler(curve, rng)
+            new NormalizedSampler(curve, rng)
+        );
     }
 
 

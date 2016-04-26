@@ -10,7 +10,7 @@ function NodeFrame(spacegraph) {
         hovered: null
     };
 
-    var frameTimeToFade = 500; //ms
+    var frameTimeToFade = 200; //ms
     var frameNodePixelScale = 300;
     var frameNodeScale = 1.15;
 
@@ -66,25 +66,34 @@ function NodeFrame(spacegraph) {
                 }
 
                 if (f.hovered !== target) {
+
+                    /*if (f.hovered) {
+                        f.hovered.unlock(); //TODO restore the state it was before locking, which could have been already locked (then we dont want to unlock it)
+                    }*/
+
                     frameEle.hide();
                     frameVisible = true;
                     frameEle[0].style.width = undefined; //reset width
                     frameEle.fadeIn();
                     f.hovered = target;
+
+                    //f.hovered.lock();
                 }
             } else {
                 frameVisible = false;
             }
 
 
-            setTimeout(f.hoverUpdate, 0);
+            f.hoverUpdate();
+            //setTimeout(f.hoverUpdate, 0);
 
         });
 
         f.hide = function () {
             frameVisible = false;
             this.hovered = null;
-            setTimeout(f.hoverUpdate, 0);
+            f.hoverUpdate();
+            //setTimeout(f.hoverUpdate, 0);
 
 
             //TODO fadeOut almost works, but not completely. so hide() for now
@@ -119,7 +128,7 @@ function NodeFrame(spacegraph) {
             }
 
             if (this.currentlyVisible && f.hovered) {
-                spacegraph.positionNodeHTML(f.hovered, frameEle, frameNodePixelScale, frameNodeScale);
+                spacegraph.positionNodeHTML(f.hovered, frameEle[0], frameNodePixelScale, frameNodeScale);
                 frameEleNode = f.hovered;
             }
 
