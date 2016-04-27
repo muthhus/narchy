@@ -1,14 +1,15 @@
 <html>
 <head>
 
+    <title>NARchy</title>
+
     <style type="text/css">
         @import url("terminal.css");
+        @import url("spacegraph.dark.css");
+        @import url("spacegraph.css");
     </style>
+
     <style>
-        body {
-
-        }
-
 
         #active {
             position: fixed; width: 100%;
@@ -40,7 +41,6 @@
 
     <link rel="import" href="init.html">
 
-    <title>NARchy</title>
 </head>
 <body>
 
@@ -90,6 +90,8 @@
 
 
 </body>
+
+
 
 <script src="narchy.js"></script>
 
@@ -159,7 +161,7 @@
 
     }
 
-    $(document).ready(function() {
+    document.addEventListener('DOMContentLoaded', function() {
 
         terminal = NARTerminal();
 

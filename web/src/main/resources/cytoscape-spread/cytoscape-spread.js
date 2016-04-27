@@ -1075,14 +1075,15 @@
                                     x: ( sx + vertex[0] ) * speed + (1 - speed) * pp.x,
                                     y: ( sy + vertex[1] ) * speed + (1 - speed) * pp.y
                                 };
-                            });
-
-                        if (options.fit) {
-                            cy.fit(options.padding);
-                        }
-
-                        nodes.rtrigger("position");
+                        });
+                        
                     });
+
+                    if (options.fit) {
+                        cy.fit(options.padding);
+                    }
+
+                    nodes.rtrigger("position");
                 }
 
                 var didLayoutReady = false;

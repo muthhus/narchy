@@ -319,7 +319,7 @@ function spacegraph(targetWrapper, opt) {
 
 
 
-        this.on('layoutready layoutstop pan zoom', updateAllWidgets);
+        this.on('layoutstop pan zoom', updateAllWidgets);
 
 //            function scaleAndTranslate( _element , _x , _y, wx, wy )  {
 //                
@@ -360,7 +360,7 @@ function spacegraph(targetWrapper, opt) {
         autolock: false,
         autoungrabify: false,
         autounselectify: true,
-        fps: 25, //target max fps (frames per second)
+        //fps: 25, //target max fps (frames per second)
         layout: {
         },
         // rendering options:
@@ -372,8 +372,8 @@ function spacegraph(targetWrapper, opt) {
         motionBlur: false,
         wheelSensitivity: 1,
         //pixelRatio: 0.25, //downsample pixels
-        //pixelRatio: 0.5,
-        pixelRatio: 1,
+        pixelRatio: 0.5,
+        //pixelRatio: 1,
 
         initrender: function (evt) { /* ... */ },
 
@@ -458,43 +458,59 @@ function spacegraph(targetWrapper, opt) {
     s.channels = { };
     s.overlay = overlaylayer;
 
+    var time;
+    function draw() {
+        requestAnimationFrame(draw);
+        var now = new Date().getTime(),
+            dt = now - (time || now);
 
+        time = now;
 
-    //IMPROVED CANVAS RENDERER FUNCTION THAT CAN THROTTLE FPS
-    s.renderer().redraw = function(roptions) {
+        // Drawing code goes here... for example updating an 'x' position:
+        this.x += 10 * dt; // Increase 'x' by 10 units per millisecond
+    }
 
-            var minRedrawLimit = 1000/opt.fps; // people can't see much better than 60fps
-            var maxRedrawLimit = 1000;  // don't cap max b/c it's more important to be responsive than smooth
-
-            roptions = roptions || {}; //util.staticEmptyObject();
-
-            var r = this;
-            var forcedContext = roptions.forcedContext;
-
-            if( r.averageRedrawTime === undefined ){ r.averageRedrawTime = 0; }
-            if( r.lastRedrawTime === undefined ){ r.lastRedrawTime = 0; }
-
-            var redrawLimit = r.lastRedrawTime; // estimate the ideal redraw limit based on how fast we can draw
-            redrawLimit = minRedrawLimit > redrawLimit ? minRedrawLimit : redrawLimit;
-            redrawLimit = redrawLimit < maxRedrawLimit ? redrawLimit : maxRedrawLimit;
-
-            if( r.lastDrawTime === undefined ){ r.lastDrawTime = 0; }
-
-            var nowTime = Date.now();
-            var timeElapsed = nowTime - r.lastDrawTime;
-            var callAfterLimit = timeElapsed >= redrawLimit;
-
-            if( !forcedContext ) {
-                if( !callAfterLimit ){
-                    r.skipFrame = true;
-                    return;
-                }
-            }
-
-            r.requestedFrame = true;
-            r.renderOptions = roptions;
-
-    };
+    // //IMPROVED CANVAS RENDERER FUNCTION THAT CAN THROTTLE FPS
+    // s.renderer().redraw = function(roptions) {
+    //
+    //
+    //         var minRedrawLimit = 1000.0/opt.fps; // people can't see much better than 60fps
+    //         //var maxRedrawLimit = 1000.0;  // don't cap max b/c it's more important to be responsive than smooth
+    //
+    //         roptions = roptions || {}; //util.staticEmptyObject();
+    //
+    //         var r = this;
+    //
+    //         if( r.averageRedrawTime === undefined ){ r.averageRedrawTime = 0; }
+    //         if( r.lastRedrawTime === undefined ){ r.lastRedrawTime = 0; }
+    //
+    //         //var redrawLimit = r.lastRedrawTime; // estimate the ideal redraw limit based on how fast we can draw
+    //         //redrawLimit = minRedrawLimit > redrawLimit ? minRedrawLimit : redrawLimit;
+    //         //redrawLimit = redrawLimit < maxRedrawLimit ? redrawLimit : maxRedrawLimit;
+    //
+    //
+    //         var nowTime = Date.now();
+    //         if (r.lastDrawAt === undefined) r.lastDrawAt = 0;
+    //
+    //         var timeElapsed = nowTime - r.lastDrawAt;
+    //         var callAfterLimit = (timeElapsed + r.lastRedrawTime) >= minRedrawLimit;
+    //
+    //
+    //         //if( !forcedContext ) {
+    //             if( !callAfterLimit ){
+    //                 r.skipFrame = true;
+    //                 console.log( 'skip', timeElapsed, minRedrawLimit);
+    //                 return;
+    //             }
+    //         //}
+    //         console.log( 'draw', timeElapsed, minRedrawLimit);
+    //
+    //         r.lastDrawAt = nowTime;
+    //         r.requestedFrame = true;
+    //         r.renderOptions = roptions;
+    //
+    // };
+    //
 
     /** adapts spacegraph node to cytoscape node */
     function spacegraphToCytoscape(d) {

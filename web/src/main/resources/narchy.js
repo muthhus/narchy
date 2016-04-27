@@ -1,27 +1,22 @@
 "use strict";
 
 function SocketNARGraph(path) {
-    return SocketSpaceGraph(path, function(x) { return x[0]; },
+    var sg = SocketSpaceGraph(path, function(x) { return x[0]; },
         function(id, x, newNodes, newEdges) {
 
             var pri = x[1]/1000.0;
             var qua = x[3]/1000.0;
-            var baseSize = 64, extraSize = 164;
             newNodes.push({
                 id: id,
                 label: id,
-                'shape': 'hexagon',
-                style: {
-                    width: baseSize + extraSize * pri,
-                    height: baseSize + extraSize * pri,
-                    'background-color': //'HSL(' + parseInt( (0.1 * qua + 0.4) * 100) + '%, 60%, 60%)',
-                        "rgb(" + ((0.5 + 0.5 * qua) * 255) + ", 128, 128)",
-                    'background-opacity': 0.25 + pri * 0.75
-                }
+                pri: pri,
+                qua: qua,
+                'shape': 'hexagon'
             });
 
+            var tlPrefix = 'tl_' + id;
             var termlinks = x[4];
-            _.each(termlinks, function(e) {
+            for (var e of termlinks) {
                 /*if (!(e = e.seq))
                     return;*/
                 if (!e)
@@ -29,26 +24,56 @@ function SocketNARGraph(path) {
 
                 var target = e[0];
 
-
                 var tlpri = e[1]/1000.0;
                 var tlqua = e[3]/1000.0;
 
                 newEdges.push({
-                    id: 'tl' + '_' + id + '_' + target, source: id, target: target,
-                    style: {
-                        'line-color':
-                        "rgb(128,128," + ((0.5 + 0.5 * tlqua) * 255) + ")",
-                        //'orange',
-                        'curve-style': 'segments', //(tlpri > 0.5) ? 'segments' : 'haystack',
-                        'opacity': 0.25 + tlpri * 0.75,
-                        'width': 2 + 6 * tlpri,
-                        'mid-target-arrow-shape': 'triangle'
-                    }
+                    id: tlPrefix + '_' + target,
+                    source: id, target: target,
+                    pri: tlpri,
+                    qua: tlqua
                 });
-            });
+            }
 
         }
     );
+
+    function d(x, key) {
+        return x._private.data[key];
+    }
+
+    var sizeFunc = function(x) {
+        return 64 + 164 * parseInt(d(x, 'pri'));
+    };
+
+    sg.spacegraph.style().selector('node')
+        .style('width', sizeFunc)
+        .style('height', sizeFunc)
+        .style('background-color', function(x) {
+            var qua = d(x, 'qua');
+            return "rgb(" + parseInt((0.5 + 0.25 * qua) * 255) + ",128,128)";
+        })
+        .style('background-opacity', function(x) {
+            var pri = d(x, 'pri');
+            return 0.25 + pri * 0.75;
+        });
+
+    sg.spacegraph.style().selector('edge')
+        .style('width', function(x) {
+            return 2 + 6 * d(x, 'pri');
+        })
+        .style('mid-target-arrow-shape', 'triangle')
+        .style('opacity', function(x) {
+            return 0.25 + d(x, 'pri') * 0.75;
+        })
+        .style('curve-style', 'segments') //(tlpri > 0.5) ? 'segments' : 'haystack',
+        .style('line-color', function(x) {
+            return "rgb(128,128," + parseInt((0.5 + 0.5 * d(x, 'qua')) * 255) + ")";
+        });
+
+    sg.spacegraph.style().update();
+
+    return sg;
 }
 
 
