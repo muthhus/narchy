@@ -1064,23 +1064,25 @@
                      *
                      * We position the nodes based on the calculation
                      */
-                    nodes.positions(
-                        function (i, node) {
-                            var vertex = vertices[node.id()];
+                    cy.batch(function() {
+                        nodes.positions(
+                            function (i, node) {
+                                var vertex = vertices[node.id()];
 
-                            var pp = node.position();
+                                var pp = node.position();
 
-                            return {
-                                x: ( sx + vertex[0] ) * speed + (1 - speed) * pp.x,
-                                y: ( sy + vertex[1] ) * speed + (1 - speed) * pp.y
-                            };
-                        });
+                                return {
+                                    x: ( sx + vertex[0] ) * speed + (1 - speed) * pp.x,
+                                    y: ( sy + vertex[1] ) * speed + (1 - speed) * pp.y
+                                };
+                            });
 
-                    if (options.fit) {
-                        cy.fit(options.padding);
-                    }
+                        if (options.fit) {
+                            cy.fit(options.padding);
+                        }
 
-                    cy.nodes().rtrigger("position");
+                        nodes.rtrigger("position");
+                    });
                 }
 
                 var didLayoutReady = false;

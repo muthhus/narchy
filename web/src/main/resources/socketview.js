@@ -74,12 +74,12 @@ function SocketSpaceGraph(path, idFunc, nodeFunc) {
         /* https://github.com/cytoscape/cytoscape.js-spread */
         name: 'spread',
         minDist: 125,
-        speed: 0.05,
+        speed: 0.02,
         animate: false,
         randomize: false, // uses random initial node positions on true
         fit: false,
-        maxFruchtermanReingoldIterations: 25, // Maximum number of initial force-directed iterations
-        maxExpandIterations: 5, // Maximum number of expanding iterations
+        maxFruchtermanReingoldIterations: 2, // Maximum number of initial force-directed iterations
+        maxExpandIterations: 1, // Maximum number of expanding iterations
 
         ready: function () {
             //console.log('starting cola', Date.now());
@@ -88,14 +88,17 @@ function SocketSpaceGraph(path, idFunc, nodeFunc) {
             //console.log('stop cola', Date.now());
         }
     });
-    var layoutUpdatePeriodMS = 300;
+    var layoutUpdatePeriodMS = 150;
     currentLayout.run();
-    setInterval(function() {
-        currentLayout.stop();
-        currentLayout.run();
-    }, layoutUpdatePeriodMS);
+
 
     var layout = function () {
+        currentLayout.stop();
+        currentLayout.run();
+
+        setTimeout(layout, layoutUpdatePeriodMS); //self-trigger
+
+
         /* https://github.com/cytoscape/cytoscape.js-cola#api */
 
 
@@ -146,6 +149,7 @@ function SocketSpaceGraph(path, idFunc, nodeFunc) {
         // });
 
     };
+    setTimeout(layout, layoutUpdatePeriodMS);
 
     return SocketView(path,
 
@@ -228,9 +232,9 @@ function SocketSpaceGraph(path, idFunc, nodeFunc) {
                     changed = true;
                 }
 
-                if (changed) {
-                    layout(); //trigger layout
-                }
+                // if (changed) {
+                //     layout(); //trigger layout
+                // }
 
             });
 

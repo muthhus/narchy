@@ -360,6 +360,7 @@ function spacegraph(targetWrapper, opt) {
         autolock: false,
         autoungrabify: false,
         autounselectify: true,
+        fps: 25, //target max fps (frames per second)
         layout: {
         },
         // rendering options:
@@ -392,9 +393,14 @@ function spacegraph(targetWrapper, opt) {
                     'text-valign': 'center',
                     'text-halign': 'center',
                     'color': '#fff',
+                    'font-family':  //keep short because this gets repeated as part of strings in the style system badly
+                        'Arial',
+                        //'Monospace',
+                    'outside-texture-bg-opacity': 1,
                     'shadow-blur': 0,
+                    'text-shadow-blur': 0,
                     'shadow-opacity': 0,
-                    'min-zoomed-font-size': 10,
+                    'min-zoomed-font-size': 7,
                     /*'text-background-opacity': 1,
                     'text-background-color': '#ccc',
                     'text-background-shape': 'roundrectangle',*/
@@ -421,51 +427,10 @@ function spacegraph(targetWrapper, opt) {
 
     var s = cytoscape(opt);
 
-    // EdgeHandler: the default values of each option are outlined below:
-    s.edgehandles({
-        preview: true, // whether to show added edges preview before releasing selection
-        handleSize: 3, // the size of the edge handle put on nodes
-        handleColor: "rgba(255, 0, 0, 0.5)", // the colour of the handle and the line drawn from it
-        handleLineType: 'ghost', // can be 'ghost' for real edge, 'straight' for a straight line, or 'draw' for a draw-as-you-go line
-        handleLineWidth: 1, // width of handle line in pixels
-        handleNodes: 'node', // selector/filter function for whether edges can be made from a given node
-        hoverDelay: 75, // time spend over a target node before it is considered a target selection
-        cxt: true, // whether cxt events trigger edgehandles (useful on touch)
-        enabled: true, // whether to start the plugin in the enabled state
-        toggleOffOnLeave: true, // whether an edge is cancelled by leaving a node (true), or whether you need to go over again to cancel (false; allows multiple edges in one pass)
-        edgeType: function (sourceNode, targetNode) {
-            // can return 'flat' for flat edges between nodes or 'node' for intermediate node between them
-            // returning null/undefined means an edge can't be added between the two nodes
-            return 'flat';
-        },
-        loopAllowed: function (node) {
-            // for the specified node, return whether edges from itself to itself are allowed
-            return false;
-        },
-        nodeLoopOffset: -50, // offset for edgeType: 'node' loops
-        nodeParams: function (sourceNode, targetNode) {
-            // for edges between the specified source and target
-            // return element object to be passed to cy.add() for intermediary node
-            return {};
-        },
-        edgeParams: function (sourceNode, targetNode, i) {
-            // for edges between the specified source and target
-            // return element object to be passed to cy.add() for edge
-            // NB: i indicates edge index in case of edgeType: 'node'
-            return {};
-        },
-        /*
-         start: function (sourceNode) {
-         // fired when edgehandles interaction starts (drag on handle)
-         },
-         complete: function (sourceNode, targetNodes, addedEntities) {
-         // fired when edgehandles is done and entities are added
-         },
-         stop: function (sourceNode) {
-         // fired when edgehandles interaction is stopped (either complete with added edges or incomplete)
-         }
-         */
-    });
+    if (opt.edgehandles) {
+        // EdgeHandler: the default values of each option are outlined below:
+        s.edgehandles(opt.edgehandles);
+    }
 
 
 //    s.noderesize({
@@ -493,6 +458,43 @@ function spacegraph(targetWrapper, opt) {
     s.channels = { };
     s.overlay = overlaylayer;
 
+
+
+    //IMPROVED CANVAS RENDERER FUNCTION THAT CAN THROTTLE FPS
+    s.renderer().redraw = function(roptions) {
+
+            var minRedrawLimit = 1000/opt.fps; // people can't see much better than 60fps
+            var maxRedrawLimit = 1000;  // don't cap max b/c it's more important to be responsive than smooth
+
+            roptions = roptions || {}; //util.staticEmptyObject();
+
+            var r = this;
+            var forcedContext = roptions.forcedContext;
+
+            if( r.averageRedrawTime === undefined ){ r.averageRedrawTime = 0; }
+            if( r.lastRedrawTime === undefined ){ r.lastRedrawTime = 0; }
+
+            var redrawLimit = r.lastRedrawTime; // estimate the ideal redraw limit based on how fast we can draw
+            redrawLimit = minRedrawLimit > redrawLimit ? minRedrawLimit : redrawLimit;
+            redrawLimit = redrawLimit < maxRedrawLimit ? redrawLimit : maxRedrawLimit;
+
+            if( r.lastDrawTime === undefined ){ r.lastDrawTime = 0; }
+
+            var nowTime = Date.now();
+            var timeElapsed = nowTime - r.lastDrawTime;
+            var callAfterLimit = timeElapsed >= redrawLimit;
+
+            if( !forcedContext ) {
+                if( !callAfterLimit ){
+                    r.skipFrame = true;
+                    return;
+                }
+            }
+
+            r.requestedFrame = true;
+            r.renderOptions = roptions;
+
+    };
 
     /** adapts spacegraph node to cytoscape node */
     function spacegraphToCytoscape(d) {

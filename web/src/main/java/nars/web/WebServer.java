@@ -94,7 +94,7 @@ public class WebServer /*extends PathHandler*/ {
                         )
                         .addPrefixPath("/terminal", socket(new NarseseIOService(nar)))
                         .addPrefixPath("/emotion", socket(new EvalService(nar, "emotion", 500)))
-                        .addPrefixPath("/active", socket(new TopConceptService<Object[]>(nar, 1000, 32) {
+                        .addPrefixPath("/active", socket(new TopConceptService<Object[]>(nar, 1000, 64) {
 
                             @Override
                             Object[] summarize(BLink<? extends Concept> bc, int n) {
@@ -107,7 +107,7 @@ public class WebServer /*extends PathHandler*/ {
                                 };
                             }
 
-                            final int maxTermLinks = 4;
+                            final int maxTermLinks = 6;
                             final int minTermLinks = 1;
 
                             private Object[] termLinks(Concept c, int num) {

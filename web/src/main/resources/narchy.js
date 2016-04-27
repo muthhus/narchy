@@ -6,15 +6,16 @@ function SocketNARGraph(path) {
 
             var pri = x[1]/1000.0;
             var qua = x[3]/1000.0;
-            var baseSize = 32, extraSize = 132;
+            var baseSize = 64, extraSize = 164;
             newNodes.push({
                 id: id,
                 label: id,
+                'shape': 'hexagon',
                 style: {
                     width: baseSize + extraSize * pri,
                     height: baseSize + extraSize * pri,
                     'background-color': //'HSL(' + parseInt( (0.1 * qua + 0.4) * 100) + '%, 60%, 60%)',
-                    "rgb(" + ((0.5 + 0.5 * qua) * 255) + ", 128, 128)",
+                        "rgb(" + ((0.5 + 0.5 * qua) * 255) + ", 128, 128)",
                     'background-opacity': 0.25 + pri * 0.75
                 }
             });
@@ -145,7 +146,7 @@ function NARConsole(terminal) {
     }
 
     terminal.on('message', function(newLines) {
-        
+
         setTimeout(function() {
             var lines = editor.session.getLength() + newLines.length;
             var linesOver = lines - maxLines;
