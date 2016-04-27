@@ -374,10 +374,10 @@ public class Json {
                         writePrimitiveArray(infoOrObject,0,Array.getLength(infoOrObject));
                         return true;
                     } else {
-                        gen.writeStartObject();
+                        //gen.writeStartObject();
                         //gen.writeFieldName(SEQ_TYPE_S);
                         //writeSymbolicClazz(null,clz);
-                        gen.writeFieldName(SEQ_S);
+                        //gen.writeFieldName(SEQ_S);
                         gen.writeStartArray();
                     }
                     break;

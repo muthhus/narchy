@@ -169,8 +169,8 @@ function SocketSpaceGraph(path, idFunc, nodeFunc) {
             var edgesToShow = [];
 
             //console.log(prev.size, 'previously');
-            _.each(v.seq, function(x) {
-                x = x.seq;
+            _.each(v, function(x) {
+                
                 if (!x) return;
                 var id = idFunc(x); //x[1];
                 //if (!toRemove.delete(id)) {

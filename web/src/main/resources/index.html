@@ -8,16 +8,21 @@
         body {
 
         }
-        #menu, #active {
+
+
+        #active {
             position: fixed; width: 100%;
         }
-        #menu {
-            height: 2em;
-        }
+
         #active {
             height: 100%;
         }
 
+
+        .NARConsole {
+            width: 100% !important;
+            height: 100% !important;
+        }
 
         #nalInput {
             position: fixed; bottom: 0; left: 0; width: 100%;
@@ -27,23 +32,27 @@
             font-size: 30px;
         }
 
+        .ui-dialog {
+            opacity: 0.8 !important;
+        }
+
     </style>
 
     <link rel="import" href="init.html">
-    <script src="narchy.js"></script>
 
     <title>NARchy</title>
 </head>
 <body>
 
-    <div id="menu">
-        <a href="demo.graph.html">GRAPH</a>
-        <a href="terminal.html">TERMINAL</a>
-
-    </div>
 
 
     <div id="active" style="position: fixed; width: 100%; height: 100%"></div>
+
+    <div class="taskbar"></div>
+
+    <div class="demo">
+        <div class="description">...</div>
+    </div>
 
     <!--<div class="ui grid">-->
 
@@ -56,6 +65,10 @@
 
     <!--</div>-->
 
+    <!--<div id="menu"></div>-->
+
+    <div id="narOutput">
+    </div>
 
     <div id="nalInput">
         <!--<div class="ui buttons">-->
@@ -77,18 +90,68 @@
 
 
 </body>
+
+<script src="narchy.js"></script>
+
 <script>
+    "use strict";
 
 
     $(document).ready(function() {
 
+        var terminal = NARTerminal();
+
+        // taskbar has to be created first
+        var tasks = $( ".taskbar" );
+        tasks.taskbar({
+            windowsContainment: "viewport",
+            horizontalStick: "top left",
+            draggable: true,
+            buttons: {
+                log: {
+                    label: "Log"
+                }
+            },
+
+            buttonsOrder: [ "log" ]
+
+        });
+
+        /** creates a new taskbar-managed window */
+        tasks.newWindow = function(title, contentBuilder, onClose, onResized) {
+            return contentBuilder().window({
+                taskbar: this,
+                title: title,
+                close: onClose,
+                resizeStop: onResized
+            });
+        };
+
+        tasks.taskbar( "option", "buttons.log" ).$element.on( "click", function () {
+
+            var c = NARConsole(terminal);
+
+            tasks.newWindow("Log",
+                function() {
+                    return c;
+                },
+                function (event) {
+                    console.log('close');
+                },
+                function( event, ui ) {
+                    c.editor.resize(true); //ace editor needs resized manually when its container has
+                }
+            );
+
+        });
+
+        $("#nalInput").append(NALEditor('', terminal));
+
         $("#active").append(SocketNARGraph("active"));
+
         //$("#emotion").append(SocketMetaWidget("emotion"));
 
-        var nalEditor = NALEditor('', NARTerminal(function(m) {
-            console.log(m);
-        }));
-        $("#nalInput").append(nalEditor);
+
     });
 
 </script>

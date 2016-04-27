@@ -1,21 +1,29 @@
 package nars.web;
 
+import io.undertow.util.FastConcurrentDirectDeque;
 import io.undertow.websockets.core.BufferedTextMessage;
 import io.undertow.websockets.core.WebSocketChannel;
 import nars.NAR;
+import nars.task.Task;
+import nars.truth.Truth;
 import nars.util.event.Active;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+
+import static nars.nal.Tense.ETERNAL;
 
 /**
  * Created by me on 4/21/16.
  */
-@Deprecated
 public class NarseseIOService extends WebsocketService {
 
 
     private final NAR nar;
     private Active active;
+
+    FastConcurrentDirectDeque buffer = new FastConcurrentDirectDeque();
 
     public NarseseIOService(NAR n) {
         super();
@@ -27,15 +35,47 @@ public class NarseseIOService extends WebsocketService {
 
 
         active = new Active(
-                nar.eventInput.on(t -> send(
-                        " IN: " + t)),
-            /*nar.memory.eventDerived.on(t -> send(socket,
-                    "DER: " + t)),*/
-                nar.eventAnswer.on(t -> send(
-                        "ANS: " + t)),
-                nar.eventError.on(t -> send(
-                        "ERR: " + t))
+                nar.eventTaskProcess.on(this::queue),
+//                nar.eventAnswer.on(t -> send(
+//                        "ANS: " + t)),
+                nar.eventError.on(this::queue),
+                nar.eventFrameStart.on(this::flush)
         );
+
+    }
+
+    protected void flush(NAR n) {
+        if (buffer.isEmpty())
+            return;
+
+        FastConcurrentDirectDeque b = buffer;
+        buffer = new FastConcurrentDirectDeque();
+        ByteBuffer x = jsonize(b);
+        nar.runAsync(()-> {
+            send(x);
+        });
+    }
+
+    protected void queue(Task t) {
+        //buffer.add(t.toString());
+        Truth truth = t.truth();
+        long occ = t.occurrence();
+        buffer.add(
+            new Object[] {
+                String.valueOf(t.punc()),
+                t.term().toString(),
+                truth!=null ? t.freq() : 0,
+                truth!=null ? t.conf() : 0,
+                occ!=ETERNAL ? occ : ":",
+                Math.round(t.pri()*1000),
+                Math.round(t.dur()*1000),
+                Math.round(t.qua()*1000),
+                t.lastLogged()
+            }
+        );
+    }
+    protected void queue(Object o) {
+        buffer.add(o.toString());
     }
 
     @Override

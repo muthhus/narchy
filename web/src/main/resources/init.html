@@ -9,15 +9,25 @@
 
 <!--<script src="lib/LAB.min.js"></script>-->
 
-<!--<script src="lib/jquery-ui/jquery-ui.min.js"></script>-->
-<!--<script src="lib/jquery-ui/minified/core.js"></script>-->
-<script src="lib/jquery-ui/ui/minified/core.min.js"></script>
-<script src="lib/jquery-ui/ui/minified/widget.min.js"></script>
-<script src="lib/jquery-ui/ui/minified/mouse.min.js"></script>
-<script src="lib/jquery-ui/ui/minified/draggable.min.js"></script>
+<script src="lib/jquery-ui/jquery-ui.min.js"></script>
+<!--<script src="/js/jquery-ui/i18n/jquery.ui.datepicker-all.js"></script>-->
+<link href="jquery-ui/base.css" rel="stylesheet">
+<link href="jquery-ui/customtheme.css" rel="stylesheet">
 
 <script src="lib/cytoscape/dist/cytoscape.js"></script>
 <script src="lib/cytoscape-edgehandles/cytoscape-edgehandles.js"></script>
+
+
+<!-- it's also recommended to include jQuery UI Datepicker language files -->
+
+<!-- now, include Simone -->
+<link href="simone/simone.taskbar.css" rel="stylesheet">
+<link href="simone/simone.window.css" rel="stylesheet">
+<script src="simone/simone.taskbar.js"></script>
+<script src="simone/simone.window.js"></script>
+<!-- include translations after widgets has been included -->
+<script src="simone/i18n-simone.min.custom.js"></script>
+
 
 
 <!--<script src="http://marvl.infotech.monash.edu/webcola/cola.v3.min.js"></script>
@@ -32,7 +42,7 @@
 <!--<script src="lib/jiff.js"></script>
 <script src="lib/jsonsynch.min.js"></script>-->
 
-<script src="web_socket.js"></script>
+<!--<script src="web_socket.js"></script>-->
 
 <!--<script src="lib/html2json/html2json.js"></script>-->
 <!--<script src="lib/html2json/htmlparser.js"></script>-->
@@ -100,3 +110,14 @@
 <link rel="stylesheet" href="spacegraph.dark.css"/>
 <link rel="stylesheet" href="spacegraph.css"/>
 <link rel="stylesheet" href="lib/semantic/dist/semantic.min.css"/>
+
+
+<script>
+    /** creates a websocket connection to a path on the server that hosts the currently visible webpage */
+    window.socket = function(path) {
+        return new WebSocket('ws://' +
+                window.location.hostname + ':' +
+                window.location.port + '/' +
+                path);
+    };
+</script>

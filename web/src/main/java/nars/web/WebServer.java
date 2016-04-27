@@ -101,7 +101,7 @@ public class WebServer /*extends PathHandler*/ {
                                 Concept c = bc.get();
                                 return new Object[] {
                                     c.toString(), //ID
-                                    n(bc.pri()), n(bc.dur()), n(bc.qua()),
+                                    b(bc.pri()), b(bc.dur()), b(bc.qua()),
                                     termLinks(c, (int)Math.ceil(((float)n/maxConcepts.intValue())*(maxTermLinks-minTermLinks)+minTermLinks) )
                                     //TODO tasklinks, beliefs
                                 };
@@ -117,15 +117,14 @@ public class WebServer /*extends PathHandler*/ {
                                 b.forEach(num, t -> {
                                     tl[n[0]++] = new Object[] {
                                        t.get().toString(), //ID
-                                       n(t.pri()), n(t.dur()), n(t.qua())
+                                       b(t.pri()), b(t.dur()), b(t.qua())
                                     };
                                 });
                                 return tl;
                             }
 
-                            private float n(float v) {
-                                return v;
-                                //return Util.round(v, 0.001f);
+                            private int b(float budgetValue) {
+                                return Math.round(budgetValue  * 1000);
                             }
                         }))
                 )

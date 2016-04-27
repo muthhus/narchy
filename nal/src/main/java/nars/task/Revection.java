@@ -98,28 +98,22 @@ public class Revection {
         }
 
         float ir = rankTemporalByConfidenceAndOriginality(input, now, now, 1f, -1);
-        if (ir < wr) {
-            //input ranks lower than all existing
-            return false;
-        }
+        if (ir >= wr) {
+            //input ranks higher than the lowest of all existing
 
-        if (a!=null) {
-
-            //merge the selected closest pair
-            return revect(input, nar, temporal, now, a, b);
-
-        } else if (w!=null) {
-
-            //remove the weakest found
-            //TODO compare with input like below?
-            remove(temporal, w, nar);
+            if (a!=null) {
+                //merge the selected closest pair
+                return revect(input, nar, temporal, now, a, b);
+            } else if (w!=null) {
+                //no pair was found; remove the weakest found
+                remove(temporal, w, nar);
+            }
 
             return true;
-        } else {
 
-            return true;
         }
 
+        return false;
     }
 
     public static boolean revect(@NotNull Task input, @NotNull NAR nar, @NotNull ListTable<Task, Task> temporal, long now, @NotNull Task a, @NotNull Task b) {

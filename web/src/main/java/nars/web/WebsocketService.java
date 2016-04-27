@@ -6,6 +6,7 @@ import io.undertow.websockets.spi.WebSocketHttpExchange;
 import nars.util.data.list.FasterList;
 import nars.util.data.map.UnifriedMap;
 import nars.util.meter.event.FloatGuage;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -52,8 +53,15 @@ public abstract class WebsocketService extends AbstractReceiveListener implement
     public void send(WebSocketChannel socket, Object object) {
         //System.out.println("send: " + object);
 
+        if (object instanceof String) {
+            WebSockets.sendText((String)object, socket, this);
+        } else if (object instanceof ByteBuffer) {
+            WebSockets.sendText((ByteBuffer)object, socket, this);
+        } else {
+            WebSockets.sendText(jsonize(object), socket, this);
+        }
 
-        WebSockets.sendText(ByteBuffer.wrap(Json.jsonizer.asByteArray(object)), socket, this);
+
         //WebSockets.sendText(jsonizer.asJsonString(object), socket, this);
 
 
@@ -68,6 +76,11 @@ public abstract class WebsocketService extends AbstractReceiveListener implement
 //            } catch (JsonProcessingException ex) {
 //                ex.printStackTrace();
 //            }
+    }
+
+    @NotNull
+    public static ByteBuffer jsonize(Object object) {
+        return ByteBuffer.wrap(Json.jsonizer.asByteArray(object));
     }
 
 //    @Override
