@@ -23,7 +23,7 @@ public class NarseseIOService extends WebsocketService {
     private final NAR nar;
     private Active active;
 
-    FastConcurrentDirectDeque buffer = new FastConcurrentDirectDeque();
+    FastConcurrentDirectDeque<Object[]> buffer = new FastConcurrentDirectDeque();
 
     public NarseseIOService(NAR n) {
         super();
@@ -50,7 +50,7 @@ public class NarseseIOService extends WebsocketService {
 
         FastConcurrentDirectDeque b = buffer;
         buffer = new FastConcurrentDirectDeque();
-        ByteBuffer x = jsonize(b);
+        CharSequence x = Json.collectionToJson(b);
         nar.runAsync(()-> {
             send(x);
         });
@@ -75,7 +75,7 @@ public class NarseseIOService extends WebsocketService {
         );
     }
     protected void queue(Object o) {
-        buffer.add(o.toString());
+        buffer.add(new Object[] { o.toString() } );
     }
 
     @Override

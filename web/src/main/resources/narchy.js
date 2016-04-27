@@ -1,10 +1,11 @@
 "use strict";
 
 function SocketNARGraph(path) {
-    return SocketSpaceGraph(path, function(x) { return x[1]; },
+    return SocketSpaceGraph(path, function(x) { return x[0]; },
         function(id, x, newNodes, newEdges) {
-            var pri = x[2]/1000.0;
-            var qua = x[4]/1000.0;
+
+            var pri = x[1]/1000.0;
+            var qua = x[3]/1000.0;
             var baseSize = 32, extraSize = 132;
             newNodes.push({
                 id: id,
@@ -18,16 +19,18 @@ function SocketNARGraph(path) {
                 }
             });
 
-            var termlinks = x[5];
+            var termlinks = x[4];
             _.each(termlinks, function(e) {
                 /*if (!(e = e.seq))
                     return;*/
                 if (!e)
                     return;
 
-                var target = e[1];
-                var tlpri = e[2]/1000.0;
-                var tlqua = e[4]/1000.0;
+                var target = e[0];
+
+
+                var tlpri = e[1]/1000.0;
+                var tlqua = e[3]/1000.0;
 
                 newEdges.push({
                     id: 'tl' + '_' + id + '_' + target, source: id, target: target,
@@ -59,8 +62,7 @@ function NARTerminal() {
     };
     ws.onmessage = function(m) {
         var x = JSON.parse(m.data);
-        x = x.obj;
-        e.emit('message', x.slice(1, x.length), this);
+        e.emit('message', [x]);
     };
     ws.onclose = function() {
         e.emit('disconnect', this);
@@ -139,21 +141,13 @@ function NARConsole(terminal) {
             return m;
         }
 
-
-        if (Array.isArray(m))
-            m = m.slice(1); //skip element count
-
-
         return JSON.stringify(m);
     }
 
-    terminal.on('message', function(m) {
-
-
-        m = [m]; //HACK
-
+    terminal.on('message', function(newLines) {
+        
         setTimeout(function() {
-            var lines = editor.session.getLength() + m.length;
+            var lines = editor.session.getLength() + newLines.length;
             var linesOver = lines - maxLines;
             if (linesOver > 0) {
                 editor.session.getDocument().removeFullLines(0, linesOver);
@@ -162,11 +156,11 @@ function NARConsole(terminal) {
             editor.navigateFileEnd();
             editor.navigateLineEnd();
 
-            for (var n = Math.max(0, m.length - maxLines); n < m.length; n++) {
+            for (var n = Math.max(0, newLines.length - maxLines); n < newLines.length; n++) {
                 if (lines + n > 0)
                     editor.insert('\n');
                 editor.navigateLineStart();
-                editor.insert(line(m[n]));
+                editor.insert(line(newLines[n]));
             }
 
             editor.scrollToRow(editor.getLastVisibleRow());

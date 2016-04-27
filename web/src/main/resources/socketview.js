@@ -170,8 +170,7 @@ function SocketSpaceGraph(path, idFunc, nodeFunc) {
 
             //console.log(prev.size, 'previously');
             _.each(v, function(x) {
-                
-                if (!x) return;
+
                 var id = idFunc(x); //x[1];
                 //if (!toRemove.delete(id)) {
 
@@ -220,6 +219,7 @@ function SocketSpaceGraph(path, idFunc, nodeFunc) {
                 if (edgesToShow.length > 0) {
                     _.each(edgesToShow, function (e) {
                         var target = e.target;
+
                         if (sg.get(target)) { //if target exists
                             sg.addEdge(e);
                             shownEdgeSet.add(e.id);

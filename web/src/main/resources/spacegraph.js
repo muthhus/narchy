@@ -645,6 +645,7 @@ function spacegraph(targetWrapper, opt) {
         var se = spacegraphToCytoscape(n);
 
         if (!ee) {
+
             s.add(se);
         } else {
             ee.data(se);

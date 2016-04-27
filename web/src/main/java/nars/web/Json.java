@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,6 +46,55 @@ public class Json {
         );
     }
 
+    /** simple primitive array to json */
+    public static StringBuilder arrayToJson(Object[] object) {
+        StringBuilder sb = new StringBuilder();
+        sb.append('[');
+        for (int i = 0, objectLength = object.length; i < objectLength; i++) {
+            Object o = object[i];
+            sb.append(objectToJson(o));
+            if (i!=objectLength-1)
+                sb.append(',');
+        }
+        sb.append(']');
+        return sb;
+    }
+
+    public static CharSequence objectToJson(Object o) {
+        if (o == null)
+            return "null";
+
+        if (o instanceof CharSequence)
+            return "\"" + ((CharSequence)o) + "\"";
+
+        if (o instanceof Object[])
+            return arrayToJson((Object[])o);
+
+        if (o instanceof Collection)
+            return collectionToJson((Collection)o);
+
+        if (o instanceof Number)
+            return String.valueOf(o);
+
+        throw new RuntimeException("unsupported type: " + o.getClass() + " while trying to serialize " + o);
+
+    }
+
+    public static CharSequence collectionToJson(Collection o) {
+        StringBuilder sb = new StringBuilder();
+        sb.append('[');
+        int i = 0;
+        int s = o.size();
+        for (Object x : o) {
+            sb.append(objectToJson(x));
+            if (i++!=s-1)
+                sb.append(',');
+        }
+        sb.append(']');
+        return sb;
+    }
+
+    /* BROKEN */
     static class FastJsonStreamCoderFactory implements FSTConfiguration.StreamCoderFactory {
         protected final FSTConfiguration conf;
 

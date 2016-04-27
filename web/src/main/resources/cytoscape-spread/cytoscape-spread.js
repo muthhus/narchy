@@ -1029,7 +1029,8 @@
                 var t1 = layout.thread;
 
                 // reuse old thread if possible
-                if (!t1 || t1.stopped()) {
+                if (!t1 /*|| t1.stopped()*/) {
+                    console.log('Creating spread.js WebWorker');
                     t1 = layout.thread = Thread();
 
                     // And to add the required scripts
@@ -1360,7 +1361,7 @@
 
                     layout.trigger("layoutstop");
 
-                    t1.stop();
+                    //t1.stop();
                 });
 
 
@@ -1368,9 +1369,9 @@
             }; // run
 
             SpreadLayout.prototype.stop = function () {
-                if (this.thread) {
+                /*if (this.thread) {
                     this.thread.stop();
-                }
+                }*/
 
                 this.trigger('layoutstop');
             };
