@@ -75,8 +75,8 @@ public abstract class TermBuilder {
             case INTERSECT_INT:
                 return newIntersectINT(u);
 
-            case SET_EXT_OPENER:
-            case SET_INT_OPENER:
+            case SET_EXT:
+            case SET_INT:
                 if (u.length == 0)
                     throw new InvalidTerm(op,u);
                     //return null; /* emptyset */

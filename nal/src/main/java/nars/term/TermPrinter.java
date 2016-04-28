@@ -50,8 +50,8 @@ public interface TermPrinter {
         final Op op = c.op();
 
         switch (op) {
-            case SET_INT_OPENER:
-            case SET_EXT_OPENER:
+            case SET_INT:
+            case SET_EXT:
                 setAppend(c, p);
                 break;
             case PRODUCT:
@@ -173,10 +173,10 @@ public interface TermPrinter {
         //duplicated from above, dont want to store this as a field in the class
         char opener, closer;
         if (set.op() == Op.SET_EXT) {
-            opener = Op.SET_EXT_OPENER.ch;
+            opener = Op.SET_EXT.ch;
             closer = Symbols.SET_EXT_CLOSER;
         } else {
-            opener = Op.SET_INT_OPENER.ch;
+            opener = Op.SET_INT.ch;
             closer = Symbols.SET_INT_CLOSER;
         }
 

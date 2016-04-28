@@ -35,7 +35,7 @@ public final class substituteIfUnifies extends substitute {
         return mm;
     }
 
-    private final static class OneMatchFindSubst extends FindSubst {
+    public final static class OneMatchFindSubst extends FindSubst {
 
         private final @NotNull Term xterm;
         private final @NotNull PremiseEval r;

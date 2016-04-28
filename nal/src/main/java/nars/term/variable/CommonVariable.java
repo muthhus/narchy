@@ -24,24 +24,21 @@ public final class CommonVariable extends GenericNormalizedVariable {
 //            //System.out.println(v1 + " " + v2);
 //        }
 
-        Op type = v1.op();
-        if (v2.op()!=type)
-            throw new RuntimeException("differing types");
-
         int a = v1.id();
         int b = v2.id();
-
-        int cmp = Integer.compare(a, b);
+        if (a == b)
+            throw new RuntimeException("variables equal");
 
         //lexical ordering: swap
-        if (cmp > 0) {
+        if (b > a) {
             int t = a;
             a = b;
             b = t;
         }
-        else if (cmp == 0) {
-            throw new RuntimeException("variables equal");
-        }
+
+        Op type = v1.op();
+        if (v2.op()!=type)
+            throw new RuntimeException("differing types");
 
         return new CommonVariable(type, a, b);
     }

@@ -470,18 +470,18 @@ public class Narsese extends BaseParser<Object> {
                                 //Negation.make(popTerm(null, true)))),
                                 $.neg(Atom.the(pop())))),
 
-                        seq(SET_EXT_OPENER.str,
+                        seq(SET_EXT.str,
 
                                 firstOf(
                                     EmptyCompound(SET_EXT_CLOSER, SET_EXT),
-                                    MultiArgTerm(SET_EXT_OPENER, SET_EXT_CLOSER)
+                                    MultiArgTerm(SET_EXT, SET_EXT_CLOSER)
                                 )
                         ),
 
-                        seq(SET_INT_OPENER.str,
+                        seq(SET_INT.str,
                                 firstOf(
                                     EmptyCompound(SET_INT_CLOSER, SET_INT),
-                                    MultiArgTerm(SET_INT_OPENER, SET_INT_CLOSER)
+                                    MultiArgTerm(SET_INT, SET_INT_CLOSER)
                                 )
                         ),
 

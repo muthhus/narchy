@@ -11,6 +11,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.container.TermContainer;
+import nars.term.transform.subst.FindSubst;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -436,7 +437,10 @@ public class CompoundConcept extends AbstractConcept<Compound> implements Compou
         return q;
     }
 
-
+    @Override
+    public final boolean match(@NotNull Compound y, @NotNull FindSubst subst) {
+        return term.match(y, subst);
+    }
 
 
     /* ---------- insert Links for indirect processing ---------- */

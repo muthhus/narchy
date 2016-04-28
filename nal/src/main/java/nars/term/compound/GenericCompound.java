@@ -6,6 +6,7 @@ import nars.nal.Tense;
 import nars.term.*;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
+import nars.term.transform.subst.FindSubst;
 import nars.util.data.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -37,7 +38,9 @@ public class GenericCompound<T extends Term> implements Compound<T> {
      */
     public final int dt;
 
-    /** content hash */
+    /**
+     * content hash
+     */
     public final int hash;
 
     @NotNull
@@ -160,7 +163,6 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     }
 
 
-
     @Override
     public final void addAllTo(@NotNull Collection<Term> set) {
         subterms.addAllTo(set);
@@ -174,7 +176,8 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
     @Override
     public final boolean equals(@Nullable Object that) {
-        return this == that ||( that!=null && hash == that.hashCode() && equalsFurther((Termed) that) );
+        return this == that ||
+                ( /*that!=null &&*/ hash == that.hashCode() && equalsFurther((Termed) that));
     }
 
     @Override
@@ -184,15 +187,17 @@ public class GenericCompound<T extends Term> implements Compound<T> {
 
     private final boolean equalsFurther(@NotNull Termed thatTerm) {
 
-        boolean r = false;
         Term u = thatTerm.term();
         if (op == u.op() /*&& (((t instanceof Compound))*/) {
             Compound c = (Compound) u;
-            r = subterms.equals(c.subterms())
-                    && (relation == c.relation())
-                    && (dt == c.dt());
+            if (relation != c.relation())
+                return false;
+            if (op.isTemporal() && dt!=c.dt())
+                return false;
+            if (!subterms.equals(c.subterms()))
+                return false;
         }
-        return r;
+        return true;
     }
 
 
@@ -256,7 +261,8 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     }
 
     @NotNull
-    @Override @Deprecated
+    @Override
+    @Deprecated
     public T[] terms() {
         return subterms.terms();
     }
@@ -311,6 +317,22 @@ public class GenericCompound<T extends Term> implements Compound<T> {
         return normalized;
     }
 
+    @Override
+    public boolean match(Compound y, FindSubst subst) {
+
+
+        int ys = y.size();
+        TermVector<T> st = subterms;
+        if ((st.size() == ys) && (relation == y.relation())) {
+            //return (isCommutative()) ?
+            return (ys > 1 && op.isCommutative()) ?
+                    subst.matchPermute(this, y) :
+                    subst.matchLinear(st, y.subterms());
+        }
+        return false;
+
+    }
+
     /**
      * WARNING: this does not perform commutive handling correctly. use the index newTerm method for now
      */
@@ -331,7 +353,6 @@ public class GenericCompound<T extends Term> implements Compound<T> {
     public final int dt() {
         return dt;
     }
-
 
 
     @Override

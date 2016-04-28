@@ -351,12 +351,12 @@ public class NarseseTest {
     @Test
     public void testSet() {
         Compound xInt = term("[x]");
-        assertEquals(Op.SET_INT_OPENER, xInt.op());
+        assertEquals(Op.SET_INT, xInt.op());
         assertEquals(1, xInt.size());
         assertEquals("x", xInt.term(0).toString());
 
         Compound xExt = term("{x}");
-        assertEquals(Op.SET_EXT_OPENER, xExt.op());
+        assertEquals(Op.SET_EXT, xExt.op());
         assertEquals(1, xExt.size());
         assertEquals("x", xExt.term(0).toString());
 

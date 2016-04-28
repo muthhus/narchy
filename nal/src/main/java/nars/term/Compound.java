@@ -193,18 +193,8 @@ public interface Compound<T extends Term> extends Term, IPair, TermContainer<T> 
      * implementations may assume that y's .op() already matches this, and that
      * equality has already determined to be false.
      * */
-    default boolean match(@NotNull Compound y, @NotNull FindSubst subst) {
+    boolean match(@NotNull Compound y, @NotNull FindSubst subst);
 
-        //TODO in compiled Compound's for patterns, include
-        //# of PATTERN_VAR so that at this point, if
-        //# vars of the expected pattern are zero,
-        //and since it doesnt equal, there is no match to test
-
-
-        return /*(firstEllipsis() != null) ?
-                subst.matchCompoundWithEllipsis(this, y) :*/
-                subst.matchCompound(this, y);
-    }
 
 
 //    @Nullable

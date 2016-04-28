@@ -298,12 +298,14 @@ public class PremiseRule extends GenericCompound {
     }
 
     /** the task-term pattern */
-    @NotNull protected final Term getTask() {
+    @NotNull
+    public final Term getTask() {
         return getPremise().term(0);
     }
 
     /** the belief-term pattern */
-    @NotNull protected final Term getBelief() {
+    @NotNull
+    public final Term getBelief() {
         return getPremise().term(1);
     }
 

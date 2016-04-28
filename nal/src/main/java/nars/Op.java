@@ -54,8 +54,8 @@ public enum Op {
     SPACE("+", true, 7, Args.GTEOne),
 
 
-    SET_INT_OPENER("[", true, 2, Args.GTEOne), //OPENER also functions as the symbol for the entire compound
-    SET_EXT_OPENER("{", true, 2, Args.GTEOne), //OPENER also functions as the symbol for the entire compound
+    SET_INT("[", true, 2, Args.GTEOne), //OPENER also functions as the symbol for the entire compound
+    SET_EXT("{", true, 2, Args.GTEOne), //OPENER also functions as the symbol for the entire compound
 
 
     IMPLICATION("==>", 5, OpType.Relation, Args.Two),
@@ -101,15 +101,7 @@ public enum Op {
      *  -1 for unlimited */
     public final int minSize, maxSize;
 
-    /**
-     * opener?
-     */
-    public final boolean opener;
 
-    /**
-     * closer?
-     */
-    public final boolean closer;
 
     /**
      * minimum NAL level required to use this operate, or 0 for N/A
@@ -117,6 +109,7 @@ public enum Op {
     public final int minLevel;
 
     private final boolean commutative;
+    private boolean temporal;
 
 
 //    Op(char c, int minLevel) {
@@ -159,12 +152,11 @@ public enum Op {
 
         this.ch = string.length() == 1 ? string.charAt(0) : 0;
 
-        this.opener = name().endsWith("_OPENER");
-        this.closer = name().endsWith("_CLOSER");
-
         this.minSize= size.getOne();
         this.maxSize = size.getTwo();
 
+        this.temporal = str.equals("&&") || str.equals("==>") || str.equals("<=>");
+            //in(or(CONJUNCTION, IMPLICATION, EQUIV));
 
     }
 
@@ -185,11 +177,6 @@ public enum Op {
         return str;
     }
 
-    /**
-     * alias
-     */
-    public static final Op SET_EXT = Op.SET_EXT_OPENER;
-    public static final Op SET_INT = Op.SET_INT_OPENER;
 
 
     @NotNull
@@ -259,11 +246,11 @@ public enum Op {
         return commutative;
     }
 
-    public final static int TemporalBits = or(CONJUNCTION, IMPLICATION, EQUIV);
+
 
     /** whether this op allows temporal relation (true) or ignores it  (false) */
     public boolean isTemporal() {
-        return in(TemporalBits);
+        return temporal;
     }
 
     public boolean validSize(int length) {

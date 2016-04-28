@@ -3,19 +3,28 @@ package nars.util.graph;
 import com.google.common.collect.Iterables;
 import com.gs.collections.impl.map.mutable.primitive.ObjectIntHashMap;
 import com.gs.collections.impl.tuple.Tuples;
+import nars.$;
 import nars.Premise;
 import nars.concept.ConceptProcess;
+import nars.concept.UnifySubst;
+import nars.nal.Deriver;
+import nars.nal.meta.PatternCompound;
+import nars.nal.meta.PremiseEval;
 import nars.nal.meta.PremiseRule;
 import nars.nal.meta.PremiseRuleSet;
+import nars.nal.meta.match.Ellipsis;
 import nars.nal.nal8.AbstractOperator;
 import nars.nar.Terminal;
 import nars.task.Task;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
+import nars.term.transform.VariableNormalization;
 import nars.term.variable.Variable;
 import nars.util.Texts;
+import nars.util.data.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jgrapht.EdgeFactory;
@@ -23,6 +32,8 @@ import org.jgrapht.graph.DirectedPseudograph;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static nars.term.Terms.*;
 
 /**
  * table for holding derivation results for online & offline
@@ -48,29 +59,102 @@ public class DerivationGraph extends DirectedPseudograph<Term, Integer> {
     int edgeID = 0;
 
     public DerivationGraph(PremiseRuleSet rules) {
-        super((EdgeFactory)null);
+        super(Integer.class);
 
-        List<Compound> l = rules.rules.stream().map(PremiseRule::reified).distinct().collect(Collectors.toList());
+        List<Compound> patterns = rules.rules.stream().map(PremiseRule::reified).distinct().collect(Collectors.toList());
 
         TreeSet<Term> taskSet = new TreeSet();
-        l.forEach(p -> {
+        patterns.forEach(p -> {
             addVertex(p);
             Compound subject = (Compound)p.term(0);
-            taskSet.add(subject.term(0)); //task
-            taskSet.add(subject.term(1)); //belief
-            taskSet.add(p.term(1)); //conclusion
+            Compound pred = (Compound)p.term(1);
+
+
+
+            Term conc = normalize(pred.term(0));
+            if (taskSet.add(conc)) { //conclusion
+                addVertex(conc);
+            }
+            addEdge(p, conc, edgeID++);
+
+            //TODO create edges for the additional possibility of a conclusion containing an ellipsis to collapse to a singular term by transofrming it that way and adding that as a secondary conclusion path
+
+
+            Term tp = normalize(subject.term(0));
+            if (taskSet.add(tp)) { //task
+                addVertex(tp);
+            }
+            addEdge(tp,p, edgeID++);
+
+
+            Term bp = normalize(subject.term(1));
+            if (taskSet.add(bp)) { //task
+                addVertex(bp);
+            }
+            addEdge(bp,p, edgeID++);
+
+
         });
         List<Term> tasks = new ArrayList(taskSet);
-        tasks.forEach(p -> {
-            addVertex(p);
+
+
+        patterns.forEach(p -> {
+            Compound subject = (Compound)p.term(0);
+            Term tp = normalize(subject.term(0));
+            Term bp = normalize(subject.term(1));
+            tasks.forEach(t -> {
+                if (unifies(tp, t)) //the pattern goes in the first argument
+                    addEdge(t, tp, edgeID++);
+
+                if (unifies(bp, t)) //the pattern goes in the first argument
+                    addEdge(t, bp, edgeID++);
+            });
         });
 
-        l.forEach(p -> {
-            addEdge(p, p.term(1), edgeID++);
-        });
 
-        //TODO unify all tasks to the potential premises they unify with and create edges
 
+    }
+
+    public
+    @Nullable
+    Term normalize(Term x) {
+        if (x instanceof Compound)
+            return terms.transform((Compound)x, new VariableNormalization());
+        else if (x instanceof Variable)
+            return $.v(x.op(), 1);
+        else
+            return x;
+    }
+
+    int matches = 0;
+    final PremiseEval p = new PremiseEval(new XorShift128PlusRandom(1), Deriver.getDefaultDeriver()) {
+
+        @Override
+        public boolean onMatch() {
+            matches++;
+            return false; //only need the first one
+        }
+    };
+
+    private boolean unifies(Term a, Term b) {
+        //HACK
+        matches = 0;
+
+        p.matchAll(a, b);
+        p.clear();
+
+
+        //System.out.println(a + " " + b + " " + (matches > 0));
+        boolean match = matches > 0;
+        if (match && !a.equals(b))
+            System.out.println(a + " " + b + " " + (match));
+        return match;
+
+    }
+
+    public static void main(String[] args) {
+        DerivationGraph d = new DerivationGraph(Deriver.getDefaultDeriver().rules);
+        System.out.println(d.vertexSet().size() + " vertices, " + d.edgeSet().size() + " edges");
     }
 }
 

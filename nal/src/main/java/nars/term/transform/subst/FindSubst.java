@@ -58,7 +58,8 @@ public abstract class FindSubst extends Versioning implements Subst, Supplier<Ve
     public final Op type;
 
     @Nullable
-    public TermIndex index;
+    public TermIndex index = Terms.terms; //default static index
+
 
     /**
      * variables whose contents are disallowed to equal each other
@@ -242,9 +243,9 @@ public abstract class FindSubst extends Versioning implements Subst, Supplier<Ve
      */
     public final boolean match(@NotNull Term x, @NotNull Term y) {
 
-        if (x.equals(y)) {
+        if (x.equals(y))
             return true;
-        }
+
 
 
         Op xOp = x.op();
@@ -260,15 +261,18 @@ public abstract class FindSubst extends Versioning implements Subst, Supplier<Ve
             Op t = type;
 
             if (xOp == t) {
-                return matchXvar(x, y);
-            }
+                if (yOp == t) {
+                    //both are variables of the target type, but different; these need to be common variable
+                    return matchVarCommon(x, y);
+                }
 
-            if (yOp == t) {
-                return matchYvar(x, y);
+                return matchVarX(x, y);
+            } else if (yOp == t) {
+                return matchVarY(x, y);
             }
 
             if (xOp.isVar() && yOp.isVar()) {
-                return nextVarX( x, y);
+                return matchVarCommon( x, y);
             }
         }
 
@@ -279,7 +283,7 @@ public abstract class FindSubst extends Versioning implements Subst, Supplier<Ve
 //        return x.complexity()<x.volume() || x.firstEllipsis()!=null;
 //    }
 
-    private final boolean nextVarX(@NotNull Term /* var */ xVar, @NotNull Term /* var */ y) {
+    private final boolean matchVarCommon(@NotNull Term /* var */ xVar, @NotNull Term /* var */ y) {
         Op xOp = xVar.op();
         return (y.op() == xOp) ?
                 putCommon((Variable)xVar, (Variable)y) :
@@ -295,14 +299,14 @@ public abstract class FindSubst extends Versioning implements Subst, Supplier<Ve
     }
 
 
-    private final boolean matchXvar(@NotNull Term /* var */ x, @NotNull Term y) {
+    private final boolean matchVarX(@NotNull Term /* var */ x, @NotNull Term y) {
         Term t = term(x);
         return (t != null) ?
                 match(t, y) :
-                nextVarX(x, y);
+                matchVarCommon(x, y);
     }
 
-    private final boolean matchYvar(@NotNull Term x, @NotNull Term /* var */ y) {
+    private final boolean matchVarY(@NotNull Term x, @NotNull Term /* var */ y) {
         Term t = yx.term(y);
         return (t != null) ?
                 match(x, t) :
@@ -869,19 +873,6 @@ public abstract class FindSubst extends Versioning implements Subst, Supplier<Ve
         //TODO yx also?
     }
 
-
-    /**
-     * default compound matching; op will already have been compared. no ellipsis will be involved
-     */
-    public final boolean matchCompound(@NotNull Compound x, @NotNull Compound y) {
-        int ys = y.size();
-        if ((x.size() == ys) && (x.relation() == y.relation())) {
-            return (y.isCommutative()) ?
-                    matchPermute(x, y) :
-                    matchLinear(x.subterms(), y.subterms());
-        }
-        return false;
-    }
 
     /**
      * VersionMap<Term,Term> which caches Variable keys, but allows any Term as keys (uncached)
